@@ -1,0 +1,106 @@
+/* Fields & Inputs */
+.ui-input-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.ui-input__wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.ui-input,
+.ui-select {
+  width: 100%;
+  min-height: var(--ui-control-height-md);
+  padding: 0 var(--space-4);
+  border-radius: var(--ui-control-radius);
+  border: 1px solid var(--ui-control-border);
+  background: var(--color-input-bg, var(--ui-control-bg));
+  color: var(--ui-control-text);
+  outline: none;
+  transition:
+    border-color var(--motion-fast),
+    box-shadow var(--motion-fast),
+    background-color var(--motion-fast),
+    color var(--motion-fast);
+}
+
+.ui-input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.65;
+}
+
+.ui-input--password {
+  padding-right: 2.75rem;
+}
+
+.ui-input:hover:not(:focus):not(.ui-input--error),
+.ui-select:hover:not(:focus) {
+  border-color: color-mix(in srgb, var(--color-accent) 35%, var(--ui-control-border));
+}
+
+.ui-input:focus,
+.ui-input:focus-visible,
+.ui-select:focus,
+.ui-select:focus-visible {
+  border-color: var(--color-accent);
+  box-shadow: var(--ui-control-shadow-focus, var(--focus-ring));
+}
+
+.ui-input--error {
+  border-color: var(--color-state-danger);
+}
+
+.ui-input--error:focus {
+  border-color: var(--color-state-danger);
+  box-shadow: var(--focus-ring-danger);
+}
+
+.ui-input--error:focus-visible {
+  border-color: var(--color-state-danger);
+  box-shadow: var(--focus-ring-danger);
+}
+
+.ui-input__toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xs);
+  border: 0;
+  background: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--motion-fast), transform var(--motion-fast);
+}
+
+.ui-input__toggle:hover {
+  color: var(--color-ink);
+}
+
+.ui-input__toggle:focus-visible {
+  outline: none;
+  color: var(--color-ink);
+}
+
+.ui-field__error {
+  margin-top: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-state-danger);
+}
+
+.ui-field__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -0.0625rem;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

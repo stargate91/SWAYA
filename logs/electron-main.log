@@ -1,0 +1,11 @@
+[2026-06-21T21:16:10.369Z] [WARN] Renderer requested app quit flow
+[2026-06-21T21:16:10.369Z] [INFO] Requesting renderer close decision
+{
+  "source": "quit-button"
+}
+[2026-06-21T21:16:11.203Z] [INFO] Renderer responded to close prompt
+{
+  "action": "quit",
+  "rememberChoice": false
+}
+[2026-06-21T21:16:11.203Z] [WARN] before-quit fired

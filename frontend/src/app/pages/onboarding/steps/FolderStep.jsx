@@ -1,0 +1,98 @@
+import { FolderOpen, CheckCircle } from 'lucide-react';
+import Button from '@/ui/Button';
+import OnboardingInfoCard from '../OnboardingInfoCard';
+import OnboardingPanelCard from '../OnboardingPanelCard';
+import OnboardingOrbitHero from '../OnboardingOrbitHero';
+import { useTranslation } from '@/providers/LanguageContext';
+
+export default function FolderStep({
+  scanDir,
+  setScanDir,
+  pickScanDir,
+  libraryPath,
+  setLibraryPath,
+  pickLibraryPath,
+  validateDirs,
+  isValidatingFolders,
+  folderValidation,
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="onboarding-split-layout">
+      <OnboardingInfoCard
+        visual={(
+          <OnboardingOrbitHero
+            icon={FolderOpen}
+            chips={[
+              { label: 'Scan folder' },
+              { label: 'Library' },
+              { label: 'Organize' },
+            ]}
+          />
+        )}
+        kicker="Library paths"
+        title="Choose where SWAYA should work."
+        description="Set the source folder SWAYA watches and, if you want, the clean library destination it should build into."
+        items={[
+          {
+            icon: FolderOpen,
+            title: 'Step 5 of 6',
+            description: 'This tells SWAYA where your unorganized files live and where finished media can go.',
+          },
+          {
+            icon: CheckCircle,
+            title: 'Validate before continuing',
+            description: 'SWAYA checks the folders now so the first scan does not fail later.',
+          },
+        ]}
+      />
+
+      <OnboardingPanelCard
+        eyebrow="Step 5"
+        title="Set your library folders"
+        meta={<div className="welcome-lang-pill">{t('onboarding.folder.pathsRequired')}</div>}
+        description="Pick the folders SWAYA should read from and organize into."
+        footerLabel="Required to continue"
+        footerValue="Validate the folder setup first"
+      >
+        <div className="onboarding-form-group">
+          <label>{t('onboarding.folder.scanSourceDirectory')}</label>
+          <div className="onboarding-input-wrapper">
+            <input 
+              type="text" 
+              value={scanDir}
+              onChange={(e) => setScanDir(e.target.value)}
+              placeholder="Select source folder (optional)"
+            />
+            <Button variant="secondary" onClick={pickScanDir}>{t('onboarding.folder.browse')}</Button>
+          </div>
+        </div>
+        <div className="onboarding-form-group">
+          <label>{t('onboarding.folder.targetLibraryDirectory')}</label>
+          <div className="onboarding-input-wrapper">
+            <input 
+              type="text" 
+              value={libraryPath}
+              onChange={(e) => setLibraryPath(e.target.value)}
+              placeholder="Select target library folder"
+            />
+            <Button variant="secondary" onClick={pickLibraryPath}>{t('onboarding.folder.browse')}</Button>
+          </div>
+        </div>
+        <Button 
+          variant="secondary" 
+          onClick={validateDirs}
+          disabled={isValidatingFolders}
+        >
+          {isValidatingFolders ? 'Validating...' : 'Validate Folders'}
+        </Button>
+        {folderValidation.valid !== null && (
+          <div className={`onboarding-validation-status ${folderValidation.valid ? 'success' : 'error'}`}>
+            {folderValidation.message}
+          </div>
+        )}
+      </OnboardingPanelCard>
+    </div>
+  );
+}

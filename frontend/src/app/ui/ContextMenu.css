@@ -1,0 +1,97 @@
+.ui-context-menu {
+  position: fixed;
+  top: var(--context-menu-top, 0);
+  left: var(--context-menu-left, 0);
+  z-index: var(--z-index-context-menu, 9999);
+  min-width: 180px;
+  background: color-mix(in srgb, var(--color-bg-elevated) 82%, transparent);
+  backdrop-filter: var(--context-menu-backdrop-filter, blur(12px) saturate(140%));
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-overlay-context, 0 10px 30px color-mix(in srgb, black 40%, transparent)), 0 1px 3px var(--color-border-subtle);
+  padding: var(--space-1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  animation: contextMenuScaleIn var(--motion-duration-fast) var(--motion-ease-emphasized) forwards;
+  transform-origin: top left;
+  pointer-events: auto;
+}
+
+@keyframes contextMenuScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.ui-context-menu__item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-sm) var(--space-3);
+  background: transparent;
+  border: 0;
+  border-radius: calc(var(--radius-md) - 3px);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--motion-fast);
+  user-select: none;
+}
+
+.ui-context-menu__item:hover:not(:disabled) {
+  background: var(--color-surface-glass);
+  color: var(--color-ink);
+}
+
+.ui-context-menu__item:active:not(:disabled) {
+  background: var(--color-surface-glass-strong);
+}
+
+.ui-context-menu__item:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ui-context-menu__item.is-danger {
+  color: var(--color-state-danger);
+}
+
+.ui-context-menu__item.is-danger:hover:not(:disabled) {
+  background: var(--color-state-danger-bg);
+  color: var(--color-state-danger);
+}
+
+.ui-context-menu__icon {
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity var(--motion-fast);
+}
+
+.ui-context-menu__item:hover:not(:disabled) .ui-context-menu__icon {
+  opacity: 1;
+}
+
+.ui-context-menu__label {
+  flex: 1 1 0;
+}
+
+.ui-context-menu__shortcut {
+  font-size: 10px;
+  color: var(--color-muted);
+  opacity: 0.6;
+}
+
+.ui-context-menu__divider {
+  height: 1px;
+  background: var(--color-border-subtle);
+  margin: var(--space-1) 0;
+}

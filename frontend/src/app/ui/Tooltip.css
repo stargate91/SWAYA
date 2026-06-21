@@ -1,0 +1,37 @@
+/* Tooltip */
+.ui-tooltip {
+  display: inline-flex;
+}
+
+.ui-tooltip__content {
+  position: fixed;
+  left: var(--tooltip-left, 0);
+  top: var(--tooltip-top, 0);
+  z-index: 3000;
+  max-width: var(--tooltip-max-width, 260px);
+  padding: var(--tooltip-padding);
+  border-radius: var(--tooltip-radius);
+  background: var(--tooltip-bg);
+  border: 1px solid var(--tooltip-border);
+  color: var(--tooltip-color);
+  font: var(--text-caption);
+  line-height: 1.35;
+  box-shadow: var(--tooltip-shadow);
+  backdrop-filter: var(--tooltip-blur);
+  white-space: normal;
+  word-break: break-word;
+  pointer-events: none;
+  transform: translate3d(-50%, -100%, 0);
+}
+
+.ui-tooltip__content[data-side='bottom'] {
+  transform: translate3d(-50%, 0, 0);
+}
+
+.ui-tooltip__content[data-side='right'] {
+  transform: translate3d(0, -50%, 0);
+}
+
+.ui-tooltip__content[data-side='left'] {
+  transform: translate3d(-100%, -50%, 0);
+}

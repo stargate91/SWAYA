@@ -1,0 +1,121 @@
+import { FolderOpen, Video, Check, Eye, Play, BellPlus, Flame } from 'lucide-react';
+import Button from '@/ui/Button';
+import { formatEpisodeNumber } from '../../utils/detailUtils';
+import { useMediaDetailContext } from './MediaDetailContext';
+
+export default function MediaActions() {
+  const { state, actions, mutations, t, navigate } = useMediaDetailContext();
+  const {
+    isOwned,
+    isMovie,
+    item,
+    isTracked,
+    canToggleTracked,
+    isWatched,
+    canToggleWatched,
+    nextEpisodeInfo
+  } = state;
+
+  const {
+    handleTrailerClick,
+    handleToggleWatched,
+    handleToggleTracked,
+    handlePlayClick
+  } = actions;
+
+  const {
+    updateStatusMutation,
+    bulkUpdateWatchedMutation,
+    toggleVirtualTrackedMutation,
+    playMutation,
+    addPeakMutation
+  } = mutations;
+
+  const hasCollection = isMovie && item?.collection_data;
+  const hasTrailer = item?.trailer_key;
+
+  if (!isOwned && !canToggleTracked && !canToggleWatched && !hasCollection && !hasTrailer) return null;
+
+  return (
+    <div className="media-detail-page__actions-row">
+      {hasCollection && (
+        <Button
+          variant="ghost"
+          onClick={() => navigate(`/library/collection/${item?.collection_data.tmdb_id}`)}
+        >
+          <FolderOpen size={16} />
+          {t('library.details.collection') || 'Collection'}
+        </Button>
+      )}
+
+      {hasTrailer && (
+        <Button
+          variant="ghost"
+          onClick={handleTrailerClick}
+        >
+          <Video size={16} />
+          {t('library.details.trailer') || 'Trailer'}
+        </Button>
+      )}
+
+      {canToggleWatched && (
+        <Button
+          variant="ghost"
+          onClick={handleToggleWatched}
+          disabled={updateStatusMutation.isPending || bulkUpdateWatchedMutation.isPending}
+        >
+          {isWatched ? <Check size={16} /> : <Eye size={16} />}
+          {isWatched ? (t('library.details.watched') || 'Watched') : (t('library.details.markWatched') || 'Mark as Watched')}
+        </Button>
+      )}
+
+      {canToggleTracked && (
+        <Button
+          variant="ghost"
+          onClick={handleToggleTracked}
+          disabled={toggleVirtualTrackedMutation.isPending}
+        >
+          {isTracked ? <Check size={16} /> : <BellPlus size={16} />}
+          {isTracked ? 'Tracked' : 'Track'}
+        </Button>
+      )}
+
+      {isOwned && (
+        <>
+          {(item?.is_adult && isMovie) && (
+            <Button
+              variant="ghost"
+              onClick={() => addPeakMutation.mutate(item.id)}
+              disabled={addPeakMutation.isPending}
+            >
+              <Flame size={16} />
+              {t('library.details.addPeak') || 'Add Peak'}
+            </Button>
+          )}
+
+          {isMovie ? (
+            <Button
+              variant="secondary"
+              onClick={handlePlayClick}
+              disabled={playMutation.isPending}
+            >
+              <Play size={16} fill="currentColor" />
+              {item?.resume_position > 0 ? (t('library.details.resume') || 'Resume') : (t('library.details.play') || 'Play')}
+            </Button>
+          ) : (
+            nextEpisodeInfo && (
+              <Button
+                variant="secondary"
+                onClick={handlePlayClick}
+                disabled={playMutation.isPending}
+              >
+                <Play size={16} fill="currentColor" />
+                {t('library.details.continueEpisode', { defaultValue: 'Continue S{{season}} E{{episode}}', season: nextEpisodeInfo.seasonNumber, episode: formatEpisodeNumber(nextEpisodeInfo.episode.episode_number) })}
+              </Button>
+            )
+          )}
+        </>
+      )}
+    </div>
+  );
+}

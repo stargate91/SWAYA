@@ -1,0 +1,74 @@
+.backdrops-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+.backdrops-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-md);
+  padding-inline: 0.25rem;
+  padding-top: var(--space-2xs);
+  padding-bottom: var(--space-2xs);
+  box-sizing: border-box;
+  contain: layout paint;
+}
+
+.backdrops-grid > * {
+  content-visibility: auto;
+  contain-intrinsic-size: 180px 108px;
+}
+
+.backdrops-panel .ui-backdrop-card {
+  contain: paint;
+}
+
+.backdrops-panel__empty {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-align: center;
+  padding: var(--space-4xl) 0;
+  font-style: italic;
+}
+
+.backdrops-panel__empty-state {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+.backdrops-panel__load-more-trigger {
+  grid-column: 1 / -1;
+  height: 1px;
+}
+
+@media (max-width: 1200px) {
+  .backdrops-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .backdrops-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.backdrops-grid--logo {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ui-backdrop-card--logo {
+  padding-bottom: 40% !important;
+}
+
+.ui-backdrop-card--logo .ui-backdrop-card__img {
+  object-fit: contain !important;
+  background: var(--color-surface-glass);
+  padding: var(--space-md);
+  box-sizing: border-box;
+}
+
+.ui-backdrop-card--poster {
+  padding-bottom: 150% !important; /* 2:3 aspect ratio */
+}

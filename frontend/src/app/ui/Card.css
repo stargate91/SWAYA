@@ -1,0 +1,70 @@
+/* Sidebar Cards & Pills */
+.shell__sidebar-card,
+.shell__stat-pill {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--ui-surface-card-gradient-soft);
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow-sm);
+}
+
+.ui-media-card {
+  border: 0;
+  border-radius: calc(var(--radius-md) - 2px);
+  overflow: hidden;
+  background: var(--ui-surface-card-media);
+  box-shadow: none;
+}
+
+.ui-card__title {
+  font-family: var(--font-display);
+}
+
+.ui-card__eyebrow {
+  color: var(--color-muted);
+  font: var(--text-caption);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Card */
+.ui-card {
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 7%, transparent);
+  border-radius: var(--radius-lg);
+  background: var(--ui-surface-card-gradient);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(24px) saturate(118%);
+}
+
+.ui-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-5) 0;
+}
+
+.ui-card__title {
+  margin: var(--space-2) 0 0;
+  font: var(--text-title);
+}
+
+.ui-card__body {
+  padding: var(--space-5);
+}
+
+.ui-card--danger {
+  border: 1px solid var(--ui-surface-danger-border) !important;
+  background: 
+    linear-gradient(180deg, var(--ui-surface-danger-tint) 0%, transparent 50%),
+    var(--ui-surface-card-gradient) !important;
+  box-shadow: var(--ui-surface-danger-shadow), var(--shadow-md) !important;
+}
+
+.ui-card--danger .ui-card__eyebrow {
+  color: var(--color-state-danger) !important;
+  font-weight: var(--font-weight-semibold);
+}

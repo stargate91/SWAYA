@@ -1,0 +1,98 @@
+
+/* Grids & Common Layout Helpers */
+.metric-grid,
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.metric-row:last-child {
+  border-bottom: 0;
+}
+
+.ui-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.ui-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+/* Type Ramp */
+.type-ramp {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.type-ramp__hero {
+  font: var(--text-hero);
+}
+
+.type-ramp__title {
+  font: var(--text-title);
+}
+
+.type-ramp__caption {
+  font: var(--text-caption);
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+
+.ui-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.ui-meta-row__item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.ui-meta-row__item + .ui-meta-row__item::before {
+  content: "\2022";
+  margin-right: var(--space-2xs);
+  opacity: 0.4;
+}
+
+/* Common Form Field Layout Styles */
+.ui-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ui-field__label {
+  color: var(--color-muted);
+  font: var(--text-caption);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ui-field__hint {
+  color: var(--color-muted);
+  font: var(--text-caption);
+  text-transform: none;
+  letter-spacing: normal;
+  margin-top: 0.125rem;
+}
+
+

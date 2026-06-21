@@ -1,0 +1,79 @@
+.scraper-order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.scraper-order-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--ui-bg-card-secondary, rgba(255, 255, 255, 0.02));
+  border: 1px solid var(--ui-border, rgba(255, 255, 255, 0.08));
+  border-radius: 8px;
+  cursor: grab;
+  user-select: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scraper-order-row:active {
+  cursor: grabbing;
+}
+
+.scraper-order-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--color-accent);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.scraper-order-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.scraper-order-drag-handle {
+  display: flex;
+  align-items: center;
+  color: var(--color-muted, #888);
+  cursor: grab;
+  transition: color 0.2s ease;
+}
+
+.scraper-order-row:hover .scraper-order-drag-handle {
+  color: var(--color-accent);
+}
+
+.scraper-order-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  color: var(--color-accent);
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.scraper-order-row:hover .scraper-order-badge {
+  background: var(--color-accent);
+  color: #000;
+  transform: scale(1.05);
+}
+
+.scraper-order-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-ink, #fff);
+}
+
+.scraper-order-actions {
+  display: flex;
+  gap: 4px;
+}

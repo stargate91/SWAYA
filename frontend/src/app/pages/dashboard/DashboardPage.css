@@ -1,0 +1,31 @@
+/* Dashboard Content */
+.dashboard-container {
+  padding: 0;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.dashboard-container .page-header {
+  margin-bottom: var(--space-6xl);
+}
+
+.dashboard-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 120px);
+}
+
+.dashboard-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-border-subtle);
+  border-top-color: var(--color-accent-blue);
+  border-radius: 50%;
+  animation: spin var(--motion-duration-spinner-slow) var(--motion-ease-linear) infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
