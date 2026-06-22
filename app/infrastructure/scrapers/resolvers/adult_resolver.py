@@ -109,7 +109,7 @@ class AdultResolver:
 
     def _resolve_adult_item(self, item: MediaItem, mode: ScanMode = ScanMode.SCENES, task_id: Optional[int] = None, preferred_provider: Optional[Provider] = None):
         scrapers_to_try = self._build_scrapers_to_try(preferred_provider)
-        logger.info('[adult:%s] Resolving %s | file=%s | md5=%s | oshash=%s', mode.value, item.id, item.filename, (item.hash_md5 or '')[:12], (item.hash_oshash or '')[:12])
+        logger.info('[adult:%s] Resolving %s | file=%s | oshash=%s | phash=%s', mode.value, item.id, item.filename, (item.hash_oshash or '')[:12], (item.hash_phash or '')[:12])
         logger.info('[adult:%s] Providers to try: %s', mode.value, [provider.value for _scraper, provider in scrapers_to_try])
 
         if not scrapers_to_try:
@@ -138,6 +138,7 @@ class AdultResolver:
 
         for scraper, provider in scrapers_to_try:
             scene_data = None
+            matched_hash_type = None
 
             if provider in (Provider.STASHDB, Provider.FANSDB):
                 hash_query = """
@@ -162,7 +163,7 @@ class AdultResolver:
                   }
                 }
                 """
-                for hash_type, hash_value in [('md5', item.hash_md5), ('oshash', item.hash_oshash), ('phash', item.hash_phash)]:
+                for hash_type, hash_value in [('oshash', item.hash_oshash), ('phash', item.hash_phash)]:
                     if scene_data or not hash_value:
                         continue
                     logger.info('[adult:%s] Trying %s %s lookup for %s', mode.value, provider.value, hash_type.upper(), item.filename)
@@ -172,6 +173,7 @@ class AdultResolver:
                         # Verify cached match duration
                         if cached and validate_duration(cached):
                             scene_data = cached
+                            matched_hash_type = hash_type
                         continue
                     try:
                         res = scraper.execute_query(hash_query, {'hash': hash_value})
@@ -179,6 +181,7 @@ class AdultResolver:
                         candidate = scenes[0] if scenes else None
                         if candidate and validate_duration(candidate):
                             scene_data = candidate
+                            matched_hash_type = hash_type
                             scraper.cache.set(provider, cache_key, scene_data or {})
                         else:
                             if candidate:
@@ -193,7 +196,7 @@ class AdultResolver:
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                 }
-                for hash_type, hash_value in [('oshash', item.hash_oshash), ('md5', item.hash_md5)]:
+                for hash_type, hash_value in [('oshash', item.hash_oshash)]:
                     if scene_data or not hash_value:
                         continue
                     cache_key = f'porndb/scenes/hash/v2/{hash_type.lower()}/{hash_value}'
@@ -201,6 +204,7 @@ class AdultResolver:
                     if cached is not None:
                         if cached and validate_duration(cached):
                             scene_data = cached
+                            matched_hash_type = hash_type
                         continue
                     url = f'{PORNDB_API_BASE}/scenes/hash/{hash_value}?type={hash_type.upper()}'
                     try:
@@ -211,6 +215,7 @@ class AdultResolver:
                             candidate = (res_json or {}).get('data')
                             if candidate and validate_duration(candidate):
                                 scene_data = candidate
+                                matched_hash_type = hash_type
                                 scraper.cache.set(provider, cache_key, scene_data or {})
                             else:
                                 if candidate:
@@ -223,15 +228,22 @@ class AdultResolver:
 
             if scene_data:
                 logger.info('[adult:%s] Hash lookup matched %s -> provider=%s external_id=%s title=%s', mode.value, item.filename, provider.value, scene_data.get('id'), scene_data.get('title'))
-                self._persist_scene_match(item=item, provider=provider, scraper=scraper, scene_data=scene_data, confidence=1.0)
+                self._persist_scene_match(
+                    item=item,
+                    provider=provider,
+                    scraper=scraper,
+                    scene_data=scene_data,
+                    confidence=1.0,
+                )
                 item.status = ItemStatus.MATCHED
                 scraper.log_search(
                     task_id=task_id,
                     media_item_id=item.id,
-                    search_query=f'hash: md5={item.hash_md5}, oshash={item.hash_oshash}',
+                    search_query=f'hash: oshash={item.hash_oshash}, phash={item.hash_phash}',
                     result_count=1,
                     details={
                         'hash_match': True,
+                        'hash_type': matched_hash_type,
                         'matched_scene_id': str(scene_data['id']),
                         'matched_title': scene_data.get('title'),
                         'final_status': 'matched',

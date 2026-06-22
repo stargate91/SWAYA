@@ -215,7 +215,7 @@ export default function OrganizerPage() {
     toast,
     openModal,
     closeModal,
-    dismissedRowIds,
+    sortedRows,
     scanStatusQuery,
     scanMode,
     sessionMode,

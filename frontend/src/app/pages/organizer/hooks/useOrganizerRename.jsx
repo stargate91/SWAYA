@@ -14,7 +14,7 @@ const EMPTY_ORGANIZER = {
 
 export function useOrganizerRename({
   organizerQuery,
-  dismissedRowIds,
+  sortedRows,
   isScanActive,
   renameMutation,
   queryClient,
@@ -38,11 +38,28 @@ export function useOrganizerRename({
       ...(currentOrganizer.tv || []),
       ...(currentOrganizer.collisions || []),
     ];
-    const matchedItems = allItems.filter((item) => {
-      const isMatched = String(item.status || '').toLowerCase() === 'matched';
-      const isDismissed = dismissedRowIds?.has(`item-${item.id}`);
-      return isMatched && !isDismissed;
+    const organizerItemsById = new Map(allItems.map((item) => [item.id, item]));
+
+    const visibleMatchedItemIds = new Set();
+    const visibleExtraIds = new Set();
+
+    (sortedRows || []).forEach((row) => {
+      if (row.rawType === 'extra') {
+        if (String(row.parentStatus || '').toLowerCase() === 'matched' && row.parent_id) {
+          visibleMatchedItemIds.add(row.parent_id);
+          visibleExtraIds.add(row.itemId);
+        }
+        return;
+      }
+
+      if (row.rawStatus === 'matched') {
+        visibleMatchedItemIds.add(row.itemId);
+      }
     });
+
+    const matchedItems = [...visibleMatchedItemIds]
+      .map((itemId) => organizerItemsById.get(itemId))
+      .filter(Boolean);
 
     if (matchedItems.length === 0) {
       toast(t('organizer.toasts.noMatchedItems'), 'danger');
@@ -51,9 +68,11 @@ export function useOrganizerRename({
 
     const matchedItemIds = new Set(matchedItems.map((item) => item.id));
     const matchedExtras = (currentOrganizer.extras || []).filter((extra) => {
-      const parentIsMatched = matchedItemIds.has(extra.parent_id || extra.parent_item_id);
-      const isDismissed = dismissedRowIds?.has(`extra-${extra.id}`);
-      return parentIsMatched && !isDismissed;
+      const parentId = extra.parent_id || extra.parent_item_id;
+      const extraId = extra.id;
+      const parentIsMatched = matchedItemIds.has(parentId);
+      const isShownExtra = visibleExtraIds.size === 0 || visibleExtraIds.has(extraId);
+      return parentIsMatched && isShownExtra;
     });
 
     const mappedItems = [

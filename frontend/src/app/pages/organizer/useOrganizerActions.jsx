@@ -14,7 +14,7 @@ export function useOrganizerActions({
   toast,
   openModal,
   closeModal,
-  dismissedRowIds,
+  sortedRows,
   scanStatusQuery,
   scanMode,
   sessionMode,
@@ -46,13 +46,11 @@ export function useOrganizerActions({
 
   const { handleRename, isRenameStarting } = useOrganizerRename({
     organizerQuery,
-    dismissedRowIds,
+    sortedRows,
     isScanActive,
     renameMutation,
     queryClient,
     renameStartedRef,
-    scanMode,
-    sessionMode,
     t,
     toast,
     openModal,

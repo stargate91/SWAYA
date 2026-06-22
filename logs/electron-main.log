@@ -3191,3 +3191,17 @@
   "line": 88,
   "sourceId": "http://localhost:5173/src/main.jsx"
 }
+[2026-06-22T22:46:47.828Z] [ERROR] Renderer console message
+{
+  "level": "error",
+  "message": "In HTML, %s cannot be a descendant of <%s>.\nThis will cause a hydration error.%s <button> button \n\n  ...\n    <OrganizerPage>\n      <OrganizerModalProvider focusFirstAvailableResult={function focusFirstAvailableResult} ...>\n        <OrganizerPageContent activeExtrasTab=\"bonus\" activeManualTab=\"movies\" activeImage={{path:\"/med...\"}} ...>\n          <Page className=\"organizer-...\">\n            <div className=\"ui-page or...\">\n              <div className={\"organize...\"}>\n                <div>\n                <OrganizerDetailsPanel activeImage={{path:\"/med...\"}} activeImageIndex={0} activeImages={[...]} ...>\n                  <aside className=\"organizer-...\" aria-label=\"Details\">\n                    <div>\n                    <div className=\"organizer-...\">\n                      <div className=\"organizer-...\">\n                        <div>\n                        <div className=\"organizer-...\">\n                          <PosterCard className=\"organizer-...\" imageUrl=\"http://loc...\" placeholderText={undefined} ...>\n                            <div className=\"ui-poster-...\" style={undefined}>\n                              <div className=\"ui-poster-...\">\n>                               <button\n>                                 type=\"button\"\n>                                 className=\"ui-poster-card__image-wrapper\"\n>                                 onClick={function handleOpenLightbox}\n>                                 disabled={undefined}\n>                               >\n                                  <MediaCard className=\"ui-poster-...\">\n                                    <div className=\"ui-media-c...\">\n                                      <img>\n>                                     <button\n>                                       type=\"button\"\n>                                       className=\"organizer-details__image-nav organizer-details__image-nav--prev\"\n>                                       aria-label=\"Previous image\"\n>                                       onClick={function onClick}\n>                                     >\n                                      ...\n                          ...\n",
+  "line": 88,
+  "sourceId": "http://localhost:5173/src/main.jsx"
+}
+[2026-06-22T22:46:47.833Z] [ERROR] Renderer console message
+{
+  "level": "error",
+  "message": "<%s> cannot contain a nested %s.\nSee this log for the ancestor stack trace. button <button>",
+  "line": 88,
+  "sourceId": "http://localhost:5173/src/main.jsx"
+}

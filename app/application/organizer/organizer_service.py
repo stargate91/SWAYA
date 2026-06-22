@@ -113,7 +113,7 @@ class OrganizerService:
         previews = []
         preview_map = {}
         for item in items:
-            active_match = next((m for m in item.matches), None)
+            active_match = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
             overrides = item.overrides
             target_lang = overrides.custom_language if (overrides and overrides.custom_language) else (formatter.config.default_target_language or pref_lang)
             if active_match:
@@ -150,7 +150,7 @@ class OrganizerService:
                     "year": m.release_date.year if m.release_date else None,
                     "poster_path": loc.poster_path if loc else None,
                     "vote_average": m.rating_tmdb,
-                    "is_active": True,
+                    "is_active": m.is_active,
                     "confidence": m.confidence_score,
                     "is_adult": m.is_adult
                 })
@@ -158,7 +158,7 @@ class OrganizerService:
             itype = self._infer_organizer_type(item)
             images_list = []
             if item.matches:
-                active_m = next((m for m in item.matches), None)
+                active_m = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
                 if active_m:
                     if active_m.media_type == MediaType.EPISODE:
                         season_m = None
