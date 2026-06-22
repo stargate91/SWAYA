@@ -1,12 +1,14 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useState } from 'react';
 
-export function useOrganizerDismissState({ organizer }) {
-  const [dismissedRowIds, setDismissedRowIds] = useState(new Set());
+const EMPTY_SET = new Set();
+
+export function useOrganizerDismissState({ organizer, scopeKey }) {
+  const [dismissedByScope, setDismissedByScope] = useState({});
+  const dismissedRowIds = dismissedByScope[scopeKey] || EMPTY_SET;
 
   useEffect(() => {
     if (!organizer) {
-      setDismissedRowIds(new Set());
       return;
     }
 
@@ -18,30 +20,42 @@ export function useOrganizerDismissState({ organizer }) {
       ...(organizer.extras || []).map((item) => `extra-${item.id}`),
     ]);
 
-    setDismissedRowIds((current) => {
-      const next = new Set();
-      current.forEach((id) => {
+    setDismissedByScope((current) => {
+      const currentScopeSet = current[scopeKey] || EMPTY_SET;
+      const nextScopeSet = new Set();
+      currentScopeSet.forEach((id) => {
         if (validIds.has(id)) {
-          next.add(id);
+          nextScopeSet.add(id);
         }
       });
-      // Return same reference if nothing changed to prevent unnecessary re-renders
-      return next.size === current.size ? current : next;
+
+      return nextScopeSet.size === currentScopeSet.size
+        ? current
+        : {
+          ...current,
+          [scopeKey]: nextScopeSet,
+        };
     });
-  }, [organizer]);
+  }, [organizer, scopeKey]);
 
   const dismissRows = (rowIds) => {
     const parentRowIds = rowIds.filter((id) => id.startsWith('item-'));
     if (parentRowIds.length === 0) return;
-    setDismissedRowIds((current) => {
-      const next = new Set(current);
+    setDismissedByScope((current) => {
+      const next = new Set(current[scopeKey] || EMPTY_SET);
       parentRowIds.forEach((id) => next.add(id));
-      return next;
+      return {
+        ...current,
+        [scopeKey]: next,
+      };
     });
   };
 
   const restoreDismissedRows = () => {
-    setDismissedRowIds(new Set());
+    setDismissedByScope((current) => ({
+      ...current,
+      [scopeKey]: new Set(),
+    }));
   };
 
   const dismissedCount = dismissedRowIds.size;
@@ -51,6 +65,5 @@ export function useOrganizerDismissState({ organizer }) {
     dismissedCount,
     dismissRows,
     restoreDismissedRows,
-    setDismissedRowIds,
   };
 }

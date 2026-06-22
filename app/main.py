@@ -99,6 +99,7 @@ from app.domains.history.routes import router as history_router
 from app.application.media.routes import router as app_media_router
 from app.application.media.playback_routes import router as app_playback_router
 from app.application.recommendations.routes import router as app_rec_router
+from app.application.organizer.routes import router as app_organizer_router
 
 app.include_router(tasks_router)
 app.include_router(media_router)
@@ -117,6 +118,7 @@ app.include_router(history_router)
 app.include_router(app_media_router)
 app.include_router(app_playback_router)
 app.include_router(app_rec_router)
+app.include_router(app_organizer_router)
 
 
 

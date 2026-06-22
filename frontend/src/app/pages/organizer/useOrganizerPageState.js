@@ -10,6 +10,7 @@ import { useOrganizerFocus } from './hooks/useOrganizerFocus';
 const isPornDbMovieMode = (scanMode) => scanMode === 'porndb_movie';
 
 export function useOrganizerPageState({ organizer, t, scanMode, sessionMode }) {
+  const dismissScopeKey = `${sessionMode || 'sfw'}:${scanMode || 'movies_tv'}`;
   const {
     activeMainTab,
     setActiveMainTab,
@@ -24,7 +25,7 @@ export function useOrganizerPageState({ organizer, t, scanMode, sessionMode }) {
     dismissedCount,
     dismissRows,
     restoreDismissedRows,
-  } = useOrganizerDismissState({ organizer });
+  } = useOrganizerDismissState({ organizer, scopeKey: dismissScopeKey });
 
   const {
     visibleMediaCount,

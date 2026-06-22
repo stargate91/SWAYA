@@ -1,50 +1,22 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import Optional
 from pydantic import BaseModel
 
 from app.shared_kernel.database import get_db
 from app.application.recommendations.recommendations_service import RecommendationsService
-from app.application.recommendations.schemas import (
-    RecommendationsResponse,
-    OrganizerGroupsResponse,
-    ActionResponse,
-)
+from app.application.recommendations.schemas import RecommendationsResponse, ActionResponse
 from app.infrastructure.scrapers.support.gateway import scraper_gateway
 
 router = APIRouter(prefix="/api/v1", tags=["Recommendations"])
-
-class OrganizerDeleteRequest(BaseModel):
-    item_ids: Optional[List[int]] = None
-    extra_ids: Optional[List[int]] = None
-    mode: str = "db_only"
 
 class WatchlistRequest(BaseModel):
     tmdb_id: int
     type: str = "movie"
 
-class OrganizerCountResponse(BaseModel):
-    count: int
-
 @router.get("/recommendations", response_model=RecommendationsResponse)
 def get_recommendations(language: Optional[str] = None, db: Session = Depends(get_db)):
     return RecommendationsService(db, scraper_gateway).get_recommendations(language=language)
-
-@router.get("/organizer", response_model=OrganizerGroupsResponse)
-def get_organizer_items(scan_mode: Optional[str] = None, session_mode: Optional[str] = None, db: Session = Depends(get_db)):
-    return RecommendationsService(db, scraper_gateway).get_organizer_groups(scan_mode=scan_mode, session_mode=session_mode)
-
-@router.get("/organizer/count", response_model=OrganizerCountResponse)
-def get_organizer_item_count(scan_mode: Optional[str] = None, session_mode: Optional[str] = None, db: Session = Depends(get_db)):
-    return {"count": RecommendationsService(db, scraper_gateway).get_organizer_item_count(scan_mode=scan_mode, session_mode=session_mode)}
-
-@router.post("/organizer/delete", response_model=ActionResponse)
-def delete_organizer_items(request: OrganizerDeleteRequest, db: Session = Depends(get_db)):
-    return RecommendationsService(db, scraper_gateway).delete_organizer_items(
-        item_ids=request.item_ids or [],
-        extra_ids=request.extra_ids or [],
-        mode=request.mode
-    )
 
 @router.post("/watchlist", response_model=ActionResponse)
 def add_to_watchlist(request: WatchlistRequest, db: Session = Depends(get_db)):
