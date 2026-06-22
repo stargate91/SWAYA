@@ -1,15 +1,18 @@
+import os
+import re
+from urllib.parse import urlparse
 import logging
 from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 
 from app.shared_kernel.enums import Provider, MediaType, RoleType
+from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.domains.metadata.models import MetadataMatch, MetadataLocalization, Studio, MediaCollection
 from app.domains.people.models import Person, MediaPersonLink
 from app.domains.people.services import PersonService
 
 logger = logging.getLogger(__name__)
 
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 
 import threading
 
@@ -156,6 +159,7 @@ class ScraperPersister:
                     match.people.append(link)
 
             self.db.flush()
+            self._queue_adult_assets(match)
             return match
 
     def persist_normalized_movie(self, movie_id: str, norm: Dict[str, Any], language: str) -> MetadataMatch:
@@ -283,4 +287,39 @@ class ScraperPersister:
                     match.people.append(link)
 
             self.db.flush()
+            self._queue_adult_assets(match)
             return match
+
+    def _queue_adult_assets(self, match: MetadataMatch) -> None:
+        """Queues poster/backdrop downloads for adult matches."""
+        try:
+            from app.domains.tasks import task_manager
+        except Exception:
+            return
+
+        image_service = task_manager.download_worker.image_service
+
+        def queue_image(path: Optional[str], subfolder: str, prefix: str) -> Optional[str]:
+            if not path:
+                return None
+
+            url = image_service.get_download_url(path, subfolder)
+            if not url:
+                return None
+
+            basename = os.path.basename(urlparse(path).path)
+            if not basename:
+                return None
+
+            safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", prefix).strip("_")
+            filename = f"{safe_prefix}_{basename}"
+            task_manager.download_worker.enqueue_download(url, subfolder, filename)
+            return f"{subfolder}/{filename}"
+
+        asset_prefix = f"{match.provider.value}_{match.external_id}"
+        backdrop_subfolder = "scene_stills" if match.media_type in (MediaType.SCENE, MediaType.JAV) else "backdrops"
+        match.local_backdrop_path = queue_image(match.backdrop_path, backdrop_subfolder, asset_prefix)
+
+        loc = next((l for l in match.localizations if l.locale == DEFAULT_FALLBACK_LANGUAGE), None)
+        if loc:
+            loc.local_poster_path = queue_image(loc.poster_path, "posters", asset_prefix)

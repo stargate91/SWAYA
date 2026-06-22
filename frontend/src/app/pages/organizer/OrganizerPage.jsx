@@ -7,14 +7,14 @@ import SegmentedControl from '../../ui/SegmentedControl';
 import OrganizerDetailsPanel from './OrganizerDetailsPanel';
 import OrganizerHeaderPanel from './OrganizerHeaderPanel';
 import OrganizerResultsPanel from './OrganizerResultsPanel';
-import { useDiscoveryCountQuery, useDiscoveryQuery, useScanStatusQuery, useSettingsQuery, useStatsQuery } from '../../queries';
+import { useOrganizerCountQuery, useOrganizerQuery, useScanStatusQuery, useSettingsQuery, useStatsQuery } from '../../queries';
 import { useUi } from '../../providers/UiProvider';
 import { useTranslation } from '../../providers/LanguageContext';
 import {
   normalizeStatusTone,
   PAGE_SIZE_OPTIONS,
 } from './organizerMappers';
-import { EMPTY_DISCOVERY } from './organizerConstants';
+import { EMPTY_ORGANIZER } from './organizerConstants';
 import { useOrganizerActions } from './useOrganizerActions.jsx';
 import { useOrganizerColumns } from './useOrganizerColumns.jsx';
 import { useOrganizerPageState } from './useOrganizerPageState';
@@ -33,8 +33,8 @@ export default function OrganizerPage() {
   const { t } = useTranslation();
   const { closeModal, openModal, toast } = useUi();
   const queryClient = useQueryClient();
-  const discoveryQuery = useDiscoveryQuery();
-  const discoveryCountQuery = useDiscoveryCountQuery();
+  const organizerQuery = useOrganizerQuery();
+  const organizerCountQuery = useOrganizerCountQuery();
   const statsQuery = useStatsQuery();
   const settingsQuery = useSettingsQuery();
   const scanStatusQuery = useScanStatusQuery({
@@ -45,7 +45,7 @@ export default function OrganizerPage() {
       last_completed: data?.last_completed || 0,
     }),
   });
-  const discovery = discoveryQuery.data || EMPTY_DISCOVERY;
+  const organizer = organizerQuery.data || EMPTY_ORGANIZER;
   const scanStatus = scanStatusQuery.data || null;
   const settings = settingsQuery.data || EMPTY_SETTINGS;
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
@@ -76,9 +76,9 @@ export default function OrganizerPage() {
     }
   }, [scanMode, scanModeOptions]);
   const isScanActive = Boolean(scanStatus?.active);
-  const rawDiscoveryItemCount = discoveryCountQuery.data?.count ?? statsQuery.data?.unmatched;
-  const discoveryItemCount = rawDiscoveryItemCount == null ? null : Number(rawDiscoveryItemCount);
-  const isDiscoveryCountReady = Number.isFinite(discoveryItemCount);
+  const rawOrganizerItemCount = organizerCountQuery.data?.count ?? statsQuery.data?.unmatched;
+  const organizerItemCount = rawOrganizerItemCount == null ? null : Number(rawOrganizerItemCount);
+  const isOrganizerCountReady = Number.isFinite(organizerItemCount);
   const organizerRuleSignature = useMemo(() => JSON.stringify({
     collision_strategy: settings.collision_strategy || 'keep_both',
     collision_duration_tolerance_seconds: settings.collision_duration_tolerance_seconds || '10',
@@ -184,7 +184,7 @@ export default function OrganizerPage() {
     restoreDismissedRows,
     dismissedCount,
     dismissedRowIds,
-  } = useOrganizerPageState({ discovery, t, scanMode });
+  } = useOrganizerPageState({ organizer, t, scanMode });
 
   const {
     handleBrowseAndScan,
@@ -196,8 +196,8 @@ export default function OrganizerPage() {
     isRenameStarting,
   } = useOrganizerActions({
     defaultScanDir: settingsQuery.data?.default_scan_dir,
-    discoveryCountQuery,
-    discoveryQuery,
+    organizerCountQuery,
+    organizerQuery,
     isScanActive,
     onResultsReady: focusFirstAvailableResult,
     queryClient,
@@ -213,7 +213,7 @@ export default function OrganizerPage() {
 
 
   const { computedExtrasTabs, computedManualTabs, computedMainTabs } = useOrganizerTabs({
-    discoveryExtras: discovery.extras,
+    organizerExtras: organizer.extras,
     t,
     tabCounts,
     dismissedRowIds,
@@ -233,10 +233,10 @@ export default function OrganizerPage() {
     shouldShowLoadRest,
     summaryText,
   } = useOrganizerViewModel({
-    discovery,
-    discoveryItemCount,
+    organizer,
+    organizerItemCount,
     isBrowseStarting,
-    isDiscoveryCountReady,
+    isOrganizerCountReady,
     isLoadingAll,
     isRenameStarting,
     isScanActive,
@@ -295,20 +295,20 @@ export default function OrganizerPage() {
 
   const handleRemoveAll = () => {
     const allItems = [
-      ...(discovery.manual || []),
-      ...(discovery.movies || []),
-      ...(discovery.tv || []),
-      ...(discovery.collisions || []),
+      ...(organizer.manual || []),
+      ...(organizer.movies || []),
+      ...(organizer.tv || []),
+      ...(organizer.collisions || []),
     ];
     const ids = allItems.map((item) => `item-${item.id}`);
     dismissRows(ids);
   };
 
   const allMediaItems = [
-    ...(discovery.manual || []),
-    ...(discovery.movies || []),
-    ...(discovery.tv || []),
-    ...(discovery.collisions || []),
+    ...(organizer.manual || []),
+    ...(organizer.movies || []),
+    ...(organizer.tv || []),
+    ...(organizer.collisions || []),
   ];
   const hasActiveVisibleItems = allMediaItems.some(item => !dismissedRowIds.has(`item-${item.id}`));
 
@@ -370,7 +370,7 @@ export default function OrganizerPage() {
     </>
   ) : null;
 
-  const { refreshOrganizerDiscovery } = useOrganizerDeleteActions({
+  const { refreshOrganizer } = useOrganizerDeleteActions({
     t,
     closeModal,
     toast,
@@ -386,21 +386,21 @@ export default function OrganizerPage() {
 
     previousRuleSignatureRef.current = organizerRuleSignature;
 
-    if (!discoveryQuery.data || isScanActive) {
+    if (!organizerQuery.data || isScanActive) {
       return;
     }
 
-    refreshOrganizerDiscovery().catch(() => {
+    refreshOrganizer().catch(() => {
       toast(t('organizer.toasts.refreshRulesFailed'), 'danger');
     });
   }, [
-    discoveryQuery.data,
+    organizerQuery.data,
     focusFirstAvailableResult,
     isScanActive,
     organizerRuleSignature,
     queryClient,
     toast,
-    refreshOrganizerDiscovery,
+    refreshOrganizer,
     t,
   ]);
 
@@ -451,7 +451,7 @@ export default function OrganizerPage() {
         sortedRows={sortedRows}
         totalPages={totalPages}
         settingsQuery={settingsQuery}
-        discoveryQuery={discoveryQuery}
+        organizerQuery={organizerQuery}
         computedExtrasTabs={computedExtrasTabs}
         computedManualTabs={computedManualTabs}
         computedMainTabs={computedMainTabs}
@@ -505,7 +505,7 @@ function OrganizerPageContent({
   sortedRows,
   totalPages,
   settingsQuery,
-  discoveryQuery,
+  organizerQuery,
   computedExtrasTabs,
   computedManualTabs,
   computedMainTabs,
@@ -544,7 +544,7 @@ function OrganizerPageContent({
         ? computedExtrasTabs.find((tab) => tab.value === activeExtrasTab)?.label || t('organizer.tabs.extras')
         : computedMainTabs.find((tab) => tab.value === activeMainTab)?.label || t('organizer.tabs.manual');
 
-  const organizerInlineEmptyText = discoveryQuery.isLoading
+  const organizerInlineEmptyText = organizerQuery.isLoading
     ? t('organizer.table.emptyLoading')
     : searchQuery.trim()
       ? t('organizer.table.emptySearch', { context: currentContextLabel }) || `No items match your search in ${currentContextLabel}.`

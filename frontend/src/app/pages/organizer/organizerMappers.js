@@ -68,7 +68,7 @@ export const compareOrganizerValues = (left, right) => {
   return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
 };
 
-export const mapDiscoveryItemRow = (item, t) => ({
+export const mapOrganizerItemRow = (item, t) => ({
   id: `item-${item.id}`,
   itemId: item.id,
   source: getFilenameFromPath(item.filename),

@@ -20,7 +20,7 @@ const getManualTabsForMode = (scanMode) => {
   return ['movies', 'episodes'];
 };
 
-export function useOrganizerTabs({ discoveryExtras, t, tabCounts, dismissedRowIds, scanMode }) {
+export function useOrganizerTabs({ organizerExtras, t, tabCounts, dismissedRowIds, scanMode }) {
   const computedMainTabs = useMemo(() => {
     const allowedTabs = new Set(getMainTabsForMode(scanMode));
     return MAIN_TABS.filter((tab) => allowedTabs.has(tab.value)).map((tab) => ({
@@ -60,7 +60,7 @@ export function useOrganizerTabs({ discoveryExtras, t, tabCounts, dismissedRowId
     .map((tab) => ({
     ...tab,
     label: t(tab.labelKey),
-    count: (discoveryExtras || []).filter((item) => {
+    count: (organizerExtras || []).filter((item) => {
       if (!isExtraForMode(item, scanMode) || item.category !== EXTRA_CATEGORY_BY_TAB[tab.value]) {
         return false;
       }
@@ -73,7 +73,7 @@ export function useOrganizerTabs({ discoveryExtras, t, tabCounts, dismissedRowId
       }
       return true;
     }).length,
-  })), [discoveryExtras, t, dismissedRowIds, scanMode]);
+  })), [organizerExtras, t, dismissedRowIds, scanMode]);
 
   return {
     computedExtrasTabs,

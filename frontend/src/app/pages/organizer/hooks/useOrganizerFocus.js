@@ -1,7 +1,7 @@
 import {
   EXTRA_CATEGORY_BY_TAB,
   MANUAL_REVIEW_STATUSES,
-  mapDiscoveryItemRow,
+  mapOrganizerItemRow,
   mapExtraRow,
   MATCHED_STATUSES,
   normalizeItemStatus,
@@ -21,7 +21,7 @@ const isExtraForMode = (item, scanMode) => {
 };
 
 export function useOrganizerFocus({
-  discovery,
+  organizer,
   t,
   activeRowId,
   setActiveRowId,
@@ -34,14 +34,14 @@ export function useOrganizerFocus({
   setIsDetailsCollapsed,
   scanMode,
 }) {
-  const focusFirstAvailableResult = (nextDiscovery = discovery) => {
-    const modeExtras = (nextDiscovery.extras || []).filter((item) => isExtraForMode(item, scanMode));
+  const focusFirstAvailableResult = (nextOrganizer = organizer) => {
+    const modeExtras = (nextOrganizer.extras || []).filter((item) => isExtraForMode(item, scanMode));
     if (activeRowId) {
       const allIds = new Set([
-        ...(nextDiscovery.manual || []).map((i) => `item-${i.id}`),
-        ...(nextDiscovery.movies || []).map((i) => `item-${i.id}`),
-        ...(nextDiscovery.tv || []).map((i) => `item-${i.id}`),
-        ...(nextDiscovery.collisions || []).map((i) => `item-${i.id}`),
+        ...(nextOrganizer.manual || []).map((i) => `item-${i.id}`),
+        ...(nextOrganizer.movies || []).map((i) => `item-${i.id}`),
+        ...(nextOrganizer.tv || []).map((i) => `item-${i.id}`),
+        ...(nextOrganizer.collisions || []).map((i) => `item-${i.id}`),
         ...modeExtras.map((i) => `extra-${i.id}`),
       ]);
       if (allIds.has(activeRowId)) {
@@ -49,39 +49,39 @@ export function useOrganizerFocus({
       }
     }
     const reviewMedia = [
-      ...(nextDiscovery.manual || []),
-      ...(nextDiscovery.movies || []),
-      ...(nextDiscovery.tv || []),
+      ...(nextOrganizer.manual || []),
+      ...(nextOrganizer.movies || []),
+      ...(nextOrganizer.tv || []),
     ];
     const matchedMedia = [
-      ...(nextDiscovery.movies || []),
-      ...(nextDiscovery.tv || []),
-      ...(nextDiscovery.collisions || []),
+      ...(nextOrganizer.movies || []),
+      ...(nextOrganizer.tv || []),
+      ...(nextOrganizer.collisions || []),
     ];
     const movieRows = matchedMedia
       .filter((item) => isRegularMovieType(item.type) && MATCHED_STATUSES.has(normalizeItemStatus(item.status)))
-      .map((item) => mapDiscoveryItemRow(item, t));
+      .map((item) => mapOrganizerItemRow(item, t));
     const episodeRows = matchedMedia
       .filter((item) => isEpisodeMediaType(item.type) && MATCHED_STATUSES.has(normalizeItemStatus(item.status)))
-      .map((item) => mapDiscoveryItemRow(item, t));
+      .map((item) => mapOrganizerItemRow(item, t));
     const manualMovieRows = reviewMedia
       .filter((item) => isRegularMovieType(item.type) && MANUAL_REVIEW_STATUSES.has(normalizeItemStatus(item.status)))
-      .map((item) => mapDiscoveryItemRow(item, t));
+      .map((item) => mapOrganizerItemRow(item, t));
     const manualEpisodeRows = reviewMedia
       .filter((item) => isTvLikeMediaType(item.type) && MANUAL_REVIEW_STATUSES.has(normalizeItemStatus(item.status)))
-      .map((item) => mapDiscoveryItemRow(item, t));
+      .map((item) => mapOrganizerItemRow(item, t));
     const sceneRows = matchedMedia
       .filter((item) => isSceneType(item.type) && MATCHED_STATUSES.has(normalizeItemStatus(item.status)))
-      .map((item) => mapDiscoveryItemRow(item, t));
+      .map((item) => mapOrganizerItemRow(item, t));
     const javRows = matchedMedia
       .filter((item) => isJavType(item.type) && MATCHED_STATUSES.has(normalizeItemStatus(item.status)))
-      .map((item) => mapDiscoveryItemRow(item, t));
+      .map((item) => mapOrganizerItemRow(item, t));
     const manualSceneRows = reviewMedia
       .filter((item) => isSceneType(item.type) && MANUAL_REVIEW_STATUSES.has(normalizeItemStatus(item.status)))
-      .map((item) => mapDiscoveryItemRow(item, t));
+      .map((item) => mapOrganizerItemRow(item, t));
     const manualJavRows = reviewMedia
       .filter((item) => isJavType(item.type) && MANUAL_REVIEW_STATUSES.has(normalizeItemStatus(item.status)))
-      .map((item) => mapDiscoveryItemRow(item, t));
+      .map((item) => mapOrganizerItemRow(item, t));
     const extraTabPriority = ['bonus', 'subtitles', 'audio', 'images', 'metadata'];
     const firstExtraTab = extraTabPriority.find((tab) =>
       modeExtras.some((item) => item.category === EXTRA_CATEGORY_BY_TAB[tab]));

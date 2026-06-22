@@ -1,32 +1,32 @@
 import { useCallback } from 'react';
 import api from '../../lib/api';
 
-export const removeDiscoveryRow = (currentDiscovery, row) => {
-  if (!currentDiscovery) {
-    return currentDiscovery;
+export const removeOrganizerRow = (currentOrganizer, row) => {
+  if (!currentOrganizer) {
+    return currentOrganizer;
   }
 
   if (row.rawType === 'extra') {
     return {
-      ...currentDiscovery,
-      extras: (currentDiscovery.extras || []).filter((item) => item.id !== row.itemId),
+      ...currentOrganizer,
+      extras: (currentOrganizer.extras || []).filter((item) => item.id !== row.itemId),
     };
   }
 
   const mediaId = row.itemId;
   return {
-    ...currentDiscovery,
-    manual: (currentDiscovery.manual || []).filter((item) => item.id !== mediaId),
-    movies: (currentDiscovery.movies || []).filter((item) => item.id !== mediaId),
-    tv: (currentDiscovery.tv || []).filter((item) => item.id !== mediaId),
-    collisions: (currentDiscovery.collisions || []).filter((item) => item.id !== mediaId),
-    extras: (currentDiscovery.extras || []).filter((item) => item.parent_id !== mediaId),
+    ...currentOrganizer,
+    manual: (currentOrganizer.manual || []).filter((item) => item.id !== mediaId),
+    movies: (currentOrganizer.movies || []).filter((item) => item.id !== mediaId),
+    tv: (currentOrganizer.tv || []).filter((item) => item.id !== mediaId),
+    collisions: (currentOrganizer.collisions || []).filter((item) => item.id !== mediaId),
+    extras: (currentOrganizer.extras || []).filter((item) => item.parent_id !== mediaId),
   };
 };
 
-export const removeDiscoveryRows = (currentDiscovery, rows) => rows.reduce(
-  (nextDiscovery, row) => removeDiscoveryRow(nextDiscovery, row),
-  currentDiscovery,
+export const removeOrganizerRows = (currentOrganizer, rows) => rows.reduce(
+  (nextOrganizer, row) => removeOrganizerRow(nextOrganizer, row),
+  currentOrganizer,
 );
 
 export function useOrganizerDeleteActions({
@@ -37,45 +37,45 @@ export function useOrganizerDeleteActions({
   focusFirstAvailableResult,
   clearSelectedRows,
 }) {
-  const refreshOrganizerDiscovery = useCallback(async () => {
-    const data = await api.discovery.get();
-    queryClient.setQueryData(['discovery'], data);
+  const refreshOrganizer = useCallback(async () => {
+    const data = await api.organizer.get();
+    queryClient.setQueryData(['organizer'], data);
     focusFirstAvailableResult(data);
-    queryClient.invalidateQueries({ queryKey: ['discovery-count'] });
+    queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
     queryClient.invalidateQueries({ queryKey: ['stats'] });
   }, [queryClient, focusFirstAvailableResult]);
 
-  const handleResolveDiscoveryRow = useCallback(async (row) => {
+  const handleResolveOrganizerRow = useCallback(async (row) => {
     closeModal();
-    const previousDiscovery = queryClient.getQueryData(['discovery']);
-    const nextDiscovery = removeDiscoveryRow(previousDiscovery, row);
-    if (nextDiscovery) {
-      queryClient.setQueryData(['discovery'], nextDiscovery);
-      focusFirstAvailableResult(nextDiscovery);
-      queryClient.invalidateQueries({ queryKey: ['discovery-count'] });
+    const previousOrganizer = queryClient.getQueryData(['organizer']);
+    const nextOrganizer = removeOrganizerRow(previousOrganizer, row);
+    if (nextOrganizer) {
+      queryClient.setQueryData(['organizer'], nextOrganizer);
+      focusFirstAvailableResult(nextOrganizer);
+      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
     }
 
     try {
-      await refreshOrganizerDiscovery();
+      await refreshOrganizer();
     } catch {
-      if (previousDiscovery) {
-        queryClient.setQueryData(['discovery'], previousDiscovery);
-        focusFirstAvailableResult(previousDiscovery);
+      if (previousOrganizer) {
+        queryClient.setQueryData(['organizer'], previousOrganizer);
+        focusFirstAvailableResult(previousOrganizer);
       }
-      queryClient.invalidateQueries({ queryKey: ['discovery-count'] });
+      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
     }
-  }, [closeModal, queryClient, focusFirstAvailableResult, refreshOrganizerDiscovery]);
+  }, [closeModal, queryClient, focusFirstAvailableResult, refreshOrganizer]);
 
-  const handleResolveDiscoveryRows = useCallback(async (rows, performMutationFn) => {
+  const handleResolveOrganizerRows = useCallback(async (rows, performMutationFn) => {
     closeModal();
-    const previousDiscovery = queryClient.getQueryData(['discovery']);
-    const nextDiscovery = removeDiscoveryRows(previousDiscovery, rows);
-    if (nextDiscovery) {
-      queryClient.setQueryData(['discovery'], nextDiscovery);
-      focusFirstAvailableResult(nextDiscovery);
-      queryClient.invalidateQueries({ queryKey: ['discovery-count'] });
+    const previousOrganizer = queryClient.getQueryData(['organizer']);
+    const nextOrganizer = removeOrganizerRows(previousOrganizer, rows);
+    if (nextOrganizer) {
+      queryClient.setQueryData(['organizer'], nextOrganizer);
+      focusFirstAvailableResult(nextOrganizer);
+      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
     }
 
@@ -83,91 +83,91 @@ export function useOrganizerDeleteActions({
       if (performMutationFn) {
         await performMutationFn();
       }
-      await refreshOrganizerDiscovery();
+      await refreshOrganizer();
     } catch (error) {
-      if (previousDiscovery) {
-        queryClient.setQueryData(['discovery'], previousDiscovery);
-        focusFirstAvailableResult(previousDiscovery);
+      if (previousOrganizer) {
+        queryClient.setQueryData(['organizer'], previousOrganizer);
+        focusFirstAvailableResult(previousOrganizer);
       }
-      queryClient.invalidateQueries({ queryKey: ['discovery-count'] });
+      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
       throw error;
     }
-  }, [closeModal, queryClient, focusFirstAvailableResult, refreshOrganizerDiscovery]);
+  }, [closeModal, queryClient, focusFirstAvailableResult, refreshOrganizer]);
 
-  const handleDeleteDiscoveryRow = useCallback(async (row, mode) => {
+  const handleDeleteOrganizerRow = useCallback(async (row, mode) => {
     closeModal();
-    const previousDiscovery = queryClient.getQueryData(['discovery']);
-    const nextDiscovery = removeDiscoveryRow(previousDiscovery, row);
-    if (nextDiscovery) {
-      queryClient.setQueryData(['discovery'], nextDiscovery);
-      focusFirstAvailableResult(nextDiscovery);
-      queryClient.invalidateQueries({ queryKey: ['discovery-count'] });
+    const previousOrganizer = queryClient.getQueryData(['organizer']);
+    const nextOrganizer = removeOrganizerRow(previousOrganizer, row);
+    if (nextOrganizer) {
+      queryClient.setQueryData(['organizer'], nextOrganizer);
+      focusFirstAvailableResult(nextOrganizer);
+      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
     }
 
     try {
-      await api.discovery.delete({
+      await api.organizer.delete({
         item_ids: row.rawType === 'extra' ? [] : [row.itemId],
         extra_ids: row.rawType === 'extra' ? [row.itemId] : [],
         mode,
       });
-      await refreshOrganizerDiscovery();
+      await refreshOrganizer();
       const toastKey = mode === 'ignore' ? 'organizer.toasts.deleteIgnoreSuccess'
         : mode === 'trash' ? 'organizer.toasts.deleteTrashSuccess'
         : 'organizer.toasts.deleteDbOnlySuccess';
       toast(t(toastKey), 'success');
     } catch (error) {
-      if (previousDiscovery) {
-        queryClient.setQueryData(['discovery'], previousDiscovery);
-        focusFirstAvailableResult(previousDiscovery);
+      if (previousOrganizer) {
+        queryClient.setQueryData(['organizer'], previousOrganizer);
+        focusFirstAvailableResult(previousOrganizer);
       }
-      queryClient.invalidateQueries({ queryKey: ['discovery-count'] });
+      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
       throw error;
     }
-  }, [closeModal, queryClient, focusFirstAvailableResult, refreshOrganizerDiscovery, toast, t]);
+  }, [closeModal, queryClient, focusFirstAvailableResult, refreshOrganizer, toast, t]);
 
-  const handleDeleteDiscoveryRows = useCallback(async (rows, mode) => {
+  const handleDeleteOrganizerRows = useCallback(async (rows, mode) => {
     closeModal();
     clearSelectedRows();
-    const previousDiscovery = queryClient.getQueryData(['discovery']);
-    const nextDiscovery = removeDiscoveryRows(previousDiscovery, rows);
-    if (nextDiscovery) {
-      queryClient.setQueryData(['discovery'], nextDiscovery);
-      focusFirstAvailableResult(nextDiscovery);
-      queryClient.invalidateQueries({ queryKey: ['discovery-count'] });
+    const previousOrganizer = queryClient.getQueryData(['organizer']);
+    const nextOrganizer = removeOrganizerRows(previousOrganizer, rows);
+    if (nextOrganizer) {
+      queryClient.setQueryData(['organizer'], nextOrganizer);
+      focusFirstAvailableResult(nextOrganizer);
+      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
     }
 
     try {
-      await api.discovery.delete({
+      await api.organizer.delete({
         item_ids: rows.filter((row) => row.rawType !== 'extra').map((row) => row.itemId),
         extra_ids: rows.filter((row) => row.rawType === 'extra').map((row) => row.itemId),
         mode,
       });
-      await refreshOrganizerDiscovery();
+      await refreshOrganizer();
       const count = rows.length;
       const toastKey = count === 1
         ? (mode === 'ignore' ? 'organizer.toasts.deleteIgnoreSuccess' : mode === 'trash' ? 'organizer.toasts.deleteTrashSuccess' : 'organizer.toasts.deleteDbOnlySuccess')
         : (mode === 'ignore' ? 'organizer.toasts.deleteIgnoreSuccessPlural' : mode === 'trash' ? 'organizer.toasts.deleteTrashSuccessPlural' : 'organizer.toasts.deleteDbOnlySuccessPlural');
       toast(t(toastKey).replace('{count}', count), 'success');
     } catch (error) {
-      if (previousDiscovery) {
-        queryClient.setQueryData(['discovery'], previousDiscovery);
-        focusFirstAvailableResult(previousDiscovery);
+      if (previousOrganizer) {
+        queryClient.setQueryData(['organizer'], previousOrganizer);
+        focusFirstAvailableResult(previousOrganizer);
       }
-      queryClient.invalidateQueries({ queryKey: ['discovery-count'] });
+      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
       throw error;
     }
-  }, [closeModal, clearSelectedRows, queryClient, focusFirstAvailableResult, refreshOrganizerDiscovery, toast, t]);
+  }, [closeModal, clearSelectedRows, queryClient, focusFirstAvailableResult, refreshOrganizer, toast, t]);
 
   return {
-    refreshOrganizerDiscovery,
-    handleResolveDiscoveryRow,
-    handleResolveDiscoveryRows,
-    handleDeleteDiscoveryRow,
-    handleDeleteDiscoveryRows,
+    refreshOrganizer,
+    handleResolveOrganizerRow,
+    handleResolveOrganizerRows,
+    handleDeleteOrganizerRow,
+    handleDeleteOrganizerRows,
   };
 }

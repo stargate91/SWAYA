@@ -49,7 +49,7 @@ export default function OrganizerDetailsPanel({
           source_path: activeRow.sourcePath,
           target_path: activeRow.targetPath,
         },
-        discovery: activeRow.rawPayload,
+        organizer: activeRow.rawPayload,
       }, null, 2);
     }
 
@@ -70,7 +70,7 @@ export default function OrganizerDetailsPanel({
         action: activeRow.rawAction || null,
         has_collision: activeRow.hasCollision,
       },
-      discovery: activeRow.rawPayload,
+      organizer: activeRow.rawPayload,
       metadata,
     }, null, 2);
   };

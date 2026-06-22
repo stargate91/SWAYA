@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import {
   EXTRA_CATEGORY_BY_TAB,
   MANUAL_REVIEW_STATUSES,
-  mapDiscoveryItemRow,
+  mapOrganizerItemRow,
   mapExtraRow,
   MATCHED_STATUSES,
   normalizeItemStatus,
@@ -24,7 +24,7 @@ const isExtraForMode = (item, scanMode) => {
 };
 
 export function useOrganizerFilteredRows({
-  discovery,
+  organizer,
   t,
   activeMainTab,
   activeExtrasTab,
@@ -32,32 +32,32 @@ export function useOrganizerFilteredRows({
   dismissedRowIds,
   scanMode,
 }) {
-  const reviewDiscoveryMedia = useMemo(
+  const reviewOrganizerMedia = useMemo(
     () => [
-      ...(discovery.manual || []),
-      ...(discovery.movies || []),
-      ...(discovery.tv || []),
+      ...(organizer.manual || []),
+      ...(organizer.movies || []),
+      ...(organizer.tv || []),
     ],
-    [discovery],
+    [organizer],
   );
 
-  const matchedDiscoveryMedia = useMemo(
+  const matchedOrganizerMedia = useMemo(
     () => [
-      ...(discovery.movies || []),
-      ...(discovery.tv || []),
-      ...(discovery.collisions || []),
+      ...(organizer.movies || []),
+      ...(organizer.tv || []),
+      ...(organizer.collisions || []),
     ],
-    [discovery],
+    [organizer],
   );
 
   const tabCounts = useMemo(() => {
-    const visibleReview = reviewDiscoveryMedia.filter((item) => {
+    const visibleReview = reviewOrganizerMedia.filter((item) => {
       const id = `item-${item.id}`;
       return !dismissedRowIds.has(id)
         && isModeType(item, scanMode)
         && MANUAL_REVIEW_STATUSES.has(normalizeItemStatus(item.status));
     });
-    const visibleMatched = matchedDiscoveryMedia.filter((item) => {
+    const visibleMatched = matchedOrganizerMedia.filter((item) => {
       const id = `item-${item.id}`;
       return !dismissedRowIds.has(id)
         && isModeType(item, scanMode)
@@ -75,7 +75,7 @@ export function useOrganizerFilteredRows({
     const scenesCount = visibleMatched.filter((item) => isSceneType(item.type)).length;
     const javCount = visibleMatched.filter((item) => isJavType(item.type)).length;
 
-    const extrasCount = (discovery.extras || []).filter((item) => {
+    const extrasCount = (organizer.extras || []).filter((item) => {
       const id = `extra-${item.id}`;
       const parentId = `item-${item.parent_id || item.parent_item_id}`;
       return isExtraForMode(item, scanMode) && !dismissedRowIds.has(id) && !dismissedRowIds.has(parentId);
@@ -93,12 +93,12 @@ export function useOrganizerFilteredRows({
       javCount,
       extrasCount,
     };
-  }, [discovery, matchedDiscoveryMedia, reviewDiscoveryMedia, dismissedRowIds, scanMode]);
+  }, [organizer, matchedOrganizerMedia, reviewOrganizerMedia, dismissedRowIds, scanMode]);
 
   const tabFilteredRows = useMemo(() => {
     let rows = [];
     if (activeMainTab === 'manual') {
-      rows = reviewDiscoveryMedia
+      rows = reviewOrganizerMedia
         .filter((item) => {
           const statusMatches = MANUAL_REVIEW_STATUSES.has(normalizeItemStatus(item.status));
           if (!statusMatches) return false;
@@ -108,25 +108,25 @@ export function useOrganizerFilteredRows({
           if (activeManualTab === 'jav') return isJavType(item.type);
           return false;
         })
-        .map((item) => mapDiscoveryItemRow(item, t));
+        .map((item) => mapOrganizerItemRow(item, t));
     } else if (activeMainTab === 'movies') {
-      rows = matchedDiscoveryMedia
+      rows = matchedOrganizerMedia
         .filter((item) => isRegularMovieType(item.type) && MATCHED_STATUSES.has(normalizeItemStatus(item.status)))
-        .map((item) => mapDiscoveryItemRow(item, t));
+        .map((item) => mapOrganizerItemRow(item, t));
     } else if (activeMainTab === 'episodes') {
-      rows = matchedDiscoveryMedia
+      rows = matchedOrganizerMedia
         .filter((item) => isEpisodeMediaType(item.type) && MATCHED_STATUSES.has(normalizeItemStatus(item.status)))
-        .map((item) => mapDiscoveryItemRow(item, t));
+        .map((item) => mapOrganizerItemRow(item, t));
     } else if (activeMainTab === 'scenes') {
-      rows = matchedDiscoveryMedia
+      rows = matchedOrganizerMedia
         .filter((item) => isSceneType(item.type) && MATCHED_STATUSES.has(normalizeItemStatus(item.status)))
-        .map((item) => mapDiscoveryItemRow(item, t));
+        .map((item) => mapOrganizerItemRow(item, t));
     } else if (activeMainTab === 'jav') {
-      rows = matchedDiscoveryMedia
+      rows = matchedOrganizerMedia
         .filter((item) => isJavType(item.type) && MATCHED_STATUSES.has(normalizeItemStatus(item.status)))
-        .map((item) => mapDiscoveryItemRow(item, t));
+        .map((item) => mapOrganizerItemRow(item, t));
     } else if (activeMainTab === 'extras') {
-      rows = (discovery.extras || [])
+      rows = (organizer.extras || [])
         .filter((item) => isExtraForMode(item, scanMode) && item.category === EXTRA_CATEGORY_BY_TAB[activeExtrasTab])
         .map((item) => mapExtraRow(item, t));
     }
@@ -136,11 +136,11 @@ export function useOrganizerFilteredRows({
         !dismissedRowIds.has(row.id) &&
         (row.rawType !== 'extra' || !dismissedRowIds.has(`item-${row.parent_id}`))
     );
-  }, [activeExtrasTab, activeManualTab, activeMainTab, discovery, matchedDiscoveryMedia, reviewDiscoveryMedia, t, dismissedRowIds, scanMode]);
+  }, [activeExtrasTab, activeManualTab, activeMainTab, organizer, matchedOrganizerMedia, reviewOrganizerMedia, t, dismissedRowIds, scanMode]);
 
   return {
-    reviewDiscoveryMedia,
-    matchedDiscoveryMedia,
+    reviewOrganizerMedia,
+    matchedOrganizerMedia,
     tabCounts,
     tabFilteredRows,
   };

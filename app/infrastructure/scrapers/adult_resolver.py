@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch
 from app.shared_kernel.enums import Provider, MediaType, ItemStatus, ScanMode
+from app.infrastructure.scrapers.resolver import normalize_title, normalize_title_words
 
 logger = logging.getLogger(__name__)
 
@@ -19,20 +20,64 @@ class AdultResolver:
     def __init__(self, db_session: Session):
         self.db = db_session
 
+    def _extract_jav_search_queries(self, item: MediaItem) -> list[str]:
+        import re
+
+        parsed = item.parsed_info or {}
+        fn_data = parsed.get("fn") or {}
+        it_data = parsed.get("it") or {}
+        fd_data = parsed.get("fd") or {}
+
+        raw_values = [
+            item.filename,
+            item.folder_name,
+            item.relative_path,
+            item.current_path,
+            fn_data.get("title"),
+            fd_data.get("title"),
+            it_data.get("title"),
+        ]
+
+        queries = []
+        seen = set()
+
+        def add_query(value: Optional[str]):
+            text = normalize_title_words(str(value or "")).strip()
+            if not text or text in seen:
+                return
+            seen.add(text)
+            queries.append(text)
+
+        for value in raw_values:
+            raw_text = str(value or "")
+            for prefix, number in re.findall(r'(?i)\b([a-z0-9]{2,10})[-._ ]?([0-9]{2,5})\b', raw_text):
+                code = f"{prefix.upper()}-{number}"
+                if code not in seen:
+                    seen.add(code)
+                    queries.append(code)
+
+        for value in raw_values:
+            if not value:
+                continue
+            cleaned = re.sub(r'(?i)\b(uncensored|censored|xxx|jav|japanese|web[ -]?rip|webrip|bluray|bdrip|dvdrip|x264|x265|hevc|aac|mp3|h264|h265|1080p|720p|2160p|480p|tbp|narcos|sample)\b', ' ', str(value))
+            cleaned = cleaned.replace('.', ' ').replace('_', ' ').replace('-', ' ')
+            cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+            add_query(cleaned)
+
+        return queries[:8]
+
     def resolve_adult_item(self, item: MediaItem, mode: ScanMode = ScanMode.SCENES, task_id: Optional[int] = None):
         """Resolves adult scene/JAV items using MD5 fingerprinting, OSHash, or text search fallbacks."""
         from app.infrastructure.scrapers.stashdb import StashDBScraper
         from app.infrastructure.scrapers.porndb import PornDBScraper
         from app.infrastructure.scrapers.fansdb import FansDBScraper
-        from app.infrastructure.scrapers.resolver import normalize_title
-
         stash_scraper = StashDBScraper(self.db)
         porndb_scraper = PornDBScraper(self.db)
         fans_scraper = FansDBScraper(self.db)
 
         target_media_type = MediaType.JAV if mode.is_jav else MediaType.SCENE
         scrapers_to_try = []
-        logger.info(f"resolve_adult_item called for mode: {mode.value}, porndb key from setting: '{porndb_scraper.get_setting('porndb_api_key')}'")
+        logger.info("[adult:%s] Resolving %s | file=%s | md5=%s | oshash=%s", mode.value, item.id, item.filename, (item.hash_md5 or "")[:12], (item.hash_oshash or "")[:12])
         if mode.is_jav:
             if porndb_scraper.get_setting("porndb_api_key") or porndb_scraper.get_setting("porndb_api_token"):
                 scrapers_to_try.append((porndb_scraper, Provider.PORNDB))
@@ -52,8 +97,11 @@ class AdultResolver:
                 if prov_name in available:
                     scrapers_to_try.append(available[prov_name])
 
+        logger.info("[adult:%s] Providers to try: %s", mode.value, [provider.value for _scraper, provider in scrapers_to_try])
+
         if not scrapers_to_try:
             logger.warning("No adult metadata provider API key configured.")
+            logger.info("[adult:%s] No match for %s after all providers", mode.value, item.filename)
             item.status = ItemStatus.NO_MATCH
             self.db.flush()
             return
@@ -112,6 +160,7 @@ class AdultResolver:
                 """
                 # Try MD5 first
                 if item.hash_md5:
+                    logger.info("[adult:%s] Trying %s MD5 lookup for %s", mode.value, provider.value, item.filename)
                     cache_key_md5 = f"{provider.value}/hash/v3/md5/{item.hash_md5}"
                     cached = scraper.cache.get(provider, cache_key_md5)
                     if cached is not None:
@@ -130,6 +179,7 @@ class AdultResolver:
 
                 # Try OSHash fallback
                 if not scene_data and item.hash_oshash:
+                    logger.info("[adult:%s] Trying %s OSHASH lookup for %s", mode.value, provider.value, item.filename)
                     cache_key_osh = f"{provider.value}/hash/v3/oshash/{item.hash_oshash}"
                     cached = scraper.cache.get(provider, cache_key_osh)
                     if cached is not None:
@@ -147,6 +197,7 @@ class AdultResolver:
                             logger.error(f"{provider.value} OSHash query failed: {e}")
 
             elif provider == Provider.PORNDB and item.hash_oshash:
+                logger.info("[adult:%s] Trying PornDB %s hash lookup with OSHASH for %s", mode.value, "jav" if mode.is_jav else "scene", item.filename)
                 # Use REST API hash lookup with caching for the selected adult mode
                 cache_key_pornhash = f"porndb/{mode.value}/hash/oshash/{item.hash_oshash}"
                 cached = scraper.cache.get(provider, cache_key_pornhash)
@@ -166,6 +217,7 @@ class AdultResolver:
                         url = f"{PORNDB_API_BASE}/{ep}/hash/{item.hash_oshash}?type=OSHASH"
                         try:
                             resp = scraper.session.get(url, headers=headers, timeout=SCRAPER_REQUEST_TIMEOUT)
+                            logger.info("[adult:%s] PornDB GET %s -> status %s", mode.value, url, resp.status_code)
                             if resp.status_code == 200:
                                 res_json = resp.json()
                                 if res_json and res_json.get("data"):
@@ -179,6 +231,7 @@ class AdultResolver:
                         scraper.cache.set(provider, cache_key_pornhash, {})
 
             if scene_data:
+                logger.info("[adult:%s] Hash lookup matched %s -> provider=%s external_id=%s title=%s", mode.value, item.filename, provider.value, scene_data.get("id"), scene_data.get("title"))
                 # Save hash match
                 self.db.query(MetadataMatch).filter(MetadataMatch.media_item_id == item.id).delete()
                 self.db.query(MetadataMatch).filter(
@@ -214,40 +267,39 @@ class AdultResolver:
                 return
 
             # 2. Try Text Search Fallback
-            parsed = item.parsed_info or {}
-            fn_data = parsed.get("fn") or {}
-            it_data = parsed.get("it") or {}
-            fd_data = parsed.get("fd") or {}
-
-            import re
-            search_title = None
-            if mode == ScanMode.JAV:
-                # Matches patterns like SSNI-942, 3DJS-051, MGP.121
-                match = re.search(r'\b([a-zA-Z0-9]{2,10})[-.]([0-9]{3,5})\b', item.filename)
-                if match:
-                    search_title = f"{match.group(1)}-{match.group(2)}"
-                else:
-                    # Fallback for codes without hyphen/dot, e.g. SSNI942
-                    match_no_sep = re.search(r'\b([a-zA-Z]{2,6})([0-9]{3,5})\b', item.filename)
-                    if match_no_sep:
-                        search_title = f"{match_no_sep.group(1)}-{match_no_sep.group(2)}"
-
-            if not search_title:
+            if mode.is_jav:
+                search_queries = self._extract_jav_search_queries(item)
+                logger.info("[adult:%s] JAV fallback queries for %s -> %s", mode.value, item.filename, search_queries)
+            else:
+                parsed = item.parsed_info or {}
+                fn_data = parsed.get("fn") or {}
+                it_data = parsed.get("it") or {}
+                fd_data = parsed.get("fd") or {}
                 search_title = fn_data.get("title") or fd_data.get("title") or it_data.get("title")
+                search_queries = [search_title] if search_title else []
 
-            if not search_title:
+            if not search_queries:
+                logger.info("[adult:%s] No fallback search title for %s", mode.value, item.filename)
                 continue
 
-            cache_key_search = f"{provider.value}/{mode.value}/search/v3/{search_title.strip().lower()}"
-            cached_search = scraper.cache.get(provider, cache_key_search)
-            if cached_search is not None:
-                scenes = cached_search
-            else:
-                if provider == Provider.PORNDB and mode.is_jav:
-                    scenes = scraper.search_jav(search_title, per_page=10)
-                    scraper.cache.set(provider, cache_key_search, scenes)
+            best_score = 0.0
+            best_scene = None
+            best_query = None
+            best_scenes = []
+
+            for search_title in search_queries:
+                logger.info("[adult:%s] Fallback search title for %s -> %s", mode.value, item.filename, search_title)
+
+                cache_key_search = f"{provider.value}/{mode.value}/search/v3/{search_title.strip().lower()}"
+                cached_search = scraper.cache.get(provider, cache_key_search)
+                if cached_search is not None:
+                    scenes = cached_search
                 else:
-                    search_query = """
+                    if provider == Provider.PORNDB and mode.is_jav:
+                        scenes = scraper.search_jav(search_title, per_page=10)
+                        scraper.cache.set(provider, cache_key_search, scenes)
+                    else:
+                        search_query = """
                 query SearchScenes($q: String!) {
                   searchScene(term: $q) {
                     id
@@ -292,43 +344,49 @@ class AdultResolver:
                   }
                 }
                 """
-                    try:
-                        res = scraper.execute_query(search_query, {"q": search_title})
-                        scenes = res.get("searchScene", []) if res else []
-                        if scenes is None:
+                        try:
+                            res = scraper.execute_query(search_query, {"q": search_title})
+                            scenes = res.get("searchScene", []) if res else []
+                            if scenes is None:
+                                scenes = []
+                            scraper.cache.set(provider, cache_key_search, scenes)
+                        except Exception as e:
+                            logger.error(f"Text query failed for provider {provider.value}: {e}")
                             scenes = []
-                        scraper.cache.set(provider, cache_key_search, scenes)
-                    except Exception as e:
-                        logger.error(f"Text query failed for provider {provider.value}: {e}")
-                        scenes = []
 
-            if not scenes:
-                continue
+                if not scenes:
+                    logger.info("[adult:%s] No search results from %s for %s", mode.value, provider.value, search_title)
+                    continue
 
-            # Score candidates
-            candidates = []
-            for scene in scenes:
-                title = scene.get("title") or ""
-                if mode.is_jav:
-                    ext_id = scene.get("external_id") or ""
-                    if normalize_title(search_title) == normalize_title(ext_id):
-                        score = 1.0
-                    elif normalize_title(search_title) in normalize_title(title):
-                        score = 0.95
+                logger.info("[adult:%s] %s returned %s candidates for %s", mode.value, provider.value, len(scenes), search_title)
+
+                candidates = []
+                for scene in scenes:
+                    title = scene.get("title") or ""
+                    if mode.is_jav:
+                        ext_id = scene.get("external_id") or ""
+                        if normalize_title(search_title) == normalize_title(ext_id):
+                            score = 1.0
+                        elif normalize_title(search_title) in normalize_title(title):
+                            score = 0.95
+                        else:
+                            score = difflib.SequenceMatcher(
+                                None, normalize_title(search_title), normalize_title(title)
+                            ).ratio()
                     else:
                         score = difflib.SequenceMatcher(
                             None, normalize_title(search_title), normalize_title(title)
                         ).ratio()
-                else:
-                    score = difflib.SequenceMatcher(
-                        None, normalize_title(search_title), normalize_title(title)
-                    ).ratio()
-                candidates.append((score, scene))
+                    candidates.append((score, scene))
 
-            candidates.sort(key=lambda x: x[0], reverse=True)
-            if candidates:
-                best_score, best_scene = candidates[0]
+                candidates.sort(key=lambda x: x[0], reverse=True)
+                if candidates and candidates[0][0] > best_score:
+                    best_score, best_scene = candidates[0]
+                    best_query = search_title
+                    best_scenes = scenes
 
+            if best_scene:
+                logger.info("[adult:%s] Best candidate for %s via %s -> score=%.3f query=%s id=%s title=%s", mode.value, item.filename, provider.value, best_score, best_query, best_scene.get("id"), best_scene.get("title"))
                 if best_score >= 0.8:
                     self.db.query(MetadataMatch).filter(MetadataMatch.media_item_id == item.id).delete()
                     self.db.query(MetadataMatch).filter(
@@ -351,17 +409,17 @@ class AdultResolver:
                     scraper.log_search(
                         task_id=task_id,
                         media_item_id=item.id,
-                        search_query=search_title,
-                        result_count=len(scenes),
+                        search_query=best_query,
+                        result_count=len(best_scenes),
                         details={
                             "hash_match": False,
                             "candidates": [
                                 {
                                     "id": s.get("id"),
                                     "title": s.get("title"),
-                                    "score": difflib.SequenceMatcher(None, normalize_title(search_title), normalize_title(s.get("title") or "")).ratio()
+                                    "score": difflib.SequenceMatcher(None, normalize_title(best_query or search_title), normalize_title(s.get("title") or "")).ratio()
                                 }
-                                for s in scenes[:10]
+                                for s in best_scenes[:10]
                             ],
                             "best_score": best_score,
                             "matched_scene_id": str(best_scene["id"]),
@@ -375,23 +433,24 @@ class AdultResolver:
                     scraper.log_search(
                         task_id=task_id,
                         media_item_id=item.id,
-                        search_query=search_title,
-                        result_count=len(scenes),
+                        search_query=best_query,
+                        result_count=len(best_scenes),
                         details={
                             "hash_match": False,
                             "candidates": [
                                 {
                                     "id": s.get("id"),
                                     "title": s.get("title"),
-                                    "score": difflib.SequenceMatcher(None, normalize_title(search_title), normalize_title(s.get("title") or "")).ratio()
+                                    "score": difflib.SequenceMatcher(None, normalize_title(best_query or search_title), normalize_title(s.get("title") or "")).ratio()
                                 }
-                                for s in scenes[:10]
+                                for s in best_scenes[:10]
                             ],
                             "best_score": best_score,
                             "final_status": "no_match_low_score"
                         }
                     )
 
+        logger.info("[adult:%s] No match for %s after all providers", mode.value, item.filename)
         item.status = ItemStatus.NO_MATCH
         self.db.flush()
         

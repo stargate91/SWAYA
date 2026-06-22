@@ -246,6 +246,7 @@ class MainstreamEnricher:
                 try:
                     with self.db.begin_nested():
                         self.db.add(tv_match)
+                        self.db.flush()
                 except Exception:
                     tv_match = self.db.query(MetadataMatch).filter(
                         MetadataMatch.provider == match.provider,
@@ -299,6 +300,9 @@ class MainstreamEnricher:
         # B. SEASON LEVEL
         season_match = None
         if match.season_number is not None:
+            # Make sure tv_match has an ID populated
+            if tv_match.id is None:
+                self.db.flush()
             with tv_enrich_lock:
                 season_match = self.db.query(MetadataMatch).filter(
                     MetadataMatch.provider == match.provider,
@@ -313,6 +317,7 @@ class MainstreamEnricher:
                         external_id=f"{match.external_id}-s{match.season_number}",
                         media_type=MediaType.SEASON,
                         season_number=match.season_number,
+                        parent=tv_match,
                         parent_id=tv_match.id,
                         confidence_score=1.0,
                         media_item_id=None
@@ -320,6 +325,7 @@ class MainstreamEnricher:
                     try:
                         with self.db.begin_nested():
                             self.db.add(season_match)
+                            self.db.flush()
                     except Exception:
                         season_match = self.db.query(MetadataMatch).filter(
                             MetadataMatch.provider == match.provider,
@@ -350,8 +356,14 @@ class MainstreamEnricher:
         # C. EPISODE LEVEL
         if match.season_number is not None and match.episode_number is not None:
             if season_match:
+                if season_match.id is None:
+                    self.db.flush()
+                match.parent = season_match
                 match.parent_id = season_match.id
             else:
+                if tv_match.id is None:
+                    self.db.flush()
+                match.parent = tv_match
                 match.parent_id = tv_match.id
 
             ep_nums = []

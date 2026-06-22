@@ -26,10 +26,10 @@ export function useOrganizerModalActions({
   const settings = settingsQuery.data;
 
   const {
-    refreshOrganizerDiscovery,
-    handleResolveDiscoveryRows,
-    handleDeleteDiscoveryRow,
-    handleDeleteDiscoveryRows,
+    refreshOrganizer,
+    handleResolveOrganizerRows,
+    handleDeleteOrganizerRow,
+    handleDeleteOrganizerRows,
   } = useOrganizerDeleteActions({
     t,
     closeModal,
@@ -90,7 +90,7 @@ export function useOrganizerModalActions({
               type="button"
               className={`ui-modal__action-card ${action.className || ''}`.trim()}
               onClick={() => {
-                handleDeleteDiscoveryRow(row, action.key).catch((error) => {
+                handleDeleteOrganizerRow(row, action.key).catch((error) => {
                   toast(error.message || t('organizer.toasts.deleteActionFailed'), 'danger');
                 });
               }}
@@ -154,7 +154,7 @@ export function useOrganizerModalActions({
               type="button"
               className={`ui-modal__action-card ${action.className || ''}`.trim()}
               onClick={() => {
-                handleDeleteDiscoveryRows(rows, action.key).catch((error) => {
+                handleDeleteOrganizerRows(rows, action.key).catch((error) => {
                   toast(error.message || t('organizer.toasts.deleteActionFailed'), 'danger');
                 });
               }}
@@ -194,7 +194,7 @@ export function useOrganizerModalActions({
           t={t}
           toast={toast}
           onResolved={(performMutationFn) => {
-            handleResolveDiscoveryRows(targetRows, performMutationFn);
+            handleResolveOrganizerRows(targetRows, performMutationFn);
           }}
         />
       ),
@@ -370,6 +370,6 @@ export function useOrganizerModalActions({
     openBulkOverrideModal,
     rowActions,
     bulkActionBar,
-    refreshOrganizerDiscovery,
+    refreshOrganizer,
   };
 }

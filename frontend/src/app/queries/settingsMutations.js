@@ -4,8 +4,8 @@ import { settingsKeys } from './settingsKeys';
 
 const SETTINGS_INVALIDATION_KEYS = [
   settingsKeys.all,
-  ['discovery'],
-  ['discovery-count'],
+  ['organizer'],
+  ['organizer-count'],
   ['stats'],
 ];
 

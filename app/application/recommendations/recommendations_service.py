@@ -17,7 +17,7 @@ from app.shared_kernel.language import LanguageService
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.application.recommendations.schemas import (
     RecommendationsResponse,
-    DiscoveryGroupsResponse,
+    OrganizerGroupsResponse,
     ActionResponse,
 )
 
@@ -46,6 +46,48 @@ class RecommendationsService:
         if resolved:
             return resolved
         return self.img_service.resolve_image_url(remote_path, subfolder)
+
+    def _looks_like_jav_code(self, value: Optional[str]) -> bool:
+        import re
+
+        text = str(value or "")
+        return bool(
+            re.search(r"\b([a-zA-Z0-9]{2,10})[-.]([0-9]{3,5})\b", text)
+            or re.search(r"\b([a-zA-Z]{2,6})([0-9]{3,5})\b", text)
+        )
+
+    def _infer_organizer_type(self, item: MediaItem) -> str:
+        scan_mode = str((item.parsed_info or {}).get("scan_mode") or "").lower()
+
+        if item.matches:
+            primary_type = item.matches[0].media_type.value
+            if primary_type == MediaType.SCENE.value and (scan_mode == MediaType.JAV.value or self._looks_like_jav_code(item.filename) or "jav" in str(item.folder_name or "").lower()):
+                return MediaType.JAV.value
+            return primary_type
+
+        gtype = None
+        if item.parsed_info:
+            fn_data = item.parsed_info.get("fn") or {}
+            it_data = item.parsed_info.get("it") or {}
+            fd_data = item.parsed_info.get("fd") or {}
+            gtype = fn_data.get("type") or it_data.get("type") or fd_data.get("type")
+
+        if gtype:
+            normalized = str(gtype).lower()
+            if scan_mode == MediaType.JAV.value:
+                return MediaType.JAV.value
+            if normalized == "scene" and (self._looks_like_jav_code(item.filename) or "jav" in str(item.folder_name or "").lower()):
+                return MediaType.JAV.value
+            return normalized
+
+        if scan_mode == MediaType.JAV.value or self._looks_like_jav_code(item.filename) or "jav" in str(item.folder_name or "").lower():
+            return MediaType.JAV.value
+
+        import re
+        filename = item.filename.lower()
+        if re.search(r"s\d+e\d+", filename) or re.search(r"\b\d+x\d+\b", filename) or re.search(r"\b(ep|episode)\s*\d+\b", filename):
+            return MediaType.EPISODE.value
+        return MediaType.MOVIE.value
 
     def _resolve_local_recommendation_bindings(self, items: List[Dict[str, Any]]) -> Dict[tuple, Dict[str, Any]]:
         movie_ids = set()
@@ -140,7 +182,7 @@ class RecommendationsService:
             watchlist_item_ids=watchlist_tmdb_ids
         )
 
-    def get_discovery_groups(self) -> DiscoveryGroupsResponse:
+    def get_organizer_groups(self) -> OrganizerGroupsResponse:
         # Retrieve all items needing review
         items = self.db.query(MediaItem).options(
             joinedload(MediaItem.matches).joinedload(MetadataMatch.localizations),
@@ -197,26 +239,7 @@ class RecommendationsService:
                     "confidence": m.confidence_score
                 })
 
-            # Determine item type (movie vs episode)
-            itype = "unknown"
-            if item.matches:
-                itype = item.matches[0].media_type.value
-            else:
-                gtype = None
-                if item.parsed_info:
-                    fn_data = item.parsed_info.get("fn") or {}
-                    it_data = item.parsed_info.get("it") or {}
-                    fd_data = item.parsed_info.get("fd") or {}
-                    gtype = fn_data.get("type") or it_data.get("type") or fd_data.get("type")
-
-                if not gtype:
-                    import re
-                    fn = item.filename.lower()
-                    if re.search(r"s\d+e\d+", fn) or re.search(r"\b\d+x\d+\b", fn) or re.search(r"\b(ep|episode)\s*\d+\b", fn):
-                        gtype = "episode"
-                    else:
-                        gtype = "movie"
-                itype = gtype
+            itype = self._infer_organizer_type(item)
 
             images_list = []
             if item.matches:
@@ -253,7 +276,7 @@ class RecommendationsService:
                             resolved = self._resolve_image_with_fallback(active_m.local_still_path, active_m.still_path, "stills")
                             if resolved:
                                 images_list.append({"path": resolved})
-                    elif active_m.media_type == MediaType.SCENE:
+                    elif active_m.media_type in (MediaType.SCENE, MediaType.JAV):
                         resolved = self._resolve_image_with_fallback(active_m.local_backdrop_path, active_m.backdrop_path, "scene_stills")
                         if resolved:
                             images_list.append({"path": resolved})
@@ -323,14 +346,14 @@ class RecommendationsService:
                 "action": "rename"
             })
 
-        return DiscoveryGroupsResponse(**groups)
+        return OrganizerGroupsResponse(**groups)
 
-    def get_discovery_item_count(self) -> int:
+    def get_organizer_item_count(self) -> int:
         return self.db.query(MediaItem).filter(
             ~MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED, ItemStatus.IGNORED])
         ).count()
 
-    def delete_discovery_items(self, item_ids: List[int], extra_ids: List[int], mode: str) -> ActionResponse:
+    def delete_organizer_items(self, item_ids: List[int], extra_ids: List[int], mode: str) -> ActionResponse:
         if mode == "ignore":
             items = self.db.query(MediaItem).filter(MediaItem.id.in_(item_ids)).all()
             for item in items:

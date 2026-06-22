@@ -29,10 +29,10 @@ class RecommendationsResponse(BaseModel):
     top_tv_genre: str
     watchlist_item_ids: List[int]
 
-class DiscoveryItemImage(BaseModel):
+class OrganizerItemImage(BaseModel):
     path: str
 
-class DiscoveryMatch(BaseModel):
+class OrganizerMatch(BaseModel):
     id: int
     tmdb_id: Optional[int] = None
     type: str
@@ -43,7 +43,7 @@ class DiscoveryMatch(BaseModel):
     is_active: bool
     confidence: Optional[float] = None
 
-class DiscoveryItem(BaseModel):
+class OrganizerItem(BaseModel):
     id: int
     filename: str
     status: str
@@ -52,13 +52,13 @@ class DiscoveryItem(BaseModel):
     planned_path: Optional[str] = None
     extension: str
     size_mb: float
-    images: List[DiscoveryItemImage]
-    matches: List[DiscoveryMatch]
+    images: List[OrganizerItemImage]
+    matches: List[OrganizerMatch]
     current_path: Optional[str] = None
     action: Optional[str] = None
     target_language: Optional[str] = None
 
-class DiscoveryExtra(BaseModel):
+class OrganizerExtra(BaseModel):
     id: int
     parent_id: int
     parent_type: str
@@ -73,11 +73,11 @@ class DiscoveryExtra(BaseModel):
     planned_path: str
     action: str
 
-class DiscoveryGroupsResponse(BaseModel):
-    manual: List[DiscoveryItem]
-    movies: List[DiscoveryItem]
-    tv: List[DiscoveryItem]
-    extras: List[DiscoveryExtra]
+class OrganizerGroupsResponse(BaseModel):
+    manual: List[OrganizerItem]
+    movies: List[OrganizerItem]
+    tv: List[OrganizerItem]
+    extras: List[OrganizerExtra]
     collisions: List[Any] = Field(default_factory=list)
 
 class ActionResponse(BaseModel):

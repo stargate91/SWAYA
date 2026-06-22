@@ -16,7 +16,7 @@ export function OrganizerModalProvider({
     openBulkOverrideModal,
     rowActions,
     bulkActionBar,
-    refreshOrganizerDiscovery,
+    refreshOrganizer,
   } = useOrganizerModalActions({
     focusFirstAvailableResult,
     clearSelectedRows,
@@ -32,7 +32,7 @@ export function OrganizerModalProvider({
     openBulkOverrideModal,
     rowActions,
     bulkActionBar,
-    refreshOrganizerDiscovery,
+    refreshOrganizer,
     selectedRows,
     dismissRows,
     clearSelectedRows,

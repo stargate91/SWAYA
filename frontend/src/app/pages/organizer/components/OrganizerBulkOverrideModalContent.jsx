@@ -110,9 +110,9 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
   const subcategoryList = translatedSubcategoriesByCategory[mainType === 'bonus' ? 'video' : category] || [];
 
   // Get parent candidates (movies + tv) from cache
-  const discovery = queryClient.getQueryData(['discovery']) || {};
-  const movies = discovery.movies || [];
-  const tv = discovery.tv || [];
+  const organizer = queryClient.getQueryData(['organizer']) || {};
+  const movies = organizer.movies || [];
+  const tv = organizer.tv || [];
   const parentCandidates = [...movies, ...tv].map((item) => ({
     value: item.id,
     label: item.filename || item.current_path || `ID: ${item.id}`,

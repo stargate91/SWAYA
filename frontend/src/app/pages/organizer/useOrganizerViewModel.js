@@ -2,10 +2,10 @@ import { useMemo } from 'react';
 import { Database, Inbox } from 'lucide-react';
 
 export function useOrganizerViewModel({
-  discovery,
-  discoveryItemCount,
+  organizer,
+  organizerItemCount,
   isBrowseStarting,
-  isDiscoveryCountReady,
+  isOrganizerCountReady,
   isLoadingAll,
   isRenameStarting,
   isScanActive,
@@ -16,16 +16,16 @@ export function useOrganizerViewModel({
   t,
 }) {
   return useMemo(() => {
-    const loadedMediaCount = (discovery.manual?.length || 0)
-      + (discovery.movies?.length || 0)
-      + (discovery.tv?.length || 0)
-      + (discovery.collisions?.length || 0);
-    const hasVisibleItems = loadedMediaCount > 0 || (discovery.extras?.length || 0) > 0;
-    const hasDatabaseItems = isDiscoveryCountReady && discoveryItemCount > 0;
-    const remainingDiscoveryCount = isDiscoveryCountReady
-      ? Math.max(0, discoveryItemCount - loadedMediaCount)
+    const loadedMediaCount = (organizer.manual?.length || 0)
+      + (organizer.movies?.length || 0)
+      + (organizer.tv?.length || 0)
+      + (organizer.collisions?.length || 0);
+    const hasVisibleItems = loadedMediaCount > 0 || (organizer.extras?.length || 0) > 0;
+    const hasDatabaseItems = isOrganizerCountReady && organizerItemCount > 0;
+    const remainingOrganizerCount = isOrganizerCountReady
+      ? Math.max(0, organizerItemCount - loadedMediaCount)
       : null;
-    const shouldShowLoadRest = hasVisibleItems && isDiscoveryCountReady && remainingDiscoveryCount > 0;
+    const shouldShowLoadRest = hasVisibleItems && isOrganizerCountReady && remainingOrganizerCount > 0;
     const summaryText = `${pageStart}-${pageEnd} / ${sortedRows.length}`;
 
     const loadingState = isLoadingAll
@@ -67,13 +67,13 @@ export function useOrganizerViewModel({
       hasVisibleItems,
       loadAllButtonLabel: isLoadingAll
         ? t('organizer.buttons.loadingAll')
-        : isDiscoveryCountReady
-          ? `${t('organizer.buttons.loadAll')} (${discoveryItemCount})`
+        : isOrganizerCountReady
+          ? `${t('organizer.buttons.loadAll')} (${organizerItemCount})`
           : t('organizer.buttons.loadAll'),
       loadRestButtonLabel: isLoadingAll
         ? t('organizer.buttons.loadingAll')
-        : isDiscoveryCountReady
-          ? `${t('organizer.buttons.loadTheRest')} (${remainingDiscoveryCount})`
+        : isOrganizerCountReady
+          ? `${t('organizer.buttons.loadTheRest')} (${remainingOrganizerCount})`
           : t('organizer.buttons.loadTheRest'),
       loadingState,
       renameButtonLabel: isRenameStarting || (isScanActive && scanPhase === 'organizing')
@@ -84,10 +84,10 @@ export function useOrganizerViewModel({
       summaryText,
     };
   }, [
-    discovery,
-    discoveryItemCount,
+    organizer,
+    organizerItemCount,
     isBrowseStarting,
-    isDiscoveryCountReady,
+    isOrganizerCountReady,
     isLoadingAll,
     isRenameStarting,
     isScanActive,

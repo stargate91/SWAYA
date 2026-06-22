@@ -107,12 +107,12 @@ export const useUpdateMediaMutation = () => {
     mutationFn: (payload) => api.media.update(payload),
     onSuccess: async () => {
       try {
-        const data = await api.discovery.get();
-        queryClient.setQueryData(['discovery'], data);
+        const data = await api.organizer.get();
+        queryClient.setQueryData(['organizer'], data);
       } catch {
-        await queryClient.refetchQueries({ queryKey: ['discovery'] });
+        await queryClient.refetchQueries({ queryKey: ['organizer'] });
       }
-      queryClient.invalidateQueries({ queryKey: ['discovery-count'] });
+      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
     },
   });
@@ -124,12 +124,12 @@ export const useBulkUpdateMediaMutation = () => {
     mutationFn: (payload) => api.media.bulkUpdate(payload),
     onSuccess: async () => {
       try {
-        const data = await api.discovery.get();
-        queryClient.setQueryData(['discovery'], data);
+        const data = await api.organizer.get();
+        queryClient.setQueryData(['organizer'], data);
       } catch {
-        await queryClient.refetchQueries({ queryKey: ['discovery'] });
+        await queryClient.refetchQueries({ queryKey: ['organizer'] });
       }
-      queryClient.invalidateQueries({ queryKey: ['discovery-count'] });
+      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
     },
   });

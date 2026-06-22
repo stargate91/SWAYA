@@ -1,5 +1,7 @@
 import os
+import re
 import time
+import logging
 from pathlib import Path
 from typing import List, Optional, Tuple, Dict, Any
 from sqlalchemy import or_
@@ -20,6 +22,21 @@ from app.infrastructure.filesystem.fs_utils import (
     calculate_full_sha256,
 )
 from .analyzer import Analyzer
+
+logger = logging.getLogger(__name__)
+
+FORCED_EXTRA_VIDEO_SUBTYPES = {
+    ExtraSubtype.SAMPLE,
+    ExtraSubtype.TRAILER,
+    ExtraSubtype.FEATURETTE,
+    ExtraSubtype.BEHIND_THE_SCENES,
+    ExtraSubtype.DELETED_SCENES,
+    ExtraSubtype.INTERVIEW,
+    ExtraSubtype.SCENE_COMPARISON,
+    ExtraSubtype.SHORT,
+    ExtraSubtype.PROMO,
+    ExtraSubtype.CLIP,
+}
 
 def sanitize_parsed_info(data):
     import datetime
@@ -65,6 +82,17 @@ class ScanCollector:
         self.min_video_duration_minutes = min_video_duration_minutes
         self.progress_callback = progress_callback
 
+    def _should_force_video_to_extra(self, path: Path) -> bool:
+        category, subtype = self.categorizer.categorize(path, self.db)
+        if category == ExtraCategory.VIDEO and subtype in FORCED_EXTRA_VIDEO_SUBTYPES:
+            return True
+
+        joined_parts = " ".join(part.lower() for part in path.parts)
+        if re.search(r"\b(sample|samples|extra|extras|trailer|trailers|bonus|featurette|promo|clip)\b", joined_parts):
+            return True
+
+        return False
+
     def collect_and_save(self) -> Tuple[List[MediaItem], Dict[str, Dict[str, Any]]]:
         """
         Discovers files, filters/probes, links extras, and saves to database.
@@ -79,6 +107,7 @@ class ScanCollector:
         potential_extras = files["potential_extras"]
 
         total_files = len(potential_media) + len(potential_extras)
+        logger.info("[scan:%s] Collected %s media candidates and %s extra candidates from %s", self.mode.value, len(potential_media), len(potential_extras), self.library.root_path)
         if total_files == 0:
             return [], {}
 
@@ -145,8 +174,10 @@ class ScanCollector:
                             probe_durations[path_str] = info.get("duration")
                         else:
                             probe_durations[path_str] = None
-                    except Exception:
+                        logger.info("[scan:%s] Probed %s | duration=%s | video=%s | md5=%s | oshash=%s", self.mode.value, path.name, probe_durations[path_str], bool(info and info.get("video_codec")), (res.get("hash_md5") or "")[:12], (res.get("hash_oshash") or "")[:12])
+                    except Exception as exc:
                         probe_durations[path_str] = None
+                        logger.warning("[scan:%s] Probe failed for %s: %s", self.mode.value, path.name, exc)
                     
                     probed_count += 1
                     if self.progress_callback:
@@ -171,10 +202,16 @@ class ScanCollector:
                 if not has_video and has_audio:
                     is_audio_only = True
 
-            if is_audio_only or (duration is not None and duration < limit_seconds):
+            forced_extra = self._should_force_video_to_extra(p)
+            if forced_extra:
+                logger.info("[scan:%s] Forced video extra classification for %s", self.mode.value, p.name)
+
+            if forced_extra or is_audio_only or (duration is not None and duration < limit_seconds):
                 extra_paths.append(p)
             else:
                 media_paths.append(p)
+
+        logger.info("[scan:%s] Classified %s media files and %s extras after duration filtering", self.mode.value, len(media_paths), len(extra_paths))
 
         # 5. Remove media items demoted to extras
         for p in extra_paths:
@@ -193,6 +230,7 @@ class ScanCollector:
 
         # 6. Establish links
         links = self.linker.link(media_paths, extra_paths)
+        logger.info("[scan:%s] Linked %s extras to parent media items", self.mode.value, len(links))
         path_to_item = {}
         to_process = []
 
@@ -237,14 +275,19 @@ class ScanCollector:
                         moved_item.hash_oshash = res.get("hash_oshash")
                         moved_item.hash_sha256 = res.get("hash_sha256")
                     else:
-                        if self.mode.uses_scene_pipeline:
+                        if self.mode == ScanMode.SCENES:
                             moved_item.hash_md5 = calculate_full_md5(str(p))
                             moved_item.hash_oshash = calculate_oshash(str(p))
                             moved_item.hash_sha256 = calculate_full_sha256(str(p))
+                        elif self.mode == ScanMode.JAV:
+                            moved_item.hash_md5 = file_hash
+                            moved_item.hash_oshash = calculate_oshash(str(p))
+                            moved_item.hash_sha256 = None
                         else:
                             moved_item.hash_md5 = file_hash
                             moved_item.hash_oshash = calculate_oshash(str(p))
                         
+                    logger.info("[scan:%s] Re-linked moved media item %s -> %s", self.mode.value, p.name, rel_path)
                     path_to_item[p] = moved_item
                     if moved_item.status == ItemStatus.NEW:
                         to_process.append(moved_item)
@@ -258,10 +301,14 @@ class ScanCollector:
                             existing.hash_oshash = res.get("hash_oshash")
                             existing.hash_sha256 = res.get("hash_sha256")
                         else:
-                            if self.mode.uses_scene_pipeline:
+                            if self.mode == ScanMode.SCENES:
                                 existing.hash_md5 = calculate_full_md5(str(p))
                                 existing.hash_oshash = calculate_oshash(str(p))
                                 existing.hash_sha256 = calculate_full_sha256(str(p))
+                            elif self.mode == ScanMode.JAV:
+                                existing.hash_md5 = file_hash
+                                existing.hash_oshash = calculate_oshash(str(p))
+                                existing.hash_sha256 = None
                             else:
                                 existing.hash_md5 = file_hash
                                 existing.hash_oshash = calculate_oshash(str(p))
@@ -284,14 +331,19 @@ class ScanCollector:
                             item.hash_oshash = res.get("hash_oshash")
                             item.hash_sha256 = res.get("hash_sha256")
                         else:
-                            if self.mode.uses_scene_pipeline:
+                            if self.mode == ScanMode.SCENES:
                                 item.hash_md5 = calculate_full_md5(str(p))
                                 item.hash_oshash = calculate_oshash(str(p))
                                 item.hash_sha256 = calculate_full_sha256(str(p))
+                            elif self.mode == ScanMode.JAV:
+                                item.hash_md5 = file_hash
+                                item.hash_oshash = calculate_oshash(str(p))
+                                item.hash_sha256 = None
                             else:
                                 item.hash_md5 = file_hash
                                 item.hash_oshash = calculate_oshash(str(p))
                         self.db.add(item)
+                        logger.info("[scan:%s] Created media item %s | rel=%s | md5=%s | oshash=%s", self.mode.value, p.name, rel_path, (item.hash_md5 or "")[:12], (item.hash_oshash or "")[:12])
                     
                     path_to_item[p] = item
                     to_process.append(item)
@@ -320,7 +372,9 @@ class ScanCollector:
                 # Populate guessit metadata from pre-computed thread result or fallback run
                 if not existing or existing.size != size or existing.mtime != mtime:
                     triple = res.get("guessit_info") if res else self.analyzer.get_triple_data(item_entity.internal_title, item_entity.filename, item_entity.folder_name)
+                    triple = {**(triple or {}), "scan_mode": self.mode.value}
                     item_entity.parsed_info = sanitize_parsed_info(triple)
+                    logger.info("[scan:%s] Parsed %s | fn.type=%s | fd.type=%s | scan_mode=%s", self.mode.value, item_entity.filename, (triple.get("fn") or {}).get("type"), (triple.get("fd") or {}).get("type"), triple.get("scan_mode"))
                     
                     if triple:
                         fn_data = triple.get("fn") or {}
@@ -353,6 +407,7 @@ class ScanCollector:
 
             category, subtype = self.categorizer.categorize(p, self.db)
             if category is None:
+                logger.info("[scan:%s] Ignored extra candidate %s because no category matched", self.mode.value, p.name)
                 continue
 
             # Scene profiles support sidecar metadata, images, subtitles, and audio tracks.
@@ -367,6 +422,9 @@ class ScanCollector:
             parent_path = links.get(p)
             parent_item = path_to_item.get(parent_path)
             
+            if not parent_item:
+                logger.info("[scan:%s] Extra %s had no linked parent media item", self.mode.value, p.name)
+
             if parent_item:
                 file_hash = calculate_fast_hash(str(p))
                 lang = self.analyzer.extract_language(p.name)
@@ -382,6 +440,7 @@ class ScanCollector:
                             break
 
                 if moved_extra:
+                    logger.info("[scan:%s] Re-linked moved extra %s -> parent %s", self.mode.value, p.name, parent_item.filename)
                     moved_extra.relative_path = rel_path
                     moved_extra.filename = p.name
                     moved_extra.extension = p.suffix.lower()
@@ -401,6 +460,7 @@ class ScanCollector:
                         file_hash=file_hash
                     )
                     self.db.add(extra)
+                    logger.info("[scan:%s] Added extra %s | category=%s | subtype=%s | parent=%s", self.mode.value, p.name, category.value if category else None, subtype.value if subtype else None, parent_item.filename)
 
         self.db.commit()
         if self.progress_callback:
@@ -431,9 +491,12 @@ class ScanCollector:
 
         # 2. Compute Hashes
         result["hash_oshash"] = calculate_oshash(filepath_str)
-        if self.mode.uses_scene_pipeline:
+        if self.mode == ScanMode.SCENES:
             result["hash_md5"] = calculate_full_md5(filepath_str)
             result["hash_sha256"] = calculate_full_sha256(filepath_str)
+        elif self.mode == ScanMode.JAV:
+            result["hash_md5"] = calculate_fast_hash(filepath_str)
+            result["hash_sha256"] = None
         else:
             result["hash_md5"] = calculate_fast_hash(filepath_str)
 

@@ -153,6 +153,7 @@ class ScannerService:
             })
             
         scan_mode = mode if mode is not None else ScanMode.MOVIES_TV
+        logger.info("[scan:%s] Starting background scan | task_id=%s | paths=%s | include_adult=%s", scan_mode.value, task_id, paths, include_adult)
         try:
             # Repair inconsistent items (status is matched/organized/renamed but has no matches)
             inconsistent_items = self.db.query(MediaItem).filter(
@@ -198,6 +199,8 @@ class ScannerService:
             from app.application.media.scanner_manager import ScannerManager
             scanner = ScannerManager(self.db)
             
+            logger.info("[scan:%s] Libraries selected: %s", scan_mode.value, [lib.root_path for lib in libraries_to_scan])
+
             for lib in libraries_to_scan:
                 if self._is_stop_requested():
                     break
@@ -207,9 +210,12 @@ class ScannerService:
                         ScannerService.scan_status["total"] = 100
                     self.task_manager.update_progress(task_id, pct * 0.5)
                 to_enrich, _ = await asyncio.to_thread(scanner.scan_library, lib.id, mode=scan_mode, progress_callback=progress_cb)
+                logger.info("[scan:%s] Library %s produced %s items to enrich", scan_mode.value, lib.root_path, len(to_enrich))
                 total_items_to_enrich.extend(to_enrich)
 
             # Phase 2: Metadata API Resolution
+            logger.info("[scan:%s] Total items queued for resolver: %s", scan_mode.value, len(total_items_to_enrich))
+
             if total_items_to_enrich and not self._is_stop_requested():
                 with ScannerService.scan_status_lock:
                     ScannerService.scan_status["phase"] = "resolving"
@@ -235,6 +241,7 @@ class ScannerService:
                     self.task_manager.update_progress(task_id, progress)
                     
                 await asyncio.to_thread(resolver.resolve_all, total_items_to_enrich, progress_callback=resolve_progress_cb, task_id=task_id)
+                logger.info("[scan:%s] Resolver phase finished for %s items", scan_mode.value, len(total_items_to_enrich))
 
             # Phase 3: People Enrichment (Run as separate background task to avoid deadlocks)
             if not self._is_stop_requested() and total_items_to_enrich:
@@ -244,12 +251,14 @@ class ScannerService:
                     match_ids.extend([m.id for m in matches])
                     
                 if match_ids:
+                    logger.info("[scan:%s] Queueing %s match ids for people enrichment", scan_mode.value, len(match_ids))
                     self.task_manager.people_enrich_worker.enqueue_enrich(match_ids)
                     
         except Exception as e:
             logger.error(f"Scan task failed: {e}", exc_info=True)
             raise e
         finally:
+            logger.info("[scan:%s] Scan task finished", scan_mode.value)
             self.task_manager.download_worker.is_paused = False
             with ScannerService.scan_status_lock:
                 ScannerService.scan_status["active"] = False

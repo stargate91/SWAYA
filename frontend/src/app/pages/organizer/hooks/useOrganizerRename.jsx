@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { Sparkles } from 'lucide-react';
 import Button from '../../../ui/Button';
 import OrganizerRenameModalContent from '../OrganizerRenameModalContent.jsx';
-import { mapDiscoveryItemRow, mapExtraRow } from '../organizerMappers';
+import { mapOrganizerItemRow, mapExtraRow } from '../organizerMappers';
 
-const EMPTY_DISCOVERY = {
+const EMPTY_ORGANIZER = {
   manual: [],
   movies: [],
   tv: [],
@@ -13,7 +13,7 @@ const EMPTY_DISCOVERY = {
 };
 
 export function useOrganizerRename({
-  discoveryQuery,
+  organizerQuery,
   dismissedRowIds,
   isScanActive,
   renameMutation,
@@ -31,12 +31,12 @@ export function useOrganizerRename({
       return;
     }
 
-    const currentDiscovery = discoveryQuery.data || EMPTY_DISCOVERY;
+    const currentOrganizer = organizerQuery.data || EMPTY_ORGANIZER;
     const allItems = [
-      ...(currentDiscovery.manual || []),
-      ...(currentDiscovery.movies || []),
-      ...(currentDiscovery.tv || []),
-      ...(currentDiscovery.collisions || []),
+      ...(currentOrganizer.manual || []),
+      ...(currentOrganizer.movies || []),
+      ...(currentOrganizer.tv || []),
+      ...(currentOrganizer.collisions || []),
     ];
     const matchedItems = allItems.filter((item) => {
       const isMatched = String(item.status || '').toLowerCase() === 'matched';
@@ -50,14 +50,14 @@ export function useOrganizerRename({
     }
 
     const matchedItemIds = new Set(matchedItems.map((item) => item.id));
-    const matchedExtras = (currentDiscovery.extras || []).filter((extra) => {
+    const matchedExtras = (currentOrganizer.extras || []).filter((extra) => {
       const parentIsMatched = matchedItemIds.has(extra.parent_id || extra.parent_item_id);
       const isDismissed = dismissedRowIds?.has(`extra-${extra.id}`);
       return parentIsMatched && !isDismissed;
     });
 
     const mappedItems = [
-      ...matchedItems.map((item) => mapDiscoveryItemRow(item, t)),
+      ...matchedItems.map((item) => mapOrganizerItemRow(item, t)),
       ...matchedExtras.map((extra) => mapExtraRow(extra, t)),
     ];
 

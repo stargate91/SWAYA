@@ -24,7 +24,7 @@ export const EXTRAS_TABS = [
   { value: 'metadata', labelKey: 'organizer.extrasTabs.metadata', icon: Info },
 ];
 
-export const EMPTY_DISCOVERY = {
+export const EMPTY_ORGANIZER = {
   manual: [],
   movies: [],
   tv: [],

@@ -7,7 +7,7 @@ import { useOrganizerDismissState } from './hooks/useOrganizerDismissState';
 import { useOrganizerFilteredRows } from './hooks/useOrganizerFilteredRows';
 import { useOrganizerFocus } from './hooks/useOrganizerFocus';
 
-export function useOrganizerPageState({ discovery, t, scanMode }) {
+export function useOrganizerPageState({ organizer, t, scanMode }) {
   const {
     activeMainTab,
     setActiveMainTab,
@@ -22,13 +22,13 @@ export function useOrganizerPageState({ discovery, t, scanMode }) {
     dismissedCount,
     dismissRows,
     restoreDismissedRows,
-  } = useOrganizerDismissState({ discovery });
+  } = useOrganizerDismissState({ organizer });
 
   const {
     tabCounts,
     tabFilteredRows,
   } = useOrganizerFilteredRows({
-    discovery,
+    organizer,
     t,
     activeMainTab,
     activeExtrasTab,
@@ -119,7 +119,7 @@ export function useOrganizerPageState({ discovery, t, scanMode }) {
   }, [paginatedRows, setSelectedRowIds]);
 
   const { focusFirstAvailableResult } = useOrganizerFocus({
-    discovery,
+    organizer,
     t,
     activeRowId,
     setActiveRowId,

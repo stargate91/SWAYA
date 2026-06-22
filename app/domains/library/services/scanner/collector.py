@@ -66,8 +66,15 @@ class Collector:
 
             ext = file_path.suffix.lower()
             
-            # Filter video files by size
-            if ext in video_exts:
+            # Known extra types must never be promoted to primary media,
+            # even if user-configured video extensions accidentally include them.
+            if ext in self.SUBTITLE_EXTS or \
+                 ext in self.IMAGE_EXTS or \
+                 ext in self.AUDIO_EXTS or \
+                 ext in self.META_EXTS:
+                results["potential_extras"].append(file_path)
+
+            elif ext in video_exts:
                 try:
                     size = file_path.stat().st_size
                 except Exception:
@@ -76,12 +83,6 @@ class Collector:
                     results["potential_media"].append(file_path)
                 else:
                     results["potential_extras"].append(file_path)
-            
-            elif ext in self.SUBTITLE_EXTS or \
-                 ext in self.IMAGE_EXTS or \
-                 ext in self.AUDIO_EXTS or \
-                 ext in self.META_EXTS:
-                results["potential_extras"].append(file_path)
             
             else:
                 results["ignored"].append(file_path)

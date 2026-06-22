@@ -5,8 +5,8 @@ import { useOrganizerScan } from './hooks/useOrganizerScan';
 
 export function useOrganizerActions({
   defaultScanDir,
-  discoveryCountQuery,
-  discoveryQuery,
+  organizerCountQuery,
+  organizerQuery,
   isScanActive,
   onResultsReady,
   queryClient,
@@ -29,7 +29,7 @@ export function useOrganizerActions({
     isBrowseStarting,
   } = useOrganizerScan({
     defaultScanDir,
-    discoveryQuery,
+    organizerQuery,
     isScanActive,
     onResultsReady,
     queryClient,
@@ -42,7 +42,7 @@ export function useOrganizerActions({
   });
 
   const { handleRename, isRenameStarting } = useOrganizerRename({
-    discoveryQuery,
+    organizerQuery,
     dismissedRowIds,
     isScanActive,
     renameMutation,
@@ -61,12 +61,12 @@ export function useOrganizerActions({
 
     setIsLoadingAll(true);
     try {
-      const result = await discoveryQuery.refetch();
+      const result = await organizerQuery.refetch();
       if (result.data) {
-        queryClient.setQueryData(['discovery'], result.data);
+        queryClient.setQueryData(['organizer'], result.data);
         onResultsReady?.(result.data);
       }
-      await discoveryCountQuery.refetch();
+      await organizerCountQuery.refetch();
       toast(t('organizer.toasts.loadAllSuccess'), 'success');
     } finally {
       setIsLoadingAll(false);

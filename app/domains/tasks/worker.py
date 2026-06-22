@@ -45,12 +45,24 @@ class DownloadWorker:
                 self.loop.create_task(self._put_in_queue(url, subfolder, filename))
             else:
                 asyncio.run_coroutine_threadsafe(self._put_in_queue(url, subfolder, filename), self.loop)
-        else:
-            try:
-                loop = asyncio.get_running_loop()
-                loop.create_task(self._put_in_queue(url, subfolder, filename))
-            except RuntimeError:
-                asyncio.run(self._put_in_queue(url, subfolder, filename))
+            return
+
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if loop and loop.is_running():
+            loop.create_task(self._put_in_queue(url, subfolder, filename))
+            return
+
+        # Background resolver threads do not have a durable event loop.
+        # Fall back to an immediate download so adult/JAV assets still get cached.
+        self.batch_total += 1
+        try:
+            self._do_download(url, subfolder, filename)
+        finally:
+            self.completed_downloads += 1
 
     async def _put_in_queue(self, url: str, subfolder: str, filename: str) -> None:
         if not self.is_running:

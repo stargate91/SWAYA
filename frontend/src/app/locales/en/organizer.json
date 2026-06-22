@@ -62,7 +62,7 @@
     "label": "Drop files or folders here",
     "description": "Drag and drop your media files right here to scan them."
   },
-  "searchPlaceholder": "Search discovery...",
+  "searchPlaceholder": "Search organizer...",
   "searchPlaceholderManual": "Search review needed...",
   "searchPlaceholderMovies": "Search movies...",
   "searchPlaceholderEpisodes": "Search episodes...",
@@ -308,7 +308,7 @@
     "inspect": {
       "open": "View Full Data",
       "title": "Inspection Data",
-      "description": "Combined discovery data, extracted info, and matched metadata for the selected item.",
+      "description": "Combined organizer data, extracted info, and matched metadata for the selected item.",
       "copy": "Copy",
       "download": "Download JSON"
     },

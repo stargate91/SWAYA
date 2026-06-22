@@ -4,7 +4,7 @@ import { scrollOrganizerToTop } from '../organizerScroll';
 import { useScanMutation } from '../../../queries';
 import { isEpisodeMediaType } from '@/lib/mediaTypes';
 
-const EMPTY_DISCOVERY = {
+const EMPTY_ORGANIZER = {
   manual: [],
   movies: [],
   tv: [],
@@ -22,12 +22,12 @@ const isPathInsideFolder = (pathValue, folderPath) => {
 
 const matchesAnyDroppedPath = (value, paths) => paths.some((path) => isPathInsideFolder(value, path));
 
-const filterDiscoveryByPaths = (discovery, paths) => ({
-  manual: (discovery.manual || []).filter((item) => matchesAnyDroppedPath(item.current_path || item.filename, paths)),
-  movies: (discovery.movies || []).filter((item) => matchesAnyDroppedPath(item.current_path || item.filename, paths)),
-  tv: (discovery.tv || []).filter((item) => matchesAnyDroppedPath(item.current_path || item.filename, paths)),
-  collisions: (discovery.collisions || []).filter((item) => matchesAnyDroppedPath(item.current_path || item.filename, paths)),
-  extras: (discovery.extras || []).filter((item) => matchesAnyDroppedPath(item.path || item.filename, paths)),
+const filterOrganizerByPaths = (organizer, paths) => ({
+  manual: (organizer.manual || []).filter((item) => matchesAnyDroppedPath(item.current_path || item.filename, paths)),
+  movies: (organizer.movies || []).filter((item) => matchesAnyDroppedPath(item.current_path || item.filename, paths)),
+  tv: (organizer.tv || []).filter((item) => matchesAnyDroppedPath(item.current_path || item.filename, paths)),
+  collisions: (organizer.collisions || []).filter((item) => matchesAnyDroppedPath(item.current_path || item.filename, paths)),
+  extras: (organizer.extras || []).filter((item) => matchesAnyDroppedPath(item.path || item.filename, paths)),
 });
 
 const mergeById = (currentItems = [], nextItems = []) => {
@@ -37,38 +37,38 @@ const mergeById = (currentItems = [], nextItems = []) => {
   return [...byId.values()];
 };
 
-const mergeDiscoveryGroups = (currentDiscovery, nextDiscovery) => {
+const mergeOrganizerGroups = (currentOrganizer, nextOrganizer) => {
   const nextItemIds = new Set([
-    ...(nextDiscovery.manual || []).map((i) => i.id),
-    ...(nextDiscovery.movies || []).map((i) => i.id),
-    ...(nextDiscovery.tv || []).map((i) => i.id),
-    ...(nextDiscovery.collisions || []).map((i) => i.id),
+    ...(nextOrganizer.manual || []).map((i) => i.id),
+    ...(nextOrganizer.movies || []).map((i) => i.id),
+    ...(nextOrganizer.tv || []).map((i) => i.id),
+    ...(nextOrganizer.collisions || []).map((i) => i.id),
   ]);
 
   const nextExtraIds = new Set([
-    ...(nextDiscovery.extras || []).map((i) => i.id),
+    ...(nextOrganizer.extras || []).map((i) => i.id),
   ]);
 
   const cleanCurrent = {
-    manual: (currentDiscovery.manual || []).filter((i) => !nextItemIds.has(i.id)),
-    movies: (currentDiscovery.movies || []).filter((i) => !nextItemIds.has(i.id)),
-    tv: (currentDiscovery.tv || []).filter((i) => !nextItemIds.has(i.id)),
-    collisions: (currentDiscovery.collisions || []).filter((i) => !nextItemIds.has(i.id)),
-    extras: (currentDiscovery.extras || []).filter((i) => !nextExtraIds.has(i.id)),
+    manual: (currentOrganizer.manual || []).filter((i) => !nextItemIds.has(i.id)),
+    movies: (currentOrganizer.movies || []).filter((i) => !nextItemIds.has(i.id)),
+    tv: (currentOrganizer.tv || []).filter((i) => !nextItemIds.has(i.id)),
+    collisions: (currentOrganizer.collisions || []).filter((i) => !nextItemIds.has(i.id)),
+    extras: (currentOrganizer.extras || []).filter((i) => !nextExtraIds.has(i.id)),
   };
 
   return {
-    manual: mergeById(cleanCurrent.manual, nextDiscovery.manual),
-    movies: mergeById(cleanCurrent.movies, nextDiscovery.movies),
-    tv: mergeById(cleanCurrent.tv, nextDiscovery.tv),
-    collisions: mergeById(cleanCurrent.collisions, nextDiscovery.collisions),
-    extras: mergeById(cleanCurrent.extras, nextDiscovery.extras),
+    manual: mergeById(cleanCurrent.manual, nextOrganizer.manual),
+    movies: mergeById(cleanCurrent.movies, nextOrganizer.movies),
+    tv: mergeById(cleanCurrent.tv, nextOrganizer.tv),
+    collisions: mergeById(cleanCurrent.collisions, nextOrganizer.collisions),
+    extras: mergeById(cleanCurrent.extras, nextOrganizer.extras),
   };
 };
 
 export function useOrganizerScan({
   defaultScanDir,
-  discoveryQuery,
+  organizerQuery,
   isScanActive,
   onResultsReady,
   queryClient,
@@ -114,19 +114,19 @@ export function useOrganizerScan({
         const wasAborted = wasStopRequestedRef.current;
         wasStopRequestedRef.current = false;
 
-        const currentVisibleDiscovery = queryClient.getQueryData(['discovery']) || EMPTY_DISCOVERY;
+        const currentVisibleOrganizer = queryClient.getQueryData(['organizer']) || EMPTY_ORGANIZER;
 
-        queryClient.invalidateQueries({ queryKey: ['discovery'] });
-        queryClient.invalidateQueries({ queryKey: ['discovery-count'] });
+        queryClient.invalidateQueries({ queryKey: ['organizer'] });
+        queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
         queryClient.invalidateQueries({ queryKey: ['stats'] });
 
         try {
-          const result = await discoveryQuery.refetch();
-          const nextDiscovery = result.data || EMPTY_DISCOVERY;
+          const result = await organizerQuery.refetch();
+          const nextOrganizer = result.data || EMPTY_ORGANIZER;
 
           if (wasRename) {
-            queryClient.setQueryData(['discovery'], nextDiscovery);
-            onResultsReady?.(nextDiscovery);
+            queryClient.setQueryData(['organizer'], nextOrganizer);
+            onResultsReady?.(nextOrganizer);
             if (wasAborted) {
               toast('Renaming stopped.', 'warning');
             } else {
@@ -134,13 +134,13 @@ export function useOrganizerScan({
             }
           } else {
             const scanSubset = lastScanPathsRef.current.length > 0
-              ? filterDiscoveryByPaths(nextDiscovery, lastScanPathsRef.current)
-              : nextDiscovery;
-            const mergedDiscovery = mergeDiscoveryGroups(currentVisibleDiscovery, scanSubset);
-            queryClient.setQueryData(['discovery'], mergedDiscovery);
-            onResultsReady?.(mergedDiscovery);
-            const matchedMovies = (nextDiscovery.movies || []).length;
-            const matchedEpisodes = (nextDiscovery.tv || []).filter((item) => isEpisodeMediaType(item.type)).length;
+              ? filterOrganizerByPaths(nextOrganizer, lastScanPathsRef.current)
+              : nextOrganizer;
+            const mergedOrganizer = mergeOrganizerGroups(currentVisibleOrganizer, scanSubset);
+            queryClient.setQueryData(['organizer'], mergedOrganizer);
+            onResultsReady?.(mergedOrganizer);
+            const matchedMovies = (nextOrganizer.movies || []).length;
+            const matchedEpisodes = (nextOrganizer.tv || []).filter((item) => isEpisodeMediaType(item.type)).length;
             const matchedReady = matchedMovies + matchedEpisodes;
             toast(t('organizer.toasts.scanComplete').replace('{count}', matchedReady), 'success');
           }
@@ -154,7 +154,7 @@ export function useOrganizerScan({
       scrollOrganizerToTop();
     }
     previousScanActiveRef.current = isScanActive;
-  }, [isScanActive, onResultsReady, queryClient, t, toast, discoveryQuery, renameStartedRef, scanStatus]);
+  }, [isScanActive, onResultsReady, queryClient, t, toast, organizerQuery, renameStartedRef, scanStatus]);
 
   const handleScanPaths = async (paths) => {
     if (isScanActive || isBrowseStarting) {
@@ -181,8 +181,8 @@ export function useOrganizerScan({
       }
 
       queryClient.invalidateQueries({ queryKey: ['scan-status'] });
-      queryClient.invalidateQueries({ queryKey: ['discovery'] });
-      queryClient.invalidateQueries({ queryKey: ['discovery-count'] });
+      queryClient.invalidateQueries({ queryKey: ['organizer'] });
+      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
     } catch (error) {
       toast(error.message || t('organizer.toasts.scanStartFailed'), 'danger');
     } finally {
