@@ -8,14 +8,17 @@ from app.domains.users.models import UserOverride
 from app.shared_kernel.enums import ItemStatus, MediaType
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.shared_kernel.language import LanguageService as LangHelper
-from app.domains.settings.models import UserSetting, SystemSetting
-from app.infrastructure.settings.formatter_config_adapter import load_formatter_config_from_db
+from app.shared_kernel.ports.settings_port import SettingsPort
+from app.domains.library.schemas import MovieCollectionsResponse
 
 logger = logging.getLogger(__name__)
 
 class LibraryCollectionService:
-    def __init__(self, db_session: Session):
+    def __init__(self, db_session: Session, settings_port: Optional[SettingsPort] = None):
         self.db = db_session
+        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+        self.settings = settings_port or DbSettingsAdapter(db_session)
+
 
     def get_movie_collections(
         self,
@@ -24,18 +27,16 @@ class LibraryCollectionService:
         search: str = "",
         tab: str = "movies",
         include_adult: bool = False,
-    ) -> dict[str, Any]:
+    ) -> MovieCollectionsResponse:
         """
         Retrieves a paginated and filtered list of movie collections in the library.
         """
         # Get ui language
         ui_lang = DEFAULT_FALLBACK_LANGUAGE
         try:
-            setting = self.db.query(UserSetting).filter(UserSetting.user_id == 1, UserSetting.key == "ui_language").first()
-            if not setting:
-                setting = self.db.query(SystemSetting).filter(SystemSetting.key == "ui_language").first()
-            if setting and setting.value:
-                ui_lang = str(setting.value).split("-", 1)[0].strip().lower()
+            val = self.settings.get_setting("ui_language")
+            if val:
+                ui_lang = str(val).split("-", 1)[0].strip().lower()
         except:
             pass
 
@@ -94,7 +95,10 @@ class LibraryCollectionService:
 
             loc = match.localizations[0] if match.localizations else None
             item = match.media_item
-            o = next((ov for ov in match.overrides if ov.user_id == 1), None) if match.overrides else None
+            
+            from app.shared_kernel.user_context import get_current_user_id
+            current_uid = get_current_user_id()
+            o = next((ov for ov in match.overrides if ov.user_id == current_uid), None) if match.overrides else None
             
             title = (o.custom_title if (o and o.custom_title) else None) or (loc.title if loc else (item.filename if item else "Unknown"))
             poster_path = (o.custom_poster if (o and o.custom_poster) else None) or (loc.poster_path if loc else None)
@@ -121,9 +125,20 @@ class LibraryCollectionService:
             })
 
         # Apply config filtering
-        config = load_formatter_config_from_db(self.db)
-        collection_mode = config.collection_folder_mode
-        threshold = config.collection_folder_threshold
+        collection_mode = self.settings.get_setting("folder_collection_mode")
+        threshold = self.settings.get_setting("folder_collection_threshold")
+        create_collection_dir = self.settings.get_setting("folder_create_collection_dir")
+
+        if not collection_mode:
+            if create_collection_dir is False:
+                collection_mode = "never"
+            else:
+                collection_mode = "threshold"
+
+        try:
+            threshold = max(1, int(threshold or 3))
+        except (TypeError, ValueError):
+            threshold = 3
 
         filtered_collections = []
         for col in collections_map.values():
@@ -149,10 +164,10 @@ class LibraryCollectionService:
         end_idx = start_idx + page_size if page_size else total_items
         paged_collections = sorted_collections[start_idx:end_idx]
 
-        return {
-            "items": paged_collections,
-            "total_items": total_items,
-            "page": current_page,
-            "page_size": page_size,
-            "total_pages": total_pages
-        }
+        return MovieCollectionsResponse(
+            items=paged_collections,
+            total_items=total_items,
+            page=current_page,
+            page_size=page_size,
+            total_pages=total_pages
+        )

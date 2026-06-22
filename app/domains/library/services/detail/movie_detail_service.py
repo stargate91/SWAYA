@@ -22,7 +22,8 @@ class MovieDetailService(DetailFormatter):
         self.scrapers = scrapers
         self.tmdb_scraper = scrapers.tmdb(db)
 
-    def get_library_item_detail(self, item_id: str, full_people: bool = False):
+    def get_library_item_detail(self, item_id: str, full_people: bool = False) -> MovieDetailResponse:
+        from app.domains.library.schemas import MovieDetailResponse
         db = self.db
         
         # Virtual TMDB Movie Detail
@@ -75,8 +76,10 @@ class MovieDetailService(DetailFormatter):
                 except:
                     pass
             
+            from app.shared_kernel.user_context import get_current_user_id
+            current_uid = get_current_user_id()
             override = db.query(UserOverride).join(MetadataMatch, UserOverride.metadata_match_id == MetadataMatch.id).filter(
-                UserOverride.user_id == 1,
+                UserOverride.user_id == current_uid,
                 MetadataMatch.provider == Provider.TMDB,
                 MetadataMatch.external_id == str(tmdb_id)
             ).first()
@@ -120,7 +123,7 @@ class MovieDetailService(DetailFormatter):
                 "playback_logs": [],
                 "in_library": False,
             }
-            return JSONResponse(content=result)
+            return MovieDetailResponse(**result)
         
         # Local MediaItem Detail
         try:
@@ -193,7 +196,7 @@ class MovieDetailService(DetailFormatter):
         
         override = item.overrides
         if not override:
-            override = db.query(UserOverride).filter(UserOverride.user_id == 1, UserOverride.media_item_id == item.id).first()
+            override = db.query(UserOverride).filter(UserOverride.user_id == current_uid, UserOverride.media_item_id == item.id).first()
             
         title = (override.custom_title if (override and override.custom_title) else None) or (loc.title if loc else item.filename)
         overview = (override.custom_overview if (override and override.custom_overview) else None) or (loc.overview if loc else None)
@@ -236,4 +239,4 @@ class MovieDetailService(DetailFormatter):
             "resume_position": override.resume_position if override else 0,
             "last_watched_at": override.last_watched_at.isoformat() if override and override.last_watched_at else None,
         }
-        return JSONResponse(content=result)
+        return MovieDetailResponse(**result)

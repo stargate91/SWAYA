@@ -9,6 +9,16 @@ from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch, MetadataLocalization
 from app.domains.people.models import Person, PersonLocalization
 from app.shared_kernel.enums import Provider, MediaType, ItemStatus, CustomListType
+from app.domains.users.schemas import (
+    CustomListItemResponse,
+    CustomListResponse,
+    CustomListDetailResponse,
+    ListMembershipResponse,
+    CatalogItemResponse,
+    CatalogPageResponse,
+    CatalogResponse,
+    BulkUpdateResponse,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +26,7 @@ class ListsService:
     def __init__(self, db: Session):
         self.db = db
 
-    def _serialize_item(self, item: CustomListItem) -> Dict[str, Any]:
+    def _serialize_item(self, item: CustomListItem) -> CustomListItemResponse:
         res = {
             "id": item.id,
             "media_item_id": item.media_item_id,
@@ -25,6 +35,10 @@ class ListsService:
             "studio_id": item.studio_id,
             "collection_id": item.collection_id,
             "added_at": item.added_at.isoformat() if item.added_at else None,
+            "title": None,
+            "tmdb_id": None,
+            "media_type": None,
+            "poster_path": None,
         }
         
         # Populate basic info based on what is linked
@@ -49,9 +63,9 @@ class ListsService:
             res["media_type"] = "person"
             res["poster_path"] = item.person.profile_path
             
-        return res
+        return CustomListItemResponse(**res)
 
-    def get_all_lists(self) -> List[Dict[str, Any]]:
+    def get_all_lists(self) -> List[CustomListResponse]:
         # Ensure Watchlist exists
         watchlist = self.db.query(CustomList).filter(CustomList.name == "Watchlist").first()
         if not watchlist:
@@ -69,40 +83,40 @@ class ListsService:
         result = []
         for l in lists:
             item_count = len(l.items)
-            posters = [self._serialize_item(item).get("poster_path") for item in l.items[:4]]
+            posters = [self._serialize_item(item).poster_path for item in l.items[:4]]
             posters = [p for p in posters if p]
             
-            result.append({
-                "id": l.id,
-                "name": l.name,
-                "is_watchlist": l.name == "Watchlist",
-                "description": l.description,
-                "color": l.color or "#3b82f6",
-                "icon": l.icon or "ListVideo",
-                "created_at": l.created_at.isoformat() if l.created_at else None,
-                "item_count": item_count,
-                "sample_posters": posters
-            })
+            result.append(CustomListResponse(
+                id=l.id,
+                name=l.name,
+                is_watchlist=l.name == "Watchlist",
+                description=l.description,
+                color=l.color or "#3b82f6",
+                icon=l.icon or "ListVideo",
+                created_at=l.created_at.isoformat() if l.created_at else None,
+                item_count=item_count,
+                sample_posters=posters
+            ))
         return result
 
-    def get_list_details(self, list_id: int) -> Dict[str, Any]:
+    def get_list_details(self, list_id: int) -> CustomListDetailResponse:
         l = self.db.query(CustomList).filter(CustomList.id == list_id).first()
         if not l:
             from app.shared_kernel.exceptions import NotFoundException
             raise NotFoundException("Not found")
 
-        return {
-            "id": l.id,
-            "name": l.name,
-            "is_watchlist": l.name == "Watchlist",
-            "description": l.description,
-            "color": l.color,
-            "icon": l.icon,
-            "created_at": l.created_at.isoformat() if l.created_at else None,
-            "items": [self._serialize_item(item) for item in l.items]
-        }
+        return CustomListDetailResponse(
+            id=l.id,
+            name=l.name,
+            is_watchlist=l.name == "Watchlist",
+            description=l.description,
+            color=l.color,
+            icon=l.icon,
+            created_at=l.created_at.isoformat() if l.created_at else None,
+            items=[self._serialize_item(item) for item in l.items]
+        )
 
-    def create_list(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+    def create_list(self, payload: Dict[str, Any]) -> CustomListResponse:
         name = payload.get("name", "").strip()
         description = payload.get("description", "").strip() or None
         color = payload.get("color", "").strip() or "#3b82f6"
@@ -120,19 +134,19 @@ class ListsService:
         new_list = CustomList(name=name, description=description, color=color, icon=icon)
         self.db.add(new_list)
         self.db.commit()
-        return {
-            "id": new_list.id,
-            "name": new_list.name,
-            "is_watchlist": False,
-            "description": new_list.description,
-            "color": new_list.color,
-            "icon": new_list.icon,
-            "created_at": new_list.created_at.isoformat() if new_list.created_at else None,
-            "item_count": 0,
-            "sample_posters": []
-        }
+        return CustomListResponse(
+            id=new_list.id,
+            name=new_list.name,
+            is_watchlist=False,
+            description=new_list.description,
+            color=new_list.color,
+            icon=new_list.icon,
+            created_at=new_list.created_at.isoformat() if new_list.created_at else None,
+            item_count=0,
+            sample_posters=[]
+        )
 
-    def update_list(self, list_id: int, payload: Dict[str, Any]) -> Dict[str, Any]:
+    def update_list(self, list_id: int, payload: Dict[str, Any]) -> CustomListDetailResponse:
         l = self.db.query(CustomList).filter(CustomList.id == list_id).first()
         if not l:
             from app.shared_kernel.exceptions import NotFoundException
@@ -158,7 +172,7 @@ class ListsService:
         self.db.commit()
         return {"status": "success"}
 
-    def add_item_to_list(self, list_id: int, payload: Dict[str, Any]) -> Dict[str, Any]:
+    def add_item_to_list(self, list_id: int, payload: Dict[str, Any]) -> CustomListItemResponse:
         l = self.db.query(CustomList).filter(CustomList.id == list_id).first()
         if not l:
             from app.shared_kernel.exceptions import NotFoundException
@@ -212,7 +226,7 @@ class ListsService:
         self.db.commit()
         return {"status": "success"}
 
-    def get_item_membership(self, item_id: str) -> Dict[str, Any]:
+    def get_item_membership(self, item_id: str) -> ListMembershipResponse:
         # Emulate legacy membership check
         tmdb_id = None
         media_item_id = None
@@ -230,10 +244,10 @@ class ListsService:
             if match:
                 query = query.filter(CustomListItem.match_id == match.id)
             else:
-                return {"list_ids": []}
+                return ListMembershipResponse(list_ids=[])
 
         items = query.all()
-        return {"list_ids": list(set(item.list_id for item in items))}
+        return ListMembershipResponse(list_ids=list(set(item.list_id for item in items)))
 
     def get_user_catalog(
         self,
@@ -242,10 +256,9 @@ class ListsService:
         limit: int = 40,
         search: str = "",
         favorite_only: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> CatalogResponse:
         # Quick simplified catalog query returning matching physical and virtual elements
         items_list = []
-        
 
         if tab == "people":
             query = self.db.query(Person)
@@ -257,14 +270,14 @@ class ListsService:
                 override = self.db.query(UserOverride).filter(UserOverride.person_id == p.id).first()
                 if favorite_only and (not override or not override.is_favorite):
                     continue
-                items_list.append({
-                    "id": p.id,
-                    "title": p.name,
-                    "media_type": "person",
-                    "poster_path": p.profile_path,
-                    "user_rating": override.user_rating if override else 0,
-                    "is_favorite": override.is_favorite if override else False,
-                })
+                items_list.append(CatalogItemResponse(
+                    id=p.id,
+                    title=p.name,
+                    media_type="person",
+                    poster_path=p.profile_path,
+                    user_rating=override.user_rating if override else 0,
+                    is_favorite=override.is_favorite if override else False,
+                ))
         else:
             # tab == "movies" or "tv"
             query = self.db.query(MediaItem).options(joinedload(MediaItem.matches))
@@ -277,36 +290,36 @@ class ListsService:
                 if favorite_only and (not override or not override.is_favorite):
                     continue
                 match = next((m for m in item.matches), None)
-                items_list.append({
-                    "id": item.id,
-                    "title": item.filename,
-                    "media_type": match.media_type.value if match else "movie",
-                    "user_rating": override.user_rating if override else 0,
-                    "is_favorite": override.is_favorite if override else False,
-                })
+                items_list.append(CatalogItemResponse(
+                    id=item.id,
+                    title=item.filename,
+                    media_type=match.media_type.value if match else "movie",
+                    user_rating=override.user_rating if override else 0,
+                    is_favorite=override.is_favorite if override else False,
+                ))
 
         counts = {"movies": total if tab == "movies" else 0, "tv": total if tab == "tv" else 0, "people": total if tab == "people" else 0}
-        return {
-            "movies": items_list if tab == "movies" else [],
-            "tv": items_list if tab == "tv" else [],
-            "people": items_list if tab == "people" else [],
-            "counts": counts,
-            "page": {
-                "tab": tab,
-                "offset": offset,
-                "limit": limit,
-                "returned": len(items_list),
-                "has_more": offset + len(items_list) < total,
-            }
-        }
+        return CatalogResponse(
+            movies=items_list if tab == "movies" else [],
+            tv=items_list if tab == "tv" else [],
+            people=items_list if tab == "people" else [],
+            counts=counts,
+            page=CatalogPageResponse(
+                tab=tab,
+                offset=offset,
+                limit=limit,
+                returned=len(items_list),
+                has_more=offset + len(items_list) < total,
+            )
+        )
 
-    def bulk_update_catalog_status(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+    def bulk_update_catalog_status(self, payload: Dict[str, Any]) -> BulkUpdateResponse:
         tab = payload.get("tab", "movies")
         updates = payload.get("updates", {})
         ids = payload.get("ids", [])
 
         if not ids:
-            return {"status": "success", "updated_ids": []}
+            return BulkUpdateResponse(status="success", tab=tab, updated_ids=[])
 
         user_rating = updates.get("user_rating")
         is_favorite = updates.get("is_favorite")
@@ -346,4 +359,4 @@ class ListsService:
                     updated_ids.append(raw_id)
 
         self.db.commit()
-        return {"status": "success", "tab": tab, "updated_ids": updated_ids}
+        return BulkUpdateResponse(status="success", tab=tab, updated_ids=updated_ids)

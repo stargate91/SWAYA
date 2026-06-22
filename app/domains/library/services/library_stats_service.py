@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session, joinedload
 from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch
 from app.shared_kernel.enums import ItemStatus, MediaType
+from app.domains.library.schemas import LibraryStatsResponse
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,7 @@ class LibraryStatsService:
             return f"{size_bytes / (1024 ** 3):.1f} GB"
         return f"{size_bytes / (1024 ** 2):.0f} MB"
 
-    def get_stats(self, include_adult: bool = False) -> dict[str, Any]:
+    def get_stats(self, include_adult: bool = False) -> LibraryStatsResponse:
         """
         Calculates and returns statistics of library media assets, including storage,
         genres, and manual review counts.
@@ -215,31 +216,31 @@ class LibraryStatsService:
             if len(constellation_links) >= 24:
                 break
 
-        return {
-            "total_movies": total_movies,
-            "total_tv": total_tv,
-            "total_episodes": total_episodes,
-            "total_scenes": total_scenes,
-            "storage": storage_str,
-            "drive_count": len(drives) or 1,
-            "unmatched": unmatched,
-            "storage_breakdown": {
+        return LibraryStatsResponse(
+            total_movies=total_movies,
+            total_tv=total_tv,
+            total_episodes=total_episodes,
+            total_scenes=total_scenes,
+            storage=storage_str,
+            drive_count=len(drives) or 1,
+            unmatched=unmatched,
+            storage_breakdown={
                 "movies": self._format_size(movie_bytes),
                 "tv": self._format_size(tv_bytes),
                 "scenes": self._format_size(adult_bytes),
                 "extras": "0 MB"
             },
-            "manual_review_total": unmatched,
-            "manual_review_breakdown": {
+            manual_review_total=unmatched,
+            manual_review_breakdown={
                 "new": self.db.query(func.count(MediaItem.id)).filter(MediaItem.status == ItemStatus.NEW).scalar() or 0,
                 "error": self.db.query(func.count(MediaItem.id)).filter(MediaItem.status == ItemStatus.ERROR).scalar() or 0,
                 "uncertain": self.db.query(func.count(MediaItem.id)).filter(MediaItem.status == ItemStatus.UNCERTAIN).scalar() or 0,
                 "no_match": self.db.query(func.count(MediaItem.id)).filter(MediaItem.status == ItemStatus.NO_MATCH).scalar() or 0,
                 "multiple": self.db.query(func.count(MediaItem.id)).filter(MediaItem.status == ItemStatus.MULTIPLE).scalar() or 0
             },
-            "genre_distribution": genre_dist,
-            "genre_distribution_ids": genre_dist_ids,
-            "genre_labels": genre_labels,
-            "genre_constellation": {"nodes": constellation_nodes, "links": constellation_links},
-            "decade_distribution": decade_dist
-        }
+            genre_distribution=genre_dist,
+            genre_distribution_ids=genre_dist_ids,
+            genre_labels=genre_labels,
+            genre_constellation={"nodes": constellation_nodes, "links": constellation_links},
+            decade_distribution=decade_dist
+        )

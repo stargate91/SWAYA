@@ -10,26 +10,31 @@ from app.domains.users.models import User, CustomList, CustomListItem
 from app.domains.library.models import MediaItem, Library, ExtraFile
 from app.domains.metadata.models import MetadataMatch, MetadataLocalization
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
-from app.domains.settings.models import UserSetting, SystemSetting
-from app.domains.tasks import task_manager
-from app.domains.media_assets.services.images import ImageProcessingService
+from app.shared_kernel.ports.settings_port import SettingsPort
+from app.domains.media_assets.services.images import image_processing_service
 from app.shared_kernel.language import LanguageService
 
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.application.recommendations.schemas import (
+    RecommendationsResponse,
+    DiscoveryGroupsResponse,
+    ActionResponse,
+)
 
 logger = logging.getLogger(__name__)
 
 class RecommendationsService:
-    def __init__(self, db: Session, scrapers: ScraperGatewayPort):
+    def __init__(self, db: Session, scrapers: ScraperGatewayPort, settings_port: Optional[SettingsPort] = None):
         self.db = db
         self.scraper = scrapers.tmdb(db)
-        self.img_service = ImageProcessingService()
+        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+        self.settings = settings_port or DbSettingsAdapter(db)
+        self.img_service = image_processing_service
 
     def _preferred_metadata_language(self) -> str:
-        lang = self.db.query(UserSetting).filter(UserSetting.key == "primary_metadata_language").first()
-        if not lang:
-            lang = self.db.query(SystemSetting).filter(SystemSetting.key == "primary_metadata_language").first()
-        return lang.value if lang else DEFAULT_FALLBACK_LANGUAGE
+        lang = self.settings.get_setting("primary_metadata_language")
+        return lang if lang else DEFAULT_FALLBACK_LANGUAGE
+
 
     def _resolve_image_with_fallback(
         self,
@@ -87,7 +92,7 @@ class RecommendationsService:
             }
         return bindings
 
-    def get_recommendations(self, language: Optional[str] = None) -> Dict[str, Any]:
+    def get_recommendations(self, language: Optional[str] = None) -> RecommendationsResponse:
         # 1. Fetch watchlist TMDB IDs
         watchlist = self.db.query(CustomList).filter(CustomList.name == "Watchlist").first()
         watchlist_tmdb_ids = []
@@ -100,12 +105,12 @@ class RecommendationsService:
         pref_lang = language or self._preferred_metadata_language()
 
         # Fetch trending and popular items from TMDB via scraper API
-        trending_movie = self.scraper._call_api("/trending/movie/day", {"language": pref_lang})
-        trending_tv = self.scraper._call_api("/trending/tv/day", {"language": pref_lang})
+        trending_movie = self.scraper.get_trending("movie", "day", language=pref_lang)
+        trending_tv = self.scraper.get_trending("tv", "day", language=pref_lang)
 
         trending_results = trending_movie.get("results", [])[:10] + trending_tv.get("results", [])[:10]
-        discover_movies = self.scraper._call_api("/discover/movie", {"language": pref_lang, "sort_by": "popularity.desc"}).get("results", [])
-        discover_tv = self.scraper._call_api("/discover/tv", {"language": pref_lang, "sort_by": "popularity.desc"}).get("results", [])
+        discover_movies = self.scraper.discover("movie", language=pref_lang, sort_by="popularity.desc").get("results", [])
+        discover_tv = self.scraper.discover("tv", language=pref_lang, sort_by="popularity.desc").get("results", [])
 
         # Annotate items with library bindings
         bindings = self._resolve_local_recommendation_bindings(trending_results + discover_movies + discover_tv)
@@ -126,16 +131,16 @@ class RecommendationsService:
                 })
             return annotated
 
-        return {
-            "trending": annotate(trending_results),
-            "discover_movies": annotate(discover_movies),
-            "discover_tv": annotate(discover_tv),
-            "top_movie_genre": "Action",
-            "top_tv_genre": "Drama",
-            "watchlist_item_ids": watchlist_tmdb_ids
-        }
+        return RecommendationsResponse(
+            trending=annotate(trending_results),
+            discover_movies=annotate(discover_movies),
+            discover_tv=annotate(discover_tv),
+            top_movie_genre="Action",
+            top_tv_genre="Drama",
+            watchlist_item_ids=watchlist_tmdb_ids
+        )
 
-    def get_discovery_groups(self) -> Dict[str, Any]:
+    def get_discovery_groups(self) -> DiscoveryGroupsResponse:
         # Retrieve all items needing review
         items = self.db.query(MediaItem).options(
             joinedload(MediaItem.matches).joinedload(MetadataMatch.localizations),
@@ -318,20 +323,20 @@ class RecommendationsService:
                 "action": "rename"
             })
 
-        return groups
+        return DiscoveryGroupsResponse(**groups)
 
     def get_discovery_item_count(self) -> int:
         return self.db.query(MediaItem).filter(
             ~MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED, ItemStatus.IGNORED])
         ).count()
 
-    def delete_discovery_items(self, item_ids: List[int], extra_ids: List[int], mode: str) -> Dict[str, Any]:
+    def delete_discovery_items(self, item_ids: List[int], extra_ids: List[int], mode: str) -> ActionResponse:
         if mode == "ignore":
             items = self.db.query(MediaItem).filter(MediaItem.id.in_(item_ids)).all()
             for item in items:
                 item.status = ItemStatus.IGNORED
             self.db.commit()
-            return {"status": "success", "ignored_items": len(item_ids)}
+            return ActionResponse(status="success", ignored_items=len(item_ids))
 
         # Direct deletion
         if item_ids:
@@ -339,9 +344,9 @@ class RecommendationsService:
         if extra_ids:
             self.db.query(ExtraFile).filter(ExtraFile.id.in_(extra_ids)).delete(synchronize_session=False)
         self.db.commit()
-        return {"status": "success", "deleted_items": len(item_ids), "deleted_extras": len(extra_ids), "mode": mode}
+        return ActionResponse(status="success", deleted_items=len(item_ids), deleted_extras=len(extra_ids), mode=mode)
 
-    def add_to_watchlist(self, tmdb_id: int, media_type: str) -> Dict[str, Any]:
+    def add_to_watchlist(self, tmdb_id: int, media_type: str) -> ActionResponse:
         watchlist = self.db.query(CustomList).filter(CustomList.name == "Watchlist").first()
         if not watchlist:
             watchlist = CustomList(
@@ -379,14 +384,14 @@ class RecommendationsService:
             item = CustomListItem(list_id=watchlist.id, match_id=match.id)
             self.db.add(item)
             self.db.commit()
-            return {"status": "success", "id": item.id}
+            return ActionResponse(status="success", id=item.id)
 
-        return {"status": "success", "message": "Already in watchlist"}
+        return ActionResponse(status="success", message="Already in watchlist")
 
-    def remove_from_watchlist(self, tmdb_id: int) -> Dict[str, Any]:
+    def remove_from_watchlist(self, tmdb_id: int) -> ActionResponse:
         watchlist = self.db.query(CustomList).filter(CustomList.name == "Watchlist").first()
         if not watchlist:
-            return {"status": "error", "message": "Watchlist not found"}
+            return ActionResponse(status="error", message="Watchlist not found")
 
         match = self.db.query(MetadataMatch).filter(
             MetadataMatch.provider == Provider.TMDB,
@@ -399,6 +404,6 @@ class RecommendationsService:
                 CustomListItem.match_id == match.id
             ).delete()
             self.db.commit()
-            return {"status": "success"}
+            return ActionResponse(status="success")
 
-        return {"status": "error", "message": "Item not found in watchlist"}
+        return ActionResponse(status="error", message="Item not found in watchlist")

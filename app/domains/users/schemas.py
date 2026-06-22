@@ -165,3 +165,92 @@ class BulkWatchedUpdate(BaseSchema):
     is_watched: bool = True
     watched_at: Optional[str] = None
     last_watched_at: Optional[str] = None
+
+
+class CustomTagImage(BaseModel):
+    path: str
+    position_x: int
+    position_y: int
+
+
+class TagResponse(BaseModel):
+    id: int
+    name: str
+    color: str
+    target_type: str
+    is_adult: bool
+    custom_images: List[CustomTagImage]
+
+
+class CustomListItemResponse(BaseModel):
+    id: int
+    media_item_id: Optional[int] = None
+    match_id: Optional[int] = None
+    person_id: Optional[int] = None
+    studio_id: Optional[int] = None
+    collection_id: Optional[int] = None
+    added_at: Optional[str] = None
+    title: Optional[str] = None
+    tmdb_id: Optional[int] = None
+    media_type: Optional[str] = None
+    poster_path: Optional[str] = None
+
+
+class CustomListResponse(BaseModel):
+    id: int
+    name: str
+    is_watchlist: bool
+    description: Optional[str] = None
+    color: str
+    icon: str
+    created_at: Optional[str] = None
+    item_count: int
+    sample_posters: List[str]
+
+
+class CustomListDetailResponse(BaseModel):
+    id: int
+    name: str
+    is_watchlist: bool
+    description: Optional[str] = None
+    color: Optional[str] = None
+    icon: Optional[str] = None
+    created_at: Optional[str] = None
+    items: List[CustomListItemResponse]
+
+
+class ListMembershipResponse(BaseModel):
+    list_ids: List[int]
+
+
+class CatalogItemResponse(BaseModel):
+    id: int
+    title: str
+    media_type: str
+    poster_path: Optional[str] = None
+    user_rating: Optional[int] = 0
+    is_favorite: bool = False
+
+
+class CatalogPageResponse(BaseModel):
+    tab: Optional[str] = None
+    offset: int
+    limit: int
+    returned: int
+    has_more: bool
+
+
+class CatalogResponse(BaseModel):
+    movies: List[CatalogItemResponse]
+    tv: List[CatalogItemResponse]
+    people: List[CatalogItemResponse]
+    counts: dict[str, int]
+    page: CatalogPageResponse
+
+
+class BulkUpdateResponse(BaseModel):
+    status: str
+    tab: str
+    updated_ids: List[Any]
+
+

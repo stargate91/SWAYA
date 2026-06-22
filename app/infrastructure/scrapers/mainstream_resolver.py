@@ -131,8 +131,10 @@ class MainstreamResolver:
         candidates: Dict[int, Dict[str, Any]] = {}
 
         if include_adult is None:
+            from app.shared_kernel.user_context import get_current_user_id
+            current_user_id = get_current_user_id()
             include_adult_setting = self.db.query(UserSetting).filter(
-                UserSetting.user_id == 1,
+                UserSetting.user_id == current_user_id,
                 UserSetting.key == "include_adult",
             ).first()
             if not include_adult_setting:

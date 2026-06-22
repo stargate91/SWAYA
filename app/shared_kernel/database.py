@@ -1,6 +1,10 @@
 import os
 import sys
+import logging
 from sqlalchemy import create_engine, event
+
+logger = logging.getLogger(__name__)
+
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from app.shared_kernel.constants import DATABASE_TIMEOUT_SECONDS
 

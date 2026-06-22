@@ -5,6 +5,7 @@ from sqlalchemy import func
 
 from app.domains.users.models import Tag, user_override_tags
 from app.domains.people.models import Person
+from app.domains.users.schemas import TagResponse
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +13,7 @@ class TagsService:
     def __init__(self, db: Session):
         self.db = db
 
-    def _serialize_tag(self, t: Tag) -> Dict[str, Any]:
+    def _serialize_tag(self, t: Tag) -> TagResponse:
         custom_images = []
         if t.custom_image_poster_1:
             custom_images.append({"path": t.custom_image_poster_1, "position_x": 50, "position_y": 50})
@@ -21,14 +22,14 @@ class TagsService:
         if t.custom_image_backdrop:
             custom_images.append({"path": t.custom_image_backdrop, "position_x": 50, "position_y": 50})
             
-        return {
-            "id": t.id,
-            "name": t.name,
-            "color": t.color or "#3b82f6",
-            "target_type": "media",
-            "is_adult": t.is_adult,
-            "custom_images": custom_images
-        }
+        return TagResponse(
+            id=t.id,
+            name=t.name,
+            color=t.color or "#3b82f6",
+            target_type="media",
+            is_adult=t.is_adult,
+            custom_images=custom_images
+        )
 
     def _parse_custom_images(self, custom_images: List[Any]) -> List[str]:
         paths = []
@@ -41,12 +42,12 @@ class TagsService:
                 paths.append(path)
         return paths
 
-    def get_all_tags(self, target_type: Optional[str] = None, is_adult: bool = False) -> List[Dict[str, Any]]:
+    def get_all_tags(self, target_type: Optional[str] = None, is_adult: bool = False) -> List[TagResponse]:
         query = self.db.query(Tag).filter(Tag.is_adult == is_adult)
         tags = query.all()
         return [self._serialize_tag(t) for t in tags]
 
-    def create_tag(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+    def create_tag(self, payload: Dict[str, Any]) -> TagResponse:
         name = payload.get("name", "").strip()
         color = payload.get("color", "#3b82f6")
         is_adult = bool(payload.get("is_adult", False))
@@ -82,7 +83,7 @@ class TagsService:
         self.db.commit()
         return self._serialize_tag(tag)
 
-    def update_tag(self, tag_id: int, payload: Dict[str, Any]) -> Dict[str, Any]:
+    def update_tag(self, tag_id: int, payload: Dict[str, Any]) -> TagResponse:
         tag = self.db.query(Tag).filter(Tag.id == tag_id).first()
         if not tag:
             from app.shared_kernel.exceptions import NotFoundException

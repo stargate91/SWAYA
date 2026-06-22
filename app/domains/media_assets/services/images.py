@@ -287,3 +287,7 @@ class ImageProcessingService:
         orig_rel = f"media/images/original/{subfolder}/{clean_filename}"
         thumb_rel = f"media/images/thumbnails/{subfolder}/{clean_filename}"
         return orig_rel, thumb_rel
+
+
+image_processing_service = ImageProcessingService()
+

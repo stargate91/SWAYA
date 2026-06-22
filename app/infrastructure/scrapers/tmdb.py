@@ -248,4 +248,22 @@ class TMDBScraper(BaseScraper):
         data = self.get_details(int(tv_id), "tv", language=language, force_refresh=force_refresh)
         return data if data else None
 
+    def get_trending(self, media_type: str, time_window: str = "day", language: Optional[str] = None) -> Dict[str, Any]:
+        """Fetch trending items from TMDB."""
+        resolved_lang = LanguageService.resolve_request_locale(Provider.TMDB, language) or DEFAULT_FALLBACK_LANGUAGE
+        endpoint = f"/trending/{media_type}/{time_window}"
+        return self._call_api(endpoint, {"language": resolved_lang})
+
+    def discover(self, media_type: str, language: Optional[str] = None, sort_by: str = "popularity.desc") -> Dict[str, Any]:
+        """Discover media items from TMDB."""
+        resolved_lang = LanguageService.resolve_request_locale(Provider.TMDB, language) or DEFAULT_FALLBACK_LANGUAGE
+        endpoint = f"/discover/{media_type}"
+        return self._call_api(endpoint, {"language": resolved_lang, "sort_by": sort_by})
+
+    def get_collection_details(self, collection_id: int, language: Optional[str] = None, force_refresh: bool = False) -> Dict[str, Any]:
+        """Retrieve details for a specific movie collection/saga."""
+        resolved_lang = LanguageService.resolve_request_locale(Provider.TMDB, language) or DEFAULT_FALLBACK_LANGUAGE
+        endpoint = f"/collection/{collection_id}"
+        return self._call_api(endpoint, {"language": resolved_lang}, force_refresh=force_refresh)
+
 

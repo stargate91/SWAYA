@@ -20,7 +20,8 @@ class TvDetailService(DetailFormatter):
         self.scrapers = scrapers
         self.tmdb_scraper = scrapers.tmdb(db)
 
-    def get_library_tv_detail(self, tv_tmdb_id: str, seasons_limit: int = 5, initial_episodes_limit: int = 4):
+    def get_library_tv_detail(self, tv_tmdb_id: str, seasons_limit: int = 5, initial_episodes_limit: int = 4) -> TvShowDetailResponse:
+        from app.domains.library.schemas import TvShowDetailResponse
         db = self.db
         try:
             tv_tmdb_id_int = int(tv_tmdb_id.split("_")[1]) if "_" in tv_tmdb_id else int(tv_tmdb_id)
@@ -68,7 +69,9 @@ class TvDetailService(DetailFormatter):
                 
                 override = None
                 if local_item:
-                    override = db.query(UserOverride).filter(UserOverride.user_id == 1, UserOverride.media_item_id == local_item.id).first()
+                    from app.shared_kernel.user_context import get_current_user_id
+                    current_uid = get_current_user_id()
+                    override = db.query(UserOverride).filter(UserOverride.user_id == current_uid, UserOverride.media_item_id == local_item.id).first()
                 
                 episodes.append({
                     "id": f"tmdb_{tv_tmdb_id_int}_{season_number}_{ep_num}",
@@ -126,7 +129,7 @@ class TvDetailService(DetailFormatter):
                 writers.append(crew_member)
         
         override = db.query(UserOverride).join(MetadataMatch, UserOverride.metadata_match_id == MetadataMatch.id).filter(
-            UserOverride.user_id == 1,
+            UserOverride.user_id == current_uid,
             MetadataMatch.provider == Provider.TMDB,
             MetadataMatch.external_id == str(tv_tmdb_id_int)
         ).first()
@@ -162,9 +165,10 @@ class TvDetailService(DetailFormatter):
             "is_tracked": override.is_tracked if override else False,
             "in_library": len(local_items) > 0,
         }
-        return JSONResponse(content=result)
-
-    def get_library_tv_season_detail(self, tv_tmdb_id: str, season_number: int):
+        return TvShowDetailResponse(**result)
+ 
+    def get_library_tv_season_detail(self, tv_tmdb_id: str, season_number: int) -> TvSeasonDetailResponse:
+        from app.domains.library.schemas import TvSeasonDetailResponse
         db = self.db
         try:
             tv_tmdb_id_int = int(tv_tmdb_id.split("_")[1]) if "_" in tv_tmdb_id else int(tv_tmdb_id)
@@ -202,7 +206,9 @@ class TvDetailService(DetailFormatter):
             
             override = None
             if local_item:
-                override = db.query(UserOverride).filter(UserOverride.user_id == 1, UserOverride.media_item_id == local_item.id).first()
+                from app.shared_kernel.user_context import get_current_user_id
+                current_uid = get_current_user_id()
+                override = db.query(UserOverride).filter(UserOverride.user_id == current_uid, UserOverride.media_item_id == local_item.id).first()
             
             episodes.append({
                 "id": f"tmdb_{tv_tmdb_id_int}_{season_number}_{ep_num}",
@@ -233,4 +239,4 @@ class TvDetailService(DetailFormatter):
             "episodes_loaded_count": len(episodes),
             "episodes": episodes,
         }
-        return JSONResponse(content=result)
+        return TvSeasonDetailResponse(**result)

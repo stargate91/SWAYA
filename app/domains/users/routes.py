@@ -17,6 +17,13 @@ from app.domains.users.schemas import (
     BulkOverridesUpdate,
     BulkTagsUpdate,
     BulkWatchedUpdate,
+    TagResponse,
+    CustomListResponse,
+    CustomListDetailResponse,
+    ListMembershipResponse,
+    CustomListItemResponse,
+    CatalogResponse,
+    BulkUpdateResponse,
 )
 
 router = APIRouter(prefix="/api/v1/users", tags=["Users"])
@@ -137,23 +144,23 @@ from app.domains.users.services.tags_service import TagsService
 from app.application.catalog.lists_service import ListsService
 
 
-@catalog_router.get("/tags")
+@catalog_router.get("/tags", response_model=List[TagResponse])
 def get_all_tags(target_type: Optional[str] = None, is_adult: bool = False, db: Session = Depends(get_db)):
     return TagsService(db).get_all_tags(target_type, is_adult)
 
 
-@catalog_router.post("/tags")
+@catalog_router.post("/tags", response_model=TagResponse)
 def create_tag(payload: dict, db: Session = Depends(get_db)):
     res = TagsService(db).create_tag(payload)
-    if "error" in res:
+    if isinstance(res, dict) and "error" in res:
         raise HTTPException(status_code=400, detail=res["error"])
     return res
 
 
-@catalog_router.put("/tags/{tag_id}")
+@catalog_router.put("/tags/{tag_id}", response_model=TagResponse)
 def update_tag(tag_id: int, payload: dict, db: Session = Depends(get_db)):
     res = TagsService(db).update_tag(tag_id, payload)
-    if "error" in res:
+    if isinstance(res, dict) and "error" in res:
         raise HTTPException(status_code=400, detail=res["error"])
     return res
 
@@ -166,35 +173,36 @@ def delete_tag(tag_id: int, db: Session = Depends(get_db)):
     return res
 
 
-@catalog_router.get("/lists")
+@catalog_router.get("/lists", response_model=List[CustomListResponse])
 def get_all_lists(db: Session = Depends(get_db)):
     return ListsService(db).get_all_lists()
 
 
-@catalog_router.get("/lists/item-membership/{item_id}")
+@catalog_router.get("/lists/item-membership/{item_id}", response_model=ListMembershipResponse)
 def get_item_membership(item_id: str, db: Session = Depends(get_db)):
     return ListsService(db).get_item_membership(item_id)
 
-@catalog_router.get("/lists/{list_id}")
+
+@catalog_router.get("/lists/{list_id}", response_model=CustomListDetailResponse)
 def get_list_details(list_id: int, db: Session = Depends(get_db)):
     res = ListsService(db).get_list_details(list_id)
-    if "error" in res:
+    if isinstance(res, dict) and "error" in res:
         raise HTTPException(status_code=404, detail=res["error"])
     return res
 
 
-@catalog_router.post("/lists")
+@catalog_router.post("/lists", response_model=CustomListResponse)
 def create_list(payload: dict, db: Session = Depends(get_db)):
     res = ListsService(db).create_list(payload)
-    if "error" in res:
+    if isinstance(res, dict) and "error" in res:
         raise HTTPException(status_code=400, detail=res["error"])
     return res
 
 
-@catalog_router.put("/lists/{list_id}")
+@catalog_router.put("/lists/{list_id}", response_model=CustomListDetailResponse)
 def update_list(list_id: int, payload: dict, db: Session = Depends(get_db)):
     res = ListsService(db).update_list(list_id, payload)
-    if "error" in res:
+    if isinstance(res, dict) and "error" in res:
         raise HTTPException(status_code=400, detail=res["error"])
     return res
 
@@ -202,15 +210,15 @@ def update_list(list_id: int, payload: dict, db: Session = Depends(get_db)):
 @catalog_router.delete("/lists/{list_id}")
 def delete_list(list_id: int, db: Session = Depends(get_db)):
     res = ListsService(db).delete_list(list_id)
-    if "error" in res:
+    if isinstance(res, dict) and "error" in res:
         raise HTTPException(status_code=400, detail=res["error"])
     return res
 
 
-@catalog_router.post("/lists/{list_id}/items")
+@catalog_router.post("/lists/{list_id}/items", response_model=CustomListItemResponse)
 def add_item_to_list(list_id: int, payload: dict, db: Session = Depends(get_db)):
     res = ListsService(db).add_item_to_list(list_id, payload)
-    if "error" in res:
+    if isinstance(res, dict) and "error" in res:
         raise HTTPException(status_code=400, detail=res["error"])
     return res
 
@@ -218,13 +226,13 @@ def add_item_to_list(list_id: int, payload: dict, db: Session = Depends(get_db))
 @catalog_router.delete("/lists/{list_id}/items/{item_id}")
 def remove_item_from_list(list_id: int, item_id: int, db: Session = Depends(get_db)):
     res = ListsService(db).remove_item_from_list(list_id, item_id)
-    if "error" in res:
+    if isinstance(res, dict) and "error" in res:
         raise HTTPException(status_code=400, detail=res["error"])
     return res
 
 
 
-@catalog_router.get("/user/catalog")
+@catalog_router.get("/user/catalog", response_model=CatalogResponse)
 def get_user_catalog(
     tab: Optional[str] = None,
     offset: int = 0,
@@ -236,7 +244,7 @@ def get_user_catalog(
     return ListsService(db).get_user_catalog(tab, offset, limit, search, favorite_only)
 
 
-@catalog_router.post("/user/catalog/bulk-status")
+@catalog_router.post("/user/catalog/bulk-status", response_model=BulkUpdateResponse)
 def bulk_update_catalog_status(payload: dict, db: Session = Depends(get_db)):
     return ListsService(db).bulk_update_catalog_status(payload)
 

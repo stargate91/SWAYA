@@ -1,10 +1,9 @@
 import logging
-from typing import List, Optional
+from typing import List, Optional, Callable
 import requests
 from sqlalchemy.orm import Session
 from app.domains.people.models import Person, PersonLocalization, MediaPersonLink, ExternalSourceLink
 from app.shared_kernel.enums import Provider, RoleType
-from app.domains.settings.models import SystemSetting, UserSetting
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 
 from app.shared_kernel.constants import DEFAULT_MAX_WORKERS, DEFAULT_FALLBACK_LANGUAGE
@@ -12,21 +11,81 @@ from app.shared_kernel.constants import DEFAULT_MAX_WORKERS, DEFAULT_FALLBACK_LA
 logger = logging.getLogger(__name__)
 
 class PeopleEnricher:
-    def __init__(self, db: Optional[Session], scrapers: Optional[ScraperGatewayPort] = None):
+    def __init__(
+        self,
+        db: Optional[Session],
+        scrapers: Optional[ScraperGatewayPort] = None,
+        session_factory: Optional[Callable[[], Session]] = None,
+        is_cancelled: Optional[Callable[[int], bool]] = None,
+        has_active_heavy_tasks: Optional[Callable[[], bool]] = None,
+        executor: Optional[Any] = None,
+        update_progress: Optional[Callable[[int, float], None]] = None,
+    ):
         self.db = db
         self.scrapers = scrapers
+        self.session_factory = session_factory
+        self._is_cancelled_cb = is_cancelled
+        self._has_active_heavy_tasks_cb = has_active_heavy_tasks
+        self._executor = executor
+        self._update_progress_cb = update_progress
         self.session = requests.Session()
+
+    def _is_cancelled(self, task_id: int) -> bool:
+        if self._is_cancelled_cb:
+            return self._is_cancelled_cb(task_id)
+        try:
+            from app.domains.tasks import task_manager
+            return task_manager.is_cancelled(task_id)
+        except Exception:
+            return False
+
+    def _has_active_heavy_tasks(self) -> bool:
+        if self._has_active_heavy_tasks_cb:
+            return self._has_active_heavy_tasks_cb()
+        try:
+            from app.domains.tasks import task_manager
+            return task_manager.has_active_heavy_tasks()
+        except Exception:
+            return False
+
+    def _get_executor(self):
+        if self._executor:
+            return self._executor
+        try:
+            from app.domains.tasks import task_manager
+            return task_manager.executor
+        except Exception:
+            import concurrent.futures
+            return concurrent.futures.ThreadPoolExecutor(max_workers=2)
+
+    def _update_progress(self, task_id: int, progress: float) -> None:
+        if self._update_progress_cb:
+            self._update_progress_cb(task_id, progress)
+        else:
+            try:
+                from app.domains.tasks import task_manager
+                task_manager.update_progress(task_id, progress)
+            except Exception:
+                pass
+
 
     def _require_scrapers(self) -> ScraperGatewayPort:
         if self.scrapers is None:
             raise RuntimeError("Scraper gateway is required for people enrichment")
         return self.scrapers
 
-    def get_setting_with_db(self, db: Session, key: str, default: Optional[str] = None) -> Optional[str]:
-        val = db.query(UserSetting).filter(UserSetting.key == key).first()
-        if not val:
-            val = db.query(SystemSetting).filter(SystemSetting.key == key).first()
-        return val.value if val else default
+    def _get_temp_db(self) -> Session:
+        if self.session_factory:
+            return self.session_factory()
+        try:
+            from app.domains.tasks import task_manager
+            if task_manager and hasattr(task_manager, "session_factory") and task_manager.session_factory:
+                return task_manager.session_factory()
+        except Exception:
+            pass
+        from app.shared_kernel.database import SessionLocal
+        return SessionLocal()
+
 
     def enrich_people_for_matches(self, task_id: int, match_ids: List[int], progress_callback: Optional[Callable[[int, int], None]] = None) -> int:
         """
@@ -45,22 +104,21 @@ class PeopleEnricher:
 
         import concurrent.futures
         import time
-        from app.domains.tasks import task_manager
 
-        executor = task_manager.executor
+        executor = self._get_executor()
         max_workers = DEFAULT_MAX_WORKERS
 
         def enrich_worker(person_id: int) -> bool:
-            if task_manager.is_cancelled(task_id):
+            if self._is_cancelled(task_id):
                 return False
 
-            while task_manager.has_active_heavy_tasks():
-                if task_manager.is_cancelled(task_id):
+            while self._has_active_heavy_tasks():
+                if self._is_cancelled(task_id):
                     return False
                 time.sleep(2)
 
             # 1. Quick read of external IDs and name (Release SQLite transaction immediately)
-            local_db = task_manager.session_factory()
+            local_db = self._get_temp_db()
             try:
                 person = local_db.query(Person).filter(Person.id == person_id).first()
                 if not person:
@@ -74,13 +132,21 @@ class PeopleEnricher:
                 local_db.close()
 
             # 3. Perform network API request outside of database transaction
-            enricher = PeopleEnricher(None, self.scrapers)
+            enricher = PeopleEnricher(
+                None,
+                self.scrapers,
+                self.session_factory,
+                self._is_cancelled_cb,
+                self._has_active_heavy_tasks_cb,
+                self._executor,
+                self._update_progress_cb
+            )
             fetched_data = enricher.fetch_external_details(person_name, external_ids, link_data, is_adult=is_adult)
             if not fetched_data:
                 return False
 
             # 4. Short transaction: save the retrieved data to database
-            local_db = task_manager.session_factory()
+            local_db = self._get_temp_db()
             try:
                 person = local_db.query(Person).filter(Person.id == person_id).first()
                 if person:
@@ -99,7 +165,7 @@ class PeopleEnricher:
         id_iter = iter(person_ids)
         completed = 0
 
-        while not task_manager.is_cancelled(task_id):
+        while not self._is_cancelled(task_id):
             while len(future_to_id) < max_workers:
                 try:
                     pid = next(id_iter)
@@ -120,7 +186,7 @@ class PeopleEnricher:
                 future_to_id.pop(future, None)
 
                 progress = (completed / total) * 100.0
-                task_manager.update_progress(task_id, progress)
+                self._update_progress(task_id, progress)
                 if progress_callback:
                     progress_callback(completed, total)
 
@@ -130,7 +196,7 @@ class PeopleEnricher:
                 enriched_count += 1
             completed += 1
             progress = (completed / total) * 100.0
-            task_manager.update_progress(task_id, progress)
+            self._update_progress(task_id, progress)
             if progress_callback:
                 progress_callback(completed, total)
 
@@ -169,8 +235,7 @@ class PeopleEnricher:
         has_data = False
 
         if is_adult and not any(link["provider"] == Provider.PORNDB for link in all_links):
-            from app.shared_kernel.database import SessionLocal
-            temp_db = SessionLocal()
+            temp_db = self._get_temp_db()
             try:
                 porndb = self._require_scrapers().adult(Provider.PORNDB, temp_db)
                 if porndb.get_setting("porndb_api_key") or porndb.get_setting("porndb_api_token"):
@@ -199,8 +264,7 @@ class PeopleEnricher:
             external_id = l["external_id"]
 
             if provider == Provider.TMDB:
-                from app.shared_kernel.database import SessionLocal
-                temp_db = SessionLocal()
+                temp_db = self._get_temp_db()
                 try:
                     tmdb = self._require_scrapers().tmdb(temp_db)
                     details = tmdb.get_person_details(int(external_id))
@@ -233,8 +297,7 @@ class PeopleEnricher:
                             result["biographies"][locale] = bio
 
             elif provider in (Provider.STASHDB, Provider.PORNDB, Provider.FANSDB):
-                from app.shared_kernel.database import SessionLocal
-                temp_db = SessionLocal()
+                temp_db = self._get_temp_db()
                 perf = None
                 try:
                     if provider in (Provider.STASHDB, Provider.PORNDB, Provider.FANSDB):
@@ -355,9 +418,8 @@ class PeopleEnricher:
             person.profile_path = profile_path
             tmdb_id = person.external_ids.get("tmdb") if person.external_ids else None
             
-            from app.domains.media_assets.services.images import ImageProcessingService
-            img_service = ImageProcessingService()
-            url = img_service.get_download_url(profile_path, "people") or profile_path
+            from app.domains.media_assets.services.images import image_processing_service
+            url = image_processing_service.get_download_url(profile_path, "people") or profile_path
             
             if tmdb_id:
                 import os

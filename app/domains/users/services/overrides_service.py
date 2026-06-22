@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 
 from app.domains.users.models import UserOverride, Tag
-from app.domains.media_assets.services.images import ImageProcessingService
+from app.domains.media_assets.services.images import image_processing_service
 from app.domains.users.schemas import (
     ItemOverridesUpdate,
     BulkOverridesUpdate,
@@ -20,9 +20,12 @@ from app.shared_kernel.exceptions import NotFoundException, BadRequestException
 logger = logging.getLogger(__name__)
 
 class OverridesService:
-    def __init__(self, db: Session, resolver: MediaResolverPort, user_id: int = 1):
+    def __init__(self, db: Session, resolver: MediaResolverPort, user_id: Optional[int] = None):
         self.db = db
         self.resolver = resolver
+        if user_id is None:
+            from app.shared_kernel.user_context import get_current_user_id
+            user_id = get_current_user_id()
         self.user_id = user_id
 
     def _get_or_create_override(self, item_id: str) -> Optional[UserOverride]:
@@ -52,6 +55,17 @@ class OverridesService:
             return override
 
         return None
+
+    def get_or_create_media_item_override(self, media_item_id: int) -> UserOverride:
+        """Helper to fetch or create a UserOverride specifically by media_item_id (physical file)."""
+        override = self.db.query(UserOverride).filter(
+            UserOverride.user_id == self.user_id,
+            UserOverride.media_item_id == media_item_id
+        ).first()
+        if not override:
+            override = UserOverride(user_id=self.user_id, media_item_id=media_item_id)
+            self.db.add(override)
+        return override
 
     def update_item_overrides(self, request: ItemOverridesUpdate) -> Dict[str, Any]:
         item_id = request.item_id
@@ -150,7 +164,7 @@ class OverridesService:
         elif image_type == "logo":
             subfolder = "logos"
 
-        img_service = ImageProcessingService()
+        img_service = image_processing_service
         img_service.ensure_folders()
 
         ext = os.path.splitext(filename)[1] or ".jpg"

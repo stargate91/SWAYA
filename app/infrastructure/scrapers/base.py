@@ -38,9 +38,11 @@ class BaseScraper:
         """Helper to get a setting from user/system settings, falling back to environment."""
         import os
         from app.domains.settings.models import SystemSetting, UserSetting
+        from app.shared_kernel.user_context import get_current_user_id
+        current_user_id = get_current_user_id()
         try:
             setting = self.db.query(UserSetting).filter(
-                UserSetting.user_id == 1,
+                UserSetting.user_id == current_user_id,
                 UserSetting.key == key,
             ).first()
             if not setting:

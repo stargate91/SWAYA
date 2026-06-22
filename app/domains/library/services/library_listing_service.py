@@ -8,6 +8,12 @@ from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch, MetadataLocalization
 from app.domains.users.models import UserOverride, Tag, user_override_tags
 from app.shared_kernel.enums import ItemStatus, MediaType
+from app.shared_kernel.user_context import get_current_user_id
+from app.domains.library.schemas import (
+    ContinueWatchingItem,
+    LibraryTabResponse,
+    GroupedLibraryResponse,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +21,7 @@ class LibraryListingService:
     def __init__(self, db_session: Session):
         self.db = db_session
 
-    def get_continue_watching(self, limit: int = 12, include_adult: bool = False) -> list[dict[str, Any]]:
+    def get_continue_watching(self, limit: int = 12, include_adult: bool = False) -> List[ContinueWatchingItem]:
         """
         Retrieves the queue of items currently being watched by the user, ordered by watch date.
         """
@@ -63,23 +69,23 @@ class LibraryListingService:
                     tv_title = (tv_override.custom_title if (tv_override and tv_override.custom_title) else None) or (tv_loc.title if tv_loc else None)
                     tv_tmdb_id = int(tv_match.external_id) if tv_match.external_id.isdigit() else None
             
-            results.append({
-                "id": item.id,
-                "title": title,
-                "tv_title": tv_title,
-                "episode_title": episode_title,
-                "type": match.media_type.value if match else "movie",
-                "season_number": match.season_number if match else None,
-                "episode_number": match.episode_number if match else None,
-                "tv_tmdb_id": tv_tmdb_id,
-                "tmdb_id": int(match.external_id) if (match and match.external_id.isdigit()) else None,
-                "backdrop_path": match.backdrop_path if match else None,
-                "still_path": match.still_path if match else None,
-                "resume_position": o.resume_position,
-                "duration": item.duration or 0,
-                "is_watched": o.is_watched,
-                "last_watched_at": o.last_watched_at.isoformat() if o.last_watched_at else None,
-            })
+            results.append(ContinueWatchingItem(
+                id=item.id,
+                title=title,
+                tv_title=tv_title,
+                episode_title=episode_title,
+                type=match.media_type.value if match else "movie",
+                season_number=match.season_number if match else None,
+                episode_number=match.episode_number if match else None,
+                tv_tmdb_id=tv_tmdb_id,
+                tmdb_id=int(match.external_id) if (match and match.external_id.isdigit()) else None,
+                backdrop_path=match.backdrop_path if match else None,
+                still_path=match.still_path if match else None,
+                resume_position=o.resume_position,
+                duration=item.duration or 0,
+                is_watched=o.is_watched,
+                last_watched_at=o.last_watched_at.isoformat() if o.last_watched_at else None,
+            ))
         return results
 
     def get_library_tab_page(
@@ -100,7 +106,7 @@ class LibraryListingService:
         filter_gender: str = "all",
         people_role: str = "all",
         include_adult: bool = False,
-    ) -> dict[str, Any]:
+    ) -> LibraryTabResponse:
         """
         Retrieves a paginated, filtered, and sorted list of library items for a specific UI tab.
         """
@@ -118,7 +124,7 @@ class LibraryListingService:
 
         # Ownership filter
         if filter_ownership == "tracked":
-            query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == 1))
+            query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == get_current_user_id()))
             joined_override = True
             query = query.filter(
                 MetadataMatch.media_item_id == None,
@@ -158,7 +164,7 @@ class LibraryListingService:
         # Favorite filter
         if filter_favorite in ("favorite", "not_favorite"):
             if not joined_override:
-                query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == 1))
+                query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == get_current_user_id()))
                 joined_override = True
             if filter_favorite == "favorite":
                 query = query.filter(UserOverride.is_favorite == True)
@@ -168,7 +174,7 @@ class LibraryListingService:
         # Watched filter
         if filter_watched in ("watched", "unwatched"):
             if not joined_override:
-                query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == 1))
+                query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == get_current_user_id()))
                 joined_override = True
             if filter_watched == "watched":
                 query = query.filter(UserOverride.is_watched == True)
@@ -201,7 +207,7 @@ class LibraryListingService:
         # Tags filter
         if selected_tags:
             if not joined_override:
-                query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == 1))
+                query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == get_current_user_id()))
                 joined_override = True
             query = query.join(user_override_tags, user_override_tags.c.user_override_id == UserOverride.id)\
                          .join(Tag, Tag.id == user_override_tags.c.tag_id)\
@@ -213,7 +219,7 @@ class LibraryListingService:
                 query = query.outerjoin(MetadataLocalization, MetadataLocalization.match_id == MetadataMatch.id)
                 joined_localization = True
             if not joined_override:
-                query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == 1))
+                query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == get_current_user_id()))
                 joined_override = True
             
             val_col = func.coalesce(UserOverride.custom_title, MetadataLocalization.title, MediaItem.filename)
@@ -227,7 +233,7 @@ class LibraryListingService:
             query = query.order_by(MetadataMatch.release_date.asc())
         elif sort_by == "rating_desc":
             if not joined_override:
-                query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == 1))
+                query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == get_current_user_id()))
                 joined_override = True
             query = query.order_by(desc(func.coalesce(
                 UserOverride.user_rating,
@@ -243,7 +249,7 @@ class LibraryListingService:
             loc = match.localizations[0] if match.localizations else None
             item = match.media_item
             
-            o = next((ov for ov in match.overrides if ov.user_id == 1), None) if match.overrides else None
+            o = next((ov for ov in match.overrides if ov.user_id == get_current_user_id()), None) if match.overrides else None
             title = (o.custom_title if (o and o.custom_title) else None) or (loc.title if loc else (item.filename if item else "Unknown"))
             poster_path = (o.custom_poster if (o and o.custom_poster) else None) or (loc.poster_path if loc else None)
             backdrop_path = (o.custom_backdrop if (o and o.custom_backdrop) else None) or (match.backdrop_path or None)
@@ -290,29 +296,31 @@ class LibraryListingService:
             "people": 0
         }
 
-        return {
-            "tab": tab,
-            "items": formatted_items,
-            "counts": counts,
-            "owned_counts": counts,
-            "total_items": total_items,
-            "page": page,
-            "page_size": page_size,
-            "total_pages": total_pages,
-        }
+        return LibraryTabResponse(
+            tab=tab,
+            items=formatted_items,
+            counts=counts,
+            owned_counts=counts,
+            total_items=total_items,
+            page=page,
+            page_size=page_size,
+            total_pages=total_pages,
+        )
 
-    def get_grouped_library(self, include_adult: bool = False) -> dict[str, Any]:
+    def get_grouped_library(self, include_adult: bool = False) -> GroupedLibraryResponse:
         """
         Returns a grouped snapshot of library items (movies, tv shows, adult scenes).
         """
         res_movies = self.get_library_tab_page("movies", page_size=20, include_adult=include_adult)
         res_tv = self.get_library_tab_page("tv", page_size=20, include_adult=include_adult)
-        res_scenes = self.get_library_tab_page("scenes", page_size=20, include_adult=include_adult) if include_adult else {"items": []}
+        res_scenes = self.get_library_tab_page("scenes", page_size=20, include_adult=include_adult) if include_adult else LibraryTabResponse(
+            tab="scenes", items=[], counts=res_movies.counts, owned_counts=res_movies.counts, total_items=0, page=1, page_size=20, total_pages=1
+        )
         
-        return {
-            "movies": res_movies["items"],
-            "tv": res_tv["items"],
-            "scenes": res_scenes["items"],
-            "people": [],
-            "counts": res_movies["counts"]
-        }
+        return GroupedLibraryResponse(
+            movies=res_movies.items,
+            tv=res_tv.items,
+            scenes=res_scenes.items,
+            people=[],
+            counts=res_movies.counts
+        )

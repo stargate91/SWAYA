@@ -15,23 +15,35 @@ from app.shared_kernel.enums import Provider, MediaType, ItemStatus
 from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch, MetadataLocalization
 from app.domains.history.models import PlaybackLog
-from app.domains.settings.models import UserSetting
-from app.domains.media_assets.services.images import ImageProcessingService
+from app.domains.media_assets.services.images import image_processing_service
 from app.shared_kernel.language import LanguageService
 
 from app.shared_kernel.constants import PLAYBACK_CHECK_TIMEOUT, DEFAULT_FALLBACK_LANGUAGE
+from app.application.media.schemas import (
+    PlaybackStatusResponse,
+    WatchHistoryResponse,
+    WatchedHistoryResponse,
+)
+
+from app.shared_kernel.ports.settings_port import SettingsPort
 
 logger = logging.getLogger(__name__)
 
 class PlaybackService:
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, settings_port: Optional[SettingsPort] = None, overrides_service: Optional[Any] = None):
         self.db = db
-        self.img_service = ImageProcessingService()
+        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+        self.settings = settings_port or DbSettingsAdapter(db)
+        if overrides_service:
+            self.overrides = overrides_service
+        else:
+            from app.domains.users.services.overrides_service import OverridesService
+            from app.infrastructure.media.db_media_resolver import DbMediaResolver
+            self.overrides = OverridesService(db, DbMediaResolver(db))
 
     def _resolve_img(self, path: Optional[str], subfolder: str) -> Optional[str]:
-        if not path:
-            return None
-        return self.img_service.resolve_image_url(path, subfolder)
+        return image_processing_service.resolve_image_url(path, subfolder)
+
 
     def _parse_watched_at(self, value) -> datetime:
         if not value:
@@ -56,22 +68,13 @@ class PlaybackService:
         ]
 
     def _recalculate_watch_state(self, item) -> None:
-        db = self.db
         logs = sorted(
             [log for log in (item.playback_logs or []) if log.watched_at],
             key=lambda x: x.watched_at,
             reverse=True,
         )
         
-        # In Swaya, watch_count, is_watched, resume_position etc are stored on UserOverride model or directly on MediaItem if applicable.
-        # Wait! Let's check e:\projects\python\Swaya\app\domains\users\models.py for UserOverride.
-        # UserOverride has user_rating, user_comment, is_favorite, is_watched, last_watched_at, watch_count, resume_position, is_tracked.
-        # Let's find/create UserOverride for user_id=1, media_item_id=item.id.
-        from app.domains.users.models import UserOverride
-        override = db.query(UserOverride).filter(UserOverride.user_id == 1, UserOverride.media_item_id == item.id).first()
-        if not override:
-            override = UserOverride(user_id=1, media_item_id=item.id)
-            db.add(override)
+        override = self.overrides.get_or_create_media_item_override(item.id)
             
         override.watch_count = len(logs)
         override.last_watched_at = logs[0].watched_at if logs else None
@@ -79,227 +82,22 @@ class PlaybackService:
         if logs:
             override.resume_position = 0
 
-    def _watch_history_response(self, item) -> dict:
-        db = self.db
-        from app.domains.users.models import UserOverride
-        override = db.query(UserOverride).filter(UserOverride.user_id == 1, UserOverride.media_item_id == item.id).first()
+    def _watch_history_response(self, item) -> WatchHistoryResponse:
+        override = self.overrides.get_or_create_media_item_override(item.id)
         
-        return {
-            "status": "success",
-            "watch_count": override.watch_count if override else 0,
-            "is_watched": override.is_watched if override else False,
-            "resume_position": override.resume_position if override else 0,
-            "last_watched_at": override.last_watched_at.isoformat() if (override and override.last_watched_at) else None,
-            "playback_logs": self._serialize_playback_logs(item),
-        }
-
-    def find_media_player(self):
-        import shutil
-        db = self.db
-
-        vlc_path_setting = db.query(UserSetting).filter(UserSetting.user_id == 1, UserSetting.key == "vlc_path").first()
-        mpc_path_setting = db.query(UserSetting).filter(UserSetting.user_id == 1, UserSetting.key == "mpc_path").first()
-
-        vlc_path = vlc_path_setting.value if vlc_path_setting else None
-        mpc_path = mpc_path_setting.value if mpc_path_setting else None
-
-        def save_setting(key, val):
-            try:
-                setting = db.query(UserSetting).filter(UserSetting.user_id == 1, UserSetting.key == key).first()
-                if setting:
-                    setting.value = val
-                else:
-                    db.add(UserSetting(user_id=1, key=key, value=val))
-                db.commit()
-            except Exception as e:
-                db.rollback()
-                logger.error(f"Failed to save player setting {key}: {e}")
-
-        # Detect VLC
-        vlc_valid = False
-        if vlc_path and os.path.exists(vlc_path):
-            vlc_valid = True
-        else:
-            which_vlc = shutil.which("vlc")
-            if which_vlc:
-                vlc_path = which_vlc
-                vlc_valid = True
-            elif platform.system() == "Windows":
-                vlc_paths = [
-                    r"C:\Program Files\VideoLAN\VLC\vlc.exe",
-                    r"C:\Program Files (x86)\VideoLAN\VLC\vlc.exe"
-                ]
-                for p in vlc_paths:
-                    if os.path.exists(p):
-                        vlc_path = p
-                        vlc_valid = True
-                        break
-            if vlc_valid and vlc_path:
-                save_setting("vlc_path", vlc_path)
-
-        # Detect MPC-HC
-        mpc_valid = False
-        if mpc_path and os.path.exists(mpc_path):
-            mpc_valid = True
-        else:
-            which_mpc = shutil.which("mpc-hc") or shutil.which("mpc-hc64")
-            if which_mpc:
-                mpc_path = which_mpc
-                mpc_valid = True
-            elif platform.system() == "Windows":
-                mpc_paths = [
-                    r"C:\Program Files\MPC-HC\mpc-hc64.exe",
-                    r"C:\Program Files (x86)\MPC-HC\mpc-hc.exe"
-                ]
-                for p in mpc_paths:
-                    if os.path.exists(p):
-                        mpc_path = p
-                        mpc_valid = True
-                        break
-            if mpc_valid and mpc_path:
-                save_setting("mpc_path", mpc_path)
-
-        if vlc_valid and vlc_path:
-            return vlc_path, "vlc"
-        if mpc_valid and mpc_path:
-            return mpc_path, "mpc"
-        return None, None
-
-    def _launch_media_file(self, file_path: str, start_seconds: int = 0) -> dict:
-        normalized_path = os.path.normpath(file_path)
-        player_path, player_type = self.find_media_player()
-
-        if player_path and player_type:
-            proc = None
-            port = 8080 if player_type == "vlc" else 13579
-
-            if player_type == "vlc":
-                args = [player_path, normalized_path]
-                if start_seconds > 10:
-                    args.append(f"--start-time={start_seconds}")
-                args.extend(["--no-one-instance", "--extraintf=http", "--http-password=renda", f"--http-port={port}", "--http-host=127.0.0.1"])
-                proc = subprocess.Popen(args)
-            elif player_type == "mpc":
-                args = [player_path, normalized_path]
-                if start_seconds > 10:
-                    h = start_seconds // 3600
-                    m = (start_seconds % 3600) // 60
-                    s = start_seconds % 60
-                    args.extend(["/startpos", f"{h:02d}:{m:02d}:{s:02d}"])
-                proc = subprocess.Popen(args)
-
-            if proc:
-                return {
-                    "status": "success",
-                    "player_type": player_type,
-                    "process": proc,
-                    "port": port,
-                    "message": f"Launched {player_type.upper()} for {normalized_path}",
-                }
-
-        logger.info(f"VLC or MPC-HC not found. Falling back to default OS player for: {normalized_path}")
-        if platform.system() == "Windows":
-            os.startfile(normalized_path)
-        elif platform.system() == "Darwin":
-            subprocess.Popen(["open", normalized_path])
-        else:
-            subprocess.Popen(["xdg-open", normalized_path])
-
-        return {
-            "status": "success",
-            "player_type": "default",
-            "process": None,
-            "port": None,
-            "message": f"Launched default player for {normalized_path}",
-        }
-
-    def monitor_playback(self, item_id: int, player_type: str, proc: subprocess.Popen, port: int):
-        logger.info(f"Started playback monitoring thread for item_id={item_id}, player={player_type}, port={port}")
-        last_saved_time = 0
-        total_length = 0
-        current_time = 0
-        time.sleep(3)
-        
-        try:
-            while proc.poll() is None:
-                time.sleep(2)
-                try:
-                    if player_type == "vlc":
-                        r = requests.get(
-                            f"http://127.0.0.1:{port}/requests/status.json", 
-                            auth=("", "renda"), 
-                            timeout=PLAYBACK_CHECK_TIMEOUT
-                        )
-                        if r.status_code == 200:
-                            data = r.json()
-                            current_time = int(data.get("time", 0))
-                            total_length = int(data.get("length", 0))
-                    elif player_type == "mpc":
-                        r = requests.get(f"http://127.0.0.1:{port}/variables.html", timeout=PLAYBACK_CHECK_TIMEOUT)
-                        if r.status_code == 200:
-                            pos_match = re.search(r'id="position">(\d+)</p>', r.text)
-                            dur_match = re.search(r'id="duration">(\d+)</p>', r.text)
-                            if pos_match:
-                                current_time = int(pos_match.group(1)) // 1000
-                            if dur_match:
-                                total_length = int(dur_match.group(1)) // 1000
-                    
-                    if current_time > 0 and abs(current_time - last_saved_time) >= 10:
-                        last_saved_time = current_time
-                        from app.shared_kernel.database import SessionLocal
-                        from app.domains.users.models import UserOverride
-                        db_session = SessionLocal()
-                        try:
-                            item = db_session.query(MediaItem).filter(MediaItem.id == item_id).first()
-                            if item:
-                                if total_length > 0:
-                                    item.duration = total_length
-                                override = db_session.query(UserOverride).filter(UserOverride.user_id == 1, UserOverride.media_item_id == item_id).first()
-                                if not override:
-                                    override = UserOverride(user_id=1, media_item_id=item_id)
-                                    db_session.add(override)
-                                override.resume_position = current_time
-                                if total_length > 0 and current_time / total_length > 0.90:
-                                    override.is_watched = True
-                                    override.resume_position = 0
-                                db_session.commit()
-                        except Exception as ex:
-                            db_session.rollback()
-                            logger.error(f"Failed to update position: {ex}")
-                        finally:
-                            db_session.close()
-                except Exception as e:
-                    logger.debug(f"Polling failed: {e}")
-        except Exception as e:
-            logger.error(f"Error in monitoring: {e}")
-        finally:
-            if current_time > 0 and current_time != last_saved_time:
-                from app.shared_kernel.database import SessionLocal
-                from app.domains.users.models import UserOverride
-                db_session = SessionLocal()
-                try:
-                    item = db_session.query(MediaItem).filter(MediaItem.id == item_id).first()
-                    if item:
-                        if total_length > 0:
-                            item.duration = total_length
-                        override = db_session.query(UserOverride).filter(UserOverride.user_id == 1, UserOverride.media_item_id == item_id).first()
-                        if not override:
-                            override = UserOverride(user_id=1, media_item_id=item_id)
-                            db_session.add(override)
-                        override.resume_position = current_time
-                        if total_length > 0 and current_time / total_length > 0.90:
-                            override.is_watched = True
-                            override.resume_position = 0
-                        db_session.commit()
-                except Exception as ex:
-                    db_session.rollback()
-                    logger.error(f"Failed final position save: {ex}")
-                finally:
-                    db_session.close()
+        return WatchHistoryResponse(
+            status="success",
+            watch_count=override.watch_count if override else 0,
+            is_watched=override.is_watched if override else False,
+            resume_position=override.resume_position if override else 0,
+            last_watched_at=override.last_watched_at.isoformat() if (override and override.last_watched_at) else None,
+            playback_logs=self._serialize_playback_logs(item),
+        )
 
     def play_media_item(self, item_id: int):
+        from app.infrastructure.playback.player_detector import launch_media_file
+        from app.infrastructure.playback.playback_monitor import monitor_playback
         db = self.db
-        from app.domains.users.models import UserOverride
         item = db.query(MediaItem).filter(MediaItem.id == item_id).first()
         if not item:
             return JSONResponse(status_code=404, content={"error": "Media item not found"})
@@ -309,10 +107,7 @@ class PlaybackService:
             return JSONResponse(status_code=404, content={"error": f"Media file not found at: {file_path}"})
 
         # general stats updates
-        override = db.query(UserOverride).filter(UserOverride.user_id == 1, UserOverride.media_item_id == item_id).first()
-        if not override:
-            override = UserOverride(user_id=1, media_item_id=item_id)
-            db.add(override)
+        override = self.overrides.get_or_create_media_item_override(item_id)
 
         override.last_watched_at = datetime.now(timezone.utc)
         
@@ -334,29 +129,50 @@ class PlaybackService:
         db.commit()
 
         start_seconds = override.resume_position or 0
-        launch_result = self._launch_media_file(file_path, start_seconds=start_seconds)
+        launch_result = launch_media_file(file_path, db, self.settings, start_seconds=start_seconds)
         proc = launch_result.get("process")
         player_type = launch_result.get("player_type")
         port = launch_result.get("port")
 
         if proc and player_type in {"vlc", "mpc"}:
             t = threading.Thread(
-                target=self.monitor_playback,
-                args=(item.id, player_type, proc, port),
+                target=monitor_playback,
+                args=(item.id, player_type, proc, port, self.overrides.user_id),
                 daemon=True
             )
             t.start()
-            return {"status": "success", "message": f"Launched {player_type.upper()} with precision tracking."}
+            return PlaybackStatusResponse(
+                status="success",
+                message=f"Launched {player_type.upper()} with precision tracking.",
+                player_type=player_type,
+                port=port,
+                resume_position=override.resume_position,
+                is_watched=override.is_watched,
+            )
 
-        return {"status": "success", "message": f"Launched default player for {file_path}"}
+        return PlaybackStatusResponse(
+            status="success",
+            message=f"Launched default player for {file_path}",
+            player_type="default",
+            resume_position=override.resume_position,
+            is_watched=override.is_watched,
+        )
 
-    def preview_media_file(self, file_path: str, start_seconds: int = 0):
+    def preview_media_file(self, file_path: str, start_seconds: int = 0) -> PlaybackStatusResponse:
+        from app.infrastructure.playback.player_detector import launch_media_file
         if not file_path or not os.path.exists(file_path):
             return JSONResponse(status_code=404, content={"error": f"Media file not found at: {file_path}"})
 
-        launch_result = self._launch_media_file(file_path, start_seconds=start_seconds)
+        launch_result = launch_media_file(file_path, self.db, self.settings, start_seconds=start_seconds)
         player_type = launch_result.get("player_type") or "default"
-        return {"status": "success", "message": f"Launched {player_type.upper()} preview for {file_path}"}
+        port = launch_result.get("port")
+        return PlaybackStatusResponse(
+            status="success",
+            message=f"Launched {player_type.upper()} preview for {file_path}",
+            player_type=player_type,
+            port=port,
+        )
+
 
     def add_watch_history_entry(self, item_id: int, watched_at_raw: Any = None):
         db = self.db
@@ -415,19 +231,21 @@ class PlaybackService:
         db.refresh(item)
         return self._watch_history_response(item)
 
-    def reset_item_progress(self, item_id: int):
-        db = self.db
-        from app.domains.users.models import UserOverride
-        override = db.query(UserOverride).filter(UserOverride.user_id == 1, UserOverride.media_item_id == item_id).first()
+    def reset_item_progress(self, item_id: int) -> PlaybackStatusResponse:
+        override = self.overrides.get_or_create_media_item_override(item_id)
         if not override:
             return JSONResponse(status_code=404, content={"error": "Item not found"})
 
         override.resume_position = 0
         override.is_watched = False
-        db.commit()
-        return {"status": "success", "resume_position": 0, "is_watched": False}
+        self.db.commit()
+        return PlaybackStatusResponse(
+            status="success",
+            resume_position=0,
+            is_watched=False,
+        )
 
-    def get_watched_history(self, page: int = 1, limit: int = 20, include_adult: bool = False):
+    def get_watched_history(self, page: int = 1, limit: int = 20, include_adult: bool = False) -> WatchedHistoryResponse:
         db = self.db
         offset = (page - 1) * limit
         
@@ -459,8 +277,7 @@ class PlaybackService:
 
             active_match = next((match for match in item.matches if match.is_active), None)
             loc = LanguageService.get_best_localization(active_match.localizations, ui_lang) if active_match else None
-            from app.domains.users.models import UserOverride
-            override = db.query(UserOverride).filter(UserOverride.user_id == 1, UserOverride.media_item_id == item.id).first()
+            override = self.overrides.get_or_create_media_item_override(item.id)
 
             title = loc.title if loc else item.filename
             
@@ -478,15 +295,15 @@ class PlaybackService:
                 "is_watched": override.is_watched if override else False,
             })
 
-        return {
-            "items": results,
-            "page": page,
-            "has_more": has_more
-        }
+        return WatchedHistoryResponse(
+            items=results,
+            page=page,
+            has_more=has_more
+        )
 
-    def reveal_in_explorer(self, path: str):
+    def reveal_in_explorer(self, path: str) -> PlaybackStatusResponse:
         if not path or not os.path.exists(path):
-            return {"status": "error", "message": f"Path does not exist: {path}"}
+            return PlaybackStatusResponse(status="error", message=f"Path does not exist: {path}")
         
         path = os.path.abspath(path)
         try:
@@ -497,14 +314,14 @@ class PlaybackService:
             else:
                 folder = os.path.dirname(path)
                 subprocess.Popen(["xdg-open", folder])
-            return {"status": "success"}
+            return PlaybackStatusResponse(status="success")
         except Exception as e:
             logger.error(f"Reveal failed: {e}")
-            return {"status": "error", "message": str(e)}
+            return PlaybackStatusResponse(status="error", message=str(e))
 
-    def open_path(self, path: str):
+    def open_path(self, path: str) -> PlaybackStatusResponse:
         if not path or not os.path.exists(path):
-            return {"status": "error", "message": f"Path does not exist: {path}"}
+            return PlaybackStatusResponse(status="error", message=f"Path does not exist: {path}")
 
         path = os.path.abspath(path)
         try:
@@ -514,7 +331,7 @@ class PlaybackService:
                 subprocess.Popen(["open", path])
             else:
                 subprocess.Popen(["xdg-open", path])
-            return {"status": "success"}
+            return PlaybackStatusResponse(status="success")
         except Exception as e:
             logger.error(f"Open path failed: {e}")
-            return {"status": "error", "message": str(e)}
+            return PlaybackStatusResponse(status="error", message=str(e))

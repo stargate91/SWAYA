@@ -74,37 +74,37 @@ def upload_user_avatar(user_id: int, file: UploadFile = File(...), db: Session =
 @router.get("", response_model=dict)
 def get_settings(db: Session = Depends(get_db)):
     """Retrieve all user settings as a key-value dictionary."""
-    return SettingsService(db, user_id=1).get_settings()
+    return SettingsService(db).get_settings()
 
 
 @router.post("", response_model=dict)
 def update_settings(payload: dict, db: Session = Depends(get_db)):
     """Update user settings keys."""
-    return SettingsService(db, user_id=1).update_settings(payload)
+    return SettingsService(db).update_settings(payload)
 
 
 @router.post("/import", response_model=dict)
 def import_settings(payload: dict, db: Session = Depends(get_db)):
     """Import and apply settings payload."""
-    return SettingsService(db, user_id=1).update_settings(payload)
+    return SettingsService(db).update_settings(payload)
 
 
 # --- Validation Endpoints ---
 @router.post("/validate-folders", response_model=dict)
 def validate_folders(payload: dict, db: Session = Depends(get_db)):
     """Validate scan and library directory paths."""
-    return SettingsService(db, user_id=1).validate_folders(payload)
+    return SettingsService(db).validate_folders(payload)
 
 
 @router.post("/validate-api-keys", response_model=dict)
 def validate_api_keys(payload: dict, db: Session = Depends(get_db)):
     """Validate external scraper API keys."""
-    return SettingsService(db, user_id=1).validate_api_keys(payload)
+    return SettingsService(db).validate_api_keys(payload)
 
 
 @router.get("/changelog", response_model=dict)
 def get_changelog(db: Session = Depends(get_db)):
-    return SettingsService(db, user_id=1).get_changelog()
+    return SettingsService(db).get_changelog()
 
 
 @router.get("/ignored-items", response_model=dict)
@@ -114,7 +114,7 @@ def get_ignored_items(
     limit: int = 40,
     db: Session = Depends(get_db),
 ):
-    return SettingsService(db, user_id=1).get_ignored_items(search, offset, limit)
+    return SettingsService(db).get_ignored_items(search, offset, limit)
 
 
 class RestoreIgnoredRequest(BaseModel):
@@ -123,7 +123,7 @@ class RestoreIgnoredRequest(BaseModel):
 
 @router.post("/ignored-items/restore", response_model=dict)
 def restore_ignored_items(request: RestoreIgnoredRequest, db: Session = Depends(get_db)):
-    return SettingsService(db, user_id=1).restore_ignored_items(request.item_ids)
+    return SettingsService(db).restore_ignored_items(request.item_ids)
 
 # --- Database Endpoints ---
 db_router = APIRouter(prefix="/api/v1/database", tags=["Database"])

@@ -8,6 +8,8 @@ from app.domains.metadata.models import MetadataMatch
 from app.domains.people.models import Person, MediaPersonLink
 from app.domains.users.models import UserOverride
 from app.shared_kernel.enums import ItemStatus
+from app.shared_kernel.user_context import get_current_user_id
+from app.domains.people.schemas import PeopleGroupItem
 
 logger = logging.getLogger(__name__)
 
@@ -19,8 +21,10 @@ class PeopleLibraryService:
     queries and formats Person entities.
     """
 
-    def __init__(self, db_session: Session, user_id: int = 1):
+    def __init__(self, db_session: Session, user_id: Optional[int] = None):
         self.db = db_session
+        if user_id is None:
+            user_id = get_current_user_id()
         self.user_id = user_id
 
     def get_people_group(
@@ -29,7 +33,7 @@ class PeopleLibraryService:
         filter_status: str = "active",
         tab: str = "people",
         include_adult: bool = False,
-    ) -> list[dict[str, Any]]:
+    ) -> List[PeopleGroupItem]:
         """
         Retrieves list of actors, directors, or creators grouped by role.
         """
@@ -119,29 +123,29 @@ class PeopleLibraryService:
             
             poster_path = (o.custom_poster if (o and o.custom_poster) else None) or person.local_profile_path or person.profile_path
             
-            people_list.append({
-                "id": person.id,
-                "name": person.name or fallback_name,
-                "year": None,
-                "poster_path": poster_path,
-                "rating": (
+            people_list.append(PeopleGroupItem(
+                id=person.id,
+                name=person.name or fallback_name,
+                year=None,
+                poster_path=poster_path,
+                rating=(
                     person.rating_porndb
                     if person.is_adult and person.rating_porndb is not None
                     else person.popularity or 0.0
                 ),
-                "popularity": person.popularity or 0.0,
-                "scene_count": person.scene_count,
-                "rating_porndb": person.rating_porndb,
-                "type": "person",
-                "is_active": person.is_active,
-                "is_favorite": o.is_favorite if o else False,
-                "user_rating": o.user_rating if o else None,
-                "birthday": person.birthday or "",
-                "gender": person.gender,
-                "library_count": project_counts.get(person.id, 0),
-                "people_role": person.known_for_department.lower() if person.known_for_department else "person",
-                "is_adult_person": person.is_adult,
-                "external_ids": person.external_ids or {},
-            })
+                popularity=person.popularity or 0.0,
+                scene_count=person.scene_count,
+                rating_porndb=person.rating_porndb,
+                type="person",
+                is_active=person.is_active,
+                is_favorite=o.is_favorite if o else False,
+                user_rating=o.user_rating if o else None,
+                birthday=person.birthday or "",
+                gender=person.gender,
+                library_count=project_counts.get(person.id, 0),
+                people_role=person.known_for_department.lower() if person.known_for_department else "person",
+                is_adult_person=person.is_adult,
+                external_ids=person.external_ids or {},
+            ))
 
         return people_list

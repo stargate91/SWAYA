@@ -20,7 +20,8 @@ class CollectionDetailService(DetailFormatter):
         self.scrapers = scrapers
         self.tmdb_scraper = scrapers.tmdb(db)
 
-    def get_collection_detail(self, collection_tmdb_id: str, language: str | None = None):
+    def get_collection_detail(self, collection_tmdb_id: str, language: str | None = None) -> CollectionDetailResponse:
+        from app.domains.library.schemas import CollectionDetailResponse
         db = self.db
         try:
             collection_tmdb_id_int = int(collection_tmdb_id)
@@ -31,9 +32,9 @@ class CollectionDetailService(DetailFormatter):
         
         tmdb_details = {}
         try:
-            tmdb_details = self.tmdb_scraper._call_api(
-                f"/collection/{collection_tmdb_id_int}",
-                {"language": ui_lang}
+            tmdb_details = self.tmdb_scraper.get_collection_details(
+                collection_tmdb_id_int,
+                language=ui_lang
             ) or {}
         except Exception:
             tmdb_details = {}
@@ -116,4 +117,4 @@ class CollectionDetailService(DetailFormatter):
             "total_count": len(movies),
             "movies": movies,
         }
-        return JSONResponse(content=result)
+        return CollectionDetailResponse(**result)

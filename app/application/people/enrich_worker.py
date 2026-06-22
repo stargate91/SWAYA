@@ -187,7 +187,7 @@ class PeopleEnrichWorker:
         finally:
             db.close()
 
-        enricher = PeopleEnricher(None, self.scrapers)
+        enricher = PeopleEnricher(None, self.scrapers, session_factory=self.session_factory)
         fetched_data = enricher.fetch_external_details(person_name, external_ids, link_data, is_adult=is_adult)
         if not fetched_data:
             return False

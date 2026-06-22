@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.shared_kernel.database import init_databases
 from app.shared_kernel.logging import setup_logger
-from app.domains.media_assets.services.images import ImageProcessingService
+from app.domains.media_assets.services.images import image_processing_service
 
 # Setup logging
 setup_logger()
@@ -21,8 +21,7 @@ async def lifespan(app: FastAPI):
     init_databases()
     
     # Ensure image folders are created
-    img_service = ImageProcessingService()
-    img_service.ensure_folders()
+    image_processing_service.ensure_folders()
     logger.info("Image directories ensured.")
     
     # Start background download worker on the main event loop
@@ -46,6 +45,8 @@ app = FastAPI(
 
 from app.shared_kernel.exceptions import DomainException
 from fastapi.responses import JSONResponse
+from fastapi import Request
+from app.shared_kernel.user_context import set_current_user_id, reset_current_user_id
 
 @app.exception_handler(DomainException)
 async def domain_exception_handler(request, exc: DomainException):
@@ -53,6 +54,30 @@ async def domain_exception_handler(request, exc: DomainException):
         status_code=exc.status_code,
         content={"error": exc.message}
     )
+
+@app.middleware("http")
+async def user_context_middleware(request: Request, call_next):
+    user_id = 1
+    header_val = request.headers.get("x-user-id")
+    if header_val:
+        try:
+            user_id = int(header_val)
+        except ValueError:
+            pass
+    else:
+        qp_val = request.query_params.get("user_id")
+        if qp_val:
+            try:
+                user_id = int(qp_val)
+            except ValueError:
+                pass
+                
+    token = set_current_user_id(user_id)
+    try:
+        response = await call_next(request)
+        return response
+    finally:
+        reset_current_user_id(token)
 
 from fastapi.middleware.cors import CORSMiddleware
 

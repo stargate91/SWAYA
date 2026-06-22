@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional, Any
+from typing import List, Optional, Any, Dict
 from pydantic import BaseModel, ConfigDict
 
 from app.shared_kernel.enums import (
@@ -108,4 +108,160 @@ class GenericSuccessResponse(BaseSchema):
 class BulkActionResponse(BaseSchema):
     status: str = "success"
     count: int = 0
+
+
+# --- DTO Response Schemas ---
+
+class LibraryStatsBreakdown(BaseModel):
+    movies: str
+    tv: str
+    scenes: str
+    extras: str
+
+class ManualReviewBreakdown(BaseModel):
+    new: int
+    error: int
+    uncertain: int
+    no_match: int
+    multiple: int
+
+class GenreConstellationNode(BaseModel):
+    id: str
+    label: str
+    count: int
+
+class GenreConstellationLink(BaseModel):
+    source: str
+    target: str
+    count: int
+
+class GenreConstellation(BaseModel):
+    nodes: List[GenreConstellationNode]
+    links: List[GenreConstellationLink]
+
+class LibraryStatsResponse(BaseModel):
+    total_movies: int
+    total_tv: int
+    total_episodes: int
+    total_scenes: int
+    storage: str
+    drive_count: int
+    unmatched: int
+    storage_breakdown: LibraryStatsBreakdown
+    manual_review_total: int
+    manual_review_breakdown: ManualReviewBreakdown
+    genre_distribution: Dict[str, int]
+    genre_distribution_ids: Dict[str, int]
+    genre_labels: Dict[str, str]
+    genre_constellation: GenreConstellation
+    decade_distribution: Dict[str, int]
+
+class ContinueWatchingItem(BaseModel):
+    id: int
+    title: str
+    tv_title: Optional[str] = None
+    episode_title: Optional[str] = None
+    type: str
+    season_number: Optional[int] = None
+    episode_number: Optional[int] = None
+    tv_tmdb_id: Optional[int] = None
+    tmdb_id: Optional[int] = None
+    backdrop_path: Optional[str] = None
+    still_path: Optional[str] = None
+    resume_position: int
+    duration: int
+    is_watched: bool
+    last_watched_at: Optional[str] = None
+
+class LibraryTabItem(BaseModel):
+    id: Optional[int] = None
+    title: str
+    year: Optional[int] = None
+    poster_path: Optional[str] = None
+    backdrop_path: Optional[str] = None
+    rating: float
+    rating_porndb: Optional[float] = None
+    rating_imdb: Optional[float] = None
+    type: str
+    path: Optional[str] = None
+    duration: float
+    size: int
+
+class LibraryTabCounts(BaseModel):
+    movies: int
+    tv: int
+    scenes: int
+    people: int
+
+class LibraryTabResponse(BaseModel):
+    tab: str
+    items: List[LibraryTabItem]
+    counts: LibraryTabCounts
+    owned_counts: LibraryTabCounts
+    total_items: int
+    page: int
+    page_size: int
+    total_pages: int
+
+class GroupedLibraryResponse(BaseModel):
+    movies: List[LibraryTabItem]
+    tv: List[LibraryTabItem]
+    scenes: List[LibraryTabItem]
+    people: List[Any]
+    counts: LibraryTabCounts
+
+class TagItem(BaseModel):
+    id: int
+    name: str
+    color: Optional[str] = None
+    is_adult: bool
+
+class TagGroupItem(BaseModel):
+    id: int
+    name: str
+    tags: List[TagItem]
+
+class FilterOptionsResponse(BaseModel):
+    genres: List[str]
+    years: List[int]
+    tags: List[TagItem]
+
+# --- Dynamic Detail Response DTOs ---
+
+class MovieDetailResponse(BaseModel):
+    model_config = ConfigDict(extra="allow")
+    title: str
+
+class TvShowDetailResponse(BaseModel):
+    model_config = ConfigDict(extra="allow")
+    title: str
+
+class TvSeasonDetailResponse(BaseModel):
+    model_config = ConfigDict(extra="allow")
+    title: str
+
+class CollectionDetailResponse(BaseModel):
+    model_config = ConfigDict(extra="allow")
+    title: str
+
+class SceneDetailResponse(BaseModel):
+    model_config = ConfigDict(extra="allow")
+    title: str
+
+class MovieCollectionItem(BaseModel):
+    tmdb_id: int
+    title: str
+    poster_path: Optional[str] = None
+    backdrop_path: Optional[str] = None
+    owned_count: int
+    total_count: Optional[int] = None
+    type: str = "collection"
+
+class MovieCollectionsResponse(BaseModel):
+    items: List[MovieCollectionItem]
+    total_items: int
+    page: int
+    page_size: Optional[int] = None
+    total_pages: int
+
 

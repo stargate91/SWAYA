@@ -5,7 +5,12 @@ from typing import List
 from app.shared_kernel.database import get_db
 from app.infrastructure.scrapers.gateway import scraper_gateway
 from app.domains.people.models import Person
-from app.domains.people.schemas import PersonRead
+from app.domains.people.schemas import (
+    PersonRead,
+    PeopleSearchResponse,
+    PersonDetailResponse,
+    PersonFilmographyResponse,
+)
 
 # Mainstream (SFW) People Router
 mainstream_router = APIRouter(prefix="/api/v1/mainstream/people", tags=["Mainstream People"])
@@ -42,7 +47,7 @@ async def run_people_enrich_coroutine(task_id: int, match_ids: List[int]):
     logger = logging.getLogger(__name__)
     db = SessionLocal()
     try:
-        enricher = PeopleEnricher(db, scraper_gateway)
+        enricher = PeopleEnricher(db, scraper_gateway, session_factory=SessionLocal)
         count = await asyncio.to_thread(enricher.enrich_people_for_matches, task_id, match_ids)
         logger.info(f"Enriched {count} people for matches {match_ids}")
     except Exception as e:
@@ -68,7 +73,7 @@ def enrich_people(match_ids: List[int], db: Session = Depends(get_db)):
 from app.domains.people.services.people_detail_service import PeopleDetailService
 from fastapi import Query
 
-@router.get("")
+@router.get("", response_model=PeopleSearchResponse)
 def get_people(
     search: str = None,
     role: str = None,
@@ -86,12 +91,12 @@ def get_people(
     )
 
 
-@router.get("/{person_id}")
+@router.get("/{person_id}", response_model=PersonDetailResponse)
 def get_person_detail(person_id: int, db: Session = Depends(get_db)):
     return PeopleDetailService(db, scraper_gateway).get_person_detail(person_id)
 
 
-@router.get("/{person_id}/movies")
+@router.get("/{person_id}/movies", response_model=PersonFilmographyResponse)
 def get_person_movies(
     person_id: int,
     page: int = Query(default=1, ge=1),
@@ -101,7 +106,7 @@ def get_person_movies(
     return PeopleDetailService(db, scraper_gateway).get_person_movies(person_id, page=page, page_size=page_size)
 
 
-@router.get("/{person_id}/tv")
+@router.get("/{person_id}/tv", response_model=PersonFilmographyResponse)
 def get_person_tv(
     person_id: int,
     page: int = Query(default=1, ge=1),
@@ -111,7 +116,7 @@ def get_person_tv(
     return PeopleDetailService(db, scraper_gateway).get_person_tv(person_id, page=page, page_size=page_size)
 
 
-@router.get("/{person_id}/scenes")
+@router.get("/{person_id}/scenes", response_model=PersonFilmographyResponse)
 def get_person_scenes(
     person_id: int,
     page: int = Query(default=1, ge=1),

@@ -27,10 +27,11 @@ class ScannerManager:
         self.categorizer = Categorizer()
         self.linker = Linker()
         self.prober = TechnicalProber()
-
     def _get_numeric_setting(self, key: str, default: float) -> float:
+        from app.shared_kernel.user_context import get_current_user_id
+        current_user_id = get_current_user_id()
         setting = self.db.query(UserSetting).filter(
-            UserSetting.user_id == 1,
+            UserSetting.user_id == current_user_id,
             UserSetting.key == key,
         ).first()
         if not setting:

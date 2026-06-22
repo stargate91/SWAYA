@@ -3,7 +3,7 @@ import math
 from typing import Optional, List, Dict, Any
 from sqlalchemy import case, func
 from sqlalchemy.orm import Session, joinedload
-from fastapi.responses import JSONResponse
+from fastapi import HTTPException
 
 from app.shared_kernel.enums import MediaType, ItemStatus, RoleType
 from app.domains.library.models import MediaItem
@@ -13,21 +13,25 @@ from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.shared_kernel.language import LanguageService
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.domains.people.services.filmography_service import FilmographyService
+from app.domains.people.schemas import (
+    PeopleSearchResponse,
+    PersonDetailResponse,
+    PersonFilmographyResponse,
+)
+
+from app.domains.media_assets.services.images import image_processing_service
 
 logger = logging.getLogger(__name__)
 
 class PeopleDetailService:
     def __init__(self, db: Session, scrapers: ScraperGatewayPort):
         self.db = db
-        from app.domains.media_assets.services.images import ImageProcessingService
-        self.img_service = ImageProcessingService()
         self.tmdb = scrapers.tmdb(db)
         self.filmography_service = FilmographyService(db)
 
     def _resolve_img(self, path: Optional[str], subfolder: str) -> Optional[str]:
-        if not path or not self.img_service:
-            return None
-        return self.img_service.resolve_image_url(path, subfolder)
+        return image_processing_service.resolve_image_url(path, subfolder)
+
 
     def get_people(
         self,
@@ -148,19 +152,19 @@ class PeopleDetailService:
         sliced_list = people_list[offset:offset+limit]
         has_more = offset + len(sliced_list) < total
         
-        return {
-            "items": sliced_list,
-            "total": total,
-            "has_more": has_more,
-            "offset": offset,
-            "limit": limit
-        }
+        return PeopleSearchResponse(
+            items=sliced_list,
+            total=total,
+            has_more=has_more,
+            offset=offset,
+            limit=limit
+        )
 
-    def get_person_detail(self, person_id: int):
+    def get_person_detail(self, person_id: int) -> PersonDetailResponse:
         db = self.db
         person = db.query(Person).options(joinedload(Person.localizations)).filter(Person.id == person_id).first()
         if not person:
-            return JSONResponse(status_code=404, content={"error": "Person not found"})
+            raise HTTPException(status_code=404, detail="Person not found")
         
         ui_lang = DEFAULT_FALLBACK_LANGUAGE
         loc = LanguageService.get_best_localization(person.localizations, ui_lang)
@@ -221,28 +225,28 @@ class PeopleDetailService:
             "initial_tv_credits_page": {"items": tv[:12], "page": 1, "page_size": 12, "total_items": len(tv), "total_pages": 1},
             "initial_scene_credits_page": {"items": scenes[:12], "page": 1, "page_size": 12, "total_items": len(scenes), "total_pages": 1},
         }
-        return JSONResponse(content=result)
+        return PersonDetailResponse(**result)
 
-    def get_person_movies(self, person_id: int, page: int = 1, page_size: int = 12):
+    def get_person_movies(self, person_id: int, page: int = 1, page_size: int = 12) -> PersonFilmographyResponse:
         db = self.db
         person = db.query(Person).filter(Person.id == person_id).first()
         if not person:
-            return JSONResponse(status_code=404, content={"error": "Person not found"})
+            raise HTTPException(status_code=404, detail="Person not found")
         res = self.filmography_service.get_person_movies(person_id, page, page_size)
-        return JSONResponse(content=res)
+        return PersonFilmographyResponse(**res)
 
-    def get_person_tv(self, person_id: int, page: int = 1, page_size: int = 12):
+    def get_person_tv(self, person_id: int, page: int = 1, page_size: int = 12) -> PersonFilmographyResponse:
         db = self.db
         person = db.query(Person).filter(Person.id == person_id).first()
         if not person:
-            return JSONResponse(status_code=404, content={"error": "Person not found"})
+            raise HTTPException(status_code=404, detail="Person not found")
         res = self.filmography_service.get_person_tv(person_id, page, page_size)
-        return JSONResponse(content=res)
+        return PersonFilmographyResponse(**res)
 
-    def get_person_scenes(self, person_id: int, page: int = 1, page_size: int = 12):
+    def get_person_scenes(self, person_id: int, page: int = 1, page_size: int = 12) -> PersonFilmographyResponse:
         db = self.db
         person = db.query(Person).filter(Person.id == person_id).first()
         if not person:
-            return JSONResponse(status_code=404, content={"error": "Person not found"})
+            raise HTTPException(status_code=404, detail="Person not found")
         res = self.filmography_service.get_person_scenes(person_id, page, page_size)
-        return JSONResponse(content=res)
+        return PersonFilmographyResponse(**res)

@@ -16,7 +16,8 @@ class SceneDetailService(DetailFormatter):
         self.db = db
         self.scrapers = scrapers
 
-    def get_scene_detail(self, item_id: str):
+    def get_scene_detail(self, item_id: str) -> SceneDetailResponse:
+        from app.domains.library.schemas import SceneDetailResponse
         db = self.db
         scene_uuid = item_id.split("_")[1] if "_" in item_id else item_id
         
@@ -87,8 +88,10 @@ class SceneDetailService(DetailFormatter):
                 "gender": mapped_gender
             })
         
+        from app.shared_kernel.user_context import get_current_user_id
+        current_uid = get_current_user_id()
         override = db.query(UserOverride).filter(
-            UserOverride.user_id == 1,
+            UserOverride.user_id == current_uid,
             UserOverride.custom_title == title
         ).first()
         
@@ -136,4 +139,4 @@ class SceneDetailService(DetailFormatter):
             "playback_logs": [],
             "in_library": False,
         }
-        return JSONResponse(content=result)
+        return SceneDetailResponse(**result)

@@ -15,26 +15,28 @@ from app.domains.people.models import Person
 
 logger = logging.getLogger(__name__)
 
-scan_status_lock = threading.Lock()
-scan_status = {
-    "active": False,
-    "phase": "idle",
-    "current": 0,
-    "total": 0,
-    "start_time": 0,
-    "can_stop": False,
-    "stop_requested": False,
-    "current_file_progress": 0.0,
-}
-
 class ScannerService:
-    def __init__(self, db: Session):
+    scan_status_lock = threading.Lock()
+    scan_status = {
+        "active": False,
+        "phase": "idle",
+        "current": 0,
+        "total": 0,
+        "start_time": 0,
+        "can_stop": False,
+        "stop_requested": False,
+        "current_file_progress": 0.0,
+    }
+
+    def __init__(self, db: Session, scan_resolver_factory: Optional[Any] = None):
         self.db = db
         self.task_manager = task_manager
+        self.scan_resolver_factory = scan_resolver_factory
+
 
     def get_scan_status(self) -> Dict[str, Any]:
-        with scan_status_lock:
-            return scan_status.copy()
+        with ScannerService.scan_status_lock:
+            return ScannerService.scan_status.copy()
 
     def get_hydrate_status(self) -> Dict[str, Any]:
         # Return status matching whether a "People Enrichment" task is running
@@ -108,12 +110,11 @@ class ScannerService:
         mode: Optional[Any] = None,
         include_adult: Optional[bool] = None,
     ) -> Dict[str, Any]:
-        global scan_status
-        with scan_status_lock:
-            if scan_status.get("active"):
-                return {"status": "error", "message": f"Task already in progress: {scan_status.get('phase')}"}
+        with ScannerService.scan_status_lock:
+            if ScannerService.scan_status.get("active"):
+                return {"status": "error", "message": f"Task already in progress: {ScannerService.scan_status.get('phase')}"}
             
-            scan_status.update({
+            ScannerService.scan_status.update({
                 "active": True,
                 "phase": "starting",
                 "current": 0,
@@ -139,10 +140,9 @@ class ScannerService:
         mode: Optional[Any] = None,
         include_adult: Optional[bool] = None,
     ):
-        global scan_status
         self.task_manager.download_worker.is_paused = True
-        with scan_status_lock:
-            scan_status.update({
+        with ScannerService.scan_status_lock:
+            ScannerService.scan_status.update({
                 "active": True,
                 "phase": "collecting",
                 "current": 0,
@@ -202,32 +202,35 @@ class ScannerService:
                 if self._is_stop_requested():
                     break
                 def progress_cb(pct):
-                    with scan_status_lock:
-                        scan_status["current"] = int(pct * 100)
-                        scan_status["total"] = 100
+                    with ScannerService.scan_status_lock:
+                        ScannerService.scan_status["current"] = int(pct * 100)
+                        ScannerService.scan_status["total"] = 100
                     self.task_manager.update_progress(task_id, pct * 0.5)
                 to_enrich, _ = await asyncio.to_thread(scanner.scan_library, lib.id, mode=scan_mode, progress_callback=progress_cb)
                 total_items_to_enrich.extend(to_enrich)
 
             # Phase 2: Metadata API Resolution
             if total_items_to_enrich and not self._is_stop_requested():
-                with scan_status_lock:
-                    scan_status["phase"] = "resolving"
-                    scan_status["current"] = 0
-                    scan_status["total"] = len(total_items_to_enrich)
+                with ScannerService.scan_status_lock:
+                    ScannerService.scan_status["phase"] = "resolving"
+                    ScannerService.scan_status["current"] = 0
+                    ScannerService.scan_status["total"] = len(total_items_to_enrich)
                     
-                from app.infrastructure.scrapers.scan_resolver import ScanResolver
-                resolver = ScanResolver(
-                    self.db,
-                    mode=scan_mode,
-                    stop_checker=self._is_stop_requested,
-                    include_adult=include_adult,
-                )
+                if self.scan_resolver_factory:
+                    resolver = self.scan_resolver_factory(
+                        self.db,
+                        mode=scan_mode,
+                        stop_checker=self._is_stop_requested,
+                        include_adult=include_adult,
+                    )
+                else:
+                    raise RuntimeError("scan_resolver_factory is required but not provided")
+
                 
                 def resolve_progress_cb(current, total):
-                    with scan_status_lock:
-                        scan_status["current"] = current
-                        scan_status["total"] = total
+                    with ScannerService.scan_status_lock:
+                        ScannerService.scan_status["current"] = current
+                        ScannerService.scan_status["total"] = total
                     progress = 50.0 + (current / total) * 50.0
                     self.task_manager.update_progress(task_id, progress)
                     
@@ -248,22 +251,21 @@ class ScannerService:
             raise e
         finally:
             self.task_manager.download_worker.is_paused = False
-            with scan_status_lock:
-                scan_status["active"] = False
-                scan_status["phase"] = "idle"
-                scan_status["can_stop"] = False
-                scan_status["stop_requested"] = False
+            with ScannerService.scan_status_lock:
+                ScannerService.scan_status["active"] = False
+                ScannerService.scan_status["phase"] = "idle"
+                ScannerService.scan_status["can_stop"] = False
+                ScannerService.scan_status["stop_requested"] = False
 
     def _is_stop_requested(self) -> bool:
-        with scan_status_lock:
-            return scan_status.get("stop_requested", False)
+        with ScannerService.scan_status_lock:
+            return ScannerService.scan_status.get("stop_requested", False)
 
     def stop_active_task(self) -> Dict[str, Any]:
-        global scan_status
         stopped_any = False
-        with scan_status_lock:
-            if scan_status.get("active") and not scan_status.get("stop_requested"):
-                scan_status["stop_requested"] = True
+        with ScannerService.scan_status_lock:
+            if ScannerService.scan_status.get("active") and not ScannerService.scan_status.get("stop_requested"):
+                ScannerService.scan_status["stop_requested"] = True
                 stopped_any = True
                 
         # Also reset download queues
@@ -275,10 +277,9 @@ class ScannerService:
         return {"status": "success", "message": "Stop requested" if stopped_any else "No active tasks to stop"}
 
     def start_rename(self, item_ids: Optional[List[int]] = None) -> Dict[str, Any]:
-        global scan_status
-        with scan_status_lock:
-            if scan_status.get("active"):
-                return {"status": "error", "message": f"Task already in progress: {scan_status.get('phase')}"}
+        with ScannerService.scan_status_lock:
+            if ScannerService.scan_status.get("active"):
+                return {"status": "error", "message": f"Task already in progress: {ScannerService.scan_status.get('phase')}"}
                 
         # Register task in the DB task manager
         task_id = self.task_manager.create_task("Organize Items")
@@ -288,7 +289,6 @@ class ScannerService:
         return {"status": "success", "message": "Organizing items in background"}
 
     async def _run_rename(self, task_id: int, item_ids: Optional[List[int]] = None):
-        global scan_status
         from sqlalchemy.orm import joinedload
         query = self.db.query(MediaItem).options(
             joinedload(MediaItem.matches).joinedload(MetadataMatch.localizations),
@@ -306,8 +306,8 @@ class ScannerService:
         self.db.add(batch)
         self.db.commit()
         
-        with scan_status_lock:
-            scan_status.update({
+        with ScannerService.scan_status_lock:
+            ScannerService.scan_status.update({
                 "active": True,
                 "phase": "organizing",
                 "current": 0,
@@ -330,36 +330,35 @@ class ScannerService:
                 
             active_match = next((m for m in item.matches), None)
             if not active_match:
-                with scan_status_lock:
-                    scan_status["current"] += 1
+                with ScannerService.scan_status_lock:
+                    ScannerService.scan_status["current"] += 1
                 continue
                 
             dest_root = formatter.config.library_path if formatter.config.move_to_library and formatter.config.library_path else os.path.dirname(item.current_path)
             preview = formatter.plan_rename(active_match, dest_root)
             
             def progress_cb(pct):
-                with scan_status_lock:
-                    scan_status["current_file_progress"] = pct
+                with ScannerService.scan_status_lock:
+                    ScannerService.scan_status["current_file_progress"] = pct
                     
             success = await asyncio.to_thread(engine.execute_single, preview, batch.id, progress_callback=progress_cb)
             
-            with scan_status_lock:
-                scan_status["current"] += 1
-                scan_status["current_file_progress"] = 0.0
+            with ScannerService.scan_status_lock:
+                ScannerService.scan_status["current"] += 1
+                ScannerService.scan_status["current_file_progress"] = 0.0
                 
             self.task_manager.update_progress(task_id, ((idx + 1) / len(items)) * 100.0)
             
-        with scan_status_lock:
-            scan_status["active"] = False
-            scan_status["phase"] = "idle"
-            scan_status["can_stop"] = False
-            scan_status["stop_requested"] = False
+        with ScannerService.scan_status_lock:
+            ScannerService.scan_status["active"] = False
+            ScannerService.scan_status["phase"] = "idle"
+            ScannerService.scan_status["can_stop"] = False
+            ScannerService.scan_status["stop_requested"] = False
 
     def start_undo(self, batch_id: int) -> Dict[str, Any]:
-        global scan_status
-        with scan_status_lock:
-            if scan_status.get("active"):
-                return {"status": "error", "message": f"Task already in progress: {scan_status.get('phase')}"}
+        with ScannerService.scan_status_lock:
+            if ScannerService.scan_status.get("active"):
+                return {"status": "error", "message": f"Task already in progress: {ScannerService.scan_status.get('phase')}"}
                 
         # Register task in the DB task manager
         task_id = self.task_manager.create_task(f"Undo batch {batch_id}")
@@ -369,9 +368,8 @@ class ScannerService:
         return {"status": "success", "message": "Reverting batch in background"}
 
     async def _run_undo(self, task_id: int, batch_id: int):
-        global scan_status
-        with scan_status_lock:
-            scan_status.update({
+        with ScannerService.scan_status_lock:
+            ScannerService.scan_status.update({
                 "active": True,
                 "phase": "undoing",
                 "current": 0,
@@ -385,92 +383,16 @@ class ScannerService:
         engine = RenamerEngine(self.db)
         
         def progress_cb(current, total):
-            with scan_status_lock:
-                scan_status["current"] = current
-                scan_status["total"] = total
+            with ScannerService.scan_status_lock:
+                ScannerService.scan_status["current"] = current
+                ScannerService.scan_status["total"] = total
                 
         await asyncio.to_thread(engine.undo_batch, batch_id, progress_callback=progress_cb, stop_check=self._is_stop_requested)
         
-        with scan_status_lock:
-            scan_status["active"] = False
-            scan_status["phase"] = "idle"
-            scan_status["can_stop"] = False
-            scan_status["stop_requested"] = False
+        with ScannerService.scan_status_lock:
+            ScannerService.scan_status["active"] = False
+            ScannerService.scan_status["phase"] = "idle"
+            ScannerService.scan_status["can_stop"] = False
+            ScannerService.scan_status["stop_requested"] = False
 
-    def get_history(self, page: int = 1, limit: int = 20) -> Dict[str, Any]:
-        offset = (page - 1) * limit
-        batches = self.db.query(ActionBatch).order_by(desc(ActionBatch.created_at)).offset(offset).limit(limit + 1).all()
-        
-        has_more = len(batches) > limit
-        if has_more:
-            batches = batches[:limit]
-            
-        result = []
-        for b in batches:
-            success_count = self.db.query(ActionLog).filter(
-                ActionLog.batch_id == b.id,
-                ActionLog.status == ActionStatus.SUCCESS
-            ).count()
-            
-            failed_count = self.db.query(ActionLog).filter(
-                ActionLog.batch_id == b.id,
-                ActionLog.status == ActionStatus.FAILED
-            ).count()
-            
-            undone_count = self.db.query(ActionLog).filter(
-                ActionLog.batch_id == b.id,
-                ActionLog.status == ActionStatus.UNDONE
-            ).count()
-            
-            movie_count = self.db.query(ActionLog).join(MediaItem, ActionLog.media_item_id == MediaItem.id).filter(
-                ActionLog.batch_id == b.id,
-                ActionLog.status.in_([ActionStatus.SUCCESS, ActionStatus.UNDONE])
-            ).filter(
-                MediaItem.matches.any(MetadataMatch.media_type == MediaType.MOVIE)
-            ).count()
-            
-            episode_count = self.db.query(ActionLog).join(MediaItem, ActionLog.media_item_id == MediaItem.id).filter(
-                ActionLog.batch_id == b.id,
-                ActionLog.status.in_([ActionStatus.SUCCESS, ActionStatus.UNDONE])
-            ).filter(
-                MediaItem.matches.any(MetadataMatch.media_type == MediaType.EPISODE)
-            ).count()
-            
-            extra_count = self.db.query(ActionLog).filter(
-                ActionLog.batch_id == b.id,
-                ActionLog.status.in_([ActionStatus.SUCCESS, ActionStatus.UNDONE]),
-                ActionLog.extra_file_id != None
-            ).count()
-            
-            is_undone = (success_count == 0) and (undone_count > 0 or failed_count == 0)
-            status = "undone" if is_undone else "completed" if failed_count == 0 else "partial"
-            
-            logs_query = self.db.query(ActionLog).filter(ActionLog.batch_id == b.id).all()
-            logs_list = [{
-                "id": log.id,
-                "old_value": log.old_value,
-                "new_value": log.new_value,
-                "status": log.status.value,
-                "error_message": log.error_message
-            } for log in logs_query]
-            
-            result.append({
-                "id": b.id,
-                "name": b.name or f"Batch #{b.id}",
-                "created_at": b.created_at.isoformat() + "Z",
-                "success_count": success_count + undone_count,
-                "failed_count": failed_count,
-                "movie_count": movie_count,
-                "episode_count": episode_count,
-                "extra_count": extra_count,
-                "remaining_count": success_count,
-                "undone_count": undone_count,
-                "status": status,
-                "logs": logs_list
-            })
-            
-        return {
-            "items": result,
-            "page": page,
-            "has_more": has_more
-        }
+

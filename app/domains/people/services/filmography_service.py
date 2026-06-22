@@ -10,18 +10,17 @@ from app.domains.people.models import MediaPersonLink
 from app.shared_kernel.language import LanguageService
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 
+from app.domains.media_assets.services.images import image_processing_service
+
 logger = logging.getLogger(__name__)
 
 class FilmographyService:
     def __init__(self, db: Session):
         self.db = db
-        from app.domains.media_assets.services.images import ImageProcessingService
-        self.img_service = ImageProcessingService()
 
     def _resolve_img(self, path: Optional[str], subfolder: str) -> Optional[str]:
-        if not path or not self.img_service:
-            return None
-        return self.img_service.resolve_image_url(path, subfolder)
+        return image_processing_service.resolve_image_url(path, subfolder)
+
 
     def aggregate_credits(self, person_id: int) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]]]:
         db = self.db

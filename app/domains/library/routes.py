@@ -12,7 +12,20 @@ from app.domains.metadata.schemas import MetadataMatchRead
 from app.domains.library.schemas import (
     MediaItemRead,
     LibraryRead,
+    LibraryStatsResponse,
+    ContinueWatchingItem,
+    LibraryTabResponse,
+    GroupedLibraryResponse,
+    TagGroupItem,
+    FilterOptionsResponse,
+    MovieCollectionsResponse,
+    MovieDetailResponse,
+    TvShowDetailResponse,
+    TvSeasonDetailResponse,
+    CollectionDetailResponse,
+    SceneDetailResponse,
 )
+from app.domains.people.schemas import PeopleGroupItem
 from app.domains.users.schemas import (
     ItemOverridesUpdate,
     ItemStatusUpdate,
@@ -67,17 +80,19 @@ from app.domains.library.services.library_listing_service import LibraryListingS
 from app.domains.library.services.library_collection_service import LibraryCollectionService
 from app.domains.library.services.library_filter_service import LibraryFilterService
 
-@library_router.get("/library/stats")
+from typing import Union
+
+@library_router.get("/library/stats", response_model=LibraryStatsResponse)
 def get_stats(db: Session = Depends(get_db), include_adult: bool = False):
     return LibraryStatsService(db).get_stats(include_adult=include_adult)
 
 
-@library_router.get("/library/continue-watching")
+@library_router.get("/library/continue-watching", response_model=List[ContinueWatchingItem])
 def get_continue_watching(db: Session = Depends(get_db), limit: int = 12, include_adult: bool = False):
     return LibraryListingService(db).get_continue_watching(limit=limit, include_adult=include_adult)
 
 
-@library_router.get("/library")
+@library_router.get("/library", response_model=Union[LibraryTabResponse, GroupedLibraryResponse])
 def get_library_items(
     db: Session = Depends(get_db),
     tab: Optional[str] = None,
@@ -116,12 +131,12 @@ def get_library_items(
     return service.get_grouped_library(include_adult=include_adult)
 
 
-@library_router.get("/library/tags")
+@library_router.get("/library/tags", response_model=List[TagGroupItem])
 def get_library_tags(db: Session = Depends(get_db), is_adult: bool = False):
     return LibraryFilterService(db).get_tag_groups(is_adult)
 
 
-@library_router.get("/library/filters")
+@library_router.get("/library/filters", response_model=FilterOptionsResponse)
 def get_library_filters(
     db: Session = Depends(get_db),
     tab: str = "movies",
@@ -131,7 +146,7 @@ def get_library_filters(
     return LibraryFilterService(db).get_library_filter_options(tab, filter_ownership, filter_status)
 
 
-@library_router.get("/library/collections")
+@library_router.get("/library/collections", response_model=MovieCollectionsResponse)
 def get_movie_collections(
     db: Session = Depends(get_db),
     page: int = 1,
@@ -152,7 +167,7 @@ def get_movie_collections(
 
 from app.domains.people.services.people_library_service import PeopleLibraryService
 
-@library_router.get("/library/people/{role}")
+@library_router.get("/library/people/{role}", response_model=List[PeopleGroupItem])
 def get_library_people(
     role: str,
     db: Session = Depends(get_db),
@@ -172,32 +187,53 @@ from app.domains.library.services.detail.movie_detail_service import MovieDetail
 from app.domains.library.services.detail.tv_detail_service import TvDetailService
 from app.domains.library.services.detail.scene_detail_service import SceneDetailService
 from app.domains.library.services.detail.collection_detail_service import CollectionDetailService
-from app.infrastructure.scrapers.gateway import scraper_gateway
+from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 
-@library_router.get("/library/item/{item_id}")
-def get_library_item_detail(item_id: str, full_people: bool = False, db: Session = Depends(get_db)):
+def get_scraper_gateway() -> ScraperGatewayPort:
+    from app.infrastructure.scrapers.gateway import scraper_gateway
+    return scraper_gateway
+
+@library_router.get("/library/item/{item_id}", response_model=Union[MovieDetailResponse, SceneDetailResponse])
+def get_library_item_detail(
+    item_id: str,
+    full_people: bool = False,
+    db: Session = Depends(get_db),
+    scrapers: ScraperGatewayPort = Depends(get_scraper_gateway)
+):
     if item_id.startswith("stash_"):
-        return SceneDetailService(db, scraper_gateway).get_scene_detail(item_id)
-    return MovieDetailService(db, scraper_gateway).get_library_item_detail(item_id, full_people=full_people)
+        return SceneDetailService(db, scrapers).get_scene_detail(item_id)
+    return MovieDetailService(db, scrapers).get_library_item_detail(item_id, full_people=full_people)
 
 
-@library_router.get("/library/tv/{tv_tmdb_id}")
+@library_router.get("/library/tv/{tv_tmdb_id}", response_model=TvShowDetailResponse)
 def get_library_tv_detail(
     tv_tmdb_id: str,
     seasons_limit: int = 5,
     initial_episodes_limit: int = 4,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    scrapers: ScraperGatewayPort = Depends(get_scraper_gateway)
 ):
-    return TvDetailService(db, scraper_gateway).get_library_tv_detail(
+    return TvDetailService(db, scrapers).get_library_tv_detail(
         tv_tmdb_id, seasons_limit=seasons_limit, initial_episodes_limit=initial_episodes_limit
     )
 
 
-@library_router.get("/library/tv/{tv_tmdb_id}/season/{season_number}")
-def get_library_tv_season_detail(tv_tmdb_id: str, season_number: int, db: Session = Depends(get_db)):
-    return TvDetailService(db, scraper_gateway).get_library_tv_season_detail(tv_tmdb_id, season_number)
+@library_router.get("/library/tv/{tv_tmdb_id}/season/{season_number}", response_model=TvSeasonDetailResponse)
+def get_library_tv_season_detail(
+    tv_tmdb_id: str,
+    season_number: int,
+    db: Session = Depends(get_db),
+    scrapers: ScraperGatewayPort = Depends(get_scraper_gateway)
+):
+    return TvDetailService(db, scrapers).get_library_tv_season_detail(tv_tmdb_id, season_number)
 
 
-@library_router.get("/library/collection/{collection_tmdb_id}")
-def get_library_collection_detail(collection_tmdb_id: str, language: str | None = None, db: Session = Depends(get_db)):
-    return CollectionDetailService(db, scraper_gateway).get_collection_detail(collection_tmdb_id, language=language)
+@library_router.get("/library/collection/{collection_tmdb_id}", response_model=CollectionDetailResponse)
+def get_library_collection_detail(
+    collection_tmdb_id: str,
+    language: str | None = None,
+    db: Session = Depends(get_db),
+    scrapers: ScraperGatewayPort = Depends(get_scraper_gateway)
+):
+    return CollectionDetailService(db, scrapers).get_collection_detail(collection_tmdb_id, language=language)
+

@@ -2,7 +2,7 @@ import asyncio
 import logging
 from typing import Optional, List
 
-from app.domains.media_assets.services.images import ImageProcessingService
+from app.domains.media_assets.services.images import image_processing_service, ImageProcessingService
 from app.shared_kernel.constants import HEAVY_IMAGE_DOWNLOAD_TIMEOUT
 
 logger = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ class DownloadWorker:
     """
 
     def __init__(self, image_service: Optional[ImageProcessingService] = None, concurrency: int = 6):
-        self.image_service = image_service or ImageProcessingService()
+        self.image_service = image_service or image_processing_service
         self.concurrency = concurrency
         self._queue: Optional[asyncio.Queue] = None
         self.is_running = False

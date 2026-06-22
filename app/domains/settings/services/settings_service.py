@@ -16,13 +16,16 @@ from app.domains.settings.models import UserSetting, SystemSetting
 from app.domains.library.models import MediaItem
 from app.shared_kernel.enums import ItemStatus, MediaType
 from app.shared_kernel.constants import STASHDB_DEFAULT_ENDPOINT, FANSDB_DEFAULT_ENDPOINT, PORNDB_DEFAULT_ENDPOINT
-from app.domains.media_assets.services.images import ImageProcessingService
+from app.domains.media_assets.services.images import image_processing_service
 
 logger = logging.getLogger(__name__)
 
 class SettingsService:
-    def __init__(self, db: Session, user_id: int = 1):
+    def __init__(self, db: Session, user_id: Optional[int] = None):
         self.db = db
+        if user_id is None:
+            from app.shared_kernel.user_context import get_current_user_id
+            user_id = get_current_user_id()
         self.user_id = user_id
 
     def _migrate_legacy_settings(self) -> None:
@@ -128,7 +131,7 @@ class SettingsService:
         if extension not in {".jpg", ".jpeg", ".png", ".webp", ".gif"}:
             raise ValueError("Unsupported image format")
 
-        image_service = ImageProcessingService()
+        image_service = image_processing_service
         avatar_filename = f"user_{self.user_id}_{uuid.uuid4().hex}{extension}"
         original_path = image_service.get_original_path("avatars", avatar_filename)
         thumbnail_path = image_service.get_thumbnail_path("avatars", avatar_filename)

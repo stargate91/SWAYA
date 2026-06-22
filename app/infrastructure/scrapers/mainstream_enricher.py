@@ -122,24 +122,24 @@ class MainstreamEnricher:
 
         # Retrieve target language and overrides so they are also cached in the DB
         try:
+            from app.shared_kernel.user_context import get_current_user_id
             from app.domains.settings.models import UserSetting, SystemSetting
-            if item.overrides and item.overrides.custom_language:
-                langs_to_enrich.append(item.overrides.custom_language)
+            current_user_id = get_current_user_id()
             
-            follow_s = self.db.query(UserSetting).filter(UserSetting.user_id == 1, UserSetting.key == "follow_app_language_for_naming").first()
+            follow_s = self.db.query(UserSetting).filter(UserSetting.user_id == current_user_id, UserSetting.key == "follow_app_language_for_naming").first()
             if not follow_s:
                 follow_s = self.db.query(SystemSetting).filter(SystemSetting.key == "follow_app_language_for_naming").first()
             follow_naming = follow_s.value if follow_s else True
             
             t_lang = None
             if follow_naming:
-                ui_s = self.db.query(UserSetting).filter(UserSetting.user_id == 1, UserSetting.key == "ui_language").first()
+                ui_s = self.db.query(UserSetting).filter(UserSetting.user_id == current_user_id, UserSetting.key == "ui_language").first()
                 if not ui_s:
                     ui_s = self.db.query(SystemSetting).filter(SystemSetting.key == "ui_language").first()
                 if ui_s and ui_s.value:
                     t_lang = ui_s.value
             else:
-                target_s = self.db.query(UserSetting).filter(UserSetting.user_id == 1, UserSetting.key == "default_target_language").first()
+                target_s = self.db.query(UserSetting).filter(UserSetting.user_id == current_user_id, UserSetting.key == "default_target_language").first()
                 if not target_s:
                     target_s = self.db.query(SystemSetting).filter(SystemSetting.key == "default_target_language").first()
                 if target_s and target_s.value:
