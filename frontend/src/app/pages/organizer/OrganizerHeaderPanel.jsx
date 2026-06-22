@@ -17,9 +17,12 @@ export default function OrganizerHeaderPanel({
   searchQuery,
   setSearchQuery,
   title,
+  sessionMode,
 }) {
+  const panelClassName = `organizer-panel${sessionMode === 'nsfw' ? ' organizer-panel--nsfw' : ''}`;
+
   return (
-    <div className="organizer-panel">
+    <div className={panelClassName}>
       <div className="organizer-panel__row">
         <span className="organizer-panel__title">{title}</span>
         <div className="organizer-panel__actions">
