@@ -47,19 +47,32 @@ class ContextBuilder:
         ctx = self.tech_parser.get_tech_context(item)
         collection_name = self._resolve_collection_name(match, loc)
         
-        from app.shared_kernel.enums import Provider
+        from app.shared_kernel.enums import Provider, MovieEdition, MediaSource, MediaAudioType
         tmdb_id = ""
         if match and getattr(match, "provider", None) == Provider.TMDB:
             tmdb_id = str(match.external_id)
         
+        edition_val = getattr(item, "edition", None)
+        source_val = getattr(item, "source", None)
+        audio_type_val = getattr(item, "audio_type", None)
+        
+        overrides = getattr(item, "overrides", None)
+        if overrides:
+            if getattr(overrides, "custom_edition", None) and overrides.custom_edition != MovieEdition.NONE:
+                edition_val = overrides.custom_edition
+            if getattr(overrides, "custom_source", None) and overrides.custom_source != MediaSource.NONE:
+                source_val = overrides.custom_source
+            if getattr(overrides, "custom_audio_type", None) and overrides.custom_audio_type != MediaAudioType.NONE:
+                audio_type_val = overrides.custom_audio_type
+
         ctx.update({
             "Title": loc.title if loc and loc.title else "",
             "OriginalTitle": getattr(match, "original_title", "") or "",
             "Year": str(match.release_date.year) if match and match.release_date else "",
             "ReleaseDate": match.release_date.strftime("%Y-%m-%d") if match and match.release_date else "",
-            "Edition": self.tech_parser.format_enum_val(getattr(item, "edition", None)),
-            "Source": self.tech_parser.format_source(getattr(item, "source", None)),
-            "AudioType": self.tech_parser.format_enum_val(getattr(item, "audio_type", None)),
+            "Edition": self.tech_parser.format_enum_val(edition_val),
+            "Source": self.tech_parser.format_source(source_val),
+            "AudioType": self.tech_parser.format_enum_val(audio_type_val),
             "Custom": self.config.custom_text,
             "ImdbId": getattr(match, "imdb_id", "") or "",
             "TmdbId": tmdb_id,
@@ -312,12 +325,63 @@ class ContextBuilder:
         if tv_loc:
             tv_title = tv_loc.title
             
-        if season_match:
+        parsed_info = getattr(item, "parsed_info", None) or {}
+        custom_season = parsed_info.get("season")
+        custom_episode = parsed_info.get("episode")
+
+        if custom_season is not None and str(custom_season).strip() != "":
+            season_number = self._format_number(custom_season)
+        elif season_match:
             season_number = self._format_number(getattr(season_match, "season_number", None))
-            if season_loc:
-                season_title = season_loc.title
+            
+        if season_match and season_loc:
+            season_title = season_loc.title
                 
-        if match and match.media_type == MediaType.EPISODE:
+        if custom_episode is not None and str(custom_episode).strip() != "":
+            episode_number = self._format_number(custom_episode)
+            # Try to lookup correct episode title in the database
+            if tv_match:
+                session = object_session(tv_match)
+                if session:
+                    from app.domains.metadata.models import MetadataMatch
+                    try:
+                        target_season_num = int(custom_season) if custom_season is not None and str(custom_season).isdigit() else None
+                        target_ep_num = int(custom_episode) if str(custom_episode).isdigit() else None
+                        
+                        if target_ep_num is not None:
+                            seasons_ids_query = session.query(MetadataMatch.id).filter(
+                                MetadataMatch.parent_id == tv_match.id,
+                                MetadataMatch.media_type == MediaType.SEASON
+                            )
+                            if target_season_num is not None:
+                                seasons_ids_query = seasons_ids_query.filter(MetadataMatch.season_number == target_season_num)
+                            season_ids = [r[0] for r in seasons_ids_query.all()]
+                            
+                            if season_ids:
+                                ep_matches = session.query(MetadataMatch).filter(
+                                    MetadataMatch.parent_id.in_(season_ids),
+                                    MetadataMatch.media_type == MediaType.EPISODE
+                                ).all()
+                                target_ep_match = None
+                                for ep_m in ep_matches:
+                                    ep_num_val = getattr(ep_m, "episode_number", None)
+                                    if ep_num_val == target_ep_num or ep_num_val == str(target_ep_num) or (isinstance(ep_num_val, list) and target_ep_num in ep_num_val):
+                                        target_ep_match = ep_m
+                                        break
+                                
+                                if target_ep_match:
+                                    target_loc = None
+                                    for l in getattr(target_ep_match, "localizations", []):
+                                        if l.locale == locale:
+                                            target_loc = l
+                                            break
+                                    if not target_loc and getattr(target_ep_match, "localizations", None):
+                                        target_loc = target_ep_match.localizations[0]
+                                    if target_loc:
+                                        episode_title = target_loc.title
+                    except Exception as e:
+                        logger.error(f"Error resolving override episode title: {e}")
+        elif match and match.media_type == MediaType.EPISODE:
             episode_number = self._format_number(getattr(match, "episode_number", None))
             if loc:
                 episode_title = loc.title
@@ -333,6 +397,20 @@ class ContextBuilder:
             season_number = self._format_number(match.season_number)
         if not episode_number and match and getattr(match, "episode_number", None) is not None:
             episode_number = self._format_number(match.episode_number)
+
+        edition_val = getattr(item, "edition", None)
+        source_val = getattr(item, "source", None)
+        audio_type_val = getattr(item, "audio_type", None)
+        
+        from app.shared_kernel.enums import MovieEdition, MediaSource, MediaAudioType
+        overrides = getattr(item, "overrides", None)
+        if overrides:
+            if getattr(overrides, "custom_edition", None) and overrides.custom_edition != MovieEdition.NONE:
+                edition_val = overrides.custom_edition
+            if getattr(overrides, "custom_source", None) and overrides.custom_source != MediaSource.NONE:
+                source_val = overrides.custom_source
+            if getattr(overrides, "custom_audio_type", None) and overrides.custom_audio_type != MediaAudioType.NONE:
+                audio_type_val = overrides.custom_audio_type
 
         ctx.update({
             "TvTitle": tv_title,
@@ -353,6 +431,10 @@ class ContextBuilder:
             "EpisodeNumber": episode_number,
             "Episode": episode_number,
             "EpisodeTitle": episode_title,
+            
+            "Edition": self.tech_parser.format_enum_val(edition_val),
+            "Source": self.tech_parser.format_source(source_val),
+            "AudioType": self.tech_parser.format_enum_val(audio_type_val),
             
             "Custom": self.config.custom_text,
             "ext": getattr(item, "extension", "") or "",

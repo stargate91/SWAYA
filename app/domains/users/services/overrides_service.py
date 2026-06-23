@@ -28,6 +28,99 @@ class OverridesService:
             user_id = get_current_user_id()
         self.user_id = user_id
 
+    def _enrich_language_if_needed(self, item, language: str):
+        if not language or language == "none":
+            return
+        
+        active_match = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
+        if not active_match or not active_match.provider:
+            return
+            
+        from app.shared_kernel.enums import Provider
+        if active_match.provider != Provider.TMDB:
+            return
+            
+        try:
+            from app.infrastructure.scrapers.enrichment.mainstream_enricher import MainstreamEnricher
+            enricher = MainstreamEnricher(self.db)
+            enricher.enrich_matched_item(item, language=language)
+        except Exception as e:
+            logger.error(f"Error enriching language {language} for item {item.id}: {e}")
+
+    def _shift_tv_episode_match_if_needed(self, item, parsed, new_season, new_episode, custom_language, reset_match: bool = False):
+        if reset_match:
+            return
+        from app.shared_kernel.enums import MediaType
+        active_match = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
+        if active_match and active_match.media_type in (MediaType.SEASON, MediaType.EPISODE, MediaType.TV):
+            tv_match = None
+            current = active_match
+            while current:
+                if current.media_type == MediaType.TV:
+                    tv_match = current
+                    break
+                current = current.parent
+                if not current and active_match.parent_id is not None:
+                    current = self.db.query(MetadataMatch).filter(MetadataMatch.id == active_match.parent_id).first()
+            
+            if tv_match:
+                try:
+                    ns_num = int(new_season) if new_season is not None and str(new_season).isdigit() else (int(parsed.get("season")) if str(parsed.get("season")).isdigit() else 1)
+                    ne_num = int(new_episode) if new_episode is not None and str(new_episode).isdigit() else (int(parsed.get("episode")) if str(parsed.get("episode")).isdigit() else 1)
+                    
+                    season_match = self.db.query(MetadataMatch).filter(
+                        MetadataMatch.provider == tv_match.provider,
+                        MetadataMatch.parent_id == tv_match.id,
+                        MetadataMatch.media_type == MediaType.SEASON,
+                        MetadataMatch.season_number == ns_num
+                    ).first()
+                    if not season_match:
+                        season_match = MetadataMatch(
+                            provider=tv_match.provider,
+                            external_id=f"{tv_match.external_id}-s{ns_num}",
+                            media_type=MediaType.SEASON,
+                            season_number=ns_num,
+                            parent_id=tv_match.id,
+                            confidence_score=1.0
+                        )
+                        self.db.add(season_match)
+                        self.db.flush()
+                        
+                    episode_match = self.db.query(MetadataMatch).filter(
+                        MetadataMatch.provider == tv_match.provider,
+                        MetadataMatch.parent_id == season_match.id,
+                        MetadataMatch.media_type == MediaType.EPISODE,
+                        MetadataMatch.episode_number == ne_num
+                    ).first()
+                    if not episode_match:
+                        episode_match = MetadataMatch(
+                            provider=tv_match.provider,
+                            external_id=tv_match.external_id,
+                            media_type=MediaType.EPISODE,
+                            season_number=ns_num,
+                            episode_number=ne_num,
+                            parent_id=season_match.id,
+                            confidence_score=1.0,
+                            media_item_id=item.id,
+                            is_active=True
+                        )
+                        self.db.add(episode_match)
+                        self.db.flush()
+                    else:
+                        episode_match.media_item_id = item.id
+                        episode_match.is_active = True
+                        
+                    for m in item.matches:
+                        if m.id != episode_match.id:
+                            m.is_active = False
+                            
+                    # Enrich the new match
+                    from app.infrastructure.scrapers.enrichment.mainstream_enricher import MainstreamEnricher
+                    enricher = MainstreamEnricher(self.db)
+                    enricher.enrich_matched_item(item, language=custom_language or "en")
+                except Exception as e:
+                    logger.error(f"Error shifting TV episode match: {e}")
+
     def _get_or_create_override(self, item_id: str) -> Optional[UserOverride]:
         media_item_id, metadata_match_id = self.resolver.resolve_ids(item_id)
 
@@ -69,6 +162,67 @@ class OverridesService:
 
     def update_item_overrides(self, request: ItemOverridesUpdate) -> Dict[str, Any]:
         item_id = request.item_id
+        is_extra = request.type == 'extra'
+
+        if is_extra:
+            from app.domains.library.models import ExtraFile, MediaItem
+            extra = self.db.query(ExtraFile).filter(ExtraFile.id == item_id).first()
+            if not extra:
+                raise NotFoundException("Target extra item not found")
+
+            # Support conversion to movie/episode
+            if request.main_type in ("movie", "episode"):
+                parent_media = extra.media_item
+                if parent_media:
+                    from app.shared_kernel.enums import ItemStatus
+                    new_item = MediaItem(
+                        library_id=parent_media.library_id,
+                        relative_path=extra.relative_path,
+                        filename=extra.filename,
+                        extension=extra.extension,
+                        status=ItemStatus.NEW,
+                        parsed_info={"season": request.season, "episode": request.episode} if request.main_type == "episode" else {}
+                    )
+                    self.db.add(new_item)
+                    self.db.delete(extra)
+                    self.db.commit()
+                    return {"status": "success", "item_id": item_id}
+
+            if request.parent_id is not None:
+                extra.media_item_id = int(request.parent_id)
+            if request.subtype is not None:
+                from app.shared_kernel.enums import ExtraSubtype
+                try:
+                    extra.subtype = ExtraSubtype(request.subtype.lower())
+                except ValueError:
+                    pass
+            if request.language is not None:
+                extra.language = request.language
+
+            self.db.commit()
+            return {"status": "success", "item_id": item_id}
+
+        from app.domains.library.models import MediaItem, ExtraFile
+        item = self.db.query(MediaItem).filter(MediaItem.id == item_id).first()
+        if not item:
+            raise NotFoundException("Target item not found")
+
+        # Convert to extra if main_type is bonus
+        if request.main_type == "bonus" and request.parent_id is not None:
+            from app.shared_kernel.enums import ExtraCategory, ExtraSubtype
+            new_extra = ExtraFile(
+                media_item_id=int(request.parent_id),
+                relative_path=item.relative_path,
+                filename=item.filename,
+                extension=item.extension,
+                category=ExtraCategory.BONUS,
+                subtype=ExtraSubtype.OTHER
+            )
+            self.db.add(new_extra)
+            self.db.delete(item)
+            self.db.commit()
+            return {"status": "success", "item_id": item_id}
+
         override = self._get_or_create_override(str(item_id))
         if not override:
             raise NotFoundException("Target item not found")
@@ -78,18 +232,38 @@ class OverridesService:
             override.custom_title = request.custom_title
         if request.custom_overview is not None:
             override.custom_overview = request.custom_overview
+        
+        # Language override
+        language_updated = False
         if request.custom_language is not None:
             override.custom_language = request.custom_language
+            language_updated = True
+        elif request.language is not None:
+            override.custom_language = request.language
+            language_updated = True
+
+        if language_updated and override.custom_language:
+            self._enrich_language_if_needed(item, override.custom_language)
+
+        # Edition, Audio Type, Source overrides
+        from app.shared_kernel.enums import MovieEdition, MediaAudioType, MediaSource
+        if request.custom_edition is not None:
+            val = request.custom_edition
+            override.custom_edition = MovieEdition.NONE if (val == "none" or not val) else MovieEdition(val.lower())
+        if request.custom_audio_type is not None:
+            val = request.custom_audio_type
+            override.custom_audio_type = MediaAudioType.NONE if (val == "none" or not val) else MediaAudioType(val.lower())
+        if request.custom_source is not None:
+            val = request.custom_source
+            override.custom_source = MediaSource.NONE if (val == "none" or not val) else MediaSource(val.lower())
 
         # Rating, comments, favorite
-        rating_val = request.user_rating if request.user_rating is not None else request.rating
-        if rating_val is not None:
-            override.user_rating = rating_val
+        if request.user_rating is not None:
+            override.user_rating = request.user_rating
             override.user_rating_at = datetime.now(timezone.utc)
 
-        comment_val = request.user_comment if request.user_comment is not None else request.comment
-        if comment_val is not None:
-            override.user_comment = comment_val
+        if request.user_comment is not None:
+            override.user_comment = request.user_comment
             override.user_comment_at = datetime.now(timezone.utc)
 
         if request.is_favorite is not None:
@@ -104,6 +278,27 @@ class OverridesService:
 
         if request.resume_position is not None:
             override.resume_position = int(request.resume_position or 0)
+
+        # Season & Episode updates in parsed_info
+        if request.season is not None or request.episode is not None:
+            parsed = dict(item.parsed_info) if item.parsed_info else {}
+            if request.season is not None:
+                parsed["season"] = request.season
+                for k in ["fn", "it", "fd"]:
+                    if k in parsed and isinstance(parsed[k], dict):
+                        parsed[k]["season"] = request.season
+            if request.episode is not None:
+                parsed["episode"] = request.episode
+                for k in ["fn", "it", "fd"]:
+                    if k in parsed and isinstance(parsed[k], dict):
+                        parsed[k]["episode"] = request.episode
+            item.parsed_info = parsed
+            self._shift_tv_episode_match_if_needed(item, parsed, request.season, request.episode, override.custom_language, bool(request.reset_match))
+
+        # Reset Match
+        if request.reset_match:
+            for match in item.matches:
+                match.is_active = False
 
         # Tags resolution
         tags_input = request.tags
@@ -197,18 +392,157 @@ class OverridesService:
 
     def bulk_update(self, request: BulkOverridesUpdate) -> Dict[str, Any]:
         item_ids = request.item_ids or []
-        updates = request.updates or {}
-        if not item_ids:
-            return {"status": "success", "count": 0}
+        is_extra = request.type == 'extra'
 
         count = 0
+        # 1. Apply common updates
         for item_id in item_ids:
-            override = self._get_or_create_override(str(item_id))
-            if override:
-                for key, val in updates.items():
-                    if hasattr(override, key):
-                        setattr(override, key, val)
-                count += 1
+            if is_extra:
+                from app.domains.library.models import ExtraFile, MediaItem
+                extra = self.db.query(ExtraFile).filter(ExtraFile.id == item_id).first()
+                if extra:
+                    if request.parent_id is not None:
+                        extra.media_item_id = int(request.parent_id)
+                    if request.subtype is not None:
+                        from app.shared_kernel.enums import ExtraSubtype
+                        try:
+                            extra.subtype = ExtraSubtype(request.subtype.lower())
+                        except ValueError:
+                            pass
+                    if request.language is not None:
+                        extra.language = request.language
+
+                    if request.main_type in ("movie", "episode"):
+                        parent_media = extra.media_item
+                        if parent_media:
+                            from app.shared_kernel.enums import ItemStatus
+                            new_item = MediaItem(
+                                library_id=parent_media.library_id,
+                                relative_path=extra.relative_path,
+                                filename=extra.filename,
+                                extension=extra.extension,
+                                status=ItemStatus.NEW,
+                                parsed_info={"season": request.season, "episode": request.episode} if request.main_type == "episode" else {}
+                            )
+                            self.db.add(new_item)
+                            self.db.delete(extra)
+                    count += 1
+            else:
+                from app.domains.library.models import MediaItem, ExtraFile
+                item = self.db.query(MediaItem).filter(MediaItem.id == item_id).first()
+                if item:
+                    if request.main_type == "bonus" and request.parent_id is not None:
+                        from app.shared_kernel.enums import ExtraCategory, ExtraSubtype
+                        new_extra = ExtraFile(
+                            media_item_id=int(request.parent_id),
+                            relative_path=item.relative_path,
+                            filename=item.filename,
+                            extension=item.extension,
+                            category=ExtraCategory.BONUS,
+                            subtype=ExtraSubtype.OTHER
+                        )
+                        self.db.add(new_extra)
+                        self.db.delete(item)
+                    else:
+                        override = self._get_or_create_override(str(item_id))
+                        if override:
+                            from app.shared_kernel.enums import MovieEdition, MediaAudioType, MediaSource
+                            if request.custom_edition is not None:
+                                val = request.custom_edition
+                                override.custom_edition = MovieEdition.NONE if (val == "none" or not val) else MovieEdition(val.lower())
+                            if request.custom_audio_type is not None:
+                                val = request.custom_audio_type
+                                override.custom_audio_type = MediaAudioType.NONE if (val == "none" or not val) else MediaAudioType(val.lower())
+                            if request.custom_source is not None:
+                                val = request.custom_source
+                                override.custom_source = MediaSource.NONE if (val == "none" or not val) else MediaSource(val.lower())
+                            
+                            language_val = request.custom_language if request.custom_language is not None else request.language
+                            if language_val is not None:
+                                override.custom_language = language_val
+                                self._enrich_language_if_needed(item, language_val)
+
+                            if request.season is not None or request.episode is not None:
+                                parsed = dict(item.parsed_info) if item.parsed_info else {}
+                                if request.season is not None:
+                                    parsed["season"] = request.season
+                                    for k in ["fn", "it", "fd"]:
+                                        if k in parsed and isinstance(parsed[k], dict):
+                                            parsed[k]["season"] = request.season
+                                if request.episode is not None:
+                                    parsed["episode"] = request.episode
+                                    for k in ["fn", "it", "fd"]:
+                                        if k in parsed and isinstance(parsed[k], dict):
+                                            parsed[k]["episode"] = request.episode
+                                item.parsed_info = parsed
+                                self._shift_tv_episode_match_if_needed(item, parsed, request.season, request.episode, override.custom_language, bool(request.reset_match))
+
+                            if request.reset_match:
+                                for match in item.matches:
+                                    match.is_active = False
+                    count += 1
+
+        # 2. Apply individual item updates (e.g. auto numbering)
+        if request.item_updates:
+            for it_up in request.item_updates:
+                u_id = it_up.get("id")
+                u_updates = it_up.get("updates") or {}
+                if not u_id:
+                    continue
+                if is_extra:
+                    from app.domains.library.models import ExtraFile
+                    extra = self.db.query(ExtraFile).filter(ExtraFile.id == u_id).first()
+                    if extra:
+                        if "parent_id" in u_updates:
+                            extra.media_item_id = int(u_updates["parent_id"])
+                        if "subtype" in u_updates:
+                            from app.shared_kernel.enums import ExtraSubtype
+                            try:
+                                extra.subtype = ExtraSubtype(u_updates["subtype"].lower())
+                            except ValueError:
+                                pass
+                        if "language" in u_updates:
+                            extra.language = u_updates["language"]
+                else:
+                    from app.domains.library.models import MediaItem
+                    item = self.db.query(MediaItem).filter(MediaItem.id == u_id).first()
+                    if item:
+                        override = self._get_or_create_override(str(u_id))
+                        if override:
+                            from app.shared_kernel.enums import MovieEdition, MediaAudioType, MediaSource
+                            if "custom_edition" in u_updates:
+                                val = u_updates["custom_edition"]
+                                override.custom_edition = MovieEdition.NONE if (val == "none" or not val) else MovieEdition(val.lower())
+                            if "custom_audio_type" in u_updates:
+                                val = u_updates["custom_audio_type"]
+                                override.custom_audio_type = MediaAudioType.NONE if (val == "none" or not val) else MediaAudioType(val.lower())
+                            if "custom_source" in u_updates:
+                                val = u_updates["custom_source"]
+                                override.custom_source = MediaSource.NONE if (val == "none" or not val) else MediaSource(val.lower())
+                            
+                            language_val = u_updates.get("custom_language") if "custom_language" in u_updates else u_updates.get("language")
+                            if language_val is not None:
+                                override.custom_language = language_val
+                                self._enrich_language_if_needed(item, language_val)
+
+                            if "season" in u_updates or "episode" in u_updates:
+                                parsed = dict(item.parsed_info) if item.parsed_info else {}
+                                if "season" in u_updates:
+                                    parsed["season"] = u_updates["season"]
+                                    for k in ["fn", "it", "fd"]:
+                                        if k in parsed and isinstance(parsed[k], dict):
+                                            parsed[k]["season"] = u_updates["season"]
+                                if "episode" in u_updates:
+                                    parsed["episode"] = u_updates["episode"]
+                                    for k in ["fn", "it", "fd"]:
+                                        if k in parsed and isinstance(parsed[k], dict):
+                                            parsed[k]["episode"] = u_updates["episode"]
+                                item.parsed_info = parsed
+                                self._shift_tv_episode_match_if_needed(item, parsed, u_updates.get("season"), u_updates.get("episode"), override.custom_language, bool(u_updates.get("reset_match") or request.reset_match))
+
+                            if u_updates.get("reset_match"):
+                                for match in item.matches:
+                                    match.is_active = False
 
         self.db.commit()
         return {"status": "success", "count": count}

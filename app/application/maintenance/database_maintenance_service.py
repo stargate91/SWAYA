@@ -31,6 +31,26 @@ class DatabaseMaintenanceService:
 
                 self._reset_sqlite_sequences(deleted_tables)
                 self._ensure_default_user()
+            elif options.get("cache") or options.get("wipe_cache"):
+                cache_tables = {
+                    "metadata_matches",
+                    "metadata_localizations",
+                    "studios",
+                    "media_collections",
+                    "people",
+                    "person_localizations",
+                    "media_person_links",
+                    "external_source_links",
+                    "metadata_match_studios",
+                    "user_overrides",
+                    "user_override_tags"
+                }
+                for table in reversed(Base.metadata.sorted_tables):
+                    if table.name in cache_tables:
+                        self.db.execute(table.delete())
+                        deleted_tables.append(table.name)
+
+                self._reset_sqlite_sequences(deleted_tables)
 
             self.db.execute(text("PRAGMA foreign_keys = ON"))
             self.db.commit()

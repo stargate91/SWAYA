@@ -195,7 +195,8 @@
       "mainTypes": {
         "movie": "Movie",
         "episode": "Episode",
-        "bonus": "Bonus Video"
+        "bonus": "Bonus Video",
+        "scene": "Scene"
       },
       "subcategories": {
         "trailer": "Trailer",

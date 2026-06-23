@@ -164,6 +164,26 @@ def probe_backdrop_tone(file_path: str, image_root: Path, session: requests.Sess
         return None
 
 
+
+def backdrop_resolution_from_raw(raw_data: Optional[dict], backdrop_path: Optional[str]) -> int:
+    if not raw_data or not backdrop_path:
+        return 0
+
+    backdrops = ((raw_data.get("images") or {}).get("backdrops") or [])
+    for backdrop in backdrops:
+        if backdrop.get("file_path") == backdrop_path:
+            width = int(backdrop.get("width") or 0)
+            height = int(backdrop.get("height") or 0)
+            return width * height
+
+    if raw_data.get("backdrop_path") == backdrop_path:
+        width = int(raw_data.get("backdrop_width") or 0)
+        height = int(raw_data.get("backdrop_height") or 0)
+        return width * height
+
+    return 0
+
+
 def pick_backdrop_path(
     raw_data: dict,
     image_root: Path,
@@ -263,3 +283,39 @@ def pick_backdrop_path(
         or main_backdrop_path 
         or ranked_backdrops[0].get("file_path")
     )
+
+
+def pick_poster_path(
+    raw_data: dict,
+    preferred_language: Optional[str] = None
+) -> Optional[str]:
+    """
+    Selects the best poster from TMDB metadata images based on preferred language and ratings.
+    """
+    raw = raw_data or {}
+    images = raw.get("images") or {}
+    posters = images.get("posters") or []
+    if not posters:
+        return raw.get("poster_path")
+
+    preferred_langs = []
+    normalized_preferred = str(preferred_language or "").split("-", 1)[0].strip().lower()
+    if normalized_preferred:
+        preferred_langs.append(normalized_preferred)
+    preferred_langs.extend([DEFAULT_FALLBACK_LANGUAGE, None, ""])
+
+    def poster_score(poster):
+        lang = poster.get("iso_639_1")
+        normalized_lang = lang.lower() if isinstance(lang, str) else lang
+        try:
+            lang_rank = preferred_langs.index(normalized_lang)
+        except ValueError:
+            lang_rank = len(preferred_langs)
+        vote_count = int(poster.get("vote_count") or 0)
+        vote_average = float(poster.get("vote_average") or 0)
+        width = int(poster.get("width") or 0)
+        return (lang_rank, -vote_count, -vote_average, -width)
+
+    ranked_posters = sorted(posters, key=poster_score)
+    return ranked_posters[0].get("file_path") or raw.get("poster_path")
+

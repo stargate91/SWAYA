@@ -67,13 +67,19 @@ export default function OrganizerOverrideModalContent({ row, onClose, toast }) {
     [t]
   );
 
-  const translatedMainTypeOptions = useMemo(() =>
-    MAIN_TYPE_OPTIONS.map((opt) => ({
+  const translatedMainTypeOptions = useMemo(() => {
+    const isScenesMode = row.rawPayload?.scan_mode === 'scenes' || row.rawPayload?.parent_scan_mode === 'scenes';
+    if (isScenesMode) {
+      return [
+        { value: 'scene', label: t('organizer.overrideModal.options.mainTypes.scene') || 'Scene' },
+        { value: 'bonus', label: t('organizer.overrideModal.options.mainTypes.bonus') || 'Bonus Video' },
+      ];
+    }
+    return MAIN_TYPE_OPTIONS.map((opt) => ({
       ...opt,
       label: t(`organizer.overrideModal.options.mainTypes.${opt.value}`) || opt.label,
-    })),
-    [t]
-  );
+    }));
+  }, [t, row.rawPayload]);
 
   // Get parent candidates (movies + tv) from cache
   const organizer = queryClient.getQueryData(['organizer']) || {};
@@ -89,17 +95,17 @@ export default function OrganizerOverrideModalContent({ row, onClose, toast }) {
     ? (category === 'video' ? 'bonus' : 'extra')
     : row.rawType;
 
-  const initialSeason = useMemo(() => row.rawPayload?.season ?? row.rawPayload?.fn_season ?? row.rawPayload?.fd_season ?? row.rawPayload?.it_season ?? '', [row.rawPayload]);
-  const initialEpisode = useMemo(() => row.rawPayload?.episode ?? row.rawPayload?.fn_episode ?? row.rawPayload?.fd_episode ?? row.rawPayload?.it_episode ?? '', [row.rawPayload]);
+  const initialSeason = useMemo(() => row.rawPayload?.season ?? '', [row.rawPayload]);
+  const initialEpisode = useMemo(() => row.rawPayload?.episode ?? '', [row.rawPayload]);
 
   const [mainType, setMainType] = useState(initialMainType);
 
   const subcategoryList = translatedSubcategoriesByCategory[mainType === 'bonus' ? 'video' : category] || [];
 
   const [targetLanguage, setTargetLanguage] = useState(row.rawPayload?.target_language || 'en');
-  const [source, setSource] = useState(row.rawPayload?.source || 'none');
-  const [edition, setEdition] = useState(row.rawPayload?.edition || 'none');
-  const [audioType, setAudioType] = useState(row.rawPayload?.audio_type || 'none');
+  const [source, setSource] = useState(row.rawPayload?.custom_source || 'none');
+  const [edition, setEdition] = useState(row.rawPayload?.custom_edition || 'none');
+  const [audioType, setAudioType] = useState(row.rawPayload?.custom_audio_type || 'none');
   const [seasonNum, setSeasonNum] = useState(initialSeason);
   const [episodeNum, setEpisodeNum] = useState(initialEpisode);
   const [subcategory, setSubcategory] = useState(row.rawPayload?.subtype || 'other');
@@ -113,6 +119,16 @@ export default function OrganizerOverrideModalContent({ row, onClose, toast }) {
   const isEpisodeModified = String(episodeNum) !== String(initialEpisode);
   const showSelector = isMatchedEpisode && (isSeasonModified || isEpisodeModified);
 
+  const activeMatch = useMemo(() =>
+    row.rawPayload?.matches?.find((m) => m.is_active) || row.rawPayload?.matches?.[0],
+    [row.rawPayload]
+  );
+  const hideLanguage = useMemo(() => {
+    const isScenesMode = row.rawPayload?.scan_mode === 'scenes' || row.rawPayload?.parent_scan_mode === 'scenes';
+    const hasAdultProviderMatch = activeMatch && ['porndb', 'stashdb', 'fansdb'].includes(activeMatch.provider);
+    return isScenesMode || hasAdultProviderMatch;
+  }, [row.rawPayload, activeMatch]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -125,58 +141,60 @@ export default function OrganizerOverrideModalContent({ row, onClose, toast }) {
       }
     }
 
-    const updates = {};
+    const payload = {
+      id: row.itemId,
+      type: isExtra ? 'extra' : 'media',
+    };
+
     if (showSelector && matchAction === 'reset') {
-      updates.reset_match = true;
+      payload.reset_match = true;
     }
 
     if (!isExtra) {
       // Media updates
-      updates.main_type = mainType;
+      payload.main_type = mainType;
       if (mainType === 'bonus') {
-        updates.parent_id = parentId;
+        payload.parent_id = parentId;
       } else {
-        updates.target_language = targetLanguage;
-        updates.audio_type = audioType;
+        payload.custom_language = targetLanguage;
+        payload.custom_audio_type = audioType;
         if (mainType === 'movie') {
-          updates.source = source;
-          updates.edition = edition;
+          payload.custom_source = source;
+          payload.custom_edition = edition;
         } else if (mainType === 'episode') {
-          updates.season = seasonNum;
-          updates.episode = episodeNum;
+          payload.season = seasonNum;
+          payload.episode = episodeNum;
         }
       }
     } else {
       // Extra updates
-      updates.main_type = mainType; // could trigger convert to movie/episode
+      payload.main_type = mainType; // could trigger convert to movie/episode
       if (mainType === 'movie' || mainType === 'episode') {
-        updates.parent_id = parentId; // not strictly needed for media but useful
+        payload.parent_id = parentId; // not strictly needed for media but useful
         if (mainType === 'episode') {
-          updates.season = seasonNum;
-          updates.episode = episodeNum;
+          payload.season = seasonNum;
+          payload.episode = episodeNum;
         }
       } else {
-        updates.parent_id = parentId;
+        payload.parent_id = parentId;
         if (category !== 'metadata') {
-          updates.subtype = subcategory;
+          payload.subtype = subcategory;
         }
         if (category === 'subtitle' || category === 'audio') {
-          updates.language = language;
+          payload.language = language;
         }
       }
     }
 
-    try {
-      await updateMediaMutation.mutateAsync({
-        id: row.itemId,
-        type: isExtra ? 'extra' : 'media',
-        updates,
-      });
-      toast(t('organizer.toasts.overrideSuccess'), 'success');
-      onClose();
-    } catch (err) {
-      toast(err.message || t('organizer.toasts.overrideSaveFailed'), 'danger');
-    }
+    updateMediaMutation.mutate(payload, {
+      onSuccess: () => {
+        toast(t('organizer.toasts.overrideSuccess'), 'success');
+      },
+      onError: (err) => {
+        toast(err.message || t('organizer.toasts.overrideSaveFailed'), 'danger');
+      },
+    });
+    onClose();
   };
 
   const renderFormFields = () => (
@@ -207,6 +225,7 @@ export default function OrganizerOverrideModalContent({ row, onClose, toast }) {
           isExtra={isExtra}
           LANGUAGE_OPTIONS={translatedLanguageOptions}
           t={t}
+          isScenesMode={hideLanguage}
         />
       )}
 
@@ -226,6 +245,7 @@ export default function OrganizerOverrideModalContent({ row, onClose, toast }) {
           EDITION_OPTIONS={translatedEditionOptions}
           AUDIO_TYPE_OPTIONS={translatedAudioTypeOptions}
           t={t}
+          hideLanguage={hideLanguage}
         />
       )}
 
@@ -243,6 +263,7 @@ export default function OrganizerOverrideModalContent({ row, onClose, toast }) {
           LANGUAGE_OPTIONS={translatedLanguageOptions}
           AUDIO_TYPE_OPTIONS={translatedAudioTypeOptions}
           t={t}
+          hideLanguage={hideLanguage}
         />
       )}
     </>

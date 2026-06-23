@@ -283,6 +283,22 @@ class ImageProcessingService:
             preferred_language=preferred_language
         )
 
+    def pick_poster_path(
+        self,
+        raw_data: dict,
+        preferred_language: Optional[str] = None
+    ) -> Optional[str]:
+        """
+        Analyzes and selects the best poster from TMDB metadata images.
+        """
+        return image_selectors.pick_poster_path(
+            raw_data=raw_data,
+            preferred_language=preferred_language
+        )
+
+    def backdrop_resolution_from_raw(self, raw_data: Optional[dict], backdrop_path: Optional[str]) -> int:
+        return image_selectors.backdrop_resolution_from_raw(raw_data, backdrop_path)
+
     def pick_backdrop_path(
         self,
         raw_data: dict,

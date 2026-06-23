@@ -85,6 +85,9 @@ export const mapOrganizerItemRow = (item, t) => ({
   extension: String(item.extension || '').replace(/^\./, ''),
   season: item.season !== undefined ? item.season : null,
   episode: item.episode !== undefined ? item.episode : null,
+  customEdition: item.custom_edition !== undefined ? item.custom_edition : 'none',
+  customAudioType: item.custom_audio_type !== undefined ? item.custom_audio_type : 'none',
+  customSource: item.custom_source !== undefined ? item.custom_source : 'none',
   images: item.images || [],
   rawPayload: item,
 });

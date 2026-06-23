@@ -14,16 +14,19 @@ export default function OverrideMovieFields({
   EDITION_OPTIONS,
   AUDIO_TYPE_OPTIONS,
   t,
+  hideLanguage,
 }) {
   return (
     <>
-      <Dropdown
-        label={t('organizer.overrideModal.labels.targetLanguage')}
-        value={targetLanguage}
-        onChange={(e) => setTargetLanguage(e.target.value)}
-        options={LANGUAGE_OPTIONS}
-        hint={t('organizer.overrideModal.hints.targetLanguage')}
-      />
+      {!hideLanguage && (
+        <Dropdown
+          label={t('organizer.overrideModal.labels.targetLanguage')}
+          value={targetLanguage}
+          onChange={(e) => setTargetLanguage(e.target.value)}
+          options={LANGUAGE_OPTIONS}
+          hint={t('organizer.overrideModal.hints.targetLanguage')}
+        />
+      )}
       <Dropdown
         label={t('organizer.overrideModal.labels.source')}
         value={source}

@@ -130,6 +130,8 @@ class OrganizerService:
             formatter.resolve_collisions(previews)
 
         for item in items:
+            overrides = item.overrides
+            target_lang = overrides.custom_language if (overrides and overrides.custom_language) else (formatter.config.default_target_language or pref_lang)
             preview = preview_map.get(item.id)
             if preview:
                 planned_path = str(preview.target_path).replace("\\", "/")
@@ -152,7 +154,8 @@ class OrganizerService:
                     "vote_average": m.rating_tmdb,
                     "is_active": m.is_active,
                     "confidence": m.confidence_score,
-                    "is_adult": m.is_adult
+                    "is_adult": m.is_adult,
+                    "provider": m.provider.value if m.provider else None
                 })
 
             itype = self._infer_organizer_type(item)
@@ -217,6 +220,18 @@ class OrganizerService:
                 self._parent_scan_modes = parent_scan_modes
             parent_scan_modes[item.id] = item_scan_mode
 
+            parsed = item.parsed_info or {}
+            fn_data = parsed.get("fn") or {}
+            it_data = parsed.get("it") or {}
+            fd_data = parsed.get("fd") or {}
+            season_val = parsed.get("season") or fn_data.get("season") or it_data.get("season") or fd_data.get("season")
+            episode_val = parsed.get("episode") or fn_data.get("episode") or it_data.get("episode") or fd_data.get("episode")
+
+            overrides = item.overrides
+            custom_edition_val = overrides.custom_edition.value if (overrides and overrides.custom_edition) else (item.edition.value if item.edition else "none")
+            custom_audio_type_val = overrides.custom_audio_type.value if (overrides and overrides.custom_audio_type) else (item.audio_type.value if item.audio_type else "none")
+            custom_source_val = overrides.custom_source.value if (overrides and overrides.custom_source) else (item.source.value if item.source else "none")
+
             item_dto = {
                 "id": item.id,
                 "filename": item.filename,
@@ -231,7 +246,12 @@ class OrganizerService:
                 "current_path": item.current_path,
                 "action": action,
                 "target_language": target_lang,
-                "scan_mode": item_scan_mode
+                "scan_mode": item_scan_mode,
+                "season": str(season_val) if season_val is not None else None,
+                "episode": str(episode_val) if episode_val is not None else None,
+                "custom_edition": custom_edition_val,
+                "custom_audio_type": custom_audio_type_val,
+                "custom_source": custom_source_val
             }
 
             if item.status in [ItemStatus.NEW, ItemStatus.UNCERTAIN, ItemStatus.NO_MATCH, ItemStatus.MULTIPLE, ItemStatus.ERROR]:

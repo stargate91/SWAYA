@@ -15,50 +15,11 @@ from app.domains.people.services import PersonService
 from app.infrastructure.scrapers.providers.tmdb import TMDBScraper
 from app.infrastructure.scrapers.providers.omdb import OMDBScraper
 from app.shared_kernel.language import LanguageService
+from app.domains.media_assets.services.images import image_processing_service
 
 logger = logging.getLogger(__name__)
 
 tv_enrich_lock = threading.Lock()
-
-def _pick_backdrop_path(raw_data) -> Optional[str]:
-    images = raw_data.get("images") or {}
-    backdrops = images.get("backdrops") or []
-    if not backdrops:
-        return raw_data.get("backdrop_path")
-
-    neutral_backdrops = [bd for bd in backdrops if bd.get("iso_639_1") in (None, "")]
-    candidates = neutral_backdrops or backdrops
-
-    def score(bd):
-        return (
-            int(bd.get("width") or 0),
-            int(bd.get("height") or 0),
-            float(bd.get("vote_average") or 0),
-            int(bd.get("vote_count") or 0),
-        )
-
-    sorted_bd = sorted(candidates, key=score, reverse=True)
-    return sorted_bd[0].get("file_path") or raw_data.get("backdrop_path")
-
-def _pick_logo_path(raw_data, language: str = None) -> Optional[str]:
-    images = raw_data.get("images") or {}
-    logos = images.get("logos") or []
-    if not logos:
-        return None
-    lang_pref = [language, DEFAULT_FALLBACK_LANGUAGE, None, ""]
-    def score(lg):
-        lg_lang = lg.get("iso_639_1")
-        try:
-            lang_idx = lang_pref.index(lg_lang)
-        except ValueError:
-            lang_idx = 999
-        return (
-            -lang_idx,
-            int(lg.get("vote_count") or 0),
-            float(lg.get("vote_average") or 0)
-        )
-    sorted_lg = sorted(logos, key=score, reverse=True)
-    return sorted_lg[0].get("file_path")
 
 from app.shared_kernel.constants import YOUTUBE_WATCH_BASE, DEFAULT_FALLBACK_LANGUAGE
 
@@ -196,7 +157,7 @@ class MainstreamEnricher:
                 self.db.add(collection)
             match.collection = collection
             
-        selected_backdrop_path = _pick_backdrop_path(details)
+        selected_backdrop_path = image_processing_service.pick_backdrop_path(details, preferred_language=language)
         if selected_backdrop_path:
             match.backdrop_path = selected_backdrop_path
 
@@ -205,8 +166,8 @@ class MainstreamEnricher:
         loc.title = details.get("title") or details.get("original_title") or "Unknown"
         loc.overview = details.get("overview")
         loc.tagline = details.get("tagline")
-        loc.poster_path = details.get("poster_path")
-        loc.logo_path = _pick_logo_path(details, language)
+        loc.poster_path = image_processing_service.pick_poster_path(details, preferred_language=language)
+        loc.logo_path = image_processing_service.pick_logo_path(details, preferred_language=language)
         localized_asset_prefix = f"tmdb_movie_{match.external_id}_{language}"
         match.local_backdrop_path = self._queue_image(
             match.backdrop_path,
@@ -275,15 +236,15 @@ class MainstreamEnricher:
                 except:
                     pass
 
-            selected_backdrop_path = _pick_backdrop_path(tv_details)
+            selected_backdrop_path = image_processing_service.pick_backdrop_path(tv_details, preferred_language=language)
             if selected_backdrop_path:
                 tv_match.backdrop_path = selected_backdrop_path
             
             tv_loc = self._get_or_create_loc(tv_match, language)
             tv_loc.title = tv_details.get("name") or tv_details.get("original_name") or "Unknown"
             tv_loc.overview = tv_details.get("overview")
-            tv_loc.poster_path = tv_details.get("poster_path")
-            tv_loc.logo_path = _pick_logo_path(tv_details, language)
+            tv_loc.poster_path = image_processing_service.pick_poster_path(tv_details, preferred_language=language)
+            tv_loc.logo_path = image_processing_service.pick_logo_path(tv_details, preferred_language=language)
             tv_loc.genres = [g["name"] for g in tv_details.get("genres") or []]
             tv_loc.original_language = tv_details.get("original_language")
             tv_loc.trailer_url = _pick_trailer_key(tv_details, language, tv_details.get("original_language"))

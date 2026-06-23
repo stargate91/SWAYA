@@ -20,6 +20,8 @@ export default function useSettingsRenderContext({
   handleImportClick,
   handleImportSettings,
   handleWipeDatabase,
+  isWipingCache,
+  handleWipeCache,
   activeTab,
   optionContext,
 }) {
@@ -29,6 +31,7 @@ export default function useSettingsRenderContext({
     setForm,
     isSaving,
     isWiping,
+    isWipingCache,
     isScanActive,
     isBackgroundActive: false,
     realBackgroundActive: isBackgroundActive,
@@ -44,6 +47,7 @@ export default function useSettingsRenderContext({
     handleImportClick,
     handleImportSettings,
     handleWipeDatabase,
+    handleWipeCache,
     activeTab,
     ...optionContext,
   };

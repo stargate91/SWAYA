@@ -15,6 +15,7 @@ class OrganizerMatch(BaseModel):
     is_active: bool
     confidence: Optional[float] = None
     is_adult: Optional[bool] = None
+    provider: Optional[str] = None
 
 class OrganizerItem(BaseModel):
     id: int
@@ -31,6 +32,11 @@ class OrganizerItem(BaseModel):
     action: Optional[str] = None
     target_language: Optional[str] = None
     scan_mode: Optional[str] = None
+    season: Optional[str] = None
+    episode: Optional[str] = None
+    custom_edition: Optional[str] = None
+    custom_audio_type: Optional[str] = None
+    custom_source: Optional[str] = None
 
 class OrganizerExtra(BaseModel):
     id: int

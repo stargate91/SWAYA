@@ -41,6 +41,8 @@ export default function SettingsPage() {
     handleImportSettings,
     handleSave,
     handleWipeDatabase,
+    isWipingCache,
+    handleWipeCache,
     handleReset,
     isShaking,
   } = useSettingsForm();
@@ -69,6 +71,7 @@ export default function SettingsPage() {
     setForm,
     isSaving,
     isWiping,
+    isWipingCache,
     isScanActive,
     isBackgroundActive,
     isSyncActive,
@@ -83,6 +86,7 @@ export default function SettingsPage() {
     handleImportClick,
     handleImportSettings,
     handleWipeDatabase,
+    handleWipeCache,
     activeTab,
     optionContext,
   });

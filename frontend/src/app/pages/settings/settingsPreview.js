@@ -16,10 +16,10 @@ const PREVIEW_CONTEXTS = {
     rating_imdb: '8.7',
   },
   adultMovie: {
-    title: 'Velvet Nights XXX',
-    original_title: 'Velvet Nights XXX',
-    year: '2018',
-    release_date: '2018-06-14',
+    title: "Riley Reid Experience",
+    original_title: "Riley Reid Experience",
+    year: '2016',
+    release_date: '2016-04-10',
     resolution: '1080p',
     edition: 'Extended Cut',
     collection: '',
@@ -29,34 +29,45 @@ const PREVIEW_CONTEXTS = {
     audio_channels: '2.0',
     imdb_id: 'tt0000000',
     tmdb_id: '0',
-    rating_imdb: '6.4',
+    rating_imdb: '7.8',
   },
   scene: {
-    studio: 'Velvet Studios',
-    performers: 'Lana Rose & Alex Stone',
-    performer: 'Lana Rose & Alex Stone',
-    rating_porndb: '8.4',
-    date: '2024-06-14',
-    title: 'Late Night Audition',
+    studio: 'Brazzers Network',
+    performers: 'Abella Danger & Jordi El Nino Polla',
+    performer: 'Abella Danger & Jordi El Nino Polla',
+    rating_porndb: '9.2',
+    date: '2018-09-15',
+    title: 'Private Tutoring',
     resolution: '1080p',
     source: 'WEB-DL',
     video_codec: 'h264',
   },
   tv: {
-    tv_title: 'Stranger Things',
-    tv_original_title: 'Stranger Things',
-    year: '2016',
-    first_air_year: '2016',
-    first_air_date: '2016-07-15',
-    last_air_year: '2022',
-    last_air_date: '2022-07-01',
-    year_range: '2016-2022',
-    tv_tmdb_id: '66732',
+    tv_title: 'Game of Thrones',
+    tv_original_title: 'Game of Thrones',
+    year: '2011',
+    first_air_year: '2011',
+    first_air_date: '2011-04-17',
+    last_air_year: '2019',
+    last_air_date: '2019-05-19',
+    year_range: '2011-2019',
+    tv_tmdb_id: '1399',
+  },
+  adultTv: {
+    tv_title: "Adriana's World",
+    tv_original_title: "Adriana's World",
+    year: '2017',
+    first_air_year: '2017',
+    first_air_date: '2017-06-15',
+    last_air_year: '2020',
+    last_air_date: '2020-08-20',
+    year_range: '2017-2020',
+    tv_tmdb_id: '99999',
   },
   season: {
     season: '01',
     season_name: 'Season 1',
-    tv_title: 'Stranger Things',
+    tv_title: 'Game of Thrones',
   },
   collection: {
     collection: 'The Matrix Collection',
@@ -83,17 +94,30 @@ const PREVIEW_CONTEXTS = {
     parent_name: 'The Matrix (1999)',
   },
   episode: {
-    tv_title: 'Stranger Things',
-    tv_original_title: 'Stranger Things',
+    tv_title: 'Game of Thrones',
+    tv_original_title: 'Game of Thrones',
     season: '01',
     episode: '03',
-    episode_title: 'Holly, Jolly',
+    episode_title: 'Lord Snow',
     resolution: '1080p',
     video_codec: 'h264',
     audio_codec: 'EAC3',
     audio_channels: '5.1',
-    tv_tmdb_id: '66732',
-    first_air_year: '2016',
+    tv_tmdb_id: '1399',
+    first_air_year: '2011',
+  },
+  adultEpisode: {
+    tv_title: "Adriana's World",
+    tv_original_title: "Adriana's World",
+    season: '01',
+    episode: '03',
+    episode_title: "Sweet Temptations",
+    resolution: '1080p',
+    video_codec: 'h264',
+    audio_codec: 'EAC3',
+    audio_channels: '5.1',
+    tv_tmdb_id: '99999',
+    first_air_year: '2017',
   },
 };
 
@@ -106,9 +130,9 @@ const PREVIEW_EXTENSIONS = {
 };
 
 const isMoviePreviewType = (type) => type === 'movie' || type === 'adultMovie';
-const isTvPreviewType = (type) => type === 'tv';
+const isTvPreviewType = (type) => type === 'tv' || type === 'adultTv';
 const isCollectionPreviewType = (type) => type === 'collection';
-const isSeasonLikePreviewType = (type) => type === 'season' || type === 'episode';
+const isSeasonLikePreviewType = (type) => type === 'season' || type === 'episode' || type === 'adultEpisode';
 
 export function generatePreview(template, type, casing, separator, customTag, isFile = true, sortOptions = null, contextOverrides = null) {
   if (!template) return '';
@@ -162,11 +186,15 @@ export function generatePreview(template, type, casing, separator, customTag, is
     if (type === 'movie') {
       finalResult = `${result}/The Matrix (1999) 1080p.mp4`;
     } else if (type === 'adultMovie') {
-      finalResult = `${result}/Velvet Nights XXX (2018) 1080p.mp4`;
-    } else if (isTvPreviewType(type)) {
-      finalResult = `${result}/Season 01/Stranger Things - S01E03 - Holly, Jolly.mp4`;
-    } else if (isSeasonLikePreviewType(type)) {
-      finalResult = `${result}/Stranger Things - S01E03 - Holly, Jolly.mp4`;
+      finalResult = `${result}/Riley Reid Experience (2016) 1080p.mp4`;
+    } else if (type === 'tv') {
+      finalResult = `${result}/Season 01/Game of Thrones - S01E03 - Lord Snow.mp4`;
+    } else if (type === 'adultTv') {
+      finalResult = `${result}/Season 01/Adriana's World - S01E03 - Sweet Temptations.mp4`;
+    } else if (type === 'season' || type === 'episode') {
+      finalResult = `${result}/Game of Thrones - S01E03 - Lord Snow.mp4`;
+    } else if (type === 'adultEpisode') {
+      finalResult = `${result}/Adriana's World - S01E03 - Sweet Temptations.mp4`;
     }
   } else if (isCollectionPreviewType(type)) {
     finalResult = result ? `${result}/The Matrix (1999).mp4` : '';

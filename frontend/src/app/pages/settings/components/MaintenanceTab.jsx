@@ -8,11 +8,13 @@ export default function MaintenanceTab({
   t,
   isSaving,
   isWiping,
+  isWipingCache,
   isScanActive,
   handleExportSettings,
   handleImportClick,
   handleImportSettings,
   handleWipeDatabase,
+  handleWipeCache,
   formInputs
 }) {
   return (
@@ -39,6 +41,19 @@ export default function MaintenanceTab({
               accept=".json"
               className="settings-hidden-input"
             />
+          </Inline>
+        </Stack>
+      </Card>
+
+      <Card title={t('settingsPage.dangerZone.wipeCacheTitle')} eyebrow={t('settingsPage.dangerZone.eyebrow')} className="ui-card--danger settings-danger-zone-card">
+        <Stack>
+          <span className="ui-field__hint settings-danger-zone-card__hint">
+            {t('settingsPage.dangerZone.wipeCacheDesc')}
+          </span>
+          <Inline className="settings-inline-actions settings-danger-zone-card__actions">
+            <Button variant="danger" onClick={handleWipeCache} disabled={isWipingCache || isSaving || isScanActive}>
+              {isWipingCache ? t('settingsPage.dangerZone.wipeCacheWiping') : t('settingsPage.dangerZone.wipeCacheBtn')}
+            </Button>
           </Inline>
         </Stack>
       </Card>

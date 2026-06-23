@@ -95,17 +95,35 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
     [t]
   );
 
-  const translatedMainTypeOptions = useMemo(() =>
-    MAIN_TYPE_OPTIONS.map((opt) => {
+  const isScenesMode = useMemo(() =>
+    rows.some((r) => r.rawPayload?.scan_mode === 'scenes' || r.rawPayload?.parent_scan_mode === 'scenes'),
+    [rows]
+  );
+
+  const hideLanguage = useMemo(() => {
+    const hasAdultMatch = rows.some((r) => {
+      const activeMatch = r.rawPayload?.matches?.find((m) => m.is_active) || r.rawPayload?.matches?.[0];
+      return activeMatch && ['porndb', 'stashdb', 'fansdb'].includes(activeMatch.provider);
+    });
+    return isScenesMode || hasAdultMatch;
+  }, [rows, isScenesMode]);
+
+  const translatedMainTypeOptions = useMemo(() => {
+    if (isScenesMode) {
+      return [
+        { value: 'scene', label: t('organizer.overrideModal.options.mainTypes.scene') || 'Scene' },
+        { value: 'bonus', label: t('organizer.overrideModal.options.mainTypes.bonus') || 'Bonus Video' },
+      ];
+    }
+    return MAIN_TYPE_OPTIONS.map((opt) => {
       const key = `organizer.overrideModal.options.mainTypes.${opt.value}`;
       const val = t(key);
       return {
         ...opt,
         label: val === key ? opt.label : val,
       };
-    }),
-    [t]
-  );
+    });
+  }, [t, isScenesMode]);
 
   const subcategoryList = translatedSubcategoriesByCategory[mainType === 'bonus' ? 'video' : category] || [];
 
@@ -222,34 +240,38 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
       }
     }
 
-    const updates = {};
+    const payload = {
+      ids: rows.map((r) => r.itemId),
+      type: isExtra ? 'extra' : 'media',
+    };
+
     if (showMatchActionSelector && matchAction === 'reset') {
-      updates.reset_match = true;
+      payload.reset_match = true;
     }
 
     if (applyMainType) {
-      updates.main_type = mainType;
+      payload.main_type = mainType;
     }
 
     if (mainType === 'bonus' || mainType === 'extra') {
-      if (applyParentId) updates.parent_id = parentId;
+      if (applyParentId) payload.parent_id = parentId;
       if (category !== 'metadata') {
-        if (applySubcategory) updates.subtype = subcategory;
+        if (applySubcategory) payload.subtype = subcategory;
       }
       if (mainType === 'extra') {
         if (category === 'subtitle' || category === 'audio') {
-          if (applyLanguage) updates.language = language;
+          if (applyLanguage) payload.language = language;
         }
       }
     } else {
       // movie or episode
-      if (applyTargetLanguage) updates.target_language = targetLanguage;
-      if (applyAudioType) updates.audio_type = audioType;
+      if (applyTargetLanguage) payload.custom_language = targetLanguage;
+      if (applyAudioType) payload.custom_audio_type = audioType;
       if (mainType === 'movie') {
-        if (applySource) updates.source = source;
-        if (applyEdition) updates.edition = edition;
+        if (applySource) payload.custom_source = source;
+        if (applyEdition) payload.custom_edition = edition;
       } else if (mainType === 'episode') {
-        if (applySeasonNum) updates.season = seasonNum;
+        if (applySeasonNum) payload.season = seasonNum;
       }
     }
 
@@ -271,18 +293,19 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
       });
     }
 
-    try {
-      await bulkUpdateMutation.mutateAsync({
-        ids: rows.map((r) => r.itemId),
-        type: isExtra ? 'extra' : 'media',
-        updates,
-        item_updates: itemUpdates,
-      });
-      toast(t('organizer.toasts.bulkOverrideSuccess'), 'success');
-      onClose();
-    } catch (err) {
-      toast(err.message || t('organizer.toasts.bulkOverrideSaveFailed'), 'danger');
+    if (itemUpdates.length > 0) {
+      payload.item_updates = itemUpdates;
     }
+
+    bulkUpdateMutation.mutate(payload, {
+      onSuccess: () => {
+        toast(t('organizer.toasts.bulkOverrideSuccess'), 'success');
+      },
+      onError: (err) => {
+        toast(err.message || t('organizer.toasts.bulkOverrideSaveFailed'), 'danger');
+      },
+    });
+    onClose();
   };
 
   const renderFieldWithCheckbox = (label, checked, setChecked, content) => (
@@ -321,7 +344,7 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
         )}
 
         {/* Target Language override (for Movies & Episodes) */}
-        {mainType !== 'extra' && mainType !== 'bonus' && renderFieldWithCheckbox(
+        {!hideLanguage && mainType !== 'extra' && mainType !== 'bonus' && renderFieldWithCheckbox(
           t('organizer.overrideModal.labels.targetLanguage'),
           applyTargetLanguage,
           setApplyTargetLanguage,

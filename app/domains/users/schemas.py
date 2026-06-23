@@ -1,5 +1,5 @@
-from pydantic import BaseModel, ConfigDict
-from typing import Optional, List, Any
+from pydantic import BaseModel, ConfigDict, model_validator
+from typing import Optional, List, Any, Union
 from datetime import datetime
 from app.shared_kernel.enums import MovieEdition, MediaAudioType, MediaSource, CustomListType
 
@@ -122,18 +122,37 @@ class CustomListRead(BaseSchema):
 # --- UserOverride Action Schemas (Legacy Endpoints) ---
 
 class ItemOverridesUpdate(BaseSchema):
-    item_id: str
+    item_id: Optional[Union[str, int]] = None
+    id: Optional[Union[str, int]] = None
+    type: Optional[str] = None
+    updates: Optional[dict[str, Any]] = None
     custom_title: Optional[str] = None
     custom_overview: Optional[str] = None
     custom_language: Optional[str] = None
+    custom_edition: Optional[str] = None
+    custom_audio_type: Optional[str] = None
+    custom_source: Optional[str] = None
+    season: Optional[str] = None
+    episode: Optional[str] = None
+    main_type: Optional[str] = None
+    parent_id: Optional[int] = None
+    reset_match: Optional[bool] = None
+    subtype: Optional[str] = None
+    language: Optional[str] = None
     user_rating: Optional[int] = None
-    rating: Optional[int] = None
     user_comment: Optional[str] = None
-    comment: Optional[str] = None
     is_favorite: Optional[bool] = None
     is_watched: Optional[bool] = None
     resume_position: Optional[int] = None
     tags: Optional[List[Any]] = None
+
+    @model_validator(mode="after")
+    def _normalize_ids(self):
+        if self.item_id is None and self.id is not None:
+            self.item_id = str(self.id)
+        elif self.item_id is not None:
+            self.item_id = str(self.item_id)
+        return self
 
 
 class ItemStatusUpdate(BaseSchema):
@@ -149,8 +168,30 @@ class ImageOverrideUpdate(BaseSchema):
 
 
 class BulkOverridesUpdate(BaseSchema):
-    item_ids: List[str]
-    updates: dict[str, Any]
+    item_ids: List[Union[str, int]] = []
+    ids: Optional[List[Union[str, int]]] = None
+    type: Optional[str] = None
+    updates: Optional[dict[str, Any]] = None
+    custom_edition: Optional[str] = None
+    custom_audio_type: Optional[str] = None
+    custom_source: Optional[str] = None
+    custom_language: Optional[str] = None
+    season: Optional[str] = None
+    episode: Optional[str] = None
+    main_type: Optional[str] = None
+    parent_id: Optional[int] = None
+    reset_match: Optional[bool] = None
+    subtype: Optional[str] = None
+    language: Optional[str] = None
+    item_updates: Optional[List[dict[str, Any]]] = None
+
+    @model_validator(mode="after")
+    def _normalize_ids(self):
+        if (not self.item_ids) and self.ids:
+            self.item_ids = [str(item_id) for item_id in self.ids]
+        else:
+            self.item_ids = [str(item_id) for item_id in self.item_ids]
+        return self
 
 
 class BulkTagsUpdate(BaseSchema):

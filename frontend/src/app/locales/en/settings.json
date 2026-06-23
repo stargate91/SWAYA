@@ -523,7 +523,16 @@
     "confirmTitle": "Wipe Database",
     "confirm": "Are you sure? This will clear your libraries, matches, lists, and playback history. Your settings and API cache will stay. This can't be undone.",
     "success": "The database was cleared.",
-    "failed": "Couldn't clear the database"
+    "failed": "Couldn't clear the database",
+    "wipeCacheTitle": "Clear Metadata Cache",
+    "wipeCacheDesc": "This clears all scraped metadata matches, localized titles, and descriptions. Your library files, manual overrides, settings, and downloaded images stay in place. This can't be undone.",
+    "wipeCacheBtn": "Clear Cache",
+    "wipeCacheWiping": "Clearing...",
+    "confirmWipeCacheTitle": "Clear Metadata Cache",
+    "confirmWipeCache": "Are you sure you want to clear the entire scraped metadata cache? This resets all match results to review needed but keeps your libraries, physical file records, manually saved overrides, and downloaded images.",
+    "wipeCacheSuccess": "Scraped metadata cache cleared successfully.",
+    "wipeCacheFailed": "Failed to clear metadata cache",
+    "buttonWipeCache": "Clear Cache"
   },
   "languageChangeInfo": {
     "title": "Language Synchronization",

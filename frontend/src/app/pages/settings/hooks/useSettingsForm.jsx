@@ -128,6 +128,8 @@ export default function useSettingsForm() {
     handleImportSettings,
     handleSave: persistence.handleSave,
     handleWipeDatabase: dangerZone.handleWipeDatabase,
+    isWipingCache: dangerZone.isWipingCache,
+    handleWipeCache: dangerZone.handleWipeCache,
     handleReset: persistence.handleReset,
     isShaking: navigation.isShaking,
     openModal,

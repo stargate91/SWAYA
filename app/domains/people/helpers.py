@@ -1,7 +1,7 @@
 import math
 from typing import List, Optional, Any
 from sqlalchemy.orm import Session
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.domains.media_assets.services.images import image_processing_service
 
 TALK_LIKE_GENRE_IDS = {10763, 10764, 10767}
 SELF_ROLE_KEYWORDS = {"self", "himself", "herself", "themselves", "guest", "host", "presenter", "interviewer"}
@@ -171,39 +171,6 @@ def select_known_for(credits: List[dict], department: Optional[str], limit: int 
 
     return selected[:limit]
 
-def _local_pick_backdrop_path(raw_data: dict, language: str = None) -> Optional[str]:
-    images = raw_data.get("images") or {}
-    backdrops = images.get("backdrops") or []
-    if not backdrops:
-        return raw_data.get("backdrop_path")
-    def score(bd):
-        return (
-            1 if bd.get("iso_639_1") in (None, "", DEFAULT_FALLBACK_LANGUAGE, language) else 0,
-            int(bd.get("vote_count") or 0),
-            float(bd.get("vote_average") or 0),
-            int(bd.get("width") or 0)
-        )
-    sorted_bd = sorted(backdrops, key=score, reverse=True)
-    return sorted_bd[0].get("file_path") or raw_data.get("backdrop_path")
-
-def _backdrop_resolution_from_raw(raw_data: Optional[dict], backdrop_path: Optional[str]) -> int:
-    if not raw_data or not backdrop_path:
-        return 0
-
-    backdrops = ((raw_data.get("images") or {}).get("backdrops") or [])
-    for backdrop in backdrops:
-        if backdrop.get("file_path") == backdrop_path:
-            width = int(backdrop.get("width") or 0)
-            height = int(backdrop.get("height") or 0)
-            return width * height
-
-    if raw_data.get("backdrop_path") == backdrop_path:
-        width = int(raw_data.get("backdrop_width") or 0)
-        height = int(raw_data.get("backdrop_height") or 0)
-        return width * height
-
-    return 0
-
 def resolve_person_known_for_backdrop(
     db: Session,
     tmdb_client: Any,
@@ -258,9 +225,9 @@ def resolve_person_known_for_backdrop(
         if adult_only and (not raw_data or not bool(raw_data.get("adult"))):
             continue
 
-        backdrop_path = _local_pick_backdrop_path(raw_data, preferred_languages[0]) if raw_data else None
+        backdrop_path = image_processing_service.pick_backdrop_path(raw_data, preferred_language=preferred_languages[0]) if raw_data else None
         if backdrop_path:
-            candidates.append((_backdrop_resolution_from_raw(raw_data, backdrop_path), backdrop_path))
+            candidates.append((image_processing_service.backdrop_resolution_from_raw(raw_data, backdrop_path), backdrop_path))
             continue
 
         fallback_backdrop = credit.get("backdrop_path")

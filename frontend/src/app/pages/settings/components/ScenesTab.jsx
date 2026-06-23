@@ -25,8 +25,8 @@ export default function ScenesTab({
   const { renderContext } = useSettingsFormContext();
   const isScanActive = Boolean(renderContext?.isBackgroundActive);
 
-  const studioName = form.naming_squeeze_studio_names ? 'VelvetStudios' : 'Velvet Studios';
-  const parentStudioName = form.naming_squeeze_studio_names ? 'VelvetMediaGroup' : 'Velvet Media Group';
+  const studioName = form.naming_squeeze_studio_names ? 'BrazzersNetwork' : 'Brazzers Network';
+  const parentStudioName = form.naming_squeeze_studio_names ? 'Brazzers' : 'Brazzers';
   const performerSeparator = form.naming_performer_splitchar || ' & ';
   const tagBlacklist = new Set(
     String(form.scene_tag_blacklist || '')
@@ -44,8 +44,8 @@ export default function ScenesTab({
     studio: studioName,
     parent_studio: parentStudioName,
     studio_family: parentStudioName,
-    performers: ['Lana Rose', 'Alex Stone'].join(performerSeparator),
-    performer: ['Lana Rose', 'Alex Stone'].join(performerSeparator),
+    performers: ['Abella Danger', 'Jordi El Nino Polla'].join(performerSeparator),
+    performer: ['Abella Danger', 'Jordi El Nino Polla'].join(performerSeparator),
     tags: previewTags.join(form.scene_tag_separator || ' '),
   };
   const scenePreview = getPreview(form.naming_scene_template, 'scene', { contextOverrides: sceneContext });

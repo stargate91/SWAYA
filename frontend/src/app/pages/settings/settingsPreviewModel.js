@@ -45,8 +45,8 @@ function createFileNode(label, options = {}) {
 
 function getScenePreviewContext(form) {
   const squeezeStudios = Boolean(form.naming_squeeze_studio_names);
-  const parentStudio = squeezeStudios ? 'VelvetMediaGroup' : 'Velvet Media Group';
-  const studio = squeezeStudios ? 'VelvetStudios' : 'Velvet Studios';
+  const parentStudio = squeezeStudios ? 'Brazzers' : 'Brazzers';
+  const studio = squeezeStudios ? 'BrazzersNetwork' : 'Brazzers Network';
   const separator = form.naming_performer_splitchar || ' & ';
   const blacklist = new Set(
     String(form.scene_tag_blacklist || '')
@@ -64,8 +64,8 @@ function getScenePreviewContext(form) {
     studio,
     parent_studio: parentStudio,
     studio_family: parentStudio,
-    performers: ['Lana Rose', 'Alex Stone'].join(separator),
-    performer: ['Lana Rose', 'Alex Stone'].join(separator),
+    performers: ['Abella Danger', 'Jordi El Nino Polla'].join(separator),
+    performer: ['Abella Danger', 'Jordi El Nino Polla'].join(separator),
     tags: tags.join(form.scene_tag_separator || ' '),
   };
 }
@@ -122,8 +122,10 @@ function buildPreviewAssets(form) {
         )
       : '',
     episodeFile: generatePreview(form.naming_episode_template, 'episode', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, true),
+    adultEpisodeFile: generatePreview(form.naming_episode_template, 'adultEpisode', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, true),
     folderMovie: generatePreview(form.folder_movie_template, 'movie', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, false),
     folderTv: generatePreview(form.folder_tv_template, 'tv', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, false),
+    adultFolderTv: generatePreview(form.folder_tv_template, 'adultTv', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, false),
     folderSeason: generatePreview(form.folder_season_template, 'season', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, false),
     folderEpisode: generatePreview(form.folder_episode_template, 'episode', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, false),
     folderCollection: generatePreview(form.folder_collection_template || '{Collection}', 'collection', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, true),
@@ -189,9 +191,9 @@ function buildAdultNodes(form, assets) {
     ? [createFolderNode(getFolderLabel(assets.adultFolderMovie), { tone: 'adult', children: [createFileNode(assets.adultMovieFile, { tone: 'adult' })] })]
     : [createFileNode(assets.adultMovieFile, { tone: 'adult' })];
   const tvNodes = [
-    createFolderNode(getFolderLabel(assets.folderTv), {
+    createFolderNode(getFolderLabel(assets.adultFolderTv), {
       tone: 'adult',
-      children: [createFileNode(assets.episodeFile, { tone: 'adult' })],
+      children: [createFileNode(assets.adultEpisodeFile, { tone: 'adult' })],
     }),
   ];
   let sceneNodes = [createFileNode(assets.adultSceneFile, { tone: 'adult' })];
