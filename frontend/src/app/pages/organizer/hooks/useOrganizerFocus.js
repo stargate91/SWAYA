@@ -63,7 +63,7 @@ export function useOrganizerFocus({
       .filter((item) => isRegularMovieType(item.type) && MATCHED_STATUSES.has(normalizeItemStatus(item.status)))
       .map((item) => mapOrganizerItemRow(item, t));
     const episodeRows = matchedMedia
-      .filter((item) => isEpisodeMediaType(item.type) && MATCHED_STATUSES.has(normalizeItemStatus(item.status)))
+      .filter((item) => isTvLikeMediaType(item.type) && MATCHED_STATUSES.has(normalizeItemStatus(item.status)))
       .map((item) => mapOrganizerItemRow(item, t));
     const manualMovieRows = reviewMedia
       .filter((item) => isRegularMovieType(item.type) && MANUAL_REVIEW_STATUSES.has(normalizeItemStatus(item.status)))

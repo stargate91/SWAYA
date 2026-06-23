@@ -20,7 +20,7 @@ class MetadataService:
         self.scrapers = scrapers
         self.tmdb = scrapers.tmdb(db)
 
-    def search_metadata(self, query: str, item_type: str = "movie", year: Optional[int] = None, language: Optional[str] = None, provider: Optional[str] = None) -> List[Dict[str, Any]]:
+    def search_metadata(self, query: str, item_type: str = "movie", year: Optional[int] = None, language: Optional[str] = None, provider: Optional[str] = None, include_adult: bool = False, season: Optional[int] = None, episode: Optional[int] = None) -> List[Dict[str, Any]]:
         # Resolve provider
         prov_enum = None
         if provider:
@@ -44,6 +44,52 @@ class MetadataService:
             if not scraper:
                 return []
 
+            if prov_enum == Provider.PORNDB and item_type == "movie":
+                try:
+                    movies = scraper.search_movies(query, year=year)
+                    formatted = []
+                    for m in movies:
+                        poster = (
+                            m.get("poster_image")
+                            or m.get("poster")
+                            or m.get("image")
+                        )
+                        if not poster and isinstance(m.get("posters"), dict):
+                            poster = (
+                                m["posters"].get("full")
+                                or m["posters"].get("large")
+                                or m["posters"].get("medium")
+                                or m["posters"].get("small")
+                            )
+                        backdrop = m.get("background")
+                        if not backdrop and isinstance(m.get("backgrounds"), dict):
+                            backdrop = (
+                                m["backgrounds"].get("full")
+                                or m["backgrounds"].get("large")
+                                or m["backgrounds"].get("medium")
+                                or m["backgrounds"].get("small")
+                            )
+                        site_data = m.get("site") or {}
+                        studio_name = m.get("studio", {}).get("name") if isinstance(m.get("studio"), dict) else (site_data.get("name") or m.get("studio"))
+                        formatted.append({
+                            "id": m.get("id"),
+                            "title": m.get("title"),
+                            "original_title": None,
+                            "release_date": m.get("date"),
+                            "year": int(str(m["date"]).split("-")[0]) if m.get("date") else None,
+                            "overview": m.get("synopsis") or m.get("description"),
+                            "poster_path": poster,
+                            "backdrop_path": backdrop,
+                            "rating": m.get("rating") or 0.0,
+                            "media_type": "movie",
+                            "provider": prov_enum.value,
+                            "studio": studio_name
+                        })
+                    return formatted
+                except Exception as e:
+                    logger.error(f"Search failed on PornDB movies: {e}")
+                    return []
+
             search_query = """
             query SearchScenes($q: String!) {
               searchScene(term: $q) {
@@ -65,7 +111,7 @@ class MetadataService:
                 res = scraper.execute_query(search_query, {"q": query})
                 scenes = res.get("searchScene", []) if res else []
                 if not scenes:
-                    scenes = []
+                  scenes = []
                 formatted = []
                 for s in scenes:
                     studio_data = s.get("studio") or {}
@@ -89,7 +135,32 @@ class MetadataService:
                 return []
 
         # Default TMDB search
-        results = self.tmdb.search(query, item_type=item_type, year=year, language=language)
+        results = self.tmdb.search(query, item_type=item_type, year=year, language=language, include_adult=include_adult)
+
+        # Concurrently fetch seasons details for TV shows
+        if item_type == "tv" and results:
+            from concurrent.futures import ThreadPoolExecutor
+            def fetch_tv_seasons(r):
+                try:
+                    details = self.tmdb.get_details(r["id"], "tv", language=language)
+                    seasons = details.get("seasons") or []
+                    return [{
+                        "season_number": s.get("season_number"),
+                        "name": s.get("name"),
+                        "episode_count": s.get("episode_count"),
+                        "poster_path": s.get("poster_path"),
+                        "air_date": s.get("air_date"),
+                    } for s in seasons]
+                except Exception as e:
+                    logger.error(f"Failed to fetch seasons for TV {r.get('id')}: {e}")
+                    return []
+
+            with ThreadPoolExecutor(max_workers=5) as executor:
+                seasons_lists = list(executor.map(fetch_tv_seasons, results))
+
+            for r, s_list in zip(results, seasons_lists):
+                r["seasons"] = s_list
+
         formatted = []
         for r in results:
             release_date = r.get("release_date") or r.get("first_air_date")
@@ -110,7 +181,8 @@ class MetadataService:
                 "backdrop_path": r.get("backdrop_path"),
                 "rating": r.get("vote_average"),
                 "media_type": item_type,
-                "provider": "tmdb"
+                "provider": "tmdb",
+                "seasons": r.get("seasons") or []
             })
         return formatted
 
@@ -187,6 +259,22 @@ class MetadataService:
             if not scraper:
                 from app.shared_kernel.exceptions import BadRequestException
                 raise BadRequestException("Selected adult scraper is not configured")
+
+            if provider == Provider.PORNDB and mtype == MediaType.MOVIE:
+                movie_data = scraper.fetch_movie(str(external_id))
+                if not movie_data:
+                    from app.shared_kernel.exceptions import BadRequestException
+                    raise BadRequestException(f"Failed to fetch movie details from {provider.value}")
+
+                from app.infrastructure.scrapers.support.normalizer import ScraperNormalizer
+                normalized = ScraperNormalizer.normalize_porndb_movie(movie_data)
+                match = self.scrapers.persist_adult_scene(
+                    self.db, provider, str(movie_data["id"]), normalized, media_type=MediaType.MOVIE
+                )
+                match.media_item_id = item.id
+                item.status = ItemStatus.MATCHED
+                self.db.commit()
+                return {"status": "success", "item_id": item.id, "match_id": match.id}
 
             scene_data = scraper.fetch_scene(str(external_id))
             if not scene_data:

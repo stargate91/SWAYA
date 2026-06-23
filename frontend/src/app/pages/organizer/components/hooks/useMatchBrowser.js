@@ -92,8 +92,8 @@ export function useMatchBrowser({ t }) {
       ? getDisplayTitle(browserState.tvCandidate, 'tv', t)
       : '';
 
-  const seasonsList = seasonsData?.seasons;
-  const episodesList = episodesData?.episodes;
+  const seasonsList = Array.isArray(seasonsData) ? seasonsData : seasonsData?.seasons;
+  const episodesList = Array.isArray(episodesData) ? episodesData : episodesData?.episodes;
 
   const browserMetaItems = browserState.view === 'episodes'
     ? [

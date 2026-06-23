@@ -422,7 +422,8 @@
     "tv": "Tv",
     "media": "Media",
     "extra": "Extra"
+  },
+  "pagination": {
+    "rowsPerPage": "Rows per page"
   }
 }
-
-

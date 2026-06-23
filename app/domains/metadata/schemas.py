@@ -78,7 +78,7 @@ class MetadataMatchRead(BaseSchema):
 
 class MetadataResolveRequest(BaseSchema):
     item_id: int
-    tmdb_id: Optional[int] = None
+    tmdb_id: Optional[Any] = None
     external_id: Optional[str] = None
     type: Optional[str] = "movie"
     media_type: Optional[str] = None

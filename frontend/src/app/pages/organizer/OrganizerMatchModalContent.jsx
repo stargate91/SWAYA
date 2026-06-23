@@ -80,6 +80,9 @@ export default function OrganizerMatchModalContent({
     handleSelectEpisode,
     confirmState,
     setConfirmState,
+    provider,
+    handleProviderChange,
+    sessionMode,
   } = useMatchModalViewModel({ row, rows, t, toast, onResolved });
 
   const targetRows = rows.length > 0 ? rows : (row ? [row] : []);
@@ -123,6 +126,9 @@ export default function OrganizerMatchModalContent({
         onModeChange={handleModeChange}
         isBulk={isBulk}
         t={t}
+        provider={provider}
+        setProvider={handleProviderChange}
+        sessionMode={sessionMode}
       />
 
       <section className="organizer-match-modal__section">

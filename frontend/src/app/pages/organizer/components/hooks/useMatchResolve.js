@@ -17,9 +17,12 @@ const buildResolvePayload = (row, candidate, selectedMode, seasonValue, episodeV
   const season = toOptionalNumber(seasonValue);
   const episode = toOptionalNumber(episodeValue);
 
-  const target = {
+  const payload = {
+    item_id: row.itemId,
     tmdb_id: candidate.tmdb_id || candidate.id,
-    item_type: mediaType,
+    type: mediaType,
+    media_type: mediaType,
+    provider: candidate.provider || 'tmdb',
   };
 
   const isMatchedEpisode = isEpisodeMediaType(row.rawType)
@@ -27,26 +30,21 @@ const buildResolvePayload = (row, candidate, selectedMode, seasonValue, episodeV
 
   if (mediaType === MEDIA_TYPES.TV) {
     if (season != null) {
-      target.season = season;
+      payload.season_number = season;
     } else if (isMatchedEpisode) {
-      target.season = null;
-    }
-
-    if (episode != null) {
-      target.episode = episode;
-    } else if (isMatchedEpisode) {
-      target.episode = null;
+      payload.season_number = null;
     }
 
     if (episodeList.length > 0) {
-      target.episodes = episodeList;
+      payload.episode_number = episodeList;
+    } else if (episode != null) {
+      payload.episode_number = episode;
+    } else if (isMatchedEpisode) {
+      payload.episode_number = null;
     }
   }
 
-  return {
-    item_id: row.itemId,
-    targets: [target],
-  };
+  return payload;
 };
 
 const getDefaultSeason = (row) => {
@@ -132,37 +130,42 @@ export function useMatchResolve({ rows = [], t, toast, onResolved, mode }) {
             const seasonVal = toOptionalNumber(effectiveSeason);
             const episodeVal = toOptionalNumber(effectiveEpisode);
 
-            const target = {
-              tmdb_id: candidate.tmdb_id || candidate.id,
-              item_type: mediaType,
-            };
+            const resolutions = rows.map((r) => {
+              const payload = {
+                item_id: r.itemId,
+                tmdb_id: candidate.tmdb_id || candidate.id,
+                type: mediaType,
+                media_type: mediaType,
+                provider: candidate.provider || 'tmdb',
+              };
 
-            if (mediaType === MEDIA_TYPES.TV) {
-              if (seasonVal != null) {
-                target.season = seasonVal;
-              } else if (isMatchedEpisode) {
-                target.season = null;
+              if (mediaType === MEDIA_TYPES.TV) {
+                if (seasonVal != null) {
+                  payload.season_number = seasonVal;
+                } else if (isMatchedEpisode) {
+                  payload.season_number = null;
+                }
+
+                if (episodeList.length > 0) {
+                  payload.episode_number = episodeList;
+                } else if (episodeVal != null) {
+                  payload.episode_number = episodeVal;
+                } else if (isMatchedEpisode) {
+                  payload.episode_number = null;
+                }
               }
 
-              if (episodeVal != null) {
-                target.episode = episodeVal;
-              } else if (isMatchedEpisode) {
-                target.episode = null;
-              }
-
-              if (episodeList.length > 0) {
-                target.episodes = episodeList;
-              }
-            }
+              return payload;
+            });
 
             await bulkResolveMutation.mutateAsync({
-              item_ids: rows.map((r) => r.itemId),
-              targets: [target],
+              resolutions,
             });
           } else {
-            await resolveMutation.mutateAsync(
-              buildResolvePayload(rows[0], candidate, mode, effectiveSeason, effectiveEpisode)
-            );
+            const payload = buildResolvePayload(rows[0], candidate, mode, effectiveSeason, effectiveEpisode);
+            console.log('[DEBUG] resolveMutation: candidate:', candidate);
+            console.log('[DEBUG] resolveMutation: built payload:', payload);
+            await resolveMutation.mutateAsync(payload);
           }
         });
         toast(t('organizer.toasts.matchResolveSuccess'), 'success');

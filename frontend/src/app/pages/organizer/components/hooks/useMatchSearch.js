@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
-import { useSearchMetadataQuery } from '@/queries';
 import { MEDIA_TYPES, toMetadataMediaType } from '@/lib/mediaTypes';
+import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
+import api from '@/lib/api';
 
 const getDefaultType = (row) => toMetadataMediaType(row?.rawType, MEDIA_TYPES.MOVIE);
 
@@ -34,40 +35,40 @@ export function useMatchSearch({ rows = [], t, toast }) {
   const [episode, setEpisode] = useState(() => (isBulk ? '' : String(getDefaultEpisode(primaryRow) || '')));
   const [results, setResults] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
-  const isTvMode = mode === MEDIA_TYPES.TV;
+  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
+  const includeAdult = sessionMode === 'nsfw';
+  const [provider, setProvider] = useState(() => (sessionMode === 'nsfw' ? 'porndb' : 'tmdb'));
+  const isTvMode = mode === MEDIA_TYPES.TV && provider !== 'porndb';
 
-  const { refetch: refetchSearch, isFetching: isSearching } = useSearchMetadataQuery(
-    query,
-    mode,
-    year,
-    season,
-    episode,
-    { enabled: false }
-  );
+  const [isSearching, setIsSearching] = useState(false);
 
   const existingCandidates = useMemo(
     () => {
       if (rows.length > 1) {
         return [];
       }
-      return (primaryRow?.rawPayload?.matches || []).map((match) => ({
-        id: match.tmdb_id,
-        tmdb_id: match.tmdb_id,
-        type: match.type,
-        title: match.title,
-        release_date: match.year ? `${match.year}-01-01` : null,
-        first_air_date: match.year ? `${match.year}-01-01` : null,
-        poster_path: match.poster_path,
-        vote_average: match.vote_average,
-        confidence: match.confidence,
-        is_active: match.is_active,
-        source: 'existing',
-      }));
+      return (primaryRow?.rawPayload?.matches || [])
+        .filter((match) => (match.provider || 'tmdb') === provider)
+        .map((match) => ({
+          id: match.tmdb_id,
+          tmdb_id: match.tmdb_id,
+          type: match.type,
+          title: match.title,
+          release_date: match.year ? `${match.year}-01-01` : null,
+          first_air_date: match.year ? `${match.year}-01-01` : null,
+          poster_path: match.poster_path,
+          vote_average: match.vote_average,
+          confidence: match.confidence,
+          is_active: match.is_active,
+          source: 'existing',
+          provider: match.provider || 'tmdb',
+        }));
     },
-    [primaryRow, rows.length],
+    [primaryRow, rows.length, provider],
   );
 
-  const performSearch = async (resetBrowser, searchMode = mode) => {
+  const performSearch = async (resetBrowser, searchMode = mode, searchProvider = provider) => {
+    console.log('[DEBUG] performSearch called with searchMode:', searchMode, 'searchProvider:', searchProvider, 'query:', query);
     const trimmedQuery = query.trim();
     if (!trimmedQuery) {
       toast(t('organizer.toasts.matchSearchMissingQuery'), 'danger');
@@ -76,11 +77,27 @@ export function useMatchSearch({ rows = [], t, toast }) {
 
     setHasSearched(true);
     resetBrowser();
+    setIsSearching(true);
     try {
-      const { data, error } = await refetchSearch();
-      if (error) {
-        throw error;
-      }
+      console.log('[DEBUG] performSearch: calling api.metadata.search with options:', {
+        query: trimmedQuery,
+        itemType: searchMode,
+        year,
+        season,
+        episode,
+        includeAdult,
+        provider: searchProvider,
+      });
+      const data = await api.metadata.search({
+        query: trimmedQuery,
+        itemType: searchMode,
+        year,
+        season,
+        episode,
+        includeAdult,
+        provider: searchProvider,
+      });
+      console.log('[DEBUG] performSearch success, received data length:', data?.length);
       const searchResults = Array.isArray(data)
         ? data.map((candidate) => ({
             ...candidate,
@@ -90,8 +107,11 @@ export function useMatchSearch({ rows = [], t, toast }) {
       setResults(searchResults);
       return searchResults;
     } catch (error) {
+      console.error('[DEBUG] performSearch failed with error:', error);
       toast(error.message || t('organizer.toasts.matchSearchFailed'), 'danger');
       return false;
+    } finally {
+      setIsSearching(false);
     }
   };
 
@@ -114,5 +134,8 @@ export function useMatchSearch({ rows = [], t, toast }) {
     isTvMode,
     existingCandidates,
     performSearch,
+    provider,
+    setProvider,
+    sessionMode,
   };
 }

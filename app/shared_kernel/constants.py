@@ -32,7 +32,7 @@ TMDB_DOWNLOAD_SIZES = {
     "backdrops": "original",
     "logos": "original",
     "stills": "500",
-    "people": "632",
+    "people": "h632",
     "avatars": "w500"
 }
 

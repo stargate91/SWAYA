@@ -53,10 +53,13 @@ def _detect_remote_image_extension(url: str, fallback_name: str = "") -> str:
             return '.svg'
         return None
 
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
     try:
         import requests
 
-        resp = requests.head(url, timeout=3, allow_redirects=True)
+        resp = requests.head(url, headers=headers, timeout=3, allow_redirects=True)
         ext = from_content_type(resp.headers.get('Content-Type', ''))
         if ext:
             return ext
@@ -66,7 +69,7 @@ def _detect_remote_image_extension(url: str, fallback_name: str = "") -> str:
     try:
         import requests
 
-        resp = requests.get(url, timeout=5, allow_redirects=True, stream=True)
+        resp = requests.get(url, headers=headers, timeout=5, allow_redirects=True, stream=True)
         ext = from_content_type(resp.headers.get('Content-Type', ''))
         if ext:
             resp.close()
@@ -94,6 +97,17 @@ class ScraperPersister:
 
     def __init__(self, db: Session):
         self.db = db
+
+    def _local_image_exists(self, path: Optional[str], subfolder: str) -> bool:
+        if not path or not path.startswith(f"{subfolder}/"):
+            return False
+        try:
+            from app.domains.tasks import task_manager
+            filename = os.path.basename(path)
+            orig_path = task_manager.download_worker.image_service.get_original_path(subfolder, filename)
+            return bool(task_manager.download_worker.image_service.exists(orig_path))
+        except Exception:
+            return False
 
     def persist_normalized_scene(
         self,
@@ -146,6 +160,7 @@ class ScraperPersister:
                         studio = self.db.query(Studio).filter(Studio.name == s_name).first()
                 elif studio_info.get("logo_path") and (
                     not studio.logo_path 
+                    or not self._local_image_exists(studio.logo_path, "logos")
                     or (studio.logo_path.startswith("logos/") and studio.logo_path.lower().endswith((".jpg", ".jpeg")))
                 ):
                     studio.logo_path = studio_info["logo_path"]
@@ -165,6 +180,7 @@ class ScraperPersister:
                             parent_studio = self.db.query(Studio).filter(Studio.name == p_name).first()
                     elif parent_info.get("logo_path") and (
                         not parent_studio.logo_path 
+                        or not self._local_image_exists(parent_studio.logo_path, "logos")
                         or (parent_studio.logo_path.startswith("logos/") and parent_studio.logo_path.lower().endswith((".jpg", ".jpeg")))
                     ):
                         parent_studio.logo_path = parent_info["logo_path"]
@@ -360,7 +376,9 @@ class ScraperPersister:
                     profile_path=cast_member["profile_path"],
                     gender=cast_member["gender"],
                     is_adult=cast_member["is_adult"],
-                    tmdb_id=cast_member["tmdb_id"]
+                    tmdb_id=cast_member["tmdb_id"],
+                    provider=Provider(cast_member["provider"]) if cast_member.get("provider") else None,
+                    external_id=cast_member.get("external_id")
                 )
                 
                 # Queue profile image download
@@ -446,7 +464,7 @@ class ScraperPersister:
         """Queues studio logo downloads."""
         if not studio or not studio.logo_path:
             return
-        if studio.logo_path.startswith("logos/"):
+        if studio.logo_path.startswith("logos/") and self._local_image_exists(studio.logo_path, "logos"):
             return
 
         try:
@@ -476,7 +494,7 @@ class ScraperPersister:
         """Queues person profile image downloads."""
         if not person or not person.profile_path:
             return
-        if person.local_profile_path and person.local_profile_path.startswith("people/"):
+        if person.local_profile_path and person.local_profile_path.startswith("people/") and self._local_image_exists(person.local_profile_path, "people"):
             return
 
         try:
@@ -495,7 +513,10 @@ class ScraperPersister:
 
         try:
             import requests
-            resp = requests.head(url, timeout=3, allow_redirects=True)
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            }
+            resp = requests.head(url, headers=headers, timeout=3, allow_redirects=True)
             ct = resp.headers.get("Content-Type", "").lower()
             if "png" in ct:
                 ext = ".png"

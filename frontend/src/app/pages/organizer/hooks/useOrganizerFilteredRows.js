@@ -165,7 +165,7 @@ export function useOrganizerFilteredRows({
     const manualEpisodesCount = visibleReview.filter((item) => isTvLikeMediaType(item.type)).length;
     const manualScenesCount = visibleReview.filter((item) => isSceneType(item.type)).length;
     const moviesCount = visibleMatched.filter((item) => isRegularMovieType(item.type)).length;
-    const episodesCount = visibleMatched.filter((item) => isEpisodeMediaType(item.type)).length;
+    const episodesCount = visibleMatched.filter((item) => isTvLikeMediaType(item.type)).length;
     const scenesCount = visibleMatched.filter((item) => isSceneType(item.type)).length;
 
     const extrasCount = filteredExtras.filter((item) => {
@@ -205,7 +205,7 @@ export function useOrganizerFilteredRows({
         .map((item) => mapOrganizerItemRow(item, t));
     } else if (activeMainTab === 'episodes') {
       rows = matchedOrganizerMedia
-        .filter((item) => isEpisodeMediaType(item.type) && MATCHED_STATUSES.has(normalizeItemStatus(item.status)))
+        .filter((item) => isTvLikeMediaType(item.type) && MATCHED_STATUSES.has(normalizeItemStatus(item.status)))
         .map((item) => mapOrganizerItemRow(item, t));
     } else if (activeMainTab === 'scenes') {
       rows = matchedOrganizerMedia

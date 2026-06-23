@@ -3,6 +3,7 @@ import IconButton from '../../../ui/IconButton';
 import SegmentedControl from '../../../ui/SegmentedControl';
 import Tooltip from '../../../ui/Tooltip';
 import Input from '../../../ui/Input';
+import Dropdown from '../../../ui/Dropdown';
 
 export default function MatchModalSearchForm({
   query,
@@ -20,6 +21,9 @@ export default function MatchModalSearchForm({
   onModeChange,
   isBulk = false,
   t,
+  provider,
+  setProvider,
+  sessionMode,
 }) {
   return (
     <form className="organizer-match-modal__search" onSubmit={onSearch}>
@@ -27,17 +31,47 @@ export default function MatchModalSearchForm({
         <div
           className={`organizer-match-modal__search-grid${isTvMode && !isBulk ? ' is-tv' : ' is-movie'}`}
         >
-          <Input
-            className="organizer-match-modal__field organizer-match-modal__field--query"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder={
-              isTvMode
-                ? t('organizer.details.matchModal.queryPlaceholderTv')
-                : t('organizer.details.matchModal.queryPlaceholderMovie')
-            }
-            aria-label={t('organizer.details.matchModal.query')}
-          />
+          {sessionMode === 'nsfw' ? (
+            <div className="organizer-match-modal__search-input-group organizer-match-modal__field organizer-match-modal__field--query">
+              <div className="organizer-match-modal__search-source">
+                <Dropdown
+                  className="organizer-match-dropdown"
+                  menuClassName="search-source-dropdown-menu"
+                  value={provider}
+                  onChange={(e) => setProvider(e.target.value)}
+                  options={[
+                    { value: 'tmdb', label: 'TMDb' },
+                    { value: 'porndb', label: 'PornDB' },
+                  ]}
+                />
+              </div>
+              <div className="organizer-match-modal__form-input-wrapper">
+                <Input
+                  type="text"
+                  placeholder={
+                    isTvMode
+                      ? t('organizer.details.matchModal.queryPlaceholderTv')
+                      : t('organizer.details.matchModal.queryPlaceholderMovie')
+                  }
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  aria-label={t('organizer.details.matchModal.query')}
+                />
+              </div>
+            </div>
+          ) : (
+            <Input
+              className="organizer-match-modal__field organizer-match-modal__field--query"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={
+                isTvMode
+                  ? t('organizer.details.matchModal.queryPlaceholderTv')
+                  : t('organizer.details.matchModal.queryPlaceholderMovie')
+              }
+              aria-label={t('organizer.details.matchModal.query')}
+            />
+          )}
           <Input
             className="organizer-match-modal__field organizer-match-modal__field--year"
             value={year}
@@ -84,7 +118,7 @@ export default function MatchModalSearchForm({
             </IconButton>
           </Tooltip>
         </div>
-        {!isBulk ? (
+        {!isBulk && provider !== 'porndb' ? (
           <SegmentedControl
             className="organizer-match-modal__mode-toggle"
             options={[

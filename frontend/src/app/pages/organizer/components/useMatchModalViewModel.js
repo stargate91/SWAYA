@@ -30,6 +30,9 @@ export default function useMatchModalViewModel({
     isTvMode,
     existingCandidates,
     performSearch,
+    provider,
+    setProvider,
+    sessionMode,
   } = useMatchSearch({ rows: targetRows, t, toast });
 
   const {
@@ -86,7 +89,9 @@ export default function useMatchModalViewModel({
   };
 
   const handleModeChange = async (nextMode) => {
+    console.log('[DEBUG] handleModeChange called with nextMode:', nextMode, 'current mode:', mode);
     if (nextMode === mode) {
+      console.log('[DEBUG] handleModeChange: nextMode matches current mode. Bailing out.');
       return;
     }
 
@@ -94,8 +99,40 @@ export default function useMatchModalViewModel({
     resetBrowser();
 
     if (hasSearched && !isSearching) {
+      console.log('[DEBUG] handleModeChange: triggering automatic search with new mode:', nextMode);
       const searchResults = await performSearch(resetBrowser, nextMode);
       if (searchResults && searchResults.length === 1 && nextMode === MEDIA_TYPES.TV) {
+        const parsedSeason = Number.parseInt(season, 10);
+        if (Number.isFinite(parsedSeason)) {
+          handleDirectBrowse(searchResults[0], parsedSeason);
+        } else {
+          handleBrowseTv(searchResults[0]);
+        }
+      }
+    }
+  };
+
+  const handleProviderChange = async (nextProvider) => {
+    console.log('[DEBUG] handleProviderChange called with nextProvider:', nextProvider, 'current provider:', provider);
+    if (nextProvider === provider) {
+      console.log('[DEBUG] handleProviderChange: nextProvider matches current provider. Bailing out.');
+      return;
+    }
+
+    setProvider(nextProvider);
+    resetBrowser();
+
+    let nextMode = mode;
+    if (nextProvider === 'porndb') {
+      console.log('[DEBUG] handleProviderChange: PornDB selected. Forcing mode to movie.');
+      nextMode = 'movie';
+      setMode('movie');
+    }
+
+    if (hasSearched && !isSearching) {
+      console.log('[DEBUG] handleProviderChange: triggering automatic search with nextMode:', nextMode, 'nextProvider:', nextProvider);
+      const searchResults = await performSearch(resetBrowser, nextMode, nextProvider);
+      if (searchResults && searchResults.length === 1 && nextMode === MEDIA_TYPES.TV && nextProvider !== 'porndb') {
         const parsedSeason = Number.parseInt(season, 10);
         if (Number.isFinite(parsedSeason)) {
           handleDirectBrowse(searchResults[0], parsedSeason);
@@ -109,7 +146,12 @@ export default function useMatchModalViewModel({
   const handleCandidateSelect = async (candidate) => {
     const mediaType = toMetadataMediaType(candidate.type || candidate.media_type || mode, mode);
     if (mediaType === MEDIA_TYPES.TV) {
-      await handleBrowseTv(candidate);
+      const parsedSeason = Number.parseInt(season, 10);
+      if (Number.isFinite(parsedSeason)) {
+        handleDirectBrowse(candidate, parsedSeason);
+      } else {
+        await handleBrowseTv(candidate);
+      }
       return;
     }
     if (candidate.is_active) {
@@ -179,6 +221,7 @@ export default function useMatchModalViewModel({
     shouldShowListResults,
     handleSearch,
     handleModeChange,
+    handleProviderChange,
     handleResolve,
     handleBrowseSeason: handleBrowseSeasonClick,
     handleCandidateSelect,
@@ -188,5 +231,7 @@ export default function useMatchModalViewModel({
     handleSelectEpisode,
     confirmState,
     setConfirmState,
+    provider,
+    sessionMode,
   };
 }

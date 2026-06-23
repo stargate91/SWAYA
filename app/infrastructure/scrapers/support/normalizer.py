@@ -134,7 +134,7 @@ class ScraperNormalizer:
             or movie.get("image")
             or image_variant(movie.get("posters"))
         )
-        backdrop = image_variant(movie.get("background"))
+        backdrop = None
 
         site = movie.get("site") or {}
         if site.get("name") and not movie.get("studio"):
@@ -256,7 +256,12 @@ class ScraperNormalizer:
         # Normalize Studio details
         studios = []
         if studio_data and studio_data.get("name"):
-            s_logo = studio_data.get("image_path") or studio_data.get("logo")
+            s_logo = (
+                studio_data.get("image_path")
+                or studio_data.get("logo")
+                or studio_data.get("image")
+                or studio_data.get("poster")
+            )
             # If images is list (Stash GraphQL)
             if not s_logo and studio_data.get("images"):
                 s_logo = studio_data["images"][0].get("url")
@@ -264,7 +269,12 @@ class ScraperNormalizer:
             parent = None
             parent_data = studio_data.get("parent")
             if parent_data and parent_data.get("name"):
-                p_logo = parent_data.get("image_path") or parent_data.get("logo")
+                p_logo = (
+                    parent_data.get("image_path")
+                    or parent_data.get("logo")
+                    or parent_data.get("image")
+                    or parent_data.get("poster")
+                )
                 if not p_logo and parent_data.get("images"):
                     p_logo = parent_data["images"][0].get("url")
                 parent = {
@@ -281,6 +291,20 @@ class ScraperNormalizer:
         # Normalize Performers
         performers = []
         for cast_member in performers_raw:
+            if not isinstance(cast_member, dict):
+                continue
+            
+            # If parent performer details exist (site-specific performers on PornDB REST), merge/fallback keys from parent
+            parent_member = cast_member.get("parent")
+            if isinstance(parent_member, dict):
+                for key in ["image", "face", "photo", "image_path", "images", "gender", "hair_color", "eye_color", "ethnicity", "height", "weight", "measurements", "extra"]:
+                    if cast_member.get(key) is None and parent_member.get(key) is not None:
+                        cast_member[key] = parent_member[key]
+                if isinstance(cast_member.get("extra"), dict) and isinstance(parent_member.get("extra"), dict):
+                    for e_key, e_val in parent_member["extra"].items():
+                        if cast_member["extra"].get(e_key) is None:
+                            cast_member["extra"][e_key] = e_val
+
             p_name = cast_member.get("name")
             if not p_name:
                 continue
@@ -311,15 +335,16 @@ class ScraperNormalizer:
                     parts.append(str(hip))
                 measurements = "-".join(parts) if parts else None
 
+            extra = cast_member.get("extra") or {}
             performer_details = {
-                "hair_color": cast_member.get("hair_color") or cast_member.get("hair"),
-                "eye_color": cast_member.get("eye_color") or cast_member.get("eye"),
-                "ethnicity": cast_member.get("ethnicity"),
-                "height": cast_member.get("height"),
+                "hair_color": cast_member.get("hair_color") or cast_member.get("hair") or extra.get("haircolor") or extra.get("hair_color") or extra.get("hair"),
+                "eye_color": cast_member.get("eye_color") or cast_member.get("eye") or extra.get("eyecolor") or extra.get("eye_color") or extra.get("eye") or extra.get("eye_colour"),
+                "ethnicity": cast_member.get("ethnicity") or extra.get("ethnicity"),
+                "height": cast_member.get("height") or extra.get("height"),
                 "scene_count": cast_member.get("scene_count"),
-                "rating_porndb": cast_member.get("rating_porndb"),
-                "weight": cast_member.get("weight"),
-                "measurements": measurements
+                "rating_porndb": cast_member.get("rating_porndb") or cast_member.get("rating"),
+                "weight": cast_member.get("weight") or extra.get("weight"),
+                "measurements": measurements or extra.get("measurements")
             }
 
             performers.append({

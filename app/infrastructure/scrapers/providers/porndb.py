@@ -128,6 +128,35 @@ class PornDBScraper(BaseScraper):
             return self.enrich_movie_ratings(data) if data else None
         except (AttributeError, ValueError, requests.RequestException) as exc:
             logger.error(f"Error querying PornDB movie hash {file_hash}: {exc}")
+    def fetch_movie(self, movie_id: str, force_refresh: bool = False) -> Optional[dict]:
+        cache_key = f"porndb/movie/v1/{movie_id}"
+        cached_data = self.cache.get(Provider.PORNDB, cache_key, force_refresh=force_refresh)
+        if cached_data is not None:
+            return None if cached_data.get("cached_error") or not cached_data else cached_data
+
+        api_token = self.get_setting("porndb_api_key") or self.get_setting("porndb_api_token")
+        if not api_token:
+            return None
+
+        try:
+            url = f"{PORNDB_API_BASE}/movies/{movie_id}"
+            response = self.session.get(
+                url,
+                headers={"Authorization": f"Bearer {api_token}", "Accept": "application/json"},
+                timeout=SCRAPER_REQUEST_TIMEOUT,
+            )
+            data = response.json().get("data") if response.status_code == 200 else None
+            self.cache.set(
+                Provider.PORNDB,
+                cache_key,
+                data or {},
+                status_code=response.status_code,
+                media_type=MediaType.MOVIE,
+                external_id=str(movie_id),
+            )
+            return self.enrich_movie_ratings(data) if data else None
+        except Exception as e:
+            logger.error(f"Error fetching PornDB movie {movie_id}: {e}")
             return None
 
     def search_movies(

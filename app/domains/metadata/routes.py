@@ -10,8 +10,8 @@ from app.domains.metadata.schemas import MetadataResolveRequest, BulkResolveRequ
 library_router = APIRouter(prefix="/api/v1", tags=["Metadata"])
 
 @library_router.get("/metadata/search")
-def search_metadata(query: str, type: str = "movie", year: Optional[int] = None, provider: Optional[str] = None, db: Session = Depends(get_db)):
-    return MetadataService(db, scraper_gateway).search_metadata(query, item_type=type, year=year, provider=provider)
+def search_metadata(query: str, item_type: str = "movie", year: Optional[int] = None, provider: Optional[str] = None, include_adult: bool = False, season: Optional[int] = None, episode: Optional[int] = None, db: Session = Depends(get_db)):
+    return MetadataService(db, scraper_gateway).search_metadata(query, item_type=item_type, year=year, provider=provider, include_adult=include_adult, season=season, episode=episode)
 
 @library_router.get("/metadata/tv/{tmdb_id}/seasons")
 def get_metadata_seasons(tmdb_id: int, db: Session = Depends(get_db)):
