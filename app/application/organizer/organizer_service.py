@@ -129,6 +129,22 @@ class OrganizerService:
             target_lang = overrides.custom_language if (overrides and overrides.custom_language) else (formatter.config.default_target_language or pref_lang)
             loc = None
             if active_match:
+                from app.shared_kernel.enums import Provider
+                if active_match.provider == Provider.TMDB and target_lang:
+                    target_lang_clean = LanguageService.resolve_request_locale(Provider.TMDB, target_lang)
+                    if target_lang_clean:
+                        has_target_loc = any(
+                            LanguageService.resolve_request_locale(Provider.TMDB, l.locale) == target_lang_clean
+                            for l in active_match.localizations
+                        )
+                        if not has_target_loc:
+                            try:
+                                from app.infrastructure.scrapers.enrichment.mainstream_enricher import MainstreamEnricher
+                                enricher = MainstreamEnricher(self.db)
+                                enricher.enrich_matched_item(item, language=target_lang_clean, commit=True)
+                                self.db.refresh(active_match)
+                            except Exception as e:
+                                logger.error(f"Failed on-the-fly enrichment for item {item.id} in {target_lang_clean}: {e}")
                 loc = LanguageService.get_best_localization(active_match.localizations, target_lang)
             try:
                 preview = formatter.format_item(item, active_match, loc)
@@ -310,19 +326,27 @@ class OrganizerService:
 
         for ex in extras:
             parent_p_path = parent_planned_paths.get(ex.media_item_id) or ""
+            parent_name = Path(parent_p_path).stem if parent_p_path else Path(ex.media_item.filename).stem
+            extra_ctx = formatter.build_extra_context(ex, parent_name)
+            extra_name = formatter.format_extra_filename(extra_ctx)
+            extra_subpath = formatter.get_extra_subpath(ex)
+            planned_extra_path = Path(parent_p_path).parent if parent_p_path else Path(ex.current_path).parent
+            if extra_subpath:
+                planned_extra_path = planned_extra_path / extra_subpath
+            planned_extra_path = planned_extra_path / extra_name
             groups["extras"].append({
                 "id": ex.id,
                 "parent_id": ex.media_item_id,
                 "parent_type": parent_types.get(ex.media_item_id, "unknown"),
                 "parent_status": parent_statuses.get(ex.media_item_id),
-                "parent_name": Path(parent_p_path).stem if parent_p_path else ex.media_item.filename,
+                "parent_name": parent_name,
                 "filename": ex.filename,
                 "extension": ex.extension,
                 "category": ex.category.value,
                 "subtype": ex.subtype.value if ex.subtype else "other",
                 "language": ex.language,
                 "path": ex.current_path,
-                "planned_path": str(Path(parent_p_path).parent / ex.filename).replace("\\", "/"),
+                "planned_path": str(planned_extra_path).replace("\\", "/"),
                 "action": "rename",
                 "parent_scan_mode": parent_scan_modes.get(ex.media_item_id, ""),
                 "parent_is_adult": parent_is_adults.get(ex.media_item_id, False)

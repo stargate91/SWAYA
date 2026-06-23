@@ -162,17 +162,18 @@ class OverridesService:
         return override
 
     def update_item_overrides(self, request: ItemOverridesUpdate) -> Dict[str, Any]:
+        logger.info(f"update_item_overrides payload: {request.model_dump()}")
         item_id = request.item_id
         is_extra = request.type == 'extra'
 
         if is_extra:
             from app.domains.library.models import ExtraFile, MediaItem
-            extra = self.db.query(ExtraFile).filter(ExtraFile.id == item_id).first()
+            extra = self.db.query(ExtraFile).filter(ExtraFile.id == int(item_id)).first()
             if not extra:
                 raise NotFoundException("Target extra item not found")
 
-            # Support conversion to movie/episode
-            if request.main_type in ("movie", "episode"):
+            # Support conversion to movie/episode/scene
+            if request.main_type in ("movie", "episode", "scene"):
                 parent_media = extra.media_item
                 if parent_media:
                     from app.shared_kernel.enums import ItemStatus
@@ -204,7 +205,7 @@ class OverridesService:
             return {"status": "success", "item_id": item_id}
 
         from app.domains.library.models import MediaItem, ExtraFile
-        item = self.db.query(MediaItem).filter(MediaItem.id == item_id).first()
+        item = self.db.query(MediaItem).filter(MediaItem.id == int(item_id)).first()
         if not item:
             raise NotFoundException("Target item not found")
 
@@ -432,6 +433,7 @@ class OverridesService:
         return {"status": "success", "path": relative_path_for_db, "url": resolved_url}
 
     def bulk_update(self, request: BulkOverridesUpdate) -> Dict[str, Any]:
+        logger.info(f"bulk_update payload: {request.model_dump()}")
         item_ids = request.item_ids or []
         is_extra = request.type == 'extra'
 
@@ -440,7 +442,7 @@ class OverridesService:
         for item_id in item_ids:
             if is_extra:
                 from app.domains.library.models import ExtraFile, MediaItem
-                extra = self.db.query(ExtraFile).filter(ExtraFile.id == item_id).first()
+                extra = self.db.query(ExtraFile).filter(ExtraFile.id == int(item_id)).first()
                 if extra:
                     if request.parent_id is not None:
                         extra.media_item_id = int(request.parent_id)
@@ -453,7 +455,7 @@ class OverridesService:
                     if request.language is not None:
                         extra.language = request.language
 
-                    if request.main_type in ("movie", "episode"):
+                    if request.main_type in ("movie", "episode", "scene"):
                         parent_media = extra.media_item
                         if parent_media:
                             from app.shared_kernel.enums import ItemStatus
@@ -470,7 +472,7 @@ class OverridesService:
                     count += 1
             else:
                 from app.domains.library.models import MediaItem, ExtraFile
-                item = self.db.query(MediaItem).filter(MediaItem.id == item_id).first()
+                item = self.db.query(MediaItem).filter(MediaItem.id == int(item_id)).first()
                 if item:
                     if request.main_type == "bonus" and request.parent_id is not None:
                         from app.shared_kernel.enums import ExtraCategory, ExtraSubtype
@@ -479,7 +481,7 @@ class OverridesService:
                             relative_path=item.relative_path,
                             filename=item.filename,
                             extension=item.extension,
-                            category=ExtraCategory.BONUS,
+                            category=ExtraCategory.VIDEO,
                             subtype=ExtraSubtype.OTHER
                         )
                         self.db.add(new_extra)
@@ -532,7 +534,7 @@ class OverridesService:
                     continue
                 if is_extra:
                     from app.domains.library.models import ExtraFile
-                    extra = self.db.query(ExtraFile).filter(ExtraFile.id == u_id).first()
+                    extra = self.db.query(ExtraFile).filter(ExtraFile.id == int(u_id)).first()
                     if extra:
                         if "parent_id" in u_updates:
                             extra.media_item_id = int(u_updates["parent_id"])
@@ -546,7 +548,7 @@ class OverridesService:
                             extra.language = u_updates["language"]
                 else:
                     from app.domains.library.models import MediaItem
-                    item = self.db.query(MediaItem).filter(MediaItem.id == u_id).first()
+                    item = self.db.query(MediaItem).filter(MediaItem.id == int(u_id)).first()
                     if item:
                         override = self._get_or_create_override(str(u_id))
                         if override:

@@ -20,6 +20,7 @@ export function useOrganizerModalActions({
   selectedRows,
   scanMode,
   sessionMode,
+  provider,
 }) {
   const { t } = useTranslation();
   const { closeModal, openModal, toast } = useUi();
@@ -356,7 +357,7 @@ export function useOrganizerModalActions({
           onClick: () => openBulkDeleteModal(selectedRows),
           disabled: selectedRows.length === 0,
         },
-        !selectedRows.some((row) => row.rawType === 'extra') ? {
+        (!selectedRows.some((row) => row.rawType === 'extra') && scanMode !== 'scenes' && provider !== 'porndb') ? {
           key: 'match',
           label: t('organizer.actions.match') || 'Match',
           icon: Search,

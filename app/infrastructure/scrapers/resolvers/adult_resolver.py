@@ -108,13 +108,19 @@ class AdultResolver:
         return match
 
     def _resolve_adult_item(self, item: MediaItem, mode: ScanMode = ScanMode.SCENES, task_id: Optional[int] = None, preferred_provider: Optional[Provider] = None):
+        existing_match = self.db.query(MetadataMatch).filter(
+            MetadataMatch.media_item_id == item.id
+        ).first()
+        preserve_existing_match = preferred_provider is not None and item.status == ItemStatus.MATCHED and existing_match is not None
+        previous_status = item.status
+
         scrapers_to_try = self._build_scrapers_to_try(preferred_provider)
         logger.info('[adult:%s] Resolving %s | file=%s | oshash=%s | phash=%s', mode.value, item.id, item.filename, (item.hash_oshash or '')[:12], (item.hash_phash or '')[:12])
         logger.info('[adult:%s] Providers to try: %s', mode.value, [provider.value for _scraper, provider in scrapers_to_try])
 
         if not scrapers_to_try:
             logger.warning('No adult metadata provider API key configured.')
-            item.status = ItemStatus.NO_MATCH
+            item.status = previous_status if preserve_existing_match else ItemStatus.NO_MATCH
             self.db.flush()
             return
 
@@ -326,6 +332,15 @@ class AdultResolver:
                 self.db.flush()
                 return
 
-        logger.info('[adult:%s] No match for %s after all providers', mode.value, item.filename)
-        item.status = ItemStatus.NO_MATCH
+        if preserve_existing_match:
+            logger.info(
+                '[adult:%s] No match for %s on preferred provider %s, keeping existing match',
+                mode.value,
+                item.filename,
+                preferred_provider.value,
+            )
+            item.status = previous_status
+        else:
+            logger.info('[adult:%s] No match for %s after all providers', mode.value, item.filename)
+            item.status = ItemStatus.NO_MATCH
         self.db.flush()

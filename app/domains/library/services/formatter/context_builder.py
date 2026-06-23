@@ -202,6 +202,20 @@ class ContextBuilder:
         tags_list = tags_list[:self.config.scene_tag_limit] if self.config.scene_tag_limit > 0 else []
         tags_str = (self.config.scene_tag_separator or " ").join(tags_list)
         
+        edition_val = getattr(item, "edition", None)
+        source_val = getattr(item, "source", None)
+        audio_type_val = getattr(item, "audio_type", None)
+        
+        from app.shared_kernel.enums import MovieEdition, MediaSource, MediaAudioType
+        overrides = getattr(item, "overrides", None)
+        if overrides:
+            if getattr(overrides, "custom_edition", None) and overrides.custom_edition != MovieEdition.NONE:
+                edition_val = overrides.custom_edition
+            if getattr(overrides, "custom_source", None) and overrides.custom_source != MediaSource.NONE:
+                source_val = overrides.custom_source
+            if getattr(overrides, "custom_audio_type", None) and overrides.custom_audio_type != MediaAudioType.NONE:
+                audio_type_val = overrides.custom_audio_type
+
         ctx.update({
             "Title": title_value,
             "title": title_value,
@@ -224,6 +238,9 @@ class ContextBuilder:
             "rating_porndb": str(match.rating_porndb) if match and getattr(match, "rating_porndb", None) is not None else "",
             "Tags": tags_str,
             "tags": tags_str,
+            "Edition": self.tech_parser.format_enum_val(edition_val),
+            "Source": self.tech_parser.format_source(source_val),
+            "AudioType": self.tech_parser.format_enum_val(audio_type_val),
             "Custom": self.config.custom_text,
             "ext": getattr(item, "extension", "") or "",
         })

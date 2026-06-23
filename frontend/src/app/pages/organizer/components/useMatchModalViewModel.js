@@ -34,6 +34,7 @@ export default function useMatchModalViewModel({
     provider,
     setProvider,
     sessionMode,
+    providerOptions,
   } = useMatchSearch({ rows: targetRows, t, toast, scanMode });
 
   const {
@@ -90,9 +91,7 @@ export default function useMatchModalViewModel({
   };
 
   const handleModeChange = async (nextMode) => {
-    console.log('[DEBUG] handleModeChange called with nextMode:', nextMode, 'current mode:', mode);
     if (nextMode === mode) {
-      console.log('[DEBUG] handleModeChange: nextMode matches current mode. Bailing out.');
       return;
     }
 
@@ -100,7 +99,6 @@ export default function useMatchModalViewModel({
     resetBrowser();
 
     if (hasSearched && !isSearching) {
-      console.log('[DEBUG] handleModeChange: triggering automatic search with new mode:', nextMode);
       const searchResults = await performSearch(resetBrowser, nextMode);
       if (searchResults && searchResults.length === 1 && nextMode === MEDIA_TYPES.TV) {
         const parsedSeason = Number.parseInt(season, 10);
@@ -114,9 +112,7 @@ export default function useMatchModalViewModel({
   };
 
   const handleProviderChange = async (nextProvider) => {
-    console.log('[DEBUG] handleProviderChange called with nextProvider:', nextProvider, 'current provider:', provider);
     if (nextProvider === provider) {
-      console.log('[DEBUG] handleProviderChange: nextProvider matches current provider. Bailing out.');
       return;
     }
 
@@ -128,13 +124,11 @@ export default function useMatchModalViewModel({
       nextMode = 'scene';
       setMode('scene');
     } else if (nextProvider === 'porndb') {
-      console.log('[DEBUG] handleProviderChange: PornDB selected in non-scenes mode. Forcing mode to movie.');
       nextMode = 'movie';
       setMode('movie');
     }
 
     if (hasSearched && !isSearching) {
-      console.log('[DEBUG] handleProviderChange: triggering automatic search with nextMode:', nextMode, 'nextProvider:', nextProvider);
       const searchResults = await performSearch(resetBrowser, nextMode, nextProvider);
       if (searchResults && searchResults.length === 1 && nextMode === MEDIA_TYPES.TV && nextProvider !== 'porndb') {
         const parsedSeason = Number.parseInt(season, 10);
@@ -237,5 +231,6 @@ export default function useMatchModalViewModel({
     setConfirmState,
     provider,
     sessionMode,
+    providerOptions,
   };
 }

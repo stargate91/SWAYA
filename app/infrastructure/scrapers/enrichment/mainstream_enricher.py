@@ -73,6 +73,11 @@ class MainstreamEnricher:
         ).first()
 
         if not active_match:
+            active_match = self.db.query(MetadataMatch).filter(
+                MetadataMatch.media_item_id == item.id
+            ).first()
+
+        if not active_match:
             return
 
         # Build unique list of languages to enrich

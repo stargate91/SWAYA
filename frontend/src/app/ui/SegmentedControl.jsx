@@ -10,14 +10,17 @@ export default function SegmentedControl({ options, value, onChange, ariaLabel, 
     >
       {options.map((option) => {
         const isActive = value === option.value;
+        const isDisabled = Boolean(option.disabled);
         return (
           <button
             key={option.value}
             type="button"
             role="tab"
             aria-selected={isActive}
-            className={`ui-segmented-control__option${isActive ? ' is-active' : ''}`}
-            onClick={() => onChange(option.value)}
+            aria-disabled={isDisabled}
+            className={`ui-segmented-control__option${isActive ? ' is-active' : ''}${isDisabled ? ' is-disabled' : ''}`}
+            onClick={() => !isDisabled && onChange(option.value)}
+            disabled={isDisabled}
           >
             {option.label}
           </button>

@@ -9,6 +9,7 @@ export function OrganizerModalProvider({
   selectedRows,
   scanMode,
   sessionMode,
+  provider,
 }) {
   const {
     openDeleteModal,
@@ -26,6 +27,7 @@ export function OrganizerModalProvider({
     selectedRows,
     scanMode,
     sessionMode,
+    provider,
   });
 
   const contextValue = {

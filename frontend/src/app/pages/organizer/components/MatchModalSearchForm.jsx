@@ -40,18 +40,7 @@ export default function MatchModalSearchForm({
                   menuClassName="search-source-dropdown-menu"
                   value={provider}
                   onChange={(e) => setProvider(e.target.value)}
-                  options={
-                    scanMode === 'scenes'
-                      ? [
-                          { value: 'stashdb', label: 'StashDB' },
-                          { value: 'fansdb', label: 'FansDB' },
-                          { value: 'porndb', label: 'PornDB' },
-                        ]
-                      : [
-                          { value: 'tmdb', label: 'TMDb' },
-                          { value: 'porndb', label: 'PornDB' },
-                        ]
-                  }
+                  options={providerOptions}
                 />
               </div>
               <div className="organizer-match-modal__form-input-wrapper">
@@ -143,3 +132,5 @@ export default function MatchModalSearchForm({
     </form>
   );
 }
+
+

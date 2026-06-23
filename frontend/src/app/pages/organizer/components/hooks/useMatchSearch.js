@@ -1,6 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { MEDIA_TYPES, toMetadataMediaType } from '@/lib/mediaTypes';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
+import { useSettingsQuery } from '@/queries';
+import { getFirstEnabledProvider, getOrganizerProviderOptions } from '@/lib/providerAvailability';
 import api from '@/lib/api';
 
 const getDefaultType = (row) => toMetadataMediaType(row?.rawType, MEDIA_TYPES.MOVIE);
@@ -28,6 +30,9 @@ const getDefaultEpisode = (row) => {
 export function useMatchSearch({ rows = [], t, toast, scanMode }) {
   const primaryRow = rows[0] || null;
   const isBulk = rows.length > 1;
+  const settingsQuery = useSettingsQuery();
+  const settings = settingsQuery.data || null;
+  const providerOptions = useMemo(() => getOrganizerProviderOptions(scanMode, settings), [scanMode, settings]);
   const [query, setQuery] = useState(() => (isBulk ? '' : getDefaultQuery(primaryRow)));
   const [mode, setMode] = useState(() => {
     const isSceneModeOrType = scanMode === 'scenes' || primaryRow?.rawType === 'scene' || primaryRow?.rawPayload?.scan_mode === 'scenes';
@@ -45,14 +50,21 @@ export function useMatchSearch({ rows = [], t, toast, scanMode }) {
   const includeAdult = sessionMode === 'nsfw';
   const [provider, setProvider] = useState(() => {
     const isSceneModeOrType = scanMode === 'scenes' || primaryRow?.rawType === 'scene' || primaryRow?.rawPayload?.scan_mode === 'scenes';
-    if (isSceneModeOrType) {
-      return 'stashdb';
-    }
-    return 'tmdb';
+    const fallbackProvider = isSceneModeOrType ? 'stashdb' : 'tmdb';
+    return getFirstEnabledProvider(providerOptions, fallbackProvider);
   });
   const isTvMode = mode === MEDIA_TYPES.TV && provider !== 'porndb';
 
   const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    const isSceneModeOrType = scanMode === 'scenes' || primaryRow?.rawType === 'scene' || primaryRow?.rawPayload?.scan_mode === 'scenes';
+    const fallbackProvider = isSceneModeOrType ? 'stashdb' : 'tmdb';
+    const nextProvider = getFirstEnabledProvider(providerOptions, provider || fallbackProvider);
+    if (nextProvider !== provider) {
+      setProvider(nextProvider);
+    }
+  }, [primaryRow?.rawPayload?.scan_mode, primaryRow?.rawType, provider, providerOptions, scanMode]);
 
   const existingCandidates = useMemo(
     () => {
@@ -80,7 +92,6 @@ export function useMatchSearch({ rows = [], t, toast, scanMode }) {
   );
 
   const performSearch = async (resetBrowser, searchMode = mode, searchProvider = provider) => {
-    console.log('[DEBUG] performSearch called with searchMode:', searchMode, 'searchProvider:', searchProvider, 'query:', query);
     const trimmedQuery = query.trim();
     if (!trimmedQuery) {
       toast(t('organizer.toasts.matchSearchMissingQuery'), 'danger');
@@ -91,15 +102,6 @@ export function useMatchSearch({ rows = [], t, toast, scanMode }) {
     resetBrowser();
     setIsSearching(true);
     try {
-      console.log('[DEBUG] performSearch: calling api.metadata.search with options:', {
-        query: trimmedQuery,
-        itemType: searchMode,
-        year,
-        season,
-        episode,
-        includeAdult,
-        provider: searchProvider,
-      });
       const data = await api.metadata.search({
         query: trimmedQuery,
         itemType: searchMode,
@@ -109,7 +111,6 @@ export function useMatchSearch({ rows = [], t, toast, scanMode }) {
         includeAdult,
         provider: searchProvider,
       });
-      console.log('[DEBUG] performSearch success, received data length:', data?.length);
       const searchResults = Array.isArray(data)
         ? data.map((candidate) => ({
           ...candidate,
@@ -119,7 +120,6 @@ export function useMatchSearch({ rows = [], t, toast, scanMode }) {
       setResults(searchResults);
       return searchResults;
     } catch (error) {
-      console.error('[DEBUG] performSearch failed with error:', error);
       toast(error.message || t('organizer.toasts.matchSearchFailed'), 'danger');
       return false;
     } finally {
@@ -149,5 +149,6 @@ export function useMatchSearch({ rows = [], t, toast, scanMode }) {
     provider,
     setProvider,
     sessionMode,
+    providerOptions,
   };
 }

@@ -9,7 +9,6 @@ import OverrideMovieFields from './OverrideMovieFields';
 import OverrideEpisodeFields from './OverrideEpisodeFields';
 import OverrideExtraFields from './OverrideExtraFields';
 
-import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 
 import {
   SUBCATEGORIES_BY_CATEGORY,
@@ -197,7 +196,7 @@ export default function OrganizerOverrideModalContent({ row, onClose, toast, sca
       } else {
         payload.custom_language = targetLanguage;
         payload.custom_audio_type = audioType;
-        if (mainType === 'movie') {
+        if (mainType === 'movie' || mainType === 'scene') {
           payload.custom_source = source;
           payload.custom_edition = edition;
         } else if (mainType === 'episode') {
@@ -207,8 +206,8 @@ export default function OrganizerOverrideModalContent({ row, onClose, toast, sca
       }
     } else {
       // Extra updates
-      payload.main_type = mainType; // could trigger convert to movie/episode
-      if (mainType === 'movie' || mainType === 'episode') {
+      payload.main_type = mainType; // could trigger convert to movie/episode/scene
+      if (mainType === 'movie' || mainType === 'episode' || mainType === 'scene') {
         payload.parent_id = parentId; // not strictly needed for media but useful
         if (mainType === 'episode') {
           payload.season = seasonNum;
@@ -225,15 +224,17 @@ export default function OrganizerOverrideModalContent({ row, onClose, toast, sca
       }
     }
 
-    updateMediaMutation.mutate(payload, {
-      onSuccess: () => {
-        toast(t('organizer.toasts.overrideSuccess'), 'success');
-      },
-      onError: (err) => {
-        toast(err.message || t('organizer.toasts.overrideSaveFailed'), 'danger');
-      },
-    });
-    onClose();
+    try {
+      await updateMediaMutation.mutateAsync({
+        ...payload,
+        scanMode,
+        sessionMode,
+      });
+      toast(t('organizer.toasts.overrideSuccess'), 'success');
+      onClose();
+    } catch (err) {
+      toast(err.message || t('organizer.toasts.overrideSaveFailed'), 'danger');
+    }
   };
 
   const renderFormFields = () => (
@@ -268,8 +269,8 @@ export default function OrganizerOverrideModalContent({ row, onClose, toast, sca
         />
       )}
 
-      {/* 3. Movie settings */}
-      {mainType === 'movie' && (
+      {/* 3. Movie/Scene settings */}
+      {(mainType === 'movie' || mainType === 'scene') && (
         <OverrideMovieFields
           targetLanguage={targetLanguage}
           setTargetLanguage={setTargetLanguage}

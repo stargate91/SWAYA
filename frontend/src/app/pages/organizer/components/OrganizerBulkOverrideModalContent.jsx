@@ -7,9 +7,6 @@ import { useTranslation } from '../../../providers/LanguageContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { useBulkUpdateMediaMutation, getOrganizerQueryKey } from '../../../queries';
 
-const DOT = '.';
-
-import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 
 import {
   SUBCATEGORIES_BY_CATEGORY,
@@ -19,6 +16,8 @@ import {
   AUDIO_TYPE_OPTIONS,
   MAIN_TYPE_OPTIONS,
 } from './overrideConstants';
+
+const DOT = '.';
 
 export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast, scanMode, sessionMode }) {
   const { t } = useTranslation();
@@ -275,6 +274,13 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
       }
     }
 
+    if (applyMainType && mainType === 'bonus') {
+      if (!applyParentId || !parentId) {
+        toast(t('organizer.toasts.bulkOverrideParentRequired') || 'A parent item must be selected when converting to bonus videos.', 'danger');
+        return;
+      }
+    }
+
     if (applyParentId && (mainType === 'bonus' || mainType === 'extra') && rows.some((r) => String(r.itemId) === String(parentId))) {
       toast(t('organizer.toasts.selfParentError') || 'An item cannot be its own parent.', 'danger');
       return;
@@ -304,10 +310,9 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
         }
       }
     } else {
-      // movie or episode
       if (applyTargetLanguage) payload.custom_language = targetLanguage;
       if (applyAudioType) payload.custom_audio_type = audioType;
-      if (mainType === 'movie') {
+      if (mainType === 'movie' || mainType === 'scene') {
         if (applySource) payload.custom_source = source;
         if (applyEdition) payload.custom_edition = edition;
       } else if (mainType === 'episode') {
@@ -337,15 +342,17 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
       payload.item_updates = itemUpdates;
     }
 
-    bulkUpdateMutation.mutate(payload, {
-      onSuccess: () => {
-        toast(t('organizer.toasts.bulkOverrideSuccess'), 'success');
-      },
-      onError: (err) => {
-        toast(err.message || t('organizer.toasts.bulkOverrideSaveFailed'), 'danger');
-      },
-    });
-    onClose();
+    try {
+      await bulkUpdateMutation.mutateAsync({
+        ...payload,
+        scanMode,
+        sessionMode,
+      });
+      toast(t('organizer.toasts.bulkOverrideSuccess'), 'success');
+      onClose();
+    } catch (err) {
+      toast(err.message || t('organizer.toasts.bulkOverrideSaveFailed'), 'danger');
+    }
   };
 
   const renderFieldWithCheckbox = (label, checked, setChecked, content) => (
@@ -371,7 +378,7 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
     <form id="organizer-bulk-override-form" className={`organizer-override-modal ${isSidebarActive ? 'bulk-override-layout' : ''}`} onSubmit={handleSubmit}>
       <div className={isSidebarActive ? 'bulk-override-layout__form' : ''}>
         {/* Main Category override (only for movie, episode, bonus) */}
-        {(initialMainType === 'movie' || initialMainType === 'episode' || initialMainType === 'bonus') && renderFieldWithCheckbox(
+        {(initialMainType === 'movie' || initialMainType === 'episode' || initialMainType === 'bonus' || initialMainType === 'scene') && renderFieldWithCheckbox(
           t('organizer.overrideModal.labels.mainCategory'),
           applyMainType,
           setApplyMainType,
@@ -396,8 +403,8 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
           />
         )}
 
-        {/* Source override (for Movies) */}
-        {mainType === 'movie' && renderFieldWithCheckbox(
+        {/* Source override (for Movies & Scenes) */}
+        {(mainType === 'movie' || mainType === 'scene') && renderFieldWithCheckbox(
           t('organizer.overrideModal.labels.source'),
           applySource,
           setApplySource,
@@ -409,8 +416,8 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
           />
         )}
 
-        {/* Edition override (for Movies) */}
-        {mainType === 'movie' && renderFieldWithCheckbox(
+        {/* Edition override (for Movies & Scenes) */}
+        {(mainType === 'movie' || mainType === 'scene') && renderFieldWithCheckbox(
           t('organizer.overrideModal.labels.edition'),
           applyEdition,
           setApplyEdition,
@@ -422,7 +429,7 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
           />
         )}
 
-        {/* Audio Type override (for Movies & Episodes) */}
+        {/* Audio Type override (for Movies, Episodes, Scenes) */}
         {mainType !== 'extra' && mainType !== 'bonus' && renderFieldWithCheckbox(
           t('organizer.overrideModal.labels.audioType'),
           applyAudioType,

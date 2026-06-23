@@ -5,6 +5,7 @@ import Page from '../../ui/Page';
 import Button from '../../ui/Button';
 import SegmentedControl from '../../ui/SegmentedControl';
 import Dropdown from '../../ui/Dropdown';
+import { getFirstEnabledProvider, getOrganizerProviderOptions } from '../../lib/providerAvailability';
 import OrganizerDetailsPanel from './OrganizerDetailsPanel';
 import OrganizerHeaderPanel from './OrganizerHeaderPanel';
 import OrganizerResultsPanel from './OrganizerResultsPanel';
@@ -52,15 +53,13 @@ export default function OrganizerPage() {
   const organizer = organizerQuery.data || EMPTY_ORGANIZER;
   const organizerCountQuery = useOrganizerCountQuery(scanMode, sessionMode);
   const [provider, setProvider] = useState('tmdb');
+  const providerOptions = useMemo(() => getOrganizerProviderOptions(scanMode, settings), [scanMode, settings]);
   const [utilityBarTarget, setUtilityBarTarget] = useState(null);
 
   useEffect(() => {
-    if (scanMode === 'scenes') {
-      setProvider('stashdb');
-    } else {
-      setProvider('tmdb');
-    }
-  }, [scanMode]);
+    const fallbackProvider = scanMode === 'scenes' ? 'stashdb' : 'tmdb';
+    setProvider((current) => getFirstEnabledProvider(providerOptions, current || fallbackProvider));
+  }, [providerOptions, scanMode]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -425,6 +424,7 @@ export default function OrganizerPage() {
       selectedRows={selectedRows}
       scanMode={scanMode}
       sessionMode={sessionMode}
+      provider={provider}
     >
       {utilityBarTarget && scanModeOptions.length > 1 && createPortal(
         <div className="organizer-utility-bar-wrapper">
@@ -440,18 +440,7 @@ export default function OrganizerPage() {
                 variant="filter"
                 value={provider}
                 onChange={setProvider}
-                options={
-                  scanMode === 'scenes'
-                    ? [
-                        { value: 'stashdb', label: 'StashDB' },
-                        { value: 'porndb', label: 'PornDB' },
-                        { value: 'fansdb', label: 'FansDB' },
-                      ]
-                    : [
-                        { value: 'tmdb', label: 'TMDb' },
-                        { value: 'porndb', label: 'PornDB' },
-                      ]
-                }
+                options={providerOptions}
               />
             </div>
           )}
@@ -676,5 +665,8 @@ function OrganizerPageContent({
     </Page>
   );
 }
+
+
+
 
 

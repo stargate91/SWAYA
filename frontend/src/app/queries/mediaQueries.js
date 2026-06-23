@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
+import { getOrganizerQueryKey } from './organizerQueries';
 
 const matchesLibraryEntity = (item, rawItemId, cleanId) => {
   if (!item || typeof item !== 'object') return false;
@@ -74,6 +75,42 @@ const updatePosterInCacheData = (cacheData, rawItemId, cleanId, data) => {
   return changed ? nextObject : cacheData;
 };
 
+const prettifyOrganizerLanguage = (value) => String(value || '')
+  .replace(/[_-]+/g, ' ')
+  .replace(/\b\w/g, (char) => char.toUpperCase());
+
+const applyOrganizerLanguageUpdate = (item, nextLanguage) => {
+  if (!item || typeof item !== 'object') return item;
+  return {
+    ...item,
+    target_language: nextLanguage,
+    language: prettifyOrganizerLanguage(nextLanguage),
+  };
+};
+
+const updateOrganizerItemsLanguage = (organizerData, itemIds, nextLanguage) => {
+  if (!organizerData || typeof organizerData !== 'object' || !nextLanguage) return organizerData;
+
+  const targetIds = new Set((itemIds || []).map((itemId) => String(itemId)));
+  let changed = false;
+
+  const updateList = (items = []) => items.map((item) => {
+    if (!targetIds.has(String(item?.id))) return item;
+    changed = true;
+    return applyOrganizerLanguageUpdate(item, nextLanguage);
+  });
+
+  const nextData = {
+    ...organizerData,
+    manual: updateList(organizerData.manual || []),
+    movies: updateList(organizerData.movies || []),
+    tv: updateList(organizerData.tv || []),
+    collisions: updateList(organizerData.collisions || []),
+  };
+
+  return changed ? nextData : organizerData;
+};
+
 const syncPosterCaches = (queryClient, rawItemId, data) => {
   const cleanId = String(rawItemId).replace('tv_', '').replace('collection_', '');
 
@@ -105,8 +142,34 @@ export const useUpdateMediaMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload) => api.media.update(payload),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['organizer'] });
+    onMutate: async (variables) => {
+      const scanMode = variables?.scanMode;
+      const sessionMode = variables?.sessionMode;
+      const nextLanguage = variables?.custom_language;
+      if (nextLanguage == null || (scanMode === undefined && sessionMode === undefined)) {
+        return {};
+      }
+
+      const organizerKey = getOrganizerQueryKey(scanMode, sessionMode);
+      await queryClient.cancelQueries({ queryKey: organizerKey });
+      const previousOrganizer = queryClient.getQueryData(organizerKey);
+      queryClient.setQueryData(organizerKey, (oldData) => updateOrganizerItemsLanguage(oldData, [variables?.id], nextLanguage));
+      return { organizerKey, previousOrganizer };
+    },
+    onError: (err, variables, context) => {
+      if (context?.organizerKey && context.previousOrganizer) {
+        queryClient.setQueryData(context.organizerKey, context.previousOrganizer);
+      }
+    },
+    onSuccess: async (data, variables) => {
+      const scanMode = variables?.scanMode;
+      const sessionMode = variables?.sessionMode;
+      if (scanMode !== undefined || sessionMode !== undefined) {
+        const organizerData = await api.organizer.get({ scanMode, sessionMode });
+        queryClient.setQueryData(getOrganizerQueryKey(scanMode, sessionMode), organizerData);
+      } else {
+        await queryClient.invalidateQueries({ queryKey: ['organizer'] });
+      }
       queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
     },
@@ -117,8 +180,35 @@ export const useBulkUpdateMediaMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload) => api.media.bulkUpdate(payload),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['organizer'] });
+    onMutate: async (variables) => {
+      const scanMode = variables?.scanMode;
+      const sessionMode = variables?.sessionMode;
+      const nextLanguage = variables?.custom_language;
+      const itemIds = variables?.ids || variables?.item_ids || [];
+      if (nextLanguage == null || (scanMode === undefined && sessionMode === undefined) || itemIds.length === 0) {
+        return {};
+      }
+
+      const organizerKey = getOrganizerQueryKey(scanMode, sessionMode);
+      await queryClient.cancelQueries({ queryKey: organizerKey });
+      const previousOrganizer = queryClient.getQueryData(organizerKey);
+      queryClient.setQueryData(organizerKey, (oldData) => updateOrganizerItemsLanguage(oldData, itemIds, nextLanguage));
+      return { organizerKey, previousOrganizer };
+    },
+    onError: (err, variables, context) => {
+      if (context?.organizerKey && context.previousOrganizer) {
+        queryClient.setQueryData(context.organizerKey, context.previousOrganizer);
+      }
+    },
+    onSuccess: async (data, variables) => {
+      const scanMode = variables?.scanMode;
+      const sessionMode = variables?.sessionMode;
+      if (scanMode !== undefined || sessionMode !== undefined) {
+        const organizerData = await api.organizer.get({ scanMode, sessionMode });
+        queryClient.setQueryData(getOrganizerQueryKey(scanMode, sessionMode), organizerData);
+      } else {
+        await queryClient.invalidateQueries({ queryKey: ['organizer'] });
+      }
       queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
     },

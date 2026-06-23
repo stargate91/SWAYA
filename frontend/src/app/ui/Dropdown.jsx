@@ -4,7 +4,6 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from '../providers/LanguageContext';
 import './Dropdown.css';
 
-
 function DropdownMenu({
   isOpen,
   menuCoords,
@@ -69,9 +68,10 @@ function DropdownMenu({
           <button
             key={opt.value}
             type="button"
-            className={`ui-dropdown__item ${opt.value === value ? 'is-active' : ''}`}
-            onClick={() => onOptionClick(opt.value)}
+            className={`ui-dropdown__item ${opt.value === value ? 'is-active' : ''}${opt.disabled ? ' is-disabled' : ''}`}
+            onClick={() => !opt.disabled && onOptionClick(opt.value)}
             title={opt.label}
+            disabled={Boolean(opt.disabled)}
           >
             {opt.label}
           </button>
@@ -115,7 +115,7 @@ export default function Dropdown({
   const updateMenuCoords = () => {
     if (triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
-      const threshold = 280; // height threshold of our dropdown menu
+      const threshold = 280;
       const spaceBelow = window.innerHeight - rect.bottom;
       const openUpwards = spaceBelow < threshold && rect.top > spaceBelow;
 
