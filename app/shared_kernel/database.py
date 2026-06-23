@@ -62,6 +62,10 @@ def configure_sqlite_engine(target_engine):
         cursor.execute("PRAGMA cache_size=-64000;")  # 64MB Cache size
         cursor.close()
 
+    @event.listens_for(target_engine, "begin")
+    def do_begin(conn):
+        conn.exec_driver_sql("BEGIN IMMEDIATE")
+
 
 # Configure both engines with optimal SQLite PRAGMAs
 configure_sqlite_engine(engine)

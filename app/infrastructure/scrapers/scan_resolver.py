@@ -114,7 +114,8 @@ class ScanResolver:
                         local_db.rollback()
                         if "database is locked" not in str(e).lower() or attempt == max_attempts - 1:
                             raise
-                        wait_seconds = 0.25 * (attempt + 1)
+                        import random
+                        wait_seconds = 0.25 * (attempt + 1) + random.uniform(0.05, 0.25)
                         logger.warning(f"Database was locked while resolving item ID {item_id}; retrying in {wait_seconds:.2f}s")
                         time.sleep(wait_seconds)
                     finally:
@@ -123,17 +124,28 @@ class ScanResolver:
                 import traceback
                 logger.error(f"Error resolving item ID {item_id}: {e}")
                 logger.error(traceback.format_exc())
-                local_db = SessionLocal()
-                try:
-                    db_item = local_db.query(MediaItem).filter(MediaItem.id == item_id).first()
-                    if db_item:
-                        db_item.status = ItemStatus.ERROR
-                        local_db.commit()
-                except Exception as status_ex:
-                    logger.error(f"Failed to set ERROR status for item ID {item_id}: {status_ex}")
-                    local_db.rollback()
-                finally:
-                    local_db.close()
+                for attempt in range(3):
+                    local_db = SessionLocal()
+                    try:
+                        db_item = local_db.query(MediaItem).filter(MediaItem.id == item_id).first()
+                        if db_item:
+                            db_item.status = ItemStatus.ERROR
+                            local_db.commit()
+                        break
+                    except OperationalError as status_ex:
+                        local_db.rollback()
+                        if "database is locked" in str(status_ex).lower() and attempt < 2:
+                            import random
+                            time.sleep(0.5 * (attempt + 1) + random.uniform(0.05, 0.25))
+                            continue
+                        logger.error(f"Failed to set ERROR status for item ID {item_id}: {status_ex}")
+                        break
+                    except Exception as status_ex:
+                        local_db.rollback()
+                        logger.error(f"Failed to set ERROR status for item ID {item_id}: {status_ex}")
+                        break
+                    finally:
+                        local_db.close()
             finally:
                 current_completed += 1
                 if progress_callback:
