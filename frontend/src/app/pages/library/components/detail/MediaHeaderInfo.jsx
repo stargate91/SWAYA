@@ -1,10 +1,12 @@
 import { Calendar, Clock, Video, Globe } from 'lucide-react';
 import Pill from '@/ui/Pill';
+import { useTranslation } from '@/providers/LanguageContext';
 import { useMediaDetailContext } from './MediaDetailContext';
 import './MediaHeaderInfo.css';
 
 
 export default function MediaHeaderInfo() {
+  const { t } = useTranslation();
   const { state, handleOpenLogoModal } = useMediaDetailContext();
   const {
     title,
@@ -131,7 +133,7 @@ export default function MediaHeaderInfo() {
             <div className="media-detail-page__meta-row">
               {normalizedGenres.map((genre, idx) => (
                 <Pill key={idx} variant="meta">
-                  {genre.toUpperCase()}
+                  {t(`library.genres.${genre}`, genre).toUpperCase()}
                 </Pill>
               ))}
             </div>

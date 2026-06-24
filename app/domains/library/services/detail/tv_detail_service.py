@@ -34,11 +34,35 @@ class TvDetailService(DetailFormatter):
             return JSONResponse(status_code=404, content={"error": "TV Show not found on TMDB"})
         
         # Load local episodes to see what is in the library
-        local_items = db.query(MediaItem).join(MediaItem.matches).filter(
+        from sqlalchemy.orm import joinedload
+        local_items = db.query(MediaItem).options(
+            joinedload(MediaItem.extras),
+            joinedload(MediaItem.matches)
+        ).join(MediaItem.matches).filter(
             MetadataMatch.external_id == str(tv_tmdb_id_int),
             MetadataMatch.media_type == MediaType.EPISODE,
             MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED])
         ).all()
+
+        extras_list = []
+        for item in local_items:
+            if item.extras:
+                match = next((m for m in item.matches if m.season_number is not None and m.episode_number is not None), None)
+                if match:
+                    parent_label = f"S{match.season_number:02d}E{match.episode_number:02d}"
+                else:
+                    parent_label = "Extras"
+
+                for ex in item.extras:
+                    extras_list.append({
+                        "id": ex.id,
+                        "name": ex.filename,
+                        "path": ex.current_path,
+                        "category": ex.category.value if hasattr(ex.category, "value") else str(ex.category),
+                        "subtype": ex.subtype.value if (ex.subtype and hasattr(ex.subtype, "value")) else (str(ex.subtype) if ex.subtype else None),
+                        "language": ex.language,
+                        "parent_label": parent_label,
+                    })
         
         local_episodes_map = {}
         for item in local_items:
@@ -243,11 +267,13 @@ class TvDetailService(DetailFormatter):
         if youtube_trailers:
             trailer_key = youtube_trailers[0].get("key")
 
+        from app.infrastructure.scrapers.enrichment.mainstream_enricher import _split_genres
         result = {
             "id": f"tmdb_{tv_tmdb_id_int}",
             "tv_tmdb_id": tv_tmdb_id_int,
             "keywords": keywords_list,
             "trailer_key": trailer_key,
+            "extras": extras_list,
             "imdb_id": tmdb_data.get("external_ids", {}).get("imdb_id") or (series_match.imdb_id if series_match else None),
             "title": tmdb_data.get("name") or tmdb_data.get("original_name") or "Unknown TV Show",
             "logo_path": self._resolve_img(effective_logo, "logos"),
@@ -264,7 +290,7 @@ class TvDetailService(DetailFormatter):
             "rating_imdb": series_match.rating_imdb if series_match else None,
             "rating_rotten": series_match.rating_rotten if series_match else None,
             "rating_meta": series_match.rating_meta if series_match else None,
-            "genres": [g["name"] for g in tmdb_data.get("genres", [])] if tmdb_data.get("genres") else [],
+            "genres": _split_genres([g["name"] for g in tmdb_data.get("genres", [])]) if tmdb_data.get("genres") else [],
             "type": "tv",
             "cast": cast,
             "directors": directors,

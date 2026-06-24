@@ -12,6 +12,7 @@ from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.shared_kernel.language import LanguageService
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.domains.library.services.detail._detail_formatter import DetailFormatter
+from app.infrastructure.scrapers.enrichment.mainstream_enricher import _split_genres
 
 logger = logging.getLogger(__name__)
 
@@ -133,7 +134,7 @@ class MovieDetailService(DetailFormatter):
                 "original_title": tmdb_data.get("original_title"),
                 "tagline": tmdb_data.get("tagline"),
                 "overview": tmdb_data.get("overview"),
-                "genres": [g["name"] for g in tmdb_data.get("genres", [])] if tmdb_data.get("genres") else [],
+                "genres": _split_genres([g["name"] for g in tmdb_data.get("genres", [])]) if tmdb_data.get("genres") else [],
                 "year": year,
                 "release_date": release_date,
                 "runtime": tmdb_data.get("runtime"),
@@ -317,16 +318,29 @@ class MovieDetailService(DetailFormatter):
             except Exception as e:
                 logger.error(f"Failed to fetch live trailer fallback: {e}")
 
+        extras_list = [
+            {
+                "id": ex.id,
+                "name": ex.filename,
+                "path": ex.current_path,
+                "category": ex.category.value if hasattr(ex.category, "value") else str(ex.category),
+                "subtype": ex.subtype.value if (ex.subtype and hasattr(ex.subtype, "value")) else (str(ex.subtype) if ex.subtype else None),
+                "language": ex.language,
+            }
+            for ex in item.extras
+        ] if item.extras else []
+
         result = {
             "id": item.id,
             "title": title,
             "keywords": keywords_list,
             "trailer_key": trailer_key,
+            "extras": extras_list,
             "logo_path": self._resolve_img(override.custom_logo if (override and override.custom_logo) else (loc.logo_path if loc else None), "logos"),
             "original_title": active_match.original_title if active_match else None,
             "tagline": loc.tagline if loc else None,
             "overview": overview,
-            "genres": loc.genres if loc else [],
+            "genres": _split_genres(loc.genres) if (loc and loc.genres) else [],
             "year": active_match.release_date.year if (active_match and active_match.release_date) else None,
             "release_date": active_match.release_date.isoformat() if (active_match and active_match.release_date) else None,
             "runtime": active_match.runtime if active_match else None,

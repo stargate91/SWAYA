@@ -24,6 +24,7 @@ class LibraryFilterService:
         
         years = sorted(list(set(r.release_date.year for r in query_years)), reverse=True)
 
+        from app.infrastructure.scrapers.enrichment.mainstream_enricher import _split_genres
         query_genres = self.db.query(MetadataLocalization.genres).join(
             MetadataMatch, MetadataLocalization.match_id == MetadataMatch.id
         ).filter(
@@ -34,7 +35,7 @@ class LibraryFilterService:
         genres_set = set()
         for row in query_genres:
             if row.genres and isinstance(row.genres, list):
-                for genre in row.genres:
+                for genre in _split_genres(row.genres):
                     if genre:
                         genres_set.add(genre.strip())
         genres = sorted(list(genres_set))

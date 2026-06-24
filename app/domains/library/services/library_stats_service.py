@@ -153,14 +153,7 @@ class LibraryStatsService:
         decade_dist = {}
         genre_pair_dist = {}
 
-        def _split_genres(genres_list):
-            res = []
-            for g in genres_list:
-                if not g:
-                    continue
-                parts = [p.strip() for p in g.replace("/", ",").replace(";", ",").split(",") if p.strip()]
-                res.extend(parts)
-            return res
+        from app.infrastructure.scrapers.enrichment.mainstream_enricher import _split_genres
 
         for m in unique_matches:
             # Decade
