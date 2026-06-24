@@ -16,33 +16,113 @@ class DbMediaResolver(MediaResolverPort):
         metadata_match_id = None
 
         if isinstance(item_id, str) and item_id.startswith("tmdb_"):
-            tmdb_id = item_id.split("_")[1]
-            query = self.db.query(MetadataMatch).filter(
-                MetadataMatch.provider == Provider.TMDB,
-                MetadataMatch.external_id == tmdb_id
-            )
-            if media_type:
-                try:
-                    resolved_type = MediaType(media_type.lower())
-                except ValueError:
-                    resolved_type = MediaType.TV if media_type.lower() == 'tv' else MediaType.MOVIE
-                query = query.filter(MetadataMatch.media_type == resolved_type)
-            
-            match = query.first()
-            if not match:
-                resolved_type = MediaType.MOVIE
+            parts = item_id.split("_")
+            if len(parts) >= 4:
+                # TV Episode format: tmdb_{tv_id}_{season}_{episode}
+                tv_id = parts[1]
+                season_num = int(parts[2])
+                episode_num = int(parts[3])
+                
+                # 1. TV show match
+                tv_match = self.db.query(MetadataMatch).filter(
+                    MetadataMatch.provider == Provider.TMDB,
+                    MetadataMatch.external_id == tv_id,
+                    MetadataMatch.media_type == MediaType.TV
+                ).first()
+                if not tv_match:
+                    tv_match = MetadataMatch(provider=Provider.TMDB, external_id=tv_id, media_type=MediaType.TV)
+                    self.db.add(tv_match)
+                    self.db.flush()
+                
+                # 2. Season match
+                season_match = self.db.query(MetadataMatch).filter(
+                    MetadataMatch.provider == Provider.TMDB,
+                    MetadataMatch.parent_id == tv_match.id,
+                    MetadataMatch.media_type == MediaType.SEASON,
+                    MetadataMatch.season_number == season_num
+                ).first()
+                if not season_match:
+                    season_match = MetadataMatch(
+                        provider=Provider.TMDB,
+                        external_id=f"{tv_id}-s{season_num}",
+                        media_type=MediaType.SEASON,
+                        season_number=season_num,
+                        parent_id=tv_match.id
+                    )
+                    self.db.add(season_match)
+                    self.db.flush()
+                
+                # 3. Episode match
+                all_season_episodes = self.db.query(MetadataMatch).filter(
+                    MetadataMatch.provider == Provider.TMDB,
+                    MetadataMatch.parent_id == season_match.id,
+                    MetadataMatch.media_type == MediaType.EPISODE
+                ).all()
+                
+                episode_match = None
+                for m in all_season_episodes:
+                    if m.episode_number == episode_num:
+                        episode_match = m
+                        break
+                    elif isinstance(m.episode_number, list) and episode_num in m.episode_number:
+                        episode_match = m
+                        break
+                    elif isinstance(m.episode_number, str):
+                        import json
+                        try:
+                            parsed_ep = json.loads(m.episode_number)
+                            if isinstance(parsed_ep, list) and episode_num in parsed_ep:
+                                episode_match = m
+                                break
+                            elif parsed_ep == episode_num:
+                                episode_match = m
+                                break
+                        except:
+                            if str(episode_num) == m.episode_number:
+                                episode_match = m
+                                break
+                if not episode_match:
+                    episode_match = MetadataMatch(
+                        provider=Provider.TMDB,
+                        external_id=tv_id,
+                        media_type=MediaType.EPISODE,
+                        season_number=season_num,
+                        episode_number=episode_num,
+                        parent_id=season_match.id
+                    )
+                    self.db.add(episode_match)
+                    self.db.flush()
+                
+                metadata_match_id = episode_match.id
+                media_item_id = episode_match.media_item_id
+            else:
+                tmdb_id = parts[1]
+                query = self.db.query(MetadataMatch).filter(
+                    MetadataMatch.provider == Provider.TMDB,
+                    MetadataMatch.external_id == tmdb_id
+                )
                 if media_type:
                     try:
                         resolved_type = MediaType(media_type.lower())
                     except ValueError:
-                        if media_type.lower() == 'tv':
-                            resolved_type = MediaType.TV
-                # Create a placeholder match record to link the override to
-                match = MetadataMatch(provider=Provider.TMDB, external_id=tmdb_id, media_type=resolved_type)
-                self.db.add(match)
-                self.db.flush()
-            metadata_match_id = match.id
-            media_item_id = match.media_item_id
+                        resolved_type = MediaType.TV if media_type.lower() == 'tv' else MediaType.MOVIE
+                    query = query.filter(MetadataMatch.media_type == resolved_type)
+                
+                match = query.first()
+                if not match:
+                    resolved_type = MediaType.MOVIE
+                    if media_type:
+                        try:
+                            resolved_type = MediaType(media_type.lower())
+                        except ValueError:
+                            if media_type.lower() == 'tv':
+                                resolved_type = MediaType.TV
+                    # Create a placeholder match record to link the override to
+                    match = MetadataMatch(provider=Provider.TMDB, external_id=tmdb_id, media_type=resolved_type)
+                    self.db.add(match)
+                    self.db.flush()
+                metadata_match_id = match.id
+                media_item_id = match.media_item_id
         elif isinstance(item_id, str) and item_id.startswith("stash_"):
             stash_id = item_id.split("_")[1]
             match = self.db.query(MetadataMatch).filter(

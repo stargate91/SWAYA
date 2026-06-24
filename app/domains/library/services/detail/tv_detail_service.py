@@ -20,7 +20,7 @@ class TvDetailService(DetailFormatter):
         self.scrapers = scrapers
         self.tmdb_scraper = scrapers.tmdb(db)
 
-    def get_library_tv_detail(self, tv_tmdb_id: str, seasons_limit: int = 5, initial_episodes_limit: int = 4, language: str = None) -> TvShowDetailResponse:
+    def get_library_tv_detail(self, tv_tmdb_id: str, seasons_limit: int = 999, initial_episodes_limit: int = 999, language: str = None) -> TvShowDetailResponse:
         from app.domains.library.schemas import TvShowDetailResponse
         db = self.db
         try:
@@ -54,47 +54,103 @@ class TvDetailService(DetailFormatter):
         seasons = []
         all_season_meta = sorted(tmdb_data.get("seasons", []), key=lambda x: x.get("season_number") or 0)
         
-        for idx, season_meta in enumerate(all_season_meta[:seasons_limit]):
+        for idx, season_meta in enumerate(all_season_meta):
             season_number = season_meta.get("season_number")
             if season_number is None:
                 continue
             
-            season_detail = self.tmdb_scraper.get_season_details(tv_tmdb_id_int, season_number, language=ui_lang)
-            all_episodes = season_detail.get("episodes", []) or []
-            
-            is_in_library = len(local_items) > 0
-            ep_limit = len(all_episodes) if is_in_library else initial_episodes_limit
-
-            episodes = []
-            for ep in all_episodes[:ep_limit]:
-                ep_num = ep.get("episode_number")
-                local_item = local_episodes_map.get((season_number, ep_num))
+            if idx < seasons_limit:
+                season_detail = self.tmdb_scraper.get_season_details(tv_tmdb_id_int, season_number, language=ui_lang)
+                all_episodes = season_detail.get("episodes", []) or []
                 
-                override = None
-                if local_item:
+                is_in_library = len(local_items) > 0
+                ep_limit = len(all_episodes) if is_in_library else initial_episodes_limit
+
+                episodes = []
+                for ep in all_episodes[:ep_limit]:
+                    ep_num = ep.get("episode_number")
+                    local_item = local_episodes_map.get((season_number, ep_num))
+                    
+                    override = None
                     from app.shared_kernel.user_context import get_current_user_id
                     current_uid = get_current_user_id()
-                    override = db.query(UserOverride).filter(UserOverride.user_id == current_uid, UserOverride.media_item_id == local_item.id).first()
+                    
+                    episode_match = db.query(MetadataMatch).filter(
+                        MetadataMatch.provider == Provider.TMDB,
+                        MetadataMatch.media_type == MediaType.EPISODE,
+                        MetadataMatch.season_number == season_number,
+                        MetadataMatch.episode_number == ep_num,
+                        MetadataMatch.external_id == str(tv_tmdb_id_int)
+                    ).first()
+                    
+                    if episode_match:
+                        override = db.query(UserOverride).filter(
+                            UserOverride.user_id == current_uid,
+                            UserOverride.metadata_match_id == episode_match.id
+                        ).first()
+                    
+                    if not override and local_item:
+                        override = db.query(UserOverride).filter(
+                            UserOverride.user_id == current_uid,
+                            UserOverride.media_item_id == local_item.id
+                        ).first()
+                    
+                    is_watched = False
+                    watch_count = 0
+                    resume_position = 0
+                    if override:
+                        is_watched = override.is_watched
+                        watch_count = override.watch_count or 0
+                        resume_position = override.resume_position or 0
+
+                    is_multi_episode = False
+                    if local_item:
+                        siblings = [k for k, v in local_episodes_map.items() if v.id == local_item.id]
+                        if len(siblings) > 1:
+                            is_multi_episode = True
+                            match_ids = [m.id for m in local_item.matches]
+                            sibling_overrides = db.query(UserOverride).filter(
+                                UserOverride.user_id == current_uid,
+                                (UserOverride.media_item_id == local_item.id) | (UserOverride.metadata_match_id.in_(match_ids))
+                            ).all()
+                            for sov in sibling_overrides:
+                                if sov.is_watched:
+                                    is_watched = True
+                                if sov.watch_count and sov.watch_count > watch_count:
+                                    watch_count = sov.watch_count
+                                if sov.resume_position and sov.resume_position > resume_position:
+                                    resume_position = sov.resume_position
+                    
+                    episodes.append({
+                        "id": f"tmdb_{tv_tmdb_id_int}_{season_number}_{ep_num}",
+                        "episode_number": ep_num,
+                        "title": ep.get("name") or f"Episode {ep_num}",
+                        "overview": ep.get("overview"),
+                        "still_path": self._resolve_img(ep.get("still_path"), "stills"),
+                        "runtime": ep.get("runtime"),
+                        "rating_tmdb": ep.get("vote_average"),
+                        "vote_count_tmdb": ep.get("vote_count"),
+                        "air_date": ep.get("air_date"),
+                        "path": local_item.current_path if local_item else None,
+                        "filename": local_item.filename if local_item else None,
+                        "watch_count": watch_count,
+                        "is_watched": is_watched,
+                        "resume_position": resume_position,
+                        "in_library": local_item is not None,
+                        "is_missing": local_item is None,
+                        "is_multi_episode": is_multi_episode,
+                    })
                 
-                episodes.append({
-                    "id": f"tmdb_{tv_tmdb_id_int}_{season_number}_{ep_num}",
-                    "episode_number": ep_num,
-                    "title": ep.get("name") or f"Episode {ep_num}",
-                    "overview": ep.get("overview"),
-                    "still_path": self._resolve_img(ep.get("still_path"), "stills"),
-                    "runtime": ep.get("runtime"),
-                    "rating_tmdb": ep.get("vote_average"),
-                    "vote_count_tmdb": ep.get("vote_count"),
-                    "air_date": ep.get("air_date"),
-                    "path": local_item.current_path if local_item else None,
-                    "filename": local_item.filename if local_item else None,
-                    "watch_count": override.watch_count if override else 0,
-                    "is_watched": override.is_watched if override else False,
-                    "resume_position": override.resume_position if override else 0,
-                    "in_library": local_item is not None,
-                    "is_missing": local_item is None,
-                })
-            
+                local_count = sum(1 for ep in all_episodes if (season_number, ep.get("episode_number")) in local_episodes_map)
+                episodes_loaded_count = len(episodes)
+                episodes_complete = True
+            else:
+                episodes = []
+                episodes_loaded_count = 0
+                episodes_complete = False
+                local_count = sum(1 for (s, e) in local_episodes_map.keys() if s == season_number)
+                all_episodes = []
+
             seasons.append({
                 "season_number": season_number,
                 "title": season_meta.get("name") or f"Season {season_number}",
@@ -102,7 +158,9 @@ class TvDetailService(DetailFormatter):
                 "poster_path": self._resolve_img(season_meta.get("poster_path"), "posters"),
                 "air_date": season_meta.get("air_date"),
                 "episode_count": season_meta.get("episode_count") or len(all_episodes),
-                "episodes_loaded_count": len(episodes),
+                "local_episode_count": local_count,
+                "episodes_loaded_count": episodes_loaded_count,
+                "episodes_complete": episodes_complete,
                 "episodes": episodes,
             })
             
@@ -177,10 +235,19 @@ class TvDetailService(DetailFormatter):
             if isinstance(raw_kws, dict):
                 keywords_list = [k["name"] for k in raw_kws.get("results", []) if isinstance(k, dict) and "name" in k]
 
+        videos = (tmdb_data.get("videos") or {}).get("results") or []
+        trailer_key = None
+        youtube_trailers = [v for v in videos if v.get("site") == "YouTube" and v.get("type") == "Trailer" and v.get("key")]
+        if not youtube_trailers:
+            youtube_trailers = [v for v in videos if v.get("site") == "YouTube" and v.get("key")]
+        if youtube_trailers:
+            trailer_key = youtube_trailers[0].get("key")
+
         result = {
             "id": f"tmdb_{tv_tmdb_id_int}",
             "tv_tmdb_id": tv_tmdb_id_int,
             "keywords": keywords_list,
+            "trailer_key": trailer_key,
             "imdb_id": tmdb_data.get("external_ids", {}).get("imdb_id") or (series_match.imdb_id if series_match else None),
             "title": tmdb_data.get("name") or tmdb_data.get("original_name") or "Unknown TV Show",
             "logo_path": self._resolve_img(effective_logo, "logos"),
@@ -211,6 +278,7 @@ class TvDetailService(DetailFormatter):
             "user_comment": override.user_comment if override else None,
             "is_tracked": override.is_tracked if override else False,
             "in_library": len(local_items) > 0,
+            "progressive_seasons": True,
         }
         return TvShowDetailResponse(**result)
  
@@ -252,10 +320,54 @@ class TvDetailService(DetailFormatter):
             local_item = local_episodes_map.get(ep_num)
             
             override = None
+            from app.shared_kernel.user_context import get_current_user_id
+            current_uid = get_current_user_id()
+            
+            episode_match = db.query(MetadataMatch).filter(
+                MetadataMatch.provider == Provider.TMDB,
+                MetadataMatch.media_type == MediaType.EPISODE,
+                MetadataMatch.season_number == season_number,
+                MetadataMatch.episode_number == ep_num,
+                MetadataMatch.external_id == str(tv_tmdb_id_int)
+            ).first()
+            
+            if episode_match:
+                override = db.query(UserOverride).filter(
+                    UserOverride.user_id == current_uid,
+                    UserOverride.metadata_match_id == episode_match.id
+                ).first()
+            
+            if not override and local_item:
+                override = db.query(UserOverride).filter(
+                    UserOverride.user_id == current_uid,
+                    UserOverride.media_item_id == local_item.id
+                ).first()
+            
+            is_watched = False
+            watch_count = 0
+            resume_position = 0
+            if override:
+                is_watched = override.is_watched
+                watch_count = override.watch_count or 0
+                resume_position = override.resume_position or 0
+
+            is_multi_episode = False
             if local_item:
-                from app.shared_kernel.user_context import get_current_user_id
-                current_uid = get_current_user_id()
-                override = db.query(UserOverride).filter(UserOverride.user_id == current_uid, UserOverride.media_item_id == local_item.id).first()
+                siblings = [k for k, v in local_episodes_map.items() if v.id == local_item.id]
+                if len(siblings) > 1:
+                    is_multi_episode = True
+                    match_ids = [m.id for m in local_item.matches]
+                    sibling_overrides = db.query(UserOverride).filter(
+                        UserOverride.user_id == current_uid,
+                        (UserOverride.media_item_id == local_item.id) | (UserOverride.metadata_match_id.in_(match_ids))
+                    ).all()
+                    for sov in sibling_overrides:
+                        if sov.is_watched:
+                            is_watched = True
+                        if sov.watch_count and sov.watch_count > watch_count:
+                            watch_count = sov.watch_count
+                        if sov.resume_position and sov.resume_position > resume_position:
+                            resume_position = sov.resume_position
             
             episodes.append({
                 "id": f"tmdb_{tv_tmdb_id_int}_{season_number}_{ep_num}",
@@ -269,13 +381,16 @@ class TvDetailService(DetailFormatter):
                 "air_date": ep.get("air_date"),
                 "path": local_item.current_path if local_item else None,
                 "filename": local_item.filename if local_item else None,
-                "watch_count": override.watch_count if override else 0,
-                "is_watched": override.is_watched if override else False,
-                "resume_position": override.resume_position if override else 0,
+                "watch_count": watch_count,
+                "is_watched": is_watched,
+                "resume_position": resume_position,
                 "in_library": local_item is not None,
                 "is_missing": local_item is None,
+                "is_multi_episode": is_multi_episode,
             })
             
+        local_count = sum(1 for ep in all_episodes if ep.get("episode_number") in local_episodes_map)
+
         result = {
             "season_number": season_number,
             "title": season_detail.get("name") or f"Season {season_number}",
@@ -283,6 +398,7 @@ class TvDetailService(DetailFormatter):
             "poster_path": self._resolve_img(season_detail.get("poster_path"), "posters"),
             "air_date": season_detail.get("air_date"),
             "episode_count": len(all_episodes),
+            "local_episode_count": local_count,
             "episodes_loaded_count": len(episodes),
             "episodes": episodes,
         }

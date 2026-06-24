@@ -50,7 +50,7 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
   const { data: movieDetail, isLoading: isMovieLoading } = useLibraryItemDetailQuery(cleanId, { enabled: isSingleItem });
   const { locale } = useTranslation();
   const metadataLanguage = locale === 'en' ? 'en-US' : locale;
-  const { data: tvDetail, isLoading: isTvLoading } = useLibraryTvDetailQuery(cleanId, { enabled: !isSingleItem, seasonsLimit: 5, initialEpisodesLimit: 4, language: metadataLanguage });
+  const { data: tvDetail, isLoading: isTvLoading } = useLibraryTvDetailQuery(cleanId, { enabled: !isSingleItem, seasonsLimit: 999, initialEpisodesLimit: 999, language: metadataLanguage });
   const item = isSingleItem ? movieDetail : tvDetail;
   const isLoading = isSingleItem ? isMovieLoading : isTvLoading;
   const effectiveId = item?.id ?? cleanId;
@@ -71,8 +71,7 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
   const [activePanel, setActivePanel] = useState(() => {
     if (isScene) return null;
     if (isMovie) return 'details';
-    if (item?.seasons?.length) return 'seasons';
-    return item?.cast?.length ? 'cast' : 'details';
+    return 'seasons';
   });
 
   if (cleanId !== prevCleanId) {
@@ -82,10 +81,8 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
       setActivePanel(null);
     } else if (isMovie) {
       setActivePanel('details');
-    } else if (item?.seasons?.length) {
-      setActivePanel('seasons');
     } else {
-      setActivePanel(item?.cast?.length ? 'cast' : 'details');
+      setActivePanel('seasons');
     }
   } else if (item !== prevItem) {
     setPrevItem(item);

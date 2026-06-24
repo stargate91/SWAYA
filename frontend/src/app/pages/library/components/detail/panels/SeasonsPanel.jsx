@@ -6,6 +6,7 @@ import Pill from '@/ui/Pill';
 import { buildTmdbImageUrl, TMDB_IMAGE_SIZES, resolveMediaImageUrl } from '@/lib/imageUrls';
 import { countEpisodesInNumber, formatEpisodeNumber, formatTime } from '../../../utils/detailUtils';
 import { useMediaDetailContext } from '../MediaDetailContext';
+import { useTranslation as useLangTranslation } from '@/providers/LanguageContext';
 import api from '@/lib/api';
 import './SeasonsPanel.css';
 
@@ -13,6 +14,8 @@ const EPISODES_BATCH_SIZE = 20;
 
 export default function SeasonsPanel() {
   const { state, mutations, t } = useMediaDetailContext();
+  const { locale } = useLangTranslation();
+  const metadataLanguage = locale === 'en' ? 'en-US' : locale;
   const { item, cleanId, nextEpisodeInfo } = state;
   const { updateStatusMutation, playMutation, bulkUpdateWatchedMutation, addPeakMutation, deletePeakMutation } = mutations;
   const queryClient = useQueryClient();
@@ -112,7 +115,7 @@ export default function SeasonsPanel() {
   const activeSeason = seasonsList.find((s) => s.season_number === selectedSeasonNumber) || seasonsList[0];
 
   useEffect(() => {
-    if (!item?.progressive_seasons || item?.in_library !== false || !activeSeason) return;
+    if (!item?.progressive_seasons || !activeSeason) return;
     if (activeSeason.episodes_complete !== false) return;
 
     let cancelled = false;
@@ -120,7 +123,7 @@ export default function SeasonsPanel() {
       try {
         const seasonPayload = await api.library.getTvSeasonDetail(cleanId, activeSeason.season_number);
         if (cancelled) return;
-        queryClient.setQueryData(['library-tv-detail', cleanId], (current) => {
+        queryClient.setQueryData(['library-tv-detail', cleanId, metadataLanguage], (current) => {
           if (!current || !seasonPayload) return current;
           const existingSeasons = Array.isArray(current.seasons) ? current.seasons : [];
           const nextMap = new Map(existingSeasons.map((season) => [Number(season?.season_number), season]));
@@ -144,13 +147,9 @@ export default function SeasonsPanel() {
     };
   }, [activeSeason, cleanId, item?.in_library, item?.progressive_seasons, queryClient]);
 
-  const totalEpisodesCount = activeSeason?.episodes
-    ? activeSeason.episodes.reduce((sum, ep) => sum + countEpisodesInNumber(ep.episode_number), 0)
-    : 0;
+  const totalEpisodesCount = activeSeason?.episode_count ?? 0;
 
-  const localEpisodesCount = activeSeason?.episodes
-    ? activeSeason.episodes.filter(ep => ep.path && !ep.is_missing).reduce((sum, ep) => sum + countEpisodesInNumber(ep.episode_number), 0)
-    : 0;
+  const localEpisodesCount = activeSeason?.local_episode_count ?? 0;
 
   const isSeasonWatched = activeSeason?.episodes
     ? activeSeason.episodes.length > 0 && activeSeason.episodes.every((ep) => ep.is_watched)
@@ -379,8 +378,13 @@ export default function SeasonsPanel() {
               <div className="episode-card__details">
                 <h4 className="episode-card__title">{episodeText}</h4>
                 
-                {(metaItems.length > 0 || (episodeTmdbRating !== undefined && episodeTmdbRating !== null && episodeTmdbRating !== '')) && (
+                {(metaItems.length > 0 || episode.is_multi_episode || (episodeTmdbRating !== undefined && episodeTmdbRating !== null && episodeTmdbRating !== '')) && (
                   <div className="episode-card__meta">
+                    {episode.is_multi_episode && (
+                      <Pill variant="neutral" className="episode-card__shared-pill" style={{ opacity: 0.8, fontSize: '0.65rem', padding: '0.05rem 0.35rem' }}>
+                        {t('library.details.sharedFile') || 'Shared File'}
+                      </Pill>
+                    )}
                     {metaItems.map((meta, idx) => (
                       <span key={idx} className="episode-card__meta-item">
                         {meta}
@@ -503,7 +507,7 @@ export default function SeasonsPanel() {
 
         {(!activeSeason.episodes || activeSeason.episodes.length === 0) && (
           <div className="episodes-list__empty">
-            {item?.progressive_seasons && item?.in_library === false && activeSeason.episodes_complete === false
+            {item?.progressive_seasons && activeSeason.episodes_complete === false
               ? (t('library.details.loadingSeason') || 'Loading season...')
               : (t('library.details.noEpisodesFound') || 'No episodes found.')}
           </div>

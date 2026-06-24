@@ -216,8 +216,8 @@ def get_library_item_detail(
 @library_router.get("/library/tv/{tv_tmdb_id}", response_model=TvShowDetailResponse)
 def get_library_tv_detail(
     tv_tmdb_id: str,
-    seasons_limit: int = 5,
-    initial_episodes_limit: int = 4,
+    seasons_limit: int = 999,
+    initial_episodes_limit: int = 999,
     language: str = None,
     db: Session = Depends(get_db),
     scrapers: ScraperGatewayPort = Depends(get_scraper_gateway)

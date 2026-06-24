@@ -145,6 +145,7 @@ class ItemOverridesUpdate(BaseSchema):
     is_watched: Optional[bool] = None
     resume_position: Optional[int] = None
     tags: Optional[List[Any]] = None
+    media_type: Optional[str] = None
 
     @model_validator(mode="after")
     def _normalize_ids(self):

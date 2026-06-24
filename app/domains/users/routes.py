@@ -246,19 +246,23 @@ def update_item_status(item_id: str, payload: ItemStatusUpdate, db: Session = De
         except ValueError:
             pass
     has_overrides = any(
-        getattr(payload, field) is not None
+        field in payload.model_fields_set
         for field in ["user_rating", "user_comment", "is_favorite", "is_watched", "custom_tags", "tags", "resume_position"]
     )
     if has_overrides:
-        overrides_payload = ItemOverridesUpdate(
-            item_id=item_id,
-            user_rating=payload.user_rating,
-            user_comment=payload.user_comment,
-            is_favorite=payload.is_favorite,
-            is_watched=payload.is_watched,
-            tags=payload.custom_tags if payload.custom_tags is not None else payload.tags,
-            resume_position=payload.resume_position,
-        )
+        update_dict = {
+            "item_id": item_id,
+            "media_type": payload.media_type,
+        }
+        for field in ["user_rating", "user_comment", "is_favorite", "is_watched", "resume_position"]:
+            if field in payload.model_fields_set:
+                update_dict[field] = getattr(payload, field)
+        if "custom_tags" in payload.model_fields_set:
+            update_dict["tags"] = payload.custom_tags
+        elif "tags" in payload.model_fields_set:
+            update_dict["tags"] = payload.tags
+
+        overrides_payload = ItemOverridesUpdate(**update_dict)
         res.update(service.update_item_overrides(overrides_payload))
     return res
 

@@ -116,10 +116,19 @@ class MovieDetailService(DetailFormatter):
 
             keywords_list = [k["name"] for k in tmdb_data.get("keywords", {}).get("keywords", [])] if tmdb_data.get("keywords") else []
 
+            videos = (tmdb_data.get("videos") or {}).get("results") or []
+            trailer_key = None
+            youtube_trailers = [v for v in videos if v.get("site") == "YouTube" and v.get("type") == "Trailer" and v.get("key")]
+            if not youtube_trailers:
+                youtube_trailers = [v for v in videos if v.get("site") == "YouTube" and v.get("key")]
+            if youtube_trailers:
+                trailer_key = youtube_trailers[0].get("key")
+
             result = {
                 "id": f"tmdb_{tmdb_id}",
                 "title": tmdb_data.get("title") or tmdb_data.get("original_title") or "Unknown",
                 "keywords": keywords_list,
+                "trailer_key": trailer_key,
                 "logo_path": self._resolve_img(effective_logo, "logos"),
                 "original_title": tmdb_data.get("original_title"),
                 "tagline": tmdb_data.get("tagline"),
@@ -277,10 +286,42 @@ class MovieDetailService(DetailFormatter):
             except Exception as e:
                 logger.error(f"Failed to fetch live keywords fallback: {e}")
 
+        # Extract trailer key
+        trailer_key = None
+        if loc and loc.trailer_url:
+            url_str = loc.trailer_url
+            if "watch?v=" in url_str:
+                trailer_key = url_str.split("watch?v=")[1].split("&")[0]
+            elif "youtu.be/" in url_str:
+                trailer_key = url_str.split("youtu.be/")[1].split("?")[0]
+        
+        if not trailer_key and active_match and active_match.raw_metadata:
+            raw_videos = active_match.raw_metadata.get("videos", {}).get("results", [])
+            youtube_trailers = [v for v in raw_videos if v.get("site") == "YouTube" and v.get("type") == "Trailer" and v.get("key")]
+            if not youtube_trailers:
+                youtube_trailers = [v for v in raw_videos if v.get("site") == "YouTube" and v.get("key")]
+            if youtube_trailers:
+                trailer_key = youtube_trailers[0].get("key")
+
+        if not trailer_key and active_match and active_match.provider == Provider.TMDB and active_match.external_id:
+            try:
+                tmdb_id_int = int(active_match.external_id)
+                tmdb_data = self.tmdb_scraper.get_details(tmdb_id_int, "movie", language=ui_lang)
+                if tmdb_data:
+                    videos = (tmdb_data.get("videos") or {}).get("results") or []
+                    youtube_trailers = [v for v in videos if v.get("site") == "YouTube" and v.get("type") == "Trailer" and v.get("key")]
+                    if not youtube_trailers:
+                        youtube_trailers = [v for v in videos if v.get("site") == "YouTube" and v.get("key")]
+                    if youtube_trailers:
+                        trailer_key = youtube_trailers[0].get("key")
+            except Exception as e:
+                logger.error(f"Failed to fetch live trailer fallback: {e}")
+
         result = {
             "id": item.id,
             "title": title,
             "keywords": keywords_list,
+            "trailer_key": trailer_key,
             "logo_path": self._resolve_img(override.custom_logo if (override and override.custom_logo) else (loc.logo_path if loc else None), "logos"),
             "original_title": active_match.original_title if active_match else None,
             "tagline": loc.tagline if loc else None,

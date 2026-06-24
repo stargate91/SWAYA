@@ -392,6 +392,9 @@
     "peakPosition": "Position",
     "addPeak": "Add Peak",
     "deletePeakBtn": "Delete Peak",
-    "noPeaks": "No peak moments recorded yet."
+    "noPeaks": "No peak moments recorded yet.",
+    "noEpisodesFound": "No episodes found.",
+    "loadingSeason": "Loading season...",
+    "sharedFile": "Shared File"
   }
 }

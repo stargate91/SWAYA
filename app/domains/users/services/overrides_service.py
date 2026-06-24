@@ -282,7 +282,7 @@ class OverridesService:
             return {"status": "success", "item_id": item_id}
 
         from app.domains.library.models import MediaItem, ExtraFile
-        media_item_id, metadata_match_id = self.resolver.resolve_ids(item_id)
+        media_item_id, metadata_match_id = self.resolver.resolve_ids(item_id, media_type=request.media_type)
         item = None
         if media_item_id:
             item = self.db.query(MediaItem).filter(MediaItem.id == media_item_id).first()
@@ -346,7 +346,7 @@ class OverridesService:
             
             item.parsed_info = parsed
 
-        metadata_override = self._get_or_create_metadata_override(str(item_id))
+        metadata_override = self._get_or_create_metadata_override(str(item_id), media_type=request.media_type)
         physical_override = self._get_or_create_physical_override(str(item_id))
 
         m_override = metadata_override or physical_override
@@ -387,13 +387,13 @@ class OverridesService:
                 item.custom_source = MediaSource.NONE if (val == "none" or not val) else MediaSource(val.lower())
 
         # Rating, comments, favorite
-        if request.user_rating is not None:
+        if "user_rating" in request.model_fields_set:
             m_override.user_rating = request.user_rating
-            m_override.user_rating_at = datetime.now(timezone.utc)
+            m_override.user_rating_at = datetime.now(timezone.utc) if request.user_rating is not None else None
 
-        if request.user_comment is not None:
+        if "user_comment" in request.model_fields_set:
             m_override.user_comment = request.user_comment
-            m_override.user_comment_at = datetime.now(timezone.utc)
+            m_override.user_comment_at = datetime.now(timezone.utc) if request.user_comment is not None else None
 
         if request.is_favorite is not None:
             m_override.is_favorite = bool(request.is_favorite)
@@ -762,7 +762,7 @@ class OverridesService:
             if override:
                 override.is_watched = is_watched
                 if is_watched:
-                    override.watch_count = max(override.watch_count, 1)
+                    override.watch_count = max(override.watch_count or 0, 1)
                     override.last_watched_at = parsed_date
                 else:
                     override.watch_count = 0
