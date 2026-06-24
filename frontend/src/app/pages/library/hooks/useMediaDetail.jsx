@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from '@/providers/LanguageContext';
 import { useLibraryItemDetailQuery, useLibraryTvDetailQuery } from '@/queries/metadataQueries';
 import {
   useUpdateMediaStatusMutation, usePlayMediaMutation,
@@ -47,7 +48,9 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
   const bulkUpdateWatchedMutation = useBulkUpdateWatchedMutation();
 
   const { data: movieDetail, isLoading: isMovieLoading } = useLibraryItemDetailQuery(cleanId, { enabled: isSingleItem });
-  const { data: tvDetail, isLoading: isTvLoading } = useLibraryTvDetailQuery(cleanId, { enabled: !isSingleItem, seasonsLimit: 5, initialEpisodesLimit: 4 });
+  const { locale } = useTranslation();
+  const metadataLanguage = locale === 'en' ? 'en-US' : locale;
+  const { data: tvDetail, isLoading: isTvLoading } = useLibraryTvDetailQuery(cleanId, { enabled: !isSingleItem, seasonsLimit: 5, initialEpisodesLimit: 4, language: metadataLanguage });
   const item = isSingleItem ? movieDetail : tvDetail;
   const isLoading = isSingleItem ? isMovieLoading : isTvLoading;
   const effectiveId = item?.id ?? cleanId;
@@ -269,13 +272,13 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
     if (isMovie) {
       return item.release_date ? item.release_date.substring(0, 10) : '';
     } else {
-      const firstYear = item.year || (item.first_air_date ? item.first_air_date.substring(0, 4) : '');
-      const lastYear = item.last_air_date ? item.last_air_date.substring(0, 4) : '';
+      const firstDate = item.first_air_date ? item.first_air_date.substring(0, 10) : '';
+      const lastDate = item.last_air_date ? item.last_air_date.substring(0, 10) : '';
       const isEnded = item.release_status?.toLowerCase() === 'ended' || item.release_status?.toLowerCase() === 'canceled';
-      if (firstYear && lastYear && isEnded && firstYear !== lastYear) {
-        return `${firstYear}–${lastYear}`;
+      if (firstDate && lastDate && isEnded) {
+        return `${firstDate} – ${lastDate}`;
       }
-      return firstYear;
+      return firstDate;
     }
   };
   const metaDate = getMetaDate();

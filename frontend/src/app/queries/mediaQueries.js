@@ -465,7 +465,7 @@ export const useUploadBackdropMutation = () => {
 export const useOverridePosterMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ itemId, posterPath }) => api.media.overridePoster(itemId, posterPath),
+    mutationFn: ({ itemId, posterPath, mediaType }) => api.media.overridePoster(itemId, posterPath, mediaType),
     onSuccess: (data, variables) => {
       const cleanId = String(variables.itemId).replace('tv_', '');
       const isCollection = String(variables.itemId).startsWith('collection_');
@@ -490,7 +490,7 @@ export const useOverridePosterMutation = () => {
 export const useUploadPosterMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ itemId, file }) => api.media.uploadPoster(itemId, file),
+    mutationFn: ({ itemId, file, mediaType }) => api.media.uploadPoster(itemId, file, mediaType),
     onSuccess: (data, variables) => {
       const cleanId = String(variables.itemId).replace('tv_', '');
       const isCollection = String(variables.itemId).startsWith('collection_');
@@ -515,7 +515,7 @@ export const useUploadPosterMutation = () => {
 export const useOverrideLogoMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ itemId, logoPath }) => api.media.overrideLogo(itemId, logoPath),
+    mutationFn: ({ itemId, logoPath, mediaType }) => api.media.overrideLogo(itemId, logoPath, mediaType),
     onSuccess: (data, variables) => {
       const cleanId = String(variables.itemId).replace('tv_', '');
       queryClient.invalidateQueries({ queryKey: ['full-metadata', variables.itemId] });
@@ -532,7 +532,7 @@ export const useOverrideLogoMutation = () => {
 export const useUploadLogoMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ itemId, file }) => api.media.uploadLogo(itemId, file),
+    mutationFn: ({ itemId, file, mediaType }) => api.media.uploadLogo(itemId, file, mediaType),
     onSuccess: (data, variables) => {
       const cleanId = String(variables.itemId).replace('tv_', '');
       queryClient.invalidateQueries({ queryKey: ['full-metadata', variables.itemId] });

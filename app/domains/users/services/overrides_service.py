@@ -125,8 +125,8 @@ class OverridesService:
                 except Exception as e:
                     logger.error(f"Error shifting TV episode match: {e}")
 
-    def _get_or_create_metadata_override(self, item_id: str) -> Optional[UserOverride]:
-        media_item_id, metadata_match_id = self.resolver.resolve_ids(item_id)
+    def _get_or_create_metadata_override(self, item_id: str, media_type: Optional[str] = None) -> Optional[UserOverride]:
+        media_item_id, metadata_match_id = self.resolver.resolve_ids(item_id, media_type)
 
         if not media_item_id and not metadata_match_id:
             return None
@@ -195,7 +195,7 @@ class OverridesService:
             self.db.add(override)
         return override
 
-    def _get_or_create_override(self, item_id: str) -> Optional[UserOverride]:
+    def _get_or_create_override(self, item_id: str, media_type: Optional[str] = None) -> Optional[UserOverride]:
         if isinstance(item_id, str) and item_id.startswith("collection_"):
             from app.domains.metadata.models import MediaCollection
             from app.shared_kernel.enums import Provider
@@ -225,7 +225,7 @@ class OverridesService:
                 self.db.flush()
             return override
 
-        return self._get_or_create_metadata_override(item_id) or self._get_or_create_physical_override(item_id)
+        return self._get_or_create_metadata_override(item_id, media_type) or self._get_or_create_physical_override(item_id)
 
     def get_or_create_media_item_override(self, media_item_id: int) -> UserOverride:
         """Helper to fetch or create a UserOverride specifically by media_item_id (physical file)."""
@@ -471,8 +471,8 @@ class OverridesService:
     def update_item_status(self, item_id: int, status: str) -> Dict[str, Any]:
         return self.resolver.update_item_status(item_id, status)
 
-    def update_item_image(self, item_id: str, image_type: str, path: str) -> Dict[str, Any]:
-        override = self._get_or_create_override(item_id)
+    def update_item_image(self, item_id: str, image_type: str, path: str, media_type: Optional[str] = None) -> Dict[str, Any]:
+        override = self._get_or_create_override(item_id, media_type=media_type)
         if not override:
             raise NotFoundException("Target item not found")
 
@@ -488,8 +488,8 @@ class OverridesService:
         self.db.commit()
         return {"status": "success", "image_type": image_type, "path": path}
 
-    def handle_image_upload(self, item_id: str, image_type: str, filename: str, file_stream) -> Dict[str, Any]:
-        override = self._get_or_create_override(item_id)
+    def handle_image_upload(self, item_id: str, image_type: str, filename: str, file_stream, media_type: Optional[str] = None) -> Dict[str, Any]:
+        override = self._get_or_create_override(item_id, media_type=media_type)
         if not override:
             raise NotFoundException("Target item not found")
 

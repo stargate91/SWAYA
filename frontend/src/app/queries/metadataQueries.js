@@ -53,10 +53,10 @@ export const useLibraryItemDetailQuery = (itemId, options = {}) => useQuery({
 });
 
 export const useLibraryTvDetailQuery = (tvId, options = {}) => {
-  const { seasonsLimit = 5, initialEpisodesLimit = 4, ...queryOptions } = options;
+  const { seasonsLimit = 5, initialEpisodesLimit = 4, language, ...queryOptions } = options;
   return useQuery({
-    queryKey: ['library-tv-detail', tvId],
-    queryFn: () => api.library.getTvDetail(tvId, { seasonsLimit, initialEpisodesLimit }),
+    queryKey: ['library-tv-detail', tvId, language || null],
+    queryFn: () => api.library.getTvDetail(tvId, { seasonsLimit, initialEpisodesLimit, language }),
     ...queryOptions,
   });
 };

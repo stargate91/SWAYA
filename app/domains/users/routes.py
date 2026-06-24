@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, File, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
@@ -267,33 +267,33 @@ def update_item_poster(item_id: str, payload: ImageOverrideUpdate, db: Session =
     path = payload.path or payload.url or payload.poster_path
     if not path:
         raise HTTPException(status_code=400, detail="Image path/url is required")
-    return OverridesService(db, DbMediaResolver(db)).update_item_image(item_id, "poster", path)
+    return OverridesService(db, DbMediaResolver(db)).update_item_image(item_id, "poster", path, media_type=payload.media_type)
 
 @catalog_router.post("/item/{item_id}/backdrop")
 def update_item_backdrop(item_id: str, payload: ImageOverrideUpdate, db: Session = Depends(get_db)):
     path = payload.path or payload.url or payload.backdrop_path
     if not path:
         raise HTTPException(status_code=400, detail="Image path/url is required")
-    return OverridesService(db, DbMediaResolver(db)).update_item_image(item_id, "backdrop", path)
+    return OverridesService(db, DbMediaResolver(db)).update_item_image(item_id, "backdrop", path, media_type=payload.media_type)
 
 @catalog_router.post("/item/{item_id}/logo")
 def update_item_logo(item_id: str, payload: ImageOverrideUpdate, db: Session = Depends(get_db)):
     path = payload.path or payload.url or payload.logo_path
     if not path:
         raise HTTPException(status_code=400, detail="Image path/url is required")
-    return OverridesService(db, DbMediaResolver(db)).update_item_image(item_id, "logo", path)
+    return OverridesService(db, DbMediaResolver(db)).update_item_image(item_id, "logo", path, media_type=payload.media_type)
 
 @catalog_router.post("/item/{item_id}/upload-poster")
-def upload_item_poster(item_id: str, file: UploadFile = File(...), db: Session = Depends(get_db)):
-    return OverridesService(db, DbMediaResolver(db)).handle_image_upload(item_id, "poster", file.filename, file.file)
+def upload_item_poster(item_id: str, file: UploadFile = File(...), media_type: Optional[str] = Form(None), db: Session = Depends(get_db)):
+    return OverridesService(db, DbMediaResolver(db)).handle_image_upload(item_id, "poster", file.filename, file.file, media_type=media_type)
 
 @catalog_router.post("/item/{item_id}/upload-backdrop")
-def upload_item_backdrop(item_id: str, file: UploadFile = File(...), db: Session = Depends(get_db)):
-    return OverridesService(db, DbMediaResolver(db)).handle_image_upload(item_id, "backdrop", file.filename, file.file)
+def upload_item_backdrop(item_id: str, file: UploadFile = File(...), media_type: Optional[str] = Form(None), db: Session = Depends(get_db)):
+    return OverridesService(db, DbMediaResolver(db)).handle_image_upload(item_id, "backdrop", file.filename, file.file, media_type=media_type)
 
 @catalog_router.post("/item/{item_id}/upload-logo")
-def upload_item_logo(item_id: str, file: UploadFile = File(...), db: Session = Depends(get_db)):
-    return OverridesService(db, DbMediaResolver(db)).handle_image_upload(item_id, "logo", file.filename, file.file)
+def upload_item_logo(item_id: str, file: UploadFile = File(...), media_type: Optional[str] = Form(None), db: Session = Depends(get_db)):
+    return OverridesService(db, DbMediaResolver(db)).handle_image_upload(item_id, "logo", file.filename, file.file, media_type=media_type)
 
 @catalog_router.post("/media/bulk-update")
 def bulk_update(payload: BulkOverridesUpdate, db: Session = Depends(get_db)):

@@ -17,10 +17,18 @@ class DbMediaResolver(MediaResolverPort):
 
         if isinstance(item_id, str) and item_id.startswith("tmdb_"):
             tmdb_id = item_id.split("_")[1]
-            match = self.db.query(MetadataMatch).filter(
+            query = self.db.query(MetadataMatch).filter(
                 MetadataMatch.provider == Provider.TMDB,
                 MetadataMatch.external_id == tmdb_id
-            ).first()
+            )
+            if media_type:
+                try:
+                    resolved_type = MediaType(media_type.lower())
+                except ValueError:
+                    resolved_type = MediaType.TV if media_type.lower() == 'tv' else MediaType.MOVIE
+                query = query.filter(MetadataMatch.media_type == resolved_type)
+            
+            match = query.first()
             if not match:
                 resolved_type = MediaType.MOVIE
                 if media_type:

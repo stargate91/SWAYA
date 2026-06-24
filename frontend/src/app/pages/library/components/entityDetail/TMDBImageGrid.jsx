@@ -130,11 +130,17 @@ export default function TMDBImageGrid({
     if (!activeMatch && fullMetadata?.raw_details?.images) {
       const rawImages = fullMetadata.raw_details.images[imageKey];
       if (Array.isArray(rawImages)) {
+        const isTvBackdrop = normalizedMediaType === 'tv' && imageType === 'backdrop';
         const localeShort = String(metadataLanguage || '').split('-', 1)[0].toLowerCase();
-        return rawImages.map((img) => {
+        return rawImages
+          .filter((img) => !isTvBackdrop || (img.width || 0) >= 720)
+          .map((img) => {
           const imgLang = String(img.iso_639_1 || '').toLowerCase();
           let score = 0;
-          if (imgLang === String(metadataLanguage || '').toLowerCase()) {
+          if (isTvBackdrop) {
+            // TV backdrops: language-independent, score only by resolution
+            score = (img.width || 0) >= 1920 ? 2 : 1;
+          } else if (imgLang === String(metadataLanguage || '').toLowerCase()) {
             score = 4;
           } else if (localeShort && imgLang.split('-', 1)[0] === localeShort) {
             score = 3;
@@ -164,6 +170,7 @@ export default function TMDBImageGrid({
       : (activeMatch?.api_responses || activeMatch?.tv_api_responses || {});
 
     const responseEntries = Object.entries(responseMap);
+    const isTvBackdrop = normalizedMediaType === 'tv' && imageType === 'backdrop';
     const localeShort = String(metadataLanguage || '').split('-', 1)[0].toLowerCase();
     const allImagesMap = new Map();
 
@@ -172,19 +179,23 @@ export default function TMDBImageGrid({
       if (!Array.isArray(rawImages)) continue;
 
       const normalizedLang = String(lang || '').toLowerCase();
-      let score = 0;
-      if (normalizedLang === String(metadataLanguage || '').toLowerCase()) {
-        score = 4;
+      let langScore = 0;
+      if (isTvBackdrop) {
+        langScore = 1; // language-independent: all equal
+      } else if (normalizedLang === String(metadataLanguage || '').toLowerCase()) {
+        langScore = 4;
       } else if (localeShort && normalizedLang.split('-', 1)[0] === localeShort) {
-        score = 3;
+        langScore = 3;
       } else if (normalizedLang === 'en' || normalizedLang === 'en-us') {
-        score = 2;
+        langScore = 2;
       } else if (!normalizedLang || normalizedLang === 'null') {
-        score = 1;
+        langScore = 1;
       }
 
       for (const img of rawImages) {
         if (!img.file_path) continue;
+        if (isTvBackdrop && (img.width || 0) < 720) continue;
+        const score = isTvBackdrop ? ((img.width || 0) >= 1920 ? 2 : 1) : langScore;
         const existing = allImagesMap.get(img.file_path);
         if (!existing || existing.score < score) {
           allImagesMap.set(img.file_path, {

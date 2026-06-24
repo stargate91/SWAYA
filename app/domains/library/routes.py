@@ -218,11 +218,12 @@ def get_library_tv_detail(
     tv_tmdb_id: str,
     seasons_limit: int = 5,
     initial_episodes_limit: int = 4,
+    language: str = None,
     db: Session = Depends(get_db),
     scrapers: ScraperGatewayPort = Depends(get_scraper_gateway)
 ):
     return TvDetailService(db, scrapers).get_library_tv_detail(
-        tv_tmdb_id, seasons_limit=seasons_limit, initial_episodes_limit=initial_episodes_limit
+        tv_tmdb_id, seasons_limit=seasons_limit, initial_episodes_limit=initial_episodes_limit, language=language
     )
 
 

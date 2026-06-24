@@ -81,7 +81,8 @@ class MovieDetailService(DetailFormatter):
             override = db.query(UserOverride).join(MetadataMatch, UserOverride.metadata_match_id == MetadataMatch.id).filter(
                 UserOverride.user_id == current_uid,
                 MetadataMatch.provider == Provider.TMDB,
-                MetadataMatch.external_id == str(tmdb_id)
+                MetadataMatch.external_id == str(tmdb_id),
+                MetadataMatch.media_type == MediaType.MOVIE
             ).first()
             
             from app.domains.media_assets.services.images import image_processing_service
@@ -265,6 +266,16 @@ class MovieDetailService(DetailFormatter):
             raw_kws = active_match.raw_metadata.get("keywords", {})
             if isinstance(raw_kws, dict):
                 keywords_list = [k["name"] for k in raw_kws.get("keywords", []) if isinstance(k, dict) and "name" in k]
+        
+        # Fallback if raw_metadata doesn't have keywords but we have a TMDB match
+        if not keywords_list and active_match and active_match.provider == Provider.TMDB and active_match.external_id:
+            try:
+                tmdb_id_int = int(active_match.external_id)
+                tmdb_data = self.tmdb_scraper.get_details(tmdb_id_int, "movie", language=ui_lang)
+                if tmdb_data and tmdb_data.get("keywords"):
+                    keywords_list = [k["name"] for k in tmdb_data.get("keywords", {}).get("keywords", [])]
+            except Exception as e:
+                logger.error(f"Failed to fetch live keywords fallback: {e}")
 
         result = {
             "id": item.id,

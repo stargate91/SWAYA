@@ -382,8 +382,48 @@ class MetadataService:
                 logger.error(f"Bulk resolve error for item {res.item_id}: {e}")
         return {"status": "success", "resolved_count": count}
 
-    def get_full_metadata(self, item_id: int) -> Dict[str, Any]:
-        item = self.db.query(MediaItem).filter(MediaItem.id == item_id).first()
+    def get_full_metadata(self, item_id: str, media_type: str = None, language: str = None) -> Dict[str, Any]:
+        is_tmdb_direct = False
+        tmdb_id_int = None
+        
+        if isinstance(item_id, str) and item_id.startswith("tmdb_"):
+            try:
+                tmdb_id_int = int(item_id.split("_")[1])
+                is_tmdb_direct = True
+            except (ValueError, IndexError):
+                pass
+        
+        if not is_tmdb_direct and (media_type == "tv" or (isinstance(item_id, str) and "tv" in item_id)):
+            try:
+                clean_id = str(item_id)
+                if clean_id.startswith("tmdb_"):
+                    clean_id = clean_id.split("_")[1]
+                tmdb_id_int = int(clean_id)
+                is_tmdb_direct = True
+            except (ValueError, IndexError):
+                pass
+
+        if is_tmdb_direct and tmdb_id_int is not None:
+            details = {}
+            try:
+                resolved_media_type = media_type or "tv"
+                item_type = "tv" if resolved_media_type == "tv" else "movie"
+                details = self.tmdb.get_details(tmdb_id_int, item_type, language=language)
+            except Exception as e:
+                logger.error(f"Failed to fetch direct TMDB full metadata: {e}")
+            return {
+                "item_id": item_id,
+                "match": None,
+                "raw_details": details,
+            }
+
+        try:
+            item_id_int = int(item_id)
+        except ValueError:
+            from app.shared_kernel.exceptions import BadRequestException
+            raise BadRequestException("Invalid item ID format")
+
+        item = self.db.query(MediaItem).filter(MediaItem.id == item_id_int).first()
         if not item:
             from app.shared_kernel.exceptions import NotFoundException
             raise NotFoundException("Item not found")
@@ -413,7 +453,7 @@ class MetadataService:
                     details = scraper.fetch_scene(match.external_id) or {}
             else:
                 item_type = "tv" if match.media_type in (MediaType.TV, MediaType.SEASON, MediaType.EPISODE) else "movie"
-                details = self.tmdb.get_details(int(match.external_id), item_type)
+                details = self.tmdb.get_details(int(match.external_id), item_type, language=language)
         except Exception as e:
             logger.error(f"Failed to fetch detailed match info: {e}")
 

@@ -173,6 +173,7 @@ class ImageOverrideUpdate(BaseSchema):
     poster_path: Optional[str] = None
     backdrop_path: Optional[str] = None
     logo_path: Optional[str] = None
+    media_type: Optional[str] = None
 
 
 class BulkOverridesUpdate(BaseSchema):

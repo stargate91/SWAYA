@@ -30,8 +30,8 @@ def bulk_resolve_metadata(payload: BulkResolveRequest, db: Session = Depends(get
     return MetadataService(db, scraper_gateway).bulk_resolve(payload)
 
 @library_router.get("/metadata/item/{item_id}/full-metadata")
-def get_full_metadata(item_id: int, db: Session = Depends(get_db)):
-    return MetadataService(db, scraper_gateway).get_full_metadata(item_id)
+def get_full_metadata(item_id: str, media_type: str = None, language: str = None, db: Session = Depends(get_db)):
+    return MetadataService(db, scraper_gateway).get_full_metadata(item_id, media_type=media_type, language=language)
 
 @library_router.get("/metadata/sync-language/status")
 def get_sync_language_status(db: Session = Depends(get_db)):

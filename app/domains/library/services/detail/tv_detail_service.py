@@ -20,7 +20,7 @@ class TvDetailService(DetailFormatter):
         self.scrapers = scrapers
         self.tmdb_scraper = scrapers.tmdb(db)
 
-    def get_library_tv_detail(self, tv_tmdb_id: str, seasons_limit: int = 5, initial_episodes_limit: int = 4) -> TvShowDetailResponse:
+    def get_library_tv_detail(self, tv_tmdb_id: str, seasons_limit: int = 5, initial_episodes_limit: int = 4, language: str = None) -> TvShowDetailResponse:
         from app.domains.library.schemas import TvShowDetailResponse
         db = self.db
         try:
@@ -28,7 +28,7 @@ class TvDetailService(DetailFormatter):
         except (ValueError, IndexError):
             return JSONResponse(status_code=400, content={"error": "Invalid tv TMDB ID"})
         
-        ui_lang = DEFAULT_FALLBACK_LANGUAGE
+        ui_lang = language or DEFAULT_FALLBACK_LANGUAGE
         tmdb_data = self.tmdb_scraper.get_details(tv_tmdb_id_int, "tv", language=ui_lang)
         if not tmdb_data:
             return JSONResponse(status_code=404, content={"error": "TV Show not found on TMDB"})
@@ -148,7 +148,8 @@ class TvDetailService(DetailFormatter):
         override = db.query(UserOverride).join(MetadataMatch, UserOverride.metadata_match_id == MetadataMatch.id).filter(
             UserOverride.user_id == current_uid,
             MetadataMatch.provider == Provider.TMDB,
-            MetadataMatch.external_id == str(tv_tmdb_id_int)
+            MetadataMatch.external_id == str(tv_tmdb_id_int),
+            MetadataMatch.media_type == MediaType.TV
         ).first()
         
         from app.domains.media_assets.services.images import image_processing_service
@@ -170,9 +171,16 @@ class TvDetailService(DetailFormatter):
             MetadataMatch.media_type == MediaType.TV
         ).first()
 
+        keywords_list = []
+        if tmdb_data.get("keywords"):
+            raw_kws = tmdb_data.get("keywords", {})
+            if isinstance(raw_kws, dict):
+                keywords_list = [k["name"] for k in raw_kws.get("results", []) if isinstance(k, dict) and "name" in k]
+
         result = {
             "id": f"tmdb_{tv_tmdb_id_int}",
             "tv_tmdb_id": tv_tmdb_id_int,
+            "keywords": keywords_list,
             "imdb_id": tmdb_data.get("external_ids", {}).get("imdb_id") or (series_match.imdb_id if series_match else None),
             "title": tmdb_data.get("name") or tmdb_data.get("original_name") or "Unknown TV Show",
             "logo_path": self._resolve_img(effective_logo, "logos"),

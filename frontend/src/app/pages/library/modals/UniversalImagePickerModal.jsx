@@ -84,11 +84,13 @@ export default function UniversalImagePickerModal({
         await overridePosterMutation.mutateAsync({
           itemId: entityId,
           posterPath: path,
+          mediaType: entityType,
         });
       } else if (imageType === 'logo') {
         await overrideLogoMutation.mutateAsync({
           itemId: entityId,
           logoPath: path,
+          mediaType: entityType,
         });
       } else if (imageType === 'profile' && entityType === 'person') {
         await overridePersonProfileMutation.mutateAsync({
@@ -117,11 +119,13 @@ export default function UniversalImagePickerModal({
         await uploadPosterMutation.mutateAsync({
           itemId: entityId,
           file,
+          mediaType: entityType,
         });
       } else if (imageType === 'logo') {
         await uploadLogoMutation.mutateAsync({
           itemId: entityId,
           file,
+          mediaType: entityType,
         });
       } else if (imageType === 'profile' && entityType === 'person') {
         await uploadPersonProfileMutation.mutateAsync({
