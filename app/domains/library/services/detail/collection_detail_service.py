@@ -165,14 +165,44 @@ class CollectionDetailService(DetailFormatter):
             
         movies.sort(key=lambda x: (0 if x["in_library"] else 1, -(x["year"] or 0), x["title"]))
         
+        raw_posters = tmdb_details.get("images", {}).get("posters", [])
+        if not raw_posters and tmdb_details.get("poster_path"):
+            raw_posters = [{"file_path": tmdb_details.get("poster_path")}]
+
+        raw_backdrops = tmdb_details.get("images", {}).get("backdrops", [])
+        if not raw_backdrops and tmdb_details.get("backdrop_path"):
+            raw_backdrops = [{"file_path": tmdb_details.get("backdrop_path")}]
+
+        # Check for user overrides
+        col_override = None
+        if collection:
+            from app.shared_kernel.user_context import get_current_user_id
+            current_uid = get_current_user_id()
+            col_override = db.query(UserOverride).filter(
+                UserOverride.user_id == current_uid,
+                UserOverride.collection_id == collection.id
+            ).first()
+
+        final_poster = self._resolve_img(tmdb_details.get("poster_path"), "posters")
+        final_backdrop = self._resolve_img(tmdb_details.get("backdrop_path"), "backdrops")
+
+        if col_override:
+            if col_override.custom_poster:
+                final_poster = self._resolve_img(col_override.custom_poster, "posters")
+            if col_override.custom_backdrop:
+                final_backdrop = self._resolve_img(col_override.custom_backdrop, "backdrops")
+
         result = {
             "tmdb_id": collection_tmdb_id_int,
             "title": tmdb_details.get("name") or f"Collection {collection_tmdb_id_int}",
             "overview": tmdb_details.get("overview"),
-            "poster_path": self._resolve_img(tmdb_details.get("poster_path"), "posters"),
-            "backdrop_path": self._resolve_img(tmdb_details.get("backdrop_path"), "backdrops"),
+            "poster_path": final_poster,
+            "backdrop_path": final_backdrop,
             "owned_count": len(owned_tmdb_ids),
             "total_count": len(movies),
             "movies": movies,
+            "images": tmdb_details.get("images", {}),
+            "collection_posters": raw_posters,
+            "collection_backdrops": raw_backdrops,
         }
         return CollectionDetailResponse(**result)

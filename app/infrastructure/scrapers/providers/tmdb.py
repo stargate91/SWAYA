@@ -264,6 +264,13 @@ class TMDBScraper(BaseScraper):
         """Retrieve details for a specific movie collection/saga."""
         resolved_lang = LanguageService.resolve_request_locale(Provider.TMDB, language) or DEFAULT_FALLBACK_LANGUAGE
         endpoint = f"/collection/{collection_id}"
-        return self._call_api(endpoint, {"language": resolved_lang}, force_refresh=force_refresh)
+        params = {
+            "language": resolved_lang,
+            "append_to_response": "images",
+        }
+        if resolved_lang:
+            lang_short = resolved_lang.split("-")[0]
+            params["include_image_language"] = f"{lang_short},en,null"
+        return self._call_api(endpoint, params, force_refresh=force_refresh)
 
 

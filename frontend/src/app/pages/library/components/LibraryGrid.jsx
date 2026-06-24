@@ -198,7 +198,7 @@ const LibraryPosterCard = memo(({
   } else {
     const subtitleParts = [];
     const displayDate = (isLibraryMovie && item.release_date)
-      ? item.release_date.substring(0, 10)
+      ? item.release_date.substring(0, 4)
       : item.year;
     if (displayDate) subtitleParts.push(displayDate);
     if (item.info) {

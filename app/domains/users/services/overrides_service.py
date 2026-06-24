@@ -196,6 +196,35 @@ class OverridesService:
         return override
 
     def _get_or_create_override(self, item_id: str) -> Optional[UserOverride]:
+        if isinstance(item_id, str) and item_id.startswith("collection_"):
+            from app.domains.metadata.models import MediaCollection
+            from app.shared_kernel.enums import Provider
+            collection_tmdb_id = item_id.split("_")[1]
+            collection = self.db.query(MediaCollection).filter(
+                MediaCollection.provider == Provider.TMDB,
+                MediaCollection.external_id == collection_tmdb_id
+            ).first()
+            if not collection:
+                collection = MediaCollection(
+                    provider=Provider.TMDB,
+                    external_id=collection_tmdb_id
+                )
+                self.db.add(collection)
+                self.db.flush()
+            
+            override = self.db.query(UserOverride).filter(
+                UserOverride.user_id == self.user_id,
+                UserOverride.collection_id == collection.id
+            ).first()
+            if not override:
+                override = UserOverride(
+                    user_id=self.user_id,
+                    collection_id=collection.id
+                )
+                self.db.add(override)
+                self.db.flush()
+            return override
+
         return self._get_or_create_metadata_override(item_id) or self._get_or_create_physical_override(item_id)
 
     def get_or_create_media_item_override(self, media_item_id: int) -> UserOverride:

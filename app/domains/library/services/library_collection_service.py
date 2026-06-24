@@ -155,15 +155,25 @@ class LibraryCollectionService:
                     except Exception as e:
                         logger.error(f"Failed to get collection parts count: {e}")
 
+                from app.shared_kernel.user_context import get_current_user_id
+                current_uid = get_current_user_id()
+                col_override = self.db.query(UserOverride).filter(
+                    UserOverride.user_id == current_uid,
+                    UserOverride.collection_id == collection.id
+                ).first()
+
+                final_poster = (col_override.custom_poster if (col_override and col_override.custom_poster) else None) or ((col_loc.local_poster_path or col_loc.poster_path) if col_loc else None)
+                final_backdrop = (col_override.custom_backdrop if (col_override and col_override.custom_backdrop) else None) or collection.backdrop_path
+
                 entry = {
                     "id": f"collection_{collection.external_id}",
                     "tmdb_id": int(collection.external_id) if collection.external_id.isdigit() else 0,
                     "title": collection_title,
                     "overview": col_loc.overview if col_loc else None,
-                    "poster_path": (col_loc.local_poster_path or col_loc.poster_path) if col_loc else None,
-                    "has_local_poster": bool(col_loc and col_loc.local_poster_path),
+                    "poster_path": final_poster,
+                    "has_local_poster": bool(col_override.custom_poster) if (col_override and col_override.custom_poster) else bool(col_loc and col_loc.local_poster_path),
                     "poster_remote_path": col_loc.poster_path if col_loc else None,
-                    "backdrop_path": collection.backdrop_path,
+                    "backdrop_path": final_backdrop,
                     "owned_count": 0,
                     "total_count": total_parts,
                     "type": "collection",

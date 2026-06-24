@@ -234,7 +234,6 @@ export function CollectionBackdropsPanel({ item, collectionId, t, toast, overrid
     const collectionBackdrops = [];
 
     for (const option of (item?.collection_backdrops || [])
-      .filter((bd) => (!bd?.iso_639_1 || bd.iso_639_1 === '') && Number(bd?.width) >= 1280)
       .map((bd, index) => ({
         backdrop_path: bd.file_path,
         backdrop_key: normalizeBackdropKey(bd.file_path),
@@ -243,8 +242,9 @@ export function CollectionBackdropsPanel({ item, collectionId, t, toast, overrid
         sort_score: Number(bd.vote_average) || 0,
         sort_votes: Number(bd.vote_count) || 0,
         sort_index: index,
+        iso_639_1: bd.iso_639_1,
       }))
-      .filter((option) => option.backdrop_path && option.backdrop_key)
+      .filter((option) => option.backdrop_path && option.backdrop_key && (!option.iso_639_1 || option.iso_639_1 === 'null'))
       .sort((a, b) => (
         (b.sort_score - a.sort_score)
         || (b.sort_votes - a.sort_votes)
@@ -262,29 +262,7 @@ export function CollectionBackdropsPanel({ item, collectionId, t, toast, overrid
       });
     }
 
-    if (collectionBackdrops.length > 0) {
-      return collectionBackdrops;
-    }
-
-    const movieBackdrops = [];
-    for (const movie of item?.movies || []) {
-      const backdropPath = movie?.backdrop_path;
-      const backdropKey = normalizeBackdropKey(backdropPath);
-      if (!backdropPath || !backdropKey || seen.has(backdropKey)) {
-        continue;
-      }
-      seen.add(backdropKey);
-      movieBackdrops.push({
-        backdrop_path: backdropPath,
-        backdrop_key: backdropKey,
-        title: movie?.title || 'Collection item',
-        subtitle: movie?.in_library
-          ? (t('library.details.have') || 'Have')
-          : (t('library.details.missing') || 'Missing'),
-        year: movie?.year,
-      });
-    }
-    return movieBackdrops;
+    return collectionBackdrops;
   }, [item, t]);
 
   const currentBackdropPath = selectedBackdropPath || item?.backdrop_path || '';

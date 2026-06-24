@@ -113,9 +113,12 @@ class MovieDetailService(DetailFormatter):
                     "backdrop_path": self._resolve_img(belongs_to_col.get("backdrop_path"), "backdrops"),
                 }
 
+            keywords_list = [k["name"] for k in tmdb_data.get("keywords", {}).get("keywords", [])] if tmdb_data.get("keywords") else []
+
             result = {
                 "id": f"tmdb_{tmdb_id}",
                 "title": tmdb_data.get("title") or tmdb_data.get("original_title") or "Unknown",
+                "keywords": keywords_list,
                 "logo_path": self._resolve_img(effective_logo, "logos"),
                 "original_title": tmdb_data.get("original_title"),
                 "tagline": tmdb_data.get("tagline"),
@@ -257,9 +260,16 @@ class MovieDetailService(DetailFormatter):
                 "backdrop_path": self._resolve_img(col.backdrop_path, "backdrops"),
             }
 
+        keywords_list = []
+        if active_match and active_match.raw_metadata:
+            raw_kws = active_match.raw_metadata.get("keywords", {})
+            if isinstance(raw_kws, dict):
+                keywords_list = [k["name"] for k in raw_kws.get("keywords", []) if isinstance(k, dict) and "name" in k]
+
         result = {
             "id": item.id,
             "title": title,
+            "keywords": keywords_list,
             "logo_path": self._resolve_img(override.custom_logo if (override and override.custom_logo) else (loc.logo_path if loc else None), "logos"),
             "original_title": active_match.original_title if active_match else None,
             "tagline": loc.tagline if loc else None,

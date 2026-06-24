@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from typing import List, Optional, Any
-from sqlalchemy import String, Integer, DateTime, JSON, Boolean, ForeignKey, Table, Column, Enum as SQLEnum, UniqueConstraint, CheckConstraint
+from sqlalchemy import String, Integer, Float, DateTime, JSON, Boolean, ForeignKey, Table, Column, Enum as SQLEnum, UniqueConstraint, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.shared_kernel.database import Base
@@ -111,7 +111,7 @@ class UserOverride(Base):
     custom_logo: Mapped[Optional[str]] = mapped_column(String) # For custom studio/performer logos
     custom_language: Mapped[Optional[str]] = mapped_column(String) # Custom per-item language override (e.g. 'hu')
     
-    user_rating: Mapped[Optional[int]] = mapped_column(Integer)
+    user_rating: Mapped[Optional[float]] = mapped_column(Float)
     user_rating_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True, index=True)
     user_comment: Mapped[Optional[str]] = mapped_column(String)
     user_comment_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True, index=True)

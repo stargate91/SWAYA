@@ -48,7 +48,7 @@ class UserOverrideCreate(BaseSchema):
     custom_edition: Optional[MovieEdition] = None
     custom_audio_type: Optional[MediaAudioType] = None
     custom_source: Optional[MediaSource] = None
-    user_rating: Optional[int] = None
+    user_rating: Optional[float] = None
     user_comment: Optional[str] = None
     is_favorite: bool = False
     is_watched: bool = False
@@ -72,7 +72,7 @@ class UserOverrideRead(BaseSchema):
     custom_edition: Optional[MovieEdition] = None
     custom_audio_type: Optional[MediaAudioType] = None
     custom_source: Optional[MediaSource] = None
-    user_rating: Optional[int] = None
+    user_rating: Optional[float] = None
     user_rating_at: Optional[datetime] = None
     user_comment: Optional[str] = None
     user_comment_at: Optional[datetime] = None
@@ -139,7 +139,7 @@ class ItemOverridesUpdate(BaseSchema):
     reset_match: Optional[bool] = None
     subtype: Optional[str] = None
     language: Optional[str] = None
-    user_rating: Optional[int] = None
+    user_rating: Optional[float] = None
     user_comment: Optional[str] = None
     is_favorite: Optional[bool] = None
     is_watched: Optional[bool] = None
@@ -157,7 +157,7 @@ class ItemOverridesUpdate(BaseSchema):
 
 class ItemStatusUpdate(BaseSchema):
     status: Optional[str] = None
-    user_rating: Optional[int] = None
+    user_rating: Optional[float] = None
     user_comment: Optional[str] = None
     is_favorite: Optional[bool] = None
     is_watched: Optional[bool] = None
@@ -277,7 +277,7 @@ class CatalogItemResponse(BaseModel):
     title: str
     media_type: str
     poster_path: Optional[str] = None
-    user_rating: Optional[int] = 0
+    user_rating: Optional[float] = 0
     is_favorite: bool = False
 
 

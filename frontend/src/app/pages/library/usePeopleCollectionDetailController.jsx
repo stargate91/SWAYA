@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/ui/Button';
+import { useTranslation } from '@/providers/LanguageContext';
 import { useOverridePersonBackdropMutation, useUploadPersonBackdropMutation, useUpdatePersonStatusMutation } from '@/queries/libraryQueries';
 import { useOverrideBackdropMutation, useUploadBackdropMutation } from '@/queries/mediaQueries';
 import {
@@ -30,11 +31,16 @@ export default function usePeopleCollectionDetailController({
   closeModal,
   toast,
 }) {
+  const { locale } = useTranslation();
+  const metadataLanguage = locale === 'en' ? 'en-US' : locale;
   const [hoveredRating, setHoveredRating] = useState(null);
   const [isActivateHovered, setIsActivateHovered] = useState(false);
 
   const personQuery = usePersonDetailQuery(id, { enabled: isPeople && Boolean(id) });
-  const collectionQuery = useLibraryCollectionDetailQuery(id, { enabled: !isPeople && Boolean(id) });
+  const collectionQuery = useLibraryCollectionDetailQuery(id, {
+    enabled: !isPeople && Boolean(id),
+    language: metadataLanguage,
+  });
   const updatePersonStatusMutation = useUpdatePersonStatusMutation();
   const overrideBackdropMutation = useOverrideBackdropMutation();
   const uploadBackdropMutation = useUploadBackdropMutation();
@@ -112,8 +118,7 @@ export default function usePeopleCollectionDetailController({
   const starsStyleSheetText = `.rating-stars-overlay-dynamic { width: ${starsFillPercent}% !important; }`;
   const canChoosePeopleBackdrop = isPeople;
   const canChooseCollectionBackdrop = Boolean(
-    item?.collection_backdrops?.some((bd) => (!bd?.iso_639_1 || bd.iso_639_1 === '') && Number(bd?.width) >= 1280)
-    || item?.movies?.some((movie) => movie?.backdrop_path)
+    item?.collection_backdrops?.some((bd) => !bd?.iso_639_1 || bd.iso_639_1 === 'null' || bd.iso_639_1 === '')
   );
 
   const handlePeopleRatingMouseMove = (e) => {

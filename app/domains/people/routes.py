@@ -155,7 +155,7 @@ def update_person_status(
             db.add(override)
 
         if "user_rating" in fields_set:
-            override.user_rating = int(payload.user_rating) if payload.user_rating is not None else None
+            override.user_rating = float(payload.user_rating) if payload.user_rating is not None else None
             override.user_rating_at = datetime.now(timezone.utc) if payload.user_rating is not None else None
 
         if "is_favorite" in fields_set:

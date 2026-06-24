@@ -92,12 +92,32 @@ export default function TMDBImageGrid({
             ? collectionDetail.images.posters
             : [];
 
-      return collectionPosterOptions.map((img) => ({
-        file_path: img.file_path || img.poster_path || img.path,
-        width: img.width,
-        height: img.height,
-        vote_average: img.vote_average,
-      }));
+      const localeShort = String(metadataLanguage || '').split('-', 1)[0].toLowerCase();
+      return collectionPosterOptions.map((img) => {
+        const imgLang = String(img.iso_639_1 || '').toLowerCase();
+        let score = 0;
+        if (imgLang === String(metadataLanguage || '').toLowerCase()) {
+          score = 4;
+        } else if (localeShort && imgLang.split('-', 1)[0] === localeShort) {
+          score = 3;
+        } else if (imgLang === 'en' || imgLang === 'en-us') {
+          score = 2;
+        } else if (!imgLang || imgLang === 'null') {
+          score = 1;
+        }
+        return {
+          file_path: img.file_path || img.poster_path || img.path,
+          width: img.width,
+          height: img.height,
+          vote_average: img.vote_average,
+          score,
+        };
+      }).sort((a, b) => {
+        if (b.score !== a.score) {
+          return b.score - a.score;
+        }
+        return (b.vote_average || 0) - (a.vote_average || 0);
+      });
     }
 
     const activeMatch = fullMetadata?.matches?.find((m) => m.is_active);
