@@ -50,7 +50,7 @@ class CollectionDetailService(DetailFormatter):
             if collection:
                 if tmdb_details.get("backdrop_path"):
                     collection.backdrop_path = tmdb_details["backdrop_path"]
-                lang_code = ui_lang.split("-", 1)[0].lower()
+                lang_code = LanguageService.clean_locale(ui_lang)
                 loc = None
                 if collection.id is not None:
                     loc = db.query(MediaCollectionLocalization).filter(
@@ -85,7 +85,7 @@ class CollectionDetailService(DetailFormatter):
                         return f"{subfolder}/{filename}"
                     
                     asset_prefix = f"tmdb_{collection.external_id}"
-                    if loc.poster_path:
+                    if loc.poster_path and not loc.local_poster_path:
                         loc.local_poster_path = queue_image(loc.poster_path, "posters", asset_prefix)
                 except Exception as e:
                     logger.error(f"Failed to queue image download for collection detail: {e}")

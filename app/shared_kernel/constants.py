@@ -28,25 +28,28 @@ MIN_CACHED_IMAGE_BYTES = 512
 MEDIA_IMAGE_SUBFOLDERS = ["posters", "backdrops", "logos", "stills", "scene_stills", "people", "avatars"]
 
 TMDB_DOWNLOAD_SIZES = {
-    "posters": "w780",
+    "posters": "original",
     "backdrops": "original",
     "logos": "original",
-    "stills": "500",
-    "people": "h632",
-    "avatars": "w500"
+    "stills": "original",
+    "people": "original",
+    "avatars": "original"
 }
 
 MEDIA_IMAGE_LIMITS = {
     "backdrops": {"max_width": 3840},     # 4K limit
-    "posters": {"max_width": 780},        # 780 width limit
-    "people": {"max_height": 632},    # h632 height limit
-    "stills": {"max_width": 500},         # 500 width limit for episode/tv screenshots
-    "scene_stills": {"max_width": 3840},   # 3840 width limit (used as backdrops for adult scenes)
+    "posters": {"max_width": 3840},       # 4K limit
+    "people": {"max_width": 3840},        # 4K limit
+    "stills": {"max_width": 3840},         # 4K limit
+    "scene_stills": {"max_width": 3840},   # 3840 width limit
     "logos": None,                        # Keep original, no resize
     "avatars": {"max_width": 500}
 }
 
 MEDIA_THUMBNAIL_LIMITS = {
+    "posters": {"max_width": 500},
+    "people": {"max_height": 632},
+    "stills": {"max_width": 500},
     "scene_stills": {"max_width": 500}
 }
 

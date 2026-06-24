@@ -4,6 +4,13 @@ from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 
 
 class LanguageService:
+    @staticmethod
+    def clean_locale(locale: Optional[str]) -> str:
+        """Normalizes a language/locale string to its short, lowercase form (e.g. 'en-US' -> 'en')."""
+        if not locale:
+            return ""
+        return str(locale).split("-", 1)[0].strip().lower()
+
     """
     Central service coordinating request locale resolution, fallback language prioritization,
     and cache invalidation patterns for metadata synchronization.
@@ -19,7 +26,7 @@ class LanguageService:
         if provider != Provider.TMDB or not preferred_language:
             return None
 
-        clean_lang = preferred_language.split("-", 1)[0].strip().lower()
+        clean_lang = LanguageService.clean_locale(preferred_language)
         return clean_lang if clean_lang else None
 
     @staticmethod
@@ -34,16 +41,16 @@ class LanguageService:
         Falls back to global metadata settings, then to standard fallback.
         """
         if user_override_language:
-            clean_override = user_override_language.split("-", 1)[0].strip().lower()
+            clean_override = LanguageService.clean_locale(user_override_language)
             if clean_override:
                 return clean_override
 
         if global_metadata_language:
-            clean_global = global_metadata_language.split("-", 1)[0].strip().lower()
+            clean_global = LanguageService.clean_locale(global_metadata_language)
             if clean_global:
                 return clean_global
 
-        return global_fallback_language.split("-", 1)[0].strip().lower()
+        return LanguageService.clean_locale(global_fallback_language)
 
     @staticmethod
     def get_best_localization(
@@ -60,18 +67,18 @@ class LanguageService:
         if not localizations:
             return None
 
-        target_lang = target_language.split("-", 1)[0].strip().lower()
-        fallback_lang = fallback_language.split("-", 1)[0].strip().lower()
+        target_lang = LanguageService.clean_locale(target_language)
+        fallback_lang = LanguageService.clean_locale(fallback_language)
 
         # Try to find exact target language match
         for loc in localizations:
-            loc_locale = getattr(loc, "locale", "").split("-", 1)[0].strip().lower()
+            loc_locale = LanguageService.clean_locale(getattr(loc, "locale", ""))
             if loc_locale == target_lang:
                 return loc
 
         # Try to find fallback language match
         for loc in localizations:
-            loc_locale = getattr(loc, "locale", "").split("-", 1)[0].strip().lower()
+            loc_locale = LanguageService.clean_locale(getattr(loc, "locale", ""))
             if loc_locale == fallback_lang:
                 return loc
 

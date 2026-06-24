@@ -282,12 +282,13 @@ class OverridesService:
             return {"status": "success", "item_id": item_id}
 
         from app.domains.library.models import MediaItem, ExtraFile
-        item = self.db.query(MediaItem).filter(MediaItem.id == int(item_id)).first()
-        if not item:
-            raise NotFoundException("Target item not found")
+        media_item_id, metadata_match_id = self.resolver.resolve_ids(item_id)
+        item = None
+        if media_item_id:
+            item = self.db.query(MediaItem).filter(MediaItem.id == media_item_id).first()
 
         # Convert to extra if main_type is bonus
-        if request.main_type == "bonus" and request.parent_id is not None:
+        if item and request.main_type == "bonus" and request.parent_id is not None:
             from app.shared_kernel.enums import ExtraCategory, ExtraSubtype
             parent_item = self.db.query(MediaItem).filter(MediaItem.id == int(request.parent_id)).first()
             if parent_item:
@@ -309,7 +310,7 @@ class OverridesService:
             return {"status": "success", "item_id": item_id}
 
         # Handle conversion between movie and episode
-        if request.main_type in ("movie", "episode"):
+        if item and request.main_type in ("movie", "episode"):
             parsed = dict(item.parsed_info) if item.parsed_info else {}
             old_type = parsed.get("type")
             if not old_type:
@@ -369,20 +370,21 @@ class OverridesService:
             m_override.custom_language = request.language
             language_updated = True
 
-        if language_updated and m_override.custom_language:
+        if item and language_updated and m_override.custom_language:
             self._enrich_language_if_needed(item, m_override.custom_language)
 
         # Edition, Audio Type, Source overrides
-        from app.shared_kernel.enums import MovieEdition, MediaAudioType, MediaSource
-        if request.custom_edition is not None:
-            val = request.custom_edition
-            item.custom_edition = MovieEdition.NONE if (val == "none" or not val) else MovieEdition(val.lower())
-        if request.custom_audio_type is not None:
-            val = request.custom_audio_type
-            item.custom_audio_type = MediaAudioType.NONE if (val == "none" or not val) else MediaAudioType(val.lower())
-        if request.custom_source is not None:
-            val = request.custom_source
-            item.custom_source = MediaSource.NONE if (val == "none" or not val) else MediaSource(val.lower())
+        if item:
+            from app.shared_kernel.enums import MovieEdition, MediaAudioType, MediaSource
+            if request.custom_edition is not None:
+                val = request.custom_edition
+                item.custom_edition = MovieEdition.NONE if (val == "none" or not val) else MovieEdition(val.lower())
+            if request.custom_audio_type is not None:
+                val = request.custom_audio_type
+                item.custom_audio_type = MediaAudioType.NONE if (val == "none" or not val) else MediaAudioType(val.lower())
+            if request.custom_source is not None:
+                val = request.custom_source
+                item.custom_source = MediaSource.NONE if (val == "none" or not val) else MediaSource(val.lower())
 
         # Rating, comments, favorite
         if request.user_rating is not None:
@@ -407,7 +409,7 @@ class OverridesService:
             p_override.resume_position = int(request.resume_position or 0)
 
         # Season & Episode updates in parsed_info
-        if request.season is not None or request.episode is not None:
+        if item and (request.season is not None or request.episode is not None):
             parsed = dict(item.parsed_info) if item.parsed_info else {}
             if request.season is not None:
                 parsed["season"] = request.season
@@ -423,7 +425,7 @@ class OverridesService:
             self._shift_tv_episode_match_if_needed(item, parsed, request.season, request.episode, m_override.custom_language, bool(request.reset_match))
 
         # Reset Match
-        if request.reset_match:
+        if item and request.reset_match:
             from app.shared_kernel.enums import ItemStatus
             item.status = ItemStatus.NEW
             for match in item.matches:

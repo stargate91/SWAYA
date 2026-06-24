@@ -139,12 +139,46 @@ class LibraryListingService:
         )
         people_count = len(people_items) if people_items else 0
         
+        # Collections count
+        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+        settings = DbSettingsAdapter(self.db)
+        collection_mode = settings.get_setting("folder_collection_mode")
+        threshold = settings.get_setting("folder_collection_threshold")
+        create_collection_dir = settings.get_setting("folder_create_collection_dir")
+
+        if not collection_mode:
+            if create_collection_dir is False:
+                collection_mode = "never"
+            else:
+                collection_mode = "threshold"
+
+        try:
+            threshold = max(1, int(threshold or 3))
+        except (TypeError, ValueError):
+            threshold = 3
+
+        if collection_mode == "never":
+            col_cnt = 0
+        else:
+            from sqlalchemy import func
+            min_count = threshold if collection_mode == "threshold" else 1
+            col_cnt = self.db.query(MetadataMatch.collection_id).join(
+                MediaItem, MetadataMatch.media_item_id == MediaItem.id
+            ).filter(
+                MediaItem.status.in_(lib_statuses),
+                MetadataMatch.media_type == MediaType.MOVIE,
+                MetadataMatch.is_active == True,
+                MetadataMatch.collection_id != None,
+                MetadataMatch.is_adult == include_adult
+            ).group_by(MetadataMatch.collection_id).having(func.count(MediaItem.id) >= min_count).count()
+
         if include_adult:
             return {
                 "adult": movies_cnt_query.count(),
                 "adult_tv": tv_shows_count,
                 "adult_scenes": scenes_cnt_query.count(),
                 "adult_people": people_count,
+                "adult_collections": col_cnt,
             }
         else:
             return {
@@ -152,6 +186,7 @@ class LibraryListingService:
                 "tv": tv_shows_count,
                 "scenes": scenes_cnt_query.count(),
                 "people": people_count,
+                "collections": col_cnt,
             }
 
     def get_library_tab_page(

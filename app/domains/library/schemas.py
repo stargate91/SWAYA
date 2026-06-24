@@ -205,10 +205,12 @@ class LibraryTabCounts(BaseModel):
     tv: Optional[int] = None
     scenes: Optional[int] = None
     people: Optional[int] = None
+    collections: Optional[int] = None
     adult: Optional[int] = None
     adult_tv: Optional[int] = None
     adult_scenes: Optional[int] = None
     adult_people: Optional[int] = None
+    adult_collections: Optional[int] = None
 
 class LibraryTabResponse(BaseModel):
     tab: str

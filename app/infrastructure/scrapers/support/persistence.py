@@ -99,15 +99,7 @@ class ScraperPersister:
         self.db = db
 
     def _local_image_exists(self, path: Optional[str], subfolder: str) -> bool:
-        if not path or not path.startswith(f"{subfolder}/"):
-            return False
-        try:
-            from app.domains.tasks import task_manager
-            filename = os.path.basename(path)
-            orig_path = task_manager.download_worker.image_service.get_original_path(subfolder, filename)
-            return bool(task_manager.download_worker.image_service.exists(orig_path))
-        except Exception:
-            return False
+        return bool(path and path.startswith(f"{subfolder}/"))
 
     def persist_normalized_scene(
         self,
@@ -352,7 +344,8 @@ class ScraperPersister:
                 
                 if collection:
                     from app.domains.metadata.models import MediaCollectionLocalization
-                    lang_code = language.split("-", 1)[0].lower()
+                    from app.shared_kernel.language import LanguageService
+                    lang_code = LanguageService.clean_locale(language)
                     loc = None
                     if collection.id is not None:
                         loc = self.db.query(MediaCollectionLocalization).filter(

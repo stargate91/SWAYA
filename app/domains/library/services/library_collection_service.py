@@ -36,7 +36,7 @@ class LibraryCollectionService:
         try:
             val = self.settings.get_setting("ui_language")
             if val:
-                ui_lang = str(val).split("-", 1)[0].strip().lower()
+                ui_lang = LangHelper.clean_locale(val)
         except:
             pass
 
@@ -85,7 +85,7 @@ class LibraryCollectionService:
                         if details.get("backdrop_path"):
                             collection.backdrop_path = details["backdrop_path"]
                         from app.domains.metadata.models import MediaCollectionLocalization
-                        lang_code = ui_lang.split("-", 1)[0].lower()
+                        lang_code = LangHelper.clean_locale(ui_lang)
                         col_loc = MediaCollectionLocalization(
                             collection=collection,
                             locale=lang_code,
@@ -114,7 +114,7 @@ class LibraryCollectionService:
                                 return f"{subfolder}/{filename}"
                             
                             asset_prefix = f"tmdb_{collection.external_id}"
-                            if col_loc.poster_path:
+                            if col_loc.poster_path and not col_loc.local_poster_path:
                                 col_loc.local_poster_path = queue_image(col_loc.poster_path, "posters", asset_prefix)
                         except Exception as e:
                             logger.error(f"Failed to queue image download for collection: {e}")
@@ -123,20 +123,6 @@ class LibraryCollectionService:
                 except Exception as e:
                     self.db.rollback()
                     logger.error(f"Failed to fetch/save collection details on-the-fly: {e}")
-
-            if col_loc and col_loc.local_poster_path:
-                try:
-                    import os
-                    from app.domains.tasks import task_manager
-                    image_service = task_manager.download_worker.image_service
-                    filename = os.path.basename(col_loc.local_poster_path)
-                    thumb_path = image_service.get_thumbnail_path("posters", filename)
-                    if not image_service.exists(thumb_path) and col_loc.poster_path:
-                        url = image_service.get_download_url(col_loc.poster_path, "posters")
-                        if url:
-                            task_manager.download_worker.enqueue_download(url, "posters", filename)
-                except Exception as e:
-                    logger.error(f"Failed to verify or heal collection thumbnail: {e}")
 
             collection_title = col_loc.title if col_loc and col_loc.title else f"Collection {collection.external_id}"
 
