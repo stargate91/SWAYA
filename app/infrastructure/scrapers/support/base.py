@@ -137,6 +137,17 @@ class BaseScraper:
             eye_color
             hair_color
             height
+            weight
+            aliases
+            details
+            tattoos {
+              body_part
+              description
+            }
+            piercings {
+              body_part
+              description
+            }
             measurements {
               cup_size
               band_size

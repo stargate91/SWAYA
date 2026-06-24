@@ -453,6 +453,131 @@ class ScannerService:
             ScannerService.scan_status["can_stop"] = False
             ScannerService.scan_status["stop_requested"] = False
 
+    def start_retry(
+        self,
+        mode: Optional[Any] = None,
+        include_adult: Optional[bool] = None,
+        provider: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        with ScannerService.scan_status_lock:
+            if ScannerService.scan_status.get("active"):
+                return {"status": "error", "message": f"Task already in progress: {ScannerService.scan_status.get('phase')}"}
+            
+            ScannerService.scan_status.update({
+                "active": True,
+                "phase": "starting",
+                "current": 0,
+                "total": 0,
+                "start_time": time.time(),
+                "can_stop": True,
+                "stop_requested": False,
+                "current_file_progress": 0.0,
+                "last_completed": 0,
+            })
+                
+        # Register task in the new db task manager
+        task_id = self.task_manager.create_task("Library Scan (Retry)")
+        
+        # Run background job
+        self.task_manager.start_task(task_id, self._run_retry, mode, include_adult, provider)
+        return {"message": "Retry started in background"}
+
+    async def _run_retry(
+        self,
+        task_id: int,
+        mode: Optional[Any] = None,
+        include_adult: Optional[bool] = None,
+        provider: Optional[str] = None,
+    ):
+        self.task_manager.download_worker.is_paused = True
+        scan_mode = mode if mode is not None else ScanMode.MOVIES_TV
+        
+        with ScannerService.scan_status_lock:
+            ScannerService.scan_status.update({
+                "active": True,
+                "phase": "starting",
+                "current": 0,
+                "total": 0,
+                "start_time": time.time(),
+                "can_stop": True,
+                "stop_requested": False,
+            })
+            
+        logger.info("[scan:%s] Starting background scan retry | task_id=%s | provider=%s", scan_mode.value, task_id, provider)
+        try:
+            # Retrieve all items matching the active scan mode that are currently in review-needed statuses
+            review_statuses = [ItemStatus.NO_MATCH, ItemStatus.UNCERTAIN, ItemStatus.MULTIPLE, ItemStatus.ERROR]
+            all_items = self.db.query(MediaItem).filter(MediaItem.status.in_(review_statuses)).all()
+            
+            items_to_retry = []
+            for item in all_items:
+                item_scan_mode = (item.parsed_info or {}).get("scan_mode") or ""
+                if scan_mode == ScanMode.SCENES:
+                    match = (item_scan_mode == "scenes")
+                elif scan_mode == ScanMode.MOVIES_TV:
+                    match = (item_scan_mode in {"", "movies_tv", "porndb_movie"})
+                else:
+                    match = (item_scan_mode == scan_mode.value)
+                
+                if match:
+                    items_to_retry.append(item)
+            
+            logger.info("[scan:%s] Found %s items to retry resolving.", scan_mode.value, len(items_to_retry))
+            
+            if items_to_retry and not self._is_stop_requested():
+                for item in items_to_retry:
+                    item.status = ItemStatus.NEW
+                    self.db.query(MetadataMatch).filter(MetadataMatch.media_item_id == item.id).delete()
+                self.db.commit()
+                
+                with ScannerService.scan_status_lock:
+                    ScannerService.scan_status["phase"] = "resolving"
+                    ScannerService.scan_status["current"] = 0
+                    ScannerService.scan_status["total"] = len(items_to_retry)
+                    
+                if self.scan_resolver_factory:
+                    resolver = self.scan_resolver_factory(
+                        self.db,
+                        mode=scan_mode,
+                        stop_checker=self._is_stop_requested,
+                        include_adult=include_adult,
+                        provider=provider,
+                    )
+                else:
+                    raise RuntimeError("scan_resolver_factory is required but not provided")
+                
+                def resolve_progress_cb(current, total):
+                    with ScannerService.scan_status_lock:
+                        ScannerService.scan_status["current"] = current
+                        ScannerService.scan_status["total"] = total
+                    progress = (current / total) * 100.0
+                    self.task_manager.update_progress(task_id, progress)
+                    
+                await asyncio.to_thread(resolver.resolve_all, items_to_retry, progress_callback=resolve_progress_cb, task_id=task_id)
+                logger.info("[scan:%s] Retry Resolver phase finished for %s items", scan_mode.value, len(items_to_retry))
+                
+                if not self._is_stop_requested():
+                    match_ids = []
+                    for item in items_to_retry:
+                        matches = self.db.query(MetadataMatch).filter(MetadataMatch.media_item_id == item.id).all()
+                        match_ids.extend([m.id for m in matches])
+                        
+                    if match_ids:
+                        logger.info("[scan:%s] Queueing %s match ids for people enrichment", scan_mode.value, len(match_ids))
+                        self.task_manager.people_enrich_worker.enqueue_enrich(match_ids)
+                        
+        except Exception as e:
+            logger.error(f"Scan retry task failed: {e}", exc_info=True)
+            raise e
+        finally:
+            logger.info("[scan:%s] Scan retry task finished", scan_mode.value)
+            self.task_manager.download_worker.is_paused = False
+            with ScannerService.scan_status_lock:
+                ScannerService.scan_status["active"] = False
+                ScannerService.scan_status["phase"] = "idle"
+                ScannerService.scan_status["can_stop"] = False
+                ScannerService.scan_status["stop_requested"] = False
+
 
 
 

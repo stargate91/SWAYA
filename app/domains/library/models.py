@@ -70,6 +70,10 @@ class MediaItem(Base):
     audio_type: Mapped[MediaAudioType] = mapped_column(SQLEnum(MediaAudioType), default=MediaAudioType.NONE, index=True)
     source: Mapped[MediaSource] = mapped_column(SQLEnum(MediaSource), default=MediaSource.NONE, index=True)
 
+    custom_edition: Mapped[Optional[MovieEdition]] = mapped_column(SQLEnum(MovieEdition), nullable=True, index=True)
+    custom_audio_type: Mapped[Optional[MediaAudioType]] = mapped_column(SQLEnum(MediaAudioType), nullable=True, index=True)
+    custom_source: Mapped[Optional[MediaSource]] = mapped_column(SQLEnum(MediaSource), nullable=True, index=True)
+
     status: Mapped[ItemStatus] = mapped_column(SQLEnum(ItemStatus), default=ItemStatus.NEW, index=True)
     ignored_previous_status: Mapped[Optional[ItemStatus]] = mapped_column(SQLEnum(ItemStatus), nullable=True)
     ignored_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True, index=True)

@@ -257,6 +257,8 @@
       },
       "folderTemplate": "Additional Scene Folder Pattern",
       "folderTemplateHint": "Optional final folder below the selected studio hierarchy. Leave blank to store scene files directly in the group folder.",
+      "createSceneSubdir": "Create Scene Folders",
+      "createSceneSubdirHint": "Give each scene its own folder.",
       "tagsTitle": "Scene Tags",
       "tagLimit": "Maximum Tags in Filename",
       "tagLimitHint": "Use 0 to omit tags. Positive values set the maximum number of tags in the filename.",

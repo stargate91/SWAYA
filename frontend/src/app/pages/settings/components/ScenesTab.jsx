@@ -7,6 +7,7 @@ import { FOLDER_SCENE_TAGS, SCENE_TAGS } from '../settingsTemplateTags.js';
 import { useTemplatePreview } from '../hooks';
 import { useSettingsFormContext } from '../SettingsFormContext.jsx';
 import TemplateFieldSection from './TemplateFieldSection.jsx';
+import SettingsLiveImpact from './SettingsLiveImpact.jsx';
 
 const formatPreviewDate = (format) => String(format || '%Y-%m-%d')
   .replaceAll('%Y', '2024')
@@ -168,20 +169,36 @@ export default function ScenesTab({
             disabled={isScanActive}
             onChange={handleChange('scene_grouping_mode')}
           />
-          <TemplateFieldSection
-            t={t}
-            inputRef={formInputs.folderScene}
-            label={t('settingsPage.sections.scenes.folderTemplate')}
-            hint={t('settingsPage.sections.scenes.folderTemplateHint')}
-            value={form.folder_scene_template}
-            disabled={isScanActive}
-            onChange={handleChange('folder_scene_template')}
-            placeholder="{year} - {title}"
-            tags={FOLDER_SCENE_TAGS}
-            fieldKey="folder_scene_template"
-            insertTag={insertTag}
-            previewText={folderPreview}
-          />
+          <div>
+            <Switch
+              id="folder_create_scene_subdir"
+              checked={form.folder_create_scene_subdir}
+              disabled={isScanActive}
+              onChange={handleCheckboxChange('folder_create_scene_subdir')}
+            >
+              {t('settingsPage.sections.scenes.createSceneSubdir') || 'Create separate folder for each scene'}
+            </Switch>
+            <span className="ui-field__hint settings-hint--block-compact">
+              {t('settingsPage.sections.scenes.createSceneSubdirHint') || 'Organize each scene into its own directory.'}
+            </span>
+
+            {form.folder_create_scene_subdir && (
+              <TemplateFieldSection
+                t={t}
+                inputRef={formInputs.folderScene}
+                label={t('settingsPage.sections.scenes.folderTemplate')}
+                value={form.folder_scene_template}
+                disabled={isScanActive}
+                onChange={handleChange('folder_scene_template')}
+                placeholder="{year} - {title}"
+                tags={FOLDER_SCENE_TAGS}
+                fieldKey="folder_scene_template"
+                insertTag={insertTag}
+                previewText={folderPreview}
+                className="settings-nested-block settings-nested-block--top"
+              />
+            )}
+          </div>
         </Stack>
       </Card>
 
@@ -269,6 +286,14 @@ export default function ScenesTab({
           </span>
         </Stack>
       </Card>
+
+      <SettingsLiveImpact
+        form={form}
+        t={t}
+        title={t('settingsPage.sections.liveImpact.title')}
+        eyebrow={t('settingsPage.sections.liveImpact.eyebrow')}
+        hint={t('settingsPage.sections.liveImpact.folderStructureHint')}
+      />
     </Stack>
   );
 }

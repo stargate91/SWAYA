@@ -60,6 +60,13 @@ class LibraryCollectionService:
             selectinload(MetadataMatch.overrides)
         ).all()
 
+        tmdb_scraper = None
+        try:
+            from app.infrastructure.scrapers.providers.tmdb import TMDBScraper
+            tmdb_scraper = TMDBScraper(self.db)
+        except Exception as e:
+            logger.error(f"Failed to initialize TMDBScraper in LibraryCollectionService: {e}")
+
         collections_map = {}
         normalized_search = search.strip().lower() if search else ""
 
@@ -69,6 +76,68 @@ class LibraryCollectionService:
                 continue
 
             col_loc = LangHelper.get_best_localization(collection.localizations, ui_lang) if collection.localizations else None
+            
+            if not col_loc and tmdb_scraper:
+                try:
+                    col_id_int = int(collection.external_id)
+                    details = tmdb_scraper.get_collection_details(col_id_int, language=ui_lang) or {}
+                    if details:
+                        if details.get("backdrop_path"):
+                            collection.backdrop_path = details["backdrop_path"]
+                        from app.domains.metadata.models import MediaCollectionLocalization
+                        lang_code = ui_lang.split("-", 1)[0].lower()
+                        col_loc = MediaCollectionLocalization(
+                            collection=collection,
+                            locale=lang_code,
+                            title=details.get("name") or f"Collection {col_id_int}",
+                            overview=details.get("overview"),
+                            poster_path=details.get("poster_path")
+                        )
+                        self.db.add(col_loc)
+                        
+                        try:
+                            from app.domains.tasks import task_manager
+                            image_service = task_manager.download_worker.image_service
+                            
+                            def queue_image(path: str, subfolder: str, prefix: str) -> Optional[str]:
+                                url = image_service.get_download_url(path, subfolder)
+                                if not url:
+                                    return None
+                                import os
+                                import re
+                                from urllib.parse import urlparse
+                                basename = os.path.basename(urlparse(path).path)
+                                ext = os.path.splitext(basename)[1].lower() or ".jpg"
+                                safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", prefix).strip("_")
+                                filename = f"{safe_prefix}_{basename}{ext}"
+                                task_manager.download_worker.enqueue_download(url, subfolder, filename)
+                                return f"{subfolder}/{filename}"
+                            
+                            asset_prefix = f"tmdb_{collection.external_id}"
+                            if col_loc.poster_path:
+                                col_loc.local_poster_path = queue_image(col_loc.poster_path, "posters", asset_prefix)
+                        except Exception as e:
+                            logger.error(f"Failed to queue image download for collection: {e}")
+                        
+                        self.db.commit()
+                except Exception as e:
+                    self.db.rollback()
+                    logger.error(f"Failed to fetch/save collection details on-the-fly: {e}")
+
+            if col_loc and col_loc.local_poster_path:
+                try:
+                    import os
+                    from app.domains.tasks import task_manager
+                    image_service = task_manager.download_worker.image_service
+                    filename = os.path.basename(col_loc.local_poster_path)
+                    thumb_path = image_service.get_thumbnail_path("posters", filename)
+                    if not image_service.exists(thumb_path) and col_loc.poster_path:
+                        url = image_service.get_download_url(col_loc.poster_path, "posters")
+                        if url:
+                            task_manager.download_worker.enqueue_download(url, "posters", filename)
+                except Exception as e:
+                    logger.error(f"Failed to verify or heal collection thumbnail: {e}")
+
             collection_title = col_loc.title if col_loc and col_loc.title else f"Collection {collection.external_id}"
 
             if normalized_search and normalized_search not in collection_title.lower():
@@ -77,17 +146,26 @@ class LibraryCollectionService:
             col_id = collection.id
             entry = collections_map.get(col_id)
             if not entry:
+                total_parts = 0
+                if tmdb_scraper:
+                    try:
+                        col_id_int = int(collection.external_id)
+                        details = tmdb_scraper.get_collection_details(col_id_int, language=ui_lang) or {}
+                        total_parts = len(details.get("parts", []) or [])
+                    except Exception as e:
+                        logger.error(f"Failed to get collection parts count: {e}")
+
                 entry = {
                     "id": f"collection_{collection.external_id}",
                     "tmdb_id": int(collection.external_id) if collection.external_id.isdigit() else 0,
                     "title": collection_title,
                     "overview": col_loc.overview if col_loc else None,
-                    "poster_path": col_loc.poster_path if col_loc else None,
+                    "poster_path": (col_loc.local_poster_path or col_loc.poster_path) if col_loc else None,
                     "has_local_poster": bool(col_loc and col_loc.local_poster_path),
-                    "poster_remote_path": None,
+                    "poster_remote_path": col_loc.poster_path if col_loc else None,
                     "backdrop_path": collection.backdrop_path,
                     "owned_count": 0,
-                    "total_count": 0,
+                    "total_count": total_parts,
                     "type": "collection",
                     "movies": []
                 }
@@ -98,7 +176,7 @@ class LibraryCollectionService:
             
             from app.shared_kernel.user_context import get_current_user_id
             current_uid = get_current_user_id()
-            o = next((ov for ov in match.overrides if ov.user_id == current_uid), None) if match.overrides else None
+            o = match.overrides if (match.overrides and match.overrides.user_id == current_uid) else None
             
             title = (o.custom_title if (o and o.custom_title) else None) or (loc.title if loc else (item.filename if item else "Unknown"))
             poster_path = (o.custom_poster if (o and o.custom_poster) else None) or (loc.poster_path if loc else None)
@@ -142,6 +220,7 @@ class LibraryCollectionService:
 
         filtered_collections = []
         for col in collections_map.values():
+            col["total_count"] = max(col["total_count"], col["owned_count"])
             if collection_mode == "never":
                 continue
             elif collection_mode == "threshold":

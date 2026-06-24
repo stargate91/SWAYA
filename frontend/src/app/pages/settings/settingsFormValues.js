@@ -65,6 +65,7 @@ export const SETTINGS_BASE_DEFAULTS = {
   naming_performer_sort: 'popularity',
   scene_grouping_mode: 'parent_studio_studio',
   folder_scene_template: '{date} - {title}',
+  folder_create_scene_subdir: true,
   naming_custom_tag: 'default',
   naming_video_exts: '.mkv, .mp4, .avi, .m4v, .mov, .wmv, .mpg, .mpeg',
   folder_organization_enabled: true,
@@ -244,6 +245,7 @@ export function getInitialFormValues(settingsData = null, t = null) {
     naming_performer_sort: getStringValue(settingsData.naming_performer_sort, defaults.naming_performer_sort),
     scene_grouping_mode: getStringValue(settingsData.scene_grouping_mode, defaults.scene_grouping_mode),
     folder_scene_template: getStringValue(settingsData.folder_scene_template, defaults.folder_scene_template),
+    folder_create_scene_subdir: getBooleanValue(settingsData.folder_create_scene_subdir, defaults.folder_create_scene_subdir),
     naming_custom_tag: getStringValue(settingsData.naming_custom_tag, defaults.naming_custom_tag),
     naming_video_exts: getStringValue(settingsData.naming_video_exts, defaults.naming_video_exts),
     folder_organization_enabled: getBooleanValue(

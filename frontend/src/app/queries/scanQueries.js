@@ -13,6 +13,10 @@ export const useScanMutation = () => useMutation({
   mutationFn: (payload) => api.scan.start(payload),
 });
 
+export const useScanRetryMutation = () => useMutation({
+  mutationFn: (payload) => api.scan.retry(payload),
+});
+
 export const useHydrateStatusQuery = () => useQuery({
   queryKey: ['hydrate-status'],
   queryFn: () => api.hydrate.getStatus(),

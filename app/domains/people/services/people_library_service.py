@@ -119,9 +119,11 @@ class PeopleLibraryService:
 
         people_list = []
         for person in people:
-            o = next((ov for ov in person.overrides if ov.user_id == self.user_id), None) if person.overrides else None
+            o = person.overrides if (person.overrides and person.overrides.user_id == self.user_id) else None
             
-            poster_path = (o.custom_poster if (o and o.custom_poster) else None) or person.local_profile_path or person.profile_path
+            from app.domains.media_assets.services.images import image_processing_service
+            raw_poster = (o.custom_poster if (o and o.custom_poster) else None) or person.local_profile_path or person.profile_path
+            poster_path = image_processing_service.resolve_image_url(raw_poster, "people")
             
             people_list.append(PeopleGroupItem(
                 id=person.id,

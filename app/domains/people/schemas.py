@@ -86,6 +86,8 @@ class PersonCreditItem(BaseModel):
     job: str
     character: Optional[str] = None
     in_library: bool
+    is_known_for: Optional[bool] = None
+    known_for_rank: Optional[int] = None
 
 class PersonFilmographyResponse(BaseModel):
     items: List[PersonCreditItem]
@@ -121,6 +123,15 @@ class PersonDetailResponse(BaseModel):
     initial_movie_credits_page: PersonFilmographyResponse
     initial_tv_credits_page: PersonFilmographyResponse
     initial_scene_credits_page: PersonFilmographyResponse
+
+
+class PersonStatusUpdate(BaseModel):
+    is_active: Optional[bool] = None
+    user_rating: Optional[float] = None
+    is_favorite: Optional[bool] = None
+    user_comment: Optional[str] = None
+
+
 
 
 

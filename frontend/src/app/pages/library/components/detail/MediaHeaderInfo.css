@@ -67,7 +67,7 @@
   filter: blur(14px);
 }
 
-.media-detail-page__details-group > * {
+.media-detail-page__details-group>* {
   position: relative;
   z-index: 1;
 }
@@ -123,7 +123,6 @@
 
 .media-detail-page__logo-container.clickable:hover .media-detail-page__logo {
   transform: scale(1.015);
-  filter: drop-shadow(0 12px 40px rgba(0, 0, 0, 0.65));
 }
 
 .media-detail-page__logo-container.clickable:hover .media-detail-page__fallback-title,
@@ -131,5 +130,3 @@
   transform: scale(1.01);
   color: var(--app-shell-color-accent, var(--color-text-primary));
 }
-
-

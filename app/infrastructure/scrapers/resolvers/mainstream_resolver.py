@@ -431,6 +431,8 @@ class MainstreamResolver:
                     item.planned_path = None
                 else:
                     item.status = ItemStatus.MATCHED
+
+            match.is_active = (i == 0 and item.status != ItemStatus.MULTIPLE)
             
             self.db.add(match)
             self.db.flush()

@@ -16,6 +16,7 @@ from app.shared_kernel.constants import (
     TMDB_DOWNLOAD_SIZES,
     MEDIA_IMAGE_SUBFOLDERS,
     MEDIA_IMAGE_LIMITS,
+    MEDIA_THUMBNAIL_LIMITS,
     MIN_CACHED_IMAGE_BYTES,
 )
 
@@ -111,13 +112,12 @@ class ImageProcessingService:
             shutil.copy2(orig, thumb)
             return True
 
-        if subfolder == "scene_stills":
-            limits = {"max_width": 780}
-        else:
-            limits = MEDIA_IMAGE_LIMITS.get(subfolder)
-            if not limits:
-                # No limits configured for this category (e.g. logos) -> skip thumbnail, use original
-                return True
+        limits = MEDIA_THUMBNAIL_LIMITS.get(subfolder) or MEDIA_IMAGE_LIMITS.get(subfolder)
+        if not limits:
+            # No limits configured for this category (e.g. logos) -> copy original to thumb path
+            thumb.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(orig, thumb)
+            return True
 
         thumb_temp = thumb.with_name(f"{thumb.name}.{uuid.uuid4().hex}.tmp")
         thumb.parent.mkdir(parents=True, exist_ok=True)
@@ -146,7 +146,8 @@ class ImageProcessingService:
                     already_in_bounds = False
 
             if already_in_bounds and subfolder != "scene_stills":
-                # Already in bounds, no thumbnail needed
+                # Already in bounds, copy original to thumbnail path
+                shutil.copy2(orig, thumb)
                 return True
 
             # 2. Resize if bounds exceeded
@@ -240,7 +241,7 @@ class ImageProcessingService:
         temp_path.replace(target_path)
         return str(target_path)
 
-    def resolve_image_url(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
+    def resolve_image_url(self, path: Optional[str], subfolder: str, size: Optional[str] = None) -> Optional[str]:
         """
         Resolves the image path/URL for the frontend.
         1. If it's a remote URL (HTTP/HTTPS), returns it directly.
@@ -250,15 +251,27 @@ class ImageProcessingService:
         if not path:
             return None
 
-        # 1. Remote URL fallback
-        if path.startswith(("http://", "https://")):
-            return path
-
         # 2. Local check
         normalized_path = path.replace("\\", "/").lstrip("/")
         path_parts = [part for part in normalized_path.split("/") if part]
         embedded_subfolder = path_parts[0] if len(path_parts) >= 2 else subfolder
         filename = path_parts[-1] if path_parts else os.path.basename(path)
+
+        if size is None:
+            if embedded_subfolder in ("backdrops", "scene_stills"):
+                size = "original"
+            else:
+                size = "w500"
+
+        # 1. Remote URL fallback
+        if path.startswith(("http://", "https://")):
+            if "image.tmdb.org/t/p/" in path:
+                parts = path.split("/t/p/")
+                if len(parts) == 2:
+                    subparts = parts[1].split("/", 1)
+                    if len(subparts) == 2:
+                        return f"{parts[0]}/t/p/{size}/{subparts[1]}"
+            return path
 
         if size == "original":
             orig_path = self.get_original_path(embedded_subfolder, filename)

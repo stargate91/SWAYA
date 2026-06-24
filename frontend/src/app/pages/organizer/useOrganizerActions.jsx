@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { useRenameMutation, getOrganizerQueryKey } from '../../queries';
+import { useRenameMutation, getOrganizerQueryKey, useScanRetryMutation } from '../../queries';
 import { useOrganizerRename } from './hooks/useOrganizerRename';
 import { useOrganizerScan } from './hooks/useOrganizerScan';
 
@@ -27,6 +27,32 @@ export function useOrganizerActions({
   const [isRenamePending, setIsRenamePending] = useState(false);
   const renameStartedRef = useRef(false);
   const renameMutation = useRenameMutation();
+  const retryMutation = useScanRetryMutation();
+
+  const handleRetryMatch = async () => {
+    if (isScanActive) {
+      return;
+    }
+
+    try {
+      const response = await retryMutation.mutateAsync({
+        mode: scanMode,
+        include_adult: includeAdult,
+        provider: provider,
+      });
+
+      if (response?.status === 'error') {
+        throw new Error(response.message);
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['scan-status'] });
+      queryClient.invalidateQueries({ queryKey: ['organizer'] });
+      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
+      toast(t('organizer.toasts.retryStarted') || 'Retrying match process...', 'success');
+    } catch (error) {
+      toast(error.message || t('organizer.toasts.retryFailed') || 'Failed to start retry.', 'danger');
+    }
+  };
 
   const {
     handleScanPaths,
@@ -89,9 +115,11 @@ export function useOrganizerActions({
     handleLoadAll,
     handleRename,
     handleScanPaths,
+    handleRetryMatch,
     isBrowseStarting,
     isLoadingAll,
     isRenamePending,
     isRenameStarting,
+    isRetryPending: retryMutation.isPending,
   };
 }

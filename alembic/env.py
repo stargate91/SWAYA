@@ -14,6 +14,11 @@ from app.shared_kernel.database import Base, SWAYA_DB_PATH
 # Import all models to register them on Base.metadata
 import app.domains.library.models  # noqa
 import app.domains.metadata.models  # noqa
+import app.domains.users.models  # noqa
+import app.domains.tasks.models  # noqa
+import app.domains.people.models  # noqa
+import app.domains.settings.models  # noqa
+import app.domains.history.models  # noqa
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

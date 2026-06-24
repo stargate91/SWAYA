@@ -30,7 +30,9 @@
     "rename": "Rename",
     "organizing": "Organizing...",
     "restoreDismissed": "Restore removed",
-    "removeAll": "Remove All"
+    "removeAll": "Remove All",
+    "retryMatch": "Retry Match",
+    "retrying": "Retrying..."
   },
   "emptyStates": {
     "notLoaded": {
@@ -94,6 +96,8 @@
     "inspectCopySuccess": "JSON copied to clipboard.",
     "inspectCopyFailed": "Oops! We couldn't copy the JSON.",
     "refreshRulesFailed": "Oops! We couldn't refresh the organizer rules.",
+    "retryStarted": "Retrying match process...",
+    "retryFailed": "Failed to start retry.",
     "bulkOverrideSeasonRequired": "Season number is required when converting items to episodes.",
     "bulkOverrideAutoNumberRequired": "Auto-numbering is required when converting items to episodes.",
     "bulkOverrideStartEpisodeInvalid": "Starting episode number must be a valid number.",

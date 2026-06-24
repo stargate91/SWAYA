@@ -78,11 +78,40 @@ class SceneDetailService(DetailFormatter):
         if not parent_logo:
             parent_images = parent_data.get("images") or []
             parent_logo = parent_images[0].get("url") if parent_images else None
-        
-        from app.domains.people.models import Person
-        cast = []
+        # Resolve local paths from DB match if it exists
+        match_db = db.query(MetadataMatch).filter(
+            MetadataMatch.external_id == scene_uuid,
+            MetadataMatch.media_type == MediaType.SCENE
+        ).first()
+
+        from app.domains.people.models import Person, MediaPersonLink
+        cast_by_name = {}
+
+        # 1. Add performers from local database match
+        if match_db:
+            for link in sorted(match_db.people, key=lambda x: x.order if x.order is not None else 0):
+                person = link.person
+                cast_by_name[person.name.lower()] = {
+                    "id": person.id,
+                    "name": person.name,
+                    "character": link.character_name,
+                    "job": link.role.value if hasattr(link.role, "value") else str(link.role),
+                    "profile_path": self._resolve_img(person.local_profile_path or person.profile_path, "people"),
+                    "popularity": person.rating_porndb if person.rating_porndb is not None else person.popularity or 0,
+                    "rating_porndb": person.rating_porndb,
+                    "scene_count": person.scene_count,
+                    "gender": person.gender
+                }
+
+        # 2. Add/merge performers from external scraper details
         for p_entry in scene_data.get("performers") or []:
             perf = p_entry.get("performer") or {}
+            perf_name = perf.get("name")
+            if not perf_name:
+                continue
+            if perf_name.lower() in cast_by_name:
+                continue
+
             p_images = perf.get("images") or []
             p_img = p_images[0].get("url") if p_images else None
             gender_str = str(perf.get("gender") or "").upper()
@@ -93,16 +122,18 @@ class SceneDetailService(DetailFormatter):
                 mapped_gender = 2
             elif gender_str:
                 mapped_gender = 3
-            
-            person_db = db.query(Person).filter(Person.name == perf.get("name")).first()
-            if person_db and (person_db.local_profile_path or person_db.profile_path):
+
+            person_db = db.query(Person).filter(Person.name == perf_name).first()
+            if person_db:
                 resolved_img = self._resolve_img(person_db.local_profile_path or person_db.profile_path, "people")
+                p_id = person_db.id
             else:
                 resolved_img = p_img
+                p_id = perf.get("id")
 
-            cast.append({
-                "id": perf.get("id"),
-                "name": perf.get("name"),
+            cast_by_name[perf_name.lower()] = {
+                "id": p_id,
+                "name": perf_name,
                 "character": None,
                 "job": "Actor",
                 "profile_path": resolved_img,
@@ -110,16 +141,13 @@ class SceneDetailService(DetailFormatter):
                 "rating_porndb": perf.get("rating_porndb"),
                 "scene_count": perf.get("scene_count"),
                 "gender": mapped_gender
-            })
+            }
+
+        cast = list(cast_by_name.values())
         
         from app.shared_kernel.user_context import get_current_user_id
         current_uid = get_current_user_id()
-        
-        # Resolve local paths from DB match if it exists
-        match_db = db.query(MetadataMatch).filter(
-            MetadataMatch.external_id == scene_uuid,
-            MetadataMatch.media_type == MediaType.SCENE
-        ).first()
+
         
         override = None
         if match_db:

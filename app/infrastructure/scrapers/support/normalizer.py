@@ -86,6 +86,7 @@ class ScraperNormalizer:
             collection = {
                 "external_id": str(belongs_to_collection["id"]),
                 "name": belongs_to_collection.get("name"),
+                "poster_path": belongs_to_collection.get("poster_path"),
                 "backdrop_path": belongs_to_collection.get("backdrop_path")
             }
 
@@ -100,7 +101,8 @@ class ScraperNormalizer:
                 "is_adult": False,
                 "tmdb_id": str(cast_member["id"]),
                 "character": cast_member.get("character"),
-                "performer_details": None
+                "performer_details": None,
+                "known_for_department": cast_member.get("known_for_department")
             })
 
         return {

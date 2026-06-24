@@ -4,7 +4,7 @@ import TvWatchedStats from './components/TvWatchedStats';
 
 export default function WatchedPanel() {
   const { state } = useMediaDetailContext();
-  const { isMovie } = state;
+  const { isMovie, isScene } = state;
 
-  return isMovie ? <MovieWatchedStats /> : <TvWatchedStats />;
+  return (isMovie || isScene) ? <MovieWatchedStats /> : <TvWatchedStats />;
 }

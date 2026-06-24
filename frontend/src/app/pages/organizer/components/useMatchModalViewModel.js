@@ -153,7 +153,7 @@ export default function useMatchModalViewModel({
       }
       return;
     }
-    if (candidate.is_active) {
+    if (candidate.is_active && targetRows.every(r => r.status === 'matched')) {
       toast(t('organizer.toasts.matchAlreadyActive'), 'info');
       return;
     }

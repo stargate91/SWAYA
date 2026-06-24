@@ -175,8 +175,10 @@ class ContinueWatchingItem(BaseModel):
     last_watched_at: Optional[str] = None
 
 class LibraryTabItem(BaseModel):
+    model_config = ConfigDict(extra="allow")
     id: Optional[Union[int, str]] = None
     title: str
+    name: Optional[str] = None
     year: Optional[int] = None
     poster_path: Optional[str] = None
     backdrop_path: Optional[str] = None
@@ -190,6 +192,12 @@ class LibraryTabItem(BaseModel):
     in_library: Optional[bool] = True
     release_date: Optional[str] = None
     user_rating: Optional[float] = None
+    is_favorite: Optional[bool] = None
+    is_active: Optional[bool] = None
+    gender: Optional[int] = None
+    library_count: Optional[int] = None
+    people_role: Optional[str] = None
+    is_adult_person: Optional[bool] = None
     people: Optional[List[Dict[str, Any]]] = None
 
 class LibraryTabCounts(BaseModel):
@@ -272,5 +280,4 @@ class MovieCollectionsResponse(BaseModel):
     page: int
     page_size: Optional[int] = None
     total_pages: int
-
 

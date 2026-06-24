@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse
 from app.shared_kernel.enums import MediaType, ItemStatus
 from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch
+from app.domains.users.models import UserOverride
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.shared_kernel.language import LanguageService
@@ -39,9 +40,65 @@ class CollectionDetailService(DetailFormatter):
         except Exception:
             tmdb_details = {}
             
+        if tmdb_details:
+            from app.domains.metadata.models import MediaCollection, MediaCollectionLocalization
+            from app.shared_kernel.enums import Provider
+            collection = db.query(MediaCollection).filter(
+                MediaCollection.provider == Provider.TMDB,
+                MediaCollection.external_id == str(collection_tmdb_id_int)
+            ).first()
+            if collection:
+                if tmdb_details.get("backdrop_path"):
+                    collection.backdrop_path = tmdb_details["backdrop_path"]
+                lang_code = ui_lang.split("-", 1)[0].lower()
+                loc = None
+                if collection.id is not None:
+                    loc = db.query(MediaCollectionLocalization).filter(
+                        MediaCollectionLocalization.collection_id == collection.id,
+                        MediaCollectionLocalization.locale == lang_code
+                    ).first()
+                if not loc:
+                    loc = MediaCollectionLocalization(
+                        collection=collection,
+                        locale=lang_code
+                    )
+                    db.add(loc)
+                loc.title = tmdb_details.get("name") or loc.title
+                loc.overview = tmdb_details.get("overview") or loc.overview
+                loc.poster_path = tmdb_details.get("poster_path") or loc.poster_path
+                try:
+                    from app.domains.tasks import task_manager
+                    image_service = task_manager.download_worker.image_service
+                    
+                    def queue_image(path: str, subfolder: str, prefix: str) -> Optional[str]:
+                        url = image_service.get_download_url(path, subfolder)
+                        if not url:
+                            return None
+                        import os
+                        import re
+                        from urllib.parse import urlparse
+                        basename = os.path.basename(urlparse(path).path)
+                        ext = os.path.splitext(basename)[1].lower() or ".jpg"
+                        safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", prefix).strip("_")
+                        filename = f"{safe_prefix}_{basename}{ext}"
+                        task_manager.download_worker.enqueue_download(url, subfolder, filename)
+                        return f"{subfolder}/{filename}"
+                    
+                    asset_prefix = f"tmdb_{collection.external_id}"
+                    if loc.poster_path:
+                        loc.local_poster_path = queue_image(loc.poster_path, "posters", asset_prefix)
+                except Exception as e:
+                    logger.error(f"Failed to queue image download for collection detail: {e}")
+
+                try:
+                    db.commit()
+                except Exception as e:
+                    db.rollback()
+                    logger.error(f"Failed to commit collection metadata: {e}")
+            
         local_items = db.query(MediaItem).join(MediaItem.matches).filter(
             MediaItem.status.in_([ItemStatus.ORGANIZED, ItemStatus.RENAMED]),
-            MediaItem.item_type == MediaType.MOVIE,
+            MetadataMatch.media_type == MediaType.MOVIE,
             MetadataMatch.collection_id != None,
             MetadataMatch.is_active == True,
         ).all()
@@ -60,12 +117,13 @@ class CollectionDetailService(DetailFormatter):
             active_match = next((m for m in item.matches if m.is_active), None)
             if not active_match:
                 continue
-            owned_tmdb_ids.add(active_match.tmdb_id)
+            active_match_tmdb_id = int(active_match.external_id) if active_match.external_id.isdigit() else 0
+            owned_tmdb_ids.add(active_match_tmdb_id)
             loc = LanguageService.get_best_localization(active_match.localizations, ui_lang)
             
             movies.append({
                 "id": item.id,
-                "tmdb_id": active_match.tmdb_id,
+                "tmdb_id": active_match_tmdb_id,
                 "library_item_id": item.id,
                 "title": loc.title if loc else item.filename,
                 "year": active_match.release_date.year if active_match.release_date else None,
@@ -73,7 +131,7 @@ class CollectionDetailService(DetailFormatter):
                 "backdrop_path": self._resolve_img(active_match.backdrop_path, "backdrops"),
                 "rating": active_match.rating_porndb or active_match.rating_tmdb or 0.0,
                 "rating_porndb": active_match.rating_porndb,
-                "type": item.item_type.value,
+                "type": active_match.media_type.value,
                 "path": item.current_path,
                 "in_library": True,
             })

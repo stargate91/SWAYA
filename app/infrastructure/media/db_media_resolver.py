@@ -11,7 +11,7 @@ class DbMediaResolver(MediaResolverPort):
     def __init__(self, db: Session):
         self.db = db
 
-    def resolve_ids(self, item_id: str) -> Tuple[Optional[int], Optional[int]]:
+    def resolve_ids(self, item_id: str, media_type: Optional[str] = None) -> Tuple[Optional[int], Optional[int]]:
         media_item_id = None
         metadata_match_id = None
 
@@ -22,8 +22,15 @@ class DbMediaResolver(MediaResolverPort):
                 MetadataMatch.external_id == tmdb_id
             ).first()
             if not match:
+                resolved_type = MediaType.MOVIE
+                if media_type:
+                    try:
+                        resolved_type = MediaType(media_type.lower())
+                    except ValueError:
+                        if media_type.lower() == 'tv':
+                            resolved_type = MediaType.TV
                 # Create a placeholder match record to link the override to
-                match = MetadataMatch(provider=Provider.TMDB, external_id=tmdb_id, media_type=MediaType.MOVIE)
+                match = MetadataMatch(provider=Provider.TMDB, external_id=tmdb_id, media_type=resolved_type)
                 self.db.add(match)
                 self.db.flush()
             metadata_match_id = match.id

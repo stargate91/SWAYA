@@ -8,7 +8,8 @@ from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch, MetadataLocalization
 from app.domains.users.models import UserOverride, Tag, user_override_tags
 from app.domains.people.models import MediaPersonLink
-from app.shared_kernel.enums import ItemStatus, MediaType
+from app.domains.people.services.people_library_service import PeopleLibraryService
+from app.shared_kernel.enums import ItemStatus, MediaType, Provider
 from app.shared_kernel.user_context import get_current_user_id
 from app.domains.library.schemas import (
     ContinueWatchingItem,
@@ -89,6 +90,70 @@ class LibraryListingService:
             ))
         return results
 
+    def _get_tab_counts(self, include_adult: bool) -> dict:
+        lib_statuses = [ItemStatus.RENAMED, ItemStatus.ORGANIZED]
+        
+        movies_cnt_query = self.db.query(MediaItem).select_from(MediaItem).join(MetadataMatch).filter(
+            MediaItem.status.in_(lib_statuses),
+            MetadataMatch.media_type == MediaType.MOVIE,
+            MetadataMatch.is_active == True,
+            MetadataMatch.is_adult == include_adult
+        )
+        
+        scenes_cnt_query = self.db.query(MediaItem).select_from(MediaItem).join(MetadataMatch).filter(
+            MediaItem.status.in_(lib_statuses),
+            MetadataMatch.media_type == MediaType.SCENE,
+            MetadataMatch.is_active == True,
+            MetadataMatch.is_adult == include_adult
+        )
+        
+        # Unique TV shows count
+        parent_ids = set()
+        current_parents = {
+            r[0] for r in self.db.query(MetadataMatch.parent_id).join(
+                MediaItem, MetadataMatch.media_item_id == MediaItem.id
+            ).filter(MediaItem.status.in_(lib_statuses), MetadataMatch.parent_id != None).all()
+        }
+        while current_parents:
+            parent_ids.update(current_parents)
+            current_parents = {
+                r[0] for r in self.db.query(MetadataMatch.parent_id).filter(
+                    MetadataMatch.id.in_(current_parents),
+                    MetadataMatch.parent_id != None
+                ).all()
+            }
+        tv_shows_count = self.db.query(MetadataMatch).filter(
+            MetadataMatch.id.in_(parent_ids),
+            MetadataMatch.media_type == MediaType.TV,
+            MetadataMatch.is_active == True,
+            MetadataMatch.is_adult == include_adult
+        ).count()
+        
+        # People count
+        people_service = PeopleLibraryService(self.db)
+        people_items = people_service.get_people_group(
+            role="all",
+            filter_status="active",
+            tab="adult_people" if include_adult else "people",
+            include_adult=include_adult,
+        )
+        people_count = len(people_items) if people_items else 0
+        
+        if include_adult:
+            return {
+                "adult": movies_cnt_query.count(),
+                "adult_tv": tv_shows_count,
+                "adult_scenes": scenes_cnt_query.count(),
+                "adult_people": people_count,
+            }
+        else:
+            return {
+                "movies": movies_cnt_query.count(),
+                "tv": tv_shows_count,
+                "scenes": scenes_cnt_query.count(),
+                "people": people_count,
+            }
+
     def get_library_tab_page(
         self,
         tab: str,
@@ -111,6 +176,20 @@ class LibraryListingService:
         """
         Retrieves a paginated, filtered, and sorted list of library items for a specific UI tab.
         """
+        if tab in ("people", "adult_people"):
+            return self._get_people_tab_page(
+                tab=tab,
+                page=page,
+                page_size=page_size,
+                sort_by=sort_by,
+                search=search,
+                filter_favorite=filter_favorite,
+                filter_gender=filter_gender,
+                people_role=people_role,
+                filter_status=filter_status,
+                include_adult=include_adult,
+            )
+
         query = self.db.query(MetadataMatch).outerjoin(
             MediaItem, MetadataMatch.media_item_id == MediaItem.id
         ).options(
@@ -132,23 +211,68 @@ class LibraryListingService:
                 MetadataMatch.media_item_id == None,
                 UserOverride.is_tracked == True
             )
+            if tab in ("tv", "adult_tv"):
+                query = query.filter(MetadataMatch.media_type == MediaType.TV)
+            elif tab in ("scenes", "adult_scenes"):
+                query = query.filter(MetadataMatch.media_type == MediaType.SCENE)
+            else:
+                query = query.filter(MetadataMatch.media_type == MediaType.MOVIE)
 
         else: # Default: owned
-            query = query.filter(
-                MetadataMatch.media_item_id != None,
-                MediaItem.status.in_(lib_statuses)
-            )
-
-        # Tab filters: movies vs tv vs adult/scenes
-        if tab in ("tv", "adult_tv"):
-            query = query.filter(MetadataMatch.media_type.in_([MediaType.TV, MediaType.EPISODE, MediaType.SEASON]))
-        elif tab in ("scenes", "adult_scenes"):
-            query = query.filter(MetadataMatch.media_type == MediaType.SCENE)
-        else:
-            query = query.filter(MetadataMatch.media_type == MediaType.MOVIE)
+            if tab in ("tv", "adult_tv"):
+                # Get parent/ancestor IDs for TV shows in library
+                parent_ids = set()
+                current_parents = {
+                    r[0] for r in self.db.query(MetadataMatch.parent_id).join(
+                        MediaItem, MetadataMatch.media_item_id == MediaItem.id
+                    ).filter(MediaItem.status.in_(lib_statuses), MetadataMatch.parent_id != None).all()
+                }
+                while current_parents:
+                    parent_ids.update(current_parents)
+                    current_parents = {
+                        r[0] for r in self.db.query(MetadataMatch.parent_id).filter(
+                            MetadataMatch.id.in_(current_parents), MetadataMatch.parent_id != None
+                        ).all()
+                    }
+                query = query.filter(
+                    MetadataMatch.id.in_(parent_ids),
+                    MetadataMatch.media_type == MediaType.TV,
+                    MetadataMatch.is_active == True,
+                )
+            else:
+                query = query.filter(
+                    MetadataMatch.media_item_id != None,
+                    MediaItem.status.in_(lib_statuses),
+                    MetadataMatch.is_active == True,
+                )
+                if tab in ("scenes", "adult_scenes"):
+                    query = query.filter(MetadataMatch.media_type == MediaType.SCENE)
+                else:
+                    query = query.filter(MetadataMatch.media_type == MediaType.MOVIE)
 
         # NSFW filter
         query = query.filter(MetadataMatch.is_adult == include_adult)
+
+        if filter_ownership not in ("tracked", "unowned") and tab not in ("tv", "adult_tv"):
+            canonical_match_ids = self.db.query(
+                func.min(MetadataMatch.id)
+            ).filter(
+                MetadataMatch.media_item_id != None,
+                MetadataMatch.is_active == True,
+                MetadataMatch.is_adult == include_adult,
+            )
+
+            if tab in ("scenes", "adult_scenes"):
+                canonical_match_ids = canonical_match_ids.filter(
+                    MetadataMatch.media_type == MediaType.SCENE
+                )
+            else:
+                canonical_match_ids = canonical_match_ids.filter(
+                    MetadataMatch.media_type == MediaType.MOVIE
+                )
+
+            canonical_match_ids = canonical_match_ids.group_by(MetadataMatch.media_item_id).subquery()
+            query = query.filter(MetadataMatch.id.in_(canonical_match_ids))
 
         # Search filter
         if search:
@@ -274,12 +398,24 @@ class LibraryListingService:
         total_items = query.count()
         items = query.offset((page - 1) * page_size).limit(page_size).all()
 
+        # Pre-fetch user overrides for metadata_matches
+        match_ids = [m.id for m in items]
+        overrides_dict = {}
+        if match_ids:
+            current_uid = get_current_user_id()
+            ovs = self.db.query(UserOverride).filter(
+                UserOverride.user_id == current_uid,
+                UserOverride.metadata_match_id.in_(match_ids)
+            ).all()
+            for ov in ovs:
+                overrides_dict[ov.metadata_match_id] = ov
+
         formatted_items = []
         for match in items:
             loc = match.localizations[0] if match.localizations else None
             item = match.media_item
             
-            o = next((ov for ov in match.overrides if ov.user_id == get_current_user_id()), None) if match.overrides else None
+            o = overrides_dict.get(match.id)
             title = (o.custom_title if (o and o.custom_title) else None) or (loc.title if loc else (item.filename if item else "Unknown"))
             poster_path = (o.custom_poster if (o and o.custom_poster) else None) or (loc.poster_path if loc else None)
             backdrop_path = (o.custom_backdrop if (o and o.custom_backdrop) else None) or (match.backdrop_path or None)
@@ -313,6 +449,8 @@ class LibraryListingService:
                 "rating_porndb": match.rating_porndb,
                 "rating_imdb": match.rating_imdb,
                 "type": match.media_type.value,
+                "tmdb_id": int(match.external_id) if (match.provider == Provider.TMDB and match.external_id and match.external_id.isdigit()) else None,
+                "tv_tmdb_id": int(match.external_id) if (match.media_type == MediaType.TV and match.provider == Provider.TMDB and match.external_id and match.external_id.isdigit()) else None,
                 "path": item.current_path if item else None,
                 "duration": (item.duration or 0.0) if item else 0.0,
                 "size": (item.size or 0) if item else 0,
@@ -324,35 +462,104 @@ class LibraryListingService:
 
         total_pages = (total_items + page_size - 1) // page_size if total_items > 0 else 1
 
-        lib_statuses = [ItemStatus.RENAMED, ItemStatus.ORGANIZED]
-        
-        movies_cnt_query = self.db.query(MediaItem).select_from(MediaItem).join(MetadataMatch).filter(
-            MediaItem.status.in_(lib_statuses), MetadataMatch.media_type == MediaType.MOVIE
-        )
-        tv_cnt_query = self.db.query(MediaItem).select_from(MediaItem).join(MetadataMatch).filter(
-            MediaItem.status.in_(lib_statuses), MetadataMatch.media_type.in_([MediaType.TV, MediaType.EPISODE, MediaType.SEASON])
-        )
-        adult_cnt_query = self.db.query(MediaItem).select_from(MediaItem).join(MetadataMatch).filter(
-            MediaItem.status.in_(lib_statuses), MetadataMatch.media_type == MediaType.SCENE
-        )
-        movies_cnt_query = movies_cnt_query.filter(MetadataMatch.is_adult == include_adult)
-        tv_cnt_query = tv_cnt_query.filter(MetadataMatch.is_adult == include_adult)
-        adult_cnt_query = adult_cnt_query.filter(MetadataMatch.is_adult == include_adult)
+        counts = self._get_tab_counts(include_adult)
 
-        if include_adult:
-            counts = {
-                "adult": movies_cnt_query.count(),
-                "adult_tv": tv_cnt_query.count(),
-                "adult_scenes": adult_cnt_query.count(),
-                "adult_people": 0
-            }
+        return LibraryTabResponse(
+            tab=tab,
+            items=formatted_items,
+            counts=counts,
+            owned_counts=counts,
+            total_items=total_items,
+            page=page,
+            page_size=page_size,
+            total_pages=total_pages,
+        )
+
+    def _get_people_tab_page(
+        self,
+        tab: str,
+        page: int,
+        page_size: int,
+        sort_by: str,
+        search: str,
+        filter_favorite: str,
+        filter_gender: str,
+        people_role: str,
+        filter_status: str,
+        include_adult: bool,
+    ) -> LibraryTabResponse:
+        people_service = PeopleLibraryService(self.db)
+        people_items = people_service.get_people_group(
+            role=people_role,
+            filter_status=filter_status,
+            tab=tab,
+            include_adult=include_adult,
+        )
+
+        if search:
+            search_lower = search.lower()
+            people_items = [
+                item for item in people_items
+                if search_lower in (item.name or "").lower()
+            ]
+
+        if filter_gender == "female":
+            people_items = [item for item in people_items if item.gender == 1]
+        elif filter_gender == "male":
+            people_items = [item for item in people_items if item.gender == 2]
+
+        if filter_favorite == "favorite":
+            people_items = [item for item in people_items if item.is_favorite]
+        elif filter_favorite == "not_favorite":
+            people_items = [item for item in people_items if not item.is_favorite]
+
+        if sort_by in ("library_count", "library_count_desc"):
+            people_items.sort(key=lambda item: (-(item.library_count or 0), -(item.rating or 0.0), (item.name or "").lower()))
+        elif sort_by == "library_count_asc":
+            people_items.sort(key=lambda item: ((item.library_count or 0), (item.rating or 0.0), (item.name or "").lower()))
+        elif sort_by in ("rating_desc", "user_rating_desc", "popularity_desc"):
+            people_items.sort(key=lambda item: (-(item.user_rating if item.user_rating is not None else item.rating or 0.0), -(item.library_count or 0), (item.name or "").lower()))
+        elif sort_by in ("user_rating_asc", "popularity_asc"):
+            people_items.sort(key=lambda item: ((item.user_rating if item.user_rating is not None else item.rating or 0.0), (item.library_count or 0), (item.name or "").lower()))
+        elif sort_by in ("name_desc", "title_desc"):
+            people_items.sort(key=lambda item: (item.name or "").lower(), reverse=True)
         else:
-            counts = {
-                "movies": movies_cnt_query.count(),
-                "tv": tv_cnt_query.count(),
-                "scenes": adult_cnt_query.count(),
-                "people": 0
+            people_items.sort(key=lambda item: (item.name or "").lower())
+
+        total_items = len(people_items)
+        paged_people = people_items[(page - 1) * page_size: page * page_size]
+        total_pages = (total_items + page_size - 1) // page_size if total_items > 0 else 1
+
+        formatted_items = [
+            {
+                "id": item.id,
+                "title": item.name,
+                "name": item.name,
+                "year": item.year,
+                "poster_path": item.poster_path,
+                "backdrop_path": None,
+                "rating": item.rating,
+                "rating_porndb": item.rating_porndb,
+                "rating_imdb": None,
+                "type": item.type,
+                "path": None,
+                "duration": 0.0,
+                "size": 0,
+                "in_library": True,
+                "release_date": None,
+                "user_rating": item.user_rating,
+                "is_favorite": item.is_favorite,
+                "is_active": item.is_active,
+                "gender": item.gender,
+                "library_count": item.library_count,
+                "people_role": item.people_role,
+                "is_adult_person": item.is_adult_person,
+                "external_ids": item.external_ids,
             }
+            for item in paged_people
+        ]
+
+        counts = self._get_tab_counts(include_adult)
 
         return LibraryTabResponse(
             tab=tab,

@@ -46,6 +46,10 @@ MEDIA_IMAGE_LIMITS = {
     "avatars": {"max_width": 500}
 }
 
+MEDIA_THUMBNAIL_LIMITS = {
+    "scene_stills": {"max_width": 500}
+}
+
 # Image Selection and Download Settings
 LOGO_MAX_DARK_PIXELS_RATIO = 0.2
 LOGO_MIN_LUMINANCE_RATIO = 0.32

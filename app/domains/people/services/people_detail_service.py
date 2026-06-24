@@ -5,13 +5,14 @@ from sqlalchemy import case, func
 from sqlalchemy.orm import Session, joinedload
 from fastapi import HTTPException
 
-from app.shared_kernel.enums import MediaType, ItemStatus, RoleType
+from app.shared_kernel.enums import MediaType, ItemStatus, RoleType, Provider
 from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch
-from app.domains.people.models import Person, PersonLocalization, MediaPersonLink
+from app.domains.people.models import Person, PersonLocalization, MediaPersonLink, ExternalSourceLink
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.shared_kernel.language import LanguageService
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.shared_kernel.user_context import get_current_user_id
 from app.domains.people.services.filmography_service import FilmographyService
 from app.domains.people.schemas import (
     PeopleSearchResponse,
@@ -26,11 +27,12 @@ logger = logging.getLogger(__name__)
 class PeopleDetailService:
     def __init__(self, db: Session, scrapers: ScraperGatewayPort):
         self.db = db
+        self.scrapers = scrapers
         self.tmdb = scrapers.tmdb(db)
         self.filmography_service = FilmographyService(db)
 
-    def _resolve_img(self, path: Optional[str], subfolder: str) -> Optional[str]:
-        return image_processing_service.resolve_image_url(path, subfolder)
+    def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
+        return image_processing_service.resolve_image_url(path, subfolder, size)
 
 
     def get_people(
@@ -46,10 +48,12 @@ class PeopleDetailService:
     ):
         db = self.db
         
+        statuses = [ItemStatus.RENAMED, ItemStatus.ORGANIZED]
+
         # Determine target match IDs linked to library items
         matched_match_ids = [
             m.id for m in db.query(MetadataMatch).join(MediaItem).filter(
-                MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED])
+                MediaItem.status.in_(statuses)
             ).filter(MetadataMatch.is_active == True).all()
         ]
         
@@ -64,7 +68,7 @@ class PeopleDetailService:
                 MetadataMatch.media_type.in_([MediaType.TV, MediaType.EPISODE, MediaType.SEASON]),
                 -func.coalesce(MetadataMatch.parent_id, MetadataMatch.id)
             ),
-            else_=func.coalesce(MetadataMatch.id)
+            else_=MetadataMatch.id
         )
 
         query = db.query(
@@ -165,12 +169,16 @@ class PeopleDetailService:
         person = db.query(Person).options(joinedload(Person.localizations)).filter(Person.id == person_id).first()
         if not person:
             raise HTTPException(status_code=404, detail="Person not found")
+        from app.domains.users.models import UserOverride
+
+        user_id = get_current_user_id() or 1
+        override = db.query(UserOverride).filter(
+            UserOverride.user_id == user_id,
+            UserOverride.person_id == person_id
+        ).first()
         
         ui_lang = DEFAULT_FALLBACK_LANGUAGE
         loc = LanguageService.get_best_localization(person.localizations, ui_lang)
-        
-        # Delegate credits lookups to FilmographyService
-        movies, tv, scenes = self.filmography_service.aggregate_credits(person_id)
         
         # Dynamically enrich from TMDB if tmdb_id is available and we lack images/biography
         ext_ids = person.external_ids or {}
@@ -178,26 +186,139 @@ class PeopleDetailService:
         if not tmdb_id and not person.is_adult and str(person_id).isdigit() and person_id < 100000000:
             tmdb_id = person_id
             
-        if tmdb_id and (not loc or not person.images):
+        # Dynamically enrich from TMDB if tmdb_id is available and we lack images/biography OR lack social links (like instagram_id)
+        if tmdb_id:
             try:
-                tmdb_details = self.tmdb.get_person_details(int(tmdb_id), language=ui_lang)
-                if tmdb_details:
-                    person.birthday = tmdb_details.get("birthday") or person.birthday
-                    person.place_of_birth = tmdb_details.get("place_of_birth") or person.place_of_birth
-                    person.deathday = tmdb_details.get("deathday") or person.deathday
-                    person.profile_path = tmdb_details.get("profile_path") or person.profile_path
-                    if tmdb_details.get("images", {}).get("profiles"):
-                        person.images = [p.get("file_path") for p in tmdb_details["images"]["profiles"]]
-                    if tmdb_details.get("biography"):
-                        if not loc:
-                            loc = PersonLocalization(person_id=person.id, locale=ui_lang, biography=tmdb_details["biography"])
-                            db.add(loc)
-                        else:
-                            loc.biography = tmdb_details["biography"]
-                    db.commit()
+                # We fetch if we lack basic info OR if we don't have external social IDs from TMDB yet
+                has_socials = any(k in ext_ids for k in ["instagram_id", "facebook_id", "twitter_id", "imdb_id"])
+                if not loc or not person.images or not person.known_for_department or not has_socials:
+                    tmdb_details = self.tmdb.get_person_details(int(tmdb_id), language=ui_lang)
+                    if tmdb_details:
+                        person.birthday = tmdb_details.get("birthday") or person.birthday
+                        person.place_of_birth = tmdb_details.get("place_of_birth") or person.place_of_birth
+                        person.deathday = tmdb_details.get("deathday") or person.deathday
+                        person.profile_path = tmdb_details.get("profile_path") or person.profile_path
+                        person.known_for_department = tmdb_details.get("known_for_department") or person.known_for_department
+                        if tmdb_details.get("images", {}).get("profiles"):
+                            person.images = [p.get("file_path") for p in tmdb_details["images"]["profiles"]]
+                        if tmdb_details.get("biography"):
+                            if not loc:
+                                loc = PersonLocalization(person_id=person.id, locale=ui_lang, biography=tmdb_details["biography"])
+                                db.add(loc)
+                            else:
+                                loc.biography = tmdb_details["biography"]
+                        
+                        ext_ids_from_tmdb = tmdb_details.get("external_ids") or {}
+                        imdb_id_from_tmdb = tmdb_details.get("imdb_id") or ext_ids_from_tmdb.get("imdb_id")
+                        current_ids = dict(person.external_ids or {})
+                        updated = False
+                        if imdb_id_from_tmdb and current_ids.get("imdb_id") != imdb_id_from_tmdb:
+                            current_ids["imdb_id"] = imdb_id_from_tmdb
+                            updated = True
+                        for key in ["facebook_id", "instagram_id", "twitter_id"]:
+                            val = ext_ids_from_tmdb.get(key)
+                            if val and current_ids.get(key) != val:
+                                current_ids[key] = val
+                                updated = True
+                        if updated:
+                            person.external_ids = current_ids
+
+                        db.commit()
             except Exception as e:
                 logger.error(f"Failed to dynamically enrich person {person_id}: {e}")
+        elif person.is_adult and (not loc or not person.measurements or not person.cup_size or not person.hair_color or not person.profile_path):
+            try:
+                from app.domains.people.services.people_enricher import PeopleEnricher
+                enricher = PeopleEnricher(db, scrapers=self.scrapers)
+                
+                # Gather links
+                links = db.query(ExternalSourceLink).filter(ExternalSourceLink.person_id == person_id).all()
+                link_data = [{"provider": l.provider, "external_id": l.external_id} for l in links]
+                
+                # Also check external_ids JSON field
+                for prov_name, ext_id in ext_ids.items():
+                    try:
+                         prov = Provider(prov_name.lower())
+                         if not any(ld["provider"] == prov for ld in link_data):
+                             link_data.append({"provider": prov, "external_id": str(ext_id)})
+                    except Exception:
+                         pass
+                
+                fetched_data = enricher.fetch_external_details(person.name, ext_ids, link_data, is_adult=True)
+                if fetched_data:
+                    enricher.apply_enriched_data(person, fetched_data)
+                    db.commit()
+                    db.refresh(person)
+                    loc = LanguageService.get_best_localization(person.localizations, ui_lang)
+            except Exception as e:
+                logger.error(f"Failed to dynamically enrich adult performer {person_id}: {e}", exc_info=True)
         
+        # Delegate combined credits lookup to FilmographyService
+        movies, tv, scenes, known_for = self.filmography_service.get_combined_filmography(
+            person_id,
+            tmdb_id=tmdb_id,
+            ui_lang=ui_lang,
+            tmdb_client=self.tmdb,
+            is_adult=person.is_adult,
+            known_for_department=person.known_for_department,
+            person_name=person.name
+        )
+
+        effective_backdrop = None
+        if override and override.custom_backdrop:
+            effective_backdrop = override.custom_backdrop
+        elif not person.is_adult and tmdb_id:
+            from app.domains.people.helpers import resolve_person_known_for_backdrop
+            effective_backdrop = resolve_person_known_for_backdrop(
+                db,
+                self.tmdb,
+                known_for,
+                [ui_lang],
+                department=person.known_for_department,
+                adult_only=person.is_adult,
+                respect_credit_order=True
+            )
+
+        external_ids = dict(person.external_ids or {})
+        if "tmdb" in external_ids and "tmdb_id" not in external_ids:
+            external_ids["tmdb_id"] = external_ids["tmdb"]
+        if "stashdb" in external_ids and "stashdb_id" not in external_ids:
+            external_ids["stashdb_id"] = external_ids["stashdb"]
+        if "porndb" in external_ids and "theporndb_id" not in external_ids:
+            external_ids["theporndb_id"] = external_ids["porndb"]
+        if "fansdb" in external_ids and "fansdb_id" not in external_ids:
+            external_ids["fansdb_id"] = external_ids["fansdb"]
+        
+        # Merge socials from person.socials or person.external_ids if they exist
+        if person.socials:
+            for k, v in person.socials.items():
+                if v and f"{k}_id" not in external_ids:
+                    external_ids[f"{k}_id"] = v
+        # Ensure fallback for imdb_id vs imdb
+        if "imdb" in external_ids and "imdb_id" not in external_ids:
+            external_ids["imdb_id"] = external_ids["imdb"]
+        elif "imdb_id" in external_ids and "imdb" not in external_ids:
+            external_ids["imdb"] = external_ids["imdb_id"]
+        external_ids["attributes"] = {
+            **dict(external_ids.get("attributes") or {}),
+            **({
+                "hair_color": person.hair_color,
+                "eye_color": person.eye_color,
+                "ethnicity": person.ethnicity,
+                "height": person.height,
+                "weight": person.weight,
+                "measurements": person.measurements,
+                "cup_size": person.cup_size,
+                "tattoos": person.tattoos,
+                "piercings": person.piercings,
+                "orientation": person.orientation,
+            }),
+        }
+        external_ids["attributes"] = {
+            key: value for key, value in external_ids["attributes"].items()
+            if value not in (None, "", [], {})
+        }
+
         result = {
             "id": person.id,
             "name": person.name,
@@ -212,12 +333,33 @@ class PeopleDetailService:
             "rating_porndb": person.rating_porndb,
             "known_for_department": person.known_for_department,
             "is_adult": person.is_adult,
-            "profile_path": self._resolve_img(person.profile_path, "people"),
-            "backdrop_path": None,
+            "profile_path": self._resolve_img((override.custom_poster if override and override.custom_poster else person.profile_path), "people"),
+            "backdrop_path": self._resolve_img(effective_backdrop, "backdrops", size="original"),
             "is_active": person.is_active,
-            "external_ids": person.external_ids or {},
+            "is_favorite": override.is_favorite if override else False,
+            "user_rating": override.user_rating if override else None,
+            "user_comment": override.user_comment if override else None,
+            "external_ids": external_ids,
             "images": [self._resolve_img(img, "people") for img in (person.images or [])],
-            "known_for": movies[:4],
+            "hair_color": person.hair_color,
+            "eye_color": person.eye_color,
+            "ethnicity": person.ethnicity,
+            "height": person.height,
+            "weight": person.weight,
+            "measurements": person.measurements,
+            "cup_size": person.cup_size,
+            "tattoos": person.tattoos,
+            "piercings": person.piercings,
+            "orientation": person.orientation,
+            "socials": person.socials or {},
+            "known_for": [
+                {
+                    **item,
+                    "poster_path": self._resolve_img(item.get("poster_path"), "posters") if item.get("poster_path") else None,
+                    "backdrop_path": self._resolve_img(item.get("backdrop_path"), "backdrops", size="original") if item.get("backdrop_path") else None,
+                }
+                for item in known_for[:8]
+            ],
             "total_movie_credits": len(movies),
             "total_tv_credits": len(tv),
             "total_scene_credits": len(scenes),
@@ -232,7 +374,34 @@ class PeopleDetailService:
         person = db.query(Person).filter(Person.id == person_id).first()
         if not person:
             raise HTTPException(status_code=404, detail="Person not found")
-        res = self.filmography_service.get_person_movies(person_id, page, page_size)
+        
+        ext_ids = person.external_ids or {}
+        tmdb_id = ext_ids.get("tmdb") or ext_ids.get("tmdb_id")
+        if not tmdb_id and not person.is_adult and str(person_id).isdigit() and person_id < 100000000:
+            tmdb_id = person_id
+
+        movies, _, _, _ = self.filmography_service.get_combined_filmography(
+            person_id,
+            tmdb_id=tmdb_id,
+            ui_lang=DEFAULT_FALLBACK_LANGUAGE,
+            tmdb_client=self.tmdb,
+            is_adult=person.is_adult,
+            known_for_department=person.known_for_department,
+            person_name=person.name
+        )
+        
+        total_items = len(movies)
+        total_pages = max(1, math.ceil(total_items / page_size))
+        start_idx = (page - 1) * page_size
+        sliced = movies[start_idx : start_idx + page_size]
+        
+        res = {
+            "items": sliced,
+            "page": page,
+            "page_size": page_size,
+            "total_items": total_items,
+            "total_pages": total_pages,
+        }
         return PersonFilmographyResponse(**res)
 
     def get_person_tv(self, person_id: int, page: int = 1, page_size: int = 12) -> PersonFilmographyResponse:
@@ -240,7 +409,34 @@ class PeopleDetailService:
         person = db.query(Person).filter(Person.id == person_id).first()
         if not person:
             raise HTTPException(status_code=404, detail="Person not found")
-        res = self.filmography_service.get_person_tv(person_id, page, page_size)
+
+        ext_ids = person.external_ids or {}
+        tmdb_id = ext_ids.get("tmdb") or ext_ids.get("tmdb_id")
+        if not tmdb_id and not person.is_adult and str(person_id).isdigit() and person_id < 100000000:
+            tmdb_id = person_id
+
+        _, tv, _, _ = self.filmography_service.get_combined_filmography(
+            person_id,
+            tmdb_id=tmdb_id,
+            ui_lang=DEFAULT_FALLBACK_LANGUAGE,
+            tmdb_client=self.tmdb,
+            is_adult=person.is_adult,
+            known_for_department=person.known_for_department,
+            person_name=person.name
+        )
+        
+        total_items = len(tv)
+        total_pages = max(1, math.ceil(total_items / page_size))
+        start_idx = (page - 1) * page_size
+        sliced = tv[start_idx : start_idx + page_size]
+        
+        res = {
+            "items": sliced,
+            "page": page,
+            "page_size": page_size,
+            "total_items": total_items,
+            "total_pages": total_pages,
+        }
         return PersonFilmographyResponse(**res)
 
     def get_person_scenes(self, person_id: int, page: int = 1, page_size: int = 12) -> PersonFilmographyResponse:
@@ -250,3 +446,98 @@ class PeopleDetailService:
             raise HTTPException(status_code=404, detail="Person not found")
         res = self.filmography_service.get_person_scenes(person_id, page, page_size)
         return PersonFilmographyResponse(**res)
+
+    def get_person_credit_backdrops(self, person_id: int, tmdb_id: int, media_type: str) -> Dict[str, Any]:
+        db = self.db
+        person = db.query(Person).filter(Person.id == person_id).first()
+        if not person:
+            raise HTTPException(status_code=404, detail="Person not found")
+
+        normalized_type = "tv" if str(media_type or "").lower() in {"tv", "series"} else "movie"
+        ui_lang = DEFAULT_FALLBACK_LANGUAGE
+
+        raw_data = self.tmdb.get_details(tmdb_id, normalized_type, language=ui_lang, include_images=True, append_parts=["images"])
+        backdrops = ((raw_data or {}).get("images") or {}).get("backdrops") or []
+        has_valid_backdrops = any((not bd.get("iso_639_1") or bd.get("iso_639_1") == "") and int(bd.get("width") or 0) >= 1280 for bd in backdrops)
+
+        # Resolve backdrop paths for frontend
+        resolved_backdrops = []
+        for bd in backdrops:
+            resolved_bd = dict(bd)
+            resolved_bd["file_path"] = self._resolve_img(bd.get("file_path"), "backdrops", size="original")
+            resolved_backdrops.append(resolved_bd)
+
+        return {
+            "tmdb_id": tmdb_id,
+            "media_type": normalized_type,
+            "title": raw_data.get("title") or raw_data.get("name") or raw_data.get("original_title") or raw_data.get("original_name"),
+            "backdrops": resolved_backdrops,
+            "has_valid_backdrops": has_valid_backdrops,
+        }
+
+    def update_person_backdrop(self, person_id: int, backdrop_path: str) -> Dict[str, Any]:
+        db = self.db
+        person = db.query(Person).filter(Person.id == person_id).first()
+        if not person:
+            raise HTTPException(status_code=404, detail="Person not found")
+
+        user_id = get_current_user_id() or 1
+        override = db.query(UserOverride).filter(
+            UserOverride.user_id == user_id,
+            UserOverride.person_id == person_id
+        ).first()
+        if not override:
+            override = UserOverride(user_id=user_id, person_id=person_id)
+            db.add(override)
+
+        override.custom_backdrop = backdrop_path
+        db.commit()
+
+        # Mark person as active on user interaction
+        person.is_active = True
+        db.commit()
+
+        return {
+            "status": "success",
+            "backdrop_path": self._resolve_img(backdrop_path, "backdrops", size="original"),
+            "has_local_backdrop": bool(backdrop_path)
+        }
+
+    def handle_person_backdrop_upload(self, person_id: int, filename: str, file_stream) -> Dict[str, Any]:
+        import os
+        import uuid
+        db = self.db
+        person = db.query(Person).filter(Person.id == person_id).first()
+        if not person:
+            raise HTTPException(status_code=404, detail="Person not found")
+
+        user_id = get_current_user_id() or 1
+        override = db.query(UserOverride).filter(
+            UserOverride.user_id == user_id,
+            UserOverride.person_id == person_id
+        ).first()
+        if not override:
+            override = UserOverride(user_id=user_id, person_id=person_id)
+            db.add(override)
+
+        img_service = image_processing_service
+        img_service.ensure_folders()
+
+        ext = os.path.splitext(filename)[1] or ".jpg"
+        new_filename = f"upload_{uuid.uuid4().hex}{ext}"
+        original_path = img_service.get_original_path("backdrops", new_filename)
+        thumbnail_path = img_service.get_thumbnail_path("backdrops", new_filename)
+
+        saved_path = img_service.write_upload(original_path, file_stream)
+        if not saved_path:
+            raise HTTPException(status_code=400, detail="Failed to save uploaded image")
+
+        img_service.generate_thumbnail(original_path, thumbnail_path, "backdrops")
+
+        override.custom_backdrop = new_filename
+        person.is_active = True
+        db.commit()
+
+        resolved_url = img_service.resolve_image_url(new_filename, "backdrops", size="original")
+        return {"status": "success", "backdrop_path": resolved_url, "has_local_backdrop": True}
+

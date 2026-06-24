@@ -82,9 +82,10 @@ class Formatter:
         media_type = getattr(match, "media_type", None) if match else None
         if not media_type:
             inferred = str((item.parsed_info or {}).get("type") or "").lower()
+            scan_mode = str((item.parsed_info or {}).get("scan_mode") or "").lower()
             if inferred == "episode":
                 media_type = MediaType.EPISODE
-            elif inferred == "scene":
+            elif inferred == "scene" or scan_mode == "scenes":
                 media_type = MediaType.SCENE
             else:
                 media_type = MediaType.MOVIE
@@ -135,10 +136,11 @@ class Formatter:
                     scenes_dir = getattr(self.config, "scenes_dir_name", "Scenes")
                     sub_path_parts.append(scenes_dir)
                 
-            folder_tmpl = self.config.folder_scene_template if media_type == MediaType.SCENE else self.config.folder_scene_template
-            if folder_tmpl:
-                scene_folder = self._render(folder_tmpl, context, is_file=False)
-                sub_path_parts.append(scene_folder)
+            if self.config.folder_create_scene_subdir:
+                folder_tmpl = self.config.folder_scene_template if media_type == MediaType.SCENE else self.config.folder_scene_template
+                if folder_tmpl:
+                    scene_folder = self._render(folder_tmpl, context, is_file=False)
+                    sub_path_parts.append(scene_folder)
                 
             sub_path_obj = Path()
             for p in sub_path_parts:
@@ -211,7 +213,16 @@ class Formatter:
         orig_path = self._get_absolute_path(item)
         target_name, target_subpath = self._get_target_name_and_subpath(item, match, loc)
         dest_root = self.config.library_path if self.config.move_to_library and self.config.library_path else os.path.dirname(orig_path)
-        media_type = getattr(match, "media_type", MediaType.MOVIE) if match else MediaType.MOVIE
+        media_type = getattr(match, "media_type", None) if match else None
+        if not media_type:
+            inferred = str((item.parsed_info or {}).get("type") or "").lower()
+            scan_mode = str((item.parsed_info or {}).get("scan_mode") or "").lower()
+            if inferred == "episode":
+                media_type = MediaType.EPISODE
+            elif inferred == "scene" or scan_mode == "scenes":
+                media_type = MediaType.SCENE
+            else:
+                media_type = MediaType.MOVIE
 
         preview = RenamePreview(
             item_id=item.id,

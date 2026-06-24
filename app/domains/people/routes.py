@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query, File, UploadFile
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -10,7 +10,9 @@ from app.domains.people.schemas import (
     PeopleSearchResponse,
     PersonDetailResponse,
     PersonFilmographyResponse,
+    PersonStatusUpdate,
 )
+from app.domains.users.schemas import ImageOverrideUpdate
 
 # Mainstream (SFW) People Router
 mainstream_router = APIRouter(prefix="/api/v1/mainstream/people", tags=["Mainstream People"])
@@ -106,4 +108,101 @@ def get_person_scenes(
     db: Session = Depends(get_db)
 ):
     return PeopleDetailService(db, scraper_gateway).get_person_scenes(person_id, page=page, page_size=page_size)
+
+
+@router.post("/{person_id}/status")
+def update_person_status(
+    person_id: int,
+    payload: PersonStatusUpdate,
+    db: Session = Depends(get_db)
+):
+    from datetime import datetime, timezone
+    from app.domains.users.models import UserOverride
+    from app.shared_kernel.user_context import get_current_user_id
+
+    person = db.query(Person).filter(Person.id == person_id).first()
+    if not person:
+        raise HTTPException(status_code=404, detail="Person not found")
+
+    user_id = get_current_user_id() or 1
+    fields_set = payload.model_fields_set
+
+    # 1. Update Person level fields
+    if "is_active" in fields_set and payload.is_active is not None:
+        person.is_active = payload.is_active
+
+    # Auto-activate on user interaction
+    has_user_interaction = (
+        ("user_rating" in fields_set and payload.user_rating is not None)
+        or ("is_favorite" in fields_set and payload.is_favorite)
+        or ("user_comment" in fields_set and payload.user_comment is not None)
+    )
+    if has_user_interaction:
+        person.is_active = True
+
+    # 2. Update UserOverride fields
+    if has_user_interaction or "is_active" in fields_set:
+        override = db.query(UserOverride).filter(
+            UserOverride.user_id == user_id,
+            UserOverride.person_id == person_id
+        ).first()
+
+        if not override:
+            override = UserOverride(
+                user_id=user_id,
+                person_id=person_id
+            )
+            db.add(override)
+
+        if "user_rating" in fields_set:
+            override.user_rating = int(payload.user_rating) if payload.user_rating is not None else None
+            override.user_rating_at = datetime.now(timezone.utc) if payload.user_rating is not None else None
+
+        if "is_favorite" in fields_set:
+            override.is_favorite = payload.is_favorite if payload.is_favorite is not None else False
+            override.is_favorite_at = datetime.now(timezone.utc) if payload.is_favorite else None
+
+        if "user_comment" in fields_set:
+            override.user_comment = payload.user_comment
+            override.user_comment_at = datetime.now(timezone.utc) if payload.user_comment else None
+
+    db.commit()
+    return {"status": "ok", "is_active": person.is_active}
+
+
+@router.get("/{person_id}/credit-backdrops")
+def get_person_credit_backdrops(
+    person_id: int,
+    tmdb_id: int = Query(..., ge=1),
+    media_type: str = Query(...),
+    db: Session = Depends(get_db)
+):
+    return PeopleDetailService(db, scraper_gateway).get_person_credit_backdrops(
+        person_id, tmdb_id=tmdb_id, media_type=media_type
+    )
+
+
+@router.post("/{person_id}/backdrop")
+def update_person_backdrop(
+    person_id: int,
+    payload: ImageOverrideUpdate,
+    db: Session = Depends(get_db)
+):
+    path = payload.path or payload.url or payload.backdrop_path
+    if not path:
+        raise HTTPException(status_code=400, detail="Backdrop path/url is required")
+    return PeopleDetailService(db, scraper_gateway).update_person_backdrop(person_id, path)
+
+
+@router.post("/{person_id}/upload-backdrop")
+def upload_person_backdrop(
+    person_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db)
+):
+    return PeopleDetailService(db, scraper_gateway).handle_person_backdrop_upload(
+        person_id, file.filename, file.file
+    )
+
+
 

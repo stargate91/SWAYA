@@ -19,6 +19,11 @@ class ScanRequest(BaseModel):
 class RenameRequest(BaseModel):
     item_ids: Optional[List[int]] = None
 
+class RetryRequest(BaseModel):
+    mode: ScanMode = ScanMode.MOVIES_TV
+    include_adult: Optional[bool] = None
+    provider: Optional[str] = None
+
 @router.get("/scan-status")
 def get_scan_status(db: Session = Depends(get_db)):
     return ScannerService(db).get_scan_status()
@@ -41,6 +46,15 @@ def start_scan(request: ScanRequest, db: Session = Depends(get_db)):
     return ScannerService(db, scan_resolver_factory=ScanResolver).start_scan(
         request.paths,
         request.stop_after,
+        request.mode,
+        request.include_adult,
+        request.provider,
+    )
+
+@router.post("/scan/retry")
+def start_retry(request: RetryRequest, db: Session = Depends(get_db)):
+    from app.infrastructure.scrapers.scan_resolver import ScanResolver
+    return ScannerService(db, scan_resolver_factory=ScanResolver).start_retry(
         request.mode,
         request.include_adult,
         request.provider,

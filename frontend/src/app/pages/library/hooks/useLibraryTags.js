@@ -9,7 +9,7 @@ export function useLibraryTags({ activeSessionMode }) {
   const { data: allTags = [], isLoading: isAllTagsLoading } = useAllTagsQuery(isNsfw);
 
   const processedTags = useMemo(() => {
-    const usageTags = Array.isArray(tagsData) ? tagsData : [];
+    const usageTags = Array.isArray(tagsData) ? tagsData.flatMap((g) => g.tags || []) : [];
     const allDefinedTags = Array.isArray(allTags) ? allTags : [];
     const bucketKeys = getLibraryTagBucketKeys(activeSessionMode);
     const usageByName = new Map(

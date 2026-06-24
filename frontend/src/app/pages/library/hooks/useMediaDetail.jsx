@@ -72,7 +72,7 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
     return item?.cast?.length ? 'cast' : 'details';
   });
 
-  if (cleanId !== prevCleanId || item !== prevItem) {
+  if (cleanId !== prevCleanId) {
     setPrevCleanId(cleanId);
     setPrevItem(item);
     if (isScene) {
@@ -84,6 +84,8 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
     } else {
       setActivePanel(item?.cast?.length ? 'cast' : 'details');
     }
+  } else if (item !== prevItem) {
+    setPrevItem(item);
   }
 
   useEffect(() => {

@@ -94,6 +94,7 @@ class OrganizerService:
     def get_organizer_groups(self, scan_mode: Optional[str] = None, session_mode: Optional[str] = None) -> OrganizerGroupsResponse:
         all_items = self.db.query(MediaItem).options(
             joinedload(MediaItem.matches).joinedload(MetadataMatch.localizations),
+            joinedload(MediaItem.matches).joinedload(MetadataMatch.overrides),
             joinedload(MediaItem.extras),
             joinedload(MediaItem.overrides)
         ).filter(
@@ -125,7 +126,10 @@ class OrganizerService:
             active_match = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
             if active_match and not active_match.is_active:
                 active_match = None
-            overrides = item.overrides
+            from app.shared_kernel.user_context import get_current_user_id
+            current_uid = get_current_user_id()
+            m_override = active_match.overrides if (active_match and active_match.overrides and active_match.overrides.user_id == current_uid) else None
+            overrides = m_override or item.overrides
             target_lang = overrides.custom_language if (overrides and overrides.custom_language) else (formatter.config.default_target_language or pref_lang)
             loc = None
             if active_match:
@@ -157,7 +161,13 @@ class OrganizerService:
             formatter.resolve_collisions(previews)
 
         for item in items:
-            overrides = item.overrides
+            active_match = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
+            if active_match and not active_match.is_active:
+                active_match = None
+            from app.shared_kernel.user_context import get_current_user_id
+            current_uid = get_current_user_id()
+            m_override = active_match.overrides if (active_match and active_match.overrides and active_match.overrides.user_id == current_uid) else None
+            overrides = m_override or item.overrides
             target_lang = overrides.custom_language if (overrides and overrides.custom_language) else (formatter.config.default_target_language or pref_lang)
             preview = preview_map.get(item.id)
             if preview:
@@ -261,10 +271,9 @@ class OrganizerService:
             season_val = parsed.get("season") or fn_data.get("season") or it_data.get("season") or fd_data.get("season")
             episode_val = parsed.get("episode") or fn_data.get("episode") or it_data.get("episode") or fd_data.get("episode")
 
-            overrides = item.overrides
-            custom_edition_val = overrides.custom_edition.value if (overrides and overrides.custom_edition) else (item.edition.value if item.edition else "none")
-            custom_audio_type_val = overrides.custom_audio_type.value if (overrides and overrides.custom_audio_type) else (item.audio_type.value if item.audio_type else "none")
-            custom_source_val = overrides.custom_source.value if (overrides and overrides.custom_source) else (item.source.value if item.source else "none")
+            custom_edition_val = item.custom_edition.value if item.custom_edition else (item.edition.value if item.edition else "none")
+            custom_audio_type_val = item.custom_audio_type.value if item.custom_audio_type else (item.audio_type.value if item.audio_type else "none")
+            custom_source_val = item.custom_source.value if item.custom_source else (item.source.value if item.source else "none")
 
             item_dto = {
                 "id": item.id,

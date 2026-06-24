@@ -156,6 +156,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
         activePanel={activePanel}
         isSideNavVisible={isSideNavVisible}
         onToggleSideNav={handleToggleSideNav}
+        onClosePanel={() => togglePanel(null)}
         topRightControls={(
           <button
             type="button"

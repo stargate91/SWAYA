@@ -113,6 +113,16 @@ div.ui-poster-card__image-wrapper:focus-visible {
   letter-spacing: 0;
   text-transform: none;
   z-index: 5;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity var(--motion-fast), transform var(--motion-fast);
+}
+
+.ui-poster-card__media-shell:hover .ui-poster-card__user-rating-badge,
+.ui-poster-card__media-shell:focus-within .ui-poster-card__user-rating-badge {
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
 }
 
 .ui-poster-card__watched-badge {

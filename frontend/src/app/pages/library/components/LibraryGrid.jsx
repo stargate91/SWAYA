@@ -135,10 +135,10 @@ const LibraryPosterCard = memo(({
     const allPeople = item.people || [];
     const filteredPeople = genderPref && genderPref !== 'all'
       ? allPeople.filter(p => {
-          if (genderPref === 'female') return p.gender === 1;
-          if (genderPref === 'male') return p.gender === 2;
-          return true;
-        })
+        if (genderPref === 'female') return p.gender === 1;
+        if (genderPref === 'male') return p.gender === 2;
+        return true;
+      })
       : allPeople;
     const performers = filteredPeople.slice(0, 4);
 
@@ -197,7 +197,10 @@ const LibraryPosterCard = memo(({
     }
   } else {
     const subtitleParts = [];
-    if (item.year) subtitleParts.push(item.year);
+    const displayDate = (isLibraryMovie && item.release_date)
+      ? item.release_date.substring(0, 10)
+      : item.year;
+    if (displayDate) subtitleParts.push(displayDate);
     if (item.info) {
       subtitleParts.push(item.info);
     }
@@ -209,7 +212,7 @@ const LibraryPosterCard = memo(({
       const playTitle = isLibraryTv
         ? (t('library.details.continue') || 'Continue')
         : ((item.resume_position || 0) > 0 ? (t('library.details.resume') || 'Resume') : (t('library.details.play') || 'Play'));
-      
+
       playOverlay = {
         onClick: (event) => {
           onPlayOverlayClick(event, item);
@@ -397,8 +400,8 @@ export default function LibraryGrid({
     const entityType = isPeopleCard
       ? 'person'
       : isCollections
-      ? 'collection'
-      : (isLibraryTvTab(resolvedTab) ? 'tv' : 'movie');
+        ? 'collection'
+        : (isLibraryTvTab(resolvedTab) ? 'tv' : 'movie');
     const imageType = isPeopleCard ? 'profile' : 'poster';
     const currentPath = isPeopleCard
       ? getProfileImagePath(item)

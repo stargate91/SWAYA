@@ -61,6 +61,8 @@ class LibraryFilterService:
         Retrieves available tag groups.
         """
         tags_query = self.db.query(Tag).filter(Tag.is_adult == is_adult).all()
+        if not tags_query:
+            return []
         tags = [
             {
                 "id": t.id,

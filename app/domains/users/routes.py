@@ -116,9 +116,15 @@ def create_user_override(user_id: int, override_data: UserOverrideCreate, db: Se
     override.custom_backdrop = override_data.custom_backdrop
     override.custom_logo = override_data.custom_logo
     override.custom_language = override_data.custom_language
-    override.custom_edition = override_data.custom_edition
-    override.custom_audio_type = override_data.custom_audio_type
-    override.custom_source = override_data.custom_source
+    # Save physical overrides directly to MediaItem if media_item_id is provided
+    media_item_id = override_data.media_item_id
+    if media_item_id:
+        from app.domains.library.models import MediaItem
+        item = db.query(MediaItem).filter(MediaItem.id == media_item_id).first()
+        if item:
+            item.custom_edition = override_data.custom_edition
+            item.custom_audio_type = override_data.custom_audio_type
+            item.custom_source = override_data.custom_source
     override.user_rating = override_data.user_rating
     override.user_comment = override_data.user_comment
     override.is_favorite = override_data.is_favorite

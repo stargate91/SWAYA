@@ -109,7 +109,7 @@ function buildPreviewAssets(form) {
       null,
       sceneContext
     ),
-    adultSceneFolder: form.folder_scene_template
+    adultSceneFolder: (form.folder_create_scene_subdir && form.folder_scene_template)
       ? generatePreview(
           form.folder_scene_template,
           'scene',

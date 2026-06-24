@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Page from '@/ui/Page';
 import NavButton from '@/ui/NavButton';
@@ -15,6 +16,7 @@ export default function DetailPageShell({
   isLoading = false,
   isSideNavVisible = true,
   onToggleSideNav,
+  onClosePanel,
   renderPanelContent,
   sideNav,
   topRightControls,
@@ -23,6 +25,43 @@ export default function DetailPageShell({
   isScene = false,
 }) {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!activePanel || !onClosePanel) return;
+
+    const excludedSelectors = [
+      '.media-detail-page__side-panel',
+      '.media-detail-page__side-nav',
+      '.media-detail-page__top-right-controls',
+      '.media-detail-page__meta-row',
+      '.media-detail-page__actions-row',
+      '.media-detail-page__actions',
+      '.media-actions',
+      '.media-detail-page__logo-container',
+      '.ui-modal',
+      '.ui-modal-backdrop',
+      '.modal',
+      '[role="dialog"]',
+      '.radix-portal',
+      '.radix-overlay',
+      '.media-detail-page__back-button'
+    ];
+
+    const handleDocumentClick = (e) => {
+      if (!document.body.contains(e.target)) {
+        return;
+      }
+      const isExcluded = excludedSelectors.some(selector => e.target.closest(selector));
+      if (!isExcluded) {
+        onClosePanel();
+      }
+    };
+
+    document.addEventListener('click', handleDocumentClick);
+    return () => {
+      document.removeEventListener('click', handleDocumentClick);
+    };
+  }, [activePanel, onClosePanel]);
 
   const combinedClassName = `media-detail-page ${isScene ? 'media-detail-page--scene' : ''} ${pageClassName}`.trim();
 

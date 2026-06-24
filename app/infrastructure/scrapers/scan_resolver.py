@@ -154,10 +154,11 @@ class ScanResolver:
                     except Exception as cb_ex:
                         logger.warning(f"Progress callback raised exception: {cb_ex}")
 
-        # ThreadPool for network requests (limited to avoid rate limit)
+        # ThreadPool for network requests (limited to avoid SQLite write lock contention and rate limits)
         from app.domains.tasks import task_manager
         executor = task_manager.executor
-        max_workers = getattr(executor, "_max_workers", DEFAULT_MAX_WORKERS)
+        # Limit to 3 concurrent workers to prevent SQLite database lock contention and keep the UI responsive
+        max_workers = min(getattr(executor, "_max_workers", DEFAULT_MAX_WORKERS), 3)
         
         future_to_item = {}
         item_iter = iter(item_ids)

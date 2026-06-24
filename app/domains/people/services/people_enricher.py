@@ -229,7 +229,14 @@ class PeopleEnricher:
             "measurements": None,
             "cup_size": None,
             "biographies": {},
-            "links_to_create": []
+            "links_to_create": [],
+            "aliases": [],
+            "weight": None,
+            "tattoos": None,
+            "piercings": None,
+            "orientation": None,
+            "socials": {},
+            "known_for_department": None
         }
 
         has_data = False
@@ -264,6 +271,9 @@ class PeopleEnricher:
                     if details.get("popularity") is not None:
                         result["popularity"] = details.get("popularity")
                     result["profile_path"] = details.get("profile_path")
+                    if details.get("known_for_department"):
+                        result["known_for_department"] = details.get("known_for_department")
+                    
                     
                     images_data = details.get("images", {}).get("profiles", [])
                     result["images"] = [img.get("file_path") for img in images_data if img.get("file_path")]
@@ -278,6 +288,17 @@ class PeopleEnricher:
                         bio = trans.get("data", {}).get("biography")
                         if bio and locale:
                             result["biographies"][locale] = bio
+
+                    # Extract TMDB also_known_as
+                    if details.get("also_known_as"):
+                        result["aliases"].extend(details["also_known_as"])
+
+                    # Extract TMDB socials
+                    ext_ids = details.get("external_ids") or {}
+                    for soc_key in ["instagram", "twitter", "tiktok", "facebook"]:
+                        soc_val = ext_ids.get(f"{soc_key}_id")
+                        if soc_val:
+                            result["socials"][soc_key] = str(soc_val)
 
             elif provider in (Provider.STASHDB, Provider.PORNDB, Provider.FANSDB):
                 temp_db = self._get_temp_db()
@@ -307,6 +328,42 @@ class PeopleEnricher:
                     if perf.get("height") is not None:
                         result["height"] = int(perf["height"])
                     
+                    # Extract adult performer weight
+                    if perf.get("weight") is not None:
+                        result["weight"] = int(perf["weight"])
+
+                    # Extract aliases
+                    if perf.get("aliases"):
+                        result["aliases"].extend(perf["aliases"])
+
+                    # Extract tattoos
+                    tats = perf.get("tattoos")
+                    if tats and isinstance(tats, list):
+                        tats_str = ", ".join(
+                            f"{t.get('body_part')}: {t.get('description')}" if t.get('description') else t.get('body_part')
+                            for t in tats if t.get('body_part')
+                        )
+                        if tats_str:
+                            result["tattoos"] = tats_str
+                    elif isinstance(tats, str) and tats:
+                        result["tattoos"] = tats
+
+                    # Extract piercings
+                    piers = perf.get("piercings")
+                    if piers and isinstance(piers, list):
+                        piers_str = ", ".join(
+                            f"{p.get('body_part')}: {p.get('description')}" if p.get('description') else p.get('body_part')
+                            for p in piers if p.get('body_part')
+                        )
+                        if piers_str:
+                            result["piercings"] = piers_str
+                    elif isinstance(piers, str) and piers:
+                        result["piercings"] = piers
+
+                    # Extract orientation
+                    if perf.get("orientation"):
+                        result["orientation"] = perf["orientation"]
+
                     g = perf.get("gender")
                     if g:
                         g_lower = str(g).lower()
@@ -339,13 +396,29 @@ class PeopleEnricher:
                             result["images"] = urls_list
                             result["profile_path"] = urls_list[0]
 
-                    # Parse URLs dynamically to extract exact provider links
+                    # Parse URLs dynamically to extract exact provider links and socials
                     perf_urls = perf.get("urls") or []
-                    for ext_link in self._extract_ids_from_urls(perf_urls):
-                        ext_pair = (ext_link["provider"], ext_link["external_id"])
-                        if ext_pair not in processed_pairs:
-                            to_process.append(ext_link)
-                            result["links_to_create"].append(ext_link)
+                    for url in perf_urls:
+                        if not url or not isinstance(url, str):
+                            continue
+                        import re
+                        # Extract exact provider links
+                        for ext_link in self._extract_ids_from_urls([url]):
+                            ext_pair = (ext_link["provider"], ext_link["external_id"])
+                            if ext_pair not in processed_pairs:
+                                to_process.append(ext_link)
+                                result["links_to_create"].append(ext_link)
+
+                        # Extract socials
+                        inst_m = re.search(r'instagram\.com/([a-zA-Z0-9\._]+)', url)
+                        if inst_m:
+                            result["socials"]["instagram"] = inst_m.group(1)
+                        tw_m = re.search(r'twitter\.com/([a-zA-Z0-9_]+)', url)
+                        if tw_m:
+                            result["socials"]["twitter"] = tw_m.group(1)
+                        of_m = re.search(r'onlyfans\.com/([a-zA-Z0-9_\.]+)', url)
+                        if of_m:
+                            result["socials"]["onlyfans"] = of_m.group(1)
 
         existing_providers = {l["provider"] for l in links}
         for prov_name, ext_id in external_ids.items():
@@ -398,6 +471,8 @@ class PeopleEnricher:
             person.deathday = data["deathday"]
         if data.get("place_of_birth"):
             person.place_of_birth = data["place_of_birth"]
+        if data.get("known_for_department"):
+            person.known_for_department = data["known_for_department"]
         if data.get("gender") is not None:
             person.gender = data["gender"]
         if data.get("popularity") is not None:
@@ -418,6 +493,23 @@ class PeopleEnricher:
             person.measurements = data["measurements"]
         if data.get("cup_size"):
             person.cup_size = data["cup_size"]
+            
+        # Save extended performer attributes
+        if data.get("weight") is not None:
+            person.weight = data["weight"]
+        if data.get("aliases"):
+            existing_aliases = person.aliases or []
+            person.aliases = list(set(existing_aliases + data["aliases"]))
+        if data.get("tattoos"):
+            person.tattoos = data["tattoos"]
+        if data.get("piercings"):
+            person.piercings = data["piercings"]
+        if data.get("orientation"):
+            person.orientation = data["orientation"]
+        if data.get("socials"):
+            existing_socials = person.socials or {}
+            existing_socials.update(data["socials"])
+            person.socials = existing_socials
 
         for l in data["links_to_create"]:
             link = self.db.query(ExternalSourceLink).filter(

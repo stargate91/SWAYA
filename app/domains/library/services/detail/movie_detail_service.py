@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 
 from app.shared_kernel.enums import Provider, MediaType, ItemStatus
 from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch
+from app.domains.metadata.models import MetadataMatch, MediaCollection
 from app.domains.people.models import Person, MediaPersonLink
 from app.domains.users.models import UserOverride
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
@@ -84,10 +84,39 @@ class MovieDetailService(DetailFormatter):
                 MetadataMatch.external_id == str(tmdb_id)
             ).first()
             
+            from app.domains.media_assets.services.images import image_processing_service
+            effective_backdrop = None
+            if override and override.custom_backdrop:
+                effective_backdrop = override.custom_backdrop
+            else:
+                effective_backdrop = image_processing_service.pick_backdrop_path(tmdb_data, preferred_language=ui_lang, allow_low_res=True)
+
+            effective_logo = None
+            if override and override.custom_logo:
+                effective_logo = override.custom_logo
+            else:
+                effective_logo = image_processing_service.pick_logo_path(tmdb_data, preferred_language=ui_lang)
+            
+            match = db.query(MetadataMatch).filter(
+                MetadataMatch.provider == Provider.TMDB,
+                MetadataMatch.external_id == str(tmdb_id),
+                MetadataMatch.media_type == MediaType.MOVIE
+            ).first()
+
+            belongs_to_col = tmdb_data.get("belongs_to_collection")
+            collection_data = None
+            if belongs_to_col:
+                collection_data = {
+                    "tmdb_id": belongs_to_col.get("id"),
+                    "title": belongs_to_col.get("name"),
+                    "poster_path": self._resolve_img(belongs_to_col.get("poster_path"), "posters"),
+                    "backdrop_path": self._resolve_img(belongs_to_col.get("backdrop_path"), "backdrops"),
+                }
+
             result = {
                 "id": f"tmdb_{tmdb_id}",
                 "title": tmdb_data.get("title") or tmdb_data.get("original_title") or "Unknown",
-                "logo_path": None,
+                "logo_path": self._resolve_img(effective_logo, "logos"),
                 "original_title": tmdb_data.get("original_title"),
                 "tagline": tmdb_data.get("tagline"),
                 "overview": tmdb_data.get("overview"),
@@ -96,14 +125,20 @@ class MovieDetailService(DetailFormatter):
                 "release_date": release_date,
                 "runtime": tmdb_data.get("runtime"),
                 "rating_tmdb": tmdb_data.get("vote_average"),
+                "rating_imdb": match.rating_imdb if match else None,
+                "rating_rotten": match.rating_rotten if match else None,
+                "rating_meta": match.rating_meta if match else None,
                 "vote_count_tmdb": tmdb_data.get("vote_count"),
+                "budget": tmdb_data.get("budget") or (match.budget if match else None),
+                "revenue": tmdb_data.get("revenue") or (match.revenue if match else None),
                 "companies": [{"name": c.get("name"), "logo_path": self._resolve_img(c.get("logo_path"), "logos")} for c in tmdb_data.get("production_companies", [])] if tmdb_data.get("production_companies") else [],
                 "networks": [],
-                "poster_path": self._resolve_img(tmdb_data.get("poster_path"), "posters"),
-                "backdrop_path": self._resolve_img(tmdb_data.get("backdrop_path"), "backdrops"),
+                "poster_path": self._resolve_img(override.custom_poster if (override and override.custom_poster) else tmdb_data.get("poster_path"), "posters"),
+                "backdrop_path": self._resolve_img(effective_backdrop, "backdrops", size="original"),
                 "original_language": tmdb_data.get("original_language"),
                 "type": "movie",
                 "tmdb_id": tmdb_id,
+                "collection_data": collection_data,
                 "cast": cast,
                 "cast_total": len(credits.get("cast", [])),
                 "people_complete": True,
@@ -135,6 +170,7 @@ class MovieDetailService(DetailFormatter):
             joinedload(MediaItem.matches).joinedload(MetadataMatch.localizations),
             joinedload(MediaItem.matches).joinedload(MetadataMatch.people).joinedload(MediaPersonLink.person).joinedload(Person.localizations),
             joinedload(MediaItem.matches).joinedload(MetadataMatch.studios),
+            joinedload(MediaItem.matches).joinedload(MetadataMatch.collection).joinedload(MediaCollection.localizations),
             joinedload(MediaItem.extras),
             joinedload(MediaItem.playback_logs),
             joinedload(MediaItem.overrides),
@@ -143,7 +179,9 @@ class MovieDetailService(DetailFormatter):
         if not item:
             return JSONResponse(status_code=404, content={"error": "Item not found"})
         
-        active_match = next((m for m in item.matches if m.media_item_id == item.id), None)
+        active_match = next((m for m in item.matches if m.media_item_id == item.id and m.is_active), None)
+        if not active_match:
+            active_match = next((m for m in item.matches if m.media_item_id == item.id), None)
         if not active_match and item.matches:
             active_match = item.matches[0]
             
@@ -172,11 +210,11 @@ class MovieDetailService(DetailFormatter):
                     "rating_porndb": person.rating_porndb,
                     "gender": person.gender
                 }
-                if person_data["job"] == "Director":
+                if person_data["job"].lower() == "director":
                     directors.append(person_data)
-                elif person_data["job"] == "Writer":
+                elif person_data["job"].lower() == "writer":
                     writers.append(person_data)
-                elif person_data["job"] == "Actor":
+                elif person_data["job"].lower() == "actor":
                     cast.append(person_data)
         
         technical = {
@@ -194,17 +232,35 @@ class MovieDetailService(DetailFormatter):
             "audio_type": item.audio_type.value if hasattr(item.audio_type, "value") else str(item.audio_type),
         }
         
-        override = item.overrides
+        override = None
+        if active_match:
+            override = db.query(UserOverride).filter(
+                UserOverride.user_id == current_uid,
+                UserOverride.metadata_match_id == active_match.id
+            ).first()
+        if not override:
+            override = item.overrides
         if not override:
             override = db.query(UserOverride).filter(UserOverride.user_id == current_uid, UserOverride.media_item_id == item.id).first()
             
         title = (override.custom_title if (override and override.custom_title) else None) or (loc.title if loc else item.filename)
         overview = (override.custom_overview if (override and override.custom_overview) else None) or (loc.overview if loc else None)
         
+        collection_data = None
+        if active_match and active_match.collection:
+            col = active_match.collection
+            col_loc = LanguageService.get_best_localization(col.localizations, ui_lang) if col.localizations else None
+            collection_data = {
+                "tmdb_id": int(col.external_id) if col.external_id.isdigit() else col.id,
+                "title": col_loc.title if col_loc else "Collection",
+                "poster_path": self._resolve_img(col_loc.poster_path if col_loc else None, "posters"),
+                "backdrop_path": self._resolve_img(col.backdrop_path, "backdrops"),
+            }
+
         result = {
             "id": item.id,
             "title": title,
-            "logo_path": self._resolve_img(loc.logo_path if loc else None, "logos"),
+            "logo_path": self._resolve_img(override.custom_logo if (override and override.custom_logo) else (loc.logo_path if loc else None), "logos"),
             "original_title": active_match.original_title if active_match else None,
             "tagline": loc.tagline if loc else None,
             "overview": overview,
@@ -213,14 +269,22 @@ class MovieDetailService(DetailFormatter):
             "release_date": active_match.release_date.isoformat() if (active_match and active_match.release_date) else None,
             "runtime": active_match.runtime if active_match else None,
             "rating_tmdb": active_match.rating_tmdb if active_match else 0.0,
+            "rating_imdb": active_match.rating_imdb if active_match else None,
+            "rating_rotten": active_match.rating_rotten if active_match else None,
+            "rating_meta": active_match.rating_meta if active_match else None,
             "rating_porndb": active_match.rating_porndb if active_match else None,
             "vote_count_tmdb": active_match.vote_count_tmdb if active_match else 0,
+            "budget": active_match.budget if active_match else None,
+            "revenue": active_match.revenue if active_match else None,
             "companies": [{"name": s.name, "logo_path": self._resolve_img(s.logo_path, "logos")} for s in active_match.studios] if active_match else [],
             "networks": [],
-            "poster_path": self._resolve_img(loc.poster_path if loc else None, "posters"),
-            "backdrop_path": self._resolve_img(active_match.backdrop_path if active_match else None, "backdrops", size="original"),
+            "poster_path": self._resolve_img(override.custom_poster if (override and override.custom_poster) else (loc.poster_path if loc else None), "posters"),
+            "backdrop_path": self._resolve_img(override.custom_backdrop if (override and override.custom_backdrop) else (active_match.backdrop_path if active_match else None), "backdrops", size="original"),
             "original_language": loc.original_language if loc else DEFAULT_FALLBACK_LANGUAGE,
             "type": active_match.media_type.value if active_match else "movie",
+            "tmdb_id": int(active_match.external_id) if (active_match and active_match.provider == Provider.TMDB and active_match.external_id.isdigit()) else None,
+            "imdb_id": active_match.imdb_id if active_match else None,
+            "collection_data": collection_data,
             "cast": cast,
             "cast_total": len(cast),
             "people_complete": True,

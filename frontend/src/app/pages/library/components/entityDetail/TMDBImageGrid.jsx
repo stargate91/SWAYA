@@ -40,12 +40,7 @@ export default function TMDBImageGrid({
     return itemId;
   }, [itemId]);
 
-  const metadataQueryId = useMemo(() => {
-    if (tmdbId !== undefined && tmdbId !== null && tmdbId !== '') {
-      return `tmdb_${tmdbId}`;
-    }
-    return cleanItemId;
-  }, [cleanItemId, tmdbId]);
+  const metadataQueryId = cleanItemId;
 
   const { data: fullMetadata, isLoading: isLoadingMetadata } = useFullMetadataQuery(metadataQueryId, normalizedMediaType, {
     enabled: !customImages && Boolean(metadataQueryId) && !isPerson && !isCollection,
@@ -106,53 +101,89 @@ export default function TMDBImageGrid({
     }
 
     const activeMatch = fullMetadata?.matches?.find((m) => m.is_active);
-    const responseMap = normalizedMediaType === 'tv'
-      ? (activeMatch?.tv_api_responses || activeMatch?.api_responses || {})
-      : (activeMatch?.api_responses || activeMatch?.tv_api_responses || {});
-
-    const responseEntries = Object.entries(responseMap);
-    const localeShort = String(metadataLanguage || '').split('-', 1)[0].toLowerCase();
     const imageKey = imageType === 'backdrop'
       ? 'backdrops'
       : imageType === 'logo'
         ? 'logos'
         : 'posters';
 
-    const scoreResponse = ([lang, response]) => {
-      const normalizedLang = String(lang || '').toLowerCase();
-      const images = response?.images?.[imageKey];
-      const hasImages = Array.isArray(images) && images.length > 0;
-      if (!hasImages) return -1;
-      if (normalizedLang === String(metadataLanguage || '').toLowerCase()) return 4;
-      if (localeShort && normalizedLang.split('-', 1)[0] === localeShort) return 3;
-      if (normalizedLang === 'en' || normalizedLang === 'en-us') return 2;
-      if (!normalizedLang) return 1;
-      return 0;
-    };
-
-    const apiResponse = responseEntries
-      .map((entry) => ({ entry, score: scoreResponse(entry) }))
-      .filter((entry) => entry.score >= 0)
-      .sort((a, b) => b.score - a.score)[0]?.entry?.[1] || null;
-
-    if (!apiResponse?.images) return [];
-
-    let rawList = [];
-    if (imageType === 'backdrop') {
-      rawList = apiResponse.images.backdrops || [];
-    } else if (imageType === 'poster') {
-      rawList = apiResponse.images.posters || [];
-    } else if (imageType === 'logo') {
-      rawList = apiResponse.images.logos || [];
+    if (!activeMatch && fullMetadata?.raw_details?.images) {
+      const rawImages = fullMetadata.raw_details.images[imageKey];
+      if (Array.isArray(rawImages)) {
+        const localeShort = String(metadataLanguage || '').split('-', 1)[0].toLowerCase();
+        return rawImages.map((img) => {
+          const imgLang = String(img.iso_639_1 || '').toLowerCase();
+          let score = 0;
+          if (imgLang === String(metadataLanguage || '').toLowerCase()) {
+            score = 4;
+          } else if (localeShort && imgLang.split('-', 1)[0] === localeShort) {
+            score = 3;
+          } else if (imgLang === 'en' || imgLang === 'en-us') {
+            score = 2;
+          } else if (!imgLang || imgLang === 'null') {
+            score = 1;
+          }
+          return {
+            file_path: img.file_path,
+            width: img.width,
+            height: img.height,
+            vote_average: img.vote_average,
+            score,
+          };
+        }).sort((a, b) => {
+          if (b.score !== a.score) {
+            return b.score - a.score;
+          }
+          return (b.vote_average || 0) - (a.vote_average || 0);
+        });
+      }
     }
 
-    // Filter and map standard TMDB images
-    return rawList.map((img) => ({
-      file_path: img.file_path,
-      width: img.width,
-      height: img.height,
-      vote_average: img.vote_average,
-    }));
+    const responseMap = normalizedMediaType === 'tv'
+      ? (activeMatch?.tv_api_responses || activeMatch?.api_responses || {})
+      : (activeMatch?.api_responses || activeMatch?.tv_api_responses || {});
+
+    const responseEntries = Object.entries(responseMap);
+    const localeShort = String(metadataLanguage || '').split('-', 1)[0].toLowerCase();
+    const allImagesMap = new Map();
+
+    for (const [lang, response] of responseEntries) {
+      const rawImages = response?.images?.[imageKey];
+      if (!Array.isArray(rawImages)) continue;
+
+      const normalizedLang = String(lang || '').toLowerCase();
+      let score = 0;
+      if (normalizedLang === String(metadataLanguage || '').toLowerCase()) {
+        score = 4;
+      } else if (localeShort && normalizedLang.split('-', 1)[0] === localeShort) {
+        score = 3;
+      } else if (normalizedLang === 'en' || normalizedLang === 'en-us') {
+        score = 2;
+      } else if (!normalizedLang || normalizedLang === 'null') {
+        score = 1;
+      }
+
+      for (const img of rawImages) {
+        if (!img.file_path) continue;
+        const existing = allImagesMap.get(img.file_path);
+        if (!existing || existing.score < score) {
+          allImagesMap.set(img.file_path, {
+            file_path: img.file_path,
+            width: img.width,
+            height: img.height,
+            vote_average: img.vote_average,
+            score,
+          });
+        }
+      }
+    }
+
+    return Array.from(allImagesMap.values()).sort((a, b) => {
+      if (b.score !== a.score) {
+        return b.score - a.score;
+      }
+      return (b.vote_average || 0) - (a.vote_average || 0);
+    });
   }, [collectionDetail, customImages, fullMetadata, imageType, isCollection, isPerson, metadataLanguage, normalizedMediaType, personDetail, selectedSource]);
 
   const normalizedCurrent = useMemo(() => {

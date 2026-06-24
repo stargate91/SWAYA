@@ -56,14 +56,12 @@ class ContextBuilder:
         source_val = getattr(item, "source", None)
         audio_type_val = getattr(item, "audio_type", None)
         
-        overrides = getattr(item, "overrides", None)
-        if overrides:
-            if getattr(overrides, "custom_edition", None) and overrides.custom_edition != MovieEdition.NONE:
-                edition_val = overrides.custom_edition
-            if getattr(overrides, "custom_source", None) and overrides.custom_source != MediaSource.NONE:
-                source_val = overrides.custom_source
-            if getattr(overrides, "custom_audio_type", None) and overrides.custom_audio_type != MediaAudioType.NONE:
-                audio_type_val = overrides.custom_audio_type
+        if getattr(item, "custom_edition", None) and item.custom_edition != MovieEdition.NONE:
+            edition_val = item.custom_edition
+        if getattr(item, "custom_source", None) and item.custom_source != MediaSource.NONE:
+            source_val = item.custom_source
+        if getattr(item, "custom_audio_type", None) and item.custom_audio_type != MediaAudioType.NONE:
+            audio_type_val = item.custom_audio_type
 
         parsed_info = getattr(item, "parsed_info", None) or {}
         title_val = loc.title if loc and loc.title else ""
@@ -207,14 +205,12 @@ class ContextBuilder:
         audio_type_val = getattr(item, "audio_type", None)
         
         from app.shared_kernel.enums import MovieEdition, MediaSource, MediaAudioType
-        overrides = getattr(item, "overrides", None)
-        if overrides:
-            if getattr(overrides, "custom_edition", None) and overrides.custom_edition != MovieEdition.NONE:
-                edition_val = overrides.custom_edition
-            if getattr(overrides, "custom_source", None) and overrides.custom_source != MediaSource.NONE:
-                source_val = overrides.custom_source
-            if getattr(overrides, "custom_audio_type", None) and overrides.custom_audio_type != MediaAudioType.NONE:
-                audio_type_val = overrides.custom_audio_type
+        if getattr(item, "custom_edition", None) and item.custom_edition != MovieEdition.NONE:
+            edition_val = item.custom_edition
+        if getattr(item, "custom_source", None) and item.custom_source != MediaSource.NONE:
+            source_val = item.custom_source
+        if getattr(item, "custom_audio_type", None) and item.custom_audio_type != MediaAudioType.NONE:
+            audio_type_val = item.custom_audio_type
 
         ctx.update({
             "Title": title_value,
@@ -459,14 +455,12 @@ class ContextBuilder:
         audio_type_val = getattr(item, "audio_type", None)
         
         from app.shared_kernel.enums import MovieEdition, MediaSource, MediaAudioType
-        overrides = getattr(item, "overrides", None)
-        if overrides:
-            if getattr(overrides, "custom_edition", None) and overrides.custom_edition != MovieEdition.NONE:
-                edition_val = overrides.custom_edition
-            if getattr(overrides, "custom_source", None) and overrides.custom_source != MediaSource.NONE:
-                source_val = overrides.custom_source
-            if getattr(overrides, "custom_audio_type", None) and overrides.custom_audio_type != MediaAudioType.NONE:
-                audio_type_val = overrides.custom_audio_type
+        if getattr(item, "custom_edition", None) and item.custom_edition != MovieEdition.NONE:
+            edition_val = item.custom_edition
+        if getattr(item, "custom_source", None) and item.custom_source != MediaSource.NONE:
+            source_val = item.custom_source
+        if getattr(item, "custom_audio_type", None) and item.custom_audio_type != MediaAudioType.NONE:
+            audio_type_val = item.custom_audio_type
 
         ctx.update({
             "TvTitle": tv_title,

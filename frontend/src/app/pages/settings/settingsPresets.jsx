@@ -27,6 +27,7 @@ const ADULT_STANDARD_PRESET = {
   naming_performer_gender_filter: 'all',
   naming_performer_sort: 'popularity',
   scene_grouping_mode: 'parent_studio_studio',
+  folder_create_scene_subdir: true,
   folder_scene_template: '{date} - {title}',
 };
 
@@ -45,6 +46,7 @@ const ADULT_MINIMAL_PRESET = {
   naming_performer_gender_filter: 'all',
   naming_performer_sort: 'popularity',
   scene_grouping_mode: 'none',
+  folder_create_scene_subdir: false,
   folder_scene_template: '',
 };
 

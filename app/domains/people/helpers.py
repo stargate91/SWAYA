@@ -196,7 +196,7 @@ def resolve_person_known_for_backdrop(
 
     for credit in ranked_credits:
         media_type = credit.get("media_type")
-        credit_id = credit.get("id")
+        credit_id = credit.get("tmdb_id") or credit.get("id")
         if media_type not in {"movie", "tv"} or not credit_id:
             continue
         try:

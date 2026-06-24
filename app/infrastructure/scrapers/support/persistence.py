@@ -246,7 +246,8 @@ class ScraperPersister:
                     is_adult=perf["is_adult"],
                     performer_details=perf["performer_details"],
                     provider=prov_enum,
-                    external_id=perf.get("external_id")
+                    external_id=perf.get("external_id"),
+                    known_for_department=perf.get("known_for_department")
                 )
 
                 # Queue profile image download
@@ -348,6 +349,43 @@ class ScraperPersister:
                             MediaCollection.external_id == coll_id
                         ).first()
                 match.collection = collection
+                
+                if collection:
+                    from app.domains.metadata.models import MediaCollectionLocalization
+                    lang_code = language.split("-", 1)[0].lower()
+                    loc = None
+                    if collection.id is not None:
+                        loc = self.db.query(MediaCollectionLocalization).filter(
+                            MediaCollectionLocalization.collection_id == collection.id,
+                            MediaCollectionLocalization.locale == lang_code
+                        ).first()
+                    if not loc:
+                        loc = MediaCollectionLocalization(
+                            collection=collection,
+                            locale=lang_code
+                        )
+                        self.db.add(loc)
+                    loc.title = coll_info.get("name") or loc.title
+                    loc.poster_path = coll_info.get("poster_path") or loc.poster_path
+                    
+                    if loc.poster_path:
+                        try:
+                            from app.domains.tasks import task_manager
+                            image_service = task_manager.download_worker.image_service
+                            url = image_service.get_download_url(loc.poster_path, "posters")
+                            if url:
+                                import os
+                                import re
+                                from urllib.parse import urlparse
+                                basename = os.path.basename(urlparse(loc.poster_path).path)
+                                ext = os.path.splitext(basename)[1].lower() or ".jpg"
+                                asset_prefix = f"tmdb_{collection.external_id}"
+                                safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", asset_prefix).strip("_")
+                                filename = f"{safe_prefix}_{basename}{ext}"
+                                task_manager.download_worker.enqueue_download(url, "posters", filename)
+                                loc.local_poster_path = f"posters/{filename}"
+                        except Exception as e:
+                            logger.error(f"Failed to queue image download for collection in persistence: {e}")
 
             # 4. Map Localization
             loc = None
@@ -387,7 +425,8 @@ class ScraperPersister:
                     is_adult=cast_member["is_adult"],
                     tmdb_id=cast_member["tmdb_id"],
                     provider=Provider(cast_member["provider"]) if cast_member.get("provider") else None,
-                    external_id=cast_member.get("external_id")
+                    external_id=cast_member.get("external_id"),
+                    known_for_department=cast_member.get("known_for_department")
                 )
                 
                 # Queue profile image download

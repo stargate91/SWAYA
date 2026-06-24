@@ -62,8 +62,11 @@ class TvDetailService(DetailFormatter):
             season_detail = self.tmdb_scraper.get_season_details(tv_tmdb_id_int, season_number, language=ui_lang)
             all_episodes = season_detail.get("episodes", []) or []
             
+            is_in_library = len(local_items) > 0
+            ep_limit = len(all_episodes) if is_in_library else initial_episodes_limit
+
             episodes = []
-            for ep in all_episodes[:initial_episodes_limit]:
+            for ep in all_episodes[:ep_limit]:
                 ep_num = ep.get("episode_number")
                 local_item = local_episodes_map.get((season_number, ep_num))
                 
@@ -103,20 +106,34 @@ class TvDetailService(DetailFormatter):
                 "episodes": episodes,
             })
             
-        credits = tmdb_data.get("credits", {})
+        tv_credits = tmdb_data.get("aggregate_credits", {}) or tmdb_data.get("credits", {})
         cast = []
         directors = []
         writers = []
         
-        for actor in credits.get("cast", [])[:15]:
+        for creator in tmdb_data.get("created_by", []) or []:
+            directors.append({
+                "id": creator.get("id"),
+                "name": creator.get("name"),
+                "job": "Creator",
+                "profile_path": self._resolve_img(creator.get("profile_path"), "people"),
+            })
+            
+        for actor in tv_credits.get("cast", [])[:15]:
+            character = actor.get("character")
+            if not character and "roles" in actor:
+                roles = actor.get("roles", [])
+                if roles:
+                    character = ", ".join(filter(None, [r.get("character") for r in roles]))
             cast.append({
                 "id": actor.get("id"),
                 "name": actor.get("name"),
-                "character": actor.get("character"),
+                "character": character,
                 "profile_path": self._resolve_img(actor.get("profile_path"), "people"),
             })
             
-        for crew in credits.get("crew", []):
+        crew_list = tmdb_data.get("credits", {}).get("crew", [])
+        for crew in crew_list:
             crew_member = {
                 "id": crew.get("id"),
                 "name": crew.get("name"),
@@ -134,14 +151,33 @@ class TvDetailService(DetailFormatter):
             MetadataMatch.external_id == str(tv_tmdb_id_int)
         ).first()
         
+        from app.domains.media_assets.services.images import image_processing_service
+        effective_backdrop = None
+        if override and override.custom_backdrop:
+            effective_backdrop = override.custom_backdrop
+        else:
+            effective_backdrop = image_processing_service.pick_backdrop_path(tmdb_data, preferred_language=ui_lang, allow_low_res=True)
+
+        effective_logo = None
+        if override and override.custom_logo:
+            effective_logo = override.custom_logo
+        else:
+            effective_logo = image_processing_service.pick_logo_path(tmdb_data, preferred_language=ui_lang)
+        
+        series_match = db.query(MetadataMatch).filter(
+            MetadataMatch.provider == Provider.TMDB,
+            MetadataMatch.external_id == str(tv_tmdb_id_int),
+            MetadataMatch.media_type == MediaType.TV
+        ).first()
+
         result = {
             "id": f"tmdb_{tv_tmdb_id_int}",
             "tv_tmdb_id": tv_tmdb_id_int,
-            "imdb_id": tmdb_data.get("external_ids", {}).get("imdb_id"),
+            "imdb_id": tmdb_data.get("external_ids", {}).get("imdb_id") or (series_match.imdb_id if series_match else None),
             "title": tmdb_data.get("name") or tmdb_data.get("original_name") or "Unknown TV Show",
-            "logo_path": None,
-            "backdrop_path": self._resolve_img(tmdb_data.get("backdrop_path"), "backdrops"),
-            "poster_path": self._resolve_img(tmdb_data.get("poster_path"), "posters"),
+            "logo_path": self._resolve_img(effective_logo, "logos"),
+            "backdrop_path": self._resolve_img(effective_backdrop, "backdrops", size="original"),
+            "poster_path": self._resolve_img(override.custom_poster if (override and override.custom_poster) else tmdb_data.get("poster_path"), "posters"),
             "year": int(tmdb_data.get("first_air_date", "").split("-")[0]) if tmdb_data.get("first_air_date") else None,
             "first_air_date": tmdb_data.get("first_air_date"),
             "last_air_date": tmdb_data.get("last_air_date"),
@@ -150,6 +186,9 @@ class TvDetailService(DetailFormatter):
             "number_of_episodes": tmdb_data.get("number_of_episodes") or 0,
             "overview": tmdb_data.get("overview"),
             "rating_tmdb": tmdb_data.get("vote_average"),
+            "rating_imdb": series_match.rating_imdb if series_match else None,
+            "rating_rotten": series_match.rating_rotten if series_match else None,
+            "rating_meta": series_match.rating_meta if series_match else None,
             "genres": [g["name"] for g in tmdb_data.get("genres", [])] if tmdb_data.get("genres") else [],
             "type": "tv",
             "cast": cast,

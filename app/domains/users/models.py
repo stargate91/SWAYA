@@ -110,9 +110,6 @@ class UserOverride(Base):
     custom_backdrop: Mapped[Optional[str]] = mapped_column(String)
     custom_logo: Mapped[Optional[str]] = mapped_column(String) # For custom studio/performer logos
     custom_language: Mapped[Optional[str]] = mapped_column(String) # Custom per-item language override (e.g. 'hu')
-    custom_edition: Mapped[Optional[MovieEdition]] = mapped_column(SQLEnum(MovieEdition), nullable=True)
-    custom_audio_type: Mapped[Optional[MediaAudioType]] = mapped_column(SQLEnum(MediaAudioType), nullable=True)
-    custom_source: Mapped[Optional[MediaSource]] = mapped_column(SQLEnum(MediaSource), nullable=True)
     
     user_rating: Mapped[Optional[int]] = mapped_column(Integer)
     user_rating_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True, index=True)

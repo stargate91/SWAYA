@@ -1,7 +1,7 @@
 from typing import Protocol, Tuple, Optional, Dict, Any
 
 class MediaResolverPort(Protocol):
-    def resolve_ids(self, item_id: str) -> Tuple[Optional[int], Optional[int]]:
+    def resolve_ids(self, item_id: str, media_type: Optional[str] = None) -> Tuple[Optional[int], Optional[int]]:
         """Resolves item_id into (media_item_id, metadata_match_id)."""
         ...
 

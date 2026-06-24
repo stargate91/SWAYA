@@ -162,6 +162,27 @@ class MainstreamEnricher:
                 )
                 self.db.add(collection)
             match.collection = collection
+
+            from app.domains.metadata.models import MediaCollectionLocalization
+            lang_code = language.split("-", 1)[0].lower()
+            loc = None
+            if collection.id is not None:
+                loc = self.db.query(MediaCollectionLocalization).filter(
+                    MediaCollectionLocalization.collection_id == collection.id,
+                    MediaCollectionLocalization.locale == lang_code
+                ).first()
+            if not loc:
+                loc = MediaCollectionLocalization(
+                    collection=collection,
+                    locale=lang_code
+                )
+                self.db.add(loc)
+            loc.title = coll.get("name") or loc.title
+            loc.poster_path = coll.get("poster_path") or loc.poster_path
+
+            if loc.poster_path:
+                asset_prefix = f"tmdb_{collection.external_id}"
+                loc.local_poster_path = self._queue_image(loc.poster_path, "posters", asset_prefix)
             
         selected_backdrop_path = image_processing_service.pick_backdrop_path(details, preferred_language=language)
         if selected_backdrop_path:
@@ -502,7 +523,8 @@ class MainstreamEnricher:
                 profile_path=cast_member.get("profile_path"),
                 gender=cast_member.get("gender"),
                 is_adult=cast_member.get("adult", False),
-                tmdb_id=str(cast_member["id"])
+                tmdb_id=str(cast_member["id"]),
+                known_for_department=cast_member.get("known_for_department")
             )
             
             link = self.db.query(MediaPersonLink).filter(
@@ -528,7 +550,8 @@ class MainstreamEnricher:
                 profile_path=dir_member.get("profile_path"),
                 gender=dir_member.get("gender"),
                 is_adult=dir_member.get("adult", False),
-                tmdb_id=str(dir_member["id"])
+                tmdb_id=str(dir_member["id"]),
+                known_for_department=dir_member.get("known_for_department")
             )
             
             link = self.db.query(MediaPersonLink).filter(

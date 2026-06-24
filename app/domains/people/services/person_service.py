@@ -29,7 +29,8 @@ class PersonService:
         tmdb_id: str = None,
         performer_details: dict = None,
         provider: Optional[Provider] = None,
-        external_id: Optional[str] = None
+        external_id: Optional[str] = None,
+        known_for_department: Optional[str] = None
     ) -> Person:
         """Finds or creates a Person entity and updates their details, supporting cross-provider deduplication."""
         person = None
@@ -79,6 +80,7 @@ class PersonService:
                 profile_path=profile_path,
                 gender=gender,
                 is_adult=is_adult,
+                known_for_department=known_for_department or ("Acting" if is_adult else None),
                 external_ids=external_ids
             )
             self.db.add(person)
@@ -97,6 +99,11 @@ class PersonService:
             if provider and external_id:
                 ids[provider.value] = str(external_id)
             person.external_ids = ids
+
+            if known_for_department:
+                person.known_for_department = known_for_department
+            elif is_adult and not person.known_for_department:
+                person.known_for_department = "Acting"
 
         # 3. Create or update ExternalSourceLink relationship
         if provider and external_id:
@@ -134,6 +141,8 @@ class PersonService:
                     person.scene_count = max(person.scene_count or 0, int(val))
                 else:
                     setattr(person, key, val)
+            if not person.known_for_department:
+                person.known_for_department = "Acting"
 
         self.db.flush()
         return person

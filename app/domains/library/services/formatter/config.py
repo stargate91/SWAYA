@@ -59,6 +59,7 @@ class FormatterConfig:
     naming_adult_subfolders_enabled: bool = True
     scene_grouping_mode: str = "none"
     folder_scene_template: str = ""
+    folder_create_scene_subdir: bool = True
     collision_strategy: str = "keep_both"
     collision_duration_tolerance_seconds: int = 10
 

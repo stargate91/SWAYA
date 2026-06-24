@@ -202,10 +202,12 @@ export default function OrganizerPage() {
     handleLoadAll,
     handleRename,
     handleScanPaths,
+    handleRetryMatch,
     isBrowseStarting,
     isLoadingAll,
     isRenamePending,
     isRenameStarting,
+    isRetryPending,
   } = useOrganizerActions({
     defaultScanDir: settingsQuery.data?.default_scan_dir,
     organizerCountQuery,
@@ -330,6 +332,8 @@ export default function OrganizerPage() {
   ];
   const hasActiveVisibleItems = allMediaItems.some(item => !dismissedRowIds.has(`item-${item.id}`));
 
+  const hasReviewNeeded = (organizer.manual || []).some(item => ['no_match', 'uncertain', 'multiple', 'error'].includes(item.status));
+
   const headerActions = (hasVisibleItems || dismissedCount > 0) ? (
     <>
       {hasActiveVisibleItems ? (
@@ -340,6 +344,17 @@ export default function OrganizerPage() {
           onClick={handleRemoveAll}
         >
           {t('organizer.buttons.removeAll')}
+        </Button>
+      ) : null}
+      {hasReviewNeeded ? (
+        <Button
+          variant="secondary"
+          size="sm"
+          className="organizer-panel__browse-btn"
+          onClick={handleRetryMatch}
+          disabled={isScanActive || isRetryPending}
+        >
+          {isRetryPending ? t('organizer.buttons.retrying') || 'Retrying...' : t('organizer.buttons.retryMatch') || 'Retry Match'}
         </Button>
       ) : null}
       {dismissedCount > 0 ? (

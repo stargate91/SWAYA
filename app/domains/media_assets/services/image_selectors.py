@@ -293,10 +293,13 @@ def pick_poster_path(
     Selects the best poster from TMDB metadata images based on preferred language and ratings.
     """
     raw = raw_data or {}
+    if raw.get("poster_path"):
+        return raw.get("poster_path")
+
     images = raw.get("images") or {}
     posters = images.get("posters") or []
     if not posters:
-        return raw.get("poster_path")
+        return None
 
     preferred_langs = []
     normalized_preferred = str(preferred_language or "").split("-", 1)[0].strip().lower()

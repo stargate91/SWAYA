@@ -144,6 +144,7 @@ def load_formatter_config_from_db(db_session, user_id: int = 1) -> FormatterConf
         grouping_mode = settings.get("scene_grouping_mode", config.scene_grouping_mode)
         config.scene_grouping_mode = grouping_mode if grouping_mode in {"none", "studio", "parent_studio", "parent_studio_studio"} else "none"
         config.folder_scene_template = _normalize_template(settings.get("folder_scene_template", config.folder_scene_template))
+        config.folder_create_scene_subdir = settings.get("folder_create_scene_subdir", True)
         config.collision_strategy = settings.get("collision_strategy", "keep_both")
         config.collision_duration_tolerance_seconds = int(settings.get("collision_duration_tolerance_seconds", 10) or 10)
 
