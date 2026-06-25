@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
+import { Plus, Minus } from 'lucide-react';
 import DetailPageShell from './components/detail/DetailPageShell';
 import EntityDetailTopControls from './components/entityDetail/EntityDetailTopControls';
 import EntityDetailStatusSection from './components/entityDetail/EntityDetailStatusSection';
@@ -29,6 +31,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
     overviewEmptyText,
     profileLinks,
     extraLinks,
+    socialLinks,
     backdropUrl,
     mediaUrl,
     metaPills,
@@ -56,6 +59,12 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
     closeModal,
     toast,
   });
+
+  const [isSocialExpanded, setIsSocialExpanded] = useState(false);
+
+  const hasExtraSocials = socialLinks.length > 5;
+  const mainSocialLinks = hasExtraSocials ? socialLinks.slice(0, 4) : socialLinks;
+  const extraSocialLinks = hasExtraSocials ? socialLinks.slice(4) : [];
 
   const handleOpenLinkSourceModal = () => {
     if (!item?.id) return;
@@ -113,6 +122,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
           handleOpenCollectionBackdropModal={handleOpenCollectionBackdropModal}
           handleOpenLinkSourceModal={handleOpenLinkSourceModal}
           extraLinks={extraLinks}
+          socialLinks={socialLinks}
         />
       }
     >
@@ -137,6 +147,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
           mediaUrl={mediaUrl}
           profileLinks={profileLinks}
           extraLinks={extraLinks}
+          socialLinks={socialLinks}
           metaPills={metaPills}
           extraMetaPills={extraMetaPills}
           overviewText={overviewText}
@@ -173,6 +184,55 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
           navigate={navigate}
           t={t}
         />
+      )}
+
+      {!hasError && isPeople && socialLinks.length > 0 && (
+        <div className={`entity-detail-page__bottom-socials ${isSocialExpanded ? 'entity-detail-page__bottom-socials--expanded' : ''}`}>
+          <div className="entity-detail-page__bottom-socials-wrapper">
+            {hasExtraSocials && (
+              <div className="entity-detail-page__bottom-socials-extra">
+                {extraSocialLinks.map((link) => (
+                  <a
+                    key={link.key}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="entity-detail-page__bottom-social-btn"
+                    title={link.label}
+                  >
+                    <img src={link.iconSrc || '/links/website.svg'} alt={link.label} />
+                  </a>
+                ))}
+              </div>
+            )}
+
+            <div className="entity-detail-page__bottom-socials-main">
+              {mainSocialLinks.map((link) => (
+                <a
+                  key={link.key}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="entity-detail-page__bottom-social-btn"
+                  title={link.label}
+                >
+                  <img src={link.iconSrc || '/links/website.svg'} alt={link.label} />
+                </a>
+              ))}
+            </div>
+
+            {hasExtraSocials && (
+              <button
+                type="button"
+                className="entity-detail-page__bottom-social-toggle"
+                onClick={() => setIsSocialExpanded(!isSocialExpanded)}
+                title={isSocialExpanded ? (t('common.less') || 'Show Less') : (t('common.more') || 'Show More')}
+              >
+                {isSocialExpanded ? <Minus size={14} /> : <Plus size={14} />}
+              </button>
+            )}
+          </div>
+        </div>
       )}
     </DetailPageShell>
   );

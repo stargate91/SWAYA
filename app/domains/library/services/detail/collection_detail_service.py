@@ -8,6 +8,7 @@ from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch
 from app.domains.users.models import UserOverride
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
+from app.shared_kernel.ports.image_download_port import ImageDownloadPort
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.shared_kernel.language import LanguageService
 from app.domains.library.services.detail._detail_formatter import DetailFormatter
@@ -15,14 +16,15 @@ from app.domains.library.services.detail._detail_formatter import DetailFormatte
 logger = logging.getLogger(__name__)
 
 class CollectionDetailService(DetailFormatter):
-    def __init__(self, db: Session, scrapers: ScraperGatewayPort):
+    def __init__(self, db: Session, scrapers: ScraperGatewayPort, image_downloader: Optional[ImageDownloadPort] = None):
         super().__init__()
         self.db = db
         self.scrapers = scrapers
         self.tmdb_scraper = scrapers.tmdb(db)
+        self.image_downloader = image_downloader
 
     def get_collection_detail(self, collection_tmdb_id: str, language: str | None = None) -> CollectionDetailResponse:
-        from app.domains.library.schemas import CollectionDetailResponse
+        from app.application.library.schemas import CollectionDetailResponse
         db = self.db
         try:
             collection_tmdb_id_int = int(collection_tmdb_id)
@@ -40,38 +42,48 @@ class CollectionDetailService(DetailFormatter):
         except Exception:
             tmdb_details = {}
             
-        if tmdb_details:
-            from app.domains.metadata.models import MediaCollection, MediaCollectionLocalization
-            from app.shared_kernel.enums import Provider
-            collection = db.query(MediaCollection).filter(
-                MediaCollection.provider == Provider.TMDB,
-                MediaCollection.external_id == str(collection_tmdb_id_int)
+        from app.domains.metadata.models import MediaCollection, MediaCollectionLocalization
+        from app.shared_kernel.enums import Provider
+        lang_code = LanguageService.clean_locale(ui_lang)
+        
+        collection = db.query(MediaCollection).filter(
+            MediaCollection.provider == Provider.TMDB,
+            MediaCollection.external_id == str(collection_tmdb_id_int)
+        ).first()
+        
+        collection_loc = None
+        if collection and collection.id is not None:
+            collection_loc = db.query(MediaCollectionLocalization).filter(
+                MediaCollectionLocalization.collection_id == collection.id,
+                MediaCollectionLocalization.locale == lang_code
             ).first()
-            if collection:
-                if tmdb_details.get("backdrop_path"):
-                    collection.backdrop_path = tmdb_details["backdrop_path"]
-                lang_code = LanguageService.clean_locale(ui_lang)
-                loc = None
-                if collection.id is not None:
-                    loc = db.query(MediaCollectionLocalization).filter(
-                        MediaCollectionLocalization.collection_id == collection.id,
-                        MediaCollectionLocalization.locale == lang_code
-                    ).first()
-                if not loc:
-                    loc = MediaCollectionLocalization(
-                        collection=collection,
-                        locale=lang_code
-                    )
-                    db.add(loc)
-                loc.title = tmdb_details.get("name") or loc.title
-                loc.overview = tmdb_details.get("overview") or loc.overview
-                loc.poster_path = tmdb_details.get("poster_path") or loc.poster_path
-                try:
-                    from app.domains.tasks import task_manager
-                    image_service = task_manager.download_worker.image_service
-                    
+
+        if tmdb_details:
+            if not collection:
+                collection = MediaCollection(
+                    provider=Provider.TMDB,
+                    external_id=str(collection_tmdb_id_int)
+                )
+                db.add(collection)
+                db.flush()
+                
+            if tmdb_details.get("backdrop_path"):
+                collection.backdrop_path = tmdb_details["backdrop_path"]
+                
+            if not collection_loc:
+                collection_loc = MediaCollectionLocalization(
+                    collection=collection,
+                    locale=lang_code
+                )
+                db.add(collection_loc)
+                
+            collection_loc.title = tmdb_details.get("name") or collection_loc.title
+            collection_loc.overview = tmdb_details.get("overview") or collection_loc.overview
+            collection_loc.poster_path = tmdb_details.get("poster_path") or collection_loc.poster_path
+            try:
+                if self.image_downloader:
                     def queue_image(path: str, subfolder: str, prefix: str) -> Optional[str]:
-                        url = image_service.get_download_url(path, subfolder)
+                        url = self.image_downloader.get_download_url(path, subfolder)
                         if not url:
                             return None
                         import os
@@ -81,22 +93,22 @@ class CollectionDetailService(DetailFormatter):
                         ext = os.path.splitext(basename)[1].lower() or ".jpg"
                         safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", prefix).strip("_")
                         filename = f"{safe_prefix}_{basename}{ext}"
-                        task_manager.download_worker.enqueue_download(url, subfolder, filename)
+                        self.image_downloader.enqueue_download(url, subfolder, filename)
                         return f"{subfolder}/{filename}"
                     
                     asset_prefix = f"tmdb_{collection.external_id}"
-                    if loc.poster_path and not loc.local_poster_path:
-                        loc.local_poster_path = queue_image(loc.poster_path, "posters", asset_prefix)
+                    if collection_loc.poster_path and not collection_loc.local_poster_path:
+                        collection_loc.local_poster_path = queue_image(collection_loc.poster_path, "posters", asset_prefix)
                     if collection.backdrop_path and not collection.local_backdrop_path:
                         collection.local_backdrop_path = queue_image(collection.backdrop_path, "backdrops", asset_prefix)
-                except Exception as e:
-                    logger.error(f"Failed to queue image download for collection detail: {e}")
+            except Exception as e:
+                logger.error(f"Failed to queue image download for collection detail: {e}")
 
-                try:
-                    db.commit()
-                except Exception as e:
-                    db.rollback()
-                    logger.error(f"Failed to commit collection metadata: {e}")
+            try:
+                db.commit()
+            except Exception as e:
+                db.rollback()
+                logger.error(f"Failed to commit collection metadata: {e}")
             
         local_items = db.query(MediaItem).join(MediaItem.matches).filter(
             MediaItem.status.in_([ItemStatus.ORGANIZED, ItemStatus.RENAMED]),
@@ -189,14 +201,33 @@ class CollectionDetailService(DetailFormatter):
                 UserOverride.collection_id == collection.id
             ).first()
 
-        final_poster = self._resolve_img(loc.local_poster_path or loc.poster_path or tmdb_details.get("poster_path") if loc else tmdb_details.get("poster_path"), "posters")
-        final_backdrop = self._resolve_img(collection.local_backdrop_path or collection.backdrop_path or tmdb_details.get("backdrop_path") if collection else tmdb_details.get("backdrop_path"), "backdrops")
+        # Resolve final poster using local file, falling back to remote path if not found on disk
+        local_poster = collection_loc.local_poster_path if collection_loc else None
+        final_poster = None
+        if local_poster:
+            final_poster = self._resolve_img(local_poster, "posters")
+        if not final_poster:
+            remote_poster = collection_loc.poster_path if collection_loc else tmdb_details.get("poster_path")
+            final_poster = self._resolve_img(remote_poster, "posters")
+
+        # Resolve final backdrop using local file, falling back to remote path if not found on disk
+        local_backdrop = collection.local_backdrop_path if collection else None
+        final_backdrop = None
+        if local_backdrop:
+            final_backdrop = self._resolve_img(local_backdrop, "backdrops")
+        if not final_backdrop:
+            remote_backdrop = collection.backdrop_path if collection else tmdb_details.get("backdrop_path")
+            final_backdrop = self._resolve_img(remote_backdrop, "backdrops")
 
         if col_override:
             if col_override.custom_poster:
-                final_poster = self._resolve_img(col_override.custom_poster, "posters")
+                custom_poster_resolved = self._resolve_img(col_override.custom_poster, "posters")
+                if custom_poster_resolved:
+                    final_poster = custom_poster_resolved
             if col_override.custom_backdrop:
-                final_backdrop = self._resolve_img(col_override.custom_backdrop, "backdrops")
+                custom_backdrop_resolved = self._resolve_img(col_override.custom_backdrop, "backdrops")
+                if custom_backdrop_resolved:
+                    final_backdrop = custom_backdrop_resolved
 
         result = {
             "tmdb_id": collection_tmdb_id_int,

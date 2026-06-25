@@ -1,0 +1,113 @@
+from typing import Any, Optional
+from sqlalchemy.orm import Session
+from app.shared_kernel.ports.metadata_repository_port import MetadataRepositoryPort
+from app.shared_kernel.enums import Provider, MediaType
+from app.domains.metadata.models import MetadataMatch, Studio, MediaCollection, MetadataLocalization, MediaCollectionLocalization
+
+class DbMetadataRepository(MetadataRepositoryPort):
+    def __init__(self, db: Session):
+        self.db = db
+
+    def get_match(self, provider: Provider, external_id: str, media_type: MediaType, media_item_id: Optional[int] = None) -> Optional[Any]:
+        query = self.db.query(MetadataMatch).filter(
+            MetadataMatch.provider == provider,
+            MetadataMatch.external_id == external_id,
+            MetadataMatch.media_type == media_type
+        )
+        if media_item_id is not None:
+            query = query.filter(MetadataMatch.media_item_id == media_item_id)
+        return query.first()
+        
+    def create_match(self, provider: Provider, external_id: str, media_type: MediaType, media_item_id: Optional[int] = None) -> Any:
+        match = MetadataMatch(
+            provider=provider,
+            external_id=external_id,
+            media_type=media_type,
+            media_item_id=media_item_id
+        )
+        self.db.add(match)
+        return match
+
+    def get_match_by_item(self, media_item_id: int, active_only: bool = False) -> Optional[Any]:
+        query = self.db.query(MetadataMatch).filter(MetadataMatch.media_item_id == media_item_id)
+        if active_only:
+            query = query.filter(MetadataMatch.is_active == True)
+        return query.first()
+
+    def get_tv_match(self, provider: Provider, external_id: str) -> Optional[Any]:
+        return self.db.query(MetadataMatch).filter(
+            MetadataMatch.provider == provider,
+            MetadataMatch.external_id == external_id,
+            MetadataMatch.media_type == MediaType.TV,
+            MetadataMatch.media_item_id.is_(None)
+        ).first()
+
+    def get_season_match(self, provider: Provider, parent_id: int, season_number: int) -> Optional[Any]:
+        return self.db.query(MetadataMatch).filter(
+            MetadataMatch.provider == provider,
+            MetadataMatch.parent_id == parent_id,
+            MetadataMatch.media_type == MediaType.SEASON,
+            MetadataMatch.season_number == season_number,
+            MetadataMatch.media_item_id.is_(None)
+        ).first()
+
+    def get_studio_by_name(self, name: str) -> Optional[Any]:
+        return self.db.query(Studio).filter(Studio.name == name).first()
+
+    def create_studio(self, name: str, logo_path: Optional[str] = None) -> Any:
+        studio = Studio(name=name, logo_path=logo_path)
+        self.db.add(studio)
+        return studio
+
+    def get_collection(self, provider: Provider, external_id: str) -> Optional[Any]:
+        return self.db.query(MediaCollection).filter(
+            MediaCollection.provider == provider,
+            MediaCollection.external_id == external_id
+        ).first()
+
+    def create_collection(self, provider: Provider, external_id: str, backdrop_path: Optional[str] = None) -> Any:
+        collection = MediaCollection(
+            provider=provider,
+            external_id=external_id,
+            backdrop_path=backdrop_path
+        )
+        self.db.add(collection)
+        return collection
+
+    def get_or_create_collection(self, provider: Provider, external_id: str) -> Any:
+        collection = self.get_collection(provider, external_id)
+        if not collection:
+            collection = self.create_collection(provider, external_id)
+            self.db.flush()
+        return collection
+
+    def get_localization(self, match_id: Optional[int], locale: str) -> Optional[Any]:
+        if not match_id:
+            return None
+        return self.db.query(MetadataLocalization).filter(
+            MetadataLocalization.match_id == match_id,
+            MetadataLocalization.locale == locale
+        ).first()
+
+    def create_localization(self, match_id: Optional[int], locale: str, **kwargs) -> Any:
+        loc = MetadataLocalization(match_id=match_id, locale=locale, **kwargs)
+        self.db.add(loc)
+        return loc
+
+    def get_collection_localization(self, collection_id: int, locale: str) -> Optional[Any]:
+        return self.db.query(MediaCollectionLocalization).filter(
+            MediaCollectionLocalization.collection_id == collection_id,
+            MediaCollectionLocalization.locale == locale
+        ).first()
+
+    def create_collection_localization(self, collection_id: int, locale: str, **kwargs) -> Any:
+        loc = MediaCollectionLocalization(collection_id=collection_id, locale=locale, **kwargs)
+        self.db.add(loc)
+        return loc
+
+    def save(self, entity: Any) -> None:
+        self.db.add(entity)
+
+    def flush(self) -> None:
+        self.db.flush()
+

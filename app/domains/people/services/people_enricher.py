@@ -7,6 +7,7 @@ from app.shared_kernel.enums import Provider, RoleType
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 
 from app.shared_kernel.constants import DEFAULT_MAX_WORKERS, DEFAULT_FALLBACK_LANGUAGE
+from app.shared_kernel.ports.task_monitor_port import TaskMonitorPort
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +21,8 @@ class PeopleEnricher:
         has_active_heavy_tasks: Optional[Callable[[], bool]] = None,
         executor: Optional[Any] = None,
         update_progress: Optional[Callable[[int, float], None]] = None,
+        task_monitor: Optional[TaskMonitorPort] = None,
+        image_downloader: Optional[Any] = None,
     ):
         self.db = db
         self.scrapers = scrapers
@@ -28,45 +31,37 @@ class PeopleEnricher:
         self._has_active_heavy_tasks_cb = has_active_heavy_tasks
         self._executor = executor
         self._update_progress_cb = update_progress
+        self.task_monitor = task_monitor
+        self.image_downloader = image_downloader
         self.session = requests.Session()
 
     def _is_cancelled(self, task_id: int) -> bool:
         if self._is_cancelled_cb:
             return self._is_cancelled_cb(task_id)
-        try:
-            from app.domains.tasks import task_manager
-            return task_manager.is_cancelled(task_id)
-        except Exception:
-            return False
+        if self.task_monitor:
+            return self.task_monitor.is_cancelled(task_id)
+        return False
 
     def _has_active_heavy_tasks(self) -> bool:
         if self._has_active_heavy_tasks_cb:
             return self._has_active_heavy_tasks_cb()
-        try:
-            from app.domains.tasks import task_manager
-            return task_manager.has_active_heavy_tasks()
-        except Exception:
-            return False
+        if self.task_monitor:
+            return self.task_monitor.has_active_heavy_tasks()
+        return False
 
     def _get_executor(self):
         if self._executor:
             return self._executor
-        try:
-            from app.domains.tasks import task_manager
-            return task_manager.executor
-        except Exception:
-            import concurrent.futures
-            return concurrent.futures.ThreadPoolExecutor(max_workers=2)
+        if self.task_monitor:
+            return self.task_monitor.executor
+        import concurrent.futures
+        return concurrent.futures.ThreadPoolExecutor(max_workers=2)
 
     def _update_progress(self, task_id: int, progress: float) -> None:
         if self._update_progress_cb:
             self._update_progress_cb(task_id, progress)
-        else:
-            try:
-                from app.domains.tasks import task_manager
-                task_manager.update_progress(task_id, progress)
-            except Exception:
-                pass
+        elif self.task_monitor:
+            self.task_monitor.update_progress(task_id, progress)
 
 
     def _require_scrapers(self) -> ScraperGatewayPort:
@@ -77,12 +72,6 @@ class PeopleEnricher:
     def _get_temp_db(self) -> Session:
         if self.session_factory:
             return self.session_factory()
-        try:
-            from app.domains.tasks import task_manager
-            if task_manager and hasattr(task_manager, "session_factory") and task_manager.session_factory:
-                return task_manager.session_factory()
-        except Exception:
-            pass
         from app.shared_kernel.database import SessionLocal
         return SessionLocal()
 
@@ -139,7 +128,8 @@ class PeopleEnricher:
                 self._is_cancelled_cb,
                 self._has_active_heavy_tasks_cb,
                 self._executor,
-                self._update_progress_cb
+                self._update_progress_cb,
+                task_monitor=self.task_monitor
             )
             fetched_data = enricher.fetch_external_details(person_name, external_ids, link_data, is_adult=is_adult)
             if not fetched_data:
@@ -500,7 +490,6 @@ class PeopleEnricher:
         return links
 
     def apply_enriched_data(self, person: Person, data: dict):
-        from app.domains.tasks import task_manager
         if data.get("birthday"):
             person.birthday = data["birthday"]
         if data.get("deathday"):
@@ -626,7 +615,10 @@ class PeopleEnricher:
                     res_list.append(img)
             person.images = res_list
 
-            task_manager.download_worker.enqueue_download(url, "people", filename)
+            if self.image_downloader:
+                self.image_downloader.enqueue_download(url, "people", filename)
+            else:
+                logger.warning("No image_downloader available for profile image download")
 
     def _save_bio(self, person_id: int, locale: str, biography: str):
         loc = self.db.query(PersonLocalization).filter(

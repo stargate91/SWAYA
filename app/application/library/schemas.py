@@ -98,7 +98,7 @@ class MediaItemRead(BaseSchema):
 
 # --- Legacy Endpoints Request and Response Schemas ---
 # NOTE: Override schemas (ItemOverridesUpdate, BulkOverridesUpdate, etc.)
-# have been moved to app.domains.users.schemas where UserOverride model lives.
+# have been moved to app.application.users.schemas where UserOverride model lives.
 
 
 class GenericSuccessResponse(BaseSchema):

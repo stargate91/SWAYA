@@ -97,7 +97,6 @@ class MetadataMatch(Base):
     children: Mapped[List["MetadataMatch"]] = relationship("MetadataMatch", back_populates="parent", cascade="all, delete-orphan")
     collection: Mapped[Optional["MediaCollection"]] = relationship("MediaCollection", back_populates="matches")
     localizations: Mapped[List["MetadataLocalization"]] = relationship(back_populates="match", cascade="all, delete-orphan")
-    people: Mapped[List["MediaPersonLink"]] = relationship(back_populates="match", cascade="all, delete-orphan")
     studios: Mapped[List["Studio"]] = relationship("Studio", secondary=metadata_match_studios, back_populates="matches")
     overrides: Mapped[Optional["UserOverride"]] = relationship("UserOverride", back_populates="metadata_match", cascade="all, delete-orphan")
     external_links: Mapped[List["ExternalMatchLink"]] = relationship("ExternalMatchLink", back_populates="match", cascade="all, delete-orphan")

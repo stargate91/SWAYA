@@ -283,3 +283,26 @@ def calculate_full_sha256(filepath: str) -> Optional[str]:
         logger.error(f"Failed to calculate full SHA256 for {filepath}: {e}")
         return None
 
+
+from app.shared_kernel.ports.file_system_port import FileSystemPort
+
+class DbFileSystemAdapter(FileSystemPort):
+    def calculate_fast_hash(self, file_path: str) -> str:
+        return calculate_fast_hash(file_path)
+
+    def to_win_long_path(self, path: str) -> str:
+        return to_win_long_path(path)
+
+    def calculate_oshash(self, file_path: str) -> str:
+        return calculate_oshash(file_path)
+
+    def calculate_phash(self, file_path: str) -> str:
+        return calculate_phash(file_path)
+
+    def calculate_full_md5(self, file_path: str) -> str:
+        return calculate_full_md5(file_path)
+
+    def calculate_full_sha256(self, file_path: str) -> str:
+        return calculate_full_sha256(file_path)
+
+

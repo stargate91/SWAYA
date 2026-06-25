@@ -10,11 +10,13 @@ from app.shared_kernel.enums import TaskStatus
 logger = logging.getLogger(__name__)
 
 class PeopleEnrichWorker:
-    def __init__(self, session_factory=None, executor=None, concurrency: int = 4, scrapers=None):
+    def __init__(self, session_factory=None, executor=None, concurrency: int = 4, scrapers=None, task_monitor=None, image_downloader=None):
         self.session_factory = session_factory
         self.executor = executor
         self.concurrency = concurrency
         self.scrapers = scrapers
+        self.task_monitor = task_monitor
+        self.image_downloader = image_downloader
         self._queue: Optional[asyncio.Queue] = None
         self.is_running = False
         self.active_task_id: Optional[int] = None
@@ -85,8 +87,6 @@ class PeopleEnrichWorker:
         if not self.is_running:
             await self.start()
 
-        from app.domains.tasks import task_manager
-        
         # Check if there is an active task
         db = self.session_factory()
         try:
@@ -126,14 +126,13 @@ class PeopleEnrichWorker:
         while self.is_running:
             try:
                 # Pause/wait if any heavy tasks (scan, rename, undo) are running
-                from app.domains.tasks import task_manager
-                while task_manager.has_active_heavy_tasks():
+                while self.task_monitor and self.task_monitor.has_active_heavy_tasks():
                     await asyncio.sleep(2)
 
                 person_id = await self.queue.get()
                 
                 # Check cancellation
-                if self.active_task_id and task_manager.is_cancelled(self.active_task_id):
+                if self.active_task_id and self.task_monitor and self.task_monitor.is_cancelled(self.active_task_id):
                     self.queue.task_done()
                     continue
 
@@ -147,9 +146,9 @@ class PeopleEnrichWorker:
                 self._pending_person_ids.discard(person_id)
 
                 # Update progress
-                if self.active_task_id:
+                if self.active_task_id and self.task_monitor:
                     progress = (self.completed_count / self.total_queued) * 100.0 if self.total_queued > 0 else 100.0
-                    task_manager.update_progress(self.active_task_id, progress)
+                    self.task_monitor.update_progress(self.active_task_id, progress)
 
                     # If queue is empty and all done, complete the task
                     db = self.session_factory()
@@ -187,7 +186,7 @@ class PeopleEnrichWorker:
         finally:
             db.close()
 
-        enricher = PeopleEnricher(None, self.scrapers, session_factory=self.session_factory)
+        enricher = PeopleEnricher(None, self.scrapers, session_factory=self.session_factory, task_monitor=self.task_monitor, image_downloader=self.image_downloader)
         fetched_data = enricher.fetch_external_details(person_name, external_ids, link_data, is_adult=is_adult)
         if not fetched_data:
             return False

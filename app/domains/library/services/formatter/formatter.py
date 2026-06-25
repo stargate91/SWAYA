@@ -76,7 +76,7 @@ class Formatter:
         preferred_locale = preferred_locale or DEFAULT_FALLBACK_LANGUAGE
         return LanguageService.get_best_localization(localizations, preferred_locale)
 
-    def _get_target_name_and_subpath(self, item: Any, match: Any, loc: Any) -> tuple[str, str]:
+    def _get_target_name_and_subpath(self, item: Any, match: Any, loc: Any, people_links: Optional[List[Any]] = None) -> tuple[str, str]:
         """Calculates target name and subpath for a media item."""
         is_inplace = not self.config.org_enabled or not self.config.move_to_library or not self.config.library_path
         media_type = getattr(match, "media_type", None) if match else None
@@ -92,9 +92,9 @@ class Formatter:
 
         if is_inplace:
              if media_type == MediaType.SCENE:
-                 target_name = self.format_scene_filename(self.build_scene_context(item, match, loc))
+                 target_name = self.format_scene_filename(self.build_scene_context(item, match, loc, people_links=people_links))
              elif media_type == MediaType.SCENE:
-                 target_name = self.format_scene_filename(self.build_scene_context(item, match, loc))
+                 target_name = self.format_scene_filename(self.build_scene_context(item, match, loc, people_links=people_links))
              elif media_type == MediaType.MOVIE:
                  target_name = self.format_movie_filename(self.build_movie_context(item, match, loc))
              else:
@@ -102,7 +102,7 @@ class Formatter:
              return target_name, ""
 
         if media_type in (MediaType.SCENE, MediaType.SCENE):
-            context = self.build_scene_context(item, match, loc)
+            context = self.build_scene_context(item, match, loc, people_links=people_links)
             if media_type == MediaType.SCENE:
                 target_name = self.format_scene_filename(context)
             else:
@@ -205,13 +205,13 @@ class Formatter:
         target_name = target_name.replace("\\", "/")
         return target_name, target_subpath
 
-    def format_item(self, item: Any, match: Any, loc: Any) -> RenamePreview:
+    def format_item(self, item: Any, match: Any, loc: Any, people_links: Optional[List[Any]] = None) -> RenamePreview:
         """
         Generates a preview for a single item using official metadata.
         Used for updating planned_path after enrichment.
         """
         orig_path = self._get_absolute_path(item)
-        target_name, target_subpath = self._get_target_name_and_subpath(item, match, loc)
+        target_name, target_subpath = self._get_target_name_and_subpath(item, match, loc, people_links=people_links)
         dest_root = self.config.library_path if self.config.move_to_library and self.config.library_path else os.path.dirname(orig_path)
         media_type = getattr(match, "media_type", None) if match else None
         if not media_type:
@@ -492,9 +492,9 @@ class Formatter:
         """Collects variables for a movie."""
         return self.context_builder.build_movie_context(item, match, loc)
 
-    def build_scene_context(self, item, match, loc) -> Dict[str, Any]:
+    def build_scene_context(self, item, match, loc, people_links: Optional[List[Any]] = None) -> Dict[str, Any]:
         """Collects variables for an adult scene."""
-        return self.context_builder.build_scene_context(item, match, loc)
+        return self.context_builder.build_scene_context(item, match, loc, people_links=people_links)
 
     def build_tv_context(self, item, match, loc, children: List[Any] = None) -> Dict[str, Any]:
         """Collects variables for a TV show/season/episode."""

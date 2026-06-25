@@ -51,6 +51,7 @@
 }
 
 .entity-detail-page__media-card {
+  position: relative;
   border-radius: 28px;
   overflow: hidden;
   background: linear-gradient(180deg, var(--color-border-default) 0%, color-mix(in srgb, black 28%, transparent) 100%);
@@ -381,3 +382,43 @@
   border-color: color-mix(in srgb, var(--color-accent-blue) 72%, var(--button-secondary-border));
   outline: none;
 }
+
+.entity-detail-page__social-overlay {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  z-index: 10;
+  max-width: calc(100% - 24px);
+}
+
+.entity-detail-page__social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background-color: color-mix(in srgb, var(--app-shell-color-panel) 82%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-border-default) 60%, transparent);
+  border-radius: 6px;
+  box-shadow: 0 4px 10px color-mix(in srgb, black 22%, transparent);
+  backdrop-filter: blur(10px);
+  transition: transform var(--motion-fast), background-color var(--motion-fast), border-color var(--motion-fast), box-shadow var(--motion-fast);
+}
+
+.entity-detail-page__social-btn:hover {
+  transform: translateY(-2px);
+  background-color: var(--color-surface-glass-strong);
+  border-color: var(--color-accent-blue);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-accent-blue) 30%, transparent);
+}
+
+.entity-detail-page__social-btn img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+

@@ -4,7 +4,8 @@ from typing import List, Optional
 
 from app.shared_kernel.database import get_db
 from app.domains.users.models import User, UserOverride, CustomList
-from app.domains.users.schemas import (
+from app.domains.users.services.user_service import UserService
+from app.application.users.schemas import (
     UserRead,
     UserCreate,
     UserOverrideRead,
@@ -34,41 +35,21 @@ router = APIRouter(prefix="/api/v1/users", tags=["Users"])
 @router.get("", response_model=List[UserRead])
 def list_users(db: Session = Depends(get_db)):
     """Retrieve all users."""
-    return db.query(User).all()
+    return UserService(db).list_users()
 
 
 @router.post("", response_model=UserRead)
 def create_user(user_data: UserCreate, db: Session = Depends(get_db)):
     """Create a new user profile."""
-    existing = db.query(User).filter(User.username == user_data.username).first()
-    if existing:
-        raise HTTPException(status_code=400, detail="Username already registered")
-    is_first_user = db.query(User.id).first() is None
-    role = "owner" if is_first_user else (user_data.role or "member")
-    if role not in {"owner", "member", "child"}:
-        raise HTTPException(status_code=400, detail="Invalid user role")
-    if role == "owner" and not is_first_user:
-        raise HTTPException(status_code=400, detail="Owner profile already exists")
-    if role == "child" and not user_data.managed_by_user_id:
-        raise HTTPException(status_code=400, detail="Child profile requires a managing user")
-    if user_data.managed_by_user_id:
-        manager = db.get(User, user_data.managed_by_user_id)
-        if not manager or manager.role not in {"owner", "member"}:
-            raise HTTPException(status_code=400, detail="Invalid managing user")
-
-    user = User(
+    return UserService(db).create_user(
         username=user_data.username,
         email=user_data.email,
         password_hash=user_data.password_hash,
         pin_hash=user_data.pin_hash,
-        role=role,
+        role=user_data.role,
         managed_by_user_id=user_data.managed_by_user_id,
-        allow_adult=user_data.allow_adult if role != "child" else False,
+        allow_adult=user_data.allow_adult,
     )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-    return user
 
 
 # --- User Overrides ---
@@ -76,64 +57,14 @@ def create_user(user_data: UserCreate, db: Session = Depends(get_db)):
 @router.get("/{user_id}/overrides", response_model=List[UserOverrideRead])
 def list_user_overrides(user_id: int, db: Session = Depends(get_db)):
     """Retrieve all metadata and physical asset overrides for a user."""
-    return db.query(UserOverride).filter(UserOverride.user_id == user_id).all()
+    return UserService(db).list_user_overrides(user_id)
 
 
 @router.post("/{user_id}/overrides", response_model=UserOverrideRead)
 def create_user_override(user_id: int, override_data: UserOverrideCreate, db: Session = Depends(get_db)):
     """Create or update a user override for a specific media item, performer, or collection."""
-    # Find existing override for same resource to avoid duplicates
-    query = db.query(UserOverride).filter(UserOverride.user_id == user_id)
-    if override_data.media_item_id:
-        query = query.filter(UserOverride.media_item_id == override_data.media_item_id)
-    elif override_data.metadata_match_id:
-        query = query.filter(UserOverride.metadata_match_id == override_data.metadata_match_id)
-    elif override_data.person_id:
-        query = query.filter(UserOverride.person_id == override_data.person_id)
-    elif override_data.studio_id:
-        query = query.filter(UserOverride.studio_id == override_data.studio_id)
-    elif override_data.collection_id:
-        query = query.filter(UserOverride.collection_id == override_data.collection_id)
-    else:
-        raise HTTPException(status_code=400, detail="Must target at least one resource ID")
+    return UserService(db).create_or_update_override(user_id, override_data.model_dump())
 
-    override = query.first()
-    if not override:
-        override = UserOverride(
-            user_id=user_id,
-            media_item_id=override_data.media_item_id,
-            metadata_match_id=override_data.metadata_match_id,
-            person_id=override_data.person_id,
-            studio_id=override_data.studio_id,
-            collection_id=override_data.collection_id,
-        )
-        db.add(override)
-
-    # Apply values
-    override.custom_title = override_data.custom_title
-    override.custom_overview = override_data.custom_overview
-    override.custom_poster = override_data.custom_poster
-    override.custom_backdrop = override_data.custom_backdrop
-    override.custom_logo = override_data.custom_logo
-    override.custom_language = override_data.custom_language
-    # Save physical overrides directly to MediaItem if media_item_id is provided
-    media_item_id = override_data.media_item_id
-    if media_item_id:
-        from app.domains.library.models import MediaItem
-        item = db.query(MediaItem).filter(MediaItem.id == media_item_id).first()
-        if item:
-            item.custom_edition = override_data.custom_edition
-            item.custom_audio_type = override_data.custom_audio_type
-            item.custom_source = override_data.custom_source
-    override.user_rating = override_data.user_rating
-    override.user_comment = override_data.user_comment
-    override.is_favorite = override_data.is_favorite
-    override.is_watched = override_data.is_watched
-    override.is_tracked = override_data.is_tracked
-
-    db.commit()
-    db.refresh(override)
-    return override
 
 
 # --- Custom User Lists ---
@@ -141,7 +72,8 @@ def create_user_override(user_id: int, override_data: UserOverrideCreate, db: Se
 @router.get("/{user_id}/lists", response_model=List[CustomListRead])
 def list_user_custom_lists(user_id: int, db: Session = Depends(get_db)):
     """Retrieve custom user lists."""
-    return db.query(CustomList).filter(CustomList.user_id == user_id).all()
+    return UserService(db).list_user_custom_lists(user_id)
+
 
 # Compatibility API owned by the Users domain.
 catalog_router = APIRouter(prefix="/api/v1", tags=["User Catalog"])
@@ -230,6 +162,10 @@ def bulk_update_catalog_status(payload: dict, db: Session = Depends(get_db)):
 
 from app.domains.users.services.overrides_service import OverridesService
 from app.infrastructure.media.db_media_resolver import DbMediaResolver
+from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+
+def _img_dl():
+    return TasksImageDownloadAdapter()
 
 @catalog_router.post("/media/update")
 def update_item_overrides(payload: ItemOverridesUpdate, db: Session = Depends(get_db)):
@@ -237,55 +173,33 @@ def update_item_overrides(payload: ItemOverridesUpdate, db: Session = Depends(ge
 
 @catalog_router.post("/item/{item_id}/status")
 def update_item_status(item_id: str, payload: ItemStatusUpdate, db: Session = Depends(get_db)):
-    service = OverridesService(db, DbMediaResolver(db))
-    res = {}
-    if payload.status is not None:
-        try:
-            item_id_int = int(item_id)
-            res.update(service.update_item_status(item_id_int, payload.status))
-        except ValueError:
-            pass
-    has_overrides = any(
-        field in payload.model_fields_set
-        for field in ["user_rating", "user_comment", "is_favorite", "is_watched", "custom_tags", "tags", "resume_position"]
+    return UserService(db).update_item_status_composite(
+        item_id=item_id,
+        payload_data=payload.model_dump(),
+        model_fields_set=payload.model_fields_set,
+        resolver=DbMediaResolver(db),
     )
-    if has_overrides:
-        update_dict = {
-            "item_id": item_id,
-            "media_type": payload.media_type,
-        }
-        for field in ["user_rating", "user_comment", "is_favorite", "is_watched", "resume_position"]:
-            if field in payload.model_fields_set:
-                update_dict[field] = getattr(payload, field)
-        if "custom_tags" in payload.model_fields_set:
-            update_dict["tags"] = payload.custom_tags
-        elif "tags" in payload.model_fields_set:
-            update_dict["tags"] = payload.tags
-
-        overrides_payload = ItemOverridesUpdate(**update_dict)
-        res.update(service.update_item_overrides(overrides_payload))
-    return res
 
 @catalog_router.post("/item/{item_id}/poster")
 def update_item_poster(item_id: str, payload: ImageOverrideUpdate, db: Session = Depends(get_db)):
     path = payload.path or payload.url or payload.poster_path
     if not path:
         raise HTTPException(status_code=400, detail="Image path/url is required")
-    return OverridesService(db, DbMediaResolver(db)).update_item_image(item_id, "poster", path, media_type=payload.media_type)
+    return OverridesService(db, DbMediaResolver(db), image_downloader=_img_dl()).update_item_image(item_id, "poster", path, media_type=payload.media_type)
 
 @catalog_router.post("/item/{item_id}/backdrop")
 def update_item_backdrop(item_id: str, payload: ImageOverrideUpdate, db: Session = Depends(get_db)):
     path = payload.path or payload.url or payload.backdrop_path
     if not path:
         raise HTTPException(status_code=400, detail="Image path/url is required")
-    return OverridesService(db, DbMediaResolver(db)).update_item_image(item_id, "backdrop", path, media_type=payload.media_type)
+    return OverridesService(db, DbMediaResolver(db), image_downloader=_img_dl()).update_item_image(item_id, "backdrop", path, media_type=payload.media_type)
 
 @catalog_router.post("/item/{item_id}/logo")
 def update_item_logo(item_id: str, payload: ImageOverrideUpdate, db: Session = Depends(get_db)):
     path = payload.path or payload.url or payload.logo_path
     if not path:
         raise HTTPException(status_code=400, detail="Image path/url is required")
-    return OverridesService(db, DbMediaResolver(db)).update_item_image(item_id, "logo", path, media_type=payload.media_type)
+    return OverridesService(db, DbMediaResolver(db), image_downloader=_img_dl()).update_item_image(item_id, "logo", path, media_type=payload.media_type)
 
 @catalog_router.post("/item/{item_id}/upload-poster")
 def upload_item_poster(item_id: str, file: UploadFile = File(...), media_type: Optional[str] = Form(None), db: Session = Depends(get_db)):

@@ -1,19 +1,36 @@
-from typing import Optional
+from typing import Optional, Any
 
 from app.domains.library.models import MediaItem
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.shared_kernel.enums import ItemStatus, ScanMode
-from app.infrastructure.scrapers.enrichment.metadata_enricher import MetadataEnricher
-from app.infrastructure.scrapers.resolver import Resolver
-
+from app.shared_kernel.ports.library_port import LibraryPort
 
 class BaseScanResolutionPipeline:
-    def __init__(self, db_session, *, mode: ScanMode, include_adult: Optional[bool] = None, provider: Optional[str] = None):
+    def __init__(
+        self,
+        db_session,
+        *,
+        mode: ScanMode,
+        include_adult: Optional[bool] = None,
+        provider: Optional[str] = None,
+        library_port: Optional[LibraryPort] = None,
+        resolver: Optional[Any] = None
+    ):
         self.db = db_session
         self.mode = mode
         self.include_adult = include_adult
         self.provider = provider
-        self.resolver = Resolver(db_session)
+        if library_port is None:
+            from app.infrastructure.media.db_media_resolver import DbMediaResolver
+            self.library_port = DbMediaResolver(db_session)
+        else:
+            self.library_port = library_port
+
+        if resolver is None:
+            from app.infrastructure.scrapers.resolver import Resolver
+            self.resolver = Resolver(db_session)
+        else:
+            self.resolver = resolver
 
     def resolve_and_enrich(
         self,
@@ -53,11 +70,7 @@ class BaseScanResolutionPipeline:
         if not item.group_hash:
             return
 
-        siblings = self.db.query(MediaItem).filter(
-            MediaItem.group_hash == item.group_hash,
-            MediaItem.id != item.id,
-            MediaItem.status == ItemStatus.MATCHED,
-        ).all()
+        siblings = self.library_port.get_siblings_by_group_hash(item.group_hash, item.id)
         for sibling in siblings:
             if stop_requested and stop_requested():
                 return
@@ -81,7 +94,29 @@ class BaseScanResolutionPipeline:
         raise NotImplementedError
 
 
+
 class MainstreamScanResolutionPipeline(BaseScanResolutionPipeline):
+    def __init__(
+        self,
+        db_session,
+        *,
+        mode: ScanMode,
+        include_adult: Optional[bool] = None,
+        provider: Optional[str] = None,
+        library_port: Optional[LibraryPort] = None,
+        resolver: Optional[Any] = None,
+        enricher: Optional[Any] = None
+    ):
+        super().__init__(
+            db_session,
+            mode=mode,
+            include_adult=include_adult,
+            provider=provider,
+            library_port=library_port,
+            resolver=resolver
+        )
+        self.enricher = enricher
+
     def enrich_matched_item(
         self,
         item: MediaItem,
@@ -91,7 +126,10 @@ class MainstreamScanResolutionPipeline(BaseScanResolutionPipeline):
         task_id: Optional[int] = None,
         stop_requested=None,
     ):
-        enricher = MetadataEnricher(self.db)
+        enricher = self.enricher
+        if enricher is None:
+            from app.infrastructure.scrapers.enrichment.metadata_enricher import MetadataEnricher
+            enricher = MetadataEnricher(self.db)
         enricher.enrich_matched_item(
             item,
             language=primary_language,
@@ -116,12 +154,41 @@ class PornDbMovieScanResolutionPipeline(MainstreamScanResolutionPipeline):
     pass
 
 
-def get_scan_resolution_pipeline(db_session, mode: ScanMode = ScanMode.MOVIES_TV, include_adult: Optional[bool] = None, provider: Optional[str] = None):
+def get_scan_resolution_pipeline(
+    db_session,
+    mode: ScanMode = ScanMode.MOVIES_TV,
+    include_adult: Optional[bool] = None,
+    provider: Optional[str] = None,
+    library_port: Optional[LibraryPort] = None,
+    resolver: Optional[Any] = None,
+    enricher: Optional[Any] = None
+):
     if mode == ScanMode.SCENES:
-        return ScenesScanResolutionPipeline(db_session, mode=mode, include_adult=include_adult, provider=provider)
+        return ScenesScanResolutionPipeline(
+            db_session,
+            mode=mode,
+            include_adult=include_adult,
+            provider=provider,
+            library_port=library_port,
+            resolver=resolver
+        )
     if mode == ScanMode.PORNDB_MOVIE:
-        return PornDbMovieScanResolutionPipeline(db_session, mode=mode, include_adult=include_adult, provider=provider)
-    # If the provider is explicitly set to porndb in MOVIES_TV mode, we can route it through the adult movie pipeline.
-    # But wait, PornDbMovieScanResolutionPipeline inherits from MainstreamScanResolutionPipeline so we can use that,
-    # and we pass the provider to the resolver below.
-    return MainstreamScanResolutionPipeline(db_session, mode=mode, include_adult=include_adult, provider=provider)
+        return PornDbMovieScanResolutionPipeline(
+            db_session,
+            mode=mode,
+            include_adult=include_adult,
+            provider=provider,
+            library_port=library_port,
+            resolver=resolver,
+            enricher=enricher
+        )
+    return MainstreamScanResolutionPipeline(
+        db_session,
+        mode=mode,
+        include_adult=include_adult,
+        provider=provider,
+        library_port=library_port,
+        resolver=resolver,
+        enricher=enricher
+    )
+

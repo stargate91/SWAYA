@@ -15,8 +15,8 @@ logger = logging.getLogger(__name__)
 class TMDBScraper(BaseScraper):
     """TMDB-specific metadata retriever and parser utilizing ScraperNormalizer."""
 
-    def __init__(self, db_session, cache_service=None):
-        super().__init__(db_session, cache_service, Provider.TMDB)
+    def __init__(self, settings_port, cache_service=None):
+        super().__init__(settings_port, cache_service, Provider.TMDB)
 
     def _call_api(self, endpoint: str, params: Dict[str, Any], max_retries: int = 3, force_refresh: bool = False) -> Dict[str, Any]:
         """Central API caller with caching and rate limit (429) handling."""

@@ -1,4 +1,5 @@
 from typing import Tuple, Optional, Dict, Any
+import logging
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 
@@ -6,8 +7,28 @@ from app.shared_kernel.enums import Provider, MediaType, ItemStatus
 from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch
 from app.shared_kernel.ports.media_resolver import MediaResolverPort
+from app.shared_kernel.ports.library_port import LibraryPort
 
-class DbMediaResolver(MediaResolverPort):
+# Specialized Adapters
+from app.infrastructure.media.adapters.db_media_item_adapter import DbMediaItemAdapter
+from app.infrastructure.media.adapters.db_rename_adapter import DbRenameAdapter
+from app.infrastructure.media.adapters.db_scan_adapter import DbScanAdapter
+from app.infrastructure.media.adapters.db_person_override_adapter import DbPersonOverrideAdapter
+from app.infrastructure.media.adapters.db_playback_adapter import DbPlaybackAdapter
+from app.infrastructure.media.adapters.db_collection_adapter import DbCollectionAdapter
+
+logger = logging.getLogger(__name__)
+
+class DbMediaResolver(
+    MediaResolverPort,
+    LibraryPort,
+    DbMediaItemAdapter,
+    DbRenameAdapter,
+    DbScanAdapter,
+    DbPersonOverrideAdapter,
+    DbPlaybackAdapter,
+    DbCollectionAdapter
+):
     def __init__(self, db: Session):
         self.db = db
 
@@ -151,7 +172,6 @@ class DbMediaResolver(MediaResolverPort):
 
         return media_item_id, metadata_match_id
 
-
     def update_item_status(self, item_id: int, status: str) -> Dict[str, Any]:
         item = self.db.query(MediaItem).filter(MediaItem.id == item_id).first()
         if not item:
@@ -174,3 +194,9 @@ class DbMediaResolver(MediaResolverPort):
         item.status = new_status
         self.db.commit()
         return {"status": "success", "item_id": item_id, "new_status": item.status.value}
+
+
+
+
+
+

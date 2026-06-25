@@ -19,11 +19,12 @@ from app.shared_kernel.constants import (
     MEDIA_THUMBNAIL_LIMITS,
     MIN_CACHED_IMAGE_BYTES,
 )
+from app.shared_kernel.ports.image_service_port import ImageServicePort
 
 logger = logging.getLogger(__name__)
 
 
-class ImageProcessingService:
+class ImageProcessingService(ImageServicePort):
     """
     Handles file operations, formatting, verification, and downscaling
     for downloaded media assets (covers, posters, backdrops, logos).
@@ -112,12 +113,10 @@ class ImageProcessingService:
             shutil.copy2(orig, thumb)
             return True
 
-        limits = MEDIA_THUMBNAIL_LIMITS.get(subfolder) or MEDIA_IMAGE_LIMITS.get(subfolder)
+        limits = MEDIA_THUMBNAIL_LIMITS.get(subfolder)
         if not limits:
-            # No limits configured for this category (e.g. logos) -> copy original to thumb path
-            thumb.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(orig, thumb)
-            return True
+            # Do not generate/copy thumbnails for subfolders that don't need them (e.g. backdrops, logos)
+            return False
 
         thumb_temp = thumb.with_name(f"{thumb.name}.{uuid.uuid4().hex}.tmp")
         thumb.parent.mkdir(parents=True, exist_ok=True)
@@ -258,7 +257,7 @@ class ImageProcessingService:
         filename = path_parts[-1] if path_parts else os.path.basename(path)
 
         if size is None:
-            if embedded_subfolder in ("backdrops", "scene_stills"):
+            if embedded_subfolder in ("backdrops", "scene_stills", "logos"):
                 size = "original"
             else:
                 size = "w500"

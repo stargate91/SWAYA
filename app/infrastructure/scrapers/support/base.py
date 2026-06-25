@@ -1,21 +1,26 @@
 import logging
 import requests
 from typing import Optional, Dict, Any, List
-from sqlalchemy.orm import Session
 
 from app.infrastructure.cache.cache_service import CacheService
 from app.shared_kernel.enums import Provider
+from app.shared_kernel.ports.settings_port import SettingsPort
 
 logger = logging.getLogger(__name__)
 
 class BaseScraper:
     """
-    Base scraper class containing database sessions, cache services,
-    reusable request sessions, configuration helpers, and unified DB persistence.
+    Base scraper class containing cache services, reusable request sessions,
+    and configuration helpers using SettingsPort.
     """
 
-    def __init__(self, db_session: Session, cache_service: Optional[CacheService] = None, provider: Optional[Provider] = None):
-        self.db = db_session
+    def __init__(self, settings_port: SettingsPort, cache_service: Optional[CacheService] = None, provider: Optional[Provider] = None):
+        from sqlalchemy.orm import Session
+        if isinstance(settings_port, Session):
+            from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+            self.settings_port = DbSettingsAdapter(settings_port)
+        else:
+            self.settings_port = settings_port
         self.cache = cache_service or CacheService()
         self.session = requests.Session()
         
@@ -35,22 +40,14 @@ class BaseScraper:
         self.provider = provider
 
     def get_setting(self, key: str, default: Optional[str] = None) -> Optional[str]:
-        """Helper to get a setting from user/system settings, falling back to environment."""
+        """Helper to get a setting from settings port, falling back to environment."""
         import os
-        from app.domains.settings.models import SystemSetting, UserSetting
-        from app.shared_kernel.user_context import get_current_user_id
-        current_user_id = get_current_user_id()
         try:
-            setting = self.db.query(UserSetting).filter(
-                UserSetting.user_id == current_user_id,
-                UserSetting.key == key,
-            ).first()
-            if not setting:
-                setting = self.db.query(SystemSetting).filter(SystemSetting.key == key).first()
-            if setting and setting.value:
-                return str(setting.value)
+            val = self.settings_port.get_setting(key)
+            if val is not None:
+                return str(val)
         except Exception as e:
-            logger.debug(f"Failed to query setting {key} from DB: {e}")
+            logger.debug(f"Failed to query setting {key} from settings port: {e}")
         
         # Fallback to env variables (uppercase)
         env_val = os.getenv(key.upper())
@@ -208,22 +205,3 @@ class BaseScraper:
                 "hip": res.get("hip_size"),
             }
         return res
-
-
-
-    def log_search(self, task_id: Optional[int], media_item_id: Optional[int], search_query: str, result_count: int, details: Dict[str, Any]) -> None:
-        """Saves a structured search log for scraper resolution auditing."""
-        from app.domains.tasks.models import ScraperLog
-        try:
-            log_entry = ScraperLog(
-                task_id=task_id,
-                media_item_id=media_item_id,
-                provider=self.provider,
-                search_query=search_query,
-                result_count=result_count,
-                details=details
-            )
-            self.db.add(log_entry)
-            self.db.flush()
-        except Exception as e:
-            logger.warning(f"Failed to save structured scraper search log: {e}")

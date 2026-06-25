@@ -18,7 +18,7 @@ class SceneDetailService(DetailFormatter):
         self.scrapers = scrapers
 
     def get_scene_detail(self, item_id: str) -> SceneDetailResponse:
-        from app.domains.library.schemas import SceneDetailResponse
+        from app.application.library.schemas import SceneDetailResponse
         db = self.db
         scene_uuid = item_id.split("_")[1] if "_" in item_id else item_id
         
@@ -88,11 +88,15 @@ class SceneDetailService(DetailFormatter):
         ).first()
 
         from app.domains.people.models import Person, MediaPersonLink
+        from sqlalchemy.orm import joinedload
         cast_by_name = {}
 
         # 1. Add performers from local database match
         if match_db:
-            for link in sorted(match_db.people, key=lambda x: x.order if x.order is not None else 0):
+            people_links = db.query(MediaPersonLink).options(
+                joinedload(MediaPersonLink.person)
+            ).filter(MediaPersonLink.match_id == match_db.id).all()
+            for link in sorted(people_links, key=lambda x: x.order if x.order is not None else 0):
                 person = link.person
                 cast_by_name[person.name.lower()] = {
                     "id": person.id,

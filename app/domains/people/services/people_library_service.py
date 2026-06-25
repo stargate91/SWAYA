@@ -3,13 +3,11 @@ from typing import List, Optional, Dict, Any
 from sqlalchemy import func
 from sqlalchemy.orm import Session, selectinload
 
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch
 from app.domains.people.models import Person, MediaPersonLink
-from app.domains.users.models import UserOverride
-from app.shared_kernel.enums import ItemStatus
 from app.shared_kernel.user_context import get_current_user_id
-from app.domains.people.schemas import PeopleGroupItem
+from app.application.people.schemas import PeopleGroupItem
+from app.shared_kernel.ports.library_port import LibraryPort
+from app.shared_kernel.ports.image_service_port import ImageServicePort
 
 logger = logging.getLogger(__name__)
 
@@ -21,11 +19,19 @@ class PeopleLibraryService:
     queries and formats Person entities.
     """
 
-    def __init__(self, db_session: Session, user_id: Optional[int] = None):
+    def __init__(self, db_session: Session, user_id: Optional[int] = None, library_port: Optional[LibraryPort] = None, image_service: Optional[ImageServicePort] = None):
         self.db = db_session
         if user_id is None:
             user_id = get_current_user_id()
         self.user_id = user_id
+        if library_port is None:
+            from app.infrastructure.media.db_media_resolver import DbMediaResolver
+            library_port = DbMediaResolver(db_session)
+        self.library_port = library_port
+        if image_service is None:
+            from app.domains.media_assets.services.images import image_processing_service
+            image_service = image_processing_service
+        self.image_service = image_service
 
     def get_people_group(
         self,
@@ -46,33 +52,10 @@ class PeopleLibraryService:
         elif role_lower in ("writers", "writer"):
             normalized_role = "writer"
 
-        lib_statuses = [ItemStatus.RENAMED, ItemStatus.ORGANIZED]
-        
-        # 1. Resolve which matches are in the library
-        library_match_ids = {
-            r[0] for r in self.db.query(MetadataMatch.id).join(
-                MediaItem, MetadataMatch.media_item_id == MediaItem.id
-            ).filter(MediaItem.status.in_(lib_statuses)).all()
-        }
-        
-        # 2. Get parent IDs for TV show / season hierarchies
-        parent_ids = set()
-        current_parents = {
-            r[0] for r in self.db.query(MetadataMatch.parent_id).join(
-                MediaItem, MetadataMatch.media_item_id == MediaItem.id
-            ).filter(MediaItem.status.in_(lib_statuses), MetadataMatch.parent_id != None).all()
-        }
-        while current_parents:
-            parent_ids.update(current_parents)
-            current_parents = {
-                r[0] for r in self.db.query(MetadataMatch.parent_id).filter(
-                    MetadataMatch.id.in_(current_parents), MetadataMatch.parent_id != None
-                ).all()
-            }
-            
-        all_valid_match_ids = library_match_ids.union(parent_ids)
+        # Resolve which matches are in the library using the port
+        all_valid_match_ids = self.library_port.get_active_match_ids()
 
-        # 3. Fetch link counts
+        # Fetch link counts
         links = self.db.query(
             MediaPersonLink.person_id,
             MediaPersonLink.match_id
@@ -91,10 +74,9 @@ class PeopleLibraryService:
             for pid, matches_set in person_projects.items()
         }
 
-        # 4. Fetch people
+        # Fetch people
         query = self.db.query(Person).options(
-            selectinload(Person.media_links),
-            selectinload(Person.overrides)
+            selectinload(Person.media_links)
         )
 
         if filter_status == "active":
@@ -119,11 +101,10 @@ class PeopleLibraryService:
 
         people_list = []
         for person in people:
-            o = person.overrides if (person.overrides and person.overrides.user_id == self.user_id) else None
+            override_dict = self.library_port.get_person_user_override(self.user_id, person.id)
             
-            from app.domains.media_assets.services.images import image_processing_service
-            raw_poster = (o.custom_poster if (o and o.custom_poster) else None) or person.local_profile_path or person.profile_path
-            poster_path = image_processing_service.resolve_image_url(raw_poster, "people")
+            raw_poster = (override_dict.get("custom_poster") if override_dict else None) or person.local_profile_path or person.profile_path
+            poster_path = self.image_service.resolve_image_url(raw_poster, "people")
             
             people_list.append(PeopleGroupItem(
                 id=person.id,
@@ -140,8 +121,8 @@ class PeopleLibraryService:
                 rating_porndb=person.rating_porndb,
                 type="person",
                 is_active=person.is_active,
-                is_favorite=o.is_favorite if o else False,
-                user_rating=o.user_rating if o else None,
+                is_favorite=override_dict.get("is_favorite") if override_dict else False,
+                user_rating=override_dict.get("user_rating") if override_dict else None,
                 birthday=person.birthday or "",
                 gender=person.gender,
                 library_count=project_counts.get(person.id, 0),

@@ -16,6 +16,10 @@ from app.infrastructure.scrapers.providers.tmdb import TMDBScraper
 from app.infrastructure.scrapers.providers.omdb import OMDBScraper
 from app.shared_kernel.language import LanguageService
 from app.domains.media_assets.services.images import image_processing_service
+from app.shared_kernel.ports.metadata_repository_port import MetadataRepositoryPort
+from app.shared_kernel.ports.people_repository_port import PeopleRepositoryPort
+from app.shared_kernel.ports.settings_port import SettingsPort
+from app.shared_kernel.ports.image_download_port import ImageDownloadPort
 
 logger = logging.getLogger(__name__)
 
@@ -44,69 +48,8 @@ def _pick_trailer_key(raw_data, language: str = None, original_language: str = N
     key = sorted_v[0].get("key")
     return f"{YOUTUBE_WATCH_BASE}{key}" if key else None
 
-def _split_genres(genres: list[str]) -> list[str]:
-    result = []
-    seen_keys = set()
+from app.shared_kernel.genre_utils import split_genres as _split_genres
 
-    genre_aliases = {
-        "scifi": "Sci-Fi",
-        "sciencefiction": "Sci-Fi",
-        "sciencefictionfantasy": "Sci-Fi & Fantasy",
-        "actionadventure": "Action & Adventure",
-    }
-
-    def _canonicalize_genre_label(raw_genre: str) -> str:
-        cleaned = str(raw_genre or "").strip()
-        if not cleaned:
-            return ""
-
-        normalized_key = "".join(ch for ch in cleaned.casefold() if ch.isalnum())
-        alias = genre_aliases.get(normalized_key)
-        if alias:
-            return alias
-
-        if len(cleaned) == 1:
-            return cleaned.upper()
-        return cleaned[0].upper() + cleaned[1:]
-
-    for g in genres:
-        if not g:
-            continue
-
-        normalized_key = "".join(ch for ch in g.casefold() if ch.isalnum())
-        alias = genre_aliases.get(normalized_key)
-        target_g = alias if alias else g
-
-        parts = []
-        if " & " in target_g:
-            parts = target_g.split(" & ")
-        elif " and " in target_g:
-            parts = target_g.split(" and ")
-        elif " és " in target_g:
-            parts = target_g.split(" és ")
-        elif " / " in target_g:
-            parts = target_g.split(" / ")
-        elif "/" in target_g:
-            parts = target_g.split("/")
-        elif ";" in target_g:
-            parts = target_g.split(";")
-        elif "," in target_g:
-            parts = target_g.split(",")
-        else:
-            parts = [target_g]
-        
-        for part in parts:
-            part_clean = _canonicalize_genre_label(part)
-            if not part_clean:
-                continue
-
-            part_key = "".join(ch for ch in part_clean.casefold() if ch.isalnum())
-            if part_key in seen_keys:
-                continue
-
-            seen_keys.add(part_key)
-            result.append(part_clean)
-    return result
 
 class MainstreamEnricher:
     """
@@ -114,8 +57,24 @@ class MainstreamEnricher:
     studios, collection details, and links cast/crew.
     """
 
-    def __init__(self, db_session: Session):
+    def __init__(
+        self,
+        db_session: Session,
+        metadata_repo: Optional[MetadataRepositoryPort] = None,
+        people_repo: Optional[PeopleRepositoryPort] = None,
+        settings_port: Optional[SettingsPort] = None,
+        image_downloader: Optional[ImageDownloadPort] = None,
+    ):
         self.db = db_session
+        from app.infrastructure.repositories.db_metadata_repository import DbMetadataRepository
+        from app.infrastructure.repositories.db_people_repository import DbPeopleRepository
+        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+        from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+        self.metadata_repo = metadata_repo or DbMetadataRepository(db_session)
+        self.people_repo = people_repo or DbPeopleRepository(db_session)
+        self.settings_port = settings_port or DbSettingsAdapter(db_session)
+        self.image_downloader = image_downloader or TasksImageDownloadAdapter()
+
         self.api = TMDBScraper(db_session)
         self.omdb = OMDBScraper(db_session)
         self._details_cache: Dict[tuple[str, int, str], Dict[str, Any]] = {}
@@ -131,15 +90,10 @@ class MainstreamEnricher:
         commit: bool = False,
     ):
         """Fetches and stores complete metadata for the active match."""
-        active_match = self.db.query(MetadataMatch).filter(
-            MetadataMatch.media_item_id == item.id,
-            MetadataMatch.is_active == True
-        ).first()
+        active_match = self.metadata_repo.get_match_by_item(item.id, active_only=True)
 
         if not active_match:
-            active_match = self.db.query(MetadataMatch).filter(
-                MetadataMatch.media_item_id == item.id
-            ).first()
+            active_match = self.metadata_repo.get_match_by_item(item.id, active_only=False)
 
         if not active_match:
             return
@@ -154,27 +108,17 @@ class MainstreamEnricher:
         # Retrieve target language and overrides so they are also cached in the DB
         try:
             from app.shared_kernel.user_context import get_current_user_id
-            from app.domains.settings.models import UserSetting, SystemSetting
             current_user_id = get_current_user_id()
             
-            follow_s = self.db.query(UserSetting).filter(UserSetting.user_id == current_user_id, UserSetting.key == "follow_app_language_for_naming").first()
-            if not follow_s:
-                follow_s = self.db.query(SystemSetting).filter(SystemSetting.key == "follow_app_language_for_naming").first()
-            follow_naming = follow_s.value if follow_s else True
+            follow_naming = self.settings_port.get_setting("follow_app_language_for_naming", current_user_id)
+            if follow_naming is None:
+                follow_naming = True
             
             t_lang = None
             if follow_naming:
-                ui_s = self.db.query(UserSetting).filter(UserSetting.user_id == current_user_id, UserSetting.key == "ui_language").first()
-                if not ui_s:
-                    ui_s = self.db.query(SystemSetting).filter(SystemSetting.key == "ui_language").first()
-                if ui_s and ui_s.value:
-                    t_lang = ui_s.value
+                t_lang = self.settings_port.get_setting("ui_language", current_user_id)
             else:
-                target_s = self.db.query(UserSetting).filter(UserSetting.user_id == current_user_id, UserSetting.key == "default_target_language").first()
-                if not target_s:
-                    target_s = self.db.query(SystemSetting).filter(SystemSetting.key == "default_target_language").first()
-                if target_s and target_s.value:
-                    t_lang = target_s.value
+                t_lang = self.settings_port.get_setting("default_target_language", current_user_id)
             
             if t_lang:
                 langs_to_enrich.append(t_lang)
@@ -214,33 +158,26 @@ class MainstreamEnricher:
         coll = details.get("belongs_to_collection")
         if coll:
             coll_id = str(coll["id"])
-            collection = self.db.query(MediaCollection).filter(
-                MediaCollection.provider == Provider.TMDB,
-                MediaCollection.external_id == coll_id
-            ).first()
+            collection = self.metadata_repo.get_collection(Provider.TMDB, coll_id)
             if not collection:
-                collection = MediaCollection(
+                collection = self.metadata_repo.create_collection(
                     provider=Provider.TMDB,
                     external_id=coll_id,
                     backdrop_path=coll.get("backdrop_path")
                 )
-                self.db.add(collection)
+                self.db.flush()
             match.collection = collection
 
             from app.domains.metadata.models import MediaCollectionLocalization
             lang_code = language.split("-", 1)[0].lower()
             loc = None
             if collection.id is not None:
-                loc = self.db.query(MediaCollectionLocalization).filter(
-                    MediaCollectionLocalization.collection_id == collection.id,
-                    MediaCollectionLocalization.locale == lang_code
-                ).first()
+                loc = self.metadata_repo.get_collection_localization(collection.id, lang_code)
             if not loc:
-                loc = MediaCollectionLocalization(
-                    collection=collection,
+                loc = self.metadata_repo.create_collection_localization(
+                    collection_id=collection.id,
                     locale=lang_code
                 )
-                self.db.add(loc)
             loc.title = coll.get("name") or loc.title
             loc.poster_path = coll.get("poster_path") or loc.poster_path
 
@@ -285,31 +222,20 @@ class MainstreamEnricher:
 
         with tv_enrich_lock:
             # Query or create the TV Show match (shared, so media_item_id is None)
-            tv_match = self.db.query(MetadataMatch).filter(
-                MetadataMatch.provider == match.provider,
-                MetadataMatch.external_id == match.external_id,
-                MetadataMatch.media_type == MediaType.TV,
-                MetadataMatch.media_item_id.is_(None)
-            ).first()
+            tv_match = self.metadata_repo.get_tv_match(match.provider, match.external_id)
             if not tv_match:
-                tv_match = MetadataMatch(
-                    provider=match.provider,
-                    external_id=match.external_id,
-                    media_type=MediaType.TV,
-                    confidence_score=1.0,
-                    media_item_id=None
-                )
                 try:
                     with self.db.begin_nested():
-                        self.db.add(tv_match)
-                        self.db.flush()
+                        tv_match = self.metadata_repo.create_match(
+                            provider=match.provider,
+                            external_id=match.external_id,
+                            media_type=MediaType.TV,
+                            media_item_id=None
+                        )
+                        tv_match.confidence_score = 1.0
+                        self.metadata_repo.flush()
                 except Exception:
-                    tv_match = self.db.query(MetadataMatch).filter(
-                        MetadataMatch.provider == match.provider,
-                        MetadataMatch.external_id == match.external_id,
-                        MetadataMatch.media_type == MediaType.TV,
-                        MetadataMatch.media_item_id.is_(None)
-                    ).first()
+                    tv_match = self.metadata_repo.get_tv_match(match.provider, match.external_id)
 
             self._update_match_common(tv_match, tv_details, include_ratings=include_ratings)
             tv_match.is_adult = tv_details.get("adult", False)
@@ -358,38 +284,25 @@ class MainstreamEnricher:
         if match.season_number is not None:
             # Make sure tv_match has an ID populated
             if tv_match.id is None:
-                self.db.flush()
+                self.metadata_repo.flush()
             with tv_enrich_lock:
-                season_match = self.db.query(MetadataMatch).filter(
-                    MetadataMatch.provider == match.provider,
-                    MetadataMatch.parent_id == tv_match.id,
-                    MetadataMatch.media_type == MediaType.SEASON,
-                    MetadataMatch.season_number == match.season_number,
-                    MetadataMatch.media_item_id.is_(None)
-                ).first()
+                season_match = self.metadata_repo.get_season_match(match.provider, tv_match.id, match.season_number)
                 if not season_match:
-                    season_match = MetadataMatch(
-                        provider=match.provider,
-                        external_id=f"{match.external_id}-s{match.season_number}",
-                        media_type=MediaType.SEASON,
-                        season_number=match.season_number,
-                        parent=tv_match,
-                        parent_id=tv_match.id,
-                        confidence_score=1.0,
-                        media_item_id=None
-                    )
                     try:
                         with self.db.begin_nested():
-                            self.db.add(season_match)
-                            self.db.flush()
+                            season_match = self.metadata_repo.create_match(
+                                provider=match.provider,
+                                external_id=f"{match.external_id}-s{match.season_number}",
+                                media_type=MediaType.SEASON,
+                                media_item_id=None
+                            )
+                            season_match.season_number = match.season_number
+                            season_match.parent = tv_match
+                            season_match.parent_id = tv_match.id
+                            season_match.confidence_score = 1.0
+                            self.metadata_repo.flush()
                     except Exception:
-                        season_match = self.db.query(MetadataMatch).filter(
-                            MetadataMatch.provider == match.provider,
-                            MetadataMatch.parent_id == tv_match.id,
-                            MetadataMatch.media_type == MediaType.SEASON,
-                            MetadataMatch.season_number == match.season_number,
-                            MetadataMatch.media_item_id.is_(None)
-                        ).first()
+                        season_match = self.metadata_repo.get_season_match(match.provider, tv_match.id, match.season_number)
 
                 seasons = tv_details.get("seasons", [])
                 season_data = next((s for s in seasons if s.get("season_number") is not None and int(s.get("season_number")) == int(match.season_number)), None)
@@ -413,12 +326,12 @@ class MainstreamEnricher:
         if match.season_number is not None and match.episode_number is not None:
             if season_match:
                 if season_match.id is None:
-                    self.db.flush()
+                    self.metadata_repo.flush()
                 match.parent = season_match
                 match.parent_id = season_match.id
             else:
                 if tv_match.id is None:
-                    self.db.flush()
+                    self.metadata_repo.flush()
                 match.parent = tv_match
                 match.parent_id = tv_match.id
 
@@ -488,10 +401,7 @@ class MainstreamEnricher:
         if not path:
             return None
 
-        from app.domains.tasks import task_manager
-
-        image_service = task_manager.download_worker.image_service
-        url = image_service.get_download_url(path, subfolder)
+        url = self.image_downloader.get_download_url(path, subfolder)
         if not url:
             return None
 
@@ -521,7 +431,7 @@ class MainstreamEnricher:
 
         safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", prefix).strip("_")
         filename = f"{safe_prefix}_{basename}"
-        task_manager.download_worker.enqueue_download(url, subfolder, filename)
+        self.image_downloader.enqueue_download(url, subfolder, filename)
         return f"{subfolder}/{filename}"
 
     def _update_match_common(self, match: MetadataMatch, details: Dict[str, Any], include_ratings: bool = True):
@@ -552,10 +462,9 @@ class MainstreamEnricher:
         for comp in details.get("production_companies") or []:
             s_name = comp.get("name")
             if s_name:
-                studio = self.db.query(Studio).filter(Studio.name == s_name).first()
+                studio = self.metadata_repo.get_studio_by_name(s_name)
                 if not studio:
-                    studio = Studio(name=s_name, logo_path=comp.get("logo_path"))
-                    self.db.add(studio)
+                    studio = self.metadata_repo.create_studio(name=s_name, logo_path=comp.get("logo_path"))
 
                 if studio.logo_path and not studio.logo_path.startswith("logos/"):
                     local_logo = self._queue_image(studio.logo_path, "logos", f"studio_{studio.name}")
@@ -595,20 +504,16 @@ class MainstreamEnricher:
                 known_for_department=cast_member.get("known_for_department")
             )
             
-            link = self.db.query(MediaPersonLink).filter(
-                MediaPersonLink.match_id == match.id if match.id else False,
-                MediaPersonLink.person_id == person.id if person.id else False,
-                MediaPersonLink.role == RoleType.ACTOR
-            ).first()
+            link = self.people_repo.get_media_person_link(match.id, person.id, RoleType.ACTOR)
             
             if not link:
-                link = MediaPersonLink(
+                link = self.people_repo.create_media_person_link(
                     role=RoleType.ACTOR,
                     character_name=cast_member.get("character") or (cast_member.get("roles", [{}])[0].get("character") if "roles" in cast_member else None),
-                    order=idx
+                    order=idx,
+                    match_id=match.id,
+                    person_id=person.id
                 )
-                link.person = person
-                match.people.append(link)
 
         # Link Directors
         directors = [p for p in crew if p.get("job") == "Director"][:2]
@@ -622,19 +527,15 @@ class MainstreamEnricher:
                 known_for_department=dir_member.get("known_for_department")
             )
             
-            link = self.db.query(MediaPersonLink).filter(
-                MediaPersonLink.match_id == match.id if match.id else False,
-                MediaPersonLink.person_id == person.id if person.id else False,
-                MediaPersonLink.role == RoleType.DIRECTOR
-            ).first()
+            link = self.people_repo.get_media_person_link(match.id, person.id, RoleType.DIRECTOR)
             
             if not link:
-                link = MediaPersonLink(
+                link = self.people_repo.create_media_person_link(
                     role=RoleType.DIRECTOR,
-                    order=idx
+                    order=idx,
+                    match_id=match.id,
+                    person_id=person.id
                 )
-                link.person = person
-                match.people.append(link)
 
     def _get_or_create_loc(self, match: MetadataMatch, language: str) -> MetadataLocalization:
         language = LanguageService.resolve_request_locale(Provider.TMDB, language) or DEFAULT_FALLBACK_LANGUAGE
@@ -649,13 +550,11 @@ class MainstreamEnricher:
                 if duplicate is not loc:
                     match.localizations.remove(duplicate)
             return loc
-        loc = self.db.query(MetadataLocalization).filter(
-            MetadataLocalization.match_id == match.id if match.id else False,
-            MetadataLocalization.locale == language
-        ).first()
+        loc = self.metadata_repo.get_localization(match.id, language)
         if not loc:
-            loc = MetadataLocalization(locale=language)
-            match.localizations.append(loc)
+            loc = self.metadata_repo.create_localization(match.id, language)
+            if loc not in match.localizations:
+                match.localizations.append(loc)
         return loc
 
     def _get_details_cached(self, tmdb_id: int, item_type: str, language: str) -> Dict[str, Any]:

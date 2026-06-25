@@ -92,7 +92,7 @@ class ContextBuilder:
         ctx.update({"PartType": part_label, "Part": part_val, "PartSep": part_sep})
         return ctx
 
-    def build_scene_context(self, item: Any, match: Any, loc: Any) -> Dict[str, Any]:
+    def build_scene_context(self, item: Any, match: Any, loc: Any, people_links: Optional[List[Any]] = None) -> Dict[str, Any]:
         """Builds context variables for an adult Scene."""
         ctx = self.tech_parser.get_tech_context(item)
         
@@ -121,7 +121,17 @@ class ContextBuilder:
         performer_names = []
         from app.shared_kernel.enums import RoleType
         
-        people_links = getattr(match, "people", []) or []
+        if people_links is None and match:
+            from sqlalchemy import inspect
+            insp = inspect(match)
+            if insp.session:
+                from app.domains.people.models import MediaPersonLink
+                from sqlalchemy.orm import joinedload
+                people_links = insp.session.query(MediaPersonLink).options(
+                    joinedload(MediaPersonLink.person)
+                ).filter(MediaPersonLink.match_id == match.id).all()
+        
+        people_links = people_links or []
         actor_links = [l for l in people_links if getattr(l, "role", None) == RoleType.ACTOR]
         
         # Sort actor links

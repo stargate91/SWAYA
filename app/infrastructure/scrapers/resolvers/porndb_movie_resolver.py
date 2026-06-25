@@ -11,7 +11,7 @@ from app.domains.metadata.models import MetadataMatch
 from app.infrastructure.scrapers.support.normalizer import ScraperNormalizer
 from app.infrastructure.scrapers.providers.omdb import OMDBScraper
 from app.infrastructure.scrapers.support.persistence import ScraperPersister
-from app.infrastructure.scrapers.providers.porndb import PornDBScraper
+from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.infrastructure.scrapers.resolver import normalize_title
 
 
@@ -21,9 +21,23 @@ logger = logging.getLogger(__name__)
 class PornDBMovieResolver:
     """Resolves adult movies without mixing PornDB scene results into the profile."""
 
-    def __init__(self, db_session: Session):
+    def __init__(self, db_session: Session, scraper_gateway: Optional[ScraperGatewayPort] = None):
         self.db = db_session
-        self.scraper = PornDBScraper(db_session)
+        from app.infrastructure.repositories.db_scraper_log_repository import DbScraperLogRepository
+        from app.infrastructure.scrapers.support.gateway import scraper_gateway as default_gateway
+        self.scraper_gateway = scraper_gateway or default_gateway
+        self.scraper = self.scraper_gateway.adult(Provider.PORNDB, db_session)
+        self.scraper_log_repo = DbScraperLogRepository(db_session)
+
+    def _log_search(self, task_id: Optional[int], media_item_id: Optional[int], provider: Provider, search_query: str, result_count: int, details: dict) -> None:
+        self.scraper_log_repo.log_search(
+            task_id=task_id,
+            media_item_id=media_item_id,
+            provider=provider,
+            search_query=search_query,
+            result_count=result_count,
+            details=details
+        )
 
     def is_available(self) -> bool:
         return bool(
@@ -102,9 +116,10 @@ class PornDBMovieResolver:
                     return False
 
         self._persist(item, movie, status=status, confidence=1.0)
-        self.scraper.log_search(
+        self._log_search(
             task_id=task_id,
             media_item_id=item.id,
+            provider=Provider.PORNDB,
             search_query=f"movie hash: {hash_type.lower()}={file_hash}",
             result_count=1,
             details={
@@ -162,9 +177,10 @@ class PornDBMovieResolver:
                 all_candidates.append((max(0.0, min(score, 1.0)), movie, title, movies))
 
         if not all_candidates:
-            self.scraper.log_search(
+            self._log_search(
                 task_id=task_id,
                 media_item_id=item.id,
+                provider=Provider.PORNDB,
                 search_query=", ".join(queries),
                 result_count=0,
                 details={
@@ -204,9 +220,10 @@ class PornDBMovieResolver:
                 score, movie, q, s = matched_candidates[0]
                 movie = self.scraper.enrich_movie_ratings(movie)
                 self._persist(item, movie, status=ItemStatus.MATCHED, confidence=score)
-                self.scraper.log_search(
+                self._log_search(
                     task_id=task_id,
                     media_item_id=item.id,
+                    provider=Provider.PORNDB,
                     search_query=q,
                     result_count=len(s),
                     details={
@@ -221,9 +238,10 @@ class PornDBMovieResolver:
                 return True
             else:
                 self._persist_multiple(item, [m for _, m, _, _ in matched_candidates])
-                self.scraper.log_search(
+                self._log_search(
                     task_id=task_id,
                     media_item_id=item.id,
+                    provider=Provider.PORNDB,
                     search_query=matched_candidates[0][2],
                     result_count=len(matched_candidates[0][3]),
                     details={
@@ -243,9 +261,10 @@ class PornDBMovieResolver:
                 score, movie, q, s = uncertain_candidates[0]
                 movie = self.scraper.enrich_movie_ratings(movie)
                 self._persist(item, movie, status=ItemStatus.UNCERTAIN, confidence=score)
-                self.scraper.log_search(
+                self._log_search(
                     task_id=task_id,
                     media_item_id=item.id,
+                    provider=Provider.PORNDB,
                     search_query=q,
                     result_count=len(s),
                     details={
@@ -260,9 +279,10 @@ class PornDBMovieResolver:
                 return True
             else:
                 self._persist_multiple(item, [m for _, m, _, _ in uncertain_candidates])
-                self.scraper.log_search(
+                self._log_search(
                     task_id=task_id,
                     media_item_id=item.id,
+                    provider=Provider.PORNDB,
                     search_query=uncertain_candidates[0][2],
                     result_count=len(uncertain_candidates[0][3]),
                     details={
@@ -276,9 +296,10 @@ class PornDBMovieResolver:
                 )
                 return True
 
-        self.scraper.log_search(
+        self._log_search(
             task_id=task_id,
             media_item_id=item.id,
+            provider=Provider.PORNDB,
             search_query=", ".join(queries),
             result_count=len(all_candidates),
             details={

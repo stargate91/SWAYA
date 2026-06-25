@@ -3,23 +3,30 @@ import logging
 from typing import Optional, List, Dict, Any, Tuple
 from sqlalchemy.orm import Session
 
-from app.shared_kernel.enums import MediaType, ItemStatus
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch
+from app.shared_kernel.enums import MediaType
 from app.domains.people.models import MediaPersonLink
 from app.shared_kernel.language import LanguageService
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.shared_kernel.ports.library_port import LibraryPort
 
-from app.domains.media_assets.services.images import image_processing_service
+from app.shared_kernel.ports.image_service_port import ImageServicePort
 
 logger = logging.getLogger(__name__)
 
 class FilmographyService:
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, library_port: Optional[LibraryPort] = None, image_service: Optional[ImageServicePort] = None):
         self.db = db
+        if library_port is None:
+            from app.infrastructure.media.db_media_resolver import DbMediaResolver
+            library_port = DbMediaResolver(db)
+        self.library_port = library_port
+        if image_service is None:
+            from app.domains.media_assets.services.images import image_processing_service
+            image_service = image_processing_service
+        self.image_service = image_service
 
     def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
-        return image_processing_service.resolve_image_url(path, subfolder, size)
+        return self.image_service.resolve_image_url(path, subfolder, size)
 
 
     def aggregate_credits(self, person_id: int) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]]]:
@@ -27,10 +34,10 @@ class FilmographyService:
         ui_lang = DEFAULT_FALLBACK_LANGUAGE
         
         # Load credits linked to this person
-        links = db.query(MediaPersonLink).join(MediaPersonLink.match).join(MetadataMatch.media_item).filter(
+        active_match_ids = self.library_port.get_active_match_ids()
+        links = db.query(MediaPersonLink).filter(
             MediaPersonLink.person_id == person_id,
-            MetadataMatch.is_active == True,
-            MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED])
+            MediaPersonLink.match_id.in_(active_match_ids)
         ).all()
         
         movies = []
@@ -294,6 +301,8 @@ class FilmographyService:
         mapped_items = []
         total_items = 0
         
+        remote_per_page = 1000 if source.lower() in ("stashdb", "fansdb") else 100
+        
         if source.lower() in ("stashdb", "fansdb"):
             if media_type != "scene":
                 return {"items": [], "page": page, "page_size": page_size, "total_items": 0, "total_pages": 1}
@@ -326,8 +335,8 @@ class FilmographyService:
                             "value": [ext_id],
                             "modifier": "INCLUDES"
                         },
-                        "page": page,
-                        "per_page": page_size,
+                        "page": 1,
+                        "per_page": remote_per_page,
                         "direction": "DESC",
                         "sort": "DATE"
                     }
@@ -373,15 +382,15 @@ class FilmographyService:
                     headers = {"Authorization": f"Bearer {api_token}", "Accept": "application/json"}
                     
                     if media_type == "movie":
-                        url = f"https://api.theporndb.net/performers/{ext_id}/movies?page={page}&per_page={page_size}"
+                        url = f"https://api.theporndb.net/performers/{ext_id}/movies?page=1&per_page={remote_per_page}"
                         resp = scraper.session.get(url, headers=headers, timeout=15)
                         if resp.status_code == 200:
                             res_json = resp.json()
                             raw_data = res_json.get("data") or []
                             meta_total = res_json.get("meta", {}).get("total") or 10000
                             total_items = meta_total
-                            if len(raw_data) < page_size:
-                                total_items = (page - 1) * page_size + len(raw_data)
+                            if len(raw_data) < remote_per_page:
+                                total_items = len(raw_data)
                             
                             for x in raw_data:
                                 xid = x.get("id")
@@ -412,7 +421,7 @@ class FilmographyService:
                                 })
                     else:
                         # Fetch page for scenes and use person.scene_count
-                        url = f"https://api.theporndb.net/performers/{ext_id}/scenes?page={page}&per_page={page_size}"
+                        url = f"https://api.theporndb.net/performers/{ext_id}/scenes?page=1&per_page={remote_per_page}"
                         resp = scraper.session.get(url, headers=headers, timeout=15)
                         if resp.status_code == 200:
                             res_json = resp.json()
@@ -451,35 +460,77 @@ class FilmographyService:
             except Exception as e:
                 logger.error(f"Error querying PornDB REST API for performer {person_id}: {e}")
                 
-        if mapped_items:
-            # Query local DB to see if any of the external IDs are already in library
-            from app.domains.metadata.models import MetadataMatch
+        local_items = []
+        try:
             prov_enum = Provider(source.lower())
-            ext_ids_list = [item["id"] for item in mapped_items]
-            matches = db.query(MetadataMatch).filter(
-                MetadataMatch.provider == prov_enum,
-                MetadataMatch.external_id.in_(ext_ids_list),
-                MetadataMatch.is_active == True
+            active_match_ids = self.library_port.get_active_match_ids(media_type=media_type)
+            from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+            from app.domains.languages.services import LanguageService
+            
+            links = db.query(MediaPersonLink).filter(
+                MediaPersonLink.person_id == person_id,
+                MediaPersonLink.match_id.in_(active_match_ids)
             ).all()
             
-            local_map = {}
-            for m in matches:
-                item = m.media_item
-                if item and item.status in (ItemStatus.RENAMED, ItemStatus.ORGANIZED):
-                    local_map[m.external_id] = item.id
-                    
-            for item in mapped_items:
-                ext_id_key = item["id"]
-                if ext_id_key in local_map:
-                    item["in_library"] = True
-                    item["library_item_id"] = local_map[ext_id_key]
-                    
-            # Sort the 12 items: in_library first
-            mapped_items.sort(key=lambda x: 0 if x.get("in_library") else 1)
+            ui_lang = DEFAULT_FALLBACK_LANGUAGE
+            for link in links:
+                match = link.match
+                item = match.media_item
+                match_loc = LanguageService.get_best_localization(match.localizations, ui_lang)
+                title = match_loc.title if match_loc else item.filename
+                
+                local_items.append({
+                    "id": item.id,
+                    "title": title,
+                    "type": media_type,
+                    "media_type": media_type,
+                    "year": match.release_date.year if match.release_date else None,
+                    "poster_path": self._resolve_img(match_loc.poster_path if match_loc else None, "posters"),
+                    "backdrop_path": self._resolve_img(match.backdrop_path, "backdrops", size="original"),
+                    "rating": match.rating_tmdb or 0.0,
+                    "rating_porndb": match.rating_porndb,
+                    "job": link.role.value if hasattr(link.role, "value") else str(link.role),
+                    "character": link.character_name,
+                    "in_library": True,
+                    "library_item_id": item.id,
+                    "stash_id": match.external_id if (match.provider and match.provider.value == source.lower()) else None,
+                })
+        except Exception as e:
+            logger.error(f"Error querying local items in _fetch_remote_credits: {e}")
+
+        local_by_ext_id = {str(li["stash_id"]).lower().strip(): li for li in local_items if li.get("stash_id")}
+        combined_items = []
+        
+        for item in mapped_items:
+            ext_id_key = str(item["id"]).lower().strip()
+            if ext_id_key in local_by_ext_id:
+                local_item = local_by_ext_id[ext_id_key]
+                item.update({
+                    "in_library": True,
+                    "library_item_id": local_item["id"],
+                })
+                local_item["_merged"] = True
+            combined_items.append(item)
             
+        for li in local_items:
+            if not li.get("_merged"):
+                combined_items.append(li)
+                
+        combined_items.sort(
+            key=lambda x: (
+                0 if x.get("in_library") else 1,
+                -(x.get("year") or 0),
+                x.get("title") or ""
+            )
+        )
+        
+        total_items = max(total_items, len(combined_items))
         total_pages = max(1, math.ceil(total_items / page_size))
+        start_idx = (page - 1) * page_size
+        sliced = combined_items[start_idx : start_idx + page_size]
+        
         return {
-            "items": mapped_items,
+            "items": sliced,
             "page": page,
             "page_size": page_size,
             "total_items": total_items,
@@ -494,20 +545,11 @@ class FilmographyService:
                 
         db = self.db
         # Load movie credits
-        query = db.query(MediaPersonLink).join(MediaPersonLink.match).join(MetadataMatch.media_item).filter(
+        active_match_ids = self.library_port.get_active_match_ids(media_type="movie", provider=source)
+        links = db.query(MediaPersonLink).filter(
             MediaPersonLink.person_id == person_id,
-            MetadataMatch.media_type == MediaType.MOVIE,
-            MetadataMatch.is_active == True,
-            MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED])
-        )
-        if source:
-            try:
-                from app.shared_kernel.enums import Provider
-                provider_enum = Provider(source.lower())
-                query = query.filter(MetadataMatch.provider == provider_enum)
-            except ValueError:
-                pass
-        links = query.all()
+            MediaPersonLink.match_id.in_(active_match_ids)
+        ).all()
         
         movies = []
         ui_lang = DEFAULT_FALLBACK_LANGUAGE
@@ -548,11 +590,10 @@ class FilmographyService:
     def get_person_tv(self, person_id: int, page: int = 1, page_size: int = 12):
         db = self.db
         # Load tv credits
-        links = db.query(MediaPersonLink).join(MediaPersonLink.match).join(MetadataMatch.media_item).filter(
+        active_match_ids = self.library_port.get_active_match_ids(media_type="tv_or_episode")
+        links = db.query(MediaPersonLink).filter(
             MediaPersonLink.person_id == person_id,
-            MetadataMatch.media_type.in_([MediaType.TV, MediaType.EPISODE]),
-            MetadataMatch.is_active == True,
-            MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED])
+            MediaPersonLink.match_id.in_(active_match_ids)
         ).all()
         
         tv_map = {}
@@ -602,20 +643,11 @@ class FilmographyService:
                 
         db = self.db
         # Load scene credits
-        query = db.query(MediaPersonLink).join(MediaPersonLink.match).join(MetadataMatch.media_item).filter(
+        active_match_ids = self.library_port.get_active_match_ids(media_type="scene", provider=source)
+        links = db.query(MediaPersonLink).filter(
             MediaPersonLink.person_id == person_id,
-            MetadataMatch.media_type == MediaType.SCENE,
-            MetadataMatch.is_active == True,
-            MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED])
-        )
-        if source:
-            try:
-                from app.shared_kernel.enums import Provider
-                provider_enum = Provider(source.lower())
-                query = query.filter(MetadataMatch.provider == provider_enum)
-            except ValueError:
-                pass
-        links = query.all()
+            MediaPersonLink.match_id.in_(active_match_ids)
+        ).all()
         
         scenes = []
         ui_lang = DEFAULT_FALLBACK_LANGUAGE

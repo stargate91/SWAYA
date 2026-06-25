@@ -5,34 +5,41 @@ from sqlalchemy import case, func
 from sqlalchemy.orm import Session, joinedload
 from fastapi import HTTPException
 
-from app.shared_kernel.enums import MediaType, ItemStatus, RoleType, Provider
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch
+from app.shared_kernel.enums import MediaType, RoleType, Provider
 from app.domains.people.models import Person, PersonLocalization, MediaPersonLink, ExternalSourceLink
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.shared_kernel.language import LanguageService
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.shared_kernel.user_context import get_current_user_id
+from app.shared_kernel.ports.library_port import LibraryPort
 from app.domains.people.services.filmography_service import FilmographyService
-from app.domains.people.schemas import (
+from app.application.people.schemas import (
     PeopleSearchResponse,
     PersonDetailResponse,
     PersonFilmographyResponse,
 )
 
-from app.domains.media_assets.services.images import image_processing_service
+from app.shared_kernel.ports.image_service_port import ImageServicePort
 
 logger = logging.getLogger(__name__)
 
 class PeopleDetailService:
-    def __init__(self, db: Session, scrapers: ScraperGatewayPort):
+    def __init__(self, db: Session, scrapers: ScraperGatewayPort, library_port: Optional[LibraryPort] = None, image_service: Optional[ImageServicePort] = None):
         self.db = db
         self.scrapers = scrapers
         self.tmdb = scrapers.tmdb(db)
-        self.filmography_service = FilmographyService(db)
+        if library_port is None:
+            from app.infrastructure.media.db_media_resolver import DbMediaResolver
+            library_port = DbMediaResolver(db)
+        self.library_port = library_port
+        if image_service is None:
+            from app.domains.media_assets.services.images import image_processing_service
+            image_service = image_processing_service
+        self.image_service = image_service
+        self.filmography_service = FilmographyService(db, library_port=library_port, image_service=image_service)
 
     def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
-        return image_processing_service.resolve_image_url(path, subfolder, size)
+        return self.image_service.resolve_image_url(path, subfolder, size)
 
 
     def get_people(
@@ -48,14 +55,11 @@ class PeopleDetailService:
     ):
         db = self.db
         
+        from app.shared_kernel.enums import ItemStatus
         statuses = [ItemStatus.MATCHED, ItemStatus.RENAMED, ItemStatus.ORGANIZED]
 
         # Determine target match IDs linked to library items
-        matched_match_ids = [
-            m.id for m in db.query(MetadataMatch).join(MediaItem).filter(
-                MediaItem.status.in_(statuses)
-            ).filter(MetadataMatch.is_active == True).all()
-        ]
+        matched_match_ids = self.library_port.get_matched_match_ids(statuses)
         
         join_cond = (MediaPersonLink.person_id == Person.id)
         if matched_match_ids:
@@ -63,6 +67,7 @@ class PeopleDetailService:
         else:
             join_cond = join_cond & (False)
 
+        from app.domains.metadata.models import MetadataMatch
         library_key = case(
             (
                 MetadataMatch.media_type.in_([MediaType.TV, MediaType.EPISODE, MediaType.SEASON]),
@@ -70,7 +75,6 @@ class PeopleDetailService:
             ),
             else_=MetadataMatch.id
         )
-
         query = db.query(
             Person,
             func.count(func.distinct(library_key)).label("library_count"),
@@ -197,13 +201,8 @@ class PeopleDetailService:
         person = db.query(Person).options(joinedload(Person.localizations)).filter(Person.id == person_id).first()
         if not person:
             raise HTTPException(status_code=404, detail="Person not found")
-        from app.domains.users.models import UserOverride
-
         user_id = get_current_user_id() or 1
-        override = db.query(UserOverride).filter(
-            UserOverride.user_id == user_id,
-            UserOverride.person_id == person_id
-        ).first()
+        override_dict = self.library_port.get_person_user_override(user_id, person_id)
         
         ui_lang = DEFAULT_FALLBACK_LANGUAGE
         loc = LanguageService.get_best_localization(person.localizations, ui_lang)
@@ -329,8 +328,8 @@ class PeopleDetailService:
         )
 
         effective_backdrop = None
-        if override and override.custom_backdrop:
-            effective_backdrop = override.custom_backdrop
+        if override_dict and override_dict.get("custom_backdrop"):
+            effective_backdrop = override_dict.get("custom_backdrop")
         elif tmdb_id:
             from app.domains.people.helpers import resolve_person_known_for_backdrop
             effective_backdrop = resolve_person_known_for_backdrop(
@@ -405,12 +404,12 @@ class PeopleDetailService:
             "rating_porndb": person.rating_porndb,
             "known_for_department": person.known_for_department,
             "is_adult": person.is_adult,
-            "profile_path": self._resolve_img((override.custom_poster if override and override.custom_poster else person.profile_path), "people"),
+            "profile_path": self._resolve_img((override_dict.get("custom_poster") if override_dict and override_dict.get("custom_poster") else person.profile_path), "people"),
             "backdrop_path": self._resolve_img(effective_backdrop, "backdrops", size="original"),
             "is_active": person.is_active,
-            "is_favorite": override.is_favorite if override else False,
-            "user_rating": override.user_rating if override else None,
-            "user_comment": override.user_comment if override else None,
+            "is_favorite": override_dict.get("is_favorite") if override_dict else False,
+            "user_rating": override_dict.get("user_rating") if override_dict else None,
+            "user_comment": override_dict.get("user_comment") if override_dict else None,
             "homepage": person.homepage,
             "external_ids": external_ids,
             "images": [self._resolve_img(img, "people") for img in (person.images or [])],
@@ -578,22 +577,18 @@ class PeopleDetailService:
         }
 
     def update_person_backdrop(self, person_id: int, backdrop_path: str) -> Dict[str, Any]:
-        from app.domains.users.models import UserOverride
         db = self.db
         person = db.query(Person).filter(Person.id == person_id).first()
         if not person:
             raise HTTPException(status_code=404, detail="Person not found")
 
         user_id = get_current_user_id() or 1
-        override = db.query(UserOverride).filter(
-            UserOverride.user_id == user_id,
-            UserOverride.person_id == person_id
-        ).first()
-        if not override:
-            override = UserOverride(user_id=user_id, person_id=person_id)
-            db.add(override)
-
-        override.custom_backdrop = backdrop_path
+        self.library_port.update_person_user_override(
+            user_id=user_id,
+            person_id=person_id,
+            custom_backdrop=backdrop_path,
+            update_backdrop=True
+        )
         db.commit()
 
         # Mark person as active on user interaction
@@ -616,15 +611,8 @@ class PeopleDetailService:
             raise HTTPException(status_code=404, detail="Person not found")
 
         user_id = get_current_user_id() or 1
-        override = db.query(UserOverride).filter(
-            UserOverride.user_id == user_id,
-            UserOverride.person_id == person_id
-        ).first()
-        if not override:
-            override = UserOverride(user_id=user_id, person_id=person_id)
-            db.add(override)
 
-        img_service = image_processing_service
+        img_service = self.image_service
         img_service.ensure_folders()
 
         ext = os.path.splitext(filename)[1] or ".jpg"
@@ -638,7 +626,12 @@ class PeopleDetailService:
 
         img_service.generate_thumbnail(original_path, thumbnail_path, "backdrops")
 
-        override.custom_backdrop = new_filename
+        self.library_port.update_person_user_override(
+            user_id=user_id,
+            person_id=person_id,
+            custom_backdrop=new_filename,
+            update_backdrop=True
+        )
         person.is_active = True
         db.commit()
 
@@ -646,22 +639,18 @@ class PeopleDetailService:
         return {"status": "success", "backdrop_path": resolved_url, "has_local_backdrop": True}
 
     def update_person_profile(self, person_id: int, profile_path: str) -> Dict[str, Any]:
-        from app.domains.users.models import UserOverride
         db = self.db
         person = db.query(Person).filter(Person.id == person_id).first()
         if not person:
             raise HTTPException(status_code=404, detail="Person not found")
 
         user_id = get_current_user_id() or 1
-        override = db.query(UserOverride).filter(
-            UserOverride.user_id == user_id,
-            UserOverride.person_id == person_id
-        ).first()
-        if not override:
-            override = UserOverride(user_id=user_id, person_id=person_id)
-            db.add(override)
-
-        override.custom_poster = profile_path
+        self.library_port.update_person_user_override(
+            user_id=user_id,
+            person_id=person_id,
+            custom_poster=profile_path,
+            update_poster=True
+        )
         person.is_active = True
         db.commit()
 
@@ -681,15 +670,8 @@ class PeopleDetailService:
             raise HTTPException(status_code=404, detail="Person not found")
 
         user_id = get_current_user_id() or 1
-        override = db.query(UserOverride).filter(
-            UserOverride.user_id == user_id,
-            UserOverride.person_id == person_id
-        ).first()
-        if not override:
-            override = UserOverride(user_id=user_id, person_id=person_id)
-            db.add(override)
 
-        img_service = image_processing_service
+        img_service = self.image_service
         img_service.ensure_folders()
 
         ext = os.path.splitext(filename)[1] or ".jpg"
@@ -703,7 +685,12 @@ class PeopleDetailService:
 
         img_service.generate_thumbnail(original_path, thumbnail_path, "people")
 
-        override.custom_poster = new_filename
+        self.library_port.update_person_user_override(
+            user_id=user_id,
+            person_id=person_id,
+            custom_poster=new_filename,
+            update_poster=True
+        )
         person.is_active = True
         db.commit()
 
@@ -713,11 +700,8 @@ class PeopleDetailService:
     def search_people_tmdb(self, query: str, language: Optional[str] = None, adult_only: bool = False, page: int = 1, source: str = "all") -> List[Dict[str, Any]]:
         db = self.db
         import hashlib
-        from app.domains.users.models import UserOverride
         from app.domains.people.models import MediaPersonLink, Person
-        from app.domains.library.models import MediaItem
-        from app.domains.metadata.models import MetadataMatch
-        from app.shared_kernel.enums import ItemStatus, Provider
+        from app.shared_kernel.enums import Provider
         from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 
         if not language:
@@ -772,14 +756,12 @@ class PeopleDetailService:
 
                         is_linked = False
                         if person:
+                            active_match_ids = self.library_port.get_active_match_ids()
                             linked_rows = (
                                 db.query(MediaPersonLink.person_id)
-                                .join(MetadataMatch, MetadataMatch.id == MediaPersonLink.match_id)
-                                .join(MediaItem, MediaItem.id == MetadataMatch.media_item_id)
                                 .filter(
                                     MediaPersonLink.person_id == person.id,
-                                    MetadataMatch.is_active.is_(True),
-                                    MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED]),
+                                    MediaPersonLink.match_id.in_(active_match_ids),
                                 )
                                 .distinct()
                                 .all()
@@ -833,14 +815,12 @@ class PeopleDetailService:
                 ).all()
             }
 
+            active_match_ids = self.library_port.get_active_match_ids()
             linked_rows = (
                 db.query(MediaPersonLink.person_id)
-                .join(MetadataMatch, MetadataMatch.id == MediaPersonLink.match_id)
-                .join(MediaItem, MediaItem.id == MetadataMatch.media_item_id)
                 .filter(
                     MediaPersonLink.person_id.in_(person_ids),
-                    MetadataMatch.is_active.is_(True),
-                    MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED]),
+                    MediaPersonLink.match_id.in_(active_match_ids),
                 )
                 .distinct()
                 .all()

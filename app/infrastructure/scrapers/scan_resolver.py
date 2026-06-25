@@ -1,9 +1,12 @@
 import time
 import logging
 import concurrent.futures
-from typing import List, Optional, Callable
+from typing import List, Optional, Callable, Any, TYPE_CHECKING
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import OperationalError
+
+if TYPE_CHECKING:
+    from app.shared_kernel.ports.task_monitor_port import TaskMonitorPort
 
 from app.domains.library.models import MediaItem
 from app.shared_kernel.enums import ItemStatus, ScanMode
@@ -22,19 +25,26 @@ class ScanResolver:
         stop_checker: Optional[Callable[[], bool]] = None,
         include_adult: Optional[bool] = None,
         provider: Optional[str] = None,
+        library_port: Optional[Any] = None,
+        task_monitor: Optional["TaskMonitorPort"] = None,
     ):
         self.db = db_session
         self.mode = mode
         self.stop_checker = stop_checker
         self.include_adult = include_adult
         self.provider = provider
+        self.task_monitor = task_monitor
+        if library_port is None:
+            from app.infrastructure.media.db_media_resolver import DbMediaResolver
+            self.library_port = DbMediaResolver(db_session)
+        else:
+            self.library_port = library_port
 
     def _stop_requested(self, task_id: Optional[int] = None) -> bool:
         if self.stop_checker and self.stop_checker():
             return True
-        if task_id is not None:
-            from app.domains.tasks import task_manager
-            if task_manager.is_cancelled(task_id):
+        if task_id is not None and self.task_monitor:
+            if self.task_monitor.is_cancelled(task_id):
                 return True
         return False
 
@@ -89,7 +99,9 @@ class ScanResolver:
                         return
                     local_db = SessionLocal()
                     try:
-                        item = local_db.query(MediaItem).filter(MediaItem.id == item_id).first()
+                        from app.infrastructure.media.db_media_resolver import DbMediaResolver
+                        local_port = DbMediaResolver(local_db)
+                        item = local_port.get_item_by_id(item_id)
                         if not item:
                             return
 
@@ -100,6 +112,7 @@ class ScanResolver:
                             mode=self.mode,
                             include_adult=self.include_adult,
                             provider=self.provider,
+                            library_port=local_port,
                         )
                         pipeline.resolve_and_enrich(
                             item,
@@ -127,10 +140,11 @@ class ScanResolver:
                 for attempt in range(3):
                     local_db = SessionLocal()
                     try:
-                        db_item = local_db.query(MediaItem).filter(MediaItem.id == item_id).first()
+                        from app.infrastructure.media.db_media_resolver import DbMediaResolver
+                        local_port = DbMediaResolver(local_db)
+                        db_item = local_port.get_item_by_id(item_id)
                         if db_item:
-                            db_item.status = ItemStatus.ERROR
-                            local_db.commit()
+                            local_port.set_item_status(item_id, ItemStatus.ERROR)
                         break
                     except OperationalError as status_ex:
                         local_db.rollback()
@@ -155,8 +169,7 @@ class ScanResolver:
                         logger.warning(f"Progress callback raised exception: {cb_ex}")
 
         # ThreadPool for network requests (limited to avoid SQLite write lock contention and rate limits)
-        from app.domains.tasks import task_manager
-        executor = task_manager.executor
+        executor = self.task_monitor.executor if self.task_monitor else concurrent.futures.ThreadPoolExecutor(max_workers=DEFAULT_MAX_WORKERS)
         # Limit to 3 concurrent workers to prevent SQLite database lock contention and keep the UI responsive
         max_workers = min(getattr(executor, "_max_workers", DEFAULT_MAX_WORKERS), 3)
         

@@ -5,7 +5,7 @@ from sqlalchemy import func
 
 from app.domains.users.models import Tag, user_override_tags
 from app.domains.people.models import Person
-from app.domains.users.schemas import TagResponse
+from app.application.users.schemas import TagResponse
 
 logger = logging.getLogger(__name__)
 

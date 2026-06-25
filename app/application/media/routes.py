@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from app.shared_kernel.database import get_db
 from app.shared_kernel.enums import ScanMode
-from app.application.media.scanner_service import ScannerService
+from app.domains.library.services.scanner_service import ScannerService
 
 router = APIRouter(prefix="/api/v1", tags=["Media Operations"])
 
@@ -69,7 +69,7 @@ def start_rename(request: Optional[RenameRequest] = None, db: Session = Depends(
     item_ids = request.item_ids if request else None
     return ScannerService(db).start_rename(item_ids)
 
-from app.domains.history.schemas import HistoryResponse
+from app.application.history.schemas import HistoryResponse
 
 @router.get("/history", response_model=HistoryResponse)
 def get_history(page: int = 1, limit: int = 20, db: Session = Depends(get_db)):

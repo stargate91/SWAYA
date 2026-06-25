@@ -7,7 +7,7 @@ from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch, MetadataLocalization
 from app.shared_kernel.enums import Provider, MediaType, ItemStatus
 from app.domains.settings.models import SystemSetting, UserSetting
-from app.infrastructure.scrapers.providers.tmdb import TMDBScraper
+from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 
 class MainstreamResolver:
@@ -15,9 +15,23 @@ class MainstreamResolver:
     Scraper match resolver that scores and matches MediaItems to TMDB candidates.
     """
 
-    def __init__(self, db_session: Session):
+    def __init__(self, db_session: Session, scraper_gateway: Optional[ScraperGatewayPort] = None):
         self.db = db_session
-        self.api = TMDBScraper(db_session)
+        from app.infrastructure.repositories.db_scraper_log_repository import DbScraperLogRepository
+        from app.infrastructure.scrapers.support.gateway import scraper_gateway as default_gateway
+        self.scraper_gateway = scraper_gateway or default_gateway
+        self.api = self.scraper_gateway.tmdb(db_session)
+        self.scraper_log_repo = DbScraperLogRepository(db_session)
+
+    def _log_search(self, task_id: Optional[int], media_item_id: Optional[int], provider: Provider, search_query: str, result_count: int, details: dict) -> None:
+        self.scraper_log_repo.log_search(
+            task_id=task_id,
+            media_item_id=media_item_id,
+            provider=provider,
+            search_query=search_query,
+            result_count=result_count,
+            details=details
+        )
 
     def _sanitize_query(self, query: str) -> str:
         """Removes common patterns left behind by text parsing."""
@@ -260,9 +274,10 @@ class MainstreamResolver:
             item.status = ItemStatus.NO_MATCH
             item.planned_path = None
             self.db.flush()
-            self.api.log_search(
+            self._log_search(
                 task_id=task_id,
                 media_item_id=item.id,
+                provider=Provider.TMDB,
                 search_query=item.filename,
                 result_count=0,
                 details={"candidates": [], "final_status": "no_match"}
@@ -471,9 +486,10 @@ class MainstreamResolver:
                 "release_date": c.get("release_date") or c.get("first_air_date")
             })
 
-        self.api.log_search(
+        self._log_search(
             task_id=task_id,
             media_item_id=item.id,
+            provider=Provider.TMDB,
             search_query=parsed_title or item.filename,
             result_count=len(candidates),
             details={

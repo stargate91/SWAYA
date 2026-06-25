@@ -1,6 +1,5 @@
 import { Image as ImageIcon, Link as LinkIcon } from 'lucide-react';
 import PeopleTagPopover from './PeopleTagPopover';
-import PeopleLinksPopover from './PeopleLinksPopover';
 
 export default function EntityDetailTopControls({
   isPeople,
@@ -13,11 +12,11 @@ export default function EntityDetailTopControls({
   handleOpenCollectionBackdropModal,
   handleOpenLinkSourceModal,
   extraLinks,
+  socialLinks = [],
 }) {
   if (isPeople) {
     return (
       <div className="entity-detail-page__top-controls">
-        <PeopleLinksPopover extraLinks={extraLinks} t={t} />
         <PeopleTagPopover
           item={item}
           t={t}

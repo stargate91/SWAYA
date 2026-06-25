@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, File, UploadFile
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Any
 
 from app.shared_kernel.database import get_db
 from app.infrastructure.scrapers.support.gateway import scraper_gateway
 from app.domains.people.models import Person
-from app.domains.people.schemas import (
+from app.domains.people.services.people_status_service import PeopleStatusService
+from app.application.people.schemas import (
     PersonRead,
     PeopleSearchResponse,
     PersonDetailResponse,
@@ -13,7 +14,7 @@ from app.domains.people.schemas import (
     PersonStatusUpdate,
     PersonAddTmdb,
 )
-from app.domains.users.schemas import ImageOverrideUpdate
+from app.application.users.schemas import ImageOverrideUpdate
 
 # Mainstream (SFW) People Router
 mainstream_router = APIRouter(prefix="/api/v1/mainstream/people", tags=["Mainstream People"])
@@ -29,14 +30,14 @@ router = APIRouter(prefix="/api/v1/people", tags=["General People"])
 @mainstream_router.get("", response_model=List[PersonRead])
 def list_mainstream_people(db: Session = Depends(get_db), limit: int = 50):
     """Retrieve mainstream cast/crew (SFW)."""
-    return db.query(Person).filter(Person.is_adult == False).limit(limit).all()
+    return PeopleStatusService(db).list_people_by_type(is_adult=False, limit=limit)
 
 
 # --- Adult Router Endpoints ---
 @adult_router.get("", response_model=List[PersonRead])
 def list_adult_people(db: Session = Depends(get_db), limit: int = 50):
     """Retrieve adult performers (NSFW)."""
-    return db.query(Person).filter(Person.is_adult == True).limit(limit).all()
+    return PeopleStatusService(db).list_people_by_type(is_adult=True, limit=limit)
 
 
 # --- General Router Endpoints ---
@@ -144,33 +145,7 @@ def get_person_scenes(
 
 
 def resolve_person(person_id: Any, db: Session):
-    from app.domains.people.models import Person, ExternalSourceLink
-    from app.shared_kernel.enums import Provider
-    
-    person_id_str = str(person_id)
-    if ":" in person_id_str:
-        parts = person_id_str.split(":", 1)
-        source_name = parts[0]
-        uuid_str = parts[1]
-        
-        scraper_name = "porndb" if source_name == "theporndb" else source_name
-        try:
-            provider_enum = Provider(scraper_name)
-            link = db.query(ExternalSourceLink).filter(
-                ExternalSourceLink.provider == provider_enum,
-                ExternalSourceLink.external_id == uuid_str
-            ).first()
-            if link:
-                return link.person
-        except Exception:
-            pass
-        return None
-    else:
-        try:
-            p_id = int(person_id_str)
-            return db.query(Person).filter(Person.id == p_id).first()
-        except (ValueError, TypeError):
-            return None
+    return PeopleStatusService(db).resolve_person(person_id)
 
 
 @router.post("/{person_id}/status")
@@ -179,75 +154,11 @@ def update_person_status(
     payload: PersonStatusUpdate,
     db: Session = Depends(get_db)
 ):
-    from datetime import datetime, timezone
-    from app.domains.users.models import UserOverride
-    from app.shared_kernel.user_context import get_current_user_id
-
-    person = resolve_person(person_id, db)
-    if not person:
-        raise HTTPException(status_code=404, detail="Person not found")
-
-    user_id = get_current_user_id() or 1
-    fields_set = payload.model_fields_set
-
-    # 1. Update Person level fields
-    if "is_active" in fields_set and payload.is_active is not None:
-        person.is_active = payload.is_active
-
-    # Auto-activate on user interaction
-    has_user_interaction = (
-        ("user_rating" in fields_set and payload.user_rating is not None)
-        or ("is_favorite" in fields_set and payload.is_favorite)
-        or ("user_comment" in fields_set and payload.user_comment is not None)
+    return PeopleStatusService(db).update_person_status(
+        person_id=person_id,
+        payload_data=payload.model_dump(),
+        fields_set=payload.model_fields_set,
     )
-    if has_user_interaction:
-        person.is_active = True
-
-    # 2. Update UserOverride fields
-    has_override_update = (
-        "user_rating" in fields_set
-        or "is_favorite" in fields_set
-        or "user_comment" in fields_set
-    )
-    if has_override_update:
-        override = db.query(UserOverride).filter(
-            UserOverride.user_id == user_id,
-            UserOverride.person_id == person.id
-        ).first()
-
-        if not override:
-            override = UserOverride(
-                user_id=user_id,
-                person_id=person.id
-            )
-            db.add(override)
-
-        if "user_rating" in fields_set:
-            override.user_rating = float(payload.user_rating) if payload.user_rating is not None else None
-            override.user_rating_at = datetime.now(timezone.utc) if payload.user_rating is not None else None
-
-        if "is_favorite" in fields_set:
-            override.is_favorite = payload.is_favorite if payload.is_favorite is not None else False
-            override.is_favorite_at = datetime.now(timezone.utc) if payload.is_favorite else None
-
-        if "user_comment" in fields_set:
-            override.user_comment = payload.user_comment
-            override.user_comment_at = datetime.now(timezone.utc) if payload.user_comment else None
-
-    db.commit()
-
-    override = db.query(UserOverride).filter(
-        UserOverride.user_id == user_id,
-        UserOverride.person_id == person.id
-    ).first()
-
-    return {
-        "status": "ok",
-        "is_active": person.is_active,
-        "is_favorite": override.is_favorite if override else False,
-        "user_rating": override.user_rating if override else None,
-        "user_comment": override.user_comment if override else None,
-    }
 
 
 @router.get("/{person_id}/credit-backdrops")

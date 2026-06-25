@@ -1,9 +1,12 @@
 import asyncio
 import logging
-from typing import Optional, List
+from typing import Optional, List, TYPE_CHECKING
 
 from app.domains.media_assets.services.images import image_processing_service, ImageProcessingService
 from app.shared_kernel.constants import HEAVY_IMAGE_DOWNLOAD_TIMEOUT
+
+if TYPE_CHECKING:
+    from app.shared_kernel.ports.task_monitor_port import TaskMonitorPort
 
 logger = logging.getLogger(__name__)
 
@@ -15,8 +18,9 @@ class DownloadWorker:
     Supports concurrent processing of downloads.
     """
 
-    def __init__(self, image_service: Optional[ImageProcessingService] = None, concurrency: int = 6):
+    def __init__(self, image_service: Optional[ImageProcessingService] = None, concurrency: int = 6, task_monitor: Optional["TaskMonitorPort"] = None):
         self.image_service = image_service or image_processing_service
+        self.task_monitor = task_monitor
         self.concurrency = concurrency
         self._queue: Optional[asyncio.Queue] = None
         self.is_running = False
@@ -28,12 +32,12 @@ class DownloadWorker:
         self._worker_tasks: List[asyncio.Task] = []
 
     @property
-    def queue(self) -> asyncio.Queue:
+    def queue(self) -> asyncio.PriorityQueue:
         if self._queue is None:
-            self._queue = asyncio.Queue()
+            self._queue = asyncio.PriorityQueue()
         return self._queue
 
-    def enqueue_download(self, url: str, subfolder: str, filename: str) -> None:
+    def enqueue_download(self, url: str, subfolder: str, filename: str, priority: int = 100) -> None:
         """Enqueue an image asset to be downloaded in the background."""
         if hasattr(self, "loop") and self.loop and self.loop.is_running():
             try:
@@ -42,9 +46,9 @@ class DownloadWorker:
                 current_loop = None
 
             if current_loop == self.loop:
-                self.loop.create_task(self._put_in_queue(url, subfolder, filename))
+                self.loop.create_task(self._put_in_queue(url, subfolder, filename, priority))
             else:
-                asyncio.run_coroutine_threadsafe(self._put_in_queue(url, subfolder, filename), self.loop)
+                asyncio.run_coroutine_threadsafe(self._put_in_queue(url, subfolder, filename, priority), self.loop)
             return
 
         try:
@@ -53,7 +57,7 @@ class DownloadWorker:
             loop = None
 
         if loop and loop.is_running():
-            loop.create_task(self._put_in_queue(url, subfolder, filename))
+            loop.create_task(self._put_in_queue(url, subfolder, filename, priority))
             return
 
         # Background resolver threads do not have a durable event loop.
@@ -64,7 +68,7 @@ class DownloadWorker:
         finally:
             self.completed_downloads += 1
 
-    async def _put_in_queue(self, url: str, subfolder: str, filename: str) -> None:
+    async def _put_in_queue(self, url: str, subfolder: str, filename: str, priority: int = 100) -> None:
         if not self.is_running:
             await self.start()
         key = (subfolder, filename)
@@ -75,8 +79,8 @@ class DownloadWorker:
             self.batch_total = 0
             self.completed_downloads = 0
         self.batch_total += 1
-        await self.queue.put((url, subfolder, filename))
-        logger.debug(f"Enqueued asset download: {url} -> {subfolder}/{filename}")
+        await self.queue.put((priority, (url, subfolder, filename)))
+        logger.debug(f"Enqueued asset download: {url} -> {subfolder}/{filename} (priority: {priority})")
 
     async def start(self) -> None:
         """Starts the background worker processing loops."""
@@ -84,7 +88,7 @@ class DownloadWorker:
             return
         self.is_running = True
         self.loop = asyncio.get_running_loop()
-        self._queue = asyncio.Queue()
+        self._queue = asyncio.PriorityQueue()
         self.image_service.ensure_folders()
         
         # Start multiple concurrent workers consuming from the same queue
@@ -144,13 +148,12 @@ class DownloadWorker:
         while self.is_running:
             try:
                 # Pause/wait if any heavy tasks (scan, rename, undo) are running
-                from app.domains.tasks import task_manager
-                while self.is_paused or task_manager.has_active_heavy_tasks():
+                while self.is_paused or (self.task_monitor and self.task_monitor.has_active_heavy_tasks()):
                     await asyncio.sleep(2)
 
-                url, subfolder, filename = await self.queue.get()
-                if self.is_paused or task_manager.has_active_heavy_tasks():
-                    await self.queue.put((url, subfolder, filename))
+                priority, (url, subfolder, filename) = await self.queue.get()
+                if self.is_paused or (self.task_monitor and self.task_monitor.has_active_heavy_tasks()):
+                    await self.queue.put((priority, (url, subfolder, filename)))
                     self.queue.task_done()
                     await asyncio.sleep(0.25)
                     continue

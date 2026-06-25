@@ -12,6 +12,7 @@ from contextlib import contextmanager
 from app.shared_kernel.enums import TaskStatus, TaskErrorCode
 from app.domains.tasks.models import BackgroundTask
 from app.shared_kernel.constants import DEFAULT_MAX_WORKERS
+from app.shared_kernel.ports.task_monitor_port import TaskMonitorPort
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +39,7 @@ def map_exception_to_error_code(exc: Exception) -> TaskErrorCode:
         
     return TaskErrorCode.UNKNOWN
 
-class TaskManager:
+class TaskManager(TaskMonitorPort):
     """
     Centralized service to supervise, track, execute, and cancel long-running
     background tasks (e.g. scanning, scraping) with database persistence.
@@ -54,13 +55,11 @@ class TaskManager:
         if max_workers is None:
             logical = os.cpu_count() or 4
             max_workers = max(DEFAULT_MAX_WORKERS, logical * 2)
-        self.executor = ThreadPoolExecutor(max_workers=max_workers)
+        self._executor = ThreadPoolExecutor(max_workers=max_workers)
 
         from app.domains.tasks.worker import DownloadWorker
-        self.download_worker = DownloadWorker()
-
-        from app.application.people.enrich_worker import PeopleEnrichWorker
-        self.people_enrich_worker = PeopleEnrichWorker(session_factory=self.session_factory, executor=self.executor)
+        self.download_worker = DownloadWorker(task_monitor=self)
+        self.people_enrich_worker = None
 
     @contextmanager
     def transaction(self):
@@ -281,3 +280,7 @@ class TaskManager:
                 if "scan" in name_lower or "rename" in name_lower or "undo" in name_lower:
                     return True
         return False
+
+    @property
+    def executor(self) -> Any:
+        return self._executor

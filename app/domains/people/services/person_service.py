@@ -3,6 +3,7 @@ from typing import List, Optional, Any, Dict
 from sqlalchemy.orm import Session
 from app.domains.people.models import Person, ExternalSourceLink
 from app.shared_kernel.enums import Provider
+from app.shared_kernel.ports.people_repository_port import PeopleRepositoryPort
 from app.domains.people.helpers import (
     known_for_score,
     select_known_for,
@@ -17,8 +18,10 @@ class PersonService:
     Encapsulates creating and updating cast members and performers to maintain cross-domain integrity.
     """
 
-    def __init__(self, db_session: Session):
+    def __init__(self, db_session: Session, people_repo: Optional[PeopleRepositoryPort] = None):
         self.db = db_session
+        from app.infrastructure.repositories.db_people_repository import DbPeopleRepository
+        self.people_repo = people_repo or DbPeopleRepository(db_session)
 
     def update_or_create_person(
         self,
@@ -59,30 +62,11 @@ class PersonService:
 
         # 1. Try finding by provider and external_id
         if provider and external_id:
-            for obj in self.db.new:
-                if isinstance(obj, ExternalSourceLink):
-                    if obj.provider == provider and obj.external_id == str(external_id):
-                        person = obj.person
-                        break
-            if not person:
-                link = self.db.query(ExternalSourceLink).filter(
-                    ExternalSourceLink.provider == provider,
-                    ExternalSourceLink.external_id == str(external_id)
-                ).first()
-                if link:
-                    person = link.person
+            person = self.people_repo.get_person_by_external_id(provider, external_id)
 
         # 1.5 Try finding by tmdb_id
         if not person and tmdb_id:
-            for obj in self.db.new:
-                if isinstance(obj, Person) and obj.is_adult == is_adult and obj.external_ids and obj.external_ids.get("tmdb") == str(tmdb_id):
-                    person = obj
-                    break
-            if not person:
-                person = self.db.query(Person).filter(
-                    Person.is_adult == is_adult,
-                    Person.external_ids["tmdb"].as_string() == str(tmdb_id)
-                ).first()
+            person = self.people_repo.get_person_by_tmdb_id(tmdb_id, is_adult)
 
         # 1.6 Try finding by extracted IDs from URLs
         if not person and extracted_ids:
@@ -91,42 +75,25 @@ class PersonService:
                     continue
                 ext_val = extracted_ids[ext_prov]
                 if ext_prov == "tmdb":
-                    for obj in self.db.new:
-                        if isinstance(obj, Person) and obj.is_adult == is_adult and obj.external_ids and obj.external_ids.get("tmdb") == str(ext_val):
-                            person = obj
-                            break
-                    if not person:
-                        person = self.db.query(Person).filter(
-                            Person.is_adult == is_adult,
-                            Person.external_ids["tmdb"].as_string() == str(ext_val)
-                        ).first()
+                    person = self.people_repo.get_person_by_tmdb_id(ext_val, is_adult)
                 else:
-                    for obj in self.db.new:
-                        if isinstance(obj, ExternalSourceLink):
-                            if obj.provider == ext_prov and obj.external_id == str(ext_val):
-                                person = obj.person
-                                break
-                    if not person:
-                        link = self.db.query(ExternalSourceLink).filter(
-                            ExternalSourceLink.provider == ext_prov,
-                            ExternalSourceLink.external_id == str(ext_val)
-                        ).first()
-                        if link:
-                            person = link.person
+                    try:
+                        prov_enum = ext_prov if isinstance(ext_prov, Provider) else Provider(ext_prov)
+                        person = self.people_repo.get_person_by_external_id(prov_enum, ext_val)
+                    except ValueError:
+                        pass
                 if person:
                     break
 
         if not person:
-            person = Person(
+            person = self.people_repo.create_person(
                 name=name,
                 profile_path=profile_path,
                 gender=gender,
                 is_adult=is_adult,
-                known_for_department=known_for_department or ("Acting" if is_adult else None),
-                external_ids={}
+                known_for_department=known_for_department or ("Acting" if is_adult else None)
             )
-            self.db.add(person)
-            self.db.flush()
+            self.people_repo.flush()
         else:
             if profile_path:
                 person.profile_path = profile_path
@@ -173,30 +140,9 @@ class PersonService:
                 except ValueError:
                     continue
 
-            link = None
-            for existing_link in person.external_links:
-                if existing_link.provider == prov_enum and existing_link.external_id == str(ext_val):
-                    link = existing_link
-                    break
+            link = self.people_repo.get_external_link(person.id, prov_enum, ext_val, person=person)
             if not link:
-                for obj in self.db.new:
-                    if isinstance(obj, ExternalSourceLink):
-                        if (obj.person_id == person.id or obj.person == person) and obj.provider == prov_enum and obj.external_id == str(ext_val):
-                            link = obj
-                            break
-            if not link:
-                link = self.db.query(ExternalSourceLink).filter(
-                    ExternalSourceLink.person_id == person.id,
-                    ExternalSourceLink.provider == prov_enum,
-                    ExternalSourceLink.external_id == str(ext_val)
-                ).first()
-            if not link:
-                link = ExternalSourceLink(
-                    person_id=person.id,
-                    provider=prov_enum,
-                    external_id=str(ext_val)
-                )
-                self.db.add(link)
+                self.people_repo.create_external_link(person.id, prov_enum, ext_val, person=person)
 
         # Map adult performer details if provided
         if performer_details:
@@ -210,5 +156,5 @@ class PersonService:
             if not person.known_for_department:
                 person.known_for_department = "Acting"
 
-        self.db.flush()
+        self.people_repo.flush()
         return person

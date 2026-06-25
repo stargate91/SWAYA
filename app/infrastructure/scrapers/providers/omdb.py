@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 class OMDBScraper(BaseScraper):
     """OMDB-specific metadata retriever."""
 
-    def __init__(self, db_session, cache_service=None):
-        super().__init__(db_session, cache_service, Provider.OMDB)
+    def __init__(self, settings_port, cache_service=None):
+        super().__init__(settings_port, cache_service, Provider.OMDB)
 
     def fetch_omdb(self, imdb_id: str, force_refresh: bool = False) -> Optional[dict]:
         """Fetches additional ratings/details from OMDB (always SFW and non-localized)."""

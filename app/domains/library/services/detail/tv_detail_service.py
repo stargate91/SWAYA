@@ -21,7 +21,7 @@ class TvDetailService(DetailFormatter):
         self.tmdb_scraper = scrapers.tmdb(db)
 
     def get_library_tv_detail(self, tv_tmdb_id: str, seasons_limit: int = 999, initial_episodes_limit: int = 999, language: str = None) -> TvShowDetailResponse:
-        from app.domains.library.schemas import TvShowDetailResponse
+        from app.application.library.schemas import TvShowDetailResponse
         db = self.db
         try:
             tv_tmdb_id_int = int(tv_tmdb_id.split("_")[1]) if "_" in tv_tmdb_id else int(tv_tmdb_id)
@@ -267,7 +267,7 @@ class TvDetailService(DetailFormatter):
         if youtube_trailers:
             trailer_key = youtube_trailers[0].get("key")
 
-        from app.infrastructure.scrapers.enrichment.mainstream_enricher import _split_genres
+        from app.shared_kernel.genre_utils import split_genres as _split_genres
         result = {
             "id": f"tmdb_{tv_tmdb_id_int}",
             "tv_tmdb_id": tv_tmdb_id_int,
@@ -309,7 +309,7 @@ class TvDetailService(DetailFormatter):
         return TvShowDetailResponse(**result)
  
     def get_library_tv_season_detail(self, tv_tmdb_id: str, season_number: int) -> TvSeasonDetailResponse:
-        from app.domains.library.schemas import TvSeasonDetailResponse
+        from app.application.library.schemas import TvSeasonDetailResponse
         db = self.db
         try:
             tv_tmdb_id_int = int(tv_tmdb_id.split("_")[1]) if "_" in tv_tmdb_id else int(tv_tmdb_id)

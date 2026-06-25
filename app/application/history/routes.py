@@ -4,7 +4,7 @@ from typing import List
 
 from app.shared_kernel.database import get_db
 from app.domains.history.models import PlaybackLog, PlaybackPeakLog, ActionBatch
-from app.domains.history.schemas import (
+from app.application.history.schemas import (
     PlaybackLogRead,
     PlaybackPeakLogRead,
     ActionBatchRead,

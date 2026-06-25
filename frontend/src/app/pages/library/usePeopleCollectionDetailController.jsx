@@ -109,6 +109,29 @@ export default function usePeopleCollectionDetailController({
     },
     [isPeople, externalLinks, profileLinks]
   );
+  const socialLinks = useMemo(() => {
+    if (!isPeople || !item) return [];
+    const excludeKeys = ['tmdb', 'stashdb', 'theporndb', 'fansdb', 'wikidata'];
+    const allLinks = externalLinks.filter(link => 
+      !excludeKeys.includes(link.key) && 
+      link.iconSrc && 
+      link.iconSrc !== '/links/website.svg'
+    );
+    const order = ['imdb', 'website', 'instagram', 'facebook', 'x', 'tiktok', 'youtube'];
+    const ordered = [];
+    for (const key of order) {
+      const found = allLinks.find(l => l.key === key);
+      if (found) {
+        ordered.push(found);
+      }
+    }
+    for (const link of allLinks) {
+      if (!order.includes(link.key)) {
+        ordered.push(link);
+      }
+    }
+    return ordered;
+  }, [isPeople, externalLinks, item]);
   const backdropUrl = resolveDetailsImageUrl(item?.backdrop_path, API_BASE, 'backdrop');
   const mediaUrl = resolveDetailsImageUrl(
     isPeople ? getProfileImagePath(item) : getPosterImagePath(item),
@@ -269,6 +292,7 @@ export default function usePeopleCollectionDetailController({
     overviewEmptyText,
     profileLinks,
     extraLinks,
+    socialLinks,
     backdropUrl,
     mediaUrl,
     metaPills,

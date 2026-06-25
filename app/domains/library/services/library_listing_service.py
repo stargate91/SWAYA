@@ -11,7 +11,7 @@ from app.domains.people.models import MediaPersonLink
 from app.domains.people.services.people_library_service import PeopleLibraryService
 from app.shared_kernel.enums import ItemStatus, MediaType, Provider
 from app.shared_kernel.user_context import get_current_user_id
-from app.domains.library.schemas import (
+from app.application.library.schemas import (
     ContinueWatchingItem,
     LibraryTabResponse,
     GroupedLibraryResponse,
@@ -230,8 +230,7 @@ class LibraryListingService:
         ).options(
             selectinload(MetadataMatch.localizations),
             selectinload(MetadataMatch.media_item),
-            selectinload(MetadataMatch.overrides),
-            selectinload(MetadataMatch.people).selectinload(MediaPersonLink.person)
+            selectinload(MetadataMatch.overrides)
         )
 
         joined_localization = False
@@ -433,9 +432,10 @@ class LibraryListingService:
         total_items = query.count()
         items = query.offset((page - 1) * page_size).limit(page_size).all()
 
-        # Pre-fetch user overrides for metadata_matches
+        # Pre-fetch user overrides and people for metadata_matches
         match_ids = [m.id for m in items]
         overrides_dict = {}
+        people_links_dict = {}
         if match_ids:
             current_uid = get_current_user_id()
             ovs = self.db.query(UserOverride).filter(
@@ -444,6 +444,14 @@ class LibraryListingService:
             ).all()
             for ov in ovs:
                 overrides_dict[ov.metadata_match_id] = ov
+                
+            from app.domains.people.models import MediaPersonLink
+            from sqlalchemy.orm import joinedload
+            links = self.db.query(MediaPersonLink).options(
+                joinedload(MediaPersonLink.person)
+            ).filter(MediaPersonLink.match_id.in_(match_ids)).all()
+            for link in links:
+                people_links_dict.setdefault(link.match_id, []).append(link)
 
         formatted_items = []
         for match in items:
@@ -463,8 +471,9 @@ class LibraryListingService:
             resolved_backdrop = image_processing_service.resolve_image_url(backdrop_path, "backdrops")
 
             people_list = []
-            if match.people:
-                for link in sorted(match.people, key=lambda x: x.order):
+            match_people = people_links_dict.get(match.id, [])
+            if match_people:
+                for link in sorted(match_people, key=lambda x: x.order):
                     person = link.person
                     if person:
                         people_list.append({

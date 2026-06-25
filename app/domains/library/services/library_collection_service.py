@@ -9,15 +9,17 @@ from app.shared_kernel.enums import ItemStatus, MediaType
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.shared_kernel.language import LanguageService as LangHelper
 from app.shared_kernel.ports.settings_port import SettingsPort
-from app.domains.library.schemas import MovieCollectionsResponse
+from app.shared_kernel.ports.image_download_port import ImageDownloadPort
+from app.application.library.schemas import MovieCollectionsResponse
 
 logger = logging.getLogger(__name__)
 
 class LibraryCollectionService:
-    def __init__(self, db_session: Session, settings_port: Optional[SettingsPort] = None):
+    def __init__(self, db_session: Session, settings_port: Optional[SettingsPort] = None, image_downloader: Optional[ImageDownloadPort] = None):
         self.db = db_session
         from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
         self.settings = settings_port or DbSettingsAdapter(db_session)
+        self.image_downloader = image_downloader
 
 
     def get_movie_collections(
@@ -96,26 +98,24 @@ class LibraryCollectionService:
                         self.db.add(col_loc)
                         
                         try:
-                            from app.domains.tasks import task_manager
-                            image_service = task_manager.download_worker.image_service
-                            
-                            def queue_image(path: str, subfolder: str, prefix: str) -> Optional[str]:
-                                url = image_service.get_download_url(path, subfolder)
-                                if not url:
-                                    return None
-                                import os
-                                import re
-                                from urllib.parse import urlparse
-                                basename = os.path.basename(urlparse(path).path)
-                                ext = os.path.splitext(basename)[1].lower() or ".jpg"
-                                safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", prefix).strip("_")
-                                filename = f"{safe_prefix}_{basename}{ext}"
-                                task_manager.download_worker.enqueue_download(url, subfolder, filename)
-                                return f"{subfolder}/{filename}"
-                            
-                            asset_prefix = f"tmdb_{collection.external_id}"
-                            if col_loc.poster_path and not col_loc.local_poster_path:
-                                col_loc.local_poster_path = queue_image(col_loc.poster_path, "posters", asset_prefix)
+                            if self.image_downloader:
+                                def queue_image(path: str, subfolder: str, prefix: str) -> Optional[str]:
+                                    url = self.image_downloader.get_download_url(path, subfolder)
+                                    if not url:
+                                        return None
+                                    import os
+                                    import re
+                                    from urllib.parse import urlparse
+                                    basename = os.path.basename(urlparse(path).path)
+                                    ext = os.path.splitext(basename)[1].lower() or ".jpg"
+                                    safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", prefix).strip("_")
+                                    filename = f"{safe_prefix}_{basename}{ext}"
+                                    self.image_downloader.enqueue_download(url, subfolder, filename)
+                                    return f"{subfolder}/{filename}"
+                                
+                                asset_prefix = f"tmdb_{collection.external_id}"
+                                if col_loc.poster_path and not col_loc.local_poster_path:
+                                    col_loc.local_poster_path = queue_image(col_loc.poster_path, "posters", asset_prefix)
                         except Exception as e:
                             logger.error(f"Failed to queue image download for collection: {e}")
                         

@@ -7,7 +7,7 @@ from typing import Optional, Tuple, Dict, Any
 
 logger = logging.getLogger(__name__)
 
-def find_media_player(db, settings_port) -> Tuple[Optional[str], Optional[str]]:
+def find_media_player(settings_port) -> Tuple[Optional[str], Optional[str]]:
     from app.shared_kernel.user_context import get_current_user_id
     current_user_id = get_current_user_id()
     vlc_path = settings_port.get_setting("vlc_path", user_id=current_user_id)
@@ -20,15 +20,10 @@ def find_media_player(db, settings_port) -> Tuple[Optional[str], Optional[str]]:
 
     def save_setting(key, val):
         try:
-            from app.domains.settings.models import UserSetting
-            setting = db.query(UserSetting).filter(UserSetting.user_id == current_user_id, UserSetting.key == key).first()
-            if setting:
-                setting.value = val
-            else:
-                db.add(UserSetting(user_id=current_user_id, key=key, value=val))
-            db.commit()
+            settings_port.set_setting(key, val, current_user_id)
+            if hasattr(settings_port, "db"):
+                settings_port.db.commit()
         except Exception as e:
-            db.rollback()
             logger.error(f"Failed to save player setting {key}: {e}")
 
     # Detect VLC
@@ -82,9 +77,10 @@ def find_media_player(db, settings_port) -> Tuple[Optional[str], Optional[str]]:
     return None, None
 
 
-def launch_media_file(file_path: str, db, settings_port, start_seconds: int = 0) -> dict:
+
+def launch_media_file(file_path: str, settings_port, start_seconds: int = 0) -> dict:
     normalized_path = os.path.normpath(file_path)
-    player_path, player_type = find_media_player(db, settings_port)
+    player_path, player_type = find_media_player(settings_port)
 
     if player_path and player_type:
         proc = None

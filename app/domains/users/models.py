@@ -127,7 +127,6 @@ class UserOverride(Base):
     user: Mapped["User"] = relationship("User", back_populates="overrides")
     media_item: Mapped[Optional["MediaItem"]] = relationship("MediaItem", back_populates="overrides")
     metadata_match: Mapped[Optional["MetadataMatch"]] = relationship("MetadataMatch", back_populates="overrides")
-    person: Mapped[Optional["Person"]] = relationship("Person", back_populates="overrides")
     studio: Mapped[Optional["Studio"]] = relationship("Studio", back_populates="overrides")
     collection: Mapped[Optional["MediaCollection"]] = relationship("MediaCollection", back_populates="overrides")
     tags: Mapped[List["Tag"]] = relationship(

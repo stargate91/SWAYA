@@ -14,14 +14,7 @@ from .collector import Collector
 from .categorizer import Categorizer
 from .linker import Linker
 from .probe import TechnicalProber
-from app.infrastructure.filesystem.fs_utils import (
-    calculate_fast_hash,
-    to_win_long_path,
-    calculate_oshash,
-    calculate_phash,
-    calculate_full_md5,
-    calculate_full_sha256,
-)
+from app.shared_kernel.ports.file_system_port import FileSystemPort
 from .analyzer import Analyzer
 
 logger = logging.getLogger(__name__)
@@ -76,7 +69,8 @@ class ScanCollector:
         mode: ScanMode = ScanMode.MOVIES_TV,
         min_video_duration_minutes: float = 10,
         progress_callback: Optional[callable] = None,
-        provider: Optional[str] = None
+        provider: Optional[str] = None,
+        fs: Optional[FileSystemPort] = None
     ):
         self.db = db
         self.library = library
@@ -89,6 +83,11 @@ class ScanCollector:
         self.min_video_duration_minutes = min_video_duration_minutes
         self.progress_callback = progress_callback
         self.provider = str(provider or "").strip().lower()
+        if fs is None:
+            from app.infrastructure.filesystem.fs_utils import DbFileSystemAdapter
+            self.fs = DbFileSystemAdapter()
+        else:
+            self.fs = fs
 
     def _duration_limit_seconds(self) -> float:
         provider_duration_overrides = {
@@ -283,7 +282,7 @@ class ScanCollector:
                     to_process.append(existing)
             else:
                 res = probe_infos.get(str(p))
-                file_hash = res.get("hash_md5") if res else calculate_fast_hash(str(p))
+                file_hash = res.get("hash_md5") if res else self.fs.calculate_fast_hash(str(p))
                 
                 # Detect rename/move by hash from local memory cache
                 moved_item = None
@@ -291,7 +290,7 @@ class ScanCollector:
                     candidates = hash_lookup.get(file_hash) or []
                     for cand in candidates:
                         cand_full_path = os.path.join(self.library.root_path, cand.relative_path)
-                        if not os.path.exists(to_win_long_path(cand_full_path)):
+                        if not os.path.exists(self.fs.to_win_long_path(cand_full_path)):
                             moved_item = cand
                             break
                 
@@ -311,12 +310,12 @@ class ScanCollector:
                     else:
                         if self.mode == ScanMode.SCENES:
                             moved_item.hash_md5 = None
-                            moved_item.hash_oshash = calculate_oshash(str(p))
-                            moved_item.hash_phash = calculate_phash(str(p))
+                            moved_item.hash_oshash = self.fs.calculate_oshash(str(p))
+                            moved_item.hash_phash = self.fs.calculate_phash(str(p))
                             moved_item.hash_sha256 = None
                         else:
                             moved_item.hash_md5 = file_hash
-                            moved_item.hash_oshash = calculate_oshash(str(p))
+                            moved_item.hash_oshash = self.fs.calculate_oshash(str(p))
                         
                     logger.info("[scan:%s] Re-linked moved media item %s -> %s", self.mode.value, p.name, rel_path)
                     path_to_item[p] = moved_item
@@ -335,12 +334,12 @@ class ScanCollector:
                         else:
                             if self.mode == ScanMode.SCENES:
                                 existing.hash_md5 = None
-                                existing.hash_oshash = calculate_oshash(str(p))
-                                existing.hash_phash = calculate_phash(str(p))
+                                existing.hash_oshash = self.fs.calculate_oshash(str(p))
+                                existing.hash_phash = self.fs.calculate_phash(str(p))
                                 existing.hash_sha256 = None
                             else:
                                 existing.hash_md5 = file_hash
-                                existing.hash_oshash = calculate_oshash(str(p))
+                                existing.hash_oshash = self.fs.calculate_oshash(str(p))
                         if existing.status not in (ItemStatus.MATCHED, ItemStatus.ORGANIZED, ItemStatus.RENAMED):
                             existing.status = ItemStatus.NEW
                         item = existing
@@ -363,12 +362,12 @@ class ScanCollector:
                         else:
                             if self.mode == ScanMode.SCENES:
                                 item.hash_md5 = None
-                                item.hash_oshash = calculate_oshash(str(p))
-                                item.hash_phash = calculate_phash(str(p))
+                                item.hash_oshash = self.fs.calculate_oshash(str(p))
+                                item.hash_phash = self.fs.calculate_phash(str(p))
                                 item.hash_sha256 = None
                             else:
                                 item.hash_md5 = file_hash
-                                item.hash_oshash = calculate_oshash(str(p))
+                                item.hash_oshash = self.fs.calculate_oshash(str(p))
                         self.db.add(item)
                         logger.info("[scan:%s] Created media item %s | rel=%s | md5=%s | oshash=%s | phash=%s", self.mode.value, p.name, rel_path, (item.hash_md5 or "")[:12], (item.hash_oshash or "")[:12], (item.hash_phash or "")[:12])
                     
@@ -464,7 +463,7 @@ class ScanCollector:
                 logger.info("[scan:%s] Extra %s had no linked parent media item", self.mode.value, p.name)
 
             if parent_item:
-                file_hash = calculate_fast_hash(str(p))
+                file_hash = self.fs.calculate_fast_hash(str(p))
                 lang = self.analyzer.extract_language(p.name)
                 
                 # Check for moved extra from memory cache
@@ -473,7 +472,7 @@ class ScanCollector:
                     candidates = extra_hash_lookup.get(file_hash) or []
                     for cand in candidates:
                         cand_full_path = os.path.join(self.library.root_path, cand.relative_path)
-                        if not os.path.exists(to_win_long_path(cand_full_path)):
+                        if not os.path.exists(self.fs.to_win_long_path(cand_full_path)):
                             moved_extra = cand
                             break
 
@@ -529,17 +528,17 @@ class ScanCollector:
             pass
 
         # 2. Compute Hashes
-        result["hash_oshash"] = calculate_oshash(filepath_str)
+        result["hash_oshash"] = self.fs.calculate_oshash(filepath_str)
         if self.mode == ScanMode.SCENES:
             result["hash_md5"] = None
             # Calculate phash using the probed duration
             duration = None
             if result.get("probe_info"):
                 duration = result["probe_info"].get("duration")
-            result["hash_phash"] = calculate_phash(filepath_str, duration)
+            result["hash_phash"] = self.fs.calculate_phash(filepath_str, duration)
             result["hash_sha256"] = None
         else:
-            result["hash_md5"] = calculate_fast_hash(filepath_str)
+            result["hash_md5"] = self.fs.calculate_fast_hash(filepath_str)
             result["hash_phash"] = None
 
         # 3. Analyze text with Guessit

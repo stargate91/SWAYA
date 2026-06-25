@@ -9,6 +9,8 @@ from app.domains.metadata.models import MetadataMatch
 from app.infrastructure.scrapers.resolver import normalize_title, normalize_title_words
 from app.shared_kernel.enums import ItemStatus, MediaType, Provider, ScanMode
 
+from app.shared_kernel.ports.scrapers import ScraperGatewayPort
+
 logger = logging.getLogger(__name__)
 
 from app.shared_kernel.constants import PORNDB_API_BASE, SCRAPER_REQUEST_TIMEOUT
@@ -17,8 +19,22 @@ from app.shared_kernel.constants import PORNDB_API_BASE, SCRAPER_REQUEST_TIMEOUT
 class AdultResolver:
     """Handles resolving adult scene items against StashDB, PornDB, and FansDB APIs."""
 
-    def __init__(self, db_session: Session):
+    def __init__(self, db_session: Session, scraper_gateway: Optional[ScraperGatewayPort] = None):
         self.db = db_session
+        from app.infrastructure.repositories.db_scraper_log_repository import DbScraperLogRepository
+        from app.infrastructure.scrapers.support.gateway import scraper_gateway as default_gateway
+        self.scraper_gateway = scraper_gateway or default_gateway
+        self.scraper_log_repo = DbScraperLogRepository(db_session)
+
+    def _log_search(self, task_id: Optional[int], media_item_id: Optional[int], provider: Provider, search_query: str, result_count: int, details: dict) -> None:
+        self.scraper_log_repo.log_search(
+            task_id=task_id,
+            media_item_id=media_item_id,
+            provider=provider,
+            search_query=search_query,
+            result_count=result_count,
+            details=details
+        )
 
     def resolve_primary_scene_item(self, item: MediaItem, task_id: Optional[int] = None):
         self._resolve_adult_item(item, ScanMode.SCENES, task_id)
@@ -39,9 +55,7 @@ class AdultResolver:
         self.resolve_primary_scene_item(item, task_id)
 
     def _configured_scene_provider_order(self) -> list[Provider]:
-        from app.infrastructure.scrapers.providers.stashdb import StashDBScraper
-
-        stash_scraper = StashDBScraper(self.db)
+        stash_scraper = self.scraper_gateway.adult(Provider.STASHDB, self.db)
         order_setting = stash_scraper.get_setting('scenes_scraper_order') or 'stashdb,porndb,fansdb'
         order = []
         for value in str(order_setting).split(','):
@@ -55,13 +69,9 @@ class AdultResolver:
         return order or [Provider.STASHDB, Provider.PORNDB, Provider.FANSDB]
 
     def _build_scrapers_to_try(self, preferred_provider: Optional[Provider] = None):
-        from app.infrastructure.scrapers.providers.fansdb import FansDBScraper
-        from app.infrastructure.scrapers.providers.porndb import PornDBScraper
-        from app.infrastructure.scrapers.providers.stashdb import StashDBScraper
-
-        stash_scraper = StashDBScraper(self.db)
-        porndb_scraper = PornDBScraper(self.db)
-        fans_scraper = FansDBScraper(self.db)
+        stash_scraper = self.scraper_gateway.adult(Provider.STASHDB, self.db)
+        porndb_scraper = self.scraper_gateway.adult(Provider.PORNDB, self.db)
+        fans_scraper = self.scraper_gateway.adult(Provider.FANSDB, self.db)
         available = {}
         if stash_scraper.get_setting('stashdb_api_key'):
             available[Provider.STASHDB] = (stash_scraper, Provider.STASHDB)
@@ -309,17 +319,17 @@ class AdultResolver:
                     status=hash_status,
                     media_item_id=item.id,
                 )
-                scraper.log_search(
+                self._log_search(
                     task_id=task_id,
                     media_item_id=item.id,
+                    provider=provider,
                     search_query=f'hash: oshash={item.hash_oshash}, phash={item.hash_phash}',
                     result_count=1,
                     details={
                         'hash_match': True,
                         'hash_type': matched_hash_type,
                         'matched_scene_id': str(scene_data['id']),
-                        'matched_title': scene_data.get('title'),
-                        'final_status': hash_status.value,
+                        'final_status': hash_status.value if hash_status else None
                     },
                 )
                 self.db.flush()
@@ -416,9 +426,10 @@ class AdultResolver:
                         status=ItemStatus.MATCHED,
                         media_item_id=item.id,
                     )
-                    scraper.log_search(
+                    self._log_search(
                         task_id=task_id,
                         media_item_id=item.id,
+                        provider=provider,
                         search_query=best_query,
                         result_count=len(best_scenes),
                         details={
@@ -449,9 +460,10 @@ class AdultResolver:
                             status=ItemStatus.MULTIPLE,
                             media_item_id=item.id,
                         )
-                    scraper.log_search(
+                    self._log_search(
                         task_id=task_id,
                         media_item_id=item.id,
+                        provider=provider,
                         search_query=matched_candidates[0][2],
                         result_count=len(matched_candidates[0][3]),
                         details={
@@ -478,9 +490,10 @@ class AdultResolver:
                         status=ItemStatus.UNCERTAIN,
                         media_item_id=item.id,
                     )
-                    scraper.log_search(
+                    self._log_search(
                         task_id=task_id,
                         media_item_id=item.id,
+                        provider=provider,
                         search_query=best_query,
                         result_count=len(best_scenes),
                         details={
@@ -511,9 +524,10 @@ class AdultResolver:
                             status=ItemStatus.MULTIPLE,
                             media_item_id=item.id,
                         )
-                    scraper.log_search(
+                    self._log_search(
                         task_id=task_id,
                         media_item_id=item.id,
+                        provider=provider,
                         search_query=uncertain_candidates[0][2],
                         result_count=len(uncertain_candidates[0][3]),
                         details={

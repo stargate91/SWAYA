@@ -52,24 +52,13 @@ def monitor_playback(item_id: int, player_type: str, proc: subprocess.Popen, por
 
 def _save_position(item_id: int, current_time: int, total_length: int, user_id: int):
     from app.shared_kernel.database import SessionLocal
-    from app.domains.users.models import UserOverride
-    from app.domains.library.models import MediaItem
+    from app.infrastructure.media.db_media_resolver import DbMediaResolver
     
     db_session = SessionLocal()
     try:
-        item = db_session.query(MediaItem).filter(MediaItem.id == item_id).first()
-        if item:
-            if total_length > 0:
-                item.duration = total_length
-            override = db_session.query(UserOverride).filter(UserOverride.user_id == user_id, UserOverride.media_item_id == item_id).first()
-            if not override:
-                override = UserOverride(user_id=user_id, media_item_id=item_id)
-                db_session.add(override)
-            override.resume_position = current_time
-            if total_length > 0 and current_time / total_length > 0.90:
-                override.is_watched = True
-                override.resume_position = 0
-            db_session.commit()
+        resolver = DbMediaResolver(db_session)
+        resolver.save_playback_position(item_id, current_time, total_length, user_id)
+        db_session.commit()
     except Exception as ex:
         db_session.rollback()
         logger.error(f"Failed to update position: {ex}")

@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session, joinedload
 from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch
 from app.shared_kernel.enums import ItemStatus, MediaType
-from app.domains.library.schemas import LibraryStatsResponse
+from app.application.library.schemas import LibraryStatsResponse
 
 logger = logging.getLogger(__name__)
 
@@ -153,7 +153,7 @@ class LibraryStatsService:
         decade_dist = {}
         genre_pair_dist = {}
 
-        from app.infrastructure.scrapers.enrichment.mainstream_enricher import _split_genres
+        from app.shared_kernel.genre_utils import split_genres as _split_genres
 
         for m in unique_matches:
             # Decade

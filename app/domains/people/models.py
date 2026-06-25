@@ -53,7 +53,6 @@ class Person(Base):
     media_links: Mapped[List["MediaPersonLink"]] = relationship(back_populates="person", cascade="all, delete-orphan")
     localizations: Mapped[List["PersonLocalization"]] = relationship(back_populates="person", cascade="all, delete-orphan")
     external_links: Mapped[List["ExternalSourceLink"]] = relationship(back_populates="person", cascade="all, delete-orphan")
-    overrides: Mapped[Optional["UserOverride"]] = relationship("UserOverride", back_populates="person", cascade="all, delete-orphan")
 
 
 class PersonLocalization(Base):
@@ -87,8 +86,8 @@ class MediaPersonLink(Base):
     order: Mapped[int] = mapped_column(Integer, default=0) # Order of appearance in cast list
     
     # Relationships
-    match: Mapped["MetadataMatch"] = relationship("MetadataMatch", back_populates="people")
     person: Mapped["Person"] = relationship(back_populates="media_links")
+    match: Mapped["MetadataMatch"] = relationship()
 
 
 class ExternalSourceLink(Base):

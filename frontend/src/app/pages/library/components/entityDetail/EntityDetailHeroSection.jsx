@@ -10,6 +10,7 @@ export default function EntityDetailHeroSection({
   item,
   mediaUrl,
   profileLinks,
+  socialLinks = [],
   metaPills,
   extraMetaPills,
   overviewText,
@@ -49,6 +50,9 @@ export default function EntityDetailHeroSection({
               {isPeople ? <User size={44} /> : <Layers size={44} />}
             </div>
           )}
+
+
+
           <button
             type="button"
             className="entity-detail-page__media-edit-badge"
@@ -72,7 +76,7 @@ export default function EntityDetailHeroSection({
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`entity-detail-page__profile-link${link.fullWidth ? ' entity-detail-page__profile-link--full-width' : ''}`}
+                className={`entity-detail-page__profile-link ${link.fullWidth ? 'entity-detail-page__profile-link--full-width' : ''}`}
               >
                 {link.label}
               </a>

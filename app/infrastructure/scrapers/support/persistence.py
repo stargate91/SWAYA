@@ -11,6 +11,9 @@ from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.domains.metadata.models import MetadataMatch, MetadataLocalization, Studio, MediaCollection
 from app.domains.people.models import Person, MediaPersonLink
 from app.domains.people.services import PersonService
+from app.shared_kernel.ports.metadata_repository_port import MetadataRepositoryPort
+from app.shared_kernel.ports.people_repository_port import PeopleRepositoryPort
+from app.shared_kernel.ports.image_download_port import ImageDownloadPort
 
 logger = logging.getLogger(__name__)
 
@@ -95,8 +98,20 @@ class ScraperPersister:
     Decoupled from scraper classes to maintain clean domain boundaries.
     """
 
-    def __init__(self, db: Session):
+    def __init__(
+        self,
+        db: Session,
+        metadata_repo: Optional[MetadataRepositoryPort] = None,
+        people_repo: Optional[PeopleRepositoryPort] = None,
+        image_downloader: Optional[ImageDownloadPort] = None,
+    ):
         self.db = db
+        from app.infrastructure.repositories.db_metadata_repository import DbMetadataRepository
+        from app.infrastructure.repositories.db_people_repository import DbPeopleRepository
+        from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+        self.metadata_repo = metadata_repo or DbMetadataRepository(db)
+        self.people_repo = people_repo or DbPeopleRepository(db)
+        self.image_downloader = image_downloader or TasksImageDownloadAdapter()
 
     def _local_image_exists(self, path: Optional[str], subfolder: str) -> bool:
         return bool(path and path.startswith(f"{subfolder}/"))
@@ -112,36 +127,30 @@ class ScraperPersister:
         """Takes a normalized scene structure and persists it to the database."""
         with persistence_lock:
             # Find or create match
-            query = self.db.query(MetadataMatch).filter(
-                MetadataMatch.provider == provider,
-                MetadataMatch.external_id == scene_id,
-                MetadataMatch.media_type == media_type
+            match = self.metadata_repo.get_match(
+                provider=provider,
+                external_id=scene_id,
+                media_type=media_type,
+                media_item_id=media_item_id
             )
-            if media_item_id is not None:
-                query = query.filter(MetadataMatch.media_item_id == media_item_id)
-            
-            match = query.first()
 
             if not match:
-                match = MetadataMatch(
-                    provider=provider,
-                    external_id=scene_id,
-                    media_type=media_type,
-                    media_item_id=media_item_id
-                )
                 try:
                     with self.db.begin_nested():
-                        self.db.add(match)
-                        self.db.flush()
+                        match = self.metadata_repo.create_match(
+                            provider=provider,
+                            external_id=scene_id,
+                            media_type=media_type,
+                            media_item_id=media_item_id
+                        )
+                        self.metadata_repo.flush()
                 except Exception:
-                    query2 = self.db.query(MetadataMatch).filter(
-                        MetadataMatch.provider == provider,
-                        MetadataMatch.external_id == scene_id,
-                        MetadataMatch.media_type == media_type
+                    match = self.metadata_repo.get_match(
+                        provider=provider,
+                        external_id=scene_id,
+                        media_type=media_type,
+                        media_item_id=media_item_id
                     )
-                    if media_item_id is not None:
-                        query2 = query2.filter(MetadataMatch.media_item_id == media_item_id)
-                    match = query2.first()
 
             # 1. Map basic match fields
             for k, v in norm["match"].items():
@@ -150,15 +159,14 @@ class ScraperPersister:
             # 2. Map Studio details
             for studio_info in norm["studios"]:
                 s_name = studio_info["name"]
-                studio = self.db.query(Studio).filter(Studio.name == s_name).first()
+                studio = self.metadata_repo.get_studio_by_name(s_name)
                 if not studio:
-                    studio = Studio(name=s_name, logo_path=studio_info["logo_path"])
                     try:
                         with self.db.begin_nested():
-                            self.db.add(studio)
-                            self.db.flush()
+                            studio = self.metadata_repo.create_studio(name=s_name, logo_path=studio_info["logo_path"])
+                            self.metadata_repo.flush()
                     except Exception:
-                        studio = self.db.query(Studio).filter(Studio.name == s_name).first()
+                        studio = self.metadata_repo.get_studio_by_name(s_name)
                 elif studio_info.get("logo_path") and (
                     not studio.logo_path 
                     or not self._local_image_exists(studio.logo_path, "logos")
@@ -170,15 +178,14 @@ class ScraperPersister:
                 parent_info = studio_info["parent"]
                 if parent_info:
                     p_name = parent_info["name"]
-                    parent_studio = self.db.query(Studio).filter(Studio.name == p_name).first()
+                    parent_studio = self.metadata_repo.get_studio_by_name(p_name)
                     if not parent_studio:
-                        parent_studio = Studio(name=p_name, logo_path=parent_info["logo_path"])
                         try:
                             with self.db.begin_nested():
-                                self.db.add(parent_studio)
-                                self.db.flush()
+                                parent_studio = self.metadata_repo.create_studio(name=p_name, logo_path=parent_info["logo_path"])
+                                self.metadata_repo.flush()
                         except Exception:
-                            parent_studio = self.db.query(Studio).filter(Studio.name == p_name).first()
+                            parent_studio = self.metadata_repo.get_studio_by_name(p_name)
                     elif parent_info.get("logo_path") and (
                         not parent_studio.logo_path 
                         or not self._local_image_exists(parent_studio.logo_path, "logos")
@@ -199,24 +206,19 @@ class ScraperPersister:
                     loc = l
                     break
             if not loc:
-                loc = self.db.query(MetadataLocalization).filter(
-                    MetadataLocalization.match_id == match.id if match.id else False,
-                    MetadataLocalization.locale == DEFAULT_FALLBACK_LANGUAGE
-                ).first()
+                loc = self.metadata_repo.get_localization(match.id, DEFAULT_FALLBACK_LANGUAGE)
             if not loc:
-                loc = MetadataLocalization(locale=DEFAULT_FALLBACK_LANGUAGE)
+                loc = self.metadata_repo.create_localization(match.id, DEFAULT_FALLBACK_LANGUAGE)
                 for k, v in norm["localization"].items():
                     if k != "genres":
                         setattr(loc, k, v)
-                match.localizations.append(loc)
+                if loc not in match.localizations:
+                    match.localizations.append(loc)
                 try:
                     with self.db.begin_nested():
-                        self.db.flush()
+                        self.metadata_repo.flush()
                 except Exception:
-                    loc = self.db.query(MetadataLocalization).filter(
-                        MetadataLocalization.match_id == match.id if match.id else False,
-                        MetadataLocalization.locale == DEFAULT_FALLBACK_LANGUAGE
-                    ).first()
+                    loc = self.metadata_repo.get_localization(match.id, DEFAULT_FALLBACK_LANGUAGE)
             else:
                 for k, v in norm["localization"].items():
                     if k != "genres":
@@ -246,49 +248,44 @@ class ScraperPersister:
                 self._queue_person_profile(person)
 
                 # Link person to match
-                link = self.db.query(MediaPersonLink).filter(
-                    MediaPersonLink.match_id == match.id if match.id else False,
-                    MediaPersonLink.person_id == person.id if person.id else False,
-                    MediaPersonLink.role == RoleType.ACTOR
-                ).first()
+                link = self.people_repo.get_media_person_link(match.id, person.id, RoleType.ACTOR)
 
                 if not link:
-                    link = MediaPersonLink(
+                    link = self.people_repo.create_media_person_link(
                         role=RoleType.ACTOR,
-                        order=idx
+                        order=idx,
+                        match_id=match.id,
+                        person_id=person.id
                     )
-                    link.person = person
-                    match.people.append(link)
 
-            self.db.flush()
+            self.metadata_repo.flush()
             self._queue_adult_assets(match)
             return match
 
     def persist_normalized_movie(self, movie_id: str, norm: Dict[str, Any], language: str) -> MetadataMatch:
         """Takes a normalized movie structure and persists it to the database."""
         with persistence_lock:
-            match = self.db.query(MetadataMatch).filter(
-                MetadataMatch.provider == Provider.TMDB,
-                MetadataMatch.external_id == movie_id,
-                MetadataMatch.media_type == MediaType.MOVIE
-            ).first()
+            match = self.metadata_repo.get_match(
+                provider=Provider.TMDB,
+                external_id=movie_id,
+                media_type=MediaType.MOVIE
+            )
 
             if not match:
-                match = MetadataMatch(
-                    provider=Provider.TMDB,
-                    external_id=movie_id,
-                    media_type=MediaType.MOVIE
-                )
                 try:
                     with self.db.begin_nested():
-                        self.db.add(match)
-                        self.db.flush()
+                        match = self.metadata_repo.create_match(
+                            provider=Provider.TMDB,
+                            external_id=movie_id,
+                            media_type=MediaType.MOVIE
+                        )
+                        self.metadata_repo.flush()
                 except Exception:
-                    match = self.db.query(MetadataMatch).filter(
-                        MetadataMatch.provider == Provider.TMDB,
-                        MetadataMatch.external_id == movie_id,
-                        MetadataMatch.media_type == MediaType.MOVIE
-                    ).first()
+                    match = self.metadata_repo.get_match(
+                        provider=Provider.TMDB,
+                        external_id=movie_id,
+                        media_type=MediaType.MOVIE
+                    )
 
             # 1. Map basic match fields
             for k, v in norm["match"].items():
@@ -297,15 +294,14 @@ class ScraperPersister:
             # 2. Map Studio details
             for studio_info in norm["studios"]:
                 s_name = studio_info["name"]
-                studio = self.db.query(Studio).filter(Studio.name == s_name).first()
+                studio = self.metadata_repo.get_studio_by_name(s_name)
                 if not studio:
-                    studio = Studio(name=s_name, logo_path=studio_info["logo_path"])
                     try:
                         with self.db.begin_nested():
-                            self.db.add(studio)
-                            self.db.flush()
+                            studio = self.metadata_repo.create_studio(name=s_name, logo_path=studio_info["logo_path"])
+                            self.metadata_repo.flush()
                     except Exception:
-                        studio = self.db.query(Studio).filter(Studio.name == s_name).first()
+                        studio = self.metadata_repo.get_studio_by_name(s_name)
                 elif studio_info.get("logo_path") and (
                     not studio.logo_path 
                     or (studio.logo_path.startswith("logos/") and studio.logo_path.lower().endswith((".jpg", ".jpeg")))
@@ -321,51 +317,37 @@ class ScraperPersister:
             coll_info = norm["collection"]
             if coll_info:
                 coll_id = coll_info["external_id"]
-                collection = self.db.query(MediaCollection).filter(
-                    MediaCollection.provider == Provider.TMDB,
-                    MediaCollection.external_id == coll_id
-                ).first()
+                collection = self.metadata_repo.get_collection(Provider.TMDB, coll_id)
                 if not collection:
-                    collection = MediaCollection(
-                        provider=Provider.TMDB,
-                        external_id=coll_id,
-                        backdrop_path=coll_info["backdrop_path"]
-                    )
                     try:
                         with self.db.begin_nested():
-                            self.db.add(collection)
-                            self.db.flush()
+                            collection = self.metadata_repo.create_collection(
+                                provider=Provider.TMDB,
+                                external_id=coll_id,
+                                backdrop_path=coll_info["backdrop_path"]
+                            )
+                            self.metadata_repo.flush()
                     except Exception:
-                        collection = self.db.query(MediaCollection).filter(
-                            MediaCollection.provider == Provider.TMDB,
-                            MediaCollection.external_id == coll_id
-                        ).first()
+                        collection = self.metadata_repo.get_collection(Provider.TMDB, coll_id)
                 match.collection = collection
                 
                 if collection:
-                    from app.domains.metadata.models import MediaCollectionLocalization
                     from app.shared_kernel.language import LanguageService
                     lang_code = LanguageService.clean_locale(language)
                     loc = None
                     if collection.id is not None:
-                        loc = self.db.query(MediaCollectionLocalization).filter(
-                            MediaCollectionLocalization.collection_id == collection.id,
-                            MediaCollectionLocalization.locale == lang_code
-                        ).first()
+                        loc = self.metadata_repo.get_collection_localization(collection.id, lang_code)
                     if not loc:
-                        loc = MediaCollectionLocalization(
-                            collection=collection,
+                        loc = self.metadata_repo.create_collection_localization(
+                            collection_id=collection.id,
                             locale=lang_code
                         )
-                        self.db.add(loc)
                     loc.title = coll_info.get("name") or loc.title
                     loc.poster_path = coll_info.get("poster_path") or loc.poster_path
                     
                     if loc.poster_path and not loc.local_poster_path:
                         try:
-                            from app.domains.tasks import task_manager
-                            image_service = task_manager.download_worker.image_service
-                            url = image_service.get_download_url(loc.poster_path, "posters")
+                            url = self.image_downloader.get_download_url(loc.poster_path, "posters")
                             if url:
                                 import os
                                 import re
@@ -375,16 +357,14 @@ class ScraperPersister:
                                 asset_prefix = f"tmdb_{collection.external_id}"
                                 safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", asset_prefix).strip("_")
                                 filename = f"{safe_prefix}_{basename}{ext}"
-                                task_manager.download_worker.enqueue_download(url, "posters", filename)
+                                self.image_downloader.enqueue_download(url, "posters", filename)
                                 loc.local_poster_path = f"posters/{filename}"
                         except Exception as e:
                             logger.error(f"Failed to queue image download for collection in persistence: {e}")
 
                     if collection.backdrop_path and not collection.local_backdrop_path:
                         try:
-                            from app.domains.tasks import task_manager
-                            image_service = task_manager.download_worker.image_service
-                            url = image_service.get_download_url(collection.backdrop_path, "backdrops")
+                            url = self.image_downloader.get_download_url(collection.backdrop_path, "backdrops")
                             if url:
                                 import os
                                 import re
@@ -394,7 +374,7 @@ class ScraperPersister:
                                 asset_prefix = f"tmdb_{collection.external_id}"
                                 safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", asset_prefix).strip("_")
                                 filename = f"{safe_prefix}_{basename}{ext}"
-                                task_manager.download_worker.enqueue_download(url, "backdrops", filename)
+                                self.image_downloader.enqueue_download(url, "backdrops", filename)
                                 collection.local_backdrop_path = f"backdrops/{filename}"
                         except Exception as e:
                             logger.error(f"Failed to queue backdrop download for collection in persistence: {e}")
@@ -406,23 +386,18 @@ class ScraperPersister:
                     loc = l
                     break
             if not loc:
-                loc = self.db.query(MetadataLocalization).filter(
-                    MetadataLocalization.match_id == match.id if match.id else False,
-                    MetadataLocalization.locale == language
-                ).first()
+                loc = self.metadata_repo.get_localization(match.id, language)
             if not loc:
-                loc = MetadataLocalization(locale=language)
+                loc = self.metadata_repo.create_localization(match.id, language)
                 for k, v in norm["localization"].items():
                     setattr(loc, k, v)
-                match.localizations.append(loc)
+                if loc not in match.localizations:
+                    match.localizations.append(loc)
                 try:
                     with self.db.begin_nested():
-                        self.db.flush()
+                        self.metadata_repo.flush()
                 except Exception:
-                    loc = self.db.query(MetadataLocalization).filter(
-                        MetadataLocalization.match_id == match.id if match.id else False,
-                        MetadataLocalization.locale == language
-                    ).first()
+                    loc = self.metadata_repo.get_localization(match.id, language)
             else:
                 for k, v in norm["localization"].items():
                     setattr(loc, k, v)
@@ -447,38 +422,27 @@ class ScraperPersister:
                 self._queue_person_profile(person)
 
                 # Check Link
-                link = self.db.query(MediaPersonLink).filter(
-                    MediaPersonLink.match_id == match.id if match.id else False,
-                    MediaPersonLink.person_id == person.id if person.id else False,
-                    MediaPersonLink.role == RoleType.ACTOR
-                ).first()
+                link = self.people_repo.get_media_person_link(match.id, person.id, RoleType.ACTOR)
                 if not link:
-                    link = MediaPersonLink(
+                    link = self.people_repo.create_media_person_link(
                         role=RoleType.ACTOR,
                         character_name=cast_member["character"],
-                        order=idx
+                        order=idx,
+                        match_id=match.id,
+                        person_id=person.id
                     )
-                    link.person = person
-                    match.people.append(link)
 
-            self.db.flush()
+            self.metadata_repo.flush()
             self._queue_adult_assets(match)
             return match
 
     def _queue_adult_assets(self, match: MetadataMatch) -> None:
         """Queues poster/backdrop downloads for adult matches."""
-        try:
-            from app.domains.tasks import task_manager
-        except Exception:
-            return
-
-        image_service = task_manager.download_worker.image_service
-
         def queue_image(path: Optional[str], subfolder: str, prefix: str) -> Optional[str]:
             if not path:
                 return None
 
-            url = image_service.get_download_url(path, subfolder)
+            url = self.image_downloader.get_download_url(path, subfolder)
             if not url:
                 return None
 
@@ -508,7 +472,7 @@ class ScraperPersister:
 
             safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", prefix).strip("_")
             filename = f"{safe_prefix}_{basename}"
-            task_manager.download_worker.enqueue_download(url, subfolder, filename)
+            self.image_downloader.enqueue_download(url, subfolder, filename)
             return f"{subfolder}/{filename}"
 
         asset_prefix = f"{match.provider.value}_{match.external_id}"
@@ -529,13 +493,7 @@ class ScraperPersister:
         if studio.logo_path.startswith("logos/") and self._local_image_exists(studio.logo_path, "logos"):
             return
 
-        try:
-            from app.domains.tasks import task_manager
-            image_service = task_manager.download_worker.image_service
-        except Exception:
-            return
-
-        url = image_service.get_download_url(studio.logo_path, "logos")
+        url = self.image_downloader.get_download_url(studio.logo_path, "logos")
         if not url:
             return
 
@@ -550,7 +508,7 @@ class ScraperPersister:
         safe_name = re.sub(r"[^A-Za-z0-9_.-]+", "_", studio.name).strip("_")
         filename = f"studio_{safe_name}_{basename}"
         studio.logo_path = f"logos/{filename}"
-        task_manager.download_worker.enqueue_download(url, "logos", filename)
+        self.image_downloader.enqueue_download(url, "logos", filename)
 
     def _queue_person_profile(self, person: Person) -> None:
         """Queues person profile image downloads."""
@@ -559,13 +517,7 @@ class ScraperPersister:
         if person.local_profile_path and person.local_profile_path.startswith("people/") and self._local_image_exists(person.local_profile_path, "people"):
             return
 
-        try:
-            from app.domains.tasks import task_manager
-            image_service = task_manager.download_worker.image_service
-        except Exception:
-            return
-
-        url = image_service.get_download_url(person.profile_path, "people")
+        url = self.image_downloader.get_download_url(person.profile_path, "people")
         if not url:
             return
 
@@ -606,4 +558,4 @@ class ScraperPersister:
                 break
         filename = f"{prov_val}_{ext_id}_{safe_name}_{basename}"
         person.local_profile_path = f"people/{filename}"
-        task_manager.download_worker.enqueue_download(url, "people", filename)
+        self.image_downloader.enqueue_download(url, "people", filename)

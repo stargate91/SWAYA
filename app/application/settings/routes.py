@@ -5,9 +5,9 @@ from typing import List, Optional
 
 from app.shared_kernel.database import get_db
 from app.application.maintenance.database_maintenance_service import DatabaseMaintenanceService
-from app.domains.settings.models import SystemSetting, UserSetting
+from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
 from app.domains.settings.services.settings_service import SettingsService
-from app.domains.settings.schemas import (
+from app.application.settings.schemas import (
     SystemSettingRead,
     SystemSettingUpdate,
     UserSettingRead,
@@ -21,47 +21,26 @@ router = APIRouter(prefix="/api/v1/settings", tags=["Settings"])
 @router.get("/system", response_model=List[SystemSettingRead])
 def list_system_settings(db: Session = Depends(get_db)):
     """Retrieve all system settings."""
-    return db.query(SystemSetting).all()
+    return SettingsService(db).get_system_settings()
 
 
 @router.put("/system/{key}", response_model=SystemSettingRead)
 def update_system_setting(key: str, update_data: SystemSettingUpdate, db: Session = Depends(get_db)):
     """Update a specific system setting."""
-    setting = db.query(SystemSetting).filter(SystemSetting.key == key).first()
-    if not setting:
-        # Create a new setting if it does not exist
-        setting = SystemSetting(key=key, value=update_data.value, description=update_data.description)
-        db.add(setting)
-    else:
-        setting.value = update_data.value
-        if update_data.description is not None:
-            setting.description = update_data.description
-    db.commit()
-    db.refresh(setting)
-    return setting
+    return SettingsService(db).set_system_setting(key, update_data.value, update_data.description)
 
 
 # --- User Settings Endpoints ---
 @router.get("/user/{user_id}", response_model=List[UserSettingRead])
 def list_user_settings(user_id: int, db: Session = Depends(get_db)):
     """Retrieve settings/preferences for a specific user."""
-    return db.query(UserSetting).filter(UserSetting.user_id == user_id).all()
+    return SettingsService(db).get_user_settings_list(user_id)
 
 
 @router.put("/user/{user_id}/{key}", response_model=UserSettingRead)
 def update_user_setting(user_id: int, key: str, update_data: UserSettingUpdate, db: Session = Depends(get_db)):
     """Update a preference key for a specific user."""
-    setting = db.query(UserSetting).filter(UserSetting.user_id == user_id, UserSetting.key == key).first()
-    if not setting:
-        setting = UserSetting(user_id=user_id, key=key, value=update_data.value, description=update_data.description)
-        db.add(setting)
-    else:
-        setting.value = update_data.value
-        if update_data.description is not None:
-            setting.description = update_data.description
-    db.commit()
-    db.refresh(setting)
-    return setting
+    return SettingsService(db).set_user_setting(user_id, key, update_data.value, update_data.description)
 @router.post("/user/{user_id}/avatar")
 def upload_user_avatar(user_id: int, file: UploadFile = File(...), db: Session = Depends(get_db)):
     try:

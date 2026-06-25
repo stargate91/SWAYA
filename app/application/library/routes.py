@@ -6,10 +6,12 @@ from pydantic import BaseModel
 
 from app.shared_kernel.database import get_db
 from app.shared_kernel.enums import ScanMode
+from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
 from app.domains.library.models import MediaItem, Library
 from app.domains.metadata.models import MetadataMatch
-from app.domains.metadata.schemas import MetadataMatchRead
-from app.domains.library.schemas import (
+from app.domains.library.services.library_service import LibraryService
+from app.application.metadata.schemas import MetadataMatchRead
+from app.application.library.schemas import (
     MediaItemRead,
     LibraryRead,
     LibraryStatsResponse,
@@ -25,8 +27,8 @@ from app.domains.library.schemas import (
     CollectionDetailResponse,
     SceneDetailResponse,
 )
-from app.domains.people.schemas import PeopleGroupItem
-from app.domains.users.schemas import (
+from app.application.people.schemas import PeopleGroupItem
+from app.application.users.schemas import (
     ItemOverridesUpdate,
     ItemStatusUpdate,
     ImageOverrideUpdate,
@@ -52,27 +54,27 @@ library_router = APIRouter(prefix="/api/v1", tags=["Library"])
 @mainstream_router.get("", response_model=List[MetadataMatchRead])
 def list_mainstream_metadata(db: Session = Depends(get_db), limit: int = 50):
     """List mainstream metadata matches (SFW)."""
-    return db.query(MetadataMatch).filter(MetadataMatch.is_adult == False).limit(limit).all()
+    return LibraryService(db).list_mainstream_metadata(limit)
 
 
 # --- Adult Router Endpoints ---
 @adult_router.get("", response_model=List[MetadataMatchRead])
 def list_adult_metadata(db: Session = Depends(get_db), limit: int = 50):
     """List adult metadata matches (NSFW)."""
-    return db.query(MetadataMatch).filter(MetadataMatch.is_adult == True).limit(limit).all()
+    return LibraryService(db).list_adult_metadata(limit)
 
 
 # General Media Router Endpoints ---
 @router.get("/items", response_model=List[MediaItemRead])
 def list_media_items(db: Session = Depends(get_db), limit: int = 50):
     """Retrieve indexed physical media files."""
-    return db.query(MediaItem).limit(limit).all()
+    return LibraryService(db).list_media_items(limit)
 
 
 @router.get("/libraries", response_model=List[LibraryRead])
 def list_libraries(db: Session = Depends(get_db)):
     """Retrieve registered media source roots."""
-    return db.query(Library).all()
+    return LibraryService(db).list_libraries()
 
 
 from app.domains.library.services.library_stats_service import LibraryStatsService
@@ -163,7 +165,7 @@ def get_movie_collections(
     tab: str = "movies",
     include_adult: bool = False,
 ):
-    return LibraryCollectionService(db).get_movie_collections(
+    return LibraryCollectionService(db, image_downloader=TasksImageDownloadAdapter()).get_movie_collections(
         page=page,
         page_size=page_size,
         search=search,
@@ -244,5 +246,5 @@ def get_library_collection_detail(
     db: Session = Depends(get_db),
     scrapers: ScraperGatewayPort = Depends(get_scraper_gateway)
 ):
-    return CollectionDetailService(db, scrapers).get_collection_detail(collection_tmdb_id, language=language)
+    return CollectionDetailService(db, scrapers, image_downloader=TasksImageDownloadAdapter()).get_collection_detail(collection_tmdb_id, language=language)
 

@@ -27,6 +27,17 @@ async def lifespan(app: FastAPI):
     # Start background download worker on the main event loop
     from app.domains.tasks import task_manager
     from app.infrastructure.scrapers.support.gateway import scraper_gateway
+    from app.application.people.enrich_worker import PeopleEnrichWorker
+    from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+    
+    image_downloader = TasksImageDownloadAdapter(task_manager.download_worker)
+    
+    task_manager.people_enrich_worker = PeopleEnrichWorker(
+        session_factory=task_manager.session_factory,
+        executor=task_manager.executor,
+        task_monitor=task_manager,
+        image_downloader=image_downloader,
+    )
     task_manager.people_enrich_worker.scrapers = scraper_gateway
     await task_manager.download_worker.start()
     await task_manager.people_enrich_worker.start()
@@ -89,13 +100,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from app.domains.tasks.routes import router as tasks_router
-from app.domains.library.routes import router as media_router, mainstream_router as media_mainstream_router, adult_router as media_adult_router, library_router
-from app.domains.metadata.routes import library_router as metadata_router
-from app.domains.people.routes import router as people_router, mainstream_router as people_mainstream_router, adult_router as people_adult_router
-from app.domains.settings.routes import router as settings_router, db_router
-from app.domains.users.routes import router as users_router, catalog_router
-from app.domains.history.routes import router as history_router
+from app.application.tasks.routes import router as tasks_router
+from app.application.library.routes import router as media_router, mainstream_router as media_mainstream_router, adult_router as media_adult_router, library_router
+from app.application.metadata.routes import library_router as metadata_router
+from app.application.people.routes import router as people_router, mainstream_router as people_mainstream_router, adult_router as people_adult_router
+from app.application.settings.routes import router as settings_router, db_router
+from app.application.users.routes import router as users_router, catalog_router
+from app.application.history.routes import router as history_router
 from app.application.media.routes import router as app_media_router
 from app.application.media.playback_routes import router as app_playback_router
 from app.application.recommendations.routes import router as app_rec_router

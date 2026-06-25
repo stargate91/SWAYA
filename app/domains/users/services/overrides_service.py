@@ -8,122 +8,38 @@ from sqlalchemy import func
 
 from app.domains.users.models import UserOverride, Tag
 from app.domains.media_assets.services.images import image_processing_service
-from app.domains.users.schemas import (
+from app.application.users.schemas import (
     ItemOverridesUpdate,
     BulkOverridesUpdate,
     BulkTagsUpdate,
     BulkWatchedUpdate,
 )
 from app.shared_kernel.ports.media_resolver import MediaResolverPort
+from app.shared_kernel.ports.library_port import LibraryPort
+from app.shared_kernel.ports.image_download_port import ImageDownloadPort
 from app.shared_kernel.exceptions import NotFoundException, BadRequestException
 
 logger = logging.getLogger(__name__)
 
 class OverridesService:
-    def __init__(self, db: Session, resolver: MediaResolverPort, user_id: Optional[int] = None):
+    def __init__(self, db: Session, resolver: MediaResolverPort, user_id: Optional[int] = None, image_downloader: Optional[ImageDownloadPort] = None):
         self.db = db
         self.resolver = resolver
+        # resolver implements both MediaResolverPort and LibraryPort
+        self.library_port: LibraryPort = resolver  # type: ignore[assignment]
+        self.image_downloader = image_downloader
         if user_id is None:
             from app.shared_kernel.user_context import get_current_user_id
             user_id = get_current_user_id()
         self.user_id = user_id
 
-    def _enrich_language_if_needed(self, item, language: str):
+    def _enrich_language_if_needed(self, media_item_id: int, language: str):
         if not language or language == "none":
             return
-        
-        active_match = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
-        if not active_match or not active_match.provider:
-            return
-            
-        from app.shared_kernel.enums import Provider
-        if active_match.provider != Provider.TMDB:
-            return
-            
         try:
-            from app.infrastructure.scrapers.enrichment.mainstream_enricher import MainstreamEnricher
-            enricher = MainstreamEnricher(self.db)
-            enricher.enrich_matched_item(item, language=language)
+            self.library_port.enrich_item_language(media_item_id, language)
         except Exception as e:
-            logger.error(f"Error enriching language {language} for item {item.id}: {e}")
-
-    def _shift_tv_episode_match_if_needed(self, item, parsed, new_season, new_episode, custom_language, reset_match: bool = False):
-        if reset_match:
-            return
-        from app.shared_kernel.enums import MediaType
-        active_match = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
-        if active_match and active_match.media_type in (MediaType.SEASON, MediaType.EPISODE, MediaType.TV):
-            tv_match = None
-            current = active_match
-            while current:
-                if current.media_type == MediaType.TV:
-                    tv_match = current
-                    break
-                current = current.parent
-                if not current and active_match.parent_id is not None:
-                    current = self.db.query(MetadataMatch).filter(MetadataMatch.id == active_match.parent_id).first()
-            
-            if tv_match:
-                try:
-                    ns_num = int(new_season) if new_season is not None and str(new_season).isdigit() else (int(parsed.get("season")) if str(parsed.get("season")).isdigit() else 1)
-                    ne_num = int(new_episode) if new_episode is not None and str(new_episode).isdigit() else (int(parsed.get("episode")) if str(parsed.get("episode")).isdigit() else 1)
-                    
-                    season_match = self.db.query(MetadataMatch).filter(
-                        MetadataMatch.provider == tv_match.provider,
-                        MetadataMatch.parent_id == tv_match.id,
-                        MetadataMatch.media_type == MediaType.SEASON,
-                        MetadataMatch.season_number == ns_num
-                    ).first()
-                    if not season_match:
-                        season_match = MetadataMatch(
-                            provider=tv_match.provider,
-                            external_id=f"{tv_match.external_id}-s{ns_num}",
-                            media_type=MediaType.SEASON,
-                            season_number=ns_num,
-                            parent_id=tv_match.id,
-                            confidence_score=1.0,
-                            is_adult=tv_match.is_adult
-                        )
-                        self.db.add(season_match)
-                        self.db.flush()
-                        
-                    episode_match = self.db.query(MetadataMatch).filter(
-                        MetadataMatch.provider == tv_match.provider,
-                        MetadataMatch.parent_id == season_match.id,
-                        MetadataMatch.media_type == MediaType.EPISODE,
-                        MetadataMatch.episode_number == ne_num
-                    ).first()
-                    if not episode_match:
-                        episode_match = MetadataMatch(
-                            provider=tv_match.provider,
-                            external_id=tv_match.external_id,
-                            media_type=MediaType.EPISODE,
-                            season_number=ns_num,
-                            episode_number=ne_num,
-                            parent_id=season_match.id,
-                            confidence_score=1.0,
-                            media_item_id=item.id,
-                            is_active=True,
-                            is_adult=tv_match.is_adult
-                        )
-                        self.db.add(episode_match)
-                        self.db.flush()
-                    else:
-                        episode_match.media_item_id = item.id
-                        episode_match.is_active = True
-                        episode_match.is_adult = tv_match.is_adult
-                        
-                    for m in item.matches:
-                        if m.id != episode_match.id:
-                            m.is_active = False
-                            m.media_item_id = None
-                            
-                    # Enrich the new match
-                    from app.infrastructure.scrapers.enrichment.mainstream_enricher import MainstreamEnricher
-                    enricher = MainstreamEnricher(self.db)
-                    enricher.enrich_matched_item(item, language=custom_language or "en")
-                except Exception as e:
-                    logger.error(f"Error shifting TV episode match: {e}")
+            logger.error(f"Error enriching language {language} for item {media_item_id}: {e}")
 
     def _get_or_create_metadata_override(self, item_id: str, media_type: Optional[str] = None) -> Optional[UserOverride]:
         media_item_id, metadata_match_id = self.resolver.resolve_ids(item_id, media_type)
@@ -133,48 +49,82 @@ class OverridesService:
 
         # Try to resolve metadata_match_id from active match if only media_item_id is present
         if media_item_id and not metadata_match_id:
-            from app.domains.metadata.models import MetadataMatch
-            active_match = self.db.query(MetadataMatch).filter(
-                MetadataMatch.media_item_id == media_item_id,
-                MetadataMatch.is_active == True
-            ).first()
-            if active_match:
-                metadata_match_id = active_match.id
+            metadata_match_id = self.library_port.get_active_match_id(media_item_id)
 
         if not metadata_match_id:
             return None
 
-        override = self.db.query(UserOverride).filter(
-            UserOverride.user_id == self.user_id,
-            UserOverride.metadata_match_id == metadata_match_id
-        ).first()
+        from sqlalchemy.exc import IntegrityError
+
+        def query_meta():
+            return self.db.query(UserOverride).filter(
+                UserOverride.user_id == self.user_id,
+                UserOverride.metadata_match_id == metadata_match_id
+            ).first()
+
+        override = query_meta()
         
         # Migration: Split old overrides associated with physical media_item_id
         if not override and media_item_id:
-            override = self.db.query(UserOverride).filter(
+            physical_override = self.db.query(UserOverride).filter(
                 UserOverride.user_id == self.user_id,
                 UserOverride.media_item_id == media_item_id,
                 UserOverride.metadata_match_id == None
             ).first()
-            if override:
-                override.metadata_match_id = metadata_match_id
-                if override.resume_position:
-                    physical_override = UserOverride(
-                        user_id=self.user_id,
-                        media_item_id=media_item_id,
-                        resume_position=override.resume_position
-                    )
-                    self.db.add(physical_override)
-                    # Clear from metadata override
-                    override.resume_position = 0
-                override.media_item_id = None
+            if physical_override:
+                try:
+                    with self.db.begin_nested():
+                        existing_meta = query_meta()
+                        if existing_meta:
+                            # Merge fields from physical override to existing metadata override
+                            for field in ["custom_title", "custom_overview", "custom_poster", "custom_backdrop", "custom_logo", "custom_language", "user_rating", "user_comment", "is_favorite", "is_watched"]:
+                                val = getattr(physical_override, field, None)
+                                if val is not None and getattr(existing_meta, field, None) is None:
+                                    setattr(existing_meta, field, val)
+                            if physical_override.resume_position:
+                                physical_override.custom_title = None
+                                physical_override.custom_overview = None
+                                physical_override.custom_poster = None
+                                physical_override.custom_backdrop = None
+                                physical_override.custom_logo = None
+                                physical_override.custom_language = None
+                                physical_override.user_rating = None
+                                physical_override.user_comment = None
+                                physical_override.is_favorite = False
+                                physical_override.is_watched = False
+                            else:
+                                self.db.delete(physical_override)
+                            override = existing_meta
+                        else:
+                            physical_override.metadata_match_id = metadata_match_id
+                            if physical_override.resume_position:
+                                new_physical = UserOverride(
+                                    user_id=self.user_id,
+                                    media_item_id=media_item_id,
+                                    resume_position=physical_override.resume_position
+                                )
+                                self.db.add(new_physical)
+                                physical_override.resume_position = 0
+                            physical_override.media_item_id = None
+                            override = physical_override
+                        self.db.flush()
+                except IntegrityError:
+                    override = query_meta()
+                    if override and physical_override in self.db:
+                        if not physical_override.resume_position:
+                            self.db.delete(physical_override)
 
         if not override:
-            override = UserOverride(
-                user_id=self.user_id,
-                metadata_match_id=metadata_match_id
-            )
-            self.db.add(override)
+            try:
+                with self.db.begin_nested():
+                    override = UserOverride(
+                        user_id=self.user_id,
+                        metadata_match_id=metadata_match_id
+                    )
+                    self.db.add(override)
+                    self.db.flush()
+            except IntegrityError:
+                override = query_meta()
         return override
 
     def _get_or_create_physical_override(self, item_id: str) -> Optional[UserOverride]:
@@ -182,60 +132,74 @@ class OverridesService:
         if not media_item_id:
             return None
 
-        override = self.db.query(UserOverride).filter(
-            UserOverride.user_id == self.user_id,
-            UserOverride.media_item_id == media_item_id,
-            UserOverride.metadata_match_id == None
-        ).first()
+        def query_physical():
+            return self.db.query(UserOverride).filter(
+                UserOverride.user_id == self.user_id,
+                UserOverride.media_item_id == media_item_id,
+                UserOverride.metadata_match_id == None
+            ).first()
+
+        override = query_physical()
         if not override:
-            override = UserOverride(
-                user_id=self.user_id,
-                media_item_id=media_item_id
-            )
-            self.db.add(override)
+            from sqlalchemy.exc import IntegrityError
+            try:
+                with self.db.begin_nested():
+                    override = UserOverride(
+                        user_id=self.user_id,
+                        media_item_id=media_item_id
+                    )
+                    self.db.add(override)
+                    self.db.flush()
+            except IntegrityError:
+                override = query_physical()
         return override
 
     def _get_or_create_override(self, item_id: str, media_type: Optional[str] = None) -> Optional[UserOverride]:
         if isinstance(item_id, str) and item_id.startswith("collection_"):
-            from app.domains.metadata.models import MediaCollection
-            from app.shared_kernel.enums import Provider
             collection_tmdb_id = item_id.split("_")[1]
-            collection = self.db.query(MediaCollection).filter(
-                MediaCollection.provider == Provider.TMDB,
-                MediaCollection.external_id == collection_tmdb_id
-            ).first()
-            if not collection:
-                collection = MediaCollection(
-                    provider=Provider.TMDB,
-                    external_id=collection_tmdb_id
-                )
-                self.db.add(collection)
-                self.db.flush()
+            collection_id = self.library_port.get_or_create_collection_id(collection_tmdb_id, "tmdb")
             
-            override = self.db.query(UserOverride).filter(
-                UserOverride.user_id == self.user_id,
-                UserOverride.collection_id == collection.id
-            ).first()
+            def query_coll():
+                return self.db.query(UserOverride).filter(
+                    UserOverride.user_id == self.user_id,
+                    UserOverride.collection_id == collection_id
+                ).first()
+
+            override = query_coll()
             if not override:
-                override = UserOverride(
-                    user_id=self.user_id,
-                    collection_id=collection.id
-                )
-                self.db.add(override)
-                self.db.flush()
+                from sqlalchemy.exc import IntegrityError
+                try:
+                    with self.db.begin_nested():
+                        override = UserOverride(
+                            user_id=self.user_id,
+                            collection_id=collection_id
+                        )
+                        self.db.add(override)
+                        self.db.flush()
+                except IntegrityError:
+                    override = query_coll()
             return override
 
         return self._get_or_create_metadata_override(item_id, media_type) or self._get_or_create_physical_override(item_id)
 
     def get_or_create_media_item_override(self, media_item_id: int) -> UserOverride:
         """Helper to fetch or create a UserOverride specifically by media_item_id (physical file)."""
-        override = self.db.query(UserOverride).filter(
-            UserOverride.user_id == self.user_id,
-            UserOverride.media_item_id == media_item_id
-        ).first()
+        def query_override():
+            return self.db.query(UserOverride).filter(
+                UserOverride.user_id == self.user_id,
+                UserOverride.media_item_id == media_item_id
+            ).first()
+
+        override = query_override()
         if not override:
-            override = UserOverride(user_id=self.user_id, media_item_id=media_item_id)
-            self.db.add(override)
+            from sqlalchemy.exc import IntegrityError
+            try:
+                with self.db.begin_nested():
+                    override = UserOverride(user_id=self.user_id, media_item_id=media_item_id)
+                    self.db.add(override)
+                    self.db.flush()
+            except IntegrityError:
+                override = query_override()
         return override
 
     def update_item_overrides(self, request: ItemOverridesUpdate) -> Dict[str, Any]:
@@ -243,108 +207,28 @@ class OverridesService:
         item_id = request.item_id
         is_extra = request.type == 'extra'
 
-        if is_extra:
-            from app.domains.library.models import ExtraFile, MediaItem
-            extra = self.db.query(ExtraFile).filter(ExtraFile.id == int(item_id)).first()
-            if not extra:
-                raise NotFoundException("Target extra item not found")
+        # Delegate all structural library mutations (extra conversion, type changes, etc.)
+        if is_extra or request.main_type in ("bonus", "movie", "episode", "scene"):
+            payload = {
+                "type": request.type,
+                "main_type": request.main_type,
+                "parent_id": request.parent_id,
+                "subtype": request.subtype,
+                "language": request.language,
+                "season": request.season,
+                "episode": request.episode,
+                "custom_language": request.custom_language,
+                "custom_edition": request.custom_edition,
+                "custom_audio_type": request.custom_audio_type,
+                "custom_source": request.custom_source,
+                "reset_match": request.reset_match,
+                "media_type": request.media_type,
+            }
+            result = self.library_port.update_library_item_type_or_hierarchy(str(item_id), payload)
+            if is_extra or result.get("converted"):
+                return {"status": "success", "item_id": item_id}
 
-            # Support conversion to movie/episode/scene
-            if request.main_type in ("movie", "episode", "scene"):
-                parent_media = extra.media_item
-                if parent_media:
-                    from app.shared_kernel.enums import ItemStatus
-                    new_item = MediaItem(
-                        library_id=parent_media.library_id,
-                        relative_path=extra.relative_path,
-                        filename=extra.filename,
-                        extension=extra.extension,
-                        status=ItemStatus.NEW,
-                        parsed_info={"season": request.season, "episode": request.episode} if request.main_type == "episode" else {}
-                    )
-                    self.db.add(new_item)
-                    self.db.delete(extra)
-                    self.db.commit()
-                    return {"status": "success", "item_id": item_id}
-
-            if request.parent_id is not None:
-                extra.media_item_id = int(request.parent_id)
-            if request.subtype is not None:
-                from app.shared_kernel.enums import ExtraSubtype
-                try:
-                    extra.subtype = ExtraSubtype(request.subtype.lower())
-                except ValueError:
-                    pass
-            if request.language is not None:
-                extra.language = request.language
-
-            self.db.commit()
-            return {"status": "success", "item_id": item_id}
-
-        from app.domains.library.models import MediaItem, ExtraFile
         media_item_id, metadata_match_id = self.resolver.resolve_ids(item_id, media_type=request.media_type)
-        item = None
-        if media_item_id:
-            item = self.db.query(MediaItem).filter(MediaItem.id == media_item_id).first()
-
-        # Convert to extra if main_type is bonus
-        if item and request.main_type == "bonus" and request.parent_id is not None:
-            from app.shared_kernel.enums import ExtraCategory, ExtraSubtype
-            parent_item = self.db.query(MediaItem).filter(MediaItem.id == int(request.parent_id)).first()
-            if parent_item:
-                for extra in list(item.extras):
-                    extra.media_item = parent_item
-                item.extras.clear()
-                self.db.flush()
-            new_extra = ExtraFile(
-                media_item_id=int(request.parent_id),
-                relative_path=item.relative_path,
-                filename=item.filename,
-                extension=item.extension,
-                category=ExtraCategory.VIDEO,
-                subtype=None
-            )
-            self.db.add(new_extra)
-            self.db.delete(item)
-            self.db.commit()
-            return {"status": "success", "item_id": item_id}
-
-        # Handle conversion between movie and episode
-        if item and request.main_type in ("movie", "episode"):
-            parsed = dict(item.parsed_info) if item.parsed_info else {}
-            old_type = parsed.get("type")
-            if not old_type:
-                active_m = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
-                if active_m:
-                    old_type = active_m.media_type.value
-                else:
-                    fn_data = parsed.get("fn") or {}
-                    it_data = parsed.get("it") or {}
-                    fd_data = parsed.get("fd") or {}
-                    old_type = fn_data.get("type") or it_data.get("type") or fd_data.get("type") or "movie"
-
-            if str(old_type).lower() != request.main_type.lower():
-                from app.shared_kernel.enums import ItemStatus
-                item.status = ItemStatus.NEW
-                parsed["type"] = request.main_type
-                for match in item.matches:
-                    match.is_active = False
-                    match.media_item_id = None
-                
-                if request.main_type == "movie":
-                    parsed.pop("season", None)
-                    parsed.pop("episode", None)
-                    for k in ["fn", "it", "fd"]:
-                        if k in parsed and isinstance(parsed[k], dict):
-                            parsed[k].pop("season", None)
-                            parsed[k].pop("episode", None)
-                            parsed[k]["type"] = "movie"
-                elif request.main_type == "episode":
-                    for k in ["fn", "it", "fd"]:
-                        if k in parsed and isinstance(parsed[k], dict):
-                            parsed[k]["type"] = "episode"
-            
-            item.parsed_info = parsed
 
         metadata_override = self._get_or_create_metadata_override(str(item_id), media_type=request.media_type)
         physical_override = self._get_or_create_physical_override(str(item_id))
@@ -370,21 +254,8 @@ class OverridesService:
             m_override.custom_language = request.language
             language_updated = True
 
-        if item and language_updated and m_override.custom_language:
-            self._enrich_language_if_needed(item, m_override.custom_language)
-
-        # Edition, Audio Type, Source overrides
-        if item:
-            from app.shared_kernel.enums import MovieEdition, MediaAudioType, MediaSource
-            if request.custom_edition is not None:
-                val = request.custom_edition
-                item.custom_edition = MovieEdition.NONE if (val == "none" or not val) else MovieEdition(val.lower())
-            if request.custom_audio_type is not None:
-                val = request.custom_audio_type
-                item.custom_audio_type = MediaAudioType.NONE if (val == "none" or not val) else MediaAudioType(val.lower())
-            if request.custom_source is not None:
-                val = request.custom_source
-                item.custom_source = MediaSource.NONE if (val == "none" or not val) else MediaSource(val.lower())
+        if media_item_id and language_updated and m_override.custom_language:
+            self._enrich_language_if_needed(media_item_id, m_override.custom_language)
 
         # Rating, comments, favorite
         if "user_rating" in request.model_fields_set:
@@ -407,30 +278,6 @@ class OverridesService:
 
         if request.resume_position is not None:
             p_override.resume_position = int(request.resume_position or 0)
-
-        # Season & Episode updates in parsed_info
-        if item and (request.season is not None or request.episode is not None):
-            parsed = dict(item.parsed_info) if item.parsed_info else {}
-            if request.season is not None:
-                parsed["season"] = request.season
-                for k in ["fn", "it", "fd"]:
-                    if k in parsed and isinstance(parsed[k], dict):
-                        parsed[k]["season"] = request.season
-            if request.episode is not None:
-                parsed["episode"] = request.episode
-                for k in ["fn", "it", "fd"]:
-                    if k in parsed and isinstance(parsed[k], dict):
-                        parsed[k]["episode"] = request.episode
-            item.parsed_info = parsed
-            self._shift_tv_episode_match_if_needed(item, parsed, request.season, request.episode, m_override.custom_language, bool(request.reset_match))
-
-        # Reset Match
-        if item and request.reset_match:
-            from app.shared_kernel.enums import ItemStatus
-            item.status = ItemStatus.NEW
-            for match in item.matches:
-                match.is_active = False
-                match.media_item_id = None
 
         # Tags resolution
         tags_input = request.tags
@@ -487,19 +334,20 @@ class OverridesService:
 
         if path and (path.startswith("/") or path.startswith(("http://", "https://"))):
             try:
-                from app.domains.tasks import task_manager
-                image_service = task_manager.download_worker.image_service
-                url = image_service.get_download_url(path, subfolder)
-                if url:
-                    import re
-                    from urllib.parse import urlparse
-                    basename = os.path.basename(urlparse(path).path)
-                    ext = os.path.splitext(basename)[1].lower() or ".jpg"
-                    prefix = f"user_override_{override.user_id}_{item_id}"
-                    safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", prefix).strip("_")
-                    filename = f"{safe_prefix}_{basename}{ext}"
-                    task_manager.download_worker.enqueue_download(url, subfolder, filename)
-                    path = f"{subfolder}/{filename}"
+                if self.image_downloader:
+                    url = self.image_downloader.get_download_url(path, subfolder)
+                    if url:
+                        import re
+                        from urllib.parse import urlparse
+                        basename = os.path.basename(urlparse(path).path)
+                        ext = os.path.splitext(basename)[1].lower() or ".jpg"
+                        prefix = f"user_override_{override.user_id}_{item_id}"
+                        safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", prefix).strip("_")
+                        filename = f"{safe_prefix}_{basename}{ext}"
+                        self.image_downloader.download_now(url, subfolder, filename)
+                        path = f"{subfolder}/{filename}"
+                else:
+                    logger.warning("No image_downloader available for user override image download")
             except Exception as e:
                 logger.error(f"Failed to queue image download for user override: {e}")
 
@@ -560,165 +408,81 @@ class OverridesService:
         item_ids = request.item_ids or []
         is_extra = request.type == 'extra'
 
-        count = 0
-        # 1. Apply common updates
-        for item_id in item_ids:
-            if is_extra:
-                from app.domains.library.models import ExtraFile, MediaItem
-                extra = self.db.query(ExtraFile).filter(ExtraFile.id == int(item_id)).first()
-                if extra:
-                    if request.parent_id is not None:
-                        extra.media_item_id = int(request.parent_id)
-                    if request.subtype is not None:
-                        from app.shared_kernel.enums import ExtraSubtype
-                        try:
-                            extra.subtype = ExtraSubtype(request.subtype.lower())
-                        except ValueError:
-                            pass
-                    if request.language is not None:
-                        extra.language = request.language
+        # 1. Apply common updates to library structure via LibraryPort
+        library_payload = {
+            "parent_id": request.parent_id,
+            "subtype": request.subtype,
+            "language": request.language,
+            "main_type": request.main_type,
+            "season": request.season,
+            "episode": request.episode,
+            "reset_match": request.reset_match,
+            "custom_edition": request.custom_edition,
+            "custom_audio_type": request.custom_audio_type,
+            "custom_source": request.custom_source,
+            "custom_language": request.custom_language if request.custom_language is not None else request.language,
+        }
+        
+        self.library_port.bulk_update_library_items(item_ids, is_extra, library_payload)
 
-                    if request.main_type in ("movie", "episode", "scene"):
-                        parent_media = extra.media_item
-                        if parent_media:
-                            from app.shared_kernel.enums import ItemStatus
-                            new_item = MediaItem(
-                                library_id=parent_media.library_id,
-                                relative_path=extra.relative_path,
-                                filename=extra.filename,
-                                extension=extra.extension,
-                                status=ItemStatus.NEW,
-                                parsed_info={"season": request.season, "episode": request.episode} if request.main_type == "episode" else {}
-                            )
-                            self.db.add(new_item)
-                            self.db.delete(extra)
+        # 2. Update user overrides if not extra and not converting to bonus (which deletes the MediaItem)
+        count = 0
+        if not is_extra:
+            is_converting_to_bonus = request.main_type == "bonus" and request.parent_id is not None
+            if not is_converting_to_bonus:
+                for item_id in item_ids:
+                    m_override = self._get_or_create_metadata_override(str(item_id)) or self._get_or_create_physical_override(str(item_id))
+                    if m_override:
+                        language_val = request.custom_language if request.custom_language is not None else request.language
+                        if language_val is not None:
+                            m_override.custom_language = language_val
+                            self._enrich_language_if_needed(int(item_id), language_val)
                     count += 1
             else:
-                from app.domains.library.models import MediaItem, ExtraFile
-                item = self.db.query(MediaItem).filter(MediaItem.id == int(item_id)).first()
-                if item:
-                    if request.main_type == "bonus" and request.parent_id is not None:
-                        from app.shared_kernel.enums import ExtraCategory, ExtraSubtype
-                        parent_item = self.db.query(MediaItem).filter(MediaItem.id == int(request.parent_id)).first()
-                        if parent_item:
-                            for extra in list(item.extras):
-                                extra.media_item = parent_item
-                            item.extras.clear()
-                            self.db.flush()
-                        new_extra = ExtraFile(
-                            media_item_id=int(request.parent_id),
-                            relative_path=item.relative_path,
-                            filename=item.filename,
-                            extension=item.extension,
-                            category=ExtraCategory.VIDEO,
-                            subtype=ExtraSubtype.OTHER
-                        )
-                        self.db.add(new_extra)
-                        self.db.delete(item)
-                    else:
-                        metadata_override = self._get_or_create_metadata_override(str(item_id))
-                        physical_override = self._get_or_create_physical_override(str(item_id))
-                        m_override = metadata_override or physical_override
-                        if m_override:
-                            from app.shared_kernel.enums import MovieEdition, MediaAudioType, MediaSource
-                            if request.custom_edition is not None:
-                                val = request.custom_edition
-                                item.custom_edition = MovieEdition.NONE if (val == "none" or not val) else MovieEdition(val.lower())
-                            if request.custom_audio_type is not None:
-                                val = request.custom_audio_type
-                                item.custom_audio_type = MediaAudioType.NONE if (val == "none" or not val) else MediaAudioType(val.lower())
-                            if request.custom_source is not None:
-                                val = request.custom_source
-                                item.custom_source = MediaSource.NONE if (val == "none" or not val) else MediaSource(val.lower())
-                            
-                            language_val = request.custom_language if request.custom_language is not None else request.language
-                            if language_val is not None:
-                                m_override.custom_language = language_val
-                                self._enrich_language_if_needed(item, language_val)
+                count = len(item_ids)
+        else:
+            count = len(item_ids)
 
-                            if request.season is not None or request.episode is not None:
-                                parsed = dict(item.parsed_info) if item.parsed_info else {}
-                                if request.season is not None:
-                                    parsed["season"] = request.season
-                                    for k in ["fn", "it", "fd"]:
-                                        if k in parsed and isinstance(parsed[k], dict):
-                                            parsed[k]["season"] = request.season
-                                if request.episode is not None:
-                                    parsed["episode"] = request.episode
-                                    for k in ["fn", "it", "fd"]:
-                                        if k in parsed and isinstance(parsed[k], dict):
-                                            parsed[k]["episode"] = request.episode
-                                item.parsed_info = parsed
-                                self._shift_tv_episode_match_if_needed(item, parsed, request.season, request.episode, m_override.custom_language, bool(request.reset_match))
-
-                            if request.reset_match:
-                                for match in item.matches:
-                                    match.is_active = False
-                    count += 1
-
-        # 2. Apply individual item updates (e.g. auto numbering)
+        # 3. Apply individual item updates (e.g. auto numbering)
         if request.item_updates:
             for it_up in request.item_updates:
                 u_id = it_up.get("id")
                 u_updates = it_up.get("updates") or {}
                 if not u_id:
                     continue
+                
                 if is_extra:
-                    from app.domains.library.models import ExtraFile
-                    extra = self.db.query(ExtraFile).filter(ExtraFile.id == int(u_id)).first()
-                    if extra:
-                        if "parent_id" in u_updates:
-                            extra.media_item_id = int(u_updates["parent_id"])
-                        if "subtype" in u_updates:
-                            from app.shared_kernel.enums import ExtraSubtype
-                            try:
-                                extra.subtype = ExtraSubtype(u_updates["subtype"].lower())
-                            except ValueError:
-                                pass
-                        if "language" in u_updates:
-                            extra.language = u_updates["language"]
+                    payload = {
+                        "type": "extra",
+                        "parent_id": u_updates.get("parent_id"),
+                        "subtype": u_updates.get("subtype"),
+                        "language": u_updates.get("language"),
+                    }
+                    self.library_port.update_library_item_type_or_hierarchy(str(u_id), payload)
                 else:
-                    from app.domains.library.models import MediaItem
-                    item = self.db.query(MediaItem).filter(MediaItem.id == int(u_id)).first()
-                    if item:
-                        metadata_override = self._get_or_create_metadata_override(str(u_id))
-                        physical_override = self._get_or_create_physical_override(str(u_id))
-                        m_override = metadata_override or physical_override
+                    is_converting_to_bonus = u_updates.get("main_type") == "bonus" and u_updates.get("parent_id") is not None
+                    
+                    payload = {
+                        "type": "media_item",
+                        "main_type": u_updates.get("main_type"),
+                        "parent_id": u_updates.get("parent_id"),
+                        "custom_edition": u_updates.get("custom_edition"),
+                        "custom_audio_type": u_updates.get("custom_audio_type"),
+                        "custom_source": u_updates.get("custom_source"),
+                        "season": u_updates.get("season"),
+                        "episode": u_updates.get("episode"),
+                        "reset_match": u_updates.get("reset_match") or request.reset_match,
+                        "custom_language": u_updates.get("custom_language") or u_updates.get("language"),
+                    }
+                    self.library_port.update_library_item_type_or_hierarchy(str(u_id), payload)
+                    
+                    if not is_converting_to_bonus:
+                        m_override = self._get_or_create_metadata_override(str(u_id)) or self._get_or_create_physical_override(str(u_id))
                         if m_override:
-                            from app.shared_kernel.enums import MovieEdition, MediaAudioType, MediaSource
-                            if "custom_edition" in u_updates:
-                                val = u_updates["custom_edition"]
-                                item.custom_edition = MovieEdition.NONE if (val == "none" or not val) else MovieEdition(val.lower())
-                            if "custom_audio_type" in u_updates:
-                                val = u_updates["custom_audio_type"]
-                                item.custom_audio_type = MediaAudioType.NONE if (val == "none" or not val) else MediaAudioType(val.lower())
-                            if "custom_source" in u_updates:
-                                val = u_updates["custom_source"]
-                                item.custom_source = MediaSource.NONE if (val == "none" or not val) else MediaSource(val.lower())
-                            
                             language_val = u_updates.get("custom_language") if "custom_language" in u_updates else u_updates.get("language")
                             if language_val is not None:
                                 m_override.custom_language = language_val
-                                self._enrich_language_if_needed(item, language_val)
-
-                            if "season" in u_updates or "episode" in u_updates:
-                                parsed = dict(item.parsed_info) if item.parsed_info else {}
-                                if "season" in u_updates:
-                                    parsed["season"] = u_updates["season"]
-                                    for k in ["fn", "it", "fd"]:
-                                        if k in parsed and isinstance(parsed[k], dict):
-                                            parsed[k]["season"] = u_updates["season"]
-                                if "episode" in u_updates:
-                                    parsed["episode"] = u_updates["episode"]
-                                    for k in ["fn", "it", "fd"]:
-                                        if k in parsed and isinstance(parsed[k], dict):
-                                            parsed[k]["episode"] = u_updates["episode"]
-                                item.parsed_info = parsed
-                                self._shift_tv_episode_match_if_needed(item, parsed, u_updates.get("season"), u_updates.get("episode"), m_override.custom_language, bool(u_updates.get("reset_match") or request.reset_match))
-
-                            if u_updates.get("reset_match"):
-                                for match in item.matches:
-                                    match.is_active = False
+                                self._enrich_language_if_needed(int(u_id), language_val)
 
         self.db.commit()
         return {"status": "success", "count": count}

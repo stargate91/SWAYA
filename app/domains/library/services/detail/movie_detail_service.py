@@ -12,7 +12,7 @@ from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.shared_kernel.language import LanguageService
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.domains.library.services.detail._detail_formatter import DetailFormatter
-from app.infrastructure.scrapers.enrichment.mainstream_enricher import _split_genres
+from app.shared_kernel.genre_utils import split_genres as _split_genres
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ class MovieDetailService(DetailFormatter):
         self.tmdb_scraper = scrapers.tmdb(db)
 
     def get_library_item_detail(self, item_id: str, full_people: bool = False) -> MovieDetailResponse:
-        from app.domains.library.schemas import MovieDetailResponse
+        from app.application.library.schemas import MovieDetailResponse
         from app.shared_kernel.user_context import get_current_user_id
         db = self.db
         current_uid = get_current_user_id()
@@ -283,7 +283,6 @@ class MovieDetailService(DetailFormatter):
         
         item = db.query(MediaItem).options(
             joinedload(MediaItem.matches).joinedload(MetadataMatch.localizations),
-            joinedload(MediaItem.matches).joinedload(MetadataMatch.people).joinedload(MediaPersonLink.person).joinedload(Person.localizations),
             joinedload(MediaItem.matches).joinedload(MetadataMatch.studios),
             joinedload(MediaItem.matches).joinedload(MetadataMatch.collection).joinedload(MediaCollection.localizations),
             joinedload(MediaItem.extras),
@@ -308,7 +307,11 @@ class MovieDetailService(DetailFormatter):
         writers = []
         
         if active_match:
-            for link in sorted(active_match.people, key=lambda x: x.order):
+            from app.domains.people.models import MediaPersonLink
+            people_links = db.query(MediaPersonLink).options(
+                joinedload(MediaPersonLink.person).joinedload(Person.localizations)
+            ).filter(MediaPersonLink.match_id == active_match.id).all()
+            for link in sorted(people_links, key=lambda x: x.order):
                 person = link.person
                 person_data = {
                     "id": person.id,

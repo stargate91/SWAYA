@@ -1,5 +1,4 @@
-from typing import Optional
-from sqlalchemy.orm import Session
+from typing import Optional, Any
 
 from app.shared_kernel.enums import Provider, MediaType
 from app.infrastructure.cache.cache_service import CacheService
@@ -16,14 +15,21 @@ class ScraperService:
     sub-scraper classes (TMDB, OMDB, StashDB, PornDB, FansDB) to maintain domain separation.
     """
 
-    def __init__(self, db_session: Session, cache_service: Optional[CacheService] = None):
-        self.db = db_session
+    def __init__(self, settings_port_or_db: Any, cache_service: Optional[CacheService] = None):
+        from app.shared_kernel.ports.settings_port import SettingsPort
+        # Workaround for Python 3.10+ Protocol check: we check if it has the required methods or uses DbSettingsAdapter
+        if hasattr(settings_port_or_db, "get_setting") and hasattr(settings_port_or_db, "get_system_setting"):
+            self.settings_port = settings_port_or_db
+        else:
+            from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+            self.settings_port = DbSettingsAdapter(settings_port_or_db)
+            
         self.cache = cache_service or CacheService()
-        self.tmdb = TMDBScraper(db_session, self.cache)
-        self.omdb = OMDBScraper(db_session, self.cache)
-        self.stashdb = StashDBScraper(db_session, self.cache)
-        self.porndb = PornDBScraper(db_session, self.cache)
-        self.fansdb = FansDBScraper(db_session, self.cache)
+        self.tmdb = TMDBScraper(self.settings_port, self.cache)
+        self.omdb = OMDBScraper(self.settings_port, self.cache)
+        self.stashdb = StashDBScraper(self.settings_port, self.cache)
+        self.porndb = PornDBScraper(self.settings_port, self.cache)
+        self.fansdb = FansDBScraper(self.settings_port, self.cache)
 
     def fetch_tmdb_movie(self, movie_id: str, language: Optional[str] = None, force_refresh: bool = False) -> Optional[dict]:
         return self.tmdb.fetch_movie(movie_id, language, force_refresh)

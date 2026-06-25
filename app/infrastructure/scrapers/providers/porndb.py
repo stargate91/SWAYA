@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 class PornDBScraper(BaseScraper):
     """ThePornDB-specific metadata retriever and parser utilizing GraphQL and ScraperNormalizer."""
 
-    def __init__(self, db_session, cache_service=None):
-        super().__init__(db_session, cache_service, Provider.PORNDB)
+    def __init__(self, settings_port, cache_service=None):
+        super().__init__(settings_port, cache_service, Provider.PORNDB)
 
     def _fetch_rating(
         self,

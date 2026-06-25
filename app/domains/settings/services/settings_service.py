@@ -13,26 +13,41 @@ from sqlalchemy import or_
 
 
 from app.domains.settings.models import UserSetting, SystemSetting
-from app.domains.library.models import MediaItem
-from app.shared_kernel.enums import ItemStatus, MediaType
+from app.shared_kernel.ports.library_port import LibraryPort
 from app.shared_kernel.constants import STASHDB_DEFAULT_ENDPOINT, FANSDB_DEFAULT_ENDPOINT, PORNDB_DEFAULT_ENDPOINT
 from app.domains.media_assets.services.images import image_processing_service
 
 logger = logging.getLogger(__name__)
 
+from app.shared_kernel.ports.settings_port import SettingsPort
+
 class SettingsService:
-    def __init__(self, db: Session, user_id: Optional[int] = None):
+    def __init__(
+        self,
+        db: Session,
+        library_port: Optional[LibraryPort] = None,
+        user_id: Optional[int] = None,
+        settings_port: Optional[SettingsPort] = None
+    ):
         self.db = db
+        if library_port is None:
+            from app.infrastructure.media.db_media_resolver import DbMediaResolver
+            library_port = DbMediaResolver(db)
+        self.library_port = library_port
         if user_id is None:
             from app.shared_kernel.user_context import get_current_user_id
             user_id = get_current_user_id()
         self.user_id = user_id
-
+        
+        if settings_port is None:
+            from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+            self.settings_port = DbSettingsAdapter(db)
+        else:
+            self.settings_port = settings_port
 
     def get_settings(self) -> Dict[str, Any]:
-
         # Auto-detect VLC path
-        vlc_setting = self.db.query(UserSetting).filter(UserSetting.user_id == self.user_id, UserSetting.key == "vlc_path").first()
+        vlc_setting = self.settings_port.get_user_setting_obj(self.user_id, "vlc_path")
         if not vlc_setting or not vlc_setting.value:
             vlc_path = ""
             which_vlc = shutil.which("vlc")
@@ -44,14 +59,13 @@ class SettingsService:
                         vlc_path = p
                         break
             if not vlc_setting:
-                vlc_setting = UserSetting(user_id=self.user_id, key="vlc_path", value=vlc_path)
-                self.db.add(vlc_setting)
+                self.settings_port.create_user_setting(self.user_id, "vlc_path", vlc_path)
             else:
-                vlc_setting.value = vlc_path
+                self.settings_port.set_setting("vlc_path", vlc_path, self.user_id)
             self.db.commit()
 
         # Auto-detect MPC path
-        mpc_setting = self.db.query(UserSetting).filter(UserSetting.user_id == self.user_id, UserSetting.key == "mpc_path").first()
+        mpc_setting = self.settings_port.get_user_setting_obj(self.user_id, "mpc_path")
         if not mpc_setting or not mpc_setting.value:
             mpc_path = ""
             which_mpc = shutil.which("mpc-hc") or shutil.which("mpc-hc64")
@@ -63,24 +77,17 @@ class SettingsService:
                         mpc_path = p
                         break
             if not mpc_setting:
-                mpc_setting = UserSetting(user_id=self.user_id, key="mpc_path", value=mpc_path)
-                self.db.add(mpc_setting)
+                self.settings_port.create_user_setting(self.user_id, "mpc_path", mpc_path)
             else:
-                mpc_setting.value = mpc_path
+                self.settings_port.set_setting("mpc_path", mpc_path, self.user_id)
             self.db.commit()
 
-        settings = self.db.query(UserSetting).filter(UserSetting.user_id == self.user_id).all()
+        settings = self.settings_port.get_user_settings(self.user_id)
         return {s.key: s.value for s in settings}
 
     def update_settings(self, settings: Dict[str, Any]) -> Dict[str, Any]:
-
         for key, value in settings.items():
-            setting = self.db.query(UserSetting).filter(UserSetting.user_id == self.user_id, UserSetting.key == key).first()
-            if setting:
-                setting.value = value
-            else:
-                setting = UserSetting(user_id=self.user_id, key=key, value=value)
-                self.db.add(setting)
+            self.settings_port.set_setting(key, value, self.user_id)
         self.db.commit()
         return {"status": "success"}
 
@@ -101,14 +108,11 @@ class SettingsService:
             raise ValueError("Failed to process avatar")
 
         avatar_path = image_service.resolve_image_url(avatar_filename, "avatars")
-        setting = self.db.query(UserSetting).filter(
-            UserSetting.user_id == self.user_id,
-            UserSetting.key == "avatar_path",
-        ).first()
+        setting = self.settings_port.get_user_setting_obj(self.user_id, "avatar_path")
         if setting:
-            setting.value = avatar_path
+            self.settings_port.set_setting("avatar_path", avatar_path, self.user_id)
         else:
-            self.db.add(UserSetting(user_id=self.user_id, key="avatar_path", value=avatar_path))
+            self.settings_port.create_user_setting(self.user_id, "avatar_path", avatar_path)
         self.db.commit()
         return {"avatar_path": avatar_path}
     def validate_folders(self, payload: Dict[str, Any]) -> Dict[str, Any]:
@@ -139,39 +143,11 @@ class SettingsService:
         return {"status": "error", "message": "CHANGELOG.md not found.", "content": ""}
 
     def get_ignored_items(self, search: str = "", offset: int = 0, limit: int = 40) -> Dict[str, Any]:
-        query = self.db.query(MediaItem).filter(MediaItem.status == ItemStatus.IGNORED)
-        if search:
-            pattern = f"%{search}%"
-            query = query.filter(MediaItem.filename.ilike(pattern))
-            
-        total = query.count()
-        items = query.order_by(MediaItem.ignored_at.desc()).offset(offset).limit(limit).all()
-        
-        serialized = [{
-            "id": item.id,
-            "filename": item.filename,
-            "current_path": item.current_path,
-            "item_type": item.matches[0].media_type.value if item.matches else None,
-            "status": item.status.value,
-            "ignored_at": item.ignored_at.isoformat() if item.ignored_at else None,
-        } for item in items]
-        
-        return {
-            "items": serialized,
-            "total": total,
-            "offset": offset,
-            "limit": limit,
-            "has_more": offset + len(items) < total,
-        }
+        return self.library_port.get_ignored_items(search, offset, limit)
 
     def restore_ignored_items(self, item_ids: List[int]) -> Dict[str, Any]:
-        items = self.db.query(MediaItem).filter(MediaItem.id.in_(item_ids), MediaItem.status == ItemStatus.IGNORED).all()
-        for item in items:
-            item.status = item.ignored_previous_status or ItemStatus.NEW
-            item.ignored_previous_status = None
-            item.ignored_at = None
-        self.db.commit()
-        return {"status": "success", "restored": len(items)}
+        restored_count = self.library_port.restore_ignored_items(item_ids)
+        return {"status": "success", "restored": restored_count}
 
     def validate_api_keys(self, payload: dict) -> Dict[str, Any]:
         tmdb_api_key = (payload.get("tmdb_api_key") or "").strip()
@@ -297,3 +273,19 @@ class SettingsService:
         result["porndb"] = validate_graphql_provider("porndb", porndb_endpoint, porndb_api_key, use_bearer=True)
 
         return result
+
+    def get_system_settings(self) -> List[SystemSetting]:
+        return self.settings_port.get_system_settings()
+
+    def set_system_setting(self, key: str, value: Any, description: Optional[str] = None) -> SystemSetting:
+        setting = self.settings_port.set_system_setting(key, value, description)
+        self.db.commit()
+        return setting
+
+    def get_user_settings_list(self, user_id: int) -> List[UserSetting]:
+        return self.settings_port.get_user_settings(user_id)
+
+    def set_user_setting(self, user_id: int, key: str, value: Any, description: Optional[str] = None) -> UserSetting:
+        setting = self.settings_port.set_user_setting(user_id, key, value, description)
+        self.db.commit()
+        return setting
