@@ -395,8 +395,13 @@ class PeopleEnricher:
                     if images:
                         urls_list = [img.get("url") for img in images if img.get("url")]
                         if urls_list:
-                            result["images"] = urls_list
-                            result["profile_path"] = urls_list[0]
+                            if result["images"] is None:
+                                result["images"] = []
+                            for u in urls_list:
+                                if u not in result["images"]:
+                                    result["images"].append(u)
+                            if not result["profile_path"]:
+                                result["profile_path"] = urls_list[0]
 
                     # Parse URLs dynamically to extract exact provider links and socials
                     perf_urls = perf.get("urls") or []

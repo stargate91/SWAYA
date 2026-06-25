@@ -314,6 +314,7 @@
     "writeReview": "Write Review",
     "reviewPlaceholder": "Write your review here...",
     "ratingsSection": "Ratings",
+    "noRatingsAvailable": "No ratings available.",
     "watchStats": "Watch Stats",
     "watchCount": "Watch Count",
     "watchStatus": "Status",

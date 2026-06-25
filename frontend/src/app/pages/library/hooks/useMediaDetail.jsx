@@ -344,9 +344,11 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
   const ratingTmdb = item?.rating_tmdb;
   const ratingPorndb = item?.rating_porndb;
   const isSceneType = item?.type === 'scene';
-  const showImdb = !isSceneType && !!ratingImdb;
-  const showTmdb = !isSceneType && !ratingImdb && !!ratingTmdb;
-  const showPorndb = isSceneType ? !!ratingPorndb : (!ratingImdb && !ratingTmdb && !!ratingPorndb);
+  const showImdb = !isSceneType && !!ratingImdb && Number(ratingImdb) > 0;
+  const showTmdb = !isSceneType && !showImdb && !!ratingTmdb && Number(ratingTmdb) > 0;
+  const showPorndb = isSceneType
+    ? (!!ratingPorndb && Number(ratingPorndb) > 0)
+    : (!showImdb && !showTmdb && !!ratingPorndb && Number(ratingPorndb) > 0);
 
   const normalizedGenres = item?.genres || [];
   const rawOverview = item?.overview || '';

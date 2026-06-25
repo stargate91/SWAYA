@@ -465,7 +465,7 @@ class FilmographyService:
             prov_enum = Provider(source.lower())
             active_match_ids = self.library_port.get_active_match_ids(media_type=media_type)
             from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
-            from app.domains.languages.services import LanguageService
+            from app.shared_kernel.language import LanguageService
             
             links = db.query(MediaPersonLink).filter(
                 MediaPersonLink.person_id == person_id,
