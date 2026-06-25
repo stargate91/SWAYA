@@ -76,17 +76,17 @@ class PeopleSearchResponse(BaseModel):
     offset: int
     limit: int
 
-class PersonCreditItem(BaseModel):
-    id: int
+class PersonCreditItem(BaseSchema):
+    id: Any
     title: str
     type: str
-    tmdb_id: int
+    tmdb_id: Optional[int] = 0
     year: Optional[int] = None
     poster_path: Optional[str] = None
     backdrop_path: Optional[str] = None
-    rating: float
+    rating: Optional[float] = 0.0
     rating_porndb: Optional[float] = None
-    job: str
+    job: Optional[str] = "Actor"
     character: Optional[str] = None
     in_library: bool
     is_known_for: Optional[bool] = None

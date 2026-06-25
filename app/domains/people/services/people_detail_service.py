@@ -110,8 +110,16 @@ class PeopleDetailService:
         for person, library_count, linked_adult_flag in results:
             if not include_inactive and not person.is_active:
                 continue
+            # If include_inactive, we want to suggest people.
+            # They should be suggested if they have linked items (library_count > 0)
+            # OR if they exist in the DB (i.e., we already resolved/added them before, but they were since inactivated).
+            # This allows user to re-activate a previously active person without searching.
             if include_inactive and not person.is_active and library_count == 0:
-                continue
+                # Let them show up if they have any external source links or external tmdb ids saved
+                # (which means they were manually added/created before).
+                has_identity = bool(person.external_ids) or (len(person.external_links) > 0)
+                if not has_identity:
+                    continue
             
             # Simple title search
             if search and search.lower() not in person.name.lower():
@@ -819,7 +827,10 @@ class PeopleDetailService:
         if person_ids:
             local_people = {
                 person.id: person
-                for person in db.query(Person).filter(Person.id.in_(person_ids)).all()
+                for person in db.query(Person).filter(
+                    (Person.id.in_(person_ids)) | 
+                    (Person.external_ids["tmdb"].as_string().in_([str(pid) for pid in person_ids]))
+                ).all()
             }
 
             linked_rows = (
@@ -846,6 +857,10 @@ class PeopleDetailService:
                 continue
 
             local_person = local_people.get(person_id)
+            if not local_person:
+                # Fallback to search by TMDB ID in the local_people dict
+                local_person = next((p for p in local_people.values() if p.external_ids and p.external_ids.get("tmdb") == str(person_id)), None)
+
             mapped_gender = result.get("gender") or 0
 
             # Map known_for
@@ -855,6 +870,10 @@ class PeopleDetailService:
                 known_for_list.append({
                     "title": item.get("title") or item.get("name") or "Unknown",
                 })
+
+            is_linked = person_id in linked_person_ids
+            if not is_linked and local_person:
+                is_linked = local_person.id in linked_person_ids
 
             adult_results.append({
                 "id": person_id,
@@ -866,7 +885,7 @@ class PeopleDetailService:
                 "known_for": known_for_list,
                 "is_active": bool(local_person.is_active) if local_person else False,
                 "is_pinned": False,
-                "is_linked": person_id in linked_person_ids
+                "is_linked": is_linked
             })
 
         return adult_results
@@ -961,7 +980,11 @@ class PeopleDetailService:
                 raise HTTPException(status_code=400, detail="Invalid person ID format")
 
             # Try to find locally first
-            person = db.query(Person).filter(Person.external_ids["tmdb"] == str(tmdb_id)).first()
+            person_query = db.query(Person).filter(Person.external_ids["tmdb"].as_string() == str(tmdb_id))
+            if is_adult is not None:
+                person = person_query.filter(Person.is_adult == is_adult).first()
+            else:
+                person = person_query.filter(Person.is_adult == False).first()
             if person:
                 person.is_active = True
                 db.commit()

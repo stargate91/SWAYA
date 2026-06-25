@@ -342,9 +342,11 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
 
   const ratingImdb = item?.rating_imdb;
   const ratingTmdb = item?.rating_tmdb;
+  const ratingPorndb = item?.rating_porndb;
   const isSceneType = item?.type === 'scene';
-  const showImdb = !!ratingImdb && !isSceneType;
-  const showTmdb = !ratingImdb && !!ratingTmdb && !isSceneType;
+  const showImdb = !isSceneType && !!ratingImdb;
+  const showTmdb = !isSceneType && !ratingImdb && !!ratingTmdb;
+  const showPorndb = isSceneType ? !!ratingPorndb : (!ratingImdb && !ratingTmdb && !!ratingPorndb);
 
   const normalizedGenres = item?.genres || [];
   const rawOverview = item?.overview || '';
@@ -570,6 +572,8 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
       ratingImdb,
       showTmdb,
       ratingTmdb,
+      showPorndb,
+      ratingPorndb,
       normalizedGenres,
       overview,
       hasTechnicalPanel,

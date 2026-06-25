@@ -25,6 +25,8 @@ export default function MediaHeaderInfo() {
     ratingImdb,
     showTmdb,
     ratingTmdb,
+    showPorndb,
+    ratingPorndb,
     normalizedGenres,
     item,
     showStudioPill,
@@ -124,6 +126,16 @@ export default function MediaHeaderInfo() {
                     className="rating-pill-img"
                   />
                   <span>{isNaN(parseFloat(ratingTmdb)) ? ratingTmdb : parseFloat(ratingTmdb).toFixed(1)}</span>
+                </Pill>
+              )}
+              {showPorndb && (
+                <Pill variant="meta">
+                  <img
+                    src="/rating/theporndb.png"
+                    alt="ThePornDB"
+                    className="rating-pill-img"
+                  />
+                  <span>{isNaN(parseFloat(ratingPorndb)) ? ratingPorndb : parseFloat(ratingPorndb).toFixed(1)}</span>
                 </Pill>
               )}
             </div>

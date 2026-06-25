@@ -226,7 +226,9 @@ class PornDBScraper(BaseScraper):
             title
             details
             date
-            rating
+            tags {
+              name
+            }
             studio {
               id
               name
@@ -287,7 +289,8 @@ class PornDBScraper(BaseScraper):
                 result = resp.json()
                 if "errors" in result:
                     logger.error(f"GraphQL errors from ThePornDB: {result['errors']}")
-                    return None
+                    # Fallback to REST
+                    return self._fetch_scene_rest(scene_id, cache_key, api_token)
                 data = result.get("data", {}).get("findScene")
                 if data:
                     for p_entry in data.get("performers") or []:
@@ -305,11 +308,102 @@ class PornDBScraper(BaseScraper):
                     self.cache.set(Provider.PORNDB, cache_key, data, status_code=200, media_type=MediaType.SCENE, external_id=scene_id)
                     return data
                 else:
-                    self.cache.set(Provider.PORNDB, cache_key, {}, status_code=404, media_type=MediaType.SCENE, external_id=scene_id)
-                    return None
+                    return self._fetch_scene_rest(scene_id, cache_key, api_token)
             else:
-                self.cache.set(Provider.PORNDB, cache_key, {}, status_code=resp.status_code, media_type=MediaType.SCENE, external_id=scene_id)
-                return None
+                return self._fetch_scene_rest(scene_id, cache_key, api_token)
         except Exception as e:
             logger.error(f"Error querying ThePornDB GraphQL for scene {scene_id}: {e}")
+            return self._fetch_scene_rest(scene_id, cache_key, api_token)
+
+    def _fetch_scene_rest(self, scene_id: str, cache_key: str, api_token: str) -> Optional[dict]:
+        try:
+            url = f"{PORNDB_API_BASE}/scenes/{scene_id}"
+            headers = {"Authorization": f"Bearer {api_token}", "Accept": "application/json"}
+            resp = self.session.get(url, headers=headers, timeout=SCRAPER_REQUEST_TIMEOUT)
+            if resp.status_code == 200:
+                res_data = resp.json().get("data")
+                if res_data:
+                    mapped_data = self._map_rest_scene_to_graphql(res_data)
+                    mapped_data = self.enrich_scene_ratings(mapped_data)
+                    self.cache.set(Provider.PORNDB, cache_key, mapped_data, status_code=200, media_type=MediaType.SCENE, external_id=scene_id)
+                    return mapped_data
+            self.cache.set(Provider.PORNDB, cache_key, {}, status_code=resp.status_code if resp is not None else 500, media_type=MediaType.SCENE, external_id=scene_id)
             return None
+        except Exception as rest_e:
+            logger.error(f"Error querying PornDB REST fallback for scene {scene_id}: {rest_e}")
+            return None
+
+    def _map_rest_scene_to_graphql(self, data: dict) -> dict:
+        site = data.get("site") or {}
+        network = site.get("network") or site.get("parent") or {}
+        
+        studio_data = {
+            "id": site.get("uuid") or str(site.get("id")) if site else None,
+            "name": site.get("name") if site else None,
+            "images": [{"url": site.get("logo")}] if site and site.get("logo") else []
+        }
+        if network:
+            studio_data["parent"] = {
+                "id": network.get("uuid") or str(network.get("id")),
+                "name": network.get("name"),
+                "images": [{"url": network.get("logo")}] if network.get("logo") else []
+            }
+            
+        performers_data = []
+        for perf in data.get("performers") or []:
+            p_info = perf.get("parent") or perf
+            p_images = []
+            if p_info.get("image"):
+                p_images.append({"url": p_info["image"]})
+                
+            performers_data.append({
+                "performer": {
+                    "id": p_info.get("id"),
+                    "name": p_info.get("name"),
+                    "gender": p_info.get("extras", {}).get("gender") or p_info.get("gender"),
+                    "scene_count": None,
+                    "rating_porndb": p_info.get("rating"),
+                    "images": p_images,
+                    "birth_date": p_info.get("extras", {}).get("birthday") or p_info.get("birthday"),
+                    "ethnicity": p_info.get("extras", {}).get("ethnicity") or p_info.get("ethnicity"),
+                    "hair_color": p_info.get("extras", {}).get("hair_colour") or p_info.get("hair_color"),
+                    "eye_color": p_info.get("extras", {}).get("eye_colour") or p_info.get("eye_color"),
+                    "height": p_info.get("extras", {}).get("height") or p_info.get("height"),
+                    "measurements": {
+                        "band_size": p_info.get("extras", {}).get("band_size"),
+                        "cup_size": p_info.get("extras", {}).get("cupsize") or p_info.get("cup_size"),
+                        "waist": p_info.get("extras", {}).get("waist"),
+                        "hip": p_info.get("extras", {}).get("hips"),
+                    }
+                }
+            })
+            
+        tags_data = []
+        for t in data.get("tags") or []:
+            tags_data.append({
+                "name": t.get("name")
+            })
+            
+        images_data = []
+        if data.get("poster"):
+            images_data.append({"url": data["poster"]})
+        elif data.get("image"):
+            images_data.append({"url": data["image"]})
+            
+        mapped = {
+            "id": data.get("id"),
+            "title": data.get("title"),
+            "details": data.get("description"),
+            "date": data.get("date"),
+            "rating": data.get("rating"),
+            "duration": data.get("duration"),
+            "studio": studio_data,
+            "performers": performers_data,
+            "tags": tags_data,
+            "images": images_data,
+            "background": data.get("background"),
+            "background_back": data.get("background_back"),
+            "poster": data.get("poster"),
+            "image": data.get("image")
+        }
+        return mapped

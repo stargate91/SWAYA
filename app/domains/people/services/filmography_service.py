@@ -30,7 +30,7 @@ class FilmographyService:
         links = db.query(MediaPersonLink).join(MediaPersonLink.match).join(MetadataMatch.media_item).filter(
             MediaPersonLink.person_id == person_id,
             MetadataMatch.is_active == True,
-            MediaItem.status.in_([ItemStatus.MATCHED, ItemStatus.RENAMED, ItemStatus.ORGANIZED])
+            MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED])
         ).all()
         
         movies = []
@@ -51,7 +51,7 @@ class FilmographyService:
                 "year": match.release_date.year if match.release_date else None,
                 "poster_path": self._resolve_img(match_loc.poster_path if match_loc else None, "posters"),
                 "backdrop_path": self._resolve_img(match.backdrop_path, "backdrops", size="original"),
-                "rating": match.rating_porndb or match.rating_tmdb or 0.0,
+                "rating": match.rating_tmdb or 0.0,
                 "rating_porndb": match.rating_porndb,
                 "job": link.role.value if hasattr(link.role, "value") else str(link.role),
                 "character": link.character_name,
@@ -260,14 +260,245 @@ class FilmographyService:
 
         return parsed_movies, parsed_tv, local_scenes, known_for
 
+    def _fetch_remote_credits(
+        self,
+        person_id: int,
+        source: str,
+        media_type: str, # "scene" or "movie"
+        page: int,
+        page_size: int
+    ) -> Optional[dict]:
+        from app.shared_kernel.enums import Provider
+        from app.domains.people.models import Person
+        from app.infrastructure.scrapers.support.gateway import scraper_gateway
+        
+        db = self.db
+        person = db.query(Person).filter(Person.id == person_id).first()
+        if not person:
+            return None
+            
+        ext_ids = person.external_ids or {}
+        ext_id = ext_ids.get(source.lower()) or ext_ids.get(f"{source.lower()}_id")
+        if not ext_id:
+            try:
+                prov_enum = Provider(source.lower())
+                link = next((l for l in person.external_links if l.provider == prov_enum), None)
+                if link:
+                    ext_id = link.external_id
+            except ValueError:
+                pass
+                
+        if not ext_id:
+            return None
+            
+        mapped_items = []
+        total_items = 0
+        
+        if source.lower() in ("stashdb", "fansdb"):
+            if media_type != "scene":
+                return {"items": [], "page": page, "page_size": page_size, "total_items": 0, "total_pages": 1}
+                
+            try:
+                prov_enum = Provider(source.lower())
+                scraper = scraper_gateway.adult(prov_enum, db)
+                query = """
+                query QueryScenes($input: SceneQueryInput!) {
+                  queryScenes(input: $input) {
+                    count
+                    scenes {
+                      id
+                      title
+                      date
+                      studio {
+                        id
+                        name
+                      }
+                      images {
+                        url
+                      }
+                    }
+                  }
+                }
+                """
+                variables = {
+                    "input": {
+                        "performers": {
+                            "value": [ext_id],
+                            "modifier": "INCLUDES"
+                        },
+                        "page": page,
+                        "per_page": page_size,
+                        "direction": "DESC",
+                        "sort": "DATE"
+                    }
+                }
+                res_data = scraper.execute_query(query, variables)
+                if res_data and "queryScenes" in res_data:
+                    qs = res_data["queryScenes"]
+                    total_items = qs.get("count") or 0
+                    raw_scenes = qs.get("scenes") or []
+                    for s in raw_scenes:
+                        sid = s.get("id")
+                        title = s.get("title") or "Unknown"
+                        date_str = s.get("date")
+                        year = None
+                        if date_str:
+                            try:
+                                year = int(date_str.split("-")[0])
+                            except:
+                                pass
+                        studio_name = s.get("studio", {}).get("name") if s.get("studio") else None
+                        poster_url = s["images"][0].get("url") if s.get("images") else None
+                        
+                        mapped_items.append({
+                            "id": sid,
+                            "title": title,
+                            "type": "scene",
+                            "media_type": "scene",
+                            "year": year,
+                            "studio": studio_name,
+                            "poster_path": poster_url,
+                            "in_library": False,
+                            "stash_id": sid,
+                        })
+            except Exception as e:
+                logger.error(f"Error querying {source} GraphQL API for performer {person_id}: {e}")
+                
+        elif source.lower() == "porndb":
+            try:
+                scraper = scraper_gateway.adult(Provider.PORNDB, db)
+                api_token = scraper.get_setting("porndb_api_key") or scraper.get_setting("porndb_api_token")
+                if api_token:
+                    import requests
+                    headers = {"Authorization": f"Bearer {api_token}", "Accept": "application/json"}
+                    
+                    if media_type == "movie":
+                        url = f"https://api.theporndb.net/performers/{ext_id}/movies?page={page}&per_page={page_size}"
+                        resp = scraper.session.get(url, headers=headers, timeout=15)
+                        if resp.status_code == 200:
+                            res_json = resp.json()
+                            raw_data = res_json.get("data") or []
+                            meta_total = res_json.get("meta", {}).get("total") or 10000
+                            total_items = meta_total
+                            if len(raw_data) < page_size:
+                                total_items = (page - 1) * page_size + len(raw_data)
+                            
+                            for x in raw_data:
+                                xid = x.get("id")
+                                title = x.get("title") or "Unknown"
+                                date_str = x.get("date")
+                                year = None
+                                if date_str:
+                                    try:
+                                        year = int(date_str.split("-")[0])
+                                    except:
+                                        pass
+                                studio_name = x.get("site", {}).get("name") if x.get("site") else None
+                                poster_url = x.get("poster")
+                                rating = x.get("rating")
+                                
+                                mapped_items.append({
+                                    "id": xid,
+                                    "title": title,
+                                    "type": "movie",
+                                    "media_type": "movie",
+                                    "year": year,
+                                    "studio": studio_name,
+                                    "poster_path": poster_url,
+                                    "rating": 0.0,
+                                    "rating_porndb": rating,
+                                    "in_library": False,
+                                    "stash_id": xid,
+                                })
+                    else:
+                        # Fetch page for scenes and use person.scene_count
+                        url = f"https://api.theporndb.net/performers/{ext_id}/scenes?page={page}&per_page={page_size}"
+                        resp = scraper.session.get(url, headers=headers, timeout=15)
+                        if resp.status_code == 200:
+                            res_json = resp.json()
+                            total_items = person.scene_count or res_json.get("meta", {}).get("total") or len(res_json.get("data") or [])
+                            if total_items == 10000 and person.scene_count:
+                                total_items = person.scene_count
+                                
+                            raw_data = res_json.get("data") or []
+                            for x in raw_data:
+                                xid = x.get("id")
+                                title = x.get("title") or "Unknown"
+                                date_str = x.get("date")
+                                year = None
+                                if date_str:
+                                    try:
+                                        year = int(date_str.split("-")[0])
+                                    except:
+                                        pass
+                                studio_name = x.get("site", {}).get("name") if x.get("site") else None
+                                poster_url = x.get("poster")
+                                rating = x.get("rating")
+                                
+                                mapped_items.append({
+                                    "id": xid,
+                                    "title": title,
+                                    "type": "scene",
+                                    "media_type": "scene",
+                                    "year": year,
+                                    "studio": studio_name,
+                                    "poster_path": poster_url,
+                                    "rating": 0.0,
+                                    "rating_porndb": rating,
+                                    "in_library": False,
+                                    "stash_id": xid,
+                                })
+            except Exception as e:
+                logger.error(f"Error querying PornDB REST API for performer {person_id}: {e}")
+                
+        if mapped_items:
+            # Query local DB to see if any of the external IDs are already in library
+            from app.domains.metadata.models import MetadataMatch
+            prov_enum = Provider(source.lower())
+            ext_ids_list = [item["id"] for item in mapped_items]
+            matches = db.query(MetadataMatch).filter(
+                MetadataMatch.provider == prov_enum,
+                MetadataMatch.external_id.in_(ext_ids_list),
+                MetadataMatch.is_active == True
+            ).all()
+            
+            local_map = {}
+            for m in matches:
+                item = m.media_item
+                if item and item.status in (ItemStatus.RENAMED, ItemStatus.ORGANIZED):
+                    local_map[m.external_id] = item.id
+                    
+            for item in mapped_items:
+                ext_id_key = item["id"]
+                if ext_id_key in local_map:
+                    item["in_library"] = True
+                    item["library_item_id"] = local_map[ext_id_key]
+                    
+            # Sort the 12 items: in_library first
+            mapped_items.sort(key=lambda x: 0 if x.get("in_library") else 1)
+            
+        total_pages = max(1, math.ceil(total_items / page_size))
+        return {
+            "items": mapped_items,
+            "page": page,
+            "page_size": page_size,
+            "total_items": total_items,
+            "total_pages": total_pages,
+        }
+
     def get_person_movies(self, person_id: int, page: int = 1, page_size: int = 12, source: Optional[str] = None):
+        if source and source.lower() in ("porndb", "stashdb", "fansdb"):
+            res = self._fetch_remote_credits(person_id, source, "movie", page, page_size)
+            if res:
+                return res
+                
         db = self.db
         # Load movie credits
         query = db.query(MediaPersonLink).join(MediaPersonLink.match).join(MetadataMatch.media_item).filter(
             MediaPersonLink.person_id == person_id,
             MetadataMatch.media_type == MediaType.MOVIE,
             MetadataMatch.is_active == True,
-            MediaItem.status.in_([ItemStatus.MATCHED, ItemStatus.RENAMED, ItemStatus.ORGANIZED])
+            MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED])
         )
         if source:
             try:
@@ -294,7 +525,7 @@ class FilmographyService:
                 "year": match.release_date.year if match.release_date else None,
                 "poster_path": self._resolve_img(match_loc.poster_path if match_loc else None, "posters"),
                 "backdrop_path": self._resolve_img(match.backdrop_path, "backdrops", size="original"),
-                "rating": match.rating_porndb or match.rating_tmdb or 0.0,
+                "rating": match.rating_tmdb or 0.0,
                 "rating_porndb": match.rating_porndb,
                 "job": link.role.value if hasattr(link.role, "value") else str(link.role),
                 "character": link.character_name,
@@ -321,7 +552,7 @@ class FilmographyService:
             MediaPersonLink.person_id == person_id,
             MetadataMatch.media_type.in_([MediaType.TV, MediaType.EPISODE]),
             MetadataMatch.is_active == True,
-            MediaItem.status.in_([ItemStatus.MATCHED, ItemStatus.RENAMED, ItemStatus.ORGANIZED])
+            MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED])
         ).all()
         
         tv_map = {}
@@ -342,7 +573,7 @@ class FilmographyService:
                     "year": match.release_date.year if match.release_date else None,
                     "poster_path": self._resolve_img(match_loc.poster_path if match_loc else None, "posters"),
                     "backdrop_path": self._resolve_img(match.backdrop_path, "backdrops", size="original"),
-                    "rating": match.rating_porndb or match.rating_tmdb or 0.0,
+                    "rating": match.rating_tmdb or 0.0,
                     "rating_porndb": match.rating_porndb,
                     "job": link.role.value if hasattr(link.role, "value") else str(link.role),
                     "character": link.character_name,
@@ -364,13 +595,18 @@ class FilmographyService:
         }
 
     def get_person_scenes(self, person_id: int, page: int = 1, page_size: int = 12, source: Optional[str] = None):
+        if source and source.lower() in ("porndb", "stashdb", "fansdb"):
+            res = self._fetch_remote_credits(person_id, source, "scene", page, page_size)
+            if res:
+                return res
+                
         db = self.db
         # Load scene credits
         query = db.query(MediaPersonLink).join(MediaPersonLink.match).join(MetadataMatch.media_item).filter(
             MediaPersonLink.person_id == person_id,
             MetadataMatch.media_type == MediaType.SCENE,
             MetadataMatch.is_active == True,
-            MediaItem.status.in_([ItemStatus.MATCHED, ItemStatus.RENAMED, ItemStatus.ORGANIZED])
+            MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED])
         )
         if source:
             try:
@@ -397,7 +633,7 @@ class FilmographyService:
                 "year": match.release_date.year if match.release_date else None,
                 "poster_path": self._resolve_img(match_loc.poster_path if match_loc else None, "posters"),
                 "backdrop_path": self._resolve_img(match.backdrop_path, "backdrops", size="original"),
-                "rating": match.rating_porndb or match.rating_tmdb or 0.0,
+                "rating": match.rating_tmdb or 0.0,
                 "rating_porndb": match.rating_porndb,
                 "job": link.role.value if hasattr(link.role, "value") else str(link.role),
                 "character": link.character_name,

@@ -55,6 +55,16 @@ export default function DetailsPanel() {
       value: `${item.rating_meta}/100`
     });
   }
+  
+  const hasPorndb = item?.rating_porndb != null;
+  if (hasPorndb) {
+    ratings.push({
+      id: 'porndb',
+      logo: '/rating/theporndb.png',
+      alt: 'ThePornDB',
+      value: `${item.rating_porndb.toFixed(1)}/10`
+    });
+  }
 
   const formatCurrency = (num) => {
     if (num === undefined || num === null || num === 0) return '-';
@@ -86,9 +96,8 @@ export default function DetailsPanel() {
 
   return (
     <div className="details-panel details-panel--custom">
-      {!isSceneType && (
-        ratings.length > 0 ? (
-          <div>
+      {(ratings.length > 0) ? (
+        <div>
             <h4 className="details-panel__ratings-title">
               {t('library.details.ratingsSection') || 'Ratings'}
             </h4>
@@ -117,7 +126,7 @@ export default function DetailsPanel() {
             {t('library.details.noRatingsAvailable') || 'No ratings available.'}
           </div>
         )
-      )}
+      }
 
       {!isMovie && (
         <div className="details-panel__section">

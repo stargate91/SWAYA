@@ -23,6 +23,7 @@ const PosterCard = memo(function PosterCard({
   playOverlay,
   ratingImdb,
   ratingTmdb,
+  ratingPorndb,
   onClick,
   disabled = false,
   active = false,
@@ -92,15 +93,16 @@ const PosterCard = memo(function PosterCard({
         ) : null}
       </div>
 
-      {!isOverlayTitle && (title || subtitle || ratingImdb || ratingTmdb) && (
+      {!isOverlayTitle && (title || subtitle || ratingImdb || ratingTmdb || ratingPorndb) && (
         <div className="ui-poster-card__details">
           {title && <div className="ui-poster-card__title" title={title}>{title}</div>}
-          {(subtitle || ratingImdb || ratingTmdb) && (
+          {(subtitle || ratingImdb || ratingTmdb || ratingPorndb) && (
             <div className="ui-poster-card__subtitle-row">
               {subtitle && <div className="ui-poster-card__subtitle">{subtitle}</div>}
               {(() => {
                 const hasImdb = ratingImdb !== undefined && ratingImdb !== null && ratingImdb !== '';
                 const hasTmdb = ratingTmdb !== undefined && ratingTmdb !== null && ratingTmdb !== '';
+                const hasPorndb = ratingPorndb !== undefined && ratingPorndb !== null && ratingPorndb !== '';
                 if (hasImdb) {
                   const val = parseFloat(ratingImdb);
                   return (
@@ -115,6 +117,14 @@ const PosterCard = memo(function PosterCard({
                     <Pill variant="tmdb">
                       <Star size={10} fill="currentColor" strokeWidth={1.8} />
                       {isNaN(val) ? ratingTmdb : val.toFixed(1)}
+                    </Pill>
+                  );
+                } else if (hasPorndb) {
+                  const val = parseFloat(ratingPorndb);
+                  return (
+                    <Pill variant="porndb">
+                      <Star size={10} fill="currentColor" strokeWidth={1.8} />
+                      {isNaN(val) ? ratingPorndb : val.toFixed(1)}
                     </Pill>
                   );
                 }

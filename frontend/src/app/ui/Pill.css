@@ -59,6 +59,16 @@
   color: var(--color-brand-tmdb);
 }
 
+.ui-pill--porndb {
+  gap: var(--space-2xs);
+  padding: 0.125rem 0.3125rem;
+  border-radius: 2px;
+  backdrop-filter: blur(4px);
+  background-color: color-mix(in srgb, var(--color-brand-porndb) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-brand-porndb) 28%, transparent);
+  color: var(--color-brand-porndb);
+}
+
 .ui-pill--imdb svg,
 .ui-pill--tmdb svg {
   display: block;

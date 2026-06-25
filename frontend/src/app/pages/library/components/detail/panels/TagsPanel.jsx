@@ -140,6 +140,36 @@ export default function TagsPanel() {
         </div>
       </div>
 
+      {/* Suggested Tags */}
+      {item?.suggested_tags && item.suggested_tags.length > 0 && (
+        <div className="tags-panel__assigned-section">
+          <span className="tags-panel__section-subtitle">
+            {t('library.details.suggestedTags') || 'Suggested Tags'}
+          </span>
+          <div className="tags-panel__assigned-list">
+            {item.suggested_tags.map(tagName => {
+              const isAssigned = currentTags.includes(tagName);
+              if (isAssigned) return null;
+              return (
+                <Pill
+                  key={tagName}
+                  variant="tag"
+                  className="tags-panel__assigned-pill tags-panel__assigned-pill--suggested"
+                  onClick={() => handleToggleTag(tagName)}
+                >
+                  <span>{tagName}</span>
+                </Pill>
+              );
+            })}
+            {item.suggested_tags.every(t => currentTags.includes(t)) && (
+              <div className="tags-panel__no-tags">
+                {t('library.tags.allTagsAssigned') || 'All suggested tags assigned.'}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Add Tag Dropdown */}
       <div className="tags-panel__select-section" ref={dropdownRef}>
         <span className="tags-panel__section-subtitle">

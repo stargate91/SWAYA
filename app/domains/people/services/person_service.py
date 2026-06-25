@@ -75,11 +75,14 @@ class PersonService:
         # 1.5 Try finding by tmdb_id
         if not person and tmdb_id:
             for obj in self.db.new:
-                if isinstance(obj, Person) and obj.external_ids and obj.external_ids.get("tmdb") == str(tmdb_id):
+                if isinstance(obj, Person) and obj.is_adult == is_adult and obj.external_ids and obj.external_ids.get("tmdb") == str(tmdb_id):
                     person = obj
                     break
             if not person:
-                person = self.db.query(Person).filter(Person.external_ids["tmdb"] == str(tmdb_id)).first()
+                person = self.db.query(Person).filter(
+                    Person.is_adult == is_adult,
+                    Person.external_ids["tmdb"].as_string() == str(tmdb_id)
+                ).first()
 
         # 1.6 Try finding by extracted IDs from URLs
         if not person and extracted_ids:
@@ -89,11 +92,14 @@ class PersonService:
                 ext_val = extracted_ids[ext_prov]
                 if ext_prov == "tmdb":
                     for obj in self.db.new:
-                        if isinstance(obj, Person) and obj.external_ids and obj.external_ids.get("tmdb") == str(ext_val):
+                        if isinstance(obj, Person) and obj.is_adult == is_adult and obj.external_ids and obj.external_ids.get("tmdb") == str(ext_val):
                             person = obj
                             break
                     if not person:
-                        person = self.db.query(Person).filter(Person.external_ids["tmdb"] == str(ext_val)).first()
+                        person = self.db.query(Person).filter(
+                            Person.is_adult == is_adult,
+                            Person.external_ids["tmdb"].as_string() == str(ext_val)
+                        ).first()
                 else:
                     for obj in self.db.new:
                         if isinstance(obj, ExternalSourceLink):

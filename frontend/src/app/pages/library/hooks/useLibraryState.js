@@ -117,7 +117,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
   ]);
 
   const { data: libraryData, isLoading: isLibraryLoading } = useLibraryQuery(
-    libraryQueryParams || { tab: 'movies', page: 1, pageSize: 1 }
+    libraryQueryParams || { tab: 'movies', page: 1, pageSize: 1, include_adult: activeSessionMode === 'nsfw' }
   );
 
   const { data: filterData } = useLibraryFiltersQuery(

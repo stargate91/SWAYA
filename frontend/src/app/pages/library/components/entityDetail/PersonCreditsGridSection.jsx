@@ -139,7 +139,11 @@ export default function PersonCreditsGridSection({ title, personId, mediaType, t
       return;
     }
 
-    const movieId = item.in_library ? (item.library_item_id || item.id) : `tmdb_${item.tmdb_id || item.id}`;
+    const movieId = item.in_library
+      ? (item.library_item_id || item.id)
+      : (item.source === 'porndb' || source === 'porndb')
+      ? `porndb_${item.tmdb_id || item.id}`
+      : `tmdb_${item.tmdb_id || item.id}`;
     navigate(`/library/movie/${movieId}`);
   };
 
@@ -225,20 +229,40 @@ export default function PersonCreditsGridSection({ title, personId, mediaType, t
                   {(() => {
                     const imdbRating = Number(item.rating_imdb);
                     const tmdbRating = Number(item.rating_tmdb ?? item.rating);
+                    const porndbRating = Number(item.rating_porndb);
                     const hasImdbRating = Number.isFinite(imdbRating) && imdbRating > 0;
                     const hasTmdbRating = Number.isFinite(tmdbRating) && tmdbRating > 0;
+                    const hasPorndbRating = Number.isFinite(porndbRating) && porndbRating > 0;
 
-                    if (!hasImdbRating && !hasTmdbRating) {
+                    if (!hasImdbRating && !hasTmdbRating && !hasPorndbRating) {
                       return null;
+                    }
+
+                    let variant = 'meta';
+                    let label = '';
+                    const isPornDbTab = String(mediaType || '').startsWith('porndb');
+
+                    if (isPornDbTab && hasPorndbRating) {
+                      variant = 'porndb';
+                      label = porndbRating.toFixed(1);
+                    } else if (hasImdbRating) {
+                      variant = 'imdb';
+                      label = imdbRating.toFixed(1);
+                    } else if (hasTmdbRating) {
+                      variant = 'tmdb';
+                      label = tmdbRating.toFixed(1);
+                    } else if (hasPorndbRating) {
+                      variant = 'porndb';
+                      label = porndbRating.toFixed(1);
                     }
 
                     return (
                       <Pill
-                        variant={hasImdbRating ? 'imdb' : 'tmdb'}
+                        variant={variant}
                         className="ui-credit-card__rating-pill"
                       >
                         <Star size={10} fill="currentColor" strokeWidth={1.8} />
-                        {hasImdbRating ? imdbRating.toFixed(1) : tmdbRating.toFixed(1)}
+                        {label}
                       </Pill>
                     );
                   })()}

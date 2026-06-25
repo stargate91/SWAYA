@@ -80,10 +80,19 @@ const LibraryPosterCard = memo(({
   let imageUrl;
   let ratingImdb = item.rating_imdb;
   let ratingTmdb = item.rating;
+  let ratingPorndb = item.rating_porndb;
+  const isScene = isSceneMediaType(item.type) || isLibraryScenes;
 
-  if (isLibraryScenes || isLibraryPeople) {
+  if (isScene || isLibraryPeople) {
     ratingTmdb = undefined;
     ratingImdb = undefined;
+    if (!isLibraryPeople) {
+      ratingPorndb = item.rating_porndb;
+    } else {
+      ratingPorndb = undefined;
+    }
+  } else {
+    ratingPorndb = item.rating_porndb;
   }
 
   let topRightAction;
@@ -287,8 +296,9 @@ const TagPosterCard = memo(({
       icon: emptyIcon,
       backgroundColor: item.color,
       badge: renderUserRatingBadge(item),
-      ratingImdb: item.rating_imdb,
-      ratingTmdb: item.rating,
+      ratingImdb: ratingImdb,
+      ratingTmdb: ratingTmdb,
+      ratingPorndb: ratingPorndb,
     };
   }
 

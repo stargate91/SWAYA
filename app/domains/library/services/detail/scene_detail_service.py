@@ -27,9 +27,12 @@ class SceneDetailService(DetailFormatter):
         if not scene_data:
             fans_scraper = self.scrapers.adult(Provider.FANSDB, db)
             scene_data = fans_scraper.fetch_scene(scene_uuid)
+        if not scene_data:
+            porndb_scraper = self.scrapers.adult(Provider.PORNDB, db)
+            scene_data = porndb_scraper.fetch_scene(scene_uuid)
         
         if not scene_data:
-            return JSONResponse(status_code=404, content={"error": "Scene not found on StashDB/FansDB"})
+            return JSONResponse(status_code=404, content={"error": "Scene not found on StashDB/FansDB/PornDB"})
         
         title = scene_data.get("title") or "Unknown Scene"
         images = scene_data.get("images") or []
@@ -174,18 +177,22 @@ class SceneDetailService(DetailFormatter):
             if loc_db:
                 local_poster = loc_db.local_poster_path
 
-        poster_resolved = None
-        if local_poster:
-            poster_resolved = self._resolve_img(local_poster, "posters")
-        if not poster_resolved:
-            poster_resolved = poster_url
-
-        backdrop_resolved = None
-        if local_backdrop:
-            backdrop_resolved = self._resolve_img(local_backdrop, "scene_stills", size="original")
-        if not backdrop_resolved:
-            backdrop_resolved = poster_url
+        genres = []
+        for t in scene_data.get("tags") or []:
+            if isinstance(t, dict) and t.get("name"):
+                genres.append(t["name"])
+            elif isinstance(t, str):
+                genres.append(t)
         
+        ext_background = scene_data.get("background")
+        if isinstance(ext_background, dict):
+            ext_background = ext_background.get("full") or ext_background.get("large") or ext_background.get("medium")
+        if not ext_background:
+            ext_background = scene_data.get("image") or poster_url
+            
+        poster_resolved = self._resolve_img(local_poster or poster_url, "posters")
+        backdrop_resolved = self._resolve_img(local_backdrop or ext_background, "backdrops")
+
         result = {
             "id": f"stash_{scene_uuid}",
             "title": title,
@@ -220,7 +227,8 @@ class SceneDetailService(DetailFormatter):
             "external_ids": {
                 "stash_id": scene_uuid,
             },
-            "custom_tags": [],
+            "custom_tags": [t.name for t in override.tags] if (override and override.tags) else [],
+            "suggested_tags": [t.get("name") for t in scene_data.get("tags") or [] if t.get("name")] if scene_data.get("tags") else (match_db.suggested_tags if (match_db and match_db.suggested_tags) else []),
             "tags": [],
             "is_tracked": override.is_tracked if override else False,
             "watch_count": override.watch_count if override else 0,
