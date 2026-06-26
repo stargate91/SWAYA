@@ -141,7 +141,7 @@ export default function LinkSourceModalContent({ personId, defaultQuery = '', pe
       await linkMutation.mutateAsync({
         personId,
         source: activeSearchSource,
-        externalId: cleanId,
+        externalId: String(cleanId),
         overrides: {},
         profileUrl: item.profile_path || item.poster_path || null,
       });
@@ -276,21 +276,6 @@ export default function LinkSourceModalContent({ personId, defaultQuery = '', pe
           return (
             <div key={bucket.key} className={`link-source-card ${isLinked ? 'link-source-card--linked' : 'link-source-card--unlinked'} ${isPrimary ? 'link-source-card--primary' : ''}`}>
               <div className="link-source-card__badge">{bucket.label}</div>
-              {isLinked && (
-                <div className="link-source-card__primary-toggle">
-                  <Tooltip content={isPrimary ? "Primary details source (Click to clear)" : "Set as primary details source"} side="top">
-                    <IconButton
-                      variant={isPrimary ? "primary" : "secondary"}
-                      size="sm"
-                      onClick={() => handleSetPrimary(isPrimary ? "none" : bucket.key)}
-                      disabled={setPrimaryMutation.isPending}
-                      className={`link-source-card__star-btn ${isPrimary ? 'link-source-card__star-btn--active' : ''}`}
-                    >
-                      <Star size={14} fill={isPrimary ? "currentColor" : "none"} />
-                    </IconButton>
-                  </Tooltip>
-                </div>
-              )}
               <div className="link-source-card__avatar-wrapper">
                 {isLinked ? (
                   profileImg ? (
@@ -322,31 +307,44 @@ export default function LinkSourceModalContent({ personId, defaultQuery = '', pe
 
               <div className="link-source-card__actions">
                 {isLinked ? (
-                  <div className="link-source-card__linked-actions">
-                    <Tooltip content="Separate this profile: creates a new performer record and moves matching media links" side="top">
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => handleUnlink(bucket.key, 'split')}
-                        disabled={unlinkMutation.isPending}
-                        icon={GitFork}
-                        className="link-source-card__action-btn"
-                      >
-                        Split
-                      </Button>
-                    </Tooltip>
-                    <Tooltip content="Remove link: deletes the connection from database but retains performer" side="top">
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => handleUnlink(bucket.key, 'remove')}
-                        disabled={unlinkMutation.isPending}
-                        icon={Trash2}
-                        className="link-source-card__action-btn"
-                      >
-                        Remove
-                      </Button>
-                    </Tooltip>
+                  <div className="link-source-card__linked-actions-wrapper">
+                    <div className="link-source-card__linked-actions">
+                      <Tooltip content="Separate this profile: creates a new performer record and moves matching media links" side="top">
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => handleUnlink(bucket.key, 'split')}
+                          disabled={unlinkMutation.isPending}
+                          icon={GitFork}
+                          className="link-source-card__action-btn"
+                        >
+                          Split
+                        </Button>
+                      </Tooltip>
+                      <Tooltip content="Remove link: deletes the connection from database but retains performer" side="top">
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={() => handleUnlink(bucket.key, 'remove')}
+                          disabled={unlinkMutation.isPending}
+                          icon={Trash2}
+                          className="link-source-card__action-btn"
+                        >
+                          Remove
+                        </Button>
+                      </Tooltip>
+                    </div>
+
+                    <Button
+                      variant={isPrimary ? "primary" : "secondary"}
+                      size="sm"
+                      onClick={() => handleSetPrimary(isPrimary ? "none" : bucket.key)}
+                      disabled={setPrimaryMutation.isPending}
+                      icon={Star}
+                      className="link-source-card__primary-btn"
+                    >
+                      {isPrimary ? "Primary Source" : "Set Primary"}
+                    </Button>
                   </div>
                 ) : (
                   <Button

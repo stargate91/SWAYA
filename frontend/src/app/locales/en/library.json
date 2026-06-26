@@ -393,6 +393,7 @@
     "linkSource": "Link External Source",
     "sourceLinked": "Source linked successfully!",
     "unlinkSuccess": "Successfully unlinked from {{source}}.",
+    "primarySourceSet": "Primary details source updated successfully!",
     "imageSource": "Image Source",
     "peaksTitle": "Peak Moments",
     "peakDate": "Date",

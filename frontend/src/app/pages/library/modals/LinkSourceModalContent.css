@@ -242,6 +242,13 @@
   justify-content: center;
 }
 
+.link-source-card__linked-actions-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: 100%;
+}
+
 .link-source-card__linked-actions {
   display: flex;
   gap: var(--space-xs);
@@ -253,6 +260,12 @@
   font-size: 12px !important;
   height: 30px !important;
   padding: 0 var(--space-sm) !important;
+}
+
+.link-source-card__primary-btn {
+  width: 100%;
+  font-size: 12px !important;
+  height: 30px !important;
 }
 
 .link-source-card__link-btn {
