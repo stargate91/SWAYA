@@ -32,6 +32,7 @@ class Person(Base):
     socials: Mapped[Optional[dict[str, str]]] = mapped_column(JSON) # Social media handles/links (e.g. instagram, twitter)
     is_active: Mapped[bool] = mapped_column(Boolean, default=False, index=True) # True if the person has local files or user interaction
     is_adult: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    primary_provider: Mapped[Optional[Provider]] = mapped_column(SQLEnum(Provider), nullable=True)
     
     # Extended/Adult Performer attributes (allows structured filtering)
     hair_color: Mapped[Optional[str]] = mapped_column(String, index=True)
@@ -53,6 +54,149 @@ class Person(Base):
     media_links: Mapped[List["MediaPersonLink"]] = relationship(back_populates="person", cascade="all, delete-orphan")
     localizations: Mapped[List["PersonLocalization"]] = relationship(back_populates="person", cascade="all, delete-orphan")
     external_links: Mapped[List["ExternalSourceLink"]] = relationship(back_populates="person", cascade="all, delete-orphan")
+
+    def recalculate_projection(self, db):
+        priority_map = {
+            Provider.TMDB: 4,
+            Provider.STASHDB: 3,
+            Provider.FANSDB: 2,
+            Provider.PORNDB: 1
+        }
+        if self.primary_provider:
+            priority_map[self.primary_provider] = 10
+        
+        sorted_links = sorted(
+            self.external_links,
+            key=lambda l: priority_map.get(l.provider, 0)
+        )
+        
+        birthday = None
+        deathday = None
+        place_of_birth = None
+        gender = None
+        known_for_department = self.known_for_department or ("Acting" if self.is_adult else None)
+        popularity = None
+        rating_porndb = None
+        scene_count = None
+        profile_path = self.profile_path
+        homepage = None
+        images = []
+        aliases = []
+        socials = {}
+        
+        hair_color = None
+        eye_color = None
+        ethnicity = None
+        height = None
+        weight = None
+        measurements = None
+        cup_size = None
+        tattoos = None
+        piercings = None
+        orientation = None
+        career_start_year = None
+        career_end_year = None
+        
+        biographies = {}
+        
+        for link in sorted_links:
+            data = link.source_data
+            if not data:
+                continue
+                
+            if data.get("birthday"): birthday = data["birthday"]
+            if data.get("deathday"): deathday = data["deathday"]
+            if data.get("place_of_birth"): place_of_birth = data["place_of_birth"]
+            if data.get("gender") is not None: gender = data["gender"]
+            if data.get("known_for_department"): known_for_department = data["known_for_department"]
+            if data.get("popularity") is not None: popularity = data["popularity"]
+            if data.get("rating_porndb") is not None: rating_porndb = data["rating_porndb"]
+            if data.get("scene_count") is not None: scene_count = data["scene_count"]
+            if data.get("profile_path"): profile_path = data["profile_path"]
+            if data.get("homepage"): homepage = data["homepage"]
+            
+            if data.get("images"):
+                for img in data["images"]:
+                    if img not in images:
+                        images.append(img)
+                        
+            if data.get("aliases"):
+                for alias in data["aliases"]:
+                    if alias not in aliases:
+                        aliases.append(alias)
+                        
+            if data.get("socials"):
+                socials.update(data["socials"])
+                
+            if data.get("hair_color"): hair_color = data["hair_color"]
+            if data.get("eye_color"): eye_color = data["eye_color"]
+            if data.get("ethnicity"): ethnicity = data["ethnicity"]
+            if data.get("height") is not None: height = data["height"]
+            if data.get("weight") is not None: weight = data["weight"]
+            if data.get("measurements"): measurements = data["measurements"]
+            if data.get("cup_size"): cup_size = data["cup_size"]
+            if data.get("tattoos"): tattoos = data["tattoos"]
+            if data.get("piercings"): piercings = data["piercings"]
+            if data.get("orientation"): orientation = data["orientation"]
+            if data.get("career_start_year") is not None: career_start_year = data["career_start_year"]
+            if data.get("career_end_year") is not None: career_end_year = data["career_end_year"]
+            
+            if data.get("biographies"):
+                for loc, bio_text in data["biographies"].items():
+                    if bio_text:
+                        biographies[loc] = bio_text
+        
+        if birthday: self.birthday = birthday
+        if deathday: self.deathday = deathday
+        if place_of_birth: self.place_of_birth = place_of_birth
+        if gender is not None: self.gender = gender
+        if known_for_department: self.known_for_department = known_for_department
+        if popularity is not None: self.popularity = popularity
+        if rating_porndb is not None: self.rating_porndb = rating_porndb
+        if scene_count is not None: self.scene_count = scene_count
+        if profile_path: self.profile_path = profile_path
+        if homepage: self.homepage = homepage
+        if images: self.images = images
+        if aliases: self.aliases = aliases
+        if socials: self.socials = socials
+        
+        if hair_color: self.hair_color = hair_color
+        if eye_color: self.eye_color = eye_color
+        if ethnicity: self.ethnicity = ethnicity
+        if height is not None: self.height = height
+        if weight is not None: self.weight = weight
+        if measurements: self.measurements = measurements
+        if cup_size: self.cup_size = cup_size
+        if tattoos: self.tattoos = tattoos
+        if piercings: self.piercings = piercings
+        if orientation: self.orientation = orientation
+        if career_start_year is not None: self.career_start_year = career_start_year
+        if career_end_year is not None: self.career_end_year = career_end_year
+        
+        ext_ids = dict(self.external_ids or {})
+        for link in self.external_links:
+            key = link.provider.value
+            ext_ids[key] = str(link.external_id)
+            ext_ids[f"{key}_id"] = str(link.external_id)
+        active_providers = {link.provider.value for link in self.external_links}
+        for provider_val in [Provider.TMDB.value, Provider.STASHDB.value, Provider.FANSDB.value, Provider.PORNDB.value]:
+            if provider_val not in active_providers:
+                ext_ids.pop(provider_val, None)
+                ext_ids.pop(f"{provider_val}_id", None)
+        self.external_ids = ext_ids
+        
+        existing_localizations = {l.locale: l for l in self.localizations}
+        for loc, bio_text in biographies.items():
+            if loc in existing_localizations:
+                existing_localizations[loc].biography = bio_text
+            else:
+                from app.domains.people.models import PersonLocalization
+                new_loc = PersonLocalization(person_id=self.id, locale=loc, biography=bio_text)
+                db.add(new_loc)
+                self.localizations.append(new_loc)
+        for loc, loc_obj in list(existing_localizations.items()):
+            if loc not in biographies:
+                db.delete(loc_obj)
 
 
 class PersonLocalization(Base):
@@ -103,6 +247,7 @@ class ExternalSourceLink(Base):
     provider: Mapped[Provider] = mapped_column(SQLEnum(Provider), index=True)
     external_id: Mapped[str] = mapped_column(String, index=True) # e.g., StashDB performer UUID
     profile_url: Mapped[Optional[str]] = mapped_column(String)
+    source_data: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON)
 
     # Relationships
     person: Mapped["Person"] = relationship(back_populates="external_links")

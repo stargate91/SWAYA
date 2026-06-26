@@ -33,6 +33,7 @@ class PersonRead(BaseSchema):
     tattoos: Optional[str] = None
     piercings: Optional[str] = None
     orientation: Optional[str] = None
+    primary_provider: Optional[str] = None
 
 class PeopleGroupItem(BaseModel):
     id: int
@@ -99,6 +100,11 @@ class PersonFilmographyResponse(BaseModel):
     total_items: int
     total_pages: int
 
+class ExternalLinkDetail(BaseModel):
+    provider: str
+    external_id: str
+    profile_url: Optional[str] = None
+
 class PersonDetailResponse(BaseModel):
     model_config = ConfigDict(extra="allow")
     id: int
@@ -129,6 +135,9 @@ class PersonDetailResponse(BaseModel):
     initial_movie_credits_page: PersonFilmographyResponse
     initial_tv_credits_page: PersonFilmographyResponse
     initial_scene_credits_page: PersonFilmographyResponse
+    external_links: Optional[List[ExternalLinkDetail]] = None
+    primary_provider: Optional[str] = None
+
 
 
 class PersonStatusUpdate(BaseModel):
@@ -145,8 +154,12 @@ class PersonAddTmdb(BaseModel):
     gender: Optional[int] = None
     is_adult: Optional[bool] = None
 
+class PersonLinkPayload(BaseModel):
+    source: str
+    external_id: str
+    overrides: Optional[dict[str, Any]] = None
+    profile_url: Optional[str] = None
 
-
-
-
-
+class PersonUnlinkPayload(BaseModel):
+    source: str
+    action: str

@@ -49,6 +49,7 @@ function ActivationButton({ isActive, onClick, disabled }) {
 export default function AddPeopleModalContent({ isAdult, t, onClose }) {
   const { toast } = useUi();
   const queryClient = useQueryClient();
+  const { data: settings } = useSettingsQuery();
   const [activeMode, setActiveMode] = useState('local'); // 'local', 'search', 'bulk'
   const [searchQuery, setSearchQuery] = useState('');
   const [optimisticStatus, setOptimisticStatus] = useState({});
@@ -63,6 +64,18 @@ export default function AddPeopleModalContent({ isAdult, t, onClose }) {
   const [tmdbQuery, setTmdbQuery] = useState('');
   const [searchSource, setSearchSource] = useState('tmdb');
   const [tmdbResults, setTmdbResults] = useState([]);
+  const filteredTmdbResults = useMemo(() => {
+    if (!isAdult || !settings?.adult_gender_preference || settings.adult_gender_preference === 'all') {
+      return tmdbResults;
+    }
+    const pref = settings.adult_gender_preference;
+    return tmdbResults.filter((person) => {
+      const g = person.gender;
+      if (pref === 'female') return g === 1 || g === '1';
+      if (pref === 'male') return g === 2 || g === '2';
+      return true;
+    });
+  }, [tmdbResults, isAdult, settings?.adult_gender_preference]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchingError, setSearchingError] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
@@ -74,7 +87,6 @@ export default function AddPeopleModalContent({ isAdult, t, onClose }) {
   // Bulk Add States
   const [bulkText, setBulkText] = useState('');
 
-  const { data: settings } = useSettingsQuery();
   const hideGenderFilter = isAdult && settings?.adult_gender_preference && settings.adult_gender_preference !== 'all';
 
   // Fetch people with pagination and infinite scroll
@@ -435,7 +447,7 @@ export default function AddPeopleModalContent({ isAdult, t, onClose }) {
                 variant="modal-intro"
               />
             </div>
-          ) : tmdbResults.length === 0 ? (
+          ) : filteredTmdbResults.length === 0 ? (
             <div className="add-people-modal__empty-fill">
               <EmptyState
                 title={t(textKey('library.addPeople.adultSearchNoResultsTitle', 'library.addPeople.searchNoResultsTitle'))}
@@ -445,7 +457,7 @@ export default function AddPeopleModalContent({ isAdult, t, onClose }) {
             </div>
           ) : (
             <div className="add-people-modal__list">
-              {tmdbResults.map((person) => {
+              {filteredTmdbResults.map((person) => {
                 const isActive = optimisticStatus[person.id] !== undefined
                   ? optimisticStatus[person.id]
                   : person.is_active;

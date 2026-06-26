@@ -306,6 +306,15 @@ class PerformerDetailReader:
             "initial_movie_credits_page": {"items": movies[:12], "page": 1, "page_size": 12, "total_items": len(movies), "total_pages": 1},
             "initial_tv_credits_page": {"items": tv[:12], "page": 1, "page_size": 12, "total_items": len(tv), "total_pages": 1},
             "initial_scene_credits_page": {"items": scenes[:12], "page": 1, "page_size": 12, "total_items": len(scenes), "total_pages": 1},
+            "external_links": [
+                {
+                    "provider": link.provider.value,
+                    "external_id": link.external_id,
+                    "profile_url": link.profile_url
+                }
+                for link in person.external_links
+            ],
+            "primary_provider": person.primary_provider.value if person.primary_provider else None
         }
         return PersonDetailResponse(**result)
 

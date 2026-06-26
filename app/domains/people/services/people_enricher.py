@@ -11,7 +11,7 @@ from app.domains.people.services.enrichment.adult import AdultEnricher
 
 from app.domains.people.services.enrichment.task import enrich_people_for_matches
 from app.domains.people.services.enrichment.fetcher import fetch_external_details
-from app.domains.people.services.enrichment.persister import apply_enriched_data, save_bio
+from app.domains.people.services.enrichment.persister import apply_enriched_data
 
 logger = logging.getLogger(__name__)
 
@@ -89,5 +89,3 @@ class PeopleEnricher:
     def apply_enriched_data(self, person: Person, data: dict):
         return apply_enriched_data(self, person, data)
 
-    def _save_bio(self, person_id: int, locale: str, biography: str):
-        return save_bio(self, person_id, locale, biography)

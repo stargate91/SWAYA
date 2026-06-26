@@ -6,58 +6,8 @@ from app.shared_kernel.enums import Provider
 logger = logging.getLogger(__name__)
 
 def apply_enriched_data(enricher, person: Person, data: dict):
-    if data.get("birthday"):
-        person.birthday = data["birthday"]
-    if data.get("deathday"):
-        person.deathday = data["deathday"]
-    if data.get("place_of_birth"):
-        person.place_of_birth = data["place_of_birth"]
-    if data.get("known_for_department"):
-        person.known_for_department = data["known_for_department"]
-    if data.get("homepage"):
-        person.homepage = data["homepage"]
-    if data.get("gender") is not None:
-        person.gender = data["gender"]
-    if data.get("popularity") is not None:
-        person.popularity = data["popularity"]
-    if data.get("rating_porndb") is not None:
-        person.rating_porndb = float(data["rating_porndb"])
-    if data.get("scene_count") is not None:
-        person.scene_count = max(person.scene_count or 0, int(data["scene_count"]))
-    if data.get("ethnicity"):
-        person.ethnicity = data["ethnicity"]
-    if data.get("hair_color"):
-        person.hair_color = data["hair_color"]
-    if data.get("eye_color"):
-        person.eye_color = data["eye_color"]
-    if data.get("height") is not None:
-        person.height = data["height"]
-    if data.get("measurements"):
-        person.measurements = data["measurements"]
-    if data.get("cup_size"):
-        person.cup_size = data["cup_size"]
-        
-    # Save extended performer attributes
-    if data.get("weight") is not None:
-        person.weight = data["weight"]
-    if data.get("aliases"):
-        existing_aliases = person.aliases or []
-        person.aliases = list(set(existing_aliases + data["aliases"]))
-    if data.get("tattoos"):
-        person.tattoos = data["tattoos"]
-    if data.get("piercings"):
-        person.piercings = data["piercings"]
-    if data.get("orientation"):
-        person.orientation = data["orientation"]
-    if data.get("career_start_year") is not None:
-        person.career_start_year = data["career_start_year"]
-    if data.get("career_end_year") is not None:
-        person.career_end_year = data["career_end_year"]
-    if data.get("socials"):
-        existing_socials = person.socials or {}
-        existing_socials.update(data["socials"])
-        person.socials = existing_socials
-
+    provider_profiles = data.get("provider_profiles") or {}
+    
     if data.get("urls"):
         ids = person.external_ids or {}
         existing_urls = ids.get("urls") or []
@@ -87,7 +37,6 @@ def apply_enriched_data(enricher, person: Person, data: dict):
         if not prov_enum:
             continue
 
-        # Check if already in session to avoid duplicate inserts
         already_added = False
         for obj in enricher.db.new:
             if (isinstance(obj, ExternalSourceLink) and 
@@ -105,20 +54,42 @@ def apply_enriched_data(enricher, person: Person, data: dict):
             ExternalSourceLink.provider == prov_enum,
             ExternalSourceLink.external_id == l["external_id"]
         ).first()
+
+        src_data = provider_profiles.get(prov_enum.value)
+        profile_url = None
+        if src_data and isinstance(src_data, dict):
+            profile_url = src_data.get("profile_path")
+
         if not link:
             new_link = ExternalSourceLink(
                 person_id=person.id,
                 provider=prov_enum,
-                external_id=l["external_id"]
+                external_id=l["external_id"],
+                profile_url=profile_url,
+                source_data=src_data if isinstance(src_data, dict) else None
             )
             enricher.db.add(new_link)
+            person.external_links.append(new_link)
+        else:
+            if src_data and isinstance(src_data, dict):
+                link.source_data = src_data
+                if profile_url:
+                    link.profile_url = profile_url
 
-    for locale, bio in data["biographies"].items():
-        save_bio(enricher, person.id, locale, bio)
+    for ext_link in person.external_links:
+        prov_key = ext_link.provider.value
+        if prov_key in provider_profiles:
+            src_data = provider_profiles[prov_key]
+            if isinstance(src_data, dict):
+                ext_link.source_data = src_data
+                profile_url = src_data.get("profile_path")
+                if profile_url:
+                    ext_link.profile_url = profile_url
 
-    profile_path = data.get("profile_path")
+    person.recalculate_projection(enricher.db)
+
+    profile_path = person.profile_path
     if profile_path:
-        person.profile_path = profile_path
         tmdb_id = person.external_ids.get("tmdb") if person.external_ids else None
         
         from app.domains.media_assets.services.images import image_processing_service
@@ -135,27 +106,13 @@ def apply_enriched_data(enricher, person: Person, data: dict):
             prov_val = "perf"
             if person.external_ids:
                 for k, v in person.external_ids.items():
-                    prov_val = k
-                    ext_id = v
-                    break
+                    if k != "urls":
+                        prov_val = k
+                        ext_id = v
+                        break
             filename = f"{prov_val}_{ext_id}{ext}"
 
         if enricher.image_downloader:
             enricher.image_downloader.enqueue_download(url, "people", filename)
         else:
             logger.warning("No image_downloader available for profile image download")
-
-    existing_imgs = person.images or []
-    new_imgs = data.get("images") or []
-    person.images = EnrichmentHelpers.merge_images(existing_imgs, new_imgs)
-
-def save_bio(enricher, person_id: int, locale: str, biography: str):
-    loc = enricher.db.query(PersonLocalization).filter(
-        PersonLocalization.person_id == person_id,
-        PersonLocalization.locale == locale
-    ).first()
-    if not loc:
-        loc = PersonLocalization(person_id=person_id, locale=locale, biography=biography)
-        enricher.db.add(loc)
-    else:
-        loc.biography = biography

@@ -99,7 +99,9 @@ def fetch_external_details(
         "urls": [],
         "known_for_department": None,
         "career_start_year": None,
-        "career_end_year": None
+        "career_end_year": None,
+        "homepage": None,
+        "provider_profiles": {}
     })
 
     has_data = False

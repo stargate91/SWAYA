@@ -33,22 +33,7 @@ class AdultEnricher:
             temp_db.close()
 
         if perf:
-            result["birthday"] = perf.get("birth_date") or result["birthday"]
-            if perf.get("rating_porndb") is not None:
-                result["rating_porndb"] = float(perf["rating_porndb"])
-            if perf.get("scene_count") is not None:
-                result["scene_count"] = max(result["scene_count"] or 0, int(perf["scene_count"]))
-            result["ethnicity"] = perf.get("ethnicity") or result["ethnicity"]
-            result["hair_color"] = perf.get("hair_color") or result["hair_color"]
-            result["eye_color"] = perf.get("eye_color") or result["eye_color"]
-            if perf.get("height") is not None:
-                result["height"] = int(perf["height"])
-            if perf.get("weight") is not None:
-                result["weight"] = int(perf["weight"])
-
-            if perf.get("aliases"):
-                result["aliases"].extend(perf["aliases"])
-
+            tats_val = None
             tats = perf.get("tattoos")
             if tats and isinstance(tats, list):
                 tats_str = ", ".join(
@@ -56,10 +41,11 @@ class AdultEnricher:
                     for t in tats if t.get('body_part')
                 )
                 if tats_str:
-                    result["tattoos"] = tats_str
+                    tats_val = tats_str
             elif isinstance(tats, str) and tats:
-                result["tattoos"] = tats
+                tats_val = tats
 
+            piers_val = None
             piers = perf.get("piercings")
             if piers and isinstance(piers, list):
                 piers_str = ", ".join(
@@ -67,30 +53,23 @@ class AdultEnricher:
                     for p in piers if p.get('body_part')
                 )
                 if piers_str:
-                    result["piercings"] = piers_str
+                    piers_val = piers_str
             elif isinstance(piers, str) and piers:
-                result["piercings"] = piers
+                piers_val = piers
 
-            if perf.get("orientation"):
-                result["orientation"] = perf["orientation"]
-
-            result["place_of_birth"] = perf.get("country") or perf.get("place_of_birth") or result["place_of_birth"]
-            result["deathday"] = perf.get("death_date") or perf.get("deathday") or result["deathday"]
-            if perf.get("career_start_year") is not None:
-                result["career_start_year"] = int(perf["career_start_year"])
-            if perf.get("career_end_year") is not None:
-                result["career_end_year"] = int(perf["career_end_year"])
-
+            g_val = None
             g = perf.get("gender")
             if g:
                 g_lower = str(g).lower()
                 if "female" in g_lower:
-                    result["gender"] = 1
+                    g_val = 1
                 elif "male" in g_lower:
-                    result["gender"] = 2
+                    g_val = 2
                 else:
-                    result["gender"] = 0
+                    g_val = 0
 
+            measurements_val = None
+            cup_val = None
             m = perf.get("measurements")
             if m and isinstance(m, dict):
                 band = m.get("band_size")
@@ -98,25 +77,89 @@ class AdultEnricher:
                 waist = m.get("waist")
                 hip = m.get("hip")
                 if band and cup and waist and hip:
-                    result["measurements"] = f"{band}{cup}-{waist}-{hip}"
+                    measurements_val = f"{band}{cup}-{waist}-{hip}"
                 if cup:
-                    result["cup_size"] = str(cup)
+                    cup_val = str(cup)
 
             bio = perf.get("details")
+            images = perf.get("images") or []
+            urls_list = [img.get("url") for img in images if img.get("url")]
+
+            # Compile source_data
+            source_data = {
+                "birthday": perf.get("birth_date"),
+                "rating_porndb": float(perf["rating_porndb"]) if perf.get("rating_porndb") is not None else None,
+                "scene_count": int(perf["scene_count"]) if perf.get("scene_count") is not None else None,
+                "ethnicity": perf.get("ethnicity"),
+                "hair_color": perf.get("hair_color"),
+                "eye_color": perf.get("eye_color"),
+                "height": int(perf["height"]) if perf.get("height") is not None else None,
+                "weight": int(perf["weight"]) if perf.get("weight") is not None else None,
+                "aliases": perf.get("aliases") or [],
+                "tattoos": tats_val,
+                "piercings": piers_val,
+                "orientation": perf.get("orientation"),
+                "place_of_birth": perf.get("country") or perf.get("place_of_birth"),
+                "deathday": perf.get("death_date") or perf.get("deathday"),
+                "career_start_year": int(perf["career_start_year"]) if perf.get("career_start_year") is not None else None,
+                "career_end_year": int(perf["career_end_year"]) if perf.get("career_end_year") is not None else None,
+                "gender": g_val,
+                "measurements": measurements_val,
+                "cup_size": cup_val,
+                "biographies": {DEFAULT_FALLBACK_LANGUAGE: bio} if bio else {},
+                "images": urls_list,
+                "profile_path": urls_list[0] if urls_list else None,
+                "socials": {},
+                "urls": perf.get("urls") or []
+            }
+
+            # Merge into prioritized result
+            result["birthday"] = source_data["birthday"] or result["birthday"]
+            if source_data["rating_porndb"] is not None:
+                result["rating_porndb"] = source_data["rating_porndb"]
+            if source_data["scene_count"] is not None:
+                result["scene_count"] = max(result["scene_count"] or 0, source_data["scene_count"])
+            result["ethnicity"] = source_data["ethnicity"] or result["ethnicity"]
+            result["hair_color"] = source_data["hair_color"] or result["hair_color"]
+            result["eye_color"] = source_data["eye_color"] or result["eye_color"]
+            if source_data["height"] is not None:
+                result["height"] = source_data["height"]
+            if source_data["weight"] is not None:
+                result["weight"] = source_data["weight"]
+            if source_data["aliases"]:
+                result["aliases"].extend(source_data["aliases"])
+            if source_data["tattoos"]:
+                result["tattoos"] = source_data["tattoos"]
+            if source_data["piercings"]:
+                result["piercings"] = source_data["piercings"]
+            if source_data["orientation"]:
+                result["orientation"] = source_data["orientation"]
+            result["place_of_birth"] = source_data["place_of_birth"] or result["place_of_birth"]
+            result["deathday"] = source_data["deathday"] or result["deathday"]
+            if source_data["career_start_year"] is not None:
+                result["career_start_year"] = source_data["career_start_year"]
+            if source_data["career_end_year"] is not None:
+                result["career_end_year"] = source_data["career_end_year"]
+            if source_data["gender"] is not None:
+                result["gender"] = source_data["gender"]
+            if source_data["measurements"]:
+                result["measurements"] = source_data["measurements"]
+            if source_data["cup_size"]:
+                result["cup_size"] = source_data["cup_size"]
             if bio:
                 result["biographies"][DEFAULT_FALLBACK_LANGUAGE] = bio
+            if urls_list:
+                if result["images"] is None:
+                    result["images"] = []
+                for u in urls_list:
+                    if u not in result["images"]:
+                        result["images"].append(u)
+                if not result["profile_path"]:
+                    result["profile_path"] = urls_list[0]
 
-            images = perf.get("images") or []
-            if images:
-                urls_list = [img.get("url") for img in images if img.get("url")]
-                if urls_list:
-                    if result["images"] is None:
-                        result["images"] = []
-                    for u in urls_list:
-                        if u not in result["images"]:
-                            result["images"].append(u)
-                    if not result["profile_path"]:
-                        result["profile_path"] = urls_list[0]
+            if "provider_profiles" not in result:
+                result["provider_profiles"] = {}
+            result["provider_profiles"][provider.value] = source_data
 
             perf_urls = perf.get("urls") or []
             if perf_urls:
@@ -124,11 +167,12 @@ class AdultEnricher:
             for url in perf_urls:
                 if not url or not isinstance(url, str):
                     continue
-                for ext_link in EnrichmentHelpers.extract_ids_from_urls([url]):
-                    ext_pair = (ext_link["provider"], ext_link["external_id"])
-                    if ext_pair not in processed_pairs:
-                        to_process.append(ext_link)
-                        result["links_to_create"].append(ext_link)
+                # URL-based external ID auto-discovery is disabled to keep linking strictly user-controlled
+                # and prevent split profiles from automatically linking themselves back.
+                # for ext_link in EnrichmentHelpers.extract_ids_from_urls([url]):
+                #     ext_pair = (ext_link["provider"], ext_link["external_id"])
+                #     if ext_pair not in processed_pairs:
+                #         to_process.append(ext_link)
 
                 social_patterns = {
                     "instagram": r'instagram\.com/([a-zA-Z0-9\._\-]+)',

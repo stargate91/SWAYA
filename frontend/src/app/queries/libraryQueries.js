@@ -578,7 +578,7 @@ export const useUploadPersonProfileMutation = () => {
 export const useLinkPersonSourceMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ personId, source, externalId, overrides }) => api.people.linkSource(personId, source, externalId, overrides),
+    mutationFn: ({ personId, source, externalId, overrides, profileUrl }) => api.people.linkSource(personId, source, externalId, overrides, profileUrl),
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['person-detail', variables.personId] });
       queryClient.invalidateQueries({ queryKey: ['person-detail', String(variables.personId)] });
@@ -587,7 +587,41 @@ export const useLinkPersonSourceMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['person-credits', String(variables.personId)] });
       queryClient.invalidateQueries({ queryKey: ['people'] });
       queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
+      queryClient.invalidateQueries({ queryKey: ['library'] });
     },
   });
 };
+
+export const useUnlinkPersonSourceMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ personId, source, action }) => api.people.unlinkSource(personId, source, action),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['person-detail', variables.personId] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail', String(variables.personId)] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['person-credits', variables.personId] });
+      queryClient.invalidateQueries({ queryKey: ['person-credits', String(variables.personId)] });
+      queryClient.invalidateQueries({ queryKey: ['people'] });
+      queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
+      queryClient.invalidateQueries({ queryKey: ['library'] });
+    },
+  });
+};
+
+export const useSetPrimaryPersonSourceMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ personId, source }) => api.people.setPrimarySource(personId, source),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['person-detail', variables.personId] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail', String(variables.personId)] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['people'] });
+      queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
+      queryClient.invalidateQueries({ queryKey: ['library'] });
+    },
+  });
+};
+
 

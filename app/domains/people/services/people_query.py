@@ -28,7 +28,7 @@ class PeopleQueryBuilder:
         limit: int = 20,
     ) -> PeopleSearchResponse:
         db = self.db
-        statuses = [ItemStatus.MATCHED, ItemStatus.RENAMED, ItemStatus.ORGANIZED]
+        statuses = [ItemStatus.RENAMED, ItemStatus.ORGANIZED]
 
         matched_match_ids = self.library_port.get_matched_match_ids(statuses)
         
@@ -85,9 +85,7 @@ class PeopleQueryBuilder:
             if not include_inactive and not person.is_active:
                 continue
             if include_inactive and not person.is_active and library_count == 0:
-                has_identity = bool(person.external_ids) or (len(person.external_links) > 0)
-                if not has_identity:
-                    continue
+                continue
             
             if search and search.lower() not in person.name.lower():
                 continue

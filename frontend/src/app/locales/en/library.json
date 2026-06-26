@@ -392,6 +392,7 @@
     "noImagesAvailable": "No images found.",
     "linkSource": "Link External Source",
     "sourceLinked": "Source linked successfully!",
+    "unlinkSuccess": "Successfully unlinked from {{source}}.",
     "imageSource": "Image Source",
     "peaksTitle": "Peak Moments",
     "peakDate": "Date",

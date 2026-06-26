@@ -40,25 +40,8 @@ class PersonService:
         person = None
         extracted_ids = {}
 
-        # Extract external IDs from urls unconditionally
-        if urls:
-            import re
-            for u in urls:
-                url_str = u.get("url") if isinstance(u, dict) else u
-                if not url_str or not isinstance(url_str, str):
-                    continue
-                match_stash = re.search(r'stashdb\.org/performers/([a-fA-F0-9\-]+)', url_str)
-                if match_stash:
-                    extracted_ids[Provider.STASHDB] = match_stash.group(1)
-                match_fans = re.search(r'fansdb\.cc/performers/([a-fA-F0-9\-]+)', url_str)
-                if match_fans:
-                    extracted_ids[Provider.FANSDB] = match_fans.group(1)
-                match_porn = re.search(r'theporndb\.net/performers/([A-Za-z0-9_-]+)', url_str)
-                if match_porn:
-                    extracted_ids[Provider.PORNDB] = match_porn.group(1)
-                match_tmdb = re.search(r'themoviedb\.org/person/(\d+)', url_str)
-                if match_tmdb:
-                    extracted_ids["tmdb"] = match_tmdb.group(1)
+        # Extract external IDs from urls is disabled to keep linking strictly user-controlled
+        pass
 
         # 1. Try finding by provider and external_id
         if provider and external_id:
@@ -157,4 +140,5 @@ class PersonService:
                 person.known_for_department = "Acting"
 
         self.people_repo.flush()
+        person.recalculate_projection(self.db)
         return person
