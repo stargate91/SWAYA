@@ -188,8 +188,8 @@ class BaseQueryBuilder:
             
             o = overrides_dict.get(match.id)
             title = (o.custom_title if (o and o.custom_title) else None) or (loc.title if loc else (item.filename if item else "Unknown"))
-            poster_path = (o.custom_poster if (o and o.custom_poster) else None) or (loc.poster_path if loc else None)
-            backdrop_path = (o.custom_backdrop if (o and o.custom_backdrop) else None) or (match.backdrop_path or None)
+            poster_path = (o.custom_poster if (o and o.custom_poster) else None) or (loc.local_poster_path if (loc and loc.local_poster_path) else (loc.poster_path if loc else None))
+            backdrop_path = (o.custom_backdrop if (o and o.custom_backdrop) else None) or (match.local_backdrop_path or match.backdrop_path or None)
             rating = (o.user_rating if (o and o.user_rating is not None) else None)
             if rating is None:
                 rating = match.rating_porndb or match.rating_tmdb or 0.0

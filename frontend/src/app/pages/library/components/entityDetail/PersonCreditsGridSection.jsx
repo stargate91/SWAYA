@@ -171,7 +171,7 @@ export default function PersonCreditsGridSection({ title, personId, mediaType, t
         ))}
         {visibleItems.map((item) => {
           const isTv = isTvLikeMediaType(item.media_type || item.type);
-          const posterPath = getPosterImagePath(item);
+          const posterPath = getPosterImagePath(item) || item.backdrop_path || item.local_backdrop_path;
           const posterUrl = posterPath ? resolveDetailsImageUrl(posterPath, API_BASE, 'poster') : null;
 
           return (

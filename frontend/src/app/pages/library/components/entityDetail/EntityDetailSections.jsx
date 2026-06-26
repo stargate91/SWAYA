@@ -123,7 +123,7 @@ export function EntityCardGrid({ items, type, navigate, t }) {
     <PosterGrid>
       {items.map((item, index) => {
         const resolvedType = item.media_type || item.type || type;
-        const posterPath = getPosterImagePath(item);
+        const posterPath = getPosterImagePath(item) || item.backdrop_path || item.local_backdrop_path;
         const subtitleParts = [];
         if (item.year) subtitleParts.push(String(item.year));
         if (item.job) subtitleParts.push(item.job);
@@ -186,7 +186,7 @@ function HorizontalCollectionItemsList({ items, navigate, t }) {
         const tmdbRating = Number(item.rating_tmdb ?? item.rating);
         const hasImdbRating = Number.isFinite(imdbRating) && imdbRating > 0;
         const hasTmdbRating = Number.isFinite(tmdbRating) && tmdbRating > 0;
-        const posterPath = getPosterImagePath(item);
+        const posterPath = getPosterImagePath(item) || item.backdrop_path || item.local_backdrop_path;
         const posterUrl = posterPath ? resolveDetailsImageUrl(posterPath, API_BASE, 'poster') : null;
 
         return (

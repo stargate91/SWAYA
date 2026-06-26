@@ -65,14 +65,19 @@ export default function TMDBImageGrid({
       if (!personDetail?.images) return [];
       let list = personDetail.images;
       if (selectedSource && selectedSource !== 'all') {
+        const isPornDB = (img) => img.includes('theporndb') || img.includes('metadataapi') || img.includes('porndb');
+        const isStashDB = (img) => img.includes('stashdb');
+        const isFansDB = (img) => img.includes('fansdb');
+        const isTMDB = (img) => img.includes('tmdb') || (!isPornDB(img) && !isStashDB(img) && !isFansDB(img));
+
         if (selectedSource === 'tmdb') {
-          list = list.filter(img => img.startsWith('/') || img.includes('tmdb') || (!img.includes('stashdb') && !img.includes('fansdb') && !img.includes('theporndb') && !img.includes('metadataapi')));
+          list = list.filter(isTMDB);
         } else if (selectedSource === 'stashdb') {
-          list = list.filter(img => img.includes('stashdb'));
+          list = list.filter(isStashDB);
         } else if (selectedSource === 'fansdb') {
-          list = list.filter(img => img.includes('fansdb'));
+          list = list.filter(isFansDB);
         } else if (selectedSource === 'theporndb') {
-          list = list.filter(img => img.includes('theporndb') || img.includes('metadataapi'));
+          list = list.filter(isPornDB);
         }
       }
       return list.map((img) => ({
@@ -132,7 +137,7 @@ export default function TMDBImageGrid({
       if (Array.isArray(rawImages)) {
         const isBackdrop = imageType === 'backdrop';
         const localeShort = String(metadataLanguage || '').split('-', 1)[0].toLowerCase();
-        
+
         if (isBackdrop) {
           return rawImages
             .filter((img) => {
@@ -192,7 +197,7 @@ export default function TMDBImageGrid({
       if (!Array.isArray(rawImages)) continue;
 
       const normalizedLang = String(lang || '').toLowerCase();
-      
+
       // For backdrops, only include language-independent entries
       if (isBackdrop && normalizedLang !== 'null' && normalizedLang !== '') {
         continue;

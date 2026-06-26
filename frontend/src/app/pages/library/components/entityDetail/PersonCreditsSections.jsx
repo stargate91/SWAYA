@@ -106,12 +106,13 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
     tabs.push({ id: 'scenes_stashdb', label: t('library.details.stashdbScenes') || 'StashDB Scenes', count: tabCounts.scenes_stashdb });
     tabs.push({ id: 'scenes_fansdb', label: t('library.details.fansdbScenes') || 'FansDB Scenes', count: tabCounts.scenes_fansdb });
   } else if (hasScenes) {
-    const label = hasStashDb
-      ? (t('library.details.stashdbScenes') || 'StashDB Scenes')
-      : hasFansDb
-      ? (t('library.details.fansdbScenes') || 'FansDB Scenes')
-      : (t('library.details.scenesTitle') || 'Scenes');
-    tabs.push({ id: 'scenes', label, count: tabCounts.scenes });
+    if (hasStashDb) {
+      tabs.push({ id: 'scenes', label: t('library.details.stashdbScenes') || 'StashDB Scenes', count: tabCounts.scenes });
+    } else if (hasFansDb) {
+      tabs.push({ id: 'scenes', label: t('library.details.fansdbScenes') || 'FansDB Scenes', count: tabCounts.scenes });
+    } else if (!hasPornDb) {
+      tabs.push({ id: 'scenes', label: t('library.details.scenesTitle') || 'Scenes', count: tabCounts.scenes });
+    }
   }
 
   if (item?.is_adult && hasPornDb) {

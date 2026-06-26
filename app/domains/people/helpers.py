@@ -222,16 +222,13 @@ def resolve_person_known_for_backdrop(
         except Exception:
             pass
 
-        if adult_only and (not raw_data or not bool(raw_data.get("adult"))):
-            continue
-
         backdrop_path = image_processing_service.pick_backdrop_path(raw_data, preferred_language=preferred_languages[0]) if raw_data else None
         if backdrop_path:
             candidates.append((image_processing_service.backdrop_resolution_from_raw(raw_data, backdrop_path), backdrop_path))
             continue
 
         fallback_backdrop = credit.get("backdrop_path")
-        if fallback_backdrop and not adult_only:
+        if fallback_backdrop:
             candidates.append((0, fallback_backdrop))
 
     if not candidates:

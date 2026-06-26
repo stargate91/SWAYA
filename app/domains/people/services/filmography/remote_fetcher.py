@@ -38,6 +38,9 @@ class RemoteCreditsFetcher:
             
         ext_ids = person.external_ids or {}
         ext_id = ext_ids.get(source.lower()) or ext_ids.get(f"{source.lower()}_id")
+        if not ext_id and source.lower() == "porndb":
+            ext_id = ext_ids.get("theporndb") or ext_ids.get("theporndb_id")
+            
         if not ext_id:
             try:
                 prov_enum = Provider(source.lower())

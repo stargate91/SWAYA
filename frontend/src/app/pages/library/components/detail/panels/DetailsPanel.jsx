@@ -96,7 +96,7 @@ export default function DetailsPanel() {
 
   return (
     <div className="details-panel details-panel--custom">
-      {(ratings.length > 0) ? (
+      {(ratings.length > 0) && (
         <div>
             <h4 className="details-panel__ratings-title">
               {t('library.details.ratingsSection') || 'Ratings'}
@@ -120,10 +120,6 @@ export default function DetailsPanel() {
                 );
               })}
             </div>
-          </div>
-        ) : (
-          <div className="details-panel__no-ratings">
-            {t('library.details.noRatingsAvailable') || 'No ratings available.'}
           </div>
         )
       }

@@ -1,6 +1,60 @@
 from typing import List, Optional
 from app.shared_kernel.enums import Provider
 
+class PrioritizedResultDict(dict):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._priorities = {}
+        self.current_provider = None
+
+    def set_provider(self, provider):
+        self.current_provider = provider
+
+    def __setitem__(self, key, value):
+        single_val_fields = {
+            "birthday", "deathday", "place_of_birth", "gender", "profile_path",
+            "ethnicity", "hair_color", "eye_color", "height", "weight",
+            "measurements", "cup_size", "tattoos", "piercings", "orientation",
+            "career_start_year", "career_end_year", "known_for_department", "popularity", "homepage"
+        }
+        if key in single_val_fields:
+            if value is None or value == "":
+                if key in self and self[key] is not None:
+                    return
+                super().__setitem__(key, value)
+                return
+            
+            priorities = {
+                Provider.TMDB: 4,
+                Provider.STASHDB: 3,
+                Provider.FANSDB: 2,
+                Provider.PORNDB: 1
+            }
+            prio = priorities.get(self.current_provider, 0)
+            existing_prio = self._priorities.get(key, -1)
+            if prio >= existing_prio:
+                super().__setitem__(key, value)
+                self._priorities[key] = prio
+        else:
+            if key == "biographies" and isinstance(value, dict):
+                if key not in self:
+                    super().__setitem__(key, {})
+                priorities = {
+                    Provider.TMDB: 4,
+                    Provider.STASHDB: 3,
+                    Provider.FANSDB: 2,
+                    Provider.PORNDB: 1
+                }
+                prio = priorities.get(self.current_provider, 0)
+                for loc, bio in value.items():
+                    bio_key = f"bio_{loc}"
+                    existing_prio = self._priorities.get(bio_key, -1)
+                    if bio and prio >= existing_prio:
+                        self[key][loc] = bio
+                        self._priorities[bio_key] = prio
+            else:
+                super().__setitem__(key, value)
+
 def fetch_external_details(
     enricher,
     name: str,
@@ -18,7 +72,7 @@ def fetch_external_details(
             except ValueError:
                 pass
 
-    result = {
+    result = PrioritizedResultDict({
         "birthday": None,
         "deathday": None,
         "place_of_birth": None,
@@ -46,7 +100,7 @@ def fetch_external_details(
         "known_for_department": None,
         "career_start_year": None,
         "career_end_year": None
-    }
+    })
 
     has_data = False
     processed_pairs = set()
@@ -62,6 +116,8 @@ def fetch_external_details(
             continue
         processed_pairs.add(pair)
 
+        result.set_provider(provider)
+
         if provider == Provider.TMDB:
             if enricher.tmdb_enricher:
                 if enricher.tmdb_enricher.enrich_tmdb(external_id, result):
@@ -76,6 +132,7 @@ def fetch_external_details(
         try:
             prov = Provider(prov_name)
             if prov not in existing_providers:
+                result.set_provider(prov)
                 result["links_to_create"].append({"provider": prov, "external_id": str(ext_id)})
         except ValueError:
             pass

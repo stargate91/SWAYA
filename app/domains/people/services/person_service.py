@@ -53,7 +53,7 @@ class PersonService:
                 match_fans = re.search(r'fansdb\.cc/performers/([a-fA-F0-9\-]+)', url_str)
                 if match_fans:
                     extracted_ids[Provider.FANSDB] = match_fans.group(1)
-                match_porn = re.search(r'theporndb\.net/performers/([a-fA-F0-9\-]+)', url_str)
+                match_porn = re.search(r'theporndb\.net/performers/([A-Za-z0-9_-]+)', url_str)
                 if match_porn:
                     extracted_ids[Provider.PORNDB] = match_porn.group(1)
                 match_tmdb = re.search(r'themoviedb\.org/person/(\d+)', url_str)

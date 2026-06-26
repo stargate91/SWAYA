@@ -136,7 +136,7 @@ const LibraryPosterCard = memo(({
     topRightAction = editButton;
   } else if (isLibraryScenes) {
     const displayDate = item.release_date ? item.release_date.substring(0, 10) : item.year;
-    imageUrl = item.displayPosterRemote || resolvePosterUrl(getPosterImagePath(item));
+    imageUrl = resolvePosterUrl(item.backdrop_path) || item.displayPosterRemote || resolvePosterUrl(getPosterImagePath(item));
     className = 'library-scene-card';
     topRightAction = editButton;
 

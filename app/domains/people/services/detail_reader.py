@@ -106,6 +106,11 @@ class PerformerDetailReader:
 
         ext_ids = person.external_ids or {}
         tmdb_id = ext_ids.get("tmdb") or ext_ids.get("tmdb_id")
+        if not tmdb_id:
+            for link in person.external_links:
+                if link.provider.value == "tmdb":
+                    tmdb_id = link.external_id
+                    break
         if not tmdb_id and not person.is_adult and str(person_id).isdigit() and person_id < 100000000:
             tmdb_id = person_id
             
@@ -311,6 +316,11 @@ class PerformerDetailReader:
         
         ext_ids = person.external_ids or {}
         tmdb_id = ext_ids.get("tmdb") or ext_ids.get("tmdb_id")
+        if not tmdb_id:
+            for link in person.external_links:
+                if link.provider.value == "tmdb":
+                    tmdb_id = link.external_id
+                    break
         if not tmdb_id and not person.is_adult and str(person_id).isdigit() and person_id < 100000000:
             tmdb_id = person_id
 
@@ -349,6 +359,11 @@ class PerformerDetailReader:
 
         ext_ids = person.external_ids or {}
         tmdb_id = ext_ids.get("tmdb") or ext_ids.get("tmdb_id")
+        if not tmdb_id:
+            for link in person.external_links:
+                if link.provider.value == "tmdb":
+                    tmdb_id = link.external_id
+                    break
         if not tmdb_id and not person.is_adult and str(person_id).isdigit() and person_id < 100000000:
             tmdb_id = person_id
 

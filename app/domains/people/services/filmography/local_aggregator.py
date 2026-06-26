@@ -2,7 +2,7 @@ import logging
 from typing import List, Dict, Any, Tuple, Optional
 from sqlalchemy.orm import Session
 
-from app.shared_kernel.enums import MediaType
+from app.shared_kernel.enums import MediaType, Provider
 from app.domains.people.models import MediaPersonLink
 from app.shared_kernel.language import LanguageService
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
@@ -61,10 +61,12 @@ class LocalCreditsAggregator:
             if match.media_type == MediaType.SCENE:
                 scenes.append(credit_entry)
             elif match.media_type == MediaType.MOVIE:
-                movies.append(credit_entry)
+                if match.provider == Provider.TMDB:
+                    movies.append(credit_entry)
             elif match.media_type in (MediaType.TV, MediaType.EPISODE):
-                sid = match.parent_id or match.id
-                if sid not in tv_map:
-                    tv_map[sid] = credit_entry
+                if match.provider == Provider.TMDB:
+                    sid = match.parent_id or match.id
+                    if sid not in tv_map:
+                        tv_map[sid] = credit_entry
         
         return movies, list(tv_map.values()), scenes

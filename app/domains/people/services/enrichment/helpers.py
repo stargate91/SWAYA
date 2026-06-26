@@ -10,8 +10,8 @@ class EnrichmentHelpers:
             if not url or not isinstance(url, str):
                 continue
             
-            # PornDB: https://theporndb.net/performers/<uuid>
-            match_porndb = re.search(r'theporndb\.net/performers/([a-fA-F0-9\-]+)', url)
+            # PornDB: https://theporndb.net/performers/<uuid> or <slug>
+            match_porndb = re.search(r'theporndb\.net/performers/([A-Za-z0-9_-]+)', url)
             if match_porndb:
                 links.append({"provider": Provider.PORNDB, "external_id": match_porndb.group(1)})
                 continue

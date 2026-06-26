@@ -380,7 +380,11 @@ class ScraperNormalizer:
                 "character": None,
                 "performer_details": performer_details,
                 "provider": provider,
-                "external_id": str(cast_member.get("id")) if cast_member.get("id") else None,
+                "external_id": str(
+                    parent_member.get("id")
+                    if isinstance(parent_member, dict) and parent_member.get("id")
+                    else cast_member.get("id")
+                ) if (cast_member.get("id") or (isinstance(parent_member, dict) and parent_member.get("id"))) else None,
                 "urls": cast_member.get("urls") or []
             })
 

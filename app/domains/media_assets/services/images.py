@@ -123,10 +123,7 @@ class ImageProcessingService(ImageServicePort):
 
         try:
             def use_adult_scene_poster_height_limit(filename: str, width: int, height: int) -> bool:
-                if subfolder != "posters" or width <= height:
-                    return False
-                lowered = filename.lower()
-                return lowered.startswith(("stashdb_", "fansdb_", "porndb_"))
+                return False
 
             # 1. Quick size check to avoid decoding/processing if already small
             with Image.open(orig) as img:
@@ -289,15 +286,7 @@ class ImageProcessingService(ImageServicePort):
                 if self.exists(thumb_path):
                     return f"/media/images/thumbnails/scene_stills/{thumb_path.name}"
 
-        if subfolder == "posters" and embedded_subfolder == "scene_stills":
-            source_orig_path = self.get_original_path("scene_stills", filename)
-            poster_thumb_path = self.get_thumbnail_path("posters", filename)
-            if self.exists(poster_thumb_path):
-                return f"/media/images/thumbnails/posters/{poster_thumb_path.name}"
-            if self.exists(source_orig_path):
-                self.generate_thumbnail(source_orig_path, poster_thumb_path, "posters")
-                if self.exists(poster_thumb_path):
-                    return f"/media/images/thumbnails/posters/{poster_thumb_path.name}"
+
 
         orig_path = self.get_original_path(embedded_subfolder, filename)
         if self.exists(orig_path):

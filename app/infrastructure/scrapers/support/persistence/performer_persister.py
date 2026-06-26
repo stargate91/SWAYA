@@ -47,28 +47,32 @@ class PerformerPersister:
         if not basename:
             return
 
-        try:
-            import requests
-            headers = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-            }
-            resp = requests.head(url, headers=headers, timeout=3, allow_redirects=True)
-            ct = resp.headers.get("Content-Type", "").lower()
-            if "png" in ct:
-                ext = ".png"
-            elif "webp" in ct:
-                ext = ".webp"
-            elif "gif" in ct:
-                ext = ".gif"
-            elif "svg" in ct:
-                ext = ".svg"
-            elif "jpeg" in ct or "jpg" in ct:
+        ext = os.path.splitext(basename)[1].lower()
+        if ext not in {'.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg'}:
+            try:
+                import requests
+                headers = {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                }
+                resp = requests.head(url, headers=headers, timeout=3, allow_redirects=True)
+                ct = resp.headers.get("Content-Type", "").lower()
+                if "png" in ct:
+                    ext = ".png"
+                elif "webp" in ct:
+                    ext = ".webp"
+                elif "gif" in ct:
+                    ext = ".gif"
+                elif "svg" in ct:
+                    ext = ".svg"
+                elif "jpeg" in ct or "jpg" in ct:
+                    ext = ".jpg"
+                else:
+                    ext = ".jpg"
+            except Exception:
                 ext = ".jpg"
-            else:
-                ext = os.path.splitext(basename)[1].lower() or ".jpg"
-        except Exception:
-            ext = os.path.splitext(basename)[1].lower() or ".jpg"
-        basename = f"{basename}{ext}"
+
+        if ext == ".jpeg":
+            ext = ".jpg"
 
         safe_name = re.sub(r"[^A-Za-z0-9_.-]+", "_", person.name).strip("_")
         ext_id = "unknown"
@@ -78,7 +82,7 @@ class PerformerPersister:
                 prov_val = k
                 ext_id = v
                 break
-        filename = f"{prov_val}_{ext_id}_{safe_name}_{basename}"
+        filename = f"{prov_val}_{ext_id}{ext}"
         person.local_profile_path = f"people/{filename}"
         self.image_downloader.enqueue_download(url, "people", filename)
 

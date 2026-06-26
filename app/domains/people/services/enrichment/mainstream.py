@@ -31,7 +31,12 @@ class TMDBEnricher:
             result["homepage"] = details.get("homepage")
             
             images_data = details.get("images", {}).get("profiles", [])
-            result["images"] = [img.get("file_path") for img in images_data if img.get("file_path")]
+            tmdb_imgs = [img.get("file_path") for img in images_data if img.get("file_path")]
+            if result["images"] is None:
+                result["images"] = []
+            for img in tmdb_imgs:
+                if img not in result["images"]:
+                    result["images"].append(img)
 
             original_bio = details.get("biography")
             if original_bio:

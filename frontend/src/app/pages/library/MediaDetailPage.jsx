@@ -283,9 +283,28 @@ export default function MediaDetailPage({ type = 'movie' }) {
           </>
         )}
       >
-        <MediaHeaderInfo />
-        <UserRatingSection />
-        <MediaOverview />
+        {(!state.logoUrl && !state.backdropUrl && state.posterUrl) ? (
+          <div className="media-detail-page__fallback-grid">
+            <div
+              className="media-detail-page__fallback-poster-col"
+              onClick={handleOpenPosterModal}
+              title={t('library.details.choosePoster') || 'Choose Poster'}
+            >
+              <img src={state.posterUrl} alt={state.title} className="media-detail-page__fallback-poster" />
+            </div>
+            <div className="media-detail-page__fallback-content-col">
+              <MediaHeaderInfo isFallbackGrid={true} />
+              <UserRatingSection />
+              <MediaOverview />
+            </div>
+          </div>
+        ) : (
+          <>
+            <MediaHeaderInfo />
+            <UserRatingSection />
+            <MediaOverview />
+          </>
+        )}
         <MediaActions />
       </DetailPageShell>
     </MediaDetailProvider>

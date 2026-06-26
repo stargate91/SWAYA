@@ -5,7 +5,7 @@ import { useMediaDetailContext } from './MediaDetailContext';
 import './MediaHeaderInfo.css';
 
 
-export default function MediaHeaderInfo() {
+export default function MediaHeaderInfo({ isFallbackGrid = false }) {
   const { t } = useTranslation();
   const { state, handleOpenLogoModal } = useMediaDetailContext();
   const {
@@ -36,7 +36,7 @@ export default function MediaHeaderInfo() {
   } = state;
 
   return (
-    <div className="media-detail-page__header-layout">
+    <div className={`media-detail-page__header-layout ${isFallbackGrid ? 'media-detail-page__header-layout--fallback' : ''}`}>
       <div className="media-detail-page__header-copy">
         <div
           className="media-detail-page__logo-container clickable"
