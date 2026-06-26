@@ -110,7 +110,9 @@ export function EntityCardGrid({ items, type, navigate, t }) {
     }
 
     if (isSceneMediaType(resolvedType)) {
-      const sceneId = item.in_library ? (item.library_item_id || item.id) : `stash_${item.stash_id || item.id}`;
+      const itemSource = item.source;
+      const prefix = itemSource === 'porndb' || itemSource === 'theporndb' ? 'porndb' : itemSource === 'fansdb' ? 'fansdb' : 'stash';
+      const sceneId = item.in_library ? (item.library_item_id || item.id) : `${prefix}_${item.stash_id || item.id}`;
       navigate(`/library/scene/${sceneId}`);
       return;
     }
@@ -169,7 +171,9 @@ function HorizontalCollectionItemsList({ items, navigate, t }) {
     }
 
     if (isSceneMediaType(resolvedType)) {
-      const sceneId = item.in_library ? (item.library_item_id || item.id) : `stash_${item.stash_id || item.id}`;
+      const itemSource = item.source;
+      const prefix = itemSource === 'porndb' || itemSource === 'theporndb' ? 'porndb' : itemSource === 'fansdb' ? 'fansdb' : 'stash';
+      const sceneId = item.in_library ? (item.library_item_id || item.id) : `${prefix}_${item.stash_id || item.id}`;
       navigate(`/library/scene/${sceneId}`);
       return;
     }

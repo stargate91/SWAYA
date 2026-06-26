@@ -140,14 +140,14 @@ def apply_enriched_data(enricher, person: Person, data: dict):
                     break
             filename = f"{prov_val}_{ext_id}{ext}"
 
-        existing_imgs = person.images or []
-        new_imgs = data.get("images") or []
-        person.images = EnrichmentHelpers.merge_images(existing_imgs, new_imgs)
-
         if enricher.image_downloader:
             enricher.image_downloader.enqueue_download(url, "people", filename)
         else:
             logger.warning("No image_downloader available for profile image download")
+
+    existing_imgs = person.images or []
+    new_imgs = data.get("images") or []
+    person.images = EnrichmentHelpers.merge_images(existing_imgs, new_imgs)
 
 def save_bio(enricher, person_id: int, locale: str, biography: str):
     loc = enricher.db.query(PersonLocalization).filter(

@@ -80,6 +80,45 @@ export default function TMDBImageGrid({
           list = list.filter(isPornDB);
         }
       }
+      // Deduplicate local vs remote duplicates
+      const seenNames = new Set();
+      const filteredList = [];
+      for (const img of list) {
+        if (!img) continue;
+        const lowerImg = img.toLowerCase();
+        const filename = lowerImg.split('/').pop().split('?')[0];
+        const cleanName = filename
+          .replace(/\.[^/.]+$/, "")
+          .replace('tmdb_', '')
+          .replace('stashdb_', '')
+          .replace('stash_', '')
+          .replace('fansdb_', '')
+          .replace('porndb_', '')
+          .replace('theporndb_', '');
+
+        if (seenNames.has(cleanName)) {
+          const existingIdx = filteredList.findIndex(x => {
+            const xFile = x.toLowerCase().split('/').pop().split('?')[0];
+            const xClean = xFile
+              .replace(/\.[^/.]+$/, "")
+              .replace('tmdb_', '')
+              .replace('stashdb_', '')
+              .replace('stash_', '')
+              .replace('fansdb_', '')
+              .replace('porndb_', '')
+              .replace('theporndb_', '');
+            return xClean === cleanName;
+          });
+          if (existingIdx !== -1 && lowerImg.startsWith('/')) {
+            filteredList[existingIdx] = img;
+          }
+        } else {
+          seenNames.add(cleanName);
+          filteredList.push(img);
+        }
+      }
+      list = filteredList;
+
       return list.map((img) => ({
         file_path: img,
         width: 0,

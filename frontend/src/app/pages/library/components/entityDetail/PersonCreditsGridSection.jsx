@@ -128,7 +128,9 @@ export default function PersonCreditsGridSection({ title, personId, mediaType, t
   const openItem = (item) => {
     const isScene = item.media_type === 'scene' || item.type === 'scene';
     if (isScene) {
-      const sceneId = item.in_library ? (item.library_item_id || item.id) : `stash_${item.stash_id || item.id}`;
+      const itemSource = item.source || source;
+      const prefix = itemSource === 'porndb' || itemSource === 'theporndb' ? 'porndb' : itemSource === 'fansdb' ? 'fansdb' : 'stash';
+      const sceneId = item.in_library ? (item.library_item_id || item.id) : `${prefix}_${item.stash_id || item.id}`;
       navigate(`/library/scene/${sceneId}`);
       return;
     }

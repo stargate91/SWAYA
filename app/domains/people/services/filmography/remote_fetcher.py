@@ -56,7 +56,7 @@ class RemoteCreditsFetcher:
         mapped_items = []
         total_items = 0
         
-        remote_per_page = 1000 if source.lower() in ("stashdb", "fansdb") else 100
+        remote_per_page = 1000
         
         if source.lower() in ("stashdb", "fansdb"):
             if media_type != "scene":
@@ -124,6 +124,7 @@ class RemoteCreditsFetcher:
                             "poster_path": poster_url,
                             "in_library": False,
                             "stash_id": sid,
+                            "source": source.lower(),
                         })
             except Exception as e:
                 logger.error(f"Error querying StashDB/FansDB scene credits: {e}")
@@ -168,6 +169,7 @@ class RemoteCreditsFetcher:
                                     "rating_porndb": rating,
                                     "in_library": False,
                                     "stash_id": xid,
+                                    "source": "porndb",
                                 })
                                 
                     elif media_type == "scene":
@@ -202,6 +204,7 @@ class RemoteCreditsFetcher:
                                     "rating_porndb": rating,
                                     "in_library": False,
                                     "stash_id": xid,
+                                    "source": "porndb",
                                 })
             except Exception as e:
                 logger.error(f"Error querying PornDB REST API for performer {person_id}: {e}")
@@ -239,6 +242,7 @@ class RemoteCreditsFetcher:
                     "in_library": True,
                     "library_item_id": item.id,
                     "stash_id": match.external_id if (match.provider and match.provider.value == source.lower()) else None,
+                    "source": source.lower(),
                 })
         except Exception as e:
             logger.error(f"Error querying local items in _fetch_remote_credits: {e}")
