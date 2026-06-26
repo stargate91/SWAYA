@@ -749,7 +749,7 @@ def save_custom_fields(
 
 
 @router.delete("/{person_id}")
-def delete_person(person_id: str, db: Session = Depends(get_db)):
+def delete_person(person_id: int, db: Session = Depends(get_db)):
     person = resolve_person(person_id, db)
     if not person:
         raise HTTPException(status_code=404, detail="Person not found")

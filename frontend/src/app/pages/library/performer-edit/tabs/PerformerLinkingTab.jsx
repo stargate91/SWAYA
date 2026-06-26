@@ -20,7 +20,8 @@ import EmptyState from '@/ui/EmptyState';
 import NavButton from '@/ui/NavButton';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import Spinner from '@/ui/Spinner';
-import { Search, Link as LinkIcon, User, Trash2, GitFork, Star, ArrowLeft } from 'lucide-react';
+import { Search, Link as LinkIcon, User, Trash2, GitFork, Star, ArrowLeft, AlertTriangle } from 'lucide-react';
+import Modal from '@/ui/Modal';
 
 const FemaleSilhouette = () => (
   <svg viewBox="0 0 24 24" className="performer-gender-silhouette" fill="currentColor" style={{ color: '#ec4899' }}>
@@ -69,6 +70,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const navigate = useNavigate();
   const linkMutation = useLinkPersonSourceMutation();
@@ -179,18 +181,25 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
     }
   };
 
+  const executeDelete = () => {
+    deleteMutation.mutate(personId, {
+      onSuccess: () => {
+        toast('Performer removed from database successfully.', 'success');
+        navigate('/library', { replace: true });
+      },
+      onError: (err) => {
+        toast(err.message || 'Failed to delete performer', 'danger');
+      },
+      onSettled: () => {
+        setShowDeleteConfirm(false);
+      }
+    });
+  };
+
   const handleUnlink = (sourceKey, action) => {
     const linkedSourcesCount = SOURCE_BUCKETS.filter(bucket => !!getLinkedInfo(bucket)).length;
     if (action === 'remove' && linkedSourcesCount === 1) {
-      deleteMutation.mutate(personId, {
-        onSuccess: () => {
-          toast('Performer removed from database successfully.', 'success');
-          navigate('/library', { replace: true });
-        },
-        onError: (err) => {
-          toast(err.message || 'Failed to delete performer', 'danger');
-        }
-      });
+      setShowDeleteConfirm(true);
       return;
     }
 
@@ -419,6 +428,35 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
           );
         })}
       </div>
+      <Modal
+        open={showDeleteConfirm}
+        title={t('library.details.deletePerformerTitle') || 'Delete Performer?'}
+        onClose={() => setShowDeleteConfirm(false)}
+        variant="danger"
+        icon={AlertTriangle}
+        footer={
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+            <Button
+              variant="secondary-neutral"
+              onClick={() => setShowDeleteConfirm(false)}
+              disabled={deleteMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              onClick={executeDelete}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? 'Deleting...' : (t('library.details.deletePerformerConfirmBtn') || 'Delete Performer')}
+            </Button>
+          </div>
+        }
+      >
+        <p style={{ margin: 0, lineHeight: 1.5 }}>
+          {t('library.details.deletePerformerWarning') || 'Are you sure you want to permanently delete this performer? All manually entered attributes, custom biographies, overrides, and ratings will be lost.'}
+        </p>
+      </Modal>
     </div>
   );
 }
