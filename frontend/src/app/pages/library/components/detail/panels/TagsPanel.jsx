@@ -20,7 +20,7 @@ export default function TagsPanel() {
   } = mutations;
 
   const [newTagName, setNewTagName] = useState('');
-  const [newTagColor, setNewTagColor] = useState('#3b82f6');
+  const [newTagColor, setNewTagColor] = useState('var(--color-accent-blue)');
   const [newTagError, setNewTagError] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -30,8 +30,12 @@ export default function TagsPanel() {
 
   const currentTags = item?.custom_tags || [];
   const PREDEFINED_COLORS = [
-    '#3b82f6', '#10b981', '#ef4444', '#8b5cf6',
-    '#ec4899', '#f59e0b', '#6366f1', '#14b8a6'
+    'var(--color-accent-blue)',
+    'color-mix(in srgb, var(--color-accent-blue) 75%, white)',
+    'color-mix(in srgb, var(--color-accent-blue) 75%, black)',
+    'var(--color-state-success)',
+    'var(--color-state-warning)',
+    'var(--color-state-danger)'
   ];
 
   const handleToggleTag = (tagName) => {
@@ -79,7 +83,7 @@ export default function TagsPanel() {
       });
 
       setNewTagName('');
-      setNewTagColor('#3b82f6');
+      setNewTagColor('var(--color-accent-blue)');
       setNewTagError('');
     } catch (err) {
       setNewTagError(err.message || 'Failed to create tag');

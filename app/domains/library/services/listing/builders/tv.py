@@ -58,3 +58,40 @@ class TvQueryBuilder(BaseQueryBuilder):
         total_items = query.count()
         items = query.offset((params.page - 1) * params.page_size).limit(params.page_size).all()
         return query, total_items, items
+
+    def _apply_sorting(
+        self,
+        query: Any,
+        params: ListingFilterParams,
+        joined_localization: bool,
+        joined_override: bool
+    ) -> Any:
+        if params.sort_by in ("file_size_desc", "size_desc", "file_size_asc", "size_asc"):
+            from sqlalchemy import select, func, or_, desc
+            from sqlalchemy.orm import aliased
+            child_match = aliased(MetadataMatch)
+            season_match = aliased(MetadataMatch)
+
+            total_size_subquery = (
+                select(func.sum(MediaItem.size))
+                .select_from(MediaItem)
+                .join(child_match, child_match.media_item_id == MediaItem.id)
+                .outerjoin(season_match, child_match.parent_id == season_match.id)
+                .where(
+                    or_(
+                        child_match.id == MetadataMatch.id,
+                        child_match.parent_id == MetadataMatch.id,
+                        season_match.parent_id == MetadataMatch.id
+                    )
+                )
+                .correlate(MetadataMatch)
+                .scalar_subquery()
+            )
+
+            size_val = func.coalesce(total_size_subquery, 0)
+            if params.sort_by in ("file_size_desc", "size_desc"):
+                return query.order_by(desc(size_val))
+            else:
+                return query.order_by(size_val.asc())
+
+        return super()._apply_sorting(query, params, joined_localization, joined_override)

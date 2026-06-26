@@ -64,11 +64,40 @@ class PerformerDetailReader:
             limit=limit,
         )
 
-    def get_person_detail(self, person_id: int) -> PersonDetailResponse:
+    def _resolve_person(self, person_id: int, load_localizations: bool = False) -> Person:
         db = self.db
-        person = db.query(Person).options(joinedload(Person.localizations)).filter(Person.id == person_id).first()
+        query = db.query(Person)
+        if load_localizations:
+            query = query.options(joinedload(Person.localizations))
+        
+        person = query.filter(Person.id == person_id).first()
+        if not person:
+            query_ext = db.query(Person)
+            if load_localizations:
+                query_ext = query_ext.options(joinedload(Person.localizations))
+            person = query_ext.filter(
+                Person.external_ids["tmdb"].as_string() == str(person_id)
+            ).first()
+            
+            if not person:
+                try:
+                    res = self.add_person_tmdb(str(person_id))
+                    if res and res.get("status") == "success":
+                        query_new = db.query(Person)
+                        if load_localizations:
+                            query_new = query_new.options(joinedload(Person.localizations))
+                        person = query_new.filter(Person.id == res["id"]).first()
+                except Exception as e:
+                    logger.error(f"Error dynamically importing person {person_id} from TMDB: {e}")
+                    
         if not person:
             raise HTTPException(status_code=404, detail="Person not found")
+        return person
+
+    def get_person_detail(self, person_id: int) -> PersonDetailResponse:
+        db = self.db
+        person = self._resolve_person(person_id, load_localizations=True)
+        person_id = person.id
         user_id = get_current_user_id() or 1
         override_dict = self.library_port.get_person_user_override(user_id, person_id)
         
@@ -277,9 +306,8 @@ class PerformerDetailReader:
 
     def get_person_movies(self, person_id: int, page: int = 1, page_size: int = 12, source: Optional[str] = None) -> PersonFilmographyResponse:
         db = self.db
-        person = db.query(Person).filter(Person.id == person_id).first()
-        if not person:
-            raise HTTPException(status_code=404, detail="Person not found")
+        person = self._resolve_person(person_id)
+        person_id = person.id
         
         ext_ids = person.external_ids or {}
         tmdb_id = ext_ids.get("tmdb") or ext_ids.get("tmdb_id")
@@ -316,9 +344,8 @@ class PerformerDetailReader:
 
     def get_person_tv(self, person_id: int, page: int = 1, page_size: int = 12) -> PersonFilmographyResponse:
         db = self.db
-        person = db.query(Person).filter(Person.id == person_id).first()
-        if not person:
-            raise HTTPException(status_code=404, detail="Person not found")
+        person = self._resolve_person(person_id)
+        person_id = person.id
 
         ext_ids = person.external_ids or {}
         tmdb_id = ext_ids.get("tmdb") or ext_ids.get("tmdb_id")
@@ -351,9 +378,8 @@ class PerformerDetailReader:
 
     def get_person_scenes(self, person_id: int, page: int = 1, page_size: int = 12, source: Optional[str] = None) -> PersonFilmographyResponse:
         db = self.db
-        person = db.query(Person).filter(Person.id == person_id).first()
-        if not person:
-            raise HTTPException(status_code=404, detail="Person not found")
+        person = self._resolve_person(person_id)
+        person_id = person.id
         res = self.filmography_service.get_person_scenes(person_id, page, page_size, source)
         return PersonFilmographyResponse(**res)
 

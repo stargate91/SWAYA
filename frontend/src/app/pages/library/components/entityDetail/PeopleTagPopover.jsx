@@ -5,14 +5,18 @@ import { useAllTagsQuery, useCreateTagMutation } from '@/queries/libraryQueries'
 import './PeopleTagPopover.css';
 
 const PREDEFINED_COLORS = [
-  '#3b82f6', '#10b981', '#ef4444', '#8b5cf6',
-  '#ec4899', '#f59e0b', '#6366f1', '#14b8a6',
+  'var(--color-accent-blue)',
+  'color-mix(in srgb, var(--color-accent-blue) 75%, white)',
+  'color-mix(in srgb, var(--color-accent-blue) 75%, black)',
+  'var(--color-state-success)',
+  'var(--color-state-warning)',
+  'var(--color-state-danger)'
 ];
 
 export default function PeopleTagPopover({ item, t, updatePersonStatusMutation }) {
   const [isOpen, setIsOpen] = useState(false);
   const [newTagName, setNewTagName] = useState('');
-  const [newTagColor, setNewTagColor] = useState('#3b82f6');
+  const [newTagColor, setNewTagColor] = useState('var(--color-accent-blue)');
   const [newTagError, setNewTagError] = useState('');
   const popoverRef = useRef(null);
   const { data: allTags = [] } = useAllTagsQuery(item?.is_adult);
@@ -84,7 +88,7 @@ export default function PeopleTagPopover({ item, t, updatePersonStatusMutation }
       });
 
       setNewTagName('');
-      setNewTagColor('#3b82f6');
+      setNewTagColor('var(--color-accent-blue)');
       setNewTagError('');
     } catch (err) {
       setNewTagError(err.message || 'Failed to create tag');

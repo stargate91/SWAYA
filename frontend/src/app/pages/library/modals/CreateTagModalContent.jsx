@@ -2,25 +2,21 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAllTagsQuery, useCreateTagMutation, useUpdateTagMutation } from '@/queries';
 import Input from '@/ui/Input';
 import Tooltip from '@/ui/Tooltip';
-import Pill from '@/ui/Pill';
-import { Paintbrush } from 'lucide-react';
 import { API_BASE } from '@/lib/backend';
 
 const REMOVE_SYMBOL = '✕';
 const BULLET_POINT = '• ';
 
 const PREDEFINED_COLORS = [
-  '#3b82f6', // Blue
-  '#10b981', // Emerald
-  '#ef4444', // Red
-  '#8b5cf6', // Purple
-  '#ec4899', // Pink
-  '#f59e0b', // Yellow
-  '#6366f1', // Indigo
-  '#14b8a6', // Teal
+  'var(--color-accent-blue)',
+  'color-mix(in srgb, var(--color-accent-blue) 75%, white)',
+  'color-mix(in srgb, var(--color-accent-blue) 75%, black)',
+  'var(--color-state-success)',
+  'var(--color-state-warning)',
+  'var(--color-state-danger)'
 ];
 
-export default function CreateTagModalContent({ onClose, t, initialTag = null, mode = 'create', onSuccess, defaultColor = '#3b82f6', isAdult = false }) {
+export default function CreateTagModalContent({ onClose, t, initialTag = null, mode = 'create', onSuccess, defaultColor = 'var(--color-accent-blue)', isAdult = false }) {
   const [name, setName] = useState(initialTag?.name || '');
   const [color, setColor] = useState(initialTag?.color || defaultColor);
   const [customImages, setCustomImages] = useState(
@@ -264,48 +260,6 @@ export default function CreateTagModalContent({ onClose, t, initialTag = null, m
             );
           })}
 
-          {/* Custom Color Selector */}
-          <label
-            className={`create-tag-form__custom-color-label ${!PREDEFINED_COLORS.includes(color) ? 'is-active' : ''}`.trim()}
-            /* eslint-disable-next-line react/forbid-dom-props */
-            style={{
-              background: !PREDEFINED_COLORS.includes(color)
-                ? color
-                : 'var(--color-surface-glass-strong, rgba(255, 255, 255, 0.08))',
-              border: !PREDEFINED_COLORS.includes(color)
-                ? '2px solid var(--color-accent-blue, #1493ff)'
-                : '1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.05))',
-              boxShadow: !PREDEFINED_COLORS.includes(color) ? '0 0 8px rgba(20, 147, 255, 0.4)' : 'none',
-            }}
-          >
-            <Paintbrush
-              size={12}
-              className="create-tag-form__paintbrush"
-            />
-            <input
-              type="color"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-              tabIndex={-1}
-              aria-label={t('library.tags.customColor') || 'Custom Color'}
-              className="create-tag-form__color-input"
-            />
-          </label>
-
-          {/* Hex Display Pill */}
-          <Pill
-            variant="default"
-            className="create-tag-form__color-hex-pill"
-            customStyle={{
-              borderColor: color,
-              borderWidth: '1px',
-              borderStyle: 'solid',
-              color: color,
-              background: `color-mix(in srgb, ${color} 12%, var(--color-bg-elevated))`
-            }}
-          >
-            {String(color).toUpperCase()}
-          </Pill>
         </div>
       </div>
     </form>

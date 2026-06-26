@@ -38,6 +38,8 @@ class LocalCreditsAggregator:
         for link in links:
             match = link.match
             item = match.media_item
+            if not item:
+                continue
             match_loc = LanguageService.get_best_localization(match.localizations, ui_lang)
             title = match_loc.title if match_loc else item.filename
             
