@@ -317,7 +317,7 @@ class PerformerDetailReader:
             "rating_porndb": person.rating_porndb,
             "known_for_department": person.known_for_department,
             "is_adult": person.is_adult,
-            "profile_path": self._resolve_img((override_dict.get("custom_poster") if override_dict and override_dict.get("custom_poster") else person.profile_path), "people"),
+            "profile_path": self._resolve_img((override_dict.get("custom_poster") if override_dict and override_dict.get("custom_poster") else (person.local_profile_path or person.profile_path)), "people"),
             "backdrop_path": self._resolve_img(effective_backdrop, "backdrops", size="original"),
             "backdrop_source_tmdb_id": source_tmdb_id,
             "backdrop_source_media_type": source_media_type,

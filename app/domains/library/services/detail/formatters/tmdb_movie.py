@@ -27,27 +27,55 @@ class TmdbMovieFormatter(MovieDetailFormatter):
             return JSONResponse(status_code=404, content={"error": "Movie not found on TMDB"})
         
         credits = tmdb_data.get("credits", {})
+        from app.domains.people.models import Person
+
+        # Fetch local overrides for matching TMDB people
+        person_ids = set()
+        for actor in credits.get("cast", []):
+            if actor.get("id"):
+                person_ids.add(str(actor["id"]))
+        for crew in credits.get("crew", []):
+            if crew.get("id"):
+                person_ids.add(str(crew["id"]))
+
+        local_profiles = {}
+        if person_ids:
+            try:
+                local_people = db.query(Person).filter(
+                    Person.external_ids["tmdb"].as_string().in_(list(person_ids))
+                ).all()
+                for lp in local_people:
+                    tmdb_id_str = lp.external_ids.get("tmdb")
+                    if tmdb_id_str:
+                        local_profiles[int(tmdb_id_str)] = lp.local_profile_path or lp.profile_path
+            except Exception as e:
+                logger.error(f"Failed to query custom performer avatars for movie detail: {e}")
+
         cast = []
         directors = []
         writers = []
         
         for actor in credits.get("cast", [])[:15]:
+            actor_id = actor.get("id")
+            resolved_img = local_profiles.get(actor_id) if actor_id else None
             cast.append({
-                "id": actor.get("id"),
+                "id": actor_id,
                 "name": actor.get("name"),
                 "character": actor.get("character"),
                 "job": "Actor",
-                "profile_path": self._resolve_img(actor.get("profile_path"), "people"),
+                "profile_path": self._resolve_img(resolved_img or actor.get("profile_path"), "people"),
                 "popularity": actor.get("popularity", 0),
                 "gender": actor.get("gender")
             })
         
         for crew in credits.get("crew", []):
+            crew_id = crew.get("id")
+            resolved_img = local_profiles.get(crew_id) if crew_id else None
             crew_member = {
-                "id": crew.get("id"),
+                "id": crew_id,
                 "name": crew.get("name"),
                 "job": crew.get("job"),
-                "profile_path": self._resolve_img(crew.get("profile_path"), "people"),
+                "profile_path": self._resolve_img(resolved_img or crew.get("profile_path"), "people"),
                 "popularity": crew.get("popularity", 0),
                 "gender": crew.get("gender")
             }

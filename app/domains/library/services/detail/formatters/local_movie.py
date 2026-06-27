@@ -59,7 +59,7 @@ class LocalMovieFormatter(MovieDetailFormatter):
                     "name": person.name,
                     "character": link.character_name,
                     "job": link.role.value if hasattr(link.role, "value") else str(link.role),
-                    "profile_path": self._resolve_img(person.profile_path, "people"),
+                    "profile_path": self._resolve_img(person.local_profile_path or person.profile_path, "people"),
                     "popularity": (
                         person.rating_porndb
                         if person.is_adult and person.rating_porndb is not None

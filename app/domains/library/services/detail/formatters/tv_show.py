@@ -190,37 +190,70 @@ class TvShowFormatter(DetailFormatter):
         directors = []
         writers = []
         
+        from app.domains.people.models import Person
+
+        # Fetch local overrides for matching TMDB people
+        person_ids = set()
         for creator in tmdb_data.get("created_by", []) or []:
+            if creator.get("id"):
+                person_ids.add(str(creator["id"]))
+        for actor in tv_credits.get("cast", []):
+            if actor.get("id"):
+                person_ids.add(str(actor["id"]))
+        for crew in tmdb_data.get("credits", {}).get("crew", []):
+            if crew.get("id"):
+                person_ids.add(str(crew["id"]))
+
+        local_profiles = {}
+        if person_ids:
+            try:
+                local_people = db.query(Person).filter(
+                    Person.external_ids["tmdb"].as_string().in_(list(person_ids))
+                ).all()
+                for lp in local_people:
+                    tmdb_id_str = lp.external_ids.get("tmdb")
+                    if tmdb_id_str:
+                        local_profiles[int(tmdb_id_str)] = lp.local_profile_path or lp.profile_path
+            except Exception as e:
+                logger.error(f"Failed to query custom performer avatars for TV detail: {e}")
+
+        for creator in tmdb_data.get("created_by", []) or []:
+            creator_id = creator.get("id")
+            resolved_img = local_profiles.get(creator_id) if creator_id else None
             directors.append({
-                "id": creator.get("id"),
+                "id": creator_id,
                 "name": creator.get("name"),
                 "job": "Creator",
                 "gender": creator.get("gender"),
-                "profile_path": self._resolve_img(creator.get("profile_path"), "people"),
+                "profile_path": self._resolve_img(resolved_img or creator.get("profile_path"), "people"),
             })
             
         for actor in tv_credits.get("cast", [])[:15]:
+            actor_id = actor.get("id")
+            resolved_img = local_profiles.get(actor_id) if actor_id else None
             character = actor.get("character")
             if not character and "roles" in actor:
                 roles = actor.get("roles", [])
                 if roles:
                     character = ", ".join(filter(None, [r.get("character") for r in roles]))
             cast.append({
-                "id": actor.get("id"),
+                "id": actor_id,
                 "name": actor.get("name"),
                 "character": character,
                 "gender": actor.get("gender"),
-                "profile_path": self._resolve_img(actor.get("profile_path"), "people"),
+                "profile_path": self._resolve_img(resolved_img or actor.get("profile_path"), "people"),
             })
             
         crew_list = tmdb_data.get("credits", {}).get("crew", [])
         for crew in crew_list:
+            crew_id = crew.get("id")
+            resolved_img = local_profiles.get(crew_id) if crew_id else None
             crew_member = {
-                "id": crew.get("id"),
+                "id": crew_id,
                 "name": crew.get("name"),
                 "job": crew.get("job"),
                 "gender": crew.get("gender"),
-                "profile_path": self._resolve_img(crew.get("profile_path"), "people"),
+                "profile_path": self._resolve_img(resolved_img or crew.get("profile_path"), "people"),
             }
             if crew.get("job") == "Director":
                 directors.append(crew_member)
