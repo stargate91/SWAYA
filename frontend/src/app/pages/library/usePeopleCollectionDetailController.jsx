@@ -261,6 +261,7 @@ export default function usePeopleCollectionDetailController({
       variant: 'extra-wide',
       content: (
         <CollectionBackdropsPanel
+          key={item.tmdb_id}
           item={item}
           collectionId={item.tmdb_id}
           t={t}
@@ -283,6 +284,7 @@ export default function usePeopleCollectionDetailController({
       className: 'person-backdrop-picker-modal',
       content: (
         <PersonBackdropPickerModal
+          key={item.id}
           personId={item.id}
           item={item}
           t={t}

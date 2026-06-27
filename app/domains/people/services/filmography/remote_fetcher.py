@@ -143,6 +143,11 @@ class RemoteCreditsFetcher:
                     "library_item_id": local_item["id"],
                 })
                 local_item["_merged"] = True
+            else:
+                item.update({
+                    "in_library": False,
+                    "library_item_id": None,
+                })
             combined_items.append(item)
             
         for li in local_items:
