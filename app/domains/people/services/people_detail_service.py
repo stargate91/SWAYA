@@ -114,12 +114,14 @@ class PeopleDetailService:
         name: Optional[str] = None,
         profile_path: Optional[str] = None,
         gender: Optional[int] = None,
-        is_adult: Optional[bool] = None
+        is_adult: Optional[bool] = None,
+        is_active: bool = False
     ) -> Dict[str, Any]:
         return self.reader.add_person_tmdb(
             db_id_or_external=db_id_or_external,
             name=name,
             profile_path=profile_path,
             gender=gender,
-            is_adult=is_adult
+            is_adult=is_adult,
+            is_active=is_active
         )

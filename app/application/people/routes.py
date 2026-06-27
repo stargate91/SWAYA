@@ -92,7 +92,8 @@ def add_person_tmdb(
         name=payload.name,
         profile_path=payload.profile_path,
         gender=payload.gender,
-        is_adult=payload.is_adult
+        is_adult=payload.is_adult,
+        is_active=True
     )
 
 

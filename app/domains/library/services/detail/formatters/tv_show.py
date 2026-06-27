@@ -195,6 +195,7 @@ class TvShowFormatter(DetailFormatter):
                 "id": creator.get("id"),
                 "name": creator.get("name"),
                 "job": "Creator",
+                "gender": creator.get("gender"),
                 "profile_path": self._resolve_img(creator.get("profile_path"), "people"),
             })
             
@@ -208,6 +209,7 @@ class TvShowFormatter(DetailFormatter):
                 "id": actor.get("id"),
                 "name": actor.get("name"),
                 "character": character,
+                "gender": actor.get("gender"),
                 "profile_path": self._resolve_img(actor.get("profile_path"), "people"),
             })
             
@@ -217,6 +219,7 @@ class TvShowFormatter(DetailFormatter):
                 "id": crew.get("id"),
                 "name": crew.get("name"),
                 "job": crew.get("job"),
+                "gender": crew.get("gender"),
                 "profile_path": self._resolve_img(crew.get("profile_path"), "people"),
             }
             if crew.get("job") == "Director":

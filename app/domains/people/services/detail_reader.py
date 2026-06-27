@@ -91,6 +91,8 @@ class PerformerDetailReader:
                 source_name = parts[0]
                 uuid_str = parts[1]
                 scraper_name = "porndb" if source_name == "theporndb" else source_name
+                if scraper_name == "stash":
+                    scraper_name = "stashdb"
                 try:
                     provider_enum = Provider(scraper_name)
                     link = db.query(ExternalSourceLink).filter(
@@ -490,7 +492,8 @@ class PerformerDetailReader:
         name: Optional[str] = None,
         profile_path: Optional[str] = None,
         gender: Optional[int] = None,
-        is_adult: Optional[bool] = None
+        is_adult: Optional[bool] = None,
+        is_active: bool = False
     ) -> Dict[str, Any]:
         return self.search_service.add_person_tmdb(
             db_id_or_external=db_id_or_external,
@@ -498,4 +501,5 @@ class PerformerDetailReader:
             profile_path=profile_path,
             gender=gender,
             is_adult=is_adult,
+            is_active=is_active,
         )

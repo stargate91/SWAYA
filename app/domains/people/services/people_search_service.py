@@ -193,7 +193,8 @@ class PeopleSearchService:
         name: Optional[str] = None,
         profile_path: Optional[str] = None,
         gender: Optional[int] = None,
-        is_adult: Optional[bool] = None
+        is_adult: Optional[bool] = None,
+        is_active: bool = False
     ) -> Dict[str, Any]:
         db = self.db
         from app.domains.people.services.person_service import PersonService
@@ -204,6 +205,8 @@ class PeopleSearchService:
             uuid_str = parts[1]
             
             scraper_name = "porndb" if source_name == "theporndb" else source_name
+            if scraper_name == "stash":
+                scraper_name = "stashdb"
             provider_enum = Provider(scraper_name)
 
             link = db.query(ExternalSourceLink).filter(
@@ -212,6 +215,9 @@ class PeopleSearchService:
             ).first()
             if link and link.person:
                 person = link.person
+                if is_active:
+                    person.is_active = True
+                    db.commit()
                 return {"status": "success", "id": person.id, "name": person.name}
 
             scraper_client = self.scrapers.adult(provider_enum, db)
@@ -259,6 +265,7 @@ class PeopleSearchService:
                 urls=perf.get("urls")
             )
             
+            person.is_active = is_active
             db.commit()
             return {"status": "success", "id": person.id, "name": person.name}
             
@@ -274,6 +281,9 @@ class PeopleSearchService:
             else:
                 person = person_query.first()
             if person:
+                if is_active:
+                    person.is_active = True
+                    db.commit()
                 return {"status": "success", "id": person.id, "name": person.name}
                 
             tmdb_details = None
@@ -306,5 +316,6 @@ class PeopleSearchService:
                 known_for_department=tmdb_details.get("known_for_department") or "Acting"
             )
             
+            person.is_active = is_active
             db.commit()
             return {"status": "success", "id": person.id, "name": person.name}

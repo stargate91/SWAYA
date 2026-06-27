@@ -7,6 +7,8 @@ from app.domains.users.models import UserOverride
 from app.application.library.schemas import MovieDetailResponse
 from app.domains.library.services.detail.formatters.base import MovieDetailFormatter
 
+from app.domains.people.models import Person
+
 logger = logging.getLogger(__name__)
 
 class PornDbMovieFormatter(MovieDetailFormatter):
@@ -36,20 +38,33 @@ class PornDbMovieFormatter(MovieDetailFormatter):
                 
         cast = []
         for perf in movie_data.get("performers") or []:
-            gender_str = str(perf.get("gender") or "").upper()
+            p_info = perf.get("parent") or perf.get("performer") or perf
+            perf_name = p_info.get("name")
+            if not perf_name:
+                continue
+            gender_str = str(p_info.get("gender") or "").upper()
             mapped_gender = 0
             if "FEMALE" in gender_str:
                 mapped_gender = 1
             elif "MALE" in gender_str:
                 mapped_gender = 2
                 
+            # Check if person exists in DB
+            person_db = db.query(Person).filter(Person.name == perf_name).first()
+            if person_db:
+                p_id = f"local:{person_db.id}"
+                resolved_img = self._resolve_img(person_db.local_profile_path or person_db.profile_path, "people")
+            else:
+                p_id = f"porndb:{p_info.get('id')}"
+                resolved_img = p_info.get("image")
+                
             cast.append({
-                "id": perf.get("id"),
-                "name": perf.get("name"),
+                "id": p_id,
+                "name": perf_name,
                 "character": None,
                 "job": "Actor",
-                "profile_path": perf.get("image"),
-                "popularity": perf.get("rating_porndb") or 0.0,
+                "profile_path": resolved_img,
+                "popularity": p_info.get("rating_porndb") or 0.0,
                 "gender": mapped_gender
             })
             

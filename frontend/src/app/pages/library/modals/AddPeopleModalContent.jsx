@@ -153,7 +153,7 @@ export default function AddPeopleModalContent({ isAdult, t, onClose }) {
               name: searchPerson.name,
               profile_path: searchPerson.profile_path,
               gender: searchPerson.gender,
-              is_adult: searchPerson.is_adult !== undefined ? searchPerson.is_adult : true,
+              is_adult: searchPerson.is_adult !== undefined ? searchPerson.is_adult : (searchPerson.adult !== undefined ? searchPerson.adult : isAdult),
             });
           } else {
             await addPersonMutation.mutateAsync(task.personId);
