@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import Pill from '@/ui/Pill';
-import { Layers, User, PenLine, Sliders, Heart, Check, Minus, Plus, Star, ChevronDown } from 'lucide-react';
+import { Layers, User, PenLine, Sliders, Heart, Check, Minus, Plus, Star, ChevronDown, Info } from 'lucide-react';
 import { OverviewContent } from './EntityDetailSections';
 import Tooltip from '@/ui/Tooltip';
 import './EntityDetailHeroSection.css';
@@ -294,7 +294,7 @@ export default function EntityDetailHeroSection({
               className="entity-detail-page__sidebar-more-btn"
               onClick={() => setIsDrawerOpen(true)}
             >
-              <Sliders size={13} style={{ marginRight: '6px' }} />
+              <Info size={13} style={{ marginRight: '6px' }} />
               {t('library.details.needMoreBtn') || 'Biography & Details'}
             </button>
           )}

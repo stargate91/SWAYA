@@ -99,6 +99,12 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
         <UniversalImagePickerModal
           entityId={idToUse}
           entityType={isPeople ? 'person' : 'collection'}
+          imageType={isPeople ? 'profile' : 'poster'}
+          externalIds={item?.external_ids}
+          item={item}
+          t={t}
+          toast={toast}
+          onClose={closeModal}
           onImageSelected={() => {
             closeModal();
             toast.success(t('library.details.imageUpdatedSuccessfully') || 'Image updated successfully');

@@ -41,10 +41,10 @@ export default function UniversalImagePickerModal({
   // Compute available sources
   const sources = [];
   if (entityType === 'person') {
-    const hasStash = !!externalIds?.stashdb_id;
-    const hasFans = !!externalIds?.fansdb_id;
-    const hasPornDb = !!externalIds?.theporndb_id;
-    const hasTMDb = !!externalIds?.tmdb_id || (!hasStash && !hasFans && !hasPornDb);
+    const hasStash = !!externalIds?.stashdb_id || !!item?.stashdb_id || !!item?.external_ids?.stashdb_id;
+    const hasFans = !!externalIds?.fansdb_id || !!item?.fansdb_id || !!item?.external_ids?.fansdb_id;
+    const hasPornDb = !!externalIds?.theporndb_id || !!item?.theporndb_id || !!item?.external_ids?.theporndb_id || !!externalIds?.porndb_id || !!item?.porndb_id || !!item?.external_ids?.porndb_id;
+    const hasTMDb = !!externalIds?.tmdb_id || !!item?.tmdb_id || !!item?.external_ids?.tmdb_id || (!hasStash && !hasFans && !hasPornDb);
 
     if (hasTMDb) sources.push({ value: 'tmdb', label: 'TMDb' });
     if (hasStash) sources.push({ value: 'stashdb', label: 'StashDB' });

@@ -435,7 +435,8 @@ export default function LibraryGrid({
           t={t}
           toast={toast}
           onClose={closeModal}
-          externalIds={item?.external_ids}
+          externalIds={item?.external_ids || item}
+          item={item}
         />
       ),
     });
