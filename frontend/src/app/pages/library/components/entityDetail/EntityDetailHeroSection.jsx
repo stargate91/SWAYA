@@ -49,134 +49,135 @@ export default function EntityDetailHeroSection({
     : [];
 
   return (
-    <section className="entity-detail-page__hero-grid">
-      <div className="entity-detail-page__media-column">
-        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-        <div
-          className={`entity-detail-page__media-card ${isPeople ? 'entity-detail-page__media-card--profile' : ''} entity-detail-page__media-card--editable`}
-          onClick={onMediaCardClick}
-          title={isPeople ? (t('library.details.changeProfile') || 'Change Profile Picture') : (t('library.details.changePoster') || 'Change Poster')}
-        >
-          {mediaUrl ? (
-            <img
-              src={mediaUrl}
-              alt={item?.name || item?.title || 'Detail artwork'}
-              className="entity-detail-page__media-image"
-            />
-          ) : (
-            <div className="entity-detail-page__media-placeholder">
-              {isPeople ? <User size={44} /> : <Layers size={44} />}
+    <div className="entity-detail-page__hero-section-wrapper">
+      <section className="entity-detail-page__hero-grid">
+        <div className="entity-detail-page__media-column">
+          {/* Headline block containing name and actions above the image */}
+          <div className="entity-detail-page__headline-block">
+            <div className="entity-detail-page__title-row">
+              <h1 className="entity-detail-page__title">
+                {item?.name || item?.title || (isPeople ? 'Unknown Person' : 'Unknown Collection')}
+              </h1>
+              {isPeople && (
+                <div className="entity-detail-page__headline-actions">
+                  <button
+                    type="button"
+                    className={`entity-detail-page__headline-action entity-detail-page__headline-action--favorite ${item?.is_favorite ? 'is-active' : ''}`}
+                    onClick={handleToggleFavorite}
+                    title={t('library.details.favorite') || 'Favorite'}
+                  >
+                    <Heart size={15} fill={item?.is_favorite ? 'currentColor' : 'none'} />
+                  </button>
+                  <button
+                    type="button"
+                    className={`entity-detail-page__headline-action entity-detail-page__headline-action--activate ${item?.is_active ? 'is-active' : ''}`}
+                    onClick={handleToggleActive}
+                    onMouseEnter={() => setIsActivateHovered(true)}
+                    onMouseLeave={() => setIsActivateHovered(false)}
+                    title={t('library.people.addPeopleBtn') || 'Activate'}
+                  >
+                    {item?.is_active
+                      ? (isActivateHovered ? <Minus size={15} /> : <Check size={15} />)
+                      : <Plus size={15} />}
+                  </button>
+                  <button
+                    type="button"
+                    className="entity-detail-page__headline-action"
+                    onClick={handleOpenReviewModal}
+                    title={t('library.details.writeReview') || 'Write Review'}
+                  >
+                    <PenLine size={15} />
+                  </button>
+                  {displayRating !== undefined && displayRating !== null && (
+                    <div className="entity-detail-page__headline-rating-badge">
+                      <Star size={12} fill="currentColor" style={{ marginRight: '4px' }} />
+                      {displayRating.toFixed(1)}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+          <div
+            className={`entity-detail-page__media-card ${isPeople ? 'entity-detail-page__media-card--profile' : ''} entity-detail-page__media-card--editable`}
+            onClick={onMediaCardClick}
+            title={isPeople ? (t('library.details.changeProfile') || 'Change Profile Picture') : (t('library.details.changePoster') || 'Change Poster')}
+          >
+            {mediaUrl ? (
+              <img
+                src={mediaUrl}
+                alt={item?.name || item?.title || 'Detail artwork'}
+                className="entity-detail-page__media-image"
+              />
+            ) : (
+              <div className="entity-detail-page__media-placeholder">
+                {isPeople ? <User size={44} /> : <Layers size={44} />}
+              </div>
+            )}
+
+            <button
+              type="button"
+              className="entity-detail-page__media-edit-badge"
+              onClick={(event) => {
+                event.stopPropagation();
+                onMediaCardClick?.();
+              }}
+              title={isPeople ? (t('library.details.changeProfile') || 'Change Profile Picture') : (t('library.details.changePoster') || 'Change Poster')}
+              aria-label={isPeople ? (t('library.details.changeProfile') || 'Change Profile Picture') : (t('library.details.changePoster') || 'Change Poster')}
+            >
+              <PenLine size={14} />
+            </button>
+          </div>
+
+          {isPeople && (
+            <div className="entity-detail-page__segmented-rating-container">
+              <div
+                className="entity-detail-page__segmented-rating-bar"
+                onMouseMove={(e) => {
+                  setIsHoveringBar(true);
+                  handlePeopleRatingMouseMove(e);
+                }}
+                onMouseLeave={() => {
+                  setIsHoveringBar(false);
+                  handlePeopleRatingMouseLeave();
+                }}
+                onMouseUp={handlePeopleRatingClick}
+                role="slider"
+                tabIndex={0}
+                aria-label={t('library.details.yourRating') || 'Your Rating'}
+                aria-valuemin={0}
+                aria-valuemax={10}
+                aria-valuenow={displayRating ?? 0}
+              >
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((val) => {
+                  let fill = 0;
+                  if (displayRating >= val) {
+                    fill = 100;
+                  } else if (displayRating > val - 1) {
+                    fill = (displayRating - (val - 1)) * 100;
+                  }
+                  return (
+                    <div key={val} className="entity-detail-page__rating-segment">
+                      <div 
+                        className="entity-detail-page__rating-segment-fill" 
+                        style={{ width: `${fill}%` }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+              <span className="entity-detail-page__segmented-rating-label">
+                {isHoveringBar && displayRating !== null && displayRating !== undefined
+                  ? `${t('library.details.yourRating') || 'Your Rating'}: ${displayRating.toFixed(1)}`
+                  : (item?.user_rating !== null && item?.user_rating !== undefined
+                    ? `${t('library.details.yourRating') || 'Your Rating'}: ${item.user_rating.toFixed(1)}`
+                    : (t('library.details.yourRating') || 'Your Rating'))}
+              </span>
             </div>
           )}
 
-          <button
-            type="button"
-            className="entity-detail-page__media-edit-badge"
-            onClick={(event) => {
-              event.stopPropagation();
-              onMediaCardClick?.();
-            }}
-            title={isPeople ? (t('library.details.changeProfile') || 'Change Profile Picture') : (t('library.details.changePoster') || 'Change Poster')}
-            aria-label={isPeople ? (t('library.details.changeProfile') || 'Change Profile Picture') : (t('library.details.changePoster') || 'Change Poster')}
-          >
-            <PenLine size={14} />
-          </button>
-        </div>
-
-        {isPeople && (
-          <div className="entity-detail-page__segmented-rating-container">
-            <div
-              className="entity-detail-page__segmented-rating-bar"
-              onMouseMove={(e) => {
-                setIsHoveringBar(true);
-                handlePeopleRatingMouseMove(e);
-              }}
-              onMouseLeave={() => {
-                setIsHoveringBar(false);
-                handlePeopleRatingMouseLeave();
-              }}
-              onMouseUp={handlePeopleRatingClick}
-              role="slider"
-              tabIndex={0}
-              aria-label={t('library.details.yourRating') || 'Your Rating'}
-              aria-valuemin={0}
-              aria-valuemax={10}
-              aria-valuenow={displayRating ?? 0}
-            >
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((val) => {
-                let fill = 0;
-                if (displayRating >= val) {
-                  fill = 100;
-                } else if (displayRating > val - 1) {
-                  fill = (displayRating - (val - 1)) * 100;
-                }
-                return (
-                  <div key={val} className="entity-detail-page__rating-segment">
-                    <div 
-                      className="entity-detail-page__rating-segment-fill" 
-                      style={{ width: `${fill}%` }}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-            <span className="entity-detail-page__segmented-rating-label">
-              {isHoveringBar && displayRating !== null && displayRating !== undefined
-                ? `${t('library.details.yourRating') || 'Your Rating'}: ${displayRating.toFixed(1)}`
-                : (item?.user_rating !== null && item?.user_rating !== undefined
-                  ? `${t('library.details.yourRating') || 'Your Rating'}: ${item.user_rating.toFixed(1)}`
-                  : (t('library.details.yourRating') || 'Your Rating'))}
-            </span>
-          </div>
-        )}
-
-      </div>
-
-      <div className="entity-detail-page__summary">
-        <div className="entity-detail-page__headline-block">
-          <div className="entity-detail-page__title-row">
-            <h1 className="entity-detail-page__title">
-              {item?.name || item?.title || (isPeople ? 'Unknown Person' : 'Unknown Collection')}
-            </h1>
-            {isPeople && (
-              <div className="entity-detail-page__headline-actions">
-                <button
-                  type="button"
-                  className={`entity-detail-page__headline-action entity-detail-page__headline-action--favorite ${item?.is_favorite ? 'is-active' : ''}`}
-                  onClick={handleToggleFavorite}
-                  title={t('library.details.favorite') || 'Favorite'}
-                >
-                  <Heart size={15} fill={item?.is_favorite ? 'currentColor' : 'none'} />
-                </button>
-                <button
-                  type="button"
-                  className={`entity-detail-page__headline-action entity-detail-page__headline-action--activate ${item?.is_active ? 'is-active' : ''}`}
-                  onClick={handleToggleActive}
-                  onMouseEnter={() => setIsActivateHovered(true)}
-                  onMouseLeave={() => setIsActivateHovered(false)}
-                  title={t('library.people.addPeopleBtn') || 'Activate'}
-                >
-                  {item?.is_active
-                    ? (isActivateHovered ? <Minus size={15} /> : <Check size={15} />)
-                    : <Plus size={15} />}
-                </button>
-                <button
-                  type="button"
-                  className="entity-detail-page__headline-action"
-                  onClick={handleOpenReviewModal}
-                  title={t('library.details.writeReview') || 'Write Review'}
-                >
-                  <PenLine size={15} />
-                </button>
-                {displayRating !== undefined && displayRating !== null && (
-                  <div className="entity-detail-page__headline-rating-badge">
-                    <Star size={12} fill="currentColor" style={{ marginRight: '4px' }} />
-                    {displayRating.toFixed(1)}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
           {metaPills.length > 0 && (() => {
             const placeOfBirthPill = metaPills.find(pill => pill.key === 'place-of-birth');
             const primaryMetaPills = metaPills.filter(pill => pill.key !== 'place-of-birth');
@@ -209,74 +210,74 @@ export default function EntityDetailHeroSection({
               </>
             );
           })()}
-          
-          {/* Known For Grid */}
+        </div>
+
+        {/* Right column containing Known For aligned to the bottom */}
+        <div className="entity-detail-page__summary">
           {isPeople && item?.known_for?.length > 0 && (
             <div className="entity-detail-page__known-for-section">
               <div className="entity-detail-page__known-for-grid">
-              {item.known_for.map((credit) => {
-                const creditTitle = credit.title || credit.name || 'Unknown';
-                const isClickable = true;
-                const handleCardClick = () => {
-                  const isScene = credit.media_type === 'scene' || credit.type === 'scene';
-                  if (isScene) {
-                    const itemSource = credit.source || (credit.rating_porndb ? 'porndb' : (item?.external_ids?.stashdb_id ? 'stashdb' : 'fansdb'));
-                    const prefix = itemSource === 'porndb' || itemSource === 'theporndb' ? 'porndb' : (itemSource === 'fansdb' ? 'fansdb' : 'stash');
-                    const sceneId = credit.in_library ? (credit.library_item_id || credit.id) : `${prefix}_${credit.stash_id || credit.id}`;
-                    navigate(`/library/scene/${sceneId}`);
-                    return;
-                  }
+                {item.known_for.map((credit) => {
+                  const creditTitle = credit.title || credit.name || 'Unknown';
+                  const handleCardClick = () => {
+                    const isScene = credit.media_type === 'scene' || credit.type === 'scene';
+                    if (isScene) {
+                      const itemSource = credit.source || (credit.rating_porndb ? 'porndb' : (item?.external_ids?.stashdb_id ? 'stashdb' : 'fansdb'));
+                      const prefix = itemSource === 'porndb' || itemSource === 'theporndb' ? 'porndb' : (itemSource === 'fansdb' ? 'fansdb' : 'stash');
+                      const sceneId = credit.in_library ? (credit.library_item_id || credit.id) : `${prefix}_${credit.stash_id || credit.id}`;
+                      navigate(`/library/scene/${sceneId}`);
+                      return;
+                    }
 
-                  const isTv = credit.media_type === 'tv' || credit.type === 'tv';
-                  if (isTv) {
-                    const tvId = credit.library_tv_tmdb_id || credit.tv_tmdb_id || credit.tmdb_id || credit.id;
-                    navigate(`/library/tv/${tvId}`);
-                    return;
-                  }
+                    const isTv = credit.media_type === 'tv' || credit.type === 'tv';
+                    if (isTv) {
+                      const tvId = credit.library_tv_tmdb_id || credit.tv_tmdb_id || credit.tmdb_id || credit.id;
+                      navigate(`/library/tv/${tvId}`);
+                      return;
+                    }
 
-                  const movieId = credit.in_library
-                    ? (credit.library_item_id || credit.id)
-                    : (credit.source === 'porndb' ? `porndb_${credit.tmdb_id || credit.id}` : `tmdb_${credit.tmdb_id || credit.id}`);
-                  navigate(`/library/movie/${movieId}`);
-                };
-                
-                return (
-                  <div 
-                    key={`${credit.id}-${credit.type || 'movie'}`} 
-                    className="entity-detail-page__known-for-card is-clickable"
-                    onClick={handleCardClick}
-                    title={creditTitle}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        handleCardClick();
-                      }
-                    }}
-                  >
-                    <div className="entity-detail-page__known-for-poster-container">
-                      {credit.poster_path ? (
-                        <img
-                          src={credit.poster_path}
-                          alt={creditTitle}
-                          className="entity-detail-page__known-for-poster"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="entity-detail-page__known-for-placeholder">
-                          <Layers size={20} />
-                        </div>
-                      )}
+                    const movieId = credit.in_library
+                      ? (credit.library_item_id || credit.id)
+                      : (credit.source === 'porndb' ? `porndb_${credit.tmdb_id || credit.id}` : `tmdb_${credit.tmdb_id || credit.id}`);
+                    navigate(`/library/movie/${movieId}`);
+                  };
+                  
+                  return (
+                    <div 
+                      key={`${credit.id}-${credit.type || 'movie'}`} 
+                      className="entity-detail-page__known-for-card is-clickable"
+                      onClick={handleCardClick}
+                      title={creditTitle}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          handleCardClick();
+                        }
+                      }}
+                    >
+                      <div className="entity-detail-page__known-for-poster-container">
+                        {credit.poster_path ? (
+                          <img
+                            src={credit.poster_path}
+                            alt={creditTitle}
+                            className="entity-detail-page__known-for-poster"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="entity-detail-page__known-for-placeholder">
+                            <Layers size={20} />
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
-
-
+          )}
+        </div>
+      </section>
 
         {isDrawerOpen && (() => {
           const toTitleCase = (str) => {
@@ -427,7 +428,6 @@ export default function EntityDetailHeroSection({
             document.body
           );
         })()}
-      </div>
-    </section>
+    </div>
   );
 }

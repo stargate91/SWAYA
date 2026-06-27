@@ -15,7 +15,7 @@
 }
 
 .is-scrolled .entity-detail-page__transition-wrapper {
-  transform: translateY(-440px); /* Slide up content by 440px to align tabs flush below utility bar */
+  transform: translateY(calc(-100vh + var(--page-top-offset, 4rem) + 120px - var(--space-4xl)));
 }
 
 .entity-detail-page__content-section {
