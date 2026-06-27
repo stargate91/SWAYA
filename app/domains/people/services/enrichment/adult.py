@@ -1,6 +1,6 @@
 import logging
 import re
-from typing import Dict, Any, List, Callable
+from typing import Dict, Any, List, Callable, Optional
 from sqlalchemy.orm import Session
 from app.shared_kernel.enums import Provider
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
@@ -8,6 +8,20 @@ from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.domains.people.services.enrichment.helpers import EnrichmentHelpers
 
 logger = logging.getLogger(__name__)
+
+def safe_int(val) -> Optional[int]:
+    if val is None:
+        return None
+    if isinstance(val, (int, float)):
+        return int(val)
+    if isinstance(val, str):
+        digits = "".join(c for c in val if c.isdigit())
+        if digits:
+            try:
+                return int(digits)
+            except ValueError:
+                pass
+    return None
 
 class AdultEnricher:
     def __init__(self, scrapers: ScraperGatewayPort, get_temp_db_cb: Callable[[], Session]):
@@ -112,20 +126,20 @@ class AdultEnricher:
             source_data = {
                 "birthday": perf.get("birth_date"),
                 "rating_porndb": float(perf["rating_porndb"]) if perf.get("rating_porndb") is not None else None,
-                "scene_count": int(perf["scene_count"]) if perf.get("scene_count") is not None else None,
+                "scene_count": safe_int(perf.get("scene_count")),
                 "ethnicity": perf.get("ethnicity"),
                 "hair_color": perf.get("hair_color"),
                 "eye_color": perf.get("eye_color"),
-                "height": int(perf["height"]) if perf.get("height") is not None else None,
-                "weight": int(perf["weight"]) if perf.get("weight") is not None else None,
+                "height": safe_int(perf.get("height")),
+                "weight": safe_int(perf.get("weight")),
                 "aliases": perf.get("aliases") or [],
                 "tattoos": tats_val,
                 "piercings": piers_val,
                 "same_sex_only": perf.get("same_sex_only"),
                 "place_of_birth": perf.get("country") or perf.get("place_of_birth"),
                 "deathday": perf.get("death_date") or perf.get("deathday"),
-                "career_start_year": int(perf["career_start_year"]) if perf.get("career_start_year") is not None else None,
-                "career_end_year": int(perf["career_end_year"]) if perf.get("career_end_year") is not None else None,
+                "career_start_year": safe_int(perf.get("career_start_year")),
+                "career_end_year": safe_int(perf.get("career_end_year")),
                 "gender": g_val,
                 "measurements": measurements_val,
                 "cup_size": cup_val,
