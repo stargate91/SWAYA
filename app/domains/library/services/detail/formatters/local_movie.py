@@ -227,4 +227,26 @@ class LocalMovieFormatter(MovieDetailFormatter):
             "resume_position": override.resume_position if override else 0,
             "last_watched_at": override.last_watched_at.isoformat() if override and override.last_watched_at else None,
         }
+        
+        ext_ids = {}
+        if active_match:
+            p_val = active_match.provider.value if hasattr(active_match.provider, "value") else str(active_match.provider)
+            p_val = p_val.lower()
+            if p_val == "tmdb":
+                ext_ids["tmdb"] = active_match.external_id
+            elif p_val in ("porndb", "theporndb"):
+                ext_ids["porndb_id"] = active_match.external_id
+                ext_ids["source"] = "porndb"
+            elif p_val == "fansdb":
+                ext_ids["fansdb_id"] = active_match.external_id
+                ext_ids["source"] = "fansdb"
+            elif p_val in ("stash", "stashdb"):
+                ext_ids["stash_id"] = active_match.external_id
+                ext_ids["source"] = "stash"
+            if active_match.imdb_id:
+                ext_ids["imdb"] = active_match.imdb_id
+
+        from app.domains.library.services.detail.external_links import generate_external_links
+        media_type_val = result["type"]
+        result["external_links"] = generate_external_links(ext_ids, media_type_val)
         return MovieDetailResponse(**result)

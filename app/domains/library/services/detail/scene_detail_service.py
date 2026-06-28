@@ -29,7 +29,6 @@ class SceneDetailService(DetailFormatter):
         else:
             if str(item_id).isdigit():
                 from app.domains.library.models import MediaItem
-                from app.domains.metadata.models import MetadataMatch
                 item = db.query(MediaItem).filter(MediaItem.id == int(item_id)).first()
                 if item:
                     match_db = db.query(MetadataMatch).filter(
@@ -235,7 +234,7 @@ class SceneDetailService(DetailFormatter):
             ext_background = scene_data.get("image") or poster_url
             
         poster_resolved = self._resolve_img(local_poster or poster_url, "posters")
-        backdrop_resolved = self._resolve_img(local_backdrop or ext_background, "backdrops")
+        backdrop_resolved = self._resolve_img(local_backdrop or ext_background, "backdrops", size="original")
 
         result = {
             "id": f"stash_{scene_uuid}",
@@ -284,4 +283,6 @@ class SceneDetailService(DetailFormatter):
             "in_library": match_db is not None and match_db.media_item_id is not None,
             "library_item_id": match_db.media_item_id if match_db else None,
         }
+        from app.domains.library.services.detail.external_links import generate_external_links
+        result["external_links"] = generate_external_links(result["external_ids"], "scene")
         return SceneDetailResponse(**result)

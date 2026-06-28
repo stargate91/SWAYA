@@ -106,10 +106,13 @@ class PersonFilmographyResponse(BaseModel):
     total_pages: int
 
 class ExternalLinkDetail(BaseModel):
+    model_config = ConfigDict(extra="allow")
     provider: str
     external_id: str
     profile_url: Optional[str] = None
     source_data: Optional[dict[str, Any]] = None
+    name: Optional[str] = None
+    url: Optional[str] = None
 
 class PersonDetailResponse(BaseModel):
     model_config = ConfigDict(extra="allow")

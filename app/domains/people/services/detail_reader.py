@@ -374,18 +374,64 @@ class PerformerDetailReader:
             "initial_movie_credits_page": {"items": movies[:12], "page": 1, "page_size": 12, "total_items": len(movies), "total_pages": 1},
             "initial_tv_credits_page": {"items": tv[:12], "page": 1, "page_size": 12, "total_items": len(tv), "total_pages": 1},
             "initial_scene_credits_page": {"items": scenes[:12], "page": 1, "page_size": 12, "total_items": len(scenes), "total_pages": 1},
-            "external_links": [
-                {
-                    "provider": link.provider.value,
-                    "external_id": link.external_id,
-                    "profile_url": link.profile_url,
-                    "source_data": link.source_data
-                }
-                for link in person.external_links
-            ],
+            "external_links": [],
             "primary_provider": person.primary_provider.value if person.primary_provider else None,
             "field_routing": person.field_routing
         }
+
+        from app.domains.library.services.detail.external_links import generate_external_links
+        formatted_links = []
+        seen_keys = set()
+
+        # 1. Map existing DB links (preserving all metadata like source_data)
+        for link in person.external_links:
+            prov_val = link.provider.value
+            prov_lower = prov_val.lower()
+            
+            helper_ids = {}
+            if prov_lower == "stashdb":
+                helper_ids["stash_id"] = link.external_id
+                helper_ids["source"] = "stash"
+            elif prov_lower == "fansdb":
+                helper_ids["fansdb_id"] = link.external_id
+                helper_ids["source"] = "fansdb"
+            elif prov_lower == "porndb":
+                helper_ids["porndb_id"] = link.external_id
+                helper_ids["source"] = "porndb"
+            elif prov_lower == "data18":
+                helper_ids["data18_id"] = link.external_id
+            
+            generated = generate_external_links(helper_ids, "person")
+            gen_url = generated[0]["url"] if generated else link.profile_url
+            gen_name = generated[0]["name"] if generated else prov_val
+            
+            formatted_links.append({
+                "provider": prov_val,
+                "external_id": link.external_id,
+                "profile_url": link.profile_url,
+                "source_data": link.source_data,
+                "name": gen_name,
+                "url": gen_url
+            })
+            seen_keys.add(prov_lower)
+            
+        # 2. Add other links (e.g. tmdb, imdb, instagram) from person.external_ids
+        merged_ids = dict(external_ids or {})
+        links_list = generate_external_links(merged_ids, "person", homepage=person.homepage)
+        for l in links_list:
+            key_lower = l["key"].lower()
+            if key_lower not in seen_keys:
+                formatted_links.append({
+                    "provider": l["key"],
+                    "external_id": l["url"].split("/")[-1],
+                    "profile_url": l["url"],
+                    "source_data": None,
+                    "name": l["name"],
+                    "url": l["url"]
+                })
+                seen_keys.add(key_lower)
+
+        result["external_links"] = formatted_links
         return PersonDetailResponse(**result)
 
     def get_person_movies(self, person_id: Any, page: int = 1, page_size: int = 12, source: Optional[str] = None) -> PersonFilmographyResponse:

@@ -188,4 +188,14 @@ class TmdbMovieFormatter(MovieDetailFormatter):
             "playback_logs": [],
             "in_library": False,
         }
+        
+        ext_ids = {
+            "tmdb": tmdb_id
+        }
+        imdb_id = tmdb_data.get("imdb_id") or (match.imdb_id if match else None)
+        if imdb_id:
+            ext_ids["imdb"] = imdb_id
+
+        from app.domains.library.services.detail.external_links import generate_external_links
+        result["external_links"] = generate_external_links(ext_ids, "movie")
         return MovieDetailResponse(**result)

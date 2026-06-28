@@ -76,6 +76,14 @@ class RemoteCreditsFetcher:
                     clean_item.pop("library_item_id", None)
                     clean_items.append(clean_item)
 
+                # Double check under concurrency before creating a new entry
+                if not cache_entry:
+                    cache_entry = db.query(RemoteFilmographyCache).filter(
+                        RemoteFilmographyCache.person_id == person_id,
+                        RemoteFilmographyCache.provider == source.lower(),
+                        RemoteFilmographyCache.media_type == media_type
+                    ).first()
+
                 if not cache_entry:
                     cache_entry = RemoteFilmographyCache(
                         person_id=person_id,
@@ -91,12 +99,25 @@ class RemoteCreditsFetcher:
                     db.commit()
                 except Exception as e:
                     db.rollback()
+                    if "UNIQUE constraint failed" in str(e):
+                        try:
+                            existing = db.query(RemoteFilmographyCache).filter(
+                                RemoteFilmographyCache.person_id == person_id,
+                                RemoteFilmographyCache.provider == source.lower(),
+                                RemoteFilmographyCache.media_type == media_type
+                            ).first()
+                            if existing:
+                                existing.data = {"items": clean_items, "total_items": total_items}
+                                db.commit()
+                                return
+                        except Exception as inner_e:
+                            db.rollback()
                     logger.error(f"Error saving remote filmography cache: {e}")
 
         local_items = []
         try:
             prov_enum = Provider(source.lower())
-            active_match_ids = self.library_port.get_active_match_ids(media_type=media_type)
+            active_match_ids = self.library_port.get_active_match_ids(media_type=media_type, provider=source.lower())
             from app.shared_kernel.language import LanguageService
             
             links = db.query(MediaPersonLink).filter(
@@ -263,20 +284,32 @@ class RemoteCreditsFetcher:
                     headers = {"Authorization": f"Bearer {api_token}", "Accept": "application/json"}
                     
                     if media_type == "movie":
+                        url = f"https://api.theporndb.net/performers/{ext_id}/movies?page=1&per_page=100"
+                        resp = requests.get(url, headers=headers, timeout=10)
                         data_list = []
-                        current_page = 1
-                        while len(data_list) < 5000:
-                            url = f"https://api.theporndb.net/performers/{ext_id}/movies?page={current_page}&per_page=100"
-                            resp = requests.get(url, headers=headers, timeout=10)
-                            if resp.status_code != 200:
-                                break
-                            page_data = resp.json().get("data") or []
-                            if not page_data:
-                                break
-                            data_list.extend(page_data)
-                            if len(page_data) < 100:
-                                break
-                            current_page += 1
+                        if resp.status_code == 200:
+                            resp_json = resp.json()
+                            data_list.extend(resp_json.get("data") or [])
+                            meta = resp_json.get("meta") or {}
+                            last_page = meta.get("last_page") or 1
+                            last_page = min(last_page, 20) # Max 2000 movies
+                            
+                            if last_page > 1:
+                                import concurrent.futures
+                                def fetch_page(page):
+                                    try:
+                                        page_url = f"https://api.theporndb.net/performers/{ext_id}/movies?page={page}&per_page=100"
+                                        page_resp = requests.get(page_url, headers=headers, timeout=10)
+                                        if page_resp.status_code == 200:
+                                            return page_resp.json().get("data") or []
+                                    except Exception as ex:
+                                        logger.error(f"Error fetching PornDB movie page {page}: {ex}")
+                                    return []
+                                    
+                                with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+                                    futures = [executor.submit(fetch_page, p) for p in range(2, last_page + 1)]
+                                    for fut in concurrent.futures.as_completed(futures):
+                                        data_list.extend(fut.result())
 
                         total_items = len(data_list)
                         for x in data_list:
@@ -290,7 +323,11 @@ class RemoteCreditsFetcher:
                                 except:
                                     pass
                             studio_name = x.get("site", {}).get("name") if x.get("site") else None
-                            poster_url = x.get("poster")
+                            poster_val = x.get("poster")
+                            if isinstance(poster_val, dict):
+                                poster_url = poster_val.get("large") or poster_val.get("medium") or poster_val.get("small") or poster_val.get("full")
+                            else:
+                                poster_url = poster_val
                             rating = x.get("rating")
                             
                             mapped_items.append({
@@ -309,20 +346,32 @@ class RemoteCreditsFetcher:
                             })
                             
                     elif media_type == "scene":
+                        url = f"https://api.theporndb.net/performers/{ext_id}/scenes?page=1&per_page=100"
+                        resp = requests.get(url, headers=headers, timeout=10)
                         data_list = []
-                        current_page = 1
-                        while len(data_list) < 5000:
-                            url = f"https://api.theporndb.net/performers/{ext_id}/scenes?page={current_page}&per_page=100"
-                            resp = requests.get(url, headers=headers, timeout=10)
-                            if resp.status_code != 200:
-                                break
-                            page_data = resp.json().get("data") or []
-                            if not page_data:
-                                break
-                            data_list.extend(page_data)
-                            if len(page_data) < 100:
-                                break
-                            current_page += 1
+                        if resp.status_code == 200:
+                            resp_json = resp.json()
+                            data_list.extend(resp_json.get("data") or [])
+                            meta = resp_json.get("meta") or {}
+                            last_page = meta.get("last_page") or 1
+                            last_page = min(last_page, 30) # Max 3000 scenes
+                            
+                            if last_page > 1:
+                                import concurrent.futures
+                                def fetch_page(page):
+                                    try:
+                                        page_url = f"https://api.theporndb.net/performers/{ext_id}/scenes?page={page}&per_page=100"
+                                        page_resp = requests.get(page_url, headers=headers, timeout=10)
+                                        if page_resp.status_code == 200:
+                                            return page_resp.json().get("data") or []
+                                    except Exception as ex:
+                                        logger.error(f"Error fetching PornDB scene page {page}: {ex}")
+                                    return []
+                                    
+                                with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+                                    futures = [executor.submit(fetch_page, p) for p in range(2, last_page + 1)]
+                                    for fut in concurrent.futures.as_completed(futures):
+                                        data_list.extend(fut.result())
 
                         total_items = len(data_list)
                         for x in data_list:
@@ -336,8 +385,27 @@ class RemoteCreditsFetcher:
                                 except:
                                     pass
                             studio_name = x.get("site", {}).get("name") if x.get("site") else None
-                            poster_url = x.get("poster")
-                            backdrop_url = x.get("image") or x.get("background") or poster_url
+                            poster_val = x.get("poster")
+                            if isinstance(poster_val, dict):
+                                poster_url = poster_val.get("large") or poster_val.get("medium") or poster_val.get("small") or poster_val.get("full")
+                            else:
+                                poster_url = poster_val
+
+                            images_list = x.get("images") or []
+                            backdrop_url = None
+                            if isinstance(images_list, list) and images_list:
+                                first_img = images_list[0]
+                                if isinstance(first_img, dict):
+                                    backdrop_url = first_img.get("url")
+                                elif isinstance(first_img, str):
+                                    backdrop_url = first_img
+
+                            if not backdrop_url:
+                                backdrop_val = x.get("background") or x.get("image")
+                                if isinstance(backdrop_val, dict):
+                                    backdrop_url = backdrop_val.get("full") or backdrop_val.get("large") or backdrop_val.get("medium") or backdrop_val.get("small")
+                                else:
+                                    backdrop_url = backdrop_val or poster_url
                             rating = x.get("rating")
                             
                             mapped_items.append({

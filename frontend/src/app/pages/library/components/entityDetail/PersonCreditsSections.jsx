@@ -20,6 +20,8 @@ function PersonCreditsRow({
     <div className={`person-credits-discover-grid ${isScene ? 'grid-16-9' : 'grid-2-3'}`}>
       {items.map((item) => {
         const creditTitle = item.title || item.name || 'Unknown';
+        const resolvedSource = item.source || (item.rating_porndb ? 'porndb' : (item.stash_id ? 'stashdb' : (item.fansdb_id ? 'fansdb' : 'tmdb')));
+        
         const posterPath = isScene
           ? (item.backdrop_path || item.local_backdrop_path || item.poster_path || item.local_poster_path)
           : (item.poster_path || item.local_poster_path || item.backdrop_path || item.local_backdrop_path);
@@ -28,7 +30,6 @@ function PersonCreditsRow({
         const handleCardClick = () => {
           const itemType = item.media_type || item.type;
           const isSceneType = itemType === 'scene' || itemType === 'scenes';
-          const resolvedSource = item.source || (item.rating_porndb ? 'porndb' : (item.stash_id ? 'stashdb' : (item.fansdb_id ? 'fansdb' : 'tmdb')));
           if (isSceneType) {
             const prefix = resolvedSource === 'porndb' || resolvedSource === 'theporndb' ? 'porndb' : (resolvedSource === 'fansdb' ? 'fansdb' : 'stash');
             const sceneId = item.in_library ? (item.library_item_id || item.id) : `${prefix}_${item.stash_id || item.id}`;
@@ -49,8 +50,6 @@ function PersonCreditsRow({
           navigate(`/library/movie/${movieId}`, { state: { allowAdult: true } });
         };
 
-        const resolvedSource = item.source || (item.rating_porndb ? 'porndb' : (item.stash_id ? 'stashdb' : 'tmdb'));
-
         return (
           <div 
             key={`${item.id}-${item.type || mediaType}`}
@@ -66,7 +65,13 @@ function PersonCreditsRow({
           >
             <div className="person-credits-card__poster-container">
               {posterUrl ? (
-                <img src={posterUrl} alt={creditTitle} className="person-credits-card__poster" loading="lazy" />
+                <img 
+                  src={posterUrl} 
+                  alt={creditTitle} 
+                  className="person-credits-card__poster" 
+                  loading="lazy" 
+                  onError={(e) => console.error("Image load failed in Row:", { src: posterUrl, resolvedSource, creditTitle, e })}
+                />
               ) : (
                 <div className="person-credits-card__placeholder">
                   <Layers size={18} />
@@ -96,16 +101,18 @@ function PersonCreditsRow({
 }
 
 export default function PersonCreditsSections({ id, item, navigate, t }) {
-  const hasMovies = Number(item?.total_movie_credits) > 0;
-  const hasTv = Number(item?.total_tv_credits) > 0;
   const hasStashDb = !!item?.external_ids?.stashdb_id;
   const hasFansDb = !!item?.external_ids?.fansdb_id;
   const hasPornDb = !!item?.external_ids?.theporndb_id || !!item?.external_ids?.porndb_id || !!item?.external_ids?.porndb;
 
-  const hasScenes = Number(item?.total_scene_credits) > 0 || (item?.is_adult && (hasStashDb || hasFansDb));
+  const hasTmdbMovies = Number(item?.total_movie_credits) > 0;
+  const hasMovies = hasTmdbMovies || (item?.is_adult && hasPornDb);
+  const hasTv = Number(item?.total_tv_credits) > 0;
+
+  const hasScenes = Number(item?.total_scene_credits) > 0 || (item?.is_adult && (hasStashDb || hasFansDb || hasPornDb));
 
   // Static queries to populate the "My Library" list
-  const tmdbMoviesLibQuery = usePersonCreditsQuery(id, 'movies', 1, 100, { enabled: hasMovies });
+  const tmdbMoviesLibQuery = usePersonCreditsQuery(id, 'movies', 1, 100, { enabled: hasTmdbMovies });
   const porndbMoviesLibQuery = usePersonCreditsQuery(id, 'movies', 1, 100, { enabled: !!(item?.is_adult && hasPornDb), source: 'porndb' });
   const tmdbTvLibQuery = usePersonCreditsQuery(id, 'tv', 1, 100, { enabled: hasTv });
   const stashdbScenesLibQuery = usePersonCreditsQuery(id, 'scenes', 1, 100, { enabled: !!(item?.is_adult && hasStashDb), source: 'stashdb' });
@@ -189,7 +196,7 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
   // Fallback default discover tab
   useEffect(() => {
     const hasDefaultOption = !!activeDiscoverTab && (
-      (activeDiscoverTab === 'movies_tmdb' && hasMovies) ||
+      (activeDiscoverTab === 'movies_tmdb' && hasTmdbMovies) ||
       (activeDiscoverTab === 'movies_porndb' && item?.is_adult && hasPornDb) ||
       (activeDiscoverTab === 'tv' && hasTv) ||
       (activeDiscoverTab === 'scenes_stashdb' && hasStashDb) ||
@@ -198,7 +205,8 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
     );
 
     if (!hasDefaultOption) {
-      if (hasMovies) setActiveDiscoverTab('movies_tmdb');
+      if (hasTmdbMovies) setActiveDiscoverTab('movies_tmdb');
+      else if (item?.is_adult && hasPornDb) setActiveDiscoverTab('movies_porndb');
       else if (hasTv) setActiveDiscoverTab('tv');
       else if (hasScenes) {
         if (hasStashDb) setActiveDiscoverTab('scenes_stashdb');
@@ -206,7 +214,7 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
         else setActiveDiscoverTab('scenes_porndb');
       }
     }
-  }, [activeDiscoverTab, hasMovies, hasTv, hasScenes, hasStashDb, hasFansDb, hasPornDb, item?.is_adult, setActiveDiscoverTab]);
+  }, [activeDiscoverTab, hasTmdbMovies, hasMovies, hasTv, hasScenes, hasStashDb, hasFansDb, hasPornDb, item?.is_adult, setActiveDiscoverTab]);
 
   // Map active discover tab to query params
   const getActiveParams = (tab) => {
@@ -332,13 +340,15 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
                 <div className="person-credits-discover-group">
                   <span className="person-credits-discover-group-title">{t('library.details.movies') || 'Movies'}</span>
                   <div className="person-credits-discover-buttons">
-                    <button 
-                      type="button" 
-                      className={`discover-btn ${activeDiscoverTab === 'movies_tmdb' ? 'active' : ''}`}
-                      onClick={() => setActiveDiscoverTab('movies_tmdb')}
-                    >
-                      {t('library.details.tmdb') || 'TMDb'}
-                    </button>
+                    {hasTmdbMovies && (
+                      <button 
+                        type="button" 
+                        className={`discover-btn ${activeDiscoverTab === 'movies_tmdb' ? 'active' : ''}`}
+                        onClick={() => setActiveDiscoverTab('movies_tmdb')}
+                      >
+                        {t('library.details.tmdb') || 'TMDb'}
+                      </button>
+                    )}
                     {item?.is_adult && hasPornDb && (
                       <button 
                         type="button" 
@@ -410,6 +420,7 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
           <div className={`person-credits-discover-grid ${isSceneGrid ? 'grid-16-9' : 'grid-2-3'}`}>
             {accumulatedItems.map((credit) => {
               const creditTitle = credit.title || credit.name || 'Unknown';
+              const resolvedSource = credit.source || activeSource || (credit.rating_porndb ? 'porndb' : (credit.stash_id ? 'stashdb' : (credit.fansdb_id ? 'fansdb' : 'tmdb')));
               const posterPath = isSceneGrid
                 ? (credit.backdrop_path || credit.local_backdrop_path || credit.poster_path || credit.local_poster_path)
                 : (credit.poster_path || credit.local_poster_path || credit.backdrop_path || credit.local_backdrop_path);
@@ -418,7 +429,6 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
               const handleCardClick = () => {
                 const itemType = credit.media_type || credit.type;
                 const isSceneType = itemType === 'scene' || itemType === 'scenes';
-                const resolvedSource = credit.source || activeSource || (credit.rating_porndb ? 'porndb' : (credit.stash_id ? 'stashdb' : (credit.fansdb_id ? 'fansdb' : 'tmdb')));
                 if (isSceneType) {
                   const prefix = resolvedSource === 'porndb' || resolvedSource === 'theporndb' ? 'porndb' : (resolvedSource === 'fansdb' ? 'fansdb' : 'stash');
                   const sceneId = credit.in_library ? (credit.library_item_id || credit.id) : `${prefix}_${credit.stash_id || credit.id}`;
@@ -439,7 +449,6 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
                 navigate(`/library/movie/${movieId}`, { state: { allowAdult: true } });
               };
 
-              const resolvedSource = credit.source || (credit.rating_porndb ? 'porndb' : (credit.stash_id ? 'stashdb' : 'tmdb'));
 
               return (
                 <div 
@@ -456,7 +465,13 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
                 >
                   <div className="person-credits-card__poster-container">
                     {posterUrl ? (
-                      <img src={posterUrl} alt={creditTitle} className="person-credits-card__poster" loading="lazy" />
+                      <img 
+                        src={posterUrl} 
+                        alt={creditTitle} 
+                        className="person-credits-card__poster" 
+                        loading="lazy" 
+                        onError={(e) => console.error("Image load failed in Grid:", { src: posterUrl, resolvedSource, creditTitle, e })}
+                      />
                     ) : (
                       <div className="person-credits-card__placeholder">
                         <Layers size={22} />

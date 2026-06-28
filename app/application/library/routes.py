@@ -203,7 +203,7 @@ def get_scraper_gateway() -> ScraperGatewayPort:
     from app.infrastructure.scrapers.support.gateway import scraper_gateway
     return scraper_gateway
 
-@library_router.get("/library/item/{item_id}", response_model=Union[MovieDetailResponse, SceneDetailResponse])
+@library_router.get("/library/item/{item_id}")
 def get_library_item_detail(
     item_id: str,
     full_people: bool = False,
@@ -222,9 +222,20 @@ def get_library_item_detail(
         if prefix in ("stash", "stashdb", "fansdb"):
             return SceneDetailService(db, scrapers).get_scene_detail(item_id)
         elif prefix in ("porndb", "theporndb"):
-            # If prefix is porndb but media_type is not specified, check if the scene exists
-            # to determine if it is a scene, otherwise fall back to movie
-            return MovieDetailService(db, scrapers).get_library_item_detail(item_id, full_people=full_people)
+            scene_uuid = item_id.split("_", 1)[1]
+            from app.domains.metadata.models import MetadataMatch
+            from app.shared_kernel.enums import MediaType
+            match_db = db.query(MetadataMatch).filter(
+                MetadataMatch.external_id == scene_uuid,
+                MetadataMatch.media_type == MediaType.SCENE
+            ).first()
+            if match_db:
+                return SceneDetailService(db, scrapers).get_scene_detail(item_id)
+            
+            scene_resp = SceneDetailService(db, scrapers).get_scene_detail(item_id)
+            if isinstance(scene_resp, JSONResponse) and scene_resp.status_code == 404:
+                return MovieDetailService(db, scrapers).get_library_item_detail(item_id, full_people=full_people)
+            return scene_resp
 
     return MovieDetailService(db, scrapers).get_library_item_detail(item_id, full_people=full_people)
 

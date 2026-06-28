@@ -120,4 +120,10 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             "playback_logs": [],
             "in_library": False,
         }
+        ext_ids = {
+            "porndb_id": porndb_id,
+            "source": "porndb"
+        }
+        from app.domains.library.services.detail.external_links import generate_external_links
+        result["external_links"] = generate_external_links(ext_ids, "movie")
         return MovieDetailResponse(**result)

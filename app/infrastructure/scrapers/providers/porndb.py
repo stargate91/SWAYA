@@ -283,7 +283,6 @@ class PornDBScraper(BaseScraper):
                 hair_color
                 eye_color
                 height
-                weight
                 band_size
                 cup_size
                 waist_size

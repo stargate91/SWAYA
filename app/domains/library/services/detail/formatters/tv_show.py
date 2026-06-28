@@ -339,4 +339,13 @@ class TvShowFormatter(DetailFormatter):
             "in_library": len(local_items) > 0,
             "progressive_seasons": True,
         }
+        ext_ids = {
+            "tmdb": tv_tmdb_id_int
+        }
+        imdb_id = result.get("imdb_id")
+        if imdb_id:
+            ext_ids["imdb"] = imdb_id
+
+        from app.domains.library.services.detail.external_links import generate_external_links
+        result["external_links"] = generate_external_links(ext_ids, "tv")
         return TvShowDetailResponse(**result)
