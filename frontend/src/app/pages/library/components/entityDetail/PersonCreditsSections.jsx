@@ -274,8 +274,7 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
   return (
     <div className="person-credits-section-container">
       {viewMode === 'library' && myLibraryTabs.length > 0 && (
-        <>
-          <div className="person-credits-row--library">
+        <div className="person-credits-detail-panel">
             <div className="person-credits-discover-header person-credits-discover-header-layout">
               <h4 className="person-credits-row__title person-credits-row-title-style">{t('library.details.inLibrary') || 'My Library'}</h4>
 
@@ -306,23 +305,21 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="person-credits-discover-grid-wrapper">
-            <PersonCreditsRow
-              items={activeLibraryItems}
-              mediaType={activeLibraryTab}
-              navigate={navigate}
-              t={t}
-            />
+            <div className="person-credits-discover-grid-wrapper">
+              <PersonCreditsRow
+                items={activeLibraryItems}
+                mediaType={activeLibraryTab}
+                navigate={navigate}
+                t={t}
+              />
+            </div>
           </div>
-        </>
       )}
 
       {/* STATE 2: DISCOVER PICKER PANEL & INFINITE GRID */}
       {viewMode === 'discover' && (
-        <>
-          <div className="person-credits-discover-panel">
+        <div className="person-credits-detail-panel">
             <div className="person-credits-discover-header person-credits-discover-header-layout">
               <h4 className="person-credits-row__title person-credits-row-title-style">{t('library.details.discoverFilmography') || 'Discover Filmography'}</h4>
 
@@ -415,7 +412,6 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
                 </div>
               )}
             </div>
-          </div>
 
           {/* DISCOVER INFINITE GRID */}
           {activeDiscoverTab && (
@@ -525,7 +521,7 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
               )}
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );
