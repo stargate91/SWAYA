@@ -402,13 +402,22 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
   };
   const isWatched = (isMovie || isScene) ? item?.is_watched : getIsTvWatched();
 
-  const canToggleWatched = (isMovie || isScene)
+  const getIsTvWatchedWithDate = () => {
+    if (!item?.seasons) return false;
+    const regularSeasons = item.seasons.filter(s => s.season_number > 0);
+    const episodes = regularSeasons.flatMap(s => s.episodes || []);
+    if (episodes.length === 0) return false;
+    return episodes.every(e => e.last_watched_at);
+  };
+  const hasManualWatchedShow = (isMovie || isScene) ? !!item?.last_watched_at : getIsTvWatchedWithDate();
+
+  const canToggleWatched = ((isMovie || isScene)
     ? Boolean(item)
     : Boolean(
       item?.seasons
         ?.filter((season) => season.season_number > 0)
         .some((season) => (season.episodes || []).length > 0)
-    );
+    )) && !hasManualWatchedShow;
 
   const getNextEpisodeInfo = () => {
     if (!item?.seasons) return null;

@@ -173,6 +173,43 @@ class PlaybackService:
             from app.infrastructure.playback.playback_monitor import active_sessions
             is_active = item.id in active_sessions
             
+            duration = int(item.duration) if item.duration else 0
+            log_position = log.position_seconds or 0
+            
+            latest_log = self.domain_service.playback_repo.get_latest_playback_log(item.id)
+            is_latest = latest_log and (log.id == latest_log.id)
+            if is_latest and override:
+                log_position = override.resume_position
+                log_is_watched = override.is_watched
+                log_is_active = is_active
+            else:
+                log_is_watched = (duration > 0 and log_position / duration > 0.90)
+                log_is_active = False
+
+            from app.shared_kernel.enums import MediaType
+            tv_title = None
+            episode_title = None
+            tv_poster_path = None
+            
+            if active_match and active_match.media_type == MediaType.EPISODE:
+                episode_title = title
+                tv_match = None
+                if active_match.parent and active_match.parent.parent:
+                    tv_match = active_match.parent.parent
+                elif active_match.parent:
+                    tv_match = active_match.parent
+                
+                if tv_match:
+                    from app.domains.users.models import UserOverride
+                    tv_override = self.db.query(UserOverride).filter(
+                        UserOverride.metadata_match_id == tv_match.id,
+                        UserOverride.user_id == log.user_id
+                    ).first()
+                    tv_loc = tv_match.localizations[0] if tv_match.localizations else None
+                    tv_title = (tv_override.custom_title if (tv_override and tv_override.custom_title) else None) or (tv_loc.title if tv_loc else None)
+                    if tv_loc and tv_loc.poster_path:
+                        tv_poster_path = self._resolve_img(tv_loc.poster_path, "posters")
+
             results.append({
                 "id": log.id,
                 "media_item_id": item.id,
@@ -183,10 +220,13 @@ class PlaybackService:
                 "episode_number": active_match.episode_number if active_match else None,
                 "poster_path": self._resolve_img(loc.poster_path if loc else None, "posters"),
                 "backdrop_path": self._resolve_img(active_match.backdrop_path if active_match else None, "backdrops"),
-                "resume_position": override.resume_position if override else 0,
-                "duration": int(item.duration) if item.duration else 0,
-                "is_watched": override.is_watched if override else False,
-                "is_active": is_active,
+                "resume_position": log_position,
+                "duration": duration,
+                "is_watched": log_is_watched,
+                "is_active": log_is_active,
+                "tv_title": tv_title,
+                "episode_title": episode_title,
+                "tv_poster_path": tv_poster_path,
             })
 
         return WatchedHistoryResponse(

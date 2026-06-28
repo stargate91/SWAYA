@@ -477,10 +477,7 @@
   border: 1px solid var(--color-border-subtle);
 }
 
-.continue-watching-card:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 15px 30px color-mix(in srgb, black 40%, transparent), 0 0 15px color-mix(in srgb, var(--color-accent-blue) 30%, transparent);
-}
+/* No hover transform, border, or shadow changes on card */
 
 .continue-watching-remove {
   position: absolute;
@@ -495,11 +492,42 @@
   border-radius: 50%;
   background: color-mix(in srgb, black 60%, transparent);
   cursor: pointer;
-  transition: background var(--motion-duration-hover) var(--motion-ease-hover);
+  color: color-mix(in srgb, white 70%, transparent);
+  transition: background var(--motion-duration-hover) var(--motion-ease-hover), color var(--motion-duration-hover) var(--motion-ease-hover);
 }
 
 .continue-watching-remove:hover {
-  background: var(--color-accent-red);
+  background: var(--color-state-danger);
+  color: white;
+}
+
+.continue-watching-card--active {
+  cursor: default !important;
+}
+
+.continue-watching-card--active .continue-watching-image {
+  opacity: 0.45 !important;
+}
+
+.continue-watching-play-active {
+  opacity: 1 !important;
+  pointer-events: none;
+  animation: continue-watching-play-pulse 2s infinite ease-in-out;
+}
+
+@keyframes continue-watching-play-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent-blue) 40%, transparent);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.08);
+    box-shadow: 0 0 20px 8px color-mix(in srgb, var(--color-accent-blue) 35%, transparent);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent-blue) 40%, transparent);
+  }
 }
 
 .continue-watching-image {
@@ -507,11 +535,12 @@
   height: 100%;
   object-fit: cover;
   opacity: 0.75;
-  transition: opacity var(--motion-duration-hover) var(--motion-ease-hover);
+  transition: opacity var(--motion-duration-hover) var(--motion-ease-hover), transform var(--motion-duration-hover) var(--motion-ease-hover);
 }
 
 .continue-watching-card:hover .continue-watching-image {
   opacity: 0.9;
+  transform: scale(1.06);
 }
 
 .continue-watching-fallback {
@@ -526,30 +555,8 @@
   background: linear-gradient(to top, color-mix(in srgb, var(--color-bg-app, black) 90%, transparent) 0%, color-mix(in srgb, var(--color-bg-app, black) 30%, transparent) 60%, transparent 100%);
 }
 
-.continue-watching-play-shell {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transform: scale(0.9);
-  transition: opacity var(--motion-duration-hover) var(--motion-ease-hover), transform var(--motion-duration-hover) var(--motion-ease-hover);
-}
-
-.continue-watching-card:hover .continue-watching-play-shell {
+.continue-watching-card:hover .ui-icon-button--play-overlay {
   opacity: 1;
-  transform: scale(1);
-}
-
-.continue-watching-play-pill {
-  padding: var(--space-lg);
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--color-accent-blue) 40%, transparent);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 0 20px color-mix(in srgb, var(--color-accent-blue) 50%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-text-primary, white) 15%, transparent);
 }
 
 .continue-watching-progress-track {

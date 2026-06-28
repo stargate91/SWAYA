@@ -173,6 +173,7 @@ class ContinueWatchingItem(BaseModel):
     duration: int
     is_watched: bool
     last_watched_at: Optional[str] = None
+    is_active: bool = False
 
 class LibraryTabItem(BaseModel):
     model_config = ConfigDict(extra="allow")

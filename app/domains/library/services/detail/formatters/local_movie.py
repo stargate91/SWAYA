@@ -91,16 +91,19 @@ class LocalMovieFormatter(MovieDetailFormatter):
             "audio_type": item.audio_type.value if hasattr(item.audio_type, "value") else str(item.audio_type),
         }
         
-        override = None
+        metadata_override = None
         if active_match:
-            override = db.query(UserOverride).filter(
+            metadata_override = db.query(UserOverride).filter(
                 UserOverride.user_id == current_uid,
                 UserOverride.metadata_match_id == active_match.id
             ).first()
-        if not override:
-            override = item.overrides
-        if not override:
-            override = db.query(UserOverride).filter(UserOverride.user_id == current_uid, UserOverride.media_item_id == item.id).first()
+
+        physical_override = db.query(UserOverride).filter(
+            UserOverride.user_id == current_uid,
+            UserOverride.media_item_id == item.id
+        ).first()
+
+        override = metadata_override or item.overrides or physical_override
             
         title = (override.custom_title if (override and override.custom_title) else None) or (loc.title if loc else item.filename)
         overview = (override.custom_overview if (override and override.custom_overview) else None) or (loc.overview if loc else None)
@@ -176,6 +179,40 @@ class LocalMovieFormatter(MovieDetailFormatter):
             for ex in item.extras
         ] if item.extras else []
 
+        # Merge watch properties
+        is_watched = False
+        watch_count = 0
+        resume_position = 0
+        last_watched_at_dt = None
+
+        if metadata_override:
+            is_watched = metadata_override.is_watched
+            watch_count = metadata_override.watch_count or 0
+            last_watched_at_dt = metadata_override.last_watched_at
+        elif override:
+            is_watched = override.is_watched
+            watch_count = override.watch_count or 0
+            last_watched_at_dt = override.last_watched_at
+
+        if physical_override:
+            if physical_override.is_watched:
+                is_watched = True
+            if physical_override.watch_count and physical_override.watch_count > watch_count:
+                watch_count = physical_override.watch_count
+            if physical_override.resume_position:
+                resume_position = physical_override.resume_position
+            if physical_override.last_watched_at:
+                if not last_watched_at_dt or physical_override.last_watched_at > last_watched_at_dt:
+                    last_watched_at_dt = physical_override.last_watched_at
+
+        playback_logs = [
+            {
+                "id": log.id,
+                "watched_at": log.watched_at.isoformat()
+            }
+            for log in sorted(item.playback_logs or [], key=lambda x: x.watched_at, reverse=True)
+        ]
+
         result = {
             "id": item.id,
             "title": title,
@@ -222,10 +259,11 @@ class LocalMovieFormatter(MovieDetailFormatter):
             "in_library": True,
             "path": item.current_path,
             "filename": item.filename,
-            "watch_count": override.watch_count if override else 0,
-            "is_watched": override.is_watched if override else False,
-            "resume_position": override.resume_position if override else 0,
-            "last_watched_at": override.last_watched_at.isoformat() if override and override.last_watched_at else None,
+            "watch_count": watch_count,
+            "is_watched": is_watched,
+            "resume_position": resume_position,
+            "last_watched_at": last_watched_at_dt.isoformat() if last_watched_at_dt else None,
+            "playback_logs": playback_logs,
         }
         
         ext_ids = {}

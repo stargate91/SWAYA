@@ -106,11 +106,15 @@ class TitleLockService:
                 has_active_interaction = True
 
         if request.is_watched is not None:
-            m_override.is_watched = bool(request.is_watched)
-            if m_override.is_watched:
+            is_watched_val = bool(request.is_watched)
+            if is_watched_val:
+                m_override.is_watched = True
                 m_override.watch_count = max(m_override.watch_count or 0, 1)
-                m_override.last_watched_at = datetime.now(timezone.utc)
                 has_active_interaction = True
+            else:
+                m_override.is_watched = False
+                m_override.watch_count = 0
+                m_override.last_watched_at = None
 
         if has_active_interaction:
             m_override.is_tracked = True
@@ -256,12 +260,18 @@ class TitleLockService:
         for item_id in item_ids:
             override = self.service._get_or_create_override(str(item_id))
             if override:
-                override.is_watched = is_watched
                 if is_watched:
+                    if override.is_watched:
+                        continue
+                    override.is_watched = True
                     override.watch_count = max(override.watch_count or 0, 1)
-                    override.last_watched_at = parsed_date
+                    if watched_at:
+                        override.last_watched_at = parsed_date
                     override.is_tracked = True
                 else:
+                    if override.last_watched_at is not None:
+                        continue
+                    override.is_watched = False
                     override.watch_count = 0
                     override.last_watched_at = None
                 count += 1

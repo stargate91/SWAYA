@@ -15,8 +15,21 @@ class DbPlaybackAdapter(PlaybackPort):
             if not override:
                 override = UserOverride(user_id=user_id, media_item_id=item_id)
                 self.db.add(override)
+            
+            # Find the latest playback log to update
+            from app.domains.history.models import PlaybackLog
+            log = self.db.query(PlaybackLog).filter(
+                PlaybackLog.media_item_id == item_id,
+                PlaybackLog.user_id == user_id
+            ).order_by(PlaybackLog.watched_at.desc()).first()
+            
             override.resume_position = current_time
+            if log:
+                log.position_seconds = current_time
+                
             if total_length > 0 and current_time / total_length > 0.90:
                 override.is_watched = True
                 override.resume_position = 0
+                if log:
+                    log.position_seconds = total_length
             self.db.flush()

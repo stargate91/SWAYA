@@ -259,44 +259,35 @@ export default function MediaDetailPage({ type = 'movie' }) {
               </button>
             )}
 
-            {item?.external_links && item.external_links.length > 0 ? (
-              item.external_links.map((link) => (
+            {(() => {
+              let links = item?.external_links || [];
+              if (links.length === 0 && item?.external_ids?.stash_id) {
+                const source = item.external_ids.source || '';
+                const url = source === 'fansdb'
+                  ? `https://fansdb.cc/scenes/${item.external_ids.stash_id}`
+                  : (source === 'porndb' || source === 'theporndb')
+                  ? `https://theporndb.net/scenes/${item.external_ids.stash_id}`
+                  : `https://stashdb.org/scenes/${item.external_ids.stash_id}`;
+                const name = source === 'fansdb' ? 'FansDB' : (source === 'porndb' || source === 'theporndb') ? 'ThePornDB' : 'StashDB';
+                links = [{ key: 'stashdb', name, url }];
+              }
+              if (links.length !== 1) {
+                return null;
+              }
+              const singleLink = links[0];
+              return (
                 <a
-                  key={link.key}
-                  href={link.url}
+                  key={singleLink.key}
+                  href={singleLink.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="media-detail-page__side-nav-btn"
-                  title={`${link.name} Link`}
+                  title={`${singleLink.name} Link`}
                 >
                   <ExternalLink size={20} />
                 </a>
-              ))
-            ) : (
-              item?.external_ids?.stash_id && (
-                <a
-                  href={
-                    item.external_ids.source === 'fansdb'
-                      ? `https://fansdb.cc/scenes/${item.external_ids.stash_id}`
-                      : (item.external_ids.source === 'porndb' || item.external_ids.source === 'theporndb')
-                      ? `https://theporndb.net/scenes/${item.external_ids.stash_id}`
-                      : `https://stashdb.org/scenes/${item.external_ids.stash_id}`
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="media-detail-page__side-nav-btn"
-                  title={
-                    item.external_ids.source === 'fansdb'
-                      ? 'FansDB Link'
-                      : (item.external_ids.source === 'porndb' || item.external_ids.source === 'theporndb')
-                      ? 'ThePornDB Link'
-                      : 'StashDB Link'
-                  }
-                >
-                  <ExternalLink size={20} />
-                </a>
-              )
-            )}
+              );
+            })()}
 
             {hasTechnicalPanel && (
               <button

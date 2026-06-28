@@ -261,32 +261,23 @@ export default function DetailsPanel() {
 
 
 
-      {(imdbId || tmdbId) && (
+      {Array.isArray(item?.external_links) && item.external_links.length > 1 && (
         <div className="details-panel__section">
           <h4 className="details-panel__section-title">
             {t('library.details.externalLinks') || 'External Links'}
           </h4>
           <div className="external-links-container">
-            {imdbId && (
+            {item.external_links.map((link) => (
               <a
-                href={`https://www.imdb.com/title/${imdbId}`}
+                key={link.key}
+                href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="external-link-btn external-link-btn--imdb"
+                className={`external-link-btn external-link-btn--${link.key}`}
               >
-                {t('library.details.imdb') || 'IMDb'}
+                {link.name}
               </a>
-            )}
-            {tmdbId && (
-              <a
-                href={`https://www.themoviedb.org/${isMovie ? 'movie' : 'tv'}/${tmdbId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="external-link-btn external-link-btn--tmdb"
-              >
-                {t('library.details.tmdb') || 'TMDb'}
-              </a>
-            )}
+            ))}
           </div>
         </div>
       )}

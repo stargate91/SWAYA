@@ -1,6 +1,7 @@
 
 import PropTypes from 'prop-types';
 import { Play, X } from 'lucide-react';
+import IconButton from '../../../ui/IconButton';
 import { useContinueWatchingQuery } from '../../../queries';
 import { usePlayMediaMutation, useResetProgressMutation } from '../../../queries';
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
@@ -92,7 +93,6 @@ const ContinueWatchingWidget = ({ T }) => {
   return (
     <div className="continue-watching-widget">
       <div className="continue-watching-header">
-        <Play size={20} className="continue-watching-header__icon" fill="var(--color-accent-blue)" color="var(--color-accent-blue)" />
         {T('dashboard.continue_watching.title') || 'Continue Watching'}
       </div>
       <div className="continue-watching-row custom-scrollbar">
@@ -107,8 +107,9 @@ const ContinueWatchingWidget = ({ T }) => {
           return (
             <div
               key={`cw-${item.id}`}
-              className="continue-watching-card"
+              className={`continue-watching-card ${item.is_active ? 'continue-watching-card--active' : ''}`}
               onClick={() => {
+                if (item.is_active) return;
                 if (item.type === 'episode' || item.type === 'movie') {
                   playMutation.mutate(item.id);
                 }
@@ -117,6 +118,7 @@ const ContinueWatchingWidget = ({ T }) => {
               tabIndex={0}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
+                  if (item.is_active) return;
                   if (item.type === 'episode' || item.type === 'movie') {
                     playMutation.mutate(item.id);
                   }
@@ -146,11 +148,12 @@ const ContinueWatchingWidget = ({ T }) => {
 
               <div className="continue-watching-overlay" />
 
-              <div className="continue-watching-play-shell">
-                <div className="continue-watching-play-pill">
-                  <Play fill="var(--color-text-primary)" color="var(--color-text-primary)" size={24} />
-                </div>
-              </div>
+              <IconButton
+                variant="play-overlay"
+                className={item.is_active ? 'continue-watching-play-active' : ''}
+              >
+                <Play size={18} fill="currentColor" />
+              </IconButton>
 
               <div className="continue-watching-progress-track">
                 <svg viewBox="0 0 100 4" preserveAspectRatio="none" className="continue-watching-progress-svg">

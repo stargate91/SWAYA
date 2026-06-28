@@ -122,7 +122,65 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             
             if db_updated:
                 db.commit()
-                
+
+        metadata_override = None
+        if match:
+            metadata_override = db.query(UserOverride).filter(
+                UserOverride.user_id == current_uid,
+                UserOverride.metadata_match_id == match.id
+            ).first()
+
+        physical_override = None
+        if match and match.media_item_id:
+            physical_override = db.query(UserOverride).filter(
+                UserOverride.user_id == current_uid,
+                UserOverride.media_item_id == match.media_item_id
+            ).first()
+
+        # Merge watch properties
+        is_watched = False
+        watch_count = 0
+        resume_position = 0
+        last_watched_at_dt = None
+
+        if metadata_override:
+            is_watched = metadata_override.is_watched
+            watch_count = metadata_override.watch_count or 0
+            last_watched_at_dt = metadata_override.last_watched_at
+        elif override:
+            is_watched = override.is_watched
+            watch_count = override.watch_count or 0
+            last_watched_at_dt = override.last_watched_at
+
+        if physical_override:
+            if physical_override.is_watched:
+                is_watched = True
+            if physical_override.watch_count and physical_override.watch_count > watch_count:
+                watch_count = physical_override.watch_count
+            if physical_override.resume_position:
+                resume_position = physical_override.resume_position
+            if physical_override.last_watched_at:
+                if not last_watched_at_dt or physical_override.last_watched_at > last_watched_at_dt:
+                    last_watched_at_dt = physical_override.last_watched_at
+
+        playback_logs = []
+        if match and match.media_item_id:
+            from app.domains.history.models import PlaybackLog
+            logs = db.query(PlaybackLog).filter(
+                PlaybackLog.user_id == current_uid,
+                PlaybackLog.media_item_id == match.media_item_id
+            ).order_by(PlaybackLog.watched_at.desc()).all()
+            playback_logs = [
+                {
+                    "id": log.id,
+                    "watched_at": log.watched_at.isoformat()
+                }
+                for log in logs
+            ]
+
+        # Use metadata_override if available, else fallback to override
+        effective_override = metadata_override if metadata_override else override
+
         result = {
             "id": f"porndb_{porndb_id}",
             "title": movie_data.get("title") or "Unknown Movie",
@@ -144,9 +202,9 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             "vote_count_tmdb": 0,
             "budget": None,
             "revenue": None,
-            "companies": [],
+            "companies": [{"name": movie_data.get("studio").get("name") if movie_data.get("studio") else None, "logo_path": self._resolve_img(movie_data.get("studio").get("image") if movie_data.get("studio") else None, "logos")}] if movie_data.get("studio") else [],
             "networks": [],
-            "poster_path": poster_url,
+            "poster_path": self._resolve_img(effective_override.custom_poster if (effective_override and effective_override.custom_poster) else poster_url, "posters"),
             "backdrop_path": backdrop_url,
             "original_language": "en",
             "type": "movie",
@@ -158,19 +216,20 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             "directors": [],
             "writers": [],
             "is_adult": True,
-            "is_favorite": override.is_favorite if override else False,
-            "user_rating": override.user_rating if override else None,
-            "user_comment": override.user_comment if override else None,
-            "custom_tags": [t.name for t in override.tags] if (override and override.tags) else [],
+            "is_favorite": effective_override.is_favorite if effective_override else False,
+            "user_rating": effective_override.user_rating if effective_override else None,
+            "user_comment": effective_override.user_comment if effective_override else None,
+            "custom_tags": [t.name for t in effective_override.tags] if (effective_override and effective_override.tags) else [],
             "suggested_tags": [t.get("name") for t in movie_data.get("tags") or [] if t.get("name")] if movie_data.get("tags") else [],
             "tags": [],
-            "is_tracked": override.is_tracked if override else False,
-            "watch_count": override.watch_count if override else 0,
-            "is_watched": override.is_watched if override else False,
-            "resume_position": override.resume_position if override else 0,
-            "last_watched_at": override.last_watched_at.isoformat() if (override and override.last_watched_at) else None,
-            "playback_logs": [],
-            "in_library": False,
+            "is_tracked": effective_override.is_tracked if effective_override else False,
+            "watch_count": watch_count,
+            "is_watched": is_watched,
+            "resume_position": resume_position,
+            "last_watched_at": last_watched_at_dt.isoformat() if last_watched_at_dt else None,
+            "playback_logs": playback_logs,
+            "in_library": match is not None and match.media_item_id is not None,
+            "library_item_id": match.media_item_id if (match and match.media_item_id) else None,
         }
         ext_ids = {
             "porndb_id": porndb_id,

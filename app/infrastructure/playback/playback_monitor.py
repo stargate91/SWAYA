@@ -41,7 +41,7 @@ def monitor_playback(item_id: int, player_type: str, proc: subprocess.Popen, por
                         if dur_match:
                             total_length = int(dur_match.group(1)) // 1000
                 
-                if current_time > 0 and abs(current_time - last_saved_time) >= 10:
+                if current_time > 0 and abs(current_time - last_saved_time) >= 5:
                     last_saved_time = current_time
                     _save_position(item_id, current_time, total_length, user_id)
             except Exception as e:

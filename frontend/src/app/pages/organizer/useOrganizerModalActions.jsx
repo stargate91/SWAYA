@@ -200,7 +200,7 @@ export function useOrganizerModalActions({
           t={t}
           toast={toast}
           scanMode={scanMode}
-          onResolved={(performMutationFn) => 
+          onResolved={(performMutationFn) =>
             handleResolveOrganizerRows(targetRows, performMutationFn)
           }
         />
@@ -269,6 +269,7 @@ export function useOrganizerModalActions({
       ),
     });
   };
+
 
   const rowActions = useMemo(() => [
     {
@@ -364,6 +365,7 @@ export function useOrganizerModalActions({
           onClick: () => openMatchModal(null, selectedRows),
           disabled: selectedRows.length === 0,
         } : null,
+
         selectedRows.length > 0 && selectedRows.every((r) => r.rawType === selectedRows[0].rawType) ? {
           key: 'override',
           label: t('organizer.actions.override') || 'Override',

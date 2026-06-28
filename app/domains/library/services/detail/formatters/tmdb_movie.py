@@ -92,12 +92,27 @@ class TmdbMovieFormatter(MovieDetailFormatter):
             except:
                 pass
         
-        override = db.query(UserOverride).join(MetadataMatch, UserOverride.metadata_match_id == MetadataMatch.id).filter(
+        metadata_override = db.query(UserOverride).join(MetadataMatch, UserOverride.metadata_match_id == MetadataMatch.id).filter(
             UserOverride.user_id == current_uid,
             MetadataMatch.provider == Provider.TMDB,
             MetadataMatch.external_id == str(tmdb_id),
             MetadataMatch.media_type == MediaType.MOVIE
         ).first()
+        
+        match = db.query(MetadataMatch).filter(
+            MetadataMatch.provider == Provider.TMDB,
+            MetadataMatch.external_id == str(tmdb_id),
+            MetadataMatch.media_type == MediaType.MOVIE
+        ).first()
+        
+        physical_override = None
+        if match and match.media_item_id:
+            physical_override = db.query(UserOverride).filter(
+                UserOverride.user_id == current_uid,
+                UserOverride.media_item_id == match.media_item_id
+            ).first()
+
+        override = metadata_override
         
         from app.domains.media_assets.services.images import image_processing_service
         effective_backdrop = None
@@ -111,12 +126,6 @@ class TmdbMovieFormatter(MovieDetailFormatter):
             effective_logo = override.custom_logo
         else:
             effective_logo = image_processing_service.pick_logo_path(tmdb_data, preferred_language=ui_lang)
-        
-        match = db.query(MetadataMatch).filter(
-            MetadataMatch.provider == Provider.TMDB,
-            MetadataMatch.external_id == str(tmdb_id),
-            MetadataMatch.media_type == MediaType.MOVIE
-        ).first()
 
         if match:
             db_updated = False
@@ -194,6 +203,43 @@ class TmdbMovieFormatter(MovieDetailFormatter):
         if youtube_trailers:
             trailer_key = youtube_trailers[0].get("key")
 
+        # Merge watch properties
+        is_watched = False
+        watch_count = 0
+        resume_position = 0
+        last_watched_at_dt = None
+
+        if metadata_override:
+            is_watched = metadata_override.is_watched
+            watch_count = metadata_override.watch_count or 0
+            last_watched_at_dt = metadata_override.last_watched_at
+
+        if physical_override:
+            if physical_override.is_watched:
+                is_watched = True
+            if physical_override.watch_count and physical_override.watch_count > watch_count:
+                watch_count = physical_override.watch_count
+            if physical_override.resume_position:
+                resume_position = physical_override.resume_position
+            if physical_override.last_watched_at:
+                if not last_watched_at_dt or physical_override.last_watched_at > last_watched_at_dt:
+                    last_watched_at_dt = physical_override.last_watched_at
+
+        playback_logs = []
+        if match and match.media_item_id:
+            from app.domains.history.models import PlaybackLog
+            logs = db.query(PlaybackLog).filter(
+                PlaybackLog.user_id == current_uid,
+                PlaybackLog.media_item_id == match.media_item_id
+            ).order_by(PlaybackLog.watched_at.desc()).all()
+            playback_logs = [
+                {
+                    "id": log.id,
+                    "watched_at": log.watched_at.isoformat()
+                }
+                for log in logs
+            ]
+
         result = {
             "id": f"tmdb_{tmdb_id}",
             "title": tmdb_data.get("title") or tmdb_data.get("original_title") or "Unknown",
@@ -235,11 +281,11 @@ class TmdbMovieFormatter(MovieDetailFormatter):
             "suggested_tags": [k["name"] for k in tmdb_data.get("keywords", {}).get("keywords", [])] if tmdb_data.get("keywords") else [],
             "tags": [],
             "is_tracked": override.is_tracked if override else False,
-            "watch_count": override.watch_count if override else 0,
-            "is_watched": override.is_watched if override else False,
-            "resume_position": override.resume_position if override else 0,
-            "last_watched_at": override.last_watched_at.isoformat() if override and override.last_watched_at else None,
-            "playback_logs": [],
+            "watch_count": watch_count,
+            "is_watched": is_watched,
+            "resume_position": resume_position,
+            "last_watched_at": last_watched_at_dt.isoformat() if last_watched_at_dt else None,
+            "playback_logs": playback_logs,
             "in_library": match is not None and match.media_item_id is not None,
             "library_item_id": match.media_item_id if (match and match.media_item_id) else None,
         }

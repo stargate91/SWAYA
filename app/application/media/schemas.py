@@ -48,6 +48,9 @@ class WatchedHistoryItem(BaseModel):
     duration: int
     is_watched: bool
     is_active: Optional[bool] = False
+    tv_title: Optional[str] = None
+    episode_title: Optional[str] = None
+    tv_poster_path: Optional[str] = None
 
 class WatchedHistoryResponse(BaseModel):
     items: List[WatchedHistoryItem]

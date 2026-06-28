@@ -37,14 +37,13 @@ class LibraryListingService:
         query = self.db.query(UserOverride).join(
             MediaItem, UserOverride.media_item_id == MediaItem.id
         ).join(
-            MetadataMatch, UserOverride.metadata_match_id == MetadataMatch.id
+            MetadataMatch, MetadataMatch.media_item_id == MediaItem.id
         ).filter(
             UserOverride.resume_position > 0,
             UserOverride.is_watched == False
         ).options(
-            joinedload(UserOverride.media_item),
-            joinedload(UserOverride.metadata_match).joinedload(MetadataMatch.localizations),
-            joinedload(UserOverride.metadata_match).joinedload(MetadataMatch.parent).joinedload(MetadataMatch.parent).joinedload(MetadataMatch.localizations)
+            joinedload(UserOverride.media_item).joinedload(MediaItem.matches).joinedload(MetadataMatch.localizations),
+            joinedload(UserOverride.media_item).joinedload(MediaItem.matches).joinedload(MetadataMatch.parent).joinedload(MetadataMatch.parent).joinedload(MetadataMatch.localizations)
         )
         query = query.filter(MetadataMatch.is_adult == include_adult)
 
@@ -53,7 +52,9 @@ class LibraryListingService:
         results = []
         for o in overrides:
             item = o.media_item
-            match = o.metadata_match
+            match = next((m for m in item.matches if m.is_active), None) if item else None
+            if not match and item and item.matches:
+                match = item.matches[0]
             loc = match.localizations[0] if match and match.localizations else None
             
             title = o.custom_title if o.custom_title else (loc.title if loc else item.filename)
@@ -77,7 +78,9 @@ class LibraryListingService:
                     tv_loc = tv_match.localizations[0] if tv_match.localizations else None
                     tv_title = (tv_override.custom_title if (tv_override and tv_override.custom_title) else None) or (tv_loc.title if tv_loc else None)
                     tv_tmdb_id = int(tv_match.external_id) if tv_match.external_id.isdigit() else None
-            
+            from app.infrastructure.playback.playback_monitor import active_sessions
+            is_active = item.id in active_sessions if item else False
+
             results.append(ContinueWatchingItem(
                 id=item.id,
                 title=title,
@@ -94,6 +97,7 @@ class LibraryListingService:
                 duration=item.duration or 0,
                 is_watched=o.is_watched,
                 last_watched_at=o.last_watched_at.isoformat() if o.last_watched_at else None,
+                is_active=is_active,
             ))
         return results
 

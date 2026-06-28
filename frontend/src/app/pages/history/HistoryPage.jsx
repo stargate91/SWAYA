@@ -273,11 +273,10 @@ export default function HistoryPage() {
                     </div>
                   ) : (
                     <div className="watched-history-card__title-group">
-                      <h3 className="watched-history-card__title">{log.tv_title}</h3>
-                      {log.year && <span className="watched-history-card__year">{LPAR}{log.year}{RPAR}</span>}
-                      <span className="watched-history-card__episode-info">
-                        {S_CHAR}{String(log.season_number).padStart(2, '0')}{E_CHAR}{String(log.episode_number).padStart(2, '0')}{DASH}{log.episode_title || log.title}
-                      </span>
+                      <h3 className="watched-history-card__title">
+                        {log.tv_title} - S{String(log.season_number).padStart(2, '0')}E{String(log.episode_number).padStart(2, '0')} - {log.episode_title || log.title}
+                      </h3>
+                      {log.year && <span className="watched-history-card__year">({log.year})</span>}
                     </div>
                   )}
                 </div>
@@ -288,18 +287,17 @@ export default function HistoryPage() {
                     <span>{new Date(log.watched_at).toLocaleString()}</span>
                   </div>
 
-                  {log.is_active ? (
-                    <div className="watched-history-card__status watched-history-card__status--active">
-                      <span className="watched-history-card__status-dot watched-history-card__status-dot--pulsing" />
+                  {log.is_watched ? (
+                    <div className="watched-history-card__status watched-history-card__status--watched">
+                      <CheckCircle2 size={12} />
+                      <span>{t('historyPage.watchedStatus') || 'Watched'}</span>
+                    </div>
+                  ) : log.is_active ? (
+                    <div className="watched-history-card__active-info">
                       <span className="watched-history-card__percent">{percent}{PERCENT}</span>
                       <span className="watched-history-card__time">
                         {LPAR}{formatTime(log.resume_position)}{SLASH}{formatTime(log.duration)}{RPAR}
                       </span>
-                    </div>
-                  ) : log.is_watched ? (
-                    <div className="watched-history-card__status watched-history-card__status--watched">
-                      <CheckCircle2 size={12} />
-                      <span>{t('historyPage.watchedStatus') || 'Watched'}</span>
                     </div>
                   ) : (
                     percent > 0 && (
@@ -313,7 +311,7 @@ export default function HistoryPage() {
                   )}
                 </div>
 
-                {(log.is_active || (!log.is_watched && percent > 0)) && (
+                {!log.is_watched && (log.is_active || percent > 0) && (
                   <div className="watched-history-card__progress-bar-wrapper">
                     <div
                       className={`watched-history-card__progress-bar ${log.is_active ? 'watched-history-bar--active' : ''}`}
@@ -330,10 +328,12 @@ export default function HistoryPage() {
                   variant="secondary"
                   size="sm"
                   onClick={() => handlePlay(log.media_item_id)}
-                  disabled={playMutation.isPending && playMutation.variables === log.media_item_id}
+                  disabled={log.is_active || (playMutation.isPending && playMutation.variables === log.media_item_id)}
                   icon={
                     playMutation.isPending && playMutation.variables === log.media_item_id ? (
                       <Spinner size={14} />
+                    ) : log.is_active ? (
+                      null
                     ) : log.is_watched ? (
                       <RotateCcw size={14} />
                     ) : (
@@ -341,7 +341,9 @@ export default function HistoryPage() {
                     )
                   }
                 >
-                  {log.is_watched
+                  {log.is_active
+                    ? 'Playing'
+                    : log.is_watched
                     ? t('historyPage.watchedRewatch') || 'Rewatch'
                     : t('historyPage.watchedContinue') || 'Continue'
                   }

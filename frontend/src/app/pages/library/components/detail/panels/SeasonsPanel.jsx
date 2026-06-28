@@ -39,26 +39,16 @@ export default function SeasonsPanel() {
   const [selectedSeasonNumber, setSelectedSeasonNumber] = useState(initialSeasonNumber);
   const [expandedEpisodes, setExpandedEpisodes] = useState(initialExpandedEpisodes);
   const [visibleEpisodesCount, setVisibleEpisodesCount] = useState(initialVisibleEpisodesCount);
-  const [prevInputs, setPrevInputs] = useState({ selectedSeasonNumber, nextEpisodeInfo });
+  const [prevSelectedSeasonNumber, setPrevSelectedSeasonNumber] = useState(selectedSeasonNumber);
 
   const scrollContainerRef = useRef(null);
   const loadMoreTriggerRef = useRef(null);
 
-  if (selectedSeasonNumber !== prevInputs.selectedSeasonNumber || nextEpisodeInfo !== prevInputs.nextEpisodeInfo) {
-    setPrevInputs({ selectedSeasonNumber, nextEpisodeInfo });
+  if (selectedSeasonNumber !== prevSelectedSeasonNumber) {
+    setPrevSelectedSeasonNumber(selectedSeasonNumber);
 
-    let currentSeasonNumber = selectedSeasonNumber;
-    if (nextEpisodeInfo !== prevInputs.nextEpisodeInfo && nextEpisodeInfo?.episode?.id) {
-      currentSeasonNumber = nextEpisodeInfo.seasonNumber;
-      setSelectedSeasonNumber(currentSeasonNumber);
-      setExpandedEpisodes((prev) => ({
-        ...prev,
-        [nextEpisodeInfo.episode.id]: true,
-      }));
-    }
-
-    const targetSeason = seasonsList.find((season) => season.season_number === currentSeasonNumber);
-    const targetEpisodeIndex = currentSeasonNumber === nextEpisodeInfo?.seasonNumber
+    const targetSeason = seasonsList.find((season) => season.season_number === selectedSeasonNumber);
+    const targetEpisodeIndex = selectedSeasonNumber === nextEpisodeInfo?.seasonNumber
       ? targetSeason?.episodes?.findIndex((episode) => episode.id === nextEpisodeInfo?.episode?.id) ?? -1
       : -1;
     setVisibleEpisodesCount(
@@ -155,6 +145,14 @@ export default function SeasonsPanel() {
 
   const isSeasonWatched = activeSeason?.episodes
     ? activeSeason.episodes.length > 0 && activeSeason.episodes.every((ep) => ep.is_watched)
+    : false;
+
+  const isSeasonPartiallyWatched = activeSeason?.episodes
+    ? activeSeason.episodes.length > 0 && activeSeason.episodes.some((ep) => ep.is_watched) && !isSeasonWatched
+    : false;
+
+  const isSeasonWatchedWithDate = activeSeason?.episodes
+    ? activeSeason.episodes.length > 0 && activeSeason.episodes.every((ep) => ep.last_watched_at)
     : false;
 
   const visibleEpisodes = activeSeason?.episodes?.slice(0, visibleEpisodesCount) || [];
@@ -295,18 +293,22 @@ export default function SeasonsPanel() {
             </div>
           </div>
 
-          <button
-            type="button"
-            className={`season-watch-btn ${isSeasonWatched ? 'season-watch-btn--watched' : ''}`}
-            onClick={handleSeasonWatchedToggle}
-          >
-            <Check size={16} />
-            <span>
-              {isSeasonWatched
-                ? (t('library.details.watched') || 'Watched')
-                : (t('library.details.markWatched') || 'Mark Watched')}
-            </span>
-          </button>
+          {!isSeasonWatchedWithDate && (
+            <button
+              type="button"
+              className={`season-watch-btn ${isSeasonWatched ? 'season-watch-btn--watched' : ''}`}
+              onClick={handleSeasonWatchedToggle}
+            >
+              <Check size={16} />
+              <span>
+                {isSeasonWatched
+                  ? (t('library.details.watched') || 'Watched')
+                  : isSeasonPartiallyWatched
+                  ? `${t('library.details.markWatched') || 'Mark Watched'} (-)`
+                  : (t('library.details.markWatched') || 'Mark Watched')}
+              </span>
+            </button>
+          )}
         </div>
 
         {activeSeason.overview && (
@@ -380,7 +382,7 @@ export default function SeasonsPanel() {
               <div className="episode-card__details">
                 <h4 className="episode-card__title">{episodeText}</h4>
                 
-                {(metaItems.length > 0 || episode.is_multi_episode || (episodeTmdbRating !== undefined && episodeTmdbRating !== null && episodeTmdbRating !== '')) && (
+                {(metaItems.length > 0 || episode.is_multi_episode || (episodeTmdbRating !== undefined && episodeTmdbRating !== null && episodeTmdbRating !== '' && Number(episodeTmdbRating) > 0)) && (
                   <div className="episode-card__meta">
                     {episode.is_multi_episode && (
                       <Pill variant="neutral" className="episode-card__shared-pill">
@@ -392,7 +394,7 @@ export default function SeasonsPanel() {
                         {meta}
                       </span>
                     ))}
-                    {(episodeTmdbRating !== undefined && episodeTmdbRating !== null && episodeTmdbRating !== '') && (
+                    {(episodeTmdbRating !== undefined && episodeTmdbRating !== null && episodeTmdbRating !== '' && Number(episodeTmdbRating) > 0) && (
                       <Pill variant="tmdb" className="episode-card__tmdb-pill">
                         <Star size={10} fill="currentColor" strokeWidth={1.8} />
                         {isNaN(parseFloat(episodeTmdbRating))
@@ -467,25 +469,27 @@ export default function SeasonsPanel() {
                     )}
 
                     {/* Watch toggle */}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        updateStatusMutation.mutate({
-                          itemId: episode.id,
-                          tvId: cleanId,
-                          payload: {
-                            is_watched: !episode.is_watched,
-                            media_type: 'episode',
-                          },
-                        })
-                      }
-                      className={`episode-card__action-btn episode-card__action-btn--watch ${
-                        episode.is_watched ? 'is-watched' : ''
-                      }`}
-                      title={episode.is_watched ? 'Mark unwatched' : 'Mark watched'}
-                    >
-                      {episode.is_watched ? <Check size={16} /> : <Eye size={16} />}
-                    </button>
+                    {!episode.last_watched_at && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateStatusMutation.mutate({
+                            itemId: episode.id,
+                            tvId: cleanId,
+                            payload: {
+                              is_watched: !episode.is_watched,
+                              media_type: 'episode',
+                            },
+                          })
+                        }
+                        className={`episode-card__action-btn episode-card__action-btn--watch ${
+                          episode.is_watched ? 'is-watched' : ''
+                        }`}
+                        title={episode.is_watched ? 'Mark unwatched' : 'Mark watched'}
+                      >
+                        {episode.is_watched ? <Check size={16} /> : <Eye size={16} />}
+                      </button>
+                    )}
 
 
                   </>

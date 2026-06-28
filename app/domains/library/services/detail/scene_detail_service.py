@@ -195,17 +195,21 @@ class SceneDetailService(DetailFormatter):
         current_uid = get_current_user_id()
 
         
-        override = None
+        metadata_override = None
         if match_db:
-            override = db.query(UserOverride).filter(
+            metadata_override = db.query(UserOverride).filter(
                 UserOverride.user_id == current_uid,
                 UserOverride.metadata_match_id == match_db.id
             ).first()
-            if not override and match_db.media_item_id:
-                override = db.query(UserOverride).filter(
-                    UserOverride.user_id == current_uid,
-                    UserOverride.media_item_id == match_db.media_item_id
-                ).first()
+
+        physical_override = None
+        if match_db and match_db.media_item_id:
+            physical_override = db.query(UserOverride).filter(
+                UserOverride.user_id == current_uid,
+                UserOverride.media_item_id == match_db.media_item_id
+            ).first()
+
+        override = metadata_override or physical_override
         if not override:
             override = db.query(UserOverride).filter(
                 UserOverride.user_id == current_uid,
@@ -278,11 +282,56 @@ class SceneDetailService(DetailFormatter):
         poster_resolved = self._resolve_img(local_poster or poster_url, "posters")
         backdrop_resolved = self._resolve_img(local_backdrop or ext_background, "backdrops", size="original")
 
+        # Merge watch properties
+        is_watched = False
+        watch_count = 0
+        resume_position = 0
+        last_watched_at_dt = None
+
+        if metadata_override:
+            is_watched = metadata_override.is_watched
+            watch_count = metadata_override.watch_count or 0
+            last_watched_at_dt = metadata_override.last_watched_at
+        elif override:
+            is_watched = override.is_watched
+            watch_count = override.watch_count or 0
+            last_watched_at_dt = override.last_watched_at
+
+        if physical_override:
+            if physical_override.is_watched:
+                is_watched = True
+            if physical_override.watch_count and physical_override.watch_count > watch_count:
+                watch_count = physical_override.watch_count
+            if physical_override.resume_position:
+                resume_position = physical_override.resume_position
+            if physical_override.last_watched_at:
+                if not last_watched_at_dt or physical_override.last_watched_at > last_watched_at_dt:
+                    last_watched_at_dt = physical_override.last_watched_at
+
+        playback_logs = []
+        if match_db and match_db.media_item_id:
+            from app.domains.history.models import PlaybackLog
+            logs = db.query(PlaybackLog).filter(
+                PlaybackLog.user_id == current_uid,
+                PlaybackLog.media_item_id == match_db.media_item_id
+            ).order_by(PlaybackLog.watched_at.desc()).all()
+            playback_logs = [
+                {
+                    "id": log.id,
+                    "watched_at": log.watched_at.isoformat()
+                }
+                for log in logs
+            ]
+
+        effective_override = metadata_override if metadata_override else override
+
         result = {
-            "id": f"stash_{scene_uuid}",
+            "id": f"scene_{scene_uuid}",
             "title": title,
-            "logo_path": self._resolve_img(local_logo or studio_logo or parent_logo, "logos"),
-            "original_logo_path": studio_logo or parent_logo,
+            "keywords": [],
+            "trailer_key": None,
+            "logo_path": self._resolve_img(override.custom_logo if (override and override.custom_logo) else (studio_logo or parent_logo), "logos"),
+            "original_poster_path": poster_url,
             "original_backdrop_path": poster_url,
             "original_title": None,
             "tagline": None,
@@ -306,22 +355,22 @@ class SceneDetailService(DetailFormatter):
             "directors": [],
             "writers": [],
             "is_adult": True,
-            "is_favorite": override.is_favorite if override else False,
-            "user_rating": override.user_rating if override else None,
-            "user_comment": override.user_comment if override else None,
+            "is_favorite": effective_override.is_favorite if effective_override else False,
+            "user_rating": effective_override.user_rating if effective_override else None,
+            "user_comment": effective_override.user_comment if effective_override else None,
             "external_ids": {
                 "stash_id": scene_uuid,
                 "source": provider_prefix or "stash",
             },
-            "custom_tags": [t.name for t in override.tags] if (override and override.tags) else [],
+            "custom_tags": [t.name for t in effective_override.tags] if (effective_override and effective_override.tags) else [],
             "suggested_tags": [t.get("name") for t in scene_data.get("tags") or [] if t.get("name")] if scene_data.get("tags") else (match_db.suggested_tags if (match_db and match_db.suggested_tags) else []),
             "tags": [],
-            "is_tracked": override.is_tracked if override else False,
-            "watch_count": override.watch_count if override else 0,
-            "is_watched": override.is_watched if override else False,
-            "resume_position": override.resume_position if override else 0,
-            "last_watched_at": override.last_watched_at.isoformat() if override and override.last_watched_at else None,
-            "playback_logs": [],
+            "is_tracked": effective_override.is_tracked if effective_override else False,
+            "watch_count": watch_count,
+            "is_watched": is_watched,
+            "resume_position": resume_position,
+            "last_watched_at": last_watched_at_dt.isoformat() if last_watched_at_dt else None,
+            "playback_logs": playback_logs,
             "in_library": match_db is not None and match_db.media_item_id is not None,
             "library_item_id": match_db.media_item_id if match_db else None,
         }

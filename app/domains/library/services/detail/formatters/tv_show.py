@@ -119,11 +119,12 @@ class TvShowFormatter(DetailFormatter):
                     is_watched = False
                     watch_count = 0
                     resume_position = 0
+                    last_watched_at = override.last_watched_at.isoformat() if override and override.last_watched_at else None
                     if override:
                         is_watched = override.is_watched
                         watch_count = override.watch_count or 0
                         resume_position = override.resume_position or 0
-
+ 
                     is_multi_episode = False
                     if local_item:
                         siblings = [k for k, v in local_episodes_map.items() if v.id == local_item.id]
@@ -141,7 +142,10 @@ class TvShowFormatter(DetailFormatter):
                                     watch_count = sov.watch_count
                                 if sov.resume_position and sov.resume_position > resume_position:
                                     resume_position = sov.resume_position
-                    
+                                if sov.last_watched_at:
+                                    if not last_watched_at or sov.last_watched_at.isoformat() > last_watched_at:
+                                        last_watched_at = sov.last_watched_at.isoformat()
+                     
                     episodes.append({
                         "id": f"tmdb_{tv_tmdb_id_int}_{season_number}_{ep_num}",
                         "episode_number": ep_num,
@@ -157,6 +161,7 @@ class TvShowFormatter(DetailFormatter):
                         "watch_count": watch_count,
                         "is_watched": is_watched,
                         "resume_position": resume_position,
+                        "last_watched_at": last_watched_at,
                         "in_library": local_item is not None,
                         "is_missing": local_item is None,
                         "is_multi_episode": is_multi_episode,
