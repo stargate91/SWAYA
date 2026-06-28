@@ -6,6 +6,7 @@ import enOrganizer from '../locales/en/organizer.json';
 import enLibrary from '../locales/en/library.json';
 import enHistory from '../locales/en/history.json';
 import enOnboarding from '../locales/en/onboarding.json';
+import enRatings from '../locales/en/ratings.json';
 import { LanguageContext } from './LanguageContext';
 
 const en = {
@@ -16,6 +17,7 @@ const en = {
   library: enLibrary,
   historyPage: enHistory,
   onboarding: enOnboarding,
+  ratings: enRatings,
 };
 
 const translations = { en };

@@ -7,7 +7,7 @@ const MediaDetailPage = lazy(() => import('../pages/library/MediaDetailPage'));
 const PeopleCollectionDetailPage = lazy(() => import('../pages/library/PeopleCollectionDetailPage'));
 const PerformerEditPage = lazy(() => import('../pages/library/performer-edit/PerformerEditPage'));
 const HistoryPage = lazy(() => import('../pages/history/HistoryPage'));
-const RatingsPage = lazy(() => import('../pages/RatingsPage'));
+const RatingsPage = lazy(() => import('../pages/ratings/RatingsPage'));
 
 export const libraryRoutes = [
   { path: 'library', element: <LibraryPage /> },

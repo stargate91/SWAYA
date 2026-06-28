@@ -1,0 +1,40 @@
+{
+  "title": "Ratings & Reviews",
+  "description": "Manage your ratings, comments, and favorites in one central place.",
+  "tabs": {
+    "unrated": "To Be Rated",
+    "rated": "Rated & Reviewed",
+    "analytics": "Analytics"
+  },
+  "subtabs": {
+    "all": "All Types",
+    "movies": "Movies",
+    "series": "Series",
+    "scenes": "Scenes",
+    "people": "People"
+  },
+  "table": {
+    "name": "Name",
+    "type": "Type",
+    "rating": "My Rating",
+    "favorite": "Favorite",
+    "comment": "Comment / Review",
+    "actions": "Actions",
+    "empty": "No items match the selected criteria.",
+    "loading": "Loading items..."
+  },
+  "stats": {
+    "average": "Average Rating",
+    "totalRated": "Total Rated",
+    "totalUnrated": "Total Unrated",
+    "distribution": "Rating Distribution",
+    "favoritesCount": "Favorites",
+    "people": "People"
+  },
+  "dialog": {
+    "editReview": "Edit Review",
+    "placeholder": "Write your thoughts about this title...",
+    "save": "Save Review",
+    "cancel": "Cancel"
+  }
+}
