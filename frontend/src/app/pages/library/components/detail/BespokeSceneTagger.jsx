@@ -137,7 +137,6 @@ export default function BespokeSceneTagger() {
       const trimmed = searchQuery.trim();
       if (!trimmed) return;
 
-      // Find if tag exists in allTags case-insensitively
       const existing = allTags.find((t) => t.name.toLowerCase() === trimmed.toLowerCase());
       const tagNameToAdd = existing ? existing.name : trimmed;
       handleAddTag(tagNameToAdd);

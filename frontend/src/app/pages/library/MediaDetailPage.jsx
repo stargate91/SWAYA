@@ -2,7 +2,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  User, Tags, Image as ImageIcon,
+  User, Image as ImageIcon,
   Minus, Plus, ChevronUp, ChevronDown, ChevronLeft, ChevronRight,
   DollarSign, TrendingUp, Coins
 } from 'lucide-react';
@@ -34,6 +34,7 @@ import ExtrasPanel from './components/detail/panels/ExtrasPanel';
 import BackdropsPanel from './components/detail/panels/BackdropsPanel';
 import TagsPanel from './components/detail/panels/TagsPanel';
 import BespokeSceneTagger from './components/detail/BespokeSceneTagger';
+import BespokeScenePeaks from './components/detail/BespokeScenePeaks';
 import './components/entityDetail/EntityDetailHeroSection.css';
 
 function BespokeCastSection({ item, t, navigate }) {
@@ -814,27 +815,6 @@ export default function MediaDetailPage({ type = 'movie' }) {
           <>
             <button
               type="button"
-              onClick={() => {
-                openModal({
-                  title: t('library.details.tagger') || 'Tagger',
-                  variant: 'wide',
-                  content: (
-                    <MediaDetailProvider value={{ ...detailState, t, navigate, toast, type: normalizedType, id }}>
-                      <TagsPanel />
-                    </MediaDetailProvider>
-                  ),
-                });
-              }}
-              className="media-detail-page__side-nav-toggle"
-              title={t('library.details.tagger') || 'Tagger'}
-            >
-              <Tags size={18} />
-            </button>
-
-
-
-            <button
-              type="button"
               onClick={handleOpenBackdropModal}
               className="media-detail-page__side-nav-toggle"
               title={t('library.details.backdrops') || 'Choose Backdrop'}
@@ -970,6 +950,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
                 />
               )}
               {item && <BespokeSceneTagger />}
+              {item && item.is_adult && (isMovie || isScene) && <BespokeScenePeaks />}
             </div>
           </div>
         </div>
