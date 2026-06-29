@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { Plus, Tag } from 'lucide-react';
+import { ChevronDown, Plus, Tag } from 'lucide-react';
 import Pill from '@/ui/Pill';
 import { useAllTagsQuery, useCreateTagMutation } from '@/queries/libraryQueries';
+import '../detail/panels/TagsPanel.css';
 import './PeopleTagPopover.css';
 
 const PREDEFINED_COLORS = [
@@ -18,11 +19,13 @@ export default function PeopleTagPopover({ item, t, updatePersonStatusMutation }
   const [newTagName, setNewTagName] = useState('');
   const [newTagColor, setNewTagColor] = useState('var(--color-accent-blue)');
   const [newTagError, setNewTagError] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const popoverRef = useRef(null);
+  const dropdownRef = useRef(null);
+  
   const { data: allTags = [] } = useAllTagsQuery(item?.is_adult);
   const createTagMutation = useCreateTagMutation();
   const currentTags = item?.custom_tags || [];
-  const availableTags = allTags.filter((tag) => !currentTags.includes(tag.name));
   const isBusy = updatePersonStatusMutation.isPending || createTagMutation.isPending;
 
   useEffect(() => {
@@ -33,6 +36,7 @@ export default function PeopleTagPopover({ item, t, updatePersonStatusMutation }
     const handleClickOutside = (event) => {
       if (popoverRef.current && !popoverRef.current.contains(event.target)) {
         setIsOpen(false);
+        setIsDropdownOpen(false);
       }
     };
 
@@ -41,6 +45,18 @@ export default function PeopleTagPopover({ item, t, updatePersonStatusMutation }
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    const handleClickDropdownOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickDropdownOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickDropdownOutside);
+    };
+  }, []);
 
   const handleToggleTag = (tagName) => {
     if (!item?.id || !tagName) {
@@ -108,25 +124,27 @@ export default function PeopleTagPopover({ item, t, updatePersonStatusMutation }
       </button>
 
       {isOpen ? (
-        <div className="entity-detail-page__tag-popover">
-          <div className="entity-detail-page__tag-popover-section">
-            <span className="entity-detail-page__tag-popover-label">
-              {t('library.tags.assignedTitle') || 'Assigned Tags'}
+        <div className="entity-detail-page__tag-popover tags-panel">
+          {/* Currently Assigned Tags */}
+          <div className="tags-panel__assigned-section">
+            <span className="tags-panel__section-subtitle">
+              {t('library.tags.assignedTitle') || 'Assigned'}
             </span>
-            <div className="entity-detail-page__tag-popover-pills">
-              {currentTags.length > 0 ? currentTags.map((tagName) => {
+            <div className="tags-panel__assigned-list">
+              {currentTags.map((tagName) => {
                 const tagObj = allTags.find((tag) => tag.name === tagName);
+                const color = tagObj?.color || '#3b82f6';
                 return (
                   <Pill
                     key={tagName}
                     variant="tag"
-                    className="entity-detail-page__tag-pill"
-                    customStyle={{ '--pill-tag-color': tagObj?.color || '#3b82f6' }}
+                    className="tags-panel__assigned-pill"
+                    customStyle={{ '--pill-tag-color': color }}
                   >
                     <span>{tagName}</span>
                     <button
                       type="button"
-                      className="entity-detail-page__tag-pill-remove"
+                      className="tags-panel__assigned-pill-remove"
                       onClick={() => handleToggleTag(tagName)}
                       disabled={isBusy}
                       title={t('common.remove') || 'Remove'}
@@ -135,80 +153,126 @@ export default function PeopleTagPopover({ item, t, updatePersonStatusMutation }
                     </button>
                   </Pill>
                 );
-              }) : (
-                <span className="entity-detail-page__tag-popover-empty">
+              })}
+              {currentTags.length === 0 && (
+                <div className="tags-panel__no-tags">
                   {t('library.tags.noTagsAssigned') || 'No tags assigned.'}
-                </span>
+                </div>
               )}
             </div>
           </div>
 
-          <div className="entity-detail-page__tag-popover-section">
-            <span className="entity-detail-page__tag-popover-label">
+          {/* Suggested Tags */}
+          {item?.suggested_tags && item.suggested_tags.length > 0 && (
+            <div className="tags-panel__assigned-section">
+              <span className="tags-panel__section-subtitle">
+                {t('library.details.suggestedTags') || 'Suggested Tags'}
+              </span>
+              <div className="tags-panel__assigned-list">
+                {item.suggested_tags.map(tagName => {
+                  const isAssigned = currentTags.includes(tagName);
+                  if (isAssigned) return null;
+                  return (
+                    <Pill
+                      key={tagName}
+                      variant="tag"
+                      className="tags-panel__assigned-pill tags-panel__assigned-pill--suggested"
+                      onClick={() => handleToggleTag(tagName)}
+                    >
+                      <span>{tagName}</span>
+                    </Pill>
+                  );
+                })}
+                {item.suggested_tags.every(t => currentTags.includes(t)) && (
+                  <div className="tags-panel__no-tags">
+                    {t('library.tags.allTagsAssigned') || 'All suggested tags assigned.'}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Add Tag Dropdown */}
+          <div className="tags-panel__select-section" ref={dropdownRef}>
+            <span className="tags-panel__section-subtitle">
               {t('library.tags.addTagLabel') || 'Add Tag'}
             </span>
-            <div className="entity-detail-page__tag-popover-pills entity-detail-page__tag-popover-pills--available">
-              {availableTags.length > 0 ? availableTags.map((tag) => (
-                <button
-                  key={tag.id}
-                  type="button"
-                  className="entity-detail-page__tag-suggestion"
-                  onClick={() => handleToggleTag(tag.name)}
-                  disabled={isBusy}
-                >
-                  <span
-                    className="entity-detail-page__tag-suggestion-dot"
-                    // eslint-disable-next-line react/forbid-dom-props
-                    style={{ backgroundColor: tag.color }}
-                  />
-                  <span>{tag.name}</span>
-                </button>
-              )) : (
-                <span className="entity-detail-page__tag-popover-empty">
-                  {allTags.length === 0
-                    ? (t('library.emptyStates.tags.description') || 'No tags created yet.')
-                    : (t('library.tags.allTagsAssigned') || 'All tags assigned.')}
-                </span>
-              )}
-            </div>
+            <button
+              type="button"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="tags-panel__select-trigger"
+            >
+              <span>{t('library.tags.addTagPlaceholder') || 'Add Tag...'}</span>
+              <ChevronDown size={16} />
+            </button>
+
+            {isDropdownOpen && (
+              <div className="tags-panel__select-dropdown">
+                {allTags
+                  .filter(tag => !currentTags.includes(tag.name))
+                  .map(tag => {
+                    return (
+                      <button
+                        key={tag.id}
+                        type="button"
+                        onClick={() => handleToggleTag(tag.name)}
+                        disabled={isBusy}
+                        className="tags-panel__dropdown-item"
+                      >
+                        {/* eslint-disable-next-line react/forbid-dom-props */}
+                        <div className="tags-panel__dropdown-item-color" style={{ backgroundColor: tag.color }} />
+                        <span className="tags-panel__dropdown-item-name">{tag.name}</span>
+                      </button>
+                    );
+                  })}
+                {allTags.length === 0 && (
+                  <div className="tags-panel__dropdown-empty">
+                    {t('library.emptyStates.tags.description') || 'No tags created yet.'}
+                  </div>
+                )}
+                {allTags.length > 0 && allTags.filter(tag => !currentTags.includes(tag.name)).length === 0 && (
+                  <div className="tags-panel__dropdown-empty">
+                    {t('library.tags.allTagsAssigned') || 'All tags assigned.'}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
-          <form onSubmit={handleCreateTag} className="entity-detail-page__tag-create-form">
-            <input
-              type="text"
-              value={newTagName}
-              onChange={(event) => {
-                setNewTagName(event.target.value);
-                setNewTagError('');
-              }}
-              placeholder={t('library.tags.namePlaceholder') || 'Enter tag name...'}
-              className="entity-detail-page__tag-create-input"
-            />
-            <div className="entity-detail-page__tag-color-row">
-              {PREDEFINED_COLORS.map((color) => (
-                <button
-                  key={color}
-                  type="button"
-                  onClick={() => setNewTagColor(color)}
-                  className={`entity-detail-page__tag-color-btn${newTagColor === color ? ' is-selected' : ''}`}
-                  // eslint-disable-next-line react/forbid-dom-props
-                  style={{ backgroundColor: color }}
-                  aria-label={color}
-                />
-              ))}
-            </div>
-            <button
-              type="submit"
-              className="entity-detail-page__tag-create-submit"
-              disabled={!newTagName.trim() || isBusy}
-            >
-              <Plus size={16} />
-            </button>
-          </form>
+          <div className="tags-panel__divider" />
 
-          {newTagError ? (
-            <span className="entity-detail-page__tag-create-error">{newTagError}</span>
-          ) : null}
+          {/* Create Tag Form */}
+          <form onSubmit={handleCreateTag} className="tags-panel__create-form">
+            <h5 className="tags-panel__create-title">
+              {t('library.tags.modalTitle') || 'Create Tag'}
+            </h5>
+
+            <div className="tags-panel__input-row">
+              <input
+                type="text"
+                value={newTagName}
+                onChange={(e) => {
+                  setNewTagName(e.target.value);
+                  setNewTagError('');
+                }}
+                placeholder={t('library.tags.namePlaceholder') || 'Enter tag name...'}
+                className="tags-panel__input"
+              />
+              <button
+                type="submit"
+                disabled={!newTagName.trim() || isBusy}
+                className="tags-panel__submit-btn"
+              >
+                <Plus size={16} />
+              </button>
+            </div>
+
+            {newTagError && (
+              <span className="tags-panel__error">
+                {newTagError}
+              </span>
+            )}
+          </form>
         </div>
       ) : null}
     </div>

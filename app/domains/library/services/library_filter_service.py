@@ -1,6 +1,7 @@
 import logging
 from typing import Any, List
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from app.domains.metadata.models import MetadataMatch, MetadataLocalization
 from app.domains.users.models import Tag
 from app.application.library.schemas import FilterOptionsResponse, TagGroupItem
@@ -105,6 +106,34 @@ class LibraryFilterService:
         """
         Retrieves available tag groups, with each tag enriched with its associated items.
         """
+        # Self-healing: Mark tags as adult if they are linked to adult items/performers
+        try:
+            self.db.execute(text("""
+                UPDATE tags 
+                SET is_adult = 1 
+                WHERE is_adult = 0 AND id IN (
+                    SELECT uot.tag_id 
+                    FROM user_override_tags uot
+                    JOIN user_overrides uo ON uot.user_override_id = uo.id
+                    JOIN metadata_matches mm ON uo.metadata_match_id = mm.id
+                    WHERE mm.is_adult = 1
+                )
+            """))
+            self.db.execute(text("""
+                UPDATE tags 
+                SET is_adult = 1 
+                WHERE is_adult = 0 AND id IN (
+                    SELECT uot.tag_id 
+                    FROM user_override_tags uot
+                    JOIN user_overrides uo ON uot.user_override_id = uo.id
+                    JOIN people p ON uo.person_id = p.id
+                    WHERE p.is_adult = 1
+                )
+            """))
+            self.db.commit()
+        except Exception as e:
+            logger.debug(f"Failed to auto-heal adult tags: {e}")
+
         from app.shared_kernel.enums import MediaType
         from app.domains.metadata.models import MetadataMatch, MetadataLocalization
         from app.domains.people.models import Person
@@ -137,12 +166,24 @@ class LibraryFilterService:
                     person = self.db.query(Person).filter(Person.id == o.person_id).first()
                     if person:
                         p_img = image_processing_service.resolve_image_url(person.profile_path, "people")
+                        
+                        # Dynamically resolve an automatic backdrop from the person's linked media items
+                        p_backdrop = None
+                        for link in person.media_links:
+                            if link.match and (link.match.local_backdrop_path or link.match.backdrop_path):
+                                p_backdrop = image_processing_service.resolve_image_url(
+                                    link.match.local_backdrop_path or link.match.backdrop_path, 
+                                    "backdrops"
+                                )
+                                break
+
                         p_item = {
                             "id": person.id,
                             "title": person.name,
                             "name": person.name,
                             "poster_path": p_img,
                             "profile_path": p_img,
+                            "backdrop_path": p_backdrop,
                             "type": "person",
                         }
                         if person.is_adult:
@@ -167,10 +208,21 @@ class LibraryFilterService:
                         poster_path = (o.custom_poster if o.custom_poster else None) or (loc.local_poster_path if (loc and loc.local_poster_path) else (loc.poster_path if loc else None))
                         resolved_poster = image_processing_service.resolve_image_url(poster_path, "posters")
 
+                        resolved_backdrop = image_processing_service.resolve_image_url(
+                            match.local_backdrop_path or match.backdrop_path, 
+                            "backdrops"
+                        )
+                        resolved_still = image_processing_service.resolve_image_url(
+                            match.local_still_path or match.still_path, 
+                            "stills"
+                        )
+
                         m_item = {
                             "id": item.id if item else f"stash_{match.external_id}" if match.media_type == MediaType.SCENE else f"tmdb_{match.external_id}",
                             "title": title,
                             "poster_path": resolved_poster,
+                            "backdrop_path": resolved_backdrop,
+                            "still_path": resolved_still or resolved_backdrop,
                             "type": match.media_type.value,
                             "year": match.release_date.year if match.release_date else None,
                             "is_favorite": o.is_favorite,

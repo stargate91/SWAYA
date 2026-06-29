@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -102,16 +105,16 @@ def load_formatter_config_from_db(db_session, user_id: int = 1) -> FormatterConf
         config.scene_prevent_title_performer = settings.get("naming_scene_prevent_title_performer", config.scene_prevent_title_performer)
         try:
             config.scene_tag_limit = max(0, int(settings.get("scene_tag_limit", config.scene_tag_limit)))
-        except (TypeError, ValueError):
-            pass
+        except (TypeError, ValueError) as e:
+            logger.debug(f"Swallowed exception in infrastructure/settings/formatter_config_adapter.py:105: {e}", exc_info=True)
         config.scene_tag_separator = settings.get("scene_tag_separator", config.scene_tag_separator)
         config.scene_tag_blacklist = settings.get("scene_tag_blacklist", config.scene_tag_blacklist)
 
         config.naming_squeeze_studio_names = settings.get("naming_squeeze_studio_names", config.naming_squeeze_studio_names)
         try:
             config.naming_performer_limit = int(settings.get("naming_performer_limit", config.naming_performer_limit))
-        except (TypeError, ValueError):
-            pass
+        except (TypeError, ValueError) as e:
+            logger.debug(f"Swallowed exception in infrastructure/settings/formatter_config_adapter.py:113: {e}", exc_info=True)
         config.naming_performer_limit_keep = settings.get("naming_performer_limit_keep", config.naming_performer_limit_keep)
         config.naming_performer_splitchar = settings.get("naming_performer_splitchar", config.naming_performer_splitchar)
         config.naming_performer_gender_filter = settings.get("naming_performer_gender_filter", config.naming_performer_gender_filter)
@@ -250,4 +253,3 @@ def _resolution_height(resolution: str) -> int:
     if "8k" in str(resolution).lower():
         return 4320
     return 0
-

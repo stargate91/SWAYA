@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -261,14 +264,18 @@ def add_item_peak(item_id: str, db: Session = Depends(get_db)):
         ).first()
         
     player_time = None
+    playing_filename = None
+    playing_filepath = None
     try:
         import requests
         r = requests.get("http://127.0.0.1:8080/requests/status.json", auth=("", "swaya"), timeout=0.1)
         if r.status_code == 200:
             data = r.json()
             player_time = int(data.get("time", 0))
-    except Exception:
-        pass
+            meta = data.get("information", {}).get("category", {}).get("meta", {})
+            playing_filename = meta.get("filename") or meta.get("title")
+    except Exception as e:
+        logger.debug(f"Swallowed exception in application/users/routes.py:270: {e}", exc_info=True)
 
     if player_time is None:
         try:
@@ -279,10 +286,66 @@ def add_item_peak(item_id: str, db: Session = Depends(get_db)):
                 pos_match = re.search(r'id="position">(\d+)</p>', r.text)
                 if pos_match:
                     player_time = int(pos_match.group(1)) // 1000
-        except Exception:
-            pass
+                file_match = re.search(r'id="file">([^<]+)</p>', r.text)
+                if file_match:
+                    playing_filename = file_match.group(1)
+                filepath_match = re.search(r'id="filepath">([^<]+)</p>', r.text)
+                if filepath_match:
+                    playing_filepath = filepath_match.group(1)
+        except Exception as e:
+            logger.debug(f"Swallowed exception in application/users/routes.py:282: {e}", exc_info=True)
 
-    if player_time is not None and player_time > 0:
+    if player_time is not None:
+        from app.domains.library.models import MediaItem
+        media_item = db.query(MediaItem).filter(MediaItem.id == media_item_id).first()
+        if media_item:
+            target_filename = media_item.filename
+            target_path = media_item.current_path
+            
+            import urllib.parse
+            import os
+
+            def clean_path(path_str):
+                if not path_str:
+                    return ""
+                if path_str.startswith("file:///"):
+                    path_str = path_str[8:]
+                elif path_str.startswith("file://"):
+                    path_str = path_str[7:]
+                decoded = urllib.parse.unquote(path_str)
+                return os.path.normpath(decoded).lower()
+
+            cleaned_target_filename = os.path.normpath(target_filename).lower() if target_filename else ""
+            cleaned_target_path = clean_path(target_path)
+
+            matches = False
+
+            if playing_filepath:
+                cleaned_playing_filepath = clean_path(playing_filepath)
+                if cleaned_playing_filepath == cleaned_target_path:
+                    matches = True
+                elif os.path.basename(cleaned_playing_filepath) == cleaned_target_filename:
+                    matches = True
+                elif os.path.splitext(os.path.basename(cleaned_playing_filepath))[0] == os.path.splitext(cleaned_target_filename)[0]:
+                    matches = True
+
+            if not matches and playing_filename:
+                cleaned_playing_filename = clean_path(playing_filename)
+                if cleaned_playing_filename == cleaned_target_path:
+                    matches = True
+                elif cleaned_playing_filename == cleaned_target_filename or os.path.basename(cleaned_playing_filename) == cleaned_target_filename:
+                    matches = True
+                elif os.path.splitext(os.path.basename(cleaned_playing_filename))[0] == os.path.splitext(cleaned_target_filename)[0]:
+                    matches = True
+                else:
+                    base_target = os.path.splitext(cleaned_target_filename)[0]
+                    base_playing = os.path.splitext(os.path.basename(cleaned_playing_filename))[0]
+                    if base_target and base_playing and (base_target in base_playing or base_playing in base_target):
+                        matches = True
+
+            if (playing_filepath or playing_filename) and not matches:
+                player_time = None
+
         video_position = player_time
     else:
         video_position = 0

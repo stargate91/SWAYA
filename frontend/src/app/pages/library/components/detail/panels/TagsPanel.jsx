@@ -252,25 +252,6 @@ export default function TagsPanel() {
             {newTagError}
           </span>
         )}
-
-        <div className="tags-panel__color-row">
-          {PREDEFINED_COLORS.map(c => {
-            const isSelected = newTagColor === c;
-            return (
-              <button
-                key={c}
-                type="button"
-                onClick={() => setNewTagColor(c)}
-                className={`tags-panel__color-btn ${isSelected ? 'tags-panel__color-btn--selected' : ''}`}
-                /* eslint-disable-next-line react/forbid-dom-props */
-                style={{
-                  backgroundColor: c,
-                  outlineColor: c
-                }}
-              />
-            );
-          })}
-        </div>
       </form>
     </div>
   );

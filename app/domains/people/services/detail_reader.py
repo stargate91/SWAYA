@@ -76,8 +76,8 @@ class PerformerDetailReader:
             try:
                 p_id = int(person_id_str.split(":", 1)[1])
                 person = query.filter(Person.id == p_id).first()
-            except (ValueError, TypeError):
-                pass
+            except (ValueError, TypeError) as e:
+                logger.debug(f"Swallowed exception in domains/people/services/detail_reader.py:79: {e}", exc_info=True)
         elif person_id_str.startswith("tmdb:"):
             try:
                 tmdb_id_val = person_id_str.split(":", 1)[1]
@@ -97,8 +97,8 @@ class PerformerDetailReader:
             try:
                 p_id = int(person_id_str)
                 person = query.filter(Person.id == p_id).first()
-            except (ValueError, TypeError):
-                pass
+            except (ValueError, TypeError) as e:
+                logger.debug(f"Swallowed exception in domains/people/services/detail_reader.py:100: {e}", exc_info=True)
         
         if not person:
             if ":" in person_id_str and not person_id_str.startswith("local:"):
@@ -118,8 +118,8 @@ class PerformerDetailReader:
                         person = link.person
                         if load_localizations:
                             person = query.filter(Person.id == person.id).first()
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.debug(f"Swallowed exception in domains/people/services/detail_reader.py:121: {e}", exc_info=True)
             else:
                 query_ext = db.query(Person)
                 if load_localizations:
@@ -230,8 +230,8 @@ class PerformerDetailReader:
                          prov = Provider(prov_name.lower())
                          if not any(ld["provider"] == prov for ld in link_data):
                              link_data.append({"provider": prov, "external_id": str(ext_id)})
-                    except Exception:
-                         pass
+                    except Exception as e:
+                         logger.debug(f"Swallowed exception in domains/people/services/detail_reader.py:233: {e}", exc_info=True)
 
                 fetched_data = enricher.fetch_external_details(person.name, ext_ids, link_data, is_adult=True)
                 if fetched_data:
@@ -434,7 +434,7 @@ class PerformerDetailReader:
         result["external_links"] = formatted_links
         return PersonDetailResponse(**result)
 
-    def get_person_movies(self, person_id: Any, page: int = 1, page_size: int = 12, source: Optional[str] = None) -> PersonFilmographyResponse:
+    def get_person_movies(self, person_id: Any, page: int = 1, page_size: int = 12, source: Optional[str] = None, local_only: bool = False) -> PersonFilmographyResponse:
         db = self.db
         person = self._resolve_person(person_id)
         person_id = person.id
@@ -460,7 +460,7 @@ class PerformerDetailReader:
         )
         
         if source and source.lower() != "tmdb":
-            res = self.filmography_service.get_person_movies(person_id, page, page_size, source)
+            res = self.filmography_service.get_person_movies(person_id, page, page_size, source, local_only=local_only)
             return PersonFilmographyResponse(**res)
 
         total_items = len(movies)
@@ -516,11 +516,11 @@ class PerformerDetailReader:
         }
         return PersonFilmographyResponse(**res)
 
-    def get_person_scenes(self, person_id: Any, page: int = 1, page_size: int = 12, source: Optional[str] = None) -> PersonFilmographyResponse:
+    def get_person_scenes(self, person_id: Any, page: int = 1, page_size: int = 12, source: Optional[str] = None, local_only: bool = False) -> PersonFilmographyResponse:
         db = self.db
         person = self._resolve_person(person_id)
         person_id = person.id
-        res = self.filmography_service.get_person_scenes(person_id, page, page_size, source)
+        res = self.filmography_service.get_person_scenes(person_id, page, page_size, source, local_only=local_only)
         return PersonFilmographyResponse(**res)
 
     def get_person_credit_backdrops(self, person_id: Any, tmdb_id: int, media_type: str) -> Dict[str, Any]:

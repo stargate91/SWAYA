@@ -415,20 +415,20 @@ class TvShowFormatter(DetailFormatter):
                 try:
                     series_match.release_date = datetime.strptime(first_air_date, "%Y-%m-%d")
                     db_updated = True
-                except:
-                    pass
+                except Exception as e:
+                    logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/tv_show.py:418: {e}", exc_info=True)
             if not series_match.rating_tmdb and tmdb_data.get("vote_average"):
                 try:
                     series_match.rating_tmdb = float(tmdb_data.get("vote_average"))
                     db_updated = True
-                except:
-                    pass
+                except Exception as e:
+                    logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/tv_show.py:424: {e}", exc_info=True)
             if not series_match.vote_count_tmdb and tmdb_data.get("vote_count"):
                 try:
                     series_match.vote_count_tmdb = int(tmdb_data.get("vote_count"))
                     db_updated = True
-                except:
-                    pass
+                except Exception as e:
+                    logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/tv_show.py:430: {e}", exc_info=True)
             if series_match.is_adult != tmdb_data.get("adult", False):
                 series_match.is_adult = tmdb_data.get("adult", False)
                 db_updated = True

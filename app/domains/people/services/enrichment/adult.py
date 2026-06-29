@@ -19,8 +19,8 @@ def safe_int(val) -> Optional[int]:
         if digits:
             try:
                 return int(digits)
-            except ValueError:
-                pass
+            except ValueError as e:
+                logger.debug(f"Swallowed exception in domains/people/services/enrichment/adult.py:22: {e}", exc_info=True)
     return None
 
 class AdultEnricher:

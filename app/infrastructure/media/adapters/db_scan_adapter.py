@@ -24,8 +24,8 @@ class DbScanAdapter(ScanPort):
             try:
                 prov_enum = Provider(provider.lower())
                 query = query.filter(MetadataMatch.provider == prov_enum)
-            except ValueError:
-                pass
+            except ValueError as e:
+                logger.debug(f"Swallowed exception in infrastructure/media/adapters/db_scan_adapter.py:27: {e}", exc_info=True)
 
         library_match_ids = {r[0] for r in query.all()}
         
@@ -45,8 +45,8 @@ class DbScanAdapter(ScanPort):
             try:
                 prov_enum = Provider(provider.lower())
                 parent_query = parent_query.filter(MetadataMatch.provider == prov_enum)
-            except ValueError:
-                pass
+            except ValueError as e:
+                logger.debug(f"Swallowed exception in infrastructure/media/adapters/db_scan_adapter.py:48: {e}", exc_info=True)
 
         current_parents = {r[0] for r in parent_query.all()}
         while current_parents:
@@ -66,8 +66,8 @@ class DbScanAdapter(ScanPort):
             if isinstance(s, str):
                 try:
                     status_enums.append(ItemStatus(s.lower()))
-                except ValueError:
-                    pass
+                except ValueError as e:
+                    logger.debug(f"Swallowed exception in infrastructure/media/adapters/db_scan_adapter.py:69: {e}", exc_info=True)
             elif isinstance(s, ItemStatus):
                 status_enums.append(s)
             

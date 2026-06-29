@@ -35,8 +35,8 @@ class MetadataService:
         if provider:
             try:
                 prov_enum = Provider(provider.lower())
-            except ValueError:
-                pass
+            except ValueError as e:
+                logger.debug(f"Swallowed exception in domains/metadata/services/metadata_service.py:38: {e}", exc_info=True)
 
         if not prov_enum and item_type in ("scene", "adult"):
             prov_enum = Provider.STASHDB
@@ -248,8 +248,8 @@ class MetadataService:
             if release_date:
                 try:
                     year_val = int(release_date.split("-")[0])
-                except:
-                    pass
+                except Exception as e:
+                    logger.debug(f"Swallowed exception in domains/metadata/services/metadata_service.py:251: {e}", exc_info=True)
             formatted.append({
                 "id": r.get("id"),
                 "title": r.get("title") or r.get("name") or r.get("original_title") or r.get("original_name"),
@@ -309,8 +309,8 @@ class MetadataService:
             try:
                 tmdb_id_int = int(item_id.split("_")[1])
                 is_tmdb_direct = True
-            except (ValueError, IndexError):
-                pass
+            except (ValueError, IndexError) as e:
+                logger.debug(f"Swallowed exception in domains/metadata/services/metadata_service.py:312: {e}", exc_info=True)
         
         if not is_tmdb_direct and (media_type == "tv" or (isinstance(item_id, str) and "tv" in item_id)):
             try:
@@ -319,8 +319,8 @@ class MetadataService:
                     clean_id = clean_id.split("_")[1]
                 tmdb_id_int = int(clean_id)
                 is_tmdb_direct = True
-            except (ValueError, IndexError):
-                pass
+            except (ValueError, IndexError) as e:
+                logger.debug(f"Swallowed exception in domains/metadata/services/metadata_service.py:322: {e}", exc_info=True)
 
         if is_tmdb_direct and tmdb_id_int is not None:
             details = {}

@@ -123,9 +123,10 @@ def get_person_movies(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=12, ge=1),
     source: str = Query(default=None),
+    local_only: bool = Query(default=False),
     db: Session = Depends(get_db)
 ):
-    return PeopleDetailService(db, scraper_gateway).get_person_movies(person_id, page=page, page_size=page_size, source=source)
+    return PeopleDetailService(db, scraper_gateway).get_person_movies(person_id, page=page, page_size=page_size, source=source, local_only=local_only)
 
 
 @router.get("/{person_id}/tv", response_model=PersonFilmographyResponse)
@@ -144,9 +145,10 @@ def get_person_scenes(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=12, ge=1),
     source: str = Query(default=None),
+    local_only: bool = Query(default=False),
     db: Session = Depends(get_db)
 ):
-    return PeopleDetailService(db, scraper_gateway).get_person_scenes(person_id, page=page, page_size=page_size, source=source)
+    return PeopleDetailService(db, scraper_gateway).get_person_scenes(person_id, page=page, page_size=page_size, source=source, local_only=local_only)
 
 
 def resolve_person(person_id: Any, db: Session):
@@ -347,8 +349,8 @@ def link_person_source_preview(
             if h is not None:
                 try:
                     external_data["height"] = int(h)
-                except (ValueError, TypeError):
-                    pass
+                except (ValueError, TypeError) as e:
+                    logger.debug(f"Swallowed exception in application/people/routes.py:350: {e}", exc_info=True)
             m = perf.get("measurements")
             if m and isinstance(m, dict):
                 band = m.get("band_size")
@@ -402,8 +404,8 @@ def link_person_source(
         try:
             tmdb_int = int(external_id)
             duplicate_person = db.query(Person).filter(Person.id == tmdb_int).first()
-        except ValueError:
-            pass
+        except ValueError as e:
+            logger.debug(f"Swallowed exception in application/people/routes.py:405: {e}", exc_info=True)
 
     ext_ids = dict(person.external_ids or {})
     ext_ids[source] = str(external_id)
@@ -542,8 +544,8 @@ def link_person_source(
                 prov = Provider(prov_name.lower())
                 if not any(ld["provider"] == prov for ld in link_data):
                     link_data.append({"provider": prov, "external_id": str(ext_id)})
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug(f"Swallowed exception in application/people/routes.py:545: {e}", exc_info=True)
 
         fetched_data = enricher.fetch_external_details(
             person.name,

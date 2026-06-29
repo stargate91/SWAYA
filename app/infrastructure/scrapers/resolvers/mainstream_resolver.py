@@ -125,8 +125,8 @@ class MainstreamResolver:
                 try:
                     tmdb_type = "tv" if res.get("item_type") == "tv" else "movie"
                     details = self.api.get_details(res["id"], tmdb_type, language=language)
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.debug(f"Failed to fetch TMDB details for NFO match {res.get('id')} ({tmdb_type}): {e}", exc_info=True)
                 
                 candidate_titles = self.title_matcher.collect_candidate_titles(res, details)
                 title_rank = 0
@@ -147,8 +147,8 @@ class MainstreamResolver:
                         c_year = int(str(date_str).split("-")[0])
                         if abs(c_year - target_year) <= 1:
                             year_match = True
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        logger.debug(f"Swallowed exception in infrastructure/scrapers/resolvers/mainstream_resolver.py:150: {e}", exc_info=True)
                 else:
                     year_match = True
                 

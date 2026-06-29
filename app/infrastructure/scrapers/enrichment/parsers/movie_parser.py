@@ -74,3 +74,13 @@ def enrich_movie(parser, match: MetadataMatch, language: str, include_ratings: b
 
     # Trailer
     loc.trailer_url = _pick_trailer_key(details, language, details.get("original_language"))
+
+    # Keywords / Suggested Tags
+    keywords_data = details.get("keywords", {})
+    if isinstance(keywords_data, dict):
+        keywords_list = keywords_data.get("keywords", [])
+        if isinstance(keywords_list, list):
+            match.suggested_tags = [
+                kw["name"] for kw in keywords_list 
+                if isinstance(kw, dict) and kw.get("name")
+            ]

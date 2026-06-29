@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { getOrganizerQueryKey } from './organizerQueries';
+import { useUi } from '@/providers/UiProvider';
 
 const matchesLibraryEntity = (item, rawItemId, cleanId) => {
   if (!item || typeof item !== 'object') return false;
@@ -352,7 +353,7 @@ export const useUpdateMediaStatusMutation = () => {
           user_rating: data.user_rating !== undefined ? data.user_rating : oldData.user_rating,
           user_comment: data.user_comment !== undefined ? data.user_comment : oldData.user_comment,
           is_watched: data.is_watched !== undefined ? data.is_watched : oldData.is_watched,
-          custom_tags: data.custom_tags !== undefined ? data.custom_tags : oldData.custom_tags,
+          custom_tags: data.custom_tags !== undefined ? data.custom_tags : (data.tags !== undefined ? data.tags : oldData.custom_tags),
           tags: data.tags !== undefined ? data.tags : oldData.tags,
         };
       };
@@ -659,6 +660,7 @@ export const useToggleTrackedMutation = () => {
 
 export const useAddPeakMutation = () => {
   const queryClient = useQueryClient();
+  const { toast } = useUi();
   return useMutation({
     mutationFn: (variables) => {
       const itemId = typeof variables === 'object' ? variables.itemId : variables;
@@ -712,6 +714,7 @@ export const useAddPeakMutation = () => {
           queryClient.setQueryData(['library-item-detail', key], val);
         });
       }
+      toast(err.message || 'Failed to add peak', 'danger');
     },
     onSuccess: (data, variables) => {
       const { itemId, tvId } = typeof variables === 'object' ? variables : { itemId: variables, tvId: null };

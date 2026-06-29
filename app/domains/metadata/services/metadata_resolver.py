@@ -59,16 +59,16 @@ class MetadataResolver:
             if season_number is not None:
                 try:
                     season_number = int(season_number)
-                except (ValueError, TypeError):
-                    pass
+                except (ValueError, TypeError) as e:
+                    logger.debug(f"Swallowed exception in domains/metadata/services/metadata_resolver.py:62: {e}", exc_info=True)
             if episode_number is not None:
                 try:
                     if isinstance(episode_number, list):
                         episode_number = [int(x) for x in episode_number if str(x).isdigit()]
                     elif str(episode_number).isdigit():
                         episode_number = int(episode_number)
-                except (ValueError, TypeError):
-                    pass
+                except (ValueError, TypeError) as e:
+                    logger.debug(f"Swallowed exception in domains/metadata/services/metadata_resolver.py:70: {e}", exc_info=True)
 
             if season_number is not None and episode_number is not None:
                 mtype = MediaType.EPISODE

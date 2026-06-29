@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 import os
 import logging
 from pathlib import Path
@@ -48,8 +51,8 @@ def probe_logo_darkness(file_path: str, image_root: Path, session: requests.Sess
         if local_file.exists():
             with Image.open(local_file) as image:
                 return measure_logo_darkness(image)
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug(f"Swallowed exception in domains/media_assets/services/image_selectors.py:51: {e}", exc_info=True)
 
     try:
         url = f"{TMDB_IMAGE_BASE}original{file_path}"
@@ -151,8 +154,8 @@ def probe_backdrop_tone(file_path: str, image_root: Path, session: requests.Sess
         if local_file.exists():
             with Image.open(local_file) as image:
                 return measure_backdrop_tone(image)
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug(f"Swallowed exception in domains/media_assets/services/image_selectors.py:154: {e}", exc_info=True)
 
     try:
         url = f"{TMDB_IMAGE_BASE}original{file_path}"
@@ -321,4 +324,3 @@ def pick_poster_path(
 
     ranked_posters = sorted(posters, key=poster_score)
     return ranked_posters[0].get("file_path") or raw.get("poster_path")
-

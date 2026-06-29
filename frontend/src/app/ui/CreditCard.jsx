@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Film, Tv } from 'lucide-react';
+import { Film, Tv, Play } from 'lucide-react';
 import './CreditCard.css';
 
 export default function CreditCard({
@@ -14,6 +14,7 @@ export default function CreditCard({
   isUnframed = false,
   isPlaceholder = false,
   onClick,
+  onPlayClick,
   disabled,
   className = '',
   children,
@@ -56,6 +57,18 @@ export default function CreditCard({
             {isTv ? <Tv size={16} /> : <Film size={16} />}
           </div>
         ))}
+        {onPlayClick && (
+          <button
+            type="button"
+            className="ui-credit-card__play-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              onPlayClick();
+            }}
+          >
+            <Play size={14} fill="currentColor" />
+          </button>
+        )}
       </div>
 
       <div className="ui-credit-card__body">

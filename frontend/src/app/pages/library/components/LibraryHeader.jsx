@@ -50,6 +50,7 @@ export default function LibraryHeader({
   setSortDirection,
   setCurrentPage,
   activeSessionMode,
+  showSearch = true,
 }) {
   const currentTabObj = tabs.find(tab => tab.value === resolvedTab);
   const hasItems = currentTabObj ? (currentTabObj.count > 0) : false;
@@ -111,14 +112,16 @@ export default function LibraryHeader({
             ) : null}
           </div>
         )}
-        <div className="organizer-search">
-          <Search size={14} className="organizer-search__icon" />
-          <SearchInput
-            key={resolvedTab}
-            placeholder={searchPlaceholder}
-            onSearchChange={setSearchQuery}
-          />
-        </div>
+        {showSearch && (
+          <div className="organizer-search">
+            <Search size={14} className="organizer-search__icon" />
+            <SearchInput
+              key={resolvedTab}
+              placeholder={searchPlaceholder}
+              onSearchChange={setSearchQuery}
+            />
+          </div>
+        )}
       </div>
     </>
   );

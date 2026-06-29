@@ -2,70 +2,80 @@ import { useState, useMemo } from 'react';
 import { useLibraryQuery, usePeopleQuery } from '@/queries/libraryQueries';
 import { useUpdateMediaStatusMutation } from '@/queries/mediaQueries';
 import { useUpdatePersonStatusMutation } from '@/queries/libraryQueries';
+import { useSettingsQuery } from '@/queries/settingsQueries';
+import { resolveLibraryBackendTab } from '@/lib/libraryTabs';
+import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 
 export function useRatingsPageState() {
+  const { data: settings } = useSettingsQuery();
+  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const [activeTab, setActiveTab] = useState('unrated'); // 'unrated' | 'rated' | 'analytics'
   const [mediaType, setMediaType] = useState('movies'); // 'movies' | 'series' | 'scenes' | 'people'
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  const [pageSize, setPageSize] = useState(40);
   const [sortKey, setSortKey] = useState('title'); // 'title' | 'rating'
   const [sortDirection, setSortDirection] = useState('asc'); // 'asc' | 'desc'
-  const [activeSessionMode] = useState(() => {
-    try {
-      return localStorage.getItem('session_mode') || 'sfw';
-    } catch {
-      return 'sfw';
-    }
-  });
+  const hasAdultSupport = settings?.include_adult;
+  const activeSessionMode = hasAdultSupport ? sessionMode : 'sfw';
+  const resolvedAdultGenderPreference =
+    activeSessionMode === 'nsfw' && settings?.adult_gender_preference && settings.adult_gender_preference !== 'all'
+      ? settings.adult_gender_preference
+      : undefined;
+
+  const effectiveMediaType = activeSessionMode !== 'nsfw' && mediaType === 'scenes'
+    ? 'movies'
+    : mediaType;
 
   // Compute resolved tab name for backend
   const resolvedBackendTab = useMemo(() => {
-    if (mediaType === 'people') return activeSessionMode === 'nsfw' ? 'adult_people' : 'people';
-    if (mediaType === 'series') return activeSessionMode === 'nsfw' ? 'adult_series' : 'series';
-    if (mediaType === 'scenes') return 'adult_scenes';
-    return activeSessionMode === 'nsfw' ? 'adult' : 'movies';
-  }, [mediaType, activeSessionMode]);
+    if (effectiveMediaType === 'series') {
+      return resolveLibraryBackendTab('tv', activeSessionMode);
+    }
+    return resolveLibraryBackendTab(effectiveMediaType, activeSessionMode);
+  }, [effectiveMediaType, activeSessionMode]);
 
   // Fetch media items
   const mediaQuery = useLibraryQuery(
-    mediaType !== 'people'
+    effectiveMediaType !== 'people'
       ? {
           tab: resolvedBackendTab,
           page: 1,
           pageSize: 5000,
           filter_ownership: 'owned',
           filter_status: 'all', // Include inactive items that might have ratings/comments
+          include_adult: activeSessionMode === 'nsfw',
         }
       : null
   );
 
   // Fetch people items
   const peopleQuery = usePeopleQuery(
-    mediaType === 'people'
+    effectiveMediaType === 'people'
       ? {
           include_inactive: true,
           limit: 5000,
           adult_only: activeSessionMode === 'nsfw',
+          gender: resolvedAdultGenderPreference,
         }
       : null
   );
 
   const rawItems = useMemo(() => {
-    if (mediaType === 'people') {
+    if (effectiveMediaType === 'people') {
       return peopleQuery.data?.items || [];
     }
     return mediaQuery.data?.items || [];
-  }, [mediaType, mediaQuery.data, peopleQuery.data]);
+  }, [effectiveMediaType, mediaQuery.data, peopleQuery.data]);
 
-  const isLoading = mediaType === 'people' ? peopleQuery.isLoading : mediaQuery.isLoading;
+  const isLoading = effectiveMediaType === 'people' ? peopleQuery.isLoading : mediaQuery.isLoading;
 
   // Mutations
   const updateMediaMutation = useUpdateMediaStatusMutation();
   const updatePersonMutation = useUpdatePersonStatusMutation();
 
   const handleRateItem = async (item, rating) => {
-    if (mediaType === 'people') {
+    if (effectiveMediaType === 'people') {
       await updatePersonMutation.mutateAsync({
         personId: item.id,
         payload: { user_rating: rating },
@@ -79,7 +89,7 @@ export function useRatingsPageState() {
   };
 
   const handleToggleFavorite = async (item) => {
-    if (mediaType === 'people') {
+    if (effectiveMediaType === 'people') {
       await updatePersonMutation.mutateAsync({
         personId: item.id,
         payload: { is_favorite: !item.is_favorite },
@@ -88,7 +98,7 @@ export function useRatingsPageState() {
   };
 
   const handleSaveComment = async (item, comment) => {
-    if (mediaType === 'people') {
+    if (effectiveMediaType === 'people') {
       await updatePersonMutation.mutateAsync({
         personId: item.id,
         payload: { user_comment: comment },
@@ -212,7 +222,7 @@ export function useRatingsPageState() {
   return {
     activeTab,
     setActiveTab: handleSetActiveTab,
-    mediaType,
+    mediaType: effectiveMediaType,
     setMediaType: handleSetMediaType,
     searchQuery,
     setSearchQuery: handleSetSearchQuery,
@@ -231,5 +241,6 @@ export function useRatingsPageState() {
     handleRateItem,
     handleToggleFavorite,
     handleSaveComment,
+    activeSessionMode,
   };
 }

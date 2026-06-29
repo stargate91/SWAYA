@@ -226,7 +226,8 @@ class RenamerEngine:
         if target_path.exists():
             try:
                 target_path.unlink()
-            except: pass
+            except Exception as e:
+                logger.warning(f"Failed to delete collision target file {target_path}: {e}")
 
     def _is_better_replacement(self, source_item: Any, target_path: Path) -> bool:
         target_item = self.library_port.get_item_by_relative_path(str(target_path).replace("\\", "/"))
@@ -348,8 +349,8 @@ class RenamerEngine:
                 libraries = self.library_port.get_all_libraries()
                 for lib in libraries:
                     protected_paths.add(Path(lib.root_path).resolve())
-            except:
-                pass
+            except Exception as e:
+                logger.debug(f"Swallowed exception in domains/library/services/renamer_engine.py:352: {e}", exc_info=True)
 
             if path.resolve() in protected_paths:
                 logger.debug(f"Cleanup stopped: {path} is a protected library root.")

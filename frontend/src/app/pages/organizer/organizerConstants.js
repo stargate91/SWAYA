@@ -1,17 +1,17 @@
-import { Eye, Film, Tv, FolderPlus, PlayCircle, Captions, Volume2, Image, Info } from 'lucide-react';
+import { Eye, Clapperboard, Video, Tv, FolderPlus, PlayCircle, Captions, Volume2, Image, Info } from 'lucide-react';
 
 export const MAIN_TABS = [
   { value: 'manual', labelKey: 'organizer.tabs.manual', icon: Eye, tone: 'warning' },
-  { value: 'movies', labelKey: 'organizer.tabs.movies', icon: Film, tone: 'success' },
+  { value: 'movies', labelKey: 'organizer.tabs.movies', icon: Clapperboard, tone: 'success' },
   { value: 'episodes', labelKey: 'organizer.tabs.episodes', icon: Tv, tone: 'success' },
-  { value: 'scenes', labelKey: 'organizer.tabs.scenes', icon: Film, tone: 'success' },
+  { value: 'scenes', labelKey: 'organizer.tabs.scenes', icon: Video, tone: 'success' },
   { value: 'extras', labelKey: 'organizer.tabs.extras', icon: FolderPlus },
 ];
 
 export const MANUAL_TABS = [
-  { value: 'movies', labelKey: 'organizer.tabs.movies', icon: Film, tone: 'warning' },
+  { value: 'movies', labelKey: 'organizer.tabs.movies', icon: Clapperboard, tone: 'warning' },
   { value: 'episodes', labelKey: 'organizer.tabs.episodes', icon: Tv, tone: 'warning' },
-  { value: 'scenes', labelKey: 'organizer.tabs.scenes', icon: Film, tone: 'warning' },
+  { value: 'scenes', labelKey: 'organizer.tabs.scenes', icon: Video, tone: 'warning' },
 ];
 
 export const EXTRAS_TABS = [

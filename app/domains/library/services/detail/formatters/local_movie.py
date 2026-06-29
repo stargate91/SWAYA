@@ -167,6 +167,8 @@ class LocalMovieFormatter(MovieDetailFormatter):
                 tmdb_data = tmdb_scraper.get_details(tmdb_id_int, "movie", language=ui_lang)
                 if tmdb_data and tmdb_data.get("keywords"):
                     keywords_list = [k["name"] for k in tmdb_data.get("keywords", {}).get("keywords", [])]
+                    active_match.suggested_tags = keywords_list
+                    db.commit()
             except Exception as e:
                 logger.error(f"Failed to fetch live keywords fallback: {e}")
 
@@ -247,6 +249,8 @@ class LocalMovieFormatter(MovieDetailFormatter):
             for log in sorted(item.playback_logs or [], key=lambda x: x.watched_at, reverse=True)
         ]
 
+        suggested_tags = active_match.suggested_tags if (active_match and active_match.suggested_tags) else keywords_list
+
         result = {
             "id": item.id,
             "title": title,
@@ -288,7 +292,7 @@ class LocalMovieFormatter(MovieDetailFormatter):
             "user_rating": override.user_rating if override else None,
             "user_comment": override.user_comment if override else None,
             "custom_tags": [t.name for t in override.tags if t.is_adult == bool(active_match.is_adult if active_match else False)] if (override and override.tags) else [],
-            "suggested_tags": active_match.suggested_tags if (active_match and active_match.suggested_tags) else [],
+            "suggested_tags": suggested_tags,
             "technical": technical,
             "in_library": True,
             "path": item.current_path,

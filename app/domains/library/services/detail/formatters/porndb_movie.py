@@ -8,7 +8,7 @@ from app.application.library.schemas import MovieDetailResponse
 from app.domains.library.services.detail.formatters.base import MovieDetailFormatter
 from app.domains.metadata.models import MetadataMatch
 
-from app.domains.people.models import Person
+from app.domains.people.models import Person, ExternalSourceLink
 
 logger = logging.getLogger(__name__)
 
@@ -34,8 +34,8 @@ class PornDbMovieFormatter(MovieDetailFormatter):
         if date_str:
             try:
                 year = int(date_str.split("-")[0])
-            except:
-                pass
+            except Exception as e:
+                logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/porndb_movie.py:37: {e}", exc_info=True)
                 
         cast = []
         for perf in movie_data.get("performers") or []:
@@ -51,10 +51,28 @@ class PornDbMovieFormatter(MovieDetailFormatter):
                 mapped_gender = 2
                 
             # Check if person exists in DB
-            person_db = db.query(Person).filter(Person.name == perf_name).first()
+            person_db = None
+            p_ext_id = p_info.get("id")
+            if p_ext_id:
+                link = db.query(ExternalSourceLink).filter(
+                    ExternalSourceLink.provider == Provider.PORNDB,
+                    ExternalSourceLink.external_id == str(p_ext_id)
+                ).first()
+                if link:
+                    person_db = link.person
+
+            if not person_db:
+                person_db = db.query(Person).filter(Person.name == perf_name).first()
+
             if person_db:
                 p_id = f"local:{person_db.id}"
-                resolved_img = self._resolve_img(person_db.local_profile_path or person_db.profile_path, "people")
+                # Check for UserOverride custom profile image
+                override_obj = db.query(UserOverride).filter(
+                    UserOverride.user_id == current_uid,
+                    UserOverride.person_id == person_db.id
+                ).first()
+                custom_img = override_obj.custom_poster if override_obj else None
+                resolved_img = self._resolve_img(custom_img or person_db.local_profile_path or person_db.profile_path, "people")
             else:
                 p_id = f"porndb:{p_info.get('id')}"
                 resolved_img = p_info.get("image")
@@ -88,14 +106,14 @@ class PornDbMovieFormatter(MovieDetailFormatter):
                 try:
                     match.release_date = datetime.strptime(date_str, "%Y-%m-%d")
                     db_updated = True
-                except:
-                    pass
+                except Exception as e:
+                    logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/porndb_movie.py:91: {e}", exc_info=True)
             if movie_data.get("rating") is not None and float(movie_data.get("rating")) > 0:
                 try:
                     match.rating_porndb = float(movie_data.get("rating"))
                     db_updated = True
-                except:
-                    pass
+                except Exception as e:
+                    logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/porndb_movie.py:97: {e}", exc_info=True)
             
             loc_db = next((l for l in match.localizations if l.locale == "en"), None)
             if not loc_db:
@@ -214,8 +232,8 @@ class PornDbMovieFormatter(MovieDetailFormatter):
                             duration_val = int(parts[0]) * 60 + int(parts[1])
                         elif len(parts) == 3:
                             duration_val = int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
-                    except ValueError:
-                        pass
+                    except ValueError as e:
+                        logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/porndb_movie.py:217: {e}", exc_info=True)
 
         result = {
             "id": f"porndb_{porndb_id}",

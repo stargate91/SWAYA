@@ -562,6 +562,41 @@
   color: var(--color-text-primary);
 }
 
+.person-credits-card__play-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: var(--app-shell-color-panel, #2c2c2e);
+  background-image: var(--button-secondary-bg);
+  color: var(--button-secondary-color, white);
+  border: 1px solid var(--button-secondary-border, rgba(255, 255, 255, 0.15));
+  box-shadow: 0 4px 10px color-mix(in srgb, black 30%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--motion-fast) ease, transform var(--motion-fast) ease, background-color var(--motion-fast) ease, background-image var(--motion-fast) ease, border-color var(--motion-fast) ease;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.person-credits-card:hover .person-credits-card__play-btn {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.person-credits-card__play-btn:hover {
+  background-color: var(--app-shell-color-panel-strong, #3a3a3c);
+  background-image: var(--button-secondary-hover-bg);
+  border-color: var(--button-secondary-border);
+  box-shadow: 0 4px 12px color-mix(in srgb, black 40%, transparent);
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
 /* Card details underneath the poster */
 .person-credits-card__title {
   display: block;
@@ -574,16 +609,31 @@
   white-space: nowrap;
 }
 
+.person-credits-card__meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: 2px;
+}
+
 .person-credits-card__role {
   display: block;
   font-size: 0.76rem;
   color: color-mix(in srgb, var(--color-text-primary) 70%, transparent);
-  --role-mt: 2px;
-  margin-top: var(--role-mt);
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
   font-weight: 500;
+  flex: 1;
+  min-width: 0;
+}
+
+.person-credits-card__year {
+  font-size: 0.74rem;
+  color: color-mix(in srgb, var(--color-text-primary) 40%, transparent);
+  font-weight: 500;
+  flex-shrink: 0;
 }
 
 

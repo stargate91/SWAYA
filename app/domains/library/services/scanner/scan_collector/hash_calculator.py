@@ -1,6 +1,9 @@
+import logging
 from typing import Optional, Dict, Any
 from app.shared_kernel.enums import ScanMode
 from app.shared_kernel.ports.file_system_port import FileSystemPort
+
+logger = logging.getLogger(__name__)
 
 class HashCalculator:
     """
@@ -27,19 +30,19 @@ class HashCalculator:
         
         try:
             hashes["hash_oshash"] = self.fs.calculate_oshash(filepath_str)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug(f"Failed to calculate OSHASH for {filepath_str}: {e}", exc_info=True)
 
         if mode == ScanMode.SCENES:
             try:
                 hashes["hash_phash"] = self.fs.calculate_phash(filepath_str, duration)
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug(f"Failed to calculate PHASH for {filepath_str}: {e}", exc_info=True)
         else:
             try:
                 hashes["hash_md5"] = self.fs.calculate_fast_hash(filepath_str)
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug(f"Failed to calculate fast hash/MD5 for {filepath_str}: {e}", exc_info=True)
 
         return hashes
 

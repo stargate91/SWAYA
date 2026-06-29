@@ -97,8 +97,8 @@ class LibraryListingService:
                         if isinstance(parsed, list):
                             return get_first_int(parsed[0]) if parsed else None
                         return int(parsed)
-                    except:
-                        pass
+                    except Exception as e:
+                        logger.debug(f"Swallowed exception in domains/library/services/library_listing_service.py:100: {e}", exc_info=True)
                 return None
 
             results.append(ContinueWatchingItem(

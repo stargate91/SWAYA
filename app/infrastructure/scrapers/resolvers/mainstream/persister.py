@@ -99,8 +99,8 @@ class MatchPersister:
                     c_year = int(date_str.split("-")[0])
                     if abs(c_year - target_year) <= 1:
                         year_match = 1
-                except:
-                    pass
+                except Exception as e:
+                    logger.debug(f"Swallowed exception in infrastructure/scrapers/resolvers/mainstream/persister.py:102: {e}", exc_info=True)
             return (title_rank, source_priority, year_match, -noise_penalty)
 
         sorted_candidates = sorted(candidates.values(), key=get_candidate_score, reverse=True)
@@ -121,8 +121,8 @@ class MatchPersister:
             if date_str:
                 try:
                     release_date = datetime.strptime(date_str, "%Y-%m-%d")
-                except:
-                    pass
+                except Exception as e:
+                    logger.debug(f"Swallowed exception in infrastructure/scrapers/resolvers/mainstream/persister.py:124: {e}", exc_info=True)
 
             raw_type = data.get("item_type") or data.get("media_type", "movie")
             itype = MediaType.TV if raw_type == "tv" else MediaType.MOVIE

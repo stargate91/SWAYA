@@ -165,8 +165,8 @@ class PornDBMovieResolver:
                 if candidate_date:
                     try:
                         candidate_year = int(str(candidate_date).split("-")[0])
-                    except (TypeError, ValueError):
-                        pass
+                    except (TypeError, ValueError) as e:
+                        logger.debug(f"Swallowed exception in infrastructure/scrapers/resolvers/porndb_movie_resolver.py:168: {e}", exc_info=True)
                 
                 if year and candidate_year:
                     if year != candidate_year:

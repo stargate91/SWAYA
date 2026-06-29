@@ -29,8 +29,8 @@ def apply_enriched_data(enricher, person: Person, data: dict):
             except ValueError:
                 try:
                     prov_enum = Provider[prov_val.upper()]
-                except KeyError:
-                    pass
+                except KeyError as e:
+                    logger.debug(f"Swallowed exception in domains/people/services/enrichment/persister.py:32: {e}", exc_info=True)
         elif isinstance(prov_val, Provider):
             prov_enum = prov_val
 

@@ -49,6 +49,7 @@ class LocalCreditsAggregator:
                 "type": match.media_type.value,
                 "tmdb_id": int(match.external_id) if match.external_id.isdigit() else 0,
                 "year": match.release_date.year if match.release_date else None,
+                "release_date": match.release_date.isoformat() if match.release_date else None,
                 "poster_path": self._resolve_img(match_loc.poster_path if match_loc else None, "posters"),
                 "backdrop_path": self._resolve_img(match.backdrop_path, "backdrops", size="original"),
                 "rating": match.rating_tmdb or 0.0,

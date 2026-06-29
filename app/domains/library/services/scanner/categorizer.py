@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 from pathlib import Path
 from typing import Tuple, Optional
 from app.shared_kernel.enums import ExtraCategory, ExtraSubtype
@@ -39,14 +42,14 @@ class Categorizer:
         if settings_port:
             try:
                 settings = settings_port.get_all_system_settings()
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug(f"Swallowed exception in domains/library/services/scanner/categorizer.py:42: {e}", exc_info=True)
         elif db_session:
             try:
                 from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
                 settings = DbSettingsAdapter(db_session).get_all_system_settings()
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug(f"Swallowed exception in domains/library/services/scanner/categorizer.py:48: {e}", exc_info=True)
 
         if settings:
             if "extras_sub_exts" in settings: sub_exts = [e.strip() for e in settings["extras_sub_exts"].split(",")]
@@ -98,4 +101,3 @@ class Categorizer:
         elif ext == '.txt': subtype = ExtraSubtype.TXT
                 
         return category, subtype
-

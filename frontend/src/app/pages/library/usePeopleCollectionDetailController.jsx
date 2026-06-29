@@ -94,10 +94,17 @@ export default function usePeopleCollectionDetailController({
       const chosen = [];
       const tmdbFound = externalLinks.find((link) => link.key === 'tmdb');
       if (tmdbFound) {
-        chosen.push({
-          ...tmdbFound,
+        chosen.push(tmdbFound);
+      }
+      const imdbFound = externalLinks.find((link) => link.key === 'imdb');
+      if (imdbFound) {
+        chosen.push(imdbFound);
+      }
+      if (chosen.length % 2 === 1) {
+        chosen[chosen.length - 1] = {
+          ...chosen[chosen.length - 1],
           fullWidth: true
-        });
+        };
       }
       return chosen;
     },

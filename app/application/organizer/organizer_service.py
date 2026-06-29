@@ -85,8 +85,8 @@ class OrganizerService:
                 preview = formatter.format_item(item, active_match, loc)
                 previews.append(preview)
                 preview_map[item.id] = preview
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug(f"Swallowed exception in application/organizer/organizer_service.py:88: {e}", exc_info=True)
 
         if previews:
             formatter.resolve_collisions(previews)

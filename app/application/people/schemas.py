@@ -157,6 +157,7 @@ class PersonStatusUpdate(BaseModel):
     user_rating: Optional[float] = None
     is_favorite: Optional[bool] = None
     user_comment: Optional[str] = None
+    custom_tags: Optional[List[str]] = None
 
 
 class PersonAddTmdb(BaseModel):

@@ -8,6 +8,7 @@ import { getPosterImagePath } from '@/lib/imageUrls';
 import { usePersonCreditsQuery } from '@/queries/metadataQueries';
 import { isTvLikeMediaType } from '@/lib/mediaTypes';
 import { API_BASE } from '@/lib/backend';
+import { usePlayMediaMutation } from '@/queries';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
 import './PersonCreditsShared.css';
 
@@ -16,6 +17,7 @@ const PERSON_INITIAL_CREDITS_PAGE_SIZE = 12;
 export default function PersonCreditsGridSection({ personId, mediaType, totalCount, initialPageData, navigate, t, onPaginationData, source }) {
   const shouldLoad = Boolean(personId) && (Number(totalCount) > 0 || !!source);
   const queryClient = useQueryClient();
+  const playMutation = usePlayMediaMutation();
   const containerRef = useRef(null);
   const [columns, setColumns] = useState(Math.max(1, Math.floor(PERSON_INITIAL_CREDITS_PAGE_SIZE / 2)));
   const [page, setPage] = useState(1);
@@ -188,6 +190,7 @@ export default function PersonCreditsGridSection({ personId, mediaType, totalCou
               isOwned={item.in_library}
               isMissing={!item.in_library}
               onClick={() => openItem(item)}
+              onPlayClick={(item.in_library && !isTv) ? () => playMutation.mutate(item.library_item_id || item.id) : undefined}
             >
               {mediaType === 'scenes' ? (
                 <>
@@ -200,7 +203,7 @@ export default function PersonCreditsGridSection({ personId, mediaType, totalCou
                     </div>
                   )}
                   <div className="ui-credit-card__meta person-credits-card__meta-container">
-                    {item.year && <span>{item.year}</span>}
+                    {(item.release_date || item.year) && <span>{item.release_date || item.year}</span>}
                     {item.duration && <span>{item.duration}</span>}
                     {item.resolution && (
                       <Pill variant="accent" className="person-credits-card__res-pill">

@@ -73,15 +73,15 @@ async def user_context_middleware(request: Request, call_next):
     if header_val:
         try:
             user_id = int(header_val)
-        except ValueError:
-            pass
+        except ValueError as e:
+            logger.debug(f"Swallowed exception in main.py:76: {e}", exc_info=True)
     else:
         qp_val = request.query_params.get("user_id")
         if qp_val:
             try:
                 user_id = int(qp_val)
-            except ValueError:
-                pass
+            except ValueError as e:
+                logger.debug(f"Swallowed exception in main.py:83: {e}", exc_info=True)
                 
     token = set_current_user_id(user_id)
     try:

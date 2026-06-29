@@ -135,9 +135,9 @@ const syncPersonBackdropCaches = (queryClient, personId, data) => {
   });
 };
 
-export const useStatsQuery = () => useQuery({
-  queryKey: ['stats'],
-  queryFn: () => api.library.getStats(),
+export const useStatsQuery = (includeAdult = false) => useQuery({
+  queryKey: ['stats', includeAdult],
+  queryFn: () => api.library.getStats({ include_adult: includeAdult }),
 });
 
 export const useLibraryQuery = (params) => useQuery({
@@ -183,6 +183,8 @@ export const useCreateTagMutation = () => {
   return useMutation({
     mutationFn: (payload) => api.tags.create(payload),
     onSuccess: () => {
+      queryClient.removeQueries({ queryKey: ['libraryTags'] });
+      queryClient.removeQueries({ queryKey: ['allTags'] });
       queryClient.invalidateQueries({ queryKey: ['libraryTags'] });
       queryClient.invalidateQueries({ queryKey: ['allTags'] });
       queryClient.invalidateQueries({ queryKey: ['libraryFilters'] });
@@ -196,6 +198,8 @@ export const useUpdateTagMutation = () => {
   return useMutation({
     mutationFn: ({ tagId, payload }) => api.tags.update(tagId, payload),
     onSuccess: () => {
+      queryClient.removeQueries({ queryKey: ['libraryTags'] });
+      queryClient.removeQueries({ queryKey: ['allTags'] });
       queryClient.invalidateQueries({ queryKey: ['libraryTags'] });
       queryClient.invalidateQueries({ queryKey: ['allTags'] });
       queryClient.invalidateQueries({ queryKey: ['libraryFilters'] });
@@ -209,6 +213,8 @@ export const useDeleteTagMutation = () => {
   return useMutation({
     mutationFn: (tagId) => api.tags.delete(tagId),
     onSuccess: () => {
+      queryClient.removeQueries({ queryKey: ['libraryTags'] });
+      queryClient.removeQueries({ queryKey: ['allTags'] });
       queryClient.invalidateQueries({ queryKey: ['libraryTags'] });
       queryClient.invalidateQueries({ queryKey: ['allTags'] });
       queryClient.invalidateQueries({ queryKey: ['library'] });

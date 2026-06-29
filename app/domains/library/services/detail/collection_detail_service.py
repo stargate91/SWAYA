@@ -162,8 +162,8 @@ class CollectionDetailService(DetailFormatter):
             if release_date:
                 try:
                     year = int(release_date.split("-")[0])
-                except:
-                    pass
+                except Exception as e:
+                    logger.debug(f"Swallowed exception in domains/library/services/detail/collection_detail_service.py:165: {e}", exc_info=True)
             
             movies.append({
                 "id": part_tmdb_id,

@@ -230,8 +230,8 @@ class AdultResolver:
                 if s_duration not in (None, ""):
                     try:
                         scene_sec = float(s_duration)
-                    except (TypeError, ValueError):
-                        pass
+                    except (TypeError, ValueError) as e:
+                        logger.debug(f"Swallowed exception in infrastructure/scrapers/resolvers/adult_resolver.py:233: {e}", exc_info=True)
 
                 if score >= 0.8:
                     if item.duration and scene_sec is not None:

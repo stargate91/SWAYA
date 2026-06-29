@@ -140,8 +140,8 @@ class TmdbMovieFormatter(MovieDetailFormatter):
         if release_date:
             try:
                 year = int(release_date.split("-")[0])
-            except:
-                pass
+            except Exception as e:
+                logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/tmdb_movie.py:143: {e}", exc_info=True)
         
         metadata_override = db.query(UserOverride).join(MetadataMatch, UserOverride.metadata_match_id == MetadataMatch.id).filter(
             UserOverride.user_id == current_uid,
@@ -188,20 +188,20 @@ class TmdbMovieFormatter(MovieDetailFormatter):
                 try:
                     match.release_date = datetime.strptime(release_date, "%Y-%m-%d")
                     db_updated = True
-                except:
-                    pass
+                except Exception as e:
+                    logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/tmdb_movie.py:191: {e}", exc_info=True)
             if not match.rating_tmdb and tmdb_data.get("vote_average"):
                 try:
                     match.rating_tmdb = float(tmdb_data.get("vote_average"))
                     db_updated = True
-                except:
-                    pass
+                except Exception as e:
+                    logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/tmdb_movie.py:197: {e}", exc_info=True)
             if not match.vote_count_tmdb and tmdb_data.get("vote_count"):
                 try:
                     match.vote_count_tmdb = int(tmdb_data.get("vote_count"))
                     db_updated = True
-                except:
-                    pass
+                except Exception as e:
+                    logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/tmdb_movie.py:203: {e}", exc_info=True)
             if match.is_adult != tmdb_data.get("adult", False):
                 match.is_adult = tmdb_data.get("adult", False)
                 db_updated = True

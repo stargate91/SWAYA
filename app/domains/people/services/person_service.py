@@ -63,8 +63,8 @@ class PersonService:
                     try:
                         prov_enum = ext_prov if isinstance(ext_prov, Provider) else Provider(ext_prov)
                         person = self.people_repo.get_person_by_external_id(prov_enum, ext_val)
-                    except ValueError:
-                        pass
+                    except ValueError as e:
+                        logger.debug(f"Swallowed exception in domains/people/services/person_service.py:66: {e}", exc_info=True)
                 if person:
                     break
 

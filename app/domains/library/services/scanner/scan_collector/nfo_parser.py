@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 import re
 from pathlib import Path
 from typing import Optional
@@ -35,7 +38,6 @@ class NFOParser:
             match = self.IMDB_PATTERN.search(content)
             if match:
                 return match.group(0)
-        except Exception:
-            # Errors are ignored to ensure non-blocking scanning
-            pass
+        except Exception as e:
+            logger.debug(f"Swallowed exception in domains/library/services/scanner/scan_collector/nfo_parser.py:38: {e}", exc_info=True)
         return None

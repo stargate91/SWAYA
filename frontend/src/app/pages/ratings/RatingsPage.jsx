@@ -1,15 +1,14 @@
-/* eslint-disable react/forbid-dom-props, jsx-a11y/no-static-element-interactions */
 import { useState, useRef, useEffect } from 'react';
-import { Star, Heart, Edit3, Search, X } from 'lucide-react';
+import { Star, Heart, Edit3, X, Clapperboard, Tv, Video, Users, CheckCircle, BarChart2 } from 'lucide-react';
 import Page from '@/ui/Page';
 import Table from '@/ui/Table';
 import { Tabs } from '@/ui/Tabs';
-import PaginationBar from '@/ui/PaginationBar';
-import Input from '@/ui/Input';
 import Button from '@/ui/Button';
 import Spinner from '@/ui/Spinner';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useRatingsPageState } from './useRatingsPageState';
+import LibraryHeader from '../library/components/LibraryHeader';
+import LibraryPagination from '../library/components/LibraryPagination';
 import './RatingsPage.css';
 
 // Compact Star Rating component
@@ -51,6 +50,7 @@ function StarRating({ value, onChange }) {
 export default function RatingsPage() {
   const { t } = useTranslation();
   const state = useRatingsPageState();
+  const isAdultMode = state.activeSessionMode === 'nsfw';
 
   // Review Drawer state
   const [editingItem, setEditingItem] = useState(null);
@@ -80,17 +80,17 @@ export default function RatingsPage() {
 
   // Main Tabs configuration
   const mainTabs = [
-    { value: 'unrated', label: t('ratings.tabs.unrated', { defaultValue: 'To Be Rated' }) },
-    { value: 'rated', label: t('ratings.tabs.rated', { defaultValue: 'Rated & Reviewed' }) },
-    { value: 'analytics', label: t('ratings.tabs.analytics', { defaultValue: 'Analytics' }) },
+    { value: 'unrated', label: t('ratings.tabs.unrated', { defaultValue: 'To Be Rated' }), icon: Star },
+    { value: 'rated', label: t('ratings.tabs.rated', { defaultValue: 'Rated & Reviewed' }), icon: CheckCircle },
+    { value: 'analytics', label: t('ratings.tabs.analytics', { defaultValue: 'Analytics' }), icon: BarChart2 },
   ];
 
   // Media Type Filter configuration
   const subTabs = [
-    { value: 'movies', label: t('ratings.subtabs.movies', { defaultValue: 'Movies' }) },
-    { value: 'series', label: t('ratings.subtabs.series', { defaultValue: 'Series' }) },
-    { value: 'scenes', label: t('ratings.subtabs.scenes', { defaultValue: 'Scenes' }) },
-    { value: 'people', label: t('ratings.subtabs.people', { defaultValue: 'People' }) },
+    { value: 'movies', label: t('ratings.subtabs.movies', { defaultValue: 'Movies' }), icon: Clapperboard },
+    { value: 'series', label: t('ratings.subtabs.tvShows', { defaultValue: 'TV Shows' }), icon: Tv },
+    ...(isAdultMode ? [{ value: 'scenes', label: t('ratings.subtabs.scenes', { defaultValue: 'Scenes' }), icon: Video }] : []),
+    { value: 'people', label: t('ratings.subtabs.people', { defaultValue: 'People' }), icon: Users },
   ];
 
   // Define table columns dynamically based on state
@@ -173,151 +173,170 @@ export default function RatingsPage() {
   };
 
   return (
-    <Page
-      eyebrow={t('ratings.title', { defaultValue: 'Ratings & Reviews' })}
-      title={t('ratings.title', { defaultValue: 'Ratings & Reviews' })}
-      description={t('ratings.description', { defaultValue: 'Manage your ratings, comments, and favorites.' })}
-      className="ratings-page"
-    >
-      <div className="ratings-main">
-        {/* Navigation & Controls panel */}
-        <div className="ratings-panel">
-          <div className="ratings-panel__row">
-            <Tabs
+    <Page className="organizer-page">
+      <div className={`organizer-main is-details-hidden ${isAdultMode ? 'organizer-main--nsfw' : ''}`}>
+        <div className="organizer-main__content">
+          <div className={`organizer-panel ${isAdultMode ? 'organizer-panel--nsfw' : ''}`}>
+            <LibraryHeader
+              t={t}
+              pageTitle={isAdultMode ? (t('ratings.adultTitle') || 'Adult Ratings & Reviews') : (t('ratings.title') || 'Ratings & Reviews')}
               tabs={mainTabs}
-              value={state.activeTab}
-              onChange={state.setActiveTab}
+              resolvedTab={state.activeTab}
+              setActiveTab={state.setActiveTab}
+              searchPlaceholder={t('common.search') || 'Search...'}
+              setSearchQuery={state.setSearchQuery}
+              showTabs={true}
+              activeSessionMode={state.activeSessionMode}
+              showSearch={state.activeTab !== 'analytics'}
             />
 
             {state.activeTab !== 'analytics' && (
-              <div className="ratings-search">
-                <Search size={14} className="ratings-search__icon" />
-                <Input
-                  type="text"
-                  placeholder={t('common.search') || 'Search...'}
-                  value={state.searchQuery}
-                  onChange={(e) => state.setSearchQuery(e.target.value)}
+              <div className="organizer-panel__row" style={{ marginTop: 'var(--space-md)' }}>
+                <Tabs
+                  tabs={subTabs}
+                  value={state.mediaType}
+                  onChange={state.setMediaType}
+                  variant="sub"
                 />
               </div>
             )}
           </div>
 
-          {state.activeTab !== 'analytics' && (
-            <div className="ratings-panel__row">
-              <Tabs
-                tabs={subTabs}
-                value={state.mediaType}
-                onChange={state.setMediaType}
-                variant="sub"
+          <div className="organizer-results">
+            {/* Upper Pagination Panel */}
+            {state.activeTab !== 'analytics' && (
+              <LibraryPagination
+                state={{
+                  paginatedItems: state.paginatedItems,
+                  shouldShowPagination: state.totalPages > 1,
+                  summaryText: state.totalItems > 0
+                    ? `${(state.currentPage - 1) * state.pageSize + 1}-${Math.min(state.currentPage * state.pageSize, state.totalItems)} / ${state.totalItems}`
+                    : '0-0 / 0',
+                  currentPage: state.currentPage,
+                  totalPages: state.totalPages,
+                  pageSize: state.pageSize,
+                  setCurrentPage: state.setCurrentPage,
+                  setPageSize: state.setPageSize,
+                  t: t
+                }}
+                showPageSizes
               />
-            </div>
-          )}
-        </div>
+            )}
 
-        {/* Content Tabs */}
-        {state.activeTab === 'analytics' ? (
-          /* Analytics Dashboard tab */
-          <div className="analytics-dashboard">
-            <div className="analytics-card">
-              <span className="analytics-card__title">
-                {t('ratings.stats.average', { defaultValue: 'Average Rating' })}
-              </span>
-              <div className="analytics-card-row">
-                <span className="analytics-card__value">{state.analytics.average}</span>
-                <Star size={24} className="is-filled analytics-star-icon" fill="currentColor" />
-              </div>
-            </div>
+            {/* Content Tabs */}
+            {state.activeTab === 'analytics' ? (
+              /* Analytics Dashboard tab */
+              <div className="analytics-dashboard">
+                <div className="analytics-card">
+                  <span className="analytics-card__title">
+                    {t('ratings.stats.average', { defaultValue: 'Average Rating' })}
+                  </span>
+                  <div className="analytics-card-row">
+                    <span className="analytics-card__value">{state.analytics.average}</span>
+                    <Star size={24} className="is-filled analytics-star-icon" fill="currentColor" />
+                  </div>
+                </div>
 
-            <div className="analytics-card">
-              <span className="analytics-card__title">
-                {t('ratings.stats.totalRated', { defaultValue: 'Total Rated' })}
-              </span>
-              <span className="analytics-card__value">{state.analytics.totalRated}</span>
-            </div>
+                <div className="analytics-card">
+                  <span className="analytics-card__title">
+                    {t('ratings.stats.totalRated', { defaultValue: 'Total Rated' })}
+                  </span>
+                  <span className="analytics-card__value">{state.analytics.totalRated}</span>
+                </div>
 
-            <div className="analytics-card">
-              <span className="analytics-card__title">
-                {t('ratings.stats.totalUnrated', { defaultValue: 'Total Unrated' })}
-              </span>
-              <span className="analytics-card__value analytics-card__value--muted">
-                {state.analytics.totalUnrated}
-              </span>
-            </div>
+                <div className="analytics-card">
+                  <span className="analytics-card__title">
+                    {t('ratings.stats.totalUnrated', { defaultValue: 'Total Unrated' })}
+                  </span>
+                  <span className="analytics-card__value analytics-card__value--muted">
+                    {state.analytics.totalUnrated}
+                  </span>
+                </div>
 
-            <div className="analytics-card">
-              <span className="analytics-card__title">
-                {t('ratings.stats.favoritesCount', { defaultValue: 'Favorites' })}
-              </span>
-              <div className="analytics-card-row">
-                <span className="analytics-card__value">{state.analytics.favoritesCount}</span>
-                <Heart size={24} className="analytics-heart-icon" fill="currentColor" />
-              </div>
-            </div>
+                <div className="analytics-card">
+                  <span className="analytics-card__title">
+                    {t('ratings.stats.favoritesCount', { defaultValue: 'Favorites' })}
+                  </span>
+                  <div className="analytics-card-row">
+                    <span className="analytics-card__value">{state.analytics.favoritesCount}</span>
+                    <Heart size={24} className="analytics-heart-icon" fill="currentColor" />
+                  </div>
+                </div>
 
-            <div className="analytics-card analytics-card--double">
-              <span className="analytics-card__title">
-                {t('ratings.stats.distribution', { defaultValue: 'Rating Distribution' })}
-              </span>
-              <div className="analytics-distribution">
-                {state.analytics.distribution.map((count, index) => {
-                  const maxCount = Math.max(...state.analytics.distribution, 1);
-                  const percentage = (count / maxCount) * 100;
-                  return (
-                    <div key={index} className="analytics-distribution__row">
-                      <span className="analytics-distribution__label">{index + 1}</span>
-                      <div className="analytics-distribution__bar-container">
-                        <div
-                          className="analytics-distribution__bar"
-                          style={{ width: `${percentage}%` }}
-                        />
-                      </div>
-                      <span className="analytics-distribution__count">{count}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        ) : (
-          /* Table of Rated / Unrated items */
-          <div className="ratings-table-container">
-            {state.isLoading ? (
-              <div className="ratings-loading-container">
-                <Spinner size="md" />
+                <div className="analytics-card analytics-card--double">
+                  <span className="analytics-card__title">
+                    {t('ratings.stats.distribution', { defaultValue: 'Rating Distribution' })}
+                  </span>
+                  <div className="analytics-distribution">
+                    {state.analytics.distribution.map((count, index) => {
+                      const maxCount = Math.max(...state.analytics.distribution, 1);
+                      const percentage = (count / maxCount) * 100;
+                      return (
+                        <div key={index} className="analytics-distribution__row">
+                          <span className="analytics-distribution__label">{index + 1}</span>
+                          <div className="analytics-distribution__bar-container">
+                            <div
+                              className="analytics-distribution__bar"
+                              style={{ width: `${percentage}%` }}
+                            />
+                          </div>
+                          <span className="analytics-distribution__count">{count}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             ) : (
-              <>
-                <Table
-                  columns={columns}
-                  rows={state.paginatedItems}
-                  emptyText={t('ratings.table.empty', { defaultValue: 'No items match selected criteria.' })}
-                />
-                {state.totalPages > 1 && (
-                  <div className="ratings-pagination-container">
-                    <PaginationBar
-                      currentPage={state.currentPage}
-                      totalPages={state.totalPages}
-                      onPageChange={state.setCurrentPage}
+              /* Table of Rated / Unrated items */
+              <div className="organizer-table-block">
+                <div className="organizer-content">
+                  {state.isLoading ? (
+                    <div className="ratings-loading-container">
+                      <Spinner size="md" />
+                    </div>
+                  ) : (
+                    <Table
+                      columns={columns}
+                      rows={state.paginatedItems}
+                      emptyText={t('ratings.table.empty', { defaultValue: 'No items match selected criteria.' })}
                     />
-                  </div>
+                  )}
+                </div>
+                {!state.isLoading && state.activeTab !== 'analytics' && (
+                  <LibraryPagination
+                    state={{
+                      paginatedItems: state.paginatedItems,
+                      shouldShowPagination: state.totalPages > 1,
+                      summaryText: state.totalItems > 0
+                        ? `${(state.currentPage - 1) * state.pageSize + 1}-${Math.min(state.currentPage * state.pageSize, state.totalItems)} / ${state.totalItems}`
+                        : '0-0 / 0',
+                      currentPage: state.currentPage,
+                      totalPages: state.totalPages,
+                      pageSize: state.pageSize,
+                      setCurrentPage: state.setCurrentPage,
+                      setPageSize: state.setPageSize,
+                      t: t
+                    }}
+                  />
                 )}
-              </>
+              </div>
             )}
           </div>
-        )}
+        </div>
       </div>
 
       {/* Review Drawer Panel */}
       {editingItem && (
         <>
           <div
-            className="review-drawer-backdrop"
+            className="review-drawer-backdrop ui-drawer-backdrop"
             onClick={() => setEditingItem(null)}
             onKeyDown={handleKeyDownBackdrop}
             role="button"
             tabIndex={0}
           />
-          <div ref={drawerRef} className={`review-drawer ${editingItem ? 'is-open' : ''}`}>
+          <div ref={drawerRef} className={`review-drawer ui-drawer ui-drawer--md ${editingItem ? 'is-open' : ''}`}>
             <div className="review-drawer__header">
               <span className="review-drawer__title">
                 {t('ratings.dialog.editReview', { defaultValue: 'Edit Review' })}

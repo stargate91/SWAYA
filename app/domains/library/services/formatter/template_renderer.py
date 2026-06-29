@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 import re
 from typing import Dict, Any, Optional
 from .config import FormatterConfig, Casing
@@ -97,8 +100,8 @@ class TemplateRenderer:
                      parsed = ast.literal_eval(num)
                      if isinstance(parsed, list):
                          return self.format_number(parsed, width)
-                 except: 
-                     pass
+                 except Exception as e:
+                     logger.debug(f"Swallowed exception in domains/library/services/formatter/template_renderer.py:100: {e}", exc_info=True)
             return str(num) if num else ""
             
         return str(n).zfill(width) if self.config.zero_pad else str(n)

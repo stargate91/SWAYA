@@ -126,6 +126,20 @@ class TitleLockService:
         # Tags resolution
         tags_input = request.tags
         if tags_input is not None:
+            # Resolve if this item is adult
+            is_adult_item = False
+            if metadata_match_id:
+                match_db = self.db.query(MetadataMatch).filter(MetadataMatch.id == metadata_match_id).first()
+                if match_db:
+                    is_adult_item = bool(match_db.is_adult)
+            elif media_item_id:
+                match_db = self.db.query(MetadataMatch).filter(
+                    MetadataMatch.media_item_id == media_item_id,
+                    MetadataMatch.is_active == True
+                ).first()
+                if match_db:
+                    is_adult_item = bool(match_db.is_adult)
+
             tags_list = []
             for t in tags_input:
                 tag_obj = None
@@ -141,7 +155,7 @@ class TitleLockService:
                 elif isinstance(t, str):
                     tag_obj = self.db.query(Tag).filter(func.lower(Tag.name) == func.lower(t)).first()
                     if not tag_obj:
-                        tag_obj = Tag(name=t)
+                        tag_obj = Tag(name=t, is_adult=is_adult_item)
                         self.db.add(tag_obj)
                         self.db.flush()
                 if tag_obj and tag_obj not in tags_list:
@@ -251,8 +265,8 @@ class TitleLockService:
         if watched_at:
             try:
                 parsed_date = datetime.fromisoformat(str(watched_at).replace("Z", "+00:00"))
-            except ValueError:
-                pass
+            except ValueError as e:
+                logger.debug(f"Swallowed exception in domains/users/services/overrides/title_lock_service.py:254: {e}", exc_info=True)
 
         if not item_ids:
             return {"status": "success", "count": 0}

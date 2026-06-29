@@ -84,8 +84,8 @@ class DbMediaItemAdapter(MediaItemPort):
             if subtype is not None:
                 try:
                     extra.subtype = ExtraSubtype(subtype.lower())
-                except ValueError:
-                    pass
+                except ValueError as e:
+                    logger.debug(f"Swallowed exception in infrastructure/media/adapters/db_media_item_adapter.py:87: {e}", exc_info=True)
             if language is not None:
                 extra.language = language
 
@@ -314,8 +314,8 @@ class DbMediaItemAdapter(MediaItemPort):
                     if subtype is not None:
                         try:
                             extra.subtype = ExtraSubtype(subtype.lower())
-                        except ValueError:
-                            pass
+                        except ValueError as e:
+                            logger.debug(f"Swallowed exception in infrastructure/media/adapters/db_media_item_adapter.py:317: {e}", exc_info=True)
                     if language is not None:
                         extra.language = language
 

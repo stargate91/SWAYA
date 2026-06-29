@@ -80,20 +80,20 @@ export const usePersonDetailQuery = (personId, options = {}) => useQuery({
 });
 
 export const usePersonCreditsQuery = (personId, mediaType, page, pageSize, options = {}) => {
-  const { excludeKnownFor = false, source, ...queryOptions } = options;
+  const { excludeKnownFor = false, source, local_only, ...queryOptions } = options;
   return useQuery({
-    queryKey: ['person-credits', personId, mediaType, page, pageSize, excludeKnownFor, source || null],
-    queryFn: () => api.people.getCredits(personId, mediaType, { page, pageSize, excludeKnownFor, source }),
+    queryKey: ['person-credits', personId, mediaType, page, pageSize, excludeKnownFor, source || null, local_only || null],
+    queryFn: () => api.people.getCredits(personId, mediaType, { page, pageSize, excludeKnownFor, source, local_only }),
     placeholderData: (previousData) => previousData,
     ...queryOptions,
   });
 };
 
 export const usePersonCreditsInfiniteQuery = (personId, mediaType, pageSize, options = {}) => {
-  const { excludeKnownFor = false, source, ...queryOptions } = options;
+  const { excludeKnownFor = false, source, local_only, ...queryOptions } = options;
   return useInfiniteQuery({
-    queryKey: ['person-credits-infinite', personId, mediaType, pageSize, excludeKnownFor, source || null],
-    queryFn: ({ pageParam = 1 }) => api.people.getCredits(personId, mediaType, { page: pageParam, pageSize, excludeKnownFor, source }),
+    queryKey: ['person-credits-infinite', personId, mediaType, pageSize, excludeKnownFor, source || null, local_only || null],
+    queryFn: ({ pageParam = 1 }) => api.people.getCredits(personId, mediaType, { page: pageParam, pageSize, excludeKnownFor, source, local_only }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       const totalPages = Math.ceil((lastPage.total_items || 0) / pageSize);

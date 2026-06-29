@@ -83,8 +83,8 @@ class SceneDetailService(DetailFormatter):
         if date_str:
             try:
                 year = int(date_str.split("-")[0])
-            except:
-                pass
+            except Exception as e:
+                logger.debug(f"Swallowed exception in domains/library/services/detail/scene_detail_service.py:86: {e}", exc_info=True)
         
         duration_raw = scene_data.get("duration")
         duration_sec = None
@@ -106,8 +106,8 @@ class SceneDetailService(DetailFormatter):
                             duration_sec = int(parts[0]) * 60 + int(parts[1])
                         elif len(parts) == 3:
                             duration_sec = int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
-                    except ValueError:
-                        pass
+                    except ValueError as e:
+                        logger.debug(f"Swallowed exception in domains/library/services/detail/scene_detail_service.py:109: {e}", exc_info=True)
 
         if duration_sec:
             duration_min = duration_sec // 60
@@ -149,8 +149,10 @@ class SceneDetailService(DetailFormatter):
             from app.domains.library.models import MediaItem
             item = db.query(MediaItem).filter(MediaItem.id == match_db.media_item_id).first()
 
-        from app.domains.people.models import Person, MediaPersonLink
+        from app.domains.people.models import Person, MediaPersonLink, ExternalSourceLink
         from sqlalchemy.orm import joinedload
+        from app.shared_kernel.user_context import get_current_user_id
+        current_uid = get_current_user_id() or 1
         cast_by_name = {}
 
         def calculate_age_at_release(birthday_str: str, release_date_str: str) -> Any:
@@ -172,14 +174,26 @@ class SceneDetailService(DetailFormatter):
             people_links = db.query(MediaPersonLink).options(
                 joinedload(MediaPersonLink.person)
             ).filter(MediaPersonLink.match_id == match_db.id).all()
+            
+            # Fetch all user overrides for these performers
+            person_ids = [l.person_id for l in people_links]
+            override_map = {}
+            if person_ids:
+                overrides = db.query(UserOverride).filter(
+                    UserOverride.user_id == current_uid,
+                    UserOverride.person_id.in_(person_ids)
+                ).all()
+                override_map = {ov.person_id: ov.custom_poster for ov in overrides if ov.custom_poster}
+
             for link in sorted(people_links, key=lambda x: x.order if x.order is not None else 0):
                 person = link.person
+                custom_img = override_map.get(person.id)
                 cast_by_name[person.name.lower()] = {
                     "id": f"local:{person.id}",
                     "name": person.name,
                     "character": link.character_name,
                     "job": link.role.value if hasattr(link.role, "value") else str(link.role),
-                    "profile_path": self._resolve_img(person.local_profile_path or person.profile_path, "people"),
+                    "profile_path": self._resolve_img(custom_img or person.local_profile_path or person.profile_path, "people"),
                     "popularity": person.rating_porndb if person.rating_porndb is not None else person.popularity or 0,
                     "rating_porndb": person.rating_porndb,
                     "scene_count": person.scene_count,
@@ -207,10 +221,32 @@ class SceneDetailService(DetailFormatter):
             elif gender_str:
                 mapped_gender = 3
 
-            person_db = db.query(Person).filter(Person.name == perf_name).first()
+            person_db = None
+            perf_ext_id = perf.get("id")
+            if perf_ext_id and provider_prefix:
+                try:
+                    prov_enum = Provider(provider_prefix)
+                    link = db.query(ExternalSourceLink).filter(
+                        ExternalSourceLink.provider == prov_enum,
+                        ExternalSourceLink.external_id == str(perf_ext_id)
+                    ).first()
+                    if link:
+                        person_db = link.person
+                except Exception as e:
+                    logger.debug(f"Swallowed exception: {e}")
+
+            if not person_db:
+                person_db = db.query(Person).filter(Person.name == perf_name).first()
+
             birthday_val = None
             if person_db:
-                resolved_img = self._resolve_img(person_db.local_profile_path or person_db.profile_path, "people")
+                # Check for UserOverride custom profile image
+                override_obj = db.query(UserOverride).filter(
+                    UserOverride.user_id == current_uid,
+                    UserOverride.person_id == person_db.id
+                ).first()
+                custom_img = override_obj.custom_poster if override_obj else None
+                resolved_img = self._resolve_img(custom_img or person_db.local_profile_path or person_db.profile_path, "people")
                 p_id = f"local:{person_db.id}"
                 birthday_val = person_db.birthday
             else:
@@ -273,14 +309,14 @@ class SceneDetailService(DetailFormatter):
                 try:
                     match_db.release_date = datetime.strptime(date_str, "%Y-%m-%d")
                     db_updated = True
-                except:
-                    pass
+                except Exception as e:
+                    logger.debug(f"Swallowed exception in domains/library/services/detail/scene_detail_service.py:276: {e}", exc_info=True)
             if scene_data.get("rating") is not None and float(scene_data.get("rating")) > 0:
                 try:
                     match_db.rating_porndb = float(scene_data.get("rating"))
                     db_updated = True
-                except:
-                    pass
+                except Exception as e:
+                    logger.debug(f"Swallowed exception in domains/library/services/detail/scene_detail_service.py:282: {e}", exc_info=True)
             
             loc_db = next((l for l in match_db.localizations if l.locale == "en"), None)
             if not loc_db:

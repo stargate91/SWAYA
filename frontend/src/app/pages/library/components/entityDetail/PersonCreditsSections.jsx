@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Layers, Bookmark } from 'lucide-react';
+import { Layers, Bookmark, Play } from 'lucide-react';
+import { usePlayMediaMutation } from '@/queries';
 import { usePersonCreditsQuery, usePersonCreditsInfiniteQuery } from '@/queries/metadataQueries';
 import { API_BASE } from '@/lib/backend';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
@@ -15,6 +16,7 @@ function PersonCreditsRow({
   t
 }) {
   const isScene = mediaType === 'scenes' || mediaType.includes('scene');
+  const playMutation = usePlayMediaMutation();
 
   return (
     <div className={`person-credits-discover-grid ${isScene ? 'grid-16-9' : 'grid-2-3'}`}>
@@ -50,50 +52,74 @@ function PersonCreditsRow({
           navigate(`/library/movie/${movieId}`, { state: { allowAdult: true } });
         };
 
-        return (
-          <div
-            key={`${item.id}-${item.type || mediaType}`}
-            className="person-credits-card"
-            onClick={handleCardClick}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                handleCardClick();
-              }
-            }}
-          >
-            <div className="person-credits-card__poster-container">
-              {posterUrl ? (
-                <img
-                  src={posterUrl}
-                  alt={creditTitle}
-                  className="person-credits-card__poster"
-                  loading="lazy"
-                  onError={(e) => console.error("Image load failed in Row:", { src: posterUrl, resolvedSource, creditTitle, e })}
-                />
-              ) : (
-                <div className="person-credits-card__placeholder">
-                  <Layers size={18} />
+            const itemType = item.media_type || item.type;
+            const isSceneOrPornDbMovie = (itemType === 'scene' || itemType === 'scenes') || (resolvedSource === 'porndb' || resolvedSource === 'theporndb');
+            const leftText = isSceneOrPornDbMovie ? (item.release_date || '').split('T')[0].split(' ')[0] || item.year || '' : item.character || '';
+            const rightText = isSceneOrPornDbMovie ? '' : item.year || '';
+            const isTvItem = itemType === 'tv' || itemType === 'tvshows';
+
+            return (
+              <div
+                key={`${item.id}-${item.type || mediaType}`}
+                className="person-credits-card"
+                onClick={handleCardClick}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    handleCardClick();
+                  }
+                }}
+              >
+                <div className="person-credits-card__poster-container">
+                  {posterUrl ? (
+                    <img
+                      src={posterUrl}
+                      alt={creditTitle}
+                      className="person-credits-card__poster"
+                      loading="lazy"
+                      onError={(e) => console.error("Image load failed in Row:", { src: posterUrl, resolvedSource, creditTitle, e })}
+                    />
+                  ) : (
+                    <div className="person-credits-card__placeholder">
+                      <Layers size={18} />
+                    </div>
+                  )}
+
+                  <span className={`person-credits-card__source-badge source-${resolvedSource}`}>
+                    {resolvedSource === 'porndb' || resolvedSource === 'theporndb' ? 'PornDB' : resolvedSource === 'stashdb' ? 'Stash' : resolvedSource === 'fansdb' ? 'Fans' : 'TMDb'}
+                  </span>
+
+                  {item.in_library && (
+                    <div className="person-credits-card__library-badge" title={t('library.details.inLibrary') || 'In Library'}>
+                      <Bookmark size={10} />
+                    </div>
+                  )}
+
+                  {item.in_library && !isTvItem && (
+                    <button
+                      type="button"
+                      className="person-credits-card__play-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        playMutation.mutate(item.library_item_id || item.id);
+                      }}
+                    >
+                      <Play size={14} fill="currentColor" />
+                    </button>
+                  )}
                 </div>
-              )}
 
-              <span className={`person-credits-card__source-badge source-${resolvedSource}`}>
-                {resolvedSource === 'porndb' || resolvedSource === 'theporndb' ? 'PornDB' : resolvedSource === 'stashdb' ? 'Stash' : resolvedSource === 'fansdb' ? 'Fans' : 'TMDb'}
-              </span>
-
-              {item.in_library && (
-                <div className="person-credits-card__library-badge" title={t('library.details.inLibrary') || 'In Library'}>
-                  <Bookmark size={10} />
+                <span className="person-credits-card__title" title={creditTitle}>{creditTitle}</span>
+                <div className="person-credits-card__meta-row">
+                  <span className="person-credits-card__role" title={leftText}>
+                    {leftText}
+                  </span>
+                  {rightText && (
+                    <span className="person-credits-card__year">{rightText}</span>
+                  )}
                 </div>
-              )}
-            </div>
-
-            <span className="person-credits-card__title" title={creditTitle}>{creditTitle}</span>
-            {item.character && (
-              <span className="person-credits-card__role" title={item.character}>{item.character}</span>
-            )}
-          </div>
+              </div>
         );
       })}
     </div>
@@ -101,6 +127,7 @@ function PersonCreditsRow({
 }
 
 export default function PersonCreditsSections({ id, item, navigate, t }) {
+  const playMutation = usePlayMediaMutation();
   const hasStashDb = !!item?.external_ids?.stashdb_id;
   const hasFansDb = !!item?.external_ids?.fansdb_id;
   const hasPornDb = !!item?.external_ids?.theporndb_id || !!item?.external_ids?.porndb_id || !!item?.external_ids?.porndb;
@@ -112,12 +139,12 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
   const hasScenes = Number(item?.total_scene_credits) > 0 || (item?.is_adult && (hasStashDb || hasFansDb || hasPornDb));
 
   // Static queries to populate the "My Library" list
-  const tmdbMoviesLibQuery = usePersonCreditsQuery(id, 'movies', 1, 100, { enabled: hasTmdbMovies });
-  const porndbMoviesLibQuery = usePersonCreditsQuery(id, 'movies', 1, 100, { enabled: !!(item?.is_adult && hasPornDb), source: 'porndb' });
-  const tmdbTvLibQuery = usePersonCreditsQuery(id, 'tv', 1, 100, { enabled: hasTv });
-  const stashdbScenesLibQuery = usePersonCreditsQuery(id, 'scenes', 1, 100, { enabled: !!(item?.is_adult && hasStashDb), source: 'stashdb' });
-  const fansdbScenesLibQuery = usePersonCreditsQuery(id, 'scenes', 1, 100, { enabled: !!(item?.is_adult && hasFansDb), source: 'fansdb' });
-  const porndbScenesLibQuery = usePersonCreditsQuery(id, 'scenes', 1, 100, { enabled: !!(item?.is_adult && hasPornDb), source: 'porndb' });
+  const tmdbMoviesLibQuery = usePersonCreditsQuery(id, 'movies', 1, 100, { enabled: hasTmdbMovies, local_only: true });
+  const porndbMoviesLibQuery = usePersonCreditsQuery(id, 'movies', 1, 100, { enabled: !!(item?.is_adult && hasPornDb), source: 'porndb', local_only: true });
+  const tmdbTvLibQuery = usePersonCreditsQuery(id, 'tv', 1, 100, { enabled: hasTv, local_only: true });
+  const stashdbScenesLibQuery = usePersonCreditsQuery(id, 'scenes', 1, 100, { enabled: !!(item?.is_adult && hasStashDb), source: 'stashdb', local_only: true });
+  const fansdbScenesLibQuery = usePersonCreditsQuery(id, 'scenes', 1, 100, { enabled: !!(item?.is_adult && hasFansDb), source: 'fansdb', local_only: true });
+  const porndbScenesLibQuery = usePersonCreditsQuery(id, 'scenes', 1, 100, { enabled: !!(item?.is_adult && hasPornDb), source: 'porndb', local_only: true });
 
   // Extract "My Library" items
   const myMovies = useMemo(() => {
@@ -448,6 +475,11 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
                     navigate(`/library/movie/${movieId}`, { state: { allowAdult: true } });
                   };
 
+                  const itemType = credit.media_type || credit.type;
+                  const isTvItem = itemType === 'tv' || itemType === 'tvshows';
+                  const isSceneOrPornDbMovie = (itemType === 'scene' || itemType === 'scenes') || (resolvedSource === 'porndb' || resolvedSource === 'theporndb');
+                  const leftText = isSceneOrPornDbMovie ? (credit.release_date || '').split('T')[0].split(' ')[0] || credit.year || '' : credit.character || '';
+                  const rightText = isSceneOrPornDbMovie ? '' : credit.year || '';
 
                   return (
                     <div
@@ -490,12 +522,30 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
                             <Bookmark size={10} />
                           </div>
                         )}
+
+                        {credit.in_library && !isTvItem && (
+                          <button
+                            type="button"
+                            className="person-credits-card__play-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              playMutation.mutate(credit.library_item_id || credit.id);
+                            }}
+                          >
+                            <Play size={14} fill="currentColor" />
+                          </button>
+                        )}
                       </div>
 
                       <span className="person-credits-card__title" title={creditTitle}>{creditTitle}</span>
-                      {credit.character && (
-                        <span className="person-credits-card__role" title={credit.character}>{credit.character}</span>
-                      )}
+                      <div className="person-credits-card__meta-row">
+                        <span className="person-credits-card__role" title={leftText}>
+                          {leftText}
+                        </span>
+                        {rightText && (
+                          <span className="person-credits-card__year">{rightText}</span>
+                        )}
+                      </div>
                     </div>
                   );
                 })}

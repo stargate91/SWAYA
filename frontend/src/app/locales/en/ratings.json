@@ -1,5 +1,6 @@
 {
   "title": "Ratings & Reviews",
+  "adultTitle": "Adult Ratings & Reviews",
   "description": "Manage your ratings, comments, and favorites in one central place.",
   "tabs": {
     "unrated": "To Be Rated",

@@ -223,8 +223,8 @@ class ScraperNormalizer:
                         return int(parts[0]) * 60 + int(parts[1])
                     elif len(parts) == 3:
                         return int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
-                except ValueError:
-                    pass
+                except ValueError as e:
+                    logger.debug(f"Swallowed exception in infrastructure/scrapers/support/normalizer.py:226: {e}", exc_info=True)
             return None
 
         duration_val = None

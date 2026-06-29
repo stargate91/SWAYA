@@ -1040,7 +1040,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
       {isDrawerOpen && (
         <>
           <div
-            className="entity-detail-page__drawer-backdrop"
+            className="entity-detail-page__drawer-backdrop ui-drawer-backdrop"
             role="button"
             tabIndex={-1}
             onClick={() => setIsDrawerOpen(false)}
@@ -1050,7 +1050,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
               }
             }}
           />
-          <div className="entity-detail-page__drawer">
+          <div className="entity-detail-page__drawer ui-drawer ui-drawer--md">
             <div className="entity-detail-page__drawer-header">
               <h3 className="entity-detail-page__drawer-title">
                 {t('library.details.details') || 'Details'}

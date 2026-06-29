@@ -39,8 +39,8 @@ class LibraryCollectionService:
             val = self.settings.get_setting("ui_language")
             if val:
                 ui_lang = LangHelper.clean_locale(val)
-        except:
-            pass
+        except Exception as e:
+            logger.debug(f"Swallowed exception in domains/library/services/library_collection_service.py:42: {e}", exc_info=True)
 
         lib_statuses = [ItemStatus.RENAMED, ItemStatus.ORGANIZED]
         

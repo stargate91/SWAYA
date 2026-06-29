@@ -29,10 +29,19 @@ class TagOverrideService:
             tag_obj = self.db.query(Tag).filter(Tag.id == tid).first()
             if tag_obj:
                 resolved_tags.append(tag_obj)
+        from app.domains.metadata.models import MetadataMatch
+        is_adult_item = False
+        if item_ids:
+            first_match = self.db.query(MetadataMatch).filter(
+                MetadataMatch.media_item_id == item_ids[0]
+            ).first()
+            if first_match:
+                is_adult_item = bool(first_match.is_adult)
+
         for tname in tags_input:
             tag_obj = self.db.query(Tag).filter(func.lower(Tag.name) == func.lower(tname)).first()
             if not tag_obj:
-                tag_obj = Tag(name=tname)
+                tag_obj = Tag(name=tname, is_adult=is_adult_item)
                 self.db.add(tag_obj)
                 self.db.flush()
             if tag_obj not in resolved_tags:

@@ -1,7 +1,7 @@
 import logging
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, text
 
 from app.domains.users.models import Tag, user_override_tags
 from app.domains.people.models import Person
@@ -43,6 +43,34 @@ class TagsService:
         return paths
 
     def get_all_tags(self, target_type: Optional[str] = None, is_adult: bool = False) -> List[TagResponse]:
+        # Self-healing: Mark tags as adult if they are linked to adult items/performers
+        try:
+            self.db.execute(text("""
+                UPDATE tags 
+                SET is_adult = 1 
+                WHERE is_adult = 0 AND id IN (
+                    SELECT uot.tag_id 
+                    FROM user_override_tags uot
+                    JOIN user_overrides uo ON uot.user_override_id = uo.id
+                    JOIN metadata_matches mm ON uo.metadata_match_id = mm.id
+                    WHERE mm.is_adult = 1
+                )
+            """))
+            self.db.execute(text("""
+                UPDATE tags 
+                SET is_adult = 1 
+                WHERE is_adult = 0 AND id IN (
+                    SELECT uot.tag_id 
+                    FROM user_override_tags uot
+                    JOIN user_overrides uo ON uot.user_override_id = uo.id
+                    JOIN people p ON uo.person_id = p.id
+                    WHERE p.is_adult = 1
+                )
+            """))
+            self.db.commit()
+        except Exception as e:
+            logger.debug(f"Failed to auto-heal adult tags: {e}")
+
         query = self.db.query(Tag).filter(Tag.is_adult == is_adult)
         tags = query.all()
         return [self._serialize_tag(t) for t in tags]

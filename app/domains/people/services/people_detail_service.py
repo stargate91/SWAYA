@@ -81,14 +81,14 @@ class PeopleDetailService:
     def get_person_detail(self, person_id: Any) -> PersonDetailResponse:
         return self.reader.get_person_detail(person_id)
 
-    def get_person_movies(self, person_id: Any, page: int = 1, page_size: int = 12, source: Optional[str] = None) -> PersonFilmographyResponse:
-        return self.reader.get_person_movies(person_id, page=page, page_size=page_size, source=source)
+    def get_person_movies(self, person_id: Any, page: int = 1, page_size: int = 12, source: Optional[str] = None, local_only: bool = False) -> PersonFilmographyResponse:
+        return self.reader.get_person_movies(person_id, page=page, page_size=page_size, source=source, local_only=local_only)
 
     def get_person_tv(self, person_id: Any, page: int = 1, page_size: int = 12) -> PersonFilmographyResponse:
         return self.reader.get_person_tv(person_id, page=page, page_size=page_size)
 
-    def get_person_scenes(self, person_id: Any, page: int = 1, page_size: int = 12, source: Optional[str] = None) -> PersonFilmographyResponse:
-        return self.reader.get_person_scenes(person_id, page=page, page_size=page_size, source=source)
+    def get_person_scenes(self, person_id: Any, page: int = 1, page_size: int = 12, source: Optional[str] = None, local_only: bool = False) -> PersonFilmographyResponse:
+        return self.reader.get_person_scenes(person_id, page=page, page_size=page_size, source=source, local_only=local_only)
 
     def get_person_credit_backdrops(self, person_id: Any, tmdb_id: int, media_type: str) -> Dict[str, Any]:
         return self.reader.get_person_credit_backdrops(person_id, tmdb_id=tmdb_id, media_type=media_type)

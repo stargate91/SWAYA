@@ -226,8 +226,8 @@ class PlaybackService:
                         if isinstance(parsed, list):
                             return get_first_int(parsed[0]) if parsed else None
                         return int(parsed)
-                    except:
-                        pass
+                    except Exception as e:
+                        logger.debug(f"Swallowed exception in application/media/playback_service.py:229: {e}", exc_info=True)
                 return None
 
             results.append({

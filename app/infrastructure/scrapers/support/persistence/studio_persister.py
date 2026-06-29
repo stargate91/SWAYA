@@ -54,8 +54,8 @@ def _detect_remote_image_extension(url: str, fallback_name: str = "") -> str:
         ext = from_content_type(resp.headers.get('Content-Type', ''))
         if ext:
             return ext
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug(f"Swallowed exception in infrastructure/scrapers/support/persistence/studio_persister.py:57: {e}", exc_info=True)
 
     try:
         import requests
@@ -73,8 +73,8 @@ def _detect_remote_image_extension(url: str, fallback_name: str = "") -> str:
                     return ext
                 break
         resp.close()
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug(f"Swallowed exception in infrastructure/scrapers/support/persistence/studio_persister.py:76: {e}", exc_info=True)
 
     return '.jpg'
 

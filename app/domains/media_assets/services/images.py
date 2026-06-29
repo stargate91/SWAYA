@@ -198,8 +198,8 @@ class ImageProcessingService(ImageServicePort):
                 header = f.read(4096).strip().lower()
                 if header.startswith(b"<svg") or header.startswith(b"<?xml") or b"<svg" in header:
                     is_svg = True
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug(f"Swallowed exception in domains/media_assets/services/images.py:201: {e}", exc_info=True)
 
         # Verify image integrity via PIL (unless SVG) and cap at 4K for scene_stills/backdrops
         if not is_svg:

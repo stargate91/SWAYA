@@ -47,8 +47,8 @@ class RemoteCreditsFetcher:
                 link = next((l for l in person.external_links if l.provider == prov_enum), None)
                 if link:
                     ext_id = link.external_id
-            except ValueError:
-                pass
+            except ValueError as e:
+                logger.debug(f"Swallowed exception in domains/people/services/filmography/remote_fetcher.py:50: {e}", exc_info=True)
                 
         if not ext_id:
             return None
@@ -61,10 +61,14 @@ class RemoteCreditsFetcher:
             RemoteFilmographyCache.media_type == media_type
         ).first()
 
+        cache_hit = False
         if cache_entry and cache_entry.data is not None:
             mapped_items = cache_entry.data.get("items") or []
-            total_items = cache_entry.data.get("total_items") or len(mapped_items)
-        else:
+            if not mapped_items or all("release_date" in item for item in mapped_items):
+                total_items = cache_entry.data.get("total_items") or len(mapped_items)
+                cache_hit = True
+        
+        if not cache_hit:
             mapped_items, total_items = self._query_remote_source(source, media_type, ext_id)
             
             # Save to Cache
@@ -138,6 +142,7 @@ class RemoteCreditsFetcher:
                     "type": media_type,
                     "media_type": media_type,
                     "year": match.release_date.year if match.release_date else None,
+                    "release_date": match.release_date.isoformat() if match.release_date else None,
                     "poster_path": self._resolve_img(match_loc.poster_path if match_loc else None, "posters"),
                     "backdrop_path": self._resolve_img(match.backdrop_path, "backdrops", size="original"),
                     "rating": match.rating_tmdb or 0.0,
@@ -177,7 +182,6 @@ class RemoteCreditsFetcher:
                 
         combined_items.sort(
             key=lambda x: (
-                0 if x.get("in_library") else 1,
                 -(x.get("year") or 0),
                 x.get("title") or ""
             )
@@ -254,8 +258,8 @@ class RemoteCreditsFetcher:
                         if date_str:
                             try:
                                 year = int(date_str.split("-")[0])
-                            except:
-                                pass
+                            except Exception as e:
+                                logger.debug(f"Swallowed exception in domains/people/services/filmography/remote_fetcher.py:257: {e}", exc_info=True)
                         studio_name = s.get("studio", {}).get("name") if s.get("studio") else None
                         poster_url = s["images"][0].get("url") if s.get("images") else None
                         
@@ -265,6 +269,7 @@ class RemoteCreditsFetcher:
                             "type": "scene",
                             "media_type": "scene",
                             "year": year,
+                            "release_date": date_str,
                             "studio": studio_name,
                             "poster_path": poster_url,
                             "backdrop_path": poster_url,
@@ -320,8 +325,8 @@ class RemoteCreditsFetcher:
                             if date_str:
                                 try:
                                     year = int(date_str.split("-")[0])
-                                except:
-                                    pass
+                                except Exception as e:
+                                    logger.debug(f"Swallowed exception in domains/people/services/filmography/remote_fetcher.py:324: {e}", exc_info=True)
                             studio_name = x.get("site", {}).get("name") if x.get("site") else None
                             poster_val = x.get("poster")
                             if isinstance(poster_val, dict):
@@ -336,6 +341,7 @@ class RemoteCreditsFetcher:
                                 "type": "movie",
                                 "media_type": "movie",
                                 "year": year,
+                                "release_date": date_str,
                                 "studio": studio_name,
                                 "poster_path": poster_url,
                                 "rating": 0.0,
@@ -382,8 +388,8 @@ class RemoteCreditsFetcher:
                             if date_str:
                                 try:
                                     year = int(date_str.split("-")[0])
-                                except:
-                                    pass
+                                except Exception as e:
+                                    logger.debug(f"Swallowed exception in domains/people/services/filmography/remote_fetcher.py:387: {e}", exc_info=True)
                             studio_name = x.get("site", {}).get("name") if x.get("site") else None
                             poster_val = x.get("poster")
                             if isinstance(poster_val, dict):
@@ -414,6 +420,7 @@ class RemoteCreditsFetcher:
                                 "type": "scene",
                                 "media_type": "scene",
                                 "year": year,
+                                "release_date": date_str,
                                 "studio": studio_name,
                                 "poster_path": poster_url,
                                 "backdrop_path": backdrop_url,

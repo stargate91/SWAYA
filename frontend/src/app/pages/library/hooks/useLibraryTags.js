@@ -54,10 +54,11 @@ export function useLibraryTags({ activeSessionMode }) {
               for (const item of modeItems) {
                 const poster = getPosterImagePath(item);
                 const backdrop = getBackdropImagePath(item);
-                if ((poster || backdrop) && !seenPosters.has(poster)) {
+                if ((poster || backdrop || item.still_path) && !seenPosters.has(poster)) {
                   list.push({
                     poster,
                     backdrop,
+                    still: item.still_path || backdrop || poster,
                     kind: item.type,
                   });
                   seenPosters.add(poster);

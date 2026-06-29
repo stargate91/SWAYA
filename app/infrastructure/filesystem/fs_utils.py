@@ -42,8 +42,10 @@ def move_with_progress(src: str, dst: str, progress_callback=None):
         if progress_callback:
             progress_callback(1.0)
         return
-    except OSError:
-        pass
+    except OSError as e:
+        import errno
+        if e.errno != errno.EXDEV:
+            raise
 
     file_size = os.path.getsize(src_long)
     copied = 0

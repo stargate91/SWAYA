@@ -10,6 +10,7 @@ from app.domains.users.models import UserOverride
 from app.shared_kernel.enums import Provider
 from app.shared_kernel.exceptions import NotFoundException
 from app.shared_kernel.user_context import get_current_user_id
+from sqlalchemy import func
 
 logger = logging.getLogger(__name__)
 
@@ -68,8 +69,8 @@ class PersonEnrichmentQueue:
                      prov = Provider(prov_name.lower())
                      if not any(ld["provider"] == prov for ld in link_data):
                          link_data.append({"provider": prov, "external_id": str(ext_id)})
-                except Exception:
-                     pass
+                except Exception as e:
+                     logger.debug(f"Swallowed exception in domains/people/services/people_status_service.py:71: {e}", exc_info=True)
 
             fetched_data = enricher.fetch_external_details(
                 person.name,
@@ -132,8 +133,8 @@ class PeopleStatusService:
                 ).first()
                 if link:
                     return link.person
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug(f"Swallowed exception in domains/people/services/people_status_service.py:135: {e}", exc_info=True)
             return None
         else:
             try:
@@ -184,6 +185,7 @@ class PeopleStatusService:
             ("user_rating" in fields_set and payload_data.get("user_rating") is not None)
             or ("is_favorite" in fields_set and payload_data.get("is_favorite"))
             or ("user_comment" in fields_set and payload_data.get("user_comment") is not None)
+            or ("custom_tags" in fields_set and payload_data.get("custom_tags") is not None)
         )
         if has_user_interaction:
             if not person.is_active:
@@ -195,6 +197,7 @@ class PeopleStatusService:
             "user_rating" in fields_set
             or "is_favorite" in fields_set
             or "user_comment" in fields_set
+            or "custom_tags" in fields_set
         )
         if has_override_update:
             override = self.db.query(UserOverride).filter(
@@ -224,6 +227,22 @@ class PeopleStatusService:
                 override.user_comment = comment_val
                 override.user_comment_at = datetime.now(timezone.utc) if comment_val else None
 
+            if "custom_tags" in fields_set:
+                tags_input = payload_data.get("custom_tags")
+                if tags_input is not None:
+                    tags_list = []
+                    for t in tags_input:
+                        tag_obj = None
+                        if isinstance(t, str):
+                            tag_obj = self.db.query(Tag).filter(func.lower(Tag.name) == func.lower(t)).first()
+                            if not tag_obj:
+                                tag_obj = Tag(name=t, is_adult=bool(person.is_adult))
+                                self.db.add(tag_obj)
+                                self.db.flush()
+                        if tag_obj and tag_obj not in tags_list:
+                            tags_list.append(tag_obj)
+                    override.tags = tags_list
+
         self.db.commit()
 
         if newly_activated:
@@ -240,4 +259,5 @@ class PeopleStatusService:
             "is_favorite": override.is_favorite if override else False,
             "user_rating": override.user_rating if override else None,
             "user_comment": override.user_comment if override else None,
+            "custom_tags": [t.name for t in override.tags if t.is_adult == bool(person.is_adult)] if (override and override.tags) else [],
         }

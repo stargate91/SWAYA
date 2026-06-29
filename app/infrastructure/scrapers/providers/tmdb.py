@@ -167,8 +167,8 @@ class TMDBScraper(BaseScraper):
                 try:
                     params.pop("append_to_response", None)
                     return self._call_api(endpoint, params, force_refresh=force_refresh)
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.debug(f"Swallowed exception in infrastructure/scrapers/providers/tmdb.py:170: {e}", exc_info=True)
             raise e
 
     def get_episode_details(self, tv_id: int, season_number: int, episode_number: int, language: str = "en-US", force_refresh: bool = False) -> Dict[str, Any]:
@@ -216,8 +216,8 @@ class TMDBScraper(BaseScraper):
                 try:
                     params.pop("append_to_response", None)
                     return self._call_api(endpoint, params, force_refresh=force_refresh)
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.debug(f"Swallowed exception in infrastructure/scrapers/providers/tmdb.py:219: {e}", exc_info=True)
             
             # If all original language attempts failed, try English fallback
             normalized_lang = str(language or DEFAULT_FALLBACK_LANGUAGE).split("-", 1)[0].strip() or DEFAULT_FALLBACK_LANGUAGE
@@ -234,8 +234,8 @@ class TMDBScraper(BaseScraper):
                         try:
                             params.pop("append_to_response", None)
                             return self._call_api(endpoint, params, force_refresh=force_refresh)
-                        except Exception:
-                            pass
+                        except Exception as e:
+                            logger.debug(f"Swallowed exception in infrastructure/scrapers/providers/tmdb.py:237: {e}", exc_info=True)
             raise e
 
     def fetch_movie(self, movie_id: str, language: Optional[str] = None, force_refresh: bool = False) -> Optional[dict]:

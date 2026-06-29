@@ -1,5 +1,8 @@
+import logging
 from typing import Dict, Any
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 class VideoProber:
     def __init__(self, prober: Any, hash_calculator: Any, analyzer: Any, mode: Any):
@@ -28,8 +31,8 @@ class VideoProber:
             raw_data = self.prober.probe(filepath_str)
             info = self.prober.extract_info(raw_data)
             result["probe_info"] = info
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug(f"Failed to probe file {filepath_str}: {e}", exc_info=True)
 
         # 2. Compute Hashes
         duration = None
@@ -54,7 +57,7 @@ class VideoProber:
         try:
             from app.domains.library.services.scanner.scan_collector.nfo_parser import NFOParser
             result["nfo_imdb_id"] = NFOParser().get_imdb_id(filepath)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug(f"Failed to parse NFO for {filepath_str}: {e}", exc_info=True)
         
         return result

@@ -120,8 +120,8 @@ class FilmographyService:
                 if date_str:
                     try:
                         year = int(str(date_str).split("-")[0])
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        logger.debug(f"Swallowed exception in domains/people/services/filmography_service.py:123: {e}", exc_info=True)
 
                 title = credit.get("title") if media_type == "movie" else credit.get("name")
                 in_library = False
@@ -204,8 +204,8 @@ class FilmographyService:
 
         return parsed_movies, parsed_tv, local_scenes, known_for
 
-    def get_person_movies(self, person_id: int, page: int = 1, page_size: int = 12, source: Optional[str] = None):
-        if source and source.lower() in ("porndb", "stashdb", "fansdb"):
+    def get_person_movies(self, person_id: int, page: int = 1, page_size: int = 12, source: Optional[str] = None, local_only: bool = False):
+        if not local_only and source and source.lower() in ("porndb", "stashdb", "fansdb"):
             res = self._fetch_remote_credits(person_id, source, "movie", page, page_size)
             if res:
                 return res
@@ -300,8 +300,8 @@ class FilmographyService:
             "total_pages": total_pages,
         }
 
-    def get_person_scenes(self, person_id: int, page: int = 1, page_size: int = 12, source: Optional[str] = None):
-        if source and source.lower() in ("porndb", "stashdb", "fansdb"):
+    def get_person_scenes(self, person_id: int, page: int = 1, page_size: int = 12, source: Optional[str] = None, local_only: bool = False):
+        if not local_only and source and source.lower() in ("porndb", "stashdb", "fansdb"):
             res = self._fetch_remote_credits(person_id, source, "scene", page, page_size)
             if res:
                 return res
@@ -327,6 +327,7 @@ class FilmographyService:
                 "type": "scene",
                 "tmdb_id": int(match.external_id) if match.external_id.isdigit() else 0,
                 "year": match.release_date.year if match.release_date else None,
+                "release_date": match.release_date.isoformat() if match.release_date else None,
                 "poster_path": self._resolve_img(match_loc.poster_path if match_loc else None, "posters"),
                 "backdrop_path": self._resolve_img(match.backdrop_path, "backdrops", size="original"),
                 "rating": match.rating_tmdb or 0.0,

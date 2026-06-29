@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 from typing import List, Optional
 from app.shared_kernel.enums import Provider
 
@@ -69,8 +72,8 @@ def fetch_external_details(
             try:
                 prov = Provider(prov_name)
                 all_links.append({"provider": prov, "external_id": str(ext_id)})
-            except ValueError:
-                pass
+            except ValueError as e:
+                logger.debug(f"Swallowed exception in domains/people/services/enrichment/fetcher.py:72: {e}", exc_info=True)
 
     result = PrioritizedResultDict({
         "birthday": None,
@@ -136,7 +139,7 @@ def fetch_external_details(
             if prov not in existing_providers:
                 result.set_provider(prov)
                 result["links_to_create"].append({"provider": prov, "external_id": str(ext_id)})
-        except ValueError:
-            pass
+        except ValueError as e:
+            logger.debug(f"Swallowed exception in domains/people/services/enrichment/fetcher.py:139: {e}", exc_info=True)
 
     return result if has_data else None

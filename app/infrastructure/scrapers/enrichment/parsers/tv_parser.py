@@ -41,14 +41,14 @@ def enrich_tv(parser, match: MetadataMatch, language: str, include_ratings: bool
         if tv_first_air_date:
             try:
                 tv_match.first_air_date = datetime.strptime(tv_first_air_date, "%Y-%m-%d")
-            except:
-                pass
+            except Exception as e:
+                logger.debug(f"Swallowed exception in infrastructure/scrapers/enrichment/parsers/tv_parser.py:44: {e}", exc_info=True)
         tv_last_air_date = tv_details.get("last_air_date")
         if tv_last_air_date:
             try:
                 tv_match.last_air_date = datetime.strptime(tv_last_air_date, "%Y-%m-%d")
-            except:
-                pass
+            except Exception as e:
+                logger.debug(f"Swallowed exception in infrastructure/scrapers/enrichment/parsers/tv_parser.py:50: {e}", exc_info=True)
 
         selected_backdrop_path = image_processing_service.pick_backdrop_path(tv_details, preferred_language=language)
         if selected_backdrop_path:
@@ -71,6 +71,16 @@ def enrich_tv(parser, match: MetadataMatch, language: str, include_ratings: bool
         )
         tv_loc.local_poster_path = parser.enricher._queue_image(tv_loc.poster_path, "posters", localized_asset_prefix)
         tv_loc.local_logo_path = parser.enricher._queue_image(tv_loc.logo_path, "logos", localized_asset_prefix)
+
+        # Keywords / Suggested Tags
+        keywords_data = tv_details.get("keywords", {})
+        if isinstance(keywords_data, dict):
+            keywords_list = keywords_data.get("results", [])
+            if isinstance(keywords_list, list):
+                tv_match.suggested_tags = [
+                    kw["name"] for kw in keywords_list 
+                    if isinstance(kw, dict) and kw.get("name")
+                ]
 
     # B. SEASON LEVEL
     season_match = None
@@ -184,7 +194,7 @@ def enrich_tv(parser, match: MetadataMatch, language: str, include_ratings: bool
             if first_air_date:
                 try:
                     match.release_date = datetime.strptime(first_air_date, "%Y-%m-%d")
-                except:
-                    pass
+                except Exception as e:
+                    logger.debug(f"Swallowed exception in infrastructure/scrapers/enrichment/parsers/tv_parser.py:187: {e}", exc_info=True)
             
             match.media_type = MediaType.EPISODE

@@ -35,26 +35,51 @@ class LibraryStatsService:
         ).filter(
             MediaItem.status.in_(library_statuses),
             MetadataMatch.media_type == MediaType.MOVIE,
-            MetadataMatch.is_adult == include_adult
+            MetadataMatch.is_active == True
         )
+        if not include_adult:
+            movie_query = movie_query.filter(MetadataMatch.is_adult == False)
         total_movies = movie_query.scalar() or 0
 
-        tv_query = self.db.query(func.count(func.distinct(MetadataMatch.parent_id))).select_from(MediaItem).join(
-            MetadataMatch, (MetadataMatch.media_item_id == MediaItem.id)
-        ).filter(
-            MediaItem.status.in_(library_statuses),
-            MetadataMatch.media_type == MediaType.EPISODE,
-            MetadataMatch.is_adult == include_adult
+        # Resolve TV Shows count by climbing the parent hierarchy from active episodes
+        parent_ids = set()
+        current_parents = {
+            r[0] for r in self.db.query(MetadataMatch.parent_id).join(
+                MediaItem, MetadataMatch.media_item_id == MediaItem.id
+            ).filter(
+                MediaItem.status.in_(library_statuses),
+                MetadataMatch.media_type == MediaType.EPISODE,
+                MetadataMatch.parent_id != None,
+                MetadataMatch.is_active == True
+            ).all()
+        }
+        while current_parents:
+            parent_ids.update(current_parents)
+            current_parents = {
+                r[0] for r in self.db.query(MetadataMatch.parent_id).filter(
+                    MetadataMatch.id.in_(current_parents),
+                    MetadataMatch.parent_id != None
+                ).all()
+            }
+
+        tv_count_query = self.db.query(func.count(MetadataMatch.id)).filter(
+            MetadataMatch.id.in_(parent_ids),
+            MetadataMatch.media_type == MediaType.TV,
+            MetadataMatch.is_active == True
         )
-        total_tv = tv_query.scalar() or 0
+        if not include_adult:
+            tv_count_query = tv_count_query.filter(MetadataMatch.is_adult == False)
+        total_tv = tv_count_query.scalar() or 0
 
         episodes_query = self.db.query(func.count(MediaItem.id)).select_from(MediaItem).join(
             MetadataMatch, (MetadataMatch.media_item_id == MediaItem.id)
         ).filter(
             MediaItem.status.in_(library_statuses),
             MetadataMatch.media_type == MediaType.EPISODE,
-            MetadataMatch.is_adult == include_adult
+            MetadataMatch.is_active == True
         )
+        if not include_adult:
+            episodes_query = episodes_query.filter(MetadataMatch.is_adult == False)
         total_episodes = episodes_query.scalar() or 0
 
         from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
@@ -70,12 +95,13 @@ class LibraryStatsService:
         include_adult_setting = str(include_adult_setting_val).lower() == "true"
 
         total_scenes = 0
-        if include_adult_setting:
+        if include_adult_setting and include_adult:
             scenes_query = self.db.query(func.count(MediaItem.id)).select_from(MediaItem).join(
                 MetadataMatch, (MetadataMatch.media_item_id == MediaItem.id)
             ).filter(
                 MediaItem.status.in_(library_statuses),
                 MetadataMatch.media_type == MediaType.SCENE,
+                MetadataMatch.is_active == True,
                 MetadataMatch.is_adult == True
             )
             total_scenes = scenes_query.scalar() or 0

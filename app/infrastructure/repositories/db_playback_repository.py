@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 from typing import Optional, List, Any
 from sqlalchemy.orm import Session, joinedload
 from app.shared_kernel.ports.playback_repository_port import PlaybackRepositoryPort
@@ -47,8 +50,8 @@ class DbPlaybackRepository(PlaybackRepositoryPort):
                             if ep_val == str(ep_num):
                                 match_db = ep
                                 break
-            except ValueError:
-                pass
+            except ValueError as e:
+                logger.debug(f"Swallowed exception in infrastructure/repositories/db_playback_repository.py:50: {e}", exc_info=True)
         elif len(parts) == 3:
             try:
                 tv_show_id = parts[0]
@@ -80,8 +83,8 @@ class DbPlaybackRepository(PlaybackRepositoryPort):
                             if ep_val == str(ep_num):
                                 match_db = ep
                                 break
-            except ValueError:
-                pass
+            except ValueError as e:
+                logger.debug(f"Swallowed exception in infrastructure/repositories/db_playback_repository.py:83: {e}", exc_info=True)
 
         if not match_db and "_" in item_str:
             parts = item_str.split("_", 1)

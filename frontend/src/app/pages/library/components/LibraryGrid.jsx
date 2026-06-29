@@ -475,9 +475,13 @@ export default function LibraryGrid({
                   if (!singlePreview) return '';
                   const isPerson = isPersonMediaType(singlePreview.kind);
                   if (isPerson) {
-                    return singlePreview.backdrop ? resolvePosterUrl(singlePreview.backdrop) : '';
+                    return singlePreview.backdrop ? resolveMediaImageUrl(singlePreview.backdrop, 'backdrop') : '';
                   }
-                  return resolvePosterUrl(singlePreview.backdrop || singlePreview.poster);
+                  const isScene = isSceneMediaType(singlePreview.kind);
+                  if (isScene) {
+                    return singlePreview.still ? resolveMediaImageUrl(singlePreview.still, 'backdrop') : '';
+                  }
+                  return resolveMediaImageUrl(singlePreview.backdrop || singlePreview.poster, 'backdrop');
                 })();
                 return (
                   <div

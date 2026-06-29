@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import DashboardWidgetShell from './DashboardWidgetShell';
 import { useStatsQuery } from '../../../queries';
+import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 
 const translateGenreLabel = (label, T) => {
   if (!label) return '';
@@ -281,7 +282,8 @@ TimeTravelTimeline.propTypes = {
 };
 
 const LibraryInsightsWidget = ({ T }) => {
-  const { data: stats = {}, isLoading } = useStatsQuery();
+  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
+  const { data: stats = {}, isLoading } = useStatsQuery(sessionMode === 'nsfw');
   const insightTitleCount = useMemo(
     () => Object.values(stats?.decade_distribution || {}).reduce((sum, value) => sum + Number(value || 0), 0),
     [stats?.decade_distribution]

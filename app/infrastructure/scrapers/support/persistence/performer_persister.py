@@ -97,8 +97,8 @@ class PerformerPersister:
             if perf.get("provider"):
                 try:
                     prov_enum = Provider(perf["provider"])
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.debug(f"Swallowed exception in infrastructure/scrapers/support/persistence/performer_persister.py:100: {e}", exc_info=True)
             person = person_service.update_or_create_person(
                 name=perf["name"],
                 profile_path=perf["profile_path"],

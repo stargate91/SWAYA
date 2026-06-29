@@ -31,6 +31,8 @@ export default function EntityDetailHeroSection({
   handlePeopleRatingClick,
   onMediaCardClick,
   openModal,
+  profileLinks = [],
+  extraLinks = [],
 }) {
   const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -131,7 +133,7 @@ export default function EntityDetailHeroSection({
     const place = item.place_of_birth.trim().toUpperCase();
     const parts = place.split(',').map(p => p.trim());
     const lastPart = parts[parts.length - 1];
-    
+
     const map = {
       'USA': 'US', 'UNITED STATES': 'US', 'UNITED STATES OF AMERICA': 'US',
       'HUNGARY': 'HU', 'MAGYARORSZÁG': 'HU',
@@ -201,7 +203,7 @@ export default function EntityDetailHeroSection({
 
             {/* Subtle Country Flag Badge overlay */}
             {flagEmoji && (
-              <div 
+              <div
                 className="entity-detail-page__media-flag-badge"
                 title={item.place_of_birth}
               >
@@ -360,6 +362,27 @@ export default function EntityDetailHeroSection({
             );
           })()}
 
+          {isPeople && profileLinks.length > 0 && (
+            <div className="entity-detail-page__profile-links">
+              {profileLinks.map((link) => (
+                <a
+                  key={link.key}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`entity-detail-page__profile-link ${link.fullWidth ? 'entity-detail-page__profile-link--full-width' : ''}`}
+                  /* eslint-disable-next-line react/forbid-dom-props */
+                  style={{
+                    borderColor: `color-mix(in srgb, ${link.brandColor} 30%, transparent)`,
+                    color: `color-mix(in srgb, ${link.brandColor} 85%, white)`
+                  }}
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          )}
+
           {/* Need More / Biography Drawer Trigger */}
           {isPeople && (
             <button
@@ -422,12 +445,12 @@ export default function EntityDetailHeroSection({
                     >
                       <div className="entity-detail-page__known-for-poster-container">
                         {credit.poster_path ? (
-                           <img
-                             src={credit.poster_path}
-                             alt={creditTitle}
-                             className="entity-detail-page__known-for-poster"
-                             loading="lazy"
-                           />
+                          <img
+                            src={credit.poster_path}
+                            alt={creditTitle}
+                            className="entity-detail-page__known-for-poster"
+                            loading="lazy"
+                          />
                         ) : (
                           <div className="entity-detail-page__known-for-placeholder">
                             <Layers size={20} />
@@ -479,7 +502,7 @@ export default function EntityDetailHeroSection({
         return createPortal(
           <>
             <div
-              className="entity-detail-page__drawer-backdrop"
+              className="entity-detail-page__drawer-backdrop ui-drawer-backdrop"
               role="button"
               tabIndex={-1}
               onClick={() => setIsDrawerOpen(false)}
@@ -489,7 +512,7 @@ export default function EntityDetailHeroSection({
                 }
               }}
             />
-            <div className="entity-detail-page__drawer">
+            <div className="entity-detail-page__drawer ui-drawer ui-drawer--md">
               <div className="entity-detail-page__drawer-header">
                 <h3 className="entity-detail-page__drawer-title">{item?.name || overviewTitle}</h3>
                 <button

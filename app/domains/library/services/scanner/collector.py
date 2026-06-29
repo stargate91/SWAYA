@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 import os
 from pathlib import Path
 from typing import List, Dict, Optional, Any
@@ -43,14 +46,14 @@ class Collector:
         if settings_port:
             try:
                 setting_val = settings_port.get_system_setting("naming_video_exts")
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug(f"Swallowed exception in domains/library/services/scanner/collector.py:46: {e}", exc_info=True)
         elif db_session:
             try:
                 from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
                 setting_val = DbSettingsAdapter(db_session).get_system_setting("naming_video_exts")
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug(f"Swallowed exception in domains/library/services/scanner/collector.py:52: {e}", exc_info=True)
 
         if setting_val:
             video_exts = {
