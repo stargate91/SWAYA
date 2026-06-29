@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Calendar, Clock, Video, Globe } from 'lucide-react';
 import Pill from '@/ui/Pill';
 import { useTranslation } from '@/providers/LanguageContext';
@@ -17,6 +18,7 @@ export default function MediaHeaderInfo({ isFallbackGrid = false }) {
     taglineText,
     metaDate,
     isMovie,
+    isScene,
     formattedDuration,
     seasonsText,
     episodesText,
@@ -34,6 +36,19 @@ export default function MediaHeaderInfo({ isFallbackGrid = false }) {
     studioName,
     networkName
   } = state;
+
+  const activeRating = useMemo(() => {
+    if (showImdb && ratingImdb) {
+      return { type: 'imdb', logo: '/rating/imdb.png', val: ratingImdb };
+    }
+    if (showTmdb && ratingTmdb) {
+      return { type: 'tmdb', logo: '/rating/tmdb.png', val: ratingTmdb };
+    }
+    if (showPorndb && ratingPorndb) {
+      return { type: 'porndb', logo: '/rating/theporndb.png', val: ratingPorndb };
+    }
+    return null;
+  }, [showImdb, ratingImdb, showTmdb, ratingTmdb, showPorndb, ratingPorndb]);
 
   return (
     <div className={`media-detail-page__header-layout ${isFallbackGrid ? 'media-detail-page__header-layout--fallback' : ''}`}>
@@ -94,18 +109,18 @@ export default function MediaHeaderInfo({ isFallbackGrid = false }) {
                   {metaDate}
                 </Pill>
               )}
-              {isMovie && formattedDuration && (
+              {(isMovie || isScene) && formattedDuration && (
                 <Pill variant="meta">
                   <Clock size={14} />
                   {formattedDuration}
                 </Pill>
               )}
-              {!isMovie && seasonsText && (
+              {!isMovie && !isScene && seasonsText && (
                 <Pill variant="meta">
                   {seasonsText}
                 </Pill>
               )}
-              {!isMovie && episodesText && (
+              {!isMovie && !isScene && episodesText && (
                 <Pill variant="meta">
                   {episodesText}
                 </Pill>
@@ -115,34 +130,18 @@ export default function MediaHeaderInfo({ isFallbackGrid = false }) {
                   {langText}
                 </Pill>
               )}
-              {showImdb && (
+              {activeRating && (
                 <Pill variant="meta">
                   <img
-                    src="/rating/imdb.png"
-                    alt="IMDb"
+                    src={activeRating.logo}
+                    alt={activeRating.type === 'imdb' ? 'IMDb' : activeRating.type === 'tmdb' ? 'TMDb' : 'ThePornDB'}
                     className="rating-pill-img"
                   />
-                  <span>{isNaN(parseFloat(ratingImdb)) ? ratingImdb : parseFloat(ratingImdb).toFixed(1)}</span>
-                </Pill>
-              )}
-              {showTmdb && (
-                <Pill variant="meta">
-                  <img
-                    src="/rating/tmdb.png"
-                    alt="TMDb"
-                    className="rating-pill-img"
-                  />
-                  <span>{isNaN(parseFloat(ratingTmdb)) ? ratingTmdb : parseFloat(ratingTmdb).toFixed(1)}</span>
-                </Pill>
-              )}
-              {showPorndb && (
-                <Pill variant="meta">
-                  <img
-                    src="/rating/theporndb.png"
-                    alt="ThePornDB"
-                    className="rating-pill-img"
-                  />
-                  <span>{isNaN(parseFloat(ratingPorndb)) ? ratingPorndb : parseFloat(ratingPorndb).toFixed(1)}</span>
+                  <span>
+                    {isNaN(parseFloat(activeRating.val))
+                      ? activeRating.val
+                      : parseFloat(activeRating.val).toFixed(1)}
+                  </span>
                 </Pill>
               )}
             </div>

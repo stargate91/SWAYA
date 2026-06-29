@@ -786,7 +786,7 @@
 }
 
 .recommend-carousel-arrow {
-  position: absolute;
+  position: absolute !important;
   top: 50%;
   transform: translateY(-50%) !important;
   z-index: 20;

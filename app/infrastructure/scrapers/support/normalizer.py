@@ -205,6 +205,29 @@ class ScraperNormalizer:
                 if isinstance(first, str):
                     return first
             return None
+
+        def safe_parse_duration(val: Any) -> Optional[int]:
+            if val is None:
+                return None
+            if isinstance(val, (int, float)):
+                return int(val)
+            if isinstance(val, str):
+                val = val.strip()
+                if not val:
+                    return None
+                if val.isdigit():
+                    return int(val)
+                parts = val.split(":")
+                try:
+                    if len(parts) == 2:
+                        return int(parts[0]) * 60 + int(parts[1])
+                    elif len(parts) == 3:
+                        return int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
+                except ValueError:
+                    pass
+            return None
+
+        duration_val = None
         # 1. Extract based on Stash-compatible GraphQL schema (StashDB & FansDB/PornDB GraphQL)
         if "findScene" in raw or "id" in raw:
             scene = raw.get("findScene") or raw
@@ -213,6 +236,7 @@ class ScraperNormalizer:
             release_date = safe_parse_date(scene.get("date"))
             
             rating_val = (scene.get("rating_porndb") if scene.get("rating_porndb") is not None else scene.get("rating")) if provider == "porndb" else None
+            duration_val = safe_parse_duration(scene.get("duration"))
             
             # Images
             images = scene.get("images") or []
@@ -248,6 +272,7 @@ class ScraperNormalizer:
             overview = scene.get("description") or scene.get("details")
             release_date = safe_parse_date(scene.get("date"))
             rating_val = (scene.get("rating_porndb") if scene.get("rating_porndb") is not None else scene.get("rating")) if provider == "porndb" else None
+            duration_val = safe_parse_duration(scene.get("duration"))
             poster_url_temp = image_variant(scene.get("posters")) or scene.get("poster_image") or scene.get("poster") or scene.get("image")
             backdrop_url = image_variant(scene.get("background")) or image_variant(scene.get("background_back")) or scene.get("back_image") or scene.get("image") or poster_url_temp
             poster_url = poster_url_temp
@@ -269,7 +294,7 @@ class ScraperNormalizer:
                 s_logo = studio_data["images"][0].get("url")
 
             parent = None
-            parent_data = studio_data.get("parent")
+            parent_data = studio_data.get("parent") or studio_data.get("network")
             if parent_data and parent_data.get("name"):
                 p_logo = (
                     parent_data.get("image_path")
@@ -393,7 +418,7 @@ class ScraperNormalizer:
             "imdb_id": None,
             "original_title": title,
             "release_date": release_date,
-            "runtime": None,
+            "runtime": duration_val,
             "popularity": None,
             "rating_porndb": float(rating_val) if provider == "porndb" and rating_val is not None and float(rating_val) > 0 else None,
             "is_adult": True,

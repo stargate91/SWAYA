@@ -265,9 +265,24 @@ export const useUpdateMediaStatusMutation = () => {
       if (Object.keys(updates).length > 0) {
         prevTvQueries.forEach(([queryKey, queryData]) => {
           if (queryData) {
+            let updatedSeasons = queryData.seasons;
+            if (queryData.seasons && 'is_watched' in updates) {
+              updatedSeasons = queryData.seasons.map(season => {
+                if (!season.episodes) return season;
+                const updatedEpisodes = season.episodes.map(ep => {
+                  if (String(ep.id) === String(itemId)) {
+                    return { ...ep, is_watched: updates.is_watched };
+                  }
+                  return ep;
+                });
+                const isSeasonWatched = updatedEpisodes.length > 0 && updatedEpisodes.every(ep => ep.is_watched);
+                return { ...season, episodes: updatedEpisodes, is_watched: isSeasonWatched };
+              });
+            }
             queryClient.setQueryData(queryKey, {
               ...queryData,
-              ...updates
+              ...updates,
+              seasons: updatedSeasons
             });
           }
         });
@@ -356,8 +371,30 @@ export const useUpdateMediaStatusMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['library-tv-detail', cleanId] });
 
       if (variables.tvId) {
-        queryClient.setQueryData(['library-tv-detail', variables.tvId], updateDetailCache);
-        queryClient.setQueryData(['library-tv-detail', `tv_${variables.tvId}`], updateDetailCache);
+        const updateTvCacheWithEpisode = (oldData) => {
+          if (!oldData) return oldData;
+          let updatedSeasons = oldData.seasons;
+          if (oldData.seasons && data.is_watched !== undefined) {
+            updatedSeasons = oldData.seasons.map(season => {
+              if (!season.episodes) return season;
+              const updatedEpisodes = season.episodes.map(ep => {
+                if (String(ep.id) === String(variables.itemId)) {
+                  return { ...ep, is_watched: data.is_watched };
+                }
+                return ep;
+              });
+              const isSeasonWatched = updatedEpisodes.length > 0 && updatedEpisodes.every(ep => ep.is_watched);
+              return { ...season, episodes: updatedEpisodes, is_watched: isSeasonWatched };
+            });
+          }
+          return {
+            ...oldData,
+            seasons: updatedSeasons,
+          };
+        };
+
+        queryClient.setQueryData(['library-tv-detail', variables.tvId], updateTvCacheWithEpisode);
+        queryClient.setQueryData(['library-tv-detail', `tv_${variables.tvId}`], updateTvCacheWithEpisode);
         queryClient.setQueryData(['library-item-detail', variables.tvId], updateDetailCache);
         queryClient.setQueryData(['library-item-detail', `tv_${variables.tvId}`], updateDetailCache);
         queryClient.invalidateQueries({ queryKey: ['library-tv-detail', variables.tvId] });

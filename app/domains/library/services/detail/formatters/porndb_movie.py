@@ -181,6 +181,42 @@ class PornDbMovieFormatter(MovieDetailFormatter):
         # Use metadata_override if available, else fallback to override
         effective_override = metadata_override if metadata_override else override
 
+        companies = []
+        site = movie_data.get("site")
+        if site and site.get("name"):
+            companies.append({
+                "name": site.get("name"),
+                "logo_path": self._resolve_img(site.get("logo") or site.get("image") or site.get("poster"), "logos")
+            })
+
+            parent_site = site.get("parent") or site.get("network")
+            if isinstance(parent_site, dict) and parent_site.get("name"):
+                companies.append({
+                    "name": parent_site.get("name"),
+                    "logo_path": self._resolve_img(parent_site.get("logo") or parent_site.get("image") or parent_site.get("poster"), "logos")
+                })
+
+        networks = []
+
+        duration_val = None
+        duration_raw = movie_data.get("duration")
+        if duration_raw:
+            if isinstance(duration_raw, (int, float)):
+                duration_val = int(duration_raw)
+            elif isinstance(duration_raw, str):
+                val = duration_raw.strip()
+                if val.isdigit():
+                    duration_val = int(val)
+                else:
+                    parts = val.split(":")
+                    try:
+                        if len(parts) == 2:
+                            duration_val = int(parts[0]) * 60 + int(parts[1])
+                        elif len(parts) == 3:
+                            duration_val = int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
+                    except ValueError:
+                        pass
+
         result = {
             "id": f"porndb_{porndb_id}",
             "title": movie_data.get("title") or "Unknown Movie",
@@ -193,7 +229,7 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             "genres": [],
             "year": year,
             "release_date": date_str,
-            "runtime": None,
+            "runtime": duration_val,
             "rating_tmdb": None,
             "rating_porndb": movie_data.get("rating"),
             "rating_imdb": None,
@@ -202,8 +238,8 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             "vote_count_tmdb": None,
             "budget": None,
             "revenue": None,
-            "companies": [{"name": movie_data.get("studio").get("name") if movie_data.get("studio") else None, "logo_path": self._resolve_img(movie_data.get("studio").get("image") if movie_data.get("studio") else None, "logos")}] if movie_data.get("studio") else [],
-            "networks": [],
+            "companies": companies,
+            "networks": networks,
             "poster_path": self._resolve_img(effective_override.custom_poster if (effective_override and effective_override.custom_poster) else poster_url, "posters"),
             "backdrop_path": backdrop_url,
             "original_language": "en",

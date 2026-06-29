@@ -1,10 +1,10 @@
-import { FolderOpen, Video, Check, Eye, Play, BellPlus, Flame } from 'lucide-react';
+import { FolderOpen, Video, Check, Eye, Play, BellPlus, Flame, Info } from 'lucide-react';
 import Button from '@/ui/Button';
 import { formatEpisodeNumber } from '../../utils/detailUtils';
 import { useMediaDetailContext } from './MediaDetailContext';
 
 export default function MediaActions() {
-  const { state, actions, mutations, t, navigate } = useMediaDetailContext();
+  const { state, actions, mutations, t, navigate, setIsDrawerOpen } = useMediaDetailContext();
   const {
     isOwned,
     isMovie,
@@ -80,6 +80,14 @@ export default function MediaActions() {
           {isTracked ? 'Tracked' : 'Track'}
         </Button>
       )}
+
+      <Button
+        variant="ghost"
+        onClick={() => setIsDrawerOpen(true)}
+      >
+        <Info size={16} />
+        {t('library.details.details') || 'Details'}
+      </Button>
 
       {isOwned && (
         <>

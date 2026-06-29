@@ -22,6 +22,7 @@ class SceneDetailService(DetailFormatter):
         db = self.db
         
         provider_prefix = None
+        item = None
         if "_" in item_id:
             parts = item_id.split("_", 1)
             provider_prefix = parts[0].lower()
@@ -95,7 +96,7 @@ class SceneDetailService(DetailFormatter):
             except:
                 pass
         
-        studio_data = scene_data.get("studio") or {}
+        studio_data = scene_data.get("studio") or scene_data.get("site") or {}
         studio_name = studio_data.get("name")
         
         studio_logo = None
@@ -106,9 +107,9 @@ class SceneDetailService(DetailFormatter):
         
         if not studio_logo:
             studio_images = studio_data.get("images") or []
-            studio_logo = studio_images[0].get("url") if studio_images else None
+            studio_logo = studio_images[0].get("url") if studio_images else (studio_data.get("logo") or studio_data.get("image") or studio_data.get("poster"))
         
-        parent_data = studio_data.get("parent") or {}
+        parent_data = studio_data.get("parent") or studio_data.get("network") or {}
         parent_name = parent_data.get("name")
         
         parent_logo = None
@@ -119,12 +120,16 @@ class SceneDetailService(DetailFormatter):
                 
         if not parent_logo:
             parent_images = parent_data.get("images") or []
-            parent_logo = parent_images[0].get("url") if parent_images else None
+            parent_logo = parent_images[0].get("url") if parent_images else (parent_data.get("logo") or parent_data.get("image") or parent_data.get("poster"))
         # Resolve local paths from DB match if it exists
         match_db = db.query(MetadataMatch).filter(
             MetadataMatch.external_id == scene_uuid,
             MetadataMatch.media_type == MediaType.SCENE
         ).first()
+
+        if match_db and match_db.media_item_id and not item:
+            from app.domains.library.models import MediaItem
+            item = db.query(MediaItem).filter(MediaItem.id == match_db.media_item_id).first()
 
         from app.domains.people.models import Person, MediaPersonLink
         from sqlalchemy.orm import joinedload
@@ -343,6 +348,23 @@ class SceneDetailService(DetailFormatter):
 
         effective_override = metadata_override if metadata_override else override
 
+        technical = None
+        if item:
+            technical = {
+                "resolution": item.resolution,
+                "video_codec": item.video_codec,
+                "audio_codec": item.audio_codec,
+                "audio_channels": item.audio_channels,
+                "hdr_type": item.hdr_type,
+                "bit_depth": item.bit_depth,
+                "framerate": item.framerate,
+                "duration": item.duration,
+                "size_bytes": item.size,
+                "source": item.source.value if hasattr(item.source, "value") else str(item.source),
+                "edition": item.edition.value if hasattr(item.edition, "value") else str(item.edition),
+                "audio_type": item.audio_type.value if hasattr(item.audio_type, "value") else str(item.audio_type),
+            }
+
         result = {
             "id": f"scene_{scene_uuid}",
             "title": title,
@@ -367,6 +389,7 @@ class SceneDetailService(DetailFormatter):
             "backdrop_path": backdrop_resolved,
             "original_language": None,
             "type": "scene",
+            "technical": technical,
             "cast": cast,
             "cast_total": len(cast),
             "people_complete": True,

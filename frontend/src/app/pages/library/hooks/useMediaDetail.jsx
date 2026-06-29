@@ -268,7 +268,7 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
 
   const getMetaDate = () => {
     if (!item) return '';
-    if (isMovie) {
+    if (isMovie || isScene) {
       return item.release_date ? item.release_date.substring(0, 10) : '';
     } else {
       const firstYear = item.first_air_date ? item.first_air_date.substring(0, 4) : '';
@@ -282,14 +282,46 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
   };
   const metaDate = getMetaDate();
 
+  const getMovieDuration = () => {
+    let dur = item?.technical?.duration;
+    if (dur) {
+      if (typeof dur === 'string' && dur.includes(':')) {
+        const parts = dur.split(':').map(Number);
+        if (parts.length === 2) dur = parts[0] * 60 + parts[1];
+        else if (parts.length === 3) dur = parts[0] * 3600 + parts[1] * 60 + parts[2];
+      }
+      return getDurationText(dur, t);
+    }
+    let rt = item?.runtime;
+    if (rt) {
+      if (typeof rt === 'string' && rt.includes(':')) {
+        const parts = rt.split(':').map(Number);
+        if (parts.length === 2) rt = (parts[0] * 60 + parts[1]) / 60;
+        else if (parts.length === 3) rt = (parts[0] * 3600 + parts[1] * 60 + parts[2]) / 60;
+      }
+      return getDurationText(rt * 60, t);
+    }
+    return '';
+  };
+
   const getSceneDuration = () => {
     if (item?.formatted_duration) return item.formatted_duration;
-    const dur = item?.runtime || item?.technical?.duration;
+    let dur = item?.runtime || item?.technical?.duration;
+    if (!dur) return '';
+    if (typeof dur === 'string' && dur.includes(':')) {
+      const parts = dur.split(':').map(Number);
+      if (parts.length === 2) {
+        dur = parts[0] * 60 + parts[1];
+      } else if (parts.length === 3) {
+        dur = parts[0] * 3600 + parts[1] * 60 + parts[2];
+      }
+    }
     if (dur) return getDurationText(dur, t);
     return '';
   };
-  const formattedDuration = isMovie && item?.runtime
-    ? getDurationText(item.runtime * 60, t)
+
+  const formattedDuration = isMovie
+    ? getMovieDuration()
     : (isScene ? getSceneDuration() : '');
 
   let seasonsCount = 0;

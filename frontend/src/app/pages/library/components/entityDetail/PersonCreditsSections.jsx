@@ -417,7 +417,7 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
           {activeDiscoverTab && (
             <div className="person-credits-discover-grid-wrapper">
               <div className={`person-credits-discover-grid ${isSceneGrid ? 'grid-16-9' : 'grid-2-3'}`}>
-                {accumulatedItems.map((credit) => {
+                {accumulatedItems.map((credit, i) => {
                   const creditTitle = credit.title || credit.name || 'Unknown';
                   const resolvedSource = credit.source || activeSource || (credit.rating_porndb ? 'porndb' : (credit.stash_id ? 'stashdb' : (credit.fansdb_id ? 'fansdb' : 'tmdb')));
                   const posterPath = isSceneGrid
@@ -451,7 +451,7 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
 
                   return (
                     <div
-                      key={`${credit.id}-${credit.type || activeMediaType}-discover`}
+                      key={`${credit.id}-${credit.type || activeMediaType}-discover-${i}`}
                       className="person-credits-card"
                       onClick={handleCardClick}
                       role="button"
