@@ -160,6 +160,9 @@ class ScanPersister:
                     item_entity.subtitle_streams = info.get("subtitle_streams")
                     item_entity.internal_title = info.get("internal_title")
 
+                if res and res.get("nfo_imdb_id"):
+                    item_entity.nfo_imdb_id = res["nfo_imdb_id"]
+
                 # Populate guessit metadata from pre-computed thread result or fallback run
                 if not existing or existing.size != size or existing.mtime != mtime:
                     triple = res.get("guessit_info") if res else self.analyzer.get_triple_data(item_entity.internal_title, item_entity.filename, item_entity.folder_name)

@@ -860,6 +860,20 @@ export default function MediaDetailPage({ type = 'movie' }) {
           <div className="media-detail-page__inline-sections">
             <div className="media-detail-page__inline-main-col">
               {item && <BespokeCastSection item={item} t={t} navigate={navigate} />}
+              {isScene && item?.technical && (
+                <div className="bespoke-boxoffice-section">
+                  <div className="bespoke-boxoffice-card">
+                    <div className="bespoke-browser-card__pills-header">
+                      <span className="bespoke-cast-title">
+                        {t('library.details.technicalInfo') || 'Technical Info'}
+                      </span>
+                    </div>
+                    <div style={{ padding: 'var(--space-md) var(--space-lg)' }}>
+                      <TechnicalPanel showTitle={false} />
+                    </div>
+                  </div>
+                </div>
+              )}
               {!isMovie && !isScene && item && <BespokeSeasonsSection />}
 
               {/* Box Office Section for Movies */}
@@ -1085,21 +1099,6 @@ export default function MediaDetailPage({ type = 'movie' }) {
                 );
               })()}
 
-              {/* Keywords section */}
-              {item?.keywords && item.keywords.length > 0 && (
-                <div className="entity-detail-page__drawer-section">
-                  <h4 className="entity-detail-page__drawer-section-title">
-                    {t('library.details.keywords') || 'Keywords'}
-                  </h4>
-                  <div className="bespoke-keywords-container is-expanded">
-                    {item.keywords.map((kw, i) => (
-                      <span key={i} className="bespoke-keyword-badge">
-                        {kw}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {/* Production Companies (for series only) */}
               {!isMovie && !isScene && item?.companies && item.companies.length > 0 && (
@@ -1145,7 +1144,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
               {item?.extras && item.extras.length > 0 && <ExtrasPanel />}
 
               {/* Technical / Specs section */}
-              {item?.technical && <TechnicalPanel />}
+              {!isScene && item?.technical && <TechnicalPanel />}
             </div>
           </div>
         </>

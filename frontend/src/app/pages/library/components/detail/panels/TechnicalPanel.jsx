@@ -3,7 +3,7 @@ import { useMediaDetailContext } from '../MediaDetailContext';
 import './PanelsCommon.css';
 
 
-export default function TechnicalPanel() {
+export default function TechnicalPanel({ showTitle = true }) {
   const { state, t } = useMediaDetailContext();
   const {
     item,
@@ -35,7 +35,7 @@ export default function TechnicalPanel() {
 
   return (
     <div className="details-panel details-panel--custom">
-      {hasEditionSource && (
+      {showTitle && hasEditionSource && (
         <div className="details-panel__section">
           <h4 className="details-panel__section-title">
             {t('library.details.editionAndSource') || 'Edition & Source'}
@@ -71,9 +71,11 @@ export default function TechnicalPanel() {
 
       {hasSpecs ? (
         <div className="details-panel__section">
-          <h4 className="details-panel__section-title">
-            {t('library.details.technicalInfo') || 'Technical Info'}
-          </h4>
+          {showTitle && (
+            <h4 className="details-panel__section-title">
+              {t('library.details.technicalInfo') || 'Technical Info'}
+            </h4>
+          )}
           <div className="specs-grid">
             {item.technical.resolution && (
               <div className="specs-card">

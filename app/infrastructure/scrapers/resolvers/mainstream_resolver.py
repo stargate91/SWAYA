@@ -120,21 +120,40 @@ class MainstreamResolver:
         if item.nfo_imdb_id:
             res = self.api.find_by_imdb(item.nfo_imdb_id, language=language)
             if res:
-                tmdb_type = "tv" if res.get("item_type") == "tv" else "movie"
+                # Validate NFO candidate against parsed metadata to reject completely bogus matches
                 details = None
                 try:
+                    tmdb_type = "tv" if res.get("item_type") == "tv" else "movie"
                     details = self.api.get_details(res["id"], tmdb_type, language=language)
                 except Exception:
                     pass
-                candidate_titles = self._collect_candidate_titles(res, details)
                 
-                match_found = False
+                candidate_titles = self.title_matcher.collect_candidate_titles(res, details)
+                title_rank = 0
                 for t in [fn_data.get("title"), it_data.get("title"), fd_data.get("title")]:
-                    if t and self._title_match_rank(t, candidate_titles) > 0:
-                        match_found = True
-                        break
+                    if t:
+                        title_rank = max(title_rank, self.title_matcher.title_match_rank(t, candidate_titles))
                 
-                if match_found:
+                year_match = False
+                target_year = fn_data.get("year") or fd_data.get("year") or it_data.get("year")
+                date_str = (
+                    res.get("release_date") 
+                    or res.get("first_air_date") 
+                    or (details.get("release_date") if details else None) 
+                    or (details.get("first_air_date") if details else None)
+                )
+                if target_year and date_str:
+                    try:
+                        c_year = int(str(date_str).split("-")[0])
+                        if abs(c_year - target_year) <= 1:
+                            year_match = True
+                    except Exception:
+                        pass
+                else:
+                    year_match = True
+                
+                # Accept NFO match if title is somewhat similar OR year matches
+                if (title_rank > 0) or year_match:
                     if res.get("item_type") == "tv":
                         res_list = filter_by_season_support([res])
                         if res_list:
@@ -158,11 +177,49 @@ class MainstreamResolver:
                 if not clean_title:
                     continue
 
-                is_tv = (
-                    fn_data.get("type") in ("episode", "tv") or 
-                    fd_data.get("type") in ("episode", "tv") or 
-                    it_data.get("type") in ("episode", "tv")
-                )
+                # Determine if it's a TV show or movie using decision logic from RENDA
+                if item.nfo_imdb_id:
+                    is_tv = False
+                else:
+                    fn_type = fn_data.get('type')
+                    fd_type = fd_data.get('type')
+
+                    # Fix common 1080p -> S10E80 trap
+                    if fn_data.get('season') == 10 and fn_data.get('episode') == 80:
+                        fn_type = 'movie'
+
+                    raw_fn_lower = (item.filename or "").lower()
+                    raw_fd_lower = (item.folder_name or "").lower()
+
+                    # Check for strong series indicators
+                    is_forced_series = False
+                    if (fn_data.get('season') or fn_data.get('episode') or fd_data.get('season') or fd_data.get('episode')) and fn_type != 'movie':
+                        is_forced_series = True
+
+                    # Exception: Movie sequels often have fractions or numbers that Guessit mistakes for episodes (e.g. Naked Gun 2 12 (1991))
+                    # If we have an episode but absolutely no season info, and we have a valid year, and no standard S/E markers:
+                    if is_forced_series and fn_data.get('episode') and not fn_data.get('season') and not fd_data.get('season') and (fn_data.get('year') or fd_data.get('year')):
+                        import re
+                        if not re.search(r'\bs\d+e\d+\b|\bseason\b|\bepizod\b|\bresz\b', raw_fn_lower):
+                            is_forced_series = False
+
+                    series_kw = ['mini-series', 'miniseries', 'complete series', 'complete.series']
+                    if any(kw in raw_fn_lower or kw in raw_fd_lower for kw in series_kw):
+                        is_forced_series = True
+
+                    # Decision Tree
+                    if is_forced_series:
+                        is_tv = True
+                    elif fd_type == 'movie' and fd_data.get('year'):
+                        is_tv = False
+                    elif fn_type == 'episode' and not fd_data.get('year'):
+                        is_tv = True
+                    elif fd_type == 'episode':
+                        is_tv = True
+                    elif fn_type == 'movie' or fd_type == 'movie':
+                        is_tv = False
+                    else:
+                        is_tv = False
                 tmdb_type = "tv" if is_tv else "movie"
                 results = self.api.search(clean_title, item_type=tmdb_type, year=year, language=language, include_adult=include_adult)
                 if tmdb_type == "tv":

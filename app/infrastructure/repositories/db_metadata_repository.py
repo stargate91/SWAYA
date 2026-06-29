@@ -52,10 +52,19 @@ class DbMetadataRepository(MetadataRepositoryPort):
         ).first()
 
     def get_studio_by_name(self, name: str) -> Optional[Any]:
-        return self.db.query(Studio).filter(Studio.name == name).first()
+        from sqlalchemy import func
+        cleaned_name = name.strip() if name else ""
+        
+        # Check pending/unsaved objects in the current session first
+        for obj in self.db.new:
+            if isinstance(obj, Studio) and obj.name and obj.name.lower() == cleaned_name.lower():
+                return obj
+                
+        return self.db.query(Studio).filter(func.lower(Studio.name) == func.lower(cleaned_name)).first()
 
     def create_studio(self, name: str, logo_path: Optional[str] = None) -> Any:
-        studio = Studio(name=name, logo_path=logo_path)
+        cleaned_name = name.strip() if name else ""
+        studio = Studio(name=cleaned_name, logo_path=logo_path)
         self.db.add(studio)
         return studio
 

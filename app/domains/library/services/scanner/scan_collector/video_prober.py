@@ -20,6 +20,7 @@ class VideoProber:
             "hash_phash": None,
             "hash_sha256": None,
             "guessit_info": None,
+            "nfo_imdb_id": None,
         }
         
         # 1. Run ffprobe
@@ -48,5 +49,12 @@ class VideoProber:
             filepath.name, 
             filepath.parent.name
         )
+
+        # 4. Parse NFO
+        try:
+            from app.domains.library.services.scanner.scan_collector.nfo_parser import NFOParser
+            result["nfo_imdb_id"] = NFOParser().get_imdb_id(filepath)
+        except Exception:
+            pass
         
         return result
