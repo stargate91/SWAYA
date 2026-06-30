@@ -211,6 +211,8 @@
     "yearMode": "Year"
   },
   "details": {
+    "backToProfile": "Back to Profile",
+    "scrollToCredits": "Scroll to Details",
     "personLabel": "Person Profile",
     "collectionLabel": "Collection Details",
     "biographyTitle": "Biography",

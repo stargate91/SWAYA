@@ -6,8 +6,12 @@ from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.shared_kernel.ports.settings_port import SettingsPort
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.application.recommendations.schemas import RecommendationsResponse, ActionResponse
-from app.domains.recommendations.services.recommendations_domain_service import RecommendationsDomainService
-from app.domains.users.services.lists_service import ListsService as DomainListsService
+from app.application.catalog.lists_service import ListsService as DomainListsService
+
+from app.domains.users.models import CustomList
+from app.domains.library.models import MediaItem
+from app.domains.metadata.models import MetadataMatch
+from app.shared_kernel.enums import MediaType, ItemStatus, Provider
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +29,7 @@ class RecommendationsService:
         return lang if lang else DEFAULT_FALLBACK_LANGUAGE
 
     def get_recommendations(self, language: Optional[str] = None) -> RecommendationsResponse:
-        watchlist_tmdb_ids = RecommendationsDomainService.fetch_watchlist_tmdb_ids(self.db)
+        watchlist_tmdb_ids = self._fetch_watchlist_tmdb_ids()
         pref_lang = language or self._preferred_metadata_language()
         
         include_adult_val = self.settings.get_setting("include_adult")
@@ -117,12 +121,12 @@ class RecommendationsService:
             with ThreadPoolExecutor(max_workers=10) as executor:
                 executor.map(fetch_tv_details, tv_items_to_enrich)
 
-        bindings = RecommendationsDomainService.resolve_local_recommendation_bindings(
-            self.db, trending_results + discover_movies + discover_tv + discover_adult
+        bindings = self._resolve_local_recommendation_bindings(
+            trending_results + discover_movies + discover_tv + discover_adult
         )
 
         def annotate(items):
-            return RecommendationsDomainService.annotate_recommendations(items, bindings)
+            return self._annotate_recommendations(items, bindings)
 
         return RecommendationsResponse(
             trending=annotate(trending_results),
@@ -162,5 +166,102 @@ class RecommendationsService:
             
         return ActionResponse(status="error", message="Item not found in watchlist")
 
-# For Provider reference
-from app.shared_kernel.enums import Provider
+    def _annotate_recommendations(
+        self,
+        items: List[Dict[str, Any]],
+        bindings: Dict[tuple, Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
+        annotated = []
+        for item in items:
+            tmdb_id = item.get("id")
+            media_type = item.get("media_type") or ("movie" if item.get("title") else "tv")
+            bind = bindings.get((media_type, tmdb_id), {})
+            annotated.append({
+                **item,
+                "media_type": media_type,
+                "in_library": bind.get("media_item_id") is not None,
+                "media_item_id": bind.get("media_item_id"),
+                "rating_imdb": bind.get("rating_imdb"),
+                "rating_tmdb": bind.get("rating_tmdb") or item.get("vote_average"),
+                "last_air_date": bind.get("last_air_date") or item.get("last_air_date"),
+                "release_status": bind.get("release_status") or item.get("release_status"),
+            })
+        return annotated
+
+    def _fetch_watchlist_tmdb_ids(self) -> List[int]:
+        watchlist = self.db.query(CustomList).filter(CustomList.name == "Watchlist").first()
+        if not watchlist:
+            return []
+        return [
+            int(item.match.external_id) for item in watchlist.items
+            if item.match and item.match.provider == Provider.TMDB and item.match.external_id.isdigit()
+        ]
+
+    def _resolve_local_recommendation_bindings(self, items: List[Dict[str, Any]]) -> Dict[tuple, Dict[str, Any]]:
+        movie_ids = set()
+        tv_ids = set()
+        for item in items or []:
+            tmdb_id = item.get("id")
+            if not tmdb_id:
+                continue
+            media_type = item.get("media_type") or ("movie" if item.get("title") else "tv")
+            if media_type == "tv":
+                tv_ids.add(str(tmdb_id))
+            else:
+                movie_ids.add(str(tmdb_id))
+
+        if not movie_ids and not tv_ids:
+            return {}
+
+        bindings = {}
+
+        # 1. Query TV matches directly from metadata_matches table
+        if tv_ids:
+            tv_rows = self.db.query(
+                MetadataMatch.external_id,
+                MetadataMatch.rating_tmdb,
+                MetadataMatch.rating_imdb,
+                MetadataMatch.last_air_date,
+                MetadataMatch.release_status
+            ).filter(
+                MetadataMatch.provider == Provider.TMDB,
+                MetadataMatch.media_type == MediaType.TV,
+                MetadataMatch.external_id.in_(tv_ids)
+            ).all()
+            for r in tv_rows:
+                ext_id = int(r.external_id)
+                bindings[("tv", ext_id)] = {
+                    "media_item_id": ext_id,
+                    "rating_imdb": r.rating_imdb,
+                    "rating_tmdb": r.rating_tmdb,
+                    "last_air_date": r.last_air_date.isoformat() if r.last_air_date else None,
+                    "release_status": r.release_status,
+                }
+
+        # 2. Query Movie matches joined with MediaItem to verify active status
+        if movie_ids:
+            movie_rows = self.db.query(
+                MediaItem.id,
+                MetadataMatch.external_id,
+                MetadataMatch.rating_tmdb,
+                MetadataMatch.rating_imdb,
+                MetadataMatch.release_status
+            ).join(
+                MetadataMatch, MetadataMatch.media_item_id == MediaItem.id
+            ).filter(
+                MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED]),
+                MetadataMatch.provider == Provider.TMDB,
+                MetadataMatch.media_type == MediaType.MOVIE,
+                MetadataMatch.external_id.in_(movie_ids)
+            ).all()
+            for r in movie_rows:
+                ext_id = int(r.external_id)
+                bindings[("movie", ext_id)] = {
+                    "media_item_id": r.id,
+                    "rating_imdb": r.rating_imdb,
+                    "rating_tmdb": r.rating_tmdb,
+                    "last_air_date": None,
+                    "release_status": r.release_status,
+                }
+
+        return bindings

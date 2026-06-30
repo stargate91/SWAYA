@@ -179,9 +179,9 @@ class BaseQueryBuilder:
         elif params.sort_by == "rating_imdb_asc":
             query = query.order_by(MetadataMatch.rating_imdb.asc())
         elif params.sort_by == "duration_desc":
-            query = query.order_by(desc(MediaItem.duration))
+            query = query.order_by(desc(func.coalesce(MediaItem.duration, MetadataMatch.runtime * 60)))
         elif params.sort_by == "duration_asc":
-            query = query.order_by(MediaItem.duration.asc())
+            query = query.order_by(func.coalesce(MediaItem.duration, MetadataMatch.runtime * 60).asc())
         elif params.sort_by in ("file_size_desc", "size_desc"):
             query = query.order_by(desc(MediaItem.size))
         elif params.sort_by in ("file_size_asc", "size_asc"):
@@ -293,6 +293,7 @@ class BaseQueryBuilder:
                 "in_library": in_library,
                 "release_date": match.release_date.isoformat() if match.release_date else None,
                 "user_rating": o.user_rating if o else None,
+                "user_comment": o.user_comment if (o and o.user_comment) else None,
                 "people": people_list,
             })
         return formatted_items

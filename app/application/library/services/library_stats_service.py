@@ -1,5 +1,5 @@
 import logging
-from typing import Any
+from typing import Any, Optional
 from itertools import combinations
 from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
@@ -279,4 +279,3 @@ class LibraryStatsService:
             genre_constellation={"nodes": constellation_nodes, "links": constellation_links},
             decade_distribution=decade_dist
         )
-

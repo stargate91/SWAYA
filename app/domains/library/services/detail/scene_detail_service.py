@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import Optional, Dict, Any
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 
@@ -9,6 +9,11 @@ from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.domains.metadata.models import Studio, MetadataMatch
 from app.domains.library.services.detail._detail_formatter import DetailFormatter
 
+# Sub-services
+from app.domains.library.services.detail.scene.cast_builder import SceneCastBuilder
+from app.domains.library.services.detail.scene.playback_resolver import ScenePlaybackResolver
+from app.domains.library.services.detail.scene.metadata_syncer import SceneMetadataSyncer
+
 logger = logging.getLogger(__name__)
 
 class SceneDetailService(DetailFormatter):
@@ -16,8 +21,11 @@ class SceneDetailService(DetailFormatter):
         super().__init__()
         self.db = db
         self.scrapers = scrapers
+        self.cast_builder = SceneCastBuilder()
+        self.playback_resolver = ScenePlaybackResolver()
+        self.metadata_syncer = SceneMetadataSyncer()
 
-    def get_scene_detail(self, item_id: str) -> SceneDetailResponse:
+    def get_scene_detail(self, item_id: str) -> Any:
         from app.domains.library.schemas import SceneDetailResponse
         db = self.db
         
@@ -84,7 +92,7 @@ class SceneDetailService(DetailFormatter):
             try:
                 year = int(date_str.split("-")[0])
             except Exception as e:
-                logger.debug(f"Swallowed exception in domains/library/services/detail/scene_detail_service.py:86: {e}", exc_info=True)
+                logger.debug(f"Swallowed exception: {e}", exc_info=True)
         
         duration_raw = scene_data.get("duration")
         duration_sec = None
@@ -107,7 +115,7 @@ class SceneDetailService(DetailFormatter):
                         elif len(parts) == 3:
                             duration_sec = int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
                     except ValueError as e:
-                        logger.debug(f"Swallowed exception in domains/library/services/detail/scene_detail_service.py:109: {e}", exc_info=True)
+                        logger.debug(f"Swallowed exception: {e}", exc_info=True)
 
         if duration_sec:
             duration_min = duration_sec // 60
@@ -139,7 +147,7 @@ class SceneDetailService(DetailFormatter):
         if not parent_logo:
             parent_images = parent_data.get("images") or []
             parent_logo = parent_images[0].get("url") if parent_images else (parent_data.get("logo") or parent_data.get("image") or parent_data.get("poster"))
-        # Resolve local paths from DB match if it exists
+
         match_db = db.query(MetadataMatch).filter(
             MetadataMatch.external_id == scene_uuid,
             MetadataMatch.media_type == MediaType.SCENE
@@ -149,129 +157,14 @@ class SceneDetailService(DetailFormatter):
             from app.domains.library.models import MediaItem
             item = db.query(MediaItem).filter(MediaItem.id == match_db.media_item_id).first()
 
-        from app.domains.people.models import Person, MediaPersonLink, ExternalSourceLink
-        from sqlalchemy.orm import joinedload
         from app.shared_kernel.user_context import get_current_user_id
         current_uid = get_current_user_id() or 1
-        cast_by_name = {}
 
-        def calculate_age_at_release(birthday_str: str, release_date_str: str) -> Any:
-            if not birthday_str or not release_date_str:
-                return None
-            try:
-                from datetime import datetime
-                b_date = datetime.strptime(birthday_str[:10], "%Y-%m-%d")
-                r_date = datetime.strptime(release_date_str[:10], "%Y-%m-%d")
-                age = r_date.year - b_date.year
-                if (r_date.month, r_date.day) < (b_date.month, b_date.day):
-                    age -= 1
-                return age
-            except:
-                return None
+        # 1. Build performers list using CastBuilder
+        cast = self.cast_builder.build_cast(
+            db, match_db, scene_data, date_str, current_uid, provider_prefix, self._resolve_img
+        )
 
-        # 1. Add performers from local database match
-        if match_db:
-            people_links = db.query(MediaPersonLink).options(
-                joinedload(MediaPersonLink.person)
-            ).filter(MediaPersonLink.match_id == match_db.id).all()
-            
-            # Fetch all user overrides for these performers
-            person_ids = [l.person_id for l in people_links]
-            override_map = {}
-            if person_ids:
-                overrides = db.query(UserOverride).filter(
-                    UserOverride.user_id == current_uid,
-                    UserOverride.person_id.in_(person_ids)
-                ).all()
-                override_map = {ov.person_id: ov.custom_poster for ov in overrides if ov.custom_poster}
-
-            for link in sorted(people_links, key=lambda x: x.order if x.order is not None else 0):
-                person = link.person
-                custom_img = override_map.get(person.id)
-                cast_by_name[person.name.lower()] = {
-                    "id": f"local:{person.id}",
-                    "name": person.name,
-                    "character": link.character_name,
-                    "job": link.role.value if hasattr(link.role, "value") else str(link.role),
-                    "profile_path": self._resolve_img(custom_img or person.local_profile_path or person.profile_path, "people"),
-                    "popularity": person.rating_porndb if person.rating_porndb is not None else person.popularity or 0,
-                    "rating_porndb": person.rating_porndb,
-                    "scene_count": person.scene_count,
-                    "gender": person.gender,
-                    "age_at_release": calculate_age_at_release(person.birthday, date_str)
-                }
-
-        # 2. Add/merge performers from external scraper details
-        for p_entry in scene_data.get("performers") or []:
-            perf = p_entry.get("performer") or {}
-            perf_name = perf.get("name")
-            if not perf_name:
-                continue
-            if perf_name.lower() in cast_by_name:
-                continue
-
-            p_images = perf.get("images") or []
-            p_img = p_images[0].get("url") if p_images else None
-            gender_str = str(perf.get("gender") or "").upper()
-            mapped_gender = 0
-            if "FEMALE" in gender_str:
-                mapped_gender = 1
-            elif "MALE" in gender_str:
-                mapped_gender = 2
-            elif gender_str:
-                mapped_gender = 3
-
-            person_db = None
-            perf_ext_id = perf.get("id")
-            if perf_ext_id and provider_prefix:
-                try:
-                    prov_enum = Provider(provider_prefix)
-                    link = db.query(ExternalSourceLink).filter(
-                        ExternalSourceLink.provider == prov_enum,
-                        ExternalSourceLink.external_id == str(perf_ext_id)
-                    ).first()
-                    if link:
-                        person_db = link.person
-                except Exception as e:
-                    logger.debug(f"Swallowed exception: {e}")
-
-            if not person_db:
-                person_db = db.query(Person).filter(Person.name == perf_name).first()
-
-            birthday_val = None
-            if person_db:
-                # Check for UserOverride custom profile image
-                override_obj = db.query(UserOverride).filter(
-                    UserOverride.user_id == current_uid,
-                    UserOverride.person_id == person_db.id
-                ).first()
-                custom_img = override_obj.custom_poster if override_obj else None
-                resolved_img = self._resolve_img(custom_img or person_db.local_profile_path or person_db.profile_path, "people")
-                p_id = f"local:{person_db.id}"
-                birthday_val = person_db.birthday
-            else:
-                resolved_img = p_img
-                p_id = f"{provider_prefix}:{perf.get('id')}" if provider_prefix else perf.get("id")
-
-            cast_by_name[perf_name.lower()] = {
-                "id": p_id,
-                "name": perf_name,
-                "character": None,
-                "job": "Actor",
-                "profile_path": resolved_img,
-                "popularity": perf.get("rating_porndb") or 0,
-                "rating_porndb": perf.get("rating_porndb"),
-                "scene_count": perf.get("scene_count"),
-                "gender": mapped_gender,
-                "age_at_release": calculate_age_at_release(birthday_val, date_str)
-            }
-
-        cast = list(cast_by_name.values())
-        
-        from app.shared_kernel.user_context import get_current_user_id
-        current_uid = get_current_user_id()
-
-        
         metadata_override = None
         if match_db:
             metadata_override = db.query(UserOverride).filter(
@@ -299,54 +192,14 @@ class SceneDetailService(DetailFormatter):
         if not ext_background:
             ext_background = scene_data.get("image") or poster_url
 
+        # 2. Sync metadata via MetadataSyncer
         if match_db:
-            db_updated = False
-            if not match_db.backdrop_path and ext_background:
-                match_db.backdrop_path = ext_background
-                db_updated = True
-            if not match_db.release_date and date_str:
-                from datetime import datetime
-                try:
-                    match_db.release_date = datetime.strptime(date_str, "%Y-%m-%d")
-                    db_updated = True
-                except Exception as e:
-                    logger.debug(f"Swallowed exception in domains/library/services/detail/scene_detail_service.py:276: {e}", exc_info=True)
-            if scene_data.get("rating") is not None and float(scene_data.get("rating")) > 0:
-                try:
-                    match_db.rating_porndb = float(scene_data.get("rating"))
-                    db_updated = True
-                except Exception as e:
-                    logger.debug(f"Swallowed exception in domains/library/services/detail/scene_detail_service.py:282: {e}", exc_info=True)
-            
-            loc_db = next((l for l in match_db.localizations if l.locale == "en"), None)
-            if not loc_db:
-                from app.domains.metadata.models import MetadataLocalization
-                loc_db = MetadataLocalization(
-                    match_id=match_db.id,
-                    locale="en",
-                    title=title,
-                    overview=scene_data.get("details"),
-                    poster_path=poster_url
-                )
-                db.add(loc_db)
-                db_updated = True
-            else:
-                if not loc_db.title and title:
-                    loc_db.title = title
-                    db_updated = True
-                if not loc_db.overview and scene_data.get("details"):
-                    loc_db.overview = scene_data.get("details")
-                    db_updated = True
-                if not loc_db.poster_path and poster_url:
-                    loc_db.poster_path = poster_url
-                    db_updated = True
-            
-            if db_updated:
-                db.commit()
+            self.metadata_syncer.sync_metadata(
+                db, match_db, title, scene_data, poster_url, ext_background, date_str
+            )
 
         local_poster = override.custom_poster if override else None
         local_backdrop = override.custom_backdrop if override else None
-        local_logo = override.custom_logo if override else None
         
         if match_db:
             if not local_backdrop:
@@ -359,46 +212,11 @@ class SceneDetailService(DetailFormatter):
         poster_resolved = self._resolve_img(local_poster or poster_url, "posters")
         backdrop_resolved = self._resolve_img(local_backdrop or ext_background, "backdrops", size="original")
 
-        # Merge watch properties
-        is_watched = False
-        watch_count = 0
-        resume_position = 0
-        last_watched_at_dt = None
-
-        if metadata_override:
-            is_watched = metadata_override.is_watched
-            watch_count = metadata_override.watch_count or 0
-            last_watched_at_dt = metadata_override.last_watched_at
-        elif override:
-            is_watched = override.is_watched
-            watch_count = override.watch_count or 0
-            last_watched_at_dt = override.last_watched_at
-
-        if physical_override:
-            if physical_override.is_watched:
-                is_watched = True
-            if physical_override.watch_count and physical_override.watch_count > watch_count:
-                watch_count = physical_override.watch_count
-            if physical_override.resume_position:
-                resume_position = physical_override.resume_position
-            if physical_override.last_watched_at:
-                if not last_watched_at_dt or physical_override.last_watched_at > last_watched_at_dt:
-                    last_watched_at_dt = physical_override.last_watched_at
-
-        playback_logs = []
-        if match_db and match_db.media_item_id:
-            from app.domains.history.models import PlaybackLog
-            logs = db.query(PlaybackLog).filter(
-                PlaybackLog.user_id == current_uid,
-                PlaybackLog.media_item_id == match_db.media_item_id
-            ).order_by(PlaybackLog.watched_at.desc()).all()
-            playback_logs = [
-                {
-                    "id": log.id,
-                    "watched_at": log.watched_at.isoformat()
-                }
-                for log in logs
-            ]
+        # 3. Resolve playback details using PlaybackResolver
+        is_watched, watch_count, resume_position, last_watched_str, playback_logs, peaks_count, peaks_history = \
+            self.playback_resolver.resolve_playback_and_peaks(
+                db, match_db, metadata_override, override, physical_override, current_uid
+            )
 
         effective_override = metadata_override if metadata_override else override
 
@@ -464,31 +282,14 @@ class SceneDetailService(DetailFormatter):
             "watch_count": watch_count,
             "is_watched": is_watched,
             "resume_position": resume_position,
-            "last_watched_at": last_watched_at_dt.isoformat() if last_watched_at_dt else None,
+            "last_watched_at": last_watched_str,
             "playback_logs": playback_logs,
             "in_library": match_db is not None and match_db.media_item_id is not None,
             "library_item_id": match_db.media_item_id if match_db else None,
+            "peaks_count": peaks_count,
+            "peaks_history": peaks_history,
         }
         
-        peaks_count = 0
-        peaks_history = []
-        if match_db and match_db.media_item_id:
-            from app.domains.history.models import PlaybackPeakLog
-            peaks = db.query(PlaybackPeakLog).filter(
-                PlaybackPeakLog.user_id == current_uid,
-                PlaybackPeakLog.media_item_id == match_db.media_item_id
-            ).order_by(PlaybackPeakLog.video_position.asc()).all()
-            peaks_count = len(peaks)
-            peaks_history = [
-                {
-                    "id": p.id,
-                    "video_position": p.video_position,
-                    "watched_at": p.created_at.isoformat()
-                }
-                for p in peaks
-            ]
-        result["peaks_count"] = peaks_count
-        result["peaks_history"] = peaks_history
         from app.domains.library.services.detail.external_links import generate_external_links
         result["external_links"] = generate_external_links(result["external_ids"], "scene")
         return SceneDetailResponse(**result)

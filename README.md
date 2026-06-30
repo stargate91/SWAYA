@@ -1,62 +1,71 @@
 # Swaya
 
-Swaya is a media library management application consisting of an Electron + React frontend and a FastAPI backend, both hosted in this repository.
+Swaya is a media library management application consisting of an Electron and React frontend and a FastAPI backend.
 
 The application scans local directories, identifies media files, resolves metadata from external services, and tracks playback state.
 
-## Repository structure
+## Program State and Architecture
 
-- **frontend/**: React + Electron client application
-- **app/**: FastAPI backend engine (business logic, DB adapters, scrapers)
+The backend codebase has been refactored into a highly modular, decoupled architecture following Domain-Driven Design (DDD) principles:
+
+- **Routing Segregation**: Endpoints are split into specific sub-routers (e.g. people management endpoints are distributed across mainstream, adult, detail, images, linking, and status sub-routers) to avoid single large route files.
+- **Polymorphic Strategies**: Tasks such as filmography querying, scraper normalization, and media organization use strategy patterns (e.g. MovieOrganizer, SceneOrganizer, EpisodeOrganizer) to handle type-specific logic.
+- **Separation of Infrastructure and Domains**: Low-level network clients, caching, and rate limiting (e.g. PornDB Client) are separated from higher-level provider parsing logic.
+- **Read-Write Separation**: Override systems separate query verification (e.g. TitleLockReader) from override updates and db sync operations (e.g. TitleLockService).
+- **Sub-service Delegation**: Heavy domain services delegate specific behaviors (like cast building, playback resolving, and metadata syncing) to dedicated sub-components.
+
+## Repository Structure
+
+- **frontend/**: React and Electron client application
+- **app/**: FastAPI backend engine (application services, domain models, infrastructure adapters, and scrapers)
 
 ---
 
-## Backend
+## Backend Architecture
 
-The backend follows a DDD (Domain-Driven Design) layered structure:
+The backend follows a DDD layered structure:
 
 ```
 app/
-  application/       -- HTTP layer: routes, Pydantic schemas, validation
+  application/       -- HTTP layer: routes, schemas, validation, and use cases
     catalog/           organizer/discovery API
     history/           watch history queries
     library/           library endpoints (listing, filtering, details)
-    media/             media playback and preview
+    media/             media playback, preview, and logging delegation
     metadata/          metadata queries (TMDB search, details)
-    organizer/         organizer page API (discovery, override, rename)
-    people/            people (actors, directors) endpoints
+    organizer/         organizer page API and strategies
+    people/            people endpoints and route packages
     recommendations/   recommendation API
     settings/          application settings
     tasks/             background task control and status
     users/             user management, overrides, custom lists
 
-  domains/            -- business logic: models, domain services
+  domains/            -- Core business logic: entities, value objects, domain services
     history/           watch and audit log models
-    library/           library, media item, extra file models; scanner, renamer, formatter
+    library/           library, media item, and extra file models; scanners and formatters
     media/             media access and playback logic
     media_assets/      image processing (download, crop, thumbnails)
     metadata/          metadata match models
-    people/            person models, enrichment logic
-    recommendations/   recommendation algorithm
+    people/            person models and detail resolvers
+    recommendations/   recommendation algorithms
     settings/          system settings models
-    tasks/             background task manager (manager, worker, queue)
-    users/             user, UserOverride, custom lists, tags
+    tasks/             background task managers and workers
+    users/             user overrides, custom lists, and tag models
 
-  infrastructure/     -- external system integrations
+  infrastructure/     -- External system integrations, repositories, and scrapers
     cache/             SQLite-based API cache (TTL, negative cache)
-    filesystem/        file system operations, watchdog
-    media/             DB adapters, resolver, media item port implementation
+    filesystem/        file system operations and watchdog
+    media/             DB adapters, mixins, and resolvers
     playback/          playback monitoring (player detector, monitor)
-    repositories/      generic repository pattern
-    scrapers/          API providers (TMDB, OMDb, StashDB, PornDB, FansDB),
-                       resolve pipelines, enrichment and parser modules
-    settings/          settings persistence
-    tasks/             task-specific adapters (image download)
+    repositories/      generic database repository implementations
+    scrapers/          API providers (TMDB, OMDb, StashDB, PornDB, FansDB) and normalizers
+    settings/          settings persistence adapters
+    tasks/             task-specific adapters
 
-  shared_kernel/      -- shared elements: enums, constants, DB session, ports
+  shared_kernel/      -- Shared components: enums, constants, DB session, and ports
 ```
 
-### Tech stack
+### Tech Stack
 
 | Category            | Tool                      |
 |---------------------|---------------------------|
@@ -76,7 +85,7 @@ app/
 - Python 3.10+
 - FFmpeg and FFprobe available on PATH
 
-### Setup and running
+### Setup and Running
 
 Install dependencies:
 ```bash
@@ -118,7 +127,7 @@ python -m pytest
 
 The frontend is built with React 19, Vite, and runs inside Electron.
 
-### Tech stack
+### Tech Stack
 
 | Category            | Tool                      |
 |---------------------|---------------------------|
@@ -129,7 +138,7 @@ The frontend is built with React 19, Vite, and runs inside Electron.
 | Data fetching       | TanStack Query (v5)       |
 | Routing             | React Router 7            |
 
-### Setup and running
+### Setup and Running
 
 Go to the frontend directory:
 ```bash

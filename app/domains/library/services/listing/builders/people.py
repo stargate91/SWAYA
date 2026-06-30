@@ -75,6 +75,7 @@ class PeopleQueryBuilder:
                 "in_library": True,
                 "release_date": None,
                 "user_rating": item.user_rating,
+                "user_comment": item.user_comment,
                 "is_favorite": item.is_favorite,
                 "is_active": item.is_active,
                 "gender": item.gender,

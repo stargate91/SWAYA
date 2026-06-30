@@ -53,6 +53,7 @@ class PeopleGroupItem(BaseModel):
     is_active: bool
     is_favorite: bool
     user_rating: Optional[float] = None
+    user_comment: Optional[str] = None
     birthday: str
     gender: Optional[int] = None
     library_count: int
@@ -72,6 +73,9 @@ class PersonSearchItem(BaseModel):
     is_active: bool
     library_count: int
     known_for: Optional[str] = None
+    user_rating: Optional[float] = None
+    user_comment: Optional[str] = None
+    is_favorite: Optional[bool] = False
     external_ids: Optional[dict[str, Any]] = None
 
 

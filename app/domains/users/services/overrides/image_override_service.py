@@ -28,6 +28,11 @@ class ImageOverrideService:
     def image_downloader(self):
         return self.service.image_downloader
 
+    def _get_bg_session(self):
+        """Create a fresh session for background threads without module-level SessionLocal import."""
+        from app.shared_kernel.database import SessionLocal
+        return SessionLocal()
+
     def update_item_image(self, item_id: str, image_type: str, path: str, media_type: Optional[str] = None) -> Dict[str, Any]:
         override = self.service._get_or_create_override(item_id, media_type=media_type)
         if not override:
@@ -84,10 +89,9 @@ class ImageOverrideService:
                             try:
                                 downloaded_filename = self.image_downloader.download_now(url, subfolder, filename)
                                 if downloaded_filename:
-                                    from app.shared_kernel.database import SessionLocal
-                                    from app.domains.users.models import UserOverride
-                                    db_bg = SessionLocal()
+                                    db_bg = self._get_bg_session()
                                     try:
+                                        from app.domains.users.models import UserOverride
                                         override_bg = db_bg.query(UserOverride).filter(UserOverride.id == override_id).first()
                                         if override_bg:
                                             local_path = f"{subfolder}/{downloaded_filename}"

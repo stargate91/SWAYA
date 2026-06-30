@@ -390,9 +390,9 @@ export default function TMDBImageGrid({
     [images, currentPath]
   );
 
-  const [prevDeps, setPrevDeps] = useState({ images, initialVisibleCount, selectedIndex });
-  if (prevDeps.images !== images || prevDeps.initialVisibleCount !== initialVisibleCount || prevDeps.selectedIndex !== selectedIndex) {
-    setPrevDeps({ images, initialVisibleCount, selectedIndex });
+  const [prevDeps, setPrevDeps] = useState({ images, initialVisibleCount });
+  if (prevDeps.images !== images || prevDeps.initialVisibleCount !== initialVisibleCount) {
+    setPrevDeps({ images, initialVisibleCount });
     setLoadMoreCount(0);
   }
 

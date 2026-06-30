@@ -73,6 +73,15 @@ class FileWalker:
         return max(0.0, override_minutes) * 60
 
     def should_force_video_to_extra(self, path: Path, db: Session) -> bool:
+        rel_path = self.get_rel_path(path)
+        # Avoid circular imports by using local import or querying directly
+        existing = db.query(MediaItem).filter(
+            MediaItem.library_id == self.library.id,
+            MediaItem.relative_path == rel_path
+        ).first()
+        if existing:
+            return False
+
         category, subtype = self.categorizer.categorize(path, settings_port=self.settings)
         forced_subtypes = SCENE_FORCE_EXTRA_VIDEO_SUBTYPES if self.mode == ScanMode.SCENES else FORCED_EXTRA_VIDEO_SUBTYPES
         if category == ExtraCategory.VIDEO and subtype in forced_subtypes:

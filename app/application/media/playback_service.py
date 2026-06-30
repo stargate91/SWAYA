@@ -3,7 +3,8 @@ import logging
 import platform
 import subprocess
 import threading
-from datetime import datetime
+from datetime import datetime, timezone
+from app.application.media.playback_logging_service import PlaybackLoggingService
 from typing import Optional, Any, List, Dict
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
@@ -47,6 +48,7 @@ class PlaybackService:
 
         from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
         self.settings = settings_port or DbSettingsAdapter(db)
+        self.playback_logging_service = PlaybackLoggingService()
 
     def track_playback_start(self, item_id: Any) -> Tuple[Any, Any, int]:
         try:
@@ -84,7 +86,7 @@ class PlaybackService:
         from typing import Tuple
         return item, override, start_seconds
 
-    def add_watch_history_entry(self, item_id: int, watched_at_raw: Any = None) -> Any:
+    def add_watch_history_entry_core(self, item_id: int, watched_at_raw: Any = None) -> Any:
         item = self.library_port.get_item_by_id(item_id)
         if not item:
             raise NotFoundException("Item not found")
@@ -97,7 +99,7 @@ class PlaybackService:
         self.db.refresh(item)
         return item
 
-    def update_watch_history_entry(self, item_id: int, log_id: int, watched_at_raw: Any = None) -> Any:
+    def update_watch_history_entry_core(self, item_id: int, log_id: int, watched_at_raw: Any = None) -> Any:
         item = self.library_port.get_item_by_id(item_id)
         if not item:
             raise NotFoundException("Item not found")
@@ -114,7 +116,7 @@ class PlaybackService:
         self.db.refresh(item)
         return item
 
-    def delete_watch_history_entry(self, item_id: int, log_id: int) -> Any:
+    def delete_watch_history_entry_core(self, item_id: int, log_id: int) -> Any:
         item = self.library_port.get_item_by_id(item_id)
         if not item:
             raise NotFoundException("Item not found")
@@ -130,7 +132,7 @@ class PlaybackService:
         self.db.refresh(item)
         return item
 
-    def reset_item_progress(self, item_id: int) -> Tuple[int, bool]:
+    def reset_item_progress_core(self, item_id: int) -> Tuple[int, bool]:
         override = self.overrides.get_or_create_media_item_override(item_id)
         if not override:
             raise NotFoundException("Item not found")
@@ -234,28 +236,28 @@ class PlaybackService:
 
     def add_watch_history_entry(self, item_id: int, watched_at_raw: Any = None):
         try:
-            item = self.add_watch_history_entry(item_id, watched_at_raw)
+            item = self.add_watch_history_entry_core(item_id, watched_at_raw)
             return self._watch_history_response(item)
         except NotFoundException as e:
             return JSONResponse(status_code=404, content={"error": str(e)})
 
     def update_watch_history_entry(self, item_id: int, log_id: int, watched_at_raw: Any = None):
         try:
-            item = self.update_watch_history_entry(item_id, log_id, watched_at_raw)
+            item = self.update_watch_history_entry_core(item_id, log_id, watched_at_raw)
             return self._watch_history_response(item)
         except NotFoundException as e:
             return JSONResponse(status_code=404, content={"error": str(e)})
 
     def delete_watch_history_entry(self, item_id: int, log_id: int):
         try:
-            item = self.delete_watch_history_entry(item_id, log_id)
+            item = self.delete_watch_history_entry_core(item_id, log_id)
             return self._watch_history_response(item)
         except NotFoundException as e:
             return JSONResponse(status_code=404, content={"error": str(e)})
 
     def reset_item_progress(self, item_id: int) -> PlaybackStatusResponse:
         try:
-            resume_pos, is_watched = self.reset_item_progress(item_id)
+            resume_pos, is_watched = self.reset_item_progress_core(item_id)
             return PlaybackStatusResponse(
                 status="success",
                 resume_position=resume_pos,
@@ -265,104 +267,14 @@ class PlaybackService:
             return JSONResponse(status_code=404, content={"error": str(e)})
 
     def get_watched_history(self, page: int = 1, limit: int = 20, include_adult: bool = False) -> WatchedHistoryResponse:
-        logs, has_more = self.get_watched_history_logs(page, limit, include_adult)
-
-        results = []
-        ui_lang = DEFAULT_FALLBACK_LANGUAGE
-        for log in logs:
-            item = log.media_item
-            if not item:
-                continue
-
-            active_match = next((match for match in item.matches if match.is_active), None)
-            loc = LanguageService.get_best_localization(active_match.localizations, ui_lang) if active_match else None
-            override = self.overrides.get_or_create_media_item_override(item.id)
-
-            title = loc.title if loc else item.filename
-            
-            from app.infrastructure.playback.playback_monitor import active_sessions
-            is_active = item.id in active_sessions
-            
-            duration = int(item.duration) if item.duration else 0
-            log_position = log.position_seconds or 0
-            
-            latest_log = self.playback_repo.get_latest_playback_log(item.id)
-            is_latest = latest_log and (log.id == latest_log.id)
-            if is_latest and override:
-                log_position = override.resume_position
-                log_is_watched = override.is_watched
-                log_is_active = is_active
-            else:
-                log_is_watched = (duration > 0 and log_position / duration > 0.90)
-                log_is_active = False
-
-            from app.shared_kernel.enums import MediaType
-            tv_title = None
-            episode_title = None
-            tv_poster_path = None
-            
-            if active_match and active_match.media_type == MediaType.EPISODE:
-                episode_title = title
-                tv_match = None
-                if active_match.parent and active_match.parent.parent:
-                    tv_match = active_match.parent.parent
-                elif active_match.parent:
-                    tv_match = active_match.parent
-                
-                if tv_match:
-                    from app.domains.users.models import UserOverride
-                    tv_override = self.db.query(UserOverride).filter(
-                        UserOverride.metadata_match_id == tv_match.id,
-                        UserOverride.user_id == log.user_id
-                    ).first()
-                    tv_loc = tv_match.localizations[0] if tv_match.localizations else None
-                    tv_title = (tv_override.custom_title if (tv_override and tv_override.custom_title) else None) or (tv_loc.title if tv_loc else None)
-                    if tv_loc and tv_loc.poster_path:
-                        tv_poster_path = self._resolve_img(tv_loc.poster_path, "posters")
-
-            def get_first_int(val):
-                if val is None:
-                    return None
-                if isinstance(val, (int, float)):
-                    return int(val)
-                if isinstance(val, list):
-                    return get_first_int(val[0]) if val else None
-                if isinstance(val, str):
-                    if val.isdigit():
-                        return int(val)
-                    import json
-                    try:
-                        parsed = json.loads(val)
-                        if isinstance(parsed, list):
-                            return get_first_int(parsed[0]) if parsed else None
-                        return int(parsed)
-                    except Exception as e:
-                        logger.debug(f"Swallowed exception in application/media/playback_service.py:229: {e}", exc_info=True)
-                return None
-
-            results.append({
-                "id": log.id,
-                "media_item_id": item.id,
-                "watched_at": log.watched_at.isoformat(),
-                "title": title,
-                "type": active_match.media_type.value if (active_match and hasattr(active_match.media_type, "value")) else (str(active_match.media_type) if active_match else "movie"),
-                "season_number": get_first_int(active_match.season_number) if active_match else None,
-                "episode_number": get_first_int(active_match.episode_number) if active_match else None,
-                "poster_path": self._resolve_img(loc.poster_path if loc else None, "posters"),
-                "backdrop_path": self._resolve_img(active_match.backdrop_path if active_match else None, "backdrops"),
-                "resume_position": log_position,
-                "duration": duration,
-                "is_watched": log_is_watched,
-                "is_active": log_is_active,
-                "tv_title": tv_title,
-                "episode_title": episode_title,
-                "tv_poster_path": tv_poster_path,
-            })
-
-        return WatchedHistoryResponse(
-            items=results,
+        return self.playback_logging_service.get_watched_history(
+            db=self.db,
+            playback_repo=self.playback_repo,
+            overrides=self.overrides,
+            resolve_img_fn=self._resolve_img,
             page=page,
-            has_more=has_more
+            limit=limit,
+            include_adult=include_adult
         )
 
     def reveal_in_explorer(self, path: str) -> PlaybackStatusResponse:

@@ -72,7 +72,7 @@ export function useOrganizerFilteredRows({
     return (item) => {
       const itemScanMode = item.scan_mode || '';
       if (scanMode === 'scenes') return itemScanMode === 'scenes';
-      if (scanMode === 'movies_tv') return itemScanMode === 'movies_tv' || itemScanMode === 'porndb_movie';
+      if (scanMode === 'movies_tv') return itemScanMode === '' || itemScanMode === 'movies_tv' || itemScanMode === 'porndb_movie';
       return true;
     };
   }, [scanMode]);
@@ -81,7 +81,7 @@ export function useOrganizerFilteredRows({
     return (extra) => {
       const parentScanMode = extra.parent_scan_mode || '';
       if (scanMode === 'scenes') return parentScanMode === 'scenes';
-      if (scanMode === 'movies_tv') return parentScanMode !== 'scenes';
+      if (scanMode === 'movies_tv') return parentScanMode === '' || parentScanMode !== 'scenes';
       return true;
     };
   }, [scanMode]);

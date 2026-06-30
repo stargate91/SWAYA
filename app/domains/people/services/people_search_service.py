@@ -17,6 +17,9 @@ class PeopleSearchService:
         self.tmdb = scrapers.tmdb(db)
         self.library_port = library_port
         self.image_service = image_service
+        if people_repo is None:
+            from app.infrastructure.repositories.db_people_repository import DbPeopleRepository
+            people_repo = DbPeopleRepository(db)
         self.people_repo = people_repo
 
     def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:

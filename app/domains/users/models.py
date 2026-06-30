@@ -133,6 +133,22 @@ class UserOverride(Base):
         "Tag", secondary=user_override_tags, back_populates="overrides"
     )
 
+    def set_rating(self, rating: Optional[float]) -> bool:
+        self.user_rating = rating
+        self.user_rating_at = datetime.now(timezone.utc) if rating is not None else None
+        return rating is not None
+
+    def set_comment(self, comment: Optional[str]) -> bool:
+        self.user_comment = comment
+        self.user_comment_at = datetime.now(timezone.utc) if comment is not None else None
+        return bool(comment)
+
+    def set_favorite(self, is_fav: bool) -> bool:
+        self.is_favorite = is_fav
+        self.is_favorite_at = datetime.now(timezone.utc) if is_fav else None
+        return is_fav
+
+
 
 class CustomList(Base):
     """User-defined collections (e.g., 'Favorite Sci-Fi', 'To Watch on Weekend')."""
@@ -144,7 +160,6 @@ class CustomList(Base):
     description: Mapped[Optional[str]] = mapped_column(String)
     list_type: Mapped[CustomListType] = mapped_column(SQLEnum(CustomListType), default=CustomListType.MEDIA, index=True)
     color: Mapped[Optional[str]] = mapped_column(String) # For UI customization
-    icon: Mapped[Optional[str]] = mapped_column(String)  # For UI customization
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     
     user: Mapped["User"] = relationship("User", back_populates="custom_lists")

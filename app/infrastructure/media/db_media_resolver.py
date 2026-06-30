@@ -31,6 +31,9 @@ class DbMediaResolver(
 ):
     def __init__(self, db: Session):
         self.db = db
+        super().__init__()
+        from app.infrastructure.media.adapters.structure.structure_updater import StructureUpdater
+        self.updater = StructureUpdater()
 
     def resolve_ids(self, item_id: str, media_type: Optional[str] = None) -> Tuple[Optional[int], Optional[int]]:
         media_item_id = None
@@ -185,15 +188,27 @@ class DbMediaResolver(
             media_item_id = match.media_item_id
         else:
             try:
-                media_item_id = int(item_id)
+                possible_id = int(item_id)
+                if self.db.query(MediaItem).filter(MediaItem.id == possible_id).count() > 0:
+                    media_item_id = possible_id
+                else:
+                    match = self.db.query(MetadataMatch).filter(
+                        MetadataMatch.provider == Provider.TMDB,
+                        MetadataMatch.external_id == str(item_id)
+                    ).first()
+                    if match:
+                        metadata_match_id = match.id
+                        media_item_id = match.media_item_id
+                    else:
+                        return None, None
             except ValueError:
-                # Fallback check if it is a pure tmdb string id passed directly
                 match = self.db.query(MetadataMatch).filter(
                     MetadataMatch.provider == Provider.TMDB,
                     MetadataMatch.external_id == str(item_id)
                 ).first()
                 if match:
                     metadata_match_id = match.id
+                    media_item_id = match.media_item_id
                 else:
                     return None, None
 

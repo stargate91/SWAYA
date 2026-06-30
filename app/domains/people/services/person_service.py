@@ -20,6 +20,9 @@ class PersonService:
 
     def __init__(self, db_session: Session, people_repo: Optional[PeopleRepositoryPort] = None):
         self.db = db_session
+        if people_repo is None:
+            from app.infrastructure.repositories.db_people_repository import DbPeopleRepository
+            people_repo = DbPeopleRepository(db_session)
         self.people_repo = people_repo
 
     def update_or_create_person(

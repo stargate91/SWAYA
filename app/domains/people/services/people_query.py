@@ -79,7 +79,22 @@ class PeopleQueryBuilder:
 
         query = query.group_by(Person.id)
         results = query.all()
-        
+
+        from app.domains.users.models import UserOverride
+        from app.shared_kernel.user_context import get_current_user_id
+        user_id = get_current_user_id() or 1
+
+        person_ids = [person.id for person, _, _ in results]
+        overrides = {}
+        if person_ids:
+            overrides = {
+                o.person_id: o 
+                for o in db.query(UserOverride).filter(
+                    UserOverride.user_id == user_id, 
+                    UserOverride.person_id.in_(person_ids)
+                ).all()
+            }
+
         people_list = []
         for person, library_count, linked_adult_flag in results:
             if not include_inactive and not person.is_active:
@@ -107,6 +122,7 @@ class PeopleQueryBuilder:
             if "fansdb" in external_ids and "fansdb_id" not in external_ids:
                 external_ids["fansdb_id"] = external_ids["fansdb"]
 
+            override = overrides.get(person.id)
             people_list.append({
                 "id": person.id,
                 "name": person.name,
@@ -124,7 +140,10 @@ class PeopleQueryBuilder:
                 "is_active": person.is_active,
                 "library_count": library_count,
                 "known_for": person.known_for_department,
-                "external_ids": external_ids
+                "external_ids": external_ids,
+                "user_rating": override.user_rating if override else None,
+                "user_comment": override.user_comment if override else None,
+                "is_favorite": override.is_favorite if override else False,
             })
 
         if sort_by in ("library_count", "library_count_desc"):

@@ -11,17 +11,15 @@ class ListsDomainService:
             name="Watchlist",
             description="Default system watchlist.",
             list_type=CustomListType.MEDIA,
-            color="#3b82f6",
-            icon="Bookmark"
+            color="#3b82f6"
         )
 
     @staticmethod
-    def create_custom_list(name: str, description: Optional[str], color: str, icon: str) -> CustomList:
+    def create_custom_list(name: str, description: Optional[str], color: str) -> CustomList:
         return CustomList(
             name=name,
             description=description,
-            color=color,
-            icon=icon
+            color=color
         )
 
     @staticmethod

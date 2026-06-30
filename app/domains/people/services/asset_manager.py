@@ -28,6 +28,11 @@ class PerformerAssetManager:
         self.image_service = image_service
         self.image_downloader = image_downloader
 
+    def _get_bg_session(self):
+        """Create a fresh session for background threads."""
+        from app.shared_kernel.database import SessionLocal
+        return SessionLocal()
+
     def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
         return self.image_service.resolve_image_url(path, subfolder, size)
 
@@ -74,9 +79,8 @@ class PerformerAssetManager:
                     def bg_download():
                         try:
                             downloader.download_now(url, "backdrops", filename)
-                            from app.shared_kernel.database import SessionLocal
                             from app.domains.users.models import UserOverride
-                            db_bg = SessionLocal()
+                            db_bg = self._get_bg_session()
                             try:
                                 override = db_bg.query(UserOverride).filter(UserOverride.person_id == person_id).first()
                                 if override:
@@ -185,9 +189,8 @@ class PerformerAssetManager:
                     def bg_download():
                         try:
                             downloader.download_now(url, "people", filename)
-                            from app.shared_kernel.database import SessionLocal
                             from app.domains.users.models import UserOverride
-                            db_bg = SessionLocal()
+                            db_bg = self._get_bg_session()
                             try:
                                 override = db_bg.query(UserOverride).filter(UserOverride.person_id == person_id).first()
                                 if override:

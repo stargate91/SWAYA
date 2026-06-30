@@ -20,7 +20,25 @@ async def lifespan(app: FastAPI):
     logger.info("Initializing databases...")
     init_databases()
     
+    # Ensure default user with id=1 exists to satisfy foreign key constraints
+    from sqlalchemy.orm import Session
+    from app.shared_kernel.database import engine
+    from app.domains.users.models import User
+    with Session(engine) as session:
+        if not session.get(User, 1):
+            default_user = User(
+                id=1,
+                username="default_user",
+                email="default@swaya.io",
+                password_hash="",
+                allow_adult=True
+            )
+            session.add(default_user)
+            session.commit()
+    
     # Ensure image folders are created
+    from app.shared_kernel.ports.image_service_port import ImageServiceRegistry
+    ImageServiceRegistry.register(image_processing_service)
     image_processing_service.ensure_folders()
     logger.info("Image directories ensured.")
     

@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, event
 
 logger = logging.getLogger(__name__)
 
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, sessionmaker, Session
 from app.shared_kernel.constants import DATABASE_TIMEOUT_SECONDS
 
 class Base(DeclarativeBase):
@@ -108,21 +108,6 @@ def init_databases():
     
     # Create main database tables if they do not exist
     Base.metadata.create_all(bind=engine)
-    
-    # Ensure default user with id=1 exists to satisfy foreign key constraints
-    from sqlalchemy.orm import Session
-    from app.domains.users.models import User
-    with Session(engine) as session:
-        if not session.get(User, 1):
-            default_user = User(
-                id=1,
-                username="default_user",
-                email="default@swaya.io",
-                password_hash="",
-                allow_adult=True
-            )
-            session.add(default_user)
-            session.commit()
     
     # Create cache tables in cache.db
     from app.infrastructure.cache.models import APICache

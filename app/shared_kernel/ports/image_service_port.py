@@ -36,3 +36,20 @@ class ImageServicePort(Protocol):
 
     def get_download_url(self, path: Optional[str], subfolder: str) -> Optional[str]:
         ...
+
+
+class ImageServiceRegistry:
+    _instance: Optional[ImageServicePort] = None
+
+    @classmethod
+    def register(cls, instance: ImageServicePort):
+        cls._instance = instance
+
+    @classmethod
+    def get(cls) -> ImageServicePort:
+        if cls._instance is None:
+            # Fallback to importing dynamically to avoid circular dependencies
+            from app.domains.media_assets.services.images import image_processing_service
+            cls._instance = image_processing_service
+        return cls._instance
+

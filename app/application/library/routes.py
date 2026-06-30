@@ -77,10 +77,10 @@ def list_libraries(db: Session = Depends(get_db)):
     return LibraryService(db).list_libraries()
 
 
-from app.domains.library.services.library_stats_service import LibraryStatsService
-from app.domains.library.services.library_listing_service import LibraryListingService
-from app.domains.library.services.library_collection_service import LibraryCollectionService
-from app.domains.library.services.library_filter_service import LibraryFilterService
+from app.application.library.services.library_stats_service import LibraryStatsService
+from app.application.library.services.library_listing_service import LibraryListingService
+from app.application.library.services.library_collection_service import LibraryCollectionService
+from app.application.library.services.library_filter_service import LibraryFilterService
 
 from typing import Union
 
@@ -154,7 +154,9 @@ def get_library_items(
 
 @library_router.get("/library/tags", response_model=List[TagGroupItem])
 def get_library_tags(db: Session = Depends(get_db), is_adult: bool = False):
-    return LibraryFilterService(db).get_tag_groups(is_adult)
+    from app.infrastructure.repositories.db_user_repository import DbUserRepository
+    user_repo = DbUserRepository(db)
+    return LibraryFilterService(db, user_repository=user_repo).get_tag_groups(is_adult)
 
 
 @library_router.get("/library/filters", response_model=FilterOptionsResponse)
@@ -164,7 +166,9 @@ def get_library_filters(
     filter_ownership: str = "owned",
     filter_status: str = "active"
 ):
-    return LibraryFilterService(db).get_library_filter_options(tab, filter_ownership, filter_status)
+    from app.infrastructure.repositories.db_user_repository import DbUserRepository
+    user_repo = DbUserRepository(db)
+    return LibraryFilterService(db, user_repository=user_repo).get_library_filter_options(tab, filter_ownership, filter_status)
 
 
 @library_router.get("/library/collections", response_model=MovieCollectionsResponse)

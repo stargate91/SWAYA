@@ -1,16 +1,18 @@
 import logging
-from typing import Any, List
+from typing import Any, List, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.domains.metadata.models import MetadataMatch, MetadataLocalization
 from app.domains.users.models import Tag
 from app.domains.library.schemas import FilterOptionsResponse, TagGroupItem
+from app.shared_kernel.ports.user_repository_port import UserRepositoryPort
 
 logger = logging.getLogger(__name__)
 
 class LibraryFilterService:
-    def __init__(self, db_session: Session):
+    def __init__(self, db_session: Session, user_repository: Optional[UserRepositoryPort] = None):
         self.db = db_session
+        self.user_repository = user_repository
 
     def get_library_filter_options(self, tab: str, filter_ownership: str = "owned", filter_status: str = "active") -> FilterOptionsResponse:
         """
@@ -144,32 +146,8 @@ class LibraryFilterService:
         Retrieves available tag groups, with each tag enriched with its associated items.
         """
         # Self-healing: Mark tags as adult if they are linked to adult items/performers
-        try:
-            self.db.execute(text("""
-                UPDATE tags 
-                SET is_adult = 1 
-                WHERE is_adult = 0 AND id IN (
-                    SELECT uot.tag_id 
-                    FROM user_override_tags uot
-                    JOIN user_overrides uo ON uot.user_override_id = uo.id
-                    JOIN metadata_matches mm ON uo.metadata_match_id = mm.id
-                    WHERE mm.is_adult = 1
-                )
-            """))
-            self.db.execute(text("""
-                UPDATE tags 
-                SET is_adult = 1 
-                WHERE is_adult = 0 AND id IN (
-                    SELECT uot.tag_id 
-                    FROM user_override_tags uot
-                    JOIN user_overrides uo ON uot.user_override_id = uo.id
-                    JOIN people p ON uo.person_id = p.id
-                    WHERE p.is_adult = 1
-                )
-            """))
-            self.db.commit()
-        except Exception as e:
-            logger.debug(f"Failed to auto-heal adult tags: {e}")
+        if self.user_repository:
+            self.user_repository.auto_heal_adult_tags()
 
         from app.shared_kernel.enums import MediaType
         from app.domains.metadata.models import MetadataMatch, MetadataLocalization

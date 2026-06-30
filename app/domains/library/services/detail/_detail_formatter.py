@@ -1,7 +1,7 @@
 from typing import Optional
-from app.domains.media_assets.services.images import image_processing_service
+from app.shared_kernel.ports.image_service_port import ImageServiceRegistry
 
 class DetailFormatter:
     def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
-        return image_processing_service.resolve_image_url(path, subfolder, size)
+        return ImageServiceRegistry.get().resolve_image_url(path, subfolder, size)
 

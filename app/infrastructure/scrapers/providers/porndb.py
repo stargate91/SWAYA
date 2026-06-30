@@ -1,12 +1,11 @@
 import logging
-import requests
-from typing import Optional
+from typing import Optional, List, Dict, Any
 
 from app.shared_kernel.enums import Provider, MediaType
-from app.infrastructure.scrapers.support.base import BaseScraper
 from app.infrastructure.scrapers.support.normalizer import ScraperNormalizer
-
-from app.shared_kernel.constants import PORNDB_API_BASE, PORNDB_DEFAULT_ENDPOINT, SCRAPER_REQUEST_TIMEOUT
+from app.infrastructure.scrapers.support.base import BaseScraper
+from app.infrastructure.scrapers.providers.porndb_client import PornDbClient
+from app.shared_kernel.constants import PORNDB_DEFAULT_ENDPOINT
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +14,7 @@ class PornDBScraper(BaseScraper):
 
     def __init__(self, settings_port, cache_service=None):
         super().__init__(settings_port, cache_service, Provider.PORNDB)
+        self.client = PornDbClient(settings_port)
 
     def _fetch_rating(
         self,
@@ -34,42 +34,26 @@ class PornDBScraper(BaseScraper):
             rating = cached_data.get("rating")
             return float(rating) if rating is not None else None
 
-        api_token = self.get_setting("porndb_api_key") or self.get_setting("porndb_api_token")
-        if not api_token:
-            return None
-
-        headers = {
-            "Authorization": f"Bearer {api_token}",
-            "Accept": "application/json",
-        }
-
-        try:
-            url = f"{PORNDB_API_BASE}/{rating_type}s/{identifier}"
-            resp = self.session.get(url, headers=headers, timeout=SCRAPER_REQUEST_TIMEOUT)
-            if resp.status_code == 200:
-                data = resp.json().get("data")
-                rating = data.get("rating") if data else None
-                self.cache.set(
-                    Provider.PORNDB,
-                    cache_key,
-                    {"rating": rating},
-                    status_code=200,
-                    media_type=media_type,
-                    external_id=str(identifier),
-                )
-                return float(rating) if rating is not None else None
-            else:
-                self.cache.set(
-                    Provider.PORNDB,
-                    cache_key,
-                    {"cached_error": True},
-                    status_code=resp.status_code,
-                    media_type=media_type,
-                    external_id=str(identifier),
-                )
-                return None
-        except Exception as e:
-            logger.error(f"Error fetching PornDB rating for {rating_type} {identifier}: {e}")
+        rating = self.client.get_rating(rating_type, identifier)
+        if rating is not None:
+            self.cache.set(
+                Provider.PORNDB,
+                cache_key,
+                {"rating": rating},
+                status_code=200,
+                media_type=media_type,
+                external_id=str(identifier),
+            )
+            return rating
+        else:
+            self.cache.set(
+                Provider.PORNDB,
+                cache_key,
+                {"cached_error": True},
+                status_code=404,
+                media_type=media_type,
+                external_id=str(identifier),
+            )
             return None
 
     def fetch_performer_rating(self, performer_id: str, force_refresh: bool = False) -> Optional[float]:
@@ -95,32 +79,21 @@ class PornDBScraper(BaseScraper):
         details = super().get_performer_details(performer_id)
         if details:
             details["rating_porndb"] = self.fetch_performer_rating(performer_id)
-            api_token = self.get_setting("porndb_api_key") or self.get_setting("porndb_api_token")
-            if api_token:
-                try:
-                    response = self.session.get(
-                        f"{PORNDB_API_BASE}/performers/{performer_id}",
-                        headers={"Authorization": f"Bearer {api_token}", "Accept": "application/json"},
-                        timeout=SCRAPER_REQUEST_TIMEOUT,
-                    )
-                    if response.status_code == 200:
-                        rest_data = response.json().get("data")
-                        if rest_data:
-                            if rest_data.get("bio"):
-                                details["details"] = rest_data["bio"]
-                            rest_extras = rest_data.get("extras") or {}
-                            if rest_extras and "same_sex_only" in rest_extras:
-                                is_same_sex = rest_extras.get("same_sex_only")
-                                details["same_sex_only"] = "Yes" if is_same_sex else "No"
-                            if rest_extras and rest_extras.get("tattoos"):
-                                details["tattoos"] = rest_extras["tattoos"]
-                            if rest_extras and rest_extras.get("piercings"):
-                                details["piercings"] = rest_extras["piercings"]
-                            if rest_extras and "fake_boobs" in rest_extras:
-                                is_fake = rest_extras.get("fake_boobs")
-                                details["breast_type"] = "FAKE" if is_fake else "NATURAL"
-                except Exception as exc:
-                    logger.error(f"Error fetching PornDB performer bio/extras: {exc}")
+            rest_data = self.client.get_performer_bio(performer_id)
+            if rest_data:
+                if rest_data.get("bio"):
+                    details["details"] = rest_data["bio"]
+                rest_extras = rest_data.get("extras") or {}
+                if rest_extras and "same_sex_only" in rest_extras:
+                    is_same_sex = rest_extras.get("same_sex_only")
+                    details["same_sex_only"] = "Yes" if is_same_sex else "No"
+                if rest_extras and rest_extras.get("tattoos"):
+                    details["tattoos"] = rest_extras["tattoos"]
+                if rest_extras and rest_extras.get("piercings"):
+                    details["piercings"] = rest_extras["piercings"]
+                if rest_extras and "fake_boobs" in rest_extras:
+                    is_fake = rest_extras.get("fake_boobs")
+                    details["breast_type"] = "FAKE" if is_fake else "NATURAL"
         return details
 
     def find_movie_by_hash(self, file_hash: str, hash_type: str = "OSHASH", force_refresh: bool = False) -> Optional[dict]:
@@ -131,59 +104,35 @@ class PornDBScraper(BaseScraper):
         if cached_data is not None:
             return None if cached_data.get("cached_error") or not cached_data else cached_data
 
-        api_token = self.get_setting("porndb_api_key") or self.get_setting("porndb_api_token")
-        if not api_token:
-            return None
+        res_json = self.client.get_movie_by_hash(file_hash, hash_type)
+        data = res_json.get("data") if res_json else None
+        self.cache.set(
+            Provider.PORNDB,
+            cache_key,
+            data or {},
+            status_code=200 if data else 404,
+            media_type=MediaType.MOVIE,
+            external_id=str(data.get("id")) if data else None,
+        )
+        return self.enrich_movie_ratings(data) if data else None
 
-        try:
-            response = self.session.get(
-                f"{PORNDB_API_BASE}/movies/hash/{file_hash}",
-                params={"type": hash_type},
-                headers={"Authorization": f"Bearer {api_token}", "Accept": "application/json"},
-                timeout=SCRAPER_REQUEST_TIMEOUT,
-            )
-            data = response.json().get("data") if response.status_code == 200 else None
-            self.cache.set(
-                Provider.PORNDB,
-                cache_key,
-                data or {},
-                status_code=response.status_code,
-                media_type=MediaType.MOVIE,
-                external_id=str(data.get("id")) if data else None,
-            )
-            return self.enrich_movie_ratings(data) if data else None
-        except (AttributeError, ValueError, requests.RequestException) as exc:
-            logger.error(f"Error querying PornDB movie hash {file_hash}: {exc}")
     def fetch_movie(self, movie_id: str, force_refresh: bool = False) -> Optional[dict]:
         cache_key = f"porndb/movie/v1/{movie_id}"
         cached_data = self.cache.get(Provider.PORNDB, cache_key, force_refresh=force_refresh)
         if cached_data is not None:
             return None if cached_data.get("cached_error") or not cached_data else cached_data
 
-        api_token = self.get_setting("porndb_api_key") or self.get_setting("porndb_api_token")
-        if not api_token:
-            return None
-
-        try:
-            url = f"{PORNDB_API_BASE}/movies/{movie_id}"
-            response = self.session.get(
-                url,
-                headers={"Authorization": f"Bearer {api_token}", "Accept": "application/json"},
-                timeout=SCRAPER_REQUEST_TIMEOUT,
-            )
-            data = response.json().get("data") if response.status_code == 200 else None
-            self.cache.set(
-                Provider.PORNDB,
-                cache_key,
-                data or {},
-                status_code=response.status_code,
-                media_type=MediaType.MOVIE,
-                external_id=str(movie_id),
-            )
-            return self.enrich_movie_ratings(data) if data else None
-        except Exception as e:
-            logger.error(f"Error fetching PornDB movie {movie_id}: {e}")
-            return None
+        res_json = self.client.get_movie_details(movie_id)
+        data = res_json.get("data") if res_json else None
+        self.cache.set(
+            Provider.PORNDB,
+            cache_key,
+            data or {},
+            status_code=200 if data else 404,
+            media_type=MediaType.MOVIE,
+            external_id=str(movie_id),
+        )
+        return self.enrich_movie_ratings(data) if data else None
 
     def search_movies(
         self,
@@ -201,42 +150,20 @@ class PornDBScraper(BaseScraper):
         if cached_data is not None:
             return [] if cached_data.get("cached_error") else cached_data.get("data", [])
 
-        api_token = self.get_setting("porndb_api_key") or self.get_setting("porndb_api_token")
-        if not api_token:
-            return []
-
-        params = {"q": normalized_query, "per_page": max(1, min(per_page, 25))}
-        if year:
-            params["year"] = year
-
-        try:
-            response = self.session.get(
-                f"{PORNDB_API_BASE}/movies",
-                params=params,
-                headers={"Authorization": f"Bearer {api_token}", "Accept": "application/json"},
-                timeout=SCRAPER_REQUEST_TIMEOUT,
-            )
-            movies = response.json().get("data") or [] if response.status_code == 200 else []
-            self.cache.set(
-                Provider.PORNDB,
-                cache_key,
-                {"data": movies},
-                status_code=response.status_code,
-                media_type=MediaType.MOVIE,
-            )
-            return movies
-        except (AttributeError, ValueError, requests.RequestException) as exc:
-            logger.error(f"Error searching PornDB movies for {normalized_query}: {exc}")
-            return []
+        res_json = self.client.search_movies(normalized_query, year, per_page)
+        movies = res_json.get("data") or [] if res_json else []
+        self.cache.set(
+            Provider.PORNDB,
+            cache_key,
+            {"data": movies},
+            status_code=200 if res_json else 404,
+            media_type=MediaType.MOVIE,
+        )
+        return movies
 
     def fetch_scene(self, scene_id: str, force_refresh: bool = False) -> Optional[dict]:
         """Queries ThePornDB GraphQL endpoint for scene info. Always mapped to English locale."""
         endpoint = self.get_setting("porndb_endpoint", PORNDB_DEFAULT_ENDPOINT)
-        api_token = self.get_setting("porndb_api_key") or self.get_setting("porndb_api_token")
-        if not api_token:
-            logger.warning("ThePornDB API key/token not configured.")
-            return None
-
         cache_key = f"porndb/scene/v4/{scene_id}"
         cached_data = self.cache.get(Provider.PORNDB, cache_key, force_refresh=force_refresh)
         if cached_data:
@@ -244,7 +171,6 @@ class PornDBScraper(BaseScraper):
                 return None
             return cached_data
 
-        # Using Stash-compatible GraphQL schema supported by ThePornDB's GraphQL endpoint
         query = """
         query FindScene($id: ID!) {
           findScene(id: $id) {
@@ -307,58 +233,39 @@ class PornDBScraper(BaseScraper):
           }
         }
         """
-        headers = {"Authorization": f"Bearer {api_token}", "Content-Type": "application/json"}
-        payload = {"query": query, "variables": {"id": scene_id}}
+        result = self.client.get_scene_graphql(endpoint, query, scene_id)
+        if result:
+            data = result.get("data", {}).get("findScene")
+            if data:
+                for p_entry in data.get("performers") or []:
+                    perf = p_entry.get("performer")
+                    if perf:
+                        perf["measurements"] = {
+                            "band_size": perf.get("band_size"),
+                            "cup_size": perf.get("cup_size"),
+                            "waist": perf.get("waist_size"),
+                            "hip": perf.get("hip_size"),
+                        }
+                        if "urls" in perf and isinstance(perf["urls"], list):
+                            perf["urls"] = [u.get("url") for u in perf["urls"] if u and u.get("url")]
+                data = self.enrich_scene_ratings(data)
+                self.cache.set(Provider.PORNDB, cache_key, data, status_code=200, media_type=MediaType.SCENE, external_id=scene_id)
+                return data
 
-        try:
-            resp = self.session.post(endpoint, json=payload, headers=headers, timeout=SCRAPER_REQUEST_TIMEOUT)
-            if resp.status_code == 200:
-                result = resp.json()
-                if "errors" in result:
-                    logger.error(f"GraphQL errors from ThePornDB: {result['errors']}")
-                    # Fallback to REST
-                    return self._fetch_scene_rest(scene_id, cache_key, api_token)
-                data = result.get("data", {}).get("findScene")
-                if data:
-                    for p_entry in data.get("performers") or []:
-                        perf = p_entry.get("performer")
-                        if perf:
-                            perf["measurements"] = {
-                                "band_size": perf.get("band_size"),
-                                "cup_size": perf.get("cup_size"),
-                                "waist": perf.get("waist_size"),
-                                "hip": perf.get("hip_size"),
-                            }
-                            if "urls" in perf and isinstance(perf["urls"], list):
-                                perf["urls"] = [u.get("url") for u in perf["urls"] if u and u.get("url")]
-                    data = self.enrich_scene_ratings(data)
-                    self.cache.set(Provider.PORNDB, cache_key, data, status_code=200, media_type=MediaType.SCENE, external_id=scene_id)
-                    return data
-                else:
-                    return self._fetch_scene_rest(scene_id, cache_key, api_token)
-            else:
-                return self._fetch_scene_rest(scene_id, cache_key, api_token)
-        except Exception as e:
-            logger.error(f"Error querying ThePornDB GraphQL for scene {scene_id}: {e}")
-            return self._fetch_scene_rest(scene_id, cache_key, api_token)
+        return self._fetch_scene_rest(scene_id, cache_key)
 
-    def _fetch_scene_rest(self, scene_id: str, cache_key: str, api_token: str) -> Optional[dict]:
-        try:
-            url = f"{PORNDB_API_BASE}/scenes/{scene_id}"
-            headers = {"Authorization": f"Bearer {api_token}", "Accept": "application/json"}
-            resp = self.session.get(url, headers=headers, timeout=SCRAPER_REQUEST_TIMEOUT)
-            if resp.status_code == 200:
-                res_data = resp.json().get("data")
-                if res_data:
-                    mapped_data = self._map_rest_scene_to_graphql(res_data)
-                    mapped_data = self.enrich_scene_ratings(mapped_data)
-                    self.cache.set(Provider.PORNDB, cache_key, mapped_data, status_code=200, media_type=MediaType.SCENE, external_id=scene_id)
-                    return mapped_data
-            self.cache.set(Provider.PORNDB, cache_key, {}, status_code=resp.status_code if resp is not None else 500, media_type=MediaType.SCENE, external_id=scene_id)
-            return None
-        except Exception as rest_e:
-            logger.error(f"Error querying PornDB REST fallback for scene {scene_id}: {rest_e}")
-            return None
+    def _fetch_scene_rest(self, scene_id: str, cache_key: str) -> Optional[dict]:
+        res_json = self.client.get_scene_rest(scene_id)
+        if res_json:
+            res_data = res_json.get("data")
+            if res_data:
+                mapped_data = self._map_rest_scene_to_graphql(res_data)
+                mapped_data = self.enrich_scene_ratings(mapped_data)
+                self.cache.set(Provider.PORNDB, cache_key, mapped_data, status_code=200, media_type=MediaType.SCENE, external_id=scene_id)
+                return mapped_data
+
+        self.cache.set(Provider.PORNDB, cache_key, {}, status_code=404, media_type=MediaType.SCENE, external_id=scene_id)
+        return None
 
     def _map_rest_scene_to_graphql(self, data: dict) -> dict:
         site = data.get("site") or {}

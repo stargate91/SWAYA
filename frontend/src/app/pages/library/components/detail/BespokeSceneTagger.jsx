@@ -176,9 +176,9 @@ export default function BespokeSceneTagger() {
                     key={tagName}
                     variant="custom"
                     style={{
-                      backgroundColor: `color-mix(in srgb, ${tagColor} 12%, rgba(255, 255, 255, 0.02))`,
-                      borderColor: `color-mix(in srgb, ${tagColor} 30%, var(--color-border-default))`,
-                      color: `color-mix(in srgb, ${tagColor} 85%, white)`,
+                      backgroundColor: `color-mix(in srgb, ${tagColor} 24%, rgba(10, 10, 15, 0.6))`,
+                      borderColor: `color-mix(in srgb, ${tagColor} 50%, rgba(255, 255, 255, 0.15))`,
+                      color: `color-mix(in srgb, ${tagColor} 95%, white)`,
                     }}
                     className="bespoke-scene-tagger-pill-active"
                     onClick={() => handleToggleTag(tagName)}

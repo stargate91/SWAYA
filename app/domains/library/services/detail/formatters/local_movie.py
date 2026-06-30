@@ -6,7 +6,6 @@ from fastapi.responses import JSONResponse
 from app.shared_kernel.enums import Provider
 from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch, MediaCollection
-from app.domains.people.models import Person, MediaPersonLink
 from app.domains.users.models import UserOverride
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.shared_kernel.language import LanguageService
@@ -17,6 +16,13 @@ from app.domains.library.services.detail.formatters.base import MovieDetailForma
 logger = logging.getLogger(__name__)
 
 class LocalMovieFormatter(MovieDetailFormatter):
+    def __init__(self):
+        super().__init__()
+        from app.domains.library.services.detail.formatters.movie.local_credits_formatter import LocalCreditsFormatter
+        from app.domains.library.services.detail.formatters.movie.local_metadata_resolver import LocalMetadataResolver
+        self.credits_formatter = LocalCreditsFormatter()
+        self.metadata_resolver = LocalMetadataResolver()
+
     def format(self, item_id: Any, db: Any, scrapers: Any, current_uid: Any) -> Any:
         try:
             item_id_int = int(item_id)
@@ -44,71 +50,12 @@ class LocalMovieFormatter(MovieDetailFormatter):
         ui_lang = DEFAULT_FALLBACK_LANGUAGE
         loc = LanguageService.get_best_localization(active_match.localizations, ui_lang) if active_match else None
         
-        cast = []
-        directors = []
-        writers = []
-        
-        def calculate_age_at_release(birthday_str: str, release_date_str: str) -> Any:
-            if not birthday_str or not release_date_str:
-                return None
-            try:
-                from datetime import datetime
-                b_date = datetime.strptime(birthday_str[:10], "%Y-%m-%d")
-                r_date = datetime.strptime(release_date_str[:10], "%Y-%m-%d")
-                age = r_date.year - b_date.year
-                if (r_date.month, r_date.day) < (b_date.month, b_date.day):
-                    age -= 1
-                return age
-            except:
-                return None
-
-        if active_match:
-            people_links = db.query(MediaPersonLink).options(
-                joinedload(MediaPersonLink.person).joinedload(Person.localizations)
-            ).filter(MediaPersonLink.match_id == active_match.id).all()
-            
-            local_person_ids = [link.person.id for link in people_links if link.person]
-            overrides = db.query(UserOverride).filter(
-                UserOverride.user_id == current_uid,
-                UserOverride.person_id.in_(local_person_ids)
-            ).all() if local_person_ids else []
-            override_map = {ov.person_id: ov.custom_poster for ov in overrides if ov.custom_poster}
-            release_date_str = active_match.release_date.strftime("%Y-%m-%d") if active_match.release_date else None
-
-            missing_birthday_ids = [link.person.id for link in people_links if link.person and link.person.birthday is None]
-            if missing_birthday_ids:
-                try:
-                    from app.domains.tasks import task_manager
-                    if task_manager.people_enrich_worker:
-                        task_manager.people_enrich_worker.enqueue_people(missing_birthday_ids)
-                except Exception as ex:
-                    logger.error(f"Failed to auto-enqueue missing birthdays in local movie: {ex}")
-
-            for link in sorted(people_links, key=lambda x: x.order):
-                person = link.person
-                custom_img = override_map.get(person.id)
-                person_data = {
-                    "id": person.id,
-                    "name": person.name,
-                    "character": link.character_name,
-                    "job": link.role.value if hasattr(link.role, "value") else str(link.role),
-                    "profile_path": self._resolve_img(custom_img or person.local_profile_path or person.profile_path, "people"),
-                    "popularity": (
-                        person.rating_porndb
-                        if person.is_adult and person.rating_porndb is not None
-                        else person.popularity or 0
-                    ),
-                    "scene_count": person.scene_count,
-                    "rating_porndb": person.rating_porndb,
-                    "gender": person.gender,
-                    "age_at_release": calculate_age_at_release(person.birthday, release_date_str)
-                }
-                if person_data["job"].lower() == "director":
-                    directors.append(person_data)
-                elif person_data["job"].lower() == "writer":
-                    writers.append(person_data)
-                elif person_data["job"].lower() == "actor":
-                    cast.append(person_data)
+        cast, directors, writers = self.credits_formatter.format_credits(
+            db=db,
+            active_match=active_match,
+            current_uid=current_uid,
+            resolve_img_fn=self._resolve_img
+        )
         
         technical = {
             "resolution": item.resolution,
@@ -153,55 +100,13 @@ class LocalMovieFormatter(MovieDetailFormatter):
                 "backdrop_path": self._resolve_img(col.local_backdrop_path or col.backdrop_path, "backdrops"),
             }
 
-        keywords_list = []
-        if active_match and active_match.raw_metadata:
-            raw_kws = active_match.raw_metadata.get("keywords", {})
-            if isinstance(raw_kws, dict):
-                keywords_list = [k["name"] for k in raw_kws.get("keywords", []) if isinstance(k, dict) and "name" in k]
-        
-        # Fallback if raw_metadata doesn't have keywords but we have a TMDB match
-        tmdb_scraper = scrapers.tmdb(db)
-        if not keywords_list and active_match and active_match.provider == Provider.TMDB and active_match.external_id:
-            try:
-                tmdb_id_int = int(active_match.external_id)
-                tmdb_data = tmdb_scraper.get_details(tmdb_id_int, "movie", language=ui_lang)
-                if tmdb_data and tmdb_data.get("keywords"):
-                    keywords_list = [k["name"] for k in tmdb_data.get("keywords", {}).get("keywords", [])]
-                    active_match.suggested_tags = keywords_list
-                    db.commit()
-            except Exception as e:
-                logger.error(f"Failed to fetch live keywords fallback: {e}")
-
-        # Extract trailer key
-        trailer_key = None
-        if loc and loc.trailer_url:
-            url_str = loc.trailer_url
-            if "watch?v=" in url_str:
-                trailer_key = url_str.split("watch?v=")[1].split("&")[0]
-            elif "youtu.be/" in url_str:
-                trailer_key = url_str.split("youtu.be/")[1].split("?")[0]
-        
-        if not trailer_key and active_match and active_match.raw_metadata:
-            raw_videos = active_match.raw_metadata.get("videos", {}).get("results", [])
-            youtube_trailers = [v for v in raw_videos if v.get("site") == "YouTube" and v.get("type") == "Trailer" and v.get("key")]
-            if not youtube_trailers:
-                youtube_trailers = [v for v in raw_videos if v.get("site") == "YouTube" and v.get("key")]
-            if youtube_trailers:
-                trailer_key = youtube_trailers[0].get("key")
-
-        if not trailer_key and active_match and active_match.provider == Provider.TMDB and active_match.external_id:
-            try:
-                tmdb_id_int = int(active_match.external_id)
-                tmdb_data = tmdb_scraper.get_details(tmdb_id_int, "movie", language=ui_lang)
-                if tmdb_data:
-                    videos = (tmdb_data.get("videos") or {}).get("results") or []
-                    youtube_trailers = [v for v in videos if v.get("site") == "YouTube" and v.get("type") == "Trailer" and v.get("key")]
-                    if not youtube_trailers:
-                        youtube_trailers = [v for v in videos if v.get("site") == "YouTube" and v.get("key")]
-                    if youtube_trailers:
-                        trailer_key = youtube_trailers[0].get("key")
-            except Exception as e:
-                logger.error(f"Failed to fetch live trailer fallback: {e}")
+        keywords_list, trailer_key = self.metadata_resolver.resolve_keywords_and_trailer(
+            db=db,
+            active_match=active_match,
+            loc=loc,
+            scrapers=scrapers,
+            ui_lang=ui_lang
+        )
 
         extras_list = [
             {

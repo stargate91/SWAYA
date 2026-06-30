@@ -1,19 +1,20 @@
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from app.shared_kernel.enums import Provider, MediaType, ItemStatus
-from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch
 from app.domains.metadata.schemas import MetadataResolveRequest, BulkResolveRequest
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.shared_kernel.ports.media_item_port import MediaItemPort
 
 logger = logging.getLogger(__name__)
 
 class MetadataResolver:
-    def __init__(self, db: Any, scrapers: Any, tmdb: Any):
+    def __init__(self, db: Any, scrapers: Any, tmdb: Any, media_item_port: Optional[MediaItemPort] = None):
         self.db = db
         self.scrapers = scrapers
         self.tmdb = tmdb
+        self.media_item_port = media_item_port
 
     def resolve_item(self, request: MetadataResolveRequest) -> Dict[str, Any]:
         db = self.db
@@ -28,7 +29,11 @@ class MetadataResolver:
             from app.shared_kernel.exceptions import BadRequestException
             raise BadRequestException("item_id and external_id (tmdb_id) are required")
 
-        item = db.query(MediaItem).filter(MediaItem.id == int(item_id)).first()
+        if not self.media_item_port:
+            from app.shared_kernel.exceptions import BadRequestException
+            raise BadRequestException("media_item_port must be configured to resolve items")
+
+        item = self.media_item_port.get_item_by_id(int(item_id))
         if not item:
             from app.shared_kernel.exceptions import NotFoundException
             raise NotFoundException("Media item not found")

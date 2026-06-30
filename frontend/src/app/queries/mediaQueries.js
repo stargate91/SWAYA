@@ -424,6 +424,7 @@ export const useUpdateMediaStatusMutation = () => {
                 return {
                   ...x,
                   user_rating: data.user_rating !== undefined ? data.user_rating : x.user_rating,
+                  user_comment: data.user_comment !== undefined ? data.user_comment : x.user_comment,
                   is_watched: data.is_watched !== undefined ? data.is_watched : x.is_watched,
                   custom_tags: data.custom_tags !== undefined ? data.custom_tags : x.custom_tags,
                   tags: data.tags !== undefined ? data.tags : x.tags,
@@ -444,10 +445,10 @@ export const useUpdateMediaStatusMutation = () => {
       });
 
       const payload = variables.payload || {};
-      if ('user_rating' in payload || 'is_watched' in payload) {
+      if ('user_rating' in payload || 'is_watched' in payload || 'user_comment' in payload) {
         queryClient.invalidateQueries({ queryKey: ['stats'] });
       }
-      if ('custom_tags' in payload) {
+      if ('custom_tags' in payload || 'is_tracked' in payload) {
         queryClient.invalidateQueries({ queryKey: ['libraryTags'] });
         queryClient.invalidateQueries({ queryKey: ['allTags'] });
         queryClient.invalidateQueries({ queryKey: ['libraryFilters'] });
@@ -474,8 +475,12 @@ export const usePlayMediaMutation = () => {
   return useMutation({
     mutationFn: (itemId) => api.media.play(itemId),
     onSuccess: (data, itemId) => {
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', itemId] });
-      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', itemId] });
+      const stringId = String(itemId);
+      const numberId = !isNaN(Number(itemId)) ? Number(itemId) : itemId;
+      queryClient.invalidateQueries({ queryKey: ['library-item-detail', stringId] });
+      queryClient.invalidateQueries({ queryKey: ['library-item-detail', numberId] });
+      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', stringId] });
+      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', numberId] });
       queryClient.invalidateQueries({ queryKey: ['watched-history'] });
       queryClient.invalidateQueries({ queryKey: ['continue-watching'] });
     },
@@ -487,8 +492,12 @@ export const useResetProgressMutation = () => {
   return useMutation({
     mutationFn: (itemId) => api.media.resetProgress(itemId),
     onSuccess: (data, itemId) => {
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', itemId] });
-      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', itemId] });
+      const stringId = String(itemId);
+      const numberId = !isNaN(Number(itemId)) ? Number(itemId) : itemId;
+      queryClient.invalidateQueries({ queryKey: ['library-item-detail', stringId] });
+      queryClient.invalidateQueries({ queryKey: ['library-item-detail', numberId] });
+      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', stringId] });
+      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', numberId] });
       queryClient.invalidateQueries({ queryKey: ['continue-watching'] });
     },
   });

@@ -14,6 +14,13 @@ from app.domains.library.services.detail.formatters.base import MovieDetailForma
 logger = logging.getLogger(__name__)
 
 class TmdbMovieFormatter(MovieDetailFormatter):
+    def __init__(self):
+        super().__init__()
+        from app.domains.library.services.detail.formatters.movie.movie_credits_formatter import MovieCreditsFormatter
+        from app.domains.library.services.detail.formatters.movie.movie_db_syncer import MovieDbSyncer
+        self.credits_formatter = MovieCreditsFormatter()
+        self.db_syncer = MovieDbSyncer()
+
     def format(self, item_id: Any, db: Any, scrapers: Any, current_uid: Any) -> Any:
         try:
             tmdb_id = int(item_id.split("_")[1])
@@ -27,115 +34,14 @@ class TmdbMovieFormatter(MovieDetailFormatter):
             return JSONResponse(status_code=404, content={"error": "Movie not found on TMDB"})
         
         credits = tmdb_data.get("credits", {})
-        from app.domains.people.models import Person
-
-        # Fetch local overrides for matching TMDB people
-        person_ids = set()
-        for actor in credits.get("cast", []):
-            if actor.get("id"):
-                person_ids.add(str(actor["id"]))
-        for crew in credits.get("crew", []):
-            if crew.get("id"):
-                person_ids.add(str(crew["id"]))
-
-        local_profiles = {}
-        if person_ids:
-            try:
-                from sqlalchemy import or_
-                from app.domains.users.models import UserOverride
-                quoted_pids = [f'"{pid}"' for pid in person_ids]
-                raw_pids = list(person_ids)
-                local_people = db.query(Person).filter(
-                    or_(
-                        Person.external_ids["tmdb"].as_string().in_(raw_pids),
-                        Person.external_ids["tmdb"].as_string().in_(quoted_pids)
-                    )
-                ).all()
-                
-                local_person_ids = [lp.id for lp in local_people]
-                overrides = db.query(UserOverride).filter(
-                    UserOverride.user_id == current_uid,
-                    UserOverride.person_id.in_(local_person_ids)
-                ).all()
-                override_map = {ov.person_id: ov.custom_poster for ov in overrides if ov.custom_poster}
-
-                for lp in local_people:
-                    tmdb_id_str = lp.external_ids.get("tmdb")
-                    if tmdb_id_str:
-                        custom_img = override_map.get(lp.id)
-                        local_profiles[int(tmdb_id_str)] = {
-                            "profile_path": custom_img or lp.local_profile_path or lp.profile_path,
-                            "birthday": lp.birthday
-                        }
-                
-                missing_birthday_ids = [lp.id for lp in local_people if lp.birthday is None]
-                if missing_birthday_ids:
-                    try:
-                        from app.domains.tasks import task_manager
-                        if task_manager.people_enrich_worker:
-                            task_manager.people_enrich_worker.enqueue_people(missing_birthday_ids)
-                    except Exception as ex:
-                        logger.error(f"Failed to auto-enqueue missing birthdays: {ex}")
-            except Exception as e:
-                logger.error(f"Failed to query custom performer avatars for movie detail: {e}")
-
-        def calculate_age_at_release(birthday_str: str, release_date_str: str) -> Any:
-            if not birthday_str or not release_date_str:
-                return None
-            try:
-                from datetime import datetime
-                b_date = datetime.strptime(birthday_str[:10], "%Y-%m-%d")
-                r_date = datetime.strptime(release_date_str[:10], "%Y-%m-%d")
-                age = r_date.year - b_date.year
-                if (r_date.month, r_date.day) < (b_date.month, b_date.day):
-                    age -= 1
-                return age
-            except:
-                return None
-
         release_date = tmdb_data.get("release_date")
-
-        cast = []
-        directors = []
-        writers = []
-        sound = []
-        
-        for actor in credits.get("cast", [])[:15]:
-            actor_id = actor.get("id")
-            resolved = local_profiles.get(actor_id) if actor_id else None
-            resolved_img = resolved.get("profile_path") if resolved else None
-            birthday_str = resolved.get("birthday") if resolved else None
-            cast.append({
-                "id": f"tmdb:{actor_id}" if actor_id else None,
-                "name": actor.get("name"),
-                "character": actor.get("character"),
-                "job": "Actor",
-                "profile_path": self._resolve_img(resolved_img or actor.get("profile_path"), "people"),
-                "popularity": actor.get("popularity", 0),
-                "gender": actor.get("gender"),
-                "age_at_release": calculate_age_at_release(birthday_str, release_date)
-            })
-        
-        for crew in credits.get("crew", []):
-            crew_id = crew.get("id")
-            resolved = local_profiles.get(crew_id) if crew_id else None
-            resolved_img = resolved.get("profile_path") if resolved else None
-            birthday_str = resolved.get("birthday") if resolved else None
-            crew_member = {
-                "id": f"tmdb:{crew_id}" if crew_id else None,
-                "name": crew.get("name"),
-                "job": crew.get("job"),
-                "profile_path": self._resolve_img(resolved_img or crew.get("profile_path"), "people"),
-                "popularity": crew.get("popularity", 0),
-                "gender": crew.get("gender"),
-                "age_at_release": calculate_age_at_release(birthday_str, release_date)
-            }
-            if crew.get("job") == "Director":
-                directors.append(crew_member)
-            elif crew.get("job") in ("Writer", "Screenplay"):
-                writers.append(crew_member)
-            elif crew.get("department") == "Sound" or crew.get("job") in ("Original Music Composer", "Music", "Composer"):
-                sound.append(crew_member)
+        cast, directors, writers, sound = self.credits_formatter.format_credits(
+            db=db,
+            credits=credits,
+            release_date=release_date,
+            current_uid=current_uid,
+            resolve_img_fn=self._resolve_img
+        )
         year = None
         if release_date:
             try:
@@ -180,74 +86,15 @@ class TmdbMovieFormatter(MovieDetailFormatter):
 
         imdb_id = tmdb_data.get("imdb_id")
         if match:
-            db_updated = False
-            if imdb_id and not match.imdb_id:
-                match.imdb_id = imdb_id
-                db_updated = True
-            if match.imdb_id and not match.rating_imdb:
-                try:
-                    omdb_data = scrapers.omdb.fetch_omdb(match.imdb_id)
-                    if omdb_data:
-                        scrapers.omdb.update_omdb_ratings(match, omdb_data)
-                        db_updated = True
-                except Exception as e:
-                    logger.error(f"Failed to fetch OMDB ratings for {match.imdb_id}: {e}")
-            if not match.backdrop_path and effective_backdrop:
-                match.backdrop_path = effective_backdrop
-                db_updated = True
-            if not match.release_date and release_date:
-                from datetime import datetime
-                try:
-                    match.release_date = datetime.strptime(release_date, "%Y-%m-%d")
-                    db_updated = True
-                except Exception as e:
-                    logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/tmdb_movie.py:191: {e}", exc_info=True)
-            if not match.rating_tmdb and tmdb_data.get("vote_average"):
-                try:
-                    match.rating_tmdb = float(tmdb_data.get("vote_average"))
-                    db_updated = True
-                except Exception as e:
-                    logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/tmdb_movie.py:197: {e}", exc_info=True)
-            if not match.vote_count_tmdb and tmdb_data.get("vote_count"):
-                try:
-                    match.vote_count_tmdb = int(tmdb_data.get("vote_count"))
-                    db_updated = True
-                except Exception as e:
-                    logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/tmdb_movie.py:203: {e}", exc_info=True)
-            if match.is_adult != tmdb_data.get("adult", False):
-                match.is_adult = tmdb_data.get("adult", False)
-                db_updated = True
-            
-            loc_db = next((l for l in match.localizations if l.locale == ui_lang), None)
-            genres_list = _split_genres([g["name"] for g in tmdb_data.get("genres", [])]) if tmdb_data.get("genres") else []
-            if not loc_db:
-                from app.domains.metadata.models import MetadataLocalization
-                loc_db = MetadataLocalization(
-                    match_id=match.id,
-                    locale=ui_lang,
-                    title=tmdb_data.get("title") or tmdb_data.get("original_title") or "Unknown Movie",
-                    overview=tmdb_data.get("overview"),
-                    poster_path=tmdb_data.get("poster_path"),
-                    genres=genres_list
-                )
-                db.add(loc_db)
-                db_updated = True
-            else:
-                if not loc_db.title and (tmdb_data.get("title") or tmdb_data.get("original_title")):
-                    loc_db.title = tmdb_data.get("title") or tmdb_data.get("original_title")
-                    db_updated = True
-                if not loc_db.overview and tmdb_data.get("overview"):
-                    loc_db.overview = tmdb_data.get("overview")
-                    db_updated = True
-                if not loc_db.poster_path and tmdb_data.get("poster_path"):
-                    loc_db.poster_path = tmdb_data.get("poster_path")
-                    db_updated = True
-                if not loc_db.genres and genres_list:
-                    loc_db.genres = genres_list
-                    db_updated = True
-            
-            if db_updated:
-                db.commit()
+            self.db_syncer.sync_db_metadata(
+                db=db,
+                match=match,
+                tmdb_data=tmdb_data,
+                release_date=release_date,
+                effective_backdrop=effective_backdrop,
+                ui_lang=ui_lang,
+                scrapers=scrapers
+            )
 
         belongs_to_col = tmdb_data.get("belongs_to_collection")
         collection_data = None

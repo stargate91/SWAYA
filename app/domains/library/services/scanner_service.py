@@ -7,9 +7,6 @@ from sqlalchemy.orm import Session
 
 from app.shared_kernel.enums import ActionStatus, ActionType, ItemStatus, MediaType, ScanMode
 from app.domains.library.models import MediaItem, Library, ExtraFile
-from app.domains.metadata.models import MetadataMatch
-from app.domains.people.models import Person
-
 from app.shared_kernel.ports.library_port import LibraryPort
 
 from app.domains.library.services.scanner.service.status_coordinator import StatusCoordinator

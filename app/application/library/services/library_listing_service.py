@@ -27,7 +27,6 @@ from app.domains.library.services.listing.query_builders import (
 logger = logging.getLogger(__name__)
 
 from app.shared_kernel.ports.library_port import LibraryPort
-
 from app.shared_kernel.ports.settings_port import SettingsPort
 
 class LibraryListingService:
@@ -313,4 +312,3 @@ class LibraryListingService:
             people=[],
             counts=res_movies.counts
         )
-

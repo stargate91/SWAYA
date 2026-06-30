@@ -93,7 +93,6 @@ class CustomListCreate(BaseSchema):
     description: Optional[str] = None
     list_type: CustomListType = CustomListType.MEDIA
     color: Optional[str] = None
-    icon: Optional[str] = None
 
 
 class CustomListItemRead(BaseSchema):
@@ -115,7 +114,6 @@ class CustomListRead(BaseSchema):
     description: Optional[str] = None
     list_type: CustomListType
     color: Optional[str] = None
-    icon: Optional[str] = None
     created_at: datetime
 
 
@@ -275,7 +273,6 @@ class CustomListResponse(BaseModel):
     is_watchlist: bool
     description: Optional[str] = None
     color: str
-    icon: str
     created_at: Optional[str] = None
     item_count: int
     sample_posters: List[str]
@@ -287,7 +284,6 @@ class CustomListDetailResponse(BaseModel):
     is_watchlist: bool
     description: Optional[str] = None
     color: Optional[str] = None
-    icon: Optional[str] = None
     created_at: Optional[str] = None
     items: List[CustomListItemResponse]
 

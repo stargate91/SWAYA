@@ -311,6 +311,54 @@ function BespokeCompaniesSection({ item, t }) {
   );
 }
 
+function BespokeRatingsSection({ item, t }) {
+  const isSceneType = item?.type === 'scene';
+  const hasImdb = !isSceneType && item?.rating_imdb != null && Number(item.rating_imdb) > 0;
+  const hasTmdb = !isSceneType && item?.rating_tmdb != null && Number(item.rating_tmdb) > 0;
+  const hasRotten = !isSceneType && item?.rating_rotten != null && item?.rating_rotten !== '';
+  const hasMeta = !isSceneType && item?.rating_meta != null && Number(item.rating_meta) > 0;
+  const hasPorndb = item?.rating_porndb != null && Number(item.rating_porndb) > 0;
+
+  // Identify which rating type is already displayed in the main header pill
+  let activeHeaderRatingType = null;
+  if (hasImdb) {
+    activeHeaderRatingType = 'imdb';
+  } else if (hasTmdb) {
+    activeHeaderRatingType = 'tmdb';
+  } else if (hasPorndb) {
+    activeHeaderRatingType = 'porndb';
+  }
+
+  const ratings = [];
+  if (hasImdb && activeHeaderRatingType !== 'imdb') ratings.push({ id: 'imdb', logo: '/rating/imdb.png', alt: 'IMDb', value: `${item.rating_imdb.toFixed(1)}/10` });
+  if (hasTmdb && activeHeaderRatingType !== 'tmdb') ratings.push({ id: 'tmdb', logo: '/rating/tmdb.png', alt: 'TMDb', value: `${item.rating_tmdb.toFixed(1)}/10` });
+  if (hasRotten) ratings.push({ id: 'rotten', logo: '/rating/rottan_tomatoes.png', alt: 'Rotten Tomatoes', value: item.rating_rotten });
+  if (hasMeta) ratings.push({ id: 'meta', logo: '/rating/metacritic.png', alt: 'Metacritic', value: `${item.rating_meta}/100` });
+  if (hasPorndb && activeHeaderRatingType !== 'porndb') ratings.push({ id: 'porndb', logo: '/rating/theporndb.png', alt: 'ThePornDB', value: `${item.rating_porndb.toFixed(1)}/10` });
+
+  if (ratings.length === 0) return null;
+
+  return (
+    <div className="bespoke-ratings-section">
+      <div className="bespoke-ratings-card">
+        <div className="bespoke-browser-card__pills-header">
+          <span className="bespoke-cast-title">
+            {t('library.details.ratingsSection') || 'Ratings'}
+          </span>
+        </div>
+        <div className="bespoke-ratings-body">
+          {ratings.map(rating => (
+            <div key={rating.id} className="bespoke-rating-item" title={rating.alt}>
+              <img src={rating.logo} alt={rating.alt} className="bespoke-rating-logo" />
+              <span className="bespoke-rating-value">{rating.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function BespokeDetailsSection({ item, t }) {
   const isSceneType = item?.type === 'scene';
   const hasImdb = !isSceneType && item?.rating_imdb != null && Number(item.rating_imdb) > 0;
@@ -426,7 +474,14 @@ function CompactWatchStatsSection({ item, isMovie, isScene, t }) {
   const formatLogDate = (dateStr) => {
     if (!dateStr) return '';
     try {
-      return new Date(dateStr).toLocaleString();
+      let normalizedStr = dateStr;
+      if (typeof dateStr === 'string' && !dateStr.endsWith('Z') && !dateStr.includes('+') && !/-\d{2}:\d{2}$/.test(dateStr)) {
+        normalizedStr = dateStr.replace(' ', 'T');
+        if (!normalizedStr.endsWith('Z')) {
+          normalizedStr += 'Z';
+        }
+      }
+      return new Date(normalizedStr).toLocaleString();
     } catch {
       return dateStr;
     }
@@ -670,6 +725,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLogoDrawerOpen, setIsLogoDrawerOpen] = useState(false);
   const [isPosterDrawerOpen, setIsPosterDrawerOpen] = useState(false);
+  const [isBackdropDrawerOpen, setIsBackdropDrawerOpen] = useState(false);
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -678,7 +734,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
   }, [id]);
 
   useEffect(() => {
-    if (isLogoDrawerOpen || isPosterDrawerOpen || isDrawerOpen) {
+    if (isLogoDrawerOpen || isPosterDrawerOpen || isBackdropDrawerOpen || isDrawerOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -686,10 +742,10 @@ export default function MediaDetailPage({ type = 'movie' }) {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [isLogoDrawerOpen, isPosterDrawerOpen, isDrawerOpen]);
+  }, [isLogoDrawerOpen, isPosterDrawerOpen, isBackdropDrawerOpen, isDrawerOpen]);
 
   useEffect(() => {
-    if (isLogoDrawerOpen || isPosterDrawerOpen) return;
+    if (isLogoDrawerOpen || isPosterDrawerOpen || isBackdropDrawerOpen) return;
 
     const handleWheel = (e) => {
       if (Math.abs(e.deltaY) > 5) {
@@ -712,7 +768,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
 
     window.addEventListener('wheel', handleWheel, { passive: true });
     return () => window.removeEventListener('wheel', handleWheel);
-  }, [isScrolled, isLogoDrawerOpen, isPosterDrawerOpen]);
+  }, [isScrolled, isLogoDrawerOpen, isPosterDrawerOpen, isBackdropDrawerOpen]);
 
   const handleScrollToggle = () => {
     setIsScrolled(!isScrolled);
@@ -772,15 +828,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
   const extraSocialLinks = hasExtraSocials ? socialLinks.slice(4) : [];
 
   const handleOpenBackdropModal = () => {
-    openModal({
-      title: t('library.details.backdrops') || 'Choose Backdrop',
-      variant: 'wide',
-      content: (
-        <MediaDetailProvider value={{ ...detailState, t, navigate, toast, type: normalizedType, id }}>
-          <BackdropsPanel showTitle={false} />
-        </MediaDetailProvider>
-      ),
-    });
+    setIsBackdropDrawerOpen(true);
   };
 
   const handleOpenPosterModal = () => {
@@ -813,7 +861,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
         fallbackUrl={posterUrl}
         isScene={item?.type === 'scene'}
         backLabel={t('common.back') || 'Back'}
-        pageClassName={`media-detail-page--scroll-transition ${isScrolled ? 'is-scrolled' : ''} ${isLogoDrawerOpen || isPosterDrawerOpen ? 'logo-drawer-open' : ''}`}
+        pageClassName={`media-detail-page--scroll-transition ${isScrolled ? 'is-scrolled' : ''} ${isLogoDrawerOpen || isPosterDrawerOpen || isBackdropDrawerOpen ? 'logo-drawer-open' : ''}`}
         containerRef={containerRef}
         topRightControls={(
           <>
@@ -957,6 +1005,9 @@ export default function MediaDetailPage({ type = 'movie' }) {
 
               {/* Production Companies / Studio Section */}
               {(isMovie || isScene) && <BespokeCompaniesSection item={item} t={t} />}
+
+              {/* Ratings Section */}
+              {(isMovie || isScene) && <BespokeRatingsSection item={item} t={t} />}
             </div>
             <div className="media-detail-page__inline-side-col">
               {item && (
@@ -1068,40 +1119,6 @@ export default function MediaDetailPage({ type = 'movie' }) {
               </button>
             </div>
             <div className="entity-detail-page__drawer-content">
-              {/* Ratings section */}
-              {(() => {
-                const isSceneType = item?.type === 'scene';
-                const hasImdb = !isSceneType && item?.rating_imdb != null && Number(item.rating_imdb) > 0;
-                const hasTmdb = !isSceneType && item?.rating_tmdb != null && Number(item.rating_tmdb) > 0;
-                const hasRotten = !isSceneType && item?.rating_rotten != null && item?.rating_rotten !== '';
-                const hasMeta = !isSceneType && item?.rating_meta != null && Number(item.rating_meta) > 0;
-                const hasPorndb = item?.rating_porndb != null && Number(item.rating_porndb) > 0;
-
-                const ratings = [];
-                if (hasImdb) ratings.push({ id: 'imdb', logo: '/rating/imdb.png', alt: 'IMDb', value: `${item.rating_imdb.toFixed(1)}/10` });
-                if (hasTmdb) ratings.push({ id: 'tmdb', logo: '/rating/tmdb.png', alt: 'TMDb', value: `${item.rating_tmdb.toFixed(1)}/10` });
-                if (hasRotten) ratings.push({ id: 'rotten', logo: '/rating/rottan_tomatoes.png', alt: 'Rotten Tomatoes', value: item.rating_rotten });
-                if (hasMeta) ratings.push({ id: 'meta', logo: '/rating/metacritic.png', alt: 'Metacritic', value: `${item.rating_meta}/100` });
-                if (hasPorndb) ratings.push({ id: 'porndb', logo: '/rating/theporndb.png', alt: 'ThePornDB', value: `${item.rating_porndb.toFixed(1)}/10` });
-
-                if (ratings.length === 0) return null;
-
-                return (
-                  <div className="entity-detail-page__drawer-section">
-                    <h4 className="entity-detail-page__drawer-section-title">
-                      {t('library.details.ratingsSection') || 'Ratings'}
-                    </h4>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-sm)', marginTop: 'var(--space-sm)' }}>
-                      {ratings.map(rating => (
-                        <div key={rating.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--color-border-default)', padding: '6px 12px', borderRadius: 'var(--radius-md, 8px)' }}>
-                          <img src={rating.logo} alt={rating.alt} style={{ height: '18px', objectFit: 'contain' }} />
-                          <span style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text-primary)' }}>{rating.value}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })()}
 
 
               {/* Production Companies (for series only) */}
@@ -1238,6 +1255,43 @@ export default function MediaDetailPage({ type = 'movie' }) {
                 onClose={() => setIsPosterDrawerOpen(false)}
                 item={item}
               />
+            </div>
+          </div>
+        </>,
+        document.body
+      )}
+
+      {/* Backdrop Selector Drawer */}
+      {isBackdropDrawerOpen && typeof document !== 'undefined' && createPortal(
+        <>
+          <div
+            className="entity-detail-page__drawer-backdrop ui-drawer-backdrop entity-detail-page__drawer-backdrop--transparent"
+            role="button"
+            tabIndex={-1}
+            onClick={() => setIsBackdropDrawerOpen(false)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                setIsBackdropDrawerOpen(false);
+              }
+            }}
+          />
+          <div className="entity-detail-page__drawer ui-drawer ui-drawer--md entity-detail-page__drawer--backdrop">
+            <div className="entity-detail-page__drawer-header">
+              <h3 className="entity-detail-page__drawer-title">
+                {t('library.details.backdrops') || 'Choose Backdrop'}
+              </h3>
+              <button
+                type="button"
+                className="entity-detail-page__drawer-close"
+                onClick={() => setIsBackdropDrawerOpen(false)}
+              >
+                &times;
+              </button>
+            </div>
+            <div className="entity-detail-page__drawer-content" style={{ padding: '24px' }}>
+              <MediaDetailProvider value={{ ...detailState, t, navigate, toast, type: normalizedType, id, onClose: () => setIsBackdropDrawerOpen(false) }}>
+                <BackdropsPanel showTitle={false} />
+              </MediaDetailProvider>
             </div>
           </div>
         </>,

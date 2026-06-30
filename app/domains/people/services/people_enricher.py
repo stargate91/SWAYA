@@ -77,8 +77,9 @@ class PeopleEnricher:
     def _get_temp_db(self) -> Session:
         if self.session_factory:
             return self.session_factory()
-        from app.shared_kernel.database import SessionLocal
-        return SessionLocal()
+        if self.db:
+            return self.db
+        raise RuntimeError("PeopleEnricher requires session_factory or db to be provided")
 
     def enrich_people_for_matches(self, task_id: int, match_ids: List[int], progress_callback: Optional[Callable[[int, int], None]] = None) -> int:
         return enrich_people_for_matches(self, task_id, match_ids, progress_callback)

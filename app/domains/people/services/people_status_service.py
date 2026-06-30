@@ -29,11 +29,14 @@ class PersonEnrichmentQueue:
     def _init_queue(self):
         self.queue = queue.Queue()
         self.scrapers = None
+        self.session_factory = None
         self.worker_thread = threading.Thread(target=self._worker, daemon=True, name="PersonEnrichmentWorker")
         self.worker_thread.start()
 
-    def configure(self, scrapers: Any):
+    def configure(self, scrapers: Any, session_factory=None):
         self.scrapers = scrapers
+        if session_factory is not None:
+            self.session_factory = session_factory
 
     def enqueue(self, person_id: int):
         self.queue.put(person_id)
@@ -51,10 +54,13 @@ class PersonEnrichmentQueue:
                 self.queue.task_done()
 
     def _enrich_person(self, person_id: int):
-        from app.shared_kernel.database import SessionLocal
         from app.domains.people.services.people_enricher import PeopleEnricher
 
-        db = SessionLocal()
+        if not self.session_factory:
+            from app.shared_kernel.database import SessionLocal
+            self.session_factory = SessionLocal
+
+        db = self.session_factory()
         try:
             person = db.query(Person).filter(Person.id == person_id).first()
             if not person:

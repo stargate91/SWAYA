@@ -135,6 +135,11 @@
   height: 100%;
 }
 
+.bespoke-scene-tagger-input::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+  opacity: 1;
+}
+
 .bespoke-scene-tagger-clear-btn {
   background: transparent;
   border: none;
@@ -215,10 +220,9 @@
   font-size: 11px;
   font-weight: 600;
   border-radius: var(--radius-md, 6px);
-  --local-border: 1px dashed var(--color-border-default);
-  border: var(--local-border);
-  background: rgba(255, 255, 255, 0.02);
-  color: var(--color-text-muted);
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.85);
   cursor: pointer;
   --local-transition: all 0.15s ease;
   transition: var(--local-transition);

@@ -545,7 +545,7 @@ export const useUpdatePersonStatusMutation = () => {
         return;
       }
 
-      if ('is_active' in payload || 'is_favorite' in payload || 'user_rating' in payload) {
+      if ('is_active' in payload || 'is_favorite' in payload || 'user_rating' in payload || 'user_comment' in payload) {
         queryClient.invalidateQueries({ queryKey: ['people'] });
         queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
         queryClient.invalidateQueries({ queryKey: ['library'] });

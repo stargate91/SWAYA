@@ -1,23 +1,14 @@
-import os
-import re
-import shutil
-import uuid
 import logging
 from pathlib import Path
 from typing import BinaryIO, Iterable, Optional
-from PIL import Image
 import requests
-from io import BytesIO
-import xml.etree.ElementTree as ET
 
 from app.domains.media_assets.services import image_selectors
-from app.shared_kernel.constants import (
-    TMDB_IMAGE_BASE,
-    TMDB_DOWNLOAD_SIZES,
-    MEDIA_IMAGE_SUBFOLDERS,
-    MEDIA_IMAGE_LIMITS,
-    MEDIA_THUMBNAIL_LIMITS,
-    MIN_CACHED_IMAGE_BYTES,
+from app.domains.media_assets.services.images import (
+    image_path_resolver,
+    image_writer,
+    image_thumbnailer,
+    image_url_resolver,
 )
 from app.shared_kernel.ports.image_service_port import ImageServicePort
 
@@ -46,287 +37,38 @@ class ImageProcessingService(ImageServicePort):
 
     def ensure_folders(self) -> None:
         """Ensures all subdirectories exist for original assets and thumbnails."""
-        for subfolder in MEDIA_IMAGE_SUBFOLDERS:
-            (self.image_root / "original" / subfolder).mkdir(parents=True, exist_ok=True)
-            (self.image_root / "thumbnails" / subfolder).mkdir(parents=True, exist_ok=True)
+        image_path_resolver.ensure_folders(self.image_root)
 
     def get_original_path(self, subfolder: str, filename: str) -> Path:
         """Returns target path for original resolution image."""
-        return self.image_root / "original" / subfolder / filename.lstrip("/")
+        return image_path_resolver.get_original_path(self.image_root, subfolder, filename)
 
     def get_thumbnail_path(self, subfolder: str, filename: str) -> Path:
-        """Returns target path for the thumbnail image (keeping original extension, except for scene_stills which forces .jpg)."""
-        if subfolder == "scene_stills":
-            base, _ = os.path.splitext(filename)
-            filename = f"{base}.jpg"
-        return self.image_root / "thumbnails" / subfolder / filename.lstrip("/")
+        """Returns target path for the thumbnail image."""
+        return image_path_resolver.get_thumbnail_path(self.image_root, subfolder, filename)
 
     def exists(self, path: str | Path) -> bool:
         """Checks if a file exists and is not corrupted/empty."""
-        p = Path(path)
-        return p.exists() and p.stat().st_size > MIN_CACHED_IMAGE_BYTES
+        return image_path_resolver.exists(path)
 
     def write_chunks(self, target_path: str | Path, chunks: Iterable[bytes], url: Optional[str] = None) -> Optional[str]:
         """Writes network chunk stream to a file safely via a temp file."""
-        target = Path(target_path)
-        temp_path = target.with_name(f"{target.name}.{uuid.uuid4().hex}.tmp")
-        target.parent.mkdir(parents=True, exist_ok=True)
-        try:
-            with open(temp_path, "wb") as f:
-                for chunk in chunks:
-                    if chunk:
-                        f.write(chunk)
-            return self._finalize_file(temp_path, target, url=url)
-        finally:
-            if temp_path.exists():
-                temp_path.unlink()
+        return image_writer.write_chunks(target_path, chunks, url)
 
     def write_upload(self, target_path: str | Path, source: BinaryIO) -> Optional[str]:
         """Writes uploaded image stream to a file safely via a temp file."""
-        target = Path(target_path)
-        temp_path = target.with_name(f"{target.name}.{uuid.uuid4().hex}.tmp")
-        target.parent.mkdir(parents=True, exist_ok=True)
-        try:
-            with open(temp_path, "wb") as f:
-                shutil.copyfileobj(source, f)
-            return self._finalize_file(temp_path, target)
-        finally:
-            if temp_path.exists():
-                temp_path.unlink()
+        return image_writer.write_upload(target_path, source)
 
     def generate_thumbnail(self, original_path: str | Path, thumbnail_path: str | Path, subfolder: str) -> bool:
-        """
-        Loads an original image, resizes it keeping aspect ratio according to
-        configured subfolder limits, and saves it in its original format.
-        If the image is already within bounds, skips processing and copies it directly.
-        """
-        orig = Path(original_path)
-        thumb = Path(thumbnail_path)
-        
-        if not self.exists(orig):
-            logger.warning(f"Cannot generate thumbnail: original file {orig} does not exist.")
-            return False
-
-        # Exclude SVGs from processing
-        if orig.suffix.lower() == ".svg":
-            thumb.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(orig, thumb)
-            return True
-
-        limits = MEDIA_THUMBNAIL_LIMITS.get(subfolder)
-        if not limits:
-            # Do not generate/copy thumbnails for subfolders that don't need them (e.g. backdrops, logos)
-            return False
-
-        thumb_temp = thumb.with_name(f"{thumb.name}.{uuid.uuid4().hex}.tmp")
-        thumb.parent.mkdir(parents=True, exist_ok=True)
-
-        try:
-            def use_adult_scene_poster_height_limit(filename: str, width: int, height: int) -> bool:
-                return False
-
-            # 1. Quick size check to avoid decoding/processing if already small
-            with Image.open(orig) as img:
-                width, height = img.size
-
-                max_width = limits.get("max_width")
-                max_height = limits.get("max_height")
-                if use_adult_scene_poster_height_limit(orig.name, width, height):
-                    max_width = None
-                    max_height = 780
-
-                already_in_bounds = True
-                if max_width and width > max_width:
-                    already_in_bounds = False
-                if max_height and height > max_height:
-                    already_in_bounds = False
-
-            if already_in_bounds and subfolder != "scene_stills":
-                # Already in bounds, copy original to thumbnail path
-                shutil.copy2(orig, thumb)
-                return True
-
-            # 2. Resize if bounds exceeded
-            with Image.open(orig) as img:
-                orig_format = img.format or ("PNG" if orig.suffix.lower() == ".png" else "JPEG")
-                if subfolder == "scene_stills":
-                    orig_format = "JPEG"
-                width, height = img.size
-                if use_adult_scene_poster_height_limit(orig.name, width, height):
-                    max_width = None
-                    max_height = 780
-                
-                if max_width and width > max_width:
-                    ratio = max_width / float(width)
-                    new_height = int(float(height) * ratio)
-                    img = img.resize((max_width, new_height), Image.Resampling.LANCZOS)
-                elif max_height and height > max_height:
-                    ratio = max_height / float(height)
-                    new_width = int(float(width) * ratio)
-                    img = img.resize((new_width, max_height), Image.Resampling.LANCZOS)
-                
-                # Convert modes if saving as JPEG (must not be RGBA)
-                if orig_format == "JPEG" and img.mode in ("RGBA", "LA", "P"):
-                    img = img.convert("RGB")
-                elif orig_format == "JPEG" and img.mode != "RGB":
-                    img = img.convert("RGB")
-
-                # Save using original format with default settings
-                img.save(thumb_temp, orig_format)
-            
-            if thumb.exists():
-                thumb.unlink()
-            thumb_temp.replace(thumb)
-            return True
-        except Exception as e:
-            logger.error(f"Failed to generate thumbnail for {orig} in {subfolder}: {e}")
-            if thumb_temp.exists():
-                thumb_temp.unlink()
-            return False
-
-
-
-    def _finalize_file(self, temp_path: Path, target_path: Path, url: Optional[str] = None) -> Optional[str]:
-        """Verifies integrity and moves file to target path."""
-        if not temp_path.exists() or temp_path.stat().st_size < MIN_CACHED_IMAGE_BYTES:
-            return None
-
-        # Check for SVG
-        is_svg = False
-        try:
-            with open(temp_path, "rb") as f:
-                header = f.read(4096).strip().lower()
-                if header.startswith(b"<svg") or header.startswith(b"<?xml") or b"<svg" in header:
-                    is_svg = True
-        except Exception as e:
-            logger.debug(f"Swallowed exception in domains/media_assets/services/images.py:201: {e}", exc_info=True)
-
-        # Verify image integrity via PIL (unless SVG) and cap at 4K for scene_stills/backdrops
-        if not is_svg:
-            try:
-                need_save = False
-                with Image.open(temp_path) as img:
-                    img.verify()
-                
-                # Open again to process/resize if needed
-                with Image.open(temp_path) as img:
-                    img_format = img.format or "JPEG"
-                    if "scene_stills" in target_path.parts or "backdrops" in target_path.parts:
-                        width, height = img.size
-                        if width > 3840 or height > 3840:
-                            if width >= height:
-                                new_width = 3840
-                                new_height = int(height * (3840.0 / float(width)))
-                            else:
-                                new_height = 3840
-                                new_width = int(width * (3840.0 / float(height)))
-                            img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
-                            need_save = True
-
-                    if need_save:
-                        if img_format == "JPEG" and img.mode in ("RGBA", "LA", "P"):
-                            img = img.convert("RGB")
-                        img.save(temp_path, img_format)
-            except Exception as e:
-                logger.error(f"Image verification/processing failed: {e}")
-                return None
-
-        if is_svg and not target_path.name.lower().endswith(".svg"):
-            target_path = target_path.with_suffix(".svg")
-
-        if target_path.exists():
-            target_path.unlink()
-        target_path.parent.mkdir(parents=True, exist_ok=True)
-        temp_path.replace(target_path)
-        return str(target_path)
+        """Loads an original image, resizes it keeping aspect ratio and saves it."""
+        return image_thumbnailer.generate_thumbnail(original_path, thumbnail_path, subfolder)
 
     def resolve_image_url(self, path: Optional[str], subfolder: str, size: Optional[str] = None) -> Optional[str]:
-        """
-        Resolves the image path/URL for the frontend.
-        1. If it's a remote URL (HTTP/HTTPS), returns it directly.
-        2. If the local thumbnail exists, returns its relative path for frontend serving.
-        3. If it is a relative TMDB path (starts with /), falls back to the TMDB CDN.
-        """
-        if not path:
-            return None
-
-        # 2. Local check
-        normalized_path = path.replace("\\", "/").lstrip("/")
-        path_parts = [part for part in normalized_path.split("/") if part]
-        embedded_subfolder = path_parts[0] if len(path_parts) >= 2 else subfolder
-        filename = path_parts[-1] if path_parts else os.path.basename(path)
-
-        if embedded_subfolder == "logos":
-            size = "original"
-        elif size is None:
-            if embedded_subfolder in ("backdrops", "scene_stills"):
-                size = "original"
-            else:
-                size = "w500"
-
-        # 1. Remote URL fallback
-        if path.startswith(("http://", "https://")):
-            # PornDB CDN image sizing
-            if "cdn.theporndb.net" in path and "/background/" in path and "/background/c/" not in path:
-                if size != "original":
-                    suffix = "medium"
-                    if size in ("w154", "w185", "w300", "personThumb", "posterThumb", "backdropThumb"):
-                        suffix = "small"
-                    
-                    parts = path.split("/background/")
-                    if len(parts) == 2:
-                        filename = parts[1]
-                        name, ext = os.path.splitext(filename)
-                        path = f"{parts[0]}/background/c/{name}-{suffix}{ext}"
-
-            # Auto-proxy hotlink-protected CDNs
-            hotlinked_hosts = ["mjedge.net", "gtflixtv.com", "pbnetcdn.com", "mjedge.com", "atkingdom-network.com", "sexlikereal.com"]
-            if any(host in path for host in hotlinked_hosts):
-                from urllib.parse import quote
-                return f"/api/v1/media/image-proxy?url={quote(path, safe='')}"
-
-            if "image.tmdb.org/t/p/" in path:
-                parts = path.split("/t/p/")
-                if len(parts) == 2:
-                    subparts = parts[1].split("/", 1)
-                    if len(subparts) == 2:
-                        return f"{parts[0]}/t/p/{size}/{subparts[1]}"
-            return path
-
-        if size == "original":
-            orig_path = self.get_original_path(embedded_subfolder, filename)
-            if self.exists(orig_path):
-                return f"/media/images/original/{embedded_subfolder}/{filename}"
-
-        thumb_subfolder = embedded_subfolder if embedded_subfolder in MEDIA_IMAGE_SUBFOLDERS else subfolder
-        thumb_path = self.get_thumbnail_path(thumb_subfolder, filename)
-        if self.exists(thumb_path):
-            return f"/media/images/thumbnails/{thumb_subfolder}/{thumb_path.name}"
-
-        if thumb_subfolder == "scene_stills":
-            source_orig_path = self.get_original_path("scene_stills", filename)
-            if self.exists(source_orig_path):
-                self.generate_thumbnail(source_orig_path, thumb_path, "scene_stills")
-                if self.exists(thumb_path):
-                    return f"/media/images/thumbnails/scene_stills/{thumb_path.name}"
-
-
-
-        orig_path = self.get_original_path(embedded_subfolder, filename)
-        if self.exists(orig_path):
-            return f"/media/images/original/{embedded_subfolder}/{filename}"
-
-        # 3. TMDB CDN fallback
-        if path.startswith("/") and not path.startswith("/media/"):
-            return f"{TMDB_IMAGE_BASE}{size}{path}"
-
-        return None
+        """Resolves the image path/URL for the frontend."""
+        return image_url_resolver.resolve_image_url(path, subfolder, self.image_root, size)
 
     def pick_logo_path(self, raw_data: dict, preferred_language: Optional[str] = None) -> Optional[str]:
-        """
-        Analyzes and selects the best logo from TMDB metadata images.
-        Ensures the logo has sufficient luminance to be readable on dark overlays.
-        """
+        """Analyzes and selects the best logo from TMDB metadata images."""
         return image_selectors.pick_logo_path(
             raw_data=raw_data,
             image_root=self.image_root,
@@ -334,14 +76,8 @@ class ImageProcessingService(ImageServicePort):
             preferred_language=preferred_language
         )
 
-    def pick_poster_path(
-        self,
-        raw_data: dict,
-        preferred_language: Optional[str] = None
-    ) -> Optional[str]:
-        """
-        Analyzes and selects the best poster from TMDB metadata images.
-        """
+    def pick_poster_path(self, raw_data: dict, preferred_language: Optional[str] = None) -> Optional[str]:
+        """Analyzes and selects the best poster from TMDB metadata images."""
         return image_selectors.pick_poster_path(
             raw_data=raw_data,
             preferred_language=preferred_language
@@ -357,10 +93,7 @@ class ImageProcessingService(ImageServicePort):
         min_width: int = 1920,
         allow_low_res: bool = True
     ) -> Optional[str]:
-        """
-        Analyzes and selects the best backdrop from TMDB metadata images.
-        Filters out over-bright (white) backdrops to maintain readability of overlaid text.
-        """
+        """Analyzes and selects the best backdrop from TMDB metadata images."""
         return image_selectors.pick_backdrop_path(
             raw_data=raw_data,
             image_root=self.image_root,
@@ -371,39 +104,12 @@ class ImageProcessingService(ImageServicePort):
         )
 
     def get_download_url(self, path: Optional[str], subfolder: str) -> Optional[str]:
-        """
-        Builds the download URL for an asset.
-        - If it's a remote URL, returns it directly (rewriting TMDB URLs to the configured download size).
-        - If it's a relative TMDB path (starts with /), prepends the base URL and the configured download size.
-        """
-        if not path:
-            return None
-        if path.startswith(("http://", "https://")):
-            if "image.tmdb.org/t/p/" in path:
-                parts = path.split("/t/p/")
-                if len(parts) == 2:
-                    subparts = parts[1].split("/", 1)
-                    if len(subparts) == 2:
-                        size = TMDB_DOWNLOAD_SIZES.get(subfolder, "original")
-                        return f"{parts[0]}/t/p/{size}/{subparts[1]}"
-            return path
-        if path.startswith("/"):
-            size = TMDB_DOWNLOAD_SIZES.get(subfolder, "original")
-            return f"{TMDB_IMAGE_BASE}{size}{path}"
-        return None
+        """Builds the download URL for an asset."""
+        return image_url_resolver.get_download_url(path, subfolder)
 
     def get_db_relative_paths(self, filename: str, subfolder: str) -> tuple[str, str]:
-        """
-        Returns relative paths for storing in the database.
-        Format:
-          Original: media/images/original/{subfolder}/{filename}
-          Thumbnail: media/images/thumbnails/{subfolder}/{filename}
-        """
-        clean_filename = os.path.basename(filename)
-        orig_rel = f"media/images/original/{subfolder}/{clean_filename}"
-        thumb_rel = f"media/images/thumbnails/{subfolder}/{clean_filename}"
-        return orig_rel, thumb_rel
+        """Returns relative paths for storing in the database."""
+        return image_path_resolver.get_db_relative_paths(filename, subfolder)
 
 
 image_processing_service = ImageProcessingService()
-

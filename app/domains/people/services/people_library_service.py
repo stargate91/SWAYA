@@ -122,6 +122,7 @@ class PeopleLibraryService:
                 is_active=person.is_active,
                 is_favorite=override_dict.get("is_favorite") if override_dict else False,
                 user_rating=override_dict.get("user_rating") if override_dict else None,
+                user_comment=override_dict.get("user_comment") if override_dict else None,
                 birthday=person.birthday or "",
                 gender=person.gender,
                 library_count=project_counts.get(person.id, 0),
