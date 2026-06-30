@@ -84,8 +84,8 @@ class PeopleDetailService:
     def get_person_movies(self, person_id: Any, page: int = 1, page_size: int = 12, source: Optional[str] = None, local_only: bool = False) -> PersonFilmographyResponse:
         return self.reader.get_person_movies(person_id, page=page, page_size=page_size, source=source, local_only=local_only)
 
-    def get_person_tv(self, person_id: Any, page: int = 1, page_size: int = 12) -> PersonFilmographyResponse:
-        return self.reader.get_person_tv(person_id, page=page, page_size=page_size)
+    def get_person_tv(self, person_id: Any, page: int = 1, page_size: int = 12, local_only: bool = False) -> PersonFilmographyResponse:
+        return self.reader.get_person_tv(person_id, page=page, page_size=page_size, local_only=local_only)
 
     def get_person_scenes(self, person_id: Any, page: int = 1, page_size: int = 12, source: Optional[str] = None, local_only: bool = False) -> PersonFilmographyResponse:
         return self.reader.get_person_scenes(person_id, page=page, page_size=page_size, source=source, local_only=local_only)

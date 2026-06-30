@@ -26,16 +26,19 @@ class TasksImageDownloadAdapter(ImageDownloadPort):
         except Exception as e:
             logger.error(f"Failed to enqueue download via TasksImageDownloadAdapter: {e}")
 
-    def download_now(self, url: str, subfolder: str, filename: str) -> bool:
+    def download_now(self, url: str, subfolder: str, filename: str) -> Optional[str]:
         try:
             worker = self.download_worker
             if worker:
-                return worker._do_download(url, subfolder, filename)
+                res = worker._do_download(url, subfolder, filename)
+                if isinstance(res, str):
+                    return res
+                return filename if res else None
             else:
                 logger.warning("DownloadWorker not available for immediate image download.")
         except Exception as e:
             logger.error(f"Failed to download immediately via TasksImageDownloadAdapter: {e}")
-        return False
+        return None
 
     def get_download_url(self, path: str, subfolder: str) -> Optional[str]:
         try:

@@ -231,6 +231,9 @@ class ImageProcessingService(ImageServicePort):
                 logger.error(f"Image verification/processing failed: {e}")
                 return None
 
+        if is_svg and not target_path.name.lower().endswith(".svg"):
+            target_path = target_path.with_suffix(".svg")
+
         if target_path.exists():
             target_path.unlink()
         target_path.parent.mkdir(parents=True, exist_ok=True)
@@ -253,8 +256,10 @@ class ImageProcessingService(ImageServicePort):
         embedded_subfolder = path_parts[0] if len(path_parts) >= 2 else subfolder
         filename = path_parts[-1] if path_parts else os.path.basename(path)
 
-        if size is None:
-            if embedded_subfolder in ("backdrops", "scene_stills", "logos"):
+        if embedded_subfolder == "logos":
+            size = "original"
+        elif size is None:
+            if embedded_subfolder in ("backdrops", "scene_stills"):
                 size = "original"
             else:
                 size = "w500"

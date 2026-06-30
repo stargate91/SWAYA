@@ -19,6 +19,13 @@ import './UniversalImagePickerModal.css';
 
 const COLON_CHAR = ':';
 
+const pathsMatch = (pathA, pathB) => {
+  if (!pathA || !pathB) return false;
+  const cleanA = String(pathA).split(/[/\\]/).pop().toLowerCase();
+  const cleanB = String(pathB).split(/[/\\]/).pop().toLowerCase();
+  return cleanA === cleanB;
+};
+
 export default function UniversalImagePickerModal({
   entityId,
   tmdbId,
@@ -52,7 +59,7 @@ export default function UniversalImagePickerModal({
     if (hasStash) sources.push({ value: 'stashdb', label: 'StashDB' });
     if (hasFans) sources.push({ value: 'fansdb', label: 'FansDB' });
     if (hasPornDb) sources.push({ value: 'theporndb', label: 'THEPornDB' });
-    
+
     console.log('UniversalImagePickerModal: Performer sources computed:', {
       externalIds,
       tmdbId,
@@ -168,7 +175,7 @@ export default function UniversalImagePickerModal({
       />
 
       {isScene && imageType === 'logo' && (
-        <div className="scene-image-picker-options">
+        <div className="scene-image-picker-options scene-image-picker-options--logo">
           <h4 className="scene-image-picker-title">{t('library.details.availableLogos') || 'Available Logos'}</h4>
           <div className="scene-image-picker-grid">
             {(() => {
@@ -202,10 +209,10 @@ export default function UniversalImagePickerModal({
                 seenLogos.add(item.networks[0].logo_path);
               }
 
-               return logoOptions.map((opt, idx) => (
-                <div 
+              return logoOptions.map((opt, idx) => (
+                <div
                   key={idx}
-                  className={`scene-image-picker-card ${selectedPath === opt.path ? 'active' : ''}`}
+                  className={`scene-image-picker-card ${pathsMatch(selectedPath || currentPath, opt.path) ? 'active' : ''}`}
                   role="button"
                   tabIndex={0}
                   onClick={() => handleSelectTmdbImage(opt.path)}
@@ -247,7 +254,7 @@ export default function UniversalImagePickerModal({
               return options.map((opt, idx) => (
                 <div 
                   key={idx}
-                  className={`scene-image-picker-card ${selectedPath === opt.path ? 'active' : ''}`}
+                  className={`scene-image-picker-card ${pathsMatch(selectedPath || currentPath, opt.path) ? 'active' : ''}`}
                   role="button"
                   tabIndex={0}
                   onClick={() => handleSelectTmdbImage(opt.path)}
@@ -288,7 +295,7 @@ export default function UniversalImagePickerModal({
             tmdbId={tmdbId}
             mediaType={entityType}
             imageType={imageType === 'profile' ? 'poster' : imageType}
-            currentPath={selectedPath}
+            currentPath={selectedPath || currentPath}
             onSelect={handleSelectTmdbImage}
             isPending={isPending}
             t={t}

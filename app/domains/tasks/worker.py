@@ -108,21 +108,42 @@ class DownloadWorker:
         self._worker_tasks.clear()
         logger.info("DownloadWorker background tasks stopped.")
 
-    async def download_now(self, url: str, subfolder: str, filename: str) -> bool:
+    async def download_now(self, url: str, subfolder: str, filename: str) -> Optional[str]:
         """Performs a synchronous/immediate download and thumbnail generation."""
         return await asyncio.to_thread(self._do_download, url, subfolder, filename)
 
-    def _do_download(self, url: str, subfolder: str, filename: str) -> bool:
+    def _do_download(self, url: str, subfolder: str, filename: str) -> Optional[str]:
         """Helper to download and generate thumbnail in a thread pool."""
         orig_path = self.image_service.get_original_path(subfolder, filename)
         thumb_path = self.image_service.get_thumbnail_path(subfolder, filename)
 
         # 1. Reuse existing files to avoid expensive redownloads
+        svg_orig_path = orig_path.with_suffix(".svg")
         if self.image_service.exists(orig_path):
+            is_svg = False
+            try:
+                with open(orig_path, "rb") as f:
+                    header = f.read(4096).strip().lower()
+                    if header.startswith(b"<svg") or header.startswith(b"<?xml") or b"<svg" in header:
+                        is_svg = True
+            except:
+                pass
+
+            if is_svg and not orig_path.name.lower().endswith(".svg"):
+                if orig_path.exists():
+                    if svg_orig_path.exists():
+                        orig_path.unlink()
+                    else:
+                        orig_path.rename(svg_orig_path)
+                return svg_orig_path.name
+
             logger.debug(f"Original asset already exists: {orig_path}. Re-generating thumbnail if missing.")
             if not self.image_service.exists(thumb_path):
                 self.image_service.generate_thumbnail(orig_path, thumb_path, subfolder)
-            return True
+            return filename
+        elif self.image_service.exists(svg_orig_path):
+            logger.debug(f"Original SVG asset already exists: {svg_orig_path}.")
+            return svg_orig_path.name
 
         # 2. Download original image
         logger.info(f"Downloading external asset: {url}")
@@ -131,16 +152,20 @@ class DownloadWorker:
             if response.status_code == 200:
                 saved_path = self.image_service.write_chunks(orig_path, response.iter_content(chunk_size=8192), url=url)
                 if saved_path:
+                    import os
+                    actual_filename = os.path.basename(saved_path)
+                    orig_path = Path(saved_path)
+                    thumb_path = self.image_service.get_thumbnail_path(subfolder, actual_filename)
                     # 3. Generate thumbnail
                     self.image_service.generate_thumbnail(orig_path, thumb_path, subfolder)
-                    return True
+                    return actual_filename
                 else:
                     logger.error(f"Failed to verify integrity of downloaded image: {url}")
             else:
                 logger.error(f"Failed to download asset from {url}. Status code: {response.status_code}")
         except Exception as e:
             logger.error(f"Exception downloading asset {url}: {e}")
-        return False
+        return None
 
     async def _process_queue(self, worker_id: int) -> None:
         """Main processing loop checking the async queue."""

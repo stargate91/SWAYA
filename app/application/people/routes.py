@@ -134,9 +134,10 @@ def get_person_tv(
     person_id: str,
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=12, ge=1),
+    local_only: bool = Query(default=False),
     db: Session = Depends(get_db)
 ):
-    return PeopleDetailService(db, scraper_gateway).get_person_tv(person_id, page=page, page_size=page_size)
+    return PeopleDetailService(db, scraper_gateway).get_person_tv(person_id, page=page, page_size=page_size, local_only=local_only)
 
 
 @router.get("/{person_id}/scenes", response_model=PersonFilmographyResponse)

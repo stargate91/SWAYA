@@ -467,6 +467,10 @@ class PerformerDetailReader:
         if not tmdb_id and not person.is_adult and str(person_id).isdigit() and person_id < 100000000:
             tmdb_id = person_id
 
+        if local_only or (source and source.lower() != "tmdb"):
+            res = self.filmography_service.get_person_movies(person_id, page, page_size, source, local_only=local_only)
+            return PersonFilmographyResponse(**res)
+
         movies, _, _, _ = self.filmography_service.get_combined_filmography(
             person_id,
             tmdb_id=tmdb_id,
@@ -476,10 +480,6 @@ class PerformerDetailReader:
             known_for_department=person.known_for_department,
             person_name=person.name
         )
-        
-        if source and source.lower() != "tmdb":
-            res = self.filmography_service.get_person_movies(person_id, page, page_size, source, local_only=local_only)
-            return PersonFilmographyResponse(**res)
 
         total_items = len(movies)
         total_pages = max(1, math.ceil(total_items / page_size))
@@ -495,10 +495,14 @@ class PerformerDetailReader:
         }
         return PersonFilmographyResponse(**res)
 
-    def get_person_tv(self, person_id: Any, page: int = 1, page_size: int = 12) -> PersonFilmographyResponse:
+    def get_person_tv(self, person_id: Any, page: int = 1, page_size: int = 12, local_only: bool = False) -> PersonFilmographyResponse:
         db = self.db
         person = self._resolve_person(person_id)
         person_id = person.id
+
+        if local_only:
+            res = self.filmography_service.get_person_tv(person_id, page, page_size)
+            return PersonFilmographyResponse(**res)
 
         ext_ids = person.external_ids or {}
         tmdb_id = ext_ids.get("tmdb") or ext_ids.get("tmdb_id")

@@ -49,7 +49,12 @@ class ImageOverrideService:
                 if "url" in query_params:
                     path = query_params["url"][0]
                 else:
-                    path = os.path.basename(parsed.path)
+                    import re
+                    match = re.search(r"/(?:original|thumbnails)/([^/]+/[^/]+)$", parsed.path)
+                    if match:
+                        path = match.group(1)
+                    else:
+                        path = os.path.basename(parsed.path)
 
         if path and (path.startswith("/") or path.startswith(("http://", "https://"))):
             try:
@@ -63,20 +68,22 @@ class ImageOverrideService:
                         prefix = f"user_override_{override.user_id}_{item_id}"
                         safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", prefix).strip("_")
                         filename = f"{safe_prefix}_{basename}{ext}"
-                        self.image_downloader.download_now(url, subfolder, filename)
-                        path = f"{subfolder}/{filename}"
+                        downloaded_filename = self.image_downloader.download_now(url, subfolder, filename)
+                        if downloaded_filename:
+                            path = f"{subfolder}/{downloaded_filename}"
                 else:
                     logger.warning("No image_downloader available for user override image download")
             except Exception as e:
                 logger.error(f"Failed to queue image download for user override: {e}")
 
         if image_type == "poster":
-            override.custom_poster = path
+            override.custom_poster = path if path else None
         elif image_type == "backdrop":
-            override.custom_backdrop = path
+            override.custom_backdrop = path if path else None
         elif image_type == "logo":
-            override.custom_logo = path
+            override.custom_logo = path if path else None
 
+        logger.info(f"[IMAGE_OVERRIDE] Saved override for item {item_id}: image_type={image_type}, path={path}, custom_logo={override.custom_logo}")
         self.db.commit()
         return {"status": "success", "image_type": image_type, "path": path}
 
