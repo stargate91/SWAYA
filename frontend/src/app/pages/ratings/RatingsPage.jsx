@@ -157,7 +157,7 @@ export default function RatingsPage() {
   const subTabs = [
     { value: 'movies', label: t('ratings.subtabs.movies', { defaultValue: 'Movies' }), icon: Clapperboard },
     { value: 'series', label: t('ratings.subtabs.tvShows', { defaultValue: 'TV Shows' }), icon: Tv },
-    ...(state.hasAdultSupport ? [{ value: 'scenes', label: t('ratings.subtabs.scenes', { defaultValue: 'Scenes' }), icon: Video }] : []),
+    ...(isAdultMode ? [{ value: 'scenes', label: t('ratings.subtabs.scenes', { defaultValue: 'Scenes' }), icon: Video }] : []),
     { value: 'people', label: t('ratings.subtabs.people', { defaultValue: 'People' }), icon: Users },
   ];
 
@@ -172,7 +172,9 @@ export default function RatingsPage() {
   const columns = [
     {
       key: 'name',
-      label: t('ratings.table.name', { defaultValue: 'Name' }),
+      label: state.mediaType === 'people'
+        ? t('ratings.table.name', { defaultValue: 'Name' })
+        : t('ratings.table.title', { defaultValue: 'Title' }),
       render: (val, row) => (
         <span className="ratings-row-name">
           {row.name || row.title || row.displayTitle}
@@ -180,42 +182,8 @@ export default function RatingsPage() {
       ),
     },
     {
-      key: 'rating',
-      label: t('ratings.table.rating', { defaultValue: 'My Rating' }),
-      width: '200px',
-      render: (val, row) => (
-        <SegmentedRating
-          value={row.user_rating}
-          onChange={(newVal) => state.handleRateItem(row, newVal)}
-          t={t}
-        />
-      ),
-    },
-    ...(state.mediaType === 'people'
-      ? [
-        {
-          key: 'favorite',
-          label: t('ratings.table.favorite', { defaultValue: 'Favorite' }),
-          width: '80px',
-          align: 'center',
-          render: (val, row) => (
-            <button
-              type="button"
-              className={`fav-heart-btn ${row.is_favorite ? 'is-favorite' : ''}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                state.handleToggleFavorite(row);
-              }}
-            >
-              <Heart size={16} fill={row.is_favorite ? 'currentColor' : 'none'} />
-            </button>
-          ),
-        },
-      ]
-      : []),
-    {
       key: 'comment',
-      label: t('ratings.table.comment', { defaultValue: 'Comment / Review' }),
+      label: t('ratings.table.comment', { defaultValue: 'Review' }),
       render: (val, row) => {
         const hasComment = row.user_comment && String(row.user_comment).trim();
         return (
@@ -240,6 +208,40 @@ export default function RatingsPage() {
         );
       },
     },
+    {
+      key: 'rating',
+      label: t('ratings.table.rating', { defaultValue: 'My Rating' }),
+      width: '200px',
+      render: (val, row) => (
+        <SegmentedRating
+          value={row.user_rating}
+          onChange={(newVal) => state.handleRateItem(row, newVal)}
+          t={t}
+        />
+      ),
+    },
+    ...(state.mediaType === 'people'
+      ? [
+        {
+          key: 'favorite',
+          label: t('ratings.table.favorite', { defaultValue: 'Favorite' }),
+          width: '110px',
+          align: 'center',
+          render: (val, row) => (
+            <button
+              type="button"
+              className={`fav-heart-btn ${row.is_favorite ? 'is-favorite' : ''}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                state.handleToggleFavorite(row);
+              }}
+            >
+              <Heart size={16} fill={row.is_favorite ? 'currentColor' : 'none'} />
+            </button>
+          ),
+        },
+      ]
+      : []),
   ];
 
   const handleKeyDownBackdrop = (e) => {

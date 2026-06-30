@@ -20,10 +20,11 @@
   },
   "table": {
     "name": "Name",
+    "title": "Title",
     "type": "Type",
     "rating": "My Rating",
     "favorite": "Favorite",
-    "comment": "Comment / Review",
+    "comment": "Review",
     "actions": "Actions",
     "empty": "No items match the selected criteria.",
     "loading": "Loading items..."
