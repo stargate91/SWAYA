@@ -10,16 +10,16 @@ from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.shared_kernel.language import LanguageService as LangHelper
 from app.shared_kernel.ports.settings_port import SettingsPort
 from app.shared_kernel.ports.image_download_port import ImageDownloadPort
-from app.application.library.schemas import MovieCollectionsResponse
+from app.domains.library.schemas import MovieCollectionsResponse
 
 logger = logging.getLogger(__name__)
 
 class LibraryCollectionService:
-    def __init__(self, db_session: Session, settings_port: Optional[SettingsPort] = None, image_downloader: Optional[ImageDownloadPort] = None):
+    def __init__(self, db_session: Session, settings_port: Optional[SettingsPort] = None, image_downloader: Optional[ImageDownloadPort] = None, tmdb_scraper: Optional[Any] = None):
         self.db = db_session
-        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
-        self.settings = settings_port or DbSettingsAdapter(db_session)
+        self.settings = settings_port
         self.image_downloader = image_downloader
+        self.tmdb_scraper = tmdb_scraper
 
 
     def get_movie_collections(
@@ -62,12 +62,7 @@ class LibraryCollectionService:
             selectinload(MetadataMatch.overrides)
         ).all()
 
-        tmdb_scraper = None
-        try:
-            from app.infrastructure.scrapers.providers.tmdb import TMDBScraper
-            tmdb_scraper = TMDBScraper(self.db)
-        except Exception as e:
-            logger.error(f"Failed to initialize TMDBScraper in LibraryCollectionService: {e}")
+        tmdb_scraper = self.tmdb_scraper
 
         collections_map = {}
         normalized_search = search.strip().lower() if search else ""

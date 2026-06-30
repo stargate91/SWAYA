@@ -13,10 +13,11 @@ from app.shared_kernel.language import LanguageService
 logger = logging.getLogger(__name__)
 
 class RemoteCreditsFetcher:
-    def __init__(self, db: Session, library_port: LibraryPort, image_service: ImageServicePort):
+    def __init__(self, db: Session, library_port: LibraryPort, image_service: ImageServicePort, scrapers: Optional[Any] = None):
         self.db = db
         self.library_port = library_port
         self.image_service = image_service
+        self.scrapers = scrapers
 
     def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
         return self.image_service.resolve_image_url(path, subfolder, size)
@@ -29,7 +30,7 @@ class RemoteCreditsFetcher:
         page: int,
         page_size: int
     ) -> Optional[dict]:
-        from app.infrastructure.scrapers.support.gateway import scraper_gateway
+        scraper_gateway = self.scrapers
         
         db = self.db
         person = db.query(Person).filter(Person.id == person_id).first()
@@ -201,7 +202,7 @@ class RemoteCreditsFetcher:
         }
 
     def _query_remote_source(self, source: str, media_type: str, ext_id: str) -> tuple[list, int]:
-        from app.infrastructure.scrapers.support.gateway import scraper_gateway
+        scraper_gateway = self.scrapers
         db = self.db
         mapped_items = []
         total_items = 0

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.domains.people.models import Person, MediaPersonLink
 from app.shared_kernel.user_context import get_current_user_id
-from app.application.people.schemas import PeopleGroupItem
+from app.domains.people.schemas import PeopleGroupItem
 from app.shared_kernel.ports.library_port import LibraryPort
 from app.shared_kernel.ports.image_service_port import ImageServicePort
 
@@ -19,14 +19,13 @@ class PeopleLibraryService:
     queries and formats Person entities.
     """
 
-    def __init__(self, db_session: Session, user_id: Optional[int] = None, library_port: Optional[LibraryPort] = None, image_service: Optional[ImageServicePort] = None):
+    def __init__(self, db_session: Session, library_port: LibraryPort, user_id: Optional[int] = None, image_service: Optional[ImageServicePort] = None):
         self.db = db_session
         if user_id is None:
             user_id = get_current_user_id()
         self.user_id = user_id
         if library_port is None:
-            from app.infrastructure.media.db_media_resolver import DbMediaResolver
-            library_port = DbMediaResolver(db_session)
+            raise ValueError("library_port is required")
         self.library_port = library_port
         if image_service is None:
             from app.domains.media_assets.services.images import image_processing_service

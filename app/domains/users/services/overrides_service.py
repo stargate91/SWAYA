@@ -3,7 +3,7 @@ from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 
 from app.domains.users.models import UserOverride
-from app.application.users.schemas import (
+from app.domains.users.schemas import (
     ItemOverridesUpdate,
     BulkOverridesUpdate,
     BulkTagsUpdate,
@@ -19,7 +19,7 @@ from app.domains.users.services.overrides.tag_override_service import TagOverrid
 logger = logging.getLogger(__name__)
 
 class OverridesService:
-    def __init__(self, db: Session, resolver: MediaResolverPort, user_id: Optional[int] = None, image_downloader: Optional[ImageDownloadPort] = None):
+    def __init__(self, db: Session, resolver: MediaResolverPort, user_id: Optional[int] = None, image_downloader: Optional[ImageDownloadPort] = None, scrapers: Optional[Any] = None, mainstream_enricher: Optional[Any] = None):
         self.db = db
         self.resolver = resolver
         self.library_port: LibraryPort = resolver  # type: ignore[assignment]
@@ -28,6 +28,8 @@ class OverridesService:
             from app.shared_kernel.user_context import get_current_user_id
             user_id = get_current_user_id()
         self.user_id = user_id
+        self.scrapers = scrapers
+        self.mainstream_enricher = mainstream_enricher
 
         self.title_lock_service = TitleLockService(self)
         self.image_override_service = ImageOverrideService(self)

@@ -30,20 +30,12 @@ class SettingsService:
         settings_port: Optional[SettingsPort] = None
     ):
         self.db = db
-        if library_port is None:
-            from app.infrastructure.media.db_media_resolver import DbMediaResolver
-            library_port = DbMediaResolver(db)
         self.library_port = library_port
         if user_id is None:
             from app.shared_kernel.user_context import get_current_user_id
             user_id = get_current_user_id()
         self.user_id = user_id
-        
-        if settings_port is None:
-            from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
-            self.settings_port = DbSettingsAdapter(db)
-        else:
-            self.settings_port = settings_port
+        self.settings_port = settings_port
 
     def get_settings(self) -> Dict[str, Any]:
         # Auto-detect VLC path

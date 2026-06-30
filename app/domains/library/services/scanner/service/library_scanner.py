@@ -114,7 +114,7 @@ class LibraryScanner:
 
             total_items_to_enrich = []
             from app.domains.library.services.scanner.scanner_manager import ScannerManager
-            scanner = ScannerManager(self.db)
+            scanner = ScannerManager(self.db, settings_port=self.service.settings_port, fs_port=self.service.fs_port)
             
             logger.info("[scan:%s] Libraries selected: %s", scan_mode.value, [lib.root_path for lib in libraries_to_scan])
 

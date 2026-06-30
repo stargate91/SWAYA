@@ -5,10 +5,11 @@ from sqlalchemy.orm import Session
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.shared_kernel.ports.library_port import LibraryPort
 from app.shared_kernel.ports.image_service_port import ImageServicePort
+from app.shared_kernel.ports.image_download_port import ImageDownloadPort
 from app.domains.people.services.filmography_service import FilmographyService
 from app.domains.people.services.detail_reader import PerformerDetailReader
 from app.domains.people.services.asset_manager import PerformerAssetManager
-from app.application.people.schemas import (
+from app.domains.people.schemas import (
     PeopleSearchResponse,
     PersonDetailResponse,
     PersonFilmographyResponse,
@@ -22,14 +23,12 @@ class PeopleDetailService:
         db: Session,
         scrapers: ScraperGatewayPort,
         library_port: Optional[LibraryPort] = None,
-        image_service: Optional[ImageServicePort] = None
+        image_service: Optional[ImageServicePort] = None,
+        image_downloader: Optional[ImageDownloadPort] = None
     ):
         self.db = db
         self.scrapers = scrapers
         
-        if library_port is None:
-            from app.infrastructure.media.db_media_resolver import DbMediaResolver
-            library_port = DbMediaResolver(db)
         self.library_port = library_port
         
         if image_service is None:
@@ -37,7 +36,7 @@ class PeopleDetailService:
             image_service = image_processing_service
         self.image_service = image_service
         
-        self.filmography_service = FilmographyService(db, library_port=library_port, image_service=image_service)
+        self.filmography_service = FilmographyService(db, library_port=library_port, image_service=image_service, scrapers=scrapers)
         
         self.reader = PerformerDetailReader(
             db=db,
@@ -50,7 +49,8 @@ class PeopleDetailService:
         self.asset_manager = PerformerAssetManager(
             db=db,
             library_port=library_port,
-            image_service=image_service
+            image_service=image_service,
+            image_downloader=image_downloader
         )
 
     def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:

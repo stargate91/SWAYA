@@ -6,6 +6,8 @@ from typing import List, Optional, Dict, Any
 from app.domains.history.models import ActionBatch
 from app.domains.library.services.scanner.service.status_coordinator import StatusCoordinator
 
+import os
+from app.domains.library.services.renamer_engine import RenamerEngine
 logger = logging.getLogger(__name__)
 
 class RenamerRunner:
@@ -26,6 +28,18 @@ class RenamerRunner:
     @property
     def library_port(self):
         return self.service.library_port
+
+    @property
+    def formatter_factory(self):
+        return self.service.formatter_factory
+
+    @property
+    def move_with_progress_fn(self):
+        return self.service.move_with_progress_fn
+
+    @property
+    def send_to_trash_fn(self):
+        return self.service.send_to_trash_fn
 
     def start_rename(self, item_ids: Optional[List[int]] = None) -> Dict[str, Any]:
         with StatusCoordinator.scan_status_lock:
@@ -69,12 +83,14 @@ class RenamerRunner:
                 "current_file_progress": 0.0,
             })
 
-        from app.domains.library.services.renamer_engine import RenamerEngine
-        from app.infrastructure.settings.formatter_config_adapter import build_formatter_from_db
-        import os
-
-        engine = RenamerEngine(self.db)
-        formatter = build_formatter_from_db(self.db)
+        formatter = self.formatter_factory(self.db) if self.formatter_factory else None
+        engine = RenamerEngine(
+            self.db,
+            library_port=self.library_port,
+            formatter=formatter,
+            move_with_progress_fn=self.move_with_progress_fn,
+            send_to_trash_fn=self.send_to_trash_fn
+        )
 
         previews = []
         for item in items:
@@ -156,8 +172,12 @@ class RenamerRunner:
                 "stop_requested": False,
             })
             
-        from app.domains.library.services.renamer_engine import RenamerEngine
-        engine = RenamerEngine(self.db)
+        engine = RenamerEngine(
+            self.db,
+            library_port=self.library_port,
+            move_with_progress_fn=self.move_with_progress_fn,
+            send_to_trash_fn=self.send_to_trash_fn
+        )
         
         def progress_cb(current, total):
             with StatusCoordinator.scan_status_lock:

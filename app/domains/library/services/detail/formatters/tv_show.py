@@ -22,9 +22,10 @@ class TvShowFormatter(DetailFormatter):
         tmdb_scraper: Any,
         seasons_limit: int = 999,
         initial_episodes_limit: int = 999,
-        language: str = None
+        language: str = None,
+        omdb_scraper: Optional[Any] = None
     ):
-        from app.application.library.schemas import TvShowDetailResponse
+        from app.domains.library.schemas import TvShowDetailResponse
         try:
             tv_tmdb_id_int = int(tv_tmdb_id.split("_")[1]) if "_" in tv_tmdb_id else int(tv_tmdb_id)
         except (ValueError, IndexError):
@@ -410,10 +411,9 @@ class TvShowFormatter(DetailFormatter):
             if imdb_id and not series_match.imdb_id:
                 series_match.imdb_id = imdb_id
                 db_updated = True
-            if series_match.imdb_id and not series_match.rating_imdb:
+            if series_match.imdb_id and not series_match.rating_imdb and omdb_scraper:
                 try:
-                    from app.infrastructure.scrapers.providers.omdb import OMDBScraper
-                    omdb = OMDBScraper(db)
+                    omdb = omdb_scraper
                     omdb_data = omdb.fetch_omdb(series_match.imdb_id)
                     if omdb_data:
                         omdb.update_omdb_ratings(series_match, omdb_data)

@@ -7,13 +7,16 @@ from sqlalchemy.orm import Session, joinedload
 from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch
 from app.shared_kernel.enums import ItemStatus, MediaType
-from app.application.library.schemas import LibraryStatsResponse
+from app.domains.library.schemas import LibraryStatsResponse
 
 logger = logging.getLogger(__name__)
 
+from app.shared_kernel.ports.settings_port import SettingsPort
+
 class LibraryStatsService:
-    def __init__(self, db_session: Session):
+    def __init__(self, db_session: Session, settings_port: Optional[SettingsPort] = None):
         self.db = db_session
+        self.settings = settings_port
 
     def _format_size(self, size_bytes: int) -> str:
         if size_bytes >= 1024 ** 4:
@@ -82,8 +85,7 @@ class LibraryStatsService:
             episodes_query = episodes_query.filter(MetadataMatch.is_adult == False)
         total_episodes = episodes_query.scalar() or 0
 
-        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
-        settings_adapter = DbSettingsAdapter(self.db)
+        settings_adapter = self.settings
         # Mock user context if needed, or fallback to system settings
         try:
             import app.shared_kernel.user_context

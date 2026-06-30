@@ -8,7 +8,8 @@ logger = logging.getLogger(__name__)
 from app.shared_kernel.database import get_db
 from app.infrastructure.scrapers.support.gateway import scraper_gateway
 from app.domains.people.models import Person
-from app.domains.people.services.people_status_service import PeopleStatusService
+from app.domains.people.services.people_status_service import PeopleStatusService, _enrichment_queue
+_enrichment_queue.configure(scraper_gateway)
 from app.application.people.schemas import (
     PersonRead,
     PeopleSearchResponse,
@@ -20,6 +21,21 @@ from app.application.people.schemas import (
     PersonUnlinkPayload,
 )
 from app.application.users.schemas import ImageOverrideUpdate
+
+def _people_status_service(db: Session, scrapers=None) -> PeopleStatusService:
+    from app.infrastructure.media.db_media_resolver import DbMediaResolver
+    return PeopleStatusService(db, scrapers=scrapers, library_port=DbMediaResolver(db))
+
+def _people_detail_service(db: Session, scrapers=None) -> PeopleDetailService:
+    from app.infrastructure.media.db_media_resolver import DbMediaResolver
+    from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+    from app.domains.people.services.people_detail_service import PeopleDetailService
+    return PeopleDetailService(
+        db,
+        scrapers or scraper_gateway,
+        library_port=DbMediaResolver(db),
+        image_downloader=TasksImageDownloadAdapter()
+    )
 
 # Mainstream (SFW) People Router
 mainstream_router = APIRouter(prefix="/api/v1/mainstream/people", tags=["Mainstream People"])
@@ -35,14 +51,14 @@ router = APIRouter(prefix="/api/v1/people", tags=["General People"])
 @mainstream_router.get("", response_model=List[PersonRead])
 def list_mainstream_people(db: Session = Depends(get_db), limit: int = 50):
     """Retrieve mainstream cast/crew (SFW)."""
-    return PeopleStatusService(db).list_people_by_type(is_adult=False, limit=limit)
+    return _people_status_service(db).list_people_by_type(is_adult=False, limit=limit)
 
 
 # --- Adult Router Endpoints ---
 @adult_router.get("", response_model=List[PersonRead])
 def list_adult_people(db: Session = Depends(get_db), limit: int = 50):
     """Retrieve adult performers (NSFW)."""
-    return PeopleStatusService(db).list_people_by_type(is_adult=True, limit=limit)
+    return _people_status_service(db).list_people_by_type(is_adult=True, limit=limit)
 
 
 # --- General Router Endpoints ---
@@ -76,7 +92,7 @@ def get_people(
     limit: int = 20,
     db: Session = Depends(get_db)
 ):
-    return PeopleDetailService(db, scraper_gateway).get_people(
+    return _people_detail_service(db).get_people(
         search=search, role=role, sort_by=sort_by, include_inactive=include_inactive,
         adult_only=adult_only, gender=gender, offset=offset, limit=limit
     )
@@ -87,7 +103,7 @@ def add_person_tmdb(
     payload: PersonAddTmdb,
     db: Session = Depends(get_db)
 ):
-    return PeopleDetailService(db, scraper_gateway).add_person_tmdb(
+    return _people_detail_service(db).add_person_tmdb(
         db_id_or_external=payload.tmdb_id,
         name=payload.name,
         profile_path=payload.profile_path,
@@ -107,14 +123,14 @@ def search_people_tmdb(
     source: str = "all",
     db: Session = Depends(get_db)
 ):
-    return PeopleDetailService(db, scraper_gateway).search_people_tmdb(
+    return _people_detail_service(db).search_people_tmdb(
         query=query, language=language, adult_only=adult_only, page=page, source=source
     )
 
 
 @router.get("/{person_id}", response_model=PersonDetailResponse)
 def get_person_detail(person_id: str, db: Session = Depends(get_db)):
-    return PeopleDetailService(db, scraper_gateway).get_person_detail(person_id)
+    return _people_detail_service(db).get_person_detail(person_id)
 
 
 @router.get("/{person_id}/movies", response_model=PersonFilmographyResponse)
@@ -126,7 +142,7 @@ def get_person_movies(
     local_only: bool = Query(default=False),
     db: Session = Depends(get_db)
 ):
-    return PeopleDetailService(db, scraper_gateway).get_person_movies(person_id, page=page, page_size=page_size, source=source, local_only=local_only)
+    return _people_detail_service(db).get_person_movies(person_id, page=page, page_size=page_size, source=source, local_only=local_only)
 
 
 @router.get("/{person_id}/tv", response_model=PersonFilmographyResponse)
@@ -137,7 +153,7 @@ def get_person_tv(
     local_only: bool = Query(default=False),
     db: Session = Depends(get_db)
 ):
-    return PeopleDetailService(db, scraper_gateway).get_person_tv(person_id, page=page, page_size=page_size, local_only=local_only)
+    return _people_detail_service(db).get_person_tv(person_id, page=page, page_size=page_size, local_only=local_only)
 
 
 @router.get("/{person_id}/scenes", response_model=PersonFilmographyResponse)
@@ -149,11 +165,11 @@ def get_person_scenes(
     local_only: bool = Query(default=False),
     db: Session = Depends(get_db)
 ):
-    return PeopleDetailService(db, scraper_gateway).get_person_scenes(person_id, page=page, page_size=page_size, source=source, local_only=local_only)
+    return _people_detail_service(db).get_person_scenes(person_id, page=page, page_size=page_size, source=source, local_only=local_only)
 
 
 def resolve_person(person_id: Any, db: Session):
-    return PeopleStatusService(db).resolve_person(person_id)
+    return _people_status_service(db).resolve_person(person_id)
 
 
 @router.post("/{person_id}/status")
@@ -162,7 +178,7 @@ def update_person_status(
     payload: PersonStatusUpdate,
     db: Session = Depends(get_db)
 ):
-    return PeopleStatusService(db, scraper_gateway).update_person_status(
+    return _people_status_service(db, scraper_gateway).update_person_status(
         person_id=person_id,
         payload_data=payload.model_dump(),
         fields_set=payload.model_fields_set,
@@ -176,7 +192,7 @@ def get_person_credit_backdrops(
     media_type: str = Query(...),
     db: Session = Depends(get_db)
 ):
-    return PeopleDetailService(db, scraper_gateway).get_person_credit_backdrops(
+    return _people_detail_service(db).get_person_credit_backdrops(
         person_id, tmdb_id=tmdb_id, media_type=media_type
     )
 
@@ -193,7 +209,7 @@ def update_person_backdrop(
     path = payload.path or payload.url or payload.backdrop_path
     if not path:
         raise HTTPException(status_code=400, detail="Backdrop path/url is required")
-    return PeopleDetailService(db, scraper_gateway).update_person_backdrop(person.id, path)
+    return _people_detail_service(db).update_person_backdrop(person.id, path)
 
 
 @router.post("/{person_id}/upload-backdrop")
@@ -205,7 +221,7 @@ def upload_person_backdrop(
     person = resolve_person(person_id, db)
     if not person:
         raise HTTPException(status_code=404, detail="Person not found")
-    return PeopleDetailService(db, scraper_gateway).handle_person_backdrop_upload(
+    return _people_detail_service(db).handle_person_backdrop_upload(
         person.id, file.filename, file.file
     )
 
@@ -222,7 +238,7 @@ def update_person_profile(
     path = payload.path or payload.url or payload.profile_path or payload.poster_path or payload.backdrop_path or payload.logo_path
     if not path:
         raise HTTPException(status_code=400, detail="Profile path/url is required")
-    return PeopleDetailService(db, scraper_gateway).update_person_profile(person.id, path)
+    return _people_detail_service(db).update_person_profile(person.id, path)
 
 
 @router.post("/{person_id}/upload-profile")
@@ -234,7 +250,7 @@ def upload_person_profile(
     person = resolve_person(person_id, db)
     if not person:
         raise HTTPException(status_code=404, detail="Person not found")
-    return PeopleDetailService(db, scraper_gateway).handle_person_profile_upload(
+    return _people_detail_service(db).handle_person_profile_upload(
         person.id, file.filename, file.file
     )
 

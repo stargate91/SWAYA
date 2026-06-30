@@ -39,9 +39,10 @@ class BaseScanPipeline:
         min_duration_minutes: float,
         progress_callback: Optional[Callable],
         provider: Optional[str] = None,
+        fs_port: Optional[FileSystemPort] = None,
+        settings_port: Optional[Any] = None,
     ) -> ScanCollector:
         collector = Collector(min_size_mb)
-        from app.infrastructure.filesystem.fs_utils import DbFileSystemAdapter
         return ScanCollector(
             db=db,
             library=library,
@@ -53,7 +54,8 @@ class BaseScanPipeline:
             min_video_duration_minutes=min_duration_minutes,
             progress_callback=progress_callback,
             provider=provider,
-            fs=DbFileSystemAdapter(),
+            fs=fs_port,
+            settings_port=settings_port,
         )
 
 

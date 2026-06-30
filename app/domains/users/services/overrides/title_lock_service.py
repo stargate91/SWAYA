@@ -5,7 +5,7 @@ from sqlalchemy import func
 
 from app.domains.users.models import UserOverride, Tag
 from app.domains.metadata.models import MetadataMatch
-from app.application.users.schemas import (
+from app.domains.users.schemas import (
     ItemOverridesUpdate,
     BulkOverridesUpdate,
     BulkWatchedUpdate,
@@ -29,6 +29,14 @@ class TitleLockService:
     @property
     def library_port(self):
         return self.service.library_port
+
+    @property
+    def scrapers(self):
+        return self.service.scrapers
+
+    @property
+    def mainstream_enricher(self):
+        return self.service.mainstream_enricher
 
     def update_item_overrides(self, request: ItemOverridesUpdate) -> Dict[str, Any]:
         item_id = request.item_id
@@ -317,30 +325,30 @@ class TitleLockService:
                     m_type = match.media_type
                     media_type = m_type.value if hasattr(m_type, "value") else str(m_type)
             
-            from app.infrastructure.scrapers.support.gateway import scraper_gateway
-            if media_type == 'scene':
-                from app.domains.library.services.detail.scene_detail_service import SceneDetailService
-                try:
-                    SceneDetailService(self.db, scraper_gateway).get_scene_detail(item_id)
-                except Exception as e:
-                    logger.error(f"Auto-enrich failed for scene {item_id}: {e}")
-            elif media_type == 'tv':
-                from app.domains.library.services.detail.tv_detail_service import TvDetailService
-                try:
-                    TvDetailService(self.db, scraper_gateway).get_library_tv_detail(item_id)
-                except Exception as e:
-                    logger.error(f"Auto-enrich failed for tv {item_id}: {e}")
-            elif media_type == 'movie':
-                from app.domains.library.services.detail.movie_detail_service import MovieDetailService
-                try:
-                    MovieDetailService(self.db, scraper_gateway).get_library_item_detail(item_id)
-                except Exception as e:
-                    logger.error(f"Auto-enrich failed for movie {item_id}: {e}")
+            scraper_gateway = self.scrapers
+            if scraper_gateway:
+                if media_type == 'scene':
+                    from app.domains.library.services.detail.scene_detail_service import SceneDetailService
+                    try:
+                        SceneDetailService(self.db, scraper_gateway).get_scene_detail(item_id)
+                    except Exception as e:
+                        logger.error(f"Auto-enrich failed for scene {item_id}: {e}")
+                elif media_type == 'tv':
+                    from app.domains.library.services.detail.tv_detail_service import TvDetailService
+                    try:
+                        TvDetailService(self.db, scraper_gateway).get_library_tv_detail(item_id)
+                    except Exception as e:
+                        logger.error(f"Auto-enrich failed for tv {item_id}: {e}")
+                elif media_type == 'movie':
+                    from app.domains.library.services.detail.movie_detail_service import MovieDetailService
+                    try:
+                        MovieDetailService(self.db, scraper_gateway).get_library_item_detail(item_id)
+                    except Exception as e:
+                        logger.error(f"Auto-enrich failed for movie {item_id}: {e}")
 
-            if match and not match.is_adult:
+            if match and not match.is_adult and self.mainstream_enricher:
                 try:
-                    from app.infrastructure.scrapers.enrichment.mainstream_enricher import MainstreamEnricher
-                    MainstreamEnricher(self.db).enrich_match(match, commit=True)
+                    self.mainstream_enricher(self.db).enrich_match(match, commit=True)
                 except Exception as e:
                     logger.error(f"Mainstream auto-enrich failed for tracked match {match_id}: {e}")
 

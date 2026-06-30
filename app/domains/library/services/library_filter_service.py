@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.domains.metadata.models import MetadataMatch, MetadataLocalization
 from app.domains.users.models import Tag
-from app.application.library.schemas import FilterOptionsResponse, TagGroupItem
+from app.domains.library.schemas import FilterOptionsResponse, TagGroupItem
 
 logger = logging.getLogger(__name__)
 

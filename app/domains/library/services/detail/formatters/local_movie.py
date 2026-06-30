@@ -11,7 +11,7 @@ from app.domains.users.models import UserOverride
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.shared_kernel.language import LanguageService
 from app.shared_kernel.genre_utils import split_genres as _split_genres
-from app.application.library.schemas import MovieDetailResponse
+from app.domains.library.schemas import MovieDetailResponse
 from app.domains.library.services.detail.formatters.base import MovieDetailFormatter
 
 logger = logging.getLogger(__name__)

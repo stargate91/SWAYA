@@ -15,6 +15,10 @@ class InfrastructureScraperGateway(ScraperGatewayPort):
     def tmdb(self, db_session: Any) -> TMDBScraper:
         return TMDBScraper(db_session)
 
+    def omdb(self, db_session: Any) -> Any:
+        from app.infrastructure.scrapers.providers.omdb import OMDBScraper
+        return OMDBScraper(db_session)
+
     def adult(self, provider: Provider, db_session: Any) -> Any:
         scrapers = {
             Provider.STASHDB: StashDBScraper,
@@ -42,6 +46,9 @@ class InfrastructureScraperGateway(ScraperGatewayPort):
 
     def normalize_adult_scene(self, provider: Provider, raw_data: dict) -> dict:
         return ScraperNormalizer.normalize_adult_scene(provider.value, raw_data)
+
+    def normalize_porndb_movie(self, raw_data: dict) -> dict:
+        return ScraperNormalizer.normalize_porndb_movie(raw_data)
 
     def persist_adult_scene(
         self,

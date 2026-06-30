@@ -4,7 +4,7 @@ from typing import Dict, Any
 from app.shared_kernel.enums import Provider, MediaType, ItemStatus
 from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch
-from app.application.metadata.schemas import MetadataResolveRequest, BulkResolveRequest
+from app.domains.metadata.schemas import MetadataResolveRequest, BulkResolveRequest
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 
 logger = logging.getLogger(__name__)
@@ -92,8 +92,7 @@ class MetadataResolver:
                     from app.shared_kernel.exceptions import BadRequestException
                     raise BadRequestException(f"Failed to fetch movie details from {provider.value}")
 
-                from app.infrastructure.scrapers.support.normalizer import ScraperNormalizer
-                normalized = ScraperNormalizer.normalize_porndb_movie(movie_data)
+                normalized = self.scrapers.normalize_porndb_movie(movie_data)
                 match = self.scrapers.persist_adult_scene(
                     db, provider, str(movie_data["id"]), normalized, media_type=MediaType.MOVIE, media_item_id=item.id
                 )

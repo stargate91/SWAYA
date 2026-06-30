@@ -86,12 +86,21 @@ from typing import Union
 
 @library_router.get("/library/stats", response_model=LibraryStatsResponse)
 def get_stats(db: Session = Depends(get_db), include_adult: bool = False):
-    return LibraryStatsService(db).get_stats(include_adult=include_adult)
+    from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+    return LibraryStatsService(db, settings_port=DbSettingsAdapter(db)).get_stats(include_adult=include_adult)
 
 
 @library_router.get("/library/continue-watching", response_model=List[ContinueWatchingItem])
 def get_continue_watching(db: Session = Depends(get_db), limit: int = 12, include_adult: bool = False):
-    return LibraryListingService(db).get_continue_watching(limit=limit, include_adult=include_adult)
+    from app.infrastructure.media.db_media_resolver import DbMediaResolver
+    from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+    from app.infrastructure.playback.playback_monitor import active_sessions
+    return LibraryListingService(
+        db,
+        library_port=DbMediaResolver(db),
+        settings_port=DbSettingsAdapter(db),
+        active_sessions=active_sessions
+    ).get_continue_watching(limit=limit, include_adult=include_adult)
 
 
 @library_router.get("/library", response_model=Union[LibraryTabResponse, GroupedLibraryResponse])
@@ -114,7 +123,9 @@ def get_library_items(
     people_role: str = "all",
     include_adult: bool = False,
 ):
-    service = LibraryListingService(db)
+    from app.infrastructure.media.db_media_resolver import DbMediaResolver
+    from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+    service = LibraryListingService(db, library_port=DbMediaResolver(db), settings_port=DbSettingsAdapter(db))
     if tab:
         tags_list = None
         if selected_tags:
@@ -165,7 +176,14 @@ def get_movie_collections(
     tab: str = "movies",
     include_adult: bool = False,
 ):
-    return LibraryCollectionService(db, image_downloader=TasksImageDownloadAdapter()).get_movie_collections(
+    from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+    from app.infrastructure.scrapers.providers.tmdb import TMDBScraper
+    return LibraryCollectionService(
+        db,
+        settings_port=DbSettingsAdapter(db),
+        image_downloader=TasksImageDownloadAdapter(),
+        tmdb_scraper=TMDBScraper(db)
+    ).get_movie_collections(
         page=page,
         page_size=page_size,
         search=search,
@@ -185,7 +203,8 @@ def get_library_people(
     tab: str = "people",
     include_adult: bool = False,
 ):
-    return PeopleLibraryService(db).get_people_group(
+    from app.infrastructure.media.db_media_resolver import DbMediaResolver
+    return PeopleLibraryService(db, library_port=DbMediaResolver(db)).get_people_group(
         role=role,
         filter_status=filter_status,
         tab=tab,

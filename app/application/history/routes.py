@@ -48,7 +48,16 @@ async def run_undo_coroutine(task_id: int, batch_id: int):
     logger = logging.getLogger(__name__)
     db = SessionLocal()
     try:
-        engine = RenamerEngine(db)
+        from app.infrastructure.media.db_media_resolver import DbMediaResolver
+        from app.infrastructure.filesystem.fs_utils import move_with_progress, send_to_trash
+        from app.infrastructure.settings.formatter_config_adapter import build_formatter_from_db
+        engine = RenamerEngine(
+            db,
+            library_port=DbMediaResolver(db),
+            formatter=build_formatter_from_db(db),
+            move_with_progress_fn=move_with_progress,
+            send_to_trash_fn=send_to_trash
+        )
         
         def progress_cb(current, total):
             progress = (current / total) * 100.0 if total > 0 else 100.0

@@ -9,6 +9,22 @@ from app.domains.library.services.scanner_service import ScannerService
 
 router = APIRouter(prefix="/api/v1", tags=["Media Operations"])
 
+def _scanner_service(db: Session, scan_resolver_factory=None) -> ScannerService:
+    from app.infrastructure.media.db_media_resolver import DbMediaResolver
+    from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+    from app.infrastructure.filesystem.fs_utils import DbFileSystemAdapter, move_with_progress, send_to_trash
+    from app.infrastructure.settings.formatter_config_adapter import build_formatter_from_db
+    return ScannerService(
+        db,
+        scan_resolver_factory=scan_resolver_factory,
+        library_port=DbMediaResolver(db),
+        settings_port=DbSettingsAdapter(db),
+        fs_port=DbFileSystemAdapter(),
+        formatter_factory=build_formatter_from_db,
+        move_with_progress_fn=move_with_progress,
+        send_to_trash_fn=send_to_trash
+    )
+
 class ScanRequest(BaseModel):
     paths: List[str]
     stop_after: Optional[str] = None
@@ -26,24 +42,24 @@ class RetryRequest(BaseModel):
 
 @router.get("/scan-status")
 def get_scan_status(db: Session = Depends(get_db)):
-    return ScannerService(db).get_scan_status()
+    return _scanner_service(db).get_scan_status()
 
 @router.get("/hydrate-status")
 def get_hydrate_status(db: Session = Depends(get_db)):
-    return ScannerService(db).get_hydrate_status()
+    return _scanner_service(db).get_hydrate_status()
 
 @router.get("/image-status")
 def get_image_status(db: Session = Depends(get_db)):
-    return ScannerService(db).get_image_status()
+    return _scanner_service(db).get_image_status()
 
 @router.post("/reset-image-status")
 def reset_image_status(db: Session = Depends(get_db)):
-    return ScannerService(db).reset_image_status()
+    return _scanner_service(db).reset_image_status()
 
 @router.post("/scan")
 def start_scan(request: ScanRequest, db: Session = Depends(get_db)):
     from app.infrastructure.scrapers.scan_resolver import ScanResolver
-    return ScannerService(db, scan_resolver_factory=ScanResolver).start_scan(
+    return _scanner_service(db, scan_resolver_factory=ScanResolver).start_scan(
         request.paths,
         request.stop_after,
         request.mode,
@@ -54,7 +70,7 @@ def start_scan(request: ScanRequest, db: Session = Depends(get_db)):
 @router.post("/scan/retry")
 def start_retry(request: RetryRequest, db: Session = Depends(get_db)):
     from app.infrastructure.scrapers.scan_resolver import ScanResolver
-    return ScannerService(db, scan_resolver_factory=ScanResolver).start_retry(
+    return _scanner_service(db, scan_resolver_factory=ScanResolver).start_retry(
         request.mode,
         request.include_adult,
         request.provider,
@@ -62,12 +78,12 @@ def start_retry(request: RetryRequest, db: Session = Depends(get_db)):
 
 @router.post("/task/stop")
 def stop_active_task(db: Session = Depends(get_db)):
-    return ScannerService(db).stop_active_task()
+    return _scanner_service(db).stop_active_task()
 
 @router.post("/rename/start")
 def start_rename(request: Optional[RenameRequest] = None, db: Session = Depends(get_db)):
     item_ids = request.item_ids if request else None
-    return ScannerService(db).start_rename(item_ids)
+    return _scanner_service(db).start_rename(item_ids)
 
 from app.application.history.schemas import HistoryResponse
 
@@ -78,7 +94,7 @@ def get_history(page: int = 1, limit: int = 20, db: Session = Depends(get_db)):
 
 @router.post("/rename/undo/{batch_id}")
 def undo_rename(batch_id: int, db: Session = Depends(get_db)):
-    return ScannerService(db).start_undo(batch_id)
+    return _scanner_service(db).start_undo(batch_id)
 
 
 @router.get("/media/image-proxy")

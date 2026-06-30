@@ -12,7 +12,7 @@ from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.shared_kernel.user_context import get_current_user_id
 from app.shared_kernel.ports.library_port import LibraryPort
 from app.domains.people.services.filmography_service import FilmographyService
-from app.application.people.schemas import (
+from app.domains.people.schemas import (
     PeopleSearchResponse,
     PersonDetailResponse,
     PersonFilmographyResponse,

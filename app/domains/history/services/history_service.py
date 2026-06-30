@@ -7,7 +7,7 @@ from app.domains.history.models import ActionBatch, ActionLog
 from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch
 from app.shared_kernel.enums import ActionStatus, MediaType
-from app.application.history.schemas import HistoryResponse
+from app.domains.history.schemas import HistoryResponse
 
 logger = logging.getLogger(__name__)
 

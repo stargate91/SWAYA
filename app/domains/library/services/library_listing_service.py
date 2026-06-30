@@ -11,7 +11,7 @@ from app.domains.people.models import MediaPersonLink
 from app.domains.people.services.people_library_service import PeopleLibraryService
 from app.shared_kernel.enums import ItemStatus, MediaType, Provider
 from app.shared_kernel.user_context import get_current_user_id
-from app.application.library.schemas import (
+from app.domains.library.schemas import (
     ContinueWatchingItem,
     LibraryTabResponse,
     GroupedLibraryResponse,
@@ -26,9 +26,16 @@ from app.domains.library.services.listing.query_builders import (
 
 logger = logging.getLogger(__name__)
 
+from app.shared_kernel.ports.library_port import LibraryPort
+
+from app.shared_kernel.ports.settings_port import SettingsPort
+
 class LibraryListingService:
-    def __init__(self, db_session: Session):
+    def __init__(self, db_session: Session, library_port: Optional[LibraryPort] = None, settings_port: Optional[SettingsPort] = None, active_sessions: Optional[set[int]] = None):
         self.db = db_session
+        self.library_port = library_port
+        self.settings = settings_port
+        self.active_sessions = active_sessions
 
     def get_continue_watching(self, limit: int = 12, include_adult: bool = False) -> List[ContinueWatchingItem]:
         """
@@ -79,8 +86,8 @@ class LibraryListingService:
                     tv_loc = tv_match.localizations[0] if tv_match.localizations else None
                     tv_title = (tv_override.custom_title if (tv_override and tv_override.custom_title) else None) or (tv_loc.title if tv_loc else None)
                     tv_tmdb_id = int(tv_match.external_id) if tv_match.external_id.isdigit() else None
-            from app.infrastructure.playback.playback_monitor import active_sessions
-            is_active = item.id in active_sessions if item else False
+            active_set = self.active_sessions or set()
+            is_active = item.id in active_set if item else False
 
             def get_first_int(val):
                 if val is None:
@@ -162,7 +169,7 @@ class LibraryListingService:
         ).count()
         
         # People count
-        people_service = PeopleLibraryService(self.db)
+        people_service = PeopleLibraryService(self.db, library_port=self.library_port)
         people_items = people_service.get_people_group(
             role="all",
             filter_status="active",
@@ -172,8 +179,7 @@ class LibraryListingService:
         people_count = len(people_items) if people_items else 0
         
         # Collections count
-        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
-        settings = DbSettingsAdapter(self.db)
+        settings = self.settings
         collection_mode = settings.get_setting("folder_collection_mode")
         threshold = settings.get_setting("folder_collection_threshold")
         create_collection_dir = settings.get_setting("folder_create_collection_dir")
@@ -263,7 +269,7 @@ class LibraryListingService:
         )
 
         if tab in ("people", "adult_people"):
-            builder = PeopleQueryBuilder(self.db)
+            builder = PeopleQueryBuilder(self.db, library_port=self.library_port)
             total_items, formatted_items = builder.query_people(params)
         else:
             if tab in ("tv", "adult_tv"):

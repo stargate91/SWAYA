@@ -21,7 +21,7 @@ class MovieDetailService(DetailFormatter):
         self.local_formatter = LocalMovieFormatter()
 
     def get_library_item_detail(self, item_id: str, full_people: bool = False):
-        from app.application.library.schemas import MovieDetailResponse
+        from app.domains.library.schemas import MovieDetailResponse
         from app.shared_kernel.user_context import get_current_user_id
         current_uid = get_current_user_id()
 

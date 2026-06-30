@@ -19,11 +19,14 @@ def fnv1a_hash(s: str) -> str:
         hash_val = (hash_val * 16777619) & 0xffffffff
     return f"{hash_val:08x}"
 
+from app.shared_kernel.ports.image_download_port import ImageDownloadPort
+
 class PerformerAssetManager:
-    def __init__(self, db: Session, library_port: LibraryPort, image_service: ImageServicePort):
+    def __init__(self, db: Session, library_port: LibraryPort, image_service: ImageServicePort, image_downloader: ImageDownloadPort):
         self.db = db
         self.library_port = library_port
         self.image_service = image_service
+        self.image_downloader = image_downloader
 
     def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
         return self.image_service.resolve_image_url(path, subfolder, size)
@@ -54,8 +57,7 @@ class PerformerAssetManager:
 
         if backdrop_path and (backdrop_path.startswith("/") or backdrop_path.startswith(("http://", "https://"))):
             try:
-                from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
-                downloader = TasksImageDownloadAdapter()
+                downloader = self.image_downloader
                 url = downloader.get_download_url(backdrop_path, "backdrops")
                 if url:
                     import re
@@ -166,8 +168,7 @@ class PerformerAssetManager:
 
         if profile_path and (profile_path.startswith("/") or profile_path.startswith(("http://", "https://"))):
             try:
-                from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
-                downloader = TasksImageDownloadAdapter()
+                downloader = self.image_downloader
                 url = downloader.get_download_url(profile_path, "people")
                 if url:
                     import re

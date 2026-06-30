@@ -6,9 +6,7 @@ from typing import List, Optional, Dict, Any
 from sqlalchemy.orm import Session
 
 from app.shared_kernel.enums import ActionType, ActionStatus, ItemStatus, MediaType
-from app.infrastructure.settings.formatter_config_adapter import build_formatter_from_db
 from app.domains.library.services.formatter.models import RenamePreview
-from app.infrastructure.filesystem.fs_utils import move_with_progress, send_to_trash
 from app.shared_kernel.ports.library_port import LibraryPort
 
 logger = logging.getLogger(__name__)
@@ -19,14 +17,19 @@ class RenamerEngine:
     maintaining consistency between the filesystem and the database.
     """
 
-    def __init__(self, db_session: Session, library_port: Optional[LibraryPort] = None):
+    def __init__(
+        self,
+        db_session: Session,
+        library_port: Optional[LibraryPort] = None,
+        formatter: Optional[Any] = None,
+        move_with_progress_fn: Optional[Any] = None,
+        send_to_trash_fn: Optional[Any] = None,
+    ):
         self.db = db_session
-        self.formatter = build_formatter_from_db(db_session)
-        if library_port is None:
-            from app.infrastructure.media.db_media_resolver import DbMediaResolver
-            self.library_port = DbMediaResolver(db_session)
-        else:
-            self.library_port = library_port
+        self.formatter = formatter
+        self.library_port = library_port
+        self.move_with_progress_fn = move_with_progress_fn
+        self.send_to_trash_fn = send_to_trash_fn
 
     def execute_batch(self, previews: List[RenamePreview], batch_name: Optional[str] = None) -> int:
         """
@@ -110,7 +113,10 @@ class RenamerEngine:
                         raise FileExistsError(f"File exists at extra target: {e_target}")
 
             target_path.parent.mkdir(parents=True, exist_ok=True)
-            move_with_progress(str(old_path), str(target_path), progress_callback)
+            if self.move_with_progress_fn:
+                self.move_with_progress_fn(str(old_path), str(target_path), progress_callback)
+            else:
+                shutil.move(str(old_path), str(target_path))
             successful_moves.append((old_path, target_path))
             
             # 3. MOVE OR DELETE EXTRAS
@@ -129,7 +135,10 @@ class RenamerEngine:
 
                 if extra_action == "delete":
                     # Delete
-                    send_to_trash([e_old])
+                    if self.send_to_trash_fn:
+                        self.send_to_trash_fn([e_old])
+                    else:
+                        os.remove(e_old)
                     successful_moves.append((e_old, None)) # None indicates it was deleted
                 else:
                     # Move

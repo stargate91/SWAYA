@@ -28,8 +28,12 @@ class PersonEnrichmentQueue:
 
     def _init_queue(self):
         self.queue = queue.Queue()
+        self.scrapers = None
         self.worker_thread = threading.Thread(target=self._worker, daemon=True, name="PersonEnrichmentWorker")
         self.worker_thread.start()
+
+    def configure(self, scrapers: Any):
+        self.scrapers = scrapers
 
     def enqueue(self, person_id: int):
         self.queue.put(person_id)
@@ -48,7 +52,6 @@ class PersonEnrichmentQueue:
 
     def _enrich_person(self, person_id: int):
         from app.shared_kernel.database import SessionLocal
-        from app.infrastructure.scrapers.support.gateway import scraper_gateway
         from app.domains.people.services.people_enricher import PeopleEnricher
 
         db = SessionLocal()
@@ -58,7 +61,7 @@ class PersonEnrichmentQueue:
                 return
 
             logger.info(f"Background enriching activated person: {person.name} (ID: {person_id})")
-            enricher = PeopleEnricher(db, scrapers=scraper_gateway)
+            enricher = PeopleEnricher(db, scrapers=self.scrapers)
             
             ext_ids = person.external_ids or {}
             links = db.query(ExternalSourceLink).filter(ExternalSourceLink.person_id == person_id).all()
@@ -106,9 +109,6 @@ class PeopleStatusService:
         self.db = db
         self.scrapers = scrapers
 
-        if library_port is None:
-            from app.infrastructure.media.db_media_resolver import DbMediaResolver
-            library_port = DbMediaResolver(db)
         self.library_port = library_port
 
         if image_service is None:

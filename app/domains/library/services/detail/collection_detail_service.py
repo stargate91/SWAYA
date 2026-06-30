@@ -24,7 +24,7 @@ class CollectionDetailService(DetailFormatter):
         self.image_downloader = image_downloader
 
     def get_collection_detail(self, collection_tmdb_id: str, language: str | None = None) -> CollectionDetailResponse:
-        from app.application.library.schemas import CollectionDetailResponse
+        from app.domains.library.schemas import CollectionDetailResponse
         db = self.db
         try:
             collection_tmdb_id_int = int(collection_tmdb_id)

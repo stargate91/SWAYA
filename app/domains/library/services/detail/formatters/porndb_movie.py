@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 
 from app.shared_kernel.enums import Provider, MediaType
 from app.domains.users.models import UserOverride
-from app.application.library.schemas import MovieDetailResponse
+from app.domains.library.schemas import MovieDetailResponse
 from app.domains.library.services.detail.formatters.base import MovieDetailFormatter
 from app.domains.metadata.models import MetadataMatch
 

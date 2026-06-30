@@ -4,12 +4,13 @@ from sqlalchemy.orm import Session
 from app.shared_kernel.enums import ScanMode, ExtraCategory, ExtraSubtype
 
 class ExtraDeterminer:
-    def __init__(self, categorizer: Any, mode: ScanMode):
+    def __init__(self, categorizer: Any, mode: ScanMode, settings_port: Optional[Any] = None):
         self.categorizer = categorizer
         self.mode = mode
+        self.settings = settings_port
 
     def determine_extra(self, path: Path, db: Session) -> Tuple[Optional[ExtraCategory], Optional[ExtraSubtype]]:
-        category, subtype = self.categorizer.categorize(path, db)
+        category, subtype = self.categorizer.categorize(path, settings_port=self.settings)
         if category is None:
             return None, None
 

@@ -33,18 +33,22 @@ from app.application.users.schemas import (
 router = APIRouter(prefix="/api/v1/users", tags=["Users"])
 
 
+def _user_service(db: Session) -> UserService:
+    from app.infrastructure.media.db_media_resolver import DbMediaResolver
+    return UserService(db, library_port=DbMediaResolver(db))
+
 # --- User Profiles ---
 
 @router.get("", response_model=List[UserRead])
 def list_users(db: Session = Depends(get_db)):
     """Retrieve all users."""
-    return UserService(db).list_users()
+    return _user_service(db).list_users()
 
 
 @router.post("", response_model=UserRead)
 def create_user(user_data: UserCreate, db: Session = Depends(get_db)):
     """Create a new user profile."""
-    return UserService(db).create_user(
+    return _user_service(db).create_user(
         username=user_data.username,
         email=user_data.email,
         password_hash=user_data.password_hash,
@@ -60,13 +64,13 @@ def create_user(user_data: UserCreate, db: Session = Depends(get_db)):
 @router.get("/{user_id}/overrides", response_model=List[UserOverrideRead])
 def list_user_overrides(user_id: int, db: Session = Depends(get_db)):
     """Retrieve all metadata and physical asset overrides for a user."""
-    return UserService(db).list_user_overrides(user_id)
+    return _user_service(db).list_user_overrides(user_id)
 
 
 @router.post("/{user_id}/overrides", response_model=UserOverrideRead)
 def create_user_override(user_id: int, override_data: UserOverrideCreate, db: Session = Depends(get_db)):
     """Create or update a user override for a specific media item, performer, or collection."""
-    return UserService(db).create_or_update_override(user_id, override_data.model_dump())
+    return _user_service(db).create_or_update_override(user_id, override_data.model_dump())
 
 
 
@@ -75,7 +79,7 @@ def create_user_override(user_id: int, override_data: UserOverrideCreate, db: Se
 @router.get("/{user_id}/lists", response_model=List[CustomListRead])
 def list_user_custom_lists(user_id: int, db: Session = Depends(get_db)):
     """Retrieve custom user lists."""
-    return UserService(db).list_user_custom_lists(user_id)
+    return _user_service(db).list_user_custom_lists(user_id)
 
 
 # Compatibility API owned by the Users domain.
@@ -170,13 +174,25 @@ from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDown
 def _img_dl():
     return TasksImageDownloadAdapter()
 
+def _overrides_service(db: Session, image_downloader=None) -> OverridesService:
+    from app.infrastructure.media.db_media_resolver import DbMediaResolver
+    from app.infrastructure.scrapers.support.gateway import scraper_gateway
+    from app.infrastructure.scrapers.enrichment.mainstream_enricher import MainstreamEnricher
+    return OverridesService(
+        db,
+        DbMediaResolver(db),
+        image_downloader=image_downloader,
+        scrapers=scraper_gateway,
+        mainstream_enricher=MainstreamEnricher
+    )
+
 @catalog_router.post("/media/update")
 def update_item_overrides(payload: ItemOverridesUpdate, db: Session = Depends(get_db)):
-    return OverridesService(db, DbMediaResolver(db)).update_item_overrides(payload)
+    return _overrides_service(db).update_item_overrides(payload)
 
 @catalog_router.post("/item/{item_id}/status")
 def update_item_status(item_id: str, payload: ItemStatusUpdate, db: Session = Depends(get_db)):
-    return UserService(db).update_item_status_composite(
+    return _user_service(db).update_item_status_composite(
         item_id=item_id,
         payload_data=payload.model_dump(),
         model_fields_set=payload.model_fields_set,
@@ -188,229 +204,80 @@ def update_item_poster(item_id: str, payload: ImageOverrideUpdate, db: Session =
     path = payload.path or payload.url or payload.poster_path
     if not path:
         raise HTTPException(status_code=400, detail="Image path/url is required")
-    return OverridesService(db, DbMediaResolver(db), image_downloader=_img_dl()).update_item_image(item_id, "poster", path, media_type=payload.media_type)
+    return _overrides_service(db, image_downloader=_img_dl()).update_item_image(item_id, "poster", path, media_type=payload.media_type)
 
 @catalog_router.post("/item/{item_id}/backdrop")
 def update_item_backdrop(item_id: str, payload: ImageOverrideUpdate, db: Session = Depends(get_db)):
     path = payload.path or payload.url or payload.backdrop_path
     if not path:
         raise HTTPException(status_code=400, detail="Image path/url is required")
-    return OverridesService(db, DbMediaResolver(db), image_downloader=_img_dl()).update_item_image(item_id, "backdrop", path, media_type=payload.media_type)
+    return _overrides_service(db, image_downloader=_img_dl()).update_item_image(item_id, "backdrop", path, media_type=payload.media_type)
 
 @catalog_router.post("/item/{item_id}/logo")
 def update_item_logo(item_id: str, payload: ImageOverrideUpdate, db: Session = Depends(get_db)):
     path = payload.path or payload.url or payload.logo_path
     if not path:
         raise HTTPException(status_code=400, detail="Image path/url is required")
-    return OverridesService(db, DbMediaResolver(db), image_downloader=_img_dl()).update_item_image(item_id, "logo", path, media_type=payload.media_type)
+    return _overrides_service(db, image_downloader=_img_dl()).update_item_image(item_id, "logo", path, media_type=payload.media_type)
 
 @catalog_router.post("/item/{item_id}/upload-poster")
 def upload_item_poster(item_id: str, file: UploadFile = File(...), media_type: Optional[str] = Form(None), db: Session = Depends(get_db)):
-    return OverridesService(db, DbMediaResolver(db)).handle_image_upload(item_id, "poster", file.filename, file.file, media_type=media_type)
+    return _overrides_service(db).handle_image_upload(item_id, "poster", file.filename, file.file, media_type=media_type)
 
 @catalog_router.post("/item/{item_id}/upload-backdrop")
 def upload_item_backdrop(item_id: str, file: UploadFile = File(...), media_type: Optional[str] = Form(None), db: Session = Depends(get_db)):
-    return OverridesService(db, DbMediaResolver(db)).handle_image_upload(item_id, "backdrop", file.filename, file.file, media_type=media_type)
+    return _overrides_service(db).handle_image_upload(item_id, "backdrop", file.filename, file.file, media_type=media_type)
 
 @catalog_router.post("/item/{item_id}/upload-logo")
 def upload_item_logo(item_id: str, file: UploadFile = File(...), media_type: Optional[str] = Form(None), db: Session = Depends(get_db)):
-    return OverridesService(db, DbMediaResolver(db)).handle_image_upload(item_id, "logo", file.filename, file.file, media_type=media_type)
+    return _overrides_service(db).handle_image_upload(item_id, "logo", file.filename, file.file, media_type=media_type)
 
 @catalog_router.post("/media/bulk-update")
 def bulk_update(payload: BulkOverridesUpdate, db: Session = Depends(get_db)):
-    return OverridesService(db, DbMediaResolver(db)).bulk_update(payload)
+    return _overrides_service(db).bulk_update(payload)
 
 @catalog_router.post("/media/bulk-tags")
 def bulk_tags(payload: BulkTagsUpdate, db: Session = Depends(get_db)):
-    return OverridesService(db, DbMediaResolver(db)).bulk_tags(payload)
+    return _overrides_service(db).bulk_tags(payload)
 
 @catalog_router.post("/media/bulk-watched")
 def bulk_watched(payload: BulkWatchedUpdate, db: Session = Depends(get_db)):
-    return OverridesService(db, DbMediaResolver(db)).bulk_watched(payload)
+    return _overrides_service(db).bulk_watched(payload)
 
 @catalog_router.post("/library/item/{item_id}/track")
 def track_item(item_id: str, db: Session = Depends(get_db)):
-    return OverridesService(db, DbMediaResolver(db)).track_item(item_id, True)
+    return _overrides_service(db).track_item(item_id, True)
 
 @catalog_router.post("/library/item/{item_id}/untrack")
 def untrack_item(item_id: str, db: Session = Depends(get_db)):
-    return OverridesService(db, DbMediaResolver(db)).track_item(item_id, False)
+    return _overrides_service(db).track_item(item_id, False)
 
 @catalog_router.post("/library/item/{item_id}/peaks")
 def add_item_peak(item_id: str, db: Session = Depends(get_db)):
     from app.shared_kernel.user_context import get_current_user_id
     from app.infrastructure.media.db_media_resolver import DbMediaResolver
-    from app.domains.history.models import PlaybackPeakLog
-    from app.domains.users.models import UserOverride
+    from app.domains.history.services.playback_peak_service import PlaybackPeakService
     
     current_uid = get_current_user_id() or 1
-    resolver = DbMediaResolver(db)
-    media_item_id, metadata_match_id = resolver.resolve_ids(item_id)
-    
-    if not media_item_id:
-        raise HTTPException(status_code=404, detail="Local media item not found")
-        
-    video_position = 0
-    override = None
-    if metadata_match_id:
-        override = db.query(UserOverride).filter(
-            UserOverride.user_id == current_uid,
-            UserOverride.metadata_match_id == metadata_match_id
-        ).first()
-    if not override and media_item_id:
-        override = db.query(UserOverride).filter(
-            UserOverride.user_id == current_uid,
-            UserOverride.media_item_id == media_item_id
-        ).first()
-        
-    player_time = None
-    playing_filename = None
-    playing_filepath = None
+    service = PlaybackPeakService(db, DbMediaResolver(db))
     try:
-        import requests
-        r = requests.get("http://127.0.0.1:8080/requests/status.json", auth=("", "swaya"), timeout=0.1)
-        if r.status_code == 200:
-            data = r.json()
-            player_time = int(data.get("time", 0))
-            meta = data.get("information", {}).get("category", {}).get("meta", {})
-            playing_filename = meta.get("filename") or meta.get("title")
+        return service.add_peak(item_id, current_uid)
     except Exception as e:
-        logger.debug(f"Swallowed exception in application/users/routes.py:270: {e}", exc_info=True)
-
-    if player_time is None:
-        try:
-            import requests
-            import re
-            r = requests.get("http://127.0.0.1:13579/variables.html", timeout=0.1)
-            if r.status_code == 200:
-                pos_match = re.search(r'id="position">(\d+)</p>', r.text)
-                if pos_match:
-                    player_time = int(pos_match.group(1)) // 1000
-                file_match = re.search(r'id="file">([^<]+)</p>', r.text)
-                if file_match:
-                    playing_filename = file_match.group(1)
-                filepath_match = re.search(r'id="filepath">([^<]+)</p>', r.text)
-                if filepath_match:
-                    playing_filepath = filepath_match.group(1)
-        except Exception as e:
-            logger.debug(f"Swallowed exception in application/users/routes.py:282: {e}", exc_info=True)
-
-    if player_time is not None:
-        from app.domains.library.models import MediaItem
-        media_item = db.query(MediaItem).filter(MediaItem.id == media_item_id).first()
-        if media_item:
-            target_filename = media_item.filename
-            target_path = media_item.current_path
-            
-            import urllib.parse
-            import os
-
-            def clean_path(path_str):
-                if not path_str:
-                    return ""
-                if path_str.startswith("file:///"):
-                    path_str = path_str[8:]
-                elif path_str.startswith("file://"):
-                    path_str = path_str[7:]
-                decoded = urllib.parse.unquote(path_str)
-                return os.path.normpath(decoded).lower()
-
-            cleaned_target_filename = os.path.normpath(target_filename).lower() if target_filename else ""
-            cleaned_target_path = clean_path(target_path)
-
-            matches = False
-
-            if playing_filepath:
-                cleaned_playing_filepath = clean_path(playing_filepath)
-                if cleaned_playing_filepath == cleaned_target_path:
-                    matches = True
-                elif os.path.basename(cleaned_playing_filepath) == cleaned_target_filename:
-                    matches = True
-                elif os.path.splitext(os.path.basename(cleaned_playing_filepath))[0] == os.path.splitext(cleaned_target_filename)[0]:
-                    matches = True
-
-            if not matches and playing_filename:
-                cleaned_playing_filename = clean_path(playing_filename)
-                if cleaned_playing_filename == cleaned_target_path:
-                    matches = True
-                elif cleaned_playing_filename == cleaned_target_filename or os.path.basename(cleaned_playing_filename) == cleaned_target_filename:
-                    matches = True
-                elif os.path.splitext(os.path.basename(cleaned_playing_filename))[0] == os.path.splitext(cleaned_target_filename)[0]:
-                    matches = True
-                else:
-                    base_target = os.path.splitext(cleaned_target_filename)[0]
-                    base_playing = os.path.splitext(os.path.basename(cleaned_playing_filename))[0]
-                    if base_target and base_playing and (base_target in base_playing or base_playing in base_target):
-                        matches = True
-
-            if (playing_filepath or playing_filename) and not matches:
-                player_time = None
-
-        video_position = player_time
-    else:
-        video_position = 0
-        
-    peak = PlaybackPeakLog(
-        user_id=current_uid,
-        media_item_id=media_item_id,
-        video_position=video_position
-    )
-    db.add(peak)
-    db.commit()
-    
-    peaks = db.query(PlaybackPeakLog).filter(
-        PlaybackPeakLog.user_id == current_uid,
-        PlaybackPeakLog.media_item_id == media_item_id
-    ).order_by(PlaybackPeakLog.video_position.asc()).all()
-    
-    return {
-        "peaks_count": len(peaks),
-        "peaks_history": [
-            {
-                "id": p.id,
-                "video_position": p.video_position,
-                "watched_at": p.created_at.isoformat()
-            }
-            for p in peaks
-        ]
-    }
+        if "not found" in str(e).lower():
+            raise HTTPException(status_code=404, detail=str(e))
+        raise
 
 @catalog_router.delete("/library/item/{item_id}/peaks/{log_id}")
 def delete_item_peak(item_id: str, log_id: int, db: Session = Depends(get_db)):
     from app.shared_kernel.user_context import get_current_user_id
     from app.infrastructure.media.db_media_resolver import DbMediaResolver
-    from app.domains.history.models import PlaybackPeakLog
+    from app.domains.history.services.playback_peak_service import PlaybackPeakService
     
     current_uid = get_current_user_id() or 1
-    resolver = DbMediaResolver(db)
-    media_item_id, _ = resolver.resolve_ids(item_id)
-    
-    if not media_item_id:
-        raise HTTPException(status_code=404, detail="Local media item not found")
-        
-    peak = db.query(PlaybackPeakLog).filter(
-        PlaybackPeakLog.id == log_id,
-        PlaybackPeakLog.user_id == current_uid,
-        PlaybackPeakLog.media_item_id == media_item_id
-    ).first()
-    
-    if peak:
-        db.delete(peak)
-        db.commit()
-        
-    peaks = db.query(PlaybackPeakLog).filter(
-        PlaybackPeakLog.user_id == current_uid,
-        PlaybackPeakLog.media_item_id == media_item_id
-    ).order_by(PlaybackPeakLog.video_position.asc()).all()
-    
-    return {
-        "peaks_count": len(peaks),
-        "peaks_history": [
-            {
-                "id": p.id,
-                "video_position": p.video_position,
-                "watched_at": p.created_at.isoformat()
-            }
-            for p in peaks
-        ]
-    }
+    service = PlaybackPeakService(db, DbMediaResolver(db))
+    try:
+        return service.delete_peak(item_id, log_id, current_uid)
+    except Exception as e:
+        if "not found" in str(e).lower():
+            raise HTTPException(status_code=404, detail=str(e))
+        raise

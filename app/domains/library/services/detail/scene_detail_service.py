@@ -18,7 +18,7 @@ class SceneDetailService(DetailFormatter):
         self.scrapers = scrapers
 
     def get_scene_detail(self, item_id: str) -> SceneDetailResponse:
-        from app.application.library.schemas import SceneDetailResponse
+        from app.domains.library.schemas import SceneDetailResponse
         db = self.db
         
         provider_prefix = None

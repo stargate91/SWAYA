@@ -4,12 +4,15 @@ from sqlalchemy.orm import Session
 from app.domains.people.services.people_library_service import PeopleLibraryService
 from app.domains.library.services.listing.filter_params import ListingFilterParams
 
+from app.shared_kernel.ports.library_port import LibraryPort
+
 class PeopleQueryBuilder:
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, library_port: LibraryPort):
         self.db = db
+        self.library_port = library_port
 
     def query_people(self, params: ListingFilterParams) -> Tuple[int, List[dict]]:
-        people_service = PeopleLibraryService(self.db)
+        people_service = PeopleLibraryService(self.db, library_port=self.library_port)
         people_items = people_service.get_people_group(
             role=params.people_role,
             filter_status=params.filter_status,

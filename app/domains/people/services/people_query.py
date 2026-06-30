@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.shared_kernel.enums import MediaType, RoleType, ItemStatus
 from app.domains.people.models import Person, MediaPersonLink
 from app.domains.metadata.models import MetadataMatch
-from app.application.people.schemas import PeopleSearchResponse
+from app.domains.people.schemas import PeopleSearchResponse
 
 class PeopleQueryBuilder:
     def __init__(self, db: Session, library_port: Any, image_service: Any):

@@ -536,3 +536,11 @@ class DbMediaItemAdapter(MediaItemPort):
         if extra:
             extra.current_path = path
             self.db.flush()
+
+    def update_custom_media_item_fields(self, item_id: int, edition: Optional[str] = None, audio_type: Optional[str] = None, source: Optional[str] = None) -> None:
+        item = self.db.query(MediaItem).filter(MediaItem.id == item_id).first()
+        if item:
+            item.custom_edition = edition
+            item.custom_audio_type = audio_type
+            item.custom_source = source
+            self.db.flush()

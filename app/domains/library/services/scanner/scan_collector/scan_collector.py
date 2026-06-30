@@ -44,7 +44,8 @@ class ScanCollector:
         min_video_duration_minutes: float = 10,
         progress_callback: Optional[callable] = None,
         provider: Optional[str] = None,
-        fs: Optional[FileSystemPort] = None
+        fs: Optional[FileSystemPort] = None,
+        settings_port: Optional[Any] = None,
     ):
         self.db = db
         self.library = library
@@ -57,11 +58,8 @@ class ScanCollector:
         self.min_video_duration_minutes = min_video_duration_minutes
         self.progress_callback = progress_callback
         self.provider = str(provider or "").strip().lower()
-        if fs is None:
-            from app.infrastructure.filesystem.fs_utils import DbFileSystemAdapter
-            self.fs = DbFileSystemAdapter()
-        else:
-            self.fs = fs
+        self.fs = fs
+        self.settings_port = settings_port
 
         # Instantiate modular subcomponents
         self.hash_calculator = HashCalculator(self.fs)
@@ -71,12 +69,13 @@ class ScanCollector:
             categorizer=self.categorizer,
             mode=self.mode,
             min_video_duration_minutes=self.min_video_duration_minutes,
-            provider=self.provider
+            provider=self.provider,
+            settings_port=settings_port
         )
 
         # New instantiated sub-services
         self.video_prober = VideoProber(self.prober, self.hash_calculator, self.analyzer, self.mode)
-        self.extra_determiner = ExtraDeterminer(self.categorizer, self.mode)
+        self.extra_determiner = ExtraDeterminer(self.categorizer, self.mode, settings_port=settings_port)
         self.scan_persister = ScanPersister(db, library, mode, self.hash_calculator, self.duplicate_finder, self.analyzer)
 
     def _duration_limit_seconds(self) -> float:
@@ -97,7 +96,7 @@ class ScanCollector:
             self.progress_callback(5.0)
 
         # 1. Collect files from root_path
-        files = self.collector.collect([self.library.root_path], self.db)
+        files = self.collector.collect([self.library.root_path], settings_port=self.settings_port)
         potential_media = files["potential_media"]
         potential_extras = files["potential_extras"]
 

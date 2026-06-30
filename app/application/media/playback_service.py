@@ -18,7 +18,7 @@ from app.application.media.schemas import (
     WatchHistoryResponse,
     WatchedHistoryResponse,
 )
-from app.domains.media.services.playback_service import PlaybackService as DomainPlaybackService
+from app.domains.media.services.playback_domain_service import PlaybackDomainService
 
 logger = logging.getLogger(__name__)
 
@@ -32,15 +32,125 @@ class PlaybackService:
         playback_repo: Optional[Any] = None,
         library_port: Optional[Any] = None
     ):
+        from app.infrastructure.media.db_media_resolver import DbMediaResolver
+        from app.infrastructure.repositories.db_playback_repository import DbPlaybackRepository
+        from app.domains.users.services.overrides_service import OverridesService
+
+        resolved_library_port = library_port or DbMediaResolver(db)
+        resolved_playback_repo = playback_repo or DbPlaybackRepository(db)
+        resolved_overrides = overrides_service or OverridesService(db, resolved_library_port)
+
         self.db = db
+        self.library_port = library_port or DbMediaResolver(db)
+        self.playback_repo = playback_repo or DbPlaybackRepository(db)
+        self.overrides = overrides_service or OverridesService(db, self.library_port)
+
         from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
         self.settings = settings_port or DbSettingsAdapter(db)
-        self.domain_service = DomainPlaybackService(
-            db=db,
-            overrides_service=overrides_service,
-            playback_repo=playback_repo,
-            library_port=library_port,
-        )
+
+    def track_playback_start(self, item_id: Any) -> Tuple[Any, Any, int]:
+        try:
+            item_id_int = int(item_id)
+        except (ValueError, TypeError):
+            item_id_int = self.playback_repo.resolve_item_id_from_external(item_id)
+            if not item_id_int:
+                raise NotFoundException(f"Media item not found for ID: {item_id}")
+
+        item = self.library_port.get_item_by_id(item_id_int)
+        if not item:
+            raise NotFoundException("Media item not found")
+
+        file_path = item.current_path
+        if not file_path or not os.path.exists(file_path):
+            raise NotFoundException(f"Media file not found at: {file_path}")
+
+        override = self.overrides.get_or_create_media_item_override(item_id_int)
+        override.last_watched_at = datetime.now(timezone.utc)
+        
+        existing_log = None
+        if not override.is_watched:
+            existing_log = self.playback_repo.get_latest_playback_log(item.id)
+
+        if existing_log:
+            self.playback_repo.update_playback_log_watched_at(existing_log.id, datetime.now(timezone.utc))
+        else:
+            self.playback_repo.create_playback_log(item.id, datetime.now(timezone.utc))
+            override.watch_count = (override.watch_count or 0) + 1
+
+        override.is_watched = False
+        self.db.commit()
+
+        start_seconds = override.resume_position or 0
+        from typing import Tuple
+        return item, override, start_seconds
+
+    def add_watch_history_entry(self, item_id: int, watched_at_raw: Any = None) -> Any:
+        item = self.library_port.get_item_by_id(item_id)
+        if not item:
+            raise NotFoundException("Item not found")
+
+        watched_at = PlaybackDomainService.parse_watched_at(watched_at_raw)
+        self.playback_repo.create_playback_log(item.id, watched_at)
+        self.db.refresh(item)
+        self._recalculate_watch_state(item)
+        self.db.commit()
+        self.db.refresh(item)
+        return item
+
+    def update_watch_history_entry(self, item_id: int, log_id: int, watched_at_raw: Any = None) -> Any:
+        item = self.library_port.get_item_by_id(item_id)
+        if not item:
+            raise NotFoundException("Item not found")
+
+        log = self.playback_repo.get_playback_log_by_id(log_id, item_id)
+        if not log:
+            raise NotFoundException("Watch history entry not found")
+
+        new_watched_at = PlaybackDomainService.parse_watched_at(watched_at_raw)
+        self.playback_repo.update_playback_log_watched_at(log.id, new_watched_at)
+        self.db.refresh(item)
+        self._recalculate_watch_state(item)
+        self.db.commit()
+        self.db.refresh(item)
+        return item
+
+    def delete_watch_history_entry(self, item_id: int, log_id: int) -> Any:
+        item = self.library_port.get_item_by_id(item_id)
+        if not item:
+            raise NotFoundException("Item not found")
+
+        log = self.playback_repo.get_playback_log_by_id(log_id, item_id)
+        if not log:
+            raise NotFoundException("Watch history entry not found")
+
+        self.playback_repo.delete_playback_log(log.id)
+        self.db.refresh(item)
+        self._recalculate_watch_state(item)
+        self.db.commit()
+        self.db.refresh(item)
+        return item
+
+    def reset_item_progress(self, item_id: int) -> Tuple[int, bool]:
+        override = self.overrides.get_or_create_media_item_override(item_id)
+        if not override:
+            raise NotFoundException("Item not found")
+
+        override.resume_position = 0
+        override.is_watched = False
+        self.db.commit()
+        return 0, False
+
+    def get_watched_history_logs(self, page: int, limit: int, include_adult: bool) -> Tuple[List[Any], bool]:
+        offset = (page - 1) * limit
+        logs = self.playback_repo.get_watched_history_logs(offset, limit + 1, include_adult)
+        has_more = len(logs) > limit
+        if has_more:
+            logs = logs[:limit]
+        return logs, has_more
+
+    def _recalculate_watch_state(self, item) -> None:
+        override = self.overrides.get_or_create_media_item_override(item.id)
+        PlaybackDomainService.recalculate_watch_state(item.playback_logs, override)
 
     def _resolve_img(self, path: Optional[str], subfolder: str) -> Optional[str]:
         return image_processing_service.resolve_image_url(path, subfolder)
@@ -57,7 +167,7 @@ class PlaybackService:
         ]
 
     def _watch_history_response(self, item) -> WatchHistoryResponse:
-        override = self.domain_service.overrides.get_or_create_media_item_override(item.id)
+        override = self.overrides.get_or_create_media_item_override(item.id)
         
         return WatchHistoryResponse(
             status="success",
@@ -73,7 +183,7 @@ class PlaybackService:
         from app.infrastructure.playback.playback_monitor import monitor_playback
 
         try:
-            item, override, start_seconds = self.domain_service.track_playback_start(item_id)
+            item, override, start_seconds = self.track_playback_start(item_id)
         except NotFoundException as e:
             return JSONResponse(status_code=404, content={"error": str(e)})
 
@@ -86,7 +196,7 @@ class PlaybackService:
         if proc and player_type in {"vlc", "mpc"}:
             t = threading.Thread(
                 target=monitor_playback,
-                args=(item.id, player_type, proc, port, self.domain_service.overrides.user_id),
+                args=(item.id, player_type, proc, port, self.overrides.user_id),
                 daemon=True
             )
             t.start()
@@ -124,28 +234,28 @@ class PlaybackService:
 
     def add_watch_history_entry(self, item_id: int, watched_at_raw: Any = None):
         try:
-            item = self.domain_service.add_watch_history_entry(item_id, watched_at_raw)
+            item = self.add_watch_history_entry(item_id, watched_at_raw)
             return self._watch_history_response(item)
         except NotFoundException as e:
             return JSONResponse(status_code=404, content={"error": str(e)})
 
     def update_watch_history_entry(self, item_id: int, log_id: int, watched_at_raw: Any = None):
         try:
-            item = self.domain_service.update_watch_history_entry(item_id, log_id, watched_at_raw)
+            item = self.update_watch_history_entry(item_id, log_id, watched_at_raw)
             return self._watch_history_response(item)
         except NotFoundException as e:
             return JSONResponse(status_code=404, content={"error": str(e)})
 
     def delete_watch_history_entry(self, item_id: int, log_id: int):
         try:
-            item = self.domain_service.delete_watch_history_entry(item_id, log_id)
+            item = self.delete_watch_history_entry(item_id, log_id)
             return self._watch_history_response(item)
         except NotFoundException as e:
             return JSONResponse(status_code=404, content={"error": str(e)})
 
     def reset_item_progress(self, item_id: int) -> PlaybackStatusResponse:
         try:
-            resume_pos, is_watched = self.domain_service.reset_item_progress(item_id)
+            resume_pos, is_watched = self.reset_item_progress(item_id)
             return PlaybackStatusResponse(
                 status="success",
                 resume_position=resume_pos,
@@ -155,7 +265,7 @@ class PlaybackService:
             return JSONResponse(status_code=404, content={"error": str(e)})
 
     def get_watched_history(self, page: int = 1, limit: int = 20, include_adult: bool = False) -> WatchedHistoryResponse:
-        logs, has_more = self.domain_service.get_watched_history_logs(page, limit, include_adult)
+        logs, has_more = self.get_watched_history_logs(page, limit, include_adult)
 
         results = []
         ui_lang = DEFAULT_FALLBACK_LANGUAGE
@@ -166,7 +276,7 @@ class PlaybackService:
 
             active_match = next((match for match in item.matches if match.is_active), None)
             loc = LanguageService.get_best_localization(active_match.localizations, ui_lang) if active_match else None
-            override = self.domain_service.overrides.get_or_create_media_item_override(item.id)
+            override = self.overrides.get_or_create_media_item_override(item.id)
 
             title = loc.title if loc else item.filename
             
@@ -176,7 +286,7 @@ class PlaybackService:
             duration = int(item.duration) if item.duration else 0
             log_position = log.position_seconds or 0
             
-            latest_log = self.domain_service.playback_repo.get_latest_playback_log(item.id)
+            latest_log = self.playback_repo.get_latest_playback_log(item.id)
             is_latest = latest_log and (log.id == latest_log.id)
             if is_latest and override:
                 log_position = override.resume_position

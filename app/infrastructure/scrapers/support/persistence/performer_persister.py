@@ -87,7 +87,8 @@ class PerformerPersister:
         self.image_downloader.enqueue_download(url, "people", filename)
 
     def persist_performers(self, performers_info: List[Dict[str, Any]], match: MetadataMatch, limit_cast: int = 15):
-        person_service = PersonService(self.db)
+        from app.infrastructure.repositories.db_people_repository import DbPeopleRepository
+        person_service = PersonService(self.db, people_repo=DbPeopleRepository(self.db))
         
         # In movies we only persist up to limit_cast performers (usually 15)
         target_performers = performers_info[:limit_cast] if limit_cast > 0 else performers_info

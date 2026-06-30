@@ -23,7 +23,7 @@ class Categorizer:
     # Keyword mapping for automated subtype detection
     SUBTYPE_MAP = SCANNER_SUBTYPE_MAP
 
-    def categorize(self, file_path: Path, db_session=None, settings_port: Optional[SettingsPort] = None) -> Tuple[Optional[ExtraCategory], Optional[ExtraSubtype]]:
+    def categorize(self, file_path: Path, settings_port: Optional[SettingsPort] = None) -> Tuple[Optional[ExtraCategory], Optional[ExtraSubtype]]:
         """
         Determines the category and subtype of a file.
         Uses extensions for primary categorization and keywords for subtype refinement.
@@ -44,12 +44,6 @@ class Categorizer:
                 settings = settings_port.get_all_system_settings()
             except Exception as e:
                 logger.debug(f"Swallowed exception in domains/library/services/scanner/categorizer.py:42: {e}", exc_info=True)
-        elif db_session:
-            try:
-                from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
-                settings = DbSettingsAdapter(db_session).get_all_system_settings()
-            except Exception as e:
-                logger.debug(f"Swallowed exception in domains/library/services/scanner/categorizer.py:48: {e}", exc_info=True)
 
         if settings:
             if "extras_sub_exts" in settings: sub_exts = [e.strip() for e in settings["extras_sub_exts"].split(",")]

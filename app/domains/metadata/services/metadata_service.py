@@ -7,7 +7,7 @@ from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 
-from app.application.metadata.schemas import MetadataResolveRequest, BulkResolveRequest
+from app.domains.metadata.schemas import MetadataResolveRequest, BulkResolveRequest
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 
 # Import sub-services

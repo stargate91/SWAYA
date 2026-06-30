@@ -17,7 +17,7 @@ class TvSeasonFormatter(DetailFormatter):
         db: Session,
         tmdb_scraper: Any
     ):
-        from app.application.library.schemas import TvSeasonDetailResponse
+        from app.domains.library.schemas import TvSeasonDetailResponse
         try:
             tv_tmdb_id_int = int(tv_tmdb_id.split("_")[1]) if "_" in tv_tmdb_id else int(tv_tmdb_id)
         except (ValueError, IndexError):

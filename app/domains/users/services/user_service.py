@@ -7,8 +7,9 @@ from app.shared_kernel.exceptions import NotFoundException, BadRequestException
 logger = logging.getLogger(__name__)
 
 class UserService:
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, library_port: Optional[Any] = None):
         self.db = db
+        self.library_port = library_port
 
     def list_users(self) -> List[User]:
         """Retrieve all users."""
@@ -110,13 +111,13 @@ class UserService:
         override.custom_logo = override_data_dict.get("custom_logo")
         override.custom_language = override_data_dict.get("custom_language")
 
-        if media_item_id:
-            from app.domains.library.models import MediaItem
-            item = self.db.query(MediaItem).filter(MediaItem.id == media_item_id).first()
-            if item:
-                item.custom_edition = override_data_dict.get("custom_edition")
-                item.custom_audio_type = override_data_dict.get("custom_audio_type")
-                item.custom_source = override_data_dict.get("custom_source")
+        if media_item_id and self.library_port:
+            self.library_port.update_custom_media_item_fields(
+                media_item_id,
+                edition=override_data_dict.get("custom_edition"),
+                audio_type=override_data_dict.get("custom_audio_type"),
+                source=override_data_dict.get("custom_source")
+            )
 
         override.user_rating = override_data_dict.get("user_rating")
         override.user_comment = override_data_dict.get("user_comment")
@@ -137,7 +138,7 @@ class UserService:
     ) -> Dict[str, Any]:
         """Composite update status and overrides."""
         from app.domains.users.services.overrides_service import OverridesService
-        from app.application.users.schemas import ItemOverridesUpdate
+        from app.domains.users.schemas import ItemOverridesUpdate
 
         service = OverridesService(self.db, resolver)
         res = {}

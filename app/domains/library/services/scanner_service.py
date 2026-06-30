@@ -23,18 +23,19 @@ class ScannerService:
     scan_status_lock = StatusCoordinator.scan_status_lock
     scan_status = StatusCoordinator.scan_status
 
-    def __init__(self, db: Session, scan_resolver_factory: Optional[Any] = None, library_port: Optional[LibraryPort] = None, task_manager=None):
+    def __init__(self, db: Session, scan_resolver_factory: Optional[Any] = None, library_port: Optional[LibraryPort] = None, task_manager=None, settings_port: Optional[Any] = None, fs_port: Optional[Any] = None, formatter_factory: Optional[Any] = None, move_with_progress_fn: Optional[Any] = None, send_to_trash_fn: Optional[Any] = None):
         self.db = db
         if task_manager is None:
             from app.domains.tasks import task_manager as _tm
             task_manager = _tm
         self.task_manager = task_manager
         self.scan_resolver_factory = scan_resolver_factory
-        if library_port is None:
-            from app.infrastructure.media.db_media_resolver import DbMediaResolver
-            self.library_port = DbMediaResolver(db)
-        else:
-            self.library_port = library_port
+        self.library_port = library_port
+        self.settings_port = settings_port
+        self.fs_port = fs_port
+        self.formatter_factory = formatter_factory
+        self.move_with_progress_fn = move_with_progress_fn
+        self.send_to_trash_fn = send_to_trash_fn
 
         # Subcomponent delegation
         self.status_coordinator = StatusCoordinator(self.db, self.task_manager)

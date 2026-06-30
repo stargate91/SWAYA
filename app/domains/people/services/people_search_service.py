@@ -11,12 +11,13 @@ from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 logger = logging.getLogger(__name__)
 
 class PeopleSearchService:
-    def __init__(self, db: Session, scrapers: Any, library_port: Any, image_service: Any):
+    def __init__(self, db: Session, scrapers: Any, library_port: Any, image_service: Any, people_repo: Any = None):
         self.db = db
         self.scrapers = scrapers
         self.tmdb = scrapers.tmdb(db)
         self.library_port = library_port
         self.image_service = image_service
+        self.people_repo = people_repo
 
     def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
         return self.image_service.resolve_image_url(path, subfolder, size)
@@ -253,7 +254,7 @@ class PeopleSearchService:
             images = perf.get("images") or []
             profile_url = images[0].get("url") if images else None
             
-            service = PersonService(db)
+            service = PersonService(db, people_repo=self.people_repo)
             person = service.update_or_create_person(
                 name=perf.get("name"),
                 profile_path=profile_url,
@@ -306,7 +307,7 @@ class PeopleSearchService:
                 
             resolved_is_adult = is_adult if is_adult is not None else bool(tmdb_details.get("adult"))
             
-            service = PersonService(db)
+            service = PersonService(db, people_repo=self.people_repo)
             person = service.update_or_create_person(
                 name=tmdb_details.get("name"),
                 profile_path=tmdb_details.get("profile_path"),

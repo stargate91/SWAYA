@@ -9,6 +9,9 @@ class ScraperGatewayPort(Protocol):
     def tmdb(self, db_session: Any) -> Any:
         ...
 
+    def omdb(self, db_session: Any) -> Any:
+        ...
+
     def adult(self, provider: Provider, db_session: Any) -> Any:
         ...
 
@@ -23,6 +26,9 @@ class ScraperGatewayPort(Protocol):
         ...
 
     def normalize_adult_scene(self, provider: Provider, raw_data: dict) -> dict:
+        ...
+
+    def normalize_porndb_movie(self, raw_data: dict) -> dict:
         ...
 
     def persist_adult_scene(

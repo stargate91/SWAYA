@@ -25,7 +25,8 @@ class TvDetailService(DetailFormatter):
             tmdb_scraper=self.tmdb_scraper,
             seasons_limit=seasons_limit,
             initial_episodes_limit=initial_episodes_limit,
-            language=language
+            language=language,
+            omdb_scraper=self.scrapers.omdb(self.db)
         )
 
     def get_library_tv_season_detail(self, tv_tmdb_id: str, season_number: int):

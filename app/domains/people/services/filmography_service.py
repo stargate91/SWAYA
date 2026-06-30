@@ -17,11 +17,8 @@ from app.domains.people.services.filmography.remote_fetcher import RemoteCredits
 logger = logging.getLogger(__name__)
 
 class FilmographyService:
-    def __init__(self, db: Session, library_port: Optional[LibraryPort] = None, image_service: Optional[ImageServicePort] = None):
+    def __init__(self, db: Session, library_port: Optional[LibraryPort] = None, image_service: Optional[ImageServicePort] = None, scrapers: Optional[Any] = None):
         self.db = db
-        if library_port is None:
-            from app.infrastructure.media.db_media_resolver import DbMediaResolver
-            library_port = DbMediaResolver(db)
         self.library_port = library_port
         
         if image_service is None:
@@ -31,7 +28,7 @@ class FilmographyService:
 
         self.local_aggregator = LocalCreditsAggregator(db, library_port, image_service)
         self.prioritizer = CreditsPrioritizer()
-        self.remote_fetcher = RemoteCreditsFetcher(db, library_port, image_service)
+        self.remote_fetcher = RemoteCreditsFetcher(db, library_port, image_service, scrapers=scrapers)
 
     def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
         return self.image_service.resolve_image_url(path, subfolder, size)

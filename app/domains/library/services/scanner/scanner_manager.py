@@ -27,6 +27,7 @@ class ScannerManager:
         linker: Optional[Any] = None,
         prober: Optional[Any] = None,
         settings_port: Optional[Any] = None,
+        fs_port: Optional[Any] = None,
     ):
         self.db = db_session
         self.default_min_video_size_mb = min_video_size_mb
@@ -34,11 +35,8 @@ class ScannerManager:
         self.categorizer = categorizer or Categorizer()
         self.linker = linker or Linker()
         self.prober = prober or TechnicalProber()
-        if settings_port is None:
-            from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
-            self.settings = DbSettingsAdapter(db_session)
-        else:
-            self.settings = settings_port
+        self.settings = settings_port
+        self.fs_port = fs_port
 
     def _get_numeric_setting(self, key: str, default: float) -> float:
         from app.shared_kernel.user_context import get_current_user_id
@@ -88,6 +86,8 @@ class ScannerManager:
             min_duration_minutes=min_duration_mins,
             progress_callback=progress_callback,
             provider=collector_provider,
+            fs_port=self.fs_port,
+            settings_port=self.settings,
         )
         
         try:

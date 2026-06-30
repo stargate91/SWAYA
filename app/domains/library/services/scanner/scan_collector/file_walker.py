@@ -36,13 +36,15 @@ class FileWalker:
         categorizer: Categorizer,
         mode: ScanMode = ScanMode.MOVIES_TV,
         min_video_duration_minutes: float = 10,
-        provider: Optional[str] = None
+        provider: Optional[str] = None,
+        settings_port: Optional[Any] = None,
     ):
         self.library = library
         self.categorizer = categorizer
         self.mode = mode
         self.min_video_duration_minutes = min_video_duration_minutes
         self.provider = str(provider or "").strip().lower()
+        self.settings = settings_port
 
     def get_rel_path(self, p: Path) -> str:
         try:
@@ -63,9 +65,7 @@ class FileWalker:
         if not setting_key:
             return default_minutes * 60
 
-        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
-
-        settings = DbSettingsAdapter(db)
+        settings = self.settings
         try:
             override_minutes = float(settings.get_setting(setting_key) or default_minutes)
         except (TypeError, ValueError):
@@ -73,7 +73,7 @@ class FileWalker:
         return max(0.0, override_minutes) * 60
 
     def should_force_video_to_extra(self, path: Path, db: Session) -> bool:
-        category, subtype = self.categorizer.categorize(path, db)
+        category, subtype = self.categorizer.categorize(path, settings_port=self.settings)
         forced_subtypes = SCENE_FORCE_EXTRA_VIDEO_SUBTYPES if self.mode == ScanMode.SCENES else FORCED_EXTRA_VIDEO_SUBTYPES
         if category == ExtraCategory.VIDEO and subtype in forced_subtypes:
             return True

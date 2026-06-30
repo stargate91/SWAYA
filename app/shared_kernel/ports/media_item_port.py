@@ -104,3 +104,9 @@ class MediaItemPort(Protocol):
         Updates the current_path of an ExtraFile.
         """
         ...
+
+    def update_custom_media_item_fields(self, item_id: int, edition: Optional[str] = None, audio_type: Optional[str] = None, source: Optional[str] = None) -> None:
+        """
+        Updates custom metadata fields (edition, audio_type, source) of a MediaItem.
+        """
+        ...
