@@ -27,48 +27,74 @@ export function useRatingsPageState() {
     ? 'movies'
     : mediaType;
 
-  // Compute resolved tab name for backend
-  const resolvedBackendTab = useMemo(() => {
-    if (effectiveMediaType === 'series') {
-      return resolveLibraryBackendTab('tv', activeSessionMode);
-    }
-    return resolveLibraryBackendTab(effectiveMediaType, activeSessionMode);
-  }, [effectiveMediaType, activeSessionMode]);
+  // Fetch all media items in parallel to display unified dashboard stats
+  const moviesQuery = useLibraryQuery({
+    tab: resolveLibraryBackendTab('movies', activeSessionMode),
+    page: 1,
+    pageSize: 5000,
+    filter_ownership: 'all',
+    filter_status: 'all',
+    include_adult: activeSessionMode === 'nsfw',
+  });
 
-  // Fetch media items
-  const mediaQuery = useLibraryQuery(
-    effectiveMediaType !== 'people'
+  const tvQuery = useLibraryQuery({
+    tab: resolveLibraryBackendTab('tv', activeSessionMode),
+    page: 1,
+    pageSize: 5000,
+    filter_ownership: 'all',
+    filter_status: 'all',
+    include_adult: activeSessionMode === 'nsfw',
+  });
+
+  const scenesQuery = useLibraryQuery(
+    activeSessionMode === 'nsfw'
       ? {
-          tab: resolvedBackendTab,
+          tab: resolveLibraryBackendTab('scenes', activeSessionMode),
           page: 1,
           pageSize: 5000,
-          filter_ownership: 'owned',
-          filter_status: 'all', // Include inactive items that might have ratings/comments
-          include_adult: activeSessionMode === 'nsfw',
+          filter_ownership: 'all',
+          filter_status: 'all',
+          include_adult: true,
         }
       : null
   );
 
-  // Fetch people items
-  const peopleQuery = usePeopleQuery(
-    effectiveMediaType === 'people'
-      ? {
-          include_inactive: true,
-          limit: 5000,
-          adult_only: activeSessionMode === 'nsfw',
-          gender: resolvedAdultGenderPreference,
-        }
-      : null
-  );
+  const peopleQuery = usePeopleQuery({
+    include_inactive: false,
+    limit: 5000,
+    adult_only: activeSessionMode === 'nsfw',
+    gender: resolvedAdultGenderPreference,
+  });
 
   const rawItems = useMemo(() => {
     if (effectiveMediaType === 'people') {
       return peopleQuery.data?.items || [];
     }
-    return mediaQuery.data?.items || [];
-  }, [effectiveMediaType, mediaQuery.data, peopleQuery.data]);
+    if (effectiveMediaType === 'movies') {
+      return moviesQuery.data?.items || [];
+    }
+    if (effectiveMediaType === 'series') {
+      return tvQuery.data?.items || [];
+    }
+    if (effectiveMediaType === 'scenes') {
+      return scenesQuery?.data?.items || [];
+    }
+    return [];
+  }, [effectiveMediaType, moviesQuery.data, tvQuery.data, scenesQuery?.data, peopleQuery.data]);
 
-  const isLoading = effectiveMediaType === 'people' ? peopleQuery.isLoading : mediaQuery.isLoading;
+  const isLoading = useMemo(() => {
+    if (effectiveMediaType === 'people') return peopleQuery.isLoading;
+    if (effectiveMediaType === 'movies') return moviesQuery.isLoading;
+    if (effectiveMediaType === 'series') return tvQuery.isLoading;
+    if (effectiveMediaType === 'scenes') return scenesQuery?.isLoading || false;
+    return false;
+  }, [effectiveMediaType, moviesQuery.isLoading, tvQuery.isLoading, scenesQuery?.isLoading, peopleQuery.isLoading]);
+
+  const isStatsLoading =
+    moviesQuery.isLoading ||
+    tvQuery.isLoading ||
+    (activeSessionMode === 'nsfw' && (scenesQuery?.isLoading ?? false)) ||
+    peopleQuery.isLoading;
 
   // Mutations
   const updateMediaMutation = useUpdateMediaStatusMutation();
@@ -180,24 +206,25 @@ export function useRatingsPageState() {
     setCurrentPage(1);
   };
 
-  // Compute Analytics Stats (calculated over all rawItems that have rating/comment/fav)
-  const analytics = useMemo(() => {
-    const ratedItems = rawItems.filter((item) => {
-      return item.user_rating !== null && item.user_rating !== undefined;
-    });
+  // Compute Analytics Stats (calculated over all items that have rating/comment/fav)
+  const computeStats = (items, isPeople = false) => {
+    const ratedItems = items.filter((item) => item.user_rating !== null && item.user_rating !== undefined);
     const totalRated = ratedItems.length;
-    const totalUnrated = rawItems.length - totalRated;
-    const favoritesCount = rawItems.filter((item) => item.is_favorite === true).length;
+    const totalUnrated = items.length - totalRated;
+    const favoritesCount = isPeople ? items.filter((item) => item.is_favorite === true).length : 0;
 
     const sum = ratedItems.reduce((acc, curr) => acc + Number(curr.user_rating), 0);
     const average = totalRated > 0 ? (sum / totalRated).toFixed(1) : '0.0';
 
-    // Distribution 1-10
-    const distribution = Array(10).fill(0);
+    // Distribution 0.5-10 (20 slots)
+    const distribution = Array(20).fill(0);
     ratedItems.forEach((item) => {
-      const val = Math.round(Number(item.user_rating));
-      if (val >= 1 && val <= 10) {
-        distribution[val - 1]++;
+      const val = Number(item.user_rating);
+      if (val >= 0.5 && val <= 10) {
+        const idx = Math.round(val * 2) - 1;
+        if (idx >= 0 && idx < 20) {
+          distribution[idx]++;
+        }
       }
     });
 
@@ -208,7 +235,12 @@ export function useRatingsPageState() {
       favoritesCount,
       distribution,
     };
-  }, [rawItems]);
+  };
+
+  const moviesStats = useMemo(() => computeStats(moviesQuery.data?.items || []), [moviesQuery.data]);
+  const tvStats = useMemo(() => computeStats(tvQuery.data?.items || []), [tvQuery.data]);
+  const scenesStats = useMemo(() => computeStats(scenesQuery?.data?.items || []), [scenesQuery?.data]);
+  const peopleStats = useMemo(() => computeStats(peopleQuery.data?.items || [], true), [peopleQuery.data]);
 
   const handleSortToggle = (key) => {
     if (sortKey === key) {
@@ -234,13 +266,18 @@ export function useRatingsPageState() {
     sortDirection,
     handleSortToggle,
     isLoading,
+    isStatsLoading,
     paginatedItems,
     totalPages,
     totalItems: sortedItems.length,
-    analytics,
+    moviesStats,
+    tvStats,
+    scenesStats,
+    peopleStats,
     handleRateItem,
     handleToggleFavorite,
     handleSaveComment,
     activeSessionMode,
+    hasAdultSupport,
   };
 }

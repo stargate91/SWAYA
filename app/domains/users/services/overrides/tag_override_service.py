@@ -25,10 +25,6 @@ class TagOverrideService:
             return {"status": "success", "count": 0}
 
         resolved_tags = []
-        for tid in tag_ids:
-            tag_obj = self.db.query(Tag).filter(Tag.id == tid).first()
-            if tag_obj:
-                resolved_tags.append(tag_obj)
         from app.domains.metadata.models import MetadataMatch
         is_adult_item = False
         if item_ids:
@@ -38,12 +34,22 @@ class TagOverrideService:
             if first_match:
                 is_adult_item = bool(first_match.is_adult)
 
+        for tid in tag_ids:
+            tag_obj = self.db.query(Tag).filter(Tag.id == tid).first()
+            if tag_obj:
+                if is_adult_item and not tag_obj.is_adult:
+                    tag_obj.is_adult = True
+                resolved_tags.append(tag_obj)
+
         for tname in tags_input:
             tag_obj = self.db.query(Tag).filter(func.lower(Tag.name) == func.lower(tname)).first()
             if not tag_obj:
                 tag_obj = Tag(name=tname, is_adult=is_adult_item)
                 self.db.add(tag_obj)
                 self.db.flush()
+            else:
+                if is_adult_item and not tag_obj.is_adult:
+                    tag_obj.is_adult = True
             if tag_obj not in resolved_tags:
                 resolved_tags.append(tag_obj)
 
@@ -61,6 +67,7 @@ class TagOverrideService:
                 elif action == "set":
                     current_tags = resolved_tags
                 override.tags = current_tags
+                override.is_tracked = True
                 count += 1
 
         self.db.commit()

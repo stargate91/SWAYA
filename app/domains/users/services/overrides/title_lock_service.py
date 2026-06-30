@@ -160,8 +160,11 @@ class TitleLockService:
                         self.db.add(tag_obj)
                         self.db.flush()
                 if tag_obj and tag_obj not in tags_list:
+                    if is_adult_item and not tag_obj.is_adult:
+                        tag_obj.is_adult = True
                     tags_list.append(tag_obj)
             m_override.tags = tags_list
+            m_override.is_tracked = True
 
         self.db.commit()
         return {

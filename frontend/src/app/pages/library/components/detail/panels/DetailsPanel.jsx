@@ -53,7 +53,7 @@ export default function DetailsPanel() {
       value: `${item.rating_meta}/100`
     });
   }
-  
+
   const hasPorndb = item?.rating_porndb != null && Number(item.rating_porndb) > 0;
   if (hasPorndb) {
     ratings.push({
@@ -96,30 +96,30 @@ export default function DetailsPanel() {
     <div className="details-panel details-panel--custom">
       {(ratings.length > 0) && (
         <div>
-            <h4 className="details-panel__ratings-title">
-              {t('library.details.ratingsSection') || 'Ratings'}
-            </h4>
-            <div className="ratings-container">
-              {ratings.map((rating, idx) => {
-                const isLast = idx === ratings.length - 1;
-                const isOddTotal = ratings.length % 2 !== 0;
-                const isSpan2 = (isLast && isOddTotal);
+          <h4 className="details-panel__ratings-title">
+            {t('library.details.ratingsSection') || 'Ratings'}
+          </h4>
+          <div className="ratings-container">
+            {ratings.map((rating, idx) => {
+              const isLast = idx === ratings.length - 1;
+              const isOddTotal = ratings.length % 2 !== 0;
+              const isSpan2 = (isLast && isOddTotal);
 
-                return (
-                  <div
-                    key={rating.id}
-                    className={`rating-card${isSpan2 ? ' rating-card--span-2' : ''}`}
-                  >
-                    <img src={rating.logo} alt={rating.alt} className="rating-card__logo" />
-                    <span className="rating-card__value">
-                      {rating.value}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+              return (
+                <div
+                  key={rating.id}
+                  className={`rating-card${isSpan2 ? ' rating-card--span-2' : ''}`}
+                >
+                  <img src={rating.logo} alt={rating.alt} className="rating-card__logo" />
+                  <span className="rating-card__value">
+                    {rating.value}
+                  </span>
+                </div>
+              );
+            })}
           </div>
-        )
+        </div>
+      )
       }
 
       {!isMovie && (

@@ -260,6 +260,7 @@ export const useUpdateMediaStatusMutation = () => {
       if (payload) {
         if ('user_rating' in payload) updates.user_rating = payload.user_rating;
         if ('is_watched' in payload) updates.is_watched = payload.is_watched;
+        if ('custom_tags' in payload) updates.custom_tags = payload.custom_tags;
       }
 
       // Optimistically update details

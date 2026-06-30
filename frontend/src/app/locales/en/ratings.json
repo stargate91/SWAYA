@@ -1,6 +1,10 @@
 {
   "title": "Ratings & Reviews",
   "adultTitle": "Adult Ratings & Reviews",
+  "viewMode": {
+    "ratings": "Ratings",
+    "stats": "Stats"
+  },
   "description": "Manage your ratings, comments, and favorites in one central place.",
   "tabs": {
     "unrated": "To Be Rated",
@@ -30,6 +34,8 @@
     "totalUnrated": "Total Unrated",
     "distribution": "Rating Distribution",
     "favoritesCount": "Favorites",
+    "favoriteArtists": "Favorite Artists",
+    "favoritePerformers": "Favorite Performers",
     "people": "People"
   },
   "dialog": {

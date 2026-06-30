@@ -1,5 +1,5 @@
 from typing import Tuple, Any, List
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 from sqlalchemy.orm import selectinload
 
 from app.domains.library.models import MediaItem
@@ -29,6 +29,32 @@ class TvQueryBuilder(BaseQueryBuilder):
                 MetadataMatch.media_item_id == None,
                 UserOverride.is_tracked == True,
                 MetadataMatch.media_type == MediaType.TV
+            )
+        elif params.filter_ownership == "all":
+            query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == self.current_user_id))
+            joined_override = True
+            
+            parent_ids = set()
+            current_parents = {
+                r[0] for r in self.db.query(MetadataMatch.parent_id).join(
+                    MediaItem, MetadataMatch.media_item_id == MediaItem.id
+                ).filter(MediaItem.status.in_(self.lib_statuses), MetadataMatch.parent_id != None).all()
+            }
+            while current_parents:
+                parent_ids.update(current_parents)
+                current_parents = {
+                    r[0] for r in self.db.query(MetadataMatch.parent_id).filter(
+                        MetadataMatch.id.in_(current_parents), MetadataMatch.parent_id != None
+                    ).all()
+                }
+            
+            query = query.filter(
+                or_(
+                    MetadataMatch.id.in_(parent_ids),
+                    and_(MetadataMatch.media_item_id == None, UserOverride.is_tracked == True)
+                ),
+                MetadataMatch.media_type == MediaType.TV,
+                MetadataMatch.is_active == True,
             )
         else:
             parent_ids = set()

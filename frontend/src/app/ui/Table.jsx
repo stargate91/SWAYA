@@ -1,3 +1,4 @@
+/* eslint-disable react/forbid-dom-props */
 import { memo, useMemo } from 'react';
 import { EyeOff, Trash2, Search, Sliders, X } from 'lucide-react';
 import { useTranslation } from '../providers/LanguageContext';
@@ -16,6 +17,7 @@ function TableHeader({ columns }) {
           <th
             key={col.key}
             width={col.width || undefined}
+            style={col.width ? { width: col.width, minWidth: col.width } : undefined}
             className={`${col.align ? `text-${col.align}` : ''} ${col.width ? 'ui-table__cell--truncate' : ''}`.trim()}
           >
             {col.label}
@@ -57,6 +59,7 @@ const TableRow = memo(function TableRow({
           <td
             key={col.key}
             width={col.width || undefined}
+            style={col.width ? { width: col.width, minWidth: col.width } : undefined}
             className={`${col.align ? `text-${col.align}` : ''} ${col.width ? 'ui-table__cell--truncate' : ''}`.trim()}
           >
             <div className="ui-table__cell-content">

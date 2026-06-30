@@ -1,5 +1,5 @@
 from typing import Tuple, Any, List
-from sqlalchemy import func, and_
+from sqlalchemy import func, and_, or_
 from sqlalchemy.orm import selectinload
 
 from app.domains.library.models import MediaItem
@@ -30,6 +30,17 @@ class SceneQueryBuilder(BaseQueryBuilder):
                 UserOverride.is_tracked == True,
                 MetadataMatch.media_type == MediaType.SCENE
             )
+        elif params.filter_ownership == "all":
+            query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == self.current_user_id))
+            joined_override = True
+            query = query.filter(
+                or_(
+                    and_(MetadataMatch.media_item_id != None, MediaItem.status.in_(self.lib_statuses)),
+                    and_(MetadataMatch.media_item_id == None, UserOverride.is_tracked == True)
+                ),
+                MetadataMatch.is_active == True,
+                MetadataMatch.media_type == MediaType.SCENE
+            )
         else:
             query = query.filter(
                 MetadataMatch.media_item_id != None,
@@ -42,7 +53,7 @@ class SceneQueryBuilder(BaseQueryBuilder):
             query, params, joined_localization, joined_override
         )
 
-        if params.filter_ownership not in ("tracked", "unowned"):
+        if params.filter_ownership not in ("tracked", "unowned", "all"):
             canonical_match_ids = self.db.query(
                 func.min(MetadataMatch.id)
             ).filter(
@@ -52,6 +63,21 @@ class SceneQueryBuilder(BaseQueryBuilder):
                 MetadataMatch.media_type == MediaType.SCENE
             ).group_by(MetadataMatch.media_item_id).subquery()
             query = query.filter(MetadataMatch.id.in_(canonical_match_ids))
+        elif params.filter_ownership == "all":
+            canonical_match_ids = self.db.query(
+                func.min(MetadataMatch.id)
+            ).filter(
+                MetadataMatch.media_item_id != None,
+                MetadataMatch.is_active == True,
+                MetadataMatch.is_adult == params.include_adult,
+                MetadataMatch.media_type == MediaType.SCENE
+            ).group_by(MetadataMatch.media_item_id).subquery()
+            query = query.filter(
+                or_(
+                    MetadataMatch.id.in_(canonical_match_ids),
+                    and_(MetadataMatch.media_item_id == None, UserOverride.is_tracked == True)
+                )
+            )
 
         query = self._apply_sorting(query, params, joined_localization, joined_override)
         total_items = query.count()
