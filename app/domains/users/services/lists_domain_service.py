@@ -10,7 +10,7 @@ class ListsDomainService:
         return CustomList(
             name="Watchlist",
             description="Default system watchlist.",
-            list_type=CustomListType.MATCH,
+            list_type=CustomListType.MEDIA,
             color="#3b82f6",
             icon="Bookmark"
         )

@@ -187,7 +187,4 @@ class ExtraSubtype(enum.Enum):
 class CustomListType(enum.Enum):
     """Types of items allowed in a custom user list to prevent mixing."""
     MEDIA = "media"
-    MATCH = "match"
     PERSON = "person"
-    STUDIO = "studio"
-    COLLECTION = "collection"
