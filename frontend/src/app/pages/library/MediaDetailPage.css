@@ -989,3 +989,31 @@
     padding-top: 120px;
   }
 }
+
+.entity-detail-page__drawer-backdrop--transparent {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.entity-detail-page__drawer--logo {
+  background: var(--color-surface-overlay, #1c1c1e) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.entity-detail-page__drawer--logo .backdrops-grid--logo {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+.entity-detail-page__drawer--logo .scene-image-picker-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+/* Prevent scrolling when logo drawer is open */
+.logo-drawer-open,
+.logo-drawer-open .media-detail-page__container,
+.logo-drawer-open .media-detail-page__inline-sections {
+  overflow: hidden !important;
+  overflow-y: hidden !important;
+}

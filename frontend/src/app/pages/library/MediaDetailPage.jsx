@@ -648,6 +648,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSocialExpanded, setIsSocialExpanded] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isLogoDrawerOpen, setIsLogoDrawerOpen] = useState(false);
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -656,6 +657,19 @@ export default function MediaDetailPage({ type = 'movie' }) {
   }, [id]);
 
   useEffect(() => {
+    if (isLogoDrawerOpen || isDrawerOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isLogoDrawerOpen, isDrawerOpen]);
+
+  useEffect(() => {
+    if (isLogoDrawerOpen) return;
+
     const handleWheel = (e) => {
       if (Math.abs(e.deltaY) > 5) {
         if (e.deltaY > 0 && !isScrolled) {
@@ -677,7 +691,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
 
     window.addEventListener('wheel', handleWheel, { passive: true });
     return () => window.removeEventListener('wheel', handleWheel);
-  }, [isScrolled]);
+  }, [isScrolled, isLogoDrawerOpen]);
 
   const handleScrollToggle = () => {
     setIsScrolled(!isScrolled);
@@ -768,23 +782,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
   };
 
   const handleOpenLogoModal = () => {
-    openModal({
-      title: t('library.details.chooseLogo') || 'Choose Logo',
-      variant: 'wide',
-      content: (
-        <UniversalImagePickerModal
-          entityId={id}
-          tmdbId={item?.tmdb_id || item?.tv_tmdb_id}
-          imageType="logo"
-          entityType={normalizedType}
-          currentPath={item?.logo_path}
-          t={t}
-          toast={toast}
-          onClose={closeModal}
-          item={item}
-        />
-      ),
-    });
+    setIsLogoDrawerOpen(true);
   };
 
   if (isLoading) {
@@ -809,7 +807,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
         fallbackUrl={posterUrl}
         isScene={item?.type === 'scene'}
         backLabel={t('common.back') || 'Back'}
-        pageClassName={`media-detail-page--scroll-transition ${isScrolled ? 'is-scrolled' : ''}`}
+        pageClassName={`media-detail-page--scroll-transition ${isScrolled ? 'is-scrolled' : ''} ${isLogoDrawerOpen ? 'logo-drawer-open' : ''}`}
         containerRef={containerRef}
         topRightControls={(
           <>
@@ -1145,6 +1143,50 @@ export default function MediaDetailPage({ type = 'movie' }) {
 
               {/* Technical / Specs section */}
               {!isScene && item?.technical && <TechnicalPanel />}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Logo Selector Drawer */}
+      {isLogoDrawerOpen && (
+        <>
+          <div
+            className="entity-detail-page__drawer-backdrop ui-drawer-backdrop entity-detail-page__drawer-backdrop--transparent"
+            role="button"
+            tabIndex={-1}
+            onClick={() => setIsLogoDrawerOpen(false)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                setIsLogoDrawerOpen(false);
+              }
+            }}
+          />
+          <div className="entity-detail-page__drawer ui-drawer ui-drawer--md entity-detail-page__drawer--logo">
+            <div className="entity-detail-page__drawer-header">
+              <h3 className="entity-detail-page__drawer-title">
+                {t('library.details.chooseLogo') || 'Choose Logo'}
+              </h3>
+              <button
+                type="button"
+                className="entity-detail-page__drawer-close"
+                onClick={() => setIsLogoDrawerOpen(false)}
+              >
+                &times;
+              </button>
+            </div>
+            <div className="entity-detail-page__drawer-content" style={{ padding: '24px' }}>
+              <UniversalImagePickerModal
+                entityId={id}
+                tmdbId={item?.tmdb_id || item?.tv_tmdb_id}
+                imageType="logo"
+                entityType={normalizedType}
+                currentPath={item?.logo_path}
+                t={t}
+                toast={toast}
+                onClose={() => { }}
+                item={item}
+              />
             </div>
           </div>
         </>

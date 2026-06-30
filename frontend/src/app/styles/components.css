@@ -1,4 +1,3 @@
-
 /* Grids & Common Layout Helpers */
 .metric-grid,
 .form-grid {
@@ -67,7 +66,7 @@
   align-items: center;
 }
 
-.ui-meta-row__item + .ui-meta-row__item::before {
+.ui-meta-row__item+.ui-meta-row__item::before {
   content: "\2022";
   margin-right: var(--space-2xs);
   opacity: 0.4;
@@ -128,24 +127,57 @@
 .ui-drawer--sm {
   width: 320px;
 }
+
 .ui-drawer--md {
   width: 480px;
 }
+
 .ui-drawer--lg {
   width: 640px;
 }
+
 .ui-drawer--720 {
   width: 720px;
 }
 
 @keyframes uiDrawerFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes uiDrawerSlideIn {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
 }
 
+/* Ensure all drawer headers are solid (not transparent) */
+.entity-detail-page__drawer-header,
+.review-drawer__header {
+  background: var(--color-surface-overlay, #1c1c1e) !important;
+  position: relative;
+  z-index: 10;
+}
 
+/* Rotate drawer close buttons on hover */
+.entity-detail-page__drawer-close,
+.review-drawer-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, transform var(--motion-fast) !important;
+}
+
+.entity-detail-page__drawer-close:hover,
+.review-drawer-close-btn:hover {
+  transform: rotate(90deg) !important;
+}
