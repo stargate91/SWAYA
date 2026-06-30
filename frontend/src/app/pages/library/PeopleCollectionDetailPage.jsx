@@ -192,6 +192,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
             handlePeopleRatingMouseLeave={handlePeopleRatingMouseLeave}
             handlePeopleRatingClick={handlePeopleRatingClick}
             onMediaCardClick={handleOpenImagePickerModal}
+            updatePersonStatusMutation={updatePersonStatusMutation}
           />
 
           {isPeople && (

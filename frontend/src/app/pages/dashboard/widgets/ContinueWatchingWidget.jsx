@@ -1,10 +1,12 @@
 
+import { useState, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { Play, X } from 'lucide-react';
+import { Play, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import IconButton from '../../../ui/IconButton';
 import { useContinueWatchingQuery } from '../../../queries';
 import { usePlayMediaMutation, useResetProgressMutation } from '../../../queries';
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
+import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 
 const normalizeEpisodeNumbers = (episodeNumber) => {
   if (Array.isArray(episodeNumber)) {
@@ -82,9 +84,29 @@ const formatEpisodeCode = (seasonNumber, episodeNumber) => {
 };
 
 const ContinueWatchingWidget = ({ T }) => {
-  const { data: items = [], isLoading } = useContinueWatchingQuery();
+  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
+  const { data: items = [], isLoading } = useContinueWatchingQuery({
+    include_adult: sessionMode === 'nsfw',
+  });
   const playMutation = usePlayMediaMutation();
   const resetProgressMutation = useResetProgressMutation();
+  const scrollRef = useRef(null);
+  const [showLeft, setShowLeft] = useState(false);
+  const [showRight, setShowRight] = useState(true);
+
+  const updateArrows = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setShowLeft(el.scrollLeft > 10);
+    setShowRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+  }, []);
+
+  const scroll = (direction) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const amount = el.clientWidth * 0.75;
+    el.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
+  };
 
   if (isLoading || !items.length) {
     return null;
@@ -95,7 +117,18 @@ const ContinueWatchingWidget = ({ T }) => {
       <div className="continue-watching-header">
         {T('dashboard.continue_watching.title') || 'Continue Watching'}
       </div>
-      <div className="continue-watching-row custom-scrollbar">
+      <div className="continue-watching-shell">
+        {showLeft && (
+          <button className="continue-watching-arrow is-left" onClick={() => scroll('left')}>
+            <ChevronLeft size={24} />
+          </button>
+        )}
+        {showRight && (
+          <button className="continue-watching-arrow is-right" onClick={() => scroll('right')}>
+            <ChevronRight size={24} />
+          </button>
+        )}
+        <div ref={scrollRef} onScroll={updateArrows} className="continue-watching-row">
         {items.map((item) => {
           const progressPercent = Math.min(100, (item.resume_position / item.duration) * 100);
           const episodeCode = formatEpisodeCode(item.season_number, item.episode_number);
@@ -180,6 +213,7 @@ const ContinueWatchingWidget = ({ T }) => {
             </div>
           );
         })}
+      </div>
       </div>
     </div>
   );

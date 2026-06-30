@@ -10,6 +10,8 @@ import useWindowProgress from './useWindowProgress';
 import useWindowControls from './useWindowControls';
 import { useSettingsQuery } from '../queries/settingsQueries';
 import { useLibraryModeStore } from '../stores/useLibraryModeStore';
+import { useNavigate, useLocation } from 'react-router-dom';
+import GlobalSearch from './GlobalSearch';
 
 const BRAND_NAME = 'SWAYA';
 
@@ -20,6 +22,8 @@ export default function WindowTitlebar() {
   const { openModal, closeModal, toast } = useUi();
   const { t } = useTranslation();
   const { minimize, toggleMaximize, close, resizeToMinimum } = useWindowControls();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleAbort = () => {
     openModal({
@@ -63,7 +67,20 @@ export default function WindowTitlebar() {
     }
 
     setTimeout(() => {
+      const nextMode = sessionMode === 'nsfw' ? 'sfw' : 'nsfw';
       toggleSessionMode();
+
+      if (nextMode === 'sfw') {
+        const path = location.pathname;
+        if (
+          path.startsWith('/library/movie/') ||
+          path.startsWith('/library/tv/') ||
+          path.startsWith('/library/scene/') ||
+          path.startsWith('/library/people/')
+        ) {
+          navigate('/dashboard');
+        }
+      }
 
       setTimeout(() => {
         if (shell) {
@@ -90,7 +107,11 @@ export default function WindowTitlebar() {
           {hydrateProgress ? <ProgressBar {...hydrateProgress} variant="sub" /> : null}
           {syncProgress ? <ProgressBar {...syncProgress} variant="sub" /> : null}
         </div>
-      ) : null}
+      ) : (
+        <div className="window-titlebar__search">
+          <GlobalSearch />
+        </div>
+      )}
 
       <div className="window-titlebar__actions">
         {settings?.include_adult && (
@@ -106,43 +127,37 @@ export default function WindowTitlebar() {
             </UtilityButton>
           </Tooltip>
         )}
-        <Tooltip content={t('titlebar.minimize')} side="bottom">
-          <UtilityButton
-            type="button"
-            className="window-titlebar__button"
-            size="titlebar"
-            tabIndex={-1}
-            aria-label={t('titlebar.minimizeWindow')}
-            onClick={minimize}
-          >
-            <Minus size={16} />
-          </UtilityButton>
-        </Tooltip>
-        <Tooltip content={t('titlebar.maximize')} side="bottom">
-          <UtilityButton
-            type="button"
-            className="window-titlebar__button"
-            size="titlebar"
-            tabIndex={-1}
-            aria-label={t('titlebar.maximizeWindow')}
-            onClick={toggleMaximize}
-          >
-            <Square size={14} />
-          </UtilityButton>
-        </Tooltip>
-        <Tooltip content={t('titlebar.close')} side="bottom">
-          <UtilityButton
-            type="button"
-            className="window-titlebar__button window-titlebar__button--close"
-            size="titlebar"
-            danger
-            tabIndex={-1}
-            aria-label={t('titlebar.closeWindow')}
-            onClick={close}
-          >
-            <X size={16} />
-          </UtilityButton>
-        </Tooltip>
+        <UtilityButton
+          type="button"
+          className="window-titlebar__button"
+          size="titlebar"
+          tabIndex={-1}
+          aria-label={t('titlebar.minimizeWindow')}
+          onClick={minimize}
+        >
+          <Minus size={16} />
+        </UtilityButton>
+        <UtilityButton
+          type="button"
+          className="window-titlebar__button"
+          size="titlebar"
+          tabIndex={-1}
+          aria-label={t('titlebar.maximizeWindow')}
+          onClick={toggleMaximize}
+        >
+          <Square size={14} />
+        </UtilityButton>
+        <UtilityButton
+          type="button"
+          className="window-titlebar__button window-titlebar__button--close"
+          size="titlebar"
+          danger
+          tabIndex={-1}
+          aria-label={t('titlebar.closeWindow')}
+          onClick={close}
+        >
+          <X size={16} />
+        </UtilityButton>
       </div>
     </header>
   );

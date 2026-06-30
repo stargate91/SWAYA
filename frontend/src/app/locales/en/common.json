@@ -50,9 +50,6 @@
     "collapse": "Collapse"
   },
   "titlebar": {
-    "minimize": "Minimize",
-    "maximize": "Maximize",
-    "close": "Close",
     "minimizeWindow": "Minimize window",
     "maximizeWindow": "Maximize window",
     "closeWindow": "Close window"

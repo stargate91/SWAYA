@@ -33,6 +33,7 @@ export default function EntityDetailHeroSection({
   openModal,
   profileLinks = [],
   extraLinks = [],
+  updatePersonStatusMutation,
 }) {
   const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -383,7 +384,6 @@ export default function EntityDetailHeroSection({
             </div>
           )}
 
-          {/* Need More / Biography Drawer Trigger */}
           {isPeople && (
             <button
               type="button"

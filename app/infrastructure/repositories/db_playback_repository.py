@@ -2,7 +2,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from typing import Optional, List, Any
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, joinedload, selectinload
 from app.shared_kernel.ports.playback_repository_port import PlaybackRepositoryPort
 from app.shared_kernel.enums import MediaType
 from app.domains.library.models import MediaItem
@@ -144,6 +144,6 @@ class DbPlaybackRepository(PlaybackRepositoryPort):
 
         return query.options(
             joinedload(PlaybackLog.media_item).options(
-                joinedload(MediaItem.matches).joinedload(MetadataMatch.localizations)
+                selectinload(MediaItem.matches).selectinload(MetadataMatch.localizations)
             )
         ).order_by(PlaybackLog.watched_at.desc()).offset(offset).limit(limit).all()

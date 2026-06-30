@@ -1,8 +1,11 @@
 import subprocess
 import json
 import os
+import logging
 from typing import Dict, Any, Optional
 from .tech_mapping import map_resolution
+
+logger = logging.getLogger(__name__)
 
 class TechnicalProber:
     """
@@ -85,15 +88,18 @@ class TechnicalProber:
                         num, den = rfr.split('/')
                         fps = round(int(num) / int(den), 3)
                         info["framerate"] = str(fps)
-                    except: pass
+                    except Exception as e:
+                        logger.warning(f"Failed to parse frame rate '{rfr}': {e}", exc_info=True)
                 elif rfr:
                     info["framerate"] = rfr
 
                 # Bit depth
                 bd = stream.get('bits_per_raw_sample')
                 if bd:
-                    try: info["bit_depth"] = int(bd)
-                    except: pass
+                    try:
+                        info["bit_depth"] = int(bd)
+                    except Exception as e:
+                        logger.warning(f"Failed to parse bit depth '{bd}': {e}", exc_info=True)
                 if not info["bit_depth"]:
                     pix_fmt = stream.get('pix_fmt', '')
                     if '10le' in pix_fmt or '10be' in pix_fmt or 'p010' in pix_fmt:

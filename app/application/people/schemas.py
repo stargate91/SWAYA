@@ -88,6 +88,7 @@ class PersonCreditItem(BaseSchema):
     type: str
     tmdb_id: Optional[int] = 0
     year: Optional[int] = None
+    release_date: Optional[str] = None
     poster_path: Optional[str] = None
     backdrop_path: Optional[str] = None
     rating: Optional[float] = 0.0
@@ -149,6 +150,7 @@ class PersonDetailResponse(BaseModel):
     external_links: Optional[List[ExternalLinkDetail]] = None
     primary_provider: Optional[str] = None
     field_routing: Optional[dict[str, str]] = None
+    suggested_tags: Optional[List[str]] = None
 
 
 

@@ -141,6 +141,9 @@ export function useOrganizerPageState({ organizer, t, scanMode, sessionMode }) {
     setCurrentPage,
     setIsDetailsCollapsed,
     scanMode,
+    activeMainTab,
+    activeManualTab,
+    activeExtrasTab,
   });
 
   return {

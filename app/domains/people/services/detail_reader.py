@@ -318,8 +318,26 @@ class PerformerDetailReader:
             if value not in (None, "", [], {})
         }
 
+        suggested_tags = []
+        if person.is_adult:
+            
+            for link in person.external_links:
+                if link.source_data and isinstance(link.source_data, dict):
+                    src_tags = link.source_data.get("tags") or []
+                    for t in src_tags:
+                        t_name = None
+                        if isinstance(t, dict):
+                            t_name = t.get("name")
+                        elif isinstance(t, str):
+                            t_name = t
+                        if t_name:
+                            t_name = t_name.strip()
+                            if t_name and t_name not in suggested_tags:
+                                suggested_tags.append(t_name)
+
         result = {
             "id": person.id,
+            "suggested_tags": suggested_tags,
             "name": person.name,
             "alternate_names": person.aliases or [],
             "biography": loc.biography if loc else None,

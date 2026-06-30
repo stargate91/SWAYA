@@ -295,6 +295,105 @@ class MetadataService:
             })
         return formatted
 
+    def global_search(self, query: str, source: str, search_type: str, include_adult: bool = False, language: Optional[str] = None) -> List[Dict[str, Any]]:
+        if not include_adult and source.lower() != "tmdb":
+            return []
+
+        source_lower = source.lower()
+        type_lower = search_type.lower()
+
+        if source_lower == "tmdb":
+            if type_lower == "all":
+                params = {
+                    "query": query,
+                    "include_adult": "true" if include_adult else "false",
+                    "language": language or DEFAULT_FALLBACK_LANGUAGE
+                }
+                data = self.tmdb._call_api("/search/multi", params)
+                results = data.get("results", []) or []
+                formatted = []
+                for r in results:
+                    media_type = r.get("media_type")
+                    if media_type not in ("movie", "tv", "person"):
+                        continue
+                    release_date = r.get("release_date") or r.get("first_air_date")
+                    year_val = None
+                    if release_date:
+                        try:
+                            year_val = int(release_date.split("-")[0])
+                        except Exception:
+                            pass
+                    formatted.append({
+                        "id": r.get("id"),
+                        "title": r.get("title") or r.get("name") or r.get("original_title") or r.get("original_name"),
+                        "original_title": r.get("original_title") or r.get("original_name"),
+                        "release_date": release_date,
+                        "year": year_val,
+                        "overview": r.get("overview") if media_type != "person" else f"Known for: {r.get('known_for_department', 'Acting')}",
+                        "poster_path": r.get("poster_path") if media_type != "person" else r.get("profile_path"),
+                        "backdrop_path": r.get("backdrop_path") if media_type != "person" else None,
+                        "rating": r.get("vote_average") or r.get("popularity") or 0.0,
+                        "media_type": media_type,
+                        "provider": "tmdb"
+                    })
+                return formatted
+
+            elif type_lower == "movie":
+                return self.search_metadata(query, item_type="movie", provider="tmdb", include_adult=include_adult, language=language)
+            elif type_lower == "tv":
+                return self.search_metadata(query, item_type="tv", provider="tmdb", include_adult=include_adult, language=language)
+            elif type_lower == "person":
+                results = self.tmdb.search_person(query, language=language or DEFAULT_FALLBACK_LANGUAGE, include_adult=include_adult)
+                formatted = []
+                for r in results:
+                    formatted.append({
+                        "id": r.get("id"),
+                        "title": r.get("name"),
+                        "original_title": None,
+                        "release_date": None,
+                        "year": None,
+                        "overview": f"Known for: {r.get('known_for_department', 'Acting')}",
+                        "poster_path": r.get("profile_path"),
+                        "backdrop_path": None,
+                        "rating": r.get("popularity") or 0.0,
+                        "media_type": "person",
+                        "provider": "tmdb"
+                    })
+                return formatted
+
+        else:
+            try:
+                prov_enum = Provider(source_lower)
+            except ValueError:
+                return []
+
+            if type_lower == "scene":
+                return self.search_metadata(query, item_type="scene", provider=source_lower, include_adult=include_adult, language=language)
+
+            elif type_lower == "person":
+                scraper = self.scrapers.adult(prov_enum, self.db)
+                if not scraper:
+                    return []
+                results = scraper.search_performers(query)
+                formatted = []
+                for p in results:
+                    formatted.append({
+                        "id": p.get("id"),
+                        "title": p.get("name"),
+                        "original_title": None,
+                        "release_date": None,
+                        "year": None,
+                        "overview": f"Gender: {p.get('gender', 'Unknown')} | Scenes: {p.get('scene_count', 0)}",
+                        "poster_path": p.get("images", [{}])[0].get("url") if p.get("images") else None,
+                        "backdrop_path": None,
+                        "rating": float(p.get("scene_count") or 0.0),
+                        "media_type": "person",
+                        "provider": prov_enum.value
+                    })
+                return formatted
+
+        return []
+
     def resolve_item(self, request: MetadataResolveRequest) -> Dict[str, Any]:
         return self.resolver.resolve_item(request)
 

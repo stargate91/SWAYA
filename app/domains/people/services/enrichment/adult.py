@@ -95,14 +95,11 @@ class AdultEnricher:
                 hip = m.get("hip")
                 
                 if band is not None:
-                    try: band_val = int(band)
-                    except (ValueError, TypeError): pass
+                    band_val = safe_int(band)
                 if waist is not None:
-                    try: waist_val = int(waist)
-                    except (ValueError, TypeError): pass
+                    waist_val = safe_int(waist)
                 if hip is not None:
-                    try: hip_val = int(hip)
-                    except (ValueError, TypeError): pass
+                    hip_val = safe_int(hip)
                 
                 parts = []
                 if band and cup:

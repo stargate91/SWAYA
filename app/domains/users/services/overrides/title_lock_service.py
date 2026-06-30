@@ -4,6 +4,7 @@ from typing import Dict, Any, List, Optional
 from sqlalchemy import func
 
 from app.domains.users.models import UserOverride, Tag
+from app.domains.metadata.models import MetadataMatch
 from app.application.users.schemas import (
     ItemOverridesUpdate,
     BulkOverridesUpdate,

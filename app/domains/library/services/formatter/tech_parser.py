@@ -42,7 +42,8 @@ class TechParser:
                 if len(parts) == 2:
                     w, h = int(parts[0]), int(parts[1])
                     return map_resolution(w, h)
-            except: pass
+            except Exception as e:
+                logger.warning(f"Failed to parse resolution '{resolution}': {e}", exc_info=True)
         return resolution
 
     @staticmethod

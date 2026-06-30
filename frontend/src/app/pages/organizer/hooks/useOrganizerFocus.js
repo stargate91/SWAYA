@@ -34,6 +34,9 @@ export function useOrganizerFocus({
   setCurrentPage,
   setIsDetailsCollapsed,
   scanMode,
+  activeMainTab,
+  activeManualTab,
+  activeExtrasTab,
 }) {
   const focusFirstAvailableResult = (nextOrganizer = organizer) => {
     const modeExtras = (nextOrganizer.extras || []).filter((item) => isExtraForMode(item, scanMode));
@@ -107,7 +110,20 @@ export function useOrganizerFocus({
             { mainTab: 'manual', rows: manualEpisodeRows, manualTab: 'episodes' },
             { mainTab: 'extras', rows: extraRows, extrasTab: firstExtraTab },
           ];
-    const firstTarget = targetPriority.find((entry) => entry.rows.length > 0);
+    
+    let firstTarget = null;
+    if (activeMainTab) {
+      firstTarget = targetPriority.find((entry) => {
+        if (entry.mainTab !== activeMainTab) return false;
+        if (activeMainTab === 'manual' && activeManualTab && entry.manualTab !== activeManualTab) return false;
+        if (activeMainTab === 'extras' && activeExtrasTab && entry.extrasTab !== activeExtrasTab) return false;
+        return entry.rows.length > 0;
+      });
+    }
+
+    if (!firstTarget) {
+      firstTarget = targetPriority.find((entry) => entry.rows.length > 0);
+    }
 
     if (!firstTarget) {
       setActiveRowId(null);

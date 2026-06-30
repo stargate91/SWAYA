@@ -36,8 +36,8 @@ class LibraryListingService:
         """
         query = self.db.query(UserOverride).join(
             MediaItem, UserOverride.media_item_id == MediaItem.id
-        ).join(
-            MetadataMatch, MetadataMatch.media_item_id == MediaItem.id
+        ).outerjoin(
+            MetadataMatch, (MetadataMatch.media_item_id == MediaItem.id) & (MetadataMatch.is_active == True)
         ).filter(
             UserOverride.resume_position > 0,
             UserOverride.is_watched == False
@@ -45,7 +45,8 @@ class LibraryListingService:
             joinedload(UserOverride.media_item).joinedload(MediaItem.matches).joinedload(MetadataMatch.localizations),
             joinedload(UserOverride.media_item).joinedload(MediaItem.matches).joinedload(MetadataMatch.parent).joinedload(MetadataMatch.parent).joinedload(MetadataMatch.localizations)
         )
-        query = query.filter(MetadataMatch.is_adult == include_adult)
+        if not include_adult:
+            query = query.filter((MetadataMatch.id == None) | (MetadataMatch.is_adult == False))
 
         overrides = query.order_by(UserOverride.last_watched_at.desc()).limit(limit).all()
 
