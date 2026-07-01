@@ -60,6 +60,9 @@ async def lifespan(app: FastAPI):
     await task_manager.download_worker.start()
     await task_manager.people_enrich_worker.start()
     
+    from app.infrastructure.playback.hotkey_listener import start_hotkey_listener
+    start_hotkey_listener()
+    
     yield
     # Shutdown logic if any goes here
     await task_manager.download_worker.stop()
