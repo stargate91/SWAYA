@@ -10,6 +10,78 @@
   gap: var(--space-md);
 }
 
+.collection-items-horizontal-grid-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  margin-top: -8px;
+  margin-bottom: -8px;
+}
+
+.collection-items-horizontal-grid-wrapper .entity-detail-page__credits-list--collection-items {
+  display: grid;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--cols, 1), 110px);
+  grid-auto-flow: row;
+  gap: var(--space-md);
+}
+
+.collection-items-horizontal-grid-wrapper .ui-poster-card {
+  --card-transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: var(--card-transition) !important;
+}
+
+.collection-items-horizontal-grid-wrapper .ui-poster-card.is-missing {
+  opacity: 0.65 !important;
+}
+
+.collection-items-horizontal-grid-wrapper .ui-poster-card.is-missing:hover {
+  opacity: 1 !important;
+}
+
+.collection-items-horizontal-grid-wrapper .ui-poster-card.is-missing .ui-poster-card__image {
+  opacity: 0.55 !important;
+}
+
+.collection-items-horizontal-grid-wrapper .ui-poster-card.is-missing:hover .ui-poster-card__image {
+  opacity: 1 !important;
+}
+
+.collection-items-horizontal-grid-wrapper .ui-poster-card:hover {
+  transform: translateY(-4px) !important;
+}
+
+.collection-items-horizontal-grid-wrapper .ui-pill--default {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.collection-items-horizontal-grid-wrapper .ui-poster-card .ui-poster-card__image-wrapper {
+  --poster-transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: var(--poster-transition);
+  --poster-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--poster-shadow);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.collection-items-horizontal-grid-wrapper .ui-poster-card:hover .ui-poster-card__image-wrapper {
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+}
+
+.collection-items-horizontal-grid-wrapper .ui-poster-card .ui-poster-card__image {
+  opacity: 0.8;
+  filter: grayscale(10%);
+  transition: opacity 0.25s cubic-bezier(0.25, 1, 0.5, 1), filter 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.collection-items-horizontal-grid-wrapper .ui-poster-card:hover .ui-poster-card__image {
+  opacity: 1;
+  filter: grayscale(0%);
+}
+
 .entity-detail-page__credits-list--people-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(224px, 1fr));

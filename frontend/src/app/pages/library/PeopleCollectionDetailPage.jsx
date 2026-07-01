@@ -10,6 +10,7 @@ import EntityDetailStatusSection from './components/entityDetail/EntityDetailSta
 import EntityDetailHeroSection from './components/entityDetail/EntityDetailHeroSection';
 import PersonCreditsSections from './components/entityDetail/PersonCreditsSections';
 import CollectionDetailSections from './components/entityDetail/CollectionDetailSections';
+import { CollectionBackdropsPanel } from './components/entityDetail/EntityDetailSections';
 import usePeopleCollectionDetailController from './usePeopleCollectionDetailController.jsx';
 import UniversalImagePickerModal from './modals/UniversalImagePickerModal';
 import UtilityBarBottomPortal from '../../../components/UtilityBarBottomPortal';
@@ -50,8 +51,9 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
     handleToggleFavorite,
     handleToggleActive,
     handleOpenReviewModal,
-    handleOpenCollectionBackdropModal,
     handleOpenPeopleBackdropModal,
+    overrideBackdropMutation,
+    uploadBackdropMutation,
   } = usePeopleCollectionDetailController({
     id,
     isPeople,
@@ -64,6 +66,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
   const [isSocialExpanded, setIsSocialExpanded] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isImagePickerDrawerOpen, setIsImagePickerDrawerOpen] = useState(false);
+  const [isBackdropDrawerOpen, setIsBackdropDrawerOpen] = useState(false);
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -72,7 +75,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
   }, [id]);
 
   useEffect(() => {
-    if (isImagePickerDrawerOpen) {
+    if (isImagePickerDrawerOpen || isBackdropDrawerOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -80,10 +83,10 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [isImagePickerDrawerOpen]);
+  }, [isImagePickerDrawerOpen, isBackdropDrawerOpen]);
 
   useEffect(() => {
-    if (isImagePickerDrawerOpen) return;
+    if (isImagePickerDrawerOpen || isBackdropDrawerOpen) return;
 
     const handleWheel = (e) => {
       if (e.target.closest('.global-search') || e.target.closest('.global-search__overlay')) {
@@ -131,7 +134,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
       fallbackUrl={mediaUrl}
       backLabel={t('common.back') || 'Back'}
       isLoading={isLoading}
-      pageClassName={`entity-detail-page ${isPeople ? 'entity-detail-page--people' : 'entity-detail-page--collection'} ${isScrolled ? 'is-scrolled' : ''} ${isImagePickerDrawerOpen ? 'logo-drawer-open' : ''}`}
+      pageClassName={`entity-detail-page ${isPeople ? 'entity-detail-page--people' : 'entity-detail-page--collection'} ${isScrolled ? 'is-scrolled' : ''} ${(isImagePickerDrawerOpen || isBackdropDrawerOpen) ? 'logo-drawer-open' : ''}`}
       topRightControls={
         <EntityDetailTopControls
           isPeople={isPeople}
@@ -141,7 +144,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
           canChooseCollectionBackdrop={canChooseCollectionBackdrop}
           updatePersonStatusMutation={updatePersonStatusMutation}
           handleOpenPeopleBackdropModal={handleOpenPeopleBackdropModal}
-          handleOpenCollectionBackdropModal={handleOpenCollectionBackdropModal}
+          handleOpenCollectionBackdropModal={() => setIsBackdropDrawerOpen(true)}
           extraLinks={extraLinks}
           socialLinks={socialLinks}
         />
@@ -324,6 +327,49 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
             </>
           );
         })(),
+        document.body
+      )}
+
+      {/* Backdrop Picker Drawer */}
+      {isBackdropDrawerOpen && typeof document !== 'undefined' && createPortal(
+        <>
+          <div
+            className="entity-detail-page__drawer-backdrop ui-drawer-backdrop entity-detail-page__drawer-backdrop--transparent"
+            role="button"
+            tabIndex={-1}
+            onClick={() => setIsBackdropDrawerOpen(false)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                setIsBackdropDrawerOpen(false);
+              }
+            }}
+          />
+          <div className="entity-detail-page__drawer ui-drawer ui-drawer--md entity-detail-page__drawer--backdrop">
+            <div className="entity-detail-page__drawer-header">
+              <h3 className="entity-detail-page__drawer-title">
+                {t('library.details.chooseBackdrop') || 'Choose Backdrop'}
+              </h3>
+              <button
+                type="button"
+                className="entity-detail-page__drawer-close"
+                onClick={() => setIsBackdropDrawerOpen(false)}
+              >
+                &times;
+              </button>
+            </div>
+            <div className="entity-detail-page__drawer-content" style={{ padding: '24px' }}>
+              <CollectionBackdropsPanel
+                key={item?.tmdb_id}
+                item={item}
+                collectionId={item?.tmdb_id}
+                t={t}
+                toast={toast}
+                overrideBackdropMutation={overrideBackdropMutation}
+                uploadBackdropMutation={uploadBackdropMutation}
+              />
+            </div>
+          </div>
+        </>,
         document.body
       )}
     </DetailPageShell>

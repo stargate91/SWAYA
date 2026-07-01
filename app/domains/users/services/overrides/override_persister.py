@@ -234,10 +234,31 @@ class OverridePersister:
         if not item_ids:
             return {"status": "success", "count": 0}
 
-        count = 0
+        # Pre-resolve overrides and find associated media_item_ids to bulk-check PlaybackLogs
+        overrides_map = {}
+        media_item_ids = []
         for item_id in item_ids:
             override = title_lock_reader.get_or_create_override(str(item_id))
             if override:
+                overrides_map[item_id] = override
+                if override.media_item_id:
+                    media_item_ids.append(override.media_item_id)
+
+        from app.domains.history.models import PlaybackLog
+        has_playback_log = set()
+        if media_item_ids:
+            logs = db.query(PlaybackLog.media_item_id).filter(PlaybackLog.media_item_id.in_(media_item_ids)).all()
+            has_playback_log = {log[0] for log in logs}
+
+        tracked_parent_ids = set()
+        count = 0
+        for item_id in item_ids:
+            override = overrides_map.get(item_id)
+            if override:
+                # Skip changing status if the item has a real play-button playback history
+                if override.media_item_id in has_playback_log:
+                    continue
+
                 if is_watched:
                     if override.is_watched:
                         continue
@@ -246,10 +267,8 @@ class OverridePersister:
                     if watched_at:
                         override.last_watched_at = parsed_date
                     override.is_tracked = True
-                    self._track_parent_tv_show_if_episode(db, str(item_id), override.media_item_id, override.metadata_match_id, track_item_fn)
+                    self._track_parent_tv_show_if_episode(db, str(item_id), override.media_item_id, override.metadata_match_id, track_item_fn, tracked_parent_ids)
                 else:
-                    if override.last_watched_at is not None:
-                        continue
                     override.is_watched = False
                     override.watch_count = 0
                     override.last_watched_at = None
@@ -320,7 +339,8 @@ class OverridePersister:
         item_id: str,
         media_item_id: Optional[int],
         metadata_match_id: Optional[int],
-        track_item_fn: Any
+        track_item_fn: Any,
+        tracked_parent_ids: Optional[set] = None
     ):
         tv_tmdb_id = None
         if isinstance(item_id, str) and item_id.startswith("tmdb_"):
@@ -347,6 +367,10 @@ class OverridePersister:
 
         if tv_tmdb_id:
             tv_show_id = f"tmdb_{tv_tmdb_id}"
+            if tracked_parent_ids is not None:
+                if tv_show_id in tracked_parent_ids:
+                    return
+                tracked_parent_ids.add(tv_show_id)
             try:
                 track_item_fn(tv_show_id, True)
             except Exception as e:

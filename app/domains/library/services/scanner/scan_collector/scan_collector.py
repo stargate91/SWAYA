@@ -123,12 +123,27 @@ class ScanCollector:
         def get_rel_path(p: Path) -> str:
             return self.file_walker.get_rel_path(p)
 
-        # 2. Identify media candidates needing probing
-        probe_targets = []
-        probe_durations = {}
-        probe_infos = {}
+        # Get video extensions to identify files in potential_extras that need probing
+        video_exts = set(self.categorizer.CATEGORIZER_VIDEO_EXTS)
+        if self.settings_port:
+            try:
+                settings = self.settings_port.get_all_system_settings()
+                if settings and "naming_video_exts" in settings:
+                    video_exts = {
+                        e.strip().lower() if e.strip().startswith('.') else f".{e.strip().lower()}"
+                        for e in settings["naming_video_exts"].split(",") if e.strip()
+                    }
+            except Exception:
+                pass
 
-        for p in potential_media:
+        # We probe all potential_media, plus any potential_extras that have video extensions (like .mkv)
+        candidates_to_probe = list(potential_media)
+        for p in potential_extras:
+            if p.suffix.lower() in video_exts:
+                if get_rel_path(p).lower() not in existing_extras:
+                    candidates_to_probe.append(p)
+
+        for p in candidates_to_probe:
             stat = p.stat()
             mtime = stat.st_mtime
             size = stat.st_size
@@ -137,6 +152,15 @@ class ScanCollector:
             existing = existing_items.get(rel_path.lower())
             if existing and existing.size == size and existing.mtime == mtime and existing.duration is not None:
                 probe_durations[str(p)] = existing.duration
+                probe_infos[str(p)] = {
+                    "probe_info": {
+                        "duration": existing.duration,
+                        "resolution": existing.resolution,
+                        "video_codec": existing.video_codec,
+                        "audio_codec": existing.audio_codec,
+                        "audio_streams": existing.audio_streams or [],
+                    }
+                }
             else:
                 probe_targets.append(p)
 
@@ -219,7 +243,8 @@ class ScanCollector:
             links=links,
             path_to_item=path_to_item,
             get_rel_path_fn=get_rel_path,
-            extra_determiner=self.extra_determiner
+            extra_determiner=self.extra_determiner,
+            probe_infos=probe_infos
         )
 
         if self.progress_callback:

@@ -264,7 +264,7 @@ export default function GlobalSearch() {
                   </div>
                   <div className="global-search__item-meta">
                     <span className="global-search__item-badge">
-                      {item.media_type === 'person' ? 'performer' : item.media_type}
+                      {item.media_type === 'person' ? ((item.is_adult || item.adult) ? 'performer' : 'artist') : item.media_type}
                     </span>
                     {item.overview && (
                       <span className="global-search__item-overview">

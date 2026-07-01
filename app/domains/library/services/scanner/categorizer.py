@@ -23,7 +23,7 @@ class Categorizer:
     # Keyword mapping for automated subtype detection
     SUBTYPE_MAP = SCANNER_SUBTYPE_MAP
 
-    def categorize(self, file_path: Path, settings_port: Optional[SettingsPort] = None) -> Tuple[Optional[ExtraCategory], Optional[ExtraSubtype]]:
+    def categorize(self, file_path: Path, settings_port: Optional[SettingsPort] = None, is_audio_only: bool = False) -> Tuple[Optional[ExtraCategory], Optional[ExtraSubtype]]:
         """
         Determines the category and subtype of a file.
         Uses extensions for primary categorization and keywords for subtype refinement.
@@ -69,6 +69,8 @@ class Categorizer:
             category = ExtraCategory.METADATA
         elif ext in video_exts:
              category = ExtraCategory.VIDEO
+             if is_audio_only:
+                 category = ExtraCategory.AUDIO
              
         # Refine subtype based on keywords
         subtype = None

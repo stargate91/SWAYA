@@ -315,5 +315,7 @@ export default function usePeopleCollectionDetailController({
     handleOpenReviewModal,
     handleOpenCollectionBackdropModal,
     handleOpenPeopleBackdropModal,
+    overrideBackdropMutation,
+    uploadBackdropMutation,
   };
 }

@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import PosterGrid from '@/ui/PosterGrid';
 import PosterCard from '@/ui/PosterCard';
 import Pill from '@/ui/Pill';
@@ -8,8 +8,8 @@ import BackdropCard from '@/ui/BackdropCard';
 import ImageUploadPanel from '../../modals/ImageUploadPanel';
 import { API_BASE } from '@/lib/backend';
 import { isTvLikeMediaType, isSceneMediaType } from '@/lib/mediaTypes';
-import { getPosterImagePath } from '@/lib/imageUrls';
-import { ChevronLeft, ChevronRight, Film, ImageOff, Star, Tv } from 'lucide-react';
+import { getPosterImagePath, buildTmdbImageUrl, TMDB_IMAGE_SIZES } from '@/lib/imageUrls';
+import { Bookmark, ChevronLeft, ChevronRight, Film, ImageOff, Star, Tv } from 'lucide-react';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
 import { normalizeBackdropKey } from '../../peopleCollectionDetailUtils.jsx';
 import './PersonCreditsShared.css';
@@ -172,47 +172,35 @@ function HorizontalCollectionItemsList({ items, navigate, t }) {
 
   return (
     <div className="entity-detail-page__credits-list entity-detail-page__credits-list--collection-items">
-      {items.map((item) => {
+      {items.map((item, index) => {
         const isTv = isTvLikeMediaType(item.media_type || item.type);
         const imdbRating = Number(item.rating_imdb);
         const tmdbRating = Number(item.rating_tmdb ?? item.rating);
-        const hasImdbRating = Number.isFinite(imdbRating) && imdbRating > 0;
-        const hasTmdbRating = Number.isFinite(tmdbRating) && tmdbRating > 0;
         const posterPath = getPosterImagePath(item) || item.backdrop_path || item.local_backdrop_path;
         const posterUrl = posterPath ? resolveDetailsImageUrl(posterPath, API_BASE, 'poster') : null;
 
+        const ratingPill = item.in_library ? (
+          <Pill variant="success">
+            {t('library.details.have') || 'HAVE'}
+          </Pill>
+        ) : (
+          <Pill variant="default">
+            {t('library.details.missing') || 'MISSING'}
+          </Pill>
+        );
+
         return (
-          <CreditCard
+          <PosterCard
             key={`collection-item-${item.media_type || item.type || 'movie'}-${item.tmdb_id || item.id}`}
             title={item.title}
+            subtitle={item.year ? String(item.year) : undefined}
             imageUrl={posterUrl}
-            isTv={isTv}
-            isCollectionItem={true}
-            isOwned={item.in_library}
-            isMissing={!item.in_library}
+            ratingPill={ratingPill}
+            icon={isTv ? Tv : Film}
             onClick={() => openItem(item)}
-          >
-            <div className="ui-credit-card__meta">
-              {item.year && <span>{item.year}</span>}
-              {(hasImdbRating || hasTmdbRating) && (
-                <Pill
-                  variant={hasImdbRating ? 'imdb' : 'tmdb'}
-                  className="ui-credit-card__rating-pill"
-                >
-                  <Star size={10} fill="currentColor" strokeWidth={1.8} />
-                  {(hasImdbRating ? imdbRating : tmdbRating).toFixed(1)}
-                </Pill>
-              )}
-              <Pill
-                variant={item.in_library ? 'success' : 'missing'}
-                className="ui-credit-card__status-pill"
-              >
-                {item.in_library
-                  ? (t('library.details.have') || 'Have')
-                  : (t('library.details.missing') || 'Missing')}
-              </Pill>
-            </div>
-          </CreditCard>
+            customStyle={{ '--item-index': index }}
+            className={item.in_library ? 'is-owned' : 'is-missing'}
+          />
         );
       })}
     </div>
@@ -229,8 +217,9 @@ export function CollectionBackdropsPanel({ item, collectionId, t, toast, overrid
       .map((bd, index) => ({
         backdrop_path: bd.file_path,
         backdrop_key: normalizeBackdropKey(bd.file_path),
-        title: item?.title || 'Collection',
-        subtitle: t('library.details.collectionBackdrop') || 'Collection backdrop',
+        width: bd.width,
+        height: bd.height,
+        vote_average: bd.vote_average,
         sort_score: Number(bd.vote_average) || 0,
         sort_votes: Number(bd.vote_count) || 0,
         sort_index: index,
@@ -249,13 +238,14 @@ export function CollectionBackdropsPanel({ item, collectionId, t, toast, overrid
       collectionBackdrops.push({
         backdrop_path: option.backdrop_path,
         backdrop_key: option.backdrop_key,
-        title: option.title,
-        subtitle: option.subtitle,
+        width: option.width,
+        height: option.height,
+        vote_average: option.vote_average,
       });
     }
 
     return collectionBackdrops;
-  }, [item, t]);
+  }, [item]);
 
   const currentBackdropPath = selectedBackdropPath || item?.backdrop_path || '';
   const currentBackdropKey = normalizeBackdropKey(currentBackdropPath);
@@ -296,22 +286,24 @@ export function CollectionBackdropsPanel({ item, collectionId, t, toast, overrid
 
       <div className="backdrops-grid">
         {backdropOptions.map((option, idx) => {
-          const backdropUrl = resolveDetailsImageUrl(option.backdrop_path, API_BASE, 'backdrop');
+          const backdropUrl = option.backdrop_path.startsWith('/')
+            ? buildTmdbImageUrl(option.backdrop_path, TMDB_IMAGE_SIZES.backdropThumb)
+            : resolveDetailsImageUrl(option.backdrop_path, API_BASE, 'backdropThumb');
           const isPending = overrideBackdropMutation.isPending && overrideBackdropMutation.variables?.backdropPath === option.backdrop_path;
           const isSelected = (currentBackdropKey !== '' && currentBackdropKey === option.backdrop_key) || isPending;
-          const label = option.year ? `${option.title} (${option.year})` : option.title;
+          const resolutionLabel = option.width && option.height ? `${option.width}×${option.height}` : '';
+          const ratingLabel = option.vote_average ? `★ ${Number(option.vote_average).toFixed(1)}` : '';
 
           return (
             <BackdropCard
               key={`${option.backdrop_path}-${idx}`}
               imageUrl={backdropUrl}
-              alt={label}
+              alt={option.backdrop_path}
               isSelected={isSelected}
               isPending={isPending || Boolean(uploadBackdropMutation?.isPending)}
-              infoLeft={label}
-              infoRight={option.subtitle}
+              infoLeft={resolutionLabel}
+              infoRight={ratingLabel}
               onClick={() => handleSelectBackdrop(option.backdrop_path)}
-              title={label}
             />
           );
         })}
@@ -328,93 +320,43 @@ export function CollectionBackdropsPanel({ item, collectionId, t, toast, overrid
 }
 
 export function CollectionItemsSection({ items, navigate, t }) {
-  const containerRef = useRef(null);
-  const [columns, setColumns] = useState(1);
-  const [page, setPage] = useState(0);
+  const [limit, setLimit] = useState(30);
+  const scrollContainerRef = useRef(null);
 
-  useLayoutEffect(() => {
-    const element = containerRef.current;
-    if (!element) {
-      return undefined;
-    }
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
 
-    let frameId = null;
-    let resizeObserver = null;
-
-    const measure = () => {
-      const styles = window.getComputedStyle(element);
-      const gap = Number.parseFloat(styles.columnGap || styles.gap || '16') || 16;
-      const minCardWidth = 224;
-      const width = element.clientWidth || 0;
-      const nextColumns = Math.max(1, Math.floor((width + gap) / (minCardWidth + gap)));
-      setColumns((current) => (current === nextColumns ? current : nextColumns));
-    };
-
-    const scheduleMeasure = () => {
-      if (frameId !== null) {
-        cancelAnimationFrame(frameId);
+    const handleScroll = () => {
+      const { scrollLeft, scrollWidth, clientWidth } = container;
+      if (scrollWidth - scrollLeft - clientWidth < 300) {
+        setLimit((prev) => Math.min(items.length, prev + 20));
       }
-      frameId = requestAnimationFrame(measure);
     };
 
-    scheduleMeasure();
-
-    if (typeof ResizeObserver !== 'undefined') {
-      resizeObserver = new ResizeObserver(() => {
-        scheduleMeasure();
-      });
-      resizeObserver.observe(element);
-    }
-
-    window.addEventListener('resize', scheduleMeasure);
-
+    container.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
-      if (frameId !== null) {
-        cancelAnimationFrame(frameId);
-      }
-      resizeObserver?.disconnect();
-      window.removeEventListener('resize', scheduleMeasure);
+      container.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [items.length]);
 
-  const itemsPerPage = Math.max(1, columns * 3);
-  const totalPages = Math.max(1, Math.ceil((items?.length || 0) / itemsPerPage));
+  useEffect(() => {
+    setLimit(30);
+  }, [items]);
 
-  if (page > totalPages - 1) {
-    setPage(totalPages - 1);
-  }
-
-  const safePage = Math.min(page, totalPages - 1);
-  const visibleItems = (items || []).slice(safePage * itemsPerPage, (safePage + 1) * itemsPerPage);
+  const visibleItems = (items || []).slice(0, limit);
+  const cols = Math.max(1, visibleItems.length <= 12 ? visibleItems.length : Math.ceil(visibleItems.length / 2));
 
   return (
     <section className="entity-detail-page__content-section">
       <div className="entity-detail-page__section-header">
         <h2>{t('library.details.collectionItemsTitle') || 'Collection Items'}</h2>
-        {totalPages > 1 && (
-          <div className="entity-detail-page__section-pager">
-            <button
-              type="button"
-              className="entity-detail-page__section-pager-btn"
-              onClick={() => setPage((current) => Math.max(0, current - 1))}
-              disabled={safePage === 0}
-              aria-label={t('common.previous') || 'Previous'}
-            >
-              <ChevronLeft size={16} />
-            </button>
-            <button
-              type="button"
-              className="entity-detail-page__section-pager-btn"
-              onClick={() => setPage((current) => Math.min(totalPages - 1, current + 1))}
-              disabled={safePage >= totalPages - 1}
-              aria-label={t('common.next') || 'Next'}
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div>
-        )}
       </div>
-      <div ref={containerRef}>
+      <div 
+        ref={scrollContainerRef} 
+        className="collection-items-horizontal-grid-wrapper"
+        style={{ '--cols': cols }}
+      >
         <HorizontalCollectionItemsList items={visibleItems} navigate={navigate} t={t} />
       </div>
     </section>

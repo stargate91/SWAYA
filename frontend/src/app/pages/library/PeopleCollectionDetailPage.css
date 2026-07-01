@@ -247,3 +247,41 @@
   color: var(--color-text-primary);
   background-color: color-mix(in srgb, var(--color-surface-glass-strong) 30%, transparent);
 }
+
+/* Missing collection items opacity styling */
+.collection-items-horizontal-grid-wrapper .ui-poster-card.is-missing {
+  opacity: 0.65 !important;
+}
+
+.collection-items-horizontal-grid-wrapper .ui-poster-card.is-missing:hover {
+  opacity: 1 !important;
+}
+
+.collection-items-horizontal-grid-wrapper .ui-poster-card.is-missing .ui-poster-card__image {
+  opacity: 0.55 !important;
+}
+
+.collection-items-horizontal-grid-wrapper .ui-poster-card.is-missing:hover .ui-poster-card__image {
+  opacity: 1 !important;
+}
+
+.collection-items-horizontal-grid-wrapper {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+  margin-top: -8px !important;
+  margin-bottom: -8px !important;
+}
+
+.collection-items-horizontal-grid-wrapper .ui-poster-card {
+  --card-transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: var(--card-transition) !important;
+}
+
+.collection-items-horizontal-grid-wrapper .ui-poster-card:hover {
+  transform: translateY(-4px) !important;
+}
+
+.collection-items-horizontal-grid-wrapper .ui-pill--default {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}

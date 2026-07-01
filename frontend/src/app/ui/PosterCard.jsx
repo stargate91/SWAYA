@@ -24,6 +24,7 @@ const PosterCard = memo(function PosterCard({
   ratingImdb,
   ratingTmdb,
   ratingPorndb,
+  ratingPill,
   onClick,
   disabled = false,
   active = false,
@@ -120,13 +121,13 @@ const PosterCard = memo(function PosterCard({
         ) : null}
       </div>
 
-      {!isOverlayTitle && (title || subtitle || ratingImdb || ratingTmdb || ratingPorndb) && (
+      {!isOverlayTitle && (title || subtitle || ratingImdb || ratingTmdb || ratingPorndb || ratingPill) && (
         <div className="ui-poster-card__details">
           {title && <div className="ui-poster-card__title" title={title}>{title}</div>}
-          {(subtitle || ratingImdb || ratingTmdb || ratingPorndb) && (
+          {(subtitle || ratingImdb || ratingTmdb || ratingPorndb || ratingPill) && (
             <div className="ui-poster-card__subtitle-row">
               {subtitle && <div className="ui-poster-card__subtitle">{subtitle}</div>}
-              {(() => {
+              {ratingPill ? ratingPill : (() => {
                 const hasImdb = ratingImdb !== undefined && ratingImdb !== null && ratingImdb !== '' && parseFloat(ratingImdb) > 0;
                 const hasTmdb = ratingTmdb !== undefined && ratingTmdb !== null && ratingTmdb !== '' && parseFloat(ratingTmdb) > 0;
                 const hasPorndb = ratingPorndb !== undefined && ratingPorndb !== null && ratingPorndb !== '' && parseFloat(ratingPorndb) > 0;

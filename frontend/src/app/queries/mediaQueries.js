@@ -461,11 +461,66 @@ export const useBulkUpdateWatchedMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ itemIds, isWatched }) => api.media.bulkWatched(itemIds, isWatched),
+    onMutate: async (variables) => {
+      const { itemIds, isWatched, tvId } = variables;
+      
+      if (tvId) {
+        await queryClient.cancelQueries({ queryKey: ['library-tv-detail', tvId] });
+        await queryClient.cancelQueries({ queryKey: ['library-tv-detail', `tv_${tvId}`] });
+      }
+      await queryClient.cancelQueries({ queryKey: ['library'] });
+
+      const prevTvDetail = tvId ? queryClient.getQueryData(['library-tv-detail', tvId]) : null;
+      const prevTvDetailWithPrefix = tvId ? queryClient.getQueryData(['library-tv-detail', `tv_${tvId}`]) : null;
+
+      const updateTvCache = (oldData) => {
+        if (!oldData) return oldData;
+        let updatedSeasons = oldData.seasons;
+        if (oldData.seasons) {
+          const idsSet = new Set(itemIds.map(id => String(id)));
+          updatedSeasons = oldData.seasons.map(season => {
+            if (!season.episodes) return season;
+            const updatedEpisodes = season.episodes.map(ep => {
+              if (idsSet.has(String(ep.id))) {
+                return { ...ep, is_watched: isWatched };
+              }
+              return ep;
+            });
+            const isSeasonWatched = updatedEpisodes.length > 0 && updatedEpisodes.every(ep => ep.is_watched);
+            return { ...season, episodes: updatedEpisodes, is_watched: isSeasonWatched };
+          });
+        }
+        return {
+          ...oldData,
+          seasons: updatedSeasons,
+        };
+      };
+
+      if (tvId) {
+        queryClient.setQueryData(['library-tv-detail', tvId], updateTvCache);
+        queryClient.setQueryData(['library-tv-detail', `tv_${tvId}`], updateTvCache);
+      }
+
+      return { prevTvDetail, prevTvDetailWithPrefix };
+    },
+    onError: (err, variables, context) => {
+      if (variables.tvId && context) {
+        if (context.prevTvDetail) {
+          queryClient.setQueryData(['library-tv-detail', variables.tvId], context.prevTvDetail);
+        }
+        if (context.prevTvDetailWithPrefix) {
+          queryClient.setQueryData(['library-tv-detail', `tv_${variables.tvId}`], context.prevTvDetailWithPrefix);
+        }
+      }
+    },
     onSuccess: (data, variables) => {
       if (variables.tvId) {
         queryClient.invalidateQueries({ queryKey: ['library-tv-detail', variables.tvId] });
+        queryClient.invalidateQueries({ queryKey: ['library-tv-detail', `tv_${variables.tvId}`] });
       }
       queryClient.invalidateQueries({ queryKey: ['library'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
+      queryClient.invalidateQueries({ queryKey: ['watched-history'] });
     },
   });
 };

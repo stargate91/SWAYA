@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 
 from app.shared_kernel.enums import ItemStatus, ScanMode
 from app.domains.library.models import Library, MediaItem, ExtraFile
@@ -213,14 +213,25 @@ class ScanPersister:
         links: Dict[Path, Path],
         path_to_item: Dict[Path, MediaItem],
         get_rel_path_fn: Any,
-        extra_determiner: Any
+        extra_determiner: Any,
+        probe_infos: Optional[Dict[str, Any]] = None
     ):
         for p in extra_paths:
             rel_path = get_rel_path_fn(p)
             if rel_path.lower() in existing_extras:
                 continue
 
-            category, subtype = extra_determiner.determine_extra(p, self.db)
+            is_audio_only = False
+            if probe_infos:
+                res = probe_infos.get(str(p))
+                info = res.get("probe_info") if res else None
+                if info:
+                    has_video = bool(info.get("video_codec"))
+                    has_audio = len(info.get("audio_streams") or []) > 0
+                    if not has_video and has_audio:
+                        is_audio_only = True
+
+            category, subtype = extra_determiner.determine_extra(p, self.db, is_audio_only=is_audio_only)
             if category is None:
                 logger.info("[scan:%s] Ignored extra candidate %s because no category matched/allowed", self.mode.value, p.name)
                 continue

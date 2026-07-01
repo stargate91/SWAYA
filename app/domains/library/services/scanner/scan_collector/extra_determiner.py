@@ -9,8 +9,8 @@ class ExtraDeterminer:
         self.mode = mode
         self.settings = settings_port
 
-    def determine_extra(self, path: Path, db: Session) -> Tuple[Optional[ExtraCategory], Optional[ExtraSubtype]]:
-        category, subtype = self.categorizer.categorize(path, settings_port=self.settings)
+    def determine_extra(self, path: Path, db: Session, is_audio_only: bool = False) -> Tuple[Optional[ExtraCategory], Optional[ExtraSubtype]]:
+        category, subtype = self.categorizer.categorize(path, settings_port=self.settings, is_audio_only=is_audio_only)
         if category is None:
             return None, None
 
