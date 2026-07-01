@@ -18,6 +18,12 @@ export default function PerformerEditPage() {
   const [isCustomDirty, setIsCustomDirty] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
 
+  useEffect(() => {
+    if (person && !person.is_adult && activeTab === 'linking') {
+      setActiveTab('mixer');
+    }
+  }, [person, activeTab]);
+
   const handleClose = useCallback(() => {
     if (isCustomDirty) {
       setIsShaking(true);
@@ -73,7 +79,7 @@ export default function PerformerEditPage() {
   }
 
   const TABS = [
-    { id: 'linking', label: t('library.performerEdit.linkedProfiles') || 'Linked Profiles', icon: Link2 },
+    ...(person.is_adult ? [{ id: 'linking', label: t('library.performerEdit.linkedProfiles') || 'Linked Profiles', icon: Link2 }] : []),
     { id: 'mixer', label: t('library.performerEdit.dataMixer') || 'Data Mixer', icon: GitMerge },
     { id: 'custom', label: t('library.performerEdit.customValues') || 'Custom Values', icon: Sliders },
   ];

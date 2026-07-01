@@ -23,34 +23,45 @@ export default function PerformerMixerTab({ person: initialPerson }) {
 
   const currentRouting = localRouting || {};
 
+  const isMale = String(person?.gender) === '2';
+
   const FIELDS = [
     { key: 'biography', label: 'Biography', type: 'text' },
     { key: 'birthday', label: 'Birthday', type: 'string' },
     { key: 'place_of_birth', label: 'Place of Birth', type: 'string' },
-    { key: 'gender', label: 'Gender', type: 'gender' },
+    ...(person?.is_adult ? [{ key: 'gender', label: 'Gender', type: 'gender' }] : []),
     { key: 'height', label: 'Height', type: 'height' },
     { key: 'weight', label: 'Weight', type: 'weight' },
     { key: 'hair_color', label: 'Hair Color', type: 'string' },
     { key: 'eye_color', label: 'Eye Color', type: 'string' },
     { key: 'ethnicity', label: 'Ethnicity', type: 'string' },
-    { key: 'measurements', label: 'Measurements', type: 'string' },
-    { key: 'cup_size', label: 'Cup Size', type: 'string' },
-    { key: 'band_size', label: 'Band Size', type: 'string' },
-    { key: 'waist', label: 'Waist', type: 'string' },
-    { key: 'hip', label: 'Hip', type: 'string' },
+    ...(!isMale
+      ? [
+          { key: 'measurements', label: 'Measurements', type: 'string' },
+          { key: 'cup_size', label: 'Cup Size', type: 'string' },
+          { key: 'band_size', label: 'Band Size', type: 'string' },
+          { key: 'waist', label: 'Waist', type: 'string' },
+          { key: 'hip', label: 'Hip', type: 'string' },
+          { key: 'breast_type', label: 'Breast Type', type: 'string' },
+        ]
+      : []),
     { key: 'tattoos', label: 'Tattoos', type: 'string' },
     { key: 'piercings', label: 'Piercings', type: 'string' },
-    { key: 'breast_type', label: 'Breast Type', type: 'string' },
-    { key: 'same_sex_only', label: 'Same Sex Only', type: 'same_sex_only' },
+    ...(person?.is_adult ? [{ key: 'same_sex_only', label: 'Same Sex Only', type: 'same_sex_only' }] : []),
   ];
 
-  const PROVIDERS = [
-    { key: 'tmdb', label: 'TMDb' },
-    { key: 'stashdb', label: 'StashDB' },
-    { key: 'fansdb', label: 'FansDB' },
-    { key: 'porndb', label: 'THEPornDB' },
-    { key: 'manual', label: 'Custom' },
-  ];
+  const PROVIDERS = person?.is_adult
+    ? [
+        { key: 'tmdb', label: 'TMDb' },
+        { key: 'stashdb', label: 'StashDB' },
+        { key: 'fansdb', label: 'FansDB' },
+        { key: 'porndb', label: 'THEPornDB' },
+        { key: 'manual', label: 'Custom' },
+      ]
+    : [
+        { key: 'tmdb', label: 'TMDb' },
+        { key: 'manual', label: 'Custom' },
+      ];
 
   // Helper to format values nicely in the grid
   const formatValue = (val, type) => {

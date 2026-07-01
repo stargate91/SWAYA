@@ -80,6 +80,25 @@ class PersonDetailCollator:
                         else:
                             loc.biography = tmdb_details["biography"]
                     
+                    tmdb_link = next((l for l in person.external_links if l.provider == Provider.TMDB), None)
+                    if not tmdb_link:
+                        tmdb_link = ExternalSourceLink(
+                            person_id=person.id,
+                            provider=Provider.TMDB,
+                            external_id=str(tmdb_id),
+                        )
+                        db.add(tmdb_link)
+                        person.external_links.append(tmdb_link)
+                    
+                    tmdb_link.source_data = {
+                        "birthday": tmdb_details.get("birthday"),
+                        "deathday": tmdb_details.get("deathday"),
+                        "place_of_birth": tmdb_details.get("place_of_birth"),
+                        "gender": tmdb_details.get("gender"),
+                        "biography": tmdb_details.get("biography"),
+                        "profile_path": tmdb_details.get("profile_path"),
+                    }
+                    
                     ext_ids_from_tmdb = tmdb_details.get("external_ids") or {}
                     imdb_id_from_tmdb = tmdb_details.get("imdb_id") or ext_ids_from_tmdb.get("imdb_id")
                     current_ids = dict(person.external_ids or {})
