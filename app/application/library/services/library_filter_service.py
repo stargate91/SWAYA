@@ -165,12 +165,23 @@ class LibraryFilterService:
             performers_query = performers_query.distinct().order_by(Person.name.asc()).all()
             performers = [{"id": r.id, "name": r.name} for r in performers_query]
 
-            studios_query = self.db.query(Studio.id, Studio.name).join(
+            active_studios = self.db.query(Studio).join(
                 Studio.matches
             ).filter(
                 MetadataMatch.id.in_(match_ids_subquery)
-            ).distinct().order_by(Studio.name.asc()).all()
-            studios = [{"id": r.id, "name": r.name} for r in studios_query]
+            ).distinct().all()
+            
+            studio_map = {}
+            for s in active_studios:
+                studio_map[s.id] = s
+                if s.parent_studio_id:
+                    if s.parent_studio_id not in studio_map:
+                        parent = s.parent_studio or self.db.query(Studio).filter(Studio.id == s.parent_studio_id).first()
+                        if parent:
+                            studio_map[parent.id] = parent
+            
+            sorted_studios = sorted(studio_map.values(), key=lambda x: (x.name or "").lower())
+            studios = [{"id": s.id, "name": s.name} for s in sorted_studios]
 
             hair_colors_query = self.db.query(Person.hair_color).join(
                 MediaPersonLink, MediaPersonLink.person_id == Person.id

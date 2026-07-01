@@ -54,7 +54,13 @@ class SceneQueryBuilder(BaseQueryBuilder):
 
         if params.selected_studio_id:
             from app.domains.metadata.models import Studio
-            query = query.join(MetadataMatch.studios).filter(Studio.id == params.selected_studio_id)
+            from sqlalchemy import or_
+            query = query.join(MetadataMatch.studios).filter(
+                or_(
+                    Studio.id == params.selected_studio_id,
+                    Studio.parent_studio_id == params.selected_studio_id
+                )
+            )
 
         query, joined_localization, joined_override = self._apply_common_filters(
             query, params, joined_localization, joined_override

@@ -64,6 +64,7 @@ class PeopleGroupItem(BaseModel):
     band_size: Optional[int] = None
     waist: Optional[int] = None
     hip: Optional[int] = None
+    height: Optional[int] = None
     hair_color: Optional[str] = None
     ethnicity: Optional[str] = None
     eye_color: Optional[str] = None

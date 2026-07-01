@@ -488,6 +488,8 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     sessionMode,
     activeSessionMode,
     setSessionMode: handleSetSessionMode,
+    favoriteFilter,
+    setFavoriteFilter: handleFilterChange(setFavoriteFilter),
   };
 }
 

@@ -62,6 +62,37 @@ export function sortLibraryItems(items, resolvedTab, sortKey, sortDirection) {
       if (sortKey === 'user_rating') {
         return parseFloat(item.user_rating) || 0;
       }
+      if (sortKey === 'height') {
+        return Number(item.height) || 0;
+      }
+      if (sortKey === 'cup_size') {
+        const cupOrder = {
+          'A': 1, 'B': 2, 'C': 3, 'D': 4, 'DD': 5, 'DDD': 6, 'E': 7, 'EE': 8, 'F': 9, 'FF': 10,
+          'G': 11, 'GG': 12, 'H': 13, 'HH': 14, 'I': 15, 'J': 16, 'K': 17
+        };
+        return cupOrder[String(item.cup_size || '').trim().toUpperCase()] || 0;
+      }
+      if (sortKey === 'waist') {
+        return Number(item.waist) || 0;
+      }
+      if (sortKey === 'hip') {
+        return Number(item.hip) || 0;
+      }
+      if (sortKey === 'hourglass_ratio') {
+        const w = parseFloat(item.waist) || 0;
+        const h = parseFloat(item.hip) || 0;
+        return w > 0 && h > 0 ? w / h : 0;
+      }
+      if (sortKey === 'body_slender') {
+        const w = parseFloat(item.waist) || 0;
+        const h = parseFloat(item.hip) || 0;
+        return w > 0 && h > 0 ? w + h : 0;
+      }
+      if (sortKey === 'body_curvy') {
+        const w = parseFloat(item.waist) || 0;
+        const h = parseFloat(item.hip) || 0;
+        return w > 0 && h > 0 ? w + h : 0;
+      }
     }
 
     if (isLibraryTagsTab(resolvedTab)) {

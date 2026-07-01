@@ -129,6 +129,7 @@ export default function LibraryFilters({
                       { value: 'birthday', label: t('library.sort.birthday') || 'Birthdate' },
                       { value: 'user_rating', label: t('library.sort.userRating') || 'User Rating' },
                       ...(activeSessionMode === 'nsfw' ? [
+                        { value: 'height', label: t('library.sort.height') || 'Height' },
                         { value: 'cup_size', label: t('library.sort.cupSize') || 'Breast Size' },
                         { value: 'waist', label: t('library.sort.waist') || 'Waist Size' },
                         { value: 'hip', label: t('library.sort.hip') || 'Hip Size' },
@@ -349,9 +350,9 @@ export default function LibraryFilters({
       <div className="library-filters-right">
         {isPeople && (
           <Pill
-            variant={favoriteFilter === 'favorites' ? 'favorite-active' : 'favorite'}
+            variant={favoriteFilter === 'favorite' ? 'favorite-active' : 'favorite'}
             onClick={() => {
-              setFavoriteFilter(prev => prev === 'favorites' ? 'all' : 'favorites');
+              setFavoriteFilter(prev => prev === 'favorite' ? 'all' : 'favorite');
               setCurrentPage(1);
             }}
           >
