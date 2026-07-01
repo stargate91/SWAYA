@@ -8,6 +8,28 @@ logger = logging.getLogger(__name__)
 PORNDB_API_BASE = "https://api.theporndb.net"
 SCRAPER_REQUEST_TIMEOUT = 15
 
+
+def _provider_source_name(prov_enum: Provider) -> str:
+    if prov_enum == Provider.PORNDB:
+        return "theporndb"
+    return prov_enum.value
+
+
+def _map_performer_gender(gender_val) -> int:
+    if gender_val in (1, "1"):
+        return 1
+    if gender_val in (2, "2"):
+        return 2
+    gender_str = str(gender_val or "").upper()
+    if "FEMALE" in gender_str:
+        return 1
+    if "MALE" in gender_str:
+        return 2
+    if gender_str:
+        return 3
+    return 0
+
+
 class AdultSearchResolver:
     def search_metadata(
         self,
@@ -197,10 +219,14 @@ class AdultSearchResolver:
             return []
         try:
             results = scraper.search_performers(query)
+            source_name = _provider_source_name(prov_enum)
             formatted = []
             for p in results:
+                perf_id = p.get("id")
+                if not perf_id:
+                    continue
                 formatted.append({
-                    "id": p.get("id"),
+                    "id": f"{source_name}:{perf_id}",
                     "title": p.get("name"),
                     "original_title": None,
                     "release_date": None,
@@ -210,7 +236,8 @@ class AdultSearchResolver:
                     "backdrop_path": None,
                     "rating": float(p.get("scene_count") or 0.0),
                     "media_type": "person",
-                    "provider": prov_enum.value
+                    "provider": prov_enum.value,
+                    "gender": _map_performer_gender(p.get("gender")),
                 })
             return formatted
         except Exception as e:

@@ -104,23 +104,49 @@ class BaseScraper:
 
     def search_performers(self, query_str: str) -> List[Dict[str, Any]]:
         """Search performers using GraphQL."""
-        gql_query = """
-        query SearchPerformers($name: String!) {
-          searchPerformer(term: $name) {
+        normalized = str(query_str or "").strip()
+        if not normalized:
+            return []
+
+        performer_fields = """
             id
             name
             gender
             scene_count
+            deleted
             images {
               url
             }
-          }
-        }
         """
-        data = self.execute_query(gql_query, {"name": query_str})
+
+        new_query = f"""
+        query SearchPerformers($term: String!) {{
+          searchPerformers(term: $term, per_page: 25) {{
+            performers {{
+              {performer_fields}
+            }}
+          }}
+        }}
+        """
+        data = self.execute_query(new_query, {"term": normalized})
+        if data and data.get("searchPerformers"):
+            performers = data["searchPerformers"].get("performers") or []
+            performers = [p for p in performers if not p.get("deleted")]
+            if performers:
+                return performers
+
+        legacy_query = f"""
+        query SearchPerformersLegacy($term: String!) {{
+          searchPerformer(term: $term) {{
+            {performer_fields}
+          }}
+        }}
+        """
+        data = self.execute_query(legacy_query, {"term": normalized})
         if not data or "searchPerformer" not in data:
             return []
-        return data["searchPerformer"] or []
+        performers = data["searchPerformer"] or []
+        return [p for p in performers if not p.get("deleted")]
 
     def get_performer_details(self, performer_id: str) -> Optional[Dict[str, Any]]:
         """Gets detailed performer metadata using GraphQL."""

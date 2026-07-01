@@ -108,7 +108,20 @@ class OrganizerGroupsBuilder:
                     if not resolved_poster:
                         resolved_poster = self._resolve_image_with_fallback(m.local_still_path, m.still_path, "stills")
                 else:
-                    if loc:
+                    tv_show_match = None
+                    curr = m
+                    while curr:
+                        if curr.media_type.value == "tv":
+                            tv_show_match = curr
+                            break
+                        curr = curr.parent
+
+                    if tv_show_match:
+                        tv_loc = LanguageService.get_best_localization(tv_show_match.localizations, pref_lang)
+                        if tv_loc:
+                            resolved_poster = self._resolve_image_with_fallback(tv_loc.local_poster_path, tv_loc.poster_path, "posters")
+
+                    if not resolved_poster and loc:
                         resolved_poster = self._resolve_image_with_fallback(loc.local_poster_path, loc.poster_path, "posters")
                     if not resolved_poster:
                         resolved_poster = self._resolve_image_with_fallback(m.local_backdrop_path, m.backdrop_path, "backdrops")

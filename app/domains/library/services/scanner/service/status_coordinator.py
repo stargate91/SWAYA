@@ -41,6 +41,14 @@ class StatusCoordinator:
         ).order_by(BackgroundTask.id.desc()).first()
         
         if task:
+            worker = getattr(self.task_manager, "people_enrich_worker", None)
+            if worker and worker.active_task_id == task.id:
+                return {
+                    "active": True,
+                    "phase": "enriching",
+                    "current": worker.completed_count,
+                    "total": worker.total_queued
+                }
             return {
                 "active": True,
                 "phase": "enriching",

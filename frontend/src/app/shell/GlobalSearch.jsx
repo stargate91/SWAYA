@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, ChevronDown, ArrowUpRight, Clapperboard, Film, Tv, Users, Video, Loader2 } from 'lucide-react';
 import api from '../lib/api';
@@ -56,6 +56,20 @@ export default function GlobalSearch() {
 
   const hasAdult = settings?.include_adult;
   const filteredSources = SOURCES.filter(s => !s.adult || hasAdult);
+
+  const filteredResults = useMemo(() => {
+    const pref = settings?.adult_gender_preference;
+    const isAdultSource = SOURCES.find((s) => s.id === selectedSource)?.adult;
+    if (!isAdultSource || selectedType !== 'person' || !pref || pref === 'all') {
+      return results;
+    }
+    return results.filter((item) => {
+      const g = item.gender;
+      if (pref === 'female') return g === 1 || g === '1';
+      if (pref === 'male') return g === 2 || g === '2';
+      return true;
+    });
+  }, [results, selectedSource, selectedType, settings?.adult_gender_preference]);
 
   // Close menus when clicking outside
   useEffect(() => {
@@ -224,10 +238,10 @@ export default function GlobalSearch() {
       </div>
 
       {/* Suggestion Results Overlay */}
-      {isOverlayOpen && results.length > 0 && (
+      {isOverlayOpen && filteredResults.length > 0 && (
         <div className="global-search__overlay">
           <div className="global-search__results-list">
-            {results.map((item, idx) => (
+            {filteredResults.map((item, idx) => (
               <div
                 key={`${item.id}-${item.media_type}-${idx}`}
                 className="global-search__result-item"

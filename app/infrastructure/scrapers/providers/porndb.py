@@ -5,7 +5,7 @@ from app.shared_kernel.enums import Provider, MediaType
 from app.infrastructure.scrapers.support.normalizer import ScraperNormalizer
 from app.infrastructure.scrapers.support.base import BaseScraper
 from app.infrastructure.scrapers.providers.porndb_client import PornDbClient
-from app.shared_kernel.constants import PORNDB_DEFAULT_ENDPOINT
+from app.shared_kernel.constants import PORNDB_DEFAULT_ENDPOINT, PORNDB_API_BASE, SCRAPER_REQUEST_TIMEOUT
 
 logger = logging.getLogger(__name__)
 
@@ -133,6 +133,57 @@ class PornDBScraper(BaseScraper):
             external_id=str(movie_id),
         )
         return self.enrich_movie_ratings(data) if data else None
+
+    def search_performers(self, query_str: str) -> list[dict]:
+        normalized_query = str(query_str or "").strip()
+        if not normalized_query:
+            return []
+
+        api_token = self.get_setting("porndb_api_key") or self.get_setting("porndb_api_token")
+        if not api_token:
+            logger.warning("PornDB API key not configured.")
+            return []
+
+        headers = {
+            "Authorization": f"Bearer {api_token}",
+            "Accept": "application/json",
+        }
+        try:
+            resp = self.session.get(
+                f"{PORNDB_API_BASE}/performers",
+                params={"q": normalized_query},
+                headers=headers,
+                timeout=SCRAPER_REQUEST_TIMEOUT,
+            )
+            if resp.status_code != 200:
+                logger.error(f"PornDB REST performers search failed with status {resp.status_code}")
+                return super().search_performers(normalized_query)
+
+            performers = resp.json().get("data") or []
+            formatted = []
+            for perf in performers:
+                parent = perf.get("parent") or perf
+                perf_id = parent.get("id")
+                if not perf_id:
+                    continue
+
+                images = []
+                image_url = parent.get("image") or parent.get("face")
+                if image_url:
+                    images.append({"url": image_url})
+
+                extras = parent.get("extras") or {}
+                formatted.append({
+                    "id": str(perf_id),
+                    "name": parent.get("name"),
+                    "gender": extras.get("gender") or parent.get("gender"),
+                    "scene_count": parent.get("scene_count") or 0,
+                    "images": images,
+                })
+            return formatted
+        except Exception as exc:
+            logger.error(f"PornDB REST performers search error: {exc}")
+            return super().search_performers(normalized_query)
 
     def search_movies(
         self,

@@ -38,6 +38,10 @@
   -webkit-app-region: no-drag;
 }
 
+.window-titlebar__center-container.has-progress {
+  justify-content: flex-start;
+}
+
 .window-titlebar__search-wrapper {
   flex: 1 1 320px;
   max-width: 480px;
@@ -46,24 +50,27 @@
 }
 
 .window-titlebar__search-wrapper.has-progress {
-  max-width: 240px;
-  flex-basis: 200px;
+  max-width: 360px;
+  flex-basis: 360px;
 }
 
 .window-titlebar__progress-wrapper {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: var(--space-md);
-  flex: 2 1 auto;
-  min-width: 0;
+  z-index: 10;
 }
 
 .window-titlebar__progress-wrapper .ui-progress-bar-container {
   flex: 1 1 380px;
-  max-width: 480px;
-  min-width: 240px;
-  width: auto;
+  max-width: 680px;
+  min-width: 320px;
+  width: 380px;
 }
 
 .window-titlebar__brand-text {

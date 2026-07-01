@@ -100,7 +100,7 @@ export default function WindowTitlebar() {
         <span className="window-titlebar__brand-text">{BRAND_NAME}</span>
       </div>
 
-      <div className="window-titlebar__center-container">
+      <div className={`window-titlebar__center-container ${hasProgress ? 'has-progress' : ''}`}>
         <div className={`window-titlebar__search-wrapper ${hasProgress ? 'has-progress' : ''}`}>
           <GlobalSearch />
         </div>

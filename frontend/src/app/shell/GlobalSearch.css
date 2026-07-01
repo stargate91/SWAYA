@@ -176,7 +176,7 @@
 .global-search__overlay {
   position: absolute;
   top: calc(100% + 8px);
-  right: 0;
+  left: 0;
   width: 480px;
   max-height: 400px;
   background: color-mix(in srgb, var(--color-panel-strong, #111115) 98%, transparent);
