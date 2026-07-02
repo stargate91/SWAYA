@@ -1,7 +1,7 @@
 .library-page {
   margin-top: calc(-1 * var(--page-top-offset, var(--space-4xl)));
   margin-right: calc(-1 * var(--space-7, 1.75rem));
-  margin-bottom: calc(-1 * var(--shell-top-band-height, 2.875rem));
+  margin-bottom: 0;
 }
 
 .library-page::after {
@@ -19,13 +19,18 @@
   padding-bottom: 0;
 }
 
-.library-main>.ui-pagination:last-child {
+.library-main > *:last-child {
   margin-bottom: 0;
 }
 
-.library-bottom-spacer {
-  flex: 0 0 calc(var(--page-bottom-offset, var(--space-4xl)) - var(--space-5, var(--space-3xl)));
-  min-height: calc(var(--page-bottom-offset, var(--space-4xl)) - var(--space-5, var(--space-3xl)));
+.library-grid-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.library-grid-container > *:last-child {
+  margin-bottom: 0;
 }
 
 .library-bulk-banner {

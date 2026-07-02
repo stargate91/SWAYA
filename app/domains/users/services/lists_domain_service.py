@@ -15,11 +15,12 @@ class ListsDomainService:
         )
 
     @staticmethod
-    def create_custom_list(name: str, description: Optional[str], color: str) -> CustomList:
+    def create_custom_list(name: str, description: Optional[str], color: str, list_type: CustomListType = CustomListType.MEDIA) -> CustomList:
         return CustomList(
             name=name,
             description=description,
-            color=color
+            color=color,
+            list_type=list_type
         )
 
     @staticmethod

@@ -359,7 +359,7 @@ export default function SearchPage() {
                 </Button>
               </div>
             )}
-            <div className="library-bottom-spacer" aria-hidden="true" />
+            
           </>
         )}
       </div>

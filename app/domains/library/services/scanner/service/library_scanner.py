@@ -125,7 +125,7 @@ class LibraryScanner:
                     with StatusCoordinator.scan_status_lock:
                         StatusCoordinator.scan_status["current"] = int(pct * 100)
                         StatusCoordinator.scan_status["total"] = 100
-                    self.task_manager.update_progress(task_id, pct * 0.5)
+                    self.task_manager.update_progress(task_id, pct * 50.0)
                 to_enrich, _ = await asyncio.to_thread(
                     scanner.scan_library,
                     lib.id,

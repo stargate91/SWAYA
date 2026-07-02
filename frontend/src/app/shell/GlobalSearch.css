@@ -89,7 +89,7 @@
   outline: none;
   color: var(--color-text-primary, #f8fafc);
   font-size: 12px;
-  width: 260px;
+  width: 100%;
   padding-right: 32px;
 }
 

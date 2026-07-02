@@ -8,7 +8,7 @@ export default function DashboardPage() {
 
   if (isSettingsLoading) {
     return (
-      <Page className="dashboard-page" contentBottom>
+      <Page className="dashboard-page">
         <div className="dashboard-loading">
           <div className="dashboard-spinner" />
         </div>
@@ -17,7 +17,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <Page className="dashboard-page" contentBottom>
+    <Page className="dashboard-page" contentBottom={false}>
       <div className="dashboard-container">
         <DashboardView />
       </div>

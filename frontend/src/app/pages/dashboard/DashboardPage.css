@@ -57,6 +57,10 @@
   margin-bottom: var(--space-6xl);
 }
 
+.dashboard-container .dashboard-widget:last-child {
+  margin-bottom: 0;
+}
+
 .dashboard-widget__loading {
   display: flex;
   align-items: center;

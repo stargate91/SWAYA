@@ -143,6 +143,8 @@ class LibraryFilterService:
         tattoos = []
         piercings = []
         breast_types = []
+        butt_shapes = []
+        butt_sizes = []
         if is_adult:
             from app.domains.people.models import Person, MediaPersonLink
             from app.domains.metadata.models import Studio

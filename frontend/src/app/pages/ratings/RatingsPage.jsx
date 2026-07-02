@@ -595,23 +595,6 @@ export default function RatingsPage() {
                     />
                   )}
                 </div>
-                {!state.isLoading && state.activeTab !== 'analytics' && (
-                  <LibraryPagination
-                    state={{
-                      paginatedItems: state.paginatedItems,
-                      shouldShowPagination: state.totalPages > 1,
-                      summaryText: state.totalItems > 0
-                        ? `${(state.currentPage - 1) * state.pageSize + 1}-${Math.min(state.currentPage * state.pageSize, state.totalItems)} / ${state.totalItems}`
-                        : '0-0 / 0',
-                      currentPage: state.currentPage,
-                      totalPages: state.totalPages,
-                      pageSize: state.pageSize,
-                      setCurrentPage: state.setCurrentPage,
-                      setPageSize: state.setPageSize,
-                      t: t
-                    }}
-                  />
-                )}
               </div>
             )}
           </div>

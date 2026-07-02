@@ -265,6 +265,8 @@ class CustomListItemResponse(BaseModel):
     tmdb_id: Optional[int] = None
     media_type: Optional[str] = None
     poster_path: Optional[str] = None
+    year: Optional[int] = None
+    rating: Optional[float] = None
 
 
 class CustomListResponse(BaseModel):
@@ -273,6 +275,7 @@ class CustomListResponse(BaseModel):
     is_watchlist: bool
     description: Optional[str] = None
     color: str
+    list_type: CustomListType = CustomListType.MEDIA
     created_at: Optional[str] = None
     item_count: int
     sample_posters: List[str]
@@ -284,6 +287,7 @@ class CustomListDetailResponse(BaseModel):
     is_watchlist: bool
     description: Optional[str] = None
     color: Optional[str] = None
+    list_type: CustomListType = CustomListType.MEDIA
     created_at: Optional[str] = None
     items: List[CustomListItemResponse]
 

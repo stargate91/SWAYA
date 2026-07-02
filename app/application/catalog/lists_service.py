@@ -40,6 +40,8 @@ class ListsService:
             "tmdb_id": None,
             "media_type": None,
             "poster_path": None,
+            "year": None,
+            "rating": None,
         }
         
         # Populate basic info based on what is linked
@@ -49,12 +51,18 @@ class ListsService:
             if match:
                 res["tmdb_id"] = int(match.external_id) if match.external_id.isdigit() else None
                 res["media_type"] = match.media_type.value
+                res["rating"] = match.rating_imdb or match.rating_tmdb
+                if match.release_date:
+                    res["year"] = match.release_date.year
                 loc = next((l for l in match.localizations), None)
                 if loc:
                     res["poster_path"] = loc.poster_path
         elif item.match:
             res["tmdb_id"] = int(item.match.external_id) if item.match.external_id.isdigit() else None
             res["media_type"] = item.match.media_type.value
+            res["rating"] = item.match.rating_imdb or item.match.rating_tmdb
+            if item.match.release_date:
+                res["year"] = item.match.release_date.year
             loc = next((l for l in item.match.localizations), None)
             res["title"] = loc.title if loc else item.match.original_title or f"Match #{item.match.id}"
             if loc:
@@ -88,6 +96,7 @@ class ListsService:
                 is_watchlist=l.name == "Watchlist",
                 description=l.description,
                 color=l.color or "#3b82f6",
+                list_type=l.list_type,
                 created_at=l.created_at.isoformat() if l.created_at else None,
                 item_count=item_count,
                 sample_posters=posters
@@ -104,6 +113,7 @@ class ListsService:
             is_watchlist=l.name == "Watchlist",
             description=l.description,
             color=l.color,
+            list_type=l.list_type,
             created_at=l.created_at.isoformat() if l.created_at else None,
             items=[self._serialize_item(item) for item in l.items]
         )
@@ -112,6 +122,11 @@ class ListsService:
         name = payload.get("name", "").strip()
         description = payload.get("description", "")
         color = payload.get("color", "")
+        list_type_str = payload.get("list_type", "media")
+        try:
+            list_type = CustomListType(list_type_str.lower())
+        except ValueError:
+            list_type = CustomListType.MEDIA
 
         if not name:
             raise BadRequestException("List name is required")
@@ -121,7 +136,9 @@ class ListsService:
             raise BadRequestException("A list with this name already exists")
 
         from app.domains.users.services.lists_domain_service import ListsDomainService
-        new_list = ListsDomainService.create_custom_list(name=name, description=description, color=color)
+        new_list = ListsDomainService.create_custom_list(
+            name=name, description=description, color=color, list_type=list_type
+        )
         self.db.add(new_list)
         self.db.commit()
 
@@ -131,6 +148,7 @@ class ListsService:
             is_watchlist=False,
             description=new_list.description,
             color=new_list.color,
+            list_type=new_list.list_type,
             created_at=new_list.created_at.isoformat() if new_list.created_at else None,
             item_count=0,
             sample_posters=[]
@@ -207,6 +225,43 @@ class ListsService:
         item = ListsDomainService.create_list_item(list_id=list_id, media_item_id=media_item_id, match_id=match_id)
         self.db.add(item)
         self.db.commit()
+
+        # Track the item immediately so it gets enriched and fully imported into the database
+        try:
+            from app.domains.users.services.overrides_service import OverridesService
+            from app.infrastructure.media.db_media_resolver import DbMediaResolver
+            from app.infrastructure.scrapers.support.gateway import scraper_gateway
+            from app.infrastructure.scrapers.enrichment.mainstream_enricher import MainstreamEnricher
+            
+            resolver = DbMediaResolver(self.db)
+            scrapers = scraper_gateway
+            mainstream = MainstreamEnricher
+            
+            overrides = OverridesService(
+                db=self.db,
+                resolver=resolver,
+                scrapers=scrapers,
+                mainstream_enricher=mainstream
+            )
+            
+            track_id = None
+            if media_item_id:
+                track_id = str(media_item_id)
+            elif tmdb_id:
+                track_id = f"tmdb_{tmdb_id}"
+                
+            if track_id:
+                overrides.track_item(track_id, True)
+        except Exception as ex:
+            logger.error(f"Failed to auto-track list item {media_item_id or tmdb_id}: {ex}")
+
+        try:
+            self.db.refresh(item)
+            if item.match:
+                self.db.refresh(item.match)
+        except Exception:
+            pass
+
         return self._serialize_item(item)
 
     def remove_item_from_list(self, list_id: int, item_id: int) -> Dict[str, Any]:

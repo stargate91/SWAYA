@@ -30,7 +30,7 @@ class Collector:
     def __init__(self, min_video_size_mb: float = 50.0):
         self.fast_track_size = min_video_size_mb * 1024 * 1024
 
-    def collect(self, paths: List[str], settings_port: Optional[SettingsPort] = None) -> Dict[str, List[Path]]:
+    def collect(self, paths: List[str], settings_port: Optional[SettingsPort] = None, progress_callback: Optional[Any] = None) -> Dict[str, List[Path]]:
         """
         Recursively traverses directories and groups files into categories.
         """
@@ -55,7 +55,9 @@ class Collector:
                 for e in str(setting_val).split(",") if e.strip()
             }
 
+        files_processed = 0
         def process_file(file_path: Path):
+            nonlocal files_processed
             # Skip hidden files and directories
             if any(part.startswith('.') for part in file_path.parts):
                 results["ignored"].append(file_path)
@@ -83,6 +85,10 @@ class Collector:
             
             else:
                 results["ignored"].append(file_path)
+
+            files_processed += 1
+            if progress_callback and files_processed % 100 == 0:
+                progress_callback(files_processed)
 
         for root_path in paths:
             p = Path(root_path)

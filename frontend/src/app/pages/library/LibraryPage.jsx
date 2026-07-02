@@ -121,20 +121,32 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
               setYearFilter={state.setYearFilter}
               timeFilterMode={state.timeFilterMode}
               setTimeFilterMode={state.setTimeFilterMode}
-              favoriteFilter={state.favoriteFilter}
-              setFavoriteFilter={state.setFavoriteFilter}
-              selectedTags={state.selectedTags}
-              setSelectedTags={state.setSelectedTags}
-              performerFilter={state.performerFilter}
-              setPerformerFilter={state.setPerformerFilter}
-              studioFilter={state.studioFilter}
-              setStudioFilter={state.setStudioFilter}
+              activeFilters={state.activeFilters}
+              isAdultMode={isAdultMode}
+              genresFilter={state.genresFilter}
+              setGenresFilter={state.setGenresFilter}
+              countriesFilter={state.countriesFilter}
+              setCountriesFilter={state.setCountriesFilter}
+              studiosFilter={state.studiosFilter}
+              setStudiosFilter={state.setStudiosFilter}
+              subtitlesFilter={state.subtitlesFilter}
+              setSubtitlesFilter={state.setSubtitlesFilter}
+              tagsFilter={state.tagsFilter}
+              setTagsFilter={state.setTagsFilter}
+              directorsFilter={state.directorsFilter}
+              setDirectorsFilter={state.setDirectorsFilter}
+              ratingsFilter={state.ratingsFilter}
+              setRatingsFilter={state.setRatingsFilter}
+              ageRatingsFilter={state.ageRatingsFilter}
+              setAgeRatingsFilter={state.setAgeRatingsFilter}
+              resolutionsFilter={state.resolutionsFilter}
+              setResolutionsFilter={state.setResolutionsFilter}
               hairColorFilter={state.hairColorFilter}
               setHairColorFilter={state.setHairColorFilter}
-              ethnicityFilter={state.ethnicityFilter}
-              setEthnicityFilter={state.setEthnicityFilter}
               eyeColorFilter={state.eyeColorFilter}
               setEyeColorFilter={state.setEyeColorFilter}
+              ethnicityFilter={state.ethnicityFilter}
+              setEthnicityFilter={state.setEthnicityFilter}
               tattoosFilter={state.tattoosFilter}
               setTattoosFilter={state.setTattoosFilter}
               piercingsFilter={state.piercingsFilter}
@@ -156,35 +168,36 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
           showPageSizes
         />
 
-        <LibraryGrid
-          key={state.resolvedTab}
-          t={state.t}
-          isDataLoading={state.isDataLoading}
-          paginatedItems={state.paginatedItems}
-          isTags={state.isTags}
-          isCollections={state.isCollections}
-          resolvedTab={state.resolvedTab}
-          emptyTitle={state.emptyTitle}
-          emptyDescription={state.emptyDescription}
-          emptyStateVariant={state.emptyStateVariant}
-          emptyIcon={state.emptyIcon}
-          hasActiveFilters={state.hasActiveFilters}
-          onAddPeople={modals.openAddPeopleModal}
-          onCreateTag={modals.openCreateTagModal}
-          onEditTag={modals.openEditTagModal}
-          onDeleteTag={modals.openDeleteTagModal}
-          focusedTag={focusedTag}
-          onFocusTag={setFocusedTagName}
-          onExitTagFocus={() => setFocusedTagName(null)}
-          activeSessionMode={state.activeSessionMode}
-          onEditImage={setImagePickerData}
-        />
+        <div className="library-grid-container">
+          <LibraryGrid
+            key={state.resolvedTab}
+            t={state.t}
+            isDataLoading={state.isDataLoading}
+            paginatedItems={state.paginatedItems}
+            isTags={state.isTags}
+            isCollections={state.isCollections}
+            resolvedTab={state.resolvedTab}
+            emptyTitle={state.emptyTitle}
+            emptyDescription={state.emptyDescription}
+            emptyStateVariant={state.emptyStateVariant}
+            emptyIcon={state.emptyIcon}
+            hasActiveFilters={state.hasActiveFilters}
+            onAddPeople={modals.openAddPeopleModal}
+            onCreateTag={modals.openCreateTagModal}
+            onEditTag={modals.openEditTagModal}
+            onDeleteTag={modals.openDeleteTagModal}
+            focusedTag={focusedTag}
+            onFocusTag={setFocusedTagName}
+            onExitTagFocus={() => setFocusedTagName(null)}
+            activeSessionMode={state.activeSessionMode}
+            onEditImage={setImagePickerData}
+          />
 
-        <LibraryPagination
-          state={state}
-          isTagFocusMode={isTagFocusMode}
-          showSpacer
-        />
+          <LibraryPagination
+            state={state}
+            isTagFocusMode={isTagFocusMode}
+          />
+        </div>
       </div>
 
       {/* Image Picker Drawer */}

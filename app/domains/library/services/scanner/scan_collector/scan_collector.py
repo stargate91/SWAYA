@@ -93,10 +93,19 @@ class ScanCollector:
         Returns a tuple of (new_or_modified_items_needing_enrichment, probe_infos).
         """
         if self.progress_callback:
-            self.progress_callback(5.0)
+            self.progress_callback(0.05)
 
-        # 1. Collect files from root_path
-        files = self.collector.collect([self.library.root_path], settings_port=self.settings_port)
+        # 1. Collect files from root_path with asymptotic progress feedback
+        def collect_progress_cb(count):
+            if self.progress_callback:
+                pct = 0.05 + (1.0 - 1.0 / (1.0 + count / 1000.0)) * 0.35
+                self.progress_callback(pct)
+
+        files = self.collector.collect(
+            [self.library.root_path],
+            settings_port=self.settings_port,
+            progress_callback=collect_progress_cb
+        )
         potential_media = files["potential_media"]
         potential_extras = files["potential_extras"]
 
@@ -195,7 +204,7 @@ class ScanCollector:
                     
                     probed_count += 1
                     if self.progress_callback:
-                        pct = 5.0 + (float(probed_count) / len(probe_targets)) * 80.0
+                        pct = 0.40 + (float(probed_count) / len(probe_targets)) * 0.50
                         self.progress_callback(pct)
 
         # 4. Filter into media paths vs extra paths based on duration
@@ -252,6 +261,6 @@ class ScanCollector:
         )
 
         if self.progress_callback:
-            self.progress_callback(100.0)
+            self.progress_callback(1.0)
 
         return to_process, probe_infos

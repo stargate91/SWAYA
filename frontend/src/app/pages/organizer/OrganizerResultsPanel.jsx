@@ -106,17 +106,6 @@ export default function OrganizerResultsPanel({
                 clearSelectedRows={clearSelectedRows}
               />
             </div>
-
-            {shouldShowPagination ? (
-              <PaginationBar
-                summaryText={summaryText}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                pageSize={pageSize}
-                onPageChange={onPageChange}
-                labels={labels}
-              />
-            ) : null}
           </div>
         </>
       )}

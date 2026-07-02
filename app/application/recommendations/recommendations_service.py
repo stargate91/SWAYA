@@ -145,7 +145,7 @@ class RecommendationsService:
         if not watchlist:
             return ActionResponse(status="error", message="Watchlist not found")
         
-        item = self.lists_service.add_item_to_list(watchlist.id, tmdb_id=tmdb_id, media_type=media_type)
+        item = self.lists_service.add_item_to_list(watchlist.id, {"tmdb_id": tmdb_id, "media_type": media_type})
         return ActionResponse(status="success", id=item.id)
 
     def remove_from_watchlist(self, tmdb_id: int) -> ActionResponse:
