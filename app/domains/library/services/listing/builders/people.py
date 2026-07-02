@@ -50,6 +50,10 @@ class PeopleQueryBuilder:
                 people_items = [item for item in people_items if not item.piercings or str(item.piercings).strip().lower() in ("no", "none", "nincs")]
         if params.filter_breast_type:
             people_items = [item for item in people_items if item.breast_type == params.filter_breast_type]
+        if params.filter_butt_shape:
+            people_items = [item for item in people_items if item.butt_shape == params.filter_butt_shape]
+        if params.filter_butt_size:
+            people_items = [item for item in people_items if item.butt_size == params.filter_butt_size]
 
         if params.filter_favorite == "favorite":
             people_items = [item for item in people_items if item.is_favorite]

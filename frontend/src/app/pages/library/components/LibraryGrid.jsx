@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import './entityDetail/EntityDetailHeroSection.css';
 import { usePlayMediaMutation, useSettingsQuery } from '@/queries';
 import api from '@/lib/api';
@@ -27,7 +28,7 @@ import {
   isLibraryScenesTab,
 } from '@/lib/libraryTabs';
 import { isMovieMediaType, isPersonMediaType, isTvLikeMediaType, isSceneMediaType } from '@/lib/mediaTypes';
-import { Heart, Pencil, Play, Plus, Trash2, UserPlus } from 'lucide-react';
+import { Heart, Pencil, Play, Plus, Trash2, UserPlus, X } from 'lucide-react';
 
 const renderUserRatingBadge = (item) => {
   const rating = Number(item?.user_rating);
@@ -255,11 +256,28 @@ const TagPosterCard = memo(({
   emptyIcon,
   isFocusMode,
   onClick,
+  onRemove,
 }) => {
   const isPerson = isPersonMediaType(item.type);
   const ratingImdb = item.rating_imdb;
   const ratingTmdb = item.rating;
   const ratingPorndb = item.rating_porndb;
+
+  const removeButton = onRemove ? (
+    <button
+      type="button"
+      className="ui-poster-card__remove-badge"
+      title={t('common.remove') || 'Remove'}
+      aria-label={t('common.remove') || 'Remove'}
+      onClick={(e) => {
+        e.stopPropagation();
+        onRemove(item);
+      }}
+    >
+      <X size={14} />
+    </button>
+  ) : null;
+
   let cardProps;
   if (isPerson) {
     cardProps = {
@@ -271,6 +289,7 @@ const TagPosterCard = memo(({
       className: 'library-person-card',
       badge: renderUserRatingBadge(item),
       topRightBadge: renderFavoriteBadge(item, t),
+      topRightAction: removeButton,
     };
   } else {
     const subtitleParts = [];
@@ -289,6 +308,7 @@ const TagPosterCard = memo(({
       ratingImdb: ratingImdb,
       ratingTmdb: ratingTmdb,
       ratingPorndb: ratingPorndb,
+      topRightAction: removeButton,
     };
   }
 
@@ -596,6 +616,30 @@ export default function LibraryGrid({
 
 function ExpandedTagPanel({ tag, t, resolvePosterUrl, emptyIcon, isFocusMode = false, activeSessionMode }) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const removeTagMutation = useMutation({
+    mutationFn: async (item) => {
+      const isPerson = isPersonMediaType(item.type);
+      if (isPerson) {
+        const detail = await api.people.getDetail(item.id);
+        const currentTags = detail.custom_tags || [];
+        const nextTags = currentTags.filter(t => t !== tag.name);
+        return api.people.updateStatus(item.id, { custom_tags: nextTags });
+      } else {
+        const detail = await api.library.getItemDetail(item.id, { mediaType: item.type });
+        const currentTags = detail.custom_tags || [];
+        const nextTags = currentTags.filter(t => t !== tag.name);
+        return api.media.updateStatus(item.id, { custom_tags: nextTags, media_type: item.type });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['libraryTags'] });
+      queryClient.invalidateQueries({ queryKey: ['allTags'] });
+      queryClient.invalidateQueries({ queryKey: ['library'] });
+    }
+  });
+
   const allItems = useMemo(() => {
     if (Array.isArray(tag.mode_items)) {
       return tag.mode_items;
@@ -656,6 +700,7 @@ function ExpandedTagPanel({ tag, t, resolvePosterUrl, emptyIcon, isFocusMode = f
             resolvePosterUrl={resolvePosterUrl}
             emptyIcon={emptyIcon}
             isFocusMode={isFocusMode}
+            onRemove={(targetItem) => removeTagMutation.mutate(targetItem)}
             onClick={() => {
               const isPerson = isPersonMediaType(item.type);
               if (isPerson) {

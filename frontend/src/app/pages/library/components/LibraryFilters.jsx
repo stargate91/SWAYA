@@ -77,6 +77,10 @@ export default function LibraryFilters({
   setPiercingsFilter,
   breastTypeFilter,
   setBreastTypeFilter,
+  buttShapeFilter,
+  setButtShapeFilter,
+  buttSizeFilter,
+  setButtSizeFilter,
   filterData,
 }) {
   const isVideoTab = isLibraryVideoTab(resolvedTab);
@@ -608,8 +612,44 @@ export default function LibraryFilters({
                   setCurrentPage(1);
                 }}
                 options={[
-                  { value: '', label: t('library.filter.allBreastTypes') || 'All Types' },
+                  { value: '', label: t('library.filter.allBreastTypes') || 'All' },
                   ...(filterData.breast_types).map(bt => ({ value: bt, label: formatPhysicalAttributeLabel(bt) })),
+                ]}
+              />
+            </div>
+          )}
+
+          {filterData?.butt_shapes && filterData.butt_shapes.length > 0 && (
+            <div className="library-sorter-container">
+              <span className="library-sorter-label">{t('library.filter.buttShapeLabel') || 'Butt Shape:'}</span>
+              <Dropdown
+                variant="sorter"
+                value={buttShapeFilter}
+                onChange={(e) => {
+                  setButtShapeFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+                options={[
+                  { value: '', label: t('library.filter.allButtShapes') || 'All' },
+                  ...(filterData.butt_shapes).map(bs => ({ value: bs, label: formatPhysicalAttributeLabel(bs) })),
+                ]}
+              />
+            </div>
+          )}
+
+          {filterData?.butt_sizes && filterData.butt_sizes.length > 0 && (
+            <div className="library-sorter-container">
+              <span className="library-sorter-label">{t('library.filter.buttSizeLabel') || 'Butt Size:'}</span>
+              <Dropdown
+                variant="sorter"
+                value={buttSizeFilter}
+                onChange={(e) => {
+                  setButtSizeFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+                options={[
+                  { value: '', label: t('library.filter.allButtSizes') || 'All' },
+                  ...(filterData.butt_sizes).map(bz => ({ value: bz, label: formatPhysicalAttributeLabel(bz) })),
                 ]}
               />
             </div>

@@ -27,6 +27,8 @@ class ListingFilterParams:
         filter_tattoos: Optional[str] = None,
         filter_piercings: Optional[str] = None,
         filter_breast_type: Optional[str] = None,
+        filter_butt_shape: Optional[str] = None,
+        filter_butt_size: Optional[str] = None,
     ):
         self.tab = tab
         self.page = page
@@ -52,3 +54,5 @@ class ListingFilterParams:
         self.filter_tattoos = filter_tattoos
         self.filter_piercings = filter_piercings
         self.filter_breast_type = filter_breast_type
+        self.filter_butt_shape = filter_butt_shape
+        self.filter_butt_size = filter_butt_size

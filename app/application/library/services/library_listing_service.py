@@ -252,6 +252,8 @@ class LibraryListingService:
         filter_tattoos: Optional[str] = None,
         filter_piercings: Optional[str] = None,
         filter_breast_type: Optional[str] = None,
+        filter_butt_shape: Optional[str] = None,
+        filter_butt_size: Optional[str] = None,
     ) -> LibraryTabResponse:
         """
         Retrieves a paginated, filtered, and sorted list of library items for a specific UI tab.
@@ -281,6 +283,8 @@ class LibraryListingService:
             filter_tattoos=filter_tattoos,
             filter_piercings=filter_piercings,
             filter_breast_type=filter_breast_type,
+            filter_butt_shape=filter_butt_shape,
+            filter_butt_size=filter_butt_size,
         )
 
         if tab in ("people", "adult_people"):

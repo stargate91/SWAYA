@@ -43,6 +43,8 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
   const [tattoosFilter, setTattoosFilter] = useState('');
   const [piercingsFilter, setPiercingsFilter] = useState('');
   const [breastTypeFilter, setBreastTypeFilter] = useState('');
+  const [buttShapeFilter, setButtShapeFilter] = useState('');
+  const [buttSizeFilter, setButtSizeFilter] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
   const [timeFilterMode, setTimeFilterMode] = useState('decade'); // 'decade' or 'year'
   const [currentPage, setCurrentPage] = useState(1);
@@ -75,6 +77,8 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     setTattoosFilter('');
     setPiercingsFilter('');
     setBreastTypeFilter('');
+    setButtShapeFilter('');
+    setButtSizeFilter('');
     setSelectedTags([]);
   };
 
@@ -118,6 +122,8 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
       filter_tattoos: tattoosFilter !== '' ? tattoosFilter : undefined,
       filter_piercings: piercingsFilter !== '' ? piercingsFilter : undefined,
       filter_breast_type: breastTypeFilter !== '' ? breastTypeFilter : undefined,
+      filter_butt_shape: buttShapeFilter !== '' ? buttShapeFilter : undefined,
+      filter_butt_size: buttSizeFilter !== '' ? buttSizeFilter : undefined,
       selected_tags: selectedTags.length > 0 ? selectedTags.join(',') : undefined,
     };
   }, [
@@ -147,6 +153,8 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     tattoosFilter,
     piercingsFilter,
     breastTypeFilter,
+    buttShapeFilter,
+    buttSizeFilter,
     selectedTags
   ]);
 
@@ -236,6 +244,8 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     setTattoosFilter('');
     setPiercingsFilter('');
     setBreastTypeFilter('');
+    setButtShapeFilter('');
+    setButtSizeFilter('');
     setSelectedTags([]);
   };
 
@@ -261,6 +271,8 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     setTattoosFilter('');
     setPiercingsFilter('');
     setBreastTypeFilter('');
+    setButtShapeFilter('');
+    setButtSizeFilter('');
     setSelectedTags([]);
   };
 
@@ -383,9 +395,19 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
   const hasSearchQuery = searchQuery.trim().length > 0;
   const hasFilterSelection = Boolean(
     (isCollections && collectionStatusFilter !== 'all') ||
-    (isPeople && peopleRoleFilter !== 'all') ||
-    (isPeople && genderFilter !== 'all') ||
-    (isPeople && favoriteFilter !== 'all') ||
+    (isPeople && (
+      peopleRoleFilter !== 'all' ||
+      genderFilter !== 'all' ||
+      favoriteFilter !== 'all' ||
+      hairColorFilter !== '' ||
+      ethnicityFilter !== '' ||
+      eyeColorFilter !== '' ||
+      tattoosFilter !== '' ||
+      piercingsFilter !== '' ||
+      breastTypeFilter !== '' ||
+      buttShapeFilter !== '' ||
+      buttSizeFilter !== ''
+    )) ||
     (!isCollections && !isTags && !isPeople && (
       ownershipFilter !== 'owned' ||
       watchedFilter !== 'all' ||
@@ -473,6 +495,10 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     setPiercingsFilter: handleFilterChange(setPiercingsFilter),
     breastTypeFilter,
     setBreastTypeFilter: handleFilterChange(setBreastTypeFilter),
+    buttShapeFilter,
+    setButtShapeFilter: handleFilterChange(setButtShapeFilter),
+    buttSizeFilter,
+    setButtSizeFilter: handleFilterChange(setButtSizeFilter),
     isCollections,
     isTags,
     isPeople,

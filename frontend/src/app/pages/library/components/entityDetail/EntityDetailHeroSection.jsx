@@ -582,7 +582,7 @@ export default function EntityDetailHeroSection({
 
         const tattooVal = formatListAttr(item.tattoos);
         const piercingVal = formatListAttr(item.piercings);
-        const hasAnySpecs = item?.height || item?.weight || item?.measurements || item?.breast_type || item?.hair_color || item?.eye_color || item?.ethnicity || item?.tattoos || item?.piercings || item?.career_start_year || item?.place_of_birth;
+        const hasAnySpecs = item?.height || item?.weight || item?.measurements || item?.breast_type || item?.hair_color || item?.eye_color || item?.ethnicity || item?.tattoos || item?.piercings || item?.career_start_year || item?.place_of_birth || item?.butt_shape || item?.butt_size;
 
         return createPortal(
           <>
@@ -663,25 +663,37 @@ export default function EntityDetailHeroSection({
                       {item.breast_type && (
                         <div className="entity-detail-page__specs-item">
                           <span className="entity-detail-page__specs-label">{t('library.details.breastType')}</span>
-                          <span className="entity-detail-page__specs-value">{toTitleCase(item.breast_type)}</span>
+                          <span className="entity-detail-page__specs-value">{t(`library.performerEdit.breastTypes.${item.breast_type.toLowerCase()}`) || toTitleCase(item.breast_type)}</span>
+                        </div>
+                      )}
+                      {item.butt_shape && (
+                        <div className="entity-detail-page__specs-item">
+                          <span className="entity-detail-page__specs-label">{t('library.details.buttShape') || 'Butt Shape'}</span>
+                          <span className="entity-detail-page__specs-value">{t(`library.performerEdit.buttShapes.${item.butt_shape.toLowerCase()}`) || toTitleCase(item.butt_shape)}</span>
+                        </div>
+                      )}
+                      {item.butt_size && (
+                        <div className="entity-detail-page__specs-item">
+                          <span className="entity-detail-page__specs-label">{t('library.details.buttSize') || 'Butt Size'}</span>
+                          <span className="entity-detail-page__specs-value">{t(`library.performerEdit.buttSizes.${item.butt_size.toLowerCase()}`) || toTitleCase(item.butt_size)}</span>
                         </div>
                       )}
                       {item.hair_color && (
                         <div className="entity-detail-page__specs-item">
                           <span className="entity-detail-page__specs-label">{t('library.details.hairColor')}</span>
-                          <span className="entity-detail-page__specs-value">{toTitleCase(item.hair_color)}</span>
+                          <span className="entity-detail-page__specs-value">{t(`library.performerEdit.hairColors.${item.hair_color.toLowerCase()}`) || toTitleCase(item.hair_color)}</span>
                         </div>
                       )}
                       {item.eye_color && (
                         <div className="entity-detail-page__specs-item">
                           <span className="entity-detail-page__specs-label">{t('library.details.eyeColor')}</span>
-                          <span className="entity-detail-page__specs-value">{toTitleCase(item.eye_color)}</span>
+                          <span className="entity-detail-page__specs-value">{t(`library.performerEdit.eyeColors.${item.eye_color.toLowerCase()}`) || toTitleCase(item.eye_color)}</span>
                         </div>
                       )}
                       {item.ethnicity && (
                         <div className="entity-detail-page__specs-item">
                           <span className="entity-detail-page__specs-label">{t('library.details.ethnicity')}</span>
-                          <span className="entity-detail-page__specs-value">{toTitleCase(item.ethnicity)}</span>
+                          <span className="entity-detail-page__specs-value">{t(`library.performerEdit.ethnicities.${item.ethnicity.toLowerCase()}`) || toTitleCase(item.ethnicity)}</span>
                         </div>
                       )}
                       {tattooVal && (

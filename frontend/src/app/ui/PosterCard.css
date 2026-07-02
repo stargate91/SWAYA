@@ -198,6 +198,53 @@ div.ui-poster-card__image-wrapper:focus-visible {
   outline: none;
 }
 
+.ui-poster-card__remove-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full, 9999px);
+  border: 1px solid color-mix(in srgb, var(--color-state-danger) 40%, var(--button-secondary-border));
+  background-color: color-mix(in srgb, var(--color-state-danger) 10%, var(--app-shell-color-panel));
+  color: var(--color-state-danger);
+  box-shadow: 0 4px 10px color-mix(in srgb, black 22%, transparent);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity var(--motion-fast), transform var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast), background-color var(--motion-fast);
+}
+
+.ui-poster-card__media-shell:hover .ui-poster-card__remove-badge,
+.ui-poster-card__media-shell:focus-within .ui-poster-card__remove-badge {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ui-poster-card__remove-badge:hover,
+.ui-poster-card__remove-badge:focus-visible {
+  color: var(--color-text-primary);
+  border-color: color-mix(in srgb, var(--color-state-danger) 80%, var(--button-secondary-border));
+  background-color: color-mix(in srgb, var(--color-state-danger) 25%, var(--app-shell-color-panel));
+  outline: none;
+}
+
+.ui-poster-card__remove-badge svg {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ui-poster-card__remove-badge:hover svg {
+  transform: rotate(90deg);
+}
+
+.ui-poster-card__remove-badge:active {
+  transform: scale(0.92) translateY(0);
+}
+
 .ui-poster-card__favorite-badge svg {
   display: block;
   flex-shrink: 0;

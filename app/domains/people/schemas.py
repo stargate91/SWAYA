@@ -37,6 +37,8 @@ class PersonRead(BaseSchema):
     piercings: Optional[str] = None
     same_sex_only: Optional[str] = None
     breast_type: Optional[str] = None
+    butt_shape: Optional[str] = None
+    butt_size: Optional[str] = None
     primary_provider: Optional[str] = None
     field_routing: Optional[dict[str, str]] = None
 
@@ -71,6 +73,8 @@ class PeopleGroupItem(BaseModel):
     tattoos: Optional[str] = None
     piercings: Optional[str] = None
     breast_type: Optional[str] = None
+    butt_shape: Optional[str] = None
+    butt_size: Optional[str] = None
 
 class PersonSearchItem(BaseModel):
     id: int

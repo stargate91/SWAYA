@@ -130,6 +130,8 @@ def get_library_items(
     filter_tattoos: Optional[str] = None,
     filter_piercings: Optional[str] = None,
     filter_breast_type: Optional[str] = None,
+    filter_butt_shape: Optional[str] = None,
+    filter_butt_size: Optional[str] = None,
 ):
     from app.infrastructure.media.db_media_resolver import DbMediaResolver
     from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
@@ -163,6 +165,8 @@ def get_library_items(
             filter_tattoos=filter_tattoos,
             filter_piercings=filter_piercings,
             filter_breast_type=filter_breast_type,
+            filter_butt_shape=filter_butt_shape,
+            filter_butt_size=filter_butt_size,
         )
 
     return service.get_grouped_library(include_adult=include_adult)

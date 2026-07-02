@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
 import { useSetPersonFieldRoutingMutation } from '@/queries/libraryQueries';
@@ -25,17 +25,31 @@ export default function PerformerMixerTab({ person: initialPerson }) {
 
   const isMale = String(person?.gender) === '2';
 
+  const isUnderage = useMemo(() => {
+    if (person?.is_adult) return false;
+    const bday = person?.birthday;
+    if (!bday) return false;
+    const birthDate = new Date(bday);
+    if (isNaN(birthDate.getTime())) return false;
+    const today = new Date();
+    const minDate = new Date(birthDate.getFullYear() + 18, birthDate.getMonth(), birthDate.getDate());
+    minDate.setDate(minDate.getDate() + 14);
+    return minDate > today;
+  }, [person?.birthday, person?.is_adult]);
+
   const FIELDS = [
     { key: 'biography', label: 'Biography', type: 'text' },
     { key: 'birthday', label: 'Birthday', type: 'string' },
     { key: 'place_of_birth', label: 'Place of Birth', type: 'string' },
     ...(person?.is_adult ? [{ key: 'gender', label: 'Gender', type: 'gender' }] : []),
-    { key: 'height', label: 'Height', type: 'height' },
-    { key: 'weight', label: 'Weight', type: 'weight' },
-    { key: 'hair_color', label: 'Hair Color', type: 'string' },
-    { key: 'eye_color', label: 'Eye Color', type: 'string' },
+    ...(!isUnderage ? [
+      { key: 'height', label: 'Height', type: 'height' },
+      { key: 'weight', label: 'Weight', type: 'weight' },
+      { key: 'hair_color', label: 'Hair Color', type: 'string' },
+      { key: 'eye_color', label: 'Eye Color', type: 'string' },
+    ] : []),
     { key: 'ethnicity', label: 'Ethnicity', type: 'string' },
-    ...(!isMale
+    ...(!isMale && !isUnderage
       ? [
           { key: 'measurements', label: 'Measurements', type: 'string' },
           { key: 'cup_size', label: 'Cup Size', type: 'string' },
@@ -43,6 +57,8 @@ export default function PerformerMixerTab({ person: initialPerson }) {
           { key: 'waist', label: 'Waist', type: 'string' },
           { key: 'hip', label: 'Hip', type: 'string' },
           { key: 'breast_type', label: 'Breast Type', type: 'string' },
+          { key: 'butt_shape', label: 'Butt Shape', type: 'string' },
+          { key: 'butt_size', label: 'Butt Size', type: 'string' },
         ]
       : []),
     { key: 'tattoos', label: 'Tattoos', type: 'string' },

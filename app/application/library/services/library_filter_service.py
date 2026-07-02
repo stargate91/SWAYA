@@ -273,6 +273,24 @@ class LibraryFilterService:
             ).distinct().order_by(Person.breast_type.asc()).all()
             breast_types = [r[0] for r in breast_types_query]
 
+            butt_shapes_query = self.db.query(Person.butt_shape).join(
+                MediaPersonLink, MediaPersonLink.person_id == Person.id
+            ).filter(
+                MediaPersonLink.match_id.in_(match_ids_subquery),
+                Person.butt_shape != None,
+                Person.butt_shape != ""
+            ).distinct().order_by(Person.butt_shape.asc()).all()
+            butt_shapes = [r[0] for r in butt_shapes_query]
+
+            butt_sizes_query = self.db.query(Person.butt_size).join(
+                MediaPersonLink, MediaPersonLink.person_id == Person.id
+            ).filter(
+                MediaPersonLink.match_id.in_(match_ids_subquery),
+                Person.butt_size != None,
+                Person.butt_size != ""
+            ).distinct().order_by(Person.butt_size.asc()).all()
+            butt_sizes = [r[0] for r in butt_sizes_query]
+
         return FilterOptionsResponse(
             genres=genres,
             years=years,
@@ -284,7 +302,9 @@ class LibraryFilterService:
             eye_colors=eye_colors,
             tattoos=tattoos,
             piercings=piercings,
-            breast_types=breast_types
+            breast_types=breast_types,
+            butt_shapes=butt_shapes,
+            butt_sizes=butt_sizes
         )
 
     def get_tag_groups(self, is_adult: bool = False) -> List[TagGroupItem]:

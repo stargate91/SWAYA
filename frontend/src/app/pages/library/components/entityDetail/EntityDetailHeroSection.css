@@ -1552,3 +1552,8 @@
 .entity-detail-page__media-card--editable:hover .entity-detail-page__media-card-hover-icon {
   transform: scale(1);
 }
+
+.entity-detail-page__summary-text {
+  max-width: 600px;
+  width: 100%;
+}
