@@ -3,7 +3,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from '../providers/LanguageContext';
 import './Input.css';
 
-export default function Input({ label, hint, error, type, className = '', inputRef, rightElement, ...props }) {
+export default function Input({ label, hint, error, type, className = '', inputRef, leftElement, rightElement, ...props }) {
   const [showPassword, setShowPassword] = useState(false);
   const hintId = useId();
   const errorId = useId();
@@ -11,6 +11,7 @@ export default function Input({ label, hint, error, type, className = '', inputR
   const isPassword = type === 'password';
   const inputType = isPassword ? (showPassword ? 'text' : 'password') : type;
   const hasRightElement = isPassword || rightElement;
+  const hasLeftElement = !!leftElement;
 
   const { t } = useTranslation();
 
@@ -19,9 +20,14 @@ export default function Input({ label, hint, error, type, className = '', inputR
       {label ? <span className="ui-field__label">{label}</span> : null}
       {hint ? <span className="ui-field__hint">{hint}</span> : null}
       <div className="ui-input__wrapper">
+        {leftElement && (
+          <div className="ui-input__left-element">
+            {leftElement}
+          </div>
+        )}
         <input
           ref={inputRef}
-          className={`ui-input${hasRightElement ? ' ui-input--has-right-element' : ''}${error ? ' ui-input--error' : ''}`}
+          className={`ui-input${hasRightElement ? ' ui-input--has-right-element' : ''}${hasLeftElement ? ' ui-input--has-left-element' : ''}${error ? ' ui-input--error' : ''}`}
           type={inputType}
           aria-invalid={error ? 'true' : undefined}
           aria-describedby={[

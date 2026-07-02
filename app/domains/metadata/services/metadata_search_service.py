@@ -88,6 +88,8 @@ class MetadataSearchService:
 
             if type_lower == "scene":
                 return self.search_metadata(query, item_type="scene", provider=source_lower, include_adult=include_adult, language=language)
+            elif type_lower == "movie":
+                return self.search_metadata(query, item_type="movie", provider=source_lower, include_adult=include_adult, language=language)
             elif type_lower == "person":
                 return self.adult_resolver.search_performers(self.db, self.scrapers, query, prov_enum)
 

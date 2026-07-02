@@ -91,6 +91,25 @@
   padding-right: 2.75rem;
 }
 
+.ui-input--has-left-element {
+  padding-left: 2.75rem;
+}
+
+.ui-input__left-element {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+}
+
+.ui-input__left-element button {
+  pointer-events: auto;
+}
+
 .ui-input__right-element {
   position: absolute;
   right: 12px;

@@ -29,6 +29,7 @@ const TYPES_BY_SOURCE = {
     { id: 'person', name: 'Performers', icon: Users },
   ],
   porndb: [
+    { id: 'movie', name: 'Movies', icon: Film },
     { id: 'scene', name: 'Scenes', icon: Video },
     { id: 'person', name: 'Performers', icon: Users },
   ],
@@ -72,6 +73,28 @@ export default function GlobalSearch() {
       return true;
     });
   }, [results, selectedSource, selectedType, settings?.adult_gender_preference]);
+
+  const groupedResults = useMemo(() => {
+    if (selectedType !== 'all') {
+      return null;
+    }
+    const groups = {
+      movie: [],
+      tv: [],
+      person: [],
+      scene: [],
+      other: []
+    };
+    filteredResults.forEach((item) => {
+      const type = item.media_type;
+      if (groups[type]) {
+        groups[type].push(item);
+      } else {
+        groups.other.push(item);
+      }
+    });
+    return groups;
+  }, [filteredResults, selectedType]);
 
   // Close menus when clicking outside
   useEffect(() => {
@@ -150,8 +173,9 @@ export default function GlobalSearch() {
     setIsOverlayOpen(false);
     setQuery('');
     
+    const provider = item.provider || selectedSource;
     if (item.media_type === 'movie') {
-      const prefix = item.provider === 'porndb' ? 'porndb_' : 'tmdb_';
+      const prefix = provider === 'porndb' ? 'porndb_' : 'tmdb_';
       const id = String(item.id).startsWith(prefix) ? item.id : `${prefix}${item.id}`;
       navigate(`/library/movie/${id}`, { state: { allowAdult: true } });
     } else if (item.media_type === 'tv') {
@@ -159,7 +183,7 @@ export default function GlobalSearch() {
     } else if (item.media_type === 'person') {
       navigate(`/library/people/${item.id}`, { state: { allowAdult: true } });
     } else if (item.media_type === 'scene') {
-      const prefix = item.provider === 'porndb' ? 'porndb' : item.provider === 'fansdb' ? 'fansdb' : 'stash';
+      const prefix = provider === 'porndb' ? 'porndb' : provider === 'fansdb' ? 'fansdb' : 'stash';
       const id = String(item.id).startsWith(`${prefix}_`) ? item.id : `${prefix}_${item.id}`;
       navigate(`/library/scene/${id}`, { state: { allowAdult: true } });
     }
@@ -265,41 +289,92 @@ export default function GlobalSearch() {
       {isOverlayOpen && filteredResults.length > 0 && (
         <div className="global-search__overlay">
           <div className="global-search__results-list">
-            {filteredResults.map((item, idx) => (
-              <div
-                key={`${item.id}-${item.media_type}-${idx}`}
-                className="global-search__result-item"
-                onClick={() => handleResultClick(item)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && handleResultClick(item)}
-              >
-                {item.poster_path ? (
-                  <img src={resolveMediaImageUrl(item.poster_path, 'posterThumb')} alt="" className="global-search__item-poster" loading="lazy" />
-                ) : (
-                  <div className="global-search__item-poster-placeholder">
-                    <ActiveTypeIcon size={16} />
+            {selectedType === 'all' ? (
+              Object.entries(groupedResults).map(([type, items], groupIdx) => {
+                if (items.length === 0) return null;
+                const groupTitles = {
+                  movie: 'Movies',
+                  tv: 'TV Shows',
+                  person: selectedSource === 'tmdb' ? 'People' : 'Performers',
+                  scene: 'Scenes',
+                  other: 'Other'
+                };
+                const activeGroupTypeObj = (TYPES_BY_SOURCE[selectedSource] || []).find(t => t.id === type) || { icon: Clapperboard };
+                const GroupTypeIcon = activeGroupTypeObj.icon;
+
+                return (
+                  <div key={type} className="global-search__group">
+                    {groupIdx > 0 && <div className="global-search__group-divider" />}
+                    <div className="global-search__group-header">{groupTitles[type]}</div>
+                    {items.map((item, idx) => (
+                      <div
+                        key={`${item.id}-${item.media_type}-${idx}`}
+                        className="global-search__result-item"
+                        onClick={() => handleResultClick(item)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => e.key === 'Enter' && handleResultClick(item)}
+                      >
+                        {item.poster_path ? (
+                          <img src={resolveMediaImageUrl(item.poster_path, 'posterThumb')} alt="" className="global-search__item-poster" loading="lazy" />
+                        ) : (
+                          <div className="global-search__item-poster-placeholder">
+                            <GroupTypeIcon size={16} />
+                          </div>
+                        )}
+                        <div className="global-search__item-info">
+                          <div className="global-search__item-title-row">
+                            <span className="global-search__item-title">{item.title}</span>
+                            {item.year && <span className="global-search__item-year">({item.year})</span>}
+                          </div>
+                          <div className="global-search__item-meta">
+                            {item.overview && (
+                              <span className="global-search__item-overview">
+                                {item.overview.length > 60 ? item.overview.slice(0, 60) + '...' : item.overview}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <ArrowUpRight className="global-search__arrow-icon" size={14} />
+                      </div>
+                    ))}
                   </div>
-                )}
-                <div className="global-search__item-info">
-                  <div className="global-search__item-title-row">
-                    <span className="global-search__item-title">{item.title}</span>
-                    {item.year && <span className="global-search__item-year">({item.year})</span>}
+                );
+              })
+            ) : (
+              filteredResults.map((item, idx) => (
+                <div
+                  key={`${item.id}-${item.media_type}-${idx}`}
+                  className="global-search__result-item"
+                  onClick={() => handleResultClick(item)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === 'Enter' && handleResultClick(item)}
+                >
+                  {item.poster_path ? (
+                    <img src={resolveMediaImageUrl(item.poster_path, 'posterThumb')} alt="" className="global-search__item-poster" loading="lazy" />
+                  ) : (
+                    <div className="global-search__item-poster-placeholder">
+                      <ActiveTypeIcon size={16} />
+                    </div>
+                  )}
+                  <div className="global-search__item-info">
+                    <div className="global-search__item-title-row">
+                      <span className="global-search__item-title">{item.title}</span>
+                      {item.year && <span className="global-search__item-year">({item.year})</span>}
+                    </div>
+                    <div className="global-search__item-meta">
+                      {item.overview && (
+                        <span className="global-search__item-overview">
+                          {item.overview.length > 60 ? item.overview.slice(0, 60) + '...' : item.overview}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className="global-search__item-meta">
-                    <span className="global-search__item-badge">
-                      {item.media_type === 'person' ? ((item.is_adult || item.adult) ? 'performer' : 'artist') : item.media_type}
-                    </span>
-                    {item.overview && (
-                      <span className="global-search__item-overview">
-                        • {item.overview.length > 60 ? item.overview.slice(0, 60) + '...' : item.overview}
-                      </span>
-                    )}
-                  </div>
+                  <ArrowUpRight className="global-search__arrow-icon" size={14} />
                 </div>
-                <ArrowUpRight className="global-search__arrow-icon" size={14} />
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       )}

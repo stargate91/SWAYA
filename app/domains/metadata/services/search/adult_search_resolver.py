@@ -156,7 +156,16 @@ class AdultSearchResolver:
                             "rating": s.get("rating") or 0.0,
                             "media_type": "scene",
                             "provider": prov_enum.value,
-                            "studio": site_data.get("name")
+                            "studio": site_data.get("name"),
+                            "people": [
+                                {
+                                    "id": f"porndb:{p.get('id')}" if p.get('id') else None,
+                                    "name": p.get("name"),
+                                    "gender": _map_performer_gender(p.get("gender"))
+                                }
+                                for p in s.get("performers", [])
+                                if isinstance(p, dict) and p.get("name")
+                            ]
                         })
                     return formatted
                 else:
@@ -177,6 +186,13 @@ class AdultSearchResolver:
             }
             images {
               url
+            }
+            performers {
+              performer {
+                id
+                name
+                gender
+              }
             }
           }
         }
@@ -205,7 +221,16 @@ class AdultSearchResolver:
                     "rating": s.get("rating") or 0.0,
                     "media_type": "scene",
                     "provider": prov_enum.value,
-                    "studio": studio_data.get("name")
+                    "studio": studio_data.get("name"),
+                    "people": [
+                        {
+                            "id": f"{_provider_source_name(prov_enum)}:{p.get('performer', {}).get('id')}" if p.get('performer', {}).get('id') else None,
+                            "name": p.get('performer', {}).get('name'),
+                            "gender": _map_performer_gender(p.get('performer', {}).get('gender'))
+                        }
+                        for p in s.get("performers", [])
+                        if isinstance(p, dict) and p.get('performer', {}).get('name')
+                    ]
                 })
             return formatted
         except Exception as e:

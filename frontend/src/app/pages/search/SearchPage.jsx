@@ -9,6 +9,7 @@ import Spinner from '@/ui/Spinner';
 import EmptyState from '@/ui/EmptyState';
 import PosterGrid from '@/ui/PosterGrid';
 import PosterCard from '@/ui/PosterCard';
+import Button from '@/ui/Button';
 import { useSettingsQuery } from '@/queries/settingsQueries';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { useTranslation } from '@/providers/LanguageContext';
@@ -37,6 +38,7 @@ const TYPES_BY_SOURCE = {
     { id: 'person', name: 'Performers', icon: Users },
   ],
   porndb: [
+    { id: 'movie', name: 'Movies', icon: Film },
     { id: 'scene', name: 'Scenes', icon: Video },
     { id: 'person', name: 'Performers', icon: Users },
   ],
@@ -131,8 +133,9 @@ export default function SearchPage() {
   }, [results, urlSource, urlType, settings?.adult_gender_preference]);
 
   const handleCardClick = (item) => {
+    const provider = item.provider || urlSource;
     if (item.media_type === 'movie') {
-      const prefix = item.provider === 'porndb' ? 'porndb_' : 'tmdb_';
+      const prefix = provider === 'porndb' ? 'porndb_' : 'tmdb_';
       const id = String(item.id).startsWith(prefix) ? item.id : `${prefix}${item.id}`;
       navigate(`/library/movie/${id}`, { state: { allowAdult: true } });
     } else if (item.media_type === 'tv') {
@@ -140,7 +143,7 @@ export default function SearchPage() {
     } else if (item.media_type === 'person') {
       navigate(`/library/people/${item.id}`, { state: { allowAdult: true } });
     } else if (item.media_type === 'scene') {
-      const prefix = item.provider === 'porndb' ? 'porndb' : item.provider === 'fansdb' ? 'fansdb' : 'stash';
+      const prefix = provider === 'porndb' ? 'porndb' : provider === 'fansdb' ? 'fansdb' : 'stash';
       const id = String(item.id).startsWith(`${prefix}_`) ? item.id : `${prefix}_${item.id}`;
       navigate(`/library/scene/${id}`, { state: { allowAdult: true } });
     }
@@ -201,7 +204,7 @@ export default function SearchPage() {
   const remainingCount = filteredResults.length - visibleCount;
 
   return (
-    <Page className="search-page-layout" contentBottom>
+    <Page className="search-page-layout">
       <div className="search-page-header">
         <h1 className="search-page-title">
           {urlQuery ? t('search.resultsFor', { query: urlQuery, defaultValue: `Search Results for "${urlQuery}"` }) : t('search.title', { defaultValue: 'Global Search' })}
@@ -216,7 +219,7 @@ export default function SearchPage() {
             placeholder={t('search.inputPlaceholder', { defaultValue: 'Type query and press Enter...' })}
             value={localQuery}
             onChange={(e) => setLocalQuery(e.target.value)}
-            rightElement={
+            leftElement={
               <button type="submit" className="search-page-input-btn" aria-label="Search">
                 <Search size={18} />
               </button>
@@ -266,19 +269,75 @@ export default function SearchPage() {
           />
         ) : (
           <>
-            <PosterGrid className="search-page-grid">
+            <PosterGrid className={`search-page-grid ${urlType === 'scene' ? 'library-scenes-grid' : ''}`}>
               {visibleResults.map((item, idx) => {
                 const posterUrl = item.poster_path ? resolveMediaImageUrl(item.poster_path, 'posterThumb') : null;
                 const mediaTypeBadge = item.media_type === 'person' 
                   ? ((item.is_adult || item.adult) ? 'performer' : 'artist') 
                   : item.media_type;
 
+                let subtitle = item.year ? String(item.year) : undefined;
+                if (item.media_type === 'scene') {
+                  const displayDate = item.release_date ? item.release_date.substring(0, 10) : item.year;
+                  const pref = settings?.adult_gender_preference;
+                  const allPeople = item.people || [];
+                  const filteredPeople = pref && pref !== 'all'
+                    ? allPeople.filter(p => {
+                      const g = typeof p.gender === 'string'
+                        ? (p.gender.toUpperCase().includes('FEMALE') ? 1 : p.gender.toUpperCase().includes('MALE') ? 2 : 0)
+                        : p.gender;
+                      if (g) {
+                        if (pref === 'female') return g === 1;
+                        if (pref === 'male') return g === 2;
+                      }
+                      return true;
+                    })
+                    : allPeople;
+                  const performers = filteredPeople.slice(0, 4);
+
+                  subtitle = (
+                    <div className="library-scene-card__subtitle-inner">
+                      <span className="library-scene-card__performers">
+                        {performers.map((p, idx) => (
+                          <span key={p.id || p.name}>
+                            {idx > 0 && ', '}
+                            <span
+                              role="button"
+                              tabIndex={0}
+                              className="library-scene-card__performer-link"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const provider = item.provider || urlSource;
+                                const rawId = p.id || p.name;
+                                const id = String(rawId).includes(':') ? rawId : `${provider}:${rawId}`;
+                                navigate(`/library/people/${id}`, { state: { allowAdult: true } });
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.stopPropagation();
+                                  const provider = item.provider || urlSource;
+                                  const rawId = p.id || p.name;
+                                  const id = String(rawId).includes(':') ? rawId : `${provider}:${rawId}`;
+                                  navigate(`/library/people/${id}`, { state: { allowAdult: true } });
+                                }
+                              }}
+                            >
+                              {p.name}
+                            </span>
+                          </span>
+                        ))}
+                      </span>
+                      {displayDate && <span className="library-scene-card__date">{displayDate}</span>}
+                    </div>
+                  );
+                }
+
                 return (
                   <PosterCard
                     key={`${item.id}-${item.media_type}-${idx}`}
                     className={item.media_type === 'scene' ? 'library-scene-card' : ''}
                     title={item.title || item.name}
-                    subtitle={item.year ? String(item.year) : undefined}
+                    subtitle={subtitle}
                     imageUrl={posterUrl}
                     icon={FallbackIcon}
                     onClick={() => handleCardClick(item)}
@@ -289,18 +348,18 @@ export default function SearchPage() {
 
             {remainingCount > 0 && (
               <div className="search-page-more-container">
-                <button
-                  type="button"
-                  className="search-page-more-btn"
+                <Button
+                  variant="secondary-neutral"
                   onClick={() => setVisibleCount((prev) => prev + 12)}
                 >
                   {t('search.moreMatches', {
                     count: remainingCount,
                     defaultValue: `More matches (+${remainingCount})`
                   })}
-                </button>
+                </Button>
               </div>
             )}
+            <div className="library-bottom-spacer" aria-hidden="true" />
           </>
         )}
       </div>

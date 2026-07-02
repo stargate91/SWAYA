@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { ChevronLeft, ImageOff, Star } from 'lucide-react';
+import { ChevronLeft, ImageOff, Star, Film, Tv } from 'lucide-react';
 import EmptyState from '@/ui/EmptyState';
 import NavButton from '@/ui/NavButton';
 import Pill from '@/ui/Pill';
@@ -691,16 +691,11 @@ export default function PersonBackdropPickerModal({ personId, item, t, toast, ov
               activeTab === 'scenes' ? (
                 <BackdropCard key={`person-backdrop-skeleton-${activeTab}-${index}`} disabled={true} />
               ) : (
-                <div key={`person-backdrop-skeleton-${activeTab}-${index}`} className="ui-credit-card ui-credit-card--people-grid entity-detail-page__skeleton-card">
-                  <div className="entity-detail-page__skeleton-block entity-detail-page__skeleton-block--credit-poster" />
-                  <div className="ui-credit-card__body">
-                    <div className="ui-credit-card__topline">
-                      <div className="entity-detail-page__skeleton-block entity-detail-page__skeleton-block--credit-title" />
-                    </div>
-                    <div className="ui-credit-card__meta">
-                      <div className="entity-detail-page__skeleton-block entity-detail-page__skeleton-block--credit-meta" />
-                      <div className="entity-detail-page__skeleton-block entity-detail-page__skeleton-block--credit-pill" />
-                    </div>
+                <div key={`person-backdrop-skeleton-${activeTab}-${index}`} className="person-backdrop-picker__credit-card skeleton">
+                  <div className="person-backdrop-picker__credit-poster-wrap skeleton-shimmer" style={{ aspectRatio: '2/3', borderRadius: '8px' }} />
+                  <div className="person-backdrop-picker__credit-info">
+                    <div className="entity-detail-page__skeleton-block entity-detail-page__skeleton-block--credit-title" style={{ width: '80%', height: '14px', marginTop: '6px' }} />
+                    <div className="entity-detail-page__skeleton-block entity-detail-page__skeleton-block--credit-meta" style={{ width: '40%', height: '10px', marginTop: '6px' }} />
                   </div>
                 </div>
               )
@@ -743,53 +738,40 @@ export default function PersonBackdropPickerModal({ personId, item, t, toast, ov
                     alt={credit.title || `Scene backdrop ${idx + 1}`}
                     isSelected={isSelected}
                     isPending={isPending}
-                    infoLeft={credit.title}
-                    infoRight={credit.release_date ? credit.release_date.split('-')[0] : ''}
                     onClick={() => handleSelectSceneBackdrop(credit)}
                     disabled={overridePersonBackdropMutation.isPending || isUploadPending}
                   />
                 );
               }
 
+              const isTv = isTvLikeMediaType(credit.media_type || credit.type);
+
               return (
-                <CreditCard
+                <button
+                  type="button"
                   key={`person-backdrop-${activeTab}-${credit.tmdb_id || credit.id}`}
-                  title={credit.title}
-                  imageUrl={posterUrl}
-                  isTv={isTvLikeMediaType(credit.media_type || credit.type)}
-                  isPeopleGrid={true}
-                  isCollectionItem={true}
-                  isKnownFor={credit.is_known_for}
-                  isOwned={credit.in_library}
-                  isMissing={!credit.in_library}
-                  className={`${isSelected ? 'person-backdrop-picker__card--selected' : ''} ${isPending ? 'backdrop-card--disabled' : ''}`}
+                  className={`person-backdrop-picker__credit-card ${isSelected ? 'is-selected' : ''} ${isPending ? 'backdrop-card--disabled' : ''}`}
                   onClick={() => handleOpenBackdropBrowser(credit)}
                   disabled={overridePersonBackdropMutation.isPending || isUploadPending}
                 >
-                  <div className="ui-credit-card__meta">
-                    {credit.year ? <span>{credit.year}</span> : (credit.release_date && <span>{credit.release_date.split('-')[0]}</span>)}
-                    {hasRating && (
-                      <Pill variant="tmdb" className="ui-credit-card__rating-pill">
-                        <Star size={10} fill="currentColor" strokeWidth={1.8} />
-                        {rating.toFixed(1)}
-                      </Pill>
-                    )}
-                    {isSelected ? (
-                      <Pill variant="success" className="ui-credit-card__status-pill">
-                        {t('common.current') || 'Current'}
-                      </Pill>
+                  <div className="person-backdrop-picker__credit-poster-wrap">
+                    {posterUrl ? (
+                      <img src={posterUrl} alt={credit.title} className="person-backdrop-picker__credit-poster" />
                     ) : (
-                      <Pill
-                        variant={credit.in_library ? 'success' : 'missing'}
-                        className="ui-credit-card__status-pill"
-                      >
-                        {credit.in_library
-                          ? (t('library.details.have') || 'Have')
-                          : (t('library.details.missing') || 'Missing')}
-                      </Pill>
+                      <div className="person-backdrop-picker__credit-poster person-backdrop-picker__credit-poster--placeholder">
+                        {isTv ? <Tv size={24} /> : <Film size={24} />}
+                      </div>
                     )}
                   </div>
-                </CreditCard>
+                  <div className="person-backdrop-picker__credit-info">
+                    <div className="person-backdrop-picker__credit-title" title={credit.title}>
+                      {credit.title}
+                    </div>
+                    <div className="person-backdrop-picker__credit-meta">
+                      {credit.year ? <span>{credit.year}</span> : (credit.release_date && <span>{credit.release_date.split('-')[0]}</span>)}
+                    </div>
+                  </div>
+                </button>
               );
             })}
           </div>

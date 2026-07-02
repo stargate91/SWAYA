@@ -8,10 +8,14 @@ const RPAR = ')';
 
 export default function BespokeScenePeaks() {
   const { state, mutations, t } = useMediaDetailContext();
-  const { item, cleanId, effectiveId } = state;
+  const { item, cleanId, effectiveId, isOwned } = state;
   const { deletePeakMutation, playMutation } = mutations;
 
   const peaks = item?.peaks_history || [];
+
+  if (!isOwned && peaks.length === 0) {
+    return null;
+  }
 
   const handleDeletePeak = (e, logId) => {
     e.stopPropagation();

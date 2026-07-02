@@ -124,7 +124,7 @@ class PersonDetailCollator:
                 logger.error(f"Failed to dynamically enrich person {person_id}: {e}")
         if person.is_adult:
             links = db.query(ExternalSourceLink).filter(ExternalSourceLink.person_id == person_id).all()
-            has_been_enriched = len(links) > 0 or person.hair_color is not None or person.eye_color is not None
+            has_been_enriched = (len(links) > 0 and any(l.source_data is not None for l in links)) or person.hair_color is not None or person.eye_color is not None
             if not has_been_enriched:
                 try:
                     from app.domains.people.services.people_enricher import PeopleEnricher
