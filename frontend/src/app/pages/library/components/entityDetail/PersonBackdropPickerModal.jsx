@@ -68,7 +68,7 @@ export default function PersonBackdropPickerModal({ personId, item, t, toast, ov
         usePersonBackdropChooserStore.getState().resetSession(personId);
       }
     };
-  }, [ensureSession, item?.backdrop_path, person?.backdrop_path, personId]);
+  }, [ensureSession, personId]);
 
   useEffect(() => {
     if (!session) {
@@ -396,6 +396,11 @@ export default function PersonBackdropPickerModal({ personId, item, t, toast, ov
 
   return (
     <div className="person-backdrop-picker">
+      {!isBackdropBrowserOpen && headerDescription && (
+        <div className="person-backdrop-picker__progress-banner">
+          <span>{headerDescription}</span>
+        </div>
+      )}
       {isBackdropBrowserOpen ? (
         <div className="person-backdrop-picker__detail-toolbar">
           <NavButton className="person-backdrop-picker__back-btn" onClick={handleBackToCredits} icon={ChevronLeft}>

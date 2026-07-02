@@ -47,9 +47,6 @@
 
 .person-backdrop-picker__viewport {
   flex: 1 1 auto;
-  height: var(--person-backdrop-viewport-height);
-  min-height: var(--person-backdrop-viewport-height);
-  max-height: var(--person-backdrop-viewport-height);
   overflow-y: auto;
   overflow-x: hidden;
   width: 100%;
@@ -59,7 +56,7 @@
 
 .person-backdrop-picker__grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-md);
   padding-top: var(--space-2xs);
   padding-bottom: var(--space-2xs);
@@ -67,6 +64,25 @@
   width: 100%;
   box-sizing: border-box;
   min-width: 0;
+}
+
+.person-backdrop-picker__progress-banner {
+  padding: var(--space-xs) var(--space-sm);
+  background: color-mix(in srgb, var(--color-accent-blue) 8%, var(--color-surface-card));
+  border: 1px solid color-mix(in srgb, var(--color-accent-blue) 15%, var(--color-border-default));
+  border-radius: 8px;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-top: calc(-1 * var(--space-xs));
+  animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
 }
 
 .person-backdrop-picker__detail-view {

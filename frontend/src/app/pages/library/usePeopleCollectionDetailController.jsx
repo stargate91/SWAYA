@@ -317,5 +317,7 @@ export default function usePeopleCollectionDetailController({
     handleOpenPeopleBackdropModal,
     overrideBackdropMutation,
     uploadBackdropMutation,
+    overridePersonBackdropMutation,
+    uploadPersonBackdropMutation,
   };
 }

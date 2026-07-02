@@ -36,8 +36,8 @@ def update_person_backdrop(
     person = resolve_person(person_id, db)
     if not person:
         raise HTTPException(status_code=404, detail="Person not found")
-    path = payload.path or payload.url or payload.backdrop_path
-    if not path:
+    path = payload.path if payload.path is not None else (payload.url if payload.url is not None else payload.backdrop_path)
+    if path is None:
         raise HTTPException(status_code=400, detail="Backdrop path/url is required")
     return _people_detail_service(db).update_person_backdrop(person.id, path)
 

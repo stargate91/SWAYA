@@ -13,6 +13,7 @@ import CollectionDetailSections from './components/entityDetail/CollectionDetail
 import { CollectionBackdropsPanel } from './components/entityDetail/EntityDetailSections';
 import usePeopleCollectionDetailController from './usePeopleCollectionDetailController.jsx';
 import UniversalImagePickerModal from './modals/UniversalImagePickerModal';
+import PersonBackdropPickerModal from './components/entityDetail/PersonBackdropPickerModal';
 import UtilityBarBottomPortal from '../../../components/UtilityBarBottomPortal';
 import './PeopleCollectionDetailPage.css';
 import './components/detail/UserRatingSection.css';
@@ -51,9 +52,11 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
     handleToggleFavorite,
     handleToggleActive,
     handleOpenReviewModal,
-    handleOpenPeopleBackdropModal,
+    handleOpenPeopleBackdropModal: controllerHandleOpenPeopleBackdropModal,
     overrideBackdropMutation,
     uploadBackdropMutation,
+    overridePersonBackdropMutation,
+    uploadPersonBackdropMutation,
   } = usePeopleCollectionDetailController({
     id,
     isPeople,
@@ -62,6 +65,8 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
     closeModal,
     toast,
   });
+
+  const handleOpenPeopleBackdropModal = () => setIsBackdropDrawerOpen(true);
 
   const [isSocialExpanded, setIsSocialExpanded] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -361,15 +366,27 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
               </button>
             </div>
             <div className="entity-detail-page__drawer-content" style={{ padding: '24px' }}>
-              <CollectionBackdropsPanel
-                key={item?.tmdb_id}
-                item={item}
-                collectionId={item?.tmdb_id}
-                t={t}
-                toast={toast}
-                overrideBackdropMutation={overrideBackdropMutation}
-                uploadBackdropMutation={uploadBackdropMutation}
-              />
+              {isPeople ? (
+                <PersonBackdropPickerModal
+                  key={item?.id}
+                  personId={item?.id}
+                  item={item}
+                  t={t}
+                  toast={toast}
+                  overridePersonBackdropMutation={overridePersonBackdropMutation}
+                  uploadPersonBackdropMutation={uploadPersonBackdropMutation}
+                />
+              ) : (
+                <CollectionBackdropsPanel
+                  key={item?.tmdb_id}
+                  item={item}
+                  collectionId={item?.tmdb_id}
+                  t={t}
+                  toast={toast}
+                  overrideBackdropMutation={overrideBackdropMutation}
+                  uploadBackdropMutation={uploadBackdropMutation}
+                />
+              )}
             </div>
           </div>
         </>,
