@@ -512,7 +512,7 @@
     "buttShape": "Butt Shape",
     "buttSize": "Butt Size",
     "buttShapes": {
-      "round": "Round",
+      "bubble": "Bubble",
       "heart": "Heart",
       "square": "Square",
       "flat": "Flat"

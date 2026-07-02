@@ -140,6 +140,8 @@ class PeopleLibraryService:
                 tattoos=person.tattoos,
                 piercings=person.piercings,
                 breast_type=person.breast_type,
+                butt_shape=person.butt_shape,
+                butt_size=person.butt_size,
             ))
 
         return people_list

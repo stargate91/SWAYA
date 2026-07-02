@@ -632,7 +632,7 @@ export default function LibraryFilters({
                   }}
                   options={[
                     { value: '', label: t('library.filter.allButtShapes') || 'All' },
-                    { value: 'ROUND', label: t('library.performerEdit.buttShapes.round') || 'Round' },
+                    { value: 'BUBBLE', label: t('library.performerEdit.buttShapes.bubble') || 'Bubble' },
                     { value: 'HEART', label: t('library.performerEdit.buttShapes.heart') || 'Heart' },
                     { value: 'SQUARE', label: t('library.performerEdit.buttShapes.square') || 'Square' },
                     { value: 'FLAT', label: t('library.performerEdit.buttShapes.flat') || 'Flat' },

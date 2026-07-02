@@ -84,7 +84,7 @@ export default function PerformerCustomValuesTab({ personId, person: initialPers
   ];
 
   const buttShapeOptions = [
-    { value: 'ROUND', label: t('library.performerEdit.buttShapes.round') || 'Round' },
+    { value: 'BUBBLE', label: t('library.performerEdit.buttShapes.bubble') || 'Bubble' },
     { value: 'HEART', label: t('library.performerEdit.buttShapes.heart') || 'Heart' },
     { value: 'SQUARE', label: t('library.performerEdit.buttShapes.square') || 'Square' },
     { value: 'FLAT', label: t('library.performerEdit.buttShapes.flat') || 'Flat' },

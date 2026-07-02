@@ -211,6 +211,8 @@ class PersonDetailCollator:
             "waist": person.waist,
             "hip": person.hip,
             "breast_type": person.breast_type,
+            "butt_shape": person.butt_shape,
+            "butt_size": person.butt_size,
             "tattoos": person.tattoos,
             "piercings": person.piercings,
             "same_sex_only": person.same_sex_only,

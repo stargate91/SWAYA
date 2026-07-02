@@ -788,28 +788,6 @@ export const useSetPersonFieldRoutingMutation = () => {
   return useMutation({
     mutationFn: ({ personId, routing }) => api.people.setFieldRouting(personId, routing),
     onSuccess: (data, variables) => {
-      const idStr = String(variables.personId);
-      const idNum = Number(variables.personId);
-      const isNumValid = !isNaN(idNum);
-
-      const personKeys = [
-        ['person-detail', variables.personId],
-        ['person-detail', idStr],
-      ];
-      if (isNumValid) {
-        personKeys.push(['person-detail', idNum]);
-      }
-
-      personKeys.forEach((key) => {
-        queryClient.setQueryData(key, (oldData) => {
-          if (!oldData) return oldData;
-          return {
-            ...oldData,
-            field_routing: variables.routing,
-          };
-        });
-      });
-
       queryClient.invalidateQueries({ queryKey: ['person-detail', variables.personId] });
       queryClient.invalidateQueries({ queryKey: ['person-detail', String(variables.personId)] });
       queryClient.invalidateQueries({ queryKey: ['person-detail'] });
@@ -825,51 +803,6 @@ export const useSavePersonCustomFieldsMutation = () => {
   return useMutation({
     mutationFn: ({ personId, fields }) => api.people.saveCustomFields(personId, fields),
     onSuccess: (data, variables) => {
-      const idStr = String(variables.personId);
-      const idNum = Number(variables.personId);
-      const isNumValid = !isNaN(idNum);
-
-      const personKeys = [
-        ['person-detail', variables.personId],
-        ['person-detail', idStr],
-      ];
-      if (isNumValid) {
-        personKeys.push(['person-detail', idNum]);
-      }
-
-      personKeys.forEach((key) => {
-        queryClient.setQueryData(key, (oldData) => {
-          if (!oldData) return oldData;
-          
-          let externalLinks = oldData.external_links ? [...oldData.external_links] : [];
-          const manualLinkIndex = externalLinks.findIndex(l => l.provider === 'manual');
-          
-          const updatedManualData = {
-            ...(manualLinkIndex > -1 ? externalLinks[manualLinkIndex].source_data : {}),
-            ...variables.fields,
-          };
-
-          const newManualLink = {
-            provider: 'manual',
-            external_id: 'manual',
-            profile_url: null,
-            ...(manualLinkIndex > -1 ? externalLinks[manualLinkIndex] : {}),
-            source_data: updatedManualData,
-          };
-
-          if (manualLinkIndex > -1) {
-            externalLinks[manualLinkIndex] = newManualLink;
-          } else {
-            externalLinks.push(newManualLink);
-          }
-
-          return {
-            ...oldData,
-            external_links: externalLinks,
-          };
-        });
-      });
-
       queryClient.invalidateQueries({ queryKey: ['person-detail', variables.personId] });
       queryClient.invalidateQueries({ queryKey: ['person-detail', String(variables.personId)] });
       queryClient.invalidateQueries({ queryKey: ['person-detail'] });
