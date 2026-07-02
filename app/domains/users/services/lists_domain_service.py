@@ -9,7 +9,7 @@ class ListsDomainService:
     def create_default_watchlist() -> CustomList:
         return CustomList(
             name="Watchlist",
-            description="Default system watchlist.",
+            description="Your go-to space for everything you want to watch later.",
             list_type=CustomListType.MEDIA,
             color="#3b82f6"
         )

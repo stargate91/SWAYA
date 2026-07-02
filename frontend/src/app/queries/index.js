@@ -8,4 +8,4 @@ export * from './renameQueries';
 export * from './mediaQueries';
 export * from './historyQueries';
 export * from './dashboardQueries';
-
+export * from './listsQueries';
