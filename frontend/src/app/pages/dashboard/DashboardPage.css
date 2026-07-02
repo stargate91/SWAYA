@@ -895,11 +895,11 @@
   background: transparent;
   cursor: pointer;
   scroll-snap-align: start;
-  transition: box-shadow var(--motion-duration-base) var(--motion-ease-standard);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
 }
 
 .recommend-card:hover {
-  /* Keep static, no bouncing on hover */
+  transform: translateY(-4px);
 }
 
 .recommend-card-poster-shell {
@@ -909,12 +909,12 @@
   background: var(--color-bg-elevated);
   box-shadow: 0 10px 24px color-mix(in srgb, var(--color-bg-app, black) 28%, transparent);
   padding-bottom: 150%;
-  transition: box-shadow var(--motion-duration-base) var(--motion-ease-standard);
+  transition: box-shadow 0.3s ease;
   border: 1px solid var(--color-border-subtle);
 }
 
 .recommend-card:hover .recommend-card-poster-shell {
-  box-shadow: 0 20px 40px color-mix(in srgb, black 50%, transparent);
+  box-shadow: 0 12px 24px var(--color-surface-overlay);
 }
 
 .recommend-card-image {
@@ -923,6 +923,11 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.28s ease;
+}
+
+.recommend-card:hover .recommend-card-image {
+  transform: scale(1.02) !important;
 }
 
 .recommend-card-overlay {

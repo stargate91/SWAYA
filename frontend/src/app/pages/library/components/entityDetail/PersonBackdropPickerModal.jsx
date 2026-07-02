@@ -571,9 +571,11 @@ export default function PersonBackdropPickerModal({ personId, item, t, toast, ov
       opts.push({ value: 'movies', label: t('library.details.moviesTitle') || 'Movies' });
       opts.push({ value: 'tv', label: t('library.details.tvShowsTitle') || 'Tv' });
     }
-    opts.push({ value: 'scenes', label: t('library.details.scenesTitle') || 'Scenes' });
+    if (sceneSourceOptions.length > 0) {
+      opts.push({ value: 'scenes', label: t('library.details.scenesTitle') || 'Scenes' });
+    }
     return opts;
-  }, [isTmdbPerformer, t]);
+  }, [isTmdbPerformer, sceneSourceOptions, t]);
 
   console.log('chooser debug:', {
     activeTab,

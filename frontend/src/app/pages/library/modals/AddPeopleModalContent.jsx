@@ -55,6 +55,7 @@ export default function AddPeopleModalContent({ isAdult, t }) {
   const [genderFilter, setGenderFilter] = useState('all');
   const [sortBy, setSortBy] = useState('library_count');
   const [sortDirection, setSortDirection] = useState('desc');
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'added', 'not_added'
 
   // TMDB Search States
   const [tmdbQuery, setTmdbQuery] = useState('');
@@ -103,9 +104,20 @@ export default function AddPeopleModalContent({ isAdult, t }) {
   const people = useMemo(() => {
     return data?.pages.flatMap(page => page.items) || [];
   }, [data]);
-  const visiblePeople = useMemo(() => people, [people]);
+
+  const visiblePeople = useMemo(() => {
+    return people.filter((person) => {
+      const isActive = optimisticStatus[person.id] !== undefined
+        ? optimisticStatus[person.id]
+        : person.is_active;
+      if (statusFilter === 'added') return isActive;
+      if (statusFilter === 'not_added') return !isActive;
+      return true;
+    });
+  }, [people, statusFilter, optimisticStatus]);
+
   const hasSearchQuery = searchQuery.trim().length > 0;
-  const hasActiveFilters = roleFilter !== 'all' || (!hideGenderFilter && genderFilter !== 'all');
+  const hasActiveFilters = roleFilter !== 'all' || (!hideGenderFilter && genderFilter !== 'all') || statusFilter !== 'all';
   const textKey = (adultKey, defaultKey) => (isAdult ? adultKey : defaultKey);
 
   const resolveProfileUrl = (path) => {
@@ -258,6 +270,21 @@ export default function AddPeopleModalContent({ isAdult, t }) {
                 />
               </div>
             )}
+
+            <div className="library-sorter-container">
+              <span className="library-sorter-label">{t('library.filter.statusLabel') || 'Status:'}</span>
+              <Dropdown
+                className="add-people-dropdown"
+                variant="sorter"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                options={[
+                  { value: 'all', label: t('library.filter.allStatuses') || 'All' },
+                  { value: 'added', label: t('library.filter.added') || 'Added' },
+                  { value: 'not_added', label: t('library.filter.notAdded') || 'Not Added' },
+                ]}
+              />
+            </div>
           </div>
 
           {isLoading ? (

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Search, ChevronDown, ArrowUpRight, Clapperboard, Film, Tv, Users, Video, Loader2 } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Search, ChevronDown, ArrowUpRight, Clapperboard, Film, Tv, Users, Video, Loader2, ExternalLink } from 'lucide-react';
 import api from '../lib/api';
 import { useSettingsQuery } from '../queries/settingsQueries';
 import { resolveMediaImageUrl } from '../lib/imageUrls';
@@ -37,6 +37,8 @@ const TYPES_BY_SOURCE = {
 export default function GlobalSearch() {
   const { data: settings } = useSettingsQuery();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isSearchPage = location.pathname === '/search';
   
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -136,6 +138,14 @@ export default function GlobalSearch() {
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && query.trim()) {
+      setIsOverlayOpen(false);
+      navigate(`/search?q=${encodeURIComponent(query.trim())}&source=${selectedSource}&type=${selectedType}`);
+      setQuery('');
+    }
+  };
+
   const handleResultClick = (item) => {
     setIsOverlayOpen(false);
     setQuery('');
@@ -232,8 +242,22 @@ export default function GlobalSearch() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => query.trim().length >= 2 && setIsOverlayOpen(true)}
+            onKeyDown={handleKeyDown}
           />
-          {isLoading && <Loader2 className="global-search__loader animate-spin" size={14} />}
+          {query.trim() && (
+            <button
+              type="button"
+              className="global-search__more-btn"
+              onClick={() => {
+                setIsOverlayOpen(false);
+                navigate(`/search?q=${encodeURIComponent(query.trim())}&source=${selectedSource}&type=${selectedType}`);
+                setQuery('');
+              }}
+              title="Advanced Search / Bővebb keresés"
+            >
+              <ExternalLink size={12} />
+            </button>
+          )}
         </div>
       </div>
 

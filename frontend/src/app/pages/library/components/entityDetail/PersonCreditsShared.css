@@ -29,8 +29,7 @@
 }
 
 .collection-items-horizontal-grid-wrapper .ui-poster-card {
-  --card-transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-  transition: var(--card-transition) !important;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
 .collection-items-horizontal-grid-wrapper .ui-poster-card.is-missing {
@@ -59,8 +58,7 @@
 }
 
 .collection-items-horizontal-grid-wrapper .ui-poster-card .ui-poster-card__image-wrapper {
-  --poster-transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-  transition: var(--poster-transition);
+  transition: box-shadow 0.3s ease;
   --poster-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   box-shadow: var(--poster-shadow);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -68,18 +66,19 @@
 
 .collection-items-horizontal-grid-wrapper .ui-poster-card:hover .ui-poster-card__image-wrapper {
   border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 12px 24px var(--color-surface-overlay) !important;
 }
 
 .collection-items-horizontal-grid-wrapper .ui-poster-card .ui-poster-card__image {
   opacity: 0.8;
   filter: grayscale(10%);
-  transition: opacity 0.25s cubic-bezier(0.25, 1, 0.5, 1), filter 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: transform 0.28s ease, opacity 0.25s cubic-bezier(0.25, 1, 0.5, 1), filter 0.25s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .collection-items-horizontal-grid-wrapper .ui-poster-card:hover .ui-poster-card__image {
   opacity: 1;
   filter: grayscale(0%);
+  transform: scale(1.02) !important;
 }
 
 .entity-detail-page__credits-list--people-grid {
@@ -457,15 +456,14 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  --card-transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-  transition: var(--card-transition);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: pointer;
   content-visibility: auto;
   contain-intrinsic-size: auto 300px;
 }
 
 .person-credits-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-4px) !important;
 }
 
 .person-credits-card.aspect-2-3 {
@@ -487,8 +485,7 @@
   background: var(--poster-container-bg);
   --poster-container-border: 1px solid rgba(255, 255, 255, 0.08);
   border: var(--poster-container-border);
-  --poster-container-transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-  transition: var(--poster-container-transition);
+  transition: box-shadow 0.3s ease;
   --poster-container-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   box-shadow: var(--poster-container-shadow);
 }
@@ -504,8 +501,7 @@
 .person-credits-card:hover .person-credits-card__poster-container {
   --poster-hover-bc: rgba(255, 255, 255, 0.2);
   border-color: var(--poster-hover-bc);
-  --poster-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  box-shadow: var(--poster-hover-shadow);
+  box-shadow: 0 12px 24px var(--color-surface-overlay) !important;
 }
 
 .person-credits-card__poster {
@@ -515,13 +511,13 @@
   display: block;
   opacity: 0.8;
   filter: grayscale(10%);
-  --poster-transition: opacity 0.25s cubic-bezier(0.25, 1, 0.5, 1), filter 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-  transition: var(--poster-transition);
+  transition: transform 0.28s ease, opacity 0.25s cubic-bezier(0.25, 1, 0.5, 1), filter 0.25s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .person-credits-card:hover .person-credits-card__poster {
   opacity: 1;
   filter: grayscale(0%);
+  transform: scale(1.02) !important;
 }
 
 .person-credits-card__placeholder {

@@ -91,7 +91,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  margin-top: calc(-1 * var(--space-xs));
+  margin-bottom: var(--space-md);
   animation: pulse 2s infinite ease-in-out;
 }
 

@@ -490,6 +490,7 @@
 .add-people-modal__filter-row {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: var(--space-xl);
   width: 100%;
   flex-shrink: 0;

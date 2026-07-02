@@ -76,6 +76,7 @@
   align-items: center;
   gap: 8px;
   flex: 1;
+  position: relative;
 }
 
 .global-search__search-icon {
@@ -88,21 +89,34 @@
   outline: none;
   color: var(--color-text-primary, #f8fafc);
   font-size: 12px;
-  width: 240px;
-  transition: width 0.25s ease;
-}
-
-.global-search__input:focus {
-  width: 320px;
+  width: 260px;
+  padding-right: 32px;
 }
 
 .global-search__input::placeholder {
   color: var(--color-text-muted, #64748b);
 }
 
-.global-search__loader {
-  color: var(--color-accent-blue);
-  animation: spin 1s linear infinite;
+.global-search__more-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  padding: 4px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted, #64748b);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+  z-index: 2;
+}
+
+.global-search__more-btn:hover {
+  color: var(--color-text-primary, #f8fafc);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 /* Cascading Popover */
