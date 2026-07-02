@@ -5,6 +5,7 @@ import { usePersonCreditsQuery, usePersonCreditsInfiniteQuery } from '@/queries/
 import { API_BASE } from '@/lib/backend';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
 import { usePersonCreditsStore } from '@/stores/usePersonCreditsStore';
+import Spinner from '@/ui/Spinner';
 import './PersonCreditsShared.css';
 
 
@@ -437,7 +438,15 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
           {/* DISCOVER INFINITE GRID */}
           {activeDiscoverTab && (
             <div className="person-credits-discover-grid-wrapper">
-              {!activeGridQuery.isLoading && accumulatedItems.length === 0 ? (
+              {activeGridQuery.isLoading ? (
+                <div className="person-credits-discover-loading" style={{ display: 'flex', justifyContent: 'center', padding: '48px 0', width: '100%' }}>
+                  <Spinner label={(() => {
+                    const name = item?.name || 'this performer';
+                    const sourceName = activeSource === 'porndb' ? 'PornDB' : (activeSource === 'stashdb' ? 'StashDB' : (activeSource === 'fansdb' ? 'FansDB' : 'TMDb'));
+                    return t('library.details.cachingFilmography', { defaultValue: `Downloading and caching ${name}'s complete filmography from ${sourceName}... This only happens once to make browsing instant!`, name, source: sourceName });
+                  })()} />
+                </div>
+              ) : !activeGridQuery.isLoading && accumulatedItems.length === 0 ? (
                 <div className="person-credits-discover-empty">
                   {t(`library.details.emptyCredits_${activeDiscoverTab}`) || t('library.details.emptyCredits') || 'No credits found for this source.'}
                 </div>

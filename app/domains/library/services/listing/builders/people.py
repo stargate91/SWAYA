@@ -32,12 +32,17 @@ class PeopleQueryBuilder:
         elif params.filter_gender == "male":
             people_items = [item for item in people_items if item.gender == 2]
 
+        def norm_cmp(val1, val2):
+            if not val1 or not val2:
+                return False
+            return str(val1).replace("_", " ").strip().lower() == str(val2).replace("_", " ").strip().lower()
+
         if params.filter_hair_color:
-            people_items = [item for item in people_items if item.hair_color == params.filter_hair_color]
+            people_items = [item for item in people_items if norm_cmp(item.hair_color, params.filter_hair_color)]
         if params.filter_ethnicity:
-            people_items = [item for item in people_items if item.ethnicity == params.filter_ethnicity]
+            people_items = [item for item in people_items if norm_cmp(item.ethnicity, params.filter_ethnicity)]
         if params.filter_eye_color:
-            people_items = [item for item in people_items if item.eye_color == params.filter_eye_color]
+            people_items = [item for item in people_items if norm_cmp(item.eye_color, params.filter_eye_color)]
         if params.filter_tattoos:
             if params.filter_tattoos.lower() == "yes":
                 people_items = [item for item in people_items if item.tattoos and str(item.tattoos).strip().lower() not in ("no", "none", "nincs")]
@@ -49,11 +54,11 @@ class PeopleQueryBuilder:
             else:
                 people_items = [item for item in people_items if not item.piercings or str(item.piercings).strip().lower() in ("no", "none", "nincs")]
         if params.filter_breast_type:
-            people_items = [item for item in people_items if item.breast_type == params.filter_breast_type]
+            people_items = [item for item in people_items if norm_cmp(item.breast_type, params.filter_breast_type)]
         if params.filter_butt_shape:
-            people_items = [item for item in people_items if item.butt_shape == params.filter_butt_shape]
+            people_items = [item for item in people_items if norm_cmp(item.butt_shape, params.filter_butt_shape)]
         if params.filter_butt_size:
-            people_items = [item for item in people_items if item.butt_size == params.filter_butt_size]
+            people_items = [item for item in people_items if norm_cmp(item.butt_size, params.filter_butt_size)]
 
         if params.filter_favorite == "favorite":
             people_items = [item for item in people_items if item.is_favorite]
@@ -91,16 +96,21 @@ class PeopleQueryBuilder:
                 'A': 1, 'B': 2, 'C': 3, 'D': 4, 'DD': 5, 'DDD': 6, 'E': 7, 'EE': 8, 'F': 9, 'FF': 10,
                 'G': 11, 'GG': 12, 'H': 13, 'HH': 14, 'I': 15, 'J': 16, 'K': 17
             }
+            def get_volume_score(item):
+                cup_val = cup_order.get(str(item.cup_size or "").strip().upper(), 0)
+                if cup_val == 0:
+                    return None
+                band_val = float(item.band_size) if item.band_size else 34.0
+                return cup_val + (band_val - 30.0) / 2.0
+
             if params.sort_by == "cup_size_desc":
                 people_items.sort(key=lambda item: (
-                    -cup_order.get(str(item.cup_size or "").strip().upper(), 0),
-                    -(item.band_size or 0),
+                    -get_volume_score(item) if get_volume_score(item) is not None else -999.0,
                     (item.name or "").lower()
                 ))
             else:
                 people_items.sort(key=lambda item: (
-                    cup_order.get(str(item.cup_size or "").strip().upper(), 99),
-                    item.band_size or 999,
+                    get_volume_score(item) if get_volume_score(item) is not None else 999.0,
                     (item.name or "").lower()
                 ))
         elif params.sort_by == "waist_desc":
@@ -158,9 +168,11 @@ class PeopleQueryBuilder:
             def get_slender_score(item):
                 try:
                     w = float(item.waist) if item.waist else 0.0
-                    h = float(item.hip) if item.hip else 0.0
-                    if w > 0 and h > 0:
-                        return w + h
+                    height = float(item.height) if item.height else 0.0
+                    if w > 0:
+                        h_cm = height if height > 0 else 165.0
+                        w_cm = w * 2.54
+                        return w_cm / h_cm
                 except (ValueError, TypeError):
                     pass
                 return None
@@ -172,7 +184,7 @@ class PeopleQueryBuilder:
                 ))
             else:
                 people_items.sort(key=lambda item: (
-                    -get_slender_score(item) if get_slender_score(item) is not None else 999.0,
+                    -get_slender_score(item) if get_slender_score(item) is not None else -999.0,
                     (item.name or "").lower()
                 ))
         elif params.sort_by in ("body_curvy_desc", "body_curvy_asc"):
@@ -181,7 +193,15 @@ class PeopleQueryBuilder:
                     w = float(item.waist) if item.waist else 0.0
                     h = float(item.hip) if item.hip else 0.0
                     if w > 0 and h > 0:
-                        return h - w
+                        lower_diff = (h - w) * 2.54
+                        cup_order = {
+                            'A': 1, 'B': 2, 'C': 3, 'D': 4, 'DD': 5, 'DDD': 6, 'E': 7, 'EE': 8, 'F': 9, 'FF': 10,
+                            'G': 11, 'GG': 12, 'H': 13, 'HH': 14, 'I': 15, 'J': 16, 'K': 17
+                        }
+                        cup_val = cup_order.get(str(item.cup_size or "").strip().upper(), 0)
+                        band_val = float(item.band_size) if item.band_size else 34.0
+                        breast_score = (cup_val + (band_val - 30.0) / 2.0) if cup_val > 0 else 0.0
+                        return lower_diff + breast_score
                 except (ValueError, TypeError):
                     pass
                 return None

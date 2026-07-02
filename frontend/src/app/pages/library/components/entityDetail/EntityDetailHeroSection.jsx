@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { Layers, User, PenLine, Heart, Check, Minus, Plus, Info, Bookmark, X, Maximize2 } from 'lucide-react';
@@ -37,9 +37,10 @@ export default function EntityDetailHeroSection({
   profileLinks = [],
   extraLinks = [],
   updatePersonStatusMutation,
+  isDrawerOpen,
+  setIsDrawerOpen,
 }) {
   const navigate = useNavigate();
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isHoveringBar, setIsHoveringBar] = useState(false);
   const [lightboxUrl, setLightboxUrl] = useState(null);
 

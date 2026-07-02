@@ -619,40 +619,45 @@ export default function LibraryFilters({
             </div>
           )}
 
-          {filterData?.butt_shapes && filterData.butt_shapes.length > 0 && (
-            <div className="library-sorter-container">
-              <span className="library-sorter-label">{t('library.filter.buttShapeLabel') || 'Butt Shape:'}</span>
-              <Dropdown
-                variant="sorter"
-                value={buttShapeFilter}
-                onChange={(e) => {
-                  setButtShapeFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-                options={[
-                  { value: '', label: t('library.filter.allButtShapes') || 'All' },
-                  ...(filterData.butt_shapes).map(bs => ({ value: bs, label: formatPhysicalAttributeLabel(bs) })),
-                ]}
-              />
-            </div>
-          )}
+          {activeSessionMode === 'nsfw' && (
+            <>
+              <div className="library-sorter-container">
+                <span className="library-sorter-label">{t('library.filter.buttShapeLabel') || 'Butt Shape:'}</span>
+                <Dropdown
+                  variant="sorter"
+                  value={buttShapeFilter}
+                  onChange={(e) => {
+                    setButtShapeFilter(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  options={[
+                    { value: '', label: t('library.filter.allButtShapes') || 'All' },
+                    { value: 'ROUND', label: t('library.performerEdit.buttShapes.round') || 'Round' },
+                    { value: 'HEART', label: t('library.performerEdit.buttShapes.heart') || 'Heart' },
+                    { value: 'SQUARE', label: t('library.performerEdit.buttShapes.square') || 'Square' },
+                    { value: 'FLAT', label: t('library.performerEdit.buttShapes.flat') || 'Flat' },
+                  ]}
+                />
+              </div>
 
-          {filterData?.butt_sizes && filterData.butt_sizes.length > 0 && (
-            <div className="library-sorter-container">
-              <span className="library-sorter-label">{t('library.filter.buttSizeLabel') || 'Butt Size:'}</span>
-              <Dropdown
-                variant="sorter"
-                value={buttSizeFilter}
-                onChange={(e) => {
-                  setButtSizeFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-                options={[
-                  { value: '', label: t('library.filter.allButtSizes') || 'All' },
-                  ...(filterData.butt_sizes).map(bz => ({ value: bz, label: formatPhysicalAttributeLabel(bz) })),
-                ]}
-              />
-            </div>
+              <div className="library-sorter-container">
+                <span className="library-sorter-label">{t('library.filter.buttSizeLabel') || 'Butt Size:'}</span>
+                <Dropdown
+                  variant="sorter"
+                  value={buttSizeFilter}
+                  onChange={(e) => {
+                    setButtSizeFilter(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  options={[
+                    { value: '', label: t('library.filter.allButtSizes') || 'All' },
+                    { value: 'SMALL', label: t('library.performerEdit.buttSizes.small') || 'Small' },
+                    { value: 'MEDIUM', label: t('library.performerEdit.buttSizes.medium') || 'Medium' },
+                    { value: 'BIG', label: t('library.performerEdit.buttSizes.big') || 'Big' },
+                  ]}
+                />
+              </div>
+            </>
           )}
 
           <div className="library-sorter-container">

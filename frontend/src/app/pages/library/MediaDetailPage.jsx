@@ -753,7 +753,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
   }, [isLogoDrawerOpen, isPosterDrawerOpen, isBackdropDrawerOpen, isDrawerOpen]);
 
   useEffect(() => {
-    if (isLogoDrawerOpen || isPosterDrawerOpen || isBackdropDrawerOpen) return;
+    if (isLogoDrawerOpen || isPosterDrawerOpen || isBackdropDrawerOpen || isDrawerOpen) return;
 
     const handleWheel = (e) => {
       if (e.target.closest('.global-search') || e.target.closest('.global-search__overlay')) {
@@ -779,7 +779,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
 
     window.addEventListener('wheel', handleWheel, { passive: true });
     return () => window.removeEventListener('wheel', handleWheel);
-  }, [isScrolled, isLogoDrawerOpen, isPosterDrawerOpen, isBackdropDrawerOpen]);
+  }, [isScrolled, isLogoDrawerOpen, isPosterDrawerOpen, isBackdropDrawerOpen, isDrawerOpen]);
 
   const handleScrollToggle = () => {
     setIsScrolled(!isScrolled);
@@ -872,7 +872,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
         fallbackUrl={posterUrl}
         isScene={item?.type === 'scene'}
         backLabel={t('common.back') || 'Back'}
-        pageClassName={`media-detail-page--scroll-transition ${isScrolled ? 'is-scrolled' : ''} ${isLogoDrawerOpen || isPosterDrawerOpen || isBackdropDrawerOpen ? 'logo-drawer-open' : ''}`}
+        pageClassName={`media-detail-page--scroll-transition ${isScrolled ? 'is-scrolled' : ''} ${isLogoDrawerOpen || isPosterDrawerOpen || isBackdropDrawerOpen || isDrawerOpen ? 'logo-drawer-open' : ''}`}
         containerRef={containerRef}
         topRightControls={(
           <>

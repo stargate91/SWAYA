@@ -10,6 +10,7 @@ export default function MatchModalResults({
   mode,
   isResolvingId,
   isBrowserLoading,
+  isSearching,
   onCandidateSelect,
   row,
   t,
@@ -73,7 +74,7 @@ export default function MatchModalResults({
         </div>
       ) : null}
 
-      {view === 'results' && hasSearched && results.length === 0 && !isBrowserLoading ? (
+      {view === 'results' && hasSearched && results.length === 0 && !isBrowserLoading && !isSearching ? (
         <EmptyState
           title={mode === 'tv' || mode === 'tv'
             ? (t('organizer.details.matchModal.noResultsTvTitle') || 'No matching tv found')

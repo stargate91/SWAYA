@@ -219,6 +219,20 @@ class LibraryFilterService:
                     name = f"  ↳ {name}"
                 studios.append({"id": s.id, "name": name})
 
+            def normalize_options(raw_list):
+                seen = set()
+                result = []
+                for val in raw_list:
+                    if not val:
+                        continue
+                    cleaned = str(val).replace("_", " ").strip().title()
+                    if cleaned.upper() in ("NA", "N/A"):
+                        cleaned = "N/A"
+                    if cleaned and cleaned not in seen:
+                        seen.add(cleaned)
+                        result.append(cleaned)
+                return sorted(result)
+
             hair_colors_query = self.db.query(Person.hair_color).join(
                 MediaPersonLink, MediaPersonLink.person_id == Person.id
             ).filter(
@@ -226,7 +240,7 @@ class LibraryFilterService:
                 Person.hair_color != None,
                 Person.hair_color != ""
             ).distinct().order_by(Person.hair_color.asc()).all()
-            hair_colors = [r[0] for r in hair_colors_query]
+            hair_colors = normalize_options([r[0] for r in hair_colors_query])
 
             ethnicities_query = self.db.query(Person.ethnicity).join(
                 MediaPersonLink, MediaPersonLink.person_id == Person.id
@@ -235,7 +249,7 @@ class LibraryFilterService:
                 Person.ethnicity != None,
                 Person.ethnicity != ""
             ).distinct().order_by(Person.ethnicity.asc()).all()
-            ethnicities = [r[0] for r in ethnicities_query]
+            ethnicities = normalize_options([r[0] for r in ethnicities_query])
 
             eye_colors_query = self.db.query(Person.eye_color).join(
                 MediaPersonLink, MediaPersonLink.person_id == Person.id
@@ -244,7 +258,7 @@ class LibraryFilterService:
                 Person.eye_color != None,
                 Person.eye_color != ""
             ).distinct().order_by(Person.eye_color.asc()).all()
-            eye_colors = [r[0] for r in eye_colors_query]
+            eye_colors = normalize_options([r[0] for r in eye_colors_query])
 
             tattoos_query = self.db.query(Person.tattoos).join(
                 MediaPersonLink, MediaPersonLink.person_id == Person.id
@@ -271,7 +285,7 @@ class LibraryFilterService:
                 Person.breast_type != None,
                 Person.breast_type != ""
             ).distinct().order_by(Person.breast_type.asc()).all()
-            breast_types = [r[0] for r in breast_types_query]
+            breast_types = normalize_options([r[0] for r in breast_types_query])
 
             butt_shapes_query = self.db.query(Person.butt_shape).join(
                 MediaPersonLink, MediaPersonLink.person_id == Person.id
@@ -280,7 +294,7 @@ class LibraryFilterService:
                 Person.butt_shape != None,
                 Person.butt_shape != ""
             ).distinct().order_by(Person.butt_shape.asc()).all()
-            butt_shapes = [r[0] for r in butt_shapes_query]
+            butt_shapes = normalize_options([r[0] for r in butt_shapes_query])
 
             butt_sizes_query = self.db.query(Person.butt_size).join(
                 MediaPersonLink, MediaPersonLink.person_id == Person.id
@@ -289,7 +303,7 @@ class LibraryFilterService:
                 Person.butt_size != None,
                 Person.butt_size != ""
             ).distinct().order_by(Person.butt_size.asc()).all()
-            butt_sizes = [r[0] for r in butt_sizes_query]
+            butt_sizes = normalize_options([r[0] for r in butt_sizes_query])
 
         return FilterOptionsResponse(
             genres=genres,

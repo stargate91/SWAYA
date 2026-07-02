@@ -67,6 +67,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isImagePickerDrawerOpen, setIsImagePickerDrawerOpen] = useState(false);
   const [isBackdropDrawerOpen, setIsBackdropDrawerOpen] = useState(false);
+  const [isDetailsDrawerOpen, setIsDetailsDrawerOpen] = useState(false);
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -75,7 +76,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
   }, [id]);
 
   useEffect(() => {
-    if (isImagePickerDrawerOpen || isBackdropDrawerOpen) {
+    if (isImagePickerDrawerOpen || isBackdropDrawerOpen || isDetailsDrawerOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -83,10 +84,10 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [isImagePickerDrawerOpen, isBackdropDrawerOpen]);
+  }, [isImagePickerDrawerOpen, isBackdropDrawerOpen, isDetailsDrawerOpen]);
 
   useEffect(() => {
-    if (isImagePickerDrawerOpen || isBackdropDrawerOpen) return;
+    if (isImagePickerDrawerOpen || isBackdropDrawerOpen || isDetailsDrawerOpen) return;
 
     const handleWheel = (e) => {
       if (e.target.closest('.global-search') || e.target.closest('.global-search__overlay')) {
@@ -111,7 +112,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
 
     window.addEventListener('wheel', handleWheel, { passive: true });
     return () => window.removeEventListener('wheel', handleWheel);
-  }, [isScrolled, isImagePickerDrawerOpen]);
+  }, [isScrolled, isImagePickerDrawerOpen, isBackdropDrawerOpen, isDetailsDrawerOpen]);
 
   const handleScrollArrowClick = useCallback(() => {
     setIsScrolled(true);
@@ -134,7 +135,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
       fallbackUrl={mediaUrl}
       backLabel={t('common.back') || 'Back'}
       isLoading={isLoading}
-      pageClassName={`entity-detail-page ${isPeople ? 'entity-detail-page--people' : 'entity-detail-page--collection'} ${isScrolled ? 'is-scrolled' : ''} ${(isImagePickerDrawerOpen || isBackdropDrawerOpen) ? 'logo-drawer-open' : ''}`}
+      pageClassName={`entity-detail-page ${isPeople ? 'entity-detail-page--people' : 'entity-detail-page--collection'} ${isScrolled ? 'is-scrolled' : ''} ${(isImagePickerDrawerOpen || isBackdropDrawerOpen || isDetailsDrawerOpen) ? 'logo-drawer-open' : ''}`}
       topRightControls={
         <EntityDetailTopControls
           isPeople={isPeople}
@@ -194,6 +195,8 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
             handlePeopleRatingClick={handlePeopleRatingClick}
             onMediaCardClick={handleOpenImagePickerModal}
             updatePersonStatusMutation={updatePersonStatusMutation}
+            isDrawerOpen={isDetailsDrawerOpen}
+            setIsDrawerOpen={setIsDetailsDrawerOpen}
           />
 
           {isPeople && (

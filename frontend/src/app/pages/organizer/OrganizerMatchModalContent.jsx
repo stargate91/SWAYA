@@ -193,7 +193,7 @@ export default function OrganizerMatchModalContent({
               />
             ) : null}
 
-            {isBrowserLoading || isResolvingId ? (
+            {isBrowserLoading || isResolvingId || isSearching ? (
               <Spinner
                 label={isResolvingId ? t('organizer.details.matchModal.applying') : t('organizer.details.matchModal.loading')}
               />
@@ -207,6 +207,7 @@ export default function OrganizerMatchModalContent({
               mode={mode}
               isResolvingId={isResolvingId}
               isBrowserLoading={isBrowserLoading}
+              isSearching={isSearching}
               onCandidateSelect={handleCandidateSelect}
               row={row}
               t={t}

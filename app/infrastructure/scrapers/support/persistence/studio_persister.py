@@ -11,6 +11,34 @@ from app.shared_kernel.ports.metadata_repository_port import MetadataRepositoryP
 
 logger = logging.getLogger(__name__)
 
+STUDIO_PARENT_MAPPING = {
+    "1000 facials": "Blowpass",
+    "facial abuse": "Blowpass",
+    "monster facials": "Blowpass",
+    "my first sex teacher": "Naughty America",
+    "naughty bookworms": "Naughty America",
+    "tonight's girlfriend": "Naughty America",
+    "milf hunter": "Reality Kings",
+    "big naturals": "Reality Kings",
+    "monster curves": "Reality Kings",
+    "rk prime": "Reality Kings",
+    "bangbus": "Bang Bros",
+    "monsters of cock": "Bang Bros",
+    "dirty wives club": "Brazzers",
+    "doctor adventures": "Brazzers",
+    "pornstar spa": "Brazzers",
+    "mommy got boobs": "Brazzers",
+    "real wife stories": "Brazzers",
+    "baby got boobs": "Brazzers",
+    "big wet butts": "Brazzers",
+    "big tits at school": "Brazzers",
+    "big tits at work": "Brazzers",
+    "zz series": "Brazzers",
+    "teens like it big": "Brazzers",
+    "milfs like it big": "Brazzers",
+    "brazzers exxtra": "Brazzers",
+}
+
 def _detect_remote_image_extension(url: str, fallback_name: str = "") -> str:
     fallback_ext = Path(urlparse(fallback_name).path).suffix.lower()
     if fallback_ext in {'.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg'}:
@@ -141,6 +169,23 @@ class StudioPersister:
             
             # Map parent studio
             parent_info = studio_info.get("parent")
+            if not parent_info:
+                s_name_lower = s_name.lower().strip()
+                fallback_parent_name = None
+                if s_name_lower in STUDIO_PARENT_MAPPING:
+                    fallback_parent_name = STUDIO_PARENT_MAPPING[s_name_lower]
+                elif "brazzers" in s_name_lower and s_name_lower != "brazzers":
+                    fallback_parent_name = "Brazzers"
+                elif "naughty america" in s_name_lower and s_name_lower != "naughty america":
+                    fallback_parent_name = "Naughty America"
+                elif "reality kings" in s_name_lower and s_name_lower != "reality kings":
+                    fallback_parent_name = "Reality Kings"
+                elif "bang bros" in s_name_lower and s_name_lower != "bang bros":
+                    fallback_parent_name = "Bang Bros"
+                
+                if fallback_parent_name:
+                    parent_info = {"name": fallback_parent_name, "logo_path": None}
+
             if parent_info:
                 p_name = parent_info["name"]
                 parent_studio = self.metadata_repo.get_studio_by_name(p_name)

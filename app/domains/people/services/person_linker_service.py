@@ -6,7 +6,7 @@ from sqlalchemy import func
 
 from app.domains.people.models import Person, ExternalSourceLink, MediaPersonLink
 from app.domains.users.models import UserOverride, Tag
-from app.shared_kernel.enums import Provider
+from app.shared_kernel.enums import Provider, RoleType
 from app.infrastructure.scrapers.support.gateway import scraper_gateway
 
 logger = logging.getLogger(__name__)
@@ -192,6 +192,7 @@ class PersonLinkerService:
         except Exception as e:
             logger.error(f"Failed to dynamically enrich linked person {person.id}: {e}", exc_info=True)
 
+        self._sync_person_media_links(db, person)
         db.commit()
         return {"status": "success", "linked_person_id": person.id}
 
@@ -298,3 +299,63 @@ class PersonLinkerService:
 
         db.commit()
         return {"status": "success", "person_id": person.id}
+
+    def _sync_person_media_links(self, db: Session, person: Person):
+        """Automatically scans library items matched to the performer's external sources and links them."""
+        links = {l.provider.value: l.external_id for l in person.external_links}
+        if not links:
+            return
+            
+        providers = [Provider(p) for p in links.keys() if p != "manual"]
+        if not providers:
+            return
+            
+        from app.domains.metadata.models import MetadataMatch
+        from app.domains.people.models import MediaPersonLink
+        
+        matches = db.query(MetadataMatch).filter(MetadataMatch.provider.in_(providers)).all()
+        
+        links_created = 0
+        for match in matches:
+            existing = db.query(MediaPersonLink).filter(
+                MediaPersonLink.person_id == person.id,
+                MediaPersonLink.match_id == match.id
+            ).first()
+            if existing:
+                continue
+                
+            prov_val = match.provider.value
+            person_ext_id = links.get(prov_val)
+            if not person_ext_id:
+                continue
+                
+            raw = match.raw_metadata or {}
+            has_performer = False
+            
+            # Retrieve performers list based on metadata structure (PornDB/StashDB/FansDB vs TMDb)
+            raw_perfs = []
+            if "performers" in raw:
+                raw_perfs = raw.get("performers") or []
+            elif "credits" in raw:
+                raw_perfs = raw.get("credits", {}).get("cast") or []
+
+            for rp in raw_perfs:
+                perf_dict = rp.get("performer") or rp if isinstance(rp, dict) else {}
+                if isinstance(perf_dict, dict):
+                    direct_id = str(perf_dict.get("id"))
+                    parent_id = str(perf_dict.get("parent", {}).get("id")) if isinstance(perf_dict.get("parent"), dict) else None
+                    if direct_id == str(person_ext_id) or (parent_id and parent_id == str(person_ext_id)):
+                        has_performer = True
+                        break
+                    
+            if has_performer:
+                new_link = MediaPersonLink(
+                    match_id=match.id,
+                    person_id=person.id,
+                    role=RoleType.ACTOR
+                )
+                db.add(new_link)
+                links_created += 1
+                
+        if links_created > 0:
+            logger.info(f"Automatically linked {links_created} scenes/movies for performer {person.name} (ID: {person.id})")
