@@ -1,9 +1,11 @@
 import { app, BrowserWindow, ipcMain, dialog, Menu, Tray, shell } from 'electron';
 import fs from 'fs';
 import path from 'path';
+import net from 'net';
 import isDev from 'electron-is-dev';
 import { fileURLToPath } from 'url';
 import { execFileSync, spawn } from 'child_process';
+import { setupMpvPlayer } from './mpvPlayer.js';
 
 let backendProcess = null;
 let backendPid = null;
@@ -405,6 +407,7 @@ function createWindow() {
     autoHideMenuBar: true,
   });
   mainWindow = win;
+  setupMpvPlayer(mainWindow, isDev, writeElectronLog);
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: 'deny' };
@@ -744,3 +747,4 @@ app.on('activate', () => {
     createWindow();
   }
 });
+

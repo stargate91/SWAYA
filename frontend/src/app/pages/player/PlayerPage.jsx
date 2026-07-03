@@ -1,0 +1,487 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Play, Pause, Volume2, VolumeX, ArrowLeft, Languages, Captions, PictureInPicture2, Maximize2, X } from 'lucide-react';
+import { resolveMediaImageUrl } from '../../lib/imageUrls';
+import './PlayerPage.css';
+
+const getQueryParam = (name) => {
+  const searchParams = new URLSearchParams(window.location.search);
+  if (searchParams.has(name)) {
+    return searchParams.get(name);
+  }
+  const hash = window.location.hash;
+  const qIndex = hash.indexOf('?');
+  if (qIndex !== -1) {
+    const hashParams = new URLSearchParams(hash.substring(qIndex));
+    if (hashParams.has(name)) {
+      return hashParams.get(name);
+    }
+  }
+  return null;
+};
+
+export default function PlayerPage() {
+  const { itemId } = useParams();
+  const navigate = useNavigate();
+  
+  const containerRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(50);
+  const [isMuted, setIsMuted] = useState(false);
+  const [title, setTitle] = useState('Loading...');
+  const [logoUrl, setLogoUrl] = useState(null);
+  const [showControls, setShowControls] = useState(true);
+  const [isPip, setIsPip] = useState(false);
+  const [chapters, setChapters] = useState([]);
+  const [clockTime, setClockTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [trackList, setTrackList] = useState([]);
+  const [showAudioMenu, setShowAudioMenu] = useState(false);
+  const [showSubMenu, setShowSubMenu] = useState(false);
+  const controlsTimeoutRef = useRef(null);
+
+  // Helper function to format time (e.g. 01:23:45)
+  const formatTime = (secs) => {
+    if (isNaN(secs)) return '0:00';
+    const h = Math.floor(secs / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    const s = Math.floor(secs % 60);
+    const mStr = String(m).padStart(2, '0');
+    const sStr = String(s).padStart(2, '0');
+    return h > 0 ? `${h}:${mStr}:${sStr}` : `${m}:${sStr}`;
+  };
+
+  const handleMouseMove = () => {
+    setShowControls(true);
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current);
+    }
+    controlsTimeoutRef.current = setTimeout(() => {
+      setShowControls(false);
+    }, 3000);
+  };
+
+  useEffect(() => {
+    const updateClock = () => {
+      const now = new Date();
+      const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
+      setClockTime(now.toLocaleTimeString('en-US', timeOptions));
+
+      if (duration > 0) {
+        const remainingSeconds = duration - currentTime;
+        const end = new Date(now.getTime() + remainingSeconds * 1000);
+        setEndTime(end.toLocaleTimeString('en-US', timeOptions));
+      }
+    };
+    updateClock();
+    const clockInterval = setInterval(updateClock, 1000);
+    return () => clearInterval(clockInterval);
+  }, [currentTime, duration]);
+
+  useEffect(() => {
+    if (!showControls) {
+      setShowAudioMenu(false);
+      setShowSubMenu(false);
+    }
+  }, [showControls]);
+
+  useEffect(() => {
+    handleMouseMove();
+    const controlsOnly = getQueryParam('controls_only') === 'true';
+    if (controlsOnly) {
+      document.body.style.backgroundColor = 'transparent';
+      document.body.style.background = 'transparent';
+      document.documentElement.style.backgroundColor = 'transparent';
+      document.documentElement.style.background = 'transparent';
+    }
+    return () => {
+      if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+      if (controlsOnly) {
+        document.body.style.backgroundColor = '';
+        document.body.style.background = '';
+        document.documentElement.style.backgroundColor = '';
+        document.documentElement.style.background = '';
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!itemId) return;
+
+    let isMounted = true;
+    let ipcRenderer = null;
+    try {
+      ipcRenderer = window.require('electron').ipcRenderer;
+    } catch (e) {
+      console.warn('Electron IPC not available');
+    }
+
+    const fetchInfoAndStart = async () => {
+      try {
+        const backendPort = getQueryParam('backend_port') || '8000';
+        const controlsOnly = getQueryParam('controls_only') === 'true';
+        const res = await fetch(`http://localhost:${backendPort}/api/v1/media/playback-info/${itemId}`);
+        if (!res.ok) throw new Error('Failed to load playback details');
+        const data = await res.json();
+        
+        if (!isMounted) return;
+        setTitle(data.title);
+        if (data.logo_path) {
+          const resolved = resolveMediaImageUrl(data.logo_path, 'logo', `http://localhost:${backendPort}`);
+          setLogoUrl(resolved);
+        }
+
+        if (controlsOnly) {
+          setIsPlaying(true);
+          return;
+        }
+
+        if (ipcRenderer && containerRef.current) {
+          const bounds = containerRef.current.getBoundingClientRect();
+          await ipcRenderer.invoke('mpv-play', {
+            filePath: data.file_path,
+            bounds: {
+              x: bounds.x,
+              y: bounds.y,
+              width: bounds.width,
+              height: bounds.height
+            }
+          });
+
+          if (data.start_seconds > 0) {
+            ipcRenderer.send('mpv-command', ['seek', data.start_seconds, 'absolute']);
+          }
+
+          setIsPlaying(true);
+        }
+      } catch (err) {
+        console.error(err);
+        setTitle('Error playing file');
+      }
+    };
+
+    fetchInfoAndStart();
+
+    // Listen to MPV events
+    const handleMpvEvent = (event, data) => {
+      if (data?.event === 'property-change') {
+        if (data.name === 'time-pos' && typeof data.data === 'number') {
+          setCurrentTime(data.data);
+        }
+        if (data.name === 'duration' && typeof data.data === 'number') {
+          setDuration(data.data);
+        }
+        if (data.name === 'pause') {
+          setIsPaused(data.data);
+        }
+        if (data.name === 'volume' && typeof data.data === 'number') {
+          setVolume(data.data);
+        }
+        if (data.name === 'chapter-list' && Array.isArray(data.data)) {
+          setChapters(data.data);
+          console.log('Chapters loaded from video file:', data.data);
+        }
+        if (data.name === 'track-list' && Array.isArray(data.data)) {
+          setTrackList(data.data);
+        }
+      }
+    };
+
+    const handlePipChange = (event, data) => {
+      setIsPip(data.isPip);
+    };
+
+    if (ipcRenderer) {
+      ipcRenderer.on('mpv-event', handleMpvEvent);
+      ipcRenderer.on('pip-mode-change', handlePipChange);
+    }
+
+    // Resize observer to keep native window exactly aligned with React container
+    const resizeObserver = new ResizeObserver(() => {
+      if (ipcRenderer && containerRef.current) {
+        const bounds = containerRef.current.getBoundingClientRect();
+        ipcRenderer.send('mpv-resize', {
+          x: bounds.x,
+          y: bounds.y,
+          width: bounds.width,
+          height: bounds.height
+        });
+      }
+    });
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => {
+      isMounted = false;
+      if (ipcRenderer) {
+        ipcRenderer.off('mpv-event', handleMpvEvent);
+        ipcRenderer.off('pip-mode-change', handlePipChange);
+      }
+      resizeObserver.disconnect();
+    };
+  }, [itemId]);
+
+  const currentTimeRef = useRef(currentTime);
+  const durationRef = useRef(duration);
+
+  useEffect(() => {
+    currentTimeRef.current = currentTime;
+  }, [currentTime]);
+
+  useEffect(() => {
+    durationRef.current = duration;
+  }, [duration]);
+
+  // Periodic progress saving to backend
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const saveProgress = async () => {
+      const cTime = currentTimeRef.current;
+      const dur = durationRef.current;
+      if (cTime <= 0) return;
+
+      try {
+        const backendPort = getQueryParam('backend_port') || '8000';
+        await fetch(`http://localhost:${backendPort}/api/v1/media/progress`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            item_id: String(itemId),
+            current_time: Math.round(cTime),
+            total_length: Math.round(dur)
+          })
+        });
+      } catch (e) {
+        // Ignore background save errors
+      }
+    };
+
+    const interval = setInterval(saveProgress, 5000);
+    return () => clearInterval(interval);
+  }, [isPlaying, itemId]);
+
+  const sendCommand = (args) => {
+    try {
+      const { ipcRenderer } = window.require('electron');
+      ipcRenderer.send('mpv-command', args);
+    } catch (e) {
+      console.warn('Failed to send command to MPV:', args);
+    }
+  };
+
+  const handlePlayPause = () => {
+    sendCommand(['cycle', 'pause']);
+  };
+
+  const handleSeek = (e) => {
+    const val = parseFloat(e.target.value);
+    setCurrentTime(val);
+    sendCommand(['seek', val, 'absolute']);
+  };
+
+  const handleVolumeChange = (e) => {
+    const val = parseInt(e.target.value, 10);
+    setVolume(val);
+    sendCommand(['set_property', 'volume', val]);
+  };
+
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+    sendCommand(['set_property', 'mute', !isMuted]);
+  };
+
+  const handleClose = () => {
+    try {
+      const { ipcRenderer } = window.require('electron');
+      ipcRenderer.send('mpv-close');
+    } catch (e) {}
+    navigate(-1);
+  };
+
+  const handleTogglePip = () => {
+    try {
+      const { ipcRenderer } = window.require('electron');
+      ipcRenderer.send('mpv-toggle-pip');
+    } catch (e) {}
+  };
+
+  const controlsOnly = getQueryParam('controls_only') === 'true';
+
+  if (isPip) {
+    return (
+      <div className="player-page player-page--transparent player-page--pip" onMouseMove={handleMouseMove}>
+        <div className="player-page__pip-overlay">
+          <button className="player-page__pip-btn" onClick={handleTogglePip} title="Restore Fullscreen">
+            <Maximize2 size={16} />
+          </button>
+          <button className="player-page__pip-btn player-page__pip-btn--close" onClick={handleClose} title="Close Player">
+            <X size={16} />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`player-page ${controlsOnly ? 'player-page--transparent' : ''}`} onMouseMove={handleMouseMove}>
+      {/* Video Container (Nesting target) */}
+      <div ref={containerRef} className="player-page__video-container" />
+
+      {/* Custom Controls Overlay */}
+      <div className={`player-page__controls-overlay ${showControls ? 'active' : ''}`}>
+        
+        {/* Top Header */}
+        <div className="player-page__header">
+          <div className="player-page__header-left">
+            <button className="player-page__btn" onClick={handleClose}>
+              <ArrowLeft size={20} />
+            </button>
+            {logoUrl ? (
+              <img src={logoUrl} alt={title} className="player-page__logo" />
+            ) : (
+              <span className="player-page__title">{title}</span>
+            )}
+          </div>
+          <div className="player-page__header-right">
+            <div className="player-page__time-info">
+              <span className="player-page__clock">{clockTime}</span>
+              {endTime && <span className="player-page__ends-at">Ends at {endTime}</span>}
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Controls */}
+        <div className="player-page__bottom">
+          
+          {/* Progress Bar */}
+          <div className="player-page__progress-container">
+            <span className="player-page__time">{formatTime(currentTime)}</span>
+            <input
+              type="range"
+              min={0}
+              max={duration || 100}
+              value={currentTime}
+              onChange={handleSeek}
+              className="player-page__slider"
+            />
+            <span className="player-page__time">{formatTime(duration)}</span>
+          </div>
+
+          {/* Action Row */}
+          <div className="player-page__actions">
+            
+            {/* Left Actions */}
+            <div className="player-page__actions-group">
+              <button className="player-page__btn player-page__btn--primary" onClick={handlePlayPause}>
+                {isPaused ? <Play size={20} fill="currentColor" /> : <Pause size={20} fill="currentColor" />}
+              </button>
+
+              <div className="player-page__volume-group">
+                <button className="player-page__btn" onClick={toggleMute}>
+                  {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+                </button>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={isMuted ? 0 : volume}
+                  onChange={handleVolumeChange}
+                  className="player-page__volume-slider"
+                />
+              </div>
+            </div>
+
+            {/* Right Actions */}
+            <div className="player-page__actions-group" style={{ position: 'relative' }}>
+              
+              {/* Audio Tracks Dropdown */}
+              {showAudioMenu && (
+                <div className="player-page__menu">
+                  <div className="player-page__menu-title">Audio Tracks</div>
+                  {trackList.filter(t => t.type === 'audio').map(t => (
+                    <button 
+                      key={t.id} 
+                      className={`player-page__menu-item ${t.selected ? 'active' : ''}`}
+                      onClick={() => {
+                        sendCommand(['set_property', 'aid', t.id]);
+                        setShowAudioMenu(false);
+                      }}
+                    >
+                      {t.title || t.lang?.toUpperCase() || `Track ${t.id}`} {t.codec ? `(${t.codec.toUpperCase()})` : ''}
+                    </button>
+                  ))}
+                  {trackList.filter(t => t.type === 'audio').length === 0 && (
+                    <div className="player-page__menu-empty">No audio tracks</div>
+                  )}
+                </div>
+              )}
+
+              {/* Subtitles Dropdown */}
+              {showSubMenu && (
+                <div className="player-page__menu">
+                  <div className="player-page__menu-title">Subtitles</div>
+                  <button 
+                    className={`player-page__menu-item ${!trackList.some(t => t.type === 'sub' && t.selected) ? 'active' : ''}`}
+                    onClick={() => {
+                      sendCommand(['set_property', 'sid', 'no']);
+                      setShowSubMenu(false);
+                    }}
+                  >
+                    Off
+                  </button>
+                  {trackList.filter(t => t.type === 'sub').map(t => (
+                    <button 
+                      key={t.id} 
+                      className={`player-page__menu-item ${t.selected ? 'active' : ''}`}
+                      onClick={() => {
+                        sendCommand(['set_property', 'sid', t.id]);
+                        setShowSubMenu(false);
+                      }}
+                    >
+                      {t.title || t.lang?.toUpperCase() || `Subtitle ${t.id}`}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <button 
+                className={`player-page__btn ${showAudioMenu ? 'active' : ''}`} 
+                onClick={() => {
+                  setShowAudioMenu(!showAudioMenu);
+                  setShowSubMenu(false);
+                }} 
+                title="Audio Tracks"
+              >
+                <Languages size={18} />
+              </button>
+              
+              <button 
+                className={`player-page__btn ${showSubMenu ? 'active' : ''}`} 
+                onClick={() => {
+                  setShowSubMenu(!showSubMenu);
+                  setShowAudioMenu(false);
+                }} 
+                title="Subtitles"
+              >
+                <Captions size={18} />
+              </button>
+
+              <button className="player-page__btn" onClick={handleTogglePip} title="Picture-in-Picture">
+                <PictureInPicture2 size={18} />
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  );
+}

@@ -14,6 +14,7 @@
   background: linear-gradient(180deg, var(--color-panel), var(--color-panel-strong));
   backdrop-filter: blur(18px) saturate(120%);
   box-shadow: var(--titlebar-shadow);
+  -webkit-app-region: drag;
 }
 
 .window-titlebar__drag-region {
@@ -35,7 +36,7 @@
   min-width: 0;
   height: 100%;
   padding: 0 var(--space-xl);
-  -webkit-app-region: no-drag;
+  -webkit-app-region: drag;
 }
 
 .window-titlebar__center-container.has-progress {
@@ -47,6 +48,7 @@
   max-width: 480px;
   min-width: 180px;
   transition: max-width var(--motion-base), flex-basis var(--motion-base);
+  -webkit-app-region: no-drag;
 }
 
 .window-titlebar__search-wrapper.has-progress {

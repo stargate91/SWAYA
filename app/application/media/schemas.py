@@ -56,3 +56,14 @@ class WatchedHistoryResponse(BaseModel):
     items: List[WatchedHistoryItem]
     page: int
     has_more: bool
+
+class PlaybackInfoResponse(BaseModel):
+    file_path: str
+    start_seconds: int
+    title: str
+    logo_path: Optional[str] = None
+
+class UpdatePlaybackProgressRequest(BaseModel):
+    item_id: Union[str, int]
+    current_time: int
+    total_length: int

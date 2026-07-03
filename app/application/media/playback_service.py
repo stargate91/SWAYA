@@ -219,6 +219,63 @@ class PlaybackService:
             is_watched=override.is_watched,
         )
 
+    def get_playback_info(self, item_id: Any):
+        from app.domains.library.models import MediaItem
+        from app.domains.users.models import UserOverride
+        
+        try:
+            item_id_int = int(item_id)
+        except (ValueError, TypeError):
+            item_id_int = self.playback_repo.resolve_item_id_from_external(item_id)
+            if not item_id_int:
+                raise NotFoundException(f"Media item not found for ID: {item_id}")
+                
+        item = self.library_port.get_item_by_id(item_id_int)
+        if not item:
+            raise NotFoundException("Media item not found")
+            
+        item, override, start_seconds = self.track_playback_start(item.id)
+            
+        logo_path = None
+        title = item.filename
+        match = next((m for m in item.matches), None)
+        if match:
+            loc = next((l for l in match.localizations), None)
+            if loc:
+                title = loc.title
+                logo_path = loc.local_logo_path or loc.logo_path
+            elif match.original_title:
+                title = match.original_title
+                
+        if override and override.custom_logo:
+            logo_path = override.custom_logo
+                
+        return {
+            "file_path": item.current_path,
+            "start_seconds": start_seconds,
+            "title": title,
+            "logo_path": logo_path
+        }
+
+    def update_playback_progress(self, item_id: Any, current_time: int, total_length: int) -> PlaybackStatusResponse:
+        try:
+            item_id_int = int(item_id)
+        except (ValueError, TypeError):
+            item_id_int = self.playback_repo.resolve_item_id_from_external(item_id)
+            if not item_id_int:
+                raise NotFoundException(f"Media item not found for ID: {item_id}")
+
+        self.library_port.save_playback_position(item_id_int, current_time, total_length, self.overrides.user_id)
+        self.db.commit()
+        
+        return PlaybackStatusResponse(
+            status="success",
+            message="Progress updated successfully",
+            player_type="native",
+            resume_position=current_time,
+            is_watched=False
+        )
+
     def preview_media_file(self, file_path: str, start_seconds: int = 0) -> PlaybackStatusResponse:
         from app.infrastructure.playback.player_detector import launch_media_file
         if not file_path or not os.path.exists(file_path):

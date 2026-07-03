@@ -1,5 +1,5 @@
-
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Play, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import IconButton from '../../../ui/IconButton';
@@ -10,7 +10,7 @@ import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 
 const normalizeEpisodeNumbers = (episodeNumber) => {
   if (Array.isArray(episodeNumber)) {
-    return episodeNumber;
+    return episodeNumber.map((n) => Number(n)).filter(Number.isInteger);
   }
 
   if (typeof episodeNumber === 'string') {
@@ -22,68 +22,36 @@ const normalizeEpisodeNumbers = (episodeNumber) => {
     if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
       try {
         const parsed = JSON.parse(trimmed);
-        return Array.isArray(parsed) ? parsed : [parsed];
+        return Array.isArray(parsed) ? parsed.map((n) => Number(n)).filter(Number.isInteger) : [Number(parsed)].filter(Number.isInteger);
       } catch {
-        return trimmed
-          .slice(1, -1)
-          .split(',')
-          .map((value) => value.trim())
-          .filter(Boolean);
+        return [];
       }
     }
 
     if (trimmed.includes(',')) {
-      return trimmed.split(',').map((value) => value.trim()).filter(Boolean);
+      return trimmed.split(',').map((s) => Number(s.trim())).filter(Number.isInteger);
     }
+
+    const parsed = Number(trimmed);
+    return Number.isInteger(parsed) ? [parsed] : [];
   }
 
-  return [episodeNumber];
+  return Number.isInteger(episodeNumber) ? [episodeNumber] : [];
 };
 
 const formatEpisodeCode = (seasonNumber, episodeNumber) => {
-  if (!seasonNumber || !episodeNumber) {
-    return null;
-  }
-
-  const episodeNumbers = normalizeEpisodeNumbers(episodeNumber);
-  const normalizedEpisodes = [...new Set(
-    episodeNumbers
-      .map((value) => Number(value))
-      .filter((value) => Number.isInteger(value) && value > 0)
-  )].sort((a, b) => a - b);
-
-  if (!normalizedEpisodes.length) {
-    return null;
-  }
-
-  const ranges = [];
-  let rangeStart = normalizedEpisodes[0];
-  let rangeEnd = normalizedEpisodes[0];
-
-  for (let index = 1; index < normalizedEpisodes.length; index += 1) {
-    const current = normalizedEpisodes[index];
-    if (current === rangeEnd + 1) {
-      rangeEnd = current;
-      continue;
-    }
-    ranges.push([rangeStart, rangeEnd]);
-    rangeStart = current;
-    rangeEnd = current;
-  }
-  ranges.push([rangeStart, rangeEnd]);
-
-  const episodeCodes = ranges
-    .map(([start, end]) => (
-      start === end
-        ? `E${String(start).padStart(2, '0')}`
-        : `E${String(start).padStart(2, '0')}-E${String(end).padStart(2, '0')}`
-    ))
-    .join(',');
-
-  return `S${String(seasonNumber).padStart(2, '0')}${episodeCodes}`;
+  if (!seasonNumber) return null;
+  const sStr = String(seasonNumber).padStart(2, '0');
+  const normalized = normalizeEpisodeNumbers(episodeNumber);
+  if (normalized.length === 0) return `S${sStr}`;
+  if (normalized.length === 1) return `S${sStr}E${String(normalized[0]).padStart(2, '0')}`;
+  const first = String(normalized[0]).padStart(2, '0');
+  const last = String(normalized[normalized.length - 1]).padStart(2, '0');
+  return `S${sStr}E${first}-${last}`;
 };
 
 const ContinueWatchingWidget = ({ T }) => {
+  const navigate = useNavigate();
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const { data: items = [], isLoading } = useContinueWatchingQuery({
     include_adult: sessionMode === 'nsfw',
@@ -92,14 +60,24 @@ const ContinueWatchingWidget = ({ T }) => {
   const resetProgressMutation = useResetProgressMutation();
   const scrollRef = useRef(null);
   const [showLeft, setShowLeft] = useState(false);
-  const [showRight, setShowRight] = useState(true);
+  const [showRight, setShowRight] = useState(false);
 
   const updateArrows = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
     setShowLeft(el.scrollLeft > 10);
-    setShowRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+    setShowRight(el.scrollWidth > el.clientWidth && el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
   }, []);
+
+  useEffect(() => {
+    updateArrows();
+    const timer = setTimeout(updateArrows, 100);
+    window.addEventListener('resize', updateArrows);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', updateArrows);
+    };
+  }, [items, updateArrows]);
 
   const scroll = (direction) => {
     const el = scrollRef.current;
@@ -144,7 +122,17 @@ const ContinueWatchingWidget = ({ T }) => {
               onClick={() => {
                 if (item.is_active) return;
                 if (item.type === 'episode' || item.type === 'movie') {
-                  playMutation.mutate(item.id);
+                  let ipcRenderer = null;
+                  try {
+                    if (window.require) {
+                      ipcRenderer = window.require('electron').ipcRenderer;
+                    }
+                  } catch (e) {}
+                  if (ipcRenderer) {
+                    ipcRenderer.invoke('mpv-open-fullscreen', { itemId: item.id });
+                  } else {
+                    navigate(`/player/${item.id}`);
+                  }
                 }
               }}
               role="button"
@@ -153,7 +141,17 @@ const ContinueWatchingWidget = ({ T }) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   if (item.is_active) return;
                   if (item.type === 'episode' || item.type === 'movie') {
-                    playMutation.mutate(item.id);
+                    let ipcRenderer = null;
+                    try {
+                      if (window.require) {
+                        ipcRenderer = window.require('electron').ipcRenderer;
+                      }
+                    } catch (e) {}
+                    if (ipcRenderer) {
+                      ipcRenderer.invoke('mpv-open-fullscreen', { itemId: item.id });
+                    } else {
+                      navigate(`/player/${item.id}`);
+                    }
                   }
                 }
               }}

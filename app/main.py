@@ -2,6 +2,16 @@ import logging
 import os
 import sys
 from contextlib import asynccontextmanager
+
+# Force-import all SQLAlchemy models on startup to prevent registry relationship errors
+import app.infrastructure.cache.models
+import app.domains.users.models
+import app.domains.tasks.models
+import app.domains.settings.models
+import app.domains.people.models
+import app.domains.metadata.models
+import app.domains.library.models
+import app.domains.history.models
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles

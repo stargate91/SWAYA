@@ -14,9 +14,19 @@ from app.application.media.schemas import (
     PlaybackStatusResponse,
     WatchHistoryResponse,
     WatchedHistoryResponse,
+    PlaybackInfoResponse,
+    UpdatePlaybackProgressRequest,
 )
 
 router = APIRouter(prefix="/api/v1", tags=["Media Playback"])
+
+@router.get("/media/playback-info/{item_id}", response_model=PlaybackInfoResponse)
+def get_playback_info(item_id: str, db: Session = Depends(get_db)):
+    return PlaybackService(db).get_playback_info(item_id)
+
+@router.post("/media/progress", response_model=PlaybackStatusResponse)
+def update_playback_progress(payload: UpdatePlaybackProgressRequest, db: Session = Depends(get_db)):
+    return PlaybackService(db).update_playback_progress(payload.item_id, payload.current_time, payload.total_length)
 
 @router.post("/media/play", response_model=PlaybackStatusResponse)
 def play_media_item(payload: PlayMediaRequest, db: Session = Depends(get_db)):
