@@ -285,7 +285,7 @@ const RecommendationsWidget = ({ language, T }) => {
 
   const handleWatchlist = async (tmdbId, type) => {
     const isWatchlisted = optimisticWatchlistIds.includes(tmdbId);
-    
+
     // Optimistic toggle
     if (isWatchlisted) {
       setOptimisticWatchlistIds((prev) => prev.filter((id) => id !== tmdbId));

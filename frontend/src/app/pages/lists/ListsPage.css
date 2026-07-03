@@ -103,11 +103,13 @@
   flex: 1 1 auto;
   overflow-y: auto;
   min-height: 0;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .lists-sidebar__content::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera, Edge */
+  display: none;
+  /* Chrome, Safari, Opera, Edge */
 }
 
 .lists-sidebar__loading {
@@ -207,6 +209,7 @@
   display: flex;
   gap: 1px;
 }
+
 .lists-sidebar__collage--2 .lists-sidebar__collage-img {
   width: calc(50% - 0.5px);
   height: 100%;
@@ -219,10 +222,12 @@
   grid-template-rows: 1fr 1fr;
   gap: 1px;
 }
+
 .lists-sidebar__collage--3 .lists-sidebar__collage-img {
   width: 100%;
   height: 100%;
 }
+
 .lists-sidebar__collage--3 .lists-sidebar__collage-img--0 {
   grid-row: span 2;
 }
@@ -239,6 +244,7 @@
   top: 0;
   height: 48px;
 }
+
 .lists-sidebar__collage--4 .lists-sidebar__collage-img--1 {
   left: 0;
   bottom: 0;
@@ -251,6 +257,7 @@
   top: 0;
   height: 21px;
 }
+
 .lists-sidebar__collage--4 .lists-sidebar__collage-img--3 {
   right: 0;
   bottom: 0;
@@ -343,7 +350,8 @@
 }
 
 .lists-sidebar__item:hover .lists-sidebar__item-count {
-  display: none; /* Hide count when action buttons are visible */
+  display: none;
+  /* Hide count when action buttons are visible */
 }
 
 .lists-sidebar__action-btn {
@@ -652,12 +660,37 @@
   border-color: transparent !important;
 }
 
+.lists-card__media.is-blurred img {
+  filter: blur(28px) saturate(110%);
+  transition: filter var(--motion-duration-slow) var(--motion-ease-standard);
+}
+
+.lists-card:hover .lists-card__media.is-blurred img {
+  filter: blur(0px) saturate(100%);
+}
+
+.recommend-card-blur-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, black 70%, transparent);
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  pointer-events: none;
+  z-index: 10;
+  transition: backdrop-filter var(--motion-duration-slow) var(--motion-ease-standard), -webkit-backdrop-filter var(--motion-duration-slow) var(--motion-ease-standard), opacity var(--motion-duration-slow) var(--motion-ease-standard), background-color var(--motion-duration-slow) var(--motion-ease-standard);
+  border-radius: 0 !important;
+}
+
 .lists-card:hover .recommend-card-blur-overlay {
   backdrop-filter: blur(0px) !important;
   -webkit-backdrop-filter: blur(0px) !important;
   background: transparent;
   opacity: 0;
 }
+
 
 .lists-card--poster .lists-card__media {
   aspect-ratio: 2 / 3;

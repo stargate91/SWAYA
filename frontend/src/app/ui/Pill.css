@@ -151,7 +151,7 @@
   --pill-color: color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 85%, var(--color-text-primary, #fff));
   --pill-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   --pill-transition: border-color var(--motion-fast, 0.15s), background-color var(--motion-fast, 0.15s), transform var(--motion-fast, 0.15s), box-shadow var(--motion-fast, 0.15s);
-  
+
   border: var(--pill-border);
   background: var(--pill-bg);
   color: var(--pill-color);
@@ -175,7 +175,7 @@
   pointer-events: none;
 }
 
-.ui-pill--tag > * {
+.ui-pill--tag>* {
   position: relative;
   z-index: 1;
 }
@@ -184,7 +184,7 @@
   --pill-bg-hover: color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 18%, var(--color-bg-elevated, rgba(30, 30, 30, 0.8)));
   --pill-border-hover: color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 50%, var(--color-border-default, rgba(255, 255, 255, 0.15)));
   --pill-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.25);
-  
+
   background: var(--pill-bg-hover);
   border-color: var(--pill-border-hover);
   box-shadow: var(--pill-shadow-hover);
@@ -196,7 +196,7 @@
   background: transparent;
   --pill-suggested-color: var(--color-text-muted, #888);
   --pill-suggested-border: var(--color-border-subtle, rgba(255, 255, 255, 0.08));
-  
+
   color: var(--pill-suggested-color);
   border-color: var(--pill-suggested-border);
 }
@@ -205,7 +205,7 @@
   --pill-suggested-bg-hover: color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 12%, var(--color-bg-elevated, rgba(30, 30, 30, 0.6)));
   --pill-suggested-border-hover: color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 30%, var(--color-border-subtle, rgba(255, 255, 255, 0.08)));
   --pill-suggested-color-hover: color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 85%, var(--color-text-primary, #fff));
-  
+
   background: var(--pill-suggested-bg-hover);
   border-color: var(--pill-suggested-border-hover);
   border-style: solid;
@@ -229,8 +229,8 @@
   background: var(--ui-surface-soft-strong);
   border: 1px solid var(--color-border-default);
   color: var(--color-text-primary);
-  box-shadow: 
-    0 1px 3px color-mix(in srgb, black 20%, transparent), 
+  box-shadow:
+    0 1px 3px color-mix(in srgb, black 20%, transparent),
     inset 0 1px 0 var(--color-border-subtle);
   outline: none;
 }

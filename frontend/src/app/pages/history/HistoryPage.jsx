@@ -413,7 +413,7 @@ export default function HistoryPage() {
                   />
                 ) : (
                   <div className="watched-history-card__poster-placeholder">
-                    <Flame size={18} color="#ff7c1e" />
+                    <Flame size={18} color="var(--color-state-danger, #ef4444)" />
                   </div>
                 )}
               </div>
@@ -431,7 +431,7 @@ export default function HistoryPage() {
                     <span>{new Date(log.created_at).toLocaleString()}</span>
                   </div>
 
-                  <div className="watched-history-card__status" style={{ background: 'rgba(255, 124, 30, 0.15)', color: '#ff7c1e' }}>
+                  <div className="watched-history-card__status" style={{ background: 'var(--color-state-danger-bg, rgba(239, 68, 68, 0.15))', color: 'var(--color-state-danger, #ef4444)' }}>
                     <Flame size={12} fill="currentColor" />
                     <span>Peak at {formatTime(log.video_position)}</span>
                   </div>

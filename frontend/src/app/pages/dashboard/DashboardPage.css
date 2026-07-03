@@ -1123,9 +1123,13 @@
   }
 }
 
-/* Adult content privacy blurring */
-.recommend-card-poster-shell.is-blurred {
-  border-color: transparent !important;
+.recommend-card-poster-shell.is-blurred img {
+  filter: blur(28px) saturate(110%);
+  transition: filter var(--motion-duration-slow) var(--motion-ease-standard);
+}
+
+.recommend-card:hover .recommend-card-poster-shell.is-blurred img {
+  filter: blur(0px) saturate(100%);
 }
 
 .recommend-card-blur-overlay {
@@ -1148,17 +1152,4 @@
   -webkit-backdrop-filter: blur(0px) !important;
   background: transparent;
   opacity: 0;
-}
-
-.recommend-card-blur-badge {
-  background: color-mix(in srgb, var(--color-state-danger, red) 95%, transparent);
-  color: var(--color-text-primary, white);
-  font-size: 11px;
-  font-weight: 850;
-  padding: var(--space-2xs) var(--space-sm);
-  border-radius: 4px;
-  border: 1px solid color-mix(in srgb, var(--color-text-primary, white) 25%, transparent);
-  letter-spacing: 0.05em;
-  box-shadow: 0 4px 10px color-mix(in srgb, black 50%, transparent);
-  text-transform: uppercase;
 }

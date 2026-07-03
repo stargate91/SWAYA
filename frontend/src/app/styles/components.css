@@ -181,3 +181,23 @@
 .review-drawer-close-btn:hover {
   transform: rotate(90deg) !important;
 }
+
+/* Global Settings Badge for Adult 18+ content */
+.settings-badge {
+  font-size: 12px;
+  font-weight: bold;
+  padding: 0.125rem var(--space-sm);
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-badge--danger {
+  background: var(--color-state-danger-bg-strong);
+  color: var(--settings-danger-text);
+  border: 1.5px solid var(--settings-danger-text);
+}

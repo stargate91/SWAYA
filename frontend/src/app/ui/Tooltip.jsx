@@ -84,6 +84,22 @@ export default function Tooltip({
   }, []);
 
   useEffect(() => {
+    hideTooltip();
+  }, [content]);
+
+  useEffect(() => {
+    const handleMouseLeaveWindow = () => {
+      hideTooltip();
+    };
+    document.addEventListener('mouseleave', handleMouseLeaveWindow);
+    window.addEventListener('blur', hideTooltip);
+    return () => {
+      document.removeEventListener('mouseleave', handleMouseLeaveWindow);
+      window.removeEventListener('blur', hideTooltip);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!isOpen) return undefined;
 
     const updatePosition = () => {

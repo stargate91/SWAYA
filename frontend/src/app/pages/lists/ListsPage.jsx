@@ -277,7 +277,7 @@ export default function ListsPage() {
                       style={{ '--list-theme-color': list.color || 'var(--color-accent-blue)' }}
                     >
                       <div className="lists-sidebar__item-left">
-                         <div
+                        <div
                           className="lists-sidebar__item-icon-wrap"
                           style={{
                             '--list-theme-color': list.color || 'var(--color-accent-blue)',
@@ -314,7 +314,7 @@ export default function ListsPage() {
                           </span>
                         </div>
                       </div>
-                      
+
                       <div className="lists-sidebar__item-right">
                         {!list.is_watchlist && (
                           <div className="lists-sidebar__item-actions">
@@ -416,7 +416,7 @@ export default function ListsPage() {
                             if (mediaType === 'episode' || mediaType === 'season') {
                               mediaType = 'tv';
                             }
-                            
+
                             let itemId = item.media_item_id;
                             if (!itemId) {
                               if (mediaType === 'movie') {
@@ -431,11 +431,11 @@ export default function ListsPage() {
                                 itemId = item.match_id;
                               }
                             }
-                            
-                            const targetPath = mediaType === 'person' 
-                              ? `/library/people/${item.person_id || itemId}` 
+
+                            const targetPath = mediaType === 'person'
+                              ? `/library/people/${item.person_id || itemId}`
                               : `/library/${mediaType}/${itemId}`;
-                            
+
                             console.log('ListsPage card click:', {
                               item,
                               rawType,
@@ -443,7 +443,7 @@ export default function ListsPage() {
                               itemId,
                               targetPath
                             });
-                            
+
                             navigate(targetPath);
                           }}
                         >
@@ -572,7 +572,7 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
       setHasMore(false);
       return;
     }
-    
+
     const currentPage = isNew ? 1 : page + 1;
     if (isNew) {
       setSearching(true);
@@ -640,7 +640,7 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
 
   useEffect(() => {
     if (!isOpen) return;
-    
+
     // Instantly load local library items when query is empty
     if (source === 'library' && !query.trim()) {
       handleSearch(true);
@@ -674,7 +674,7 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
       } else {
         const isSceneItem = item.media_type === 'scene' || mediaType === 'scene';
         const poster = isSceneItem ? (item.backdrop_path || item.poster_path) : (item.poster_path || item.profile_path);
-        
+
         await addListItemMutation.mutateAsync({
           listId: activeList.id,
           payload: {
@@ -741,187 +741,187 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
           </button>
         </div>
 
-      <div className="lists-drawer__search-area" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <SegmentedControl
-          options={[
-            { label: 'My Library', value: 'library' },
-            { label: isAdultActive ? 'Discover (Online)' : 'Discover (TMDB)', value: 'discover' }
-          ]}
-          value={source}
-          onChange={(val) => {
-            setSource(val);
-            if (val === 'discover') {
-              if (mediaType === 'scene') {
-                if (isAdultActive) {
-                  setProvider('porndb');
+        <div className="lists-drawer__search-area" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <SegmentedControl
+            options={[
+              { label: 'My Library', value: 'library' },
+              { label: isAdultActive ? 'Discover (Online)' : 'Discover (TMDB)', value: 'discover' }
+            ]}
+            value={source}
+            onChange={(val) => {
+              setSource(val);
+              if (val === 'discover') {
+                if (mediaType === 'scene') {
+                  if (isAdultActive) {
+                    setProvider('porndb');
+                  } else {
+                    setMediaType('movie');
+                    setProvider('tmdb');
+                  }
                 } else {
-                  setMediaType('movie');
                   setProvider('tmdb');
                 }
-              } else {
-                setProvider('tmdb');
-              }
-            }
-            setResults([]);
-          }}
-        />
-
-        {listType === 'media' && (
-          <SegmentedControl
-            options={[
-              { label: 'Movies', value: 'movie' },
-              { label: 'TV Shows', value: 'tv' },
-              ...(isAdultActive ? [{ label: 'Scenes', value: 'scene' }] : [])
-            ]}
-            value={mediaType}
-            onChange={(val) => {
-              setMediaType(val);
-              if (val === 'scene') {
-                setProvider('porndb');
-              } else {
-                setProvider('tmdb');
               }
               setResults([]);
             }}
           />
-        )}
 
-        {isAdultActive && source === 'discover' && (mediaType === 'movie' || mediaType === 'scene' || listType === 'person') && (
-          <SegmentedControl
-            options={
-              listType === 'person' ? [
-                { label: 'TMDB', value: 'tmdb' },
-                { label: 'ThePornDB', value: 'porndb' },
-                { label: 'StashDB', value: 'stashdb' },
-                { label: 'FansDB', value: 'fansdb' }
-              ] : mediaType === 'scene' ? [
-                { label: 'ThePornDB', value: 'porndb' },
-                { label: 'StashDB', value: 'stashdb' },
-                { label: 'FansDB', value: 'fansdb' }
-              ] : [
-                { label: 'TMDB', value: 'tmdb' },
-                { label: 'ThePornDB', value: 'porndb' }
-              ]
-            }
-            value={provider}
-            onChange={(val) => {
-              setProvider(val);
-              setResults([]);
-            }}
-          />
-        )}
+          {listType === 'media' && (
+            <SegmentedControl
+              options={[
+                { label: 'Movies', value: 'movie' },
+                { label: 'TV Shows', value: 'tv' },
+                ...(isAdultActive ? [{ label: 'Scenes', value: 'scene' }] : [])
+              ]}
+              value={mediaType}
+              onChange={(val) => {
+                setMediaType(val);
+                if (val === 'scene') {
+                  setProvider('porndb');
+                } else {
+                  setProvider('tmdb');
+                }
+                setResults([]);
+              }}
+            />
+          )}
 
-        {source === 'library' && (
-          <SegmentedControl
-            options={[
-              { label: 'Not in List', value: 'not_added' },
-              { label: 'In List', value: 'added' }
-            ]}
-            value={statusFilter}
-            onChange={setStatusFilter}
-          />
-        )}
+          {isAdultActive && source === 'discover' && (mediaType === 'movie' || mediaType === 'scene' || listType === 'person') && (
+            <SegmentedControl
+              options={
+                listType === 'person' ? [
+                  { label: 'TMDB', value: 'tmdb' },
+                  { label: 'ThePornDB', value: 'porndb' },
+                  { label: 'StashDB', value: 'stashdb' },
+                  { label: 'FansDB', value: 'fansdb' }
+                ] : mediaType === 'scene' ? [
+                  { label: 'ThePornDB', value: 'porndb' },
+                  { label: 'StashDB', value: 'stashdb' },
+                  { label: 'FansDB', value: 'fansdb' }
+                ] : [
+                  { label: 'TMDB', value: 'tmdb' },
+                  { label: 'ThePornDB', value: 'porndb' }
+                ]
+              }
+              value={provider}
+              onChange={(val) => {
+                setProvider(val);
+                setResults([]);
+              }}
+            />
+          )}
 
-        <div className="lists-drawer__search-input-wrap">
-          <Search size={16} className="lists-drawer__search-icon" />
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={listType === 'person' ? 'Search performers...' : 'Search movies, series...'}
-          />
+          {source === 'library' && (
+            <SegmentedControl
+              options={[
+                { label: 'Not in List', value: 'not_added' },
+                { label: 'In List', value: 'added' }
+              ]}
+              value={statusFilter}
+              onChange={setStatusFilter}
+            />
+          )}
+
+          <div className="lists-drawer__search-input-wrap">
+            <Search size={16} className="lists-drawer__search-icon" />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={listType === 'person' ? 'Search performers...' : 'Search movies, series...'}
+            />
+          </div>
+        </div>
+
+        <div className="lists-drawer__results" onScroll={handleScroll}>
+          {searching && (
+            <div className="lists-drawer__loader">
+              <Loader2 className="spinner" size={24} />
+            </div>
+          )}
+
+          {!searching && results.length === 0 && query && (
+            <div className="lists-drawer__empty">
+              No results found.
+            </div>
+          )}
+
+          {!searching && results.length > 0 && results.filter((item) => {
+            if (source === 'discover') return true;
+            const added = isAdded(item);
+            if (statusFilter === 'added') return added;
+            if (statusFilter === 'not_added') return !added;
+            return true;
+          }).length === 0 && (
+              <div className="lists-drawer__empty">
+                No items match the selected status filter.
+              </div>
+            )}
+
+          {!searching && results.filter((item) => {
+            if (source === 'discover') return true;
+            const added = isAdded(item);
+            if (statusFilter === 'added') return added;
+            if (statusFilter === 'not_added') return !added;
+            return true;
+          }).map((item) => {
+            const added = isAdded(item);
+            const title = item.title || item.name;
+            const subtitle = listType === 'person' ? (item.role || 'Actor') : (item.year || item.media_type || mediaType);
+            const isSceneItem = item.media_type === 'scene' || mediaType === 'scene';
+            const poster = isSceneItem ? (item.backdrop_path || item.poster_path) : (item.poster_path || item.profile_path);
+            const imageSize = listType === 'person' ? 'person' : (isSceneItem ? 'backdrop' : 'poster');
+
+            return (
+              <div key={item.id} className={`lists-drawer__item ${isSceneItem ? 'lists-drawer__item--scene' : ''}`}>
+                <div className="lists-drawer__item-media">
+                  <img
+                    src={poster ? resolveMediaImageUrl(poster, imageSize) : ''}
+                    alt=""
+                    style={{ display: poster ? 'block' : 'none' }}
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      const placeholderEl = e.currentTarget.nextSibling;
+                      if (placeholderEl) {
+                        placeholderEl.style.display = 'flex';
+                      }
+                    }}
+                  />
+                  <div
+                    className="lists-drawer__item-media-placeholder"
+                    style={{ display: poster ? 'none' : 'flex' }}
+                  >
+                    {listType === 'person' ? (
+                      <Users size={14} />
+                    ) : (isSceneItem ? (
+                      <Film size={14} />
+                    ) : (mediaType === 'tv' || item.media_type === 'tv') ? (
+                      <Tv size={14} />
+                    ) : (
+                      <Film size={14} />
+                    ))}
+                  </div>
+                </div>
+                <div className="lists-drawer__item-info">
+                  <span className="lists-drawer__item-title">{title}</span>
+                  <span className="lists-drawer__item-subtitle">{subtitle}</span>
+                </div>
+                <ResultAddButton
+                  added={added}
+                  onAdd={() => handleAdd(item)}
+                  onRemove={() => handleRemove(item)}
+                />
+              </div>
+            );
+          })}
+
+          {loadingMore && (
+            <div className="lists-drawer__loader" style={{ padding: '8px 0' }}>
+              <Loader2 className="spinner" size={20} />
+            </div>
+          )}
         </div>
       </div>
-
-      <div className="lists-drawer__results" onScroll={handleScroll}>
-        {searching && (
-          <div className="lists-drawer__loader">
-            <Loader2 className="spinner" size={24} />
-          </div>
-        )}
-        
-        {!searching && results.length === 0 && query && (
-          <div className="lists-drawer__empty">
-            No results found.
-          </div>
-        )}
-
-        {!searching && results.length > 0 && results.filter((item) => {
-          if (source === 'discover') return true;
-          const added = isAdded(item);
-          if (statusFilter === 'added') return added;
-          if (statusFilter === 'not_added') return !added;
-          return true;
-        }).length === 0 && (
-          <div className="lists-drawer__empty">
-            No items match the selected status filter.
-          </div>
-        )}
-
-        {!searching && results.filter((item) => {
-          if (source === 'discover') return true;
-          const added = isAdded(item);
-          if (statusFilter === 'added') return added;
-          if (statusFilter === 'not_added') return !added;
-          return true;
-        }).map((item) => {
-          const added = isAdded(item);
-          const title = item.title || item.name;
-          const subtitle = listType === 'person' ? (item.role || 'Actor') : (item.year || item.media_type || mediaType);
-          const isSceneItem = item.media_type === 'scene' || mediaType === 'scene';
-          const poster = isSceneItem ? (item.backdrop_path || item.poster_path) : (item.poster_path || item.profile_path);
-          const imageSize = listType === 'person' ? 'person' : (isSceneItem ? 'backdrop' : 'poster');
-          
-          return (
-            <div key={item.id} className={`lists-drawer__item ${isSceneItem ? 'lists-drawer__item--scene' : ''}`}>
-              <div className="lists-drawer__item-media">
-                <img
-                  src={poster ? resolveMediaImageUrl(poster, imageSize) : ''}
-                  alt=""
-                  style={{ display: poster ? 'block' : 'none' }}
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    const placeholderEl = e.currentTarget.nextSibling;
-                    if (placeholderEl) {
-                      placeholderEl.style.display = 'flex';
-                    }
-                  }}
-                />
-                <div
-                  className="lists-drawer__item-media-placeholder"
-                  style={{ display: poster ? 'none' : 'flex' }}
-                >
-                  {listType === 'person' ? (
-                    <Users size={14} />
-                  ) : (isSceneItem ? (
-                    <Film size={14} />
-                  ) : (mediaType === 'tv' || item.media_type === 'tv') ? (
-                    <Tv size={14} />
-                  ) : (
-                    <Film size={14} />
-                  ))}
-                </div>
-              </div>
-              <div className="lists-drawer__item-info">
-                <span className="lists-drawer__item-title">{title}</span>
-                <span className="lists-drawer__item-subtitle">{subtitle}</span>
-              </div>
-              <ResultAddButton
-                added={added}
-                onAdd={() => handleAdd(item)}
-                onRemove={() => handleRemove(item)}
-              />
-            </div>
-          );
-        })}
-
-        {loadingMore && (
-          <div className="lists-drawer__loader" style={{ padding: '8px 0' }}>
-            <Loader2 className="spinner" size={20} />
-          </div>
-        )}
-      </div>
-    </div>
-  </>
+    </>
   );
 }
