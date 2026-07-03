@@ -267,6 +267,7 @@ class CustomListItemResponse(BaseModel):
     poster_path: Optional[str] = None
     year: Optional[int] = None
     rating: Optional[float] = None
+    is_adult: Optional[bool] = False
 
 
 class CustomListResponse(BaseModel):

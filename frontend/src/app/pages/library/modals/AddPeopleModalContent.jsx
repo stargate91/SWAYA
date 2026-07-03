@@ -55,7 +55,7 @@ export default function AddPeopleModalContent({ isAdult, t }) {
   const [genderFilter, setGenderFilter] = useState('all');
   const [sortBy, setSortBy] = useState('library_count');
   const [sortDirection, setSortDirection] = useState('desc');
-  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'added', 'not_added'
+  const [statusFilter, setStatusFilter] = useState('not_added'); // 'added', 'not_added'
 
   // TMDB Search States
   const [tmdbQuery, setTmdbQuery] = useState('');
@@ -279,9 +279,8 @@ export default function AddPeopleModalContent({ isAdult, t }) {
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 options={[
-                  { value: 'all', label: t('library.filter.allStatuses') || 'All' },
-                  { value: 'added', label: t('library.filter.added') || 'Added' },
                   { value: 'not_added', label: t('library.filter.notAdded') || 'Not Added' },
+                  { value: 'added', label: t('library.filter.added') || 'Added' },
                 ]}
               />
             </div>

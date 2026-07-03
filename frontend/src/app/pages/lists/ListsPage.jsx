@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from '@/providers/LanguageContext';
 import Page from '@/ui/Page';
 import Button from '@/ui/Button';
+import IconButton from '@/ui/IconButton';
 import { useUi } from '@/providers/UiProvider';
 import {
   useListsQuery,
@@ -9,12 +10,16 @@ import {
   useCreateListMutation,
   useUpdateListMutation,
   useDeleteListMutation,
-  useAddListItemMutation
+  useAddListItemMutation,
+  useRemoveListItemMutation
 } from '@/queries';
-import { Plus, Edit2, Trash2, List as ListIcon, Loader2, Film, Users, Download, Search } from 'lucide-react';
+import { Plus, Edit2, Trash2, List as ListIcon, Loader2, Film, Users, Download, Search, X, Check, Minus } from 'lucide-react';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import api from '@/lib/api';
 import EmptyState from '@/ui/EmptyState';
+import SegmentedControl from '@/ui/SegmentedControl';
+import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
+import { API_BASE } from '@/lib/backend';
 import CreateListModalContent from './CreateListModalContent';
 import './ListsPage.css';
 
@@ -24,6 +29,7 @@ export default function ListsPage() {
   const { t } = useTranslation();
   const { openModal, closeModal } = useUi();
   const { data: lists = [], isLoading } = useListsQuery();
+  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
 
   const createMutation = useCreateListMutation();
   const updateMutation = useUpdateListMutation();
@@ -33,10 +39,16 @@ export default function ListsPage() {
   const fileInputRef = useRef(null);
 
   const [activeListId, setActiveListId] = useState(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const activeList = lists.find((l) => l.id === activeListId);
   const { data: activeListDetails, isLoading: isDetailsLoading } = useListDetailsQuery(activeListId, {
     enabled: !!activeListId
   });
+
+  // Close drawer when switching active list
+  useEffect(() => {
+    setIsDrawerOpen(false);
+  }, [activeListId]);
 
   // Set default active list on load
   useEffect(() => {
@@ -204,48 +216,7 @@ export default function ListsPage() {
   const { toast } = useUi();
 
   const handleStartAddItems = () => {
-    if (!activeList) return;
-    openModal({
-      title: activeList.list_type === 'person' ? (t('lists.add_people_title') || 'Add People to List') : (t('lists.add_titles_title') || 'Add Titles to List'),
-      icon: Plus,
-      content: (
-        <AddItemsModalContent
-          listId={activeList.id}
-          listType={activeList.list_type}
-          onAdd={async (item) => {
-            try {
-              if (activeList.list_type === 'person') {
-                await addListItemMutation.mutateAsync({
-                  listId: activeList.id,
-                  payload: {
-                    person_id: item.id
-                  }
-                });
-              } else {
-                await addListItemMutation.mutateAsync({
-                  listId: activeList.id,
-                  payload: {
-                    media_item_id: item.id,
-                    media_type: item.media_type || 'movie'
-                  }
-                });
-              }
-              toast(t('lists.item_added_success') || 'Item added successfully!', 'success');
-            } catch (err) {
-              toast(err.message || 'Failed to add item', 'danger');
-            }
-          }}
-          t={t}
-        />
-      ),
-      footer: (
-        <div className="lists-modal-footer">
-          <Button variant="secondary-neutral" onClick={closeModal}>
-            {t('common.close') || 'Close'}
-          </Button>
-        </div>
-      ),
-    });
+    setIsDrawerOpen(true);
   };
 
   return (
@@ -426,15 +397,22 @@ export default function ListsPage() {
                   <div className="lists-grid">
                     {activeListDetails.items.map((item) => {
                       const isScene = item.media_type === 'scene';
+                      const isAdult = item.is_adult || isScene;
+                      const shouldBlur = isAdult && sessionMode !== 'nsfw';
+                      const rawPosterUrl = item.poster_path ? resolveMediaImageUrl(item.poster_path, isScene ? 'backdrop' : 'poster') : null;
+                      const posterUrl = (shouldBlur && rawPosterUrl)
+                        ? `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(rawPosterUrl)}&blur=true`
+                        : rawPosterUrl;
+
                       return (
                         <div
                           key={item.id}
                           className={`lists-card ${isScene ? 'lists-card--scene' : 'lists-card--poster'}`}
                         >
-                          <div className="lists-card__media">
-                            {item.poster_path ? (
+                          <div className={`lists-card__media ${shouldBlur ? 'is-blurred' : ''}`} style={{ position: 'relative' }}>
+                            {posterUrl ? (
                               <img
-                                src={resolveMediaImageUrl(item.poster_path, isScene ? 'backdrop' : 'poster')}
+                                src={posterUrl}
                                 alt={item.title}
                                 style={{
                                   width: '100%',
@@ -453,6 +431,11 @@ export default function ListsPage() {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                               }} />
+                            )}
+                            {shouldBlur && (
+                              <div className="recommend-card-blur-overlay">
+                                <span className="settings-badge settings-badge--danger">18+</span>
+                              </div>
                             )}
                           </div>
                           <div className="lists-card__info">
@@ -476,111 +459,404 @@ export default function ListsPage() {
           )}
         </main>
       </div>
+
+      <ListsAddDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        activeList={activeList}
+        addListItemMutation={addListItemMutation}
+        activeListDetails={activeListDetails}
+        t={t}
+      />
     </Page>
   );
 }
 
-function AddItemsModalContent({ listId, listType, onAdd, t }) {
+function ResultAddButton({ added, onAdd, onRemove }) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  if (added) {
+    return (
+      <IconButton
+        variant={isHovered ? 'danger' : 'ghost'}
+        size="sm"
+        onClick={onRemove}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className={!isHovered ? 'add-people-modal__activation-btn--active' : ''}
+      >
+        {isHovered ? <Minus size={16} /> : <Check size={16} />}
+      </IconButton>
+    );
+  }
+
+  return (
+    <IconButton
+      variant="secondary"
+      size="sm"
+      onClick={onAdd}
+    >
+      <Plus size={16} />
+    </IconButton>
+  );
+}
+
+function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, activeListDetails, t }) {
+  if (!activeList) return null;
+  const listType = activeList.list_type;
+
+  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
+  const isAdultActive = sessionMode === 'nsfw';
+  const removeListItemMutation = useRemoveListItemMutation();
+
   const [query, setQuery] = useState('');
+  const [source, setSource] = useState('library'); // 'library' or 'discover'
+  const [mediaType, setMediaType] = useState('movie'); // 'movie', 'tv', 'scene'
+  const [provider, setProvider] = useState('tmdb'); // 'tmdb', 'porndb', 'stashdb'
   const [results, setResults] = useState([]);
   const [searching, setSearching] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('not_added'); // 'added', 'not_added'
+  const { toast } = useUi();
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!query.trim()) return;
-    setSearching(true);
+  // Reset search when opening/closing or changing lists/tabs
+  useEffect(() => {
+    setQuery('');
+    setResults([]);
+    setPage(1);
+    setHasMore(false);
+    setStatusFilter('not_added');
+    setProvider(mediaType === 'scene' ? 'porndb' : 'tmdb');
+  }, [isOpen, activeList.id, source, mediaType]);
+
+  const handleSearch = async (isNew = true) => {
+    if (source === 'discover' && !query.trim()) {
+      setResults([]);
+      setHasMore(false);
+      return;
+    }
+    
+    const currentPage = isNew ? 1 : page + 1;
+    if (isNew) {
+      setSearching(true);
+    } else {
+      setLoadingMore(true);
+    }
+
     try {
       if (listType === 'person') {
-        const res = await api.people.getAll({ search: query });
-        setResults(res.results || res || []);
+        if (source === 'library') {
+          const limit = 20;
+          const currentOffset = isNew ? 0 : (currentPage - 1) * limit;
+          const res = await api.people.getAll({
+            search: query.trim() || undefined,
+            offset: currentOffset,
+            limit,
+            adult_only: isAdultActive
+          });
+          const newItems = res.items || res.results || res || [];
+          setResults((prev) => isNew ? newItems : [...prev, ...newItems]);
+          setHasMore(res.has_more || (newItems.length === limit));
+          if (!isNew) setPage(currentPage);
+        } else {
+          const res = await api.metadata.globalSearch({
+            query: query.trim(),
+            source: isAdultActive ? provider : 'tmdb',
+            searchType: 'person',
+            includeAdult: isAdultActive
+          });
+          setResults(res.results || res || []);
+          setHasMore(false);
+        }
       } else {
-        const res = await api.library.getItems({ search: query, tab: 'movies' });
-        setResults(res.results || res.movies || []);
+        if (source === 'library') {
+          const pageSize = 20;
+          const res = await api.library.getItems({
+            search: query.trim() || undefined,
+            tab: mediaType === 'movie' ? 'movies' : mediaType === 'tv' ? 'tv' : 'scenes',
+            page: currentPage,
+            pageSize,
+            include_adult: isAdultActive
+          });
+          const newItems = res.items || res.results || [];
+          setResults((prev) => isNew ? newItems : [...prev, ...newItems]);
+          setHasMore(res.page < res.total_pages);
+          if (!isNew) setPage(currentPage);
+        } else {
+          const res = await api.metadata.globalSearch({
+            query: query.trim(),
+            source: isAdultActive ? provider : 'tmdb',
+            searchType: mediaType === 'movie' ? 'movie' : mediaType === 'tv' ? 'tv' : 'scene',
+            includeAdult: isAdultActive
+          });
+          setResults(res.results || res || []);
+          setHasMore(false);
+        }
       }
     } catch (err) {
       console.error(err);
     } finally {
       setSearching(false);
+      setLoadingMore(false);
     }
   };
 
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    // Instantly load local library items when query is empty
+    if (source === 'library' && !query.trim()) {
+      handleSearch(true);
+      return;
+    }
+
+    const delayDebounceFn = setTimeout(() => {
+      if (query.trim()) {
+        handleSearch(true);
+      } else {
+        setResults([]);
+        setHasMore(false);
+      }
+    }, 350);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [query, source, mediaType, provider, isOpen]);
+
+  const handleAdd = async (item) => {
+    try {
+      if (listType === 'person') {
+        await addListItemMutation.mutateAsync({
+          listId: activeList.id,
+          payload: {
+            person_id: item.id
+          }
+        });
+      } else {
+        await addListItemMutation.mutateAsync({
+          listId: activeList.id,
+          payload: {
+            media_item_id: source === 'library' ? item.id : undefined,
+            tmdb_id: source === 'discover' ? item.id : undefined,
+            media_type: item.media_type || mediaType
+          }
+        });
+      }
+      toast(t('lists.item_added_success') || 'Item added successfully!', 'success');
+    } catch (err) {
+      toast(err.message || 'Failed to add item', 'danger');
+    }
+  };
+
+  const getListItem = (item) => {
+    if (!activeListDetails || !activeListDetails.items) return null;
+    return activeListDetails.items.find((i) => {
+      if (listType === 'person') {
+        return i.person_id === item.id;
+      } else {
+        return i.media_item_id === item.id || i.tmdb_id === item.id;
+      }
+    });
+  };
+
+  const isAdded = (item) => !!getListItem(item);
+
+  const handleRemove = async (item) => {
+    const listItem = getListItem(item);
+    if (!listItem) return;
+    try {
+      await removeListItemMutation.mutateAsync({
+        listId: activeList.id,
+        itemId: listItem.id
+      });
+      toast('Item removed from list', 'success');
+    } catch (err) {
+      toast(err.message || 'Failed to remove item', 'danger');
+    }
+  };
+
+  const handleScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    if (scrollHeight - scrollTop - clientHeight < 40 && hasMore && !loadingMore && !searching) {
+      handleSearch(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
   return (
-    <div className="add-items-modal" style={{ minWidth: '400px' }}>
-      <form onSubmit={handleSearch} style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={listType === 'person' ? 'Search performers...' : 'Search movies & shows...'}
-          style={{
-            flex: 1,
-            background: 'var(--color-surface-card)',
-            border: '1px solid var(--color-border-subtle)',
-            borderRadius: '6px',
-            padding: '8px 12px',
-            color: 'var(--color-text-primary)'
+    <>
+      <div className="ui-drawer-backdrop" onClick={onClose} />
+      <div className="ui-drawer ui-drawer--lg lists-drawer">
+        <div className="lists-drawer__header">
+          <h3>{listType === 'person' ? (t('lists.add_people_title') || 'Add People') : (t('lists.add_titles_title') || 'Add Titles')}</h3>
+          <button className="lists-drawer__close" onClick={onClose}>
+            <X size={18} />
+          </button>
+        </div>
+
+      <div className="lists-drawer__search-area" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <SegmentedControl
+          options={[
+            { label: 'My Library', value: 'library' },
+            { label: isAdultActive ? 'Discover (Online)' : 'Discover (TMDB)', value: 'discover' }
+          ]}
+          value={source}
+          onChange={(val) => {
+            setSource(val);
+            if (val === 'discover') {
+              if (mediaType === 'scene') {
+                if (isAdultActive) {
+                  setProvider('porndb');
+                } else {
+                  setMediaType('movie');
+                  setProvider('tmdb');
+                }
+              } else {
+                setProvider('tmdb');
+              }
+            }
+            setResults([]);
           }}
         />
-        <Button type="submit" variant="primary" style={{ padding: '8px 12px' }}>
-          <Search size={16} />
-        </Button>
-      </form>
 
-      <div style={{ maxHeight: '300px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {listType === 'media' && (
+          <SegmentedControl
+            options={[
+              { label: 'Movies', value: 'movie' },
+              { label: 'TV Shows', value: 'tv' },
+              ...(isAdultActive ? [{ label: 'Scenes', value: 'scene' }] : [])
+            ]}
+            value={mediaType}
+            onChange={(val) => {
+              setMediaType(val);
+              if (val === 'scene') {
+                setProvider('porndb');
+              } else {
+                setProvider('tmdb');
+              }
+              setResults([]);
+            }}
+          />
+        )}
+
+        {isAdultActive && source === 'discover' && (mediaType === 'movie' || mediaType === 'scene' || listType === 'person') && (
+          <SegmentedControl
+            options={
+              listType === 'person' ? [
+                { label: 'TMDB', value: 'tmdb' },
+                { label: 'ThePornDB', value: 'porndb' },
+                { label: 'StashDB', value: 'stashdb' },
+                { label: 'FansDB', value: 'fansdb' }
+              ] : mediaType === 'scene' ? [
+                { label: 'ThePornDB', value: 'porndb' },
+                { label: 'StashDB', value: 'stashdb' },
+                { label: 'FansDB', value: 'fansdb' }
+              ] : [
+                { label: 'TMDB', value: 'tmdb' },
+                { label: 'ThePornDB', value: 'porndb' }
+              ]
+            }
+            value={provider}
+            onChange={(val) => {
+              setProvider(val);
+              setResults([]);
+            }}
+          />
+        )}
+
+        {source === 'library' && (
+          <SegmentedControl
+            options={[
+              { label: 'Not in List', value: 'not_added' },
+              { label: 'In List', value: 'added' }
+            ]}
+            value={statusFilter}
+            onChange={setStatusFilter}
+          />
+        )}
+
+        <div className="lists-drawer__search-input-wrap">
+          <Search size={16} className="lists-drawer__search-icon" />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={listType === 'person' ? 'Search performers...' : 'Search movies, series...'}
+          />
+        </div>
+      </div>
+
+      <div className="lists-drawer__results" onScroll={handleScroll}>
         {searching && (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '16px' }}>
-            <Loader2 className="spinner" />
+          <div className="lists-drawer__loader">
+            <Loader2 className="spinner" size={24} />
           </div>
         )}
+        
         {!searching && results.length === 0 && query && (
-          <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)', padding: '16px' }}>
+          <div className="lists-drawer__empty">
             No results found.
           </div>
         )}
-        {!searching && results.map((item) => (
-          <div
-            key={item.id}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '8px 12px',
-              background: 'var(--color-panel-soft)',
-              borderRadius: '6px',
-              border: '1px solid var(--color-border-subtle)'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flex: 1 }}>
-              <div style={{ width: '32px', height: '48px', overflow: 'hidden', borderRadius: '4px', background: 'rgba(255,255,255,0.02)' }}>
-                {item.poster_path ? (
+
+        {!searching && results.length > 0 && results.filter((item) => {
+          if (source === 'discover') return true;
+          const added = isAdded(item);
+          if (statusFilter === 'added') return added;
+          if (statusFilter === 'not_added') return !added;
+          return true;
+        }).length === 0 && (
+          <div className="lists-drawer__empty">
+            No items match the selected status filter.
+          </div>
+        )}
+
+        {!searching && results.filter((item) => {
+          if (source === 'discover') return true;
+          const added = isAdded(item);
+          if (statusFilter === 'added') return added;
+          if (statusFilter === 'not_added') return !added;
+          return true;
+        }).map((item) => {
+          const added = isAdded(item);
+          const title = item.title || item.name;
+          const subtitle = listType === 'person' ? (item.role || 'Actor') : (item.year || item.media_type || mediaType);
+          const poster = item.poster_path || item.profile_path;
+          
+          return (
+            <div key={item.id} className="lists-drawer__item">
+              <div className="lists-drawer__item-media">
+                {poster ? (
                   <img
-                    src={resolveMediaImageUrl(item.poster_path, listType === 'person' ? 'person' : 'poster')}
+                    src={resolveMediaImageUrl(poster, listType === 'person' ? 'person' : 'poster')}
                     alt=""
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                 ) : (
-                  <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg, rgba(255,255,255,0.05), rgba(0,0,0,0.4))' }} />
+                  <div className="lists-drawer__item-media-placeholder" />
                 )}
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                <span style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {item.title || item.name}
-                </span>
-                <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>
-                  {listType === 'person' ? (item.role || 'Performer') : (item.year || item.media_type || '')}
-                </span>
+              <div className="lists-drawer__item-info">
+                <span className="lists-drawer__item-title">{title}</span>
+                <span className="lists-drawer__item-subtitle">{subtitle}</span>
               </div>
+              <ResultAddButton
+                added={added}
+                onAdd={() => handleAdd(item)}
+                onRemove={() => handleRemove(item)}
+              />
             </div>
-            <Button
-              variant="secondary-neutral"
-              onClick={() => onAdd(item)}
-              style={{ padding: '6px 10px', height: 'auto' }}
-            >
-              <Plus size={14} />
-            </Button>
+          );
+        })}
+
+        {loadingMore && (
+          <div className="lists-drawer__loader" style={{ padding: '8px 0' }}>
+            <Loader2 className="spinner" size={20} />
           </div>
-        ))}
+        )}
       </div>
     </div>
+  </>
   );
 }

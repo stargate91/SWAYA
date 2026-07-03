@@ -59,3 +59,14 @@ export const useAddListItemMutation = () => {
     },
   });
 };
+
+export const useRemoveListItemMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ listId, itemId }) => api.lists.removeFromList(listId, itemId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: listsKeys.all });
+      queryClient.invalidateQueries({ queryKey: listsKeys.details(variables.listId) });
+    },
+  });
+};

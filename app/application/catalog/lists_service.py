@@ -42,6 +42,7 @@ class ListsService:
             "poster_path": None,
             "year": None,
             "rating": None,
+            "is_adult": False,
         }
         
         # Populate basic info based on what is linked
@@ -52,15 +53,20 @@ class ListsService:
                 res["tmdb_id"] = int(match.external_id) if match.external_id.isdigit() else None
                 res["media_type"] = match.media_type.value
                 res["rating"] = match.rating_imdb or match.rating_tmdb
+                res["is_adult"] = bool(match.is_adult)
                 if match.release_date:
                     res["year"] = match.release_date.year
                 loc = next((l for l in match.localizations), None)
                 if loc:
                     res["poster_path"] = loc.poster_path
+                    res["title"] = loc.title
+                elif match.original_title:
+                    res["title"] = match.original_title
         elif item.match:
             res["tmdb_id"] = int(item.match.external_id) if item.match.external_id.isdigit() else None
             res["media_type"] = item.match.media_type.value
             res["rating"] = item.match.rating_imdb or item.match.rating_tmdb
+            res["is_adult"] = bool(item.match.is_adult)
             if item.match.release_date:
                 res["year"] = item.match.release_date.year
             loc = next((l for l in item.match.localizations), None)
@@ -71,8 +77,41 @@ class ListsService:
             res["title"] = item.person.name
             res["media_type"] = "person"
             res["poster_path"] = item.person.profile_path
+            res["is_adult"] = bool(item.person.is_adult)
             
         return CustomListItemResponse(**res)
+
+    def _adult_access_enabled(self) -> bool:
+        from app.domains.settings.models import SystemSetting, UserSetting
+        
+        # Check user setting
+        us = self.db.query(UserSetting).filter(
+            UserSetting.user_id == 1,  # Default user ID
+            UserSetting.key == "include_adult"
+        ).first()
+        if us:
+            return us.value.lower() in ("true", "1", "yes") if isinstance(us.value, str) else bool(us.value)
+            
+        # Fallback to system setting
+        ss = self.db.query(SystemSetting).filter(
+            SystemSetting.key == "include_adult"
+        ).first()
+        if ss:
+            return ss.value.lower() in ("true", "1", "yes") if isinstance(ss.value, str) else bool(ss.value)
+            
+        return False
+
+    def _is_list_adult(self, l: CustomList) -> bool:
+        for item in l.items:
+            if item.media_item:
+                match = next((m for m in item.media_item.matches), None)
+                if match and match.is_adult:
+                    return True
+            elif item.match and item.match.is_adult:
+                return True
+            elif item.person and item.person.is_adult:
+                return True
+        return False
 
     def get_all_lists(self) -> List[CustomListResponse]:
         # Ensure Watchlist exists
@@ -83,9 +122,15 @@ class ListsService:
             self.db.add(watchlist)
             self.db.commit()
 
+        adult_enabled = self._adult_access_enabled()
+
         lists = self.db.query(CustomList).all()
         result = []
         for l in lists:
+            # Hide the entire list if adult is disabled and it has adult items
+            if not adult_enabled and self._is_list_adult(l):
+                continue
+
             item_count = len(l.items)
             posters = [self._serialize_item(item).poster_path for item in l.items[:4]]
             posters = [p for p in posters if p]
@@ -106,6 +151,9 @@ class ListsService:
     def get_list_details(self, list_id: int) -> CustomListDetailResponse:
         l = self.db.query(CustomList).filter(CustomList.id == list_id).first()
         if not l:
+            raise NotFoundException("Not found")
+            
+        if not self._adult_access_enabled() and self._is_list_adult(l):
             raise NotFoundException("Not found")
         return CustomListDetailResponse(
             id=l.id,
@@ -187,6 +235,36 @@ class ListsService:
         media_item_id = payload.get("media_item_id")
         tmdb_id = payload.get("tmdb_id")
         media_type = payload.get("media_type", "movie")
+
+        # Parse unified string IDs (e.g. "tmdb_46459" or "porndb_123")
+        if isinstance(media_item_id, str):
+            if "_" in media_item_id:
+                prefix, val = media_item_id.split("_", 1)
+                if prefix == "tmdb":
+                    tmdb_id = int(val) if val.isdigit() else val
+                    media_item_id = None
+                elif val.isdigit():
+                    media_item_id = int(val)
+            elif media_item_id.isdigit():
+                media_item_id = int(media_item_id)
+
+        if isinstance(tmdb_id, str):
+            if "_" in tmdb_id:
+                _, val = tmdb_id.split("_", 1)
+                tmdb_id = int(val) if val.isdigit() else val
+            elif tmdb_id.isdigit():
+                tmdb_id = int(tmdb_id)
+
+        # If we have a TMDB ID, check if it already exists as a local MediaItem
+        if tmdb_id and not media_item_id:
+            from app.domains.library.models import MediaItem
+            from app.domains.metadata.models import MetadataMatch
+            local_item = self.db.query(MediaItem).join(MediaItem.matches).filter(
+                MetadataMatch.provider == Provider.TMDB,
+                MetadataMatch.external_id == str(tmdb_id)
+            ).first()
+            if local_item:
+                media_item_id = local_item.id
 
         l = self.db.query(CustomList).filter(CustomList.id == list_id).first()
         if not l:

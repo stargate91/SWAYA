@@ -1,5 +1,5 @@
 from typing import Tuple, Any, List
-from sqlalchemy import func, and_, or_
+from sqlalchemy import func, and_, or_, select
 from sqlalchemy.orm import selectinload
 
 from app.domains.library.models import MediaItem
@@ -62,7 +62,7 @@ class MovieQueryBuilder(BaseQueryBuilder):
                 MetadataMatch.is_adult == params.include_adult,
                 MetadataMatch.media_type == MediaType.MOVIE
             ).group_by(MetadataMatch.media_item_id).subquery()
-            query = query.filter(MetadataMatch.id.in_(canonical_match_ids))
+            query = query.filter(MetadataMatch.id.in_(select(canonical_match_ids)))
         elif params.filter_ownership == "all":
             canonical_match_ids = self.db.query(
                 func.min(MetadataMatch.id)
@@ -74,7 +74,7 @@ class MovieQueryBuilder(BaseQueryBuilder):
             ).group_by(MetadataMatch.media_item_id).subquery()
             query = query.filter(
                 or_(
-                    MetadataMatch.id.in_(canonical_match_ids),
+                    MetadataMatch.id.in_(select(canonical_match_ids)),
                     and_(MetadataMatch.media_item_id == None, UserOverride.is_tracked == True)
                 )
             )

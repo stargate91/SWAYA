@@ -3,7 +3,7 @@ import { create } from 'zustand';
 export const useLibraryModeStore = create((set) => ({
   sessionMode: (() => {
     try {
-      return sessionStorage.getItem('library_session_mode') || 'sfw';
+      return localStorage.getItem('library_session_mode') || 'sfw';
     } catch {
       return 'sfw';
     }
@@ -11,9 +11,9 @@ export const useLibraryModeStore = create((set) => ({
   setSessionMode: (mode) => {
     try {
       if (mode) {
-        sessionStorage.setItem('library_session_mode', mode);
+        localStorage.setItem('library_session_mode', mode);
       } else {
-        sessionStorage.removeItem('library_session_mode');
+        localStorage.removeItem('library_session_mode');
       }
     } catch {
       // Ignore
@@ -24,7 +24,7 @@ export const useLibraryModeStore = create((set) => ({
     set((state) => {
       const nextMode = state.sessionMode === 'nsfw' ? 'sfw' : 'nsfw';
       try {
-        sessionStorage.setItem('library_session_mode', nextMode);
+        localStorage.setItem('library_session_mode', nextMode);
       } catch {
         // Ignore
       }
