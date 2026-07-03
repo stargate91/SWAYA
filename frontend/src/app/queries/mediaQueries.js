@@ -533,7 +533,9 @@ export const usePlayMediaMutation = () => {
   const { data: settings = {} } = useSettingsQuery();
 
   return useMutation({
-    mutationFn: async (itemId) => {
+    mutationFn: async (arg) => {
+      const itemId = typeof arg === 'object' ? arg.itemId : arg;
+      const start = typeof arg === 'object' ? arg.start : undefined;
       const preferredPlayer = settings.preferred_player || 'swaya';
       if (preferredPlayer === 'swaya') {
         let ipcRenderer = null;
@@ -544,9 +546,10 @@ export const usePlayMediaMutation = () => {
         } catch (e) {}
 
         if (ipcRenderer) {
-          await ipcRenderer.invoke('mpv-open-fullscreen', { itemId });
+          await ipcRenderer.invoke('mpv-open-fullscreen', { itemId, start });
         } else {
-          navigate(`/player/${itemId}`);
+          const startQ = start !== undefined ? `?start=${start}` : '';
+          navigate(`/player/${itemId}${startQ}`);
         }
         return { success: true };
       } else {

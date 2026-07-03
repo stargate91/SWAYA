@@ -29,6 +29,61 @@ def get_peak_history(db: Session = Depends(get_db), limit: int = 50):
     return db.query(PlaybackPeakLog).order_by(PlaybackPeakLog.created_at.desc()).limit(limit).all()
 
 
+@router.get("/peaks-decorated")
+def get_peaks_decorated(db: Session = Depends(get_db), limit: int = 50):
+    """Retrieve peak moments decorated with media item info."""
+    from app.domains.library.models import MediaItem
+    from app.shared_kernel.ports.image_service_port import ImageServiceRegistry
+    from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+    from app.shared_kernel.language import LanguageService
+    
+    logs = db.query(PlaybackPeakLog).order_by(PlaybackPeakLog.created_at.desc()).limit(limit).all()
+    results = []
+    
+    for log in logs:
+        item = db.query(MediaItem).filter(MediaItem.id == log.media_item_id).first()
+        if not item:
+            continue
+            
+        active_match = next((match for match in item.matches if match.is_active), None)
+        title = item.filename
+        poster_path = None
+        backdrop_path = None
+        media_type = None
+        
+        if active_match:
+            media_type = active_match.media_type.value if active_match.media_type else None
+            loc = LanguageService.get_best_localization(active_match.localizations, DEFAULT_FALLBACK_LANGUAGE)
+            if loc:
+                title = loc.title
+                poster_path = loc.local_poster_path or loc.poster_path
+                backdrop_path = active_match.local_backdrop_path or active_match.backdrop_path
+            else:
+                if active_match.original_title:
+                    title = active_match.original_title
+                    
+        resolved_poster = None
+        resolved_backdrop = None
+        if poster_path:
+            resolved_poster = ImageServiceRegistry.get().resolve_image_url(poster_path, "posters")
+        if backdrop_path:
+            resolved_backdrop = ImageServiceRegistry.get().resolve_image_url(backdrop_path, "backdrops")
+            
+        results.append({
+            "id": log.id,
+            "media_item_id": log.media_item_id,
+            "video_position": log.video_position,
+            "created_at": log.created_at.isoformat(),
+            "title": title,
+            "poster_path": resolved_poster,
+            "backdrop_path": resolved_backdrop,
+            "duration": int(item.duration) if item.duration else 0,
+            "media_type": media_type
+        })
+        
+    return results
+
+
 # --- Action Batches / File History ---
 
 @router.get("/actions", response_model=List[ActionBatchRead])

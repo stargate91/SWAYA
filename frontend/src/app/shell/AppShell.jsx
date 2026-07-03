@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import AppClosePrompt from './AppClosePrompt';
 import WindowTitlebar from './WindowTitlebar';
+import PlayerControlBar from './PlayerControlBar';
 import Sidebar from './Sidebar';
 import Spinner from '../ui/Spinner';
 import { useSettingsQuery, useScanStatusQuery } from '../queries';
@@ -81,6 +82,88 @@ export default function AppShell() {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
+  const [playerState, setPlayerState] = useState({
+    active: false,
+    itemId: null,
+    title: '',
+    duration: 0,
+    currentTime: 0,
+    isPaused: false,
+    isPip: false,
+    isMinimized: false
+  });
+
+  useEffect(() => {
+    let ipcRenderer = null;
+    try {
+      ipcRenderer = window.require('electron').ipcRenderer;
+    } catch (e) {}
+
+    if (!ipcRenderer) return;
+
+    const handlePlayerStateUpdate = (event, data) => {
+      setPlayerState((prev) => {
+        if (data.event === 'start') {
+          return {
+            active: true,
+            itemId: data.itemId,
+            title: data.title,
+            duration: data.duration,
+            currentTime: data.currentTime,
+            isPaused: data.isPaused,
+            isPip: data.isPip,
+            isMinimized: data.isMinimized
+          };
+        }
+        if (data.event === 'close') {
+          return { ...prev, active: false };
+        }
+        if (data.event === 'time-pos') {
+          return { ...prev, currentTime: data.currentTime };
+        }
+        if (data.event === 'duration') {
+          return { ...prev, duration: data.duration };
+        }
+        if (data.event === 'pause') {
+          return { ...prev, isPaused: data.isPaused };
+        }
+        if (data.event === 'pip-change') {
+          return { ...prev, isPip: data.isPip };
+        }
+        if (data.event === 'minimize-change') {
+          return { ...prev, isMinimized: data.isMinimized };
+        }
+        return prev;
+      });
+    };
+
+    ipcRenderer.on('player-state-update', handlePlayerStateUpdate);
+    return () => {
+      ipcRenderer.off('player-state-update', handlePlayerStateUpdate);
+    };
+  }, []);
+
+  const handleTogglePlay = () => {
+    try {
+      const ipcRenderer = window.require('electron').ipcRenderer;
+      ipcRenderer.send('mpv-command', ['cycle', 'pause']);
+    } catch (e) {}
+  };
+
+  const handleMaximize = () => {
+    try {
+      const ipcRenderer = window.require('electron').ipcRenderer;
+      ipcRenderer.send('mpv-restore');
+    } catch (e) {}
+  };
+
+  const handleClosePlayer = () => {
+    try {
+      const ipcRenderer = window.require('electron').ipcRenderer;
+      ipcRenderer.send('mpv-close');
+    } catch (e) {}
+  };
+
   useEffect(() => {
     if (settings && !settings.onboarding_completed) {
       navigate('/onboarding');
@@ -141,6 +224,12 @@ export default function AppShell() {
           </footer>
         </main>
       </div>
+      <PlayerControlBar
+        state={playerState}
+        onTogglePlay={handleTogglePlay}
+        onMaximize={handleMaximize}
+        onClose={handleClosePlayer}
+      />
       <AppClosePrompt />
     </div>
   );

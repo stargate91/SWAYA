@@ -1,6 +1,12 @@
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
+
+export const usePeaksQuery = () => useQuery({
+  queryKey: ['peaks-history'],
+  queryFn: () => api.history.getPeaks({ limit: 50 }),
+  refetchInterval: 5000,
+});
 
 export const useHistoryQuery = () => useInfiniteQuery({
   queryKey: ['history'],

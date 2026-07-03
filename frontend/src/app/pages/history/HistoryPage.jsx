@@ -8,9 +8,10 @@ import PageHeader from '@/ui/PageHeader';
 import SegmentedControl from '@/ui/SegmentedControl';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
-import { useHistoryQuery, useUndoMutation, useScanStatusQuery, useWatchedHistoryQuery, usePlayMediaMutation } from '@/queries';
-import { RotateCcw, AlertTriangle, Play, CheckCircle2, Clock, Tv, Film } from 'lucide-react';
+import { useHistoryQuery, useUndoMutation, useScanStatusQuery, useWatchedHistoryQuery, usePlayMediaMutation, usePeaksQuery } from '@/queries';
+import { RotateCcw, AlertTriangle, Play, CheckCircle2, Clock, Tv, Film, Flame } from 'lucide-react';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
+import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import HistoryCard from './components/HistoryCard';
 import './HistoryPage.css';
 
@@ -39,6 +40,7 @@ export default function HistoryPage() {
   const { t } = useTranslation();
   const { openModal, closeModal, toast } = useUi();
   const [activeTab, setActiveTab] = useState('rename');
+  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const utilityBarTarget = typeof document !== 'undefined' ? document.getElementById('shell-utility-bar-center') : null;
 
   // Rename History
@@ -69,6 +71,13 @@ export default function HistoryPage() {
   const watchedHistory = watchedHistoryData?.pages.flatMap((page) => Array.isArray(page) ? page : (page?.items || [])) || [];
 
   const playMutation = usePlayMediaMutation();
+
+  // Peak Moments History
+  const { data: peaksData = [], isLoading: isPeaksLoading } = usePeaksQuery();
+
+  const handlePlayMoment = (itemId, videoPosition) => {
+    playMutation.mutate({ itemId, start: videoPosition });
+  };
 
   // Infinite scroll handlers
   useEffect(() => {
@@ -360,26 +369,142 @@ export default function HistoryPage() {
     );
   };
 
+  const renderPeaksContent = () => {
+    if (isPeaksLoading) {
+      return (
+        <div className="watched-history-page__loading-container">
+          <Spinner size={32} />
+        </div>
+      );
+    }
+
+    if (!peaksData || peaksData.length === 0) {
+      return (
+        <div className="watched-history-page__empty-container">
+          <EmptyState
+            title="No marked peak moments"
+            description="Moments you mark with the peak button during NSFW playback will be listed here."
+            icon={Flame}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className="watched-history-list">
+        {peaksData.map((log, index) => {
+          const posterUrl = log.poster_path || log.backdrop_path || '';
+          
+          return (
+            <div
+              key={log.id}
+              className="watched-history-card"
+              ref={(el) => {
+                if (el) el.style.setProperty('--item-index', index);
+              }}
+            >
+              <div className="watched-history-card__poster-wrapper is-scene">
+                {posterUrl ? (
+                  <img 
+                    src={posterUrl} 
+                    alt="" 
+                    className="watched-history-card__poster" 
+                  />
+                ) : (
+                  <div className="watched-history-card__poster-placeholder">
+                    <Flame size={18} color="#ff7c1e" />
+                  </div>
+                )}
+              </div>
+
+              <div className="watched-history-card__content">
+                <div className="watched-history-card__header">
+                  <div className="watched-history-card__title-group">
+                    <h3 className="watched-history-card__title">{log.title}</h3>
+                  </div>
+                </div>
+
+                <div className="watched-history-card__meta">
+                  <div className="watched-history-card__meta-item">
+                    <Clock size={12} />
+                    <span>{new Date(log.created_at).toLocaleString()}</span>
+                  </div>
+
+                  <div className="watched-history-card__status" style={{ background: 'rgba(255, 124, 30, 0.15)', color: '#ff7c1e' }}>
+                    <Flame size={12} fill="currentColor" />
+                    <span>Peak at {formatTime(log.video_position)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="watched-history-card__right">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handlePlayMoment(log.media_item_id, log.video_position)}
+                  disabled={playMutation.isPending && playMutation.variables?.itemId === log.media_item_id}
+                  icon={
+                    playMutation.isPending && playMutation.variables?.itemId === log.media_item_id ? (
+                      <Spinner size={14} />
+                    ) : (
+                      <Play size={14} />
+                    )
+                  }
+                >
+                  Play Moment
+                </Button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const tabOptions = [
+    { value: 'rename', label: t('historyPage.tabRename') || 'Rename Logs' },
+    { value: 'watched', label: t('historyPage.tabWatched') || 'Playback Logs' }
+  ];
+  if (sessionMode === 'nsfw') {
+    tabOptions.push({ value: 'peaks', label: 'Peak Logs' });
+  }
+
+  const getPageTitle = () => {
+    if (activeTab === 'rename') return t('historyPage.pageTitle') || 'Rename history';
+    if (activeTab === 'watched') return t('historyPage.watchedPageTitle') || 'Watched History';
+    return 'Peak Moments';
+  };
+
+  const getPageDesc = () => {
+    if (activeTab === 'rename') return t('historyPage.pageDesc') || 'Review and revert past physical organization and renaming actions.';
+    if (activeTab === 'watched') return t('historyPage.watchedPageDesc') || 'See recently watched items and playback activity.';
+    return 'Moments you marked with the peak button during NSFW playback.';
+  };
+
+  const renderActiveContent = () => {
+    if (activeTab === 'rename') return renderRenameContent();
+    if (activeTab === 'watched') return renderWatchedContent();
+    if (activeTab === 'peaks') return renderPeaksContent();
+    return null;
+  };
+
   return (
     <Page>
       {utilityBarTarget && createPortal(
         <SegmentedControl
           value={activeTab}
           onChange={setActiveTab}
-          options={[
-            { value: 'rename', label: t('historyPage.tabRename') || 'Rename Logs' },
-            { value: 'watched', label: t('historyPage.tabWatched') || 'Playback Logs' }
-          ]}
+          options={tabOptions}
         />,
         utilityBarTarget
       )}
       <div className="history-page">
         <PageHeader
-          title={activeTab === 'rename' ? (t('historyPage.pageTitle') || 'Rename history') : (t('historyPage.watchedPageTitle') || 'Watched History')}
-          description={activeTab === 'rename' ? (t('historyPage.pageDesc') || 'Review and revert past physical organization and renaming actions.') : (t('historyPage.watchedPageDesc') || 'See recently watched items and playback activity.')}
+          title={getPageTitle()}
+          description={getPageDesc()}
         />
 
-        {activeTab === 'rename' ? renderRenameContent() : renderWatchedContent()}
+        {renderActiveContent()}
       </div>
     </Page>
   );

@@ -65,8 +65,8 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
     }
   }
 
-  ipcMain.handle('mpv-open-fullscreen', async (event, { itemId }) => {
-    writeElectronLog('INFO', 'mpv-open-fullscreen requested', { itemId });
+  ipcMain.handle('mpv-open-fullscreen', async (event, { itemId, start }) => {
+    writeElectronLog('INFO', 'mpv-open-fullscreen requested', { itemId, start });
 
     await cleanupExistingMpv();
 
@@ -197,8 +197,9 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
         '--audio-file-paths=sub;subs;subtitles;Extras;extras;audio;audios',
       ];
 
-      if (playbackInfo.start_seconds > 0) {
-        args.push(`--start=${playbackInfo.start_seconds}`);
+      const startSec = start !== undefined ? start : (playbackInfo.start_seconds || 0);
+      if (startSec > 0) {
+        args.push(`--start=${startSec}`);
       }
 
       args.push(filePath);
@@ -258,15 +259,29 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
               if (controlsWindow && !controlsWindow.isDestroyed()) {
                 controlsWindow.webContents.send('mpv-event', parsed);
               }
+
+              // Forward state updates to the mainWindow for the floating control bar
+              if (mainWindow && !mainWindow.isDestroyed()) {
+                if (parsed.event === 'property-change') {
+                  if (parsed.name === 'time-pos' && typeof parsed.data === 'number') {
+                    mainWindow.webContents.send('player-state-update', { event: 'time-pos', currentTime: parsed.data });
+                  }
+                  if (parsed.name === 'duration' && typeof parsed.data === 'number') {
+                    mainWindow.webContents.send('player-state-update', { event: 'duration', duration: parsed.data });
+                  }
+                  if (parsed.name === 'pause' && typeof parsed.data === 'boolean') {
+                    mainWindow.webContents.send('player-state-update', { event: 'pause', isPaused: parsed.data });
+                  }
+                }
+              }
             } catch (e) { }
           }
         });
       }, 400);
 
-      // Load controls route in controlsWindow
       const controlsUrl = isDev
-        ? `http://localhost:5173/?backend_port=${backendPort}&controls_only=true#/player/${itemId}`
-        : `file://${path.join(__dirname, 'build', 'index.html')}?backend_port=${backendPort}&controls_only=true#/player/${itemId}`;
+        ? `http://localhost:5173/?backend_port=${backendPort}&controls_only=true&start=${startSec}#/player/${itemId}`
+        : `file://${path.join(__dirname, 'build', 'index.html')}?backend_port=${backendPort}&controls_only=true&start=${startSec}#/player/${itemId}`;
 
       controlsWindow.loadURL(controlsUrl);
 
@@ -278,14 +293,26 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
       });
 
       if (controlsWindow && !controlsWindow.isDestroyed()) {
-        controlsWindow.focus();
+        controlsWindow.webContents.once('did-finish-load', () => {
+          // Send initial details to controls Window
+        });
       }
 
+      // Notify mainWindow that video playback has started
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('player-state-update', {
+          event: 'start',
+          itemId: String(itemId),
+          title: title,
+          duration: playbackInfo.duration || 0,
+          currentTime: startSec,
+          isPaused: false,
+          isPip: false,
+          isMinimized: false
+        });
+      }
     } catch (err) {
-      writeElectronLog('ERROR', 'Failed starting MPV fullscreen', {
-        message: err.message,
-        stack: err.stack
-      });
+      writeElectronLog('ERROR', 'Error starting MPV', { error: err.message, stack: err.stack });
       if (controlsWindow && !controlsWindow.isDestroyed()) controlsWindow.close();
       if (mpvPlayerWindow && !mpvPlayerWindow.isDestroyed()) mpvPlayerWindow.close();
       return { success: false, error: err.message };
@@ -300,14 +327,14 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
     }
   });
 
-  let isPipLocal = false; // We use the file-level isPip variable instead
-  ipcMain.on('mpv-toggle-pip', (event) => {
-    if (!mpvPlayerWindow || mpvPlayerWindow.isDestroyed()) return;
+  let isMinimized = false;
 
+  function setPipMode(enable) {
+    if (!mpvPlayerWindow || mpvPlayerWindow.isDestroyed()) return;
     const primaryDisplay = screen.getPrimaryDisplay();
     const { width, height } = primaryDisplay.bounds;
 
-    isPip = !isPip;
+    isPip = enable;
 
     if (isPip) {
       mpvPlayerWindow.setFullScreen(false);
@@ -335,6 +362,7 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
       if (mainWindow && !mainWindow.isDestroyed()) {
         mainWindow.show();
         mainWindow.focus();
+        mainWindow.webContents.send('player-state-update', { event: 'pip-change', isPip: true });
       }
     } else {
       if (controlsWindow && !controlsWindow.isDestroyed()) {
@@ -351,12 +379,65 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
         controlsWindow.webContents.send('pip-mode-change', { isPip: false });
         controlsWindow.focus();
       }
+
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('player-state-update', { event: 'pip-change', isPip: false });
+      }
+    }
+  }
+
+  ipcMain.on('mpv-toggle-pip', (event) => {
+    setPipMode(!isPip);
+  });
+
+  ipcMain.on('mpv-minimize', () => {
+    if (!mpvPlayerWindow || mpvPlayerWindow.isDestroyed()) return;
+    isMinimized = true;
+
+    mpvPlayerWindow.setAlwaysOnTop(false);
+    mpvPlayerWindow.minimize();
+
+    if (controlsWindow && !controlsWindow.isDestroyed()) {
+      controlsWindow.setAlwaysOnTop(false);
+      controlsWindow.minimize();
+    }
+
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('player-state-update', { event: 'minimize-change', isMinimized: true });
+    }
+  });
+
+  ipcMain.on('mpv-restore', () => {
+    if (!mpvPlayerWindow || mpvPlayerWindow.isDestroyed()) return;
+    isMinimized = false;
+
+    mpvPlayerWindow.restore();
+    if (controlsWindow && !controlsWindow.isDestroyed()) {
+      controlsWindow.restore();
+    }
+
+    if (isPip) {
+      setPipMode(false);
+    } else {
+      mpvPlayerWindow.show();
+      if (controlsWindow && !controlsWindow.isDestroyed()) {
+        controlsWindow.show();
+        controlsWindow.focus();
+      }
+    }
+
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('player-state-update', { event: 'minimize-change', isMinimized: false });
     }
   });
 
   ipcMain.on('mpv-close', () => {
     writeElectronLog('INFO', 'mpv-close requested');
     isPip = false;
+    isMinimized = false;
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('player-state-update', { event: 'close' });
+    }
     if (mpvProcess) {
       try { mpvProcess.kill(); } catch (e) { }
       mpvProcess = null;

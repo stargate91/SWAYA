@@ -41,19 +41,28 @@ class BaseScraper:
 
     def get_setting(self, key: str, default: Optional[str] = None) -> Optional[str]:
         """Helper to get a setting from settings port, falling back to environment."""
+        if not hasattr(self, "_settings_cache"):
+            self._settings_cache = {}
+        if key in self._settings_cache:
+            return self._settings_cache[key]
+
         import os
+        val = None
         try:
             val = self.settings_port.get_setting(key)
-            if val is not None:
-                return str(val)
         except Exception as e:
             logger.debug(f"Failed to query setting {key} from settings port: {e}")
         
-        # Fallback to env variables (uppercase)
-        env_val = os.getenv(key.upper())
-        if env_val:
-            return env_val
-        return default
+        if val is not None:
+            ret = str(val)
+        else:
+            # Fallback to env variables (uppercase)
+            env_val = os.getenv(key.upper())
+            ret = env_val if env_val else default
+            
+        self._settings_cache[key] = ret
+        return ret
+
 
     def execute_query(self, query: str, variables: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
         """Executes a GraphQL query against the provider's endpoint."""

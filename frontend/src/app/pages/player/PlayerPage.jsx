@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Play, Pause, Volume2, VolumeX, ArrowLeft, Languages, Captions, PictureInPicture2, Maximize2, X, Square, Rewind, FastForward, SkipBack, SkipForward, Flame } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, ArrowLeft, Languages, Captions, PictureInPicture2, Maximize2, X, Square, Rewind, FastForward, SkipBack, SkipForward, Flame, Minimize2 } from 'lucide-react';
 import { resolveMediaImageUrl } from '../../lib/imageUrls';
 import './PlayerPage.css';
 
@@ -163,8 +163,10 @@ export default function PlayerPage() {
             }
           });
 
-          if (data.start_seconds > 0) {
-            ipcRenderer.send('mpv-command', ['seek', data.start_seconds, 'absolute']);
+          const startParam = getQueryParam('start');
+          const startSec = startParam ? parseInt(startParam, 10) : data.start_seconds;
+          if (startSec > 0) {
+            ipcRenderer.send('mpv-command', ['seek', startSec, 'absolute']);
           }
 
           setIsPlaying(true);
@@ -312,8 +314,6 @@ export default function PlayerPage() {
   };
 
   const handleWheel = (e) => {
-    if (isPip && !isMouseOver) return;
-
     const step = 5;
     const currentVolume = isMuted ? 0 : volume;
     let newVolume = currentVolume + (e.deltaY < 0 ? step : -step);
@@ -329,6 +329,7 @@ export default function PlayerPage() {
     sendCommand(['set_property', 'volume', newVolume]);
     handleMouseMove();
   };
+
 
   const handleSpeedUp = () => {
     const nextSpeed = Math.min(16.0, speed * 2);
@@ -374,6 +375,13 @@ export default function PlayerPage() {
     } catch (e) { }
   };
 
+  const handleMinimizePip = () => {
+    try {
+      const { ipcRenderer } = window.require('electron');
+      ipcRenderer.send('mpv-minimize');
+    } catch (e) { }
+  };
+
   const controlsOnly = getQueryParam('controls_only') === 'true';
 
   const currentChapter = (() => {
@@ -399,6 +407,9 @@ export default function PlayerPage() {
         onMouseLeave={() => setIsMouseOver(false)}
       >
         <div className="player-page__pip-overlay">
+          <button className="player-page__pip-btn" onClick={handleMinimizePip} title="Minimize Player">
+            <Minimize2 size={16} />
+          </button>
           <button className="player-page__pip-btn" onClick={handleTogglePip} title="Restore Fullscreen">
             <Maximize2 size={16} />
           </button>
@@ -625,6 +636,10 @@ export default function PlayerPage() {
                 title="Subtitles"
               >
                 <Captions size={18} />
+              </button>
+
+              <button className="player-page__btn" onClick={handleMinimizePip} title="Minimize to Background">
+                <Minimize2 size={18} />
               </button>
 
               <button className="player-page__btn" onClick={handleTogglePip} title="Picture-in-Picture">

@@ -210,10 +210,11 @@
 
 .player-page__pip-overlay {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 0;
+  right: 0;
+  padding: 12px 12px 24px 24px; /* Expanded no-drag hover/scroll area around buttons */
   display: flex;
-  gap: 6px;
+  gap: 8px;
   opacity: 0;
   transition: opacity 0.2s ease;
   z-index: 10000;
@@ -228,8 +229,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 32px; /* Increased size for a better click surface */
+  height: 32px;
   border-radius: 50%;
   border: none;
   background: rgba(0, 0, 0, 0.6);
@@ -238,6 +239,7 @@
   cursor: pointer;
   transition: background 0.15s, transform 0.15s;
 }
+
 
 .player-page__pip-btn:hover {
   background: rgba(0, 0, 0, 0.8);
