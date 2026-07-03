@@ -23,7 +23,7 @@ const getQueryParam = (name) => {
 export default function PlayerPage() {
   const { itemId } = useParams();
   const navigate = useNavigate();
-  
+
   const containerRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -136,7 +136,7 @@ export default function PlayerPage() {
         const res = await fetch(`http://localhost:${backendPort}/api/v1/media/playback-info/${itemId}`);
         if (!res.ok) throw new Error('Failed to load playback details');
         const data = await res.json();
-        
+
         if (!isMounted) return;
         setTitle(data.title);
         setIsAdult(data.is_adult);
@@ -317,14 +317,14 @@ export default function PlayerPage() {
     const step = 5;
     const currentVolume = isMuted ? 0 : volume;
     let newVolume = currentVolume + (e.deltaY < 0 ? step : -step);
-    
+
     newVolume = Math.max(0, Math.min(100, newVolume));
-    
+
     if (isMuted && newVolume > 0) {
       setIsMuted(false);
       sendCommand(['set_property', 'mute', false]);
     }
-    
+
     setVolume(newVolume);
     sendCommand(['set_property', 'volume', newVolume]);
     handleMouseMove();
@@ -363,7 +363,7 @@ export default function PlayerPage() {
     try {
       const { ipcRenderer } = window.require('electron');
       ipcRenderer.send('mpv-close');
-    } catch (e) {}
+    } catch (e) { }
     navigate(-1);
   };
 
@@ -371,7 +371,7 @@ export default function PlayerPage() {
     try {
       const { ipcRenderer } = window.require('electron');
       ipcRenderer.send('mpv-toggle-pip');
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const controlsOnly = getQueryParam('controls_only') === 'true';
@@ -391,9 +391,9 @@ export default function PlayerPage() {
 
   if (isPip) {
     return (
-      <div 
-        className="player-page player-page--transparent player-page--pip" 
-        onMouseMove={handleMouseMove} 
+      <div
+        className="player-page player-page--transparent player-page--pip"
+        onMouseMove={handleMouseMove}
         onWheel={handleWheel}
         onMouseEnter={() => setIsMouseOver(true)}
         onMouseLeave={() => setIsMouseOver(false)}
@@ -417,15 +417,15 @@ export default function PlayerPage() {
 
       {/* Custom Controls Overlay */}
       <div className={`player-page__controls-overlay ${showControls ? 'active' : ''}`}>
-        
+
         {/* Top Header */}
         <div className="player-page__header">
           <div className="player-page__header-left">
             {logoUrl && !logoError ? (
-              <img 
-                src={logoUrl} 
-                alt={title} 
-                className="player-page__logo" 
+              <img
+                src={logoUrl}
+                alt={title}
+                className="player-page__logo"
                 onError={() => setLogoError(true)}
               />
             ) : (
@@ -449,7 +449,7 @@ export default function PlayerPage() {
 
         {/* Bottom Controls */}
         <div className="player-page__bottom">
-          
+
           {/* Progress Bar */}
           <div className="player-page__progress-container">
             <span className="player-page__time">{formatTime(currentTime)}</span>
@@ -480,7 +480,7 @@ export default function PlayerPage() {
 
           {/* Action Row */}
           <div className="player-page__actions">
-            
+
             {/* Left Actions */}
             <div className="player-page__actions-group">
               <button className="player-page__btn" onClick={() => sendCommand(['add', 'chapter', -1])} title="Previous Chapter">
@@ -538,14 +538,14 @@ export default function PlayerPage() {
 
             {/* Right Actions */}
             <div className="player-page__actions-group" style={{ position: 'relative' }}>
-              
+
               {/* Audio Tracks Dropdown */}
               {showAudioMenu && (
                 <div className="player-page__menu" onWheel={(e) => e.stopPropagation()}>
                   <div className="player-page__menu-title">Audio Tracks</div>
                   {trackList.filter(t => t.type === 'audio').map(t => (
-                    <button 
-                      key={t.id} 
+                    <button
+                      key={t.id}
                       className={`player-page__menu-item ${t.selected ? 'active' : ''}`}
                       onClick={() => {
                         sendCommand(['set_property', 'aid', t.id]);
@@ -565,7 +565,7 @@ export default function PlayerPage() {
               {showSubMenu && (
                 <div className="player-page__menu" onWheel={(e) => e.stopPropagation()}>
                   <div className="player-page__menu-title">Subtitles</div>
-                  <button 
+                  <button
                     className={`player-page__menu-item ${!trackList.some(t => t.type === 'sub' && t.selected) ? 'active' : ''}`}
                     onClick={() => {
                       sendCommand(['set_property', 'sid', 'no']);
@@ -575,8 +575,8 @@ export default function PlayerPage() {
                     Off
                   </button>
                   {trackList.filter(t => t.type === 'sub').map(t => (
-                    <button 
-                      key={t.id} 
+                    <button
+                      key={t.id}
                       className={`player-page__menu-item ${t.selected ? 'active' : ''}`}
                       onClick={() => {
                         sendCommand(['set_property', 'sid', t.id]);
@@ -591,11 +591,11 @@ export default function PlayerPage() {
 
               {/* Peak Button */}
               {(isAdult || mediaType === 'scene') && (
-                <button 
-                  className={`player-page__btn ${justAddedPeak ? 'player-page__btn--success' : ''}`} 
-                  onClick={handleAddPeak} 
+                <button
+                  className={`player-page__btn ${justAddedPeak ? 'player-page__btn--success' : ''}`}
+                  onClick={handleAddPeak}
                   title="Mark Peak Moment"
-                  style={{ 
+                  style={{
                     color: justAddedPeak ? '#22c55e' : '#ff7c1e',
                     transition: 'color 0.2s ease, transform 0.2s ease',
                     transform: justAddedPeak ? 'scale(1.2)' : 'none'
@@ -605,23 +605,23 @@ export default function PlayerPage() {
                 </button>
               )}
 
-              <button 
-                className={`player-page__btn ${showAudioMenu ? 'active' : ''}`} 
+              <button
+                className={`player-page__btn ${showAudioMenu ? 'active' : ''}`}
                 onClick={() => {
                   setShowAudioMenu(!showAudioMenu);
                   setShowSubMenu(false);
-                }} 
+                }}
                 title="Audio Tracks"
               >
                 <Languages size={18} />
               </button>
-              
-              <button 
-                className={`player-page__btn ${showSubMenu ? 'active' : ''}`} 
+
+              <button
+                className={`player-page__btn ${showSubMenu ? 'active' : ''}`}
                 onClick={() => {
                   setShowSubMenu(!showSubMenu);
                   setShowAudioMenu(false);
-                }} 
+                }}
                 title="Subtitles"
               >
                 <Captions size={18} />
