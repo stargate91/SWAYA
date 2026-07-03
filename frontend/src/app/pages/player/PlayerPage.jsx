@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Play, Pause, Volume2, VolumeX, ArrowLeft, Languages, Captions, PictureInPicture2, Maximize2, X, Square, Rewind, FastForward, SkipBack, SkipForward } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, ArrowLeft, Languages, Captions, PictureInPicture2, Maximize2, X, Square, Rewind, FastForward, SkipBack, SkipForward, Flame } from 'lucide-react';
 import { resolveMediaImageUrl } from '../../lib/imageUrls';
 import './PlayerPage.css';
 
@@ -37,6 +37,10 @@ export default function PlayerPage() {
   const [isPip, setIsPip] = useState(false);
   const [isMouseOver, setIsMouseOver] = useState(false);
   const [speed, setSpeed] = useState(1.0);
+  const [isAdult, setIsAdult] = useState(false);
+  const [mediaType, setMediaType] = useState(null);
+  const [justAddedPeak, setJustAddedPeak] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   const [chapters, setChapters] = useState([]);
   const [clockTime, setClockTime] = useState('');
   const [endTime, setEndTime] = useState('');
@@ -91,6 +95,10 @@ export default function PlayerPage() {
   }, [showControls]);
 
   useEffect(() => {
+    setLogoError(false);
+  }, [logoUrl]);
+
+  useEffect(() => {
     handleMouseMove();
     const controlsOnly = getQueryParam('controls_only') === 'true';
     if (controlsOnly) {
@@ -131,6 +139,8 @@ export default function PlayerPage() {
         
         if (!isMounted) return;
         setTitle(data.title);
+        setIsAdult(data.is_adult);
+        setMediaType(data.media_type);
         if (data.logo_path) {
           const resolved = resolveMediaImageUrl(data.logo_path, 'logo', `http://localhost:${backendPort}`);
           setLogoUrl(resolved);
@@ -330,6 +340,25 @@ export default function PlayerPage() {
     sendCommand(['set_property', 'speed', nextSpeed]);
   };
 
+  const handleAddPeak = async (e) => {
+    if (e && e.currentTarget) {
+      e.currentTarget.blur();
+    }
+    setJustAddedPeak(true);
+    setTimeout(() => setJustAddedPeak(false), 1500);
+
+    try {
+      const backendPort = getQueryParam('backend_port') || '8000';
+      await fetch(`http://localhost:${backendPort}/api/v1/library/item/${itemId}/peaks`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ video_position: Math.round(currentTime) })
+      });
+    } catch (e) {
+      console.error('Failed to add peak:', e);
+    }
+  };
+
   const handleClose = () => {
     try {
       const { ipcRenderer } = window.require('electron');
@@ -392,8 +421,13 @@ export default function PlayerPage() {
         {/* Top Header */}
         <div className="player-page__header">
           <div className="player-page__header-left">
-            {logoUrl ? (
-              <img src={logoUrl} alt={title} className="player-page__logo" />
+            {logoUrl && !logoError ? (
+              <img 
+                src={logoUrl} 
+                alt={title} 
+                className="player-page__logo" 
+                onError={() => setLogoError(true)}
+              />
             ) : (
               <span className="player-page__title">{title}</span>
             )}
@@ -507,7 +541,7 @@ export default function PlayerPage() {
               
               {/* Audio Tracks Dropdown */}
               {showAudioMenu && (
-                <div className="player-page__menu">
+                <div className="player-page__menu" onWheel={(e) => e.stopPropagation()}>
                   <div className="player-page__menu-title">Audio Tracks</div>
                   {trackList.filter(t => t.type === 'audio').map(t => (
                     <button 
@@ -529,7 +563,7 @@ export default function PlayerPage() {
 
               {/* Subtitles Dropdown */}
               {showSubMenu && (
-                <div className="player-page__menu">
+                <div className="player-page__menu" onWheel={(e) => e.stopPropagation()}>
                   <div className="player-page__menu-title">Subtitles</div>
                   <button 
                     className={`player-page__menu-item ${!trackList.some(t => t.type === 'sub' && t.selected) ? 'active' : ''}`}
@@ -553,6 +587,22 @@ export default function PlayerPage() {
                     </button>
                   ))}
                 </div>
+              )}
+
+              {/* Peak Button */}
+              {(isAdult || mediaType === 'scene') && (
+                <button 
+                  className={`player-page__btn ${justAddedPeak ? 'player-page__btn--success' : ''}`} 
+                  onClick={handleAddPeak} 
+                  title="Mark Peak Moment"
+                  style={{ 
+                    color: justAddedPeak ? '#22c55e' : '#ff7c1e',
+                    transition: 'color 0.2s ease, transform 0.2s ease',
+                    transform: justAddedPeak ? 'scale(1.2)' : 'none'
+                  }}
+                >
+                  <Flame size={18} fill="currentColor" style={{ animation: justAddedPeak ? 'bounce 0.5s infinite' : 'none' }} />
+                </button>
               )}
 
               <button 

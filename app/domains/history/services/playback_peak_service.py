@@ -66,52 +66,53 @@ class PlaybackPeakService:
 
         return player_time, playing_filename, playing_filepath
 
-    def add_peak(self, item_id: str, current_uid: int) -> Dict[str, Any]:
+    def add_peak(self, item_id: str, current_uid: int, video_position: Optional[int] = None) -> Dict[str, Any]:
         media_item_id, metadata_match_id = self.resolver.resolve_ids(item_id)
         if not media_item_id:
             raise NotFoundException("Local media item not found")
 
-        player_time, playing_filename, playing_filepath = self._get_player_info()
-        video_position = 0
+        if video_position is None:
+            player_time, playing_filename, playing_filepath = self._get_player_info()
+            video_position = 0
 
-        if player_time is not None:
-            media_item = self.db.query(MediaItem).filter(MediaItem.id == media_item_id).first()
-            if media_item:
-                target_filename = media_item.filename
-                target_path = media_item.current_path
+            if player_time is not None:
+                media_item = self.db.query(MediaItem).filter(MediaItem.id == media_item_id).first()
+                if media_item:
+                    target_filename = media_item.filename
+                    target_path = media_item.current_path
 
-                cleaned_target_filename = os.path.normpath(target_filename).lower() if target_filename else ""
-                cleaned_target_path = self._clean_path(target_path)
+                    cleaned_target_filename = os.path.normpath(target_filename).lower() if target_filename else ""
+                    cleaned_target_path = self._clean_path(target_path)
 
-                matches = False
+                    matches = False
 
-                if playing_filepath:
-                    cleaned_playing_filepath = self._clean_path(playing_filepath)
-                    if cleaned_playing_filepath == cleaned_target_path:
-                        matches = True
-                    elif os.path.basename(cleaned_playing_filepath) == cleaned_target_filename:
-                        matches = True
-                    elif os.path.splitext(os.path.basename(cleaned_playing_filepath))[0] == os.path.splitext(cleaned_target_filename)[0]:
-                        matches = True
-
-                if not matches and playing_filename:
-                    cleaned_playing_filename = self._clean_path(playing_filename)
-                    if cleaned_playing_filename == cleaned_target_path:
-                        matches = True
-                    elif cleaned_playing_filename == cleaned_target_filename or os.path.basename(cleaned_playing_filename) == cleaned_target_filename:
-                        matches = True
-                    elif os.path.splitext(os.path.basename(cleaned_playing_filename))[0] == os.path.splitext(cleaned_target_filename)[0]:
-                        matches = True
-                    else:
-                        base_target = os.path.splitext(cleaned_target_filename)[0]
-                        base_playing = os.path.splitext(os.path.basename(cleaned_playing_filename))[0]
-                        if base_target and base_playing and (base_target in base_playing or base_playing in base_target):
+                    if playing_filepath:
+                        cleaned_playing_filepath = self._clean_path(playing_filepath)
+                        if cleaned_playing_filepath == cleaned_target_path:
+                            matches = True
+                        elif os.path.basename(cleaned_playing_filepath) == cleaned_target_filename:
+                            matches = True
+                        elif os.path.splitext(os.path.basename(cleaned_playing_filepath))[0] == os.path.splitext(cleaned_target_filename)[0]:
                             matches = True
 
-                if (playing_filepath or playing_filename) and not matches:
-                    player_time = None
+                    if not matches and playing_filename:
+                        cleaned_playing_filename = self._clean_path(playing_filename)
+                        if cleaned_playing_filename == cleaned_target_path:
+                            matches = True
+                        elif cleaned_playing_filename == cleaned_target_filename or os.path.basename(cleaned_playing_filename) == cleaned_target_filename:
+                            matches = True
+                        elif os.path.splitext(os.path.basename(cleaned_playing_filename))[0] == os.path.splitext(cleaned_target_filename)[0]:
+                            matches = True
+                        else:
+                            base_target = os.path.splitext(cleaned_target_filename)[0]
+                            base_playing = os.path.splitext(os.path.basename(cleaned_playing_filename))[0]
+                            if base_target and base_playing and (base_target in base_playing or base_playing in base_target):
+                                matches = True
 
-            video_position = player_time if player_time is not None else 0
+                    if (playing_filepath or playing_filename) and not matches:
+                        player_time = None
+
+                video_position = player_time if player_time is not None else 0
 
         peak = PlaybackPeakLog(
             user_id=current_uid,

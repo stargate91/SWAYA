@@ -238,23 +238,124 @@ class PlaybackService:
             
         logo_path = None
         title = item.filename
+        is_adult = False
+        media_type = None
         match = next((m for m in item.matches), None)
         if match:
-            loc = next((l for l in match.localizations), None)
-            if loc:
-                title = loc.title
-                logo_path = loc.local_logo_path or loc.logo_path
-            elif match.original_title:
-                title = match.original_title
+            from app.domains.metadata.models import MetadataMatch
+            is_adult = bool(match.is_adult)
+            media_type = match.media_type.value if match.media_type else None
+            
+            # Resolve parent show match for TV shows using explicit queries to avoid lazy loading issues
+            show_match = None
+            if match.media_type and match.media_type.value == "episode":
+                season_match = self.db.query(MetadataMatch).filter(MetadataMatch.id == match.parent_id).first()
+                if season_match:
+                    show_match = self.db.query(MetadataMatch).filter(MetadataMatch.id == season_match.parent_id).first()
+            elif match.media_type and match.media_type.value == "season":
+                show_match = self.db.query(MetadataMatch).filter(MetadataMatch.id == match.parent_id).first()
+            else:
+                show_match = match
+
+            # Extract logo from show match
+            logo_match = show_match or match
+            if logo_match:
+                from app.domains.metadata.models import MetadataLocalization
+                from app.shared_kernel.ports.image_service_port import ImageServiceRegistry
+                loc_logo = self.db.query(MetadataLocalization).filter(MetadataLocalization.match_id == logo_match.id).first()
+                if loc_logo:
+                    resolved = None
+                    if loc_logo.local_logo_path:
+                        resolved = ImageServiceRegistry.get().resolve_image_url(loc_logo.local_logo_path, "logos")
+                    if not resolved and loc_logo.logo_path:
+                        resolved = ImageServiceRegistry.get().resolve_image_url(loc_logo.logo_path, "logos")
+                    logo_path = resolved
+
+            # Prioritize studio logo if available (for scenes)
+            if match.media_type and match.media_type.value == "scene":
+                from app.domains.metadata.models import metadata_match_studios, Studio
+                from app.shared_kernel.ports.image_service_port import ImageServiceRegistry
+                studio_row = self.db.query(Studio).join(metadata_match_studios).filter(
+                    metadata_match_studios.c.metadata_match_id == match.id
+                ).first()
+                
+                if studio_row:
+                    studio_logo = studio_row.logo_path
+                    parent_logo = None
+                    if studio_row.parent_studio_id:
+                        parent_studio = self.db.query(Studio).filter(Studio.id == studio_row.parent_studio_id).first()
+                        if parent_studio:
+                            parent_logo = parent_studio.logo_path
+                    
+                    chosen_logo = studio_logo or parent_logo
+                    if chosen_logo:
+                        resolved_studio = ImageServiceRegistry.get().resolve_image_url(chosen_logo, "logos")
+                        if resolved_studio:
+                            logo_path = resolved_studio
+
+            # Extract title from current match localization
+            from app.domains.metadata.models import MetadataLocalization
+            loc = self.db.query(MetadataLocalization).filter(MetadataLocalization.match_id == match.id).first()
+            if match.media_type and match.media_type.value == "episode":
+                ep_title = loc.title if loc else (match.original_title or item.filename)
+                show_title = ""
+                if show_match:
+                    loc_show = self.db.query(MetadataLocalization).filter(MetadataLocalization.match_id == show_match.id).first()
+                    if loc_show:
+                        show_title = loc_show.title
+                    else:
+                        show_title = show_match.original_title
+                
+                season_num = match.season_number if match.season_number is not None else 0
+                ep_num = match.episode_number
+                ep_str = ""
+                
+                def pad(num):
+                    try:
+                        return str(int(num)).zfill(2)
+                    except:
+                        return str(num).zfill(2)
+
+                if isinstance(ep_num, list) and ep_num:
+                    ep_str = f"E{pad(ep_num[0])}-{pad(ep_num[-1])}" if len(ep_num) > 1 else f"E{pad(ep_num[0])}"
+                elif isinstance(ep_num, (int, float)):
+                    ep_str = f"E{pad(ep_num)}"
+                elif isinstance(ep_num, str):
+                    try:
+                        import json
+                        parsed = json.loads(ep_num)
+                        if isinstance(parsed, list) and parsed:
+                            ep_str = f"E{pad(parsed[0])}-{pad(parsed[-1])}" if len(parsed) > 1 else f"E{pad(parsed[0])}"
+                        else:
+                            ep_str = f"E{pad(parsed)}"
+                    except:
+                        ep_str = f"E{pad(ep_num)}"
+                else:
+                    ep_str = f"E{pad(ep_num or 0)}"
+                
+                formatted_code = f"S{str(season_num).zfill(2)}{ep_str}"
+                title = f"{show_title} - {formatted_code} - {ep_title}" if show_title else f"{formatted_code} - {ep_title}"
+            else:
+                if loc:
+                    title = loc.title
+                elif match.original_title:
+                    title = match.original_title
                 
         if override and override.custom_logo:
             logo_path = override.custom_logo
+
+        # Resolve logo path using ImageServiceRegistry so the client gets a fully qualified URL
+        if logo_path and not logo_path.startswith(("/media/", "http://", "https://")):
+            from app.shared_kernel.ports.image_service_port import ImageServiceRegistry
+            logo_path = ImageServiceRegistry.get().resolve_image_url(logo_path, "logos")
                 
         return {
             "file_path": item.current_path,
             "start_seconds": start_seconds,
             "title": title,
-            "logo_path": logo_path
+            "logo_path": logo_path,
+            "is_adult": is_adult,
+            "media_type": media_type
         }
 
     def update_playback_progress(self, item_id: Any, current_time: int, total_length: int) -> PlaybackStatusResponse:

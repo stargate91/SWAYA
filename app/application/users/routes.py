@@ -252,8 +252,13 @@ def track_item(item_id: str, db: Session = Depends(get_db)):
 def untrack_item(item_id: str, db: Session = Depends(get_db)):
     return _overrides_service(db).track_item(item_id, False)
 
+from pydantic import BaseModel
+
+class AddPeakRequest(BaseModel):
+    video_position: Optional[int] = None
+
 @catalog_router.post("/library/item/{item_id}/peaks")
-def add_item_peak(item_id: str, db: Session = Depends(get_db)):
+def add_item_peak(item_id: str, payload: Optional[AddPeakRequest] = None, db: Session = Depends(get_db)):
     from app.shared_kernel.user_context import get_current_user_id
     from app.infrastructure.media.db_media_resolver import DbMediaResolver
     from app.domains.history.services.playback_peak_service import PlaybackPeakService
@@ -261,7 +266,8 @@ def add_item_peak(item_id: str, db: Session = Depends(get_db)):
     current_uid = get_current_user_id() or 1
     service = PlaybackPeakService(db, DbMediaResolver(db))
     try:
-        return service.add_peak(item_id, current_uid)
+        video_pos = payload.video_position if payload else None
+        return service.add_peak(item_id, current_uid, video_position=video_pos)
     except Exception as e:
         if "not found" in str(e).lower():
             raise HTTPException(status_code=404, detail=str(e))

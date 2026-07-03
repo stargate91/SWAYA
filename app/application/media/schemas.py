@@ -62,6 +62,8 @@ class PlaybackInfoResponse(BaseModel):
     start_seconds: int
     title: str
     logo_path: Optional[str] = None
+    is_adult: Optional[bool] = False
+    media_type: Optional[str] = None
 
 class UpdatePlaybackProgressRequest(BaseModel):
     item_id: Union[str, int]

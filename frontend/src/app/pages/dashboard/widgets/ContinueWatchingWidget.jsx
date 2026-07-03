@@ -123,7 +123,7 @@ const ContinueWatchingWidget = ({ T }) => {
               onClick={() => {
                 const preferredPlayer = settings.preferred_player || 'swaya';
                 if (item.is_active && preferredPlayer !== 'swaya') return;
-                if (item.type === 'episode' || item.type === 'movie') {
+                if (item.type === 'episode' || item.type === 'movie' || item.type === 'scene') {
                   playMutation.mutate(item.id);
                 }
               }}
@@ -133,7 +133,7 @@ const ContinueWatchingWidget = ({ T }) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   const preferredPlayer = settings.preferred_player || 'swaya';
                   if (item.is_active && preferredPlayer !== 'swaya') return;
-                  if (item.type === 'episode' || item.type === 'movie') {
+                  if (item.type === 'episode' || item.type === 'movie' || item.type === 'scene') {
                     playMutation.mutate(item.id);
                   }
                 }
