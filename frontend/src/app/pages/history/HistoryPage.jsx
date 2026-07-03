@@ -393,7 +393,8 @@ export default function HistoryPage() {
     return (
       <div className="watched-history-list">
         {peaksData.map((log, index) => {
-          const posterUrl = log.poster_path || log.backdrop_path || '';
+          const poster = log.poster_path || log.backdrop_path;
+          const posterUrl = poster ? resolveMediaImageUrl(poster, 'backdrop') : '';
           
           return (
             <div

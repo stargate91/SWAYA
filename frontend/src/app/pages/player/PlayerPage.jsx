@@ -603,16 +603,11 @@ export default function PlayerPage() {
               {/* Peak Button */}
               {(isAdult || mediaType === 'scene') && (
                 <button
-                  className={`player-page__btn ${justAddedPeak ? 'player-page__btn--success' : ''}`}
+                  className={`player-page__btn ${justAddedPeak ? 'player-page__btn--peak-success' : 'player-page__btn--peak'}`}
                   onClick={handleAddPeak}
                   title="Mark Peak Moment"
-                  style={{
-                    color: justAddedPeak ? '#22c55e' : '#ff7c1e',
-                    transition: 'color 0.2s ease, transform 0.2s ease',
-                    transform: justAddedPeak ? 'scale(1.2)' : 'none'
-                  }}
                 >
-                  <Flame size={18} fill="currentColor" style={{ animation: justAddedPeak ? 'bounce 0.5s infinite' : 'none' }} />
+                  <Flame size={18} fill="currentColor" />
                 </button>
               )}
 
