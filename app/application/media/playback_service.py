@@ -349,13 +349,26 @@ class PlaybackService:
             from app.shared_kernel.ports.image_service_port import ImageServiceRegistry
             logo_path = ImageServiceRegistry.get().resolve_image_url(logo_path, "logos")
                 
+        # Collect subtitle and audio extras
+        from app.shared_kernel.enums import ExtraCategory
+        extras_list = []
+        for extra in item.extras:
+            if extra.category in (ExtraCategory.SUBTITLE, ExtraCategory.AUDIO):
+                extras_list.append({
+                    "category": extra.category.value,
+                    "path": extra.current_path,
+                    "language": extra.language,
+                    "filename": extra.filename
+                })
+
         return {
             "file_path": item.current_path,
             "start_seconds": start_seconds,
             "title": title,
             "logo_path": logo_path,
             "is_adult": is_adult,
-            "media_type": media_type
+            "media_type": media_type,
+            "extras": extras_list
         }
 
     def update_playback_progress(self, item_id: Any, current_time: int, total_length: int) -> PlaybackStatusResponse:

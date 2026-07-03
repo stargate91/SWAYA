@@ -30,6 +30,13 @@ const TOOLTIP_DELAYS = {
   slow: 1000,
 };
 
+let globalLastMouseDownTime = 0;
+if (typeof window !== 'undefined') {
+  window.addEventListener('mousedown', () => {
+    globalLastMouseDownTime = Date.now();
+  }, true);
+}
+
 export default function Tooltip({
   content,
   className = '',
@@ -53,6 +60,15 @@ export default function Tooltip({
         setIsOpen(true);
       }
     }, delay);
+  };
+
+  const handleFocus = () => {
+    // If focus was triggered by a mouse click (mousedown happened in the last 150ms),
+    // do not show the tooltip.
+    if (Date.now() - globalLastMouseDownTime < 150) {
+      return;
+    }
+    showTooltip();
   };
 
   const hideTooltip = () => {
@@ -101,7 +117,7 @@ export default function Tooltip({
         className="ui-tooltip"
         onMouseEnter={showTooltip}
         onMouseLeave={hideTooltip}
-        onFocus={showTooltip}
+        onFocus={handleFocus}
         onBlur={hideTooltip}
         onMouseDown={hideTooltip}
         aria-describedby={isOpen ? tooltipId : undefined}

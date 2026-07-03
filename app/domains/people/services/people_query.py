@@ -77,8 +77,45 @@ class PeopleQueryBuilder:
         else:
             query = query.filter(Person.is_adult == False)
 
+        if search:
+            query = query.filter(Person.name.ilike(f"%{search}%"))
+
+        if not include_inactive:
+            query = query.filter(Person.is_active == True)
+
         query = query.group_by(Person.id)
-        results = query.all()
+
+        if include_inactive:
+            query = query.having((Person.is_active == True) | (func.count(func.distinct(library_key)) > 0))
+
+        # Build popularity score expression for SQL sorting
+        popularity_score_expr = case(
+            (
+                (Person.is_adult == True) & (Person.rating_porndb != None),
+                Person.rating_porndb
+            ),
+            else_=func.coalesce(Person.popularity, 0.0)
+        )
+
+        # Apply ordering in SQL
+        if sort_by in ("library_count", "library_count_desc"):
+            query = query.order_by(func.count(func.distinct(library_key)).desc(), popularity_score_expr.desc())
+        elif sort_by == "library_count_asc":
+            query = query.order_by(func.count(func.distinct(library_key)).asc(), popularity_score_expr.asc())
+        elif sort_by in ("popularity", "popularity_desc"):
+            query = query.order_by(popularity_score_expr.desc(), func.count(func.distinct(library_key)).desc())
+        elif sort_by == "popularity_asc":
+            query = query.order_by(popularity_score_expr.asc(), func.count(func.distinct(library_key)).asc())
+        elif sort_by in ("name", "name_asc", "title_asc"):
+            query = query.order_by(Person.name.asc())
+        elif sort_by in ("name_desc", "title_desc"):
+            query = query.order_by(Person.name.desc())
+
+        # Get total count using subquery count in SQL
+        total = db.query(func.count()).select_from(query.subquery()).scalar() or 0
+
+        # Apply SQL-level offset and limit
+        results = query.offset(offset).limit(limit).all()
 
         from app.domains.users.models import UserOverride
         from app.shared_kernel.user_context import get_current_user_id
@@ -97,14 +134,6 @@ class PeopleQueryBuilder:
 
         people_list = []
         for person, library_count, linked_adult_flag in results:
-            if not include_inactive and not person.is_active:
-                continue
-            if include_inactive and not person.is_active and library_count == 0:
-                continue
-            
-            if search and search.lower() not in person.name.lower():
-                continue
-                
             external_ids = dict(person.external_ids or {})
             for link in person.external_links:
                 prov_key = link.provider.value
@@ -131,11 +160,6 @@ class PeopleQueryBuilder:
                 "scene_count": person.scene_count,
                 "rating_porndb": person.rating_porndb,
                 "popularity": person.popularity or 0.0,
-                "popularity_score": (
-                    person.rating_porndb
-                    if person.is_adult and person.rating_porndb is not None
-                    else person.popularity or 0.0
-                ),
                 "is_adult": person.is_adult,
                 "is_active": person.is_active,
                 "library_count": library_count,
@@ -146,27 +170,10 @@ class PeopleQueryBuilder:
                 "is_favorite": override.is_favorite if override else False,
             })
 
-        if sort_by in ("library_count", "library_count_desc"):
-            people_list.sort(key=lambda x: (-x["library_count"], -x["popularity_score"]))
-        elif sort_by == "library_count_asc":
-            people_list.sort(key=lambda x: (x["library_count"], x["popularity_score"]))
-        elif sort_by in ("popularity", "popularity_desc"):
-            people_list.sort(key=lambda x: (-x["popularity_score"], -x["library_count"]))
-        elif sort_by == "popularity_asc":
-            people_list.sort(key=lambda x: (x["popularity_score"], x["library_count"]))
-        elif sort_by in ("name", "name_asc", "title_asc"):
-            people_list.sort(key=lambda x: x["name"].lower())
-        elif sort_by in ("name_desc", "title_desc"):
-            people_list.sort(key=lambda x: x["name"].lower(), reverse=True)
-            
-        total = len(people_list)
-        for item in people_list:
-            item.pop("popularity_score", None)
-        sliced_list = people_list[offset:offset+limit]
-        has_more = offset + len(sliced_list) < total
+        has_more = offset + len(people_list) < total
         
         return PeopleSearchResponse(
-            items=sliced_list,
+            items=people_list,
             total=total,
             has_more=has_more,
             offset=offset,

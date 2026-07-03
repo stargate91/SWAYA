@@ -57,6 +57,12 @@ class WatchedHistoryResponse(BaseModel):
     page: int
     has_more: bool
 
+class PlaybackExtra(BaseModel):
+    category: str
+    path: str
+    language: Optional[str] = None
+    filename: Optional[str] = None
+
 class PlaybackInfoResponse(BaseModel):
     file_path: str
     start_seconds: int
@@ -64,6 +70,7 @@ class PlaybackInfoResponse(BaseModel):
     logo_path: Optional[str] = None
     is_adult: Optional[bool] = False
     media_type: Optional[str] = None
+    extras: Optional[List[PlaybackExtra]] = []
 
 class UpdatePlaybackProgressRequest(BaseModel):
     item_id: Union[str, int]

@@ -11,8 +11,8 @@ const StatisticsWidget = ({ T }) => {
   const showScenes = settings?.include_adult;
 
   return (
-    <DashboardWidgetShell loading={isLoading} size="sm">
-      <div className="stats-grid">
+    <DashboardWidgetShell loading={isLoading} size="sm" transparent={true}>
+      <div className={`stats-grid stats-grid--${showScenes ? '5' : '4'}`}>
         <div className="stat-card">
           <div className="stat-label">{T('dashboard.stats.total_movies') || 'Total Movies'}</div>
           <div className="stat-value">{(stats.total_movies || 0).toLocaleString()}</div>

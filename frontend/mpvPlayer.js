@@ -215,6 +215,16 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
         args.push(`--start=${startSec}`);
       }
 
+      if (playbackInfo.extras && Array.isArray(playbackInfo.extras)) {
+        playbackInfo.extras.forEach(extra => {
+          if (extra.category === 'subtitle' && extra.path) {
+            args.push(`--sub-file=${extra.path}`);
+          } else if (extra.category === 'audio' && extra.path) {
+            args.push(`--audio-file=${extra.path}`);
+          }
+        });
+      }
+
       args.push(filePath);
 
       writeElectronLog('INFO', 'Spawning MPV', { mpvExecutable, args });
