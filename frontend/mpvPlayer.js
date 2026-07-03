@@ -214,6 +214,7 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
         '--no-window-dragging',
         '--force-window=yes',
         '--idle=yes',
+        '--keep-open=yes',
         '--vo=gpu',
         '--gpu-api=d3d11',
         '--hwdec=auto',
@@ -279,6 +280,7 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
           mpvSocket.write(JSON.stringify({ command: ["observe_property", 5, "chapter-list"] }) + '\n');
           mpvSocket.write(JSON.stringify({ command: ["observe_property", 6, "track-list"] }) + '\n');
           mpvSocket.write(JSON.stringify({ command: ["observe_property", 7, "speed"] }) + '\n');
+          mpvSocket.write(JSON.stringify({ command: ["observe_property", 8, "eof-reached"] }) + '\n');
         });
 
         let buffer = '';

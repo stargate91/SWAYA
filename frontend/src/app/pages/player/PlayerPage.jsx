@@ -41,6 +41,15 @@ export default function PlayerPage() {
   const [logoUrl, setLogoUrl] = useState(null);
   const [showControls, setShowControls] = useState(true);
   const [isPip, setIsPip] = useState(false);
+  
+  // Ending Overlay States
+  const [showEndOverlay, setShowEndOverlay] = useState(false);
+  const [userRating, setUserRating] = useState(null);
+  const [hoverRating, setHoverRating] = useState(null);
+  const [nextEpisode, setNextEpisode] = useState(null);
+  const [countdown, setCountdown] = useState(10);
+  const countdownIntervalRef = useRef(null);
+  const hasTriggeredEndRef = useRef(false);
   const [isMouseOver, setIsMouseOver] = useState(false);
   const [speed, setSpeed] = useState(1.0);
   const [isAdult, setIsAdult] = useState(false);
@@ -156,6 +165,8 @@ export default function PlayerPage() {
         setTitle(data.title);
         setIsAdult(data.is_adult);
         setMediaType(data.media_type);
+        setUserRating(data.user_rating);
+        setNextEpisode(data.next_episode);
         if (data.logo_path) {
           const resolved = resolveMediaImageUrl(data.logo_path, 'logo', `http://localhost:${backendPort}`);
           setLogoUrl(resolved);
@@ -199,9 +210,38 @@ export default function PlayerPage() {
 
     // Listen to MPV events
     const handleMpvEvent = (event, data) => {
+      if (data?.event === 'end-of-file') {
+        if (isTrailer) {
+          handleClose();
+        } else {
+          setShowEndOverlay(true);
+        }
+      }
       if (data?.event === 'property-change') {
         if (data.name === 'time-pos' && typeof data.data === 'number') {
           setCurrentTime(data.data);
+          const dur = durationRef.current;
+          if (dur > 0) {
+            if (data.data < dur - 5.0) {
+              hasTriggeredEndRef.current = false;
+            } else if (data.data >= dur - 1.0 && !hasTriggeredEndRef.current) {
+              hasTriggeredEndRef.current = true;
+              if (isTrailer) {
+                handleClose();
+              } else {
+                sendCommand(['set_property', 'pause', true]);
+                setShowEndOverlay(true);
+              }
+            }
+          }
+        }
+         if (data.name === 'eof-reached' && data.data === true) {
+          if (isTrailer) {
+            handleClose();
+          } else {
+            sendCommand(['set_property', 'pause', true]);
+            setShowEndOverlay(true);
+          }
         }
         if (data.name === 'duration' && typeof data.data === 'number') {
           setDuration(data.data);
@@ -399,6 +439,63 @@ export default function PlayerPage() {
     } catch (e) {
       console.error('Failed to add peak:', e);
     }
+  };
+
+  useEffect(() => {
+    if (showEndOverlay && nextEpisode) {
+      setCountdown(10);
+      countdownIntervalRef.current = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(countdownIntervalRef.current);
+            handlePlayNext();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+      }
+    };
+  }, [showEndOverlay, nextEpisode]);
+
+  const handlePlayNext = async () => {
+    if (!nextEpisode) return;
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+    }
+    setShowEndOverlay(false);
+    
+    try {
+      const { ipcRenderer } = window.require('electron');
+      ipcRenderer.invoke('mpv-open-fullscreen', { itemId: nextEpisode.id });
+    } catch (e) {
+      navigate(`/player/${nextEpisode.id}`);
+    }
+  };
+
+  const handleRate = async (rating) => {
+    setUserRating(rating);
+    try {
+      const backendPort = getQueryParam('backend_port') || '8000';
+      await fetch(`http://localhost:${backendPort}/api/v1/media/${itemId}/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_rating: rating })
+      });
+    } catch (e) {
+      console.error('Failed to update rating:', e);
+    }
+  };
+
+  const handleReplay = () => {
+    hasTriggeredEndRef.current = false;
+    setShowEndOverlay(false);
+    sendCommand(['seek', 0, 'absolute']);
+    sendCommand(['set_property', 'pause', false]);
   };
 
   const handleClose = () => {
@@ -702,6 +799,61 @@ export default function PlayerPage() {
         </div>
 
       </div>
+
+      {showEndOverlay && (
+        <div className="player-page__end-overlay">
+          <div className="player-page__end-card">
+            <div className="player-page__end-title">Finished watching</div>
+            <div className="player-page__end-subtitle">{title}</div>
+
+            {nextEpisode ? (
+              <div className="player-page__end-next">
+                <div className="player-page__end-next-label">Up Next</div>
+                <div className="player-page__end-next-title">{nextEpisode.title}</div>
+                <div className="player-page__end-countdown">Starting in {countdown}s...</div>
+                <div className="player-page__end-buttons">
+                  <button className="player-page__end-btn player-page__end-btn--primary" onClick={handlePlayNext}>
+                    Play Now
+                  </button>
+                  <button className="player-page__end-btn" onClick={() => {
+                    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+                    setNextEpisode(null);
+                  }}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="player-page__end-rating">
+                <div className="player-page__end-rating-label">Rate this title</div>
+                <div className="player-page__end-stars">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
+                    <button
+                      key={star}
+                      className={`player-page__end-star ${(hoverRating || userRating || 0) >= star ? 'active' : ''}`}
+                      onMouseEnter={() => setHoverRating(star)}
+                      onMouseLeave={() => setHoverRating(null)}
+                      onClick={() => handleRate(star)}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+                {userRating && <div className="player-page__end-rating-val">{userRating.toFixed(1)} / 10</div>}
+              </div>
+            )}
+
+            <div className="player-page__end-actions">
+              <button className="player-page__end-btn" onClick={handleReplay}>
+                Replay
+              </button>
+              <button className="player-page__end-btn player-page__end-btn--danger" onClick={handleClose}>
+                Close Player
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
