@@ -66,8 +66,8 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
     }
   }
 
-  ipcMain.handle('mpv-open-fullscreen', async (event, { itemId, start }) => {
-    writeElectronLog('INFO', 'mpv-open-fullscreen requested', { itemId, start });
+  ipcMain.handle('mpv-open-fullscreen', async (event, { itemId, start, url, title: customTitle }) => {
+    writeElectronLog('INFO', 'mpv-open-fullscreen requested', { itemId, start, url, customTitle });
 
     await cleanupExistingMpv();
 
@@ -164,21 +164,34 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
 
     // Fetch video info from backend to spawn MPV
     try {
-      const res = await fetch(`http://localhost:${backendPort}/api/v1/media/playback-info/${itemId}`);
-      if (!res.ok) throw new Error('Failed to get playback info');
-      const playbackInfo = await res.json();
-      const filePath = playbackInfo.file_path;
+      let filePath = '';
+      let playbackInfo = {};
 
-      // Register active session immediately in backend
-      fetch(`http://localhost:${backendPort}/api/v1/media/progress`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          item_id: String(itemId),
-          current_time: Math.round(playbackInfo.start_seconds || 0),
-          total_length: Math.round(playbackInfo.duration || 0)
-        })
-      }).catch(() => {});
+      if (url) {
+        filePath = url;
+        playbackInfo = {
+          file_path: url,
+          title: customTitle || 'Trailer',
+          duration: 0,
+          start_seconds: 0
+        };
+      } else {
+        const res = await fetch(`http://localhost:${backendPort}/api/v1/media/playback-info/${itemId}`);
+        if (!res.ok) throw new Error('Failed to get playback info');
+        playbackInfo = await res.json();
+        filePath = playbackInfo.file_path;
+
+        // Register active session immediately in backend
+        fetch(`http://localhost:${backendPort}/api/v1/media/progress`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            item_id: String(itemId),
+            current_time: Math.round(playbackInfo.start_seconds || 0),
+            total_length: Math.round(playbackInfo.duration || 0)
+          })
+        }).catch(() => {});
+      }
 
       const title = playbackInfo.title || 'SWAYA';
       if (mpvPlayerWindow && !mpvPlayerWindow.isDestroyed()) {
@@ -302,9 +315,17 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
         });
       }, 400);
 
-      const controlsUrl = isDev
-        ? `http://localhost:5173/?backend_port=${backendPort}&controls_only=true&start=${startSec}#/player/${itemId}`
-        : `file://${path.join(__dirname, 'build', 'index.html')}?backend_port=${backendPort}&controls_only=true&start=${startSec}#/player/${itemId}`;
+      let controlsUrl = '';
+      if (url) {
+        const encodedTitle = encodeURIComponent(customTitle || 'Trailer');
+        controlsUrl = isDev
+          ? `http://localhost:5173/?backend_port=${backendPort}&controls_only=true&title=${encodedTitle}&is_trailer=true#/player/trailer`
+          : `file://${path.join(__dirname, 'build', 'index.html')}?backend_port=${backendPort}&controls_only=true&title=${encodedTitle}&is_trailer=true#/player/trailer`;
+      } else {
+        controlsUrl = isDev
+          ? `http://localhost:5173/?backend_port=${backendPort}&controls_only=true&start=${startSec}#/player/${itemId}`
+          : `file://${path.join(__dirname, 'build', 'index.html')}?backend_port=${backendPort}&controls_only=true&start=${startSec}#/player/${itemId}`;
+      }
 
       controlsWindow.loadURL(controlsUrl);
 

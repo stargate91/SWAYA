@@ -482,22 +482,37 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
 
   const handleTrailerClick = () => {
     if (!item?.trailer_key) return;
-    openModal({
-      title: `${title} - Trailer`,
-      variant: 'extra-wide',
-      className: 'theater-modal',
-      content: (
-        <iframe
-          width="100%"
-          src={`https://www.youtube.com/embed/${item.trailer_key}?autoplay=1`}
-          title="Trailer"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          className="trailer-iframe"
-        />
-      )
-    });
+
+    let ipcRenderer = null;
+    try {
+      if (window.require) {
+        ipcRenderer = window.require('electron').ipcRenderer;
+      }
+    } catch (e) {}
+
+    if (ipcRenderer) {
+      ipcRenderer.invoke('mpv-open-fullscreen', {
+        url: `https://www.youtube.com/watch?v=${item.trailer_key}`,
+        title: `${title} - Trailer`
+      });
+    } else {
+      openModal({
+        title: `${title} - Trailer`,
+        variant: 'extra-wide',
+        className: 'theater-modal',
+        content: (
+          <iframe
+            width="100%"
+            src={`https://www.youtube.com/embed/${item.trailer_key}?autoplay=1`}
+            title="Trailer"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="trailer-iframe"
+          />
+        )
+      });
+    }
   };
 
   const handlePlayClick = () => {

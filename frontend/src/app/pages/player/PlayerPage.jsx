@@ -135,7 +135,16 @@ export default function PlayerPage() {
       console.warn('Electron IPC not available');
     }
 
+    const isTrailer = getQueryParam('is_trailer') === 'true' || itemId === 'trailer';
+    const queryTitle = getQueryParam('title');
+
+    if (isTrailer) {
+      setTitle(queryTitle || 'Trailer');
+      setIsPlaying(true);
+    }
+
     const fetchInfoAndStart = async () => {
+      if (isTrailer) return;
       try {
         const backendPort = getQueryParam('backend_port') || '8000';
         const controlsOnly = getQueryParam('controls_only') === 'true';
@@ -283,7 +292,7 @@ export default function PlayerPage() {
 
   // Periodic progress saving to backend
   useEffect(() => {
-    if (!isPlaying) return;
+    if (!isPlaying || itemId === 'trailer' || getQueryParam('is_trailer') === 'true') return;
 
     const saveProgress = async () => {
       const cTime = currentTimeRef.current;
