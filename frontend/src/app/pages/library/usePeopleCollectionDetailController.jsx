@@ -86,7 +86,7 @@ export default function usePeopleCollectionDetailController({
   );
   const socialLinks = useMemo(() => {
     if (!isPeople || !item) return [];
-    // Only show links that have a real icon file in /links/
+    // Only show links that have a real specific icon file in /links/ (including homepage/website)
     const knownIcons = new Set([
       '/links/tmdb.png', '/links/stashdb.png', '/links/fansdb.webp', '/links/theporndb.png',
       '/links/imdb.png', '/links/instagram.ico', '/links/instagram.svg',
@@ -98,35 +98,70 @@ export default function usePeopleCollectionDetailController({
       '/links/bluesky.png', '/links/clip4sale.ico', '/links/allmylinks.ico',
       '/links/beacons.png', '/links/iafd.ico', '/links/babepedia.ico',
       '/links/freeones.png', '/links/data18.ico', '/links/homepage.png',
-      '/links/twitter.png', '/links/website.svg',
+      '/links/twitter.png', '/links/website.svg'
     ]);
     const allLinks = externalLinks.filter(link =>
       link.iconSrc && knownIcons.has(link.iconSrc)
     );
-    // Source links first (reversed: porndb → fansdb → stashdb → tmdb), then social/industry links
-    const order = ['theporndb', 'fansdb', 'stashdb', 'tmdb', 'imdb', 'website', 'instagram', 'facebook', 'x', 'twitter', 'tiktok', 'youtube'];
-    const ordered = [];
-    for (const key of order) {
-      const found = allLinks.find(l => l.key === key);
-      if (found) {
-        ordered.push(found);
-      }
-    }
-    for (const link of allLinks) {
-      if (!order.includes(link.key)) {
-        ordered.push(link);
-      }
-    }
+    // Left-to-right display priority order (imdb, website, homepage on the far right / highest priority)
+    const order = [
+      'clip4sale', 'manyvids', 'pornhub', 'data18', 'babepedia', 'iafd', 'freeones',
+      'facebook', 'threads', 'bluesky', 'kick', 'twitch', 'fansly', 'onlyfans', 'patreon', 'beacons', 'linktree', 'youtube', 'tiktok', 'twitter', 'x', 'instagram',
+      'theporndb', 'porndb', 'fansdb', 'stashdb', 'stash', 'tmdb', 'imdb', 'website', 'homepage'
+    ];
+    const getCleanKey = (link) => {
+      const icon = String(link.iconSrc || '').toLowerCase();
+      if (icon.includes('tmdb')) return 'tmdb';
+      if (icon.includes('imdb')) return 'imdb';
+      if (icon.includes('stashdb')) return 'stashdb';
+      if (icon.includes('fansdb')) return 'fansdb';
+      if (icon.includes('theporndb') || icon.includes('porndb')) return 'porndb';
+      if (icon.includes('instagram')) return 'instagram';
+      if (icon.includes('x.svg')) return 'x';
+      if (icon.includes('twitter')) return 'twitter';
+      if (icon.includes('tiktok')) return 'tiktok';
+      if (icon.includes('youtube')) return 'youtube';
+      if (icon.includes('onlyfans') || icon.includes('onylfans')) return 'onlyfans';
+      if (icon.includes('fansly')) return 'fansly';
+      if (icon.includes('patreon')) return 'patreon';
+      if (icon.includes('pornhub')) return 'pornhub';
+      if (icon.includes('manyvids')) return 'manyvids';
+      if (icon.includes('linktree')) return 'linktree';
+      if (icon.includes('threads')) return 'threads';
+      if (icon.includes('twitch')) return 'twitch';
+      if (icon.includes('kick')) return 'kick';
+      if (icon.includes('bluesky')) return 'bluesky';
+      if (icon.includes('clip4sale')) return 'clip4sale';
+      if (icon.includes('allmylinks')) return 'allmylinks';
+      if (icon.includes('beacons')) return 'beacons';
+      if (icon.includes('iafd')) return 'iafd';
+      if (icon.includes('babepedia')) return 'babepedia';
+      if (icon.includes('freeones')) return 'freeones';
+      if (icon.includes('data18')) return 'data18';
+      if (icon.includes('homepage') || icon.includes('website')) return 'homepage';
+      return String(link.key || '').toLowerCase();
+    };
+    const sorted = [...allLinks].sort((a, b) => {
+      const keyA = getCleanKey(a);
+      const keyB = getCleanKey(b);
+      const idxA = order.indexOf(keyA);
+      const idxB = order.indexOf(keyB);
+      
+      const cleanIdxA = idxA === -1 ? 999 : idxA;
+      const cleanIdxB = idxB === -1 ? 999 : idxB;
+      
+      return cleanIdxA - cleanIdxB;
+    });
     const seenIcons = new Set();
     const uniqueLinks = [];
-    for (const link of ordered) {
+    for (const link of sorted) {
       if (!link.iconSrc) continue;
-      const isGeneric = link.iconSrc.includes('homepage') || link.iconSrc.includes('website');
-      if (isGeneric || !seenIcons.has(link.iconSrc)) {
+      if (!seenIcons.has(link.iconSrc)) {
         seenIcons.add(link.iconSrc);
         uniqueLinks.push(link);
       }
     }
+    console.log('uniqueLinks keys sorted LTR:', uniqueLinks.map(l => l.key));
     return uniqueLinks;
   }, [isPeople, externalLinks, item]);
   const backdropUrl = resolveDetailsImageUrl(item?.backdrop_path, API_BASE, 'backdrop');

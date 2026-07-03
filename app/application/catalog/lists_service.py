@@ -27,6 +27,27 @@ class ListsService:
     def __init__(self, db: Session):
         self.db = db
 
+    def _resolve_tv_show_tmdb_id(self, match) -> Optional[int]:
+        if not match:
+            return None
+        from app.domains.metadata.models import MetadataMatch
+        from app.shared_kernel.enums import MediaType
+        
+        parent = match
+        visited = set()
+        while parent and parent.media_type in (MediaType.EPISODE, MediaType.SEASON):
+            if parent.id in visited:
+                break
+            visited.add(parent.id)
+            if parent.parent_id:
+                parent = self.db.query(MetadataMatch).filter(MetadataMatch.id == parent.parent_id).first()
+            else:
+                break
+                
+        if parent and parent.media_type == MediaType.TV:
+            return int(parent.external_id) if parent.external_id.isdigit() else None
+        return int(match.external_id) if match.external_id.isdigit() else None
+
     def _serialize_item(self, item: CustomListItem) -> CustomListItemResponse:
         res = {
             "id": item.id,
@@ -43,6 +64,8 @@ class ListsService:
             "year": None,
             "rating": None,
             "is_adult": False,
+            "external_id": None,
+            "provider": None,
         }
         
         # Populate basic info based on what is linked
@@ -50,28 +73,36 @@ class ListsService:
             res["title"] = item.media_item.filename
             match = next((m for m in item.media_item.matches), None)
             if match:
-                res["tmdb_id"] = int(match.external_id) if match.external_id.isdigit() else None
+                res["tmdb_id"] = self._resolve_tv_show_tmdb_id(match)
                 res["media_type"] = match.media_type.value
                 res["rating"] = match.rating_imdb or match.rating_tmdb
                 res["is_adult"] = bool(match.is_adult)
+                res["external_id"] = match.external_id
+                res["provider"] = match.provider.value if hasattr(match.provider, "value") else str(match.provider)
                 if match.release_date:
                     res["year"] = match.release_date.year
                 loc = next((l for l in match.localizations), None)
-                if loc:
+                if match.media_type.value in ("scene", "still"):
+                    res["poster_path"] = match.backdrop_path or match.still_path
+                elif loc:
                     res["poster_path"] = loc.poster_path
                     res["title"] = loc.title
-                elif match.original_title:
-                    res["title"] = match.original_title
+                if not res["title"]:
+                    res["title"] = loc.title if loc else match.original_title
         elif item.match:
-            res["tmdb_id"] = int(item.match.external_id) if item.match.external_id.isdigit() else None
+            res["tmdb_id"] = self._resolve_tv_show_tmdb_id(item.match)
             res["media_type"] = item.match.media_type.value
             res["rating"] = item.match.rating_imdb or item.match.rating_tmdb
             res["is_adult"] = bool(item.match.is_adult)
+            res["external_id"] = item.match.external_id
+            res["provider"] = item.match.provider.value if hasattr(item.match.provider, "value") else str(item.match.provider)
             if item.match.release_date:
                 res["year"] = item.match.release_date.year
             loc = next((l for l in item.match.localizations), None)
             res["title"] = loc.title if loc else item.match.original_title or f"Match #{item.match.id}"
-            if loc:
+            if item.match.media_type.value in ("scene", "still"):
+                res["poster_path"] = item.match.backdrop_path or item.match.still_path
+            elif loc:
                 res["poster_path"] = loc.poster_path
         elif item.person:
             res["title"] = item.person.name
@@ -101,17 +132,19 @@ class ListsService:
             
         return False
 
-    def _is_list_adult(self, l: CustomList) -> bool:
-        for item in l.items:
-            if item.media_item:
-                match = next((m for m in item.media_item.matches), None)
-                if match and match.is_adult:
-                    return True
-            elif item.match and item.match.is_adult:
+    def _is_item_adult(self, item: CustomListItem) -> bool:
+        if item.media_item:
+            match = next((m for m in item.media_item.matches), None)
+            if match and match.is_adult:
                 return True
-            elif item.person and item.person.is_adult:
-                return True
+        elif item.match and item.match.is_adult:
+            return True
+        elif item.person and item.person.is_adult:
+            return True
         return False
+
+    def _is_list_adult(self, l: CustomList) -> bool:
+        return any(self._is_item_adult(item) for item in l.items)
 
     def get_all_lists(self) -> List[CustomListResponse]:
         # Ensure Watchlist exists
@@ -127,12 +160,18 @@ class ListsService:
         lists = self.db.query(CustomList).all()
         result = []
         for l in lists:
-            # Hide the entire list if adult is disabled and it has adult items
-            if not adult_enabled and self._is_list_adult(l):
-                continue
+            # Hide the entire list if adult is disabled and it has ONLY adult items (Watchlist is never hidden)
+            if not adult_enabled and l.name != "Watchlist":
+                if l.items and all(self._is_item_adult(item) for item in l.items):
+                    continue
 
-            item_count = len(l.items)
-            posters = [self._serialize_item(item).poster_path for item in l.items[:4]]
+            if not adult_enabled:
+                filtered_items = [item for item in l.items if not self._is_item_adult(item)]
+            else:
+                filtered_items = l.items
+
+            item_count = len(filtered_items)
+            posters = [self._serialize_item(item).poster_path for item in filtered_items[:4]]
             posters = [p for p in posters if p]
             
             result.append(CustomListResponse(
@@ -153,8 +192,17 @@ class ListsService:
         if not l:
             raise NotFoundException("Not found")
             
-        if not self._adult_access_enabled() and self._is_list_adult(l):
-            raise NotFoundException("Not found")
+        adult_enabled = self._adult_access_enabled()
+        if not adult_enabled and l.name != "Watchlist":
+            if l.items and all(self._is_item_adult(item) for item in l.items):
+                raise NotFoundException("Not found")
+                
+        serialized_items = []
+        for item in l.items:
+            if not adult_enabled and self._is_item_adult(item):
+                continue
+            serialized_items.append(self._serialize_item(item))
+
         return CustomListDetailResponse(
             id=l.id,
             name=l.name,
@@ -163,7 +211,7 @@ class ListsService:
             color=l.color,
             list_type=l.list_type,
             created_at=l.created_at.isoformat() if l.created_at else None,
-            items=[self._serialize_item(item) for item in l.items]
+            items=serialized_items
         )
 
     def create_list(self, payload: Dict[str, Any]) -> CustomListResponse:
@@ -235,6 +283,7 @@ class ListsService:
         media_item_id = payload.get("media_item_id")
         tmdb_id = payload.get("tmdb_id")
         media_type = payload.get("media_type", "movie")
+        provider_name = payload.get("provider")
 
         # Parse unified string IDs (e.g. "tmdb_46459" or "porndb_123")
         if isinstance(media_item_id, str):
@@ -248,20 +297,46 @@ class ListsService:
             elif media_item_id.isdigit():
                 media_item_id = int(media_item_id)
 
-        if isinstance(tmdb_id, str):
+        # Determine provider and clean external ID
+        provider = Provider.TMDB
+        external_id = str(tmdb_id) if tmdb_id else None
+        
+        if tmdb_id and isinstance(tmdb_id, str):
             if "_" in tmdb_id:
-                _, val = tmdb_id.split("_", 1)
-                tmdb_id = int(val) if val.isdigit() else val
-            elif tmdb_id.isdigit():
-                tmdb_id = int(tmdb_id)
+                prefix, val = tmdb_id.split("_", 1)
+                if prefix in ("tmdb", "porndb", "stash", "stashdb", "fansdb"):
+                    if prefix == "tmdb":
+                        provider = Provider.TMDB
+                    elif prefix in ("porndb", "theporndb"):
+                        provider = Provider.PORNDB
+                    elif prefix in ("stash", "stashdb"):
+                        provider = Provider.STASHDB
+                    elif prefix == "fansdb":
+                        provider = Provider.FANSDB
+                    external_id = val
+                else:
+                    external_id = tmdb_id
+            else:
+                external_id = tmdb_id
 
-        # If we have a TMDB ID, check if it already exists as a local MediaItem
-        if tmdb_id and not media_item_id:
+        if provider_name:
+            p_clean = provider_name.lower()
+            if p_clean == "tmdb":
+                provider = Provider.TMDB
+            elif p_clean in ("porndb", "theporndb"):
+                provider = Provider.PORNDB
+            elif p_clean in ("stash", "stashdb"):
+                provider = Provider.STASHDB
+            elif p_clean == "fansdb":
+                provider = Provider.FANSDB
+
+        # If we have a matching provider/external_id, check if it already exists as a local MediaItem
+        if external_id and not media_item_id:
             from app.domains.library.models import MediaItem
             from app.domains.metadata.models import MetadataMatch
             local_item = self.db.query(MediaItem).join(MediaItem.matches).filter(
-                MetadataMatch.provider == Provider.TMDB,
-                MetadataMatch.external_id == str(tmdb_id)
+                MetadataMatch.provider == provider,
+                MetadataMatch.external_id == str(external_id)
             ).first()
             if local_item:
                 media_item_id = local_item.id
@@ -271,19 +346,52 @@ class ListsService:
             raise NotFoundException("Not found")
 
         match_id = None
-        if tmdb_id:
+        if external_id:
+            from app.domains.metadata.models import MetadataMatch
+            from datetime import datetime
             match = self.db.query(MetadataMatch).filter(
-                MetadataMatch.provider == Provider.TMDB,
-                MetadataMatch.external_id == str(tmdb_id)
+                MetadataMatch.provider == provider,
+                MetadataMatch.external_id == str(external_id)
             ).first()
             if not match:
+                try:
+                    m_type = MediaType(media_type.lower())
+                except ValueError:
+                    m_type = MediaType.MOVIE if media_type == "movie" else MediaType.TV
+                
+                year_val = payload.get("year")
+                rel_date = None
+                if year_val:
+                    try:
+                        rel_date = datetime(int(year_val), 1, 1)
+                    except Exception:
+                        pass
+
                 match = MetadataMatch(
-                    provider=Provider.TMDB,
-                    external_id=str(tmdb_id),
-                    media_type=MediaType.MOVIE if media_type == "movie" else MediaType.TV
+                    provider=provider,
+                    external_id=str(external_id),
+                    media_type=m_type,
+                    original_title=payload.get("title"),
+                    release_date=rel_date,
+                    backdrop_path=payload.get("poster_path") if m_type.value == "scene" else None
                 )
                 self.db.add(match)
                 self.db.commit()
+
+                # Create basic metadata localization
+                title = payload.get("title")
+                poster_path = payload.get("poster_path")
+                if title or poster_path:
+                    from app.domains.metadata.models import MetadataLocalization
+                    loc = MetadataLocalization(
+                        match_id=match.id,
+                        language="en",
+                        title=title or "",
+                        poster_path=poster_path if m_type.value != "scene" else ""
+                    )
+                    self.db.add(loc)
+                    self.db.commit()
+
             match_id = match.id
 
         # Check if already exists

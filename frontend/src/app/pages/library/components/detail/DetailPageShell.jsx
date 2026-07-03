@@ -78,11 +78,6 @@ export default function DetailPageShell({
 
   return (
     <Page className={combinedClassName}>
-      <UtilityBarPortal>
-        <NavButton className="media-detail-page__back-button" onClick={() => navigate(-1)}>
-          {backLabel}
-        </NavButton>
-      </UtilityBarPortal>
 
       <HeroSection backdropUrl={backdropUrl || fallbackUrl} isFallback={!backdropUrl && !isScene} />
 

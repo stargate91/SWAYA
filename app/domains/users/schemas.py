@@ -268,6 +268,8 @@ class CustomListItemResponse(BaseModel):
     year: Optional[int] = None
     rating: Optional[float] = None
     is_adult: Optional[bool] = False
+    external_id: Optional[str] = None
+    provider: Optional[str] = None
 
 
 class CustomListResponse(BaseModel):

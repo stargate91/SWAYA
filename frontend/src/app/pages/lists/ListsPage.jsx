@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '@/providers/LanguageContext';
 import Page from '@/ui/Page';
 import Button from '@/ui/Button';
@@ -13,7 +14,7 @@ import {
   useAddListItemMutation,
   useRemoveListItemMutation
 } from '@/queries';
-import { Plus, Edit2, Trash2, List as ListIcon, Loader2, Film, Users, Download, Search, X, Check, Minus } from 'lucide-react';
+import { Plus, Edit2, Trash2, List as ListIcon, Loader2, Film, Users, Tv, Download, Search, X, Check, Minus } from 'lucide-react';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import api from '@/lib/api';
 import EmptyState from '@/ui/EmptyState';
@@ -27,6 +28,7 @@ import './ListsPage.css';
 
 export default function ListsPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { openModal, closeModal } = useUi();
   const { data: lists = [], isLoading } = useListsQuery();
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
@@ -408,6 +410,42 @@ export default function ListsPage() {
                         <div
                           key={item.id}
                           className={`lists-card ${isScene ? 'lists-card--scene' : 'lists-card--poster'}`}
+                          onClick={() => {
+                            const rawType = item.media_type || 'movie';
+                            let mediaType = rawType === 'show' ? 'tv' : rawType;
+                            if (mediaType === 'episode' || mediaType === 'season') {
+                              mediaType = 'tv';
+                            }
+                            
+                            let itemId = item.media_item_id;
+                            if (!itemId) {
+                              if (mediaType === 'movie') {
+                                const prefix = item.provider === 'porndb' ? 'porndb_' : 'tmdb_';
+                                itemId = item.external_id ? `${prefix}${item.external_id}` : (item.tmdb_id ? `tmdb_${item.tmdb_id}` : item.match_id);
+                              } else if (mediaType === 'tv') {
+                                itemId = item.external_id || item.tmdb_id || item.match_id;
+                              } else if (mediaType === 'scene') {
+                                const prefix = item.provider === 'porndb' ? 'porndb' : item.provider === 'fansdb' ? 'fansdb' : 'stash';
+                                itemId = item.external_id ? `${prefix}_${item.external_id}` : item.match_id;
+                              } else {
+                                itemId = item.match_id;
+                              }
+                            }
+                            
+                            const targetPath = mediaType === 'person' 
+                              ? `/library/people/${item.person_id || itemId}` 
+                              : `/library/${mediaType}/${itemId}`;
+                            
+                            console.log('ListsPage card click:', {
+                              item,
+                              rawType,
+                              mediaType,
+                              itemId,
+                              targetPath
+                            });
+                            
+                            navigate(targetPath);
+                          }}
                         >
                           <div className={`lists-card__media ${shouldBlur ? 'is-blurred' : ''}`} style={{ position: 'relative' }}>
                             {posterUrl ? (
@@ -502,9 +540,6 @@ function ResultAddButton({ added, onAdd, onRemove }) {
 }
 
 function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, activeListDetails, t }) {
-  if (!activeList) return null;
-  const listType = activeList.list_type;
-
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const isAdultActive = sessionMode === 'nsfw';
   const removeListItemMutation = useRemoveListItemMutation();
@@ -529,7 +564,7 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
     setHasMore(false);
     setStatusFilter('not_added');
     setProvider(mediaType === 'scene' ? 'porndb' : 'tmdb');
-  }, [isOpen, activeList.id, source, mediaType]);
+  }, [isOpen, activeList?.id, source, mediaType, isAdultActive]);
 
   const handleSearch = async (isNew = true) => {
     if (source === 'discover' && !query.trim()) {
@@ -546,7 +581,7 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
     }
 
     try {
-      if (listType === 'person') {
+      if (activeList?.list_type === 'person') {
         if (source === 'library') {
           const limit = 20;
           const currentOffset = isNew ? 0 : (currentPage - 1) * limit;
@@ -622,7 +657,10 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
     }, 350);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [query, source, mediaType, provider, isOpen]);
+  }, [query, source, mediaType, provider, isOpen, isAdultActive]);
+
+  if (!activeList) return null;
+  const listType = activeList.list_type;
 
   const handleAdd = async (item) => {
     try {
@@ -634,12 +672,19 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
           }
         });
       } else {
+        const isSceneItem = item.media_type === 'scene' || mediaType === 'scene';
+        const poster = isSceneItem ? (item.backdrop_path || item.poster_path) : (item.poster_path || item.profile_path);
+        
         await addListItemMutation.mutateAsync({
           listId: activeList.id,
           payload: {
             media_item_id: source === 'library' ? item.id : undefined,
             tmdb_id: source === 'discover' ? item.id : undefined,
-            media_type: item.media_type || mediaType
+            media_type: item.media_type || mediaType,
+            provider: source === 'discover' ? (item.provider || provider) : undefined,
+            title: item.title || item.name,
+            poster_path: poster,
+            year: item.year ? parseInt(item.year, 10) : undefined
           }
         });
       }
@@ -823,19 +868,39 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
           const added = isAdded(item);
           const title = item.title || item.name;
           const subtitle = listType === 'person' ? (item.role || 'Actor') : (item.year || item.media_type || mediaType);
-          const poster = item.poster_path || item.profile_path;
+          const isSceneItem = item.media_type === 'scene' || mediaType === 'scene';
+          const poster = isSceneItem ? (item.backdrop_path || item.poster_path) : (item.poster_path || item.profile_path);
+          const imageSize = listType === 'person' ? 'person' : (isSceneItem ? 'backdrop' : 'poster');
           
           return (
-            <div key={item.id} className="lists-drawer__item">
+            <div key={item.id} className={`lists-drawer__item ${isSceneItem ? 'lists-drawer__item--scene' : ''}`}>
               <div className="lists-drawer__item-media">
-                {poster ? (
-                  <img
-                    src={resolveMediaImageUrl(poster, listType === 'person' ? 'person' : 'poster')}
-                    alt=""
-                  />
-                ) : (
-                  <div className="lists-drawer__item-media-placeholder" />
-                )}
+                <img
+                  src={poster ? resolveMediaImageUrl(poster, imageSize) : ''}
+                  alt=""
+                  style={{ display: poster ? 'block' : 'none' }}
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const placeholderEl = e.currentTarget.nextSibling;
+                    if (placeholderEl) {
+                      placeholderEl.style.display = 'flex';
+                    }
+                  }}
+                />
+                <div
+                  className="lists-drawer__item-media-placeholder"
+                  style={{ display: poster ? 'none' : 'flex' }}
+                >
+                  {listType === 'person' ? (
+                    <Users size={14} />
+                  ) : (isSceneItem ? (
+                    <Film size={14} />
+                  ) : (mediaType === 'tv' || item.media_type === 'tv') ? (
+                    <Tv size={14} />
+                  ) : (
+                    <Film size={14} />
+                  ))}
+                </div>
               </div>
               <div className="lists-drawer__item-info">
                 <span className="lists-drawer__item-title">{title}</span>

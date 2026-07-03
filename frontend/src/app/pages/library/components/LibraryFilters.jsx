@@ -59,8 +59,10 @@ export default function LibraryFilters({
   setTimeFilterMode,
   favoriteFilter,
   setFavoriteFilter,
-  selectedTags,
-  setSelectedTags,
+  selectedTags = [],
+  setSelectedTags = () => {},
+  tagsFilter = [],
+  setTagsFilter = () => {},
   performerFilter,
   setPerformerFilter,
   studioFilter,
@@ -83,6 +85,9 @@ export default function LibraryFilters({
   setButtSizeFilter,
   filterData,
 }) {
+  const actualSelectedTags = selectedTags.length > 0 ? selectedTags : tagsFilter;
+  const actualSetSelectedTags = setSelectedTags !== (() => {}) ? setSelectedTags : setTagsFilter;
+
   const isVideoTab = isLibraryVideoTab(resolvedTab);
   const isCollectionTab = isLibraryCollectionTab(resolvedTab);
   const isPeopleTab = isLibraryPeopleTab(resolvedTab);
@@ -384,9 +389,9 @@ export default function LibraryFilters({
                   }}
                 >
                   <span className="ui-dropdown__trigger-text" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {selectedTags.length === 0
+                    {actualSelectedTags.length === 0
                       ? (t('library.filter.allTags') || 'All Tags')
-                      : `${selectedTags.join(', ')}`}
+                      : `${actualSelectedTags.join(', ')}`}
                   </span>
                   <span className="ui-dropdown__chevron" style={{ display: 'flex', alignItems: 'center' }}><ChevronDown size={12} /></span>
                 </button>
@@ -416,7 +421,7 @@ export default function LibraryFilters({
                     {filterData.tags
                       .filter(tag => String(tag.name || '').toLowerCase().includes(tagSearch.toLowerCase()))
                       .map((tag) => {
-                        const isChecked = selectedTags.includes(tag.name);
+                        const isChecked = actualSelectedTags.includes(tag.name);
                         return (
                           <div
                             key={tag.id}
@@ -438,9 +443,9 @@ export default function LibraryFilters({
                               checked={isChecked}
                               onChange={() => {
                                 if (isChecked) {
-                                  setSelectedTags(selectedTags.filter(t => t !== tag.name));
+                                  actualSetSelectedTags(actualSelectedTags.filter(t => t !== tag.name));
                                 } else {
-                                  setSelectedTags([...selectedTags, tag.name]);
+                                  actualSetSelectedTags([...actualSelectedTags, tag.name]);
                                 }
                                 setCurrentPage(1);
                               }}

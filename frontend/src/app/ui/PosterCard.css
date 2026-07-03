@@ -193,6 +193,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
   align-items: center;
   justify-content: center;
   z-index: 6;
+  cursor: pointer;
   opacity: 0;
   transform: translateY(-4px);
   transition: opacity var(--motion-fast), transform var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast);
@@ -227,6 +228,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
   align-items: center;
   justify-content: center;
   z-index: 10;
+  cursor: pointer;
   opacity: 0;
   transform: translateY(-4px);
   transition: opacity var(--motion-fast), transform var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast), background-color var(--motion-fast);

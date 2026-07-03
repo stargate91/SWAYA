@@ -1,4 +1,4 @@
-import { Minus, Square, X, AlertTriangle, Flame } from 'lucide-react';
+import { Minus, Square, X, AlertTriangle, Flame, ArrowLeft, ArrowRight } from 'lucide-react';
 import UtilityButton from '../ui/UtilityButton';
 import ProgressBar from '../ui/ProgressBar';
 import Button from '../ui/Button';
@@ -11,6 +11,7 @@ import useWindowControls from './useWindowControls';
 import { useSettingsQuery } from '../queries/settingsQueries';
 import { useLibraryModeStore } from '../stores/useLibraryModeStore';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigationStore } from '../stores/useNavigationStore';
 import GlobalSearch from './GlobalSearch';
 
 const BRAND_NAME = 'SWAYA';
@@ -24,6 +25,10 @@ export default function WindowTitlebar() {
   const { minimize, toggleMaximize, close, resizeToMinimum } = useWindowControls();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { historyStack, currentIndex, goBack, goForward } = useNavigationStore();
+  const canGoBack = currentIndex > 0;
+  const canGoForward = currentIndex < historyStack.length - 1;
 
   const handleAbort = () => {
     openModal({
@@ -98,6 +103,27 @@ export default function WindowTitlebar() {
         onDoubleClick={resizeToMinimum}
       >
         <span className="window-titlebar__brand-text">{BRAND_NAME}</span>
+      </div>
+
+      <div className="window-titlebar__nav-buttons">
+        <button
+          type="button"
+          className="window-titlebar__nav-btn"
+          disabled={!canGoBack}
+          onClick={() => goBack(navigate)}
+          title="Back"
+        >
+          <ArrowLeft size={16} />
+        </button>
+        <button
+          type="button"
+          className="window-titlebar__nav-btn"
+          disabled={!canGoForward}
+          onClick={() => goForward(navigate)}
+          title="Forward"
+        >
+          <ArrowRight size={16} />
+        </button>
       </div>
 
       <div className={`window-titlebar__center-container ${hasProgress ? 'has-progress' : ''}`}>

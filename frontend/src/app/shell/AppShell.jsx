@@ -1,5 +1,5 @@
 import { Suspense, useState, useEffect, useRef } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import AppClosePrompt from './AppClosePrompt';
 import WindowTitlebar from './WindowTitlebar';
@@ -10,6 +10,7 @@ import { useSettingsQuery, useScanStatusQuery } from '../queries';
 import { useUi } from '../providers/UiProvider';
 import { useTranslation } from '../providers/LanguageContext';
 import api from '../lib/api';
+import { useNavigationStore } from '../stores/useNavigationStore';
 
 const getBulkImportBannerStorageKey = (adultOnly) => adultOnly ? 'showBulkImportBanner:nsfw' : 'showBulkImportBanner:sfw';
 
@@ -77,6 +78,12 @@ export default function AppShell() {
   const { data: settings } = useSettingsQuery();
   const theme = settings?.ui_theme || 'dark';
   const navigate = useNavigate();
+  const location = useLocation();
+  const pushPath = useNavigationStore((state) => state.pushPath);
+
+  useEffect(() => {
+    pushPath(location.pathname + location.search);
+  }, [location, pushPath]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);

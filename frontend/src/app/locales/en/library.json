@@ -247,6 +247,9 @@
     "yearMode": "Year"
   },
   "details": {
+    "viewOriginalImage": "View Original Image",
+    "favorite": "Favorite",
+    "cachingFilmography": "Downloading and caching {{name}}'s complete filmography from {{source}}... This only happens once to make browsing instant!",
     "emptyCredits": "No credits found for this source.",
     "emptyCredits_scenes_fansdb": "No scenes found on FansDB.",
     "emptyCredits_scenes_stashdb": "No scenes found on StashDB.",

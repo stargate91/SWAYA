@@ -216,7 +216,7 @@ export function buildPersonExternalLinks(item, t) {
     } catch {
       /* ignore invalid URL */
     }
-    return '/links/homepage.png';
+    return null;
   };
 
   const getBrandColorForKey = (key) => {
