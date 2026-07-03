@@ -14,6 +14,7 @@ let mpvProcess = null;
 let mpvSocket = null;
 let mpvSocketPath = null;
 let isPip = false;
+let lastPipBounds = null;
 
 export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
   function getWindowIconPath() {
@@ -91,6 +92,18 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true
+      }
+    });
+ 
+    mpvPlayerWindow.on('move', () => {
+      if (isPip && mpvPlayerWindow && !mpvPlayerWindow.isDestroyed()) {
+        lastPipBounds = mpvPlayerWindow.getBounds();
+      }
+    });
+
+    mpvPlayerWindow.on('resize', () => {
+      if (isPip && mpvPlayerWindow && !mpvPlayerWindow.isDestroyed()) {
+        lastPipBounds = mpvPlayerWindow.getBounds();
       }
     });
 
@@ -342,19 +355,23 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
         controlsWindow.setFullScreen(false);
       }
 
-      const pipWidth = 384;
-      const pipHeight = 216;
-      const x = width - pipWidth - 20;
-      const y = height - pipHeight - 50;
+      let pipBounds = lastPipBounds;
+      if (!pipBounds) {
+        const pipWidth = 384;
+        const pipHeight = 216;
+        const x = width - pipWidth - 20;
+        const y = height - pipHeight - 50;
+        pipBounds = { x, y, width: pipWidth, height: pipHeight };
+      }
 
-      mpvPlayerWindow.setBounds({ x, y, width: pipWidth, height: pipHeight });
+      mpvPlayerWindow.setBounds(pipBounds);
       mpvPlayerWindow.setAlwaysOnTop(true, 'screen-saver');
 
       if (controlsWindow && !controlsWindow.isDestroyed()) {
         controlsWindow.setResizable(true);
         controlsWindow.setMinimumSize(280, 157);
         controlsWindow.setMaximumSize(960, 540);
-        controlsWindow.setBounds({ x, y, width: pipWidth, height: pipHeight });
+        controlsWindow.setBounds(pipBounds);
         controlsWindow.setAlwaysOnTop(true, 'screen-saver');
         controlsWindow.webContents.send('pip-mode-change', { isPip: true });
       }

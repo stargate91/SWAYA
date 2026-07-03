@@ -29,8 +29,14 @@ export default function PlayerPage() {
   const [isPaused, setIsPaused] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(50);
-  const [isMuted, setIsMuted] = useState(false);
+  const [volume, setVolume] = useState(() => {
+    const saved = localStorage.getItem('player_volume');
+    return saved !== null ? parseInt(saved, 10) : 50;
+  });
+  const [isMuted, setIsMuted] = useState(() => {
+    const saved = localStorage.getItem('player_mute');
+    return saved === 'true';
+  });
   const [title, setTitle] = useState('Loading...');
   const [logoUrl, setLogoUrl] = useState(null);
   const [showControls, setShowControls] = useState(true);
@@ -179,6 +185,9 @@ export default function PlayerPage() {
 
     fetchInfoAndStart();
 
+    const volumeInitializedRef = { current: false };
+    const muteInitializedRef = { current: false };
+
     // Listen to MPV events
     const handleMpvEvent = (event, data) => {
       if (data?.event === 'property-change') {
@@ -192,7 +201,25 @@ export default function PlayerPage() {
           setIsPaused(data.data);
         }
         if (data.name === 'volume' && typeof data.data === 'number') {
-          setVolume(data.data);
+          if (!volumeInitializedRef.current) {
+            volumeInitializedRef.current = true;
+            // Force MPV to match our loaded localStorage volume state
+            ipcRenderer.send('mpv-command', ['set_property', 'volume', volume]);
+          } else {
+            setVolume(data.data);
+            localStorage.setItem('player_volume', String(data.data));
+          }
+        }
+        if (data.name === 'mute') {
+          const isMutedBool = !!data.data;
+          if (!muteInitializedRef.current) {
+            muteInitializedRef.current = true;
+            // Force MPV to match our loaded localStorage mute state
+            ipcRenderer.send('mpv-command', ['set_property', 'mute', isMuted]);
+          } else {
+            setIsMuted(isMutedBool);
+            localStorage.setItem('player_mute', String(isMutedBool));
+          }
         }
         if (data.name === 'chapter-list' && Array.isArray(data.data)) {
           setChapters(data.data);
@@ -305,12 +332,15 @@ export default function PlayerPage() {
   const handleVolumeChange = (e) => {
     const val = parseInt(e.target.value, 10);
     setVolume(val);
+    localStorage.setItem('player_volume', String(val));
     sendCommand(['set_property', 'volume', val]);
   };
 
   const toggleMute = () => {
-    setIsMuted(!isMuted);
-    sendCommand(['set_property', 'mute', !isMuted]);
+    const nextMuted = !isMuted;
+    setIsMuted(nextMuted);
+    localStorage.setItem('player_mute', String(nextMuted));
+    sendCommand(['set_property', 'mute', nextMuted]);
   };
 
   const handleWheel = (e) => {
@@ -322,10 +352,12 @@ export default function PlayerPage() {
 
     if (isMuted && newVolume > 0) {
       setIsMuted(false);
+      localStorage.setItem('player_mute', 'false');
       sendCommand(['set_property', 'mute', false]);
     }
 
     setVolume(newVolume);
+    localStorage.setItem('player_volume', String(newVolume));
     sendCommand(['set_property', 'volume', newVolume]);
     handleMouseMove();
   };
@@ -382,6 +414,13 @@ export default function PlayerPage() {
     } catch (e) { }
   };
 
+  const handleDoubleClick = (e) => {
+    if (e.target.closest('button') || e.target.closest('input') || e.target.closest('select') || e.target.closest('.player-page__menu')) {
+      return;
+    }
+    handleTogglePip();
+  };
+
   const controlsOnly = getQueryParam('controls_only') === 'true';
 
   const currentChapter = (() => {
@@ -405,7 +444,9 @@ export default function PlayerPage() {
         onWheel={handleWheel}
         onMouseEnter={() => setIsMouseOver(true)}
         onMouseLeave={() => setIsMouseOver(false)}
+        onDoubleClick={handleDoubleClick}
       >
+        <div className="player-page__pip-drag-handle" />
         <div className="player-page__pip-overlay">
           <button className="player-page__pip-btn" onClick={handleMinimizePip} title="Minimize Player">
             <Minimize2 size={16} />
@@ -422,7 +463,12 @@ export default function PlayerPage() {
   }
 
   return (
-    <div className={`player-page ${controlsOnly ? 'player-page--transparent' : ''}`} onMouseMove={handleMouseMove} onWheel={handleWheel}>
+    <div
+      className={`player-page ${controlsOnly ? 'player-page--transparent' : ''}`}
+      onMouseMove={handleMouseMove}
+      onWheel={handleWheel}
+      onDoubleClick={handleDoubleClick}
+    >
       {/* Video Container (Nesting target) */}
       <div ref={containerRef} className="player-page__video-container" />
 
