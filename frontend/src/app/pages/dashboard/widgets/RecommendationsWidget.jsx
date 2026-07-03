@@ -276,11 +276,11 @@ const RecommendationsWidget = ({ language, T }) => {
   const addToWatchlist = useAddToWatchlistMutation();
   const removeFromWatchlist = useRemoveFromWatchlistMutation();
 
-  const watchlistIdsFromQuery = recommendations.watchlist_item_ids || [];
+  const watchlistIdsFromQuery = recommendations.watchlist_item_ids;
   const [optimisticWatchlistIds, setOptimisticWatchlistIds] = useState([]);
 
   useEffect(() => {
-    setOptimisticWatchlistIds(watchlistIdsFromQuery);
+    setOptimisticWatchlistIds(watchlistIdsFromQuery || []);
   }, [watchlistIdsFromQuery]);
 
   const handleWatchlist = async (tmdbId, type) => {
