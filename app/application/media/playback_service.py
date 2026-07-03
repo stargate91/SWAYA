@@ -266,6 +266,11 @@ class PlaybackService:
                 raise NotFoundException(f"Media item not found for ID: {item_id}")
 
         self.library_port.save_playback_position(item_id_int, current_time, total_length, self.overrides.user_id)
+        
+        # Track active session for embedded/MPV players
+        from app.infrastructure.playback.playback_monitor import active_sessions
+        active_sessions.add_active(item_id_int)
+
         self.db.commit()
         
         return PlaybackStatusResponse(

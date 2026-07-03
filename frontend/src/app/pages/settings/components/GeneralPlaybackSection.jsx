@@ -1,6 +1,8 @@
 import Card from '@/ui/Card';
 import Stack from '@/ui/Stack';
 import SettingsPathField from './fields/SettingsPathField.jsx';
+import SettingsSelectField from './fields/SettingsSelectField.jsx';
+import { PREFERRED_PLAYER_OPTIONS } from '../settingsFieldOptions.js';
 
 export default function GeneralPlaybackSection({ t }) {
   return (
@@ -9,6 +11,12 @@ export default function GeneralPlaybackSection({ t }) {
       eyebrow={t('settingsPage.sections.playback.eyebrow')}
     >
       <Stack>
+        <SettingsSelectField
+          field="preferred_player"
+          label={t('settingsPage.sections.playback.preferredPlayer')}
+          hint={t('settingsPage.sections.playback.preferredPlayerHint')}
+          options={PREFERRED_PLAYER_OPTIONS}
+        />
         <SettingsPathField
           field="vlc_path"
           picker="file"

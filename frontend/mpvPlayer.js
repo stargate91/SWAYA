@@ -156,6 +156,17 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
       const playbackInfo = await res.json();
       const filePath = playbackInfo.file_path;
 
+      // Register active session immediately in backend
+      fetch(`http://localhost:${backendPort}/api/v1/media/progress`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          item_id: String(itemId),
+          current_time: Math.round(playbackInfo.start_seconds || 0),
+          total_length: Math.round(playbackInfo.duration || 0)
+        })
+      }).catch(() => {});
+
       const title = playbackInfo.title || 'SWAYA';
       if (mpvPlayerWindow && !mpvPlayerWindow.isDestroyed()) {
         mpvPlayerWindow.setTitle(title);
@@ -184,8 +195,13 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
         '--sub-file-paths=sub;subs;subtitles;Extras;extras;srt',
         '--audio-file-auto=all',
         '--audio-file-paths=sub;subs;subtitles;Extras;extras;audio;audios',
-        filePath
       ];
+
+      if (playbackInfo.start_seconds > 0) {
+        args.push(`--start=${playbackInfo.start_seconds}`);
+      }
+
+      args.push(filePath);
 
       writeElectronLog('INFO', 'Spawning MPV', { mpvExecutable, args });
       mpvProcess = spawn(mpvExecutable, args);

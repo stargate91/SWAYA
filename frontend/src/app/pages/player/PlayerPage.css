@@ -362,3 +362,45 @@
 .player-page__menu::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+
+/* Chapter Markers and Slider Wrapper */
+.player-page__slider-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.player-page__chapter-marker {
+  position: absolute;
+  width: 2px;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+  transform: translateX(-50%);
+  z-index: 2;
+  border-radius: 1px;
+  transition: height 0.1s ease, background-color 0.1s ease;
+}
+
+.player-page__slider-wrapper:hover .player-page__chapter-marker {
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+.player-page__current-chapter {
+  position: absolute;
+  left: 50%;
+  top: 32px;
+  transform: translateX(-50%);
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  max-width: 40%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 10;
+}

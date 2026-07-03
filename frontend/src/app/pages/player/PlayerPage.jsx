@@ -35,6 +35,7 @@ export default function PlayerPage() {
   const [logoUrl, setLogoUrl] = useState(null);
   const [showControls, setShowControls] = useState(true);
   const [isPip, setIsPip] = useState(false);
+  const [isMouseOver, setIsMouseOver] = useState(false);
   const [chapters, setChapters] = useState([]);
   const [clockTime, setClockTime] = useState('');
   const [endTime, setEndTime] = useState('');
@@ -296,6 +297,25 @@ export default function PlayerPage() {
     sendCommand(['set_property', 'mute', !isMuted]);
   };
 
+  const handleWheel = (e) => {
+    if (isPip && !isMouseOver) return;
+
+    const step = 5;
+    const currentVolume = isMuted ? 0 : volume;
+    let newVolume = currentVolume + (e.deltaY < 0 ? step : -step);
+    
+    newVolume = Math.max(0, Math.min(100, newVolume));
+    
+    if (isMuted && newVolume > 0) {
+      setIsMuted(false);
+      sendCommand(['set_property', 'mute', false]);
+    }
+    
+    setVolume(newVolume);
+    sendCommand(['set_property', 'volume', newVolume]);
+    handleMouseMove();
+  };
+
   const handleClose = () => {
     try {
       const { ipcRenderer } = window.require('electron');
@@ -313,9 +333,28 @@ export default function PlayerPage() {
 
   const controlsOnly = getQueryParam('controls_only') === 'true';
 
+  const currentChapter = (() => {
+    if (!chapters || chapters.length === 0) return null;
+    let active = null;
+    for (const chap of chapters) {
+      if (currentTime >= chap.time) {
+        active = chap;
+      } else {
+        break;
+      }
+    }
+    return active;
+  })();
+
   if (isPip) {
     return (
-      <div className="player-page player-page--transparent player-page--pip" onMouseMove={handleMouseMove}>
+      <div 
+        className="player-page player-page--transparent player-page--pip" 
+        onMouseMove={handleMouseMove} 
+        onWheel={handleWheel}
+        onMouseEnter={() => setIsMouseOver(true)}
+        onMouseLeave={() => setIsMouseOver(false)}
+      >
         <div className="player-page__pip-overlay">
           <button className="player-page__pip-btn" onClick={handleTogglePip} title="Restore Fullscreen">
             <Maximize2 size={16} />
@@ -329,7 +368,7 @@ export default function PlayerPage() {
   }
 
   return (
-    <div className={`player-page ${controlsOnly ? 'player-page--transparent' : ''}`} onMouseMove={handleMouseMove}>
+    <div className={`player-page ${controlsOnly ? 'player-page--transparent' : ''}`} onMouseMove={handleMouseMove} onWheel={handleWheel}>
       {/* Video Container (Nesting target) */}
       <div ref={containerRef} className="player-page__video-container" />
 
@@ -348,6 +387,13 @@ export default function PlayerPage() {
               <span className="player-page__title">{title}</span>
             )}
           </div>
+
+          {currentChapter && (
+            <div className="player-page__current-chapter">
+              {currentChapter.title}
+            </div>
+          )}
+
           <div className="player-page__header-right">
             <div className="player-page__time-info">
               <span className="player-page__clock">{clockTime}</span>
@@ -362,14 +408,28 @@ export default function PlayerPage() {
           {/* Progress Bar */}
           <div className="player-page__progress-container">
             <span className="player-page__time">{formatTime(currentTime)}</span>
-            <input
-              type="range"
-              min={0}
-              max={duration || 100}
-              value={currentTime}
-              onChange={handleSeek}
-              className="player-page__slider"
-            />
+            <div className="player-page__slider-wrapper">
+              <input
+                type="range"
+                min={0}
+                max={duration || 100}
+                value={currentTime}
+                onChange={handleSeek}
+                className="player-page__slider"
+              />
+              {duration > 0 && chapters.map((chap, index) => {
+                if (chap.time <= 1) return null;
+                const pct = (chap.time / duration) * 100;
+                return (
+                  <div
+                    key={`chap-${index}`}
+                    className="player-page__chapter-marker"
+                    style={{ left: `${pct}%` }}
+                    title={chap.title || `Chapter ${index + 1}`}
+                  />
+                );
+              })}
+            </div>
             <span className="player-page__time">{formatTime(duration)}</span>
           </div>
 

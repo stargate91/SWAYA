@@ -70,10 +70,24 @@ def find_media_player(settings_port) -> Tuple[Optional[str], Optional[str]]:
         if mpc_valid and mpc_path:
             save_setting("mpc_path", mpc_path)
 
-    if vlc_valid and vlc_path:
-        return vlc_path, "vlc"
-    if mpc_valid and mpc_path:
-        return mpc_path, "mpc"
+    # Preferred order based on settings
+    preferred_player = settings_port.get_setting("preferred_player", user_id=current_user_id) or "swaya"
+
+    players_to_check = []
+    if preferred_player == "vlc":
+        players_to_check = [("vlc", vlc_valid, vlc_path)]
+    elif preferred_player == "mpc":
+        players_to_check = [("mpc", mpc_valid, mpc_path)]
+
+    # Add other players as fallbacks
+    for name, valid, path in [("vlc", vlc_valid, vlc_path), ("mpc", mpc_valid, mpc_path)]:
+        if name != preferred_player:
+            players_to_check.append((name, valid, path))
+
+    for name, valid, path in players_to_check:
+        if valid and path:
+            return path, name
+
     return None, None
 
 

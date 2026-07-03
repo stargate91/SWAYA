@@ -74,6 +74,12 @@ class SettingsService:
                 self.settings_port.set_setting("mpc_path", mpc_path, self.user_id)
             self.db.commit()
 
+        # Auto-detect or default preferred_player
+        player_setting = self.settings_port.get_user_setting_obj(self.user_id, "preferred_player")
+        if not player_setting:
+            self.settings_port.create_user_setting(self.user_id, "preferred_player", "swaya")
+            self.db.commit()
+
         settings = self.settings_port.get_user_settings(self.user_id)
         return {s.key: s.value for s in settings}
 

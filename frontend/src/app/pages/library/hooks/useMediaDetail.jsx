@@ -503,19 +503,7 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
   const handlePlayClick = () => {
     const targetId = (isMovie || isScene) ? item.id : nextEpisodeInfo?.episode.id;
     if (!targetId) return;
-
-    let ipcRenderer = null;
-    try {
-      if (window.require) {
-        ipcRenderer = window.require('electron').ipcRenderer;
-      }
-    } catch (e) {}
-
-    if (ipcRenderer) {
-      ipcRenderer.invoke('mpv-open-fullscreen', { itemId: targetId });
-    } else {
-      navigate(`/player/${targetId}`);
-    }
+    playMutation.mutate(targetId);
   };
 
   const handleToggleWatched = () => {

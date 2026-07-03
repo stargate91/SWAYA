@@ -415,6 +415,8 @@
     "playback": {
       "title": "Video Players",
       "eyebrow": "Playback",
+      "preferredPlayer": "Preferred Player",
+      "preferredPlayerHint": "Choose which player to use for video playback",
       "vlcPath": "VLC Path",
       "vlcPlaceholder": "Detected automatically if possible",
       "mpcPath": "MPC-HC Path",

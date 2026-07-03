@@ -37,3 +37,9 @@ export const EXTRAS_FOLDER_MODE_OPTIONS = [
   { value: EXTRAS_FOLDER_MODES.SUBFOLDER, label: 'Grouped in subfolder' },
   { value: EXTRAS_FOLDER_MODES.FLAT, label: 'Flat (next to media)' },
 ];
+
+export const PREFERRED_PLAYER_OPTIONS = [
+  { value: 'swaya', label: 'Swaya Player (MPV)' },
+  { value: 'vlc', label: 'VLC Media Player' },
+  { value: 'mpc', label: 'MPC-HC' },
+];

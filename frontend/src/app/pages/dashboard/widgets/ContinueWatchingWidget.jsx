@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Play, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import IconButton from '../../../ui/IconButton';
 import { useContinueWatchingQuery } from '../../../queries';
-import { usePlayMediaMutation, useResetProgressMutation } from '../../../queries';
+import { usePlayMediaMutation, useResetProgressMutation, useSettingsQuery } from '../../../queries';
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 
@@ -58,6 +58,7 @@ const ContinueWatchingWidget = ({ T }) => {
   });
   const playMutation = usePlayMediaMutation();
   const resetProgressMutation = useResetProgressMutation();
+  const { data: settings = {} } = useSettingsQuery();
   const scrollRef = useRef(null);
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(false);
@@ -120,38 +121,20 @@ const ContinueWatchingWidget = ({ T }) => {
               key={`cw-${item.id}`}
               className={`continue-watching-card ${item.is_active ? 'continue-watching-card--active' : ''}`}
               onClick={() => {
-                if (item.is_active) return;
+                const preferredPlayer = settings.preferred_player || 'swaya';
+                if (item.is_active && preferredPlayer !== 'swaya') return;
                 if (item.type === 'episode' || item.type === 'movie') {
-                  let ipcRenderer = null;
-                  try {
-                    if (window.require) {
-                      ipcRenderer = window.require('electron').ipcRenderer;
-                    }
-                  } catch (e) {}
-                  if (ipcRenderer) {
-                    ipcRenderer.invoke('mpv-open-fullscreen', { itemId: item.id });
-                  } else {
-                    navigate(`/player/${item.id}`);
-                  }
+                  playMutation.mutate(item.id);
                 }
               }}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
-                  if (item.is_active) return;
+                  const preferredPlayer = settings.preferred_player || 'swaya';
+                  if (item.is_active && preferredPlayer !== 'swaya') return;
                   if (item.type === 'episode' || item.type === 'movie') {
-                    let ipcRenderer = null;
-                    try {
-                      if (window.require) {
-                        ipcRenderer = window.require('electron').ipcRenderer;
-                      }
-                    } catch (e) {}
-                    if (ipcRenderer) {
-                      ipcRenderer.invoke('mpv-open-fullscreen', { itemId: item.id });
-                    } else {
-                      navigate(`/player/${item.id}`);
-                    }
+                    playMutation.mutate(item.id);
                   }
                 }
               }}

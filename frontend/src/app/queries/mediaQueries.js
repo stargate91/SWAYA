@@ -1,7 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import api from '@/lib/api';
 import { getOrganizerQueryKey } from './organizerQueries';
 import { useUi } from '@/providers/UiProvider';
+import { useSettingsQuery } from './settingsQueries';
 
 const matchesLibraryEntity = (item, rawItemId, cleanId) => {
   if (!item || typeof item !== 'object') return false;
@@ -527,8 +529,30 @@ export const useBulkUpdateWatchedMutation = () => {
 
 export const usePlayMediaMutation = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { data: settings = {} } = useSettingsQuery();
+
   return useMutation({
-    mutationFn: (itemId) => api.media.play(itemId),
+    mutationFn: async (itemId) => {
+      const preferredPlayer = settings.preferred_player || 'swaya';
+      if (preferredPlayer === 'swaya') {
+        let ipcRenderer = null;
+        try {
+          if (window.require) {
+            ipcRenderer = window.require('electron').ipcRenderer;
+          }
+        } catch (e) {}
+
+        if (ipcRenderer) {
+          await ipcRenderer.invoke('mpv-open-fullscreen', { itemId });
+        } else {
+          navigate(`/player/${itemId}`);
+        }
+        return { success: true };
+      } else {
+        return api.media.play(itemId);
+      }
+    },
     onSuccess: (data, itemId) => {
       const stringId = String(itemId);
       const numberId = !isNaN(Number(itemId)) ? Number(itemId) : itemId;

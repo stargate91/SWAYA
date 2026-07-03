@@ -7,7 +7,63 @@ from app.shared_kernel.constants import PLAYBACK_CHECK_TIMEOUT
 
 logger = logging.getLogger(__name__)
 
-active_sessions = set()
+class ActiveSessionsSet(set):
+    def __init__(self):
+        super().__init__()
+        self.timestamps = {}
+
+    def add(self, item):
+        super().add(item)
+        self.timestamps[item] = time.time() + 86400 * 365
+
+    def add_active(self, item):
+        now = time.time()
+        # Deactivate any other dynamic sessions immediately
+        to_remove = [item_id for item_id, ts in self.timestamps.items() if ts - now < 86400]
+        for item_id in to_remove:
+            if item_id != item:
+                super().discard(item_id)
+                self.timestamps.pop(item_id, None)
+                
+        super().add(item)
+        self.timestamps[item] = now
+
+    def discard(self, item):
+        super().discard(item)
+        self.timestamps.pop(item, None)
+
+    def _cleanup(self):
+        now = time.time()
+        expired = [item_id for item_id, ts in self.timestamps.items() if now - ts > 12]
+        for item_id in expired:
+            super().discard(item_id)
+            self.timestamps.pop(item_id, None)
+
+    def __contains__(self, item):
+        self._cleanup()
+        if super().__contains__(item):
+            return True
+        try:
+            val = int(item)
+            if super().__contains__(val):
+                return True
+        except (ValueError, TypeError):
+            pass
+        return False
+
+    def __iter__(self):
+        self._cleanup()
+        return super().__iter__()
+
+    def __len__(self):
+        self._cleanup()
+        return super().__len__()
+
+    def __repr__(self):
+        self._cleanup()
+        return super().__repr__()
+
+active_sessions = ActiveSessionsSet()
 
 def monitor_playback(item_id: int, player_type: str, proc: subprocess.Popen, port: int, user_id: int):
     logger.info(f"Started playback monitoring thread for item_id={item_id}, player={player_type}, port={port}, user_id={user_id}")
