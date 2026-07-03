@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Play, Pause, Volume2, VolumeX, ArrowLeft, Languages, Captions, PictureInPicture2, Maximize2, X } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, ArrowLeft, Languages, Captions, PictureInPicture2, Maximize2, X, Square, Rewind, FastForward, SkipBack, SkipForward } from 'lucide-react';
 import { resolveMediaImageUrl } from '../../lib/imageUrls';
 import './PlayerPage.css';
 
@@ -36,6 +36,7 @@ export default function PlayerPage() {
   const [showControls, setShowControls] = useState(true);
   const [isPip, setIsPip] = useState(false);
   const [isMouseOver, setIsMouseOver] = useState(false);
+  const [speed, setSpeed] = useState(1.0);
   const [chapters, setChapters] = useState([]);
   const [clockTime, setClockTime] = useState('');
   const [endTime, setEndTime] = useState('');
@@ -188,6 +189,9 @@ export default function PlayerPage() {
         if (data.name === 'track-list' && Array.isArray(data.data)) {
           setTrackList(data.data);
         }
+        if (data.name === 'speed' && typeof data.data === 'number') {
+          setSpeed(data.data);
+        }
       }
     };
 
@@ -316,6 +320,16 @@ export default function PlayerPage() {
     handleMouseMove();
   };
 
+  const handleSpeedUp = () => {
+    const nextSpeed = Math.min(16.0, speed * 2);
+    sendCommand(['set_property', 'speed', nextSpeed]);
+  };
+
+  const handleSpeedDown = () => {
+    const nextSpeed = Math.max(0.25, speed / 2);
+    sendCommand(['set_property', 'speed', nextSpeed]);
+  };
+
   const handleClose = () => {
     try {
       const { ipcRenderer } = window.require('electron');
@@ -378,9 +392,6 @@ export default function PlayerPage() {
         {/* Top Header */}
         <div className="player-page__header">
           <div className="player-page__header-left">
-            <button className="player-page__btn" onClick={handleClose}>
-              <ArrowLeft size={20} />
-            </button>
             {logoUrl ? (
               <img src={logoUrl} alt={title} className="player-page__logo" />
             ) : (
@@ -438,9 +449,43 @@ export default function PlayerPage() {
             
             {/* Left Actions */}
             <div className="player-page__actions-group">
+              <button className="player-page__btn" onClick={() => sendCommand(['add', 'chapter', -1])} title="Previous Chapter">
+                <SkipBack size={18} fill="currentColor" />
+              </button>
+
+              <button className="player-page__btn" onClick={handleSpeedDown} title={`Slow Down / Rewind (${speed}x)`}>
+                <Rewind size={18} fill="currentColor" />
+              </button>
+
               <button className="player-page__btn player-page__btn--primary" onClick={handlePlayPause}>
                 {isPaused ? <Play size={20} fill="currentColor" /> : <Pause size={20} fill="currentColor" />}
               </button>
+
+              <button className="player-page__btn" onClick={handleClose} title="Stop Playback">
+                <Square size={18} fill="currentColor" />
+              </button>
+
+              <button className="player-page__btn" onClick={handleSpeedUp} title={`Fast Forward (${speed}x)`}>
+                <FastForward size={18} fill="currentColor" />
+              </button>
+
+              <button className="player-page__btn" onClick={() => sendCommand(['add', 'chapter', 1])} title="Next Chapter">
+                <SkipForward size={18} fill="currentColor" />
+              </button>
+
+              {speed !== 1.0 && (
+                <span className="player-page__speed-badge" style={{
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  color: '#38bdf8',
+                  background: 'rgba(56, 189, 248, 0.15)',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  marginLeft: '4px'
+                }}>
+                  {speed}x
+                </span>
+              )}
 
               <div className="player-page__volume-group">
                 <button className="player-page__btn" onClick={toggleMute}>

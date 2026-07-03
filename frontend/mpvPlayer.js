@@ -241,6 +241,7 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
           mpvSocket.write(JSON.stringify({ command: ["observe_property", 4, "duration"] }) + '\n');
           mpvSocket.write(JSON.stringify({ command: ["observe_property", 5, "chapter-list"] }) + '\n');
           mpvSocket.write(JSON.stringify({ command: ["observe_property", 6, "track-list"] }) + '\n');
+          mpvSocket.write(JSON.stringify({ command: ["observe_property", 7, "speed"] }) + '\n');
         });
 
         let buffer = '';
