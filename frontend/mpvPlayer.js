@@ -535,4 +535,10 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
       mpvPlayerWindow = null;
     }
   });
+
+  ipcMain.on('theme-changed', (event, newTheme) => {
+    if (controlsWindow && !controlsWindow.isDestroyed()) {
+      controlsWindow.webContents.send('theme-changed', newTheme);
+    }
+  });
 }

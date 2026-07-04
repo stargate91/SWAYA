@@ -87,6 +87,12 @@ export default function AppShell() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    try {
+      const { ipcRenderer } = window.require('electron');
+      ipcRenderer.send('theme-changed', theme);
+    } catch {
+      // Ignored outside Electron
+    }
   }, [theme]);
 
   const [playerState, setPlayerState] = useState({

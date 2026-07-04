@@ -1,0 +1,104 @@
+[data-theme="vaporwave-dream"] {
+  /* Foundation overrides */
+  --color-bg-canvas: #1a1226;
+  --color-bg-elevated: #251c35;
+  --ui-library-tag-focus-bg: var(--color-bg-elevated);
+  --ui-empty-page-search-bg: color-mix(in srgb, var(--color-surface-card) 70%, transparent);
+  --ui-empty-page-search-border: color-mix(in srgb, var(--color-border-default) 78%, transparent);
+  --ui-empty-page-search-highlight: rgba(255, 128, 191, 0.015);
+  --ui-empty-page-search-icon-color: color-mix(in srgb, var(--color-accent) 72%, var(--color-text-muted));
+  --ui-empty-page-search-icon-bg: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  --ui-empty-page-search-icon-border: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  --ui-empty-page-filter-bg: color-mix(in srgb, var(--color-surface-card) 46%, transparent);
+  --ui-empty-page-filter-border: color-mix(in srgb, var(--color-border-default) 58%, transparent);
+  --ui-empty-page-filter-highlight: rgba(255, 128, 191, 0.01);
+  --ui-empty-page-filter-icon-color: color-mix(in srgb, var(--color-accent) 48%, var(--color-text-muted));
+  --ui-empty-page-filter-icon-bg: color-mix(in srgb, var(--color-accent) 5%, transparent);
+  --ui-empty-page-filter-icon-border: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  --ui-empty-page-filter-description-color: color-mix(in srgb, var(--color-muted) 86%, var(--color-text-faint, var(--color-muted)));
+  --color-surface-card: rgba(255, 128, 191, 0.015);
+  --color-surface-glass: rgba(128, 255, 210, 0.03);
+  --color-surface-glass-strong: rgba(255, 128, 191, 0.07);
+  --color-surface-glass-heavy: rgba(128, 255, 210, 0.12);
+  --color-surface-overlay: rgba(26, 18, 38, 0.78);
+  --color-surface-overlay-strong: rgba(26, 18, 38, 0.92);
+  --color-surface-overlay-heavy: rgba(26, 18, 38, 0.98);
+
+  --color-text-primary: #faedf3;
+  --color-text-secondary: #c2b1d6;
+  --color-text-muted: #7b6d92;
+  --color-text-disabled: rgba(250, 237, 243, 0.35);
+  --color-text-faint: rgba(250, 237, 243, 0.22);
+  --color-text-inverse: #1a1226;
+
+  --color-border-subtle: rgba(250, 237, 243, 0.08);
+  --color-border-default: rgba(250, 237, 243, 0.14);
+  --color-border-strong: rgba(255, 128, 191, 0.28);
+  --color-border-heavy: rgba(255, 128, 191, 0.38);
+
+  --color-accent-blue: #80ffd2;
+  --color-accent-blue-soft: #5ce6b8;
+  --color-accent-blue-pale: #b8ffe2;
+  --color-accent-purple: #bd00ff;
+  --color-accent-pink: #ff80bf;
+  --color-accent-yellow: #ffea00;
+  --color-accent-yellow-soft: #ffb700;
+  --color-accent-green: #39ff14;
+  --color-accent-green-soft: #85ff7a;
+  --color-accent-red-soft: #ff5c8a;
+
+  --color-state-info: #80ffd2;
+  --color-state-danger: #ff5c8a;
+  --color-state-success: #80ffd2;
+  --color-state-warning: #ffea00;
+  --color-state-amber: #ffb700;
+
+  --color-state-info-bg: rgba(128, 255, 210, 0.08);
+  --color-state-danger-bg: rgba(255, 92, 138, 0.12);
+  --color-state-danger-bg-strong: rgba(255, 92, 138, 0.22);
+  --color-state-success-bg: rgba(128, 255, 210, 0.12);
+  --color-state-warning-bg: rgba(255, 234, 0, 0.08);
+  --color-state-amber-bg: rgba(255, 183, 0, 0.08);
+
+  --color-accent-glow: rgba(255, 128, 191, 0.18);
+  --color-danger-glow: rgba(255, 92, 138, 0.18);
+  --color-canvas-glow: rgba(26, 18, 38, 0.12);
+  --color-accent-gradient: linear-gradient(135deg, #ff80bf 0%, #80ffd2 100%);
+
+  /* App Shell */
+  --app-shell-color-canvas: #1a1226;
+  --app-shell-color-panel: rgba(37, 28, 53, 0.95);
+  --app-shell-color-panel-strong: rgba(37, 28, 53, 0.98);
+  --app-shell-color-panel-soft: rgba(255, 128, 191, 0.015);
+  --app-shell-color-ink: #faedf3;
+  --app-shell-color-muted: #c2b1d6;
+  --app-shell-color-subtle: #7b6d92;
+  --app-shell-color-line: rgba(255, 128, 191, 0.12);
+  --app-shell-color-line-strong: rgba(128, 255, 210, 0.22);
+  --app-shell-color-accent: #ff80bf;
+  --app-shell-color-accent-strong: #d45d97;
+  --app-shell-color-accent-soft: rgba(255, 128, 191, 0.12);
+  --app-shell-color-accent-glow: rgba(255, 128, 191, 0.28);
+  --app-shell-color-signal: #80ffd2;
+  --app-shell-color-signal-soft: rgba(128, 255, 210, 0.16);
+  --app-shell-color-info: #80ffd2;
+
+  --app-shell-scrollbar-track: rgba(26, 18, 38, 0.25);
+  --app-shell-scrollbar-track-hover: rgba(26, 18, 38, 0.4);
+  --app-shell-scrollbar-thumb: rgba(255, 128, 191, 0.2);
+  --app-shell-scrollbar-thumb-hover: rgba(255, 128, 191, 0.35);
+  --app-shell-scrollbar-thumb-active: rgba(255, 128, 191, 0.5);
+
+  /* Shadow overrides */
+  --app-shell-shadow-sm: 0 6px 16px rgba(0, 0, 0, 0.5), 0 0 4px color-mix(in srgb, var(--color-accent) 20%, transparent);
+  --app-shell-shadow-md: 0 12px 28px rgba(0, 0, 0, 0.58), 0 0 8px color-mix(in srgb, var(--color-accent) 25%, transparent);
+  --app-shell-shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.68), 0 0 16px color-mix(in srgb, var(--color-accent) 30%, transparent);
+
+  /* Button overrides */
+  --button-primary-bg: linear-gradient(135deg, #ff80bf, #80ffd2);
+  --button-primary-color: #1a1226;
+  --button-secondary-bg: linear-gradient(180deg, rgba(255, 128, 191, 0.1), rgba(37, 28, 53, 0.25));
+  --button-secondary-color: #ff80bf;
+  --button-secondary-border: rgba(255, 128, 191, 0.4);
+  --button-secondary-hover-bg: linear-gradient(180deg, rgba(255, 128, 191, 0.2), rgba(37, 28, 53, 0.35));
+}

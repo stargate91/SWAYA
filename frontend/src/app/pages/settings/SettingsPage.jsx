@@ -52,8 +52,20 @@ export default function SettingsPage() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', currentTheme);
+    try {
+      const { ipcRenderer } = window.require('electron');
+      ipcRenderer.send('theme-changed', currentTheme);
+    } catch {
+      // Ignored outside Electron
+    }
     return () => {
       document.documentElement.setAttribute('data-theme', savedTheme);
+      try {
+        const { ipcRenderer } = window.require('electron');
+        ipcRenderer.send('theme-changed', savedTheme);
+      } catch {
+        // Ignored outside Electron
+      }
     };
   }, [currentTheme, savedTheme]);
 

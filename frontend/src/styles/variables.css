@@ -48,6 +48,7 @@
   --color-border-strong: rgba(255, 255, 255, 0.12);
   --color-border-heavy: rgba(255, 255, 255, 0.16);
 
+  --color-accent: var(--color-accent-blue);
   --color-accent-blue: #3b82f6;
   --color-accent-blue-soft: #3b82f6;
   --color-accent-blue-pale: #93c5fd;

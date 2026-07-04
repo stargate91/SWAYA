@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Play, Pause, Volume2, VolumeX, Languages, Captions, PictureInPicture2, Maximize2, X, Square, Rewind, FastForward, SkipBack, SkipForward, Flame, Minimize2 } from 'lucide-react';
 import { resolveMediaImageUrl } from '../../lib/imageUrls';
 import { useTranslation } from '@/providers/LanguageContext';
+import { useSettingsQuery } from '../../queries';
 import './PlayerPage.css';
 
 const getQueryParam = (name) => {
@@ -25,6 +26,31 @@ export default function PlayerPage() {
   const { itemId } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { data: settings } = useSettingsQuery();
+  const theme = settings?.ui_theme || 'dark';
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
+    let ipcRenderer = null;
+    try {
+      ipcRenderer = window.require('electron').ipcRenderer;
+    } catch (err) {
+      console.error(err);
+    }
+    if (!ipcRenderer) return;
+
+    const handleThemeChange = (event, newTheme) => {
+      document.documentElement.setAttribute('data-theme', newTheme);
+    };
+
+    ipcRenderer.on('theme-changed', handleThemeChange);
+    return () => {
+      ipcRenderer.off('theme-changed', handleThemeChange);
+    };
+  }, []);
 
   const starSymbol = '\u2605';
 
