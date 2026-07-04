@@ -29,16 +29,16 @@ import DetailPageShell from './components/detail/DetailPageShell';
 import UtilityBarBottomPortal from '../../../components/UtilityBarBottomPortal';
 
 // Panels
-import BespokeSeasonsSection from './components/detail/BespokeSeasonsSection';
+import BespokeSeasonsSection from './components/detail/sections/BespokeSeasonsSection';
 import TechnicalPanel from './components/detail/panels/TechnicalPanel';
-import BespokeSceneTagger from './components/detail/BespokeSceneTagger';
-import BespokeScenePeaks from './components/detail/BespokeScenePeaks';
+import BespokeSceneTagger from './components/detail/scene/BespokeSceneTagger';
+import BespokeScenePeaks from './components/detail/scene/BespokeScenePeaks';
 import './components/entityDetail/EntityDetailHeroSection.css';
 
-import BespokeCastSection from './components/detail/BespokeCastSection';
-import BespokeCompaniesSection from './components/detail/BespokeCompaniesSection';
-import BespokeRatingsSection from './components/detail/BespokeRatingsSection';
-import CompactWatchStatsSection from './components/detail/CompactWatchStatsSection';
+import BespokeCastSection from './components/detail/sections/BespokeCastSection';
+import BespokeCompaniesSection from './components/detail/sections/BespokeCompaniesSection';
+import BespokeRatingsSection from './components/detail/sections/BespokeRatingsSection';
+import CompactWatchStatsSection from './components/detail/sections/CompactWatchStatsSection';
 
 import LogoSelectorDrawer from './components/detail/modals/LogoSelectorDrawer';
 import PosterSelectorDrawer from './components/detail/modals/PosterSelectorDrawer';
@@ -46,8 +46,8 @@ import BackdropSelectorDrawer from './components/detail/modals/BackdropSelectorD
 import ImageLightbox from './components/detail/modals/ImageLightbox';
 
 import DetailsMetadataDrawer from './components/detail/DetailsMetadataDrawer';
-import BespokeBoxOfficeSection from './components/detail/BespokeBoxOfficeSection';
-import BottomSocialsBar from './components/detail/BottomSocialsBar';
+import BespokeBoxOfficeSection from './components/detail/sections/BespokeBoxOfficeSection';
+import BottomSocialsBar from './components/detail/sections/BottomSocialsBar';
 
 
 

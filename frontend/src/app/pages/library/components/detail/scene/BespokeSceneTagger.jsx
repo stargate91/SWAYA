@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Plus, X, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import Pill from '@/ui/Pill';
 import { useAllTagsQuery } from '@/queries/libraryQueries';
-import { useMediaDetailContext } from './MediaDetailContext';
+import { useMediaDetailContext } from '../MediaDetailContext';
 import './BespokeSceneTagger.css';
 
 function HorizontalPillList({ children }) {

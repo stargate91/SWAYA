@@ -1,6 +1,6 @@
 import { Flame, X } from 'lucide-react';
-import { useMediaDetailContext } from './MediaDetailContext';
-import { formatTime } from '../../utils/detailUtils';
+import { useMediaDetailContext } from '../MediaDetailContext';
+import { formatTime } from '../../../utils/detailUtils';
 import './BespokeScenePeaks.css';
 
 const LPAR = '(';

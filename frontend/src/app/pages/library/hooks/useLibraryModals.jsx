@@ -1,6 +1,6 @@
 import { useUi } from '@/providers/UiProvider';
 import Button from '@/ui/Button';
-import AddPeopleModalContent from '../modals/AddPeopleModalContent';
+import AddPeopleModalContent from '../modals/add-people/AddPeopleModalContent';
 import BulkImportResolveModalContent from '../modals/BulkImportResolveModalContent';
 import CreateTagModalContent from '../modals/CreateTagModalContent';
 import { Pencil, Tag, Trash2, Users, AlertCircle } from 'lucide-react';

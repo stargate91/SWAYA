@@ -2,8 +2,8 @@ import { ChevronRight, ChevronLeft, Check, Eye, Play, Clapperboard, Star, Flame,
 import IconButton from '@/ui/IconButton';
 import Pill from '@/ui/Pill';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
-import { formatEpisodeNumber, formatTime } from '../../utils/detailUtils';
-import { useMediaDetailContext } from './MediaDetailContext';
+import { formatEpisodeNumber, formatTime } from '../../../utils/detailUtils';
+import { useMediaDetailContext } from '../MediaDetailContext';
 
 const LPAR = '(';
 const RPAR = ')';

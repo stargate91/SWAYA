@@ -6,8 +6,8 @@ import {
   Clapperboard, Calendar, Tv
 } from 'lucide-react';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
-import { formatEpisodeNumber } from '../../utils/detailUtils';
-import { useMediaDetailContext } from './MediaDetailContext';
+import { formatEpisodeNumber } from '../../../utils/detailUtils';
+import { useMediaDetailContext } from '../MediaDetailContext';
 import { useTranslation as useLangTranslation } from '@/providers/LanguageContext';
 import api from '@/lib/api';
 import BespokeEpisodeDetail from './BespokeEpisodeDetail';

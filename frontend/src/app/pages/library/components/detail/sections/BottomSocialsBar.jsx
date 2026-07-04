@@ -1,7 +1,7 @@
 /* eslint-disable react/forbid-dom-props, react/jsx-no-literals, i18next/no-literal-string */
 import { useState } from 'react';
 import { Minus, Plus } from 'lucide-react';
-import UtilityBarBottomPortal from '../../../../../components/UtilityBarBottomPortal';
+import UtilityBarBottomPortal from '../../../../../../components/UtilityBarBottomPortal';
 
 export default function BottomSocialsBar({
   socialLinks,
