@@ -1,5 +1,5 @@
 /* eslint-disable react/forbid-dom-props */
-import { BarChart2, CheckCircle, Users, Heart } from 'lucide-react';
+import { BarChart2, CheckCircle, Users, Heart } from '@/ui/icons';
 import SegmentedControl from '@/ui/SegmentedControl';
 import Spinner from '@/ui/Spinner';
 

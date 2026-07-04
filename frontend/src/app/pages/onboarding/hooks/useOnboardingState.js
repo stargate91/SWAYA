@@ -186,18 +186,18 @@ export default function useOnboardingState() {
 
       if (response?.tmdb?.valid) {
         setTmdbValidation({ valid: true, message: response.tmdb.message });
-        toast('TMDB credentials successfully verified.', 'success');
+        toast(t('onboarding.toasts.tmdbVerified') || 'TMDB credentials successfully verified.', 'success');
         setTimeout(() => {
           goToStep(4, 'forward');
         }, 800);
       } else {
-        setTmdbValidation({ valid: false, message: response?.tmdb?.message || 'Verification failed.' });
-        toast(response?.tmdb?.message || 'TMDB credentials verification failed.', 'danger');
+        setTmdbValidation({ valid: false, message: response?.tmdb?.message || t('onboarding.toasts.verificationFailed') || 'Verification failed.' });
+        toast(response?.tmdb?.message || t('onboarding.toasts.tmdbVerificationFailed') || 'TMDB credentials verification failed.', 'danger');
       }
     } catch (err) {
       console.error(err);
-      setTmdbValidation({ valid: false, message: 'Connection error during validation.' });
-      toast('Failed to connect to validation server.', 'danger');
+      setTmdbValidation({ valid: false, message: t('onboarding.toasts.connectionError') || 'Connection error during validation.' });
+      toast(t('onboarding.toasts.validationServerFailed') || 'Failed to connect to validation server.', 'danger');
     } finally {
       setIsValidatingApi(false);
     }
@@ -208,7 +208,7 @@ export default function useOnboardingState() {
     if (!omdbApiKey.trim()) {
       setOmdbValidation({
         valid: false,
-        message: 'OMDB API Key is required.'
+        message: t('onboarding.toasts.omdbKeyRequired') || 'OMDB API Key is required.'
       });
       return;
     }
@@ -221,18 +221,18 @@ export default function useOnboardingState() {
 
       if (response?.omdb?.valid) {
         setOmdbValidation({ valid: true, message: response.omdb.message });
-        toast('OMDB API Key successfully verified.', 'success');
+        toast(t('onboarding.toasts.omdbVerified') || 'OMDB API Key successfully verified.', 'success');
         setTimeout(() => {
           goToStep(5, 'forward');
         }, 800);
       } else {
-        setOmdbValidation({ valid: false, message: response?.omdb?.message || 'Verification failed.' });
-        toast(response?.omdb?.message || 'OMDB verification failed.', 'danger');
+        setOmdbValidation({ valid: false, message: response?.omdb?.message || t('onboarding.toasts.verificationFailed') || 'Verification failed.' });
+        toast(response?.omdb?.message || t('onboarding.toasts.omdbVerificationFailed') || 'OMDB verification failed.', 'danger');
       }
     } catch (err) {
       console.error(err);
-      setOmdbValidation({ valid: false, message: 'Connection error during validation.' });
-      toast('Failed to connect to validation server.', 'danger');
+      setOmdbValidation({ valid: false, message: t('onboarding.toasts.connectionError') || 'Connection error during validation.' });
+      toast(t('onboarding.toasts.validationServerFailed') || 'Failed to connect to validation server.', 'danger');
     } finally {
       setIsValidatingApi(false);
     }
@@ -252,7 +252,7 @@ export default function useOnboardingState() {
   // Validate Folders
   const validateDirs = async () => {
     if (!libraryPath.trim()) {
-      setFolderValidation({ valid: false, message: 'Target library folder is required.' });
+      setFolderValidation({ valid: false, message: t('onboarding.toasts.targetFolderRequired') || 'Target library folder is required.' });
       return;
     }
 
@@ -265,8 +265,8 @@ export default function useOnboardingState() {
       });
 
       if (response.valid) {
-        setFolderValidation({ valid: true, message: 'Folders validated and ready.' });
-        toast('Folder configuration is valid.', 'success');
+        setFolderValidation({ valid: true, message: t('onboarding.toasts.foldersReady') || 'Folders validated and ready.' });
+        toast(t('onboarding.toasts.folderValid') || 'Folder configuration is valid.', 'success');
         setTimeout(() => {
           goToStep(6, 'forward');
         }, 800);
@@ -274,12 +274,12 @@ export default function useOnboardingState() {
         const firstErr = response.errors 
           ? (response.errors.scanFolder || response.errors.targetFolder)
           : response.code;
-        setFolderValidation({ valid: false, message: firstErr || 'Validation failed.' });
-        toast(firstErr || 'Folder validation failed.', 'danger');
+        setFolderValidation({ valid: false, message: firstErr || t('onboarding.toasts.validationFailed') || 'Validation failed.' });
+        toast(firstErr || t('onboarding.toasts.folderValidationFailed') || 'Folder validation failed.', 'danger');
       }
     } catch (err) {
       console.error(err);
-      setFolderValidation({ valid: false, message: 'Folder validation failed.' });
+      setFolderValidation({ valid: false, message: t('onboarding.toasts.folderValidationFailed') || 'Folder validation failed.' });
     } finally {
       setIsValidatingFolders(false);
     }
@@ -290,7 +290,7 @@ export default function useOnboardingState() {
     setIsFinishing(true);
     try {
       if (configChoice === 'import') {
-        toast('Onboarding completed! Welcome to SWAYA.', 'success');
+        toast(t('onboarding.toasts.onboardingCompleted') || 'Onboarding completed! Welcome to SWAYA.', 'success');
         navigate('/dashboard');
         return;
       }
@@ -312,13 +312,13 @@ export default function useOnboardingState() {
       await api.settings.update(payload);
       queryClient.setQueryData(['settings'], payload);
       await queryClient.invalidateQueries({ queryKey: ['settings'] });
-      toast('Onboarding completed! Welcome to SWAYA.', 'success');
+      toast(t('onboarding.toasts.onboardingCompleted') || 'Onboarding completed! Welcome to SWAYA.', 'success');
       
       // Navigate to dashboard
       navigate('/dashboard');
     } catch (err) {
       console.error(err);
-      toast('Failed to save configuration settings.', 'danger');
+      toast(t('onboarding.toasts.saveConfigFailed') || 'Failed to save configuration settings.', 'danger');
     } finally {
       setIsFinishing(false);
     }

@@ -1,4 +1,4 @@
-import { Play, Pause, Maximize2, X } from 'lucide-react';
+import { Play, Pause, Maximize2, X } from '@/ui/icons';
 import './PlayerControlBar.css';
 
 export default function PlayerControlBar({ state, onTogglePlay, onMaximize, onClose }) {
@@ -24,7 +24,7 @@ export default function PlayerControlBar({ state, onTogglePlay, onMaximize, onCl
   return (
     <div className="player-control-bar">
       <div className="player-control-bar__info">
-        <span className="player-control-bar__title" title={title}>
+        <span className="player-control-bar__title">
           {title}
         </span>
         <span className="player-control-bar__time">
@@ -46,7 +46,6 @@ export default function PlayerControlBar({ state, onTogglePlay, onMaximize, onCl
         <button
           className="player-control-bar__btn player-control-bar__btn--play"
           onClick={onTogglePlay}
-          title={isPaused ? 'Play' : 'Pause'}
         >
           {isPaused ? <Play size={16} fill="currentColor" /> : <Pause size={16} fill="currentColor" />}
         </button>
@@ -54,7 +53,6 @@ export default function PlayerControlBar({ state, onTogglePlay, onMaximize, onCl
         <button
           className="player-control-bar__btn player-control-bar__btn--maximize"
           onClick={onMaximize}
-          title="Restore Fullscreen"
         >
           <Maximize2 size={16} />
         </button>
@@ -62,7 +60,6 @@ export default function PlayerControlBar({ state, onTogglePlay, onMaximize, onCl
         <button
           className="player-control-bar__btn player-control-bar__btn--close"
           onClick={onClose}
-          title="Close Player"
         >
           <X size={16} />
         </button>

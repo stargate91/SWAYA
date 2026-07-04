@@ -1,5 +1,5 @@
 /* eslint-disable react/forbid-dom-props */
-import { PenLine } from 'lucide-react';
+import { PenLine } from '@/ui/icons';
 import Pill from '@/ui/Pill';
 import { useMediaDetailContext } from './MediaDetailContext';
 import './UserRatingSection.css';

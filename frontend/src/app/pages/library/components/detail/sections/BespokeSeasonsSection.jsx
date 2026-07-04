@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import {
   ChevronRight, ChevronLeft, Check,
   Clapperboard, Calendar, Tv
-} from 'lucide-react';
+} from '@/ui/icons';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { formatEpisodeNumber } from '../../../utils/detailUtils';
 import { useMediaDetailContext } from '../MediaDetailContext';

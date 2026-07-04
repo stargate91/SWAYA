@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from '@/ui/icons';
 import Button from '../ui/Button';
 import Modal from '../ui/Modal';
 import Checkbox from '../ui/Checkbox';

@@ -379,7 +379,7 @@ export default function usePersonBackdropPicker({
     try {
       const dimensions = await checkImageResolution(path);
       if (dimensions.width > 0 && dimensions.width < 1280) {
-        toast(`Warning: This scene image resolution is low (${dimensions.width}x${dimensions.height}). Minimum recommended is 1280 width.`, 'warning');
+        toast(t('library.details.lowResolutionWarning', { width: dimensions.width, height: dimensions.height }) || `Warning: This scene image resolution is low (${dimensions.width}x${dimensions.height}). Minimum recommended is 1280 width.`, 'warning');
       }
     } catch (e) {
       console.error(e);

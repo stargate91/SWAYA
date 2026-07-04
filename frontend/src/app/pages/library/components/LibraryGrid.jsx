@@ -24,7 +24,7 @@ import {
   isLibraryScenesTab,
 } from '@/lib/libraryTabs';
 import { isMovieMediaType, isPersonMediaType, isTvLikeMediaType, isSceneMediaType } from '@/lib/mediaTypes';
-import { Pencil, Plus, Trash2, UserPlus } from 'lucide-react';
+import { Pencil, Plus, Trash2, UserPlus } from '@/ui/icons';
 import { LibraryPosterCard } from './LibraryPosterCard';
 import { TagPosterCard } from './TagPosterCard';
 

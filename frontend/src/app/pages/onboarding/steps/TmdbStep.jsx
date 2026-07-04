@@ -1,4 +1,4 @@
-import { Key, CheckCircle } from 'lucide-react';
+import { Key, CheckCircle } from '@/ui/icons';
 import Button from '@/ui/Button';
 import OnboardingOrbitHero from '../OnboardingOrbitHero';
 import OnboardingPanelCard from '../OnboardingPanelCard';
@@ -170,12 +170,12 @@ export default function TmdbStep({
       <div className={`tmdb-credentials-column ${isTmdbGuideOpen ? 'is-guided' : ''}`}>
         <OnboardingPanelCard
           className={`tmdb-credentials-panel ${isTmdbGuideOpen ? 'is-guided' : ''}`}
-          eyebrow="TMDB credentials"
-          title="Paste your TMDB keys to unlock scanning"
+          eyebrow={t('onboarding.tmdb.eyebrow') || 'TMDB credentials'}
+          title={t('onboarding.tmdb.title') || 'Paste your TMDB keys to unlock scanning'}
           meta={<div className="welcome-lang-pill">{t('onboarding.tmdb.twoFieldsRequired')}</div>}
-          description="Both values are required before SWAYA can move past this step."
-          footerLabel="This step blocks the next one"
-          footerValue="Validate both keys to continue onboarding"
+          description={t('onboarding.tmdb.description') || 'Both values are required before SWAYA can move past this step.'}
+          footerLabel={t('onboarding.tmdb.footerLabel') || 'This step blocks the next one'}
+          footerValue={t('onboarding.tmdb.footerValue') || 'Validate both keys to continue onboarding'}
         >
           <div className="onboarding-form-group">
             <label>{t('onboarding.tmdb.apiKeyLabel')}</label>
@@ -184,7 +184,7 @@ export default function TmdbStep({
                 type="text" 
                 value={tmdbApiKey}
                 onChange={(e) => setTmdbApiKey(e.target.value)}
-                placeholder="Enter TMDB API Key"
+                placeholder={t('onboarding.tmdb.apiKeyPlaceholder') || 'Enter TMDB API Key'}
               />
             </div>
           </div>
@@ -195,7 +195,7 @@ export default function TmdbStep({
                 type="text" 
                 value={tmdbBearerToken}
                 onChange={(e) => setTmdbBearerToken(e.target.value)}
-                placeholder="Enter TMDB bearer token"
+                placeholder={t('onboarding.tmdb.bearerTokenPlaceholder') || 'Enter TMDB bearer token'}
               />
             </div>
           </div>
@@ -204,7 +204,7 @@ export default function TmdbStep({
             onClick={validateTmdb}
             disabled={isValidatingApi}
           >
-            {isValidatingApi ? 'Validating...' : 'Validate Credentials'}
+            {isValidatingApi ? (t('onboarding.tmdb.validating') || 'Validating...') : (t('onboarding.tmdb.validateBtn') || 'Validate Credentials')}
           </Button>
           {tmdbValidation.valid !== null && (
             <div className={`onboarding-validation-status ${tmdbValidation.valid ? 'success' : 'error'}`}>

@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { X } from '@/ui/icons';
 import { useTranslation } from '../providers/LanguageContext';
 import IconButton from './IconButton';
 import './Modal.css';

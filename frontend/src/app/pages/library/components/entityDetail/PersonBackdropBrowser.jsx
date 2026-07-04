@@ -1,5 +1,5 @@
  
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft } from '@/ui/icons';
 import NavButton from '@/ui/NavButton';
 import TMDBImageGrid from './TMDBImageGrid';
 

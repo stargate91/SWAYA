@@ -3,7 +3,7 @@ import { useAddPersonTmdbMutation } from '@/queries';
 import api from '@/lib/api';
 import Spinner from '@/ui/Spinner';
 import Pill from '@/ui/Pill';
-import { Check } from 'lucide-react';
+import { Check } from '@/ui/icons';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 
 const getBulkImportResolveStatePrefix = (isAdult) => `bulkImportResolvedRows:${isAdult ? 'nsfw' : 'sfw'}:`;

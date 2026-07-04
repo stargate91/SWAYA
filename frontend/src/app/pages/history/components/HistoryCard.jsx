@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { RotateCcw, Calendar, CheckCircle2, Clock, AlertTriangle, ChevronDown, ChevronUp, ArrowRight } from 'lucide-react';
+import { RotateCcw, Calendar, CheckCircle2, Clock, AlertTriangle, ChevronDown, ChevronUp, ArrowRight } from '@/ui/icons';
 import Button from '@/ui/Button';
 import Tooltip from '@/ui/Tooltip';
 import Spinner from '@/ui/Spinner';

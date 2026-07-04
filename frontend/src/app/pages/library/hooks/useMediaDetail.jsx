@@ -12,7 +12,7 @@ import {
   getDurationText,
   resolveDetailsImageUrl
 } from '../utils/detailUtils';
-import { PenLine, Info } from 'lucide-react';
+import { PenLine, Info } from '@/ui/icons';
 import ReviewModalContent from '../components/detail/modals/ReviewModalContent';
 import Button from '@/ui/Button';
 import { useMediaMutations } from './useMediaMutations';
@@ -460,14 +460,15 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
       }
     } catch { /* ignore */ }
 
+    const trailerSuffix = ` - ${t('library.details.trailer') || 'Trailer'}`;
     if (ipcRenderer) {
       ipcRenderer.invoke('mpv-open-fullscreen', {
         url: `https://www.youtube.com/watch?v=${item.trailer_key}`,
-        title: `${title} - Trailer`
+        title: `${title}${trailerSuffix}`
       });
     } else {
       openModal({
-        title: `${title} - Trailer`,
+        title: `${title}${trailerSuffix}`,
         variant: 'extra-wide',
         className: 'theater-modal',
         content: (

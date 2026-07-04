@@ -1,4 +1,4 @@
-import { Layers, Bookmark, Play } from 'lucide-react';
+import { Layers, Bookmark, Play } from '@/ui/icons';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
 import { API_BASE } from '@/lib/backend';
 

@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
-import { Clapperboard, Check } from 'lucide-react';
+import { Check } from '@/ui/icons';
+import { ENTITY_ICONS } from '@/ui/icons';
 import Badge from '../../../ui/Badge';
 import MediaCard from '../../../ui/MediaCard';
 import MetaRow from '../../../ui/MetaRow';
@@ -67,7 +68,7 @@ export default function MatchEpisodeCard({
             />
           ) : (
             <div className="organizer-match-modal__poster-placeholder">
-              <Clapperboard size={18} />
+              <ENTITY_ICONS.episode size={18} />
             </div>
           )}
           {isBucketed ? (

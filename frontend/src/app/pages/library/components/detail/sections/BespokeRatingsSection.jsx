@@ -1,3 +1,5 @@
+import Tooltip from '@/ui/Tooltip';
+
 export default function BespokeRatingsSection({ item, t }) {
   const isSceneType = item?.type === 'scene';
   const hasImdb = !isSceneType && item?.rating_imdb != null && Number(item.rating_imdb) > 0;
@@ -35,9 +37,11 @@ export default function BespokeRatingsSection({ item, t }) {
         </div>
         <div className="bespoke-ratings-body">
           {ratings.map(rating => (
-            <div key={rating.id} className="bespoke-rating-item" title={rating.alt}>
-              <img src={rating.logo} alt={rating.alt} className="bespoke-rating-logo" />
-              <span className="bespoke-rating-value">{rating.value}</span>
+            <div key={rating.id} className="bespoke-rating-item">
+              <Tooltip content={rating.alt} side="top">
+                <img src={rating.logo} alt={rating.alt} className="bespoke-rating-logo" />
+                <span className="bespoke-rating-value">{rating.value}</span>
+              </Tooltip>
             </div>
           ))}
         </div>

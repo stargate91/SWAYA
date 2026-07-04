@@ -15,7 +15,8 @@ import {
   useRemoveListItemMutation,
   useSettingsQuery
 } from '@/queries';
-import { Plus, Edit2, Trash2, List as ListIcon, Loader2, Film, Users, Tv, Download, Search, X, Check, Minus, AlertTriangle } from 'lucide-react';
+import { Plus, Edit2, Trash2, List as ListIcon, Loader2, ENTITY_ICONS, Download, Search, X, Check, Minus, AlertTriangle } from '@/ui/icons';
+import Tooltip from '@/ui/Tooltip';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import api from '@/lib/api';
 import EmptyState from '@/ui/EmptyState';
@@ -295,14 +296,16 @@ export default function ListsPage() {
               {t('lists.sidebar_title') || 'My Lists'}
             </span>
             <div className="lists-sidebar__actions">
-              <button
-                type="button"
-                className="lists-sidebar__import-btn"
-                onClick={handleTriggerImport}
-                title={t('lists.import_title') || 'Import List'}
-              >
-                <Download size={18} />
-              </button>
+              <Tooltip content={t('lists.import_title') || 'Import List'} side="top">
+                <button
+                  type="button"
+                  className="lists-sidebar__import-btn"
+                  onClick={handleTriggerImport}
+                  title={null}
+                >
+                  <Download size={18} />
+                </button>
+              </Tooltip>
               <input
                 type="file"
                 ref={fileInputRef}
@@ -310,14 +313,16 @@ export default function ListsPage() {
                 onChange={handleFileChange}
                 hidden
               />
-              <button
-                type="button"
-                className="lists-sidebar__create-btn"
-                onClick={handleStartCreate}
-                title={t('lists.create_title') || 'Create New List'}
-              >
-                <Plus size={18} />
-              </button>
+              <Tooltip content={t('lists.create_title') || 'Create New List'} side="top">
+                <button
+                  type="button"
+                  className="lists-sidebar__create-btn"
+                  onClick={handleStartCreate}
+                  title={null}
+                >
+                  <Plus size={18} />
+                </button>
+              </Tooltip>
             </div>
           </div>
 
@@ -356,9 +361,9 @@ export default function ListsPage() {
                               ))}
                             </div>
                           ) : list.list_type === 'person' ? (
-                            <Users size={28} color={list.color || 'var(--color-accent-blue)'} />
+                            <ENTITY_ICONS.performer size={28} color={list.color || 'var(--color-accent-blue)'} />
                           ) : (
-                            <Film size={28} color={list.color || 'var(--color-accent-blue)'} />
+                            <ENTITY_ICONS.movie size={28} color={list.color || 'var(--color-accent-blue)'} />
                           )}
                         </div>
                         <div className="lists-sidebar__item-info">
@@ -377,22 +382,26 @@ export default function ListsPage() {
                       <div className="lists-sidebar__item-right">
                         {!list.is_watchlist && (
                           <div className="lists-sidebar__item-actions">
-                            <button
-                              type="button"
-                              className="lists-sidebar__action-btn lists-sidebar__action-btn--edit"
-                              onClick={(e) => handleStartEdit(list, e)}
-                              title={t('common.edit') || 'Edit'}
-                            >
-                              <Edit2 size={12} />
-                            </button>
-                            <button
-                              type="button"
-                              className="lists-sidebar__action-btn lists-sidebar__action-btn--delete"
-                              onClick={(e) => handleDelete(list.id, e)}
-                              title={t('common.delete') || 'Delete'}
-                            >
-                              <Trash2 size={12} />
-                            </button>
+                            <Tooltip content={t('common.edit') || 'Edit'} side="top">
+                              <button
+                                type="button"
+                                className="lists-sidebar__action-btn lists-sidebar__action-btn--edit"
+                                onClick={(e) => handleStartEdit(list, e)}
+                                title={null}
+                              >
+                                <Edit2 size={12} />
+                              </button>
+                            </Tooltip>
+                            <Tooltip content={t('common.delete') || 'Delete'} side="top">
+                              <button
+                                type="button"
+                                className="lists-sidebar__action-btn lists-sidebar__action-btn--delete"
+                                onClick={(e) => handleDelete(list.id, e)}
+                                title={null}
+                              >
+                                <Trash2 size={12} />
+                              </button>
+                            </Tooltip>
                           </div>
                         )}
                       </div>
@@ -421,15 +430,16 @@ export default function ListsPage() {
                   )}
                 </div>
                 <div className="lists-header__right">
-                  <Button
-                    variant="secondary-neutral"
-                    size="sm"
-                    onClick={() => handleExportList(activeList.id)}
-                    title={t('lists.export') || 'Export JSON'}
-                  >
-                    <Download size={14} />
-                    <span>{t('lists.export') || 'Export JSON'}</span>
-                  </Button>
+                  <Tooltip content={t('lists.export') || 'Export JSON'} side="top">
+                    <Button
+                      variant="secondary-neutral"
+                      size="sm"
+                      onClick={() => handleExportList(activeList.id)}
+                    >
+                      <Download size={14} />
+                      <span>{t('lists.export') || 'Export JSON'}</span>
+                    </Button>
+                  </Tooltip>
                   <Button
                     variant="primary"
                     size="sm"
@@ -608,13 +618,13 @@ function DrawerItemImage({ src, listType, isSceneItem, mediaType, itemMediaType 
     return (
       <div className="lists-drawer__item-media-placeholder">
         {listType === 'person' ? (
-          <Users size={14} />
+          <ENTITY_ICONS.performer size={14} />
         ) : isSceneItem ? (
-          <Film size={14} />
+          <ENTITY_ICONS.episode size={14} />
         ) : (mediaType === 'tv' || itemMediaType === 'tv') ? (
-          <Tv size={14} />
+          <ENTITY_ICONS.tv size={14} />
         ) : (
-          <Film size={14} />
+          <ENTITY_ICONS.movie size={14} />
         )}
       </div>
     );
@@ -819,9 +829,9 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
         listId: activeList.id,
         itemId: listItem.id
       });
-      toast('Item removed from list', 'success');
+      toast(t('lists.item_removed_success') || 'Item removed from list', 'success');
     } catch (err) {
-      toast(err.message || 'Failed to remove item', 'danger');
+      toast(err.message || t('lists.remove_item_failed') || 'Failed to remove item', 'danger');
     }
   };
 

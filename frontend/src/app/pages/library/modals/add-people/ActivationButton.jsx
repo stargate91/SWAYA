@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import IconButton from '@/ui/IconButton';
-import { Check, Minus, Plus } from 'lucide-react';
+import { Check, Minus, Plus } from '@/ui/icons';
 
 export default function ActivationButton({ isActive, onClick, disabled }) {
   const [isHovered, setIsHovered] = useState(false);

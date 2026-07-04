@@ -98,8 +98,6 @@
 }
 
 .global-search__more-btn {
-  position: absolute;
-  right: var(--space-3);
   background: none;
   border: none;
   padding: var(--space-1);
@@ -112,6 +110,13 @@
   border-radius: 4px;
   transition: color var(--motion-duration-fast) var(--motion-ease-standard), background-color var(--motion-duration-fast) var(--motion-ease-standard);
   z-index: 2;
+}
+
+.global-search__input-wrapper > .ui-tooltip {
+  position: absolute;
+  right: var(--space-3);
+  display: flex;
+  align-items: center;
 }
 
 .global-search__more-btn:hover {

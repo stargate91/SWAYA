@@ -1,7 +1,7 @@
  
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Star, Heart, Edit3, Clapperboard, Tv, Video, Users, CheckCircle, Search } from 'lucide-react';
+import { Star, Heart, Edit3, Clapperboard, Tv, Video, Users, CheckCircle, Search } from '@/ui/icons';
 import Page from '@/ui/Page';
 import Table from '@/ui/Table';
 import { Tabs } from '@/ui/Tabs';

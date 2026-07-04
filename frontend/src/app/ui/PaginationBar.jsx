@@ -131,7 +131,7 @@ export default function PaginationBar({
             onClick={() => onPageChange?.(1)}
             disabled={currentPage === 1}
           >
-            {labels.first ?? 'First'}
+            {(labels.first ?? t('pagination.first')) || 'First'}
           </Button>
           <Button
             type="button"
@@ -141,7 +141,7 @@ export default function PaginationBar({
             onClick={() => onPageChange?.(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
           >
-            {labels.prev ?? 'Prev'}
+            {(labels.prev ?? t('pagination.prev')) || 'Prev'}
           </Button>
           <PaginationPageEditor currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
           <Button
@@ -152,7 +152,7 @@ export default function PaginationBar({
             onClick={() => onPageChange?.(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
           >
-            {labels.next ?? 'Next'}
+            {(labels.next ?? t('pagination.next')) || 'Next'}
           </Button>
           <Button
             type="button"
@@ -162,7 +162,7 @@ export default function PaginationBar({
             onClick={() => onPageChange?.(totalPages)}
             disabled={currentPage === totalPages}
           >
-            {labels.last ?? 'Last'}
+            {(labels.last ?? t('pagination.last')) || 'Last'}
           </Button>
         </div>
       </div>

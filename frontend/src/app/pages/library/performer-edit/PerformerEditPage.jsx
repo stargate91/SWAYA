@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { usePersonDetailQuery } from '@/queries/metadataQueries';
-import { Link2, GitMerge, Sliders, X } from 'lucide-react';
+import { Link2, GitMerge, Sliders, X } from '@/ui/icons';
 import IconButton from '@/ui/IconButton';
 import PerformerLinkingTab from './tabs/PerformerLinkingTab';
 import PerformerMixerTab from './tabs/PerformerMixerTab';

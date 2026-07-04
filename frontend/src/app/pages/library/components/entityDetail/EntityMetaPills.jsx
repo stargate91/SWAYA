@@ -1,5 +1,5 @@
 import { createElement } from 'react';
-import { Layers, Briefcase, Calendar, CalendarX2, MapPin, X, Check } from 'lucide-react';
+import { Layers, Briefcase, Calendar, CalendarX2, MapPin, X, Check } from '@/ui/icons';
 import Pill from '@/ui/Pill';
 import { getGenderIcon, getGenderLabel } from '../../utils/personCreditsUtils';
 

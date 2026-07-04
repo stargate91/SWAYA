@@ -1,7 +1,7 @@
 /* eslint-disable react/forbid-dom-props */
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown } from '@/ui/icons';
 import Checkbox from '@/ui/Checkbox';
 import useClickOutside from '../hooks/useClickOutside';
 

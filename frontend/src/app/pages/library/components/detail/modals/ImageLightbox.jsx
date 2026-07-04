@@ -1,5 +1,5 @@
 import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
+import { X } from '@/ui/icons';
 
 export default function ImageLightbox({
   lightboxUrl,

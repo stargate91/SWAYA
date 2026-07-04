@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Clapperboard } from 'lucide-react';
+import { Clapperboard } from '@/ui/icons';
 import Badge from '../../../ui/Badge';
 import MediaCard from '../../../ui/MediaCard';
 import MetaRow from '../../../ui/MetaRow';

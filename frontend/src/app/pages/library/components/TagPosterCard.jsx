@@ -1,6 +1,6 @@
  
 import { memo } from 'react';
-import { Heart, X } from 'lucide-react';
+import { Heart, X } from '@/ui/icons';
 import Badge from '@/ui/Badge';
 import PosterCard from '@/ui/PosterCard';
 import { getProfileImagePath, getTvPosterImagePath, getPosterImagePath } from '@/lib/imageUrls';

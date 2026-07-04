@@ -5,7 +5,7 @@ import {
   Image as ImageIcon,
   ChevronUp, ChevronDown,
   Maximize2, PenLine
-} from 'lucide-react';
+} from '@/ui/icons';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
 import { normalizeMediaType } from '@/lib/mediaTypes';

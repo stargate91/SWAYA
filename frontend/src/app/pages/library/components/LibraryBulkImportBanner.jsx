@@ -1,4 +1,4 @@
-import { Info, X } from 'lucide-react';
+import { Info, X } from '@/ui/icons';
 import Button from '@/ui/Button';
 import { isLibraryPeopleTab } from '@/lib/libraryTabs';
 

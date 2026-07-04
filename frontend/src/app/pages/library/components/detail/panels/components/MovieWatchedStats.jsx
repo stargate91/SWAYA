@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight } from '@/ui/icons';
 import { formatTime } from '../../../../utils/detailUtils';
 import { useMediaDetailContext } from '../../MediaDetailContext';
 import '../PanelsCommon.css';

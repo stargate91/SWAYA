@@ -1,7 +1,7 @@
  
 import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Pencil, Play } from 'lucide-react';
+import { Heart, Pencil, Play } from '@/ui/icons';
 import Badge from '@/ui/Badge';
 import PosterCard from '@/ui/PosterCard';
 import {

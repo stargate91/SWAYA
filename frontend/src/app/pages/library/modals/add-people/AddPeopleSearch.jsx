@@ -7,7 +7,7 @@ import IconButton from '@/ui/IconButton';
 import Tooltip from '@/ui/Tooltip';
 import EmptyState from '@/ui/EmptyState';
 import Dropdown from '@/ui/Dropdown';
-import { Search } from 'lucide-react';
+import { Search } from '@/ui/icons';
 import ActivationButton from './ActivationButton';
 
 const QUESTION_MARK = '?';

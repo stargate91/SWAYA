@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Layers, PenLine, X, Maximize2 } from 'lucide-react';
+import { Layers, PenLine, X, Maximize2 } from '@/ui/icons';
 import Pill from '@/ui/Pill';
 import { OverviewContent } from './EntityDetailSections';
 import { API_BASE } from '@/lib/backend';

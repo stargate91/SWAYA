@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import Page from '@/ui/Page';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from '@/ui/icons';
 import HeroSection from './HeroSection';
 import '../../MediaDetailPage.css';
 

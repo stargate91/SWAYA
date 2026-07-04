@@ -1,4 +1,4 @@
-import { Settings2, FolderTree, KeyRound, Wrench, Palette, Cpu, Flame } from 'lucide-react';
+import { Settings2, FolderTree, KeyRound, Wrench, Palette, Cpu, Flame } from '@/ui/icons';
 import { ORGANIZATION_TAB_IDS, SETTINGS_TAB_GROUP_IDS, SETTINGS_TAB_IDS } from './settingsConstants.js';
 
 import {

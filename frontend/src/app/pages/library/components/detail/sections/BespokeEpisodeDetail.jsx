@@ -1,4 +1,4 @@
-import { ChevronRight, ChevronLeft, Check, Eye, Play, Clapperboard, Star, Flame, Trash2 } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, Eye, Play, Clapperboard, Star, Flame, Trash2 } from '@/ui/icons';
 import IconButton from '@/ui/IconButton';
 import Pill from '@/ui/Pill';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
@@ -40,7 +40,7 @@ export default function BespokeEpisodeDetail({
         className="bespoke-card-nav bespoke-card-nav--left"
         disabled={activeEpisodeIndex <= 0}
         onClick={() => stepEpisode('left')}
-        title="Previous Episode"
+        title={t('library.details.previousEpisode') || 'Previous Episode'}
       >
         <ChevronLeft size={24} />
       </button>
@@ -50,7 +50,7 @@ export default function BespokeEpisodeDetail({
         className="bespoke-card-nav bespoke-card-nav--right"
         disabled={activeEpisodeIndex >= episodes.length - 1}
         onClick={() => stepEpisode('right')}
-        title="Next Episode"
+        title={t('library.details.nextEpisode') || 'Next Episode'}
       >
         <ChevronRight size={24} />
       </button>
@@ -91,7 +91,7 @@ export default function BespokeEpisodeDetail({
                 e.stopPropagation();
                 playMutation.mutate(activeEpisode.id);
               }}
-              title="Play episode"
+              title={t('library.details.playEpisode') || 'Play Episode'}
             >
               <Play size={20} fill="currentColor" />
             </IconButton>

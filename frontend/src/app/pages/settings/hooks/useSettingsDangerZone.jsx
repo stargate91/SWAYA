@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from '@/ui/icons';
 import { useClearDatabaseMutation } from '@/queries';
 import Button from '@/ui/Button';
 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Search, Clapperboard, Film, Tv, Users, Video, ImageOff } from 'lucide-react';
+import { Search, Clapperboard, ENTITY_ICONS, ImageOff } from '@/ui/icons';
 import api from '@/lib/api';
 import Page from '@/ui/Page';
 import Input from '@/ui/Input';
@@ -25,22 +25,22 @@ const SOURCES = [
 const TYPES_BY_SOURCE = {
   tmdb: [
     { id: 'all', name: 'All', icon: Clapperboard },
-    { id: 'movie', name: 'Movies', icon: Film },
-    { id: 'tv', name: 'TV Shows', icon: Tv },
-    { id: 'person', name: 'People', icon: Users },
+    { id: 'movie', name: 'Movies', icon: ENTITY_ICONS.movie },
+    { id: 'tv', name: 'TV Shows', icon: ENTITY_ICONS.tv },
+    { id: 'person', name: 'People', icon: ENTITY_ICONS.performer },
   ],
   stashdb: [
-    { id: 'scene', name: 'Scenes', icon: Video },
-    { id: 'person', name: 'Performers', icon: Users },
+    { id: 'scene', name: 'Scenes', icon: ENTITY_ICONS.episode },
+    { id: 'person', name: 'Performers', icon: ENTITY_ICONS.performer },
   ],
   fansdb: [
-    { id: 'scene', name: 'Scenes', icon: Video },
-    { id: 'person', name: 'Performers', icon: Users },
+    { id: 'scene', name: 'Scenes', icon: ENTITY_ICONS.episode },
+    { id: 'person', name: 'Performers', icon: ENTITY_ICONS.performer },
   ],
   porndb: [
-    { id: 'movie', name: 'Movies', icon: Film },
-    { id: 'scene', name: 'Scenes', icon: Video },
-    { id: 'person', name: 'Performers', icon: Users },
+    { id: 'movie', name: 'Movies', icon: ENTITY_ICONS.movie },
+    { id: 'scene', name: 'Scenes', icon: ENTITY_ICONS.episode },
+    { id: 'person', name: 'Performers', icon: ENTITY_ICONS.performer },
   ],
 };
 

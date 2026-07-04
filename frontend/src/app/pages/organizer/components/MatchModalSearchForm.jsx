@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react';
+import { Search } from '@/ui/icons';
 import IconButton from '../../../ui/IconButton';
 import SegmentedControl from '../../../ui/SegmentedControl';
 import Tooltip from '../../../ui/Tooltip';

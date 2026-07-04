@@ -1,6 +1,6 @@
  
 import { useState } from 'react';
-import { Minus, Plus } from 'lucide-react';
+import { Minus, Plus } from '@/ui/icons';
 import UtilityBarBottomPortal from '../../../../../../components/UtilityBarBottomPortal';
 
 export default function BottomSocialsBar({

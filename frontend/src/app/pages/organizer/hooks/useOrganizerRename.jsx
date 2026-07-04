@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Sparkles } from 'lucide-react';
+import { Sparkles } from '@/ui/icons';
 import Button from '../../../ui/Button';
 import OrganizerRenameModalContent from '../OrganizerRenameModalContent.jsx';
 import { mapOrganizerItemRow, mapExtraRow } from '../organizerMappers';

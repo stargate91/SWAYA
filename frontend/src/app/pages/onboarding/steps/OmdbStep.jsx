@@ -1,4 +1,4 @@
-import { Key } from 'lucide-react';
+import { Key } from '@/ui/icons';
 import Button from '@/ui/Button';
 import OnboardingOrbitHero from '../OnboardingOrbitHero';
 import OnboardingPanelCard from '../OnboardingPanelCard';
@@ -157,12 +157,12 @@ export default function OmdbStep({
       <div className={`tmdb-credentials-column ${isOmdbGuideOpen ? 'is-guided' : ''}`}>
         <OnboardingPanelCard
           className={`tmdb-credentials-panel ${isOmdbGuideOpen ? 'is-guided' : ''}`}
-          eyebrow="OMDb key"
-          title="Paste your OMDb key to unlock ratings"
+          eyebrow={t('onboarding.omdb.eyebrow') || 'OMDb key'}
+          title={t('onboarding.omdb.title') || 'Paste your OMDb key to unlock ratings'}
           meta={<div className="welcome-lang-pill">{t('onboarding.omdb.oneFieldRequired')}</div>}
-          description="This key is required before SWAYA can enrich items with ratings data."
-          footerLabel="This step blocks the next one"
-          footerValue="Validate the OMDb key to continue onboarding"
+          description={t('onboarding.omdb.description') || 'This key is required before SWAYA can enrich items with ratings data.'}
+          footerLabel={t('onboarding.omdb.footerLabel') || 'This step blocks the next one'}
+          footerValue={t('onboarding.omdb.footerValue') || 'Validate the OMDb key to continue onboarding'}
         >
           <div className="onboarding-form-group">
             <label>{t('onboarding.omdb.apiKeyLabel')}</label>
@@ -171,7 +171,7 @@ export default function OmdbStep({
                 type="text" 
                 value={omdbApiKey}
                 onChange={(e) => setOmdbApiKey(e.target.value)}
-                placeholder="Enter OMDb API Key"
+                placeholder={t('onboarding.omdb.apiKeyPlaceholder') || 'Enter OMDb API Key'}
               />
             </div>
           </div>
@@ -180,7 +180,7 @@ export default function OmdbStep({
             onClick={validateOmdb}
             disabled={isValidatingApi}
           >
-            {isValidatingApi ? 'Validating...' : 'Validate Key'}
+            {isValidatingApi ? (t('onboarding.omdb.validating') || 'Validating...') : (t('onboarding.omdb.validateBtn') || 'Validate Key')}
           </Button>
           {omdbValidation.valid !== null && (
             <div className={`onboarding-validation-status ${omdbValidation.valid ? 'success' : 'error'}`}>

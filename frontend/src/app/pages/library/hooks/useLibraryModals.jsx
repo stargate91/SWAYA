@@ -3,7 +3,7 @@ import Button from '@/ui/Button';
 import AddPeopleModalContent from '../modals/add-people/AddPeopleModalContent';
 import BulkImportResolveModalContent from '../modals/BulkImportResolveModalContent';
 import CreateTagModalContent from '../modals/CreateTagModalContent';
-import { Pencil, Tag, Trash2, Users, AlertCircle } from 'lucide-react';
+import { Pencil, Tag, Trash2, Users, AlertCircle } from '@/ui/icons';
 
 export function useLibraryModals({ state, focusedTagName, setFocusedTagName, deleteTagMutation }) {
   const { openModal, closeModal, toast } = useUi();
@@ -120,7 +120,7 @@ export function useLibraryModals({ state, focusedTagName, setFocusedTagName, del
                 }
                 closeModal();
               } catch (error) {
-                toast(error?.message || 'Failed to delete tag', 'error');
+                toast(error?.message || state.t('library.tags.deleteFailed') || 'Failed to delete tag', 'error');
               }
             }}
           >

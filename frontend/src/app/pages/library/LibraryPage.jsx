@@ -6,7 +6,7 @@ import LibraryHeader from './components/LibraryHeader';
 import LibraryFilters from './components/LibraryFilters';
 import LibraryGrid from './components/LibraryGrid';
 import { useDeleteTagMutation } from '@/queries';
-import { X } from 'lucide-react';
+import { X } from '@/ui/icons';
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { isLibraryTagsTab } from '@/lib/libraryTabs';

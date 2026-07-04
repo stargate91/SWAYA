@@ -1,4 +1,4 @@
-import { FolderOpen, Video, Check, Eye, Play, BellPlus, Flame, Info } from 'lucide-react';
+import { FolderOpen, Video, Check, Eye, Play, BellPlus, Flame, Info } from '@/ui/icons';
 import Button from '@/ui/Button';
 import { formatEpisodeNumber } from '../../utils/detailUtils';
 import { useMediaDetailContext } from './MediaDetailContext';

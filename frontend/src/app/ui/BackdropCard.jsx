@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check } from 'lucide-react';
+import { Check } from '@/ui/icons';
 import './BackdropCard.css';
 
 export default function BackdropCard({

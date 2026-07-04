@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { X } from '@/ui/icons';
 import IconButton from '@/ui/IconButton';
 
 export default function SettingsChrome({ t, onClose }) {

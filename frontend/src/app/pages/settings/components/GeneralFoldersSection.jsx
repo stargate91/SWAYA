@@ -1,4 +1,4 @@
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from '@/ui/icons';
 import Card from '@/ui/Card';
 import Stack from '@/ui/Stack';
 import { useSettingsField, useSettingsFormContext, useSettingsInputRef } from '../SettingsFormContext.jsx';

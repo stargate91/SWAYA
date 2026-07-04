@@ -3,7 +3,7 @@ import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
 import { useSetPersonFieldRoutingMutation } from '@/queries';
 import { usePersonDetailQuery } from '@/queries/metadataQueries';
-import { Check } from 'lucide-react';
+import { Check } from '@/ui/icons';
 
 export default function PerformerMixerTab({ person: initialPerson }) {
   const { t } = useTranslation();
@@ -143,10 +143,10 @@ export default function PerformerMixerTab({ person: initialPerson }) {
         personId: person.id,
         routing: newRouting,
       });
-      toast('Metadata routing updated successfully!', 'success');
+      toast(t('performer.mixer.routing_updated') || 'Metadata routing updated successfully!', 'success');
     } catch (err) {
       setLocalRouting(person?.field_routing || {});
-      toast(err.message || 'Failed to update routing', 'danger');
+      toast(err.message || t('performer.mixer.routing_update_failed') || 'Failed to update routing', 'danger');
     }
   };
 

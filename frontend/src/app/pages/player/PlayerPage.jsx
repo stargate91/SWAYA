@@ -1,7 +1,7 @@
  
 import { useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { Maximize2, X, Minimize2 } from 'lucide-react';
+import { Maximize2, X, Minimize2 } from '@/ui/icons';
 import { useTranslation } from '@/providers/LanguageContext';
 import useVideoPlayer from './hooks/useVideoPlayer';
 import PlayerControlBar from './components/PlayerControlBar';
@@ -122,13 +122,13 @@ export default function PlayerPage() {
       >
         <div className="player-page__pip-drag-handle" />
         <div className="player-page__pip-overlay">
-          <button className="player-page__pip-btn" onClick={handleMinimizePip} title="Minimize Player">
+          <button className="player-page__pip-btn" onClick={handleMinimizePip}>
             <Minimize2 size={16} />
           </button>
-          <button className="player-page__pip-btn" onClick={handleTogglePip} title="Restore Fullscreen">
+          <button className="player-page__pip-btn" onClick={handleTogglePip}>
             <Maximize2 size={16} />
           </button>
-          <button className="player-page__pip-btn player-page__pip-btn--close" onClick={handleClose} title="Close Player">
+          <button className="player-page__pip-btn player-page__pip-btn--close" onClick={handleClose}>
             <X size={16} />
           </button>
         </div>

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
-import { Plus, Minus, ChevronDown, ChevronUp, X } from 'lucide-react';
+import { Plus, Minus, ChevronDown, ChevronUp, X } from '@/ui/icons';
 import DetailPageShell from './components/detail/DetailPageShell';
 import EntityDetailTopControls from './components/entityDetail/EntityDetailTopControls';
 import EntityDetailStatusSection from './components/entityDetail/EntityDetailStatusSection';

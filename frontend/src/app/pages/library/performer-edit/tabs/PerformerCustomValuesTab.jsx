@@ -210,9 +210,9 @@ export default function PerformerCustomValuesTab({ personId, person: initialPers
         fields: payload,
       });
       setInitialForm(form);
-      toast('Custom values saved successfully!', 'success');
+      toast(t('performer.custom.values_saved') || 'Custom values saved successfully!', 'success');
     } catch (err) {
-      toast(err.message || 'Failed to save custom values', 'danger');
+      toast(err.message || t('performer.custom.save_values_failed') || 'Failed to save custom values', 'danger');
     }
   };
 

@@ -2,7 +2,8 @@ import { memo, useState, useEffect } from 'react';
 import MediaCard from './MediaCard';
 import Pill from './Pill';
 import IconButton from './IconButton';
-import { Star, Check } from 'lucide-react';
+import { Star, Check } from '@/ui/icons';
+import Tooltip from './Tooltip';
 import './PosterCard.css';
 
 const PosterCard = memo(function PosterCard({
@@ -101,7 +102,9 @@ const PosterCard = memo(function PosterCard({
             {isOverlayTitle && title ? (
               <div className="ui-poster-card__title-overlay">
                 <div className="ui-poster-card__title-overlay-gradient" />
-                <div className="ui-poster-card__title-overlay-label" title={title}>{title}</div>
+                <Tooltip content={title} side="top">
+                  <div className="ui-poster-card__title-overlay-label">{title}</div>
+                </Tooltip>
               </div>
             ) : null}
             {children}
@@ -123,7 +126,11 @@ const PosterCard = memo(function PosterCard({
 
       {!isOverlayTitle && (title || subtitle || ratingImdb || ratingTmdb || ratingPorndb || ratingPill) && (
         <div className="ui-poster-card__details">
-          {title && <div className="ui-poster-card__title" title={title}>{title}</div>}
+          {title && (
+            <Tooltip content={title} side="top">
+              <div className="ui-poster-card__title">{title}</div>
+            </Tooltip>
+          )}
           {(subtitle || ratingImdb || ratingTmdb || ratingPorndb || ratingPill) && (
             <div className="ui-poster-card__subtitle-row">
               {subtitle && <div className="ui-poster-card__subtitle">{subtitle}</div>}

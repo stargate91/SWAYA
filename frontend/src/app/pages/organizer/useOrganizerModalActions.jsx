@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from 'react';
-import { FolderOpen, Play, Search, Sliders, Trash2, X, EyeOff } from 'lucide-react';
+import { FolderOpen, Play, Search, Sliders, Trash2, X, EyeOff } from '@/ui/icons';
 import { useQueryClient } from '@tanstack/react-query';
 import Button from '../../ui/Button';
 import FloatingActionBar from '../../ui/FloatingActionBar';

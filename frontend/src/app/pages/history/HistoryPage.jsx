@@ -9,7 +9,7 @@ import SegmentedControl from '@/ui/SegmentedControl';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
 import { useHistoryQuery, useUndoMutation, useScanStatusQuery, useWatchedHistoryQuery, usePlayMediaMutation, usePeaksQuery } from '@/queries';
-import { RotateCcw, AlertTriangle, Play, CheckCircle2, Clock, Tv, Film, Flame, Loader2 } from 'lucide-react';
+import { RotateCcw, AlertTriangle, Play, CheckCircle2, Clock, ENTITY_ICONS, Flame, Loader2 } from '@/ui/icons';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import HistoryCard from './components/HistoryCard';
@@ -267,7 +267,13 @@ export default function HistoryPage() {
                   />
                 ) : (
                   <div className="watched-history-card__poster-placeholder">
-                    {isSingle ? <Film size={18} /> : <Tv size={18} />}
+                    {isScene ? (
+                      <ENTITY_ICONS.episode size={18} />
+                    ) : isSingle ? (
+                      <ENTITY_ICONS.movie size={18} />
+                    ) : (
+                      <ENTITY_ICONS.tv size={18} />
+                    )}
                   </div>
                 )}
               </div>
@@ -382,8 +388,8 @@ export default function HistoryPage() {
       return (
         <div className="watched-history-page__empty-container">
           <EmptyState
-            title="No marked peak moments"
-            description="Moments you mark with the peak button during NSFW playback will be listed here."
+            title={t('historyPage.peaksEmptyTitle') || 'No marked peak moments'}
+            description={t('historyPage.peaksEmptyDesc') || 'Moments you mark with the peak button during NSFW playback will be listed here.'}
             icon={Flame}
           />
         </div>

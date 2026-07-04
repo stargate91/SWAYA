@@ -1,4 +1,4 @@
-import { Mars, User, Venus, VenusAndMars } from 'lucide-react';
+import { Mars, User, Venus, VenusAndMars } from '@/ui/icons';
 import { isTvLikeMediaType } from '@/lib/mediaTypes';
 
 export function getGenderLabel(gender, t) {

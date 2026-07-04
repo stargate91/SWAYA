@@ -1,6 +1,6 @@
 /* eslint-disable react/forbid-dom-props, react/jsx-no-literals, i18next/no-literal-string */
 import { useState } from 'react';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight } from '@/ui/icons';
 
 export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) {
   const [isHistoryExpanded, setIsHistoryExpanded] = useState(false);

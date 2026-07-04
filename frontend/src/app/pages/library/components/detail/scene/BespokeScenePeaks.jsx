@@ -1,4 +1,4 @@
-import { Flame, X } from 'lucide-react';
+import { Flame, X } from '@/ui/icons';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import { formatTime } from '../../../utils/detailUtils';
 import './BespokeScenePeaks.css';

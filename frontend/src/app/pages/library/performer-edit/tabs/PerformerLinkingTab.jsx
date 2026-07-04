@@ -18,7 +18,7 @@ import Tooltip from '@/ui/Tooltip';
 import NavButton from '@/ui/NavButton';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import Spinner from '@/ui/Spinner';
-import { Search, Link as LinkIcon, User, Trash2, GitFork, Star, ArrowLeft, AlertTriangle } from 'lucide-react';
+import { Search, Link as LinkIcon, User, Trash2, GitFork, Star, ArrowLeft, AlertTriangle } from '@/ui/icons';
 import Modal from '@/ui/Modal';
 
 const FemaleSilhouette = () => (
@@ -126,7 +126,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
       });
       toast(t('library.details.primarySourceSet') || 'Primary source updated successfully!', 'success');
     } catch (err) {
-      toast(err.message || 'Failed to set primary source', 'danger');
+      toast(err.message || t('library.details.primarySourceSetFailed') || 'Failed to set primary source', 'danger');
     }
   };
 
@@ -228,7 +228,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
         }
       }, 8000);
     } catch (err) {
-      toast(err.message || 'Failed to link source', 'danger');
+      toast(err.message || t('performer.linking.link_source_failed') || 'Failed to link source', 'danger');
       setLinkingSource(null);
       setIsWaitingForImage(false);
       showSuccessToastPendingRef.current = false;
@@ -238,11 +238,11 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
   const executeDelete = () => {
     deleteMutation.mutate(personId, {
       onSuccess: () => {
-        toast('Performer removed from database successfully.', 'success');
+        toast(t('performer.linking.performer_deleted') || 'Performer removed from database successfully.', 'success');
         navigate('/library', { replace: true });
       },
       onError: (err) => {
-        toast(err.message || 'Failed to delete performer', 'danger');
+        toast(err.message || t('performer.linking.delete_performer_failed') || 'Failed to delete performer', 'danger');
       },
       onSettled: () => {
         setShowDeleteConfirm(false);
@@ -268,7 +268,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
         },
         onError: (err) => {
           toast(
-            err.message || 'Failed to unlink source',
+            err.message || t('library.details.unlinkSourceFailed') || 'Failed to unlink source',
             'danger'
           );
         },
@@ -306,7 +306,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
               autoFocus
             />
           </div>
-          <Tooltip content={isSearching ? 'Searching...' : 'Search'} side="top">
+          <Tooltip content={isSearching ? (t('library.performerEdit.searching') || 'Searching...') : (t('library.performerEdit.search') || 'Search')} side="top">
             <IconButton
               type="submit"
               variant="secondary"

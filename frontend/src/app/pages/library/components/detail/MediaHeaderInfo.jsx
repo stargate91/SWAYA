@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Calendar, Clock, Video, Globe } from 'lucide-react';
+import { Calendar, Clock, Video, Globe } from '@/ui/icons';
 import Pill from '@/ui/Pill';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useMediaDetailContext } from './MediaDetailContext';

@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ChevronDown, ArrowUpRight, Clapperboard, Film, Tv, Users, Video, ExternalLink } from 'lucide-react';
+import { Search, ChevronDown, ArrowUpRight, Clapperboard, ExternalLink } from '@/ui/icons';
+import { ENTITY_ICONS } from '../ui/icons';
+import Tooltip from '../ui/Tooltip';
 import { useTranslation } from '@/providers/LanguageContext';
 import api from '../lib/api';
 import { useSettingsQuery } from '../queries/settingsQueries';
@@ -17,22 +19,22 @@ const SOURCES = [
 const TYPES_BY_SOURCE = {
   tmdb: [
     { id: 'all', name: 'All', icon: Clapperboard },
-    { id: 'movie', name: 'Movies', icon: Film },
-    { id: 'tv', name: 'TV Shows', icon: Tv },
-    { id: 'person', name: 'People', icon: Users },
+    { id: 'movie', name: 'Movies', icon: ENTITY_ICONS.movie },
+    { id: 'tv', name: 'TV Shows', icon: ENTITY_ICONS.tv },
+    { id: 'person', name: 'People', icon: ENTITY_ICONS.performers },
   ],
   stashdb: [
-    { id: 'scene', name: 'Scenes', icon: Video },
-    { id: 'person', name: 'Performers', icon: Users },
+    { id: 'scene', name: 'Scenes', icon: ENTITY_ICONS.episode },
+    { id: 'person', name: 'Performers', icon: ENTITY_ICONS.performers },
   ],
   fansdb: [
-    { id: 'scene', name: 'Scenes', icon: Video },
-    { id: 'person', name: 'Performers', icon: Users },
+    { id: 'scene', name: 'Scenes', icon: ENTITY_ICONS.episode },
+    { id: 'person', name: 'Performers', icon: ENTITY_ICONS.performers },
   ],
   porndb: [
-    { id: 'movie', name: 'Movies', icon: Film },
-    { id: 'scene', name: 'Scenes', icon: Video },
-    { id: 'person', name: 'Performers', icon: Users },
+    { id: 'movie', name: 'Movies', icon: ENTITY_ICONS.movie },
+    { id: 'scene', name: 'Scenes', icon: ENTITY_ICONS.episode },
+    { id: 'person', name: 'Performers', icon: ENTITY_ICONS.performers },
   ],
 };
 
@@ -209,7 +211,7 @@ export default function GlobalSearch() {
           >
             <ActiveTypeIcon className="global-search__active-icon" size={14} />
             <span className="global-search__active-label">
-              {activeTypeObj.name}
+              {t(`search.types.${activeTypeObj.id}`) || activeTypeObj.name}
             </span>
             <ChevronDown className={`global-search__chevron ${isSelectorOpen ? 'is-open' : ''}`} size={12} />
           </button>
@@ -219,7 +221,7 @@ export default function GlobalSearch() {
             <div className="global-search__dropdown">
               {/* Left Column: Sources */}
               <div className="global-search__dropdown-column global-search__dropdown-column--sources">
-                <div className="global-search__dropdown-header">{t('search.source', { defaultValue: 'Source' })}</div>
+                <div className="global-search__dropdown-header">{t('search.source') || 'Source'}</div>
                 {filteredSources.map(source => (
                   <button
                     key={source.id}
@@ -234,7 +236,7 @@ export default function GlobalSearch() {
               
               {/* Right Column: Types */}
               <div className="global-search__dropdown-column global-search__dropdown-column--types">
-                <div className="global-search__dropdown-header">{t('search.type', { defaultValue: 'Type' })}</div>
+                <div className="global-search__dropdown-header">{t('search.type') || 'Type'}</div>
                 {(TYPES_BY_SOURCE[selectedSource] || []).map(type => {
                   const TypeIcon = type.icon;
                   return (
@@ -248,7 +250,7 @@ export default function GlobalSearch() {
                       }}
                     >
                       <TypeIcon size={12} className="global-search__item-icon" />
-                      {type.name}
+                      {t(`search.types.${type.id}`) || type.name}
                     </button>
                   );
                 })}
@@ -265,25 +267,31 @@ export default function GlobalSearch() {
           <input
             type="text"
             className="global-search__input"
-            placeholder={`Search ${activeSourceObj.name === 'TMDb' ? activeTypeObj.name.toLowerCase() : activeTypeObj.name.toLowerCase() + ' on ' + activeSourceObj.name}...`}
+            placeholder={
+              selectedSource === 'tmdb'
+                ? t('search.placeholderTmdb', { type: (t(`search.types.${activeTypeObj.id}`) || activeTypeObj.name).toLowerCase() }) || `Search ${(t(`search.types.${activeTypeObj.id}`) || activeTypeObj.name).toLowerCase()}...`
+                : t('search.placeholderPattern', { type: (t(`search.types.${activeTypeObj.id}`) || activeTypeObj.name).toLowerCase(), source: activeSourceObj.name }) || `Search ${(t(`search.types.${activeTypeObj.id}`) || activeTypeObj.name).toLowerCase()} on ${activeSourceObj.name}...`
+            }
             value={query}
             onChange={handleInputChange}
             onFocus={() => query.trim().length >= 2 && setIsOverlayOpen(true)}
             onKeyDown={handleKeyDown}
           />
           {query.trim() && (
-            <button
-              type="button"
-              className="global-search__more-btn"
-              onClick={() => {
-                setIsOverlayOpen(false);
-                navigate(`/search?q=${encodeURIComponent(query.trim())}&source=${selectedSource}&type=${selectedType}`);
-                setQuery('');
-              }}
-              title="Advanced Search / Bővebb keresés"
-            >
-              <ExternalLink size={12} />
-            </button>
+            <Tooltip content={t('common.advancedSearch') || 'Advanced Search'} side="bottom">
+              <button
+                type="button"
+                className="global-search__more-btn"
+                onClick={() => {
+                  setIsOverlayOpen(false);
+                  navigate(`/search?q=${encodeURIComponent(query.trim())}&source=${selectedSource}&type=${selectedType}`);
+                  setQuery('');
+                }}
+                title={null}
+              >
+                <ExternalLink size={12} />
+              </button>
+            </Tooltip>
           )}
         </div>
       </div>
@@ -296,11 +304,11 @@ export default function GlobalSearch() {
               Object.entries(groupedResults).map(([type, items], groupIdx) => {
                 if (items.length === 0) return null;
                 const groupTitles = {
-                  movie: 'Movies',
-                  tv: 'TV Shows',
-                  person: selectedSource === 'tmdb' ? 'People' : 'Performers',
-                  scene: 'Scenes',
-                  other: 'Other'
+                  movie: t('library.tabs.movies') || 'Movies',
+                  tv: t('library.tabs.tv') || 'TV Shows',
+                  person: selectedSource === 'tmdb' ? (t('library.tabs.people') || 'People') : (t('library.tabs.performers') || 'Performers'),
+                  scene: t('library.tabs.scenes') || 'Scenes',
+                  other: t('common.other') || 'Other'
                 };
                 const activeGroupTypeObj = (TYPES_BY_SOURCE[selectedSource] || []).find(t => t.id === type) || { icon: Clapperboard };
                 const GroupTypeIcon = activeGroupTypeObj.icon;

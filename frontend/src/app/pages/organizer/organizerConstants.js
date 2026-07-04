@@ -1,4 +1,4 @@
-import { Eye, Clapperboard, Video, Tv, FolderPlus, PlayCircle, Captions, Volume2, Image, Info } from 'lucide-react';
+import { Eye, Clapperboard, Video, Tv, FolderPlus, PlayCircle, Captions, Volume2, Image, Info } from '@/ui/icons';
 
 export const MAIN_TABS = [
   { value: 'manual', labelKey: 'organizer.tabs.manual', icon: Eye, tone: 'warning' },

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown } from '@/ui/icons';
 import Pill from '@/ui/Pill';
 import { useAllTagsQuery, useCreateTagMutation } from '@/queries';
 import { useMediaDetailContext } from '../MediaDetailContext';

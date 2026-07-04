@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { ImageOff } from 'lucide-react';
+import { ImageOff } from '@/ui/icons';
 import { useFullMetadataQuery, usePersonDetailQuery, useLibraryCollectionDetailQuery } from '@/queries/metadataQueries';
 import { useTranslation } from '@/providers/LanguageContext';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';

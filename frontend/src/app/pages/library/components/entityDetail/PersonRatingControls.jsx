@@ -1,5 +1,5 @@
 import Pill from '@/ui/Pill';
-import { Check, Heart, Minus, PenLine, Plus, Star } from 'lucide-react';
+import { Check, Heart, Minus, PenLine, Plus, Star } from '@/ui/icons';
 import './PersonRatingControls.css';
 
 export default function PersonRatingControls({

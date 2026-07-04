@@ -44,5 +44,7 @@
   "empty_list_desc": "This list has no items yet.",
   "import_title": "Import List",
   "import_invalid_format": "Invalid list format: \"name\" is required.",
-  "import_failed": "Failed to import list: "
+  "import_failed": "Failed to import list: ",
+  "item_removed_success": "Item removed from list",
+  "remove_item_failed": "Failed to remove item"
 }

@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
-import { Check, ChevronLeft, ChevronRight, Star, Plus, Minus } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Star, Plus, Minus } from '@/ui/icons';
 import { useUi } from '../../../providers/UiProvider';
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
 import {

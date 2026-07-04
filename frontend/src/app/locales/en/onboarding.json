@@ -2,13 +2,42 @@
   "welcome": {
     "options": "options",
     "englishOnlyActiveNote": "English is available now. More languages are staged next.",
-    "comingSoon": "Soon"
+    "comingSoon": "Soon",
+    "kicker": "Getting started",
+    "heroTitle": "A few quick steps and you are ready.",
+    "heroDesc": "You can revisit everything later in Settings.",
+    "step1Title": "Step 1 of 6",
+    "step1Desc": "After this, we move on to metadata access and library folders.",
+    "appWideTitle": "One setup, app-wide",
+    "appWideDesc": "These preferences shape how SWAYA behaves across the rest of the app.",
+    "eyebrow": "Step 1",
+    "title": "Choose your interface language",
+    "description": "Select your interface language to begin setup.",
+    "footerLabel": "Current selection",
+    "searchPlaceholder": "Search languages..."
   },
   "choice": {
     "configureNewSetup": "Configure New Setup",
     "configureNewSetupDesc": "Start fresh and let us guide you step-by-step through setting up TMDb, OMDb, and your media folder paths.",
     "importBackupProfile": "Import Backup Profile",
-    "importBackupProfileDesc": "Instantly load your settings from an existing SWAYA backup file."
+    "importBackupProfileDesc": "Instantly load your settings from an existing SWAYA backup file.",
+    "kicker": "Setup path",
+    "heroTitle": "Choose how you want to begin.",
+    "heroDesc": "Start from scratch or bring in a saved profile.",
+    "step2Title": "Step 2 of 6",
+    "step2Desc": "This decides whether the next steps build a fresh setup or use an existing one.",
+    "flexibleTitle": "Flexible either way",
+    "flexibleDesc": "You can keep going manually or jump ahead by importing a backup file.",
+    "eyebrow": "Step 2",
+    "title": "How would you like to continue?",
+    "freshSetup": "Fresh setup",
+    "importProfile": "Import profile",
+    "description": "Pick the setup path that fits how you want to configure SWAYA.",
+    "footerLabel": "Current mode",
+    "configScratch": "Configure from scratch",
+    "importBackup": "Import from backup",
+    "importingSettings": "Importing settings...",
+    "browseJson": "Click to Browse JSON"
   },
   "tmdb": {
     "requiredToContinue": "Required to get started",
@@ -19,14 +48,31 @@
     "openApiPage": "Open TMDb API page",
     "twoFieldsRequired": "2 fields required",
     "apiKeyLabel": "TMDb API Key (v3)",
-    "readAccessTokenLabel": "TMDb Read Access Token (v4)"
+    "readAccessTokenLabel": "TMDb Read Access Token (v4)",
+    "eyebrow": "TMDB credentials",
+    "title": "Paste your TMDB keys to unlock scanning",
+    "description": "Both values are required before SWAYA can move past this step.",
+    "footerLabel": "This step blocks the next one",
+    "footerValue": "Validate both keys to continue onboarding",
+    "apiKeyPlaceholder": "Enter TMDB API Key",
+    "bearerTokenPlaceholder": "Enter TMDB bearer token",
+    "validating": "Validating...",
+    "validateBtn": "Validate Credentials"
   },
   "omdb": {
     "optionalButRecommended": "Optional but highly recommended",
     "optionalButRecommendedDesc": "A free OMDb API key lets you pull IMDb ratings and Rotten Tomatoes scores automatically.",
     "getOmdbKey": "Get an OMDb key",
     "oneFieldRequired": "1 field required",
-    "apiKeyLabel": "OMDb API Key"
+    "apiKeyLabel": "OMDb API Key",
+    "eyebrow": "OMDb key",
+    "title": "Paste your OMDb key to unlock ratings",
+    "description": "This key is required before SWAYA can enrich items with ratings data.",
+    "footerLabel": "This step blocks the next one",
+    "footerValue": "Validate the OMDb key to continue onboarding",
+    "apiKeyPlaceholder": "Enter OMDb API Key",
+    "validating": "Validating...",
+    "validateBtn": "Validate Key"
   },
   "completion": {
     "title": "Setup Complete!",
@@ -36,7 +82,23 @@
     "pathsRequired": "Paths required",
     "scanSourceDirectory": "Scan Source Directory (Optional)",
     "browse": "Browse",
-    "targetLibraryDirectory": "Target Library Directory"
+    "targetLibraryDirectory": "Target Library Directory",
+    "kicker": "Library paths",
+    "heroTitle": "Choose where SWAYA should work.",
+    "heroDesc": "Set the source folder SWAYA watches and, if you want, the clean library destination it should build into.",
+    "step5Title": "Step 5 of 6",
+    "step5Desc": "This tells SWAYA where your unorganized files live and where finished media can go.",
+    "validateTitle": "Validate before continuing",
+    "validateDesc": "SWAYA checks the folders now so the first scan does not fail later.",
+    "eyebrow": "Step 5",
+    "title": "Set your library folders",
+    "description": "Pick the folders SWAYA should read from and organize into.",
+    "footerLabel": "Required to continue",
+    "footerValue": "Validate the folder setup first",
+    "scanPlaceholder": "Select source folder (optional)",
+    "targetPlaceholder": "Select target library folder",
+    "validating": "Validating...",
+    "validateBtn": "Validate Folders"
   },
   "tmdbGuide": {
     "requiredOneTimeSetup": "Required one-time setup",
@@ -65,5 +127,22 @@
     "continue": "Continue",
     "saving": "Saving...",
     "finishSetup": "Finish Setup"
+  },
+  "toasts": {
+    "tmdbVerified": "TMDB credentials successfully verified.",
+    "verificationFailed": "Verification failed.",
+    "tmdbVerificationFailed": "TMDB credentials verification failed.",
+    "connectionError": "Connection error during validation.",
+    "validationServerFailed": "Failed to connect to validation server.",
+    "omdbKeyRequired": "OMDB API Key is required.",
+    "omdbVerified": "OMDB API Key successfully verified.",
+    "omdbVerificationFailed": "OMDB verification failed.",
+    "targetFolderRequired": "Target library folder is required.",
+    "foldersReady": "Folders validated and ready.",
+    "folderValid": "Folder configuration is valid.",
+    "validationFailed": "Validation failed.",
+    "folderValidationFailed": "Folder validation failed.",
+    "onboardingCompleted": "Onboarding completed! Welcome to SWAYA.",
+    "saveConfigFailed": "Failed to save configuration settings."
   }
 }

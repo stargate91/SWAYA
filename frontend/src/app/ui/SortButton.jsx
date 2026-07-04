@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp } from '@/ui/icons';
 import './SortButton.css';
 
 export default function SortButton({

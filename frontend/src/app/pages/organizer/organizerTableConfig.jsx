@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight } from '@/ui/icons';
 import Checkbox from '../../ui/Checkbox';
 import Pill from '../../ui/Pill';
 import Tooltip from '../../ui/Tooltip';

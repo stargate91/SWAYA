@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search } from 'lucide-react';
+import { Search } from '@/ui/icons';
 import { compareOrganizerValues } from './organizerMappers';
 import Input from '../../ui/Input';
 import SortButton from '../../ui/SortButton';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, UserPlus, Plus } from 'lucide-react';
+import { Search, UserPlus, Plus } from '@/ui/icons';
 import { Tabs } from '@/ui/Tabs';
 import Input from '@/ui/Input';
 import Button from '@/ui/Button';

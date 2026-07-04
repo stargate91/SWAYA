@@ -1,11 +1,22 @@
 import { countEpisodesInNumber } from '../../../utils/detailUtils';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import Pill from '@/ui/Pill';
+import Tooltip from '@/ui/Tooltip';
 import { buildTmdbImageUrl, resolveMediaImageUrl, TMDB_IMAGE_SIZES } from '@/lib/imageUrls';
 import './PanelsCommon.css';
 import './DetailsPanel.css';
 
-
+function SpecCard({ label, value, className = '' }) {
+  if (!value) return null;
+  return (
+    <div className={`specs-card ${className}`}>
+      <Tooltip content={String(value)} side="top">
+        <span className="specs-card__label">{label}</span>
+        <span className="specs-card__value">{value}</span>
+      </Tooltip>
+    </div>
+  );
+}
 
 export default function DetailsPanel() {
   const { state, t } = useMediaDetailContext();
@@ -14,79 +25,28 @@ export default function DetailsPanel() {
     isMovie
   } = state;
 
-  const isSceneType = item?.type === 'scene';
-  const hasImdb = !isSceneType && item?.rating_imdb != null && Number(item.rating_imdb) > 0;
-  const hasTmdb = !isSceneType && item?.rating_tmdb != null && Number(item.rating_tmdb) > 0;
-  const hasRotten = !isSceneType && item?.rating_rotten != null && item?.rating_rotten !== '';
-  const hasMeta = !isSceneType && item?.rating_meta != null && Number(item.rating_meta) > 0;
-
-  const ratings = [];
-  if (hasImdb) {
-    ratings.push({
-      id: 'imdb',
-      logo: '/rating/imdb.png',
-      alt: 'IMDb',
-      value: `${item.rating_imdb.toFixed(1)}/10`
-    });
-  }
-  if (hasTmdb) {
-    ratings.push({
-      id: 'tmdb',
-      logo: '/rating/tmdb.png',
-      alt: 'TMDb',
-      value: `${item.rating_tmdb.toFixed(1)}/10`
-    });
-  }
-  if (hasRotten) {
-    ratings.push({
-      id: 'rotten',
-      logo: '/rating/rottan_tomatoes.png',
-      alt: 'Rotten Tomatoes',
-      value: item.rating_rotten
-    });
-  }
-  if (hasMeta) {
-    ratings.push({
-      id: 'meta',
-      logo: '/rating/metacritic.png',
-      alt: 'Metacritic',
-      value: `${item.rating_meta}/100`
-    });
-  }
-
-  const hasPorndb = item?.rating_porndb != null && Number(item.rating_porndb) > 0;
-  if (hasPorndb) {
-    ratings.push({
-      id: 'porndb',
-      logo: '/rating/theporndb.png',
-      alt: 'ThePornDB',
-      value: `${item.rating_porndb.toFixed(1)}/10`
-    });
-  }
-
-  const formatCurrency = (num) => {
-    if (num === undefined || num === null || num === 0) return '-';
+  const isSceneType = item?.type === 'scene' || item?.media_type === 'scene';
+  const formatCurrency = (val) => {
+    if (!val) return '';
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
-      maximumFractionDigits: 0
-    }).format(num);
+      maximumFractionDigits: 0,
+    }).format(val);
   };
 
-  const hasBoxOffice = isMovie && !!((item.budget && item.budget > 0) || (item.revenue && item.revenue > 0));
+  const hasBoxOffice = isMovie && ((item.budget && item.budget > 0) || (item.revenue && item.revenue > 0));
 
-  const companies = item.companies || [];
-  const networks = item.networks || [];
+  const companies = item?.companies || [];
+  const networks = item?.networks || [];
 
-  const nonSpecialSeasons = !isMovie && Array.isArray(item?.seasons)
-    ? item.seasons.filter(s => s.season_number !== 0)
-    : [];
-  const derivedSeasonCount = nonSpecialSeasons.length;
-  const derivedEpisodeCount = nonSpecialSeasons.reduce((acc, s) => {
-    if (s.episodes && s.episodes.length > 0) {
-      return acc + s.episodes.reduce((sum, ep) => sum + countEpisodesInNumber(ep.episode_number), 0);
+  const derivedSeasonCount = countEpisodesInNumber(item?.seasons || []);
+  const derivedEpisodeCount = (item?.seasons || []).reduce((acc, s) => {
+    if (s && s.episodes) {
+      return acc + (s.episodes.length || 0);
+    } else {
+      return acc + (s.episode_count || 0);
     }
-    return acc + 0;
   }, 0);
   const seasonCount = Number(item?.number_of_seasons ?? 0) || derivedSeasonCount;
   const episodeCount = Number(item?.number_of_episodes ?? 0) || derivedEpisodeCount;
@@ -101,19 +61,10 @@ export default function DetailsPanel() {
             {t('library.details.tvInfo') || 'Tv Info'}
           </h4>
           <div className="specs-grid">
-            <div className="specs-card specs-card--tall">
-              <span className="specs-card__label">{t('library.details.seasons') || 'Seasons'}</span>
-              <span className="specs-card__value" title={seasonCount}>{seasonCount}</span>
-            </div>
-            <div className="specs-card specs-card--tall">
-              <span className="specs-card__label">{t('library.details.episodes') || 'Episodes'}</span>
-              <span className="specs-card__value" title={episodeCount}>{episodeCount}</span>
-            </div>
+            <SpecCard className="specs-card--tall" label={t('library.details.seasons') || 'Seasons'} value={seasonCount} />
+            <SpecCard className="specs-card--tall" label={t('library.details.episodes') || 'Episodes'} value={episodeCount} />
             {tvStatus && (
-              <div className="specs-card specs-card--tall specs-card--span-2">
-                <span className="specs-card__label">{t('library.details.status') || 'Status'}</span>
-                <span className="specs-card__value" title={tvStatus}>{tvStatus}</span>
-              </div>
+              <SpecCard className="specs-card--tall specs-card--span-2" label={t('library.details.status') || 'Status'} value={tvStatus} />
             )}
           </div>
         </div>
@@ -128,17 +79,13 @@ export default function DetailsPanel() {
             {item.budget > 0 && (
               <div className="specs-card">
                 <span className="specs-card__label">{t('library.details.budget') || 'Budget'}</span>
-                <span className="specs-card__value" title={formatCurrency(item.budget)}>
-                  {formatCurrency(item.budget)}
-                </span>
+                <span className="specs-card__value" title={formatCurrency(item.budget)}>{formatCurrency(item.budget)}</span>
               </div>
             )}
             {item.revenue > 0 && (
               <div className="specs-card">
                 <span className="specs-card__label">{t('library.details.revenue') || 'Revenue'}</span>
-                <span className="specs-card__value" title={formatCurrency(item.revenue)}>
-                  {formatCurrency(item.revenue)}
-                </span>
+                <span className="specs-card__value" title={formatCurrency(item.revenue)}>{formatCurrency(item.revenue)}</span>
               </div>
             )}
             {item.budget > 0 && item.revenue > 0 && (
@@ -169,23 +116,21 @@ export default function DetailsPanel() {
                   : buildTmdbImageUrl(it.logo_path, TMDB_IMAGE_SIZES.posterThumb)
                 : null;
               return (
-                <div
-                  key={idx}
-                  className="specs-card specs-card--company"
-                  title={it.name}
-                >
-                  {logoUrl && (
-                    <img
-                      src={logoUrl}
-                      alt={it.name}
-                      className="specs-card__company-logo"
-                    />
-                  )}
-                  {!logoUrl && (
-                    <span className="specs-card__company-text">
-                      {it.name}
-                    </span>
-                  )}
+                <div key={idx} className="specs-card specs-card--company">
+                  <Tooltip content={it.name} side="top">
+                    {logoUrl && (
+                      <img
+                        src={logoUrl}
+                        alt={it.name}
+                        className="specs-card__company-logo"
+                      />
+                    )}
+                    {!logoUrl && (
+                      <span className="specs-card__company-text">
+                        {it.name}
+                      </span>
+                    )}
+                  </Tooltip>
                 </div>
               );
             })}
@@ -206,33 +151,27 @@ export default function DetailsPanel() {
                   : buildTmdbImageUrl(it.logo_path, TMDB_IMAGE_SIZES.posterThumb)
                 : null;
               return (
-                <div
-                  key={idx}
-                  className="specs-card specs-card--company"
-                  title={it.name}
-                >
-                  {logoUrl && (
-                    <img
-                      src={logoUrl}
-                      alt={it.name}
-                      className="specs-card__company-logo"
-                    />
-                  )}
-                  {!logoUrl && (
-                    <span className="specs-card__company-text">
-                      {it.name}
-                    </span>
-                  )}
+                <div key={idx} className="specs-card specs-card--company">
+                  <Tooltip content={it.name} side="top">
+                    {logoUrl && (
+                      <img
+                        src={logoUrl}
+                        alt={it.name}
+                        className="specs-card__company-logo"
+                      />
+                    )}
+                    {!logoUrl && (
+                      <span className="specs-card__company-text">
+                        {it.name}
+                      </span>
+                    )}
+                  </Tooltip>
                 </div>
               );
             })}
           </div>
         </div>
       )}
-
-
-
-
 
       {Array.isArray(item?.keywords) && item.keywords.filter(Boolean).length > 0 && (
         <div className="details-panel__section">
@@ -249,11 +188,9 @@ export default function DetailsPanel() {
                 {keyword}
               </Pill>
             ))}
-
           </div>
         </div>
       )}
     </div>
-
   );
 }

@@ -6,7 +6,7 @@ import { getInitialFormValues } from '../settingsFormValues.js';
 import { isSettingsDirty } from '../settingsMapper.js';
 import Button from '@/ui/Button';
 import Checkbox from '@/ui/Checkbox';
-import { Info } from 'lucide-react';
+import { Info } from '@/ui/icons';
 
 export default function useSettingsPersistence({
   t,

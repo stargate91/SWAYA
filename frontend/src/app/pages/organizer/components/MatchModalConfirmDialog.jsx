@@ -1,4 +1,4 @@
-import { HelpCircle } from 'lucide-react';
+import { HelpCircle } from '@/ui/icons';
 import Button from '../../../ui/Button';
 import Checkbox from '../../../ui/Checkbox';
 

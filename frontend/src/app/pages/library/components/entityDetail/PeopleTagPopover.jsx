@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, Plus, Tag } from 'lucide-react';
+import { ChevronDown, Plus, Tag } from '@/ui/icons';
 import Pill from '@/ui/Pill';
 import { useAllTagsQuery, useCreateTagMutation } from '@/queries';
 import '../detail/panels/TagsPanel.css';

@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight } from '@/ui/icons';
 import { SETTINGS_TAB_GROUP_IDS } from '../settingsConstants.js';
 
 export default function SettingsSidebar({

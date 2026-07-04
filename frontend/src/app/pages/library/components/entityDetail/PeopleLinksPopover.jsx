@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Globe } from 'lucide-react';
+import { Globe } from '@/ui/icons';
 import './PeopleLinksPopover.css';
 
 export default function PeopleLinksPopover({ extraLinks, t }) {

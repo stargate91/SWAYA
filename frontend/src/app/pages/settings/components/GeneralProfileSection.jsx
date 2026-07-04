@@ -1,5 +1,5 @@
 ﻿import { useRef, useState } from 'react';
-import { Upload, UserRound } from 'lucide-react';
+import { Upload, UserRound } from '@/ui/icons';
 import api from '@/lib/api';
 import { API_BASE } from '@/lib/backend';
 import Button from '@/ui/Button';

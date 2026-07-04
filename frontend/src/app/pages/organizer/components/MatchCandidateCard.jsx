@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Clapperboard } from 'lucide-react';
+import { ENTITY_ICONS } from '@/ui/icons';
 import Badge from '@/ui/Badge';
 import MetaRow from '@/ui/MetaRow';
 import PosterCard from '@/ui/PosterCard';
@@ -103,7 +103,7 @@ export default function MatchCandidateCard({
         className={`organizer-match-modal__poster-card${mediaType === 'scene' ? ' is-scene' : ''}`}
         active={candidate.is_active}
         imageUrl={posterUrl}
-        icon={Clapperboard}
+        icon={mediaType === 'tv' ? ENTITY_ICONS.tv : (mediaType === 'scene' ? ENTITY_ICONS.episode : ENTITY_ICONS.movie)}
         onClick={() => onSelect(candidate)}
         disabled={isDisabled}
         title={displayTitle}
@@ -151,7 +151,7 @@ export default function MatchCandidateCard({
           />
         ) : (
           <div className="organizer-match-modal__poster-placeholder">
-            <Clapperboard size={18} />
+            {mediaType === 'tv' ? <ENTITY_ICONS.tv size={18} /> : (mediaType === 'scene' ? <ENTITY_ICONS.episode size={18} /> : <ENTITY_ICONS.movie size={18} />)}
           </div>
         )}
       </div>

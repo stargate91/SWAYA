@@ -4,7 +4,7 @@ import Input from '@/ui/Input';
 import Spinner from '@/ui/Spinner';
 import EmptyState from '@/ui/EmptyState';
 import Dropdown from '@/ui/Dropdown';
-import { Search } from 'lucide-react';
+import { Search } from '@/ui/icons';
 import ActivationButton from './ActivationButton';
 
 const QUESTION_MARK = '?';

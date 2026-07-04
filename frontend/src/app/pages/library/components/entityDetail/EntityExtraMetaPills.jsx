@@ -1,5 +1,5 @@
  
-import { Ruler, Globe, Eye, Palette, Brush, Gem } from 'lucide-react';
+import { Ruler, Globe, Eye, Palette, Brush, Gem } from '@/ui/icons';
 import Pill from '@/ui/Pill';
 
 const toTitleCase = (str) => {

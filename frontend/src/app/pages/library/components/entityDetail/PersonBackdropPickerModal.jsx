@@ -1,6 +1,7 @@
  
 import { useRef } from 'react';
-import { ImageOff, Film, Tv } from 'lucide-react';
+import { ImageOff, ENTITY_ICONS } from '@/ui/icons';
+import Tooltip from '@/ui/Tooltip';
 import EmptyState from '@/ui/EmptyState';
 import SegmentedControl from '@/ui/SegmentedControl';
 import BackdropCard from '@/ui/BackdropCard';
@@ -220,14 +221,16 @@ export default function PersonBackdropPickerModal({
                       <img src={posterUrl} alt={credit.title} className="person-backdrop-picker__credit-poster" />
                     ) : (
                       <div className="person-backdrop-picker__credit-poster person-backdrop-picker__credit-poster--placeholder">
-                        {isTv ? <Tv size={24} /> : <Film size={24} />}
+                        {isTv ? <ENTITY_ICONS.tv size={24} /> : <ENTITY_ICONS.movie size={24} />}
                       </div>
                     )}
                   </div>
                   <div className="person-backdrop-picker__credit-info">
-                    <div className="person-backdrop-picker__credit-title" title={credit.title}>
-                      {credit.title}
-                    </div>
+                    <Tooltip content={credit.title} side="top">
+                      <div className="person-backdrop-picker__credit-title">
+                        {credit.title}
+                      </div>
+                    </Tooltip>
                     <div className="person-backdrop-picker__credit-meta">
                       {credit.year ? <span>{credit.year}</span> : (credit.release_date && <span>{credit.release_date.split('-')[0]}</span>)}
                     </div>

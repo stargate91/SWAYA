@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Database, Inbox } from 'lucide-react';
+import { Database, Inbox } from '@/ui/icons';
 
 export function useOrganizerViewModel({
   organizerItemCount,

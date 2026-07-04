@@ -355,3 +355,12 @@ button.ui-poster-card__image-wrapper:hover:not(:disabled) {
 .ui-poster-card--overlay-title {
   gap: 0;
 }
+
+.ui-poster-card__details .ui-tooltip,
+.ui-poster-card__title-overlay .ui-tooltip {
+  display: block;
+}
+
+.ui-poster-card__title-overlay-label {
+  pointer-events: auto;
+}

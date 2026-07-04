@@ -1,5 +1,6 @@
 /* eslint-disable react/forbid-dom-props */
 import { resolveMediaImageUrl, buildTmdbImageUrl, TMDB_IMAGE_SIZES } from '@/lib/imageUrls';
+import Tooltip from '@/ui/Tooltip';
 
 export default function BespokeDetailsSection({ item, t }) {
   const isSceneType = item?.type === 'scene';
@@ -36,8 +37,10 @@ export default function BespokeDetailsSection({ item, t }) {
           <div className="dashboard-ratings-grid">
             {ratings.map(rating => (
               <div key={rating.id} className="dashboard-rating-box">
-                <img src={rating.logo} alt={rating.alt} className="dashboard-rating-box__logo" />
-                <span className="dashboard-rating-box__value">{rating.value}</span>
+                <Tooltip content={rating.alt} side="top">
+                  <img src={rating.logo} alt={rating.alt} className="dashboard-rating-box__logo" />
+                  <span className="dashboard-rating-box__value">{rating.value}</span>
+                </Tooltip>
               </div>
             ))}
           </div>
@@ -49,14 +52,18 @@ export default function BespokeDetailsSection({ item, t }) {
         <div className="dashboard-metadata-grid">
           {item.release_date && (
             <div className="dashboard-metadata-card">
-              <span className="dashboard-metadata-card__label">{t('library.details.releaseDate') || 'Release Date'}</span>
-              <span className="dashboard-metadata-card__value">{item.release_date}</span>
+              <Tooltip content={item.release_date} side="top">
+                <span className="dashboard-metadata-card__label">{t('library.details.releaseDate') || 'Release Date'}</span>
+                <span className="dashboard-metadata-card__value">{item.release_date}</span>
+              </Tooltip>
             </div>
           )}
           {item.release_status && (
             <div className="dashboard-metadata-card">
-              <span className="dashboard-metadata-card__label">{t('library.details.status') || 'Status'}</span>
-              <span className="dashboard-metadata-card__value">{item.release_status}</span>
+              <Tooltip content={item.release_status} side="top">
+                <span className="dashboard-metadata-card__label">{t('library.details.status') || 'Status'}</span>
+                <span className="dashboard-metadata-card__value">{item.release_status}</span>
+              </Tooltip>
             </div>
           )}
           {item.budget > 0 && (
@@ -96,8 +103,10 @@ export default function BespokeDetailsSection({ item, t }) {
                 : null;
               if (!logoUrl) return null;
               return (
-                <div key={it.id} className="dashboard-studio-logo" title={it.name}>
-                  <img src={logoUrl} alt={it.name} />
+                <div key={it.id} className="dashboard-studio-logo">
+                  <Tooltip content={it.name} side="top">
+                    <img src={logoUrl} alt={it.name} />
+                  </Tooltip>
                 </div>
               );
             })}

@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { CircleHelp, Power, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CircleHelp, Power, ChevronLeft, ChevronRight } from '@/ui/icons';
 import UtilityButton from '../ui/UtilityButton';
 import Tooltip from '../ui/Tooltip';
 import { useSidebar } from './useSidebar';

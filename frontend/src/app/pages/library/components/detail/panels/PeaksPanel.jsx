@@ -1,4 +1,4 @@
-import { Trash2, Flame } from 'lucide-react';
+import { Trash2, Flame } from '@/ui/icons';
 import { formatTime } from '../../../utils/detailUtils';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import Pill from '@/ui/Pill';

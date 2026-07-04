@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react';
+import { Check } from '@/ui/icons';
 import { useSettingsViewContext, useSettingsField } from '../SettingsFormContext.jsx';
 import Card from '@/ui/Card';
 import SelectableCard from '@/ui/SelectableCard';

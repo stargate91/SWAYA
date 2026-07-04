@@ -1,5 +1,5 @@
 ﻿import { useRef, useState } from 'react';
-import { Link2, Upload } from 'lucide-react';
+import { Link2, Upload } from '@/ui/icons';
 import Input from '@/ui/Input';
 import './UniversalImagePickerModal.css';
 

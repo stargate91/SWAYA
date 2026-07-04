@@ -1,5 +1,5 @@
 import NavButton from '@/ui/NavButton';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight } from '@/ui/icons';
 import './OnboardingWizard.css';
 import { useTranslation } from '@/providers/LanguageContext';
 

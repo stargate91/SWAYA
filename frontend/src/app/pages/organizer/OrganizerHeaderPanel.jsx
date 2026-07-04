@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react';
+import { Search } from '@/ui/icons';
 import { Tabs } from '../../ui/Tabs';
 import Input from '../../ui/Input';
 

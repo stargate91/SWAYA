@@ -1,4 +1,4 @@
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle } from '@/ui/icons';
 import { useTranslation } from '@/providers/LanguageContext';
 
 export default function CompletionStep() {

@@ -1,4 +1,4 @@
-import { FolderOpen, CheckCircle } from 'lucide-react';
+import { FolderOpen, CheckCircle } from '@/ui/icons';
 import Button from '@/ui/Button';
 import OnboardingInfoCard from '../OnboardingInfoCard';
 import OnboardingPanelCard from '../OnboardingPanelCard';
@@ -31,30 +31,30 @@ export default function FolderStep({
             ]}
           />
         )}
-        kicker="Library paths"
-        title="Choose where SWAYA should work."
-        description="Set the source folder SWAYA watches and, if you want, the clean library destination it should build into."
+        kicker={t('onboarding.folder.kicker') || 'Library paths'}
+        title={t('onboarding.folder.heroTitle') || 'Choose where SWAYA should work.'}
+        description={t('onboarding.folder.heroDesc') || 'Set the source folder SWAYA watches and, if you want, the clean library destination it should build into.'}
         items={[
           {
             icon: FolderOpen,
-            title: 'Step 5 of 6',
-            description: 'This tells SWAYA where your unorganized files live and where finished media can go.',
+            title: t('onboarding.folder.step5Title') || 'Step 5 of 6',
+            description: t('onboarding.folder.step5Desc') || 'This tells SWAYA where your unorganized files live and where finished media can go.',
           },
           {
             icon: CheckCircle,
-            title: 'Validate before continuing',
-            description: 'SWAYA checks the folders now so the first scan does not fail later.',
+            title: t('onboarding.folder.validateTitle') || 'Validate before continuing',
+            description: t('onboarding.folder.validateDesc') || 'SWAYA checks the folders now so the first scan does not fail later.',
           },
         ]}
       />
 
       <OnboardingPanelCard
-        eyebrow="Step 5"
-        title="Set your library folders"
+        eyebrow={t('onboarding.folder.eyebrow') || 'Step 5'}
+        title={t('onboarding.folder.title') || 'Set your library folders'}
         meta={<div className="welcome-lang-pill">{t('onboarding.folder.pathsRequired')}</div>}
-        description="Pick the folders SWAYA should read from and organize into."
-        footerLabel="Required to continue"
-        footerValue="Validate the folder setup first"
+        description={t('onboarding.folder.description') || 'Pick the folders SWAYA should read from and organize into.'}
+        footerLabel={t('onboarding.folder.footerLabel') || 'Required to continue'}
+        footerValue={t('onboarding.folder.footerValue') || 'Validate the folder setup first'}
       >
         <div className="onboarding-form-group">
           <label>{t('onboarding.folder.scanSourceDirectory')}</label>
@@ -63,7 +63,7 @@ export default function FolderStep({
               type="text" 
               value={scanDir}
               onChange={(e) => setScanDir(e.target.value)}
-              placeholder="Select source folder (optional)"
+              placeholder={t('onboarding.folder.scanPlaceholder') || 'Select source folder (optional)'}
             />
             <Button variant="secondary" onClick={pickScanDir}>{t('onboarding.folder.browse')}</Button>
           </div>
@@ -75,7 +75,7 @@ export default function FolderStep({
               type="text" 
               value={libraryPath}
               onChange={(e) => setLibraryPath(e.target.value)}
-              placeholder="Select target library folder"
+              placeholder={t('onboarding.folder.targetPlaceholder') || 'Select target library folder'}
             />
             <Button variant="secondary" onClick={pickLibraryPath}>{t('onboarding.folder.browse')}</Button>
           </div>
@@ -85,7 +85,7 @@ export default function FolderStep({
           onClick={validateDirs}
           disabled={isValidatingFolders}
         >
-          {isValidatingFolders ? 'Validating...' : 'Validate Folders'}
+          {isValidatingFolders ? (t('onboarding.folder.validating') || 'Validating...') : (t('onboarding.folder.validateBtn') || 'Validate Folders')}
         </Button>
         {folderValidation.valid !== null && (
           <div className={`onboarding-validation-status ${folderValidation.valid ? 'success' : 'error'}`}>

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { ArrowUp, ArrowDown, GripVertical } from 'lucide-react';
+import { ArrowUp, ArrowDown, GripVertical } from '@/ui/icons';
 import Dropdown from '../../../ui/Dropdown';
 import Input from '../../../ui/Input';
 import SelectableCard from '../../../ui/SelectableCard';

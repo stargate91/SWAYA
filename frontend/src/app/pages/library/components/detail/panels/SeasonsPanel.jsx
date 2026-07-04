@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { ChevronDown, ChevronRight, ChevronLeft, Check, Eye, Play, Clapperboard, Calendar, Tv, Star, Flame, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronRight, ChevronLeft, Check, Eye, Play, Clapperboard, Calendar, Tv, Star, Flame, Trash2 } from '@/ui/icons';
 import IconButton from '@/ui/IconButton';
 import Pill from '@/ui/Pill';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
@@ -216,7 +216,7 @@ export default function SeasonsPanel() {
             onClick={handlePrevSeason}
             disabled={selectedSeasonIndex <= 0}
             className="seasons-panel__nav-arrow-btn"
-            title="Previous Season"
+            title={t('library.details.previousSeason') || 'Previous Season'}
           >
             <ChevronLeft size={16} />
           </button>
@@ -226,7 +226,7 @@ export default function SeasonsPanel() {
             onClick={handleNextSeason}
             disabled={selectedSeasonIndex >= seasonsCount - 1}
             className="seasons-panel__nav-arrow-btn"
-            title="Next Season"
+            title={t('library.details.nextSeason') || 'Next Season'}
           >
             <ChevronRight size={16} />
           </button>
@@ -371,7 +371,7 @@ export default function SeasonsPanel() {
                         e.stopPropagation();
                         playMutation.mutate(episode.id);
                       }}
-                      title="Play episode"
+                      title={t('library.details.playEpisode') || 'Play Episode'}
                     >
                       <Play size={12} fill="currentColor" />
                     </IconButton>

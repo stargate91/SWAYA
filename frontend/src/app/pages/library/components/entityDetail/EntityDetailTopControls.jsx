@@ -1,4 +1,4 @@
-import { Image as ImageIcon, Settings } from 'lucide-react';
+import { Image as ImageIcon, Settings } from '@/ui/icons';
 import { useNavigate } from 'react-router-dom';
 import PeopleTagPopover from './PeopleTagPopover';
 
@@ -26,7 +26,7 @@ export default function EntityDetailTopControls({
           type="button"
           onClick={() => navigate(`/library/people/${item.id}/edit`)}
           className="media-detail-page__side-nav-toggle"
-          title="Edit Performer"
+          title={t('library.details.editPerformer') || 'Edit Performer'}
         >
           <Settings size={18} />
         </button>

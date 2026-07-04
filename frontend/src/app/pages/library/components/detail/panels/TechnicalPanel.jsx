@@ -2,7 +2,6 @@ import { EDITION_LABELS, SOURCE_LABELS, AUDIO_TYPE_LABELS, formatTime } from '..
 import { useMediaDetailContext } from '../MediaDetailContext';
 import './PanelsCommon.css';
 
-
 export default function TechnicalPanel({ showTitle = true }) {
   const { state, t } = useMediaDetailContext();
   const {
@@ -127,11 +126,7 @@ export default function TechnicalPanel({ showTitle = true }) {
             )}
           </div>
         </div>
-      ) : (
-        <div className="details-panel__no-ratings">
-          {t('library.details.noTechnicalInfo') || 'No technical info available.'}
-        </div>
-      )}
+      ) : null}
     </div>
   );
 }

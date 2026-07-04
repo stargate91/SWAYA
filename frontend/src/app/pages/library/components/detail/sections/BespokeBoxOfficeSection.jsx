@@ -1,5 +1,4 @@
- 
-import { DollarSign, Coins, TrendingUp } from 'lucide-react';
+import { DollarSign, Coins, TrendingUp } from '@/ui/icons';
 
 export default function BespokeBoxOfficeSection({ item, t }) {
   if (!item || (item.budget <= 0 && item.revenue <= 0)) return null;

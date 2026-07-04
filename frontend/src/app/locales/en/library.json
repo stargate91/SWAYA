@@ -149,6 +149,7 @@
     "customColor": "Custom Color",
     "errorNameRequired": "Name is required",
     "errorExists": "A tag with this name already exists",
+    "deleteFailed": "Failed to delete tag",
     "customImagesLabel": "Custom Images (Max 3)",
     "imageUrlPlaceholder": "Paste image URL...",
     "addImageUrl": "Add URL",
@@ -308,6 +309,10 @@
     "stashdb": "StashDB",
     "fansdb": "FansDB",
     "noOverviewAvailable": "No overview available.",
+    "lowResolutionWarning": "Warning: This scene image resolution is low ({{width}}x{{height}}). Minimum recommended is 1280 width.",
+    "primarySourceSetFailed": "Failed to set primary source",
+    "unlinkSourceFailed": "Failed to unlink source",
+    "unlinkSuccess": "Successfully unlinked from {{source}}.",
     "noItemsFound": "No items found.",
     "have": "Have",
     "inLibrary": "In Library",
@@ -387,6 +392,14 @@
     "activeTags": "Active Tags",
     "noTagsAssigned": "No tags assigned.",
     "suggestedTags": "Suggested Tags",
+    "previousEpisode": "Previous Episode",
+    "nextEpisode": "Next Episode",
+    "playEpisode": "Play Episode",
+    "previousSeason": "Previous Season",
+    "nextSeason": "Next Season",
+    "addTag": "Add Tag",
+    "editPerformer": "Edit Performer",
+    "trailer": "Trailer",
     "playSession": "Play Session",
     "createTagFromKeyword": "Create tag from keyword",
     "allKeywordsTagged": "All keywords already exist as tags.",
@@ -502,6 +515,7 @@
     "profileIdentity": "Profile & Identity",
     "biography": "Biography",
     "language": "Language:",
+    "gender": "Gender",
     "birthday": "Birthday",
     "placeOfBirth": "Place of Birth",
     "featuresAppearance": "Features & Appearance",
@@ -580,6 +594,7 @@
     "remove": "Remove",
     "connect": "Connect",
     "connecting": "Connecting...",
+    "searching": "Searching...",
     "linkingEnriching": "Linking & Enriching...",
     "cancel": "Cancel",
     "field": "Field",
@@ -598,6 +613,19 @@
       "hip": "Hip has to be between 10 and 100",
       "correctErrors": "Please fix the details above before saving!",
       "underage": "Performer must be at least 18 years and 2 weeks old"
+    },
+    "mixer": {
+      "routing_updated": "Metadata routing updated successfully!",
+      "routing_update_failed": "Failed to update routing"
+    },
+    "linking": {
+      "link_source_failed": "Failed to link source",
+      "performer_deleted": "Performer removed from database successfully.",
+      "delete_performer_failed": "Failed to delete performer"
+    },
+    "custom": {
+      "values_saved": "Custom values saved successfully!",
+      "save_values_failed": "Failed to save custom values"
     }
   }
 }

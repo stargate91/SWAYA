@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Plus, X, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, X, Search, ChevronLeft, ChevronRight } from '@/ui/icons';
 import Pill from '@/ui/Pill';
 import { useAllTagsQuery } from '@/queries/libraryQueries';
 import { useMediaDetailContext } from '../MediaDetailContext';
@@ -269,7 +269,7 @@ export default function BespokeSceneTagger() {
                   type="button"
                   onClick={() => handleAddTag(tag)}
                   className="bespoke-scene-tagger-pill-suggested"
-                  title="Add tag"
+                  title={t('library.details.addTag') || 'Add tag'}
                 >
                   <Plus size={10} />
                   <span>{tag}</span>

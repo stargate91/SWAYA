@@ -1,5 +1,6 @@
-import { FolderOpen } from 'lucide-react';
+import { FolderOpen } from '@/ui/icons';
 import Button from '@/ui/Button';
+import Tooltip from '@/ui/Tooltip';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import './PanelsCommon.css';
 import './ExtrasPanel.css';
@@ -70,36 +71,44 @@ export default function ExtrasPanel() {
                 <div className="extras-panel__header">
                   <div className="extras-panel__header-copy">
                     <div className="extras-panel__title-row">
-                      <div className="extras-panel__filename" title={extra.name}>
-                        {extra.name}
-                      </div>
+                      <Tooltip content={extra.name} side="top">
+                        <div className="extras-panel__filename">
+                          {extra.name}
+                        </div>
+                      </Tooltip>
                     </div>
                     {extra.path ? (
-                      <div className="extras-panel__path" title={extra.path}>
-                        {extra.path}
-                      </div>
+                      <Tooltip content={extra.path} side="top">
+                        <div className="extras-panel__path">
+                          {extra.path}
+                        </div>
+                      </Tooltip>
                     ) : null}
                     {getExtraMeta(extra) ? (
-                      <span className="extras-panel__inline-meta" title={getExtraMeta(extra)}>
-                        {getExtraMeta(extra)}
-                      </span>
+                      <Tooltip content={getExtraMeta(extra)} side="top">
+                        <span className="extras-panel__inline-meta">
+                          {getExtraMeta(extra)}
+                        </span>
+                      </Tooltip>
                     ) : null}
                   </div>
                   {extra.path ? (
-                    <Button
-                      variant="secondary-neutral"
-                      size="sm"
-                      className="extras-panel__browse-btn"
-                      onClick={async () => {
-                        const result = await showItemInFolder(extra.path);
-                        if (!result?.success) {
-                          toast(result?.error || t('organizer.toasts.showInFolderFailed'), 'danger');
-                        }
-                      }}
-                      title={t('library.details.showInFolder') || 'Show in Folder'}
-                    >
-                      <FolderOpen size={14} />
-                    </Button>
+                    <Tooltip content={t('library.details.showInFolder') || 'Show in Folder'} side="top">
+                      <Button
+                        variant="secondary-neutral"
+                        size="sm"
+                        className="extras-panel__browse-btn"
+                        onClick={async () => {
+                          const result = await showItemInFolder(extra.path);
+                          if (!result?.success) {
+                            toast(result?.error || t('organizer.toasts.showInFolderFailed'), 'danger');
+                          }
+                        }}
+                        title={null}
+                      >
+                        <FolderOpen size={14} />
+                      </Button>
+                    </Tooltip>
                   ) : null}
                 </div>
               </div>

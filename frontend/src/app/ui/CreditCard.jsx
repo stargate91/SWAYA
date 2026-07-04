@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Film, Tv, Play } from 'lucide-react';
+import { ENTITY_ICONS, Play } from '@/ui/icons';
 import './CreditCard.css';
 
 export default function CreditCard({
@@ -54,7 +54,7 @@ export default function CreditCard({
           />
         ) : (
           <div className="ui-credit-card__poster ui-credit-card__poster--placeholder">
-            {isTv ? <Tv size={16} /> : <Film size={16} />}
+            {isTv ? <ENTITY_ICONS.tv size={16} /> : <ENTITY_ICONS.movie size={16} />}
           </div>
         ))}
         {onPlayClick && (

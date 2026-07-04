@@ -1,4 +1,4 @@
-import { Users } from 'lucide-react';
+import { Users } from '@/ui/icons';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import './CastPanel.css';
 

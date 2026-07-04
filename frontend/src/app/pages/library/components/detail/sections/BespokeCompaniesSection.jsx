@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from '@/ui/icons';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { API_BASE } from '@/lib/backend';
+import Tooltip from '@/ui/Tooltip';
 
 export default function BespokeCompaniesSection({ item, t }) {
   const companiesScrollRef = useRef(null);
@@ -77,12 +78,14 @@ export default function BespokeCompaniesSection({ item, t }) {
               onScroll={handleScrollState}
             >
               {allCompanies.map((c, i) => (
-                <div key={i} className="bespoke-company-item" title={c.name}>
-                  {c.logo_path ? (
-                    <img src={resolveMediaImageUrl(c.logo_path, 'logo', API_BASE)} alt={c.name} className="bespoke-company-logo" />
-                  ) : (
-                    <span className="bespoke-company-name-only">{c.name}</span>
-                  )}
+                <div key={i} className="bespoke-company-item">
+                  <Tooltip content={c.name} side="top">
+                    {c.logo_path ? (
+                      <img src={resolveMediaImageUrl(c.logo_path, 'logo', API_BASE)} alt={c.name} className="bespoke-company-logo" />
+                    ) : (
+                      <span className="bespoke-company-name-only">{c.name}</span>
+                    )}
+                  </Tooltip>
                 </div>
               ))}
             </div>

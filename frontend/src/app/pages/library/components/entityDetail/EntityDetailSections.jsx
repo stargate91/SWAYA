@@ -8,7 +8,7 @@ import ImageUploadPanel from '../../modals/ImageUploadPanel';
 import { API_BASE } from '@/lib/backend';
 import { isTvLikeMediaType, isSceneMediaType } from '@/lib/mediaTypes';
 import { getPosterImagePath, buildTmdbImageUrl, TMDB_IMAGE_SIZES } from '@/lib/imageUrls';
-import { Film, ImageOff, Tv } from 'lucide-react';
+import { ImageOff, ENTITY_ICONS } from '@/ui/icons';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
 import { normalizeBackdropKey } from '../../utils/personCreditsUtils';
 import './PersonCreditsShared.css';
@@ -134,7 +134,7 @@ export function EntityCardGrid({ items, type, navigate, t }) {
             imageUrl={resolveDetailsImageUrl(posterPath, API_BASE, 'poster')}
             ratingImdb={item.rating_imdb}
             ratingTmdb={item.rating_tmdb ?? item.rating}
-            icon={isTvLikeMediaType(resolvedType) ? Tv : Film}
+            icon={isTvLikeMediaType(resolvedType) ? ENTITY_ICONS.tv : ENTITY_ICONS.movie}
             customStyle={{ '--item-index': index }}
             onClick={() => openItem(item)}
           />
@@ -193,7 +193,7 @@ function HorizontalCollectionItemsList({ items, navigate, t }) {
             subtitle={item.year ? String(item.year) : undefined}
             imageUrl={posterUrl}
             ratingPill={ratingPill}
-            icon={isTv ? Tv : Film}
+            icon={isTv ? ENTITY_ICONS.tv : ENTITY_ICONS.movie}
             onClick={() => openItem(item)}
             customStyle={{ '--item-index': index }}
             className={item.in_library ? 'is-owned' : 'is-missing'}

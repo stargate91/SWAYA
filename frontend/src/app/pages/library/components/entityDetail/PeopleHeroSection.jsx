@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
-import { Layers, User, PenLine, Heart, Check, Minus, Plus, Info, Bookmark, X, Maximize2 } from 'lucide-react';
+import { Layers, User, PenLine, Heart, Check, Minus, Plus, Info, Bookmark, X, Maximize2 } from '@/ui/icons';
 import { API_BASE } from '@/lib/backend';
 import { getProfileImagePath } from '@/lib/imageUrls';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';

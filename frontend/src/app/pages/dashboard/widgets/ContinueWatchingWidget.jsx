@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Play, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Play, X, ChevronLeft, ChevronRight } from '@/ui/icons';
 import IconButton from '../../../ui/IconButton';
 import { useContinueWatchingQuery } from '../../../queries';
 import { usePlayMediaMutation, useResetProgressMutation, useSettingsQuery } from '../../../queries';

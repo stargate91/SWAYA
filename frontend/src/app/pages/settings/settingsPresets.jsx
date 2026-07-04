@@ -1,4 +1,4 @@
-import { Minimize2 } from 'lucide-react';
+import { Minimize2 } from '@/ui/icons';
 import {
   EXTRAS_FOLDER_MODES,
   FOLDER_COLLECTION_MODES,

@@ -6,7 +6,7 @@ import Tooltip from '../../ui/Tooltip';
 import MediaCard from '../../ui/MediaCard';
 import PosterCard from '../../ui/PosterCard';
 import BackdropCard from '../../ui/BackdropCard';
-import { ChevronLeft, ChevronRight, FileJson, Info, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, FileJson, Info, X } from '@/ui/icons';
 import { API_BASE } from '../../lib/backend';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { useTranslation } from '../../providers/LanguageContext';

@@ -1,6 +1,6 @@
 /* eslint-disable react/forbid-dom-props */
 import { memo, useMemo } from 'react';
-import { EyeOff, Trash2, Search, Sliders, X } from 'lucide-react';
+import { EyeOff, Trash2, Search, Sliders, X } from '@/ui/icons';
 import { useTranslation } from '../providers/LanguageContext';
 import EmptyState from './EmptyState';
 import Tooltip from './Tooltip';

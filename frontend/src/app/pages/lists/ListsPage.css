@@ -1006,3 +1006,10 @@
 .lists-drawer__loader--small {
   padding: 8px 0;
 }
+
+.library-scene-card__subtitle-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}

@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Star } from 'lucide-react';
+import { Star } from '@/ui/icons';
 import Pill from '@/ui/Pill';
 import CreditCard from '@/ui/CreditCard';
 import api from '@/lib/api';

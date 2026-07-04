@@ -55,11 +55,11 @@ export default function BioSection({
         <div className="custom-values-card__grid-2">
           {person?.is_adult && (
             <Dropdown
-              label="Gender"
+              label={t('library.performerEdit.gender') || 'Gender'}
               options={genderOptions}
               value={form.gender}
               onChange={e => handleChange('gender', e.target.value)}
-              placeholder="- Select -"
+              placeholder={t('dropdown.placeholder') || 'Select...'}
             />
           )}
           <div className="ui-field">

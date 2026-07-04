@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp } from '@/ui/icons';
+import Tooltip from './Tooltip';
 import { useTranslation } from '../providers/LanguageContext';
 import './Dropdown.css';
 
@@ -65,16 +66,17 @@ function DropdownMenu({
       ) : null}
       <div className="ui-dropdown__items-wrapper">
         {filteredOptions.map((opt) => (
-          <button
-            key={opt.value}
-            type="button"
-            className={`ui-dropdown__item ${opt.value === value ? 'is-active' : ''}${opt.disabled ? ' is-disabled' : ''}`}
-            onClick={() => !opt.disabled && onOptionClick(opt.value)}
-            title={opt.label}
-            disabled={Boolean(opt.disabled)}
-          >
-            {opt.label}
-          </button>
+          <Tooltip content={opt.label} side="right" key={opt.value}>
+            <button
+              type="button"
+              className={`ui-dropdown__item ${opt.value === value ? 'is-active' : ''}${opt.disabled ? ' is-disabled' : ''}`}
+              onClick={() => !opt.disabled && onOptionClick(opt.value)}
+              title={null}
+              disabled={Boolean(opt.disabled)}
+            >
+              {opt.label}
+            </button>
+          </Tooltip>
         ))}
         {filteredOptions.length === 0 ? (
           <div className="ui-dropdown__no-results">
@@ -180,17 +182,19 @@ export default function Dropdown({
           </button>
 
           {isSorter && onSortDirectionToggle && (
-            <button
-              type="button"
-              className="ui-dropdown__direction-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (onSortDirectionToggle) onSortDirectionToggle();
-              }}
-              title={sortDirection === 'asc' ? t('dropdown.ascending') : t('dropdown.descending')}
-            >
-              {sortDirection === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-            </button>
+            <Tooltip content={sortDirection === 'asc' ? t('dropdown.ascending') : t('dropdown.descending')} side="top">
+              <button
+                type="button"
+                className="ui-dropdown__direction-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onSortDirectionToggle) onSortDirectionToggle();
+                }}
+                title={null}
+              >
+                {sortDirection === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </button>
+            </Tooltip>
           )}
         </div>
 

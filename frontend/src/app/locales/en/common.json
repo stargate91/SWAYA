@@ -10,6 +10,7 @@
     "remove": "Remove",
     "save": "Save",
     "search": "Search",
+    "advancedSearch": "Advanced Search",
     "add": "Add",
     "edit": "Edit",
     "delete": "Delete",
@@ -18,14 +19,21 @@
     "showDetails": "Show Details",
     "hideDetails": "Hide Details",
     "more": "Show More",
-    "less": "Show Less"
+    "less": "Show Less",
+    "sfwMode": "SFW Mode",
+    "nsfwMode": "NSFW Mode",
+    "other": "Other"
   },
   "dropzone": {
     "label": "Drop files or folders here",
     "description": "Drag and drop your media files right here to scan them."
   },
   "pagination": {
-    "rowsPerPage": "Rows per page"
+    "rowsPerPage": "Rows per page",
+    "first": "First",
+    "prev": "Prev",
+    "next": "Next",
+    "last": "Last"
   },
   "dropdown": {
     "search": "Search...",
@@ -127,6 +135,8 @@
     "no_audio_tracks": "No audio tracks",
     "subtitles": "Subtitles",
     "off": "Off",
+    "track": "Track",
+    "subtitle": "Subtitle",
     "finished_watching": "Finished watching",
     "up_next": "Up Next",
     "starting_in": "Starting in {{count}}s...",
@@ -134,5 +144,18 @@
     "rate_title": "Rate this title",
     "replay": "Replay",
     "close_player": "Close Player"
+  },
+  "search": {
+    "source": "Source",
+    "type": "Type",
+    "placeholderTmdb": "Search {{type}}...",
+    "placeholderPattern": "Search {{type}} on {{source}}...",
+    "types": {
+      "all": "All",
+      "movie": "Movies",
+      "tv": "TV Shows",
+      "person": "People",
+      "scene": "Scenes"
+    }
   }
 }

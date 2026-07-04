@@ -1,5 +1,5 @@
 /* eslint-disable react/forbid-dom-props */
-import { Play, Pause, Volume2, VolumeX, Languages, Captions, PictureInPicture2, Square, Rewind, FastForward, SkipBack, SkipForward, Flame, Minimize2 } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Languages, Captions, PictureInPicture2, Square, Rewind, FastForward, SkipBack, SkipForward, Flame, Minimize2 } from '@/ui/icons';
 import Badge from '../../../ui/Badge';
 
 export default function PlayerControlBar({
@@ -58,7 +58,6 @@ export default function PlayerControlBar({
                 key={`chap-${index}`}
                 className="player-page__chapter-marker"
                 style={{ left: `${pct}%` }}
-                title={chap.title || `Chapter ${index + 1}`}
               />
             );
           })}
@@ -71,11 +70,11 @@ export default function PlayerControlBar({
 
         {/* Left Actions */}
         <div className="player-page__actions-group">
-          <button className="player-page__btn" onClick={() => sendCommand(['add', 'chapter', -1])} title="Previous Chapter">
+          <button className="player-page__btn" onClick={() => sendCommand(['add', 'chapter', -1])}>
             <SkipBack size={18} fill="currentColor" />
           </button>
 
-          <button className="player-page__btn" onClick={handleSpeedDown} title={`Slow Down / Rewind (${speed}x)`}>
+          <button className="player-page__btn" onClick={handleSpeedDown}>
             <Rewind size={18} fill="currentColor" />
           </button>
 
@@ -83,15 +82,15 @@ export default function PlayerControlBar({
             {isPaused ? <Play size={20} fill="currentColor" /> : <Pause size={20} fill="currentColor" />}
           </button>
 
-          <button className="player-page__btn" onClick={handleClose} title="Stop Playback">
+          <button className="player-page__btn" onClick={handleClose}>
             <Square size={18} fill="currentColor" />
           </button>
 
-          <button className="player-page__btn" onClick={handleSpeedUp} title={`Fast Forward (${speed}x)`}>
+          <button className="player-page__btn" onClick={handleSpeedUp}>
             <FastForward size={18} fill="currentColor" />
           </button>
 
-          <button className="player-page__btn" onClick={() => sendCommand(['add', 'chapter', 1])} title="Next Chapter">
+          <button className="player-page__btn" onClick={() => sendCommand(['add', 'chapter', 1])}>
             <SkipForward size={18} fill="currentColor" />
           </button>
 
@@ -174,7 +173,6 @@ export default function PlayerControlBar({
             <button
               className={`player-page__btn ${justAddedPeak ? 'player-page__btn--peak-success' : 'player-page__btn--peak'}`}
               onClick={handleAddPeak}
-              title="Mark Peak Moment"
             >
               <Flame size={18} fill="currentColor" />
             </button>
@@ -186,7 +184,6 @@ export default function PlayerControlBar({
               setShowAudioMenu(!showAudioMenu);
               setShowSubMenu(false);
             }}
-            title="Audio Tracks"
           >
             <Languages size={18} />
           </button>
@@ -197,16 +194,15 @@ export default function PlayerControlBar({
               setShowSubMenu(!showSubMenu);
               setShowAudioMenu(false);
             }}
-            title="Subtitles"
           >
             <Captions size={18} />
           </button>
 
-          <button className="player-page__btn" onClick={handleMinimizePip} title="Minimize to Background">
+          <button className="player-page__btn" onClick={handleMinimizePip}>
             <Minimize2 size={18} />
           </button>
 
-          <button className="player-page__btn" onClick={handleTogglePip} title="Picture-in-Picture">
+          <button className="player-page__btn" onClick={handleTogglePip}>
             <PictureInPicture2 size={18} />
           </button>
         </div>

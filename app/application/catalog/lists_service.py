@@ -87,6 +87,9 @@ class ListsService:
                 loc = next((l for l in match.localizations), None)
                 if match.media_type.value in ("scene", "still"):
                     res["poster_path"] = match.backdrop_path or match.still_path
+                    scene_title = loc.title if loc else match.original_title
+                    if scene_title:
+                        res["title"] = scene_title
                 elif loc:
                     res["poster_path"] = loc.poster_path
                     res["title"] = loc.title
@@ -415,24 +418,76 @@ class ListsService:
         person_id = payload.get("person_id")
 
         if person_id:
-            from app.infrastructure.scrapers.support.gateway import scraper_gateway
-            from app.infrastructure.media.db_media_resolver import DbMediaResolver
-            from app.domains.media_assets.services.images import image_processing_service
-            from app.domains.people.services.people_search_service import PeopleSearchService
+            from app.domains.people.models import Person, ExternalSourceLink
+            resolved_person = None
             
-            search_service = PeopleSearchService(
-                db=self.db,
-                scrapers=scraper_gateway,
-                library_port=DbMediaResolver(self.db),
-                image_service=image_processing_service
-            )
-            try:
-                res = search_service.add_person_tmdb(str(person_id), is_active=True)
-                if res and res.get("status") == "success":
-                    person_id = res["id"]
-            except Exception as e:
-                logger.error(f"Failed to dynamically import person {person_id} for custom list: {e}")
-                raise BadRequestException(f"Failed to import performer: {str(e)}")
+            def find_by_direct_id(pid_val):
+                try:
+                    p_id_int = int(pid_val)
+                    return self.db.query(Person).filter(Person.id == p_id_int).first()
+                except (ValueError, TypeError):
+                    return self.db.query(Person).filter(Person.id == pid_val).first()
+                    
+            if resolved_person is None:
+                resolved_person = find_by_direct_id(person_id)
+                
+            if resolved_person is None and isinstance(person_id, str):
+                prefix = None
+                val = None
+                if ":" in person_id:
+                    prefix, val = person_id.split(":", 1)
+                elif "_" in person_id:
+                    prefix, val = person_id.split("_", 1)
+                    
+                if prefix and val:
+                    p_enum = None
+                    if prefix == "tmdb":
+                        p_enum = Provider.TMDB
+                    elif prefix in ("porndb", "theporndb"):
+                        p_enum = Provider.PORNDB
+                    elif prefix in ("stash", "stashdb"):
+                        p_enum = Provider.STASHDB
+                    elif prefix == "fansdb":
+                        p_enum = Provider.FANSDB
+                        
+                    if p_enum:
+                        link = self.db.query(ExternalSourceLink).filter(
+                            ExternalSourceLink.provider == p_enum,
+                            ExternalSourceLink.external_id == val
+                        ).first()
+                        if link:
+                            resolved_person = link.person
+                            
+                        if resolved_person is None and p_enum == Provider.TMDB:
+                            resolved_person = find_by_direct_id(val)
+                            
+            if resolved_person:
+                person_id = resolved_person.id
+            else:
+                from app.infrastructure.scrapers.support.gateway import scraper_gateway
+                from app.infrastructure.media.db_media_resolver import DbMediaResolver
+                from app.domains.media_assets.services.images import image_processing_service
+                from app.domains.people.services.people_search_service import PeopleSearchService
+                
+                search_service = PeopleSearchService(
+                    db=self.db,
+                    scrapers=scraper_gateway,
+                    library_port=DbMediaResolver(self.db),
+                    image_service=image_processing_service
+                )
+                try:
+                    import_id = str(person_id)
+                    if isinstance(person_id, str) and "_" in person_id and ":" not in person_id:
+                        prefix, val = person_id.split("_", 1)
+                        if prefix in ("tmdb", "porndb", "stash", "fansdb"):
+                            import_id = f"{prefix}:{val}"
+                            
+                    res = search_service.add_person_tmdb(import_id, is_active=True)
+                    if res and res.get("status") == "success":
+                        person_id = res["id"]
+                except Exception as e:
+                    logger.error(f"Failed to dynamically import person {person_id} for custom list: {e}")
+                    raise BadRequestException(f"Failed to import performer: {str(e)}")
 
         # Check if already exists
         exists_query = self.db.query(CustomListItem).filter(CustomListItem.list_id == list_id)

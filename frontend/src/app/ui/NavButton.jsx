@@ -1,4 +1,4 @@
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from '@/ui/icons';
 import './NavButton.css';
 
 export default function NavButton({

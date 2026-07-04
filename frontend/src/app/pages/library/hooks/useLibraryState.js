@@ -7,7 +7,7 @@ import { useLibraryTags } from './useLibraryTags';
 import { usePaginationVisibility } from '../../../hooks/usePaginationVisibility';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useLocalListSearch } from '../../../hooks/useLocalListSearch';
-import { Clapperboard, Tv, Users, Tag, Layers, Video } from 'lucide-react';
+import { Clapperboard, Tv, Users, Tag, Layers, Video } from '@/ui/icons';
 import {
   getLibraryEmptyStateKey,
   getLibraryTabTranslationKey,

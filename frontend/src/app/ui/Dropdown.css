@@ -284,3 +284,8 @@
   background: var(--color-surface-hover, var(--ui-control-bg-hover));
   color: var(--ui-control-text);
 }
+
+.ui-dropdown__items-wrapper .ui-tooltip {
+  display: block;
+  width: 100%;
+}
