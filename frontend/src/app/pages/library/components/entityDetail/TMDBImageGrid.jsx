@@ -390,11 +390,9 @@ export default function TMDBImageGrid({
     [images, currentPath]
   );
 
-  const [prevDeps, setPrevDeps] = useState({ images, initialVisibleCount });
-  if (prevDeps.images !== images || prevDeps.initialVisibleCount !== initialVisibleCount) {
-    setPrevDeps({ images, initialVisibleCount });
+  useEffect(() => {
     setLoadMoreCount(0);
-  }
+  }, [images, initialVisibleCount]);
 
   const baseVisibleCount = initialVisibleCount ?? Number.POSITIVE_INFINITY;
   const minimumVisibleCount = selectedIndex >= 0
@@ -416,7 +414,7 @@ export default function TMDBImageGrid({
   }, []);
 
   useEffect(() => {
-    if (!hasMore || !loadMoreRef.current || !Number.isFinite(visibleCount)) {
+    if (!hasMore || !loadMoreRef.current) {
       return undefined;
     }
 
@@ -435,7 +433,7 @@ export default function TMDBImageGrid({
 
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
-  }, [hasMore, visibleCount, handleLoadMore]);
+  }, [hasMore, handleLoadMore]);
 
   const handleSelectImage = (path) => {
     if (onSelect) {
