@@ -50,15 +50,16 @@ export default function ListsPage() {
   });
 
   const [prevActiveListId, setPrevActiveListId] = useState(null);
-  const [prevLists, setPrevLists] = useState([]);
+  const listsDeps = lists.map((l) => l.id).join(',');
+  const [prevListsDeps, setPrevListsDeps] = useState('');
 
   if (activeListId !== prevActiveListId) {
     setPrevActiveListId(activeListId);
     setIsDrawerOpen(false);
   }
 
-  if (lists !== prevLists) {
-    setPrevLists(lists);
+  if (listsDeps !== prevListsDeps) {
+    setPrevListsDeps(listsDeps);
     if (lists.length > 0 && activeListId === null) {
       const watchlist = lists.find((l) => l.is_watchlist) || lists[0];
       setActiveListId(watchlist.id);

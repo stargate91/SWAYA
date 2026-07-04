@@ -13,7 +13,8 @@
     "dist": "electron-builder build",
     "lint": "eslint .",
     "lint:style": "stylelint \"src/**/*.css\"",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:smoke": "playwright test"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.101.0",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.61.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
