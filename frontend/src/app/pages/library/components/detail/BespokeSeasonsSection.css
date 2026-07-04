@@ -14,7 +14,6 @@
   border-radius: var(--radius-lg, 16px);
   display: flex;
   flex-direction: column;
-  backdrop-filter: blur(10px);
   overflow: hidden;
 }
 
@@ -57,7 +56,7 @@
 .bespoke-season-pill,
 .bespoke-episode-pill {
   padding: var(--space-2xs) var(--space-sm);
-  border-radius: var(--radius-md, 6px);
+  border-radius: var(--radius-sm, 4px);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -542,7 +541,6 @@
   border-radius: var(--radius-lg, 16px);
   display: flex;
   flex-direction: column;
-  backdrop-filter: blur(10px);
   overflow: hidden;
 }
 
@@ -694,7 +692,6 @@
   border-radius: var(--radius-lg, 16px);
   display: flex;
   flex-direction: column;
-  backdrop-filter: blur(10px);
   overflow: hidden;
 }
 
@@ -773,7 +770,6 @@
   border-radius: var(--radius-lg, 16px);
   display: flex;
   flex-direction: column;
-  backdrop-filter: blur(10px);
   overflow: hidden;
 }
 
@@ -941,7 +937,6 @@
   border-radius: var(--radius-lg, 16px);
   display: flex;
   flex-direction: column;
-  backdrop-filter: blur(10px);
   overflow: hidden;
 }
 

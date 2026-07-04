@@ -4,6 +4,7 @@ import { Play, Pause, Volume2, VolumeX, Languages, Captions, PictureInPicture2, 
 import { resolveMediaImageUrl } from '../../lib/imageUrls';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useSettingsQuery } from '../../queries';
+import Badge from '../../ui/Badge';
 import './PlayerPage.css';
 
 const getQueryParam = (name) => {
@@ -774,9 +775,9 @@ export default function PlayerPage() {
               </button>
 
               {speed !== 1.0 && (
-                <span className="player-page__speed-badge">
+                <Badge family="status" tone="accent" className="player-page__speed-badge">
                   {speedText}
-                </span>
+                </Badge>
               )}
 
               <div className="player-page__volume-group">

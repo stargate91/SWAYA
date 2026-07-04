@@ -4,7 +4,6 @@
   border-radius: var(--radius-lg, 16px);
   display: flex;
   flex-direction: column;
-  backdrop-filter: blur(10px);
   overflow: visible;
   margin-top: var(--space-md);
 }

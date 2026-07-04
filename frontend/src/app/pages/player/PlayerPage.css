@@ -148,12 +148,6 @@
 }
 
 .player-page__speed-badge {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--color-accent);
-  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
-  padding: var(--space-2px) calc(var(--space-2) - var(--space-2px));
-  border-radius: 4px;
   margin-left: var(--space-1);
 }
 
