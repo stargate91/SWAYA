@@ -1,23 +1,25 @@
 # Swaya
 
-Swaya is a media library management application consisting of an Electron and React frontend and a FastAPI backend.
+Swaya is a desktop-oriented media library management application consisting of a React and Electron frontend and a modular FastAPI backend. The system is designed to scan local directories, identify media files, resolve metadata from external databases, and track user playback state.
 
-The application scans local directories, identifies media files, resolves metadata from external services, and tracks playback state.
+## Current Project Status and Architecture
 
-## Program State and Architecture
+Swaya is built on a highly modular, decoupled architecture following Domain-Driven Design (DDD) principles.
 
-The backend codebase has been refactored into a highly modular, decoupled architecture following Domain-Driven Design (DDD) principles:
+### Current State and Achievements
 
-- **Routing Segregation**: Endpoints are split into specific sub-routers (e.g. people management endpoints are distributed across mainstream, adult, detail, images, linking, and status sub-routers) to avoid single large route files.
-- **Polymorphic Strategies**: Tasks such as filmography querying, scraper normalization, and media organization use strategy patterns (e.g. MovieOrganizer, SceneOrganizer, EpisodeOrganizer) to handle type-specific logic.
-- **Separation of Infrastructure and Domains**: Low-level network clients, caching, and rate limiting (e.g. PornDB Client) are separated from higher-level provider parsing logic.
-- **Read-Write Separation**: Override systems separate query verification (e.g. TitleLockReader) from override updates and db sync operations (e.g. TitleLockService).
-- **Sub-service Delegation**: Heavy domain services delegate specific behaviors (like cast building, playback resolving, and metadata syncing) to dedicated sub-components.
+- **State Persistence**: The SFW/NSFW view context persists across application restarts by using persistent local storage (`localStorage`) instead of transient session storage.
+- **Backend Modularization**: Decoupled Python architecture following Domain-Driven Design (DDD) principles. Large endpoint routes are split into domain-specific sub-routers, and heavy operations (such as cast building, media assets download, and metadata syncing) are delegated to sub-services and background workers.
+- **Scraper Clients**: Integration with external metadata databases (TMDB, OMDb, StashDB, PornDB, FansDB) utilizing rate limiting and negative caching strategies.
+- **Read-Write Separation**: Strict segregation between database reading patterns (e.g., TitleLockReader) and sync/mutation operations (e.g., TitleLockService).
+- **Media Playback**: Embedded MPV playback with dynamic event listener handling and system volume control.
+
+---
 
 ## Repository Structure
 
-- **frontend/**: React and Electron client application
-- **app/**: FastAPI backend engine (application services, domain models, infrastructure adapters, and scrapers)
+- **frontend/**: React 19 and Electron client application.
+- **app/**: FastAPI backend engine (application services, domain models, infrastructure adapters, and scrapers).
 
 ---
 

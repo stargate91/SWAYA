@@ -187,6 +187,8 @@ class DbMediaResolver(
             metadata_match_id = match.id
             media_item_id = match.media_item_id
         else:
+            if item_id is None:
+                return None, None
             try:
                 possible_id = int(item_id)
                 if self.db.query(MediaItem).filter(MediaItem.id == possible_id).count() > 0:
