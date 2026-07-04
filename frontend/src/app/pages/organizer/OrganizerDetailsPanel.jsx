@@ -258,7 +258,9 @@ export default function OrganizerDetailsPanel({
                 ) : null}
                 <MediaCard className="organizer-details__field">
                   <span className="organizer-details__label">{t('organizer.details.fields.source')}</span>
-                  <span className="organizer-details__value" title={activeRow.sourcePath}>{activeRow.sourcePath}</span>
+                  <Tooltip content={activeRow.sourcePath} side="top">
+                    <span className="organizer-details__value">{activeRow.sourcePath}</span>
+                  </Tooltip>
                 </MediaCard>
                 {(() => {
                   const unmatchedStatuses = ['new', 'no_match', 'uncertain', 'multiple', 'error'];
@@ -272,7 +274,9 @@ export default function OrganizerDetailsPanel({
                   return (
                     <MediaCard className="organizer-details__field">
                       <span className="organizer-details__label">{t('organizer.details.fields.target')}</span>
-                      <span className="organizer-details__value" title={activeRow.targetPath}>{activeRow.targetPath}</span>
+                      <Tooltip content={activeRow.targetPath} side="top">
+                        <span className="organizer-details__value">{activeRow.targetPath}</span>
+                      </Tooltip>
                     </MediaCard>
                   );
                 })()}

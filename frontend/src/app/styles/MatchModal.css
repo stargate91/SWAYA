@@ -729,6 +729,11 @@
   min-width: 0;
 }
 
+.organizer-override-bulk-episodes__item-left .ui-tooltip {
+  min-width: 0;
+  flex: 1;
+}
+
 .organizer-override-bulk-episodes__grip {
   color: var(--color-muted);
   cursor: grab;
@@ -753,6 +758,12 @@
   display: flex;
   align-items: center;
   gap: var(--space-1);
+}
+
+.organizer-override-bulk-episodes__item-actions .ui-icon-button {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
 }
 
 .organizer-override-icon-button {

@@ -1,7 +1,6 @@
 import { X } from 'lucide-react';
 import { useTranslation } from '../providers/LanguageContext';
 import IconButton from './IconButton';
-import Tooltip from './Tooltip';
 import './Modal.css';
 
 export default function Modal({ open, title, description, children, footer, onClose, variant, icon: Icon, className }) {
@@ -29,11 +28,9 @@ export default function Modal({ open, title, description, children, footer, onCl
             ) : null}
             {description ? <p className="ui-modal__description">{description}</p> : null}
           </div>
-          <Tooltip content={t('common.close')} side="top">
-            <IconButton type="button" className="ui-modal__close" onClick={onClose} label={t('common.close')} title={null} size="sm">
-              <X size={16} />
-            </IconButton>
-          </Tooltip>
+          <IconButton type="button" className="ui-modal__close" onClick={onClose} label={t('common.close')} title={null} size="sm">
+            <X size={16} />
+          </IconButton>
         </header>
         <div className="ui-modal__body">{children}</div>
         {footer ? <footer className="ui-modal__footer">{footer}</footer> : null}

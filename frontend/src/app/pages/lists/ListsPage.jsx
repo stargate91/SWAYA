@@ -15,7 +15,7 @@ import {
   useRemoveListItemMutation,
   useSettingsQuery
 } from '@/queries';
-import { Plus, Edit2, Trash2, List as ListIcon, Loader2, Film, Users, Tv, Download, Search, X, Check, Minus } from 'lucide-react';
+import { Plus, Edit2, Trash2, List as ListIcon, Loader2, Film, Users, Tv, Download, Search, X, Check, Minus, AlertTriangle } from 'lucide-react';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import api from '@/lib/api';
 import EmptyState from '@/ui/EmptyState';
@@ -193,16 +193,39 @@ export default function ListsPage() {
 
   const handleDelete = (listId, e) => {
     e.stopPropagation();
-    if (window.confirm(t('lists.delete_confirm') || 'Are you sure you want to delete this list?')) {
-      deleteMutation.mutate(listId, {
-        onSuccess: () => {
-          if (activeListId === listId) {
-            const nextList = lists.find((l) => l.id !== listId);
-            setActiveListId(nextList ? nextList.id : null);
-          }
-        },
-      });
-    }
+    openModal({
+      title: t('lists.delete_confirm_title') || 'Delete List',
+      icon: AlertTriangle,
+      variant: 'danger',
+      content: (
+        <p className="ui-modal__body-text">
+          {t('lists.delete_confirm') || 'Are you sure you want to delete this list?'}
+        </p>
+      ),
+      footer: (
+        <>
+          <Button variant="secondary-neutral" onClick={closeModal}>
+            {t('common.cancel') || 'Cancel'}
+          </Button>
+          <Button
+            variant="danger"
+            onClick={() => {
+              deleteMutation.mutate(listId, {
+                onSuccess: () => {
+                  if (activeListId === listId) {
+                    const nextList = lists.find((l) => l.id !== listId);
+                    setActiveListId(nextList ? nextList.id : null);
+                  }
+                  closeModal();
+                },
+              });
+            }}
+          >
+            {t('common.delete') || 'Delete'}
+          </Button>
+        </>
+      ),
+    });
   };
 
   const handleExportList = async (listId) => {

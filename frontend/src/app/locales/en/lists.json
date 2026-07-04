@@ -9,6 +9,7 @@
   "add_people": "Add People",
   "created_prefix": "CREATED",
   "delete_confirm": "Are you sure you want to delete this list?",
+  "delete_confirm_title": "Delete List",
   "search_placeholder": "Search in this list...",
   "badge_missing": "MISSING",
   "empty_title": "No items found",

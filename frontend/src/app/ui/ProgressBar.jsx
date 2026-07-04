@@ -19,7 +19,7 @@ export default function ProgressBar({ taskName, progress = 0, timeRemaining = '-
   return (
     <div className={containerClass}>
       {active && <span className={dotClass} />}
-      <span className="ui-progress-bar__text" title={taskName}>
+      <span className="ui-progress-bar__text">
         {taskName}
       </span>
       <div className="ui-progress-bar__track">

@@ -106,24 +106,28 @@ export default function WindowTitlebar() {
       </div>
 
       <div className="window-titlebar__nav-buttons">
-        <button
-          type="button"
-          className="window-titlebar__nav-btn"
-          disabled={!canGoBack}
-          onClick={() => goBack(navigate)}
-          aria-label="Back"
-        >
-          <ArrowLeft size={16} />
-        </button>
-        <button
-          type="button"
-          className="window-titlebar__nav-btn"
-          disabled={!canGoForward}
-          onClick={() => goForward(navigate)}
-          aria-label="Forward"
-        >
-          <ArrowRight size={16} />
-        </button>
+        <Tooltip content={t('common.back')} side="bottom">
+          <button
+            type="button"
+            className="window-titlebar__nav-btn"
+            disabled={!canGoBack}
+            onClick={() => goBack(navigate)}
+            aria-label="Back"
+          >
+            <ArrowLeft size={16} />
+          </button>
+        </Tooltip>
+        <Tooltip content={t('common.forward')} side="bottom">
+          <button
+            type="button"
+            className="window-titlebar__nav-btn"
+            disabled={!canGoForward}
+            onClick={() => goForward(navigate)}
+            aria-label="Forward"
+          >
+            <ArrowRight size={16} />
+          </button>
+        </Tooltip>
       </div>
 
       <div className={`window-titlebar__center-container ${hasProgress ? 'has-progress' : ''}`}>

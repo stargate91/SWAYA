@@ -244,6 +244,10 @@
   padding: 0.6875rem 0.8125rem;
 }
 
+.organizer-details__field .ui-tooltip {
+  display: block;
+}
+
 .organizer-details__actions {
   display: flex;
   justify-content: flex-start;

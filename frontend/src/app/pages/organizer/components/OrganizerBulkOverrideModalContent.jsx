@@ -4,6 +4,7 @@ import Dropdown from '../../../ui/Dropdown';
 import Input from '../../../ui/Input';
 import SelectableCard from '../../../ui/SelectableCard';
 import IconButton from '../../../ui/IconButton';
+import Tooltip from '../../../ui/Tooltip';
 import { useTranslation } from '../../../providers/LanguageContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { useBulkUpdateMediaMutation, getOrganizerQueryKey } from '../../../queries';
@@ -614,13 +615,16 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
                     <div className="organizer-override-bulk-episodes__item-left">
                       <GripVertical className="organizer-override-bulk-episodes__grip" size={14} />
                       <span className="organizer-override-bulk-episodes__index">{index + parseInt(startEpisodeNum, 10) || (index + 1)}{DOT}</span>
-                      <span className="organizer-override-bulk-episodes__filename" title={item.source}>
-                        {item.source}
-                      </span>
+                      <Tooltip content={item.source} side="top">
+                        <span className="organizer-override-bulk-episodes__filename">
+                          {item.source}
+                        </span>
+                      </Tooltip>
                     </div>
                     <div className="organizer-override-bulk-episodes__item-actions">
                       <IconButton
                         type="button"
+                        size="xs"
                         onClick={() => handleMoveUp(index)}
                         disabled={index === 0}
                       >
@@ -628,6 +632,7 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
                       </IconButton>
                       <IconButton
                         type="button"
+                        size="xs"
                         onClick={() => handleMoveDown(index)}
                         disabled={index === orderedItems.length - 1}
                       >
