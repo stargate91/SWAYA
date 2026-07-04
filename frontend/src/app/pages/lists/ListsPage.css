@@ -647,9 +647,8 @@
   font-size: var(--font-size-2xs, 11px);
   font-weight: var(--font-weight-bold, 700);
   color: var(--color-text-muted);
-  letter-spacing: 0.06em;
+  letter-spacing: normal;
   user-select: none;
-  text-transform: uppercase;
 }
 
 .lists-header__search-input {
