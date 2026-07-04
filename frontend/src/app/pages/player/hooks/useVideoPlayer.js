@@ -182,19 +182,17 @@ export default function useVideoPlayer({ itemId, containerRef }) {
   }, [nextEpisode, navigate]);
 
   // Sync menu state when controls hide during render
-  useEffect(() => {
-    if (showControls) return;
+  if (!showControls) {
     if (showAudioMenu) setShowAudioMenu(false);
     if (showSubMenu) setShowSubMenu(false);
-  }, [showAudioMenu, showControls, showSubMenu]);
+  }
 
   // Sync logo error reset during render
   const [prevLogoUrl, setPrevLogoUrl] = useState(null);
-  useEffect(() => {
-    if (logoUrl === prevLogoUrl) return;
+  if (logoUrl !== prevLogoUrl) {
     setPrevLogoUrl(logoUrl);
     setLogoError(false);
-  }, [logoUrl, prevLogoUrl]);
+  }
 
   const handleMouseMove = () => {
     setShowControls(true);

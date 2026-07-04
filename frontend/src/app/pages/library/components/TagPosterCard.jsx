@@ -1,4 +1,4 @@
-/* eslint-disable react/forbid-dom-props, react/jsx-no-literals, i18next/no-literal-string */
+ 
 import { memo } from 'react';
 import { Heart, X } from 'lucide-react';
 import Badge from '@/ui/Badge';

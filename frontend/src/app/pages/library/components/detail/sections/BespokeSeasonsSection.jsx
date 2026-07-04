@@ -14,15 +14,12 @@ import BespokeEpisodeDetail from './BespokeEpisodeDetail';
 import BespokeLightbox from './BespokeLightbox';
 import './BespokeSeasonsSection.css';
 
-const LPAR = '(';
-const RPAR = ')';
-
 export default function BespokeSeasonsSection() {
   const { state, mutations, t } = useMediaDetailContext();
   const { locale } = useLangTranslation();
   const metadataLanguage = locale === 'en' ? 'en-US' : locale;
   const { item, cleanId, nextEpisodeInfo } = state;
-  const { updateStatusMutation, playMutation, bulkUpdateWatchedMutation, addPeakMutation, deletePeakMutation } = mutations;
+  const { bulkUpdateWatchedMutation } = mutations;
   const queryClient = useQueryClient();
 
   const [lightboxUrl, setLightboxUrl] = useState(null);
@@ -150,9 +147,7 @@ export default function BespokeSeasonsSection() {
   };
 
   const getPosterUrl = (path) => path ? resolveMediaImageUrl(path, 'poster') : '';
-  const getStillUrl = (path) => path ? resolveMediaImageUrl(path, 'still') : '';
   const getOriginalPosterUrl = (path) => path ? resolveMediaImageUrl(path, 'originalPoster') : '';
-  const getOriginalStillUrl = (path) => path ? resolveMediaImageUrl(path, 'originalStill') : '';
 
   const isSeasonWatched = useMemo(() => {
     return episodes.length > 0 && episodes.every((ep) => ep.is_watched);

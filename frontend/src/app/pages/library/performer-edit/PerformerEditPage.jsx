@@ -20,13 +20,12 @@ export default function PerformerEditPage() {
 
   const [prevPerson, setPrevPerson] = useState(null);
 
-  useEffect(() => {
-    if (person === prevPerson) return;
+  if (person !== prevPerson) {
     setPrevPerson(person);
     if (person && !person.is_adult && activeTab === 'linking') {
       setActiveTab('mixer');
     }
-  }, [activeTab, person, prevPerson]);
+  }
 
   const handleClose = useCallback(() => {
     if (isCustomDirty) {

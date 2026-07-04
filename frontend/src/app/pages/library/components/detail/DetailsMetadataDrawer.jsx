@@ -1,4 +1,4 @@
-/* eslint-disable react/forbid-dom-props, react/jsx-no-literals, i18next/no-literal-string */
+/* eslint-disable react/jsx-no-literals */
 import TechnicalPanel from './panels/TechnicalPanel';
 import ExtrasPanel from './panels/ExtrasPanel';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';

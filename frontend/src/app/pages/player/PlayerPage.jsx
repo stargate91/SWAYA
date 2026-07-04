@@ -1,4 +1,4 @@
-/* eslint-disable react/forbid-dom-props, react/jsx-no-literals, i18next/no-literal-string */
+ 
 import { useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { Maximize2, X, Minimize2 } from 'lucide-react';

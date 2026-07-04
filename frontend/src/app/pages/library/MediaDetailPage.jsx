@@ -1,4 +1,4 @@
-/* eslint-disable react/forbid-dom-props, react/jsx-no-literals, i18next/no-literal-string */
+/* eslint-disable react/forbid-dom-props */
 import { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {

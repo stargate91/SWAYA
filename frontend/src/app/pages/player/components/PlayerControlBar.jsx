@@ -1,4 +1,4 @@
-/* eslint-disable react/forbid-dom-props, react/jsx-no-literals, i18next/no-literal-string */
+/* eslint-disable react/forbid-dom-props */
 import { Play, Pause, Volume2, VolumeX, Languages, Captions, PictureInPicture2, Square, Rewind, FastForward, SkipBack, SkipForward, Flame, Minimize2 } from 'lucide-react';
 import Badge from '../../../ui/Badge';
 

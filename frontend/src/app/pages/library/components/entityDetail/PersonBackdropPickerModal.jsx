@@ -1,4 +1,4 @@
-/* eslint-disable react/forbid-dom-props, react/jsx-no-literals, i18next/no-literal-string */
+ 
 import { useRef } from 'react';
 import { ImageOff, Film, Tv } from 'lucide-react';
 import EmptyState from '@/ui/EmptyState';

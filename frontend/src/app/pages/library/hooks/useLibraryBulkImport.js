@@ -14,11 +14,10 @@ export function useLibraryBulkImport({ isAdultMode, isPeopleTab }) {
   );
   const [prevIsAdultMode, setPrevIsAdultMode] = useState(isAdultMode);
 
-  useEffect(() => {
-    if (isAdultMode === prevIsAdultMode) return;
+  if (isAdultMode !== prevIsAdultMode) {
     setPrevIsAdultMode(isAdultMode);
     setShowBulkImportBanner(localStorage.getItem(getBulkImportBannerStorageKey(isAdultMode)) === 'true');
-  }, [isAdultMode, prevIsAdultMode]);
+  }
 
   const scanStatusQuery = useScanStatusQuery({ enabled: isPeopleTab });
   const prevPeopleImportCurrent = useRef(0);

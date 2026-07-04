@@ -1,4 +1,4 @@
-/* eslint-disable react/forbid-dom-props, react/jsx-no-literals, i18next/no-literal-string */
+ 
 import { Ruler, Globe, Eye, Palette, Brush, Gem } from 'lucide-react';
 import Pill from '@/ui/Pill';
 

@@ -1,4 +1,4 @@
-/* eslint-disable react/forbid-dom-props, react/jsx-no-literals, i18next/no-literal-string */
+ 
 import { ChevronLeft } from 'lucide-react';
 import NavButton from '@/ui/NavButton';
 import TMDBImageGrid from './TMDBImageGrid';

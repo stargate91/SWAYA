@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { Check, ChevronLeft, ChevronRight, Star, Plus, Minus } from 'lucide-react';
@@ -280,11 +280,10 @@ const RecommendationsWidget = ({ language, T }) => {
   const [prevWatchlistIds, setPrevWatchlistIds] = useState(null);
   const [optimisticWatchlistIds, setOptimisticWatchlistIds] = useState(null);
 
-  useEffect(() => {
-    if (watchlistIdsFromQuery === prevWatchlistIds) return;
+  if (watchlistIdsFromQuery !== prevWatchlistIds) {
     setPrevWatchlistIds(watchlistIdsFromQuery);
     setOptimisticWatchlistIds(null);
-  }, [prevWatchlistIds, watchlistIdsFromQuery]);
+  }
 
   const actualWatchlistIds = optimisticWatchlistIds !== null ? optimisticWatchlistIds : (watchlistIdsFromQuery || []);
 

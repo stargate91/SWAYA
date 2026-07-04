@@ -31,11 +31,10 @@ export default function MatchEpisodeCard({
   const [prevStillUrl, setPrevStillUrl] = useState(stillUrl);
   const [stillError, setStillError] = useState(false);
 
-  useEffect(() => {
-    if (prevStillUrl === stillUrl) return;
+  if (stillUrl !== prevStillUrl) {
     setPrevStillUrl(stillUrl);
     setStillError(false);
-  }, [stillUrl, prevStillUrl]);
+  }
 
   useEffect(() => {
     if (isHighlighted && cardRef.current) {

@@ -103,6 +103,7 @@ export default function BespokeEpisodeDetail({
       <div className="bespoke-episode-detail-card__content-col">
         <div className="bespoke-episode-detail-card__header">
           <h4 className="bespoke-episode-detail-card__title">
+            {/* eslint-disable-next-line react/jsx-no-literals */}
             {`${formatEpisodeNumber(activeEpisode.episode_number)}. ${
               activeEpisode.title || `Episode ${activeEpisode.episode_number}`
             }`}

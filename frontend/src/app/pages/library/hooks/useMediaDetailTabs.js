@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export function useMediaDetailTabs({ cleanId, isMovie, isScene }) {
   const [activePanel, setActivePanel] = useState(() => {
@@ -8,8 +8,10 @@ export function useMediaDetailTabs({ cleanId, isMovie, isScene }) {
   });
   const [isSideNavVisible, setIsSideNavVisible] = useState(true);
 
-  // Sync active panel when cleanId changes
-  useEffect(() => {
+  const [prevCleanId, setPrevCleanId] = useState(cleanId);
+
+  if (cleanId !== prevCleanId) {
+    setPrevCleanId(cleanId);
     if (isScene) {
       setActivePanel(null);
     } else if (isMovie) {
@@ -17,7 +19,7 @@ export function useMediaDetailTabs({ cleanId, isMovie, isScene }) {
     } else {
       setActivePanel('seasons');
     }
-  }, [cleanId, isMovie, isScene]);
+  }
 
   const togglePanel = (panelName) => {
     setActivePanel(prev => prev === panelName ? null : panelName);

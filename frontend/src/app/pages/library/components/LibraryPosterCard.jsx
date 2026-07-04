@@ -1,4 +1,4 @@
-/* eslint-disable react/forbid-dom-props, react/jsx-no-literals, i18next/no-literal-string */
+ 
 import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, Pencil, Play } from 'lucide-react';

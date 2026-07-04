@@ -1,4 +1,4 @@
-/* eslint-disable react/forbid-dom-props, react/jsx-no-literals, i18next/no-literal-string */
+ 
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Star, Heart, Edit3, Clapperboard, Tv, Video, Users, CheckCircle, Search } from 'lucide-react';

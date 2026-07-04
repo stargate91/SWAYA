@@ -50,13 +50,12 @@ export default function OrganizerPage() {
   const [prevScanMode, setPrevScanMode] = useState(scanMode);
   const [prevProviderOptions, setPrevProviderOptions] = useState(providerOptions);
 
-  useEffect(() => {
-    if (prevScanMode === scanMode && prevProviderOptions === providerOptions) return;
+  if (prevScanMode !== scanMode || prevProviderOptions !== providerOptions) {
     setPrevScanMode(scanMode);
     setPrevProviderOptions(providerOptions);
     const fallbackProvider = scanMode === 'scenes' ? 'stashdb' : 'tmdb';
     setProvider((current) => getFirstEnabledProvider(providerOptions, current || fallbackProvider));
-  }, [prevProviderOptions, prevScanMode, providerOptions, scanMode]);
+  }
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect

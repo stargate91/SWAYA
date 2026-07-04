@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import TMDBImageGrid from '../../entityDetail/TMDBImageGrid';
 import ImageUploadPanel from '../../../modals/ImageUploadPanel';
@@ -20,11 +20,10 @@ export default function BackdropsPanel({ showTitle = true }) {
   const [prevBackdropPath, setPrevBackdropPath] = useState(item?.backdrop_path || '');
   const [selectedBackdropPath, setSelectedBackdropPath] = useState(item?.backdrop_path || '');
 
-  useEffect(() => {
-    if (!item?.backdrop_path || item.backdrop_path === prevBackdropPath) return;
+  if (item?.backdrop_path && item.backdrop_path !== prevBackdropPath) {
     setPrevBackdropPath(item.backdrop_path);
     setSelectedBackdropPath(item.backdrop_path);
-  }, [item?.backdrop_path, prevBackdropPath]);
+  }
 
   const handleUploadBackdrop = async (file) => {
     if (!file || uploadBackdropMutation.isPending) return;

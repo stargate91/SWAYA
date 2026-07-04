@@ -1,4 +1,4 @@
-/* eslint-disable react/forbid-dom-props, react/jsx-no-literals, i18next/no-literal-string */
+ 
 import { useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Button from '@/ui/Button';

@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-literals, i18next/no-literal-string */
 import Inline from '@/ui/Inline';
 import SettingsInstructionsBox from '../components/SettingsInstructionsBox.jsx';
 

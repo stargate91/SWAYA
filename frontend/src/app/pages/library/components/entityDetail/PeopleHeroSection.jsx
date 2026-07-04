@@ -5,8 +5,6 @@ import { Layers, User, PenLine, Heart, Check, Minus, Plus, Info, Bookmark, X, Ma
 import { API_BASE } from '@/lib/backend';
 import { getProfileImagePath } from '@/lib/imageUrls';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
-import EntityMetaPills from './EntityMetaPills';
-import EntityExtraMetaPills from './EntityExtraMetaPills';
 import './EntityDetailHeroSection.css';
 
 const TIMES_CHAR = '\u00d7';
@@ -15,7 +13,6 @@ const CM_CHAR = ' cm';
 const KG_CHAR = ' kg';
 
 export default function PeopleHeroSection({
-  isPeople,
   item,
   mediaUrl,
   overviewText,

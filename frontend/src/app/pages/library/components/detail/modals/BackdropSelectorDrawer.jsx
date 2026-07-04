@@ -1,4 +1,4 @@
-/* eslint-disable react/forbid-dom-props, react/jsx-no-literals, i18next/no-literal-string */
+/* eslint-disable react/forbid-dom-props, react/jsx-no-literals */
 import { createPortal } from 'react-dom';
 import { MediaDetailProvider } from '../MediaDetailContext';
 import BackdropsPanel from '../panels/BackdropsPanel';

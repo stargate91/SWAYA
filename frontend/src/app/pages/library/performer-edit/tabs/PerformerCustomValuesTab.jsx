@@ -87,8 +87,7 @@ export default function PerformerCustomValuesTab({ personId, person: initialPers
     return minDate > today;
   }, [form.birthday, person?.birthday, person?.is_adult]);
 
-  useEffect(() => {
-    if (prevManualLink === manualLink) return;
+  if (prevManualLink !== manualLink) {
     setPrevManualLink(manualLink);
     const initialized = {
       name: manualData.name || '',
@@ -116,7 +115,7 @@ export default function PerformerCustomValuesTab({ personId, person: initialPers
     };
     setInitialForm(initialized);
     setForm(initialized);
-  }, [manualData, manualLink, prevManualLink]);
+  }
 
   const handleChange = (key, val) => {
     setForm(prev => ({ ...prev, [key]: val }));

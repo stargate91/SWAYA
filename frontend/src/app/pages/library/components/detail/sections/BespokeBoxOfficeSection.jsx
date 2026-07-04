@@ -1,4 +1,4 @@
-/* eslint-disable react/forbid-dom-props, react/jsx-no-literals, i18next/no-literal-string */
+ 
 import { DollarSign, Coins, TrendingUp } from 'lucide-react';
 
 export default function BespokeBoxOfficeSection({ item, t }) {

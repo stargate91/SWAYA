@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
 import { useSetPersonFieldRoutingMutation } from '@/queries';
@@ -16,11 +16,10 @@ export default function PerformerMixerTab({ person: initialPerson }) {
   const [prevFieldRouting, setPrevFieldRouting] = useState(person?.field_routing);
   const [localRouting, setLocalRouting] = useState(person?.field_routing || {});
 
-  useEffect(() => {
-    if (prevFieldRouting === person?.field_routing) return;
+  if (person?.field_routing !== prevFieldRouting) {
     setPrevFieldRouting(person?.field_routing);
     setLocalRouting(person?.field_routing || {});
-  }, [person?.field_routing, prevFieldRouting]);
+  }
 
   const currentRouting = localRouting || {};
 

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { Layers, PenLine, X, Maximize2 } from 'lucide-react';
 import Pill from '@/ui/Pill';
@@ -27,7 +26,6 @@ export default function MovieCollectionHeroSection({
   onMediaCardClick,
   openModal,
 }) {
-  const navigate = useNavigate();
   const [lightboxUrl, setLightboxUrl] = useState(null);
 
   const getOriginalUrl = () => {
