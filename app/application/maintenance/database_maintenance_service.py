@@ -21,10 +21,24 @@ class DatabaseMaintenanceService:
             self.db.execute(text("PRAGMA foreign_keys = OFF"))
             deleted_tables = []
 
+            from sqlalchemy import delete
+            from app.domains.users.models import CustomList, CustomListItem
+            from app.domains.history.models import PlaybackLog, PlaybackPeakLog, ActionLog, ActionBatch
+
             if options.get("all") or options.get("wipe"):
                 excluded_tables = {"api_caches", "alembic_version", "system_settings", "user_settings", "users"}
+                
+                # Explicitly delete custom lists, custom list items, playback/peak logs, and rename/action logs using SQLAlchemy's query builder
+                self.db.execute(delete(CustomListItem))
+                self.db.execute(delete(CustomList))
+                self.db.execute(delete(PlaybackLog))
+                self.db.execute(delete(PlaybackPeakLog))
+                self.db.execute(delete(ActionLog))
+                self.db.execute(delete(ActionBatch))
+                deleted_tables.extend(["custom_list_items", "custom_lists", "playback_logs", "playback_peak_logs", "action_logs", "action_batches"])
+
                 for table in reversed(Base.metadata.sorted_tables):
-                    if table.name in excluded_tables:
+                    if table.name in excluded_tables or table.name in deleted_tables:
                         continue
                     self.db.execute(table.delete())
                     deleted_tables.append(table.name)
@@ -32,6 +46,10 @@ class DatabaseMaintenanceService:
                 self._reset_sqlite_sequences(deleted_tables)
                 self._ensure_default_user()
             elif options.get("cache") or options.get("wipe_cache"):
+                # Clean up custom list items that refer to matches using SQLAlchemy's query builder
+                self.db.execute(delete(CustomListItem).where(CustomListItem.match_id.isnot(None)))
+                deleted_tables.append("custom_list_items_matches")
+
                 cache_tables = {
                     "metadata_matches",
                     "metadata_localizations",

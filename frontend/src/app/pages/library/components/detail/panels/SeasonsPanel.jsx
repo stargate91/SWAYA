@@ -471,27 +471,25 @@ export default function SeasonsPanel() {
                     )}
 
                     {/* Watch toggle */}
-                    {!episode.last_watched_at && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          updateStatusMutation.mutate({
-                            itemId: episode.id,
-                            tvId: cleanId,
-                            payload: {
-                              is_watched: !episode.is_watched,
-                              media_type: 'episode',
-                            },
-                          })
-                        }
-                        className={`episode-card__action-btn episode-card__action-btn--watch ${
-                          episode.is_watched ? 'is-watched' : ''
-                        }`}
-                        title={episode.is_watched ? 'Mark unwatched' : 'Mark watched'}
-                      >
-                        {episode.is_watched ? <Check size={16} /> : <Eye size={16} />}
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateStatusMutation.mutate({
+                          itemId: episode.id,
+                          tvId: cleanId,
+                          payload: {
+                            is_watched: !episode.is_watched,
+                            media_type: 'episode',
+                          },
+                        })
+                      }
+                      className={`episode-card__action-btn episode-card__action-btn--watch ${
+                        episode.is_watched ? 'is-watched' : ''
+                      }`}
+                      title={episode.is_watched ? 'Mark unwatched' : 'Mark watched'}
+                    >
+                      {episode.is_watched ? <Check size={16} /> : <Eye size={16} />}
+                    </button>
 
 
                   </>

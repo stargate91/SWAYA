@@ -232,7 +232,13 @@ export default function ListsPage() {
       mediaType = 'tv';
     }
 
-    let itemId = item.media_item_id;
+    let itemId;
+    if (mediaType === 'tv') {
+      itemId = item.tmdb_id || item.external_id || item.match_id || item.media_item_id;
+    } else {
+      itemId = item.media_item_id;
+    }
+
     if (!itemId) {
       if (mediaType === 'movie') {
         const prefix = item.provider === 'porndb' ? 'porndb_' : 'tmdb_';
@@ -688,14 +694,15 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
           }
         });
       } else {
+        const isTvItem = item.media_type === 'tv' || mediaType === 'tv';
         const isSceneItem = item.media_type === 'scene' || mediaType === 'scene';
         const poster = isSceneItem ? (item.backdrop_path || item.poster_path) : (item.poster_path || item.profile_path);
 
         await addListItemMutation.mutateAsync({
           listId: activeList.id,
           payload: {
-            media_item_id: source === 'library' ? item.id : undefined,
-            tmdb_id: source === 'discover' ? item.id : undefined,
+            media_item_id: (source === 'library' && !isTvItem) ? item.id : undefined,
+            tmdb_id: (source === 'discover' || isTvItem) ? item.id : undefined,
             media_type: item.media_type || mediaType,
             provider: source === 'discover' ? (item.provider || provider) : undefined,
             title: item.title || item.name,

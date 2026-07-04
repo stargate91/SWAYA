@@ -441,27 +441,25 @@ export default function BespokeSeasonsSection() {
                   )}
 
                   {/* Watch toggle */}
-                  {!activeEpisode.last_watched_at && (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        updateStatusMutation.mutate({
-                          itemId: activeEpisode.id,
-                          tvId: cleanId,
-                          payload: {
-                            is_watched: !activeEpisode.is_watched,
-                            media_type: 'episode',
-                          },
-                        })
-                      }
-                      className={`bespoke-action-btn bespoke-action-btn--watch ${
-                        activeEpisode.is_watched ? 'is-watched' : ''
-                      }`}
-                      title={activeEpisode.is_watched ? 'Mark unwatched' : 'Mark watched'}
-                    >
-                      {activeEpisode.is_watched ? <Check size={15} /> : <Eye size={15} />}
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      updateStatusMutation.mutate({
+                        itemId: activeEpisode.id,
+                        tvId: cleanId,
+                        payload: {
+                          is_watched: !activeEpisode.is_watched,
+                          media_type: 'episode',
+                        },
+                      })
+                    }
+                    className={`bespoke-action-btn bespoke-action-btn--watch ${
+                      activeEpisode.is_watched ? 'is-watched' : ''
+                    }`}
+                    title={activeEpisode.is_watched ? 'Mark unwatched' : 'Mark watched'}
+                  >
+                    {activeEpisode.is_watched ? <Check size={15} /> : <Eye size={15} />}
+                  </button>
                 </div>
               </div>
 

@@ -105,6 +105,9 @@ class OverridePersister:
                 m_override.is_watched = False
                 m_override.watch_count = 0
                 m_override.last_watched_at = None
+                if media_item_id:
+                    from app.domains.history.models import PlaybackLog
+                    db.query(PlaybackLog).filter(PlaybackLog.media_item_id == media_item_id).delete()
 
         if has_active_interaction:
             m_override.is_tracked = True
@@ -272,6 +275,9 @@ class OverridePersister:
                     override.is_watched = False
                     override.watch_count = 0
                     override.last_watched_at = None
+                    if override.media_item_id:
+                        from app.domains.history.models import PlaybackLog
+                        db.query(PlaybackLog).filter(PlaybackLog.media_item_id == override.media_item_id).delete()
                 count += 1
 
         db.commit()
