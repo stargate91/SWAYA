@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Plus, X, Search, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, X, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import Pill from '@/ui/Pill';
 import { useAllTagsQuery } from '@/queries/libraryQueries';
 import { useMediaDetailContext } from './MediaDetailContext';
@@ -71,6 +71,11 @@ function HorizontalPillList({ children }) {
       )}
     </div>
   );
+}
+
+function TagColorDot({ color }) {
+  // eslint-disable-next-line react/forbid-dom-props
+  return <span className="bespoke-scene-tagger-dropdown-color-dot" style={{ backgroundColor: color }} />;
 }
 
 export default function BespokeSceneTagger() {
@@ -175,7 +180,7 @@ export default function BespokeSceneTagger() {
                   <Pill
                     key={tagName}
                     variant="custom"
-                    style={{
+                    customStyle={{
                       backgroundColor: `color-mix(in srgb, ${tagColor} 24%, rgba(10, 10, 15, 0.6))`,
                       borderColor: `color-mix(in srgb, ${tagColor} 50%, rgba(255, 255, 255, 0.15))`,
                       color: `color-mix(in srgb, ${tagColor} 95%, white)`,
@@ -233,10 +238,7 @@ export default function BespokeSceneTagger() {
                   onClick={() => handleAddTag(tag.name)}
                   className="bespoke-scene-tagger-dropdown-item"
                 >
-                  <span
-                    className="bespoke-scene-tagger-dropdown-color-dot"
-                    style={{ backgroundColor: tag.color }}
-                  />
+                  <TagColorDot color={tag.color} />
                   <span>{tag.name}</span>
                 </button>
               ))}
@@ -247,7 +249,7 @@ export default function BespokeSceneTagger() {
                   className="bespoke-scene-tagger-dropdown-item bespoke-scene-tagger-dropdown-item--create"
                 >
                   <Plus size={12} />
-                  <span>Create tag &quot;{searchQuery.trim()}&quot;</span>
+                  <span>{t('library.details.createTag', { name: searchQuery.trim() })}</span>
                 </button>
               )}
             </div>

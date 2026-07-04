@@ -4,7 +4,8 @@ export const useLibraryModeStore = create((set) => ({
   sessionMode: (() => {
     try {
       return localStorage.getItem('library_session_mode') || 'sfw';
-    } catch {
+    } catch (err) {
+      console.error(err);
       return 'sfw';
     }
   })(),
@@ -15,8 +16,8 @@ export const useLibraryModeStore = create((set) => ({
       } else {
         localStorage.removeItem('library_session_mode');
       }
-    } catch {
-      // Ignore
+    } catch (err) {
+      console.error(err);
     }
     set({ sessionMode: mode || 'sfw' });
   },
@@ -25,8 +26,8 @@ export const useLibraryModeStore = create((set) => ({
       const nextMode = state.sessionMode === 'nsfw' ? 'sfw' : 'nsfw';
       try {
         localStorage.setItem('library_session_mode', nextMode);
-      } catch {
-        // Ignore
+      } catch (err) {
+        console.error(err);
       }
       return { sessionMode: nextMode };
     });

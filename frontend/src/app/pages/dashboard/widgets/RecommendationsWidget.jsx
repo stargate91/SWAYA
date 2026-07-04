@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, useEffect } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { Check, ChevronLeft, ChevronRight, Star, Plus, Minus } from 'lucide-react';
@@ -277,20 +277,24 @@ const RecommendationsWidget = ({ language, T }) => {
   const removeFromWatchlist = useRemoveFromWatchlistMutation();
 
   const watchlistIdsFromQuery = recommendations.watchlist_item_ids;
-  const [optimisticWatchlistIds, setOptimisticWatchlistIds] = useState([]);
+  const [prevWatchlistIds, setPrevWatchlistIds] = useState(null);
+  const [optimisticWatchlistIds, setOptimisticWatchlistIds] = useState(null);
 
-  useEffect(() => {
-    setOptimisticWatchlistIds(watchlistIdsFromQuery || []);
-  }, [watchlistIdsFromQuery]);
+  if (watchlistIdsFromQuery !== prevWatchlistIds) {
+    setPrevWatchlistIds(watchlistIdsFromQuery);
+    setOptimisticWatchlistIds(null);
+  }
+
+  const actualWatchlistIds = optimisticWatchlistIds !== null ? optimisticWatchlistIds : (watchlistIdsFromQuery || []);
 
   const handleWatchlist = async (tmdbId, type) => {
-    const isWatchlisted = optimisticWatchlistIds.includes(tmdbId);
+    const isWatchlisted = actualWatchlistIds.includes(tmdbId);
 
     // Optimistic toggle
     if (isWatchlisted) {
-      setOptimisticWatchlistIds((prev) => prev.filter((id) => id !== tmdbId));
+      setOptimisticWatchlistIds(actualWatchlistIds.filter((id) => id !== tmdbId));
     } else {
-      setOptimisticWatchlistIds((prev) => [...prev, tmdbId]);
+      setOptimisticWatchlistIds([...actualWatchlistIds, tmdbId]);
     }
 
     try {
@@ -303,9 +307,9 @@ const RecommendationsWidget = ({ language, T }) => {
       console.error(error);
       // Revert optimistic update
       if (isWatchlisted) {
-        setOptimisticWatchlistIds((prev) => [...prev, tmdbId]);
+        setOptimisticWatchlistIds(actualWatchlistIds.filter((id) => id !== tmdbId).concat(tmdbId));
       } else {
-        setOptimisticWatchlistIds((prev) => prev.filter((id) => id !== tmdbId));
+        setOptimisticWatchlistIds(actualWatchlistIds.filter((id) => id !== tmdbId));
       }
       toast(T(isWatchlisted ? 'dashboard.watchlist.remove_failed' : 'dashboard.watchlist.add_failed') || 'Action failed', 'danger');
     }
@@ -324,7 +328,7 @@ const RecommendationsWidget = ({ language, T }) => {
       {!isLoading && recommendations?.trending?.length > 0 && (
         <SpotlightBanner
           item={recommendations.trending[0]}
-          watchlistIds={optimisticWatchlistIds}
+          watchlistIds={actualWatchlistIds}
           onWatchlist={handleWatchlist}
           onCardClick={handleCardClick}
           T={T}
@@ -337,7 +341,7 @@ const RecommendationsWidget = ({ language, T }) => {
         <RecommendationCarousel
           title={T('dashboard.recommendations.discover_movies') || 'Discover Movies'}
           items={recommendations.discover_movies}
-          watchlistIds={optimisticWatchlistIds}
+          watchlistIds={actualWatchlistIds}
           onWatchlist={handleWatchlist}
           onCardClick={handleCardClick}
           T={T}
@@ -348,7 +352,7 @@ const RecommendationsWidget = ({ language, T }) => {
         <RecommendationCarousel
           title={T('dashboard.recommendations.discover_series') || 'Discover Series'}
           items={recommendations.discover_tv}
-          watchlistIds={optimisticWatchlistIds}
+          watchlistIds={actualWatchlistIds}
           onWatchlist={handleWatchlist}
           onCardClick={handleCardClick}
           T={T}
@@ -359,7 +363,7 @@ const RecommendationsWidget = ({ language, T }) => {
         <RecommendationCarousel
           title={T('dashboard.recommendations.discover_adult') || 'Discover Adult Movies'}
           items={recommendations.discover_adult}
-          watchlistIds={optimisticWatchlistIds}
+          watchlistIds={actualWatchlistIds}
           onWatchlist={handleWatchlist}
           onCardClick={handleCardClick}
           T={T}

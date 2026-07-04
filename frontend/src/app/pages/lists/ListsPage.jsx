@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '@/providers/LanguageContext';
 import Page from '@/ui/Page';
@@ -47,18 +47,21 @@ export default function ListsPage() {
     enabled: !!activeListId
   });
 
-  // Close drawer when switching active list
-  useEffect(() => {
-    setIsDrawerOpen(false);
-  }, [activeListId]);
+  const [prevActiveListId, setPrevActiveListId] = useState(null);
+  const [prevLists, setPrevLists] = useState([]);
 
-  // Set default active list on load
-  useEffect(() => {
+  if (activeListId !== prevActiveListId) {
+    setPrevActiveListId(activeListId);
+    setIsDrawerOpen(false);
+  }
+
+  if (lists !== prevLists) {
+    setPrevLists(lists);
     if (lists.length > 0 && activeListId === null) {
       const watchlist = lists.find((l) => l.is_watchlist) || lists[0];
       setActiveListId(watchlist.id);
     }
-  }, [lists, activeListId]);
+  }
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -215,11 +218,41 @@ export default function ListsPage() {
     }
   };
 
-  const { toast } = useUi();
 
   const handleStartAddItems = () => {
     setIsDrawerOpen(true);
   };
+
+  const handleCardClick = (item) => {
+    const rawType = item.media_type || 'movie';
+    let mediaType = rawType === 'show' ? 'tv' : rawType;
+    if (mediaType === 'episode' || mediaType === 'season') {
+      mediaType = 'tv';
+    }
+
+    let itemId = item.media_item_id;
+    if (!itemId) {
+      if (mediaType === 'movie') {
+        const prefix = item.provider === 'porndb' ? 'porndb_' : 'tmdb_';
+        itemId = item.external_id ? `${prefix}${item.external_id}` : (item.tmdb_id ? `tmdb_${item.tmdb_id}` : item.match_id);
+      } else if (mediaType === 'tv') {
+        itemId = item.external_id || item.tmdb_id || item.match_id;
+      } else if (mediaType === 'scene') {
+        const prefix = item.provider === 'porndb' ? 'porndb' : item.provider === 'fansdb' ? 'fansdb' : 'stash';
+        itemId = item.external_id ? `${prefix}_${item.external_id}` : item.match_id;
+      } else {
+        itemId = item.match_id;
+      }
+    }
+
+    const targetPath = mediaType === 'person'
+      ? `/library/people/${item.person_id || itemId}`
+      : `/library/${mediaType}/${itemId}`;
+
+    navigate(targetPath);
+  };
+
+  const createdLabel = activeList?.created_at ? ((t('lists.created_prefix') || 'CREATED') + ': ' + new Date(activeList.created_at).toLocaleDateString()) : '';
 
   return (
     <Page className="lists-page">
@@ -243,7 +276,7 @@ export default function ListsPage() {
                 ref={fileInputRef}
                 accept=".json"
                 onChange={handleFileChange}
-                style={{ display: 'none' }}
+                hidden
               />
               <button
                 type="button"
@@ -274,17 +307,11 @@ export default function ListsPage() {
                       role="button"
                       tabIndex={0}
                       onKeyDown={(e) => e.key === 'Enter' && setActiveListId(list.id)}
+                      // eslint-disable-next-line react/forbid-dom-props
                       style={{ '--list-theme-color': list.color || 'var(--color-accent-blue)' }}
                     >
                       <div className="lists-sidebar__item-left">
-                        <div
-                          className="lists-sidebar__item-icon-wrap"
-                          style={{
-                            '--list-theme-color': list.color || 'var(--color-accent-blue)',
-                            backgroundImage: `linear-gradient(135deg, color-mix(in srgb, ${list.color || 'var(--color-accent-blue)'} 18%, #121216), color-mix(in srgb, ${list.color || 'var(--color-accent-blue)'} 6%, #09090b))`,
-                            boxShadow: `0 4px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -2px 6px rgba(0, 0, 0, 0.5)`
-                          }}
-                        >
+                        <div className="lists-sidebar__item-icon-wrap">
                           {list.sample_posters && list.sample_posters.length > 0 ? (
                             <div className={`lists-sidebar__collage lists-sidebar__collage--${Math.min(4, list.sample_posters.length)}`}>
                               {list.sample_posters.slice(0, 4).map((path, idx) => (
@@ -297,9 +324,9 @@ export default function ListsPage() {
                               ))}
                             </div>
                           ) : list.list_type === 'person' ? (
-                            <Users size={28} style={{ color: list.color || 'var(--color-accent-blue)' }} />
+                            <Users size={28} color={list.color || 'var(--color-accent-blue)'} />
                           ) : (
-                            <Film size={28} style={{ color: list.color || 'var(--color-accent-blue)' }} />
+                            <Film size={28} color={list.color || 'var(--color-accent-blue)'} />
                           )}
                         </div>
                         <div className="lists-sidebar__item-info">
@@ -348,6 +375,7 @@ export default function ListsPage() {
         <main className="lists-main">
           {activeList ? (
             <>
+              {/* eslint-disable-next-line react/forbid-dom-props */}
               <div className="lists-header" style={{ '--list-theme-color': activeList.color || 'var(--color-accent-blue)' }}>
                 <div className="lists-header__left">
                   <div className="lists-header__title-row">
@@ -357,12 +385,10 @@ export default function ListsPage() {
                     <p className="lists-header__description">{activeList.description}</p>
                   )}
                   {activeList.created_at && (
-                    <span className="lists-header__date">
-                      {t('lists.created_prefix') || 'CREATED'}: {new Date(activeList.created_at).toLocaleDateString()}
-                    </span>
+                    <span className="lists-header__date">{createdLabel}</span>
                   )}
                 </div>
-                <div className="lists-header__right" style={{ display: 'flex', gap: '8px' }}>
+                <div className="lists-header__right">
                   <Button
                     variant="secondary-neutral"
                     size="sm"
@@ -385,7 +411,7 @@ export default function ListsPage() {
 
               <div className="lists-content">
                 {isDetailsLoading ? (
-                  <div className="lists-sidebar__loading" style={{ padding: 'var(--space-8) 0', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                  <div className="lists-content__loading">
                     <Loader2 className="spinner" size={24} />
                   </div>
                 ) : !activeListDetails || !activeListDetails.items || activeListDetails.items.length === 0 ? (
@@ -406,73 +432,35 @@ export default function ListsPage() {
                         ? `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(rawPosterUrl)}&blur=true`
                         : rawPosterUrl;
 
-                      return (
+                       return (
                         <div
                           key={item.id}
                           className={`lists-card ${isScene ? 'lists-card--scene' : 'lists-card--poster'}`}
-                          onClick={() => {
-                            const rawType = item.media_type || 'movie';
-                            let mediaType = rawType === 'show' ? 'tv' : rawType;
-                            if (mediaType === 'episode' || mediaType === 'season') {
-                              mediaType = 'tv';
+                          onClick={() => handleCardClick(item)}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handleCardClick(item);
                             }
-
-                            let itemId = item.media_item_id;
-                            if (!itemId) {
-                              if (mediaType === 'movie') {
-                                const prefix = item.provider === 'porndb' ? 'porndb_' : 'tmdb_';
-                                itemId = item.external_id ? `${prefix}${item.external_id}` : (item.tmdb_id ? `tmdb_${item.tmdb_id}` : item.match_id);
-                              } else if (mediaType === 'tv') {
-                                itemId = item.external_id || item.tmdb_id || item.match_id;
-                              } else if (mediaType === 'scene') {
-                                const prefix = item.provider === 'porndb' ? 'porndb' : item.provider === 'fansdb' ? 'fansdb' : 'stash';
-                                itemId = item.external_id ? `${prefix}_${item.external_id}` : item.match_id;
-                              } else {
-                                itemId = item.match_id;
-                              }
-                            }
-
-                            const targetPath = mediaType === 'person'
-                              ? `/library/people/${item.person_id || itemId}`
-                              : `/library/${mediaType}/${itemId}`;
-
-                            console.log('ListsPage card click:', {
-                              item,
-                              rawType,
-                              mediaType,
-                              itemId,
-                              targetPath
-                            });
-
-                            navigate(targetPath);
                           }}
                         >
-                          <div className={`lists-card__media ${shouldBlur ? 'is-blurred' : ''}`} style={{ position: 'relative' }}>
+                          <div className={`lists-card__media ${shouldBlur ? 'is-blurred' : ''}`}>
                             {posterUrl ? (
                               <img
                                 src={posterUrl}
                                 alt={item.title}
-                                style={{
-                                  width: '100%',
-                                  height: '100%',
-                                  objectFit: 'cover',
-                                  display: 'block',
-                                  borderBottom: '1px solid var(--color-border-subtle, rgba(255,255,255,0.05))'
-                                }}
+                                className="lists-card__img"
                               />
                             ) : (
-                              <div style={{
-                                position: 'absolute',
-                                inset: 0,
-                                background: 'linear-gradient(135deg, rgba(255,255,255,0.05), rgba(0,0,0,0.4))',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                              }} />
+                              <div className="lists-card__placeholder" />
                             )}
                             {shouldBlur && (
                               <div className="recommend-card-blur-overlay">
-                                <span className="settings-badge settings-badge--danger">18+</span>
+                                <span className="settings-badge settings-badge--danger">
+                                  {t('common.adult_badge', { defaultValue: '18+' })}
+                                </span>
                               </div>
                             )}
                           </div>
@@ -539,6 +527,34 @@ function ResultAddButton({ added, onAdd, onRemove }) {
   );
 }
 
+function DrawerItemImage({ src, listType, isSceneItem, mediaType, itemMediaType }) {
+  const [hasError, setHasError] = useState(!src);
+
+  if (!src || hasError) {
+    return (
+      <div className="lists-drawer__item-media-placeholder">
+        {listType === 'person' ? (
+          <Users size={14} />
+        ) : isSceneItem ? (
+          <Film size={14} />
+        ) : (mediaType === 'tv' || itemMediaType === 'tv') ? (
+          <Tv size={14} />
+        ) : (
+          <Film size={14} />
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt=""
+      onError={() => setHasError(true)}
+    />
+  );
+}
+
 function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, activeListDetails, t }) {
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const isAdultActive = sessionMode === 'nsfw';
@@ -556,17 +572,20 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
   const [statusFilter, setStatusFilter] = useState('not_added'); // 'added', 'not_added'
   const { toast } = useUi();
 
-  // Reset search when opening/closing or changing lists/tabs
-  useEffect(() => {
+  const [prevResetDeps, setPrevResetDeps] = useState(null);
+  const resetDepsStr = `${isOpen}_${activeList?.id || ''}_${source}_${mediaType}_${isAdultActive}`;
+
+  if (resetDepsStr !== prevResetDeps) {
+    setPrevResetDeps(resetDepsStr);
     setQuery('');
     setResults([]);
     setPage(1);
     setHasMore(false);
     setStatusFilter('not_added');
     setProvider(mediaType === 'scene' ? 'porndb' : 'tmdb');
-  }, [isOpen, activeList?.id, source, mediaType, isAdultActive]);
+  }
 
-  const handleSearch = async (isNew = true) => {
+  const handleSearch = useCallback(async (isNew = true) => {
     if (source === 'discover' && !query.trim()) {
       setResults([]);
       setHasMore(false);
@@ -636,28 +655,22 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
       setSearching(false);
       setLoadingMore(false);
     }
-  };
+  }, [query, source, mediaType, provider, isAdultActive, page, activeList]);
 
   useEffect(() => {
     if (!isOpen) return;
 
-    // Instantly load local library items when query is empty
-    if (source === 'library' && !query.trim()) {
-      handleSearch(true);
-      return;
-    }
-
     const delayDebounceFn = setTimeout(() => {
-      if (query.trim()) {
+      if (source === 'library' || query.trim()) {
         handleSearch(true);
       } else {
         setResults([]);
         setHasMore(false);
       }
-    }, 350);
+    }, source === 'library' && !query.trim() ? 0 : 350);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [query, source, mediaType, provider, isOpen, isAdultActive]);
+  }, [query, source, mediaType, provider, isOpen, isAdultActive, handleSearch]);
 
   if (!activeList) return null;
   const listType = activeList.list_type;
@@ -732,7 +745,7 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
 
   return (
     <>
-      <div className="ui-drawer-backdrop" onClick={onClose} />
+      <div className="ui-drawer-backdrop" onClick={onClose} role="presentation" />
       <div className="ui-drawer ui-drawer--lg lists-drawer">
         <div className="lists-drawer__header">
           <h3>{listType === 'person' ? (t('lists.add_people_title') || 'Add People') : (t('lists.add_titles_title') || 'Add Titles')}</h3>
@@ -741,7 +754,7 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
           </button>
         </div>
 
-        <div className="lists-drawer__search-area" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div className="lists-drawer__search-area">
           <SegmentedControl
             options={[
               { label: 'My Library', value: 'library' },
@@ -842,7 +855,7 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
 
           {!searching && results.length === 0 && query && (
             <div className="lists-drawer__empty">
-              No results found.
+              {t('lists.no_results', { defaultValue: 'No results found.' })}
             </div>
           )}
 
@@ -854,7 +867,7 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
             return true;
           }).length === 0 && (
               <div className="lists-drawer__empty">
-                No items match the selected status filter.
+                {t('lists.no_status_match', { defaultValue: 'No items match the selected status filter.' })}
               </div>
             )}
 
@@ -875,32 +888,13 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
             return (
               <div key={item.id} className={`lists-drawer__item ${isSceneItem ? 'lists-drawer__item--scene' : ''}`}>
                 <div className="lists-drawer__item-media">
-                  <img
+                  <DrawerItemImage
                     src={poster ? resolveMediaImageUrl(poster, imageSize) : ''}
-                    alt=""
-                    style={{ display: poster ? 'block' : 'none' }}
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      const placeholderEl = e.currentTarget.nextSibling;
-                      if (placeholderEl) {
-                        placeholderEl.style.display = 'flex';
-                      }
-                    }}
+                    listType={listType}
+                    isSceneItem={isSceneItem}
+                    mediaType={mediaType}
+                    itemMediaType={item.media_type}
                   />
-                  <div
-                    className="lists-drawer__item-media-placeholder"
-                    style={{ display: poster ? 'none' : 'flex' }}
-                  >
-                    {listType === 'person' ? (
-                      <Users size={14} />
-                    ) : (isSceneItem ? (
-                      <Film size={14} />
-                    ) : (mediaType === 'tv' || item.media_type === 'tv') ? (
-                      <Tv size={14} />
-                    ) : (
-                      <Film size={14} />
-                    ))}
-                  </div>
                 </div>
                 <div className="lists-drawer__item-info">
                   <span className="lists-drawer__item-title">{title}</span>
@@ -916,7 +910,7 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
           })}
 
           {loadingMore && (
-            <div className="lists-drawer__loader" style={{ padding: '8px 0' }}>
+            <div className="lists-drawer__loader lists-drawer__loader--small">
               <Loader2 className="spinner" size={20} />
             </div>
           )}

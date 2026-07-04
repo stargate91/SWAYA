@@ -225,9 +225,19 @@ export default function BespokeSeasonsSection() {
           {/* Left Column: Large Season Poster */}
           <div className="bespoke-season-detail-card__poster-col">
             <div
-              className="bespoke-season-detail-card__poster-wrapper"
-              style={{ cursor: getPosterUrl(activeSeason.poster_path) ? 'pointer' : 'default' }}
-              onClick={() => handleOpenLightbox(getOriginalPosterUrl(activeSeason.poster_path))}
+              className={`bespoke-season-detail-card__poster-wrapper ${getPosterUrl(activeSeason.poster_path) ? 'is-clickable' : ''}`}
+              role="button"
+              tabIndex={getPosterUrl(activeSeason.poster_path) ? 0 : -1}
+              onKeyDown={(e) => {
+                if (getPosterUrl(activeSeason.poster_path) && (e.key === 'Enter' || e.key === ' ')) {
+                  handleOpenLightbox(getOriginalPosterUrl(activeSeason.poster_path));
+                }
+              }}
+              onClick={() => {
+                if (getPosterUrl(activeSeason.poster_path)) {
+                  handleOpenLightbox(getOriginalPosterUrl(activeSeason.poster_path));
+                }
+              }}
             >
               {getPosterUrl(activeSeason.poster_path) ? (
                 <img
@@ -360,11 +370,21 @@ export default function BespokeSeasonsSection() {
 
             {/* Left Column: Large Cinematic 16:9 Still */}
             <div className="bespoke-episode-detail-card__still-col">
-              <div
-                className="bespoke-episode-detail-card__still-wrapper"
-                style={{ cursor: getStillUrl(activeEpisode.still_path) ? 'pointer' : 'default' }}
-                onClick={() => handleOpenLightbox(getOriginalStillUrl(activeEpisode.still_path))}
-              >
+            <div
+              className={`bespoke-episode-detail-card__still-wrapper ${getStillUrl(activeEpisode.still_path) ? 'is-clickable' : ''}`}
+              role="button"
+              tabIndex={getStillUrl(activeEpisode.still_path) ? 0 : -1}
+              onKeyDown={(e) => {
+                if (getStillUrl(activeEpisode.still_path) && (e.key === 'Enter' || e.key === ' ')) {
+                  handleOpenLightbox(getOriginalStillUrl(activeEpisode.still_path));
+                }
+              }}
+              onClick={() => {
+                if (getStillUrl(activeEpisode.still_path)) {
+                  handleOpenLightbox(getOriginalStillUrl(activeEpisode.still_path));
+                }
+              }}
+            >
                 {getStillUrl(activeEpisode.still_path) ? (
                   <img
                     src={getStillUrl(activeEpisode.still_path)}

@@ -36,6 +36,13 @@ const OtherSilhouette = () => (
   </svg>
 );
 
+const SOURCE_BUCKETS = [
+  { key: 'tmdb', label: 'TMDb', dbName: 'tmdb' },
+  { key: 'stashdb', label: 'StashDB', dbName: 'stashdb' },
+  { key: 'fansdb', label: 'FansDB', dbName: 'fansdb' },
+  { key: 'theporndb', label: 'THEPornDB', dbName: 'porndb' },
+];
+
 export default function PerformerLinkingTab({ personId, defaultQuery = '', person: initialPerson }) {
   const { data: fetchedPerson } = usePersonDetailQuery(personId);
   const person = fetchedPerson || initialPerson;
@@ -97,7 +104,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
         handleFinish();
       }
     }
-  }, [person, currentProfileUrl, oldProfileUrl, isWaitingForImage, linkingSource]);
+  }, [person, currentProfileUrl, oldProfileUrl, isWaitingForImage, linkingSource, t, toast]);
 
   useEffect(() => {
     return () => {
@@ -122,13 +129,6 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
       toast(err.message || 'Failed to set primary source', 'danger');
     }
   };
-
-  const SOURCE_BUCKETS = [
-    { key: 'tmdb', label: 'TMDb', dbName: 'tmdb' },
-    { key: 'stashdb', label: 'StashDB', dbName: 'stashdb' },
-    { key: 'fansdb', label: 'FansDB', dbName: 'fansdb' },
-    { key: 'theporndb', label: 'THEPornDB', dbName: 'porndb' },
-  ];
 
   const getLinkedInfo = (bucket) => {
     if (!person) return null;

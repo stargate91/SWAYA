@@ -4,7 +4,7 @@ import Dropdown from '@/ui/Dropdown';
 import Checkbox from '@/ui/Checkbox';
 import SegmentedControl from '@/ui/SegmentedControl';
 import Pill from '@/ui/Pill';
-import { SlidersHorizontal, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import {
   isLibraryCollectionTab,
   isLibraryPeopleTab,
@@ -26,6 +26,8 @@ const formatPhysicalAttributeLabel = (val) => {
     })
     .join(' ');
 };
+
+const dummyFunc = () => {};
 
 export default function LibraryFilters({
   t,
@@ -60,9 +62,9 @@ export default function LibraryFilters({
   favoriteFilter,
   setFavoriteFilter,
   selectedTags = [],
-  setSelectedTags = () => {},
+  setSelectedTags = dummyFunc,
   tagsFilter = [],
-  setTagsFilter = () => {},
+  setTagsFilter = dummyFunc,
   performerFilter,
   setPerformerFilter,
   studioFilter,
@@ -86,7 +88,7 @@ export default function LibraryFilters({
   filterData,
 }) {
   const actualSelectedTags = selectedTags.length > 0 ? selectedTags : tagsFilter;
-  const actualSetSelectedTags = setSelectedTags !== (() => {}) ? setSelectedTags : setTagsFilter;
+  const actualSetSelectedTags = setSelectedTags !== dummyFunc ? setSelectedTags : setTagsFilter;
 
   const isVideoTab = isLibraryVideoTab(resolvedTab);
   const isCollectionTab = isLibraryCollectionTab(resolvedTab);
@@ -369,6 +371,7 @@ export default function LibraryFilters({
           </div>
         )}
 
+        {/* eslint-disable react/forbid-dom-props */}
         {(isVideoTab || isPeopleTab) && filterData?.tags && filterData.tags.length > 0 && (
           <div className="library-sorter-container" ref={tagDropdownRef}>
             <span className="library-sorter-label">{t('library.filter.tagsLabel') || 'Tags:'}</span>
@@ -377,16 +380,8 @@ export default function LibraryFilters({
                 <button
                   ref={tagTriggerRef}
                   type="button"
-                  className="ui-dropdown__trigger ui-dropdown__trigger--sorter"
+                  className="ui-dropdown__trigger ui-dropdown__trigger--sorter ui-dropdown__trigger--sorter-custom"
                   onClick={() => setIsTagDropdownOpen(prev => !prev)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '8px',
-                    minWidth: '140px',
-                    maxWidth: '240px'
-                  }}
                 >
                   <span className="ui-dropdown__trigger-text" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {actualSelectedTags.length === 0
@@ -432,13 +427,6 @@ export default function LibraryFilters({
                               width: '100%'
                             }}
                           >
-                            <style>{`
-                              .tags-dropdown-item .ui-checkbox-wrap {
-                                justify-content: flex-start !important;
-                                width: 100%;
-                                padding: 6px 12px;
-                              }
-                            `}</style>
                              <Checkbox
                               checked={isChecked}
                               onChange={() => {
@@ -456,9 +444,7 @@ export default function LibraryFilters({
                         );
                       })}
                     {filterData.tags.filter(tag => String(tag.name || '').toLowerCase().includes(tagSearch.toLowerCase())).length === 0 && (
-                      <div className="ui-dropdown__no-results">
-                        {t('dropdown.noResults') || 'No results'}
-                      </div>
+                      <div className="ui-dropdown__empty">{t('dropdown.noResults') || 'No results'}</div>
                     )}
                   </div>
                 </div>,
@@ -467,6 +453,7 @@ export default function LibraryFilters({
             </div>
           </div>
         )}
+        {/* eslint-enable react/forbid-dom-props */}
 
         {isVideoTab && timeFilterMode === 'decade' && (
           <div className="library-sorter-container">

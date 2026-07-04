@@ -33,7 +33,6 @@ import BespokeSeasonsSection from './components/detail/BespokeSeasonsSection';
 import TechnicalPanel from './components/detail/panels/TechnicalPanel';
 import ExtrasPanel from './components/detail/panels/ExtrasPanel';
 import BackdropsPanel from './components/detail/panels/BackdropsPanel';
-import TagsPanel from './components/detail/panels/TagsPanel';
 import BespokeSceneTagger from './components/detail/BespokeSceneTagger';
 import BespokeScenePeaks from './components/detail/BespokeScenePeaks';
 import './components/entityDetail/EntityDetailHeroSection.css';
@@ -228,7 +227,7 @@ function BespokeCompaniesSection({ item, t }) {
       }
     }
     return list;
-  }, [item?.companies, item?.networks, isSceneType]);
+  }, [item, isSceneType]);
 
   const handleScrollState = () => {
     const container = companiesScrollRef.current;

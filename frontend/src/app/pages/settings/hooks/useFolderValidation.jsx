@@ -16,7 +16,8 @@ export default function useFolderValidation({ t, onInvalid }) {
         folder_library_path: libraryPath,
         folder_move_to_library: moveToLibrary,
       });
-    } catch {
+    } catch (err) {
+      console.error(err);
       return normalizeFolderValidationResult({ valid: false, message: 'backendUnavailable' });
     }
   }, [validateFoldersMutation]);

@@ -4,7 +4,8 @@ export const usePersonCreditsStore = create((set) => ({
   activeDiscoverTab: (() => {
     try {
       return localStorage.getItem('person_credits_discover_tab') || '';
-    } catch {
+    } catch (err) {
+      console.error(err);
       return '';
     }
   })(),
@@ -15,8 +16,8 @@ export const usePersonCreditsStore = create((set) => ({
       } else {
         localStorage.removeItem('person_credits_discover_tab');
       }
-    } catch {
-      // Ignore
+    } catch (err) {
+      console.error(err);
     }
     set({ activeDiscoverTab: tab });
   },

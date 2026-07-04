@@ -3,13 +3,12 @@ import PosterGrid from '@/ui/PosterGrid';
 import PosterCard from '@/ui/PosterCard';
 import Pill from '@/ui/Pill';
 import EmptyState from '@/ui/EmptyState';
-import CreditCard from '@/ui/CreditCard';
 import BackdropCard from '@/ui/BackdropCard';
 import ImageUploadPanel from '../../modals/ImageUploadPanel';
 import { API_BASE } from '@/lib/backend';
 import { isTvLikeMediaType, isSceneMediaType } from '@/lib/mediaTypes';
 import { getPosterImagePath, buildTmdbImageUrl, TMDB_IMAGE_SIZES } from '@/lib/imageUrls';
-import { Bookmark, ChevronLeft, ChevronRight, Film, ImageOff, Star, Tv } from 'lucide-react';
+import { Film, ImageOff, Tv } from 'lucide-react';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
 import { normalizeBackdropKey } from '../../peopleCollectionDetailUtils.jsx';
 import './PersonCreditsShared.css';
@@ -174,8 +173,6 @@ function HorizontalCollectionItemsList({ items, navigate, t }) {
     <div className="entity-detail-page__credits-list entity-detail-page__credits-list--collection-items">
       {items.map((item, index) => {
         const isTv = isTvLikeMediaType(item.media_type || item.type);
-        const imdbRating = Number(item.rating_imdb);
-        const tmdbRating = Number(item.rating_tmdb ?? item.rating);
         const posterPath = getPosterImagePath(item) || item.backdrop_path || item.local_backdrop_path;
         const posterUrl = posterPath ? resolveDetailsImageUrl(posterPath, API_BASE, 'poster') : null;
 
@@ -320,8 +317,14 @@ export function CollectionBackdropsPanel({ item, collectionId, t, toast, overrid
 }
 
 export function CollectionItemsSection({ items, navigate, t }) {
+  const [prevItems, setPrevItems] = useState(null);
   const [limit, setLimit] = useState(30);
   const scrollContainerRef = useRef(null);
+
+  if (items !== prevItems) {
+    setPrevItems(items);
+    setLimit(30);
+  }
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -340,12 +343,14 @@ export function CollectionItemsSection({ items, navigate, t }) {
     };
   }, [items.length]);
 
-  useEffect(() => {
-    setLimit(30);
-  }, [items]);
-
   const visibleItems = (items || []).slice(0, limit);
   const cols = Math.max(1, visibleItems.length <= 12 ? visibleItems.length : Math.ceil(visibleItems.length / 2));
+
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.style.setProperty('--cols', cols);
+    }
+  }, [cols]);
 
   return (
     <section className="entity-detail-page__content-section">
@@ -355,7 +360,6 @@ export function CollectionItemsSection({ items, navigate, t }) {
       <div 
         ref={scrollContainerRef} 
         className="collection-items-horizontal-grid-wrapper"
-        style={{ '--cols': cols }}
       >
         <HorizontalCollectionItemsList items={visibleItems} navigate={navigate} t={t} />
       </div>

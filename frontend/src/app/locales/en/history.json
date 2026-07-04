@@ -30,5 +30,7 @@
   "watchedContinue": "Continue",
   "watchedRewatch": "Rewatch",
   "tabRename": "Rename Logs",
-  "tabWatched": "Playback Logs"
+  "tabWatched": "Playback Logs",
+  "peakAt": "Peak at",
+  "playMoment": "Play Moment"
 }

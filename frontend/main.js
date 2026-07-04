@@ -1,7 +1,6 @@
 import { app, BrowserWindow, ipcMain, dialog, Menu, Tray, shell } from 'electron';
 import fs from 'fs';
 import path from 'path';
-import net from 'net';
 import isDev from 'electron-is-dev';
 import { fileURLToPath } from 'url';
 import { execFileSync, spawn } from 'child_process';
@@ -747,4 +746,3 @@ app.on('activate', () => {
     createWindow();
   }
 });
-

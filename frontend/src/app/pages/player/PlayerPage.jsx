@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Play, Pause, Volume2, VolumeX, ArrowLeft, Languages, Captions, PictureInPicture2, Maximize2, X, Square, Rewind, FastForward, SkipBack, SkipForward, Flame, Minimize2 } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Languages, Captions, PictureInPicture2, Maximize2, X, Square, Rewind, FastForward, SkipBack, SkipForward, Flame, Minimize2 } from 'lucide-react';
 import { resolveMediaImageUrl } from '../../lib/imageUrls';
+import { useTranslation } from '@/providers/LanguageContext';
 import './PlayerPage.css';
 
 const getQueryParam = (name) => {
@@ -23,9 +24,18 @@ const getQueryParam = (name) => {
 export default function PlayerPage() {
   const { itemId } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const speedText = `${speed}x`;
+  const ratingText = userRating ? `${userRating.toFixed(1)} / 10` : '';
+  const starSymbol = '\u2605';
 
   const containerRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  
+  const isTrailer = getQueryParam('is_trailer') === 'true' || itemId === 'trailer';
+  const queryTitle = getQueryParam('title');
+
+  const [isPlaying, setIsPlaying] = useState(isTrailer);
   const [isPaused, setIsPaused] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -37,7 +47,7 @@ export default function PlayerPage() {
     const saved = localStorage.getItem('player_mute');
     return saved === 'true';
   });
-  const [title, setTitle] = useState('Loading...');
+  const [title, setTitle] = useState(isTrailer ? (queryTitle || 'Trailer') : 'Loading...');
   const [logoUrl, setLogoUrl] = useState(null);
   const [showControls, setShowControls] = useState(true);
   const [isPip, setIsPip] = useState(false);
@@ -50,7 +60,6 @@ export default function PlayerPage() {
   const [countdown, setCountdown] = useState(10);
   const countdownIntervalRef = useRef(null);
   const hasTriggeredEndRef = useRef(false);
-  const [isMouseOver, setIsMouseOver] = useState(false);
   const [speed, setSpeed] = useState(1.0);
   const [isAdult, setIsAdult] = useState(false);
   const [mediaType, setMediaType] = useState(null);
@@ -63,6 +72,78 @@ export default function PlayerPage() {
   const [showAudioMenu, setShowAudioMenu] = useState(false);
   const [showSubMenu, setShowSubMenu] = useState(false);
   const controlsTimeoutRef = useRef(null);
+
+  const currentTimeRef = useRef(currentTime);
+  const durationRef = useRef(duration);
+  const volumeRef = useRef(volume);
+  const isMutedRef = useRef(isMuted);
+
+  useEffect(() => {
+    currentTimeRef.current = currentTime;
+  }, [currentTime]);
+
+  useEffect(() => {
+    durationRef.current = duration;
+  }, [duration]);
+
+  useEffect(() => {
+    volumeRef.current = volume;
+  }, [volume]);
+
+  useEffect(() => {
+    isMutedRef.current = isMuted;
+  }, [isMuted]);
+
+  const sendCommand = useCallback((args) => {
+    try {
+      const { ipcRenderer } = window.require('electron');
+      ipcRenderer.send('mpv-command', args);
+    } catch {
+      console.warn('Failed to send command to MPV:', args);
+    }
+  }, []);
+
+  const handleClose = useCallback(() => {
+    try {
+      const { ipcRenderer } = window.require('electron');
+      ipcRenderer.send('mpv-close');
+    } catch { /* ignore */ }
+    navigate(-1);
+  }, [navigate]);
+
+  const handleCloseRef = useRef(handleClose);
+
+  useEffect(() => {
+    handleCloseRef.current = handleClose;
+  }, [handleClose]);
+
+  const handlePlayNext = useCallback(async () => {
+    if (!nextEpisode) return;
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+    }
+    setShowEndOverlay(false);
+    
+    try {
+      const { ipcRenderer } = window.require('electron');
+      ipcRenderer.invoke('mpv-open-fullscreen', { itemId: nextEpisode.id });
+    } catch {
+      navigate(`/player/${nextEpisode.id}`);
+    }
+  }, [nextEpisode, navigate]);
+
+  // Sync menu state when controls hide during render
+  if (!showControls) {
+    if (showAudioMenu) setShowAudioMenu(false);
+    if (showSubMenu) setShowSubMenu(false);
+  }
+
+  // Sync logo error reset during render
+  const [prevLogoUrl, setPrevLogoUrl] = useState(null);
+  if (logoUrl !== prevLogoUrl) {
+    setPrevLogoUrl(logoUrl);
+    setLogoError(false);
+  }
 
   // Helper function to format time (e.g. 01:23:45)
   const formatTime = (secs) => {
@@ -103,18 +184,9 @@ export default function PlayerPage() {
   }, [currentTime, duration]);
 
   useEffect(() => {
-    if (!showControls) {
-      setShowAudioMenu(false);
-      setShowSubMenu(false);
-    }
-  }, [showControls]);
-
-  useEffect(() => {
-    setLogoError(false);
-  }, [logoUrl]);
-
-  useEffect(() => {
-    handleMouseMove();
+    controlsTimeoutRef.current = setTimeout(() => {
+      setShowControls(false);
+    }, 3000);
     const controlsOnly = getQueryParam('controls_only') === 'true';
     if (controlsOnly) {
       document.body.style.backgroundColor = 'transparent';
@@ -140,17 +212,11 @@ export default function PlayerPage() {
     let ipcRenderer = null;
     try {
       ipcRenderer = window.require('electron').ipcRenderer;
-    } catch (e) {
+    } catch {
       console.warn('Electron IPC not available');
     }
 
     const isTrailer = getQueryParam('is_trailer') === 'true' || itemId === 'trailer';
-    const queryTitle = getQueryParam('title');
-
-    if (isTrailer) {
-      setTitle(queryTitle || 'Trailer');
-      setIsPlaying(true);
-    }
 
     const fetchInfoAndStart = async () => {
       if (isTrailer) return;
@@ -212,7 +278,7 @@ export default function PlayerPage() {
     const handleMpvEvent = (event, data) => {
       if (data?.event === 'end-of-file') {
         if (isTrailer) {
-          handleClose();
+          handleCloseRef.current();
         } else {
           setShowEndOverlay(true);
         }
@@ -227,7 +293,7 @@ export default function PlayerPage() {
             } else if (data.data >= dur - 1.0 && !hasTriggeredEndRef.current) {
               hasTriggeredEndRef.current = true;
               if (isTrailer) {
-                handleClose();
+                handleCloseRef.current();
               } else {
                 sendCommand(['set_property', 'pause', true]);
                 setShowEndOverlay(true);
@@ -237,7 +303,7 @@ export default function PlayerPage() {
         }
          if (data.name === 'eof-reached' && data.data === true) {
           if (isTrailer) {
-            handleClose();
+            handleCloseRef.current();
           } else {
             sendCommand(['set_property', 'pause', true]);
             setShowEndOverlay(true);
@@ -253,7 +319,7 @@ export default function PlayerPage() {
           if (!volumeInitializedRef.current) {
             volumeInitializedRef.current = true;
             // Force MPV to match our loaded localStorage volume state
-            ipcRenderer.send('mpv-command', ['set_property', 'volume', volume]);
+            ipcRenderer.send('mpv-command', ['set_property', 'volume', volumeRef.current]);
           } else {
             setVolume(data.data);
             localStorage.setItem('player_volume', String(data.data));
@@ -264,7 +330,7 @@ export default function PlayerPage() {
           if (!muteInitializedRef.current) {
             muteInitializedRef.current = true;
             // Force MPV to match our loaded localStorage mute state
-            ipcRenderer.send('mpv-command', ['set_property', 'mute', isMuted]);
+            ipcRenderer.send('mpv-command', ['set_property', 'mute', isMutedRef.current]);
           } else {
             setIsMuted(isMutedBool);
             localStorage.setItem('player_mute', String(isMutedBool));
@@ -317,18 +383,7 @@ export default function PlayerPage() {
       }
       resizeObserver.disconnect();
     };
-  }, [itemId]);
-
-  const currentTimeRef = useRef(currentTime);
-  const durationRef = useRef(duration);
-
-  useEffect(() => {
-    currentTimeRef.current = currentTime;
-  }, [currentTime]);
-
-  useEffect(() => {
-    durationRef.current = duration;
-  }, [duration]);
+  }, [itemId, sendCommand]);
 
   // Periodic progress saving to backend
   useEffect(() => {
@@ -350,7 +405,7 @@ export default function PlayerPage() {
             total_length: Math.round(dur)
           })
         });
-      } catch (e) {
+      } catch {
         // Ignore background save errors
       }
     };
@@ -359,14 +414,7 @@ export default function PlayerPage() {
     return () => clearInterval(interval);
   }, [isPlaying, itemId]);
 
-  const sendCommand = (args) => {
-    try {
-      const { ipcRenderer } = window.require('electron');
-      ipcRenderer.send('mpv-command', args);
-    } catch (e) {
-      console.warn('Failed to send command to MPV:', args);
-    }
-  };
+
 
   const handlePlayPause = () => {
     sendCommand(['cycle', 'pause']);
@@ -442,8 +490,11 @@ export default function PlayerPage() {
   };
 
   useEffect(() => {
+    let timer;
     if (showEndOverlay && nextEpisode) {
-      setCountdown(10);
+      timer = setTimeout(() => {
+        setCountdown(10);
+      }, 0);
       countdownIntervalRef.current = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
@@ -456,26 +507,12 @@ export default function PlayerPage() {
       }, 1000);
     }
     return () => {
+      if (timer) clearTimeout(timer);
       if (countdownIntervalRef.current) {
         clearInterval(countdownIntervalRef.current);
       }
     };
-  }, [showEndOverlay, nextEpisode]);
-
-  const handlePlayNext = async () => {
-    if (!nextEpisode) return;
-    if (countdownIntervalRef.current) {
-      clearInterval(countdownIntervalRef.current);
-    }
-    setShowEndOverlay(false);
-    
-    try {
-      const { ipcRenderer } = window.require('electron');
-      ipcRenderer.invoke('mpv-open-fullscreen', { itemId: nextEpisode.id });
-    } catch (e) {
-      navigate(`/player/${nextEpisode.id}`);
-    }
-  };
+  }, [showEndOverlay, nextEpisode, handlePlayNext]);
 
   const handleRate = async (rating) => {
     setUserRating(rating);
@@ -498,26 +535,24 @@ export default function PlayerPage() {
     sendCommand(['set_property', 'pause', false]);
   };
 
-  const handleClose = () => {
-    try {
-      const { ipcRenderer } = window.require('electron');
-      ipcRenderer.send('mpv-close');
-    } catch (e) { }
-    navigate(-1);
-  };
+
 
   const handleTogglePip = () => {
     try {
       const { ipcRenderer } = window.require('electron');
       ipcRenderer.send('mpv-toggle-pip');
-    } catch (e) { }
+    } catch {
+      /* ignore */
+    }
   };
 
   const handleMinimizePip = () => {
     try {
       const { ipcRenderer } = window.require('electron');
       ipcRenderer.send('mpv-minimize');
-    } catch (e) { }
+    } catch {
+      /* ignore */
+    }
   };
 
   const handleDoubleClick = (e) => {
@@ -544,12 +579,11 @@ export default function PlayerPage() {
 
   if (isPip) {
     return (
+      /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
       <div
         className="player-page player-page--transparent player-page--pip"
         onMouseMove={handleMouseMove}
         onWheel={handleWheel}
-        onMouseEnter={() => setIsMouseOver(true)}
-        onMouseLeave={() => setIsMouseOver(false)}
         onDoubleClick={handleDoubleClick}
       >
         <div className="player-page__pip-drag-handle" />
@@ -569,6 +603,7 @@ export default function PlayerPage() {
   }
 
   return (
+    /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
     <div
       className={`player-page ${controlsOnly ? 'player-page--transparent' : ''}`}
       onMouseMove={handleMouseMove}
@@ -605,7 +640,7 @@ export default function PlayerPage() {
           <div className="player-page__header-right">
             <div className="player-page__time-info">
               <span className="player-page__clock">{clockTime}</span>
-              {endTime && <span className="player-page__ends-at">Ends at {endTime}</span>}
+              {endTime && <span className="player-page__ends-at">{t('player.ends_at', { defaultValue: 'Ends at' }) + ' ' + endTime}</span>}
             </div>
           </div>
         </div>
@@ -632,6 +667,7 @@ export default function PlayerPage() {
                   <div
                     key={`chap-${index}`}
                     className="player-page__chapter-marker"
+                    // eslint-disable-next-line react/forbid-dom-props
                     style={{ left: `${pct}%` }}
                     title={chap.title || `Chapter ${index + 1}`}
                   />
@@ -671,16 +707,8 @@ export default function PlayerPage() {
               </button>
 
               {speed !== 1.0 && (
-                <span className="player-page__speed-badge" style={{
-                  fontSize: '12px',
-                  fontWeight: '600',
-                  color: '#38bdf8',
-                  background: 'rgba(56, 189, 248, 0.15)',
-                  padding: '2px 6px',
-                  borderRadius: '4px',
-                  marginLeft: '4px'
-                }}>
-                  {speed}x
+                <span className="player-page__speed-badge">
+                  {speedText}
                 </span>
               )}
 
@@ -700,12 +728,12 @@ export default function PlayerPage() {
             </div>
 
             {/* Right Actions */}
-            <div className="player-page__actions-group" style={{ position: 'relative' }}>
+            <div className="player-page__actions-group">
 
               {/* Audio Tracks Dropdown */}
               {showAudioMenu && (
                 <div className="player-page__menu" onWheel={(e) => e.stopPropagation()}>
-                  <div className="player-page__menu-title">Audio Tracks</div>
+                  <div className="player-page__menu-title">{t('player.audio_tracks', { defaultValue: 'Audio Tracks' })}</div>
                   {trackList.filter(t => t.type === 'audio').map(t => (
                     <button
                       key={t.id}
@@ -715,11 +743,11 @@ export default function PlayerPage() {
                         setShowAudioMenu(false);
                       }}
                     >
-                      {t.title || t.lang?.toUpperCase() || `Track ${t.id}`} {t.codec ? `(${t.codec.toUpperCase()})` : ''}
+                      {t.title || t.lang?.toUpperCase() || ((t('player.track') || 'Track') + ' ' + t.id)} {t.codec ? `(${t.codec.toUpperCase()})` : ''}
                     </button>
                   ))}
                   {trackList.filter(t => t.type === 'audio').length === 0 && (
-                    <div className="player-page__menu-empty">No audio tracks</div>
+                    <div className="player-page__menu-empty">{t('player.no_audio_tracks', { defaultValue: 'No audio tracks' })}</div>
                   )}
                 </div>
               )}
@@ -727,7 +755,7 @@ export default function PlayerPage() {
               {/* Subtitles Dropdown */}
               {showSubMenu && (
                 <div className="player-page__menu" onWheel={(e) => e.stopPropagation()}>
-                  <div className="player-page__menu-title">Subtitles</div>
+                  <div className="player-page__menu-title">{t('player.subtitles', { defaultValue: 'Subtitles' })}</div>
                   <button
                     className={`player-page__menu-item ${!trackList.some(t => t.type === 'sub' && t.selected) ? 'active' : ''}`}
                     onClick={() => {
@@ -735,7 +763,7 @@ export default function PlayerPage() {
                       setShowSubMenu(false);
                     }}
                   >
-                    Off
+                    {t('player.off', { defaultValue: 'Off' })}
                   </button>
                   {trackList.filter(t => t.type === 'sub').map(t => (
                     <button
@@ -746,7 +774,7 @@ export default function PlayerPage() {
                         setShowSubMenu(false);
                       }}
                     >
-                      {t.title || t.lang?.toUpperCase() || `Subtitle ${t.id}`}
+                      {t.title || t.lang?.toUpperCase() || ((t('player.subtitle') || 'Subtitle') + ' ' + t.id)}
                     </button>
                   ))}
                 </div>
@@ -803,29 +831,29 @@ export default function PlayerPage() {
       {showEndOverlay && (
         <div className="player-page__end-overlay">
           <div className="player-page__end-card">
-            <div className="player-page__end-title">Finished watching</div>
+            <div className="player-page__end-title">{t('player.finished_watching', { defaultValue: 'Finished watching' })}</div>
             <div className="player-page__end-subtitle">{title}</div>
 
             {nextEpisode ? (
               <div className="player-page__end-next">
-                <div className="player-page__end-next-label">Up Next</div>
+                <div className="player-page__end-next-label">{t('player.up_next', { defaultValue: 'Up Next' })}</div>
                 <div className="player-page__end-next-title">{nextEpisode.title}</div>
-                <div className="player-page__end-countdown">Starting in {countdown}s...</div>
+                <div className="player-page__end-countdown">{t('player.starting_in', { count: countdown, defaultValue: 'Starting in {{count}}s...' })}</div>
                 <div className="player-page__end-buttons">
                   <button className="player-page__end-btn player-page__end-btn--primary" onClick={handlePlayNext}>
-                    Play Now
+                    {t('player.play_now', { defaultValue: 'Play Now' })}
                   </button>
                   <button className="player-page__end-btn" onClick={() => {
                     if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
                     setNextEpisode(null);
                   }}>
-                    Cancel
+                    {t('common.cancel', { defaultValue: 'Cancel' })}
                   </button>
                 </div>
               </div>
             ) : (
               <div className="player-page__end-rating">
-                <div className="player-page__end-rating-label">Rate this title</div>
+                <div className="player-page__end-rating-label">{t('player.rate_title', { defaultValue: 'Rate this title' })}</div>
                 <div className="player-page__end-stars">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
                     <button
@@ -835,20 +863,20 @@ export default function PlayerPage() {
                       onMouseLeave={() => setHoverRating(null)}
                       onClick={() => handleRate(star)}
                     >
-                      ★
+                      {starSymbol}
                     </button>
                   ))}
                 </div>
-                {userRating && <div className="player-page__end-rating-val">{userRating.toFixed(1)} / 10</div>}
+                {userRating && <div className="player-page__end-rating-val">{ratingText}</div>}
               </div>
             )}
 
             <div className="player-page__end-actions">
               <button className="player-page__end-btn" onClick={handleReplay}>
-                Replay
+                {t('player.replay', { defaultValue: 'Replay' })}
               </button>
               <button className="player-page__end-btn player-page__end-btn--danger" onClick={handleClose}>
-                Close Player
+                {t('player.close_player', { defaultValue: 'Close Player' })}
               </button>
             </div>
           </div>

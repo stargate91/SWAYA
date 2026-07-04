@@ -44,24 +44,24 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
     isPip = false;
     if (mpvProcess) {
       mpvProcess.removeAllListeners('exit');
-      try { mpvProcess.kill('SIGKILL'); } catch (e) { }
+      try { mpvProcess.kill('SIGKILL'); } catch { /* ignore */ }
       mpvProcess = null;
     }
     if (mpvSocket) {
       try {
         mpvSocket.end();
         mpvSocket.destroy();
-      } catch (e) { }
+      } catch { /* ignore */ }
       mpvSocket = null;
     }
 
     if (controlsWindow && !controlsWindow.isDestroyed()) {
-      try { controlsWindow.destroy(); } catch (e) { }
+      try { controlsWindow.destroy(); } catch { /* ignore */ }
       controlsWindow = null;
     }
 
     if (mpvPlayerWindow && !mpvPlayerWindow.isDestroyed()) {
-      try { mpvPlayerWindow.destroy(); } catch (e) { }
+      try { mpvPlayerWindow.destroy(); } catch { /* ignore */ }
       mpvPlayerWindow = null;
     }
   }
@@ -158,7 +158,7 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
             backendPort = parsed;
             break;
           }
-        } catch (e) { }
+        } catch { /* ignore */ }
       }
     }
 
@@ -312,7 +312,7 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
                   }
                 }
               }
-            } catch (e) { }
+            } catch { /* ignore */ }
           }
         });
       }, 400);
@@ -372,9 +372,6 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
       mpvSocket.write(JSON.stringify({ command: commandArgs }) + '\n');
     }
   });
-
-  let isMinimized = false;
-
   function setPipMode(enable) {
     if (!mpvPlayerWindow || mpvPlayerWindow.isDestroyed()) return;
     const primaryDisplay = screen.getPrimaryDisplay();
@@ -436,13 +433,12 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
     }
   }
 
-  ipcMain.on('mpv-toggle-pip', (event) => {
+  ipcMain.on('mpv-toggle-pip', () => {
     setPipMode(!isPip);
   });
 
   ipcMain.on('mpv-minimize', () => {
     if (!mpvPlayerWindow || mpvPlayerWindow.isDestroyed()) return;
-    isMinimized = true;
 
     mpvPlayerWindow.setAlwaysOnTop(false);
     mpvPlayerWindow.minimize();
@@ -459,7 +455,6 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
 
   ipcMain.on('mpv-restore', () => {
     if (!mpvPlayerWindow || mpvPlayerWindow.isDestroyed()) return;
-    isMinimized = false;
 
     mpvPlayerWindow.restore();
     if (controlsWindow && !controlsWindow.isDestroyed()) {
@@ -484,24 +479,23 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
   ipcMain.on('mpv-close', () => {
     writeElectronLog('INFO', 'mpv-close requested');
     isPip = false;
-    isMinimized = false;
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send('player-state-update', { event: 'close' });
     }
     if (mpvProcess) {
-      try { mpvProcess.kill(); } catch (e) { }
+      try { mpvProcess.kill(); } catch { /* ignore */ }
       mpvProcess = null;
     }
     if (mpvSocket) {
-      try { mpvSocket.end(); } catch (e) { }
+      try { mpvSocket.end(); } catch { /* ignore */ }
       mpvSocket = null;
     }
     if (controlsWindow && !controlsWindow.isDestroyed()) {
-      try { controlsWindow.close(); } catch (e) { }
+      try { controlsWindow.close(); } catch { /* ignore */ }
       controlsWindow = null;
     }
     if (mpvPlayerWindow && !mpvPlayerWindow.isDestroyed()) {
-      try { mpvPlayerWindow.close(); } catch (e) { }
+      try { mpvPlayerWindow.close(); } catch { /* ignore */ }
       mpvPlayerWindow = null;
     }
   });

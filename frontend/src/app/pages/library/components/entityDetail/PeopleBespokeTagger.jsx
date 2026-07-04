@@ -72,6 +72,11 @@ function HorizontalPillList({ children }) {
   );
 }
 
+function TagColorDot({ color }) {
+  // eslint-disable-next-line react/forbid-dom-props
+  return <span className="bespoke-scene-tagger-dropdown-color-dot" style={{ backgroundColor: color }} />;
+}
+
 export default function PeopleBespokeTagger({ item, t, updatePersonStatusMutation }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -146,7 +151,7 @@ export default function PeopleBespokeTagger({ item, t, updatePersonStatusMutatio
   }, []);
 
   return (
-    <div className="bespoke-scene-tagger-card" style={{ marginTop: 'var(--space-xl)' }}>
+    <div className="bespoke-scene-tagger-card bespoke-scene-tagger-card--spaced">
       <div className="bespoke-scene-tagger-header">
         <span className="bespoke-scene-tagger-title">
           {t('library.details.tagger') || 'Tags & Keywords'}
@@ -167,7 +172,7 @@ export default function PeopleBespokeTagger({ item, t, updatePersonStatusMutatio
                   <Pill
                     key={tagName}
                     variant="custom"
-                    style={{
+                    customStyle={{
                       backgroundColor: `color-mix(in srgb, ${tagColor} 12%, rgba(255, 255, 255, 0.02))`,
                       borderColor: `color-mix(in srgb, ${tagColor} 30%, var(--color-border-default))`,
                       color: `color-mix(in srgb, ${tagColor} 85%, white)`,
@@ -225,10 +230,7 @@ export default function PeopleBespokeTagger({ item, t, updatePersonStatusMutatio
                   onClick={() => handleAddTag(tag.name)}
                   className="bespoke-scene-tagger-dropdown-item"
                 >
-                  <span
-                    className="bespoke-scene-tagger-dropdown-color-dot"
-                    style={{ backgroundColor: tag.color }}
-                  />
+                  <TagColorDot color={tag.color} />
                   <span>{tag.name}</span>
                 </button>
               ))}
@@ -239,7 +241,7 @@ export default function PeopleBespokeTagger({ item, t, updatePersonStatusMutatio
                   className="bespoke-scene-tagger-dropdown-item bespoke-scene-tagger-dropdown-item--create"
                 >
                   <Plus size={12} />
-                  <span>Create tag &quot;{searchQuery.trim()}&quot;</span>
+                  <span>{t('library.details.createTag', { name: searchQuery.trim() })}</span>
                 </button>
               )}
             </div>

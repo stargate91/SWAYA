@@ -513,6 +513,12 @@
   color: var(--color-state-success);
 }
 
+.watched-history-card__status--peak {
+  background: var(--color-state-danger-bg, rgba(239, 68, 68, 0.15));
+  border: 1px solid color-mix(in srgb, var(--color-state-danger) 20%, transparent);
+  color: var(--color-state-danger, #ef4444);
+}
+
 .watched-history-card.is-active {
   border-color: color-mix(in srgb, var(--color-accent-blue) 40%, var(--color-border-subtle));
   box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent-blue) 15%, transparent),

@@ -1,9 +1,6 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Page from '@/ui/Page';
-import NavButton from '@/ui/NavButton';
 import { Eye, EyeOff } from 'lucide-react';
-import UtilityBarPortal from '../../../../../components/UtilityBarPortal';
 import HeroSection from './HeroSection';
 import '../../MediaDetailPage.css';
 
@@ -11,7 +8,6 @@ export default function DetailPageShell({
   children,
   backdropUrl,
   fallbackUrl,
-  backLabel = 'Back',
   activePanel,
   isLoading = false,
   isSideNavVisible = true,
@@ -25,7 +21,6 @@ export default function DetailPageShell({
   isScene = false,
   containerRef,
 }) {
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (!activePanel || !onClosePanel) return;

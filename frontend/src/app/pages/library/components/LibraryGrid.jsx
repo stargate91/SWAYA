@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, memo } from 'react';
+import { useState, useMemo, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import './entityDetail/EntityDetailHeroSection.css';
@@ -11,8 +11,6 @@ import EmptyState from '@/ui/EmptyState';
 import Button from '@/ui/Button';
 import IconButton from '@/ui/IconButton';
 import NavButton from '@/ui/NavButton';
-import { useUi } from '@/providers/UiProvider';
-import UniversalImagePickerModal from '../modals/UniversalImagePickerModal';
 import {
   getPosterImagePath,
   getProfileImagePath,
@@ -348,7 +346,6 @@ export default function LibraryGrid({
   const navigate = useNavigate();
   const playMutation = usePlayMediaMutation();
   const { data: settings } = useSettingsQuery();
-  const { openModal, closeModal, toast } = useUi();
 
   const getNextOwnedEpisode = (tvDetail) => {
     const seasons = Array.isArray(tvDetail?.seasons) ? tvDetail.seasons : [];

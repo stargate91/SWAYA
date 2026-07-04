@@ -249,6 +249,9 @@
   "details": {
     "viewOriginalImage": "View Original Image",
     "favorite": "Favorite",
+    "createTag": "Create tag \"{{name}}\"",
+    "playVideo": "Play Video",
+    "playSession": "Play Session",
     "cachingFilmography": "Downloading and caching {{name}}'s complete filmography from {{source}}... This only happens once to make browsing instant!",
     "emptyCredits": "No credits found for this source.",
     "emptyCredits_scenes_fansdb": "No scenes found on FansDB.",

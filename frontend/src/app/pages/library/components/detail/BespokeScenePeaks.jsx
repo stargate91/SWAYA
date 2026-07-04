@@ -5,6 +5,7 @@ import './BespokeScenePeaks.css';
 
 const LPAR = '(';
 const RPAR = ')';
+const PLAY_VIDEO_FALLBACK = 'Play Video';
 
 export default function BespokeScenePeaks() {
   const { state, mutations, t } = useMediaDetailContext();
@@ -49,7 +50,14 @@ export default function BespokeScenePeaks() {
                   key={log.id || index}
                   className={`bespoke-scene-peaks-item ${hasPosition ? 'bespoke-scene-peaks-item--playable' : ''}`}
                   onClick={hasPosition ? handlePlayMedia : undefined}
-                  title={hasPosition ? "Play Video" : undefined}
+                  role="button"
+                  tabIndex={hasPosition ? 0 : -1}
+                  onKeyDown={hasPosition ? (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      handlePlayMedia();
+                    }
+                  } : undefined}
+                  title={hasPosition ? (t('library.details.playVideo') || PLAY_VIDEO_FALLBACK) : undefined}
                 >
                   <div className="bespoke-scene-peaks-item-left">
                     <Flame size={11} className="bespoke-scene-peaks-item-icon" />

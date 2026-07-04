@@ -64,3 +64,15 @@ This document serves as a living roadmap for future features, architecture adjus
         *   `Ctrl + Left/Right`: Long-skip (1 minute)
     *   **Frame-by-Frame Stepping:** Add a hotkey (e.g., `E`) to advance the paused video frame-by-frame, enabling high-precision Peak Moment selection.
     *   **Subtitle Style Customization:** Add a font-size scale slider (e.g., 50% to 150%) to adjust subtitle sizes on the fly.
+
+---
+
+## 6. Tone of Voice & Explicit/Elegant Language Selection
+*   **Status:** Proposed / Backlog
+*   **Goal:** Provide customizable application tone of voice by introducing selectable locale/translation variants.
+*   **Proposed Behavior:**
+    1.  **Multiple Tone Variants:** In addition to standard language locales (e.g., English, Hungarian), introduce tone variants:
+        *   **Standard / Elegant (Default):** Polite, clean, professional, and discreet vocabulary (perfect for SFW environments or keeping a clean profile).
+        *   **Explicit / Fun:** Playful, direct, and explicit/adult-humored text (e.g., customized empty states, playful peak moment descriptors, and fun buttons).
+    2.  **Locales Registration:** Leverage the existing i18next translation namespace structure to create `en-explicit`, `hu-explicit` variants by copying and customizing JSON files (`dashboard.json`, `library.json`, etc.) without altering React layout or logic code.
+    3.  **Dropdown Toggle in Settings:** Expose a "Tone of Voice / Style" selection dropdown (or append it directly in Settings > General > Language options as e.g. "English (Explicit / Fun)") allowing users to switch tone preferences dynamically.

@@ -28,8 +28,8 @@ const installSafePerformanceMeasure = () => {
         if (typeof name === 'string') {
           return originalMeasure(name);
         }
-      } catch {
-        // Ignore fallback errors and drop this measurement.
+      } catch (err) {
+        console.error(err);
       }
 
       return undefined;
@@ -43,8 +43,8 @@ const sendRendererLog = (level, message, details = null) => {
   try {
     const { ipcRenderer } = window.require('electron');
     ipcRenderer.send('renderer-log', { level, message, details });
-  } catch {
-    // Ignore if Electron IPC is unavailable.
+  } catch (err) {
+    console.error(err);
   }
 };
 
@@ -93,7 +93,8 @@ const installConsoleLogging = () => {
             }
             try {
               return JSON.parse(JSON.stringify(arg));
-            } catch {
+            } catch (err) {
+              console.error(err);
               return String(arg);
             }
           }),
@@ -101,8 +102,8 @@ const installConsoleLogging = () => {
           runtime: getRendererRuntimeSnapshot(),
         });
       }
-    } catch {
-      // Ignore logging failures.
+    } catch (err) {
+      console.error(err);
     }
 
     originalConsoleError(...args);

@@ -9,8 +9,8 @@ const getDroppedPaths = (dataTransfer) => {
       if (webUtils && typeof webUtils.getPathForFile === 'function') {
         try {
           return webUtils.getPathForFile(file);
-        } catch {
-          // Fallback to legacy path
+        } catch (err) {
+          console.error(err);
         }
       }
       return file?.path;

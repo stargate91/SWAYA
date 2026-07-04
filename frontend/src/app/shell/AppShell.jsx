@@ -104,7 +104,9 @@ export default function AppShell() {
     let ipcRenderer = null;
     try {
       ipcRenderer = window.require('electron').ipcRenderer;
-    } catch (e) {}
+    } catch (err) {
+      console.error(err);
+    }
 
     if (!ipcRenderer) return;
 
@@ -154,21 +156,27 @@ export default function AppShell() {
     try {
       const ipcRenderer = window.require('electron').ipcRenderer;
       ipcRenderer.send('mpv-command', ['cycle', 'pause']);
-    } catch (e) {}
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleMaximize = () => {
     try {
       const ipcRenderer = window.require('electron').ipcRenderer;
       ipcRenderer.send('mpv-restore');
-    } catch (e) {}
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleClosePlayer = () => {
     try {
       const ipcRenderer = window.require('electron').ipcRenderer;
       ipcRenderer.send('mpv-close');
-    } catch (e) {}
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   useEffect(() => {
@@ -181,7 +189,8 @@ export default function AppShell() {
     try {
       const saved = localStorage.getItem('sidebar_collapsed');
       return saved !== null ? JSON.parse(saved) : false;
-    } catch {
+    } catch (err) {
+      console.error(err);
       return false;
     }
   });
@@ -191,8 +200,8 @@ export default function AppShell() {
       const next = !current;
       try {
         localStorage.setItem('sidebar_collapsed', JSON.stringify(next));
-      } catch {
-        // Ignore storage access errors.
+      } catch (err) {
+        console.error(err);
       }
       return next;
     });

@@ -157,7 +157,8 @@ export default function useOnboardingState() {
         
         // Skip straight to completion/finish step
         goToStep(6, 'forward');
-      } catch {
+      } catch (err) {
+        console.error(err);
         toast(t('settingsPage.sections.backup.importError') || 'Failed to import settings file.', 'danger');
       } finally {
         setIsImporting(false);
@@ -193,7 +194,8 @@ export default function useOnboardingState() {
         setTmdbValidation({ valid: false, message: response?.tmdb?.message || 'Verification failed.' });
         toast(response?.tmdb?.message || 'TMDB credentials verification failed.', 'danger');
       }
-    } catch {
+    } catch (err) {
+      console.error(err);
       setTmdbValidation({ valid: false, message: 'Connection error during validation.' });
       toast('Failed to connect to validation server.', 'danger');
     } finally {
@@ -227,7 +229,8 @@ export default function useOnboardingState() {
         setOmdbValidation({ valid: false, message: response?.omdb?.message || 'Verification failed.' });
         toast(response?.omdb?.message || 'OMDB verification failed.', 'danger');
       }
-    } catch {
+    } catch (err) {
+      console.error(err);
       setOmdbValidation({ valid: false, message: 'Connection error during validation.' });
       toast('Failed to connect to validation server.', 'danger');
     } finally {
@@ -274,7 +277,8 @@ export default function useOnboardingState() {
         setFolderValidation({ valid: false, message: firstErr || 'Validation failed.' });
         toast(firstErr || 'Folder validation failed.', 'danger');
       }
-    } catch {
+    } catch (err) {
+      console.error(err);
       setFolderValidation({ valid: false, message: 'Folder validation failed.' });
     } finally {
       setIsValidatingFolders(false);
@@ -312,7 +316,8 @@ export default function useOnboardingState() {
       
       // Navigate to dashboard
       navigate('/dashboard');
-    } catch {
+    } catch (err) {
+      console.error(err);
       toast('Failed to save configuration settings.', 'danger');
     } finally {
       setIsFinishing(false);

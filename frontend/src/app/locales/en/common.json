@@ -119,5 +119,19 @@
     "ja-JP": "Japanese (日本語)",
     "pt-PT": "Portuguese (Português)",
     "pl-PL": "Polish (Polski)"
+  },
+  "player": {
+    "ends_at": "Ends at",
+    "audio_tracks": "Audio Tracks",
+    "no_audio_tracks": "No audio tracks",
+    "subtitles": "Subtitles",
+    "off": "Off",
+    "finished_watching": "Finished watching",
+    "up_next": "Up Next",
+    "starting_in": "Starting in {{count}}s...",
+    "play_now": "Play Now",
+    "rate_title": "Rate this title",
+    "replay": "Replay",
+    "close_player": "Close Player"
   }
 }

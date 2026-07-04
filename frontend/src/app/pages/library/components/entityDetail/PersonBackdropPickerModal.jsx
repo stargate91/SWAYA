@@ -1,10 +1,8 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { ChevronLeft, ImageOff, Star, Film, Tv } from 'lucide-react';
+import { useEffect, useMemo, useRef } from 'react';
+import { ChevronLeft, ImageOff, Film, Tv } from 'lucide-react';
 import EmptyState from '@/ui/EmptyState';
 import NavButton from '@/ui/NavButton';
-import Pill from '@/ui/Pill';
 import SegmentedControl from '@/ui/SegmentedControl';
-import CreditCard from '@/ui/CreditCard';
 import BackdropCard from '@/ui/BackdropCard';
 import TMDBImageGrid from './TMDBImageGrid';
 import ImageUploadPanel from '../../modals/ImageUploadPanel';
@@ -136,14 +134,13 @@ export default function PersonBackdropPickerModal({ personId, item, t, toast, ov
         usePersonBackdropChooserStore.getState().resetSession(personId);
       }
     };
-  }, [ensureSession, personId]);
+  }, [ensureSession, personId, person?.backdrop_path, item?.backdrop_path]);
 
   useEffect(() => {
     if (!session) {
       patchSession(personId, { selectedBackdropPath: person?.backdrop_path || item?.backdrop_path || '' });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [personId]);
+  }, [personId, person?.backdrop_path, item?.backdrop_path, session, patchSession]);
 
   const initialTabPageSize = PERSON_BACKDROP_COLUMNS * PERSON_BACKDROP_INITIAL_ROWS;
   const moviesQuery = usePersonCreditsQuery(personId, 'movies', 1, PERSON_BACKDROP_PAGE_SIZE, {
@@ -692,10 +689,10 @@ export default function PersonBackdropPickerModal({ personId, item, t, toast, ov
                 <BackdropCard key={`person-backdrop-skeleton-${activeTab}-${index}`} disabled={true} />
               ) : (
                 <div key={`person-backdrop-skeleton-${activeTab}-${index}`} className="person-backdrop-picker__credit-card skeleton">
-                  <div className="person-backdrop-picker__credit-poster-wrap skeleton-shimmer" style={{ aspectRatio: '2/3', borderRadius: '8px' }} />
+                  <div className="person-backdrop-picker__credit-poster-wrap skeleton-shimmer" />
                   <div className="person-backdrop-picker__credit-info">
-                    <div className="entity-detail-page__skeleton-block entity-detail-page__skeleton-block--credit-title" style={{ width: '80%', height: '14px', marginTop: '6px' }} />
-                    <div className="entity-detail-page__skeleton-block entity-detail-page__skeleton-block--credit-meta" style={{ width: '40%', height: '10px', marginTop: '6px' }} />
+                    <div className="entity-detail-page__skeleton-block entity-detail-page__skeleton-block--credit-title" />
+                    <div className="entity-detail-page__skeleton-block entity-detail-page__skeleton-block--credit-meta" />
                   </div>
                 </div>
               )
@@ -721,8 +718,6 @@ export default function PersonBackdropPickerModal({ personId, item, t, toast, ov
               const isPending = overridePersonBackdropMutation.isPending && 
                 overridePersonBackdropMutation.variables?.backdropPath === (credit.backdrop_path || credit.original_backdrop_path || credit.backdrop_path);
 
-              const rating = Number(credit.rating_tmdb ?? credit.rating);
-              const hasRating = Number.isFinite(rating) && rating > 0;
               const posterPath = getPosterImagePath(credit);
               const posterUrl = posterPath ? resolveDetailsImageUrl(posterPath, API_BASE, 'poster') : null;
 

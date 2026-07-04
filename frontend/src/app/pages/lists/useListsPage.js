@@ -51,15 +51,21 @@ export function useListsPage() {
   }, []);
 
   useEffect(() => {
-    fetchLists();
+    const timer = setTimeout(() => {
+      fetchLists();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [fetchLists]);
 
   useEffect(() => {
-    if (activeListId) {
-      fetchListDetails(activeListId);
-    } else {
-      setActiveListDetails(null);
-    }
+    const timer = setTimeout(() => {
+      if (activeListId) {
+        fetchListDetails(activeListId);
+      } else {
+        setActiveListDetails(null);
+      }
+    }, 0);
+    return () => clearTimeout(timer);
   }, [activeListId, fetchListDetails]);
 
   const handleCreateList = async ({ name, description, color, list_type }) => {

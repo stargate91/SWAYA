@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import './Tooltip.css';
 
@@ -71,21 +71,30 @@ export default function Tooltip({
     showTooltip();
   };
 
-  const hideTooltip = () => {
+  const hideTooltip = useCallback(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setIsOpen(false);
     setPosition(null);
-  };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    const timer = setTimeout(() => {
+      if (active) {
+        hideTooltip();
+      }
+    }, 0);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [content, hideTooltip]);
 
   useEffect(() => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, []);
-
-  useEffect(() => {
-    hideTooltip();
-  }, [content]);
 
   useEffect(() => {
     const handleMouseLeaveWindow = () => {
@@ -97,7 +106,7 @@ export default function Tooltip({
       document.removeEventListener('mouseleave', handleMouseLeaveWindow);
       window.removeEventListener('blur', hideTooltip);
     };
-  }, []);
+  }, [hideTooltip]);
 
   useEffect(() => {
     if (!isOpen) return undefined;

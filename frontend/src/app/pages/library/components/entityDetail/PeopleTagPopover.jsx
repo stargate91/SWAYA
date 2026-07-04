@@ -5,14 +5,7 @@ import { useAllTagsQuery, useCreateTagMutation } from '@/queries/libraryQueries'
 import '../detail/panels/TagsPanel.css';
 import './PeopleTagPopover.css';
 
-const PREDEFINED_COLORS = [
-  'var(--color-accent-blue)',
-  'color-mix(in srgb, var(--color-accent-blue) 75%, white)',
-  'color-mix(in srgb, var(--color-accent-blue) 75%, black)',
-  'var(--color-state-success)',
-  'var(--color-state-warning)',
-  'var(--color-state-danger)'
-];
+
 
 export default function PeopleTagPopover({ item, t, updatePersonStatusMutation }) {
   const [isOpen, setIsOpen] = useState(false);

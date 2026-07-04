@@ -156,6 +156,10 @@
   align-items: center;
 }
 
+.compact-stats-favorites svg {
+  margin-left: var(--space-xs);
+}
+
 .compact-distribution-card {
   height: 100%;
 }

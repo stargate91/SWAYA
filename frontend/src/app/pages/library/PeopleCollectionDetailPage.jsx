@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
-import { Plus, Minus, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Minus, ChevronDown, ChevronUp, X } from 'lucide-react';
 import DetailPageShell from './components/detail/DetailPageShell';
 import EntityDetailTopControls from './components/entityDetail/EntityDetailTopControls';
 import EntityDetailStatusSection from './components/entityDetail/EntityDetailStatusSection';
@@ -52,7 +52,6 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
     handleToggleFavorite,
     handleToggleActive,
     handleOpenReviewModal,
-    handleOpenPeopleBackdropModal: controllerHandleOpenPeopleBackdropModal,
     overrideBackdropMutation,
     uploadBackdropMutation,
     overridePersonBackdropMutation,
@@ -117,11 +116,11 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
 
     window.addEventListener('wheel', handleWheel, { passive: true });
     return () => window.removeEventListener('wheel', handleWheel);
-  }, [isScrolled, isImagePickerDrawerOpen, isBackdropDrawerOpen, isDetailsDrawerOpen]);
+  }, [isScrolled, isImagePickerDrawerOpen, isBackdropDrawerOpen, isDetailsDrawerOpen, isPeople]);
 
   const handleScrollArrowClick = useCallback(() => {
     setIsScrolled(true);
-  }, []);
+  }, [setIsScrolled]);
 
   const hasExtraSocials = socialLinks.length > 4;
   const visibleSocialLinks = (hasExtraSocials && !isSocialExpanded)
@@ -298,10 +297,10 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
                     className="entity-detail-page__drawer-close"
                     onClick={() => setIsImagePickerDrawerOpen(false)}
                   >
-                    &times;
+                    <X size={16} />
                   </button>
                 </div>
-                <div className="entity-detail-page__drawer-content" style={{ padding: '24px' }}>
+                <div className="entity-detail-page__drawer-content entity-detail-page__drawer-content--padded">
                   <UniversalImagePickerModal
                     entityId={idToUse}
                     entityType={isPeople ? 'person' : 'collection'}
@@ -346,10 +345,10 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
                 className="entity-detail-page__drawer-close"
                 onClick={() => setIsBackdropDrawerOpen(false)}
               >
-                &times;
+                <X size={16} />
               </button>
             </div>
-            <div className="entity-detail-page__drawer-content" style={{ padding: '24px' }}>
+            <div className="entity-detail-page__drawer-content entity-detail-page__drawer-content--padded">
               {isPeople ? (
                 <PersonBackdropPickerModal
                   key={item?.id}

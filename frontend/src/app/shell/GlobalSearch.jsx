@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Search, ChevronDown, ArrowUpRight, Clapperboard, Film, Tv, Users, Video, Loader2, ExternalLink } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Search, ChevronDown, ArrowUpRight, Clapperboard, Film, Tv, Users, Video, ExternalLink } from 'lucide-react';
+import { useTranslation } from '@/providers/LanguageContext';
 import api from '../lib/api';
 import { useSettingsQuery } from '../queries/settingsQueries';
 import { resolveMediaImageUrl } from '../lib/imageUrls';
@@ -38,12 +39,12 @@ const TYPES_BY_SOURCE = {
 export default function GlobalSearch() {
   const { data: settings } = useSettingsQuery();
   const navigate = useNavigate();
-  const location = useLocation();
-  const isSearchPage = location.pathname === '/search';
+  const { t } = useTranslation();
+  
+  const getYearLabel = (year) => year ? `(${year})` : '';
   
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
   
   // Selection state
   const [selectedSource, setSelectedSource] = useState('tmdb');
@@ -111,13 +112,11 @@ export default function GlobalSearch() {
   }, []);
 
   // Perform search
-  const performSearch = async (searchQuery) => {
+  const performSearch = useCallback(async (searchQuery) => {
     if (!searchQuery.trim()) {
       setResults([]);
-      setIsLoading(false);
       return;
     }
-    setIsLoading(true);
     try {
       const data = await api.metadata.globalSearch({
         query: searchQuery,
@@ -130,10 +129,8 @@ export default function GlobalSearch() {
     } catch (err) {
       console.error('Global search error:', err);
       setResults([]);
-    } finally {
-      setIsLoading(false);
     }
-  };
+  }, [selectedSource, selectedType, hasAdult]);
 
   // Debounced search trigger
   useEffect(() => {
@@ -144,12 +141,18 @@ export default function GlobalSearch() {
       debounceTimer.current = setTimeout(() => {
         performSearch(query);
       }, 300);
-    } else {
+    }
+    return () => clearTimeout(debounceTimer.current);
+  }, [query, performSearch]);
+
+  const handleInputChange = (e) => {
+    const val = e.target.value;
+    setQuery(val);
+    if (val.trim().length < 2) {
       setResults([]);
       setIsOverlayOpen(false);
     }
-    return () => clearTimeout(debounceTimer.current);
-  }, [query, selectedSource, selectedType]);
+  };
 
   const handleSourceSelect = (sourceId) => {
     setSelectedSource(sourceId);
@@ -216,7 +219,7 @@ export default function GlobalSearch() {
             <div className="global-search__dropdown">
               {/* Left Column: Sources */}
               <div className="global-search__dropdown-column global-search__dropdown-column--sources">
-                <div className="global-search__dropdown-header">Source</div>
+                <div className="global-search__dropdown-header">{t('search.source', { defaultValue: 'Source' })}</div>
                 {filteredSources.map(source => (
                   <button
                     key={source.id}
@@ -231,7 +234,7 @@ export default function GlobalSearch() {
               
               {/* Right Column: Types */}
               <div className="global-search__dropdown-column global-search__dropdown-column--types">
-                <div className="global-search__dropdown-header">Type</div>
+                <div className="global-search__dropdown-header">{t('search.type', { defaultValue: 'Type' })}</div>
                 {(TYPES_BY_SOURCE[selectedSource] || []).map(type => {
                   const TypeIcon = type.icon;
                   return (
@@ -264,7 +267,7 @@ export default function GlobalSearch() {
             className="global-search__input"
             placeholder={`Search ${activeSourceObj.name === 'TMDb' ? activeTypeObj.name.toLowerCase() : activeTypeObj.name.toLowerCase() + ' on ' + activeSourceObj.name}...`}
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={handleInputChange}
             onFocus={() => query.trim().length >= 2 && setIsOverlayOpen(true)}
             onKeyDown={handleKeyDown}
           />
@@ -325,7 +328,7 @@ export default function GlobalSearch() {
                         <div className="global-search__item-info">
                           <div className="global-search__item-title-row">
                             <span className="global-search__item-title">{item.title}</span>
-                            {item.year && <span className="global-search__item-year">({item.year})</span>}
+                            {item.year && <span className="global-search__item-year">{getYearLabel(item.year)}</span>}
                           </div>
                           <div className="global-search__item-meta">
                             {item.overview && (
@@ -361,7 +364,7 @@ export default function GlobalSearch() {
                   <div className="global-search__item-info">
                     <div className="global-search__item-title-row">
                       <span className="global-search__item-title">{item.title}</span>
-                      {item.year && <span className="global-search__item-year">({item.year})</span>}
+                      {item.year && <span className="global-search__item-year">{getYearLabel(item.year)}</span>}
                     </div>
                     <div className="global-search__item-meta">
                       {item.overview && (

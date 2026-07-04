@@ -42,7 +42,7 @@ export default function OrganizerRenameModalContent({ items = [], t, organizeInP
         />
       </div>
 
-      <div className="organizer-rename-modal__summary" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+      <div className="organizer-rename-modal__summary">
         <span>
           {t('organizer.renameModal.showing')
             .replace('{count}', sortedItems.length)
@@ -98,7 +98,7 @@ export default function OrganizerRenameModalContent({ items = [], t, organizeInP
                 </td>
                 <td className="organizer-rename-modal__col organizer-rename-modal__col--target">
                   <Tooltip content={organizeInPlace ? item.sourcePath : item.targetPath} side="top" align="start">
-                    <span className="organizer-rename-modal__cell-text" style={organizeInPlace ? { opacity: 0.55, fontStyle: 'italic' } : {}}>
+                    <span className={`organizer-rename-modal__cell-text ${organizeInPlace ? 'is-organize-in-place' : ''}`}>
                       {organizeInPlace ? item.source : item.target}
                     </span>
                   </Tooltip>

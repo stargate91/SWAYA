@@ -9,7 +9,7 @@ import SegmentedControl from '@/ui/SegmentedControl';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
 import { useHistoryQuery, useUndoMutation, useScanStatusQuery, useWatchedHistoryQuery, usePlayMediaMutation, usePeaksQuery } from '@/queries';
-import { RotateCcw, AlertTriangle, Play, CheckCircle2, Clock, Tv, Film, Flame } from 'lucide-react';
+import { RotateCcw, AlertTriangle, Play, CheckCircle2, Clock, Tv, Film, Flame, Loader2 } from 'lucide-react';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import HistoryCard from './components/HistoryCard';
@@ -395,6 +395,7 @@ export default function HistoryPage() {
         {peaksData.map((log, index) => {
           const poster = log.poster_path || log.backdrop_path;
           const posterUrl = poster ? resolveMediaImageUrl(poster, 'backdrop') : '';
+          const peakText = t('historyPage.peakAt', { defaultValue: 'Peak at' }) + ' ' + formatTime(log.video_position);
           
           return (
             <div
@@ -431,9 +432,9 @@ export default function HistoryPage() {
                     <span>{new Date(log.created_at).toLocaleString()}</span>
                   </div>
 
-                  <div className="watched-history-card__status" style={{ background: 'var(--color-state-danger-bg, rgba(239, 68, 68, 0.15))', color: 'var(--color-state-danger, #ef4444)' }}>
+                  <div className="watched-history-card__status watched-history-card__status--peak">
                     <Flame size={12} fill="currentColor" />
-                    <span>Peak at {formatTime(log.video_position)}</span>
+                    <span>{peakText}</span>
                   </div>
                 </div>
               </div>
@@ -446,13 +447,13 @@ export default function HistoryPage() {
                   disabled={playMutation.isPending && playMutation.variables?.itemId === log.media_item_id}
                   icon={
                     playMutation.isPending && playMutation.variables?.itemId === log.media_item_id ? (
-                      <Spinner size={14} />
+                      <Loader2 className="spinner" size={14} />
                     ) : (
                       <Play size={14} />
                     )
                   }
                 >
-                  Play Moment
+                  {t('historyPage.playMoment', { defaultValue: 'Play Moment' })}
                 </Button>
               </div>
             </div>

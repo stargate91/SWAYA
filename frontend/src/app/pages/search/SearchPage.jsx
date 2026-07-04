@@ -68,20 +68,24 @@ export default function SearchPage() {
     return SOURCES.filter(s => !s.adult || hasAdult);
   }, [hasAdult]);
 
-  // Keep local input in sync with URL queries (e.g. when searching from the top bar)
-  useEffect(() => {
+  const [prevUrlQuery, setPrevUrlQuery] = useState(urlQuery);
+  if (urlQuery !== prevUrlQuery) {
+    setPrevUrlQuery(urlQuery);
     setLocalQuery(urlQuery);
-  }, [urlQuery]);
+  }
 
-  // Reset visible results count on search criteria changes
-  useEffect(() => {
+  const [prevCriteria, setPrevCriteria] = useState({ query: urlQuery, source: urlSource, type: urlType });
+  if (urlQuery !== prevCriteria.query || urlSource !== prevCriteria.source || urlType !== prevCriteria.type) {
+    setPrevCriteria({ query: urlQuery, source: urlSource, type: urlType });
     setVisibleCount(12);
-  }, [urlQuery, urlSource, urlType]);
+    if (!urlQuery.trim()) {
+      setResults([]);
+    }
+  }
 
   // Execute search when URL params change
   useEffect(() => {
     if (!urlQuery.trim()) {
-      setResults([]);
       return;
     }
 
@@ -272,9 +276,6 @@ export default function SearchPage() {
             <PosterGrid className={`search-page-grid ${urlType === 'scene' ? 'library-scenes-grid' : ''}`}>
               {visibleResults.map((item, idx) => {
                 const posterUrl = item.poster_path ? resolveMediaImageUrl(item.poster_path, 'posterThumb') : null;
-                const mediaTypeBadge = item.media_type === 'person' 
-                  ? ((item.is_adult || item.adult) ? 'performer' : 'artist') 
-                  : item.media_type;
 
                 let subtitle = item.year ? String(item.year) : undefined;
                 if (item.media_type === 'scene') {

@@ -259,3 +259,15 @@
   color: var(--color-brand-imdb);
 }
 
+.entity-detail-page__skeleton-block--credit-title {
+  width: 80%;
+  height: 14px;
+  margin-top: 6px;
+}
+
+.entity-detail-page__skeleton-block--credit-meta {
+  width: 40%;
+  height: 10px;
+  margin-top: 6px;
+}
+

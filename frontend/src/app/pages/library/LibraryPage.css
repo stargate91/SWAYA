@@ -140,6 +140,21 @@
   gap: var(--space-2, var(--space-sm));
 }
 
+.ui-dropdown__trigger--sorter-custom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 140px;
+  max-width: 240px;
+}
+
+.tags-dropdown-item .ui-checkbox-wrap {
+  justify-content: flex-start !important;
+  width: 100%;
+  padding: 6px 12px;
+}
+
 .library-header__inline-tools {
   display: flex;
   align-items: center;

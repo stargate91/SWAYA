@@ -488,7 +488,7 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
       if (window.require) {
         ipcRenderer = window.require('electron').ipcRenderer;
       }
-    } catch (e) {}
+    } catch { /* ignore */ }
 
     if (ipcRenderer) {
       ipcRenderer.invoke('mpv-open-fullscreen', {

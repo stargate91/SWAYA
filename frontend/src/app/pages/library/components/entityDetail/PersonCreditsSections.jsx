@@ -13,8 +13,7 @@ import './PersonCreditsShared.css';
 function PersonCreditsRow({
   items,
   mediaType,
-  navigate,
-  t
+  navigate
 }) {
   const isScene = mediaType === 'scenes' || mediaType.includes('scene');
   const playMutation = usePlayMediaMutation();
@@ -439,7 +438,7 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
           {activeDiscoverTab && (
             <div className="person-credits-discover-grid-wrapper">
               {activeGridQuery.isLoading ? (
-                <div className="person-credits-discover-loading" style={{ display: 'flex', justifyContent: 'center', padding: '48px 0', width: '100%' }}>
+                <div className="person-credits-discover-loading">
                   <Spinner label={(() => {
                     const name = item?.name || 'this performer';
                     const sourceName = activeSource === 'porndb' ? 'PornDB' : (activeSource === 'stashdb' ? 'StashDB' : (activeSource === 'fansdb' ? 'FansDB' : 'TMDb'));

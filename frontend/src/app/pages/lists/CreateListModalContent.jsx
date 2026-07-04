@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import Input from '@/ui/Input';
-import Button from '@/ui/Button';
 import Radio from '@/ui/Radio';
 import Tooltip from '@/ui/Tooltip';
 
@@ -13,8 +12,25 @@ const PRESET_COLORS = [
   'var(--color-state-danger)'
 ];
 
+function ColorPresetBtn({ colorValue, isSelected, onClick }) {
+  return (
+    <button
+      type="button"
+      className="create-list-form__color-btn"
+      // eslint-disable-next-line react/forbid-dom-props
+      style={{
+        backgroundColor: colorValue,
+        border: isSelected ? '2px solid var(--color-accent-blue, #1493ff)' : '2px solid transparent',
+        transform: isSelected ? 'scale(1.1)' : 'scale(1)',
+        boxShadow: isSelected ? '0 0 8px rgba(20, 147, 255, 0.4)' : 'none',
+      }}
+      onClick={onClick}
+      aria-label={colorValue}
+    />
+  );
+}
+
 export default function CreateListModalContent({
-  onClose,
   onSave,
   t,
   initialList = null,
@@ -69,7 +85,7 @@ export default function CreateListModalContent({
           required
         />
         {error && (
-          <span className="ui-field__error-text" style={{ color: 'var(--color-state-danger)', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+          <span className="ui-field__error-text create-list-form__error">
             {error}
           </span>
         )}
@@ -81,8 +97,7 @@ export default function CreateListModalContent({
         </label>
         <textarea
           id="list-desc"
-          className="ui-input"
-          style={{ minHeight: '80px', resize: 'vertical', padding: 'var(--space-md)' }}
+          className="ui-input create-list-form__desc-textarea"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder={t('lists.desc_placeholder') || 'Description...'}
@@ -93,7 +108,7 @@ export default function CreateListModalContent({
         <label className="ui-field__label">
           {t('lists.type_label') || 'List Type'}
         </label>
-        <div style={{ display: 'flex', gap: 'var(--space-xl)', marginTop: 'var(--space-xs)' }}>
+        <div className="create-list-form__type-radio-group">
           <Radio
             name="listType"
             value="media"
@@ -124,17 +139,10 @@ export default function CreateListModalContent({
             const isSelected = color === c;
             return (
               <Tooltip key={c} content={c} side="top">
-                <button
-                  type="button"
-                  className="create-list-form__color-btn"
-                  style={{
-                    backgroundColor: c,
-                    border: isSelected ? '2px solid var(--color-accent-blue, #1493ff)' : '2px solid transparent',
-                    transform: isSelected ? 'scale(1.1)' : 'scale(1)',
-                    boxShadow: isSelected ? '0 0 8px rgba(20, 147, 255, 0.4)' : 'none',
-                  }}
+                <ColorPresetBtn
+                  colorValue={c}
+                  isSelected={isSelected}
                   onClick={() => setColor(c)}
-                  aria-label={c}
                 />
               </Tooltip>
             );

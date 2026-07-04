@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Star, Heart, Edit3, X, Clapperboard, Tv, Video, Users, CheckCircle, BarChart2, Search } from 'lucide-react';
+import { Star, Heart, Edit3, Clapperboard, Tv, Video, Users, CheckCircle, BarChart2, Search } from 'lucide-react';
 import Page from '@/ui/Page';
 import Table from '@/ui/Table';
 import { Tabs } from '@/ui/Tabs';
@@ -65,6 +65,7 @@ function SegmentedRating({ value, onChange, t }) {
             <div key={val} className="rating-segment">
               <div
                 className="rating-segment-fill"
+                // eslint-disable-next-line react/forbid-dom-props
                 style={{ width: `${fill}%` }}
               />
             </div>
@@ -85,6 +86,15 @@ export default function RatingsPage() {
   const state = useRatingsPageState();
   const isAdultMode = state.activeSessionMode === 'nsfw';
 
+  const bulletSep = '\u2022';
+  const timesChar = '\u00D7';
+
+  const getPercentageText = (rated, unrated) => {
+    const total = rated + unrated;
+    if (total === 0) return ' (0%)';
+    return ' (' + Math.round((rated / total) * 100) + '%)';
+  };
+
   // Review Drawer state
   const [editingItem, setEditingItem] = useState(null);
   const [reviewText, setReviewText] = useState('');
@@ -93,11 +103,9 @@ export default function RatingsPage() {
   // Distribution chart tab state
   const [distTab, setDistTab] = useState('movies');
 
-  useEffect(() => {
-    if (!isAdultMode && distTab === 'scenes') {
-      setDistTab('movies');
-    }
-  }, [isAdultMode, distTab]);
+  if (!isAdultMode && distTab === 'scenes') {
+    setDistTab('movies');
+  }
 
   const handleOpenReviewDrawer = (e, item) => {
     e.stopPropagation();
@@ -136,16 +144,18 @@ export default function RatingsPage() {
   // Local Search Input with Debounce Sync
   const [localSearch, setLocalSearch] = useState(state.searchQuery);
 
+  const [prevSearchQuery, setPrevSearchQuery] = useState(state.searchQuery);
+  if (state.searchQuery !== prevSearchQuery) {
+    setPrevSearchQuery(state.searchQuery);
+    setLocalSearch(state.searchQuery);
+  }
+
   useEffect(() => {
     const timer = setTimeout(() => {
       state.setSearchQuery(localSearch);
     }, 150);
     return () => clearTimeout(timer);
-  }, [localSearch]);
-
-  useEffect(() => {
-    setLocalSearch(state.searchQuery);
-  }, [state.searchQuery]);
+  }, [localSearch, state]);
 
   // Tabs configurations
   const ratingTabs = [
@@ -356,6 +366,7 @@ export default function RatingsPage() {
                                 else if (avg > val - 1) fill = (avg - (val - 1)) * 100;
                                 return (
                                   <div key={val} className="analytics-segment">
+                                    {/* eslint-disable-next-line react/forbid-dom-props */}
                                     <div className="analytics-segment-fill" style={{ width: `${fill}%` }} />
                                   </div>
                                 );
@@ -379,6 +390,7 @@ export default function RatingsPage() {
                                 else if (avg > val - 1) fill = (avg - (val - 1)) * 100;
                                 return (
                                   <div key={val} className="analytics-segment">
+                                    {/* eslint-disable-next-line react/forbid-dom-props */}
                                     <div className="analytics-segment-fill" style={{ width: `${fill}%` }} />
                                   </div>
                                 );
@@ -403,6 +415,7 @@ export default function RatingsPage() {
                                   else if (avg > val - 1) fill = (avg - (val - 1)) * 100;
                                   return (
                                     <div key={val} className="analytics-segment">
+                                      {/* eslint-disable-next-line react/forbid-dom-props */}
                                       <div className="analytics-segment-fill" style={{ width: `${fill}%` }} />
                                     </div>
                                   );
@@ -430,10 +443,10 @@ export default function RatingsPage() {
                           </div>
                           <div className="compact-stats-counts">
                             <span className="compact-count-rated">{state.moviesStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</span>
-                            <span className="compact-count-sep">•</span>
+                            <span className="compact-count-sep">{bulletSep}</span>
                             <span className="compact-count-unrated">
                               {state.moviesStats.totalUnrated} {t('ratings.stats.unrated', { defaultValue: 'unrated' })}
-                              {` (${state.moviesStats.totalRated + state.moviesStats.totalUnrated > 0 ? Math.round((state.moviesStats.totalRated / (state.moviesStats.totalRated + state.moviesStats.totalUnrated)) * 100) : 0}%)`}
+                              {getPercentageText(state.moviesStats.totalRated, state.moviesStats.totalUnrated)}
                             </span>
                           </div>
                         </div>
@@ -445,10 +458,10 @@ export default function RatingsPage() {
                           </div>
                           <div className="compact-stats-counts">
                             <span className="compact-count-rated">{state.tvStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</span>
-                            <span className="compact-count-sep">•</span>
+                            <span className="compact-count-sep">{bulletSep}</span>
                             <span className="compact-count-unrated">
                               {state.tvStats.totalUnrated} {t('ratings.stats.unrated', { defaultValue: 'unrated' })}
-                              {` (${state.tvStats.totalRated + state.tvStats.totalUnrated > 0 ? Math.round((state.tvStats.totalRated / (state.tvStats.totalRated + state.tvStats.totalUnrated)) * 100) : 0}%)`}
+                              {getPercentageText(state.tvStats.totalRated, state.tvStats.totalUnrated)}
                             </span>
                           </div>
                         </div>
@@ -461,10 +474,10 @@ export default function RatingsPage() {
                             </div>
                             <div className="compact-stats-counts">
                               <span className="compact-count-rated">{state.scenesStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</span>
-                              <span className="compact-count-sep">•</span>
+                              <span className="compact-count-sep">{bulletSep}</span>
                               <span className="compact-count-unrated">
                                 {state.scenesStats.totalUnrated} {t('ratings.stats.unrated', { defaultValue: 'unrated' })}
-                                {` (${state.scenesStats.totalRated + state.scenesStats.totalUnrated > 0 ? Math.round((state.scenesStats.totalRated / (state.scenesStats.totalRated + state.scenesStats.totalUnrated)) * 100) : 0}%)`}
+                                {getPercentageText(state.scenesStats.totalRated, state.scenesStats.totalUnrated)}
                               </span>
                             </div>
                           </div>
@@ -496,6 +509,7 @@ export default function RatingsPage() {
                                 else if (avg > val - 1) fill = (avg - (val - 1)) * 100;
                                 return (
                                   <div key={val} className="analytics-segment">
+                                    {/* eslint-disable-next-line react/forbid-dom-props */}
                                     <div className="analytics-segment-fill" style={{ width: `${fill}%` }} />
                                   </div>
                                 );
@@ -511,10 +525,10 @@ export default function RatingsPage() {
                           </div>
                           <div className="compact-stats-counts">
                             <span className="compact-count-rated">{state.peopleStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</span>
-                            <span className="compact-count-sep">•</span>
+                            <span className="compact-count-sep">{bulletSep}</span>
                             <span className="compact-count-unrated">
                               {state.peopleStats.totalUnrated} {t('ratings.stats.unrated', { defaultValue: 'unrated' })}
-                              {` (${state.peopleStats.totalRated + state.peopleStats.totalUnrated > 0 ? Math.round((state.peopleStats.totalRated / (state.peopleStats.totalRated + state.peopleStats.totalUnrated)) * 100) : 0}%)`}
+                              {getPercentageText(state.peopleStats.totalRated, state.peopleStats.totalUnrated)}
                             </span>
                           </div>
                         </div>
@@ -528,7 +542,7 @@ export default function RatingsPage() {
                           </div>
                           <div className="compact-stats-favorites">
                             <span className="compact-stats-row__value">{state.peopleStats.favoritesCount}</span>
-                            <Heart size={14} className="analytics-card__icon text-danger" fill="currentColor" style={{ marginLeft: 'var(--space-xs)' }} />
+                            <Heart size={14} className="analytics-card__icon text-danger" fill="currentColor" />
                           </div>
                         </div>
                       </div>
@@ -566,6 +580,7 @@ export default function RatingsPage() {
                                 <div className="analytics-distribution__bar-container">
                                   <div
                                     className="analytics-distribution__bar"
+                                    // eslint-disable-next-line react/forbid-dom-props
                                     style={{ width: `${percentage}%` }}
                                   />
                                 </div>
@@ -621,7 +636,7 @@ export default function RatingsPage() {
                 className="review-drawer-close-btn"
                 onClick={() => setEditingItem(null)}
               >
-                &times;
+                {timesChar}
               </button>
             </div>
             <div className="review-drawer__content">

@@ -928,3 +928,10 @@
   height: 20px;
   width: 100%;
 }
+
+.person-credits-discover-loading {
+  display: flex;
+  justify-content: center;
+  padding: 48px 0;
+  width: 100%;
+}

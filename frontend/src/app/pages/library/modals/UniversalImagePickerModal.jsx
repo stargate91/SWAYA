@@ -17,7 +17,6 @@ import ImageUploadPanel from './ImageUploadPanel';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import './UniversalImagePickerModal.css';
 
-const COLON_CHAR = ':';
 
 const pathsMatch = (pathA, pathB) => {
   if (!pathA || !pathB) return false;

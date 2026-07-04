@@ -6,6 +6,7 @@ import LibraryHeader from './components/LibraryHeader';
 import LibraryFilters from './components/LibraryFilters';
 import LibraryGrid from './components/LibraryGrid';
 import { useDeleteTagMutation } from '@/queries';
+import { X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { isLibraryTagsTab } from '@/lib/libraryTabs';
@@ -224,10 +225,10 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
                 className="entity-detail-page__drawer-close"
                 onClick={() => setImagePickerData(null)}
               >
-                &times;
+                <X size={16} />
               </button>
             </div>
-            <div className="entity-detail-page__drawer-content" style={{ padding: '24px' }}>
+            <div className="entity-detail-page__drawer-content entity-detail-page__drawer-content--padded">
               <UniversalImagePickerModal
                 entityId={imagePickerData.entityId}
                 tmdbId={imagePickerData.tmdbId}

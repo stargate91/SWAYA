@@ -1,4 +1,3 @@
-import React from 'react';
 import { Play, Pause, Maximize2, X } from 'lucide-react';
 import './PlayerControlBar.css';
 
@@ -8,6 +7,7 @@ export default function PlayerControlBar({ state, onTogglePlay, onMaximize, onCl
   }
 
   const { title, currentTime, duration, isPaused } = state;
+  const timeSeparator = ' / ';
 
   const formatTime = (secs) => {
     if (isNaN(secs) || secs === null || secs === undefined) return '0:00';
@@ -28,7 +28,7 @@ export default function PlayerControlBar({ state, onTogglePlay, onMaximize, onCl
           {title}
         </span>
         <span className="player-control-bar__time">
-          {formatTime(currentTime)} / {formatTime(duration)}
+          {formatTime(currentTime) + timeSeparator + formatTime(duration)}
         </span>
       </div>
 
@@ -36,6 +36,7 @@ export default function PlayerControlBar({ state, onTogglePlay, onMaximize, onCl
         <div className="player-control-bar__progress-bg">
           <div
             className="player-control-bar__progress-fill"
+            // eslint-disable-next-line react/forbid-dom-props
             style={{ width: `${progressPercent}%` }}
           />
         </div>

@@ -14,6 +14,11 @@
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
   margin-bottom: var(--app-shell-space-1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .organizer-rename-modal__list-container {
@@ -98,4 +103,9 @@
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.organizer-rename-modal__cell-text.is-organize-in-place {
+  opacity: 0.55;
+  font-style: italic;
 }

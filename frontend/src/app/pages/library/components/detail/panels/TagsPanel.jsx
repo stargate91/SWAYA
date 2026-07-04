@@ -29,14 +29,7 @@ export default function TagsPanel() {
   const createTagMutation = useCreateTagMutation();
 
   const currentTags = item?.custom_tags || [];
-  const PREDEFINED_COLORS = [
-    'var(--color-accent-blue)',
-    'color-mix(in srgb, var(--color-accent-blue) 75%, white)',
-    'color-mix(in srgb, var(--color-accent-blue) 75%, black)',
-    'var(--color-state-success)',
-    'var(--color-state-warning)',
-    'var(--color-state-danger)'
-  ];
+
 
   const handleToggleTag = (tagName) => {
     const isAssigned = currentTags.includes(tagName);

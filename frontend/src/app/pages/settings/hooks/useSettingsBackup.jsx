@@ -13,7 +13,8 @@ export default function useSettingsBackup({ form, setForm, fileInputRef, toast, 
       downloadAnchor.click();
       downloadAnchor.remove();
       toast(t('settingsPage.sections.backup.exportSuccess'), 'success');
-    } catch {
+    } catch (err) {
+      console.error(err);
       toast(t('settingsPage.sections.backup.exportError'), 'danger');
     }
   }, [form, t, toast]);
@@ -43,7 +44,8 @@ export default function useSettingsBackup({ form, setForm, fileInputRef, toast, 
         }));
 
         toast(t('settingsPage.sections.backup.importSuccess'), 'success');
-      } catch {
+      } catch (err) {
+        console.error(err);
         toast(t('settingsPage.sections.backup.importError'), 'danger');
       }
     };

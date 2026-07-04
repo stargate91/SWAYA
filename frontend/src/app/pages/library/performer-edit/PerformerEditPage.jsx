@@ -18,11 +18,14 @@ export default function PerformerEditPage() {
   const [isCustomDirty, setIsCustomDirty] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
 
-  useEffect(() => {
+  const [prevPerson, setPrevPerson] = useState(null);
+
+  if (person !== prevPerson) {
+    setPrevPerson(person);
     if (person && !person.is_adult && activeTab === 'linking') {
       setActiveTab('mixer');
     }
-  }, [person, activeTab]);
+  }
 
   const handleClose = useCallback(() => {
     if (isCustomDirty) {

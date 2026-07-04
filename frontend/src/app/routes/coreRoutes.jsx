@@ -6,7 +6,6 @@ const DashboardPage = lazy(() => import('../pages/dashboard/DashboardPage'));
 const SettingsPage = lazy(() => import('../pages/settings/SettingsPage'));
 const SearchPage = lazy(() => import('../pages/search/SearchPage'));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
-const PlaceholderPage = lazy(() => import('../pages/PlaceholderPage'));
 const ListsPage = lazy(() => import('../pages/lists/ListsPage'));
 
 export const coreRoutes = [

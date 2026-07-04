@@ -201,3 +201,7 @@
   color: var(--settings-danger-text);
   border: 1.5px solid var(--settings-danger-text);
 }
+
+.entity-detail-page__drawer-content--padded {
+  padding: 24px;
+}

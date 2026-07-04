@@ -543,7 +543,9 @@ export const usePlayMediaMutation = () => {
           if (window.require) {
             ipcRenderer = window.require('electron').ipcRenderer;
           }
-        } catch (e) {}
+        } catch (err) {
+          console.error(err);
+        }
 
         if (ipcRenderer) {
           await ipcRenderer.invoke('mpv-open-fullscreen', { itemId, start });

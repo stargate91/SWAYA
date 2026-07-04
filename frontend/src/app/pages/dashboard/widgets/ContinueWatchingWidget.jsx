@@ -1,5 +1,4 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Play, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import IconButton from '../../../ui/IconButton';
@@ -51,7 +50,6 @@ const formatEpisodeCode = (seasonNumber, episodeNumber) => {
 };
 
 const ContinueWatchingWidget = ({ T }) => {
-  const navigate = useNavigate();
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const { data: items = [], isLoading } = useContinueWatchingQuery({
     include_adult: sessionMode === 'nsfw',
