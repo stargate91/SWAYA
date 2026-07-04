@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '@/providers/LanguageContext';
 import Page from '@/ui/Page';
 import Button from '@/ui/Button';
 import IconButton from '@/ui/IconButton';
+import Input from '@/ui/Input';
 import { useUi } from '@/providers/UiProvider';
 import {
   useListsQuery,
@@ -45,6 +46,7 @@ export default function ListsPage() {
 
   const [activeListId, setActiveListId] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [listSearchQuery, setListSearchQuery] = useState('');
   const activeList = lists.find((l) => l.id === activeListId);
   const { data: activeListDetails, isLoading: isDetailsLoading } = useListDetailsQuery(activeListId, {
     enabled: !!activeListId
@@ -57,6 +59,7 @@ export default function ListsPage() {
   if (activeListId !== prevActiveListId) {
     setPrevActiveListId(activeListId);
     setIsDrawerOpen(false);
+    setListSearchQuery('');
   }
 
   if (listsDeps !== prevListsDeps) {
@@ -287,6 +290,18 @@ export default function ListsPage() {
 
   const createdLabel = activeList?.created_at ? ((t('lists.created_prefix') || 'CREATED') + ': ' + new Date(activeList.created_at).toLocaleDateString()) : '';
 
+  const filteredListItems = useMemo(() => {
+    if (!activeListDetails?.items) return [];
+    if (!listSearchQuery.trim()) return activeListDetails.items;
+    const queryLower = listSearchQuery.toLowerCase().trim();
+    return activeListDetails.items.filter((item) => {
+      const titleMatch = item.title && item.title.toLowerCase().includes(queryLower);
+      const nameMatch = item.name && item.name.toLowerCase().includes(queryLower);
+      const performersMatch = item.people && item.people.some(p => p.name && p.name.toLowerCase().includes(queryLower));
+      return titleMatch || nameMatch || performersMatch;
+    });
+  }, [activeListDetails, listSearchQuery]);
+
   return (
     <Page className="lists-page">
       <div className="lists-layout">
@@ -419,15 +434,27 @@ export default function ListsPage() {
               {/* eslint-disable-next-line react/forbid-dom-props */}
               <div className="lists-header" style={{ '--list-theme-color': activeList.color || 'var(--color-accent-blue)' }}>
                 <div className="lists-header__left">
-                  <div className="lists-header__title-row">
-                    <h1 className="lists-header__title">{activeList.name}</h1>
+                  <div className="lists-header__meta-stack">
+                    <div className="lists-header__title-row">
+                      <h1 className="lists-header__title">{activeList.name}</h1>
+                    </div>
+                    {activeList.description && (
+                      <p className="lists-header__description">{activeList.description}</p>
+                    )}
+                    {activeList.created_at && (
+                      <span className="lists-header__date">{createdLabel}</span>
+                    )}
                   </div>
-                  {activeList.description && (
-                    <p className="lists-header__description">{activeList.description}</p>
-                  )}
-                  {activeList.created_at && (
-                    <span className="lists-header__date">{createdLabel}</span>
-                  )}
+                  <div className="lists-header__search-wrapper">
+                    <Input
+                      type="text"
+                      className="lists-header__search-input"
+                      placeholder={t('lists.search_placeholder') || 'Search in this list...'}
+                      value={listSearchQuery}
+                      onChange={(e) => setListSearchQuery(e.target.value)}
+                      leftElement={<Search size={16} />}
+                    />
+                  </div>
                 </div>
                 <div className="lists-header__right">
                   <Tooltip content={t('lists.export') || 'Export JSON'} side="top">
@@ -463,9 +490,16 @@ export default function ListsPage() {
                     icon={ListIcon}
                     variant="page-filter"
                   />
+                ) : filteredListItems.length === 0 ? (
+                  <EmptyState
+                    title={t('lists.no_search_results_title') || 'No Matches Found'}
+                    description={t('lists.no_search_results_desc') || 'Try refining your search query.'}
+                    icon={Search}
+                    variant="page-filter"
+                  />
                 ) : (
                   <div className="lists-grid">
-                    {activeListDetails.items.map((item) => {
+                    {filteredListItems.map((item) => {
                       const isScene = item.media_type === 'scene';
                       const isAdult = item.is_adult || isScene;
                       const shouldBlur = isAdult && sessionMode !== 'nsfw';
@@ -486,7 +520,7 @@ export default function ListsPage() {
                         : allPeople;
                       const performers = filteredPeople.slice(0, 4);
 
-                       return (
+                      return (
                         <div
                           key={item.id}
                           className={`lists-card ${isScene ? 'lists-card--scene' : 'lists-card--poster'}`}
@@ -801,19 +835,19 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
         return i.person_id === item.id;
       } else {
         if (item.id && i.media_item_id === item.id) return true;
-        
+
         const cleanTmdbId = typeof item.id === 'string' && item.id.startsWith('tmdb_')
           ? parseInt(item.id.replace('tmdb_', ''), 10)
           : item.tmdb_id || (typeof item.id === 'number' ? item.id : null);
-        
+
         if (cleanTmdbId && i.tmdb_id === cleanTmdbId) return true;
-        
+
         const cleanExternalId = typeof item.id === 'string' && item.id.startsWith('stash_')
           ? item.id.replace('stash_', '')
           : item.id;
-          
+
         if (cleanExternalId && i.external_id === cleanExternalId) return true;
-        
+
         return false;
       }
     });
