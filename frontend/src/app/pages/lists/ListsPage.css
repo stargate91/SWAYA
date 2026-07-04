@@ -370,13 +370,13 @@
 }
 
 .lists-sidebar__action-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, var(--color-ink) 8%, transparent);
   color: var(--color-text-primary);
 }
 
 .lists-sidebar__action-btn--delete:hover {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
+  background: color-mix(in srgb, var(--color-state-danger) 15%, transparent);
+  color: var(--color-state-danger);
 }
 
 /* Edit / Create Form */
@@ -385,8 +385,8 @@
   flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-4);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, var(--color-ink) 3%, transparent);
+  border: 1px solid var(--color-border-subtle);
   border-radius: 8px;
   margin-bottom: var(--space-2);
 }
@@ -397,8 +397,8 @@
 
 .lists-sidebar__form-input {
   width: 100%;
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, var(--color-ink) 5%, transparent);
+  border: 1px solid var(--color-border-subtle);
   border-radius: 6px;
   color: var(--color-text-primary);
   font-size: 13px;
@@ -433,7 +433,7 @@
 }
 
 .lists-sidebar__form-color-option.is-selected {
-  border-color: #ffffff;
+  border-color: var(--color-text-primary);
   transform: scale(1.1);
 }
 
@@ -457,8 +457,8 @@
 }
 
 .lists-sidebar__form-btn--save {
-  background: var(--color-accent, #3b82f6);
-  color: #ffffff;
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
 }
 
 .lists-sidebar__form-btn--save:hover:not(:disabled) {
@@ -925,7 +925,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-secondary, #94a3b8);
+  color: var(--color-text-secondary);
   opacity: 0.5;
 }
 
@@ -958,7 +958,7 @@
 }
 
 .lists-sidebar__item-icon-wrap {
-  background-image: linear-gradient(135deg, color-mix(in srgb, var(--list-theme-color, var(--color-accent-blue)) 18%, #121216), color-mix(in srgb, var(--list-theme-color, var(--color-accent-blue)) 6%, #09090b));
+  background-image: linear-gradient(135deg, color-mix(in srgb, var(--list-theme-color, var(--color-accent)) 18%, var(--color-bg-elevated)), color-mix(in srgb, var(--list-theme-color, var(--color-accent)) 6%, var(--color-bg-canvas)));
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -2px 6px rgba(0, 0, 0, 0.5);
 }
 

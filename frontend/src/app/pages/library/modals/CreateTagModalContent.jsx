@@ -251,9 +251,9 @@ export default function CreateTagModalContent({ onClose, t, initialTag = null, m
                   /* eslint-disable-next-line react/forbid-dom-props */
                   style={{
                     backgroundColor: c,
-                    border: isSelected ? '2px solid var(--color-accent-blue, #1493ff)' : '2px solid transparent',
+                    border: isSelected ? '2px solid var(--color-accent)' : '2px solid transparent',
                     transform: isSelected ? 'scale(1.1)' : 'scale(1)',
-                    boxShadow: isSelected ? '0 0 8px rgba(20, 147, 255, 0.4)' : 'none',
+                    boxShadow: isSelected ? '0 0 8px color-mix(in srgb, var(--color-accent) 40%, transparent)' : 'none',
                   }}
                 />
               </Tooltip>

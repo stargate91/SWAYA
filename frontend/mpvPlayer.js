@@ -15,6 +15,24 @@ let mpvSocket = null;
 let mpvSocketPath = null;
 let isPip = false;
 let lastPipBounds = null;
+let latestMpvProperties = {};
+
+const observedMpvProperties = [
+  [1, 'time-pos'],
+  [2, 'pause'],
+  [3, 'volume'],
+  [4, 'duration'],
+  [5, 'chapter-list'],
+  [6, 'track-list'],
+  [7, 'speed'],
+  [8, 'eof-reached'],
+  [9, 'video-params'],
+  [10, 'mute'],
+];
+
+const snapshotRequestIds = new Map(
+  observedMpvProperties.map(([id, name]) => [1000 + id, name])
+);
 
 export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
   function getWindowIconPath() {
@@ -42,6 +60,7 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
 
   async function cleanupExistingMpv() {
     isPip = false;
+    latestMpvProperties = {};
     if (mpvProcess) {
       mpvProcess.removeAllListeners('exit');
       try { mpvProcess.kill('SIGKILL'); } catch { /* ignore */ }
@@ -272,15 +291,9 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
         mpvSocket = net.createConnection(mpvSocketPath, () => {
           writeElectronLog('INFO', 'Connected to MPV IPC socket');
 
-          // Observe properties
-          mpvSocket.write(JSON.stringify({ command: ["observe_property", 1, "time-pos"] }) + '\n');
-          mpvSocket.write(JSON.stringify({ command: ["observe_property", 2, "pause"] }) + '\n');
-          mpvSocket.write(JSON.stringify({ command: ["observe_property", 3, "volume"] }) + '\n');
-          mpvSocket.write(JSON.stringify({ command: ["observe_property", 4, "duration"] }) + '\n');
-          mpvSocket.write(JSON.stringify({ command: ["observe_property", 5, "chapter-list"] }) + '\n');
-          mpvSocket.write(JSON.stringify({ command: ["observe_property", 6, "track-list"] }) + '\n');
-          mpvSocket.write(JSON.stringify({ command: ["observe_property", 7, "speed"] }) + '\n');
-          mpvSocket.write(JSON.stringify({ command: ["observe_property", 8, "eof-reached"] }) + '\n');
+          observedMpvProperties.forEach(([id, name]) => {
+            mpvSocket.write(JSON.stringify({ command: ["observe_property", id, name] }) + '\n');
+          });
         });
 
         let buffer = '';
@@ -293,6 +306,14 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
             if (!line.trim()) continue;
             try {
               const parsed = JSON.parse(line);
+              if (parsed.event === 'property-change' && parsed.name) {
+                latestMpvProperties[parsed.name] = parsed.data;
+              } else if (snapshotRequestIds.has(parsed.request_id)) {
+                const propertyName = snapshotRequestIds.get(parsed.request_id);
+                latestMpvProperties[propertyName] = parsed.data;
+                parsed.event = 'property-change';
+                parsed.name = propertyName;
+              }
               // Send events to the controls window!
               if (controlsWindow && !controlsWindow.isDestroyed()) {
                 controlsWindow.webContents.send('mpv-event', parsed);
@@ -335,6 +356,21 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
         if (controlsWindow && !controlsWindow.isDestroyed()) {
           controlsWindow.show();
           controlsWindow.focus();
+          Object.entries(latestMpvProperties).forEach(([name, data]) => {
+            controlsWindow.webContents.send('mpv-event', {
+              event: 'property-change',
+              name,
+              data
+            });
+          });
+          if (mpvSocket && !mpvSocket.destroyed) {
+            observedMpvProperties.forEach(([id, name]) => {
+              mpvSocket.write(JSON.stringify({
+                command: ['get_property', name],
+                request_id: 1000 + id
+              }) + '\n');
+            });
+          }
         }
       });
 

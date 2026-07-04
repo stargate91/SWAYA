@@ -50,18 +50,20 @@ export default function ListsPage() {
   const [prevActiveListId, setPrevActiveListId] = useState(null);
   const [prevLists, setPrevLists] = useState([]);
 
-  if (activeListId !== prevActiveListId) {
+  useEffect(() => {
+    if (activeListId === prevActiveListId) return;
     setPrevActiveListId(activeListId);
     setIsDrawerOpen(false);
-  }
+  }, [activeListId, prevActiveListId]);
 
-  if (lists !== prevLists) {
+  useEffect(() => {
+    if (lists === prevLists) return;
     setPrevLists(lists);
     if (lists.length > 0 && activeListId === null) {
       const watchlist = lists.find((l) => l.is_watchlist) || lists[0];
       setActiveListId(watchlist.id);
     }
-  }
+  }, [activeListId, lists, prevLists]);
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -575,7 +577,8 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
   const [prevResetDeps, setPrevResetDeps] = useState(null);
   const resetDepsStr = `${isOpen}_${activeList?.id || ''}_${source}_${mediaType}_${isAdultActive}`;
 
-  if (resetDepsStr !== prevResetDeps) {
+  useEffect(() => {
+    if (resetDepsStr === prevResetDeps) return;
     setPrevResetDeps(resetDepsStr);
     setQuery('');
     setResults([]);
@@ -583,7 +586,7 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
     setHasMore(false);
     setStatusFilter('not_added');
     setProvider(mediaType === 'scene' ? 'porndb' : 'tmdb');
-  }
+  }, [mediaType, prevResetDeps, resetDepsStr]);
 
   const handleSearch = useCallback(async (isNew = true) => {
     if (source === 'discover' && !query.trim()) {

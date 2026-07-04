@@ -48,13 +48,19 @@ export default function Tooltip({
   const timeoutRef = useRef(null);
   const tooltipId = useId();
   const tooltipRef = useRef(null);
+  const isPointerInsideRef = useRef(false);
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState(null);
 
-  const showTooltip = () => {
+  const showTooltip = (source = 'pointer') => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
-      const rect = triggerRef.current?.getBoundingClientRect();
+      const trigger = triggerRef.current;
+      if (!trigger) return;
+      if (source === 'pointer' && !isPointerInsideRef.current) return;
+      if (source === 'focus' && !trigger.matches(':focus-within')) return;
+
+      const rect = trigger.getBoundingClientRect();
       if (rect) {
         setPosition(getPosition(rect, side));
         setIsOpen(true);
@@ -68,7 +74,16 @@ export default function Tooltip({
     if (Date.now() - globalLastMouseDownTime < 150) {
       return;
     }
-    showTooltip();
+    requestAnimationFrame(() => {
+      const trigger = triggerRef.current;
+      const activeElement = document.activeElement;
+      if (
+        trigger?.contains(activeElement)
+        && activeElement?.matches?.(':focus-visible')
+      ) {
+        showTooltip('focus');
+      }
+    });
   };
 
   const hideTooltip = useCallback(() => {
@@ -140,11 +155,20 @@ export default function Tooltip({
       <span
         ref={triggerRef}
         className="ui-tooltip"
-        onMouseEnter={showTooltip}
-        onMouseLeave={hideTooltip}
+        onMouseEnter={() => {
+          isPointerInsideRef.current = true;
+          showTooltip('pointer');
+        }}
+        onMouseLeave={() => {
+          isPointerInsideRef.current = false;
+          hideTooltip();
+        }}
         onFocus={handleFocus}
         onBlur={hideTooltip}
-        onMouseDown={hideTooltip}
+        onMouseDown={() => {
+          isPointerInsideRef.current = false;
+          hideTooltip();
+        }}
         aria-describedby={isOpen ? tooltipId : undefined}
       >
         {children}

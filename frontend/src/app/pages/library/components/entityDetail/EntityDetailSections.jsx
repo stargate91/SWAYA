@@ -321,10 +321,11 @@ export function CollectionItemsSection({ items, navigate, t }) {
   const [limit, setLimit] = useState(30);
   const scrollContainerRef = useRef(null);
 
-  if (items !== prevItems) {
+  useEffect(() => {
+    if (items === prevItems) return;
     setPrevItems(items);
     setLimit(30);
-  }
+  }, [items, prevItems]);
 
   useEffect(() => {
     const container = scrollContainerRef.current;

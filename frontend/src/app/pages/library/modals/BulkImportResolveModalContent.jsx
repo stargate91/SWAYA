@@ -41,7 +41,8 @@ export default function BulkImportResolveModalContent({ t, isAdult = false }) {
     : null;
 
   const [prevResolveStateStorageKey, setPrevResolveStateStorageKey] = useState(resolveStateStorageKey);
-  if (resolveStateStorageKey !== prevResolveStateStorageKey) {
+  useEffect(() => {
+    if (resolveStateStorageKey === prevResolveStateStorageKey) return;
     setPrevResolveStateStorageKey(resolveStateStorageKey);
     let parsed = {};
     if (resolveStateStorageKey) {
@@ -53,7 +54,7 @@ export default function BulkImportResolveModalContent({ t, isAdult = false }) {
       }
     }
     setResolvedRows(parsed);
-  }
+  }, [prevResolveStateStorageKey, resolveStateStorageKey]);
 
   const resolveProfileUrl = (path) => {
     return resolveMediaImageUrl(path, 'personThumb');

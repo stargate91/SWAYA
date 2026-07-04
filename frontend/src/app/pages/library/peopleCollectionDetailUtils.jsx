@@ -222,19 +222,36 @@ export function buildPersonExternalLinks(item, t) {
   const getBrandColorForKey = (key) => {
     const colors = {
       tmdb: 'var(--color-brand-tmdb)',
-      imdb: '#f5c518',
-      stashdb: '#081c24',
-      fansdb: '#00aff0',
-      porndb: '#ff0055',
-      onlyfans: '#00aff0',
-      fansly: '#5b93fa',
-      patreon: '#ff424d',
-      instagram: '#c13584',
-      facebook: '#1877f2',
-      twitter: '#1da1f2',
-      youtube: '#ff0000',
-      data18: '#f25b29',
-      website: '#888888',
+      imdb: 'var(--color-brand-imdb)',
+      stashdb: 'var(--color-brand-stashdb)',
+      fansdb: 'var(--color-brand-fansdb)',
+      porndb: 'var(--color-brand-porndb)',
+      onlyfans: 'var(--color-brand-onlyfans)',
+      fansly: 'var(--color-brand-fansly)',
+      patreon: 'var(--color-brand-patreon)',
+      instagram: 'var(--color-brand-instagram)',
+      facebook: 'var(--color-brand-facebook)',
+      twitter: 'var(--color-brand-twitter)',
+      x: 'var(--color-brand-threads)',
+      youtube: 'var(--color-brand-youtube)',
+      tiktok: 'var(--color-brand-tiktok)',
+      threads: 'var(--color-brand-threads)',
+      twitch: 'var(--color-brand-twitch)',
+      kick: 'var(--color-brand-kick)',
+      bluesky: 'var(--color-brand-bluesky)',
+      loyalfans: 'var(--color-brand-loyalfans)',
+      manyvids: 'var(--color-brand-manyvids)',
+      linktree: 'var(--color-brand-linktree)',
+      pornhub: 'var(--color-brand-pornhub)',
+      clips4sale: 'var(--color-brand-clips4sale)',
+      allmylinks: 'var(--color-brand-allmylinks)',
+      beacons: 'var(--color-brand-beacons)',
+      iafd: 'var(--color-brand-iafd)',
+      babepedia: 'var(--color-brand-babepedia)',
+      freeones: 'var(--color-brand-freeones)',
+      theporndb: 'var(--color-brand-porndb)',
+      data18: 'var(--color-brand-data18)',
+      website: 'var(--color-brand-website)',
     };
     return colors[key?.toLowerCase()] || 'var(--color-text-primary)';
   };
@@ -357,7 +374,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'Instagram',
       href: String(instagramId).startsWith('http') ? instagramId : `https://www.instagram.com/${instagramId}`,
       iconSrc: '/links/instagram.ico',
-      brandColor: '#f77737',
+      brandColor: getBrandColorForKey('instagram'),
     });
   }
 
@@ -368,7 +385,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'Facebook',
       href: String(facebookId).startsWith('http') ? facebookId : `https://www.facebook.com/${facebookId}`,
       iconSrc: '/links/facebook.ico',
-      brandColor: '#1877f2',
+      brandColor: getBrandColorForKey('facebook'),
     });
   }
 
@@ -381,7 +398,7 @@ export function buildPersonExternalLinks(item, t) {
       label: isXUrl ? 'X' : 'Twitter',
       href: String(twitterId).startsWith('http') ? twitterId : (isXUrl ? `https://x.com/${cleanId}` : `https://twitter.com/${cleanId}`),
       iconSrc: isXUrl ? '/links/x.svg' : '/links/twitter.png',
-      brandColor: isXUrl ? '#ffffff' : '#1da1f2',
+      brandColor: isXUrl ? getBrandColorForKey('x') : getBrandColorForKey('twitter'),
     });
   }
 
@@ -392,7 +409,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'YouTube',
       href: String(youtubeId).startsWith('http') ? youtubeId : `https://www.youtube.com/${String(youtubeId).startsWith('@') ? youtubeId : `@${youtubeId}`}`,
       iconSrc: '/links/youtube.ico',
-      brandColor: '#ff0033',
+      brandColor: getBrandColorForKey('youtube'),
     });
   }
 
@@ -403,7 +420,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'TikTok',
       href: String(tiktokId).startsWith('http') ? tiktokId : `https://www.tiktok.com/@${String(tiktokId).replace(/^@/, '')}`,
       iconSrc: '/links/tiktok.png',
-      brandColor: '#25f4ee',
+      brandColor: getBrandColorForKey('tiktok'),
     });
   }
 
@@ -413,7 +430,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'Threads',
       href: `https://www.threads.net/@${externalIds.threads_id.replace(/^@/, '')}`,
       iconSrc: '/links/threads.png',
-      brandColor: '#000000',
+      brandColor: getBrandColorForKey('threads'),
     });
   }
 
@@ -423,7 +440,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'Twitch',
       href: `https://www.twitch.tv/${externalIds.twitch_id}`,
       iconSrc: '/links/twitch.jpg',
-      brandColor: '#9146ff',
+      brandColor: getBrandColorForKey('twitch'),
     });
   }
 
@@ -433,7 +450,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'Kick',
       href: `https://kick.com/${externalIds.kick_id}`,
       iconSrc: '/links/kick.ico',
-      brandColor: '#53fc18',
+      brandColor: getBrandColorForKey('kick'),
     });
   }
 
@@ -443,7 +460,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'BlueSky',
       href: `https://bsky.app/profile/${externalIds.bluesky_id}`,
       iconSrc: '/links/bluesky.png',
-      brandColor: '#0285FF',
+      brandColor: getBrandColorForKey('bluesky'),
     });
   }
 
@@ -453,7 +470,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'OnlyFans',
       href: `https://onlyfans.com/${externalIds.onlyfans_id}`,
       iconSrc: '/links/onylfans.ico',
-      brandColor: '#00aff0',
+      brandColor: getBrandColorForKey('onlyfans'),
     });
   }
 
@@ -463,7 +480,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'Fansly',
       href: `https://fansly.com/${externalIds.fansly_id}`,
       iconSrc: '/links/fansly.png',
-      brandColor: '#5b93fa',
+      brandColor: getBrandColorForKey('fansly'),
     });
   }
 
@@ -473,7 +490,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'Patreon',
       href: `https://www.patreon.com/${externalIds.patreon_id}`,
       iconSrc: '/links/patreon.ico',
-      brandColor: '#ff424d',
+      brandColor: getBrandColorForKey('patreon'),
     });
   }
 
@@ -483,7 +500,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'LoyalFans',
       href: `https://www.loyalfans.com/${externalIds.loyalfans_id}`,
       iconSrc: '/links/loyalfans.ico',
-      brandColor: '#eb1b4b',
+      brandColor: getBrandColorForKey('loyalfans'),
     });
   }
 
@@ -493,7 +510,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'ManyVids',
       href: `https://www.manyvids.com/${externalIds.manyvids_id}`,
       iconSrc: '/links/manyvids.ico',
-      brandColor: '#ff5c00',
+      brandColor: getBrandColorForKey('manyvids'),
     });
   }
 
@@ -503,7 +520,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'Linktree',
       href: `https://linktr.ee/${externalIds.linktree_id}`,
       iconSrc: '/links/linktree.png',
-      brandColor: '#39e09b',
+      brandColor: getBrandColorForKey('linktree'),
     });
   }
 
@@ -513,7 +530,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'Pornhub',
       href: `https://www.pornhub.com/${externalIds.pornhub_id}`,
       iconSrc: '/links/pornhub.ico',
-      brandColor: '#ff9900',
+      brandColor: getBrandColorForKey('pornhub'),
     });
   }
 
@@ -523,7 +540,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'Clips4Sale',
       href: `https://www.clips4sale.com/${externalIds.clips4sale_id}`,
       iconSrc: '/links/clip4sale.ico',
-      brandColor: '#ff0000',
+      brandColor: getBrandColorForKey('clips4sale'),
     });
   }
 
@@ -533,7 +550,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'AllMyLinks',
       href: `https://allmylinks.com/${externalIds.allmylinks_id}`,
       iconSrc: '/links/allmylinks.ico',
-      brandColor: '#00c2ff',
+      brandColor: getBrandColorForKey('allmylinks'),
     });
   }
 
@@ -543,7 +560,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'Beacons',
       href: `https://beacons.ai/${externalIds.beacons_id}`,
       iconSrc: '/links/beacons.png',
-      brandColor: '#8A2BE2',
+      brandColor: getBrandColorForKey('beacons'),
     });
   }
 
@@ -553,7 +570,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'IAFD',
       href: `https://www.iafd.com/person.rme/${externalIds.iafd_id}`,
       iconSrc: '/links/iafd.ico',
-      brandColor: '#1d2a44',
+      brandColor: getBrandColorForKey('iafd'),
     });
   }
 
@@ -563,7 +580,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'Babepedia',
       href: `https://www.babepedia.com/babe/${externalIds.babepedia_id}`,
       iconSrc: '/links/babepedia.ico',
-      brandColor: '#ff0066',
+      brandColor: getBrandColorForKey('babepedia'),
     });
   }
 
@@ -573,7 +590,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'FreeOnes',
       href: `https://www.freeones.com/${externalIds.freeones_id}`,
       iconSrc: '/links/freeones.png',
-      brandColor: '#0066cc',
+      brandColor: getBrandColorForKey('freeones'),
     });
   }
 
@@ -583,7 +600,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'DATA18',
       href: `https://www.data18.com/star/${externalIds.data18_id}`,
       iconSrc: '/links/data18.ico',
-      brandColor: '#f25b29',
+      brandColor: getBrandColorForKey('data18'),
     });
   }
 
@@ -593,7 +610,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'StashDB',
       href: `https://stashdb.org/performers/${externalIds.stashdb_id}`,
       iconSrc: '/links/stashdb.png',
-      brandColor: '#081c24',
+      brandColor: getBrandColorForKey('stashdb'),
     });
   }
 
@@ -603,7 +620,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'FansDB',
       href: `https://fansdb.cc/performers/${externalIds.fansdb_id}`,
       iconSrc: '/links/fansdb.webp',
-      brandColor: '#00aff0',
+      brandColor: getBrandColorForKey('fansdb'),
     });
   }
 
@@ -613,7 +630,7 @@ export function buildPersonExternalLinks(item, t) {
       label: 'THEPornDB',
       href: `https://theporndb.net/performers/${externalIds.theporndb_id}`,
       iconSrc: '/links/theporndb.png',
-      brandColor: '#ff0055',
+      brandColor: getBrandColorForKey('theporndb'),
     });
   }
 
@@ -956,19 +973,36 @@ export function buildMediaExternalLinks(item, t, type) {
   const getBrandColorForKey = (key) => {
     const colors = {
       tmdb: 'var(--color-brand-tmdb)',
-      imdb: '#f5c518',
-      stashdb: '#081c24',
-      fansdb: '#00aff0',
-      porndb: '#ff0055',
-      onlyfans: '#00aff0',
-      fansly: '#5b93fa',
-      patreon: '#ff424d',
-      instagram: '#c13584',
-      facebook: '#1877f2',
-      twitter: '#1da1f2',
-      youtube: '#ff0000',
-      data18: '#f25b29',
-      website: '#888888',
+      imdb: 'var(--color-brand-imdb)',
+      stashdb: 'var(--color-brand-stashdb)',
+      fansdb: 'var(--color-brand-fansdb)',
+      porndb: 'var(--color-brand-porndb)',
+      onlyfans: 'var(--color-brand-onlyfans)',
+      fansly: 'var(--color-brand-fansly)',
+      patreon: 'var(--color-brand-patreon)',
+      instagram: 'var(--color-brand-instagram)',
+      facebook: 'var(--color-brand-facebook)',
+      twitter: 'var(--color-brand-twitter)',
+      x: 'var(--color-brand-threads)',
+      youtube: 'var(--color-brand-youtube)',
+      tiktok: 'var(--color-brand-tiktok)',
+      threads: 'var(--color-brand-threads)',
+      twitch: 'var(--color-brand-twitch)',
+      kick: 'var(--color-brand-kick)',
+      bluesky: 'var(--color-brand-bluesky)',
+      loyalfans: 'var(--color-brand-loyalfans)',
+      manyvids: 'var(--color-brand-manyvids)',
+      linktree: 'var(--color-brand-linktree)',
+      pornhub: 'var(--color-brand-pornhub)',
+      clips4sale: 'var(--color-brand-clips4sale)',
+      allmylinks: 'var(--color-brand-allmylinks)',
+      beacons: 'var(--color-brand-beacons)',
+      iafd: 'var(--color-brand-iafd)',
+      babepedia: 'var(--color-brand-babepedia)',
+      freeones: 'var(--color-brand-freeones)',
+      theporndb: 'var(--color-brand-porndb)',
+      data18: 'var(--color-brand-data18)',
+      website: 'var(--color-brand-website)',
     };
     return colors[key?.toLowerCase()] || 'var(--color-text-primary)';
   };

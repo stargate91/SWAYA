@@ -26,8 +26,6 @@ export default function PlayerPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const speedText = `${speed}x`;
-  const ratingText = userRating ? `${userRating.toFixed(1)} / 10` : '';
   const starSymbol = '\u2605';
 
   const containerRef = useRef(null);
@@ -72,6 +70,43 @@ export default function PlayerPage() {
   const [showAudioMenu, setShowAudioMenu] = useState(false);
   const [showSubMenu, setShowSubMenu] = useState(false);
   const controlsTimeoutRef = useRef(null);
+
+  const [videoParams, setVideoParams] = useState(null);
+  const [bottomOffset, setBottomOffset] = useState(0);
+  const videoParamsRef = useRef(null);
+
+  useEffect(() => {
+    videoParamsRef.current = videoParams;
+  }, [videoParams]);
+
+  const updateBottomOffset = useCallback((params) => {
+    if (!params || !params.aspect || !containerRef.current) {
+      setBottomOffset(0);
+      return;
+    }
+    const rect = containerRef.current.getBoundingClientRect();
+    const containerWidth = rect.width;
+    const containerHeight = rect.height;
+    if (containerWidth === 0 || containerHeight === 0) return;
+
+    const containerAspect = containerWidth / containerHeight;
+    const videoAspect = params.aspect;
+
+    if (videoAspect > containerAspect) {
+      const displayedVideoHeight = containerWidth / videoAspect;
+      const blackBarHeight = (containerHeight - displayedVideoHeight) / 2;
+      setBottomOffset(Math.max(0, Math.round(blackBarHeight)));
+    } else {
+      setBottomOffset(0);
+    }
+  }, []);
+
+  useEffect(() => {
+    updateBottomOffset(videoParams);
+  }, [videoParams, updateBottomOffset]);
+
+  const speedText = `${speed}x`;
+  const ratingText = userRating ? `${userRating.toFixed(1)} / 10` : '';
 
   const currentTimeRef = useRef(currentTime);
   const durationRef = useRef(duration);
@@ -133,17 +168,19 @@ export default function PlayerPage() {
   }, [nextEpisode, navigate]);
 
   // Sync menu state when controls hide during render
-  if (!showControls) {
+  useEffect(() => {
+    if (showControls) return;
     if (showAudioMenu) setShowAudioMenu(false);
     if (showSubMenu) setShowSubMenu(false);
-  }
+  }, [showAudioMenu, showControls, showSubMenu]);
 
   // Sync logo error reset during render
   const [prevLogoUrl, setPrevLogoUrl] = useState(null);
-  if (logoUrl !== prevLogoUrl) {
+  useEffect(() => {
+    if (logoUrl === prevLogoUrl) return;
     setPrevLogoUrl(logoUrl);
     setLogoError(false);
-  }
+  }, [logoUrl, prevLogoUrl]);
 
   // Helper function to format time (e.g. 01:23:45)
   const formatTime = (secs) => {
@@ -346,6 +383,9 @@ export default function PlayerPage() {
         if (data.name === 'speed' && typeof data.data === 'number') {
           setSpeed(data.data);
         }
+        if (data.name === 'video-params' && data.data) {
+          setVideoParams(data.data);
+        }
       }
     };
 
@@ -369,6 +409,7 @@ export default function PlayerPage() {
           height: bounds.height
         });
       }
+      updateBottomOffset(videoParamsRef.current);
     });
 
     if (containerRef.current) {
@@ -383,7 +424,7 @@ export default function PlayerPage() {
       }
       resizeObserver.disconnect();
     };
-  }, [itemId, sendCommand]);
+  }, [itemId, sendCommand, updateBottomOffset]);
 
   // Periodic progress saving to backend
   useEffect(() => {
@@ -646,7 +687,7 @@ export default function PlayerPage() {
         </div>
 
         {/* Bottom Controls */}
-        <div className="player-page__bottom">
+        <div className="player-page__bottom" style={bottomOffset > 0 ? { transform: `translateY(-${bottomOffset}px)` } : undefined}>
 
           {/* Progress Bar */}
           <div className="player-page__progress-container">
@@ -734,19 +775,19 @@ export default function PlayerPage() {
               {showAudioMenu && (
                 <div className="player-page__menu" onWheel={(e) => e.stopPropagation()}>
                   <div className="player-page__menu-title">{t('player.audio_tracks', { defaultValue: 'Audio Tracks' })}</div>
-                  {trackList.filter(t => t.type === 'audio').map(t => (
+                  {trackList.filter((track) => track.type === 'audio').map((track) => (
                     <button
-                      key={t.id}
-                      className={`player-page__menu-item ${t.selected ? 'active' : ''}`}
+                      key={track.id}
+                      className={`player-page__menu-item ${track.selected ? 'active' : ''}`}
                       onClick={() => {
-                        sendCommand(['set_property', 'aid', t.id]);
+                        sendCommand(['set_property', 'aid', track.id]);
                         setShowAudioMenu(false);
                       }}
                     >
-                      {t.title || t.lang?.toUpperCase() || ((t('player.track') || 'Track') + ' ' + t.id)} {t.codec ? `(${t.codec.toUpperCase()})` : ''}
+                      {track.title || track.lang?.toUpperCase() || ((t('player.track') || 'Track') + ' ' + track.id)} {track.codec ? `(${track.codec.toUpperCase()})` : ''}
                     </button>
                   ))}
-                  {trackList.filter(t => t.type === 'audio').length === 0 && (
+                  {trackList.filter((track) => track.type === 'audio').length === 0 && (
                     <div className="player-page__menu-empty">{t('player.no_audio_tracks', { defaultValue: 'No audio tracks' })}</div>
                   )}
                 </div>
@@ -757,7 +798,7 @@ export default function PlayerPage() {
                 <div className="player-page__menu" onWheel={(e) => e.stopPropagation()}>
                   <div className="player-page__menu-title">{t('player.subtitles', { defaultValue: 'Subtitles' })}</div>
                   <button
-                    className={`player-page__menu-item ${!trackList.some(t => t.type === 'sub' && t.selected) ? 'active' : ''}`}
+                    className={`player-page__menu-item ${!trackList.some((track) => track.type === 'sub' && track.selected) ? 'active' : ''}`}
                     onClick={() => {
                       sendCommand(['set_property', 'sid', 'no']);
                       setShowSubMenu(false);
@@ -765,16 +806,16 @@ export default function PlayerPage() {
                   >
                     {t('player.off', { defaultValue: 'Off' })}
                   </button>
-                  {trackList.filter(t => t.type === 'sub').map(t => (
+                  {trackList.filter((track) => track.type === 'sub').map((track) => (
                     <button
-                      key={t.id}
-                      className={`player-page__menu-item ${t.selected ? 'active' : ''}`}
+                      key={track.id}
+                      className={`player-page__menu-item ${track.selected ? 'active' : ''}`}
                       onClick={() => {
-                        sendCommand(['set_property', 'sid', t.id]);
+                        sendCommand(['set_property', 'sid', track.id]);
                         setShowSubMenu(false);
                       }}
                     >
-                      {t.title || t.lang?.toUpperCase() || ((t('player.subtitle') || 'Subtitle') + ' ' + t.id)}
+                      {track.title || track.lang?.toUpperCase() || ((t('player.subtitle') || 'Subtitle') + ' ' + track.id)}
                     </button>
                   ))}
                 </div>

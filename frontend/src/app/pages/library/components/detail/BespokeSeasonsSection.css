@@ -81,12 +81,12 @@
 
 .bespoke-season-pill.is-active,
 .bespoke-episode-pill.is-active {
-  background: color-mix(in srgb, var(--app-shell-color-accent, var(--color-accent-blue)) 15%, transparent);
-  --local-color: color-mix(in srgb, var(--app-shell-color-accent, var(--color-accent-blue)) 88%, var(--color-text-primary, #ffffff));
+  background: color-mix(in srgb, var(--app-shell-color-accent, var(--color-accent)) 15%, transparent);
+  --local-color: color-mix(in srgb, var(--app-shell-color-accent, var(--color-accent)) 88%, var(--color-text-primary));
   color: var(--local-color);
-  --local-border-color: color-mix(in srgb, var(--app-shell-color-accent, var(--color-accent-blue)) 88%, var(--color-text-primary, #ffffff));
+  --local-border-color: color-mix(in srgb, var(--app-shell-color-accent, var(--color-accent)) 88%, var(--color-text-primary));
   border-color: var(--local-border-color);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--app-shell-color-accent, var(--color-accent-blue)) 25%, transparent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--app-shell-color-accent, var(--color-accent)) 25%, transparent);
   font-weight: 700;
 }
 
@@ -441,7 +441,7 @@
 }
 
 .bespoke-action-btn--peak {
-  --local-color: var(--color-accent-orange, #f59e0b);
+  --local-color: var(--color-state-danger);
   color: var(--local-color);
 }
 
@@ -468,7 +468,7 @@
   gap: var(--space-xs);
   font-size: 10px;
   font-weight: 600;
-  --local-color: var(--color-accent-orange, #f59e0b);
+  --local-color: var(--color-state-danger);
   color: var(--local-color);
   margin-bottom: var(--space-3xs);
 }
@@ -511,7 +511,7 @@
 }
 
 .bespoke-episode-detail-card__peak-delete:hover {
-  --local-color: var(--color-state-danger, #ef4444);
+  --local-color: var(--color-state-danger);
   color: var(--local-color);
 }
 
@@ -756,9 +756,9 @@
 }
 
 .bespoke-boxoffice-stat--loss .bespoke-boxoffice-icon-wrapper {
-  --local-color: var(--color-state-danger, #ef4444);
+  --local-color: var(--color-state-danger);
   color: var(--local-color);
-  --local-bg: color-mix(in srgb, var(--color-state-danger, #ef4444) 10%, transparent);
+  --local-bg: color-mix(in srgb, var(--color-state-danger) 10%, transparent);
   background: var(--local-bg);
 }
 

@@ -76,7 +76,14 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
     return 'seasons';
   });
 
-  if (cleanId !== prevCleanId) {
+  useEffect(() => {
+    if (cleanId === prevCleanId) {
+      if (item !== prevItem) {
+        setPrevItem(item);
+      }
+      return;
+    }
+
     setPrevCleanId(cleanId);
     setPrevItem(item);
     if (isScene) {
@@ -86,9 +93,7 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
     } else {
       setActivePanel('seasons');
     }
-  } else if (item !== prevItem) {
-    setPrevItem(item);
-  }
+  }, [cleanId, isMovie, isScene, item, prevCleanId, prevItem]);
 
   useEffect(() => {
     if (!isMovie || !cleanId || !String(item?.id || '').startsWith('tmdb_')) return;

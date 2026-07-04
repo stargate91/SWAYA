@@ -38,10 +38,10 @@
   padding: var(--space-xl);
   /* Increased padding for breathing room */
   border-radius: 24px;
-  --column-bg: color-mix(in srgb, var(--app-shell-color-panel, #1e1e24) 22%, transparent);
+  --column-bg: color-mix(in srgb, var(--app-shell-color-panel, var(--color-panel)) 22%, transparent);
   background: var(--column-bg);
   /* More translucent background */
-  --column-border: 1px solid color-mix(in srgb, var(--color-border-default, #32323d) 40%, transparent);
+  --column-border: 1px solid color-mix(in srgb, var(--color-border-default) 40%, transparent);
   border: var(--column-border);
   backdrop-filter: blur(16px);
   /* Slightly increased blur for premium glassmorphism */
@@ -384,12 +384,11 @@
   top: calc(100% + 6px);
   left: 0;
   z-index: 9999;
-  --popover-bg: #18181a;
+  --popover-bg: var(--color-bg-elevated);
   background: var(--popover-bg);
-  --popover-border: 1px solid var(--color-border, rgba(255, 255, 255, 0.15));
+  --popover-border: 1px solid var(--color-border-subtle);
   border: var(--popover-border);
-  border-radius: 8px;
-  --popover-shadow: 0 10px 25px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  --popover-shadow: 0 10px 25px rgba(0, 0, 0, 0.55), 0 0 0 1px color-mix(in srgb, var(--color-border-subtle) 50%, transparent);
   box-shadow: var(--popover-shadow);
   --popover-padding: 10px 12px;
   padding: var(--popover-padding);
@@ -768,7 +767,7 @@
 }
 
 .entity-detail-page__drawer {
-  --drawer-bg: var(--color-surface-overlay, #1c1c1e);
+  --drawer-bg: var(--color-surface-overlay, var(--color-panel-strong));
   background: var(--drawer-bg);
   z-index: 99999999 !important;
   top: var(--layout-window-titlebar-height, 46px) !important;
@@ -1031,15 +1030,15 @@
   padding: 0 var(--space-2);
   height: 28px;
   border-radius: 6px;
-  --badge-border: 1px solid rgba(255, 215, 0, 0.2);
+  --badge-border: 1px solid color-mix(in srgb, var(--color-accent-yellow) 20%, transparent);
   border: var(--badge-border);
-  --badge-bg: rgba(255, 215, 0, 0.06);
+  --badge-bg: color-mix(in srgb, var(--color-accent-yellow) 6%, transparent);
   background: var(--badge-bg);
-  --badge-color: #ffd700;
+  --badge-color: var(--color-accent-yellow);
   color: var(--badge-color);
   font-size: 11px;
   font-weight: 700;
-  --badge-shadow: 0 2px 8px rgba(255, 215, 0, 0.05);
+  --badge-shadow: 0 2px 8px color-mix(in srgb, var(--color-accent-yellow) 5%, transparent);
   box-shadow: var(--badge-shadow);
 }
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Clapperboard } from 'lucide-react';
 import Badge from '@/ui/Badge';
 import MetaRow from '@/ui/MetaRow';
@@ -63,10 +63,11 @@ export default function MatchCandidateCard({
   const [prevPosterUrl, setPrevPosterUrl] = useState(posterUrl);
   const [imageError, setImageError] = useState(false);
 
-  if (prevPosterUrl !== posterUrl) {
+  useEffect(() => {
+    if (prevPosterUrl === posterUrl) return;
     setPrevPosterUrl(posterUrl);
     setImageError(false);
-  }
+  }, [posterUrl, prevPosterUrl]);
 
   if (variant === 'poster') {
     if (mediaType === 'scene') {

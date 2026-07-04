@@ -89,7 +89,7 @@
   color: var(--color-text-primary);
   font-size: 0.625rem;
   font-weight: 700;
-  padding: var(--space-two-px) var(--space-xs);
+  padding: var(--space-2px) var(--space-xs);
   border-radius: 4px;
   position: absolute;
   top: var(--space-sm);

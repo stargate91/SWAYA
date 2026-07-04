@@ -32,10 +32,11 @@ function PaginationPageEditor({ currentPage, totalPages, onPageChange }) {
   const [prevCurrentPage, setPrevCurrentPage] = useState(currentPage);
   const inputRef = useRef(null);
 
-  if (currentPage !== prevCurrentPage) {
+  useEffect(() => {
+    if (currentPage === prevCurrentPage) return;
     setPrevCurrentPage(currentPage);
     setPageValue(String(currentPage));
-  }
+  }, [currentPage, prevCurrentPage]);
 
   useEffect(() => {
     if (isEditing) {

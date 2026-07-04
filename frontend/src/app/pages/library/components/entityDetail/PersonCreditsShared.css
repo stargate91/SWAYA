@@ -279,9 +279,9 @@
   grid-column: 2;
   display: flex;
   flex-direction: column;
-  --local-bg: color-mix(in srgb, var(--app-shell-color-panel, #1e1e24) 22%, transparent);
+  --local-bg: color-mix(in srgb, var(--app-shell-color-panel, var(--color-panel)) 22%, transparent);
   background: var(--local-bg);
-  --local-border: 1px solid color-mix(in srgb, var(--color-border-default, #32323d) 40%, transparent);
+  --local-border: 1px solid color-mix(in srgb, var(--color-border-default) 40%, transparent);
   border: var(--local-border);
   --local-padding: 24px;
   padding: var(--local-padding);
@@ -684,7 +684,7 @@
   justify-content: space-between;
   align-items: center;
   gap: var(--space-2);
-  margin-top: var(--space-two-px);
+  margin-top: var(--space-2px);
 }
 
 .person-credits-card__role {

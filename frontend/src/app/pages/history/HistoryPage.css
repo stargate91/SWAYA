@@ -514,23 +514,23 @@
 }
 
 .watched-history-card__status--peak {
-  --peak-bg: var(--color-state-danger-bg, rgba(239, 68, 68, 0.15));
-  --peak-color: var(--color-state-danger, #ef4444);
+  --peak-bg: var(--color-state-danger-bg);
+  --peak-color: var(--color-state-danger);
   background: var(--peak-bg);
   border: 1px solid color-mix(in srgb, var(--color-state-danger) 20%, transparent);
   color: var(--peak-color);
 }
 
 .watched-history-card.is-active {
-  border-color: color-mix(in srgb, var(--color-accent-blue) 40%, var(--color-border-subtle));
-  box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent-blue) 15%, transparent),
+  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border-subtle));
+  box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent) 15%, transparent),
               0 4px 12px color-mix(in srgb, black 25%, transparent);
 }
 
 .watched-history-card__status--active {
-  background: color-mix(in srgb, var(--color-accent-blue) 10%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-accent-blue) 30%, transparent);
-  --active-color: var(--color-accent-blue-pale, #5ac8fa);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+  --active-color: var(--color-accent);
   color: var(--active-color);
 }
 
@@ -538,7 +538,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--color-accent-blue);
+  background: var(--color-accent);
   display: inline-block;
   margin-right: var(--space-1);
 }
@@ -551,17 +551,17 @@
 @keyframes livePulse {
   0% {
     transform: scale(0.9);
-    --pulse-shadow-0: 0 0 0 0 rgba(0, 122, 255, 0.7);
+    --pulse-shadow-0: 0 0 0 0 color-mix(in srgb, var(--color-accent) 70%, transparent);
     box-shadow: var(--pulse-shadow-0);
   }
   70% {
     transform: scale(1.1);
-    --pulse-shadow-70: 0 0 0 5px rgba(0, 122, 255, 0);
+    --pulse-shadow-70: 0 0 0 5px color-mix(in srgb, var(--color-accent) 0%, transparent);
     box-shadow: var(--pulse-shadow-70);
   }
   100% {
     transform: scale(0.9);
-    --pulse-shadow-100: 0 0 0 0 rgba(0, 122, 255, 0);
+    --pulse-shadow-100: 0 0 0 0 color-mix(in srgb, var(--color-accent) 0%, transparent);
     box-shadow: var(--pulse-shadow-100);
   }
 }
@@ -576,7 +576,7 @@
 
 .watched-history-card__percent {
   font-weight: var(--font-weight-bold);
-  color: var(--color-accent-blue-pale);
+  color: var(--color-accent);
 }
 
 .watched-history-card__time {
@@ -595,17 +595,17 @@
 
 .watched-history-card__progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-accent-blue), var(--color-accent-blue-pale));
+  background: linear-gradient(90deg, var(--color-accent), color-mix(in srgb, var(--color-accent) 60%, white));
   border-radius: var(--radius-full);
 }
 
 .watched-history-card__progress-bar--active {
-  --bar-active-bg: linear-gradient(90deg, var(--color-accent-blue), #5ac8fa, var(--color-accent-blue));
+  --bar-active-bg: linear-gradient(90deg, var(--color-accent), color-mix(in srgb, var(--color-accent) 60%, white), var(--color-accent));
   background: var(--bar-active-bg);
   background-size: 200% 100%;
   --bar-active-animation: progressBarGlow 2s linear infinite;
   animation: var(--bar-active-animation);
-  --bar-active-shadow: 0 0 8px rgba(90, 200, 250, 0.6);
+  --bar-active-shadow: 0 0 8px color-mix(in srgb, var(--color-accent) 60%, transparent);
   box-shadow: var(--bar-active-shadow);
 }
 

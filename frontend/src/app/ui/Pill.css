@@ -148,7 +148,7 @@
   border-radius: 6px;
   --pill-border: 1px solid color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 30%, var(--color-border-subtle, rgba(255, 255, 255, 0.08)));
   --pill-bg: color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 12%, var(--color-bg-elevated, rgba(30, 30, 30, 0.6)));
-  --pill-color: color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 85%, var(--color-text-primary, #fff));
+  --pill-color: color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 85%, var(--color-text-primary));
   --pill-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   --pill-transition: border-color var(--motion-fast, 0.15s), background-color var(--motion-fast, 0.15s), transform var(--motion-fast, 0.15s), box-shadow var(--motion-fast, 0.15s);
 
@@ -194,7 +194,7 @@
 .ui-pill--tag-suggested {
   border-style: dashed;
   background: transparent;
-  --pill-suggested-color: var(--color-text-muted, #888);
+  --pill-suggested-color: var(--color-text-muted);
   --pill-suggested-border: var(--color-border-subtle, rgba(255, 255, 255, 0.08));
 
   color: var(--pill-suggested-color);
@@ -204,7 +204,7 @@
 .ui-pill--tag-suggested:hover {
   --pill-suggested-bg-hover: color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 12%, var(--color-bg-elevated, rgba(30, 30, 30, 0.6)));
   --pill-suggested-border-hover: color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 30%, var(--color-border-subtle, rgba(255, 255, 255, 0.08)));
-  --pill-suggested-color-hover: color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 85%, var(--color-text-primary, #fff));
+  --pill-suggested-color-hover: color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 85%, var(--color-text-primary));
 
   background: var(--pill-suggested-bg-hover);
   border-color: var(--pill-suggested-border-hover);

@@ -111,7 +111,7 @@ export default function WindowTitlebar() {
           className="window-titlebar__nav-btn"
           disabled={!canGoBack}
           onClick={() => goBack(navigate)}
-          title="Back"
+          aria-label="Back"
         >
           <ArrowLeft size={16} />
         </button>
@@ -120,7 +120,7 @@ export default function WindowTitlebar() {
           className="window-titlebar__nav-btn"
           disabled={!canGoForward}
           onClick={() => goForward(navigate)}
-          title="Forward"
+          aria-label="Forward"
         >
           <ArrowRight size={16} />
         </button>

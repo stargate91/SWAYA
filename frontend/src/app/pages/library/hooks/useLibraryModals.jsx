@@ -44,7 +44,7 @@ export function useLibraryModals({ state, focusedTagName, setFocusedTagName, del
         <CreateTagModalContent
           onClose={closeModal}
           t={state.t}
-          defaultColor="#3b82f6"
+          defaultColor="var(--color-accent)"
           isAdult={isAdult}
         />
       ),

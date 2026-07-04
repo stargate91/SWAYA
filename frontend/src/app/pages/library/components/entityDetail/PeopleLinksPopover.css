@@ -10,7 +10,7 @@
   width: 280px;
   max-height: 380px;
   overflow-y: auto;
-  --popover-bg: color-mix(in srgb, var(--color-panel-strong, #121824) 94%, transparent);
+  --popover-bg: color-mix(in srgb, var(--color-panel-strong) 94%, transparent);
   background-color: var(--popover-bg);
   backdrop-filter: blur(16px);
   border: 1px solid color-mix(in srgb, var(--color-border-default) 45%, transparent);

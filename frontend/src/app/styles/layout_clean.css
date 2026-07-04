@@ -114,7 +114,7 @@
 }
 
 .window-titlebar__button--close:hover {
-  --close-hover-bg: #e81123;
+  --close-hover-bg: var(--color-state-danger);
   background: var(--close-hover-bg) !important;
   color: var(--color-text-primary) !important;
 }
@@ -125,7 +125,7 @@
 }
 
 .window-titlebar__button--close:active {
-  --close-active-bg: #f1707a;
+  --close-active-bg: color-mix(in srgb, var(--color-state-danger) 60%, white);
   background: var(--close-active-bg) !important;
   color: var(--color-text-primary) !important;
 }

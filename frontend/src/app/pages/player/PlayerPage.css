@@ -150,9 +150,9 @@
 .player-page__speed-badge {
   font-size: 12px;
   font-weight: 600;
-  color: var(--color-state-info);
-  background: color-mix(in srgb, var(--color-state-info) 15%, transparent);
-  padding: var(--space-two-px) calc(var(--space-2) - var(--space-two-px));
+  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+  padding: var(--space-2px) calc(var(--space-2) - var(--space-2px));
   border-radius: 4px;
   margin-left: var(--space-1);
 }
@@ -292,7 +292,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: calc(var(--space-2) - var(--space-two-px));
+  gap: calc(var(--space-2) - var(--space-2px));
 }
 
 .player-page__ends-at {
@@ -316,12 +316,12 @@
   backdrop-filter: blur(12px);
   border: 1px solid var(--color-border-strong);
   border-radius: 8px;
-  padding: calc(var(--space-2) - var(--space-two-px));
+  padding: calc(var(--space-2) - var(--space-2px));
   box-shadow: var(--shadow-lg);
   z-index: 10000;
   display: flex;
   flex-direction: column;
-  gap: var(--space-two-px);
+  gap: var(--space-2px);
 }
 
 .player-page__menu-title {
@@ -330,7 +330,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  padding: calc(var(--space-2) - var(--space-two-px)) var(--space-2) var(--space-1) var(--space-2);
+  padding: calc(var(--space-2) - var(--space-2px)) var(--space-2) var(--space-1) var(--space-2);
   border-bottom: 1px solid var(--color-border-default);
   margin-bottom: var(--space-1);
 }
@@ -358,8 +358,8 @@
 }
 
 .player-page__menu-item.active {
-  color: var(--color-state-info);
-  background: color-mix(in srgb, var(--color-state-info) 12%, transparent);
+  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
   font-weight: 600;
 }
 
@@ -494,7 +494,7 @@
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 2px;
-  color: var(--color-accent-blue);
+  color: var(--color-accent);
   margin-bottom: var(--space-2);
   font-weight: 800;
 }
@@ -519,7 +519,7 @@
   font-size: 12px;
   color: color-mix(in srgb, var(--color-ink) 50%, transparent);
   text-transform: uppercase;
-  margin-bottom: calc(var(--space-2) - var(--space-two-px));
+  margin-bottom: calc(var(--space-2) - var(--space-2px));
   font-weight: 600;
 }
 
@@ -532,7 +532,7 @@
 
 .player-page__end-countdown {
   font-size: 14px;
-  color: var(--color-accent-blue);
+  color: var(--color-accent);
   font-weight: 600;
   margin-bottom: var(--space-4);
 }
@@ -610,13 +610,13 @@
 }
 
 .player-page__end-btn--primary {
-  background: var(--color-accent-blue);
+  background: var(--color-accent);
   border-color: transparent;
-  color: black;
+  color: var(--color-text-inverse, black);
 }
 
 .player-page__end-btn--primary:hover {
-  background: var(--color-accent-blue-pale);
+  background: var(--color-accent-strong);
   border-color: transparent;
 }
 

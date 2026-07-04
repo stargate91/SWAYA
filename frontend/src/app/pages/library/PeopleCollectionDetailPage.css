@@ -90,9 +90,9 @@
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  --socials-bg: color-mix(in srgb, var(--app-shell-color-panel, #1e1e24) 65%, transparent);
+  --socials-bg: color-mix(in srgb, var(--app-shell-color-panel, var(--color-panel)) 65%, transparent);
   background-color: var(--socials-bg);
-  --socials-border: 1px solid color-mix(in srgb, var(--color-border-default, #32323d) 35%, transparent);
+  --socials-border: 1px solid color-mix(in srgb, var(--color-border-default) 35%, transparent);
   border: var(--socials-border);
   border-radius: 9999px;
   --socials-padding: 5px;
@@ -120,9 +120,9 @@
   width: 38px;
   height: 38px;
   border-radius: var(--radius-md, 12px);
-  --scroll-border: 1px solid color-mix(in srgb, var(--color-border-default, #32323d) 45%, transparent);
+  --scroll-border: 1px solid color-mix(in srgb, var(--color-border-default) 45%, transparent);
   border: var(--scroll-border);
-  --scroll-bg: color-mix(in srgb, var(--app-shell-color-panel, #1e1e24) 75%, transparent);
+  --scroll-bg: color-mix(in srgb, var(--app-shell-color-panel, var(--color-panel)) 75%, transparent);
   background-color: var(--scroll-bg);
   color: var(--color-text-primary);
   cursor: pointer;
@@ -136,7 +136,7 @@
 }
 
 .entity-detail-page__scroll-toggle-btn:hover {
-  --scroll-hover-bg: color-mix(in srgb, var(--app-shell-color-panel, #1e1e24) 85%, transparent);
+  --scroll-hover-bg: color-mix(in srgb, var(--app-shell-color-panel, var(--color-panel)) 85%, transparent);
   background-color: var(--scroll-hover-bg);
   border-color: color-mix(in srgb, var(--color-border-default) 70%, transparent);
   transform: scale(1.1);
@@ -165,7 +165,7 @@
 
 .entity-detail-page__bottom-socials-wrapper:hover {
   border-color: color-mix(in srgb, var(--color-border-default) 70%, transparent);
-  --wrapper-hover-bg: color-mix(in srgb, var(--app-shell-color-panel, #1e1e24) 85%, transparent);
+  --wrapper-hover-bg: color-mix(in srgb, var(--app-shell-color-panel, var(--color-panel)) 85%, transparent);
   background-color: var(--wrapper-hover-bg);
 }
 

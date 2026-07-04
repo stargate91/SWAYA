@@ -391,10 +391,11 @@ export default function TMDBImageGrid({
   );
 
   const [prevDeps, setPrevDeps] = useState({ images, initialVisibleCount });
-  if (prevDeps.images !== images || prevDeps.initialVisibleCount !== initialVisibleCount) {
+  useEffect(() => {
+    if (prevDeps.images === images && prevDeps.initialVisibleCount === initialVisibleCount) return;
     setPrevDeps({ images, initialVisibleCount });
     setLoadMoreCount(0);
-  }
+  }, [images, initialVisibleCount, prevDeps]);
 
   const baseVisibleCount = initialVisibleCount ?? Number.POSITIVE_INFINITY;
   const minimumVisibleCount = selectedIndex >= 0

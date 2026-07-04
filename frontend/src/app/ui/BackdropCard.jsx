@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Check } from 'lucide-react';
 import './BackdropCard.css';
 
@@ -27,10 +27,11 @@ export default function BackdropCard({
   const [prevImageUrl, setPrevImageUrl] = useState(imageUrl);
   const [imageError, setImageError] = useState(false);
 
-  if (prevImageUrl !== imageUrl) {
+  useEffect(() => {
+    if (prevImageUrl === imageUrl) return;
     setPrevImageUrl(imageUrl);
     setImageError(false);
-  }
+  }, [imageUrl, prevImageUrl]);
 
   return (
     <button

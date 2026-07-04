@@ -384,20 +384,20 @@
 .table-segmented-rating-container .rating-segment {
   flex: 1;
   height: 100%;
-  --local-bg: rgba(255, 255, 255, 0.08);
+  --local-bg: color-mix(in srgb, var(--color-ink) 8%, transparent);
   background: var(--local-bg);
   border-radius: 1.5px;
   overflow: hidden;
-  --local-border: 1px solid rgba(255, 255, 255, 0.04);
+  --local-border: 1px solid var(--color-border-subtle);
   border: var(--local-border);
-  --local-transition: all 0.2s ease;
+  --local-transition: all var(--motion-duration-base) var(--motion-ease-standard);
   transition: var(--local-transition);
 }
 
 .table-segmented-rating-container .rating-segmented-bar:hover .rating-segment {
-  --local-bg: rgba(255, 255, 255, 0.12);
+  --local-bg: color-mix(in srgb, var(--color-ink) 12%, transparent);
   background: var(--local-bg);
-  --local-border-color: rgba(255, 255, 255, 0.08);
+  --local-border-color: var(--color-border-default);
   border-color: var(--local-border-color);
 }
 
@@ -405,7 +405,7 @@
   height: 100%;
   background: var(--color-accent-blue);
   opacity: 0.85;
-  --local-transition: opacity 0.2s ease, box-shadow 0.2s ease, width 0.12s ease;
+  --local-transition: opacity var(--motion-duration-base) var(--motion-ease-standard), box-shadow var(--motion-duration-base) var(--motion-ease-standard), width var(--motion-duration-fast) var(--motion-ease-standard);
   transition: var(--local-transition);
 }
 

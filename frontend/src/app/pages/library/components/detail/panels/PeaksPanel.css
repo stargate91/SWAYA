@@ -91,11 +91,11 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2xs);
-  --pill-bg: color-mix(in srgb, var(--color-accent-blue, #3b82f6) 12%, transparent);
+  --pill-bg: color-mix(in srgb, var(--color-accent) 12%, transparent);
   background: var(--pill-bg);
-  --pill-border: 1px solid color-mix(in srgb, var(--color-accent-blue, #3b82f6) 30%, transparent);
+  --pill-border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
   border: var(--pill-border);
-  --pill-color: var(--color-accent-blue, #3b82f6);
+  --pill-color: var(--color-accent);
   color: var(--pill-color);
   font-weight: 700;
   font-size: 10px;
@@ -105,7 +105,7 @@
 }
 
 .peak-position-pill__icon {
-  --pill-icon-color: var(--color-accent-blue, #3b82f6);
+  --pill-icon-color: var(--color-accent);
   color: var(--pill-icon-color);
 }
 
@@ -138,8 +138,8 @@
 }
 
 .peak-delete-btn:hover {
-  --danger-color: var(--color-danger, #ef4444);
+  --danger-color: var(--color-state-danger);
   color: var(--danger-color);
-  --danger-bg: rgba(239, 68, 68, 0.1);
+  --danger-bg: color-mix(in srgb, var(--color-state-danger) 10%, transparent);
   background: var(--danger-bg);
 }

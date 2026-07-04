@@ -414,7 +414,7 @@ export default function HistoryPage() {
                   />
                 ) : (
                   <div className="watched-history-card__poster-placeholder">
-                    <Flame size={18} color="var(--color-state-danger, #ef4444)" />
+                    <Flame size={18} color="var(--color-state-danger)" />
                   </div>
                 )}
               </div>

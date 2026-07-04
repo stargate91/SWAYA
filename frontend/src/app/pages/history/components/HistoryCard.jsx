@@ -10,22 +10,22 @@ const getCardIconAndClass = (status) => {
     case 'completed':
       return {
         icon: <CheckCircle2 size={18} />,
-        accentColor: 'var(--color-state-success, #10b981)',
+        accentColor: 'var(--color-state-success)',
       };
     case 'partial':
       return {
         icon: <AlertTriangle size={18} />,
-        accentColor: 'var(--color-state-warning, #f59e0b)',
+        accentColor: 'var(--color-state-warning)',
       };
     case 'undone':
       return {
         icon: <RotateCcw size={18} />,
-        accentColor: 'var(--color-text-muted, #94a3b8)',
+        accentColor: 'var(--color-text-muted)',
       };
     default:
       return {
         icon: <Clock size={18} />,
-        accentColor: 'var(--color-accent, #1493ff)',
+        accentColor: 'var(--color-accent)',
       };
   }
 };

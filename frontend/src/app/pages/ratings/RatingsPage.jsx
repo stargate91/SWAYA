@@ -102,10 +102,7 @@ export default function RatingsPage() {
 
   // Distribution chart tab state
   const [distTab, setDistTab] = useState('movies');
-
-  if (!isAdultMode && distTab === 'scenes') {
-    setDistTab('movies');
-  }
+  const effectiveDistTab = !isAdultMode && distTab === 'scenes' ? 'movies' : distTab;
 
   const handleOpenReviewDrawer = (e, item) => {
     e.stopPropagation();
@@ -144,18 +141,19 @@ export default function RatingsPage() {
   // Local Search Input with Debounce Sync
   const [localSearch, setLocalSearch] = useState(state.searchQuery);
 
-  const [prevSearchQuery, setPrevSearchQuery] = useState(state.searchQuery);
-  if (state.searchQuery !== prevSearchQuery) {
-    setPrevSearchQuery(state.searchQuery);
-    setLocalSearch(state.searchQuery);
-  }
+  const stateRef = useRef(state);
+  useEffect(() => {
+    stateRef.current = state;
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      state.setSearchQuery(localSearch);
+      if (localSearch !== stateRef.current.searchQuery) {
+        stateRef.current.setSearchQuery(localSearch);
+      }
     }, 150);
     return () => clearTimeout(timer);
-  }, [localSearch, state]);
+  }, [localSearch]);
 
   // Tabs configurations
   const ratingTabs = [
@@ -558,7 +556,7 @@ export default function RatingsPage() {
                         </span>
                         <SegmentedControl
                           options={distTabs}
-                          value={distTab}
+                          value={effectiveDistTab}
                           onChange={setDistTab}
                           variant="filter"
                         />
@@ -566,9 +564,9 @@ export default function RatingsPage() {
                       <div className="analytics-distribution">
                         {(() => {
                           const activeDistStats = 
-                            distTab === 'people' ? state.peopleStats :
-                            distTab === 'tv' ? state.tvStats :
-                            distTab === 'scenes' ? state.scenesStats :
+                            effectiveDistTab === 'people' ? state.peopleStats :
+                            effectiveDistTab === 'tv' ? state.tvStats :
+                            effectiveDistTab === 'scenes' ? state.scenesStats :
                             state.moviesStats;
                           return activeDistStats.distribution.map((count, index) => {
                             const maxCount = Math.max(...activeDistStats.distribution, 1);

@@ -75,11 +75,13 @@ export default function PersonCreditsGridSection({ personId, mediaType, totalCou
   });
   const totalPages = Math.max(1, Number(creditsQuery.data?.total_pages) || Math.ceil(Number(totalCount) / itemsPerPage) || 1);
 
-  if (page > totalPages) {
-    setPage(totalPages);
-  } else if (page < 1) {
-    setPage(1);
-  }
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages);
+    } else if (page < 1) {
+      setPage(1);
+    }
+  }, [page, totalPages]);
 
   const safePage = Math.min(page, totalPages);
 

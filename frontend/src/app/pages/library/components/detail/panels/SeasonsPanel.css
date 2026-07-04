@@ -499,7 +499,7 @@
 }
 
 .episode-card__peaks-title svg {
-  --peaks-svg-color: #ef4444;
+  --peaks-svg-color: var(--color-state-danger);
   color: var(--peaks-svg-color);
 }
 
@@ -547,9 +547,9 @@
 }
 
 .episode-card__peak-delete:hover {
-  --peaks-del-color: #ef4444;
+  --peaks-del-color: var(--color-state-danger);
   color: var(--peaks-del-color);
-  --peaks-del-bg: color-mix(in srgb, #ef4444 10%, transparent);
+  --peaks-del-bg: color-mix(in srgb, var(--color-state-danger) 10%, transparent);
   background: var(--peaks-del-bg);
 }
 
@@ -558,9 +558,9 @@
 }
 
 .episode-card__action-btn--peak:hover {
-  --peaks-act-color: #ef4444;
+  --peaks-act-color: var(--color-state-danger);
   color: var(--peaks-act-color);
-  --peaks-act-bg: color-mix(in srgb, #ef4444 12%, transparent);
+  --peaks-act-bg: color-mix(in srgb, var(--color-state-danger) 12%, transparent);
   background: var(--peaks-act-bg);
 }
 

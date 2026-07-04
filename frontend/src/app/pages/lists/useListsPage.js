@@ -143,7 +143,7 @@ export function useListsPage() {
       const created = await api.lists.createList({
         name: `${data.name} (Imported)`,
         description: data.description || 'Imported list',
-        color: data.color || '#3b82f6',
+        color: data.color || 'var(--color-accent)',
       });
 
       if (data.items && Array.isArray(data.items)) {

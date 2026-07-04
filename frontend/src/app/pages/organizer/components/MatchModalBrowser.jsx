@@ -19,10 +19,11 @@ export default function MatchModalBrowser({
   const [prevViewSeason, setPrevViewSeason] = useState('');
 
   const currentViewSeason = `${browserState.view}-${browserState.selectedSeason?.id || browserState.selectedSeason?.season_number || ''}`;
-  if (prevViewSeason !== currentViewSeason) {
+  useEffect(() => {
+    if (prevViewSeason === currentViewSeason) return;
     setPrevViewSeason(currentViewSeason);
     setVisibleCount(30);
-  }
+  }, [currentViewSeason, prevViewSeason]);
 
   // Ensure searched episode is rendered even if it's beyond initial visibleCount
   const targetEpisodeNum = Number.parseInt(episode, 10);
@@ -30,9 +31,11 @@ export default function MatchModalBrowser({
     ? browserState.episodes.findIndex(e => e.episode_number === targetEpisodeNum)
     : -1;
 
-  if (matchedEpisodeIndex >= visibleCount) {
-    setVisibleCount(matchedEpisodeIndex + 10);
-  }
+  useEffect(() => {
+    if (matchedEpisodeIndex >= visibleCount) {
+      setVisibleCount(matchedEpisodeIndex + 10);
+    }
+  }, [matchedEpisodeIndex, visibleCount]);
 
   const observerRef = useRef();
   const loadMoreRef = useCallback((node) => {

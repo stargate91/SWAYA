@@ -45,14 +45,12 @@
 }
 
 .specs-card__progress::-webkit-progress-value {
-  --progress-cyan: #00d2ff;
-  background: linear-gradient(90deg, var(--color-accent-blue) 0%, var(--progress-cyan) 100%);
+  background: linear-gradient(90deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, white) 100%);
   border-radius: 3px;
 }
 
 .specs-card__progress::-moz-progress-bar {
-  --progress-cyan: #00d2ff;
-  background: linear-gradient(90deg, var(--color-accent-blue) 0%, var(--progress-cyan) 100%);
+  background: linear-gradient(90deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, white) 100%);
   border-radius: 3px;
 }
 
@@ -199,14 +197,12 @@
 }
 
 .season-progress-card__progress::-webkit-progress-value {
-  --progress-cyan: #00d2ff;
-  background: linear-gradient(90deg, var(--color-accent-blue) 0%, var(--progress-cyan) 100%);
+  background: linear-gradient(90deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, white) 100%);
   border-radius: 2px;
 }
 
 .season-progress-card__progress::-moz-progress-bar {
-  --progress-cyan: #00d2ff;
-  background: linear-gradient(90deg, var(--color-accent-blue) 0%, var(--progress-cyan) 100%);
+  background: linear-gradient(90deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, white) 100%);
   border-radius: 2px;
 }
 

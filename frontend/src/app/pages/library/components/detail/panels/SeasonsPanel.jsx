@@ -44,7 +44,8 @@ export default function SeasonsPanel() {
   const scrollContainerRef = useRef(null);
   const loadMoreTriggerRef = useRef(null);
 
-  if (selectedSeasonNumber !== prevSelectedSeasonNumber) {
+  useEffect(() => {
+    if (selectedSeasonNumber === prevSelectedSeasonNumber) return;
     setPrevSelectedSeasonNumber(selectedSeasonNumber);
 
     const targetSeason = seasonsList.find((season) => season.season_number === selectedSeasonNumber);
@@ -56,7 +57,7 @@ export default function SeasonsPanel() {
         ? Math.max(EPISODES_BATCH_SIZE, targetEpisodeIndex + 1)
         : EPISODES_BATCH_SIZE
     );
-  }
+  }, [nextEpisodeInfo, prevSelectedSeasonNumber, seasonsList, selectedSeasonNumber]);
 
   // Automatically scroll the selected season card into view without affecting outer scroll containers
   useEffect(() => {

@@ -69,19 +69,21 @@ export default function SearchPage() {
   }, [hasAdult]);
 
   const [prevUrlQuery, setPrevUrlQuery] = useState(urlQuery);
-  if (urlQuery !== prevUrlQuery) {
+  useEffect(() => {
+    if (urlQuery === prevUrlQuery) return;
     setPrevUrlQuery(urlQuery);
     setLocalQuery(urlQuery);
-  }
+  }, [prevUrlQuery, urlQuery]);
 
   const [prevCriteria, setPrevCriteria] = useState({ query: urlQuery, source: urlSource, type: urlType });
-  if (urlQuery !== prevCriteria.query || urlSource !== prevCriteria.source || urlType !== prevCriteria.type) {
+  useEffect(() => {
+    if (urlQuery === prevCriteria.query && urlSource === prevCriteria.source && urlType === prevCriteria.type) return;
     setPrevCriteria({ query: urlQuery, source: urlSource, type: urlType });
     setVisibleCount(12);
     if (!urlQuery.trim()) {
       setResults([]);
     }
-  }
+  }, [prevCriteria, urlQuery, urlSource, urlType]);
 
   // Execute search when URL params change
   useEffect(() => {

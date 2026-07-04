@@ -30,7 +30,7 @@
 }
 
 .bespoke-scene-peaks-title-icon {
-  --peaks-color: #ef4444;
+  --peaks-color: var(--color-state-danger);
   color: var(--peaks-color);
 }
 
@@ -64,9 +64,9 @@
   gap: var(--local-gap);
   max-height: 176px; /* Approx 5 items */
   overflow-y: auto;
-  padding-right: var(--space-two-px);
-  padding-top: var(--space-two-px);
-  padding-bottom: var(--space-two-px);
+  padding-right: var(--space-2px);
+  padding-top: var(--space-2px);
+  padding-bottom: var(--space-2px);
   scrollbar-width: thin;
   scrollbar-color: color-mix(in srgb, var(--color-ink) 10%, transparent) transparent;
 }
@@ -88,7 +88,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: calc(var(--space-2) - var(--space-two-px)) calc(var(--space-3) - var(--space-two-px));
+  padding: calc(var(--space-2) - var(--space-2px)) calc(var(--space-3) - var(--space-2px));
   border-radius: var(--radius-md, 8px);
   background: var(--color-surface-card);
   border: 1px solid var(--color-border-default);

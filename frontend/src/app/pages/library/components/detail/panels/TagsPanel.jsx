@@ -109,7 +109,7 @@ export default function TagsPanel() {
         <div className="tags-panel__assigned-list">
           {currentTags.map(tagName => {
             const tagObj = allTags.find(t => t.name === tagName);
-            const color = tagObj?.color || '#3b82f6';
+            const color = tagObj?.color || 'var(--color-accent)';
             return (
               <Pill
                 key={tagName}
