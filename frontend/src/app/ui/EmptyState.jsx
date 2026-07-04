@@ -7,9 +7,13 @@ export default function EmptyState({
   actions = null,
   className = '',
   variant = 'default',
+  style = null,
 }) {
   return (
-    <div className={`ui-empty-state ui-empty-state--${variant} ${className}`.trim()}>
+    <div
+      className={`ui-empty-state ui-empty-state--${variant} ${className}`.trim()}
+      style={style}
+    >
       {Icon ? (
         <div className="ui-empty-state__icon" aria-hidden="true">
           <Icon size={22} />

@@ -21,6 +21,7 @@ import Tooltip from '@/ui/Tooltip';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import api from '@/lib/api';
 import EmptyState from '@/ui/EmptyState';
+import Dropdown from '@/ui/Dropdown';
 import SegmentedControl from '@/ui/SegmentedControl';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import { API_BASE } from '@/lib/backend';
@@ -47,6 +48,13 @@ export default function ListsPage() {
   const [activeListId, setActiveListId] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [listSearchQuery, setListSearchQuery] = useState('');
+  const [sortKey, setSortKey] = useState('added_at');
+  const [sortDirection, setSortDirection] = useState('desc');
+  const [watchedFilter, setWatchedFilter] = useState('all');
+  const [mediaTypeFilter, setMediaTypeFilter] = useState('all');
+  const [genreFilter, setGenreFilter] = useState('all');
+  const [genderFilter, setGenderFilter] = useState('all');
+  const [jobFilter, setJobFilter] = useState('all');
   const activeList = lists.find((l) => l.id === activeListId);
   const { data: activeListDetails, isLoading: isDetailsLoading } = useListDetailsQuery(activeListId, {
     enabled: !!activeListId
@@ -60,6 +68,13 @@ export default function ListsPage() {
     setPrevActiveListId(activeListId);
     setIsDrawerOpen(false);
     setListSearchQuery('');
+    setSortKey('added_at');
+    setSortDirection('desc');
+    setWatchedFilter('all');
+    setMediaTypeFilter('all');
+    setGenreFilter('all');
+    setGenderFilter('all');
+    setJobFilter('all');
   }
 
   if (listsDeps !== prevListsDeps) {
@@ -290,17 +305,117 @@ export default function ListsPage() {
 
   const createdLabel = activeList?.created_at ? ((t('lists.created_prefix') || 'CREATED') + ': ' + new Date(activeList.created_at).toLocaleDateString()) : '';
 
+  const availableGenres = useMemo(() => {
+    if (!activeListDetails?.items) return [];
+    const genresSet = new Set();
+    activeListDetails.items.forEach((item) => {
+      if (item.genres && Array.isArray(item.genres)) {
+        item.genres.forEach((genre) => {
+          if (genre) genresSet.add(genre.trim());
+        });
+      }
+    });
+    return ['all', ...Array.from(genresSet).sort()];
+  }, [activeListDetails]);
+
+  const sortOptions = useMemo(() => {
+    const isPeopleList = activeList?.list_type === 'person';
+    const options = [
+      { value: 'added_at', label: t('lists.sort_date_added') || 'Date Added' },
+      { value: 'title', label: isPeopleList ? (t('lists.sort_name') || 'Name') : (t('lists.sort_title') || 'Title') },
+      { value: 'user_rating', label: t('lists.sort_user_rating') || 'User Rating' }
+    ];
+    if (!isPeopleList) {
+      options.push({ value: 'release_date', label: t('lists.sort_release_date') || 'Release Date' });
+    }
+    return options;
+  }, [activeList, t]);
+
   const filteredListItems = useMemo(() => {
     if (!activeListDetails?.items) return [];
-    if (!listSearchQuery.trim()) return activeListDetails.items;
-    const queryLower = listSearchQuery.toLowerCase().trim();
-    return activeListDetails.items.filter((item) => {
-      const titleMatch = item.title && item.title.toLowerCase().includes(queryLower);
-      const nameMatch = item.name && item.name.toLowerCase().includes(queryLower);
-      const performersMatch = item.people && item.people.some(p => p.name && p.name.toLowerCase().includes(queryLower));
-      return titleMatch || nameMatch || performersMatch;
+    
+    let result = activeListDetails.items;
+    
+    // Filter by watch status
+    if (watchedFilter !== 'all') {
+      const wantWatched = watchedFilter === 'watched';
+      result = result.filter((item) => !!item.is_watched === wantWatched);
+    }
+
+    // Filter by media type
+    if (activeList?.list_type !== 'person' && mediaTypeFilter !== 'all') {
+      result = result.filter((item) => {
+        const itemType = item.media_type;
+        if (mediaTypeFilter === 'movie') {
+          return itemType === 'movie';
+        } else if (mediaTypeFilter === 'show') {
+          return itemType === 'show' || itemType === 'tv' || itemType === 'episode' || itemType === 'season';
+        } else if (mediaTypeFilter === 'scene') {
+          return itemType === 'scene' || itemType === 'still';
+        }
+        return true;
+      });
+    }
+
+    // Filter by genre
+    if (activeList?.list_type !== 'person' && genreFilter !== 'all') {
+      result = result.filter((item) => {
+        return item.genres && item.genres.some((g) => g.toLowerCase().trim() === genreFilter.toLowerCase().trim());
+      });
+    }
+
+    // Filter by gender (only for people lists)
+    if (activeList?.list_type === 'person' && genderFilter !== 'all') {
+      result = result.filter((item) => {
+        const itemGender = item.gender; // 1 = female, 2 = male
+        if (genderFilter === 'female') return itemGender === 1;
+        if (genderFilter === 'male') return itemGender === 2;
+        return true;
+      });
+    }
+
+    // Filter by job (only for people lists)
+    if (activeList?.list_type === 'person' && jobFilter !== 'all') {
+      result = result.filter((item) => {
+        const dept = item.known_for_department;
+        if (jobFilter === 'actor') return dept === 'Acting';
+        if (jobFilter === 'director') return dept === 'Directing' || dept === 'Creator';
+        if (jobFilter === 'writer') return dept === 'Writing';
+        return true;
+      });
+    }
+
+    if (listSearchQuery.trim()) {
+      const queryLower = listSearchQuery.toLowerCase().trim();
+      result = result.filter((item) => {
+        const titleMatch = item.title && item.title.toLowerCase().includes(queryLower);
+        const nameMatch = item.name && item.name.toLowerCase().includes(queryLower);
+        const performersMatch = item.people && item.people.some(p => p.name && p.name.toLowerCase().includes(queryLower));
+        return titleMatch || nameMatch || performersMatch;
+      });
+    }
+
+    return [...result].sort((a, b) => {
+      let valA, valB;
+      if (sortKey === 'added_at') {
+        valA = a.added_at ? new Date(a.added_at).getTime() : 0;
+        valB = b.added_at ? new Date(b.added_at).getTime() : 0;
+      } else if (sortKey === 'release_date') {
+        valA = a.release_date ? new Date(a.release_date).getTime() : 0;
+        valB = b.release_date ? new Date(b.release_date).getTime() : 0;
+      } else if (sortKey === 'user_rating') {
+        valA = typeof a.user_rating === 'number' ? a.user_rating : 0;
+        valB = typeof b.user_rating === 'number' ? b.user_rating : 0;
+      } else {
+        valA = (a.title || a.name || '').toLowerCase();
+        valB = (b.title || b.name || '').toLowerCase();
+      }
+
+      if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
     });
-  }, [activeListDetails, listSearchQuery]);
+  }, [activeListDetails, listSearchQuery, sortKey, sortDirection, watchedFilter, mediaTypeFilter, genreFilter, genderFilter, jobFilter, activeList]);
 
   return (
     <Page className="lists-page">
@@ -433,7 +548,7 @@ export default function ListsPage() {
             <>
               {/* eslint-disable-next-line react/forbid-dom-props */}
               <div className="lists-header" style={{ '--list-theme-color': activeList.color || 'var(--color-accent-blue)' }}>
-                <div className="lists-header__left">
+                <div className="lists-header__top-row">
                   <div className="lists-header__meta-stack">
                     <div className="lists-header__title-row">
                       <h1 className="lists-header__title">{activeList.name}</h1>
@@ -445,36 +560,139 @@ export default function ListsPage() {
                       <span className="lists-header__date">{createdLabel}</span>
                     )}
                   </div>
-                  <div className="lists-header__search-wrapper">
-                    <Input
-                      type="text"
-                      className="lists-header__search-input"
-                      placeholder={t('lists.search_placeholder') || 'Search in this list...'}
-                      value={listSearchQuery}
-                      onChange={(e) => setListSearchQuery(e.target.value)}
-                      leftElement={<Search size={16} />}
-                    />
+                  <div className="lists-header__right">
+                    <Tooltip content={t('lists.export') || 'Export JSON'} side="top">
+                      <Button
+                        variant="secondary-neutral"
+                        size="sm"
+                        onClick={() => handleExportList(activeList.id)}
+                      >
+                        <Download size={14} />
+                        <span>{t('lists.export') || 'Export JSON'}</span>
+                      </Button>
+                    </Tooltip>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={handleStartAddItems}
+                      style={activeList?.color ? {
+                        '--button-primary-bg': (activeList.color.includes('success') || activeList.color.includes('warning'))
+                          ? `color-mix(in srgb, ${activeList.color} 80%, black)`
+                          : activeList.color,
+                        '--button-primary-color': '#ffffff',
+                      } : null}
+                    >
+                      <Plus size={14} />
+                      <span>{activeList.list_type === 'person' ? (t('lists.add_people') || 'Add People') : (t('lists.add_titles') || 'Add Titles')}</span>
+                    </Button>
                   </div>
                 </div>
-                <div className="lists-header__right">
-                  <Tooltip content={t('lists.export') || 'Export JSON'} side="top">
-                    <Button
-                      variant="secondary-neutral"
-                      size="sm"
-                      onClick={() => handleExportList(activeList.id)}
-                    >
-                      <Download size={14} />
-                      <span>{t('lists.export') || 'Export JSON'}</span>
-                    </Button>
-                  </Tooltip>
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    onClick={handleStartAddItems}
-                  >
-                    <Plus size={14} />
-                    <span>{activeList.list_type === 'person' ? (t('lists.add_people') || 'Add People') : (t('lists.add_titles') || 'Add Titles')}</span>
-                  </Button>
+                <div className="lists-header__bottom-row">
+                  <div className="lists-header__bottom-left">
+                    <div className="lists-header__search-wrapper">
+                      <Input
+                        type="text"
+                        className="lists-header__search-input"
+                        placeholder={t('lists.search_placeholder') || 'Search in this list...'}
+                        value={listSearchQuery}
+                        onChange={(e) => setListSearchQuery(e.target.value)}
+                        leftElement={<Search size={16} />}
+                      />
+                    </div>
+                    {activeList.list_type !== 'person' && (
+                      <div className="lists-header__filter-wrapper">
+                        <span className="library-sorter-label">{t('library.filter.statusLabel') || 'Status:'}</span>
+                        <Dropdown
+                          value={watchedFilter}
+                          onChange={(e) => setWatchedFilter(e.target.value)}
+                          variant="sorter"
+                          options={[
+                            { value: 'all', label: t('library.filter.all') || 'All' },
+                            { value: 'watched', label: t('library.filter.watched') || 'Watched' },
+                            { value: 'unwatched', label: t('library.filter.unwatched') || 'Unwatched' },
+                          ]}
+                          themeColor={activeList.color || 'var(--color-accent-blue)'}
+                        />
+                      </div>
+                    )}
+                    {activeList.list_type !== 'person' && (
+                      <div className="lists-header__filter-wrapper">
+                        <span className="library-sorter-label">{t('lists.filter_media_type_label') || 'Type:'}</span>
+                        <Dropdown
+                          value={mediaTypeFilter}
+                          onChange={(e) => setMediaTypeFilter(e.target.value)}
+                          variant="sorter"
+                          options={[
+                            { value: 'all', label: t('lists.filter_media_type_all') || 'All' },
+                            { value: 'movie', label: t('lists.filter_media_type_movies') || 'Movies' },
+                            { value: 'show', label: t('lists.filter_media_type_shows') || 'TV Shows' },
+                            { value: 'scene', label: t('lists.filter_media_type_scenes') || 'Scenes' },
+                          ]}
+                          themeColor={activeList.color || 'var(--color-accent-blue)'}
+                        />
+                      </div>
+                    )}
+                    {activeList.list_type !== 'person' && (
+                      <div className="lists-header__filter-wrapper">
+                        <span className="library-sorter-label">{t('library.filter.genreLabel') || 'Genre:'}</span>
+                        <Dropdown
+                          value={genreFilter}
+                          onChange={(e) => setGenreFilter(e.target.value)}
+                          variant="sorter"
+                          options={availableGenres.map((genre) => ({
+                            value: genre,
+                            label: genre === 'all' ? (t('library.filter.all') || 'All') : genre,
+                          }))}
+                          themeColor={activeList.color || 'var(--color-accent-blue)'}
+                        />
+                      </div>
+                    )}
+                    {activeList.list_type === 'person' && (
+                      <div className="lists-header__filter-wrapper">
+                        <span className="library-sorter-label">{t('library.filter.genderLabel') || 'Gender:'}</span>
+                        <Dropdown
+                          value={genderFilter}
+                          onChange={(e) => setGenderFilter(e.target.value)}
+                          variant="sorter"
+                          options={[
+                            { value: 'all', label: t('library.filter.all') || 'All' },
+                            { value: 'female', label: t('library.filter.female') || 'Female' },
+                            { value: 'male', label: t('library.filter.male') || 'Male' },
+                          ]}
+                          themeColor={activeList.color || 'var(--color-accent-blue)'}
+                        />
+                      </div>
+                    )}
+                    {activeList.list_type === 'person' && (
+                      <div className="lists-header__filter-wrapper">
+                        <span className="library-sorter-label">{t('lists.filter_role_label') || 'Role:'}</span>
+                        <Dropdown
+                          value={jobFilter}
+                          onChange={(e) => setJobFilter(e.target.value)}
+                          variant="sorter"
+                          options={[
+                            { value: 'all', label: t('lists.filter_job_all') || 'All' },
+                            { value: 'actor', label: t('lists.filter_job_actor') || 'Actor' },
+                            { value: 'director', label: t('lists.filter_job_director') || 'Director' },
+                            { value: 'writer', label: t('lists.filter_job_writer') || 'Writer' },
+                          ]}
+                          themeColor={activeList.color || 'var(--color-accent-blue)'}
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <div className="lists-header__sorting-wrapper">
+                    <span className="library-sorter-label">{t('lists.sort_label') || 'Sort:'}</span>
+                    <Dropdown
+                      value={sortKey}
+                      options={sortOptions}
+                      onChange={(e) => setSortKey(e.target.value)}
+                      variant="sorter"
+                      sortDirection={sortDirection}
+                      onSortDirectionToggle={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+                      themeColor={activeList.color || 'var(--color-accent-blue)'}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -489,6 +707,11 @@ export default function ListsPage() {
                     description={t('lists.empty_list_desc') || 'This list has no items yet.'}
                     icon={ListIcon}
                     variant="page-filter"
+                    style={activeList?.color ? {
+                      '--ui-empty-page-filter-icon-color': activeList.color,
+                      '--ui-empty-page-filter-icon-bg': `color-mix(in srgb, ${activeList.color} 14%, transparent)`,
+                      '--ui-empty-page-filter-icon-border': `color-mix(in srgb, ${activeList.color} 20%, transparent)`,
+                    } : null}
                   />
                 ) : filteredListItems.length === 0 ? (
                   <EmptyState
@@ -496,6 +719,11 @@ export default function ListsPage() {
                     description={t('lists.no_search_results_desc') || 'Try refining your search query.'}
                     icon={Search}
                     variant="page-filter"
+                    style={activeList?.color ? {
+                      '--ui-empty-page-filter-icon-color': activeList.color,
+                      '--ui-empty-page-filter-icon-bg': `color-mix(in srgb, ${activeList.color} 14%, transparent)`,
+                      '--ui-empty-page-filter-icon-border': `color-mix(in srgb, ${activeList.color} 20%, transparent)`,
+                    } : null}
                   />
                 ) : (
                   <div className="lists-grid">

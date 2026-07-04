@@ -116,6 +116,8 @@ class ListsService:
             res["media_type"] = "person"
             res["poster_path"] = item.person.profile_path
             res["is_adult"] = bool(item.person.is_adult)
+            res["gender"] = item.person.gender
+            res["known_for_department"] = item.person.known_for_department
 
         if match:
             res["release_date"] = match.release_date.isoformat() if match.release_date else None
@@ -127,6 +129,44 @@ class ListsService:
                     "gender": pl.person.gender
                 })
             res["people"] = p_list
+
+        from app.domains.users.models import UserOverride
+        user_rating = None
+        is_watched = False
+        if item.media_item:
+            override = self.db.query(UserOverride).filter(UserOverride.media_item_id == item.media_item_id).first()
+            if not override and match:
+                override = self.db.query(UserOverride).filter(UserOverride.metadata_match_id == match.id).first()
+            if override:
+                user_rating = override.user_rating
+                is_watched = bool(override.is_watched)
+        elif item.match_id:
+            override = self.db.query(UserOverride).filter(UserOverride.metadata_match_id == item.match_id).first()
+            if override:
+                user_rating = override.user_rating
+                is_watched = bool(override.is_watched)
+        elif item.person_id:
+            override = self.db.query(UserOverride).filter(UserOverride.person_id == item.person_id).first()
+            if override:
+                user_rating = override.user_rating
+                is_watched = bool(override.is_watched)
+                
+        res["user_rating"] = user_rating
+        res["is_watched"] = is_watched
+
+        # Get genres
+        genres_list = []
+        resolved_loc = None
+        if item.media_item and match:
+            resolved_loc = next((l for l in match.localizations), None)
+        elif item.match:
+            resolved_loc = next((l for l in item.match.localizations), None)
+            
+        if resolved_loc and resolved_loc.genres:
+            from app.shared_kernel.genre_utils import split_genres as _split_genres
+            genres_list = _split_genres(resolved_loc.genres)
+            
+        res["genres"] = genres_list
             
         return CustomListItemResponse(**res)
 

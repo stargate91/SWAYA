@@ -1,3 +1,4 @@
+/* eslint-disable react/forbid-dom-props */
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, ChevronUp } from '@/ui/icons';
@@ -14,6 +15,7 @@ function DropdownMenu({
   searchable,
   variant,
   className = '',
+  themeColor = '',
 }) {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
@@ -50,6 +52,7 @@ function DropdownMenu({
     <div
       ref={menuRef}
       className={`ui-dropdown__menu ${searchable ? 'has-search' : ''} ${menuCoords.openUpwards ? 'is-upwards' : ''} ${variant === 'sorter' ? 'ui-dropdown__menu--sorter' : ''} ${className}`.trim()}
+      style={themeColor ? { '--list-theme-color': themeColor } : undefined}
     >
       {searchable ? (
         <div className="ui-dropdown__search-container">
@@ -103,6 +106,7 @@ export default function Dropdown({
   sortDirection = 'asc',
   onSortDirectionToggle,
   menuClassName = '',
+  themeColor = '',
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
@@ -166,7 +170,11 @@ export default function Dropdown({
     <div className={`ui-field ${isSorter ? 'ui-field--sorter' : ''} ${className}`.trim()} ref={containerRef}>
       {label ? <span className="ui-field__label">{label}</span> : null}
       {hint ? <span className="ui-field__hint">{hint}</span> : null}
-      <div className={`ui-dropdown ${isSorter ? 'ui-dropdown--sorter' : ''}`}>
+      <div
+        className={`ui-dropdown ${isSorter ? 'ui-dropdown--sorter' : ''}`}
+        style={themeColor ? { '--list-theme-color': themeColor } : undefined}
+      >
+        
         <div className="ui-dropdown__sorter-wrapper">
           <button
             ref={triggerRef}
@@ -207,6 +215,7 @@ export default function Dropdown({
           searchable={searchable}
           variant={variant}
           className={menuClassName}
+          themeColor={themeColor}
         />
       </div>
     </div>

@@ -267,6 +267,11 @@ class CustomListItemResponse(BaseModel):
     poster_path: Optional[str] = None
     year: Optional[int] = None
     rating: Optional[float] = None
+    user_rating: Optional[float] = None
+    is_watched: Optional[bool] = False
+    genres: Optional[list[str]] = None
+    gender: Optional[int] = None
+    known_for_department: Optional[str] = None
     is_adult: Optional[bool] = False
     external_id: Optional[str] = None
     provider: Optional[str] = None
