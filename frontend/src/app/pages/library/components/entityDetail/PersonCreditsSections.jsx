@@ -1,124 +1,12 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Layers, Bookmark, Play } from 'lucide-react';
 import { usePlayMediaMutation } from '@/queries';
 import { usePersonCreditsQuery, usePersonCreditsInfiniteQuery } from '@/queries/metadataQueries';
-import { API_BASE } from '@/lib/backend';
-import { resolveDetailsImageUrl } from '../../utils/detailUtils';
 import { usePersonCreditsStore } from '@/stores/usePersonCreditsStore';
 import Spinner from '@/ui/Spinner';
+import PersonCreditsRow from './PersonCreditsRow';
+import PersonCreditsCard from './PersonCreditsCard';
 import './PersonCreditsShared.css';
 
-
-// Reusable Grid Component for My Library
-function PersonCreditsRow({
-  items,
-  mediaType,
-  navigate
-}) {
-  const isScene = mediaType === 'scenes' || mediaType.includes('scene');
-  const playMutation = usePlayMediaMutation();
-
-  return (
-    <div className={`person-credits-discover-grid ${isScene ? 'grid-16-9' : 'grid-2-3'}`}>
-      {items.map((item) => {
-        const creditTitle = item.title || item.name || 'Unknown';
-        const resolvedSource = item.source || (item.rating_porndb ? 'porndb' : (item.stash_id ? 'stashdb' : (item.fansdb_id ? 'fansdb' : 'tmdb')));
-
-        const posterPath = isScene
-          ? (item.backdrop_path || item.local_backdrop_path || item.poster_path || item.local_poster_path)
-          : (item.poster_path || item.local_poster_path || item.backdrop_path || item.local_backdrop_path);
-        const posterUrl = posterPath ? resolveDetailsImageUrl(posterPath, API_BASE, isScene ? 'backdrop' : 'poster') : null;
-
-        const handleCardClick = () => {
-          const itemType = item.media_type || item.type;
-          const isSceneType = itemType === 'scene' || itemType === 'scenes';
-          if (isSceneType) {
-            const prefix = resolvedSource === 'porndb' || resolvedSource === 'theporndb' ? 'porndb' : (resolvedSource === 'fansdb' ? 'fansdb' : 'stash');
-            const sceneId = item.in_library ? (item.library_item_id || item.id) : `${prefix}_${item.stash_id || item.id}`;
-            navigate(`/library/scene/${sceneId}`, { state: { allowAdult: true } });
-            return;
-          }
-
-          const isTv = itemType === 'tv' || itemType === 'tvshows';
-          if (isTv) {
-            const tvId = item.library_tv_tmdb_id || item.tv_tmdb_id || item.tmdb_id || item.id;
-            navigate(`/library/tv/${tvId}`, { state: { allowAdult: true } });
-            return;
-          }
-
-          const movieId = item.in_library
-            ? (item.library_item_id || item.id)
-            : (resolvedSource === 'porndb' ? `porndb_${item.tmdb_id || item.id}` : `tmdb_${item.tmdb_id || item.id}`);
-          navigate(`/library/movie/${movieId}`, { state: { allowAdult: true } });
-        };
-
-            const itemType = item.media_type || item.type;
-            const isSceneOrPornDbMovie = (itemType === 'scene' || itemType === 'scenes') || (resolvedSource === 'porndb' || resolvedSource === 'theporndb');
-            const leftText = isSceneOrPornDbMovie ? (item.release_date || '').split('T')[0].split(' ')[0] || item.year || '' : item.character || '';
-            const rightText = isSceneOrPornDbMovie ? '' : item.year || '';
-            const isTvItem = itemType === 'tv' || itemType === 'tvshows';
-
-            return (
-              <div
-                key={`${item.id}-${item.type || mediaType}`}
-                className="person-credits-card"
-                onClick={handleCardClick}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    handleCardClick();
-                  }
-                }}
-              >
-                <div className="person-credits-card__poster-container">
-                  {posterUrl ? (
-                    <img
-                      src={posterUrl}
-                      alt={creditTitle}
-                      className="person-credits-card__poster"
-                      loading="lazy"
-                      onError={(e) => console.error("Image load failed in Row:", { src: posterUrl, resolvedSource, creditTitle, e })}
-                    />
-                  ) : (
-                    <div className="person-credits-card__placeholder">
-                      <Layers size={18} />
-                    </div>
-                  )}
-
-                  <span className={`person-credits-card__source-badge source-${resolvedSource}`}>
-                    {resolvedSource === 'porndb' || resolvedSource === 'theporndb' ? 'PornDB' : resolvedSource === 'stashdb' ? 'Stash' : resolvedSource === 'fansdb' ? 'Fans' : 'TMDb'}
-                  </span>
-
-                  {item.in_library && !isTvItem && (
-                    <button
-                      type="button"
-                      className="person-credits-card__play-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        playMutation.mutate(item.library_item_id || item.id);
-                      }}
-                    >
-                      <Play size={14} fill="currentColor" />
-                    </button>
-                  )}
-                </div>
-
-                <span className="person-credits-card__title" title={creditTitle}>{creditTitle}</span>
-                <div className="person-credits-card__meta-row">
-                  <span className="person-credits-card__role" title={leftText}>
-                    {leftText}
-                  </span>
-                  {rightText && (
-                    <span className="person-credits-card__year">{rightText}</span>
-                  )}
-                </div>
-              </div>
-        );
-      })}
-    </div>
-  );
-}
 
 export default function PersonCreditsSections({ id, item, navigate, t }) {
   const playMutation = usePlayMediaMutation();
@@ -452,111 +340,19 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
               ) : (
                 <>
                   <div className={`person-credits-discover-grid ${isSceneGrid ? 'grid-16-9' : 'grid-2-3'}`}>
-                    {accumulatedItems.map((credit, i) => {
-                      const creditTitle = credit.title || credit.name || 'Unknown';
-                      const resolvedSource = credit.source || activeSource || (credit.rating_porndb ? 'porndb' : (credit.stash_id ? 'stashdb' : (credit.fansdb_id ? 'fansdb' : 'tmdb')));
-                      const posterPath = isSceneGrid
-                        ? (credit.backdrop_path || credit.local_backdrop_path || credit.poster_path || credit.local_poster_path)
-                        : (credit.poster_path || credit.local_poster_path || credit.backdrop_path || credit.local_backdrop_path);
-                      const posterUrl = posterPath ? resolveDetailsImageUrl(posterPath, API_BASE, isSceneGrid ? 'backdrop' : 'poster') : null;
-
-                      const handleCardClick = () => {
-                        const itemType = credit.media_type || credit.type;
-                        const isSceneType = itemType === 'scene' || itemType === 'scenes';
-                        if (isSceneType) {
-                          const prefix = resolvedSource === 'porndb' || resolvedSource === 'theporndb' ? 'porndb' : (resolvedSource === 'fansdb' ? 'fansdb' : 'stash');
-                          const sceneId = credit.in_library ? (credit.library_item_id || credit.id) : `${prefix}_${credit.stash_id || credit.id}`;
-                          navigate(`/library/scene/${sceneId}`, { state: { allowAdult: true } });
-                          return;
-                        }
-
-                        const isTv = itemType === 'tv' || itemType === 'tvshows';
-                        if (isTv) {
-                          const tvId = credit.library_tv_tmdb_id || credit.tv_tmdb_id || credit.tmdb_id || credit.id;
-                          navigate(`/library/tv/${tvId}`, { state: { allowAdult: true } });
-                          return;
-                        }
-
-                        const movieId = credit.in_library
-                          ? (credit.library_item_id || credit.id)
-                          : (resolvedSource === 'porndb' ? `porndb_${credit.tmdb_id || credit.id}` : `tmdb_${credit.tmdb_id || credit.id}`);
-                        navigate(`/library/movie/${movieId}`, { state: { allowAdult: true } });
-                      };
-
-                      const itemType = credit.media_type || credit.type;
-                      const isTvItem = itemType === 'tv' || itemType === 'tvshows';
-                      const isSceneOrPornDbMovie = (itemType === 'scene' || itemType === 'scenes') || (resolvedSource === 'porndb' || resolvedSource === 'theporndb');
-                      const leftText = isSceneOrPornDbMovie ? (credit.release_date || '').split('T')[0].split(' ')[0] || credit.year || '' : credit.character || '';
-                      const rightText = isSceneOrPornDbMovie ? '' : credit.year || '';
-
-                      return (
-                        <div
-                          key={`${credit.id}-${credit.type || activeMediaType}-discover-${i}`}
-                          className="person-credits-card"
-                          onClick={handleCardClick}
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              handleCardClick();
-                            }
-                          }}
-                        >
-                          <div className="person-credits-card__poster-container">
-                            {posterUrl ? (
-                              <img
-                                src={posterUrl}
-                                alt={creditTitle}
-                                className="person-credits-card__poster"
-                                loading="lazy"
-                                onError={(e) => console.error("Image load failed in Grid:", { src: posterUrl, resolvedSource, creditTitle, e })}
-                              />
-                            ) : (
-                              <div className="person-credits-card__placeholder">
-                                <Layers size={22} />
-                              </div>
-                            )}
-
-                            {/* Discrete Source Logo Badge */}
-                            {credit.in_library && (
-                              <span className={`person-credits-card__source-badge source-${resolvedSource}`}>
-                                {resolvedSource === 'porndb' || resolvedSource === 'theporndb' ? 'PornDB' : resolvedSource === 'stashdb' ? 'Stash' : resolvedSource === 'fansdb' ? 'Fans' : 'TMDb'}
-                              </span>
-                            )}
-
-                            {/* "In Library" bookmark badge */}
-                            {credit.in_library && (
-                              <div className="person-credits-card__library-badge" title={t('library.details.inLibrary') || 'In Library'}>
-                                <Bookmark size={10} />
-                              </div>
-                            )}
-
-                            {credit.in_library && !isTvItem && (
-                              <button
-                                type="button"
-                                className="person-credits-card__play-btn"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  playMutation.mutate(credit.library_item_id || credit.id);
-                                }}
-                              >
-                                <Play size={14} fill="currentColor" />
-                              </button>
-                            )}
-                          </div>
-
-                          <span className="person-credits-card__title" title={creditTitle}>{creditTitle}</span>
-                          <div className="person-credits-card__meta-row">
-                            <span className="person-credits-card__role" title={leftText}>
-                              {leftText}
-                            </span>
-                            {rightText && (
-                              <span className="person-credits-card__year">{rightText}</span>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
+                    {accumulatedItems.map((credit, i) => (
+                      <PersonCreditsCard
+                        key={`${credit.id}-${credit.type || activeMediaType}-discover-${i}`}
+                        item={credit}
+                        mediaType={activeMediaType}
+                        navigate={navigate}
+                        playMutation={playMutation}
+                        t={t}
+                        alwaysShowSourceBadge={false}
+                        showLibraryBadge={true}
+                        placeholderIconSize={22}
+                      />
+                    ))}
 
                     {/* Skeletons on loading page */}
                     {isFetchingNextPage && Array.from({ length: 12 }).map((_, idx) => (

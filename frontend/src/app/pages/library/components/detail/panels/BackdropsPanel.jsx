@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import TMDBImageGrid from '../../entityDetail/TMDBImageGrid';
 import ImageUploadPanel from '../../../modals/ImageUploadPanel';
-import { useUploadBackdropMutation } from '@/queries/mediaQueries';
+import { useUploadBackdropMutation } from '@/queries';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import './BackdropsPanel.css';
 

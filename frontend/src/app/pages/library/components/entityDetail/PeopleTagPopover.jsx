@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, Plus, Tag } from 'lucide-react';
 import Pill from '@/ui/Pill';
-import { useAllTagsQuery, useCreateTagMutation } from '@/queries/libraryQueries';
+import { useAllTagsQuery, useCreateTagMutation } from '@/queries';
 import '../detail/panels/TagsPanel.css';
 import './PeopleTagPopover.css';
 

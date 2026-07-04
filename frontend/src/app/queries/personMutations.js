@@ -1,0 +1,399 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import api from '@/lib/api';
+
+const syncPersonProfileCaches = (queryClient, personId, data) => {
+  const personKeys = [
+    ['person-detail', personId],
+    ['person-detail', String(personId)],
+    ['person-detail', Number(personId)],
+  ];
+
+  personKeys.forEach((key) => {
+    queryClient.setQueryData(key, (oldData) => {
+      if (!oldData) {
+        return oldData;
+      }
+      return {
+        ...oldData,
+        profile_path: data?.profile_path ?? oldData.profile_path,
+        local_profile_path: data?.local_profile_path ?? oldData.local_profile_path,
+        has_local_profile: data?.has_local_profile ?? oldData.has_local_profile,
+      };
+    });
+  });
+
+  queryClient.setQueriesData({ queryKey: ['people'] }, (oldData) => {
+    if (!oldData?.items) return oldData;
+    return {
+      ...oldData,
+      items: oldData.items.map((item) => (
+        item.id === personId || String(item.id) === String(personId)
+          ? {
+              ...item,
+              profile_path: data?.profile_path ?? item.profile_path,
+              poster_path: data?.profile_path ?? item.poster_path,
+              local_profile_path: data?.local_profile_path ?? item.local_profile_path,
+            }
+          : item
+      )),
+    };
+  });
+
+  queryClient.setQueriesData({ queryKey: ['people-infinite'] }, (oldData) => {
+    if (!oldData?.pages) return oldData;
+    return {
+      ...oldData,
+      pages: oldData.pages.map((page) => ({
+        ...page,
+        items: (page.items || []).map((item) => (
+          item.id === personId || String(item.id) === String(personId)
+            ? {
+                ...item,
+                profile_path: data?.profile_path ?? item.profile_path,
+                poster_path: data?.profile_path ?? item.poster_path,
+                local_profile_path: data?.local_profile_path ?? item.local_profile_path,
+              }
+            : item
+        )),
+      })),
+    };
+  });
+
+  queryClient.setQueriesData({ queryKey: ['library'] }, (oldData) => {
+    if (!oldData?.items) return oldData;
+    return {
+      ...oldData,
+      items: oldData.items.map((item) => (
+        item.id === personId || String(item.id) === String(personId)
+          ? {
+              ...item,
+              profile_path: data?.profile_path ?? item.profile_path,
+              poster_path: data?.profile_path ?? item.poster_path,
+              local_profile_path: data?.local_profile_path ?? item.local_profile_path,
+              displayPoster: data?.profile_path ?? item.displayPoster,
+            }
+          : item
+      )),
+    };
+  });
+
+  const cachedPerson = queryClient.getQueryData(['person-detail', personId]) || 
+                       queryClient.getQueryData(['person-detail', String(personId)]) ||
+                       queryClient.getQueryData(['person-detail', Number(personId)]);
+  const personName = (data?.name || cachedPerson?.name)?.toLowerCase();
+
+  const updateMediaDetailCache = (oldData) => {
+    if (!oldData) return oldData;
+    if (!oldData.directors && !oldData.cast) return oldData;
+    const updatePersonList = (list) => {
+      if (!list) return list;
+      return list.map((p) => {
+        const matchesId = p.id === personId || String(p.id) === String(personId);
+        const matchesPrefixedId = p.id === `local:${personId}` || p.id === `tmdb:${personId}`;
+        const matchesName = personName && p.name?.toLowerCase() === personName;
+
+        return matchesId || matchesPrefixedId || matchesName
+          ? {
+              ...p,
+              profile_path: data?.profile_path ?? p.profile_path,
+              local_profile_path: data?.local_profile_path ?? p.local_profile_path,
+            }
+          : p;
+      });
+    };
+    return {
+      ...oldData,
+      directors: updatePersonList(oldData.directors),
+      cast: updatePersonList(oldData.cast),
+    };
+  };
+
+  queryClient.setQueriesData({ queryKey: ['library-item-detail'] }, updateMediaDetailCache);
+  queryClient.setQueriesData({ queryKey: ['library-tv-detail'] }, updateMediaDetailCache);
+};
+
+const syncPersonBackdropCaches = (queryClient, personId, data) => {
+  const personKeys = [
+    ['person-detail', personId],
+    ['person-detail', String(personId)],
+    ['person-detail', Number(personId)],
+  ];
+
+  personKeys.forEach((key) => {
+    queryClient.setQueryData(key, (oldData) => {
+      if (!oldData) {
+        return oldData;
+      }
+      return {
+        ...oldData,
+        backdrop_path: data?.backdrop_path ?? oldData.backdrop_path,
+        local_backdrop_path: data?.local_backdrop_path ?? oldData.local_backdrop_path,
+        has_local_backdrop: data?.has_local_backdrop ?? oldData.has_local_backdrop,
+      };
+    });
+  });
+};
+
+export const useAddPersonTmdbMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (tmdbId) => api.people.addFromTmdb(tmdbId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['people'] });
+      queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
+      queryClient.invalidateQueries({ queryKey: ['library'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
+    },
+  });
+};
+
+export const useUpdatePersonStatusMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ personId, payload }) => api.people.updateStatus(personId, payload),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['person-detail', variables.personId] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail', String(variables.personId)] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['people'] });
+      queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
+      queryClient.invalidateQueries({ queryKey: ['library'] });
+    },
+  });
+};
+
+export const useOverridePersonBackdropMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ personId, backdropPath }) => api.people.overrideBackdrop(personId, backdropPath),
+    onSuccess: (data, variables) => {
+      const { personId } = variables;
+      syncPersonBackdropCaches(queryClient, personId, data);
+      queryClient.invalidateQueries({ queryKey: ['person-detail', personId] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail', String(personId)] });
+    },
+  });
+};
+
+export const useUploadPersonBackdropMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ personId, file }) => api.people.uploadBackdrop(personId, file),
+    onSuccess: (data, variables) => {
+      const { personId } = variables;
+      syncPersonBackdropCaches(queryClient, personId, data);
+      queryClient.invalidateQueries({ queryKey: ['person-detail', personId] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail', String(personId)] });
+    },
+  });
+};
+
+export const useOverridePersonProfileMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ personId, profilePath }) => api.people.overrideProfile(personId, profilePath),
+    onSuccess: (data, variables) => {
+      const { personId } = variables;
+      syncPersonProfileCaches(queryClient, personId, data);
+      queryClient.invalidateQueries({ queryKey: ['person-detail', personId] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail', String(personId)] });
+    },
+  });
+};
+
+export const useUploadPersonProfileMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ personId, file }) => api.people.uploadProfile(personId, file),
+    onSuccess: (data, variables) => {
+      const { personId } = variables;
+      syncPersonProfileCaches(queryClient, personId, data);
+      queryClient.invalidateQueries({ queryKey: ['person-detail', personId] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail', String(personId)] });
+    },
+  });
+};
+
+export const useLinkPersonSourceMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ personId, source, externalId, overrides, profileUrl }) => api.people.linkSource(personId, source, externalId, overrides, profileUrl),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['person-detail', variables.personId] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail', String(variables.personId)] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['person-credits', variables.personId] });
+      queryClient.invalidateQueries({ queryKey: ['person-credits', String(variables.personId)] });
+      queryClient.invalidateQueries({ queryKey: ['people'] });
+      queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
+      queryClient.invalidateQueries({ queryKey: ['library'] });
+    },
+  });
+};
+
+export const useDeletePersonMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (personId) => api.people.delete(personId),
+    onSuccess: (data, personId) => {
+      queryClient.invalidateQueries({ queryKey: ['people'] });
+      queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
+      queryClient.invalidateQueries({ queryKey: ['library'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
+      queryClient.removeQueries({ queryKey: ['person-detail', personId] });
+      queryClient.removeQueries({ queryKey: ['person-detail', String(personId)] });
+      queryClient.removeQueries({ queryKey: ['person-credits', personId] });
+      queryClient.removeQueries({ queryKey: ['person-credits', String(personId)] });
+    },
+  });
+};
+
+export const useUnlinkPersonSourceMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ personId, source, action }) => api.people.unlinkSource(personId, source, action),
+    onMutate: async ({ personId, source }) => {
+      const idStr = String(personId);
+      const idNum = Number(personId);
+      const isNumValid = !isNaN(idNum);
+
+      const personKeys = [
+        ['person-detail', personId],
+        ['person-detail', idStr],
+      ];
+      if (isNumValid) {
+        personKeys.push(['person-detail', idNum]);
+      }
+
+      for (const key of personKeys) {
+        await queryClient.cancelQueries({ queryKey: key });
+      }
+
+      const previousPersonDetail = queryClient.getQueryData(['person-detail', idStr]) || queryClient.getQueryData(['person-detail', personId]);
+
+      const dbNames = [source];
+      if (source === 'theporndb') dbNames.push('porndb');
+      if (source === 'porndb') dbNames.push('theporndb');
+
+      const updateData = (oldData) => {
+        if (!oldData) return oldData;
+        const newExternalLinks = (oldData.external_links || []).filter(
+          (l) => !dbNames.includes(l.provider)
+        );
+        const newExternalIds = { ...(oldData.external_ids || {}) };
+        dbNames.forEach((dbName) => {
+          delete newExternalIds[dbName];
+          delete newExternalIds[`${dbName}_id`];
+        });
+        
+        let newPrimaryProvider = oldData.primary_provider;
+        if (dbNames.includes(oldData.primary_provider)) {
+          newPrimaryProvider = null;
+        }
+
+        return {
+          ...oldData,
+          external_links: newExternalLinks,
+          external_ids: newExternalIds,
+          primary_provider: newPrimaryProvider,
+        };
+      };
+
+      personKeys.forEach((key) => {
+        queryClient.setQueryData(key, updateData);
+      });
+
+      return { previousPersonDetail, personId };
+    },
+    onError: (err, variables, context) => {
+      if (context && 'previousPersonDetail' in context) {
+        const idStr = String(context.personId);
+        const idNum = Number(context.personId);
+        const isNumValid = !isNaN(idNum);
+
+        queryClient.setQueryData(['person-detail', context.personId], context.previousPersonDetail);
+        queryClient.setQueryData(['person-detail', idStr], context.previousPersonDetail);
+        if (isNumValid) {
+          queryClient.setQueryData(['person-detail', idNum], context.previousPersonDetail);
+        }
+      }
+    },
+    onSettled: (data, error, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['person-detail', variables.personId] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail', String(variables.personId)] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['person-credits', variables.personId] });
+      queryClient.invalidateQueries({ queryKey: ['person-credits', String(variables.personId)] });
+      queryClient.invalidateQueries({ queryKey: ['people'] });
+      queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
+      queryClient.invalidateQueries({ queryKey: ['library'] });
+    },
+  });
+};
+
+export const useSetPrimaryPersonSourceMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ personId, source }) => api.people.setPrimarySource(personId, source),
+    onSuccess: (data, variables) => {
+      const idStr = String(variables.personId);
+      const idNum = Number(variables.personId);
+      const isNumValid = !isNaN(idNum);
+
+      const personKeys = [
+        ['person-detail', variables.personId],
+        ['person-detail', idStr],
+      ];
+      if (isNumValid) {
+        personKeys.push(['person-detail', idNum]);
+      }
+
+      personKeys.forEach((key) => {
+        queryClient.setQueryData(key, (oldData) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            primary_provider: variables.source,
+          };
+        });
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['person-detail', variables.personId] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail', String(variables.personId)] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['people'] });
+      queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
+      queryClient.invalidateQueries({ queryKey: ['library'] });
+    },
+  });
+};
+
+export const useSetPersonFieldRoutingMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ personId, routing }) => api.people.setFieldRouting(personId, routing),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['person-detail', variables.personId] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail', String(variables.personId)] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['people'] });
+      queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
+      queryClient.invalidateQueries({ queryKey: ['library'] });
+    },
+  });
+};
+
+export const useSavePersonCustomFieldsMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ personId, fields }) => api.people.saveCustomFields(personId, fields),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['person-detail', variables.personId] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail', String(variables.personId)] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['people'] });
+      queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
+      queryClient.invalidateQueries({ queryKey: ['library'] });
+    },
+  });
+};

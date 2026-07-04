@@ -8,11 +8,11 @@ import {
   useUploadPosterMutation,
   useOverrideLogoMutation,
   useUploadLogoMutation,
-} from '@/queries/mediaQueries';
+} from '@/queries';
 import {
   useOverridePersonProfileMutation,
   useUploadPersonProfileMutation,
-} from '@/queries/libraryQueries';
+} from '@/queries';
 import ImageUploadPanel from './ImageUploadPanel';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import './UniversalImagePickerModal.css';

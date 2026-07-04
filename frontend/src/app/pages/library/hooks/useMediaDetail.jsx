@@ -3,11 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useLibraryItemDetailQuery, useLibraryTvDetailQuery } from '@/queries/metadataQueries';
-import {
-  useUpdateMediaStatusMutation, usePlayMediaMutation,
-  useBulkUpdateWatchedMutation, useOverrideBackdropMutation, useToggleTrackedMutation,
-  useAddPeakMutation, useDeletePeakMutation
-} from '@/queries/mediaQueries';
 import { useSettingsQuery } from '@/queries/settingsQueries';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import { API_BASE } from '@/lib/backend';
@@ -20,6 +15,8 @@ import {
 import { PenLine, Info } from 'lucide-react';
 import ReviewModalContent from '../components/detail/modals/ReviewModalContent';
 import Button from '@/ui/Button';
+import { useMediaMutations } from './useMediaMutations';
+import { useMediaDetailTabs } from './useMediaDetailTabs';
 
 export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
   const normalizedId = id == null ? '' : String(id);
@@ -30,7 +27,6 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
 
   const [hoveredRating, setHoveredRating] = useState(null);
   const [expandedSeasons, setExpandedSeasons] = useState({ 1: true });
-  const [isSideNavVisible, setIsSideNavVisible] = useState(true);
   const [isWatchLogsExpanded, setIsWatchLogsExpanded] = useState(false);
   const [isTruncated, setIsTruncated] = useState(false);
 
@@ -39,13 +35,15 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
   const unownedSeasonPrefetchRef = useRef(new Set());
   const queryClient = useQueryClient();
 
-  const updateStatusMutation = useUpdateMediaStatusMutation();
-  const overrideBackdropMutation = useOverrideBackdropMutation();
-  const toggleTrackedMutation = useToggleTrackedMutation();
-  const addPeakMutation = useAddPeakMutation();
-  const deletePeakMutation = useDeletePeakMutation();
-  const playMutation = usePlayMediaMutation();
-  const bulkUpdateWatchedMutation = useBulkUpdateWatchedMutation();
+  const {
+    updateStatusMutation,
+    overrideBackdropMutation,
+    toggleTrackedMutation,
+    addPeakMutation,
+    deletePeakMutation,
+    playMutation,
+    bulkUpdateWatchedMutation
+  } = useMediaMutations();
 
   const { data: movieDetail, isLoading: isMovieLoading } = useLibraryItemDetailQuery(cleanId, { enabled: isSingleItem, mediaType: type });
   const { locale } = useTranslation();
@@ -67,33 +65,13 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
     }
   }, [isLoading, item, sessionMode, navigate, allowAdult]);
 
-  const [prevItem, setPrevItem] = useState(item);
-  const [prevCleanId, setPrevCleanId] = useState(cleanId);
   const isScene = isSceneMedia || item?.type === 'scene';
-  const [activePanel, setActivePanel] = useState(() => {
-    if (isScene) return null;
-    if (isMovie) return 'details';
-    return 'seasons';
-  });
-
-  useEffect(() => {
-    if (cleanId === prevCleanId) {
-      if (item !== prevItem) {
-        setPrevItem(item);
-      }
-      return;
-    }
-
-    setPrevCleanId(cleanId);
-    setPrevItem(item);
-    if (isScene) {
-      setActivePanel(null);
-    } else if (isMovie) {
-      setActivePanel('details');
-    } else {
-      setActivePanel('seasons');
-    }
-  }, [cleanId, isMovie, isScene, item, prevCleanId, prevItem]);
+  const {
+    activePanel,
+    isSideNavVisible,
+    togglePanel,
+    handleToggleSideNav
+  } = useMediaDetailTabs({ cleanId, isMovie, isScene });
 
   useEffect(() => {
     if (!isMovie || !cleanId || !String(item?.id || '').startsWith('tmdb_')) return;
@@ -175,19 +153,6 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
     };
   }, [cleanId, isMovie, item, queryClient]);
 
-  const togglePanel = (panelName) => {
-    setActivePanel(prev => prev === panelName ? null : panelName);
-  };
-
-  const handleToggleSideNav = () => {
-    setIsSideNavVisible(prev => {
-      const next = !prev;
-      if (!next) {
-        setActivePanel(null);
-      }
-      return next;
-    });
-  };
 
   const toggleSeason = (seasonNum) => {
     setExpandedSeasons(prev => ({

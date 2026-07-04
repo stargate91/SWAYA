@@ -2,8 +2,8 @@ import { useMemo, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Button from '@/ui/Button';
 import { useTranslation } from '@/providers/LanguageContext';
-import { useOverridePersonBackdropMutation, useUploadPersonBackdropMutation, useUpdatePersonStatusMutation } from '@/queries/libraryQueries';
-import { useOverrideBackdropMutation, useUploadBackdropMutation } from '@/queries/mediaQueries';
+import { useOverridePersonBackdropMutation, useUploadPersonBackdropMutation, useUpdatePersonStatusMutation } from '@/queries';
+import { useOverrideBackdropMutation, useUploadBackdropMutation } from '@/queries';
 import {
   useLibraryCollectionDetailQuery,
   usePersonDetailQuery,
@@ -12,10 +12,8 @@ import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import { API_BASE } from '@/lib/backend';
 import { resolveDetailsImageUrl } from './utils/detailUtils';
 import {
-  buildEntityMetaPills,
-  buildEntityExtraMetaPills,
   buildPersonExternalLinks,
-} from './peopleCollectionDetailUtils.jsx';
+} from './utils/externalLinksUtils';
 import { getPosterImagePath, getProfileImagePath } from '@/lib/imageUrls';
 import PersonBackdropPickerModal from './components/entityDetail/PersonBackdropPickerModal';
 import {
@@ -169,14 +167,6 @@ export default function usePeopleCollectionDetailController({
     isPeople ? getProfileImagePath(item) : getPosterImagePath(item),
     API_BASE,
     isPeople ? 'person' : 'poster'
-  );
-  const metaPills = useMemo(
-    () => buildEntityMetaPills({ isPeople, item, t }),
-    [isPeople, item, t]
-  );
-  const extraMetaPills = useMemo(
-    () => buildEntityExtraMetaPills({ isPeople, item, t }),
-    [isPeople, item, t]
   );
   const currentRating = item?.user_rating ?? null;
   const displayRating = hoveredRating !== null ? hoveredRating : currentRating;
@@ -333,8 +323,6 @@ export default function usePeopleCollectionDetailController({
     socialLinks,
     backdropUrl,
     mediaUrl,
-    metaPills,
-    extraMetaPills,
     displayRating,
     isActivateHovered,
     starsStyleSheetText,

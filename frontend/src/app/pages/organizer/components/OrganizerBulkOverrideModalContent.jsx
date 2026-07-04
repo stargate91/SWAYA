@@ -3,9 +3,11 @@ import { ArrowUp, ArrowDown, GripVertical } from 'lucide-react';
 import Dropdown from '../../../ui/Dropdown';
 import Input from '../../../ui/Input';
 import SelectableCard from '../../../ui/SelectableCard';
+import IconButton from '../../../ui/IconButton';
 import { useTranslation } from '../../../providers/LanguageContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { useBulkUpdateMediaMutation, getOrganizerQueryKey } from '../../../queries';
+import BulkOverrideFieldRow from './BulkOverrideFieldRow';
 
 
 import {
@@ -355,22 +357,7 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
     }
   };
 
-  const renderFieldWithCheckbox = (label, checked, setChecked, content) => (
-    <div className="organizer-override-field">
-      <label className="organizer-override-field__checkbox-label">
-        <input
-          type="checkbox"
-          checked={checked}
-          onChange={(e) => setChecked(e.target.checked)}
-          className="ui-checkbox"
-        />
-        <span className="organizer-override-field__label-text">{label}</span>
-      </label>
-      <div className={`organizer-override-field__input ${!checked ? 'is-disabled' : ''}`}>
-        {content}
-      </div>
-    </div>
-  );
+
 
   const isSidebarActive = mainType === 'episode' && applyAutoNumbering;
 
@@ -378,122 +365,149 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
     <form id="organizer-bulk-override-form" className={`organizer-override-modal ${isSidebarActive ? 'bulk-override-layout' : ''}`} onSubmit={handleSubmit}>
       <div className={isSidebarActive ? 'bulk-override-layout__form' : ''}>
         {/* Main Category override (only for movie, episode, bonus) */}
-        {(initialMainType === 'movie' || initialMainType === 'episode' || initialMainType === 'bonus' || initialMainType === 'scene') && renderFieldWithCheckbox(
-          t('organizer.overrideModal.labels.mainCategory'),
-          applyMainType,
-          setApplyMainType,
-          <Dropdown
-            value={mainType}
-            onChange={(e) => setMainType(e.target.value)}
-            options={translatedMainTypeOptions}
-            disabled={!applyMainType}
-          />
+        {(initialMainType === 'movie' || initialMainType === 'episode' || initialMainType === 'bonus' || initialMainType === 'scene') && (
+          <BulkOverrideFieldRow
+            label={t('organizer.overrideModal.labels.mainCategory')}
+            checked={applyMainType}
+            onChange={setApplyMainType}
+          >
+            <Dropdown
+              value={mainType}
+              onChange={(e) => setMainType(e.target.value)}
+              options={translatedMainTypeOptions}
+              disabled={!applyMainType}
+            />
+          </BulkOverrideFieldRow>
         )}
 
         {/* Target Language override (for Movies & Episodes) */}
-        {!hideLanguage && mainType !== 'extra' && mainType !== 'bonus' && renderFieldWithCheckbox(
-          t('organizer.overrideModal.labels.targetLanguage'),
-          applyTargetLanguage,
-          setApplyTargetLanguage,
-          <Dropdown
-            value={targetLanguage}
-            onChange={(e) => setTargetLanguage(e.target.value)}
-            options={translatedLanguageOptions}
-            disabled={!applyTargetLanguage}
-          />
+        {!hideLanguage && mainType !== 'extra' && mainType !== 'bonus' && (
+          <BulkOverrideFieldRow
+            label={t('organizer.overrideModal.labels.targetLanguage')}
+            checked={applyTargetLanguage}
+            onChange={setApplyTargetLanguage}
+          >
+            <Dropdown
+              value={targetLanguage}
+              onChange={(e) => setTargetLanguage(e.target.value)}
+              options={translatedLanguageOptions}
+              disabled={!applyTargetLanguage}
+            />
+          </BulkOverrideFieldRow>
         )}
 
         {/* Source override (for Movies & Scenes) */}
-        {(mainType === 'movie' || mainType === 'scene') && renderFieldWithCheckbox(
-          t('organizer.overrideModal.labels.source'),
-          applySource,
-          setApplySource,
-          <Dropdown
-            value={source}
-            onChange={(e) => setSource(e.target.value)}
-            options={translatedSourceOptions}
-            disabled={!applySource}
-          />
+        {(mainType === 'movie' || mainType === 'scene') && (
+          <BulkOverrideFieldRow
+            label={t('organizer.overrideModal.labels.source')}
+            checked={applySource}
+            onChange={setApplySource}
+          >
+            <Dropdown
+              value={source}
+              onChange={(e) => setSource(e.target.value)}
+              options={translatedSourceOptions}
+              disabled={!applySource}
+            />
+          </BulkOverrideFieldRow>
         )}
 
         {/* Edition override (for Movies & Scenes) */}
-        {(mainType === 'movie' || mainType === 'scene') && renderFieldWithCheckbox(
-          t('organizer.overrideModal.labels.edition'),
-          applyEdition,
-          setApplyEdition,
-          <Dropdown
-            value={edition}
-            onChange={(e) => setEdition(e.target.value)}
-            options={translatedEditionOptions}
-            disabled={!applyEdition}
-          />
+        {(mainType === 'movie' || mainType === 'scene') && (
+          <BulkOverrideFieldRow
+            label={t('organizer.overrideModal.labels.edition')}
+            checked={applyEdition}
+            onChange={setApplyEdition}
+          >
+            <Dropdown
+              value={edition}
+              onChange={(e) => setEdition(e.target.value)}
+              options={translatedEditionOptions}
+              disabled={!applyEdition}
+            />
+          </BulkOverrideFieldRow>
         )}
 
         {/* Audio Type override (for Movies, Episodes, Scenes) */}
-        {mainType !== 'extra' && mainType !== 'bonus' && renderFieldWithCheckbox(
-          t('organizer.overrideModal.labels.audioType'),
-          applyAudioType,
-          setApplyAudioType,
-          <Dropdown
-            value={audioType}
-            onChange={(e) => setAudioType(e.target.value)}
-            options={translatedAudioTypeOptions}
-            disabled={!applyAudioType}
-          />
+        {mainType !== 'extra' && mainType !== 'bonus' && (
+          <BulkOverrideFieldRow
+            label={t('organizer.overrideModal.labels.audioType')}
+            checked={applyAudioType}
+            onChange={setApplyAudioType}
+          >
+            <Dropdown
+              value={audioType}
+              onChange={(e) => setAudioType(e.target.value)}
+              options={translatedAudioTypeOptions}
+              disabled={!applyAudioType}
+            />
+          </BulkOverrideFieldRow>
         )}
 
         {/* Season Number override (for Episodes) */}
-        {mainType === 'episode' && renderFieldWithCheckbox(
-          t('organizer.overrideModal.labels.seasonNumber'),
-          applySeasonNum,
-          setApplySeasonNum,
-          <Input
-            type="text"
-            value={seasonNum}
-            onChange={(e) => setSeasonNum(e.target.value)}
-            placeholder={t('organizer.overrideModal.placeholders.seasonNumber')}
-            disabled={!applySeasonNum}
-          />
+        {mainType === 'episode' && (
+          <BulkOverrideFieldRow
+            label={t('organizer.overrideModal.labels.seasonNumber')}
+            checked={applySeasonNum}
+            onChange={setApplySeasonNum}
+          >
+            <Input
+              type="text"
+              value={seasonNum}
+              onChange={(e) => setSeasonNum(e.target.value)}
+              placeholder={t('organizer.overrideModal.placeholders.seasonNumber')}
+              disabled={!applySeasonNum}
+            />
+          </BulkOverrideFieldRow>
         )}
 
         {/* Subcategory override (for Extras & Bonus videos) */}
-        {(mainType === 'extra' || mainType === 'bonus') && category !== 'metadata' && renderFieldWithCheckbox(
-          t('organizer.overrideModal.labels.extraSubcategory'),
-          applySubcategory,
-          setApplySubcategory,
-          <Dropdown
-            value={subcategory}
-            onChange={(e) => setSubcategory(e.target.value)}
-            options={subcategoryList}
-            disabled={!applySubcategory}
-          />
+        {(mainType === 'extra' || mainType === 'bonus') && category !== 'metadata' && (
+          <BulkOverrideFieldRow
+            label={t('organizer.overrideModal.labels.extraSubcategory')}
+            checked={applySubcategory}
+            onChange={setApplySubcategory}
+          >
+            <Dropdown
+              value={subcategory}
+              onChange={(e) => setSubcategory(e.target.value)}
+              options={subcategoryList}
+              disabled={!applySubcategory}
+            />
+          </BulkOverrideFieldRow>
         )}
 
         {/* Parent ID override (for Extras & Bonus videos) */}
-        {(mainType === 'bonus' || mainType === 'extra') && renderFieldWithCheckbox(
-          t('organizer.overrideModal.labels.parentMovieOrEpisode'),
-          applyParentId,
-          setApplyParentId,
-          <Dropdown
-            value={parentId}
-            onChange={(e) => setParentId(e.target.value)}
-            options={parentCandidates}
-            disabled={!applyParentId}
-            searchable={true}
-          />
+        {(mainType === 'bonus' || mainType === 'extra') && (
+          <BulkOverrideFieldRow
+            label={t('organizer.overrideModal.labels.parentMovieOrEpisode')}
+            checked={applyParentId}
+            onChange={setApplyParentId}
+          >
+            <Dropdown
+              value={parentId}
+              onChange={(e) => setParentId(e.target.value)}
+              options={parentCandidates}
+              disabled={!applyParentId}
+              searchable={true}
+            />
+          </BulkOverrideFieldRow>
         )}
 
         {/* Language override (for Subtitle & Audio extras) */}
-        {mainType === 'extra' && (category === 'subtitle' || category === 'audio') && renderFieldWithCheckbox(
-          t('organizer.overrideModal.labels.language'),
-          applyLanguage,
-          setApplyLanguage,
-          <Dropdown
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            options={translatedLanguageOptions}
-            disabled={!applyLanguage}
-          />
+        {mainType === 'extra' && (category === 'subtitle' || category === 'audio') && (
+          <BulkOverrideFieldRow
+            label={t('organizer.overrideModal.labels.language')}
+            checked={applyLanguage}
+            onChange={setApplyLanguage}
+          >
+            <Dropdown
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              options={translatedLanguageOptions}
+              disabled={!applyLanguage}
+            />
+          </BulkOverrideFieldRow>
         )}
 
         {/* Auto-numbering and sorting panel checkbox (Only for Episodes) */}
@@ -631,15 +645,3 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
   );
 }
 
-function IconButton({ children, disabled, onClick, type = 'button' }) {
-  return (
-    <button
-      type={type}
-      onClick={onClick}
-      disabled={disabled}
-      className={`ui-icon-button organizer-override-icon-button${disabled ? ' is-disabled' : ''}`.trim()}
-    >
-      {children}
-    </button>
-  );
-}

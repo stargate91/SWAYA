@@ -1,8 +1,11 @@
 import { useState, useMemo } from 'react';
-import { useLibraryQuery, usePeopleQuery } from '@/queries/libraryQueries';
-import { useUpdateMediaStatusMutation } from '@/queries/mediaQueries';
-import { useUpdatePersonStatusMutation } from '@/queries/libraryQueries';
-import { useSettingsQuery } from '@/queries/settingsQueries';
+import {
+  useLibraryQuery,
+  usePeopleQuery,
+  useUpdatePersonStatusMutation,
+  useUpdateMediaStatusMutation,
+  useSettingsQuery
+} from '@/queries';
 import { resolveLibraryBackendTab } from '@/lib/libraryTabs';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 

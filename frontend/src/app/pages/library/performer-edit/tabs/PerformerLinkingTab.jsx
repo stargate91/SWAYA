@@ -8,7 +8,7 @@ import {
   useUnlinkPersonSourceMutation,
   useSetPrimaryPersonSourceMutation,
   useDeletePersonMutation
-} from '@/queries/libraryQueries';
+} from '@/queries';
 import { usePersonDetailQuery } from '@/queries/metadataQueries';
 import api from '@/lib/api';
 import Input from '@/ui/Input';

@@ -10,7 +10,7 @@ import { isTvLikeMediaType, isSceneMediaType } from '@/lib/mediaTypes';
 import { getPosterImagePath, buildTmdbImageUrl, TMDB_IMAGE_SIZES } from '@/lib/imageUrls';
 import { Film, ImageOff, Tv } from 'lucide-react';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
-import { normalizeBackdropKey } from '../../peopleCollectionDetailUtils.jsx';
+import { normalizeBackdropKey } from '../../utils/personCreditsUtils';
 import './PersonCreditsShared.css';
 
 export function OverviewContent({ text, emptyText, t, openDrawer, className = '' }) {

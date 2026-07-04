@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
-import { useSetPersonFieldRoutingMutation } from '@/queries/libraryQueries';
+import { useSetPersonFieldRoutingMutation } from '@/queries';
 import { usePersonDetailQuery } from '@/queries/metadataQueries';
 import { Check } from 'lucide-react';
 

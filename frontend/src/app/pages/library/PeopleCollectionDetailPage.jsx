@@ -37,8 +37,6 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
     socialLinks,
     backdropUrl,
     mediaUrl,
-    metaPills,
-    extraMetaPills,
     displayRating,
     isActivateHovered,
     starsStyleSheetText,
@@ -181,8 +179,6 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
             profileLinks={profileLinks}
             extraLinks={extraLinks}
             socialLinks={socialLinks}
-            metaPills={metaPills}
-            extraMetaPills={extraMetaPills}
             overviewText={overviewText}
             overviewTitle={overviewTitle}
             overviewEmptyText={overviewEmptyText}

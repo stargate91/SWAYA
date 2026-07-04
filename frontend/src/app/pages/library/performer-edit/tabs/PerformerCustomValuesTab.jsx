@@ -1,12 +1,26 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useSavePersonCustomFieldsMutation } from '@/queries/libraryQueries';
+import { useSavePersonCustomFieldsMutation } from '@/queries';
 import { usePersonDetailQuery } from '@/queries/metadataQueries';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
-import Input from '@/ui/Input';
-import Dropdown from '@/ui/Dropdown';
 import FloatingActionBar from '@/ui/FloatingActionBar';
 import { TARGET_LANGUAGE_OPTIONS } from '@/pages/settings/settingsLanguageOptions';
+import {
+  getGenderOptions,
+  getSameSexOnlyOptions,
+  getBreastTypeOptions,
+  getCupSizeOptions,
+  getHairColorOptions,
+  getEyeColorOptions,
+  getEthnicityOptions,
+  getButtShapeOptions,
+  getButtSizeOptions,
+  getDropdownOptions,
+} from './performerCustomValuesConfig';
+import BioSection from './components/BioSection';
+import PhysicalAttributesSection from './components/PhysicalAttributesSection';
+import MeasurementsSection from './components/MeasurementsSection';
+import ModificationsSection from './components/ModificationsSection';
 
 export default function PerformerCustomValuesTab({ personId, person: initialPerson, onDirtyChange, isShaking }) {
   const { t } = useTranslation();
@@ -17,93 +31,15 @@ export default function PerformerCustomValuesTab({ personId, person: initialPers
   const manualLink = person?.external_links?.find(l => l.provider === 'manual');
   const manualData = manualLink?.source_data || {};
 
-  const genderOptions = [
-    { value: '1', label: t('library.performerEdit.female') || 'Female' },
-    { value: '2', label: t('library.performerEdit.male') || 'Male' },
-    { value: '0', label: t('library.performerEdit.other') || 'Other' },
-  ];
-
-  const sameSexOnlyOptions = [
-    { value: 'No', label: 'No' },
-    { value: 'Yes', label: 'Yes' },
-  ];
-
-  const breastTypeOptions = [
-    { value: 'NATURAL', label: t('library.performerEdit.breastTypes.natural') || 'Natural' },
-    { value: 'FAKE', label: t('library.performerEdit.breastTypes.fake') || 'Fake / Implant' },
-    { value: 'NA', label: t('library.performerEdit.breastTypes.na') || 'N/A' },
-  ];
-
-  const cupSizeOptions = [
-    { value: 'A', label: 'A' },
-    { value: 'B', label: 'B' },
-    { value: 'C', label: 'C' },
-    { value: 'D', label: 'D' },
-    { value: 'DD', label: 'DD' },
-    { value: 'DDD', label: 'DDD' },
-    { value: 'E', label: 'E' },
-    { value: 'F', label: 'F' },
-    { value: 'G', label: 'G' },
-    { value: 'H', label: 'H' },
-    { value: 'I', label: 'I' },
-    { value: 'J', label: 'J' },
-    { value: 'K', label: 'K' },
-  ];
-
-  const hairColorOptions = [
-    { value: 'BLONDE', label: t('library.performerEdit.hairColors.blonde') || 'Blonde' },
-    { value: 'BRUNETTE', label: t('library.performerEdit.hairColors.brunette') || 'Brunette' },
-    { value: 'BLACK', label: t('library.performerEdit.hairColors.black') || 'Black' },
-    { value: 'RED', label: t('library.performerEdit.hairColors.red') || 'Red' },
-    { value: 'AUBURN', label: t('library.performerEdit.hairColors.auburn') || 'Auburn' },
-    { value: 'GREY', label: t('library.performerEdit.hairColors.grey') || 'Grey' },
-    { value: 'BALD', label: t('library.performerEdit.hairColors.bald') || 'Bald' },
-    { value: 'VARIOUS', label: t('library.performerEdit.hairColors.various') || 'Various' },
-    { value: 'WHITE', label: t('library.performerEdit.hairColors.white') || 'White' },
-    { value: 'OTHER', label: t('library.performerEdit.hairColors.other') || 'Other' },
-  ];
-
-  const eyeColorOptions = [
-    { value: 'BLUE', label: t('library.performerEdit.eyeColors.blue') || 'Blue' },
-    { value: 'BROWN', label: t('library.performerEdit.eyeColors.brown') || 'Brown' },
-    { value: 'GREY', label: t('library.performerEdit.eyeColors.grey') || 'Grey' },
-    { value: 'GREEN', label: t('library.performerEdit.eyeColors.green') || 'Green' },
-    { value: 'HAZEL', label: t('library.performerEdit.eyeColors.hazel') || 'Hazel' },
-    { value: 'RED', label: t('library.performerEdit.eyeColors.red') || 'Red' },
-  ];
-
-  const ethnicityOptions = [
-    { value: 'CAUCASIAN', label: t('library.performerEdit.ethnicities.caucasian') || 'Caucasian' },
-    { value: 'BLACK', label: t('library.performerEdit.ethnicities.black') || 'Black' },
-    { value: 'ASIAN', label: t('library.performerEdit.ethnicities.asian') || 'Asian' },
-    { value: 'INDIAN', label: t('library.performerEdit.ethnicities.indian') || 'Indian' },
-    { value: 'LATIN', label: t('library.performerEdit.ethnicities.latin') || 'Latin' },
-    { value: 'MIDDLE_EASTERN', label: t('library.performerEdit.ethnicities.middle_eastern') || 'Middle Eastern' },
-    { value: 'MIXED', label: t('library.performerEdit.ethnicities.mixed') || 'Mixed' },
-    { value: 'OTHER', label: t('library.performerEdit.ethnicities.other') || 'Other' },
-  ];
-
-  const buttShapeOptions = [
-    { value: 'BUBBLE', label: t('library.performerEdit.buttShapes.bubble') || 'Bubble' },
-    { value: 'HEART', label: t('library.performerEdit.buttShapes.heart') || 'Heart' },
-    { value: 'SQUARE', label: t('library.performerEdit.buttShapes.square') || 'Square' },
-    { value: 'FLAT', label: t('library.performerEdit.buttShapes.flat') || 'Flat' },
-  ];
-
-  const buttSizeOptions = [
-    { value: 'SMALL', label: t('library.performerEdit.buttSizes.small') || 'Small' },
-    { value: 'MEDIUM', label: t('library.performerEdit.buttSizes.medium') || 'Medium' },
-    { value: 'BIG', label: t('library.performerEdit.buttSizes.big') || 'Big' },
-  ];
-
-  const getDropdownOptions = (standardOptions, currentValue) => {
-    if (!currentValue) return standardOptions;
-    const upperValue = currentValue.toUpperCase();
-    const exists = standardOptions.some(opt => opt.value === upperValue);
-    if (exists) return standardOptions;
-    const label = currentValue.charAt(0).toUpperCase() + currentValue.slice(1).toLowerCase();
-    return [...standardOptions, { value: upperValue, label }];
-  };
+  const genderOptions = getGenderOptions(t);
+  const sameSexOnlyOptions = getSameSexOnlyOptions();
+  const breastTypeOptions = getBreastTypeOptions(t);
+  const cupSizeOptions = getCupSizeOptions();
+  const hairColorOptions = getHairColorOptions(t);
+  const eyeColorOptions = getEyeColorOptions(t);
+  const ethnicityOptions = getEthnicityOptions(t);
+  const buttShapeOptions = getButtShapeOptions(t);
+  const buttSizeOptions = getButtSizeOptions(t);
 
   const [selectedBioLang, setSelectedBioLang] = useState('en');
 
@@ -334,266 +270,52 @@ export default function PerformerCustomValuesTab({ personId, person: initialPers
       </div>
 
       <div className="custom-values-cards-grid">
-        {/* Card 1: Profile & Identity */}
-        <div className="custom-values-card">
-          <div className="custom-values-card__header">
-            <h4 className="custom-values-card__title">{t('library.performerEdit.profileIdentity') || 'Profile & Identity'}</h4>
-          </div>
-          <div className="custom-values-card__body">
-            <div className="ui-field custom-values-field--full">
-              <div className="performer-custom-values-header-row">
-                <label className="ui-field__label performer-custom-values-biography-label">{t('library.performerEdit.biography') || 'Biography'}</label>
-                <div className="performer-custom-values-language-selector-wrapper">
-                  <span className="performer-custom-values-language-label">{t('library.performerEdit.language') || 'Language:'}</span>
-                  <div className="performer-custom-values-language-dropdown-container">
-                    <Dropdown
-                      options={bioLanguageOptions}
-                      value={selectedBioLang}
-                      onChange={e => setSelectedBioLang(e.target.value)}
-                      placeholder={t('library.performerEdit.language') || 'Language'}
-                    />
-                  </div>
-                </div>
-              </div>
-              <textarea
-                className="ui-input performer-custom-values-bio"
-                value={form.biographies?.[selectedBioLang] || ''}
-                onChange={e => {
-                  const val = e.target.value;
-                  setForm(prev => ({
-                    ...prev,
-                    biographies: {
-                      ...prev.biographies,
-                      [selectedBioLang]: val
-                    }
-                  }));
-                }}
-                placeholder={`Write a custom biography in ${TARGET_LANGUAGE_OPTIONS.find(o => o.value === selectedBioLang)?.label || selectedBioLang}...`}
-              />
-            </div>
-            <div className="custom-values-card__grid-2">
-              {person?.is_adult && (
-                <Dropdown
-                  label="Gender"
-                  options={genderOptions}
-                  value={form.gender}
-                  onChange={e => handleChange('gender', e.target.value)}
-                  placeholder="- Select -"
-                />
-              )}
-              <div className="ui-field">
-                <label className="ui-field__label">{t('library.performerEdit.birthday') || 'Birthday'}</label>
-                <Input
-                  type="date"
-                  value={form.birthday}
-                  onChange={e => handleChange('birthday', e.target.value)}
-                  error={errors.birthday}
-                />
-              </div>
-              <div className="ui-field">
-                <label className="ui-field__label">{t('library.performerEdit.placeOfBirth') || 'Place of Birth'}</label>
-                <Input
-                  type="text"
-                  placeholder="e.g. Los Angeles, California"
-                  value={form.place_of_birth}
-                  onChange={e => handleChange('place_of_birth', e.target.value)}
-                />
-              </div>
-              {person?.is_adult && (
-                <Dropdown
-                  label={t('library.performerEdit.sameSexOnly') || 'Same Sex Only'}
-                  options={sameSexOnlyOptions}
-                  value={form.same_sex_only}
-                  onChange={e => handleChange('same_sex_only', e.target.value)}
-                  placeholder="- Select -"
-                />
-              )}
-            </div>
-          </div>
-        </div>
+        <BioSection
+          form={form}
+          setForm={setForm}
+          person={person}
+          errors={errors}
+          handleChange={handleChange}
+          bioLanguageOptions={bioLanguageOptions}
+          selectedBioLang={selectedBioLang}
+          setSelectedBioLang={setSelectedBioLang}
+          genderOptions={genderOptions}
+          sameSexOnlyOptions={sameSexOnlyOptions}
+          t={t}
+        />
 
-        {/* Card 2: Features & Appearance */}
-        <div className="custom-values-card">
-          <div className="custom-values-card__header">
-            <h4 className="custom-values-card__title">{t('library.performerEdit.featuresAppearance') || 'Features & Appearance'}</h4>
-          </div>
-          <div className="custom-values-card__body">
-            <div className="custom-values-card__grid-2">
-              {!isUnderage && (
-                <div className="ui-field">
-                  <label className="ui-field__label">{t('library.performerEdit.heightCm') || 'Height (cm)'}</label>
-                  <Input
-                    type="number"
-                    placeholder="e.g. 170"
-                    value={form.height}
-                    onChange={e => handleChange('height', e.target.value)}
-                    error={errors.height}
-                  />
-                </div>
-              )}
-              {!isUnderage && (
-                <div className="ui-field">
-                  <label className="ui-field__label">{t('library.performerEdit.weightKg') || 'Weight (kg)'}</label>
-                  <Input
-                    type="number"
-                    placeholder="e.g. 60"
-                    value={form.weight}
-                    onChange={e => handleChange('weight', e.target.value)}
-                    error={errors.weight}
-                  />
-                </div>
-              )}
-              {!isUnderage && (
-                <Dropdown
-                  label={t('library.details.hairColor') || 'Hair Color'}
-                  options={getDropdownOptions(hairColorOptions, form.hair_color)}
-                  value={form.hair_color}
-                  onChange={e => handleChange('hair_color', e.target.value)}
-                  placeholder="- Select -"
-                  searchable
-                />
-              )}
-              {!isUnderage && (
-                <Dropdown
-                  label={t('library.details.eyeColor') || 'Eye Color'}
-                  options={getDropdownOptions(eyeColorOptions, form.eye_color)}
-                  value={form.eye_color}
-                  onChange={e => handleChange('eye_color', e.target.value)}
-                  placeholder="- Select -"
-                  searchable
-                />
-              )}
-              <Dropdown
-                label={t('library.details.ethnicity') || 'Ethnicity'}
-                options={getDropdownOptions(ethnicityOptions, form.ethnicity)}
-                value={form.ethnicity}
-                onChange={e => handleChange('ethnicity', e.target.value)}
-                placeholder="- Select -"
-                searchable
-              />
-            </div>
-          </div>
-        </div>
+        <PhysicalAttributesSection
+          form={form}
+          errors={errors}
+          handleChange={handleChange}
+          isUnderage={isUnderage}
+          hairColorOptions={hairColorOptions}
+          eyeColorOptions={eyeColorOptions}
+          ethnicityOptions={ethnicityOptions}
+          getDropdownOptions={getDropdownOptions}
+          t={t}
+        />
 
-        {/* Card 3: Body & Measurements */}
         {!isMale && !isUnderage && (
-          <div className="custom-values-card">
-            <div className="custom-values-card__header">
-              <h4 className="custom-values-card__title">{t('library.performerEdit.bodyMeasurements') || 'Body & Measurements'}</h4>
-            </div>
-            <div className="custom-values-card__body">
-              <div className="custom-values-card__grid-2">
-                <div className="ui-field">
-                  <label className="ui-field__label">{t('library.performerEdit.measurementsPreview') || 'Measurements (Preview)'}</label>
-                  <Input
-                    type="text"
-                    placeholder="e.g. 34B-24-34"
-                    value={computedMeasurements}
-                    disabled
-                  />
-                </div>
-                <Dropdown
-                  label={t('library.details.breastType') || 'Breast Type'}
-                  options={breastTypeOptions}
-                  value={form.breast_type}
-                  onChange={e => handleChange('breast_type', e.target.value)}
-                  placeholder="- Select -"
-                />
-                <Dropdown
-                  label={t('library.performerEdit.cupSize') || 'Cup Size'}
-                  options={getDropdownOptions(cupSizeOptions, form.cup_size)}
-                  value={form.cup_size}
-                  onChange={e => handleChange('cup_size', e.target.value)}
-                  placeholder="- Select -"
-                  error={errors.cup_size}
-                  searchable
-                />
-                <div className="ui-field">
-                  <label className="ui-field__label">{t('library.performerEdit.bandSize') || 'Band Size'}</label>
-                  <Input
-                    type="number"
-                    placeholder="e.g. 34"
-                    value={form.band_size}
-                    onChange={e => handleChange('band_size', e.target.value.replace(/\D/g, ''))}
-                    min={10}
-                    max={100}
-                    step={1}
-                    error={errors.band_size}
-                  />
-                </div>
-                <div className="ui-field">
-                  <label className="ui-field__label">{t('library.performerEdit.waistInches') || 'Waist (inches)'}</label>
-                  <Input
-                    type="number"
-                    placeholder="e.g. 24"
-                    value={form.waist}
-                    onChange={e => handleChange('waist', e.target.value.replace(/\D/g, ''))}
-                    min={10}
-                    max={100}
-                    step={1}
-                    error={errors.waist}
-                  />
-                </div>
-                <div className="ui-field">
-                  <label className="ui-field__label">{t('library.performerEdit.hipInches') || 'Hip (inches)'}</label>
-                  <Input
-                    type="number"
-                    placeholder="e.g. 34"
-                    value={form.hip}
-                    onChange={e => handleChange('hip', e.target.value.replace(/\D/g, ''))}
-                    min={10}
-                    max={100}
-                    step={1}
-                    error={errors.hip}
-                  />
-                </div>
-                <Dropdown
-                  label={t('library.performerEdit.buttShape') || 'Butt Shape'}
-                  options={buttShapeOptions}
-                  value={form.butt_shape}
-                  onChange={e => handleChange('butt_shape', e.target.value)}
-                  placeholder="- Select -"
-                />
-                <Dropdown
-                  label={t('library.performerEdit.buttSize') || 'Butt Size'}
-                  options={buttSizeOptions}
-                  value={form.butt_size}
-                  onChange={e => handleChange('butt_size', e.target.value)}
-                  placeholder="- Select -"
-                />
-              </div>
-            </div>
-          </div>
+          <MeasurementsSection
+            form={form}
+            errors={errors}
+            handleChange={handleChange}
+            computedMeasurements={computedMeasurements}
+            breastTypeOptions={breastTypeOptions}
+            cupSizeOptions={cupSizeOptions}
+            buttShapeOptions={buttShapeOptions}
+            buttSizeOptions={buttSizeOptions}
+            getDropdownOptions={getDropdownOptions}
+            t={t}
+          />
         )}
 
-        {/* Card 4: Modifications */}
-        <div className="custom-values-card">
-          <div className="custom-values-card__header">
-            <h4 className="custom-values-card__title">{t('library.performerEdit.modifications') || 'Modifications'}</h4>
-          </div>
-          <div className="custom-values-card__body">
-            <div className="custom-values-card__grid-2">
-              <div className="ui-field custom-values-field--full-grid">
-                <label className="ui-field__label">{t('library.details.tattoos') || 'Tattoos'}</label>
-                <Input
-                  type="text"
-                  placeholder="e.g. Rose on left shoulder"
-                  value={form.tattoos}
-                  onChange={e => handleChange('tattoos', e.target.value)}
-                />
-              </div>
-              <div className="ui-field custom-values-field--full-grid">
-                <label className="ui-field__label">{t('library.details.piercings') || 'Piercings'}</label>
-                <Input
-                  type="text"
-                  placeholder="e.g. Nose ring"
-                  value={form.piercings}
-                  onChange={e => handleChange('piercings', e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+        <ModificationsSection
+          form={form}
+          handleChange={handleChange}
+          t={t}
+        />
       </div>
 
       <FloatingActionBar

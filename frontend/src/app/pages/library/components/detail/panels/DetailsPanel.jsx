@@ -73,7 +73,7 @@ export default function DetailsPanel() {
     }).format(num);
   };
 
-  const hasBoxOffice = !!((item.budget && item.budget > 0) || (item.revenue && item.revenue > 0));
+  const hasBoxOffice = isMovie && !!((item.budget && item.budget > 0) || (item.revenue && item.revenue > 0));
 
   const companies = item.companies || [];
   const networks = item.networks || [];
