@@ -76,3 +76,25 @@ This document serves as a living roadmap for future features, architecture adjus
         *   **Explicit / Fun:** Playful, direct, and explicit/adult-humored text (e.g., customized empty states, playful peak moment descriptors, and fun buttons).
     2.  **Locales Registration:** Leverage the existing i18next translation namespace structure to create `en-explicit`, `hu-explicit` variants by copying and customizing JSON files (`dashboard.json`, `library.json`, etc.) without altering React layout or logic code.
     3.  **Dropdown Toggle in Settings:** Expose a "Tone of Voice / Style" selection dropdown (or append it directly in Settings > General > Language options as e.g. "English (Explicit / Fun)") allowing users to switch tone preferences dynamically.
+
+---
+
+## 7. Custom Metadata Management & Home Videos Workflow
+*   **Status:** Proposed / Backlog
+*   **Goal:** Provide full support for home videos (házi videók) and manually cataloged custom entries.
+*   **Details:**
+    *   **Custom Metadata Creator Page:** A dedicated tab/page under Settings or Admin Panel to manually construct TV Shows, Seasons, Episodes, and Movies from scratch without relying on external API databases.
+    *   **Interactive File Mapping:** Allow users to bind physical files (`MediaItem`) to manually created metadata records (`MetadataMatch`) with a drag-and-drop or file picker interface. Once mapped, the backend triggers technical scans and local thumbnail extraction automatically.
+    *   **Custom Person Creator:** Enable manual creation of actors/directors directly from the media detail editor (using inline popups) or the People page, supporting name, biography, default roles, custom avatar upload, and SFW/NSFW visibility toggles.
+    *   **Multi-Thumbnail Picker:** Allow selecting/replacing the main video thumbnail by choosing from a selection of keyframe alternatives generated at different timestamps of the video file.
+
+---
+
+## 8. Metadata Alias & Duplicate Merging Support
+*   **Status:** Proposed / Backlog
+*   **Goal:** Resolve external database differences and duplicate entries by merging records and defining aliases.
+*   **Details:**
+    *   **Manual Merging Interface:** Allow users to select multiple people, studios, or media items in the Library/Settings, and merge them into a single consolidated record.
+    *   **Alias Fields:** Add support for alias names in `MetadataMatch` (e.g. for actors with different name spellings across TMDB/StashDB/PornDB).
+    *   **Merge Conflict Resolution:** When merging duplicate metadata pages, allow the user to select which values (e.g., custom local description, rating, or posters) should be prioritized as the master record.
+

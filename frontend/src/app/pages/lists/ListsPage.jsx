@@ -12,7 +12,8 @@ import {
   useUpdateListMutation,
   useDeleteListMutation,
   useAddListItemMutation,
-  useRemoveListItemMutation
+  useRemoveListItemMutation,
+  useSettingsQuery
 } from '@/queries';
 import { Plus, Edit2, Trash2, List as ListIcon, Loader2, Film, Users, Tv, Download, Search, X, Check, Minus } from 'lucide-react';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
@@ -31,6 +32,7 @@ export default function ListsPage() {
   const navigate = useNavigate();
   const { openModal, closeModal } = useUi();
   const { data: lists = [], isLoading } = useListsQuery();
+  const { data: settings } = useSettingsQuery();
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
 
   const createMutation = useCreateListMutation();
@@ -257,7 +259,7 @@ export default function ListsPage() {
       ? `/library/people/${item.person_id || itemId}`
       : `/library/${mediaType}/${itemId}`;
 
-    navigate(targetPath);
+    navigate(targetPath, { state: { allowAdult: true } });
   };
 
   const createdLabel = activeList?.created_at ? ((t('lists.created_prefix') || 'CREATED') + ': ' + new Date(activeList.created_at).toLocaleDateString()) : '';
@@ -440,6 +442,18 @@ export default function ListsPage() {
                         ? `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(rawPosterUrl)}&blur=true`
                         : rawPosterUrl;
 
+                      const displayDate = item.release_date ? item.release_date.substring(0, 10) : item.year;
+                      const genderPref = settings?.adult_gender_preference;
+                      const allPeople = item.people || [];
+                      const filteredPeople = genderPref && genderPref !== 'all'
+                        ? allPeople.filter(p => {
+                          if (genderPref === 'female') return p.gender === 1;
+                          if (genderPref === 'male') return p.gender === 2;
+                          return true;
+                        })
+                        : allPeople;
+                      const performers = filteredPeople.slice(0, 4);
+
                        return (
                         <div
                           key={item.id}
@@ -474,7 +488,37 @@ export default function ListsPage() {
                           </div>
                           <div className="lists-card__info">
                             <span className="lists-card__title">{item.title}</span>
-                            <span className="lists-card__subtitle">{isScene ? 'Scene' : item.year}</span>
+                            <span className="lists-card__subtitle">
+                              {isScene ? (
+                                <div className="library-scene-card__subtitle-inner">
+                                  <span className="library-scene-card__performers">
+                                    {performers.map((p, idx) => (
+                                      <span key={p.id}>
+                                        {idx > 0 && ', '}
+                                        <span
+                                          role="button"
+                                          tabIndex={0}
+                                          className="library-scene-card__performer-link"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigate(`/library/people/${p.id}`, { state: { allowAdult: true } });
+                                          }}
+                                          onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                              e.stopPropagation();
+                                              navigate(`/library/people/${p.id}`, { state: { allowAdult: true } });
+                                            }
+                                          }}
+                                        >
+                                          {p.name}
+                                        </span>
+                                      </span>
+                                    ))}
+                                  </span>
+                                  {displayDate && <span className="library-scene-card__date">{displayDate}</span>}
+                                </div>
+                              ) : item.year}
+                            </span>
                           </div>
                         </div>
                       );
@@ -617,7 +661,8 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
             search: query.trim() || undefined,
             offset: currentOffset,
             limit,
-            adult_only: isAdultActive
+            adult_only: isAdultActive,
+            include_inactive: false
           });
           const newItems = res.items || res.results || res || [];
           setResults((prev) => isNew ? newItems : [...prev, ...newItems]);
@@ -641,7 +686,8 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
             tab: mediaType === 'movie' ? 'movies' : mediaType === 'tv' ? 'tv' : 'scenes',
             page: currentPage,
             pageSize,
-            include_adult: isAdultActive
+            include_adult: isAdultActive,
+            filter_ownership: 'all'
           });
           const newItems = res.items || res.results || [];
           setResults((prev) => isNew ? newItems : [...prev, ...newItems]);
@@ -723,7 +769,21 @@ function ListsAddDrawer({ isOpen, onClose, activeList, addListItemMutation, acti
       if (listType === 'person') {
         return i.person_id === item.id;
       } else {
-        return i.media_item_id === item.id || i.tmdb_id === item.id;
+        if (item.id && i.media_item_id === item.id) return true;
+        
+        const cleanTmdbId = typeof item.id === 'string' && item.id.startsWith('tmdb_')
+          ? parseInt(item.id.replace('tmdb_', ''), 10)
+          : item.tmdb_id || (typeof item.id === 'number' ? item.id : null);
+        
+        if (cleanTmdbId && i.tmdb_id === cleanTmdbId) return true;
+        
+        const cleanExternalId = typeof item.id === 'string' && item.id.startsWith('stash_')
+          ? item.id.replace('stash_', '')
+          : item.id;
+          
+        if (cleanExternalId && i.external_id === cleanExternalId) return true;
+        
+        return false;
       }
     });
   };

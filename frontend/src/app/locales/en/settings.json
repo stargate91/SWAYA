@@ -152,7 +152,16 @@
       "apiKey": "StashDB API Key",
       "apiKeyHint": "Enter your StashDB (stashdb.org) API key to get adult performer details.",
       "endpoint": "StashDB API Link",
-      "endpointHint": "The address where SWAYA connects to StashDB."
+      "endpointHint": "The address where SWAYA connects to StashDB.",
+      "stepsTitle": "How to Get a StashDB Key",
+      "step1Start": "Create an account or sign in at ",
+      "step1Link": "stashdb.org",
+      "step1End": ".",
+      "step2Start": "Click on your username in the top-right corner to open your ",
+      "step2Link": "Profile",
+      "step2End": ".",
+      "step3": "Select the 'API Key' tab or generate a new key if none exists.",
+      "step4": "Copy the API Key and paste it into the field above."
     },
     "fansdb": {
       "title": "FansDB Integration",
@@ -160,7 +169,16 @@
       "apiKey": "FansDB API Key",
       "apiKeyHint": "Enter your FansDB (fansdb.cc) API key to get indie performer and OnlyFans details.",
       "endpoint": "FansDB API Link",
-      "endpointHint": "The address where SWAYA connects to FansDB."
+      "endpointHint": "The address where SWAYA connects to FansDB.",
+      "stepsTitle": "How to Get a FansDB Key",
+      "step1Start": "Create an account or sign in at ",
+      "step1Link": "fansdb.cc",
+      "step1End": ".",
+      "step2Start": "Go to your ",
+      "step2Link": "Profile Settings",
+      "step2End": " or Developer panel.",
+      "step3": "Generate a new GraphQL API Key under the API tab.",
+      "step4": "Copy the key into the FansDB API Key field above."
     },
     "theporndb": {
       "title": "ThePornDB Integration",
@@ -168,7 +186,16 @@
       "apiKey": "ThePornDB API Key",
       "apiKeyHint": "Enter your ThePornDB (theporndb.net) API key to get details.",
       "endpoint": "ThePornDB API Link",
-      "endpointHint": "The address where SWAYA connects to ThePornDB."
+      "endpointHint": "The address where SWAYA connects to ThePornDB.",
+      "stepsTitle": "How to Get a ThePornDB Key",
+      "step1Start": "Create an account or sign in at ",
+      "step1Link": "theporndb.net",
+      "step1End": ".",
+      "step2Start": "Navigate to the ",
+      "step2Link": "Developer API Tokens",
+      "step2End": " page in settings.",
+      "step3": "Create a new Personal Access Token.",
+      "step4": "Copy the token and paste it into the field above."
     },
     "folders": {
       "title": "Folders",

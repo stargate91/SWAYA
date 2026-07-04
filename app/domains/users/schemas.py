@@ -270,6 +270,8 @@ class CustomListItemResponse(BaseModel):
     is_adult: Optional[bool] = False
     external_id: Optional[str] = None
     provider: Optional[str] = None
+    release_date: Optional[str] = None
+    people: Optional[List[dict[str, Any]]] = None
 
 
 class CustomListResponse(BaseModel):

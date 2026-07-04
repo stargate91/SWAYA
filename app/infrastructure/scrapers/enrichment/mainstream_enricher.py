@@ -123,6 +123,12 @@ class MainstreamEnricher:
             elif active_match.media_type == MediaType.TV or active_match.media_type == MediaType.EPISODE:
                 self.tmdb_parser.enrich_tv(active_match, lang, include_ratings=inc_rat)
 
+        if active_match.imdb_id:
+            try:
+                self.omdb_parser.fetch_and_update_ratings(active_match, active_match.imdb_id)
+            except Exception as e:
+                logger.error(f"Failed to fetch OMDB ratings for tracked match {active_match.id}: {e}")
+
         if commit:
             self.db.commit()
         else:

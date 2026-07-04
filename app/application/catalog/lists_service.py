@@ -66,9 +66,12 @@ class ListsService:
             "is_adult": False,
             "external_id": None,
             "provider": None,
+            "release_date": None,
+            "people": None,
         }
         
         # Populate basic info based on what is linked
+        match = None
         if item.media_item:
             res["title"] = item.media_item.filename
             match = next((m for m in item.media_item.matches), None)
@@ -76,7 +79,7 @@ class ListsService:
                 res["tmdb_id"] = self._resolve_tv_show_tmdb_id(match)
                 res["media_type"] = match.media_type.value
                 res["rating"] = match.rating_imdb or match.rating_tmdb
-                res["is_adult"] = bool(match.is_adult)
+                res["is_adult"] = bool(match.is_adult) or match.provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB)
                 res["external_id"] = match.external_id
                 res["provider"] = match.provider.value if hasattr(match.provider, "value") else str(match.provider)
                 if match.release_date:
@@ -90,10 +93,11 @@ class ListsService:
                 if not res["title"]:
                     res["title"] = loc.title if loc else match.original_title
         elif item.match:
+            match = item.match
             res["tmdb_id"] = self._resolve_tv_show_tmdb_id(item.match)
             res["media_type"] = item.match.media_type.value
             res["rating"] = item.match.rating_imdb or item.match.rating_tmdb
-            res["is_adult"] = bool(item.match.is_adult)
+            res["is_adult"] = bool(item.match.is_adult) or item.match.provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB)
             res["external_id"] = item.match.external_id
             res["provider"] = item.match.provider.value if hasattr(item.match.provider, "value") else str(item.match.provider)
             if item.match.release_date:
@@ -109,6 +113,17 @@ class ListsService:
             res["media_type"] = "person"
             res["poster_path"] = item.person.profile_path
             res["is_adult"] = bool(item.person.is_adult)
+
+        if match:
+            res["release_date"] = match.release_date.isoformat() if match.release_date else None
+            p_list = []
+            for pl in match.people_links:
+                p_list.append({
+                    "id": pl.person.id,
+                    "name": pl.person.name,
+                    "gender": pl.person.gender
+                })
+            res["people"] = p_list
             
         return CustomListItemResponse(**res)
 
@@ -135,10 +150,11 @@ class ListsService:
     def _is_item_adult(self, item: CustomListItem) -> bool:
         if item.media_item:
             match = next((m for m in item.media_item.matches), None)
-            if match and match.is_adult:
+            if match and (match.is_adult or match.provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB)):
                 return True
-        elif item.match and item.match.is_adult:
-            return True
+        elif item.match:
+            if item.match.is_adult or item.match.provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB):
+                return True
         elif item.person and item.person.is_adult:
             return True
         return False
@@ -367,13 +383,15 @@ class ListsService:
                     except Exception:
                         pass
 
+                is_adult_item = (provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB)) or (m_type.value == "scene")
                 match = MetadataMatch(
                     provider=provider,
                     external_id=str(external_id),
                     media_type=m_type,
                     original_title=payload.get("title"),
                     release_date=rel_date,
-                    backdrop_path=payload.get("poster_path") if m_type.value == "scene" else None
+                    backdrop_path=payload.get("poster_path") if m_type.value == "scene" else None,
+                    is_adult=is_adult_item
                 )
                 self.db.add(match)
                 self.db.commit()
@@ -385,7 +403,7 @@ class ListsService:
                     from app.domains.metadata.models import MetadataLocalization
                     loc = MetadataLocalization(
                         match_id=match.id,
-                        language="en",
+                        locale="en",
                         title=title or "",
                         poster_path=poster_path if m_type.value != "scene" else ""
                     )
@@ -394,12 +412,36 @@ class ListsService:
 
             match_id = match.id
 
+        person_id = payload.get("person_id")
+
+        if person_id:
+            from app.infrastructure.scrapers.support.gateway import scraper_gateway
+            from app.infrastructure.media.db_media_resolver import DbMediaResolver
+            from app.domains.media_assets.services.images import image_processing_service
+            from app.domains.people.services.people_search_service import PeopleSearchService
+            
+            search_service = PeopleSearchService(
+                db=self.db,
+                scrapers=scraper_gateway,
+                library_port=DbMediaResolver(self.db),
+                image_service=image_processing_service
+            )
+            try:
+                res = search_service.add_person_tmdb(str(person_id), is_active=True)
+                if res and res.get("status") == "success":
+                    person_id = res["id"]
+            except Exception as e:
+                logger.error(f"Failed to dynamically import person {person_id} for custom list: {e}")
+                raise BadRequestException(f"Failed to import performer: {str(e)}")
+
         # Check if already exists
         exists_query = self.db.query(CustomListItem).filter(CustomListItem.list_id == list_id)
         if media_item_id:
             exists_query = exists_query.filter(CustomListItem.media_item_id == media_item_id)
         elif match_id:
             exists_query = exists_query.filter(CustomListItem.match_id == match_id)
+        elif person_id:
+            exists_query = exists_query.filter(CustomListItem.person_id == person_id)
         else:
             raise BadRequestException("Missing item identifier")
 
@@ -408,7 +450,12 @@ class ListsService:
             return self._serialize_item(exists)
 
         from app.domains.users.services.lists_domain_service import ListsDomainService
-        item = ListsDomainService.create_list_item(list_id=list_id, media_item_id=media_item_id, match_id=match_id)
+        item = ListsDomainService.create_list_item(
+            list_id=list_id,
+            media_item_id=media_item_id,
+            match_id=match_id,
+            person_id=person_id
+        )
         self.db.add(item)
         self.db.commit()
 
@@ -433,8 +480,9 @@ class ListsService:
             track_id = None
             if media_item_id:
                 track_id = str(media_item_id)
-            elif tmdb_id:
-                track_id = f"tmdb_{tmdb_id}"
+            elif external_id:
+                prefix = "stash" if provider == Provider.STASHDB else provider.value.lower()
+                track_id = f"{prefix}_{external_id}"
                 
             if track_id:
                 overrides.track_item(track_id, True)
