@@ -776,15 +776,21 @@
 
 .lists-card__media.is-blurred {
   border-color: transparent !important;
+  isolation: isolate;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  mask-image: -webkit-radial-gradient(white, black);
 }
 
 .lists-card__media.is-blurred img {
   filter: blur(28px) saturate(110%);
-  transition: filter var(--motion-duration-slow) var(--motion-ease-standard);
+  transform: scale(1.08);
+  transition: filter var(--motion-duration-slow) var(--motion-ease-standard), transform var(--motion-duration-slow) var(--motion-ease-standard);
 }
 
 .lists-card:hover .lists-card__media.is-blurred img {
   filter: blur(0px) saturate(100%);
+  transform: scale(1);
 }
 
 .recommend-card-blur-overlay {
@@ -794,17 +800,13 @@
   align-items: center;
   justify-content: center;
   background: color-mix(in srgb, black 70%, transparent);
-  backdrop-filter: blur(28px) !important;
-  -webkit-backdrop-filter: blur(28px) !important;
   pointer-events: none;
   z-index: 10;
-  transition: backdrop-filter var(--motion-duration-slow) var(--motion-ease-standard), -webkit-backdrop-filter var(--motion-duration-slow) var(--motion-ease-standard), opacity var(--motion-duration-slow) var(--motion-ease-standard), background-color var(--motion-duration-slow) var(--motion-ease-standard);
+  transition: opacity var(--motion-duration-slow) var(--motion-ease-standard), background-color var(--motion-duration-slow) var(--motion-ease-standard);
   border-radius: 0 !important;
 }
 
 .lists-card:hover .recommend-card-blur-overlay {
-  backdrop-filter: blur(0px) !important;
-  -webkit-backdrop-filter: blur(0px) !important;
   background: transparent;
   opacity: 0;
 }

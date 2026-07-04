@@ -117,6 +117,7 @@ class PersonCreditItem(BaseSchema):
     in_library: bool
     is_known_for: Optional[bool] = None
     known_for_rank: Optional[int] = None
+    source: Optional[str] = None
 
 class PersonFilmographyResponse(BaseModel):
     items: List[PersonCreditItem]

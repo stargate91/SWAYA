@@ -6,11 +6,12 @@ import EmptyState from '@/ui/EmptyState';
 import BackdropCard from '@/ui/BackdropCard';
 import ImageUploadPanel from '../../modals/ImageUploadPanel';
 import { API_BASE } from '@/lib/backend';
-import { isTvLikeMediaType, isSceneMediaType } from '@/lib/mediaTypes';
+import { isTvLikeMediaType } from '@/lib/mediaTypes';
 import { getPosterImagePath, buildTmdbImageUrl, TMDB_IMAGE_SIZES } from '@/lib/imageUrls';
 import { ImageOff, ENTITY_ICONS } from '@/ui/icons';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
 import { normalizeBackdropKey } from '../../utils/personCreditsUtils';
+import { navigateToCreditDetail } from '../../utils/mediaNavigation';
 import './PersonCreditsShared.css';
 
 export function OverviewContent({ text, emptyText, t, openDrawer, className = '' }) {
@@ -89,23 +90,7 @@ export function EntityCardGrid({ items, type, navigate, t }) {
   }
 
   const openItem = (item) => {
-    const resolvedType = item.media_type || item.type || type;
-    if (isTvLikeMediaType(resolvedType)) {
-      const tvId = item.library_tv_tmdb_id || item.tv_tmdb_id || item.tmdb_id || item.id;
-      navigate(`/library/tv/${tvId}`, { state: { allowAdult: true } });
-      return;
-    }
-
-    if (isSceneMediaType(resolvedType)) {
-      const itemSource = item.source;
-      const prefix = itemSource === 'porndb' || itemSource === 'theporndb' ? 'porndb' : itemSource === 'fansdb' ? 'fansdb' : 'stash';
-      const sceneId = item.in_library ? (item.library_item_id || item.id) : `${prefix}_${item.stash_id || item.id}`;
-      navigate(`/library/scene/${sceneId}`, { state: { allowAdult: true } });
-      return;
-    }
-
-    const movieId = item.in_library ? (item.library_item_id || item.id) : `tmdb_${item.tmdb_id || item.id}`;
-    navigate(`/library/movie/${movieId}`, { state: { allowAdult: true } });
+    navigateToCreditDetail(navigate, item, type, item.source);
   };
 
   return (
@@ -150,23 +135,7 @@ function HorizontalCollectionItemsList({ items, navigate, t }) {
   }
 
   const openItem = (item) => {
-    const resolvedType = item.media_type || item.type;
-    if (isTvLikeMediaType(resolvedType)) {
-      const tvId = item.library_tv_tmdb_id || item.tv_tmdb_id || item.tmdb_id || item.id;
-      navigate(`/library/tv/${tvId}`, { state: { allowAdult: true } });
-      return;
-    }
-
-    if (isSceneMediaType(resolvedType)) {
-      const itemSource = item.source;
-      const prefix = itemSource === 'porndb' || itemSource === 'theporndb' ? 'porndb' : itemSource === 'fansdb' ? 'fansdb' : 'stash';
-      const sceneId = item.in_library ? (item.library_item_id || item.id) : `${prefix}_${item.stash_id || item.id}`;
-      navigate(`/library/scene/${sceneId}`, { state: { allowAdult: true } });
-      return;
-    }
-
-    const movieId = item.in_library ? (item.library_item_id || item.id) : `tmdb_${item.tmdb_id || item.id}`;
-    navigate(`/library/movie/${movieId}`, { state: { allowAdult: true } });
+    navigateToCreditDetail(navigate, item, item.media_type || item.type, item.source);
   };
 
   return (

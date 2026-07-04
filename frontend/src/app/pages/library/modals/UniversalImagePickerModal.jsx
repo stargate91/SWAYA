@@ -34,6 +34,7 @@ export default function UniversalImagePickerModal({
   t,
   toast,
   onClose,
+  closeOnSelect = true,
   externalIds,
   item,
 }) {
@@ -70,13 +71,7 @@ export default function UniversalImagePickerModal({
     });
   }
 
-  const [prevCurrentPath, setPrevCurrentPath] = useState(currentPath);
   const [selectedPath, setSelectedPath] = useState(currentPath);
-
-  if (prevCurrentPath !== currentPath) {
-    setPrevCurrentPath(currentPath);
-    setSelectedPath(currentPath);
-  }
 
   const [imageSource, setImageSource] = useState(() => {
     return sources.length > 0 ? sources[0].value : 'tmdb';
@@ -110,7 +105,9 @@ export default function UniversalImagePickerModal({
         });
       }
       toast(t?.('library.details.imageUpdated') || 'Image updated successfully!', 'success');
-      onClose?.();
+      if (closeOnSelect) {
+        onClose?.();
+      }
     } catch (err) {
       toast(err.message || t?.('library.details.imageUpdateFailed') || 'Failed to update image', 'danger');
     }
@@ -145,7 +142,9 @@ export default function UniversalImagePickerModal({
         });
       }
       toast(t?.('library.details.imageUploaded') || 'Image uploaded and updated successfully!', 'success');
-      onClose?.();
+      if (closeOnSelect) {
+        onClose?.();
+      }
     } catch (err) {
       toast(err.message || t?.('library.details.imageUploadFailed') || 'Failed to upload image', 'danger');
     }
@@ -162,6 +161,7 @@ export default function UniversalImagePickerModal({
     uploadPersonProfileMutation.isPending;
 
   const isScene = entityType === 'scene' || item?.type === 'scene' || (typeof entityId === 'string' && entityId.startsWith('stash_'));
+  const imageLookupId = entityType === 'tv' && tmdbId ? tmdbId : entityId;
 
   return (
     <div className="universal-image-picker">
@@ -287,8 +287,7 @@ export default function UniversalImagePickerModal({
       {!isScene && (
         <div className="universal-image-picker__grid">
           <TMDBImageGrid
-            itemId={entityId}
-            tmdbId={tmdbId}
+            itemId={imageLookupId}
             mediaType={entityType}
             imageType={imageType === 'profile' ? 'poster' : imageType}
             currentPath={selectedPath || currentPath}

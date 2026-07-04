@@ -49,6 +49,7 @@ export default function PosterSelectorDrawer({
             t={t}
             toast={toast}
             onClose={onClose}
+            closeOnSelect={false}
             item={item}
           />
         </div>

@@ -151,6 +151,9 @@ class DbMediaResolver(
             parts = item_id.split("_", 1)
             provider_prefix = parts[0].lower()
             scene_id = parts[1]
+            for sub in ("movie_", "scene_"):
+                if scene_id.lower().startswith(sub):
+                    scene_id = scene_id[len(sub):]
             
             provider = Provider.STASHDB
             if provider_prefix == "scene":

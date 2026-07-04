@@ -245,12 +245,12 @@ def bulk_watched(payload: BulkWatchedUpdate, db: Session = Depends(get_db)):
     return _overrides_service(db).bulk_watched(payload)
 
 @catalog_router.post("/library/item/{item_id}/track")
-def track_item(item_id: str, db: Session = Depends(get_db)):
-    return _overrides_service(db).track_item(item_id, True)
+def track_item(item_id: str, media_type: Optional[str] = None, db: Session = Depends(get_db)):
+    return _overrides_service(db).track_item(item_id, True, media_type=media_type)
 
 @catalog_router.post("/library/item/{item_id}/untrack")
-def untrack_item(item_id: str, db: Session = Depends(get_db)):
-    return _overrides_service(db).track_item(item_id, False)
+def untrack_item(item_id: str, media_type: Optional[str] = None, db: Session = Depends(get_db)):
+    return _overrides_service(db).track_item(item_id, False, media_type=media_type)
 
 from pydantic import BaseModel
 

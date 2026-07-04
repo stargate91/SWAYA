@@ -78,5 +78,5 @@ class OverridesService:
     def bulk_watched(self, request: BulkWatchedUpdate) -> Dict[str, Any]:
         return self.title_lock_service.bulk_watched(request)
 
-    def track_item(self, item_id: str, is_tracked: bool) -> Dict[str, Any]:
-        return self.title_lock_service.track_item(item_id, is_tracked)
+    def track_item(self, item_id: str, is_tracked: bool, media_type: Optional[str] = None) -> Dict[str, Any]:
+        return self.title_lock_service.track_item(item_id, is_tracked, media_type=media_type)

@@ -66,7 +66,7 @@ class TitleLockService:
             request=request
         )
 
-    def track_item(self, item_id: str, is_tracked: bool) -> Dict[str, Any]:
+    def track_item(self, item_id: str, is_tracked: bool, media_type: Optional[str] = None) -> Dict[str, Any]:
         """Flags an override as tracked and launches auto-enrichment processes."""
         return self.persister.track_item(
             db=self.db,
@@ -74,5 +74,6 @@ class TitleLockService:
             mainstream_enricher=self.mainstream_enricher,
             title_lock_reader=self.service.title_lock_reader,
             item_id=item_id,
-            is_tracked=is_tracked
+            is_tracked=is_tracked,
+            media_type=media_type
         )

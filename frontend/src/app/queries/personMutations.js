@@ -151,6 +151,122 @@ export const useUpdatePersonStatusMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ personId, payload }) => api.people.updateStatus(personId, payload),
+    onMutate: async ({ personId, payload }) => {
+      const idStr = String(personId);
+      const idNum = Number(personId);
+      const isNumValid = !isNaN(idNum);
+
+      const personKeys = [
+        ['person-detail', personId],
+        ['person-detail', idStr],
+      ];
+      if (isNumValid) {
+        personKeys.push(['person-detail', idNum]);
+      }
+
+      // Cancel outgoing refetches
+      for (const key of personKeys) {
+        await queryClient.cancelQueries({ queryKey: key });
+      }
+      await queryClient.cancelQueries({ queryKey: ['people'] });
+      await queryClient.cancelQueries({ queryKey: ['people-infinite'] });
+      await queryClient.cancelQueries({ queryKey: ['library'] });
+
+      // Snapshot previous values
+      const previousPersonDetails = personKeys.map((key) => [key, queryClient.getQueryData(key)]);
+      const previousPeople = queryClient.getQueriesData({ queryKey: ['people'] });
+      const previousPeopleInfinite = queryClient.getQueriesData({ queryKey: ['people-infinite'] });
+      const previousLibrary = queryClient.getQueriesData({ queryKey: ['library'] });
+
+      const updates = {};
+      if (payload) {
+        if ('is_favorite' in payload) updates.is_favorite = payload.is_favorite;
+        if ('is_active' in payload) updates.is_active = payload.is_active;
+        if ('user_rating' in payload) updates.user_rating = payload.user_rating;
+        if ('user_comment' in payload) updates.user_comment = payload.user_comment;
+      }
+
+      if (Object.keys(updates).length > 0) {
+        // Update person details
+        personKeys.forEach((key) => {
+          queryClient.setQueryData(key, (oldData) => {
+            if (!oldData) return oldData;
+            return {
+              ...oldData,
+              ...updates,
+            };
+          });
+        });
+
+        // Update people lists
+        queryClient.setQueriesData({ queryKey: ['people'] }, (oldData) => {
+          if (!oldData?.items) return oldData;
+          return {
+            ...oldData,
+            items: oldData.items.map((item) => (
+              item.id === personId || String(item.id) === idStr
+                ? { ...item, ...updates }
+                : item
+            )),
+          };
+        });
+
+        // Update infinite people lists
+        queryClient.setQueriesData({ queryKey: ['people-infinite'] }, (oldData) => {
+          if (!oldData?.pages) return oldData;
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) => ({
+              ...page,
+              items: (page.items || []).map((item) => (
+                item.id === personId || String(item.id) === idStr
+                  ? { ...item, ...updates }
+                  : item
+              )),
+            })),
+          };
+        });
+
+        // Update library list
+        queryClient.setQueriesData({ queryKey: ['library'] }, (oldData) => {
+          if (!oldData?.items) return oldData;
+          return {
+            ...oldData,
+            items: oldData.items.map((item) => (
+              item.id === personId || String(item.id) === idStr
+                ? { ...item, ...updates }
+                : item
+            )),
+          };
+        });
+      }
+
+      return { previousPersonDetails, previousPeople, previousPeopleInfinite, previousLibrary };
+    },
+    onError: (err, variables, context) => {
+      if (context) {
+        if (context.previousPersonDetails) {
+          context.previousPersonDetails.forEach(([key, val]) => {
+            queryClient.setQueryData(key, val);
+          });
+        }
+        if (context.previousPeople) {
+          context.previousPeople.forEach(([key, val]) => {
+            queryClient.setQueryData(key, val);
+          });
+        }
+        if (context.previousPeopleInfinite) {
+          context.previousPeopleInfinite.forEach(([key, val]) => {
+            queryClient.setQueryData(key, val);
+          });
+        }
+        if (context.previousLibrary) {
+          context.previousLibrary.forEach(([key, val]) => {
+            queryClient.setQueryData(key, val);
+          });
+        }
+      }
+    },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['person-detail', variables.personId] });
       queryClient.invalidateQueries({ queryKey: ['person-detail', String(variables.personId)] });

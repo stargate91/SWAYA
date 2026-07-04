@@ -16,6 +16,17 @@ from app.domains.library.services.detail.scene.metadata_syncer import SceneMetad
 
 logger = logging.getLogger(__name__)
 
+PROVIDER_PREFIXES = ("stashdb", "stash", "fansdb", "porndb", "theporndb", "scene", "movie")
+
+def _strip_provider_prefix(value: str) -> str:
+    cleaned = str(value or "")
+    while "_" in cleaned:
+        prefix, rest = cleaned.split("_", 1)
+        if prefix.lower() not in PROVIDER_PREFIXES:
+            break
+        cleaned = rest
+    return cleaned
+
 class SceneDetailService(DetailFormatter):
     def __init__(self, db: Session, scrapers: ScraperGatewayPort):
         super().__init__()
@@ -29,12 +40,13 @@ class SceneDetailService(DetailFormatter):
         from app.domains.library.schemas import SceneDetailResponse
         db = self.db
         
+        print(f"[DEBUG] SceneDetailService.get_scene_detail called with item_id={item_id}")
         provider_prefix = None
         item = None
         if "_" in item_id:
             parts = item_id.split("_", 1)
             provider_prefix = parts[0].lower()
-            scene_uuid = parts[1]
+            scene_uuid = _strip_provider_prefix(parts[1])
         else:
             if str(item_id).isdigit():
                 from app.domains.library.models import MediaItem
@@ -55,6 +67,7 @@ class SceneDetailService(DetailFormatter):
             else:
                 scene_uuid = item_id
 
+        print(f"[DEBUG] SceneDetailService.get_scene_detail: resolved provider_prefix={provider_prefix}, scene_uuid={scene_uuid}")
         import re
         is_uuid = bool(re.match(r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", scene_uuid))
         scene_data = None
@@ -79,6 +92,7 @@ class SceneDetailService(DetailFormatter):
                 porndb_scraper = self.scrapers.adult(Provider.PORNDB, db)
                 scene_data = porndb_scraper.fetch_scene(scene_uuid)
         
+        print(f"[DEBUG] SceneDetailService.get_scene_detail fetch_scene result: success={bool(scene_data)}")
         if not scene_data:
             return JSONResponse(status_code=404, content={"error": "Scene not found on StashDB/FansDB/PornDB"})
         

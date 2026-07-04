@@ -59,17 +59,18 @@ export default function usePersonBackdropPicker({
   });
 
   useEffect(() => {
-    ensureSession(personId, person?.backdrop_path || item?.backdrop_path || '');
+    ensureSession(personId);
     return () => {
       if (personId) {
         usePersonBackdropChooserStore.getState().resetSession(personId);
       }
     };
-  }, [ensureSession, personId, person?.backdrop_path, item?.backdrop_path]);
+  }, [ensureSession, personId]);
 
   useEffect(() => {
-    if (!session) {
-      patchSession(personId, { selectedBackdropPath: person?.backdrop_path || item?.backdrop_path || '' });
+    const backdropPath = person?.backdrop_path || item?.backdrop_path || '';
+    if (!session || (!session.selectedBackdropPath && backdropPath)) {
+      patchSession(personId, { selectedBackdropPath: backdropPath });
     }
   }, [personId, person?.backdrop_path, item?.backdrop_path, session, patchSession]);
 

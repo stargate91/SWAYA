@@ -28,7 +28,7 @@ const normalizeLocalPosterPath = (path) => {
 
 const applyPosterFields = (item, data, rawItemId) => {
   if (!item || typeof item !== 'object') return item;
-  const nextPosterPath = data?.poster_path ?? item.poster_path;
+  const nextPosterPath = data?.poster_path ?? data?.path ?? data?.url ?? item.poster_path;
   const nextLocalPosterPath = normalizeLocalPosterPath(data?.local_poster_path ?? item.local_poster_path);
   const nextDisplayPoster = nextLocalPosterPath || nextPosterPath || item.displayPoster;
 
@@ -74,6 +74,42 @@ const updatePosterInCacheData = (cacheData, rawItemId, cleanId, data) => {
   return changed ? nextObject : cacheData;
 };
 
+const applyLogoFields = (item, data) => {
+  if (!item || typeof item !== 'object') return item;
+  return {
+    ...item,
+    logo_path: data?.logo_path ?? data?.path ?? data?.url ?? item.logo_path,
+  };
+};
+
+const updateLogoInCacheData = (cacheData, rawItemId, cleanId, data) => {
+  if (!cacheData || typeof cacheData !== 'object') return cacheData;
+
+  if (Array.isArray(cacheData)) {
+    let changed = false;
+    const nextArray = cacheData.map((entry) => {
+      const nextEntry = updateLogoInCacheData(entry, rawItemId, cleanId, data);
+      if (nextEntry !== entry) changed = true;
+      return nextEntry;
+    });
+    return changed ? nextArray : cacheData;
+  }
+
+  if (matchesLibraryEntity(cacheData, rawItemId, cleanId)) {
+    return applyLogoFields(cacheData, data);
+  }
+
+  let changed = false;
+  const nextObject = {};
+  for (const [key, value] of Object.entries(cacheData)) {
+    const nextValue = updateLogoInCacheData(value, rawItemId, cleanId, data);
+    if (nextValue !== value) changed = true;
+    nextObject[key] = nextValue;
+  }
+
+  return changed ? nextObject : cacheData;
+};
+
 const syncPosterCaches = (queryClient, rawItemId, data) => {
   const cleanId = String(rawItemId).replace('tv_', '').replace('collection_', '');
 
@@ -97,14 +133,33 @@ const syncPosterCaches = (queryClient, rawItemId, data) => {
   }
 
   detailKeys.forEach((key) => {
-    queryClient.setQueryData(key, (oldData) => updatePosterInCacheData(oldData, rawItemId, cleanId, data));
+    queryClient.setQueriesData({ queryKey: key }, (oldData) => updatePosterInCacheData(oldData, rawItemId, cleanId, data));
+  });
+};
+
+const syncLogoCaches = (queryClient, rawItemId, data) => {
+  const cleanId = String(rawItemId).replace('tv_', '').replace('collection_', '');
+
+  queryClient.setQueriesData({ queryKey: ['library'] }, (oldData) => (
+    updateLogoInCacheData(oldData, rawItemId, cleanId, data)
+  ));
+
+  const detailKeys = [
+    ['library-item-detail', rawItemId],
+    ['library-item-detail', cleanId],
+    ['library-tv-detail', rawItemId],
+    ['library-tv-detail', cleanId],
+  ];
+
+  detailKeys.forEach((key) => {
+    queryClient.setQueriesData({ queryKey: key }, (oldData) => updateLogoInCacheData(oldData, rawItemId, cleanId, data));
   });
 };
 
 export const useOverrideBackdropMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ itemId, backdropPath }) => api.media.overrideBackdrop(itemId, backdropPath),
+    mutationFn: ({ itemId, backdropPath, mediaType }) => api.media.overrideBackdrop(itemId, backdropPath, mediaType),
     onSuccess: (data, variables) => {
       const { itemId } = variables;
       const cleanId = String(itemId).replace('tv_', '').replace('collection_', '');
@@ -124,7 +179,7 @@ export const useOverrideBackdropMutation = () => {
 export const useUploadBackdropMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ itemId, file }) => api.media.uploadBackdrop(itemId, file),
+    mutationFn: ({ itemId, file, mediaType }) => api.media.uploadBackdrop(itemId, file, mediaType),
     onSuccess: (data, variables) => {
       const { itemId } = variables;
       const cleanId = String(itemId).replace('tv_', '').replace('collection_', '');
@@ -144,7 +199,7 @@ export const useUploadBackdropMutation = () => {
 export const useOverridePosterMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ itemId, posterPath }) => api.media.overridePoster(itemId, posterPath),
+    mutationFn: ({ itemId, posterPath, mediaType }) => api.media.overridePoster(itemId, posterPath, mediaType),
     onSuccess: (data, variables) => {
       const { itemId } = variables;
       const cleanId = String(itemId).replace('tv_', '').replace('collection_', '');
@@ -158,7 +213,7 @@ export const useOverridePosterMutation = () => {
 export const useUploadPosterMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ itemId, file }) => api.media.uploadPoster(itemId, file),
+    mutationFn: ({ itemId, file, mediaType }) => api.media.uploadPoster(itemId, file, mediaType),
     onSuccess: (data, variables) => {
       const { itemId } = variables;
       const cleanId = String(itemId).replace('tv_', '').replace('collection_', '');
@@ -172,10 +227,11 @@ export const useUploadPosterMutation = () => {
 export const useOverrideLogoMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ itemId, logoPath }) => api.media.overrideLogo(itemId, logoPath),
+    mutationFn: ({ itemId, logoPath, mediaType }) => api.media.overrideLogo(itemId, logoPath, mediaType),
     onSuccess: (data, variables) => {
       const { itemId } = variables;
       const cleanId = String(itemId).replace('tv_', '').replace('collection_', '');
+      syncLogoCaches(queryClient, itemId, data);
       queryClient.invalidateQueries({ queryKey: ['full-metadata', cleanId] });
       queryClient.invalidateQueries({ queryKey: ['full-metadata', itemId] });
       queryClient.invalidateQueries({ queryKey: ['library-item-detail', cleanId] });
@@ -191,10 +247,11 @@ export const useOverrideLogoMutation = () => {
 export const useUploadLogoMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ itemId, file }) => api.media.uploadLogo(itemId, file),
+    mutationFn: ({ itemId, file, mediaType }) => api.media.uploadLogo(itemId, file, mediaType),
     onSuccess: (data, variables) => {
       const { itemId } = variables;
       const cleanId = String(itemId).replace('tv_', '').replace('collection_', '');
+      syncLogoCaches(queryClient, itemId, data);
       queryClient.invalidateQueries({ queryKey: ['full-metadata', cleanId] });
       queryClient.invalidateQueries({ queryKey: ['full-metadata', itemId] });
       queryClient.invalidateQueries({ queryKey: ['library-item-detail', cleanId] });

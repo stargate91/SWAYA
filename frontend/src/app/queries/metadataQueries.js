@@ -51,6 +51,7 @@ export const useLibraryItemDetailQuery = (itemId, options = {}) => {
   return useQuery({
     queryKey: ['library-item-detail', itemId, mediaType || null],
     queryFn: () => api.library.getItemDetail(itemId, { mediaType }),
+    placeholderData: (previousData) => previousData,
     ...queryOptions,
   });
 };
@@ -60,6 +61,7 @@ export const useLibraryTvDetailQuery = (tvId, options = {}) => {
   return useQuery({
     queryKey: ['library-tv-detail', tvId, language || null],
     queryFn: () => api.library.getTvDetail(tvId, { seasonsLimit, initialEpisodesLimit, language }),
+    placeholderData: (previousData) => previousData,
     ...queryOptions,
   });
 };

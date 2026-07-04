@@ -63,5 +63,12 @@
   "item_removed_success": "Item removed from list",
   "remove_item_failed": "Failed to remove item",
   "no_search_results_title": "No Matches Found",
-  "no_search_results_desc": "Try refining your search query."
+  "no_search_results_desc": "Try refining your search query.",
+  "roles": {
+    "acting": "Actor",
+    "directing": "Director",
+    "writing": "Writer",
+    "performer": "Performer",
+    "artist": "Artist"
+  }
 }

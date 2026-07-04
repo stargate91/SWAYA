@@ -15,12 +15,15 @@ logger = logging.getLogger(__name__)
 class PornDbMovieFormatter(MovieDetailFormatter):
     def format(self, item_id: Any, db: Any, scrapers: Any, current_uid: Any) -> Any:
         try:
-            porndb_id = item_id.split("_")[1]
+            porndb_id = item_id.split("_")[-1]
         except IndexError:
+            print(f"[DEBUG] PornDbMovieFormatter.format: Invalid PornDB ID format: {item_id}")
             return JSONResponse(status_code=400, content={"error": "Invalid PornDB ID format"})
             
+        print(f"[DEBUG] PornDbMovieFormatter.format called with item_id={item_id}, parsed porndb_id={porndb_id}")
         porndb_scraper = scrapers.adult(Provider.PORNDB, db)
         movie_data = porndb_scraper.fetch_movie(porndb_id)
+        print(f"[DEBUG] PornDbMovieFormatter.format fetch_movie result: success={bool(movie_data)}")
         if not movie_data:
             return JSONResponse(status_code=404, content={"error": "Movie not found on PornDB"})
             

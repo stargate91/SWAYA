@@ -811,6 +811,11 @@ export default function ListsPage() {
                                   </span>
                                   {displayDate && <span className="library-scene-card__date">{displayDate}</span>}
                                 </div>
+                              ) : item.media_type === 'person' ? (
+                                (() => {
+                                  const dept = item.known_for_department || (item.is_adult ? 'performer' : 'artist');
+                                  return t(`lists.roles.${dept.toLowerCase()}`) || dept;
+                                })()
                               ) : item.year}
                             </span>
                           </div>

@@ -1,6 +1,7 @@
 import { Layers, Bookmark, Play } from '@/ui/icons';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
 import { API_BASE } from '@/lib/backend';
+import { getCreditSource, navigateToCreditDetail } from '../../utils/mediaNavigation';
 
 export default function PersonCreditsCard({
   item,
@@ -13,7 +14,7 @@ export default function PersonCreditsCard({
   placeholderIconSize = 18
 }) {
   const creditTitle = item.title || item.name || 'Unknown';
-  const resolvedSource = item.source || (item.rating_porndb ? 'porndb' : (item.stash_id ? 'stashdb' : (item.fansdb_id ? 'fansdb' : 'tmdb')));
+  const resolvedSource = getCreditSource(item);
 
   const isScene = mediaType === 'scenes' || mediaType.includes('scene');
   const posterPath = isScene
@@ -22,26 +23,7 @@ export default function PersonCreditsCard({
   const posterUrl = posterPath ? resolveDetailsImageUrl(posterPath, API_BASE, isScene ? 'backdrop' : 'poster') : null;
 
   const handleCardClick = () => {
-    const itemType = item.media_type || item.type;
-    const isSceneType = itemType === 'scene' || itemType === 'scenes';
-    if (isSceneType) {
-      const prefix = resolvedSource === 'porndb' || resolvedSource === 'theporndb' ? 'porndb' : (resolvedSource === 'fansdb' ? 'fansdb' : 'stash');
-      const sceneId = item.in_library ? (item.library_item_id || item.id) : `${prefix}_${item.stash_id || item.id}`;
-      navigate(`/library/scene/${sceneId}`, { state: { allowAdult: true } });
-      return;
-    }
-
-    const isTv = itemType === 'tv' || itemType === 'tvshows';
-    if (isTv) {
-      const tvId = item.library_tv_tmdb_id || item.tv_tmdb_id || item.tmdb_id || item.id;
-      navigate(`/library/tv/${tvId}`, { state: { allowAdult: true } });
-      return;
-    }
-
-    const movieId = item.in_library
-      ? (item.library_item_id || item.id)
-      : (resolvedSource === 'porndb' ? `porndb_${item.tmdb_id || item.id}` : `tmdb_${item.tmdb_id || item.id}`);
-    navigate(`/library/movie/${movieId}`, { state: { allowAdult: true } });
+    navigateToCreditDetail(navigate, item, mediaType, resolvedSource);
   };
 
   const itemType = item.media_type || item.type;

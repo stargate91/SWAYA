@@ -48,6 +48,7 @@ class PaginatedCreditsRetriever:
                 "job": link.role.value if hasattr(link.role, "value") else str(link.role),
                 "character": link.character_name,
                 "in_library": True,
+                "source": match.provider.value if hasattr(match.provider, "value") else str(match.provider),
             })
             
         total_items = len(movies)
@@ -95,6 +96,7 @@ class PaginatedCreditsRetriever:
                     "job": link.role.value if hasattr(link.role, "value") else str(link.role),
                     "character": link.character_name,
                     "in_library": True,
+                    "source": match.provider.value if hasattr(match.provider, "value") else str(match.provider),
                 }
                 
         tv_list = list(tv_map.values())
@@ -147,6 +149,7 @@ class PaginatedCreditsRetriever:
                 "job": link.role.value if hasattr(link.role, "value") else str(link.role),
                 "character": link.character_name,
                 "in_library": True,
+                "source": match.provider.value if hasattr(match.provider, "value") else str(match.provider),
             })
             
         total_items = len(scenes)

@@ -290,10 +290,11 @@ class OverridePersister:
         mainstream_enricher: Any,
         title_lock_reader: Any,
         item_id: str,
-        is_tracked: bool
+        is_tracked: bool,
+        media_type: Optional[str] = None
     ) -> Dict[str, Any]:
         """Flags an override as tracked and launches auto-enrichment processes."""
-        override = title_lock_reader.get_or_create_override(item_id)
+        override = title_lock_reader.get_or_create_override(item_id, media_type=media_type)
         if not override:
             raise NotFoundException("Target item not found")
 

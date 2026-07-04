@@ -259,6 +259,8 @@ def get_library_item_detail(
             return SceneDetailService(db, scrapers).get_scene_detail(item_id)
         elif media_type.lower() == "movie":
             return MovieDetailService(db, scrapers).get_library_item_detail(item_id, full_people=full_people)
+        elif media_type.lower() == "tv":
+            return TvDetailService(db, scrapers).get_library_tv_detail(item_id)
 
     if "_" in item_id:
         prefix = item_id.split("_", 1)[0].lower()

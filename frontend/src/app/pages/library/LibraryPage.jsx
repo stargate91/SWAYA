@@ -11,10 +11,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { isLibraryTagsTab } from '@/lib/libraryTabs';
 import { useUi } from '@/providers/UiProvider';
+import { useQueryClient } from '@tanstack/react-query';
 import UniversalImagePickerModal from './modals/UniversalImagePickerModal';
 import './LibraryPage.css';
 
 export default function LibraryPage({ initialTab = 'movies', lockTab = false, showTabs = true, pageTitle = null }) {
+  const queryClient = useQueryClient();
   const state = useLibraryState({ initialTab, lockTab, includeTagsTab: true });
   const [focusedTagName, setFocusedTagName] = useState(null);
   const [imagePickerData, setImagePickerData] = useState(null);
@@ -239,8 +241,9 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
                 toast={toast}
                 externalIds={imagePickerData.externalIds}
                 item={imagePickerData.item}
-                onImageSelected={() => {
-                  toast.success(state.t('library.details.imageUpdatedSuccessfully') || 'Image updated successfully');
+                onClose={() => {
+                  queryClient.invalidateQueries({ queryKey: ['library'] });
+                  queryClient.invalidateQueries({ queryKey: ['libraryCollections'] });
                 }}
               />
             </div>
