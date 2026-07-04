@@ -514,9 +514,11 @@
 }
 
 .watched-history-card__status--peak {
-  background: var(--color-state-danger-bg, rgba(239, 68, 68, 0.15));
+  --peak-bg: var(--color-state-danger-bg, rgba(239, 68, 68, 0.15));
+  --peak-color: var(--color-state-danger, #ef4444);
+  background: var(--peak-bg);
   border: 1px solid color-mix(in srgb, var(--color-state-danger) 20%, transparent);
-  color: var(--color-state-danger, #ef4444);
+  color: var(--peak-color);
 }
 
 .watched-history-card.is-active {

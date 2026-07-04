@@ -172,13 +172,11 @@
   background: var(--color-surface-glass);
   border: 1px solid var(--color-border-default);
   position: relative;
+  box-shadow: var(--shadow-md);
 }
 
 .bespoke-season-detail-card__poster-wrapper.is-clickable {
   cursor: pointer;
-}
-  --local-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-  box-shadow: var(--local-shadow);
 }
 
 .bespoke-season-detail-card__poster {
@@ -367,13 +365,11 @@
   background: var(--color-surface-glass);
   border: 1px solid var(--color-border-default);
   position: relative;
+  box-shadow: var(--shadow-sm);
 }
 
 .bespoke-episode-detail-card__still-wrapper.is-clickable {
   cursor: pointer;
-}
-  --local-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-  box-shadow: var(--local-shadow);
 }
 
 .bespoke-episode-detail-card__still {
@@ -964,7 +960,7 @@
   gap: var(--space-xs);
   height: 72px;
   padding: var(--space-sm) var(--space-md);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--color-surface-card);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-md, 8px);
   transition: all var(--motion-fast);

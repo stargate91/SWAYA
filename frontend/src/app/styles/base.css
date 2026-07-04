@@ -27,6 +27,8 @@
   --scrollbar-thumb-active: var(--app-shell-scrollbar-thumb-active);
   --scrollbar-border: var(--app-shell-scrollbar-border);
 
+  --space-px: 1px;
+  --space-2px: 2px;
   --space-1: var(--app-shell-space-1);
   --space-2: var(--app-shell-space-2);
   --space-3: var(--app-shell-space-3);
@@ -81,6 +83,8 @@
   --motion-base: var(--motion-duration-base) var(--motion-ease-standard);
   --motion-slow: var(--motion-duration-slow) var(--motion-ease-emphasized);
   --motion-emphasized: var(--motion-duration-base) var(--motion-ease-emphasized);
+  --motion-spring: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --motion-zoom: transform 0.28s ease;
   --motion-lift-distance-sm: -1px;
   --motion-lift-distance-md: -2px;
   --focus-ring-width: 3px;

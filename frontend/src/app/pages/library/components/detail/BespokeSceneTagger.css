@@ -16,8 +16,7 @@
   --local-gap: var(--space-xs);
   gap: var(--local-gap);
   padding: var(--space-xs) var(--space-md);
-  --local-bg: rgba(0, 0, 0, 0.15);
-  background: var(--local-bg);
+  background: color-mix(in srgb, black 15%, transparent);
   border-top-left-radius: var(--radius-lg, 16px);
   border-top-right-radius: var(--radius-lg, 16px);
   border-bottom: 1px solid var(--color-border-default);
@@ -52,7 +51,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: rgba(255, 255, 255, 0.45);
+  color: color-mix(in srgb, var(--color-ink) 45%, transparent);
 }
 
 .bespoke-scene-tagger-pills-row {
@@ -67,12 +66,11 @@
   align-items: center;
   --local-gap: 4px;
   gap: var(--local-gap);
-  padding: 4px 8px !important;
+  padding: var(--space-1) var(--space-2) !important;
   font-size: 11px !important;
   font-weight: 600 !important;
   cursor: pointer;
-  --local-transition: opacity 0.15s ease, transform 0.15s ease;
-  transition: var(--local-transition);
+  transition: opacity var(--motion-duration-fast) var(--motion-ease-standard), transform var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 .bespoke-scene-tagger-pill-active:hover {
@@ -82,8 +80,7 @@
 
 .bespoke-scene-tagger-pill-remove-icon {
   opacity: 0.6;
-  --local-transition: opacity 0.15s ease;
-  transition: var(--local-transition);
+  transition: opacity var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 .bespoke-scene-tagger-pill-active:hover .bespoke-scene-tagger-pill-remove-icon {
@@ -92,7 +89,7 @@
 
 .bespoke-scene-tagger-empty-text {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: color-mix(in srgb, var(--color-ink) 60%, transparent);
   font-style: italic;
 }
 
@@ -104,28 +101,23 @@
 .bespoke-scene-tagger-input-container {
   display: flex;
   align-items: center;
-  --local-bg: rgba(255, 255, 255, 0.03);
-  background: var(--local-bg);
+  --local-gap: var(--space-sm);
+  gap: var(--local-gap);
   border: 1px solid var(--color-border-default);
+  background: var(--color-bg-canvas);
   border-radius: var(--radius-md, 8px);
-  padding: 0 var(--space-sm);
-  height: 34px;
-  --local-transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  transition: var(--local-transition);
+  padding: 0 var(--space-md);
+  height: 38px;
+  transition: border-color var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 .bespoke-scene-tagger-input-container:focus-within {
   border-color: var(--color-accent-blue);
-  box-shadow: 0 0 0 1px var(--color-accent-blue);
-}
-
-.bespoke-scene-tagger-search-icon {
-  color: var(--color-text-muted);
-  flex-shrink: 0;
-  margin-right: var(--space-xs);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent-blue) 15%, transparent);
 }
 
 .bespoke-scene-tagger-input {
+  flex: 1;
   background: transparent;
   border: none;
   outline: none;
@@ -136,7 +128,7 @@
 }
 
 .bespoke-scene-tagger-input::placeholder {
-  color: rgba(255, 255, 255, 0.5) !important;
+  color: color-mix(in srgb, var(--color-ink) 50%, transparent) !important;
   opacity: 1;
 }
 
@@ -161,16 +153,15 @@
   top: 100%;
   left: 0;
   right: 0;
-  margin-top: 4px;
-  --local-bg: color-mix(in srgb, var(--color-surface-overlay-strong) 65%, var(--color-surface-overlay));
-  background: var(--local-bg);
+  margin-top: var(--space-1);
+  background: color-mix(in srgb, var(--color-surface-overlay-strong) 65%, var(--color-surface-overlay));
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-md, 8px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-lg);
   z-index: 100;
   max-height: 200px;
   overflow-y: auto;
-  padding: 4px 0;
+  padding: var(--space-1) 0;
   backdrop-filter: blur(16px);
 }
 
@@ -180,7 +171,7 @@
   width: 100%;
   background: transparent;
   border: none;
-  padding: 8px 12px;
+  padding: var(--space-2) var(--space-3);
   color: var(--color-text-primary);
   font-size: 12px;
   font-weight: 500;
@@ -188,13 +179,11 @@
   cursor: pointer;
   --local-gap: 8px;
   gap: var(--local-gap);
-  --local-transition: background 0.15s ease;
-  transition: var(--local-transition);
+  transition: background var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 .bespoke-scene-tagger-dropdown-item:hover {
-  --local-hover-bg: rgba(255, 255, 255, 0.05);
-  background: var(--local-hover-bg);
+  background: color-mix(in srgb, var(--color-ink) 5%, transparent);
 }
 
 .bespoke-scene-tagger-dropdown-color-dot {
@@ -207,7 +196,7 @@
 .bespoke-scene-tagger-dropdown-item--create {
   color: var(--color-accent-blue);
   border-top: 1px solid var(--color-border-default);
-  margin-top: 4px;
+  margin-top: var(--space-1);
 }
 
 /* Suggested Tags */
@@ -216,21 +205,19 @@
   align-items: center;
   --local-gap: 4px;
   gap: var(--local-gap);
-  padding: 4px 8px;
+  padding: var(--space-1) var(--space-2);
   font-size: 11px;
   font-weight: 600;
   border-radius: var(--radius-md, 6px);
-  border: 1px dashed rgba(255, 255, 255, 0.25);
-  background: rgba(0, 0, 0, 0.35);
-  color: rgba(255, 255, 255, 0.85);
+  border: 1px dashed var(--color-border-heavy);
+  background: color-mix(in srgb, black 35%, transparent);
+  color: color-mix(in srgb, var(--color-ink) 85%, transparent);
   cursor: pointer;
-  --local-transition: all 0.15s ease;
-  transition: var(--local-transition);
+  transition: all var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 .bespoke-scene-tagger-pill-suggested:hover {
-  --local-hover-border: 1px solid var(--color-accent-blue);
-  border: var(--local-hover-border);
+  border: 1px solid var(--color-accent-blue);
   color: var(--color-accent-blue);
   background: color-mix(in srgb, var(--color-accent-blue) 8%, transparent);
 }
@@ -266,7 +253,7 @@
 .bespoke-scene-tagger-scroller-btn {
   flex-shrink: 0;
   z-index: 10;
-  background: rgba(255, 255, 255, 0.05);
+  background: color-mix(in srgb, var(--color-ink) 5%, transparent);
   border: 1px solid var(--color-border-default);
   color: var(--color-text-secondary);
   border-radius: 999px;
@@ -277,14 +264,13 @@
   justify-content: center;
   cursor: pointer;
   opacity: 0.8;
-  --local-transition: opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease;
-  transition: var(--local-transition);
+  transition: opacity var(--motion-duration-base) var(--motion-ease-standard), background-color var(--motion-duration-base) var(--motion-ease-standard), color var(--motion-duration-base) var(--motion-ease-standard);
   padding: 0;
 }
 
 .bespoke-scene-tagger-scroller-btn:hover {
   opacity: 1;
-  background: rgba(255, 255, 255, 0.15);
+  background: color-mix(in srgb, var(--color-ink) 15%, transparent);
   color: var(--color-text-primary);
 }
 

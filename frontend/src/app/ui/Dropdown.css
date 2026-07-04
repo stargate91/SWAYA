@@ -209,7 +209,6 @@
 
 .ui-dropdown--sorter {
   width: 160px;
-  --ui-dropdown-sorter-hover-border: color-mix(in srgb, var(--color-accent) 35%, var(--ui-control-border));
 }
 
 .ui-dropdown__sorter-wrapper {
@@ -229,7 +228,7 @@
 }
 
 .ui-dropdown__trigger--sorter:hover {
-  border-color: var(--ui-dropdown-sorter-hover-border);
+  border-color: color-mix(in srgb, var(--color-accent) 35%, var(--ui-control-border));
 }
 
 .ui-dropdown__direction-btn {

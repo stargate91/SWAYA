@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: var(--space-sm);
   width: 100%;
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: var(--motion-spring);
 }
 
 .ui-poster-card:hover {
@@ -26,7 +26,7 @@
   cursor: default;
   border-radius: calc(var(--radius-md, 8px) - 2px);
   overflow: hidden;
-  transition: transform var(--motion-duration-fast) var(--motion-ease-emphasized), box-shadow 0.3s ease;
+  transition: transform var(--motion-duration-fast) var(--motion-ease-emphasized), box-shadow var(--motion-duration-slow) var(--motion-ease-standard);
 }
 
 .ui-poster-card:hover .ui-poster-card__image-wrapper {
@@ -67,7 +67,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
   height: 100%;
   object-fit: cover;
   background: var(--color-surface-overlay-heavy);
-  transition: transform 0.28s ease;
+  transition: var(--motion-zoom);
 }
 
 .ui-poster-card:hover .ui-poster-card__image {
@@ -249,7 +249,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
 }
 
 .ui-poster-card__remove-badge svg {
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: var(--motion-spring);
 }
 
 .ui-poster-card__remove-badge:hover svg {

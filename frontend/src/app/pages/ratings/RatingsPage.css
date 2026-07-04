@@ -192,7 +192,7 @@
   gap: var(--space-md);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
 }
 
 .analytics-summary-panel {
@@ -278,13 +278,13 @@
 }
 
 .analytics-card__icon.text-success {
-  color: #10b981;
-  filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.5));
+  color: var(--color-state-success);
+  filter: drop-shadow(0 0 var(--space-1) color-mix(in srgb, var(--color-state-success) 50%, transparent));
 }
 
 .analytics-card__icon.text-danger {
-  color: var(--color-accent-pink, #f43f5e);
-  filter: drop-shadow(0 0 4px var(--color-accent-pink));
+  color: var(--color-accent-pink);
+  filter: drop-shadow(0 0 var(--space-1) var(--color-accent-pink));
 }
 
 .analytics-card__icon.text-muted {
@@ -296,25 +296,25 @@
   display: flex;
   width: 100%;
   height: 8px;
-  gap: 3px;
+  gap: calc(var(--space-1) - var(--space-px));
   margin-top: var(--space-xs);
 }
 
 .analytics-mini-segmented-bar .analytics-segment {
   flex: 1;
   height: 100%;
-  background: rgba(255, 255, 255, 0.06);
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
   border-radius: 2px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--color-border-subtle);
 }
 
 .analytics-mini-segmented-bar .analytics-segment-fill {
   height: 100%;
   background: var(--color-accent-blue);
   opacity: 0.85;
-  box-shadow: 0 0 4px var(--color-accent-blue);
-  transition: width 0.3s ease;
+  box-shadow: 0 0 var(--space-1) var(--color-accent-blue);
+  transition: width var(--motion-duration-slow) var(--motion-ease-standard);
 }
 
 /* Distribution Graph styling */
@@ -342,10 +342,10 @@
 .analytics-distribution__bar-container {
   flex: 1;
   height: 8px;
-  background: rgba(255, 255, 255, 0.04);
+  background: color-mix(in srgb, var(--color-ink) 4%, transparent);
   border-radius: 99px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--color-border-subtle);
 }
 
 .analytics-distribution__bar {
@@ -353,7 +353,7 @@
   background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent-blue) 30%, transparent), var(--color-accent-blue));
   box-shadow: 0 0 6px var(--color-accent-blue);
   border-radius: 99px;
-  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: width var(--motion-duration-slow) var(--motion-ease-emphasized);
 }
 
 .analytics-distribution__count {

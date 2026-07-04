@@ -101,10 +101,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--color-surface-overlay, rgba(0, 0, 0, 0.4));
+  background: var(--color-surface-overlay);
   backdrop-filter: blur(4px);
   z-index: 99999998 !important;
-  animation: uiDrawerFadeIn 0.3s ease;
+  animation: uiDrawerFadeIn var(--motion-duration-slow) var(--motion-ease-standard);
 }
 
 .ui-drawer {
@@ -112,15 +112,15 @@
   top: var(--layout-window-titlebar-height, 46px);
   right: 0;
   height: calc(100vh - var(--layout-window-titlebar-height, 46px));
-  background: var(--color-surface-overlay, #1c1c1e);
-  border-left: 1px solid var(--color-border, rgba(255, 255, 255, 0.15));
-  box-shadow: -10px 0 35px rgba(0, 0, 0, 0.6);
+  background: var(--color-bg-elevated);
+  border-left: 1px solid var(--color-border-strong);
+  box-shadow: -10px 0 35px color-mix(in srgb, black 60%, transparent);
   z-index: 99999999 !important;
   display: flex;
   flex-direction: column;
   max-width: 100%;
-  animation: uiDrawerSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  transition: transform var(--motion-fast) cubic-bezier(0.16, 1, 0.3, 1), width 0.3s ease;
+  animation: uiDrawerSlideIn var(--motion-duration-slow) var(--motion-ease-emphasized);
+  transition: transform var(--motion-fast), width var(--motion-duration-slow) var(--motion-ease-standard);
 }
 
 /* Sizes */
@@ -163,7 +163,7 @@
 /* Ensure all drawer headers are solid (not transparent) */
 .entity-detail-page__drawer-header,
 .review-drawer__header {
-  background: var(--color-surface-overlay, #1c1c1e) !important;
+  background: var(--color-bg-elevated) !important;
   position: relative;
   z-index: 10;
 }
@@ -174,7 +174,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s ease, transform var(--motion-fast) !important;
+  transition: color var(--motion-duration-base) var(--motion-ease-standard), transform var(--motion-fast) !important;
 }
 
 .entity-detail-page__drawer-close:hover,
@@ -203,5 +203,5 @@
 }
 
 .entity-detail-page__drawer-content--padded {
-  padding: 24px;
+  padding: var(--space-6);
 }

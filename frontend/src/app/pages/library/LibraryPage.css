@@ -126,7 +126,8 @@
 .library-filters-right {
   display: flex;
   align-items: center;
-  gap: var(--space-3, 12px);
+  --filters-right-gap: var(--space-3, 12px);
+  gap: var(--filters-right-gap);
 }
 
 .library-filters-advanced-row {
@@ -144,7 +145,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  --sorter-custom-gap: 8px;
+  gap: var(--sorter-custom-gap);
   min-width: 140px;
   max-width: 240px;
 }
@@ -152,7 +154,8 @@
 .tags-dropdown-item .ui-checkbox-wrap {
   justify-content: flex-start !important;
   width: 100%;
-  padding: 6px 12px;
+  --checkbox-wrap-padding: 6px 12px;
+  padding: var(--checkbox-wrap-padding);
 }
 
 .library-header__inline-tools {
@@ -1424,7 +1427,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-8, 32px);
+  --discover-empty-padding: var(--space-8, 32px);
+  padding: var(--discover-empty-padding);
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
   text-align: center;

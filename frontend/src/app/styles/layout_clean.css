@@ -485,7 +485,8 @@
 }
 
 .shell:has(#shell-utility-bar-bottom-center > *:not(:empty)) .ui-page:not(.lists-page):not(.organizer-page) {
-  padding-bottom: 72px;
+  --page-pb: 72px;
+  padding-bottom: var(--page-pb);
 }
 
 .shell__suspense-fallback {
@@ -561,14 +562,14 @@
   border-radius: var(--radius-sm, 6px) !important;
   background: transparent !important;
   border: none !important;
-  color: var(--color-text-secondary, #94a3b8) !important;
+  color: var(--color-text-secondary) !important;
   cursor: pointer;
   transition: background var(--motion-fast), color var(--motion-fast);
 }
 
 .window-titlebar__nav-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.05) !important;
-  color: var(--color-ink, #fff) !important;
+  background: color-mix(in srgb, var(--color-ink) 5%, transparent) !important;
+  color: var(--color-ink) !important;
 }
 
 .window-titlebar__nav-btn:disabled {

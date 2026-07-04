@@ -266,10 +266,14 @@
 }
 
 .collection-items-horizontal-grid-wrapper {
-  padding-top: 8px !important;
-  padding-bottom: 8px !important;
-  margin-top: -8px !important;
-  margin-bottom: -8px !important;
+  --wrapper-pt: 8px;
+  --wrapper-pb: 8px;
+  --wrapper-mt: -8px;
+  --wrapper-mb: -8px;
+  padding-top: var(--wrapper-pt) !important;
+  padding-bottom: var(--wrapper-pb) !important;
+  margin-top: var(--wrapper-mt) !important;
+  margin-bottom: var(--wrapper-mb) !important;
 }
 
 .collection-items-horizontal-grid-wrapper .ui-poster-card {

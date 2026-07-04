@@ -92,7 +92,8 @@
   align-items: center;
   gap: var(--space-xs);
   margin-bottom: var(--space-md);
-  animation: pulse 2s infinite ease-in-out;
+  --pulse-anim: pulse 2s infinite ease-in-out;
+  animation: var(--pulse-anim);
 }
 
 @keyframes pulse {
@@ -174,7 +175,7 @@
   cursor: pointer;
   color: var(--color-text-primary);
   outline: none;
-  transition: transform 0.25s ease;
+  transition: transform var(--motion-duration-slow) var(--motion-ease-standard);
 }
 
 .person-backdrop-picker__credit-card:hover:not(:disabled) {
@@ -189,12 +190,12 @@
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--color-border-default) 82%, transparent);
   background: var(--color-bg-elevated);
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  transition: border-color var(--motion-duration-slow) var(--motion-ease-standard), box-shadow var(--motion-duration-slow) var(--motion-ease-standard);
 }
 
 .person-backdrop-picker__credit-card:hover:not(:disabled) .person-backdrop-picker__credit-poster-wrap {
-  border-color: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  border-color: color-mix(in srgb, var(--color-ink) 25%, transparent);
+  box-shadow: var(--shadow-lg);
 }
 
 .person-backdrop-picker__credit-card.is-selected .person-backdrop-picker__credit-poster-wrap {
@@ -218,13 +219,13 @@
   position: absolute;
   top: 6px;
   right: 6px;
-  background: rgba(0, 0, 0, 0.75);
+  background: color-mix(in srgb, black 75%, transparent);
   color: var(--color-text-primary);
   font-size: 0.6rem;
   font-weight: 800;
-  padding: 2px 4px;
+  padding: var(--space-two-px) var(--space-1);
   border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--color-border-strong);
   letter-spacing: 0.05em;
   backdrop-filter: blur(2px);
 }
@@ -232,7 +233,7 @@
 .person-backdrop-picker__credit-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-two-px);
 }
 
 .person-backdrop-picker__credit-title {
@@ -255,19 +256,18 @@
 .person-backdrop-picker__credit-rating {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: var(--space-two-px);
   color: var(--color-brand-imdb);
 }
 
 .entity-detail-page__skeleton-block--credit-title {
   width: 80%;
   height: 14px;
-  margin-top: 6px;
+  margin-top: calc(var(--space-2) - var(--space-two-px));
 }
 
 .entity-detail-page__skeleton-block--credit-meta {
   width: 40%;
   height: 10px;
-  margin-top: 6px;
+  margin-top: calc(var(--space-2) - var(--space-two-px));
 }
-
