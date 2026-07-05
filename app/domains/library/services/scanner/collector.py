@@ -1,10 +1,6 @@
 import logging
-logger = logging.getLogger(__name__)
-
-import os
 from pathlib import Path
 from typing import List, Dict, Optional, Any
-from sqlalchemy.orm import Session
 from app.shared_kernel.ports.settings_port import SettingsPort
 from app.shared_kernel.constants import (
     DEFAULT_VIDEO_EXTS,
@@ -13,6 +9,8 @@ from app.shared_kernel.constants import (
     DEFAULT_AUDIO_EXTS,
     DEFAULT_META_EXTS,
 )
+
+logger = logging.getLogger(__name__)
 
 class Collector:
     """

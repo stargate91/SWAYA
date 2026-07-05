@@ -74,7 +74,7 @@ class MovieCreditsFormatter:
                 if (r_date.month, r_date.day) < (b_date.month, b_date.day):
                     age -= 1
                 return age
-            except:
+            except Exception:
                 return None
 
         cast = []

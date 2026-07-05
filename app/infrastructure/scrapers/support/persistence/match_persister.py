@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 
-from app.domains.metadata.models import MetadataMatch, MetadataLocalization, MediaCollection
+from app.domains.metadata.models import MetadataMatch
 from app.shared_kernel.enums import Provider, MediaType
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.shared_kernel.language import LanguageService
@@ -77,7 +77,7 @@ class MatchPersister:
                 loc.poster_path = None
                 loc.local_poster_path = None
         else:
-            loc = next((l for l in match.localizations if l.locale == DEFAULT_FALLBACK_LANGUAGE), None)
+            loc = next((x for x in match.localizations if x.locale == DEFAULT_FALLBACK_LANGUAGE), None)
             if loc:
                 loc.local_poster_path = queue_image(loc.poster_path, "posters", asset_prefix)
 

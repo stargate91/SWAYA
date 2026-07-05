@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Any
+from app.application.people.schemas import PersonStatusUpdate
 
 from app.shared_kernel.database import get_db
 from app.infrastructure.scrapers.support.gateway import scraper_gateway
 from app.domains.people.services.people_status_service import PeopleStatusService, _enrichment_queue
 _enrichment_queue.configure(scraper_gateway)
-from app.application.people.schemas import PersonStatusUpdate
 
 router = APIRouter(prefix="/api/v1/people", tags=["General People"])
 

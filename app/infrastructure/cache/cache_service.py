@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Any
-from sqlalchemy.orm import Session
 
 from app.shared_kernel.database import CacheSessionLocal
 from app.shared_kernel.enums import Provider, MediaType, CacheStatus

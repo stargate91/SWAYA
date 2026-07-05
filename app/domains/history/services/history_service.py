@@ -57,7 +57,7 @@ class HistoryService:
             extra_count = self.db.query(ActionLog).filter(
                 ActionLog.batch_id == b.id,
                 ActionLog.status.in_([ActionStatus.SUCCESS, ActionStatus.UNDONE]),
-                ActionLog.extra_file_id != None
+                ActionLog.extra_file_id is not None
             ).count()
             
             is_undone = (success_count == 0) and (undone_count > 0 or failed_count == 0)

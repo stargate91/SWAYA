@@ -188,7 +188,7 @@ class RecommendationsService:
     def add_to_watchlist(self, tmdb_id: int, media_type: str) -> ActionResponse:
         # Get watchlist ID
         lists = self.lists_service.get_all_lists()
-        watchlist = next((l for l in lists if l.name == "Watchlist"), None)
+        watchlist = next((lst for lst in lists if lst.name == "Watchlist"), None)
         if not watchlist:
             return ActionResponse(status="error", message="Watchlist not found")
         
@@ -197,7 +197,7 @@ class RecommendationsService:
 
     def remove_from_watchlist(self, tmdb_id: int) -> ActionResponse:
         lists = self.lists_service.get_all_lists()
-        watchlist = next((l for l in lists if l.name == "Watchlist"), None)
+        watchlist = next((lst for lst in lists if lst.name == "Watchlist"), None)
         if not watchlist:
             return ActionResponse(status="error", message="Watchlist not found")
         
@@ -541,7 +541,7 @@ class RecommendationsService:
         offset = (page - 1) * limit
         
         recent_people = self.db.query(Person).filter(
-            Person.is_active == True,
+            Person.is_active,
             Person.is_adult == include_adult
         ).order_by(desc(Person.id)).offset(offset).limit(limit).all()
         

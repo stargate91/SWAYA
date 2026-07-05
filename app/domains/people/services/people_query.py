@@ -1,4 +1,4 @@
-from typing import Optional, List, Dict, Any
+from typing import Optional, Any
 from sqlalchemy import case, func
 from sqlalchemy.orm import Session
 
@@ -50,7 +50,7 @@ class PeopleQueryBuilder:
             func.count(func.distinct(library_key)).label("library_count"),
             func.max(
                 case(
-                    (MetadataMatch.is_adult == True, 1),
+                    (MetadataMatch.is_adult, 1),
                     else_=0
                 )
             ).label("linked_adult_flag")
@@ -73,25 +73,25 @@ class PeopleQueryBuilder:
             query = query.filter(Person.gender == 2)
 
         if adult_only:
-            query = query.filter(Person.is_adult == True)
+            query = query.filter(Person.is_adult)
         else:
-            query = query.filter(Person.is_adult == False)
+            query = query.filter(not Person.is_adult)
 
         if search:
             query = query.filter(Person.name.ilike(f"%{search}%"))
 
         if not include_inactive:
-            query = query.filter(Person.is_active == True)
+            query = query.filter(Person.is_active)
 
         query = query.group_by(Person.id)
 
         if include_inactive:
-            query = query.having((Person.is_active == True) | (func.count(func.distinct(library_key)) > 0))
+            query = query.having((Person.is_active) | (func.count(func.distinct(library_key)) > 0))
 
         # Build popularity score expression for SQL sorting
         popularity_score_expr = case(
             (
-                (Person.is_adult == True) & (Person.rating_porndb != None),
+                (Person.is_adult) & (Person.rating_porndb is not None),
                 Person.rating_porndb
             ),
             else_=func.coalesce(Person.popularity, 0.0)

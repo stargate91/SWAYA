@@ -1,6 +1,5 @@
 from typing import Optional, Any
 
-from app.shared_kernel.enums import Provider, MediaType
 from app.infrastructure.cache.cache_service import CacheService
 from app.infrastructure.scrapers.providers.tmdb import TMDBScraper
 from app.infrastructure.scrapers.providers.omdb import OMDBScraper
@@ -16,7 +15,6 @@ class ScraperService:
     """
 
     def __init__(self, settings_port_or_db: Any, cache_service: Optional[CacheService] = None):
-        from app.shared_kernel.ports.settings_port import SettingsPort
         # Workaround for Python 3.10+ Protocol check: we check if it has the required methods or uses DbSettingsAdapter
         if hasattr(settings_port_or_db, "get_setting") and hasattr(settings_port_or_db, "get_system_setting"):
             self.settings_port = settings_port_or_db

@@ -5,7 +5,7 @@ from typing import List, Optional, Tuple, Dict, Any
 from sqlalchemy.orm import Session
 
 from app.shared_kernel.enums import ExtraCategory, ExtraSubtype, ScanMode, Provider
-from app.domains.library.models import Library, MediaItem, ExtraFile
+from app.domains.library.models import Library, MediaItem
 from app.domains.library.services.scanner.categorizer import Categorizer
 
 FORCED_EXTRA_VIDEO_SUBTYPES = {

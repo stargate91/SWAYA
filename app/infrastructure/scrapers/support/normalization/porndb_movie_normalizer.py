@@ -1,6 +1,5 @@
 import re
 from typing import Dict, Any, Optional
-from app.infrastructure.scrapers.support.normalization.helpers import safe_parse_date
 
 class PorndbMovieNormalizer:
     @staticmethod

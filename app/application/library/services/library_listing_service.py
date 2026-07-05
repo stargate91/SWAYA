@@ -1,16 +1,12 @@
 import logging
-from datetime import datetime
-from typing import List, Optional, Any
-from sqlalchemy import func, or_, and_, desc
-from sqlalchemy.orm import Session, selectinload, joinedload
+from typing import List, Optional
+from sqlalchemy.orm import Session, joinedload
 
 from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch, MetadataLocalization
-from app.domains.users.models import UserOverride, Tag, user_override_tags
-from app.domains.people.models import MediaPersonLink
+from app.domains.metadata.models import MetadataMatch
+from app.domains.users.models import UserOverride
 from app.domains.people.services.people_library_service import PeopleLibraryService
-from app.shared_kernel.enums import ItemStatus, MediaType, Provider
-from app.shared_kernel.user_context import get_current_user_id
+from app.shared_kernel.enums import ItemStatus, MediaType
 from app.domains.library.schemas import (
     ContinueWatchingItem,
     LibraryTabResponse,
@@ -24,10 +20,10 @@ from app.domains.library.services.listing.query_builders import (
     PeopleQueryBuilder,
 )
 
-logger = logging.getLogger(__name__)
-
 from app.shared_kernel.ports.library_port import LibraryPort
 from app.shared_kernel.ports.settings_port import SettingsPort
+
+logger = logging.getLogger(__name__)
 
 class LibraryListingService:
     def __init__(self, db_session: Session, library_port: Optional[LibraryPort] = None, settings_port: Optional[SettingsPort] = None, active_sessions: Optional[set[int]] = None):
@@ -43,16 +39,16 @@ class LibraryListingService:
         query = self.db.query(UserOverride).join(
             MediaItem, UserOverride.media_item_id == MediaItem.id
         ).outerjoin(
-            MetadataMatch, (MetadataMatch.media_item_id == MediaItem.id) & (MetadataMatch.is_active == True)
+            MetadataMatch, (MetadataMatch.media_item_id == MediaItem.id) & (MetadataMatch.is_active)
         ).filter(
             UserOverride.resume_position > 0,
-            UserOverride.is_watched == False
+            not UserOverride.is_watched
         ).options(
             joinedload(UserOverride.media_item).joinedload(MediaItem.matches).joinedload(MetadataMatch.localizations),
             joinedload(UserOverride.media_item).joinedload(MediaItem.matches).joinedload(MetadataMatch.parent).joinedload(MetadataMatch.parent).joinedload(MetadataMatch.localizations)
         )
         if not include_adult:
-            query = query.filter((MetadataMatch.id == None) | (MetadataMatch.is_adult == False))
+            query = query.filter((MetadataMatch.id is None) | (not MetadataMatch.is_adult))
 
         overrides = query.order_by(UserOverride.last_watched_at.desc()).limit(limit).all()
 
@@ -134,14 +130,14 @@ class LibraryListingService:
         movies_cnt_query = self.db.query(MediaItem).select_from(MediaItem).join(MetadataMatch).filter(
             MediaItem.status.in_(lib_statuses),
             MetadataMatch.media_type == MediaType.MOVIE,
-            MetadataMatch.is_active == True,
+            MetadataMatch.is_active,
             MetadataMatch.is_adult == include_adult
         )
         
         scenes_cnt_query = self.db.query(MediaItem).select_from(MediaItem).join(MetadataMatch).filter(
             MediaItem.status.in_(lib_statuses),
             MetadataMatch.media_type == MediaType.SCENE,
-            MetadataMatch.is_active == True,
+            MetadataMatch.is_active,
             MetadataMatch.is_adult == include_adult
         )
         
@@ -150,20 +146,20 @@ class LibraryListingService:
         current_parents = {
             r[0] for r in self.db.query(MetadataMatch.parent_id).join(
                 MediaItem, MetadataMatch.media_item_id == MediaItem.id
-            ).filter(MediaItem.status.in_(lib_statuses), MetadataMatch.parent_id != None).all()
+            ).filter(MediaItem.status.in_(lib_statuses), MetadataMatch.parent_id is not None).all()
         }
         while current_parents:
             parent_ids.update(current_parents)
             current_parents = {
                 r[0] for r in self.db.query(MetadataMatch.parent_id).filter(
                     MetadataMatch.id.in_(current_parents),
-                    MetadataMatch.parent_id != None
+                    MetadataMatch.parent_id is not None
                 ).all()
             }
         tv_shows_count = self.db.query(MetadataMatch).filter(
             MetadataMatch.id.in_(parent_ids),
             MetadataMatch.media_type == MediaType.TV,
-            MetadataMatch.is_active == True,
+            MetadataMatch.is_active,
             MetadataMatch.is_adult == include_adult
         ).count()
         
@@ -204,8 +200,8 @@ class LibraryListingService:
             ).filter(
                 MediaItem.status.in_(lib_statuses),
                 MetadataMatch.media_type == MediaType.MOVIE,
-                MetadataMatch.is_active == True,
-                MetadataMatch.collection_id != None,
+                MetadataMatch.is_active,
+                MetadataMatch.collection_id is not None,
                 MetadataMatch.is_adult == include_adult
             ).group_by(MetadataMatch.collection_id).having(func.count(MediaItem.id) >= min_count).count()
 

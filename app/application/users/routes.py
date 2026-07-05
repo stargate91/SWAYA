@@ -1,12 +1,9 @@
 import logging
-logger = logging.getLogger(__name__)
-
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
 from app.shared_kernel.database import get_db
-from app.domains.users.models import User, UserOverride, CustomList
 from app.domains.users.services.user_service import UserService
 from app.application.users.schemas import (
     UserRead,
@@ -14,7 +11,6 @@ from app.application.users.schemas import (
     UserOverrideRead,
     UserOverrideCreate,
     CustomListRead,
-    CustomListCreate,
     ItemOverridesUpdate,
     ItemStatusUpdate,
     ImageOverrideUpdate,
@@ -29,6 +25,14 @@ from app.application.users.schemas import (
     CatalogResponse,
     BulkUpdateResponse,
 )
+from app.domains.users.services.tags_service import TagsService
+from app.application.catalog.lists_service import ListsService
+from app.domains.users.services.overrides_service import OverridesService
+from app.infrastructure.media.db_media_resolver import DbMediaResolver
+from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+from pydantic import BaseModel
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/users", tags=["Users"])
 
@@ -85,8 +89,6 @@ def list_user_custom_lists(user_id: int, db: Session = Depends(get_db)):
 # Compatibility API owned by the Users domain.
 catalog_router = APIRouter(prefix="/api/v1", tags=["User Catalog"])
 
-from app.domains.users.services.tags_service import TagsService
-from app.application.catalog.lists_service import ListsService
 
 
 @catalog_router.get("/tags", response_model=List[TagResponse])
@@ -145,7 +147,6 @@ def set_list_image(list_id: int, payload: dict, db: Session = Depends(get_db)):
     return ListsService(db).set_list_image(list_id, path)
 
 
-from fastapi import UploadFile, File
 @catalog_router.post("/lists/{list_id}/upload-image", response_model=CustomListDetailResponse)
 def upload_list_image(list_id: int, file: UploadFile = File(...), db: Session = Depends(get_db)):
     return ListsService(db).upload_list_image(list_id, file.filename, file.file)
@@ -180,9 +181,6 @@ def bulk_update_catalog_status(payload: dict, db: Session = Depends(get_db)):
     return ListsService(db).bulk_update_catalog_status(payload)
 
 
-from app.domains.users.services.overrides_service import OverridesService
-from app.infrastructure.media.db_media_resolver import DbMediaResolver
-from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
 
 def _img_dl():
     return TasksImageDownloadAdapter()
@@ -265,7 +263,6 @@ def track_item(item_id: str, media_type: Optional[str] = None, db: Session = Dep
 def untrack_item(item_id: str, media_type: Optional[str] = None, db: Session = Depends(get_db)):
     return _overrides_service(db).track_item(item_id, False, media_type=media_type)
 
-from pydantic import BaseModel
 
 class AddPeakRequest(BaseModel):
     video_position: Optional[int] = None

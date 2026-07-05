@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Set, Tuple
 from sqlalchemy.orm import Session, joinedload
-from app.shared_kernel.enums import MediaType, ItemStatus
+from app.shared_kernel.enums import MediaType, ItemStatus, Provider
 from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch
 from app.domains.users.models import UserOverride
@@ -63,16 +63,10 @@ class TvLocalResolver:
                         local_episodes_map[(match.season_number, int(ep_num))] = item
 
         episode_matches = db.query(MetadataMatch).filter(
-            MetadataMatch.provider == Provider.TMDB if 'Provider' in globals() else MetadataMatch.provider == "tmdb",
+            MetadataMatch.provider == Provider.TMDB,
             MetadataMatch.media_type == MediaType.EPISODE,
             MetadataMatch.external_id == str(tv_tmdb_id_int)
-        ).all() if 'Provider' in globals() else db.query(MetadataMatch).filter(
-            MetadataMatch.media_type == MediaType.EPISODE,
-            MetadataMatch.external_id == str(tv_tmdb_id_int)
-        ).all() # Just query dynamically
-
-        # Filter TMDB provider safely
-        from app.shared_kernel.enums import Provider
+        ).all()
         episode_matches = [m for m in episode_matches if m.provider == Provider.TMDB]
         episode_match_ids = [m.id for m in episode_matches]
         local_item_ids = [item.id for item in local_items]

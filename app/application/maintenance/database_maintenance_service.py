@@ -90,13 +90,7 @@ class DatabaseMaintenanceService:
             ))
 
     def _load_main_metadata(self) -> None:
-        import app.domains.tasks.models
-        import app.domains.history.models
-        import app.domains.library.models
-        import app.domains.metadata.models
-        import app.domains.people.models
-        import app.domains.settings.models
-        import app.domains.users.models
+        pass
 
     def _reset_sqlite_sequences(self, table_names: list[str]) -> None:
         has_sequence_table = self.db.execute(

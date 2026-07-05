@@ -3,7 +3,7 @@ import platform
 import shutil
 import subprocess
 import logging
-from typing import Optional, Tuple, Dict, Any
+from typing import Optional, Tuple
 
 logger = logging.getLogger(__name__)
 

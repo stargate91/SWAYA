@@ -2,13 +2,11 @@ import logging
 import re
 import urllib.parse
 import os
-from typing import Dict, Any, List, Optional
-from datetime import datetime, timezone
+from typing import Dict, Any, Optional
 import requests
 from sqlalchemy.orm import Session
 
 from app.domains.history.models import PlaybackPeakLog
-from app.domains.users.models import UserOverride
 from app.domains.library.models import MediaItem
 from app.shared_kernel.exceptions import NotFoundException
 

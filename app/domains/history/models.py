@@ -1,10 +1,14 @@
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import List, Optional, TYPE_CHECKING
 from sqlalchemy import String, Integer, DateTime, Enum as SQLEnum, JSON, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.shared_kernel.database import Base
 from app.shared_kernel.enums import ActionType, ActionStatus
+
+if TYPE_CHECKING:
+    from app.domains.users.models import User
+    from app.domains.library.models import MediaItem, ExtraFile
 
 class PlaybackLog(Base):
     """Every time a user plays a file, a log entry is created."""

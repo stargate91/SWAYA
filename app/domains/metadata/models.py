@@ -1,10 +1,15 @@
-from datetime import datetime, timezone
-from typing import List, Optional, Any
+from datetime import datetime
+from typing import List, Optional, Any, TYPE_CHECKING
 from sqlalchemy import String, Integer, Float, DateTime, Enum as SQLEnum, JSON, Boolean, ForeignKey, UniqueConstraint, Table, Column, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.shared_kernel.database import Base
 from app.shared_kernel.enums import Provider, MediaType
+
+if TYPE_CHECKING:
+    from app.domains.users.models import UserOverride
+    from app.domains.library.models import MediaItem
+    from app.domains.people.models import MediaPersonLink
 
 
 # Association table for MetadataMatch many-to-many relationship with Studio/Company/Network

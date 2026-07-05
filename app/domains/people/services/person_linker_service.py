@@ -1,7 +1,7 @@
 import logging
 import datetime
 from typing import Dict, Any, Optional
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 from sqlalchemy import func
 
 from app.domains.people.models import Person, ExternalSourceLink, MediaPersonLink
@@ -122,7 +122,7 @@ class PersonLinkerService:
 
         if duplicate_person and duplicate_person.id != person.id:
             existing_links = db.query(MediaPersonLink).filter(MediaPersonLink.person_id == person.id).all()
-            existing_match_roles = {(l.match_id, l.role) for l in existing_links}
+            existing_match_roles = {(x.match_id, x.role) for x in existing_links}
 
             dup_links = db.query(MediaPersonLink).filter(MediaPersonLink.person_id == duplicate_person.id).all()
             for dl in dup_links:
@@ -171,7 +171,7 @@ class PersonLinkerService:
             enricher = PeopleEnricher(db, scrapers=scraper_gateway)
             
             links = db.query(ExternalSourceLink).filter(ExternalSourceLink.person_id == person.id).all()
-            link_data = [{"provider": l.provider, "external_id": l.external_id} for l in links]
+            link_data = [{"provider": x.provider, "external_id": x.external_id} for x in links]
             
             for prov_name, ext_id in (person.external_ids or {}).items():
                 try:
@@ -302,7 +302,7 @@ class PersonLinkerService:
 
     def _sync_person_media_links(self, db: Session, person: Person):
         """Automatically scans library items matched to the performer's external sources and links them."""
-        links = {l.provider.value: l.external_id for l in person.external_links}
+        links = {x.provider.value: x.external_id for x in person.external_links}
         if not links:
             return
             

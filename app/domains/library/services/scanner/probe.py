@@ -1,6 +1,5 @@
 import subprocess
 import json
-import os
 import logging
 from typing import Dict, Any, Optional
 from .tech_mapping import map_resolution

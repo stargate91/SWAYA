@@ -1,4 +1,4 @@
-from typing import Protocol, Optional, Any, Iterable, BinaryIO
+from typing import Protocol, Optional, Any, BinaryIO
 
 class ImageServicePort(Protocol):
     def ensure_folders(self) -> None:

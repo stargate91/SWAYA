@@ -1,8 +1,6 @@
 import logging
-import re
 from typing import List, Dict, Any, Optional
 from datetime import datetime
-from sqlalchemy.orm import object_session
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.shared_kernel.language import LanguageService
 
@@ -80,7 +78,8 @@ class NameParser:
         return str(n)
 
     def format_number(self, num: Any, prefix_multi: str = "") -> str:
-        if num is None or str(num).strip() == "": return ""
+        if num is None or str(num).strip() == "":
+            return ""
         import json
         
         if isinstance(num, str):
@@ -106,7 +105,7 @@ class NameParser:
                         parts.append(formatted_n)
                 return "-".join(parts)
             return self.format_single_num(num)
-        except:
+        except Exception:
             return str(num)
 
     def resolve_studios(self, match: Any) -> tuple[str, str, str]:
@@ -149,22 +148,22 @@ class NameParser:
                     ).filter(MediaPersonLink.match_id == match.id).all()
         
         people_links = people_links or []
-        actor_links = [l for l in people_links if getattr(l, "role", None) == RoleType.ACTOR]
+        actor_links = [x for x in people_links if getattr(x, "role", None) == RoleType.ACTOR]
         
         sort_mode = self.config.naming_performer_sort
         if sort_mode == "popularity":
             actor_links.sort(
-                key=lambda l: (
-                    l.person.rating_porndb
-                    if getattr(l.person, "rating_porndb", None) is not None
-                    else getattr(l.person, "popularity", 0) or 0
+                key=lambda x: (
+                    x.person.rating_porndb
+                    if getattr(x.person, "rating_porndb", None) is not None
+                    else getattr(x.person, "popularity", 0) or 0
                 ),
                 reverse=True,
             )
         elif sort_mode == "name":
-            actor_links.sort(key=lambda l: getattr(l.person, "name", "").lower())
+            actor_links.sort(key=lambda x: getattr(x.person, "name", "").lower())
         else:
-            actor_links.sort(key=lambda l: getattr(l, "order", 0) or 0)
+            actor_links.sort(key=lambda x: getattr(x, "order", 0) or 0)
             
         for link in actor_links:
             person = getattr(link, "person", None)

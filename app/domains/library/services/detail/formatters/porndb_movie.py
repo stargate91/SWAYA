@@ -118,7 +118,7 @@ class PornDbMovieFormatter(MovieDetailFormatter):
                 except Exception as e:
                     logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/porndb_movie.py:97: {e}", exc_info=True)
             
-            loc_db = next((l for l in match.localizations if l.locale == "en"), None)
+            loc_db = next((x for x in match.localizations if x.locale == "en"), None)
             if not loc_db:
                 from app.domains.metadata.models import MetadataLocalization
                 loc_db = MetadataLocalization(
@@ -276,7 +276,7 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             "is_favorite": effective_override.is_favorite if effective_override else False,
             "user_rating": effective_override.user_rating if effective_override else None,
             "user_comment": effective_override.user_comment if effective_override else None,
-            "custom_tags": [t.name for t in effective_override.tags if t.is_adult == True] if (effective_override and effective_override.tags) else [],
+            "custom_tags": [t.name for t in effective_override.tags if t.is_adult] if (effective_override and effective_override.tags) else [],
             "suggested_tags": [t.get("name") for t in movie_data.get("tags") or [] if t.get("name")] if movie_data.get("tags") else [],
             "tags": [],
             "is_tracked": effective_override.is_tracked if effective_override else False,

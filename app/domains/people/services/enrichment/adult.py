@@ -5,7 +5,6 @@ from sqlalchemy.orm import Session
 from app.shared_kernel.enums import Provider
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
-from app.domains.people.services.enrichment.helpers import EnrichmentHelpers
 
 logger = logging.getLogger(__name__)
 

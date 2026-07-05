@@ -1,10 +1,15 @@
 from datetime import datetime, timezone
-from typing import List, Optional, Any
+from typing import List, Optional, Any, TYPE_CHECKING
 from sqlalchemy import String, Integer, Float, DateTime, Enum as SQLEnum, JSON, Boolean, ForeignKey, UniqueConstraint, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.shared_kernel.database import Base
 from app.shared_kernel.enums import ItemStatus, MovieEdition, MediaAudioType, MediaSource, ExtraCategory, ExtraSubtype
+
+if TYPE_CHECKING:
+    from app.domains.metadata.models import MetadataMatch
+    from app.domains.users.models import UserOverride
+    from app.domains.history.models import PlaybackLog
 
 
 class Library(Base):

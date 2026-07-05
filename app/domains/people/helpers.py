@@ -1,10 +1,10 @@
 import logging
-logger = logging.getLogger(__name__)
-
 import math
 from typing import List, Optional, Any
 from sqlalchemy.orm import Session
 from app.domains.media_assets.services.images import image_processing_service
+
+logger = logging.getLogger(__name__)
 
 TALK_LIKE_GENRE_IDS = {10763, 10764, 10767}
 SELF_ROLE_KEYWORDS = {"self", "himself", "herself", "themselves", "guest", "host", "presenter", "interviewer"}

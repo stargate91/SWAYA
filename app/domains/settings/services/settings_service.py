@@ -2,24 +2,20 @@ import os
 import shutil
 import platform
 import logging
-import json
 import requests
 import uuid
-from datetime import datetime
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
 
 
 from app.domains.settings.models import UserSetting, SystemSetting
 from app.shared_kernel.ports.library_port import LibraryPort
 from app.shared_kernel.constants import STASHDB_DEFAULT_ENDPOINT, FANSDB_DEFAULT_ENDPOINT, PORNDB_DEFAULT_ENDPOINT
 from app.domains.media_assets.services.images import image_processing_service
+from app.shared_kernel.ports.settings_port import SettingsPort
 
 logger = logging.getLogger(__name__)
-
-from app.shared_kernel.ports.settings_port import SettingsPort
 
 class SettingsService:
     def __init__(

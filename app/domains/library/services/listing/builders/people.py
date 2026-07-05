@@ -74,7 +74,7 @@ class PeopleQueryBuilder:
                     Tag, Tag.id == user_override_tags.c.tag_id
                 ).filter(
                     Tag.name.in_(params.selected_tags),
-                    UserOverride.person_id != None
+                    UserOverride.person_id is not None
                 ).all()
             ]
             people_items = [item for item in people_items if item.id in matching_person_ids]

@@ -1,9 +1,12 @@
 from datetime import datetime, timezone
-from typing import Any, Optional
+from typing import Any, Optional, TYPE_CHECKING
 from sqlalchemy import String, DateTime, JSON, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.shared_kernel.database import Base
+
+if TYPE_CHECKING:
+    from app.domains.users.models import User
 
 
 class SystemSetting(Base):

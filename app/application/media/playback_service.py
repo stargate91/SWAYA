@@ -5,14 +5,11 @@ import subprocess
 import threading
 from datetime import datetime, timezone
 from app.application.media.playback_logging_service import PlaybackLoggingService
-from typing import Optional, Any, List, Dict
+from typing import Optional, Any, List, Tuple
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 
-from app.shared_kernel.enums import Provider, MediaType
 from app.domains.media_assets.services.images import image_processing_service
-from app.shared_kernel.language import LanguageService
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.shared_kernel.exceptions import NotFoundException
 from app.application.media.schemas import (
     PlaybackStatusResponse,
@@ -37,9 +34,6 @@ class PlaybackService:
         from app.infrastructure.repositories.db_playback_repository import DbPlaybackRepository
         from app.domains.users.services.overrides_service import OverridesService
 
-        resolved_library_port = library_port or DbMediaResolver(db)
-        resolved_playback_repo = playback_repo or DbPlaybackRepository(db)
-        resolved_overrides = overrides_service or OverridesService(db, resolved_library_port)
 
         self.db = db
         self.library_port = library_port or DbMediaResolver(db)
@@ -92,7 +86,6 @@ class PlaybackService:
         self.db.commit()
 
         start_seconds = override.resume_position or 0
-        from typing import Tuple
         return item, override, start_seconds
 
     def add_watch_history_entry_core(self, item_id: int, watched_at_raw: Any = None) -> Any:
@@ -230,7 +223,6 @@ class PlaybackService:
 
     def get_playback_info(self, item_id: Any):
         from app.domains.library.models import MediaItem
-        from app.domains.users.models import UserOverride
         
         try:
             item_id_int = int(item_id)
@@ -322,7 +314,7 @@ class PlaybackService:
                 def pad(num):
                     try:
                         return str(int(num)).zfill(2)
-                    except:
+                    except Exception:
                         return str(num).zfill(2)
 
                 if isinstance(ep_num, list) and ep_num:
@@ -337,7 +329,7 @@ class PlaybackService:
                             ep_str = f"E{pad(parsed[0])}-{pad(parsed[-1])}" if len(parsed) > 1 else f"E{pad(parsed[0])}"
                         else:
                             ep_str = f"E{pad(parsed)}"
-                    except:
+                    except Exception:
                         ep_str = f"E{pad(ep_num)}"
                 else:
                     ep_str = f"E{pad(ep_num or 0)}"

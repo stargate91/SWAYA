@@ -4,7 +4,6 @@ import time
 from typing import List, Optional, Any, Dict
 
 from app.shared_kernel.enums import ScanMode
-from app.domains.library.models import Library
 from app.domains.library.services.scanner.service.status_coordinator import StatusCoordinator
 
 logger = logging.getLogger(__name__)

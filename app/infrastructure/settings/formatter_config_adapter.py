@@ -1,6 +1,4 @@
 import logging
-logger = logging.getLogger(__name__)
-
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -8,6 +6,8 @@ from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.domains.library.models import Library, MediaItem
 from app.domains.library.services.formatter.config import Casing, FormatterConfig, Separator
 from app.domains.settings.models import SystemSetting, UserSetting
+
+logger = logging.getLogger(__name__)
 
 
 def _settings_dict(db_session, user_id: int = 1) -> Dict[str, Any]:

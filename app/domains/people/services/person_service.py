@@ -1,14 +1,9 @@
 import logging
-from typing import List, Optional, Any, Dict
+from typing import List, Optional
 from sqlalchemy.orm import Session
-from app.domains.people.models import Person, ExternalSourceLink
+from app.domains.people.models import Person
 from app.shared_kernel.enums import Provider
 from app.shared_kernel.ports.people_repository_port import PeopleRepositoryPort
-from app.domains.people.helpers import (
-    known_for_score,
-    select_known_for,
-    resolve_person_known_for_backdrop,
-)
 
 logger = logging.getLogger(__name__)
 

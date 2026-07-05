@@ -1,6 +1,4 @@
 import logging
-logger = logging.getLogger(__name__)
-
 from pathlib import Path
 from typing import Tuple, Optional
 from app.shared_kernel.enums import ExtraCategory, ExtraSubtype
@@ -13,6 +11,8 @@ from app.shared_kernel.constants import (
     CATEGORIZER_AUDIO_EXTS,
     CATEGORIZER_META_EXTS,
 )
+
+logger = logging.getLogger(__name__)
 
 class Categorizer:
     """
@@ -51,10 +51,14 @@ class Categorizer:
                 logger.debug(f"Swallowed exception in domains/library/services/scanner/categorizer.py:42: {e}", exc_info=True)
 
         if settings:
-            if "extras_sub_exts" in settings: sub_exts = [e.strip() for e in settings["extras_sub_exts"].split(",")]
-            if "extras_audio_exts" in settings: audio_exts = [e.strip() for e in settings["extras_audio_exts"].split(",")]
-            if "extras_img_exts" in settings: img_exts = [e.strip() for e in settings["extras_img_exts"].split(",")]
-            if "extras_meta_exts" in settings: meta_exts = [e.strip() for e in settings["extras_meta_exts"].split(",")]
+            if "extras_sub_exts" in settings:
+                sub_exts = [e.strip() for e in settings["extras_sub_exts"].split(",")]
+            if "extras_audio_exts" in settings:
+                audio_exts = [e.strip() for e in settings["extras_audio_exts"].split(",")]
+            if "extras_img_exts" in settings:
+                img_exts = [e.strip() for e in settings["extras_img_exts"].split(",")]
+            if "extras_meta_exts" in settings:
+                meta_exts = [e.strip() for e in settings["extras_meta_exts"].split(",")]
             if "naming_video_exts" in settings:
                 video_exts = [
                     e.strip().lower() if e.strip().startswith('.') else f".{e.strip().lower()}"
@@ -96,9 +100,13 @@ class Categorizer:
                 subtype = ExtraSubtype.FEATURETTE
 
         # Special case for Metadata files
-        if ext == '.nfo': subtype = ExtraSubtype.NFO
-        elif ext == '.xml': subtype = ExtraSubtype.XML
-        elif ext == '.json': subtype = ExtraSubtype.JSON
-        elif ext == '.txt': subtype = ExtraSubtype.TXT
+        if ext == '.nfo':
+            subtype = ExtraSubtype.NFO
+        elif ext == '.xml':
+            subtype = ExtraSubtype.XML
+        elif ext == '.json':
+            subtype = ExtraSubtype.JSON
+        elif ext == '.txt':
+            subtype = ExtraSubtype.TXT
                 
         return category, subtype

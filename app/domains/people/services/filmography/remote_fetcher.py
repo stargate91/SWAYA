@@ -1,14 +1,13 @@
 import logging
 import math
-from typing import Optional, List, Dict, Any
+from typing import Optional, Any
 from sqlalchemy.orm import Session
 
-from app.shared_kernel.enums import Provider, MediaType
+from app.shared_kernel.enums import Provider
 from app.domains.people.models import Person, MediaPersonLink
 from app.shared_kernel.ports.library_port import LibraryPort
 from app.shared_kernel.ports.image_service_port import ImageServicePort
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
-from app.shared_kernel.language import LanguageService
 from app.domains.people.services.filmography.strategies.base_strategy import BaseFilmographyStrategy
 
 logger = logging.getLogger(__name__)
@@ -31,7 +30,6 @@ class RemoteCreditsFetcher:
         page: int,
         page_size: int
     ) -> Optional[dict]:
-        scraper_gateway = self.scrapers
         
         db = self.db
         person = db.query(Person).filter(Person.id == person_id).first()
@@ -46,7 +44,7 @@ class RemoteCreditsFetcher:
         if not ext_id:
             try:
                 prov_enum = Provider(source.lower())
-                link = next((l for l in person.external_links if l.provider == prov_enum), None)
+                link = next((x for x in person.external_links if x.provider == prov_enum), None)
                 if link:
                     ext_id = link.external_id
             except ValueError as e:
@@ -116,7 +114,7 @@ class RemoteCreditsFetcher:
                                 existing.data = {"items": clean_items, "total_items": total_items}
                                 db.commit()
                                 return
-                        except Exception as inner_e:
+                        except Exception:
                             db.rollback()
                     logger.error(f"Error saving remote filmography cache: {e}")
 

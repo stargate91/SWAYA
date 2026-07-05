@@ -1,1 +1,1 @@
-from app.application.catalog.lists_service import ListsService
+from app.application.catalog.lists_service import ListsService as ListsService

@@ -1,5 +1,5 @@
 import logging
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Any, Optional, Tuple
 from sqlalchemy.orm import Session
 from app.shared_kernel.enums import Provider
 

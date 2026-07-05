@@ -1,8 +1,8 @@
 import logging
-logger = logging.getLogger(__name__)
-
 from typing import List, Optional
 from app.shared_kernel.enums import Provider
+
+logger = logging.getLogger(__name__)
 
 class PrioritizedResultDict(dict):
     def __init__(self, *args, **kwargs):
@@ -112,9 +112,9 @@ def fetch_external_details(
     to_process = list(all_links)
 
     while to_process:
-        l = to_process.pop(0)
-        provider = l["provider"]
-        external_id = l["external_id"]
+        link = to_process.pop(0)
+        provider = link["provider"]
+        external_id = link["external_id"]
 
         pair = (provider, external_id)
         if pair in processed_pairs:
@@ -132,7 +132,7 @@ def fetch_external_details(
                 if enricher.adult_enricher.enrich_adult(provider, external_id, result, to_process, processed_pairs):
                     has_data = True
 
-    existing_providers = {l["provider"] for l in links}
+    existing_providers = {x["provider"] for x in links}
     for prov_name, ext_id in external_ids.items():
         try:
             prov = Provider(prov_name)

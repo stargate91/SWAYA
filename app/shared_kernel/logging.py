@@ -29,7 +29,7 @@ def get_log_filepath() -> str:
         os.makedirs(log_dir, exist_ok=True)
         log_file = os.path.join(log_dir, "swaya.log")
         # Test if writable
-        with open(log_file, "a") as f:
+        with open(log_file, "a"):
             pass
         return log_file
     except Exception:

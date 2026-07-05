@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from sqlalchemy.orm import Session
 from app.shared_kernel.enums import Provider, MediaType
 from app.domains.metadata.models import MetadataMatch

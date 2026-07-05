@@ -1,13 +1,13 @@
 import logging
-from typing import Optional, Any, List, Tuple
+from typing import Any
 from sqlalchemy.orm import Session
 
 from app.domains.media.services.playback_domain_service import PlaybackDomainService
 from app.shared_kernel.exceptions import NotFoundException
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.shared_kernel.language import LanguageService
-from app.domains.media_assets.services.images import image_processing_service
 from app.application.media.schemas import WatchedHistoryResponse
+from app.domains.users.models import UserOverride
 
 logger = logging.getLogger(__name__)
 
@@ -22,16 +22,12 @@ class PlaybackLoggingService:
         db.refresh(item)
         
         # recalculate watch state
-        override = db.query(UserOverride).filter(UserOverride.media_item_id == item.id).first() if 'UserOverride' in globals() else None
+        override = db.query(UserOverride).filter(UserOverride.media_item_id == item.id).first()
         if not override:
-            from app.domains.users.models import UserOverride
             override = db.query(UserOverride).filter(
                 UserOverride.media_item_id == item.id,
-                UserOverride.user_id == (override.user_id if override else 1) # fallback
+                UserOverride.user_id == 1  # fallback
             ).first()
-            if not override:
-                # we'll fetch from overrides via parameter or context
-                pass
         
         return item
 

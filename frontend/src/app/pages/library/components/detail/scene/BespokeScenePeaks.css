@@ -55,7 +55,6 @@
   font-style: italic;
 }
 
-/* Vertical list layout */
 .bespoke-scene-peaks-list {
   display: flex;
   flex-direction: column;

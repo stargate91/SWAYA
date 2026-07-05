@@ -2,8 +2,7 @@ import logging
 from typing import Optional, List, Dict, Any, Tuple
 from sqlalchemy.orm import Session
 
-from app.domains.people.models import Person, ExternalSourceLink
-from app.domains.people.schemas import PersonDetailResponse
+from app.domains.people.models import Person
 
 logger = logging.getLogger(__name__)
 
@@ -147,16 +146,16 @@ class ProfileMerger:
             
         merged_ids = dict(external_ids or {})
         links_list = generate_external_links(merged_ids, "person", homepage=person.homepage)
-        for l in links_list:
-            key_lower = l["key"].lower()
+        for link in links_list:
+            key_lower = link["key"].lower()
             if key_lower not in seen_keys:
                 formatted_links.append({
-                    "provider": l["key"],
-                    "external_id": l["url"].split("/")[-1],
-                    "profile_url": l["url"],
+                    "provider": link["key"],
+                    "external_id": link["url"].split("/")[-1],
+                    "profile_url": link["url"],
                     "source_data": None,
-                    "name": l["name"],
-                    "url": l["url"]
+                    "name": link["name"],
+                    "url": link["url"]
                 })
                 seen_keys.add(key_lower)
 

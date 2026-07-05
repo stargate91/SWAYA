@@ -1,6 +1,5 @@
 import logging
-from typing import List, Optional, Dict, Any
-from sqlalchemy import func
+from typing import List, Optional
 from sqlalchemy.orm import Session, selectinload
 
 from app.domains.people.models import Person, MediaPersonLink
@@ -79,9 +78,9 @@ class PeopleLibraryService:
         )
 
         if filter_status == "active":
-            query = query.filter(Person.is_active == True)
+            query = query.filter(Person.is_active)
         elif filter_status == "inactive":
-            query = query.filter(Person.is_active == False)
+            query = query.filter(not Person.is_active)
 
         query = query.filter(Person.is_adult == include_adult)
 

@@ -1,5 +1,4 @@
 import logging
-import requests
 from typing import Optional, Dict, Any
 
 from app.shared_kernel.enums import Provider

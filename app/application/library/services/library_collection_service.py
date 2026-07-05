@@ -48,7 +48,7 @@ class LibraryCollectionService:
             MediaItem, MetadataMatch.media_item_id == MediaItem.id
         ).filter(
             MediaItem.status.in_(lib_statuses),
-            MetadataMatch.collection_id != None
+            MetadataMatch.collection_id.isnot(None)
         )
 
         query = query.filter(MetadataMatch.is_adult == include_adult)

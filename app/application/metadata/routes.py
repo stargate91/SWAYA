@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import Optional
 
@@ -6,6 +6,7 @@ from app.shared_kernel.database import get_db
 from app.infrastructure.scrapers.support.gateway import scraper_gateway
 from app.domains.metadata.services.metadata_service import MetadataService
 from app.application.metadata.schemas import MetadataResolveRequest, BulkResolveRequest
+from app.infrastructure.media.db_media_resolver import DbMediaResolver
 
 library_router = APIRouter(prefix="/api/v1", tags=["Metadata"])
 
@@ -25,7 +26,6 @@ def get_metadata_seasons(tmdb_id: int, db: Session = Depends(get_db)):
 def get_metadata_episodes(tmdb_id: int, season_number: int, db: Session = Depends(get_db)):
     return MetadataService(db, scraper_gateway).get_episodes(tmdb_id, season_number)
 
-from app.infrastructure.media.db_media_resolver import DbMediaResolver
 
 @library_router.post("/metadata/resolve")
 def resolve_metadata_item(payload: MetadataResolveRequest, db: Session = Depends(get_db)):

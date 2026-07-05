@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import Any, Optional
 from sqlalchemy.orm import Session
 
 from app.shared_kernel.enums import MediaType, ItemStatus
@@ -60,8 +60,8 @@ class OrganizerGroupsBuilder:
                     target_lang_clean = LanguageService.resolve_request_locale(Provider.TMDB, target_lang)
                     if target_lang_clean:
                         has_target_loc = any(
-                            LanguageService.resolve_request_locale(Provider.TMDB, l.locale) == target_lang_clean
-                            for l in active_match.localizations
+                            LanguageService.resolve_request_locale(Provider.TMDB, localization.locale) == target_lang_clean
+                            for localization in active_match.localizations
                         )
                         if not has_target_loc:
                             try:

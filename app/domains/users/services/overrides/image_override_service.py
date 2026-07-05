@@ -3,7 +3,6 @@ import uuid
 import logging
 from typing import Dict, Any, Optional
 
-from app.domains.users.models import UserOverride
 from app.domains.media_assets.services.images import image_processing_service
 from app.shared_kernel.exceptions import NotFoundException, BadRequestException
 

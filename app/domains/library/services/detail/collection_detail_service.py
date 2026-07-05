@@ -13,6 +13,7 @@ from app.shared_kernel.ports.image_download_port import ImageDownloadPort
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.shared_kernel.language import LanguageService
 from app.domains.library.services.detail._detail_formatter import DetailFormatter
+from app.domains.library.schemas import CollectionDetailResponse
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +26,6 @@ class CollectionDetailService(DetailFormatter):
         self.image_downloader = image_downloader
 
     def get_collection_detail(self, collection_tmdb_id: str, language: str | None = None) -> CollectionDetailResponse:
-        from app.domains.library.schemas import CollectionDetailResponse
         db = self.db
         try:
             collection_tmdb_id_int = int(collection_tmdb_id)
@@ -114,8 +114,8 @@ class CollectionDetailService(DetailFormatter):
         local_items = db.query(MediaItem).join(MediaItem.matches).filter(
             MediaItem.status.in_([ItemStatus.ORGANIZED, ItemStatus.RENAMED]),
             MetadataMatch.media_type == MediaType.MOVIE,
-            MetadataMatch.collection_id != None,
-            MetadataMatch.is_active == True,
+            MetadataMatch.collection_id is not None,
+            MetadataMatch.is_active,
         ).all()
         
         collection_items = []

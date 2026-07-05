@@ -1,14 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, File, UploadFile
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-from typing import List, Optional, Any
-from pydantic import BaseModel
+from typing import List, Optional
 
 from app.shared_kernel.database import get_db
-from app.shared_kernel.enums import ScanMode
 from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
-from app.domains.library.models import MediaItem, Library
-from app.domains.metadata.models import MetadataMatch
 from app.domains.library.services.library_service import LibraryService
 from app.application.metadata.schemas import MetadataMatchRead
 from app.application.library.schemas import (
@@ -21,21 +17,22 @@ from app.application.library.schemas import (
     TagGroupItem,
     FilterOptionsResponse,
     MovieCollectionsResponse,
-    MovieDetailResponse,
     TvShowDetailResponse,
     TvSeasonDetailResponse,
     CollectionDetailResponse,
-    SceneDetailResponse,
 )
 from app.application.people.schemas import PeopleGroupItem
-from app.application.users.schemas import (
-    ItemOverridesUpdate,
-    ItemStatusUpdate,
-    ImageOverrideUpdate,
-    BulkOverridesUpdate,
-    BulkTagsUpdate,
-    BulkWatchedUpdate,
-)
+from app.application.library.services.library_stats_service import LibraryStatsService
+from app.application.library.services.library_listing_service import LibraryListingService
+from app.application.library.services.library_collection_service import LibraryCollectionService
+from app.application.library.services.library_filter_service import LibraryFilterService
+from typing import Union
+from app.domains.people.services.people_library_service import PeopleLibraryService
+from app.domains.library.services.detail.movie_detail_service import MovieDetailService
+from app.domains.library.services.detail.tv_detail_service import TvDetailService
+from app.domains.library.services.detail.scene_detail_service import SceneDetailService
+from app.domains.library.services.detail.collection_detail_service import CollectionDetailService
+from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 
 # Mainstream (SFW) Media Router
 mainstream_router = APIRouter(prefix="/api/v1/mainstream/media", tags=["Mainstream Media"])
@@ -77,12 +74,7 @@ def list_libraries(db: Session = Depends(get_db)):
     return LibraryService(db).list_libraries()
 
 
-from app.application.library.services.library_stats_service import LibraryStatsService
-from app.application.library.services.library_listing_service import LibraryListingService
-from app.application.library.services.library_collection_service import LibraryCollectionService
-from app.application.library.services.library_filter_service import LibraryFilterService
 
-from typing import Union
 
 @library_router.get("/library/stats", response_model=LibraryStatsResponse)
 def get_stats(db: Session = Depends(get_db), include_adult: bool = False):
@@ -217,7 +209,6 @@ def get_movie_collections(
 
 
 
-from app.domains.people.services.people_library_service import PeopleLibraryService
 
 @library_router.get("/library/people/{role}", response_model=List[PeopleGroupItem])
 def get_library_people(
@@ -236,11 +227,7 @@ def get_library_people(
     )
 
 
-from app.domains.library.services.detail.movie_detail_service import MovieDetailService
-from app.domains.library.services.detail.tv_detail_service import TvDetailService
-from app.domains.library.services.detail.scene_detail_service import SceneDetailService
-from app.domains.library.services.detail.collection_detail_service import CollectionDetailService
-from app.shared_kernel.ports.scrapers import ScraperGatewayPort
+
 
 def get_scraper_gateway() -> ScraperGatewayPort:
     from app.infrastructure.scrapers.support.gateway import scraper_gateway

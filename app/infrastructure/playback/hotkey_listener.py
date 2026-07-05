@@ -24,7 +24,7 @@ def trigger_peak_moment():
         from app.domains.metadata.models import MetadataMatch
         is_adult = db.query(MetadataMatch).filter(
             MetadataMatch.media_item_id == item_id,
-            MetadataMatch.is_adult == True
+            MetadataMatch.is_adult
         ).count() > 0
         
         if not is_adult:

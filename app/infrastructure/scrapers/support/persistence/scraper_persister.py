@@ -84,9 +84,9 @@ class ScraperPersister:
             self.studio_persister.persist_studios(norm.get("studios", []), match)
 
             loc = None
-            for l in match.localizations:
-                if l.locale == DEFAULT_FALLBACK_LANGUAGE:
-                    loc = l
+            for x in match.localizations:
+                if x.locale == DEFAULT_FALLBACK_LANGUAGE:
+                    loc = x
                     break
             if not loc:
                 loc = self.metadata_repo.get_localization(match.id, DEFAULT_FALLBACK_LANGUAGE)
@@ -148,9 +148,9 @@ class ScraperPersister:
                 self.match_persister.persist_collection(coll_info, match, language)
 
             loc = None
-            for l in match.localizations:
-                if l.locale == language:
-                    loc = l
+            for x in match.localizations:
+                if x.locale == language:
+                    loc = x
                     break
             if not loc:
                 loc = self.metadata_repo.get_localization(match.id, language)

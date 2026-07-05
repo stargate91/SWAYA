@@ -33,7 +33,7 @@ class SceneCastBuilder:
                 if (r_date.month, r_date.day) < (b_date.month, b_date.day):
                     age -= 1
                 return age
-            except:
+            except Exception:
                 return None
 
         # 1. Add performers from local database match
@@ -42,7 +42,7 @@ class SceneCastBuilder:
                 joinedload(MediaPersonLink.person)
             ).filter(MediaPersonLink.match_id == match_db.id).all()
             
-            person_ids = [l.person_id for l in people_links]
+            person_ids = [x.person_id for x in people_links]
             override_map = {}
             if person_ids:
                 overrides = db.query(UserOverride).filter(

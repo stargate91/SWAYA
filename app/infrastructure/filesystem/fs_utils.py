@@ -8,6 +8,7 @@ import sys
 import subprocess
 from pathlib import Path
 from typing import Iterable, Set, Optional
+from app.shared_kernel.ports.file_system_port import FileSystemPort
 
 from PIL import Image
 
@@ -286,7 +287,6 @@ def calculate_full_sha256(filepath: str) -> Optional[str]:
         return None
 
 
-from app.shared_kernel.ports.file_system_port import FileSystemPort
 
 class DbFileSystemAdapter(FileSystemPort):
     def calculate_fast_hash(self, file_path: str) -> str:

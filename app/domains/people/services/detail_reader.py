@@ -2,7 +2,6 @@ import logging
 from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
 
-from app.shared_kernel.enums import MediaType
 from app.domains.people.models import Person
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
@@ -85,7 +84,7 @@ class PerformerDetailReader:
         return self.paginator.get_person_scenes(person, page=page, page_size=page_size, source=source, local_only=local_only)
 
     def get_person_credit_backdrops(self, person_id: Any, tmdb_id: int, media_type: str) -> Dict[str, Any]:
-        person = self._resolve_person(person_id)
+        self._resolve_person(person_id)
         normalized_type = "tv" if str(media_type or "").lower() in {"tv", "series"} else "movie"
         ui_lang = DEFAULT_FALLBACK_LANGUAGE
 

@@ -6,7 +6,7 @@ from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 
 from app.domains.metadata.models import MetadataMatch
-from app.domains.people.models import Person, MediaPersonLink
+from app.domains.people.models import Person
 from app.domains.people.services import PersonService
 from app.shared_kernel.enums import Provider, RoleType
 from app.shared_kernel.ports.people_repository_port import PeopleRepositoryPort
@@ -74,7 +74,7 @@ class PerformerPersister:
         if ext == ".jpeg":
             ext = ".jpg"
 
-        safe_name = re.sub(r"[^A-Za-z0-9_.-]+", "_", person.name).strip("_")
+        re.sub(r"[^A-Za-z0-9_.-]+", "_", person.name).strip("_")
         ext_id = "unknown"
         prov_val = "perf"
         if person.external_ids:

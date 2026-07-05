@@ -1,5 +1,5 @@
 import logging
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from app.domains.library.services.scanner.tech_mapping import map_resolution
 
 logger = logging.getLogger(__name__)
@@ -35,7 +35,8 @@ class TechParser:
     @staticmethod
     def parse_resolution(resolution: str) -> str:
         """Standardizes resolution strings (e.g., 1920x1080 -> 1080p)."""
-        if not resolution: return ""
+        if not resolution:
+            return ""
         if "x" in resolution.lower() and "p" not in resolution.lower():
             try:
                 parts = resolution.lower().split("x")
@@ -49,7 +50,8 @@ class TechParser:
     @staticmethod
     def format_enum_val(enum_obj) -> str:
         """Formats internal enum values for display (e.g., directors_cut -> Director's Cut)."""
-        if not enum_obj or enum_obj.value == "none": return ""
+        if not enum_obj or enum_obj.value == "none":
+            return ""
         val = enum_obj.value.replace("_", " ").title()
         val = val.replace("Directors Cut", "Director's Cut")
         val = val.replace("Collectors Edition", "Collector's Edition")
@@ -59,10 +61,13 @@ class TechParser:
     @staticmethod
     def format_source(source_enum) -> str:
         """Special formatting for media sources."""
-        if not source_enum or source_enum.value == "none": return ""
+        if not source_enum or source_enum.value == "none":
+            return ""
         val = source_enum.value.upper()
-        if val == "BLURAY": return "BluRay"
-        if val == "WEB": return "WEB-DL"
+        if val == "BLURAY":
+            return "BluRay"
+        if val == "WEB":
+            return "WEB-DL"
         return val
 
     @staticmethod
@@ -72,9 +77,12 @@ class TechParser:
             list(set(i.resolution for i in items if i.resolution)),
             key=TechParser._resolution_sort_key
         )
-        if not res_list: return ""
-        if len(res_list) == 1: return res_list[0]
-        if len(res_list) == 2: return f"{res_list[0]}-{res_list[1]}"
+        if not res_list:
+            return ""
+        if len(res_list) == 1:
+            return res_list[0]
+        if len(res_list) == 2:
+            return f"{res_list[0]}-{res_list[1]}"
         return "Mixed"
 
     @staticmethod

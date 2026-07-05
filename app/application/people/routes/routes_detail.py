@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
-from typing import List, Any
+from typing import Any
 
 from app.shared_kernel.database import get_db
 from app.infrastructure.scrapers.support.gateway import scraper_gateway
@@ -17,7 +17,6 @@ def _people_detail_service(db: Session, scrapers=None) -> Any:
     from app.infrastructure.media.db_media_resolver import DbMediaResolver
     from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
     from app.domains.people.services.people_detail_service import PeopleDetailService
-    from typing import Any
     return PeopleDetailService(
         db,
         scrapers or scraper_gateway,
@@ -25,8 +24,6 @@ def _people_detail_service(db: Session, scrapers=None) -> Any:
         image_downloader=TasksImageDownloadAdapter()
     )
 
-# Python needs Any to be defined for the return type of the helper function above
-from typing import Any
 
 @router.get("", response_model=PeopleSearchResponse)
 def get_people(

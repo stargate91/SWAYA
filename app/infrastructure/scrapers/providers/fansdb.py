@@ -3,7 +3,6 @@ from typing import Optional
 
 from app.shared_kernel.enums import Provider, MediaType
 from app.infrastructure.scrapers.support.base import BaseScraper
-from app.infrastructure.scrapers.support.normalizer import ScraperNormalizer
 
 from app.shared_kernel.constants import FANSDB_DEFAULT_ENDPOINT, SCRAPER_REQUEST_TIMEOUT
 

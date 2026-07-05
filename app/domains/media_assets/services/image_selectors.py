@@ -1,8 +1,4 @@
 import logging
-logger = logging.getLogger(__name__)
-
-import os
-import logging
 from pathlib import Path
 from typing import Optional
 from PIL import Image
@@ -20,6 +16,8 @@ from app.shared_kernel.constants import (
     BACKDROP_DEFAULT_MIN_WIDTH,
     IMAGE_DOWNLOAD_TIMEOUT,
 )
+
+logger = logging.getLogger(__name__)
 
 def measure_logo_darkness(image: Image.Image) -> Optional[tuple[float, float]]:
     rgba = image.convert("RGBA")

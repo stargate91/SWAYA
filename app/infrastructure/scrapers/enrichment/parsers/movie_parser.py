@@ -1,4 +1,3 @@
-from typing import Dict, Any
 from app.domains.metadata.models import MetadataMatch
 from app.shared_kernel.enums import Provider
 from app.domains.media_assets.services.images import image_processing_service

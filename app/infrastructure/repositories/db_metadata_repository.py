@@ -31,7 +31,7 @@ class DbMetadataRepository(MetadataRepositoryPort):
     def get_match_by_item(self, media_item_id: int, active_only: bool = False) -> Optional[Any]:
         query = self.db.query(MetadataMatch).filter(MetadataMatch.media_item_id == media_item_id)
         if active_only:
-            query = query.filter(MetadataMatch.is_active == True)
+            query = query.filter(MetadataMatch.is_active)
         return query.first()
 
     def get_tv_match(self, provider: Provider, external_id: str) -> Optional[Any]:

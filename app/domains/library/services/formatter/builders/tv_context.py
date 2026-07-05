@@ -1,6 +1,5 @@
 import logging
-from typing import List, Dict, Any, Optional
-from datetime import datetime
+from typing import List, Dict, Any
 from sqlalchemy.orm import object_session
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 
@@ -66,9 +65,9 @@ def build_tv_context(
     def get_loc(m):
         if not m:
             return None
-        for l in getattr(m, "localizations", []):
-            if l.locale == locale:
-                return l
+        for loc in getattr(m, "localizations", []):
+            if loc.locale == locale:
+                return loc
         if getattr(m, "localizations", None):
             return m.localizations[0]
         return None
@@ -183,9 +182,9 @@ def build_tv_context(
                                 
                                 if target_ep_match:
                                     target_loc = None
-                                    for l in getattr(target_ep_match, "localizations", []):
-                                        if l.locale == locale:
-                                            target_loc = l
+                                    for loc in getattr(target_ep_match, "localizations", []):
+                                        if loc.locale == locale:
+                                            target_loc = loc
                                             break
                                     if not target_loc and getattr(target_ep_match, "localizations", None):
                                         target_loc = target_ep_match.localizations[0]

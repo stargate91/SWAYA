@@ -1,7 +1,6 @@
 import os
 import subprocess
 import logging
-from typing import Optional
 from app.shared_kernel.database import SWAYA_DB_PATH
 from app.infrastructure.filesystem.fs_utils import to_win_long_path
 

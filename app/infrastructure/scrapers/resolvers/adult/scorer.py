@@ -1,6 +1,5 @@
 import difflib
 import logging
-from typing import Set
 from app.shared_kernel.enums import ItemStatus
 from app.domains.library.models import MediaItem
 from app.infrastructure.scrapers.resolver import normalize_title, normalize_title_words

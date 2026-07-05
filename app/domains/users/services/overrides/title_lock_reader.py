@@ -38,7 +38,7 @@ class TitleLockReader:
             physical_override = self.db.query(UserOverride).filter(
                 UserOverride.user_id == self.user_id,
                 UserOverride.media_item_id == media_item_id,
-                UserOverride.metadata_match_id == None
+                UserOverride.metadata_match_id is None
             ).first()
             if physical_override:
                 try:
@@ -104,7 +104,7 @@ class TitleLockReader:
             return self.db.query(UserOverride).filter(
                 UserOverride.user_id == self.user_id,
                 UserOverride.media_item_id == media_item_id,
-                UserOverride.metadata_match_id == None
+                UserOverride.metadata_match_id is None
             ).first()
 
         override = query_physical()

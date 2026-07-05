@@ -169,7 +169,7 @@ class MatchPersister:
                             continue
                         try:
                             candidate_year = int(str(candidate_date).split("-")[0])
-                        except:
+                        except Exception:
                             continue
                         if abs(candidate_year - target_year) <= 1:
                             ambiguous_exact_candidates += 1

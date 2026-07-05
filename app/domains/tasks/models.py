@@ -1,9 +1,12 @@
 from datetime import datetime, timezone
-from typing import Optional, List, Dict, Any
+from typing import Optional, Dict, Any, TYPE_CHECKING
 from sqlalchemy import String, Float, DateTime, Enum as SQLEnum, ForeignKey, Integer, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.shared_kernel.database import Base
+
+if TYPE_CHECKING:
+    from app.domains.users.models import User
 from app.shared_kernel.enums import TaskStatus, TaskErrorCode, Provider
 
 

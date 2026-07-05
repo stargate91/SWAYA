@@ -1,6 +1,4 @@
 import logging
-logger = logging.getLogger(__name__)
-
 from typing import Optional, List, Any
 from sqlalchemy.orm import Session, joinedload, selectinload
 from app.shared_kernel.ports.playback_repository_port import PlaybackRepositoryPort
@@ -8,6 +6,8 @@ from app.shared_kernel.enums import MediaType
 from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch
 from app.domains.history.models import PlaybackLog
+
+logger = logging.getLogger(__name__)
 
 class DbPlaybackRepository(PlaybackRepositoryPort):
     def __init__(self, db: Session):
@@ -46,7 +46,7 @@ class DbPlaybackRepository(PlaybackRepositoryPort):
                             if loaded == ep_num or (isinstance(loaded, list) and ep_num in loaded):
                                 match_db = ep
                                 break
-                        except:
+                        except Exception:
                             if ep_val == str(ep_num):
                                 match_db = ep
                                 break
@@ -79,7 +79,7 @@ class DbPlaybackRepository(PlaybackRepositoryPort):
                             if loaded == ep_num or (isinstance(loaded, list) and ep_num in loaded):
                                 match_db = ep
                                 break
-                        except:
+                        except Exception:
                             if ep_val == str(ep_num):
                                 match_db = ep
                                 break
@@ -137,8 +137,8 @@ class DbPlaybackRepository(PlaybackRepositoryPort):
         if not include_adult:
             active_adult_match = self.db.query(MetadataMatch.id).filter(
                 MetadataMatch.media_item_id == MediaItem.id,
-                MetadataMatch.is_active == True,
-                MetadataMatch.is_adult == True,
+                MetadataMatch.is_active,
+                MetadataMatch.is_adult,
             ).exists()
             query = query.filter(~active_adult_match)
 

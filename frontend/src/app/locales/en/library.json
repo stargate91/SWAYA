@@ -259,6 +259,8 @@
     "yearMode": "Year"
   },
   "details": {
+    "tab_activity": "Activity",
+    "tab_organize": "Organize",
     "viewOriginalImage": "View Original Image",
     "favorite": "Favorite",
     "createTag": "Create tag \"{{name}}\"",

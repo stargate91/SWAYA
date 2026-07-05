@@ -48,7 +48,7 @@ def enrich_people_for_matches(
                 return False
             person_name = person.name
             links = local_db.query(ExternalSourceLink).filter(ExternalSourceLink.person_id == person_id).all()
-            link_data = [{"provider": l.provider, "external_id": l.external_id} for l in links]
+            link_data = [{"provider": x.provider, "external_id": x.external_id} for x in links]
             external_ids = person.external_ids or {}
             is_adult = person.is_adult
         finally:

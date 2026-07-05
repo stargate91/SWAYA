@@ -1,4 +1,4 @@
-from typing import Protocol, Any, Optional, Callable
+from typing import Protocol, Any
 
 class TaskMonitorPort(Protocol):
     def is_cancelled(self, task_id: int) -> bool:

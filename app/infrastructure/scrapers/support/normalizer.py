@@ -1,9 +1,7 @@
 import logging
-from typing import Optional, Dict, Any, List
-from datetime import datetime
+from typing import Dict, Any
 
 # Import helpers & normalizers
-from app.infrastructure.scrapers.support.normalization.helpers import normalize_tag_names, safe_parse_date
 from app.infrastructure.scrapers.support.normalization.tmdb_movie_normalizer import TmdbMovieNormalizer
 from app.infrastructure.scrapers.support.normalization.porndb_movie_normalizer import PorndbMovieNormalizer
 from app.infrastructure.scrapers.support.normalization.adult_scene_normalizer import AdultSceneNormalizer

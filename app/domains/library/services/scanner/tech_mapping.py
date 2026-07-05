@@ -5,13 +5,20 @@ def map_resolution(width: int, height: int) -> str:
     h = min(width, height)
     w = max(width, height)
     
-    if w >= 7000: return "8K"
-    if w >= 3500: return "2160p"
-    if w >= 2500: return "1440p"
-    if w >= 1800: return "1080p"
-    if w >= 1200: return "720p"
-    if w >= 700 and h >= 500: return "576p"
-    if w >= 640: return "480p"
+    if w >= 7000:
+        return "8K"
+    if w >= 3500:
+        return "2160p"
+    if w >= 2500:
+        return "1440p"
+    if w >= 1800:
+        return "1080p"
+    if w >= 1200:
+        return "720p"
+    if w >= 700 and h >= 500:
+        return "576p"
+    if w >= 640:
+        return "480p"
     return f"{h}p"
 
 _VIDEO_CODEC_MAP = {

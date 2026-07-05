@@ -127,7 +127,7 @@ class DownloadWorker:
                     header = f.read(4096).strip().lower()
                     if header.startswith(b"<svg") or header.startswith(b"<?xml") or b"<svg" in header:
                         is_svg = True
-            except:
+            except Exception:
                 pass
 
             if is_svg and not orig_path.name.lower().endswith(".svg"):

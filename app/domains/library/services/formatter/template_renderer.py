@@ -1,9 +1,9 @@
 import logging
-logger = logging.getLogger(__name__)
-
 import re
 from typing import Dict, Any, Optional
 from .config import FormatterConfig, Casing
+
+logger = logging.getLogger(__name__)
 
 class TemplateRenderer:
     """
@@ -88,11 +88,11 @@ class TemplateRenderer:
 
     def format_number(self, num: Any, width: int = 2) -> str:
         if isinstance(num, (list, tuple)):
-            return f"-E".join(str(n).zfill(width) for n in num)
+            return "-E".join(str(n).zfill(width) for n in num)
             
         try: 
             n = int(num)
-        except: 
+        except Exception: 
             # If string and JSON list, try to parse it
             if isinstance(num, str) and num.startswith("["):
                  try:

@@ -10,7 +10,7 @@ def generate_external_links(external_ids: Dict[str, Any], media_type: str, homep
         mt = "person"
 
     def add_link(key: str, name: str, url: str):
-        if not any(l["key"] == key for l in links):
+        if not any(x["key"] == key for x in links):
             links.append({"key": key, "name": name, "url": url})
 
     # 1. TMDB Links

@@ -71,5 +71,10 @@
     "performer": "Star",
     "artist": "Artist"
   },
-  "no_status_match": "No items match the selected status filter."
+  "no_status_match": "No items match the selected status filter.",
+  "remove_from_watchlist": "Remove from Watchlist",
+  "add_to_watchlist": "Add to Watchlist",
+  "no_lists_yet": "No custom lists created yet.",
+  "create_quick_placeholder": "Quick create list...",
+  "title": "Lists"
 }

@@ -2,13 +2,12 @@ import logging
 import os
 import re
 from urllib.parse import urlparse
-from typing import List, Optional, Dict, Any
+from typing import Optional, Dict, Any
 from sqlalchemy.orm import Session
 
 from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch, MetadataLocalization, Studio, MediaCollection
-from app.shared_kernel.enums import Provider, MediaType, RoleType
-from app.domains.people.models import MediaPersonLink
+from app.domains.metadata.models import MetadataMatch
+from app.shared_kernel.enums import Provider, MediaType
 from app.infrastructure.scrapers.providers.tmdb import TMDBScraper
 from app.infrastructure.scrapers.providers.omdb import OMDBScraper
 from app.shared_kernel.language import LanguageService

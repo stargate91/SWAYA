@@ -1,10 +1,13 @@
-from typing import List, Optional, Any
+from typing import List, Optional, Any, TYPE_CHECKING
 from datetime import datetime
 from sqlalchemy import String, Integer, Float, Enum as SQLEnum, JSON, Boolean, ForeignKey, UniqueConstraint, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.shared_kernel.database import Base
 from app.shared_kernel.enums import RoleType, Provider
+
+if TYPE_CHECKING:
+    from app.domains.metadata.models import MetadataMatch
 
 
 class Person(Base):
@@ -76,7 +79,7 @@ class Person(Base):
         
         sorted_links = sorted(
             self.external_links,
-            key=lambda l: priority_map.get(l.provider, 0)
+            key=lambda x: priority_map.get(x.provider, 0)
         )
         
         routing = dict(self.field_routing or {})
@@ -169,38 +172,69 @@ class Person(Base):
                     if bio_text:
                         biographies[loc] = bio_text
         
-        if birthday: self.birthday = birthday
-        if deathday: self.deathday = deathday
-        if place_of_birth: self.place_of_birth = place_of_birth
-        if gender is not None: self.gender = gender
-        if known_for_department: self.known_for_department = known_for_department
-        if popularity is not None: self.popularity = popularity
-        if rating_porndb is not None: self.rating_porndb = rating_porndb
-        if scene_count is not None: self.scene_count = scene_count
-        if profile_path: self.profile_path = profile_path
-        if homepage: self.homepage = homepage
-        if images: self.images = images
-        if aliases: self.aliases = aliases
-        if socials: self.socials = socials
+        if birthday:
+            self.birthday = birthday
+        if deathday:
+            self.deathday = deathday
+        if place_of_birth:
+            self.place_of_birth = place_of_birth
+        if gender is not None:
+            self.gender = gender
+        if known_for_department:
+            self.known_for_department = known_for_department
+        if popularity is not None:
+            self.popularity = popularity
+        if rating_porndb is not None:
+            self.rating_porndb = rating_porndb
+        if scene_count is not None:
+            self.scene_count = scene_count
+        if profile_path:
+            self.profile_path = profile_path
+        if homepage:
+            self.homepage = homepage
+        if images:
+            self.images = images
+        if aliases:
+            self.aliases = aliases
+        if socials:
+            self.socials = socials
         
-        if hair_color: self.hair_color = hair_color
-        if eye_color: self.eye_color = eye_color
-        if ethnicity: self.ethnicity = ethnicity
-        if height is not None: self.height = height
-        if weight is not None: self.weight = weight
-        if measurements: self.measurements = measurements
-        if cup_size: self.cup_size = cup_size
-        if band_size is not None: self.band_size = band_size
-        if waist is not None: self.waist = waist
-        if hip is not None: self.hip = hip
-        if tattoos: self.tattoos = tattoos
-        if piercings: self.piercings = piercings
-        if same_sex_only: self.same_sex_only = same_sex_only
-        if breast_type: self.breast_type = breast_type
-        if butt_shape: self.butt_shape = butt_shape
-        if butt_size: self.butt_size = butt_size
-        if career_start_year is not None: self.career_start_year = career_start_year
-        if career_end_year is not None: self.career_end_year = career_end_year
+        if hair_color:
+            self.hair_color = hair_color
+        if eye_color:
+            self.eye_color = eye_color
+        if ethnicity:
+            self.ethnicity = ethnicity
+        if height is not None:
+            self.height = height
+        if weight is not None:
+            self.weight = weight
+        if measurements:
+            self.measurements = measurements
+        if cup_size:
+            self.cup_size = cup_size
+        if band_size is not None:
+            self.band_size = band_size
+        if waist is not None:
+            self.waist = waist
+        if hip is not None:
+            self.hip = hip
+        if tattoos:
+            self.tattoos = tattoos
+        if piercings:
+            self.piercings = piercings
+        if same_sex_only:
+            self.same_sex_only = same_sex_only
+        if breast_type:
+            self.breast_type = breast_type
+        if butt_shape:
+            self.butt_shape = butt_shape
+        if butt_size:
+            self.butt_size = butt_size
+        if career_start_year is not None:
+            self.career_start_year = career_start_year
+        if career_end_year is not None:
+            self.career_end_year = career_end_year
         
         ext_ids = dict(self.external_ids or {})
         for link in self.external_links:
@@ -214,7 +248,7 @@ class Person(Base):
                 ext_ids.pop(f"{provider_val}_id", None)
         self.external_ids = ext_ids
         
-        existing_localizations = {l.locale: l for l in self.localizations}
+        existing_localizations = {x.locale: x for x in self.localizations}
         for loc, bio_text in biographies.items():
             if loc in existing_localizations:
                 existing_localizations[loc].biography = bio_text

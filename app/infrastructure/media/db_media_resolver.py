@@ -101,7 +101,7 @@ class DbMediaResolver(
                             elif parsed_ep == episode_num:
                                 episode_match = m
                                 break
-                        except:
+                        except Exception:
                             if str(episode_num) == m.episode_number:
                                 episode_match = m
                                 break

@@ -3,7 +3,7 @@ from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 
 from app.domains.library.models import MediaItem
-from app.shared_kernel.enums import Provider, ItemStatus
+from app.shared_kernel.enums import Provider
 from app.domains.settings.models import SystemSetting, UserSetting
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE

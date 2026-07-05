@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from app.domains.users.schemas import (
     ItemOverridesUpdate,

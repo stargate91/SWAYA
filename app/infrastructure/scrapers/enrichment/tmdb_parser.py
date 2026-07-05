@@ -1,10 +1,10 @@
 import logging
 from datetime import datetime
-from typing import List, Dict, Any
+from typing import Dict, Any
 from sqlalchemy.orm import Session
 
-from app.domains.metadata.models import MetadataMatch, MetadataLocalization, Studio
-from app.shared_kernel.enums import Provider, MediaType
+from app.domains.metadata.models import MetadataMatch, MetadataLocalization
+from app.shared_kernel.enums import Provider
 from app.shared_kernel.language import LanguageService
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 

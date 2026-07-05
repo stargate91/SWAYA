@@ -71,7 +71,7 @@ class PersonEnrichmentQueue:
             
             ext_ids = person.external_ids or {}
             links = db.query(ExternalSourceLink).filter(ExternalSourceLink.person_id == person_id).all()
-            link_data = [{"provider": l.provider, "external_id": l.external_id} for l in links]
+            link_data = [{"provider": x.provider, "external_id": x.external_id} for x in links]
             
             for prov_name, ext_id in ext_ids.items():
                 try:

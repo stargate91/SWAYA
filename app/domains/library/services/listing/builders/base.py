@@ -48,9 +48,9 @@ class BaseQueryBuilder:
                 query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == self.current_user_id))
                 joined_override = True
             if params.filter_favorite == "favorite":
-                query = query.filter(UserOverride.is_favorite == True)
+                query = query.filter(UserOverride.is_favorite)
             else:
-                query = query.filter(or_(UserOverride.is_favorite == False, UserOverride.is_favorite == None))
+                query = query.filter(or_(not UserOverride.is_favorite, UserOverride.is_favorite is None))
 
         # Watched filter
         if params.filter_watched in ("watched", "unwatched"):
@@ -58,9 +58,9 @@ class BaseQueryBuilder:
                 query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == self.current_user_id))
                 joined_override = True
             if params.filter_watched == "watched":
-                query = query.filter(UserOverride.is_watched == True)
+                query = query.filter(UserOverride.is_watched)
             else:
-                query = query.filter(or_(UserOverride.is_watched == False, UserOverride.is_watched == None))
+                query = query.filter(or_(not UserOverride.is_watched, UserOverride.is_watched is None))
 
         # Genre filter
         if params.selected_genre:
@@ -92,7 +92,7 @@ class BaseQueryBuilder:
                     or_(
                         UserOverride.metadata_match_id == MetadataMatch.id,
                         and_(
-                            UserOverride.metadata_match_id == None,
+                            UserOverride.metadata_match_id is None,
                             UserOverride.media_item_id == MetadataMatch.media_item_id
                         )
                     ),
@@ -121,7 +121,7 @@ class BaseQueryBuilder:
                     or_(
                         UserOverride.metadata_match_id == MetadataMatch.id,
                         and_(
-                            UserOverride.metadata_match_id == None,
+                            UserOverride.metadata_match_id is None,
                             UserOverride.media_item_id == MetadataMatch.media_item_id
                         )
                     ),
@@ -144,7 +144,7 @@ class BaseQueryBuilder:
                     or_(
                         UserOverride.metadata_match_id == MetadataMatch.id,
                         and_(
-                            UserOverride.metadata_match_id == None,
+                            UserOverride.metadata_match_id is None,
                             UserOverride.media_item_id == MetadataMatch.media_item_id
                         )
                     ),
@@ -162,7 +162,7 @@ class BaseQueryBuilder:
                     or_(
                         UserOverride.metadata_match_id == MetadataMatch.id,
                         and_(
-                            UserOverride.metadata_match_id == None,
+                            UserOverride.metadata_match_id is None,
                             UserOverride.media_item_id == MetadataMatch.media_item_id
                         )
                     ),
@@ -192,7 +192,7 @@ class BaseQueryBuilder:
                     or_(
                         UserOverride.metadata_match_id == MetadataMatch.id,
                         and_(
-                            UserOverride.metadata_match_id == None,
+                            UserOverride.metadata_match_id is None,
                             UserOverride.media_item_id == MetadataMatch.media_item_id
                         )
                     ),
@@ -206,7 +206,7 @@ class BaseQueryBuilder:
                     or_(
                         UserOverride.metadata_match_id == MetadataMatch.id,
                         and_(
-                            UserOverride.metadata_match_id == None,
+                            UserOverride.metadata_match_id is None,
                             UserOverride.media_item_id == MetadataMatch.media_item_id
                         )
                     ),
@@ -243,7 +243,7 @@ class BaseQueryBuilder:
             in_library = item is not None
             if match.media_type == MediaType.TV:
                 has_local_eps = self.db.query(MetadataMatch).filter(
-                    MetadataMatch.media_item_id != None,
+                    MetadataMatch.media_item_id is not None,
                     MetadataMatch.parent_id.in_(
                         self.db.query(MetadataMatch.id).filter(MetadataMatch.parent_id == match.id)
                     )

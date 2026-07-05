@@ -304,8 +304,14 @@ class CustomListDetailResponse(BaseModel):
     custom_image_path: Optional[str] = None
 
 
+class ListMembershipItem(BaseModel):
+    list_id: int
+    list_item_id: int
+
+
 class ListMembershipResponse(BaseModel):
     list_ids: List[int]
+    memberships: List[ListMembershipItem] = []
 
 
 class CatalogItemResponse(BaseModel):

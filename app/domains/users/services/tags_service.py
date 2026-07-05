@@ -1,10 +1,9 @@
 import logging
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
-from sqlalchemy import func, text
+from sqlalchemy import func
 
 from app.domains.users.models import Tag, user_override_tags
-from app.domains.people.models import Person
 from app.domains.users.schemas import TagResponse
 
 logger = logging.getLogger(__name__)

@@ -1,9 +1,9 @@
 import logging
-logger = logging.getLogger(__name__)
-
 import re
 from pathlib import Path
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 class NFOParser:
     """

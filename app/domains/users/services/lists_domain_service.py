@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional
+from typing import Optional
 from datetime import datetime
 
 from app.domains.users.models import CustomList, CustomListItem

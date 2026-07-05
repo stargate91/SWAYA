@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 
 from app.shared_kernel.enums import Provider
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 
 from app.domains.metadata.services.search.adult_search_resolver import AdultSearchResolver
 from app.domains.metadata.services.search.tmdb_search_resolver import TmdbSearchResolver

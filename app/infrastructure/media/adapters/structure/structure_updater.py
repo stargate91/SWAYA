@@ -2,9 +2,8 @@ import logging
 from typing import List, Dict, Any
 from sqlalchemy.orm import Session
 
-from app.shared_kernel.enums import Provider, MediaType, ItemStatus
+from app.shared_kernel.enums import ItemStatus
 from app.domains.library.models import MediaItem, ExtraFile
-from app.domains.metadata.models import MetadataMatch
 from app.shared_kernel.enums import ExtraSubtype, ExtraCategory, MovieEdition, MediaAudioType, MediaSource
 from app.infrastructure.media.adapters.structure.tv_episode_shifter import TvEpisodeShifter
 

@@ -56,7 +56,7 @@ class MovieDbSyncer:
             match.is_adult = tmdb_data.get("adult", False)
             db_updated = True
         
-        loc_db = next((l for l in match.localizations if l.locale == ui_lang), None)
+        loc_db = next((x for x in match.localizations if x.locale == ui_lang), None)
         genres_list = _split_genres([g["name"] for g in tmdb_data.get("genres", [])]) if tmdb_data.get("genres") else []
         if not loc_db:
             loc_db = MetadataLocalization(

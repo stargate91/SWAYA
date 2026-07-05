@@ -1,4 +1,4 @@
-from typing import Protocol, Any
+from typing import Protocol
 
 class UserRepositoryPort(Protocol):
     def auto_heal_adult_tags(self) -> None:

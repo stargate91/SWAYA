@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import threading
-import time
 from typing import Dict, Any
 
 from app.shared_kernel.enums import TaskStatus

@@ -57,6 +57,7 @@ export const useAddListItemMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: listsKeys.all });
       queryClient.invalidateQueries({ queryKey: ['lists', 'details'] });
+      queryClient.invalidateQueries({ queryKey: ['lists', 'membership'] });
     },
   });
 };
@@ -68,6 +69,7 @@ export const useRemoveListItemMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: listsKeys.all });
       queryClient.invalidateQueries({ queryKey: ['lists', 'details'] });
+      queryClient.invalidateQueries({ queryKey: ['lists', 'membership'] });
     },
   });
 };
@@ -91,6 +93,14 @@ export const useOverrideListImageMutation = () => {
       queryClient.invalidateQueries({ queryKey: listsKeys.all });
       queryClient.invalidateQueries({ queryKey: ['lists', 'details'] });
     },
+  });
+};
+
+export const useItemMembershipQuery = (itemId) => {
+  return useQuery({
+    queryKey: ['lists', 'membership', itemId],
+    queryFn: () => api.lists.getItemMembership(itemId),
+    enabled: !!itemId,
   });
 };
 

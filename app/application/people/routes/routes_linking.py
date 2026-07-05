@@ -8,6 +8,10 @@ from app.shared_kernel.database import get_db
 from app.domains.people.services.people_status_service import PeopleStatusService
 from app.domains.people.services.linking_data_mapper import LinkingDataMapper
 from app.domains.people.services.person_linker_service import PersonLinkerService
+from app.application.people.schemas import (
+    PersonLinkPayload,
+    PersonUnlinkPayload,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -20,10 +24,6 @@ def _people_status_service(db: Session, scrapers=None) -> PeopleStatusService:
 def resolve_person(person_id: Any, db: Session):
     return _people_status_service(db).resolve_person(person_id)
 
-from app.application.people.schemas import (
-    PersonLinkPayload,
-    PersonUnlinkPayload,
-)
 
 @router.get("/{person_id}/link/preview")
 def link_person_source_preview(
@@ -53,7 +53,7 @@ def link_person_source_preview(
 
     biography = None
     if person.localizations:
-        loc = next((l for l in person.localizations if l.locale == "en"), person.localizations[0])
+        loc = next((x for x in person.localizations if x.locale == "en"), person.localizations[0])
         biography = loc.biography
 
     local_data = {
@@ -191,7 +191,7 @@ def save_custom_fields(
     from app.domains.people.models import ExternalSourceLink
     from app.shared_kernel.enums import Provider
 
-    manual_link = next((l for l in person.external_links if l.provider == Provider.MANUAL), None)
+    manual_link = next((x for x in person.external_links if x.provider == Provider.MANUAL), None)
     if not manual_link:
         manual_link = ExternalSourceLink(
             person_id=person.id,

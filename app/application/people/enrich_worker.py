@@ -158,10 +158,9 @@ class PeopleEnrichWorker:
                     continue
 
                 try:
-                    success = await asyncio.to_thread(self._enrich_single_person, person_id)
+                    await asyncio.to_thread(self._enrich_single_person, person_id)
                 except Exception as e:
                     logger.error(f"Worker-{worker_id} failed to enrich person {person_id}: {e}")
-                    success = False
 
                 self.completed_count += 1
                 self._pending_person_ids.discard(person_id)
@@ -193,7 +192,7 @@ class PeopleEnrichWorker:
                 await asyncio.sleep(2)
 
     def _enrich_single_person(self, person_id: int) -> bool:
-        from app.domains.people.models import Person, ExternalSourceLink
+        from app.domains.people.models import ExternalSourceLink
         db = self.session_factory()
         try:
             person = db.query(Person).filter(Person.id == person_id).first()
@@ -201,7 +200,7 @@ class PeopleEnrichWorker:
                 return False
             person_name = person.name
             links = db.query(ExternalSourceLink).filter(ExternalSourceLink.person_id == person_id).all()
-            link_data = [{"provider": l.provider, "external_id": l.external_id} for l in links]
+            link_data = [{"provider": x.provider, "external_id": x.external_id} for x in links]
             external_ids = person.external_ids or {}
             is_adult = person.is_adult
         finally:

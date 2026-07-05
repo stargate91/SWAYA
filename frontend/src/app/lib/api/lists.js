@@ -38,5 +38,6 @@ export const lists = {
     method: 'POST',
     body: JSON.stringify({ path }),
   }),
+  getItemMembership: (itemId) => fetchJson(`/api/lists/item-membership/${itemId}`),
 };
 

@@ -42,7 +42,7 @@ export default function BespokeScenePeaks() {
 
       <div className="bespoke-scene-peaks-body">
         {peaks.length > 0 ? (
-          <div className="bespoke-scene-peaks-list">
+          <div className="bespoke-scene-peaks-list custom-scrollbar">
             {peaks.map((log, index) => {
               const hasPosition = log.video_position != null && log.video_position > 0;
               return (

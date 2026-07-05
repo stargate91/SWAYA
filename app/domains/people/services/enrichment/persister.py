@@ -1,6 +1,5 @@
 import logging
-from app.domains.people.models import Person, PersonLocalization, ExternalSourceLink
-from app.domains.people.services.enrichment.helpers import EnrichmentHelpers
+from app.domains.people.models import Person, ExternalSourceLink
 from app.shared_kernel.enums import Provider
 
 logger = logging.getLogger(__name__)
@@ -20,8 +19,8 @@ def apply_enriched_data(enricher, person: Person, data: dict):
         ids["urls"] = existing_urls
         person.external_ids = ids
 
-    for l in data["links_to_create"]:
-        prov_val = l["provider"]
+    for link_to_create in data["links_to_create"]:
+        prov_val = link_to_create["provider"]
         prov_enum = None
         if isinstance(prov_val, str):
             try:
@@ -42,7 +41,7 @@ def apply_enriched_data(enricher, person: Person, data: dict):
             if (isinstance(obj, ExternalSourceLink) and 
                 obj.person_id == person.id and 
                 obj.provider == prov_enum and 
-                obj.external_id == l["external_id"]):
+                obj.external_id == link_to_create["external_id"]):
                 already_added = True
                 break
 
@@ -52,7 +51,7 @@ def apply_enriched_data(enricher, person: Person, data: dict):
         link = enricher.db.query(ExternalSourceLink).filter(
             ExternalSourceLink.person_id == person.id,
             ExternalSourceLink.provider == prov_enum,
-            ExternalSourceLink.external_id == l["external_id"]
+            ExternalSourceLink.external_id == link_to_create["external_id"]
         ).first()
 
         src_data = provider_profiles.get(prov_enum.value)
@@ -64,7 +63,7 @@ def apply_enriched_data(enricher, person: Person, data: dict):
             new_link = ExternalSourceLink(
                 person_id=person.id,
                 provider=prov_enum,
-                external_id=l["external_id"],
+                external_id=link_to_create["external_id"],
                 profile_url=profile_url,
                 source_data=src_data if isinstance(src_data, dict) else None
             )

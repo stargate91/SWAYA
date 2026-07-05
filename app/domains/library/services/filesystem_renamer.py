@@ -107,7 +107,8 @@ class FilesystemRenamer:
             
             for extra_preview in preview.extra_previews:
                 extra = self.library_port.get_extra_by_id(extra_preview.extra_id)
-                if not extra: continue
+                if not extra:
+                    continue
 
                 e_old = Path(extra.current_path)
                 if not e_old.exists():

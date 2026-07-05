@@ -33,6 +33,7 @@ import BespokeSeasonsSection from './components/detail/sections/BespokeSeasonsSe
 import TechnicalPanel from './components/detail/panels/TechnicalPanel';
 import BespokeSceneTagger from './components/detail/scene/BespokeSceneTagger';
 import BespokeScenePeaks from './components/detail/scene/BespokeScenePeaks';
+import BespokeListPanel from './components/detail/sections/BespokeListPanel';
 import './components/entityDetail/EntityDetailHeroSection.css';
 
 import BespokeCastSection from './components/detail/sections/BespokeCastSection';
@@ -83,6 +84,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
   const [isPosterDrawerOpen, setIsPosterDrawerOpen] = useState(false);
   const [isBackdropDrawerOpen, setIsBackdropDrawerOpen] = useState(false);
   const [lightboxUrl, setLightboxUrl] = useState(null);
+  const [activeSideTab, setActiveSideTab] = useState('activity');
   const containerRef = useRef(null);
 
   const [isScrolled, handleScrollToggle] = useHeaderScrollTransition(
@@ -231,16 +233,43 @@ export default function MediaDetailPage({ type = 'movie' }) {
               {(isMovie || isScene) && <BespokeRatingsSection item={item} t={t} />}
             </div>
             <div className="media-detail-page__inline-side-col">
-              {item && (
-                <CompactWatchStatsSection
-                  item={item}
-                  isMovie={isMovie}
-                  isScene={isScene}
-                  t={t}
-                />
+              <div className="media-side-tabs">
+                <button
+                  type="button"
+                  className={`media-side-tab-btn ${activeSideTab === 'activity' ? 'is-active' : ''}`}
+                  onClick={() => setActiveSideTab('activity')}
+                >
+                  {t('library.details.tab_activity') || 'Activity'}
+                </button>
+                <button
+                  type="button"
+                  className={`media-side-tab-btn ${activeSideTab === 'organize' ? 'is-active' : ''}`}
+                  onClick={() => setActiveSideTab('organize')}
+                >
+                  {t('library.details.tab_organize') || 'Organize'}
+                </button>
+              </div>
+
+              {activeSideTab === 'activity' && (
+                <>
+                  {item && (
+                    <CompactWatchStatsSection
+                      item={item}
+                      isMovie={isMovie}
+                      isScene={isScene}
+                      t={t}
+                    />
+                  )}
+                  {item && <BespokeSceneTagger />}
+                </>
               )}
-              {item && <BespokeSceneTagger />}
-              {item && item.is_adult && (isMovie || isScene) && <BespokeScenePeaks />}
+
+              {activeSideTab === 'organize' && (
+                <>
+                  {item && <BespokeListPanel />}
+                  {item && item.is_adult && (isMovie || isScene) && <BespokeScenePeaks />}
+                </>
+              )}
             </div>
           </div>
         </div>

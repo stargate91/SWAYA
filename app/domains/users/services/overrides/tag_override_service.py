@@ -2,7 +2,7 @@ import logging
 from typing import Dict, Any
 from sqlalchemy import func
 
-from app.domains.users.models import UserOverride, Tag
+from app.domains.users.models import Tag
 from app.domains.users.schemas import BulkTagsUpdate
 
 logger = logging.getLogger(__name__)

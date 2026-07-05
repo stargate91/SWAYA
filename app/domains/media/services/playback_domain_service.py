@@ -21,13 +21,13 @@ class PlaybackDomainService:
             reverse=True,
         )
             
-        def is_log_completed(l):
-            duration = l.media_item.duration if (l.media_item and l.media_item.duration) else 0
+        def is_log_completed(log):
+            duration = log.media_item.duration if (log.media_item and log.media_item.duration) else 0
             if duration > 0:
-                return (l.position_seconds or 0) / duration >= 0.90
-            return (l.position_seconds or 0) > 0
+                return (log.position_seconds or 0) / duration >= 0.90
+            return (log.position_seconds or 0) > 0
 
-        completed_count = sum(1 for l in logs if is_log_completed(l))
+        completed_count = sum(1 for log in logs if is_log_completed(log))
         override.watch_count = completed_count
         override.last_watched_at = logs[0].watched_at if logs else None
         

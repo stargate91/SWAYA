@@ -1,7 +1,6 @@
 import logging
-from typing import Any, List, Optional
+from typing import List, Optional
 from sqlalchemy.orm import Session
-from sqlalchemy import text
 from app.domains.metadata.models import MetadataMatch, MetadataLocalization
 from app.domains.users.models import Tag
 from app.domains.library.schemas import FilterOptionsResponse, TagGroupItem
@@ -34,32 +33,32 @@ class LibraryFilterService:
             
             if tab == "movies":
                 match_ids_subquery = select(MetadataMatch.id).join(UserOverride, UserOverride.metadata_match_id == MetadataMatch.id).filter(
-                    MetadataMatch.media_item_id == None,
-                    UserOverride.is_tracked == True,
+                    MetadataMatch.media_item_id.is_(None),
+                    UserOverride.is_tracked,
                     UserOverride.user_id == current_uid,
                     MetadataMatch.media_type == MediaType.MOVIE,
                     MetadataMatch.is_adult == is_adult
                 ).scalar_subquery()
             elif tab in ("scenes", "adult_scenes"):
                 match_ids_subquery = select(MetadataMatch.id).join(UserOverride, UserOverride.metadata_match_id == MetadataMatch.id).filter(
-                    MetadataMatch.media_item_id == None,
-                    UserOverride.is_tracked == True,
+                    MetadataMatch.media_item_id.is_(None),
+                    UserOverride.is_tracked,
                     UserOverride.user_id == current_uid,
                     MetadataMatch.media_type == MediaType.SCENE,
                     MetadataMatch.is_adult == is_adult
                 ).scalar_subquery()
             elif tab in ("tv", "series", "tv_shows", "adult_tv", "adult_series"):
                 match_ids_subquery = select(MetadataMatch.id).join(UserOverride, UserOverride.metadata_match_id == MetadataMatch.id).filter(
-                    MetadataMatch.media_item_id == None,
-                    UserOverride.is_tracked == True,
+                    MetadataMatch.media_item_id.is_(None),
+                    UserOverride.is_tracked,
                     UserOverride.user_id == current_uid,
                     MetadataMatch.media_type == MediaType.TV,
                     MetadataMatch.is_adult == is_adult
                 ).scalar_subquery()
             else:
                 match_ids_subquery = select(MetadataMatch.id).join(UserOverride, UserOverride.metadata_match_id == MetadataMatch.id).filter(
-                    MetadataMatch.media_item_id == None,
-                    UserOverride.is_tracked == True,
+                    MetadataMatch.media_item_id.is_(None),
+                    UserOverride.is_tracked,
                     UserOverride.user_id == current_uid,
                     MetadataMatch.is_adult == is_adult
                 ).scalar_subquery()
@@ -68,27 +67,27 @@ class LibraryFilterService:
                 match_ids_subquery = select(MetadataMatch.id).join(MediaItem).filter(
                     MediaItem.status.in_(lib_statuses),
                     MetadataMatch.media_type == MediaType.MOVIE,
-                    MetadataMatch.is_active == True,
+                    MetadataMatch.is_active,
                     MetadataMatch.is_adult == is_adult
                 ).scalar_subquery()
             elif tab in ("scenes", "adult_scenes"):
                 match_ids_subquery = select(MetadataMatch.id).join(MediaItem).filter(
                     MediaItem.status.in_(lib_statuses),
                     MetadataMatch.media_type == MediaType.SCENE,
-                    MetadataMatch.is_active == True,
+                    MetadataMatch.is_active,
                     MetadataMatch.is_adult == is_adult
                 ).scalar_subquery()
             elif tab in ("tv", "series", "tv_shows", "adult_tv", "adult_series"):
                 season_parent_ids = select(MetadataMatch.parent_id).join(MediaItem).filter(
                     MediaItem.status.in_(lib_statuses),
                     MetadataMatch.media_type == MediaType.EPISODE,
-                    MetadataMatch.is_active == True,
+                    MetadataMatch.is_active,
                     MetadataMatch.is_adult == is_adult
                 ).scalar_subquery()
                 
                 tv_ids = select(MetadataMatch.parent_id).filter(
                     MetadataMatch.id.in_(season_parent_ids),
-                    MetadataMatch.parent_id != None
+                    MetadataMatch.parent_id is not None
                 ).scalar_subquery()
                 
                 match_ids_subquery = select(MetadataMatch.id).filter(
@@ -104,7 +103,7 @@ class LibraryFilterService:
         # 1. Fetch years
         query_years = self.db.query(MetadataMatch.release_date).filter(
             MetadataMatch.id.in_(match_ids_subquery),
-            MetadataMatch.release_date != None
+            MetadataMatch.release_date is not None
         ).distinct().all()
         
         years = sorted(list(set(r.release_date.year for r in query_years)), reverse=True)
@@ -113,7 +112,7 @@ class LibraryFilterService:
         from app.shared_kernel.genre_utils import split_genres as _split_genres
         query_genres = self.db.query(MetadataLocalization.genres).filter(
             MetadataLocalization.match_id.in_(match_ids_subquery),
-            MetadataLocalization.genres != None
+            MetadataLocalization.genres is not None
         ).all()
         
         genres_set = set()
@@ -239,7 +238,7 @@ class LibraryFilterService:
                 MediaPersonLink, MediaPersonLink.person_id == Person.id
             ).filter(
                 MediaPersonLink.match_id.in_(match_ids_subquery),
-                Person.hair_color != None,
+                Person.hair_color is not None,
                 Person.hair_color != ""
             ).distinct().order_by(Person.hair_color.asc()).all()
             hair_colors = normalize_options([r[0] for r in hair_colors_query])
@@ -248,7 +247,7 @@ class LibraryFilterService:
                 MediaPersonLink, MediaPersonLink.person_id == Person.id
             ).filter(
                 MediaPersonLink.match_id.in_(match_ids_subquery),
-                Person.ethnicity != None,
+                Person.ethnicity is not None,
                 Person.ethnicity != ""
             ).distinct().order_by(Person.ethnicity.asc()).all()
             ethnicities = normalize_options([r[0] for r in ethnicities_query])
@@ -257,7 +256,7 @@ class LibraryFilterService:
                 MediaPersonLink, MediaPersonLink.person_id == Person.id
             ).filter(
                 MediaPersonLink.match_id.in_(match_ids_subquery),
-                Person.eye_color != None,
+                Person.eye_color is not None,
                 Person.eye_color != ""
             ).distinct().order_by(Person.eye_color.asc()).all()
             eye_colors = normalize_options([r[0] for r in eye_colors_query])
@@ -266,7 +265,7 @@ class LibraryFilterService:
                 MediaPersonLink, MediaPersonLink.person_id == Person.id
             ).filter(
                 MediaPersonLink.match_id.in_(match_ids_subquery),
-                Person.tattoos != None,
+                Person.tattoos is not None,
                 Person.tattoos != ""
             ).distinct().order_by(Person.tattoos.asc()).all()
             tattoos = [r[0] for r in tattoos_query]
@@ -275,7 +274,7 @@ class LibraryFilterService:
                 MediaPersonLink, MediaPersonLink.person_id == Person.id
             ).filter(
                 MediaPersonLink.match_id.in_(match_ids_subquery),
-                Person.piercings != None,
+                Person.piercings is not None,
                 Person.piercings != ""
             ).distinct().order_by(Person.piercings.asc()).all()
             piercings = [r[0] for r in piercings_query]
@@ -284,7 +283,7 @@ class LibraryFilterService:
                 MediaPersonLink, MediaPersonLink.person_id == Person.id
             ).filter(
                 MediaPersonLink.match_id.in_(match_ids_subquery),
-                Person.breast_type != None,
+                Person.breast_type is not None,
                 Person.breast_type != ""
             ).distinct().order_by(Person.breast_type.asc()).all()
             breast_types = normalize_options([r[0] for r in breast_types_query])
@@ -293,7 +292,7 @@ class LibraryFilterService:
                 MediaPersonLink, MediaPersonLink.person_id == Person.id
             ).filter(
                 MediaPersonLink.match_id.in_(match_ids_subquery),
-                Person.butt_shape != None,
+                Person.butt_shape is not None,
                 Person.butt_shape != ""
             ).distinct().order_by(Person.butt_shape.asc()).all()
             butt_shapes = normalize_options([r[0] for r in butt_shapes_query])
@@ -302,7 +301,7 @@ class LibraryFilterService:
                 MediaPersonLink, MediaPersonLink.person_id == Person.id
             ).filter(
                 MediaPersonLink.match_id.in_(match_ids_subquery),
-                Person.butt_size != None,
+                Person.butt_size is not None,
                 Person.butt_size != ""
             ).distinct().order_by(Person.butt_size.asc()).all()
             butt_sizes = normalize_options([r[0] for r in butt_sizes_query])
@@ -334,8 +333,6 @@ class LibraryFilterService:
         from app.shared_kernel.enums import MediaType
         from app.domains.metadata.models import MetadataMatch, MetadataLocalization
         from app.domains.people.models import Person
-        from app.domains.library.models import MediaItem
-        from app.domains.users.models import UserOverride
         from app.domains.media_assets.services.images import image_processing_service
 
         tags_query = self.db.query(Tag).filter(Tag.is_adult == is_adult).all()
@@ -394,7 +391,7 @@ class LibraryFilterService:
                     elif o.media_item_id:
                         match = self.db.query(MetadataMatch).filter(
                             MetadataMatch.media_item_id == o.media_item_id,
-                            MetadataMatch.is_active == True
+                            MetadataMatch.is_active
                         ).first()
 
                     if match:

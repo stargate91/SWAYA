@@ -57,7 +57,7 @@ class PeopleSearchService:
                         if not uuid_str:
                             continue
 
-                        stable_id = get_stable_integer_id(source_name, uuid_str)
+                        get_stable_integer_id(source_name, uuid_str)
 
                         gender_str = str(perf.get("gender") or "").upper()
                         if "FEMALE" in gender_str:

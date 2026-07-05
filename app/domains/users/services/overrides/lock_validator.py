@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timezone
-from typing import List, Dict, Any, Optional
+from typing import List, Any, Optional
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -20,7 +20,7 @@ class LockValidator:
         elif media_item_id:
             match_db = db.query(MetadataMatch).filter(
                 MetadataMatch.media_item_id == media_item_id,
-                MetadataMatch.is_active == True
+                MetadataMatch.is_active
             ).first()
             if match_db:
                 is_adult_item = bool(match_db.is_adult)

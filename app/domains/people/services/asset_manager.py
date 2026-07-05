@@ -9,6 +9,7 @@ from app.domains.people.models import Person
 from app.shared_kernel.user_context import get_current_user_id
 from app.shared_kernel.ports.library_port import LibraryPort
 from app.shared_kernel.ports.image_service_port import ImageServicePort
+from app.shared_kernel.ports.image_download_port import ImageDownloadPort
 
 logger = logging.getLogger(__name__)
 
@@ -18,8 +19,6 @@ def fnv1a_hash(s: str) -> str:
         hash_val ^= char
         hash_val = (hash_val * 16777619) & 0xffffffff
     return f"{hash_val:08x}"
-
-from app.shared_kernel.ports.image_download_port import ImageDownloadPort
 
 class PerformerAssetManager:
     def __init__(self, db: Session, library_port: LibraryPort, image_service: ImageServicePort, image_downloader: ImageDownloadPort):

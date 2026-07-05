@@ -1,12 +1,10 @@
 import os
-import sys
 import logging
 from sqlalchemy import create_engine, event
-
-logger = logging.getLogger(__name__)
-
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, Session
 from app.shared_kernel.constants import DATABASE_TIMEOUT_SECONDS
+
+logger = logging.getLogger(__name__)
 
 class Base(DeclarativeBase):
     """SQLAlchemy Declarative Base class shared by all domain models."""
@@ -99,13 +97,6 @@ def init_databases():
     as a fallback. Cache tables are created directly.
     """
     # Import all models here to ensure they register on Base.metadata
-    import app.domains.tasks.models
-    import app.domains.history.models
-    import app.domains.library.models
-    import app.domains.metadata.models
-    import app.domains.people.models
-    import app.domains.settings.models
-    import app.domains.users.models
     
     # Create main database tables if they do not exist
     Base.metadata.create_all(bind=engine)

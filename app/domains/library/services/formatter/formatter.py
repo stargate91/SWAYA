@@ -1,11 +1,8 @@
-import os
 from typing import Callable, Optional, Dict, Any, List
-from pathlib import Path
 
-from app.shared_kernel.enums import MediaType, ItemStatus
 from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.shared_kernel.language import LanguageService
-from .config import Casing, Separator, ExtraOrg, FormatterConfig
+from .config import FormatterConfig
 from .models import RenamePreview
 from .context_builder import ContextBuilder
 from .template_renderer import TemplateRenderer

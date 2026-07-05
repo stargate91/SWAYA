@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from pydantic import BaseModel
+from app.application.history.schemas import HistoryResponse
 
 from app.shared_kernel.database import get_db
 from app.shared_kernel.enums import ScanMode
@@ -87,7 +88,6 @@ def start_rename(request: Optional[RenameRequest] = None, db: Session = Depends(
     organize_in_place = request.organize_in_place if request else False
     return _scanner_service(db).start_rename(item_ids, organize_in_place)
 
-from app.application.history.schemas import HistoryResponse
 
 @router.get("/history", response_model=HistoryResponse)
 def get_history(page: int = 1, limit: int = 20, db: Session = Depends(get_db)):
@@ -106,7 +106,6 @@ def image_proxy(url: str = Query(..., description="The remote image URL to proxy
     from fastapi.responses import StreamingResponse
     from urllib.parse import urlparse
     import logging
-    import traceback
     import urllib3
     from PIL import Image, ImageFilter, ImageEnhance
     import io

@@ -1,5 +1,4 @@
 import contextvars
-from typing import Optional
 
 _current_user_id: contextvars.ContextVar[int] = contextvars.ContextVar("current_user_id", default=1)
 

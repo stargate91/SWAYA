@@ -21,7 +21,7 @@ class DbMediaItemStructureAdapter:
         matches = self.db.query(MetadataMatch).filter(
             MetadataMatch.provider == prov_enum,
             MetadataMatch.external_id.in_(external_ids),
-            MetadataMatch.is_active == True
+            MetadataMatch.is_active
         ).all()
         
         local_map = {}

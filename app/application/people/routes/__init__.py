@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 
 # Import sub-routers from the split route files
-from app.application.people.routes.routes_mainstream import mainstream_router
-from app.application.people.routes.routes_adult import adult_router
+from app.application.people.routes.routes_mainstream import mainstream_router as mainstream_router
+from app.application.people.routes.routes_adult import adult_router as adult_router
 
 from app.application.people.routes.routes_detail import router as detail_router
 from app.application.people.routes.routes_images import router as images_router

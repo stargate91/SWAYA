@@ -212,9 +212,12 @@ class PlanGenerator:
                 cat = extra.category.value if hasattr(extra.category, 'value') else str(extra.category)
                 
                 short_cat = cat.lower()
-                if short_cat == "subtitle": short_cat = "sub"
-                elif short_cat == "image": short_cat = "img"
-                elif short_cat == "metadata": short_cat = "meta"
+                if short_cat == "subtitle":
+                    short_cat = "sub"
+                elif short_cat == "image":
+                    short_cat = "img"
+                elif short_cat == "metadata":
+                    short_cat = "meta"
                 
                 action = getattr(self.config, f"extra_{short_cat}_action", "rename")
                 

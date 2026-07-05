@@ -22,7 +22,7 @@ class TvPlaybackResolver:
         localizations = db.query(MetadataLocalization).filter(
             MetadataLocalization.match_id.in_(episode_match_ids)
         ).all() if episode_match_ids else []
-        loc_map = {l.match_id: l.title for l in localizations if l.title}
+        loc_map = {x.match_id: x.title for x in localizations if x.title}
 
         playback_logs = []
         seen_logs = set()

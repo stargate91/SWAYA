@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 from pathlib import Path
 from app.domains.library.services.formatter.models import RenamePreview
 from app.shared_kernel.ports.library_port import LibraryPort

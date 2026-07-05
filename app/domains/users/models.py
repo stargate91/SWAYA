@@ -1,10 +1,17 @@
 from datetime import datetime, timezone
-from typing import List, Optional, Any
-from sqlalchemy import String, Integer, Float, DateTime, JSON, Boolean, ForeignKey, Table, Column, Enum as SQLEnum, UniqueConstraint, CheckConstraint
+from typing import List, Optional, TYPE_CHECKING
+from sqlalchemy import String, Integer, Float, DateTime, Boolean, ForeignKey, Table, Column, Enum as SQLEnum, UniqueConstraint, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.shared_kernel.database import Base
-from app.shared_kernel.enums import MovieEdition, MediaAudioType, MediaSource, CustomListType
+from app.shared_kernel.enums import CustomListType
+
+if TYPE_CHECKING:
+    from app.domains.history.models import PlaybackLog
+    from app.domains.settings.models import UserSetting
+    from app.domains.library.models import MediaItem
+    from app.domains.metadata.models import MetadataMatch, Studio, MediaCollection
+    from app.domains.people.models import Person
 
 
 # Association table for UserOverride many-to-many relationship with Tag

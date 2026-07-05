@@ -3,10 +3,9 @@ import time
 import random
 from typing import Optional, List, Dict, Any
 
-from app.shared_kernel.enums import Provider, MediaType
+from app.shared_kernel.enums import Provider
 from app.shared_kernel.language import LanguageService
 from app.infrastructure.scrapers.support.base import BaseScraper
-from app.infrastructure.scrapers.support.normalizer import ScraperNormalizer
 
 from app.shared_kernel.constants import TMDB_API_BASE, DEFAULT_FALLBACK_LANGUAGE, TMDB_MOVIE_APPEND_PARTS, TMDB_TV_APPEND_PARTS, SCRAPER_REQUEST_TIMEOUT
 
@@ -116,8 +115,10 @@ class TMDBScraper(BaseScraper):
         movies = data.get("movie_results", [])
         tv = data.get("tv_results", [])
         
-        if movies: return {**movies[0], "item_type": "movie"}
-        if tv: return {**tv[0], "item_type": "tv"}
+        if movies:
+            return {**movies[0], "item_type": "movie"}
+        if tv:
+            return {**tv[0], "item_type": "tv"}
         return None
 
     def get_details(

@@ -79,7 +79,6 @@ async def lifespan(app: FastAPI):
     await task_manager.download_worker.start()
     await task_manager.people_enrich_worker.start()
     
-    import sys
     if sys.platform == "win32":
         from app.infrastructure.playback.hotkey_listener import start_hotkey_listener
         start_hotkey_listener()
@@ -96,10 +95,10 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-from app.shared_kernel.exceptions import DomainException
-from fastapi.responses import JSONResponse
-from fastapi import Request
-from app.shared_kernel.user_context import set_current_user_id, reset_current_user_id
+from app.shared_kernel.exceptions import DomainException  # noqa: E402
+from fastapi.responses import JSONResponse  # noqa: E402
+from fastapi import Request  # noqa: E402
+from app.shared_kernel.user_context import set_current_user_id, reset_current_user_id  # noqa: E402
 
 @app.exception_handler(DomainException)
 async def domain_exception_handler(request, exc: DomainException):
@@ -132,7 +131,7 @@ async def user_context_middleware(request: Request, call_next):
     finally:
         reset_current_user_id(token)
 
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 
 app.add_middleware(
     CORSMiddleware,
@@ -142,17 +141,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from app.application.tasks.routes import router as tasks_router
-from app.application.library.routes import router as media_router, mainstream_router as media_mainstream_router, adult_router as media_adult_router, library_router
-from app.application.metadata.routes import library_router as metadata_router
-from app.application.people.routes import router as people_router, mainstream_router as people_mainstream_router, adult_router as people_adult_router
-from app.application.settings.routes import router as settings_router, db_router
-from app.application.users.routes import router as users_router, catalog_router
-from app.application.history.routes import router as history_router
-from app.application.media.routes import router as app_media_router
-from app.application.media.playback_routes import router as app_playback_router
-from app.application.recommendations.routes import router as app_rec_router
-from app.application.organizer.routes import router as app_organizer_router
+from app.application.tasks.routes import router as tasks_router  # noqa: E402
+from app.application.library.routes import router as media_router, mainstream_router as media_mainstream_router, adult_router as media_adult_router, library_router  # noqa: E402
+from app.application.metadata.routes import library_router as metadata_router  # noqa: E402
+from app.application.people.routes import router as people_router, mainstream_router as people_mainstream_router, adult_router as people_adult_router  # noqa: E402
+from app.application.settings.routes import router as settings_router, db_router  # noqa: E402
+from app.application.users.routes import router as users_router, catalog_router  # noqa: E402
+from app.application.history.routes import router as history_router  # noqa: E402
+from app.application.media.routes import router as app_media_router  # noqa: E402
+from app.application.media.playback_routes import router as app_playback_router  # noqa: E402
+from app.application.recommendations.routes import router as app_rec_router  # noqa: E402
+from app.application.organizer.routes import router as app_organizer_router  # noqa: E402
 
 app.include_router(tasks_router)
 app.include_router(media_router)

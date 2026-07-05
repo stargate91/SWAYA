@@ -1,14 +1,12 @@
 import logging
-from datetime import datetime
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import or_, desc, func
 
 from app.domains.users.models import CustomList, CustomListItem, UserOverride
 from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch
 from app.domains.people.models import Person
-from app.shared_kernel.enums import Provider, MediaType, ItemStatus, CustomListType
+from app.shared_kernel.enums import Provider, MediaType, CustomListType
 from app.shared_kernel.exceptions import NotFoundException, BadRequestException
 from app.application.users.schemas import (
     CustomListItemResponse,
@@ -84,7 +82,7 @@ class ListsService:
                 res["provider"] = match.provider.value if hasattr(match.provider, "value") else str(match.provider)
                 if match.release_date:
                     res["year"] = match.release_date.year
-                loc = next((l for l in match.localizations), None)
+                loc = next((x for x in match.localizations), None)
                 if match.media_type.value in ("scene", "still"):
                     res["poster_path"] = match.backdrop_path or match.still_path
                     scene_title = loc.title if loc else match.original_title
@@ -105,7 +103,7 @@ class ListsService:
             res["provider"] = item.match.provider.value if hasattr(item.match.provider, "value") else str(item.match.provider)
             if item.match.release_date:
                 res["year"] = item.match.release_date.year
-            loc = next((l for l in item.match.localizations), None)
+            loc = next((x for x in item.match.localizations), None)
             res["title"] = loc.title if loc else item.match.original_title or f"Match #{item.match.id}"
             if item.match.media_type.value in ("scene", "still"):
                 res["poster_path"] = item.match.backdrop_path or item.match.still_path
@@ -158,9 +156,9 @@ class ListsService:
         genres_list = []
         resolved_loc = None
         if item.media_item and match:
-            resolved_loc = next((l for l in match.localizations), None)
+            resolved_loc = next((x for x in match.localizations), None)
         elif item.match:
-            resolved_loc = next((l for l in item.match.localizations), None)
+            resolved_loc = next((x for x in item.match.localizations), None)
             
         if resolved_loc and resolved_loc.genres:
             from app.shared_kernel.genre_utils import split_genres as _split_genres
@@ -202,8 +200,8 @@ class ListsService:
             return True
         return False
 
-    def _is_list_adult(self, l: CustomList) -> bool:
-        return any(self._is_item_adult(item) for item in l.items)
+    def _is_list_adult(self, custom_list: CustomList) -> bool:
+        return any(self._is_item_adult(item) for item in custom_list.items)
 
     def get_all_lists(self) -> List[CustomListResponse]:
         # Ensure Watchlist exists
@@ -218,34 +216,34 @@ class ListsService:
 
         lists = self.db.query(CustomList).all()
         result = []
-        for l in lists:
+        for custom_list in lists:
             # Hide the entire list if adult is disabled and it has ONLY adult items (Watchlist is never hidden)
-            if not adult_enabled and l.name != "Watchlist":
-                if l.items and all(self._is_item_adult(item) for item in l.items):
+            if not adult_enabled and custom_list.name != "Watchlist":
+                if custom_list.items and all(self._is_item_adult(item) for item in custom_list.items):
                     continue
 
             if not adult_enabled:
-                filtered_items = [item for item in l.items if not self._is_item_adult(item)]
+                filtered_items = [item for item in custom_list.items if not self._is_item_adult(item)]
             else:
-                filtered_items = l.items
+                filtered_items = custom_list.items
 
             item_count = len(filtered_items)
             posters = [self._serialize_item(item).poster_path for item in filtered_items[:4]]
             posters = [p for p in posters if p]
             
             resolved_image = None
-            if l.custom_image_path:
+            if custom_list.custom_image_path:
                 from app.domains.media_assets.services.images import image_processing_service
-                resolved_image = image_processing_service.resolve_image_url(l.custom_image_path, "covers")
+                resolved_image = image_processing_service.resolve_image_url(custom_list.custom_image_path, "covers")
 
             result.append(CustomListResponse(
-                id=l.id,
-                name=l.name,
-                is_watchlist=l.name == "Watchlist",
-                description=l.description,
-                color=l.color or "#3b82f6",
-                list_type=l.list_type,
-                created_at=l.created_at.isoformat() if l.created_at else None,
+                id=custom_list.id,
+                name=custom_list.name,
+                is_watchlist=custom_list.name == "Watchlist",
+                description=custom_list.description,
+                color=custom_list.color or "#3b82f6",
+                list_type=custom_list.list_type,
+                created_at=custom_list.created_at.isoformat() if custom_list.created_at else None,
                 item_count=item_count,
                 sample_posters=posters,
                 custom_image_path=resolved_image
@@ -253,34 +251,34 @@ class ListsService:
         return result
 
     def get_list_details(self, list_id: int) -> CustomListDetailResponse:
-        l = self.db.query(CustomList).filter(CustomList.id == list_id).first()
-        if not l:
+        custom_list = self.db.query(CustomList).filter(CustomList.id == list_id).first()
+        if not custom_list:
             raise NotFoundException("Not found")
             
         adult_enabled = self._adult_access_enabled()
-        if not adult_enabled and l.name != "Watchlist":
-            if l.items and all(self._is_item_adult(item) for item in l.items):
+        if not adult_enabled and custom_list.name != "Watchlist":
+            if custom_list.items and all(self._is_item_adult(item) for item in custom_list.items):
                 raise NotFoundException("Not found")
                 
         serialized_items = []
-        for item in l.items:
+        for item in custom_list.items:
             if not adult_enabled and self._is_item_adult(item):
                 continue
             serialized_items.append(self._serialize_item(item))
 
         resolved_image = None
-        if l.custom_image_path:
+        if custom_list.custom_image_path:
             from app.domains.media_assets.services.images import image_processing_service
-            resolved_image = image_processing_service.resolve_image_url(l.custom_image_path, "covers")
+            resolved_image = image_processing_service.resolve_image_url(custom_list.custom_image_path, "covers")
 
         return CustomListDetailResponse(
-            id=l.id,
-            name=l.name,
-            is_watchlist=l.name == "Watchlist",
-            description=l.description,
-            color=l.color,
-            list_type=l.list_type,
-            created_at=l.created_at.isoformat() if l.created_at else None,
+            id=custom_list.id,
+            name=custom_list.name,
+            is_watchlist=custom_list.name == "Watchlist",
+            description=custom_list.description,
+            color=custom_list.color,
+            list_type=custom_list.list_type,
+            created_at=custom_list.created_at.isoformat() if custom_list.created_at else None,
             items=serialized_items,
             custom_image_path=resolved_image
         )
@@ -323,8 +321,8 @@ class ListsService:
         )
 
     def update_list(self, list_id: int, payload: Dict[str, Any]) -> CustomListDetailResponse:
-        l = self.db.query(CustomList).filter(CustomList.id == list_id).first()
-        if not l:
+        custom_list = self.db.query(CustomList).filter(CustomList.id == list_id).first()
+        if not custom_list:
             raise NotFoundException("Not found")
 
         name = payload.get("name")
@@ -332,22 +330,22 @@ class ListsService:
         color = payload.get("color")
 
         if name is not None:
-            l.name = name.strip()
+            custom_list.name = name.strip()
         if description is not None:
-            l.description = description
+            custom_list.description = description
         if color is not None:
-            l.color = color.strip()
+            custom_list.color = color.strip()
         self.db.commit()
         return self.get_list_details(list_id)
 
     def delete_list(self, list_id: int) -> Dict[str, Any]:
-        l = self.db.query(CustomList).filter(CustomList.id == list_id).first()
-        if not l:
+        custom_list = self.db.query(CustomList).filter(CustomList.id == list_id).first()
+        if not custom_list:
             raise NotFoundException("Not found")
-        if l.name == "Watchlist":
+        if custom_list.name == "Watchlist":
             raise BadRequestException("Watchlist cannot be deleted")
 
-        self.db.delete(l)
+        self.db.delete(custom_list)
         self.db.commit()
         return {"status": "success"}
 
@@ -413,8 +411,8 @@ class ListsService:
             if local_item:
                 media_item_id = local_item.id
 
-        l = self.db.query(CustomList).filter(CustomList.id == list_id).first()
-        if not l:
+        custom_list = self.db.query(CustomList).filter(CustomList.id == list_id).first()
+        if not custom_list:
             raise NotFoundException("Not found")
 
         match_id = None
@@ -635,7 +633,9 @@ class ListsService:
 
         items = query.all()
         list_ids = list(set(item.list_id for item in items))
-        return ListMembershipResponse(list_ids=list_ids)
+        from app.domains.users.schemas import ListMembershipItem
+        memberships = [ListMembershipItem(list_id=i.list_id, list_item_id=i.id) for i in items]
+        return ListMembershipResponse(list_ids=list_ids, memberships=memberships)
 
     def get_user_catalog(
         self,
@@ -722,8 +722,10 @@ class ListsService:
                     if not override:
                         override = UserOverride(metadata_match_id=match.id)
                         self.db.add(override)
-                    if user_rating is not None: override.user_rating = user_rating
-                    if is_favorite is not None: override.is_favorite = is_favorite
+                    if user_rating is not None:
+                        override.user_rating = user_rating
+                    if is_favorite is not None:
+                        override.is_favorite = is_favorite
                     updated_ids.append(raw_id)
             else:
                 item_id = int(raw_id)
@@ -732,33 +734,37 @@ class ListsService:
                     if not override:
                         override = UserOverride(person_id=item_id)
                         self.db.add(override)
-                    if user_rating is not None: override.user_rating = user_rating
-                    if is_favorite is not None: override.is_favorite = is_favorite
+                    if user_rating is not None:
+                        override.user_rating = user_rating
+                    if is_favorite is not None:
+                        override.is_favorite = is_favorite
                     updated_ids.append(raw_id)
                 else:
                     override = self.db.query(UserOverride).filter(UserOverride.media_item_id == item_id).first()
                     if not override:
                         override = UserOverride(media_item_id=item_id)
                         self.db.add(override)
-                    if user_rating is not None: override.user_rating = user_rating
-                    if is_favorite is not None: override.is_favorite = is_favorite
+                    if user_rating is not None:
+                        override.user_rating = user_rating
+                    if is_favorite is not None:
+                        override.is_favorite = is_favorite
                     updated_ids.append(raw_id)
 
         self.db.commit()
         return BulkUpdateResponse(status="success", tab=tab, updated_ids=updated_ids)
 
     def set_list_image(self, list_id: int, image_path: Optional[str]) -> CustomListDetailResponse:
-        l = self.db.query(CustomList).filter(CustomList.id == list_id).first()
-        if not l:
+        custom_list = self.db.query(CustomList).filter(CustomList.id == list_id).first()
+        if not custom_list:
             raise NotFoundException("List not found")
 
-        l.custom_image_path = image_path if image_path else None
+        custom_list.custom_image_path = image_path if image_path else None
         self.db.commit()
         return self.get_list_details(list_id)
 
     def upload_list_image(self, list_id: int, filename: str, file_stream) -> CustomListDetailResponse:
-        l = self.db.query(CustomList).filter(CustomList.id == list_id).first()
-        if not l:
+        custom_list = self.db.query(CustomList).filter(CustomList.id == list_id).first()
+        if not custom_list:
             raise NotFoundException("List not found")
 
         import uuid
@@ -782,7 +788,7 @@ class ListsService:
 
         img_service.generate_thumbnail(original_path, thumbnail_path, "covers")
 
-        l.custom_image_path = new_filename
+        custom_list.custom_image_path = new_filename
         self.db.commit()
 
         return self.get_list_details(list_id)

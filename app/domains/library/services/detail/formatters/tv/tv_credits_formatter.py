@@ -21,7 +21,7 @@ class TvCreditsFormatter:
             if (r_date.month, r_date.day) < (b_date.month, b_date.day):
                 age -= 1
             return age
-        except:
+        except Exception:
             return None
 
     def query_local_profiles(self, db: Session, person_ids: set, current_uid: int) -> Dict[int, Dict[str, Any]]:
