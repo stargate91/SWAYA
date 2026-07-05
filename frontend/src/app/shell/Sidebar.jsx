@@ -47,17 +47,23 @@ export default function Sidebar({ isCollapsed, onToggle }) {
       </nav>
       <div className="shell__sidebar-footer">
         {isCollapsed ? (
-          <Tooltip content={t('sidebar.about')} side="right">
-            <button type="button" className="shell__nav-link shell__nav-link--footer">
+          <Tooltip content={t('sidebar.about') || 'About'} side="right">
+            <NavLink
+              to="/about"
+              className={({ isActive }) => `shell__nav-link shell__nav-link--footer ${isActive ? 'is-active' : ''}`}
+            >
               <CircleHelp size={18} />
-              <span className="shell__nav-link-label">{t('sidebar.about')}</span>
-            </button>
+              <span className="shell__nav-link-label">{t('sidebar.about') || 'About'}</span>
+            </NavLink>
           </Tooltip>
         ) : (
-          <button type="button" className="shell__nav-link shell__nav-link--footer">
+          <NavLink
+            to="/about"
+            className={({ isActive }) => `shell__nav-link shell__nav-link--footer ${isActive ? 'is-active' : ''}`}
+          >
             <CircleHelp size={18} />
-            <span className="shell__nav-link-label">{t('sidebar.about')}</span>
-          </button>
+            <span className="shell__nav-link-label">{t('sidebar.about') || 'About'}</span>
+          </NavLink>
         )}
         {isCollapsed ? (
           <Tooltip content={t('sidebar.quit')} side="right">

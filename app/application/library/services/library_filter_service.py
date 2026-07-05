@@ -144,13 +144,13 @@ class LibraryFilterService:
         breast_types = []
         butt_shapes = []
         butt_sizes = []
-        if is_adult:
+        if True:
             from app.domains.people.models import Person, MediaPersonLink
             from app.domains.metadata.models import Studio
             from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
 
             settings_adapter = DbSettingsAdapter(self.db)
-            gender_pref = settings_adapter.get_setting("adult_gender_preference")
+            gender_pref = settings_adapter.get_setting("adult_gender_preference") if is_adult else "all"
 
             performers_query = self.db.query(Person.id, Person.name).join(
                 MediaPersonLink, MediaPersonLink.person_id == Person.id

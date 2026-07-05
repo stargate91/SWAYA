@@ -143,6 +143,16 @@ class PeopleQueryBuilder:
                 item.height or 999,
                 (item.name or "").lower()
             ))
+        elif params.sort_by == "weight_desc":
+            people_items.sort(key=lambda item: (
+                -(item.weight or 0),
+                (item.name or "").lower()
+            ))
+        elif params.sort_by == "weight_asc":
+            people_items.sort(key=lambda item: (
+                item.weight or 9999,
+                (item.name or "").lower()
+            ))
         elif params.sort_by in ("hourglass_ratio_desc", "hourglass_ratio_asc"):
             def get_whr(item):
                 try:
@@ -256,6 +266,7 @@ class PeopleQueryBuilder:
                 "waist": item.waist,
                 "hip": item.hip,
                 "height": item.height,
+                "weight": item.weight,
                 "hair_color": item.hair_color,
                 "ethnicity": item.ethnicity,
                 "eye_color": item.eye_color,

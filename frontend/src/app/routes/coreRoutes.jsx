@@ -7,6 +7,7 @@ const SettingsPage = lazy(() => import('../pages/settings/SettingsPage'));
 const SearchPage = lazy(() => import('../pages/search/SearchPage'));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 const ListsPage = lazy(() => import('../pages/lists/ListsPage'));
+const AboutPage = lazy(() => import('../pages/about/AboutPage'));
 
 export const coreRoutes = [
   { index: true, element: <Navigate to="/dashboard" replace /> },
@@ -14,5 +15,6 @@ export const coreRoutes = [
   { path: 'search', element: <SearchPage /> },
   { path: 'lists', element: <ListsPage /> },
   { path: 'settings', element: <SettingsPage /> },
+  { path: 'about', element: <AboutPage /> },
   { path: '*', element: <NotFoundPage /> },
 ];

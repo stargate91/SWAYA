@@ -125,6 +125,7 @@ import {
   Star,
   History,
   Settings,
+  Info,
 } from 'lucide-react';
 
 export const ENTITY_ICONS = {
@@ -144,4 +145,5 @@ export const SIDEBAR_ICONS = {
   myRatings: Star,
   history: History,
   settings: Settings,
+  about: Info,
 };

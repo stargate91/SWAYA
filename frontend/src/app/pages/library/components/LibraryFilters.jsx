@@ -17,6 +17,19 @@ import LibraryAdvancedFilters from './LibraryAdvancedFilters';
 
 const dummyFunc = () => {};
 
+const formatPhysicalAttributeLabel = (val) => {
+  if (!val) return '';
+  if (val.toUpperCase() === 'NA' || val.toUpperCase() === 'N/A') return 'N/A';
+  return val
+    .toLowerCase()
+    .split(' ')
+    .map(word => {
+      if (word === 'na' || word === 'n/a') return 'N/A';
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(' ');
+};
+
 export default function LibraryFilters({
   t,
   settings,
@@ -131,15 +144,14 @@ export default function LibraryFilters({
                       { value: 'name', label: t('library.sort.name') || 'Name' },
                       { value: 'birthday', label: t('library.sort.birthday') || 'Birthdate' },
                       { value: 'user_rating', label: t('library.sort.userRating') || 'User Rating' },
-                      ...(activeSessionMode === 'nsfw' ? [
-                        { value: 'height', label: t('library.sort.height') || 'Height' },
-                        { value: 'cup_size', label: t('library.sort.cupSize') || 'Breast Size' },
-                        { value: 'waist', label: t('library.sort.waist') || 'Waist Size' },
-                        { value: 'hip', label: t('library.sort.hip') || 'Hip Size' },
-                        { value: 'hourglass_ratio', label: t('library.sort.hourglassRatio') || 'Hourglass Ratio' },
-                        { value: 'body_slender', label: t('library.sort.bodySlender') || 'Slender / Athletic' },
-                        { value: 'body_curvy', label: t('library.sort.bodyCurvy') || 'Hourglass / Curvy' }
-                      ] : []),
+                      { value: 'height', label: t('library.sort.height') || 'Height' },
+                      { value: 'weight', label: t('library.sort.weight') || 'Weight' },
+                      { value: 'cup_size', label: t('library.sort.cupSize') || 'Breast Size' },
+                      { value: 'waist', label: t('library.sort.waist') || 'Waist Size' },
+                      { value: 'hip', label: t('library.sort.hip') || 'Hip Size' },
+                      { value: 'hourglass_ratio', label: t('library.sort.hourglassRatio') || 'Hourglass Ratio' },
+                      { value: 'body_slender', label: t('library.sort.bodySlender') || 'Slender / Athletic' },
+                      { value: 'body_curvy', label: t('library.sort.bodyCurvy') || 'Hourglass / Curvy' }
                     ]
                     : [
                       { value: 'title', label: t('library.sort.title') || 'Title' },
@@ -217,8 +229,25 @@ export default function LibraryFilters({
               ]}
             />
           </div>
-        )
-      }
+        )}
+
+        {isPeople && filterData?.ethnicities && filterData.ethnicities.length > 0 && (
+          <div className="library-sorter-container">
+            <span className="library-sorter-label">{t('library.filter.ethnicityLabel') || 'Ethnicity:'}</span>
+            <Dropdown
+              variant="sorter"
+              value={ethnicityFilter}
+              onChange={(e) => {
+                setEthnicityFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              options={[
+                { value: '', label: t('library.filter.allEthnicities') || 'All Ethnicities' },
+                ...(filterData.ethnicities).map(eth => ({ value: eth, label: formatPhysicalAttributeLabel(eth) })),
+              ]}
+            />
+          </div>
+        )}
 
         {isVideoTab && (
           <div className="library-sorter-container">
@@ -367,7 +396,7 @@ export default function LibraryFilters({
           </Pill>
         )}
 
-        {isPeopleTab && activeSessionMode === 'nsfw' && (
+        {isPeopleTab && (
           <Pill
             variant={showAdvanced ? 'filter-active' : 'favorite'}
             onClick={() => setShowAdvanced(prev => !prev)}
@@ -396,7 +425,7 @@ export default function LibraryFilters({
       </div>
     </div>
 
-    {showAdvanced && isPeopleTab && activeSessionMode === 'nsfw' && (
+    {showAdvanced && isPeopleTab && (
       <LibraryAdvancedFilters
         t={t}
         hairColorFilter={hairColorFilter}

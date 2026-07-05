@@ -1,0 +1,51 @@
+{
+  "title": "About & Help",
+  "subtitle": "Learn more about Swaya, read the changelog, or view legal notices.",
+  "links": {
+    "email": "Email",
+    "website": "Website",
+    "github": "GitHub",
+    "discord_server": "Discord Server"
+  },
+  "resources": {
+    "docs": "Documentation",
+    "changelog": "Changelog"
+  },
+  "notices": {
+    "privacy": "Privacy Policy",
+    "privacy_intro": "Swaya is designed with privacy in mind:",
+    "points": {
+      "local_only": "All database records, settings, and files are stored strictly locally on your machine.",
+      "api_keys": "Third-party API keys are stored securely in your local configuration.",
+      "network": "External network connections are only made to fetch metadata from active providers you configure.",
+      "logs": "Application logs are stored locally and are never shared automatically."
+    },
+    "license": "License",
+    "license_intro": "Swaya is licensed under the MIT License:",
+    "license_body": {
+      "p1": "Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so.",
+      "p2": "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.",
+      "p3": "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.",
+      "p4": "IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
+    },
+    "third_party": "Third-Party Notices",
+    "third_party_intro": "Swaya is built with gratitude using open-source libraries and APIs:",
+    "third_party_points": {
+      "ui": "UI Components: React, Vite, TailwindCSS (for legacy parts), Lucide React, and other open source NPM packages.",
+      "backend": "Backend Framework: FastAPI, Python, SQLite, SQLAlchemy, and Alembic.",
+      "media": "Media Player: MPV player integration and local media streaming capabilities.",
+      "metadata": "Metadata Scrapers: TMDb, FansDB, PornDB, StashDB, and others."
+    },
+    "third_party_highlight": {
+      "tmdb_title": "The Movie Database (TMDB)",
+      "tmdb_body": "This product uses the TMDB API but is not endorsed or certified by TMDB."
+    },
+    "third_party_thanks": "A huge thank you to all open-source developers, maintainers, and community metadata providers!"
+  },
+  "app_info": {
+    "version": "Version",
+    "developer": "Developer"
+  },
+  "coming_soon": "Coming soon...",
+  "back": "Back"
+}

@@ -1443,7 +1443,11 @@
 .library-page .ui-dropdown__trigger--sorter:hover:not(:disabled),
 .library-page .ui-dropdown__trigger:hover:not(:disabled),
 .library-page .ui-input:hover:not(:focus),
-.library-page .ui-select:hover:not(:focus) {
+.library-page .ui-select:hover:not(:focus),
+.add-people-modal .ui-dropdown__trigger--sorter:hover:not(:disabled),
+.add-people-modal .ui-dropdown__trigger:hover:not(:disabled),
+.add-people-modal .ui-input:hover:not(:focus),
+.add-people-modal .ui-select:hover:not(:focus) {
   border-color: color-mix(in srgb, var(--color-accent) 45%, var(--ui-control-border)) !important;
 }
 
@@ -1456,7 +1460,17 @@
 .library-page .ui-input:focus,
 .library-page .ui-input:focus-visible,
 .library-page .ui-select:focus,
-.library-page .ui-select:focus-visible {
+.library-page .ui-select:focus-visible,
+.add-people-modal .ui-dropdown__trigger--sorter.is-open,
+.add-people-modal .ui-dropdown__trigger--sorter:focus,
+.add-people-modal .ui-dropdown__trigger--sorter:focus-visible,
+.add-people-modal .ui-dropdown__trigger.is-open,
+.add-people-modal .ui-dropdown__trigger:focus,
+.add-people-modal .ui-dropdown__trigger:focus-visible,
+.add-people-modal .ui-input:focus,
+.add-people-modal .ui-input:focus-visible,
+.add-people-modal .ui-select:focus,
+.add-people-modal .ui-select:focus-visible {
   border-color: var(--color-accent) !important;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 15%, transparent) !important;
   outline: none !important;

@@ -56,23 +56,6 @@ export default function LibraryAdvancedFilters({
           </div>
         )}
 
-        {filterData?.ethnicities && filterData.ethnicities.length > 0 && (
-          <div className="library-sorter-container">
-            <span className="library-sorter-label">{t('library.filter.ethnicityLabel') || 'Ethnicity:'}</span>
-            <Dropdown
-              variant="sorter"
-              value={ethnicityFilter}
-              onChange={(e) => {
-                setEthnicityFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-              options={[
-                { value: '', label: t('library.filter.allEthnicities') || 'All Ethnicities' },
-                ...(filterData.ethnicities).map(eth => ({ value: eth, label: formatPhysicalAttributeLabel(eth) })),
-              ]}
-            />
-          </div>
-        )}
 
         {filterData?.eye_colors && filterData.eye_colors.length > 0 && (
           <div className="library-sorter-container">
