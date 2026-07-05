@@ -45,7 +45,7 @@ class FilesystemRenamer:
         batch_id = self._ensure_batch_id(batch_id)
 
         successful_moves = []
-
+        paths_to_ignore = []
         try:
             preview_action = self.compiler._preview_action(preview)
             if preview_action == "skip":
@@ -96,6 +96,21 @@ class FilesystemRenamer:
                         if e_target.is_dir():
                             raise FileExistsError(f"Directory exists at extra target: {e_target}")
                         raise FileExistsError(f"File exists at extra target: {e_target}")
+
+            # Register paths to ignore in the Watchdog registry
+            from app.infrastructure.filesystem.folder_watcher import ignore_path
+            if target_path != old_path:
+                paths_to_ignore.append(str(old_path.resolve()))
+                paths_to_ignore.append(str(target_path.resolve()))
+            for extra_preview in preview.extra_previews:
+                extra = self.library_port.get_extra_by_id(extra_preview.extra_id)
+                if extra:
+                    paths_to_ignore.append(str(Path(extra.current_path).resolve()))
+                    if extra_preview.target_path:
+                        paths_to_ignore.append(str(Path(extra_preview.target_path).resolve()))
+            
+            for p in paths_to_ignore:
+                ignore_path(p)
 
             if target_path != old_path:
                 target_path.parent.mkdir(parents=True, exist_ok=True)
@@ -183,6 +198,16 @@ class FilesystemRenamer:
                             new_val=preview.target_path, error=str(e))
             self.db.flush()
             return False
+        finally:
+            if paths_to_ignore:
+                import time
+                import threading
+                from app.infrastructure.filesystem.folder_watcher import stop_ignoring
+                def delayed_unignore(paths):
+                    time.sleep(3.0)
+                    for p in paths:
+                        stop_ignoring(p)
+                threading.Thread(target=delayed_unignore, args=(paths_to_ignore,), daemon=True).start()
 
     def _ensure_batch_id(self, batch_id: Optional[int]) -> int:
         if batch_id is not None:
@@ -236,6 +261,7 @@ class FilesystemRenamer:
         return undo_count
 
     def _undo_single(self, log: Any) -> bool:
+        paths_to_ignore = []
         try:
             if log.action_type not in [ActionType.RENAME, ActionType.MOVE]:
                 return False
@@ -247,6 +273,12 @@ class FilesystemRenamer:
                 logger.error(f"Undo hiba: A fájl már nem található a célhelyen: {new_path}")
                 self.library_port.update_action_log_status(log.id, ActionStatus.FAILED, "File missing at destination")
                 return False
+
+            from app.infrastructure.filesystem.folder_watcher import ignore_path
+            paths_to_ignore.append(str(old_path.resolve()))
+            paths_to_ignore.append(str(new_path.resolve()))
+            for p in paths_to_ignore:
+                ignore_path(p)
 
             old_path.parent.mkdir(parents=True, exist_ok=True)
             shutil.move(str(new_path), str(old_path))
@@ -264,6 +296,16 @@ class FilesystemRenamer:
             logger.exception(f"Undo hiba: {e}")
             self.db.rollback()
             return False
+        finally:
+            if paths_to_ignore:
+                import time
+                import threading
+                from app.infrastructure.filesystem.folder_watcher import stop_ignoring
+                def delayed_unignore(paths):
+                    time.sleep(3.0)
+                    for p in paths:
+                        stop_ignoring(p)
+                threading.Thread(target=delayed_unignore, args=(paths_to_ignore,), daemon=True).start()
 
     def _cleanup_empty_parent(self, path: Path):
         try:

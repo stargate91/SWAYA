@@ -65,6 +65,9 @@ export function sortLibraryItems(items, resolvedTab, sortKey, sortDirection) {
       if (sortKey === 'height') {
         return Number(item.height) || 0;
       }
+      if (sortKey === 'weight') {
+        return Number(item.weight) || 0;
+      }
       if (sortKey === 'cup_size') {
         const cupOrder = {
           'A': 1, 'B': 2, 'C': 3, 'D': 4, 'DD': 5, 'DDD': 6, 'E': 7, 'EE': 8, 'F': 9, 'FF': 10,

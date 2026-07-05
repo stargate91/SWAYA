@@ -78,13 +78,16 @@ async def lifespan(app: FastAPI):
     task_manager.people_enrich_worker.scrapers = scraper_gateway
     await task_manager.download_worker.start()
     await task_manager.people_enrich_worker.start()
-    
     if sys.platform == "win32":
         from app.infrastructure.playback.hotkey_listener import start_hotkey_listener
         start_hotkey_listener()
     
+    from app.infrastructure.filesystem.folder_watcher import start_watcher, stop_watcher
+    start_watcher()
+    
     yield
     # Shutdown logic if any goes here
+    stop_watcher()
     await task_manager.download_worker.stop()
     await task_manager.people_enrich_worker.stop()
     logger.info("Application shutting down.")

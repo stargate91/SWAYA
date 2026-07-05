@@ -133,6 +133,7 @@ class PeopleLibraryService:
                 waist=person.waist,
                 hip=person.hip,
                 height=person.height,
+                weight=person.weight,
                 hair_color=person.hair_color,
                 ethnicity=person.ethnicity,
                 eye_color=person.eye_color,

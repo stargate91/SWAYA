@@ -397,6 +397,7 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     if (ipcRenderer) {
       ipcRenderer.on('mpv-event', handleMpvEvent);
       ipcRenderer.on('pip-mode-change', handlePipChange);
+      ipcRenderer.send('mpv-player-ready');
     }
 
     // Resize observer to keep native window exactly aligned with React container

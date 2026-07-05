@@ -42,13 +42,13 @@ class LibraryListingService:
             MetadataMatch, (MetadataMatch.media_item_id == MediaItem.id) & (MetadataMatch.is_active)
         ).filter(
             UserOverride.resume_position > 0,
-            UserOverride.is_watched == False
+            (UserOverride.is_watched == False) | (UserOverride.is_watched.is_(None))
         ).options(
             joinedload(UserOverride.media_item).joinedload(MediaItem.matches).joinedload(MetadataMatch.localizations),
             joinedload(UserOverride.media_item).joinedload(MediaItem.matches).joinedload(MetadataMatch.parent).joinedload(MetadataMatch.parent).joinedload(MetadataMatch.localizations)
         )
         if not include_adult:
-            query = query.filter((MetadataMatch.id is None) | (MetadataMatch.is_adult == False))
+            query = query.filter((MetadataMatch.id.is_(None)) | (MetadataMatch.is_adult == False) | (MetadataMatch.is_adult.is_(None)))
 
         overrides = query.order_by(UserOverride.last_watched_at.desc()).limit(limit).all()
 

@@ -23,7 +23,9 @@ class DbPlaybackAdapter(PlaybackPort):
                 PlaybackLog.user_id == user_id
             ).order_by(PlaybackLog.watched_at.desc()).first()
             
+            from datetime import datetime, timezone
             override.resume_position = current_time
+            override.last_watched_at = datetime.now(timezone.utc)
             if log:
                 log.position_seconds = current_time
                 

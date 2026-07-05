@@ -558,4 +558,15 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
       controlsWindow.webContents.send('theme-changed', newTheme);
     }
   });
+
+  ipcMain.on('mpv-player-ready', (event) => {
+    writeElectronLog('INFO', 'mpv-player-ready received, sending latest properties', Object.keys(latestMpvProperties));
+    for (const [name, data] of Object.entries(latestMpvProperties)) {
+      event.sender.send('mpv-event', {
+        event: 'property-change',
+        name,
+        data
+      });
+    }
+  });
 }

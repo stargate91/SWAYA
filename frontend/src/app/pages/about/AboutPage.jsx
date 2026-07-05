@@ -16,6 +16,7 @@ import {
 import IconButton from '../../ui/IconButton';
 import Button from '../../ui/Button';
 import Card from '../../ui/Card';
+import { fetchJson } from '../../lib/http';
 import '../../styles/AboutPage.css';
 
 const tmdbAttributionLogoSrc = 'https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_2-d537fb228cf3ded904ef09b136fe3fec72548ebc1fea3fbbd1ad9e36364db38b.svg';
@@ -50,35 +51,34 @@ export default function AboutPage() {
   const [changelogContent, setChangelogContent] = useState('');
   const [isLoadingChangelog, setIsLoadingChangelog] = useState(false);
   const [changelogError, setChangelogError] = useState(null);
+  const [hasLoadedChangelog, setHasLoadedChangelog] = useState(false);
 
   const handleClose = () => {
     navigate(-1);
   };
 
   useEffect(() => {
-    if (activeTab === 'changelog' && !changelogContent && !isLoadingChangelog) {
+    if (activeTab === 'changelog' && !hasLoadedChangelog && !isLoadingChangelog) {
       setIsLoadingChangelog(true);
       setChangelogError(null);
-      fetch('/api/v1/settings/changelog')
-        .then((res) => {
-          if (!res.ok) throw new Error('Failed to load changelog');
-          return res.json();
-        })
+      fetchJson('/api/settings/changelog')
         .then((data) => {
           if (data.status === 'success') {
             setChangelogContent(data.content || '');
+            setHasLoadedChangelog(true);
           } else {
             throw new Error(data.message || 'Failed to load changelog');
           }
         })
         .catch((err) => {
           setChangelogError(err.message || 'Failed to load changelog');
+          setHasLoadedChangelog(true);
         })
         .finally(() => {
           setIsLoadingChangelog(false);
         });
     }
-  }, [activeTab, changelogContent, isLoadingChangelog]);
+  }, [activeTab, hasLoadedChangelog, isLoadingChangelog]);
 
   const tabs = [
     { id: 'info', label: t('about.title'), icon: <Info size={18} /> },
@@ -142,45 +142,50 @@ export default function AboutPage() {
           <div className="settings-tab-content">
             {activeTab === 'info' && (
               <div className="about-tab-panel info-panel">
-                <Card className="about-card info-card">
-                  <div className="info-header">
-                    <div className="info-logo">
-                      <Info size={48} className="info-logo-icon" />
+                <div className="about-app-brand-card">
+                  <div className="about-app-logo">S</div>
+                  <div className="about-app-details">
+                    <div className="about-app-name-row">
+                      <span className="about-app-title">SWAYA</span>
+                      <span className="about-app-version">v{appInfo.version}</span>
                     </div>
-                    <div className="info-titles">
-                      <h2 className="info-app-name">{appInfo.name}</h2>
-                      <p className="info-app-tagline">{t('about.subtitle')}</p>
-                    </div>
+                    <p className="about-app-description">{t('about.subtitle') || 'Organize, enrich, and keep your media library clean.'}</p>
                   </div>
+                </div>
 
-                  <div className="info-details-list">
-                    <div className="info-details-item">
-                      <span className="info-detail-label">{t('about.app_info.version')}</span>
-                      <span className="info-detail-value">{appInfo.version}</span>
+                <div className="about-single-layout">
+                  <div className="about-column">
+                    <div className="about-section-header">
+                      <h3>Developer</h3>
+                      <p>Reach out directly if you want to report bugs, collaborate, or share feedback.</p>
                     </div>
-                    <div className="info-details-item">
-                      <span className="info-detail-label">{t('about.app_info.developer')}</span>
-                      <span className="info-detail-value">{appInfo.developer.name}</span>
+                    <div className="developer-profile-card">
+                      <div className="developer-avatar">L</div>
+                      <div className="developer-info">
+                        <span className="developer-name">Levente Gáll</span>
+                        <span className="developer-email">leventegall@proton.me</span>
+                      </div>
                     </div>
-                  </div>
-
-                  <div className="info-links-grid">
-                    {developerLinks.map((link) => (
-                      <a
-                        key={link.href}
-                        href={link.href}
-                        className="info-link-btn"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          openExternalLink(link.href);
-                        }}
-                      >
-                        <span className="info-link-icon">{link.icon}</span>
-                        <span className="info-link-label">{link.label}</span>
+                    <div className="developer-links-grid">
+                      <a href="mailto:leventegall@proton.me" className="about-action-btn" onClick={(e) => { e.preventDefault(); openExternalLink('mailto:leventegall@proton.me'); }}>
+                        <Mail size={16} />
+                        <span>Email</span>
                       </a>
-                    ))}
+                      <a href="https://swaya.io" className="about-action-btn" onClick={(e) => { e.preventDefault(); openExternalLink('https://swaya.io'); }}>
+                        <Globe size={16} />
+                        <span>Website</span>
+                      </a>
+                      <a href="https://github.com/stargate91/SWAYA" className="about-action-btn" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/stargate91/SWAYA'); }}>
+                        <GitHubIcon size={16} />
+                        <span>GitHub</span>
+                      </a>
+                      <a href="https://discord.gg/swaya" className="about-action-btn" onClick={(e) => { e.preventDefault(); openExternalLink('https://discord.gg/swaya'); }}>
+                        <DiscordIcon size={16} />
+                        <span>Discord Server</span>
+                      </a>
+                    </div>
                   </div>
-                </Card>
+                </div>
               </div>
             )}
 
@@ -269,6 +274,54 @@ export default function AboutPage() {
                     <div className="tmdb-attribution-text">
                       <h3>{t('about.notices.third_party_highlight.tmdb_title')}</h3>
                       <p>{t('about.notices.third_party_highlight.tmdb_body')}</p>
+                    </div>
+                  </div>
+
+                  <div className="special-thanks-section">
+                    <h3 className="special-thanks-title">{t('about.notices.special_thanks_title')}</h3>
+                    <p className="special-thanks-intro">{t('about.notices.special_thanks_intro')}</p>
+                    <div className="special-thanks-grid">
+                      <div className="thanks-item">
+                        <span className="thanks-name">Silur</span>
+                        <div className="thanks-links">
+                          <a href="https://github.com/Silur" className="thanks-link" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/Silur'); }}>
+                            <GitHubIcon size={12} />
+                            <span>GitHub</span>
+                          </a>
+                        </div>
+                      </div>
+                      <div className="thanks-item">
+                        <span className="thanks-name">Kerrigan</span>
+                        <div className="thanks-links">
+                          <a href="https://github.com/rasztasd" className="thanks-link" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/rasztasd'); }}>
+                            <GitHubIcon size={12} />
+                            <span>GitHub 1</span>
+                          </a>
+                          <span className="thanks-divider">•</span>
+                          <a href="https://github.com/danielmcallisterSG" className="thanks-link" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/danielmcallisterSG'); }}>
+                            <GitHubIcon size={12} />
+                            <span>GitHub 2</span>
+                          </a>
+                        </div>
+                      </div>
+                      <div className="thanks-item">
+                        <span className="thanks-name">YaShock</span>
+                        <div className="thanks-links">
+                          <a href="https://github.com/YaShock" className="thanks-link" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/YaShock'); }}>
+                            <GitHubIcon size={12} />
+                            <span>GitHub</span>
+                          </a>
+                        </div>
+                      </div>
+                      <div className="thanks-item">
+                        <span className="thanks-name">Data</span>
+                        <div className="thanks-links">
+                          <a href="https://github.com/adamgyongyosi" className="thanks-link" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/adamgyongyosi'); }}>
+                            <GitHubIcon size={12} />
+                            <span>GitHub</span>
+                          </a>
+                        </div>
+                      </div>
                     </div>
                   </div>
 

@@ -122,15 +122,26 @@ def send_to_trash(paths: Iterable[Path]) -> int:
             continue
         filtered_candidates.append(candidate)
 
+    from app.infrastructure.filesystem.folder_watcher import ignore_path, stop_ignoring
+
     for candidate in filtered_candidates:
-        if send2trash is not None:
-            send2trash(str(candidate))
-        elif sys.platform.startswith("win"):
-            _send_to_trash_windows(candidate)
-        else:
-            raise RuntimeError("send2trash is not installed and OS is not Windows")
-        moved += 1
-        logger.info(f"FS: Sent to trash: {candidate}")
+        abs_path = str(candidate.resolve())
+        ignore_path(abs_path)
+        try:
+            if send2trash is not None:
+                send2trash(str(candidate))
+            elif sys.platform.startswith("win"):
+                _send_to_trash_windows(candidate)
+            else:
+                raise RuntimeError("send2trash is not installed and OS is not Windows")
+            moved += 1
+            logger.info(f"FS: Sent to trash: {candidate}")
+        finally:
+            # We delay un-ignoring slightly to let the database delete transaction finish
+            def delayed_unignore(p):
+                time.sleep(3.0)
+                stop_ignoring(p)
+            threading.Thread(target=delayed_unignore, args=(abs_path,), daemon=True).start()
 
     return moved
 

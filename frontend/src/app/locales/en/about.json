@@ -1,6 +1,6 @@
 {
   "title": "About & Help",
-  "subtitle": "Learn more about Swaya, read the changelog, or view legal notices.",
+  "subtitle": "Your next-generation personal media center to organize, enrich, and play your local library.",
   "links": {
     "email": "Email",
     "website": "Website",
@@ -20,26 +20,28 @@
       "network": "External network connections are only made to fetch metadata from active providers you configure.",
       "logs": "Application logs are stored locally and are never shared automatically."
     },
-    "license": "License",
-    "license_intro": "Swaya is licensed under the MIT License:",
+    "license": "End User License Agreement",
+    "license_intro": "Swaya Commercial License Terms:",
     "license_body": {
-      "p1": "Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so.",
-      "p2": "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.",
-      "p3": "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.",
-      "p4": "IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
+      "p1": "Swaya is a commercial proprietary application. All rights, including copyright and intellectual property rights, are reserved and owned exclusively by the developer.",
+      "p2": "Swaya is distributed under a hybrid licensing model, offering monthly or annual subscription plans alongside a one-time lifetime purchase option. Usage of this software requires an active, valid license associated with your account.",
+      "p3": "You are granted a non-exclusive, non-transferable, and revocable license to install and run the software on personal devices for personal use, in accordance with your active plan.",
+      "p4": "Any unauthorized copying, modification, distribution, redistribution, decompilation, or reverse engineering of the software code and assets is strictly prohibited."
     },
     "third_party": "Third-Party Notices",
     "third_party_intro": "Swaya is built with gratitude using open-source libraries and APIs:",
     "third_party_points": {
-      "ui": "UI Components: React, Vite, TailwindCSS (for legacy parts), Lucide React, and other open source NPM packages.",
-      "backend": "Backend Framework: FastAPI, Python, SQLite, SQLAlchemy, and Alembic.",
-      "media": "Media Player: MPV player integration and local media streaming capabilities.",
+      "ui": "UI Components & States: Electron, React, Vite, TailwindCSS (for legacy parts), Zustand, React Router DOM, TanStack React Query, Lucide React, and other open-source NPM packages.",
+      "backend": "Backend Framework: FastAPI, Uvicorn, Python, SQLite, SQLAlchemy, Alembic, Pydantic, and GuessIt.",
+      "media": "Media & OS Integration: MPV player integration, Pillow (image processing), Watchdog (file system monitoring), PyWin32, and icoextract.",
       "metadata": "Metadata Scrapers: TMDb, FansDB, PornDB, StashDB, and others."
     },
     "third_party_highlight": {
       "tmdb_title": "The Movie Database (TMDB)",
       "tmdb_body": "This product uses the TMDB API but is not endorsed or certified by TMDB."
     },
+    "special_thanks_title": "Special Thanks",
+    "special_thanks_intro": "For their ideas, guidance, and inspiration:",
     "third_party_thanks": "A huge thank you to all open-source developers, maintainers, and community metadata providers!"
   },
   "app_info": {

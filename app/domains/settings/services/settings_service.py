@@ -147,7 +147,10 @@ class SettingsService:
         return {"valid": True, "message": "foldersVerified"}
 
     def get_changelog(self) -> Dict[str, Any]:
-        changelog_path = Path("CHANGELOG.md")
+        project_root = Path(__file__).resolve().parents[4]
+        changelog_path = project_root / "CHANGELOG.md"
+        if not changelog_path.exists():
+            changelog_path = Path("CHANGELOG.md")
         if changelog_path.exists():
             return {"status": "success", "content": changelog_path.read_text(encoding="utf-8")}
         return {"status": "error", "message": "CHANGELOG.md not found.", "content": ""}
