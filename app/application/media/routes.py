@@ -152,3 +152,33 @@ def image_proxy(url: str = Query(..., description="The remote image URL to proxy
         logger.exception(f"Image proxy failed for URL {url}")
         raise HTTPException(status_code=502, detail=f"Failed to fetch remote image: {e}")
 
+
+@router.get("/media/{item_id}/preview")
+def get_media_preview(item_id: int, db: Session = Depends(get_db)):
+    import os
+    from fastapi.responses import FileResponse
+    from fastapi import HTTPException
+    from app.domains.library.models import MediaItem
+    from app.domains.library.services.preview_service import PreviewService
+
+    item = db.query(MediaItem).filter(MediaItem.id == item_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Media item not found")
+    
+    if not item.library or not item.library.root_path:
+        raise HTTPException(status_code=400, detail="Invalid library configuration for media item")
+        
+    filepath = os.path.join(item.library.root_path, item.relative_path)
+    
+    try:
+        preview_service = PreviewService()
+        preview_path = preview_service.generate_preview(filepath, str(item_id))
+        return FileResponse(preview_path, media_type="video/mp4")
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"Error generating preview: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to generate preview: {e}")
+
+

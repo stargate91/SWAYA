@@ -494,3 +494,8 @@ button.ui-poster-card__image-wrapper:hover:not(:disabled) {
   align-items: center;
   justify-content: center;
 }
+
+@keyframes ui-poster-card-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

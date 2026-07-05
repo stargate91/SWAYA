@@ -212,6 +212,10 @@ export const LibraryPosterCard = memo(({
     }
   }
 
+  const previewItemId = (isLibraryScenes && item.in_library !== false)
+    ? (item.library_item_id || item.id)
+    : undefined;
+
   return (
     <PosterCard
       customStyle={{ '--item-index': index }}
@@ -230,6 +234,7 @@ export const LibraryPosterCard = memo(({
       topRightBadge={topRightBadge}
       playOverlay={playOverlay}
       className={className}
+      previewItemId={previewItemId}
     />
   );
 });

@@ -4,6 +4,7 @@ import Pill from './Pill';
 import IconButton from './IconButton';
 import { Star, Check } from '@/ui/icons';
 import Tooltip from './Tooltip';
+import { API_BASE } from '@/lib/backend';
 import './PosterCard.css';
 
 const PosterCard = memo(function PosterCard({
@@ -32,6 +33,7 @@ const PosterCard = memo(function PosterCard({
   style,
   customStyle,
   children,
+  previewItemId,
   ...props
 }) {
   const isInteractive = !!onClick;
@@ -40,10 +42,53 @@ const PosterCard = memo(function PosterCard({
   const isOverlayTitle = variant === 'overlay-title';
 
   const [imageError, setImageError] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [previewSrc, setPreviewSrc] = useState(null);
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
 
   useEffect(() => {
     setImageError(false);
   }, [imageUrl]);
+
+  useEffect(() => {
+    if (!previewItemId || !isHovered) {
+      setPreviewSrc(null);
+      setIsLoadingPreview(false);
+      return;
+    }
+
+    let active = true;
+    let controller = null;
+
+    const timer = setTimeout(async () => {
+      if (!active) return;
+      setIsLoadingPreview(true);
+      try {
+        controller = new AbortController();
+        const url = `${API_BASE}/api/v1/media/${previewItemId}/preview`;
+        const response = await fetch(url, { signal: controller.signal });
+        if (response.ok && active) {
+          setPreviewSrc(url);
+        }
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error("Failed to load preview:", err);
+        }
+      } finally {
+        if (active) {
+          setIsLoadingPreview(false);
+        }
+      }
+    }, 500);
+
+    return () => {
+      active = false;
+      clearTimeout(timer);
+      if (controller) {
+        controller.abort();
+      }
+    };
+  }, [isHovered, previewItemId]);
 
   const handleKeyDown = (e) => {
     if (onClick && (e.key === 'Enter' || e.key === ' ')) {
@@ -61,9 +106,15 @@ const PosterCard = memo(function PosterCard({
     interactiveProps.onKeyDown = handleKeyDown;
   }
 
+
   return (
     /* eslint-disable-next-line react/forbid-dom-props */
-    <div className={cardClassName} style={customStyle || style}>
+    <div
+      className={cardClassName}
+      style={customStyle || style}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className="ui-poster-card__media-shell">
         <DefaultComponent
           type={DefaultComponent === 'button' ? 'button' : undefined}
@@ -89,6 +140,55 @@ const PosterCard = memo(function PosterCard({
               >
                 {IconComponent && <IconComponent size={32} className="ui-poster-card__placeholder-icon" />}
                 {placeholderText && <span className="ui-poster-card__placeholder-text">{placeholderText}</span>}
+              </div>
+            )}
+            {previewSrc && (
+              <video
+                ref={(el) => {
+                  if (el) {
+                    el.muted = true;
+                    el.defaultMuted = true;
+                  }
+                }}
+                src={previewSrc}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="ui-poster-card__image"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  zIndex: 3,
+                }}
+              />
+            )}
+            {isLoadingPreview && (
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'rgba(0, 0, 0, 0.4)',
+                  zIndex: 4,
+                  backdropFilter: 'blur(2px)',
+                }}
+              >
+                <div
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    border: '3px solid rgba(255, 255, 255, 0.1)',
+                    borderTop: '3px solid var(--color-accent, var(--color-accent-blue, #0088ff))',
+                    borderRadius: '50%',
+                    animation: 'ui-poster-card-spin 0.6s linear infinite',
+                  }}
+                />
               </div>
             )}
             {overlay}
