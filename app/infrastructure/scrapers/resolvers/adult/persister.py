@@ -1,8 +1,11 @@
+import logging
 from typing import Optional
 from sqlalchemy.orm import Session
 from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch
 from app.shared_kernel.enums import Provider, MediaType, ItemStatus
+
+logger = logging.getLogger(__name__)
 
 def persist_scene_match(
     db: Session,
@@ -26,6 +29,7 @@ def persist_scene_match(
     if provider == Provider.PORNDB:
         scene_data = scraper.enrich_scene_ratings(scene_data)
     normalized = ScraperNormalizer.normalize_adult_scene(provider.value, scene_data)
+
     persister = ScraperPersister(db)
     match = persister.persist_normalized_scene(provider, str(scene_data['id']), normalized, media_type=MediaType.SCENE, media_item_id=item.id)
     match.is_active = is_active

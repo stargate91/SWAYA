@@ -572,6 +572,11 @@
   color: var(--color-ink) !important;
 }
 
+.window-titlebar__nav-btn:focus-visible {
+  outline: none !important;
+  box-shadow: inset 0 0 0 2px var(--color-accent) !important;
+}
+
 .window-titlebar__nav-btn:disabled {
   opacity: 0.35;
   cursor: not-allowed;

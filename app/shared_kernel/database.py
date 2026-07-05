@@ -60,6 +60,7 @@ def configure_sqlite_engine(target_engine):
         cursor.execute("PRAGMA synchronous=NORMAL;")
         cursor.execute("PRAGMA foreign_keys=ON;")
         cursor.execute("PRAGMA cache_size=-64000;")  # 64MB Cache size
+        cursor.execute("PRAGMA journal_size_limit=67108864;")  # 64MB WAL size limit
         cursor.close()
 
     # Remove BEGIN IMMEDIATE to prevent deadlocking read-only transactions in WAL mode.

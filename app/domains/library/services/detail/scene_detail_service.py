@@ -27,6 +27,7 @@ def _strip_provider_prefix(value: str) -> str:
         cleaned = rest
     return cleaned
 
+
 class SceneDetailService(DetailFormatter):
     def __init__(self, db: Session, scrapers: ScraperGatewayPort):
         super().__init__()

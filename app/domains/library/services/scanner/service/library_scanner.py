@@ -165,7 +165,7 @@ class LibraryScanner:
                 await asyncio.to_thread(resolver.resolve_all, total_items_to_enrich, progress_callback=resolve_progress_cb, task_id=task_id)
                 logger.info("[scan:%s] Resolver phase finished for %s items", scan_mode.value, len(total_items_to_enrich))
 
-            if not self.service._is_stop_requested() and total_items_to_enrich:
+            if total_items_to_enrich:
                 match_ids = self.library_port.get_metadata_match_ids_for_media_items([item.id for item in total_items_to_enrich])
                 if match_ids:
                     logger.info("[scan:%s] Queueing %s match ids for people enrichment", scan_mode.value, len(match_ids))
@@ -264,11 +264,10 @@ class LibraryScanner:
                 await asyncio.to_thread(resolver.resolve_all, items_to_retry, progress_callback=resolve_progress_cb, task_id=task_id)
                 logger.info("[scan:%s] Retry Resolver phase finished for %s items", scan_mode.value, len(items_to_retry))
                 
-                if not self.service._is_stop_requested():
-                    match_ids = self.library_port.get_metadata_match_ids_for_media_items([item.id for item in items_to_retry])
-                    if match_ids:
-                        logger.info("[scan:%s] Queueing %s match ids for people enrichment", scan_mode.value, len(match_ids))
-                        self.task_manager.people_enrich_worker.enqueue_enrich(match_ids)
+                match_ids = self.library_port.get_metadata_match_ids_for_media_items([item.id for item in items_to_retry])
+                if match_ids:
+                    logger.info("[scan:%s] Queueing %s match ids for people enrichment", scan_mode.value, len(match_ids))
+                    self.task_manager.people_enrich_worker.enqueue_enrich(match_ids)
                         
         except Exception as e:
             logger.error(f"Scan retry task failed: {e}", exc_info=True)
