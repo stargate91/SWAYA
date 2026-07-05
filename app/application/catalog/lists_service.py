@@ -166,6 +166,15 @@ class ListsService:
             
         res["genres"] = genres_list
             
+        if res["poster_path"]:
+            from app.domains.media_assets.services.images import image_processing_service
+            subfolder = "posters"
+            if res["media_type"] == "person":
+                subfolder = "people"
+            elif res["media_type"] in ("scene", "still"):
+                subfolder = "backdrops"
+            res["poster_path"] = image_processing_service.resolve_image_url(res["poster_path"], subfolder)
+
         return CustomListItemResponse(**res)
 
     def _adult_access_enabled(self) -> bool:
