@@ -55,6 +55,17 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
       }
       return 'mpv.exe';
     }
+    if (process.platform === 'linux') {
+      const bundledPath = isDev
+        ? path.join(__dirname, 'bin', 'linux', 'mpv')
+        : path.join(process.resourcesPath, 'bin', 'linux', 'mpv');
+      if (fs.existsSync(bundledPath)) {
+        try {
+          fs.chmodSync(bundledPath, '755');
+        } catch { /* ignore */ }
+        return bundledPath;
+      }
+    }
     return 'mpv';
   }
 
@@ -127,7 +138,9 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
     });
 
     const handle = mpvPlayerWindow.getNativeWindowHandle();
-    const wid = handle.readBigUInt64LE(0).toString();
+    const wid = process.platform === 'win32'
+      ? handle.readBigUInt64LE(0).toString()
+      : (process.platform === 'linux' ? handle.readUint32LE(0).toString() : handle.toString('utf-8'));
 
     // 2. Create transparent controls window on top
     controlsWindow = new BrowserWindow({
@@ -235,7 +248,7 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
         '--idle=yes',
         '--keep-open=yes',
         '--vo=gpu',
-        '--gpu-api=d3d11',
+        ...(process.platform === 'win32' ? ['--gpu-api=d3d11'] : []),
         '--hwdec=auto',
         '--sub-auto=all',
         '--sub-file-paths=sub;subs;subtitles;Extras;extras;srt',

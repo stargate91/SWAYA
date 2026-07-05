@@ -80,18 +80,23 @@ app/
 | File identification | guessit                    |
 | File watching       | watchdog                   |
 | Testing             | pytest + anyio             |
-| Platform            | Windows (pywin32)          |
+| Platform            | Windows, Linux             |
 
 ### Prerequisites
 
 - Python 3.10+
 - FFmpeg and FFprobe available on PATH
+- **For Linux users**: `mpv` installed via your package manager (e.g., `sudo apt install mpv` on Debian/Ubuntu).
 
 ### Setup and Running
 
 Install dependencies:
 ```bash
+# Windows
 pip install -r requirements.txt
+
+# Linux / macOS (ignores Windows-only dependencies)
+pip install -r requirements.txt --r-requirements-ignore pywin32 || pip install fastapi uvicorn pydantic SQLAlchemy alembic guessit pillow watchdog requests python-multipart pytest anyio httpx
 ```
 
 Start the server:
