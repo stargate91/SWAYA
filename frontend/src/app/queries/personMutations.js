@@ -327,6 +327,7 @@ export const useOverridePersonProfileMutation = () => {
       syncPersonProfileCaches(queryClient, personId, data);
       queryClient.invalidateQueries({ queryKey: ['person-detail', personId] });
       queryClient.invalidateQueries({ queryKey: ['person-detail', String(personId)] });
+      queryClient.invalidateQueries({ queryKey: ['lists'] });
     },
   });
 };
@@ -340,6 +341,7 @@ export const useUploadPersonProfileMutation = () => {
       syncPersonProfileCaches(queryClient, personId, data);
       queryClient.invalidateQueries({ queryKey: ['person-detail', personId] });
       queryClient.invalidateQueries({ queryKey: ['person-detail', String(personId)] });
+      queryClient.invalidateQueries({ queryKey: ['lists'] });
     },
   });
 };
@@ -358,6 +360,7 @@ export const useLinkPersonSourceMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
       queryClient.invalidateQueries({ queryKey: ['library'] });
       queryClient.invalidateQueries({ queryKey: ['recommendations'] });
+      queryClient.invalidateQueries({ queryKey: ['lists'] });
     },
   });
 };

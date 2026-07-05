@@ -131,23 +131,23 @@ class ListsService:
         from app.domains.users.models import UserOverride
         user_rating = None
         is_watched = False
+        override = None
         if item.media_item:
             override = self.db.query(UserOverride).filter(UserOverride.media_item_id == item.media_item_id).first()
             if not override and match:
                 override = self.db.query(UserOverride).filter(UserOverride.metadata_match_id == match.id).first()
-            if override:
-                user_rating = override.user_rating
-                is_watched = bool(override.is_watched)
         elif item.match_id:
             override = self.db.query(UserOverride).filter(UserOverride.metadata_match_id == item.match_id).first()
-            if override:
-                user_rating = override.user_rating
-                is_watched = bool(override.is_watched)
         elif item.person_id:
             override = self.db.query(UserOverride).filter(UserOverride.person_id == item.person_id).first()
-            if override:
-                user_rating = override.user_rating
-                is_watched = bool(override.is_watched)
+            
+        if override:
+            user_rating = override.user_rating
+            is_watched = bool(override.is_watched)
+            if override.custom_poster:
+                res["poster_path"] = override.custom_poster
+            if override.custom_title:
+                res["title"] = override.custom_title
                 
         res["user_rating"] = user_rating
         res["is_watched"] = is_watched

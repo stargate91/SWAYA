@@ -208,6 +208,7 @@ export const useOverridePosterMutation = () => {
       syncPosterCaches(queryClient, itemId, data);
       queryClient.invalidateQueries({ queryKey: ['full-metadata', cleanId] });
       queryClient.invalidateQueries({ queryKey: ['full-metadata', itemId] });
+      queryClient.invalidateQueries({ queryKey: ['lists'] });
     },
   });
 };
@@ -222,6 +223,7 @@ export const useUploadPosterMutation = () => {
       syncPosterCaches(queryClient, itemId, data);
       queryClient.invalidateQueries({ queryKey: ['full-metadata', cleanId] });
       queryClient.invalidateQueries({ queryKey: ['full-metadata', itemId] });
+      queryClient.invalidateQueries({ queryKey: ['lists'] });
     },
   });
 };
