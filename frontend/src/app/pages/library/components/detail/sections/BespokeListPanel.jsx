@@ -8,7 +8,6 @@ import {
 } from '@/queries';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import { List, Plus, Check, Loader2 } from '@/ui/icons';
-import Input from '@/ui/Input';
 import './BespokeListPanel.css';
 
 export default function BespokeListPanel() {
@@ -18,7 +17,9 @@ export default function BespokeListPanel() {
   const isTv = type === 'tv';
 
   // Construct item_id for membership check
-  const membershipItemId = isTv ? `tmdb_${item?.id || cleanId}` : (item?.id || cleanId);
+  const membershipItemId = isTv
+    ? (item?.id && String(item.id).startsWith('tmdb_') ? item.id : `tmdb_${cleanId}`)
+    : (item?.id || cleanId);
 
   // Queries
   const { data: lists = [], isLoading: listsLoading } = useListsQuery();
@@ -167,7 +168,7 @@ export default function BespokeListPanel() {
             )}
 
             <form onSubmit={handleCreateList} className="bespoke-list-panel-create-form">
-              <Input
+              <input
                 type="text"
                 value={newListName}
                 onChange={(e) => setNewListName(e.target.value)}

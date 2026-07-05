@@ -5,7 +5,6 @@
   display: flex;
   flex-direction: column;
   overflow: visible;
-  margin-top: var(--space-md);
 }
 
 .bespoke-list-panel-header {
@@ -168,33 +167,43 @@
 
 .bespoke-list-panel-input {
   flex: 1;
+  background: var(--color-surface-glass);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md, 12px);
+  padding: var(--space-sm) var(--space-lg);
+  height: 38px;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  outline: none;
+  transition: all var(--motion-base);
 }
 
-.bespoke-list-panel-input input {
-  height: 32px;
-  min-height: 32px;
-  font-size: 12px;
-  padding: 4px 10px;
+.bespoke-list-panel-input:focus {
+  background: var(--color-border-default);
+  border-color: var(--color-accent-blue);
 }
 
 .bespoke-list-panel-add-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  border: 1px solid var(--button-secondary-border, rgba(255, 255, 255, 0.08));
-  background: var(--button-secondary-bg, rgba(255, 255, 255, 0.04));
+  width: 38px;
+  height: 38px;
+  background: var(--button-secondary-neutral-bg, var(--color-surface-glass));
+  border: 1px solid var(--button-secondary-neutral-border, var(--color-border-heavy));
+  border-radius: var(--radius-md, 12px);
   color: var(--color-text-primary);
+  font-size: var(--font-size-lg, 18px);
+  font-weight: 600;
   cursor: pointer;
-  transition: all var(--motion-fast);
+  transition: all var(--motion-base);
+  outline: none;
   flex-shrink: 0;
 }
 
 .bespoke-list-panel-add-btn:hover:not(:disabled) {
-  background: var(--button-secondary-hover-bg, rgba(255, 255, 255, 0.08));
-  border-color: var(--button-secondary-border, rgba(255, 255, 255, 0.12));
+  background: var(--color-border-default);
+  border-color: color-mix(in srgb, var(--color-text-primary) 25%, transparent);
 }
 
 .bespoke-list-panel-add-btn:disabled {

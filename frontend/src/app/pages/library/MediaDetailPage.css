@@ -137,7 +137,7 @@
 .media-detail-page__inline-side-col {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4xl);
+  gap: var(--space-lg);
   min-width: 0;
 }
 
