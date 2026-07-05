@@ -35,24 +35,42 @@ class RecommendationsService:
         include_adult_val = self.settings.get_setting("include_adult")
         include_adult = str(include_adult_val).lower() == "true"
 
+        # Fetch Candidates
         trending_movie = self.scraper.get_trending("movie", "day", language=pref_lang)
         trending_tv = self.scraper.get_trending("tv", "day", language=pref_lang)
+        
+        trending_movie_results = trending_movie.get("results", [])
+        trending_tv_results = trending_tv.get("results", [])
 
-        trending_results = trending_movie.get("results", [])[:10] + trending_tv.get("results", [])[:10]
-        if not include_adult:
-            trending_results = [item for item in trending_results if not item.get("adult", False)]
+        # Discover Movies (fetch 3 pages = 60 items)
+        discover_movies_pool = []
+        for page in (1, 2, 3):
+            try:
+                res = self.scraper.discover("movie", language=pref_lang, sort_by="popularity.desc", include_adult=include_adult, page=page)
+                res_items = res.get("results", [])
+                if not res_items:
+                    break
+                discover_movies_pool.extend(res_items)
+            except Exception as e:
+                logger.error(f"Failed to fetch discover movies page {page}: {e}")
+                break
 
-        discover_movies = self.scraper.discover("movie", language=pref_lang, sort_by="popularity.desc", include_adult=include_adult).get("results", [])
-        discover_tv = self.scraper.discover("tv", language=pref_lang, sort_by="popularity.desc", include_adult=include_adult).get("results", [])
+        # Discover TV (fetch 3 pages = 60 items)
+        discover_tv_pool = []
+        for page in (1, 2, 3):
+            try:
+                res = self.scraper.discover("tv", language=pref_lang, sort_by="popularity.desc", include_adult=include_adult, page=page)
+                res_items = res.get("results", [])
+                if not res_items:
+                    break
+                discover_tv_pool.extend(res_items)
+            except Exception as e:
+                logger.error(f"Failed to fetch discover tv page {page}: {e}")
+                break
 
-        discover_adult = []
+        # Discover Adult
+        discover_adult_pool = []
         if include_adult:
-            import random
-            from datetime import datetime
-            import math
-            
-            # Fetch a larger pool of 60 items (3 pages) to select from
-            pool = []
             adult_companies = "6886|6463|5979|6112|8552|6316|15887|56675|281764|6258|5788|195672|115980|115981|115982|128489|5785|6013|7360|6109|15891|8551|147321|18625"
             for page in (1, 2, 3):
                 try:
@@ -67,39 +85,66 @@ class RecommendationsService:
                     results = res.get("results", [])
                     if not results:
                         break
-                    pool.extend(results)
+                    discover_adult_pool.extend(results)
                 except Exception as e:
                     logger.error(f"Failed to fetch adult recommendations page {page}: {e}")
                     break
+            discover_adult_pool = [item for item in discover_adult_pool if item.get("adult")]
 
-            # Filter to keep only actual adult items
-            pool = [item for item in pool if item.get("adult")]
+        # Resolve local bindings for all candidate items
+        all_candidates = (
+            trending_movie_results +
+            trending_tv_results +
+            discover_movies_pool +
+            discover_tv_pool +
+            discover_adult_pool
+        )
+        bindings = self._resolve_local_recommendation_bindings(all_candidates)
 
-            if pool:
-                # Use current date as seed (stable for the entire day)
-                day_str = datetime.utcnow().strftime("%Y-%m-%d")
-                seed_val = int(day_str.replace("-", ""))
-                
-                # Score function: popularity * (vote_average + 1) * log10(vote_count)
-                def get_score(x):
-                    pop = float(x.get("popularity") or 0.0)
-                    vote_avg = float(x.get("vote_average") or 0.0)
-                    vote_cnt = int(x.get("vote_count") or 0)
-                    return pop * (vote_avg + 1.0) * math.log10(max(vote_cnt, 2))
-                
-                # Sort pool and select the top 40 highest quality/popular items
-                pool.sort(key=get_score, reverse=True)
-                top_pool = pool[:40]
-                
-                # Shuffle deterministically based on today's seed
-                rng = random.Random(seed_val)
-                rng.shuffle(top_pool)
-                
-                # Return the final 20 recommendations for today
-                discover_adult = top_pool[:20]
+        def is_in_library(item):
+            tmdb_id = item.get("id")
+            if not tmdb_id:
+                return False
+            media_type = item.get("media_type") or ("movie" if item.get("title") else "tv")
+            bind = bindings.get((media_type, tmdb_id), {})
+            return bind.get("media_item_id") is not None
+
+        # Filter out items already in the library
+        clean_trending_movie = [item for item in trending_movie_results if not is_in_library(item)]
+        clean_trending_tv = [item for item in trending_tv_results if not is_in_library(item)]
+        
+        trending_results = clean_trending_movie[:10] + clean_trending_tv[:10]
+        if not include_adult:
+            trending_results = [item for item in trending_results if not item.get("adult", False)]
+
+        clean_discover_movies = [item for item in discover_movies_pool if not is_in_library(item)][:20]
+        clean_discover_tv = [item for item in discover_tv_pool if not is_in_library(item)][:20]
+
+        clean_discover_adult = []
+        if include_adult and discover_adult_pool:
+            import random
+            from datetime import datetime
+            import math
+            
+            def get_score(x):
+                pop = float(x.get("popularity") or 0.0)
+                vote_avg = float(x.get("vote_average") or 0.0)
+                vote_cnt = int(x.get("vote_count") or 0)
+                return pop * (vote_avg + 1.0) * math.log10(max(vote_cnt, 2))
+
+            filtered_adult_pool = [item for item in discover_adult_pool if not is_in_library(item)]
+            filtered_adult_pool.sort(key=get_score, reverse=True)
+            top_pool = filtered_adult_pool[:40]
+            
+            day_str = datetime.utcnow().strftime("%Y-%m-%d")
+            seed_val = int(day_str.replace("-", ""))
+            rng = random.Random(seed_val)
+            rng.shuffle(top_pool)
+            
+            clean_discover_adult = top_pool[:20]
 
         # Parallel fetch for TV show details to populate last_air_date and release_status for items not in the library
-        all_tv_shows = discover_tv + [item for item in trending_results if item.get("media_type") == "tv" or not item.get("title")]
+        all_tv_shows = clean_discover_tv + [item for item in trending_results if item.get("media_type") == "tv" or not item.get("title")]
         tv_items_to_enrich = [item for item in all_tv_shows if not item.get("last_air_date")]
         if tv_items_to_enrich:
             from concurrent.futures import ThreadPoolExecutor
@@ -121,18 +166,14 @@ class RecommendationsService:
             with ThreadPoolExecutor(max_workers=10) as executor:
                 executor.map(fetch_tv_details, tv_items_to_enrich)
 
-        bindings = self._resolve_local_recommendation_bindings(
-            trending_results + discover_movies + discover_tv + discover_adult
-        )
-
         def annotate(items):
             return self._annotate_recommendations(items, bindings)
 
         return RecommendationsResponse(
             trending=annotate(trending_results),
-            discover_movies=annotate(discover_movies),
-            discover_tv=annotate(discover_tv),
-            discover_adult=annotate(discover_adult) if include_adult else [],
+            discover_movies=annotate(clean_discover_movies),
+            discover_tv=annotate(clean_discover_tv),
+            discover_adult=annotate(clean_discover_adult) if include_adult else [],
             top_movie_genre="Action",
             top_tv_genre="Drama",
             watchlist_item_ids=watchlist_tmdb_ids
@@ -265,3 +306,59 @@ class RecommendationsService:
                 }
 
         return bindings
+
+    def discover_top_items(
+        self,
+        genre_id: Optional[int] = None,
+        year: Optional[int] = None,
+        language: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
+        pref_lang = language or self._preferred_metadata_language()
+        include_adult_val = self.settings.get_setting("include_adult")
+        include_adult = str(include_adult_val).lower() == "true"
+        
+        # Fetch 3 pages of popular candidates for the genre/year (60 items total)
+        results_pool = []
+        for page in (1, 2, 3):
+            try:
+                res = self.scraper.discover(
+                    "movie",
+                    language=pref_lang,
+                    sort_by="popularity.desc",
+                    include_adult=include_adult,
+                    with_genres=str(genre_id) if genre_id else None,
+                    primary_release_year=year,
+                    page=page
+                )
+                items = res.get("results", [])
+                if not items:
+                    break
+                results_pool.extend(items)
+            except Exception as e:
+                logger.error(f"Failed to discover top items page {page}: {e}")
+                break
+
+        bindings = self._resolve_local_recommendation_bindings(results_pool)
+        
+        def is_in_library(item):
+            tmdb_id = item.get("id")
+            if not tmdb_id:
+                return False
+            media_type = item.get("media_type") or ("movie" if item.get("title") else "tv")
+            bind = bindings.get((media_type, tmdb_id), {})
+            return bind.get("media_item_id") is not None
+
+        # Filter out items that are already in the library
+        filtered_results = [item for item in results_pool if not is_in_library(item)]
+
+        # Score remaining items locally: vote_average * log10(vote_count + 1)
+        import math
+        def get_compound_score(item):
+            vote_avg = float(item.get("vote_average") or 0.0)
+            vote_cnt = int(item.get("vote_count") or 0)
+            return vote_avg * math.log10(vote_cnt + 1)
+
+        filtered_results.sort(key=get_compound_score, reverse=True)
+        top_results = filtered_results[:20]
+            
+        return self._annotate_recommendations(top_results, bindings)

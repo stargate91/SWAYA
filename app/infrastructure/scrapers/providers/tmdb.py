@@ -254,7 +254,18 @@ class TMDBScraper(BaseScraper):
         endpoint = f"/trending/{media_type}/{time_window}"
         return self._call_api(endpoint, {"language": resolved_lang})
 
-    def discover(self, media_type: str, language: Optional[str] = None, sort_by: str = "popularity.desc", include_adult: bool = False, with_companies: Optional[str] = None, page: Optional[int] = None) -> Dict[str, Any]:
+    def discover(
+        self,
+        media_type: str,
+        language: Optional[str] = None,
+        sort_by: str = "popularity.desc",
+        include_adult: bool = False,
+        with_companies: Optional[str] = None,
+        page: Optional[int] = None,
+        with_genres: Optional[str] = None,
+        primary_release_year: Optional[int] = None,
+        vote_count_gte: Optional[int] = None
+    ) -> Dict[str, Any]:
         """Discover media items from TMDB."""
         resolved_lang = LanguageService.resolve_request_locale(Provider.TMDB, language) or DEFAULT_FALLBACK_LANGUAGE
         endpoint = f"/discover/{media_type}"
@@ -263,6 +274,12 @@ class TMDBScraper(BaseScraper):
             params["with_companies"] = with_companies
         if page is not None:
             params["page"] = str(page)
+        if with_genres is not None:
+            params["with_genres"] = with_genres
+        if primary_release_year is not None:
+            params["primary_release_year"] = str(primary_release_year)
+        if vote_count_gte is not None:
+            params["vote_count.gte"] = str(vote_count_gte)
         return self._call_api(endpoint, params)
 
     def get_collection_details(self, collection_id: int, language: Optional[str] = None, force_refresh: bool = False) -> Dict[str, Any]:

@@ -25,3 +25,17 @@ def add_to_watchlist(request: WatchlistRequest, db: Session = Depends(get_db)):
 @router.delete("/watchlist/{tmdb_id}", response_model=ActionResponse)
 def remove_from_watchlist(tmdb_id: int, db: Session = Depends(get_db)):
     return RecommendationsService(db, scraper_gateway).remove_from_watchlist(tmdb_id)
+
+
+@router.get("/recommendations/discover")
+def discover_recommendations(
+    genre_id: Optional[int] = None,
+    year: Optional[int] = None,
+    language: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    return RecommendationsService(db, scraper_gateway).discover_top_items(
+        genre_id=genre_id,
+        year=year,
+        language=language
+    )

@@ -146,6 +146,15 @@
         "male": "Male"
       }
     },
+    "adultPreviews": {
+      "title": "Hover Previews",
+      "eyebrow": "PREVIEWS",
+      "enable": "Enable Hover Previews",
+      "delay": "Hover Delay",
+      "duration": "Clip Duration",
+      "cacheSize": "Max Cache Size",
+      "cacheAge": "Max Cache Age"
+    },
     "stashdb": {
       "title": "StashDB Integration",
       "eyebrow": "Adult Metadata",

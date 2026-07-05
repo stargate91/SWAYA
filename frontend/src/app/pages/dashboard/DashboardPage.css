@@ -1153,3 +1153,25 @@
   background: transparent;
   opacity: 0;
 }
+
+/* Dashboard Drawer Customizer Styles */
+.dashboard-customizer-drawer {
+  background: var(--color-surface-overlay, var(--color-panel-strong)) !important;
+}
+
+.dashboard-customizer-drawer .entity-detail-page__drawer-close {
+  background: none !important;
+  border: none !important;
+  font-size: 28px !important;
+  color: var(--color-text-secondary) !important;
+  cursor: pointer !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+.dashboard-customizer-drawer .entity-detail-page__drawer-close:hover {
+  color: var(--color-text-primary) !important;
+  background: none !important;
+}

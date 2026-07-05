@@ -281,7 +281,7 @@ TimeTravelTimeline.propTypes = {
   T: PropTypes.func.isRequired,
 };
 
-const LibraryInsightsWidget = ({ T }) => {
+const LibraryInsightsWidget = ({ T, showDna = true, showTimeline = true }) => {
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const { data: stats = {}, isLoading } = useStatsQuery(sessionMode === 'nsfw');
   const insightTitleCount = useMemo(
@@ -301,17 +301,21 @@ const LibraryInsightsWidget = ({ T }) => {
   return (
     <DashboardWidgetShell loading={isLoading} size="lg">
       <div className="insights-layout">
-        <LibraryDNA
-          constellation={stats?.genre_constellation}
-          genres={stats?.genre_distribution}
-          insightTitleCount={insightTitleCount}
-          T={T}
-        />
-        <TimeTravelTimeline
-          decades={stats?.decade_distribution}
-          insightTitleCount={insightTitleCount}
-          T={T}
-        />
+        {showDna && (
+          <LibraryDNA
+            constellation={stats?.genre_constellation}
+            genres={stats?.genre_distribution}
+            insightTitleCount={insightTitleCount}
+            T={T}
+          />
+        )}
+        {showTimeline && (
+          <TimeTravelTimeline
+            decades={stats?.decade_distribution}
+            insightTitleCount={insightTitleCount}
+            T={T}
+          />
+        )}
       </div>
     </DashboardWidgetShell>
   );
@@ -319,6 +323,8 @@ const LibraryInsightsWidget = ({ T }) => {
 
 LibraryInsightsWidget.propTypes = {
   T: PropTypes.func.isRequired,
+  showDna: PropTypes.bool,
+  showTimeline: PropTypes.bool,
 };
 
 export default LibraryInsightsWidget;

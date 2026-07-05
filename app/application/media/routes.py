@@ -171,8 +171,12 @@ def get_media_preview(item_id: int, db: Session = Depends(get_db)):
     filepath = os.path.join(item.library.root_path, item.relative_path)
     
     try:
+        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+        settings_adapter = DbSettingsAdapter(db)
+        duration = settings_adapter.get_setting("hover_previews_duration") or 16
+
         preview_service = PreviewService()
-        preview_path = preview_service.generate_preview(filepath, str(item_id))
+        preview_path = preview_service.generate_preview(filepath, str(item_id), preview_duration=int(duration))
         return FileResponse(preview_path, media_type="video/mp4")
     except FileNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))

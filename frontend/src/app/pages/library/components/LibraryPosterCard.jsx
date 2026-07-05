@@ -235,6 +235,8 @@ export const LibraryPosterCard = memo(({
       playOverlay={playOverlay}
       className={className}
       previewItemId={previewItemId}
+      previewEnabled={Boolean(settings?.hover_previews_enabled ?? true)}
+      previewDelay={Number(settings?.hover_previews_delay ?? 500)}
     />
   );
 });

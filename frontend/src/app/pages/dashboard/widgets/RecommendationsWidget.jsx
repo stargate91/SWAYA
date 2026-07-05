@@ -13,6 +13,7 @@ import Button from '../../../ui/Button';
 import Pill from '../../../ui/Pill';
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 import { API_BASE } from '../../../lib/backend';
+import TMDBDiscoveryWidget from './TMDBDiscoveryWidget';
 
 const ADULT_LABEL = '18+';
 
@@ -269,7 +270,7 @@ RecommendationSkeleton.propTypes = {
   showBanner: PropTypes.bool,
 };
 
-const RecommendationsWidget = ({ language, T }) => {
+const RecommendationsWidget = ({ language, T, visibleWidgets = {} }) => {
   const { toast } = useUi();
   const navigate = useNavigate();
   const { data: recommendations = {}, isLoading } = useRecommendationsQuery(language);
@@ -321,11 +322,13 @@ const RecommendationsWidget = ({ language, T }) => {
     navigate(`/library/${type}/${idToUse}`, { state: { allowAdult: true } });
   };
 
+  const isWidgetVisible = (key) => visibleWidgets[key] !== false;
+
   return (
     <>
-      {isLoading && <RecommendationSkeleton showBanner />}
+      {isLoading && isWidgetVisible('spotlight') && <RecommendationSkeleton showBanner />}
 
-      {!isLoading && recommendations?.trending?.length > 0 && (
+      {!isLoading && isWidgetVisible('spotlight') && recommendations?.trending?.length > 0 && (
         <SpotlightBanner
           item={recommendations.trending[0]}
           watchlistIds={actualWatchlistIds}
@@ -335,9 +338,11 @@ const RecommendationsWidget = ({ language, T }) => {
         />
       )}
 
-      {isLoading && <RecommendationSkeleton />}
+      {isLoading && (isWidgetVisible('movies_discovery') || isWidgetVisible('tv_discovery') || isWidgetVisible('adult')) && (
+        <RecommendationSkeleton />
+      )}
 
-      {!isLoading && recommendations?.discover_movies?.length > 0 && (
+      {!isLoading && isWidgetVisible('movies_discovery') && recommendations?.discover_movies?.length > 0 && (
         <RecommendationCarousel
           title={T('dashboard.recommendations.discover_movies') || 'Discover Movies'}
           items={recommendations.discover_movies}
@@ -348,9 +353,9 @@ const RecommendationsWidget = ({ language, T }) => {
         />
       )}
 
-      {!isLoading && recommendations?.discover_tv?.length > 0 && (
+      {!isLoading && isWidgetVisible('tv_discovery') && recommendations?.discover_tv?.length > 0 && (
         <RecommendationCarousel
-          title={T('dashboard.recommendations.discover_series') || 'Discover Series'}
+          title={T('dashboard.recommendations.discover_series') || 'Discover TV Shows'}
           items={recommendations.discover_tv}
           watchlistIds={actualWatchlistIds}
           onWatchlist={handleWatchlist}
@@ -359,7 +364,9 @@ const RecommendationsWidget = ({ language, T }) => {
         />
       )}
 
-      {!isLoading && recommendations?.discover_adult?.length > 0 && (
+      {isWidgetVisible('top_20') && <TMDBDiscoveryWidget T={T} />}
+
+      {!isLoading && isWidgetVisible('adult') && recommendations?.discover_adult?.length > 0 && (
         <RecommendationCarousel
           title={T('dashboard.recommendations.discover_adult') || 'Discover Adult Movies'}
           items={recommendations.discover_adult}
@@ -377,6 +384,7 @@ const RecommendationsWidget = ({ language, T }) => {
 RecommendationsWidget.propTypes = {
   language: PropTypes.string,
   T: PropTypes.func.isRequired,
+  visibleWidgets: PropTypes.object,
 };
 
 export default RecommendationsWidget;

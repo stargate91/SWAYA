@@ -80,6 +80,22 @@ class SettingsService:
             self.settings_port.create_user_setting(self.user_id, "preferred_player", "swaya")
             self.db.commit()
 
+        # Default hover preview settings
+        preview_defaults = {
+            "hover_previews_enabled": True,
+            "hover_previews_delay": 500,
+            "hover_previews_duration": 16,
+            "previews_cache_max_size_mb": 2048,
+            "previews_cache_max_age_days": 30
+        }
+        db_changed = False
+        for k, v in preview_defaults.items():
+            if not self.settings_port.get_user_setting_obj(self.user_id, k):
+                self.settings_port.create_user_setting(self.user_id, k, v)
+                db_changed = True
+        if db_changed:
+            self.db.commit()
+
         settings = self.settings_port.get_user_settings(self.user_id)
         return {s.key: s.value for s in settings}
 

@@ -34,6 +34,8 @@ const PosterCard = memo(function PosterCard({
   customStyle,
   children,
   previewItemId,
+  previewEnabled = true,
+  previewDelay = 500,
   ...props
 }) {
   const isInteractive = !!onClick;
@@ -45,15 +47,17 @@ const PosterCard = memo(function PosterCard({
   const [isHovered, setIsHovered] = useState(false);
   const [previewSrc, setPreviewSrc] = useState(null);
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
   useEffect(() => {
     setImageError(false);
   }, [imageUrl]);
 
   useEffect(() => {
-    if (!previewItemId || !isHovered) {
+    if (!previewItemId || !previewEnabled || !isHovered) {
       setPreviewSrc(null);
       setIsLoadingPreview(false);
+      setIsVideoPlaying(false);
       return;
     }
 
@@ -79,7 +83,7 @@ const PosterCard = memo(function PosterCard({
           setIsLoadingPreview(false);
         }
       }
-    }, 500);
+    }, previewDelay);
 
     return () => {
       active = false;
@@ -88,7 +92,7 @@ const PosterCard = memo(function PosterCard({
         controller.abort();
       }
     };
-  }, [isHovered, previewItemId]);
+  }, [isHovered, previewItemId, previewEnabled, previewDelay]);
 
   const handleKeyDown = (e) => {
     if (onClick && (e.key === 'Enter' || e.key === ' ')) {
@@ -142,6 +146,19 @@ const PosterCard = memo(function PosterCard({
                 {placeholderText && <span className="ui-poster-card__placeholder-text">{placeholderText}</span>}
               </div>
             )}
+            {isHovered && previewItemId && previewEnabled && !isVideoPlaying && (
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  backdropFilter: 'blur(8px)',
+                  background: 'rgba(0, 0, 0, 0.15)',
+                  zIndex: 2,
+                  pointerEvents: 'none',
+                  transition: 'opacity 0.3s ease',
+                }}
+              />
+            )}
             {previewSrc && (
               <video
                 ref={(el) => {
@@ -155,6 +172,8 @@ const PosterCard = memo(function PosterCard({
                 muted
                 loop
                 playsInline
+                onPlay={() => setIsVideoPlaying(true)}
+                onPlaying={() => setIsVideoPlaying(true)}
                 className="ui-poster-card__image"
                 style={{
                   position: 'absolute',
@@ -163,6 +182,8 @@ const PosterCard = memo(function PosterCard({
                   height: '100%',
                   objectFit: 'cover',
                   zIndex: 3,
+                  opacity: isVideoPlaying ? 1 : 0,
+                  transition: 'opacity 0.35s ease-in-out',
                 }}
               />
             )}
@@ -174,9 +195,7 @@ const PosterCard = memo(function PosterCard({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  background: 'rgba(0, 0, 0, 0.4)',
                   zIndex: 4,
-                  backdropFilter: 'blur(2px)',
                 }}
               >
                 <div

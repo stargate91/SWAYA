@@ -34,10 +34,10 @@ class PreviewService:
             logger.error(f"Failed to get video duration via ffprobe for {filepath}: {e}")
             raise
 
-    def generate_preview(self, filepath: str, item_id: str) -> str:
+    def generate_preview(self, filepath: str, item_id: str, preview_duration: int = 16) -> str:
         """
-        Generates a 16-second preview video from the original file.
-        Slices 4 segments of 4 seconds each (at 20%, 40%, 60%, 80% marks),
+        Generates a preview video from the original file.
+        Slices 4 segments of (preview_duration / 4) seconds each (at 20%, 40%, 60%, 80% marks),
         downscales to 720p, strips audio, and concats them.
         """
         output_path = self.get_preview_path(item_id)
@@ -53,14 +53,16 @@ class PreviewService:
         except Exception:
             duration = 0.0
 
-        logger.info(f"Generating preview for item {item_id} (duration={duration:.1f}s)")
+        logger.info(f"Generating preview for item {item_id} (duration={duration:.1f}s, preview_duration={preview_duration}s)")
 
-        if duration < 20.0:
-            # For short videos, just copy the first 10 seconds or less
+        seg_duration = float(preview_duration) / 4.0
+
+        if duration < (seg_duration * 4.0 + 4.0):
+            # For short videos, just copy the first few seconds
             cmd = [
                 'ffmpeg', '-y',
                 '-i', long_path,
-                '-t', '10.0',
+                '-t', f'{preview_duration:.3f}',
                 '-vf', 'scale=-2:720',
                 '-c:v', 'libx264',
                 '-preset', 'superfast',
@@ -72,14 +74,14 @@ class PreviewService:
             t1 = duration * 0.20
             t2 = duration * 0.40
             t3 = duration * 0.60
-            t4 = min(duration * 0.80, duration - 4.5)  # Ensure we don't seek past end
+            t4 = min(duration * 0.80, duration - (seg_duration + 0.5))  # Ensure we don't seek past end
 
             cmd = [
                 'ffmpeg', '-y',
-                '-ss', f'{t1:.3f}', '-t', '4.000', '-i', long_path,
-                '-ss', f'{t2:.3f}', '-t', '4.000', '-i', long_path,
-                '-ss', f'{t3:.3f}', '-t', '4.000', '-i', long_path,
-                '-ss', f'{t4:.3f}', '-t', '4.000', '-i', long_path,
+                '-ss', f'{t1:.3f}', '-t', f'{seg_duration:.3f}', '-i', long_path,
+                '-ss', f'{t2:.3f}', '-t', f'{seg_duration:.3f}', '-i', long_path,
+                '-ss', f'{t3:.3f}', '-t', f'{seg_duration:.3f}', '-i', long_path,
+                '-ss', f'{t4:.3f}', '-t', f'{seg_duration:.3f}', '-i', long_path,
                 '-filter_complex', '[0:v][1:v][2:v][3:v]concat=n=4:v=1:a=0[v];[v]scale=-2:720[outv]',
                 '-map', '[outv]',
                 '-c:v', 'libx264',

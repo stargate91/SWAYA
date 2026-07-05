@@ -101,6 +101,11 @@ export const SETTINGS_BASE_DEFAULTS = {
   extras_meta_template: '{parent_name}',
   extras_folder_mode: EXTRAS_FOLDER_MODES.SUBFOLDER,
   extras_subfolder_name: 'Extras',
+  hover_previews_enabled: true,
+  hover_previews_delay: 500,
+  hover_previews_duration: 16,
+  previews_cache_max_size_mb: 2048,
+  previews_cache_max_age_days: 30,
 };
 
 export function getLocalizedSettingsDefaults(t = null) {
@@ -309,6 +314,11 @@ export function getInitialFormValues(settingsData = null, t = null) {
     extras_meta_template: getStringValue(settingsData.extras_meta_template, defaults.extras_meta_template),
     extras_folder_mode: getStringValue(settingsData.extras_folder_mode, defaults.extras_folder_mode),
     extras_subfolder_name: getStringValue(settingsData.extras_subfolder_name, defaults.extras_subfolder_name),
+    hover_previews_enabled: getBooleanValue(settingsData.hover_previews_enabled, defaults.hover_previews_enabled),
+    hover_previews_delay: settingsData.hover_previews_delay !== undefined && settingsData.hover_previews_delay !== null ? Number(settingsData.hover_previews_delay) : defaults.hover_previews_delay,
+    hover_previews_duration: settingsData.hover_previews_duration !== undefined && settingsData.hover_previews_duration !== null ? Number(settingsData.hover_previews_duration) : defaults.hover_previews_duration,
+    previews_cache_max_size_mb: settingsData.previews_cache_max_size_mb !== undefined && settingsData.previews_cache_max_size_mb !== null ? Number(settingsData.previews_cache_max_size_mb) : defaults.previews_cache_max_size_mb,
+    previews_cache_max_age_days: settingsData.previews_cache_max_age_days !== undefined && settingsData.previews_cache_max_age_days !== null ? Number(settingsData.previews_cache_max_age_days) : defaults.previews_cache_max_age_days,
   };
 }
 

@@ -51,6 +51,15 @@ async def lifespan(app: FastAPI):
     ImageServiceRegistry.register(image_processing_service)
     image_processing_service.ensure_folders()
     logger.info("Image directories ensured.")
+
+    # Clean preview cache on startup
+    try:
+        from app.shared_kernel.database import SessionLocal
+        from app.domains.library.tasks.preview_cleanup import clean_preview_cache
+        with SessionLocal() as db_session:
+            clean_preview_cache(db_session)
+    except Exception as e:
+        logger.error(f"Failed to run preview cache cleanup on startup: {e}")
     
     # Start background download worker on the main event loop
     from app.domains.tasks import task_manager

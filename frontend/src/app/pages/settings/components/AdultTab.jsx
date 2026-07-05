@@ -6,12 +6,17 @@ import {
   createAdultStashdbSection,
   createAdultFansdbSection,
   createAdultTheporndbSection,
+  createAdultPreviewsSection,
 } from '../settingsSectionConfigs.jsx';
 
 export default function AdultTab() {
   const { adultGenderPreferenceOptions, t } = useSettingsViewContext();
   const includeAdultField = useSettingsField('include_adult');
-  const context = { include_adult: includeAdultField.checked };
+  const hoverPreviewsEnabledField = useSettingsField('hover_previews_enabled');
+  const context = {
+    include_adult: includeAdultField.checked,
+    hover_previews_enabled: hoverPreviewsEnabledField.checked
+  };
 
   return (
     <Stack gap="xl">
@@ -21,6 +26,10 @@ export default function AdultTab() {
       />
       {includeAdultField.checked && (
         <>
+          <SettingsSectionRenderer
+            section={createAdultPreviewsSection(t)}
+            context={context}
+          />
           <SettingsSectionRenderer
             section={createAdultStashdbSection(t)}
             context={context}
