@@ -17,6 +17,7 @@ const en = {
   settingsPage: enSettings,
   organizer: enOrganizer,
   library: enLibrary,
+  performer: enLibrary.performerEdit,
   historyPage: enHistory,
   onboarding: enOnboarding,
   ratings: enRatings,
