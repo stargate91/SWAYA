@@ -2,6 +2,11 @@
   "title": "Media Library",
   "adultTitle": "Adult Library",
   "searchPlaceholder": "Search {{tab}}...",
+  "sort": {
+    "libraryCountValue_one": "{{count}} item",
+    "libraryCountValue_other": "{{count}} items",
+    "libraryCountValue": "{{count}} items"
+  },
   "tabs": {
     "movies": "Movies",
     "collections": "Collections",

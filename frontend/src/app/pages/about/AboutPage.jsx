@@ -82,6 +82,7 @@ export default function AboutPage() {
 
   const tabs = [
     { id: 'info', label: t('about.title'), icon: <Info size={18} /> },
+    { id: 'docs', label: t('about.resources.docs') || 'Documentation', icon: <BookOpen size={18} /> },
     { id: 'changelog', label: t('about.resources.changelog'), icon: <ScrollText size={18} /> },
     { id: 'privacy', label: t('about.notices.privacy'), icon: <Lock size={18} /> },
     { id: 'license', label: t('about.notices.license'), icon: <ScrollText size={18} /> },
@@ -219,6 +220,35 @@ export default function AboutPage() {
                       })}
                     </div>
                   )}
+            {activeTab === 'docs' && (
+              <div className="about-tab-panel docs-panel">
+                <Card className="about-card docs-card">
+                  <h2 className="about-section-title">{t('about.resources.docs') || 'Documentation'}</h2>
+                  <div className="docs-content-container">
+                    <p className="docs-intro">Welcome to the SWAYA user guide and documentation. Here you can find answers on how to use this application to manage your library.</p>
+                    
+                    <div className="docs-sections">
+                      <div className="docs-section">
+                        <h3>📁 1. Media Library Setup</h3>
+                        <p>To populate your library, go to the <strong>Organizer</strong> page. You can add your folders (Movies, TV Shows, or Scenes) and let SWAYA scan them. SWAYA will match them automatically with online databases (TMDb, PornDB, etc.).</p>
+                      </div>
+
+                      <div className="docs-section">
+                        <h3>⚙️ 2. Organizer & Matcher</h3>
+                        <p>If a file was not matched automatically or has a wrong match, you can use the manual <strong>Match</strong> button to search online or use <strong>Rename</strong> to rename the physical file according to its metadata. When satisfied, click <strong>Organize</strong> to move them into the organized folder structure.</p>
+                      </div>
+
+                      <div className="docs-section">
+                        <h3>🎬 3. Video Player & Previews</h3>
+                        <p>SWAYA uses a built-in high-performance <strong>MPV player</strong> for video playback. On the Media Detail page of a scene, you can play a 16-second preview directly in the header backdrop. For movies and TV shows, you can resume playback from where you left off.</p>
+                      </div>
+
+                      <div className="docs-section">
+                        <h3>👤 4. Artists & Performers</h3>
+                        <p>From the <strong>Artists</strong> and <strong>Stars</strong> tabs, you can follow actors, directors, writers, or adult performers. SWAYA will index all their media items in your library and show you their filmography, physical attributes, and more.</p>
+                      </div>
+                    </div>
+                  </div>
                 </Card>
               </div>
             )}

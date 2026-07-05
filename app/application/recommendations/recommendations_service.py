@@ -421,7 +421,8 @@ class RecommendationsService:
             MediaItem.id.in_(media_ids)
         ).options(
             selectinload(MediaItem.matches).selectinload(MetadataMatch.localizations),
-            selectinload(MediaItem.matches).selectinload(MetadataMatch.parent).selectinload(MetadataMatch.parent),
+            selectinload(MediaItem.matches).selectinload(MetadataMatch.parent).selectinload(MetadataMatch.localizations),
+            selectinload(MediaItem.matches).selectinload(MetadataMatch.parent).selectinload(MetadataMatch.parent).selectinload(MetadataMatch.localizations),
             selectinload(MediaItem.matches).selectinload(MetadataMatch.people_links).selectinload(MediaPersonLink.person)
         ).all()
         
@@ -459,10 +460,6 @@ class RecommendationsService:
             match = next((m for m in item.matches if m.is_adult == include_adult), None)
             if not match:
                 continue
-            
-            loc = LanguageService.get_best_localization(match.localizations, pref_lang) if match.localizations else None
-            title = loc.title if loc else (match.original_title or item.filename)
-            overview = loc.overview if loc else None
 
             # Resolve parent show match for TV shows / episodes to get show-level metadata
             show_match = match
@@ -474,6 +471,10 @@ class RecommendationsService:
             elif match.media_type.value == "season":
                 if match.parent:
                     show_match = match.parent
+            
+            loc = LanguageService.get_best_localization(show_match.localizations, pref_lang) if show_match.localizations else None
+            title = loc.title if loc else (show_match.original_title or item.filename)
+            overview = loc.overview if loc else None
 
             o = overrides_by_media.get(item.id) or overrides_by_match.get(match.id)
             if not o and show_match != match:
@@ -483,7 +484,7 @@ class RecommendationsService:
             custom_backdrop = o.custom_backdrop if o else None
             
             poster_path = custom_poster or (loc.poster_path if loc else None)
-            backdrop_path = custom_backdrop or match.backdrop_path
+            backdrop_path = custom_backdrop or show_match.backdrop_path
 
             rating_imdb = show_match.rating_imdb
             rating_tmdb = show_match.rating_tmdb
