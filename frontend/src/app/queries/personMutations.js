@@ -110,6 +110,7 @@ const syncPersonProfileCaches = (queryClient, personId, data) => {
 
   queryClient.setQueriesData({ queryKey: ['library-item-detail'] }, updateMediaDetailCache);
   queryClient.setQueriesData({ queryKey: ['library-tv-detail'] }, updateMediaDetailCache);
+  queryClient.invalidateQueries({ queryKey: ['recommendations'] });
 };
 
 const syncPersonBackdropCaches = (queryClient, personId, data) => {
@@ -143,6 +144,7 @@ export const useAddPersonTmdbMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
       queryClient.invalidateQueries({ queryKey: ['library'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
+      queryClient.invalidateQueries({ queryKey: ['recommendations'] });
     },
   });
 };
@@ -274,6 +276,7 @@ export const useUpdatePersonStatusMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['people'] });
       queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
       queryClient.invalidateQueries({ queryKey: ['library'] });
+      queryClient.invalidateQueries({ queryKey: ['recommendations'] });
     },
   });
 };
@@ -343,6 +346,7 @@ export const useLinkPersonSourceMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['people'] });
       queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
       queryClient.invalidateQueries({ queryKey: ['library'] });
+      queryClient.invalidateQueries({ queryKey: ['recommendations'] });
     },
   });
 };
@@ -356,6 +360,7 @@ export const useDeletePersonMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
       queryClient.invalidateQueries({ queryKey: ['library'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
+      queryClient.invalidateQueries({ queryKey: ['recommendations'] });
       queryClient.removeQueries({ queryKey: ['person-detail', personId] });
       queryClient.removeQueries({ queryKey: ['person-detail', String(personId)] });
       queryClient.removeQueries({ queryKey: ['person-credits', personId] });
@@ -443,6 +448,7 @@ export const useUnlinkPersonSourceMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['people'] });
       queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
       queryClient.invalidateQueries({ queryKey: ['library'] });
+      queryClient.invalidateQueries({ queryKey: ['recommendations'] });
     },
   });
 };

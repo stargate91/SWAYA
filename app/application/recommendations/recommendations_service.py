@@ -28,12 +28,13 @@ class RecommendationsService:
         lang = self.settings.get_setting("primary_metadata_language")
         return lang if lang else DEFAULT_FALLBACK_LANGUAGE
 
-    def get_recommendations(self, language: Optional[str] = None) -> RecommendationsResponse:
+    def get_recommendations(self, language: Optional[str] = None, include_adult: Optional[bool] = None) -> RecommendationsResponse:
         watchlist_tmdb_ids = self._fetch_watchlist_tmdb_ids()
         pref_lang = language or self._preferred_metadata_language()
         
-        include_adult_val = self.settings.get_setting("include_adult")
-        include_adult = str(include_adult_val).lower() == "true"
+        if include_adult is None:
+            include_adult_val = self.settings.get_setting("include_adult")
+            include_adult = str(include_adult_val).lower() == "true"
 
         # Fetch Candidates
         trending_movie = self.scraper.get_trending("movie", "day", language=pref_lang)
@@ -70,26 +71,25 @@ class RecommendationsService:
 
         # Discover Adult
         discover_adult_pool = []
-        if include_adult:
-            adult_companies = "6886|6463|5979|6112|8552|6316|15887|56675|281764|6258|5788|195672|115980|115981|115982|128489|5785|6013|7360|6109|15891|8551|147321|18625"
-            for page in (1, 2, 3):
-                try:
-                    res = self.scraper.discover(
-                        "movie",
-                        language=pref_lang,
-                        sort_by="popularity.desc",
-                        include_adult=True,
-                        with_companies=adult_companies,
-                        page=page
-                    )
-                    results = res.get("results", [])
-                    if not results:
-                        break
-                    discover_adult_pool.extend(results)
-                except Exception as e:
-                    logger.error(f"Failed to fetch adult recommendations page {page}: {e}")
+        adult_companies = "6886|6463|5979|6112|8552|6316|15887|56675|281764|6258|5788|195672|115980|115981|115982|128489|5785|6013|7360|6109|15891|8551|147321|18625"
+        for page in (1, 2, 3):
+            try:
+                res = self.scraper.discover(
+                    "movie",
+                    language=pref_lang,
+                    sort_by="popularity.desc",
+                    include_adult=True,
+                    with_companies=adult_companies,
+                    page=page
+                )
+                results = res.get("results", [])
+                if not results:
                     break
-            discover_adult_pool = [item for item in discover_adult_pool if item.get("adult")]
+                discover_adult_pool.extend(results)
+            except Exception as e:
+                logger.error(f"Failed to fetch adult recommendations page {page}: {e}")
+                break
+        discover_adult_pool = [item for item in discover_adult_pool if item.get("adult")]
 
         # Resolve local bindings for all candidate items
         all_candidates = (
@@ -121,7 +121,7 @@ class RecommendationsService:
         clean_discover_tv = [item for item in discover_tv_pool if not is_in_library(item)][:20]
 
         clean_discover_adult = []
-        if include_adult and discover_adult_pool:
+        if discover_adult_pool:
             import random
             from datetime import datetime
             import math
@@ -166,6 +166,10 @@ class RecommendationsService:
             with ThreadPoolExecutor(max_workers=10) as executor:
                 executor.map(fetch_tv_details, tv_items_to_enrich)
 
+        # 5. Fetch recently added library items and active people matching the mode (Page 1)
+        recently_added = self.get_recently_added_paginated(page=1, limit=20, include_adult=include_adult, language=pref_lang)
+        recently_activated_people = self.get_recently_activated_people_paginated(page=1, limit=20, include_adult=include_adult)
+
         def annotate(items):
             return self._annotate_recommendations(items, bindings)
 
@@ -173,10 +177,12 @@ class RecommendationsService:
             trending=annotate(trending_results),
             discover_movies=annotate(clean_discover_movies),
             discover_tv=annotate(clean_discover_tv),
-            discover_adult=annotate(clean_discover_adult) if include_adult else [],
+            discover_adult=annotate(clean_discover_adult),
             top_movie_genre="Action",
             top_tv_genre="Drama",
-            watchlist_item_ids=watchlist_tmdb_ids
+            watchlist_item_ids=watchlist_tmdb_ids,
+            recently_added=recently_added,
+            recently_activated_people=recently_activated_people
         )
 
     def add_to_watchlist(self, tmdb_id: int, media_type: str) -> ActionResponse:
@@ -362,3 +368,210 @@ class RecommendationsService:
         top_results = filtered_results[:20]
             
         return self._annotate_recommendations(top_results, bindings)
+
+    def get_recently_added_paginated(
+        self,
+        page: int = 1,
+        limit: int = 20,
+        include_adult: Optional[bool] = None,
+        language: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
+        pref_lang = language or self._preferred_metadata_language()
+        if include_adult is None:
+            include_adult_val = self.settings.get_setting("include_adult")
+            include_adult = str(include_adult_val).lower() == "true"
+            
+        from sqlalchemy import desc, case, String, func
+        from sqlalchemy.orm import selectinload
+        from app.shared_kernel.language import LanguageService
+        
+        offset = (page - 1) * limit
+        
+        # Collapse TV shows by external_id (TMDB TV ID), other media by MediaItem.id
+        group_key = case(
+            (MetadataMatch.media_type == MediaType.TV, MetadataMatch.external_id),
+            else_=func.cast(MediaItem.id, String)
+        )
+        
+        filter_conds = [
+            MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED]),
+            MetadataMatch.is_adult == include_adult,
+            MetadataMatch.media_type.in_([MediaType.MOVIE, MediaType.TV, MediaType.SCENE])
+        ]
+            
+        recent_matches = self.db.query(
+            func.max(MediaItem.id).label("max_media_id"),
+            group_key.label("collapsed_key")
+        ).join(
+            MetadataMatch, MetadataMatch.media_item_id == MediaItem.id
+        ).filter(
+            *filter_conds
+        ).group_by(
+            "collapsed_key"
+        ).order_by(
+            desc("max_media_id")
+        ).offset(offset).limit(limit).all()
+
+        if not recent_matches:
+            return []
+            
+        from app.domains.people.models import MediaPersonLink
+        media_ids = [r.max_media_id for r in recent_matches]
+        recent_media = self.db.query(MediaItem).filter(
+            MediaItem.id.in_(media_ids)
+        ).options(
+            selectinload(MediaItem.matches).selectinload(MetadataMatch.localizations),
+            selectinload(MediaItem.matches).selectinload(MetadataMatch.parent).selectinload(MetadataMatch.parent),
+            selectinload(MediaItem.matches).selectinload(MetadataMatch.people_links).selectinload(MediaPersonLink.person)
+        ).all()
+        
+        # Sort in python to match query order
+        media_id_to_index = {mid: idx for idx, mid in enumerate(media_ids)}
+        recent_media.sort(key=lambda item: media_id_to_index.get(item.id, 999))
+
+        from sqlalchemy import or_
+        from app.domains.users.models import UserOverride
+        from app.shared_kernel.user_context import get_current_user_id
+        current_uid = get_current_user_id() or 1
+        
+        # Collect match IDs to resolve overrides linked by metadata_match_id
+        match_ids = []
+        for item in recent_media:
+            for m in item.matches:
+                match_ids.append(m.id)
+                if m.parent_id:
+                    match_ids.append(m.parent_id)
+                    if m.parent and m.parent.parent_id:
+                        match_ids.append(m.parent.parent_id)
+
+        overrides = self.db.query(UserOverride).filter(
+            UserOverride.user_id == current_uid,
+            or_(
+                UserOverride.media_item_id.in_(media_ids),
+                UserOverride.metadata_match_id.in_(match_ids)
+            )
+        ).all()
+        overrides_by_media = {o.media_item_id: o for o in overrides if o.media_item_id}
+        overrides_by_match = {o.metadata_match_id: o for o in overrides if o.metadata_match_id}
+
+        recently_added = []
+        for item in recent_media:
+            match = next((m for m in item.matches if m.is_adult == include_adult), None)
+            if not match:
+                continue
+            
+            loc = LanguageService.get_best_localization(match.localizations, pref_lang) if match.localizations else None
+            title = loc.title if loc else (match.original_title or item.filename)
+            overview = loc.overview if loc else None
+
+            # Resolve parent show match for TV shows / episodes to get show-level metadata
+            show_match = match
+            if match.media_type.value == "episode":
+                if match.parent and match.parent.parent:
+                    show_match = match.parent.parent
+                elif match.parent:
+                    show_match = match.parent
+            elif match.media_type.value == "season":
+                if match.parent:
+                    show_match = match.parent
+
+            o = overrides_by_media.get(item.id) or overrides_by_match.get(match.id)
+            if not o and show_match != match:
+                o = overrides_by_match.get(show_match.id)
+                
+            custom_poster = o.custom_poster if o else None
+            custom_backdrop = o.custom_backdrop if o else None
+            
+            poster_path = custom_poster or (loc.poster_path if loc else None)
+            backdrop_path = custom_backdrop or match.backdrop_path
+
+            rating_imdb = show_match.rating_imdb
+            rating_tmdb = show_match.rating_tmdb
+            rating_porndb = show_match.rating_porndb
+            
+            release_date = show_match.release_date.isoformat() if show_match.release_date else None
+            first_air_date = show_match.release_date.isoformat() if show_match.release_date else None
+            last_air_date = show_match.last_air_date.isoformat() if show_match.last_air_date else None
+            release_status = show_match.release_status
+            
+            people_list = []
+            if match.people_links:
+                for link in match.people_links:
+                    if link.person:
+                        people_list.append({
+                            "id": link.person.id,
+                            "name": link.person.name,
+                            "gender": link.person.gender,
+                        })
+
+            recently_added.append({
+                "id": int(match.external_id) if match.external_id and match.external_id.isdigit() else item.id,
+                "title": title,
+                "name": title,
+                "media_type": match.media_type.value,
+                "in_library": True,
+                "media_item_id": item.id,
+                "rating_imdb": rating_imdb,
+                "rating_tmdb": rating_tmdb,
+                "rating_porndb": rating_porndb,
+                "poster_path": poster_path,
+                "backdrop_path": backdrop_path,
+                "release_date": release_date,
+                "first_air_date": first_air_date,
+                "last_air_date": last_air_date,
+                "release_status": release_status,
+                "overview": overview,
+                "people": people_list,
+            })
+        return recently_added
+
+    def get_recently_activated_people_paginated(
+        self,
+        page: int = 1,
+        limit: int = 20,
+        include_adult: Optional[bool] = None
+    ) -> List[Dict[str, Any]]:
+        if include_adult is None:
+            include_adult_val = self.settings.get_setting("include_adult")
+            include_adult = str(include_adult_val).lower() == "true"
+            
+        from sqlalchemy import desc
+        from app.domains.people.models import Person
+        
+        offset = (page - 1) * limit
+        
+        recent_people = self.db.query(Person).filter(
+            Person.is_active == True,
+            Person.is_adult == include_adult
+        ).order_by(desc(Person.id)).offset(offset).limit(limit).all()
+        
+        from app.domains.users.models import UserOverride
+        from app.shared_kernel.user_context import get_current_user_id
+        current_uid = get_current_user_id() or 1
+        
+        person_ids = [p.id for p in recent_people]
+        overrides = self.db.query(UserOverride).filter(
+            UserOverride.user_id == current_uid,
+            UserOverride.person_id.in_(person_ids)
+        ).all()
+        overrides_dict = {o.person_id: o for o in overrides if o.person_id}
+
+        recently_activated_people = []
+        for p in recent_people:
+            o = overrides_dict.get(p.id)
+            custom_profile = o.custom_poster if o else None
+            
+            profile_path = custom_profile or p.local_profile_path or p.profile_path
+            
+            recently_activated_people.append({
+                "id": p.id,
+                "name": p.name,
+                "profile_path": profile_path,
+                "local_profile_path": p.local_profile_path,
+                "is_adult": p.is_adult,
+                "is_active": p.is_active,
+                "scene_count": p.scene_count,
+                "popularity": p.popularity,
+                "known_for_department": p.known_for_department,
+            })
+        return recently_activated_people

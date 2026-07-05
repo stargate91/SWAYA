@@ -98,3 +98,17 @@ This document serves as a living roadmap for future features, architecture adjus
     *   **Alias Fields:** Add support for alias names in `MetadataMatch` (e.g. for actors with different name spellings across TMDB/StashDB/PornDB).
     *   **Merge Conflict Resolution:** When merging duplicate metadata pages, allow the user to select which values (e.g., custom local description, rating, or posters) should be prioritized as the master record.
 
+---
+
+## 9. Centralized Media Presentation & Card Component Refactoring
+*   **Status:** Proposed / Backlog
+*   **Goal:** Eliminate duplicate metadata rendering, navigation, and user override logic by centralizing them into unified backend and frontend layers.
+*   **Details:**
+    *   **Backend (Python - `media_presentation_service.py`):**
+        *   Implement a shared function/service (e.g., `resolve_media_card_dto(media_item, pref_lang, include_adult)`) that automatically resolves parent TV show matches for episode items, applies `UserOverride` custom posters/backdrops, parses the prioritized rating (`imdb` > `tmdb` > `porndb`), and returns a unified JSON schema.
+        *   Integrate this service across the recommendations service, library pages, search, and continue watching endpoints to guarantee data consistency.
+    *   **Frontend (React - `<MediaCard>`):**
+        *   Create a single `<MediaCard>` component that handles card hover effects, custom aspect ratios (e.g., 1.38 for scenes, 2:3 for movies/shows), blurred overlays in SFW mode, and universal routing.
+        *   Replace all custom rendering loops in `RecommendationsWidget.jsx`, `ContinueWatchingWidget.jsx`, `DrawerResultsList.jsx`, and `SearchPage.jsx` with this unified component.
+
+

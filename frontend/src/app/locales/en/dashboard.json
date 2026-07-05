@@ -40,7 +40,9 @@
     "discovery_title": "Top 20 Discoveries",
     "discovery_no_results": "No popular movies found matching filters.",
     "because_you_like": "Because you like {genre}...",
-    "fallback_title": "Recommended for you"
+    "fallback_title": "Recommended for you",
+    "recently_added": "Recently Added",
+    "recently_activated_people": "Recently Active People"
   },
   "customize": "Customize Dashboard",
   "customize_desc": "Select which widgets you want to display on your dashboard.",
@@ -48,6 +50,8 @@
   "customize_insights": "Library Insights (DNA & Timeline)",
   "widget_continue_watching": "Continue Watching",
   "widget_spotlight": "Spotlight (Trending)",
+  "widget_recently_added": "Recently Added",
+  "widget_recently_activated_people": "Recently Active People",
   "widget_movies_discovery": "Discover Movies",
   "widget_tv_discovery": "Discover TV Shows",
   "widget_top_20": "Top 20 Discoveries",

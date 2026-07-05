@@ -135,6 +135,8 @@ const syncPosterCaches = (queryClient, rawItemId, data) => {
   detailKeys.forEach((key) => {
     queryClient.setQueriesData({ queryKey: key }, (oldData) => updatePosterInCacheData(oldData, rawItemId, cleanId, data));
   });
+
+  queryClient.invalidateQueries({ queryKey: ['recommendations'] });
 };
 
 const syncLogoCaches = (queryClient, rawItemId, data) => {

@@ -15,8 +15,8 @@ class WatchlistRequest(BaseModel):
     type: str = "movie"
 
 @router.get("/recommendations", response_model=RecommendationsResponse)
-def get_recommendations(language: Optional[str] = None, db: Session = Depends(get_db)):
-    return RecommendationsService(db, scraper_gateway).get_recommendations(language=language)
+def get_recommendations(language: Optional[str] = None, include_adult: Optional[bool] = None, db: Session = Depends(get_db)):
+    return RecommendationsService(db, scraper_gateway).get_recommendations(language=language, include_adult=include_adult)
 
 @router.post("/watchlist", response_model=ActionResponse)
 def add_to_watchlist(request: WatchlistRequest, db: Session = Depends(get_db)):
@@ -38,4 +38,34 @@ def discover_recommendations(
         genre_id=genre_id,
         year=year,
         language=language
+    )
+
+
+@router.get("/recommendations/recently-added")
+def get_recently_added(
+    page: int = 1,
+    limit: int = 20,
+    include_adult: Optional[bool] = None,
+    language: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    return RecommendationsService(db, scraper_gateway).get_recently_added_paginated(
+        page=page,
+        limit=limit,
+        include_adult=include_adult,
+        language=language
+    )
+
+
+@router.get("/recommendations/recently-activated-people")
+def get_recently_activated_people(
+    page: int = 1,
+    limit: int = 20,
+    include_adult: Optional[bool] = None,
+    db: Session = Depends(get_db)
+):
+    return RecommendationsService(db, scraper_gateway).get_recently_activated_people_paginated(
+        page=page,
+        limit=limit,
+        include_adult=include_adult
     )

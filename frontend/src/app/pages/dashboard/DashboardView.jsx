@@ -14,6 +14,8 @@ import './DashboardPage.css';
 const DEFAULT_WIDGETS = {
   continue_watching: true,
   spotlight: true,
+  recently_added: true,
+  recently_activated_people: true,
   movies_discovery: true,
   tv_discovery: true,
   top_20: true,
@@ -41,7 +43,17 @@ const DashboardView = () => {
   const [widgetOrder, setWidgetOrder] = useState(() => {
     try {
       const saved = localStorage.getItem('swaya_dashboard_order');
-      return saved ? JSON.parse(saved) : DEFAULT_ORDER;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const merged = [...parsed];
+        DEFAULT_ORDER.forEach((key) => {
+          if (!merged.includes(key)) {
+            merged.push(key);
+          }
+        });
+        return merged;
+      }
+      return DEFAULT_ORDER;
     } catch {
       return DEFAULT_ORDER;
     }

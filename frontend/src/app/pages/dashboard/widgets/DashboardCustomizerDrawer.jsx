@@ -87,7 +87,7 @@ export default function DashboardCustomizerDrawer({
       />
       <div
         ref={drawerRef}
-        className="entity-detail-page__drawer ui-drawer ui-drawer--sm"
+        className="entity-detail-page__drawer ui-drawer ui-drawer--sm dashboard-customizer-drawer"
         style={{
           boxShadow: 'var(--shadow-overlay-strong, 0 10px 40px rgba(0,0,0,0.4))',
         }}
@@ -130,6 +130,20 @@ export default function DashboardCustomizerDrawer({
                       onChange={() => toggleWidget('spotlight')}
                     >
                       {t('dashboard.widget_spotlight') || 'Spotlight (Trending)'}
+                    </Switch>
+
+                    <Switch
+                      checked={Boolean(visibleWidgets.recently_added)}
+                      onChange={() => toggleWidget('recently_added')}
+                    >
+                      {t('dashboard.widget_recently_added') || 'Recently Added'}
+                    </Switch>
+
+                    <Switch
+                      checked={Boolean(visibleWidgets.recently_activated_people)}
+                      onChange={() => toggleWidget('recently_activated_people')}
+                    >
+                      {t('dashboard.widget_recently_activated_people') || 'Recently Active People'}
                     </Switch>
 
                     <Switch

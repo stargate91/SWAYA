@@ -6,9 +6,9 @@ export const useContinueWatchingQuery = (params) => useQuery({
   queryFn: () => api.library.getContinueWatching(params),
 });
 
-export const useRecommendationsQuery = (language) => useQuery({
-  queryKey: ['recommendations', language],
-  queryFn: () => api.recommendations.get(language),
+export const useRecommendationsQuery = (language, includeAdult) => useQuery({
+  queryKey: ['recommendations', language, includeAdult],
+  queryFn: () => api.recommendations.get(language, includeAdult),
 });
 
 export const useAddToWatchlistMutation = () => {

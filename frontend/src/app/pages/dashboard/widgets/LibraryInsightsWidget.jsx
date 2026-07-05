@@ -299,7 +299,7 @@ const LibraryInsightsWidget = ({ T, showDna = true, showTimeline = true }) => {
   }
 
   return (
-    <DashboardWidgetShell loading={isLoading} size="lg">
+    <DashboardWidgetShell loading={isLoading} size="lg" transparent={true}>
       <div className="insights-layout">
         {showDna && (
           <LibraryDNA

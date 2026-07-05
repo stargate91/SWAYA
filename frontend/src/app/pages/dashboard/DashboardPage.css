@@ -182,11 +182,37 @@
   position: relative;
   flex: 1;
   overflow: hidden;
-  padding: var(--space-4xl);
+  padding: var(--space-5xl);
   border: 1px solid var(--color-border-subtle);
-  border-radius: 24px;
-  background: var(--color-surface-card);
+  border-radius: var(--radius-2xl);
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--color-accent-blue-soft) 12%, transparent), transparent 42%),
+    linear-gradient(180deg, color-mix(in srgb, var(--color-surface-glass) 72%, transparent), var(--color-surface-card));
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   min-width: 320px;
+}
+
+.insights-panel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--color-accent-gradient);
+  opacity: 0.72;
+}
+
+.insights-panel::before {
+  content: '';
+  position: absolute;
+  inset: auto -18% -42% auto;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-accent-blue) 18%, transparent) 0%, transparent 68%);
+  pointer-events: none;
 }
 
 .insights-panel-title {
@@ -926,6 +952,15 @@
 
 .recommend-card:hover {
   transform: translateY(-4px);
+}
+
+.recommend-card--scene {
+  min-width: 414px;
+  width: 414px;
+}
+
+.recommend-card--scene .recommend-card-poster-shell {
+  padding-bottom: 72.46% !important; /* aspect-ratio 1.38 (maintains 300px height matching portrait cards) */
 }
 
 .recommend-card-poster-shell {

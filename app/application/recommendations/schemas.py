@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Any
 
 class RecommendationItem(BaseModel):
     id: int
@@ -29,6 +29,8 @@ class RecommendationsResponse(BaseModel):
     top_movie_genre: str
     top_tv_genre: str
     watchlist_item_ids: List[int]
+    recently_added: Optional[List[RecommendationItem]] = []
+    recently_activated_people: Optional[List[Any]] = []
 
 class ActionResponse(BaseModel):
     status: str
