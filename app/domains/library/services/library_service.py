@@ -11,7 +11,7 @@ class LibraryService:
 
     def list_mainstream_metadata(self, limit: int = 50) -> List[MetadataMatch]:
         """List mainstream metadata matches (SFW)."""
-        return self.db.query(MetadataMatch).filter(not MetadataMatch.is_adult).limit(limit).all()
+        return self.db.query(MetadataMatch).filter(~MetadataMatch.is_adult).limit(limit).all()
 
     def list_adult_metadata(self, limit: int = 50) -> List[MetadataMatch]:
         """List adult metadata matches (NSFW)."""

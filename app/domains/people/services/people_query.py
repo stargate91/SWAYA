@@ -75,7 +75,7 @@ class PeopleQueryBuilder:
         if adult_only:
             query = query.filter(Person.is_adult)
         else:
-            query = query.filter(not Person.is_adult)
+            query = query.filter(~Person.is_adult)
 
         if search:
             query = query.filter(Person.name.ilike(f"%{search}%"))

@@ -41,7 +41,7 @@ class LibraryStatsService:
             MetadataMatch.is_active
         )
         if not include_adult:
-            movie_query = movie_query.filter(not MetadataMatch.is_adult)
+            movie_query = movie_query.filter(~MetadataMatch.is_adult)
         total_movies = movie_query.scalar() or 0
 
         # Resolve TV Shows count by climbing the parent hierarchy from active episodes
@@ -52,7 +52,7 @@ class LibraryStatsService:
             ).filter(
                 MediaItem.status.in_(library_statuses),
                 MetadataMatch.media_type == MediaType.EPISODE,
-                MetadataMatch.parent_id is not None,
+                MetadataMatch.parent_id.isnot(None),
                 MetadataMatch.is_active
             ).all()
         }
@@ -61,7 +61,7 @@ class LibraryStatsService:
             current_parents = {
                 r[0] for r in self.db.query(MetadataMatch.parent_id).filter(
                     MetadataMatch.id.in_(current_parents),
-                    MetadataMatch.parent_id is not None
+                    MetadataMatch.parent_id.isnot(None)
                 ).all()
             }
 
@@ -71,7 +71,7 @@ class LibraryStatsService:
             MetadataMatch.is_active
         )
         if not include_adult:
-            tv_count_query = tv_count_query.filter(not MetadataMatch.is_adult)
+            tv_count_query = tv_count_query.filter(~MetadataMatch.is_adult)
         total_tv = tv_count_query.scalar() or 0
 
         episodes_query = self.db.query(func.count(MediaItem.id)).select_from(MediaItem).join(
@@ -82,7 +82,7 @@ class LibraryStatsService:
             MetadataMatch.is_active
         )
         if not include_adult:
-            episodes_query = episodes_query.filter(not MetadataMatch.is_adult)
+            episodes_query = episodes_query.filter(~MetadataMatch.is_adult)
         total_episodes = episodes_query.scalar() or 0
 
         settings_adapter = self.settings

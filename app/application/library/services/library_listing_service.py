@@ -146,14 +146,14 @@ class LibraryListingService:
         current_parents = {
             r[0] for r in self.db.query(MetadataMatch.parent_id).join(
                 MediaItem, MetadataMatch.media_item_id == MediaItem.id
-            ).filter(MediaItem.status.in_(lib_statuses), MetadataMatch.parent_id is not None).all()
+            ).filter(MediaItem.status.in_(lib_statuses), MetadataMatch.parent_id.isnot(None)).all()
         }
         while current_parents:
             parent_ids.update(current_parents)
             current_parents = {
                 r[0] for r in self.db.query(MetadataMatch.parent_id).filter(
                     MetadataMatch.id.in_(current_parents),
-                    MetadataMatch.parent_id is not None
+                    MetadataMatch.parent_id.isnot(None)
                 ).all()
             }
         tv_shows_count = self.db.query(MetadataMatch).filter(

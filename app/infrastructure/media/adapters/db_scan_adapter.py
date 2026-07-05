@@ -36,7 +36,7 @@ class DbScanAdapter(ScanPort):
         parent_ids = set()
         parent_query = self.db.query(MetadataMatch.parent_id).join(
             MediaItem, MetadataMatch.media_item_id == MediaItem.id
-        ).filter(MediaItem.status.in_(lib_statuses), MetadataMatch.parent_id is not None)
+        ).filter(MediaItem.status.in_(lib_statuses), MetadataMatch.parent_id.isnot(None))
 
         if media_type == "movie":
             parent_query = parent_query.filter(MetadataMatch.media_type == MediaType.MOVIE)
@@ -57,7 +57,7 @@ class DbScanAdapter(ScanPort):
             parent_ids.update(current_parents)
             current_parents = {
                 r[0] for r in self.db.query(MetadataMatch.parent_id).filter(
-                    MetadataMatch.id.in_(current_parents), MetadataMatch.parent_id is not None
+                    MetadataMatch.id.in_(current_parents), MetadataMatch.parent_id.isnot(None)
                 ).all()
             }
             
@@ -86,13 +86,13 @@ class DbScanAdapter(ScanPort):
         current_parents = {
             m.parent_id for m in self.db.query(MetadataMatch).join(MediaItem).filter(
                 MediaItem.status.in_(status_enums)
-            ).filter(MetadataMatch.is_active, MetadataMatch.parent_id is not None).all()
+            ).filter(MetadataMatch.is_active, MetadataMatch.parent_id.isnot(None)).all()
         }
         while current_parents:
             parent_ids.update(current_parents)
             current_parents = {
                 r[0] for r in self.db.query(MetadataMatch.parent_id).filter(
-                    MetadataMatch.id.in_(current_parents), MetadataMatch.parent_id is not None
+                    MetadataMatch.id.in_(current_parents), MetadataMatch.parent_id.isnot(None)
                 ).all()
             }
             

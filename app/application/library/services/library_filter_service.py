@@ -87,7 +87,7 @@ class LibraryFilterService:
                 
                 tv_ids = select(MetadataMatch.parent_id).filter(
                     MetadataMatch.id.in_(season_parent_ids),
-                    MetadataMatch.parent_id is not None
+                    MetadataMatch.parent_id.isnot(None)
                 ).scalar_subquery()
                 
                 match_ids_subquery = select(MetadataMatch.id).filter(

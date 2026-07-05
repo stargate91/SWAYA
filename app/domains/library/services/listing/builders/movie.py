@@ -35,7 +35,7 @@ class MovieQueryBuilder(BaseQueryBuilder):
             joined_override = True
             query = query.filter(
                 or_(
-                    and_(MetadataMatch.media_item_id is not None, MediaItem.status.in_(self.lib_statuses)),
+                    and_(MetadataMatch.media_item_id.isnot(None), MediaItem.status.in_(self.lib_statuses)),
                     and_(MetadataMatch.media_item_id is None, UserOverride.is_tracked)
                 ),
                 MetadataMatch.is_active,
@@ -43,7 +43,7 @@ class MovieQueryBuilder(BaseQueryBuilder):
             )
         else:
             query = query.filter(
-                MetadataMatch.media_item_id is not None,
+                MetadataMatch.media_item_id.isnot(None),
                 MediaItem.status.in_(self.lib_statuses),
                 MetadataMatch.is_active,
                 MetadataMatch.media_type == MediaType.MOVIE
@@ -57,7 +57,7 @@ class MovieQueryBuilder(BaseQueryBuilder):
             canonical_match_ids = self.db.query(
                 func.min(MetadataMatch.id)
             ).filter(
-                MetadataMatch.media_item_id is not None,
+                MetadataMatch.media_item_id.isnot(None),
                 MetadataMatch.is_active,
                 MetadataMatch.is_adult == params.include_adult,
                 MetadataMatch.media_type == MediaType.MOVIE
@@ -67,7 +67,7 @@ class MovieQueryBuilder(BaseQueryBuilder):
             canonical_match_ids = self.db.query(
                 func.min(MetadataMatch.id)
             ).filter(
-                MetadataMatch.media_item_id is not None,
+                MetadataMatch.media_item_id.isnot(None),
                 MetadataMatch.is_active,
                 MetadataMatch.is_adult == params.include_adult,
                 MetadataMatch.media_type == MediaType.MOVIE

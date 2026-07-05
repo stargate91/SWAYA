@@ -80,7 +80,7 @@ class PeopleLibraryService:
         if filter_status == "active":
             query = query.filter(Person.is_active)
         elif filter_status == "inactive":
-            query = query.filter(not Person.is_active)
+            query = query.filter(~Person.is_active)
 
         query = query.filter(Person.is_adult == include_adult)
 
