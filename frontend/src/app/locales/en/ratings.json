@@ -15,8 +15,9 @@
     "all": "All Types",
     "movies": "Movies",
     "series": "Series",
+    "tvShows": "TV Shows",
     "scenes": "Scenes",
-    "people": "People"
+    "people": "Artists"
   },
   "table": {
     "name": "Name",
@@ -26,8 +27,7 @@
     "favorite": "Favorite",
     "comment": "Review",
     "actions": "Actions",
-    "empty": "No items match the selected criteria.",
-    "loading": "Loading items..."
+    "empty": "No items match the selected criteria."
   },
   "stats": {
     "average": "Average Rating",
@@ -36,13 +36,16 @@
     "distribution": "Rating Distribution",
     "favoritesCount": "Favorites",
     "favoriteArtists": "Favorite Artists",
-    "favoritePerformers": "Favorite Performers",
-    "people": "People"
+    "favoritePerformers": "Favorite Stars",
+    "people": "Artists",
+    "mediaAverages": "Media Averages",
+    "mediaItems": "Media Items",
+    "rated": "Rated",
+    "unrated": "Unrated"
   },
   "dialog": {
     "editReview": "Edit Review",
     "placeholder": "Write your thoughts about this title...",
-    "save": "Save Review",
-    "cancel": "Cancel"
+    "save": "Save Review"
   }
 }

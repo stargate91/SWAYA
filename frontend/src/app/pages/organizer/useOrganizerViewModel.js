@@ -65,12 +65,12 @@ export function useOrganizerViewModel({
       hasDatabaseItems,
       hasVisibleItems,
       loadAllButtonLabel: isLoadingAll
-        ? t('organizer.buttons.loadingAll')
+        ? t('common.loading')
         : isOrganizerCountReady
           ? `${t('organizer.buttons.loadAll')} (${organizerItemCount})`
           : t('organizer.buttons.loadAll'),
       loadRestButtonLabel: isLoadingAll
-        ? t('organizer.buttons.loadingAll')
+        ? t('common.loading')
         : isOrganizerCountReady
           ? `${t('organizer.buttons.loadTheRest')} (${remainingOrganizerCount})`
           : t('organizer.buttons.loadTheRest'),

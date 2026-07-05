@@ -143,7 +143,7 @@ export default function DashboardCustomizerDrawer({
                       checked={Boolean(visibleWidgets.recently_activated_people)}
                       onChange={() => toggleWidget('recently_activated_people')}
                     >
-                      {t('dashboard.widget_recently_activated_people') || 'Recently Active People'}
+                      {t('dashboard.widget_recently_activated_people') || 'Recently Tracked People'}
                     </Switch>
 
                     <Switch

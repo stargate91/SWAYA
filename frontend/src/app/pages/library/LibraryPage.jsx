@@ -160,6 +160,8 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
               setButtShapeFilter={state.setButtShapeFilter}
               buttSizeFilter={state.buttSizeFilter}
               setButtSizeFilter={state.setButtSizeFilter}
+              favoriteFilter={state.favoriteFilter}
+              setFavoriteFilter={state.setFavoriteFilter}
               filterData={state.filterData}
             />
           ) : null}

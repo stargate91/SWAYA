@@ -96,7 +96,7 @@ export function useOrganizerRename({
         footer: (
           <>
             <Button variant="secondary-neutral" onClick={closeModal}>
-              {t('organizer.details.delete.cancel') || 'Cancel'}
+              {t('common.cancel') || 'Cancel'}
             </Button>
             <Button variant="primary" onClick={() => executeRename(organizeInPlaceVal)}>
               {organizeInPlaceVal

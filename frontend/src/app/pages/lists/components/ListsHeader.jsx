@@ -122,7 +122,7 @@ export default function ListsHeader({
             <Input
               type="text"
               className="lists-header__search-input"
-              placeholder={t('lists.search_placeholder') || 'Search in this list...'}
+              placeholder={t('common.searchPlaceholder') || 'Search in this list...'}
               value={listSearchQuery}
               onChange={(e) => setListSearchQuery(e.target.value)}
               leftElement={<Search size={16} />}

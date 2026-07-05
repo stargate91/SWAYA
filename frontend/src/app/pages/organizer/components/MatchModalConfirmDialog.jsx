@@ -43,7 +43,7 @@ export default function MatchModalConfirmDialog({
             size="sm"
             onClick={onCancel}
           >
-            {t('organizer.details.matchModal.confirm.cancel')}
+            {t('common.cancel')}
           </Button>
           <Button
             type="button"

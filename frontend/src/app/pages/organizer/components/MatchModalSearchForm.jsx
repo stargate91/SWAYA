@@ -102,7 +102,7 @@ export default function MatchModalSearchForm({
         </div>
         <div className="organizer-match-modal__search-actions">
           <Tooltip
-            content={isSearching ? t('organizer.details.matchModal.searching') : t('organizer.details.matchModal.search')}
+            content={isSearching ? t('organizer.details.matchModal.searching') : t('common.search')}
             side="top"
           >
             <IconButton
@@ -110,7 +110,7 @@ export default function MatchModalSearchForm({
               variant="secondary"
               className="organizer-match-modal__search-button"
               disabled={isSearching}
-              label={isSearching ? t('organizer.details.matchModal.searching') : t('organizer.details.matchModal.search')}
+              label={isSearching ? t('organizer.details.matchModal.searching') : t('common.search')}
               title={null}
             >
               <Search size={15} />

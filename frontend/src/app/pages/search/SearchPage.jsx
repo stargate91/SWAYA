@@ -268,7 +268,7 @@ export default function SearchPage() {
         ) : filteredResults.length === 0 ? (
           <EmptyState
             icon={ImageOff}
-            title={t('search.noResults.title', { defaultValue: 'No Results Found' })}
+            title={t('common.noResults', { defaultValue: 'No Results Found' })}
             description={t('search.noResults.desc', { defaultValue: 'Try another query or change search settings.' })}
           />
         ) : (

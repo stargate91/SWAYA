@@ -130,7 +130,7 @@ export default function Table({
       if (!hasExtras && dismissRows && clearSelectedRows) {
         items.push({
           key: 'bulk-dismiss',
-          label: t('organizer.actions.dismissBulk') || 'Remove',
+          label: t('common.remove') || 'Remove',
           icon: EyeOff,
           onClick: () => {
             dismissRows(selectedRows.map((r) => r.id));
@@ -142,7 +142,7 @@ export default function Table({
       if (openBulkDeleteModal) {
         items.push({
           key: 'bulk-delete',
-          label: t('organizer.actions.delete') || 'Delete',
+          label: t('common.delete') || 'Delete',
           icon: Trash2,
           className: 'is-danger',
           onClick: () => openBulkDeleteModal(selectedRows),

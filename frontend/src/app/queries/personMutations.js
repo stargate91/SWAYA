@@ -1,25 +1,34 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 
-const syncPersonProfileCaches = (queryClient, personId, data) => {
-  const personKeys = [
-    ['person-detail', personId],
-    ['person-detail', String(personId)],
-    ['person-detail', Number(personId)],
-  ];
+const matchesId = (itemId, targetId) => {
+  if (itemId === targetId || String(itemId) === String(targetId)) return true;
+  const idStr = String(targetId);
+  if (String(itemId) === `local:${idStr}` || String(itemId) === `tmdb:${idStr}`) return true;
+  return false;
+};
 
-  personKeys.forEach((key) => {
-    queryClient.setQueryData(key, (oldData) => {
-      if (!oldData) {
-        return oldData;
-      }
+const syncPersonProfileCaches = (queryClient, personId, data) => {
+  queryClient.setQueriesData({ queryKey: ['person-detail'] }, (oldData) => {
+    if (!oldData) return oldData;
+    
+    const matchesDbId = oldData.id === personId || String(oldData.id) === String(personId);
+    const matchesExternalId = oldData.external_ids && Object.values(oldData.external_ids).some(extId => {
+      const extIdStr = String(extId);
+      return extIdStr === String(personId) || 
+             `tmdb_${extIdStr}` === String(personId) || 
+             `tmdb:${extIdStr}` === String(personId);
+    });
+
+    if (matchesDbId || matchesExternalId) {
       return {
         ...oldData,
         profile_path: data?.profile_path ?? oldData.profile_path,
         local_profile_path: data?.local_profile_path ?? oldData.local_profile_path,
         has_local_profile: data?.has_local_profile ?? oldData.has_local_profile,
       };
-    });
+    }
+    return oldData;
   });
 
   queryClient.setQueriesData({ queryKey: ['people'] }, (oldData) => {
@@ -27,7 +36,7 @@ const syncPersonProfileCaches = (queryClient, personId, data) => {
     return {
       ...oldData,
       items: oldData.items.map((item) => (
-        item.id === personId || String(item.id) === String(personId)
+        matchesId(item.id, personId)
           ? {
               ...item,
               profile_path: data?.profile_path ?? item.profile_path,
@@ -46,7 +55,7 @@ const syncPersonProfileCaches = (queryClient, personId, data) => {
       pages: oldData.pages.map((page) => ({
         ...page,
         items: (page.items || []).map((item) => (
-          item.id === personId || String(item.id) === String(personId)
+          matchesId(item.id, personId)
             ? {
                 ...item,
                 profile_path: data?.profile_path ?? item.profile_path,
@@ -64,7 +73,7 @@ const syncPersonProfileCaches = (queryClient, personId, data) => {
     return {
       ...oldData,
       items: oldData.items.map((item) => (
-        item.id === personId || String(item.id) === String(personId)
+        matchesId(item.id, personId)
           ? {
               ...item,
               profile_path: data?.profile_path ?? item.profile_path,
@@ -114,24 +123,26 @@ const syncPersonProfileCaches = (queryClient, personId, data) => {
 };
 
 const syncPersonBackdropCaches = (queryClient, personId, data) => {
-  const personKeys = [
-    ['person-detail', personId],
-    ['person-detail', String(personId)],
-    ['person-detail', Number(personId)],
-  ];
+  queryClient.setQueriesData({ queryKey: ['person-detail'] }, (oldData) => {
+    if (!oldData) return oldData;
 
-  personKeys.forEach((key) => {
-    queryClient.setQueryData(key, (oldData) => {
-      if (!oldData) {
-        return oldData;
-      }
+    const matchesDbId = oldData.id === personId || String(oldData.id) === String(personId);
+    const matchesExternalId = oldData.external_ids && Object.values(oldData.external_ids).some(extId => {
+      const extIdStr = String(extId);
+      return extIdStr === String(personId) || 
+             `tmdb_${extIdStr}` === String(personId) || 
+             `tmdb:${extIdStr}` === String(personId);
+    });
+
+    if (matchesDbId || matchesExternalId) {
       return {
         ...oldData,
         backdrop_path: data?.backdrop_path ?? oldData.backdrop_path,
         local_backdrop_path: data?.local_backdrop_path ?? oldData.local_backdrop_path,
         has_local_backdrop: data?.has_local_backdrop ?? oldData.has_local_backdrop,
       };
-    });
+    }
+    return oldData;
   });
 };
 

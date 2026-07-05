@@ -22,7 +22,16 @@
     "less": "Show Less",
     "sfwMode": "SFW Mode",
     "nsfwMode": "NSFW Mode",
-    "other": "Other"
+    "other": "Other",
+    "showMore": "Show More",
+    "adult_badge": "ADULT",
+    "noResults": "No results found",
+    "select": "Select...",
+    "loading": "Loading...",
+    "searchPlaceholder": "Search...",
+    "subtitles": "Subtitles",
+    "subtitle": "Subtitle",
+    "adult": "Adult"
   },
   "dropzone": {
     "label": "Drop files or folders here",
@@ -36,9 +45,6 @@
     "last": "Last"
   },
   "dropdown": {
-    "search": "Search...",
-    "noResults": "No results found",
-    "placeholder": "Select...",
     "ascending": "Ascending",
     "descending": "Descending"
   },
@@ -78,8 +84,8 @@
       "downloading": "Downloading images..."
     },
     "people": {
-      "hydrating": "Getting extra info for people...",
-      "importing": "Importing your list of people..."
+      "hydrating": "Getting extra info for artists...",
+      "importing": "Importing your list of artists..."
     },
     "sync": {
       "running": "Syncing info languages..."
@@ -97,7 +103,6 @@
     "description": "Do you want to close SWAYA completely, or just minimize it to your system tray?",
     "info": "You can always change this later in Settings > General.",
     "action": {
-      "cancel": "Cancel",
       "tray": "Minimize to Tray",
       "quit": "Quit"
     },
@@ -133,10 +138,8 @@
     "ends_at": "Ends at",
     "audio_tracks": "Audio Tracks",
     "no_audio_tracks": "No audio tracks",
-    "subtitles": "Subtitles",
     "off": "Off",
     "track": "Track",
-    "subtitle": "Subtitle",
     "finished_watching": "Finished watching",
     "up_next": "Up Next",
     "starting_in": "Starting in {{count}}s...",
@@ -144,18 +147,5 @@
     "rate_title": "Rate this title",
     "replay": "Replay",
     "close_player": "Close Player"
-  },
-  "search": {
-    "source": "Source",
-    "type": "Type",
-    "placeholderTmdb": "Search {{type}}...",
-    "placeholderPattern": "Search {{type}} on {{source}}...",
-    "types": {
-      "all": "All",
-      "movie": "Movies",
-      "tv": "TV Shows",
-      "person": "People",
-      "scene": "Scenes"
-    }
   }
 }

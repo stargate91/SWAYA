@@ -385,7 +385,6 @@
       "episodeTemplate": "Episode Folder Naming Pattern",
       "defaultMoviesName": "Movies",
       "defaultTvName": "TV Shows",
-      "defaultAdultName": "Adult",
       "defaultAdultMoviesName": "Movies",
       "defaultAdultTvName": "TV Shows",
       "defaultAdultScenesName": "Scenes"
@@ -458,8 +457,7 @@
       "metadataTemplate": "Info File Naming Pattern",
       "actionOptions": {
         "rename": "Rename",
-        "ignore": "Leave As Is",
-        "delete": "Delete"
+        "ignore": "Leave As Is"
       }
     },
     "playback": {
@@ -491,7 +489,6 @@
       "tmdbStep2Link": "API",
       "tmdbStep2End": " from the sidebar.",
       "tmdbStep3Start": "Click ",
-      "tmdbStep3Bold1": "Create",
       "tmdbStep3Mid": " and pick ",
       "tmdbStep3Bold2": "Developer",
       "tmdbStep3End": " (or Personal) to request a key.",
@@ -592,12 +589,8 @@
     "title": "Language Synchronization",
     "description": "SWAYA will download the new language data if it is not already available. The larger the library, the longer this process will take.",
     "dontShowAgain": "Don't show this again",
-    "cancel": "Cancel",
     "syncButton": "Sync Language",
     "syncStarted": "Language synchronization started in background.",
     "syncFailed": "Could not start language synchronization."
   }
 }
-
-
-

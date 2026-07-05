@@ -104,7 +104,7 @@ export default function AddPeopleModalContent({ isAdult, t }) {
           onChange={setActiveMode}
           options={[
             { value: 'local', label: t('library.addPeople.modes.local') || 'Local Pack' },
-            { value: 'search', label: t('library.addPeople.modes.search') || 'TMDB Search' },
+            { value: 'search', label: t('common.search') || 'TMDB Search' },
           ]}
           className="add-people-modal__segmented-control"
         />

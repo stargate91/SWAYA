@@ -70,7 +70,7 @@ export default function AppClosePrompt() {
       icon={AlertTriangle}
       footer={(
         <>
-          <Button variant="secondary-neutral" onClick={() => handleAction('cancel')}>{t('closePrompt.action.cancel')}</Button>
+          <Button variant="secondary-neutral" onClick={() => handleAction('cancel')}>{t('common.cancel')}</Button>
           <Button variant="secondary-neutral" onClick={() => handleAction('minimize-to-tray')}>{t('closePrompt.action.tray')}</Button>
           <Button variant="danger" onClick={() => handleAction('quit')}>{t('closePrompt.action.quit')}</Button>
         </>

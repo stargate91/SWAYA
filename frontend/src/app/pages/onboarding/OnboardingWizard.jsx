@@ -186,7 +186,7 @@ export default function OnboardingWizard() {
               <div />
               <div className="onboarding-footer-actions-cluster">
                 <NavButton className="ui-nav-button--onboarding-back" onClick={handlePrev}>
-                  {t('onboarding.buttons.back')}
+                  {t('common.back')}
                 </NavButton>
                 <NavButton
                   className="ui-nav-button--onboarding-continue"
@@ -202,7 +202,7 @@ export default function OnboardingWizard() {
             <>
               {step > 1 && step < 6 ? (
                 <NavButton className="ui-nav-button--onboarding-back" onClick={handlePrev}>
-                  {t('onboarding.buttons.back')}
+                  {t('common.back')}
                 </NavButton>
               ) : (
                 <div />

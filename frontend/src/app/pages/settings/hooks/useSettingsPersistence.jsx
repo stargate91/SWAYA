@@ -160,7 +160,7 @@ export default function useSettingsPersistence({
                   closeModal();
                 }}
               >
-                {t('settingsPage.languageChangeInfo.cancel')}
+                {t('common.cancel')}
               </Button>
               <Button
                 variant="primary"

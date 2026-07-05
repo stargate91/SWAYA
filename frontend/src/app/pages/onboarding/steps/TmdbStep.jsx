@@ -140,7 +140,7 @@ export default function TmdbStep({
                   variant="secondary-neutral"
                   onClick={() => (tmdbGuideStep === 0 ? closeTmdbGuide() : goToTmdbGuideStep(tmdbGuideStep - 1, 'backward'))}
                 >
-                  {tmdbGuideStep === 0 ? t('onboarding.tmdbGuide.closeGuide', { defaultValue: 'Close guide' }) : t('onboarding.tmdbGuide.back', { defaultValue: 'Back' })}
+                  {tmdbGuideStep === 0 ? t('onboarding.tmdbGuide.closeGuide', { defaultValue: 'Close guide' }) : t('common.back', { defaultValue: 'Back' })}
                 </Button>
                 {activeTmdbGuideStep.actionHref ? (
                   <Button

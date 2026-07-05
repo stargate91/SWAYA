@@ -59,7 +59,7 @@ export default function BioSection({
               options={genderOptions}
               value={form.gender}
               onChange={e => handleChange('gender', e.target.value)}
-              placeholder={t('dropdown.placeholder') || 'Select...'}
+              placeholder={t('common.select') || 'Select...'}
             />
           )}
           <div className="ui-field">

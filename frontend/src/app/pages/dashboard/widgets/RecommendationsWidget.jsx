@@ -245,7 +245,7 @@ const RecommendationCarousel = ({
                               <Check size={12} strokeWidth={3} /> {T('dashboard.watchlist.added') || 'Watchlisted'}
                             </span>
                             <span className="watchlist-btn-state-hover">
-                              <Minus size={12} strokeWidth={3} /> {T('dashboard.watchlist.remove_short') || 'Remove'}
+                              <Minus size={12} strokeWidth={3} /> {T('common.remove') || 'Remove'}
                             </span>
                           </>
                         ) : (
@@ -516,7 +516,7 @@ const RecommendationsWidget = ({ language, T, visibleWidgets = {} }) => {
 
       {!isLoading && isWidgetVisible('recently_activated_people') && recentlyActivePeople?.length > 0 && (
         <RecommendationCarousel
-          title={T('dashboard.recommendations.recently_activated_people') || 'Recently Active People'}
+          title={T('dashboard.recommendations.recently_activated_people') || 'Recently Tracked People'}
           items={recentlyActivePeople.map(p => ({
             ...p,
             media_type: 'person'

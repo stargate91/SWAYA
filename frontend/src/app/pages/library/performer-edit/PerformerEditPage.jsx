@@ -74,7 +74,7 @@ export default function PerformerEditPage() {
         <div className="settings-error-card">
           <div className="settings-error-content">
             <h3>{t('library.performerEdit.failedToLoadPerformer') || 'Failed to load performer'}</h3>
-            <button className="btn btn--primary" onClick={handleClose}>{t('library.performerEdit.back') || 'Back'}</button>
+            <button className="btn btn--primary" onClick={handleClose}>{t('common.back') || 'Back'}</button>
           </div>
         </div>
       </div>

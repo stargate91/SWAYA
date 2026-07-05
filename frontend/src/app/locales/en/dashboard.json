@@ -29,7 +29,6 @@
     "add": "Watchlist",
     "add_short": "Watchlist",
     "added": "Watchlisted",
-    "remove_short": "Remove",
     "add_failed": "Couldn't add this to your watchlist.",
     "remove_failed": "Couldn't remove this from your watchlist."
   },
@@ -42,7 +41,7 @@
     "because_you_like": "Because you like {genre}...",
     "fallback_title": "Recommended for you",
     "recently_added": "Recently Added",
-    "recently_activated_people": "Recently Active People"
+    "recently_activated_people": "Recently Followed Artists"
   },
   "customize": "Customize Dashboard",
   "customize_desc": "Select which widgets you want to display on your dashboard.",
@@ -51,7 +50,7 @@
   "widget_continue_watching": "Continue Watching",
   "widget_spotlight": "Spotlight (Trending)",
   "widget_recently_added": "Recently Added",
-  "widget_recently_activated_people": "Recently Active People",
+  "widget_recently_activated_people": "Recently Followed Artists",
   "widget_movies_discovery": "Discover Movies",
   "widget_tv_discovery": "Discover TV Shows",
   "widget_top_20": "Top 20 Discoveries",

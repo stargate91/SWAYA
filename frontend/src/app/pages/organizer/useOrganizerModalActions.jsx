@@ -111,7 +111,7 @@ export function useOrganizerModalActions({
       ),
       footer: (
         <Button variant="secondary-neutral" onClick={closeModal}>
-          {t('organizer.details.delete.cancel')}
+          {t('common.cancel')}
         </Button>
       ),
     });
@@ -175,7 +175,7 @@ export function useOrganizerModalActions({
       ),
       footer: (
         <Button variant="secondary-neutral" onClick={closeModal}>
-          {t('organizer.details.delete.cancel')}
+          {t('common.cancel')}
         </Button>
       ),
     });
@@ -207,7 +207,7 @@ export function useOrganizerModalActions({
       ),
       footer: (
         <Button variant="secondary-neutral" onClick={closeModal}>
-          {t('organizer.details.delete.cancel')}
+          {t('common.cancel')}
         </Button>
       ),
     });
@@ -231,7 +231,7 @@ export function useOrganizerModalActions({
       footer: (
         <>
           <Button variant="secondary-neutral" type="button" onClick={closeModal}>
-            {t('organizer.details.delete.cancel')}
+            {t('common.cancel')}
           </Button>
           <Button variant="primary" type="submit" form="organizer-override-form">
             {t('organizer.overrideModal.apply')}
@@ -260,7 +260,7 @@ export function useOrganizerModalActions({
       footer: (
         <>
           <Button variant="secondary-neutral" type="button" onClick={closeModal}>
-            {t('organizer.details.delete.cancel')}
+            {t('common.cancel')}
           </Button>
           <Button variant="primary" type="submit" form="organizer-bulk-override-form">
             {t('organizer.overrideModal.applyBulk')}
@@ -319,7 +319,7 @@ export function useOrganizerModalActions({
     {
       key: 'delete',
       label: t('organizer.details.delete.title'),
-      tooltip: t('organizer.actions.delete'),
+      tooltip: t('common.delete'),
       icon: Trash2,
       className: 'is-danger',
       onClick: (row) => openDeleteModal(row),
@@ -342,7 +342,7 @@ export function useOrganizerModalActions({
       actions={[
         !selectedRows.some((row) => row.rawType === 'extra') ? {
           key: 'dismiss',
-          label: t('organizer.actions.dismissBulk'),
+          label: t('common.remove'),
           icon: EyeOff,
           onClick: () => {
             dismissRows(selectedRows.map((r) => r.id));
@@ -352,7 +352,7 @@ export function useOrganizerModalActions({
         } : null,
         {
           key: 'delete',
-          label: t('organizer.actions.delete'),
+          label: t('common.delete'),
           icon: Trash2,
           variant: 'danger',
           onClick: () => openBulkDeleteModal(selectedRows),

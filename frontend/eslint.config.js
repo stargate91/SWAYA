@@ -6,6 +6,7 @@ import reactPlugin from 'eslint-plugin-react'
 import i18next from 'eslint-plugin-i18next'
 import jsxA11y from 'eslint-plugin-jsx-a11y'
 import { defineConfig, globalIgnores } from 'eslint/config'
+import i18nCheck from './eslint-rules/i18n-check.js'
 
 export default defineConfig([
   globalIgnores(['dist', 'build']),
@@ -20,6 +21,11 @@ export default defineConfig([
       react: reactPlugin,
       i18next,
       'jsx-a11y': jsxA11y,
+      'custom-i18n': {
+        rules: {
+          'no-missing-keys': i18nCheck,
+        },
+      },
     },
     languageOptions: {
       globals: {
@@ -44,6 +50,7 @@ export default defineConfig([
       'react/forbid-component-props': ['warn', { forbid: ['style'] }],
       'i18next/no-literal-string': ['warn', { markupOnly: true, ignoreCallees: ['t', 'console.log'] }],
       'jsx-a11y/no-static-element-interactions': 'warn',
+      'custom-i18n/no-missing-keys': 'error',
     },
   },
 ])

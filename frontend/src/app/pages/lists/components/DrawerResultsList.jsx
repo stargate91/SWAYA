@@ -39,7 +39,7 @@ export default function DrawerResultsList({
 
       {!searching && results.length === 0 && query && (
         <div className="lists-drawer__empty">
-          {t('lists.no_results', { defaultValue: 'No results found.' })}
+          {t('common.noResults', { defaultValue: 'No results found.' })}
         </div>
       )}
 

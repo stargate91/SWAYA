@@ -103,7 +103,7 @@ export default function MatchEpisodeCard({
             onClick={() => onSelect(episodeEntry)}
             disabled={isDisabled}
           >
-            {t('organizer.details.matchModal.select')}
+            {t('common.select')}
           </Button>
         </div>
       </div>

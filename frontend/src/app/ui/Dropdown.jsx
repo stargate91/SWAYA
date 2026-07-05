@@ -60,7 +60,7 @@ function DropdownMenu({
             ref={searchInputRef}
             type="text"
             className="ui-dropdown__search-input"
-            placeholder={t('dropdown.search')}
+            placeholder={t('common.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onClick={(e) => e.stopPropagation()}
@@ -83,7 +83,7 @@ function DropdownMenu({
         ))}
         {filteredOptions.length === 0 ? (
           <div className="ui-dropdown__no-results">
-            {t('dropdown.noResults')}
+            {t('common.noResults')}
           </div>
         ) : null}
       </div>
@@ -114,7 +114,7 @@ export default function Dropdown({
   const [menuCoords, setMenuCoords] = useState({ top: 0, left: 0, width: 0 });
 
   const { t } = useTranslation();
-  const displayPlaceholder = placeholder ?? t('dropdown.placeholder');
+  const displayPlaceholder = placeholder ?? t('common.select');
   const selectedOption = options.find((opt) => opt.value === value);
   const isSorter = variant === 'sorter';
 

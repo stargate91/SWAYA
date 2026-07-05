@@ -182,7 +182,9 @@ export default function PeopleHeroSection({
               onClick={handleToggleActive}
               onMouseEnter={() => setIsActivateHovered(true)}
               onMouseLeave={() => setIsActivateHovered(false)}
-              title={t('library.people.addPeopleBtn') || 'Activate'}
+              title={item?.is_active 
+                ? (t('library.people.unfollow') || 'Unfollow') 
+                : (t('library.people.follow') || 'Follow')}
             >
               {item?.is_active
                 ? (isActivateHovered ? <Minus size={15} /> : <Check size={15} />)

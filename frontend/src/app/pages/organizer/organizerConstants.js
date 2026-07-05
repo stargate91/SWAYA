@@ -16,7 +16,7 @@ export const MANUAL_TABS = [
 
 export const EXTRAS_TABS = [
   { value: 'bonus', labelKey: 'organizer.extrasTabs.bonus', icon: PlayCircle },
-  { value: 'subtitles', labelKey: 'organizer.extrasTabs.subtitles', icon: Captions },
+  { value: 'subtitles', labelKey: 'common.subtitles', icon: Captions },
   { value: 'audio', labelKey: 'organizer.extrasTabs.audio', icon: Volume2 },
   { value: 'images', labelKey: 'organizer.extrasTabs.images', icon: Image },
   { value: 'metadata', labelKey: 'organizer.extrasTabs.metadata', icon: Info },

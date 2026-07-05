@@ -71,12 +71,29 @@ class DbScanAdapter(ScanPort):
             elif isinstance(s, ItemStatus):
                 status_enums.append(s)
             
-        matched_match_ids = [
+        matched_match_ids = {
             m.id for m in self.db.query(MetadataMatch).join(MediaItem).filter(
                 MediaItem.status.in_(status_enums)
             ).filter(MetadataMatch.is_active == True).all()
-        ]
-        return matched_match_ids
+        }
+
+        # Traverse parent IDs to include TV show and season matches
+        parent_ids = set()
+        current_parents = {
+            m.parent_id for m in self.db.query(MetadataMatch).join(MediaItem).filter(
+                MediaItem.status.in_(status_enums)
+            ).filter(MetadataMatch.is_active == True, MetadataMatch.parent_id != None).all()
+        }
+        while current_parents:
+            parent_ids.update(current_parents)
+            current_parents = {
+                r[0] for r in self.db.query(MetadataMatch.parent_id).filter(
+                    MetadataMatch.id.in_(current_parents), MetadataMatch.parent_id != None
+                ).all()
+            }
+            
+        all_valid_match_ids = list(matched_match_ids.union(parent_ids))
+        return all_valid_match_ids
 
     def get_active_match_id(self, media_item_id: int) -> Optional[int]:
         active_match = self.db.query(MetadataMatch).filter(

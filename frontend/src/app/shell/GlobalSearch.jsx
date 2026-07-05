@@ -306,7 +306,7 @@ export default function GlobalSearch() {
                 const groupTitles = {
                   movie: t('library.tabs.movies') || 'Movies',
                   tv: t('library.tabs.tv') || 'TV Shows',
-                  person: selectedSource === 'tmdb' ? (t('library.tabs.people') || 'People') : (t('library.tabs.performers') || 'Performers'),
+                  person: selectedSource === 'tmdb' ? (t('library.tabs.people') || 'Artists') : (t('library.tabs.adultPeople') || 'Stars'),
                   scene: t('library.tabs.scenes') || 'Scenes',
                   other: t('common.other') || 'Other'
                 };

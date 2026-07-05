@@ -61,7 +61,7 @@ export default function RatingsReviewDrawer({
         </div>
         <div className="review-drawer__footer">
           <Button variant="secondary-neutral" onClick={() => setEditingItem(null)}>
-            {t('ratings.dialog.cancel', { defaultValue: 'Cancel' })}
+            {t('common.cancel', { defaultValue: 'Cancel' })}
           </Button>
           <Button variant="primary" onClick={handleSaveReview}>
             {t('ratings.dialog.save', { defaultValue: 'Save Review' })}

@@ -143,7 +143,7 @@ export default function PlayerControlBar({
           {/* Subtitles Dropdown */}
           {showSubMenu && (
             <div className="player-page__menu" onWheel={(e) => e.stopPropagation()}>
-              <div className="player-page__menu-title">{t('player.subtitles', { defaultValue: 'Subtitles' })}</div>
+              <div className="player-page__menu-title">{t('common.subtitles', { defaultValue: 'Subtitles' })}</div>
               <button
                 className={`player-page__menu-item ${!trackList.some((track) => track.type === 'sub' && track.selected) ? 'active' : ''}`}
                 onClick={() => {
@@ -162,7 +162,7 @@ export default function PlayerControlBar({
                     setShowSubMenu(false);
                   }}
                 >
-                  {track.title || track.lang?.toUpperCase() || ((t('player.subtitle') || 'Subtitle') + ' ' + track.id)}
+                  {track.title || track.lang?.toUpperCase() || ((t('common.subtitle') || 'Subtitle') + ' ' + track.id)}
                 </button>
               ))}
             </div>

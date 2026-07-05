@@ -113,7 +113,7 @@ export default function FolderStructureTab({
                       value={form.folder_adult_name}
                       disabled={isScanActive}
                       onChange={handleChange('folder_adult_name')}
-                      placeholder={t('settingsPage.sections.folderStructure.defaultAdultName')}
+                      placeholder={t('common.adult')}
                     />
                     <Switch
                       id="naming_adult_subfolders_enabled"

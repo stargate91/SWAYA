@@ -103,7 +103,7 @@ export const mapExtraRow = (item, t) => ({
   sourcePath: item.path || item.filename,
   targetPath: item.planned_path || '-',
   type: t('organizer.typeLabels.extra'),
-  status: item.action === 'delete' ? t('organizer.status.delete') : t('organizer.status.ready'),
+  status: item.action === 'delete' ? t('common.delete') : t('organizer.status.ready'),
   rawAction: String(item.action || '').toLowerCase(),
   rawType: 'extra',
   rawStatus: String(item.action === 'delete' ? 'delete' : 'matched'),

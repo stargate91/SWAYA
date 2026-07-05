@@ -1,7 +1,7 @@
 export const getGenderOptions = (t) => [
   { value: '1', label: t('library.performerEdit.female') || 'Female' },
   { value: '2', label: t('library.performerEdit.male') || 'Male' },
-  { value: '0', label: t('library.performerEdit.other') || 'Other' },
+  { value: '0', label: t('common.other') || 'Other' },
 ];
 
 export const getSameSexOnlyOptions = () => [
@@ -41,7 +41,7 @@ export const getHairColorOptions = (t) => [
   { value: 'BALD', label: t('library.performerEdit.hairColors.bald') || 'Bald' },
   { value: 'VARIOUS', label: t('library.performerEdit.hairColors.various') || 'Various' },
   { value: 'WHITE', label: t('library.performerEdit.hairColors.white') || 'White' },
-  { value: 'OTHER', label: t('library.performerEdit.hairColors.other') || 'Other' },
+  { value: 'OTHER', label: t('common.other') || 'Other' },
 ];
 
 export const getEyeColorOptions = (t) => [
@@ -61,7 +61,7 @@ export const getEthnicityOptions = (t) => [
   { value: 'LATIN', label: t('library.performerEdit.ethnicities.latin') || 'Latin' },
   { value: 'MIDDLE_EASTERN', label: t('library.performerEdit.ethnicities.middle_eastern') || 'Middle Eastern' },
   { value: 'MIXED', label: t('library.performerEdit.ethnicities.mixed') || 'Mixed' },
-  { value: 'OTHER', label: t('library.performerEdit.ethnicities.other') || 'Other' },
+  { value: 'OTHER', label: t('common.other') || 'Other' },
 ];
 
 export const getButtShapeOptions = (t) => [

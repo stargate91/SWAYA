@@ -124,7 +124,7 @@ export function getLocalizedSettingsDefaults(t = null) {
   return {
     folder_movies_name: t('settingsPage.sections.folderStructure.defaultMoviesName'),
     folder_tv_name: t('settingsPage.sections.folderStructure.defaultTvName'),
-    folder_adult_name: t('settingsPage.sections.folderStructure.defaultAdultName'),
+    folder_adult_name: t('common.adult'),
     folder_adult_movies_name: t('settingsPage.sections.folderStructure.defaultAdultMoviesName'),
     folder_adult_tv_name: t('settingsPage.sections.folderStructure.defaultAdultTvName'),
     folder_adult_scenes_name: t('settingsPage.sections.folderStructure.defaultAdultScenesName'),

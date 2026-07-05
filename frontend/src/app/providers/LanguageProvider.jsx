@@ -8,6 +8,7 @@ import enHistory from '../locales/en/history.json';
 import enOnboarding from '../locales/en/onboarding.json';
 import enRatings from '../locales/en/ratings.json';
 import enLists from '../locales/en/lists.json';
+import enSearch from '../locales/en/search.json';
 import { LanguageContext } from './LanguageContext';
 
 const en = {
@@ -20,6 +21,7 @@ const en = {
   onboarding: enOnboarding,
   ratings: enRatings,
   lists: enLists,
+  search: enSearch,
 };
 
 const translations = { en };

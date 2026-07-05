@@ -15,8 +15,8 @@ export function useLibraryModals({ state, focusedTagName, setFocusedTagName, del
         ? (state.t('library.addPeople.adultModalTitle') || 'Add Adult People')
         : (state.t('library.addPeople.modalTitle') || 'Add People'),
       description: isAdult
-        ? (state.t('library.addPeople.adultModalDescription') || 'Activate or search for adult people to add to the library.')
-        : (state.t('library.addPeople.modalDescription') || 'Activate or search for people to add to the library.'),
+        ? (state.t('library.addPeople.adultModalDescription') || 'Track or search for adult people to add to the library.')
+        : (state.t('library.addPeople.modalDescription') || 'Track or search for people to add to the library.'),
       icon: Users,
       className: 'ui-modal--wide',
       content: (

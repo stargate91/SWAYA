@@ -324,7 +324,7 @@ export default function PerformerCustomValuesTab({ personId, person: initialPers
         actions={[
           {
             key: 'reset',
-            label: t('library.performerEdit.back') || 'Reset',
+            label: t('common.back') || 'Reset',
             onClick: handleReset,
             disabled: saveMutation.isPending,
           },

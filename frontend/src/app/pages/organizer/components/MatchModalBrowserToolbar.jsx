@@ -21,7 +21,7 @@ export default function MatchModalBrowserToolbar({
   return (
     <div className="organizer-match-modal__browser-toolbar">
       <NavButton onClick={onBack}>
-        {t('organizer.details.matchModal.back')}
+        {t('common.back')}
       </NavButton>
       <div className="organizer-match-modal__browser-copy">
         <strong className="organizer-match-modal__browser-title">{browserTitle}</strong>

@@ -292,7 +292,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
             {t('library.performerEdit.backToSources') || 'Back to Sources'}
           </NavButton>
           <span className="performer-linker__title">
-            {t('library.performerEdit.search') || 'Search'} {SOURCE_BUCKETS.find((b) => b.key === activeSearchSource)?.label}
+            {t('common.search') || 'Search'} {SOURCE_BUCKETS.find((b) => b.key === activeSearchSource)?.label}
           </span>
         </div>
 
@@ -306,7 +306,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
               autoFocus
             />
           </div>
-          <Tooltip content={isSearching ? (t('library.performerEdit.searching') || 'Searching...') : (t('library.performerEdit.search') || 'Search')} side="top">
+          <Tooltip content={isSearching ? (t('library.performerEdit.searching') || 'Searching...') : (t('common.search') || 'Search')} side="top">
             <IconButton
               type="submit"
               variant="secondary"
@@ -455,7 +455,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
                             icon={Trash2}
                             className="performer-linker-card__action-btn"
                           >
-                            {t('library.performerEdit.remove') || 'Remove'}
+                            {t('common.remove') || 'Remove'}
                           </Button>
                         </Tooltip>
                       </div>
@@ -504,7 +504,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
               onClick={() => setShowDeleteConfirm(false)}
               disabled={deleteMutation.isPending}
             >
-              {t('library.performerEdit.cancel') || 'Cancel'}
+              {t('common.cancel') || 'Cancel'}
             </Button>
             <Button
               variant="danger"

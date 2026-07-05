@@ -34,5 +34,7 @@
   "peakAt": "Peak at",
   "playMoment": "Play Moment",
   "peaksEmptyTitle": "No marked peak moments",
-  "peaksEmptyDesc": "Moments you mark with the peak button during NSFW playback will be listed here."
+  "peaksEmptyDesc": "Moments you mark with the peak button during NSFW playback will be listed here.",
+  "succeededCount": "{{count}} succeeded",
+  "batchIdLabel": "ID: #{{id}}"
 }

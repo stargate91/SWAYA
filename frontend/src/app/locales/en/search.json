@@ -1,0 +1,26 @@
+{
+  "resultsFor": "Search Results for \"{{query}}\"",
+  "title": "Global Search",
+  "inputPlaceholder": "Type query and press Enter...",
+  "sourceLabel": "Source",
+  "typeLabel": "Type",
+  "empty": {
+    "title": "Start Searching",
+    "desc": "Search metadata from TMDb, StashDB, FansDB, or PornDB"
+  },
+  "noResults": {
+    "desc": "Try another query or change search settings."
+  },
+  "moreMatches": "More matches (+{{count}})",
+  "source": "Source",
+  "type": "Type",
+  "placeholderTmdb": "Search {{type}}...",
+  "placeholderPattern": "Search {{type}} on {{source}}...",
+  "types": {
+    "all": "All",
+    "movie": "Movies",
+    "tv": "TV Shows",
+    "person": "Artists",
+    "scene": "Scenes"
+  }
+}

@@ -195,7 +195,7 @@ export default function OrganizerMatchModalContent({
 
             {isBrowserLoading || isResolvingId || isSearching ? (
               <Spinner
-                label={isResolvingId ? t('organizer.details.matchModal.applying') : t('organizer.details.matchModal.loading')}
+                label={isResolvingId ? t('organizer.details.matchModal.applying') : t('common.loading')}
               />
             ) : null}
 

@@ -91,7 +91,7 @@ export default function TagFilterDropdown({
               <input
                 type="text"
                 className="ui-dropdown__search-input"
-                placeholder={t('dropdown.search') || 'Search...'}
+                placeholder={t('common.searchPlaceholder') || 'Search...'}
                 value={tagSearch}
                 onChange={(e) => setTagSearch(e.target.value)}
               />
@@ -137,7 +137,7 @@ export default function TagFilterDropdown({
                   );
                 })}
               {filterData.tags.filter(tag => String(tag.name || '').toLowerCase().includes(tagSearch.toLowerCase())).length === 0 && (
-                <div className="ui-dropdown__empty">{t('dropdown.noResults') || 'No results'}</div>
+                <div className="ui-dropdown__empty">{t('common.noResults') || 'No results'}</div>
               )}
             </div>
           </div>,

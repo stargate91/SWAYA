@@ -127,7 +127,7 @@ export default function OmdbStep({
                   variant="secondary-neutral"
                   onClick={() => (omdbGuideStep === 0 ? closeOmdbGuide() : goToOmdbGuideStep(omdbGuideStep - 1, 'backward'))}
                 >
-                  {omdbGuideStep === 0 ? t('onboarding.omdbGuide.closeGuide', { defaultValue: 'Close guide' }) : t('onboarding.omdbGuide.back', { defaultValue: 'Back' })}
+                  {omdbGuideStep === 0 ? t('onboarding.omdbGuide.closeGuide', { defaultValue: 'Close guide' }) : t('common.back', { defaultValue: 'Back' })}
                 </Button>
                 {activeOmdbGuideStep.actionHref ? (
                   <Button

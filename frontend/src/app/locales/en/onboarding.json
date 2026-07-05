@@ -101,29 +101,29 @@
     "validateBtn": "Validate Folders"
   },
   "tmdbGuide": {
+    "activateTmdb": "Unlock TMDb metadata to continue",
     "requiredOneTimeSetup": "Required one-time setup",
     "whyThisIsRequired": "Why this is required",
     "guidedModeActive": "Guided mode active",
     "scanningLimited": "Without TMDb, we can only read basic file info like size and format.",
+    "scanningLimitedDesc": "SWAYA needs TMDB before scanning can do real metadata matching, artwork lookups, and clean organization.",
     "closeGuide": "Close guide",
-    "back": "Back",
     "ready": "Ready",
     "backToForm": "Back to form"
   },
   "omdbGuide": {
-    "activateRatings": "Activate OMDb ratings to continue",
+    "activateRatings": "Unlock OMDb ratings to continue",
     "requiredOneTimeSetup": "Required one-time setup",
     "whyThisIsRequired": "Why this is required",
     "guidedModeActive": "Guided mode active",
+    "ratingsPurpose": "Activate OMDb ratings to continue",
     "ratingsPurposeDesc": "SWAYA uses OMDb to fetch IMDb, Metascore, and Rotten Tomatoes ratings when fetching details.",
     "ratingsMetricsDesc": "These ratings are what you see on the movie and show detail pages.",
     "closeGuide": "Close guide",
-    "back": "Back",
     "ready": "Ready",
     "backToForm": "Back to form"
   },
   "buttons": {
-    "back": "Back",
     "continue": "Continue",
     "saving": "Saving...",
     "finishSetup": "Finish Setup"
