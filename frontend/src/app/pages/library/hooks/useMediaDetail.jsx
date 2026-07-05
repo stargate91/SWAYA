@@ -71,7 +71,10 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
     }
     if (initialItem?.seasons) {
       return initialItem.seasons.some(season => 
-        (season.episodes || []).some(ep => Number(ep.id) === Number(id))
+        (season.episodes || []).some(ep => 
+          (ep.media_item_id != null && Number(ep.media_item_id) === Number(id)) || 
+          String(ep.id) === String(id)
+        )
       );
     }
     return false;

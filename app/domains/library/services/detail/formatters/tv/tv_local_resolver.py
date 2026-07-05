@@ -22,6 +22,15 @@ class TvLocalResolver:
             MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED])
         ).all()
 
+        # Deduplicate local_items by item.id
+        unique_items = []
+        seen_item_ids = set()
+        for item in local_items:
+            if item.id not in seen_item_ids:
+                seen_item_ids.add(item.id)
+                unique_items.append(item)
+        local_items = unique_items
+
         extras_list = []
         for item in local_items:
             if item.extras:
@@ -76,14 +85,21 @@ class TvLocalResolver:
         item_episodes_map = {}
         for item in local_items:
             eps = []
+            seen_eps = set()
             for match in item.matches:
                 if match.season_number is not None and match.episode_number is not None:
                     ep_num = match.episode_number
                     if isinstance(ep_num, list):
                         for num in ep_num:
-                            eps.append((match.season_number, num))
+                            pair = (match.season_number, num)
+                            if pair not in seen_eps:
+                                seen_eps.add(pair)
+                                eps.append(pair)
                     else:
-                        eps.append((match.season_number, int(ep_num)))
+                        pair = (match.season_number, int(ep_num))
+                        if pair not in seen_eps:
+                            seen_eps.add(pair)
+                            eps.append(pair)
             item_episodes_map[item.id] = eps
 
         watched_episodes_set = set()

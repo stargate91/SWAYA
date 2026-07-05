@@ -1,6 +1,7 @@
 /* eslint-disable react/forbid-dom-props, react/jsx-no-literals, i18next/no-literal-string */
 import { useState } from 'react';
 import { ChevronDown, ChevronRight } from '@/ui/icons';
+import { countEpisodesInNumber } from '@/pages/library/utils/detailUtils';
 
 export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) {
   const [isHistoryExpanded, setIsHistoryExpanded] = useState(false);
@@ -90,21 +91,21 @@ export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) 
     const allEpisodes = regularSeasons.flatMap(s => s.episodes || []);
     const watchStats = item.watch_stats;
 
-    const totalEpisodesCount = watchStats
-      ? watchStats.total_episodes_count
-      : allEpisodes.length;
+    const totalEpisodesCount = allEpisodes.length > 0
+      ? allEpisodes.reduce((sum, ep) => sum + countEpisodesInNumber(ep.episode_number), 0)
+      : (watchStats ? watchStats.total_episodes_count : 0);
 
-    const watchedEpisodesCount = watchStats
-      ? watchStats.watched_episodes_count
-      : allEpisodes.filter(ep => ep.is_watched).length;
+    const watchedEpisodesCount = allEpisodes.length > 0
+      ? allEpisodes.reduce((sum, ep) => sum + (ep.is_watched ? countEpisodesInNumber(ep.episode_number) : 0), 0)
+      : (watchStats ? watchStats.watched_episodes_count : 0);
 
     progressPercent = totalEpisodesCount > 0
       ? Math.round((watchedEpisodesCount / totalEpisodesCount) * 100)
       : 0;
 
-    const inProgressEpisodes = watchStats
-      ? watchStats.in_progress_episodes
-      : allEpisodes.filter(e => e.resume_position > 0);
+    const inProgressEpisodes = allEpisodes.length > 0
+      ? allEpisodes.filter(e => e.resume_position > 0)
+      : (watchStats ? watchStats.in_progress_episodes || [] : []);
 
     const isInProgress = inProgressEpisodes.length > 0;
 

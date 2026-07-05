@@ -24,21 +24,21 @@ export default function TvWatchedStats() {
   const allEpisodes = regularSeasons.flatMap(s => s.episodes || []);
   const watchStats = item.watch_stats;
 
-  const totalEpisodesCount = watchStats
-    ? watchStats.total_episodes_count
-    : allEpisodes.reduce((sum, ep) => sum + countEpisodesInNumber(ep.episode_number), 0);
+  const totalEpisodesCount = allEpisodes.length > 0
+    ? allEpisodes.reduce((sum, ep) => sum + countEpisodesInNumber(ep.episode_number), 0)
+    : (watchStats ? watchStats.total_episodes_count : 0);
 
-  const watchedEpisodesCount = watchStats
-    ? watchStats.watched_episodes_count
-    : allEpisodes.reduce((sum, ep) => sum + (ep.is_watched ? countEpisodesInNumber(ep.episode_number) : 0), 0);
+  const watchedEpisodesCount = allEpisodes.length > 0
+    ? allEpisodes.reduce((sum, ep) => sum + (ep.is_watched ? countEpisodesInNumber(ep.episode_number) : 0), 0)
+    : (watchStats ? watchStats.watched_episodes_count : 0);
 
   const completionPercentage = totalEpisodesCount > 0
     ? Math.round((watchedEpisodesCount / totalEpisodesCount) * 100)
     : 0;
 
-  const inProgressEpisodes = watchStats
-    ? watchStats.in_progress_episodes
-    : allEpisodes.filter(e => e.resume_position > 0);
+  const inProgressEpisodes = allEpisodes.length > 0
+    ? allEpisodes.filter(e => e.resume_position > 0)
+    : (watchStats ? watchStats.in_progress_episodes || [] : []);
 
   const isInProgress = inProgressEpisodes.length > 0;
 

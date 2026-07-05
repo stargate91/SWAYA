@@ -105,6 +105,7 @@ class TvEpisodeFormatter:
                 "air_date": ep.get("air_date"),
                 "path": local_item.current_path if local_item else None,
                 "filename": local_item.filename if local_item else None,
+                "media_item_id": local_item.id if local_item else None,
                 "watch_count": watch_count,
                 "is_watched": is_watched,
                 "resume_position": resume_position,

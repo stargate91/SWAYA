@@ -25,6 +25,7 @@ class TvPlaybackResolver:
         loc_map = {l.match_id: l.title for l in localizations if l.title}
 
         playback_logs = []
+        seen_logs = set()
         for log in playback_logs_db:
             eps = item_episodes_map.get(log.media_item_id, [])
             for s_num, ep_num in eps:
@@ -32,9 +33,16 @@ class TvPlaybackResolver:
                 ep_title = loc_map.get(match.id) if match else None
                 if not ep_title:
                     ep_title = f"Episode {ep_num}"
+                
+                watched_at_str = log.watched_at.isoformat()
+                log_key = (s_num, ep_num, watched_at_str)
+                if log_key in seen_logs:
+                    continue
+                seen_logs.add(log_key)
+                
                 playback_logs.append({
                     "id": f"{log.id}_{s_num}_{ep_num}",
-                    "watched_at": log.watched_at.isoformat(),
+                    "watched_at": watched_at_str,
                     "seasonNumber": s_num,
                     "episodeNumber": ep_num,
                     "episodeTitle": ep_title,
