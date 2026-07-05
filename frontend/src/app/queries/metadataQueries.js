@@ -110,3 +110,10 @@ export const usePersonCreditBackdropsQuery = (personId, tmdbId, mediaType, optio
   queryFn: () => api.people.getCreditBackdrops(personId, tmdbId, mediaType),
   ...options,
 });
+
+export const useActiveSessionsQuery = (options = {}) => useQuery({
+  queryKey: ['active-playback-sessions'],
+  queryFn: () => api.media.activeSessions(),
+  ...options,
+});
+

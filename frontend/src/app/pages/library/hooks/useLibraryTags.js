@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useAllTagsQuery, useTagsQuery } from '@/queries/libraryQueries';
 import { getLibraryTagBucketKeys } from '@/lib/libraryTabs';
 import { getBackdropImagePath, getPosterImagePath } from '@/lib/imageUrls';
+import { isSceneMediaType } from '@/lib/mediaTypes';
 
 export function useLibraryTags({ activeSessionMode }) {
   const isNsfw = activeSessionMode === 'nsfw';
@@ -49,23 +50,54 @@ export function useLibraryTags({ activeSessionMode }) {
         const localPreviews = hasCustomImages
           ? tag.sample_previews
           : (() => {
-              const list = [];
-              const seenPosters = new Set();
+              const scenesList = [];
+              const postersList = [];
+              const seenPaths = new Set();
+
               for (const item of modeItems) {
+                const isScene = isSceneMediaType(item.type);
                 const poster = getPosterImagePath(item);
                 const backdrop = getBackdropImagePath(item);
-                if ((poster || backdrop || item.still_path) && !seenPosters.has(poster)) {
-                  list.push({
+                const path = poster || backdrop || item.still_path;
+
+                if (path && !seenPaths.has(path)) {
+                  seenPaths.add(path);
+                  const previewObj = {
                     poster,
                     backdrop,
                     still: item.still_path || backdrop || poster,
                     kind: item.type,
-                  });
-                  seenPosters.add(poster);
-                  if (list.length >= 3) break;
+                  };
+                  if (isScene) {
+                    scenesList.push(previewObj);
+                  } else {
+                    postersList.push(previewObj);
+                  }
                 }
               }
-              return list;
+
+              // Apply priority rules:
+              // 1. If we have 3 or more posters, they have priority (3 posters)
+              if (postersList.length >= 3) {
+                return postersList.slice(0, 3);
+              }
+
+              // 2. Only scenes (1 or more scenes -> show 1)
+              if (scenesList.length >= 1 && postersList.length === 0) {
+                return [scenesList[0]];
+              }
+
+              // 3. 1 scene + (1 or 2 posters) -> 1 scene + 1 poster (fills area evenly)
+              if (scenesList.length >= 1 && postersList.length >= 1) {
+                return [scenesList[0], postersList[0]];
+              }
+
+              // Fallback: If only posters (less than 3)
+              if (postersList.length > 0) {
+                return postersList.slice(0, 3);
+              }
+
+              return [];
             })();
 
         return {

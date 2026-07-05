@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from '@/providers/LanguageContext';
-import { useLibraryItemDetailQuery, useLibraryTvDetailQuery } from '@/queries/metadataQueries';
+import { useLibraryItemDetailQuery, useLibraryTvDetailQuery, useActiveSessionsQuery } from '@/queries/metadataQueries';
 import { useSettingsQuery } from '@/queries/settingsQueries';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import { API_BASE } from '@/lib/backend';
@@ -45,14 +45,60 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
     bulkUpdateWatchedMutation
   } = useMediaMutations();
 
-  const { data: movieDetail, isLoading: isMovieLoading } = useLibraryItemDetailQuery(cleanId, { enabled: isSingleItem, mediaType: type });
+  // Poll active sessions list every 5 seconds
+  const { data: activeSessions = [] } = useActiveSessionsQuery({
+    refetchInterval: 5000,
+  });
+
+  const { data: movieDetail, isLoading: isMovieLoading } = useLibraryItemDetailQuery(cleanId, {
+    enabled: isSingleItem,
+    mediaType: type,
+  });
   const { locale } = useTranslation();
   const metadataLanguage = locale === 'en' ? 'en-US' : locale;
-  const { data: tvDetail, isLoading: isTvLoading } = useLibraryTvDetailQuery(cleanId, { enabled: !isSingleItem, seasonsLimit: 999, initialEpisodesLimit: 999, language: metadataLanguage });
-  const item = isSingleItem ? movieDetail : tvDetail;
+  const { data: tvDetail, isLoading: isTvLoading } = useLibraryTvDetailQuery(cleanId, {
+    enabled: !isSingleItem,
+    seasonsLimit: 999,
+    initialEpisodesLimit: 999,
+    language: metadataLanguage,
+  });
+
+  const initialItem = isSingleItem ? movieDetail : tvDetail;
+
+  const isPlaying = activeSessions.some(id => {
+    if (isSingleItem) {
+      return Number(id) === Number(initialItem?.id) || Number(id) === Number(initialItem?.library_item_id) || String(id) === String(cleanId);
+    }
+    if (initialItem?.seasons) {
+      return initialItem.seasons.some(season => 
+        (season.episodes || []).some(ep => Number(ep.id) === Number(id))
+      );
+    }
+    return false;
+  });
+
+  // Re-run the details query with a refetchInterval if isPlaying is true
+  const { data: movieDetailLive } = useLibraryItemDetailQuery(cleanId, {
+    enabled: isSingleItem && isPlaying,
+    mediaType: type,
+    refetchInterval: 5000,
+  });
+  const { data: tvDetailLive } = useLibraryTvDetailQuery(cleanId, {
+    enabled: !isSingleItem && isPlaying,
+    seasonsLimit: 999,
+    initialEpisodesLimit: 999,
+    language: metadataLanguage,
+    refetchInterval: 5000,
+  });
+
+  const liveItem = isPlaying ? (isSingleItem ? movieDetailLive : tvDetailLive) : null;
+  const item = liveItem || initialItem;
+
   const isLoading = isSingleItem ? isMovieLoading : isTvLoading;
   const effectiveId = item?.id ?? cleanId;
   const { data: settings } = useSettingsQuery();
+
+
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -64,6 +110,16 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
       navigate('/dashboard', { replace: true });
     }
   }, [isLoading, item, sessionMode, navigate, allowAdult]);
+
+  const prevIsPlaying = useRef(isPlaying);
+  useEffect(() => {
+    if (prevIsPlaying.current !== isPlaying) {
+      queryClient.invalidateQueries({ queryKey: ['library-item-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['library-tv-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['watched-history'] });
+    }
+    prevIsPlaying.current = isPlaying;
+  }, [isPlaying, queryClient]);
 
   const isScene = isSceneMedia || item?.type === 'scene';
   const {
@@ -381,7 +437,20 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
   const isTracked = Boolean(item?.is_tracked);
   const trackedExternalId = !isOwned
     ? (isScene
-      ? (item?.external_ids?.stash_id || cleanId)
+      ? (() => {
+          if (item?.external_ids?.source && item?.external_ids?.stash_id) {
+            const src = String(item.external_ids.source).toLowerCase();
+            const prefix = (src === 'theporndb' || src === 'porndb')
+              ? 'porndb_'
+              : src === 'fansdb'
+                ? 'fansdb_'
+                : 'stash_';
+            return `${prefix}${item.external_ids.stash_id}`;
+          }
+          return cleanId.startsWith('porndb_') || cleanId.startsWith('fansdb_') || cleanId.startsWith('stash_')
+            ? cleanId
+            : `stash_${cleanId}`;
+        })()
       : (cleanId.startsWith('porndb_') || cleanId.startsWith('fansdb_') ? cleanId : Number(item?.tv_tmdb_id || item?.tmdb_id || cleanId || 0))
     )
     : 0;

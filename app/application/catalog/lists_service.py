@@ -233,6 +233,11 @@ class ListsService:
             posters = [self._serialize_item(item).poster_path for item in filtered_items[:4]]
             posters = [p for p in posters if p]
             
+            resolved_image = None
+            if l.custom_image_path:
+                from app.domains.media_assets.services.images import image_processing_service
+                resolved_image = image_processing_service.resolve_image_url(l.custom_image_path, "covers")
+
             result.append(CustomListResponse(
                 id=l.id,
                 name=l.name,
@@ -242,7 +247,8 @@ class ListsService:
                 list_type=l.list_type,
                 created_at=l.created_at.isoformat() if l.created_at else None,
                 item_count=item_count,
-                sample_posters=posters
+                sample_posters=posters,
+                custom_image_path=resolved_image
             ))
         return result
 
@@ -262,6 +268,11 @@ class ListsService:
                 continue
             serialized_items.append(self._serialize_item(item))
 
+        resolved_image = None
+        if l.custom_image_path:
+            from app.domains.media_assets.services.images import image_processing_service
+            resolved_image = image_processing_service.resolve_image_url(l.custom_image_path, "covers")
+
         return CustomListDetailResponse(
             id=l.id,
             name=l.name,
@@ -270,7 +281,8 @@ class ListsService:
             color=l.color,
             list_type=l.list_type,
             created_at=l.created_at.isoformat() if l.created_at else None,
-            items=serialized_items
+            items=serialized_items,
+            custom_image_path=resolved_image
         )
 
     def create_list(self, payload: Dict[str, Any]) -> CustomListResponse:
@@ -306,7 +318,8 @@ class ListsService:
             list_type=new_list.list_type,
             created_at=new_list.created_at.isoformat() if new_list.created_at else None,
             item_count=0,
-            sample_posters=[]
+            sample_posters=[],
+            custom_image_path=None
         )
 
     def update_list(self, list_id: int, payload: Dict[str, Any]) -> CustomListDetailResponse:
@@ -733,3 +746,44 @@ class ListsService:
 
         self.db.commit()
         return BulkUpdateResponse(status="success", tab=tab, updated_ids=updated_ids)
+
+    def set_list_image(self, list_id: int, image_path: Optional[str]) -> CustomListDetailResponse:
+        l = self.db.query(CustomList).filter(CustomList.id == list_id).first()
+        if not l:
+            raise NotFoundException("List not found")
+
+        l.custom_image_path = image_path if image_path else None
+        self.db.commit()
+        return self.get_list_details(list_id)
+
+    def upload_list_image(self, list_id: int, filename: str, file_stream) -> CustomListDetailResponse:
+        l = self.db.query(CustomList).filter(CustomList.id == list_id).first()
+        if not l:
+            raise NotFoundException("List not found")
+
+        import uuid
+        import os
+        from app.domains.media_assets.services.images import image_processing_service
+        
+        img_service = image_processing_service
+        img_service.ensure_folders()
+
+        ext = os.path.splitext(filename)[1] or ".jpg"
+        new_filename = f"list_{list_id}_{uuid.uuid4().hex}{ext}"
+        original_path = img_service.get_original_path("covers", new_filename)
+        thumbnail_path = img_service.get_thumbnail_path("covers", new_filename)
+
+        os.makedirs(os.path.dirname(original_path), exist_ok=True)
+        os.makedirs(os.path.dirname(thumbnail_path), exist_ok=True)
+
+        saved_path = img_service.write_upload(original_path, file_stream)
+        if not saved_path:
+            raise BadRequestException("Failed to save uploaded image")
+
+        img_service.generate_thumbnail(original_path, thumbnail_path, "covers")
+
+        l.custom_image_path = new_filename
+        self.db.commit()
+
+        return self.get_list_details(list_id)
+

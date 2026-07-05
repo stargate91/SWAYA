@@ -32,9 +32,9 @@ export const useUpdateListMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ listId, payload }) => api.lists.updateList(listId, payload),
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: listsKeys.all });
-      queryClient.invalidateQueries({ queryKey: listsKeys.details(variables.listId) });
+      queryClient.invalidateQueries({ queryKey: ['lists', 'details'] });
     },
   });
 };
@@ -45,6 +45,7 @@ export const useDeleteListMutation = () => {
     mutationFn: (listId) => api.lists.deleteList(listId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: listsKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['lists', 'details'] });
     },
   });
 };
@@ -53,9 +54,9 @@ export const useAddListItemMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ listId, payload }) => api.lists.addToList(listId, payload),
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: listsKeys.all });
-      queryClient.invalidateQueries({ queryKey: listsKeys.details(variables.listId) });
+      queryClient.invalidateQueries({ queryKey: ['lists', 'details'] });
     },
   });
 };
@@ -64,9 +65,32 @@ export const useRemoveListItemMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ listId, itemId }) => api.lists.removeFromList(listId, itemId),
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: listsKeys.all });
-      queryClient.invalidateQueries({ queryKey: listsKeys.details(variables.listId) });
+      queryClient.invalidateQueries({ queryKey: ['lists', 'details'] });
     },
   });
 };
+
+export const useUploadListImageMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ listId, file }) => api.lists.uploadListImage(listId, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: listsKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['lists', 'details'] });
+    },
+  });
+};
+
+export const useOverrideListImageMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ listId, path }) => api.lists.overrideListImage(listId, path),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: listsKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['lists', 'details'] });
+    },
+  });
+};
+

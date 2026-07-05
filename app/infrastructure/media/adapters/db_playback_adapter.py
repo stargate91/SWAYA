@@ -28,7 +28,9 @@ class DbPlaybackAdapter(PlaybackPort):
                 log.position_seconds = current_time
                 
             if total_length > 0 and current_time / total_length > 0.90:
-                override.is_watched = True
+                if not override.is_watched:
+                    override.is_watched = True
+                    override.watch_count = (override.watch_count or 0) + 1
                 override.resume_position = 0
                 if log:
                     log.position_seconds = total_length

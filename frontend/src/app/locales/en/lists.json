@@ -18,6 +18,7 @@
   "no_list_selected_desc": "Select a list from the sidebar or create a new one.",
   "create_title": "Create Custom List",
   "edit_title": "Edit List Details",
+  "edit_image_title": "Choose List Image",
   "add_titles_title": "Add Titles to List",
   "add_people_title": "Add People to List",
   "item_added_success": "Item added successfully!",
@@ -64,6 +65,7 @@
   "remove_item_failed": "Failed to remove item",
   "no_search_results_title": "No Matches Found",
   "no_search_results_desc": "Try refining your search query.",
+  "reset_to_default_collage": "Reset to Default Collage",
   "roles": {
     "acting": "Actor",
     "directing": "Director",

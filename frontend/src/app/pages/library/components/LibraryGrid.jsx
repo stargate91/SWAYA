@@ -228,7 +228,13 @@ export default function LibraryGrid({
                             className="library-tag-card__preview-image"
                             /* eslint-disable-next-line react/forbid-dom-props */
                             style={{
-                              backgroundImage: `url(${previewCount === 1 ? singlePreviewImage : resolvePosterUrl(preview.poster)})`,
+                              backgroundImage: `url(${
+                                previewCount === 1
+                                  ? singlePreviewImage
+                                  : isSceneMediaType(preview.kind)
+                                    ? resolveMediaImageUrl(preview.still || preview.backdrop || preview.poster, 'backdrop')
+                                    : resolvePosterUrl(preview.poster)
+                              })`,
                               backgroundPositionX: preview.position_x != null ? `${preview.position_x}%` : 'center',
                               backgroundPositionY: preview.position_y != null ? `${preview.position_y}%` : 'center',
                             }}

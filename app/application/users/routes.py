@@ -139,6 +139,19 @@ def delete_list(list_id: int, db: Session = Depends(get_db)):
     return ListsService(db).delete_list(list_id)
 
 
+@catalog_router.post("/lists/{list_id}/image", response_model=CustomListDetailResponse)
+def set_list_image(list_id: int, payload: dict, db: Session = Depends(get_db)):
+    path = payload.get("path") or payload.get("url")
+    return ListsService(db).set_list_image(list_id, path)
+
+
+from fastapi import UploadFile, File
+@catalog_router.post("/lists/{list_id}/upload-image", response_model=CustomListDetailResponse)
+def upload_list_image(list_id: int, file: UploadFile = File(...), db: Session = Depends(get_db)):
+    return ListsService(db).upload_list_image(list_id, file.filename, file.file)
+
+
+
 @catalog_router.post("/lists/{list_id}/items", response_model=CustomListItemResponse)
 def add_item_to_list(list_id: int, payload: dict, db: Session = Depends(get_db)):
     return ListsService(db).add_item_to_list(list_id, payload)

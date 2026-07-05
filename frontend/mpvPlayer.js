@@ -241,6 +241,10 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
         '--sub-file-paths=sub;subs;subtitles;Extras;extras;srt',
         '--audio-file-auto=all',
         '--audio-file-paths=sub;subs;subtitles;Extras;extras;audio;audios',
+        '--cache=yes',
+        '--demuxer-max-bytes=500MiB',
+        '--demuxer-max-back-bytes=100MiB',
+        '--demuxer-readahead-secs=300',
       ];
 
       const startSec = start !== undefined ? start : (playbackInfo.start_seconds || 0);

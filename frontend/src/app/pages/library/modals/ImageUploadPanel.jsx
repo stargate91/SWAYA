@@ -1,4 +1,4 @@
-﻿import { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link2, Upload } from '@/ui/icons';
 import Input from '@/ui/Input';
 import './UniversalImagePickerModal.css';
@@ -91,7 +91,7 @@ export default function ImageUploadPanel({
       {hasUploadPreview || uploadFile || isPending ? (
         <div className="universal-image-picker__upload-status">
           {hasUploadPreview ? (
-            <div className={`universal-image-picker__preview${imageType === 'logo' ? ' is-logo' : ''}${imageType === 'backdrop' ? ' is-backdrop' : ''}`}>
+            <div className={`universal-image-picker__preview${imageType === 'logo' ? ' is-logo' : ''}${imageType === 'backdrop' ? ' is-backdrop' : ''}${imageType === 'square' ? ' is-square' : ''}`}>
               <img
                 src={uploadPreview}
                 alt="Upload preview"

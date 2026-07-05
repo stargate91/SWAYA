@@ -101,6 +101,29 @@ class OverridePersister:
                 m_override.watch_count = max(m_override.watch_count or 0, 1)
                 has_active_interaction = True
                 self._track_parent_tv_show_if_episode(db, str(item_id), media_item_id, metadata_match_id, track_item_fn)
+                if media_item_id:
+                    from app.domains.history.models import PlaybackLog
+                    from app.domains.library.models import MediaItem
+                    from datetime import datetime, timezone
+                    item = db.query(MediaItem).filter(MediaItem.id == media_item_id).first()
+                    duration = item.duration if (item and item.duration) else 0
+                    has_completed = False
+                    logs = db.query(PlaybackLog).filter(PlaybackLog.media_item_id == media_item_id).all()
+                    for log in logs:
+                        if duration > 0 and log.position_seconds / duration >= 0.90:
+                            has_completed = True
+                            break
+                        elif duration == 0 and log.position_seconds > 0:
+                            has_completed = True
+                            break
+                    if not has_completed:
+                        new_log = PlaybackLog(
+                            media_item_id=media_item_id,
+                            user_id=m_override.user_id,
+                            watched_at=datetime.now(timezone.utc),
+                            position_seconds=duration if duration > 0 else 1
+                        )
+                        db.add(new_log)
             else:
                 m_override.is_watched = False
                 m_override.watch_count = 0

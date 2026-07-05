@@ -1,37 +1,21 @@
-import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Minus } from '@/ui/icons';
-import { getProfileImagePath, getTvPosterImagePath, getPosterImagePath } from '@/lib/imageUrls';
-import { isTvLikeMediaType, isSceneMediaType, isPersonMediaType } from '@/lib/mediaTypes';
-import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
-import { useSettingsQuery } from '@/queries';
+import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { API_BASE } from '@/lib/backend';
+import { Check, Minus } from '@/ui/icons';
 
-export const TagPosterCard = memo(({
+export default function ListsCard({
   item,
+  sessionMode,
+  settings,
   t,
-  resolvePosterUrl,
-  emptyIcon: EmptyIcon,
-  onClick,
-  onRemove,
-}) => {
+  handleCardClick,
+  handleRemoveListItem,
+}) {
   const navigate = useNavigate();
-  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
-  const { data: settings } = useSettingsQuery();
-
-  const isScene = isSceneMediaType(item.type);
-  const isPerson = isPersonMediaType(item.type);
+  const isScene = item.media_type === 'scene';
   const isAdult = item.is_adult || isScene;
   const shouldBlur = isAdult && sessionMode !== 'nsfw';
-
-  const rawPosterUrl = isPerson
-    ? resolvePosterUrl(getProfileImagePath(item))
-    : resolvePosterUrl(
-        isScene
-          ? (item.backdrop_path || item.poster_path)
-          : (isTvLikeMediaType(item.type) ? getTvPosterImagePath(item) : getPosterImagePath(item))
-      );
-
+  const rawPosterUrl = item.poster_path ? resolveMediaImageUrl(item.poster_path, isScene ? 'backdrop' : 'poster') : null;
   const posterUrl = (shouldBlur && rawPosterUrl)
     ? `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(rawPosterUrl)}&blur=true`
     : rawPosterUrl;
@@ -41,53 +25,45 @@ export const TagPosterCard = memo(({
   const allPeople = item.people || [];
   const filteredPeople = genderPref && genderPref !== 'all'
     ? allPeople.filter(p => {
-        if (genderPref === 'female') return p.gender === 1;
-        if (genderPref === 'male') return p.gender === 2;
-        return true;
-      })
+      if (genderPref === 'female') return p.gender === 1;
+      if (genderPref === 'male') return p.gender === 2;
+      return true;
+    })
     : allPeople;
   const performers = filteredPeople.slice(0, 4);
-
-  const removeButton = onRemove ? (
-    <button
-      type="button"
-      className="ui-card-action-btn ui-card-action-btn--danger"
-      title={t('common.remove') || 'Remove'}
-      aria-label={t('common.remove') || 'Remove'}
-      onClick={(e) => {
-        e.stopPropagation();
-        onRemove(item);
-      }}
-    >
-      <Minus size={11} strokeWidth={3.5} /> {t('common.remove') || 'Remove'}
-    </button>
-  ) : null;
 
   return (
     <div
       className={`lists-card ${isScene ? 'lists-card--scene' : 'lists-card--poster'}`}
-      onClick={onClick}
+      onClick={() => handleCardClick(item)}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          onClick();
+          handleCardClick(item);
         }
       }}
     >
       <div className={`lists-card__media ${shouldBlur ? 'is-blurred' : ''}`}>
-        {removeButton}
+        <button
+          className="ui-card-action-btn ui-card-action-btn--danger"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleRemoveListItem(item.id);
+          }}
+          title={t('lists.remove_from_list') || 'Remove from list'}
+        >
+          <Minus size={11} strokeWidth={3.5} /> {t('common.remove') || 'Remove'}
+        </button>
         {posterUrl ? (
           <img
             src={posterUrl}
-            alt={item.title || item.name}
+            alt={item.title}
             className="lists-card__img"
           />
         ) : (
-          <div className="lists-card__placeholder">
-            {EmptyIcon && <EmptyIcon size={32} className="lists-card__placeholder-icon" />}
-          </div>
+          <div className="lists-card__placeholder" />
         )}
         {shouldBlur && (
           <div className="recommend-card-blur-overlay">
@@ -98,7 +74,7 @@ export const TagPosterCard = memo(({
         )}
       </div>
       <div className="lists-card__info">
-        <span className="lists-card__title">{item.title || item.name}</span>
+        <span className="lists-card__title">{item.title}</span>
         <span className="lists-card__subtitle">
           {isScene ? (
             <div className="library-scene-card__subtitle-inner">
@@ -128,7 +104,7 @@ export const TagPosterCard = memo(({
               </span>
               {displayDate && <span className="library-scene-card__date">{displayDate}</span>}
             </div>
-          ) : isPerson ? (
+          ) : item.media_type === 'person' ? (
             (() => {
               const dept = item.known_for_department || (item.is_adult ? 'performer' : 'artist');
               return t(`lists.roles.${dept.toLowerCase()}`) || dept;
@@ -138,6 +114,4 @@ export const TagPosterCard = memo(({
       </div>
     </div>
   );
-});
-
-TagPosterCard.displayName = 'TagPosterCard';
+}

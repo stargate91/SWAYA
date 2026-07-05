@@ -348,6 +348,7 @@ export const useUpdateMediaStatusMutation = () => {
       const payload = variables.payload || {};
       if ('user_rating' in payload || 'is_watched' in payload || 'user_comment' in payload) {
         queryClient.invalidateQueries({ queryKey: ['stats'] });
+        queryClient.invalidateQueries({ queryKey: ['watched-history'] });
       }
       if ('custom_tags' in payload || 'is_tracked' in payload) {
         queryClient.invalidateQueries({ queryKey: ['libraryTags'] });
@@ -482,6 +483,7 @@ export const useResetProgressMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['library-tv-detail', stringId] });
       queryClient.invalidateQueries({ queryKey: ['library-tv-detail', numberId] });
       queryClient.invalidateQueries({ queryKey: ['continue-watching'] });
+      queryClient.invalidateQueries({ queryKey: ['watched-history'] });
     },
   });
 };

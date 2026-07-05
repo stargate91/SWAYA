@@ -117,6 +117,13 @@ def init_databases():
     from sqlalchemy import text
     with Session(engine) as session:
         try:
+            # Auto-migration to add custom_image_path if it doesn't exist
+            try:
+                session.execute(text("ALTER TABLE custom_lists ADD COLUMN custom_image_path TEXT;"))
+                session.commit()
+            except Exception:
+                session.rollback()
+
             session.execute(text("DELETE FROM metadata_localizations WHERE match_id NOT IN (SELECT id FROM metadata_matches)"))
             session.execute(text("DELETE FROM media_person_links WHERE match_id NOT IN (SELECT id FROM metadata_matches)"))
             session.execute(text("DELETE FROM metadata_match_studios WHERE metadata_match_id NOT IN (SELECT id FROM metadata_matches)"))

@@ -163,6 +163,7 @@ class CustomList(Base):
     description: Mapped[Optional[str]] = mapped_column(String)
     list_type: Mapped[CustomListType] = mapped_column(SQLEnum(CustomListType), default=CustomListType.MEDIA, index=True)
     color: Mapped[Optional[str]] = mapped_column(String) # For UI customization
+    custom_image_path: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     
     user: Mapped["User"] = relationship("User", back_populates="custom_lists")

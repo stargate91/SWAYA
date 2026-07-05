@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Play, X, ChevronLeft, ChevronRight } from '@/ui/icons';
+import { Play, Minus, ChevronLeft, ChevronRight } from '@/ui/icons';
 import IconButton from '../../../ui/IconButton';
 import { useContinueWatchingQuery } from '../../../queries';
 import { usePlayMediaMutation, useResetProgressMutation, useSettingsQuery } from '../../../queries';
@@ -145,7 +145,7 @@ const ContinueWatchingWidget = ({ T }) => {
                 }}
                 title={T('dashboard.continue_watching.remove') || 'Remove progress'}
               >
-                <X size={14} color="var(--color-text-primary)" />
+                <Minus size={14} color="var(--color-text-primary)" />
               </button>
 
               {resolvedImageUrl ? (

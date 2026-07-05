@@ -1,0 +1,71 @@
+import { Loader2, Search, List as ListIcon } from '@/ui/icons';
+import EmptyState from '@/ui/EmptyState';
+import ListsCard from './ListsCard';
+
+export default function ListsGrid({
+  isDetailsLoading,
+  activeList,
+  activeListDetails,
+  filteredListItems,
+  sessionMode,
+  settings,
+  t,
+  handleCardClick,
+  handleRemoveListItem,
+}) {
+  if (isDetailsLoading) {
+    return (
+      <div className="lists-content__loading">
+        <Loader2 className="spinner" size={24} />
+      </div>
+    );
+  }
+
+  if (!activeListDetails || !activeListDetails.items || activeListDetails.items.length === 0) {
+    return (
+      <EmptyState
+        title={t('lists.empty_list_title') || 'List is Empty'}
+        description={t('lists.empty_list_desc') || 'This list has no items yet.'}
+        icon={ListIcon}
+        variant="page-filter"
+        style={activeList?.color ? {
+          '--ui-empty-page-filter-icon-color': activeList.color,
+          '--ui-empty-page-filter-icon-bg': `color-mix(in srgb, ${activeList.color} 14%, transparent)`,
+          '--ui-empty-page-filter-icon-border': `color-mix(in srgb, ${activeList.color} 20%, transparent)`,
+        } : null}
+      />
+    );
+  }
+
+  if (filteredListItems.length === 0) {
+    return (
+      <EmptyState
+        title={t('lists.no_search_results_title') || 'No Matches Found'}
+        description={t('lists.no_search_results_desc') || 'Try refining your search query.'}
+        icon={Search}
+        variant="page-filter"
+        style={activeList?.color ? {
+          '--ui-empty-page-filter-icon-color': activeList.color,
+          '--ui-empty-page-filter-icon-bg': `color-mix(in srgb, ${activeList.color} 14%, transparent)`,
+          '--ui-empty-page-filter-icon-border': `color-mix(in srgb, ${activeList.color} 20%, transparent)`,
+        } : null}
+      />
+    );
+  }
+
+  return (
+    <div className="lists-grid">
+      {filteredListItems.map((item) => (
+        <ListsCard
+          key={item.id}
+          item={item}
+          sessionMode={sessionMode}
+          settings={settings}
+          t={t}
+          handleCardClick={handleCardClick}
+          handleRemoveListItem={handleRemoveListItem}
+        />
+      ))}
+    </div>
+  );
+}

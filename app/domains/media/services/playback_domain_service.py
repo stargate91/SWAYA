@@ -21,8 +21,24 @@ class PlaybackDomainService:
             reverse=True,
         )
             
-        override.watch_count = len(logs)
+        def is_log_completed(l):
+            duration = l.media_item.duration if (l.media_item and l.media_item.duration) else 0
+            if duration > 0:
+                return (l.position_seconds or 0) / duration >= 0.90
+            return (l.position_seconds or 0) > 0
+
+        completed_count = sum(1 for l in logs if is_log_completed(l))
+        override.watch_count = completed_count
         override.last_watched_at = logs[0].watched_at if logs else None
-        override.is_watched = bool(logs)
+        
         if logs:
+            latest_log = logs[0]
+            is_latest_completed = is_log_completed(latest_log)
+            override.is_watched = is_latest_completed
+            if is_latest_completed:
+                override.resume_position = 0
+            else:
+                override.resume_position = latest_log.position_seconds or 0
+        else:
+            override.is_watched = False
             override.resume_position = 0

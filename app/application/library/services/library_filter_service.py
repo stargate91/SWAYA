@@ -414,6 +414,16 @@ class LibraryFilterService:
                             "stills"
                         )
 
+                        p_list = []
+                        if match.people_links:
+                            for pl in match.people_links:
+                                if pl.person:
+                                    p_list.append({
+                                        "id": pl.person.id,
+                                        "name": pl.person.name,
+                                        "gender": pl.person.gender
+                                    })
+
                         m_item = {
                             "id": item.id if item else f"stash_{match.external_id}" if match.media_type == MediaType.SCENE else f"tmdb_{match.external_id}",
                             "title": title,
@@ -422,8 +432,11 @@ class LibraryFilterService:
                             "still_path": resolved_still or resolved_backdrop,
                             "type": match.media_type.value,
                             "year": match.release_date.year if match.release_date else None,
+                            "release_date": match.release_date.isoformat() if match.release_date else None,
                             "is_favorite": o.is_favorite,
                             "user_rating": o.user_rating,
+                            "is_adult": bool(match.is_adult),
+                            "people": p_list,
                         }
 
                         if match.media_type == MediaType.MOVIE:

@@ -289,6 +289,7 @@ class CustomListResponse(BaseModel):
     created_at: Optional[str] = None
     item_count: int
     sample_posters: List[str]
+    custom_image_path: Optional[str] = None
 
 
 class CustomListDetailResponse(BaseModel):
@@ -300,6 +301,7 @@ class CustomListDetailResponse(BaseModel):
     list_type: CustomListType = CustomListType.MEDIA
     created_at: Optional[str] = None
     items: List[CustomListItemResponse]
+    custom_image_path: Optional[str] = None
 
 
 class ListMembershipResponse(BaseModel):

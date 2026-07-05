@@ -173,11 +173,18 @@ class DbMediaResolver(
                     elif media_type.lower() == 'tv':
                         resolved_media_type = MediaType.TV
 
-            match = self.db.query(MetadataMatch).filter(
-                MetadataMatch.provider == provider,
-                MetadataMatch.external_id == scene_id,
-                MetadataMatch.media_type == resolved_media_type
-            ).first()
+            if provider_prefix == "scene":
+                match = self.db.query(MetadataMatch).filter(
+                    MetadataMatch.external_id == scene_id,
+                    MetadataMatch.media_type == resolved_media_type
+                ).first()
+            else:
+                match = self.db.query(MetadataMatch).filter(
+                    MetadataMatch.provider == provider,
+                    MetadataMatch.external_id == scene_id,
+                    MetadataMatch.media_type == resolved_media_type
+                ).first()
+
             if not match:
                 match = MetadataMatch(
                     provider=provider, 

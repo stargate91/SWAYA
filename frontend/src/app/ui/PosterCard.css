@@ -212,52 +212,77 @@ div.ui-poster-card__image-wrapper:focus-visible {
   outline: none;
 }
 
-.ui-poster-card__remove-badge {
+/* Card Action Button (e.g. Added / Remove) */
+.ui-card-action-btn {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-full, 9999px);
-  border: 1px solid color-mix(in srgb, var(--color-state-danger) 40%, var(--button-secondary-border));
-  background-color: color-mix(in srgb, var(--color-state-danger) 10%, var(--app-shell-color-panel));
-  color: var(--color-state-danger);
-  box-shadow: 0 4px 10px color-mix(in srgb, black 22%, transparent);
-  backdrop-filter: blur(10px);
-  display: flex;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  z-index: 10;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;
+  gap: var(--space-xs);
+  min-height: 28px;
+  padding: 0 var(--space-lg);
+  border-radius: var(--radius-full, 9999px);
+  border: 1px solid color-mix(in srgb, var(--color-state-success) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
+  background-color: color-mix(in srgb, var(--app-shell-color-panel, black) 82%, transparent);
+  color: var(--color-state-success);
+  box-shadow: 0 4px 10px color-mix(in srgb, black 35%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   cursor: pointer;
   opacity: 0;
-  transform: translateY(-4px);
-  transition: opacity var(--motion-fast), transform var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast), background-color var(--motion-fast);
+  font-size: 11px;
+  font-weight: 600;
+  transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+  pointer-events: auto;
+  white-space: nowrap;
 }
 
-.ui-poster-card__media-shell:hover .ui-poster-card__remove-badge,
-.ui-poster-card__media-shell:focus-within .ui-poster-card__remove-badge {
+.ui-poster-card__media-shell:hover .ui-card-action-btn,
+.ui-poster-card__media-shell:focus-within .ui-card-action-btn,
+.lists-card:hover .ui-card-action-btn {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateX(-50%) translateY(0);
 }
 
-.ui-poster-card__remove-badge:hover,
-.ui-poster-card__remove-badge:focus-visible {
-  color: var(--color-text-primary);
-  border-color: color-mix(in srgb, var(--color-state-danger) 80%, var(--button-secondary-border));
-  background-color: color-mix(in srgb, var(--color-state-danger) 25%, var(--app-shell-color-panel));
-  outline: none;
+.ui-card-action-btn .action-btn-state-default {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
 }
 
-.ui-poster-card__remove-badge svg {
-  transition: var(--motion-spring);
+.ui-card-action-btn .action-btn-state-hover {
+  display: none !important;
 }
 
-.ui-poster-card__remove-badge:hover svg {
-  transform: rotate(90deg);
+.ui-card-action-btn:hover {
+  border-color: color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent))) !important;
+  color: var(--color-state-danger) !important;
 }
 
-.ui-poster-card__remove-badge:active {
-  transform: scale(0.92) translateY(0);
+.ui-card-action-btn:hover .action-btn-state-default {
+  display: none !important;
+}
+
+.ui-card-action-btn:hover .action-btn-state-hover {
+  display: inline-flex !important;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+/* Danger variant for direct remove actions (Lists, Tags) */
+.ui-card-action-btn--danger {
+  border-color: color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent))) !important;
+  color: var(--color-state-danger) !important;
+}
+
+.ui-card-action-btn--danger:hover {
+  border-color: color-mix(in srgb, var(--color-state-danger) 80%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent))) !important;
+  background-color: color-mix(in srgb, var(--color-state-danger) 15%, var(--app-shell-color-panel, black)) !important;
+  color: var(--color-state-danger) !important;
 }
 
 .ui-poster-card__favorite-badge svg {
@@ -278,12 +303,10 @@ div.ui-poster-card__image-wrapper:focus-visible {
   position: absolute;
   inset: auto 0 0 0;
   height: 42%;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    color-mix(in srgb, var(--color-surface-overlay) 72%, transparent) 38%,
-    color-mix(in srgb, var(--color-surface-overlay-heavy) 92%, transparent) 100%
-  );
+  background: linear-gradient(180deg,
+      transparent 0%,
+      color-mix(in srgb, var(--color-surface-overlay) 72%, transparent) 38%,
+      color-mix(in srgb, var(--color-surface-overlay-heavy) 92%, transparent) 100%);
 }
 
 .ui-poster-card__title-overlay-label {
@@ -363,4 +386,111 @@ button.ui-poster-card__image-wrapper:hover:not(:disabled) {
 
 .ui-poster-card__title-overlay-label {
   pointer-events: auto;
+}
+
+/* Reusable card component styles for custom lists and tags */
+.lists-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 0.5rem);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+  width: 100%;
+}
+
+.lists-card:hover {
+  transform: translateY(-4px) !important;
+}
+
+.lists-card img {
+  transition: transform 0.28s ease;
+}
+
+.lists-card:hover img {
+  transform: scale(1.02) !important;
+}
+
+.lists-card__media {
+  width: 100%;
+  position: relative;
+  background: rgba(255, 255, 255, 0.01);
+  border-radius: var(--radius-md, 12px);
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.05));
+  transition: border-color var(--motion-fast), box-shadow 0.3s ease;
+}
+
+.lists-card:hover .lists-card__media {
+  border-color: var(--color-border-default, rgba(255, 255, 255, 0.12));
+  box-shadow: 0 12px 24px var(--color-surface-overlay);
+}
+
+.lists-card__media.is-blurred {
+  border-color: transparent !important;
+  isolation: isolate;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  mask-image: -webkit-radial-gradient(white, black);
+}
+
+.lists-card__media.is-blurred img {
+  filter: blur(28px) saturate(110%);
+  transform: scale(1.08);
+  transition: filter var(--motion-duration-slow) var(--motion-ease-standard), transform var(--motion-duration-slow) var(--motion-ease-standard);
+}
+
+.lists-card:hover .lists-card__media.is-blurred img {
+  filter: blur(0px) saturate(100%);
+  transform: scale(1);
+}
+
+.lists-card--poster .lists-card__media {
+  aspect-ratio: 2 / 3;
+}
+
+.lists-card--scene {
+  grid-column: span 2;
+}
+
+.lists-card--scene .lists-card__media {
+  aspect-ratio: 1.38;
+}
+
+.lists-card__info {
+  padding: 0 var(--space-1, 0.25rem);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lists-card__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lists-card__subtitle {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  opacity: 0.6;
+}
+
+.lists-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-bottom: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.05));
+}
+
+.lists-card__placeholder {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.4));
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

@@ -67,17 +67,26 @@ class PlaybackService:
             raise NotFoundException(f"Media file not found at: {file_path}")
 
         override = self.overrides.get_or_create_media_item_override(item_id_int)
-        override.last_watched_at = datetime.now(timezone.utc)
-        
+        from datetime import timedelta
+        now_utc = datetime.now(timezone.utc)
+        override.last_watched_at = now_utc
+
         existing_log = None
         if not override.is_watched:
-            existing_log = self.playback_repo.get_latest_playback_log(item.id)
+            latest_log = self.playback_repo.get_latest_playback_log(item.id)
+            if latest_log:
+                watched_at_tz = latest_log.watched_at
+                if watched_at_tz.tzinfo is None:
+                    watched_at_tz = watched_at_tz.replace(tzinfo=timezone.utc)
+                if now_utc - watched_at_tz < timedelta(minutes=30):
+                    existing_log = latest_log
+
 
         if existing_log:
-            self.playback_repo.update_playback_log_watched_at(existing_log.id, datetime.now(timezone.utc))
+            self.playback_repo.update_playback_log_watched_at(existing_log.id, now_utc)
         else:
-            self.playback_repo.create_playback_log(item.id, datetime.now(timezone.utc))
-            override.watch_count = (override.watch_count or 0) + 1
+            self.playback_repo.create_playback_log(item.id, now_utc)
+
 
         override.is_watched = False
         self.db.commit()

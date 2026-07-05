@@ -203,6 +203,7 @@ class LibraryTabItem(BaseModel):
     library_count: Optional[int] = None
     people_role: Optional[str] = None
     is_adult_person: Optional[bool] = None
+    is_adult: Optional[bool] = None
     people: Optional[List[Dict[str, Any]]] = None
 
 

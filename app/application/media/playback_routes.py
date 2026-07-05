@@ -73,3 +73,10 @@ def delete_watch_history_entry(item_id: int, log_id: int, db: Session = Depends(
 @router.post("/library/item/{item_id}/reset-progress", response_model=PlaybackStatusResponse)
 def reset_item_progress(item_id: int, db: Session = Depends(get_db)):
     return PlaybackService(db).reset_item_progress(item_id)
+
+
+@router.get("/media/active-sessions", response_model=List[int])
+def get_active_sessions():
+    from app.infrastructure.playback.playback_monitor import active_sessions
+    return list(active_sessions)
+
