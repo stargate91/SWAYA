@@ -50,7 +50,7 @@ class BaseQueryBuilder:
             if params.filter_favorite == "favorite":
                 query = query.filter(UserOverride.is_favorite)
             else:
-                query = query.filter(or_(not UserOverride.is_favorite, UserOverride.is_favorite is None))
+                query = query.filter(or_(~UserOverride.is_favorite, UserOverride.is_favorite.is_(None)))
 
         # Watched filter
         if params.filter_watched in ("watched", "unwatched"):
@@ -60,7 +60,7 @@ class BaseQueryBuilder:
             if params.filter_watched == "watched":
                 query = query.filter(UserOverride.is_watched)
             else:
-                query = query.filter(or_(not UserOverride.is_watched, UserOverride.is_watched is None))
+                query = query.filter(or_(~UserOverride.is_watched, UserOverride.is_watched.is_(None)))
 
         # Genre filter
         if params.selected_genre:
@@ -192,7 +192,7 @@ class BaseQueryBuilder:
                     or_(
                         UserOverride.metadata_match_id == MetadataMatch.id,
                         and_(
-                            UserOverride.metadata_match_id is None,
+                            UserOverride.metadata_match_id.is_(None),
                             UserOverride.media_item_id == MetadataMatch.media_item_id
                         )
                     ),
@@ -206,7 +206,7 @@ class BaseQueryBuilder:
                     or_(
                         UserOverride.metadata_match_id == MetadataMatch.id,
                         and_(
-                            UserOverride.metadata_match_id is None,
+                            UserOverride.metadata_match_id.is_(None),
                             UserOverride.media_item_id == MetadataMatch.media_item_id
                         )
                     ),

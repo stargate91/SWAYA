@@ -1,18 +1,23 @@
 import { useState, useRef } from 'react';
 import { useUpdatePersonStatusMutation, useAddPersonTmdbMutation } from '@/queries';
-import SegmentedControl from '@/ui/SegmentedControl';
+import SearchInputCombo from '@/ui/SearchInputCombo';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
+import api from '@/lib/api';
 import AddPeopleLocal from './AddPeopleLocal';
 import AddPeopleSearch from './AddPeopleSearch';
 
 export default function AddPeopleModalContent({ isAdult, t }) {
-  const [activeMode, setActiveMode] = useState('local'); // 'local', 'search'
+  const [selectedOption, setSelectedOption] = useState('local'); // 'local', 'tmdb', 'stashdb', ...
+  const [searchQuery, setSearchQuery] = useState('');
   const [optimisticStatus, setOptimisticStatus] = useState({});
   const [loadingIds, setLoadingIds] = useState(new Set());
   const [queuedIds, setQueuedIds] = useState(new Set());
 
-  // Search results state shared to allow activation queue access
+  // Search results and searching states
   const [tmdbResults, setTmdbResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchingError, setSearchingError] = useState('');
+  const [hasSearched, setHasSearched] = useState(false);
 
   const addPersonMutation = useAddPersonTmdbMutation();
   const updateStatusMutation = useUpdatePersonStatusMutation();
@@ -96,18 +101,75 @@ export default function AddPeopleModalContent({ isAdult, t }) {
     processQueuedActions();
   };
 
+  const handleSearchSubmit = async (e) => {
+    if (e) e.preventDefault();
+    if (!searchQuery.trim()) return;
+    setIsSearching(true);
+    setSearchingError('');
+    try {
+      const results = await api.people.searchTmdb(searchQuery.trim(), {
+        adultOnly: isAdult,
+        source: selectedOption
+      });
+      setTmdbResults(results);
+      setHasSearched(true);
+    } catch (err) {
+      setSearchingError(err.message || 'Failed to search');
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const options = [
+    { value: 'local', label: t('library.addPeople.modes.local') || 'Local Pack' },
+    { value: 'tmdb', label: 'TMDb' },
+    ...(isAdult ? [
+      { value: 'stashdb', label: 'StashDB' },
+      { value: 'fansdb', label: 'FansDB' },
+      { value: 'theporndb', label: 'THEPornDB' },
+    ] : []),
+  ];
+
+  const activeMode = selectedOption === 'local' ? 'local' : 'search';
+
+  const placeholderText = selectedOption === 'local'
+    ? t(textKey('library.addPeople.adultSearchPlaceholder', 'library.addPeople.searchPlaceholder'))
+    : t(textKey('library.addPeople.adultTmdbSearchPlaceholder', 'library.addPeople.tmdbSearchPlaceholder'));
+
   return (
     <div className="add-people-modal add-people-modal--people">
       <div className="add-people-modal__mode-selector">
-        <SegmentedControl
-          value={activeMode}
-          onChange={setActiveMode}
-          options={[
-            { value: 'local', label: t('library.addPeople.modes.local') || 'Local Pack' },
-            { value: 'search', label: t('common.search') || 'TMDB Search' },
-          ]}
-          className="add-people-modal__segmented-control"
-        />
+        {activeMode === 'search' ? (
+          <form onSubmit={handleSearchSubmit} className="add-people-modal__search-form-wrapper">
+            <SearchInputCombo
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={placeholderText}
+              selectedOption={selectedOption}
+              onOptionChange={(val) => {
+                setSelectedOption(val);
+                setSearchQuery('');
+                setHasSearched(false);
+                setTmdbResults([]);
+              }}
+              options={options}
+            />
+          </form>
+        ) : (
+          <SearchInputCombo
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={placeholderText}
+            selectedOption={selectedOption}
+            onOptionChange={(val) => {
+              setSelectedOption(val);
+              setSearchQuery('');
+              setHasSearched(false);
+              setTmdbResults([]);
+            }}
+            options={options}
+          />
+        )}
       </div>
 
       {activeMode === 'local' && (
@@ -120,6 +182,7 @@ export default function AddPeopleModalContent({ isAdult, t }) {
           loadingIds={loadingIds}
           queuedIds={queuedIds}
           enqueueToggleStatus={enqueueToggleStatus}
+          searchQuery={searchQuery}
         />
       )}
 
@@ -134,7 +197,9 @@ export default function AddPeopleModalContent({ isAdult, t }) {
           queuedIds={queuedIds}
           enqueueToggleStatus={enqueueToggleStatus}
           tmdbResults={tmdbResults}
-          setTmdbResults={setTmdbResults}
+          isSearching={isSearching}
+          searchingError={searchingError}
+          hasSearched={hasSearched}
         />
       )}
     </div>

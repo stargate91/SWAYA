@@ -1,9 +1,7 @@
 {
   "welcome": "Welcome back, {name}",
   "welcome_no_name": "Welcome back",
-  "user_fallback": "User",
   "subtitle": "Your library is ready whenever you are.",
-  "details": "Details",
   "stats": {
     "total_movies": "Total Movies",
     "movies_sub": "In Library",
@@ -13,7 +11,6 @@
     "episodes_sub": "Episodes",
     "storage_used": "Storage Used",
     "storage_sub": "across {count} drives",
-    "hydrating": "Downloading Actors",
     "unmatched": "Unmatched",
     "unmatched_sub": "Pending in Organizer",
     "library_dna": "Library DNA",
@@ -41,7 +38,10 @@
     "because_you_like": "Because you like {genre}...",
     "fallback_title": "Recommended for you",
     "recently_added": "Recently Added",
-    "recently_activated_people": "Recently Followed Artists"
+    "recently_activated_people": "Recently Followed Artists",
+    "recently_activated_people_adult": "Recently Followed Adult Stars",
+    "genres_all": "All Genres",
+    "years_all": "All Time"
   },
   "customize": "Customize Dashboard",
   "customize_desc": "Select which widgets you want to display on your dashboard.",
@@ -51,6 +51,7 @@
   "widget_spotlight": "Spotlight (Trending)",
   "widget_recently_added": "Recently Added",
   "widget_recently_activated_people": "Recently Followed Artists",
+  "widget_recently_activated_people_adult": "Recently Followed Adult Stars",
   "widget_movies_discovery": "Discover Movies",
   "widget_tv_discovery": "Discover TV Shows",
   "widget_top_20": "Top 20 Discoveries",

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import { GripVertical } from '@/ui/icons';
 import Switch from '@/ui/Switch';
+import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 
 export default function DashboardCustomizerDrawer({
   isOpen,
@@ -14,6 +15,8 @@ export default function DashboardCustomizerDrawer({
   showAdult,
   t,
 }) {
+  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
+  const isNsfw = showAdult && sessionMode === 'nsfw';
   const draggedItemRef = useRef(null);
   const drawerRef = useRef(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
@@ -143,7 +146,7 @@ export default function DashboardCustomizerDrawer({
                       checked={Boolean(visibleWidgets.recently_activated_people)}
                       onChange={() => toggleWidget('recently_activated_people')}
                     >
-                      {t('dashboard.widget_recently_activated_people') || 'Recently Tracked People'}
+                      {t(isNsfw ? 'dashboard.widget_recently_activated_people_adult' : 'dashboard.widget_recently_activated_people') || (isNsfw ? 'Recently Followed Adult Stars' : 'Recently Tracked People')}
                     </Switch>
 
                     <Switch

@@ -18,9 +18,9 @@ export default function AddPeopleLocal({
   loadingIds,
   queuedIds,
   enqueueToggleStatus,
+  searchQuery,
 }) {
   const { data: settings } = useSettingsQuery();
-  const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [genderFilter, setGenderFilter] = useState('all');
   const [sortBy, setSortBy] = useState('library_count');
@@ -65,15 +65,6 @@ export default function AddPeopleLocal({
 
   return (
     <div className="add-people-modal__local-panel">
-      <div className="add-people-modal__search-row">
-        <Input
-          type="text"
-          placeholder={t(textKey('library.addPeople.adultSearchPlaceholder', 'library.addPeople.searchPlaceholder'))}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          icon={Search}
-        />
-      </div>
 
       <div className="add-people-modal__filter-row">
         <div className="library-sorter-container">

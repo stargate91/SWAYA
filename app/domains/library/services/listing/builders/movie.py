@@ -26,7 +26,7 @@ class MovieQueryBuilder(BaseQueryBuilder):
             query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == self.current_user_id))
             joined_override = True
             query = query.filter(
-                MetadataMatch.media_item_id is None,
+                MetadataMatch.media_item_id.is_(None),
                 UserOverride.is_tracked,
                 MetadataMatch.media_type == MediaType.MOVIE
             )
@@ -36,7 +36,7 @@ class MovieQueryBuilder(BaseQueryBuilder):
             query = query.filter(
                 or_(
                     and_(MetadataMatch.media_item_id.isnot(None), MediaItem.status.in_(self.lib_statuses)),
-                    and_(MetadataMatch.media_item_id is None, UserOverride.is_tracked)
+                    and_(MetadataMatch.media_item_id.is_(None), UserOverride.is_tracked)
                 ),
                 MetadataMatch.is_active,
                 MetadataMatch.media_type == MediaType.MOVIE
@@ -75,7 +75,7 @@ class MovieQueryBuilder(BaseQueryBuilder):
             query = query.filter(
                 or_(
                     MetadataMatch.id.in_(select(canonical_match_ids)),
-                    and_(MetadataMatch.media_item_id is None, UserOverride.is_tracked)
+                    and_(MetadataMatch.media_item_id.is_(None), UserOverride.is_tracked)
                 )
             )
 

@@ -22,14 +22,11 @@ export default function AddPeopleSearch({
   queuedIds,
   enqueueToggleStatus,
   tmdbResults,
-  setTmdbResults,
+  isSearching,
+  searchingError,
+  hasSearched,
 }) {
   const { data: settings } = useSettingsQuery();
-  const [tmdbQuery, setTmdbQuery] = useState('');
-  const [searchSource, setSearchSource] = useState('tmdb');
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchingError, setSearchingError] = useState('');
-  const [hasSearched, setHasSearched] = useState(false);
 
   const filteredTmdbResults = useMemo(() => {
     if (!isAdult || !settings?.adult_gender_preference || settings.adult_gender_preference === 'all') {
@@ -46,65 +43,6 @@ export default function AddPeopleSearch({
 
   return (
     <div className="add-people-modal__tab-panel">
-      <form
-        onSubmit={async (e) => {
-          e.preventDefault();
-          if (!tmdbQuery.trim()) return;
-          setIsSearching(true);
-          setSearchingError('');
-          try {
-            const results = await api.people.searchTmdb(tmdbQuery.trim(), { adultOnly: isAdult, source: searchSource });
-            setTmdbResults(results);
-            setHasSearched(true);
-          } catch (err) {
-            setSearchingError(err.message || 'Failed to search');
-          } finally {
-            setIsSearching(false);
-          }
-        }}
-        className="add-people-modal__search-form"
-      >
-        <div className="add-people-modal__search-input-group">
-          {isAdult && (
-            <div className="add-people-modal__search-source">
-              <Dropdown
-                className="add-people-dropdown"
-                menuClassName="search-source-dropdown-menu"
-                value={searchSource}
-                onChange={(e) => setSearchSource(e.target.value)}
-                options={[
-                  { value: 'tmdb', label: 'TMDb' },
-                  { value: 'stashdb', label: 'StashDB' },
-                  { value: 'fansdb', label: 'FansDB' },
-                  { value: 'theporndb', label: 'THEPornDB' },
-                ]}
-              />
-            </div>
-          )}
-          <div className="add-people-modal__form-input-wrapper">
-            <Input
-              type="text"
-              placeholder={t(textKey('library.addPeople.adultTmdbSearchPlaceholder', 'library.addPeople.tmdbSearchPlaceholder'))}
-              value={tmdbQuery}
-              onChange={(e) => setTmdbQuery(e.target.value)}
-            />
-          </div>
-        </div>
-        <Tooltip
-          content={isSearching ? t('library.addPeople.searching') || 'Searching...' : t('common.search') || 'Search'}
-          side="top"
-        >
-          <IconButton
-            type="submit"
-            variant="secondary"
-            disabled={isSearching}
-            label={isSearching ? t('library.addPeople.searching') || 'Searching...' : t('common.search') || 'Search'}
-            title={null}
-          >
-            <Search size={15} />
-          </IconButton>
-        </Tooltip>
-      </form>
 
       {isSearching ? (
         <div className="add-people-modal__loading-wrapper">

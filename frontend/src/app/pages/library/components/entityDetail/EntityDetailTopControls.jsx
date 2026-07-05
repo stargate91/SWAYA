@@ -1,6 +1,7 @@
 import { Image as ImageIcon, Settings } from '@/ui/icons';
 import { useNavigate } from 'react-router-dom';
 import PeopleTagPopover from './PeopleTagPopover';
+import ListsPopover from '../detail/sections/ListsPopover';
 
 export default function EntityDetailTopControls({
   isPeople,
@@ -17,6 +18,11 @@ export default function EntityDetailTopControls({
   if (isPeople) {
     return (
       <div className="entity-detail-page__top-controls">
+        <ListsPopover
+          item={item}
+          type="person"
+          t={t}
+        />
         <PeopleTagPopover
           item={item}
           t={t}

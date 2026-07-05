@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { Check, Star, Plus, Minus, ChevronLeft, ChevronRight } from '@/ui/icons';
@@ -125,6 +125,20 @@ const TMDBDiscoveryWidget = ({ T }) => {
     element.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
   };
 
+  const translatedGenres = useMemo(() => {
+    return GENRES.map(g => ({
+      value: g.value,
+      label: g.value === '' ? (T('dashboard.recommendations.genres_all') || 'All Genres') : (T(`library.genres.${g.label}`, g.label) || g.label)
+    }));
+  }, [T]);
+
+  const translatedYears = useMemo(() => {
+    return YEARS.map(y => ({
+      value: y.value,
+      label: y.value === '' ? (T('dashboard.recommendations.years_all') || 'All Time') : y.label
+    }));
+  }, [T]);
+
   return (
     <div className="recommend-carousel">
       <div className="recommend-carousel-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', gap: '16px', flexWrap: 'wrap' }}>
@@ -134,14 +148,14 @@ const TMDBDiscoveryWidget = ({ T }) => {
         
         <div style={{ display: 'flex', gap: '12px' }}>
           <Dropdown
-            options={GENRES}
+            options={translatedGenres}
             value={genreId}
             onChange={(e) => setGenreId(e.target.value)}
             style={{ width: '160px' }}
           />
 
           <Dropdown
-            options={YEARS}
+            options={translatedYears}
             value={year}
             onChange={(e) => setYear(e.target.value)}
             style={{ width: '130px' }}
@@ -226,15 +240,15 @@ const TMDBDiscoveryWidget = ({ T }) => {
                           {isWatchlisted ? (
                             <>
                               <span className="watchlist-btn-state-default">
-                                <Check size={12} strokeWidth={3} /> Watchlisted
+                                <Check size={12} strokeWidth={3} /> {T('dashboard.watchlist.added') || 'Watchlisted'}
                               </span>
                               <span className="watchlist-btn-state-hover">
-                                <Minus size={12} strokeWidth={3} /> Remove
+                                <Minus size={12} strokeWidth={3} /> {T('common.remove') || 'Remove'}
                               </span>
                             </>
                           ) : (
                             <>
-                              <Plus size={12} strokeWidth={3} /> Watchlist
+                              <Plus size={12} strokeWidth={3} /> {T('dashboard.watchlist.add_short') || 'Watchlist'}
                             </>
                           )}
                         </Button>

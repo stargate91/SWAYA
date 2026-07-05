@@ -615,11 +615,21 @@ class ListsService:
     def get_item_membership(self, item_id: str) -> ListMembershipResponse:
         tmdb_id = None
         media_item_id = None
+        person_id = None
 
         if item_id.startswith("tmdb_"):
             tmdb_id = item_id.split("_")[1]
+        elif item_id.startswith("person_"):
+            p_val = item_id.split("_")[1]
+            if p_val.isdigit():
+                person_id = int(p_val)
+            else:
+                person_id = p_val
         else:
-            media_item_id = int(item_id)
+            try:
+                media_item_id = int(item_id)
+            except (ValueError, TypeError):
+                pass
 
         query = self.db.query(CustomListItem)
         if media_item_id:
@@ -630,6 +640,10 @@ class ListsService:
                 query = query.filter(CustomListItem.match_id == match.id)
             else:
                 return ListMembershipResponse(list_ids=[])
+        elif person_id:
+            query = query.filter(CustomListItem.person_id == person_id)
+        else:
+            return ListMembershipResponse(list_ids=[])
 
         items = query.all()
         list_ids = list(set(item.list_id for item in items))

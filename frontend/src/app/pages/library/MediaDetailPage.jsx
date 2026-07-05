@@ -28,6 +28,7 @@ import MediaActions from './components/detail/MediaActions';
 import DetailPageShell from './components/detail/DetailPageShell';
 import UtilityBarBottomPortal from '../../../components/UtilityBarBottomPortal';
 
+
 // Panels
 import BespokeSeasonsSection from './components/detail/sections/BespokeSeasonsSection';
 import TechnicalPanel from './components/detail/panels/TechnicalPanel';

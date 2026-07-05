@@ -26,7 +26,7 @@ class TvQueryBuilder(BaseQueryBuilder):
             query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == self.current_user_id))
             joined_override = True
             query = query.filter(
-                MetadataMatch.media_item_id is None,
+                MetadataMatch.media_item_id.is_(None),
                 UserOverride.is_tracked,
                 MetadataMatch.media_type == MediaType.TV
             )
@@ -51,7 +51,7 @@ class TvQueryBuilder(BaseQueryBuilder):
             query = query.filter(
                 or_(
                     MetadataMatch.id.in_(parent_ids),
-                    and_(MetadataMatch.media_item_id is None, UserOverride.is_tracked)
+                    and_(MetadataMatch.media_item_id.is_(None), UserOverride.is_tracked)
                 ),
                 MetadataMatch.media_type == MediaType.TV,
                 MetadataMatch.is_active,

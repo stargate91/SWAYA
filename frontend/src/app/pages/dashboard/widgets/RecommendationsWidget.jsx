@@ -516,7 +516,7 @@ const RecommendationsWidget = ({ language, T, visibleWidgets = {} }) => {
 
       {!isLoading && isWidgetVisible('recently_activated_people') && recentlyActivePeople?.length > 0 && (
         <RecommendationCarousel
-          title={T('dashboard.recommendations.recently_activated_people') || 'Recently Tracked People'}
+          title={T(includeAdult ? 'dashboard.recommendations.recently_activated_people_adult' : 'dashboard.recommendations.recently_activated_people') || (includeAdult ? 'Recently Followed Adult Stars' : 'Recently Tracked People')}
           items={recentlyActivePeople.map(p => ({
             ...p,
             media_type: 'person'
