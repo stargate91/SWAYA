@@ -3,7 +3,7 @@ import Button from '@/ui/Button';
 import Input from '@/ui/Input';
 import Dropdown from '@/ui/Dropdown';
 import Tooltip from '@/ui/Tooltip';
-import { Plus, Download, Search, List, PenLine, ENTITY_ICONS } from '@/ui/icons';
+import { Plus, Download, Search, List, PenLine, ENTITY_ICONS, Calendar } from '@/ui/icons';
 import ListCollageIcon from './ListCollageIcon';
 
 export default function ListsHeader({
@@ -83,7 +83,9 @@ export default function ListsHeader({
                 <p className="lists-header__description">{activeList.description}</p>
               )}
               {activeList.created_at && (
-                <span className="lists-header__date">{createdLabel}</span>
+                <div className="lists-header__meta-row">
+                  <span className="lists-header__date">{createdLabel}</span>
+                </div>
               )}
             </div>
           </div>
