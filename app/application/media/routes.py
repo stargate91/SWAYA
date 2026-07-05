@@ -153,7 +153,7 @@ def image_proxy(url: str = Query(..., description="The remote image URL to proxy
 
 
 @router.get("/media/{item_id}/preview")
-def get_media_preview(item_id: int, db: Session = Depends(get_db)):
+def get_media_preview(item_id: int, resolution: int = 720, db: Session = Depends(get_db)):
     import os
     from fastapi.responses import FileResponse
     from fastapi import HTTPException
@@ -175,7 +175,7 @@ def get_media_preview(item_id: int, db: Session = Depends(get_db)):
         duration = settings_adapter.get_setting("hover_previews_duration") or 16
 
         preview_service = PreviewService()
-        preview_path = preview_service.generate_preview(filepath, str(item_id), preview_duration=int(duration))
+        preview_path = preview_service.generate_preview(filepath, str(item_id), preview_duration=int(duration), resolution=resolution)
         return FileResponse(preview_path, media_type="video/mp4")
     except FileNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))

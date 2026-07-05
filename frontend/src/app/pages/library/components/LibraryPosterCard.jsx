@@ -54,6 +54,7 @@ export const LibraryPosterCard = memo(({
   onPlayOverlayClick,
   onEditImageClick,
   settings,
+  sortKey,
 }) => {
   const navigate = useNavigate();
   const isPeople = isLibraryPeopleTab(resolvedTab);
@@ -118,7 +119,55 @@ export const LibraryPosterCard = memo(({
     topRightAction = editButton;
   } else if (isPeople) {
     title = item.name || item.title;
-    subtitle = item.people_role ? t(`library.people.roles.${item.people_role}`, { defaultValue: item.people_role }) : '';
+    const isPhysicalSort = ['height', 'weight', 'cup_size', 'waist', 'hip', 'hourglass_ratio', 'body_slender', 'body_curvy'].includes(sortKey);
+    const isMetadataSort = ['birthday', 'rating', 'library_count'].includes(sortKey);
+    if (isPhysicalSort || isMetadataSort) {
+      if (sortKey === 'height') {
+        subtitle = item.height ? `${item.height} cm` : '—';
+      } else if (sortKey === 'weight') {
+        subtitle = item.weight ? `${item.weight} kg` : '—';
+      } else if (sortKey === 'cup_size') {
+        const band = item.band_size || '';
+        const cup = item.cup_size || '';
+        subtitle = (band || cup) ? `${band}${cup}` : '—';
+      } else if (sortKey === 'waist') {
+        subtitle = item.waist ? `${t('library.performerEdit.waistInches') || 'Waist'}: ${item.waist}"` : '—';
+      } else if (sortKey === 'hip') {
+        subtitle = item.hip ? `${t('library.performerEdit.hipInches') || 'Hip'}: ${item.hip}"` : '—';
+      } else if (sortKey === 'hourglass_ratio') {
+        const w = parseFloat(item.waist) || 0;
+        const h = parseFloat(item.hip) || 0;
+        subtitle = w > 0 && h > 0 ? (w / h).toFixed(2) : '—';
+      } else if (['body_slender', 'body_curvy'].includes(sortKey)) {
+        const w = item.waist || '—';
+        const h = item.hip || '—';
+        subtitle = `${w}-${h}`;
+      } else if (sortKey === 'birthday') {
+        if (item.birthday) {
+          const birthDate = new Date(item.birthday);
+          if (!isNaN(birthDate.getTime())) {
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+              age--;
+            }
+            subtitle = `${item.birthday} (${age})`;
+          } else {
+            subtitle = item.birthday;
+          }
+        } else {
+          subtitle = '—';
+        }
+      } else if (sortKey === 'rating') {
+        subtitle = item.popularity ? `Popularity: ${Number(item.popularity).toFixed(1)}` : '—';
+      } else if (sortKey === 'library_count') {
+        const count = item.library_count || 0;
+        subtitle = t('library.sort.libraryCountValue', { count }) || `${count} items`;
+      }
+    } else {
+      subtitle = item.people_role ? t(`library.people.roles.${item.people_role}`, { defaultValue: item.people_role }) : '';
+    }
     imageUrl = resolvePosterUrl(getProfileImagePath(item));
     className = 'library-person-card';
     topRightBadge = renderFavoriteBadge(item, t);

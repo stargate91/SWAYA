@@ -93,6 +93,21 @@ class PersonSearchItem(BaseModel):
     user_comment: Optional[str] = None
     is_favorite: Optional[bool] = False
     external_ids: Optional[dict[str, Any]] = None
+    birthday: Optional[str] = None
+    cup_size: Optional[str] = None
+    band_size: Optional[int] = None
+    waist: Optional[int] = None
+    hip: Optional[int] = None
+    height: Optional[int] = None
+    weight: Optional[int] = None
+    hair_color: Optional[str] = None
+    ethnicity: Optional[str] = None
+    eye_color: Optional[str] = None
+    tattoos: Optional[str] = None
+    piercings: Optional[str] = None
+    breast_type: Optional[str] = None
+    butt_shape: Optional[str] = None
+    butt_size: Optional[str] = None
 
 
 class PeopleSearchResponse(BaseModel):

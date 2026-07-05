@@ -83,6 +83,19 @@ class PeopleQueryBuilder:
         if not include_inactive:
             query = query.filter(Person.is_active)
 
+        if sort_by in ("height", "height_asc", "height_desc"):
+            query = query.filter(Person.height.isnot(None), Person.height > 0)
+        elif sort_by in ("weight", "weight_asc", "weight_desc"):
+            query = query.filter(Person.weight.isnot(None), Person.weight > 0)
+        elif sort_by in ("cup_size", "cup_size_asc", "cup_size_desc"):
+            query = query.filter(Person.cup_size.isnot(None), Person.cup_size != "")
+        elif sort_by in ("waist", "waist_asc", "waist_desc"):
+            query = query.filter(Person.waist.isnot(None), Person.waist > 0)
+        elif sort_by in ("hip", "hip_asc", "hip_desc"):
+            query = query.filter(Person.hip.isnot(None), Person.hip > 0)
+        elif sort_by in ("hourglass_ratio", "hourglass_ratio_asc", "hourglass_ratio_desc", "body_slender", "body_slender_asc", "body_slender_desc", "body_curvy", "body_curvy_asc", "body_curvy_desc"):
+            query = query.filter(Person.waist.isnot(None), Person.waist > 0, Person.hip.isnot(None), Person.hip > 0)
+
         query = query.group_by(Person.id)
 
         if include_inactive:
@@ -95,6 +108,27 @@ class PeopleQueryBuilder:
                 Person.rating_porndb
             ),
             else_=func.coalesce(Person.popularity, 0.0)
+        )
+
+        cup_order = case(
+            (Person.cup_size == 'A', 1),
+            (Person.cup_size == 'B', 2),
+            (Person.cup_size == 'C', 3),
+            (Person.cup_size == 'D', 4),
+            (Person.cup_size == 'DD', 5),
+            (Person.cup_size == 'DDD', 6),
+            (Person.cup_size == 'E', 7),
+            (Person.cup_size == 'EE', 8),
+            (Person.cup_size == 'F', 9),
+            (Person.cup_size == 'FF', 10),
+            (Person.cup_size == 'G', 11),
+            (Person.cup_size == 'GG', 12),
+            (Person.cup_size == 'H', 13),
+            (Person.cup_size == 'HH', 14),
+            (Person.cup_size == 'I', 15),
+            (Person.cup_size == 'J', 16),
+            (Person.cup_size == 'K', 17),
+            else_=0
         )
 
         # Apply ordering in SQL
@@ -110,6 +144,38 @@ class PeopleQueryBuilder:
             query = query.order_by(Person.name.asc())
         elif sort_by in ("name_desc", "title_desc"):
             query = query.order_by(Person.name.desc())
+        elif sort_by in ("height", "height_asc"):
+            query = query.order_by(Person.height.asc())
+        elif sort_by == "height_desc":
+            query = query.order_by(Person.height.desc())
+        elif sort_by in ("weight", "weight_asc"):
+            query = query.order_by(Person.weight.asc())
+        elif sort_by == "weight_desc":
+            query = query.order_by(Person.weight.desc())
+        elif sort_by in ("cup_size", "cup_size_asc"):
+            query = query.order_by(cup_order.asc())
+        elif sort_by == "cup_size_desc":
+            query = query.order_by(cup_order.desc())
+        elif sort_by in ("waist", "waist_asc"):
+            query = query.order_by(Person.waist.asc())
+        elif sort_by == "waist_desc":
+            query = query.order_by(Person.waist.desc())
+        elif sort_by in ("hip", "hip_asc"):
+            query = query.order_by(Person.hip.asc())
+        elif sort_by == "hip_desc":
+            query = query.order_by(Person.hip.desc())
+        elif sort_by in ("hourglass_ratio", "hourglass_ratio_asc"):
+            query = query.order_by((Person.waist * 1.0 / Person.hip).asc())
+        elif sort_by == "hourglass_ratio_desc":
+            query = query.order_by((Person.waist * 1.0 / Person.hip).desc())
+        elif sort_by in ("body_slender", "body_slender_asc"):
+            query = query.order_by((Person.waist + Person.hip).asc())
+        elif sort_by == "body_slender_desc":
+            query = query.order_by((Person.waist + Person.hip).desc())
+        elif sort_by in ("body_curvy", "body_curvy_asc"):
+            query = query.order_by((Person.waist + Person.hip).desc())
+        elif sort_by == "body_curvy_desc":
+            query = query.order_by((Person.waist + Person.hip).asc())
 
         # Get total count using subquery count in SQL
         total = db.query(func.count()).select_from(query.subquery()).scalar() or 0
@@ -162,12 +228,27 @@ class PeopleQueryBuilder:
                 "popularity": person.popularity or 0.0,
                 "is_adult": person.is_adult,
                 "is_active": person.is_active,
+                "birthday": person.birthday,
                 "library_count": library_count,
                 "known_for": person.known_for_department,
                 "external_ids": external_ids,
                 "user_rating": override.user_rating if override else None,
                 "user_comment": override.user_comment if override else None,
                 "is_favorite": override.is_favorite if override else False,
+                "cup_size": person.cup_size,
+                "band_size": person.band_size,
+                "waist": person.waist,
+                "hip": person.hip,
+                "height": person.height,
+                "weight": person.weight,
+                "hair_color": person.hair_color,
+                "ethnicity": person.ethnicity,
+                "eye_color": person.eye_color,
+                "tattoos": person.tattoos,
+                "piercings": person.piercings,
+                "breast_type": person.breast_type,
+                "butt_shape": person.butt_shape,
+                "butt_size": person.butt_size,
             })
 
         has_more = offset + len(people_list) < total

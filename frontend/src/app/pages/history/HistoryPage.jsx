@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import Page from '@/ui/Page';
 import EmptyState from '@/ui/EmptyState';
 import Button from '@/ui/Button';
@@ -41,7 +42,14 @@ export default function HistoryPage() {
   const { openModal, closeModal, toast } = useUi();
   const [activeTab, setActiveTab] = useState('rename');
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
+  const navigate = useNavigate();
   const utilityBarTarget = typeof document !== 'undefined' ? document.getElementById('shell-utility-bar-center') : null;
+
+  useEffect(() => {
+    if (sessionMode !== 'nsfw' && activeTab === 'peaks') {
+      navigate('/dashboard');
+    }
+  }, [sessionMode, activeTab, navigate]);
 
   // Rename History
   const {

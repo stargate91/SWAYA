@@ -122,6 +122,13 @@ export const people = {
     method: 'POST',
     body: JSON.stringify({ fields }),
   }),
+  scrapeHealthyCeleb: (personId, url) => {
+    const params = new URLSearchParams();
+    if (url) params.append('url', url);
+    return fetchJson(`/api/people/${personId}/scrape-healthyceleb?${params.toString()}`, {
+      method: 'POST',
+    });
+  },
   delete: (personId) => fetchJson(`/api/people/${personId}`, {
     method: 'DELETE',
   }),
@@ -133,7 +140,7 @@ export const people = {
     if (source) params.append('source', source);
     return fetchJson(`/api/people/search-tmdb?${params.toString()}`);
   },
-  addTmdb: (payload) => {
+  addFromTmdb: (payload) => {
     const body = typeof payload === 'object' ? payload : { tmdb_id: payload };
     return fetchJson('/api/people/add-tmdb', {
       method: 'POST',

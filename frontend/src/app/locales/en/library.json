@@ -639,7 +639,14 @@
     },
     "custom": {
       "values_saved": "Custom values saved successfully!",
-      "save_values_failed": "Failed to save custom values"
+      "save_values_failed": "Failed to save custom values",
+      "fetch_healthyceleb_success": "Successfully fetched statistics from HealthyCeleb!",
+      "fetch_healthyceleb_failed": "Failed to fetch statistics from HealthyCeleb",
+      "import_healthyceleb_title": "Import physical statistics from HealthyCeleb",
+      "import_healthyceleb_placeholder": "HealthyCeleb URL (optional, e.g. https://healthyceleb.com/james-cameron/)",
+      "import_healthyceleb_btn": "Import Data",
+      "import_healthyceleb_btn_fetching": "Fetching...",
+      "import_healthyceleb_desc": "This will fetch stats like height, weight, cup size, measurements, and eye/hair color, then populate the fields below. You can review them before saving."
     }
   }
 }

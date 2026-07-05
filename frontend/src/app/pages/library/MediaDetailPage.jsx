@@ -1,10 +1,11 @@
 /* eslint-disable react/forbid-dom-props */
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Image as ImageIcon,
   ChevronUp, ChevronDown,
-  Maximize2, PenLine
+  Maximize2, PenLine,
+  Play, Pause
 } from '@/ui/icons';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
@@ -86,11 +87,29 @@ export default function MediaDetailPage({ type = 'movie' }) {
   const [isBackdropDrawerOpen, setIsBackdropDrawerOpen] = useState(false);
   const [lightboxUrl, setLightboxUrl] = useState(null);
   const [activeSideTab, setActiveSideTab] = useState('activity');
+  const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
+  const [previewSrc, setPreviewSrc] = useState(null);
   const containerRef = useRef(null);
+
+  useEffect(() => {
+    setIsPreviewPlaying(false);
+    setPreviewSrc(null);
+  }, [id]);
+
+  const handleTogglePreview = () => {
+    if (isPreviewPlaying) {
+      setIsPreviewPlaying(false);
+    } else {
+      const url = `${API_BASE}/api/v1/media/${id}/preview?resolution=1080`;
+      setPreviewSrc(url);
+      setIsPreviewPlaying(true);
+    }
+  };
 
   const [isScrolled, handleScrollToggle] = useHeaderScrollTransition(
     id,
-    isLogoDrawerOpen || isPosterDrawerOpen || isBackdropDrawerOpen || isDrawerOpen
+    isLogoDrawerOpen || isPosterDrawerOpen || isBackdropDrawerOpen || isDrawerOpen,
+    isPreviewPlaying
   );
 
   const socialLinks = useMediaSocialLinks(item, t, normalizedType);
@@ -135,8 +154,10 @@ export default function MediaDetailPage({ type = 'movie' }) {
         backdropUrl={backdropUrl}
         fallbackUrl={posterUrl}
         isScene={item?.type === 'scene'}
+        isPreviewPlaying={isPreviewPlaying}
+        previewSrc={previewSrc}
         backLabel={t('common.back') || 'Back'}
-        pageClassName={`media-detail-page--scroll-transition ${isScrolled ? 'is-scrolled' : ''} ${isLogoDrawerOpen || isPosterDrawerOpen || isBackdropDrawerOpen || isDrawerOpen ? 'logo-drawer-open' : ''}`}
+        pageClassName={`media-detail-page--scroll-transition ${isScrolled ? 'is-scrolled' : ''} ${isPreviewPlaying ? 'is-preview-playing' : ''} ${isLogoDrawerOpen || isPosterDrawerOpen || isBackdropDrawerOpen || isDrawerOpen ? 'logo-drawer-open' : ''}`}
         containerRef={containerRef}
         topRightControls={(
           <>
@@ -153,6 +174,16 @@ export default function MediaDetailPage({ type = 'movie' }) {
       >
         <div className="media-detail-page__transition-wrapper">
           <div className="media-detail-page__hero-content-section">
+            {isScene && !isScrolled && (
+              <button
+                type="button"
+                className={`media-detail-page__center-play-btn ${isPreviewPlaying ? 'is-playing' : ''}`}
+                onClick={handleTogglePreview}
+                title={isPreviewPlaying ? 'Pause Preview' : 'Play Preview'}
+              >
+                {isPreviewPlaying ? <Pause size={32} /> : <Play size={32} className="play-icon-offset" />}
+              </button>
+            )}
             {(!state.logoUrl && state.posterUrl && !isScene) ? (
               <div className="media-detail-page__fallback-grid">
                 <div

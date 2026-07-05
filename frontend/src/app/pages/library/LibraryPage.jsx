@@ -200,6 +200,7 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
             onExitTagFocus={() => setFocusedTagName(null)}
             activeSessionMode={state.activeSessionMode}
             onEditImage={setImagePickerData}
+            sortKey={state.sortKey}
           />
 
           <LibraryPagination

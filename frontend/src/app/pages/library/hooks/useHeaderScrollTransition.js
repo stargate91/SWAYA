@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export default function useHeaderScrollTransition(id, isAnyDrawerOpen) {
+export default function useHeaderScrollTransition(id, isAnyDrawerOpen, isPreviewPlaying) {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export default function useHeaderScrollTransition(id, isAnyDrawerOpen) {
   }, [isAnyDrawerOpen]);
 
   useEffect(() => {
-    if (isAnyDrawerOpen) return;
+    if (isAnyDrawerOpen || isPreviewPlaying) return;
 
     const handleWheel = (e) => {
       if (e.target.closest('.global-search') || e.target.closest('.global-search__overlay')) {
@@ -46,7 +46,7 @@ export default function useHeaderScrollTransition(id, isAnyDrawerOpen) {
 
     window.addEventListener('wheel', handleWheel, { passive: true });
     return () => window.removeEventListener('wheel', handleWheel);
-  }, [isScrolled, isAnyDrawerOpen]);
+  }, [isScrolled, isAnyDrawerOpen, isPreviewPlaying]);
 
   const handleScrollToggle = () => {
     setIsScrolled((prev) => !prev);

@@ -49,6 +49,7 @@ export default function LibraryGrid({
   onExitTagFocus,
   activeSessionMode,
   onEditImage,
+  sortKey,
 }) {
   const navigate = useNavigate();
   const playMutation = usePlayMediaMutation();
@@ -295,6 +296,7 @@ export default function LibraryGrid({
                 onPlayOverlayClick={handlePlayOverlayClick}
                 onEditImageClick={openImagePicker}
                 settings={settings}
+                sortKey={sortKey}
               />
             ))}
           </PosterGrid>

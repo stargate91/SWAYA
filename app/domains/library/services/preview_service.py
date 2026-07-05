@@ -12,9 +12,11 @@ class PreviewService:
         self.previews_dir = os.path.abspath(os.path.join(os.path.dirname(SWAYA_DB_PATH), "previews"))
         os.makedirs(self.previews_dir, exist_ok=True)
 
-    def get_preview_path(self, item_id: str) -> str:
+    def get_preview_path(self, item_id: str, resolution: int = 720) -> str:
         """Returns the absolute file path for a cached preview."""
-        return os.path.join(self.previews_dir, f"{item_id}.mp4")
+        if resolution == 720:
+            return os.path.join(self.previews_dir, f"{item_id}.mp4")
+        return os.path.join(self.previews_dir, f"{item_id}_{resolution}.mp4")
 
     def get_video_duration(self, filepath: str) -> float:
         """Executes ffprobe to extract duration in seconds."""
@@ -33,13 +35,13 @@ class PreviewService:
             logger.error(f"Failed to get video duration via ffprobe for {filepath}: {e}")
             raise
 
-    def generate_preview(self, filepath: str, item_id: str, preview_duration: int = 16) -> str:
+    def generate_preview(self, filepath: str, item_id: str, preview_duration: int = 16, resolution: int = 720) -> str:
         """
         Generates a preview video from the original file.
         Slices 4 segments of (preview_duration / 4) seconds each (at 20%, 40%, 60%, 80% marks),
-        downscales to 720p, strips audio, and concats them.
+        downscales to the target resolution, strips audio, and concats them.
         """
-        output_path = self.get_preview_path(item_id)
+        output_path = self.get_preview_path(item_id, resolution)
         if os.path.exists(output_path):
             return output_path
 
@@ -62,7 +64,7 @@ class PreviewService:
                 'ffmpeg', '-y',
                 '-i', long_path,
                 '-t', f'{preview_duration:.3f}',
-                '-vf', 'scale=-2:720',
+                '-vf', f'scale=-2:min(ih\\,{resolution})',
                 '-c:v', 'libx264',
                 '-preset', 'superfast',
                 '-crf', '24',
@@ -74,14 +76,14 @@ class PreviewService:
             t2 = duration * 0.40
             t3 = duration * 0.60
             t4 = min(duration * 0.80, duration - (seg_duration + 0.5))  # Ensure we don't seek past end
-
+ 
             cmd = [
                 'ffmpeg', '-y',
                 '-ss', f'{t1:.3f}', '-t', f'{seg_duration:.3f}', '-i', long_path,
                 '-ss', f'{t2:.3f}', '-t', f'{seg_duration:.3f}', '-i', long_path,
                 '-ss', f'{t3:.3f}', '-t', f'{seg_duration:.3f}', '-i', long_path,
                 '-ss', f'{t4:.3f}', '-t', f'{seg_duration:.3f}', '-i', long_path,
-                '-filter_complex', '[0:v][1:v][2:v][3:v]concat=n=4:v=1:a=0[v];[v]scale=-2:720[outv]',
+                '-filter_complex', f'[0:v][1:v][2:v][3:v]concat=n=4:v=1:a=0[v];[v]scale=-2:min(ih\\,{resolution})[outv]',
                 '-map', '[outv]',
                 '-c:v', 'libx264',
                 '-preset', 'superfast',

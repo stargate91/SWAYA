@@ -4,6 +4,8 @@ import { usePersonDetailQuery } from '@/queries/metadataQueries';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
 import FloatingActionBar from '@/ui/FloatingActionBar';
+import Button from '@/ui/Button';
+import api from '@/lib/api';
 import { TARGET_LANGUAGE_OPTIONS } from '@/pages/settings/settingsLanguageOptions';
 import {
   getGenderOptions,
@@ -72,6 +74,42 @@ export default function PerformerCustomValuesTab({ personId, person: initialPers
     return initialized;
   });
   const [form, setForm] = useState(initialForm);
+
+  const [healthyCelebUrl, setHealthyCelebUrl] = useState('');
+  const [isFetchingHealthyCeleb, setIsFetchingHealthyCeleb] = useState(false);
+
+  const handleFetchHealthyCeleb = async () => {
+    setIsFetchingHealthyCeleb(true);
+    try {
+      const data = await api.people.scrapeHealthyCeleb(personId, healthyCelebUrl);
+      
+      setForm(prev => {
+        const next = { ...prev };
+        if (data.height) next.height = String(data.height);
+        if (data.weight) next.weight = String(data.weight);
+        if (data.measurements) next.measurements = data.measurements;
+        if (data.cup_size) next.cup_size = data.cup_size;
+        if (data.band_size) next.band_size = String(data.band_size);
+        if (data.waist) next.waist = String(data.waist);
+        if (data.hip) next.hip = String(data.hip);
+        if (data.hair_color) next.hair_color = data.hair_color;
+        if (data.eye_color) next.eye_color = data.eye_color;
+        if (data.ethnicity) next.ethnicity = data.ethnicity;
+        if (data.place_of_birth) next.place_of_birth = data.place_of_birth;
+        return next;
+      });
+      
+      if (data.source_url) {
+        setHealthyCelebUrl(data.source_url);
+      }
+      
+      toast(t('library.performerEdit.custom.fetch_healthyceleb_success') || 'Successfully fetched statistics from HealthyCeleb!', 'success');
+    } catch (err) {
+      toast(err.message || t('library.performerEdit.custom.fetch_healthyceleb_failed') || 'Failed to fetch statistics from HealthyCeleb', 'danger');
+    } finally {
+      setIsFetchingHealthyCeleb(false);
+    }
+  };
 
   const isMale = String(form.gender) === '2' || (form.gender === '' && String(person?.gender) === '2');
 
@@ -210,9 +248,9 @@ export default function PerformerCustomValuesTab({ personId, person: initialPers
         fields: payload,
       });
       setInitialForm(form);
-      toast(t('performer.custom.values_saved') || 'Custom values saved successfully!', 'success');
+      toast(t('library.performerEdit.custom.values_saved') || 'Custom values saved successfully!', 'success');
     } catch (err) {
-      toast(err.message || t('performer.custom.save_values_failed') || 'Failed to save custom values', 'danger');
+      toast(err.message || t('library.performerEdit.custom.save_values_failed') || 'Failed to save custom values', 'danger');
     }
   };
 
@@ -266,6 +304,48 @@ export default function PerformerCustomValuesTab({ personId, person: initialPers
       <div className="custom-values-header">
         <h3 className="settings-section-title">{t('library.performerEdit.manualOverrides') || 'Manual Overrides'}</h3>
         <p className="settings-section-subtitle">{t('library.performerEdit.manualOverridesSubtitle') || 'Set your own values for performer attributes. These take priority if manual routing is selected.'}</p>
+      </div>
+
+      <div className="healthyceleb-import-box" style={{
+        padding: '16px',
+        border: '1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.08))',
+        borderRadius: '8px',
+        background: 'rgba(255, 255, 255, 0.02)',
+        marginBottom: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px'
+      }}>
+        <h4 style={{ margin: 0, fontSize: '13px', fontWeight: 600 }}>{t('library.performerEdit.custom.import_healthyceleb_title') || 'Import physical statistics from HealthyCeleb'}</h4>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <input
+            type="text"
+            placeholder={t('library.performerEdit.custom.import_healthyceleb_placeholder') || 'HealthyCeleb URL (optional, e.g. https://healthyceleb.com/james-cameron/)'}
+            value={healthyCelebUrl}
+            onChange={(e) => setHealthyCelebUrl(e.target.value)}
+            style={{
+              flex: 1,
+              padding: '6px 12px',
+              borderRadius: '6px',
+              border: '1px solid var(--color-border-default, rgba(255, 255, 255, 0.15))',
+              background: 'var(--color-surface-card, rgba(0, 0, 0, 0.2))',
+              color: 'var(--color-text-primary, white)',
+              fontSize: '12px',
+              outline: 'none'
+            }}
+          />
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleFetchHealthyCeleb}
+            disabled={isFetchingHealthyCeleb}
+          >
+            {isFetchingHealthyCeleb ? (t('library.performerEdit.custom.import_healthyceleb_btn_fetching') || 'Fetching...') : (t('library.performerEdit.custom.import_healthyceleb_btn') || 'Import Data')}
+          </Button>
+        </div>
+        <p style={{ margin: 0, fontSize: '11px', color: 'var(--color-text-secondary, rgba(255, 255, 255, 0.6))' }}>
+          {t('library.performerEdit.custom.import_healthyceleb_desc') || 'This will fetch stats like height, weight, cup size, measurements, and eye/hair color, then populate the fields below. You can review them before saving.'}
+        </p>
       </div>
 
       <div className="custom-values-cards-grid">

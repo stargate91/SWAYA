@@ -79,6 +79,22 @@ class PeopleQueryBuilder:
             ]
             people_items = [item for item in people_items if item.id in matching_person_ids]
 
+        # Hide performers who do not have the active sorted attribute
+        if params.sort_by in ("height_desc", "height_asc"):
+            people_items = [item for item in people_items if item.height and item.height > 0]
+        elif params.sort_by in ("weight_desc", "weight_asc"):
+            people_items = [item for item in people_items if item.weight and item.weight > 0]
+        elif params.sort_by in ("cup_size_desc", "cup_size_asc"):
+            people_items = [item for item in people_items if item.cup_size]
+        elif params.sort_by in ("waist_desc", "waist_asc"):
+            people_items = [item for item in people_items if item.waist and item.waist > 0]
+        elif params.sort_by in ("hip_desc", "hip_asc"):
+            people_items = [item for item in people_items if item.hip and item.hip > 0]
+        elif params.sort_by in ("hourglass_ratio_desc", "hourglass_ratio_asc", "body_slender_desc", "body_slender_asc", "body_curvy_desc", "body_curvy_asc"):
+            people_items = [item for item in people_items if item.waist and item.waist > 0 and item.hip and item.hip > 0]
+        elif params.sort_by in ("birthday", "birthday_desc", "birthday_asc"):
+            people_items = [item for item in people_items if item.birthday]
+
         if params.sort_by in ("library_count", "library_count_desc"):
             people_items.sort(key=lambda item: (-(item.library_count or 0), -(item.rating or 0.0), (item.name or "").lower()))
         elif params.sort_by == "library_count_asc":
@@ -105,7 +121,7 @@ class PeopleQueryBuilder:
 
             if params.sort_by == "cup_size_desc":
                 people_items.sort(key=lambda item: (
-                    -get_volume_score(item) if get_volume_score(item) is not None else -999.0,
+                    -get_volume_score(item) if get_volume_score(item) is not None else 999.0,
                     (item.name or "").lower()
                 ))
             else:

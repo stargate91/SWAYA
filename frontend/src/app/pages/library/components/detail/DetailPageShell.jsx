@@ -20,6 +20,8 @@ export default function DetailPageShell({
   panelOpenClassName = 'media-detail-page__container--panel-open',
   isScene = false,
   containerRef,
+  isPreviewPlaying,
+  previewSrc,
 }) {
 
   useEffect(() => {
@@ -74,7 +76,12 @@ export default function DetailPageShell({
   return (
     <Page className={combinedClassName}>
 
-      <HeroSection backdropUrl={backdropUrl || fallbackUrl} isFallback={!backdropUrl && !isScene} />
+      <HeroSection
+        backdropUrl={backdropUrl || fallbackUrl}
+        isFallback={!backdropUrl && !isScene}
+        isPreviewPlaying={isPreviewPlaying}
+        previewSrc={previewSrc}
+      />
 
       <div className="media-detail-page__layout-wrapper">
         {(topRightControls || onToggleSideNav) ? (

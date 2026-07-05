@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
-from typing import Any
+from typing import Any, Optional
 
 from app.shared_kernel.database import get_db
 from app.infrastructure.scrapers.support.gateway import scraper_gateway
@@ -115,3 +115,11 @@ def get_person_credit_backdrops(
     return _people_detail_service(db).get_person_credit_backdrops(
         person_id, tmdb_id=tmdb_id, media_type=media_type
     )
+
+@router.post("/{person_id}/scrape-healthyceleb")
+def scrape_healthyceleb(
+    person_id: str,
+    url: str = Query(default=None),
+    db: Session = Depends(get_db)
+):
+    return _people_detail_service(db).scrape_healthyceleb(person_id, url)
