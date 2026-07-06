@@ -9,6 +9,7 @@ from app.domains.users.models import UserOverride, Tag, user_override_tags
 from app.domains.people.models import MediaPersonLink
 from app.shared_kernel.enums import ItemStatus, MediaType, Provider
 from app.shared_kernel.user_context import get_current_user_id
+from app.shared_kernel.language import LanguageService
 from app.domains.library.services.listing.filter_params import ListingFilterParams
 
 class BaseQueryBuilder:
@@ -16,6 +17,11 @@ class BaseQueryBuilder:
         self.db = db
         self.current_user_id = get_current_user_id()
         self.lib_statuses = [ItemStatus.RENAMED, ItemStatus.ORGANIZED]
+        
+        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+        settings_port = DbSettingsAdapter(self.db)
+        self.ui_lang = get_user_ui_language(settings_port)
 
     def _apply_common_filters(
         self,
@@ -30,7 +36,10 @@ class BaseQueryBuilder:
         # Search filter
         if params.search:
             if not joined_localization:
-                query = query.outerjoin(MetadataLocalization, MetadataLocalization.match_id == MetadataMatch.id)
+                query = query.outerjoin(MetadataLocalization, and_(
+                    MetadataLocalization.match_id == MetadataMatch.id,
+                    MetadataLocalization.locale == self.ui_lang
+                ))
                 joined_localization = True
             if params.filter_ownership == "tracked":
                 query = query.filter(MetadataLocalization.title.ilike(f"%{params.search}%"))
@@ -65,7 +74,10 @@ class BaseQueryBuilder:
         # Genre filter
         if params.selected_genre:
             if not joined_localization:
-                query = query.outerjoin(MetadataLocalization, MetadataLocalization.match_id == MetadataMatch.id)
+                query = query.outerjoin(MetadataLocalization, and_(
+                    MetadataLocalization.match_id == MetadataMatch.id,
+                    MetadataLocalization.locale == self.ui_lang
+                ))
                 joined_localization = True
             query = query.filter(MetadataLocalization.genres.like(f'%"{params.selected_genre}"%'))
 
@@ -114,7 +126,10 @@ class BaseQueryBuilder:
     ) -> Any:
         if params.sort_by in ("title_asc", "title_desc", "default"):
             if not joined_localization:
-                query = query.outerjoin(MetadataLocalization, MetadataLocalization.match_id == MetadataMatch.id)
+                query = query.outerjoin(MetadataLocalization, and_(
+                    MetadataLocalization.match_id == MetadataMatch.id,
+                    MetadataLocalization.locale == self.ui_lang
+                ))
                 joined_localization = True
             if not joined_override:
                 query = query.outerjoin(UserOverride, and_(
@@ -235,9 +250,14 @@ class BaseQueryBuilder:
             for link in links:
                 people_links_dict.setdefault(link.match_id, []).append(link)
 
+        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+        settings_port = DbSettingsAdapter(self.db)
+        ui_lang = get_user_ui_language(settings_port)
+
         formatted_items = []
         for match in items:
-            loc = match.localizations[0] if match.localizations else None
+            loc = LanguageService.get_best_localization(match.localizations, ui_lang) if match.localizations else None
             item = match.media_item
             
             in_library = item is not None

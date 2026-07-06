@@ -151,8 +151,12 @@ class MetadataResolver:
         item.status = ItemStatus.MATCHED
 
         # Enrich item metadata
+        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+        settings_port = DbSettingsAdapter(db)
+        ui_lang = get_user_ui_language(settings_port)
         try:
-            self.scrapers.enrich_mainstream(db, item, DEFAULT_FALLBACK_LANGUAGE, commit=True)
+            self.scrapers.enrich_mainstream(db, item, ui_lang, commit=True)
         except Exception as e:
             logger.error(f"Enrichment failed during manual resolve: {e}")
             db.rollback()

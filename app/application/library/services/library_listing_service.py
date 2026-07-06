@@ -52,13 +52,17 @@ class LibraryListingService:
 
         overrides = query.order_by(UserOverride.last_watched_at.desc()).limit(limit).all()
 
+        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.shared_kernel.language import LanguageService
+        ui_lang = get_user_ui_language(self.settings)
+
         results = []
         for o in overrides:
             item = o.media_item
             match = next((m for m in item.matches if m.is_active), None) if item else None
             if not match and item and item.matches:
                 match = item.matches[0]
-            loc = match.localizations[0] if match and match.localizations else None
+            loc = LanguageService.get_best_localization(match.localizations, ui_lang) if match and match.localizations else None
             
             title = o.custom_title if o.custom_title else (loc.title if loc else item.filename)
             tv_title = None
@@ -201,7 +205,7 @@ class LibraryListingService:
                 MediaItem.status.in_(lib_statuses),
                 MetadataMatch.media_type == MediaType.MOVIE,
                 MetadataMatch.is_active,
-                MetadataMatch.collection_id is not None,
+                MetadataMatch.collection_id.isnot(None),
                 MetadataMatch.is_adult == include_adult
             ).group_by(MetadataMatch.collection_id).having(func.count(MediaItem.id) >= min_count).count()
 

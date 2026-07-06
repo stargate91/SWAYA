@@ -32,7 +32,10 @@ class CollectionDetailService(DetailFormatter):
         except ValueError:
             return JSONResponse(status_code=400, content={"error": "Invalid collection TMDB ID"})
         
-        ui_lang = language or DEFAULT_FALLBACK_LANGUAGE
+        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+        settings_port = DbSettingsAdapter(db)
+        ui_lang = language or get_user_ui_language(settings_port)
         
         from app.domains.metadata.models import MediaCollection, MediaCollectionLocalization
         from app.shared_kernel.enums import Provider
@@ -51,14 +54,13 @@ class CollectionDetailService(DetailFormatter):
             ).first()
 
         tmdb_details = {}
-        if not collection or not collection_loc or not collection_loc.title:
-            try:
-                tmdb_details = self.tmdb_scraper.get_collection_details(
-                    collection_tmdb_id_int,
-                    language=ui_lang
-                ) or {}
-            except Exception:
-                tmdb_details = {}
+        try:
+            tmdb_details = self.tmdb_scraper.get_collection_details(
+                collection_tmdb_id_int,
+                language=ui_lang
+            ) or {}
+        except Exception:
+            tmdb_details = {}
 
         if tmdb_details:
             if not collection:

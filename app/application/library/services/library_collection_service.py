@@ -34,13 +34,8 @@ class LibraryCollectionService:
         Retrieves a paginated and filtered list of movie collections in the library.
         """
         # Get ui language
-        ui_lang = DEFAULT_FALLBACK_LANGUAGE
-        try:
-            val = self.settings.get_setting("ui_language")
-            if val:
-                ui_lang = LangHelper.clean_locale(val)
-        except Exception as e:
-            logger.debug(f"Swallowed exception in domains/library/services/library_collection_service.py:42: {e}", exc_info=True)
+        from app.shared_kernel.language_settings import get_user_ui_language
+        ui_lang = get_user_ui_language(self.settings)
 
         lib_statuses = [ItemStatus.RENAMED, ItemStatus.ORGANIZED]
         

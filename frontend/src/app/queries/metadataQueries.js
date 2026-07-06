@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useInfiniteQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 
 export const useSearchMetadataQuery = (query, itemType, year, season, episode, includeAdult, provider, options = {}) => useQuery({
@@ -42,9 +42,21 @@ export const useFullMetadataQuery = (itemId, mediaType, options = {}) => {
   });
 };
 
-export const useSyncLanguageMutation = () => useMutation({
-  mutationFn: () => api.metadata.syncLanguage(),
-});
+export const useSyncLanguageMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.metadata.syncLanguage(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['library-item-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['library-tv-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['library-collection-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['full-metadata'] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['person-credits'] });
+      queryClient.invalidateQueries({ queryKey: ['library'] });
+    },
+  });
+};
 
 export const useLibraryItemDetailQuery = (itemId, options = {}) => {
   const { mediaType, ...queryOptions } = options;

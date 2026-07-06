@@ -47,7 +47,10 @@ class LocalMovieFormatter(MovieDetailFormatter):
         if not active_match and item.matches:
             active_match = item.matches[0]
             
-        ui_lang = DEFAULT_FALLBACK_LANGUAGE
+        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+        settings_port = DbSettingsAdapter(db)
+        ui_lang = get_user_ui_language(settings_port)
         loc = LanguageService.get_best_localization(active_match.localizations, ui_lang) if active_match else None
         
         cast, directors, writers = self.credits_formatter.format_credits(

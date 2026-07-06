@@ -1,5 +1,5 @@
 /* eslint-disable react/forbid-dom-props */
-import { Play, Pause, Volume2, VolumeX, Languages, Captions, PictureInPicture2, Square, Rewind, FastForward, SkipBack, SkipForward, Flame, Minimize2 } from '@/ui/icons';
+import { Play, Pause, Volume2, VolumeX, Languages, Captions, PictureInPicture2, Square, Rewind, FastForward, SkipBack, SkipForward, Droplets, Minimize2 } from '@/ui/icons';
 import Badge from '../../../ui/Badge';
 
 export default function PlayerControlBar({
@@ -173,8 +173,9 @@ export default function PlayerControlBar({
             <button
               className={`player-page__btn ${justAddedPeak ? 'player-page__btn--peak-success' : 'player-page__btn--peak'}`}
               onClick={handleAddPeak}
+              title={t('library.addPeak') || 'Add Finish'}
             >
-              <Flame size={18} fill="currentColor" />
+              <Droplets size={18} fill="currentColor" />
             </button>
           )}
 

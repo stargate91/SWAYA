@@ -129,7 +129,10 @@ class RemoteCreditsFetcher:
                 MediaPersonLink.match_id.in_(active_match_ids)
             ).all()
             
-            ui_lang = DEFAULT_FALLBACK_LANGUAGE
+            from app.shared_kernel.language_settings import get_user_ui_language
+            from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+            settings_port = DbSettingsAdapter(db)
+            ui_lang = get_user_ui_language(settings_port)
             for link in links:
                 match = link.match
                 item = match.media_item

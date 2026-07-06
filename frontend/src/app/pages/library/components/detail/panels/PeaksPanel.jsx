@@ -1,4 +1,4 @@
-import { Trash2, Flame } from '@/ui/icons';
+import { Trash2, Droplets } from '@/ui/icons';
 import { formatTime } from '../../../utils/detailUtils';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import Pill from '@/ui/Pill';
@@ -54,7 +54,7 @@ export default function PeaksPanel() {
                   <div className="peaks-table__cell peaks-table__cell--position">
                     {log.video_position != null ? (
                       <Pill variant="neutral" className="peak-position-pill">
-                        <Flame size={12} className="peak-position-pill__icon" />
+                        <Droplets size={12} className="peak-position-pill__icon" />
                         {formatTime(log.video_position)}
                       </Pill>
                     ) : (

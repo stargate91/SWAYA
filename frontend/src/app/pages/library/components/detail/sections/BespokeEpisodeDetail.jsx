@@ -1,4 +1,4 @@
-import { ChevronRight, ChevronLeft, Check, Eye, Play, Clapperboard, Star, Flame, Trash2 } from '@/ui/icons';
+import { ChevronRight, ChevronLeft, Check, Eye, Play, Clapperboard, Star, Droplets, Trash2 } from '@/ui/icons';
 import IconButton from '@/ui/IconButton';
 import Pill from '@/ui/Pill';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
@@ -122,7 +122,7 @@ export default function BespokeEpisodeDetail({
                 className="bespoke-action-btn bespoke-action-btn--peak"
                 title={t('library.details.addPeak') || 'Add Peak'}
               >
-                <Flame size={15} />
+                <Droplets size={15} />
               </button>
             )}
 
@@ -197,7 +197,7 @@ export default function BespokeEpisodeDetail({
         {item.is_adult && activeEpisode.peaks_history && activeEpisode.peaks_history.length > 0 && (
           <div className="bespoke-episode-detail-card__peaks">
             <div className="bespoke-episode-detail-card__peaks-title">
-              <Flame size={12} fill="currentColor" />
+              <Droplets size={12} fill="currentColor" />
               <span>{t('library.details.peaksTitle') || 'Peak Moments'} {LPAR}{activeEpisode.peaks_history.length}{RPAR}</span>
             </div>
             <div className="bespoke-episode-detail-card__peaks-list">

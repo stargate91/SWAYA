@@ -1,4 +1,4 @@
-import { FolderOpen, Video, Check, Eye, Play, BellPlus, Flame, Info } from '@/ui/icons';
+import { FolderOpen, Video, Check, Eye, Play, BellPlus, Droplets, Info } from '@/ui/icons';
 import Button from '@/ui/Button';
 import { formatEpisodeNumber } from '../../utils/detailUtils';
 import { useMediaDetailContext } from './MediaDetailContext';
@@ -101,7 +101,7 @@ export default function MediaActions() {
               onClick={() => addPeakMutation.mutate({ itemId: effectiveId, tvId: cleanId })}
               disabled={addPeakMutation.isPending}
             >
-              <Flame size={16} />
+              <Droplets size={16} />
               {t('library.details.addPeak') || 'Add Peak'}
             </Button>
           )}

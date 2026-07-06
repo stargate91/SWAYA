@@ -22,7 +22,10 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             return JSONResponse(status_code=400, content={"error": "Invalid PornDB ID format"})
             
         print(f"[DEBUG] PornDbMovieFormatter.format called with item_id={item_id}, parsed porndb_id={porndb_id}")
-        ui_lang = DEFAULT_FALLBACK_LANGUAGE
+        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+        settings_port = DbSettingsAdapter(db)
+        ui_lang = get_user_ui_language(settings_port)
         
         from app.domains.metadata.models import MetadataMatch
         from app.shared_kernel.enums import Provider, MediaType

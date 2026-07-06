@@ -56,4 +56,4 @@ class MetadataService:
         return self.sync_service.get_sync_status()
 
     def trigger_sync(self, payload: Dict[str, Any] = None) -> Dict[str, Any]:
-        return self.sync_service.trigger_sync(payload)
+        return self.sync_service.trigger_sync(self.db, self.scrapers, payload)

@@ -1,4 +1,4 @@
-import { Flame, X } from '@/ui/icons';
+import { Droplets, X } from '@/ui/icons';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import { formatTime } from '../../../utils/detailUtils';
 import './BespokeScenePeaks.css';
@@ -33,7 +33,7 @@ export default function BespokeScenePeaks() {
     <div className="bespoke-scene-peaks-card">
       <div className="bespoke-scene-peaks-header">
         <div className="bespoke-scene-peaks-header-left">
-          <Flame size={12} className="bespoke-scene-peaks-title-icon" />
+          <Droplets size={12} className="bespoke-scene-peaks-title-icon" />
           <span className="bespoke-scene-peaks-title">
             {t('library.details.peaksTitle') || 'Peak Moments'} {LPAR}{peaks.length}{RPAR}
           </span>
@@ -60,7 +60,7 @@ export default function BespokeScenePeaks() {
                   title={hasPosition ? (t('library.details.playVideo') || PLAY_VIDEO_FALLBACK) : undefined}
                 >
                   <div className="bespoke-scene-peaks-item-left">
-                    <Flame size={11} className="bespoke-scene-peaks-item-icon" />
+                    <Droplets size={11} className="bespoke-scene-peaks-item-icon" />
                     <span className="bespoke-scene-peaks-item-time">
                       {hasPosition ? formatTime(log.video_position) : (t('library.details.playSession') || 'Play Session')}
                     </span>

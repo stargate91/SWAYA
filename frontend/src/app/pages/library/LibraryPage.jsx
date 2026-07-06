@@ -49,6 +49,16 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
       setFocusedTagName(null);
     }
   }, [state.isTags, focusedTagName]);
+  
+  // Smooth scroll to top after page change finishes loading new data
+  useEffect(() => {
+    if (!state.isDataLoading) {
+      const container = document.querySelector('.shell__content');
+      if (container) {
+        container.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  }, [state.currentPage, state.isDataLoading]);
 
 
 

@@ -10,7 +10,7 @@ import SegmentedControl from '@/ui/SegmentedControl';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
 import { useHistoryQuery, useUndoMutation, useScanStatusQuery, useWatchedHistoryQuery, usePlayMediaMutation, usePeaksQuery } from '@/queries';
-import { RotateCcw, AlertTriangle, Play, CheckCircle2, Clock, ENTITY_ICONS, Flame, Loader2 } from '@/ui/icons';
+import { RotateCcw, AlertTriangle, Play, CheckCircle2, Clock, ENTITY_ICONS, Droplets, Loader2 } from '@/ui/icons';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import HistoryCard from './components/HistoryCard';
@@ -396,9 +396,9 @@ export default function HistoryPage() {
       return (
         <div className="watched-history-page__empty-container">
           <EmptyState
-            title={t('historyPage.peaksEmptyTitle') || 'No marked peak moments'}
-            description={t('historyPage.peaksEmptyDesc') || 'Moments you mark with the peak button during NSFW playback will be listed here.'}
-            icon={Flame}
+            title={t('historyPage.peaksEmptyTitle') || 'No marked finishes'}
+            description={t('historyPage.peaksEmptyDesc') || 'Moments you mark with the finish button during NSFW playback will be listed here.'}
+            icon={Droplets}
           />
         </div>
       );
@@ -409,7 +409,7 @@ export default function HistoryPage() {
         {peaksData.map((log, index) => {
           const poster = log.poster_path || log.backdrop_path;
           const posterUrl = poster ? resolveMediaImageUrl(poster, 'backdrop') : '';
-          const peakText = t('historyPage.peakAt', { defaultValue: 'Peak at' }) + ' ' + formatTime(log.video_position);
+          const peakText = t('historyPage.peakAt', { defaultValue: 'Finish at' }) + ' ' + formatTime(log.video_position);
           
           return (
             <div
@@ -428,7 +428,7 @@ export default function HistoryPage() {
                   />
                 ) : (
                   <div className="watched-history-card__poster-placeholder">
-                    <Flame size={18} color="var(--color-state-danger)" />
+                    <Droplets size={18} color="var(--color-state-danger)" />
                   </div>
                 )}
               </div>
@@ -447,7 +447,7 @@ export default function HistoryPage() {
                   </div>
 
                   <div className="watched-history-card__status watched-history-card__status--peak">
-                    <Flame size={12} fill="currentColor" />
+                    <Droplets size={12} fill="currentColor" />
                     <span>{peakText}</span>
                   </div>
                 </div>
@@ -482,19 +482,19 @@ export default function HistoryPage() {
     { value: 'watched', label: t('historyPage.tabWatched') || 'Playback Logs' }
   ];
   if (sessionMode === 'nsfw') {
-    tabOptions.push({ value: 'peaks', label: 'Peak Logs' });
+    tabOptions.push({ value: 'peaks', label: 'Finish Logs' });
   }
 
   const getPageTitle = () => {
     if (activeTab === 'rename') return t('historyPage.pageTitle') || 'Rename history';
     if (activeTab === 'watched') return t('historyPage.watchedPageTitle') || 'Watched History';
-    return 'Peak Moments';
+    return 'Finishes';
   };
 
   const getPageDesc = () => {
     if (activeTab === 'rename') return t('historyPage.pageDesc') || 'Review and revert past physical organization and renaming actions.';
     if (activeTab === 'watched') return t('historyPage.watchedPageDesc') || 'See recently watched items and playback activity.';
-    return 'Moments you marked with the peak button during NSFW playback.';
+    return 'Moments you marked with the finish button during NSFW playback.';
   };
 
   const renderActiveContent = () => {

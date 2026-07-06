@@ -63,7 +63,7 @@ export default function usePeopleCollectionDetailController({
 
   const overviewTitle = isPeople
     ? (t('library.details.biographyTitle') || 'Biography')
-    : (t('library.details.collectionOverviewTitle') || 'Overview');
+    : '';
   const overviewText = item?.biography || item?.overview || '';
   const overviewEmptyText = t('library.details.noOverviewAvailable') || 'No overview available.';
   const externalLinks = useMemo(

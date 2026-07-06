@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { ChevronDown, ChevronRight, ChevronLeft, Check, Eye, Play, Clapperboard, Calendar, Tv, Star, Flame, Trash2 } from '@/ui/icons';
+import { ChevronDown, ChevronRight, ChevronLeft, Check, Eye, Play, Clapperboard, Calendar, Tv, Star, Droplets, Trash2 } from '@/ui/icons';
 import IconButton from '@/ui/IconButton';
 import Pill from '@/ui/Pill';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
@@ -415,7 +415,7 @@ export default function SeasonsPanel() {
                 {item.is_adult && episode.peaks_history && episode.peaks_history.length > 0 && isExpanded && (
                   <div className="episode-card__peaks-list" role="presentation" onClick={(e) => e.stopPropagation()}>
                     <div className="episode-card__peaks-title">
-                      <Flame size={12} fill="currentColor" />
+                      <Droplets size={12} fill="currentColor" />
                       <span>{t('library.details.peaksTitle') || 'Peak Moments'} {LPAR}{episode.peaks_history.length}{RPAR}</span>
                     </div>
                     <div className="episode-card__peaks-items">
@@ -465,7 +465,7 @@ export default function SeasonsPanel() {
                         className="episode-card__action-btn episode-card__action-btn--peak"
                         title={t('library.details.addPeak') || 'Add Peak'}
                       >
-                        <Flame size={16} />
+                        <Droplets size={16} />
                       </button>
                     )}
 

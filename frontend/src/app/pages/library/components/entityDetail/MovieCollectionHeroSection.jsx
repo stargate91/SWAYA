@@ -104,7 +104,7 @@ export default function MovieCollectionHeroSection({
           {overviewText && (
             <div className="entity-detail-page__summary-layout">
               <div className="entity-detail-page__summary-text">
-                <h3 className="entity-detail-page__summary-title">{overviewTitle}</h3>
+                {overviewTitle && <h3 className="entity-detail-page__summary-title">{overviewTitle}</h3>}
                 <div className="entity-detail-page__description">
                   {overviewText.split(/\n{2,}/).map((paragraph, index) => (
                     <p key={index} className="entity-detail-page__description-paragraph">{paragraph}</p>

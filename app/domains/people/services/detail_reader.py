@@ -86,7 +86,10 @@ class PerformerDetailReader:
     def get_person_credit_backdrops(self, person_id: Any, tmdb_id: int, media_type: str) -> Dict[str, Any]:
         self._resolve_person(person_id)
         normalized_type = "tv" if str(media_type or "").lower() in {"tv", "series"} else "movie"
-        ui_lang = DEFAULT_FALLBACK_LANGUAGE
+        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+        settings_port = DbSettingsAdapter(self.db)
+        ui_lang = get_user_ui_language(settings_port)
 
         raw_data = self.tmdb.get_details(tmdb_id, normalized_type, language=ui_lang, include_images=True, append_parts=["images"])
         backdrops = ((raw_data or {}).get("images") or {}).get("backdrops") or []

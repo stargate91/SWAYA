@@ -45,7 +45,10 @@ class TvShowFormatter(DetailFormatter):
         except (ValueError, IndexError):
             return JSONResponse(status_code=400, content={"error": "Invalid tv TMDB ID"})
         
-        ui_lang = language or DEFAULT_FALLBACK_LANGUAGE
+        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+        settings_port = DbSettingsAdapter(db)
+        ui_lang = language or get_user_ui_language(settings_port)
         
         from app.domains.metadata.models import MetadataMatch
         series_match = db.query(MetadataMatch).filter(

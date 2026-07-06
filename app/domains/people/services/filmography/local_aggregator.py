@@ -22,7 +22,10 @@ class LocalCreditsAggregator:
 
     def aggregate_credits(self, person_id: int) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]]]:
         db = self.db
-        ui_lang = DEFAULT_FALLBACK_LANGUAGE
+        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+        settings_port = DbSettingsAdapter(db)
+        ui_lang = get_user_ui_language(settings_port)
         
         # Load credits linked to this person
         active_match_ids = self.library_port.get_active_match_ids()

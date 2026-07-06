@@ -48,7 +48,10 @@ class PlaybackLoggingService:
             logs = logs[:limit]
 
         results = []
-        ui_lang = DEFAULT_FALLBACK_LANGUAGE
+        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+        settings_port = DbSettingsAdapter(db)
+        ui_lang = get_user_ui_language(settings_port)
         for log in logs:
             item = log.media_item
             if not item:
