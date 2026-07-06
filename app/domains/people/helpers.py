@@ -184,10 +184,7 @@ def resolve_person_known_for_backdrop(
     respect_credit_order: bool = False,
 ) -> tuple[Optional[str], Optional[int], Optional[str]]:
     """Resolves the best backdrop image for a person based on their credits."""
-    candidates: List[tuple[int, str, int, str]] = []
-    seen_media = set()
-    max_scan = 5 if adult_only else 3
-
+    first_fallback = None
     ranked_credits = list(credits or []) if respect_credit_order else sorted(
         credits or [],
         key=lambda credit: (
@@ -197,6 +194,8 @@ def resolve_person_known_for_backdrop(
         reverse=True,
     )
 
+    seen_media = set()
+    max_scan = 5 if adult_only else 3
     for credit in ranked_credits:
         media_type = credit.get("media_type")
         credit_id = credit.get("tmdb_id") or credit.get("id")
@@ -227,24 +226,17 @@ def resolve_person_known_for_backdrop(
 
         backdrop_path = image_processing_service.pick_backdrop_path(raw_data, preferred_language=preferred_languages[0]) if raw_data else None
         if backdrop_path:
-            candidates.append((
-                image_processing_service.backdrop_resolution_from_raw(raw_data, backdrop_path),
-                backdrop_path,
-                parsed_credit_id,
-                media_type
-            ))
-            continue
+            return backdrop_path, parsed_credit_id, media_type
 
-        fallback_backdrop = credit.get("backdrop_path")
-        if fallback_backdrop:
-            candidates.append((0, fallback_backdrop, parsed_credit_id, media_type))
+        if not first_fallback:
+            fallback_backdrop = credit.get("backdrop_path")
+            if fallback_backdrop:
+                first_fallback = (fallback_backdrop, parsed_credit_id, media_type)
 
-    if not candidates:
-        return None, None, None
+    if first_fallback:
+        return first_fallback[0], first_fallback[1], first_fallback[2]
 
-    candidates.sort(key=lambda item: item[0], reverse=True)
-    best = candidates[0]
-    return best[1], best[2], best[3]
+    return None, None, None
 
 
 def merge_images(existing: Optional[list[str]], new_images: list[str]) -> list[str]:

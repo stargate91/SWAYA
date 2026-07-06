@@ -81,6 +81,7 @@ class PersonDetailCollator:
                             new_imgs.insert(0, person.profile_path)
                         person.images = merge_images(person.images, new_imgs)
                         
+                        from app.domains.people.models import PersonLocalization
                         if tmdb_details.get("biography"):
                             if not loc:
                                 loc = PersonLocalization(person_id=person.id, locale=ui_lang, biography=tmdb_details["biography"])
@@ -158,6 +159,8 @@ class PersonDetailCollator:
                         loc = LanguageService.get_best_localization(person.localizations, ui_lang)
                 except Exception as e:
                     logger.error(f"Failed to dynamically enrich adult performer {person_id}: {e}", exc_info=True)
+
+
         
         movies, tv, scenes, known_for = self.filmography_service.get_combined_filmography(
             person_id,
@@ -211,7 +214,7 @@ class PersonDetailCollator:
                 try:
                     self.db.commit()
                     self.image_downloader.enqueue_download(url, "backdrops", filename)
-                    effective_backdrop = self._resolve_img(person.local_backdrop_path, "backdrops", size="original")
+                    effective_backdrop = url
                 except Exception as e:
                     logger.error(f"Failed to save and enqueue person backdrop: {e}")
 

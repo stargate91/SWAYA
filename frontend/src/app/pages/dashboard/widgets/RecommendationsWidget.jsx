@@ -553,7 +553,7 @@ const RecommendationsWidget = ({ language, T, visibleWidgets = {} }) => {
         />
       )}
 
-      {isWidgetVisible('top_20') && <TMDBDiscoveryWidget T={T} />}
+      {isWidgetVisible('top_20') && settings?.tmdb_api_key && <TMDBDiscoveryWidget T={T} />}
 
       {!isLoading && isWidgetVisible('adult') && settings?.include_adult && recommendations?.discover_adult?.length > 0 && (
         <RecommendationCarousel

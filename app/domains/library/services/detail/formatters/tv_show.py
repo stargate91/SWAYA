@@ -55,7 +55,23 @@ class TvShowFormatter(DetailFormatter):
         ).first()
 
         tmdb_data = None
-        if series_match:
+        try:
+            tmdb_data = tmdb_scraper.get_details(tv_tmdb_id_int, "tv", language=ui_lang)
+        except Exception:
+            tmdb_data = None
+
+        if tmdb_data and series_match:
+            from app.shared_kernel.language import LanguageService
+            loc_db = LanguageService.get_best_localization(series_match.localizations, ui_lang)
+            if loc_db:
+                if loc_db.local_poster_path:
+                    tmdb_data["poster_path"] = loc_db.local_poster_path
+                if loc_db.local_logo_path:
+                    tmdb_data["logo_path"] = loc_db.local_logo_path
+            if series_match.local_backdrop_path:
+                tmdb_data["backdrop_path"] = series_match.local_backdrop_path
+
+        if not tmdb_data and series_match:
             from app.shared_kernel.language import LanguageService
             loc_db = LanguageService.get_best_localization(series_match.localizations, ui_lang)
             if loc_db and loc_db.title:
@@ -66,29 +82,65 @@ class TvShowFormatter(DetailFormatter):
                 
                 seasons_meta = []
                 for s in local_seasons:
+                    s_loc = LanguageService.get_best_localization(s.localizations, ui_lang)
+                    poster = None
+                    if s_loc:
+                        poster = s_loc.local_poster_path or s_loc.poster_path
+                    if not poster:
+                        poster = s.backdrop_path or s.still_path
+                        
                     seasons_meta.append({
                         "season_number": s.season_number,
-                        "name": f"Season {s.season_number}",
+                        "name": (s_loc.title if s_loc else None) or f"Season {s.season_number}",
                         "episode_count": s.number_of_episodes or 0,
-                        "poster_path": s.backdrop_path or s.still_path
+                        "poster_path": poster
                     })
                 
+                cast_list = []
+                crew_list = []
+                created_by = []
+                for link in series_match.people_links:
+                    person_obj = link.person
+                    if not person_obj:
+                        continue
+                    role_str = link.role.value if hasattr(link.role, "value") else str(link.role)
+                    role_name = role_str
+                    credit_item = {
+                        "id": int(person_obj.external_ids.get("tmdb")) if (person_obj.external_ids and person_obj.external_ids.get("tmdb") and person_obj.external_ids.get("tmdb").isdigit()) else person_obj.id,
+                        "name": person_obj.name,
+                        "profile_path": person_obj.local_profile_path or person_obj.profile_path,
+                        "gender": person_obj.gender,
+                        "job": role_name,
+                        "character": link.character_name
+                    }
+                    if role_str == "actor":
+                        cast_list.append(credit_item)
+                    elif role_str == "creator":
+                        created_by.append(credit_item)
+                    else:
+                        crew_list.append(credit_item)
+
                 tmdb_data = {
                     "name": loc_db.title,
                     "overview": loc_db.overview or "",
-                    "poster_path": loc_db.poster_path,
-                    "backdrop_path": series_match.backdrop_path,
+                    "poster_path": loc_db.local_poster_path or loc_db.poster_path,
+                    "backdrop_path": series_match.local_backdrop_path or series_match.backdrop_path,
+                    "logo_path": loc_db.local_logo_path or loc_db.logo_path,
                     "tagline": loc_db.tagline,
                     "seasons": seasons_meta,
                     "vote_average": series_match.rating_tmdb or 0.0,
-                    "external_ids": {"imdb_id": series_match.imdb_id}
+                    "external_ids": {"imdb_id": series_match.imdb_id},
+                    "created_by": created_by,
+                    "credits": {
+                        "cast": cast_list,
+                        "crew": crew_list
+                    },
+                    "first_air_date": series_match.release_date.isoformat()[:10] if series_match.release_date else None,
+                    "last_air_date": series_match.last_air_date.isoformat()[:10] if series_match.last_air_date else None,
+                    "status": series_match.release_status,
+                    "keywords": {"results": [{"name": tag} for tag in (series_match.suggested_tags or [])]}
                 }
 
-        if not tmdb_data:
-            try:
-                tmdb_data = tmdb_scraper.get_details(tv_tmdb_id_int, "tv", language=ui_lang)
-            except Exception:
-                tmdb_data = None
                 
         if not tmdb_data:
             return JSONResponse(status_code=404, content={"error": "TV Show not found"})
@@ -154,7 +206,7 @@ class TvShowFormatter(DetailFormatter):
         if override and override.custom_logo:
             effective_logo = override.custom_logo
         else:
-            effective_logo = image_processing_service.pick_logo_path(tmdb_data, preferred_language=ui_lang)
+            effective_logo = tmdb_data.get("logo_path") or image_processing_service.pick_logo_path(tmdb_data, preferred_language=ui_lang)
 
         series_match, loc_db = self.metadata_resolver.sync_metadata_match_and_localization(
             db=db,

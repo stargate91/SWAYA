@@ -93,12 +93,18 @@ class TvEpisodeFormatter:
                     "audio_type": local_item.audio_type.value if hasattr(local_item.audio_type, "value") else str(local_item.audio_type),
                 }
              
+            still = None
+            if episode_match:
+                still = episode_match.local_still_path or episode_match.still_path
+            if not still:
+                still = ep.get("still_path")
+                
             episodes.append({
                 "id": f"tmdb_{tv_tmdb_id_int}_{season_number}_{ep_num}",
                 "episode_number": ep_num,
                 "title": ep.get("name") or f"Episode {ep_num}",
                 "overview": ep.get("overview"),
-                "still_path": resolve_img_fn(ep.get("still_path"), "stills"),
+                "still_path": resolve_img_fn(still, "stills"),
                 "runtime": ep.get("runtime"),
                 "rating_tmdb": ep.get("vote_average"),
                 "vote_count_tmdb": ep.get("vote_count"),

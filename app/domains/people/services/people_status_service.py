@@ -30,6 +30,7 @@ class PersonEnrichmentQueue:
         self.queue = queue.Queue()
         self.scrapers = None
         self.session_factory = None
+        self.enqueued_ids = set()
         self.worker_thread = threading.Thread(target=self._worker, daemon=True, name="PersonEnrichmentWorker")
         self.worker_thread.start()
 
@@ -39,7 +40,10 @@ class PersonEnrichmentQueue:
             self.session_factory = session_factory
 
     def enqueue(self, person_id: int):
-        self.queue.put(person_id)
+        with self._lock:
+            if person_id not in self.enqueued_ids:
+                self.enqueued_ids.add(person_id)
+                self.queue.put(person_id)
 
     def _worker(self):
         while True:
@@ -48,10 +52,13 @@ class PersonEnrichmentQueue:
                 if person_id is None:
                     break
                 self._enrich_person(person_id)
+                with self._lock:
+                    self.enqueued_ids.discard(person_id)
             except Exception as e:
                 logger.error(f"Error in PersonEnrichmentQueue worker: {e}", exc_info=True)
             finally:
                 self.queue.task_done()
+
 
     def _enrich_person(self, person_id: int):
         from app.domains.people.services.people_enricher import PeopleEnricher

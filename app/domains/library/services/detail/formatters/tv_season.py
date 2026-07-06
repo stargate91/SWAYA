@@ -61,14 +61,14 @@ class TvSeasonFormatter(DetailFormatter):
                         "overview": ep_loc.overview if ep_loc else "",
                         "air_date": ep.release_date.isoformat()[:10] if ep.release_date else None,
                         "vote_average": ep.rating_tmdb or 0.0,
-                        "still_path": ep.still_path
+                        "still_path": ep.local_still_path or ep.still_path
                     })
                 episodes_meta.sort(key=lambda x: x["episode_number"])
                 
                 season_detail = {
                     "name": loc_db.title,
                     "overview": loc_db.overview,
-                    "poster_path": loc_db.poster_path or season_match.backdrop_path,
+                    "poster_path": loc_db.local_poster_path or loc_db.poster_path or season_match.local_backdrop_path or season_match.backdrop_path,
                     "air_date": season_match.release_date.isoformat()[:10] if season_match.release_date else None,
                     "episodes": episodes_meta
                 }

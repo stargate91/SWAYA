@@ -78,12 +78,28 @@ class TvSeasonFormatter:
             watched_count = sum(1 for (s, e) in watched_episodes_set if s == season_number)
             episode_count = season_meta.get("episode_count") or len(all_episodes)
             is_season_watched = episode_count > 0 and watched_count >= episode_count
+            
+            poster = None
+            from app.domains.metadata.models import MetadataMatch
+            from app.shared_kernel.enums import Provider, MediaType
+            s_match = db.query(MetadataMatch).filter(
+                MetadataMatch.provider == Provider.TMDB,
+                MetadataMatch.external_id == f"{tv_tmdb_id_int}-s{season_number}",
+                MetadataMatch.media_type == MediaType.SEASON
+            ).first()
+            if s_match:
+                from app.shared_kernel.language import LanguageService
+                s_loc = LanguageService.get_best_localization(s_match.localizations, ui_lang)
+                if s_loc:
+                    poster = s_loc.local_poster_path or s_loc.poster_path
+            if not poster:
+                poster = season_meta.get("poster_path")
 
             seasons.append({
                 "season_number": season_number,
                 "title": season_meta.get("name") or f"Season {season_number}",
                 "overview": season_meta.get("overview"),
-                "poster_path": resolve_img_fn(season_meta.get("poster_path"), "posters"),
+                "poster_path": resolve_img_fn(poster, "posters"),
                 "air_date": season_meta.get("air_date"),
                 "episode_count": episode_count,
                 "local_episode_count": local_count,

@@ -34,7 +34,13 @@ class PornDbMovieFormatter(MovieDetailFormatter):
         ).first()
 
         movie_data = None
-        if match:
+        porndb_scraper = scrapers.adult(Provider.PORNDB, db)
+        try:
+            movie_data = porndb_scraper.fetch_movie(porndb_id)
+        except Exception:
+            movie_data = None
+
+        if not movie_data and match:
             from app.shared_kernel.language import LanguageService
             loc_db = LanguageService.get_best_localization(match.localizations, ui_lang)
             if loc_db and loc_db.title:
@@ -66,13 +72,6 @@ class PornDbMovieFormatter(MovieDetailFormatter):
                     "studio": studio_data
                 }
 
-        if not movie_data:
-            porndb_scraper = scrapers.adult(Provider.PORNDB, db)
-            try:
-                movie_data = porndb_scraper.fetch_movie(porndb_id)
-            except Exception:
-                movie_data = None
-                
         if not movie_data:
             return JSONResponse(status_code=404, content={"error": "Movie not found on PornDB"})
             
@@ -112,10 +111,10 @@ class PornDbMovieFormatter(MovieDetailFormatter):
                 ).first()
                 if link:
                     person_db = link.person
-
+ 
             if not person_db:
                 person_db = db.query(Person).filter(Person.name == perf_name).first()
-
+ 
             if person_db:
                 p_id = f"local:{person_db.id}"
                 # Check for UserOverride custom profile image
@@ -140,7 +139,14 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             })
             
         poster_url = movie_data.get("poster")
-        backdrop_url = None
+        backdrop_url = movie_data.get("backdrop")
+        if match:
+            from app.shared_kernel.language import LanguageService
+            loc_db = LanguageService.get_best_localization(match.localizations, ui_lang)
+            if loc_db and loc_db.local_poster_path:
+                poster_url = loc_db.local_poster_path
+            backdrop_url = match.local_backdrop_path or match.backdrop_path or backdrop_url
+
 
         match = db.query(MetadataMatch).filter(
             MetadataMatch.provider == Provider.PORNDB,

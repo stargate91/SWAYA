@@ -71,6 +71,8 @@ class TvShowMetadataResolver:
             
             loc_db = next((x for x in series_match.localizations if x.locale == ui_lang), None)
             genres_list = _split_genres([g["name"] for g in tmdb_data.get("genres", [])]) if tmdb_data.get("genres") else []
+            from app.domains.media_assets.services.images import image_processing_service
+            logo_path = tmdb_data.get("logo_path") or image_processing_service.pick_logo_path(tmdb_data, preferred_language=ui_lang)
             if not loc_db:
                 loc_db = MetadataLocalization(
                     match_id=series_match.id,
@@ -78,6 +80,7 @@ class TvShowMetadataResolver:
                     title=tmdb_data.get("name") or tmdb_data.get("original_name") or "Unknown TV Show",
                     overview=tmdb_data.get("overview"),
                     poster_path=tmdb_data.get("poster_path"),
+                    logo_path=logo_path,
                     tagline=tmdb_data.get("tagline"),
                     genres=genres_list
                 )
@@ -92,6 +95,9 @@ class TvShowMetadataResolver:
                     db_updated = True
                 if not loc_db.poster_path and tmdb_data.get("poster_path"):
                     loc_db.poster_path = tmdb_data.get("poster_path")
+                    db_updated = True
+                if not loc_db.logo_path and logo_path:
+                    loc_db.logo_path = logo_path
                     db_updated = True
                 if not loc_db.tagline and tmdb_data.get("tagline"):
                     loc_db.tagline = tmdb_data.get("tagline")

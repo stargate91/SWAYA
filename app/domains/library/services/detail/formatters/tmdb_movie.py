@@ -39,7 +39,13 @@ class TmdbMovieFormatter(MovieDetailFormatter):
         ).first()
 
         tmdb_data = None
-        if match:
+        tmdb_scraper = scrapers.tmdb(db)
+        try:
+            tmdb_data = tmdb_scraper.get_details(tmdb_id, "movie", language=ui_lang)
+        except Exception:
+            tmdb_data = None
+
+        if not tmdb_data and match:
             from app.shared_kernel.language import LanguageService
             loc_db = LanguageService.get_best_localization(match.localizations, ui_lang)
             if loc_db and loc_db.title:
@@ -75,8 +81,9 @@ class TmdbMovieFormatter(MovieDetailFormatter):
                     "vote_count": match.vote_count_tmdb or 0,
                     "budget": match.budget,
                     "revenue": match.revenue,
-                    "poster_path": loc_db.poster_path,
-                    "backdrop_path": match.backdrop_path,
+                    "poster_path": loc_db.local_poster_path or loc_db.poster_path,
+                    "backdrop_path": match.local_backdrop_path or match.backdrop_path,
+                    "logo_path": loc_db.local_logo_path or loc_db.logo_path,
                     "imdb_id": match.imdb_id,
                     "genres": [{"name": g} for g in (loc_db.genres or [])],
                     "production_companies": companies,
@@ -88,12 +95,6 @@ class TmdbMovieFormatter(MovieDetailFormatter):
                     }
                 }
 
-        if not tmdb_data:
-            tmdb_scraper = scrapers.tmdb(db)
-            try:
-                tmdb_data = tmdb_scraper.get_details(tmdb_id, "movie", language=ui_lang)
-            except Exception:
-                tmdb_data = None
 
         if not tmdb_data:
             return JSONResponse(status_code=404, content={"error": "Movie not found on TMDB"})
@@ -147,7 +148,7 @@ class TmdbMovieFormatter(MovieDetailFormatter):
         if override and override.custom_logo:
             effective_logo = override.custom_logo
         else:
-            effective_logo = image_processing_service.pick_logo_path(tmdb_data, preferred_language=ui_lang)
+            effective_logo = tmdb_data.get("logo_path") or image_processing_service.pick_logo_path(tmdb_data, preferred_language=ui_lang)
 
         imdb_id = tmdb_data.get("imdb_id")
         if match:

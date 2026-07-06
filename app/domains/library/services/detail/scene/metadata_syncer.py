@@ -34,7 +34,17 @@ class SceneMetadataSyncer:
             except Exception as e:
                 logger.debug(f"Swallowed exception: {e}", exc_info=True)
         
+        duration_raw = scene_data.get("duration")
+        if duration_raw and not match_db.runtime:
+            try:
+                duration_sec = int(duration_raw)
+                match_db.runtime = int(duration_sec // 60)
+                db_updated = True
+            except Exception as e:
+                logger.debug(f"Swallowed exception: {e}", exc_info=True)
+        
         loc_db = next((x for x in match_db.localizations if x.locale == "en"), None)
+
         if not loc_db:
             from app.domains.metadata.models import MetadataLocalization
             loc_db = MetadataLocalization(

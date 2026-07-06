@@ -33,7 +33,12 @@ export function LanguageProvider({ children }) {
   const [locale, setLocale] = useState('en');
 
   const t = (key, options) => {
-    const keys = key.split('.');
+    let finalKey = key;
+    if (options && typeof options.count === 'number') {
+      const suffix = options.count === 1 ? '_one' : '_other';
+      finalKey = `${key}${suffix}`;
+    }
+    const keys = finalKey.split('.');
     let value = translations[locale];
     for (const k of keys) {
       if (value && typeof value === 'object') {
@@ -42,6 +47,19 @@ export function LanguageProvider({ children }) {
         value = undefined;
         break;
       }
+    }
+    if (value === undefined && finalKey !== key) {
+      const baseKeys = key.split('.');
+      let baseValue = translations[locale];
+      for (const k of baseKeys) {
+        if (baseValue && typeof baseValue === 'object') {
+          baseValue = baseValue[k];
+        } else {
+          baseValue = undefined;
+          break;
+        }
+      }
+      value = baseValue;
     }
     let result = value;
     if (result === undefined) {

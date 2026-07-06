@@ -19,7 +19,7 @@ class PornDbFilmographyStrategy(BaseFilmographyStrategy):
                 headers = {"Authorization": f"Bearer {api_token}", "Accept": "application/json"}
                 endpoint_type = "movies" if media_type == "movie" else "scenes"
                 url = f"https://api.theporndb.net/performers/{ext_id}/{endpoint_type}?page=1&per_page=100"
-                resp = requests.get(url, headers=headers, timeout=10)
+                resp = requests.get(url, headers=headers, timeout=40)
                 
                 if resp.status_code == 200:
                     resp_json = resp.json()
@@ -133,7 +133,7 @@ class PornDbFilmographyStrategy(BaseFilmographyStrategy):
         def fetch_page(page):
             try:
                 page_url = f"https://api.theporndb.net/performers/{ext_id}/{endpoint_type}?page={page}&per_page=100"
-                page_resp = requests.get(page_url, headers=headers, timeout=10)
+                page_resp = requests.get(page_url, headers=headers, timeout=25)
                 if page_resp.status_code == 200:
                     return page_resp.json().get("data") or []
             except Exception as ex:

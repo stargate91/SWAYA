@@ -72,9 +72,6 @@ class SceneDetailService(DetailFormatter):
         import re
         is_uuid = bool(re.match(r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", scene_uuid))
         # Try to load scene details from the local database
-        from app.shared_kernel.enums import Provider, MediaType
-        from app.domains.metadata.models import MetadataMatch
-        
         prov_enum = None
         if provider_prefix in ("stashdb", "stash"):
             prov_enum = Provider.STASHDB
@@ -97,7 +94,45 @@ class SceneDetailService(DetailFormatter):
             ).first()
             
         scene_data = None
-        if match:
+        if provider_prefix in ("stashdb", "stash"):
+            stash_scraper = self.scrapers.adult(Provider.STASHDB, db)
+            try:
+                scene_data = stash_scraper.fetch_scene(scene_uuid)
+            except Exception:
+                scene_data = None
+        elif provider_prefix == "fansdb":
+            fans_scraper = self.scrapers.adult(Provider.FANSDB, db)
+            try:
+                scene_data = fans_scraper.fetch_scene(scene_uuid)
+            except Exception:
+                scene_data = None
+        elif provider_prefix in ("porndb", "theporndb"):
+            porndb_scraper = self.scrapers.adult(Provider.PORNDB, db)
+            try:
+                scene_data = porndb_scraper.fetch_scene(scene_uuid)
+            except Exception:
+                scene_data = None
+        else:
+            if is_uuid:
+                stash_scraper = self.scrapers.adult(Provider.STASHDB, db)
+                try:
+                    scene_data = stash_scraper.fetch_scene(scene_uuid)
+                except Exception:
+                    scene_data = None
+                if not scene_data:
+                    fans_scraper = self.scrapers.adult(Provider.FANSDB, db)
+                    try:
+                        scene_data = fans_scraper.fetch_scene(scene_uuid)
+                    except Exception:
+                        scene_data = None
+            else:
+                porndb_scraper = self.scrapers.adult(Provider.PORNDB, db)
+                try:
+                    scene_data = porndb_scraper.fetch_scene(scene_uuid)
+                except Exception:
+                    scene_data = None
+
+        if not scene_data and match:
             from app.shared_kernel.language import LanguageService
             from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
             loc_db = LanguageService.get_best_localization(match.localizations, DEFAULT_FALLBACK_LANGUAGE)
@@ -117,7 +152,18 @@ class SceneDetailService(DetailFormatter):
                 
                 studio_data = {}
                 if match.studios:
-                    studio_data = {"name": match.studios[0].name, "logo_path": match.studios[0].logo_path}
+                    primary_studio = match.studios[0]
+                    parent_data = None
+                    if primary_studio.parent_studio:
+                        parent_data = {
+                            "name": primary_studio.parent_studio.name,
+                            "logo_path": primary_studio.parent_studio.logo_path
+                        }
+                    studio_data = {
+                        "name": primary_studio.name,
+                        "logo_path": primary_studio.logo_path,
+                        "parent": parent_data
+                    }
                 
                 images_list = [{"url": match.backdrop_path}] if match.backdrop_path else []
                 if loc_db.poster_path:
@@ -134,44 +180,6 @@ class SceneDetailService(DetailFormatter):
                     "tags": [{"name": t} for t in (match.suggested_tags or [])]
                 }
 
-        if not scene_data:
-            if provider_prefix in ("stashdb", "stash"):
-                stash_scraper = self.scrapers.adult(Provider.STASHDB, db)
-                try:
-                    scene_data = stash_scraper.fetch_scene(scene_uuid)
-                except Exception:
-                    scene_data = None
-            elif provider_prefix == "fansdb":
-                fans_scraper = self.scrapers.adult(Provider.FANSDB, db)
-                try:
-                    scene_data = fans_scraper.fetch_scene(scene_uuid)
-                except Exception:
-                    scene_data = None
-            elif provider_prefix in ("porndb", "theporndb"):
-                porndb_scraper = self.scrapers.adult(Provider.PORNDB, db)
-                try:
-                    scene_data = porndb_scraper.fetch_scene(scene_uuid)
-                except Exception:
-                    scene_data = None
-            else:
-                if is_uuid:
-                    stash_scraper = self.scrapers.adult(Provider.STASHDB, db)
-                    try:
-                        scene_data = stash_scraper.fetch_scene(scene_uuid)
-                    except Exception:
-                        scene_data = None
-                    if not scene_data:
-                        fans_scraper = self.scrapers.adult(Provider.FANSDB, db)
-                        try:
-                            scene_data = fans_scraper.fetch_scene(scene_uuid)
-                        except Exception:
-                            scene_data = None
-                else:
-                    porndb_scraper = self.scrapers.adult(Provider.PORNDB, db)
-                    try:
-                        scene_data = porndb_scraper.fetch_scene(scene_uuid)
-                    except Exception:
-                        scene_data = None
         
         print(f"[DEBUG] SceneDetailService.get_scene_detail fetch_scene result: success={bool(scene_data)}")
         if not scene_data:
