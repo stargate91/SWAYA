@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
+import { invalidateEntity } from '@/lib/queryKeys';
 
 const matchesLibraryEntity = (item, rawItemId, cleanId) => {
   if (!item || typeof item !== 'object') return false;
@@ -164,16 +165,7 @@ export const useOverrideBackdropMutation = () => {
     mutationFn: ({ itemId, backdropPath, mediaType }) => api.media.overrideBackdrop(itemId, backdropPath, mediaType),
     onSuccess: (data, variables) => {
       const { itemId } = variables;
-      const cleanId = String(itemId).replace('tv_', '').replace('collection_', '');
-      queryClient.invalidateQueries({ queryKey: ['full-metadata', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['full-metadata', itemId] });
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', itemId] });
-      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', itemId] });
-      queryClient.invalidateQueries({ queryKey: ['library-collection-detail', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['library-collection-detail', itemId] });
-      queryClient.invalidateQueries({ queryKey: ['library'] });
+      invalidateEntity(queryClient, itemId, { lists: true });
     },
   });
 };
@@ -184,16 +176,7 @@ export const useUploadBackdropMutation = () => {
     mutationFn: ({ itemId, file, mediaType }) => api.media.uploadBackdrop(itemId, file, mediaType),
     onSuccess: (data, variables) => {
       const { itemId } = variables;
-      const cleanId = String(itemId).replace('tv_', '').replace('collection_', '');
-      queryClient.invalidateQueries({ queryKey: ['full-metadata', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['full-metadata', itemId] });
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', itemId] });
-      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', itemId] });
-      queryClient.invalidateQueries({ queryKey: ['library-collection-detail', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['library-collection-detail', itemId] });
-      queryClient.invalidateQueries({ queryKey: ['library'] });
+      invalidateEntity(queryClient, itemId, { lists: true });
     },
   });
 };
@@ -204,11 +187,8 @@ export const useOverridePosterMutation = () => {
     mutationFn: ({ itemId, posterPath, mediaType }) => api.media.overridePoster(itemId, posterPath, mediaType),
     onSuccess: (data, variables) => {
       const { itemId } = variables;
-      const cleanId = String(itemId).replace('tv_', '').replace('collection_', '');
       syncPosterCaches(queryClient, itemId, data);
-      queryClient.invalidateQueries({ queryKey: ['full-metadata', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['full-metadata', itemId] });
-      queryClient.invalidateQueries({ queryKey: ['lists'] });
+      invalidateEntity(queryClient, itemId, { listsList: true });
     },
   });
 };
@@ -219,11 +199,8 @@ export const useUploadPosterMutation = () => {
     mutationFn: ({ itemId, file, mediaType }) => api.media.uploadPoster(itemId, file, mediaType),
     onSuccess: (data, variables) => {
       const { itemId } = variables;
-      const cleanId = String(itemId).replace('tv_', '').replace('collection_', '');
       syncPosterCaches(queryClient, itemId, data);
-      queryClient.invalidateQueries({ queryKey: ['full-metadata', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['full-metadata', itemId] });
-      queryClient.invalidateQueries({ queryKey: ['lists'] });
+      invalidateEntity(queryClient, itemId, { listsList: true });
     },
   });
 };
@@ -234,16 +211,8 @@ export const useOverrideLogoMutation = () => {
     mutationFn: ({ itemId, logoPath, mediaType }) => api.media.overrideLogo(itemId, logoPath, mediaType),
     onSuccess: (data, variables) => {
       const { itemId } = variables;
-      const cleanId = String(itemId).replace('tv_', '').replace('collection_', '');
       syncLogoCaches(queryClient, itemId, data);
-      queryClient.invalidateQueries({ queryKey: ['full-metadata', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['full-metadata', itemId] });
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', itemId] });
-      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', itemId] });
-      queryClient.invalidateQueries({ queryKey: ['library-collection-detail', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['library-collection-detail', itemId] });
+      invalidateEntity(queryClient, itemId);
     },
   });
 };
@@ -254,16 +223,8 @@ export const useUploadLogoMutation = () => {
     mutationFn: ({ itemId, file, mediaType }) => api.media.uploadLogo(itemId, file, mediaType),
     onSuccess: (data, variables) => {
       const { itemId } = variables;
-      const cleanId = String(itemId).replace('tv_', '').replace('collection_', '');
       syncLogoCaches(queryClient, itemId, data);
-      queryClient.invalidateQueries({ queryKey: ['full-metadata', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['full-metadata', itemId] });
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', itemId] });
-      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', itemId] });
-      queryClient.invalidateQueries({ queryKey: ['library-collection-detail', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['library-collection-detail', itemId] });
+      invalidateEntity(queryClient, itemId);
     },
   });
 };

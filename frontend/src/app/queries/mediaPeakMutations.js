@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { useUi } from '@/providers/UiProvider';
+import { invalidateEntity, invalidateTvDetail } from '@/lib/queryKeys';
 
 export const useToggleTrackedMutation = () => {
   const queryClient = useQueryClient();
@@ -11,33 +12,7 @@ export const useToggleTrackedMutation = () => {
         : api.media.trackItem(tmdbId, mediaType)
     ),
     onSuccess: (data, variables) => {
-      const rawId = String(variables.tmdbId)
-        .replace('stash_', '')
-        .replace('tmdb_', '')
-        .replace('tv_', '')
-        .replace('porndb_', '')
-        .replace('fansdb_', '');
-      const cleanId = rawId;
-      const tvId = `tv_${rawId}`;
-      const trackedId = `tmdb_${rawId}`;
-      const stashId = `stash_${rawId}`;
-      const porndbId = `porndb_${rawId}`;
-      const fansdbId = `fansdb_${rawId}`;
-      queryClient.invalidateQueries({ queryKey: ['library'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
-      queryClient.invalidateQueries({ queryKey: ['full-metadata', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['full-metadata', tvId] });
-      queryClient.invalidateQueries({ queryKey: ['full-metadata', trackedId] });
-      queryClient.invalidateQueries({ queryKey: ['full-metadata', stashId] });
-      queryClient.invalidateQueries({ queryKey: ['full-metadata', porndbId] });
-      queryClient.invalidateQueries({ queryKey: ['full-metadata', fansdbId] });
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', trackedId] });
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', stashId] });
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', porndbId] });
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', fansdbId] });
-      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', tvId] });
+      invalidateEntity(queryClient, variables.tmdbId, { lists: true, stats: true });
     },
   });
 };
@@ -117,10 +92,9 @@ export const useAddPeakMutation = () => {
         queryClient.setQueriesData({ queryKey: ['library-item-detail', id] }, updateData);
         queryClient.setQueriesData({ queryKey: ['library-item-detail', clean] }, updateData);
         queryClient.setQueriesData({ queryKey: ['library-tv-detail', id] }, updateData);
-        queryClient.invalidateQueries({ queryKey: ['library-item-detail', id] });
-        queryClient.invalidateQueries({ queryKey: ['library-item-detail', clean] });
       });
-      queryClient.invalidateQueries({ queryKey: ['library-tv-detail'] });
+      invalidateEntity(queryClient, itemId);
+      if (tvId) invalidateTvDetail(queryClient, tvId);
     },
   });
 };
@@ -145,10 +119,9 @@ export const useDeletePeakMutation = () => {
         queryClient.setQueriesData({ queryKey: ['library-item-detail', id] }, updateData);
         queryClient.setQueriesData({ queryKey: ['library-item-detail', clean] }, updateData);
         queryClient.setQueriesData({ queryKey: ['library-tv-detail', id] }, updateData);
-        queryClient.invalidateQueries({ queryKey: ['library-item-detail', id] });
-        queryClient.invalidateQueries({ queryKey: ['library-item-detail', clean] });
       });
-      queryClient.invalidateQueries({ queryKey: ['library-tv-detail'] });
+      invalidateEntity(queryClient, itemId);
+      if (tvId) invalidateTvDetail(queryClient, tvId);
     },
   });
 };

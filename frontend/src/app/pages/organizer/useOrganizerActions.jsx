@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { useRenameMutation, getOrganizerQueryKey, useScanRetryMutation } from '../../queries';
+import { QK } from '../../lib/queryKeys';
 import { useOrganizerRename } from './hooks/useOrganizerRename';
 import { useOrganizerScan } from './hooks/useOrganizerScan';
 
@@ -46,8 +47,8 @@ export function useOrganizerActions({
       }
 
       queryClient.invalidateQueries({ queryKey: ['scan-status'] });
-      queryClient.invalidateQueries({ queryKey: ['organizer'] });
-      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
+      queryClient.invalidateQueries({ queryKey: QK.organizer });
+      queryClient.invalidateQueries({ queryKey: QK.organizerCount });
       toast(t('organizer.toasts.retryStarted') || 'Retrying match process...', 'success');
     } catch (error) {
       toast(error.message || t('organizer.toasts.retryFailed') || 'Failed to start retry.', 'danger');

@@ -3,6 +3,7 @@ import { selectFolder } from '../../../lib/ipc';
 import { scrollOrganizerToTop } from '../organizerScroll';
 import { useScanMutation, getOrganizerQueryKey } from '../../../queries';
 import { isEpisodeMediaType } from '@/lib/mediaTypes';
+import { QK } from '@/lib/queryKeys';
 
 const EMPTY_ORGANIZER = {
   manual: [],
@@ -121,11 +122,11 @@ export function useOrganizerScan({
 
         const currentVisibleOrganizer = queryClient.getQueryData(queryKey) || EMPTY_ORGANIZER;
 
-        queryClient.invalidateQueries({ queryKey: ['organizer'] });
-        queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
-        queryClient.invalidateQueries({ queryKey: ['stats'] });
+        queryClient.invalidateQueries({ queryKey: QK.organizer });
+        queryClient.invalidateQueries({ queryKey: QK.organizerCount });
+        queryClient.invalidateQueries({ queryKey: QK.stats });
         queryClient.invalidateQueries({ queryKey: ['history'] });
-        queryClient.invalidateQueries({ queryKey: ['library'] });
+        queryClient.invalidateQueries({ queryKey: QK.library });
 
         try {
           const result = await organizerQuery.refetch();
@@ -189,8 +190,8 @@ export function useOrganizerScan({
       }
 
       queryClient.invalidateQueries({ queryKey: ['scan-status'] });
-      queryClient.invalidateQueries({ queryKey: ['organizer'] });
-      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
+      queryClient.invalidateQueries({ queryKey: QK.organizer });
+      queryClient.invalidateQueries({ queryKey: QK.organizerCount });
     } catch (error) {
       toast(error.message || t('organizer.toasts.scanStartFailed'), 'danger');
     } finally {

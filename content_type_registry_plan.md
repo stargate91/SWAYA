@@ -412,3 +412,144 @@ graph LR
     style C fill:#10b981,stroke:#059669,color:#fff
     style F fill:#f59e0b,stroke:#d97706,color:#000
 ```
+# Egységesítési lehetőségek — Payoff/Energia rangsor
+
+A kódbázis teljes átvizsgálása alapján, **legnagyobb megtérülés / legkisebb energia** sorrendben:
+
+---
+
+## 1. 🟢 Cache invalidáció egységesítés (`invalidateEntity`)
+
+| | |
+|---|---|
+| **Energia** | ~1-2 óra |
+| **Payoff** | Nagyon magas |
+| **Kód csökkenés** | ~200 sor törlés a mutation fájlokból |
+| **Törési kockázat** | Minimális — belső refactor |
+
+**Mit csinál:** Jelenleg 6 mutation fájl × 8-15 `invalidateQueries` hívás mindegyikben, az ID variánsokat (`cleanId`, `tv_`, `collection_`, `stash_`, `porndb_`, `fansdb_`, `tmdb_`) kézzel generálja. Egy `invalidateEntity(queryClient, rawId, options)` helper mindent megold.
+
+**Érintett fájlok:** `mediaMutations.js` (496 sor), `mediaAssetMutations.js` (270 sor), `mediaPeakMutations.js` (155 sor)
+
+**Miért #1:** Legkisebb befektetés, legnagyobb azonnali hatás. Minden jövőbeli mutation automatikusan profitál.
+
+---
+
+## 2. 🟢 Media card rendering egységesítés
+
+| | |
+|---|---|
+| **Energia** | ~3-4 óra |
+| **Payoff** | Magas |
+| **Kód csökkenés** | ~300-400 sor összevonás |
+| **Törési kockázat** | Közepes — UI érint |
+
+**Mit csinál:** A `PosterCard` generikus UI primitív, de minden felhasználási hely (`LibraryPosterCard`, `ContinueWatchingWidget`, `RecommendationsWidget`, `SearchPage`, `DrawerResultsList`, `PersonCreditsCard`) **újra és újra összeállítja** ugyanazt:
+- poster/backdrop path kiválogatás (5+ fallback kombináció)
+- rating prioritás (IMDb > TMDB > PornDB)
+- title resolution (override > localized > original)
+- subtitle formázás (year, info, performers)
+
+Egy `normalizeMediaEntity()` + egy `<MediaContentCard>` wrapper ami a normalizált entitásból renderel, mindezt egyszer definiálná.
+
+**Érintett fájlok:** `LibraryPosterCard.jsx` (294 sor), `ContinueWatchingWidget.jsx`, `RecommendationsWidget.jsx` (580 sor), `SearchPage.jsx`, `DrawerResultsList.jsx`, `PersonCreditsCard.jsx`
+
+---
+
+## 3. 🟢 Image URL resolution centralizálás
+
+| | |
+|---|---|
+| **Energia** | ~1 óra |
+| **Payoff** | Közepes-Magas |
+| **Kód csökkenés** | Kevés (inkább konzisztencia) |
+| **Törési kockázat** | Alacsony |
+
+**Mit csinál:** `resolveMediaImageUrl` **32 fájlban** van importálva, és 5 különböző helper (`getPosterImagePath`, `getTvPosterImagePath`, `getProfileImagePath`, `getBackdropImagePath`, `resolveDetailsImageUrl`) létezik ugyanarra. Plusz `detailUtils.js` wrappereli `resolveDetailsImageUrl`-ben ami pont ugyanaz.
+
+**Megoldás:** A `normalizeMediaEntity()` (lásd #2) pre-resolve-olja az URL-eket, és a komponensek `item.posterUrl`-t használnak `resolveMediaImageUrl(getPosterImagePath(item), 'poster')` helyett.
+
+**Ez a #2-vel együtt jár** — önmagában is megéri, de a #2-vel kombinálva dupla hatás.
+
+---
+
+## 4. 🟡 Backend detail service-ek generalizálása
+
+| | |
+|---|---|
+| **Energia** | ~4-5 óra |
+| **Payoff** | Közepes |
+| **Kód csökkenés** | ~200 sor |
+| **Törési kockázat** | Közepes |
+
+**Mit csinál:** `MovieDetailService`, `TvDetailService`, `SceneDetailService` — három külön service ami nagyrészt ugyanazt csinálja (match lookup → localization → override → format response), de type-specifikus elágazásokkal. A route handler (`get_library_item_detail`) `if media_type == "scene"` / `"movie"` / `"tv"` if-lánccal dispatch-el.
+
+**Megoldás:** Közös `BaseDetailService` + type-specifikus formatterek. Ez a **content type registry** előfeltétele is — ha a detail dispatch generikus, akkor új type = új formatter, nem új service + route módosítás.
+
+---
+
+## 5. 🟡 Rating display logika (PosterCard + detail)
+
+| | |
+|---|---|
+| **Energia** | ~30 perc |
+| **Payoff** | Alacsony-Közepes |
+| **Kód csökkenés** | ~50 sor |
+| **Törési kockázat** | Minimális |
+
+**Mit csinál:** A rating prioritás (IMDb > TMDB > PornDB) **3 helyen** van implementálva eltérő módon:
+- `PosterCard.jsx` (L256-285) — inline IIFE a JSX-ben
+- `LibraryPosterCard.jsx` (L71-86) — props assembly
+- `RecommendationsWidget.jsx` (L28-30) — `SpotlightBanner`-ben
+
+**Megoldás:** `resolveRating(item) → { value, source, formatted }` egyetlen helper.
+
+**A #2-vel együtt jár** — ha a `normalizeMediaEntity()` elkészül, ez benne lesz.
+
+---
+
+## 6. 🟡 Episode number parsing/formatting
+
+| | |
+|---|---|
+| **Energia** | ~30 perc |
+| **Payoff** | Alacsony |
+| **Kód csökkenés** | ~40 sor |
+| **Törési kockázat** | Minimális |
+
+**Mit csinál:** Episode szám parsing/formatting **2 helyen** van duplikálva:
+- `ContinueWatchingWidget.jsx` (L10-49) — `normalizeEpisodeNumbers()` + `formatEpisodeCode()`
+- `detailUtils.js` (L46-63) — `formatEpisodeNumber()`
+
+Két különböző implementáció, hasonló de nem azonos logikával.
+
+**Megoldás:** Egyetlen `episodeFormat.js` utility.
+
+---
+
+## 7. 🔴 Content Type Registry (backend + frontend)
+
+| | |
+|---|---|
+| **Energia** | ~8-12 óra |
+| **Payoff** | Magas — de **csak ha** új type-ok jönnek |
+| **Kód csökkenés** | ~0 (absztrakció hozzáadás) |
+| **Törési kockázat** | Közepes-Magas |
+
+Ez a plan §1-5. A legnagyobb scope, a legtöbb érintett fájl, és a payoff csak akkor realizálódik, ha ténylegesen jönnek új type-ok. **Az összes fenti (#1-#6) előfeltétele annak, hogy ez gyorsan és tisztán menjen.**
+
+---
+
+## Javasolt sorrend
+
+```
+#1 invalidateEntity        [1-2h]  ← azonnal fizet, 0 kockázat
+#5 resolveRating helper    [30min] ← kis erőfeszítés, közben melegítés
+#6 episodeFormat utility   [30min] ← kis erőfeszítés
+#3 image URL centralizálás [1h]    ← normalizeMediaEntity előkészítés
+#2 normalizeMediaEntity    [3-4h]  ← nagy payoff, #3 és #5 beolvad
+#4 backend detail services [4-5h]  ← registry előkészítés
+#7 content type registry   [8-12h] ← minden előzőre épít
+```
+
+**Teljes idő:** ~18-25 óra ha mindent csinálunk, de az első 4 lépés (~3 óra) már az érték 60%-át hozza.

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '@/lib/api';
 import { getOrganizerQueryKey } from './organizerQueries';
 import { useSettingsQuery } from './settingsQueries';
+import { invalidateEntity, invalidateTvDetail, QK } from '@/lib/queryKeys';
 
 const prettifyOrganizerLanguage = (value) => String(value || '')
   .replace(/[_-]+/g, ' ')
@@ -94,10 +95,10 @@ export const useUpdateMediaMutation = () => {
         const organizerData = await api.organizer.get({ scanMode, sessionMode });
         queryClient.setQueryData(getOrganizerQueryKey(scanMode, sessionMode), organizerData);
       } else {
-        await queryClient.invalidateQueries({ queryKey: ['organizer'] });
+        await queryClient.invalidateQueries({ queryKey: QK.organizer });
       }
-      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
+      queryClient.invalidateQueries({ queryKey: QK.organizerCount });
+      queryClient.invalidateQueries({ queryKey: QK.stats });
     },
   });
 };
@@ -264,14 +265,7 @@ export const useUpdateMediaStatusMutation = () => {
       queryClient.setQueryData(['library-item-detail', variables.itemId], updateDetailCache);
       queryClient.setQueryData(['library-tv-detail', variables.itemId], updateDetailCache);
 
-      queryClient.invalidateQueries({ queryKey: ['full-metadata', variables.itemId] });
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', variables.itemId] });
-      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', variables.itemId] });
-
-      const cleanId = String(variables.itemId).replace('tv_', '');
-      queryClient.invalidateQueries({ queryKey: ['full-metadata', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', cleanId] });
-      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', cleanId] });
+      invalidateEntity(queryClient, variables.itemId);
 
       if (variables.tvId) {
         const updateTvCacheWithEpisode = (oldData) => {
@@ -300,10 +294,8 @@ export const useUpdateMediaStatusMutation = () => {
         queryClient.setQueryData(['library-tv-detail', `tv_${variables.tvId}`], updateTvCacheWithEpisode);
         queryClient.setQueryData(['library-item-detail', variables.tvId], updateDetailCache);
         queryClient.setQueryData(['library-item-detail', `tv_${variables.tvId}`], updateDetailCache);
-        queryClient.invalidateQueries({ queryKey: ['library-tv-detail', variables.tvId] });
-        queryClient.invalidateQueries({ queryKey: ['library-tv-detail', `tv_${variables.tvId}`] });
-        queryClient.invalidateQueries({ queryKey: ['library-item-detail', variables.tvId] });
-        queryClient.invalidateQueries({ queryKey: ['library-item-detail', `tv_${variables.tvId}`] });
+        invalidateEntity(queryClient, variables.tvId);
+        invalidateTvDetail(queryClient, variables.tvId);
       }
 
       // Update matching items in the library query cache instead of invalidating everything
@@ -347,13 +339,13 @@ export const useUpdateMediaStatusMutation = () => {
 
       const payload = variables.payload || {};
       if ('user_rating' in payload || 'is_watched' in payload || 'user_comment' in payload) {
-        queryClient.invalidateQueries({ queryKey: ['stats'] });
-        queryClient.invalidateQueries({ queryKey: ['watched-history'] });
+        queryClient.invalidateQueries({ queryKey: QK.stats });
+        queryClient.invalidateQueries({ queryKey: QK.watchedHistory });
       }
       if ('custom_tags' in payload || 'is_tracked' in payload) {
-        queryClient.invalidateQueries({ queryKey: ['libraryTags'] });
-        queryClient.invalidateQueries({ queryKey: ['allTags'] });
-        queryClient.invalidateQueries({ queryKey: ['libraryFilters'] });
+        queryClient.invalidateQueries({ queryKey: QK.libraryTags });
+        queryClient.invalidateQueries({ queryKey: QK.allTags });
+        queryClient.invalidateQueries({ queryKey: QK.libraryFilters });
       }
     },
   });
@@ -416,13 +408,10 @@ export const useBulkUpdateWatchedMutation = () => {
       }
     },
     onSuccess: (data, variables) => {
-      if (variables.tvId) {
-        queryClient.invalidateQueries({ queryKey: ['library-tv-detail', variables.tvId] });
-        queryClient.invalidateQueries({ queryKey: ['library-tv-detail', `tv_${variables.tvId}`] });
-      }
-      queryClient.invalidateQueries({ queryKey: ['library'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
-      queryClient.invalidateQueries({ queryKey: ['watched-history'] });
+      if (variables.tvId) invalidateTvDetail(queryClient, variables.tvId);
+      queryClient.invalidateQueries({ queryKey: QK.library });
+      queryClient.invalidateQueries({ queryKey: QK.stats });
+      queryClient.invalidateQueries({ queryKey: QK.watchedHistory });
     },
   });
 };
@@ -459,14 +448,7 @@ export const usePlayMediaMutation = () => {
       }
     },
     onSuccess: (data, itemId) => {
-      const stringId = String(itemId);
-      const numberId = !isNaN(Number(itemId)) ? Number(itemId) : itemId;
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', stringId] });
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', numberId] });
-      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', stringId] });
-      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', numberId] });
-      queryClient.invalidateQueries({ queryKey: ['watched-history'] });
-      queryClient.invalidateQueries({ queryKey: ['continue-watching'] });
+      invalidateEntity(queryClient, itemId, { watchedHistory: true, continueWatching: true });
     },
   });
 };
@@ -476,14 +458,7 @@ export const useResetProgressMutation = () => {
   return useMutation({
     mutationFn: (itemId) => api.media.resetProgress(itemId),
     onSuccess: (data, itemId) => {
-      const stringId = String(itemId);
-      const numberId = !isNaN(Number(itemId)) ? Number(itemId) : itemId;
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', stringId] });
-      queryClient.invalidateQueries({ queryKey: ['library-item-detail', numberId] });
-      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', stringId] });
-      queryClient.invalidateQueries({ queryKey: ['library-tv-detail', numberId] });
-      queryClient.invalidateQueries({ queryKey: ['continue-watching'] });
-      queryClient.invalidateQueries({ queryKey: ['watched-history'] });
+      invalidateEntity(queryClient, itemId, { continueWatching: true, watchedHistory: true });
     },
   });
 };

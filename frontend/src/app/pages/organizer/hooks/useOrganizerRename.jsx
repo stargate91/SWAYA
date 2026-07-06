@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Sparkles } from '@/ui/icons';
 import Button from '../../../ui/Button';
+import { QK } from '@/lib/queryKeys';
 import OrganizerRenameModalContent from '../OrganizerRenameModalContent.jsx';
 import { mapOrganizerItemRow, mapExtraRow } from '../organizerMappers';
 
@@ -66,7 +67,7 @@ export function useOrganizerRename({
           throw new Error(response.message);
         }
         queryClient.invalidateQueries({ queryKey: ['history'] });
-        queryClient.invalidateQueries({ queryKey: ['library'] });
+        queryClient.invalidateQueries({ queryKey: QK.library });
       } catch (error) {
         queryClient.setQueryData(['scan-status'], previousScanStatus || null);
         if (renameStartedRef) {

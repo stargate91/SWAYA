@@ -1,6 +1,7 @@
 import { Suspense, useState, useEffect, useRef } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
+import { QK } from '@/lib/queryKeys';
 import AppClosePrompt from './AppClosePrompt';
 import WindowTitlebar from './WindowTitlebar';
 import PlayerControlBar from './PlayerControlBar';
@@ -55,8 +56,8 @@ function PeopleImportCompletionWatcher() {
           window.dispatchEvent(new CustomEvent('people-bulk-import-complete', {
             detail: { hasUnresolved, adultOnly }
           }));
-          queryClient.invalidateQueries({ queryKey: ['library'] });
-          queryClient.invalidateQueries({ queryKey: ['stats'] });
+          queryClient.invalidateQueries({ queryKey: QK.library });
+          queryClient.invalidateQueries({ queryKey: QK.stats });
           toast(t(adultOnly ? 'library.addPeople.adultBulkFinishedToast' : 'library.addPeople.bulkFinishedToast'), 'success');
         }
       }).catch(() => {

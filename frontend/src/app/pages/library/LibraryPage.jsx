@@ -12,6 +12,7 @@ import { createPortal } from 'react-dom';
 import { isLibraryTagsTab } from '@/lib/libraryTabs';
 import { useUi } from '@/providers/UiProvider';
 import { useQueryClient } from '@tanstack/react-query';
+import { QK } from '@/lib/queryKeys';
 import UniversalImagePickerModal from './modals/UniversalImagePickerModal';
 import './LibraryPage.css';
 
@@ -249,8 +250,8 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
                 externalIds={imagePickerData.externalIds}
                 item={imagePickerData.item}
                 onClose={() => {
-                  queryClient.invalidateQueries({ queryKey: ['library'] });
-                  queryClient.invalidateQueries({ queryKey: ['libraryCollections'] });
+                  queryClient.invalidateQueries({ queryKey: QK.library });
+                  queryClient.invalidateQueries({ queryKey: QK.libraryCollections });
                 }}
               />
             </div>

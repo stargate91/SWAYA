@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
+import { invalidatePerson, QK } from '@/lib/queryKeys';
 
 const matchesId = (itemId, targetId) => {
   if (itemId === targetId || String(itemId) === String(targetId)) return true;
@@ -119,7 +120,7 @@ const syncPersonProfileCaches = (queryClient, personId, data) => {
 
   queryClient.setQueriesData({ queryKey: ['library-item-detail'] }, updateMediaDetailCache);
   queryClient.setQueriesData({ queryKey: ['library-tv-detail'] }, updateMediaDetailCache);
-  queryClient.invalidateQueries({ queryKey: ['recommendations'] });
+  queryClient.invalidateQueries({ queryKey: QK.recommendations });
 };
 
 const syncPersonBackdropCaches = (queryClient, personId, data) => {
@@ -151,11 +152,7 @@ export const useAddPersonTmdbMutation = () => {
   return useMutation({
     mutationFn: (tmdbId) => api.people.addFromTmdb(tmdbId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['people'] });
-      queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
-      queryClient.invalidateQueries({ queryKey: ['library'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
-      queryClient.invalidateQueries({ queryKey: ['recommendations'] });
+      invalidatePerson(queryClient, '', { lists: true, stats: true, recommendations: true });
     },
   });
 };
@@ -281,13 +278,7 @@ export const useUpdatePersonStatusMutation = () => {
       }
     },
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['person-detail', variables.personId] });
-      queryClient.invalidateQueries({ queryKey: ['person-detail', String(variables.personId)] });
-      queryClient.invalidateQueries({ queryKey: ['person-detail'] });
-      queryClient.invalidateQueries({ queryKey: ['people'] });
-      queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
-      queryClient.invalidateQueries({ queryKey: ['library'] });
-      queryClient.invalidateQueries({ queryKey: ['recommendations'] });
+      invalidatePerson(queryClient, variables.personId, { lists: true, recommendations: true });
     },
   });
 };
@@ -299,8 +290,7 @@ export const useOverridePersonBackdropMutation = () => {
     onSuccess: (data, variables) => {
       const { personId } = variables;
       syncPersonBackdropCaches(queryClient, personId, data);
-      queryClient.invalidateQueries({ queryKey: ['person-detail', personId] });
-      queryClient.invalidateQueries({ queryKey: ['person-detail', String(personId)] });
+      invalidatePerson(queryClient, personId);
     },
   });
 };
@@ -312,8 +302,7 @@ export const useUploadPersonBackdropMutation = () => {
     onSuccess: (data, variables) => {
       const { personId } = variables;
       syncPersonBackdropCaches(queryClient, personId, data);
-      queryClient.invalidateQueries({ queryKey: ['person-detail', personId] });
-      queryClient.invalidateQueries({ queryKey: ['person-detail', String(personId)] });
+      invalidatePerson(queryClient, personId);
     },
   });
 };
@@ -325,9 +314,7 @@ export const useOverridePersonProfileMutation = () => {
     onSuccess: (data, variables) => {
       const { personId } = variables;
       syncPersonProfileCaches(queryClient, personId, data);
-      queryClient.invalidateQueries({ queryKey: ['person-detail', personId] });
-      queryClient.invalidateQueries({ queryKey: ['person-detail', String(personId)] });
-      queryClient.invalidateQueries({ queryKey: ['lists'] });
+      invalidatePerson(queryClient, personId, { listsList: true });
     },
   });
 };
@@ -339,9 +326,7 @@ export const useUploadPersonProfileMutation = () => {
     onSuccess: (data, variables) => {
       const { personId } = variables;
       syncPersonProfileCaches(queryClient, personId, data);
-      queryClient.invalidateQueries({ queryKey: ['person-detail', personId] });
-      queryClient.invalidateQueries({ queryKey: ['person-detail', String(personId)] });
-      queryClient.invalidateQueries({ queryKey: ['lists'] });
+      invalidatePerson(queryClient, personId, { listsList: true });
     },
   });
 };
@@ -351,16 +336,7 @@ export const useLinkPersonSourceMutation = () => {
   return useMutation({
     mutationFn: ({ personId, source, externalId, overrides, profileUrl }) => api.people.linkSource(personId, source, externalId, overrides, profileUrl),
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['person-detail', variables.personId] });
-      queryClient.invalidateQueries({ queryKey: ['person-detail', String(variables.personId)] });
-      queryClient.invalidateQueries({ queryKey: ['person-detail'] });
-      queryClient.invalidateQueries({ queryKey: ['person-credits', variables.personId] });
-      queryClient.invalidateQueries({ queryKey: ['person-credits', String(variables.personId)] });
-      queryClient.invalidateQueries({ queryKey: ['people'] });
-      queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
-      queryClient.invalidateQueries({ queryKey: ['library'] });
-      queryClient.invalidateQueries({ queryKey: ['recommendations'] });
-      queryClient.invalidateQueries({ queryKey: ['lists'] });
+      invalidatePerson(queryClient, variables.personId, { lists: true, recommendations: true, listsList: true });
     },
   });
 };
@@ -370,11 +346,7 @@ export const useDeletePersonMutation = () => {
   return useMutation({
     mutationFn: (personId) => api.people.delete(personId),
     onSuccess: (data, personId) => {
-      queryClient.invalidateQueries({ queryKey: ['people'] });
-      queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
-      queryClient.invalidateQueries({ queryKey: ['library'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
-      queryClient.invalidateQueries({ queryKey: ['recommendations'] });
+      invalidatePerson(queryClient, personId, { lists: true, stats: true, recommendations: true });
       queryClient.removeQueries({ queryKey: ['person-detail', personId] });
       queryClient.removeQueries({ queryKey: ['person-detail', String(personId)] });
       queryClient.removeQueries({ queryKey: ['person-credits', personId] });
@@ -454,15 +426,7 @@ export const useUnlinkPersonSourceMutation = () => {
       }
     },
     onSettled: (data, error, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['person-detail', variables.personId] });
-      queryClient.invalidateQueries({ queryKey: ['person-detail', String(variables.personId)] });
-      queryClient.invalidateQueries({ queryKey: ['person-detail'] });
-      queryClient.invalidateQueries({ queryKey: ['person-credits', variables.personId] });
-      queryClient.invalidateQueries({ queryKey: ['person-credits', String(variables.personId)] });
-      queryClient.invalidateQueries({ queryKey: ['people'] });
-      queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
-      queryClient.invalidateQueries({ queryKey: ['library'] });
-      queryClient.invalidateQueries({ queryKey: ['recommendations'] });
+      invalidatePerson(queryClient, variables.personId, { lists: true, recommendations: true });
     },
   });
 };
@@ -494,12 +458,7 @@ export const useSetPrimaryPersonSourceMutation = () => {
         });
       });
 
-      queryClient.invalidateQueries({ queryKey: ['person-detail', variables.personId] });
-      queryClient.invalidateQueries({ queryKey: ['person-detail', String(variables.personId)] });
-      queryClient.invalidateQueries({ queryKey: ['person-detail'] });
-      queryClient.invalidateQueries({ queryKey: ['people'] });
-      queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
-      queryClient.invalidateQueries({ queryKey: ['library'] });
+      invalidatePerson(queryClient, variables.personId, { lists: true });
     },
   });
 };
@@ -509,12 +468,7 @@ export const useSetPersonFieldRoutingMutation = () => {
   return useMutation({
     mutationFn: ({ personId, routing }) => api.people.setFieldRouting(personId, routing),
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['person-detail', variables.personId] });
-      queryClient.invalidateQueries({ queryKey: ['person-detail', String(variables.personId)] });
-      queryClient.invalidateQueries({ queryKey: ['person-detail'] });
-      queryClient.invalidateQueries({ queryKey: ['people'] });
-      queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
-      queryClient.invalidateQueries({ queryKey: ['library'] });
+      invalidatePerson(queryClient, variables.personId, { lists: true });
     },
   });
 };
@@ -524,12 +478,7 @@ export const useSavePersonCustomFieldsMutation = () => {
   return useMutation({
     mutationFn: ({ personId, fields }) => api.people.saveCustomFields(personId, fields),
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['person-detail', variables.personId] });
-      queryClient.invalidateQueries({ queryKey: ['person-detail', String(variables.personId)] });
-      queryClient.invalidateQueries({ queryKey: ['person-detail'] });
-      queryClient.invalidateQueries({ queryKey: ['people'] });
-      queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
-      queryClient.invalidateQueries({ queryKey: ['library'] });
+      invalidatePerson(queryClient, variables.personId, { lists: true });
     },
   });
 };

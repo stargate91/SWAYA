@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useScanStatusQuery } from '@/queries';
+import { QK } from '@/lib/queryKeys';
 
 const getBulkImportBannerStorageKey = (isAdultMode) =>
   isAdultMode ? 'showBulkImportBanner:nsfw' : 'showBulkImportBanner:sfw';
@@ -33,8 +34,8 @@ export function useLibraryBulkImport({ isAdultMode, isPeopleTab }) {
       const current = Number(data.current || 0);
       if (current > prevPeopleImportCurrent.current) {
         prevPeopleImportCurrent.current = current;
-        queryClient.invalidateQueries({ queryKey: ['library'] });
-        queryClient.invalidateQueries({ queryKey: ['stats'] });
+        queryClient.invalidateQueries({ queryKey: QK.library });
+        queryClient.invalidateQueries({ queryKey: QK.stats });
       }
     } else {
       prevPeopleImportCurrent.current = 0;

@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import './entityDetail/EntityDetailHeroSection.css';
 import { usePlayMediaMutation, useSettingsQuery } from '@/queries';
 import api from '@/lib/api';
+import { QK } from '@/lib/queryKeys';
 import EmptyState from '@/ui/EmptyState';
 import Button from '@/ui/Button';
 import IconButton from '@/ui/IconButton';
@@ -346,9 +347,9 @@ function ExpandedTagPanel({ tag, t, resolvePosterUrl, emptyIcon, isFocusMode = f
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['libraryTags'] });
-      queryClient.invalidateQueries({ queryKey: ['allTags'] });
-      queryClient.invalidateQueries({ queryKey: ['library'] });
+      queryClient.invalidateQueries({ queryKey: QK.libraryTags });
+      queryClient.invalidateQueries({ queryKey: QK.allTags });
+      queryClient.invalidateQueries({ queryKey: QK.library });
     }
   });
 

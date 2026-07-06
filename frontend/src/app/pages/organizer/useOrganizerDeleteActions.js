@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import api from '../../lib/api';
 import { getOrganizerQueryKey } from '../../queries';
+import { QK } from '../../lib/queryKeys';
 
 export const removeOrganizerRow = (currentOrganizer, row) => {
   if (!currentOrganizer) {
@@ -57,8 +58,8 @@ export function useOrganizerDeleteActions({
     if (nextOrganizer) {
       queryClient.setQueryData(queryKey, nextOrganizer);
       focusFirstAvailableResult(nextOrganizer);
-      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
+      queryClient.invalidateQueries({ queryKey: QK.organizerCount });
+      queryClient.invalidateQueries({ queryKey: QK.stats });
     }
 
     try {
@@ -68,8 +69,8 @@ export function useOrganizerDeleteActions({
         queryClient.setQueryData(queryKey, previousOrganizer);
         focusFirstAvailableResult(previousOrganizer);
       }
-      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
+      queryClient.invalidateQueries({ queryKey: QK.organizerCount });
+      queryClient.invalidateQueries({ queryKey: QK.stats });
     }
   }, [closeModal, queryClient, focusFirstAvailableResult, refreshOrganizer, queryKey]);
 
@@ -80,8 +81,8 @@ export function useOrganizerDeleteActions({
     if (nextOrganizer) {
       queryClient.setQueryData(queryKey, nextOrganizer);
       focusFirstAvailableResult(nextOrganizer);
-      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
+      queryClient.invalidateQueries({ queryKey: QK.organizerCount });
+      queryClient.invalidateQueries({ queryKey: QK.stats });
     }
 
     try {
@@ -94,8 +95,8 @@ export function useOrganizerDeleteActions({
         queryClient.setQueryData(queryKey, previousOrganizer);
         focusFirstAvailableResult(previousOrganizer);
       }
-      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
+      queryClient.invalidateQueries({ queryKey: QK.organizerCount });
+      queryClient.invalidateQueries({ queryKey: QK.stats });
       throw error;
     }
   }, [closeModal, queryClient, focusFirstAvailableResult, refreshOrganizer, queryKey]);
@@ -107,8 +108,8 @@ export function useOrganizerDeleteActions({
     if (nextOrganizer) {
       queryClient.setQueryData(queryKey, nextOrganizer);
       focusFirstAvailableResult(nextOrganizer);
-      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
+      queryClient.invalidateQueries({ queryKey: QK.organizerCount });
+      queryClient.invalidateQueries({ queryKey: QK.stats });
     }
 
     try {
@@ -127,8 +128,8 @@ export function useOrganizerDeleteActions({
         queryClient.setQueryData(queryKey, previousOrganizer);
         focusFirstAvailableResult(previousOrganizer);
       }
-      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
+      queryClient.invalidateQueries({ queryKey: QK.organizerCount });
+      queryClient.invalidateQueries({ queryKey: QK.stats });
       throw error;
     }
   }, [closeModal, queryClient, focusFirstAvailableResult, refreshOrganizer, toast, t, queryKey]);
@@ -141,8 +142,8 @@ export function useOrganizerDeleteActions({
     if (nextOrganizer) {
       queryClient.setQueryData(queryKey, nextOrganizer);
       focusFirstAvailableResult(nextOrganizer);
-      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
+      queryClient.invalidateQueries({ queryKey: QK.organizerCount });
+      queryClient.invalidateQueries({ queryKey: QK.stats });
     }
 
     try {
@@ -162,8 +163,8 @@ export function useOrganizerDeleteActions({
         queryClient.setQueryData(queryKey, previousOrganizer);
         focusFirstAvailableResult(previousOrganizer);
       }
-      queryClient.invalidateQueries({ queryKey: ['organizer-count'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
+      queryClient.invalidateQueries({ queryKey: QK.organizerCount });
+      queryClient.invalidateQueries({ queryKey: QK.stats });
       throw error;
     }
   }, [closeModal, clearSelectedRows, queryClient, focusFirstAvailableResult, refreshOrganizer, toast, t, queryKey]);

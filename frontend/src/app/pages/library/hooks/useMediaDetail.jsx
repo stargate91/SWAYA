@@ -7,6 +7,7 @@ import { useSettingsQuery } from '@/queries/settingsQueries';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import { API_BASE } from '@/lib/backend';
 import api from '@/lib/api';
+import { QK } from '@/lib/queryKeys';
 import { isMovieMediaType, isSceneMediaType } from '@/lib/mediaTypes';
 import {
   getDurationText,
@@ -119,7 +120,7 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
     if (prevIsPlaying.current !== isPlaying) {
       queryClient.invalidateQueries({ queryKey: ['library-item-detail'] });
       queryClient.invalidateQueries({ queryKey: ['library-tv-detail'] });
-      queryClient.invalidateQueries({ queryKey: ['watched-history'] });
+      queryClient.invalidateQueries({ queryKey: QK.watchedHistory });
     }
     prevIsPlaying.current = isPlaying;
   }, [isPlaying, queryClient]);

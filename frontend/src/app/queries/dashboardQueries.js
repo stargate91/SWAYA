@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
+import { QK } from '../lib/queryKeys';
 
 export const useContinueWatchingQuery = (params) => useQuery({
   queryKey: ['continue-watching', params],
@@ -16,7 +17,7 @@ export const useAddToWatchlistMutation = () => {
   return useMutation({
     mutationFn: ({ tmdbId, type }) => api.recommendations.addToWatchlist(tmdbId, type),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['recommendations'] });
+      queryClient.invalidateQueries({ queryKey: QK.recommendations });
     },
   });
 };
@@ -26,7 +27,7 @@ export const useRemoveFromWatchlistMutation = () => {
   return useMutation({
     mutationFn: (tmdbId) => api.recommendations.removeFromWatchlist(tmdbId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['recommendations'] });
+      queryClient.invalidateQueries({ queryKey: QK.recommendations });
     },
   });
 };
