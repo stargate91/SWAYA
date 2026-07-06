@@ -39,14 +39,11 @@ export const normalizeMediaType = (value, fallback = null) => {
   return normalizeMediaType(fallback, null);
 };
 
-export const isMovieMediaType = (value) => {
-  const mediaType = normalizeMediaType(value);
-  return mediaType === MEDIA_TYPES.MOVIE || mediaType === MEDIA_TYPES.JAV;
-};
+export const isMovieMediaType = (value) => normalizeMediaType(value) === MEDIA_TYPES.MOVIE;
 
 export const isSceneMediaType = (value) => normalizeMediaType(value) === MEDIA_TYPES.SCENE;
 
-export const isJavMediaType = (value) => normalizeMediaType(value) === MEDIA_TYPES.JAV;
+
 
 export const isSeasonMediaType = (value) => normalizeMediaType(value) === MEDIA_TYPES.SEASON;
 
