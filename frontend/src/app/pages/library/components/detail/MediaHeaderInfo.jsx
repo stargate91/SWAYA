@@ -151,7 +151,7 @@ export default function MediaHeaderInfo({ isFallbackGrid = false }) {
             <div className="media-detail-page__meta-row">
               {normalizedGenres.map((genre, idx) => (
                 <Pill key={idx} variant="meta">
-                  {t(`library.genres.${genre}`, genre).toUpperCase()}
+                  {t(`library.genres.${genre}`, { defaultValue: genre }).toUpperCase()}
                 </Pill>
               ))}
             </div>

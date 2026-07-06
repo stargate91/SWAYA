@@ -105,6 +105,8 @@ export default function PaginationBar({
   onPageChange,
   onPageSizeChange,
   labels = {},
+  paginationMode = 'pages',
+  onPaginationModeChange,
 }) {
   const { t } = useTranslation();
 
@@ -114,7 +116,7 @@ export default function PaginationBar({
         <span>{summaryText}</span>
       </div>
       <div className="ui-pagination__controls">
-        {showPageSizes ? (
+        {showPageSizes && paginationMode !== 'infinite' ? (
           <PaginationPageSizes
             pageSize={pageSize}
             pageSizeOptions={pageSizeOptions}
@@ -122,49 +124,99 @@ export default function PaginationBar({
             ariaLabel={labels.pageSizesAriaLabel ?? t('pagination.rowsPerPage')}
           />
         ) : null}
-        <div className="ui-pagination__nav">
-          <Button
-            type="button"
-            variant="secondary-neutral"
-            size="sm"
-            className="ui-pagination__button"
-            onClick={() => onPageChange?.(1)}
-            disabled={currentPage === 1}
-          >
-            {(labels.first ?? t('pagination.first')) || 'First'}
-          </Button>
-          <Button
-            type="button"
-            variant="secondary-neutral"
-            size="sm"
-            className="ui-pagination__button"
-            onClick={() => onPageChange?.(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-          >
-            {(labels.prev ?? t('pagination.prev')) || 'Prev'}
-          </Button>
-          <PaginationPageEditor currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
-          <Button
-            type="button"
-            variant="secondary-neutral"
-            size="sm"
-            className="ui-pagination__button"
-            onClick={() => onPageChange?.(Math.min(totalPages, currentPage + 1))}
-            disabled={currentPage === totalPages}
-          >
-            {(labels.next ?? t('pagination.next')) || 'Next'}
-          </Button>
-          <Button
-            type="button"
-            variant="secondary-neutral"
-            size="sm"
-            className="ui-pagination__button"
-            onClick={() => onPageChange?.(totalPages)}
-            disabled={currentPage === totalPages}
-          >
-            {(labels.last ?? t('pagination.last')) || 'Last'}
-          </Button>
-        </div>
+        
+        {paginationMode === 'infinite' ? (
+          <div className="ui-pagination__nav">
+            {onPaginationModeChange ? (
+              <div className="ui-pagination__modes">
+                <Button
+                  type="button"
+                  variant="secondary-neutral"
+                  size="sm"
+                  className="ui-pagination__button"
+                  onClick={() => onPaginationModeChange('pages')}
+                >
+                  {t('pagination.modePages') || 'Pages'}
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary-neutral"
+                  size="sm"
+                  className="ui-pagination__button is-active"
+                  onClick={() => onPaginationModeChange('infinite')}
+                >
+                  {t('pagination.modeInfinite') || 'Infinite'}
+                </Button>
+              </div>
+            ) : null}
+          </div>
+        ) : (
+          <div className="ui-pagination__nav">
+            {onPaginationModeChange ? (
+              <div className="ui-pagination__modes" style={{ marginRight: '16px' }}>
+                <Button
+                  type="button"
+                  variant="secondary-neutral"
+                  size="sm"
+                  className="ui-pagination__button is-active"
+                  onClick={() => onPaginationModeChange('pages')}
+                >
+                  {t('pagination.modePages') || 'Pages'}
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary-neutral"
+                  size="sm"
+                  className="ui-pagination__button"
+                  onClick={() => onPaginationModeChange('infinite')}
+                >
+                  {t('pagination.modeInfinite') || 'Infinite'}
+                </Button>
+              </div>
+            ) : null}
+            <Button
+              type="button"
+              variant="secondary-neutral"
+              size="sm"
+              className="ui-pagination__button"
+              onClick={() => onPageChange?.(1)}
+              disabled={currentPage === 1}
+            >
+              {(labels.first ?? t('pagination.first')) || 'First'}
+            </Button>
+            <Button
+              type="button"
+              variant="secondary-neutral"
+              size="sm"
+              className="ui-pagination__button"
+              onClick={() => onPageChange?.(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+            >
+              {(labels.prev ?? t('pagination.prev')) || 'Prev'}
+            </Button>
+            <PaginationPageEditor currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
+            <Button
+              type="button"
+              variant="secondary-neutral"
+              size="sm"
+              className="ui-pagination__button"
+              onClick={() => onPageChange?.(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages}
+            >
+              {(labels.next ?? t('pagination.next')) || 'Next'}
+            </Button>
+            <Button
+              type="button"
+              variant="secondary-neutral"
+              size="sm"
+              className="ui-pagination__button"
+              onClick={() => onPageChange?.(totalPages)}
+              disabled={currentPage === totalPages}
+            >
+              {(labels.last ?? t('pagination.last')) || 'Last'}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

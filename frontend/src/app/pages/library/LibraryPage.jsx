@@ -7,7 +7,7 @@ import LibraryFilters from './components/LibraryFilters';
 import LibraryGrid from './components/LibraryGrid';
 import { useDeleteTagMutation } from '@/queries';
 import { X } from '@/ui/icons';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { isLibraryTagsTab } from '@/lib/libraryTabs';
 import { useUi } from '@/providers/UiProvider';
@@ -52,13 +52,42 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
   
   // Smooth scroll to top after page change finishes loading new data
   useEffect(() => {
+    if (state.paginationMode === 'infinite') return;
     if (!state.isDataLoading) {
       const container = document.querySelector('.shell__content');
       if (container) {
         container.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
-  }, [state.currentPage, state.isDataLoading]);
+  }, [state.currentPage, state.isDataLoading, state.paginationMode]);
+
+  const sentinelRef = useRef(null);
+
+  useEffect(() => {
+    if (state.paginationMode !== 'infinite') return;
+    if (state.currentPage >= state.totalPages) return;
+    if (state.isDataLoading) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          state.setCurrentPage(state.currentPage + 1);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentSentinel = sentinelRef.current;
+    if (currentSentinel) {
+      observer.observe(currentSentinel);
+    }
+
+    return () => {
+      if (currentSentinel) {
+        observer.unobserve(currentSentinel);
+      }
+    };
+  }, [state.paginationMode, state.currentPage, state.totalPages, state.isDataLoading, state.setCurrentPage]);
 
 
 
@@ -213,6 +242,12 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
             onEditImage={setImagePickerData}
             sortKey={state.sortKey}
           />
+
+          {state.paginationMode === 'infinite' && state.currentPage < state.totalPages && (
+            <div ref={sentinelRef} className="library-infinite-sentinel" style={{ height: '30px', margin: '20px 0', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <div className="library-spinner" style={{ width: '24px', height: '24px' }} />
+            </div>
+          )}
 
           <LibraryPagination
             state={state}

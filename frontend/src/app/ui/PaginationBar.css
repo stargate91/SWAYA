@@ -113,3 +113,27 @@
   border-color: var(--color-accent-blue);
   box-shadow: 0 0 0 1px var(--color-accent-blue);
 }
+
+.ui-pagination__modes {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+  background: var(--color-surface-sunken);
+}
+
+.ui-pagination__modes .ui-pagination__button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: var(--radius-xs);
+}
+
+.ui-pagination__modes .ui-pagination__button.is-active {
+  background: var(--color-surface-card);
+  color: var(--color-accent-blue);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+

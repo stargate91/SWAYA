@@ -26,6 +26,8 @@ export default function LibraryPagination({
       onPageChange={state.setCurrentPage}
       onPageSizeChange={showPageSizes ? state.setPageSize : undefined}
       labels={state.t('organizer.pagination')}
+      paginationMode={state.paginationMode}
+      onPaginationModeChange={state.setPaginationMode}
     />
   );
 }

@@ -128,7 +128,7 @@ const TMDBDiscoveryWidget = ({ T }) => {
   const translatedGenres = useMemo(() => {
     return GENRES.map(g => ({
       value: g.value,
-      label: g.value === '' ? (T('dashboard.recommendations.genres_all') || 'All Genres') : (T(`library.genres.${g.label}`, g.label) || g.label)
+      label: g.value === '' ? (T('dashboard.recommendations.genres_all') || 'All Genres') : (T(`library.genres.${g.label}`, { defaultValue: g.label }) || g.label)
     }));
   }, [T]);
 

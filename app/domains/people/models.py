@@ -229,10 +229,36 @@ class Person(Base):
             self.same_sex_only = same_sex_only
         if breast_type:
             self.breast_type = breast_type
+        # Check if manual butt_size is explicitly provided
+        manual_link = next((x for x in self.external_links if x.provider == Provider.MANUAL), None)
+        has_manual_butt_size = manual_link and manual_link.source_data and manual_link.source_data.get("butt_size")
+        
+        if not has_manual_butt_size:
+            if height is not None and waist is not None and hip is not None:
+                try:
+                    height_in = float(height) / 2.54
+                    fah = float(hip) / (height_in * 0.53)
+                    whr = float(waist) / float(hip)
+                    ccf = 0.72 / whr
+                    bcs = float(hip) * fah * ccf
+                    
+                    if bcs < 33:
+                        butt_size = "SMALL"
+                    elif bcs < 40:
+                        butt_size = "MEDIUM"
+                    elif bcs < 50:
+                        butt_size = "BIG"
+                    else:
+                        butt_size = "EXTRA_BIG"
+                except (ValueError, TypeError, ZeroDivisionError):
+                    pass
+
         if butt_shape:
             self.butt_shape = butt_shape
         if butt_size:
             self.butt_size = butt_size
+        else:
+            self.butt_size = None
         if career_start_year is not None:
             self.career_start_year = career_start_year
         if career_end_year is not None:

@@ -572,7 +572,8 @@
     "buttSizes": {
       "small": "Small",
       "medium": "Medium",
-      "big": "Big"
+      "big": "Big",
+      "extra_big": "Extra Big"
     },
     "breastTypes": {
       "natural": "Natural",

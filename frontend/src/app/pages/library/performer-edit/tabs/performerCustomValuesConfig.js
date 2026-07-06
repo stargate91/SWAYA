@@ -75,6 +75,7 @@ export const getButtSizeOptions = (t) => [
   { value: 'SMALL', label: t('library.performerEdit.buttSizes.small') || 'Small' },
   { value: 'MEDIUM', label: t('library.performerEdit.buttSizes.medium') || 'Medium' },
   { value: 'BIG', label: t('library.performerEdit.buttSizes.big') || 'Big' },
+  { value: 'EXTRA_BIG', label: t('library.performerEdit.buttSizes.extra_big') || 'Extra Big' },
 ];
 
 export const getDropdownOptions = (standardOptions, currentValue) => {

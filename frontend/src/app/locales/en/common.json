@@ -42,7 +42,9 @@
     "first": "First",
     "prev": "Prev",
     "next": "Next",
-    "last": "Last"
+    "last": "Last",
+    "modePages": "Pages",
+    "modeInfinite": "Infinite"
   },
   "dropdown": {
     "ascending": "Ascending",

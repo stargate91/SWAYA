@@ -51,6 +51,22 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
   const [pageSize, setPageSize] = useState(40);
   const [sortKey, setSortKey] = useState('title');
   const [sortDirection, setSortDirection] = useState('asc');
+  const [paginationMode, setPaginationModeState] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('library_pagination_mode') || 'pages';
+    }
+    return 'pages';
+  });
+
+  const setPaginationMode = (mode) => {
+    setPaginationModeState(mode);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('library_pagination_mode', mode);
+    }
+    setCurrentPage(1);
+  };
+
+  const [accumulatedItems, setAccumulatedItems] = useState([]);
 
   const { sessionMode, setSessionMode } = useLibraryModeStore();
 
@@ -164,7 +180,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
 
   const { data: filterData } = useLibraryFiltersQuery(
     !isCollections && !isTags && activeSessionMode
-      ? { tab: backendTab, filter_ownership: ownershipFilter, include_adult: activeSessionMode === 'nsfw' }
+      ? { tab: backendTab, filter_ownership: ownershipFilter, include_adult: activeSessionMode === 'nsfw', lang: settings?.primary_metadata_language }
       : null
   );
 
@@ -319,11 +335,39 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
 
   const localFilteredItems = useLocalListSearch(allItems, searchQuery);
 
+  const filterParamsHash = useMemo(() => {
+    if (!libraryQueryParams) return '';
+    const { page, ...rest } = libraryQueryParams;
+    return JSON.stringify(rest);
+  }, [libraryQueryParams]);
+
+  useEffect(() => {
+    setAccumulatedItems([]);
+  }, [filterParamsHash]);
+
+  useEffect(() => {
+    if (paginationMode === 'infinite') {
+      if (isServerPaged && libraryData?.items) {
+        if (currentPage === 1) {
+          setAccumulatedItems(libraryData.items);
+        } else {
+          setAccumulatedItems((prev) => {
+            const prevIds = new Set(prev.map(item => item.id));
+            const newItems = libraryData.items.filter(item => !prevIds.has(item.id));
+            return [...prev, ...newItems];
+          });
+        }
+      }
+    } else {
+      setAccumulatedItems([]);
+    }
+  }, [libraryData?.items, currentPage, paginationMode, isServerPaged]);
+
   const { sortedItems, paginatedItems, totalItems, totalPages } = useMemo(() => {
     if (isServerPaged) {
       return {
         sortedItems: allItems,
-        paginatedItems: allItems,
+        paginatedItems: paginationMode === 'infinite' ? accumulatedItems : allItems,
         totalItems: libraryData?.total_items || 0,
         totalPages: libraryData?.total_pages || 1,
       };
@@ -343,7 +387,9 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     const sorted = sortLibraryItems(filtered, resolvedTab, sortKey, sortDirection);
     const total = sorted.length;
     const pages = Math.max(1, Math.ceil(total / pageSize));
-    const paginated = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+    const paginated = paginationMode === 'infinite'
+      ? sorted.slice(0, currentPage * pageSize)
+      : sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
     return {
       sortedItems: sorted,
@@ -364,6 +410,8 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     sortDirection,
     currentPage,
     pageSize,
+    paginationMode,
+    accumulatedItems,
   ]);
 
   // Background Prefetch next/prev pages
@@ -522,6 +570,8 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     setSessionMode: handleSetSessionMode,
     selectedTags,
     setSelectedTags: handleFilterChange(setSelectedTags),
+    paginationMode,
+    setPaginationMode,
   };
 }
 

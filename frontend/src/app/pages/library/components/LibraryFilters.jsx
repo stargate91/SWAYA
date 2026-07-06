@@ -316,7 +316,7 @@ export default function LibraryFilters({
               }}
               options={[
                 { value: '', label: t('library.filter.allGenres') || 'All Genres' },
-                ...(filterData?.genres || []).map(g => ({ value: g, label: t(`library.genres.${g}`, g) })),
+                ...(filterData?.genres || []).map(g => ({ value: g, label: t(`library.genres.${g}`, { defaultValue: g }) })),
               ]}
             />
           </div>
