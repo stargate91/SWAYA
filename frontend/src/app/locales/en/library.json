@@ -206,6 +206,11 @@
     "hourglassRatio": "Hourglass Ratio",
     "bodySlender": "Slender / Athletic",
     "bodyCurvy": "Hourglass / Curvy",
+    "watchCount": "Watch Count",
+    "tagCount": "Tag Count",
+    "finishCount": "Finish Count",
+    "lastFinish": "Last Finish",
+    "random": "Random",
     "libraryCountValue_one": "{{count}} item",
     "libraryCountValue_other": "{{count}} items",
     "libraryCountValue": "{{count}} items"

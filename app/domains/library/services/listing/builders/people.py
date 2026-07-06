@@ -99,10 +99,34 @@ class PeopleQueryBuilder:
             people_items.sort(key=lambda item: (-(item.library_count or 0), -(item.rating or 0.0), (item.name or "").lower()))
         elif params.sort_by == "library_count_asc":
             people_items.sort(key=lambda item: ((item.library_count or 0), (item.rating or 0.0), (item.name or "").lower()))
-        elif params.sort_by in ("rating_desc", "user_rating_desc", "popularity_desc"):
+        elif params.sort_by == "watch_count_desc":
+            people_items.sort(key=lambda item: (-(item.watch_count or 0), -(item.library_count or 0), (item.name or "").lower()))
+        elif params.sort_by == "watch_count_asc":
+            people_items.sort(key=lambda item: ((item.watch_count or 0), (item.library_count or 0), (item.name or "").lower()))
+        elif params.sort_by == "last_watched_desc":
+            people_items.sort(key=lambda item: (item.last_watched_at or "0000-00-00T00:00:00", (item.name or "").lower()), reverse=True)
+        elif params.sort_by == "last_watched_asc":
+            people_items.sort(key=lambda item: (item.last_watched_at or "9999-12-31T23:59:59", (item.name or "").lower()))
+        elif params.sort_by == "tag_count_desc":
+            people_items.sort(key=lambda item: (-(item.tag_count or 0), (item.name or "").lower()))
+        elif params.sort_by == "tag_count_asc":
+            people_items.sort(key=lambda item: ((item.tag_count or 0), (item.name or "").lower()))
+        elif params.sort_by == "finish_count_desc":
+            people_items.sort(key=lambda item: (-(item.finish_count or 0), -(item.library_count or 0), (item.name or "").lower()))
+        elif params.sort_by == "finish_count_asc":
+            people_items.sort(key=lambda item: ((item.finish_count or 0), (item.library_count or 0), (item.name or "").lower()))
+        elif params.sort_by == "last_finish_desc":
+            people_items.sort(key=lambda item: (item.last_finish_at or "0000-00-00T00:00:00", (item.name or "").lower()), reverse=True)
+        elif params.sort_by == "last_finish_asc":
+            people_items.sort(key=lambda item: (item.last_finish_at or "9999-12-31T23:59:59", (item.name or "").lower()))
+        elif params.sort_by in ("rating_desc", "user_rating_desc"):
             people_items.sort(key=lambda item: (-(item.user_rating if item.user_rating is not None else item.rating or 0.0), -(item.library_count or 0), (item.name or "").lower()))
-        elif params.sort_by in ("user_rating_asc", "popularity_asc"):
+        elif params.sort_by in ("user_rating_asc", "rating_asc"):
             people_items.sort(key=lambda item: ((item.user_rating if item.user_rating is not None else item.rating or 0.0), (item.library_count or 0), (item.name or "").lower()))
+        elif params.sort_by == "popularity_desc":
+            people_items.sort(key=lambda item: (-(item.popularity or 0.0), -(item.library_count or 0), (item.name or "").lower()))
+        elif params.sort_by == "popularity_asc":
+            people_items.sort(key=lambda item: ((item.popularity or 0.0), (item.library_count or 0), (item.name or "").lower()))
         elif params.sort_by in ("birthday", "birthday_desc"):
             people_items.sort(key=lambda item: (item.birthday or "0000-00-00", (item.name or "").lower()), reverse=True)
         elif params.sort_by == "birthday_asc":
@@ -244,6 +268,9 @@ class PeopleQueryBuilder:
                 ))
         elif params.sort_by in ("name_desc", "title_desc"):
             people_items.sort(key=lambda item: (item.name or "").lower(), reverse=True)
+        elif params.sort_by in ("random", "random_desc", "random_asc"):
+            import random
+            random.shuffle(people_items)
         else:
             people_items.sort(key=lambda item: (item.name or "").lower())
 
@@ -259,6 +286,7 @@ class PeopleQueryBuilder:
                 "poster_path": item.poster_path,
                 "backdrop_path": None,
                 "rating": item.rating,
+                "popularity": item.popularity,
                 "rating_porndb": item.rating_porndb,
                 "rating_imdb": None,
                 "type": item.type,
@@ -289,6 +317,11 @@ class PeopleQueryBuilder:
                 "tattoos": item.tattoos,
                 "piercings": item.piercings,
                 "breast_type": item.breast_type,
+                "last_watched_at": item.last_watched_at,
+                "watch_count": item.watch_count,
+                "tag_count": item.tag_count,
+                "finish_count": item.finish_count,
+                "last_finish_at": item.last_finish_at,
             }
             for item in paged_people
         ]

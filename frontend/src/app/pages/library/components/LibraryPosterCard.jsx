@@ -1,4 +1,4 @@
- 
+
 import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, Pencil, Play } from '@/ui/icons';
@@ -123,7 +123,7 @@ export const LibraryPosterCard = memo(({
   } else if (isPeople) {
     title = item.name || item.title;
     const isPhysicalSort = ['height', 'weight', 'cup_size', 'waist', 'hip', 'hourglass_ratio', 'body_slender', 'body_curvy'].includes(sortKey);
-    const isMetadataSort = ['birthday', 'rating', 'library_count'].includes(sortKey);
+    const isMetadataSort = ['birthday', 'rating', 'popularity', 'library_count', 'last_watched', 'watch_count', 'tag_count', 'finish_count', 'last_finish'].includes(sortKey);
     if (isPhysicalSort || isMetadataSort) {
       if (sortKey === 'height') {
         subtitle = item.height ? `${item.height} cm` : '—';
@@ -163,10 +163,26 @@ export const LibraryPosterCard = memo(({
           subtitle = '—';
         }
       } else if (sortKey === 'rating') {
+        if (item.is_adult_person || item.rating_porndb) {
+          subtitle = item.rating_porndb ? `PornDB Rating: ${Number(item.rating_porndb).toFixed(1)}` : '—';
+        } else {
+          subtitle = item.popularity ? `Popularity: ${Number(item.popularity).toFixed(1)}` : '—';
+        }
+      } else if (sortKey === 'popularity') {
         subtitle = item.popularity ? `Popularity: ${Number(item.popularity).toFixed(1)}` : '—';
       } else if (sortKey === 'library_count') {
         const count = item.library_count || 0;
         subtitle = t('library.sort.libraryCountValue', { count }) || `${count} items`;
+      } else if (sortKey === 'last_watched') {
+        subtitle = item.last_watched_at ? `Last Watched: ${item.last_watched_at.substring(0, 10)}` : '—';
+      } else if (sortKey === 'watch_count') {
+        subtitle = `Watch Count: ${item.watch_count || 0}`;
+      } else if (sortKey === 'tag_count') {
+        subtitle = `Tags: ${item.tag_count || 0}`;
+      } else if (sortKey === 'finish_count') {
+        subtitle = `Finish Count: ${item.finish_count || 0}`;
+      } else if (sortKey === 'last_finish') {
+        subtitle = item.last_finish_at ? `Last Finish: ${item.last_finish_at.substring(0, 10)}` : '—';
       }
     } else {
       subtitle = item.people_role ? t(`library.people.roles.${item.people_role}`, { defaultValue: item.people_role }) : '';

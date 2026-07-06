@@ -32,6 +32,7 @@ export {
   Database,
   DollarSign,
   Download,
+  Droplets,
   Edit2,
   Edit3,
   ExternalLink,

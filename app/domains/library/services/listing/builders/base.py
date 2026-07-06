@@ -229,6 +229,71 @@ class BaseQueryBuilder:
                 ))
                 joined_override = True
             query = query.order_by(UserOverride.last_watched_at.asc())
+        elif params.sort_by in ("watch_count_desc", "watch_count_asc"):
+            if not joined_override:
+                query = query.outerjoin(UserOverride, and_(
+                    or_(
+                        UserOverride.metadata_match_id == MetadataMatch.id,
+                        and_(
+                            UserOverride.metadata_match_id.is_(None),
+                            UserOverride.media_item_id == MetadataMatch.media_item_id
+                        )
+                    ),
+                    UserOverride.user_id == self.current_user_id
+                ))
+                joined_override = True
+            if params.sort_by == "watch_count_desc":
+                query = query.order_by(desc(func.coalesce(UserOverride.watch_count, 0)))
+            else:
+                query = query.order_by(func.coalesce(UserOverride.watch_count, 0).asc())
+        elif params.sort_by in ("tag_count_desc", "tag_count_asc"):
+            if not joined_override:
+                query = query.outerjoin(UserOverride, and_(
+                    or_(
+                        UserOverride.metadata_match_id == MetadataMatch.id,
+                        and_(
+                            UserOverride.metadata_match_id.is_(None),
+                            UserOverride.media_item_id == MetadataMatch.media_item_id
+                        )
+                    ),
+                    UserOverride.user_id == self.current_user_id
+                ))
+                joined_override = True
+            tag_subquery = self.db.query(
+                UserOverride.id.label("override_id"),
+                func.count(user_override_tags.c.tag_id).label("tag_count")
+            ).join(
+                user_override_tags, UserOverride.id == user_override_tags.c.user_override_id
+            ).group_by(UserOverride.id).subquery()
+            query = query.outerjoin(tag_subquery, UserOverride.id == tag_subquery.c.override_id)
+            if params.sort_by == "tag_count_desc":
+                query = query.order_by(desc(func.coalesce(tag_subquery.c.tag_count, 0)))
+            else:
+                query = query.order_by(func.coalesce(tag_subquery.c.tag_count, 0).asc())
+        elif params.sort_by in ("finish_count_desc", "finish_count_asc"):
+            from app.domains.history.models import PlaybackPeakLog
+            peak_subquery = self.db.query(
+                PlaybackPeakLog.media_item_id,
+                func.count(PlaybackPeakLog.id).label("finish_count")
+            ).group_by(PlaybackPeakLog.media_item_id).subquery()
+            query = query.outerjoin(peak_subquery, MetadataMatch.media_item_id == peak_subquery.c.media_item_id)
+            if params.sort_by == "finish_count_desc":
+                query = query.order_by(desc(func.coalesce(peak_subquery.c.finish_count, 0)))
+            else:
+                query = query.order_by(func.coalesce(peak_subquery.c.finish_count, 0).asc())
+        elif params.sort_by in ("last_finish_desc", "last_finish_asc"):
+            from app.domains.history.models import PlaybackPeakLog
+            peak_subquery = self.db.query(
+                PlaybackPeakLog.media_item_id,
+                func.max(PlaybackPeakLog.created_at).label("last_finish_at")
+            ).group_by(PlaybackPeakLog.media_item_id).subquery()
+            query = query.outerjoin(peak_subquery, MetadataMatch.media_item_id == peak_subquery.c.media_item_id)
+            if params.sort_by == "last_finish_desc":
+                query = query.order_by(desc(peak_subquery.c.last_finish_at))
+            else:
+                query = query.order_by(peak_subquery.c.last_finish_at.asc())
+        elif params.sort_by in ("random", "random_desc", "random_asc"):
+            query = query.order_by(func.random())
 
         return query
 

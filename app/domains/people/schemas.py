@@ -93,6 +93,11 @@ class PeopleGroupItem(BaseModel, NumericAttributesMixin):
     breast_type: Optional[str] = None
     butt_shape: Optional[str] = None
     butt_size: Optional[str] = None
+    last_watched_at: Optional[str] = None
+    watch_count: int = 0
+    tag_count: int = 0
+    finish_count: int = 0
+    last_finish_at: Optional[str] = None
 
 class PersonSearchItem(BaseModel, NumericAttributesMixin):
     id: int

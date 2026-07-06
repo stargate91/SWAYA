@@ -141,9 +141,19 @@ export default function LibraryFilters({
                     ? [
                       { value: 'library_count', label: t('library.sort.libraryCount') || 'Library Count' },
                       { value: 'rating', label: activeSessionMode === 'nsfw' ? (t('library.sort.porndbPerformerRating') || 'PornDB performer rating') : (t('library.sort.popularity') || 'Popularity') },
+                      ...(activeSessionMode === 'nsfw' ? [
+                        { value: 'popularity', label: t('library.sort.popularity') || 'Popularity' },
+                      ] : []),
                       { value: 'name', label: t('library.sort.name') || 'Name' },
                       { value: 'birthday', label: t('library.sort.birthday') || 'Birthdate' },
                       { value: 'user_rating', label: t('library.sort.userRating') || 'User Rating' },
+                      { value: 'last_watched', label: t('library.sort.lastWatched') || 'Last Watched' },
+                      { value: 'watch_count', label: t('library.sort.watchCount') || 'Watch Count' },
+                      { value: 'tag_count', label: t('library.sort.tagCount') || 'Tag Count' },
+                      ...(activeSessionMode === 'nsfw' ? [
+                        { value: 'finish_count', label: t('library.sort.finishCount') || 'Finish Count' },
+                        { value: 'last_finish', label: t('library.sort.lastFinish') || 'Last Finish' },
+                      ] : []),
                       { value: 'height', label: t('library.sort.height') || 'Height' },
                       { value: 'weight', label: t('library.sort.weight') || 'Weight' },
                       { value: 'cup_size', label: t('library.sort.cupSize') || 'Breast Size' },
@@ -151,7 +161,8 @@ export default function LibraryFilters({
                       { value: 'hip', label: t('library.sort.hip') || 'Hip Size' },
                       { value: 'hourglass_ratio', label: t('library.sort.hourglassRatio') || 'Hourglass Ratio' },
                       { value: 'body_slender', label: t('library.sort.bodySlender') || 'Slender / Athletic' },
-                      { value: 'body_curvy', label: t('library.sort.bodyCurvy') || 'Hourglass / Curvy' }
+                      { value: 'body_curvy', label: t('library.sort.bodyCurvy') || 'Hourglass / Curvy' },
+                      { value: 'random', label: t('library.sort.random') || 'Random' }
                     ]
                     : [
                       { value: 'title', label: t('library.sort.title') || 'Title' },
@@ -163,10 +174,17 @@ export default function LibraryFilters({
                       ] : []),
                       { value: 'user_rating', label: t('library.sort.userRating') || 'User Rating' },
                       { value: 'duration', label: t('library.sort.duration') || 'Duration' },
+                      { value: 'tag_count', label: t('library.sort.tagCount') || 'Tag Count' },
                       ...(ownershipFilter !== 'unowned' ? [
                         { value: 'file_size', label: t('library.sort.fileSize') || 'File Size' },
                         { value: 'last_watched', label: t('library.sort.lastWatched') || 'Last Watched' },
+                        { value: 'watch_count', label: t('library.sort.watchCount') || 'Watch Count' },
+                        ...(activeSessionMode === 'nsfw' ? [
+                          { value: 'finish_count', label: t('library.sort.finishCount') || 'Finish Count' },
+                          { value: 'last_finish', label: t('library.sort.lastFinish') || 'Last Finish' },
+                        ] : []),
                       ] : []),
+                      { value: 'random', label: t('library.sort.random') || 'Random' }
                     ]
               }
             />

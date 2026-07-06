@@ -72,6 +72,106 @@ class PeopleLibraryService:
             for pid, matches_set in person_projects.items()
         }
 
+        # Calculate watch, tag and finish counts for sorting/display
+        from app.domains.metadata.models import MetadataMatch
+        from app.domains.history.models import PlaybackLog, PlaybackPeakLog
+        from sqlalchemy import func
+
+        match_media_map = {}
+        if all_valid_match_ids:
+            match_media_map = dict(
+                self.db.query(MetadataMatch.id, MetadataMatch.media_item_id)
+                .filter(MetadataMatch.id.in_(all_valid_match_ids))
+                .all()
+            )
+
+        person_media_items = {}
+        for person_id, match_id in links:
+            media_item_id = match_media_map.get(match_id)
+            if media_item_id:
+                if person_id not in person_media_items:
+                    person_media_items[person_id] = set()
+                person_media_items[person_id].add(media_item_id)
+
+        all_linked_media_item_ids = set()
+        for media_ids in person_media_items.values():
+            all_linked_media_item_ids.update(media_ids)
+
+        media_watch_counts = {}
+        media_last_watch = {}
+        media_finish_counts = {}
+        media_last_finish = {}
+
+        if all_linked_media_item_ids:
+            playback_logs = self.db.query(
+                PlaybackLog.media_item_id,
+                PlaybackLog.watched_at
+            ).filter(
+                PlaybackLog.media_item_id.in_(list(all_linked_media_item_ids)),
+                PlaybackLog.user_id == self.user_id
+            ).all()
+
+            for media_id, watched_at in playback_logs:
+                media_watch_counts[media_id] = media_watch_counts.get(media_id, 0) + 1
+                if media_id not in media_last_watch or watched_at > media_last_watch[media_id]:
+                    media_last_watch[media_id] = watched_at
+
+            peak_logs = self.db.query(
+                PlaybackPeakLog.media_item_id,
+                PlaybackPeakLog.created_at
+            ).filter(
+                PlaybackPeakLog.media_item_id.in_(list(all_linked_media_item_ids)),
+                PlaybackPeakLog.user_id == self.user_id
+            ).all()
+
+            for media_id, created_at in peak_logs:
+                media_finish_counts[media_id] = media_finish_counts.get(media_id, 0) + 1
+                if media_id not in media_last_finish or created_at > media_last_finish[media_id]:
+                    media_last_finish[media_id] = created_at
+
+        person_watch_counts = {}
+        person_last_watch = {}
+        person_finish_counts = {}
+        person_last_finish = {}
+
+        for pid, media_ids in person_media_items.items():
+            w_count = 0
+            l_watch = None
+            for mid in media_ids:
+                w_count += media_watch_counts.get(mid, 0)
+                watched = media_last_watch.get(mid)
+                if watched:
+                    if l_watch is None or watched > l_watch:
+                        l_watch = watched
+            person_watch_counts[pid] = w_count
+            person_last_watch[pid] = l_watch
+
+            f_count = 0
+            l_finish = None
+            for mid in media_ids:
+                f_count += media_finish_counts.get(mid, 0)
+                finished = media_last_finish.get(mid)
+                if finished:
+                    if l_finish is None or finished > l_finish:
+                        l_finish = finished
+            person_finish_counts[pid] = f_count
+            person_last_finish[pid] = l_finish
+
+        from app.domains.users.models import UserOverride, user_override_tags
+        tag_counts = dict(
+            self.db.query(
+                UserOverride.person_id,
+                func.count(user_override_tags.c.tag_id)
+            ).join(
+                user_override_tags, UserOverride.id == user_override_tags.c.user_override_id
+            ).filter(
+                UserOverride.person_id.isnot(None),
+                UserOverride.user_id == self.user_id
+            ).group_by(
+                UserOverride.person_id
+            ).all()
+        )
+
         # Fetch people
         query = self.db.query(Person).options(
             selectinload(Person.media_links)
@@ -142,6 +242,11 @@ class PeopleLibraryService:
                 breast_type=person.breast_type,
                 butt_shape=person.butt_shape,
                 butt_size=person.butt_size,
+                last_watched_at=person_last_watch.get(person.id).isoformat() if person_last_watch.get(person.id) else None,
+                watch_count=person_watch_counts.get(person.id, 0),
+                tag_count=tag_counts.get(person.id, 0),
+                finish_count=person_finish_counts.get(person.id, 0),
+                last_finish_at=person_last_finish.get(person.id).isoformat() if person_last_finish.get(person.id) else None,
             ))
 
         return people_list
