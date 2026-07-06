@@ -23,18 +23,22 @@ class ProfileMerger:
 
         if override_dict and override_dict.get("custom_backdrop"):
             effective_backdrop = override_dict.get("custom_backdrop")
-        elif person.local_backdrop_path:
+
+        if not effective_backdrop and person.local_backdrop_path:
             from app.domains.media_assets.services.images import image_processing_service
             effective_backdrop = image_processing_service.resolve_image_url(
                 person.local_backdrop_path, "backdrops", size="original"
             )
-            source_tmdb_id = int(person.external_ids.get("tmdb")) if (person.external_ids and person.external_ids.get("tmdb") and person.external_ids.get("tmdb").isdigit()) else None
-        elif person.backdrop_path:
+            if effective_backdrop:
+                source_tmdb_id = int(person.external_ids.get("tmdb")) if (person.external_ids and person.external_ids.get("tmdb") and person.external_ids.get("tmdb").isdigit()) else None
+
+        if not effective_backdrop and person.backdrop_path:
             from app.domains.media_assets.services.images import image_processing_service
             effective_backdrop = image_processing_service.resolve_image_url(
                 person.backdrop_path, "backdrops", size="original"
             )
-            source_tmdb_id = int(person.external_ids.get("tmdb")) if (person.external_ids and person.external_ids.get("tmdb") and person.external_ids.get("tmdb").isdigit()) else None
+            if effective_backdrop:
+                source_tmdb_id = int(person.external_ids.get("tmdb")) if (person.external_ids and person.external_ids.get("tmdb") and person.external_ids.get("tmdb").isdigit()) else None
 
         if not effective_backdrop:
             from app.domains.people.models import MediaPersonLink
@@ -66,7 +70,7 @@ class ProfileMerger:
 
         if not effective_backdrop and person.external_ids and (person.external_ids.get("tmdb") or person.external_ids.get("tmdb_id")):
             from app.domains.people.helpers import resolve_person_known_for_backdrop
-            effective_backdrop, source_tmdb_id, source_media_type = resolve_person_known_for_backdrop(
+            raw_backdrop, source_tmdb_id, source_media_type = resolve_person_known_for_backdrop(
                 db,
                 tmdb_client,
                 known_for,
@@ -75,6 +79,11 @@ class ProfileMerger:
                 adult_only=person.is_adult,
                 respect_credit_order=True
             )
+            if raw_backdrop:
+                from app.domains.media_assets.services.images import image_processing_service
+                effective_backdrop = image_processing_service.resolve_image_url(
+                    raw_backdrop, "backdrops", size="original"
+                )
 
         return effective_backdrop, source_tmdb_id, source_media_type
 

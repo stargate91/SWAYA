@@ -51,78 +51,85 @@ class PersonDetailCollator:
             tmdb_id = person_id
             
         if tmdb_id:
-            try:
-                tmdb_details = self.tmdb.get_person_details(int(tmdb_id), language=ui_lang)
-                if tmdb_details:
-                    person.birthday = tmdb_details.get("birthday") or person.birthday
-                    person.place_of_birth = tmdb_details.get("place_of_birth") or person.place_of_birth
-                    person.deathday = tmdb_details.get("deathday") or person.deathday
-                    person.profile_path = tmdb_details.get("profile_path") or person.profile_path
-                    person.known_for_department = tmdb_details.get("known_for_department") or person.known_for_department
-                    person.homepage = tmdb_details.get("homepage") or person.homepage
-                    
-                    if tmdb_details.get("also_known_as"):
-                        aliases = list(person.aliases or [])
-                        for alias in tmdb_details["also_known_as"]:
-                            if alias not in aliases:
-                                aliases.append(alias)
-                        person.aliases = aliases
-                    
-                    profiles = tmdb_details.get("images", {}).get("profiles") or []
-                    new_imgs = [p.get("file_path") for p in profiles if p.get("file_path")]
-                    if person.profile_path:
-                        new_imgs.insert(0, person.profile_path)
-                    person.images = merge_images(person.images, new_imgs)
-                    
-                    if tmdb_details.get("biography"):
-                        if not loc:
-                            loc = PersonLocalization(person_id=person.id, locale=ui_lang, biography=tmdb_details["biography"])
-                            db.add(loc)
-                        else:
-                            loc.biography = tmdb_details["biography"]
-                    
-                    tmdb_link = next((x for x in person.external_links if x.provider == Provider.TMDB), None)
-                    if not tmdb_link:
-                        tmdb_link = ExternalSourceLink(
-                            person_id=person.id,
-                            provider=Provider.TMDB,
-                            external_id=str(tmdb_id),
-                        )
-                        db.add(tmdb_link)
-                        person.external_links.append(tmdb_link)
-                    
-                    tmdb_link.source_data = {
-                        "birthday": tmdb_details.get("birthday"),
-                        "deathday": tmdb_details.get("deathday"),
-                        "place_of_birth": tmdb_details.get("place_of_birth"),
-                        "gender": tmdb_details.get("gender"),
-                        "biography": tmdb_details.get("biography"),
-                        "profile_path": tmdb_details.get("profile_path"),
-                    }
-                    
-                    ext_ids_from_tmdb = tmdb_details.get("external_ids") or {}
-                    imdb_id_from_tmdb = tmdb_details.get("imdb_id") or ext_ids_from_tmdb.get("imdb_id")
-                    current_ids = dict(person.external_ids or {})
-                    updated = False
-                    if imdb_id_from_tmdb and current_ids.get("imdb_id") != imdb_id_from_tmdb:
-                        current_ids["imdb_id"] = imdb_id_from_tmdb
-                        updated = True
-                    for key in ["facebook_id", "instagram_id", "twitter_id"]:
-                        val = ext_ids_from_tmdb.get(key)
-                        if val and current_ids.get(key) != val:
-                            current_ids[key] = val
+            has_local_details = (
+                person.birthday is not None
+                and person.place_of_birth is not None
+                and loc is not None
+                and loc.biography is not None
+            )
+            if not has_local_details:
+                try:
+                    tmdb_details = self.tmdb.get_person_details(int(tmdb_id), language=ui_lang)
+                    if tmdb_details:
+                        person.birthday = tmdb_details.get("birthday") or person.birthday
+                        person.place_of_birth = tmdb_details.get("place_of_birth") or person.place_of_birth
+                        person.deathday = tmdb_details.get("deathday") or person.deathday
+                        person.profile_path = tmdb_details.get("profile_path") or person.profile_path
+                        person.known_for_department = tmdb_details.get("known_for_department") or person.known_for_department
+                        person.homepage = tmdb_details.get("homepage") or person.homepage
+                        
+                        if tmdb_details.get("also_known_as"):
+                            aliases = list(person.aliases or [])
+                            for alias in tmdb_details["also_known_as"]:
+                                if alias not in aliases:
+                                    aliases.append(alias)
+                            person.aliases = aliases
+                        
+                        profiles = tmdb_details.get("images", {}).get("profiles") or []
+                        new_imgs = [p.get("file_path") for p in profiles if p.get("file_path")]
+                        if person.profile_path:
+                            new_imgs.insert(0, person.profile_path)
+                        person.images = merge_images(person.images, new_imgs)
+                        
+                        if tmdb_details.get("biography"):
+                            if not loc:
+                                loc = PersonLocalization(person_id=person.id, locale=ui_lang, biography=tmdb_details["biography"])
+                                db.add(loc)
+                            else:
+                                loc.biography = tmdb_details["biography"]
+                        
+                        tmdb_link = next((x for x in person.external_links if x.provider == Provider.TMDB), None)
+                        if not tmdb_link:
+                            tmdb_link = ExternalSourceLink(
+                                person_id=person.id,
+                                provider=Provider.TMDB,
+                                external_id=str(tmdb_id),
+                            )
+                            db.add(tmdb_link)
+                            person.external_links.append(tmdb_link)
+                        
+                        tmdb_link.source_data = {
+                            "birthday": tmdb_details.get("birthday"),
+                            "deathday": tmdb_details.get("deathday"),
+                            "place_of_birth": tmdb_details.get("place_of_birth"),
+                            "gender": tmdb_details.get("gender"),
+                            "biography": tmdb_details.get("biography"),
+                            "profile_path": tmdb_details.get("profile_path"),
+                        }
+                        
+                        ext_ids_from_tmdb = tmdb_details.get("external_ids") or {}
+                        imdb_id_from_tmdb = tmdb_details.get("imdb_id") or ext_ids_from_tmdb.get("imdb_id")
+                        current_ids = dict(person.external_ids or {})
+                        updated = False
+                        if imdb_id_from_tmdb and current_ids.get("imdb_id") != imdb_id_from_tmdb:
+                            current_ids["imdb_id"] = imdb_id_from_tmdb
                             updated = True
-                    if tmdb_id and current_ids.get("tmdb") != str(tmdb_id):
-                        current_ids["tmdb"] = str(tmdb_id)
-                        current_ids["tmdb_id"] = str(tmdb_id)
-                        updated = True
-                    if updated:
-                        person.external_ids = current_ids
+                        for key in ["facebook_id", "instagram_id", "twitter_id"]:
+                            val = ext_ids_from_tmdb.get(key)
+                            if val and current_ids.get(key) != val:
+                                current_ids[key] = val
+                                updated = True
+                        if tmdb_id and current_ids.get("tmdb") != str(tmdb_id):
+                            current_ids["tmdb"] = str(tmdb_id)
+                            current_ids["tmdb_id"] = str(tmdb_id)
+                            updated = True
+                        if updated:
+                            person.external_ids = current_ids
 
-                    db.commit()
-                    person = db.merge(person)
-            except Exception as e:
-                logger.error(f"Failed to dynamically enrich person {person_id}: {e}")
+                        db.commit()
+                        person = db.merge(person)
+                except Exception as e:
+                    logger.error(f"Failed to dynamically enrich person {person_id}: {e}")
         if person.is_adult:
             links = db.query(ExternalSourceLink).filter(ExternalSourceLink.person_id == person_id).all()
             has_been_enriched = (len(links) > 0 and any(x.source_data is not None for x in links)) or person.hair_color is not None or person.eye_color is not None
@@ -171,7 +178,14 @@ class PersonDetailCollator:
             ui_lang=ui_lang
         )
 
-        if effective_backdrop and self.image_downloader and not person.local_backdrop_path:
+        local_file_exists = False
+        if person.local_backdrop_path:
+            from app.domains.media_assets.services.images import image_processing_service
+            local_file_exists = image_processing_service.resolve_image_url(
+                person.local_backdrop_path, "backdrops", size="original"
+            ) is not None
+
+        if effective_backdrop and self.image_downloader and not local_file_exists:
             is_remote = False
             url = None
             if effective_backdrop.startswith(("http://", "https://")):
@@ -220,7 +234,11 @@ class PersonDetailCollator:
             "rating_porndb": person.rating_porndb,
             "known_for_department": person.known_for_department,
             "is_adult": person.is_adult,
-            "profile_path": self._resolve_img((override_dict.get("custom_poster") if override_dict and override_dict.get("custom_poster") else (person.local_profile_path or person.profile_path)), "people"),
+            "profile_path": (
+                self._resolve_img(override_dict.get("custom_poster"), "people")
+                if override_dict and override_dict.get("custom_poster")
+                else (self._resolve_img(person.local_profile_path, "people") or self._resolve_img(person.profile_path, "people"))
+            ),
             "backdrop_path": self._resolve_img(effective_backdrop, "backdrops", size="original"),
             "backdrop_source_tmdb_id": source_tmdb_id,
             "backdrop_source_media_type": source_media_type,

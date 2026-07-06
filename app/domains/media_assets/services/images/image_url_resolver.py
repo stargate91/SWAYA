@@ -22,6 +22,9 @@ def resolve_image_url(
     if not path:
         return None
 
+    if path.startswith(("/media/", "/api/")):
+        return path
+
     # 2. Local check
     normalized_path = path.replace("\\", "/").lstrip("/")
     path_parts = [part for part in normalized_path.split("/") if part]

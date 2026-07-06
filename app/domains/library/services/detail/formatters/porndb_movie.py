@@ -2,6 +2,7 @@ import logging
 from typing import Any
 from fastapi.responses import JSONResponse
 
+from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.shared_kernel.enums import Provider, MediaType
 from app.domains.users.models import UserOverride
 from app.domains.library.schemas import MovieDetailResponse

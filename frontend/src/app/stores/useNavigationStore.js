@@ -25,7 +25,7 @@ export const useNavigationStore = create((set, get) => ({
     if (currentIndex > 0) {
       const nextIndex = currentIndex - 1;
       set({ currentIndex: nextIndex });
-      navigate(historyStack[nextIndex]);
+      navigate(historyStack[nextIndex], { state: { allowAdult: true } });
     }
   },
 
@@ -34,7 +34,7 @@ export const useNavigationStore = create((set, get) => ({
     if (currentIndex < historyStack.length - 1) {
       const nextIndex = currentIndex + 1;
       set({ currentIndex: nextIndex });
-      navigate(historyStack[nextIndex]);
+      navigate(historyStack[nextIndex], { state: { allowAdult: true } });
     }
   },
 
