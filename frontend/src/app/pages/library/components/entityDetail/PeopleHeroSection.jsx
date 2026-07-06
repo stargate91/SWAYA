@@ -6,6 +6,7 @@ import { API_BASE } from '@/lib/backend';
 import { getProfileImagePath } from '@/lib/imageUrls';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
 import { navigateToCreditDetail } from '../../utils/mediaNavigation';
+import { useTranslation } from '@/providers/LanguageContext';
 import './EntityDetailHeroSection.css';
 
 const TIMES_CHAR = '\u00d7';
@@ -34,6 +35,7 @@ export default function PeopleHeroSection({
   setIsDrawerOpen,
 }) {
   const navigate = useNavigate();
+  const { locale } = useTranslation();
   const [isHoveringBar, setIsHoveringBar] = useState(false);
   const [lightboxUrl, setLightboxUrl] = useState(null);
 
@@ -270,6 +272,13 @@ export default function PeopleHeroSection({
               return null;
             };
 
+            const formatLastFinish = (isoStr) => {
+              if (!isoStr) return '—';
+              const date = new Date(isoStr);
+              if (isNaN(date.getTime())) return '—';
+              return date.toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
+            };
+
             const genderVal = getGenderLabel(item?.gender);
             const deptVal = item?.known_for_department || (item?.is_adult ? 'Performer' : 'Artist');
 
@@ -297,6 +306,18 @@ export default function PeopleHeroSection({
                     </span>
                   </div>
                 </div>
+                {item?.is_adult && (
+                  <div className="entity-detail-page__info-row">
+                    <div className="entity-detail-page__info-cell">
+                      <span className="entity-detail-page__info-label">{t('library.details.finishes') || 'Finishes'}</span>
+                      <span className="entity-detail-page__info-value">{item?.finish_count ?? 0}</span>
+                    </div>
+                    <div className="entity-detail-page__info-cell">
+                      <span className="entity-detail-page__info-label">{t('library.details.lastFinish') || 'Last Finish'}</span>
+                      <span className="entity-detail-page__info-value">{formatLastFinish(item?.last_finish_at)}</span>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })()}

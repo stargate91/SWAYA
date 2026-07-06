@@ -64,10 +64,19 @@ def get_peaks_decorated(db: Session = Depends(get_db), limit: int = 50):
                     
         resolved_poster = None
         resolved_backdrop = None
+        resolved_snapshot = None
         if poster_path:
             resolved_poster = ImageServiceRegistry.get().resolve_image_url(poster_path, "posters")
         if backdrop_path:
             resolved_backdrop = ImageServiceRegistry.get().resolve_image_url(backdrop_path, "backdrops")
+        if getattr(log, "snapshot_path", None):
+            snap_path = log.snapshot_path
+            if not snap_path.startswith("/media/"):
+                if snap_path.startswith("snapshots/"):
+                    snap_path = f"/media/images/{snap_path}"
+                else:
+                    snap_path = f"/media/images/snapshots/{snap_path}"
+            resolved_snapshot = ImageServiceRegistry.get().resolve_image_url(snap_path, "snapshots")
             
         results.append({
             "id": log.id,
@@ -77,6 +86,7 @@ def get_peaks_decorated(db: Session = Depends(get_db), limit: int = 50):
             "title": title,
             "poster_path": resolved_poster,
             "backdrop_path": resolved_backdrop,
+            "snapshot_path": resolved_snapshot,
             "duration": int(item.duration) if item.duration else 0,
             "media_type": media_type
         })

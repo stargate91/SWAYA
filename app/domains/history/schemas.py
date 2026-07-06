@@ -23,6 +23,7 @@ class PlaybackPeakLogRead(BaseSchema):
     media_item_id: int
     video_position: int
     created_at: datetime
+    snapshot_path: Optional[str] = None
 
 
 # --- Action History (Audit) ---

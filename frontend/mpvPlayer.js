@@ -96,6 +96,26 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
     }
   }
 
+  ipcMain.handle('mpv-take-snapshot', async (event, { filename }) => {
+    writeElectronLog('INFO', 'mpv-take-snapshot requested', { filename });
+    try {
+      const absoluteDir = path.resolve(path.join(__dirname, '..', 'data', 'media', 'images', 'snapshots'));
+      if (!fs.existsSync(absoluteDir)) {
+        fs.mkdirSync(absoluteDir, { recursive: true });
+      }
+      const absolutePath = path.join(absoluteDir, filename);
+
+      if (mpvSocket && !mpvSocket.destroyed) {
+        mpvSocket.write(JSON.stringify({ command: ["screenshot-to-file", absolutePath, "video"] }) + '\n');
+        return { success: true, filepath: `/media/images/snapshots/${filename}` };
+      }
+      return { success: false, error: 'MPV socket not active' };
+    } catch (err) {
+      writeElectronLog('ERROR', 'Error taking MPV snapshot', { error: err.message });
+      return { success: false, error: err.message };
+    }
+  });
+
   ipcMain.handle('mpv-open-fullscreen', async (event, { itemId, start, url, title: customTitle }) => {
     writeElectronLog('INFO', 'mpv-open-fullscreen requested', { itemId, start, url, customTitle });
 

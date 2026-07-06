@@ -209,6 +209,8 @@ class PersonDetailResponse(BaseModel):
     primary_provider: Optional[str] = None
     field_routing: Optional[dict[str, str]] = None
     suggested_tags: Optional[List[str]] = None
+    finish_count: Optional[int] = 0
+    last_finish_at: Optional[str] = None
 
 
 

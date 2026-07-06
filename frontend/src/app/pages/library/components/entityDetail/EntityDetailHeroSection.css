@@ -1464,7 +1464,7 @@
   width: 100%;
 }
 
-.entity-detail-page__info-row:first-child {
+.entity-detail-page__info-row:not(:last-child) {
   --row-bb: 1px solid rgba(255, 255, 255, 0.04);
   border-bottom: var(--row-bb);
   --row-pb: 10px;

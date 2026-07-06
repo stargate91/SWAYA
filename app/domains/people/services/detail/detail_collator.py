@@ -222,8 +222,36 @@ class PersonDetailCollator:
         suggested_tags = self.profile_merger.build_suggested_tags(person)
         stats = self.stats_calculator.format_credits_stats(movies, tv, scenes)
 
+        finish_count = 0
+        last_finish_at = None
+        if person.is_adult:
+            from app.domains.history.models import PlaybackPeakLog
+            from app.domains.metadata.models import MetadataMatch
+            from app.domains.people.models import MediaPersonLink
+            from sqlalchemy import desc
+
+            finish_count = (
+                db.query(PlaybackPeakLog)
+                .join(MetadataMatch, MetadataMatch.media_item_id == PlaybackPeakLog.media_item_id)
+                .join(MediaPersonLink, MediaPersonLink.match_id == MetadataMatch.id)
+                .filter(MediaPersonLink.person_id == person_id)
+                .count()
+            )
+            last_peak = (
+                db.query(PlaybackPeakLog.created_at)
+                .join(MetadataMatch, MetadataMatch.media_item_id == PlaybackPeakLog.media_item_id)
+                .join(MediaPersonLink, MediaPersonLink.match_id == MetadataMatch.id)
+                .filter(MediaPersonLink.person_id == person_id)
+                .order_by(desc(PlaybackPeakLog.created_at))
+                .first()
+            )
+            if last_peak:
+                last_finish_at = last_peak[0].isoformat()
+
         result = {
             "id": person.id,
+            "finish_count": finish_count,
+            "last_finish_at": last_finish_at,
             "suggested_tags": suggested_tags,
             "name": person.name,
             "alternate_names": person.aliases or [],

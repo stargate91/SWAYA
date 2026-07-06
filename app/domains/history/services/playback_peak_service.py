@@ -64,7 +64,7 @@ class PlaybackPeakService:
 
         return player_time, playing_filename, playing_filepath
 
-    def add_peak(self, item_id: str, current_uid: int, video_position: Optional[int] = None) -> Dict[str, Any]:
+    def add_peak(self, item_id: str, current_uid: int, video_position: Optional[int] = None, snapshot_path: Optional[str] = None) -> Dict[str, Any]:
         media_item_id, metadata_match_id = self.resolver.resolve_ids(item_id)
         if not media_item_id:
             raise NotFoundException("Local media item not found")
@@ -115,7 +115,8 @@ class PlaybackPeakService:
         peak = PlaybackPeakLog(
             user_id=current_uid,
             media_item_id=media_item_id,
-            video_position=video_position
+            video_position=video_position,
+            snapshot_path=snapshot_path
         )
         self.db.add(peak)
         self.db.commit()

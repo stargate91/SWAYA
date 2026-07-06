@@ -266,6 +266,7 @@ def untrack_item(item_id: str, media_type: Optional[str] = None, db: Session = D
 
 class AddPeakRequest(BaseModel):
     video_position: Optional[int] = None
+    snapshot_path: Optional[str] = None
 
 @catalog_router.post("/library/item/{item_id}/peaks")
 def add_item_peak(item_id: str, payload: Optional[AddPeakRequest] = None, db: Session = Depends(get_db)):
@@ -277,7 +278,8 @@ def add_item_peak(item_id: str, payload: Optional[AddPeakRequest] = None, db: Se
     service = PlaybackPeakService(db, DbMediaResolver(db))
     try:
         video_pos = payload.video_position if payload else None
-        return service.add_peak(item_id, current_uid, video_position=video_pos)
+        snap_path = payload.snapshot_path if payload else None
+        return service.add_peak(item_id, current_uid, video_position=video_pos, snapshot_path=snap_path)
     except Exception as e:
         if "not found" in str(e).lower():
             raise HTTPException(status_code=404, detail=str(e))

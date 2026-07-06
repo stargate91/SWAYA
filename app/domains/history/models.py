@@ -34,6 +34,7 @@ class PlaybackPeakLog(Base):
     media_item_id: Mapped[int] = mapped_column(ForeignKey("media_items.id", ondelete="CASCADE"), index=True)
     video_position: Mapped[int] = mapped_column(Integer) # Position in seconds
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+    snapshot_path: Mapped[Optional[str]] = mapped_column(String)
 
 
 class ActionBatch(Base):

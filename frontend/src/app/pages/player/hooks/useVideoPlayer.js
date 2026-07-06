@@ -517,12 +517,27 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     setJustAddedPeak(true);
     setTimeout(() => setJustAddedPeak(false), 1500);
 
+    let snapshotPath = null;
+    try {
+      const { ipcRenderer } = window.require('electron');
+      const filename = `finish_${itemId}_${Date.now()}.jpg`;
+      const result = await ipcRenderer.invoke('mpv-take-snapshot', { filename });
+      if (result && result.success) {
+        snapshotPath = result.filepath;
+      }
+    } catch (err) {
+      console.warn('Failed to take mpv snapshot:', err);
+    }
+
     try {
       const backendPort = getQueryParam('backend_port') || '8000';
       await fetch(`http://localhost:${backendPort}/api/v1/library/item/${itemId}/peaks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ video_position: Math.round(currentTime) })
+        body: JSON.stringify({ 
+          video_position: Math.round(currentTime),
+          snapshot_path: snapshotPath
+        })
       });
     } catch (e) {
       console.error('Failed to add peak:', e);
@@ -574,6 +589,24 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     sendCommand(['seek', 0, 'absolute']);
     sendCommand(['set_property', 'pause', false]);
   };
+
+  const handleAddPeakRef = useRef(handleAddPeak);
+  useEffect(() => {
+    handleAddPeakRef.current = handleAddPeak;
+  }, [handleAddPeak]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        if (isAdult) {
+          e.preventDefault();
+          handleAddPeakRef.current();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isAdult]);
 
   const handleTogglePip = () => {
     try {

@@ -41,6 +41,7 @@ export default function HistoryPage() {
   const { t } = useTranslation();
   const { openModal, closeModal, toast } = useUi();
   const [activeTab, setActiveTab] = useState('rename');
+  const [lightboxImage, setLightboxImage] = useState(null);
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const navigate = useNavigate();
   const utilityBarTarget = typeof document !== 'undefined' ? document.getElementById('shell-utility-bar-center') : null;
@@ -407,8 +408,9 @@ export default function HistoryPage() {
     return (
       <div className="watched-history-list">
         {peaksData.map((log, index) => {
+          const snapshotUrl = log.snapshot_path ? resolveMediaImageUrl(log.snapshot_path, 'backdrop') : '';
           const poster = log.poster_path || log.backdrop_path;
-          const posterUrl = poster ? resolveMediaImageUrl(poster, 'backdrop') : '';
+          const posterUrl = snapshotUrl || (poster ? resolveMediaImageUrl(poster, 'backdrop') : '');
           const peakText = t('historyPage.peakAt', { defaultValue: 'Finish at' }) + ' ' + formatTime(log.video_position);
           
           return (
@@ -425,6 +427,12 @@ export default function HistoryPage() {
                     src={posterUrl} 
                     alt="" 
                     className="watched-history-card__poster" 
+                    onClick={() => {
+                      if (snapshotUrl) {
+                        setLightboxImage(snapshotUrl);
+                      }
+                    }}
+                    style={{ cursor: snapshotUrl ? 'zoom-in' : 'default' }}
                   />
                 ) : (
                   <div className="watched-history-card__poster-placeholder">
@@ -522,6 +530,40 @@ export default function HistoryPage() {
 
         {renderActiveContent()}
       </div>
+      {lightboxImage && createPortal(
+        <div 
+          className="history-lightbox-overlay"
+          onClick={() => setLightboxImage(null)}
+          role="button"
+          tabIndex={-1}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            background: 'rgba(0, 0, 0, 0.85)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 9999,
+            cursor: 'pointer'
+          }}
+        >
+          <img 
+            src={lightboxImage} 
+            alt="Snapshot" 
+            style={{
+              maxWidth: '90%',
+              maxHeight: '90%',
+              objectFit: 'contain',
+              borderRadius: '8px',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.5)'
+            }} 
+          />
+        </div>,
+        document.body
+      )}
     </Page>
   );
 }
