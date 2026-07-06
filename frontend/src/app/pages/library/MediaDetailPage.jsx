@@ -174,7 +174,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
       >
         <div className="media-detail-page__transition-wrapper">
           <div className="media-detail-page__hero-content-section">
-            {isScene && !isScrolled && (
+            {isScene && !isScrolled && item?.in_library && (
               <button
                 type="button"
                 className={`media-detail-page__center-play-btn ${isPreviewPlaying ? 'is-playing' : ''}`}

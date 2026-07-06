@@ -9,11 +9,11 @@
   width: min(36rem, calc(100vw - 2.5rem));
   padding: var(--space-lg);
   border-radius: var(--radius-lg, 16px);
-  border: 1px solid var(--color-border-default);
-  background: color-mix(in srgb, var(--color-text-inverse) 72%, transparent);
-  box-shadow: 0 10px 30px color-mix(in srgb, black 50%, transparent), inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 10%, transparent);
-  backdrop-filter: blur(20px) saturate(125%);
-  -webkit-backdrop-filter: blur(20px) saturate(125%);
+  border: 1px solid var(--app-shell-color-line, var(--color-border-default)) !important;
+  background: var(--app-shell-color-panel, color-mix(in srgb, var(--color-bg-canvas) 92%, transparent)) !important;
+  box-shadow: var(--dropdown-menu-shadow, 0 10px 30px rgba(0, 0, 0, 0.5)) !important;
+  backdrop-filter: blur(20px) saturate(125%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(125%) !important;
   z-index: 20;
   display: grid;
   gap: var(--space-md);

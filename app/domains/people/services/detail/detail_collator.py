@@ -224,34 +224,49 @@ class PersonDetailCollator:
 
         finish_count = 0
         last_finish_at = None
+        finishes = []
         if person.is_adult:
             from app.domains.history.models import PlaybackPeakLog
             from app.domains.metadata.models import MetadataMatch
             from app.domains.people.models import MediaPersonLink
             from sqlalchemy import desc
 
-            finish_count = (
-                db.query(PlaybackPeakLog)
-                .join(MetadataMatch, MetadataMatch.media_item_id == PlaybackPeakLog.media_item_id)
-                .join(MediaPersonLink, MediaPersonLink.match_id == MetadataMatch.id)
-                .filter(MediaPersonLink.person_id == person_id)
-                .count()
-            )
-            last_peak = (
-                db.query(PlaybackPeakLog.created_at)
+            peaks = (
+                db.query(PlaybackPeakLog, MetadataMatch.original_title)
                 .join(MetadataMatch, MetadataMatch.media_item_id == PlaybackPeakLog.media_item_id)
                 .join(MediaPersonLink, MediaPersonLink.match_id == MetadataMatch.id)
                 .filter(MediaPersonLink.person_id == person_id)
                 .order_by(desc(PlaybackPeakLog.created_at))
-                .first()
+                .all()
             )
-            if last_peak:
-                last_finish_at = last_peak[0].isoformat()
+            finish_count = len(peaks)
+            if peaks:
+                last_finish_at = peaks[0][0].created_at.isoformat()
+                for peak, title in peaks:
+                    resolved_snapshot = None
+                    if peak.snapshot_path:
+                        snap_path = peak.snapshot_path
+                        if not snap_path.startswith("/media/"):
+                            if snap_path.startswith("snapshots/"):
+                                snap_path = f"/media/images/{snap_path}"
+                            else:
+                                snap_path = f"/media/images/snapshots/{snap_path}"
+                        resolved_snapshot = self.image_service.resolve_image_url(snap_path, "snapshots")
+                    
+                    finishes.append({
+                        "id": peak.id,
+                        "media_item_id": peak.media_item_id,
+                        "video_position": peak.video_position,
+                        "created_at": peak.created_at.isoformat(),
+                        "snapshot_path": resolved_snapshot,
+                        "media_title": title or "Unknown Video"
+                    })
 
         result = {
             "id": person.id,
             "finish_count": finish_count,
             "last_finish_at": last_finish_at,
+            "finishes": finishes,
             "suggested_tags": suggested_tags,
             "name": person.name,
             "alternate_names": person.aliases or [],

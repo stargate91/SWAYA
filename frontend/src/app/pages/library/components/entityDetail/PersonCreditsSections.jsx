@@ -1,10 +1,13 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { usePlayMediaMutation } from '@/queries';
 import { usePersonCreditsQuery, usePersonCreditsInfiniteQuery } from '@/queries/metadataQueries';
 import { usePersonCreditsStore } from '@/stores/usePersonCreditsStore';
 import Spinner from '@/ui/Spinner';
+import { X, Play } from '@/ui/icons';
 import PersonCreditsRow from './PersonCreditsRow';
 import PersonCreditsCard from './PersonCreditsCard';
+import { API_BASE } from '@/lib/backend';
 import './PersonCreditsShared.css';
 
 
@@ -173,9 +176,24 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
     };
   }, [hasMore, isFetchingNextPage, activeGridQuery]);
 
-  // View mode state: 'library' or 'discover'
+  // View mode state: 'library', 'discover' or 'gallery'
   const [viewModeState, setViewMode] = useState('library');
-  const viewMode = myLibraryTabs.length === 0 ? 'discover' : viewModeState;
+  const [lightboxUrl, setLightboxUrl] = useState(null);
+
+  const viewMode = viewModeState === 'gallery' ? 'gallery' : (myLibraryTabs.length === 0 ? 'discover' : viewModeState);
+
+  const formatTime = (secs) => {
+    const h = Math.floor(secs / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    const s = Math.floor(secs % 60);
+    return `${h > 0 ? `${h}:` : ''}${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
+  const getSnapshotUrl = (path) => {
+    if (!path) return '';
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    return `${API_BASE}${path}`;
+  };
 
   const activeLibraryItems = myLibraryTabs.find(t => t.id === activeLibraryTab)?.items || [];
   const isSceneGrid = activeMediaType === 'scenes';
@@ -188,13 +206,24 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
               <h4 className="person-credits-row__title person-credits-row-title-style">{t('library.details.inLibrary') || 'My Library'}</h4>
 
               {/* Toggle button to switch to Discover mode */}
-              <button
-                type="button"
-                className="person-credits-row__mode-switch-btn"
-                onClick={() => setViewMode('discover')}
-              >
-                {t('library.details.wantToDiscover') || 'Want to discover?'}
-              </button>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                {item?.is_adult && item?.finishes?.length > 0 && (
+                  <button
+                    type="button"
+                    className="person-credits-row__mode-switch-btn"
+                    onClick={() => setViewMode('gallery')}
+                  >
+                    {t('library.details.gallery') || 'Climax Gallery'}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="person-credits-row__mode-switch-btn"
+                  onClick={() => setViewMode('discover')}
+                >
+                  {t('library.details.wantToDiscover') || 'Want to discover?'}
+                </button>
+              </div>
             </div>
 
             <div className="person-credits-discover-groups person-credits-discover-groups-style">
@@ -234,13 +263,24 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
 
               {/* Back to Library button (only shown if user has library items) */}
               {myLibraryTabs.length > 0 && (
-                <button
-                  type="button"
-                  className="person-credits-row__mode-switch-btn"
-                  onClick={() => setViewMode('library')}
-                >
-                  {t('library.details.backToMyLibrary') || 'Back to My Library'}
-                </button>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  {item?.is_adult && item?.finishes?.length > 0 && (
+                    <button
+                      type="button"
+                      className="person-credits-row__mode-switch-btn"
+                      onClick={() => setViewMode('gallery')}
+                    >
+                      {t('library.details.gallery') || 'Climax Gallery'}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="person-credits-row__mode-switch-btn"
+                    onClick={() => setViewMode('library')}
+                  >
+                    {t('library.details.backToMyLibrary') || 'Back to My Library'}
+                  </button>
+                </div>
               )}
             </div>
 
@@ -379,6 +419,91 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
           )}
         </div>
       )}
+
+      {viewMode === 'gallery' && (
+        <div className="person-credits-detail-panel">
+          <div className="person-credits-discover-header person-credits-discover-header-layout">
+            <h4 className="person-credits-row__title person-credits-row-title-style">
+              {t('library.details.galleryTitle') || 'Climax Gallery'}
+            </h4>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                type="button"
+                className="person-credits-row__mode-switch-btn"
+                onClick={() => setViewMode('discover')}
+              >
+                {t('library.details.wantToDiscover') || 'Want to discover?'}
+              </button>
+              {myLibraryTabs.length > 0 && (
+                <button
+                  type="button"
+                  className="person-credits-row__mode-switch-btn"
+                  onClick={() => setViewMode('library')}
+                >
+                  {t('library.details.backToMyLibrary') || 'Back to My Library'}
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="person-credits-gallery-grid">
+            {item.finishes?.map((finish) => {
+              const fullSnapUrl = getSnapshotUrl(finish.snapshot_path);
+              return (
+                <div key={finish.id} className="person-credits-gallery-item">
+                  <img
+                    src={fullSnapUrl}
+                    alt={finish.media_title}
+                    className="person-credits-gallery-img"
+                    onClick={() => setLightboxUrl(fullSnapUrl)}
+                  />
+                  <div className="person-credits-gallery-overlay">
+                    <div className="person-credits-gallery-info">
+                      <span className="person-credits-gallery-title">{finish.media_title}</span>
+                      <span className="person-credits-gallery-time">{formatTime(finish.video_position)}</span>
+                    </div>
+                    <button
+                      type="button"
+                      className="person-credits-gallery-play-btn"
+                      onClick={() => playMutation.mutate({ itemId: finish.media_item_id, start: finish.video_position })}
+                      title={t('library.details.playMoment') || 'Play Moment'}
+                    >
+                      <Play size={14} fill="currentColor" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {lightboxUrl && typeof document !== 'undefined' ? createPortal(
+        <div
+          className="organizer-details__lightbox"
+          role="button"
+          tabIndex={0}
+          onClick={() => setLightboxUrl(null)}
+        >
+          <button
+            type="button"
+            className="organizer-details__lightbox-close"
+            onClick={(event) => {
+              event.stopPropagation();
+              setLightboxUrl(null);
+            }}
+          >
+            <X size={18} />
+          </button>
+          <img
+            src={lightboxUrl}
+            alt="Enlarged preview"
+            className="organizer-details__lightbox-image"
+            onClick={(event) => event.stopPropagation()}
+          />
+        </div>,
+        document.body
+      ) : null}
     </div>
   );
 }

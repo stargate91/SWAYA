@@ -7,6 +7,7 @@ import {
   useCreateListMutation
 } from '@/queries';
 import { List, Plus, Check, Loader2 } from '@/ui/icons';
+import './BespokeListPanel.css';
 import './ListsPopover.css';
 
 export default function ListsPopover({ item, type, t }) {

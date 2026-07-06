@@ -173,6 +173,14 @@ class ExternalLinkDetail(BaseModel):
     name: Optional[str] = None
     url: Optional[str] = None
 
+class PersonFinishItem(BaseModel):
+    id: int
+    media_item_id: int
+    video_position: int
+    created_at: str
+    snapshot_path: Optional[str] = None
+    media_title: str
+
 class PersonDetailResponse(BaseModel):
     model_config = ConfigDict(extra="allow")
     id: int
@@ -211,6 +219,7 @@ class PersonDetailResponse(BaseModel):
     suggested_tags: Optional[List[str]] = None
     finish_count: Optional[int] = 0
     last_finish_at: Optional[str] = None
+    finishes: List[PersonFinishItem] = []
 
 
 

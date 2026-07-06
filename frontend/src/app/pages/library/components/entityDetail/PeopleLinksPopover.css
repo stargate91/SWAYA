@@ -10,12 +10,12 @@
   width: 280px;
   max-height: 380px;
   overflow-y: auto;
-  --popover-bg: color-mix(in srgb, var(--color-panel-strong) 94%, transparent);
-  background-color: var(--popover-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid color-mix(in srgb, var(--color-border-default) 45%, transparent);
+  background-color: var(--dropdown-menu-bg, color-mix(in srgb, var(--color-bg-canvas) 92%, transparent)) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid var(--dropdown-menu-border, var(--color-border-default)) !important;
   border-radius: var(--radius-md, 16px);
-  box-shadow: 0 16px 40px color-mix(in srgb, black 52%, transparent);
+  box-shadow: var(--dropdown-menu-shadow, 0 16px 40px rgba(0, 0, 0, 0.5)) !important;
   z-index: 100;
   display: flex;
   flex-direction: column;
