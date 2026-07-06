@@ -1,10 +1,25 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 from typing import List, Optional, Any
+
+class NumericAttributesMixin:
+    @field_validator('height', 'weight', 'band_size', 'waist', 'hip', mode='before', check_fields=False)
+    @classmethod
+    def parse_int_field(cls, v: Any) -> Optional[int]:
+        if v is None:
+            return None
+        if isinstance(v, (int, float)):
+            return int(v)
+        if isinstance(v, str):
+            import re
+            match = re.search(r'\d+', v)
+            if match:
+                return int(match.group(0))
+        return None
 
 class BaseSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-class PersonRead(BaseSchema):
+class PersonRead(BaseSchema, NumericAttributesMixin):
     id: int
     name: str
     aliases: Optional[List[str]] = None
@@ -18,6 +33,8 @@ class PersonRead(BaseSchema):
     scene_count: Optional[int] = None
     profile_path: Optional[str] = None
     local_profile_path: Optional[str] = None
+    backdrop_path: Optional[str] = None
+    local_backdrop_path: Optional[str] = None
     homepage: Optional[str] = None
     external_ids: Optional[dict[str, Any]] = None
     is_adult: bool
@@ -42,7 +59,7 @@ class PersonRead(BaseSchema):
     primary_provider: Optional[str] = None
     field_routing: Optional[dict[str, str]] = None
 
-class PeopleGroupItem(BaseModel):
+class PeopleGroupItem(BaseModel, NumericAttributesMixin):
     id: int
     name: str
     year: Optional[int] = None
@@ -77,7 +94,7 @@ class PeopleGroupItem(BaseModel):
     butt_shape: Optional[str] = None
     butt_size: Optional[str] = None
 
-class PersonSearchItem(BaseModel):
+class PersonSearchItem(BaseModel, NumericAttributesMixin):
     id: int
     name: str
     profile_path: Optional[str] = None

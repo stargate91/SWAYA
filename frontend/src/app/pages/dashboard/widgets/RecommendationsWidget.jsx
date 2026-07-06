@@ -495,7 +495,7 @@ const RecommendationsWidget = ({ language, T, visibleWidgets = {} }) => {
         />
       )}
 
-      {isLoading && (isWidgetVisible('movies_discovery') || isWidgetVisible('tv_discovery') || isWidgetVisible('adult')) && (
+      {isLoading && (isWidgetVisible('movies_discovery') || isWidgetVisible('tv_discovery') || (isWidgetVisible('adult') && settings?.include_adult)) && (
         <RecommendationSkeleton />
       )}
 
@@ -555,7 +555,7 @@ const RecommendationsWidget = ({ language, T, visibleWidgets = {} }) => {
 
       {isWidgetVisible('top_20') && <TMDBDiscoveryWidget T={T} />}
 
-      {!isLoading && isWidgetVisible('adult') && recommendations?.discover_adult?.length > 0 && (
+      {!isLoading && isWidgetVisible('adult') && settings?.include_adult && recommendations?.discover_adult?.length > 0 && (
         <RecommendationCarousel
           title={T('dashboard.recommendations.discover_adult') || 'Discover Adult Movies'}
           items={recommendations.discover_adult}

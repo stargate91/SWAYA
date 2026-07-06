@@ -23,7 +23,48 @@ class ProfileMerger:
 
         if override_dict and override_dict.get("custom_backdrop"):
             effective_backdrop = override_dict.get("custom_backdrop")
-        elif person.external_ids and (person.external_ids.get("tmdb") or person.external_ids.get("tmdb_id")):
+        elif person.local_backdrop_path:
+            from app.domains.media_assets.services.images import image_processing_service
+            effective_backdrop = image_processing_service.resolve_image_url(
+                person.local_backdrop_path, "backdrops", size="original"
+            )
+            source_tmdb_id = int(person.external_ids.get("tmdb")) if (person.external_ids and person.external_ids.get("tmdb") and person.external_ids.get("tmdb").isdigit()) else None
+        elif person.backdrop_path:
+            from app.domains.media_assets.services.images import image_processing_service
+            effective_backdrop = image_processing_service.resolve_image_url(
+                person.backdrop_path, "backdrops", size="original"
+            )
+            source_tmdb_id = int(person.external_ids.get("tmdb")) if (person.external_ids and person.external_ids.get("tmdb") and person.external_ids.get("tmdb").isdigit()) else None
+
+        if not effective_backdrop:
+            from app.domains.people.models import MediaPersonLink
+            from app.domains.metadata.models import MetadataMatch
+            
+            best_link = (
+                db.query(MediaPersonLink, MetadataMatch)
+                .join(MetadataMatch, MediaPersonLink.match_id == MetadataMatch.id)
+                .filter(
+                    MediaPersonLink.person_id == person.id,
+                    MetadataMatch.backdrop_path.isnot(None),
+                    MetadataMatch.backdrop_path != ""
+                )
+                .order_by(
+                    MetadataMatch.rating_tmdb.desc(),
+                    MetadataMatch.rating_porndb.desc(),
+                    MetadataMatch.id.desc()
+                )
+                .first()
+            )
+            if best_link:
+                link_obj, match_obj = best_link
+                from app.domains.media_assets.services.images import image_processing_service
+                effective_backdrop = image_processing_service.resolve_image_url(
+                    match_obj.backdrop_path, "backdrops", size="original"
+                )
+                source_tmdb_id = int(match_obj.external_id) if (match_obj.external_id and match_obj.external_id.isdigit()) else None
+                source_media_type = match_obj.media_type.value if match_obj.media_type else None
+
+        if not effective_backdrop and person.external_ids and (person.external_ids.get("tmdb") or person.external_ids.get("tmdb_id")):
             from app.domains.people.helpers import resolve_person_known_for_backdrop
             effective_backdrop, source_tmdb_id, source_media_type = resolve_person_known_for_backdrop(
                 db,
@@ -34,6 +75,7 @@ class ProfileMerger:
                 adult_only=person.is_adult,
                 respect_credit_order=True
             )
+
         return effective_backdrop, source_tmdb_id, source_media_type
 
     def build_suggested_tags(self, person: Person) -> List[str]:

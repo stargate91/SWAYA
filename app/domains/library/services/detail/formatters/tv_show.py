@@ -46,9 +46,52 @@ class TvShowFormatter(DetailFormatter):
             return JSONResponse(status_code=400, content={"error": "Invalid tv TMDB ID"})
         
         ui_lang = language or DEFAULT_FALLBACK_LANGUAGE
-        tmdb_data = tmdb_scraper.get_details(tv_tmdb_id_int, "tv", language=ui_lang)
+        
+        from app.domains.metadata.models import MetadataMatch
+        series_match = db.query(MetadataMatch).filter(
+            MetadataMatch.provider == Provider.TMDB,
+            MetadataMatch.external_id == str(tv_tmdb_id_int),
+            MetadataMatch.media_type == MediaType.TV
+        ).first()
+
+        tmdb_data = None
+        if series_match:
+            from app.shared_kernel.language import LanguageService
+            loc_db = LanguageService.get_best_localization(series_match.localizations, ui_lang)
+            if loc_db and loc_db.title:
+                local_seasons = db.query(MetadataMatch).filter(
+                    MetadataMatch.parent_id == series_match.id,
+                    MetadataMatch.media_type == MediaType.SEASON
+                ).all()
+                
+                seasons_meta = []
+                for s in local_seasons:
+                    seasons_meta.append({
+                        "season_number": s.season_number,
+                        "name": f"Season {s.season_number}",
+                        "episode_count": s.number_of_episodes or 0,
+                        "poster_path": s.backdrop_path or s.still_path
+                    })
+                
+                tmdb_data = {
+                    "name": loc_db.title,
+                    "overview": loc_db.overview or "",
+                    "poster_path": loc_db.poster_path,
+                    "backdrop_path": series_match.backdrop_path,
+                    "tagline": loc_db.tagline,
+                    "seasons": seasons_meta,
+                    "vote_average": series_match.rating_tmdb or 0.0,
+                    "external_ids": {"imdb_id": series_match.imdb_id}
+                }
+
         if not tmdb_data:
-            return JSONResponse(status_code=404, content={"error": "TV Show not found on TMDB"})
+            try:
+                tmdb_data = tmdb_scraper.get_details(tv_tmdb_id_int, "tv", language=ui_lang)
+            except Exception:
+                tmdb_data = None
+                
+        if not tmdb_data:
+            return JSONResponse(status_code=404, content={"error": "TV Show not found"})
         
         from app.shared_kernel.user_context import get_current_user_id
         current_uid = get_current_user_id()

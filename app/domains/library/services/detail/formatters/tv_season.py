@@ -24,7 +24,61 @@ class TvSeasonFormatter(DetailFormatter):
             return JSONResponse(status_code=400, content={"error": "Invalid tv TMDB ID"})
         
         ui_lang = DEFAULT_FALLBACK_LANGUAGE
-        season_detail = tmdb_scraper.get_season_details(tv_tmdb_id_int, season_number, language=ui_lang)
+        
+        from app.domains.metadata.models import MetadataMatch
+        from app.shared_kernel.enums import Provider, MediaType
+        
+        series_match = db.query(MetadataMatch).filter(
+            MetadataMatch.provider == Provider.TMDB,
+            MetadataMatch.external_id == str(tv_tmdb_id_int),
+            MetadataMatch.media_type == MediaType.TV
+        ).first()
+        
+        season_match = None
+        if series_match:
+            season_match = db.query(MetadataMatch).filter(
+                MetadataMatch.parent_id == series_match.id,
+                MetadataMatch.media_type == MediaType.SEASON,
+                MetadataMatch.season_number == season_number
+            ).first()
+
+        season_detail = None
+        if season_match:
+            from app.shared_kernel.language import LanguageService
+            loc_db = LanguageService.get_best_localization(season_match.localizations, ui_lang)
+            if loc_db and loc_db.title:
+                local_episodes = db.query(MetadataMatch).filter(
+                    MetadataMatch.parent_id == season_match.id,
+                    MetadataMatch.media_type == MediaType.EPISODE
+                ).all()
+                
+                episodes_meta = []
+                for ep in local_episodes:
+                    ep_loc = LanguageService.get_best_localization(ep.localizations, ui_lang)
+                    episodes_meta.append({
+                        "episode_number": ep.episode_number,
+                        "name": ep_loc.title if ep_loc else (ep.original_title or f"Episode {ep.episode_number}"),
+                        "overview": ep_loc.overview if ep_loc else "",
+                        "air_date": ep.release_date.isoformat()[:10] if ep.release_date else None,
+                        "vote_average": ep.rating_tmdb or 0.0,
+                        "still_path": ep.still_path
+                    })
+                episodes_meta.sort(key=lambda x: x["episode_number"])
+                
+                season_detail = {
+                    "name": loc_db.title,
+                    "overview": loc_db.overview,
+                    "poster_path": loc_db.poster_path or season_match.backdrop_path,
+                    "air_date": season_match.release_date.isoformat()[:10] if season_match.release_date else None,
+                    "episodes": episodes_meta
+                }
+
+        if not season_detail:
+            try:
+                season_detail = tmdb_scraper.get_season_details(tv_tmdb_id_int, season_number, language=ui_lang) or {}
+            except Exception:
+                season_detail = {}
+                
         if not season_detail:
             return JSONResponse(status_code=404, content={"error": "Season not found"})
         

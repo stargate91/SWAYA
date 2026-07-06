@@ -116,6 +116,18 @@ def init_databases():
             except Exception:
                 session.rollback()
 
+            try:
+                session.execute(text("ALTER TABLE people ADD COLUMN backdrop_path TEXT;"))
+                session.commit()
+            except Exception:
+                session.rollback()
+
+            try:
+                session.execute(text("ALTER TABLE people ADD COLUMN local_backdrop_path TEXT;"))
+                session.commit()
+            except Exception:
+                session.rollback()
+
             session.execute(text("DELETE FROM metadata_localizations WHERE match_id NOT IN (SELECT id FROM metadata_matches)"))
             session.execute(text("DELETE FROM media_person_links WHERE match_id NOT IN (SELECT id FROM metadata_matches)"))
             session.execute(text("DELETE FROM metadata_match_studios WHERE metadata_match_id NOT IN (SELECT id FROM metadata_matches)"))

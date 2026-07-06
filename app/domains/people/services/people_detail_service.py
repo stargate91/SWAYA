@@ -43,7 +43,8 @@ class PeopleDetailService:
             scrapers=scrapers,
             library_port=library_port,
             image_service=image_service,
-            filmography_service=self.filmography_service
+            filmography_service=self.filmography_service,
+            image_downloader=image_downloader
         )
         
         self.asset_manager = PerformerAssetManager(

@@ -24,7 +24,7 @@ from app.domains.people.services.detail.filmography_paginator import Filmography
 logger = logging.getLogger(__name__)
 
 class PerformerDetailReader:
-    def __init__(self, db: Session, scrapers: ScraperGatewayPort, library_port: LibraryPort, image_service: ImageServicePort, filmography_service: FilmographyService):
+    def __init__(self, db: Session, scrapers: ScraperGatewayPort, library_port: LibraryPort, image_service: ImageServicePort, filmography_service: FilmographyService, image_downloader: Optional[Any] = None):
         self.db = db
         self.scrapers = scrapers
         self.tmdb = scrapers.tmdb(db)
@@ -36,7 +36,7 @@ class PerformerDetailReader:
         self.query_builder = PeopleQueryBuilder(db, library_port, image_service)
         self.search_service = PeopleSearchService(db, scrapers, library_port, image_service)
         self.resolver = PersonResolver(db, self.search_service)
-        self.collator = PersonDetailCollator(db, scrapers, self.tmdb, library_port, image_service, filmography_service)
+        self.collator = PersonDetailCollator(db, scrapers, self.tmdb, library_port, image_service, filmography_service, image_downloader=image_downloader)
         self.paginator = FilmographyPaginator(self.tmdb, filmography_service)
 
     def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:

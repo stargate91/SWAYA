@@ -111,10 +111,12 @@ class PeopleSearchService:
                 return adult_results
 
         seen_names = {r["name"].lower().strip() for r in adult_results}
-        results = self.tmdb.search_person(query=query, language=language, include_adult=True, page=page)
+        results = self.tmdb.search_person(query=query, language=language, include_adult=adult_only, page=page)
 
         if adult_only:
             results = [r for r in (results or []) if bool(r.get("adult"))]
+        else:
+            results = [r for r in (results or []) if not bool(r.get("adult"))]
 
         person_ids = []
         for result in results:

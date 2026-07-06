@@ -26,8 +26,30 @@ class TvSeasonFormatter:
                 continue
             
             if idx < seasons_limit:
-                season_detail = tmdb_scraper.get_season_details(tv_tmdb_id_int, season_number, language=ui_lang)
+                try:
+                    season_detail = tmdb_scraper.get_season_details(tv_tmdb_id_int, season_number, language=ui_lang) or {}
+                except Exception:
+                    season_detail = {}
                 all_episodes = season_detail.get("episodes", []) or []
+                
+                if not all_episodes:
+                    for (s_num, ep_num), media_item in local_episodes_map.items():
+                        if s_num == season_number:
+                            ep_match = next((m for m in media_item.matches if m.season_number == season_number and m.episode_number == ep_num), None)
+                            ep_loc = None
+                            if ep_match:
+                                from app.shared_kernel.language import LanguageService
+                                ep_loc = LanguageService.get_best_localization(ep_match.localizations, ui_lang)
+                            
+                            all_episodes.append({
+                                "episode_number": ep_num,
+                                "name": ep_loc.title if ep_loc else (ep_match.original_title if ep_match else f"Episode {ep_num}"),
+                                "overview": ep_loc.overview if ep_loc else "",
+                                "air_date": ep_match.release_date.isoformat()[:10] if (ep_match and ep_match.release_date) else None,
+                                "vote_average": ep_match.rating_tmdb if ep_match else 0.0,
+                                "still_path": ep_match.still_path if ep_match else None
+                            })
+                    all_episodes.sort(key=lambda x: x["episode_number"])
                 
                 is_in_library = len(local_items) > 0
                 ep_limit = len(all_episodes) if is_in_library else initial_episodes_limit

@@ -30,6 +30,8 @@ class Person(Base):
     scene_count: Mapped[Optional[int]] = mapped_column(Integer, index=True)
     profile_path: Mapped[Optional[str]] = mapped_column(String)
     local_profile_path: Mapped[Optional[str]] = mapped_column(String) # Local path to cached profile image
+    backdrop_path: Mapped[Optional[str]] = mapped_column(String)
+    local_backdrop_path: Mapped[Optional[str]] = mapped_column(String) # Local path to cached backdrop image
     homepage: Mapped[Optional[str]] = mapped_column(String)
     images: Mapped[Optional[List[str]]] = mapped_column(JSON) # List of alternative profile image URLs
     external_ids: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON) # {"tmdb": "123", "stashdb": "uuid-xyz"}

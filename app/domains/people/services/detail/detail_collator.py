@@ -17,7 +17,7 @@ from app.domains.people.services.detail.profile_merger import ProfileMerger
 logger = logging.getLogger(__name__)
 
 class PersonDetailCollator:
-    def __init__(self, db: Session, scrapers: ScraperGatewayPort, tmdb: Any, library_port: LibraryPort, image_service: ImageServicePort, filmography_service: FilmographyService):
+    def __init__(self, db: Session, scrapers: ScraperGatewayPort, tmdb: Any, library_port: LibraryPort, image_service: ImageServicePort, filmography_service: FilmographyService, image_downloader: Optional[Any] = None):
         self.db = db
         self.scrapers = scrapers
         self.tmdb = tmdb
@@ -26,6 +26,7 @@ class PersonDetailCollator:
         self.filmography_service = filmography_service
         self.stats_calculator = PerformerStatsCalculator()
         self.profile_merger = ProfileMerger()
+        self.image_downloader = image_downloader
 
     def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
         return self.image_service.resolve_image_url(path, subfolder, size)
@@ -169,6 +170,36 @@ class PersonDetailCollator:
             known_for=known_for,
             ui_lang=ui_lang
         )
+
+        if effective_backdrop and self.image_downloader and not person.local_backdrop_path:
+            is_remote = False
+            url = None
+            if effective_backdrop.startswith(("http://", "https://")):
+                is_remote = True
+                url = effective_backdrop
+            elif effective_backdrop.startswith("/"):
+                is_remote = True
+                url = self.image_downloader.get_download_url(effective_backdrop, "backdrops") or f"https://image.tmdb.org/t/p/original{effective_backdrop}"
+            
+            if is_remote and url:
+                import os
+                import re
+                from urllib.parse import urlparse
+                basename = os.path.basename(urlparse(url).path)
+                ext = os.path.splitext(basename)[1].lower() or ".jpg"
+                if ext == ".jpeg":
+                    ext = ".jpg"
+                safe_name = re.sub(r"[^A-Za-z0-9_.-]+", "_", person.name).strip("_")
+                filename = f"person_backdrop_{person.id}_{safe_name}{ext}"
+                
+                person.backdrop_path = effective_backdrop
+                person.local_backdrop_path = f"backdrops/{filename}"
+                try:
+                    self.db.commit()
+                    self.image_downloader.enqueue_download(url, "backdrops", filename)
+                    effective_backdrop = self._resolve_img(person.local_backdrop_path, "backdrops", size="original")
+                except Exception as e:
+                    logger.error(f"Failed to save and enqueue person backdrop: {e}")
 
         external_ids = self.profile_merger.build_external_ids(person)
         suggested_tags = self.profile_merger.build_suggested_tags(person)

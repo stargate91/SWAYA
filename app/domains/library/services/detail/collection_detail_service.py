@@ -34,15 +34,6 @@ class CollectionDetailService(DetailFormatter):
         
         ui_lang = language or DEFAULT_FALLBACK_LANGUAGE
         
-        tmdb_details = {}
-        try:
-            tmdb_details = self.tmdb_scraper.get_collection_details(
-                collection_tmdb_id_int,
-                language=ui_lang
-            ) or {}
-        except Exception:
-            tmdb_details = {}
-            
         from app.domains.metadata.models import MediaCollection, MediaCollectionLocalization
         from app.shared_kernel.enums import Provider
         lang_code = LanguageService.clean_locale(ui_lang)
@@ -58,6 +49,16 @@ class CollectionDetailService(DetailFormatter):
                 MediaCollectionLocalization.collection_id == collection.id,
                 MediaCollectionLocalization.locale == lang_code
             ).first()
+
+        tmdb_details = {}
+        if not collection or not collection_loc or not collection_loc.title:
+            try:
+                tmdb_details = self.tmdb_scraper.get_collection_details(
+                    collection_tmdb_id_int,
+                    language=ui_lang
+                ) or {}
+            except Exception:
+                tmdb_details = {}
 
         if tmdb_details:
             if not collection:
@@ -230,10 +231,13 @@ class CollectionDetailService(DetailFormatter):
                 if custom_backdrop_resolved:
                     final_backdrop = custom_backdrop_resolved
 
+        custom_title = col_override.custom_title if (col_override and col_override.custom_title) else None
+        custom_overview = col_override.custom_overview if (col_override and col_override.custom_overview) else None
+
         result = {
             "tmdb_id": collection_tmdb_id_int,
-            "title": tmdb_details.get("name") or f"Collection {collection_tmdb_id_int}",
-            "overview": tmdb_details.get("overview"),
+            "title": custom_title or (collection_loc.title if collection_loc else None) or tmdb_details.get("name") or f"Collection {collection_tmdb_id_int}",
+            "overview": custom_overview or (collection_loc.overview if collection_loc else None) or tmdb_details.get("overview"),
             "poster_path": final_poster,
             "backdrop_path": final_backdrop,
             "owned_count": len(owned_tmdb_ids),

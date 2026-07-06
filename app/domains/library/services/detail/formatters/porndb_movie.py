@@ -21,9 +21,57 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             return JSONResponse(status_code=400, content={"error": "Invalid PornDB ID format"})
             
         print(f"[DEBUG] PornDbMovieFormatter.format called with item_id={item_id}, parsed porndb_id={porndb_id}")
-        porndb_scraper = scrapers.adult(Provider.PORNDB, db)
-        movie_data = porndb_scraper.fetch_movie(porndb_id)
-        print(f"[DEBUG] PornDbMovieFormatter.format fetch_movie result: success={bool(movie_data)}")
+        ui_lang = DEFAULT_FALLBACK_LANGUAGE
+        
+        from app.domains.metadata.models import MetadataMatch
+        from app.shared_kernel.enums import Provider, MediaType
+        
+        match = db.query(MetadataMatch).filter(
+            MetadataMatch.provider == Provider.PORNDB,
+            MetadataMatch.external_id == str(porndb_id),
+            MetadataMatch.media_type == MediaType.MOVIE
+        ).first()
+
+        movie_data = None
+        if match:
+            from app.shared_kernel.language import LanguageService
+            loc_db = LanguageService.get_best_localization(match.localizations, ui_lang)
+            if loc_db and loc_db.title:
+                performers = []
+                for link in match.people_links:
+                    person_obj = link.person
+                    if person_obj:
+                        performers.append({
+                            "parent": {
+                                "id": person_obj.id,
+                                "name": person_obj.name,
+                                "gender": "female" if person_obj.gender == 1 else "male" if person_obj.gender == 2 else "",
+                                "profile_path": person_obj.local_profile_path or person_obj.profile_path
+                            }
+                        })
+                
+                studio_data = {}
+                if match.studios:
+                    studio_data = {"name": match.studios[0].name, "logo_path": match.studios[0].logo_path}
+
+                movie_data = {
+                    "title": loc_db.title,
+                    "date": match.release_date.isoformat()[:10] if match.release_date else None,
+                    "synopsis": loc_db.overview,
+                    "poster": loc_db.poster_path,
+                    "backdrop": match.backdrop_path,
+                    "rating_porndb": match.rating_porndb,
+                    "performers": performers,
+                    "studio": studio_data
+                }
+
+        if not movie_data:
+            porndb_scraper = scrapers.adult(Provider.PORNDB, db)
+            try:
+                movie_data = porndb_scraper.fetch_movie(porndb_id)
+            except Exception:
+                movie_data = None
+                
         if not movie_data:
             return JSONResponse(status_code=404, content={"error": "Movie not found on PornDB"})
             

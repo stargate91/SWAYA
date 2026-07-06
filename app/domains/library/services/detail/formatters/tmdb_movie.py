@@ -28,8 +28,73 @@ class TmdbMovieFormatter(MovieDetailFormatter):
             return JSONResponse(status_code=400, content={"error": "Invalid TMDB ID format"})
         
         ui_lang = DEFAULT_FALLBACK_LANGUAGE
-        tmdb_scraper = scrapers.tmdb(db)
-        tmdb_data = tmdb_scraper.get_details(tmdb_id, "movie", language=ui_lang)
+        
+        from app.domains.metadata.models import MetadataMatch
+        from app.shared_kernel.enums import Provider, MediaType
+        
+        match = db.query(MetadataMatch).filter(
+            MetadataMatch.provider == Provider.TMDB,
+            MetadataMatch.external_id == str(tmdb_id),
+            MetadataMatch.media_type == MediaType.MOVIE
+        ).first()
+
+        tmdb_data = None
+        if match:
+            from app.shared_kernel.language import LanguageService
+            loc_db = LanguageService.get_best_localization(match.localizations, ui_lang)
+            if loc_db and loc_db.title:
+                companies = [{"name": s.name, "logo_path": s.logo_path} for s in match.studios]
+                
+                cast_list = []
+                crew_list = []
+                for link in match.people_links:
+                    person_obj = link.person
+                    if not person_obj:
+                        continue
+                    credit_item = {
+                        "id": person_obj.id,
+                        "name": person_obj.name,
+                        "profile_path": person_obj.local_profile_path or person_obj.profile_path,
+                        "character": link.character_name,
+                        "job": link.role.value if hasattr(link.role, "value") else str(link.role)
+                    }
+                    role_str = link.role.value if hasattr(link.role, "value") else str(link.role)
+                    if role_str == "acting":
+                        cast_list.append(credit_item)
+                    else:
+                        crew_list.append(credit_item)
+                
+                tmdb_data = {
+                    "title": loc_db.title,
+                    "original_title": match.original_title or loc_db.title,
+                    "overview": loc_db.overview or "",
+                    "tagline": loc_db.tagline or "",
+                    "release_date": match.release_date.isoformat()[:10] if match.release_date else None,
+                    "runtime": match.runtime,
+                    "vote_average": match.rating_tmdb or 0.0,
+                    "vote_count": match.vote_count_tmdb or 0,
+                    "budget": match.budget,
+                    "revenue": match.revenue,
+                    "poster_path": loc_db.poster_path,
+                    "backdrop_path": match.backdrop_path,
+                    "imdb_id": match.imdb_id,
+                    "genres": [{"name": g} for g in (loc_db.genres or [])],
+                    "production_companies": companies,
+                    "original_language": loc_db.original_language,
+                    "adult": match.is_adult,
+                    "credits": {
+                        "cast": cast_list,
+                        "crew": crew_list
+                    }
+                }
+
+        if not tmdb_data:
+            tmdb_scraper = scrapers.tmdb(db)
+            try:
+                tmdb_data = tmdb_scraper.get_details(tmdb_id, "movie", language=ui_lang)
+            except Exception:
+                tmdb_data = None
+
         if not tmdb_data:
             return JSONResponse(status_code=404, content={"error": "Movie not found on TMDB"})
         

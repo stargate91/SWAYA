@@ -220,6 +220,9 @@ export default function AboutPage() {
                       })}
                     </div>
                   )}
+                </Card>
+              </div>
+            )}
             {activeTab === 'docs' && (
               <div className="about-tab-panel docs-panel">
                 <Card className="about-card docs-card">
