@@ -17,6 +17,7 @@ import {
   isLibraryScenesTab,
 } from '@/lib/libraryTabs';
 import { isSceneMediaType } from '@/lib/mediaTypes';
+import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
 
 const renderUserRatingBadge = (item) => {
   const rating = Number(item?.user_rating);
@@ -64,13 +65,15 @@ export const LibraryPosterCard = memo(({
 
   const resolvePosterUrl = (path) => resolveMediaImageUrl(path, 'poster');
 
+  const n = normalizeMediaEntity(item, { context: 'library', settings });
+
   // Compute props stably
   let title = item.title;
   let subtitle;
   let imageUrl;
-  let ratingImdb = item.rating_imdb;
-  let ratingTmdb = item.rating;
-  let ratingPorndb;
+  let ratingImdb = n.ratingImdb;
+  let ratingTmdb = n.ratingTmdb;
+  let ratingPorndb = n.ratingPorndb;
   const isScene = isSceneMediaType(item.type) || isLibraryScenes;
 
   if (isScene || isPeople) {
@@ -179,15 +182,7 @@ export const LibraryPosterCard = memo(({
     topRightAction = editButton;
 
     const genderPref = settings?.adult_gender_preference;
-    const allPeople = item.people || [];
-    const filteredPeople = genderPref && genderPref !== 'all'
-      ? allPeople.filter(p => {
-        if (genderPref === 'female') return p.gender === 1;
-        if (genderPref === 'male') return p.gender === 2;
-        return true;
-      })
-      : allPeople;
-    const performers = filteredPeople.slice(0, 4);
+    const performers = n.performers;
 
     subtitle = (
       <div className="library-scene-card__subtitle-inner">

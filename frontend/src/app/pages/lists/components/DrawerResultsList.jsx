@@ -3,6 +3,7 @@ import { Loader2 } from '@/ui/icons';
 import DrawerItemImage from './DrawerItemImage';
 import ResultAddButton from './ResultAddButton';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
+import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
 
 export default function DrawerResultsList({
   searching,
@@ -51,8 +52,7 @@ export default function DrawerResultsList({
 
       {!searching && filteredResults.map((item) => {
         const added = isAdded(item);
-        const title = item.title || item.name;
-        const subtitle = listType === 'person' ? (item.role || 'Actor') : (item.year || item.media_type || mediaType);
+        const n = normalizeMediaEntity(item, { context: 'drawer', sessionMode });
         const isSceneItem = item.media_type === 'scene' || mediaType === 'scene';
         const poster = isSceneItem ? (item.backdrop_path || item.poster_path) : (item.poster_path || item.profile_path);
         const imageSize = listType === 'person' ? 'person' : (isSceneItem ? 'backdrop' : 'poster');
@@ -79,8 +79,8 @@ export default function DrawerResultsList({
               />
             </div>
             <div className="lists-drawer__item-info">
-              <span className="lists-drawer__item-title">{title}</span>
-              <span className="lists-drawer__item-subtitle">{subtitle}</span>
+              <span className="lists-drawer__item-title">{n.title}</span>
+              <span className="lists-drawer__item-subtitle">{n.subtitle}</span>
             </div>
             <ResultAddButton
               added={added}

@@ -43,24 +43,7 @@ export const getDurationText = (seconds, t) => {
   return t('library.details.durationMinutes', { minutes, count: minutes, defaultValue: '{{minutes}}m' });
 };
 
-export const formatEpisodeNumber = (epNum) => {
-  if (epNum === undefined || epNum === null) return '';
-  const str = String(epNum).trim();
-
-  if (str.includes(',')) {
-    const parts = str.split(',').map(s => s.trim()).filter(Boolean);
-    if (parts.length > 1) {
-      return `${parts[0]}-${parts[parts.length - 1]}`;
-    }
-  }
-
-  if (str.includes('-')) {
-    const parts = str.split('-').map(s => s.trim()).filter(Boolean);
-    return parts.length > 0 ? parts.join('-') : '';
-  }
-
-  return str;
-};
+export { formatEpisodeNumber } from '@/lib/episodeFormat';
 
 export const formatTime = (secs) => {
   if (secs === undefined || secs === null) return '';

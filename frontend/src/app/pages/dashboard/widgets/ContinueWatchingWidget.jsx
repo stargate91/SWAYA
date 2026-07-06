@@ -7,47 +7,7 @@ import { usePlayMediaMutation, useResetProgressMutation, useSettingsQuery } from
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 
-const normalizeEpisodeNumbers = (episodeNumber) => {
-  if (Array.isArray(episodeNumber)) {
-    return episodeNumber.map((n) => Number(n)).filter(Number.isInteger);
-  }
-
-  if (typeof episodeNumber === 'string') {
-    const trimmed = episodeNumber.trim();
-    if (!trimmed) {
-      return [];
-    }
-
-    if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
-      try {
-        const parsed = JSON.parse(trimmed);
-        return Array.isArray(parsed) ? parsed.map((n) => Number(n)).filter(Number.isInteger) : [Number(parsed)].filter(Number.isInteger);
-      } catch {
-        return [];
-      }
-    }
-
-    if (trimmed.includes(',')) {
-      return trimmed.split(',').map((s) => Number(s.trim())).filter(Number.isInteger);
-    }
-
-    const parsed = Number(trimmed);
-    return Number.isInteger(parsed) ? [parsed] : [];
-  }
-
-  return Number.isInteger(episodeNumber) ? [episodeNumber] : [];
-};
-
-const formatEpisodeCode = (seasonNumber, episodeNumber) => {
-  if (!seasonNumber) return null;
-  const sStr = String(seasonNumber).padStart(2, '0');
-  const normalized = normalizeEpisodeNumbers(episodeNumber);
-  if (normalized.length === 0) return `S${sStr}`;
-  if (normalized.length === 1) return `S${sStr}E${String(normalized[0]).padStart(2, '0')}`;
-  const first = String(normalized[0]).padStart(2, '0');
-  const last = String(normalized[normalized.length - 1]).padStart(2, '0');
-  return `S${sStr}E${first}-${last}`;
-};
+import { normalizeEpisodeNumbers, formatEpisodeCode } from '../../../lib/episodeFormat';
 
 const ContinueWatchingWidget = ({ T }) => {
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);

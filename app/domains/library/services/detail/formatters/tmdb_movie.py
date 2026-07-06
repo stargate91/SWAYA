@@ -46,7 +46,6 @@ class TmdbMovieFormatter(MovieDetailFormatter):
             tmdb_data = None
 
         if not tmdb_data and match:
-            from app.shared_kernel.language import LanguageService
             loc_db = LanguageService.get_best_localization(match.localizations, ui_lang)
             if loc_db and loc_db.title:
                 companies = [{"name": s.name, "logo_path": s.logo_path} for s in match.studios]

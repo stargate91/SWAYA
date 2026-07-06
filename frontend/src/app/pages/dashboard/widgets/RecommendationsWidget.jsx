@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Check, ChevronLeft, ChevronRight, Star, Plus, Minus } from '@/ui/icons';
 import { useUi } from '../../../providers/UiProvider';
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
+import { normalizeMediaEntity } from '../../../lib/normalizeMediaEntity';
 import {
   useRecommendationsQuery,
   useAddToWatchlistMutation,
@@ -152,52 +153,26 @@ const RecommendationCarousel = ({
           className="recommend-carousel-track"
         >
           {items.map((item) => {
+            const n = normalizeMediaEntity(item, {
+              context: 'recommendations',
+              settings,
+              sessionMode,
+              isAdultContext: isAdultCarousel,
+            });
             const isWatchlisted = watchlistIds.includes(item.id);
-            const isPerson = item.media_type === 'person' || (!item.hasOwnProperty('title') && item.hasOwnProperty('profile_path'));
-            const isScene = item.media_type === 'scene';
-            const rawPosterUrl = isPerson
+            const rawPosterUrl = n.isPerson
               ? resolveMediaImageUrl(item.profile_path || item.local_profile_path, 'personThumb')
-              : resolveMediaImageUrl(isScene ? (item.backdrop_path || item.poster_path) : item.poster_path, isScene ? 'backdrop' : 'poster');
-            const shouldBlur = (isAdultCarousel || isScene) && sessionMode !== 'nsfw';
-            const posterUrl = (shouldBlur && rawPosterUrl)
+              : resolveMediaImageUrl(n.isScene ? (item.backdrop_path || item.poster_path) : item.poster_path, n.isScene ? 'backdrop' : 'poster');
+            const posterUrl = (n.shouldBlur && rawPosterUrl)
               ? `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(rawPosterUrl)}&blur=true`
               : rawPosterUrl;
-            const ratingImdb = item.rating_imdb;
-            const ratingTmdb = item.rating_tmdb || item.vote_average;
-            const ratingPorndb = item.rating_porndb;
-            const hasRating = (ratingImdb && ratingImdb > 0) || (ratingTmdb && ratingTmdb > 0) || (ratingPorndb && ratingPorndb > 0);
-
-            const isTv = !isPerson && !isScene && (item.media_type === 'tv' || item.media_type === 'episode' || !item.title);
-            let yearLabel = null;
-            if (isPerson || isScene) {
-              // No year label
-            } else if (isTv) {
-              const firstAirYear = item.first_air_date ? new Date(item.first_air_date).getFullYear() : null;
-              const lastAirYear = item.last_air_date ? new Date(item.last_air_date).getFullYear() : null;
-              const isEnded = item.release_status?.toLowerCase() === 'ended';
-              if (firstAirYear) {
-                yearLabel = isEnded && lastAirYear
-                  ? `${firstAirYear} - ${lastAirYear}`
-                  : `${firstAirYear} - `;
-              }
-            } else {
-              yearLabel = item.release_date ? new Date(item.release_date).getFullYear() : null;
-            }
-
-            const genderPref = settings?.adult_gender_preference;
-            const allPeople = item.people || [];
-            const filteredPeople = genderPref && genderPref !== 'all'
-              ? allPeople.filter(p => {
-                if (genderPref === 'female') return p.gender === 1;
-                if (genderPref === 'male') return p.gender === 2;
-                return true;
-              })
-              : allPeople;
-            const performers = filteredPeople.slice(0, 3);
+            const hasRating = (n.ratingImdb && n.ratingImdb > 0) || (n.ratingTmdb && n.ratingTmdb > 0) || (n.ratingPorndb && n.ratingPorndb > 0);
+            const yearLabel = n.subtitle;
+            const performers = n.performers;
             const displayDate = item.release_date ? item.release_date.substring(0, 10) : '';
 
             let roleLabel = null;
-            if (isPerson) {
+            if (n.isPerson) {
               const dept = item.known_for_department || (item.is_adult ? 'performer' : 'artist');
               roleLabel = T(`lists.roles.${dept.toLowerCase()}`) || dept;
             }
@@ -205,7 +180,7 @@ const RecommendationCarousel = ({
             return (
               <div
                 key={item.id}
-                className={`recommend-card ${isScene ? 'recommend-card--scene' : ''}`}
+                className={`recommend-card ${n.isScene ? 'recommend-card--scene' : ''}`}
                 onClick={() => onCardClick(item)}
                 role="button"
                 tabIndex={0}
@@ -215,7 +190,7 @@ const RecommendationCarousel = ({
                   }
                 }}
               >
-                <div className={`recommend-card-poster-shell ${shouldBlur ? 'is-blurred' : ''}`}>
+                <div className={`recommend-card-poster-shell ${n.shouldBlur ? 'is-blurred' : ''}`}>
                   {posterUrl && (
                     <img
                       key={posterUrl}
@@ -224,12 +199,12 @@ const RecommendationCarousel = ({
                       className="recommend-card-image"
                     />
                   )}
-                  {shouldBlur && (
+                  {n.shouldBlur && (
                     <div className="recommend-card-blur-overlay">
                       <span className="settings-badge settings-badge--danger">{ADULT_LABEL}</span>
                     </div>
                   )}
-                  {!isPerson && (
+                  {!n.isPerson && (
                     <div className="recommend-card-overlay">
                       <Button
                         onClick={(e) => {
@@ -260,11 +235,11 @@ const RecommendationCarousel = ({
 
                 <div className="recommend-card-meta">
                   <div className="recommend-card-name" title={item.title || item.name}>{item.title || item.name}</div>
-                  {isPerson ? (
+                  {n.isPerson ? (
                     <div className="recommend-card-secondary" style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
                       {roleLabel}
                     </div>
-                  ) : isScene ? (
+                  ) : n.isScene ? (
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '4px' }}>
                       <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
                         {performers.map((p, idx) => (
@@ -288,17 +263,17 @@ const RecommendationCarousel = ({
                       <div className="recommend-card-secondary">
                         {yearLabel ? <span className="recommend-card-year">{yearLabel}</span> : null}
                         <div className="recommend-card-ratings">
-                          {ratingImdb && ratingImdb > 0 ? (
+                          {n.ratingImdb && n.ratingImdb > 0 ? (
                             <Pill variant="imdb">
-                              <Star size={10} fill="currentColor" /> {ratingImdb.toFixed(1)}
+                              <Star size={10} fill="currentColor" /> {n.ratingImdb.toFixed(1)}
                             </Pill>
-                          ) : (ratingTmdb && ratingTmdb > 0) ? (
+                          ) : (n.ratingTmdb && n.ratingTmdb > 0) ? (
                             <Pill variant="tmdb">
-                              <Star size={10} fill="currentColor" /> {ratingTmdb.toFixed(1)}
+                              <Star size={10} fill="currentColor" /> {n.ratingTmdb.toFixed(1)}
                             </Pill>
-                          ) : (ratingPorndb && ratingPorndb > 0) ? (
+                          ) : (n.ratingPorndb && n.ratingPorndb > 0) ? (
                             <Pill variant="porndb">
-                              <Star size={10} fill="currentColor" /> {ratingPorndb.toFixed(1)}
+                              <Star size={10} fill="currentColor" /> {n.ratingPorndb.toFixed(1)}
                             </Pill>
                           ) : null}
                         </div>

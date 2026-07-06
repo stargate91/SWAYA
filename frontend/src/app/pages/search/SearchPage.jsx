@@ -12,6 +12,7 @@ import PosterCard from '@/ui/PosterCard';
 import Button from '@/ui/Button';
 import { useSettingsQuery } from '@/queries/settingsQueries';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
+import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
 import { useTranslation } from '@/providers/LanguageContext';
 import './SearchPage.css';
 
@@ -275,26 +276,13 @@ export default function SearchPage() {
           <>
             <PosterGrid className={`search-page-grid ${urlType === 'scene' ? 'library-scenes-grid' : ''}`}>
               {visibleResults.map((item, idx) => {
+                const n = normalizeMediaEntity(item, { context: 'search', settings });
                 const posterUrl = item.poster_path ? resolveMediaImageUrl(item.poster_path, 'posterThumb') : null;
 
-                let subtitle = item.year ? String(item.year) : undefined;
+                let subtitle = n.subtitle || undefined;
                 if (item.media_type === 'scene') {
                   const displayDate = item.release_date ? item.release_date.substring(0, 10) : item.year;
-                  const pref = settings?.adult_gender_preference;
-                  const allPeople = item.people || [];
-                  const filteredPeople = pref && pref !== 'all'
-                    ? allPeople.filter(p => {
-                      const g = typeof p.gender === 'string'
-                        ? (p.gender.toUpperCase().includes('FEMALE') ? 1 : p.gender.toUpperCase().includes('MALE') ? 2 : 0)
-                        : p.gender;
-                      if (g) {
-                        if (pref === 'female') return g === 1;
-                        if (pref === 'male') return g === 2;
-                      }
-                      return true;
-                    })
-                    : allPeople;
-                  const performers = filteredPeople.slice(0, 4);
+                  const performers = n.performers;
 
                   subtitle = (
                     <div className="library-scene-card__subtitle-inner">

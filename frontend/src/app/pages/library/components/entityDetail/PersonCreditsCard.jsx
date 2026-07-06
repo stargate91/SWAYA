@@ -2,6 +2,7 @@ import { Layers, Bookmark, Play } from '@/ui/icons';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
 import { API_BASE } from '@/lib/backend';
 import { getCreditSource, navigateToCreditDetail } from '../../utils/mediaNavigation';
+import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
 
 export default function PersonCreditsCard({
   item,
@@ -13,7 +14,8 @@ export default function PersonCreditsCard({
   showLibraryBadge = false,
   placeholderIconSize = 18
 }) {
-  const creditTitle = item.title || item.name || 'Unknown';
+  const n = normalizeMediaEntity(item, { context: 'credits' });
+  const creditTitle = n.title;
   const resolvedSource = getCreditSource(item);
 
   const isScene = mediaType === 'scenes' || mediaType.includes('scene');
@@ -28,7 +30,7 @@ export default function PersonCreditsCard({
 
   const itemType = item.media_type || item.type;
   const isSceneOrPornDbMovie = (itemType === 'scene' || itemType === 'scenes') || (resolvedSource === 'porndb' || resolvedSource === 'theporndb');
-  const leftText = isSceneOrPornDbMovie ? (item.release_date || '').split('T')[0].split(' ')[0] || item.year || '' : item.character || '';
+  const leftText = isSceneOrPornDbMovie ? n.subtitle : item.character || '';
   const rightText = isSceneOrPornDbMovie ? '' : item.year || '';
   const isTvItem = itemType === 'tv' || itemType === 'tvshows';
 
