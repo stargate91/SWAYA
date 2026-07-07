@@ -13,6 +13,8 @@ export const TMDB_IMAGE_SIZES = {
   originalPoster: 'original',
   originalStill: 'original',
   originalPerson: 'original',
+  scene_stills: 'w500',
+  originalSceneStill: 'original',
 };
 
 export const buildTmdbImageUrl = (path, size = TMDB_IMAGE_SIZES.poster) => {
@@ -59,7 +61,7 @@ export const getBackdropImagePath = (item) => pickFirstImagePath(
 export const resolveMediaImageUrl = (path, imageType = 'poster', apiBase = API_BASE) => {
   if (!path) return '';
   const pathStr = String(path);
-  const isOriginalType = imageType === 'backdrop' || imageType === 'logo' || imageType === 'originalPoster' || imageType === 'originalStill' || imageType === 'originalPerson';
+  const isOriginalType = imageType === 'backdrop' || imageType === 'logo' || imageType === 'originalPoster' || imageType === 'originalStill' || imageType === 'originalPerson' || imageType === 'originalSceneStill';
   if (pathStr.startsWith('/media/') || pathStr.startsWith('/api/')) {
     if (isOriginalType && pathStr.includes('/thumbnails/')) {
       return `${apiBase}${pathStr.replace('/thumbnails/', '/original/')}`;
@@ -96,6 +98,7 @@ export const resolveMediaImageUrl = (path, imageType = 'poster', apiBase = API_B
   else if (imageType === 'logo') folder = 'logos';
   else if (imageType === 'person' || imageType === 'originalPerson' || imageType === 'personThumb') folder = 'people';
   else if (imageType === 'still' || imageType === 'originalStill') folder = 'stills';
+  else if (imageType === 'scene_stills' || imageType === 'originalSceneStill') folder = 'scene_stills';
 
   const subfolderType = isOriginalType ? 'original' : 'thumbnails';
 

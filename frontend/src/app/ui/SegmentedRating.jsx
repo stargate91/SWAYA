@@ -1,7 +1,7 @@
 /* eslint-disable react/forbid-dom-props */
 import { useState } from 'react';
 
-export default function SegmentedRating({ value, onChange, t }) {
+export default function SegmentedRating({ value, onChange, t, labelUnder = false }) {
   const [hoveredRating, setHoveredRating] = useState(null);
 
   const displayRating = hoveredRating !== null ? hoveredRating : value;
@@ -28,7 +28,7 @@ export default function SegmentedRating({ value, onChange, t }) {
   };
 
   return (
-    <div className="table-segmented-rating-container">
+    <div className={`table-segmented-rating-container ${labelUnder ? 'layout-column' : ''}`}>
       <div
         className="rating-segmented-bar"
         onMouseMove={handleMouseMove}
@@ -36,7 +36,7 @@ export default function SegmentedRating({ value, onChange, t }) {
         onMouseUp={handleClick}
         role="slider"
         tabIndex={0}
-        aria-label={t('library.details.yourRating') || 'Your Rating'}
+        aria-label={t('library.yourRating') || 'Your Rating'}
         aria-valuemin={0}
         aria-valuemax={10}
         aria-valuenow={displayRating ?? 0}
@@ -58,11 +58,22 @@ export default function SegmentedRating({ value, onChange, t }) {
           );
         })}
       </div>
-      <span className={`user-rating-label ${displayRating !== undefined && displayRating !== null ? 'has-value' : ''}`}>
-        {displayRating !== undefined && displayRating !== null
-          ? displayRating.toFixed(1)
-          : '-.-'}
-      </span>
+      {labelUnder ? (
+        <span className={`user-rating-label-under ${displayRating !== undefined && displayRating !== null ? 'has-value' : ''}`}>
+          {t('library.yourRating', { defaultValue: 'Your Rating' })}
+          <span className="rating-value-bold">
+            {displayRating !== undefined && displayRating !== null
+              ? displayRating.toFixed(1)
+              : '-.-'}
+          </span>
+        </span>
+      ) : (
+        <span className={`user-rating-label ${displayRating !== undefined && displayRating !== null ? 'has-value' : ''}`}>
+          {displayRating !== undefined && displayRating !== null
+            ? displayRating.toFixed(1)
+            : '-.-'}
+        </span>
+      )}
     </div>
   );
 }

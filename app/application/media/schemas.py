@@ -68,15 +68,18 @@ class DiscoveryItem(BaseModel):
     title: str
     poster_path: Optional[str] = None
     media_type: str
+    overview: Optional[str] = None
 
 class PlaybackInfoResponse(BaseModel):
     file_path: str
     start_seconds: int
     title: str
     logo_path: Optional[str] = None
+    media_image: Optional[str] = None
     is_adult: Optional[bool] = False
     media_type: Optional[str] = None
     extras: Optional[List[PlaybackExtra]] = []
+    user_rating: Optional[float] = None
     peaks_count: Optional[int] = 0
     collection_next: Optional[DiscoveryItem] = None
     performer_unwatched: Optional[DiscoveryItem] = None

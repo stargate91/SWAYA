@@ -1,7 +1,7 @@
 import { Suspense, useState, useEffect, useRef } from 'react';
 import { Outlet, useNavigate, useLocation, useNavigationType } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { QK } from '@/lib/queryKeys';
+import { QK, invalidateEntity } from '@/lib/queryKeys';
 import AppClosePrompt from './AppClosePrompt';
 import WindowTitlebar from './WindowTitlebar';
 import PlayerControlBar from './PlayerControlBar';
@@ -82,6 +82,7 @@ export default function AppShell() {
   const location = useLocation();
   const pushPath = useNavigationStore((state) => state.pushPath);
   const navType = useNavigationType();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (navType !== 'POP') {
@@ -135,6 +136,12 @@ export default function AppShell() {
           };
         }
         if (data.event === 'close') {
+          queryClient.invalidateQueries({ queryKey: ['library'] });
+          queryClient.invalidateQueries({ queryKey: QK.stats });
+          queryClient.invalidateQueries({ queryKey: QK.watchedHistory });
+          if (prev.itemId) {
+            invalidateEntity(queryClient, prev.itemId);
+          }
           return { ...prev, active: false };
         }
         if (data.event === 'time-pos') {
@@ -160,7 +167,7 @@ export default function AppShell() {
     return () => {
       ipcRenderer.off('player-state-update', handlePlayerStateUpdate);
     };
-  }, []);
+  }, [queryClient]);
 
   const handleTogglePlay = () => {
     try {

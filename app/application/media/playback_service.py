@@ -238,6 +238,7 @@ class PlaybackService:
         item, override, start_seconds = self.track_playback_start(item.id)
             
         logo_path = None
+        media_image = None
         title = item.filename
         is_adult = False
         media_type = None
@@ -249,6 +250,7 @@ class PlaybackService:
             
             # Resolve parent show match for TV shows using explicit queries to avoid lazy loading issues
             show_match = None
+            season_match = None
             if match.media_type and match.media_type.value == "episode":
                 season_match = self.db.query(MetadataMatch).filter(MetadataMatch.id == match.parent_id).first()
                 if season_match:
@@ -342,6 +344,61 @@ class PlaybackService:
                 elif match.original_title:
                     title = match.original_title
                 
+            # Extract raw image paths first
+            raw_image = None
+            image_category = "posters"
+
+            # Check override first
+            if override and override.custom_poster:
+                raw_image = override.custom_poster
+                image_category = "posters"
+
+            if not raw_image:
+                if media_type == "episode":
+                    raw_image = match.local_still_path or match.still_path
+                    image_category = "stills"
+                    
+                    if not raw_image and season_match:
+                        loc_season = self.db.query(MetadataLocalization).filter(MetadataLocalization.match_id == season_match.id).first()
+                        if loc_season:
+                            raw_image = loc_season.local_poster_path or loc_season.poster_path
+                            image_category = "posters"
+                    if not raw_image and show_match:
+                        loc_show = self.db.query(MetadataLocalization).filter(MetadataLocalization.match_id == show_match.id).first()
+                        if loc_show:
+                            raw_image = loc_show.local_poster_path or loc_show.poster_path
+                            image_category = "posters"
+                elif media_type == "scene":
+                    raw_image = match.local_backdrop_path or match.backdrop_path
+                    image_category = "scene_stills"
+                else:
+                    if loc:
+                        raw_image = loc.local_poster_path or loc.poster_path
+                    if not raw_image:
+                        raw_image = match.local_poster_path or match.poster_path
+                    if raw_image:
+                        image_category = "posters"
+
+            # Resolve the raw_image
+            if raw_image:
+                if raw_image.startswith(("/media/", "http://", "https://")):
+                    media_image = raw_image
+                else:
+                    from app.shared_kernel.ports.image_service_port import ImageServiceRegistry
+                    media_image = ImageServiceRegistry.get().resolve_image_url(raw_image, image_category)
+        else:
+            # Check override poster without match
+            if override and override.custom_poster:
+                media_image = override.custom_poster
+                if media_image and not media_image.startswith(("/media/", "http://", "https://")):
+                    from app.shared_kernel.ports.image_service_port import ImageServiceRegistry
+                    media_image = ImageServiceRegistry.get().resolve_image_url(media_image, "posters")
+        
+        # Make sure media_image gets resolved if it's set
+        if media_image and not media_image.startswith(("/media/", "http://", "https://")):
+            from app.shared_kernel.ports.image_service_port import ImageServiceRegistry
+            media_image = ImageServiceRegistry.get().resolve_image_url(media_image, "posters")
+        
         if override and override.custom_logo:
             logo_path = override.custom_logo
 
@@ -379,10 +436,17 @@ class PlaybackService:
             "start_seconds": start_seconds,
             "title": title,
             "logo_path": logo_path,
+            "media_image": media_image,
             "is_adult": is_adult,
             "media_type": media_type,
             "extras": extras_list,
-            "user_rating": override.user_rating if override else None,
+            "user_rating": (
+                override.user_rating 
+                if (override and override.user_rating is not None) 
+                else (self.overrides._get_or_create_override(str(item.id), media_type).user_rating 
+                      if self.overrides._get_or_create_override(str(item.id), media_type) 
+                      else None)
+            ),
             "next_episode": discovery.get("next_episode"),
             "peaks_count": discovery.get("peaks_count", 0),
             "collection_next": discovery.get("collection_next"),

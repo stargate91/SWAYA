@@ -58,11 +58,14 @@ class PlayerDiscoveryService:
         if not p_path and target_loc:
             p_path = target_loc.local_poster_path or target_loc.poster_path
 
+        overview = target_loc.overview if target_loc else None
+
         return {
             "id": active_match.media_item_id or f"external_{active_match.provider.value}_{active_match.external_id}",
             "title": title_val,
             "poster_path": p_path,
-            "media_type": active_match.media_type.value if active_match.media_type else "movie"
+            "media_type": active_match.media_type.value if active_match.media_type else "movie",
+            "overview": overview
         }
 
     @classmethod
@@ -178,13 +181,26 @@ class PlayerDiscoveryService:
                 if next_stud_match:
                     studio_unwatched_info = cls.to_discovery_item(db, next_stud_match, current_uid, settings_adapter)
 
-            # Surprise Me (Random unwatched same type)
+            # Surprise Me (Random unwatched same type, excluding already recommended items)
+            from sqlalchemy.sql.expression import func
+            excluded_item_ids = {match.media_item_id}
+            if collection_next_info and collection_next_info.get("id"):
+                excluded_item_ids.add(collection_next_info["id"])
+            if performer_unwatched_info and performer_unwatched_info.get("id"):
+                excluded_item_ids.add(performer_unwatched_info["id"])
+            if studio_unwatched_info and studio_unwatched_info.get("id"):
+                excluded_item_ids.add(studio_unwatched_info["id"])
+
+            is_adult_filter = MetadataMatch.is_adult == True if is_adult else (MetadataMatch.is_adult == False) | (MetadataMatch.is_adult.is_(None))
+
             rand_match = db.query(MetadataMatch).filter(
                 MetadataMatch.media_type == match.media_type,
                 MetadataMatch.id != match.id,
                 MetadataMatch.is_active == True,
                 MetadataMatch.media_item_id.isnot(None),
-                ~MetadataMatch.media_item_id.in_(unwatched_item_ids_subq)
+                is_adult_filter,
+                ~MetadataMatch.media_item_id.in_(unwatched_item_ids_subq),
+                ~MetadataMatch.media_item_id.in_(list(excluded_item_ids))
             ).order_by(func.random()).first()
             if rand_match:
                 surprise_me_info = cls.to_discovery_item(db, rand_match, current_uid, settings_adapter)

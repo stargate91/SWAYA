@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSettingsQuery } from '../../../queries';
+import { useQueryClient } from '@tanstack/react-query';
+import { useSettingsQuery, useUpdateMediaStatusMutation } from '../../../queries';
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
 
 const getQueryParam = (name) => {
@@ -21,6 +22,8 @@ const getQueryParam = (name) => {
 
 export default function useVideoPlayer({ itemId, containerRef }) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const updateStatusMutation = useUpdateMediaStatusMutation();
   const { data: settings } = useSettingsQuery();
   const theme = settings?.ui_theme || 'dark';
 
@@ -64,6 +67,7 @@ export default function useVideoPlayer({ itemId, containerRef }) {
   });
   const [title, setTitle] = useState(isTrailer ? (queryTitle || 'Trailer') : 'Loading...');
   const [logoUrl, setLogoUrl] = useState(null);
+  const [mediaImage, setMediaImage] = useState(null);
   const [showControls, setShowControls] = useState(true);
   const [isPip, setIsPip] = useState(false);
 
@@ -304,6 +308,14 @@ export default function useVideoPlayer({ itemId, containerRef }) {
           const resolved = resolveMediaImageUrl(data.logo_path, 'logo', `http://localhost:${backendPort}`);
           setLogoUrl(resolved);
         }
+        if (data.media_image) {
+          const resolvedImage = resolveMediaImageUrl(
+            data.media_image,
+            data.media_type === 'episode' ? 'still' : (data.media_type === 'scene' || data.is_adult ? 'scene_stills' : 'poster'),
+            `http://localhost:${backendPort}`
+          );
+          setMediaImage(resolvedImage);
+        }
 
         if (controlsOnly) {
           setIsPlaying(true);
@@ -368,7 +380,7 @@ export default function useVideoPlayer({ itemId, containerRef }) {
             }
           }
         }
-         if (data.name === 'eof-reached' && data.data === true) {
+        if (data.name === 'eof-reached' && data.data === true) {
           if (isTrailer) {
             handleCloseRef.current();
           } else {
@@ -569,7 +581,7 @@ export default function useVideoPlayer({ itemId, containerRef }) {
       await fetch(`http://localhost:${backendPort}/api/v1/library/item/${itemId}/peaks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           video_position: Math.round(currentTime),
           snapshot_path: snapshotPath
         })
@@ -607,11 +619,12 @@ export default function useVideoPlayer({ itemId, containerRef }) {
   const handleRate = async (rating) => {
     setUserRating(rating);
     try {
-      const backendPort = getQueryParam('backend_port') || '8000';
-      await fetch(`http://localhost:${backendPort}/api/v1/media/${itemId}/status`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_rating: rating })
+      await updateStatusMutation.mutateAsync({
+        itemId: itemId,
+        payload: {
+          user_rating: rating,
+          media_type: mediaType
+        }
       });
     } catch (e) {
       console.error('Failed to update rating:', e);
@@ -642,7 +655,7 @@ export default function useVideoPlayer({ itemId, containerRef }) {
   }, []);
 
   const handleKeyDownRef = useRef(null);
-  
+
   const prevSubDelayRef = useRef(0);
   const prevAudioDelayRef = useRef(0);
 
@@ -800,6 +813,7 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     speed,
     isAdult,
     mediaType,
+    mediaImage,
     justAddedPeak,
     logoError,
     chapters,

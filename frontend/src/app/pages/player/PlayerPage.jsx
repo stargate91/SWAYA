@@ -47,6 +47,7 @@ export default function PlayerPage() {
     speed,
     isAdult,
     mediaType,
+    mediaImage,
     justAddedPeak,
     logoError,
     chapters,
@@ -242,6 +243,7 @@ export default function PlayerPage() {
           studioUnwatched={studioUnwatched}
           surpriseMe={surpriseMe}
           mediaType={mediaType}
+          mediaImage={mediaImage}
           isAdult={isAdult}
           handlePlayNext={handlePlayNext}
           setNextEpisode={setNextEpisode}

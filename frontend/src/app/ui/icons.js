@@ -42,6 +42,7 @@ export {
   FileJson,
   Film,
   Flame,
+  Gift,
   FolderOpen,
   FolderPlus,
   FolderSync,
