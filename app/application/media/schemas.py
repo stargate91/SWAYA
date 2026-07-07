@@ -70,6 +70,10 @@ class DiscoveryItem(BaseModel):
     media_type: str
     overview: Optional[str] = None
 
+class NextEpisodeInfo(BaseModel):
+    id: Union[int, str]
+    title: str
+
 class PlaybackInfoResponse(BaseModel):
     file_path: str
     start_seconds: int
@@ -82,9 +86,18 @@ class PlaybackInfoResponse(BaseModel):
     user_rating: Optional[float] = None
     peaks_count: Optional[int] = 0
     collection_next: Optional[DiscoveryItem] = None
+    next_episode: Optional[NextEpisodeInfo] = None
+    first_episode: Optional[NextEpisodeInfo] = None
     performer_unwatched: Optional[DiscoveryItem] = None
     studio_unwatched: Optional[DiscoveryItem] = None
     surprise_me: Optional[DiscoveryItem] = None
+    tv_show_id: Optional[str] = None
+    tv_show_title: Optional[str] = None
+    tv_show_poster: Optional[str] = None
+    tv_show_rating: Optional[float] = None
+    season_number: Optional[int] = None
+    season_poster: Optional[str] = None
+    episode_number: Optional[int] = None
 
 class UpdatePlaybackProgressRequest(BaseModel):
     item_id: Union[str, int]

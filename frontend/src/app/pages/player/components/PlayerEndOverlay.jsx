@@ -7,6 +7,8 @@ export default function PlayerEndOverlay({
   t,
   title,
   nextEpisode,
+  firstEpisode,
+  episodeNumber,
   countdown,
   userRating,
   hoverRating,
@@ -20,6 +22,12 @@ export default function PlayerEndOverlay({
   mediaType,
   mediaImage,
   isAdult,
+  tvShowId,
+  tvShowTitle,
+  tvShowPoster,
+  tvShowRating,
+  seasonNumber,
+  seasonPoster,
   handlePlayNext,
   setNextEpisode,
   setHoverRating,
@@ -44,6 +52,25 @@ export default function PlayerEndOverlay({
   const isTv = mediaType === 'episode' || mediaType === 'tv';
   const isScene = mediaType === 'scene';
   const activeMovie = (!collectionNext || showSurprise) ? surpriseMe : collectionNext;
+  const isDiscoveryEmpty = isTv ? !nextEpisode : !activeMovie;
+
+  // Resolve episode number from prop or parse from title as fallback
+  const parsedEpMatch = title.match(/E(\d{2})/i);
+  const resolvedEpisodeNum = episodeNumber ?? (parsedEpMatch ? parseInt(parsedEpMatch[1], 10) : null);
+
+  // Clean the title for TV episodes to prevent redundancy (e.g. Relic Hunter - E06 - Diamond in the Rough -> Diamond in the Rough)
+  let displayTitle = title;
+  if (tvShowId && tvShowTitle) {
+    let clean = title;
+    if (clean.startsWith(tvShowTitle)) {
+      clean = clean.substring(tvShowTitle.length).trim();
+    }
+    clean = clean.replace(/^[\s-&_—]+/, '').trim();
+    clean = clean.replace(/S?\d{2}E\d{2}/i, '').trim();
+    clean = clean.replace(/E\d{2}/i, '').trim();
+    clean = clean.replace(/^[\s-&_—]+/, '').trim();
+    displayTitle = clean;
+  }
 
   return (
     <div className="player-page__end-overlay active">
@@ -51,25 +78,75 @@ export default function PlayerEndOverlay({
       <div className="player-page__end-drawer player-page__end-drawer--left">
         <div className="player-page__drawer-header">
           <div className="player-page__drawer-tag">{t('player.finished_watching', { defaultValue: 'Finished watching' })}</div>
-          <h2 className="player-page__drawer-title">{title}</h2>
+          <h2 className="player-page__drawer-title">
+            {tvShowTitle ? `${tvShowTitle} - ${displayTitle}` : displayTitle}
+          </h2>
         </div>
 
         <div className="player-page__drawer-content">
           {mediaImage && (
             <div className="player-page__drawer-media-container">
-              <img src={mediaImage} alt={title} className="player-page__drawer-media" />
+              <div className="player-page__drawer-media-wrapper" style={{ position: 'relative', display: 'inline-flex', maxWidth: '100%' }}>
+                <img src={mediaImage} alt={title} className="player-page__drawer-media" />
+                {resolvedEpisodeNum !== null && resolvedEpisodeNum !== undefined && (
+                  <div className="player-page__episode-badge">
+                    {resolvedEpisodeNum}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {tvShowId && (
+            <div className="player-page__tv-season-context">
+              <span className="player-page__tv-season-label-top">
+                {t('player.watching_season_top', { defaultValue: 'You are watching this season' })}
+              </span>
+              <h3 className="player-page__tv-season-title-top">
+                {t('player.season_number', { defaultValue: 'Season {{season}}', season: seasonNumber })}
+              </h3>
             </div>
           )}
 
           {/* Segmented Rater */}
-          <div className="player-page__segmented-rater-container">
-            <SegmentedRating
-              value={userRating}
-              onChange={handleRate}
-              t={t}
-              labelUnder={true}
-            />
-          </div>
+          {!tvShowId ? (
+            <div className="player-page__segmented-rater-container">
+              <SegmentedRating
+                value={userRating}
+                onChange={handleRate}
+                t={t}
+                labelUnder={true}
+              />
+            </div>
+          ) : (
+            <>
+              <hr className="player-page__tv-divider" />
+              <div className="player-page__tv-rate-card">
+                <span className="player-page__tv-rate-prompt">
+                  {t('player.rate_show_prompt', { defaultValue: 'Ready to rate the series?' })}
+                </span>
+                
+                <div className="player-page__tv-rate-split">
+                  {(seasonPoster || tvShowPoster) && (
+                    <div className="player-page__tv-poster-side">
+                      <img src={seasonPoster || tvShowPoster} alt={tvShowTitle} className="player-page__tv-poster" />
+                    </div>
+                  )}
+
+                  <div className="player-page__tv-details-side">
+                    <div className="player-page__segmented-rater-container">
+                      <SegmentedRating
+                        value={tvShowRating}
+                        onChange={handleRate}
+                        t={t}
+                        labelUnder={true}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Scene specific Peaks statistics */}
@@ -110,7 +187,7 @@ export default function PlayerEndOverlay({
           )}
         </div>
 
-        <div className={`player-page__discovery-content ${(!isTv && !isScene && !activeMovie) ? 'player-page__discovery-content--empty' : ''}`}>
+        <div className={`player-page__discovery-content ${isDiscoveryEmpty ? 'player-page__discovery-content--empty' : ''}`}>
           {/* TV SHOWS: Up Next Episode */}
           {isTv && (
             <div className="player-page__tv-next">
@@ -128,11 +205,12 @@ export default function PlayerEndOverlay({
                 </div>
               ) : (
                 <div className="player-page__no-next-msg">
-                  <p>{t('player.no_more_episodes', { defaultValue: "You've caught up with this show!" })}</p>
-                  {surpriseMe && (
-                    <button className="player-page__discover-btn" onClick={() => playItem(surpriseMe.id)}>
-                      <Flame size={16} />
-                      <span>{t('player.surprise_me', { defaultValue: 'Surprise Me' })}</span>
+                  <Tv size={48} className="player-page__card-placeholder-icon" />
+                  <p>{t('player.series_completed', { defaultValue: "You've finished this series!" })}</p>
+                  {firstEpisode && (
+                    <button className="player-page__discover-btn" onClick={() => playItem(firstEpisode.id)}>
+                      <RotateCcw size={16} />
+                      <span>{t('player.replay_series', { defaultValue: 'Replay Series' })}</span>
                     </button>
                   )}
                 </div>

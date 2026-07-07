@@ -76,6 +76,8 @@ export default function useVideoPlayer({ itemId, containerRef }) {
   const [userRating, setUserRating] = useState(null);
   const [hoverRating, setHoverRating] = useState(null);
   const [nextEpisode, setNextEpisode] = useState(null);
+  const [firstEpisode, setFirstEpisode] = useState(null);
+  const [episodeNumber, setEpisodeNumber] = useState(null);
   const [countdown, setCountdown] = useState(10);
   const countdownIntervalRef = useRef(null);
   const hasTriggeredEndRef = useRef(false);
@@ -107,6 +109,12 @@ export default function useVideoPlayer({ itemId, containerRef }) {
   const [performerUnwatched, setPerformerUnwatched] = useState(null);
   const [studioUnwatched, setStudioUnwatched] = useState(null);
   const [surpriseMe, setSurpriseMe] = useState(null);
+  const [tvShowId, setTvShowId] = useState(null);
+  const [tvShowTitle, setTvShowTitle] = useState(null);
+  const [tvShowPoster, setTvShowPoster] = useState(null);
+  const [tvShowRating, setTvShowRating] = useState(null);
+  const [seasonNumber, setSeasonNumber] = useState(null);
+  const [seasonPoster, setSeasonPoster] = useState(null);
 
   const videoParamsRef = useRef(null);
 
@@ -299,11 +307,25 @@ export default function useVideoPlayer({ itemId, containerRef }) {
         setMediaType(data.media_type);
         setUserRating(data.user_rating);
         setNextEpisode(data.next_episode);
+        setFirstEpisode(data.first_episode);
         setPeaksCount(data.peaks_count || 0);
         setCollectionNext(data.collection_next);
         setPerformerUnwatched(data.performer_unwatched);
         setStudioUnwatched(data.studio_unwatched);
         setSurpriseMe(data.surprise_me);
+        setTvShowId(data.tv_show_id);
+        setTvShowTitle(data.tv_show_title);
+        setTvShowRating(data.tv_show_rating);
+        setSeasonNumber(data.season_number);
+        setEpisodeNumber(data.episode_number);
+        if (data.tv_show_poster) {
+          const resolvedTvPoster = resolveMediaImageUrl(data.tv_show_poster, 'poster', `http://localhost:${backendPort}`);
+          setTvShowPoster(resolvedTvPoster);
+        }
+        if (data.season_poster) {
+          const resolvedSeasonPoster = resolveMediaImageUrl(data.season_poster, 'poster', `http://localhost:${backendPort}`);
+          setSeasonPoster(resolvedSeasonPoster);
+        }
         if (data.logo_path) {
           const resolved = resolveMediaImageUrl(data.logo_path, 'logo', `http://localhost:${backendPort}`);
           setLogoUrl(resolved);
@@ -617,17 +639,32 @@ export default function useVideoPlayer({ itemId, containerRef }) {
   }, [showEndOverlay, nextEpisode, handlePlayNext]);
 
   const handleRate = async (rating) => {
-    setUserRating(rating);
-    try {
-      await updateStatusMutation.mutateAsync({
-        itemId: itemId,
-        payload: {
-          user_rating: rating,
-          media_type: mediaType
-        }
-      });
-    } catch (e) {
-      console.error('Failed to update rating:', e);
+    if (tvShowId) {
+      setTvShowRating(rating);
+      try {
+        await updateStatusMutation.mutateAsync({
+          itemId: tvShowId,
+          payload: {
+            user_rating: rating,
+            media_type: 'tv'
+          }
+        });
+      } catch (e) {
+        console.error('Failed to update TV show rating:', e);
+      }
+    } else {
+      setUserRating(rating);
+      try {
+        await updateStatusMutation.mutateAsync({
+          itemId: itemId,
+          payload: {
+            user_rating: rating,
+            media_type: mediaType
+          }
+        });
+      } catch (e) {
+        console.error('Failed to update rating:', e);
+      }
     }
   };
 
@@ -809,6 +846,8 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     userRating,
     hoverRating,
     nextEpisode,
+    firstEpisode,
+    episodeNumber,
     countdown,
     speed,
     isAdult,
@@ -829,11 +868,18 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     performerUnwatched,
     studioUnwatched,
     surpriseMe,
+    tvShowId,
+    tvShowTitle,
+    tvShowPoster,
+    tvShowRating,
+    seasonNumber,
+    seasonPoster,
     setShowAudioMenu,
     setShowSubMenu,
     setLogoError,
     setHoverRating,
     setNextEpisode,
+    setFirstEpisode,
     handleMouseMove,
     handleWheel,
     handleDoubleClick,

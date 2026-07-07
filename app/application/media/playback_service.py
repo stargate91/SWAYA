@@ -17,6 +17,7 @@ from app.application.media.schemas import (
     WatchedHistoryResponse,
 )
 from app.domains.media.services.playback_domain_service import PlaybackDomainService
+from app.shared_kernel.enums import Provider, MediaType
 
 logger = logging.getLogger(__name__)
 
@@ -431,6 +432,79 @@ class PlaybackService:
             settings_adapter=self.settings
         )
 
+        tv_show_id = None
+        tv_show_title = None
+        tv_show_poster = None
+        tv_show_rating = None
+        season_number = None
+        season_poster = None
+
+        episode_number = None
+        if match and match.media_type and match.media_type.value == "episode":
+            season_number = match.season_number
+            
+            # Parse episode number
+            current_ep = match.episode_number
+            if isinstance(current_ep, list) and current_ep:
+                try:
+                    episode_number = int(current_ep[-1])
+                except (ValueError, TypeError):
+                    pass
+            elif isinstance(current_ep, (int, float)):
+                episode_number = int(current_ep)
+            elif isinstance(current_ep, str):
+                try:
+                    import json
+                    parsed = json.loads(current_ep)
+                    if isinstance(parsed, list) and parsed:
+                        episode_number = int(parsed[-1])
+                    else:
+                        episode_number = int(parsed)
+                except Exception:
+                    try:
+                        episode_number = int(current_ep)
+                    except (ValueError, TypeError):
+                        pass
+
+            if show_match:
+                tv_show_id = f"tmdb_{show_match.external_id}"
+                tv_override = self.overrides._get_or_create_override(tv_show_id, "tv")
+                if tv_override:
+                    tv_show_rating = tv_override.user_rating
+
+                from app.domains.metadata.models import MetadataLocalization
+                loc_show = self.db.query(MetadataLocalization).filter(MetadataLocalization.match_id == show_match.id).first()
+                raw_show_poster = None
+                if loc_show:
+                    tv_show_title = loc_show.title
+                    raw_show_poster = loc_show.local_poster_path or loc_show.poster_path
+                if not tv_show_title:
+                    tv_show_title = show_match.original_title
+                if not raw_show_poster:
+                    raw_show_poster = show_match.local_poster_path or show_match.poster_path
+
+                from app.shared_kernel.ports.image_service_port import ImageServiceRegistry
+                if raw_show_poster:
+                    tv_show_poster = ImageServiceRegistry.get().resolve_image_url(raw_show_poster, "posters")
+
+                # Resolve season poster
+                season_match = self.db.query(MetadataMatch).filter(
+                    MetadataMatch.provider == Provider.TMDB,
+                    MetadataMatch.parent_id == show_match.id,
+                    MetadataMatch.media_type == MediaType.SEASON,
+                    MetadataMatch.season_number == season_number
+                ).first()
+                if season_match:
+                    loc_season = self.db.query(MetadataLocalization).filter(MetadataLocalization.match_id == season_match.id).first()
+                    raw_season_poster = None
+                    if loc_season:
+                        raw_season_poster = loc_season.local_poster_path or loc_season.poster_path
+                    if not raw_season_poster:
+                        raw_season_poster = season_match.local_poster_path or season_match.poster_path
+                    
+                    if raw_season_poster:
+                        season_poster = ImageServiceRegistry.get().resolve_image_url(raw_season_poster, "posters")
+
         return {
             "file_path": item.current_path,
             "start_seconds": start_seconds,
@@ -448,11 +522,19 @@ class PlaybackService:
                       else None)
             ),
             "next_episode": discovery.get("next_episode"),
+            "first_episode": discovery.get("first_episode"),
             "peaks_count": discovery.get("peaks_count", 0),
             "collection_next": discovery.get("collection_next"),
             "performer_unwatched": discovery.get("performer_unwatched"),
             "studio_unwatched": discovery.get("studio_unwatched"),
             "surprise_me": discovery.get("surprise_me"),
+            "tv_show_id": tv_show_id,
+            "tv_show_title": tv_show_title,
+            "tv_show_poster": tv_show_poster,
+            "tv_show_rating": tv_show_rating,
+            "season_number": season_number,
+            "season_poster": season_poster,
+            "episode_number": episode_number,
         }
 
     def update_playback_progress(self, item_id: Any, current_time: int, total_length: int) -> PlaybackStatusResponse:

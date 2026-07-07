@@ -767,6 +767,14 @@
   flex-direction: column;
   gap: var(--space-6, 24px);
   width: 100%;
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.player-page__drawer-content::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
 
 .player-page__drawer-content .player-page__segmented-rater-container {
@@ -778,6 +786,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 
 .player-page__drawer-media {
@@ -787,6 +796,119 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
   object-fit: contain;
+}
+
+.player-page__tv-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: var(--space-2, 8px) 0;
+  border: none;
+  width: 100%;
+}
+
+.player-page__tv-rate-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-4, 16px);
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.player-page__episode-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--app-shell-color-panel, #1e1e24) 82%, transparent);
+  background-image: var(--button-secondary-bg, linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent));
+  border: 1px solid var(--button-secondary-border, rgba(255, 255, 255, 0.15));
+  color: var(--color-ink, #ffffff);
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  z-index: 5;
+  pointer-events: none;
+}
+
+.player-page__tv-rate-split {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  align-items: center;
+}
+
+.player-page__tv-poster-side {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.player-page__tv-details-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-2, 8px);
+  min-width: 0;
+}
+
+.player-page__tv-details-side .player-page__segmented-rater-container {
+  width: 100%;
+  align-self: stretch;
+  margin-top: 4px;
+}
+
+.player-page__tv-season-context {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-1, 4px);
+  margin-top: 4px;
+  width: 100%;
+}
+
+.player-page__tv-season-label-top {
+  color: var(--color-accent, #38bdf8);
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.player-page__tv-season-title-top {
+  color: var(--color-ink, #ffffff);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.player-page__tv-rate-prompt {
+  color: color-mix(in srgb, var(--color-ink) 60%, transparent);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  text-align: center;
+}
+
+.player-page__tv-poster {
+  width: 80px;
+  height: 120px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .player-page__rater-label {
@@ -843,6 +965,11 @@
   height: 24px;
   cursor: ew-resize;
   gap: 2px;
+}
+
+.player-page__tv-rate-card .rating-segmented-bar {
+  max-width: 280px;
+  margin: 0 auto;
 }
 
 .player-page__segmented-rater-container .rating-segment {

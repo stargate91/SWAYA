@@ -84,50 +84,141 @@ class PlayerDiscoveryService:
         studio_unwatched_info = None
         surprise_me_info = None
         next_episode_info = None
+        first_episode_info = None
 
         # Filter items we have watched already
-        unwatched_item_ids_subq = db.query(UserOverride.media_item_id).filter(
+        watched_item_ids_q = db.query(UserOverride.media_item_id).filter(
             UserOverride.user_id == current_uid,
             UserOverride.is_watched == True,
             UserOverride.media_item_id.isnot(None)
-        ).subquery()
+        )
 
         # TV Show Next Episode check
-        if match and match.media_type and match.media_type.value == "episode" and match.parent_id:
+        if match and match.media_type and match.media_type.value == "episode":
             current_season = match.season_number
             current_ep = match.episode_number
+            current_ep_num = 0
             if isinstance(current_ep, list) and current_ep:
-                current_ep_num = current_ep[-1]
+                try:
+                    current_ep_num = int(current_ep[-1])
+                except (ValueError, TypeError):
+                    current_ep_num = 0
             elif isinstance(current_ep, (int, float)):
                 current_ep_num = int(current_ep)
-            else:
-                current_ep_num = 0
+            elif isinstance(current_ep, str):
+                try:
+                    import json
+                    parsed = json.loads(current_ep)
+                    if isinstance(parsed, list) and parsed:
+                        current_ep_num = int(parsed[-1])
+                    else:
+                        current_ep_num = int(parsed)
+                except Exception:
+                    try:
+                        current_ep_num = int(current_ep)
+                    except (ValueError, TypeError):
+                        current_ep_num = 0
 
+            # Get all active episodes for the show by navigating the parent hierarchy (Episode -> Season -> TV Show)
             season_match = db.query(MetadataMatch).filter(MetadataMatch.id == match.parent_id).first()
-            if season_match and season_match.parent_id:
-                show_id = season_match.parent_id
-                next_ep_match = db.query(MetadataMatch).join(MediaItem).filter(
-                    MetadataMatch.parent_id.in_(
-                        db.query(MetadataMatch.id).filter(MetadataMatch.parent_id == show_id)
-                    ),
+            show_match = None
+            if season_match:
+                show_match = db.query(MetadataMatch).filter(MetadataMatch.id == season_match.parent_id).first()
+
+            episodes = []
+            if show_match:
+                seasons = db.query(MetadataMatch).filter(
+                    MetadataMatch.parent_id == show_match.id,
+                    MetadataMatch.media_type == MediaType.SEASON
+                ).all()
+                season_ids = [s.id for s in seasons]
+                if season_ids:
+                    episodes = db.query(MetadataMatch).join(MediaItem).filter(
+                        MetadataMatch.parent_id.in_(season_ids),
+                        MetadataMatch.media_type == MediaType.EPISODE,
+                        MetadataMatch.is_active == True,
+                        MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED]),
+                        ~MetadataMatch.media_item_id.in_(watched_item_ids_q)
+                    ).all()
+
+            candidate = None
+            for ep in episodes:
+                ep_season = ep.season_number
+                ep_num_raw = ep.episode_number
+                
+                # Parse episode number
+                ep_num = 0
+                if isinstance(ep_num_raw, list) and ep_num_raw:
+                    try:
+                        ep_num = int(ep_num_raw[-1])
+                    except (ValueError, TypeError):
+                        ep_num = 0
+                elif isinstance(ep_num_raw, (int, float)):
+                    ep_num = int(ep_num_raw)
+                elif isinstance(ep_num_raw, str):
+                    try:
+                        import json
+                        parsed = json.loads(ep_num_raw)
+                        if isinstance(parsed, list) and parsed:
+                            ep_num = int(parsed[-1])
+                        else:
+                            ep_num = int(parsed)
+                    except Exception:
+                        try:
+                            ep_num = int(ep_num_raw)
+                        except (ValueError, TypeError):
+                            ep_num = 0
+
+                # Check if this episode comes after the current one
+                if (ep_season > current_season) or (ep_season == current_season and ep_num > current_ep_num):
+                    if candidate is None:
+                        candidate = (ep, ep_season, ep_num)
+                    else:
+                        cand_ep, cand_season, cand_num = candidate
+                        if (ep_season < cand_season) or (ep_season == cand_season and ep_num < cand_num):
+                            candidate = (ep, ep_season, ep_num)
+
+            first_episode_info = None
+            if show_match and season_ids:
+                all_episodes = db.query(MetadataMatch).join(MediaItem).filter(
+                    MetadataMatch.parent_id.in_(season_ids),
                     MetadataMatch.media_type == MediaType.EPISODE,
                     MetadataMatch.is_active == True,
                     MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED])
-                ).filter(
-                    (MetadataMatch.season_number > current_season) |
-                    ((MetadataMatch.season_number == current_season) & (MetadataMatch.episode_number > current_ep_num))
-                ).order_by(
-                    MetadataMatch.season_number.asc(),
-                    MetadataMatch.episode_number.asc()
-                ).first()
-
-                if next_ep_match:
-                    next_loc = db.query(MetadataLocalization).filter(MetadataLocalization.match_id == next_ep_match.id).first()
-                    next_title = next_loc.title if next_loc else (next_ep_match.original_title or f"Episode {next_ep_match.episode_number}")
-                    next_episode_info = {
-                        "id": next_ep_match.media_item_id,
-                        "title": f"S{str(next_ep_match.season_number).zfill(2)}E{str(next_ep_match.episode_number or 0).zfill(2)} - {next_title}"
+                ).all()
+                if all_episodes:
+                    def get_ep_num(e):
+                        val = e.episode_number
+                        if isinstance(val, list) and val:
+                            return int(val[0])
+                        try:
+                            import json
+                            parsed = json.loads(val)
+                            if isinstance(parsed, list) and parsed:
+                                return int(parsed[0])
+                            return int(parsed)
+                        except Exception:
+                            try:
+                                return int(val)
+                            except Exception:
+                                return 0
+                    all_episodes.sort(key=lambda e: (e.season_number or 0, get_ep_num(e)))
+                    first_ep = all_episodes[0]
+                    first_loc = db.query(MetadataLocalization).filter(MetadataLocalization.match_id == first_ep.id).first()
+                    first_title = first_loc.title if first_loc else (first_ep.original_title or f"Episode {first_ep.episode_number}")
+                    first_episode_info = {
+                        "id": first_ep.media_item_id,
+                        "title": f"S{str(first_ep.season_number).zfill(2)}E{str(first_ep.episode_number or 0).zfill(2)} - {first_title}"
                     }
+
+            if candidate:
+                next_ep_match = candidate[0]
+                next_loc = db.query(MetadataLocalization).filter(MetadataLocalization.match_id == next_ep_match.id).first()
+                next_title = next_loc.title if next_loc else (next_ep_match.original_title or f"Episode {next_ep_match.episode_number}")
+                next_episode_info = {
+                    "id": next_ep_match.media_item_id,
+                    "title": f"S{str(next_ep_match.season_number).zfill(2)}E{str(next_ep_match.episode_number or 0).zfill(2)} - {next_title}"
+                }
 
         # Movie & Scene Discovery
         if match:
@@ -199,7 +290,7 @@ class PlayerDiscoveryService:
                 MetadataMatch.is_active == True,
                 MetadataMatch.media_item_id.isnot(None),
                 is_adult_filter,
-                ~MetadataMatch.media_item_id.in_(unwatched_item_ids_subq),
+                ~MetadataMatch.media_item_id.in_(watched_item_ids_q),
                 ~MetadataMatch.media_item_id.in_(list(excluded_item_ids))
             ).order_by(func.random()).first()
             if rand_match:
@@ -216,6 +307,7 @@ class PlayerDiscoveryService:
 
         return {
             "next_episode": next_episode_info,
+            "first_episode": first_episode_info,
             "peaks_count": peaks_count,
             "collection_next": collection_next_info,
             "performer_unwatched": performer_unwatched_info,

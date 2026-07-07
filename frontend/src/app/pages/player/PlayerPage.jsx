@@ -43,6 +43,8 @@ export default function PlayerPage() {
     userRating,
     hoverRating,
     nextEpisode,
+    firstEpisode,
+    episodeNumber,
     countdown,
     speed,
     isAdult,
@@ -63,6 +65,12 @@ export default function PlayerPage() {
     performerUnwatched,
     studioUnwatched,
     surpriseMe,
+    tvShowId,
+    tvShowTitle,
+    tvShowPoster,
+    tvShowRating,
+    seasonNumber,
+    seasonPoster,
     setShowAudioMenu,
     setShowSubMenu,
     setLogoError,
@@ -232,6 +240,8 @@ export default function PlayerPage() {
           t={t}
           title={title}
           nextEpisode={nextEpisode}
+          firstEpisode={firstEpisode}
+          episodeNumber={episodeNumber}
           countdown={countdown}
           userRating={userRating}
           hoverRating={hoverRating}
@@ -245,6 +255,12 @@ export default function PlayerPage() {
           mediaType={mediaType}
           mediaImage={mediaImage}
           isAdult={isAdult}
+          tvShowId={tvShowId}
+          tvShowTitle={tvShowTitle}
+          tvShowPoster={tvShowPoster}
+          tvShowRating={tvShowRating}
+          seasonNumber={seasonNumber}
+          seasonPoster={seasonPoster}
           handlePlayNext={handlePlayNext}
           setNextEpisode={setNextEpisode}
           setHoverRating={setHoverRating}

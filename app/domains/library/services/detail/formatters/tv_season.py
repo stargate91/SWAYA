@@ -121,26 +121,26 @@ class TvSeasonFormatter(DetailFormatter):
                 MetadataMatch.external_id == str(tv_tmdb_id_int)
             ).first()
             
+            metadata_override = None
             if episode_match:
-                override = db.query(UserOverride).filter(
+                metadata_override = db.query(UserOverride).filter(
                     UserOverride.user_id == current_uid,
                     UserOverride.metadata_match_id == episode_match.id
                 ).first()
             
-            if not override and local_item:
-                override = db.query(UserOverride).filter(
+            physical_override = None
+            if local_item:
+                physical_override = db.query(UserOverride).filter(
                     UserOverride.user_id == current_uid,
                     UserOverride.media_item_id == local_item.id
                 ).first()
             
-            is_watched = False
-            watch_count = 0
-            resume_position = 0
-            last_watched_at = override.last_watched_at.isoformat() if override and override.last_watched_at else None
-            if override:
-                is_watched = override.is_watched
-                watch_count = override.watch_count or 0
-                resume_position = override.resume_position or 0
+            from app.domains.library.services.detail.detail_mixins import OverrideResolver
+            is_watched, watch_count, resume_position, last_watched_at_dt = OverrideResolver.merge_watch_state(
+                metadata_override=metadata_override,
+                physical_override=physical_override
+            )
+            last_watched_at = last_watched_at_dt.isoformat() if last_watched_at_dt else None
 
             is_multi_episode = False
             if local_item:

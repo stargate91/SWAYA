@@ -185,6 +185,7 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
         backgroundThrottling: false
       }
     });
+    controlsWindow.setAlwaysOnTop(true, 'screen-saver');
 
     // Transition to minimized/mini-player mode when focus is lost (e.g., Alt-Tab out)
     controlsWindow.on('blur', () => {
@@ -372,6 +373,10 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
               // Send events to the controls window!
               if (controlsWindow && !controlsWindow.isDestroyed()) {
                 controlsWindow.webContents.send('mpv-event', parsed);
+                if (parsed.event === 'property-change' && parsed.name === 'eof-reached' && parsed.data === true) {
+                  controlsWindow.show();
+                  controlsWindow.focus();
+                }
               }
 
               // Forward state updates to the mainWindow for the floating control bar
