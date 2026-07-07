@@ -148,6 +148,10 @@
     "play_now": "Play Now",
     "rate_title": "Rate this title",
     "replay": "Replay",
-    "close_player": "Close Player"
+    "close_player": "Close Player",
+    "unwatched_studio_recommendation": "Fancy some more {{studio}}?",
+    "unwatched_performer_recommendation": "Craving more {{performer}}?",
+    "unwatched_library_recommendation": "Something unseen from your library:",
+    "all_scenes_watched": "Nothing new here - you've watched it all!"
   }
 }

@@ -69,6 +69,8 @@ class DiscoveryItem(BaseModel):
     poster_path: Optional[str] = None
     media_type: str
     overview: Optional[str] = None
+    performer_name: Optional[str] = None
+    studio_name: Optional[str] = None
 
 class NextEpisodeInfo(BaseModel):
     id: Union[int, str]

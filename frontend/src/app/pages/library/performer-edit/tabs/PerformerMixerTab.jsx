@@ -170,6 +170,20 @@ export default function PerformerMixerTab({ person: initialPerson }) {
     return link.source_data[fieldKey];
   };
 
+  const getAutoValue = (fieldKey) => {
+    if (person?.primary_provider) {
+      const val = getProviderValue(person.primary_provider, fieldKey);
+      if (val !== null && val !== undefined && val !== '') return val;
+    }
+    const priority = ['tmdb', 'stashdb', 'fansdb', 'porndb'];
+    for (const prov of priority) {
+      if (prov === person?.primary_provider) continue;
+      const val = getProviderValue(prov, fieldKey);
+      if (val !== null && val !== undefined && val !== '') return val;
+    }
+    return null;
+  };
+
   const handleSelectRoute = async (fieldKey, providerKey) => {
     const newRouting = { ...currentRouting };
     if (providerKey === 'auto') {

@@ -80,7 +80,11 @@ export default function PlayerEndOverlay({
   const isTv = mediaType === 'episode' || mediaType === 'tv';
   const isScene = mediaType === 'scene';
   const activeMovie = (!collectionNext || showSurprise) ? surpriseMe : collectionNext;
-  const isDiscoveryEmpty = isTv ? !nextEpisode : !activeMovie;
+  const isDiscoveryEmpty = isTv 
+    ? !nextEpisode 
+    : (isScene 
+        ? (!performerUnwatched && !studioUnwatched && !surpriseMe) 
+        : !activeMovie);
 
   // Resolve episode number from prop or parse from title as fallback
   const parsedEpMatch = title.match(/E(\d{2})/i);
@@ -113,7 +117,7 @@ export default function PlayerEndOverlay({
 
         <div className="player-page__drawer-content">
           <div className="player-page__drawer-media-container">
-            <div className={`player-page__card player-page__card--static ${mediaType === 'episode' ? 'player-page__card--hero' : 'player-page__card--single'}`} style={{ width: '100%' }}>
+            <div className={`player-page__card player-page__card--static ${(mediaType === 'episode' || mediaType === 'scene') ? 'player-page__card--hero' : 'player-page__card--single'}`} style={{ width: '100%' }}>
               <div className="player-page__card-media">
                 {mediaStillSrc && !mediaStillError ? (
                   <img 
@@ -211,20 +215,22 @@ export default function PlayerEndOverlay({
 
       {/* 2. Right Drawer: Discovery & Up Next */}
       <div className="player-page__end-drawer player-page__end-drawer--right">
-        <div className="player-page__drawer-header">
-          <h3 className="player-page__discovery-header">
-            {!isTv && !isScene && activeMovie
-              ? (activeMovie === collectionNext
-                  ? t('player.continue_collection', { defaultValue: 'Continue your collection' })
-                  : t('player.unwatched_movie_recommendation', { defaultValue: "A movie you haven't watched yet" })
-                )
-              : t('player.what_to_watch', { defaultValue: 'What to Watch Next' })
-            }
-          </h3>
-          {!isTv && !isScene && activeMovie && (
-            <h2 className="player-page__drawer-title">{activeMovie.title}</h2>
-          )}
-        </div>
+        {!isScene && (
+          <div className="player-page__drawer-header">
+            <h3 className="player-page__discovery-header">
+              {!isTv && activeMovie
+                ? (activeMovie === collectionNext
+                    ? t('player.continue_collection', { defaultValue: 'Continue your collection' })
+                    : t('player.unwatched_movie_recommendation', { defaultValue: "A movie you haven't watched yet" })
+                  )
+                : t('player.what_to_watch', { defaultValue: 'What to Watch Next' })
+              }
+            </h3>
+            {!isTv && activeMovie && (
+              <h2 className="player-page__drawer-title">{activeMovie.title}</h2>
+            )}
+          </div>
+        )}
 
         <div className={`player-page__discovery-content ${isDiscoveryEmpty ? 'player-page__discovery-content--empty' : ''}`}>
           {/* TV SHOWS: Up Next Episode */}
@@ -310,67 +316,97 @@ export default function PlayerEndOverlay({
           )}
 
           {/* SCENES (NSFW): Cast, Studio & Surprise Me */}
-          {isScene && (
-            <div className="player-page__discovery-grid player-page__discovery-grid--three">
-              {performerUnwatched && (
-                <div className="player-page__card player-page__card--16-9" onClick={() => playItem(performerUnwatched.id)}>
-                  <div className="player-page__card-media">
-                    {performerUnwatched.poster_path ? (
-                      <img 
-                        src={resolveMediaImageUrl(performerUnwatched.poster_path, 'backdrop')} 
-                        alt={performerUnwatched.title} 
-                        className="player-page__card-img" 
-                        onError={(e) => { e.target.src = '/mockup_still.png'; }}
-                      />
-                    ) : (
-                      <Flame size={32} />
-                    )}
+          {isScene && !isDiscoveryEmpty && (
+            <div className="player-page__discovery-vertical-list">
+              {studioUnwatched && (
+                <div className="player-page__discovery-section">
+                  <h3 className="player-page__discovery-header" style={{ marginBottom: '2px' }}>
+                    {t('player.unwatched_studio_recommendation', { 
+                      defaultValue: 'FANCY SOME MORE {{studio}}?', 
+                      studio: studioUnwatched.studio_name ? studioUnwatched.studio_name.toUpperCase() : 'STUDIO' 
+                    })}
+                  </h3>
+                  <div className="player-page__discovery-item-title" style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-ink)', marginBottom: '8px' }}>
+                    {studioUnwatched.title}
                   </div>
-                  <div className="player-page__card-meta">
-                    <div className="player-page__card-title">{performerUnwatched.title}</div>
+                  <div className="player-page__card player-page__card--16-9" onClick={() => playItem(studioUnwatched.id)}>
+                    <div className="player-page__card-media">
+                      {studioUnwatched.poster_path ? (
+                        <img 
+                          src={resolveMediaImageUrl(studioUnwatched.poster_path, 'backdrop')} 
+                          alt={studioUnwatched.title} 
+                          className="player-page__card-img" 
+                          onError={(e) => { e.target.src = '/mockup_still.png'; }}
+                        />
+                      ) : (
+                        <Flame size={32} />
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
 
-              {studioUnwatched && (
-                <div className="player-page__card player-page__card--16-9" onClick={() => playItem(studioUnwatched.id)}>
-                  <div className="player-page__card-media">
-                    {studioUnwatched.poster_path ? (
-                      <img 
-                        src={resolveMediaImageUrl(studioUnwatched.poster_path, 'backdrop')} 
-                        alt={studioUnwatched.title} 
-                        className="player-page__card-img" 
-                        onError={(e) => { e.target.src = '/mockup_still.png'; }}
-                      />
-                    ) : (
-                      <Flame size={32} />
-                    )}
+              {performerUnwatched && (
+                <div className="player-page__discovery-section">
+                  <h3 className="player-page__discovery-header" style={{ marginBottom: '2px' }}>
+                    {t('player.unwatched_performer_recommendation', { 
+                      defaultValue: 'CRAVING MORE {{performer}}?', 
+                      performer: performerUnwatched.performer_name ? performerUnwatched.performer_name.toUpperCase() : 'PERFORMER' 
+                    })}
+                  </h3>
+                  <div className="player-page__discovery-item-title" style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-ink)', marginBottom: '8px' }}>
+                    {performerUnwatched.title}
                   </div>
-                  <div className="player-page__card-meta">
-                    <div className="player-page__card-title">{studioUnwatched.title}</div>
+                  <div className="player-page__card player-page__card--16-9" onClick={() => playItem(performerUnwatched.id)}>
+                    <div className="player-page__card-media">
+                      {performerUnwatched.poster_path ? (
+                        <img 
+                          src={resolveMediaImageUrl(performerUnwatched.poster_path, 'backdrop')} 
+                          alt={performerUnwatched.title} 
+                          className="player-page__card-img" 
+                          onError={(e) => { e.target.src = '/mockup_still.png'; }}
+                        />
+                      ) : (
+                        <Flame size={32} />
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
 
               {surpriseMe && (
-                <div className="player-page__card player-page__card--surprise player-page__card--16-9" onClick={() => playItem(surpriseMe.id)}>
-                  <div className="player-page__card-media">
-                    {surpriseMe.poster_path ? (
-                      <img 
-                        src={resolveMediaImageUrl(surpriseMe.poster_path, 'backdrop')} 
-                        alt={surpriseMe.title} 
-                        className="player-page__card-img" 
-                        onError={(e) => { e.target.src = '/mockup_still.png'; }}
-                      />
-                    ) : (
-                      <HelpCircle size={32} />
-                    )}
+                <div className="player-page__discovery-section">
+                  <h3 className="player-page__discovery-header" style={{ marginBottom: '2px' }}>
+                    {t('player.unwatched_library_recommendation', { 
+                      defaultValue: 'SOMETHING UNSEEN FROM YOUR LIBRARY:' 
+                    })}
+                  </h3>
+                  <div className="player-page__discovery-item-title" style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-ink)', marginBottom: '8px' }}>
+                    {surpriseMe.title}
                   </div>
-                  <div className="player-page__card-meta">
-                    <div className="player-page__card-title">{surpriseMe.title}</div>
+                  <div className="player-page__card player-page__card--surprise player-page__card--16-9" onClick={() => playItem(surpriseMe.id)}>
+                    <div className="player-page__card-media">
+                      {surpriseMe.poster_path ? (
+                        <img 
+                          src={resolveMediaImageUrl(surpriseMe.poster_path, 'backdrop')} 
+                          alt={surpriseMe.title} 
+                          className="player-page__card-img" 
+                          onError={(e) => { e.target.src = '/mockup_still.png'; }}
+                        />
+                      ) : (
+                        <HelpCircle size={32} />
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {isScene && isDiscoveryEmpty && (
+            <div className="player-page__no-next-msg">
+              <Flame size={48} className="player-page__card-placeholder-icon" />
+              <p>{t('player.all_scenes_watched', { defaultValue: "You've watched all your scenes!" })}</p>
             </div>
           )}
         </div>

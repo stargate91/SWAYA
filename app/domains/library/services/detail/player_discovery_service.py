@@ -226,6 +226,8 @@ class PlayerDiscoveryService:
 
         # Movie & Scene Discovery
         if match:
+            excluded_discovery_ids = {match.media_item_id}
+            
             # Collection Next (for movies in a Collection)
             if media_type == "movie" and match.collection_id:
                 next_in_col = db.query(MetadataMatch).filter(
@@ -238,25 +240,46 @@ class PlayerDiscoveryService:
                 ).first()
                 if next_in_col:
                     collection_next_info = cls.to_discovery_item(db, next_in_col, current_uid, settings_adapter)
+                    if collection_next_info and collection_next_info.get("id"):
+                        excluded_discovery_ids.add(collection_next_info["id"])
 
             # Performer Unwatched (for Scene performers)
             if media_type == "scene":
-                from app.domains.people.models import MediaPersonLink
-                first_perf_link = db.query(MediaPersonLink).filter(
+                from app.domains.people.models import MediaPersonLink, Person
+                
+                gender_pref = settings_adapter.get_setting("naming_performer_gender_filter", user_id=current_uid) or "all"
+                
+                perf_links = db.query(MediaPersonLink, Person.gender).join(Person, Person.id == MediaPersonLink.person_id).filter(
                     MediaPersonLink.match_id == match.id
-                ).first()
-                if first_perf_link:
-                    perf_id = first_perf_link.person_id
+                ).all()
+                
+                selected_link = None
+                if gender_pref == "female":
+                    selected_link = next((pl for pl, gender in perf_links if gender == 1), None)
+                elif gender_pref == "male":
+                    selected_link = next((pl for pl, gender in perf_links if gender == 2), None)
+                
+                if not selected_link and perf_links:
+                    selected_link = perf_links[0][0]
+                
+                if selected_link:
+                    perf_id = selected_link.person_id
                     next_perf_scene = db.query(MetadataMatch).join(MediaPersonLink, MediaPersonLink.match_id == MetadataMatch.id).filter(
                         MediaPersonLink.person_id == perf_id,
                         MetadataMatch.media_type == MediaType.SCENE,
                         MetadataMatch.id != match.id,
                         MetadataMatch.is_active == True,
                         MetadataMatch.media_item_id.isnot(None),
-                        ~MetadataMatch.media_item_id.in_(watched_item_ids_q)
+                        ~MetadataMatch.media_item_id.in_(watched_item_ids_q),
+                        ~MetadataMatch.media_item_id.in_(list(excluded_discovery_ids))
                     ).first()
                     if next_perf_scene:
                         performer_unwatched_info = cls.to_discovery_item(db, next_perf_scene, current_uid, settings_adapter)
+                        if performer_unwatched_info:
+                            perf = db.query(Person).filter(Person.id == perf_id).first()
+                            performer_unwatched_info["performer_name"] = perf.name if perf else "Unknown Performer"
+                            if performer_unwatched_info.get("id"):
+                                excluded_discovery_ids.add(performer_unwatched_info["id"])
 
             # Studio Unwatched (for Movie/Scene studios)
             from app.domains.metadata.models import metadata_match_studios
@@ -271,21 +294,20 @@ class PlayerDiscoveryService:
                     MetadataMatch.id != match.id,
                     MetadataMatch.is_active == True,
                     MetadataMatch.media_item_id.isnot(None),
-                    ~MetadataMatch.media_item_id.in_(watched_item_ids_q)
+                    ~MetadataMatch.media_item_id.in_(watched_item_ids_q),
+                    ~MetadataMatch.media_item_id.in_(list(excluded_discovery_ids))
                 ).first()
                 if next_stud_match:
                     studio_unwatched_info = cls.to_discovery_item(db, next_stud_match, current_uid, settings_adapter)
+                    if studio_unwatched_info:
+                        from app.domains.metadata.models import Studio
+                        studio_row = db.query(Studio).filter(Studio.id == stud_id).first()
+                        studio_unwatched_info["studio_name"] = studio_row.name if studio_row else "Unknown Studio"
+                        if studio_unwatched_info.get("id"):
+                            excluded_discovery_ids.add(studio_unwatched_info["id"])
 
             # Surprise Me (Random unwatched same type, excluding already recommended items)
             from sqlalchemy.sql.expression import func
-            excluded_item_ids = {match.media_item_id}
-            if collection_next_info and collection_next_info.get("id"):
-                excluded_item_ids.add(collection_next_info["id"])
-            if performer_unwatched_info and performer_unwatched_info.get("id"):
-                excluded_item_ids.add(performer_unwatched_info["id"])
-            if studio_unwatched_info and studio_unwatched_info.get("id"):
-                excluded_item_ids.add(studio_unwatched_info["id"])
-
             is_adult_filter = MetadataMatch.is_adult == True if is_adult else (MetadataMatch.is_adult == False) | (MetadataMatch.is_adult.is_(None))
 
             rand_match = db.query(MetadataMatch).filter(
@@ -295,7 +317,7 @@ class PlayerDiscoveryService:
                 MetadataMatch.media_item_id.isnot(None),
                 is_adult_filter,
                 ~MetadataMatch.media_item_id.in_(watched_item_ids_q),
-                ~MetadataMatch.media_item_id.in_(list(excluded_item_ids))
+                ~MetadataMatch.media_item_id.in_(list(excluded_discovery_ids))
             ).order_by(func.random()).first()
             if rand_match:
                 surprise_me_info = cls.to_discovery_item(db, rand_match, current_uid, settings_adapter)

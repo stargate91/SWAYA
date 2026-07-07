@@ -87,6 +87,10 @@ export default function useVideoPlayer({ itemId, containerRef }) {
   const [justAddedPeak, setJustAddedPeak] = useState(false);
   const [logoError, setLogoError] = useState(false);
   const [chapters, setChapters] = useState([]);
+  const chaptersRef = useRef([]);
+  useEffect(() => {
+    chaptersRef.current = chapters;
+  }, [chapters]);
   const [clockTime, setClockTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [trackList, setTrackList] = useState([]);
