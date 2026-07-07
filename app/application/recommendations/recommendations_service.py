@@ -344,6 +344,16 @@ class RecommendationsService:
                 logger.error(f"Failed to discover top items page {page}: {e}")
                 break
 
+        # Deduplicate candidates in results_pool by ID
+        seen_ids = set()
+        deduped_results_pool = []
+        for item in results_pool:
+            tmdb_id = item.get("id")
+            if tmdb_id not in seen_ids:
+                seen_ids.add(tmdb_id)
+                deduped_results_pool.append(item)
+        results_pool = deduped_results_pool
+
         bindings = self._resolve_local_recommendation_bindings(results_pool)
         
         def is_in_library(item):
