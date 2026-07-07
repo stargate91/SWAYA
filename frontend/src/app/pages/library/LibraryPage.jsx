@@ -1,4 +1,7 @@
 import Page from '@/ui/Page';
+import { useLocation } from 'react-router-dom';
+import { useNavigationStateStore } from '@/stores/useNavigationStateStore';
+import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import LibraryPagination from './components/LibraryPagination';
 import { useLibraryState } from './hooks/useLibraryState';
 import { useLibraryModals } from './hooks/useLibraryModals';
@@ -19,6 +22,9 @@ import './LibraryPage.css';
 export default function LibraryPage({ initialTab = 'movies', lockTab = false, showTabs = true, pageTitle = null }) {
   const queryClient = useQueryClient();
   const state = useLibraryState({ initialTab, lockTab, includeTagsTab: true });
+  const location = useLocation();
+  const currentPath = location.pathname;
+  const isInitialLoadRef = useRef(true);
   const [focusedTagName, setFocusedTagName] = useState(null);
   const [imagePickerData, setImagePickerData] = useState(null);
   const { toast } = useUi();
@@ -53,13 +59,22 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
   // Smooth scroll to top after page change finishes loading new data
   useEffect(() => {
     if (state.paginationMode === 'infinite') return;
+    if (isInitialLoadRef.current) {
+      if (!state.isDataLoading && !state.isLoading) {
+        isInitialLoadRef.current = false;
+      }
+      return;
+    }
     if (!state.isDataLoading) {
       const container = document.querySelector('.shell__content');
       if (container) {
         container.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
-  }, [state.currentPage, state.isDataLoading, state.paginationMode]);
+  }, [state.currentPage, state.isDataLoading, state.isLoading, state.paginationMode]);
+
+  // Save & Restore scroll position
+  useScrollRestoration('.shell__content', [state.isLoading, state.isDataLoading]);
 
   const sentinelRef = useRef(null);
 

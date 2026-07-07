@@ -1,5 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
+import { useNavigationStateStore } from '@/stores/useNavigationStateStore';
 import api from '@/lib/api';
 import { useSettingsQuery } from '@/queries/settingsQueries';
 import { useLibraryQuery, useCollectionsQuery, useLibraryFiltersQuery } from '@/queries/libraryQueries';
@@ -21,36 +23,40 @@ import { sortLibraryItems } from '../utils/librarySort';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 
 export function useLibraryState({ initialTab = 'movies', lockTab = false, includeTagsTab = false } = {}) {
+  const location = useLocation();
+  const currentPath = location.pathname;
+  const savedState = useNavigationStateStore.getState().getPageState(currentPath);
+
   const { data: settings, isLoading } = useSettingsQuery();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState(initialTab);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [ownershipFilter, setOwnershipFilter] = useState('owned');
-  const [watchedFilter, setWatchedFilter] = useState('all');
-  const [genreFilter, setGenreFilter] = useState('');
-  const [collectionStatusFilter, setCollectionStatusFilter] = useState('all');
-  const [peopleRoleFilter, setPeopleRoleFilter] = useState('all');
-  const [genderFilter, setGenderFilter] = useState('all');
-  const [favoriteFilter, setFavoriteFilter] = useState('all');
-  const [decadeFilter, setDecadeFilter] = useState('all');
-  const [yearFilter, setYearFilter] = useState('');
-  const [performerFilter, setPerformerFilter] = useState('');
-  const [studioFilter, setStudioFilter] = useState('');
-  const [hairColorFilter, setHairColorFilter] = useState('');
-  const [ethnicityFilter, setEthnicityFilter] = useState('');
-  const [eyeColorFilter, setEyeColorFilter] = useState('');
-  const [tattoosFilter, setTattoosFilter] = useState('');
-  const [piercingsFilter, setPiercingsFilter] = useState('');
-  const [breastTypeFilter, setBreastTypeFilter] = useState('');
-  const [buttShapeFilter, setButtShapeFilter] = useState('');
-  const [buttSizeFilter, setButtSizeFilter] = useState('');
-  const [selectedTags, setSelectedTags] = useState([]);
-  const [timeFilterMode, setTimeFilterMode] = useState('decade'); // 'decade' or 'year'
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(40);
-  const [sortKey, setSortKey] = useState('title');
-  const [sortDirection, setSortDirection] = useState('asc');
+  const [activeTab, setActiveTab] = useState(savedState.activeTab ?? initialTab);
+  const [searchQuery, setSearchQuery] = useState(savedState.searchQuery ?? '');
+  const [ownershipFilter, setOwnershipFilter] = useState(savedState.ownershipFilter ?? 'owned');
+  const [watchedFilter, setWatchedFilter] = useState(savedState.watchedFilter ?? 'all');
+  const [genreFilter, setGenreFilter] = useState(savedState.genreFilter ?? '');
+  const [collectionStatusFilter, setCollectionStatusFilter] = useState(savedState.collectionStatusFilter ?? 'all');
+  const [peopleRoleFilter, setPeopleRoleFilter] = useState(savedState.peopleRoleFilter ?? 'all');
+  const [genderFilter, setGenderFilter] = useState(savedState.genderFilter ?? 'all');
+  const [favoriteFilter, setFavoriteFilter] = useState(savedState.favoriteFilter ?? 'all');
+  const [decadeFilter, setDecadeFilter] = useState(savedState.decadeFilter ?? 'all');
+  const [yearFilter, setYearFilter] = useState(savedState.yearFilter ?? '');
+  const [performerFilter, setPerformerFilter] = useState(savedState.performerFilter ?? '');
+  const [studioFilter, setStudioFilter] = useState(savedState.studioFilter ?? '');
+  const [hairColorFilter, setHairColorFilter] = useState(savedState.hairColorFilter ?? '');
+  const [ethnicityFilter, setEthnicityFilter] = useState(savedState.ethnicityFilter ?? '');
+  const [eyeColorFilter, setEyeColorFilter] = useState(savedState.eyeColorFilter ?? '');
+  const [tattoosFilter, setTattoosFilter] = useState(savedState.tattoosFilter ?? '');
+  const [piercingsFilter, setPiercingsFilter] = useState(savedState.piercingsFilter ?? '');
+  const [breastTypeFilter, setBreastTypeFilter] = useState(savedState.breastTypeFilter ?? '');
+  const [buttShapeFilter, setButtShapeFilter] = useState(savedState.buttShapeFilter ?? '');
+  const [buttSizeFilter, setButtSizeFilter] = useState(savedState.buttSizeFilter ?? '');
+  const [selectedTags, setSelectedTags] = useState(savedState.selectedTags ?? []);
+  const [timeFilterMode, setTimeFilterMode] = useState(savedState.timeFilterMode ?? 'decade'); // 'decade' or 'year'
+  const [currentPage, setCurrentPage] = useState(savedState.currentPage ?? 1);
+  const [pageSize, setPageSize] = useState(savedState.pageSize ?? 40);
+  const [sortKey, setSortKey] = useState(savedState.sortKey ?? 'title');
+  const [sortDirection, setSortDirection] = useState(savedState.sortDirection ?? 'asc');
   const [paginationMode, setPaginationModeState] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('library_pagination_mode') || 'pages';
@@ -97,6 +103,69 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     setButtSizeFilter('');
     setSelectedTags([]);
   };
+
+  useEffect(() => {
+    useNavigationStateStore.getState().setPageState(currentPath, {
+      activeTab,
+      searchQuery,
+      ownershipFilter,
+      watchedFilter,
+      genreFilter,
+      collectionStatusFilter,
+      peopleRoleFilter,
+      genderFilter,
+      favoriteFilter,
+      decadeFilter,
+      yearFilter,
+      performerFilter,
+      studioFilter,
+      hairColorFilter,
+      ethnicityFilter,
+      eyeColorFilter,
+      tattoosFilter,
+      piercingsFilter,
+      breastTypeFilter,
+      buttShapeFilter,
+      buttSizeFilter,
+      selectedTags,
+      timeFilterMode,
+      currentPage,
+      pageSize,
+      sortKey,
+      sortDirection,
+      paginationMode
+    });
+  }, [
+    currentPath,
+    activeTab,
+    searchQuery,
+    ownershipFilter,
+    watchedFilter,
+    genreFilter,
+    collectionStatusFilter,
+    peopleRoleFilter,
+    genderFilter,
+    favoriteFilter,
+    decadeFilter,
+    yearFilter,
+    performerFilter,
+    studioFilter,
+    hairColorFilter,
+    ethnicityFilter,
+    eyeColorFilter,
+    tattoosFilter,
+    piercingsFilter,
+    breastTypeFilter,
+    buttShapeFilter,
+    buttSizeFilter,
+    selectedTags,
+    timeFilterMode,
+    currentPage,
+    pageSize,
+    sortKey,
+    sortDirection,
+    paginationMode
+  ]);
 
   const isCollections = isLibraryCollectionTab(activeTab);
   const isTags = isLibraryTagsTab(activeTab);

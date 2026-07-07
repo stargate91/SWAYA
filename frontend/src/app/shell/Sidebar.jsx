@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { CircleHelp, Power, ChevronLeft, ChevronRight } from '@/ui/icons';
+import { useNavigationStateStore } from '@/stores/useNavigationStateStore';
 import UtilityButton from '../ui/UtilityButton';
 import Tooltip from '../ui/Tooltip';
 import { useSidebar } from './useSidebar';
@@ -26,9 +27,19 @@ export default function Sidebar({ isCollapsed, onToggle }) {
         {navItems.map((item) => {
           const Icon = item.icon;
           const label = t(item.translationKey);
+          const handleNavClick = () => {
+            if (window.location.pathname === item.to) {
+              useNavigationStateStore.getState().clearPageState(item.to);
+              const container = document.querySelector('.shell__content') || document.querySelector('.media-detail-page__container');
+              if (container) {
+                container.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }
+          };
           const linkContent = (
             <NavLink
               to={item.to}
+              onClick={handleNavClick}
               className={({ isActive }) => `shell__nav-link ${isActive ? 'is-active' : ''}`}
             >
               <Icon size={18} />
@@ -46,25 +57,38 @@ export default function Sidebar({ isCollapsed, onToggle }) {
         })}
       </nav>
       <div className="shell__sidebar-footer">
-        {isCollapsed ? (
-          <Tooltip content={t('sidebar.about') || 'About'} side="right">
+        {(() => {
+          const handleAboutClick = () => {
+            if (window.location.pathname === '/about') {
+              useNavigationStateStore.getState().clearPageState('/about');
+              const container = document.querySelector('.shell__content') || document.querySelector('.media-detail-page__container');
+              if (container) {
+                container.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }
+          };
+          return isCollapsed ? (
+            <Tooltip content={t('sidebar.about') || 'About'} side="right">
+              <NavLink
+                to="/about"
+                onClick={handleAboutClick}
+                className={({ isActive }) => `shell__nav-link shell__nav-link--footer ${isActive ? 'is-active' : ''}`}
+              >
+                <CircleHelp size={18} />
+                <span className="shell__nav-link-label">{t('sidebar.about') || 'About'}</span>
+              </NavLink>
+            </Tooltip>
+          ) : (
             <NavLink
               to="/about"
+              onClick={handleAboutClick}
               className={({ isActive }) => `shell__nav-link shell__nav-link--footer ${isActive ? 'is-active' : ''}`}
             >
               <CircleHelp size={18} />
               <span className="shell__nav-link-label">{t('sidebar.about') || 'About'}</span>
             </NavLink>
-          </Tooltip>
-        ) : (
-          <NavLink
-            to="/about"
-            className={({ isActive }) => `shell__nav-link shell__nav-link--footer ${isActive ? 'is-active' : ''}`}
-          >
-            <CircleHelp size={18} />
-            <span className="shell__nav-link-label">{t('sidebar.about') || 'About'}</span>
-          </NavLink>
-        )}
+          );
+        })()}
         {isCollapsed ? (
           <Tooltip content={t('sidebar.quit')} side="right">
             <button

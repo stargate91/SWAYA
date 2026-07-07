@@ -1,5 +1,5 @@
 import { Suspense, useState, useEffect, useRef } from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation, useNavigationType } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { QK } from '@/lib/queryKeys';
 import AppClosePrompt from './AppClosePrompt';
@@ -81,10 +81,13 @@ export default function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
   const pushPath = useNavigationStore((state) => state.pushPath);
+  const navType = useNavigationType();
 
   useEffect(() => {
-    pushPath(location.pathname + location.search);
-  }, [location, pushPath]);
+    if (navType !== 'POP') {
+      pushPath(location.pathname + location.search);
+    }
+  }, [location, pushPath, navType]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);

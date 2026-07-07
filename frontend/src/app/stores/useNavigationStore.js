@@ -21,20 +21,18 @@ export const useNavigationStore = create((set, get) => ({
   },
 
   goBack: (navigate) => {
-    const { historyStack, currentIndex } = get();
+    const { currentIndex } = get();
     if (currentIndex > 0) {
-      const nextIndex = currentIndex - 1;
-      set({ currentIndex: nextIndex });
-      navigate(historyStack[nextIndex], { state: { allowAdult: true } });
+      set({ currentIndex: currentIndex - 1 });
+      navigate(-1);
     }
   },
 
   goForward: (navigate) => {
     const { historyStack, currentIndex } = get();
     if (currentIndex < historyStack.length - 1) {
-      const nextIndex = currentIndex + 1;
-      set({ currentIndex: nextIndex });
-      navigate(historyStack[nextIndex], { state: { allowAdult: true } });
+      set({ currentIndex: currentIndex + 1 });
+      navigate(1);
     }
   },
 

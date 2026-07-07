@@ -15,6 +15,7 @@ import usePeopleCollectionDetailController from './usePeopleCollectionDetailCont
 import UniversalImagePickerModal from './modals/UniversalImagePickerModal';
 import PersonBackdropPickerModal from './components/entityDetail/PersonBackdropPickerModal';
 import UtilityBarBottomPortal from '../../../components/UtilityBarBottomPortal';
+import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import './PeopleCollectionDetailPage.css';
 import './components/detail/UserRatingSection.css';
 import './components/detail/panels/BackdropsPanel.css';
@@ -62,6 +63,8 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
     closeModal,
     toast,
   });
+
+  useScrollRestoration('.media-detail-page__container', [isLoading]);
 
   const handleOpenPeopleBackdropModal = () => setIsBackdropDrawerOpen(true);
 

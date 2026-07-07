@@ -20,6 +20,7 @@ import { MediaDetailProvider } from './components/detail/MediaDetailContext';
 import useMediaDetail from './hooks/useMediaDetail';
 import useHeaderScrollTransition from './hooks/useHeaderScrollTransition';
 import useMediaSocialLinks from './hooks/useMediaSocialLinks';
+import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 
 
 import MediaHeaderInfo from './components/detail/MediaHeaderInfo';
@@ -80,6 +81,8 @@ export default function MediaDetailPage({ type = 'movie' }) {
     isMovie,
     isScene
   } = state;
+
+  useScrollRestoration('.media-detail-page__container', [isLoading]);
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLogoDrawerOpen, setIsLogoDrawerOpen] = useState(false);

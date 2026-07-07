@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
+import { usePreservedState } from '@/hooks/usePreservedState';
+import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import Page from '@/ui/Page';
 import EmptyState from '@/ui/EmptyState';
 import Button from '@/ui/Button';
@@ -40,9 +42,11 @@ const formatTime = (seconds) => {
 export default function HistoryPage() {
   const { t } = useTranslation();
   const { openModal, closeModal, toast } = useUi();
-  const [activeTab, setActiveTab] = useState('rename');
+  const [activeTab, setActiveTab] = usePreservedState('activeTab', 'rename');
   const [lightboxImage, setLightboxImage] = useState(null);
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
+
+  useScrollRestoration('.shell__content', [activeTab]);
   const navigate = useNavigate();
   const utilityBarTarget = typeof document !== 'undefined' ? document.getElementById('shell-utility-bar-center') : null;
 
