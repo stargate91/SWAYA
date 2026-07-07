@@ -1,6 +1,7 @@
 import { useState, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '@/providers/LanguageContext';
+import { AlertTriangle } from '@/ui/icons';
 import {
   useListsQuery,
   useListDetailsQuery,
@@ -20,7 +21,7 @@ import { getAvailableGenres, getFilteredListItems } from '../utils/listsFilterUt
 export default function useListsPageState() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { toast } = useUi();
+  const { toast, openModal, closeModal } = useUi();
   const { data: lists = [], isLoading } = useListsQuery();
   const { data: settings } = useSettingsQuery();
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
@@ -83,12 +84,24 @@ export default function useListsPageState() {
       try {
         const data = JSON.parse(evt.target.result);
         if (!data.name) {
-          alert(t('lists.import_invalid_format') || 'Invalid list format: "name" is required.');
+          openModal({
+            title: t('common.error') || 'Error',
+            icon: AlertTriangle,
+            variant: 'danger',
+            content: t('lists.import_invalid_format') || 'Invalid list format: "name" is required.'
+          });
           return;
         }
 
+        let listName = data.name;
+        let suffix = 1;
+        while (lists.some((l) => l.name.toLowerCase() === listName.toLowerCase())) {
+          listName = `${data.name} (${suffix})`;
+          suffix++;
+        }
+
         const newList = await createMutation.mutateAsync({
-          name: data.name,
+          name: listName,
           description: data.description || '',
           color: data.color || 'var(--color-accent-blue)',
           list_type: data.list_type || 'media'
@@ -111,7 +124,12 @@ export default function useListsPageState() {
           setActiveListId(newList.id);
         }
       } catch (err) {
-        alert((t('lists.import_failed') || 'Failed to import list: ') + (err.message || err));
+        openModal({
+          title: t('common.error') || 'Error',
+          icon: AlertTriangle,
+          variant: 'danger',
+          content: (t('lists.import_failed') || 'Failed to import list: ') + (err.message || err)
+        });
       }
     };
     reader.readAsText(file);
@@ -120,6 +138,40 @@ export default function useListsPageState() {
 
   const handleTriggerImport = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleExportList = (listId) => {
+    const listToExport = lists.find((l) => l.id === listId);
+    if (!listToExport) return;
+
+    try {
+      const details = activeListId === listId ? activeListDetails : null;
+      const items = details?.items || [];
+
+      const exportData = {
+        name: listToExport.name,
+        description: listToExport.description || '',
+        color: listToExport.color || 'var(--color-accent-blue)',
+        list_type: listToExport.list_type || 'media',
+        items: items.map((item) => ({
+          media_item_id: item.media_item_id,
+          tmdb_id: item.tmdb_id,
+          media_type: item.media_type || 'movie'
+        }))
+      };
+
+      const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(exportData, null, 2))}`;
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute('href', dataStr);
+      downloadAnchor.setAttribute('download', `${listToExport.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_list.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      toast(t('lists.export_success') || 'List exported successfully', 'success');
+    } catch (err) {
+      console.error(err);
+      toast(t('lists.export_failed') || 'Failed to export list', 'danger');
+    }
   };
 
   const handleStartAddItems = () => {
@@ -244,6 +296,7 @@ export default function useListsPageState() {
     fileInputRef,
     handleFileChange,
     handleTriggerImport,
+    handleExportList,
     handleStartAddItems,
     handleCardClick,
     handleRemoveListItem,

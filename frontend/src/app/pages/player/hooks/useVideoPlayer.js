@@ -402,8 +402,24 @@ export default function useVideoPlayer({ itemId, containerRef }) {
         if (data.name === 'time-pos' && typeof data.data === 'number') {
           setCurrentTime(data.data);
           const dur = durationRef.current;
+          
+          let isLastChapterActive = false;
+          if (chaptersRef.current && chaptersRef.current.length > 1) {
+            const lastChapter = chaptersRef.current[chaptersRef.current.length - 1];
+            if (lastChapter && typeof lastChapter.time === 'number' && lastChapter.time > 30) {
+              isLastChapterActive = true;
+              if (data.data >= lastChapter.time && !hasTriggeredEndRef.current) {
+                hasTriggeredEndRef.current = true;
+                setShowEndOverlay(true);
+              } else if (data.data < lastChapter.time - 5.0 && hasTriggeredEndRef.current) {
+                hasTriggeredEndRef.current = false;
+                setShowEndOverlay(false);
+              }
+            }
+          }
+
           if (dur > 0) {
-            if (data.data < dur - 5.0) {
+            if (data.data < dur - 5.0 && (!isLastChapterActive || (chaptersRef.current && chaptersRef.current.length > 1 && data.data < chaptersRef.current[chaptersRef.current.length - 1].time - 5.0))) {
               hasTriggeredEndRef.current = false;
             } else if (data.data >= dur - 1.0 && !hasTriggeredEndRef.current) {
               hasTriggeredEndRef.current = true;
