@@ -39,11 +39,39 @@ export default function PlayerEndOverlay({
 
   const [showSurprise, setShowSurprise] = React.useState(false);
 
+  const backendPort = window.location.search.match(/backend_port=(\d+)/)?.[1] || '8000';
+
+  // Left drawer: current episode media image
+  const mediaStillSrc = React.useMemo(() => {
+    if (mediaImage) return mediaImage;
+    return null;
+  }, [mediaImage]);
+  const [mediaStillError, setMediaStillError] = React.useState(false);
+  React.useEffect(() => { setMediaStillError(false); }, [mediaImage]);
+
+  // Right drawer: next episode still
+  const nextStillSrc = React.useMemo(() => {
+    if (nextEpisode?.still_path) {
+      return resolveMediaImageUrl(nextEpisode.still_path, 'still', `http://localhost:${backendPort}`);
+    }
+    return null;
+  }, [nextEpisode, backendPort]);
+  const [nextStillError, setNextStillError] = React.useState(false);
+  React.useEffect(() => { setNextStillError(false); }, [nextEpisode]);
+
   // Helper to open/play recommended item
   const playItem = (targetId) => {
     try {
       const { ipcRenderer } = window.require('electron');
-      ipcRenderer.invoke('mpv-open-fullscreen', { itemId: targetId });
+      const savedVolume = parseInt(localStorage.getItem('player_volume'), 10);
+      const savedMute = localStorage.getItem('player_mute') === 'true';
+      ipcRenderer.invoke('mpv-open-fullscreen', {
+        itemId: targetId,
+        volume: isNaN(savedVolume) ? undefined : savedVolume,
+        mute: savedMute,
+      }).catch(() => {
+        // Swallow IPC promise rejection
+      });
     } catch {
       window.location.href = `/player/${targetId}`;
     }
@@ -84,10 +112,21 @@ export default function PlayerEndOverlay({
         </div>
 
         <div className="player-page__drawer-content">
-          {mediaImage && (
-            <div className="player-page__drawer-media-container">
-              <div className="player-page__drawer-media-wrapper" style={{ position: 'relative', display: 'inline-flex', maxWidth: '100%' }}>
-                <img src={mediaImage} alt={title} className="player-page__drawer-media" />
+          <div className="player-page__drawer-media-container">
+            <div className={`player-page__card player-page__card--static ${mediaType === 'episode' ? 'player-page__card--hero' : 'player-page__card--single'}`} style={{ width: '100%' }}>
+              <div className="player-page__card-media">
+                {mediaStillSrc && !mediaStillError ? (
+                  <img 
+                    src={mediaStillSrc} 
+                    alt={title} 
+                    className="player-page__card-img" 
+                    onError={() => setMediaStillError(true)}
+                  />
+                ) : (
+                  <div className="player-page__card-still-placeholder">
+                    <Clapperboard size={48} />
+                  </div>
+                )}
                 {resolvedEpisodeNum !== null && resolvedEpisodeNum !== undefined && (
                   <div className="player-page__episode-badge">
                     {resolvedEpisodeNum}
@@ -95,7 +134,7 @@ export default function PlayerEndOverlay({
                 )}
               </div>
             </div>
-          )}
+          </div>
 
           {tvShowId && (
             <div className="player-page__tv-season-context">
@@ -127,9 +166,9 @@ export default function PlayerEndOverlay({
                 </span>
                 
                 <div className="player-page__tv-rate-split">
-                  {(seasonPoster || tvShowPoster) && (
+                  {(tvShowPoster || seasonPoster) && (
                     <div className="player-page__tv-poster-side">
-                      <img src={seasonPoster || tvShowPoster} alt={tvShowTitle} className="player-page__tv-poster" />
+                      <img src={tvShowPoster || seasonPoster} alt={tvShowTitle} className="player-page__tv-poster" />
                     </div>
                   )}
 
@@ -194,7 +233,18 @@ export default function PlayerEndOverlay({
               {nextEpisode ? (
                 <div className="player-page__card player-page__card--hero" onClick={handlePlayNext}>
                   <div className="player-page__card-media">
-                    <Tv size={48} className="player-page__card-placeholder-icon" />
+                    {nextStillSrc && !nextStillError ? (
+                      <img 
+                        src={nextStillSrc} 
+                        alt={nextEpisode.title} 
+                        className="player-page__card-img" 
+                        onError={() => setNextStillError(true)}
+                      />
+                    ) : (
+                      <div className="player-page__card-still-placeholder">
+                        <Clapperboard size={48} />
+                      </div>
+                    )}
                   </div>
                   <div className="player-page__card-meta">
                     <div className="player-page__card-title">{nextEpisode.title}</div>
@@ -225,7 +275,12 @@ export default function PlayerEndOverlay({
                 <div className="player-page__card player-page__card--surprise player-page__card--single" onClick={() => playItem(activeMovie.id)}>
                   <div className="player-page__card-media">
                     {activeMovie.poster_path ? (
-                      <img src={resolveMediaImageUrl(activeMovie.poster_path, 'poster')} alt={activeMovie.title} className="player-page__card-img" />
+                      <img 
+                        src={resolveMediaImageUrl(activeMovie.poster_path, 'poster')} 
+                        alt={activeMovie.title} 
+                        className="player-page__card-img" 
+                        onError={(e) => { e.target.src = '/no-cover.png'; }}
+                      />
                     ) : (
                       <Clapperboard size={40} />
                     )}
@@ -261,7 +316,12 @@ export default function PlayerEndOverlay({
                 <div className="player-page__card player-page__card--16-9" onClick={() => playItem(performerUnwatched.id)}>
                   <div className="player-page__card-media">
                     {performerUnwatched.poster_path ? (
-                      <img src={resolveMediaImageUrl(performerUnwatched.poster_path, 'backdrop')} alt={performerUnwatched.title} className="player-page__card-img" />
+                      <img 
+                        src={resolveMediaImageUrl(performerUnwatched.poster_path, 'backdrop')} 
+                        alt={performerUnwatched.title} 
+                        className="player-page__card-img" 
+                        onError={(e) => { e.target.src = '/mockup_still.png'; }}
+                      />
                     ) : (
                       <Flame size={32} />
                     )}
@@ -276,7 +336,12 @@ export default function PlayerEndOverlay({
                 <div className="player-page__card player-page__card--16-9" onClick={() => playItem(studioUnwatched.id)}>
                   <div className="player-page__card-media">
                     {studioUnwatched.poster_path ? (
-                      <img src={resolveMediaImageUrl(studioUnwatched.poster_path, 'backdrop')} alt={studioUnwatched.title} className="player-page__card-img" />
+                      <img 
+                        src={resolveMediaImageUrl(studioUnwatched.poster_path, 'backdrop')} 
+                        alt={studioUnwatched.title} 
+                        className="player-page__card-img" 
+                        onError={(e) => { e.target.src = '/mockup_still.png'; }}
+                      />
                     ) : (
                       <Flame size={32} />
                     )}
@@ -291,7 +356,12 @@ export default function PlayerEndOverlay({
                 <div className="player-page__card player-page__card--surprise player-page__card--16-9" onClick={() => playItem(surpriseMe.id)}>
                   <div className="player-page__card-media">
                     {surpriseMe.poster_path ? (
-                      <img src={resolveMediaImageUrl(surpriseMe.poster_path, 'backdrop')} alt={surpriseMe.title} className="player-page__card-img" />
+                      <img 
+                        src={resolveMediaImageUrl(surpriseMe.poster_path, 'backdrop')} 
+                        alt={surpriseMe.title} 
+                        className="player-page__card-img" 
+                        onError={(e) => { e.target.src = '/mockup_still.png'; }}
+                      />
                     ) : (
                       <HelpCircle size={32} />
                     )}

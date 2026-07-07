@@ -209,9 +209,19 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     }
     setShowEndOverlay(false);
 
+    // Read current volume/mute from localStorage so the next MPV instance starts at the right level
+    const savedVolume = parseInt(localStorage.getItem('player_volume'), 10);
+    const savedMute = localStorage.getItem('player_mute') === 'true';
+
     try {
       const { ipcRenderer } = window.require('electron');
-      ipcRenderer.invoke('mpv-open-fullscreen', { itemId: nextEpisode.id });
+      ipcRenderer.invoke('mpv-open-fullscreen', {
+        itemId: nextEpisode.id,
+        volume: isNaN(savedVolume) ? undefined : savedVolume,
+        mute: savedMute,
+      }).catch(() => {
+        // Swallow IPC promise rejection because Electron immediately kills this window
+      });
     } catch {
       navigate(`/player/${nextEpisode.id}`);
     }
@@ -613,8 +623,14 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     }
   };
 
+  const handlePlayNextRef = useRef(handlePlayNext);
+  useEffect(() => {
+    handlePlayNextRef.current = handlePlayNext;
+  }, [handlePlayNext]);
+
   useEffect(() => {
     let timer;
+    let fired = false;
     if (showEndOverlay && nextEpisode) {
       timer = setTimeout(() => {
         setCountdown(10);
@@ -623,7 +639,10 @@ export default function useVideoPlayer({ itemId, containerRef }) {
         setCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(countdownIntervalRef.current);
-            handlePlayNext();
+            if (!fired) {
+              fired = true;
+              handlePlayNextRef.current();
+            }
             return 0;
           }
           return prev - 1;
@@ -636,7 +655,7 @@ export default function useVideoPlayer({ itemId, containerRef }) {
         clearInterval(countdownIntervalRef.current);
       }
     };
-  }, [showEndOverlay, nextEpisode, handlePlayNext]);
+  }, [showEndOverlay, nextEpisode]);
 
   const handleRate = async (rating) => {
     if (tvShowId) {

@@ -437,7 +437,14 @@ export const usePlayMediaMutation = () => {
         }
 
         if (ipcRenderer) {
-          await ipcRenderer.invoke('mpv-open-fullscreen', { itemId, start });
+          const savedVolume = parseInt(localStorage.getItem('player_volume'), 10);
+          const savedMute = localStorage.getItem('player_mute') === 'true';
+          await ipcRenderer.invoke('mpv-open-fullscreen', {
+            itemId,
+            start,
+            volume: isNaN(savedVolume) ? undefined : savedVolume,
+            mute: savedMute,
+          });
         } else {
           const startQ = start !== undefined ? `?start=${start}` : '';
           navigate(`/player/${itemId}${startQ}`);

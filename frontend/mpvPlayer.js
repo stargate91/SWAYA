@@ -16,6 +16,7 @@ let mpvSocketPath = null;
 let isPip = false;
 let lastPipBounds = null;
 let latestMpvProperties = {};
+let isOpeningMpv = false;
 
 const observedMpvProperties = [
   [1, 'time-pos'],
@@ -74,6 +75,7 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
   async function cleanupExistingMpv() {
     isPip = false;
     latestMpvProperties = {};
+    // Kill MPV process FIRST to stop audio immediately (prevents double audio during transitions)
     if (mpvProcess) {
       mpvProcess.removeAllListeners('exit');
       try { mpvProcess.kill('SIGKILL'); } catch { /* ignore */ }
@@ -96,6 +98,9 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
       try { mpvPlayerWindow.destroy(); } catch { /* ignore */ }
       mpvPlayerWindow = null;
     }
+
+    // Brief delay to ensure old windows/processes are fully torn down before spawning new ones
+    await new Promise(resolve => setTimeout(resolve, 50));
   }
 
   ipcMain.handle('mpv-take-snapshot', async (event, { filename }) => {
@@ -118,8 +123,14 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
     }
   });
 
-  ipcMain.handle('mpv-open-fullscreen', async (event, { itemId, start, url, title: customTitle }) => {
-    writeElectronLog('INFO', 'mpv-open-fullscreen requested', { itemId, start, url, customTitle });
+  ipcMain.handle('mpv-open-fullscreen', async (event, { itemId, start, url, title: customTitle, volume, mute }) => {
+    // Prevent concurrent calls (e.g. controls window countdown + click race)
+    if (isOpeningMpv) {
+      writeElectronLog('WARN', 'mpv-open-fullscreen already in progress, ignoring duplicate call');
+      return { success: false, error: 'Already opening' };
+    }
+    isOpeningMpv = true;
+    writeElectronLog('INFO', 'mpv-open-fullscreen requested', { itemId, start, url, customTitle, volume, mute });
 
     await cleanupExistingMpv();
 
@@ -299,6 +310,14 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
         '--demuxer-readahead-secs=300',
       ];
 
+      // Apply stored volume/mute so MPV starts at the correct level (not default 100%)
+      if (typeof volume === 'number') {
+        args.push(`--volume=${volume}`);
+      }
+      if (typeof mute === 'boolean') {
+        args.push(`--mute=${mute ? 'yes' : 'no'}`);
+      }
+
       const startSec = start !== undefined ? start : (playbackInfo.start_seconds || 0);
       if (startSec > 0) {
         args.push(`--start=${startSec}`);
@@ -457,9 +476,11 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
       writeElectronLog('ERROR', 'Error starting MPV', { error: err.message, stack: err.stack });
       if (controlsWindow && !controlsWindow.isDestroyed()) controlsWindow.close();
       if (mpvPlayerWindow && !mpvPlayerWindow.isDestroyed()) mpvPlayerWindow.close();
+      isOpeningMpv = false;
       return { success: false, error: err.message };
     }
 
+    isOpeningMpv = false;
     return { success: true };
   });
 

@@ -358,17 +358,6 @@ class PlaybackService:
                 if media_type == "episode":
                     raw_image = match.local_still_path or match.still_path
                     image_category = "stills"
-                    
-                    if not raw_image and season_match:
-                        loc_season = self.db.query(MetadataLocalization).filter(MetadataLocalization.match_id == season_match.id).first()
-                        if loc_season:
-                            raw_image = loc_season.local_poster_path or loc_season.poster_path
-                            image_category = "posters"
-                    if not raw_image and show_match:
-                        loc_show = self.db.query(MetadataLocalization).filter(MetadataLocalization.match_id == show_match.id).first()
-                        if loc_show:
-                            raw_image = loc_show.local_poster_path or loc_show.poster_path
-                            image_category = "posters"
                 elif media_type == "scene":
                     raw_image = match.local_backdrop_path or match.backdrop_path
                     image_category = "scene_stills"

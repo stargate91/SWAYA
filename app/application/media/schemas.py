@@ -73,6 +73,7 @@ class DiscoveryItem(BaseModel):
 class NextEpisodeInfo(BaseModel):
     id: Union[int, str]
     title: str
+    still_path: Optional[str] = None
 
 class PlaybackInfoResponse(BaseModel):
     file_path: str

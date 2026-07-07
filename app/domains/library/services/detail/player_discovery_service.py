@@ -206,18 +206,22 @@ class PlayerDiscoveryService:
                     first_ep = all_episodes[0]
                     first_loc = db.query(MetadataLocalization).filter(MetadataLocalization.match_id == first_ep.id).first()
                     first_title = first_loc.title if first_loc else (first_ep.original_title or f"Episode {first_ep.episode_number}")
+                    first_still = first_ep.local_still_path or first_ep.still_path
                     first_episode_info = {
                         "id": first_ep.media_item_id,
-                        "title": f"S{str(first_ep.season_number).zfill(2)}E{str(first_ep.episode_number or 0).zfill(2)} - {first_title}"
+                        "title": f"S{str(first_ep.season_number).zfill(2)}E{str(first_ep.episode_number or 0).zfill(2)} - {first_title}",
+                        "still_path": first_still
                     }
 
             if candidate:
                 next_ep_match = candidate[0]
                 next_loc = db.query(MetadataLocalization).filter(MetadataLocalization.match_id == next_ep_match.id).first()
                 next_title = next_loc.title if next_loc else (next_ep_match.original_title or f"Episode {next_ep_match.episode_number}")
+                next_still = next_ep_match.local_still_path or next_ep_match.still_path
                 next_episode_info = {
                     "id": next_ep_match.media_item_id,
-                    "title": f"S{str(next_ep_match.season_number).zfill(2)}E{str(next_ep_match.episode_number or 0).zfill(2)} - {next_title}"
+                    "title": f"S{str(next_ep_match.season_number).zfill(2)}E{str(next_ep_match.episode_number or 0).zfill(2)} - {next_title}",
+                    "still_path": next_still
                 }
 
         # Movie & Scene Discovery
@@ -230,7 +234,7 @@ class PlayerDiscoveryService:
                     MetadataMatch.id != match.id,
                     MetadataMatch.is_active == True,
                     MetadataMatch.media_item_id.isnot(None),
-                    ~MetadataMatch.media_item_id.in_(unwatched_item_ids_subq)
+                    ~MetadataMatch.media_item_id.in_(watched_item_ids_q)
                 ).first()
                 if next_in_col:
                     collection_next_info = cls.to_discovery_item(db, next_in_col, current_uid, settings_adapter)
@@ -249,7 +253,7 @@ class PlayerDiscoveryService:
                         MetadataMatch.id != match.id,
                         MetadataMatch.is_active == True,
                         MetadataMatch.media_item_id.isnot(None),
-                        ~MetadataMatch.media_item_id.in_(unwatched_item_ids_subq)
+                        ~MetadataMatch.media_item_id.in_(watched_item_ids_q)
                     ).first()
                     if next_perf_scene:
                         performer_unwatched_info = cls.to_discovery_item(db, next_perf_scene, current_uid, settings_adapter)
@@ -267,7 +271,7 @@ class PlayerDiscoveryService:
                     MetadataMatch.id != match.id,
                     MetadataMatch.is_active == True,
                     MetadataMatch.media_item_id.isnot(None),
-                    ~MetadataMatch.media_item_id.in_(unwatched_item_ids_subq)
+                    ~MetadataMatch.media_item_id.in_(watched_item_ids_q)
                 ).first()
                 if next_stud_match:
                     studio_unwatched_info = cls.to_discovery_item(db, next_stud_match, current_uid, settings_adapter)
