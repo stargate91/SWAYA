@@ -8,6 +8,7 @@ from app.domains.users.models import UserOverride
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.domains.metadata.models import Studio, MetadataMatch
 from app.domains.library.services.detail._detail_formatter import DetailFormatter
+from app.domains.library.services.detail.detail_mixins import OverrideResolver, ExternalLinksBuilder
 
 # Sub-services
 from app.domains.library.services.detail.scene.cast_builder import SceneCastBuilder
@@ -268,19 +269,9 @@ class SceneDetailService(DetailFormatter):
             db, match_db, scene_data, date_str, current_uid, provider_prefix, self._resolve_img
         )
 
-        metadata_override = None
-        if match_db:
-            metadata_override = db.query(UserOverride).filter(
-                UserOverride.user_id == current_uid,
-                UserOverride.metadata_match_id == match_db.id
-            ).first()
-
-        physical_override = None
-        if match_db and match_db.media_item_id:
-            physical_override = db.query(UserOverride).filter(
-                UserOverride.user_id == current_uid,
-                UserOverride.media_item_id == match_db.media_item_id
-            ).first()
+        metadata_override, physical_override = OverrideResolver.resolve_overrides(
+            db, current_uid, match=match_db
+        )
 
         override = metadata_override or physical_override
         if not override:
@@ -393,6 +384,5 @@ class SceneDetailService(DetailFormatter):
             "peaks_history": peaks_history,
         }
         
-        from app.domains.library.services.detail.external_links import generate_external_links
-        result["external_links"] = generate_external_links(result["external_ids"], "scene")
+        ExternalLinksBuilder.append_links(result, result["external_ids"], "scene")
         return SceneDetailResponse(**result)

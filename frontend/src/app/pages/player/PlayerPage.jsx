@@ -56,6 +56,7 @@ export default function PlayerPage() {
     showAudioMenu,
     showSubMenu,
     bottomOffset,
+    osdMessage,
     setShowAudioMenu,
     setShowSubMenu,
     setLogoError,
@@ -139,7 +140,7 @@ export default function PlayerPage() {
   return (
     /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
     <div
-      className={`player-page ${controlsOnly ? 'player-page--transparent' : ''}`}
+      className={`player-page ${controlsOnly ? 'player-page--transparent' : ''} ${!showControls ? 'player-page--hide-cursor' : ''}`}
       onMouseMove={handleMouseMove}
       onWheel={handleWheel}
       onDoubleClick={handleDoubleClick}
@@ -213,6 +214,12 @@ export default function PlayerPage() {
         />
 
       </div>
+
+      {osdMessage && (
+        <div className="player-page__osd">
+          {osdMessage}
+        </div>
+      )}
 
       {showEndOverlay && (
         <PlayerEndOverlay

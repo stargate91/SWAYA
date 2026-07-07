@@ -10,6 +10,7 @@ from app.shared_kernel.language import LanguageService
 from app.shared_kernel.genre_utils import split_genres as _split_genres
 from app.domains.library.schemas import MovieDetailResponse
 from app.domains.library.services.detail.formatters.base import MovieDetailFormatter
+from app.domains.library.services.detail.detail_mixins import OverrideResolver, PlaybackResolver, ExternalLinksBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -117,25 +118,15 @@ class TmdbMovieFormatter(MovieDetailFormatter):
             except Exception as e:
                 logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/tmdb_movie.py:143: {e}", exc_info=True)
         
-        metadata_override = db.query(UserOverride).join(MetadataMatch, UserOverride.metadata_match_id == MetadataMatch.id).filter(
-            UserOverride.user_id == current_uid,
-            MetadataMatch.provider == Provider.TMDB,
-            MetadataMatch.external_id == str(tmdb_id),
-            MetadataMatch.media_type == MediaType.MOVIE
-        ).first()
-        
         match = db.query(MetadataMatch).filter(
             MetadataMatch.provider == Provider.TMDB,
             MetadataMatch.external_id == str(tmdb_id),
             MetadataMatch.media_type == MediaType.MOVIE
         ).first()
-        
-        physical_override = None
-        if match and match.media_item_id:
-            physical_override = db.query(UserOverride).filter(
-                UserOverride.user_id == current_uid,
-                UserOverride.media_item_id == match.media_item_id
-            ).first()
+
+        metadata_override, physical_override = OverrideResolver.resolve_overrides(
+            db, current_uid, match=match
+        )
 
         override = metadata_override
         
@@ -186,42 +177,12 @@ class TmdbMovieFormatter(MovieDetailFormatter):
         if youtube_trailers:
             trailer_key = youtube_trailers[0].get("key")
 
-        # Merge watch properties
-        is_watched = False
-        watch_count = 0
-        resume_position = 0
-        last_watched_at_dt = None
-
-        if metadata_override:
-            is_watched = metadata_override.is_watched
-            watch_count = metadata_override.watch_count or 0
-            last_watched_at_dt = metadata_override.last_watched_at
-
-        if physical_override:
-            if physical_override.is_watched:
-                is_watched = True
-            if physical_override.watch_count and physical_override.watch_count > watch_count:
-                watch_count = physical_override.watch_count
-            if physical_override.resume_position:
-                resume_position = physical_override.resume_position
-            if physical_override.last_watched_at:
-                if not last_watched_at_dt or physical_override.last_watched_at > last_watched_at_dt:
-                    last_watched_at_dt = physical_override.last_watched_at
-
-        playback_logs = []
-        if match and match.media_item_id:
-            from app.domains.history.models import PlaybackLog
-            logs = db.query(PlaybackLog).filter(
-                PlaybackLog.user_id == current_uid,
-                PlaybackLog.media_item_id == match.media_item_id
-            ).order_by(PlaybackLog.watched_at.desc()).all()
-            playback_logs = [
-                {
-                    "id": log.id,
-                    "watched_at": log.watched_at.isoformat()
-                }
-                for log in logs
-            ]
+        is_watched, watch_count, resume_position, last_watched_at_dt = OverrideResolver.merge_watch_state(
+            metadata_override=metadata_override, physical_override=physical_override
+        )
+        playback_logs = PlaybackResolver.get_playback_logs(
+            db, current_uid, match.media_item_id if match else None
+        )
 
         result = {
             "id": f"tmdb_{tmdb_id}",
@@ -274,33 +235,15 @@ class TmdbMovieFormatter(MovieDetailFormatter):
             "library_item_id": match.media_item_id if (match and match.media_item_id) else None,
         }
         
-        peaks_count = 0
-        peaks_history = []
-        if match and match.media_item_id:
-            from app.domains.history.models import PlaybackPeakLog
-            peaks = db.query(PlaybackPeakLog).filter(
-                PlaybackPeakLog.user_id == current_uid,
-                PlaybackPeakLog.media_item_id == match.media_item_id
-            ).order_by(PlaybackPeakLog.video_position.asc()).all()
-            peaks_count = len(peaks)
-            peaks_history = [
-                {
-                    "id": p.id,
-                    "video_position": p.video_position,
-                    "watched_at": p.created_at.isoformat()
-                }
-                for p in peaks
-            ]
+        peaks_count, peaks_history = PlaybackResolver.get_peaks(
+            db, current_uid, match.media_item_id if match else None
+        )
         result["peaks_count"] = peaks_count
         result["peaks_history"] = peaks_history
         
-        ext_ids = {
-            "tmdb": tmdb_id
-        }
+        ext_ids = {"tmdb": tmdb_id}
         imdb_id = tmdb_data.get("imdb_id") or (match.imdb_id if match else None)
         if imdb_id:
             ext_ids["imdb"] = imdb_id
-
-        from app.domains.library.services.detail.external_links import generate_external_links
-        result["external_links"] = generate_external_links(ext_ids, "movie")
+        ExternalLinksBuilder.append_links(result, ext_ids, "movie")
         return MovieDetailResponse(**result)

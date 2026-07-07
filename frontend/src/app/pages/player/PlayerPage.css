@@ -11,6 +11,10 @@
   font-family: var(--font-family, inherit);
 }
 
+.player-page.player-page--hide-cursor {
+  cursor: none;
+}
+
 .player-page.player-page--transparent {
   background-color: transparent !important;
 }
@@ -614,13 +618,37 @@
   border-color: transparent;
 }
 
-.player-page__end-btn--danger {
-  background: color-mix(in srgb, var(--color-state-danger) 15%, transparent);
-  border-color: color-mix(in srgb, var(--color-state-danger) 20%, transparent);
-  color: var(--color-accent-red-soft);
-}
-
 .player-page__end-btn--danger:hover {
   background: color-mix(in srgb, var(--color-state-danger) 25%, transparent);
-  border-color: color-mix(in srgb, var(--color-state-danger) 35%, transparent);
+  border-color: var(--color-state-danger);
+}
+
+/* OSD (On-Screen Display) notification */
+.player-page__osd {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.75);
+  color: var(--color-ink, #ffffff);
+  padding: var(--space-3, 10px) var(--space-6, 20px);
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: 600;
+  z-index: 100;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  animation: osd-fade-in 0.15s ease-out;
+}
+
+@keyframes osd-fade-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }

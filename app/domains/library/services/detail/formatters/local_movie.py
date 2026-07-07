@@ -12,6 +12,7 @@ from app.shared_kernel.language import LanguageService
 from app.shared_kernel.genre_utils import split_genres as _split_genres
 from app.domains.library.schemas import MovieDetailResponse
 from app.domains.library.services.detail.formatters.base import MovieDetailFormatter
+from app.domains.library.services.detail.detail_mixins import OverrideResolver, PlaybackResolver, ExternalLinksBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -75,17 +76,9 @@ class LocalMovieFormatter(MovieDetailFormatter):
             "audio_type": item.audio_type.value if hasattr(item.audio_type, "value") else str(item.audio_type),
         }
         
-        metadata_override = None
-        if active_match:
-            metadata_override = db.query(UserOverride).filter(
-                UserOverride.user_id == current_uid,
-                UserOverride.metadata_match_id == active_match.id
-            ).first()
-
-        physical_override = db.query(UserOverride).filter(
-            UserOverride.user_id == current_uid,
-            UserOverride.media_item_id == item.id
-        ).first()
+        metadata_override, physical_override = OverrideResolver.resolve_overrides(
+            db, current_uid, match=active_match, media_item_id=item.id
+        )
 
         override = metadata_override or item.overrides or physical_override
             
@@ -123,37 +116,13 @@ class LocalMovieFormatter(MovieDetailFormatter):
             for ex in item.extras
         ] if item.extras else []
 
-        # Merge watch properties
-        is_watched = False
-        watch_count = 0
-        resume_position = 0
-        last_watched_at_dt = None
-
-        if metadata_override:
-            is_watched = metadata_override.is_watched
-            watch_count = metadata_override.watch_count or 0
-            last_watched_at_dt = metadata_override.last_watched_at
-        elif override:
-            is_watched = override.is_watched
-            watch_count = override.watch_count or 0
-            last_watched_at_dt = override.last_watched_at
-
-        if physical_override:
-            if physical_override.is_watched:
-                is_watched = True
-            if physical_override.watch_count and physical_override.watch_count > watch_count:
-                watch_count = physical_override.watch_count
-            if physical_override.resume_position:
-                resume_position = physical_override.resume_position
-            if physical_override.last_watched_at:
-                if not last_watched_at_dt or physical_override.last_watched_at > last_watched_at_dt:
-                    last_watched_at_dt = physical_override.last_watched_at
+        is_watched, watch_count, resume_position, last_watched_at_dt = OverrideResolver.merge_watch_state(
+            metadata_override=metadata_override, physical_override=physical_override,
+            fallback_override=override
+        )
 
         playback_logs = [
-            {
-                "id": log.id,
-                "watched_at": log.watched_at.isoformat()
-            }
+            {"id": log.id, "watched_at": log.watched_at.isoformat()}
             for log in sorted(item.playback_logs or [], key=lambda x: x.watched_at, reverse=True)
         ]
 
@@ -212,23 +181,7 @@ class LocalMovieFormatter(MovieDetailFormatter):
             "playback_logs": playback_logs,
         }
 
-        peaks_count = 0
-        peaks_history = []
-        if item.id:
-            from app.domains.history.models import PlaybackPeakLog
-            peaks = db.query(PlaybackPeakLog).filter(
-                PlaybackPeakLog.user_id == current_uid,
-                PlaybackPeakLog.media_item_id == item.id
-            ).order_by(PlaybackPeakLog.video_position.asc()).all()
-            peaks_count = len(peaks)
-            peaks_history = [
-                {
-                    "id": p.id,
-                    "video_position": p.video_position,
-                    "watched_at": p.created_at.isoformat() if p.created_at else None
-                }
-                for p in peaks
-            ]
+        peaks_count, peaks_history = PlaybackResolver.get_peaks(db, current_uid, item.id)
         result["peaks_count"] = peaks_count
         result["peaks_history"] = peaks_history
         
@@ -250,7 +203,6 @@ class LocalMovieFormatter(MovieDetailFormatter):
             if active_match.imdb_id:
                 ext_ids["imdb"] = active_match.imdb_id
 
-        from app.domains.library.services.detail.external_links import generate_external_links
         media_type_val = result["type"]
-        result["external_links"] = generate_external_links(ext_ids, media_type_val)
+        ExternalLinksBuilder.append_links(result, ext_ids, media_type_val)
         return MovieDetailResponse(**result)

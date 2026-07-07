@@ -233,6 +233,12 @@ def get_scraper_gateway() -> ScraperGatewayPort:
     from app.infrastructure.scrapers.support.gateway import scraper_gateway
     return scraper_gateway
 
+DETAIL_DISPATCH = {
+    "scene": lambda db, scrapers, item_id, **kw: SceneDetailService(db, scrapers).get_scene_detail(item_id),
+    "movie": lambda db, scrapers, item_id, **kw: MovieDetailService(db, scrapers).get_library_item_detail(item_id, full_people=kw.get("full_people", False)),
+    "tv":    lambda db, scrapers, item_id, **kw: TvDetailService(db, scrapers).get_library_tv_detail(item_id),
+}
+
 @library_router.get("/library/item/{item_id}")
 def get_library_item_detail(
     item_id: str,
@@ -241,18 +247,15 @@ def get_library_item_detail(
     db: Session = Depends(get_db),
     scrapers: ScraperGatewayPort = Depends(get_scraper_gateway)
 ):
-    if media_type:
-        if media_type.lower() == "scene":
-            return SceneDetailService(db, scrapers).get_scene_detail(item_id)
-        elif media_type.lower() == "movie":
-            return MovieDetailService(db, scrapers).get_library_item_detail(item_id, full_people=full_people)
-        elif media_type.lower() == "tv":
-            return TvDetailService(db, scrapers).get_library_tv_detail(item_id)
+    # Explicit media_type from query param
+    if media_type and media_type.lower() in DETAIL_DISPATCH:
+        return DETAIL_DISPATCH[media_type.lower()](db, scrapers, item_id, full_people=full_people)
 
+    # Auto-detect from ID prefix
     if "_" in item_id:
         prefix = item_id.split("_", 1)[0].lower()
         if prefix in ("stash", "stashdb", "fansdb"):
-            return SceneDetailService(db, scrapers).get_scene_detail(item_id)
+            return DETAIL_DISPATCH["scene"](db, scrapers, item_id)
         elif prefix in ("porndb", "theporndb"):
             scene_uuid = item_id.split("_", 1)[1]
             from app.domains.metadata.models import MetadataMatch
@@ -262,14 +265,14 @@ def get_library_item_detail(
                 MetadataMatch.media_type == MediaType.SCENE
             ).first()
             if match_db:
-                return SceneDetailService(db, scrapers).get_scene_detail(item_id)
+                return DETAIL_DISPATCH["scene"](db, scrapers, item_id)
             
-            scene_resp = SceneDetailService(db, scrapers).get_scene_detail(item_id)
+            scene_resp = DETAIL_DISPATCH["scene"](db, scrapers, item_id)
             if isinstance(scene_resp, JSONResponse) and scene_resp.status_code == 404:
-                return MovieDetailService(db, scrapers).get_library_item_detail(item_id, full_people=full_people)
+                return DETAIL_DISPATCH["movie"](db, scrapers, item_id, full_people=full_people)
             return scene_resp
 
-    return MovieDetailService(db, scrapers).get_library_item_detail(item_id, full_people=full_people)
+    return DETAIL_DISPATCH["movie"](db, scrapers, item_id, full_people=full_people)
 
 
 @library_router.get("/library/tv/{tv_tmdb_id}", response_model=TvShowDetailResponse)

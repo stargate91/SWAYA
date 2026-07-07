@@ -28,6 +28,8 @@ const observedMpvProperties = [
   [8, 'eof-reached'],
   [9, 'video-params'],
   [10, 'mute'],
+  [11, 'sub-delay'],
+  [12, 'audio-delay'],
 ];
 
 const snapshotRequestIds = new Map(
@@ -181,6 +183,22 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
         nodeIntegration: true,
         contextIsolation: false,
         backgroundThrottling: false
+      }
+    });
+
+    // Transition to minimized/mini-player mode when focus is lost (e.g., Alt-Tab out)
+    controlsWindow.on('blur', () => {
+      if (isPip) return;
+      if (mpvPlayerWindow && !mpvPlayerWindow.isDestroyed() && !mpvPlayerWindow.isMinimized()) {
+        mpvPlayerWindow.setAlwaysOnTop(false);
+        mpvPlayerWindow.minimize();
+      }
+      if (controlsWindow && !controlsWindow.isDestroyed() && !controlsWindow.isMinimized()) {
+        controlsWindow.setAlwaysOnTop(false);
+        controlsWindow.minimize();
+      }
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('player-state-update', { event: 'minimize-change', isMinimized: true });
       }
     });
 

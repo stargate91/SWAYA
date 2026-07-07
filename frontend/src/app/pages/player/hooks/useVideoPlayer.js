@@ -90,11 +90,21 @@ export default function useVideoPlayer({ itemId, containerRef }) {
 
   const [videoParams, setVideoParams] = useState(null);
   const [bottomOffset, setBottomOffset] = useState(0);
+  const [osdMessage, setOsdMessage] = useState('');
+  const osdTimeoutRef = useRef(null);
+
+  // Keep track of delays in local component state as well for OSD feedback
+  const [subDelay, setSubDelay] = useState(0);
+  const [audioDelay, setAudioDelay] = useState(0);
+
   const videoParamsRef = useRef(null);
 
   useEffect(() => {
     videoParamsRef.current = videoParams;
   }, [videoParams]);
+
+  // Height of the bottom controls (progress bar + action row)
+  const CONTROLS_FIT_THRESHOLD = 80;
 
   const updateBottomOffset = useCallback((params) => {
     if (!params || !params.aspect || !containerRef.current) {
@@ -112,7 +122,14 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     if (videoAspect > containerAspect) {
       const displayedVideoHeight = containerWidth / videoAspect;
       const blackBarHeight = (containerHeight - displayedVideoHeight) / 2;
-      setBottomOffset(Math.max(0, Math.round(blackBarHeight)));
+
+      if (blackBarHeight >= CONTROLS_FIT_THRESHOLD) {
+        // Black bar is large enough — controls fit comfortably, stay at bottom
+        setBottomOffset(0);
+      } else {
+        // Black bar too small — push controls up to the video edge
+        setBottomOffset(Math.max(0, Math.round(blackBarHeight)));
+      }
     } else {
       setBottomOffset(0);
     }
@@ -381,6 +398,12 @@ export default function useVideoPlayer({ itemId, containerRef }) {
         if (data.name === 'track-list' && Array.isArray(data.data)) {
           setTrackList(data.data);
         }
+        if (data.name === 'sub-delay' && typeof data.data === 'number') {
+          setSubDelay(data.data);
+        }
+        if (data.name === 'audio-delay' && typeof data.data === 'number') {
+          setAudioDelay(data.data);
+        }
         if (data.name === 'speed' && typeof data.data === 'number') {
           setSpeed(data.data);
         }
@@ -595,36 +618,149 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     handleAddPeakRef.current = handleAddPeak;
   }, [handleAddPeak]);
 
+  // Helper to trigger OSD message
+  const triggerOsd = useCallback((text) => {
+    setOsdMessage(text);
+    if (osdTimeoutRef.current) {
+      clearTimeout(osdTimeoutRef.current);
+    }
+    osdTimeoutRef.current = setTimeout(() => {
+      setOsdMessage('');
+    }, 2000);
+  }, []);
+
+  const handleKeyDownRef = useRef(null);
+  
+  const prevSubDelayRef = useRef(0);
+  const prevAudioDelayRef = useRef(0);
+
+  // Track delay changes in effects to show OSD
+  useEffect(() => {
+    // Only trigger if value actually changed from the last received value
+    if (subDelay !== prevSubDelayRef.current) {
+      triggerOsd(`Subtitle delay: ${Math.round(subDelay * 1000)} ms`);
+      prevSubDelayRef.current = subDelay;
+    }
+  }, [subDelay, triggerOsd]);
+
+  useEffect(() => {
+    if (audioDelay !== prevAudioDelayRef.current) {
+      triggerOsd(`Audio delay: ${Math.round(audioDelay * 1000)} ms`);
+      prevAudioDelayRef.current = audioDelay;
+    }
+  }, [audioDelay, triggerOsd]);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Enter for peaks
       if (e.key === 'Enter') {
         if (isAdult) {
           e.preventDefault();
           handleAddPeakRef.current();
         }
       }
+
+      // We only allow keyboard controls if no dropdown menu or text input is active
+      if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
+        return;
+      }
+
+      const key = e.key.toLowerCase();
+
+      // Space: Play / Pause
+      if (e.key === ' ' || key === 'spacebar') {
+        e.preventDefault();
+        handlePlayPause();
+        triggerOsd(isPaused ? 'Play' : 'Pause');
+      }
+
+      // Left/Right Arrows: Seek -10s / +10s
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        sendCommand(['seek', -10]);
+        triggerOsd('Seek -10s');
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        sendCommand(['seek', 10]);
+        triggerOsd('Seek +10s');
+      }
+
+      // Up/Down Arrows: Volume +5 / -5
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const nextVol = Math.min(100, (isMuted ? 0 : volume) + 5);
+        setVolume(nextVol);
+        if (isMuted) {
+          setIsMuted(false);
+          sendCommand(['set_property', 'mute', false]);
+        }
+        sendCommand(['set_property', 'volume', nextVol]);
+        triggerOsd(`Volume: ${nextVol}%`);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const nextVol = Math.max(0, (isMuted ? 0 : volume) - 5);
+        setVolume(nextVol);
+        if (isMuted) {
+          setIsMuted(false);
+          sendCommand(['set_property', 'mute', false]);
+        }
+        sendCommand(['set_property', 'volume', nextVol]);
+        triggerOsd(`Volume: ${nextVol}%`);
+      }
+
+      // M key: Mute Toggle
+      if (key === 'm') {
+        e.preventDefault();
+        toggleMute();
+        // Since toggleMute is async in state, look at inverse for OSD
+        triggerOsd(!isMuted ? 'Muted' : 'Unmuted');
+      }
+
+      // F key: Fullscreen (PiP toggle back-and-forth)
+      if (key === 'f') {
+        e.preventDefault();
+        handleTogglePip();
+      }
+
+      // Subtitle Delay: G (decrease / speed up), H (increase / slow down)
+      if (key === 'g') {
+        e.preventDefault();
+        sendCommand(['add', 'sub-delay', -0.1]);
+      } else if (key === 'h') {
+        e.preventDefault();
+        sendCommand(['add', 'sub-delay', 0.1]);
+      }
+
+      // Audio Delay: J (decrease), K (increase)
+      if (key === 'j') {
+        e.preventDefault();
+        sendCommand(['add', 'audio-delay', -0.1]);
+      } else if (key === 'k') {
+        e.preventDefault();
+        sendCommand(['add', 'audio-delay', 0.1]);
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isAdult]);
+  }, [isAdult, sendCommand, isPaused, volume, isMuted, toggleMute, handlePlayPause, handleTogglePip, triggerOsd]);
 
-  const handleTogglePip = () => {
+  function handleTogglePip() {
     try {
       const { ipcRenderer } = window.require('electron');
       ipcRenderer.send('mpv-toggle-pip');
     } catch {
       /* ignore */
     }
-  };
+  }
 
-  const handleMinimizePip = () => {
+  function handleMinimizePip() {
     try {
       const { ipcRenderer } = window.require('electron');
       ipcRenderer.send('mpv-minimize');
     } catch {
       /* ignore */
     }
-  };
+  }
 
   const handleDoubleClick = (e) => {
     if (e.target.closest('button') || e.target.closest('input') || e.target.closest('select') || e.target.closest('.player-page__menu')) {
@@ -661,6 +797,7 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     showAudioMenu,
     showSubMenu,
     bottomOffset,
+    osdMessage,
     setShowAudioMenu,
     setShowSubMenu,
     setLogoError,

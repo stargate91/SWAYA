@@ -333,25 +333,18 @@ class OverridePersister:
                     media_type = m_type.value if hasattr(m_type, "value") else str(m_type)
             
             scraper_gateway = scrapers
-            if scraper_gateway:
-                if media_type == 'scene':
-                    from app.domains.library.services.detail.scene_detail_service import SceneDetailService
+            if scraper_gateway and media_type:
+                _ENRICH_DISPATCH = {
+                    'scene': lambda: __import__('app.domains.library.services.detail.scene_detail_service', fromlist=['SceneDetailService']).SceneDetailService(db, scraper_gateway).get_scene_detail(item_id),
+                    'tv': lambda: __import__('app.domains.library.services.detail.tv_detail_service', fromlist=['TvDetailService']).TvDetailService(db, scraper_gateway).get_library_tv_detail(item_id),
+                    'movie': lambda: __import__('app.domains.library.services.detail.movie_detail_service', fromlist=['MovieDetailService']).MovieDetailService(db, scraper_gateway).get_library_item_detail(item_id),
+                }
+                enrich_fn = _ENRICH_DISPATCH.get(media_type)
+                if enrich_fn:
                     try:
-                        SceneDetailService(db, scraper_gateway).get_scene_detail(item_id)
+                        enrich_fn()
                     except Exception as e:
-                        logger.error(f"Auto-enrich failed for scene {item_id}: {e}")
-                elif media_type == 'tv':
-                    from app.domains.library.services.detail.tv_detail_service import TvDetailService
-                    try:
-                        TvDetailService(db, scraper_gateway).get_library_tv_detail(item_id)
-                    except Exception as e:
-                        logger.error(f"Auto-enrich failed for tv {item_id}: {e}")
-                elif media_type == 'movie':
-                    from app.domains.library.services.detail.movie_detail_service import MovieDetailService
-                    try:
-                        MovieDetailService(db, scraper_gateway).get_library_item_detail(item_id)
-                    except Exception as e:
-                        logger.error(f"Auto-enrich failed for movie {item_id}: {e}")
+                        logger.error(f"Auto-enrich failed for {media_type} {item_id}: {e}")
 
             if match and not match.is_adult and mainstream_enricher:
                 try:

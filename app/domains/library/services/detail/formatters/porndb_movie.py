@@ -7,6 +7,7 @@ from app.shared_kernel.enums import Provider, MediaType
 from app.domains.users.models import UserOverride
 from app.domains.library.schemas import MovieDetailResponse
 from app.domains.library.services.detail.formatters.base import MovieDetailFormatter
+from app.domains.library.services.detail.detail_mixins import OverrideResolver, PlaybackResolver, ExternalLinksBuilder
 from app.domains.metadata.models import MetadataMatch
 
 from app.domains.people.models import Person, ExternalSourceLink
@@ -202,60 +203,17 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             if db_updated:
                 db.commit()
 
-        metadata_override = None
-        if match:
-            metadata_override = db.query(UserOverride).filter(
-                UserOverride.user_id == current_uid,
-                UserOverride.metadata_match_id == match.id
-            ).first()
+        metadata_override, physical_override = OverrideResolver.resolve_overrides(
+            db, current_uid, match=match
+        )
 
-        physical_override = None
-        if match and match.media_item_id:
-            physical_override = db.query(UserOverride).filter(
-                UserOverride.user_id == current_uid,
-                UserOverride.media_item_id == match.media_item_id
-            ).first()
-
-        # Merge watch properties
-        is_watched = False
-        watch_count = 0
-        resume_position = 0
-        last_watched_at_dt = None
-
-        if metadata_override:
-            is_watched = metadata_override.is_watched
-            watch_count = metadata_override.watch_count or 0
-            last_watched_at_dt = metadata_override.last_watched_at
-        elif override:
-            is_watched = override.is_watched
-            watch_count = override.watch_count or 0
-            last_watched_at_dt = override.last_watched_at
-
-        if physical_override:
-            if physical_override.is_watched:
-                is_watched = True
-            if physical_override.watch_count and physical_override.watch_count > watch_count:
-                watch_count = physical_override.watch_count
-            if physical_override.resume_position:
-                resume_position = physical_override.resume_position
-            if physical_override.last_watched_at:
-                if not last_watched_at_dt or physical_override.last_watched_at > last_watched_at_dt:
-                    last_watched_at_dt = physical_override.last_watched_at
-
-        playback_logs = []
-        if match and match.media_item_id:
-            from app.domains.history.models import PlaybackLog
-            logs = db.query(PlaybackLog).filter(
-                PlaybackLog.user_id == current_uid,
-                PlaybackLog.media_item_id == match.media_item_id
-            ).order_by(PlaybackLog.watched_at.desc()).all()
-            playback_logs = [
-                {
-                    "id": log.id,
-                    "watched_at": log.watched_at.isoformat()
-                }
-                for log in logs
-            ]
+        is_watched, watch_count, resume_position, last_watched_at_dt = OverrideResolver.merge_watch_state(
+            metadata_override=metadata_override, physical_override=physical_override,
+            fallback_override=override
+        )
+        playback_logs = PlaybackResolver.get_playback_logs(
+            db, current_uid, match.media_item_id if match else None
+        )
 
         # Use metadata_override if available, else fallback to override
         effective_override = metadata_override if metadata_override else override
@@ -346,10 +304,6 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             "in_library": match is not None and match.media_item_id is not None,
             "library_item_id": match.media_item_id if (match and match.media_item_id) else None,
         }
-        ext_ids = {
-            "porndb_id": porndb_id,
-            "source": "porndb"
-        }
-        from app.domains.library.services.detail.external_links import generate_external_links
-        result["external_links"] = generate_external_links(ext_ids, "movie")
+        ext_ids = {"porndb_id": porndb_id, "source": "porndb"}
+        ExternalLinksBuilder.append_links(result, ext_ids, "movie")
         return MovieDetailResponse(**result)
