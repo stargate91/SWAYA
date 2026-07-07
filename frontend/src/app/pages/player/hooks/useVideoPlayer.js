@@ -97,6 +97,13 @@ export default function useVideoPlayer({ itemId, containerRef }) {
   const [subDelay, setSubDelay] = useState(0);
   const [audioDelay, setAudioDelay] = useState(0);
 
+  // Discovery / End Overlay states
+  const [peaksCount, setPeaksCount] = useState(0);
+  const [collectionNext, setCollectionNext] = useState(null);
+  const [performerUnwatched, setPerformerUnwatched] = useState(null);
+  const [studioUnwatched, setStudioUnwatched] = useState(null);
+  const [surpriseMe, setSurpriseMe] = useState(null);
+
   const videoParamsRef = useRef(null);
 
   useEffect(() => {
@@ -288,6 +295,11 @@ export default function useVideoPlayer({ itemId, containerRef }) {
         setMediaType(data.media_type);
         setUserRating(data.user_rating);
         setNextEpisode(data.next_episode);
+        setPeaksCount(data.peaks_count || 0);
+        setCollectionNext(data.collection_next);
+        setPerformerUnwatched(data.performer_unwatched);
+        setStudioUnwatched(data.studio_unwatched);
+        setSurpriseMe(data.surprise_me);
         if (data.logo_path) {
           const resolved = resolveMediaImageUrl(data.logo_path, 'logo', `http://localhost:${backendPort}`);
           setLogoUrl(resolved);
@@ -798,6 +810,11 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     showSubMenu,
     bottomOffset,
     osdMessage,
+    peaksCount,
+    collectionNext,
+    performerUnwatched,
+    studioUnwatched,
+    surpriseMe,
     setShowAudioMenu,
     setShowSubMenu,
     setLogoError,

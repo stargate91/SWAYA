@@ -63,6 +63,12 @@ class PlaybackExtra(BaseModel):
     language: Optional[str] = None
     filename: Optional[str] = None
 
+class DiscoveryItem(BaseModel):
+    id: Union[int, str]
+    title: str
+    poster_path: Optional[str] = None
+    media_type: str
+
 class PlaybackInfoResponse(BaseModel):
     file_path: str
     start_seconds: int
@@ -71,6 +77,11 @@ class PlaybackInfoResponse(BaseModel):
     is_adult: Optional[bool] = False
     media_type: Optional[str] = None
     extras: Optional[List[PlaybackExtra]] = []
+    peaks_count: Optional[int] = 0
+    collection_next: Optional[DiscoveryItem] = None
+    performer_unwatched: Optional[DiscoveryItem] = None
+    studio_unwatched: Optional[DiscoveryItem] = None
+    surprise_me: Optional[DiscoveryItem] = None
 
 class UpdatePlaybackProgressRequest(BaseModel):
     item_id: Union[str, int]

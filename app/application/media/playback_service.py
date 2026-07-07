@@ -362,46 +362,17 @@ class PlaybackService:
                     "filename": extra.filename
                 })
 
-        # Check if next episode exists
-        next_episode_info = None
-        if match and match.media_type and match.media_type.value == "episode" and match.parent_id:
-            current_season = match.season_number
-            current_ep = match.episode_number
-            if isinstance(current_ep, list) and current_ep:
-                current_ep_num = current_ep[-1]
-            elif isinstance(current_ep, (int, float)):
-                current_ep_num = int(current_ep)
-            else:
-                current_ep_num = 0
-
-            from app.domains.metadata.models import MetadataMatch, MetadataLocalization
-            from app.shared_kernel.enums import MediaType, ItemStatus
-            from app.domains.library.models import MediaItem
-
-            season_match = self.db.query(MetadataMatch).filter(MetadataMatch.id == match.parent_id).first()
-            if season_match and season_match.parent_id:
-                show_id = season_match.parent_id
-                next_ep_match = self.db.query(MetadataMatch).join(MediaItem).filter(
-                    MetadataMatch.parent_id.in_(
-                        self.db.query(MetadataMatch.id).filter(MetadataMatch.parent_id == show_id)
-                    ),
-                    MetadataMatch.media_type == MediaType.EPISODE,
-                    MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED])
-                ).filter(
-                    (MetadataMatch.season_number > current_season) |
-                    ((MetadataMatch.season_number == current_season) & (MetadataMatch.episode_number > current_ep_num))
-                ).order_by(
-                    MetadataMatch.season_number.asc(),
-                    MetadataMatch.episode_number.asc()
-                ).first()
-
-                if next_ep_match:
-                    next_loc = self.db.query(MetadataLocalization).filter(MetadataLocalization.match_id == next_ep_match.id).first()
-                    next_title = next_loc.title if next_loc else (next_ep_match.original_title or f"Episode {next_ep_match.episode_number}")
-                    next_episode_info = {
-                        "id": next_ep_match.media_item_id,
-                        "title": f"S{str(next_ep_match.season_number).zfill(2)}E{str(next_ep_match.episode_number or 0).zfill(2)} - {next_title}"
-                    }
+        # Delegate recommendations and discovery details to PlayerDiscoveryService
+        from app.domains.library.services.detail.player_discovery_service import PlayerDiscoveryService
+        discovery = PlayerDiscoveryService.get_playback_discovery_info(
+            db=self.db,
+            item=item,
+            current_uid=self.overrides.user_id,
+            is_adult=is_adult,
+            media_type=media_type,
+            match=match,
+            settings_adapter=self.settings
+        )
 
         return {
             "file_path": item.current_path,
@@ -412,7 +383,12 @@ class PlaybackService:
             "media_type": media_type,
             "extras": extras_list,
             "user_rating": override.user_rating if override else None,
-            "next_episode": next_episode_info
+            "next_episode": discovery.get("next_episode"),
+            "peaks_count": discovery.get("peaks_count", 0),
+            "collection_next": discovery.get("collection_next"),
+            "performer_unwatched": discovery.get("performer_unwatched"),
+            "studio_unwatched": discovery.get("studio_unwatched"),
+            "surprise_me": discovery.get("surprise_me"),
         }
 
     def update_playback_progress(self, item_id: Any, current_time: int, total_length: int) -> PlaybackStatusResponse:

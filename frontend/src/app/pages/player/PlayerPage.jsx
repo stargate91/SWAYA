@@ -57,6 +57,11 @@ export default function PlayerPage() {
     showSubMenu,
     bottomOffset,
     osdMessage,
+    peaksCount,
+    collectionNext,
+    performerUnwatched,
+    studioUnwatched,
+    surpriseMe,
     setShowAudioMenu,
     setShowSubMenu,
     setLogoError,
@@ -231,6 +236,13 @@ export default function PlayerPage() {
           hoverRating={hoverRating}
           ratingText={ratingText}
           starSymbol={starSymbol}
+          peaksCount={peaksCount}
+          collectionNext={collectionNext}
+          performerUnwatched={performerUnwatched}
+          studioUnwatched={studioUnwatched}
+          surpriseMe={surpriseMe}
+          mediaType={mediaType}
+          isAdult={isAdult}
           handlePlayNext={handlePlayNext}
           setNextEpisode={setNextEpisode}
           setHoverRating={setHoverRating}

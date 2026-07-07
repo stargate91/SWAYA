@@ -1,6 +1,6 @@
 import logging
 from typing import List, Dict, Any, Optional
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, aliased
 
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.shared_kernel.ports.settings_port import SettingsPort
@@ -387,16 +387,28 @@ class RecommendationsService:
         
         offset = (page - 1) * limit
         
-        # Collapse TV shows by external_id (TMDB TV ID), other media by MediaItem.id
+        # Subquery: for each episode match, find the show-level external_id via parent chain
+        # episode -> season (parent_id) -> show (parent_id)
+        season_alias = aliased(MetadataMatch)
+        show_alias = aliased(MetadataMatch)
+        show_external_id_subq = self.db.query(
+            show_alias.external_id
+        ).join(
+            season_alias, season_alias.parent_id == show_alias.id
+        ).filter(
+            season_alias.id == MetadataMatch.parent_id
+        ).correlate(MetadataMatch).scalar_subquery()
+        
+        # Collapse TV episodes by their show external_id, other media by MediaItem.id
         group_key = case(
-            (MetadataMatch.media_type == MediaType.TV, MetadataMatch.external_id),
+            (MetadataMatch.media_type == MediaType.EPISODE, show_external_id_subq),
             else_=func.cast(MediaItem.id, String)
         )
         
         filter_conds = [
             MediaItem.status.in_([ItemStatus.RENAMED, ItemStatus.ORGANIZED]),
             MetadataMatch.is_adult == include_adult,
-            MetadataMatch.media_type.in_([MediaType.MOVIE, MediaType.TV, MediaType.SCENE])
+            MetadataMatch.media_type.in_([MediaType.MOVIE, MediaType.EPISODE, MediaType.SCENE])
         ]
             
         recent_matches = self.db.query(
