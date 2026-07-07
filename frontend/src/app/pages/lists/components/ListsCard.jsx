@@ -12,8 +12,9 @@ export default function ListsCard({
   handleRemoveListItem,
 }) {
   const navigate = useNavigate();
-  const isScene = item.media_type === 'scene';
-  const isAdult = item.is_adult || isScene;
+  const isScene = item.media_type === 'scene' || item.media_type === 'videos' || item.media_type === 'video';
+  const isExplicitlySfw = item.is_adult === false || item.adult === false;
+  const isAdult = (isScene && !isExplicitlySfw) || (!isScene && (item.is_adult || item.adult));
   const shouldBlur = isAdult && sessionMode !== 'nsfw';
   const rawPosterUrl = item.poster_path ? resolveMediaImageUrl(item.poster_path, isScene ? 'backdrop' : 'poster') : null;
   const posterUrl = (shouldBlur && rawPosterUrl)

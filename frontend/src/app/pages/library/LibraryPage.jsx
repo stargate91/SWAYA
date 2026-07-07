@@ -189,8 +189,8 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
               setStudiosFilter={state.setStudiosFilter}
               subtitlesFilter={state.subtitlesFilter}
               setSubtitlesFilter={state.setSubtitlesFilter}
-              tagsFilter={state.tagsFilter}
-              setTagsFilter={state.setTagsFilter}
+              selectedTags={state.selectedTags}
+              setSelectedTags={state.setSelectedTags}
               directorsFilter={state.directorsFilter}
               setDirectorsFilter={state.setDirectorsFilter}
               ratingsFilter={state.ratingsFilter}

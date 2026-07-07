@@ -34,6 +34,9 @@ export default function DrawerSearchHeader({
                 setMediaType('movie');
                 setProvider('tmdb');
               }
+            } else if (mediaType === 'videos') {
+              setMediaType('movie');
+              setProvider('tmdb');
             } else {
               setProvider('tmdb');
             }
@@ -47,7 +50,8 @@ export default function DrawerSearchHeader({
           options={[
             { label: 'Movies', value: 'movie' },
             { label: 'TV Shows', value: 'tv' },
-            ...(isAdultActive ? [{ label: 'Scenes', value: 'scene' }] : [])
+            ...(isAdultActive ? [{ label: 'Scenes', value: 'scene' }] : []),
+            ...(source === 'library' ? [{ label: 'Videos', value: 'videos' }] : [])
           ]}
           value={mediaType}
           onChange={(val) => {

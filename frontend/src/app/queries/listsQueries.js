@@ -6,9 +6,9 @@ export const listsKeys = {
   details: (id) => ['lists', 'details', id],
 };
 
-export const useListsQuery = () => useQuery({
-  queryKey: listsKeys.all,
-  queryFn: () => api.lists.getLists(),
+export const useListsQuery = (includeAdult = false) => useQuery({
+  queryKey: [...listsKeys.all, includeAdult],
+  queryFn: () => api.lists.getLists(includeAdult),
 });
 
 export const useListDetailsQuery = (listId, options = {}) => useQuery({

@@ -277,6 +277,7 @@ class CustomListItemResponse(BaseModel):
     provider: Optional[str] = None
     release_date: Optional[str] = None
     people: Optional[List[dict[str, Any]]] = None
+    is_home_video: Optional[bool] = False
 
 
 class CustomListResponse(BaseModel):

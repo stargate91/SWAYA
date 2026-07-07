@@ -9,6 +9,7 @@ import {
   isLibraryTagsTab,
   isLibraryVideoTab,
   isLibraryScenesTab,
+  isLibraryVideosTab,
 } from '@/lib/libraryTabs';
 import TagFilterDropdown from './TagFilterDropdown';
 import DecadeFilterDropdown from './DecadeFilterDropdown';
@@ -267,7 +268,7 @@ export default function LibraryFilters({
           </div>
         )}
 
-        {isVideoTab && (
+        {isVideoTab && !isLibraryVideosTab(resolvedTab) && (
           <div className="library-sorter-container">
             <span className="library-sorter-label">{t('library.filter.label') || 'Filter:'}</span>
             <Dropdown

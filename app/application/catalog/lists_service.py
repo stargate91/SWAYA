@@ -62,6 +62,7 @@ class ListsService:
             "year": None,
             "rating": None,
             "is_adult": False,
+            "is_home_video": False,
             "external_id": None,
             "provider": None,
             "release_date": None,
@@ -118,6 +119,7 @@ class ListsService:
             res["known_for_department"] = item.person.known_for_department
 
         if match:
+            res["is_home_video"] = bool(match.is_home_video)
             res["release_date"] = match.release_date.isoformat() if match.release_date else None
             p_list = []
             for pl in match.people_links:
@@ -212,7 +214,7 @@ class ListsService:
     def _is_list_adult(self, custom_list: CustomList) -> bool:
         return any(self._is_item_adult(item) for item in custom_list.items)
 
-    def get_all_lists(self) -> List[CustomListResponse]:
+    def get_all_lists(self, include_adult: bool = False) -> List[CustomListResponse]:
         # Ensure Watchlist exists
         watchlist = self.db.query(CustomList).filter(CustomList.name == "Watchlist").first()
         if not watchlist:
@@ -221,7 +223,7 @@ class ListsService:
             self.db.add(watchlist)
             self.db.commit()
 
-        adult_enabled = self._adult_access_enabled()
+        adult_enabled = self._adult_access_enabled() and include_adult
 
         lists = self.db.query(CustomList).all()
         result = []
@@ -231,19 +233,28 @@ class ListsService:
                 if custom_list.items and all(self._is_item_adult(item) for item in custom_list.items):
                     continue
 
-            if not adult_enabled:
+            global_adult_enabled = self._adult_access_enabled()
+            if not global_adult_enabled:
                 filtered_items = [item for item in custom_list.items if not self._is_item_adult(item)]
             else:
                 filtered_items = custom_list.items
 
             item_count = len(filtered_items)
-            posters = [self._serialize_item(item).poster_path for item in filtered_items[:4]]
+            posters = []
+            for item in filtered_items[:4]:
+                serialized = self._serialize_item(item)
+                path = serialized.poster_path
+                if path and serialized.is_adult:
+                    path = f"{path}#adult"
+                posters.append(path)
             posters = [p for p in posters if p]
             
             resolved_image = None
             if custom_list.custom_image_path:
                 from app.domains.media_assets.services.images import image_processing_service
                 resolved_image = image_processing_service.resolve_image_url(custom_list.custom_image_path, "covers")
+                if self._is_list_adult(custom_list):
+                    resolved_image = f"{resolved_image}#adult"
 
             result.append(CustomListResponse(
                 id=custom_list.id,

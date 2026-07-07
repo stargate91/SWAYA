@@ -331,6 +331,7 @@ class SceneDetailService(DetailFormatter):
                 "audio_type": item.audio_type.value if hasattr(item.audio_type, "value") else str(item.audio_type),
             }
 
+        is_adult_val = bool(match_db.is_adult if match_db else (provider_prefix in ("stashdb", "stash", "fansdb", "porndb", "theporndb")))
         result = {
             "id": f"scene_{scene_uuid}",
             "title": title,
@@ -361,7 +362,7 @@ class SceneDetailService(DetailFormatter):
             "people_complete": True,
             "directors": [],
             "writers": [],
-            "is_adult": match_db.is_adult if match_db else (provider_prefix in ("stashdb", "stash", "fansdb", "porndb", "theporndb")),
+            "is_adult": is_adult_val,
             "is_favorite": effective_override.is_favorite if effective_override else False,
             "user_rating": effective_override.user_rating if effective_override else None,
             "user_comment": effective_override.user_comment if effective_override else None,
@@ -369,7 +370,7 @@ class SceneDetailService(DetailFormatter):
                 "stash_id": scene_uuid,
                 "source": provider_prefix or "stash",
             },
-            "custom_tags": [t.name for t in effective_override.tags if t.is_adult] if (effective_override and effective_override.tags) else [],
+            "custom_tags": [t.name for t in effective_override.tags if t.is_adult == is_adult_val] if (effective_override and effective_override.tags) else [],
             "suggested_tags": [t.get("name") for t in scene_data.get("tags") or [] if t.get("name")] if scene_data.get("tags") else (match_db.suggested_tags if (match_db and match_db.suggested_tags) else []),
             "tags": [],
             "is_tracked": effective_override.is_tracked if effective_override else False,

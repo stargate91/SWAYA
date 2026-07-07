@@ -1,16 +1,25 @@
 import { ENTITY_ICONS } from '@/ui/icons';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
+import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 
 export default function ListCollageIcon({ samplePosters, listType, color, customImagePath, iconSize = 20 }) {
+  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const iconColor = color || 'var(--color-accent-blue)';
 
   if (customImagePath) {
+    const isAdult = customImagePath.includes('#adult');
+    const shouldBlur = isAdult && sessionMode !== 'nsfw';
     return (
       <div className="lists-sidebar__collage lists-sidebar__collage--1">
         <img
           src={resolveMediaImageUrl(customImagePath)}
           className="lists-sidebar__collage-img lists-sidebar__collage-img--0"
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            ...(shouldBlur ? { filter: 'blur(10px) brightness(0.6)' } : {})
+          }}
           alt=""
         />
       </div>
@@ -20,14 +29,19 @@ export default function ListCollageIcon({ samplePosters, listType, color, custom
   if (samplePosters && samplePosters.length > 0) {
     return (
       <div className={`lists-sidebar__collage lists-sidebar__collage--${Math.min(4, samplePosters.length)}`}>
-        {samplePosters.slice(0, 4).map((path, idx) => (
-          <img
-            key={idx}
-            src={resolveMediaImageUrl(path, 'posterThumb')}
-            className={`lists-sidebar__collage-img lists-sidebar__collage-img--${idx}`}
-            alt=""
-          />
-        ))}
+        {samplePosters.slice(0, 4).map((path, idx) => {
+          const isAdult = path.includes('#adult');
+          const shouldBlur = isAdult && sessionMode !== 'nsfw';
+          return (
+            <img
+              key={idx}
+              src={resolveMediaImageUrl(path, 'posterThumb')}
+              className={`lists-sidebar__collage-img lists-sidebar__collage-img--${idx}`}
+              style={shouldBlur ? { filter: 'blur(6px) brightness(0.6)' } : undefined}
+              alt=""
+            />
+          );
+        })}
       </div>
     );
   }

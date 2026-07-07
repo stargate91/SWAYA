@@ -35,12 +35,15 @@ export function getFilteredListItems({
   if (listType !== 'person' && mediaTypeFilter !== 'all') {
     result = result.filter((item) => {
       const itemType = item.media_type;
+      const isAdult = item.is_adult !== false && item.adult !== false;
       if (mediaTypeFilter === 'movie') {
         return itemType === 'movie';
       } else if (mediaTypeFilter === 'show') {
         return itemType === 'show' || itemType === 'tv' || itemType === 'episode' || itemType === 'season';
       } else if (mediaTypeFilter === 'scene') {
-        return itemType === 'scene' || itemType === 'still';
+        return (itemType === 'scene' || itemType === 'still') && isAdult && !item.is_home_video;
+      } else if (mediaTypeFilter === 'videos') {
+        return itemType === 'videos' || itemType === 'video' || ((itemType === 'scene' || itemType === 'still') && (!isAdult || item.is_home_video));
       }
       return true;
     });

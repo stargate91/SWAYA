@@ -53,16 +53,14 @@ export default function DrawerResultsList({
       {!searching && filteredResults.map((item) => {
         const added = isAdded(item);
         const n = normalizeMediaEntity(item, { context: 'drawer', sessionMode });
-        const isSceneItem = item.media_type === 'scene' || mediaType === 'scene';
+        const isSceneItem = item.media_type === 'scene' || mediaType === 'scene' || item.media_type === 'videos' || mediaType === 'videos';
         const poster = isSceneItem ? (item.backdrop_path || item.poster_path) : (item.poster_path || item.profile_path);
         const imageSize = listType === 'person' ? 'person' : (isSceneItem ? 'backdrop' : 'poster');
 
+        const isExplicitlySfw = item.is_adult === false || item.adult === false;
         const isAdultItem =
-          !!item.is_adult ||
-          !!item.adult ||
-          !!item.is_adult_person ||
-          isSceneItem ||
-          ['porndb', 'stashdb', 'fansdb'].includes(item.provider);
+          (isSceneItem && !isExplicitlySfw) ||
+          (!isSceneItem && (!!item.is_adult || !!item.adult || !!item.is_adult_person || ['porndb', 'stashdb', 'fansdb'].includes(item.provider)));
 
         const isBlurred = sessionMode === 'sfw' && isAdultItem;
 

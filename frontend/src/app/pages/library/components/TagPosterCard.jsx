@@ -21,7 +21,7 @@ export const TagPosterCard = memo(({
 
   const isScene = isSceneMediaType(item.type);
   const isPerson = isPersonMediaType(item.type);
-  const isAdult = item.is_adult || isScene;
+  const isAdult = item.is_adult || (isScene && !item.is_home_video);
   const shouldBlur = isAdult && sessionMode !== 'nsfw';
 
   const rawPosterUrl = isPerson

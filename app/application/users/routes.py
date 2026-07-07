@@ -112,8 +112,8 @@ def delete_tag(tag_id: int, db: Session = Depends(get_db)):
 
 
 @catalog_router.get("/lists", response_model=List[CustomListResponse])
-def get_all_lists(db: Session = Depends(get_db)):
-    return ListsService(db).get_all_lists()
+def get_all_lists(include_adult: bool = False, db: Session = Depends(get_db)):
+    return ListsService(db).get_all_lists(include_adult)
 
 
 @catalog_router.get("/lists/item-membership/{item_id}", response_model=ListMembershipResponse)

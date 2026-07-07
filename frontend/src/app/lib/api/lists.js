@@ -2,7 +2,7 @@ import { fetchJson } from '../http';
 import { API_BASE } from '../backend';
 
 export const lists = {
-  getLists: () => fetchJson('/api/lists'),
+  getLists: (includeAdult = false) => fetchJson(`/api/lists?include_adult=${includeAdult}`),
   createList: (payload) => fetchJson('/api/lists', {
     method: 'POST',
     body: JSON.stringify(payload),

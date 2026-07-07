@@ -104,7 +104,7 @@ class BaseQueryBuilder:
                     or_(
                         UserOverride.metadata_match_id == MetadataMatch.id,
                         and_(
-                            UserOverride.metadata_match_id is None,
+                            UserOverride.metadata_match_id == None,
                             UserOverride.media_item_id == MetadataMatch.media_item_id
                         )
                     ),
@@ -136,7 +136,7 @@ class BaseQueryBuilder:
                     or_(
                         UserOverride.metadata_match_id == MetadataMatch.id,
                         and_(
-                            UserOverride.metadata_match_id is None,
+                            UserOverride.metadata_match_id == None,
                             UserOverride.media_item_id == MetadataMatch.media_item_id
                         )
                     ),
@@ -159,7 +159,7 @@ class BaseQueryBuilder:
                     or_(
                         UserOverride.metadata_match_id == MetadataMatch.id,
                         and_(
-                            UserOverride.metadata_match_id is None,
+                            UserOverride.metadata_match_id == None,
                             UserOverride.media_item_id == MetadataMatch.media_item_id
                         )
                     ),
@@ -177,7 +177,7 @@ class BaseQueryBuilder:
                     or_(
                         UserOverride.metadata_match_id == MetadataMatch.id,
                         and_(
-                            UserOverride.metadata_match_id is None,
+                            UserOverride.metadata_match_id == None,
                             UserOverride.media_item_id == MetadataMatch.media_item_id
                         )
                     ),
@@ -380,5 +380,7 @@ class BaseQueryBuilder:
                 "user_rating": o.user_rating if o else None,
                 "user_comment": o.user_comment if (o and o.user_comment) else None,
                 "people": people_list,
+                "is_adult": bool(match.is_adult) or match.provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB),
+                "is_home_video": bool(match.is_home_video),
             })
         return formatted_items

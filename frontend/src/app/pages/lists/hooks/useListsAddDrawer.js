@@ -96,7 +96,7 @@ export default function useListsAddDrawer({
           const pageSize = 20;
           const res = await api.library.getItems({
             search: query.trim() || undefined,
-            tab: mediaType === 'movie' ? 'movies' : mediaType === 'tv' ? 'tv' : 'scenes',
+            tab: mediaType === 'movie' ? 'movies' : mediaType === 'tv' ? 'tv' : mediaType === 'videos' ? 'videos' : 'scenes',
             page: currentPage,
             pageSize,
             include_adult: isAdultActive,
@@ -153,7 +153,7 @@ export default function useListsAddDrawer({
         });
       } else {
         const isTvItem = item.media_type === 'tv' || mediaType === 'tv';
-        const isSceneItem = item.media_type === 'scene' || mediaType === 'scene';
+        const isSceneItem = item.media_type === 'scene' || mediaType === 'scene' || item.media_type === 'videos' || mediaType === 'videos';
         const poster = isSceneItem ? (item.backdrop_path || item.poster_path) : (item.poster_path || item.profile_path);
 
         await addListItemMutation.mutateAsync({

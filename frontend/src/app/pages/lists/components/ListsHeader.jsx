@@ -158,6 +158,7 @@ export default function ListsHeader({
                   { value: 'movie', label: t('lists.filter_media_type_movies') || 'Movies' },
                   { value: 'show', label: t('lists.filter_media_type_shows') || 'TV Shows' },
                   { value: 'scene', label: t('lists.filter_media_type_scenes') || 'Scenes' },
+                  { value: 'videos', label: t('library.tabs.videos') || 'Videos' },
                 ]}
                 themeColor={activeList.color || 'var(--color-accent-blue)'}
               />

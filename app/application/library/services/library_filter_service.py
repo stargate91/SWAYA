@@ -329,6 +329,8 @@ class LibraryFilterService:
                 "adult_tv": [],
                 "adult_people": [],
                 "adult_scenes": [],
+                "videos": [],
+                "adult_videos": [],
             }
 
             for o in t.overrides:
@@ -409,6 +411,7 @@ class LibraryFilterService:
                             "is_favorite": o.is_favorite,
                             "user_rating": o.user_rating,
                             "is_adult": bool(match.is_adult),
+                            "is_home_video": bool(match.is_home_video),
                             "people": p_list,
                         }
 
@@ -423,7 +426,13 @@ class LibraryFilterService:
                             else:
                                 tag_data["tv"].append(m_item)
                         elif match.media_type == MediaType.SCENE:
-                            tag_data["adult_scenes"].append(m_item)
+                            if match.is_home_video:
+                                if match.is_adult:
+                                    tag_data["adult_videos"].append(m_item)
+                                else:
+                                    tag_data["videos"].append(m_item)
+                            else:
+                                tag_data["adult_scenes"].append(m_item)
 
             tags.append(tag_data)
 

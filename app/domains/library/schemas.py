@@ -211,11 +211,13 @@ class LibraryTabCounts(BaseModel):
     movies: Optional[int] = None
     tv: Optional[int] = None
     scenes: Optional[int] = None
+    videos: Optional[int] = None
     people: Optional[int] = None
     collections: Optional[int] = None
     adult: Optional[int] = None
     adult_tv: Optional[int] = None
     adult_scenes: Optional[int] = None
+    adult_videos: Optional[int] = None
     adult_people: Optional[int] = None
     adult_collections: Optional[int] = None
 
@@ -245,6 +247,15 @@ class TagItem(BaseModel):
     name: str
     color: Optional[str] = None
     is_adult: bool
+    movies: Optional[List[Any]] = None
+    tv: Optional[List[Any]] = None
+    people: Optional[List[Any]] = None
+    adult: Optional[List[Any]] = None
+    adult_tv: Optional[List[Any]] = None
+    adult_people: Optional[List[Any]] = None
+    adult_scenes: Optional[List[Any]] = None
+    videos: Optional[List[Any]] = None
+    adult_videos: Optional[List[Any]] = None
 
 
 class TagGroupItem(BaseModel):

@@ -22,9 +22,9 @@ export default function useListsPageState() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast, openModal, closeModal } = useUi();
-  const { data: lists = [], isLoading } = useListsQuery();
-  const { data: settings } = useSettingsQuery();
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
+  const { data: lists = [], isLoading } = useListsQuery(sessionMode === 'nsfw');
+  const { data: settings } = useSettingsQuery();
 
   const createMutation = useCreateListMutation();
   const updateMutation = useUpdateListMutation();
