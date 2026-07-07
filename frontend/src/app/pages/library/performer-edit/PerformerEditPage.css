@@ -31,7 +31,7 @@
 .performer-linker-card {
   --brand-color: var(--color-text-muted);
   --brand-glow: rgba(255, 255, 255, 0.02);
-  
+
   position: relative;
   --card-bg: var(--color-surface-card, rgba(255, 255, 255, 0.02));
   background: var(--card-bg);
@@ -166,7 +166,7 @@
   backdrop-filter: blur(6px);
   --badge-border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.05));
   border: var(--badge-border);
-  color: var(--brand-color);
+  color: var(--color-text-secondary, rgba(255, 255, 255, 0.7));
   --badge-padding: 4px 8px;
   padding: var(--badge-padding);
   border-radius: 4px;
@@ -402,8 +402,15 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 
@@ -416,7 +423,7 @@
 .performer-edit-sidebar-title-container {
   --container-padding: 0 20px 15px 20px;
   padding: var(--container-padding);
-  --container-bb: 1px solid var(--color-border-subtle, rgba(255,255,255,0.06));
+  --container-bb: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
   border-bottom: var(--container-bb);
 }
 
@@ -500,7 +507,8 @@
   font-size: 12px;
 }
 
-.mixer-th-field, .mixer-th-source {
+.mixer-th-field,
+.mixer-th-source {
   --th-padding: 6px 12px;
   padding: var(--th-padding);
   font-weight: 600;
@@ -851,10 +859,12 @@
     opacity: 0.2;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.6;
     transform: scale(1.08);
   }
+
   100% {
     opacity: 0.2;
     transform: scale(1);
@@ -888,6 +898,3 @@
   --linking-pulse: performer-linking-pulse 1.8s infinite ease-in-out;
   animation: var(--linking-pulse);
 }
-
-
-

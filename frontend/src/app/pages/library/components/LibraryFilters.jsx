@@ -465,6 +465,7 @@ export default function LibraryFilters({
         filterData={filterData}
         setCurrentPage={setCurrentPage}
         activeSessionMode={activeSessionMode}
+        settings={settings}
       />
     )}
   </>

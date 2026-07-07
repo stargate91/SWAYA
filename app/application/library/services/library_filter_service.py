@@ -103,16 +103,16 @@ class LibraryFilterService:
         # 1. Fetch years
         query_years = self.db.query(MetadataMatch.release_date).filter(
             MetadataMatch.id.in_(match_ids_subquery),
-            MetadataMatch.release_date is not None
+            MetadataMatch.release_date.isnot(None)
         ).distinct().all()
         
-        years = sorted(list(set(r.release_date.year for r in query_years)), reverse=True)
+        years = sorted(list(set(r.release_date.year for r in query_years if r.release_date)), reverse=True)
 
         # 2. Fetch genres
         from app.shared_kernel.genre_utils import split_genres as _split_genres
         query_genres = self.db.query(MetadataLocalization.genres).filter(
             MetadataLocalization.match_id.in_(match_ids_subquery),
-            MetadataLocalization.genres is not None
+            MetadataLocalization.genres.isnot(None)
         ).all()
         
         genres_set = set()
@@ -234,76 +234,52 @@ class LibraryFilterService:
                         result.append(cleaned)
                 return sorted(result)
 
-            hair_colors_query = self.db.query(Person.hair_color).join(
-                MediaPersonLink, MediaPersonLink.person_id == Person.id
-            ).filter(
-                MediaPersonLink.match_id.in_(match_ids_subquery),
-                Person.hair_color is not None,
+            hair_colors_query = self.db.query(Person.hair_color).filter(
+                Person.hair_color.isnot(None),
                 Person.hair_color != ""
-            ).distinct().order_by(Person.hair_color.asc()).all()
+            ).distinct().all()
             hair_colors = normalize_options([r[0] for r in hair_colors_query])
 
-            ethnicities_query = self.db.query(Person.ethnicity).join(
-                MediaPersonLink, MediaPersonLink.person_id == Person.id
-            ).filter(
-                MediaPersonLink.match_id.in_(match_ids_subquery),
-                Person.ethnicity is not None,
+            ethnicities_query = self.db.query(Person.ethnicity).filter(
+                Person.ethnicity.isnot(None),
                 Person.ethnicity != ""
-            ).distinct().order_by(Person.ethnicity.asc()).all()
+            ).distinct().all()
             ethnicities = normalize_options([r[0] for r in ethnicities_query])
 
-            eye_colors_query = self.db.query(Person.eye_color).join(
-                MediaPersonLink, MediaPersonLink.person_id == Person.id
-            ).filter(
-                MediaPersonLink.match_id.in_(match_ids_subquery),
-                Person.eye_color is not None,
+            eye_colors_query = self.db.query(Person.eye_color).filter(
+                Person.eye_color.isnot(None),
                 Person.eye_color != ""
-            ).distinct().order_by(Person.eye_color.asc()).all()
+            ).distinct().all()
             eye_colors = normalize_options([r[0] for r in eye_colors_query])
 
-            tattoos_query = self.db.query(Person.tattoos).join(
-                MediaPersonLink, MediaPersonLink.person_id == Person.id
-            ).filter(
-                MediaPersonLink.match_id.in_(match_ids_subquery),
-                Person.tattoos is not None,
+            tattoos_query = self.db.query(Person.tattoos).filter(
+                Person.tattoos.isnot(None),
                 Person.tattoos != ""
-            ).distinct().order_by(Person.tattoos.asc()).all()
+            ).distinct().all()
             tattoos = [r[0] for r in tattoos_query]
 
-            piercings_query = self.db.query(Person.piercings).join(
-                MediaPersonLink, MediaPersonLink.person_id == Person.id
-            ).filter(
-                MediaPersonLink.match_id.in_(match_ids_subquery),
-                Person.piercings is not None,
+            piercings_query = self.db.query(Person.piercings).filter(
+                Person.piercings.isnot(None),
                 Person.piercings != ""
-            ).distinct().order_by(Person.piercings.asc()).all()
+            ).distinct().all()
             piercings = [r[0] for r in piercings_query]
 
-            breast_types_query = self.db.query(Person.breast_type).join(
-                MediaPersonLink, MediaPersonLink.person_id == Person.id
-            ).filter(
-                MediaPersonLink.match_id.in_(match_ids_subquery),
-                Person.breast_type is not None,
+            breast_types_query = self.db.query(Person.breast_type).filter(
+                Person.breast_type.isnot(None),
                 Person.breast_type != ""
-            ).distinct().order_by(Person.breast_type.asc()).all()
+            ).distinct().all()
             breast_types = normalize_options([r[0] for r in breast_types_query])
 
-            butt_shapes_query = self.db.query(Person.butt_shape).join(
-                MediaPersonLink, MediaPersonLink.person_id == Person.id
-            ).filter(
-                MediaPersonLink.match_id.in_(match_ids_subquery),
-                Person.butt_shape is not None,
+            butt_shapes_query = self.db.query(Person.butt_shape).filter(
+                Person.butt_shape.isnot(None),
                 Person.butt_shape != ""
-            ).distinct().order_by(Person.butt_shape.asc()).all()
+            ).distinct().all()
             butt_shapes = normalize_options([r[0] for r in butt_shapes_query])
 
-            butt_sizes_query = self.db.query(Person.butt_size).join(
-                MediaPersonLink, MediaPersonLink.person_id == Person.id
-            ).filter(
-                MediaPersonLink.match_id.in_(match_ids_subquery),
-                Person.butt_size is not None,
+            butt_sizes_query = self.db.query(Person.butt_size).filter(
+                Person.butt_size.isnot(None),
                 Person.butt_size != ""
-            ).distinct().order_by(Person.butt_size.asc()).all()
+            ).distinct().all()
             butt_sizes = normalize_options([r[0] for r in butt_sizes_query])
 
         return FilterOptionsResponse(

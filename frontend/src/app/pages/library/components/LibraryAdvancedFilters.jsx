@@ -33,7 +33,8 @@ export default function LibraryAdvancedFilters({
   setPiercingsFilter,
   filterData,
   setCurrentPage,
-  activeSessionMode
+  activeSessionMode,
+  settings
 }) {
   return (
     <div className="organizer-panel__row library-filters-row library-filters-advanced-row">
@@ -93,7 +94,7 @@ export default function LibraryAdvancedFilters({
           </div>
         )}
 
-        {activeSessionMode === 'nsfw' && (
+        {(activeSessionMode === 'nsfw' || settings?.include_adult) && (
           <>
             <div className="library-sorter-container">
               <span className="library-sorter-label">{t('library.filter.buttShapeLabel') || 'Butt Shape:'}</span>

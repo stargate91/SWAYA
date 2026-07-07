@@ -51,15 +51,15 @@ export default function PerformerMixerTab({ person: initialPerson }) {
     { key: 'ethnicity', label: 'Ethnicity', type: 'string' },
     ...(!isMale && !isUnderage
       ? [
-          { key: 'measurements', label: 'Measurements', type: 'string' },
-          { key: 'cup_size', label: 'Cup Size', type: 'string' },
-          { key: 'band_size', label: 'Band Size', type: 'string' },
-          { key: 'waist', label: 'Waist', type: 'string' },
-          { key: 'hip', label: 'Hip', type: 'string' },
-          { key: 'breast_type', label: 'Breast Type', type: 'string' },
-          { key: 'butt_shape', label: 'Butt Shape', type: 'string' },
-          { key: 'butt_size', label: 'Butt Size', type: 'string' },
-        ]
+        { key: 'measurements', label: 'Measurements', type: 'string' },
+        { key: 'cup_size', label: 'Cup Size', type: 'string' },
+        { key: 'band_size', label: 'Band Size', type: 'string' },
+        { key: 'waist', label: 'Waist', type: 'string' },
+        { key: 'hip', label: 'Hip', type: 'string' },
+        { key: 'breast_type', label: 'Breast Type', type: 'string' },
+        { key: 'butt_shape', label: 'Butt Shape', type: 'string' },
+        { key: 'butt_size', label: 'Butt Size', type: 'string' },
+      ]
       : []),
     { key: 'tattoos', label: 'Tattoos', type: 'string' },
     { key: 'piercings', label: 'Piercings', type: 'string' },
@@ -68,20 +68,27 @@ export default function PerformerMixerTab({ person: initialPerson }) {
 
   const PROVIDERS = person?.is_adult
     ? [
-        { key: 'tmdb', label: 'TMDb' },
-        { key: 'stashdb', label: 'StashDB' },
-        { key: 'fansdb', label: 'FansDB' },
-        { key: 'porndb', label: 'THEPornDB' },
-        { key: 'manual', label: 'Custom' },
-      ]
+      { key: 'tmdb', label: 'TMDb' },
+      { key: 'stashdb', label: 'StashDB' },
+      { key: 'fansdb', label: 'FansDB' },
+      { key: 'porndb', label: 'THEPornDB' },
+      { key: 'manual', label: 'Custom' },
+    ]
     : [
-        { key: 'tmdb', label: 'TMDb' },
-        { key: 'manual', label: 'Custom' },
-      ];
+      { key: 'tmdb', label: 'TMDb' },
+      { key: 'manual', label: 'Custom' },
+    ];
 
   // Helper to format values nicely in the grid
-  const formatValue = (val, type) => {
+  const formatValue = (val, type, fieldKey) => {
     if (val === undefined || val === null || val === '') return '-';
+    if (fieldKey === 'butt_size') {
+      const lower = String(val).toLowerCase();
+      if (lower === 'small') return t('library.performerEdit.buttSizes.small') || 'Small';
+      if (lower === 'medium') return t('library.performerEdit.buttSizes.medium') || 'Medium';
+      if (lower === 'big') return t('library.performerEdit.buttSizes.big') || 'Big';
+      if (lower === 'extra_big') return t('library.performerEdit.buttSizes.extra_big') || 'Extra Big';
+    }
     if (type === 'same_sex_only') {
       if (val === 'Same-Sex Only') return 'Yes';
       if (val === 'All') return 'No';
@@ -114,6 +121,29 @@ export default function PerformerMixerTab({ person: initialPerson }) {
     return strVal;
   };
 
+  const calculateButtSize = (height, waist, hip) => {
+    try {
+      const h = parseFloat(height);
+      const w = parseFloat(waist);
+      const hp = parseFloat(hip);
+      if (isNaN(h) || isNaN(w) || isNaN(hp) || h === 0 || hp === 0 || w === 0) return null;
+      
+      const heightIn = h / 2.54;
+      const fah = hp / (heightIn * 0.53);
+      const whr = w / hp;
+      if (whr === 0) return null;
+      const ccf = 0.72 / whr;
+      const bcs = hp * fah * ccf;
+
+      if (bcs < 33) return 'SMALL';
+      if (bcs < 40) return 'MEDIUM';
+      if (bcs < 50) return 'BIG';
+      return 'EXTRA_BIG';
+    } catch (e) {
+      return null;
+    }
+  };
+
   // Helper to get raw value of a field from a specific provider
   const getProviderValue = (providerKey, fieldKey) => {
     const keys = [providerKey];
@@ -125,6 +155,18 @@ export default function PerformerMixerTab({ person: initialPerson }) {
     if (fieldKey === 'biography') {
       return link.source_data.biographies || link.source_data.biography;
     }
+    
+    if (fieldKey === 'butt_size') {
+      const rawButtSize = link.source_data.butt_size;
+      if (rawButtSize) return rawButtSize;
+      
+      const h = link.source_data.height;
+      const w = link.source_data.waist;
+      const hp = link.source_data.hip;
+      const computed = calculateButtSize(h, w, hp);
+      if (computed) return computed;
+    }
+
     return link.source_data[fieldKey];
   };
 
@@ -177,6 +219,8 @@ export default function PerformerMixerTab({ person: initialPerson }) {
           <tbody>
             {FIELDS.map(field => {
               const activeRoute = currentRouting[field.key] || 'auto';
+              const autoVal = getAutoValue(field.key);
+              const formattedAutoVal = formatValue(autoVal, field.type, field.key);
 
               return (
                 <tr key={field.key} className="mixer-row">
@@ -189,14 +233,23 @@ export default function PerformerMixerTab({ person: initialPerson }) {
                     className={`mixer-td-cell mixer-td-cell--auto ${activeRoute === 'auto' ? 'mixer-td-cell--active' : ''}`}
                   >
                     <div className="mixer-cell-content">
-                      <span className="mixer-cell-value">{t('library.performerEdit.defaultPriority') || 'Default Priority'}</span>
+                      <span className="mixer-cell-value">
+                        {formattedAutoVal !== '-' ? (
+                          <>
+                            <span className="mixer-cell-auto-label" style={{ opacity: 0.45, fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em', marginRight: '4px' }}>Auto: </span>
+                            <span className="mixer-cell-auto-value" style={{ fontWeight: 500 }}>{formattedAutoVal}</span>
+                          </>
+                        ) : (
+                          t('library.performerEdit.defaultPriority') || 'Default Priority'
+                        )}
+                      </span>
                       {activeRoute === 'auto' && <Check size={14} className="mixer-check-icon" />}
                     </div>
                   </td>
                   {PROVIDERS.map(p => {
                     const isLinked = isSourceLinked(p.key);
                     const rawVal = getProviderValue(p.key, field.key);
-                    const formatted = formatValue(rawVal, field.type);
+                    const formatted = formatValue(rawVal, field.type, field.key);
                     const isSelected = activeRoute === p.key;
 
                     const hasValue = (() => {
