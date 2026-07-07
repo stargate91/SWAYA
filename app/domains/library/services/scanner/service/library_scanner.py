@@ -81,6 +81,8 @@ class LibraryScanner:
             })
             
         scan_mode = mode if mode is not None else ScanMode.MOVIES_TV
+        with StatusCoordinator.scan_status_lock:
+            StatusCoordinator.scan_status["scan_mode"] = scan_mode.value
         logger.info("[scan:%s] Starting background scan | task_id=%s | paths=%s | include_adult=%s", scan_mode.value, task_id, paths, include_adult)
         try:
             repaired_count = self.library_port.repair_inconsistent_matched_items()
@@ -124,7 +126,8 @@ class LibraryScanner:
                     with StatusCoordinator.scan_status_lock:
                         StatusCoordinator.scan_status["current"] = int(pct * 100)
                         StatusCoordinator.scan_status["total"] = 100
-                    self.task_manager.update_progress(task_id, pct * 50.0)
+                    scale = 90.0 if scan_mode == ScanMode.OFFLINE else 50.0
+                    self.task_manager.update_progress(task_id, pct * scale)
                 to_enrich, _ = await asyncio.to_thread(
                     scanner.scan_library,
                     lib.id,
@@ -158,7 +161,10 @@ class LibraryScanner:
                     with StatusCoordinator.scan_status_lock:
                         StatusCoordinator.scan_status["current"] = current
                         StatusCoordinator.scan_status["total"] = total
-                    progress = 50.0 + (current / total) * 50.0
+                    if scan_mode == ScanMode.OFFLINE:
+                        progress = 90.0 + (current / total) * 10.0
+                    else:
+                        progress = 50.0 + (current / total) * 50.0
                     self.task_manager.update_progress(task_id, progress)
                     
                 await asyncio.to_thread(resolver.resolve_all, total_items_to_enrich, progress_callback=resolve_progress_cb, task_id=task_id)

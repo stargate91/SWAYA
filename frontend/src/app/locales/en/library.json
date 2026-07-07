@@ -12,7 +12,9 @@
     "adultCollections": "Adult Collections",
     "tags": "Tags",
     "scenes": "Scenes",
-    "adult_scenes": "Scenes"
+    "adult_scenes": "Scenes",
+    "videos": "Videos",
+    "adult_videos": "Videos"
   },
   "people": {
     "addPeopleBtn": "Follow Artists",
@@ -107,6 +109,14 @@
     "adult_scenes": {
       "title": "No Scenes Found",
       "description": "Your scenes library is empty. Scan and match adult content in the organizer."
+    },
+    "videos": {
+      "title": "No Videos Found",
+      "description": "Your videos library is empty. Scan and organize your home videos in the organizer."
+    },
+    "adult_videos": {
+      "title": "No Videos Found",
+      "description": "Your videos library is empty. Scan and organize your adult home videos in the organizer."
     },
     "adultPeople": {
       "title": "No Stars Found",

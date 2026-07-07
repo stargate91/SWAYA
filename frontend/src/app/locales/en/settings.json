@@ -357,6 +357,7 @@
       "sortByTypeHint": "SWAYA will split movies, shows, and adult content into their own top-level folders.",
       "moviesDirName": "Movies Folder Name",
       "tvDirName": "TV Shows Folder Name",
+      "videosDirName": "Videos Folder Name",
       "adultFoldersTitle": "Adult Library Folders",
       "adultDirName": "Adult Root Folder Name",
       "organizeAdultByType": "Separate adult movies, TV shows, and scenes",
@@ -364,6 +365,7 @@
       "adultMoviesDirName": "Adult Movies Folder Name",
       "adultTvDirName": "Adult TV Shows Folder Name",
       "adultScenesDirName": "Adult Scenes Folder Name",
+      "adultVideosDirName": "Adult Videos Folder Name",
       "removeEmpty": "Remove Empty Folders",
       "removeEmptyHint": "SWAYA will clean up empty folders after it moves files.",
       "structureTitle": "Folder Layout",
@@ -372,6 +374,8 @@
       "seasonEpisodeFoldersTitle": "Season and Episode Folders",
       "createMovieSubdir": "Create Movie Folders",
       "createMovieSubdirHint": "Give each movie its own folder.",
+      "createVideoSubdir": "Create Video Folders",
+      "createVideoSubdirHint": "Give each video file its own folder (named using the filename without extension).",
       "movieTemplate": "Movie Folder Naming Pattern",
       "createShowDir": "Create Show Folders",
       "createShowDirHint": "Give each TV show its own folder.",
@@ -385,9 +389,11 @@
       "episodeTemplate": "Episode Folder Naming Pattern",
       "defaultMoviesName": "Movies",
       "defaultTvName": "TV Shows",
+      "defaultVideosName": "Videos",
       "defaultAdultMoviesName": "Movies",
       "defaultAdultTvName": "TV Shows",
-      "defaultAdultScenesName": "Scenes"
+      "defaultAdultScenesName": "Scenes",
+      "defaultAdultVideosName": "Videos"
     },
     "rules": {
       "title": "When a File Already Exists",

@@ -5,6 +5,7 @@ import { EXTRAS_TABS, MAIN_TABS, MANUAL_TABS } from './organizerConstants';
 const isPornDbMovieMode = (scanMode) => scanMode === 'porndb_movie';
 
 const getMainTabsForMode = (scanMode) => {
+  if (scanMode === 'offline') return ['scenes', 'extras'];
   if (scanMode === 'scenes') return ['manual', 'scenes', 'extras'];
   if (isPornDbMovieMode(scanMode)) return ['manual', 'movies', 'extras'];
   return ['manual', 'movies', 'episodes', 'extras'];
@@ -12,13 +13,13 @@ const getMainTabsForMode = (scanMode) => {
 
 const isExtraForMode = (item, scanMode) => {
   const parentType = String(item.parent_type || '').toLowerCase();
-  if (scanMode === 'scenes') return parentType === 'scene';
+  if (scanMode === 'scenes' || scanMode === 'offline') return parentType === 'scene';
   if (isPornDbMovieMode(scanMode)) return parentType === 'movie';
   return parentType !== 'scene';
 };
 
 const getManualTabsForMode = (scanMode) => {
-  if (scanMode === 'scenes') return ['scenes'];
+  if (scanMode === 'scenes' || scanMode === 'offline') return ['scenes'];
   if (isPornDbMovieMode(scanMode)) return ['movies'];
   return ['movies', 'episodes'];
 };
@@ -26,19 +27,25 @@ const getManualTabsForMode = (scanMode) => {
 export function useOrganizerTabs({ organizerExtras, t, tabCounts, dismissedRowIds, scanMode }) {
   const computedMainTabs = useMemo(() => {
     const allowedTabs = new Set(getMainTabsForMode(scanMode));
-    return MAIN_TABS.filter((tab) => allowedTabs.has(tab.value)).map((tab) => ({
-      ...tab,
-      label: t(tab.labelKey),
-      count: tab.value === 'manual'
-        ? tabCounts.manualCount
-        : tab.value === 'movies'
-          ? tabCounts.moviesCount
-          : tab.value === 'episodes'
-            ? tabCounts.episodesCount
-            : tab.value === 'scenes'
-              ? tabCounts.scenesCount
-              : tabCounts.extrasCount,
-    }));
+    return MAIN_TABS.filter((tab) => allowedTabs.has(tab.value)).map((tab) => {
+      let label = t(tab.labelKey);
+      if (scanMode === 'offline' && tab.value === 'scenes') {
+        label = t('organizer.tabs.videos') || 'Videos';
+      }
+      return {
+        ...tab,
+        label,
+        count: tab.value === 'manual'
+          ? tabCounts.manualCount
+          : tab.value === 'movies'
+            ? tabCounts.moviesCount
+            : tab.value === 'episodes'
+              ? tabCounts.episodesCount
+              : tab.value === 'scenes'
+                ? tabCounts.scenesCount
+                : tabCounts.extrasCount,
+      };
+    });
   }, [t, tabCounts, scanMode]);
 
   const computedManualTabs = useMemo(() => {

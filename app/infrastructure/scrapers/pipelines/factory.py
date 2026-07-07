@@ -9,6 +9,7 @@ from app.infrastructure.scrapers.pipelines.scenes import (
     StashDbSceneResolverPipeline,
 )
 from app.infrastructure.scrapers.pipelines.tmdb_omdb import TmdbOmdbResolverPipeline
+from app.infrastructure.scrapers.pipelines.offline import OfflineResolverPipeline
 
 
 def get_resolver_pipeline(
@@ -21,6 +22,9 @@ def get_resolver_pipeline(
 ):
     # Normalized provider string
     p = str(provider or '').strip().lower()
+
+    if mode == ScanMode.OFFLINE:
+        return OfflineResolverPipeline(mainstream_resolver, include_adult)
 
     if mode == ScanMode.SCENES:
         if p == "stashdb":

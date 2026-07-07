@@ -361,7 +361,7 @@ class SceneDetailService(DetailFormatter):
             "people_complete": True,
             "directors": [],
             "writers": [],
-            "is_adult": True,
+            "is_adult": match_db.is_adult if match_db else (provider_prefix in ("stashdb", "stash", "fansdb", "porndb", "theporndb")),
             "is_favorite": effective_override.is_favorite if effective_override else False,
             "user_rating": effective_override.user_rating if effective_override else None,
             "user_comment": effective_override.user_comment if effective_override else None,

@@ -99,9 +99,24 @@ class PornDbMovieScanPipeline(BaseScanPipeline):
         )
 
 
+class OfflineScanPipeline(BaseScanPipeline):
+    def __init__(self):
+        super().__init__(ScanMode.OFFLINE)
+
+    def threshold_config(self) -> ScanThresholdConfig:
+        return ScanThresholdConfig(
+            size_key='min_video_size_mb',
+            duration_key='min_video_duration_minutes',
+            default_size_mb=1.0,
+            default_duration_minutes=0.1,
+        )
+
+
 def get_scan_pipeline(mode: ScanMode) -> BaseScanPipeline:
     if mode == ScanMode.SCENES:
         return ScenesScanPipeline()
     if mode == ScanMode.PORNDB_MOVIE:
         return PornDbMovieScanPipeline()
+    if mode == ScanMode.OFFLINE:
+        return OfflineScanPipeline()
     return MainstreamScanPipeline()

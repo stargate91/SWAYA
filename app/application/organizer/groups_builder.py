@@ -137,7 +137,8 @@ class OrganizerGroupsBuilder:
                     "is_active": m.is_active,
                     "confidence": m.confidence_score,
                     "is_adult": m.is_adult,
-                    "provider": m.provider.value if m.provider else None
+                    "provider": m.provider.value if m.provider else None,
+                    "is_home_video": m.is_home_video
                 })
 
             itype = OrganizerHelper.infer_organizer_type(item)

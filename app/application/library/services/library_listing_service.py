@@ -142,7 +142,16 @@ class LibraryListingService:
             MediaItem.status.in_(lib_statuses),
             MetadataMatch.media_type == MediaType.SCENE,
             MetadataMatch.is_active,
-            MetadataMatch.is_adult == include_adult
+            MetadataMatch.is_adult == include_adult,
+            MetadataMatch.is_home_video == False
+        )
+
+        videos_cnt_query = self.db.query(MediaItem).select_from(MediaItem).join(MetadataMatch).filter(
+            MediaItem.status.in_(lib_statuses),
+            MetadataMatch.media_type == MediaType.SCENE,
+            MetadataMatch.is_active,
+            MetadataMatch.is_adult == include_adult,
+            MetadataMatch.is_home_video == True
         )
         
         # Unique TV shows count
@@ -214,6 +223,7 @@ class LibraryListingService:
                 "adult": movies_cnt_query.count(),
                 "adult_tv": tv_shows_count,
                 "adult_scenes": scenes_cnt_query.count(),
+                "adult_videos": videos_cnt_query.count(),
                 "adult_people": people_count,
                 "adult_collections": col_cnt,
             }
@@ -222,6 +232,7 @@ class LibraryListingService:
                 "movies": movies_cnt_query.count(),
                 "tv": tv_shows_count,
                 "scenes": scenes_cnt_query.count(),
+                "videos": videos_cnt_query.count(),
                 "people": people_count,
                 "collections": col_cnt,
             }
@@ -295,6 +306,9 @@ class LibraryListingService:
                 builder = TvQueryBuilder(self.db)
             elif tab in ("scenes", "adult_scenes"):
                 builder = SceneQueryBuilder(self.db)
+            elif tab in ("videos", "adult_videos"):
+                from app.domains.library.services.listing.builders.video import VideoQueryBuilder
+                builder = VideoQueryBuilder(self.db)
             else:
                 builder = MovieQueryBuilder(self.db)
 

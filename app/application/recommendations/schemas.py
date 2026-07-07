@@ -18,6 +18,7 @@ class RecommendationItem(BaseModel):
     release_date: Optional[str] = None
     first_air_date: Optional[str] = None
     overview: Optional[str] = None
+    is_adult: Optional[bool] = False
 
     model_config = {"extra": "allow"}
 

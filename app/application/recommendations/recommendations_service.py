@@ -534,6 +534,7 @@ class RecommendationsService:
                 "media_type": match.media_type.value,
                 "in_library": True,
                 "media_item_id": item.id,
+                "is_adult": bool(match.is_adult),
                 "rating_imdb": rating_imdb,
                 "rating_tmdb": rating_tmdb,
                 "rating_porndb": rating_porndb,

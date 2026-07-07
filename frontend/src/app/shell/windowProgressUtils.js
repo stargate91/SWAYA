@@ -33,7 +33,16 @@ export const getScanProgress = (status) => {
   }
 
   const phaseProgress = getPhaseProgress(status);
-  const range = PHASE_RANGES[status.phase];
+  
+  const offlineRanges = {
+    collecting: [0, 90],
+    resolving: [90, 100],
+    organizing: [0, 100],
+    undoing: [0, 100],
+  };
+
+  const ranges = status.scan_mode === 'offline' ? offlineRanges : PHASE_RANGES;
+  const range = ranges[status.phase];
 
   let progress;
   if (!range) {

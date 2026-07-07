@@ -94,6 +94,7 @@ class MetadataMatch(Base):
     
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
     is_adult: Mapped[bool] = mapped_column(Boolean, default=False, index=True) # SFW / NSFW content flag for safe filtering
+    is_home_video: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     confidence_score: Mapped[float] = mapped_column(Float, default=1.0) # Match accuracy confidence (0.0 to 1.0)
     
     # Relationships

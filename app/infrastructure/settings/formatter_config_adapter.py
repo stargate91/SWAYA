@@ -36,6 +36,8 @@ def _localized_builtin_folder_name(settings: Dict[str, Any], setting_key: str, c
         "folder_adult_tv_name": {"en": {"TV Shows", "Shows", "TV"}, "hu": {"TV Shows", "Shows", "TV", "Sorozatok"}},
         "folder_adult_scenes_name": {"en": {"Scenes"}, "hu": {"Scenes", "Jelenetek"}},
         "folder_scenes_name": {"en": {"Scenes"}, "hu": {"Scenes", "Jelenetek"}},
+        "folder_videos_name": {"en": {"Videos"}, "hu": {"Videos", "Videók"}},
+        "folder_adult_videos_name": {"en": {"Videos"}, "hu": {"Videos", "Videók"}},
         "extras_subfolder_name": {"en": {"Extras", "extras"}, "hu": {"Extras", "extras", "Extrak", "Extr\u00e1k"}},
     }
     localized_targets = {
@@ -47,6 +49,8 @@ def _localized_builtin_folder_name(settings: Dict[str, Any], setting_key: str, c
             "folder_adult_tv_name": "TV Shows",
             "folder_adult_scenes_name": "Scenes",
             "folder_scenes_name": "Scenes",
+            "folder_videos_name": "Videos",
+            "folder_adult_videos_name": "Videos",
             "extras_subfolder_name": "Extras",
         },
         "hu": {
@@ -57,6 +61,8 @@ def _localized_builtin_folder_name(settings: Dict[str, Any], setting_key: str, c
             "folder_adult_tv_name": "Sorozatok",
             "folder_adult_scenes_name": "Jelenetek",
             "folder_scenes_name": "Jelenetek",
+            "folder_videos_name": "Vide\u00f3k",
+            "folder_adult_videos_name": "Vide\u00f3k",
             "extras_subfolder_name": "Extr\u00e1k",
         },
     }
@@ -143,11 +149,14 @@ def load_formatter_config_from_db(db_session, user_id: int = 1) -> FormatterConf
         config.adult_tv_dir_name = _localized_builtin_folder_name(settings, "folder_adult_tv_name", settings.get("folder_adult_tv_name", "TV Shows"))
         config.adult_scenes_dir_name = _localized_builtin_folder_name(settings, "folder_adult_scenes_name", settings.get("folder_adult_scenes_name", "Scenes"))
         config.scenes_dir_name = _localized_builtin_folder_name(settings, "folder_scenes_name", settings.get("folder_scenes_name", "Scenes"))
+        config.videos_dir_name = _localized_builtin_folder_name(settings, "folder_videos_name", settings.get("folder_videos_name", "Videos"))
+        config.adult_videos_dir_name = _localized_builtin_folder_name(settings, "folder_adult_videos_name", settings.get("folder_adult_videos_name", "Videos"))
         config.naming_adult_subfolders_enabled = settings.get("naming_adult_subfolders_enabled", config.naming_adult_subfolders_enabled)
         grouping_mode = settings.get("scene_grouping_mode", config.scene_grouping_mode)
         config.scene_grouping_mode = grouping_mode if grouping_mode in {"none", "studio", "parent_studio", "parent_studio_studio"} else "none"
         config.folder_scene_template = _normalize_template(settings.get("folder_scene_template", config.folder_scene_template))
         config.folder_create_scene_subdir = settings.get("folder_create_scene_subdir", True)
+        config.folder_create_video_subdir = settings.get("folder_create_video_subdir", True)
         config.collision_strategy = settings.get("collision_strategy", "keep_both")
         config.collision_duration_tolerance_seconds = int(settings.get("collision_duration_tolerance_seconds", 10) or 10)
 

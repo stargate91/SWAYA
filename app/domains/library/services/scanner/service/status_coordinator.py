@@ -23,6 +23,7 @@ class StatusCoordinator:
         "stop_requested": False,
         "current_file_progress": 0.0,
         "last_completed": 0,
+        "scan_mode": None,
     }
 
     def __init__(self, db, task_manager):

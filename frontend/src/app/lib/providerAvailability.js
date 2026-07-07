@@ -2,7 +2,7 @@ export const hasProviderCredential = (settings, provider) => {
   if (!settings || typeof settings !== 'object') return false;
 
   if (provider === 'tmdb') {
-    return true;
+    return Boolean(String(settings.tmdb_api_key || '').trim());
   }
 
   if (provider === 'porndb') {
@@ -21,6 +21,10 @@ export const hasProviderCredential = (settings, provider) => {
 };
 
 export const getOrganizerProviderOptions = (scanMode, settings) => {
+  if (scanMode === 'offline') {
+    return [];
+  }
+
   if (scanMode === 'scenes') {
     return [
       { value: 'stashdb', label: 'StashDB', disabled: !hasProviderCredential(settings, 'stashdb') },

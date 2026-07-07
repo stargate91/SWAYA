@@ -169,7 +169,7 @@ export default function PlayerControlBar({
           )}
 
           {/* Peak Button */}
-          {(isAdult || mediaType === 'scene') && (
+          {isAdult && (
             <button
               className={`player-page__btn ${justAddedPeak ? 'player-page__btn--peak-success' : 'player-page__btn--peak'}`}
               onClick={handleAddPeak}

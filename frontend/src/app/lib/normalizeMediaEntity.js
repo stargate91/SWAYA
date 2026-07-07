@@ -167,7 +167,17 @@ const resolveShouldBlur = (item, opts = {}) => {
   const { sessionMode, isAdultContext } = opts;
   if (sessionMode === 'nsfw') return false;
   const isScene = isSceneEntity(item);
-  return isScene || !!isAdultContext || !!item.is_adult || !!item.adult;
+  const isAdultItem = !!item.is_adult || !!item.adult;
+  
+  if (isScene) {
+    const isExplicitlySfw = item.is_adult === false || item.adult === false;
+    if (isExplicitlySfw) {
+      return !!isAdultContext;
+    }
+    return true;
+  }
+  
+  return !!isAdultContext || isAdultItem;
 };
 
 // ─── Main Export ─────────────────────────────────────────────────

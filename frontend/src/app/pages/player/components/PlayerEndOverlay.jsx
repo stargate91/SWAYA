@@ -193,7 +193,7 @@ export default function PlayerEndOverlay({
         </div>
 
         {/* Scene specific Peaks statistics */}
-        {isScene && peaksCount > 0 && (
+        {isScene && isAdult && peaksCount > 0 && (
           <div className="player-page__peaks-stats">
             <Flame size={18} className="player-page__peaks-icon" />
             <span>{t('player.peaks_recorded', { count: peaksCount, defaultValue: `You marked ${peaksCount} finish moments in this scene` })}</span>

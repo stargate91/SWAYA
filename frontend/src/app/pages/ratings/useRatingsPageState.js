@@ -62,6 +62,15 @@ export function useRatingsPageState() {
       : null
   );
 
+  const videosQuery = useLibraryQuery({
+    tab: resolveLibraryBackendTab('videos', activeSessionMode),
+    page: 1,
+    pageSize: 5000,
+    filter_ownership: 'all',
+    filter_status: 'all',
+    include_adult: activeSessionMode === 'nsfw',
+  });
+
   const peopleQuery = usePeopleQuery({
     include_inactive: false,
     limit: 5000,
@@ -82,21 +91,26 @@ export function useRatingsPageState() {
     if (effectiveMediaType === 'scenes') {
       return scenesQuery?.data?.items || [];
     }
+    if (effectiveMediaType === 'videos') {
+      return videosQuery.data?.items || [];
+    }
     return [];
-  }, [effectiveMediaType, moviesQuery.data, tvQuery.data, scenesQuery?.data, peopleQuery.data]);
+  }, [effectiveMediaType, moviesQuery.data, tvQuery.data, scenesQuery?.data, videosQuery.data, peopleQuery.data]);
 
   const isLoading = useMemo(() => {
     if (effectiveMediaType === 'people') return peopleQuery.isLoading;
     if (effectiveMediaType === 'movies') return moviesQuery.isLoading;
     if (effectiveMediaType === 'series') return tvQuery.isLoading;
     if (effectiveMediaType === 'scenes') return scenesQuery?.isLoading || false;
+    if (effectiveMediaType === 'videos') return videosQuery.isLoading;
     return false;
-  }, [effectiveMediaType, moviesQuery.isLoading, tvQuery.isLoading, scenesQuery?.isLoading, peopleQuery.isLoading]);
+  }, [effectiveMediaType, moviesQuery.isLoading, tvQuery.isLoading, scenesQuery?.isLoading, videosQuery.isLoading, peopleQuery.isLoading]);
 
   const isStatsLoading =
     moviesQuery.isLoading ||
     tvQuery.isLoading ||
     (activeSessionMode === 'nsfw' && (scenesQuery?.isLoading ?? false)) ||
+    videosQuery.isLoading ||
     peopleQuery.isLoading;
 
   // Mutations
@@ -243,6 +257,7 @@ export function useRatingsPageState() {
   const moviesStats = useMemo(() => computeStats(moviesQuery.data?.items || []), [moviesQuery.data]);
   const tvStats = useMemo(() => computeStats(tvQuery.data?.items || []), [tvQuery.data]);
   const scenesStats = useMemo(() => computeStats(scenesQuery?.data?.items || []), [scenesQuery?.data]);
+  const videosStats = useMemo(() => computeStats(videosQuery.data?.items || []), [videosQuery.data]);
   const peopleStats = useMemo(() => computeStats(peopleQuery.data?.items || [], true), [peopleQuery.data]);
 
   const handleSortToggle = (key) => {
@@ -276,6 +291,7 @@ export function useRatingsPageState() {
     moviesStats,
     tvStats,
     scenesStats,
+    videosStats,
     peopleStats,
     handleRateItem,
     handleToggleFavorite,

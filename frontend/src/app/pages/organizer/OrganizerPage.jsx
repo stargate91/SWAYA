@@ -62,19 +62,37 @@ export default function OrganizerPage() {
     setUtilityBarTarget(document.getElementById('shell-utility-bar-center'));
   }, []);
   const scanModeOptions = useMemo(() => {
-    const options = [
-      { value: 'movies_tv', label: t('organizer.scanModes.moviesTv') },
-    ];
+    const hasTmdb = Boolean(String(settings.tmdb_api_key || '').trim());
+    const hasPornDb = Boolean(String(settings.porndb_api_key || settings.porndb_api_token || '').trim());
+    const hasStashDb = Boolean(String(settings.stashdb_api_key || '').trim());
+    const hasFansDb = Boolean(String(settings.fansdb_api_key || '').trim());
+
+    const moviesTvDisabled = sessionMode === 'nsfw'
+      ? (!hasTmdb && !hasPornDb)
+      : !hasTmdb;
+
+    const scenesDisabled = !hasStashDb && !hasPornDb && !hasFansDb;
+
     if (settings.include_adult && sessionMode === 'nsfw') {
-      options.push({ value: 'scenes', label: t('organizer.scanModes.scenes') });
+      return [
+        { value: 'movies_tv', label: t('organizer.scanModes.moviesTv'), disabled: moviesTvDisabled },
+        { value: 'scenes', label: t('organizer.scanModes.scenes'), disabled: scenesDisabled },
+        { value: 'offline', label: t('organizer.scanModes.offline'), disabled: false },
+      ];
     }
-    return options;
-  }, [sessionMode, settings.include_adult, t]);
+    return [
+      { value: 'movies_tv', label: t('organizer.scanModes.moviesTv'), disabled: moviesTvDisabled },
+      { value: 'offline', label: t('organizer.scanModes.offline'), disabled: false },
+    ];
+  }, [sessionMode, settings, t]);
 
   useEffect(() => {
-    if (!scanModeOptions.some((option) => option.value === scanMode)) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setScanMode('movies_tv');
+    const currentOption = scanModeOptions.find((option) => option.value === scanMode);
+    if (!currentOption || currentOption.disabled) {
+      const firstEnabled = scanModeOptions.find((option) => !option.disabled);
+      if (firstEnabled) {
+        setScanMode(firstEnabled.value);
+      }
     }
   }, [scanMode, scanModeOptions]);
   const isScanActive = Boolean(scanStatus?.active);
@@ -95,11 +113,13 @@ export default function OrganizerPage() {
     folder_sort_by_type: settings.folder_sort_by_type !== false,
     folder_movies_name: settings.folder_movies_name || '',
     folder_tv_name: settings.folder_tv_name || '',
+    folder_videos_name: settings.folder_videos_name || '',
     folder_adult_name: settings.folder_adult_name || '',
     naming_adult_subfolders_enabled: settings.naming_adult_subfolders_enabled !== false,
     folder_adult_movies_name: settings.folder_adult_movies_name || '',
     folder_adult_tv_name: settings.folder_adult_tv_name || '',
     folder_adult_scenes_name: settings.folder_adult_scenes_name || '',
+    folder_adult_videos_name: settings.folder_adult_videos_name || '',
     naming_scene_template: settings.naming_scene_template || '',
     naming_scene_date_format: settings.naming_scene_date_format || '',
     naming_scene_prevent_title_performer: settings.naming_scene_prevent_title_performer !== false,
@@ -118,6 +138,7 @@ export default function OrganizerPage() {
     folder_movie_template: settings.folder_movie_template || '',
     folder_create_show_dir: settings.folder_create_show_dir !== false,
     folder_tv_template: settings.folder_tv_template || '',
+    folder_create_video_subdir: settings.folder_create_video_subdir !== false,
     folder_create_season_dir: settings.folder_create_season_dir !== false,
     folder_season_template: settings.folder_season_template || '',
     folder_create_episode_dir: Boolean(settings.folder_create_episode_dir),
@@ -453,15 +474,15 @@ export default function OrganizerPage() {
             options={scanModeOptions}
             className="main-scan-mode"
           />
-          {sessionMode === 'nsfw' && (
+          {sessionMode === 'nsfw' && scanMode !== 'offline' && providerOptions.length > 0 && (
             <div key={scanMode} className="provider-segmented-control-wrapper animate-slide-in">
-              <SegmentedControl
-                variant="filter"
-                value={provider}
-                onChange={setProvider}
-                options={providerOptions}
-              />
-            </div>
+               <SegmentedControl
+                 variant="filter"
+                 value={provider}
+                 onChange={setProvider}
+                 options={providerOptions}
+               />
+             </div>
           )}
         </div>,
         utilityBarTarget

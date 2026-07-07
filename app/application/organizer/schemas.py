@@ -16,6 +16,7 @@ class OrganizerMatch(BaseModel):
     confidence: Optional[float] = None
     is_adult: Optional[bool] = None
     provider: Optional[str] = None
+    is_home_video: Optional[bool] = None
 
 class OrganizerItem(BaseModel):
     id: int

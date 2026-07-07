@@ -47,19 +47,21 @@ export function useOrganizerPageState({ organizer, t, scanMode, sessionMode }) {
     sessionMode,
   });
   useEffect(() => {
-    const allowedMainTabs = scanMode === 'scenes'
-      ? ['manual', 'scenes', 'extras']
-      : isPornDbMovieMode(scanMode)
-        ? ['manual', 'movies', 'extras']
-        : ['manual', 'movies', 'episodes', 'extras'];
-    const allowedManualTabs = scanMode === 'scenes'
+    const allowedMainTabs = scanMode === 'offline'
+      ? ['scenes', 'extras']
+      : (scanMode === 'scenes')
+        ? ['manual', 'scenes', 'extras']
+        : isPornDbMovieMode(scanMode)
+          ? ['manual', 'movies', 'extras']
+          : ['manual', 'movies', 'episodes', 'extras'];
+    const allowedManualTabs = (scanMode === 'scenes' || scanMode === 'offline')
       ? ['scenes']
       : isPornDbMovieMode(scanMode)
         ? ['movies']
         : ['movies', 'episodes'];
 
     if (!allowedMainTabs.includes(activeMainTab)) {
-      setActiveMainTab('manual');
+      setActiveMainTab(allowedMainTabs.includes('manual') ? 'manual' : allowedMainTabs[0]);
     }
     if (!allowedManualTabs.includes(activeManualTab)) {
       setActiveManualTab(allowedManualTabs[0]);

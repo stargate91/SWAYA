@@ -5,6 +5,7 @@ from app.domains.library.services.listing.builders.movie import MovieQueryBuilde
 from app.domains.library.services.listing.builders.tv import TvQueryBuilder
 from app.domains.library.services.listing.builders.scene import SceneQueryBuilder
 from app.domains.library.services.listing.builders.people import PeopleQueryBuilder
+from app.domains.library.services.listing.builders.video import VideoQueryBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -13,5 +14,6 @@ __all__ = [
     "MovieQueryBuilder",
     "TvQueryBuilder",
     "SceneQueryBuilder",
-    "PeopleQueryBuilder"
+    "PeopleQueryBuilder",
+    "VideoQueryBuilder"
 ]

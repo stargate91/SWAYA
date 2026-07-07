@@ -280,8 +280,8 @@ class OverridePersister:
         for item_id in item_ids:
             override = overrides_map.get(item_id)
             if override:
-                # Skip changing status if the item has a real play-button playback history
-                if override.media_item_id in has_playback_log:
+                # Skip changing status if the item has a real play-button playback history and we're marking as watched
+                if is_watched and override.media_item_id in has_playback_log:
                     continue
 
                 if is_watched:

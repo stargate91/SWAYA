@@ -56,10 +56,13 @@ class FormatterConfig:
     adult_tv_dir_name: str = "TV Shows"
     adult_scenes_dir_name: str = "Scenes"
     scenes_dir_name: str = "Scenes"
+    videos_dir_name: str = "Videos"
+    adult_videos_dir_name: str = "Videos"
     naming_adult_subfolders_enabled: bool = True
     scene_grouping_mode: str = "none"
     folder_scene_template: str = ""
     folder_create_scene_subdir: bool = True
+    folder_create_video_subdir: bool = True
     collision_strategy: str = "keep_both"
     collision_duration_tolerance_seconds: int = 10
 

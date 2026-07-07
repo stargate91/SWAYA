@@ -129,6 +129,8 @@ function buildPreviewAssets(form) {
     folderSeason: generatePreview(form.folder_season_template, 'season', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, false),
     folderEpisode: generatePreview(form.folder_episode_template, 'episode', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, false),
     folderCollection: generatePreview(form.folder_collection_template || '{Collection}', 'collection', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, true),
+    videoFile: 'Family Vacation 2024.mp4',
+    adultVideoFile: 'HomeMade Private Tape.mp4',
   };
 }
 
@@ -213,14 +215,19 @@ function buildAdultNodes(form, assets) {
     ];
   }
 
+  const videoNodes = form.folder_create_video_subdir
+    ? [createFolderNode(assets.adultVideoFile.replace(/\.mp4$/, ''), { tone: 'adult', children: [createFileNode(assets.adultVideoFile, { tone: 'adult' })] })]
+    : [createFileNode(assets.adultVideoFile, { tone: 'adult' })];
+
   if (!form.naming_adult_subfolders_enabled) {
-    return [...movieNodes, ...tvNodes, ...sceneNodes];
+    return [...movieNodes, ...tvNodes, ...sceneNodes, ...videoNodes];
   }
 
   return [
     createFolderNode(form.folder_adult_movies_name, { tone: 'adult', children: movieNodes }),
     createFolderNode(form.folder_adult_tv_name, { tone: 'adult', children: tvNodes }),
     createFolderNode(form.folder_adult_scenes_name, { tone: 'adult', children: sceneNodes }),
+    createFolderNode(form.folder_adult_videos_name, { tone: 'adult', children: videoNodes }),
   ];
 }
 
@@ -249,11 +256,23 @@ function buildShowNodes(form, assets, options = {}) {
   ];
 }
 
+function buildVideoNodes(form, assets) {
+  if (form.folder_create_video_subdir) {
+    return [
+      createFolderNode(assets.videoFile.replace(/\.mp4$/, ''), {
+        children: [createFileNode(assets.videoFile)],
+      }),
+    ];
+  }
+  return [createFileNode(assets.videoFile)];
+}
+
 function buildOrganizedNodes(form, assets) {
   if (form.folder_sort_by_type) {
     return [
       createFolderNode(form.folder_movies_name, { children: buildMovieNodes(form, assets) }),
       createFolderNode(form.folder_tv_name, { topSpacing: true, children: buildShowNodes(form, assets) }),
+      createFolderNode(form.folder_videos_name, { topSpacing: true, children: buildVideoNodes(form, assets) }),
       ...(form.include_adult ? [createFolderNode(form.folder_adult_name, { tone: 'adult', topSpacing: true, children: buildAdultNodes(form, assets) })] : []),
     ];
   }
@@ -261,6 +280,7 @@ function buildOrganizedNodes(form, assets) {
   return [
     ...buildMovieNodes(form, assets),
     ...buildShowNodes(form, assets, { topSpacing: true }),
+    ...buildVideoNodes(form, assets).map((node, index) => ({ ...node, topSpacing: index === 0 })),
     ...(form.include_adult ? buildAdultNodes(form, assets).map((node, index) => ({ ...node, topSpacing: index === 0 })) : []),
   ];
 }
@@ -293,6 +313,7 @@ function buildUnorganizedNodes(form, assets) {
     createFileNode(assets.movieFile),
     ...extraNodes,
     createFileNode(assets.episodeFile),
+    createFileNode(assets.videoFile, { topSpacing: true }),
     ...(form.include_adult ? [createFileNode(assets.adultMovieFile, { topSpacing: true })] : []),
   ];
 }
@@ -301,6 +322,7 @@ function buildRenameItems(form, assets) {
   const items = [
     { before: 'original_movie_file.mp4', after: assets.movieFile, afterTone: 'success' },
     { before: 'original_episode_file.mp4', after: assets.episodeFile, afterTone: 'success' },
+    { before: 'original_video_file.mp4', after: assets.videoFile, afterTone: 'success' },
   ];
 
   if (form.extras_enabled) {

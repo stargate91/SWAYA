@@ -6,7 +6,11 @@ export const useScanStatusQuery = ({ enabled = true, select } = {}) => useQuery(
   queryFn: () => api.scan.getStatus(),
   enabled,
   select,
-  refetchInterval: (query) => (query.state.data?.active ? 1200 : 10000),
+  refetchInterval: (query) => {
+    const data = query.state.data;
+    if (!data?.active) return 10000;
+    return data.scan_mode === 'offline' ? 400 : 1200;
+  },
 });
 
 export const useScanMutation = () => useMutation({

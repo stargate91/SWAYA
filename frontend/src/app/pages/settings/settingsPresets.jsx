@@ -10,6 +10,7 @@ const ADULT_SUBFOLDER_PRESET = {
   folder_adult_movies_name: 'Movies',
   folder_adult_tv_name: 'TV Shows',
   folder_adult_scenes_name: 'Scenes',
+  folder_adult_videos_name: 'Videos',
 };
 
 const ADULT_STANDARD_PRESET = {
@@ -61,6 +62,8 @@ export const PRESETS_CONFIG = {
     folder_movie_template: '{title} ({year})',
     folder_create_show_dir: true,
     folder_tv_template: '{tv_title} ({year_range})',
+    folder_create_video_subdir: true,
+    folder_videos_name: 'Videos',
     folder_create_season_dir: true,
     folder_season_template: 'Season {season}',
     folder_create_episode_dir: false,
@@ -80,6 +83,8 @@ export const PRESETS_CONFIG = {
     folder_movie_template: '{title} ({year})',
     folder_create_show_dir: true,
     folder_tv_template: '{tv_title} ({year_range})',
+    folder_create_video_subdir: true,
+    folder_videos_name: 'Videos',
     folder_create_season_dir: true,
     folder_season_template: 'Season {season}',
     folder_create_episode_dir: false,
@@ -99,6 +104,8 @@ export const PRESETS_CONFIG = {
     folder_movie_template: '{title} ({year})',
     folder_create_show_dir: true,
     folder_tv_template: '{tv_title} ({year_range})',
+    folder_create_video_subdir: true,
+    folder_videos_name: 'Videos',
     folder_create_season_dir: true,
     folder_season_template: 'Season {season}',
     folder_create_episode_dir: false,
@@ -118,6 +125,8 @@ export const PRESETS_CONFIG = {
     folder_movie_template: '{title} ({year})',
     folder_create_show_dir: true,
     folder_tv_template: '{tv_title}',
+    folder_create_video_subdir: false,
+    folder_videos_name: 'Videos',
     folder_create_season_dir: false,
     folder_season_template: 'Season {season}',
     folder_create_episode_dir: false,

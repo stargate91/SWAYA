@@ -15,13 +15,12 @@ const isRegularMovieType = (value) => isMovieMediaType(value);
 const isPornDbMovieMode = (scanMode) => scanMode === 'porndb_movie';
 
 const isModeType = (item, scanMode) => {
-  if (scanMode === 'scenes') return isSceneType(item.type);
+  if (scanMode === 'scenes' || scanMode === 'offline') return isSceneType(item.type);
   if (isPornDbMovieMode(scanMode)) return isRegularMovieType(item.type);
   return !isSceneType(item.type);
 };
 
 const isExtraForMode = (item, scanMode) => {
-  if (scanMode === 'scenes') return isModeType({ type: item.parent_type }, scanMode);
   return isModeType({ type: item.parent_type }, scanMode);
 };
 
@@ -39,7 +38,7 @@ export function useOrganizerFilteredRows({
     return (item) => {
       const itemScanMode = item.scan_mode || '';
       const isAdultScanModeOrType = (
-        String(item.type).toLowerCase() === 'scene'
+        (String(item.type).toLowerCase() === 'scene' && itemScanMode !== 'offline')
         || itemScanMode === 'porndb_movie'
         || itemScanMode === 'scenes'
       );
@@ -62,7 +61,7 @@ export function useOrganizerFilteredRows({
     return (extra) => {
       const parentIsAdult = (extra.parent_is_adult !== undefined && extra.parent_is_adult !== null)
         ? extra.parent_is_adult
-        : (extra.parent_type === 'scene' || (extra.parent_scan_mode || '') === 'scenes' || (extra.parent_scan_mode || '') === 'porndb_movie');
+        : ((extra.parent_type === 'scene' && (extra.parent_scan_mode || '') !== 'offline') || (extra.parent_scan_mode || '') === 'scenes' || (extra.parent_scan_mode || '') === 'porndb_movie');
 
       return sessionMode === 'nsfw' ? parentIsAdult : !parentIsAdult;
     };
@@ -72,6 +71,7 @@ export function useOrganizerFilteredRows({
     return (item) => {
       const itemScanMode = item.scan_mode || '';
       if (scanMode === 'scenes') return itemScanMode === 'scenes';
+      if (scanMode === 'offline') return itemScanMode === 'offline';
       if (scanMode === 'movies_tv') return itemScanMode === '' || itemScanMode === 'movies_tv' || itemScanMode === 'porndb_movie';
       return true;
     };
@@ -81,7 +81,8 @@ export function useOrganizerFilteredRows({
     return (extra) => {
       const parentScanMode = extra.parent_scan_mode || '';
       if (scanMode === 'scenes') return parentScanMode === 'scenes';
-      if (scanMode === 'movies_tv') return parentScanMode === '' || parentScanMode !== 'scenes';
+      if (scanMode === 'offline') return parentScanMode === 'offline';
+      if (scanMode === 'movies_tv') return parentScanMode === '' || (parentScanMode !== 'scenes' && parentScanMode !== 'offline');
       return true;
     };
   }, [scanMode]);

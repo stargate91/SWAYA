@@ -108,6 +108,29 @@ export default function AnalyticsTabContent({
                 </div>
               </div>
             )}
+
+            {/* Videos Row */}
+            <div className="compact-stats-row">
+              <div className="compact-stats-row__label">
+                {t('library.tabs.videos') || 'Videos'}
+              </div>
+              <div className="compact-stats-row__value-wrapper">
+                <span className="compact-stats-row__value">{state.videosStats.average}</span>
+                <div className="analytics-mini-segmented-bar">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((val) => {
+                    const avg = parseFloat(state.videosStats.average) || 0;
+                    let fill = 0;
+                    if (avg >= val) fill = 100;
+                    else if (avg > val - 1) fill = (avg - (val - 1)) * 100;
+                    return (
+                      <div key={val} className="analytics-segment">
+                        <div className="analytics-segment-fill" style={{ width: `${fill}%` }} />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -166,6 +189,21 @@ export default function AnalyticsTabContent({
                 </div>
               </div>
             )}
+
+            {/* Videos counts */}
+            <div className="compact-stats-row">
+              <div className="compact-stats-row__label">
+                {t('library.tabs.videos') || 'Videos'}
+              </div>
+              <div className="compact-stats-counts">
+                <span className="compact-count-rated">{state.videosStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</span>
+                <span className="compact-count-sep">{bulletSep}</span>
+                <span className="compact-count-unrated">
+                  {state.videosStats.totalUnrated} {t('ratings.stats.unrated', { defaultValue: 'unrated' })}
+                  {getPercentageText(state.videosStats.totalRated, state.videosStats.totalUnrated)}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -252,6 +290,7 @@ export default function AnalyticsTabContent({
                 effectiveDistTab === 'people' ? state.peopleStats :
                 effectiveDistTab === 'tv' ? state.tvStats :
                 effectiveDistTab === 'scenes' ? state.scenesStats :
+                effectiveDistTab === 'videos' ? state.videosStats :
                 state.moviesStats;
               return activeDistStats.distribution.map((count, index) => {
                 const maxCount = Math.max(...activeDistStats.distribution, 1);

@@ -267,6 +267,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
   const collectionCountKey = resolveLibraryBackendTab('collections', activeSessionMode);
   const peopleCountKey = resolveLibraryBackendTab('people', activeSessionMode);
   const scenesCountKey = resolveLibraryBackendTab('scenes', activeSessionMode);
+  const videosCountKey = resolveLibraryBackendTab('videos', activeSessionMode);
 
   const tabs = [
     { value: 'movies', label: t('library.tabs.movies'), count: counts[movieCountKey], icon: Clapperboard },
@@ -277,6 +278,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     ...(activeSessionMode === 'nsfw' ? [
       { value: 'scenes', label: t('library.tabs.scenes') || 'Scenes', count: counts[scenesCountKey] ?? 0, icon: Video }
     ] : []),
+    { value: 'videos', label: t('library.tabs.videos') || 'Videos', count: counts[videosCountKey] ?? 0, icon: Video },
     { value: 'people', label: t('library.tabs.people'), count: counts[peopleCountKey], icon: Users },
     ...(includeTagsTab ? [
       { value: 'tags', label: t('library.tabs.tags'), count: processedTags.length, icon: Tag },
@@ -388,6 +390,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
       case 'people': return Users;
       case 'tags': return Tag;
       case 'scenes': return Video;
+      case 'videos': return Video;
       default: return initialTab === 'tags' ? Tag : Clapperboard;
     }
   };

@@ -486,13 +486,14 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
   };
   const hasManualWatchedShow = (isMovie || isScene) ? !!item?.last_watched_at : getIsTvWatchedWithDate();
 
+  const isSfwScene = isScene && !item?.is_adult;
   const canToggleWatched = ((isMovie || isScene)
     ? Boolean(item)
     : Boolean(
       item?.seasons
         ?.filter((season) => season.season_number > 0)
         .some((season) => (season.episodes || []).length > 0)
-    )) && !hasManualWatchedShow;
+    )) && (!hasManualWatchedShow || isSfwScene);
 
   const getNextEpisodeInfo = () => {
     if (!item?.seasons) return null;

@@ -15,7 +15,7 @@ class OrganizerHelper:
     def infer_organizer_type(item: MediaItem) -> str:
         """Infers whether the media item is a movie, tv show episode, or adult scene."""
         scan_mode = str((item.parsed_info or {}).get("scan_mode") or "").lower()
-        if scan_mode == "scenes":
+        if scan_mode in ("scenes", "offline"):
             return MediaType.SCENE.value
 
         if item.parsed_info and item.parsed_info.get("type"):

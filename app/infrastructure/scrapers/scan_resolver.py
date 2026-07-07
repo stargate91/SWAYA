@@ -64,7 +64,7 @@ class ScanResolver:
         unique_items = []
         seen_hashes = set()
         for item in items:
-            if not item.group_hash or self.mode == ScanMode.SCENES:
+            if not item.group_hash or self.mode in (ScanMode.SCENES, ScanMode.OFFLINE):
                 unique_items.append(item)
             elif item.group_hash not in seen_hashes:
                 unique_items.append(item)

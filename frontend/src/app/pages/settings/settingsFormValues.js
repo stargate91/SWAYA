@@ -74,15 +74,18 @@ export const SETTINGS_BASE_DEFAULTS = {
   folder_sort_by_type: true,
   folder_movies_name: 'Movies',
   folder_tv_name: 'TV Shows',
+  folder_videos_name: 'Videos',
   folder_adult_name: 'Adult',
   naming_adult_subfolders_enabled: true,
   folder_adult_movies_name: 'Movies',
   folder_adult_tv_name: 'TV Shows',
   folder_adult_scenes_name: 'Scenes',
+  folder_adult_videos_name: 'Videos',
   folder_create_movie_subdir: true,
   folder_movie_template: '{title} ({year})',
   folder_create_show_dir: true,
   folder_tv_template: '{tv_title} ({year_range})',
+  folder_create_video_subdir: true,
   folder_create_season_dir: true,
   folder_season_template: 'Season {season}',
   folder_create_episode_dir: false,
@@ -113,10 +116,12 @@ export function getLocalizedSettingsDefaults(t = null) {
     return {
       folder_movies_name: SETTINGS_BASE_DEFAULTS.folder_movies_name,
       folder_tv_name: SETTINGS_BASE_DEFAULTS.folder_tv_name,
+      folder_videos_name: SETTINGS_BASE_DEFAULTS.folder_videos_name,
       folder_adult_name: SETTINGS_BASE_DEFAULTS.folder_adult_name,
       folder_adult_movies_name: SETTINGS_BASE_DEFAULTS.folder_adult_movies_name,
       folder_adult_tv_name: SETTINGS_BASE_DEFAULTS.folder_adult_tv_name,
       folder_adult_scenes_name: SETTINGS_BASE_DEFAULTS.folder_adult_scenes_name,
+      folder_adult_videos_name: SETTINGS_BASE_DEFAULTS.folder_adult_videos_name,
       extras_subfolder_name: SETTINGS_BASE_DEFAULTS.extras_subfolder_name,
     };
   }
@@ -124,10 +129,12 @@ export function getLocalizedSettingsDefaults(t = null) {
   return {
     folder_movies_name: t('settingsPage.sections.folderStructure.defaultMoviesName'),
     folder_tv_name: t('settingsPage.sections.folderStructure.defaultTvName'),
+    folder_videos_name: t('settingsPage.sections.folderStructure.defaultVideosName'),
     folder_adult_name: t('common.adult'),
     folder_adult_movies_name: t('settingsPage.sections.folderStructure.defaultAdultMoviesName'),
     folder_adult_tv_name: t('settingsPage.sections.folderStructure.defaultAdultTvName'),
     folder_adult_scenes_name: t('settingsPage.sections.folderStructure.defaultAdultScenesName'),
+    folder_adult_videos_name: t('settingsPage.sections.folderStructure.defaultAdultVideosName'),
     extras_subfolder_name: t('settingsPage.sections.extras.defaultSubfolderName'),
   };
 }
@@ -263,6 +270,7 @@ export function getInitialFormValues(settingsData = null, t = null) {
     folder_sort_by_type: getBooleanValue(settingsData.folder_sort_by_type, defaults.folder_sort_by_type),
     folder_movies_name: getStringValue(settingsData.folder_movies_name, defaults.folder_movies_name),
     folder_tv_name: getStringValue(settingsData.folder_tv_name, defaults.folder_tv_name),
+    folder_videos_name: getStringValue(settingsData.folder_videos_name, defaults.folder_videos_name),
     folder_adult_name: getStringValue(settingsData.folder_adult_name, defaults.folder_adult_name),
     naming_adult_subfolders_enabled: getBooleanValue(
       settingsData.naming_adult_subfolders_enabled,
@@ -280,6 +288,10 @@ export function getInitialFormValues(settingsData = null, t = null) {
       settingsData.folder_adult_scenes_name,
       defaults.folder_adult_scenes_name
     ),
+    folder_adult_videos_name: getStringValue(
+      settingsData.folder_adult_videos_name,
+      defaults.folder_adult_videos_name
+    ),
     folder_create_movie_subdir: getBooleanValue(
       settingsData.folder_create_movie_subdir,
       defaults.folder_create_movie_subdir
@@ -287,6 +299,7 @@ export function getInitialFormValues(settingsData = null, t = null) {
     folder_movie_template: getStringValue(settingsData.folder_movie_template, defaults.folder_movie_template),
     folder_create_show_dir: getBooleanValue(settingsData.folder_create_show_dir, defaults.folder_create_show_dir),
     folder_tv_template: getStringValue(settingsData.folder_tv_template, defaults.folder_tv_template),
+    folder_create_video_subdir: getBooleanValue(settingsData.folder_create_video_subdir, defaults.folder_create_video_subdir),
     folder_create_season_dir: getBooleanValue(
       settingsData.folder_create_season_dir,
       defaults.folder_create_season_dir

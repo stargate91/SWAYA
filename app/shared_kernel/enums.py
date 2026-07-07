@@ -14,10 +14,11 @@ class ScanMode(enum.Enum):
     MOVIES_TV = "movies_tv"
     SCENES = "scenes"
     PORNDB_MOVIE = "porndb_movie"
+    OFFLINE = "offline"
 
     @property
     def uses_scene_pipeline(self) -> bool:
-        return self == ScanMode.SCENES
+        return self in (ScanMode.SCENES, ScanMode.OFFLINE)
 
     @property
     def requires_adult_access(self) -> bool:

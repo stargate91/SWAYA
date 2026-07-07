@@ -97,6 +97,13 @@ export default function FolderStructureTab({
                       onChange={handleChange('folder_tv_name')}
                       placeholder={t('settingsPage.sections.folderStructure.defaultTvName')}
                     />
+                    <Input
+                      label={t('settingsPage.sections.folderStructure.videosDirName')}
+                      value={form.folder_videos_name}
+                      disabled={isScanActive}
+                      onChange={handleChange('folder_videos_name')}
+                      placeholder={t('settingsPage.sections.folderStructure.defaultVideosName')}
+                    />
 
                   </Stack>
                 </div>
@@ -149,6 +156,13 @@ export default function FolderStructureTab({
                             disabled={isScanActive}
                             onChange={handleChange('folder_adult_scenes_name')}
                             placeholder={t('settingsPage.sections.folderStructure.defaultAdultScenesName')}
+                          />
+                          <Input
+                            label={t('settingsPage.sections.folderStructure.adultVideosDirName')}
+                            value={form.folder_adult_videos_name}
+                            disabled={isScanActive}
+                            onChange={handleChange('folder_adult_videos_name')}
+                            placeholder={t('settingsPage.sections.folderStructure.defaultAdultVideosName')}
                           />
 
                         </Stack>
@@ -245,6 +259,20 @@ export default function FolderStructureTab({
                       className="settings-nested-block settings-nested-block--top"
                     />
                   )}
+                </div>
+
+                <div>
+                  <Switch
+                    id="folder_create_video_subdir"
+                    checked={form.folder_create_video_subdir}
+                    disabled={isScanActive}
+                    onChange={handleCheckboxChange('folder_create_video_subdir')}
+                  >
+                    {t('settingsPage.sections.folderStructure.createVideoSubdir')}
+                  </Switch>
+                  <span className="ui-field__hint settings-hint--block-compact">
+                    {t('settingsPage.sections.folderStructure.createVideoSubdirHint')}
+                  </span>
                 </div>
               </Stack>
             </div>

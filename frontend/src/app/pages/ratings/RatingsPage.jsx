@@ -92,6 +92,7 @@ export default function RatingsPage() {
     { value: 'movies', label: t('ratings.subtabs.movies', { defaultValue: 'Movies' }), icon: Clapperboard },
     { value: 'series', label: t('ratings.subtabs.tvShows', { defaultValue: 'TV Shows' }), icon: Tv },
     ...(isAdultMode ? [{ value: 'scenes', label: t('ratings.subtabs.scenes', { defaultValue: 'Scenes' }), icon: Video }] : []),
+    { value: 'videos', label: t('library.tabs.videos') || 'Videos', icon: Video },
     { value: 'people', label: t('ratings.subtabs.people', { defaultValue: 'People' }), icon: Users },
   ];
 
@@ -99,6 +100,7 @@ export default function RatingsPage() {
     { value: 'movies', label: t('ratings.subtabs.movies', { defaultValue: 'Movies' }), icon: Clapperboard },
     { value: 'tv', label: t('ratings.subtabs.tvShows', { defaultValue: 'TV Shows' }), icon: Tv },
     ...(state.hasAdultSupport ? [{ value: 'scenes', label: t('ratings.subtabs.scenes', { defaultValue: 'Scenes' }), icon: Video }] : []),
+    { value: 'videos', label: t('library.tabs.videos') || 'Videos', icon: Video },
     { value: 'people', label: t('ratings.subtabs.people', { defaultValue: 'People' }), icon: Users },
   ];
 

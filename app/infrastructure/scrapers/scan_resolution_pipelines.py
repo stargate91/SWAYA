@@ -53,7 +53,7 @@ class BaseScanResolutionPipeline:
         if stop_requested and stop_requested():
             return
 
-        if self.mode != ScanMode.SCENES:
+        if self.mode not in (ScanMode.SCENES, ScanMode.OFFLINE):
             self.resolver.propagate_match(item)
 
         if item.status != ItemStatus.MATCHED:
@@ -150,6 +150,19 @@ class ScenesScanResolutionPipeline(BaseScanResolutionPipeline):
         return
 
 
+class OfflineScanResolutionPipeline(BaseScanResolutionPipeline):
+    def enrich_matched_item(
+        self,
+        item: MediaItem,
+        *,
+        primary_language: str = DEFAULT_FALLBACK_LANGUAGE,
+        fallback_language: Optional[str] = None,
+        task_id: Optional[int] = None,
+        stop_requested=None,
+    ):
+        return
+
+
 class PornDbMovieScanResolutionPipeline(MainstreamScanResolutionPipeline):
     pass
 
@@ -163,6 +176,15 @@ def get_scan_resolution_pipeline(
     resolver: Optional[Any] = None,
     enricher: Optional[Any] = None
 ):
+    if mode == ScanMode.OFFLINE:
+        return OfflineScanResolutionPipeline(
+            db_session,
+            mode=mode,
+            include_adult=include_adult,
+            provider=provider,
+            library_port=library_port,
+            resolver=resolver
+        )
     if mode == ScanMode.SCENES:
         return ScenesScanResolutionPipeline(
             db_session,

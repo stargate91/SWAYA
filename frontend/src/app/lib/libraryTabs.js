@@ -5,6 +5,7 @@ export const LIBRARY_TABS = Object.freeze({
   PEOPLE: 'people',
   TAGS: 'tags',
   SCENES: 'scenes',
+  VIDEOS: 'videos',
 });
 
 const LIBRARY_TAB_ALIASES = Object.freeze({
@@ -19,6 +20,8 @@ const LIBRARY_TAB_ALIASES = Object.freeze({
   tags: LIBRARY_TABS.TAGS,
   scenes: LIBRARY_TABS.SCENES,
   adult_scenes: LIBRARY_TABS.SCENES,
+  videos: LIBRARY_TABS.VIDEOS,
+  adult_videos: LIBRARY_TABS.VIDEOS,
 });
 
 export const normalizeLibraryTab = (value, fallback = null) => {
@@ -42,10 +45,15 @@ export const isLibraryPeopleTab = (value) => normalizeLibraryTab(value) === LIBR
 
 export const isLibraryTagsTab = (value) => normalizeLibraryTab(value) === LIBRARY_TABS.TAGS;
 
-export const isLibraryScenesTab = (value) => normalizeLibraryTab(value) === LIBRARY_TABS.SCENES;
+export const isLibraryScenesTab = (value) => {
+  const normalized = normalizeLibraryTab(value);
+  return normalized === LIBRARY_TABS.SCENES || normalized === LIBRARY_TABS.VIDEOS;
+};
+
+export const isLibraryVideosTab = (value) => normalizeLibraryTab(value) === LIBRARY_TABS.VIDEOS;
 
 export const isLibraryVideoTab = (value) => (
-  isLibraryMovieTab(value) || isLibraryTvTab(value) || isLibraryScenesTab(value)
+  isLibraryMovieTab(value) || isLibraryTvTab(value) || isLibraryScenesTab(value) || isLibraryVideosTab(value)
 );
 
 export const resolveLibraryBackendTab = (value, sessionMode) => {
@@ -67,6 +75,9 @@ export const resolveLibraryBackendTab = (value, sessionMode) => {
   }
   if (normalized === LIBRARY_TABS.SCENES) {
     return 'adult_scenes';
+  }
+  if (normalized === LIBRARY_TABS.VIDEOS) {
+    return 'adult_videos';
   }
   return normalized;
 };
@@ -102,11 +113,14 @@ export const getLibraryEmptyStateKey = (value, sessionMode) => {
   if (normalized === LIBRARY_TABS.SCENES) {
     return 'adult_scenes';
   }
+  if (normalized === LIBRARY_TABS.VIDEOS) {
+    return 'adult_videos';
+  }
   return normalized;
 };
 
 export const getLibraryTagBucketKeys = (sessionMode) => (
   sessionMode === 'nsfw'
-    ? ['adult', 'adult_tv', 'adult_people', 'adult_scenes']
-    : ['movies', 'tv', 'people']
+    ? ['adult', 'adult_tv', 'adult_people', 'adult_scenes', 'adult_videos']
+    : ['movies', 'tv', 'people', 'videos']
 );

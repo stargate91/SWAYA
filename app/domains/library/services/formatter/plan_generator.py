@@ -26,7 +26,31 @@ class PlanGenerator:
         loc: Any,
         people_links: Optional[List[Any]] = None
     ) -> Tuple[str, str]:
+        scan_mode = str((item.parsed_info or {}).get("scan_mode") or "").lower()
         is_inplace = not self.config.org_enabled or not self.config.move_to_library or not self.config.library_path
+
+        if scan_mode == "offline":
+            target_name = item.filename
+            if is_inplace:
+                return target_name, ""
+            sub_path_parts = []
+            is_adult = match and getattr(match, "is_adult", False)
+            if is_adult:
+                sub_path_parts.append(self.config.adult_dir_name)
+                if self.config.naming_adult_subfolders_enabled:
+                    sub_path_parts.append(getattr(self.config, "adult_videos_dir_name", "Videos"))
+            else:
+                if self.config.sort_by_type:
+                    sub_path_parts.append(getattr(self.config, "videos_dir_name", "Videos"))
+            if getattr(self.config, "folder_create_video_subdir", True):
+                sub_path_parts.append(Path(item.filename).stem)
+            sub_path_obj = Path()
+            for p in sub_path_parts:
+                if p and str(p).strip() and str(p) != ".":
+                    sub_path_obj = sub_path_obj / p
+            target_subpath = str(sub_path_obj).replace("\\", "/")
+            return target_name, target_subpath
+
         media_type = getattr(match, "media_type", None) if match else None
         if not media_type:
             inferred = str((item.parsed_info or {}).get("type") or "").lower()
