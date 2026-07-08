@@ -1,13 +1,14 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
-import { useSetPersonFieldRoutingMutation } from '@/queries';
+import { useSetPersonFieldRoutingMutation, useSettingsQuery } from '@/queries';
 import { usePersonDetailQuery } from '@/queries/metadataQueries';
 import { Check } from '@/ui/icons';
 
 export default function PerformerMixerTab({ person: initialPerson }) {
   const { t } = useTranslation();
   const { toast } = useUi();
+  const { data: settings } = useSettingsQuery();
   const routingMutation = useSetPersonFieldRoutingMutation();
 
   const { data: fetchedPerson } = usePersonDetailQuery(initialPerson?.id);
@@ -24,6 +25,7 @@ export default function PerformerMixerTab({ person: initialPerson }) {
   const currentRouting = localRouting || {};
 
   const isMale = String(person?.gender) === '2';
+  const includeAdult = settings?.include_adult;
 
   const isUnderage = useMemo(() => {
     if (person?.is_adult) return false;
@@ -44,12 +46,12 @@ export default function PerformerMixerTab({ person: initialPerson }) {
     ...(person?.is_adult ? [{ key: 'gender', label: 'Gender', type: 'gender' }] : []),
     ...(!isUnderage ? [
       { key: 'height', label: 'Height', type: 'height' },
-      { key: 'weight', label: 'Weight', type: 'weight' },
+      ...(includeAdult ? [{ key: 'weight', label: 'Weight', type: 'weight' }] : []),
       { key: 'hair_color', label: 'Hair Color', type: 'string' },
       { key: 'eye_color', label: 'Eye Color', type: 'string' },
     ] : []),
     { key: 'ethnicity', label: 'Ethnicity', type: 'string' },
-    ...(!isMale && !isUnderage
+    ...(includeAdult && !isMale && !isUnderage
       ? [
         { key: 'measurements', label: 'Measurements', type: 'string' },
         { key: 'cup_size', label: 'Cup Size', type: 'string' },

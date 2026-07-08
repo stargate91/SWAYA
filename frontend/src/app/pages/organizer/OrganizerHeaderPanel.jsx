@@ -1,6 +1,7 @@
 import { Search } from '@/ui/icons';
 import { Tabs } from '../../ui/Tabs';
 import Input from '../../ui/Input';
+import { useTranslation } from '@/providers/LanguageContext';
 
 export default function OrganizerHeaderPanel({
   activeExtrasTab,
@@ -19,12 +20,22 @@ export default function OrganizerHeaderPanel({
   title,
   sessionMode,
 }) {
+  const { t } = useTranslation();
   const panelClassName = `organizer-panel${sessionMode === 'nsfw' ? ' organizer-panel--nsfw' : ''}`;
 
   return (
     <div className={panelClassName}>
       <div className="organizer-panel__row">
-        <span className="organizer-panel__title">{title}</span>
+        <span className="organizer-panel__title" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+          {title}
+          {sessionMode === 'nsfw' && (
+            <sup style={{ fontSize: '0.55em', top: '-0.8em', position: 'relative', userSelect: 'none' }}>
+              <span className="settings-badge settings-badge--danger" style={{ fontSize: 'inherit', letterSpacing: 'normal', borderRadius: '4px', padding: '2px 6px', height: 'auto', minHeight: '0', lineRight: '1' }}>
+                {t('common.adult_badge', { defaultValue: '18+' })}
+              </span>
+            </sup>
+          )}
+        </span>
         <div className="organizer-panel__actions">
           {actions}
         </div>

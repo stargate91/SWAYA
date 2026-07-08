@@ -23,10 +23,12 @@ import BioSection from './components/BioSection';
 import PhysicalAttributesSection from './components/PhysicalAttributesSection';
 import MeasurementsSection from './components/MeasurementsSection';
 import ModificationsSection from './components/ModificationsSection';
+import { useSettingsQuery } from '@/queries';
 
 export default function PerformerCustomValuesTab({ personId, person: initialPerson, onDirtyChange, isShaking }) {
   const { t } = useTranslation();
   const { toast } = useUi();
+  const { data: settings } = useSettingsQuery();
   const { data: fetchedPerson } = usePersonDetailQuery(personId);
   const person = fetchedPerson || initialPerson;
   const saveMutation = useSavePersonCustomFieldsMutation();
@@ -373,9 +375,10 @@ export default function PerformerCustomValuesTab({ personId, person: initialPers
           ethnicityOptions={ethnicityOptions}
           getDropdownOptions={getDropdownOptions}
           t={t}
+          includeAdult={settings?.include_adult}
         />
 
-        {!isMale && !isUnderage && (
+        {settings?.include_adult && !isMale && !isUnderage && (
           <MeasurementsSection
             form={form}
             errors={errors}

@@ -32,7 +32,7 @@ export default function EntityDetailTopControls({
           type="button"
           onClick={() => navigate(`/library/people/${item.id}/edit`)}
           className="media-detail-page__side-nav-toggle"
-          title={t('library.details.editPerformer') || 'Edit Performer'}
+          title={item.is_adult ? (t('library.details.editPerformer') || 'Edit Star') : (t('library.details.editArtist') || 'Edit Artist')}
         >
           <Settings size={18} />
         </button>

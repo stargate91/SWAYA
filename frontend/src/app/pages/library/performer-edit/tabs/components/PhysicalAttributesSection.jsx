@@ -11,6 +11,7 @@ export default function PhysicalAttributesSection({
   ethnicityOptions,
   getDropdownOptions,
   t,
+  includeAdult,
 }) {
   return (
     <div className="custom-values-card">
@@ -31,7 +32,7 @@ export default function PhysicalAttributesSection({
               />
             </div>
           )}
-          {!isUnderage && (
+          {!isUnderage && includeAdult && (
             <div className="ui-field">
               <label className="ui-field__label">{t('library.performerEdit.weightKg') || 'Weight (kg)'}</label>
               <Input

@@ -1,4 +1,4 @@
- 
+
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Star, Heart, Edit3, Clapperboard, Tv, Video, Users, CheckCircle, Search } from '@/ui/icons';
@@ -198,8 +198,15 @@ export default function RatingsPage() {
           {viewMode === 'ratings' && (
             <div className={`organizer-panel ${isAdultMode ? 'organizer-panel--nsfw' : ''}`}>
               <div className="organizer-panel__row">
-                <span className="organizer-panel__title">
-                  {isAdultMode ? (t('ratings.adultTitle') || 'Adult Ratings & Reviews') : (t('ratings.title') || 'Ratings & Reviews')}
+                <span className="organizer-panel__title" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  {t('ratings.title') || 'Ratings & Reviews'}
+                  {isAdultMode && (
+                    <sup style={{ fontSize: '0.5em', top: '-0.8em', position: 'relative', userSelect: 'none' }}>
+                      <span className="settings-badge settings-badge--danger" style={{ fontSize: 'inherit', letterSpacing: 'normal', borderRadius: '4px', padding: '2px 6px', height: 'auto', minHeight: '0', lineRight: '1' }}>
+                        {t('common.adult_badge', { defaultValue: '18+' })}
+                      </span>
+                    </sup>
+                  )}
                 </span>
               </div>
 
@@ -209,7 +216,7 @@ export default function RatingsPage() {
                   value={state.activeTab}
                   onChange={state.setActiveTab}
                 />
-                
+
                 <div className="organizer-search">
                   <Search size={14} className="organizer-search__icon" />
                   <Input

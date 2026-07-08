@@ -91,7 +91,7 @@ export default function PerformerEditPage() {
     <div className="settings-overlay">
       <aside className="settings-sidebar">
         <h1 className="settings-sidebar-header performer-edit-sidebar-header">
-          {t('library.performerEdit.editPerformer') || 'Edit Performer'}
+          {person.is_adult ? (t('library.performerEdit.editPerformer') || 'Edit Star') : (t('library.performerEdit.editArtist') || 'Edit Artist')}
         </h1>
         <div className="performer-edit-sidebar-title-container">
           <h2 className="performer-edit-sidebar-name">{person.name}</h2>

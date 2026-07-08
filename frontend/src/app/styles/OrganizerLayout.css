@@ -12,25 +12,7 @@
   box-shadow: var(--shadow-md);
 }
 
-.organizer-panel--nsfw .organizer-panel__row:first-child {
-  position: relative;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--color-accent-soft) 4%, color-mix(in srgb, var(--color-accent-red-soft) 10%, transparent)), transparent 82%);
-}
-
-.organizer-panel--nsfw .organizer-panel__row:first-child::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 14px;
-  right: 14px;
-  height: 2px;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 18%, color-mix(in srgb, var(--color-accent-red-soft) 26%, transparent)), color-mix(in srgb, var(--color-accent) 10%, color-mix(in srgb, var(--color-accent-red-soft) 24%, transparent)) 42%, color-mix(in srgb, var(--color-accent-red-soft) 14%, color-mix(in srgb, var(--color-state-danger) 6%, transparent)));
-  pointer-events: none;
-}
-
-.organizer-panel--nsfw .organizer-panel__title {
-  color: color-mix(in srgb, var(--color-ink) 84%, color-mix(in srgb, var(--color-accent) 18%, var(--color-accent-red-soft)));
-}
+/* NSFW specific panel header highlights removed for cleaner look */
 
 .organizer-panel__row {
   display: flex;

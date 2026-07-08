@@ -61,8 +61,15 @@ export default function LibraryHeader({
     <>
       {/* Row 1: Title */}
       <div className="organizer-panel__row library-header-row">
-        <span className="organizer-panel__title">
-          {pageTitle || (activeSessionMode === 'nsfw' ? (t('library.adultTitle') || 'Adult Library') : t('library.title'))}
+        <span className="organizer-panel__title" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+          {pageTitle || t('library.title')}
+          {!pageTitle && activeSessionMode === 'nsfw' && (
+            <sup style={{ fontSize: '0.5em', top: '-0.8em', position: 'relative', userSelect: 'none' }}>
+              <span className="settings-badge settings-badge--danger" style={{ fontSize: 'inherit', letterSpacing: 'normal', borderRadius: '4px', padding: '2px 6px', height: 'auto', minHeight: '0', lineRight: '1' }}>
+                {t('common.adult_badge', { defaultValue: '18+' })}
+              </span>
+            </sup>
+          )}
         </span>
         {isLibraryPeopleTab(resolvedTab) && hasItems && onAddPeople && (
           <Button variant={btnVariant} size="sm" onClick={onAddPeople} className="library-header-btn">

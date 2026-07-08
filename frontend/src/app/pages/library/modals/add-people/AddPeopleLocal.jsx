@@ -39,6 +39,7 @@ export default function AddPeopleLocal({
   } = usePeopleInfiniteQuery({
     include_inactive: true,
     adult_only: isAdult,
+    pageSize: 100,
     search: searchQuery.trim() || undefined,
     role: roleFilter !== 'all' ? ({ actor: 'Actor', director: 'Director', writer: 'Writer', sound: 'Sound' }[roleFilter]) : undefined,
     gender: hideGenderFilter ? settings.adult_gender_preference : (genderFilter !== 'all' ? genderFilter : undefined),

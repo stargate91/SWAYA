@@ -141,10 +141,33 @@ export const LibraryPosterCard = memo(({
         const w = parseFloat(item.waist) || 0;
         const h = parseFloat(item.hip) || 0;
         subtitle = w > 0 && h > 0 ? (w / h).toFixed(2) : '—';
-      } else if (['body_slender', 'body_curvy'].includes(sortKey)) {
-        const w = item.waist || '—';
-        const h = item.hip || '—';
-        subtitle = `${w}-${h}`;
+      } else if (sortKey === 'body_slender') {
+        const w = parseFloat(item.waist) || 0;
+        const height = parseFloat(item.height) || 0;
+        if (w > 0) {
+          const h_cm = height > 0 ? height : 165.0;
+          const w_cm = w * 2.54;
+          const score = (w_cm / h_cm).toFixed(3);
+          subtitle = `${t('library.sort.slenderScore') || 'Slender Score'}: ${score}`;
+        } else {
+          subtitle = '—';
+        }
+      } else if (sortKey === 'body_curvy') {
+        const w = parseFloat(item.waist) || 0;
+        const h = parseFloat(item.hip) || 0;
+        if (w > 0 && h > 0) {
+          const cupOrder = {
+            'A': 1, 'B': 2, 'C': 3, 'D': 4, 'DD': 5, 'DDD': 6, 'E': 7, 'EE': 8, 'F': 9, 'FF': 10,
+            'G': 11, 'GG': 12, 'H': 13, 'HH': 14, 'I': 15, 'J': 16, 'K': 17
+          };
+          const cupVal = cupOrder[String(item.cup_size || '').trim().toUpperCase()] || 0;
+          const bandVal = parseFloat(item.band_size) || 34.0;
+          const breastScore = cupVal > 0 ? (cupVal + (bandVal - 30.0) / 2.0) : 0.0;
+          const score = ((h - w) * 2.54 + breastScore).toFixed(1);
+          subtitle = `${t('library.sort.curvyScore') || 'Curvy Score'}: ${score}`;
+        } else {
+          subtitle = '—';
+        }
       } else if (sortKey === 'birthday') {
         if (item.birthday) {
           const birthDate = new Date(item.birthday);

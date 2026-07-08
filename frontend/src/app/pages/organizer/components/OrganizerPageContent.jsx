@@ -110,16 +110,16 @@ export default function OrganizerPageContent({
               activeMainTab === 'manual'
                 ? t('organizer.searchPlaceholderManual')
                 : activeMainTab === 'movies'
-                ? t('organizer.searchPlaceholderMovies')
-                : activeMainTab === 'episodes'
-                ? t('organizer.searchPlaceholderEpisodes')
-                : activeMainTab === 'extras'
-                ? t('organizer.searchPlaceholderExtras')
-                : t('organizer.searchPlaceholder')
+                  ? t('organizer.searchPlaceholderMovies')
+                  : activeMainTab === 'episodes'
+                    ? t('organizer.searchPlaceholderEpisodes')
+                    : activeMainTab === 'extras'
+                      ? t('organizer.searchPlaceholderExtras')
+                      : t('organizer.searchPlaceholder')
             }
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
-            title={sessionMode === 'nsfw' ? t('organizer.adultTitle') : t('organizer.title')}
+            title={t('organizer.title')}
           />
 
           <OrganizerResultsPanel
