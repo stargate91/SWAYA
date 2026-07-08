@@ -1,0 +1,23 @@
+{
+  "description": "Visual overview and breakdown of your media library",
+  "stats": {
+    "total_movies": "Total Movies",
+    "movies_sub": "In Library",
+    "total_scenes": "Total Scenes",
+    "scenes_sub": "Scenes in library",
+    "tv_series": "TV Shows",
+    "episodes_sub": "Episodes",
+    "storage_used": "Storage Used",
+    "storage_sub": "across {count} drives",
+    "unmatched": "Unmatched",
+    "unmatched_sub": "Pending in Organizer",
+    "library_dna": "Library DNA",
+    "timeline": "Time-Travel Timeline",
+    "decade_label": "{decade}s",
+    "top_decade": "You are a {decade} fanatic!",
+    "other_genres": "Other Genres",
+    "items_count_tooltip": "{label}: {count} items",
+    "library_dna_low_data": "Your Library DNA needs a few more organized titles before the radar view becomes meaningful. For now, these are your strongest genre signals from {count} organized title(s).",
+    "timeline_low_data": "The timeline needs a bit more organized history before it can draw a real spread. Right now it is based on {count} organized title(s)."
+  }
+}

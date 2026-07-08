@@ -247,7 +247,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
                   type="button"
                   className="entity-detail-page__bottom-social-toggle"
                   onClick={() => setIsSocialExpanded(!isSocialExpanded)}
-                  title={isSocialExpanded ? (t('common.less') || 'Show Less') : (t('common.showMore') || 'Show More')}
+                  title={isSocialExpanded ? (t('common.showLess') || 'Show Less') : (t('common.showMore') || 'Show More')}
                 >
                   {isSocialExpanded ? <Minus size={14} /> : <Plus size={14} />}
                 </button>

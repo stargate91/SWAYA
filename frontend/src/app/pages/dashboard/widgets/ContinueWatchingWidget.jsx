@@ -6,6 +6,7 @@ import { useContinueWatchingQuery } from '../../../queries';
 import { usePlayMediaMutation, useResetProgressMutation, useSettingsQuery } from '../../../queries';
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
+import Tooltip from '../../../ui/Tooltip';
 import './ContinueWatchingWidget.css';
 
 import { formatEpisodeCode } from '../../../lib/episodeFormat';
@@ -86,16 +87,18 @@ const ContinueWatchingWidget = ({ T }) => {
                 }
               }}
               topRightAction={
-                <button
-                  className="continue-watching-remove"
-                  onClick={async (e) => {
-                    e.stopPropagation();
-                    resetProgressMutation.mutate(item.id);
-                  }}
-                  title={T('dashboard.continue_watching.remove') || 'Remove progress'}
-                >
-                  <Minus size={14} color="var(--color-text-primary)" />
-                </button>
+                <Tooltip content={T('dashboard.continue_watching.remove') || 'Remove progress'} side="top">
+                  <button
+                    className="continue-watching-remove"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      resetProgressMutation.mutate(item.id);
+                    }}
+                    aria-label={T('dashboard.continue_watching.remove') || 'Remove progress'}
+                  >
+                    <Minus size={14} color="var(--color-text-primary)" />
+                  </button>
+                </Tooltip>
               }
               playOverlay={{
                 icon: <Play size={18} fill="currentColor" />,

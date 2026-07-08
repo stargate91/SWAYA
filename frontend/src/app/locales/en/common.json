@@ -5,7 +5,6 @@
     "cancel": "Cancel",
     "close": "Close",
     "create": "Create",
-    "current": "Current",
     "default": "Default",
     "remove": "Remove",
     "save": "Save",
@@ -14,28 +13,27 @@
     "add": "Add",
     "edit": "Edit",
     "delete": "Delete",
-    "noData": "No data available",
+    "noData": "Nothing here yet",
     "uploading": "Uploading...",
     "showDetails": "Show Details",
     "hideDetails": "Hide Details",
-    "more": "Show More",
-    "less": "Show Less",
     "sfwMode": "SFW Mode",
     "nsfwMode": "NSFW Mode",
     "other": "Other",
+    "showLess": "Show Less",
     "showMore": "Show More",
     "adult_badge": "18+",
-    "noResults": "No results found",
+    "noResults": "No matches found",
     "select": "Select...",
-    "loading": "Loading...",
+    "loading": "Just a second...",
     "searchPlaceholder": "Search...",
     "subtitles": "Subtitles",
     "subtitle": "Subtitle",
     "adult": "Adult"
   },
   "dropzone": {
-    "label": "Drop files or folders here",
-    "description": "Drag and drop your media files right here to scan them."
+    "label": "Drop your files or folders here",
+    "description": "Drag and drop your media files right here to start scan them."
   },
   "pagination": {
     "rowsPerPage": "Rows per page",
@@ -61,6 +59,7 @@
     "history": "History",
     "myRatings": "My Ratings",
     "lists": "Lists",
+    "statistics": "Statistics",
     "settings": "Settings",
     "about": "About",
     "quit": "Quit",
@@ -74,39 +73,39 @@
   },
   "progress": {
     "abortConfirm": {
-      "title": "Stop Scanning?",
-      "description": "Are you sure you want to stop the scan or rename?",
-      "body": "The file we're currently working on will finish up, and then we'll stop the whole process safely.",
-      "confirm": "Stop Process",
-      "cancel": "Keep Going"
+      "title": "Stop the run?",
+      "description": "Are you sure you want to cancel the current task?",
+      "body": "We'll finish up the file we are currently working on and then halt safely.",
+      "confirm": "Stop it",
+      "cancel": "Keep going"
     },
     "ready": "Ready",
     "working": "Working on it...",
     "images": {
-      "downloading": "Downloading images..."
+      "downloading": "Grabbing posters & backdrops..."
     },
     "people": {
-      "hydrating": "Getting extra info for artists...",
-      "importing": "Importing your list of artists..."
+      "hydrating": "Fetching details for your artists...",
+      "importing": "Adding your artists..."
     },
     "sync": {
-      "running": "Syncing info languages..."
+      "running": "Syncing metadata languages..."
     },
     "scan": {
-      "collecting": "Scanning your files...",
-      "resolving": "Finding matches...",
-      "enriching": "Fetching media details...",
-      "organizing": "Organizing your files...",
-      "undoing": "Undoing file organization..."
+      "collecting": "Scanning files...",
+      "resolving": "Matching files...",
+      "enriching": "Gathering media details...",
+      "organizing": "Sorting and renaming files...",
+      "undoing": "Undoing organization..."
     }
   },
   "closePrompt": {
     "title": "Close SWAYA?",
-    "description": "Do you want to close SWAYA completely, or just minimize it to your system tray?",
+    "description": "Do you want to shut down SWAYA, or keep it running in the system tray?",
     "info": "You can always change this later in Settings > General.",
     "action": {
       "tray": "Minimize to Tray",
-      "quit": "Quit"
+      "quit": "Quit SWAYA"
     },
     "dontAskAgain": "Remember my choice"
   },
@@ -139,19 +138,19 @@
   "player": {
     "ends_at": "Ends at",
     "audio_tracks": "Audio Tracks",
-    "no_audio_tracks": "No audio tracks",
+    "no_audio_tracks": "No extra audio tracks",
     "off": "Off",
     "track": "Track",
-    "finished_watching": "Finished watching",
+    "finished_watching": "All done!",
     "up_next": "Up Next",
     "starting_in": "Starting in {{count}}s...",
     "play_now": "Play Now",
-    "rate_title": "Rate this title",
+    "rate_title": "What did you think of this?",
     "replay": "Replay",
     "close_player": "Close Player",
     "unwatched_studio_recommendation": "Fancy some more {{studio}}?",
     "unwatched_performer_recommendation": "Craving more {{performer}}?",
-    "unwatched_library_recommendation": "Something unseen from your library:",
-    "all_scenes_watched": "Nothing new here - you've watched it all!"
+    "unwatched_library_recommendation": "Something fresh from your library:",
+    "all_scenes_watched": "You've watched it all!"
   }
 }

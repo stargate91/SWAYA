@@ -240,7 +240,7 @@ const PosterCard = memo(function PosterCard({
           <IconButton
             variant="play-overlay"
             onClick={playOverlay.onClick}
-            title={playOverlay.title}
+            title={null}
             label={playOverlay.label}
             disabled={playOverlay.disabled}
           >

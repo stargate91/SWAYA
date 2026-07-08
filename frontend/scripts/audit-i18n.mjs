@@ -70,6 +70,7 @@ const NAMESPACE_MAP = {
   'lists.json': 'lists',
   'search.json': 'search',
   'about.json': 'about',
+  'statistics.json': 'statistics',
 };
 
 function loadAllKeys() {

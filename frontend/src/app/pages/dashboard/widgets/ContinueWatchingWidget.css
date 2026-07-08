@@ -56,11 +56,14 @@
   transform: scale(1.06);
 }
 
-.continue-watching-remove {
+.continue-watching-card .ui-tooltip {
   position: absolute;
   top: 10px;
   right: 10px;
   z-index: 10;
+}
+
+.continue-watching-remove {
   display: flex;
   align-items: center;
   justify-content: center;

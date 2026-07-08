@@ -133,31 +133,7 @@ export default function DashboardCustomizerDrawer({
                   </div>
                 );
               }
-              if (key === 'insights') {
-                label = t('dashboard.customize_insights') || 'Library Insights';
-                hasSwitch = false;
-                childSwitches = (
-                  <div className="dashboard-customizer-child-switches">
-                    <Switch
-                      checked={Boolean(visibleWidgets.library_dna)}
-                      onChange={() => toggleWidget('library_dna')}
-                    >
-                      {t('dashboard.widget_library_dna') || 'Library DNA'}
-                    </Switch>
 
-                    <Switch
-                      checked={Boolean(visibleWidgets.timeline)}
-                      onChange={() => toggleWidget('timeline')}
-                    >
-                      {t('dashboard.widget_timeline') || 'Time-Travel Timeline'}
-                    </Switch>
-                  </div>
-                );
-              }
-              if (key === 'statistics') {
-                label = t('dashboard.widget_statistics') || 'Statistics';
-                switchKey = 'statistics';
-              }
 
               const isDragOver = index === dragOverIndex;
 

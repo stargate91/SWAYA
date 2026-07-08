@@ -75,6 +75,12 @@
   align-items: center;
 }
 
+.dashboard-utility-bar-wrapper .ui-tooltip {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
 .ui-icon-button.ui-icon-button--dashboard-customizer {
   background: var(--media-detail-side-nav-bg, color-mix(in srgb, black 60%, transparent));
   border: 1px solid var(--media-detail-side-nav-border, color-mix(in srgb, white 8%, transparent));

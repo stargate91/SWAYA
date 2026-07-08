@@ -4,9 +4,8 @@ import { useTranslation } from '../../providers/LanguageContext';
 import { SlidersHorizontal } from '@/ui/icons';
 import UtilityBarPortal from '../../../components/UtilityBarPortal';
 import IconButton from '@/ui/IconButton';
+import Tooltip from '@/ui/Tooltip';
 import ContinueWatchingWidget from './widgets/ContinueWatchingWidget';
-import LibraryInsightsWidget from './widgets/LibraryInsightsWidget';
-import StatisticsWidget from './widgets/StatisticsWidget';
 import RecommendationsWidget from './widgets/RecommendationsWidget';
 import DashboardCustomizerDrawer from './widgets/DashboardCustomizerDrawer';
 import './DashboardPage.css';
@@ -20,12 +19,9 @@ const DEFAULT_WIDGETS = {
   tv_discovery: true,
   top_20: true,
   adult: true,
-  library_dna: true,
-  timeline: true,
-  statistics: true,
 };
 
-const DEFAULT_ORDER = ['continue_watching', 'recommendations', 'insights', 'statistics'];
+const DEFAULT_ORDER = ['continue_watching', 'recommendations'];
 
 const DashboardView = () => {
   const { data: settings = {} } = useSettingsQuery();
@@ -51,7 +47,7 @@ const DashboardView = () => {
             merged.push(key);
           }
         });
-        return merged;
+        return merged.filter((key) => DEFAULT_ORDER.includes(key));
       }
       return DEFAULT_ORDER;
     } catch {
@@ -89,13 +85,15 @@ const DashboardView = () => {
     <>
       <UtilityBarPortal>
         <div className="dashboard-utility-bar-wrapper">
-          <IconButton
-            onClick={() => setIsCustomizerOpen(true)}
-            variant="dashboard-customizer"
-            title={t('dashboard.customize') || 'Customize Dashboard'}
-          >
-            <SlidersHorizontal size={18} />
-          </IconButton>
+          <Tooltip content={t('dashboard.customize') || 'Customize Dashboard'} side="bottom">
+            <IconButton
+              onClick={() => setIsCustomizerOpen(true)}
+              variant="dashboard-customizer"
+              title={null}
+            >
+              <SlidersHorizontal size={18} />
+            </IconButton>
+          </Tooltip>
         </div>
       </UtilityBarPortal>
 
@@ -117,19 +115,6 @@ const DashboardView = () => {
               visibleWidgets={visibleWidgets}
             />
           );
-        }
-        if (key === 'insights') {
-          return (visibleWidgets.library_dna !== false || visibleWidgets.timeline !== false) && (
-            <LibraryInsightsWidget
-              key={key}
-              T={t}
-              showDna={visibleWidgets.library_dna !== false}
-              showTimeline={visibleWidgets.timeline !== false}
-            />
-          );
-        }
-        if (key === 'statistics') {
-          return visibleWidgets.statistics && <StatisticsWidget key={key} T={t} />;
         }
         return null;
       })}

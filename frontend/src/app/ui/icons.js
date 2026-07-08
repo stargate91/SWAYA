@@ -128,6 +128,7 @@ import {
   History,
   Settings,
   Info,
+  BarChart2,
 } from 'lucide-react';
 
 export const ENTITY_ICONS = {
@@ -145,6 +146,7 @@ export const SIDEBAR_ICONS = {
   library: Library,
   lists: Bookmark,
   myRatings: Star,
+  statistics: BarChart2,
   history: History,
   settings: Settings,
   about: Info,

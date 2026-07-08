@@ -8,6 +8,7 @@ export const navItems = [
   { to: '/library', translationKey: 'sidebar.library', icon: SIDEBAR_ICONS.library },
   { to: '/lists', translationKey: 'sidebar.lists', icon: SIDEBAR_ICONS.lists },
   { to: '/my-ratings', translationKey: 'sidebar.myRatings', icon: SIDEBAR_ICONS.myRatings },
+  { to: '/statistics', translationKey: 'sidebar.statistics', icon: SIDEBAR_ICONS.statistics },
   { to: '/history', translationKey: 'sidebar.history', icon: SIDEBAR_ICONS.history },
   { to: '/settings', translationKey: 'sidebar.settings', icon: SIDEBAR_ICONS.settings },
 ];

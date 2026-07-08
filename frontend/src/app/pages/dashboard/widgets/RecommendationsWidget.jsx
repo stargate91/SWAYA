@@ -363,7 +363,11 @@ const RecommendationsWidget = ({ language, T, visibleWidgets = {} }) => {
   const [isLoadingMorePeople, setIsLoadingMorePeople] = useState(false);
 
   const [prevRecommendations, setPrevRecommendations] = useState(null);
-  if (recommendations && recommendations !== prevRecommendations) {
+  const isFirstLoad = !prevRecommendations && recommendations;
+  const firstItemChanged = recommendations?.recently_added?.[0]?.id !== prevRecommendations?.recently_added?.[0]?.id;
+  const firstPersonChanged = recommendations?.recently_activated_people?.[0]?.id !== prevRecommendations?.recently_activated_people?.[0]?.id;
+
+  if (recommendations && (isFirstLoad || firstItemChanged || firstPersonChanged)) {
     setPrevRecommendations(recommendations);
     setRecentlyAddedItems(recommendations.recently_added || []);
     setRecentlyAddedPage(1);

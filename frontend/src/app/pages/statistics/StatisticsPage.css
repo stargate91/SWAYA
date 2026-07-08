@@ -1,0 +1,14 @@
+.statistics-page-container {
+  padding: 0;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  animation: fadeIn var(--motion-duration-fade) var(--motion-ease-out);
+}
+
+.statistics-page-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6xl);
+  margin-top: var(--space-4xl);
+}

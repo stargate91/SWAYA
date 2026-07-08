@@ -157,7 +157,7 @@ const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
               <div
                 key={node.id}
                 className="insights-radar-legend-row"
-                title={T('dashboard.stats.items_count_tooltip', { label: node.translatedLabel, count: node.count }) || `${node.translatedLabel}: ${node.count}`}
+                title={T('statistics.stats.items_count_tooltip', { label: node.translatedLabel, count: node.count }) || `${node.translatedLabel}: ${node.count}`}
               >
                 <span className="insights-radar-legend-label">{node.translatedLabel}</span>
                 <strong className="insights-radar-legend-count">{node.count}</strong>
@@ -166,13 +166,13 @@ const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
 
             {insightData.otherGenres.length > 0 && (
               <div className="insights-radar-other">
-                <span className="insights-radar-other__title">{T('dashboard.stats.other_genres') || 'Other Genres'}</span>
+                <span className="insights-radar-other__title">{T('statistics.stats.other_genres') || 'Other Genres'}</span>
                 <div className="insights-radar-other__list">
                   {insightData.otherGenres.map((node) => (
                     <span
                       key={`other-${node.id}`}
                       className="insights-radar-other__chip"
-                      title={T('dashboard.stats.items_count_tooltip', { label: node.translatedLabel, count: node.count }) || `${node.translatedLabel}: ${node.count}`}
+                      title={T('statistics.stats.items_count_tooltip', { label: node.translatedLabel, count: node.count }) || `${node.translatedLabel}: ${node.count}`}
                     >
                       {node.translatedLabel} {node.count}
                     </span>
@@ -185,14 +185,14 @@ const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
       ) : (
         <div className="insights-low-data">
           <p className="insights-low-data__copy">
-            {T('dashboard.stats.library_dna_low_data', { count: insightTitleCount }) || `Need more matched files for library insights. Current count: ${insightTitleCount}`}
+            {T('statistics.stats.library_dna_low_data', { count: insightTitleCount }) || `Need more matched files for library insights. Current count: ${insightTitleCount}`}
           </p>
           <div className="insights-low-data__chips">
             {topGenres.map((node) => (
               <div
                 key={node.id}
                 className="insights-low-data__chip"
-                title={T('dashboard.stats.items_count_tooltip', { label: node.translatedLabel, count: node.count }) || `${node.translatedLabel}: ${node.count}`}
+                title={T('statistics.stats.items_count_tooltip', { label: node.translatedLabel, count: node.count }) || `${node.translatedLabel}: ${node.count}`}
               >
                 <span>{node.translatedLabel}</span>
                 <strong>{node.count}</strong>
@@ -219,7 +219,7 @@ const TimeTravelTimeline = ({ decades, insightTitleCount, T }) => {
   const topDecade = [...sorted].sort((a, b) => b[1] - a[1])[0][0];
   const formatDecade = (decade) => {
     const match = String(decade || '').match(/^(\d{4})s$/);
-    return match ? T('dashboard.stats.decade_label', { decade: match[1] }) || `${match[1]}s` : decade;
+    return match ? T('statistics.stats.decade_label', { decade: match[1] }) || `${match[1]}s` : decade;
   };
   const topDecadeLabel = formatDecade(topDecade);
   const hasEnoughData = insightTitleCount >= MIN_TIMELINE_TITLES && sorted.length >= 2;
@@ -228,10 +228,10 @@ const TimeTravelTimeline = ({ decades, insightTitleCount, T }) => {
     <div className="insights-panel">
       <h3 className="insights-panel-title">
         <span className="insights-panel-dot is-blue" />
-        {T('dashboard.stats.timeline') || 'Time Travel'}
+        {T('statistics.stats.timeline') || 'Time Travel'}
       </h3>
       <p className="insights-panel-subtitle">
-        {T('dashboard.stats.top_decade', { decade: topDecadeLabel }) || `Most files are from the ${topDecadeLabel}`}
+        {T('statistics.stats.top_decade', { decade: topDecadeLabel }) || `Most files are from the ${topDecadeLabel}`}
       </p>
 
       {hasEnoughData ? (
@@ -251,7 +251,7 @@ const TimeTravelTimeline = ({ decades, insightTitleCount, T }) => {
                     ry="6"
                     className="insights-timeline-bar"
                   >
-                    <title>{T('dashboard.stats.items_count_tooltip', { label: decadeLabel, count }) || `${decadeLabel}: ${count} files`}</title>
+                    <title>{T('statistics.stats.items_count_tooltip', { label: decadeLabel, count }) || `${decadeLabel}: ${count} files`}</title>
                   </rect>
                 </svg>
                 <div className="insights-timeline-label">
@@ -264,11 +264,11 @@ const TimeTravelTimeline = ({ decades, insightTitleCount, T }) => {
       ) : (
         <div className="insights-low-data insights-low-data--timeline">
           <p className="insights-low-data__copy">
-            {T('dashboard.stats.timeline_low_data', { count: insightTitleCount }) || `Timeline will build automatically once more movies are scanned.`}
+            {T('statistics.stats.timeline_low_data', { count: insightTitleCount }) || `Timeline will build automatically once more movies are scanned.`}
           </p>
           <div className="insights-low-data__highlight">
             <strong>{topDecadeLabel}</strong>
-            <span>{T('dashboard.stats.items_count_tooltip', { label: topDecadeLabel, count: decades[topDecade] }) || `${topDecadeLabel}: ${decades[topDecade]} files`}</span>
+            <span>{T('statistics.stats.items_count_tooltip', { label: topDecadeLabel, count: decades[topDecade] }) || `${topDecadeLabel}: ${decades[topDecade]} files`}</span>
           </div>
         </div>
       )}

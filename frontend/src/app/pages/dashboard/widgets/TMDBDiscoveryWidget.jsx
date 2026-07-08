@@ -58,7 +58,16 @@ const TMDBDiscoveryWidget = ({ T }) => {
   const [showRight, setShowRight] = useState(true);
 
   const { data: recommendations } = useRecommendationsQuery();
-  const watchlistIds = recommendations?.watchlist_item_ids || [];
+  const watchlistIdsFromQuery = recommendations?.watchlist_item_ids || [];
+  const [prevWatchlistIds, setPrevWatchlistIds] = useState(null);
+  const [optimisticWatchlistIds, setOptimisticWatchlistIds] = useState(null);
+
+  if (watchlistIdsFromQuery !== prevWatchlistIds) {
+    setPrevWatchlistIds(watchlistIdsFromQuery);
+    setOptimisticWatchlistIds(null);
+  }
+
+  const actualWatchlistIds = optimisticWatchlistIds !== null ? optimisticWatchlistIds : watchlistIdsFromQuery;
 
   const addToWatchlistMutation = useAddToWatchlistMutation();
   const removeFromWatchlistMutation = useRemoveFromWatchlistMutation();
@@ -105,11 +114,28 @@ const TMDBDiscoveryWidget = ({ T }) => {
     };
   }, [genreId, year, updateArrows]);
 
-  const handleWatchlist = (tmdbId, isWatchlisted) => {
+  const handleWatchlist = async (tmdbId, isWatchlisted) => {
+    // Optimistic toggle
     if (isWatchlisted) {
-      removeFromWatchlistMutation.mutate(tmdbId);
+      setOptimisticWatchlistIds(actualWatchlistIds.filter((id) => id !== tmdbId));
     } else {
-      addToWatchlistMutation.mutate({ tmdbId, type: 'movie' });
+      setOptimisticWatchlistIds([...actualWatchlistIds, tmdbId]);
+    }
+
+    try {
+      if (isWatchlisted) {
+        await removeFromWatchlistMutation.mutateAsync(tmdbId);
+      } else {
+        await addToWatchlistMutation.mutateAsync({ tmdbId, type: 'movie' });
+      }
+    } catch (error) {
+      console.error(error);
+      // Revert optimistic update
+      if (isWatchlisted) {
+        setOptimisticWatchlistIds(actualWatchlistIds.filter((id) => id !== tmdbId).concat(tmdbId));
+      } else {
+        setOptimisticWatchlistIds(actualWatchlistIds.filter((id) => id !== tmdbId));
+      }
     }
   };
 
@@ -196,7 +222,7 @@ const TMDBDiscoveryWidget = ({ T }) => {
             >
               {items.map((item) => {
                 const posterUrl = resolveMediaImageUrl(item.poster_path, 'poster');
-                const isWatchlisted = watchlistIds.includes(item.id);
+                const isWatchlisted = actualWatchlistIds.includes(item.id);
                 const ratingImdb = item.rating_imdb;
                 const ratingTmdb = item.rating_tmdb || item.vote_average;
                 const yearLabel = item.release_date ? new Date(item.release_date).getFullYear() : null;
