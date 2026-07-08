@@ -294,10 +294,9 @@
 /* Mini Segmented Bar for Average Rating */
 .analytics-mini-segmented-bar {
   display: flex;
-  width: 100%;
+  width: 100px;
   height: 8px;
   gap: calc(var(--space-1) - var(--space-px));
-  margin-top: var(--space-xs);
 }
 
 .analytics-mini-segmented-bar .analytics-segment {

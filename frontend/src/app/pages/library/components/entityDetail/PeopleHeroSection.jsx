@@ -7,6 +7,7 @@ import { getProfileImagePath } from '@/lib/imageUrls';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
 import { navigateToCreditDetail } from '../../utils/mediaNavigation';
 import { useTranslation } from '@/providers/LanguageContext';
+import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import './EntityDetailHeroSection.css';
 
 const TIMES_CHAR = '\u00d7';
@@ -35,6 +36,7 @@ export default function PeopleHeroSection({
   setIsDrawerOpen,
 }) {
   const navigate = useNavigate();
+  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const { locale } = useTranslation();
   const [isHoveringBar, setIsHoveringBar] = useState(false);
   const [lightboxUrl, setLightboxUrl] = useState(null);
@@ -306,7 +308,7 @@ export default function PeopleHeroSection({
                     </span>
                   </div>
                 </div>
-                {item?.is_adult && (
+                {item?.is_adult && sessionMode === 'nsfw' && (
                   <div className="entity-detail-page__info-row">
                     <div className="entity-detail-page__info-cell">
                       <span className="entity-detail-page__info-label">{t('library.details.finishes') || 'Finishes'}</span>

@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { GripVertical } from '@/ui/icons';
 import Switch from '@/ui/Switch';
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
+import '../../library/components/entityDetail/EntityDetailHeroSection.css';
+
 
 export default function DashboardCustomizerDrawer({
   isOpen,
