@@ -96,7 +96,9 @@ class LibraryFilterService:
                     MetadataMatch.is_adult == is_adult
                 ).scalar_subquery()
             else:
-                match_ids_subquery = select(MetadataMatch.id).filter(
+                match_ids_subquery = select(MetadataMatch.id).join(MediaItem).filter(
+                    MediaItem.status.in_(lib_statuses),
+                    MetadataMatch.is_active,
                     MetadataMatch.is_adult == is_adult
                 ).scalar_subquery()
             
@@ -151,6 +153,10 @@ class LibraryFilterService:
 
             settings_adapter = DbSettingsAdapter(self.db)
             gender_pref = settings_adapter.get_setting("adult_gender_preference") if is_adult else "all"
+
+            active_people_ids = select(MediaPersonLink.person_id).filter(
+                MediaPersonLink.match_id.in_(match_ids_subquery)
+            ).scalar_subquery()
 
             performers_query = self.db.query(Person.id, Person.name).join(
                 MediaPersonLink, MediaPersonLink.person_id == Person.id
@@ -235,7 +241,7 @@ class LibraryFilterService:
                 return sorted(result)
 
             hair_colors_query = self.db.query(Person.hair_color).filter(
-                Person.is_active == True,
+                Person.id.in_(active_people_ids),
                 Person.is_adult == is_adult,
                 Person.hair_color.isnot(None),
                 Person.hair_color != ""
@@ -243,7 +249,7 @@ class LibraryFilterService:
             hair_colors = normalize_options([r[0] for r in hair_colors_query])
 
             ethnicities_query = self.db.query(Person.ethnicity).filter(
-                Person.is_active == True,
+                Person.id.in_(active_people_ids),
                 Person.is_adult == is_adult,
                 Person.ethnicity.isnot(None),
                 Person.ethnicity != ""
@@ -251,7 +257,7 @@ class LibraryFilterService:
             ethnicities = normalize_options([r[0] for r in ethnicities_query])
 
             eye_colors_query = self.db.query(Person.eye_color).filter(
-                Person.is_active == True,
+                Person.id.in_(active_people_ids),
                 Person.is_adult == is_adult,
                 Person.eye_color.isnot(None),
                 Person.eye_color != ""
@@ -259,7 +265,7 @@ class LibraryFilterService:
             eye_colors = normalize_options([r[0] for r in eye_colors_query])
 
             tattoos_query = self.db.query(Person.tattoos).filter(
-                Person.is_active == True,
+                Person.id.in_(active_people_ids),
                 Person.is_adult == is_adult,
                 Person.tattoos.isnot(None),
                 Person.tattoos != ""
@@ -267,7 +273,7 @@ class LibraryFilterService:
             tattoos = [r[0] for r in tattoos_query]
 
             piercings_query = self.db.query(Person.piercings).filter(
-                Person.is_active == True,
+                Person.id.in_(active_people_ids),
                 Person.is_adult == is_adult,
                 Person.piercings.isnot(None),
                 Person.piercings != ""
@@ -275,7 +281,7 @@ class LibraryFilterService:
             piercings = [r[0] for r in piercings_query]
 
             breast_types_query = self.db.query(Person.breast_type).filter(
-                Person.is_active == True,
+                Person.id.in_(active_people_ids),
                 Person.is_adult == is_adult,
                 Person.breast_type.isnot(None),
                 Person.breast_type != ""
@@ -283,7 +289,7 @@ class LibraryFilterService:
             breast_types = normalize_options([r[0] for r in breast_types_query])
 
             butt_shapes_query = self.db.query(Person.butt_shape).filter(
-                Person.is_active == True,
+                Person.id.in_(active_people_ids),
                 Person.is_adult == is_adult,
                 Person.butt_shape.isnot(None),
                 Person.butt_shape != ""
@@ -291,7 +297,7 @@ class LibraryFilterService:
             butt_shapes = normalize_options([r[0] for r in butt_shapes_query])
 
             butt_sizes_query = self.db.query(Person.butt_size).filter(
-                Person.is_active == True,
+                Person.id.in_(active_people_ids),
                 Person.is_adult == is_adult,
                 Person.butt_size.isnot(None),
                 Person.butt_size != ""
