@@ -56,7 +56,9 @@ export default function EntityMetaPills({ isPeople, item, t }) {
         <Pill variant="meta">
           <span className="entity-detail-page__meta-pill-content">
             <Briefcase size={14} />
-            <span>{item.known_for_department}</span>
+            <span>
+              {t(`library.people.roles.${item.known_for_department.toLowerCase()}`) || item.known_for_department}
+            </span>
           </span>
         </Pill>
       )}

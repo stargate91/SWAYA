@@ -66,6 +66,9 @@ class PeopleQueryBuilder:
             query = query.filter((MediaPersonLink.role == RoleType.DIRECTOR) | (Person.known_for_department.in_(["Directing", "Creator"])))
         elif role == "Writer":
             query = query.filter((MediaPersonLink.role == RoleType.WRITER) | (Person.known_for_department == "Writing"))
+        elif role == "Sound":
+            query = query.filter((MediaPersonLink.role == RoleType.SOUND) | (Person.known_for_department == "Sound"))
+            
             
         if gender == "female":
             query = query.filter(Person.gender == 1)

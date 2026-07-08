@@ -194,6 +194,9 @@ class PeopleLibraryService:
         elif normalized_role == "writer":
             query = query.filter(Person.known_for_department == "Writing")
             fallback_name = "Unknown Writer"
+        elif normalized_role == "sound":
+            query = query.filter(Person.known_for_department == "Sound")
+            fallback_name = "Unknown Composer"
 
         people = query.distinct().all()
 

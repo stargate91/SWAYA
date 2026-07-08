@@ -1,6 +1,6 @@
  
-import { createPortal } from 'react-dom';
 import { toTitleCase, formatListAttr } from '../../utils/heroSectionUtils';
+import Drawer from '@/ui/Drawer';
 
 const TIMES_CHAR = '\u00d7';
 const DASH_CHAR = ' - ';
@@ -16,39 +16,18 @@ export default function EntityDetailDrawer({
   overviewText,
   t
 }) {
-  if (!isDrawerOpen || typeof document === 'undefined') {
-    return null;
-  }
-
   const tattooVal = formatListAttr(item.tattoos);
   const piercingVal = formatListAttr(item.piercings);
   const hasAnySpecs = item?.height || item?.weight || item?.measurements || item?.breast_type || item?.hair_color || item?.eye_color || item?.ethnicity || item?.tattoos || item?.piercings || item?.career_start_year || item?.place_of_birth || item?.butt_shape || item?.butt_size;
 
-  return createPortal(
-    <>
-      <div
-        className="entity-detail-page__drawer-backdrop ui-drawer-backdrop"
-        role="button"
-        tabIndex={-1}
-        onClick={() => setIsDrawerOpen(false)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            setIsDrawerOpen(false);
-          }
-        }}
-      />
-      <div className="entity-detail-page__drawer ui-drawer ui-drawer--md">
-        <div className="entity-detail-page__drawer-header">
-          <h3 className="entity-detail-page__drawer-title">{item?.name || overviewTitle}</h3>
-          <button
-            type="button"
-            className="entity-detail-page__drawer-close"
-            onClick={() => setIsDrawerOpen(false)}
-          >
-            {TIMES_CHAR}
-          </button>
-        </div>
-        <div className="entity-detail-page__drawer-content">
+  return (
+    <Drawer
+      isOpen={isDrawerOpen}
+      onClose={() => setIsDrawerOpen(false)}
+      title={item?.name || overviewTitle}
+      size="md"
+    >
+      <div className="entity-detail-page__drawer-content">
           {/* Section 1: Alternate Names */}
           {drawerAliases.length > 0 && (
             <div className="entity-detail-page__drawer-section">
@@ -166,8 +145,6 @@ export default function EntityDetailDrawer({
             </div>
           )}
         </div>
-      </div>
-    </>,
-    document.body
+    </Drawer>
   );
 }

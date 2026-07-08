@@ -279,7 +279,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
       { value: 'scenes', label: t('library.tabs.scenes') || 'Scenes', count: counts[scenesCountKey] ?? 0, icon: Video }
     ] : []),
     { value: 'videos', label: t('library.tabs.videos') || 'Videos', count: counts[videosCountKey] ?? 0, icon: Video },
-    { value: 'people', label: t('library.tabs.people'), count: counts[peopleCountKey], icon: Users },
+    { value: 'people', label: activeSessionMode === 'nsfw' ? (t('library.tabs.adultPeople') || 'Stars') : t('library.tabs.people'), count: counts[peopleCountKey], icon: Users },
     ...(includeTagsTab ? [
       { value: 'tags', label: t('library.tabs.tags'), count: processedTags.length, icon: Tag },
     ] : []),

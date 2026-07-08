@@ -98,7 +98,9 @@ export default function AddPeopleSearch({
                   <div className="add-people-modal__card-info">
                     <strong className="add-people-modal__card-name">{person.name}</strong>
                     <span className="add-people-modal__card-meta add-people-modal__card-meta--wrap">
-                      {person.known_for_department || ''}
+                      {person.known_for_department 
+                        ? (t(`library.people.roles.${person.known_for_department.toLowerCase()}`) || person.known_for_department)
+                        : ''}
                       {Array.isArray(person.known_for) && person.known_for.length > 0 && ` - Known for: ${person.known_for.map(k => k.title || k.name).filter(Boolean).slice(0, 3).join(', ')}`}
                     </span>
                   </div>

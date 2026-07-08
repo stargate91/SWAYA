@@ -152,8 +152,8 @@ class MainstreamResolver:
                 else:
                     year_match = True
                 
-                # Accept NFO match if title is somewhat similar OR year matches
-                if (title_rank > 0) or year_match:
+                # Accept NFO match if title is somewhat similar AND year matches (if target year is known)
+                if title_rank > 0 and (not target_year or year_match):
                     if res.get("item_type") == "tv":
                         res_list = filter_by_season_support([res])
                         if res_list:

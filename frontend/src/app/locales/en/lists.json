@@ -71,7 +71,8 @@
     "directing": "Director",
     "writing": "Writer",
     "performer": "Star",
-    "artist": "Artist"
+    "artist": "Artist",
+    "sound": "Composer"
   },
   "no_status_match": "No items match the selected status filter.",
   "remove_from_watchlist": "Remove from Watchlist",

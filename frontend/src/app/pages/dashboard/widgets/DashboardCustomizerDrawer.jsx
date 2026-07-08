@@ -1,11 +1,9 @@
-import { useRef, useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { GripVertical } from '@/ui/icons';
 import Switch from '@/ui/Switch';
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
-import '../../library/components/entityDetail/EntityDetailHeroSection.css';
-
+import Drawer from '@/ui/Drawer';
 
 export default function DashboardCustomizerDrawer({
   isOpen,
@@ -20,28 +18,7 @@ export default function DashboardCustomizerDrawer({
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const isNsfw = showAdult && sessionMode === 'nsfw';
   const draggedItemRef = useRef(null);
-  const drawerRef = useRef(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleClickOutside = (e) => {
-      if (e.target.closest('button[aria-label="Customize Dashboard"]')) {
-        return;
-      }
-      if (drawerRef.current && !drawerRef.current.contains(e.target)) {
-        onClose();
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside, true);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside, true);
-    };
-  }, [isOpen, onClose]);
-
-  if (!isOpen || typeof document === 'undefined') return null;
 
   const handleDragStart = (e, index) => {
     draggedItemRef.current = index;
@@ -75,45 +52,21 @@ export default function DashboardCustomizerDrawer({
     setDragOverIndex(null);
   };
 
-  return createPortal(
-    <>
-      <div
-        className="entity-detail-page__drawer-backdrop ui-drawer-backdrop"
-        onClick={onClose}
-        onWheel={(e) => {
-          const container = document.querySelector('.shell__content');
-          if (container) {
-            container.scrollBy(0, e.deltaY);
-          } else {
-            window.scrollBy(0, e.deltaY);
-          }
-        }}
-        role="presentation"
-      />
-      <div
-        ref={drawerRef}
-        className="entity-detail-page__drawer ui-drawer ui-drawer--sm dashboard-customizer-drawer"
-        style={{
-          boxShadow: 'var(--shadow-overlay-strong, 0 10px 40px rgba(0,0,0,0.4))',
-        }}
-      >
-        <div className="entity-detail-page__drawer-header">
-          <h3 className="entity-detail-page__drawer-title">
-            {t('dashboard.customize') || 'Customize Dashboard'}
-          </h3>
-          <button
-            type="button"
-            className="entity-detail-page__drawer-close"
-            onClick={onClose}
-          >
-            &times;
-          </button>
-        </div>
-
-        <div className="entity-detail-page__drawer-content" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: 'calc(100vh - 80px)', overflowY: 'auto' }}>
-          <p style={{ margin: 0, fontSize: '13px', color: 'var(--color-text-muted, #888899)', lineHeight: 1.5 }}>
-            {t('dashboard.customize_desc') || 'Select which widgets you want to display on your dashboard.'}
-          </p>
+  return (
+    <Drawer
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t('dashboard.customize') || 'Customize Dashboard'}
+      size="sm"
+      className="dashboard-customizer-drawer"
+      style={{
+        boxShadow: 'var(--shadow-overlay-strong, 0 10px 40px rgba(0,0,0,0.4))',
+      }}
+    >
+      <div className="entity-detail-page__drawer-content" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: 'calc(100vh - 80px)', overflowY: 'auto' }}>
+        <p style={{ margin: 0, fontSize: '13px', color: 'var(--color-text-muted, #888899)', lineHeight: 1.5 }}>
+          {t('dashboard.customize_desc') || 'Select which widgets you want to display on your dashboard.'}
+        </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {widgetOrder.map((key, index) => {
@@ -258,9 +211,7 @@ export default function DashboardCustomizerDrawer({
             })}
           </div>
         </div>
-      </div>
-    </>,
-    document.body
+    </Drawer>
   );
 }
 

@@ -70,6 +70,7 @@ export function getFilteredListItems({
       if (jobFilter === 'actor') return dept === 'Acting';
       if (jobFilter === 'director') return dept === 'Directing' || dept === 'Creator';
       if (jobFilter === 'writer') return dept === 'Writing';
+      if (jobFilter === 'sound') return dept === 'Sound';
       return true;
     });
   }

@@ -282,7 +282,9 @@ export default function PeopleHeroSection({
             };
 
             const genderVal = getGenderLabel(item?.gender);
-            const deptVal = item?.known_for_department || (item?.is_adult ? 'Performer' : 'Artist');
+            const deptVal = item?.known_for_department 
+              ? (t(`library.people.roles.${item.known_for_department.toLowerCase()}`) || item.known_for_department)
+              : (item?.is_adult ? (t('lists.roles.performer') || 'Performer') : (t('lists.roles.artist') || 'Artist'));
 
             return (
               <div className="entity-detail-page__sidebar-info-table">

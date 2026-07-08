@@ -207,6 +207,7 @@ export default function ListsHeader({
                   { value: 'actor', label: t('lists.filter_job_actor') || 'Actor' },
                   { value: 'director', label: t('lists.filter_job_director') || 'Director' },
                   { value: 'writer', label: t('lists.filter_job_writer') || 'Writer' },
+                  { value: 'sound', label: t('library.people.roles.sound') || 'Composer' },
                 ]}
                 themeColor={activeList.color || 'var(--color-accent-blue)'}
               />

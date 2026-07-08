@@ -126,9 +126,44 @@ class OrganizerHelper:
             db.commit()
             return {"ignored_items": len(item_ids)}
 
+        from pathlib import Path
+        paths_to_trash = []
+
+        # Find all extras belonging to the parent items to delete/trash them too
+        related_extra_ids = []
         if item_ids:
+            related_extras = db.query(ExtraFile).filter(ExtraFile.media_item_id.in_(item_ids)).all()
+            for ex in related_extras:
+                related_extra_ids.append(ex.id)
+                if mode == "trash" and ex.current_path:
+                    paths_to_trash.append(Path(ex.current_path))
+
+        if item_ids:
+            if mode == "trash":
+                items = db.query(MediaItem).filter(MediaItem.id.in_(item_ids)).all()
+                for item in items:
+                    if item.current_path:
+                        paths_to_trash.append(Path(item.current_path))
             db.query(MediaItem).filter(MediaItem.id.in_(item_ids)).delete(synchronize_session=False)
-        if extra_ids:
-            db.query(ExtraFile).filter(ExtraFile.id.in_(extra_ids)).delete(synchronize_session=False)
+
+        all_extra_ids = list(set(extra_ids + related_extra_ids))
+        if all_extra_ids:
+            if mode == "trash" and extra_ids:
+                extras = db.query(ExtraFile).filter(ExtraFile.id.in_(extra_ids)).all()
+                for ex in extras:
+                    if ex.current_path:
+                        paths_to_trash.append(Path(ex.current_path))
+            db.query(ExtraFile).filter(ExtraFile.id.in_(all_extra_ids)).delete(synchronize_session=False)
+
         db.commit()
-        return {"deleted_items": len(item_ids), "deleted_extras": len(extra_ids)}
+
+        if mode == "trash" and paths_to_trash:
+            try:
+                from app.infrastructure.filesystem.fs_utils import send_to_trash
+                # Use unique paths to avoid duplicates
+                unique_paths = list(set(paths_to_trash))
+                send_to_trash(unique_paths)
+            except Exception as e:
+                logger.error(f"Failed to send unorganized files to trash: {e}", exc_info=True)
+
+        return {"deleted_items": len(item_ids), "deleted_extras": len(all_extra_ids)}

@@ -17,6 +17,7 @@ import { useUi } from '@/providers/UiProvider';
 import { useQueryClient } from '@tanstack/react-query';
 import { QK } from '@/lib/queryKeys';
 import UniversalImagePickerModal from './modals/UniversalImagePickerModal';
+import SegmentedControl from '@/ui/SegmentedControl';
 import './LibraryPage.css';
 
 export default function LibraryPage({ initialTab = 'movies', lockTab = false, showTabs = true, pageTitle = null }) {
@@ -37,6 +38,8 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
   });
 
   const isAdultMode = state.activeSessionMode === 'nsfw';
+  const utilityBarTarget = typeof document !== 'undefined' ? document.getElementById('shell-utility-bar-center') : null;
+  const showOwnershipSegment = state.resolvedTab === 'movies' || state.resolvedTab === 'tv' || state.resolvedTab === 'scenes';
 
   useEffect(() => {
     if (imagePickerData) {
@@ -127,6 +130,20 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
 
   return (
     <Page className={`library-page ${isAdultMode ? 'library-page--nsfw' : ''}`}>
+      {utilityBarTarget && showOwnershipSegment && createPortal(
+        <SegmentedControl
+          value={state.ownershipFilter}
+          onChange={(val) => {
+            state.setOwnershipFilter(val);
+            state.setCurrentPage(1);
+          }}
+          options={[
+            { value: 'owned', label: state.t('library.filter.have') || 'Have' },
+            { value: 'unowned', label: state.t('library.filter.missing') || 'Missing' },
+          ]}
+        />,
+        utilityBarTarget
+      )}
       <div className="library-main">
         <div className={`organizer-panel ${isAdultMode ? 'organizer-panel--nsfw' : ''}`}>
           <LibraryHeader

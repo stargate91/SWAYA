@@ -58,6 +58,28 @@ def process_people(parser, match: MetadataMatch, details: Dict[str, Any]):
                 person_id=person.id
             )
 
+    # Link Writers
+    writers = [p for p in crew if p.get("job") in ("Writer", "Screenplay")][:2]
+    for idx, writer_member in enumerate(writers):
+        person = person_service.update_or_create_person(
+            name=writer_member["name"],
+            profile_path=writer_member.get("profile_path"),
+            gender=writer_member.get("gender"),
+            is_adult=writer_member.get("adult", False),
+            tmdb_id=str(writer_member["id"]),
+            known_for_department=writer_member.get("known_for_department")
+        )
+        
+        link = parser.people_repo.get_media_person_link(match.id, person.id, RoleType.WRITER)
+        
+        if not link:
+            link = parser.people_repo.create_media_person_link(
+                role=RoleType.WRITER,
+                order=idx,
+                match_id=match.id,
+                person_id=person.id
+            )
+
     # Link Sound/Music
     sound_crew = [p for p in crew if p.get("department") == "Sound" or p.get("job") in ("Original Music Composer", "Music", "Composer")][:2]
     for idx, sound_member in enumerate(sound_crew):

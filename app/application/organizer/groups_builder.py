@@ -225,16 +225,32 @@ class OrganizerGroupsBuilder:
                     p_is_adult = active_match.is_adult if active_match else False
                 parent_is_adults[parent.id] = p_is_adult
 
+        from app.domains.library.services.formatter.models import RenamePreview
+        extra_previews = []
         for ex in extras:
             parent_p_path = parent_planned_paths.get(ex.media_item_id) or ""
             parent_name = Path(parent_p_path).stem if parent_p_path else Path(ex.media_item.filename).stem
             extra_ctx = formatter.build_extra_context(ex, parent_name)
             extra_name = formatter.format_extra_filename(extra_ctx)
-            extra_subpath = formatter.get_extra_subpath(ex)
-            planned_extra_path = Path(parent_p_path).parent if parent_p_path else Path(ex.current_path).parent
-            if extra_subpath:
-                planned_extra_path = planned_extra_path / extra_subpath
-            planned_extra_path = planned_extra_path / extra_name
+            extra_subpath = formatter.get_extra_subpath(ex) or ""
+            dest_root = str(Path(parent_p_path).parent if parent_p_path else Path(ex.current_path).parent).replace("\\", "/")
+
+            preview = RenamePreview(
+                item_id=ex.media_item_id,
+                original_path=ex.current_path,
+                target_name=extra_name,
+                target_subpath=extra_subpath,
+                item_type="extra",
+                destination_root=dest_root,
+                extra_id=ex.id,
+            )
+            extra_previews.append(preview)
+
+        formatter.resolve_collisions(extra_previews)
+
+        for ex, preview in zip(extras, extra_previews):
+            parent_p_path = parent_planned_paths.get(ex.media_item_id) or ""
+            parent_name = Path(parent_p_path).stem if parent_p_path else Path(ex.media_item.filename).stem
             groups["extras"].append({
                 "id": ex.id,
                 "parent_id": ex.media_item_id,
@@ -247,7 +263,7 @@ class OrganizerGroupsBuilder:
                 "subtype": ex.subtype.value if ex.subtype else "other",
                 "language": ex.language,
                 "path": ex.current_path,
-                "planned_path": str(planned_extra_path).replace("\\", "/"),
+                "planned_path": str(preview.target_path).replace("\\", "/"),
                 "action": "rename",
                 "parent_scan_mode": parent_scan_modes.get(ex.media_item_id, ""),
                 "parent_is_adult": parent_is_adults.get(ex.media_item_id, False)

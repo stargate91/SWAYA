@@ -29,7 +29,8 @@
       "screenplay": "Screenplay",
       "acting": "Actor",
       "directing": "Director",
-      "writing": "Writer"
+      "writing": "Writer",
+      "sound": "Composer"
     }
   },
   "addPeople": {

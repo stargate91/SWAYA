@@ -1,0 +1,35 @@
+.ui-drawer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md, 16px) var(--space-lg, 24px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-bg-elevated) !important;
+  position: relative;
+  z-index: 10;
+}
+
+.ui-drawer__title {
+  margin: 0;
+  font-size: var(--font-size-lg, 18px);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.ui-drawer__close {
+  background: none !important;
+  border: none !important;
+  color: var(--color-text-secondary) !important;
+  cursor: pointer !important;
+  transition: color var(--motion-duration-base, 0.2s) var(--motion-ease-standard, ease) !important;
+}
+
+.ui-drawer__close:hover {
+  color: var(--color-text-primary) !important;
+  background: none !important;
+}
+
+.ui-drawer__content {
+  flex: 1;
+  overflow-y: auto;
+}

@@ -40,7 +40,7 @@ export default function AddPeopleLocal({
     include_inactive: true,
     adult_only: isAdult,
     search: searchQuery.trim() || undefined,
-    role: roleFilter !== 'all' ? (roleFilter === 'actor' ? 'Actor' : roleFilter === 'director' ? 'Director' : 'Writer') : undefined,
+    role: roleFilter !== 'all' ? ({ actor: 'Actor', director: 'Director', writer: 'Writer', sound: 'Sound' }[roleFilter]) : undefined,
     gender: hideGenderFilter ? settings.adult_gender_preference : (genderFilter !== 'all' ? genderFilter : undefined),
     sort_by: sortBy === 'library_count' ? `library_count_${sortDirection}` : `name_${sortDirection}`,
   });
@@ -95,6 +95,7 @@ export default function AddPeopleLocal({
               { value: 'actor', label: t('library.people.roles.actor') || 'Actor' },
               { value: 'director', label: t('library.people.roles.director') || 'Director' },
               { value: 'writer', label: t('library.people.roles.writer') || 'Writer' },
+              { value: 'sound', label: t('library.people.roles.sound') || 'Composer' },
             ]}
           />
         </div>
@@ -203,7 +204,9 @@ export default function AddPeopleLocal({
                   <div className="add-people-modal__card-info">
                     <strong className="add-people-modal__card-name">{person.name}</strong>
                     <span className="add-people-modal__card-meta">
-                      {person.known_for || ''}
+                      {person.known_for 
+                        ? (t(`library.people.roles.${person.known_for.toLowerCase()}`) || person.known_for)
+                        : ''}
                     </span>
                   </div>
                 </div>
