@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Tooltip from '@/ui/Tooltip';
 import Pill from '@/ui/Pill';
@@ -19,15 +18,13 @@ const CardMetadata = memo(function CardMetadata({
   subtitleRowClassName = 'ui-poster-card__subtitle-row',
   subtitleClassName = 'ui-poster-card__subtitle',
 }) {
-  const navigate = useNavigate();
-
   if (!title && !subtitle && (!performers || performers.length === 0) && !ratingImdb && !ratingTmdb && !ratingPorndb && !ratingPill) {
     return null;
   }
 
   const handlePerformerClick = (e, p) => {
     e.stopPropagation();
-    navigate(`/library/people/${p.id}`, { state: { allowAdult: true } });
+    window.location.hash = `/library/people/${p.id}`;
   };
 
   const renderRating = () => {

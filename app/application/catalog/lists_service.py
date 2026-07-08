@@ -603,6 +603,9 @@ class ListsService:
         self.db.add(item)
         self.db.commit()
 
+        # Serialize the item first while it is fresh in the session and definitely exists
+        serialized_fallback = self._serialize_item(item)
+
         # Track the item immediately so it gets enriched and fully imported into the database
         try:
             from app.domains.users.services.overrides_service import OverridesService
@@ -637,10 +640,15 @@ class ListsService:
             self.db.refresh(item)
             if item.match:
                 self.db.refresh(item.match)
+            return self._serialize_item(item)
         except Exception:
-            pass
-
-        return self._serialize_item(item)
+            try:
+                db_item = self.db.query(CustomListItem).filter(CustomListItem.id == serialized_fallback["id"]).first()
+                if db_item:
+                    return self._serialize_item(db_item)
+            except Exception:
+                pass
+            return serialized_fallback
 
     def remove_item_from_list(self, list_id: int, item_id: int) -> Dict[str, Any]:
         item = self.db.query(CustomListItem).filter(CustomListItem.list_id == list_id, CustomListItem.id == item_id).first()
