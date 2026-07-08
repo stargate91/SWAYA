@@ -297,6 +297,7 @@ export default function SearchPage() {
                 return (
                   <PosterCard
                     key={`${item.id}-${item.media_type}-${idx}`}
+                    aspect={item.media_type === 'scene' ? 'landscape' : 'poster'}
                     className={item.media_type === 'scene' ? 'library-scene-card' : ''}
                     title={item.title || item.name}
                     subtitle={subtitle}

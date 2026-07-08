@@ -270,6 +270,7 @@ export const LibraryPosterCard = memo(({
 
   return (
     <PosterCard
+      aspect={isLibraryScenes ? 'landscape' : 'poster'}
       customStyle={{ '--item-index': index }}
       onClick={() => onItemClick(item)}
       isWatched={item.is_watched}

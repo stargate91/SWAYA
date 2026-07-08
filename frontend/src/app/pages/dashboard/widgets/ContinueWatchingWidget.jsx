@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Play, Minus, ChevronLeft, ChevronRight } from '@/ui/icons';
-import IconButton from '../../../ui/IconButton';
+import PosterCard from '../../../ui/PosterCard';
 import { useContinueWatchingQuery } from '../../../queries';
 import { usePlayMediaMutation, useResetProgressMutation, useSettingsQuery } from '../../../queries';
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
@@ -24,18 +24,15 @@ const ContinueWatchingWidget = ({ T }) => {
   const updateArrows = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
-    setShowLeft(el.scrollLeft > 10);
-    setShowRight(el.scrollWidth > el.clientWidth && el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setShowLeft(scrollLeft > 10);
+    setShowRight(scrollLeft + clientWidth < scrollWidth - 10);
   }, []);
 
   useEffect(() => {
     updateArrows();
-    const timer = setTimeout(updateArrows, 100);
     window.addEventListener('resize', updateArrows);
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('resize', updateArrows);
-    };
+    return () => window.removeEventListener('resize', updateArrows);
   }, [items, updateArrows]);
 
   const scroll = (direction) => {
@@ -75,9 +72,11 @@ const ContinueWatchingWidget = ({ T }) => {
           const resolvedImageUrl = resolveMediaImageUrl(imagePath, item.still_path ? 'still' : 'backdrop');
 
           return (
-            <div
+            <PosterCard
               key={`cw-${item.id}`}
+              aspect="landscape"
               className={`continue-watching-card ${item.is_active ? 'continue-watching-card--active' : ''}`}
+              imageUrl={resolvedImageUrl}
               onClick={() => {
                 const preferredPlayer = settings.preferred_player || 'swaya';
                 if (item.is_active && preferredPlayer !== 'swaya') return;
@@ -85,10 +84,21 @@ const ContinueWatchingWidget = ({ T }) => {
                   playMutation.mutate(item.id);
                 }
               }}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
+              topRightAction={
+                <button
+                  className="continue-watching-remove"
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    resetProgressMutation.mutate(item.id);
+                  }}
+                  title={T('dashboard.continue_watching.remove') || 'Remove progress'}
+                >
+                  <Minus size={14} color="var(--color-text-primary)" />
+                </button>
+              }
+              playOverlay={{
+                icon: <Play size={18} fill="currentColor" />,
+                onClick: () => {
                   const preferredPlayer = settings.preferred_player || 'swaya';
                   if (item.is_active && preferredPlayer !== 'swaya') return;
                   if (item.type === 'episode' || item.type === 'movie' || item.type === 'scene') {
@@ -97,43 +107,13 @@ const ContinueWatchingWidget = ({ T }) => {
                 }
               }}
             >
-              <button
-                className="continue-watching-remove"
-                onClick={async (e) => {
-                  e.stopPropagation();
-                  resetProgressMutation.mutate(item.id);
-                }}
-                title={T('dashboard.continue_watching.remove') || 'Remove progress'}
-              >
-                <Minus size={14} color="var(--color-text-primary)" />
-              </button>
-
-              {resolvedImageUrl ? (
-                <img
-                  src={resolvedImageUrl}
-                  alt=""
-                  className="continue-watching-image"
-                />
-              ) : (
-                <div className="continue-watching-fallback" />
-              )}
-
               <div className="continue-watching-overlay" />
-
-              <IconButton
-                variant="play-overlay"
-                className={item.is_active ? 'continue-watching-play-active' : ''}
-              >
-                <Play size={18} fill="currentColor" />
-              </IconButton>
-
               <div className="continue-watching-progress-track">
                 <svg viewBox="0 0 100 4" preserveAspectRatio="none" className="continue-watching-progress-svg">
                   <rect x="0" y="0" width="100" height="4" className="continue-watching-progress-bg" />
                   <rect x="0" y="0" width={progressPercent} height="4" className="continue-watching-progress-fill" />
                 </svg>
               </div>
-
               <div className="continue-watching-copy">
                 <div className="continue-watching-title">
                   {item.series_title || item.title}
@@ -149,7 +129,7 @@ const ContinueWatchingWidget = ({ T }) => {
                   ) : null}
                 </div>
               </div>
-            </div>
+            </PosterCard>
           );
         })}
       </div>

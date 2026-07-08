@@ -21,6 +21,8 @@ import { API_BASE } from '../../../lib/backend';
 import api from '../../../lib/api';
 import TMDBDiscoveryWidget from './TMDBDiscoveryWidget';
 import Skeleton from '../../../ui/Skeleton';
+import PosterCard from '../../../ui/PosterCard';
+import AdultOverlay from '../../../ui/AdultOverlay';
 
 const ADULT_LABEL = '18+';
 
@@ -241,89 +243,58 @@ const RecommendationCarousel = ({
             }
 
             return (
-              <div
+              <PosterCard
                 key={item.id}
-                className={`recommend-card ${n.isScene ? 'recommend-card--scene' : ''}`}
+                className={`recommend-card ${n.isScene ? 'recommend-card--scene' : ''} ${n.shouldBlur ? 'is-blurred' : ''}`}
+                imageUrl={posterUrl}
+                onClick={() => onCardClick(item)}
+                title={item.title || item.name}
+                subtitle={subtitle}
+                ratingImdb={n.ratingImdb}
+                ratingTmdb={n.ratingTmdb}
+                ratingPorndb={n.ratingPorndb}
+                topRightBadge={renderFavoriteBadge(item, T)}
+                badge={renderUserRatingBadge(item)}
+                previewItemId={item.id}
+                previewEnabled={n.isScene && !n.shouldBlur}
+                playOverlay={!n.isPerson && item.in_library && onPlayClick ? {
+                  icon: <Play size={12} fill="currentColor" />,
+                  onClick: (e) => onPlayClick(e, item),
+                  title: T('library.details.play') || 'Play',
+                  disabled: playMutationPending
+                } : null}
               >
-                <div
-                  className={`recommend-card-poster-shell ${n.shouldBlur ? 'is-blurred' : ''}`}
-                  onClick={() => onCardClick(item)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      onCardClick(item);
-                    }
-                  }}
-                >
-                  {posterUrl && (
-                    <img
-                      key={posterUrl}
-                      src={posterUrl}
-                      alt={item.title || item.name}
-                      className="recommend-card-image"
-                    />
-                  )}
-                  {n.shouldBlur && (
-                    <div className="recommend-card-blur-overlay">
-                      <span className="settings-badge settings-badge--danger">{ADULT_LABEL}</span>
-                    </div>
-                  )}
-                  {renderUserRatingBadge(item)}
-                  {renderFavoriteBadge(item, T)}
-                  {!n.isPerson && (
-                    <div className="recommend-card-overlay">
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onWatchlist(item.id, item.title ? 'movie' : 'tv');
-                        }}
-                        className={`recommend-card-watchlist-btn ${isWatchlisted ? 'is-active' : ''}`}
-                        variant="unstyled"
-                      >
-                        {isWatchlisted ? (
-                          <>
-                            <span className="watchlist-btn-state-default">
-                              <Check size={12} strokeWidth={3} /> {T('dashboard.watchlist.added') || 'Watchlisted'}
-                            </span>
-                            <span className="watchlist-btn-state-hover">
-                              <Minus size={12} strokeWidth={3} /> {T('common.remove') || 'Remove'}
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <Plus size={12} strokeWidth={3} /> {T('dashboard.watchlist.add_short') || 'Watchlist'}
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  )}
-                  {!n.isPerson && item.in_library && onPlayClick && (
-                    <IconButton
-                      variant="play-overlay"
-                      onClick={(e) => onPlayClick(e, item)}
-                      title={T('library.details.play') || 'Play'}
-                      label={T('library.details.play') || 'Play'}
-                      disabled={playMutationPending}
+                {n.shouldBlur && (
+                  <AdultOverlay variant="blur" badgeText={ADULT_LABEL} />
+                )}
+                {!n.isPerson && (
+                  <div className="recommend-card-overlay">
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onWatchlist(item.id, item.title ? 'movie' : 'tv');
+                      }}
+                      className={`ui-card-action-btn ${isWatchlisted ? '' : 'ui-card-action-btn--neutral'}`}
+                      variant="unstyled"
                     >
-                      <Play size={12} fill="currentColor" />
-                    </IconButton>
-                  )}
-                </div>
-
-                <CardMetadata
-                  title={item.title || item.name}
-                  onTitleClick={() => onCardClick(item)}
-                  subtitle={subtitle}
-                  ratingImdb={n.ratingImdb}
-                  ratingTmdb={n.ratingTmdb}
-                  ratingPorndb={n.ratingPorndb}
-                  className="recommend-card-meta"
-                  titleClassName="recommend-card-name"
-                  subtitleRowClassName="recommend-card-secondary"
-                  subtitleClassName=""
-                />
-              </div>
+                      {isWatchlisted ? (
+                        <>
+                          <span className="action-btn-state-default">
+                            <Check size={12} strokeWidth={3} /> {T('dashboard.watchlist.added') || 'Watchlisted'}
+                          </span>
+                          <span className="action-btn-state-hover">
+                            <Minus size={12} strokeWidth={3} /> {T('common.remove') || 'Remove'}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <Plus size={12} strokeWidth={3} /> {T('dashboard.watchlist.add_short') || 'Watchlist'}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </PosterCard>
             );
           })}
           {isLoadingMore && (

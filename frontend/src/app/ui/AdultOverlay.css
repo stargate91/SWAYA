@@ -1,0 +1,42 @@
+.ui-adult-overlay {
+  position: absolute;
+  inset: -10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 10;
+  border-radius: 0 !important;
+}
+
+/* Obscure variant - solid dark background */
+.ui-adult-overlay--obscure {
+  background: color-mix(in srgb, black 95%, transparent);
+  transition: opacity var(--motion-duration-slow) var(--motion-ease-standard), background-color var(--motion-duration-slow) var(--motion-ease-standard);
+}
+
+/* Blur variant - frosted glass/backdrop blur */
+.ui-adult-overlay--blur {
+  background: color-mix(in srgb, black 70%, transparent);
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  transition: backdrop-filter var(--motion-duration-slow) var(--motion-ease-standard),
+              -webkit-backdrop-filter var(--motion-duration-slow) var(--motion-ease-standard),
+              opacity var(--motion-duration-slow) var(--motion-ease-standard),
+              background-color var(--motion-duration-slow) var(--motion-ease-standard);
+}
+
+/* Reveal overlays on parent hover */
+.ui-poster-card:hover .ui-adult-overlay--obscure,
+.lists-card:hover .ui-adult-overlay--obscure {
+  background: transparent;
+  opacity: 0;
+}
+
+.ui-poster-card:hover .ui-adult-overlay--blur,
+.lists-card:hover .ui-adult-overlay--blur {
+  backdrop-filter: blur(0px) !important;
+  -webkit-backdrop-filter: blur(0px) !important;
+  background: transparent;
+  opacity: 0;
+}

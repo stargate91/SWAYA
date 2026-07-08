@@ -4,12 +4,14 @@ import IconButton from './IconButton';
 import CardMetadata from './CardMetadata';
 import { Check } from '@/ui/icons';
 import { API_BASE } from '@/lib/backend';
+import { useSettingsQuery } from '@/queries/settingsQueries';
 import './PosterCard.css';
 
 const PosterCard = memo(function PosterCard({
   as: Component,
   className = '',
   variant = 'default',
+  aspect = 'poster', // 'poster' or 'landscape'
   imageUrl,
   backgroundColor,
   icon: IconComponent,
@@ -49,12 +51,16 @@ const PosterCard = memo(function PosterCard({
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
+  const { data: settings = {} } = useSettingsQuery();
+  const hoverPreviewsEnabled = settings.hover_previews_enabled !== false;
+  const hoverPreviewsDelay = settings.hover_previews_delay ?? previewDelay;
+
   useEffect(() => {
     setImageError(false);
   }, [imageUrl]);
 
   useEffect(() => {
-    if (!previewItemId || !previewEnabled || !isHovered) {
+    if (!previewItemId || !previewEnabled || !isHovered || !hoverPreviewsEnabled) {
       setPreviewSrc(null);
       setIsLoadingPreview(false);
       setIsVideoPlaying(false);
@@ -83,7 +89,7 @@ const PosterCard = memo(function PosterCard({
           setIsLoadingPreview(false);
         }
       }
-    }, previewDelay);
+    }, hoverPreviewsDelay);
 
     return () => {
       active = false;
@@ -92,7 +98,7 @@ const PosterCard = memo(function PosterCard({
         controller.abort();
       }
     };
-  }, [isHovered, previewItemId, previewEnabled, previewDelay]);
+  }, [isHovered, previewItemId, previewEnabled, hoverPreviewsDelay, hoverPreviewsEnabled]);
 
   const handleKeyDown = (e) => {
     if (onClick && (e.key === 'Enter' || e.key === ' ')) {
@@ -101,7 +107,7 @@ const PosterCard = memo(function PosterCard({
     }
   };
 
-  const cardClassName = `ui-poster-card ${isOverlayTitle ? 'ui-poster-card--overlay-title' : ''} ${active ? 'is-active' : ''} ${className}`.trim();
+  const cardClassName = `ui-poster-card ui-poster-card--aspect-${aspect} ${isOverlayTitle ? 'ui-poster-card--overlay-title' : ''} ${active ? 'is-active' : ''} ${className}`.trim();
 
   const interactiveProps = {};
   if (DefaultComponent === 'div' && isInteractive) {
@@ -146,7 +152,7 @@ const PosterCard = memo(function PosterCard({
                 {placeholderText && <span className="ui-poster-card__placeholder-text">{placeholderText}</span>}
               </div>
             )}
-            {isHovered && previewItemId && previewEnabled && !isVideoPlaying && (
+            {isHovered && previewItemId && previewEnabled && hoverPreviewsEnabled && !isVideoPlaying && (
               <div
                 style={{
                   position: 'absolute',

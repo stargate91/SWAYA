@@ -98,20 +98,22 @@
   }
 }
 
-.stat-card {
+.stat-card,
+.insights-panel {
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-5xl);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-2xl);
   background:
     radial-gradient(circle at top right, color-mix(in srgb, var(--color-accent-blue-soft) 12%, transparent), transparent 42%),
     linear-gradient(180deg, color-mix(in srgb, var(--color-surface-glass) 72%, transparent), var(--color-surface-card));
-  padding: var(--space-5xl);
-  position: relative;
-  overflow: hidden;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-2xl);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
 }
 
-.stat-card::after {
+.stat-card::after,
+.insights-panel::after {
   content: '';
   position: absolute;
   top: 0;
@@ -122,7 +124,8 @@
   opacity: 0.72;
 }
 
-.stat-card::before {
+.stat-card::before,
+.insights-panel::before {
   content: '';
   position: absolute;
   inset: auto -18% -42% auto;
@@ -167,40 +170,8 @@
 }
 
 .insights-panel {
-  position: relative;
   flex: 1;
-  overflow: hidden;
-  padding: var(--space-5xl);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-2xl);
-  background:
-    radial-gradient(circle at top right, color-mix(in srgb, var(--color-accent-blue-soft) 12%, transparent), transparent 42%),
-    linear-gradient(180deg, color-mix(in srgb, var(--color-surface-glass) 72%, transparent), var(--color-surface-card));
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
   min-width: 320px;
-}
-
-.insights-panel::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: var(--color-accent-gradient);
-  opacity: 0.72;
-}
-
-.insights-panel::before {
-  content: '';
-  position: absolute;
-  inset: auto -18% -42% auto;
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  background: radial-gradient(circle, color-mix(in srgb, var(--color-accent-blue) 18%, transparent) 0%, transparent 68%);
-  pointer-events: none;
 }
 
 .insights-panel-title {
@@ -508,20 +479,34 @@
 }
 
 .continue-watching-card {
-  position: relative;
-  min-width: 280px;
-  width: 280px;
-  height: 160px;
-  overflow: hidden;
-  border-radius: 16px;
-  background: var(--color-bg-elevated);
-  cursor: pointer;
-  box-shadow: 0 10px 25px color-mix(in srgb, black 30%, transparent);
-  transition: transform var(--motion-duration-hover) var(--motion-ease-hover), box-shadow var(--motion-duration-hover) var(--motion-ease-hover);
-  border: 1px solid var(--color-border-subtle);
+  min-width: 280px !important;
+  width: 280px !important;
+  transform: none !important;
+  transition: none !important;
 }
 
-/* No hover transform, border, or shadow changes on card */
+.continue-watching-card:hover {
+  transform: none !important;
+}
+
+
+
+.continue-watching-card .ui-poster-card__image-wrapper {
+  border-radius: 16px !important;
+  box-shadow: 0 10px 25px color-mix(in srgb, black 30%, transparent) !important;
+  border: 1px solid var(--color-border-subtle) !important;
+  background: var(--color-bg-elevated) !important;
+}
+
+.continue-watching-card .ui-poster-card__image {
+  opacity: 0.75;
+  transition: opacity var(--motion-duration-hover) var(--motion-ease-hover), transform var(--motion-duration-hover) var(--motion-ease-hover) !important;
+}
+
+.continue-watching-card:hover .ui-poster-card__image {
+  opacity: 0.9 !important;
+  transform: scale(1.06) !important;
+}
 
 .continue-watching-remove {
   position: absolute;
@@ -549,7 +534,7 @@
   cursor: default !important;
 }
 
-.continue-watching-card--active .continue-watching-image {
+.continue-watching-card--active .ui-poster-card__image {
   opacity: 0.45 !important;
 }
 
@@ -574,25 +559,6 @@
     transform: translate(-50%, -50%) scale(1);
     box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent-blue) 40%, transparent);
   }
-}
-
-.continue-watching-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.75;
-  transition: opacity var(--motion-duration-hover) var(--motion-ease-hover), transform var(--motion-duration-hover) var(--motion-ease-hover);
-}
-
-.continue-watching-card:hover .continue-watching-image {
-  opacity: 0.9;
-  transform: scale(1.06);
-}
-
-.continue-watching-fallback {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(45deg, var(--color-bg-app), var(--color-surface-card));
 }
 
 .continue-watching-overlay {
@@ -847,61 +813,29 @@
 }
 
 .recommend-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-  min-width: 200px;
-  width: 200px;
-  flex-shrink: 0;
-  overflow: visible;
-  border-radius: 0;
-  background: transparent;
-  scroll-snap-align: start;
-  transition: var(--motion-spring), box-shadow var(--motion-duration-slow) var(--motion-ease-standard);
-}
-
-.recommend-card:hover {
-  transform: translateY(-4px);
+  min-width: 200px !important;
+  width: 200px !important;
 }
 
 .recommend-card--scene {
-  min-width: 414px;
-  width: 414px;
+  min-width: 414px !important;
+  width: 414px !important;
 }
 
-.recommend-card--scene .recommend-card-poster-shell {
-  padding-bottom: 72.46% !important;
-  /* aspect-ratio 1.38 (maintains 300px height matching portrait cards) */
+.recommend-card .ui-poster-card__image-wrapper {
+  border-radius: 16px !important;
+  background: var(--color-bg-elevated) !important;
+  border: 1px solid var(--color-border-subtle) !important;
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-bg-app, black) 28%, transparent) !important;
+  transition: box-shadow var(--motion-duration-slow) var(--motion-ease-standard) !important;
 }
 
-.recommend-card-poster-shell {
-  position: relative;
-  overflow: hidden;
-  border-radius: 16px;
-  background: var(--color-bg-elevated);
-  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-bg-app, black) 28%, transparent);
-  padding-bottom: 150%;
-  transition: box-shadow var(--motion-duration-slow) var(--motion-ease-standard);
-  border: 1px solid var(--color-border-subtle);
-  cursor: pointer;
+.recommend-card:hover .ui-poster-card__image-wrapper {
+  box-shadow: 0 12px 24px var(--color-surface-overlay) !important;
 }
 
-.recommend-card:hover .recommend-card-poster-shell {
-  box-shadow: 0 12px 24px var(--color-surface-overlay);
-}
-
-.recommend-card-image {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: var(--motion-zoom);
-}
-
-.recommend-card:hover .recommend-card-image {
-  transform: scale(1.02) !important;
+.recommend-card--scene .ui-poster-card__media {
+  aspect-ratio: 414 / 300 !important;
 }
 
 .recommend-card-overlay {
@@ -920,14 +854,14 @@
   opacity: 1;
 }
 
-.recommend-card-meta {
+.recommend-card .ui-poster-card__details {
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
   padding: 0 var(--space-2xs);
 }
 
-.recommend-card-name {
+.recommend-card .ui-poster-card__title {
   overflow: hidden;
   color: var(--color-text-primary);
   font-size: 14px;
@@ -937,7 +871,7 @@
   white-space: nowrap;
 }
 
-.recommend-card-secondary {
+.recommend-card .ui-poster-card__subtitle-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -948,112 +882,9 @@
   font-weight: 600;
 }
 
-.recommend-card-ratings {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-}
 
-.recommend-card-year {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
-.recommend-card-watchlist-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-xs);
-  min-height: 30px;
-  padding: 0 var(--space-xl);
-  border-radius: var(--radius-full, 9999px);
-  border: 1px solid var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent));
-  background-color: color-mix(in srgb, var(--app-shell-color-panel, black) 82%, transparent);
-  background-image: var(--button-secondary-bg);
-  color: var(--button-secondary-color, var(--color-text-secondary));
-  box-shadow: 0 4px 10px color-mix(in srgb, black 35%, transparent);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 5;
-  cursor: pointer;
-  pointer-events: auto;
-  transform: translateY(4px);
-  transition: opacity var(--motion-duration-fast) var(--motion-ease-standard), transform var(--motion-duration-fast) var(--motion-ease-standard), color var(--motion-duration-fast) var(--motion-ease-standard), border-color var(--motion-duration-fast) var(--motion-ease-standard), background-color var(--motion-duration-fast) var(--motion-ease-standard);
-}
 
-.recommend-card:hover .recommend-card-watchlist-btn {
-  transform: translateY(0);
-}
-
-.recommend-card-watchlist-btn:hover {
-  color: var(--color-text-primary);
-  border-color: color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
-}
-
-.recommend-card-watchlist-btn.is-active {
-  border-color: color-mix(in srgb, var(--color-state-success) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
-  color: var(--color-state-success);
-}
-
-.recommend-card-watchlist-btn.is-active:hover {
-  border-color: color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
-  color: var(--color-state-danger);
-}
-
-.recommend-card-watchlist-btn .watchlist-btn-state-default {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-xs);
-}
-
-.recommend-card-watchlist-btn .watchlist-btn-state-hover {
-  display: none !important;
-}
-
-.recommend-card-watchlist-btn:hover .watchlist-btn-state-default {
-  display: none !important;
-}
-
-.recommend-card-watchlist-btn:hover .watchlist-btn-state-hover {
-  display: inline-flex !important;
-  align-items: center;
-  gap: var(--space-xs);
-}
-
-.recommend-card-poster-shell.is-blurred img {
-  filter: blur(28px) saturate(110%);
-  transition: filter var(--motion-duration-slow) var(--motion-ease-standard);
-}
-
-.recommend-card:hover .recommend-card-poster-shell.is-blurred img {
-  filter: blur(0px) saturate(100%);
-}
-
-.recommend-card-blur-overlay {
-  position: absolute;
-  inset: -10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: color-mix(in srgb, black 70%, transparent);
-  backdrop-filter: blur(28px) !important;
-  -webkit-backdrop-filter: blur(28px) !important;
-  pointer-events: none;
-  z-index: 10;
-  transition: backdrop-filter var(--motion-duration-slow) var(--motion-ease-standard), -webkit-backdrop-filter var(--motion-duration-slow) var(--motion-ease-standard), opacity var(--motion-duration-slow) var(--motion-ease-standard), background-color var(--motion-duration-slow) var(--motion-ease-standard);
-  border-radius: 0 !important;
-}
-
-.recommend-card:hover .recommend-card-blur-overlay {
-  backdrop-filter: blur(0px) !important;
-  -webkit-backdrop-filter: blur(0px) !important;
-  background: transparent;
-  opacity: 0;
-}
 
 /* Dashboard Drawer Customizer Styles */
 .dashboard-customizer-drawer {

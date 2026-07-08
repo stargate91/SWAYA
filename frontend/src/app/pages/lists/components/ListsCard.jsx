@@ -5,6 +5,7 @@ import { Check, Minus, Star } from '@/ui/icons';
 import Pill from '@/ui/Pill';
 import CardMetadata from '@/ui/CardMetadata';
 import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
+import AdultOverlay from '@/ui/AdultOverlay';
 
 export default function ListsCard({
   item,
@@ -74,11 +75,7 @@ export default function ListsCard({
           <div className="lists-card__placeholder" />
         )}
         {shouldBlur && (
-          <div className="recommend-card-blur-overlay">
-            <span className="settings-badge settings-badge--danger">
-              {t('common.adult_badge', { defaultValue: '18+' })}
-            </span>
-          </div>
+          <AdultOverlay variant="blur" badgeText={t('common.adult_badge', { defaultValue: '18+' })} />
         )}
       </div>
       <CardMetadata

@@ -13,6 +13,7 @@ import CardMetadata from '../../../ui/CardMetadata';
 import Dropdown from '../../../ui/Dropdown';
 import DashboardWidgetShell from './DashboardWidgetShell';
 import { API_BASE } from '../../../lib/backend';
+import PosterCard from '../../../ui/PosterCard';
 
 const GENRES = [
   { value: '', label: 'All Genres' },
@@ -201,68 +202,42 @@ const TMDBDiscoveryWidget = ({ T }) => {
                 const yearLabel = item.release_date ? new Date(item.release_date).getFullYear() : null;
 
                 return (
-                  <div
+                  <PosterCard
                     key={item.id}
                     className="recommend-card"
+                    imageUrl={posterUrl}
+                    onClick={() => handleCardClick(item)}
+                    title={item.title}
+                    subtitle={yearLabel ? String(yearLabel) : null}
+                    ratingImdb={ratingImdb}
+                    ratingTmdb={ratingTmdb}
                   >
-                    <div
-                      className="recommend-card-poster-shell"
-                      onClick={() => handleCardClick(item)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          handleCardClick(item);
-                        }
-                      }}
-                    >
-                      {posterUrl && (
-                        <img
-                          src={posterUrl}
-                          alt={item.title}
-                          className="recommend-card-image"
-                          loading="lazy"
-                        />
-                      )}
-                      <div className="recommend-card-overlay">
-                        <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleWatchlist(item.id, isWatchlisted);
-                          }}
-                          className={`recommend-card-watchlist-btn ${isWatchlisted ? 'is-active' : ''}`}
-                          variant="unstyled"
-                        >
-                          {isWatchlisted ? (
-                            <>
-                              <span className="watchlist-btn-state-default">
-                                <Check size={12} strokeWidth={3} /> {T('dashboard.watchlist.added') || 'Watchlisted'}
-                              </span>
-                              <span className="watchlist-btn-state-hover">
-                                <Minus size={12} strokeWidth={3} /> {T('common.remove') || 'Remove'}
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <Plus size={12} strokeWidth={3} /> {T('dashboard.watchlist.add_short') || 'Watchlist'}
-                            </>
-                          )}
-                        </Button>
-                      </div>
+                    <div className="recommend-card-overlay">
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleWatchlist(item.id, isWatchlisted);
+                        }}
+                        className={`ui-card-action-btn ${isWatchlisted ? '' : 'ui-card-action-btn--neutral'}`}
+                        variant="unstyled"
+                      >
+                        {isWatchlisted ? (
+                          <>
+                            <span className="action-btn-state-default">
+                              <Check size={12} strokeWidth={3} /> {T('dashboard.watchlist.added') || 'Watchlisted'}
+                            </span>
+                            <span className="action-btn-state-hover">
+                              <Minus size={12} strokeWidth={3} /> {T('common.remove') || 'Remove'}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <Plus size={12} strokeWidth={3} /> {T('dashboard.watchlist.add_short') || 'Watchlist'}
+                          </>
+                        )}
+                      </Button>
                     </div>
-
-                    <CardMetadata
-                      title={item.title}
-                      onTitleClick={() => handleCardClick(item)}
-                      subtitle={yearLabel ? String(yearLabel) : null}
-                      ratingImdb={ratingImdb}
-                      ratingTmdb={ratingTmdb}
-                      className="recommend-card-meta"
-                      titleClassName="recommend-card-name"
-                      subtitleRowClassName="recommend-card-secondary"
-                      subtitleClassName=""
-                    />
-                  </div>
+                  </PosterCard>
                 );
               })}
             </div>
