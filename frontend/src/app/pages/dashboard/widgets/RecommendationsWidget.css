@@ -261,3 +261,8 @@
   padding: var(--space-10);
   color: var(--color-text-muted);
 }
+
+.recommend-card-scene-date {
+  text-align: right;
+  flex: none;
+}

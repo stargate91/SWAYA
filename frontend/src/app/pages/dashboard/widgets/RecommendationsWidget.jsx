@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, useEffect } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { Check, ChevronLeft, ChevronRight, Star, Plus, Minus, Play, Heart } from '@/ui/icons';
@@ -13,9 +13,7 @@ import {
 import { useSettingsQuery } from '../../../queries/settingsQueries';
 import { usePlayMediaMutation } from '../../../queries';
 import Button from '../../../ui/Button';
-import IconButton from '../../../ui/IconButton';
 import Badge from '../../../ui/Badge';
-import CardMetadata from '../../../ui/CardMetadata';
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 import { API_BASE } from '../../../lib/backend';
 import api from '../../../lib/api';
@@ -220,7 +218,7 @@ const RecommendationCarousel = ({
             } else if (n.isScene) {
               subtitle = (
                 <div className="ui-poster-card__subtitle-row">
-                  <span className="ui-poster-card__subtitle" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span className="ui-poster-card__subtitle">
                     {performers.map((p, idx) => (
                       <span
                         key={p.id}
@@ -237,7 +235,7 @@ const RecommendationCarousel = ({
                       </span>
                     ))}
                   </span>
-                  {displayDate && <span className="ui-poster-card__subtitle" style={{ textAlign: 'right', flex: 'none' }}>{displayDate}</span>}
+                  {displayDate && <span className="ui-poster-card__subtitle recommend-card-scene-date">{displayDate}</span>}
                 </div>
               );
             } else {

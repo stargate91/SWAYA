@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import DashboardWidgetShell from './DashboardWidgetShell';
-import { useStatsQuery } from '../../../queries';
-import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
+import DashboardWidgetShell from '../dashboard/widgets/DashboardWidgetShell';
+import { useStatsQuery } from '../../queries';
+import { useLibraryModeStore } from '../../stores/useLibraryModeStore';
 import './LibraryInsightsWidget.css';
 
 const translateGenreLabel = (label, T) => {
@@ -109,7 +109,7 @@ const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
     <div className="insights-panel">
       <h3 className="insights-panel-title">
         <span className="insights-panel-dot is-pink" />
-        {T('dashboard.stats.library_dna') || 'Library DNA'}
+        {T('statistics.stats.library_dna') || 'Library DNA'}
       </h3>
       {hasEnoughData ? (
         <div className="insights-dna-stage insights-dna-stage--radar">

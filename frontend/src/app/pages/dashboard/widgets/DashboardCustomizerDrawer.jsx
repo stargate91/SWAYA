@@ -67,7 +67,7 @@ export default function DashboardCustomizerDrawer({
 
         <div className="dashboard-customizer-list">
           {widgetOrder.map((key, index) => {
-            let label = '';
+            let label;
             let switchKey = key;
 
             if (key === 'continue_watching') {

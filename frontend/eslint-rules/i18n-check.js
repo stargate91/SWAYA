@@ -36,6 +36,7 @@ const translationTree = {
   ratings: localesCache['ratings'] || {},
   lists: localesCache['lists'] || {},
   search: localesCache['search'] || {},
+  statistics: localesCache['statistics'] || {},
 };
 
 // Helper to check if a nested key exists

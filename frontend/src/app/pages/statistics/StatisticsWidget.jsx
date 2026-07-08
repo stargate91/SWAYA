@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
-import { useStatsQuery, useSettingsQuery } from '../../../queries';
-import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
-import DashboardWidgetShell from './DashboardWidgetShell';
+import { useStatsQuery, useSettingsQuery } from '../../queries';
+import { useLibraryModeStore } from '../../stores/useLibraryModeStore';
+import DashboardWidgetShell from '../dashboard/widgets/DashboardWidgetShell';
 import './StatisticsWidget.css';
 
 const StatisticsWidget = ({ T }) => {

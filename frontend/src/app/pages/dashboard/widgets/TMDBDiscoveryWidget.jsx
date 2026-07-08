@@ -9,7 +9,6 @@ import {
   useRemoveFromWatchlistMutation,
 } from '../../../queries/dashboardQueries';
 import Button from '../../../ui/Button';
-import CardMetadata from '../../../ui/CardMetadata';
 import Dropdown from '../../../ui/Dropdown';
 import DashboardWidgetShell from './DashboardWidgetShell';
 import { API_BASE } from '../../../lib/backend';

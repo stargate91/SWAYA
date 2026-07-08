@@ -103,7 +103,7 @@ const DashboardView = () => {
     }
 
     const hour = new Date().getHours();
-    let timeKey = 'afternoon';
+    let timeKey;
     if (hour >= 5 && hour < 12) {
       timeKey = 'morning';
     } else if (hour >= 12 && hour < 18) {

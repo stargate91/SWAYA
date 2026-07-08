@@ -1,7 +1,7 @@
 import Page from '@/ui/Page';
 import { useTranslation } from '@/providers/LanguageContext';
-import StatisticsWidget from '../dashboard/widgets/StatisticsWidget';
-import LibraryInsightsWidget from '../dashboard/widgets/LibraryInsightsWidget';
+import StatisticsWidget from './StatisticsWidget';
+import LibraryInsightsWidget from './LibraryInsightsWidget';
 import './StatisticsPage.css';
 
 export default function StatisticsPage() {
