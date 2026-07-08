@@ -1,5 +1,6 @@
 
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { Star, Heart, Edit3, Clapperboard, Tv, Video, Users, CheckCircle, Search } from '@/ui/icons';
 import Page from '@/ui/Page';
@@ -18,6 +19,7 @@ import AnalyticsTabContent from './components/AnalyticsTabContent';
 import './RatingsPage.css';
 
 export default function RatingsPage() {
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const state = useRatingsPageState();
   const isAdultMode = state.activeSessionMode === 'nsfw';
@@ -111,11 +113,35 @@ export default function RatingsPage() {
       label: state.mediaType === 'people'
         ? t('ratings.table.name', { defaultValue: 'Name' })
         : t('ratings.table.title', { defaultValue: 'Title' }),
-      render: (val, row) => (
-        <span className="ratings-row-name">
-          {row.name || row.title || row.displayTitle}
-        </span>
-      ),
+      render: (val, row) => {
+        const handleClick = () => {
+          if (state.mediaType === 'people') {
+            navigate(`/library/people/${row.id}`, { state: { allowAdult: true } });
+          } else if (state.mediaType === 'movies') {
+            navigate(`/library/movie/${row.id}`, { state: { allowAdult: true } });
+          } else if (state.mediaType === 'series') {
+            navigate(`/library/tv/${row.id}`, { state: { allowAdult: true } });
+          } else if (state.mediaType === 'scenes' || state.mediaType === 'videos') {
+            navigate(`/library/scene/${row.id}`, { state: { allowAdult: true } });
+          }
+        };
+
+        return (
+          <span 
+            className="ratings-row-name ratings-row-name-link"
+            onClick={handleClick}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleClick();
+              }
+            }}
+          >
+            {row.name || row.title || row.displayTitle}
+          </span>
+        );
+      },
     },
     {
       key: 'comment',

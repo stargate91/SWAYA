@@ -196,8 +196,7 @@ class RecommendationsService:
         return ActionResponse(status="success", id=item.id)
 
     def remove_from_watchlist(self, tmdb_id: int) -> ActionResponse:
-        lists = self.lists_service.get_all_lists()
-        watchlist = next((lst for lst in lists if lst.name == "Watchlist"), None)
+        watchlist = self.db.query(CustomList).filter(CustomList.name == "Watchlist").first()
         if not watchlist:
             return ActionResponse(status="error", message="Watchlist not found")
         

@@ -90,6 +90,7 @@
 }
 
 @media (max-width: 1400px) {
+
   .stats-grid--5,
   .stats-grid--4 {
     grid-template-columns: repeat(3, 1fr);
@@ -97,6 +98,7 @@
 }
 
 @media (max-width: 900px) {
+
   .stats-grid--5,
   .stats-grid--4 {
     grid-template-columns: repeat(2, 1fr);
@@ -104,6 +106,7 @@
 }
 
 @media (max-width: 550px) {
+
   .stats-grid--5,
   .stats-grid--4 {
     grid-template-columns: 1fr;
@@ -617,10 +620,12 @@
     transform: translate(-50%, -50%) scale(1);
     box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent-blue) 40%, transparent);
   }
+
   50% {
     transform: translate(-50%, -50%) scale(1.08);
     box-shadow: 0 0 20px 8px color-mix(in srgb, var(--color-accent-blue) 35%, transparent);
   }
+
   100% {
     transform: translate(-50%, -50%) scale(1);
     box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent-blue) 40%, transparent);
@@ -794,14 +799,15 @@
   font-size: 42px;
   font-weight: 900;
   text-shadow: 0 4px 8px color-mix(in srgb, black 80%, transparent);
-  transition: opacity var(--motion-duration-fast) var(--motion-ease-standard);
+  transition: color var(--motion-duration-fast) var(--motion-ease-standard), opacity var(--motion-duration-fast) var(--motion-ease-standard);
   cursor: pointer;
   display: inline-block;
   width: fit-content;
 }
 
 .recommend-spotlight-title:hover {
-  opacity: 0.85;
+  color: var(--color-accent);
+  opacity: 0.95;
 }
 
 .recommend-spotlight-actions {
@@ -959,7 +965,8 @@
 }
 
 .recommend-card--scene .recommend-card-poster-shell {
-  padding-bottom: 72.46% !important; /* aspect-ratio 1.38 (maintains 300px height matching portrait cards) */
+  padding-bottom: 72.46% !important;
+  /* aspect-ratio 1.38 (maintains 300px height matching portrait cards) */
 }
 
 .recommend-card-poster-shell {
