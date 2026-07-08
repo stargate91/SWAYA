@@ -59,30 +59,27 @@ export default function DashboardCustomizerDrawer({
       title={t('dashboard.customize') || 'Customize Dashboard'}
       size="sm"
       className="dashboard-customizer-drawer"
-      style={{
-        boxShadow: 'var(--shadow-overlay-strong, 0 10px 40px rgba(0,0,0,0.4))',
-      }}
     >
-      <div className="entity-detail-page__drawer-content" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: 'calc(100vh - 80px)', overflowY: 'auto' }}>
-        <p style={{ margin: 0, fontSize: '13px', color: 'var(--color-text-muted, #888899)', lineHeight: 1.5 }}>
+      <div className="dashboard-customizer-content">
+        <p className="dashboard-customizer-desc">
           {t('dashboard.customize_desc') || 'Select which widgets you want to display on your dashboard.'}
         </p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {widgetOrder.map((key, index) => {
-              let label = '';
-              let hasSwitch = true;
-              let switchKey = key;
-              let childSwitches = null;
+        <div className="dashboard-customizer-list">
+          {widgetOrder.map((key, index) => {
+            let label = '';
+            let hasSwitch = true;
+            let switchKey = key;
+            let childSwitches = null;
 
-              if (key === 'continue_watching') {
-                label = t('dashboard.widget_continue_watching') || 'Continue Watching';
-              }
-              if (key === 'recommendations') {
-                label = t('dashboard.customize_recommendations') || 'Recommendations & Discoveries';
-                hasSwitch = false; // Container only, child items have separate switches
-                childSwitches = (
-                  <div style={{ paddingLeft: '32px', display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
+            if (key === 'continue_watching') {
+              label = t('dashboard.widget_continue_watching') || 'Continue Watching';
+            }
+            if (key === 'recommendations') {
+              label = t('dashboard.customize_recommendations') || 'Recommendations & Discoveries';
+              hasSwitch = false; // Container only, child items have separate switches
+              childSwitches = (
+                <div className="dashboard-customizer-child-switches">
                     <Switch
                       checked={Boolean(visibleWidgets.spotlight)}
                       onChange={() => toggleWidget('spotlight')}
@@ -140,7 +137,7 @@ export default function DashboardCustomizerDrawer({
                 label = t('dashboard.customize_insights') || 'Library Insights';
                 hasSwitch = false;
                 childSwitches = (
-                  <div style={{ paddingLeft: '32px', display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
+                  <div className="dashboard-customizer-child-switches">
                     <Switch
                       checked={Boolean(visibleWidgets.library_dna)}
                       onChange={() => toggleWidget('library_dna')}
@@ -165,6 +162,7 @@ export default function DashboardCustomizerDrawer({
               const isDragOver = index === dragOverIndex;
 
               return (
+                // eslint-disable-next-line jsx-a11y/no-static-element-interactions
                 <div
                   key={key}
                   draggable
@@ -173,28 +171,14 @@ export default function DashboardCustomizerDrawer({
                   onDragLeave={handleDragLeave}
                   onDrop={(e) => handleDrop(e, index)}
                   onDragEnd={handleDragEnd}
-                  style={{
-                    background: isDragOver
-                      ? 'var(--color-surface-hover, rgba(59, 130, 246, 0.08))'
-                      : 'var(--color-bg-panel, rgba(255,255,255,0.02))',
-                    padding: '16px',
-                    borderRadius: '12px',
-                    border: isDragOver
-                      ? '1px dashed var(--color-accent-blue, #3b82f6)'
-                      : '1px solid var(--color-border, rgba(255,255,255,0.06))',
-                    boxShadow: isDragOver
-                      ? '0 0 12px rgba(59, 130, 246, 0.15)'
-                      : 'none',
-                    cursor: 'grab',
-                    transition: 'all 0.2s ease',
-                  }}
+                  className={`dashboard-customizer-item ${isDragOver ? 'is-drag-over' : ''}`}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div style={{ color: 'var(--color-text-muted, #555566)', display: 'flex', alignItems: 'center' }}>
+                  <div className="dashboard-customizer-item-header">
+                    <div className="dashboard-customizer-item-left">
+                      <div className="dashboard-customizer-grip">
                         <GripVertical size={16} />
                       </div>
-                      <span style={{ fontSize: '14px', fontWeight: 600 }}>{label}</span>
+                      <span className="dashboard-customizer-item-label">{label}</span>
                     </div>
 
                     {hasSwitch && (

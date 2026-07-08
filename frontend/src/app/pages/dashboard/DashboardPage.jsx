@@ -1,6 +1,7 @@
 import { useSettingsQuery } from '@/queries/settingsQueries';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import Page from '@/ui/Page';
+import Spinner from '@/ui/Spinner';
 import DashboardView from './DashboardView';
 import './DashboardPage.css';
 
@@ -13,7 +14,7 @@ export default function DashboardPage() {
     return (
       <Page className="dashboard-page">
         <div className="dashboard-loading">
-          <div className="dashboard-spinner" />
+          <Spinner />
         </div>
       </Page>
     );

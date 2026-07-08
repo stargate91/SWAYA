@@ -104,13 +104,6 @@
   flex: 1 1 auto;
   overflow-y: auto;
   min-height: 0;
-  scrollbar-width: none;
-  /* Firefox */
-}
-
-.lists-sidebar__content::-webkit-scrollbar {
-  display: none;
-  /* Chrome, Safari, Opera, Edge */
 }
 
 .lists-sidebar__loading {

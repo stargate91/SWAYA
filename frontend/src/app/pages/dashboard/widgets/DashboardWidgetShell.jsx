@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
+import Spinner from '@/ui/Spinner';
 
 const DashboardWidgetShell = ({ children, loading, size, transparent }) => {
   return (
     <div className={`dashboard-widget dashboard-widget--${size || 'md'} ${transparent ? 'dashboard-widget--transparent' : ''}`}>
       {loading ? (
         <div className="dashboard-widget__loading">
-          <div className="dashboard-spinner" />
+          <Spinner />
         </div>
       ) : (
         <div className="dashboard-widget__content">{children}</div>

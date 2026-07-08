@@ -9,12 +9,10 @@ import {
   BookOpen,
   Mail,
   Globe,
-  ArrowLeft,
   X,
   RefreshCw,
 } from 'lucide-react';
 import IconButton from '../../ui/IconButton';
-import Button from '../../ui/Button';
 import Card from '../../ui/Card';
 import { fetchJson } from '../../lib/http';
 import '../../styles/AboutPage.css';

@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useSettingsQuery } from '../../queries';
 import { useTranslation } from '../../providers/LanguageContext';
 import { SlidersHorizontal } from '@/ui/icons';
-import Button from '../../ui/Button';
 import UtilityBarPortal from '../../../components/UtilityBarPortal';
+import IconButton from '@/ui/IconButton';
 import ContinueWatchingWidget from './widgets/ContinueWatchingWidget';
 import LibraryInsightsWidget from './widgets/LibraryInsightsWidget';
 import StatisticsWidget from './widgets/StatisticsWidget';
@@ -78,8 +78,6 @@ const DashboardView = () => {
     });
   };
 
-  const [isBtnHovered, setIsBtnHovered] = useState(false);
-
   const displayName = settings.user_name?.trim();
   const welcomeTitle = displayName
     ? t('dashboard.welcome', { name: displayName })
@@ -90,34 +88,14 @@ const DashboardView = () => {
   return (
     <>
       <UtilityBarPortal>
-        <div style={{ position: 'absolute', right: 0, height: '100%', display: 'flex', alignItems: 'center' }}>
-          <button
-            type="button"
+        <div className="dashboard-utility-bar-wrapper">
+          <IconButton
             onClick={() => setIsCustomizerOpen(true)}
-            onMouseEnter={() => setIsBtnHovered(true)}
-            onMouseLeave={() => setIsBtnHovered(false)}
-            style={{
-              background: 'var(--media-detail-side-nav-bg, rgba(20, 20, 25, 0.6))',
-              border: '1px solid var(--media-detail-side-nav-border, rgba(255, 255, 255, 0.08))',
-              color: isBtnHovered ? 'var(--color-text-primary, #ffffff)' : 'var(--color-text-secondary, #888899)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '40px',
-              height: '40px',
-              borderRadius: '8px',
-              transition: 'all 0.2s ease',
-              opacity: isBtnHovered ? 1 : 0.6,
-              outline: 'none',
-              backdropFilter: 'blur(12px)',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            }}
+            variant="dashboard-customizer"
             title={t('dashboard.customize') || 'Customize Dashboard'}
-            aria-label={t('dashboard.customize') || 'Customize Dashboard'}
           >
             <SlidersHorizontal size={18} />
-          </button>
+          </IconButton>
         </div>
       </UtilityBarPortal>
 

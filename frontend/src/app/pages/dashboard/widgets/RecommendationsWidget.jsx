@@ -20,6 +20,7 @@ import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 import { API_BASE } from '../../../lib/backend';
 import api from '../../../lib/api';
 import TMDBDiscoveryWidget from './TMDBDiscoveryWidget';
+import Skeleton from '../../../ui/Skeleton';
 
 const ADULT_LABEL = '18+';
 
@@ -89,7 +90,7 @@ const renderUserRatingBadge = (item) => {
   if (!Number.isFinite(rating) || rating <= 0) return null;
   const label = Number.isInteger(rating) ? String(rating) : rating.toFixed(1);
   return (
-    <Badge className="ui-poster-card__user-rating-badge" style={{ gap: '4px' }}>
+    <Badge className="ui-poster-card__user-rating-badge">
       <Star size={10} fill="currentColor" />
       {label}
     </Badge>
@@ -161,7 +162,7 @@ const RecommendationCarousel = ({
       <div className="recommend-carousel-shell">
         {showLeft && (
           <button
-            className="recommend-carousel-arrow is-left"
+            className="ui-carousel-arrow is-left"
             onClick={() => scroll('left')}
           >
             <ChevronLeft size={24} />
@@ -170,7 +171,7 @@ const RecommendationCarousel = ({
 
         {showRight && (
           <button
-            className="recommend-carousel-arrow is-right"
+            className="ui-carousel-arrow is-right"
             onClick={() => scroll('right')}
           >
             <ChevronRight size={24} />
@@ -180,7 +181,7 @@ const RecommendationCarousel = ({
         <div
           ref={scrollRef}
           onScroll={updateArrows}
-          className="recommend-carousel-track"
+          className="recommend-carousel-track no-scrollbar"
         >
           {items.map((item) => {
             const n = normalizeMediaEntity(item, {
@@ -196,7 +197,6 @@ const RecommendationCarousel = ({
             const posterUrl = (n.shouldBlur && rawPosterUrl)
               ? `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(rawPosterUrl)}&blur=true`
               : rawPosterUrl;
-            const hasRating = (n.ratingImdb && n.ratingImdb > 0) || (n.ratingTmdb && n.ratingTmdb > 0) || (n.ratingPorndb && n.ratingPorndb > 0);
             const yearLabel = n.subtitle;
             const performers = n.performers;
             const displayDate = item.release_date ? item.release_date.substring(0, 10) : '';
@@ -207,21 +207,22 @@ const RecommendationCarousel = ({
               roleLabel = T(`lists.roles.${dept.toLowerCase()}`) || dept;
             }
 
-            let subtitle = null;
+            let subtitle;
             if (n.isPerson) {
               subtitle = (
-                <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                <div className="recommend-card-person-subtitle">
                   {roleLabel}
                 </div>
               );
             } else if (n.isScene) {
               subtitle = (
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
+                <div className="recommend-card-scene-subtitle">
+                  <span className="recommend-card-performers">
                     {performers.map((p, idx) => (
+                      // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
                       <span
                         key={p.id}
-                        style={{ cursor: 'pointer', color: 'var(--color-accent-blue-soft, #56a5ff)' }}
+                        className="recommend-card-performer-link"
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/library/people/${p.id}`, { state: { allowAdult: true } });
@@ -254,7 +255,6 @@ const RecommendationCarousel = ({
                       onCardClick(item);
                     }
                   }}
-                  style={{ cursor: 'pointer' }}
                 >
                   {posterUrl && (
                     <img
@@ -327,8 +327,8 @@ const RecommendationCarousel = ({
             );
           })}
           {isLoadingMore && (
-            <div className="recommend-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '150px', height: '225px' }}>
-              <div className="dashboard-spinner" style={{ width: '24px', height: '24px' }} />
+            <div className="recommend-card recommend-card-loading-wrapper">
+              <span className="ui-spinner" />
             </div>
           )}
         </div>
@@ -355,18 +355,13 @@ RecommendationCarousel.propTypes = {
 
 const RecommendationSkeleton = ({ showBanner = false }) => (
   <div className="recommend-skeleton">
-    {showBanner && (
-      <div className="recommend-skeleton-banner dashboard-widget-shell-skeleton" />
-    )}
-    <div className="recommend-skeleton-title dashboard-widget-shell-skeleton" />
-    <div className="recommend-skeleton-row">
+    {showBanner && <Skeleton.Banner />}
+    <Skeleton.Title />
+    <Skeleton.Row>
       {Array.from({ length: 6 }).map((_, idx) => (
-        <div
-          key={idx}
-          className="recommend-skeleton-card dashboard-widget-shell-skeleton"
-        />
+        <Skeleton.Card key={idx} />
       ))}
-    </div>
+    </Skeleton.Row>
   </div>
 );
 
@@ -395,8 +390,9 @@ const RecommendationsWidget = ({ language, T, visibleWidgets = {} }) => {
   const [hasMorePeople, setHasMorePeople] = useState(true);
   const [isLoadingMorePeople, setIsLoadingMorePeople] = useState(false);
 
-  useEffect(() => {
-    if (!recommendations) return;
+  const [prevRecommendations, setPrevRecommendations] = useState(null);
+  if (recommendations && recommendations !== prevRecommendations) {
+    setPrevRecommendations(recommendations);
     setRecentlyAddedItems(recommendations.recently_added || []);
     setRecentlyAddedPage(1);
     setHasMoreRecentlyAdded((recommendations.recently_added || []).length === 20);
@@ -404,7 +400,7 @@ const RecommendationsWidget = ({ language, T, visibleWidgets = {} }) => {
     setRecentlyActivePeople(recommendations.recently_activated_people || []);
     setRecentlyActivePage(1);
     setHasMorePeople((recommendations.recently_activated_people || []).length === 20);
-  }, [recommendations]);
+  }
 
   const handleLoadMoreAdded = async () => {
     if (isLoadingMoreAdded || !hasMoreRecentlyAdded) return;

@@ -163,7 +163,7 @@ const resolveSubtitle = (item, opts = {}) => {
     const firstYear = airDateStr ? new Date(airDateStr).getFullYear() : null;
     const lastYear = item.last_air_date ? new Date(item.last_air_date).getFullYear() : null;
     const isEnded = item.release_status?.toLowerCase() === 'ended';
-    let tvYear = '';
+    let tvYear;
     if (firstYear) {
       tvYear = isEnded && lastYear ? `${firstYear} - ${lastYear}` : `${firstYear} - `;
     } else {

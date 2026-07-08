@@ -239,11 +239,6 @@
   flex-wrap: nowrap;
   overflow-x: auto;
   scroll-behavior: smooth;
-  scrollbar-width: none;
-}
-
-.bespoke-scene-tagger-pills-row--nowrap::-webkit-scrollbar {
-  display: none;
 }
 
 .bespoke-scene-tagger-pill-active,

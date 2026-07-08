@@ -52,7 +52,6 @@
   box-sizing: border-box;
   max-height: 100%;
   overflow-y: auto;
-  scrollbar-width: none;
   --column-transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
   transition: var(--column-transition);
   will-change: transform;
@@ -62,9 +61,7 @@
   transform: translateY(calc(100vh - var(--page-top-offset, 4rem) - 120px + var(--space-4xl)));
 }
 
-.entity-detail-page--people .entity-detail-page__media-column::-webkit-scrollbar {
-  display: none;
-}
+
 
 .entity-detail-page__profile-links {
   display: grid;
@@ -1072,12 +1069,6 @@
   --grid-padding: 4px 4px 0 4px;
   padding: var(--grid-padding);
   /* Removed bottom padding */
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.entity-detail-page__known-for-grid::-webkit-scrollbar {
-  display: none;
 }
 
 .entity-detail-page__known-for-card {

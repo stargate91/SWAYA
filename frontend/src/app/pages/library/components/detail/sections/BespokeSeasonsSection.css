@@ -47,10 +47,8 @@
   scroll-behavior: smooth;
 }
 
-.bespoke-seasons-pills::-webkit-scrollbar,
-.bespoke-episodes-pills::-webkit-scrollbar {
-  display: none;
-}
+
+
 
 /* Pills styling */
 .bespoke-season-pill,
@@ -587,9 +585,7 @@
   width: 100%;
 }
 
-.bespoke-cast-browser-card__body .dashboard-cast-grid::-webkit-scrollbar {
-  display: none;
-}
+
 
 /* Dynamic Scroll Fade Masks */
 .bespoke-fade-container {
@@ -630,11 +626,6 @@
   gap: var(--space-xs);
   width: 100%;
   padding: var(--space-3xs) 0;
-  scrollbar-width: none;
-}
-
-.bespoke-keywords-container::-webkit-scrollbar {
-  display: none;
 }
 
 .bespoke-keyword-badge {
@@ -780,12 +771,6 @@
   padding: var(--space-md) var(--space-lg);
   align-items: center;
   overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.bespoke-companies-body::-webkit-scrollbar {
-  display: none;
 }
 
 .bespoke-company-item {

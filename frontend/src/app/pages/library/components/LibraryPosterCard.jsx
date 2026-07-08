@@ -25,7 +25,7 @@ const renderUserRatingBadge = (item) => {
   if (!Number.isFinite(rating) || rating <= 0) return null;
   const label = Number.isInteger(rating) ? String(rating) : rating.toFixed(1);
   return (
-    <Badge className="ui-poster-card__user-rating-badge" style={{ gap: '4px' }}>
+    <Badge className="ui-poster-card__user-rating-badge">
       <Star size={10} fill="currentColor" />
       {label}
     </Badge>

@@ -26,7 +26,7 @@ export function useScrollRestoration(selector, dependencies = []) {
       return () => timers.forEach(clearTimeout);
     }
     return undefined;
-  }, [currentPath, selector, navType, ...dependencies]);
+  }, [currentPath, selector, navType, ...dependencies]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const container = document.querySelector(selector);
@@ -42,5 +42,5 @@ export function useScrollRestoration(selector, dependencies = []) {
     return () => {
       container.removeEventListener('scroll', handleScroll);
     };
-  }, [currentPath, selector, ...dependencies]);
+  }, [currentPath, selector, ...dependencies]); // eslint-disable-line react-hooks/exhaustive-deps
 }

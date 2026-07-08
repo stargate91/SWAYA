@@ -1,24 +1,17 @@
 import { memo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Minus, Star } from '@/ui/icons';
-import Pill from '@/ui/Pill';
-import { getProfileImagePath, getTvPosterImagePath, getPosterImagePath } from '@/lib/imageUrls';
-import { isTvLikeMediaType, isSceneMediaType, isPersonMediaType } from '@/lib/mediaTypes';
+import { Minus } from '@/ui/icons';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import { useSettingsQuery } from '@/queries';
-import { API_BASE } from '@/lib/backend';
 import CardMetadata from '@/ui/CardMetadata';
 import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
 
 export const TagPosterCard = memo(({
   item,
   t,
-  resolvePosterUrl,
   emptyIcon: EmptyIcon,
   onClick,
   onRemove,
 }) => {
-  const navigate = useNavigate();
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const { data: settings } = useSettingsQuery();
 
@@ -29,7 +22,6 @@ export const TagPosterCard = memo(({
   });
 
   const isScene = n.isScene;
-  const isPerson = n.isPerson;
   const shouldBlur = n.shouldBlur;
   const posterUrl = n.imageUrl;
 

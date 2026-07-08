@@ -769,12 +769,6 @@
   width: 100%;
   flex: 1;
   overflow-y: auto;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
-}
-
-.player-page__drawer-content::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
 }
 
 .player-page__drawer-content .player-page__segmented-rater-container {
@@ -1107,12 +1101,6 @@
   width: 100%;
   flex: 1;
   overflow-y: auto;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
-}
-
-.player-page__discovery-content::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
 }
 
 .player-page__discovery-vertical-list {

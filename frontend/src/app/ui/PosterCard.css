@@ -117,6 +117,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
   left: 12px;
   min-height: 28px;
   padding: 0 var(--space-md);
+  gap: 4px;
   border: 1px solid var(--button-secondary-border);
   background-color: color-mix(in srgb, var(--app-shell-color-panel) 82%, transparent);
   background-image: var(--button-secondary-bg);

@@ -187,3 +187,72 @@ a {
     --motion-lift-distance-md: 0px;
   }
 }
+
+.no-scrollbar,
+.player-page__drawer-content,
+.player-page__discovery-content,
+.lists-sidebar__content,
+.dashboard-cast-grid,
+.bespoke-seasons-pills,
+.bespoke-episodes-pills,
+.bespoke-keywords-container,
+.bespoke-companies-body,
+.bespoke-scene-tagger-pills-row--nowrap,
+.person-credits-row__scroll-container,
+.entity-detail-page--people .entity-detail-page__media-column,
+.entity-detail-page__known-for-grid {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.no-scrollbar::-webkit-scrollbar,
+.player-page__drawer-content::-webkit-scrollbar,
+.player-page__discovery-content::-webkit-scrollbar,
+.lists-sidebar__content::-webkit-scrollbar,
+.dashboard-cast-grid::-webkit-scrollbar,
+.bespoke-seasons-pills::-webkit-scrollbar,
+.bespoke-episodes-pills::-webkit-scrollbar,
+.bespoke-keywords-container::-webkit-scrollbar,
+.bespoke-companies-body::-webkit-scrollbar,
+.bespoke-scene-tagger-pills-row--nowrap::-webkit-scrollbar,
+.person-credits-row__scroll-container::-webkit-scrollbar,
+.entity-detail-page--people .entity-detail-page__media-column::-webkit-scrollbar,
+.entity-detail-page__known-for-grid::-webkit-scrollbar {
+  display: none !important;
+}
+
+.ui-carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, black 75%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--color-text-primary);
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 15px color-mix(in srgb, black 50%, transparent);
+  transition: background-color var(--motion-duration-fast) var(--motion-ease-standard), opacity var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.ui-carousel-arrow.is-left {
+  left: 10px;
+}
+
+.ui-carousel-arrow.is-right {
+  right: 10px;
+}
+
+.ui-carousel-arrow:hover {
+  background: color-mix(in srgb, var(--color-text-primary, white) 15%, transparent);
+  transform: translateY(-50%) !important;
+}

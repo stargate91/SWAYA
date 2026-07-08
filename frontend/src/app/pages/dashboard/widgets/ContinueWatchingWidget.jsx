@@ -7,7 +7,7 @@ import { usePlayMediaMutation, useResetProgressMutation, useSettingsQuery } from
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 
-import { normalizeEpisodeNumbers, formatEpisodeCode } from '../../../lib/episodeFormat';
+import { formatEpisodeCode } from '../../../lib/episodeFormat';
 
 const ContinueWatchingWidget = ({ T }) => {
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
@@ -56,16 +56,16 @@ const ContinueWatchingWidget = ({ T }) => {
       </div>
       <div className="continue-watching-shell">
         {showLeft && (
-          <button className="continue-watching-arrow is-left" onClick={() => scroll('left')}>
+          <button className="ui-carousel-arrow is-left" onClick={() => scroll('left')}>
             <ChevronLeft size={24} />
           </button>
         )}
         {showRight && (
-          <button className="continue-watching-arrow is-right" onClick={() => scroll('right')}>
+          <button className="ui-carousel-arrow is-right" onClick={() => scroll('right')}>
             <ChevronRight size={24} />
           </button>
         )}
-        <div ref={scrollRef} onScroll={updateArrows} className="continue-watching-row">
+        <div ref={scrollRef} onScroll={updateArrows} className="continue-watching-row no-scrollbar">
         {items.map((item) => {
           const progressPercent = Math.min(100, (item.resume_position / item.duration) * 100);
           const episodeCode = formatEpisodeCode(item.season_number, item.episode_number);

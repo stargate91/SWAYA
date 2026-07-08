@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
-import { Check, Star, Plus, Minus, ChevronLeft, ChevronRight } from '@/ui/icons';
+import { Check, Plus, Minus, ChevronLeft, ChevronRight } from '@/ui/icons';
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
 import {
   useRecommendationsQuery,
@@ -141,40 +141,39 @@ const TMDBDiscoveryWidget = ({ T }) => {
 
   return (
     <div className="recommend-carousel">
-      <div className="recommend-carousel-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', gap: '16px', flexWrap: 'wrap' }}>
-        <h3 className="recommend-carousel-title" style={{ margin: 0 }}>
+      <div className="recommend-carousel-header">
+        <h3 className="recommend-carousel-title recommend-carousel-title--header">
           {T('dashboard.recommendations.discovery_title') || 'Top 20 Discoveries'}
         </h3>
         
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div className="recommend-carousel-filters">
           <Dropdown
             options={translatedGenres}
             value={genreId}
             onChange={(e) => setGenreId(e.target.value)}
-            style={{ width: '160px' }}
+            className="recommend-carousel-filter-genre"
           />
 
           <Dropdown
             options={translatedYears}
             value={year}
             onChange={(e) => setYear(e.target.value)}
-            style={{ width: '130px' }}
+            className="recommend-carousel-filter-year"
           />
         </div>
       </div>
 
       <DashboardWidgetShell loading={loading} size="lg" transparent={true}>
         {items.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px', color: 'var(--color-text-muted, #888899)' }}>
+          <div className="recommend-carousel-no-results">
             {T('dashboard.recommendations.discovery_no_results') || 'No popular movies found matching filters.'}
           </div>
         ) : (
           <div className="recommend-carousel-shell">
             {showLeft && (
               <button
-                className="recommend-carousel-arrow is-left"
+                className="ui-carousel-arrow is-left"
                 onClick={() => scroll('left')}
-                style={{ zIndex: 10 }}
               >
                 <ChevronLeft size={24} />
               </button>
@@ -182,9 +181,8 @@ const TMDBDiscoveryWidget = ({ T }) => {
 
             {showRight && (
               <button
-                className="recommend-carousel-arrow is-right"
+                className="ui-carousel-arrow is-right"
                 onClick={() => scroll('right')}
-                style={{ zIndex: 10 }}
               >
                 <ChevronRight size={24} />
               </button>
@@ -192,12 +190,8 @@ const TMDBDiscoveryWidget = ({ T }) => {
 
             <div
               ref={scrollRef}
-              className="recommend-carousel-track"
+              className={`recommend-carousel-track no-scrollbar ${loading ? 'is-loading' : ''}`}
               onScroll={updateArrows}
-              style={{
-                opacity: loading ? 0.5 : 1,
-                transition: 'opacity 0.2s ease',
-              }}
             >
               {items.map((item) => {
                 const posterUrl = resolveMediaImageUrl(item.poster_path, 'poster');
@@ -221,7 +215,6 @@ const TMDBDiscoveryWidget = ({ T }) => {
                           handleCardClick(item);
                         }
                       }}
-                      style={{ cursor: 'pointer' }}
                     >
                       {posterUrl && (
                         <img

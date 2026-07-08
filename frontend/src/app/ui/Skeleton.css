@@ -1,0 +1,57 @@
+.ui-skeleton {
+  display: block;
+  background: var(--color-surface-card);
+  border-radius: var(--radius-md);
+}
+
+.ui-skeleton--circle {
+  border-radius: var(--radius-full);
+}
+
+.ui-skeleton--text {
+  height: 1em;
+  border-radius: var(--radius-sm);
+}
+
+.ui-skeleton--shimmer {
+  background: linear-gradient(90deg, var(--color-surface-card), color-mix(in srgb, var(--color-text-primary) 6%, transparent), var(--color-surface-card));
+  background-size: 200% 100%;
+  animation: uiSkeletonShimmer var(--motion-duration-pulse-slow) var(--motion-ease-linear) infinite;
+}
+
+.ui-skeleton-row {
+  display: flex;
+  gap: var(--space-3xl);
+  overflow: hidden;
+}
+
+.ui-skeleton-card {
+  min-width: 200px;
+  width: 200px;
+  min-height: 300px;
+  border-radius: var(--radius-2xl, 16px);
+  flex-shrink: 0;
+}
+
+.ui-skeleton-banner {
+  min-height: 400px;
+  margin-bottom: var(--space-6xl);
+  border-radius: var(--radius-3xl, 24px);
+}
+
+.ui-skeleton-title {
+  width: 220px;
+  min-height: 26px;
+  margin-bottom: var(--space-3xl);
+  border-radius: var(--radius-lg, 10px);
+}
+
+@keyframes uiSkeletonShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
