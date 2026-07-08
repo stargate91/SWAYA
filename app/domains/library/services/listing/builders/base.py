@@ -382,5 +382,7 @@ class BaseQueryBuilder:
                 "people": people_list,
                 "is_adult": bool(match.is_adult) or match.provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB),
                 "is_home_video": bool(match.is_home_video),
+                "last_air_date": match.last_air_date.isoformat() if (hasattr(match, "last_air_date") and match.last_air_date) else None,
+                "release_status": match.release_status if hasattr(match, "release_status") else None,
             })
         return formatted_items

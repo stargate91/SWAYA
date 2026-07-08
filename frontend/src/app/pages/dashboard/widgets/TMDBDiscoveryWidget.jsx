@@ -9,7 +9,7 @@ import {
   useRemoveFromWatchlistMutation,
 } from '../../../queries/dashboardQueries';
 import Button from '../../../ui/Button';
-import Pill from '../../../ui/Pill';
+import CardMetadata from '../../../ui/CardMetadata';
 import Dropdown from '../../../ui/Dropdown';
 import DashboardWidgetShell from './DashboardWidgetShell';
 import { API_BASE } from '../../../lib/backend';
@@ -210,16 +210,19 @@ const TMDBDiscoveryWidget = ({ T }) => {
                   <div
                     key={item.id}
                     className="recommend-card"
-                    onClick={() => handleCardClick(item)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        handleCardClick(item);
-                      }
-                    }}
                   >
-                    <div className="recommend-card-poster-shell">
+                    <div
+                      className="recommend-card-poster-shell"
+                      onClick={() => handleCardClick(item)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          handleCardClick(item);
+                        }
+                      }}
+                      style={{ cursor: 'pointer' }}
+                    >
                       {posterUrl && (
                         <img
                           src={posterUrl}
@@ -255,26 +258,17 @@ const TMDBDiscoveryWidget = ({ T }) => {
                       </div>
                     </div>
 
-                    <div className="recommend-card-meta">
-                      <div className="recommend-card-name" style={{ fontSize: '14px', fontWeight: '600' }}>
-                        {item.title}
-                      </div>
-                      <div className="recommend-card-secondary">
-                        {yearLabel ? <span className="recommend-card-year">{yearLabel}</span> : null}
-                        <div className="recommend-card-ratings">
-                          {ratingImdb && ratingImdb > 0 ? (
-                            <Pill variant="imdb">
-                              <Star size={10} fill="currentColor" /> {ratingImdb.toFixed(1)}
-                            </Pill>
-                          ) : null}
-                          {ratingTmdb && ratingTmdb > 0 ? (
-                            <Pill variant="tmdb">
-                              <Star size={10} fill="currentColor" /> {ratingTmdb.toFixed(1)}
-                            </Pill>
-                          ) : null}
-                        </div>
-                      </div>
-                    </div>
+                    <CardMetadata
+                      title={item.title}
+                      onTitleClick={() => handleCardClick(item)}
+                      subtitle={yearLabel ? String(yearLabel) : null}
+                      ratingImdb={ratingImdb}
+                      ratingTmdb={ratingTmdb}
+                      className="recommend-card-meta"
+                      titleClassName="recommend-card-name"
+                      subtitleRowClassName="recommend-card-secondary"
+                      subtitleClassName=""
+                    />
                   </div>
                 );
               })}

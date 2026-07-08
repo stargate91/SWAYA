@@ -1,9 +1,8 @@
 import { memo, useState, useEffect } from 'react';
 import MediaCard from './MediaCard';
-import Pill from './Pill';
 import IconButton from './IconButton';
-import { Star, Check } from '@/ui/icons';
-import Tooltip from './Tooltip';
+import CardMetadata from './CardMetadata';
+import { Check } from '@/ui/icons';
 import { API_BASE } from '@/lib/backend';
 import './PosterCard.css';
 
@@ -27,6 +26,7 @@ const PosterCard = memo(function PosterCard({
   ratingTmdb,
   ratingPorndb,
   ratingPill,
+  performers,
   onClick,
   disabled = false,
   active = false,
@@ -243,50 +243,16 @@ const PosterCard = memo(function PosterCard({
         ) : null}
       </div>
 
-      {!isOverlayTitle && (title || subtitle || ratingImdb || ratingTmdb || ratingPorndb || ratingPill) && (
-        <div className="ui-poster-card__details">
-          {title && (
-            <Tooltip content={title} side="top">
-              <div className="ui-poster-card__title">{title}</div>
-            </Tooltip>
-          )}
-          {(subtitle || ratingImdb || ratingTmdb || ratingPorndb || ratingPill) && (
-            <div className="ui-poster-card__subtitle-row">
-              {subtitle && <div className="ui-poster-card__subtitle">{subtitle}</div>}
-              {ratingPill ? ratingPill : (() => {
-                const hasImdb = ratingImdb !== undefined && ratingImdb !== null && ratingImdb !== '' && parseFloat(ratingImdb) > 0;
-                const hasTmdb = ratingTmdb !== undefined && ratingTmdb !== null && ratingTmdb !== '' && parseFloat(ratingTmdb) > 0;
-                const hasPorndb = ratingPorndb !== undefined && ratingPorndb !== null && ratingPorndb !== '' && parseFloat(ratingPorndb) > 0;
-                if (hasImdb) {
-                  const val = parseFloat(ratingImdb);
-                  return (
-                    <Pill variant="imdb">
-                      <Star size={10} fill="currentColor" strokeWidth={1.8} />
-                      {isNaN(val) ? ratingImdb : val.toFixed(1)}
-                    </Pill>
-                  );
-                } else if (hasTmdb) {
-                  const val = parseFloat(ratingTmdb);
-                  return (
-                    <Pill variant="tmdb">
-                      <Star size={10} fill="currentColor" strokeWidth={1.8} />
-                      {isNaN(val) ? ratingTmdb : val.toFixed(1)}
-                    </Pill>
-                  );
-                } else if (hasPorndb) {
-                  const val = parseFloat(ratingPorndb);
-                  return (
-                    <Pill variant="porndb">
-                      <Star size={10} fill="currentColor" strokeWidth={1.8} />
-                      {isNaN(val) ? ratingPorndb : val.toFixed(1)}
-                    </Pill>
-                  );
-                }
-                return null;
-              })()}
-            </div>
-          )}
-        </div>
+      {!isOverlayTitle && (
+        <CardMetadata
+          title={title}
+          subtitle={subtitle}
+          performers={performers}
+          ratingImdb={ratingImdb}
+          ratingTmdb={ratingTmdb}
+          ratingPorndb={ratingPorndb}
+          ratingPill={ratingPill}
+        />
       )}
     </div>
   );

@@ -74,6 +74,14 @@ class ListsService:
         if item.media_item:
             res["title"] = item.media_item.filename
             match = next((m for m in item.media_item.matches), None)
+            if match and match.media_type == MediaType.EPISODE:
+                parent_show = None
+                if match.parent and match.parent.parent:
+                    parent_show = match.parent.parent
+                elif match.parent and match.parent.media_type == MediaType.TV:
+                    parent_show = match.parent
+                if parent_show:
+                    match = parent_show
             if match:
                 res["tmdb_id"] = self._resolve_tv_show_tmdb_id(match)
                 res["media_type"] = match.media_type.value
@@ -96,18 +104,26 @@ class ListsService:
                     res["title"] = loc.title if loc else match.original_title
         elif item.match:
             match = item.match
-            res["tmdb_id"] = self._resolve_tv_show_tmdb_id(item.match)
-            res["media_type"] = item.match.media_type.value
-            res["rating"] = item.match.rating_imdb or item.match.rating_tmdb
-            res["is_adult"] = bool(item.match.is_adult) or item.match.provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB)
-            res["external_id"] = item.match.external_id
-            res["provider"] = item.match.provider.value if hasattr(item.match.provider, "value") else str(item.match.provider)
-            if item.match.release_date:
-                res["year"] = item.match.release_date.year
-            loc = next((x for x in item.match.localizations), None)
-            res["title"] = loc.title if loc else item.match.original_title or f"Match #{item.match.id}"
-            if item.match.media_type.value in ("scene", "still"):
-                res["poster_path"] = item.match.backdrop_path or item.match.still_path
+            if match and match.media_type == MediaType.EPISODE:
+                parent_show = None
+                if match.parent and match.parent.parent:
+                    parent_show = match.parent.parent
+                elif match.parent and match.parent.media_type == MediaType.TV:
+                    parent_show = match.parent
+                if parent_show:
+                    match = parent_show
+            res["tmdb_id"] = self._resolve_tv_show_tmdb_id(match)
+            res["media_type"] = match.media_type.value
+            res["rating"] = match.rating_imdb or match.rating_tmdb
+            res["is_adult"] = bool(match.is_adult) or match.provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB)
+            res["external_id"] = match.external_id
+            res["provider"] = match.provider.value if hasattr(match.provider, "value") else str(match.provider)
+            if match.release_date:
+                res["year"] = match.release_date.year
+            loc = next((x for x in match.localizations), None)
+            res["title"] = loc.title if loc else match.original_title or f"Match #{match.id}"
+            if match.media_type.value in ("scene", "still"):
+                res["poster_path"] = match.backdrop_path or match.still_path
             elif loc:
                 res["poster_path"] = loc.poster_path
         elif item.person:
@@ -121,6 +137,8 @@ class ListsService:
         if match:
             res["is_home_video"] = bool(match.is_home_video)
             res["release_date"] = match.release_date.isoformat() if match.release_date else None
+            res["last_air_date"] = match.last_air_date.isoformat() if (hasattr(match, "last_air_date") and match.last_air_date) else None
+            res["release_status"] = match.release_status if hasattr(match, "release_status") else None
             p_list = []
             for pl in match.people_links:
                 p_list.append({

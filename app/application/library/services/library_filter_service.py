@@ -435,6 +435,8 @@ class LibraryFilterService:
                             "is_adult": bool(match.is_adult),
                             "is_home_video": bool(match.is_home_video),
                             "people": p_list,
+                            "last_air_date": match.last_air_date.isoformat() if (hasattr(match, "last_air_date") and match.last_air_date) else None,
+                            "release_status": match.release_status if hasattr(match, "release_status") else None,
                         }
 
                         if match.media_type == MediaType.MOVIE:

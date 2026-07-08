@@ -1,7 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { API_BASE } from '@/lib/backend';
-import { Check, Minus } from '@/ui/icons';
+import { Check, Minus, Star } from '@/ui/icons';
+import Pill from '@/ui/Pill';
+import CardMetadata from '@/ui/CardMetadata';
+import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
 
 export default function ListsCard({
   item,
@@ -12,41 +15,45 @@ export default function ListsCard({
   handleRemoveListItem,
 }) {
   const navigate = useNavigate();
-  const isScene = item.media_type === 'scene' || item.media_type === 'videos' || item.media_type === 'video';
-  const isExplicitlySfw = item.is_adult === false || item.adult === false;
-  const isAdult = (isScene && !isExplicitlySfw) || (!isScene && (item.is_adult || item.adult));
-  const shouldBlur = isAdult && sessionMode !== 'nsfw';
-  const rawPosterUrl = item.poster_path ? resolveMediaImageUrl(item.poster_path, isScene ? 'backdrop' : 'poster') : null;
-  const posterUrl = (shouldBlur && rawPosterUrl)
-    ? `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(rawPosterUrl)}&blur=true`
-    : rawPosterUrl;
+  const n = normalizeMediaEntity(item, {
+    context: 'library',
+    settings,
+    sessionMode,
+  });
 
-  const displayDate = item.release_date ? item.release_date.substring(0, 10) : item.year;
-  const genderPref = settings?.adult_gender_preference;
-  const allPeople = item.people || [];
-  const filteredPeople = genderPref && genderPref !== 'all'
-    ? allPeople.filter(p => {
-      if (genderPref === 'female') return p.gender === 1;
-      if (genderPref === 'male') return p.gender === 2;
-      return true;
-    })
-    : allPeople;
-  const performers = filteredPeople.slice(0, 4);
+  const isScene = n.isScene;
+  const shouldBlur = n.shouldBlur;
+  const posterUrl = n.imageUrl;
+
+  let subtitle = n.subtitle;
+  let ratingPill;
+  let performers;
+
+  if (isScene) {
+    performers = n.performers;
+    subtitle = undefined;
+
+    const displayDate = item.release_date ? item.release_date.substring(0, 10) : item.year;
+    ratingPill = displayDate ? (
+      <span style={{ opacity: 0.6, fontSize: '0.75rem', flexShrink: 0 }}>{displayDate}</span>
+    ) : undefined;
+  }
 
   return (
-    <div
-      className={`lists-card ${isScene ? 'lists-card--scene' : 'lists-card--poster'}`}
-      onClick={() => handleCardClick(item)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          handleCardClick(item);
-        }
-      }}
-    >
-      <div className={`lists-card__media ${shouldBlur ? 'is-blurred' : ''}`}>
+    <div className={`lists-card ${isScene ? 'lists-card--scene' : 'lists-card--poster'}`}>
+      <div
+        className={`lists-card__media ${shouldBlur ? 'is-blurred' : ''}`}
+        onClick={() => handleCardClick(item)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleCardClick(item);
+          }
+        }}
+        style={{ cursor: 'pointer' }}
+      >
         <button
           className="ui-card-action-btn ui-card-action-btn--danger"
           onClick={(e) => {
@@ -74,45 +81,17 @@ export default function ListsCard({
           </div>
         )}
       </div>
-      <div className="lists-card__info">
-        <span className="lists-card__title">{item.title}</span>
-        <span className="lists-card__subtitle">
-          {isScene ? (
-            <div className="library-scene-card__subtitle-inner">
-              <span className="library-scene-card__performers">
-                {performers.map((p, idx) => (
-                  <span key={p.id}>
-                    {idx > 0 && ', '}
-                    <span
-                      role="button"
-                      tabIndex={0}
-                      className="library-scene-card__performer-link"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/library/people/${p.id}`, { state: { allowAdult: true } });
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.stopPropagation();
-                          navigate(`/library/people/${p.id}`, { state: { allowAdult: true } });
-                        }
-                      }}
-                    >
-                      {p.name}
-                    </span>
-                  </span>
-                ))}
-              </span>
-              {displayDate && <span className="library-scene-card__date">{displayDate}</span>}
-            </div>
-          ) : item.media_type === 'person' ? (
-            (() => {
-              const dept = item.known_for_department || (item.is_adult ? 'performer' : 'artist');
-              return t(`lists.roles.${dept.toLowerCase()}`) || dept;
-            })()
-          ) : item.year}
-        </span>
-      </div>
+      <CardMetadata
+        title={item.title}
+        onTitleClick={() => handleCardClick(item)}
+        subtitle={subtitle}
+        performers={performers}
+        ratingPill={ratingPill}
+        className="lists-card__info"
+        titleClassName="lists-card__title"
+        subtitleRowClassName=""
+        subtitleClassName="lists-card__subtitle"
+      />
     </div>
   );
 }

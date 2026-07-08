@@ -92,24 +92,33 @@ const resolveRatings = (item) => {
 
 // ─── Performers (gender-preference filtered) ─────────────────────
 
-const resolvePerformers = (item, settings, maxCount = 4) => {
+const resolvePerformers = (item, settings, maxCount = 4, opts = {}) => {
   const allPeople = item.people || [];
   if (!allPeople.length) return [];
 
   const pref = settings?.adult_gender_preference;
-  if (!pref || pref === 'all') {
-    return allPeople.slice(0, maxCount);
+  let filtered = allPeople;
+  if (pref && pref !== 'all') {
+    filtered = allPeople.filter((p) => {
+      const g = typeof p.gender === 'string'
+        ? (p.gender.toUpperCase().includes('FEMALE') ? 1 : p.gender.toUpperCase().includes('MALE') ? 2 : 0)
+        : p.gender;
+      if (pref === 'female') return g === 1;
+      if (pref === 'male') return g === 2;
+      return true;
+    });
   }
 
-  const filtered = allPeople.filter((p) => {
-    const g = typeof p.gender === 'string'
-      ? (p.gender.toUpperCase().includes('FEMALE') ? 1 : p.gender.toUpperCase().includes('MALE') ? 2 : 0)
-      : p.gender;
-    if (pref === 'female') return g === 1;
-    if (pref === 'male') return g === 2;
-    return true;
-  });
-  return filtered.slice(0, maxCount);
+  const sliced = filtered.slice(0, maxCount);
+  if (opts.context === 'search') {
+    const provider = item.provider || 'tmdb';
+    return sliced.map(p => {
+      const rawId = p.id || p.name;
+      const id = String(rawId).includes(':') ? rawId : `${provider}:${rawId}`;
+      return { ...p, id };
+    });
+  }
+  return sliced;
 };
 
 // ─── Subtitle ────────────────────────────────────────────────────
@@ -140,17 +149,30 @@ const resolveSubtitle = (item, opts = {}) => {
   }
 
   if (isScene) {
-    return (item.release_date ? item.release_date.substring(0, 10) : item.year) || '';
+    const datePart = (item.release_date ? item.release_date.substring(0, 10) : item.year) || '';
+    const performersList = item.people || [];
+    const performersStr = performersList.map(p => p.name).slice(0, 3).join(', ');
+    const parts = [];
+    if (performersStr) parts.push(performersStr);
+    if (datePart) parts.push(datePart);
+    return parts.join(' • ');
   }
 
   if (isTv) {
-    const firstYear = item.first_air_date ? new Date(item.first_air_date).getFullYear() : null;
+    const airDateStr = item.first_air_date || item.release_date;
+    const firstYear = airDateStr ? new Date(airDateStr).getFullYear() : null;
     const lastYear = item.last_air_date ? new Date(item.last_air_date).getFullYear() : null;
     const isEnded = item.release_status?.toLowerCase() === 'ended';
+    let tvYear = '';
     if (firstYear) {
-      return isEnded && lastYear ? `${firstYear} - ${lastYear}` : `${firstYear} - `;
+      tvYear = isEnded && lastYear ? `${firstYear} - ${lastYear}` : `${firstYear} - `;
+    } else {
+      tvYear = item.year || '';
     }
-    return item.year || '';
+    const parts = [];
+    if (tvYear) parts.push(tvYear);
+    if (item.info) parts.push(item.info);
+    return parts.join(' • ');
   }
 
   // Movie default
@@ -214,7 +236,7 @@ export function normalizeMediaEntity(item, opts = {}) {
     isFavorite: item.is_favorite || false,
     inLibrary: item.in_library,
 
-    performers: resolvePerformers(item, settings),
+    performers: resolvePerformers(item, settings, 4, opts),
     shouldBlur: resolveShouldBlur(item, opts),
   };
 }

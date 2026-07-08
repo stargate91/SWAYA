@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Search, Clapperboard, ENTITY_ICONS, ImageOff } from '@/ui/icons';
+import { Search, Clapperboard, ENTITY_ICONS, ImageOff, Star } from '@/ui/icons';
+import Pill from '@/ui/Pill';
 import api from '@/lib/api';
 import Page from '@/ui/Page';
 import Input from '@/ui/Input';
@@ -280,45 +281,17 @@ export default function SearchPage() {
                 const posterUrl = item.poster_path ? resolveMediaImageUrl(item.poster_path, 'posterThumb') : null;
 
                 let subtitle = n.subtitle || undefined;
-                if (item.media_type === 'scene') {
-                  const displayDate = item.release_date ? item.release_date.substring(0, 10) : item.year;
-                  const performers = n.performers;
+                let ratingPill;
+                let performers;
 
-                  subtitle = (
-                    <div className="library-scene-card__subtitle-inner">
-                      <span className="library-scene-card__performers">
-                        {performers.map((p, idx) => (
-                          <span key={p.id || p.name}>
-                            {idx > 0 && ', '}
-                            <span
-                              role="button"
-                              tabIndex={0}
-                              className="library-scene-card__performer-link"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const provider = item.provider || urlSource;
-                                const rawId = p.id || p.name;
-                                const id = String(rawId).includes(':') ? rawId : `${provider}:${rawId}`;
-                                navigate(`/library/people/${id}`, { state: { allowAdult: true } });
-                              }}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter' || e.key === ' ') {
-                                  e.stopPropagation();
-                                  const provider = item.provider || urlSource;
-                                  const rawId = p.id || p.name;
-                                  const id = String(rawId).includes(':') ? rawId : `${provider}:${rawId}`;
-                                  navigate(`/library/people/${id}`, { state: { allowAdult: true } });
-                                }
-                              }}
-                            >
-                              {p.name}
-                            </span>
-                          </span>
-                        ))}
-                      </span>
-                      {displayDate && <span className="library-scene-card__date">{displayDate}</span>}
-                    </div>
-                  );
+                if (item.media_type === 'scene') {
+                  performers = n.performers;
+                  subtitle = undefined;
+
+                  const displayDate = item.release_date ? item.release_date.substring(0, 10) : item.year;
+                  ratingPill = displayDate ? (
+                    <span style={{ opacity: 0.6, fontSize: '0.75rem', flexShrink: 0 }}>{displayDate}</span>
+                  ) : undefined;
                 }
 
                 return (
@@ -327,6 +300,8 @@ export default function SearchPage() {
                     className={item.media_type === 'scene' ? 'library-scene-card' : ''}
                     title={item.title || item.name}
                     subtitle={subtitle}
+                    ratingPill={ratingPill}
+                    performers={performers}
                     imageUrl={posterUrl}
                     icon={FallbackIcon}
                     onClick={() => handleCardClick(item)}

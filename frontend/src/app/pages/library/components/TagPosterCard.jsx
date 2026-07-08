@@ -1,11 +1,14 @@
 import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Minus } from '@/ui/icons';
+import { Minus, Star } from '@/ui/icons';
+import Pill from '@/ui/Pill';
 import { getProfileImagePath, getTvPosterImagePath, getPosterImagePath } from '@/lib/imageUrls';
 import { isTvLikeMediaType, isSceneMediaType, isPersonMediaType } from '@/lib/mediaTypes';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import { useSettingsQuery } from '@/queries';
 import { API_BASE } from '@/lib/backend';
+import CardMetadata from '@/ui/CardMetadata';
+import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
 
 export const TagPosterCard = memo(({
   item,
@@ -19,35 +22,18 @@ export const TagPosterCard = memo(({
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const { data: settings } = useSettingsQuery();
 
-  const isScene = isSceneMediaType(item.type);
-  const isPerson = isPersonMediaType(item.type);
-  const isAdult = item.is_adult || (isScene && !item.is_home_video);
-  const shouldBlur = isAdult && sessionMode !== 'nsfw';
+  const n = normalizeMediaEntity(item, {
+    context: 'library',
+    settings,
+    sessionMode,
+  });
 
-  const rawPosterUrl = isPerson
-    ? resolvePosterUrl(getProfileImagePath(item))
-    : resolvePosterUrl(
-        isScene
-          ? (item.backdrop_path || item.poster_path)
-          : (isTvLikeMediaType(item.type) ? getTvPosterImagePath(item) : getPosterImagePath(item))
-      );
-
-  const posterUrl = (shouldBlur && rawPosterUrl)
-    ? `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(rawPosterUrl)}&blur=true`
-    : rawPosterUrl;
+  const isScene = n.isScene;
+  const isPerson = n.isPerson;
+  const shouldBlur = n.shouldBlur;
+  const posterUrl = n.imageUrl;
 
   const displayDate = item.release_date ? item.release_date.substring(0, 10) : item.year;
-  const genderPref = settings?.adult_gender_preference;
-  const allPeople = item.people || [];
-  const filteredPeople = genderPref && genderPref !== 'all'
-    ? allPeople.filter(p => {
-        if (genderPref === 'female') return p.gender === 1;
-        if (genderPref === 'male') return p.gender === 2;
-        return true;
-      })
-    : allPeople;
-  const performers = filteredPeople.slice(0, 4);
-
   const removeButton = onRemove ? (
     <button
       type="button"
@@ -63,20 +49,34 @@ export const TagPosterCard = memo(({
     </button>
   ) : null;
 
+  let subtitle = n.subtitle;
+  let ratingPill;
+  let performers;
+
+  if (isScene) {
+    performers = n.performers;
+    subtitle = undefined;
+
+    ratingPill = displayDate ? (
+      <span style={{ opacity: 0.6, fontSize: '0.75rem', flexShrink: 0 }}>{displayDate}</span>
+    ) : undefined;
+  }
+
   return (
-    <div
-      className={`lists-card ${isScene ? 'lists-card--scene' : 'lists-card--poster'}`}
-      onClick={onClick}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onClick();
-        }
-      }}
-    >
-      <div className={`lists-card__media ${shouldBlur ? 'is-blurred' : ''}`}>
+    <div className={`lists-card ${isScene ? 'lists-card--scene' : 'lists-card--poster'}`}>
+      <div
+        className={`lists-card__media ${shouldBlur ? 'is-blurred' : ''}`}
+        onClick={onClick}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onClick();
+          }
+        }}
+        style={{ cursor: 'pointer' }}
+      >
         {removeButton}
         {posterUrl ? (
           <img
@@ -97,45 +97,17 @@ export const TagPosterCard = memo(({
           </div>
         )}
       </div>
-      <div className="lists-card__info">
-        <span className="lists-card__title">{item.title || item.name}</span>
-        <span className="lists-card__subtitle">
-          {isScene ? (
-            <div className="library-scene-card__subtitle-inner">
-              <span className="library-scene-card__performers">
-                {performers.map((p, idx) => (
-                  <span key={p.id}>
-                    {idx > 0 && ', '}
-                    <span
-                      role="button"
-                      tabIndex={0}
-                      className="library-scene-card__performer-link"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/library/people/${p.id}`, { state: { allowAdult: true } });
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.stopPropagation();
-                          navigate(`/library/people/${p.id}`, { state: { allowAdult: true } });
-                        }
-                      }}
-                    >
-                      {p.name}
-                    </span>
-                  </span>
-                ))}
-              </span>
-              {displayDate && <span className="library-scene-card__date">{displayDate}</span>}
-            </div>
-          ) : isPerson ? (
-            (() => {
-              const dept = item.known_for_department || (item.is_adult ? 'performer' : 'artist');
-              return t(`lists.roles.${dept.toLowerCase()}`) || dept;
-            })()
-          ) : item.year}
-        </span>
-      </div>
+      <CardMetadata
+        title={item.title || item.name}
+        onTitleClick={onClick}
+        subtitle={subtitle}
+        performers={performers}
+        ratingPill={ratingPill}
+        className="lists-card__info"
+        titleClassName="lists-card__title"
+        subtitleRowClassName=""
+        subtitleClassName="lists-card__subtitle"
+      />
     </div>
   );
 });

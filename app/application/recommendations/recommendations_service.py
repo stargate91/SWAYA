@@ -497,9 +497,14 @@ class RecommendationsService:
             title = loc.title if loc else (show_match.original_title or item.filename)
             overview = loc.overview if loc else None
 
-            o = overrides_by_media.get(item.id) or overrides_by_match.get(match.id)
-            if not o and show_match != match:
-                o = overrides_by_match.get(show_match.id)
+            o_media = overrides_by_media.get(item.id)
+            o_match = overrides_by_match.get(match.id)
+            if not o_match and show_match != match:
+                o_match = overrides_by_match.get(show_match.id)
+
+            o = o_match or o_media
+            user_rating = (o_match.user_rating if (o_match and o_match.user_rating is not None) else None) or (o_media.user_rating if (o_media and o_media.user_rating is not None) else None)
+            is_favorite = (o_match.is_favorite if o_match else False) or (o_media.is_favorite if o_media else False)
                 
             custom_poster = o.custom_poster if o else None
             custom_backdrop = o.custom_backdrop if o else None
@@ -537,6 +542,8 @@ class RecommendationsService:
                 "rating_imdb": rating_imdb,
                 "rating_tmdb": rating_tmdb,
                 "rating_porndb": rating_porndb,
+                "user_rating": user_rating,
+                "is_favorite": is_favorite,
                 "poster_path": poster_path,
                 "backdrop_path": backdrop_path,
                 "release_date": release_date,
@@ -596,5 +603,7 @@ class RecommendationsService:
                 "scene_count": p.scene_count,
                 "popularity": p.popularity,
                 "known_for_department": p.known_for_department,
+                "user_rating": o.user_rating if o else None,
+                "is_favorite": o.is_favorite if o else False,
             })
         return recently_activated_people

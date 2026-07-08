@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
-import { Check, ChevronLeft, ChevronRight, Star, Plus, Minus } from '@/ui/icons';
+import { Check, ChevronLeft, ChevronRight, Star, Plus, Minus, Play, Heart } from '@/ui/icons';
 import { useUi } from '../../../providers/UiProvider';
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
 import { normalizeMediaEntity } from '../../../lib/normalizeMediaEntity';
@@ -11,8 +11,11 @@ import {
   useRemoveFromWatchlistMutation,
 } from '../../../queries/dashboardQueries';
 import { useSettingsQuery } from '../../../queries/settingsQueries';
+import { usePlayMediaMutation } from '../../../queries';
 import Button from '../../../ui/Button';
-import Pill from '../../../ui/Pill';
+import IconButton from '../../../ui/IconButton';
+import Badge from '../../../ui/Badge';
+import CardMetadata from '../../../ui/CardMetadata';
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 import { API_BASE } from '../../../lib/backend';
 import api from '../../../lib/api';
@@ -81,6 +84,31 @@ SpotlightBanner.propTypes = {
   T: PropTypes.func.isRequired,
 };
 
+const renderUserRatingBadge = (item) => {
+  const rating = Number(item?.user_rating);
+  if (!Number.isFinite(rating) || rating <= 0) return null;
+  const label = Number.isInteger(rating) ? String(rating) : rating.toFixed(1);
+  return (
+    <Badge className="ui-poster-card__user-rating-badge" style={{ gap: '4px' }}>
+      <Star size={10} fill="currentColor" />
+      {label}
+    </Badge>
+  );
+};
+
+const renderFavoriteBadge = (item, T) => {
+  if (!item?.is_favorite) return null;
+  return (
+    <div
+      className="ui-poster-card__favorite-badge"
+      title={T('library.filter.favorite') || 'Favourite'}
+      aria-label={T('library.filter.favorite') || 'Favourite'}
+    >
+      <Heart size={14} fill="currentColor" strokeWidth={2.2} />
+    </div>
+  );
+};
+
 const RecommendationCarousel = ({
   title,
   items,
@@ -93,6 +121,8 @@ const RecommendationCarousel = ({
   hasMore = false,
   isLoadingMore = false,
   settings = {},
+  onPlayClick,
+  playMutationPending,
 }) => {
   const scrollRef = useRef(null);
   const navigate = useNavigate();
@@ -177,20 +207,55 @@ const RecommendationCarousel = ({
               roleLabel = T(`lists.roles.${dept.toLowerCase()}`) || dept;
             }
 
+            let subtitle = null;
+            if (n.isPerson) {
+              subtitle = (
+                <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                  {roleLabel}
+                </div>
+              );
+            } else if (n.isScene) {
+              subtitle = (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
+                    {performers.map((p, idx) => (
+                      <span
+                        key={p.id}
+                        style={{ cursor: 'pointer', color: 'var(--color-accent-blue-soft, #56a5ff)' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/library/people/${p.id}`, { state: { allowAdult: true } });
+                        }}
+                      >
+                        {idx > 0 && ', '}
+                        {p.name}
+                      </span>
+                    ))}
+                  </span>
+                  {displayDate && <span>{displayDate}</span>}
+                </div>
+              );
+            } else {
+              subtitle = yearLabel;
+            }
+
             return (
               <div
                 key={item.id}
                 className={`recommend-card ${n.isScene ? 'recommend-card--scene' : ''}`}
-                onClick={() => onCardClick(item)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    onCardClick(item);
-                  }
-                }}
               >
-                <div className={`recommend-card-poster-shell ${n.shouldBlur ? 'is-blurred' : ''}`}>
+                <div
+                  className={`recommend-card-poster-shell ${n.shouldBlur ? 'is-blurred' : ''}`}
+                  onClick={() => onCardClick(item)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      onCardClick(item);
+                    }
+                  }}
+                  style={{ cursor: 'pointer' }}
+                >
                   {posterUrl && (
                     <img
                       key={posterUrl}
@@ -204,6 +269,8 @@ const RecommendationCarousel = ({
                       <span className="settings-badge settings-badge--danger">{ADULT_LABEL}</span>
                     </div>
                   )}
+                  {renderUserRatingBadge(item)}
+                  {renderFavoriteBadge(item, T)}
                   {!n.isPerson && (
                     <div className="recommend-card-overlay">
                       <Button
@@ -231,56 +298,31 @@ const RecommendationCarousel = ({
                       </Button>
                     </div>
                   )}
-                </div>
-
-                <div className="recommend-card-meta">
-                  <div className="recommend-card-name" title={item.title || item.name}>{item.title || item.name}</div>
-                  {n.isPerson ? (
-                    <div className="recommend-card-secondary" style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-                      {roleLabel}
-                    </div>
-                  ) : n.isScene ? (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
-                        {performers.map((p, idx) => (
-                          <span
-                            key={p.id}
-                            style={{ cursor: 'pointer', color: 'var(--color-accent-blue-soft, #56a5ff)' }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/library/people/${p.id}`, { state: { allowAdult: true } });
-                            }}
-                          >
-                            {idx > 0 && ', '}
-                            {p.name}
-                          </span>
-                        ))}
-                      </span>
-                      {displayDate && <span>{displayDate}</span>}
-                    </div>
-                  ) : (
-                    (yearLabel || hasRating) ? (
-                      <div className="recommend-card-secondary">
-                        {yearLabel ? <span className="recommend-card-year">{yearLabel}</span> : null}
-                        <div className="recommend-card-ratings">
-                          {n.ratingImdb && n.ratingImdb > 0 ? (
-                            <Pill variant="imdb">
-                              <Star size={10} fill="currentColor" /> {n.ratingImdb.toFixed(1)}
-                            </Pill>
-                          ) : (n.ratingTmdb && n.ratingTmdb > 0) ? (
-                            <Pill variant="tmdb">
-                              <Star size={10} fill="currentColor" /> {n.ratingTmdb.toFixed(1)}
-                            </Pill>
-                          ) : (n.ratingPorndb && n.ratingPorndb > 0) ? (
-                            <Pill variant="porndb">
-                              <Star size={10} fill="currentColor" /> {n.ratingPorndb.toFixed(1)}
-                            </Pill>
-                          ) : null}
-                        </div>
-                      </div>
-                    ) : null
+                  {!n.isPerson && item.in_library && onPlayClick && (
+                    <IconButton
+                      variant="play-overlay"
+                      onClick={(e) => onPlayClick(e, item)}
+                      title={T('library.details.play') || 'Play'}
+                      label={T('library.details.play') || 'Play'}
+                      disabled={playMutationPending}
+                    >
+                      <Play size={12} fill="currentColor" />
+                    </IconButton>
                   )}
                 </div>
+
+                <CardMetadata
+                  title={item.title || item.name}
+                  onTitleClick={() => onCardClick(item)}
+                  subtitle={subtitle}
+                  ratingImdb={n.ratingImdb}
+                  ratingTmdb={n.ratingTmdb}
+                  ratingPorndb={n.ratingPorndb}
+                  className="recommend-card-meta"
+                  titleClassName="recommend-card-name"
+                  subtitleRowClassName="recommend-card-secondary"
+                  subtitleClassName=""
+                />
               </div>
             );
           })}
@@ -307,6 +349,8 @@ RecommendationCarousel.propTypes = {
   hasMore: PropTypes.bool,
   isLoadingMore: PropTypes.bool,
   settings: PropTypes.object,
+  onPlayClick: PropTypes.func,
+  playMutationPending: PropTypes.bool,
 };
 
 const RecommendationSkeleton = ({ showBanner = false }) => (
@@ -339,6 +383,7 @@ const RecommendationsWidget = ({ language, T, visibleWidgets = {} }) => {
   const { data: recommendations, isLoading } = useRecommendationsQuery(language, includeAdult);
   const addToWatchlist = useAddToWatchlistMutation();
   const removeFromWatchlist = useRemoveFromWatchlistMutation();
+  const playMutation = usePlayMediaMutation();
 
   const [recentlyAddedItems, setRecentlyAddedItems] = useState([]);
   const [recentlyAddedPage, setRecentlyAddedPage] = useState(1);
@@ -440,6 +485,62 @@ const RecommendationsWidget = ({ language, T, visibleWidgets = {} }) => {
     }
   };
 
+  const handlePlayClick = useCallback(async (event, item) => {
+    event.stopPropagation();
+    if (playMutation.isPending) return;
+
+    const isTv = item.media_type === 'tv' || item.type === 'tv' || String(item.id).startsWith('tv_');
+    if (!isTv) {
+      const playId = item.in_library ? item.media_item_id : item.id;
+      playMutation.mutate(playId);
+      return;
+    }
+
+    try {
+      const tvId = String(item.in_library ? item.media_item_id : item.id).replace('tv_', '').replace('tmdb_', '');
+      const tvDetail = await api.library.getTvDetail(tvId);
+      
+      const seasons = Array.isArray(tvDetail?.seasons) ? tvDetail.seasons : [];
+      let nextEpisode = null;
+
+      for (const season of seasons) {
+        const ownedEpisodes = (season.episodes || []).filter((episode) => episode.path && !episode.is_missing);
+        const inProgress = ownedEpisodes.find((episode) => episode.resume_position > 0);
+        if (inProgress) {
+          nextEpisode = inProgress;
+          break;
+        }
+      }
+
+      if (!nextEpisode) {
+        for (const season of seasons) {
+          const ownedEpisodes = (season.episodes || []).filter((episode) => episode.path && !episode.is_missing);
+          const unwatched = ownedEpisodes.find((episode) => !episode.is_watched);
+          if (unwatched) {
+            nextEpisode = unwatched;
+            break;
+          }
+        }
+      }
+
+      if (!nextEpisode) {
+        for (const season of seasons) {
+          const ownedEpisodes = (season.episodes || []).filter((episode) => episode.path && !episode.is_missing);
+          if (ownedEpisodes.length > 0) {
+            nextEpisode = ownedEpisodes[0];
+            break;
+          }
+        }
+      }
+
+      if (nextEpisode?.id) {
+        playMutation.mutate(nextEpisode.id);
+      }
+    } catch {
+      // Ignore
+    }
+  }, [playMutation]);
+
   const handleCardClick = (item) => {
     const type = item.media_type || (item.title ? 'movie' : (item.profile_path ? 'person' : 'tv'));
     if (type === 'person') {
@@ -486,6 +587,8 @@ const RecommendationsWidget = ({ language, T, visibleWidgets = {} }) => {
           hasMore={hasMoreRecentlyAdded}
           isLoadingMore={isLoadingMoreAdded}
           settings={settings}
+          onPlayClick={handlePlayClick}
+          playMutationPending={playMutation.isPending}
         />
       )}
 
@@ -514,6 +617,8 @@ const RecommendationsWidget = ({ language, T, visibleWidgets = {} }) => {
           onWatchlist={handleWatchlist}
           onCardClick={handleCardClick}
           T={T}
+          onPlayClick={handlePlayClick}
+          playMutationPending={playMutation.isPending}
         />
       )}
 
@@ -525,6 +630,8 @@ const RecommendationsWidget = ({ language, T, visibleWidgets = {} }) => {
           onWatchlist={handleWatchlist}
           onCardClick={handleCardClick}
           T={T}
+          onPlayClick={handlePlayClick}
+          playMutationPending={playMutation.isPending}
         />
       )}
 
@@ -539,6 +646,8 @@ const RecommendationsWidget = ({ language, T, visibleWidgets = {} }) => {
           onCardClick={handleCardClick}
           T={T}
           isAdultCarousel={true}
+          onPlayClick={handlePlayClick}
+          playMutationPending={playMutation.isPending}
         />
       )}
     </>

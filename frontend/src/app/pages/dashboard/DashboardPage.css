@@ -943,14 +943,13 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-xs);
   min-width: 200px;
   width: 200px;
   flex-shrink: 0;
   overflow: visible;
   border-radius: 0;
   background: transparent;
-  cursor: pointer;
   scroll-snap-align: start;
   transition: var(--motion-spring), box-shadow var(--motion-duration-slow) var(--motion-ease-standard);
 }
@@ -1016,7 +1015,7 @@
 .recommend-card-meta {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xs);
+  gap: 0.125rem;
   padding: 0 var(--space-2xs);
 }
 

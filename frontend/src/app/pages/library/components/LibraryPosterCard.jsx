@@ -1,8 +1,9 @@
 
 import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Pencil, Play } from '@/ui/icons';
+import { Heart, Pencil, Play, Star } from '@/ui/icons';
 import Badge from '@/ui/Badge';
+import Pill from '@/ui/Pill';
 import PosterCard from '@/ui/PosterCard';
 import {
   getPosterImagePath,
@@ -24,7 +25,8 @@ const renderUserRatingBadge = (item) => {
   if (!Number.isFinite(rating) || rating <= 0) return null;
   const label = Number.isInteger(rating) ? String(rating) : rating.toFixed(1);
   return (
-    <Badge className="ui-poster-card__user-rating-badge">
+    <Badge className="ui-poster-card__user-rating-badge" style={{ gap: '4px' }}>
+      <Star size={10} fill="currentColor" />
       {label}
     </Badge>
   );
@@ -93,6 +95,8 @@ export const LibraryPosterCard = memo(({
   let topRightBadge = null;
   let playOverlay = null;
   let className = '';
+  let ratingPill;
+  let performers;
 
   const handleEditClick = (e) => {
     e.stopPropagation();
@@ -215,43 +219,16 @@ export const LibraryPosterCard = memo(({
     topRightBadge = renderFavoriteBadge(item, t);
     topRightAction = editButton;
   } else if (isLibraryScenes) {
+    performers = n.performers;
+
     const displayDate = item.release_date ? item.release_date.substring(0, 10) : item.year;
+    ratingPill = displayDate ? (
+      <span style={{ opacity: 0.6, fontSize: '0.75rem', flexShrink: 0 }}>{displayDate}</span>
+    ) : undefined;
+    ratingPorndb = undefined;
     imageUrl = resolvePosterUrl(item.backdrop_path) || item.displayPosterRemote || resolvePosterUrl(getPosterImagePath(item));
     className = 'library-scene-card';
     topRightAction = editButton;
-
-    const genderPref = settings?.adult_gender_preference;
-    const performers = n.performers;
-
-    subtitle = (
-      <div className="library-scene-card__subtitle-inner">
-        <span className="library-scene-card__performers">
-          {performers.map((p, idx) => (
-            <span key={p.id}>
-              {idx > 0 && ', '}
-              <span
-                role="button"
-                tabIndex={0}
-                className="library-scene-card__performer-link"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/library/people/${p.id}`, { state: { allowAdult: true } });
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.stopPropagation();
-                    navigate(`/library/people/${p.id}`, { state: { allowAdult: true } });
-                  }
-                }}
-              >
-                {p.name}
-              </span>
-            </span>
-          ))}
-        </span>
-        {displayDate && <span className="library-scene-card__date">{displayDate}</span>}
-      </div>
-    );
 
     if (item.in_library !== false) {
       const playTitle = ((item.resume_position || 0) > 0 ? (t('library.details.resume') || 'Resume') : (t('library.details.play') || 'Play'));
@@ -266,15 +243,7 @@ export const LibraryPosterCard = memo(({
       };
     }
   } else {
-    const subtitleParts = [];
-    const displayDate = (isLibraryMovie && item.release_date)
-      ? item.release_date.substring(0, 4)
-      : item.year;
-    if (displayDate) subtitleParts.push(displayDate);
-    if (item.info) {
-      subtitleParts.push(item.info);
-    }
-    subtitle = subtitleParts.join(' • ');
+    subtitle = n.subtitle;
     imageUrl = resolvePosterUrl(isLibraryTv ? getTvPosterImagePath(item) : getPosterImagePath(item));
     topRightAction = editButton;
 
@@ -312,6 +281,8 @@ export const LibraryPosterCard = memo(({
       ratingImdb={ratingImdb}
       ratingTmdb={ratingTmdb}
       ratingPorndb={ratingPorndb}
+      ratingPill={ratingPill}
+      performers={performers}
       topRightAction={topRightAction}
       badge={badge}
       topRightBadge={topRightBadge}

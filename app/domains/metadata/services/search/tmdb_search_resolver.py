@@ -22,6 +22,8 @@ class TmdbSearchResolver:
             def fetch_tv_seasons(r):
                 try:
                     details = tmdb_client.get_details(r["id"], "tv", language=language)
+                    r["last_air_date"] = details.get("last_air_date")
+                    r["release_status"] = details.get("status")
                     seasons = details.get("seasons") or []
                     return [{
                         "season_number": s.get("season_number"),
@@ -61,7 +63,9 @@ class TmdbSearchResolver:
                 "rating": r.get("vote_average"),
                 "media_type": item_type,
                 "provider": "tmdb",
-                "seasons": r.get("seasons") or []
+                "seasons": r.get("seasons") or [],
+                "last_air_date": r.get("last_air_date"),
+                "release_status": r.get("release_status")
             })
         return formatted
 
@@ -80,6 +84,20 @@ class TmdbSearchResolver:
         }
         data = tmdb_client._call_api("/search/multi", params)
         results = data.get("results", []) or []
+        # Fetch TV show details concurrently for multi-search results
+        tv_items = [r for r in results if r.get("media_type") == "tv"]
+        if tv_items:
+            from concurrent.futures import ThreadPoolExecutor
+            def fetch_tv_details(r):
+                try:
+                    details = tmdb_client.get_details(r["id"], "tv", language=language or DEFAULT_FALLBACK_LANGUAGE)
+                    r["last_air_date"] = details.get("last_air_date")
+                    r["release_status"] = details.get("status")
+                except Exception as e:
+                    logger.error(f"Failed to fetch details for TV {r.get('id')}: {e}")
+            with ThreadPoolExecutor(max_workers=5) as executor:
+                list(executor.map(fetch_tv_details, tv_items))
+
         formatted = []
         for r in results:
             media_type = r.get("media_type")
@@ -103,7 +121,9 @@ class TmdbSearchResolver:
                 "backdrop_path": r.get("backdrop_path") if media_type != "person" else None,
                 "rating": r.get("vote_average") or r.get("popularity") or 0.0,
                 "media_type": media_type,
-                "provider": "tmdb"
+                "provider": "tmdb",
+                "last_air_date": r.get("last_air_date"),
+                "release_status": r.get("release_status")
             })
         return formatted
 

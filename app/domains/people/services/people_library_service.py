@@ -49,6 +49,8 @@ class PeopleLibraryService:
             normalized_role = "director"
         elif role_lower in ("writers", "writer"):
             normalized_role = "writer"
+        elif role_lower in ("sound", "composer", "composers"):
+            normalized_role = "sound"
 
         # Resolve which matches are in the library using the port
         all_valid_match_ids = self.library_port.get_active_match_ids()
