@@ -8,7 +8,7 @@ import PlayerControlBar from './PlayerControlBar';
 import Sidebar from './Sidebar';
 import Spinner from '../ui/Spinner';
 import { useSettingsQuery, useScanStatusQuery } from '../queries';
-import { useUi } from '../providers/UiProvider';
+import { useUi } from '@/providers/UiProvider';
 import { useTranslation } from '../providers/LanguageContext';
 import api from '../lib/api';
 import { useNavigationStore } from '../stores/useNavigationStore';

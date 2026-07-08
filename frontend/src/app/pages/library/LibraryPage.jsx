@@ -10,6 +10,7 @@ import LibraryFilters from './components/LibraryFilters';
 import LibraryGrid from './components/LibraryGrid';
 import { useDeleteTagMutation } from '@/queries';
 import { X } from '@/ui/icons';
+import IconButton from '@/ui/IconButton';
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { isLibraryTagsTab } from '@/lib/libraryTabs';
@@ -307,13 +308,15 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
               <h3 className="entity-detail-page__drawer-title">
                 {imagePickerData.title}
               </h3>
-              <button
+              <IconButton
                 type="button"
-                className="entity-detail-page__drawer-close"
+                variant="close"
                 onClick={() => setImagePickerData(null)}
+                label={state.t('common.close') || 'Close'}
+                size="sm"
               >
                 <X size={16} />
-              </button>
+              </IconButton>
             </div>
             <div className="entity-detail-page__drawer-content entity-detail-page__drawer-content--padded">
               <UniversalImagePickerModal

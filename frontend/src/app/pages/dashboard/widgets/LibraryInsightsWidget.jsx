@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import DashboardWidgetShell from './DashboardWidgetShell';
 import { useStatsQuery } from '../../../queries';
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
+import './LibraryInsightsWidget.css';
 
 const translateGenreLabel = (label, T) => {
   if (!label) return '';

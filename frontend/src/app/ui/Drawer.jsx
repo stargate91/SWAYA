@@ -45,7 +45,7 @@ export default function Drawer({
           {title && <h3 className="ui-drawer__title">{title}</h3>}
           <IconButton
             type="button"
-            className="ui-drawer__close"
+            variant="close"
             onClick={onClose}
             label={t('common.close') || 'Close'}
             title={null}

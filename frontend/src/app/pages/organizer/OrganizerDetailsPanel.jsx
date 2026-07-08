@@ -10,7 +10,7 @@ import { ChevronLeft, ChevronRight, FileJson, Info, X } from '@/ui/icons';
 import { API_BASE } from '../../lib/backend';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { useTranslation } from '../../providers/LanguageContext';
-import { useUi } from '../../providers/UiProvider';
+import { useUi } from '@/providers/UiProvider';
 import { useFullMetadataQuery } from '../../queries';
 import '../../styles/OrganizerDetailsPanel.css';
 

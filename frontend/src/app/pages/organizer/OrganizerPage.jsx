@@ -7,7 +7,7 @@ import SegmentedControl from '../../ui/SegmentedControl';
 import { getFirstEnabledProvider, getOrganizerProviderOptions } from '../../lib/providerAvailability';
 
 import { useOrganizerCountQuery, useOrganizerQuery, useScanStatusQuery, useSettingsQuery } from '../../queries';
-import { useUi } from '../../providers/UiProvider';
+import { useUi } from '@/providers/UiProvider';
 import { useTranslation } from '../../providers/LanguageContext';
 import { EMPTY_ORGANIZER } from './organizerConstants';
 import { useOrganizerActions } from './useOrganizerActions.jsx';

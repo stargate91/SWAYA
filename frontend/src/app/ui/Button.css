@@ -161,6 +161,27 @@
   border-color: var(--button-danger-border);
 }
 
+.ui-icon-button--close {
+  background: none !important;
+  border: none !important;
+  color: var(--color-text-secondary) !important;
+  cursor: pointer !important;
+  transition: color var(--motion-duration-base, 0.2s) var(--motion-ease-standard, ease) !important;
+}
+
+.ui-icon-button--close svg {
+  transition: transform var(--motion-duration-base, 0.2s) var(--motion-ease-standard, ease) !important;
+}
+
+.ui-icon-button--close:hover:not(:disabled) {
+  color: var(--color-text-primary) !important;
+  background: none !important;
+}
+
+.ui-icon-button--close:hover:not(:disabled) svg {
+  transform: rotate(90deg) !important;
+}
+
 .ui-button--sm {
   min-height: var(--button-height-sm);
   padding: var(--button-padding-sm);

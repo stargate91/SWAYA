@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { Layers, User, PenLine, Heart, Check, Minus, Plus, Info, Bookmark, X, Maximize2 } from '@/ui/icons';
+import IconButton from '@/ui/IconButton';
 import { API_BASE } from '@/lib/backend';
 import { getProfileImagePath } from '@/lib/imageUrls';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
@@ -457,13 +458,15 @@ export default function PeopleHeroSection({
             <div className="entity-detail-page__drawer ui-drawer ui-drawer--md">
               <div className="entity-detail-page__drawer-header">
                 <h3 className="entity-detail-page__drawer-title">{item?.name || overviewTitle}</h3>
-                <button
+                <IconButton
                   type="button"
-                  className="entity-detail-page__drawer-close"
+                  variant="close"
                   onClick={() => setIsDrawerOpen(false)}
+                  label={t('common.close') || 'Close'}
+                  size="sm"
                 >
-                  {TIMES_CHAR}
-                </button>
+                  <X size={16} />
+                </IconButton>
               </div>
               <div className="entity-detail-page__drawer-content">
                 {/* Section 1: Alternate Names */}

@@ -6,6 +6,7 @@ import { useContinueWatchingQuery } from '../../../queries';
 import { usePlayMediaMutation, useResetProgressMutation, useSettingsQuery } from '../../../queries';
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
+import './ContinueWatchingWidget.css';
 
 import { formatEpisodeCode } from '../../../lib/episodeFormat';
 

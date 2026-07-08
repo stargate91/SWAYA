@@ -28,7 +28,7 @@ export default function Modal({ open, title, description, children, footer, onCl
             ) : null}
             {description ? <p className="ui-modal__description">{description}</p> : null}
           </div>
-          <IconButton type="button" className="ui-modal__close" onClick={onClose} label={t('common.close')} title={null} size="sm">
+          <IconButton type="button" variant="close" onClick={onClose} label={t('common.close')} title={null} size="sm">
             <X size={16} />
           </IconButton>
         </header>

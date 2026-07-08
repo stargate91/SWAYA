@@ -2,6 +2,8 @@
 import { useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Button from '@/ui/Button';
+import IconButton from '@/ui/IconButton';
+import { X } from '@/ui/icons';
 
 const timesChar = '\u00D7';
 
@@ -39,13 +41,15 @@ export default function RatingsReviewDrawer({
           <span className="review-drawer__title">
             {t('ratings.dialog.editReview', { defaultValue: 'Edit Review' })}
           </span>
-          <button
+          <IconButton
             type="button"
-            className="review-drawer-close-btn"
+            variant="close"
             onClick={() => setEditingItem(null)}
+            label={t('common.close') || 'Close'}
+            size="sm"
           >
-            {timesChar}
-          </button>
+            <X size={18} />
+          </IconButton>
         </div>
         <div className="review-drawer__content">
           <span className="review-drawer-media-title">

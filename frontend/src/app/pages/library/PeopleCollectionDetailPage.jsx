@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
 import { Plus, Minus, ChevronDown, ChevronUp, X } from '@/ui/icons';
+import IconButton from '@/ui/IconButton';
 import DetailPageShell from './components/detail/DetailPageShell';
 import EntityDetailTopControls from './components/entityDetail/EntityDetailTopControls';
 import EntityDetailStatusSection from './components/entityDetail/EntityDetailStatusSection';
@@ -291,13 +292,15 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
                   <h3 className="entity-detail-page__drawer-title">
                     {isPeople ? (t('library.details.changeProfile') || 'Change Profile Picture') : (t('library.details.changePoster') || 'Change Poster')}
                   </h3>
-                  <button
+                  <IconButton
                     type="button"
-                    className="entity-detail-page__drawer-close"
+                    variant="close"
                     onClick={() => setIsImagePickerDrawerOpen(false)}
+                    label={t('common.close') || 'Close'}
+                    size="sm"
                   >
                     <X size={16} />
-                  </button>
+                  </IconButton>
                 </div>
                 <div className="entity-detail-page__drawer-content entity-detail-page__drawer-content--padded">
                   <UniversalImagePickerModal
@@ -339,13 +342,15 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
               <h3 className="entity-detail-page__drawer-title">
                 {t('library.details.chooseBackdrop') || 'Choose Backdrop'}
               </h3>
-              <button
+              <IconButton
                 type="button"
-                className="entity-detail-page__drawer-close"
+                variant="close"
                 onClick={() => setIsBackdropDrawerOpen(false)}
+                label={t('common.close') || 'Close'}
+                size="sm"
               >
                 <X size={16} />
-              </button>
+              </IconButton>
             </div>
             <div className="entity-detail-page__drawer-content entity-detail-page__drawer-content--padded">
               {isPeople ? (

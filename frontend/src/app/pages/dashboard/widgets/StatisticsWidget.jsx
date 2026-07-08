@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { useStatsQuery, useSettingsQuery } from '../../../queries';
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 import DashboardWidgetShell from './DashboardWidgetShell';
+import './StatisticsWidget.css';
 
 const StatisticsWidget = ({ T }) => {
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);

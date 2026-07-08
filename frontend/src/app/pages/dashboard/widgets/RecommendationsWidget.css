@@ -1,0 +1,260 @@
+.recommend-spotlight {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  margin-bottom: var(--space-6xl);
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--color-bg-elevated);
+  box-shadow: 0 20px 40px color-mix(in srgb, black 40%, transparent);
+  border: 1px solid var(--color-border-subtle);
+}
+
+.recommend-spotlight-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.75;
+  filter: blur(0.8px) contrast(1.08);
+}
+
+.recommend-spotlight-gradient {
+  position: absolute;
+  inset: 0;
+}
+
+.recommend-spotlight-gradient--side {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--color-bg-app, black) 95%, transparent) 0%, color-mix(in srgb, var(--color-bg-app, black) 60%, transparent) 35%, transparent 65%);
+}
+
+.recommend-spotlight-gradient--bottom {
+  background: linear-gradient(0deg, color-mix(in srgb, var(--color-bg-app, black) 96%, transparent) 0%, transparent 50%);
+}
+
+.recommend-spotlight-copy {
+  position: absolute;
+  bottom: 40px;
+  left: 40px;
+  z-index: 10;
+  max-width: 500px;
+}
+
+.recommend-spotlight-title {
+  margin: 0 0 var(--space-md);
+  color: var(--color-text-primary);
+  font-size: 42px;
+  font-weight: 900;
+  text-shadow: 0 4px 8px color-mix(in srgb, black 80%, transparent);
+  transition: color var(--motion-duration-fast) var(--motion-ease-standard), opacity var(--motion-duration-fast) var(--motion-ease-standard);
+  cursor: pointer;
+  display: inline-block;
+  width: fit-content;
+}
+
+.recommend-spotlight-title:hover {
+  color: var(--color-accent);
+  opacity: 0.95;
+}
+
+.recommend-spotlight-actions {
+  display: flex;
+  gap: var(--space-lg);
+}
+
+.recommend-spotlight-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xl);
+  margin-bottom: var(--space-3xl);
+  color: var(--color-text-primary);
+  font-weight: 700;
+}
+
+.recommend-spotlight-rating {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--color-text-primary, white) 15%, transparent);
+  background: color-mix(in srgb, var(--color-text-primary, white) 10%, transparent);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.recommend-spotlight-rating.is-tmdb {
+  border-color: color-mix(in srgb, var(--color-brand-tmdb) 42%, transparent);
+  background: color-mix(in srgb, var(--color-brand-tmdb) 18%, transparent);
+  color: var(--color-brand-tmdb);
+}
+
+.recommend-spotlight-rating.is-imdb {
+  border-color: color-mix(in srgb, var(--color-brand-imdb) 42%, transparent);
+  background: color-mix(in srgb, var(--color-brand-imdb) 18%, transparent);
+  color: var(--color-brand-imdb);
+}
+
+.recommend-spotlight-year {
+  color: color-mix(in srgb, var(--color-text-primary) 92%, transparent);
+  text-shadow: 0 2px 4px color-mix(in srgb, black 80%, transparent);
+}
+
+.recommend-spotlight-overview {
+  display: -webkit-box;
+  overflow: hidden;
+  margin-bottom: var(--space-4xl);
+  color: color-mix(in srgb, var(--color-text-primary) 80%, transparent);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.recommend-watchlist-btn {
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-4xl);
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.recommend-carousel {
+  position: relative;
+  margin-bottom: var(--space-6xl);
+}
+
+.recommend-carousel-title {
+  margin: 0 0 var(--space-3xl);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.recommend-carousel-shell {
+  position: relative;
+}
+
+.recommend-carousel-track {
+  display: flex;
+  gap: var(--space-3xl);
+  overflow-x: auto;
+  padding-top: var(--space-md);
+  padding-bottom: var(--space-md);
+  scroll-snap-type: x mandatory;
+  transition: opacity var(--motion-duration-base) var(--motion-ease-standard);
+}
+
+.recommend-carousel-track.is-loading {
+  opacity: 0.5;
+}
+
+.recommend-card {
+  --ui-poster-card-width: 12.5rem;
+  --ui-poster-card-min-width: 12.5rem;
+}
+
+.recommend-card--scene {
+  --ui-poster-card-width: 25.875rem;
+  --ui-poster-card-min-width: 25.875rem;
+}
+
+.ui-poster-card.recommend-card .ui-poster-card__image-wrapper {
+  border-radius: 16px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-bg-app, black) 28%, transparent);
+  transition: box-shadow var(--motion-duration-slow) var(--motion-ease-standard);
+}
+
+.ui-poster-card.recommend-card:hover .ui-poster-card__image-wrapper {
+  box-shadow: 0 12px 24px var(--color-surface-overlay);
+}
+
+.recommend-card--scene.ui-poster-card .ui-poster-card__media {
+  aspect-ratio: 414 / 300;
+}
+
+.recommend-card-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: var(--space-3xl);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.recommend-card:hover .recommend-card-overlay {
+  opacity: 1;
+}
+
+.recommend-card-person-subtitle {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: var(--space-2px);
+}
+
+.recommend-card-scene-subtitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.recommend-card-performers {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 70%;
+}
+
+.recommend-card-performer-link {
+  cursor: pointer;
+  color: var(--color-accent-blue-soft);
+}
+
+.recommend-card-loading-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 150px;
+  height: 225px;
+}
+
+.recommend-card-loading-wrapper .ui-spinner {
+  color: var(--color-accent-blue-soft);
+}
+
+.recommend-carousel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.recommend-carousel-header .recommend-carousel-title--header {
+  margin: 0;
+}
+
+.recommend-carousel-filters {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.recommend-carousel-filters .recommend-carousel-filter-genre {
+  width: 10rem;
+}
+
+.recommend-carousel-filters .recommend-carousel-filter-year {
+  width: 8.125rem;
+}
+
+.recommend-carousel-no-results {
+  text-align: center;
+  padding: var(--space-10);
+  color: var(--color-text-muted);
+}

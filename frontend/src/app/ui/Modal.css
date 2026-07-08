@@ -94,34 +94,7 @@
   font-family: var(--font-family-sans);
 }
 
-.ui-modal__close {
-  border: 1px solid var(--modal-close-border);
-  background: var(--modal-close-bg);
-  color: var(--modal-close-color);
-  font-family: Consolas, Monaco, monospace;
-  font-size: var(--font-size-2xs);
-  font-weight: var(--font-weight-bold);
-  line-height: 1;
-}
 
-.ui-modal__close svg {
-  transition: transform var(--motion-fast) !important;
-}
-
-.ui-modal__close:hover {
-  background: var(--modal-close-bg-hover);
-  border-color: var(--modal-close-border-hover);
-  color: var(--modal-close-color-hover);
-}
-
-.ui-modal__close:hover svg {
-  transform: rotate(90deg) !important;
-}
-
-.ui-modal__close:focus-visible {
-  border-color: color-mix(in srgb, var(--color-accent) 42%, var(--color-border-heavy));
-  box-shadow: var(--focus-ring);
-}
 
 .ui-modal__body {
   flex: 1 1 auto;

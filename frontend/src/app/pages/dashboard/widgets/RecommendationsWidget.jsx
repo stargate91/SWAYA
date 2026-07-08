@@ -2,7 +2,7 @@ import { useCallback, useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { Check, ChevronLeft, ChevronRight, Star, Plus, Minus, Play, Heart } from '@/ui/icons';
-import { useUi } from '../../../providers/UiProvider';
+import { useUi } from '@/providers/UiProvider';
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
 import { normalizeMediaEntity } from '../../../lib/normalizeMediaEntity';
 import {
@@ -23,6 +23,7 @@ import TMDBDiscoveryWidget from './TMDBDiscoveryWidget';
 import Skeleton from '../../../ui/Skeleton';
 import PosterCard from '../../../ui/PosterCard';
 import AdultOverlay from '../../../ui/AdultOverlay';
+import './RecommendationsWidget.css';
 
 const ADULT_LABEL = '18+';
 

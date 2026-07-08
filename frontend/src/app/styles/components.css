@@ -168,19 +168,7 @@
   z-index: 10;
 }
 
-/* Rotate drawer close buttons on hover */
-.entity-detail-page__drawer-close,
-.review-drawer-close-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: color var(--motion-duration-base) var(--motion-ease-standard), transform var(--motion-fast) !important;
-}
 
-.entity-detail-page__drawer-close:hover,
-.review-drawer-close-btn:hover {
-  transform: rotate(90deg) !important;
-}
 
 /* Global Settings Badge for Adult 18+ content */
 .settings-badge {
