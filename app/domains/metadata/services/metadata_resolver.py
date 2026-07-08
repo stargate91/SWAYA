@@ -56,10 +56,14 @@ class MetadataResolver:
         # Promote TV show match to EPISODE if the item is an episode or we have season/episode numbers
         inferred_type = str((item.parsed_info or {}).get("type") or "").lower()
         if mtype == MediaType.TV and (inferred_type == "episode" or season_number is not None or episode_number is not None):
+            parsed = item.parsed_info or {}
+            fn_data = parsed.get("fn") or {}
+            it_data = parsed.get("it") or {}
+            fd_data = parsed.get("fd") or {}
             if season_number is None:
-                season_number = (item.parsed_info or {}).get("season")
+                season_number = parsed.get("season") or fn_data.get("season") or it_data.get("season") or fd_data.get("season")
             if episode_number is None:
-                episode_number = (item.parsed_info or {}).get("episode")
+                episode_number = parsed.get("episode") or fn_data.get("episode") or it_data.get("episode") or fd_data.get("episode")
             
             if season_number is not None:
                 try:

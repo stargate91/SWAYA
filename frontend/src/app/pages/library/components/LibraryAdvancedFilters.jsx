@@ -76,7 +76,7 @@ export default function LibraryAdvancedFilters({
           </div>
         )}
 
-        {filterData?.breast_types && filterData.breast_types.length > 0 && (
+        {settings?.include_adult && filterData?.breast_types && filterData.breast_types.length > 0 && (
           <div className="library-sorter-container">
             <span className="library-sorter-label">{t('library.filter.breastTypeLabel') || 'Breast Type:'}</span>
             <Dropdown
@@ -94,81 +94,85 @@ export default function LibraryAdvancedFilters({
           </div>
         )}
 
-        {(activeSessionMode === 'nsfw' || settings?.include_adult) && (
-          <>
-            <div className="library-sorter-container">
-              <span className="library-sorter-label">{t('library.filter.buttShapeLabel') || 'Butt Shape:'}</span>
-              <Dropdown
-                variant="sorter"
-                value={buttShapeFilter}
-                onChange={(e) => {
-                  setButtShapeFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-                options={[
-                  { value: '', label: t('library.filter.allButtShapes') || 'All' },
-                  { value: 'BUBBLE', label: t('library.performerEdit.buttShapes.bubble') || 'Bubble' },
-                  { value: 'HEART', label: t('library.performerEdit.buttShapes.heart') || 'Heart' },
-                  { value: 'SQUARE', label: t('library.performerEdit.buttShapes.square') || 'Square' },
-                  { value: 'FLAT', label: t('library.performerEdit.buttShapes.flat') || 'Flat' },
-                ]}
-              />
-            </div>
-
-            <div className="library-sorter-container">
-              <span className="library-sorter-label">{t('library.filter.buttSizeLabel') || 'Butt Size:'}</span>
-              <Dropdown
-                variant="sorter"
-                value={buttSizeFilter}
-                onChange={(e) => {
-                  setButtSizeFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-                options={[
-                  { value: '', label: t('library.filter.allButtSizes') || 'All' },
-                  { value: 'SMALL', label: t('library.performerEdit.buttSizes.small') || 'Small' },
-                  { value: 'MEDIUM', label: t('library.performerEdit.buttSizes.medium') || 'Medium' },
-                  { value: 'BIG', label: t('library.performerEdit.buttSizes.big') || 'Big' },
-                  { value: 'EXTRA_BIG', label: t('library.performerEdit.buttSizes.extra_big') || 'Extra Big' },
-                ]}
-              />
-            </div>
-          </>
+        {settings?.include_adult && filterData?.butt_shapes && filterData.butt_shapes.length > 0 && (
+          <div className="library-sorter-container">
+            <span className="library-sorter-label">{t('library.filter.buttShapeLabel') || 'Butt Shape:'}</span>
+            <Dropdown
+              variant="sorter"
+              value={buttShapeFilter}
+              onChange={(e) => {
+                setButtShapeFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              options={[
+                { value: '', label: t('library.filter.allButtShapes') || 'All' },
+                { value: 'BUBBLE', label: t('library.performerEdit.buttShapes.bubble') || 'Bubble' },
+                { value: 'HEART', label: t('library.performerEdit.buttShapes.heart') || 'Heart' },
+                { value: 'SQUARE', label: t('library.performerEdit.buttShapes.square') || 'Square' },
+                { value: 'FLAT', label: t('library.performerEdit.buttShapes.flat') || 'Flat' },
+              ]}
+            />
+          </div>
         )}
 
-        <div className="library-sorter-container">
-          <span className="library-sorter-label">{t('library.filter.tattoosLabel') || 'Tattoos:'}</span>
-          <Dropdown
-            variant="sorter"
-            value={tattoosFilter}
-            onChange={(e) => {
-              setTattoosFilter(e.target.value);
-              setCurrentPage(1);
-            }}
-            options={[
-              { value: '', label: t('library.filter.allTattoos') || 'All Options' },
-              { value: 'yes', label: t('library.filter.yes') || 'Yes' },
-              { value: 'no', label: t('library.filter.no') || 'No' },
-            ]}
-          />
-        </div>
+        {settings?.include_adult && filterData?.butt_sizes && filterData.butt_sizes.length > 0 && (
+          <div className="library-sorter-container">
+            <span className="library-sorter-label">{t('library.filter.buttSizeLabel') || 'Butt Size:'}</span>
+            <Dropdown
+              variant="sorter"
+              value={buttSizeFilter}
+              onChange={(e) => {
+                setButtSizeFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              options={[
+                { value: '', label: t('library.filter.allButtSizes') || 'All' },
+                { value: 'SMALL', label: t('library.performerEdit.buttSizes.small') || 'Small' },
+                { value: 'MEDIUM', label: t('library.performerEdit.buttSizes.medium') || 'Medium' },
+                { value: 'BIG', label: t('library.performerEdit.buttSizes.big') || 'Big' },
+                { value: 'EXTRA_BIG', label: t('library.performerEdit.buttSizes.extra_big') || 'Extra Big' },
+              ]}
+            />
+          </div>
+        )}
 
-        <div className="library-sorter-container">
-          <span className="library-sorter-label">{t('library.filter.piercingsLabel') || 'Piercings:'}</span>
-          <Dropdown
-            variant="sorter"
-            value={piercingsFilter}
-            onChange={(e) => {
-              setPiercingsFilter(e.target.value);
-              setCurrentPage(1);
-            }}
-            options={[
-              { value: '', label: t('library.filter.allPiercings') || 'All Options' },
-              { value: 'yes', label: t('library.filter.yes') || 'Yes' },
-              { value: 'no', label: t('library.filter.no') || 'No' },
-            ]}
-          />
-        </div>
+        {filterData?.tattoos && filterData.tattoos.length > 0 && (
+          <div className="library-sorter-container">
+            <span className="library-sorter-label">{t('library.filter.tattoosLabel') || 'Tattoos:'}</span>
+            <Dropdown
+              variant="sorter"
+              value={tattoosFilter}
+              onChange={(e) => {
+                setTattoosFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              options={[
+                { value: '', label: t('library.filter.allTattoos') || 'All Options' },
+                { value: 'yes', label: t('library.filter.yes') || 'Yes' },
+                { value: 'no', label: t('library.filter.no') || 'No' },
+              ]}
+            />
+          </div>
+        )}
+
+        {filterData?.piercings && filterData.piercings.length > 0 && (
+          <div className="library-sorter-container">
+            <span className="library-sorter-label">{t('library.filter.piercingsLabel') || 'Piercings:'}</span>
+            <Dropdown
+              variant="sorter"
+              value={piercingsFilter}
+              onChange={(e) => {
+                setPiercingsFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              options={[
+                { value: '', label: t('library.filter.allPiercings') || 'All Options' },
+                { value: 'yes', label: t('library.filter.yes') || 'Yes' },
+                { value: 'no', label: t('library.filter.no') || 'No' },
+              ]}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

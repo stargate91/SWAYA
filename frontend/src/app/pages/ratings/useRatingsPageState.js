@@ -73,7 +73,7 @@ export function useRatingsPageState() {
 
   const peopleQuery = usePeopleQuery({
     include_inactive: false,
-    limit: 5000,
+    pageSize: 5000,
     adult_only: activeSessionMode === 'nsfw',
     gender: resolvedAdultGenderPreference,
   });

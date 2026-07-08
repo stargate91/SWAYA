@@ -8,7 +8,7 @@ const bulletSep = '\u2022';
 const getPercentageText = (rated, unrated) => {
   const total = rated + unrated;
   if (total === 0) return ' (0%)';
-  return ' (' + Math.round((rated / total) * 100) + '%)';
+  return ' (' + Math.round((unrated / total) * 100) + '%)';
 };
 
 export default function AnalyticsTabContent({

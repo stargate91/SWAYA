@@ -122,8 +122,11 @@ def build_tv_context(
             tv_title = fn_data.get("show_name") or fn_data.get("show") or it_data.get("show_name") or it_data.get("show") or fd_data.get("show_name") or fd_data.get("show") or getattr(item, "filename", "").rsplit(".", 1)[0]
     if not tv_orig_title:
         tv_orig_title = tv_title
-    custom_season = parsed_info.get("season")
-    custom_episode = parsed_info.get("episode")
+    fn_data = parsed_info.get("fn") or {}
+    it_data = parsed_info.get("it") or {}
+    fd_data = parsed_info.get("fd") or {}
+    custom_season = parsed_info.get("season") or fn_data.get("season") or it_data.get("season") or fd_data.get("season")
+    custom_episode = parsed_info.get("episode") or fn_data.get("episode") or it_data.get("episode") or fd_data.get("episode")
 
     if custom_season is not None and str(custom_season).strip() != "":
         season_number = name_parser.format_number(custom_season)

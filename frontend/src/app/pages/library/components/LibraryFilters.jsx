@@ -107,6 +107,15 @@ export default function LibraryFilters({
   }, [yearsList]);
 
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const hasAdvancedFilters = !!(
+    (filterData?.hair_colors && filterData.hair_colors.length > 0) ||
+    (filterData?.eye_colors && filterData.eye_colors.length > 0) ||
+    (settings?.include_adult && filterData?.breast_types && filterData.breast_types.length > 0) ||
+    (settings?.include_adult && filterData?.butt_shapes && filterData.butt_shapes.length > 0) ||
+    (settings?.include_adult && filterData?.butt_sizes && filterData.butt_sizes.length > 0) ||
+    (filterData?.tattoos && filterData.tattoos.length > 0) ||
+    (filterData?.piercings && filterData.piercings.length > 0)
+  );
 
   return (
     <>
@@ -140,31 +149,33 @@ export default function LibraryFilters({
                       ]
                       : isPeopleTab
                         ? [
-                          { value: 'library_count', label: t('library.sort.libraryCount') || 'Library Count' },
-                          { value: 'rating', label: activeSessionMode === 'nsfw' ? (t('library.sort.porndbPerformerRating') || 'PornDB performer rating') : (t('library.sort.popularity') || 'Popularity') },
-                          ...(activeSessionMode === 'nsfw' ? [
-                            { value: 'popularity', label: t('library.sort.popularity') || 'Popularity' },
-                          ] : []),
-                          { value: 'name', label: t('library.sort.name') || 'Name' },
-                          { value: 'birthday', label: t('library.sort.birthday') || 'Birthdate' },
-                          { value: 'user_rating', label: t('library.sort.userRating') || 'User Rating' },
-                          { value: 'last_watched', label: t('library.sort.lastWatched') || 'Last Watched' },
-                          { value: 'watch_count', label: t('library.sort.watchCount') || 'Watch Count' },
-                          { value: 'tag_count', label: t('library.sort.tagCount') || 'Tag Count' },
-                          ...(activeSessionMode === 'nsfw' ? [
-                            { value: 'finish_count', label: t('library.sort.finishCount') || 'Finish Count' },
-                            { value: 'last_finish', label: t('library.sort.lastFinish') || 'Last Finish' },
-                          ] : []),
-                          { value: 'height', label: t('library.sort.height') || 'Height' },
-                          { value: 'weight', label: t('library.sort.weight') || 'Weight' },
-                          { value: 'cup_size', label: t('library.sort.cupSize') || 'Breast Size' },
-                          { value: 'waist', label: t('library.sort.waist') || 'Waist Size' },
-                          { value: 'hip', label: t('library.sort.hip') || 'Hip Size' },
-                          { value: 'hourglass_ratio', label: t('library.sort.hourglassRatio') || 'Hourglass Ratio' },
-                          { value: 'body_slender', label: t('library.sort.bodySlender') || 'Slender / Athletic' },
-                          { value: 'body_curvy', label: t('library.sort.bodyCurvy') || 'Hourglass / Curvy' },
-                          { value: 'random', label: t('library.sort.random') || 'Random' }
-                        ]
+                            { value: 'name', label: t('library.sort.name') || 'Name' },
+                            { value: 'rating', label: activeSessionMode === 'nsfw' ? (t('library.sort.porndbPerformerRating') || 'PornDB performer rating') : (t('library.sort.popularity') || 'Popularity') },
+                            ...(activeSessionMode === 'nsfw' ? [
+                              { value: 'popularity', label: t('library.sort.popularity') || 'Popularity' },
+                            ] : []),
+                            { value: 'user_rating', label: t('library.sort.userRating') || 'User Rating' },
+                            { value: 'library_count', label: t('library.sort.libraryCount') || 'Library Count' },
+                            { value: 'birthday', label: t('library.sort.birthday') || 'Birthdate' },
+                            { value: 'last_watched', label: t('library.sort.lastWatched') || 'Last Watched' },
+                            { value: 'watch_count', label: t('library.sort.watchCount') || 'Watch Count' },
+                            ...(activeSessionMode === 'nsfw' ? [
+                              { value: 'finish_count', label: t('library.sort.finishCount') || 'Finish Count' },
+                              { value: 'last_finish', label: t('library.sort.lastFinish') || 'Last Finish' },
+                            ] : []),
+                            { value: 'tag_count', label: t('library.sort.tagCount') || 'Tag Count' },
+                            { value: 'height', label: t('library.sort.height') || 'Height' },
+                            ...(settings?.include_adult ? [
+                              { value: 'weight', label: t('library.sort.weight') || 'Weight' },
+                              { value: 'cup_size', label: t('library.sort.cupSize') || 'Breast Size' },
+                              { value: 'waist', label: t('library.sort.waist') || 'Waist Size' },
+                              { value: 'hip', label: t('library.sort.hip') || 'Hip Size' },
+                              { value: 'hourglass_ratio', label: t('library.sort.hourglassRatio') || 'Hourglass Ratio' },
+                              { value: 'body_slender', label: t('library.sort.bodySlender') || 'Slender / Athletic' },
+                              { value: 'body_curvy', label: t('library.sort.bodyCurvy') || 'Hourglass / Curvy' },
+                            ] : []),
+                            { value: 'random', label: t('library.sort.random') || 'Random' }
+                          ]
                         : [
                           { value: 'title', label: t('library.sort.title') || 'Title' },
                           { value: 'year', label: isTvTab ? (t('library.sort.firstAirYear') || 'First Air Year') : (t('library.sort.year') || 'Year') },
@@ -400,7 +411,7 @@ export default function LibraryFilters({
             </Pill>
           )}
 
-          {isPeopleTab && (
+          {isPeopleTab && hasAdvancedFilters && (
             <Pill
               variant={showAdvanced ? 'filter-active' : 'favorite'}
               onClick={() => setShowAdvanced(prev => !prev)}
