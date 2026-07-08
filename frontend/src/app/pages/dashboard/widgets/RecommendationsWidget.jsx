@@ -213,19 +213,20 @@ const RecommendationCarousel = ({
             let subtitle;
             if (n.isPerson) {
               subtitle = (
-                <div className="recommend-card-person-subtitle">
+                <div className="ui-poster-card__subtitle">
                   {roleLabel}
                 </div>
               );
             } else if (n.isScene) {
               subtitle = (
-                <div className="recommend-card-scene-subtitle">
-                  <span className="recommend-card-performers">
+                <div className="ui-poster-card__subtitle-row">
+                  <span className="ui-poster-card__subtitle" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {performers.map((p, idx) => (
-                      // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
                       <span
                         key={p.id}
-                        className="recommend-card-performer-link"
+                        role="button"
+                        tabIndex={0}
+                        className="ui-poster-card__performer-link"
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/library/people/${p.id}`, { state: { allowAdult: true } });
@@ -236,7 +237,7 @@ const RecommendationCarousel = ({
                       </span>
                     ))}
                   </span>
-                  {displayDate && <span>{displayDate}</span>}
+                  {displayDate && <span className="ui-poster-card__subtitle" style={{ textAlign: 'right', flex: 'none' }}>{displayDate}</span>}
                 </div>
               );
             } else {
@@ -341,7 +342,7 @@ RecommendationSkeleton.propTypes = {
   showBanner: PropTypes.bool,
 };
 
-const RecommendationsWidget = ({ language, T, visibleWidgets = {} }) => {
+const RecommendationsWidget = ({ widgetKey = null, language, T, visibleWidgets = {} }) => {
   const { toast } = useUi();
   const navigate = useNavigate();
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
@@ -363,19 +364,33 @@ const RecommendationsWidget = ({ language, T, visibleWidgets = {} }) => {
   const [isLoadingMorePeople, setIsLoadingMorePeople] = useState(false);
 
   const [prevRecommendations, setPrevRecommendations] = useState(null);
-  const isFirstLoad = !prevRecommendations && recommendations;
-  const firstItemChanged = recommendations?.recently_added?.[0]?.id !== prevRecommendations?.recently_added?.[0]?.id;
-  const firstPersonChanged = recommendations?.recently_activated_people?.[0]?.id !== prevRecommendations?.recently_activated_people?.[0]?.id;
 
-  if (recommendations && (isFirstLoad || firstItemChanged || firstPersonChanged)) {
+  if (recommendations && recommendations !== prevRecommendations) {
+    const isFirstLoad = !prevRecommendations;
+    const firstItemChanged = recommendations?.recently_added?.[0]?.id !== prevRecommendations?.recently_added?.[0]?.id;
+    const firstPersonChanged = recommendations?.recently_activated_people?.[0]?.id !== prevRecommendations?.recently_activated_people?.[0]?.id;
+
     setPrevRecommendations(recommendations);
-    setRecentlyAddedItems(recommendations.recently_added || []);
-    setRecentlyAddedPage(1);
-    setHasMoreRecentlyAdded((recommendations.recently_added || []).length === 20);
 
-    setRecentlyActivePeople(recommendations.recently_activated_people || []);
-    setRecentlyActivePage(1);
-    setHasMorePeople((recommendations.recently_activated_people || []).length === 20);
+    setRecentlyAddedItems((prev) => {
+      if (isFirstLoad || firstItemChanged) {
+        setRecentlyAddedPage(1);
+        setHasMoreRecentlyAdded((recommendations.recently_added || []).length === 20);
+        return recommendations.recently_added || [];
+      }
+      const freshMap = new Map((recommendations.recently_added || []).map(item => [item.id, item]));
+      return prev.map(item => freshMap.has(item.id) ? { ...item, ...freshMap.get(item.id) } : item);
+    });
+
+    setRecentlyActivePeople((prev) => {
+      if (isFirstLoad || firstPersonChanged) {
+        setRecentlyActivePage(1);
+        setHasMorePeople((recommendations.recently_activated_people || []).length === 20);
+        return recommendations.recently_activated_people || [];
+      }
+      const freshMap = new Map((recommendations.recently_activated_people || []).map(p => [p.id, p]));
+      return prev.map(p => freshMap.has(p.id) ? { ...p, ...freshMap.get(p.id) } : p);
+    });
   }
 
   const handleLoadMoreAdded = async () => {
@@ -527,7 +542,10 @@ const RecommendationsWidget = ({ language, T, visibleWidgets = {} }) => {
     navigate(`/library/${type}/${idToUse}`, { state: { allowAdult: true } });
   };
 
-  const isWidgetVisible = (key) => visibleWidgets[key] !== false;
+  const isWidgetVisible = (key) => {
+    if (widgetKey && widgetKey !== key) return false;
+    return visibleWidgets[key] !== false;
+  };
 
   return (
     <>
@@ -627,6 +645,7 @@ const RecommendationsWidget = ({ language, T, visibleWidgets = {} }) => {
 };
 
 RecommendationsWidget.propTypes = {
+  widgetKey: PropTypes.string,
   language: PropTypes.string,
   T: PropTypes.func.isRequired,
   visibleWidgets: PropTypes.object,

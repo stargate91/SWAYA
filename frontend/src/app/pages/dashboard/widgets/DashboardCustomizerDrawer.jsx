@@ -68,76 +68,31 @@ export default function DashboardCustomizerDrawer({
         <div className="dashboard-customizer-list">
           {widgetOrder.map((key, index) => {
             let label = '';
-            let hasSwitch = true;
             let switchKey = key;
-            let childSwitches = null;
 
             if (key === 'continue_watching') {
               label = t('dashboard.widget_continue_watching') || 'Continue Watching';
+            } else if (key === 'spotlight') {
+              label = t('dashboard.widget_spotlight') || 'Spotlight (Trending)';
+            } else if (key === 'recently_added') {
+              label = t('dashboard.widget_recently_added') || 'Recently Added';
+            } else if (key === 'recently_activated_people') {
+              label = t(isNsfw ? 'dashboard.widget_recently_activated_people_adult' : 'dashboard.widget_recently_activated_people') || (isNsfw ? 'Lately Tracked Adult Stars' : 'Lately Tracked Artists');
+            } else if (key === 'movies_discovery') {
+              label = t('dashboard.widget_movies_discovery') || 'Discover Movies';
+            } else if (key === 'tv_discovery') {
+              label = t('dashboard.widget_tv_discovery') || 'Discover TV Shows';
+            } else if (key === 'top_20') {
+              label = t('dashboard.widget_top_20') || 'Top 20 Discoveries';
+            } else if (key === 'adult') {
+              if (!showAdult) return null;
+              label = t('dashboard.widget_adult') || 'Adult recommendations';
+            } else {
+              return null;
             }
-            if (key === 'recommendations') {
-              label = t('dashboard.customize_recommendations') || 'Recommendations & Discoveries';
-              hasSwitch = false; // Container only, child items have separate switches
-              childSwitches = (
-                <div className="dashboard-customizer-child-switches">
-                    <Switch
-                      checked={Boolean(visibleWidgets.spotlight)}
-                      onChange={() => toggleWidget('spotlight')}
-                    >
-                      {t('dashboard.widget_spotlight') || 'Spotlight (Trending)'}
-                    </Switch>
+            const isDragOver = index === dragOverIndex;
 
-                    <Switch
-                      checked={Boolean(visibleWidgets.recently_added)}
-                      onChange={() => toggleWidget('recently_added')}
-                    >
-                      {t('dashboard.widget_recently_added') || 'Recently Added'}
-                    </Switch>
-
-                    <Switch
-                      checked={Boolean(visibleWidgets.recently_activated_people)}
-                      onChange={() => toggleWidget('recently_activated_people')}
-                    >
-                      {t(isNsfw ? 'dashboard.widget_recently_activated_people_adult' : 'dashboard.widget_recently_activated_people') || (isNsfw ? 'Recently Followed Adult Stars' : 'Recently Tracked People')}
-                    </Switch>
-
-                    <Switch
-                      checked={Boolean(visibleWidgets.movies_discovery)}
-                      onChange={() => toggleWidget('movies_discovery')}
-                    >
-                      {t('dashboard.widget_movies_discovery') || 'Discover Movies'}
-                    </Switch>
-
-                    <Switch
-                      checked={Boolean(visibleWidgets.tv_discovery)}
-                      onChange={() => toggleWidget('tv_discovery')}
-                    >
-                      {t('dashboard.widget_tv_discovery') || 'Discover TV Shows'}
-                    </Switch>
-
-                    <Switch
-                      checked={Boolean(visibleWidgets.top_20)}
-                      onChange={() => toggleWidget('top_20')}
-                    >
-                      {t('dashboard.widget_top_20') || 'Top 20 Discoveries'}
-                    </Switch>
-
-                    {showAdult && (
-                      <Switch
-                        checked={Boolean(visibleWidgets.adult)}
-                        onChange={() => toggleWidget('adult')}
-                      >
-                        {t('dashboard.widget_adult') || 'Adult recommendations'}
-                      </Switch>
-                    )}
-                  </div>
-                );
-              }
-
-
-              const isDragOver = index === dragOverIndex;
-
-              return (
+            return (
                 // eslint-disable-next-line jsx-a11y/no-static-element-interactions
                 <div
                   key={key}
@@ -157,15 +112,11 @@ export default function DashboardCustomizerDrawer({
                       <span className="dashboard-customizer-item-label">{label}</span>
                     </div>
 
-                    {hasSwitch && (
-                      <Switch
-                        checked={Boolean(visibleWidgets[switchKey])}
-                        onChange={() => toggleWidget(switchKey)}
-                      />
-                    )}
+                    <Switch
+                      checked={Boolean(visibleWidgets[switchKey])}
+                      onChange={() => toggleWidget(switchKey)}
+                    />
                   </div>
-
-                  {childSwitches}
                 </div>
               );
             })}

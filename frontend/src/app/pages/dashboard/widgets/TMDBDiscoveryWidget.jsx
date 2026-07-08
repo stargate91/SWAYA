@@ -58,7 +58,7 @@ const TMDBDiscoveryWidget = ({ T }) => {
   const [showRight, setShowRight] = useState(true);
 
   const { data: recommendations } = useRecommendationsQuery();
-  const watchlistIdsFromQuery = recommendations?.watchlist_item_ids || [];
+  const watchlistIdsFromQuery = recommendations?.watchlist_item_ids;
   const [prevWatchlistIds, setPrevWatchlistIds] = useState(null);
   const [optimisticWatchlistIds, setOptimisticWatchlistIds] = useState(null);
 
@@ -67,7 +67,7 @@ const TMDBDiscoveryWidget = ({ T }) => {
     setOptimisticWatchlistIds(null);
   }
 
-  const actualWatchlistIds = optimisticWatchlistIds !== null ? optimisticWatchlistIds : watchlistIdsFromQuery;
+  const actualWatchlistIds = optimisticWatchlistIds !== null ? optimisticWatchlistIds : (watchlistIdsFromQuery || []);
 
   const addToWatchlistMutation = useAddToWatchlistMutation();
   const removeFromWatchlistMutation = useRemoveFromWatchlistMutation();

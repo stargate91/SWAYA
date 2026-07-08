@@ -1,6 +1,28 @@
 {
-  "welcome": "Welcome back, {name}! Ready for a show?",
-  "welcome_no_name": "Welcome back! What are we watching today?",
+  "welcome": {
+    "onboarding": "Welcome to SWAYA, {name}! Let's get your library set up.",
+    "onboarding_nsfw": "Welcome to SWAYA, {name}! Ready to build your ultimate sanctuary?",
+    "morning": "Good morning, {name}! Ready for a fresh start?",
+    "afternoon": "Good afternoon, {name}! What's on the menu today?",
+    "evening": "Good evening, {name}! Time to sit back and relax.",
+    "night": "Up late, {name}? What are we watching tonight?",
+    "morning_nsfw": "Good morning, {name}! Starting the day with a bang?",
+    "afternoon_nsfw": "Good afternoon, {name}! Sneaking in a quick break?",
+    "evening_nsfw": "Good evening, {name}! Time to turn up the heat.",
+    "night_nsfw": "Late night desires, {name}? Enjoy your private time."
+  },
+  "welcome_no_name": {
+    "onboarding": "Welcome to SWAYA! Let's get your library set up.",
+    "onboarding_nsfw": "Welcome to SWAYA! Ready to build your ultimate sanctuary?",
+    "morning": "Good morning! Ready for a fresh start?",
+    "afternoon": "Good afternoon! What's on the menu today?",
+    "evening": "Good evening! Time to sit back and relax.",
+    "night": "Up late? What are we watching tonight?",
+    "morning_nsfw": "Good morning! Starting the day with a bang?",
+    "afternoon_nsfw": "Good afternoon! Sneaking in a quick break?",
+    "evening_nsfw": "Good evening! Time to turn up the heat.",
+    "night_nsfw": "Late night desires? Enjoy your private time."
+  },
   "subtitle": "Your library is locked, loaded, and ready to go.",
   "watchlist": {
     "add": "Watchlist",

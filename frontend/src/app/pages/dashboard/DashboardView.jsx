@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { useSettingsQuery } from '../../queries';
+import { useSettingsQuery, useStatsQuery } from '../../queries';
 import { useTranslation } from '../../providers/LanguageContext';
+import { useLibraryModeStore } from '../../stores/useLibraryModeStore';
 import { SlidersHorizontal } from '@/ui/icons';
 import UtilityBarPortal from '../../../components/UtilityBarPortal';
 import IconButton from '@/ui/IconButton';
 import Tooltip from '@/ui/Tooltip';
 import ContinueWatchingWidget from './widgets/ContinueWatchingWidget';
 import RecommendationsWidget from './widgets/RecommendationsWidget';
+import TMDBDiscoveryWidget from './widgets/TMDBDiscoveryWidget';
 import DashboardCustomizerDrawer from './widgets/DashboardCustomizerDrawer';
 import './DashboardPage.css';
 
@@ -21,7 +23,16 @@ const DEFAULT_WIDGETS = {
   adult: true,
 };
 
-const DEFAULT_ORDER = ['continue_watching', 'recommendations'];
+const DEFAULT_ORDER = [
+  'continue_watching',
+  'spotlight',
+  'recently_added',
+  'recently_activated_people',
+  'movies_discovery',
+  'tv_discovery',
+  'top_20',
+  'adult'
+];
 
 const DashboardView = () => {
   const { data: settings = {} } = useSettingsQuery();
@@ -74,12 +85,43 @@ const DashboardView = () => {
     });
   };
 
-  const displayName = settings.user_name?.trim();
-  const welcomeTitle = displayName
-    ? t('dashboard.welcome', { name: displayName })
-    : t('dashboard.welcome_no_name') || 'Welcome back';
-
+  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const showAdult = Boolean(settings?.include_adult);
+
+  const { data: stats = {}, isLoading: statsLoading } = useStatsQuery(sessionMode === 'nsfw');
+
+  const getGreetingKey = () => {
+    const isNsfw = showAdult && sessionMode === 'nsfw';
+
+    const hasItems = (
+      (stats.genre_distribution && Object.keys(stats.genre_distribution).length > 0) ||
+      (stats.decade_distribution && Object.keys(stats.decade_distribution).length > 0)
+    );
+
+    if (!statsLoading && !hasItems) {
+      return isNsfw ? 'onboarding_nsfw' : 'onboarding';
+    }
+
+    const hour = new Date().getHours();
+    let timeKey = 'afternoon';
+    if (hour >= 5 && hour < 12) {
+      timeKey = 'morning';
+    } else if (hour >= 12 && hour < 18) {
+      timeKey = 'afternoon';
+    } else if (hour >= 18 && hour < 22) {
+      timeKey = 'evening';
+    } else {
+      timeKey = 'night';
+    }
+
+    return isNsfw ? `${timeKey}_nsfw` : timeKey;
+  };
+
+  const displayName = settings.user_name?.trim();
+  const greetingKey = getGreetingKey();
+  const welcomeTitle = displayName
+    ? t(`dashboard.welcome.${greetingKey}`, { name: displayName })
+    : t(`dashboard.welcome_no_name.${greetingKey}`) || 'Welcome back';
 
   return (
     <>
@@ -106,10 +148,15 @@ const DashboardView = () => {
         if (key === 'continue_watching') {
           return visibleWidgets.continue_watching && <ContinueWatchingWidget key={key} T={t} />;
         }
-        if (key === 'recommendations') {
+        if (key === 'top_20') {
+          return visibleWidgets.top_20 && settings?.tmdb_api_key && <TMDBDiscoveryWidget key={key} T={t} />;
+        }
+        const isRecKey = ['spotlight', 'recently_added', 'recently_activated_people', 'movies_discovery', 'tv_discovery', 'adult'].includes(key);
+        if (isRecKey) {
           return (
             <RecommendationsWidget
               key={key}
+              widgetKey={key}
               language={settings?.ui_language || settings?.primary_metadata_language}
               T={t}
               visibleWidgets={visibleWidgets}
