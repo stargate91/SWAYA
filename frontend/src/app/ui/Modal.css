@@ -22,7 +22,7 @@
 }
 
 .ui-modal {
-  width: min(580px, 100%);
+  width: var(--modal-width, min(580px, 100%));
   max-height: min(88vh, calc(100vh - (var(--space-6) * 2)));
   border-radius: var(--radius-lg);
   background: var(--modal-surface-base);
@@ -35,12 +35,12 @@
 }
 
 .ui-modal--wide {
-  width: min(760px, 100%);
+  --modal-width: min(760px, 100%);
 }
 
 
 .ui-modal--extra-wide {
-  width: min(1080px, 100%);
+  --modal-width: min(1080px, 100%);
 }
 
 @keyframes ui-modal-scale-up {

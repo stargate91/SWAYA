@@ -3,7 +3,6 @@ import { ENTITY_ICONS } from '@/ui/icons';
 import Badge from '@/ui/Badge';
 import CardMetadata from '@/ui/CardMetadata';
 import PosterCard from '@/ui/PosterCard';
-import BackdropCard from '@/ui/BackdropCard';
 import CompactCard from '@/ui/CompactCard';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { MEDIA_TYPES, isTvLikeMediaType, toMetadataMediaType } from '@/lib/mediaTypes';
@@ -52,7 +51,9 @@ export default function MatchCandidateCard({
 }) {
   const mediaType = mode === 'scene' ? 'scene' : toMetadataMediaType(candidate.type || candidate.media_type, mode);
   const displayTitle = getDisplayTitle(candidate, mediaType, t);
-  const displayYear = getDisplayYear(candidate, mediaType);
+  const displayYear = mediaType === 'scene'
+    ? (candidate.release_date ? String(candidate.release_date).slice(0, 10) : null)
+    : getDisplayYear(candidate, mediaType);
   const candidateId = candidate.tmdb_id || candidate.id;
   const posterUrl = resolveMediaImageUrl(candidate.poster_path, mediaType === 'scene' ? 'backdrop' : 'poster');
   const isDisabled = isResolvingId === candidateId || isBrowserLoading;
@@ -65,38 +66,11 @@ export default function MatchCandidateCard({
   }
 
   if (variant === 'poster') {
-    if (mediaType === 'scene') {
-      return (
-        <BackdropCard
-          key={`${sourceLabel}-${candidateId}`}
-          className={`organizer-match-modal__poster-card is-scene${candidate.is_active ? ' is-active' : ''}`}
-          imageUrl={posterUrl}
-          onClick={() => onSelect(candidate)}
-          disabled={isDisabled}
-          infoLeft={displayTitle}
-          infoRight={displayYear}
-        >
-          {candidate.is_active && (
-            <div className="organizer-match-modal__candidate-badge-wrapper">
-              {rowStatus === 'uncertain' ? (
-                <Badge family="status" variant="overlay" tone="warning">
-                  {t('organizer.status.uncertain')}
-                </Badge>
-              ) : (
-                <Badge family="status" variant="overlay" tone="accent">
-                  {t('organizer.details.matchModal.current')}
-                </Badge>
-              )}
-            </div>
-          )}
-        </BackdropCard>
-      );
-    }
-
     return (
       <PosterCard
         key={`${sourceLabel}-${candidateId}`}
         className={`organizer-match-modal__poster-card${mediaType === 'scene' ? ' is-scene' : ''}`}
+        aspect={mediaType === 'scene' ? 'landscape' : 'poster'}
         active={candidate.is_active}
         imageUrl={posterUrl}
         icon={mediaType === 'tv' ? ENTITY_ICONS.tv : (mediaType === 'scene' ? ENTITY_ICONS.episode : ENTITY_ICONS.movie)}

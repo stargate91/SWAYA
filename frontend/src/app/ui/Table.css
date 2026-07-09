@@ -191,28 +191,28 @@
   box-shadow: none;
 }
 
-.ui-table--minimal th,
-.ui-table--minimal td {
-  padding: 6px 8px !important;
-  font-size: var(--font-size-xs, 13px);
+.ui-table.ui-table--minimal th,
+.ui-table.ui-table--minimal td {
+  padding: var(--ui-table-cell-padding, 6px 8px);
+  font-size: var(--ui-table-cell-font-size, var(--font-size-xs, 13px));
 }
 
-.ui-table--minimal th {
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border-bottom: 1.5px solid var(--color-border-subtle, rgba(255, 255, 255, 0.08)) !important;
-  padding-bottom: 8px !important;
+.ui-table.ui-table--minimal th {
+  background: var(--ui-table-header-bg, transparent);
+  backdrop-filter: var(--ui-table-header-backdrop-filter, none);
+  -webkit-backdrop-filter: var(--ui-table-header-backdrop-filter, none);
+  border-bottom: var(--ui-table-header-border-bottom, 1.5px solid var(--color-border-subtle, rgba(255, 255, 255, 0.08)));
+  padding-bottom: var(--ui-table-header-padding-bottom, 8px);
 }
 
-.ui-table--minimal td {
-  border-bottom: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.08)) !important;
+.ui-table.ui-table--minimal td {
+  border-bottom: var(--ui-table-cell-border-bottom, 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.08)));
 }
 
-.ui-table--minimal tbody tr:nth-child(even) {
-  background: transparent !important;
+.ui-table.ui-table--minimal tbody tr:nth-child(even) {
+  background: transparent;
 }
 
-.ui-table--minimal tbody tr:hover {
-  background: color-mix(in srgb, var(--color-line) 6%, transparent) !important;
+.ui-table.ui-table--minimal tbody tr:hover {
+  background: color-mix(in srgb, var(--color-line) 6%, transparent);
 }

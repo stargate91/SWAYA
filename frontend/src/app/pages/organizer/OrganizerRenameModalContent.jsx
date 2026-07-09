@@ -74,7 +74,7 @@ export default function OrganizerRenameModalContent({ items = [], t, organizeInP
           placeholder={t('organizer.searchPlaceholder') || 'Search files...'}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          icon={Search}
+          leftElement={<Search size={18} />}
         />
       </div>
 

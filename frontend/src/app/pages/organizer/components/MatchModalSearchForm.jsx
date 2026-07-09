@@ -4,6 +4,7 @@ import SegmentedControl from '../../../ui/SegmentedControl';
 import Tooltip from '../../../ui/Tooltip';
 import Input from '../../../ui/Input';
 import Dropdown from '../../../ui/Dropdown';
+import SearchInputCombo from '../../../ui/SearchInputCombo';
 
 export default function MatchModalSearchForm({
   query,
@@ -34,30 +35,22 @@ export default function MatchModalSearchForm({
           className={`organizer-match-modal__search-grid${isTvMode && !isBulk ? ' is-tv' : ' is-movie'}`}
         >
           {sessionMode === 'nsfw' ? (
-            <div className="organizer-match-modal__search-input-group organizer-match-modal__field organizer-match-modal__field--query">
-              <div className="organizer-match-modal__search-source">
-                <Dropdown
-                  className="organizer-match-dropdown"
-                  menuClassName="search-source-dropdown-menu"
-                  value={provider}
-                  onChange={(e) => setProvider(e.target.value)}
-                  options={providerOptions}
-                />
-              </div>
-              <div className="organizer-match-modal__form-input-wrapper">
-                <Input
-                  type="text"
-                  placeholder={
-                    isTvMode
-                      ? t('organizer.details.matchModal.queryPlaceholderTv')
-                      : t('organizer.details.matchModal.queryPlaceholderMovie')
-                  }
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  aria-label={t('organizer.details.matchModal.query')}
-                />
-              </div>
-            </div>
+            <SearchInputCombo
+              className="organizer-match-modal__field organizer-match-modal__field--query"
+              size="lg"
+              showSearchIcon={false}
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={
+                isTvMode
+                  ? t('organizer.details.matchModal.queryPlaceholderTv')
+                  : t('organizer.details.matchModal.queryPlaceholderMovie')
+              }
+              selectedOption={provider}
+              onOptionChange={(val) => setProvider({ target: { value: val } })}
+              options={providerOptions}
+              aria-label={t('organizer.details.matchModal.query')}
+            />
           ) : (
             <Input
               className="organizer-match-modal__field organizer-match-modal__field--query"

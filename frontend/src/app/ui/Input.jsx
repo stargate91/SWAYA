@@ -3,7 +3,7 @@ import { Eye, EyeOff } from '@/ui/icons';
 import { useTranslation } from '../providers/LanguageContext';
 import './Input.css';
 
-export default function Input({ label, hint, error, type, className = '', inputRef, leftElement, rightElement, ...props }) {
+export default function Input({ label, hint, error, type, className = '', size = 'md', inputRef, leftElement, rightElement, ...props }) {
   const [showPassword, setShowPassword] = useState(false);
   const hintId = useId();
   const errorId = useId();
@@ -27,7 +27,7 @@ export default function Input({ label, hint, error, type, className = '', inputR
         )}
         <input
           ref={inputRef}
-          className={`ui-input${hasRightElement ? ' ui-input--has-right-element' : ''}${hasLeftElement ? ' ui-input--has-left-element' : ''}${error ? ' ui-input--error' : ''}`}
+          className={`ui-input ui-input--${size}${hasRightElement ? ' ui-input--has-right-element' : ''}${hasLeftElement ? ' ui-input--has-left-element' : ''}${error ? ' ui-input--error' : ''}`}
           type={inputType}
           aria-invalid={error ? 'true' : undefined}
           aria-describedby={[

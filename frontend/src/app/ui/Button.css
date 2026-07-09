@@ -224,7 +224,7 @@
 
 .ui-button--ghost {
   background: var(--button-ghost-bg);
-  color: var(--button-ghost-color);
+  color: var(--button-ghost-color-override, var(--button-ghost-color));
   border-color: var(--button-ghost-border);
 }
 
@@ -260,7 +260,7 @@
 
 .ui-button--ghost:hover:not(:disabled) {
   background: var(--button-ghost-hover-bg);
-  color: var(--button-ghost-hover-color);
+  color: var(--button-ghost-hover-color-override, var(--button-ghost-hover-color));
 }
 
 .ui-button--danger:hover:not(:disabled) {

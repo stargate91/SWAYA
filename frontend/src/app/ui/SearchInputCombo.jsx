@@ -12,6 +12,7 @@ export default function SearchInputCombo({
   rightElement,
   className = '',
   size = 'md',
+  showSearchIcon = true,
   ...props
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -76,7 +77,7 @@ export default function SearchInputCombo({
 
         {/* Input area */}
         <div className="search-input-combo__input-wrapper">
-          <Search className="search-input-combo__search-icon" size={14} />
+          {showSearchIcon && <Search className="search-input-combo__search-icon" size={14} />}
           <input
             type="text"
             className="search-input-combo__input"
