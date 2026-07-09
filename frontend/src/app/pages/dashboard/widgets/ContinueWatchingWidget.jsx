@@ -37,7 +37,8 @@ const ContinueWatchingWidget = ({ T }) => {
   const [prevItems, setPrevItems] = useState(items);
   const [localItems, setLocalItems] = useState(items);
 
-  if (items !== prevItems) {
+  const itemsChanged = items.length !== prevItems.length || items.some((item, idx) => item.id !== prevItems[idx]?.id);
+  if (itemsChanged) {
     setPrevItems(items);
     setLocalItems(items);
   }
