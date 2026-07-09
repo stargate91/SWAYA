@@ -2,9 +2,9 @@ import { useState, useMemo } from 'react';
 import { Search } from '@/ui/icons';
 import { compareOrganizerValues } from './organizerMappers';
 import Input from '../../ui/Input';
-import SortButton from '../../ui/SortButton';
 import Tooltip from '../../ui/Tooltip';
 import Checkbox from '../../ui/Checkbox';
+import Table from '../../ui/Table';
 import { useOrganizerSort } from './useOrganizerSort';
 import { useLocalListSearch } from '../../hooks/useLocalListSearch';
 import '../../styles/RenameModal.css';
@@ -29,6 +29,42 @@ export default function OrganizerRenameModalContent({ items = [], t, organizeInP
     }
     return result;
   }, [filteredItems, sortConfig]);
+
+  const columns = useMemo(() => [
+    {
+      key: 'source',
+      label: t('organizer.renameModal.currentFilename') || 'Current Filename',
+      sortable: true,
+      width: '45%',
+      render: (value, row) => (
+        <Tooltip content={row.sourcePath} side="top" align="start">
+          <span className="organizer-rename-modal__cell-text">
+            {row.source}
+          </span>
+        </Tooltip>
+      )
+    },
+    {
+      key: 'target',
+      label: t('organizer.renameModal.newFilename') || 'New Filename',
+      sortable: true,
+      width: '45%',
+      render: (value, row) => (
+        <Tooltip content={organizeInPlace ? row.sourcePath : row.targetPath} side="top" align="start">
+          <span className={`organizer-rename-modal__cell-text ${organizeInPlace ? 'is-organize-in-place' : ''}`}>
+            {organizeInPlace ? row.source : row.target}
+          </span>
+        </Tooltip>
+      )
+    },
+    {
+      key: 'type',
+      label: t('organizer.table.type') || 'Type',
+      sortable: true,
+      width: '10%',
+      align: 'center'
+    }
+  ], [t, organizeInPlace]);
 
   return (
     <div className="organizer-rename-modal">
@@ -57,64 +93,15 @@ export default function OrganizerRenameModalContent({ items = [], t, organizeInP
       </div>
 
       <div className="organizer-rename-modal__list-container">
-        <table className="organizer-rename-modal__table">
-          <thead>
-            <tr className="organizer-rename-modal__header-row">
-              <th className="organizer-rename-modal__header-col organizer-rename-modal__header-col--source">
-                <SortButton
-                  isActive={sortConfig.key === 'source'}
-                  label={t('organizer.renameModal.currentFilename') || 'Current Filename'}
-                  onToggle={() => handleSortToggle('source')}
-                  sortDirection={sortConfig.direction}
-                />
-              </th>
-              <th className="organizer-rename-modal__header-col organizer-rename-modal__header-col--target">
-                <SortButton
-                  isActive={sortConfig.key === 'target'}
-                  label={t('organizer.renameModal.newFilename') || 'New Filename'}
-                  onToggle={() => handleSortToggle('target')}
-                  sortDirection={sortConfig.direction}
-                />
-              </th>
-              <th className="organizer-rename-modal__header-col organizer-rename-modal__header-col--type">
-                <SortButton
-                  isActive={sortConfig.key === 'type'}
-                  label={t('organizer.table.type') || 'Type'}
-                  onToggle={() => handleSortToggle('type')}
-                  sortDirection={sortConfig.direction}
-                />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedItems.map((item) => (
-              <tr key={item.id} className="organizer-rename-modal__row">
-                <td className="organizer-rename-modal__col organizer-rename-modal__col--source">
-                  <Tooltip content={item.sourcePath} side="top" align="start">
-                    <span className="organizer-rename-modal__cell-text">
-                      {item.source}
-                    </span>
-                  </Tooltip>
-                </td>
-                <td className="organizer-rename-modal__col organizer-rename-modal__col--target">
-                  <Tooltip content={organizeInPlace ? item.sourcePath : item.targetPath} side="top" align="start">
-                    <span className={`organizer-rename-modal__cell-text ${organizeInPlace ? 'is-organize-in-place' : ''}`}>
-                      {organizeInPlace ? item.source : item.target}
-                    </span>
-                  </Tooltip>
-                </td>
-                <td className="organizer-rename-modal__col organizer-rename-modal__col--type">
-                  {item.type}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {sortedItems.length === 0 && (
-          <div className="organizer-rename-modal__empty">
-            {t('organizer.renameModal.noMatching')}
-          </div>
-        )}
+        <Table
+          variant="minimal"
+          columns={columns}
+          rows={sortedItems}
+          sortKey={sortConfig.key}
+          sortDirection={sortConfig.direction}
+          onSort={handleSortToggle}
+          emptyText={t('organizer.renameModal.noMatching')}
+        />
       </div>
     </div>
   );

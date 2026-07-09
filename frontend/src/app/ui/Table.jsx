@@ -7,22 +7,36 @@ import Tooltip from './Tooltip';
 import IconButton from './IconButton';
 import ContextMenu from './ContextMenu';
 import { useContextMenu } from './useContextMenu';
+import SortButton from './SortButton';
 import './Table.css';
 
-function TableHeader({ columns }) {
+function TableHeader({ columns, sortKey, sortDirection, onSort }) {
   return (
     <thead>
       <tr>
-        {columns.map((col) => (
-          <th
-            key={col.key}
-            width={col.width || undefined}
-            style={col.width ? { width: col.width, minWidth: col.width } : undefined}
-            className={`${col.align ? `text-${col.align}` : ''} ${col.width ? 'ui-table__cell--truncate' : ''}`.trim()}
-          >
-            {col.label}
-          </th>
-        ))}
+        {columns.map((col) => {
+          const isSortable = col.sortable;
+          const isCurrentSort = sortKey === col.key;
+          return (
+            <th
+              key={col.key}
+              width={col.width || undefined}
+              style={col.width ? { width: col.width, minWidth: col.width } : undefined}
+              className={`${col.align ? `text-${col.align}` : ''} ${col.width ? 'ui-table__cell--truncate' : ''}`.trim()}
+            >
+              {isSortable && onSort ? (
+                <SortButton
+                  isActive={isCurrentSort}
+                  label={col.label}
+                  onToggle={() => onSort(col.key)}
+                  sortDirection={sortDirection}
+                />
+              ) : (
+                col.label
+              )}
+            </th>
+          );
+        })}
       </tr>
     </thead>
   );
@@ -107,6 +121,10 @@ export default function Table({
   openBulkOverrideModal,
   dismissRows,
   clearSelectedRows,
+  variant = 'default',
+  sortKey = null,
+  sortDirection = null,
+  onSort = null,
 }) {
   const {
     contextMenu,
@@ -198,9 +216,14 @@ export default function Table({
   }, [activeRow, useBulkActions, selectedRows, dismissRows, clearSelectedRows, openBulkDeleteModal, openMatchModal, openBulkOverrideModal, rowActions, t]);
 
   return (
-    <div className="ui-table-wrap">
-      <table className="ui-table">
-        <TableHeader columns={columns} />
+    <div className={`ui-table-wrap ${variant === 'minimal' ? 'ui-table-wrap--minimal' : ''}`.trim()}>
+      <table className={`ui-table ${variant === 'minimal' ? 'ui-table--minimal' : ''}`.trim()}>
+        <TableHeader
+          columns={columns}
+          sortKey={sortKey}
+          sortDirection={sortDirection}
+          onSort={onSort}
+        />
         <tbody>
           {rows.length === 0 ? (
             <tr className="is-empty">
@@ -215,9 +238,9 @@ export default function Table({
                 row={row}
                 columns={columns}
                 onRowClick={onRowClick}
-                onContextMenu={handleRowContextMenu}
+                onContextMenu={variant === 'minimal' ? undefined : handleRowContextMenu}
                 activeRowId={activeRowId}
-                rowActions={rowActions}
+                rowActions={variant === 'minimal' ? [] : rowActions}
               />
             ))
           )}
