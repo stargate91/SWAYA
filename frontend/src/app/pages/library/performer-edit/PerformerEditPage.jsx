@@ -107,26 +107,26 @@ export default function PerformerEditPage() {
   );
 
   return (
-    <div className="settings-overlay">
+    <div className="ui-overlay">
+      <div className="ui-close-container ui-overlay__close-container">
+        <IconButton
+          className="ui-close-btn"
+          onClick={handleClose}
+          size="md"
+        >
+          <X size={18} />
+        </IconButton>
+        <span className="ui-close-esc-hint">{t('library.performerEdit.esc') || 'ESC'}</span>
+      </div>
       <Sidebar
         header={sidebarHeader}
         groups={sidebarGroups}
         onTabSelect={handleTabClick}
       />
 
-      <main className="settings-content-wrapper">
-        <div className="ui-close-container settings-close-container">
-          <IconButton
-            className="ui-close-btn"
-            onClick={handleClose}
-            size="md"
-          >
-            <X size={18} />
-          </IconButton>
-          <span className="ui-close-esc-hint">{t('library.performerEdit.esc') || 'ESC'}</span>
-        </div>
+      <main className="ui-overlay__content-wrapper">
 
-        <div className="settings-content performer-edit-content-wrapper--wide">
+        <div className="ui-overlay__content performer-edit-content-wrapper--wide">
           {activeTab === 'linking' && (
             <div className="performer-edit-section">
               <h3 className="settings-section-title performer-edit-section-title">{t('library.performerEdit.linkedProfiles') || 'Linked Profiles'}</h3>

@@ -1,11 +1,11 @@
 .settings-sidebar {
-  width: var(--settings-sidebar-width);
-  background: var(--settings-sidebar-bg);
+  width: var(--ui-overlay-sidebar-width);
+  background: var(--ui-overlay-sidebar-bg);
   border-right: 1px solid var(--color-line);
-  padding: var(--settings-sidebar-padding);
+  padding: var(--ui-overlay-sidebar-padding);
   display: flex;
   flex-direction: column;
-  backdrop-filter: var(--settings-sidebar-blur);
+  backdrop-filter: var(--ui-overlay-sidebar-blur);
 }
 
 .settings-sidebar-header {

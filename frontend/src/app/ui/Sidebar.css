@@ -1,11 +1,11 @@
 .ui-sidebar {
   width: 270px;
-  background: var(--settings-sidebar-bg, var(--color-bg-canvas));
+  background: var(--ui-overlay-sidebar-bg, var(--color-bg-canvas));
   border-right: 1px solid var(--color-line);
-  padding: var(--settings-sidebar-padding, var(--space-xl) var(--space-md));
+  padding: var(--ui-overlay-sidebar-padding, var(--space-xl) var(--space-md));
   display: flex;
   flex-direction: column;
-  backdrop-filter: var(--settings-sidebar-blur, blur(10px));
+  backdrop-filter: var(--ui-overlay-sidebar-blur, blur(10px));
 }
 
 .ui-sidebar-header {

@@ -1,21 +1,3 @@
-.settings-overlay {
-  position: fixed;
-  top: var(--settings-overlay-top);
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: var(--settings-overlay-z);
-  display: flex;
-  background: var(--settings-overlay-bg);
-  color: var(--color-text-primary);
-  animation: settingsFadeIn var(--motion-base);
-}
-
-.settings-overlay--centered {
-  justify-content: center;
-  align-items: center;
-}
-
 .settings-loading-state {
   display: flex;
   flex-direction: column;
@@ -43,33 +25,6 @@
   display: flex;
   gap: var(--space-lg);
   margin-top: var(--space-2xl);
-}
-
-@keyframes settingsFadeIn {
-  from { opacity: 0; transform: scale(1.01); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-.settings-content-wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  position: relative;
-  overflow-y: auto;
-}
-
-.settings-content {
-  max-width: var(--settings-content-max-width);
-  width: 100%;
-  padding: var(--settings-content-padding);
-  margin: 0 auto;
-}
-
-.settings-close-container {
-  top: var(--settings-close-top);
-  right: var(--settings-close-right);
-  z-index: var(--settings-close-z);
 }
 
 .settings-tab-content {

@@ -189,18 +189,18 @@
 
 /* Reusable Page Close Button Layout (Settings, About, Lightbox, etc.) */
 .ui-close-container {
-  position: fixed;
+  position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 .ui-close-btn {
-  width: var(--settings-close-size, 36px) !important;
-  height: var(--settings-close-size, 36px) !important;
+  width: var(--ui-overlay-close-size, 36px) !important;
+  height: var(--ui-overlay-close-size, 36px) !important;
   border-radius: 50% !important;
   border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.1)) !important;
-  background: var(--settings-close-bg, rgba(255, 255, 255, 0.03)) !important;
+  background: var(--ui-overlay-close-bg, rgba(255, 255, 255, 0.03)) !important;
   color: var(--color-text-secondary, #b3b3b3) !important;
   display: flex;
   align-items: center;
@@ -210,7 +210,7 @@
 }
 
 .ui-close-btn:hover {
-  background-color: var(--settings-close-bg-hover, rgba(255, 255, 255, 0.08)) !important;
+  background-color: var(--ui-overlay-close-bg-hover, rgba(255, 255, 255, 0.08)) !important;
   border-color: var(--color-border-default, rgba(255, 255, 255, 0.2)) !important;
   color: var(--color-text-primary, white) !important;
 }
@@ -231,4 +231,50 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   user-select: none;
+}
+
+/* Fullscreen Overlay Page Layout System */
+.ui-overlay {
+  position: fixed;
+  top: var(--ui-overlay-top, 46px);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--ui-overlay-z, 1000);
+  display: flex;
+  background: var(--ui-overlay-bg);
+  color: var(--color-text-primary);
+  animation: uiOverlayFadeIn var(--motion-base);
+}
+
+.ui-overlay--centered {
+  justify-content: center;
+  align-items: center;
+}
+
+@keyframes uiOverlayFadeIn {
+  from { opacity: 0; transform: scale(1.01); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.ui-overlay__content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  overflow-y: auto;
+}
+
+.ui-overlay__content {
+  max-width: var(--ui-overlay-content-max-width, 760px);
+  width: 100%;
+  padding: var(--ui-overlay-content-padding, 29px 40px 120px 40px);
+  margin: 0 auto;
+}
+
+.ui-overlay__close-container {
+  top: var(--ui-overlay-close-top, 30px);
+  right: var(--ui-overlay-close-right, 40px);
+  z-index: var(--ui-overlay-close-z, 1010);
 }

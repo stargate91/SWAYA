@@ -120,7 +120,8 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="settings-overlay">
+    <div className="ui-overlay">
+      <SettingsChrome t={t} onClose={handleClose} />
       <SettingsSidebar
         t={t}
         tabGroups={settingsTabGroups}
@@ -136,10 +137,9 @@ export default function SettingsPage() {
         }}
       />
 
-      <main className="settings-content-wrapper">
-        <SettingsChrome t={t} onClose={handleClose} />
+      <main className="ui-overlay__content-wrapper">
 
-        <div className="settings-content">
+        <div className="ui-overlay__content">
           <div className="settings-tab-content">
             <SettingsFormProvider
               form={form}

@@ -146,7 +146,7 @@ export function getPresetCards(t) {
       desc: t('settingsPage.sections.organization.presets.plexDesc') || 'Plex-style naming with Adult/Movies, Adult/TV Shows, and studio-grouped Adult/Scenes.',
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="settings-preset-svg-icon">
-          <path d="M5.25 2H10.75L18.75 12L10.75 22H5.25L13.25 12L5.25 2Z" fill="var(--settings-preset-plex-color)" />
+          <path d="M5.25 2H10.75L18.75 12L10.75 22H5.25L13.25 12L5.25 2Z" fill="var(--brand-plex)" />
         </svg>
       )
     },
@@ -159,8 +159,8 @@ export function getPresetCards(t) {
           <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 4C14.76 4 17.14 5.37 18.57 7.43L12 11.5L5.43 7.43C6.86 5.37 9.24 4 12 4ZM5.07 9.47L11 13.18V20C7.38 19.54 4.54 16.7 4.08 13.08C3.93 11.83 4.29 10.57 5.07 9.47ZM13 20V13.18L18.93 9.47C19.71 10.57 20.07 11.83 19.92 13.08C19.46 16.7 16.62 19.54 13 20Z" fill="url(#jellyfin-gradient)" />
           <defs>
             <linearGradient id="jellyfin-gradient" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-              <stop stopColor="var(--settings-preset-jellyfin-start)" />
-              <stop offset="1" stopColor="var(--settings-preset-jellyfin-end)" />
+              <stop stopColor="var(--brand-jellyfin-start)" />
+              <stop offset="1" stopColor="var(--brand-jellyfin-end)" />
             </linearGradient>
           </defs>
         </svg>
@@ -172,9 +172,9 @@ export function getPresetCards(t) {
       desc: t('settingsPage.sections.organization.presets.kodiDesc') || 'Kodi-friendly dot naming with Adult/Movies, Adult/TV Shows, and studio-grouped Adult/Scenes.',
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="settings-preset-svg-icon">
-          <path d="M12 2L2 12L12 22L22 12L12 2Z" fill="var(--settings-preset-kodi-primary)" />
-          <path d="M12 6L6 12L12 18L18 12L12 6Z" fill="var(--settings-preset-kodi-secondary)" />
-          <rect x="11.25" y="11.25" width="1.5" height="1.5" fill="var(--settings-preset-kodi-accent)" />
+          <path d="M12 2L2 12L12 22L22 12L12 2Z" fill="var(--brand-kodi-primary)" />
+          <path d="M12 6L6 12L12 18L18 12L12 6Z" fill="var(--brand-kodi-secondary)" />
+          <rect x="11.25" y="11.25" width="1.5" height="1.5" fill="var(--brand-kodi-accent)" />
         </svg>
       )
     },
@@ -182,7 +182,7 @@ export function getPresetCards(t) {
       value: SETTINGS_PRESET_IDS.MINIMAL,
       label: t('settingsPage.sections.organization.presets.minimal') || 'Minimalist Layout',
       desc: t('settingsPage.sections.organization.presets.minimalDesc') || 'A shallow layout that still separates Adult/Movies, Adult/TV Shows, and Adult/Scenes.',
-      icon: <Minimize2 size={20} color="var(--settings-preset-minimal-color)" className="settings-preset-svg-icon" />
+      icon: <Minimize2 size={20} color="var(--brand-minimal)" className="settings-preset-svg-icon" />
     }
   ];
 }

@@ -90,15 +90,15 @@
 }
 
 .settings-alert--danger {
-  background: var(--settings-danger-bg);
-  border: 1px solid var(--settings-danger-border);
-  color: var(--settings-danger-text);
+  background: var(--ui-overlay-danger-bg);
+  border: 1px solid var(--ui-overlay-danger-border);
+  color: var(--color-state-danger);
 }
 
 .settings-alert--warning {
-  background: var(--settings-warning-bg);
-  border: 1px solid var(--settings-warning-border);
-  color: var(--settings-warning-text);
+  background: var(--ui-overlay-warning-bg);
+  border: 1px solid var(--ui-overlay-warning-border);
+  color: var(--color-state-warning);
 }
 
 .settings-alert--spaced {

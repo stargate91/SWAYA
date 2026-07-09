@@ -477,52 +477,48 @@
   --tooltip-shadow: 0 16px 38px rgba(0, 0, 0, 0.34);
   --tooltip-blur: blur(16px) saturate(135%);
 
-  /* Settings Tokens */
-  --settings-overlay-top: 46px;
-  --settings-overlay-z: 1000;
-  --settings-overlay-bg: var(--color-bg-canvas);
-  --settings-sidebar-width: 200px;
-  --settings-sidebar-padding: 29px 18px 30px 18px;
-  --settings-sidebar-bg:
+  /* Fullscreen Overlay UI Tokens */
+  --ui-overlay-top: 46px;
+  --ui-overlay-z: 1000;
+  --ui-overlay-bg: var(--color-bg-canvas);
+  --ui-overlay-sidebar-width: 200px;
+  --ui-overlay-sidebar-padding: 29px 18px 30px 18px;
+  --ui-overlay-sidebar-bg:
     linear-gradient(180deg, var(--color-panel-strong), var(--color-panel)),
     var(--app-shell-color-panel-soft, rgba(255, 255, 255, 0.018));
-  --settings-sidebar-blur: blur(22px) saturate(120%);
-  --settings-content-max-width: 760px;
-  --settings-content-padding: 29px 40px 120px 40px;
-  --settings-close-top: 76px;
-  --settings-close-right: 40px;
-  --settings-close-z: 1010;
-  --settings-close-size: 36px;
-  --settings-close-bg: rgba(255, 255, 255, 0.03);
-  --settings-close-bg-hover: rgba(255, 255, 255, 0.08);
-  --settings-accent-surface: color-mix(in srgb, var(--color-state-info) 5%, transparent);
-  --settings-accent-surface-soft: color-mix(in srgb, var(--color-state-info) 4%, transparent);
-  --settings-accent-surface-strong: color-mix(in srgb, var(--color-state-info) 8%, transparent);
-  --settings-accent-border-soft: color-mix(in srgb, var(--color-state-info) 12%, transparent);
-  --settings-accent-border: color-mix(in srgb, var(--color-state-info) 40%, transparent);
-  --settings-accent-fill-soft: color-mix(in srgb, var(--color-state-info) 15%, transparent);
-  --settings-accent-shadow: 0 0 16px color-mix(in srgb, var(--color-state-info) 8%, transparent);
-  --settings-accent-shadow-soft: 0 0 16px color-mix(in srgb, var(--color-state-info) 6%, transparent);
-  --settings-danger-bg: color-mix(in srgb, var(--color-state-danger) 8%, transparent);
-  --settings-danger-border: color-mix(in srgb, var(--color-state-danger) 20%, transparent);
-  --settings-warning-bg: color-mix(in srgb, var(--color-state-warning) 8%, transparent);
-  --settings-warning-border: color-mix(in srgb, var(--color-state-warning) 20%, transparent);
-  --settings-danger-text: var(--color-state-danger);
-  --settings-warning-text: var(--color-state-warning);
-  --settings-success-text: var(--color-state-success);
-  --settings-contrast-text: var(--color-text-primary);
-  --settings-font-family-mono: var(--font-family-mono, monospace);
-  --settings-preview-panel-bg: rgba(0, 0, 0, 0.2);
-  --settings-preview-label-bg: color-mix(in srgb, var(--color-state-info) 15%, transparent);
-  --settings-preview-badge-bg: color-mix(in srgb, var(--color-state-info) 5%, transparent);
-  --settings-preview-badge-border: color-mix(in srgb, var(--color-state-info) 12%, transparent);
-  --settings-preset-plex-color: #e5a93b;
-  --settings-preset-jellyfin-start: #00a4dc;
-  --settings-preset-jellyfin-end: #aa5cc3;
-  --settings-preset-kodi-primary: #17b2e5;
-  --settings-preset-kodi-secondary: #118cb5;
-  --settings-preset-kodi-accent: #ffffff;
-  --settings-preset-minimal-color: #10b981;
+  --ui-overlay-sidebar-blur: blur(22px) saturate(120%);
+  --ui-overlay-content-max-width: 760px;
+  --ui-overlay-content-padding: 29px 40px 120px 40px;
+  --ui-overlay-close-top: 30px;
+  --ui-overlay-close-right: 40px;
+  --ui-overlay-close-z: 1010;
+  --ui-overlay-close-size: 36px;
+  --ui-overlay-close-bg: rgba(255, 255, 255, 0.03);
+  --ui-overlay-close-bg-hover: rgba(255, 255, 255, 0.08);
+  --ui-overlay-accent-surface: color-mix(in srgb, var(--color-state-info) 5%, transparent);
+  --ui-overlay-accent-surface-soft: color-mix(in srgb, var(--color-state-info) 4%, transparent);
+  --ui-overlay-accent-surface-strong: color-mix(in srgb, var(--color-state-info) 8%, transparent);
+  --ui-overlay-accent-border-soft: color-mix(in srgb, var(--color-state-info) 12%, transparent);
+  --ui-overlay-accent-border: color-mix(in srgb, var(--color-state-info) 40%, transparent);
+  --ui-overlay-accent-fill-soft: color-mix(in srgb, var(--color-state-info) 15%, transparent);
+  --ui-overlay-accent-shadow: 0 0 16px color-mix(in srgb, var(--color-state-info) 8%, transparent);
+  --ui-overlay-accent-shadow-soft: 0 0 16px color-mix(in srgb, var(--color-state-info) 6%, transparent);
+  --ui-overlay-danger-bg: color-mix(in srgb, var(--color-state-danger) 8%, transparent);
+  --ui-overlay-danger-border: color-mix(in srgb, var(--color-state-danger) 20%, transparent);
+  --ui-overlay-warning-bg: color-mix(in srgb, var(--color-state-warning) 8%, transparent);
+  --ui-overlay-warning-border: color-mix(in srgb, var(--color-state-warning) 20%, transparent);
+  --ui-preview-panel-bg: rgba(0, 0, 0, 0.2);
+  --ui-preview-label-bg: color-mix(in srgb, var(--color-state-info) 15%, transparent);
+  --ui-preview-badge-bg: color-mix(in srgb, var(--color-state-info) 5%, transparent);
+  --ui-preview-badge-border: color-mix(in srgb, var(--color-state-info) 12%, transparent);
+  /* Brand Colors */
+  --brand-plex: #e5a93b;
+  --brand-jellyfin-start: #00a4dc;
+  --brand-jellyfin-end: #aa5cc3;
+  --brand-kodi-primary: #17b2e5;
+  --brand-kodi-secondary: #118cb5;
+  --brand-kodi-accent: #ffffff;
+  --brand-minimal: #10b981;
 
   /* Toast Tokens */
   --toast-bg:

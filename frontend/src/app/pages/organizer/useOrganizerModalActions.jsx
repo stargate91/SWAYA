@@ -56,10 +56,31 @@ export function useOrganizerModalActions({
   }, []);
 
   const handlePreviewRow = useCallback(async (row) => {
-    if (!settings?.vlc_path && !settings?.mpc_path) {
-      throw new Error(t('organizer.toasts.noMediaPlayerConfigured'));
+    const preferredPlayer = settings?.preferred_player || 'swaya';
+    let ipcRenderer = null;
+    try {
+      if (window.require) {
+        ipcRenderer = window.require('electron').ipcRenderer;
+      }
+    } catch (err) {
+      console.error(err);
     }
-    await api.media.preview(row.sourcePath);
+
+    if (preferredPlayer === 'swaya' && ipcRenderer) {
+      const savedVolume = parseInt(localStorage.getItem('player_volume'), 10);
+      const savedMute = localStorage.getItem('player_mute') === 'true';
+      await ipcRenderer.invoke('mpv-open-fullscreen', {
+        url: row.sourcePath,
+        title: row.sourceName || row.name || 'Preview',
+        volume: isNaN(savedVolume) ? undefined : savedVolume,
+        mute: savedMute,
+      });
+    } else {
+      if (!settings?.vlc_path && !settings?.mpc_path) {
+        throw new Error(t('organizer.toasts.noMediaPlayerConfigured'));
+      }
+      await api.media.preview(row.sourcePath);
+    }
   }, [settings, t]);
 
   const openDeleteModal = useCallback((row) => {

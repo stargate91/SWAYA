@@ -847,28 +847,28 @@ export default function AboutPage() {
   });
 
   return (
-    <div className="settings-overlay">
+    <div className="ui-overlay">
+      <div className="ui-close-container ui-overlay__close-container">
+        <IconButton
+          className="ui-close-btn"
+          onClick={handleClose}
+          label={t('common.close')}
+          title={null}
+          size="md"
+        >
+          <X size={18} />
+        </IconButton>
+        <span className="ui-close-esc-hint">{t('settingsPage.closeShortcut') || 'ESC'}</span>
+      </div>
       <Sidebar
         header={t('about.title')}
         groups={sidebarGroups}
         onTabSelect={handleSetActiveTab}
       />
 
-      <main className="settings-content-wrapper">
-        <div className="ui-close-container settings-close-container">
-          <IconButton
-            className="ui-close-btn"
-            onClick={handleClose}
-            label={t('common.close')}
-            title={null}
-            size="md"
-          >
-            <X size={18} />
-          </IconButton>
-          <span className="ui-close-esc-hint">{t('settingsPage.closeShortcut') || 'ESC'}</span>
-        </div>
+      <main className="ui-overlay__content-wrapper">
 
-        <div className="settings-content" style={activeTab === 'docs_features' ? { maxWidth: '1200px' } : undefined}>
+        <div className="ui-overlay__content" style={activeTab === 'docs_features' ? { maxWidth: '1200px' } : undefined}>
           <div className="settings-tab-content">
             {activeTab === 'info' && (
               <div className="about-tab-panel info-panel">

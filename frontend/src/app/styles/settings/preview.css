@@ -1,9 +1,9 @@
 .structure-preview-container {
-  background: var(--settings-preview-panel-bg);
+  background: var(--ui-preview-panel-bg);
   border: 1px solid var(--color-line);
   border-radius: 8px;
   padding: var(--space-2xl);
-  font-family: var(--settings-font-family-mono);
+  font-family: var(--font-family-mono, monospace);
   font-size: 12.5px;
   line-height: 1.6;
   color: var(--color-text-secondary);
@@ -35,7 +35,7 @@
 }
 
 .structure-preview-line--success {
-  color: var(--settings-success-text);
+  color: var(--color-state-success);
 }
 
 .structure-preview-line--adult {
@@ -100,12 +100,12 @@
 .preview-badge-container {
   font-size: 11px;
   color: var(--color-accent);
-  background: var(--settings-preview-badge-bg);
-  border: 1px solid var(--settings-preview-badge-border);
+  background: var(--ui-preview-badge-bg);
+  border: 1px solid var(--ui-preview-badge-border);
   border-radius: 6px;
   padding: var(--space-xs) var(--space-lg);
   margin-top: var(--space-md);
-  font-family: var(--settings-font-family-mono);
+  font-family: var(--font-family-mono, monospace);
   display: flex;
   align-items: center;
   gap: var(--space-xs);
@@ -117,7 +117,7 @@
   font-size: 9px;
   padding: 0.0625rem var(--space-2xs);
   border-radius: 3px;
-  background: var(--settings-preview-label-bg);
+  background: var(--ui-preview-label-bg);
   flex-shrink: 0;
 }
 

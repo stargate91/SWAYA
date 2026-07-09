@@ -3,7 +3,7 @@ import IconButton from '@/ui/IconButton';
 
 export default function SettingsChrome({ t, onClose }) {
   return (
-    <div className="ui-close-container settings-close-container">
+    <div className="ui-close-container ui-overlay__close-container">
       <IconButton
         className="ui-close-btn"
         onClick={onClose}
