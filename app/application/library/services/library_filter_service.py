@@ -154,9 +154,15 @@ class LibraryFilterService:
             settings_adapter = DbSettingsAdapter(self.db)
             gender_pref = settings_adapter.get_setting("adult_gender_preference") if is_adult else "all"
 
-            active_people_ids = select(MediaPersonLink.person_id).filter(
-                MediaPersonLink.match_id.in_(match_ids_subquery)
-            ).scalar_subquery()
+            if "people" in tab.lower():
+                active_people_ids = select(Person.id).filter(
+                    Person.is_adult == is_adult,
+                    Person.is_active == True
+                ).scalar_subquery()
+            else:
+                active_people_ids = select(MediaPersonLink.person_id).filter(
+                    MediaPersonLink.match_id.in_(match_ids_subquery)
+                ).scalar_subquery()
 
             performers_query = self.db.query(Person.id, Person.name).join(
                 MediaPersonLink, MediaPersonLink.person_id == Person.id

@@ -152,7 +152,14 @@ class MetadataResolver:
             db.add(match)
         db.flush()
 
-        item.status = ItemStatus.MATCHED
+        # Promote or mark status based on TV show S/E requirements
+        is_tv_without_se = (mtype == MediaType.TV)
+        is_episode_without_se = (mtype == MediaType.EPISODE and (season_number is None or episode_number is None))
+        if is_tv_without_se or is_episode_without_se:
+            item.status = ItemStatus.UNCERTAIN
+        else:
+            item.status = ItemStatus.MATCHED
+
 
         # Enrich item metadata
         from app.shared_kernel.language_settings import get_user_ui_language

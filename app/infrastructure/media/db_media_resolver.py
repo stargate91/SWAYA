@@ -199,26 +199,37 @@ class DbMediaResolver(
         else:
             if item_id is None:
                 return None, None
+            is_numeric = False
+            possible_id = None
             try:
                 possible_id = int(item_id)
-                if self.db.query(MediaItem).filter(MediaItem.id == possible_id).count() > 0:
-                    media_item_id = possible_id
-                else:
-                    match = self.db.query(MetadataMatch).filter(
-                        MetadataMatch.provider == Provider.TMDB,
-                        MetadataMatch.external_id == str(item_id)
-                    ).first()
-                    if match:
-                        metadata_match_id = match.id
-                        media_item_id = match.media_item_id
-                    else:
-                        return None, None
-            except ValueError:
+                is_numeric = True
+            except (ValueError, TypeError):
+                pass
+
+            if is_numeric and self.db.query(MediaItem).filter(MediaItem.id == possible_id).count() > 0:
+                media_item_id = possible_id
+            else:
                 match = self.db.query(MetadataMatch).filter(
                     MetadataMatch.provider == Provider.TMDB,
                     MetadataMatch.external_id == str(item_id)
                 ).first()
                 if match:
+                    metadata_match_id = match.id
+                    media_item_id = match.media_item_id
+                elif media_type and media_type.lower() in ('tv', 'movie'):
+                    try:
+                        resolved_type = MediaType(media_type.lower())
+                    except ValueError:
+                        resolved_type = MediaType.TV if media_type.lower() == 'tv' else MediaType.MOVIE
+                    match = MetadataMatch(
+                        provider=Provider.TMDB,
+                        external_id=str(item_id),
+                        media_type=resolved_type,
+                        is_adult=False
+                    )
+                    self.db.add(match)
+                    self.db.flush()
                     metadata_match_id = match.id
                     media_item_id = match.media_item_id
                 else:

@@ -167,7 +167,11 @@ class OrganizerGroupsBuilder:
             it_data = parsed.get("it") or {}
             fd_data = parsed.get("fd") or {}
             season_val = parsed.get("season") or fn_data.get("season") or it_data.get("season") or fd_data.get("season")
+            if season_val is None and active_match:
+                season_val = active_match.season_number
             episode_val = parsed.get("episode") or fn_data.get("episode") or it_data.get("episode") or fd_data.get("episode")
+            if episode_val is None and active_match:
+                episode_val = active_match.episode_number
 
             custom_edition_val = item.custom_edition.value if item.custom_edition else (item.edition.value if item.edition else "none")
             custom_audio_type_val = item.custom_audio_type.value if item.custom_audio_type else (item.audio_type.value if item.audio_type else "none")

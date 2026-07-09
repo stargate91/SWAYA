@@ -23,6 +23,8 @@ class OrganizerHelper:
 
         active_match = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
         if active_match:
+            if active_match.media_type == MediaType.TV:
+                return MediaType.EPISODE.value
             return active_match.media_type.value
 
         gtype = None
