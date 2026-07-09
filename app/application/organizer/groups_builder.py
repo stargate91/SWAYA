@@ -101,6 +101,8 @@ class OrganizerGroupsBuilder:
             matches_dto = []
             for m in item.matches:
                 loc = LanguageService.get_best_localization(m.localizations, pref_lang)
+                tv_show_match = None
+                tv_loc = None
                 
                 resolved_poster = None
                 if m.media_type.value == "scene":

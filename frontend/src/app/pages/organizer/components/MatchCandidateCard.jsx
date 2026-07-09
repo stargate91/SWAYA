@@ -4,6 +4,7 @@ import Badge from '@/ui/Badge';
 import CardMetadata from '@/ui/CardMetadata';
 import PosterCard from '@/ui/PosterCard';
 import BackdropCard from '@/ui/BackdropCard';
+import CompactCard from '@/ui/CompactCard';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { MEDIA_TYPES, isTvLikeMediaType, toMetadataMediaType } from '@/lib/mediaTypes';
 import { API_BASE } from '@/lib/backend';
@@ -18,7 +19,7 @@ const getDisplayTitle = (candidate, mediaType, t) => (
 
 const getDisplayYear = (candidate, mediaType) => {
   const rawDate = mediaType === MEDIA_TYPES.TV
-    ? candidate?.first_air_date
+    ? (candidate?.first_air_date || candidate?.release_date)
     : candidate?.release_date;
   if (!rawDate) return null;
   const startYear = String(rawDate).slice(0, 4);
@@ -98,11 +99,11 @@ export default function MatchCandidateCard({
           {candidate.is_active && (
             <div className="organizer-match-modal__candidate-badge-wrapper">
               {rowStatus === 'uncertain' ? (
-                <Badge family="status" variant="overlay" tone="warning" className="ui-status-badge ui-status-badge--warning ui-status-badge--overlay">
+                <Badge family="status" variant="overlay" tone="warning">
                   {t('organizer.status.uncertain')}
                 </Badge>
               ) : (
-                <Badge family="status" variant="overlay" tone="accent" className="ui-status-badge ui-status-badge--accent ui-status-badge--overlay">
+                <Badge family="status" variant="overlay" tone="accent">
                   {t('organizer.details.matchModal.current')}
                 </Badge>
               )}
@@ -134,11 +135,11 @@ export default function MatchCandidateCard({
         badge={
           candidate.is_active ? (
             rowStatus === 'uncertain' ? (
-              <Badge family="status" variant="overlay" tone="warning" className="ui-status-badge ui-status-badge--warning ui-status-badge--overlay">
+              <Badge family="status" variant="overlay" tone="warning">
                 {t('organizer.status.uncertain')}
               </Badge>
             ) : (
-              <Badge family="status" variant="overlay" tone="accent" className="ui-status-badge ui-status-badge--accent ui-status-badge--overlay">
+              <Badge family="status" variant="overlay" tone="accent">
                 {t('organizer.details.matchModal.current')}
               </Badge>
             )
@@ -148,59 +149,51 @@ export default function MatchCandidateCard({
     );
   }
 
+  const fallbackIcon = mediaType === 'tv'
+    ? ENTITY_ICONS.tv
+    : (mediaType === 'scene' ? ENTITY_ICONS.episode : ENTITY_ICONS.movie);
+
+  const activeBadge = candidate.is_active ? (
+    rowStatus === 'uncertain' ? (
+      <Badge family="status" tone="warning" variant="inline">
+        {t('organizer.status.uncertain')}
+      </Badge>
+    ) : (
+      <Badge family="status" tone="accent" variant="inline">
+        {t('organizer.details.matchModal.current')}
+      </Badge>
+    )
+  ) : null;
+
+  const rightAction = isResolvingId === candidateId ? (
+    <span className="organizer-match-modal__result-action">
+      {t('organizer.details.matchModal.applying')}
+    </span>
+  ) : null;
+
   return (
-    <button
+    <CompactCard
       key={`${sourceLabel}-${candidateId}`}
-      type="button"
-      className={`organizer-match-modal__result-card${candidate.is_active ? ' is-active' : ''}${mediaType === 'scene' ? ' is-scene' : ''}`.trim()}
-      onClick={() => onSelect(candidate)}
+      imageUrl={posterUrl}
+      fallbackIcon={fallbackIcon}
+      aspect={mediaType === 'scene' ? 'landscape' : 'poster'}
+      title={displayTitle}
+      badge={activeBadge}
+      active={candidate.is_active}
       disabled={isDisabled}
-    >
-      <div className="organizer-match-modal__poster">
-        {posterUrl && !imageError ? (
-          <img
-            src={posterUrl}
-            alt=""
-            className="organizer-match-modal__poster-image"
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          <div className="organizer-match-modal__poster-placeholder">
-            {mediaType === 'tv' ? <ENTITY_ICONS.tv size={18} /> : (mediaType === 'scene' ? <ENTITY_ICONS.episode size={18} /> : <ENTITY_ICONS.movie size={18} />)}
-          </div>
-        )}
-      </div>
-      <div className="organizer-match-modal__result-copy">
-        <div className="organizer-match-modal__result-topline">
-          <strong className="organizer-match-modal__result-title">{displayTitle}</strong>
-          {candidate.is_active ? (
-            rowStatus === 'uncertain' ? (
-              <Badge family="status" tone="warning" variant="inline" className="ui-status-badge ui-status-badge--warning ui-status-badge--inline">
-                {t('organizer.status.uncertain')}
-              </Badge>
-            ) : (
-              <Badge family="status" tone="accent" variant="inline" className="ui-status-badge ui-status-badge--accent ui-status-badge--inline">
-                {t('organizer.details.matchModal.current')}
-              </Badge>
-            )
-          ) : null}
-        </div>
+      onClick={() => onSelect(candidate)}
+      className={mediaType === 'scene' ? 'is-scene' : ''}
+      meta={
         <CardMetadata.Row
           className="organizer-match-modal__result-meta"
           items={[
-            mediaType === 'scene' ? t('organizer.details.matchModal.scene') : (isTvLikeMediaType(mediaType) ? t('organizer.details.matchModal.tv') : t('organizer.details.matchModal.movie')),
             displayYear,
+            mediaType === 'scene' ? t('organizer.details.matchModal.scene') : (isTvLikeMediaType(mediaType) ? t('organizer.details.matchModal.tv') : t('organizer.details.matchModal.movie')),
           ]}
         />
-        {candidate.overview ? (
-          <p className="organizer-match-modal__result-overview">{candidate.overview}</p>
-        ) : null}
-        {isResolvingId === candidateId && (
-          <span className="organizer-match-modal__result-action">
-            {t('organizer.details.matchModal.applying')}
-          </span>
-        )}
-      </div>
-    </button>
+      }
+      description={candidate.overview}
+      rightElement={rightAction}
+    />
   );
 }

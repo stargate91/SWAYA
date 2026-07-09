@@ -151,11 +151,11 @@
   height: 100%;
 }
 
-.organizer-match-modal .ui-status-badge--overlay {
+.organizer-match-modal .ui-badge--overlay {
   background: color-mix(in srgb, var(--color-accent-blue) 60%, transparent);
 }
 
-.organizer-match-modal .ui-status-badge--overlay.ui-status-badge--warning {
+.organizer-match-modal .ui-badge--overlay.ui-badge--warning {
   background: color-mix(in srgb, var(--color-state-warning) 75%, transparent);
   color: var(--color-text-inverse);
 }

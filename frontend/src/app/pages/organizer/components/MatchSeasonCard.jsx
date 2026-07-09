@@ -45,7 +45,7 @@ export default function MatchSeasonCard({
       aspect="poster"
       badge={
         isActive ? (
-          <Badge family="status" variant="overlay" tone="accent" className="ui-status-badge ui-status-badge--accent ui-status-badge--overlay">
+          <Badge family="status" variant="overlay" tone="accent">
             {t('organizer.details.matchModal.current')}
           </Badge>
         ) : null
