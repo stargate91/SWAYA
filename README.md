@@ -163,3 +163,15 @@ npm run dev
 ```
 
 Build and package instructions are defined in the `package.json` scripts.
+
+---
+
+## Licensing & Sustainability
+
+Swaya is built with a commitment to transparency, open collaboration, and long-term active development. To make the project sustainable while keeping the code accessible, it is distributed under a **Source-Available License**:
+
+* **For Developers & Contributors:** The entire source code is public, inspectable, and open for community contributions. You can download, compile, and run the software locally for free for personal, non-commercial use.
+* **For Convenience & Support:** Official pre-built installers (.exe), automatic background updates, and certain premium features require a commercial license (subscription or one-time lifetime purchase). 
+
+This hybrid model ensures that I can dedicate the massive amount of time required to actively maintain and improve Swaya as a solo developer, while keeping the codebase fully transparent to everyone.
+

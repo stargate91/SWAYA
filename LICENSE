@@ -1,0 +1,11 @@
+# SWAYA Source-Available License (EULA)
+
+Copyright (c) 2026 Levente Gáll. All rights reserved.
+
+This license governs the use of the Swaya source code. By accessing, downloading, or using the source code, you agree to these terms:
+
+1. Source Visibility: The source code is made available for viewing, learning, and community contributions.
+2. Personal Use: You may download, compile, and run the software locally on your personal devices for personal, non-commercial use.
+3. No Redistribution: You are strictly prohibited from redistributing the source code or any compiled binary releases (such as .exe installers), modified or unmodified, to any third party.
+4. Contributions: Any contributions (Pull Requests) you submit to this repository will be licensed under these same terms, granting the owner the right to include them in official commercial releases.
+5. Proprietary Releases: The owner retains the exclusive right to distribute official binaries, automatic updates, and premium services under separate commercial terms.
