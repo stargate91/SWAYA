@@ -7,6 +7,7 @@ import PerformerLinkingTab from './tabs/PerformerLinkingTab';
 import PerformerMixerTab from './tabs/PerformerMixerTab';
 import PerformerCustomValuesTab from './tabs/PerformerCustomValuesTab';
 import { useTranslation } from '@/providers/LanguageContext';
+import Sidebar from '@/ui/Sidebar';
 import './PerformerEditPage.css';
 
 export default function PerformerEditPage() {
@@ -87,38 +88,31 @@ export default function PerformerEditPage() {
     { id: 'custom', label: t('library.performerEdit.customValues') || 'Custom Values', icon: Sliders },
   ];
 
+  const sidebarGroups = TABS.map((tab) => ({
+    id: tab.id,
+    label: tab.label,
+    icon: tab.icon,
+    isActive: activeTab === tab.id,
+  }));
+
+  const sidebarHeader = (
+    <>
+      <h1 className="ui-sidebar-header performer-edit-sidebar-header">
+        {person.is_adult ? (t('library.performerEdit.editPerformer') || 'Edit Star') : (t('library.performerEdit.editArtist') || 'Edit Artist')}
+      </h1>
+      <div className="performer-edit-sidebar-title-container">
+        <h2 className="performer-edit-sidebar-name">{person.name}</h2>
+      </div>
+    </>
+  );
+
   return (
     <div className="settings-overlay">
-      <aside className="settings-sidebar">
-        <h1 className="settings-sidebar-header performer-edit-sidebar-header">
-          {person.is_adult ? (t('library.performerEdit.editPerformer') || 'Edit Star') : (t('library.performerEdit.editArtist') || 'Edit Artist')}
-        </h1>
-        <div className="performer-edit-sidebar-title-container">
-          <h2 className="performer-edit-sidebar-name">{person.name}</h2>
-        </div>
-        <nav className="settings-sidebar-menu performer-edit-sidebar-menu">
-          {TABS.map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <div
-                key={tab.id}
-                className={`settings-sidebar-item${activeTab === tab.id ? ' active' : ''}`}
-                role="button"
-                tabIndex={0}
-                onClick={() => handleTabClick(tab.id)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    handleTabClick(tab.id);
-                  }
-                }}
-              >
-                <Icon size={18} />
-                <span className="settings-sidebar-label">{tab.label}</span>
-              </div>
-            );
-          })}
-        </nav>
-      </aside>
+      <Sidebar
+        header={sidebarHeader}
+        groups={sidebarGroups}
+        onTabSelect={handleTabClick}
+      />
 
       <main className="settings-content-wrapper">
         <div className="settings-close-container">

@@ -3,56 +3,36 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../providers/LanguageContext';
 import { shell } from '../../lib/electron';
 import {
-  Info,
-  ScrollText,
-  Lock,
   BookOpen,
   Mail,
   Globe,
   X,
   RefreshCw,
-  ChevronDown,
-  ChevronRight,
   Home,
   FolderSync,
-  Library,
   Bookmark,
   Star,
   BarChart2,
   History,
   Settings,
 } from 'lucide-react';
+import {
+  Info,
+  ScrollText,
+  Lock,
+  Library,
+  CircleHelp,
+} from '../../ui/icons';
+import Sidebar from '../../ui/Sidebar';
 import IconButton from '../../ui/IconButton';
 import Card from '../../ui/Card';
+import Switch from '../../ui/Switch';
 import { fetchJson } from '../../lib/http';
 import { useSettingsQuery, useUpdateSettingsMutation } from '../../queries';
 import ImageLightbox from '../library/components/detail/modals/ImageLightbox';
 import './AboutPage.css';
 
 const tmdbAttributionLogoSrc = 'https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_2-d537fb228cf3ded904ef09b136fe3fec72548ebc1fea3fbbd1ad9e36364db38b.svg';
-
-const CAMERA_EMOJI = '📷 ';
-const COLON_SEPARATOR = ': ';
-const SUCCESS_ICON = '✓ ';
-const ERROR_ICON = '✗ ';
-const APP_LOGO_LETTER = 'S';
-const APP_NAME_UPPER = 'SWAYA';
-const VERSION_PREFIX = 'v';
-const DEVELOPER_AVATAR_LETTER = 'L';
-const SCREENSHOT_FALLBACK = 'Screenshot';
-const SAVED_FALLBACK = 'Saved successfully!';
-const SAVE_FAILED_FALLBACK = 'Failed to save';
-const SCREENSHOT_PLACEHOLDER_FALLBACK = 'Screenshot Placeholder';
-const DOCS_FALLBACK = 'Documentation';
-const CHANGELOG_LOAD_FAILED_FALLBACK = 'Failed to load changelog';
-const OPEN_PAREN = ' (';
-const CLOSE_PAREN = ')';
-const SILUR_NAME = 'Silur';
-const KERRIGAN_NAME = 'Kerrigan';
-const YASHOCK_NAME = 'YaShock';
-const DATA_NAME = 'Data';
-const GITHUB_LABEL = 'GitHub';
-const DOT_DIVIDER = '•';
 
 const GitHubIcon = ({ size = 16 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="about-social-icon">
@@ -93,6 +73,13 @@ export default function AboutPage() {
   const [saveStatus, setSaveStatus] = useState(null); // null | 'saving' | 'success' | 'error'
   const [activeLightboxUrl, setActiveLightboxUrl] = useState(null);
   const [activeTourIndex, setActiveTourIndex] = useState(0);
+  const [activeSubFeatureIndex, setActiveSubFeatureIndex] = useState(null);
+  const showAdult = Boolean(settings?.include_adult);
+  const [showNsfwDocs, setShowNsfwDocs] = useState(showAdult);
+
+  useEffect(() => {
+    setShowNsfwDocs(showAdult);
+  }, [showAdult]);
 
   const [wizardInputs, setWizardInputs] = useState(null);
 
@@ -126,25 +113,9 @@ export default function AboutPage() {
   const handleSetActiveTab = (tabId) => {
     setActiveTab(tabId);
     setWizardStep(0);
-    if (tabId === 'changelog' && !hasLoadedChangelog && !isLoadingChangelog) {
-      setIsLoadingChangelog(true);
-      setChangelogError(null);
-      fetchJson('/api/settings/changelog')
-        .then((data) => {
-          if (data.status === 'success') {
-            setChangelogContent(data.content || '');
-            setHasLoadedChangelog(true);
-          } else {
-            throw new Error(data.message || t('about.changelog_load_failed') || CHANGELOG_LOAD_FAILED_FALLBACK);
-          }
-        })
-        .catch((err) => {
-          setChangelogError(err.message || t('about.changelog_load_failed') || CHANGELOG_LOAD_FAILED_FALLBACK);
-          setHasLoadedChangelog(true);
-        })
-        .finally(() => {
-          setIsLoadingChangelog(false);
-        });
+    setActiveSubFeatureIndex(null);
+    if (!tabId.startsWith('docs_')) {
+      setIsDocsExpanded(false);
     }
   };
 
@@ -188,7 +159,7 @@ export default function AboutPage() {
           <h3 className="docs-wizard-slide-title">
             {step.title}
           </h3>
-          
+
           <p className="docs-wizard-slide-desc">
             {step.description}
           </p>
@@ -198,7 +169,7 @@ export default function AboutPage() {
               {step.links.map((link, lidx) => (
                 <button
                   key={lidx}
-                  className="about-action-btn docs-wizard-link-btn-inline"
+                  className="ui-button ui-button--secondary ui-button--md docs-wizard-link-btn-inline"
                   onClick={(e) => { e.preventDefault(); openExternalLink(link.url); }}
                 >
                   <span>{link.label}</span>
@@ -221,7 +192,7 @@ export default function AboutPage() {
             </button>
           ) : step.screenshotPlaceholder && (
             <div className="docs-wizard-screenshot-placeholder">
-              {CAMERA_EMOJI}{t('about.docs_wizard.screenshot_placeholder') || SCREENSHOT_FALLBACK}{COLON_SEPARATOR}{step.screenshotPlaceholder}
+              {'📷 '}{t('about.docs_wizard.screenshot_placeholder') || 'Screenshot'}{': '}{step.screenshotPlaceholder}
             </div>
           )}
 
@@ -230,14 +201,14 @@ export default function AboutPage() {
           {step.onSave && (
             <div className="docs-wizard-save-container">
               <button
-                className="about-action-btn docs-wizard-save-btn"
+                className="ui-button ui-button--primary ui-button--md docs-wizard-save-btn"
                 onClick={step.onSave}
                 disabled={saveStatus === 'saving'}
               >
                 {saveStatus === 'saving' ? (t('about.docs_wizard.saving') || 'Saving...') : (t('about.docs_wizard.save') || 'Save')}
               </button>
-              {saveStatus === 'success' && <span className="docs-wizard-save-status-success">{SUCCESS_ICON}{t('about.docs_wizard.saved') || SAVED_FALLBACK}</span>}
-              {saveStatus === 'error' && <span className="docs-wizard-save-status-error">{ERROR_ICON}{t('about.docs_wizard.save_failed') || SAVE_FAILED_FALLBACK}</span>}
+              {saveStatus === 'success' && <span className="docs-wizard-save-status-success">{'✓ '}{t('about.docs_wizard.saved') || 'Saved successfully!'}</span>}
+              {saveStatus === 'error' && <span className="docs-wizard-save-status-error">{'✗ '}{t('about.docs_wizard.save_failed') || 'Failed to save'}</span>}
             </div>
           )}
         </div>
@@ -246,7 +217,7 @@ export default function AboutPage() {
           <div className="docs-wizard-footer">
             {!isFirst ? (
               <button
-                className="about-action-btn docs-wizard-btn-auto"
+                className="ui-button ui-button--secondary ui-button--md docs-wizard-btn-auto"
                 onClick={() => {
                   setWizardStep(currentStepIdx - 1);
                   setSaveStatus(null);
@@ -258,7 +229,7 @@ export default function AboutPage() {
 
             {!isLast && (
               <button
-                className="about-action-btn docs-wizard-btn-next"
+                className="ui-button ui-button--secondary ui-button--md docs-wizard-btn-next"
                 onClick={() => {
                   setWizardStep(currentStepIdx + 1);
                   setSaveStatus(null);
@@ -329,7 +300,7 @@ export default function AboutPage() {
           { label: 'State', value: 'Movie State' },
           { label: 'Zip Code', value: '7777' }
         ];
-        
+
         return (
           <div className="about-wizard-dummy-grid">
             {dummyData.map((d, idx) => (
@@ -340,7 +311,7 @@ export default function AboutPage() {
                 </div>
                 {!d.noCopy && (
                   <button
-                    className="about-action-btn about-wizard-dummy-copy-btn"
+                    className="ui-button ui-button--secondary ui-button--md about-wizard-dummy-copy-btn"
                     onClick={(e) => { e.preventDefault(); navigator.clipboard.writeText(d.value); }}
                   >
                     {t('about.docs_wizard.copy') || 'Copy'}
@@ -409,7 +380,7 @@ export default function AboutPage() {
           { label: 'Email', value: 'Use your registered email', noCopy: true },
           { label: 'Use', value: 'Checking imdb, rotten, and meta movie ratings.' }
         ];
-        
+
         return (
           <div className="about-wizard-dummy-grid">
             {dummyData.map((d, idx) => (
@@ -420,7 +391,7 @@ export default function AboutPage() {
                 </div>
                 {!d.noCopy && (
                   <button
-                    className="about-action-btn about-wizard-dummy-copy-btn"
+                    className="ui-button ui-button--secondary ui-button--md about-wizard-dummy-copy-btn"
                     onClick={(e) => { e.preventDefault(); navigator.clipboard.writeText(d.value); }}
                   >
                     {t('about.docs_wizard.copy') || 'Copy'}
@@ -488,7 +459,7 @@ export default function AboutPage() {
                   <span className="about-wizard-dummy-value">{c.value}</span>
                 </div>
                 <button
-                  className="about-action-btn about-wizard-dummy-copy-btn"
+                  className="ui-button ui-button--secondary ui-button--md about-wizard-dummy-copy-btn"
                   onClick={(e) => { e.preventDefault(); navigator.clipboard.writeText(c.value); }}
                 >
                   {t('about.docs_wizard.copy') || 'Copy'}
@@ -647,11 +618,74 @@ export default function AboutPage() {
 
   const featuresTourData = [
     {
+      id: 'general_layout',
+      icon: <BookOpen size={16} />,
+      title: t('about.docs_wizard.features_tour.general_layout_title') || 'Interface & Navigation',
+      description: t('about.docs_wizard.features_tour.general_layout_desc') || 'Get familiar with the general layout of SWAYA, including the sidebar navigation, session mode controls, and real-time background task monitors.',
+      image: '/documentations/interface/interface1.png',
+      details: [
+        {
+          title: t('about.docs_wizard.features_tour.general_layout_details.navigation_title') || 'Sidebar Navigation',
+          description: t('about.docs_wizard.features_tour.general_layout_details.navigation_desc') || 'Allows navigating between core features of SWAYA. The sidebar can be expanded or collapsed to maximize screen space for content browsing.',
+          image: '/documentations/interface/interface1.png'
+        },
+        {
+          title: t('about.docs_wizard.features_tour.general_layout_details.session_modes_title') || 'SFW / NSFW Modes (Flame Icon)',
+          description: t('about.docs_wizard.features_tour.general_layout_details.session_modes_desc') || 'Located in the top header. Toggles the global session context between SFW and NSFW. NSFW mode reveals adult-oriented categories, unblurs explicit media posters, and adapts greeting titles.',
+          image: '/documentations/interface/interface2.png',
+          nsfw: true
+        },
+        {
+          title: t('about.docs_wizard.features_tour.general_layout_details.background_tasks_title') || 'Background Tasks & Scanning',
+          description: t('about.docs_wizard.features_tour.general_layout_details.background_tasks_desc') || 'Displays scanning status, metadata fetching, and image processing jobs in progress with live progress bars at the top of the application.',
+          image: '/documentations/interface/interface3.png'
+        },
+        {
+          title: t('about.docs_wizard.features_tour.general_layout_details.history_nav_title') || 'History Navigation (Back & Forward)',
+          description: t('about.docs_wizard.features_tour.general_layout_details.history_nav_desc') || 'Located in the top header. Allows you to easily navigate back and forward through your recently visited pages, similar to a web browser.',
+          image: '/documentations/interface/interface4.png'
+        },
+        {
+          title: t('about.docs_wizard.features_tour.general_layout_details.global_search_title') || 'Global Search',
+          description: t('about.docs_wizard.features_tour.general_layout_details.global_search_desc') || 'Located in the top header. Allows you to search your entire media library, performers, studios, and categories instantly from anywhere in the application.',
+          image: '/documentations/interface/interface5.png'
+        }
+      ]
+    },
+    {
       id: 'dashboard',
       icon: <Home size={16} />,
       title: t('about.docs_wizard.features_tour.dashboard_title') || 'Dashboard',
       description: t('about.docs_wizard.features_tour.dashboard_desc') || 'Your library landing page and central hub. Features clean widgets showing continue watching, recently added videos, spotlight items, and database counts.',
-      image: '/documentations/features/dashboard.png'
+      image: '/documentations/dashboard/dashboard1.png',
+      details: [
+        {
+          title: t('about.docs_wizard.features_tour.dashboard_details.greeting_title') || 'Dynamic Greeting',
+          description: t('about.docs_wizard.features_tour.dashboard_details.greeting_desc') || 'Greets you contextually based on the time of day, onboarding status, and SFW/NSFW session modes.',
+          image: '/documentations/dashboard/dashboard1.png'
+        },
+        {
+          title: t('about.docs_wizard.features_tour.dashboard_details.customizer_title') || 'Dashboard Customizer',
+          description: t('about.docs_wizard.features_tour.dashboard_details.customizer_desc') || 'A drawer widget that allows toggling visibility and drag-and-drop reordering of widgets, persisting settings to local storage.',
+          image: '/documentations/dashboard/dashboard2.png'
+        },
+        {
+          title: t('about.docs_wizard.features_tour.dashboard_details.error_boundary_title') || 'Modular Widget System & Error Boundaries',
+          description: t('about.docs_wizard.features_tour.dashboard_details.error_boundary_desc') || 'Each widget runs within its own boundary (WidgetErrorBoundary), preventing a crash in one widget from bringing down the entire dashboard.',
+          image: '/documentations/dashboard/dashboard3.png'
+        },
+        {
+          title: t('about.docs_wizard.features_tour.dashboard_details.widgets_title') || 'Context-Sensitive Content Widgets',
+          description: t('about.docs_wizard.features_tour.dashboard_details.widgets_desc') || 'Includes Continue Watching, Trending (Spotlight), Fresh Arrivals, lately tracked artists/stars, and recommendations. Adapts dynamically to SFW/NSFW session settings.',
+          image: '/documentations/dashboard/dashboard4.png'
+        },
+        {
+          title: t('about.docs_wizard.features_tour.dashboard_details.adult_widget_title') || 'Adult Recommendations',
+          description: t('about.docs_wizard.features_tour.dashboard_details.adult_widget_desc') || 'Exclusively displays personalized adult recommendations when the application is toggled to NSFW session mode.',
+          image: '/documentations/dashboard/dashboard5.png',
+          nsfw: true
+        }
+      ]
     },
     {
       id: 'organizer',
@@ -705,13 +739,13 @@ export default function AboutPage() {
   ];
 
   const docSubItems = [
-    { id: 'docs_tmdb', label: t('about.docs_wizard.headers.tmdb') },
-    { id: 'docs_omdb', label: t('about.docs_wizard.headers.omdb') },
-    { id: 'docs_stashdb', label: t('about.docs_wizard.headers.stashdb') },
-    { id: 'docs_fansdb', label: t('about.docs_wizard.headers.fansdb') },
-    { id: 'docs_porndb', label: t('about.docs_wizard.headers.porndb') },
-    { id: 'docs_offline', label: t('about.docs_wizard.headers.offline') },
-    { id: 'docs_features', label: t('about.docs_wizard.headers.features') },
+    { id: 'docs_tmdb', label: 'TMDb API Key' },
+    { id: 'docs_omdb', label: 'OMDb API Key' },
+    { id: 'docs_stashdb', label: 'StashDB' },
+    { id: 'docs_fansdb', label: 'FansDB' },
+    { id: 'docs_porndb', label: 'ThePornDB' },
+    { id: 'docs_offline', label: 'Offline Scan' },
+    { id: 'docs_features', label: 'Feature Tour' },
   ];
 
   const handleClose = () => {
@@ -719,99 +753,106 @@ export default function AboutPage() {
   };
 
   useEffect(() => {
-    // Changelog is fetched in handleSetActiveTab
-  }, []);
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        const target = e.target;
+        if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA' && target.tagName !== 'SELECT') {
+          handleClose();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleClose]);
+
+  useEffect(() => {
+    if (activeTab === 'changelog' && !hasLoadedChangelog && !isLoadingChangelog) {
+      setIsLoadingChangelog(true);
+      setChangelogError(null);
+      fetchJson('/api/settings/changelog')
+        .then((data) => {
+          if (data.status === 'success') {
+            setChangelogContent(data.content || '');
+            setHasLoadedChangelog(true);
+          } else {
+            throw new Error(data.message || 'Failed to load changelog');
+          }
+        })
+        .catch((err) => {
+          setChangelogError(err.message || 'Failed to load changelog');
+          setHasLoadedChangelog(true);
+        })
+        .finally(() => {
+          setIsLoadingChangelog(false);
+        });
+    }
+  }, [activeTab, hasLoadedChangelog, isLoadingChangelog]);
 
   const tabs = [
-    { id: 'info', label: t('about.title'), icon: <Info size={18} /> },
-    { id: 'docs', label: t('about.resources.docs') || DOCS_FALLBACK, icon: <BookOpen size={18} />, subItems: docSubItems },
-    { id: 'changelog', label: t('about.resources.changelog'), icon: <ScrollText size={18} /> },
-    { id: 'privacy', label: t('about.notices.privacy'), icon: <Lock size={18} /> },
-    { id: 'license', label: t('about.notices.license'), icon: <ScrollText size={18} /> },
-    { id: 'third_party', label: t('about.notices.third_party'), icon: <BookOpen size={18} /> },
+    { id: 'info', label: t('about.general'), icon: Info },
+    { id: 'docs', label: t('about.resources.docs') || 'Documentation', icon: CircleHelp, subItems: docSubItems },
+    { id: 'changelog', label: t('about.resources.changelog'), icon: ScrollText },
+    { id: 'privacy', label: t('about.notices.privacy'), icon: Lock },
+    { id: 'license', label: t('about.notices.license'), icon: ScrollText },
+    { id: 'third_party', label: t('about.notices.third_party'), icon: Library },
   ];
 
   const appInfo = {
     name: 'Swaya',
     version: '0.1.0',
     developer: {
-      name: 'Levente Gáll',
-      email: 'leventegall@proton.me',
+      name: 'Levi',
+      email: 'levi@swaya.io',
       website: 'https://swaya.io',
       github: 'https://github.com/stargate91/SWAYA',
       discordServer: 'https://discord.gg/swaya',
     },
   };
 
+  const developerLinks = [
+    { href: `mailto:${appInfo.developer.email}`, icon: <Mail size={16} />, label: t('about.links.email') },
+    { href: appInfo.developer.website, icon: <Globe size={16} />, label: t('about.links.website') },
+    { href: appInfo.developer.github, icon: <GitHubIcon size={16} />, label: t('about.links.github') },
+    { href: appInfo.developer.discordServer, icon: <DiscordIcon size={16} />, label: t('about.links.discord_server') },
+  ];
+
+  const isDocsTabActive = activeTab === 'docs' || activeTab.startsWith('docs_');
+  const sidebarGroups = tabs.map((tab) => {
+    if (tab.subItems) {
+      return {
+        id: tab.id,
+        label: tab.label,
+        icon: tab.icon,
+        isActive: isDocsTabActive,
+        isExpanded: isDocsExpanded || isDocsTabActive,
+        onToggle: () => {
+          setIsDocsExpanded(!isDocsExpanded);
+          if (!activeTab.startsWith('docs_')) {
+            handleSetActiveTab('docs_tmdb');
+          }
+        },
+        subItems: tab.subItems.map((sub) => ({
+          id: sub.id,
+          label: sub.label,
+          isActive: activeTab === sub.id,
+        })),
+      };
+    }
+    return {
+      id: tab.id,
+      label: tab.label,
+      icon: tab.icon,
+      isActive: activeTab === tab.id,
+    };
+  });
+
   return (
     <div className="settings-overlay">
-      <aside className="settings-sidebar">
-        <h1 className="settings-sidebar-header">{t('about.title')}</h1>
-        <nav className="settings-sidebar-menu">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isDocsTabActive = activeTab === 'docs' || activeTab.startsWith('docs_');
-
-            if (tab.subItems) {
-              const isSubMenuVisible = isDocsExpanded || isDocsTabActive;
-              const activeSubIndex = tab.subItems.findIndex((sub) => sub.id === activeTab);
-
-              return (
-                <div key={tab.id}>
-                  {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-                  <div
-                    className={`settings-sidebar-item${isDocsTabActive ? ' active' : ''}`}
-                    onClick={() => {
-                      setIsDocsExpanded(!isDocsExpanded);
-                      if (!activeTab.startsWith('docs_')) {
-                        handleSetActiveTab('docs_tmdb');
-                      }
-                    }}
-                  >
-                    {Icon}
-                    <span className="settings-sidebar-label">{tab.label}</span>
-                    {isSubMenuVisible ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                  </div>
-                  <div
-                    className={`settings-sidebar-sub-menu${isSubMenuVisible ? ' is-open' : ' is-closed'}`}
-                    aria-hidden={!isSubMenuVisible}
-                  >
-                    {activeSubIndex !== -1 && (
-                      <div
-                        className={`settings-sidebar-sub-indicator settings-sidebar-sub-indicator--${activeSubIndex}`}
-                      />
-                    )}
-                    {tab.subItems.map((sub) => {
-                      return (
-                        // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-                        <div
-                          key={sub.id}
-                          className={`settings-sidebar-sub-item${activeTab === sub.id ? ' active' : ''}`}
-                          onClick={() => handleSetActiveTab(sub.id)}
-                        >
-                          <span>{sub.label}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            }
-
-            return (
-              // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-              <div
-                key={tab.id}
-                className={`settings-sidebar-item${activeTab === tab.id ? ' active' : ''}`}
-                onClick={() => handleSetActiveTab(tab.id)}
-              >
-                {Icon}
-                <span className="settings-sidebar-label">{tab.label}</span>
-              </div>
-            );
-          })}
-        </nav>
-      </aside>
+      <Sidebar
+        header={t('about.title')}
+        groups={sidebarGroups}
+        onTabSelect={handleSetActiveTab}
+      />
 
       <main className="settings-content-wrapper">
         <div className="settings-close-container">
@@ -824,18 +865,19 @@ export default function AboutPage() {
           >
             <X size={18} />
           </IconButton>
+          <span className="settings-close-esc-hint">{t('settingsPage.closeShortcut') || 'ESC'}</span>
         </div>
 
-        <div className="settings-content">
+        <div className="settings-content" style={activeTab === 'docs_features' ? { maxWidth: '1200px' } : undefined}>
           <div className="settings-tab-content">
             {activeTab === 'info' && (
               <div className="about-tab-panel info-panel">
                 <div className="about-app-brand-card">
-                  <div className="about-app-logo">{APP_LOGO_LETTER}</div>
+                  <div className="about-app-logo">S</div>
                   <div className="about-app-details">
                     <div className="about-app-name-row">
-                      <span className="about-app-title">{APP_NAME_UPPER}</span>
-                      <span className="about-app-version">{VERSION_PREFIX}{appInfo.version}</span>
+                      <span className="about-app-title">SWAYA</span>
+                      <span className="about-app-version">v{appInfo.version}</span>
                     </div>
                     <p className="about-app-description">{t('about.subtitle') || 'Organize, enrich, and keep your media library clean.'}</p>
                   </div>
@@ -844,32 +886,32 @@ export default function AboutPage() {
                 <div className="about-single-layout">
                   <div className="about-column">
                     <div className="about-section-header">
-                      <h3>{t('about.app_info.developer')}</h3>
-                      <p>{t('about.app_info.developer_intro')}</p>
+                      <h3>{t('about.app_info.developer') || 'Developer'}</h3>
+                      <p>{t('about.app_info.developer_intro') || 'Reach out directly if you want to report bugs, collaborate, or share feedback.'}</p>
                     </div>
                     <div className="developer-profile-card">
-                      <div className="developer-avatar">{DEVELOPER_AVATAR_LETTER}</div>
+                      <div className="developer-avatar">L</div>
                       <div className="developer-info">
-                        <span className="developer-name">{t('about.app_info.developer_name')}</span>
-                        <span className="developer-email">{t('about.app_info.developer_email')}</span>
+                        <span className="developer-name">{t('about.app_info.developer_name') || 'Levente Gáll'}</span>
+                        <span className="developer-email">{t('about.app_info.developer_email') || 'leventegall@proton.me'}</span>
                       </div>
                     </div>
                     <div className="developer-links-grid">
-                      <a href={`mailto:${appInfo.developer.email}`} className="about-action-btn" onClick={(e) => { e.preventDefault(); openExternalLink(`mailto:${appInfo.developer.email}`); }}>
+                      <a href={`mailto:${t('about.app_info.developer_email') || 'leventegall@proton.me'}`} className="ui-button ui-button--secondary ui-button--md" onClick={(e) => { e.preventDefault(); openExternalLink(`mailto:${t('about.app_info.developer_email') || 'leventegall@proton.me'}`); }}>
                         <Mail size={16} />
-                        <span>{t('about.links.email')}</span>
+                        <span>{t('about.links.email') || 'Email'}</span>
                       </a>
-                      <a href={appInfo.developer.website} className="about-action-btn" onClick={(e) => { e.preventDefault(); openExternalLink(appInfo.developer.website); }}>
+                      <a href="https://swaya.io" className="ui-button ui-button--secondary ui-button--md" onClick={(e) => { e.preventDefault(); openExternalLink('https://swaya.io'); }}>
                         <Globe size={16} />
-                        <span>{t('about.links.website')}</span>
+                        <span>Website</span>
                       </a>
-                      <a href={appInfo.developer.github} className="about-action-btn" onClick={(e) => { e.preventDefault(); openExternalLink(appInfo.developer.github); }}>
+                      <a href="https://github.com/stargate91/SWAYA" className="ui-button ui-button--secondary ui-button--md" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/stargate91/SWAYA'); }}>
                         <GitHubIcon size={16} />
-                        <span>{t('about.links.github')}</span>
+                        <span>GitHub</span>
                       </a>
-                      <a href={appInfo.developer.discordServer} className="about-action-btn" onClick={(e) => { e.preventDefault(); openExternalLink(appInfo.developer.discordServer); }}>
+                      <a href="https://discord.gg/swaya" className="ui-button ui-button--secondary ui-button--md" onClick={(e) => { e.preventDefault(); openExternalLink('https://discord.gg/swaya'); }}>
                         <DiscordIcon size={16} />
-                        <span>{t('about.links.discord_server')}</span>
+                        <span>Discord Server</span>
                       </a>
                     </div>
                   </div>
@@ -913,7 +955,7 @@ export default function AboutPage() {
             {activeTab === 'docs_tmdb' && (
               <div className="about-tab-panel docs-panel">
                 <Card className="about-card docs-card">
-                  <h2 className="about-section-title">{t('about.docs_wizard.headers.tmdb')}</h2>
+                  <h2 className="about-section-title">TMDb API Key</h2>
                   {renderWizard(tmdbWizardSteps)}
                 </Card>
               </div>
@@ -921,7 +963,7 @@ export default function AboutPage() {
             {activeTab === 'docs_omdb' && (
               <div className="about-tab-panel docs-panel">
                 <Card className="about-card docs-card">
-                  <h2 className="about-section-title">{t('about.docs_wizard.headers.omdb')}</h2>
+                  <h2 className="about-section-title">OMDb API Key</h2>
                   {renderWizard(omdbWizardSteps)}
                 </Card>
               </div>
@@ -929,7 +971,7 @@ export default function AboutPage() {
             {activeTab === 'docs_stashdb' && (
               <div className="about-tab-panel docs-panel">
                 <Card className="about-card docs-card">
-                  <h2 className="about-section-title">{t('about.docs_wizard.headers.stashdb')}</h2>
+                  <h2 className="about-section-title">StashDB</h2>
                   {renderWizard(stashdbWizardSteps)}
                 </Card>
               </div>
@@ -937,7 +979,7 @@ export default function AboutPage() {
             {activeTab === 'docs_fansdb' && (
               <div className="about-tab-panel docs-panel">
                 <Card className="about-card docs-card">
-                  <h2 className="about-section-title">{t('about.docs_wizard.headers.fansdb')}</h2>
+                  <h2 className="about-section-title">FansDB</h2>
                   {renderWizard(fansdbWizardSteps)}
                 </Card>
               </div>
@@ -945,7 +987,7 @@ export default function AboutPage() {
             {activeTab === 'docs_porndb' && (
               <div className="about-tab-panel docs-panel">
                 <Card className="about-card docs-card">
-                  <h2 className="about-section-title">{t('about.docs_wizard.headers.porndb')}</h2>
+                  <h2 className="about-section-title">ThePornDB</h2>
                   {renderWizard(porndbWizardSteps)}
                 </Card>
               </div>
@@ -953,69 +995,154 @@ export default function AboutPage() {
             {activeTab === 'docs_offline' && (
               <div className="about-tab-panel docs-panel">
                 <Card className="about-card docs-card">
-                  <h2 className="about-section-title">{t('about.docs_wizard.headers.offline')}</h2>
+                  <h2 className="about-section-title">Offline Scan</h2>
                   {renderWizard(offlineWizardSteps)}
                 </Card>
               </div>
             )}
-            {activeTab === 'docs_features' && (
-              <div className="about-tab-panel docs-panel features-tour-container">
-                <h2 className="features-tour-header">{t('about.docs_wizard.headers.features')}</h2>
-                <div className="features-tour-layout">
-                  {/* Left Sidebar List of Pages */}
-                  <div className="features-tour-sidebar">
-                    {featuresTourData.map((f, idx) => (
-                      <button
-                        key={f.id}
-                        onClick={() => setActiveTourIndex(idx)}
-                        className={`features-tour-sidebar-item${activeTourIndex === idx ? ' active' : ''}`}
-                      >
-                        {f.icon}
-                        <span>{f.title}</span>
-                      </button>
-                    ))}
-                  </div>
+            {activeTab === 'docs_features' && (() => {
+              const activeItem = featuresTourData[activeTourIndex];
+              const hasSubFeature = activeSubFeatureIndex !== null && activeItem.details && activeItem.details[activeSubFeatureIndex];
+              const displayTitle = hasSubFeature ? activeItem.details[activeSubFeatureIndex].title : activeItem.title;
+              const displayDescription = hasSubFeature ? activeItem.details[activeSubFeatureIndex].description : activeItem.description;
+              const displayImage = hasSubFeature ? activeItem.details[activeSubFeatureIndex].image : activeItem.image;
 
-                  {/* Right Content Panel (Split details + image) */}
-                  <div className="features-tour-content">
-                    <h3 className="features-tour-title">
-                      {featuresTourData[activeTourIndex].title}
-                    </h3>
+              return (
+                <div className="about-tab-panel docs-panel" style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: '10px 20px 20px 20px' }}>
+                  <h2 style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--color-text-primary)', margin: '0 0 20px 0' }}>Feature Tour</h2>
+                  <div style={{ display: 'flex', flex: 1, gap: '30px', minHeight: 0 }}>
+                    {/* Left Sidebar List of Pages & Sub-features */}
+                    <div style={{ width: '280px', borderRight: '1px solid var(--color-border-subtle)', paddingRight: '20px', display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--color-bg-subtle, rgba(255,255,255,0.01))', borderRadius: '8px', border: '1px solid var(--color-border-subtle)', marginBottom: '8px', flexShrink: 0 }}>
+                        <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-secondary)' }}>
+                          {t('about.docs_wizard.show_nsfw_features') || 'Show NSFW Features'}
+                        </span>
+                        <Switch
+                          checked={showNsfwDocs}
+                          onChange={() => {
+                            setShowNsfwDocs(!showNsfwDocs);
+                            if (showNsfwDocs && hasSubFeature && activeItem.details[activeSubFeatureIndex].nsfw) {
+                              setActiveSubFeatureIndex(null);
+                            }
+                          }}
+                        />
+                      </div>
 
-                    {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-                    <div
-                      className="features-tour-showcase"
-                      onClick={() => {
-                        if (featuresTourData[activeTourIndex].image) {
-                          setActiveLightboxUrl(featuresTourData[activeTourIndex].image);
-                        }
-                      }}
-                    >
-                      {featuresTourData[activeTourIndex].image ? (
-                        <div className="features-tour-image-overlay">
-                          <div className="features-tour-placeholder-text-absolute">
-                            <span className="features-tour-placeholder-icon">{CAMERA_EMOJI}</span>
-                            <span className="features-tour-placeholder-label">{t('about.docs_wizard.screenshot_placeholder') || SCREENSHOT_PLACEHOLDER_FALLBACK}</span>
-                            <span className="features-tour-placeholder-sub">{featuresTourData[activeTourIndex].title}{OPEN_PAREN}{featuresTourData[activeTourIndex].image}{CLOSE_PAREN}</span>
+                      {featuresTourData.map((f, idx) => {
+                        const isMainActive = activeTourIndex === idx && activeSubFeatureIndex === null;
+                        const isAnyActive = activeTourIndex === idx;
+                        const filteredDetails = f.details ? f.details.filter(detail => showNsfwDocs || !detail.nsfw) : [];
+                        const activeSubIndex = f.details ? filteredDetails.findIndex(detail => f.details.indexOf(detail) === activeSubFeatureIndex) : -1;
+
+                        return (
+                          <div key={f.id} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <div
+                              className={`ui-sidebar-item ${isMainActive ? 'active' : ''}`}
+                              onClick={() => {
+                                setActiveTourIndex(idx);
+                                setActiveSubFeatureIndex(null);
+                              }}
+                              style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
+                            >
+                              <span className="ui-sidebar-item-icon" style={{ display: 'flex', alignItems: 'center', color: 'inherit' }}>{f.icon}</span>
+                              <span className="ui-sidebar-label" style={{ color: 'inherit' }}>{f.title}</span>
+                              {f.details && (
+                                <span style={{ fontSize: '10px', opacity: 0.7, color: 'inherit' }}>
+                                  {isAnyActive ? '▼' : '▶'}
+                                </span>
+                              )}
+                            </div>
+
+                            {f.details && isAnyActive && filteredDetails.length > 0 && (
+                              <div className="ui-sidebar-sub-menu is-open" style={{ marginLeft: '1.25rem', paddingLeft: '1.25rem', position: 'relative' }}>
+                                {activeSubIndex !== -1 && (
+                                  <div
+                                    className="ui-sidebar-sub-indicator"
+                                    style={{ top: `${activeSubIndex * 32}px` }}
+                                  />
+                                )}
+                                {filteredDetails.map((detail) => {
+                                  const originalIndex = f.details.indexOf(detail);
+                                  const isSubActive = activeTourIndex === idx && activeSubFeatureIndex === originalIndex;
+                                  return (
+                                    <div
+                                      key={originalIndex}
+                                      className={`ui-sidebar-sub-item ${isSubActive ? 'active' : ''}`}
+                                      onClick={() => {
+                                        setActiveTourIndex(idx);
+                                        setActiveSubFeatureIndex(originalIndex);
+                                      }}
+                                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px', width: '100%' }}
+                                    >
+                                      <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{detail.title}</span>
+                                      {detail.nsfw && (
+                                        <span style={{ fontSize: '9px', fontWeight: 'bold', color: 'var(--color-danger, #ef4444)', background: 'rgba(239, 68, 68, 0.15)', padding: '1px 4px', borderRadius: '4px', textTransform: 'uppercase', flexShrink: 0 }}>
+                                          NSFW
+                                        </span>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      ) : (
-                        <div className="features-tour-placeholder-text">
-                          <span className="features-tour-placeholder-icon">{CAMERA_EMOJI}</span>
-                          <span className="features-tour-placeholder-label">{t('about.docs_wizard.screenshot_placeholder') || SCREENSHOT_PLACEHOLDER_FALLBACK}</span>
-                          <span className="features-tour-placeholder-sub">{featuresTourData[activeTourIndex].title}</span>
-                        </div>
-                      )}
+                        );
+                      })}
                     </div>
 
-                    {/* Features / Details of the selected page */}
-                    <p className="features-tour-desc">
-                      {featuresTourData[activeTourIndex].description}
-                    </p>
+                    {/* Right Content Panel (Split details + image) */}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px', minWidth: 0, overflowY: 'auto', paddingRight: '15px' }}>
+                      <h3 style={{ fontSize: '20px', fontWeight: 'bold', margin: 0, color: 'var(--color-text-primary)' }}>
+                        {displayTitle}
+                      </h3>
+
+                      {/* Screenshot / Image Showcase */}
+                      <div
+                        style={{
+                          width: '100%',
+                          maxWidth: '800px',
+                          height: '360px',
+                          background: 'var(--color-bg-subtle, rgba(255,255,255,0.01))',
+                          border: '1px dashed var(--color-border-default)',
+                          borderRadius: '12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          overflow: 'hidden',
+                          position: 'relative',
+                          flexShrink: 0
+                        }}
+                        onClick={() => {
+                          if (displayImage) {
+                            setActiveLightboxUrl(displayImage);
+                          }
+                        }}
+                      >
+                        {displayImage ? (
+                          <img
+                            src={displayImage}
+                            alt={displayTitle}
+                            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                          />
+                        ) : (
+                          <div style={{ textAlign: 'center', padding: '25px', color: 'var(--color-text-muted)' }}>
+                            <span style={{ fontSize: '32px', display: 'block', marginBottom: '10px' }}>📷</span>
+                            <span style={{ fontSize: '12px', fontWeight: 600 }}>{t('about.docs_wizard.screenshot_placeholder') || 'Screenshot Placeholder'}</span>
+                            <span style={{ fontSize: '11px', display: 'block', color: 'var(--color-text-secondary)', marginTop: '6px' }}>{displayTitle}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Features / Details of the selected page */}
+                      <p style={{ fontSize: '14px', lineHeight: '1.7', color: 'var(--color-text-secondary)', margin: '0 0 15px 0', whiteSpace: 'pre-wrap', maxWidth: '800px' }}>
+                        {displayDescription}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {activeTab === 'privacy' && (
               <div className="about-tab-panel privacy-panel">
@@ -1027,6 +1154,8 @@ export default function AboutPage() {
                     <li>{t('about.notices.points.api_keys')}</li>
                     <li>{t('about.notices.points.network')}</li>
                     <li>{t('about.notices.points.logs')}</li>
+                    <li>{t('about.notices.points.no_telemetry')}</li>
+                    <li>{t('about.notices.points.no_sharing')}</li>
                   </ul>
                 </Card>
               </div>
@@ -1076,43 +1205,43 @@ export default function AboutPage() {
                     <p className="special-thanks-intro">{t('about.notices.special_thanks_intro')}</p>
                     <div className="special-thanks-grid">
                       <div className="thanks-item">
-                        <span className="thanks-name">{SILUR_NAME}</span>
+                        <span className="thanks-name">Silur</span>
                         <div className="thanks-links">
                           <a href="https://github.com/Silur" className="thanks-link" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/Silur'); }}>
                             <GitHubIcon size={12} />
-                            <span>{GITHUB_LABEL}</span>
+                            <span>GitHub</span>
                           </a>
                         </div>
                       </div>
                       <div className="thanks-item">
-                        <span className="thanks-name">{KERRIGAN_NAME}</span>
+                        <span className="thanks-name">Kerrigan</span>
                         <div className="thanks-links">
                           <a href="https://github.com/rasztasd" className="thanks-link" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/rasztasd'); }}>
                             <GitHubIcon size={12} />
-                            <span>{t('about.docs_wizard.labels.github_1')}</span>
+                            <span>GitHub 1</span>
                           </a>
-                          <span className="thanks-divider">{DOT_DIVIDER}</span>
+                          <span className="thanks-divider">•</span>
                           <a href="https://github.com/danielmcallisterSG" className="thanks-link" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/danielmcallisterSG'); }}>
                             <GitHubIcon size={12} />
-                            <span>{t('about.docs_wizard.labels.github_2')}</span>
+                            <span>GitHub 2</span>
                           </a>
                         </div>
                       </div>
                       <div className="thanks-item">
-                        <span className="thanks-name">{YASHOCK_NAME}</span>
+                        <span className="thanks-name">YaShock</span>
                         <div className="thanks-links">
                           <a href="https://github.com/YaShock" className="thanks-link" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/YaShock'); }}>
                             <GitHubIcon size={12} />
-                            <span>{GITHUB_LABEL}</span>
+                            <span>GitHub</span>
                           </a>
                         </div>
                       </div>
                       <div className="thanks-item">
-                        <span className="thanks-name">{DATA_NAME}</span>
+                        <span className="thanks-name">Data</span>
                         <div className="thanks-links">
                           <a href="https://github.com/adamgyongyosi" className="thanks-link" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/adamgyongyosi'); }}>
                             <GitHubIcon size={12} />
-                            <span>{GITHUB_LABEL}</span>
+                            <span>GitHub</span>
                           </a>
                         </div>
                       </div>

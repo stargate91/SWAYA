@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight } from '@/ui/icons';
+import Sidebar from '@/ui/Sidebar';
 import { SETTINGS_TAB_GROUP_IDS } from '../settingsConstants.js';
 
 export default function SettingsSidebar({
@@ -14,68 +14,36 @@ export default function SettingsSidebar({
 }) {
   const isSubMenuVisible = isOrgExpanded || isOrganizationTabActive;
 
+  const sidebarGroups = tabGroups.map((group) => {
+    if (group.id === SETTINGS_TAB_GROUP_IDS.ORGANIZATION) {
+      return {
+        id: group.id,
+        label: t(group.labelKey),
+        icon: group.icon,
+        isActive: isOrganizationTabActive,
+        isExpanded: isSubMenuVisible,
+        onToggle: onOrganizationToggle,
+        subItems: visibleOrganizationTabs.map((tab) => ({
+          id: tab.id,
+          label: t(tab.labelKey),
+          isActive: activeTab === tab.id,
+        })),
+      };
+    }
+
+    return {
+      id: group.id,
+      label: t(group.labelKey),
+      icon: group.icon,
+      isActive: activeTab === group.id,
+    };
+  });
+
   return (
-    <aside className="settings-sidebar">
-      <h1 className="settings-sidebar-header">{t('sidebar.settings')}</h1>
-      <nav className="settings-sidebar-menu">
-        {tabGroups.map((group) => {
-          const Icon = group.icon;
-
-          if (group.id === SETTINGS_TAB_GROUP_IDS.ORGANIZATION) {
-            return (
-              <div key={group.id}>
-                {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-                <div
-                  className={`settings-sidebar-item${isOrganizationTabActive ? ' active' : ''}`}
-                  onClick={onOrganizationToggle}
-                >
-                  <Icon size={18} />
-                  <span className="settings-sidebar-label">{t(group.labelKey)}</span>
-                  {(isOrgExpanded || isOrganizationTabActive) ? (
-                    <ChevronDown size={16} />
-                  ) : (
-                    <ChevronRight size={16} />
-                  )}
-                </div>
-                <div
-                  className={`settings-sidebar-sub-menu${isSubMenuVisible ? ' is-open' : ' is-closed'}`}
-                  aria-hidden={!isSubMenuVisible}
-                >
-                  {activeOrganizationIndex !== -1 && (
-                    <div
-                      className={`settings-sidebar-sub-indicator settings-sidebar-sub-indicator--${activeOrganizationIndex}`}
-                    />
-                  )}
-                  {visibleOrganizationTabs.map((tab) => {
-                    return (
-                      // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-                      <div
-                        key={tab.id}
-                        className={`settings-sidebar-sub-item${tab.className ? ` ${tab.className}${tab.isCurrentlyVisible ? ' visible' : ''}` : ''}${activeTab === tab.id ? ' active' : ''}`}
-                        onClick={() => onTabSelect(tab.id)}
-                      >
-                        <span>{t(tab.labelKey)}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          }
-
-          return (
-            // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-            <div
-              key={group.id}
-              className={`settings-sidebar-item${activeTab === group.id ? ' active' : ''}`}
-              onClick={() => onTabSelect(group.id)}
-            >
-              <Icon size={18} />
-              <span>{t(group.labelKey)}</span>
-            </div>
-          );
-        })}
-      </nav>
-    </aside>
+    <Sidebar
+      header={t('sidebar.settings')}
+      groups={sidebarGroups}
+      onTabSelect={onTabSelect}
+    />
   );
 }

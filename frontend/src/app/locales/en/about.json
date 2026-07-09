@@ -1,5 +1,6 @@
 {
   "title": "About & Help",
+  "general": "General",
   "subtitle": "Your next-generation personal media center to organize, enrich, and play your local library.",
   "links": {
     "email": "Email",
@@ -15,18 +16,20 @@
     "privacy": "Privacy Policy",
     "privacy_intro": "Swaya is designed with privacy in mind:",
     "points": {
-      "local_only": "All database records, settings, and files are stored strictly locally on your machine.",
-      "api_keys": "Third-party API keys are stored securely in your local configuration.",
-      "network": "External network connections are only made to fetch metadata from active providers you configure.",
-      "logs": "Application logs are stored locally and are never shared automatically."
+      "local_only": "Local-First Architecture: All database records, metadata caches, user settings, and library structures are stored strictly on your local machine.",
+      "api_keys": "Secured Local Credentials: Third-party API keys and access tokens (TMDb, OMDb, StashDB, etc.) are saved locally within your app configuration and are never transmitted to any third-party intermediate servers.",
+      "network": "Direct Network Isolation: Outbound network connections are strictly limited to fetching metadata directly from the official API endpoints of the active providers you configure.",
+      "logs": "Offline Local Logging: System logs, scan histories, and error reports are kept strictly offline on your disk for troubleshooting purposes, with zero automated cloud reporting.",
+      "no_telemetry": "Zero Telemetry & Tracking: The application contains absolutely no analytics, user tracking, usage reporting, or background telemetry. Your interactions with the application are entirely private.",
+      "no_sharing": "No Cloud Matching: Your media library directories, filenames, and internal catalog metadata are kept strictly local. Swaya never uploads, indexes, or shares your media collection with any cloud server or database."
     },
     "license": "End User License Agreement",
-    "license_intro": "Swaya Commercial License Terms:",
+    "license_intro": "Swaya Source-Available License Terms:",
     "license_body": {
-      "p1": "Swaya is a commercial proprietary application. All rights, including copyright and intellectual property rights, are reserved and owned exclusively by the developer.",
-      "p2": "Swaya is distributed under a hybrid licensing model, offering monthly or annual subscription plans alongside a one-time lifetime purchase option. Usage of this software requires an active, valid license associated with your account.",
-      "p3": "You are granted a non-exclusive, non-transferable, and revocable license to install and run the software on personal devices for personal use, in accordance with your active plan.",
-      "p4": "Any unauthorized copying, modification, distribution, redistribution, decompilation, or reverse engineering of the software code and assets is strictly prohibited."
+      "p1": "Swaya is distributed under a proprietary Source-Available License. The source code is publicly visible for inspection, learning, and community contributions, but you are not granted the right to redistribute it.",
+      "p2": "You may download, compile, and run the software locally for personal use, but you are strictly prohibited from distributing pre-built binary installers (.exe) or modified versions to others.",
+      "p3": "Official pre-compiled installers, automatic updates, and premium services are provided exclusively by the developer and require an active subscription or a lifetime purchase.",
+      "p4": "Any unauthorized redistribution, commercial exploitation, or bypassing of the licensing system is strictly prohibited and constitutes copyright infringement."
     },
     "third_party": "Third-Party Notices",
     "third_party_intro": "Swaya is built with gratitude using open-source libraries and APIs:",
@@ -64,6 +67,7 @@
     "save_failed": "Failed to save",
     "copy": "Copy",
     "screenshot_placeholder": "Screenshot Placeholder",
+    "show_nsfw_features": "Show NSFW Features",
     "headers": {
       "tmdb": "TMDb API Key",
       "omdb": "OMDb API Key",
@@ -180,8 +184,34 @@
       "step_single_desc": "SWAYA works fully offline without any API keys!\n\n• Video Snapshotting: The program automatically extracts technical file metadata and captures a video frame to use as the cover and backdrop image.\n• File Safety & Indexing: Physical files are kept safe. You have two options during organization: SWAYA can either organize files into a single target directory (configurable in settings) leaving the filenames untouched, or you can choose to skip moving/renaming entirely (available before running the organizer) and just index them in-place into the database.\n• Library Categorization: SWAYA automatically groups scanned items in the Organizer into Movies, TV Shows, Extras (trailers, clips, samples), or Collisions (naming conflicts). Offline scanning matches and registers everything immediately without requiring manual matching.\n• Video Classification: Offline scanning imports all video files under a generic category. Although folder or file name guessing is sometimes possible, doing so without an online database is unreliable and we want to avoid inaccurate guessing to prevent disappointment. Connecting external APIs guarantees high-precision movie/show classification.\n• Full Library Experience: All core features work identically—you can rate movies, add comments, track watch history/counters, create playlists, select custom covers, and assign tags.\n• Home Videos: Perfect for importing and cataloguing personal recordings.\n\nNote: If you want the full SWAYA experience (automatic high-res posters, trailers, synopses, and cast profiles), you will need to add API keys. Read more details on the Organizer page or start the Feature Tour in the media library."
     },
     "features_tour": {
+      "general_layout_title": "Interface & Navigation",
+      "general_layout_desc": "Get familiar with the general layout of SWAYA, including the sidebar navigation, session mode controls, and real-time background task monitors.",
+      "general_layout_details": {
+        "navigation_title": "Sidebar Navigation",
+        "navigation_desc": "Allows navigating between core features of SWAYA. The sidebar can be expanded or collapsed to maximize screen space for content browsing.",
+        "session_modes_title": "SFW / NSFW Modes (Flame Icon)",
+        "session_modes_desc": "Located in the top header. Toggles the global session context between SFW and NSFW modes. NSFW mode reveals and unlocks adult-oriented categories in the Organizer and Media Library, unblurs explicit media posters, and adapts greeting titles. It also dynamically toggles context-specific widgets; for example, the 'Lately Tracked Artists' widget in SFW mode automatically switches to showing 'Lately Tracked Adult Stars' in NSFW mode (or remains empty if no media is scanned yet). Additionally, disabling NSFW mode completely hides other private, adult-specific fields, sections, and settings throughout the application (which will be highlighted on their respective documentation pages).",
+        "background_tasks_title": "Background Tasks & Scanning",
+        "background_tasks_desc": "Displays scanning status, metadata fetching, and image processing jobs in progress with live progress bars at the top of the application. These background processes are designed to not freeze or block the application, though heavy main operations (like scanning or renaming large directories) may temporarily slow down page loading or responsiveness.",
+        "history_nav_title": "History Navigation (Back & Forward)",
+        "history_nav_desc": "Located in the top header. Allows you to easily navigate back and forward through your recently visited pages, similar to a web browser.",
+        "global_search_title": "Global Search",
+        "global_search_desc": "Located in the top header. Allows you to search and discover online metadata databases (it does not search your local library files or custom collections). The search scope depends on your configured API keys and settings. TMDb yields movies, TV shows, and cast profiles. StashDB and FansDB query scenes and performers. ThePornDB queries movies, scenes, and performers. Disabling 'adult content' in the settings completely filters out and blocks all adult results, ensuring no explicit matches appear even if adult-related keywords are searched. Furthermore, if adult content is disabled, adult-specific providers will not even be listed as selectable sources in the search dropdown, regardless of whether their API keys were previously saved."
+      },
       "dashboard_title": "Dashboard",
       "dashboard_desc": "Your library landing page and central hub. Features clean widgets showing continue watching, recently added videos, spotlight items, and database counts.",
+      "dashboard_details": {
+        "greeting_title": "Dynamic Greeting",
+        "greeting_desc": "Greets you contextually based on the time of day, onboarding status, and SFW/NSFW session modes.",
+        "customizer_title": "Dashboard Customizer",
+        "customizer_desc": "A drawer widget that allows toggling visibility and drag-and-drop reordering of widgets, persisting settings to local storage.",
+        "error_boundary_title": "Modular Widget System & Error Boundaries",
+        "error_boundary_desc": "Each widget runs within its own boundary (WidgetErrorBoundary), preventing a crash in one widget from bringing down the entire dashboard.",
+        "widgets_title": "Context-Sensitive Content Widgets",
+        "widgets_desc": "Includes Continue Watching, Trending (Spotlight), Fresh Arrivals, lately tracked artists/stars, and recommendations. Adapts dynamically to SFW/NSFW session settings.",
+        "adult_widget_title": "Adult Recommendations",
+        "adult_widget_desc": "Only visible when adult content is enabled in the settings. In SFW mode, adult items are hidden or blurred/blacked out on the screen, and they are only fully revealed and shown when the application is toggled to NSFW session mode."
+      },
       "organizer_title": "Organizer",
       "organizer_desc": "The control center for scanning and sorting. Input folder paths to parse video metadata, index files offline, check collisions, and match videos with online databases.",
       "library_title": "Media Library",
