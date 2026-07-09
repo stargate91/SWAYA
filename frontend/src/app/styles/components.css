@@ -123,6 +123,12 @@
   transition: transform var(--motion-fast), width var(--motion-duration-slow) var(--motion-ease-standard);
 }
 
+.ui-drawer--glass {
+  background: color-mix(in srgb, var(--color-bg-elevated) 70%, transparent) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
 /* Sizes */
 .ui-drawer--sm {
   width: 320px;
@@ -160,12 +166,19 @@
   }
 }
 
-/* Ensure all drawer headers are solid (not transparent) */
+/* Ensure all drawer headers are solid (not transparent) by default */
 .entity-detail-page__drawer-header,
 .review-drawer__header {
   background: var(--color-bg-elevated) !important;
   position: relative;
   z-index: 10;
+}
+
+/* Let the glassmorphic blur show through for the glass variant headers */
+.ui-drawer--glass .ui-drawer__header,
+.ui-drawer--glass .entity-detail-page__drawer-header,
+.ui-drawer--glass .review-drawer__header {
+  background: transparent !important;
 }
 
 

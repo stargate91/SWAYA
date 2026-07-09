@@ -187,18 +187,41 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     try {
       const { ipcRenderer } = window.require('electron');
       ipcRenderer.send('mpv-command', args);
-    } catch {
+    } catch (err) {
       console.warn('Failed to send command to MPV:', args);
     }
   }, []);
 
-  const handleClose = useCallback(() => {
+  const saveProgress = useCallback(async () => {
+    if (itemId === 'trailer' || getQueryParam('is_trailer') === 'true') return;
+    const cTime = currentTimeRef.current;
+    const dur = durationRef.current;
+    if (cTime <= 0) return;
+
+    try {
+      const backendPort = getQueryParam('backend_port') || '8000';
+      await fetch(`http://localhost:${backendPort}/api/v1/media/progress`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          item_id: String(itemId),
+          current_time: Math.round(cTime),
+          total_length: Math.round(dur)
+        })
+      });
+    } catch {
+      // Ignore background save errors
+    }
+  }, [itemId]);
+
+  const handleClose = useCallback(async () => {
+    await saveProgress();
     try {
       const { ipcRenderer } = window.require('electron');
       ipcRenderer.send('mpv-close');
     } catch { /* ignore */ }
     navigate(-1);
-  }, [navigate]);
+  }, [navigate, saveProgress]);
 
   const handleCloseRef = useRef(handleClose);
 
@@ -529,32 +552,10 @@ export default function useVideoPlayer({ itemId, containerRef }) {
 
   // Periodic progress saving to backend
   useEffect(() => {
-    if (!isPlaying || itemId === 'trailer' || getQueryParam('is_trailer') === 'true') return;
-
-    const saveProgress = async () => {
-      const cTime = currentTimeRef.current;
-      const dur = durationRef.current;
-      if (cTime <= 0) return;
-
-      try {
-        const backendPort = getQueryParam('backend_port') || '8000';
-        await fetch(`http://localhost:${backendPort}/api/v1/media/progress`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            item_id: String(itemId),
-            current_time: Math.round(cTime),
-            total_length: Math.round(dur)
-          })
-        });
-      } catch {
-        // Ignore background save errors
-      }
-    };
-
+    if (!isPlaying) return;
     const interval = setInterval(saveProgress, 5000);
     return () => clearInterval(interval);
-  }, [isPlaying, itemId]);
+  }, [isPlaying, saveProgress]);
 
   const handlePlayPause = () => {
     sendCommand(['cycle', 'pause']);

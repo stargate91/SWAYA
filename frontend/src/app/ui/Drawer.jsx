@@ -13,9 +13,13 @@ export default function Drawer({
   size = 'md',
   className = '',
   style = {},
+  variant = 'default',
+  hasBackdrop,
   children,
 }) {
   const { t } = useTranslation();
+
+  const actualHasBackdrop = hasBackdrop !== undefined ? hasBackdrop : (variant !== 'glass');
 
   useEffect(() => {
     if (!isOpen) return;
@@ -26,17 +30,36 @@ export default function Drawer({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    if (!isOpen || actualHasBackdrop) return;
+    const handleDocumentClick = (e) => {
+      const drawerEl = document.querySelector('.ui-drawer');
+      if (drawerEl && !drawerEl.contains(e.target)) {
+        onClose();
+      }
+    };
+    const timer = setTimeout(() => {
+      document.addEventListener('click', handleDocumentClick);
+    }, 0);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('click', handleDocumentClick);
+    };
+  }, [isOpen, actualHasBackdrop, onClose]);
+
   if (!isOpen || typeof document === 'undefined') return null;
 
   return createPortal(
     <>
+      {actualHasBackdrop && (
+        <div
+          className="ui-drawer-backdrop"
+          onClick={onClose}
+          role="presentation"
+        />
+      )}
       <div
-        className="ui-drawer-backdrop"
-        onClick={onClose}
-        role="presentation"
-      />
-      <div
-        className={`ui-drawer ui-drawer--${size} ${className}`.trim()}
+        className={`ui-drawer ui-drawer--${size} ui-drawer--${variant} ${className}`.trim()}
         style={style}
         role="dialog"
         aria-modal="true"
@@ -70,5 +93,7 @@ Drawer.propTypes = {
   size: PropTypes.oneOf(['sm', 'md', 'lg', '720']),
   className: PropTypes.string,
   style: PropTypes.object,
+  variant: PropTypes.oneOf(['default', 'glass']),
+  hasBackdrop: PropTypes.bool,
   children: PropTypes.node,
 };

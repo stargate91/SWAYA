@@ -7,9 +7,15 @@ import UtilityBarPortal from '../../../components/UtilityBarPortal';
 import IconButton from '@/ui/IconButton';
 import Tooltip from '@/ui/Tooltip';
 import ContinueWatchingWidget from './widgets/ContinueWatchingWidget';
-import RecommendationsWidget from './widgets/RecommendationsWidget';
+import SpotlightWidget from './widgets/SpotlightWidget';
+import RecentlyAddedWidget from './widgets/RecentlyAddedWidget';
+import RecentlyActivePeopleWidget from './widgets/RecentlyActivePeopleWidget';
+import MoviesDiscoveryWidget from './widgets/MoviesDiscoveryWidget';
+import TvDiscoveryWidget from './widgets/TvDiscoveryWidget';
+import AdultRecommendationsWidget from './widgets/AdultRecommendationsWidget';
 import TMDBDiscoveryWidget from './widgets/TMDBDiscoveryWidget';
 import DashboardCustomizerDrawer from './widgets/DashboardCustomizerDrawer';
+import WidgetErrorBoundary from '../../../components/WidgetErrorBoundary';
 import './DashboardPage.css';
 
 const DEFAULT_WIDGETS = {
@@ -145,22 +151,42 @@ const DashboardView = () => {
       </div>
 
       {widgetOrder.map((key) => {
+        const lang = settings?.ui_language || settings?.primary_metadata_language;
+        const isNsfw = showAdult && sessionMode === 'nsfw';
+        let widgetEl = null;
+        let title = '';
+
         if (key === 'continue_watching') {
-          return visibleWidgets.continue_watching && <ContinueWatchingWidget key={key} T={t} />;
+          title = t('dashboard.widget_continue_watching') || 'Continue Watching';
+          widgetEl = visibleWidgets.continue_watching && <ContinueWatchingWidget T={t} />;
+        } else if (key === 'spotlight') {
+          title = t('dashboard.widget_spotlight') || 'Spotlight (Trending)';
+          widgetEl = visibleWidgets.spotlight && <SpotlightWidget T={t} />;
+        } else if (key === 'recently_added') {
+          title = t('dashboard.widget_recently_added') || 'Recently Added';
+          widgetEl = visibleWidgets.recently_added && <RecentlyAddedWidget T={t} language={lang} />;
+        } else if (key === 'recently_activated_people') {
+          title = t(isNsfw ? 'dashboard.widget_recently_activated_people_adult' : 'dashboard.widget_recently_activated_people') || (isNsfw ? 'Lately Tracked Adult Stars' : 'Lately Tracked Artists');
+          widgetEl = visibleWidgets.recently_activated_people && <RecentlyActivePeopleWidget T={t} language={lang} />;
+        } else if (key === 'movies_discovery') {
+          title = t('dashboard.widget_movies_discovery') || 'Discover Movies';
+          widgetEl = visibleWidgets.movies_discovery && <MoviesDiscoveryWidget T={t} />;
+        } else if (key === 'tv_discovery') {
+          title = t('dashboard.widget_tv_discovery') || 'Discover TV Shows';
+          widgetEl = visibleWidgets.tv_discovery && <TvDiscoveryWidget T={t} />;
+        } else if (key === 'top_20') {
+          title = t('dashboard.widget_top_20') || 'Top 20 Discoveries';
+          widgetEl = visibleWidgets.top_20 && settings?.tmdb_api_key && <TMDBDiscoveryWidget T={t} />;
+        } else if (key === 'adult') {
+          title = t('dashboard.widget_adult') || 'Adult recommendations';
+          widgetEl = visibleWidgets.adult && <AdultRecommendationsWidget T={t} />;
         }
-        if (key === 'top_20') {
-          return visibleWidgets.top_20 && settings?.tmdb_api_key && <TMDBDiscoveryWidget key={key} T={t} />;
-        }
-        const isRecKey = ['spotlight', 'recently_added', 'recently_activated_people', 'movies_discovery', 'tv_discovery', 'adult'].includes(key);
-        if (isRecKey) {
+
+        if (widgetEl) {
           return (
-            <RecommendationsWidget
-              key={key}
-              widgetKey={key}
-              language={settings?.ui_language || settings?.primary_metadata_language}
-              T={t}
-              visibleWidgets={visibleWidgets}
-            />
+            <WidgetErrorBoundary key={key} name={key} title={title}>
+              {widgetEl}
+            </WidgetErrorBoundary>
           );
         }
         return null;

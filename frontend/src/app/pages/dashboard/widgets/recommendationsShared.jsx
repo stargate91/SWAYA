@@ -1,31 +1,22 @@
-import { useCallback, useRef, useState } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
-import { Check, ChevronLeft, ChevronRight, Star, Plus, Minus, Play, Heart } from '@/ui/icons';
-import { useUi } from '@/providers/UiProvider';
+import { Check, ChevronLeft, ChevronRight, Star, Plus, Heart, Play, Minus } from '@/ui/icons';
+import { usePlayMediaMutation } from '../../../queries';
+import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
 import { normalizeMediaEntity } from '../../../lib/normalizeMediaEntity';
-import {
-  useRecommendationsQuery,
-  useAddToWatchlistMutation,
-  useRemoveFromWatchlistMutation,
-} from '../../../queries/dashboardQueries';
-import { useSettingsQuery } from '../../../queries/settingsQueries';
-import { usePlayMediaMutation } from '../../../queries';
+import { API_BASE } from '../../../lib/backend';
 import Button from '../../../ui/Button';
 import Badge from '../../../ui/Badge';
-import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
-import { API_BASE } from '../../../lib/backend';
-import api from '../../../lib/api';
-import TMDBDiscoveryWidget from './TMDBDiscoveryWidget';
 import Skeleton from '../../../ui/Skeleton';
 import PosterCard from '../../../ui/PosterCard';
 import AdultOverlay from '../../../ui/AdultOverlay';
-import './RecommendationsWidget.css';
 
-const ADULT_LABEL = '18+';
+export const ADULT_LABEL = '18+';
 
-const SpotlightBanner = ({ item, watchlistIds, onWatchlist, onCardClick, T }) => {
+export const SpotlightBanner = ({ item, watchlistIds, onWatchlist, onCardClick, T }) => {
   if (!item) return null;
   const imageUrl = resolveMediaImageUrl(item.backdrop_path, 'backdrop');
   const title = item.title || item.name;
@@ -86,7 +77,7 @@ SpotlightBanner.propTypes = {
   T: PropTypes.func.isRequired,
 };
 
-const renderUserRatingBadge = (item) => {
+export const renderUserRatingBadge = (item) => {
   const rating = Number(item?.user_rating);
   if (!Number.isFinite(rating) || rating <= 0) return null;
   const label = Number.isInteger(rating) ? String(rating) : rating.toFixed(1);
@@ -98,7 +89,7 @@ const renderUserRatingBadge = (item) => {
   );
 };
 
-const renderFavoriteBadge = (item, T) => {
+export const renderFavoriteBadge = (item, T) => {
   if (!item?.is_favorite) return null;
   return (
     <div
@@ -111,7 +102,7 @@ const renderFavoriteBadge = (item, T) => {
   );
 };
 
-const RecommendationCarousel = ({
+export const RecommendationCarousel = ({
   title,
   items,
   watchlistIds,
@@ -129,7 +120,7 @@ const RecommendationCarousel = ({
   const scrollRef = useRef(null);
   const navigate = useNavigate();
   const [showLeft, setShowLeft] = useState(false);
-  const [showRight, setShowRight] = useState(true);
+  const [showRight, setShowRight] = useState(false);
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
 
   const updateArrows = useCallback(() => {
@@ -144,6 +135,16 @@ const RecommendationCarousel = ({
       onLoadMore();
     }
   }, [hasMore, isLoadingMore, onLoadMore]);
+
+  useEffect(() => {
+    // Small timeout to ensure DOM styles have computed width
+    const timer = setTimeout(updateArrows, 100);
+    window.addEventListener('resize', updateArrows);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', updateArrows);
+    };
+  }, [updateArrows, items]);
 
   if (!items?.length) {
     return null;
@@ -252,21 +253,23 @@ const RecommendationCarousel = ({
                 subtitle={subtitle}
                 ratingImdb={n.ratingImdb}
                 ratingTmdb={n.ratingTmdb}
-                ratingPorndb={n.ratingPorndb}
-                topRightBadge={renderFavoriteBadge(item, T)}
+                ratingPill={null}
                 badge={renderUserRatingBadge(item)}
-                previewItemId={item.id}
-                previewEnabled={n.isScene && !n.shouldBlur}
-                playOverlay={!n.isPerson && item.in_library && onPlayClick ? {
-                  icon: <Play size={12} fill="currentColor" />,
-                  onClick: (e) => onPlayClick(e, item),
-                  title: T('library.details.play') || 'Play',
-                  disabled: playMutationPending
-                } : null}
+                topRightBadge={renderFavoriteBadge(item, T)}
+                playOverlay={
+                  !n.isPerson && item.in_library && onPlayClick
+                    ? {
+                        title: null,
+                        onClick: (e) => {
+                          e.stopPropagation();
+                          onPlayClick(item);
+                        },
+                        pending: playMutationPending,
+                        icon: <Play size={16} fill="currentColor" />,
+                      }
+                    : null
+                }
               >
-                {n.shouldBlur && (
-                  <AdultOverlay variant="blur" badgeText={ADULT_LABEL} />
-                )}
                 {!n.isPerson && (
                   <div className="recommend-card-overlay">
                     <Button
@@ -292,6 +295,11 @@ const RecommendationCarousel = ({
                         </>
                       )}
                     </Button>
+                  </div>
+                )}
+                {n.shouldBlur && (
+                  <div className="recommend-card-blur-overlay">
+                    <AdultOverlay isNsfw={sessionMode === 'nsfw'} />
                   </div>
                 )}
               </PosterCard>
@@ -324,7 +332,7 @@ RecommendationCarousel.propTypes = {
   playMutationPending: PropTypes.bool,
 };
 
-const RecommendationSkeleton = ({ showBanner = false }) => (
+export const RecommendationSkeleton = ({ showBanner = false }) => (
   <div className="recommend-skeleton">
     {showBanner && <Skeleton.Banner />}
     <Skeleton.Title />
@@ -340,138 +348,13 @@ RecommendationSkeleton.propTypes = {
   showBanner: PropTypes.bool,
 };
 
-const RecommendationsWidget = ({ widgetKey = null, language, T, visibleWidgets = {} }) => {
-  const { toast } = useUi();
+import api from '../../../lib/api';
+
+export const useRecommendationActions = () => {
   const navigate = useNavigate();
-  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
-  const { data: settings } = useSettingsQuery();
-  const includeAdult = sessionMode === 'nsfw';
-  const { data: recommendations, isLoading } = useRecommendationsQuery(language, includeAdult);
-  const addToWatchlist = useAddToWatchlistMutation();
-  const removeFromWatchlist = useRemoveFromWatchlistMutation();
   const playMutation = usePlayMediaMutation();
 
-  const [recentlyAddedItems, setRecentlyAddedItems] = useState([]);
-  const [recentlyAddedPage, setRecentlyAddedPage] = useState(1);
-  const [hasMoreRecentlyAdded, setHasMoreRecentlyAdded] = useState(true);
-  const [isLoadingMoreAdded, setIsLoadingMoreAdded] = useState(false);
-
-  const [recentlyActivePeople, setRecentlyActivePeople] = useState([]);
-  const [recentlyActivePage, setRecentlyActivePage] = useState(1);
-  const [hasMorePeople, setHasMorePeople] = useState(true);
-  const [isLoadingMorePeople, setIsLoadingMorePeople] = useState(false);
-
-  const [prevRecommendations, setPrevRecommendations] = useState(null);
-
-  if (recommendations && recommendations !== prevRecommendations) {
-    const isFirstLoad = !prevRecommendations;
-    const firstItemChanged = recommendations?.recently_added?.[0]?.id !== prevRecommendations?.recently_added?.[0]?.id;
-    const firstPersonChanged = recommendations?.recently_activated_people?.[0]?.id !== prevRecommendations?.recently_activated_people?.[0]?.id;
-
-    setPrevRecommendations(recommendations);
-
-    setRecentlyAddedItems((prev) => {
-      if (isFirstLoad || firstItemChanged) {
-        setRecentlyAddedPage(1);
-        setHasMoreRecentlyAdded((recommendations.recently_added || []).length === 20);
-        return recommendations.recently_added || [];
-      }
-      const freshMap = new Map((recommendations.recently_added || []).map(item => [item.id, item]));
-      return prev.map(item => freshMap.has(item.id) ? { ...item, ...freshMap.get(item.id) } : item);
-    });
-
-    setRecentlyActivePeople((prev) => {
-      if (isFirstLoad || firstPersonChanged) {
-        setRecentlyActivePage(1);
-        setHasMorePeople((recommendations.recently_activated_people || []).length === 20);
-        return recommendations.recently_activated_people || [];
-      }
-      const freshMap = new Map((recommendations.recently_activated_people || []).map(p => [p.id, p]));
-      return prev.map(p => freshMap.has(p.id) ? { ...p, ...freshMap.get(p.id) } : p);
-    });
-  }
-
-  const handleLoadMoreAdded = async () => {
-    if (isLoadingMoreAdded || !hasMoreRecentlyAdded) return;
-    setIsLoadingMoreAdded(true);
-    const nextPage = recentlyAddedPage + 1;
-    try {
-      const data = await api.recommendations.getRecentlyAdded(nextPage, 20, includeAdult, language);
-      if (data && data.length > 0) {
-        setRecentlyAddedItems((prev) => [...prev, ...data]);
-        setRecentlyAddedPage(nextPage);
-        setHasMoreRecentlyAdded(data.length === 20);
-      } else {
-        setHasMoreRecentlyAdded(false);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoadingMoreAdded(false);
-    }
-  };
-
-  const handleLoadMorePeople = async () => {
-    if (isLoadingMorePeople || !hasMorePeople) return;
-    setIsLoadingMorePeople(true);
-    const nextPage = recentlyActivePage + 1;
-    try {
-      const data = await api.recommendations.getRecentlyActivatedPeople(nextPage, 20, includeAdult);
-      if (data && data.length > 0) {
-        setRecentlyActivePeople((prev) => [...prev, ...data]);
-        setRecentlyActivePage(nextPage);
-        setHasMorePeople(data.length === 20);
-      } else {
-        setHasMorePeople(false);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoadingMorePeople(false);
-    }
-  };
-
-  const watchlistIdsFromQuery = recommendations?.watchlist_item_ids;
-  const [prevWatchlistIds, setPrevWatchlistIds] = useState(null);
-  const [optimisticWatchlistIds, setOptimisticWatchlistIds] = useState(null);
-
-  if (watchlistIdsFromQuery !== prevWatchlistIds) {
-    setPrevWatchlistIds(watchlistIdsFromQuery);
-    setOptimisticWatchlistIds(null);
-  }
-
-  const actualWatchlistIds = optimisticWatchlistIds !== null ? optimisticWatchlistIds : (watchlistIdsFromQuery || []);
-
-  const handleWatchlist = async (tmdbId, type) => {
-    const isWatchlisted = actualWatchlistIds.includes(tmdbId);
-
-    // Optimistic toggle
-    if (isWatchlisted) {
-      setOptimisticWatchlistIds(actualWatchlistIds.filter((id) => id !== tmdbId));
-    } else {
-      setOptimisticWatchlistIds([...actualWatchlistIds, tmdbId]);
-    }
-
-    try {
-      if (isWatchlisted) {
-        await removeFromWatchlist.mutateAsync(tmdbId);
-      } else {
-        await addToWatchlist.mutateAsync({ tmdbId, type });
-      }
-    } catch (error) {
-      console.error(error);
-      // Revert optimistic update
-      if (isWatchlisted) {
-        setOptimisticWatchlistIds(actualWatchlistIds.filter((id) => id !== tmdbId).concat(tmdbId));
-      } else {
-        setOptimisticWatchlistIds(actualWatchlistIds.filter((id) => id !== tmdbId));
-      }
-      toast(T(isWatchlisted ? 'dashboard.watchlist.remove_failed' : 'dashboard.watchlist.add_failed') || 'Action failed', 'danger');
-    }
-  };
-
-  const handlePlayClick = useCallback(async (event, item) => {
-    event.stopPropagation();
+  const handlePlayClick = useCallback(async (item) => {
     if (playMutation.isPending) return;
 
     const isTv = item.media_type === 'tv' || item.type === 'tv' || String(item.id).startsWith('tv_');
@@ -521,12 +404,12 @@ const RecommendationsWidget = ({ widgetKey = null, language, T, visibleWidgets =
       if (nextEpisode?.id) {
         playMutation.mutate(nextEpisode.id);
       }
-    } catch {
-      // Ignore
+    } catch (err) {
+      console.error('Failed to play TV show:', err);
     }
   }, [playMutation]);
 
-  const handleCardClick = (item) => {
+  const handleCardClick = useCallback((item) => {
     const type = item.media_type || (item.title ? 'movie' : (item.profile_path ? 'person' : 'tv'));
     if (type === 'person') {
       navigate(`/library/people/${item.id}`, { state: { allowAdult: true } });
@@ -538,115 +421,34 @@ const RecommendationsWidget = ({ widgetKey = null, language, T, visibleWidgets =
     }
     const idToUse = item.in_library ? item.media_item_id : `tmdb_${item.id}`;
     navigate(`/library/${type}/${idToUse}`, { state: { allowAdult: true } });
-  };
+  }, [navigate]);
 
-  const isWidgetVisible = (key) => {
-    if (widgetKey && widgetKey !== key) return false;
-    return visibleWidgets[key] !== false;
-  };
-
-  return (
-    <>
-      {isLoading && isWidgetVisible('spotlight') && <RecommendationSkeleton showBanner />}
-
-      {!isLoading && isWidgetVisible('spotlight') && recommendations?.trending?.length > 0 && (
-        <SpotlightBanner
-          item={recommendations.trending[0]}
-          watchlistIds={actualWatchlistIds}
-          onWatchlist={handleWatchlist}
-          onCardClick={handleCardClick}
-          T={T}
-        />
-      )}
-
-      {isLoading && (isWidgetVisible('movies_discovery') || isWidgetVisible('tv_discovery') || (isWidgetVisible('adult') && settings?.include_adult)) && (
-        <RecommendationSkeleton />
-      )}
-
-      {!isLoading && isWidgetVisible('recently_added') && recentlyAddedItems?.length > 0 && (
-        <RecommendationCarousel
-          title={T('dashboard.recommendations.recently_added') || 'Recently Added'}
-          items={recentlyAddedItems}
-          watchlistIds={actualWatchlistIds}
-          onWatchlist={handleWatchlist}
-          onCardClick={handleCardClick}
-          T={T}
-          onLoadMore={handleLoadMoreAdded}
-          hasMore={hasMoreRecentlyAdded}
-          isLoadingMore={isLoadingMoreAdded}
-          settings={settings}
-          onPlayClick={handlePlayClick}
-          playMutationPending={playMutation.isPending}
-        />
-      )}
-
-      {!isLoading && isWidgetVisible('recently_activated_people') && recentlyActivePeople?.length > 0 && (
-        <RecommendationCarousel
-          title={T(includeAdult ? 'dashboard.recommendations.recently_activated_people_adult' : 'dashboard.recommendations.recently_activated_people') || (includeAdult ? 'Recently Followed Adult Stars' : 'Recently Tracked People')}
-          items={recentlyActivePeople.map(p => ({
-            ...p,
-            media_type: 'person'
-          }))}
-          watchlistIds={actualWatchlistIds}
-          onWatchlist={handleWatchlist}
-          onCardClick={handleCardClick}
-          T={T}
-          onLoadMore={handleLoadMorePeople}
-          hasMore={hasMorePeople}
-          isLoadingMore={isLoadingMorePeople}
-        />
-      )}
-
-      {!isLoading && isWidgetVisible('movies_discovery') && recommendations?.discover_movies?.length > 0 && (
-        <RecommendationCarousel
-          title={T('dashboard.recommendations.discover_movies') || 'Discover Movies'}
-          items={recommendations.discover_movies}
-          watchlistIds={actualWatchlistIds}
-          onWatchlist={handleWatchlist}
-          onCardClick={handleCardClick}
-          T={T}
-          onPlayClick={handlePlayClick}
-          playMutationPending={playMutation.isPending}
-        />
-      )}
-
-      {!isLoading && isWidgetVisible('tv_discovery') && recommendations?.discover_tv?.length > 0 && (
-        <RecommendationCarousel
-          title={T('dashboard.recommendations.discover_series') || 'Discover TV Shows'}
-          items={recommendations.discover_tv}
-          watchlistIds={actualWatchlistIds}
-          onWatchlist={handleWatchlist}
-          onCardClick={handleCardClick}
-          T={T}
-          onPlayClick={handlePlayClick}
-          playMutationPending={playMutation.isPending}
-        />
-      )}
-
-      {isWidgetVisible('top_20') && settings?.tmdb_api_key && <TMDBDiscoveryWidget T={T} />}
-
-      {!isLoading && isWidgetVisible('adult') && settings?.include_adult && recommendations?.discover_adult?.length > 0 && (
-        <RecommendationCarousel
-          title={T('dashboard.recommendations.discover_adult') || 'Discover Adult Movies'}
-          items={recommendations.discover_adult}
-          watchlistIds={actualWatchlistIds}
-          onWatchlist={handleWatchlist}
-          onCardClick={handleCardClick}
-          T={T}
-          isAdultCarousel={true}
-          onPlayClick={handlePlayClick}
-          playMutationPending={playMutation.isPending}
-        />
-      )}
-    </>
-  );
+  return { handlePlayClick, handleCardClick, playMutationPending: playMutation.isPending };
 };
 
-RecommendationsWidget.propTypes = {
-  widgetKey: PropTypes.string,
-  language: PropTypes.string,
-  T: PropTypes.func.isRequired,
-  visibleWidgets: PropTypes.object,
-};
+export const useWatchlistHandler = (watchlistIdsFromQuery, addToWatchlistMutation, removeFromWatchlistMutation) => {
+  const [optimisticWatchlistIds, setOptimisticWatchlistIds] = useState(null);
+  const [prevWatchlistIds, setPrevWatchlistIds] = useState(null);
 
-export default RecommendationsWidget;
+  if (watchlistIdsFromQuery !== prevWatchlistIds) {
+    setPrevWatchlistIds(watchlistIdsFromQuery);
+    setOptimisticWatchlistIds(null);
+  }
+
+  const actualWatchlistIds = useMemo(() => {
+    return optimisticWatchlistIds !== null ? optimisticWatchlistIds : (watchlistIdsFromQuery || []);
+  }, [optimisticWatchlistIds, watchlistIdsFromQuery]);
+
+  const handleWatchlist = useCallback((id, type) => {
+    const isWatchlisted = actualWatchlistIds.includes(id);
+    if (isWatchlisted) {
+      setOptimisticWatchlistIds((prev) => (prev || watchlistIdsFromQuery || []).filter((i) => i !== id));
+      removeFromWatchlistMutation.mutate(id);
+    } else {
+      setOptimisticWatchlistIds((prev) => [...(prev || watchlistIdsFromQuery || []), id]);
+      addToWatchlistMutation.mutate({ tmdbId: id, type });
+    }
+  }, [actualWatchlistIds, watchlistIdsFromQuery, addToWatchlistMutation, removeFromWatchlistMutation]);
+
+  return { actualWatchlistIds, handleWatchlist };
+};

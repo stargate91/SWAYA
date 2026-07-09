@@ -139,8 +139,9 @@ export default function AppShell() {
           queryClient.invalidateQueries({ queryKey: ['library'] });
           queryClient.invalidateQueries({ queryKey: QK.stats });
           queryClient.invalidateQueries({ queryKey: QK.watchedHistory });
+          queryClient.invalidateQueries({ queryKey: QK.continueWatching });
           if (prev.itemId) {
-            invalidateEntity(queryClient, prev.itemId);
+            invalidateEntity(queryClient, prev.itemId, { continueWatching: true, watchedHistory: true });
           }
           return { ...prev, active: false };
         }

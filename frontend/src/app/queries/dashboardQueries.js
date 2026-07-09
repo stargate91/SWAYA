@@ -18,6 +18,8 @@ export const useAddToWatchlistMutation = () => {
     mutationFn: ({ tmdbId, type }) => api.recommendations.addToWatchlist(tmdbId, type),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QK.recommendations });
+      queryClient.invalidateQueries({ queryKey: QK.lists });
+      queryClient.invalidateQueries({ queryKey: QK.listDetails });
     },
   });
 };
@@ -28,6 +30,8 @@ export const useRemoveFromWatchlistMutation = () => {
     mutationFn: (tmdbId) => api.recommendations.removeFromWatchlist(tmdbId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QK.recommendations });
+      queryClient.invalidateQueries({ queryKey: QK.lists });
+      queryClient.invalidateQueries({ queryKey: QK.listDetails });
     },
   });
 };

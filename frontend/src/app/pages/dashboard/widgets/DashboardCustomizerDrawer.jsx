@@ -59,6 +59,7 @@ export default function DashboardCustomizerDrawer({
       title={t('dashboard.customize') || 'Customize Dashboard'}
       size="sm"
       className="dashboard-customizer-drawer"
+      variant="glass"
     >
       <div className="dashboard-customizer-content">
         <p className="dashboard-customizer-desc">

@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import PropTypes from 'prop-types';
 import { Play, Minus, ChevronLeft, ChevronRight } from '@/ui/icons';
 import PosterCard from '../../../ui/PosterCard';
@@ -10,8 +11,10 @@ import Tooltip from '../../../ui/Tooltip';
 import './ContinueWatchingWidget.css';
 
 import { formatEpisodeCode } from '../../../lib/episodeFormat';
+import api from '../../../lib/api';
 
 const ContinueWatchingWidget = ({ T }) => {
+  const queryClient = useQueryClient();
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const { data: items = [], isLoading } = useContinueWatchingQuery({
     include_adult: sessionMode === 'nsfw',
@@ -31,11 +34,96 @@ const ContinueWatchingWidget = ({ T }) => {
     setShowRight(scrollLeft + clientWidth < scrollWidth - 10);
   }, []);
 
+  const [prevItems, setPrevItems] = useState(items);
+  const [localItems, setLocalItems] = useState(items);
+
+  if (items !== prevItems) {
+    setPrevItems(items);
+    setLocalItems(items);
+  }
+
   useEffect(() => {
     updateArrows();
     window.addEventListener('resize', updateArrows);
     return () => window.removeEventListener('resize', updateArrows);
-  }, [items, updateArrows]);
+  }, [localItems, updateArrows]);
+
+  const [activePlayback, setActivePlayback] = useState(null);
+
+  useEffect(() => {
+    let ipcRenderer = null;
+    try {
+      if (window.require) {
+        ipcRenderer = window.require('electron').ipcRenderer;
+      }
+    } catch {
+      // ignore
+    }
+
+    if (!ipcRenderer) return;
+
+    const handlePlayerStateUpdate = async (event, data) => {
+      if (data.event === 'start') {
+        setActivePlayback({
+          itemId: data.itemId,
+          currentTime: data.currentTime || 0,
+          duration: data.duration || 1,
+        });
+
+        // If not already in localItems, fetch it from API and prepend it
+        setLocalItems((prev) => {
+          const exists = prev.some(item => String(item.id) === String(data.itemId));
+          if (!exists) {
+            // Fetch detail asynchronously
+            api.library.getItemDetail(data.itemId).then((detail) => {
+              if (detail) {
+                const newItem = {
+                  id: detail.id,
+                  title: detail.title,
+                  series_title: detail.series_title,
+                  still_path: detail.still_path,
+                  backdrop_path: detail.backdrop_path,
+                  poster_path: detail.poster_path,
+                  season_number: detail.season_number,
+                  episode_number: detail.episode_number,
+                  duration: data.duration || detail.duration || 1,
+                  resume_position: data.currentTime || 0,
+                  type: detail.media_type || detail.type,
+                };
+                setLocalItems((current) => {
+                  const filtered = current.filter(item => String(item.id) !== String(detail.id));
+                  return [newItem, ...filtered];
+                });
+              }
+            }).catch((err) => {
+              console.error('Failed to fetch detail for continue watching start:', err);
+            });
+          }
+          return prev;
+        });
+      } else if (data.event === 'time-pos') {
+        setActivePlayback((prev) => {
+          if (!prev) return null;
+          return { ...prev, currentTime: data.currentTime };
+        });
+      } else if (data.event === 'duration') {
+        setActivePlayback((prev) => {
+          if (!prev) return null;
+          return { ...prev, duration: data.duration };
+        });
+      } else if (data.event === 'close') {
+        setActivePlayback(null);
+        setTimeout(() => {
+          queryClient.invalidateQueries({ queryKey: ['continue-watching'] });
+        }, 500);
+      }
+    };
+
+    ipcRenderer.on('player-state-update', handlePlayerStateUpdate);
+    return () => {
+      ipcRenderer.off('player-state-update', handlePlayerStateUpdate);
+    };
+  }, [queryClient]);
 
   const scroll = (direction) => {
     const el = scrollRef.current;
@@ -44,7 +132,7 @@ const ContinueWatchingWidget = ({ T }) => {
     el.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
   };
 
-  if (isLoading || !items.length) {
+  if (isLoading || (!localItems.length && !activePlayback)) {
     return null;
   }
 
@@ -65,10 +153,15 @@ const ContinueWatchingWidget = ({ T }) => {
           </button>
         )}
         <div ref={scrollRef} onScroll={updateArrows} className="continue-watching-row no-scrollbar">
-        {items.map((item) => {
-          const progressPercent = Math.min(100, (item.resume_position / item.duration) * 100);
-          const episodeCode = formatEpisodeCode(item.season_number, item.episode_number);
-          const minutesLeft = Math.max(0, Math.floor(item.duration / 60) - Math.floor(item.resume_position / 60));
+        {localItems.map((item) => {
+          const isCurrentlyPlaying = activePlayback && String(activePlayback.itemId) === String(item.id);
+          const currentResumePos = isCurrentlyPlaying ? activePlayback.currentTime : item.resume_position;
+          const currentDuration = item.duration || 1;
+
+          const progressPercent = Math.min(100, (currentResumePos / currentDuration) * 100);
+          const isEpisode = item.type === 'episode';
+          const episodeCode = isEpisode ? formatEpisodeCode(item.season_number, item.episode_number) : null;
+          const minutesLeft = Math.max(0, Math.floor(currentDuration / 60) - Math.floor(currentResumePos / 60));
           const episodeMeta = episodeCode ? `${episodeCode} - ${item.episode_title || item.title}` : null;
           const imagePath = item.still_path || item.backdrop_path;
           const resolvedImageUrl = resolveMediaImageUrl(imagePath, item.still_path ? 'still' : 'backdrop');

@@ -54,6 +54,10 @@
   margin-bottom: 0;
 }
 
+.shell__content:has(.dashboard-page) {
+  padding-bottom: var(--space-8, 32px);
+}
+
 .dashboard-widget__loading {
   display: flex;
   align-items: center;
