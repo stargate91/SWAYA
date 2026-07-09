@@ -11,6 +11,7 @@ import PageHeader from '@/ui/PageHeader';
 import SegmentedControl from '@/ui/SegmentedControl';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
+import Lightbox from '@/ui/Lightbox';
 import { useHistoryQuery, useUndoMutation, useScanStatusQuery, useWatchedHistoryQuery, usePlayMediaMutation, usePeaksQuery } from '@/queries';
 import { RotateCcw, AlertTriangle, Play, CheckCircle2, Clock, ENTITY_ICONS, Droplets, Loader2 } from '@/ui/icons';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
@@ -533,20 +534,12 @@ export default function HistoryPage() {
 
         {renderActiveContent()}
       </div>
-      {lightboxImage && createPortal(
-        <div 
-          className="history-lightbox-overlay"
-          onClick={() => setLightboxImage(null)}
-          role="button"
-          tabIndex={-1}
-        >
-          <img 
-            src={lightboxImage} 
-            alt="Snapshot" 
-            className="history-lightbox-img"
-          />
-        </div>,
-        document.body
+      {lightboxImage && (
+        <Lightbox
+          imageUrl={lightboxImage}
+          onClose={() => setLightboxImage(null)}
+          t={t}
+        />
       )}
     </Page>
   );

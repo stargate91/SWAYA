@@ -1,0 +1,37 @@
+.ui-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  background: color-mix(in srgb, black 82%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.ui-lightbox__close-container {
+  top: 24px;
+  right: 24px;
+  z-index: 1210;
+}
+
+.ui-lightbox__close-btn {
+  background: rgba(0, 0, 0, 0.4) !important;
+  color: white !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.ui-lightbox__close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.ui-lightbox__image {
+  max-width: min(92vw, 1400px);
+  max-height: 88vh;
+  object-fit: contain;
+  border-radius: 14px;
+  box-shadow: 0 20px 60px color-mix(in srgb, black 55%, transparent);
+}

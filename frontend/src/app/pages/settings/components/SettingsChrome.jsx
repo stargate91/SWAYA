@@ -3,9 +3,9 @@ import IconButton from '@/ui/IconButton';
 
 export default function SettingsChrome({ t, onClose }) {
   return (
-    <div className="settings-close-container">
+    <div className="ui-close-container settings-close-container">
       <IconButton
-        className="settings-close-btn"
+        className="ui-close-btn"
         onClick={onClose}
         label={t('settingsPage.closeSettings')}
         title={null}
@@ -13,7 +13,7 @@ export default function SettingsChrome({ t, onClose }) {
       >
         <X size={18} />
       </IconButton>
-      <span className="settings-close-esc-hint">{t('settingsPage.closeShortcut')}</span>
+      <span className="ui-close-esc-hint">{t('settingsPage.closeShortcut')}</span>
     </div>
   );
 }

@@ -29,7 +29,7 @@ import Card from '../../ui/Card';
 import Switch from '../../ui/Switch';
 import { fetchJson } from '../../lib/http';
 import { useSettingsQuery, useUpdateSettingsMutation } from '../../queries';
-import ImageLightbox from '../library/components/detail/modals/ImageLightbox';
+import Lightbox from '../../ui/Lightbox';
 import './AboutPage.css';
 
 const tmdbAttributionLogoSrc = 'https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_2-d537fb228cf3ded904ef09b136fe3fec72548ebc1fea3fbbd1ad9e36364db38b.svg';
@@ -855,9 +855,9 @@ export default function AboutPage() {
       />
 
       <main className="settings-content-wrapper">
-        <div className="settings-close-container">
+        <div className="ui-close-container settings-close-container">
           <IconButton
-            className="settings-close-btn"
+            className="ui-close-btn"
             onClick={handleClose}
             label={t('common.close')}
             title={null}
@@ -865,7 +865,7 @@ export default function AboutPage() {
           >
             <X size={18} />
           </IconButton>
-          <span className="settings-close-esc-hint">{t('settingsPage.closeShortcut') || 'ESC'}</span>
+          <span className="ui-close-esc-hint">{t('settingsPage.closeShortcut') || 'ESC'}</span>
         </div>
 
         <div className="settings-content" style={activeTab === 'docs_features' ? { maxWidth: '1200px' } : undefined}>
@@ -1255,7 +1255,7 @@ export default function AboutPage() {
           </div>
         </div>
       </main>
-      <ImageLightbox lightboxUrl={activeLightboxUrl} onClose={() => setActiveLightboxUrl(null)} t={t} />
+      <Lightbox imageUrl={activeLightboxUrl} onClose={() => setActiveLightboxUrl(null)} t={t} />
     </div>
   );
 }

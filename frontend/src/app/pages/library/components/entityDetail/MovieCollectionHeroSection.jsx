@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Layers, PenLine, X, Maximize2 } from '@/ui/icons';
 import Pill from '@/ui/Pill';
+import Lightbox from '@/ui/Lightbox';
 import { OverviewContent } from './EntityDetailSections';
 import { API_BASE } from '@/lib/backend';
 import { getPosterImagePath } from '@/lib/imageUrls';
@@ -134,40 +135,13 @@ export default function MovieCollectionHeroSection({
         </div>
       </section>
 
-      {lightboxUrl && typeof document !== 'undefined' ? createPortal(
-        <div
-          className="organizer-details__lightbox"
-          role="button"
-          tabIndex={0}
-          aria-label={t('common.close') || 'Close image preview'}
-          onClick={() => setLightboxUrl(null)}
-          onKeyDown={(event) => {
-            if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
-              event.preventDefault();
-              setLightboxUrl(null);
-            }
-          }}
-        >
-          <button
-            type="button"
-            className="organizer-details__lightbox-close"
-            aria-label={t('common.close') || 'Close image preview'}
-            onClick={(event) => {
-              event.stopPropagation();
-              setLightboxUrl(null);
-            }}
-          >
-            <X size={18} />
-          </button>
-          <img
-            src={lightboxUrl}
-            alt="Enlarged preview"
-            className="organizer-details__lightbox-image"
-            onClick={(event) => event.stopPropagation()}
-          />
-        </div>,
-        document.body
-      ) : null}
+      {lightboxUrl && (
+        <Lightbox
+          imageUrl={lightboxUrl}
+          onClose={() => setLightboxUrl(null)}
+          t={t}
+        />
+      )}
     </>
   );
 }

@@ -47,7 +47,7 @@ import CompactWatchStatsSection from './components/detail/sections/CompactWatchS
 import LogoSelectorDrawer from './components/detail/modals/LogoSelectorDrawer';
 import PosterSelectorDrawer from './components/detail/modals/PosterSelectorDrawer';
 import BackdropSelectorDrawer from './components/detail/modals/BackdropSelectorDrawer';
-import ImageLightbox from './components/detail/modals/ImageLightbox';
+import Lightbox from '@/ui/Lightbox';
 
 import DetailsMetadataDrawer from './components/detail/DetailsMetadataDrawer';
 import BespokeBoxOfficeSection from './components/detail/sections/BespokeBoxOfficeSection';
@@ -367,8 +367,8 @@ export default function MediaDetailPage({ type = 'movie' }) {
         toast={toast}
       />
 
-      <ImageLightbox
-        lightboxUrl={lightboxUrl}
+      <Lightbox
+        imageUrl={lightboxUrl}
         onClose={() => setLightboxUrl(null)}
         t={t}
       />

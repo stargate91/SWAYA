@@ -6,6 +6,7 @@ import Tooltip from '../../ui/Tooltip';
 import MediaCard from '../../ui/MediaCard';
 import PosterCard from '../../ui/PosterCard';
 import BackdropCard from '../../ui/BackdropCard';
+import Lightbox from '../../ui/Lightbox';
 import { ChevronLeft, ChevronRight, FileJson, Info, X } from '@/ui/icons';
 import { API_BASE } from '../../lib/backend';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
@@ -177,41 +178,6 @@ export default function OrganizerDetailsPanel({
       </div>
     </>
   ) : null;
-
-  const lightbox = isLightboxOpen ? (
-    <div
-      className="organizer-details__lightbox"
-      role="button"
-      tabIndex={0}
-      aria-label={t('common.close') || 'Close image preview'}
-      onClick={() => setIsLightboxOpen(false)}
-      onKeyDown={(event) => {
-        if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          setIsLightboxOpen(false);
-        }
-      }}
-    >
-      <button
-        type="button"
-        className="organizer-details__lightbox-close"
-        aria-label={t('common.close') || 'Close image preview'}
-        onClick={(event) => {
-          event.stopPropagation();
-          setIsLightboxOpen(false);
-        }}
-      >
-        <X size={18} />
-      </button>
-      <img
-        src={activeImageUrl}
-        alt={activeRow?.source || 'Organizer preview'}
-        className="organizer-details__lightbox-image"
-        onClick={(event) => event.stopPropagation()}
-      />
-    </div>
-  ) : null;
-
   return (
     <aside className="organizer-details" aria-label={t('organizer.details.title')}>
       <div className="organizer-details__toggle-row">
@@ -304,7 +270,13 @@ export default function OrganizerDetailsPanel({
           )}
         </div>
       </div>
-      {lightbox && typeof document !== 'undefined' ? createPortal(lightbox, document.body) : null}
+      {isLightboxOpen && (
+        <Lightbox
+          imageUrl={activeImageUrl}
+          onClose={() => setIsLightboxOpen(false)}
+          t={t}
+        />
+      )}
     </aside>
   );
 }

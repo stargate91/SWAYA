@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { Layers, User, PenLine, Heart, Check, Minus, Plus, Info, Bookmark, X, Maximize2 } from '@/ui/icons';
 import IconButton from '@/ui/IconButton';
+import Lightbox from '@/ui/Lightbox';
 import { API_BASE } from '@/lib/backend';
 import { getProfileImagePath } from '@/lib/imageUrls';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
@@ -591,40 +592,13 @@ export default function PeopleHeroSection({
         );
       })()}
 
-      {lightboxUrl && typeof document !== 'undefined' ? createPortal(
-        <div
-          className="organizer-details__lightbox"
-          role="button"
-          tabIndex={0}
-          aria-label={t('common.close') || 'Close image preview'}
-          onClick={() => setLightboxUrl(null)}
-          onKeyDown={(event) => {
-            if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
-              event.preventDefault();
-              setLightboxUrl(null);
-            }
-          }}
-        >
-          <button
-            type="button"
-            className="organizer-details__lightbox-close"
-            aria-label={t('common.close') || 'Close image preview'}
-            onClick={(event) => {
-              event.stopPropagation();
-              setLightboxUrl(null);
-            }}
-          >
-            <X size={18} />
-          </button>
-          <img
-            src={lightboxUrl}
-            alt="Enlarged preview"
-            className="organizer-details__lightbox-image"
-            onClick={(event) => event.stopPropagation()}
-          />
-        </div>,
-        document.body
-      ) : null}
+      {lightboxUrl && (
+        <Lightbox
+          imageUrl={lightboxUrl}
+          onClose={() => setLightboxUrl(null)}
+          t={t}
+        />
+      )}
     </div>
   );
 }

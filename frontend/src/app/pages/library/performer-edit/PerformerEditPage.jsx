@@ -115,15 +115,15 @@ export default function PerformerEditPage() {
       />
 
       <main className="settings-content-wrapper">
-        <div className="settings-close-container">
+        <div className="ui-close-container settings-close-container">
           <IconButton
-            className="settings-close-btn"
+            className="ui-close-btn"
             onClick={handleClose}
             size="md"
           >
             <X size={18} />
           </IconButton>
-          <span className="settings-close-esc-hint">{t('library.performerEdit.esc') || 'ESC'}</span>
+          <span className="ui-close-esc-hint">{t('library.performerEdit.esc') || 'ESC'}</span>
         </div>
 
         <div className="settings-content performer-edit-content-wrapper--wide">
