@@ -3,6 +3,21 @@
   width: 100%;
 }
 
+.search-input-combo--sm .search-input-combo__bar {
+  height: 32px;
+  border-radius: var(--radius-input, var(--radius-md));
+  padding: 0 var(--space-2, 8px);
+}
+
+.search-input-combo--sm .search-input-combo__selector-btn {
+  padding: 2px 6px;
+  font-size: 10px;
+}
+
+.search-input-combo--sm .search-input-combo__divider {
+  margin: 0 6px;
+}
+
 .search-input-combo__bar {
   display: flex;
   align-items: center;

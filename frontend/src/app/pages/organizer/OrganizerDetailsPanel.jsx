@@ -4,9 +4,11 @@ import UtilityButton from '../../ui/UtilityButton';
 import Button from '../../ui/Button';
 import Tooltip from '../../ui/Tooltip';
 import MediaCard from '../../ui/MediaCard';
+import Stack from '../../ui/Stack';
 import PosterCard from '../../ui/PosterCard';
 import BackdropCard from '../../ui/BackdropCard';
 import Lightbox from '../../ui/Lightbox';
+import EmptyState from '../../ui/EmptyState';
 import { ChevronLeft, ChevronRight, FileJson, Info, X } from '@/ui/icons';
 import { API_BASE } from '../../lib/backend';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
@@ -153,7 +155,7 @@ export default function OrganizerDetailsPanel({
     <>
       <button
         type="button"
-        className="organizer-details__image-nav organizer-details__image-nav--prev"
+        className="ui-carousel-arrow is-left"
         aria-label="Previous image"
         onClick={(event) => {
           event.stopPropagation();
@@ -164,7 +166,7 @@ export default function OrganizerDetailsPanel({
       </button>
       <button
         type="button"
-        className="organizer-details__image-nav organizer-details__image-nav--next"
+        className="ui-carousel-arrow is-right"
         aria-label="Next image"
         onClick={(event) => {
           event.stopPropagation();
@@ -223,10 +225,12 @@ export default function OrganizerDetailsPanel({
                   )
                 ) : null}
                 <MediaCard className="organizer-details__field">
-                  <span className="organizer-details__label">{t('organizer.details.fields.source')}</span>
-                  <Tooltip content={activeRow.sourcePath} side="top">
-                    <span className="organizer-details__value">{activeRow.sourcePath}</span>
-                  </Tooltip>
+                  <Stack size="sm">
+                    <span className="organizer-details__label">{t('organizer.details.fields.source')}</span>
+                    <Tooltip content={activeRow.sourcePath} side="top">
+                      <span className="organizer-details__value">{activeRow.sourcePath}</span>
+                    </Tooltip>
+                  </Stack>
                 </MediaCard>
                 {(() => {
                   const unmatchedStatuses = ['new', 'no_match', 'uncertain', 'multiple', 'error'];
@@ -239,10 +243,12 @@ export default function OrganizerDetailsPanel({
 
                   return (
                     <MediaCard className="organizer-details__field">
-                      <span className="organizer-details__label">{t('organizer.details.fields.target')}</span>
-                      <Tooltip content={activeRow.targetPath} side="top">
-                        <span className="organizer-details__value">{activeRow.targetPath}</span>
-                      </Tooltip>
+                      <Stack size="sm">
+                        <span className="organizer-details__label">{t('organizer.details.fields.target')}</span>
+                        <Tooltip content={activeRow.targetPath} side="top">
+                          <span className="organizer-details__value">{activeRow.targetPath}</span>
+                        </Tooltip>
+                      </Stack>
                     </MediaCard>
                   );
                 })()}
@@ -260,13 +266,15 @@ export default function OrganizerDetailsPanel({
               </div>
             </>
           ) : (
-            <div className="organizer-details__empty-state">
-              <div className="organizer-details__empty-icon-wrapper">
-                <Info className="organizer-details__empty-icon" size={24} />
-              </div>
-              <h3 className="organizer-details__empty-title">{t('organizer.details.title')}</h3>
-              <p className="organizer-details__empty-text">{t('organizer.details.empty')}</p>
-            </div>
+            <EmptyState
+              variant="panel"
+              title={t('organizer.details.title')}
+              description={t('organizer.details.empty')}
+              icon={Info}
+              className="organizer-details__empty-state"
+              hasBorder={false}
+              animateIcon={true}
+            />
           )}
         </div>
       </div>

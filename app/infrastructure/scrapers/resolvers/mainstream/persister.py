@@ -130,6 +130,18 @@ class MatchPersister:
             s_num = fn_data.get("season") or fd_data.get("season") or it_data.get("season")
             ep_num = fn_data.get("episode") or fd_data.get("episode") or it_data.get("episode")
 
+            details = details_cache.get(tmdb_id)
+            last_air_date = None
+            release_status = None
+            if details and itype == MediaType.TV:
+                release_status = details.get("status")
+                last_air_date_str = details.get("last_air_date")
+                if last_air_date_str:
+                    try:
+                        last_air_date = datetime.strptime(last_air_date_str, "%Y-%m-%d")
+                    except Exception:
+                        pass
+
             match = MetadataMatch(
                 media_item_id=item.id,
                 provider=Provider.TMDB,
@@ -141,7 +153,9 @@ class MatchPersister:
                 confidence_score=1.0,
                 rating_tmdb=data.get("vote_average"),
                 vote_count_tmdb=data.get("vote_count"),
-                backdrop_path=data.get("backdrop_path")
+                backdrop_path=data.get("backdrop_path"),
+                release_status=release_status,
+                last_air_date=last_air_date
             )
             
             if i == 0:

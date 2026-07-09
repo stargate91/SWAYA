@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, UserPlus, Plus } from '@/ui/icons';
+import { UserPlus, Plus } from '@/ui/icons';
 import { Tabs } from '@/ui/Tabs';
-import Input from '@/ui/Input';
+import SearchInputCombo from '@/ui/SearchInputCombo';
 import Button from '@/ui/Button';
 import Dropdown from '@/ui/Dropdown';
 import Badge from '@/ui/Badge';
@@ -23,11 +23,12 @@ const SearchInput = React.memo(({ placeholder, onSearchChange }) => {
   }, [value]);
 
   return (
-    <Input
-      type="text"
+    <SearchInputCombo
       placeholder={placeholder}
       value={value}
       onChange={(e) => setValue(e.target.value)}
+      className="organizer-search"
+      size="sm"
     />
   );
 });
@@ -121,14 +122,11 @@ export default function LibraryHeader({
           </div>
         )}
         {showSearch && (
-          <div className="organizer-search">
-            <Search size={14} className="organizer-search__icon" />
-            <SearchInput
-              key={resolvedTab}
-              placeholder={searchPlaceholder}
-              onSearchChange={setSearchQuery}
-            />
-          </div>
+          <SearchInput
+            key={resolvedTab}
+            placeholder={searchPlaceholder}
+            onSearchChange={setSearchQuery}
+          />
         )}
       </div>
     </>

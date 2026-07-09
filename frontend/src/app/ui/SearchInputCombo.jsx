@@ -11,6 +11,7 @@ export default function SearchInputCombo({
   options = [],
   rightElement,
   className = '',
+  size = 'md',
   ...props
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,7 +31,7 @@ export default function SearchInputCombo({
   const ActiveIcon = activeOption?.icon;
 
   return (
-    <div className={`search-input-combo ${className}`} ref={containerRef}>
+    <div className={`search-input-combo search-input-combo--${size} ${className}`.trim()} ref={containerRef}>
       <div className="search-input-combo__bar">
         {/* Selector Dropdown */}
         {options.length > 0 && (

@@ -1,6 +1,6 @@
-import { useRef, useEffect } from 'react';
 import MatchCandidateCard from './MatchCandidateCard';
 import EmptyState from '../../../ui/EmptyState';
+import ScrollRow from '../../../ui/ScrollRow';
 
 export default function MatchModalResults({
   results,
@@ -17,25 +17,12 @@ export default function MatchModalResults({
   hasSearched,
   view,
 }) {
-  const posterResultsRef = useRef(null);
-
-  useEffect(() => {
-    const el = posterResultsRef.current;
-    if (!el) return;
-    const handleWheel = (e) => {
-      if (e.deltaY === 0) return;
-      e.preventDefault();
-      el.scrollLeft += e.deltaY;
-    };
-    el.addEventListener('wheel', handleWheel, { passive: false });
-    return () => el.removeEventListener('wheel', handleWheel);
-  }, [shouldShowPosterResults]);
-
   return (
     <>
       {shouldShowPosterResults ? (
-        <div
-          ref={posterResultsRef}
+        <ScrollRow
+          enableWheelScroll
+          showArrows
           className={`organizer-match-modal__poster-results${mode === 'scene' || visibleResultCandidates.some(c => c.type === 'scene' || c.media_type === 'scene') ? ' is-scene' : ''}`}
         >
           {visibleResultCandidates.map((candidate) => (
@@ -52,7 +39,7 @@ export default function MatchModalResults({
               rowStatus={row?.rawStatus}
             />
           ))}
-        </div>
+        </ScrollRow>
       ) : null}
 
       {shouldShowListResults ? (

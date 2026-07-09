@@ -17,6 +17,8 @@ class OrganizerMatch(BaseModel):
     is_adult: Optional[bool] = None
     provider: Optional[str] = None
     is_home_video: Optional[bool] = None
+    last_air_date: Optional[str] = None
+    release_status: Optional[str] = None
 
 class OrganizerItem(BaseModel):
     id: int

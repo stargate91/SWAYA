@@ -116,6 +116,7 @@ class OrganizerGroupsBuilder:
                             break
                         curr = curr.parent
 
+                    tv_loc = None
                     if tv_show_match:
                         tv_loc = LanguageService.get_best_localization(tv_show_match.localizations, pref_lang)
                         if tv_loc:
@@ -130,7 +131,7 @@ class OrganizerGroupsBuilder:
                     "id": m.id,
                     "tmdb_id": int(m.external_id) if m.external_id.isdigit() else m.external_id,
                     "type": m.media_type.value,
-                    "title": loc.title if loc else "",
+                    "title": tv_loc.title if tv_loc else (loc.title if loc else ""),
                     "year": m.release_date.year if m.release_date else None,
                     "poster_path": resolved_poster,
                     "vote_average": m.rating_tmdb,
@@ -138,7 +139,9 @@ class OrganizerGroupsBuilder:
                     "confidence": m.confidence_score,
                     "is_adult": m.is_adult,
                     "provider": m.provider.value if m.provider else None,
-                    "is_home_video": m.is_home_video
+                    "is_home_video": m.is_home_video,
+                    "last_air_date": (tv_show_match.last_air_date.isoformat() if tv_show_match.last_air_date else None) if tv_show_match else (m.last_air_date.isoformat() if m.last_air_date else None),
+                    "release_status": tv_show_match.release_status if tv_show_match else m.release_status
                 })
 
             itype = OrganizerHelper.infer_organizer_type(item)

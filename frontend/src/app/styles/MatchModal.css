@@ -467,14 +467,24 @@
   text-overflow: ellipsis;
 }
 
+.organizer-match-modal__browser-card-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+}
+
 .organizer-match-modal__browser-card-meta {
   color: var(--color-muted);
   font-size: var(--font-size-2xs);
   line-height: 1.4;
+  min-width: 0;
 }
 
 .organizer-match-modal__select-button {
   color: var(--color-accent) !important;
+  flex-shrink: 0;
 }
 
 .organizer-match-modal__bucket {

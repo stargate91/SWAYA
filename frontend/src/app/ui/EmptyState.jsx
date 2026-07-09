@@ -8,10 +8,14 @@ export default function EmptyState({
   className = '',
   variant = 'default',
   style = null,
+  hasBorder = true,
+  animateIcon = false,
 }) {
+  const borderClass = hasBorder ? '' : 'ui-empty-state--no-border';
+  const animateClass = animateIcon ? 'ui-empty-state--animated-icon' : '';
   return (
     <div
-      className={`ui-empty-state ui-empty-state--${variant} ${className}`.trim()}
+      className={`ui-empty-state ui-empty-state--${variant} ${borderClass} ${animateClass} ${className}`.trim()}
       style={style}
     >
       {Icon ? (

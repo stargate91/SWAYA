@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ENTITY_ICONS } from '@/ui/icons';
 import Badge from '@/ui/Badge';
-import MetaRow from '@/ui/MetaRow';
+import CardMetadata from '@/ui/CardMetadata';
 import PosterCard from '@/ui/PosterCard';
 import BackdropCard from '@/ui/BackdropCard';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
@@ -20,7 +20,22 @@ const getDisplayYear = (candidate, mediaType) => {
   const rawDate = mediaType === MEDIA_TYPES.TV
     ? candidate?.first_air_date
     : candidate?.release_date;
-  return rawDate ? String(rawDate).slice(0, 4) : null;
+  if (!rawDate) return null;
+  const startYear = String(rawDate).slice(0, 4);
+
+  if (mediaType === MEDIA_TYPES.TV) {
+    const lastAirDate = candidate?.last_air_date;
+    const statusClean = (candidate?.status || candidate?.release_status || '').toLowerCase();
+    const isEnded = statusClean === 'ended' || statusClean === 'canceled';
+    if (isEnded && lastAirDate) {
+      const endYear = String(lastAirDate).slice(0, 4);
+      if (startYear !== endYear) {
+        return `${startYear} - ${endYear}`;
+      }
+    }
+    return startYear;
+  }
+  return startYear;
 };
 
 const getImageUrl = (path, mediaType) => {
@@ -108,7 +123,7 @@ export default function MatchCandidateCard({
         disabled={isDisabled}
         title={displayTitle}
         subtitle={
-          <MetaRow
+          <CardMetadata.Row
             className="organizer-match-modal__poster-card-meta"
             items={[
               displayYear,
@@ -170,7 +185,7 @@ export default function MatchCandidateCard({
             )
           ) : null}
         </div>
-        <MetaRow
+        <CardMetadata.Row
           className="organizer-match-modal__result-meta"
           items={[
             mediaType === 'scene' ? t('organizer.details.matchModal.scene') : (isTvLikeMediaType(mediaType) ? t('organizer.details.matchModal.tv') : t('organizer.details.matchModal.movie')),

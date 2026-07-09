@@ -3,7 +3,7 @@ import { Check } from '@/ui/icons';
 import { ENTITY_ICONS } from '@/ui/icons';
 import Badge from '../../../ui/Badge';
 import PosterCard from '../../../ui/PosterCard';
-import MetaRow from '../../../ui/MetaRow';
+import CardMetadata from '../../../ui/CardMetadata';
 import Button from '../../../ui/Button';
 import { buildTmdbImageUrl, TMDB_IMAGE_SIZES } from '@/lib/imageUrls';
 import { API_BASE } from '@/lib/backend';
@@ -41,7 +41,7 @@ export default function MatchEpisodeCard({
 
   const subtitleNode = (
     <div className="organizer-match-modal__browser-card-meta-row">
-      <MetaRow
+      <CardMetadata.Row
         className="organizer-match-modal__browser-card-meta"
         items={[
           `E${episodeEntry.episode_number}`,
@@ -56,7 +56,7 @@ export default function MatchEpisodeCard({
         onClick={() => onSelect(episodeEntry)}
         disabled={isDisabled}
       >
-        {t('common.select')}
+        Select
       </Button>
     </div>
   );

@@ -1,6 +1,7 @@
 import { Clapperboard } from '@/ui/icons';
 import Badge from '../../../ui/Badge';
 import PosterCard from '../../../ui/PosterCard';
+import CardMetadata from '../../../ui/CardMetadata';
 import { buildTmdbImageUrl, TMDB_IMAGE_SIZES } from '@/lib/imageUrls';
 import { API_BASE } from '@/lib/backend';
 
@@ -22,7 +23,9 @@ export default function MatchSeasonCard({
 }) {
   const posterUrl = getImageUrl(seasonEntry.poster_path, TMDB_IMAGE_SIZES.posterThumb);
   const displayTitle = seasonEntry.name || t('organizer.details.matchModal.seasonNum').replace('{number}', seasonEntry.season_number);
-  const subtitleText = seasonEntry.episode_count ? `${seasonEntry.episode_count} eps` : null;
+  
+  const year = seasonEntry.air_date ? String(seasonEntry.air_date).slice(0, 4) : null;
+  const eps = seasonEntry.episode_count ? `${seasonEntry.episode_count} eps` : null;
 
   return (
     <PosterCard
@@ -30,7 +33,12 @@ export default function MatchSeasonCard({
       imageUrl={posterUrl}
       icon={Clapperboard}
       title={displayTitle}
-      subtitle={subtitleText}
+      subtitle={
+        <CardMetadata.Row
+          className="organizer-match-modal__browser-card-meta"
+          items={[year, eps]}
+        />
+      }
       onClick={() => onSelect(seasonEntry)}
       disabled={isBrowserLoading}
       active={isActive}

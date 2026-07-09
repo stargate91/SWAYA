@@ -67,7 +67,7 @@
 }
 
 .ui-meta-row__item+.ui-meta-row__item::before {
-  content: "\2022";
+  content: "-";
   margin-right: var(--space-2xs);
   opacity: 0.4;
 }

@@ -1,5 +1,5 @@
 import Button from '../../../ui/Button';
-import MetaRow from '../../../ui/MetaRow';
+import CardMetadata from '../../../ui/CardMetadata';
 import NavButton from '../../../ui/NavButton';
 
 export default function MatchModalBrowserToolbar({
@@ -25,7 +25,7 @@ export default function MatchModalBrowserToolbar({
       </NavButton>
       <div className="organizer-match-modal__browser-copy">
         <strong className="organizer-match-modal__browser-title">{browserTitle}</strong>
-        <MetaRow className="organizer-match-modal__browser-meta" items={browserMetaItems} />
+        <CardMetadata.Row className="organizer-match-modal__browser-meta" items={browserMetaItems} />
       </div>
       {view === 'seasons' ? (
         <Button

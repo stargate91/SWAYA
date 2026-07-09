@@ -2,13 +2,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
-import { Star, Heart, Edit3, Clapperboard, Tv, Video, Users, CheckCircle, Search } from '@/ui/icons';
+import { Star, Heart, Edit3, Clapperboard, Tv, Video, Users, CheckCircle } from '@/ui/icons';
 import Page from '@/ui/Page';
 import Badge from '@/ui/Badge';
 import Table from '@/ui/Table';
 import { Tabs } from '@/ui/Tabs';
 import Button from '@/ui/Button';
-import Input from '@/ui/Input';
+import SearchInputCombo from '@/ui/SearchInputCombo';
 import Spinner from '@/ui/Spinner';
 import SegmentedControl from '@/ui/SegmentedControl';
 import SegmentedRating from '@/ui/SegmentedRating';
@@ -244,15 +244,13 @@ export default function RatingsPage() {
                   onChange={state.setActiveTab}
                 />
 
-                <div className="organizer-search">
-                  <Search size={14} className="organizer-search__icon" />
-                  <Input
-                    type="text"
-                    placeholder={t('common.search') || 'Search...'}
-                    value={localSearch}
-                    onChange={(e) => setLocalSearch(e.target.value)}
-                  />
-                </div>
+                <SearchInputCombo
+                  placeholder={t('common.search') || 'Search...'}
+                  value={localSearch}
+                  onChange={(e) => setLocalSearch(e.target.value)}
+                  className="organizer-search"
+                  size="sm"
+                />
               </div>
 
               <div className="organizer-panel__row">

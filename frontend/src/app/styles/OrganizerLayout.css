@@ -123,47 +123,22 @@
 }
 
 /* Organizer Search Input */
-.organizer-search {
+.organizer-search.search-input-combo {
   margin-left: auto;
-  display: flex;
-  align-items: center;
-  position: relative;
+  width: 13.75rem;
+  transition: width var(--motion-base);
 }
 
-.organizer-search__icon {
-  position: absolute;
-  left: 10px;
-  color: var(--color-muted);
-  pointer-events: none;
-  z-index: 1;
+.organizer-search.search-input-combo:focus-within {
+  width: 17.5rem;
 }
 
-.organizer-search .ui-field {
-  width: auto;
-}
-
-.organizer-search .ui-input {
-  width: 220px;
-  height: 28px;
-  min-height: 28px;
-  padding: 0 var(--space-3) 0 1.875rem;
-  border-radius: var(--radius-input);
-  border: 1px solid var(--ui-control-border);
+.organizer-search .search-input-combo__bar {
   background: var(--ui-control-bg-subtle);
-  color: var(--color-ink);
-  font-family: var(--font-family-base);
-  font-size: var(--font-size-xs);
-  outline: none;
-  transition: all var(--motion-base);
+  border-color: var(--ui-control-border);
 }
 
-.organizer-search .ui-input::placeholder {
-  color: var(--color-muted);
-  opacity: 0.8;
-}
-
-.organizer-search .ui-input:focus {
-  width: 280px;
+.organizer-search .search-input-combo__bar:focus-within {
   background: var(--ui-control-bg);
   border-color: var(--color-accent-blue);
   box-shadow: none;

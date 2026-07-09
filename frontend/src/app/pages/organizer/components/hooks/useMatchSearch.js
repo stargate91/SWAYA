@@ -128,6 +128,9 @@ export function useMatchSearch({ rows = [], t, toast, scanMode }) {
           is_active: match.is_active,
           source: 'existing',
           provider: match.provider || 'tmdb',
+          last_air_date: match.last_air_date,
+          status: match.release_status || match.status,
+          release_status: match.release_status || match.status,
         }));
     },
     [primaryRow, rows.length, scanMode],

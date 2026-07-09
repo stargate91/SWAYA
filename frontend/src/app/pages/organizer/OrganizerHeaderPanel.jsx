@@ -1,6 +1,5 @@
-import { Search } from '@/ui/icons';
 import { Tabs } from '../../ui/Tabs';
-import Input from '../../ui/Input';
+import SearchInputCombo from '../../ui/SearchInputCombo';
 import Badge from '../../ui/Badge';
 import { useTranslation } from '@/providers/LanguageContext';
 
@@ -48,15 +47,13 @@ export default function OrganizerHeaderPanel({
           value={activeMainTab}
           onChange={onChangeMainTab}
         />
-        <div className="organizer-search">
-          <Search size={14} className="organizer-search__icon" />
-          <Input
-            type="text"
-            placeholder={searchPlaceholder}
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-          />
-        </div>
+        <SearchInputCombo
+          placeholder={searchPlaceholder}
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+          className="organizer-search"
+          size="sm"
+        />
       </div>
 
       {activeMainTab === 'manual' && computedManualTabs.length > 1 ? (

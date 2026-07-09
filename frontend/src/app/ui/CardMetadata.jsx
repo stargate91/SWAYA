@@ -147,4 +147,25 @@ CardMetadata.propTypes = {
   subtitleClassName: PropTypes.string,
 };
 
+export const CardMetadataRow = function CardMetadataRow({ items = [], className = '' }) {
+  const filteredItems = items.filter((item) => item !== null && item !== undefined && item !== '');
+
+  return (
+    <div className={`ui-meta-row ${className}`.trim()}>
+      {filteredItems.map((item, index) => (
+        <span key={`${String(item)}-${index}`} className="ui-meta-row__item">
+          {item}
+        </span>
+      ))}
+    </div>
+  );
+};
+
+CardMetadataRow.propTypes = {
+  items: PropTypes.array,
+  className: PropTypes.string,
+};
+
+CardMetadata.Row = CardMetadataRow;
+
 export default CardMetadata;
