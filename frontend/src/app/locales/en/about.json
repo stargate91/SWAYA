@@ -161,6 +161,24 @@
       "desc": "SWAYA can scan, organize, and play your media collection fully offline without any API keys.",
       "step_single_title": "Local Offline Scan Capabilities",
       "step_single_desc": "SWAYA works fully offline without any API keys!\n\n• Video Snapshotting: The program automatically extracts technical file metadata and captures a video frame to use as the cover and backdrop image.\n• File Safety & Indexing: Physical files are kept safe. You have two options during organization: SWAYA can either organize files into a single target directory (configurable in settings) leaving the filenames untouched, or you can choose to skip moving/renaming entirely (available before running the organizer) and just index them in-place into the database.\n• Library Categorization: SWAYA automatically groups scanned items in the Organizer into Movies, TV Shows, Extras (trailers, clips, samples), or Collisions (naming conflicts). Offline scanning matches and registers everything immediately without requiring manual matching.\n• Video Classification: Offline scanning imports all video files under a generic category. Although folder or file name guessing is sometimes possible, doing so without an online database is unreliable and we want to avoid inaccurate guessing to prevent disappointment. Connecting external APIs guarantees high-precision movie/show classification.\n• Full Library Experience: All core features work identically—you can rate movies, add comments, track watch history/counters, create playlists, select custom covers, and assign tags.\n• Home Videos: Perfect for importing and cataloguing personal recordings.\n\nNote: If you want the full SWAYA experience (automatic high-res posters, trailers, synopses, and cast profiles), you will need to add API keys. Read more details on the Organizer page or start the Feature Tour in the media library."
+    },
+    "features_tour": {
+      "dashboard_title": "Dashboard",
+      "dashboard_desc": "Your library landing page and central hub. Features clean widgets showing continue watching, recently added videos, spotlight items, and database counts.",
+      "organizer_title": "Organizer",
+      "organizer_desc": "The control center for scanning and sorting. Input folder paths to parse video metadata, index files offline, check collisions, and match videos with online databases.",
+      "library_title": "Media Library",
+      "library_desc": "Browse and filter your entire collection. Filter by performers, studios, release year, tags, resolution, or type. Edit video settings, change posters, and add custom details.",
+      "lists_title": "Lists & Playlists",
+      "lists_desc": "Organize your videos into custom playlists or watch lists. Perfect for cataloguing files by genre, custom series, performer playlists, or personal favorites.",
+      "ratings_title": "Ratings System",
+      "ratings_desc": "Rate your videos using a clean star system. Sort your media library by rating to quickly locate your top-rated films and media.",
+      "statistics_title": "Statistics & Insights",
+      "statistics_desc": "Analyze your collection. View size breakdowns, distribution by resolution, performer/studio counts, and total library duration.",
+      "history_title": "Watch History",
+      "history_desc": "Track your watching habits. See what files you watched, how many times they were played, and resume from exactly where you left off.",
+      "settings_title": "Settings & Presets",
+      "settings_desc": "Configure the core application. Customize file naming patterns, target directories, metadata providers priority, and cache maintenance."
     }
   }
 }

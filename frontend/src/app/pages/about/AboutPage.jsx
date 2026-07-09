@@ -13,6 +13,14 @@ import {
   RefreshCw,
   ChevronDown,
   ChevronRight,
+  Home,
+  FolderSync,
+  Library,
+  Bookmark,
+  Star,
+  BarChart2,
+  History,
+  Settings,
 } from 'lucide-react';
 import IconButton from '../../ui/IconButton';
 import Card from '../../ui/Card';
@@ -61,6 +69,7 @@ export default function AboutPage() {
   const updateSettingsMutation = useUpdateSettingsMutation();
   const [saveStatus, setSaveStatus] = useState(null); // null | 'saving' | 'success' | 'error'
   const [activeLightboxUrl, setActiveLightboxUrl] = useState(null);
+  const [activeTourIndex, setActiveTourIndex] = useState(0);
 
   const [wizardInputs, setWizardInputs] = useState({
     tmdb_api_key: '',
@@ -796,6 +805,65 @@ export default function AboutPage() {
     }
   ];
 
+  const featuresTourData = [
+    {
+      id: 'dashboard',
+      icon: <Home size={16} />,
+      title: t('about.docs_wizard.features_tour.dashboard_title') || 'Dashboard',
+      description: t('about.docs_wizard.features_tour.dashboard_desc') || 'Your library landing page and central hub. Features clean widgets showing continue watching, recently added videos, spotlight items, and database counts.',
+      image: '/documentations/features/dashboard.png'
+    },
+    {
+      id: 'organizer',
+      icon: <FolderSync size={16} />,
+      title: t('about.docs_wizard.features_tour.organizer_title') || 'Organizer',
+      description: t('about.docs_wizard.features_tour.organizer_desc') || 'The control center for scanning and sorting. Input folder paths to parse video metadata, index files offline, check collisions, and match videos with online databases.',
+      image: '/documentations/features/organizer.png'
+    },
+    {
+      id: 'library',
+      icon: <Library size={16} />,
+      title: t('about.docs_wizard.features_tour.library_title') || 'Media Library',
+      description: t('about.docs_wizard.features_tour.library_desc') || 'Browse and filter your entire collection. Filter by performers, studios, release year, tags, resolution, or type. Edit video settings, change posters, and add custom details.',
+      image: '/documentations/features/library.png'
+    },
+    {
+      id: 'lists',
+      icon: <Bookmark size={16} />,
+      title: t('about.docs_wizard.features_tour.lists_title') || 'Lists & Playlists',
+      description: t('about.docs_wizard.features_tour.lists_desc') || 'Organize your videos into custom playlists or watch lists. Perfect for cataloguing files by genre, custom series, performer playlists, or personal favorites.',
+      image: '/documentations/features/lists.png'
+    },
+    {
+      id: 'ratings',
+      icon: <Star size={16} />,
+      title: t('about.docs_wizard.features_tour.ratings_title') || 'Ratings System',
+      description: t('about.docs_wizard.features_tour.ratings_desc') || 'Rate your videos using a clean star system. Sort your media library by rating to quickly locate your top-rated films and media.',
+      image: '/documentations/features/ratings.png'
+    },
+    {
+      id: 'statistics',
+      icon: <BarChart2 size={16} />,
+      title: t('about.docs_wizard.features_tour.statistics_title') || 'Statistics & Insights',
+      description: t('about.docs_wizard.features_tour.statistics_desc') || 'Analyze your collection. View size breakdowns, distribution by resolution, performer/studio counts, and total library duration.',
+      image: '/documentations/features/statistics.png'
+    },
+    {
+      id: 'history',
+      icon: <History size={16} />,
+      title: t('about.docs_wizard.features_tour.history_title') || 'Watch History',
+      description: t('about.docs_wizard.features_tour.history_desc') || 'Track your watching habits. See what files you watched, how many times they were played, and resume from exactly where you left off.',
+      image: '/documentations/features/history.png'
+    },
+    {
+      id: 'settings',
+      icon: <Settings size={16} />,
+      title: t('about.docs_wizard.features_tour.settings_title') || 'Settings & Presets',
+      description: t('about.docs_wizard.features_tour.settings_desc') || 'Configure the core application. Customize file naming patterns, target directories, metadata providers priority, and cache maintenance.',
+      image: '/documentations/features/settings.png'
+    }
+  ];
+
   const docSubItems = [
     { id: 'docs_tmdb', label: 'TMDb API Key' },
     { id: 'docs_omdb', label: 'OMDb API Key' },
@@ -1077,47 +1145,89 @@ export default function AboutPage() {
               </div>
             )}
             {activeTab === 'docs_features' && (
-              <div className="about-tab-panel docs-panel">
-                <Card className="about-card docs-card">
-                  <h2 className="about-section-title">Feature Tour</h2>
-                  <div className="docs-content-container">
-                    <p className="docs-intro">Explore SWAYA's key features designed to organize, enrich, and enjoy your media collection.</p>
-                    
-                    <div className="docs-sections">
-                      <div className="docs-section">
-                        <h3>📊 1. Personal Dashboard</h3>
-                        <p>Get a comprehensive overview of your media library. Personalize your layout by enabling, disabling, or rearranging widgets like Continue Watching, Trending Spotlight, and custom recommendations.</p>
-                        <div className="docs-screenshot-placeholder" style={{ background: 'rgba(255,255,255,0.03)', border: '1px dashed var(--color-line-strong)', borderRadius: '8px', padding: '20px', textAlign: 'center', marginTop: '10px', color: 'var(--color-muted)', fontSize: '13px' }}>
-                          📷 [Dashboard Screenshot Placeholder]
-                        </div>
-                      </div>
-
-                      <div className="docs-section">
-                        <h3>⚙️ 2. Organizer & Matcher</h3>
-                        <p>Input your folder paths and let SWAYA scan and parse file structures. Easily match files with online databases, rename files dynamically to match clean metadata, and organize your physical library into clean directories.</p>
-                        <div className="docs-screenshot-placeholder" style={{ background: 'rgba(255,255,255,0.03)', border: '1px dashed var(--color-line-strong)', borderRadius: '8px', padding: '20px', textAlign: 'center', marginTop: '10px', color: 'var(--color-muted)', fontSize: '13px' }}>
-                          📷 [Organizer & Matcher Screenshot Placeholder]
-                        </div>
-                      </div>
-
-                      <div className="docs-section">
-                        <h3>🎬 3. Video Player & Previews</h3>
-                        <p>Enjoy smooth high-quality playback powered by an embedded MPV player. Watch 16-second dynamic backdrops directly in the details page and resume playback instantly from where you left off.</p>
-                        <div className="docs-screenshot-placeholder" style={{ background: 'rgba(255,255,255,0.03)', border: '1px dashed var(--color-line-strong)', borderRadius: '8px', padding: '20px', textAlign: 'center', marginTop: '10px', color: 'var(--color-muted)', fontSize: '13px' }}>
-                          📷 [Player & Live Previews Screenshot Placeholder]
-                        </div>
-                      </div>
-
-                      <div className="docs-section">
-                        <h3>👤 4. Artists & Performers</h3>
-                        <p>Follow your favorite directors, writers, actors, or performers. SWAYA builds detailed profiles containing physical attributes, complete list of appearances in your collection, and dynamic links.</p>
-                        <div className="docs-screenshot-placeholder" style={{ background: 'rgba(255,255,255,0.03)', border: '1px dashed var(--color-line-strong)', borderRadius: '8px', padding: '20px', textAlign: 'center', marginTop: '10px', color: 'var(--color-muted)', fontSize: '13px' }}>
-                          📷 [Artists Profiles Screenshot Placeholder]
-                        </div>
-                      </div>
-                    </div>
+              <div className="about-tab-panel docs-panel" style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: '10px 20px 20px 20px' }}>
+                <h2 style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--color-text-primary)', margin: '0 0 20px 0' }}>Feature Tour</h2>
+                <div style={{ display: 'flex', flex: 1, gap: '30px', minHeight: 0 }}>
+                  {/* Left Sidebar List of Pages */}
+                  <div style={{ width: '240px', borderRight: '1px solid var(--color-border-subtle)', paddingRight: '20px', display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto' }}>
+                    {featuresTourData.map((f, idx) => (
+                      <button
+                        key={f.id}
+                        onClick={() => setActiveTourIndex(idx)}
+                        style={{
+                          textAlign: 'left',
+                          padding: '12px 16px',
+                          borderRadius: '8px',
+                          border: 'none',
+                          background: activeTourIndex === idx ? 'var(--color-bg-hover)' : 'transparent',
+                          color: activeTourIndex === idx ? 'var(--color-accent)' : 'var(--color-text-secondary)',
+                          fontWeight: activeTourIndex === idx ? 'bold' : 'normal',
+                          fontSize: '14px',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px'
+                        }}
+                      >
+                        {f.icon}
+                        <span>{f.title}</span>
+                      </button>
+                    ))}
                   </div>
-                </Card>
+
+                  {/* Right Content Panel (Split details + image) */}
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px', minWidth: 0, overflowY: 'auto', paddingRight: '15px' }}>
+                    <h3 style={{ fontSize: '20px', fontWeight: 'bold', margin: 0, color: 'var(--color-text-primary)' }}>
+                      {featuresTourData[activeTourIndex].title}
+                    </h3>
+
+                    {/* Screenshot / Image Showcase */}
+                    <div
+                      style={{
+                        width: '100%',
+                        maxWidth: '800px',
+                        height: '360px',
+                        background: 'var(--color-bg-subtle, rgba(255,255,255,0.01))',
+                        border: '1px dashed var(--color-border-default)',
+                        borderRadius: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        flexShrink: 0
+                      }}
+                      onClick={() => {
+                        if (featuresTourData[activeTourIndex].image) {
+                          setActiveLightboxUrl(featuresTourData[activeTourIndex].image);
+                        }
+                      }}
+                    >
+                      {featuresTourData[activeTourIndex].image ? (
+                        <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <div style={{ textAlign: 'center', padding: '25px', color: 'var(--color-text-muted)', position: 'absolute', zIndex: 1 }}>
+                            <span style={{ fontSize: '32px', display: 'block', marginBottom: '10px' }}>📷</span>
+                            <span style={{ fontSize: '12px', fontWeight: 600 }}>{t('about.docs_wizard.screenshot_placeholder') || 'Screenshot Placeholder'}</span>
+                            <span style={{ fontSize: '11px', display: 'block', color: 'var(--color-text-secondary)', marginTop: '6px' }}>{featuresTourData[activeTourIndex].title} ({featuresTourData[activeTourIndex].image})</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div style={{ textAlign: 'center', padding: '25px', color: 'var(--color-text-muted)' }}>
+                          <span style={{ fontSize: '32px', display: 'block', marginBottom: '10px' }}>📷</span>
+                          <span style={{ fontSize: '12px', fontWeight: 600 }}>{t('about.docs_wizard.screenshot_placeholder') || 'Screenshot Placeholder'}</span>
+                          <span style={{ fontSize: '11px', display: 'block', color: 'var(--color-text-secondary)', marginTop: '6px' }}>{featuresTourData[activeTourIndex].title}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Features / Details of the selected page */}
+                    <p style={{ fontSize: '14px', lineHeight: '1.7', color: 'var(--color-text-secondary)', margin: 0, whiteSpace: 'pre-wrap', maxWidth: '800px' }}>
+                      {featuresTourData[activeTourIndex].description}
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
 
