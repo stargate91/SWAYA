@@ -7,7 +7,7 @@ import Checkbox from '../../ui/Checkbox';
 import Table from '../../ui/Table';
 import { useOrganizerSort } from './useOrganizerSort';
 import { useLocalListSearch } from '../../hooks/useLocalListSearch';
-import '../../styles/RenameModal.css';
+import './RenameModal.css';
 
 const RENAME_SEARCH_KEYS = ['source', 'target', 'type'];
 

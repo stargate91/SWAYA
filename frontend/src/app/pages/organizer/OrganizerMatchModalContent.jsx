@@ -8,7 +8,7 @@ import MatchModalResults from './components/MatchModalResults';
 import MatchModalBrowser from './components/MatchModalBrowser';
 import useMatchModalViewModel from './components/useMatchModalViewModel';
 import EmptyState from '../../ui/EmptyState';
-import '../../styles/MatchModal.css';
+import './MatchModal.css';
 
 function getInitialMatchEmptyState({ row, mode, t }) {
   const isTvMode = mode === 'tv' || mode === 'tv';

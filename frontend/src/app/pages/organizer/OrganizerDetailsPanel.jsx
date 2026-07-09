@@ -15,7 +15,7 @@ import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { useTranslation } from '../../providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
 import { useFullMetadataQuery } from '../../queries';
-import '../../styles/OrganizerDetailsPanel.css';
+import './OrganizerDetailsPanel.css';
 
 const resolveOrganizerImageUrl = (path) => resolveMediaImageUrl(path, 'poster', API_BASE);
 const SLASH_CHAR = ' / ';

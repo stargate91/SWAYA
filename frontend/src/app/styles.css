@@ -31,7 +31,7 @@
 @import './styles/base.css';
 @import './styles/layout_clean.css';
 @import './styles/components.css';
-@import './styles/OrganizerLayout.css';
+@import './pages/organizer/OrganizerLayout.css';
 @import './styles/SettingsPage.css';
 @import './pages/about/AboutPage.css';
 @import './styles/responsive.css';
