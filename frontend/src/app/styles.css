@@ -33,6 +33,6 @@
 @import './styles/components.css';
 @import './styles/OrganizerLayout.css';
 @import './styles/SettingsPage.css';
-@import './styles/AboutPage.css';
+@import './pages/about/AboutPage.css';
 @import './styles/responsive.css';
 @import './ui/PosterCard.css';

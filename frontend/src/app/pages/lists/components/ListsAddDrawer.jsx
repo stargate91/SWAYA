@@ -25,20 +25,14 @@ export default function ListsAddDrawer({
   const listType = activeList.list_type;
 
   const headerTitle = (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+    <div className="lists-add-drawer-header-title">
       <span>{listType === 'person' ? (t('lists.add_people_title') || 'Add People') : (t('lists.add_titles_title') || 'Add Titles')}</span>
       {settings?.include_adult && (
         <Pill
           as="button"
           variant={state.isAdultActive ? 'favorite-active' : 'favorite'}
           onClick={state.toggleAdultMode}
-          style={{
-            fontSize: '11px',
-            fontWeight: 600,
-            borderRadius: '6px',
-            cursor: 'pointer',
-            padding: '4px 10px',
-          }}
+          className="lists-add-drawer-nsfw-toggle"
         >
           {state.isAdultActive ? 'NSFW' : 'SFW'}
         </Pill>

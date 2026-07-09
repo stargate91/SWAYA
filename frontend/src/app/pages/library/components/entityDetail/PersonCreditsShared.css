@@ -846,6 +846,11 @@
   outline: none;
 }
 
+.person-credits-header-actions {
+  display: flex;
+  gap: 12px;
+}
+
 .person-credits-row__mode-switch-btn:hover {
   --switch-btn-hover-bg: rgba(255, 255, 255, 0.08);
   background: var(--switch-btn-hover-bg);

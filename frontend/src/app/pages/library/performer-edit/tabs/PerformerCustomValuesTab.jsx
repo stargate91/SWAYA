@@ -172,36 +172,36 @@ export default function PerformerCustomValuesTab({ personId, person: initialPers
     if (form.height) {
       const h = Number(form.height);
       if (isNaN(h) || h < 50 || h > 300) {
-        errs.height = t('performerEdit.validation.height');
+        errs.height = t('library.performerEdit.validation.height');
       }
     }
     if (form.weight) {
       const w = Number(form.weight);
       if (isNaN(w) || w < 30 || w > 300) {
-        errs.weight = t('performerEdit.validation.weight');
+        errs.weight = t('library.performerEdit.validation.weight');
       }
     }
     if (form.cup_size) {
       if (!/^[A-Z]{1,3}$/.test(form.cup_size)) {
-        errs.cup_size = t('performerEdit.validation.cupSize');
+        errs.cup_size = t('library.performerEdit.validation.cupSize');
       }
     }
     if (form.band_size) {
       const b = Number(form.band_size);
       if (isNaN(b) || b < 10 || b > 100) {
-        errs.band_size = t('performerEdit.validation.bandSize');
+        errs.band_size = t('library.performerEdit.validation.bandSize');
       }
     }
     if (form.waist) {
       const w = Number(form.waist);
       if (isNaN(w) || w < 10 || w > 100) {
-        errs.waist = t('performerEdit.validation.waist');
+        errs.waist = t('library.performerEdit.validation.waist');
       }
     }
     if (form.hip) {
       const h = Number(form.hip);
       if (isNaN(h) || h < 10 || h > 100) {
-        errs.hip = t('performerEdit.validation.hip');
+        errs.hip = t('library.performerEdit.validation.hip');
       }
     }
     if (person?.is_adult && form.birthday) {
@@ -211,7 +211,7 @@ export default function PerformerCustomValuesTab({ personId, person: initialPers
         const minDate = new Date(birthDate.getFullYear() + 18, birthDate.getMonth(), birthDate.getDate());
         minDate.setDate(minDate.getDate() + 14);
         if (minDate > today) {
-          errs.birthday = t('performerEdit.validation.underage') || 'Performer must be at least 18 years and 2 weeks old';
+          errs.birthday = t('library.performerEdit.validation.underage') || 'Performer must be at least 18 years and 2 weeks old';
         }
       }
     }
@@ -221,7 +221,7 @@ export default function PerformerCustomValuesTab({ personId, person: initialPers
   const handleSave = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
     if (Object.keys(errors).length > 0) {
-      toast(t('performerEdit.validation.correctErrors'), 'danger');
+      toast(t('library.performerEdit.validation.correctErrors'), 'danger');
       return;
     }
     try {
@@ -308,33 +308,15 @@ export default function PerformerCustomValuesTab({ personId, person: initialPers
         <p className="settings-section-subtitle">{t('library.performerEdit.manualOverridesSubtitle') || 'Set your own values for performer attributes. These take priority if manual routing is selected.'}</p>
       </div>
 
-      <div className="healthyceleb-import-box" style={{
-        padding: '16px',
-        border: '1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.08))',
-        borderRadius: '8px',
-        background: 'rgba(255, 255, 255, 0.02)',
-        marginBottom: '20px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '8px'
-      }}>
-        <h4 style={{ margin: 0, fontSize: '13px', fontWeight: 600 }}>{t('library.performerEdit.custom.import_healthyceleb_title') || 'Import physical statistics from HealthyCeleb'}</h4>
-        <div style={{ display: 'flex', gap: '8px' }}>
+      <div className="healthyceleb-import-box">
+        <h4 className="healthyceleb-import-title">{t('library.performerEdit.custom.import_healthyceleb_title') || 'Import physical statistics from HealthyCeleb'}</h4>
+        <div className="healthyceleb-import-row">
           <input
             type="text"
             placeholder={t('library.performerEdit.custom.import_healthyceleb_placeholder') || 'HealthyCeleb URL (optional, e.g. https://healthyceleb.com/james-cameron/)'}
             value={healthyCelebUrl}
             onChange={(e) => setHealthyCelebUrl(e.target.value)}
-            style={{
-              flex: 1,
-              padding: '6px 12px',
-              borderRadius: '6px',
-              border: '1px solid var(--color-border-default, rgba(255, 255, 255, 0.15))',
-              background: 'var(--color-surface-card, rgba(0, 0, 0, 0.2))',
-              color: 'var(--color-text-primary, white)',
-              fontSize: '12px',
-              outline: 'none'
-            }}
+            className="healthyceleb-import-input"
           />
           <Button
             type="button"
@@ -345,7 +327,7 @@ export default function PerformerCustomValuesTab({ personId, person: initialPers
             {isFetchingHealthyCeleb ? (t('library.performerEdit.custom.import_healthyceleb_btn_fetching') || 'Fetching...') : (t('library.performerEdit.custom.import_healthyceleb_btn') || 'Import Data')}
           </Button>
         </div>
-        <p style={{ margin: 0, fontSize: '11px', color: 'var(--color-text-secondary, rgba(255, 255, 255, 0.6))' }}>
+        <p className="healthyceleb-import-desc">
           {t('library.performerEdit.custom.import_healthyceleb_desc') || 'This will fetch stats like height, weight, cup size, measurements, and eye/hair color, then populate the fields below. You can review them before saving.'}
         </p>
       </div>

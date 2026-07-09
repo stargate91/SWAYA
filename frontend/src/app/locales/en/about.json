@@ -46,9 +46,13 @@
   },
   "app_info": {
     "version": "Version",
-    "developer": "Developer"
+    "developer": "Developer",
+    "developer_intro": "Reach out directly if you want to report bugs, collaborate, or share feedback.",
+    "developer_name": "Levente Gáll",
+    "developer_email": "leventegall@proton.me"
   },
   "coming_soon": "Coming soon...",
+  "changelog_load_failed": "Failed to load changelog",
   "back": "Back",
   "docs_wizard": {
     "next": "Next Step",
@@ -60,6 +64,19 @@
     "save_failed": "Failed to save",
     "copy": "Copy",
     "screenshot_placeholder": "Screenshot Placeholder",
+    "headers": {
+      "tmdb": "TMDb API Key",
+      "omdb": "OMDb API Key",
+      "stashdb": "StashDB",
+      "fansdb": "FansDB",
+      "porndb": "ThePornDB",
+      "offline": "Offline Scan",
+      "features": "Feature Tour"
+    },
+    "labels": {
+      "github_1": "GitHub 1",
+      "github_2": "GitHub 2"
+    },
     "tmdb": {
       "title": "TMDb API Integration",
       "desc": "TMDb (The Movie Database) is a free movie and TV show database. By entering your API key, SWAYA will automatically fetch movie posters, backdrops, synopses, and cast details. The process is completely free and takes about 2 minutes.",

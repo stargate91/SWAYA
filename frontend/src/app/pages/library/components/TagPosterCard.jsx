@@ -50,7 +50,7 @@ export const TagPosterCard = memo(({
     subtitle = undefined;
 
     ratingPill = displayDate ? (
-      <span style={{ opacity: 0.6, fontSize: '0.75rem', flexShrink: 0 }}>{displayDate}</span>
+      <span className="library-scene-date">{displayDate}</span>
     ) : undefined;
   }
 
@@ -67,7 +67,6 @@ export const TagPosterCard = memo(({
             onClick();
           }
         }}
-        style={{ cursor: 'pointer' }}
       >
         {removeButton}
         {posterUrl ? (

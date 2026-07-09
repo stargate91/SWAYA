@@ -1,9 +1,6 @@
-
 import { memo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Heart, Pencil, Play, Star } from '@/ui/icons';
 import Badge from '@/ui/Badge';
-import Pill from '@/ui/Pill';
 import PosterCard from '@/ui/PosterCard';
 import {
   getPosterImagePath,
@@ -59,7 +56,6 @@ export const LibraryPosterCard = memo(({
   settings,
   sortKey,
 }) => {
-  const navigate = useNavigate();
   const isPeople = isLibraryPeopleTab(resolvedTab);
   const isLibraryTv = isLibraryTvTab(resolvedTab);
   const isLibraryMovie = isLibraryMovieTab(resolvedTab);
@@ -75,19 +71,12 @@ export const LibraryPosterCard = memo(({
   let imageUrl;
   let ratingImdb = n.ratingImdb;
   let ratingTmdb = n.ratingTmdb;
-  let ratingPorndb = n.ratingPorndb;
+  const ratingPorndb = isPeople ? undefined : item.rating_porndb;
   const isScene = isSceneMediaType(item.type) || isLibraryScenes;
 
   if (isScene || isPeople) {
     ratingTmdb = undefined;
     ratingImdb = undefined;
-    if (!isPeople) {
-      ratingPorndb = item.rating_porndb;
-    } else {
-      ratingPorndb = undefined;
-    }
-  } else {
-    ratingPorndb = item.rating_porndb;
   }
 
   let topRightAction;
@@ -223,9 +212,8 @@ export const LibraryPosterCard = memo(({
 
     const displayDate = item.release_date ? item.release_date.substring(0, 10) : item.year;
     ratingPill = displayDate ? (
-      <span style={{ opacity: 0.6, fontSize: '0.75rem', flexShrink: 0 }}>{displayDate}</span>
+      <span className="library-scene-date">{displayDate}</span>
     ) : undefined;
-    ratingPorndb = undefined;
     imageUrl = resolvePosterUrl(item.backdrop_path) || item.displayPosterRemote || resolvePosterUrl(getPosterImagePath(item));
     className = 'library-scene-card';
     topRightAction = editButton;

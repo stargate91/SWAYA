@@ -15,7 +15,7 @@ export default function ListImageSelectorDrawer({
       size="md"
       className="entity-detail-page__drawer--poster"
     >
-      <div className="entity-detail-page__drawer-content" style={{ padding: '24px' }}>
+      <div className="entity-detail-page__drawer-content list-image-selector-drawer-content">
         <ImageUploadPanel
           imageType="square"
           isPending={state.uploadImageMutation.isPending || state.overrideImageMutation.isPending}
@@ -34,11 +34,10 @@ export default function ListImageSelectorDrawer({
           }}
         />
         {list?.custom_image_path && (
-          <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'center' }}>
+          <div className="list-image-selector-drawer-reset-container">
             <button
               type="button"
-              className="ui-button ui-button--secondary-neutral ui-button--md"
-              style={{ width: '100%', borderColor: 'rgba(255, 255, 255, 0.15)', color: 'var(--color-text-muted)' }}
+              className="ui-button ui-button--secondary-neutral ui-button--md list-image-selector-drawer-reset-btn"
               onClick={() => {
                 state.overrideImageMutation.mutate(
                   { listId: list.id, path: null },

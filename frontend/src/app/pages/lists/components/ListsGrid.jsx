@@ -28,6 +28,7 @@ export default function ListsGrid({
         description={t('lists.empty_list_desc') || 'This list has no items yet.'}
         icon={ListIcon}
         variant="page-filter"
+        // eslint-disable-next-line react/forbid-component-props
         style={activeList?.color ? {
           '--ui-empty-page-filter-icon-color': activeList.color,
           '--ui-empty-page-filter-icon-bg': `color-mix(in srgb, ${activeList.color} 14%, transparent)`,
@@ -44,6 +45,7 @@ export default function ListsGrid({
         description={t('lists.no_search_results_desc') || 'Try refining your search query.'}
         icon={Search}
         variant="page-filter"
+        // eslint-disable-next-line react/forbid-component-props
         style={activeList?.color ? {
           '--ui-empty-page-filter-icon-color': activeList.color,
           '--ui-empty-page-filter-icon-bg': `color-mix(in srgb, ${activeList.color} 14%, transparent)`,

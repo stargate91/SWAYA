@@ -1,10 +1,8 @@
 import { useState, useMemo } from 'react';
 import { usePeopleInfiniteQuery, useSettingsQuery } from '@/queries';
-import Input from '@/ui/Input';
 import Spinner from '@/ui/Spinner';
 import EmptyState from '@/ui/EmptyState';
 import Dropdown from '@/ui/Dropdown';
-import { Search } from '@/ui/icons';
 import ActivationButton from './ActivationButton';
 
 const QUESTION_MARK = '?';
@@ -12,7 +10,6 @@ const QUESTION_MARK = '?';
 export default function AddPeopleLocal({
   isAdult,
   t,
-  textKey,
   resolveProfileUrl,
   optimisticStatus,
   loadingIds,

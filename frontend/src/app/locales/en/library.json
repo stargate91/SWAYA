@@ -2,6 +2,8 @@
   "title": "Media Library",
   "adultTitle": "Adult Library",
   "searchPlaceholder": "Search {{tab}}...",
+  "addPeak": "Add Finish",
+  "yourRating": "Your Rating",
 
   "tabs": {
     "movies": "Movies",
@@ -668,6 +670,7 @@
       "delete_performer_failed": "Failed to delete star"
     },
     "custom": {
+      "autoPrefix": "Auto: ",
       "values_saved": "Custom values saved successfully!",
       "save_values_failed": "Failed to save custom values",
       "fetch_healthyceleb_success": "Successfully fetched statistics from HealthyCeleb!",

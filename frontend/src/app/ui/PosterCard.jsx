@@ -2,6 +2,7 @@ import { memo, useState, useEffect } from 'react';
 import MediaCard from './MediaCard';
 import IconButton from './IconButton';
 import CardMetadata from './CardMetadata';
+import Tooltip from './Tooltip';
 import { Check } from '@/ui/icons';
 import { API_BASE } from '@/lib/backend';
 import { useSettingsQuery } from '@/queries/settingsQueries';
@@ -118,9 +119,10 @@ const PosterCard = memo(function PosterCard({
 
 
   return (
-    /* eslint-disable-next-line react/forbid-dom-props */
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
       className={cardClassName}
+      // eslint-disable-next-line react/forbid-dom-props
       style={customStyle || style}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -145,7 +147,7 @@ const PosterCard = memo(function PosterCard({
             ) : (
               <div
                 className="ui-poster-card__placeholder"
-                /* eslint-disable-next-line react/forbid-dom-props */
+                // eslint-disable-next-line react/forbid-dom-props
                 style={backgroundColor ? { background: backgroundColor } : undefined}
               >
                 {IconComponent && <IconComponent size={32} className="ui-poster-card__placeholder-icon" />}
@@ -153,17 +155,7 @@ const PosterCard = memo(function PosterCard({
               </div>
             )}
             {isHovered && previewItemId && previewEnabled && hoverPreviewsEnabled && !isVideoPlaying && (
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  backdropFilter: 'blur(8px)',
-                  background: 'rgba(0, 0, 0, 0.15)',
-                  zIndex: 2,
-                  pointerEvents: 'none',
-                  transition: 'opacity 0.3s ease',
-                }}
-              />
+              <div className="ui-poster-card__hover-overlay" />
             )}
             {previewSrc && (
               <video
@@ -181,6 +173,7 @@ const PosterCard = memo(function PosterCard({
                 onPlay={() => setIsVideoPlaying(true)}
                 onPlaying={() => setIsVideoPlaying(true)}
                 className="ui-poster-card__image"
+                // eslint-disable-next-line react/forbid-dom-props
                 style={{
                   position: 'absolute',
                   inset: 0,
@@ -194,26 +187,8 @@ const PosterCard = memo(function PosterCard({
               />
             )}
             {isLoadingPreview && (
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  zIndex: 4,
-                }}
-              >
-                <div
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    border: '3px solid rgba(255, 255, 255, 0.1)',
-                    borderTop: '3px solid var(--color-accent, var(--color-accent-blue, #0088ff))',
-                    borderRadius: '50%',
-                    animation: 'ui-poster-card-spin 0.6s linear infinite',
-                  }}
-                />
+              <div className="ui-poster-card__loader-overlay">
+                <div className="ui-poster-card__loader-spinner" />
               </div>
             )}
             {overlay}

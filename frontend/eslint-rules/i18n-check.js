@@ -27,6 +27,7 @@ try {
 // Reconstruct the translation tree exactly as LanguageProvider.jsx does
 const translationTree = {
   ...(localesCache['common'] || {}),
+  about: localesCache['about'] || {},
   dashboard: localesCache['dashboard'] || {},
   settingsPage: localesCache['settings'] || {},
   organizer: localesCache['organizer'] || {},

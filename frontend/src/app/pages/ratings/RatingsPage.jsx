@@ -224,11 +224,11 @@ export default function RatingsPage() {
           {viewMode === 'ratings' && (
             <div className={`organizer-panel ${isAdultMode ? 'organizer-panel--nsfw' : ''}`}>
               <div className="organizer-panel__row">
-                <span className="organizer-panel__title" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <span className="organizer-panel__title ratings-title-inline">
                   {t('ratings.title') || 'Ratings & Reviews'}
                   {isAdultMode && (
-                    <sup style={{ fontSize: '0.5em', top: '-0.8em', position: 'relative', userSelect: 'none' }}>
-                      <span className="settings-badge settings-badge--danger" style={{ fontSize: 'inherit', letterSpacing: 'normal', borderRadius: '4px', padding: '2px 6px', height: 'auto', minHeight: '0', lineRight: '1' }}>
+                    <sup className="ratings-title-sup">
+                      <span className="settings-badge settings-badge--danger ratings-title-adult-badge">
                         {t('common.adult_badge', { defaultValue: '18+' })}
                       </span>
                     </sup>

@@ -5,8 +5,6 @@ import Button from '@/ui/Button';
 import IconButton from '@/ui/IconButton';
 import { X } from '@/ui/icons';
 
-const timesChar = '\u00D7';
-
 export default function RatingsReviewDrawer({
   editingItem,
   setEditingItem,

@@ -3,7 +3,7 @@ import Button from '@/ui/Button';
 import Input from '@/ui/Input';
 import Dropdown from '@/ui/Dropdown';
 import Tooltip from '@/ui/Tooltip';
-import { Plus, Download, Search, List, PenLine, ENTITY_ICONS, Calendar } from '@/ui/icons';
+import { Plus, Download, Search, PenLine } from '@/ui/icons';
 import ListCollageIcon from './ListCollageIcon';
 
 export default function ListsHeader({

@@ -206,7 +206,7 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
               <h4 className="person-credits-row__title person-credits-row-title-style">{t('library.details.inLibrary') || 'My Library'}</h4>
 
               {/* Toggle button to switch to Discover mode */}
-              <div style={{ display: 'flex', gap: '12px' }}>
+              <div className="person-credits-header-actions">
                 {item?.is_adult && item?.finishes?.length > 0 && (
                   <button
                     type="button"
@@ -263,7 +263,7 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
 
               {/* Back to Library button (only shown if user has library items) */}
               {myLibraryTabs.length > 0 && (
-                <div style={{ display: 'flex', gap: '12px' }}>
+                <div className="person-credits-header-actions">
                   {item?.is_adult && item?.finishes?.length > 0 && (
                     <button
                       type="button"
@@ -426,7 +426,7 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
             <h4 className="person-credits-row__title person-credits-row-title-style">
               {t('library.details.galleryTitle') || 'Climax Gallery'}
             </h4>
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div className="person-credits-header-actions">
               <button
                 type="button"
                 className="person-credits-row__mode-switch-btn"

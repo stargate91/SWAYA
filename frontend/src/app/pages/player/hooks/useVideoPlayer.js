@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
 import { useSettingsQuery, useUpdateMediaStatusMutation } from '../../../queries';
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
 
@@ -22,7 +21,6 @@ const getQueryParam = (name) => {
 
 export default function useVideoPlayer({ itemId, containerRef }) {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const updateStatusMutation = useUpdateMediaStatusMutation();
   const { data: settings } = useSettingsQuery();
   const theme = settings?.ui_theme || 'dark';
@@ -188,7 +186,7 @@ export default function useVideoPlayer({ itemId, containerRef }) {
       const { ipcRenderer } = window.require('electron');
       ipcRenderer.send('mpv-command', args);
     } catch (err) {
-      console.warn('Failed to send command to MPV:', args);
+      console.warn('Failed to send command to MPV:', args, err);
     }
   }, []);
 
@@ -730,8 +728,6 @@ export default function useVideoPlayer({ itemId, containerRef }) {
       setOsdMessage('');
     }, 2000);
   }, []);
-
-  const handleKeyDownRef = useRef(null);
 
   const prevSubDelayRef = useRef(0);
   const prevAudioDelayRef = useRef(0);

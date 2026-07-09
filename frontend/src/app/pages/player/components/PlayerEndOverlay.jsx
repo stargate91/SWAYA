@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, RotateCcw, X, HelpCircle, Star, Tv, Clapperboard, Flame, Gift } from '@/ui/icons';
+import { Play, RotateCcw, X, HelpCircle, Tv, Clapperboard, Flame, Gift } from '@/ui/icons';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import SegmentedRating from '@/ui/SegmentedRating';
 
@@ -11,9 +11,6 @@ export default function PlayerEndOverlay({
   episodeNumber,
   countdown,
   userRating,
-  hoverRating,
-  ratingText,
-  starSymbol,
   peaksCount,
   collectionNext,
   performerUnwatched,
@@ -29,8 +26,6 @@ export default function PlayerEndOverlay({
   seasonNumber,
   seasonPoster,
   handlePlayNext,
-  setNextEpisode,
-  setHoverRating,
   handleRate,
   handleReplay,
   handleClose,

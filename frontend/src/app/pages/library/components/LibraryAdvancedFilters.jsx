@@ -17,8 +17,6 @@ export default function LibraryAdvancedFilters({
   t,
   hairColorFilter,
   setHairColorFilter,
-  ethnicityFilter,
-  setEthnicityFilter,
   eyeColorFilter,
   setEyeColorFilter,
   breastTypeFilter,
@@ -33,7 +31,6 @@ export default function LibraryAdvancedFilters({
   setPiercingsFilter,
   filterData,
   setCurrentPage,
-  activeSessionMode,
   settings
 }) {
   return (

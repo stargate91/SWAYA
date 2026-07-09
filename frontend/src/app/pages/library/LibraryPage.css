@@ -1476,3 +1476,49 @@
   outline: none !important;
 }
 
+.library-infinite-sentinel {
+  height: 30px;
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.library-infinite-spinner {
+  width: 24px;
+  height: 24px;
+}
+
+.library-title-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.library-nsfw-badge-sup {
+  font-size: 0.5em;
+  top: -0.8em;
+  position: relative;
+  user-select: none;
+}
+
+.library-nsfw-badge-span {
+  font-size: inherit;
+  letter-spacing: normal;
+  border-radius: 4px;
+  padding: 2px 6px;
+  height: auto;
+  min-height: 0;
+  line-height: 1;
+}
+
+.library-scene-date {
+  opacity: 0.6;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.lists-card__media {
+  cursor: pointer;
+}
+

@@ -26,11 +26,11 @@ export default function OrganizerHeaderPanel({
   return (
     <div className={panelClassName}>
       <div className="organizer-panel__row">
-        <span className="organizer-panel__title" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+        <span className="organizer-panel__title organizer-panel__title--nsfw-container">
           {title}
           {sessionMode === 'nsfw' && (
-            <sup style={{ fontSize: '0.55em', top: '-0.8em', position: 'relative', userSelect: 'none' }}>
-              <span className="settings-badge settings-badge--danger" style={{ fontSize: 'inherit', letterSpacing: 'normal', borderRadius: '4px', padding: '2px 6px', height: 'auto', minHeight: '0', lineRight: '1' }}>
+            <sup className="organizer-panel__adult-sup">
+              <span className="settings-badge settings-badge--danger organizer-panel__adult-badge-override">
                 {t('common.adult_badge', { defaultValue: '18+' })}
               </span>
             </sup>

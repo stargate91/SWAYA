@@ -1,8 +1,4 @@
-import { useNavigate } from 'react-router-dom';
-import { resolveMediaImageUrl } from '@/lib/imageUrls';
-import { API_BASE } from '@/lib/backend';
-import { Check, Minus, Star } from '@/ui/icons';
-import Pill from '@/ui/Pill';
+import { Minus } from '@/ui/icons';
 import CardMetadata from '@/ui/CardMetadata';
 import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
 import AdultOverlay from '@/ui/AdultOverlay';
@@ -15,7 +11,6 @@ export default function ListsCard({
   handleCardClick,
   handleRemoveListItem,
 }) {
-  const navigate = useNavigate();
   const n = normalizeMediaEntity(item, {
     context: 'library',
     settings,
@@ -36,7 +31,7 @@ export default function ListsCard({
 
     const displayDate = item.release_date ? item.release_date.substring(0, 10) : item.year;
     ratingPill = displayDate ? (
-      <span style={{ opacity: 0.6, fontSize: '0.75rem', flexShrink: 0 }}>{displayDate}</span>
+      <span className="lists-card__date">{displayDate}</span>
     ) : undefined;
   }
 
@@ -53,7 +48,6 @@ export default function ListsCard({
             handleCardClick(item);
           }
         }}
-        style={{ cursor: 'pointer' }}
       >
         <button
           className="ui-card-action-btn ui-card-action-btn--danger"

@@ -173,3 +173,33 @@
   font-size: 14px;
   font-weight: 600;
 }
+
+/* Error widget styles to avoid forbidden style props */
+.dashboard-widget--error {
+  padding: var(--space-6xl, 40px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-md, 12px);
+  min-height: 200px;
+}
+
+.dashboard-widget-error-icon {
+  color: var(--color-status-danger, #e53e3e);
+}
+
+.dashboard-widget-error-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--color-text-primary);
+}
+
+.dashboard-widget-error-desc {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  max-width: 450px;
+}

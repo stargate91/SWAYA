@@ -1,6 +1,4 @@
 import Page from '@/ui/Page';
-import { useLocation } from 'react-router-dom';
-import { useNavigationStateStore } from '@/stores/useNavigationStateStore';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import LibraryPagination from './components/LibraryPagination';
 import { useLibraryState } from './hooks/useLibraryState';
@@ -24,8 +22,6 @@ import './LibraryPage.css';
 export default function LibraryPage({ initialTab = 'movies', lockTab = false, showTabs = true, pageTitle = null }) {
   const queryClient = useQueryClient();
   const state = useLibraryState({ initialTab, lockTab, includeTagsTab: true });
-  const location = useLocation();
-  const currentPath = location.pathname;
   const isInitialLoadRef = useRef(true);
   const [focusedTagName, setFocusedTagName] = useState(null);
   const [imagePickerData, setImagePickerData] = useState(null);
@@ -106,6 +102,7 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
         observer.unobserve(currentSentinel);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.paginationMode, state.currentPage, state.totalPages, state.isDataLoading, state.setCurrentPage]);
 
 
@@ -277,8 +274,8 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
           />
 
           {state.paginationMode === 'infinite' && state.currentPage < state.totalPages && (
-            <div ref={sentinelRef} className="library-infinite-sentinel" style={{ height: '30px', margin: '20px 0', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <div className="library-spinner" style={{ width: '24px', height: '24px' }} />
+            <div ref={sentinelRef} className="library-infinite-sentinel">
+              <div className="library-spinner library-infinite-spinner" />
             </div>
           )}
 

@@ -1,4 +1,8 @@
 import React from 'react';
+import { AlertTriangle } from 'lucide-react';
+
+const DEFAULT_ERROR_TITLE = 'Failed to load';
+const DEFAULT_ERROR_DESC = 'An unknown error occurred while loading this widget.';
 
 class WidgetErrorBoundary extends React.Component {
   constructor(props) {
@@ -15,24 +19,16 @@ class WidgetErrorBoundary extends React.Component {
   }
 
   render() {
+    const { t } = this.props;
     if (this.state.hasError) {
       return (
-        <div className="dashboard-widget dashboard-widget--error" style={{
-          padding: 'var(--space-6xl, 40px)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-          gap: 'var(--space-md, 12px)',
-          minHeight: '200px'
-        }}>
-          <span style={{ fontSize: '2rem' }}>⚠️</span>
-          <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
-            {this.props.title || 'Sikertelen betöltés'}
+        <div className="dashboard-widget dashboard-widget--error">
+          <AlertTriangle className="dashboard-widget-error-icon" size={32} />
+          <h3 className="dashboard-widget-error-title">
+            {this.props.title || (t ? t('widget.failed_to_load') : DEFAULT_ERROR_TITLE)}
           </h3>
-          <p style={{ margin: 0, fontSize: '14px', color: 'var(--color-text-secondary)', maxWidth: '450px' }}>
-            {this.state.error?.message || 'Ismeretlen hiba történt a modul betöltése közben.'}
+          <p className="dashboard-widget-error-desc">
+            {this.state.error?.message || (t ? t('widget.unknown_error') : DEFAULT_ERROR_DESC)}
           </p>
         </div>
       );

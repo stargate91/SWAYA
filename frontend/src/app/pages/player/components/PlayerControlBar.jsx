@@ -12,7 +12,6 @@ export default function PlayerControlBar({
   volume,
   speed,
   isAdult,
-  mediaType,
   justAddedPeak,
   trackList,
   showAudioMenu,

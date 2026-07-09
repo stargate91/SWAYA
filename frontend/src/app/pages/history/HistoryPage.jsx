@@ -430,13 +430,12 @@ export default function HistoryPage() {
                   <img 
                     src={posterUrl} 
                     alt="" 
-                    className="watched-history-card__poster" 
+                    className={`watched-history-card__poster${snapshotUrl ? ' is-zoomable' : ''}`} 
                     onClick={() => {
                       if (snapshotUrl) {
                         setLightboxImage(snapshotUrl);
                       }
                     }}
-                    style={{ cursor: snapshotUrl ? 'zoom-in' : 'default' }}
                   />
                 ) : (
                   <div className="watched-history-card__poster-placeholder">
@@ -540,30 +539,11 @@ export default function HistoryPage() {
           onClick={() => setLightboxImage(null)}
           role="button"
           tabIndex={-1}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            background: 'rgba(0, 0, 0, 0.85)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 9999,
-            cursor: 'pointer'
-          }}
         >
           <img 
             src={lightboxImage} 
             alt="Snapshot" 
-            style={{
-              maxWidth: '90%',
-              maxHeight: '90%',
-              objectFit: 'contain',
-              borderRadius: '8px',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.5)'
-            }} 
+            className="history-lightbox-img"
           />
         </div>,
         document.body

@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Search, Clapperboard, ENTITY_ICONS, ImageOff, Star } from '@/ui/icons';
-import Pill from '@/ui/Pill';
+import { Search, Clapperboard, ENTITY_ICONS, ImageOff } from '@/ui/icons';
 import api from '@/lib/api';
 import Page from '@/ui/Page';
 import Input from '@/ui/Input';
@@ -290,7 +289,7 @@ export default function SearchPage() {
 
                   const displayDate = item.release_date ? item.release_date.substring(0, 10) : item.year;
                   ratingPill = displayDate ? (
-                    <span style={{ opacity: 0.6, fontSize: '0.75rem', flexShrink: 0 }}>{displayDate}</span>
+                    <span className="search-page-card-date">{displayDate}</span>
                   ) : undefined;
                 }
 

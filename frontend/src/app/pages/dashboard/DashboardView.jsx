@@ -184,7 +184,7 @@ const DashboardView = () => {
 
         if (widgetEl) {
           return (
-            <WidgetErrorBoundary key={key} name={key} title={title}>
+            <WidgetErrorBoundary key={key} name={key} title={title} t={t}>
               {widgetEl}
             </WidgetErrorBoundary>
           );

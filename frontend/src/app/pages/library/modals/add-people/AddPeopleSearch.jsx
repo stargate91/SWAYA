@@ -1,13 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useSettingsQuery } from '@/queries';
-import api from '@/lib/api';
-import Input from '@/ui/Input';
 import Spinner from '@/ui/Spinner';
-import IconButton from '@/ui/IconButton';
-import Tooltip from '@/ui/Tooltip';
 import EmptyState from '@/ui/EmptyState';
-import Dropdown from '@/ui/Dropdown';
-import { Search } from '@/ui/icons';
 import ActivationButton from './ActivationButton';
 
 const QUESTION_MARK = '?';

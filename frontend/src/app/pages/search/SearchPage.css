@@ -175,3 +175,9 @@
 .library-scene-card__date {
   flex-shrink: 0;
 }
+
+.search-page-card-date {
+  opacity: 0.6;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}

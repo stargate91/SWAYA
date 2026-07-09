@@ -9,7 +9,6 @@ import {
   isLibraryTagsTab,
   isLibraryVideoTab,
   isLibraryScenesTab,
-  isLibraryVideosTab,
 } from '@/lib/libraryTabs';
 import TagFilterDropdown from './TagFilterDropdown';
 import DecadeFilterDropdown from './DecadeFilterDropdown';
@@ -50,7 +49,6 @@ export default function LibraryFilters({
   genderFilter,
   setGenderFilter,
   ownershipFilter,
-  setOwnershipFilter,
   watchedFilter,
   setWatchedFilter,
   genreFilter,

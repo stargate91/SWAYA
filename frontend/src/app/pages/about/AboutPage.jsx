@@ -27,18 +27,41 @@ import Card from '../../ui/Card';
 import { fetchJson } from '../../lib/http';
 import { useSettingsQuery, useUpdateSettingsMutation } from '../../queries';
 import ImageLightbox from '../library/components/detail/modals/ImageLightbox';
-import '../../styles/AboutPage.css';
+import './AboutPage.css';
 
 const tmdbAttributionLogoSrc = 'https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_2-d537fb228cf3ded904ef09b136fe3fec72548ebc1fea3fbbd1ad9e36364db38b.svg';
 
+const CAMERA_EMOJI = '📷 ';
+const COLON_SEPARATOR = ': ';
+const SUCCESS_ICON = '✓ ';
+const ERROR_ICON = '✗ ';
+const APP_LOGO_LETTER = 'S';
+const APP_NAME_UPPER = 'SWAYA';
+const VERSION_PREFIX = 'v';
+const DEVELOPER_AVATAR_LETTER = 'L';
+const SCREENSHOT_FALLBACK = 'Screenshot';
+const SAVED_FALLBACK = 'Saved successfully!';
+const SAVE_FAILED_FALLBACK = 'Failed to save';
+const SCREENSHOT_PLACEHOLDER_FALLBACK = 'Screenshot Placeholder';
+const DOCS_FALLBACK = 'Documentation';
+const CHANGELOG_LOAD_FAILED_FALLBACK = 'Failed to load changelog';
+const OPEN_PAREN = ' (';
+const CLOSE_PAREN = ')';
+const SILUR_NAME = 'Silur';
+const KERRIGAN_NAME = 'Kerrigan';
+const YASHOCK_NAME = 'YaShock';
+const DATA_NAME = 'Data';
+const GITHUB_LABEL = 'GitHub';
+const DOT_DIVIDER = '•';
+
 const GitHubIcon = ({ size = 16 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="about-social-icon">
     <path d="M12 .5C5.649.5.5 5.649.5 12A11.5 11.5 0 0 0 8.36 22.08c.575.106.785-.25.785-.556 0-.274-.01-1-.016-1.963-3.184.692-3.855-1.534-3.855-1.534-.52-1.323-1.27-1.675-1.27-1.675-1.038-.71.078-.696.078-.696 1.148.08 1.752 1.178 1.752 1.178 1.02 1.75 2.675 1.245 3.327.952.104-.739.399-1.245.726-1.531-2.542-.289-5.215-1.271-5.215-5.657 0-1.249.446-2.271 1.176-3.071-.118-.289-.51-1.452.111-3.026 0 0 .96-.307 3.146 1.173A10.94 10.94 0 0 1 12 6.03c.977.004 1.962.132 2.882.389 2.184-1.48 3.143-1.173 3.143-1.173.623 1.574.231 2.737.113 3.026.732.8 1.175 1.822 1.175 3.07 0 4.397-2.678 5.365-5.228 5.649.41.353.775 1.05.775 2.117 0 1.529-.014 2.762-.014 3.138 0 .31.207.668.79.555A11.503 11.503 0 0 0 23.5 12C23.5 5.649 18.351.5 12 .5Z" />
   </svg>
 );
 
 const DiscordIcon = ({ size = 16 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true" className="about-social-icon">
     <path
       d="M20.317 4.37A19.791 19.791 0 0 0 15.429 3a13.915 13.915 0 0 0-.625 1.29 18.27 18.27 0 0 0-5.608 0A13.935 13.935 0 0 0 8.57 3a19.736 19.736 0 0 0-4.89 1.372C.587 9.04-.252 13.59.167 18.075a19.9 19.9 0 0 0 5.993 2.925 14.312 14.312 0 0 0 1.282-2.11 12.944 12.944 0 0 1-2.014-.98c.17-.124.337-.254.498-.388 3.885 1.824 8.101 1.824 11.94 0 .163.134.33.264.5.388a12.88 12.88 0 0 1-2.016.982A14.218 14.218 0 0 0 17.632 21a19.857 19.857 0 0 0 5.995-2.925c.492-5.195-.84-9.705-3.31-13.705ZM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.21 0 2.176 1.095 2.156 2.418 0 1.334-.955 2.419-2.156 2.419Zm7.96 0c-1.182 0-2.156-1.085-2.156-2.419 0-1.333.955-2.418 2.156-2.418 1.21 0 2.177 1.095 2.157 2.418 0 1.334-.947 2.419-2.157 2.419Z"
       fill="currentColor"
@@ -71,25 +94,21 @@ export default function AboutPage() {
   const [activeLightboxUrl, setActiveLightboxUrl] = useState(null);
   const [activeTourIndex, setActiveTourIndex] = useState(0);
 
-  const [wizardInputs, setWizardInputs] = useState({
-    tmdb_api_key: '',
-    tmdb_bearer_token: '',
-    omdb_api_key: '',
-    stashdb_api_key: '',
-    stashdb_endpoint: 'https://stashdb.org/graphql',
-    porndb_api_key: '',
-    porndb_endpoint: 'https://theporndb.net/graphql',
-    fansdb_api_key: '',
-    fansdb_endpoint: 'https://fansdb.cc/graphql',
-  });
+  const [wizardInputs, setWizardInputs] = useState(null);
 
-  useEffect(() => {
-    setWizardStep(0);
-  }, [activeTab]);
+  const getWizardInputValue = (key) => {
+    if (wizardInputs && key in wizardInputs) {
+      return wizardInputs[key];
+    }
+    if (key === 'stashdb_endpoint') return settings.stashdb_endpoint || 'https://stashdb.org/graphql';
+    if (key === 'porndb_endpoint') return settings.porndb_endpoint || 'https://theporndb.net/graphql';
+    if (key === 'fansdb_endpoint') return settings.fansdb_endpoint || 'https://fansdb.cc/graphql';
+    return settings[key] || '';
+  };
 
-  useEffect(() => {
-    if (settings) {
-      setWizardInputs({
+  const handleInputChange = (key, value) => {
+    setWizardInputs(prev => ({
+      ...(prev || {
         tmdb_api_key: settings.tmdb_api_key || '',
         tmdb_bearer_token: settings.tmdb_bearer_token || '',
         omdb_api_key: settings.omdb_api_key || '',
@@ -99,16 +118,42 @@ export default function AboutPage() {
         porndb_endpoint: settings.porndb_endpoint || 'https://theporndb.net/graphql',
         fansdb_api_key: settings.fansdb_api_key || '',
         fansdb_endpoint: settings.fansdb_endpoint || 'https://fansdb.cc/graphql',
-      });
+      }),
+      [key]: value
+    }));
+  };
+
+  const handleSetActiveTab = (tabId) => {
+    setActiveTab(tabId);
+    setWizardStep(0);
+    if (tabId === 'changelog' && !hasLoadedChangelog && !isLoadingChangelog) {
+      setIsLoadingChangelog(true);
+      setChangelogError(null);
+      fetchJson('/api/settings/changelog')
+        .then((data) => {
+          if (data.status === 'success') {
+            setChangelogContent(data.content || '');
+            setHasLoadedChangelog(true);
+          } else {
+            throw new Error(data.message || t('about.changelog_load_failed') || CHANGELOG_LOAD_FAILED_FALLBACK);
+          }
+        })
+        .catch((err) => {
+          setChangelogError(err.message || t('about.changelog_load_failed') || CHANGELOG_LOAD_FAILED_FALLBACK);
+          setHasLoadedChangelog(true);
+        })
+        .finally(() => {
+          setIsLoadingChangelog(false);
+        });
     }
-  }, [settings]);
+  };
 
   const handleSaveSetting = async (fieldMap) => {
     setSaveStatus('saving');
     try {
       const payload = {};
       Object.keys(fieldMap).forEach((key) => {
-        payload[key] = wizardInputs[fieldMap[key]];
+        payload[key] = getWizardInputValue(fieldMap[key]);
       });
       await updateSettingsMutation.mutateAsync(payload);
       setSaveStatus('success');
@@ -127,53 +172,34 @@ export default function AboutPage() {
     const isLast = currentStepIdx === steps.length - 1;
 
     return (
-      <div className="docs-wizard-container" style={{
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: '380px',
-        justifyContent: 'space-between',
-        gap: '20px',
-        marginTop: '15px'
-      }}>
+      <div className="docs-wizard-container">
         {steps.length > 1 && (
-          <div className="docs-wizard-progress" style={{ display: 'flex', gap: '8px' }}>
+          <div className="docs-wizard-progress">
             {steps.map((_, idx) => (
               <div
                 key={idx}
-                style={{
-                  flex: 1,
-                  height: '4px',
-                  borderRadius: '2px',
-                  backgroundColor: idx === currentStepIdx ? 'var(--color-accent)' : idx < currentStepIdx ? 'var(--color-accent-subtle, var(--color-muted))' : 'var(--color-border-subtle, var(--color-line))',
-                  transition: 'all 0.3s ease'
-                }}
+                className={`docs-wizard-progress-step ${idx === currentStepIdx ? 'is-active' : idx < currentStepIdx ? 'is-passed' : ''}`}
               />
             ))}
           </div>
         )}
 
-        <div className="docs-wizard-slide" style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-          flex: 1
-        }}>
-          <h3 style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--color-text-primary)', margin: 0 }}>
+        <div className="docs-wizard-slide">
+          <h3 className="docs-wizard-slide-title">
             {step.title}
           </h3>
           
-          <p style={{ fontSize: '13px', lineHeight: '1.6', color: 'var(--color-text-secondary)', margin: 0, whiteSpace: 'pre-wrap' }}>
+          <p className="docs-wizard-slide-desc">
             {step.description}
           </p>
 
           {step.links && (
-            <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
+            <div className="docs-wizard-slide-links">
               {step.links.map((link, lidx) => (
                 <button
                   key={lidx}
-                  className="about-action-btn"
+                  className="about-action-btn docs-wizard-link-btn-inline"
                   onClick={(e) => { e.preventDefault(); openExternalLink(link.url); }}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', width: 'auto' }}
                 >
                   <span>{link.label}</span>
                 </button>
@@ -182,77 +208,49 @@ export default function AboutPage() {
           )}
 
           {step.image ? (
-            <div
-              style={{
-                marginTop: '10px',
-                borderRadius: '8px',
-                overflow: 'hidden',
-                border: '1px solid var(--color-border-subtle)',
-                cursor: 'pointer'
-              }}
+            <button
+              type="button"
+              className="about-wizard-image-btn"
               onClick={() => setActiveLightboxUrl(step.image)}
             >
               <img
                 src={step.image}
                 alt={step.title}
-                style={{ width: '100%', height: 'auto', display: 'block' }}
+                className="about-wizard-image"
               />
-            </div>
+            </button>
           ) : step.screenshotPlaceholder && (
-            <div style={{
-              background: 'var(--color-bg-subtle, rgba(255,255,255,0.02))',
-              border: '1px dashed var(--color-border-default)',
-              borderRadius: '12px',
-              padding: '30px 20px',
-              textAlign: 'center',
-              color: 'var(--color-text-muted)',
-              fontSize: '12px',
-              marginTop: '10px'
-            }}>
-              📷 {t('about.docs_wizard.screenshot_placeholder') || 'Screenshot'}: {step.screenshotPlaceholder}
+            <div className="docs-wizard-screenshot-placeholder">
+              {CAMERA_EMOJI}{t('about.docs_wizard.screenshot_placeholder') || SCREENSHOT_FALLBACK}{COLON_SEPARATOR}{step.screenshotPlaceholder}
             </div>
           )}
 
           {step.renderInputs && step.renderInputs()}
 
           {step.onSave && (
-            <div style={{ marginTop: '15px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="docs-wizard-save-container">
               <button
-                className="about-action-btn"
+                className="about-action-btn docs-wizard-save-btn"
                 onClick={step.onSave}
                 disabled={saveStatus === 'saving'}
-                style={{
-                  backgroundColor: 'var(--color-accent)',
-                  color: '#fff',
-                  borderColor: 'var(--color-accent)',
-                  width: 'auto'
-                }}
               >
                 {saveStatus === 'saving' ? (t('about.docs_wizard.saving') || 'Saving...') : (t('about.docs_wizard.save') || 'Save')}
               </button>
-              {saveStatus === 'success' && <span style={{ color: 'var(--color-success)', fontSize: '13px', fontWeight: 600 }}>✓ {t('about.docs_wizard.saved') || 'Saved successfully!'}</span>}
-              {saveStatus === 'error' && <span style={{ color: 'var(--color-danger)', fontSize: '13px', fontWeight: 600 }}>✗ {t('about.docs_wizard.save_failed') || 'Failed to save'}</span>}
+              {saveStatus === 'success' && <span className="docs-wizard-save-status-success">{SUCCESS_ICON}{t('about.docs_wizard.saved') || SAVED_FALLBACK}</span>}
+              {saveStatus === 'error' && <span className="docs-wizard-save-status-error">{ERROR_ICON}{t('about.docs_wizard.save_failed') || SAVE_FAILED_FALLBACK}</span>}
             </div>
           )}
         </div>
 
         {steps.length > 1 && (
-          <div className="docs-wizard-footer" style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginTop: '20px',
-            borderTop: '1px solid var(--color-border-subtle)',
-            paddingTop: '15px'
-          }}>
+          <div className="docs-wizard-footer">
             {!isFirst ? (
               <button
-                className="about-action-btn"
+                className="about-action-btn docs-wizard-btn-auto"
                 onClick={() => {
                   setWizardStep(currentStepIdx - 1);
                   setSaveStatus(null);
                 }}
-                style={{ width: 'auto' }}
               >
                 {t('about.docs_wizard.back') || 'Back'}
               </button>
@@ -260,12 +258,11 @@ export default function AboutPage() {
 
             {!isLast && (
               <button
-                className="about-action-btn"
+                className="about-action-btn docs-wizard-btn-next"
                 onClick={() => {
                   setWizardStep(currentStepIdx + 1);
                   setSaveStatus(null);
                 }}
-                style={{ backgroundColor: 'var(--color-bg-hover)', width: 'auto' }}
               >
                 {isFirst ? (t('about.docs_wizard.start') || "Let's get it!") : (t('about.docs_wizard.next') || 'Next Step')}
               </button>
@@ -334,45 +331,17 @@ export default function AboutPage() {
         ];
         
         return (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-            gap: '8px',
-            marginTop: '10px',
-            background: 'var(--color-bg-subtle, rgba(255,255,255,0.01))',
-            padding: '12px',
-            borderRadius: '8px',
-            border: '1px solid var(--color-border-subtle)',
-            boxSizing: 'border-box'
-          }}>
+          <div className="about-wizard-dummy-grid">
             {dummyData.map((d, idx) => (
-              <div key={idx} style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '4px 8px',
-                background: 'var(--color-bg-canvas, rgba(0,0,0,0.2))',
-                borderRadius: '4px',
-                fontSize: '12px',
-                border: '1px solid var(--color-border-default)',
-                minWidth: 0
-              }}>
-                <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginRight: '8px', minWidth: 0 }}>
-                  <strong style={{ color: 'var(--color-text-secondary)', fontSize: '10px', display: 'block', textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.label}</strong>
-                  <span style={{ color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>{d.value}</span>
+              <div key={idx} className="about-wizard-dummy-item">
+                <div className="about-wizard-dummy-text">
+                  <strong className="about-wizard-dummy-label">{d.label}</strong>
+                  <span className="about-wizard-dummy-value">{d.value}</span>
                 </div>
                 {!d.noCopy && (
                   <button
-                    className="about-action-btn"
+                    className="about-action-btn about-wizard-dummy-copy-btn"
                     onClick={(e) => { e.preventDefault(); navigator.clipboard.writeText(d.value); }}
-                    style={{
-                      padding: '3px 8px',
-                      fontSize: '10px',
-                      width: 'auto',
-                      minWidth: '45px',
-                      height: 'auto',
-                      flexShrink: 0
-                    }}
                   >
                     {t('about.docs_wizard.copy') || 'Copy'}
                   </button>
@@ -393,45 +362,27 @@ export default function AboutPage() {
       description: t('about.docs_wizard.tmdb.step_save_desc') || 'Copy your API key...',
       image: '/documentations/apis/tmdb9.PNG',
       renderInputs: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ fontSize: '11px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
+        <div className="about-wizard-inputs-container">
+          <div className="about-wizard-input-group">
+            <label className="about-wizard-input-label">
               {t('about.docs_wizard.tmdb.label_key') || 'TMDb API Key'}
             </label>
             <input
               type="text"
-              value={wizardInputs.tmdb_api_key}
-              onChange={(e) => setWizardInputs(prev => ({ ...prev, tmdb_api_key: e.target.value }))}
-              style={{
-                padding: '8px 12px',
-                borderRadius: '6px',
-                border: '1px solid var(--color-border-default)',
-                background: 'var(--color-bg-subtle)',
-                color: 'var(--color-text-primary)',
-                fontSize: '13px',
-                outline: 'none'
-              }}
+              value={getWizardInputValue('tmdb_api_key')}
+              onChange={(e) => handleInputChange('tmdb_api_key', e.target.value)}
+              className="about-wizard-input-text"
               placeholder={t('about.docs_wizard.tmdb.placeholder_key') || 'API Key...'}
             />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ fontSize: '11px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
+          <div className="about-wizard-input-group">
+            <label className="about-wizard-input-label">
               {t('about.docs_wizard.tmdb.label_token') || 'TMDb Read Access Token'}
             </label>
             <textarea
-              value={wizardInputs.tmdb_bearer_token}
-              onChange={(e) => setWizardInputs(prev => ({ ...prev, tmdb_bearer_token: e.target.value }))}
-              style={{
-                padding: '8px 12px',
-                borderRadius: '6px',
-                border: '1px solid var(--color-border-default)',
-                background: 'var(--color-bg-subtle)',
-                color: 'var(--color-text-primary)',
-                fontSize: '13px',
-                height: '70px',
-                resize: 'none',
-                outline: 'none'
-              }}
+              value={getWizardInputValue('tmdb_bearer_token')}
+              onChange={(e) => handleInputChange('tmdb_bearer_token', e.target.value)}
+              className="about-wizard-input-textarea"
               placeholder={t('about.docs_wizard.tmdb.placeholder_token') || 'Long bearer token...'}
             />
           </div>
@@ -460,46 +411,17 @@ export default function AboutPage() {
         ];
         
         return (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-            gap: '8px',
-            marginTop: '10px',
-            background: 'var(--color-bg-subtle, rgba(255,255,255,0.01))',
-            padding: '12px',
-            borderRadius: '8px',
-            border: '1px solid var(--color-border-subtle)',
-            boxSizing: 'border-box'
-          }}>
+          <div className="about-wizard-dummy-grid">
             {dummyData.map((d, idx) => (
-              <div key={idx} style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '4px 8px',
-                background: 'var(--color-bg-canvas, rgba(0,0,0,0.2))',
-                borderRadius: '4px',
-                fontSize: '12px',
-                border: '1px solid var(--color-border-default)',
-                minWidth: 0,
-                gridColumn: d.label === 'Use' ? 'span 2' : 'auto'
-              }}>
-                <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginRight: '8px', minWidth: 0 }}>
-                  <strong style={{ color: 'var(--color-text-secondary)', fontSize: '10px', display: 'block', textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.label}</strong>
-                  <span style={{ color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>{d.value}</span>
+              <div key={idx} className={`about-wizard-dummy-item ${d.label === 'Use' ? 'about-wizard-dummy-span-2' : ''}`}>
+                <div className="about-wizard-dummy-text">
+                  <strong className="about-wizard-dummy-label">{d.label}</strong>
+                  <span className="about-wizard-dummy-value">{d.value}</span>
                 </div>
                 {!d.noCopy && (
                   <button
-                    className="about-action-btn"
+                    className="about-action-btn about-wizard-dummy-copy-btn"
                     onClick={(e) => { e.preventDefault(); navigator.clipboard.writeText(d.value); }}
-                    style={{
-                      padding: '3px 8px',
-                      fontSize: '10px',
-                      width: 'auto',
-                      minWidth: '45px',
-                      height: 'auto',
-                      flexShrink: 0
-                    }}
                   >
                     {t('about.docs_wizard.copy') || 'Copy'}
                   </button>
@@ -520,25 +442,19 @@ export default function AboutPage() {
       description: t('about.docs_wizard.omdb.step_save_desc') || 'Open your email...',
       image: '/documentations/apis/omdb3.PNG',
       renderInputs: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '10px' }}>
-          <label style={{ fontSize: '11px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
-            {t('about.docs_wizard.omdb.label_key') || 'OMDb API Key'}
-          </label>
-          <input
-            type="text"
-            value={wizardInputs.omdb_api_key}
-            onChange={(e) => setWizardInputs(prev => ({ ...prev, omdb_api_key: e.target.value }))}
-            style={{
-              padding: '8px 12px',
-              borderRadius: '6px',
-              border: '1px solid var(--color-border-default)',
-              background: 'var(--color-bg-subtle)',
-              color: 'var(--color-text-primary)',
-              fontSize: '13px',
-              outline: 'none'
-            }}
-            placeholder={t('about.docs_wizard.omdb.placeholder_key') || 'OMDb API Key...'}
-          />
+        <div className="about-wizard-inputs-container">
+          <div className="about-wizard-input-group">
+            <label className="about-wizard-input-label">
+              {t('about.docs_wizard.omdb.label_key') || 'OMDb API Key'}
+            </label>
+            <input
+              type="text"
+              value={getWizardInputValue('omdb_api_key')}
+              onChange={(e) => handleInputChange('omdb_api_key', e.target.value)}
+              className="about-wizard-input-text"
+              placeholder={t('about.docs_wizard.omdb.placeholder_key') || 'OMDb API Key...'}
+            />
+          </div>
         </div>
       ),
       onSave: () => handleSaveSetting({ omdb_api_key: 'omdb_api_key' })
@@ -564,44 +480,16 @@ export default function AboutPage() {
         ];
 
         return (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-            gap: '8px',
-            marginTop: '10px',
-            background: 'var(--color-bg-subtle, rgba(255,255,255,0.01))',
-            padding: '12px',
-            borderRadius: '8px',
-            border: '1px solid var(--color-border-subtle)',
-            boxSizing: 'border-box'
-          }}>
+          <div className="about-wizard-dummy-grid">
             {inviteCodes.map((c, idx) => (
-              <div key={idx} style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '4px 8px',
-                background: 'var(--color-bg-canvas, rgba(0,0,0,0.2))',
-                borderRadius: '4px',
-                fontSize: '12px',
-                border: '1px solid var(--color-border-default)',
-                minWidth: 0
-              }}>
-                <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginRight: '8px', minWidth: 0 }}>
-                  <strong style={{ color: 'var(--color-text-secondary)', fontSize: '10px', display: 'block', textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.label}</strong>
-                  <span style={{ color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>{c.value}</span>
+              <div key={idx} className="about-wizard-dummy-item">
+                <div className="about-wizard-dummy-text">
+                  <strong className="about-wizard-dummy-label">{c.label}</strong>
+                  <span className="about-wizard-dummy-value">{c.value}</span>
                 </div>
                 <button
-                  className="about-action-btn"
+                  className="about-action-btn about-wizard-dummy-copy-btn"
                   onClick={(e) => { e.preventDefault(); navigator.clipboard.writeText(c.value); }}
-                  style={{
-                    padding: '3px 8px',
-                    fontSize: '10px',
-                    width: 'auto',
-                    minWidth: '45px',
-                    height: 'auto',
-                    flexShrink: 0
-                  }}
                 >
                   {t('about.docs_wizard.copy') || 'Copy'}
                 </button>
@@ -619,44 +507,28 @@ export default function AboutPage() {
       title: t('about.docs_wizard.stashdb.step_save') || 'Retrieve your API Key',
       description: t('about.docs_wizard.stashdb.step_save_desc') || 'Log in and copy API key...',
       renderInputs: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ fontSize: '11px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
+        <div className="about-wizard-inputs-container">
+          <div className="about-wizard-input-group">
+            <label className="about-wizard-input-label">
               {t('about.docs_wizard.stashdb.label_endpoint') || 'StashDB API Endpoint'}
             </label>
             <input
               type="text"
-              value={wizardInputs.stashdb_endpoint}
-              onChange={(e) => setWizardInputs(prev => ({ ...prev, stashdb_endpoint: e.target.value }))}
-              style={{
-                padding: '8px 12px',
-                borderRadius: '6px',
-                border: '1px solid var(--color-border-default)',
-                background: 'var(--color-bg-subtle)',
-                color: 'var(--color-text-primary)',
-                fontSize: '13px',
-                outline: 'none'
-              }}
+              value={getWizardInputValue('stashdb_endpoint')}
+              onChange={(e) => handleInputChange('stashdb_endpoint', e.target.value)}
+              className="about-wizard-input-text"
               placeholder={t('about.docs_wizard.stashdb.placeholder_endpoint') || 'API Endpoint...'}
             />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ fontSize: '11px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
+          <div className="about-wizard-input-group">
+            <label className="about-wizard-input-label">
               {t('about.docs_wizard.stashdb.label_key') || 'StashDB API Key'}
             </label>
             <input
               type="text"
-              value={wizardInputs.stashdb_api_key}
-              onChange={(e) => setWizardInputs(prev => ({ ...prev, stashdb_api_key: e.target.value }))}
-              style={{
-                padding: '8px 12px',
-                borderRadius: '6px',
-                border: '1px solid var(--color-border-default)',
-                background: 'var(--color-bg-subtle)',
-                color: 'var(--color-text-primary)',
-                fontSize: '13px',
-                outline: 'none'
-              }}
+              value={getWizardInputValue('stashdb_api_key')}
+              onChange={(e) => handleInputChange('stashdb_api_key', e.target.value)}
+              className="about-wizard-input-text"
               placeholder={t('about.docs_wizard.stashdb.placeholder_key') || 'StashDB API Key...'}
             />
           </div>
@@ -685,44 +557,28 @@ export default function AboutPage() {
       title: t('about.docs_wizard.fansdb.step_save') || 'Retrieve your API Key',
       description: t('about.docs_wizard.fansdb.step_save_desc') || 'Log in and copy API key...',
       renderInputs: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ fontSize: '11px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
+        <div className="about-wizard-inputs-container">
+          <div className="about-wizard-input-group">
+            <label className="about-wizard-input-label">
               {t('about.docs_wizard.fansdb.label_endpoint') || 'FansDB API Endpoint'}
             </label>
             <input
               type="text"
-              value={wizardInputs.fansdb_endpoint}
-              onChange={(e) => setWizardInputs(prev => ({ ...prev, fansdb_endpoint: e.target.value }))}
-              style={{
-                padding: '8px 12px',
-                borderRadius: '6px',
-                border: '1px solid var(--color-border-default)',
-                background: 'var(--color-bg-subtle)',
-                color: 'var(--color-text-primary)',
-                fontSize: '13px',
-                outline: 'none'
-              }}
+              value={getWizardInputValue('fansdb_endpoint')}
+              onChange={(e) => handleInputChange('fansdb_endpoint', e.target.value)}
+              className="about-wizard-input-text"
               placeholder={t('about.docs_wizard.fansdb.placeholder_endpoint') || 'API Endpoint...'}
             />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ fontSize: '11px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
+          <div className="about-wizard-input-group">
+            <label className="about-wizard-input-label">
               {t('about.docs_wizard.fansdb.label_key') || 'FansDB API Key'}
             </label>
             <input
               type="text"
-              value={wizardInputs.fansdb_api_key}
-              onChange={(e) => setWizardInputs(prev => ({ ...prev, fansdb_api_key: e.target.value }))}
-              style={{
-                padding: '8px 12px',
-                borderRadius: '6px',
-                border: '1px solid var(--color-border-default)',
-                background: 'var(--color-bg-subtle)',
-                color: 'var(--color-text-primary)',
-                fontSize: '13px',
-                outline: 'none'
-              }}
+              value={getWizardInputValue('fansdb_api_key')}
+              onChange={(e) => handleInputChange('fansdb_api_key', e.target.value)}
+              className="about-wizard-input-text"
               placeholder={t('about.docs_wizard.fansdb.placeholder_key') || 'FansDB API Key...'}
             />
           </div>
@@ -751,44 +607,28 @@ export default function AboutPage() {
       title: t('about.docs_wizard.porndb.step_save') || 'Copy Token & Save',
       description: t('about.docs_wizard.porndb.step_save_desc') || 'A popup window will display your new token...',
       renderInputs: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ fontSize: '11px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
+        <div className="about-wizard-inputs-container">
+          <div className="about-wizard-input-group">
+            <label className="about-wizard-input-label">
               {t('about.docs_wizard.porndb.label_endpoint') || 'ThePornDB API Endpoint'}
             </label>
             <input
               type="text"
-              value={wizardInputs.porndb_endpoint}
-              onChange={(e) => setWizardInputs(prev => ({ ...prev, porndb_endpoint: e.target.value }))}
-              style={{
-                padding: '8px 12px',
-                borderRadius: '6px',
-                border: '1px solid var(--color-border-default)',
-                background: 'var(--color-bg-subtle)',
-                color: 'var(--color-text-primary)',
-                fontSize: '13px',
-                outline: 'none'
-              }}
+              value={getWizardInputValue('porndb_endpoint')}
+              onChange={(e) => handleInputChange('porndb_endpoint', e.target.value)}
+              className="about-wizard-input-text"
               placeholder={t('about.docs_wizard.porndb.placeholder_endpoint') || 'API Endpoint...'}
             />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ fontSize: '11px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
+          <div className="about-wizard-input-group">
+            <label className="about-wizard-input-label">
               {t('about.docs_wizard.porndb.label_key') || 'ThePornDB API Key'}
             </label>
             <input
               type="text"
-              value={wizardInputs.porndb_api_key}
-              onChange={(e) => setWizardInputs(prev => ({ ...prev, porndb_api_key: e.target.value }))}
-              style={{
-                padding: '8px 12px',
-                borderRadius: '6px',
-                border: '1px solid var(--color-border-default)',
-                background: 'var(--color-bg-subtle)',
-                color: 'var(--color-text-primary)',
-                fontSize: '13px',
-                outline: 'none'
-              }}
+              value={getWizardInputValue('porndb_api_key')}
+              onChange={(e) => handleInputChange('porndb_api_key', e.target.value)}
+              className="about-wizard-input-text"
               placeholder={t('about.docs_wizard.porndb.placeholder_key') || 'ThePornDB API Key...'}
             />
           </div>
@@ -865,13 +705,13 @@ export default function AboutPage() {
   ];
 
   const docSubItems = [
-    { id: 'docs_tmdb', label: 'TMDb API Key' },
-    { id: 'docs_omdb', label: 'OMDb API Key' },
-    { id: 'docs_stashdb', label: 'StashDB' },
-    { id: 'docs_fansdb', label: 'FansDB' },
-    { id: 'docs_porndb', label: 'ThePornDB' },
-    { id: 'docs_offline', label: 'Offline Scan' },
-    { id: 'docs_features', label: 'Feature Tour' },
+    { id: 'docs_tmdb', label: t('about.docs_wizard.headers.tmdb') },
+    { id: 'docs_omdb', label: t('about.docs_wizard.headers.omdb') },
+    { id: 'docs_stashdb', label: t('about.docs_wizard.headers.stashdb') },
+    { id: 'docs_fansdb', label: t('about.docs_wizard.headers.fansdb') },
+    { id: 'docs_porndb', label: t('about.docs_wizard.headers.porndb') },
+    { id: 'docs_offline', label: t('about.docs_wizard.headers.offline') },
+    { id: 'docs_features', label: t('about.docs_wizard.headers.features') },
   ];
 
   const handleClose = () => {
@@ -879,31 +719,12 @@ export default function AboutPage() {
   };
 
   useEffect(() => {
-    if (activeTab === 'changelog' && !hasLoadedChangelog && !isLoadingChangelog) {
-      setIsLoadingChangelog(true);
-      setChangelogError(null);
-      fetchJson('/api/settings/changelog')
-        .then((data) => {
-          if (data.status === 'success') {
-            setChangelogContent(data.content || '');
-            setHasLoadedChangelog(true);
-          } else {
-            throw new Error(data.message || 'Failed to load changelog');
-          }
-        })
-        .catch((err) => {
-          setChangelogError(err.message || 'Failed to load changelog');
-          setHasLoadedChangelog(true);
-        })
-        .finally(() => {
-          setIsLoadingChangelog(false);
-        });
-    }
-  }, [activeTab, hasLoadedChangelog, isLoadingChangelog]);
+    // Changelog is fetched in handleSetActiveTab
+  }, []);
 
   const tabs = [
     { id: 'info', label: t('about.title'), icon: <Info size={18} /> },
-    { id: 'docs', label: t('about.resources.docs') || 'Documentation', icon: <BookOpen size={18} />, subItems: docSubItems },
+    { id: 'docs', label: t('about.resources.docs') || DOCS_FALLBACK, icon: <BookOpen size={18} />, subItems: docSubItems },
     { id: 'changelog', label: t('about.resources.changelog'), icon: <ScrollText size={18} /> },
     { id: 'privacy', label: t('about.notices.privacy'), icon: <Lock size={18} /> },
     { id: 'license', label: t('about.notices.license'), icon: <ScrollText size={18} /> },
@@ -914,20 +735,13 @@ export default function AboutPage() {
     name: 'Swaya',
     version: '0.1.0',
     developer: {
-      name: 'Levi',
-      email: 'levi@swaya.io',
+      name: 'Levente Gáll',
+      email: 'leventegall@proton.me',
       website: 'https://swaya.io',
       github: 'https://github.com/stargate91/SWAYA',
       discordServer: 'https://discord.gg/swaya',
     },
   };
-
-  const developerLinks = [
-    { href: `mailto:${appInfo.developer.email}`, icon: <Mail size={16} />, label: t('about.links.email') },
-    { href: appInfo.developer.website, icon: <Globe size={16} />, label: t('about.links.website') },
-    { href: appInfo.developer.github, icon: <GitHubIcon size={16} />, label: t('about.links.github') },
-    { href: appInfo.developer.discordServer, icon: <DiscordIcon size={16} />, label: t('about.links.discord_server') },
-  ];
 
   return (
     <div className="settings-overlay">
@@ -950,7 +764,7 @@ export default function AboutPage() {
                     onClick={() => {
                       setIsDocsExpanded(!isDocsExpanded);
                       if (!activeTab.startsWith('docs_')) {
-                        setActiveTab('docs_tmdb');
+                        handleSetActiveTab('docs_tmdb');
                       }
                     }}
                   >
@@ -973,7 +787,7 @@ export default function AboutPage() {
                         <div
                           key={sub.id}
                           className={`settings-sidebar-sub-item${activeTab === sub.id ? ' active' : ''}`}
-                          onClick={() => setActiveTab(sub.id)}
+                          onClick={() => handleSetActiveTab(sub.id)}
                         >
                           <span>{sub.label}</span>
                         </div>
@@ -989,7 +803,7 @@ export default function AboutPage() {
               <div
                 key={tab.id}
                 className={`settings-sidebar-item${activeTab === tab.id ? ' active' : ''}`}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleSetActiveTab(tab.id)}
               >
                 {Icon}
                 <span className="settings-sidebar-label">{tab.label}</span>
@@ -1017,11 +831,11 @@ export default function AboutPage() {
             {activeTab === 'info' && (
               <div className="about-tab-panel info-panel">
                 <div className="about-app-brand-card">
-                  <div className="about-app-logo">S</div>
+                  <div className="about-app-logo">{APP_LOGO_LETTER}</div>
                   <div className="about-app-details">
                     <div className="about-app-name-row">
-                      <span className="about-app-title">SWAYA</span>
-                      <span className="about-app-version">v{appInfo.version}</span>
+                      <span className="about-app-title">{APP_NAME_UPPER}</span>
+                      <span className="about-app-version">{VERSION_PREFIX}{appInfo.version}</span>
                     </div>
                     <p className="about-app-description">{t('about.subtitle') || 'Organize, enrich, and keep your media library clean.'}</p>
                   </div>
@@ -1030,32 +844,32 @@ export default function AboutPage() {
                 <div className="about-single-layout">
                   <div className="about-column">
                     <div className="about-section-header">
-                      <h3>Developer</h3>
-                      <p>Reach out directly if you want to report bugs, collaborate, or share feedback.</p>
+                      <h3>{t('about.app_info.developer')}</h3>
+                      <p>{t('about.app_info.developer_intro')}</p>
                     </div>
                     <div className="developer-profile-card">
-                      <div className="developer-avatar">L</div>
+                      <div className="developer-avatar">{DEVELOPER_AVATAR_LETTER}</div>
                       <div className="developer-info">
-                        <span className="developer-name">Levente Gáll</span>
-                        <span className="developer-email">leventegall@proton.me</span>
+                        <span className="developer-name">{t('about.app_info.developer_name')}</span>
+                        <span className="developer-email">{t('about.app_info.developer_email')}</span>
                       </div>
                     </div>
                     <div className="developer-links-grid">
-                      <a href="mailto:leventegall@proton.me" className="about-action-btn" onClick={(e) => { e.preventDefault(); openExternalLink('mailto:leventegall@proton.me'); }}>
+                      <a href={`mailto:${appInfo.developer.email}`} className="about-action-btn" onClick={(e) => { e.preventDefault(); openExternalLink(`mailto:${appInfo.developer.email}`); }}>
                         <Mail size={16} />
-                        <span>Email</span>
+                        <span>{t('about.links.email')}</span>
                       </a>
-                      <a href="https://swaya.io" className="about-action-btn" onClick={(e) => { e.preventDefault(); openExternalLink('https://swaya.io'); }}>
+                      <a href={appInfo.developer.website} className="about-action-btn" onClick={(e) => { e.preventDefault(); openExternalLink(appInfo.developer.website); }}>
                         <Globe size={16} />
-                        <span>Website</span>
+                        <span>{t('about.links.website')}</span>
                       </a>
-                      <a href="https://github.com/stargate91/SWAYA" className="about-action-btn" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/stargate91/SWAYA'); }}>
+                      <a href={appInfo.developer.github} className="about-action-btn" onClick={(e) => { e.preventDefault(); openExternalLink(appInfo.developer.github); }}>
                         <GitHubIcon size={16} />
-                        <span>GitHub</span>
+                        <span>{t('about.links.github')}</span>
                       </a>
-                      <a href="https://discord.gg/swaya" className="about-action-btn" onClick={(e) => { e.preventDefault(); openExternalLink('https://discord.gg/swaya'); }}>
+                      <a href={appInfo.developer.discordServer} className="about-action-btn" onClick={(e) => { e.preventDefault(); openExternalLink(appInfo.developer.discordServer); }}>
                         <DiscordIcon size={16} />
-                        <span>Discord Server</span>
+                        <span>{t('about.links.discord_server')}</span>
                       </a>
                     </div>
                   </div>
@@ -1099,7 +913,7 @@ export default function AboutPage() {
             {activeTab === 'docs_tmdb' && (
               <div className="about-tab-panel docs-panel">
                 <Card className="about-card docs-card">
-                  <h2 className="about-section-title">TMDb API Key</h2>
+                  <h2 className="about-section-title">{t('about.docs_wizard.headers.tmdb')}</h2>
                   {renderWizard(tmdbWizardSteps)}
                 </Card>
               </div>
@@ -1107,7 +921,7 @@ export default function AboutPage() {
             {activeTab === 'docs_omdb' && (
               <div className="about-tab-panel docs-panel">
                 <Card className="about-card docs-card">
-                  <h2 className="about-section-title">OMDb API Key</h2>
+                  <h2 className="about-section-title">{t('about.docs_wizard.headers.omdb')}</h2>
                   {renderWizard(omdbWizardSteps)}
                 </Card>
               </div>
@@ -1115,7 +929,7 @@ export default function AboutPage() {
             {activeTab === 'docs_stashdb' && (
               <div className="about-tab-panel docs-panel">
                 <Card className="about-card docs-card">
-                  <h2 className="about-section-title">StashDB</h2>
+                  <h2 className="about-section-title">{t('about.docs_wizard.headers.stashdb')}</h2>
                   {renderWizard(stashdbWizardSteps)}
                 </Card>
               </div>
@@ -1123,7 +937,7 @@ export default function AboutPage() {
             {activeTab === 'docs_fansdb' && (
               <div className="about-tab-panel docs-panel">
                 <Card className="about-card docs-card">
-                  <h2 className="about-section-title">FansDB</h2>
+                  <h2 className="about-section-title">{t('about.docs_wizard.headers.fansdb')}</h2>
                   {renderWizard(fansdbWizardSteps)}
                 </Card>
               </div>
@@ -1131,7 +945,7 @@ export default function AboutPage() {
             {activeTab === 'docs_porndb' && (
               <div className="about-tab-panel docs-panel">
                 <Card className="about-card docs-card">
-                  <h2 className="about-section-title">ThePornDB</h2>
+                  <h2 className="about-section-title">{t('about.docs_wizard.headers.porndb')}</h2>
                   {renderWizard(porndbWizardSteps)}
                 </Card>
               </div>
@@ -1139,36 +953,22 @@ export default function AboutPage() {
             {activeTab === 'docs_offline' && (
               <div className="about-tab-panel docs-panel">
                 <Card className="about-card docs-card">
-                  <h2 className="about-section-title">Offline Scan</h2>
+                  <h2 className="about-section-title">{t('about.docs_wizard.headers.offline')}</h2>
                   {renderWizard(offlineWizardSteps)}
                 </Card>
               </div>
             )}
             {activeTab === 'docs_features' && (
-              <div className="about-tab-panel docs-panel" style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: '10px 20px 20px 20px' }}>
-                <h2 style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--color-text-primary)', margin: '0 0 20px 0' }}>Feature Tour</h2>
-                <div style={{ display: 'flex', flex: 1, gap: '30px', minHeight: 0 }}>
+              <div className="about-tab-panel docs-panel features-tour-container">
+                <h2 className="features-tour-header">{t('about.docs_wizard.headers.features')}</h2>
+                <div className="features-tour-layout">
                   {/* Left Sidebar List of Pages */}
-                  <div style={{ width: '240px', borderRight: '1px solid var(--color-border-subtle)', paddingRight: '20px', display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto' }}>
+                  <div className="features-tour-sidebar">
                     {featuresTourData.map((f, idx) => (
                       <button
                         key={f.id}
                         onClick={() => setActiveTourIndex(idx)}
-                        style={{
-                          textAlign: 'left',
-                          padding: '12px 16px',
-                          borderRadius: '8px',
-                          border: 'none',
-                          background: activeTourIndex === idx ? 'var(--color-bg-hover)' : 'transparent',
-                          color: activeTourIndex === idx ? 'var(--color-accent)' : 'var(--color-text-secondary)',
-                          fontWeight: activeTourIndex === idx ? 'bold' : 'normal',
-                          fontSize: '14px',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '10px'
-                        }}
+                        className={`features-tour-sidebar-item${activeTourIndex === idx ? ' active' : ''}`}
                       >
                         {f.icon}
                         <span>{f.title}</span>
@@ -1177,28 +977,14 @@ export default function AboutPage() {
                   </div>
 
                   {/* Right Content Panel (Split details + image) */}
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px', minWidth: 0, overflowY: 'auto', paddingRight: '15px' }}>
-                    <h3 style={{ fontSize: '20px', fontWeight: 'bold', margin: 0, color: 'var(--color-text-primary)' }}>
+                  <div className="features-tour-content">
+                    <h3 className="features-tour-title">
                       {featuresTourData[activeTourIndex].title}
                     </h3>
 
-                    {/* Screenshot / Image Showcase */}
+                    {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
                     <div
-                      style={{
-                        width: '100%',
-                        maxWidth: '800px',
-                        height: '360px',
-                        background: 'var(--color-bg-subtle, rgba(255,255,255,0.01))',
-                        border: '1px dashed var(--color-border-default)',
-                        borderRadius: '12px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        overflow: 'hidden',
-                        position: 'relative',
-                        flexShrink: 0
-                      }}
+                      className="features-tour-showcase"
                       onClick={() => {
                         if (featuresTourData[activeTourIndex].image) {
                           setActiveLightboxUrl(featuresTourData[activeTourIndex].image);
@@ -1206,24 +992,24 @@ export default function AboutPage() {
                       }}
                     >
                       {featuresTourData[activeTourIndex].image ? (
-                        <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <div style={{ textAlign: 'center', padding: '25px', color: 'var(--color-text-muted)', position: 'absolute', zIndex: 1 }}>
-                            <span style={{ fontSize: '32px', display: 'block', marginBottom: '10px' }}>📷</span>
-                            <span style={{ fontSize: '12px', fontWeight: 600 }}>{t('about.docs_wizard.screenshot_placeholder') || 'Screenshot Placeholder'}</span>
-                            <span style={{ fontSize: '11px', display: 'block', color: 'var(--color-text-secondary)', marginTop: '6px' }}>{featuresTourData[activeTourIndex].title} ({featuresTourData[activeTourIndex].image})</span>
+                        <div className="features-tour-image-overlay">
+                          <div className="features-tour-placeholder-text-absolute">
+                            <span className="features-tour-placeholder-icon">{CAMERA_EMOJI}</span>
+                            <span className="features-tour-placeholder-label">{t('about.docs_wizard.screenshot_placeholder') || SCREENSHOT_PLACEHOLDER_FALLBACK}</span>
+                            <span className="features-tour-placeholder-sub">{featuresTourData[activeTourIndex].title}{OPEN_PAREN}{featuresTourData[activeTourIndex].image}{CLOSE_PAREN}</span>
                           </div>
                         </div>
                       ) : (
-                        <div style={{ textAlign: 'center', padding: '25px', color: 'var(--color-text-muted)' }}>
-                          <span style={{ fontSize: '32px', display: 'block', marginBottom: '10px' }}>📷</span>
-                          <span style={{ fontSize: '12px', fontWeight: 600 }}>{t('about.docs_wizard.screenshot_placeholder') || 'Screenshot Placeholder'}</span>
-                          <span style={{ fontSize: '11px', display: 'block', color: 'var(--color-text-secondary)', marginTop: '6px' }}>{featuresTourData[activeTourIndex].title}</span>
+                        <div className="features-tour-placeholder-text">
+                          <span className="features-tour-placeholder-icon">{CAMERA_EMOJI}</span>
+                          <span className="features-tour-placeholder-label">{t('about.docs_wizard.screenshot_placeholder') || SCREENSHOT_PLACEHOLDER_FALLBACK}</span>
+                          <span className="features-tour-placeholder-sub">{featuresTourData[activeTourIndex].title}</span>
                         </div>
                       )}
                     </div>
 
                     {/* Features / Details of the selected page */}
-                    <p style={{ fontSize: '14px', lineHeight: '1.7', color: 'var(--color-text-secondary)', margin: 0, whiteSpace: 'pre-wrap', maxWidth: '800px' }}>
+                    <p className="features-tour-desc">
                       {featuresTourData[activeTourIndex].description}
                     </p>
                   </div>
@@ -1290,43 +1076,43 @@ export default function AboutPage() {
                     <p className="special-thanks-intro">{t('about.notices.special_thanks_intro')}</p>
                     <div className="special-thanks-grid">
                       <div className="thanks-item">
-                        <span className="thanks-name">Silur</span>
+                        <span className="thanks-name">{SILUR_NAME}</span>
                         <div className="thanks-links">
                           <a href="https://github.com/Silur" className="thanks-link" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/Silur'); }}>
                             <GitHubIcon size={12} />
-                            <span>GitHub</span>
+                            <span>{GITHUB_LABEL}</span>
                           </a>
                         </div>
                       </div>
                       <div className="thanks-item">
-                        <span className="thanks-name">Kerrigan</span>
+                        <span className="thanks-name">{KERRIGAN_NAME}</span>
                         <div className="thanks-links">
                           <a href="https://github.com/rasztasd" className="thanks-link" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/rasztasd'); }}>
                             <GitHubIcon size={12} />
-                            <span>GitHub 1</span>
+                            <span>{t('about.docs_wizard.labels.github_1')}</span>
                           </a>
-                          <span className="thanks-divider">•</span>
+                          <span className="thanks-divider">{DOT_DIVIDER}</span>
                           <a href="https://github.com/danielmcallisterSG" className="thanks-link" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/danielmcallisterSG'); }}>
                             <GitHubIcon size={12} />
-                            <span>GitHub 2</span>
+                            <span>{t('about.docs_wizard.labels.github_2')}</span>
                           </a>
                         </div>
                       </div>
                       <div className="thanks-item">
-                        <span className="thanks-name">YaShock</span>
+                        <span className="thanks-name">{YASHOCK_NAME}</span>
                         <div className="thanks-links">
                           <a href="https://github.com/YaShock" className="thanks-link" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/YaShock'); }}>
                             <GitHubIcon size={12} />
-                            <span>GitHub</span>
+                            <span>{GITHUB_LABEL}</span>
                           </a>
                         </div>
                       </div>
                       <div className="thanks-item">
-                        <span className="thanks-name">Data</span>
+                        <span className="thanks-name">{DATA_NAME}</span>
                         <div className="thanks-links">
                           <a href="https://github.com/adamgyongyosi" className="thanks-link" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/adamgyongyosi'); }}>
                             <GitHubIcon size={12} />
-                            <span>GitHub</span>
+                            <span>{GITHUB_LABEL}</span>
                           </a>
                         </div>
                       </div>

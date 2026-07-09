@@ -141,7 +141,7 @@ export default function PerformerMixerTab({ person: initialPerson }) {
       if (bcs < 40) return 'MEDIUM';
       if (bcs < 50) return 'BIG';
       return 'EXTRA_BIG';
-    } catch (e) {
+    } catch {
       return null;
     }
   };
@@ -201,10 +201,10 @@ export default function PerformerMixerTab({ person: initialPerson }) {
         personId: person.id,
         routing: newRouting,
       });
-      toast(t('performer.mixer.routing_updated') || 'Metadata routing updated successfully!', 'success');
+      toast(t('library.performerEdit.mixer.routing_updated') || 'Metadata routing updated successfully!', 'success');
     } catch (err) {
       setLocalRouting(person?.field_routing || {});
-      toast(err.message || t('performer.mixer.routing_update_failed') || 'Failed to update routing', 'danger');
+      toast(err.message || t('library.performerEdit.mixer.routing_update_failed') || 'Failed to update routing', 'danger');
     }
   };
 
@@ -252,8 +252,8 @@ export default function PerformerMixerTab({ person: initialPerson }) {
                       <span className="mixer-cell-value">
                         {formattedAutoVal !== '-' ? (
                           <>
-                            <span className="mixer-cell-auto-label" style={{ opacity: 0.45, fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em', marginRight: '4px' }}>Auto: </span>
-                            <span className="mixer-cell-auto-value" style={{ fontWeight: 500 }}>{formattedAutoVal}</span>
+                            <span className="mixer-cell-auto-label">{t('library.performerEdit.custom.autoPrefix', { defaultValue: 'Auto: ' })}</span>
+                            <span className="mixer-cell-auto-value">{formattedAutoVal}</span>
                           </>
                         ) : (
                           t('library.performerEdit.defaultPriority') || 'Default Priority'

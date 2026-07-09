@@ -3,6 +3,7 @@
     "back": "Back",
     "forward": "Forward",
     "cancel": "Cancel",
+    "error": "Error",
     "close": "Close",
     "create": "Create",
     "default": "Default",
@@ -151,6 +152,22 @@
     "unwatched_studio_recommendation": "Fancy some more {{studio}}?",
     "unwatched_performer_recommendation": "Craving more {{performer}}?",
     "unwatched_library_recommendation": "Something fresh from your library:",
-    "all_scenes_watched": "You've watched it all!"
+    "all_scenes_watched": "You've watched it all!",
+    "watching_season_top": "You are watching this season",
+    "season_number": "Season {{season}}",
+    "rate_show_prompt": "Ready to rate the series?",
+    "peaks_recorded": "You marked {{count}} finish moments in this scene",
+    "continue_collection": "Continue your collection",
+    "unwatched_movie_recommendation": "A movie you haven't watched yet",
+    "what_to_watch": "What to Watch Next",
+    "series_completed": "You've finished this series!",
+    "replay_series": "Replay Series",
+    "all_movies_watched": "You've watched all your movies!",
+    "show_collection": "Back to Collection",
+    "surprise_me": "Surprise Me"
+  },
+  "widget": {
+    "failed_to_load": "Failed to load",
+    "unknown_error": "An unknown error occurred while loading this widget."
   }
 }

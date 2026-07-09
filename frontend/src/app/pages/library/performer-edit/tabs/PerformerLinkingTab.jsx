@@ -228,7 +228,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
         }
       }, 8000);
     } catch (err) {
-      toast(err.message || t('performer.linking.link_source_failed') || 'Failed to link source', 'danger');
+      toast(err.message || t('library.performerEdit.linking.link_source_failed') || 'Failed to link source', 'danger');
       setLinkingSource(null);
       setIsWaitingForImage(false);
       showSuccessToastPendingRef.current = false;
@@ -238,11 +238,11 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
   const executeDelete = () => {
     deleteMutation.mutate(personId, {
       onSuccess: () => {
-        toast(t('performer.linking.performer_deleted') || 'Performer removed from database successfully.', 'success');
+        toast(t('library.performerEdit.linking.performer_deleted') || 'Performer removed from database successfully.', 'success');
         navigate('/library', { replace: true });
       },
       onError: (err) => {
-        toast(err.message || t('performer.linking.delete_performer_failed') || 'Failed to delete performer', 'danger');
+        toast(err.message || t('library.performerEdit.linking.delete_performer_failed') || 'Failed to delete performer', 'danger');
       },
       onSettled: () => {
         setShowDeleteConfirm(false);

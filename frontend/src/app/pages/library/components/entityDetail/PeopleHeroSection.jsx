@@ -11,7 +11,6 @@ import { useTranslation } from '@/providers/LanguageContext';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import './EntityDetailHeroSection.css';
 
-const TIMES_CHAR = '\u00d7';
 const DASH_CHAR = ' - ';
 const CM_CHAR = ' cm';
 const KG_CHAR = ' kg';

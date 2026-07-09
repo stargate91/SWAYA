@@ -2,7 +2,6 @@
 import { toTitleCase, formatListAttr } from '../../utils/heroSectionUtils';
 import Drawer from '@/ui/Drawer';
 
-const TIMES_CHAR = '\u00d7';
 const DASH_CHAR = ' - ';
 const CM_CHAR = ' cm';
 const KG_CHAR = ' kg';
