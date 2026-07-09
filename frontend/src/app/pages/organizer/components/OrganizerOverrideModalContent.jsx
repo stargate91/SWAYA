@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import Dropdown from '../../../ui/Dropdown';
 import SelectableCard from '../../../ui/SelectableCard';
+import Radio from '../../../ui/Radio';
 import { useTranslation } from '../../../providers/LanguageContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUpdateMediaMutation, getOrganizerQueryKey } from '../../../queries';
@@ -327,16 +328,14 @@ export default function OrganizerOverrideModalContent({ row, onClose, toast, sca
               selected={matchAction === 'keep'}
               onClick={() => setMatchAction('keep')}
             >
-              <label className="match-action-option__radio-label">
-                <input
-                  type="radio"
-                  name="matchAction"
-                  checked={matchAction === 'keep'}
-                  onChange={() => setMatchAction('keep')}
-                  className="match-action-option__radio-input"
-                />
+              <Radio
+                name="matchAction"
+                checked={matchAction === 'keep'}
+                onChange={() => setMatchAction('keep')}
+                className="match-action-option__radio-label"
+              >
                 {t('organizer.overrideModal.matchAction.keep') || 'Keep current tv match'}
-              </label>
+              </Radio>
               <span className="match-action-option__description">
                 {t('organizer.overrideModal.matchAction.keepDesc') || 'Update season/episode under the tv.'}
               </span>
@@ -348,16 +347,14 @@ export default function OrganizerOverrideModalContent({ row, onClose, toast, sca
               selected={matchAction === 'reset'}
               onClick={() => setMatchAction('reset')}
             >
-              <label className="match-action-option__radio-label">
-                <input
-                  type="radio"
-                  name="matchAction"
-                  checked={matchAction === 'reset'}
-                  onChange={() => setMatchAction('reset')}
-                  className="match-action-option__radio-input"
-                />
+              <Radio
+                name="matchAction"
+                checked={matchAction === 'reset'}
+                onChange={() => setMatchAction('reset')}
+                className="match-action-option__radio-label"
+              >
                 {t('organizer.overrideModal.matchAction.reset') || 'Reset match (Pending)'}
-              </label>
+              </Radio>
               <span className="match-action-option__description">
                 {t('organizer.overrideModal.matchAction.resetDesc') || 'Remove match and return to Review Needed.'}
               </span>

@@ -3,6 +3,7 @@ import { Minus } from '@/ui/icons';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import { useSettingsQuery } from '@/queries';
 import CardMetadata from '@/ui/CardMetadata';
+import Badge from '@/ui/Badge';
 import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
 
 export const TagPosterCard = memo(({
@@ -82,9 +83,9 @@ export const TagPosterCard = memo(({
         )}
         {shouldBlur && (
           <div className="recommend-card-blur-overlay">
-            <span className="settings-badge settings-badge--danger">
+            <Badge family="adult" tone="danger">
               {t('common.adult_badge', { defaultValue: '18+' })}
-            </span>
+            </Badge>
           </div>
         )}
       </div>

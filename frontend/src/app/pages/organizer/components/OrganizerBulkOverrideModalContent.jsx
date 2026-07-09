@@ -5,6 +5,8 @@ import Input from '../../../ui/Input';
 import SelectableCard from '../../../ui/SelectableCard';
 import IconButton from '../../../ui/IconButton';
 import Tooltip from '../../../ui/Tooltip';
+import Checkbox from '../../../ui/Checkbox';
+import Radio from '../../../ui/Radio';
 import { useTranslation } from '../../../providers/LanguageContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { useBulkUpdateMediaMutation, getOrganizerQueryKey } from '../../../queries';
@@ -514,15 +516,13 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
         {/* Auto-numbering and sorting panel checkbox (Only for Episodes) */}
         {mainType === 'episode' && (
           <div className={`organizer-override-bulk-episodes${isSidebarActive ? ' organizer-override-bulk-episodes--sidebar-active' : ''}`}>
-            <label className="organizer-override-field__checkbox-label organizer-override-bulk-episodes__header-check">
-              <input
-                type="checkbox"
-                checked={applyAutoNumbering}
-                onChange={(e) => setApplyAutoNumbering(e.target.checked)}
-                className="ui-checkbox"
-              />
+            <Checkbox
+              checked={applyAutoNumbering}
+              onChange={(e) => setApplyAutoNumbering(e.target.checked)}
+              className="organizer-override-field__checkbox-label organizer-override-bulk-episodes__header-check"
+            >
               <span className="organizer-override-field__label-text font-semibold">{t('organizer.overrideModal.labels.autoNumberCheck')}</span>
-            </label>
+            </Checkbox>
           </div>
         )}
 
@@ -542,16 +542,14 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
                 selected={matchAction === 'keep'}
                 onClick={() => setMatchAction('keep')}
               >
-                <label className="match-action-option__radio-label">
-                  <input
-                    type="radio"
-                    name="bulkMatchAction"
-                    checked={matchAction === 'keep'}
-                    onChange={() => setMatchAction('keep')}
-                    className="match-action-option__radio-input"
-                  />
+                <Radio
+                  name="bulkMatchAction"
+                  checked={matchAction === 'keep'}
+                  onChange={() => setMatchAction('keep')}
+                  className="match-action-option__radio-label"
+                >
                   {t('organizer.overrideModal.matchAction.keep') || 'Keep current tv match'}
-                </label>
+                </Radio>
                 <span className="match-action-option__description">
                   {t('organizer.overrideModal.matchAction.keepDesc') || 'Update season/episode under the tv.'}
                 </span>
@@ -563,16 +561,14 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
                 selected={matchAction === 'reset'}
                 onClick={() => setMatchAction('reset')}
               >
-                <label className="match-action-option__radio-label">
-                  <input
-                    type="radio"
-                    name="bulkMatchAction"
-                    checked={matchAction === 'reset'}
-                    onChange={() => setMatchAction('reset')}
-                    className="match-action-option__radio-input"
-                  />
+                <Radio
+                  name="bulkMatchAction"
+                  checked={matchAction === 'reset'}
+                  onChange={() => setMatchAction('reset')}
+                  className="match-action-option__radio-label"
+                >
                   {t('organizer.overrideModal.matchAction.reset') || 'Reset match (Pending)'}
-                </label>
+                </Radio>
                 <span className="match-action-option__description">
                   {t('organizer.overrideModal.matchAction.resetDesc') || 'Remove match and return to Review Needed.'}
                 </span>

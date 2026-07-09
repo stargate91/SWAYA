@@ -80,22 +80,6 @@
   display: none;
 }
 
-.settings-badge {
-  font-size: 12px;
-  font-weight: bold;
-  padding: 0.125rem var(--space-sm);
-  border-radius: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  line-height: 1.2;
-}
-
-.settings-badge--danger {
-  background: var(--color-state-danger-bg-strong);
-  color: var(--settings-danger-text);
-  border: 1.5px solid var(--settings-danger-text);
-}
-
 .settings-alert {
   display: flex;
   align-items: center;

@@ -619,6 +619,7 @@
 .organizer-override-field__checkbox-label {
   display: inline-flex;
   align-items: center;
+  justify-content: flex-start !important;
   gap: var(--space-2);
   cursor: pointer;
   user-select: none;

@@ -606,14 +606,4 @@
   top: -0.8em;
   position: relative;
   user-select: none;
-}
-
-.ratings-title-adult-badge {
-  font-size: inherit;
-  letter-spacing: normal;
-  border-radius: 4px;
-  padding: 2px 6px;
-  height: auto;
-  min-height: 0;
-  line-height: 1;
-}
+}

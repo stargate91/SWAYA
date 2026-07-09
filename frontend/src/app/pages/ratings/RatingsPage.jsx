@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { Star, Heart, Edit3, Clapperboard, Tv, Video, Users, CheckCircle, Search } from '@/ui/icons';
 import Page from '@/ui/Page';
+import Badge from '@/ui/Badge';
 import Table from '@/ui/Table';
 import { Tabs } from '@/ui/Tabs';
 import Button from '@/ui/Button';
@@ -228,9 +229,9 @@ export default function RatingsPage() {
                   {t('ratings.title') || 'Ratings & Reviews'}
                   {isAdultMode && (
                     <sup className="ratings-title-sup">
-                      <span className="settings-badge settings-badge--danger ratings-title-adult-badge">
+                      <Badge family="adult" tone="danger" className="ratings-title-adult-badge">
                         {t('common.adult_badge', { defaultValue: '18+' })}
-                      </span>
+                      </Badge>
                     </sup>
                   )}
                 </span>

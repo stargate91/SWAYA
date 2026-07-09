@@ -1,6 +1,7 @@
 import { Search } from '@/ui/icons';
 import { Tabs } from '../../ui/Tabs';
 import Input from '../../ui/Input';
+import Badge from '../../ui/Badge';
 import { useTranslation } from '@/providers/LanguageContext';
 
 export default function OrganizerHeaderPanel({
@@ -30,9 +31,9 @@ export default function OrganizerHeaderPanel({
           {title}
           {sessionMode === 'nsfw' && (
             <sup className="organizer-panel__adult-sup">
-              <span className="settings-badge settings-badge--danger organizer-panel__adult-badge-override">
+              <Badge family="adult" tone="danger" className="organizer-panel__adult-badge-override">
                 {t('common.adult_badge', { defaultValue: '18+' })}
-              </span>
+              </Badge>
             </sup>
           )}
         </span>

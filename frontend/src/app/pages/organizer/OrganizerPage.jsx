@@ -39,28 +39,7 @@ export default function OrganizerPage() {
   const scanStatus = scanStatusQuery.data || null;
   const settings = settingsQuery.data || EMPTY_SETTINGS;
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
-  const [scanMode, setScanMode] = useState('movies_tv');
-  const organizerQuery = useOrganizerQuery(scanMode, sessionMode);
-  const organizer = organizerQuery.data || EMPTY_ORGANIZER;
-  const organizerCountQuery = useOrganizerCountQuery(scanMode, sessionMode);
-  const [provider, setProvider] = useState('tmdb');
-  const providerOptions = useMemo(() => getOrganizerProviderOptions(scanMode, settings), [scanMode, settings]);
-  const [utilityBarTarget, setUtilityBarTarget] = useState(null);
 
-  const [prevScanMode, setPrevScanMode] = useState(scanMode);
-  const [prevProviderOptions, setPrevProviderOptions] = useState(providerOptions);
-
-  if (prevScanMode !== scanMode || prevProviderOptions !== providerOptions) {
-    setPrevScanMode(scanMode);
-    setPrevProviderOptions(providerOptions);
-    const fallbackProvider = scanMode === 'scenes' ? 'stashdb' : 'tmdb';
-    setProvider((current) => getFirstEnabledProvider(providerOptions, current || fallbackProvider));
-  }
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setUtilityBarTarget(document.getElementById('shell-utility-bar-center'));
-  }, []);
   const scanModeOptions = useMemo(() => {
     const hasTmdb = Boolean(String(settings.tmdb_api_key || '').trim());
     const hasPornDb = Boolean(String(settings.porndb_api_key || settings.porndb_api_token || '').trim());
@@ -86,15 +65,38 @@ export default function OrganizerPage() {
     ];
   }, [sessionMode, settings, t]);
 
-  useEffect(() => {
-    const currentOption = scanModeOptions.find((option) => option.value === scanMode);
-    if (!currentOption || currentOption.disabled) {
-      const firstEnabled = scanModeOptions.find((option) => !option.disabled);
-      if (firstEnabled) {
-        setScanMode(firstEnabled.value);
-      }
+  const [scanMode, setScanMode] = useState('movies_tv');
+
+  // Adjust scanMode if the current option is disabled or invalid
+  const currentOption = scanModeOptions.find((option) => option.value === scanMode);
+  if (!currentOption || currentOption.disabled) {
+    const firstEnabled = scanModeOptions.find((option) => !option.disabled);
+    if (firstEnabled) {
+      setScanMode(firstEnabled.value);
     }
-  }, [scanMode, scanModeOptions]);
+  }
+
+  const organizerQuery = useOrganizerQuery(scanMode, sessionMode);
+  const organizer = organizerQuery.data || EMPTY_ORGANIZER;
+  const organizerCountQuery = useOrganizerCountQuery(scanMode, sessionMode);
+  const [provider, setProvider] = useState('tmdb');
+  const providerOptions = useMemo(() => getOrganizerProviderOptions(scanMode, settings), [scanMode, settings]);
+  const [utilityBarTarget, setUtilityBarTarget] = useState(null);
+
+  const [prevScanMode, setPrevScanMode] = useState(scanMode);
+  const [prevProviderOptions, setPrevProviderOptions] = useState(providerOptions);
+
+  if (prevScanMode !== scanMode || prevProviderOptions !== providerOptions) {
+    setPrevScanMode(scanMode);
+    setPrevProviderOptions(providerOptions);
+    const fallbackProvider = scanMode === 'scenes' ? 'stashdb' : 'tmdb';
+    setProvider((current) => getFirstEnabledProvider(providerOptions, current || fallbackProvider));
+  }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setUtilityBarTarget(document.getElementById('shell-utility-bar-center'));
+  }, []);
   const isScanActive = Boolean(scanStatus?.active);
   const rawOrganizerItemCount = organizerCountQuery.data?.count ?? null;
   const organizerItemCount = rawOrganizerItemCount == null ? null : Number(rawOrganizerItemCount);

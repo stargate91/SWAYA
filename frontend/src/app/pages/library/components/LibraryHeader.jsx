@@ -4,6 +4,7 @@ import { Tabs } from '@/ui/Tabs';
 import Input from '@/ui/Input';
 import Button from '@/ui/Button';
 import Dropdown from '@/ui/Dropdown';
+import Badge from '@/ui/Badge';
 import { isLibraryPeopleTab, isLibraryTagsTab } from '@/lib/libraryTabs';
 
 const SearchInput = React.memo(({ placeholder, onSearchChange }) => {
@@ -65,9 +66,9 @@ export default function LibraryHeader({
           {pageTitle || t('library.title')}
           {!pageTitle && activeSessionMode === 'nsfw' && (
             <sup className="library-nsfw-badge-sup">
-              <span className="settings-badge settings-badge--danger library-nsfw-badge-span">
+              <Badge family="adult" tone="danger" className="library-nsfw-badge-span">
                 {t('common.adult_badge', { defaultValue: '18+' })}
-              </span>
+              </Badge>
             </sup>
           )}
         </span>

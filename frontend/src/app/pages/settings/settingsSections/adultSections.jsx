@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-no-literals, i18next/no-literal-string */
 import Inline from '@/ui/Inline';
+import Badge from '@/ui/Badge';
 import SettingsInstructionsBox from '../components/SettingsInstructionsBox.jsx';
 
 export function createAdultGeneralSection(t, adultGenderPreferenceOptions) {
@@ -16,9 +17,9 @@ export function createAdultGeneralSection(t, adultGenderPreferenceOptions) {
         children: (
           <Inline gap="sm" align="center" className="settings-inline-switch">
             <span>{t('settingsPage.sections.adult.includeAdult')}</span>
-            <span className="settings-badge settings-badge--danger">
+            <Badge family="adult" tone="danger">
               {t('settingsPage.sections.adult.eighteenPlus')}
-            </span>
+            </Badge>
           </Inline>
         ),
       },
