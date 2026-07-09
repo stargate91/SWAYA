@@ -12,76 +12,25 @@ import OverrideExtraFields from './OverrideExtraFields';
 
 
 import {
-  SUBCATEGORIES_BY_CATEGORY,
-  LANGUAGE_OPTIONS,
-  SOURCE_OPTIONS,
-  EDITION_OPTIONS,
-  AUDIO_TYPE_OPTIONS,
-  MAIN_TYPE_OPTIONS,
+  useTranslatedOverrideOptions,
 } from './overrideConstants';
 
 export default function OrganizerOverrideModalContent({ row, onClose, toast, scanMode, sessionMode }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 
-  const translatedLanguageOptions = useMemo(() =>
-    LANGUAGE_OPTIONS.map((opt) => ({
-      ...opt,
-      label: t(`languages.${opt.value}`) || opt.label,
-    })),
-    [t]
-  );
+  const isScenesMode = row.rawPayload?.scan_mode === 'scenes' || row.rawPayload?.parent_scan_mode === 'scenes';
+  const {
+    translatedLanguageOptions,
+    translatedSubcategoriesByCategory,
+    translatedSourceOptions,
+    translatedEditionOptions,
+    translatedAudioTypeOptions,
+    translatedMainTypeOptions,
+  } = useTranslatedOverrideOptions(t, isScenesMode);
+
   const isExtra = row.rawType === 'extra';
   const category = isExtra ? (row.rawPayload?.category || 'video') : 'video';
-
-  const translatedSubcategoriesByCategory = useMemo(() => {
-    const result = {};
-    Object.keys(SUBCATEGORIES_BY_CATEGORY).forEach((catKey) => {
-      result[catKey] = SUBCATEGORIES_BY_CATEGORY[catKey].map((opt) => ({
-        ...opt,
-        label: t(`organizer.overrideModal.options.subcategories.${opt.value}`) || opt.label,
-      }));
-    });
-    return result;
-  }, [t]);
-
-  const translatedSourceOptions = useMemo(() =>
-    SOURCE_OPTIONS.map((opt) => ({
-      ...opt,
-      label: t(`organizer.overrideModal.options.sources.${opt.value}`) || opt.label,
-    })),
-    [t]
-  );
-
-  const translatedEditionOptions = useMemo(() =>
-    EDITION_OPTIONS.map((opt) => ({
-      ...opt,
-      label: t(`organizer.overrideModal.options.editions.${opt.value}`) || opt.label,
-    })),
-    [t]
-  );
-
-  const translatedAudioTypeOptions = useMemo(() =>
-    AUDIO_TYPE_OPTIONS.map((opt) => ({
-      ...opt,
-      label: t(`organizer.overrideModal.options.audioTypes.${opt.value}`) || opt.label,
-    })),
-    [t]
-  );
-
-  const translatedMainTypeOptions = useMemo(() => {
-    const isScenesMode = row.rawPayload?.scan_mode === 'scenes' || row.rawPayload?.parent_scan_mode === 'scenes';
-    if (isScenesMode) {
-      return [
-        { value: 'scene', label: t('organizer.overrideModal.options.mainTypes.scene') || 'Scene' },
-        { value: 'bonus', label: t('organizer.overrideModal.options.mainTypes.bonus') || 'Bonus Video' },
-      ];
-    }
-    return MAIN_TYPE_OPTIONS.map((opt) => ({
-      ...opt,
-      label: t(`organizer.overrideModal.options.mainTypes.${opt.value}`) || opt.label,
-    }));
-  }, [t, row.rawPayload]);
 
   // Get parent candidates (movies + tv) from cache
   const organizer = queryClient.getQueryData(getOrganizerQueryKey(scanMode, sessionMode)) || {};

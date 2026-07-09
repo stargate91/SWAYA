@@ -60,13 +60,20 @@ export const getBackdropImagePath = (item) => pickFirstImagePath(
 
 export const resolveMediaImageUrl = (path, imageType = 'poster', apiBase = API_BASE) => {
   if (!path) return '';
-  const pathStr = String(path);
+  let pathStr = String(path);
+  if (pathStr.startsWith('//')) {
+    pathStr = `https:${pathStr}`;
+  }
+  if (pathStr.startsWith(apiBase) || pathStr.startsWith('http://localhost') || pathStr.startsWith('http://127.0.0.1')) {
+    return pathStr;
+  }
   const isOriginalType = imageType === 'backdrop' || imageType === 'logo' || imageType === 'originalPoster' || imageType === 'originalStill' || imageType === 'originalPerson' || imageType === 'originalSceneStill';
-  if (pathStr.startsWith('/media/') || pathStr.startsWith('/api/')) {
-    if (isOriginalType && pathStr.includes('/thumbnails/')) {
-      return `${apiBase}${pathStr.replace('/thumbnails/', '/original/')}`;
+  if (pathStr.startsWith('/media/') || pathStr.startsWith('/api/') || pathStr.startsWith('media/')) {
+    const relPath = pathStr.startsWith('media/') ? `/${pathStr}` : pathStr;
+    if (isOriginalType && relPath.includes('/thumbnails/')) {
+      return `${apiBase}${relPath.replace('/thumbnails/', '/original/')}`;
     }
-    return `${apiBase}${path}`;
+    return `${apiBase}${relPath}`;
   }
   if (pathStr.startsWith('http://') || pathStr.startsWith('https://')) {
     if (pathStr.includes('image.tmdb.org/t/p/')) {
@@ -79,13 +86,13 @@ export const resolveMediaImageUrl = (path, imageType = 'poster', apiBase = API_B
           return `${parts[0]}/t/p/${size}/${rest}`;
         }
       }
-      return path;
+      return pathStr;
     }
-    return `${apiBase}/api/v1/media/image-proxy?url=${encodeURIComponent(path)}`;
+    return `${apiBase}/api/v1/media/image-proxy?url=${encodeURIComponent(pathStr)}`;
   }
-  if (String(path).startsWith('/')) {
+  if (pathStr.startsWith('/')) {
     const size = TMDB_IMAGE_SIZES[imageType] || TMDB_IMAGE_SIZES.poster;
-    return buildTmdbImageUrl(path, size);
+    return buildTmdbImageUrl(pathStr, size);
   }
 
   const normalizedPath = String(path).replace(/^\/+/, '');

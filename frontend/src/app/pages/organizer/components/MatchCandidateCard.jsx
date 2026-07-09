@@ -39,26 +39,6 @@ const getDisplayYear = (candidate, mediaType) => {
   return startYear;
 };
 
-const getImageUrl = (path, mediaType) => {
-  if (!path) return '';
-  const pathStr = String(path);
-
-  if (pathStr.startsWith(API_BASE) || pathStr.startsWith('http://localhost') || pathStr.startsWith('http://127.0.0.1')) {
-    return pathStr;
-  }
-
-  if (pathStr.startsWith('/media/') || pathStr.startsWith('media/')) {
-    return resolveMediaImageUrl(path, mediaType === 'scene' ? 'backdrop' : 'poster', API_BASE);
-  }
-
-  if (pathStr.startsWith('http://') || pathStr.startsWith('https://') || pathStr.startsWith('//')) {
-    const url = pathStr.startsWith('//') ? `https:${pathStr}` : pathStr;
-    return `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(url)}`;
-  }
-
-  return resolveMediaImageUrl(path, mediaType === 'scene' ? 'backdrop' : 'poster', API_BASE);
-};
-
 export default function MatchCandidateCard({
   candidate,
   sourceLabel,
@@ -74,7 +54,7 @@ export default function MatchCandidateCard({
   const displayTitle = getDisplayTitle(candidate, mediaType, t);
   const displayYear = getDisplayYear(candidate, mediaType);
   const candidateId = candidate.tmdb_id || candidate.id;
-  const posterUrl = getImageUrl(candidate.poster_path, mediaType);
+  const posterUrl = resolveMediaImageUrl(candidate.poster_path, mediaType === 'scene' ? 'backdrop' : 'poster');
   const isDisabled = isResolvingId === candidateId || isBrowserLoading;
   const [prevPosterUrl, setPrevPosterUrl] = useState(posterUrl);
   const [imageError, setImageError] = useState(false);

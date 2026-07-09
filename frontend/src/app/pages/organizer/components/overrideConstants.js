@@ -102,3 +102,77 @@ export const MAIN_TYPE_OPTIONS = [
   { value: 'episode', label: 'Episode' },
   { value: 'bonus', label: 'Bonus Video' },
 ];
+
+import { useMemo } from 'react';
+
+export function useTranslatedOverrideOptions(t, isScenesMode = false) {
+  const translate = (key, fallback) => {
+    const val = t(key);
+    return (val && val !== key) ? val : fallback;
+  };
+
+  const translatedLanguageOptions = useMemo(() =>
+    LANGUAGE_OPTIONS.map((opt) => ({
+      ...opt,
+      label: translate(`languages.${opt.value}`, opt.label),
+    })),
+    [t]
+  );
+
+  const translatedSubcategoriesByCategory = useMemo(() => {
+    const result = {};
+    Object.keys(SUBCATEGORIES_BY_CATEGORY).forEach((catKey) => {
+      result[catKey] = SUBCATEGORIES_BY_CATEGORY[catKey].map((opt) => ({
+        ...opt,
+        label: translate(`organizer.overrideModal.options.subcategories.${opt.value}`, opt.label),
+      }));
+    });
+    return result;
+  }, [t]);
+
+  const translatedSourceOptions = useMemo(() =>
+    SOURCE_OPTIONS.map((opt) => ({
+      ...opt,
+      label: translate(`organizer.overrideModal.options.sources.${opt.value}`, opt.label),
+    })),
+    [t]
+  );
+
+  const translatedEditionOptions = useMemo(() =>
+    EDITION_OPTIONS.map((opt) => ({
+      ...opt,
+      label: translate(`organizer.overrideModal.options.editions.${opt.value}`, opt.label),
+    })),
+    [t]
+  );
+
+  const translatedAudioTypeOptions = useMemo(() =>
+    AUDIO_TYPE_OPTIONS.map((opt) => ({
+      ...opt,
+      label: translate(`organizer.overrideModal.options.audioTypes.${opt.value}`, opt.label),
+    })),
+    [t]
+  );
+
+  const translatedMainTypeOptions = useMemo(() => {
+    if (isScenesMode) {
+      return [
+        { value: 'scene', label: translate('organizer.overrideModal.options.mainTypes.scene', 'Scene') },
+        { value: 'bonus', label: translate('organizer.overrideModal.options.mainTypes.bonus', 'Bonus Video') },
+      ];
+    }
+    return MAIN_TYPE_OPTIONS.map((opt) => ({
+      ...opt,
+      label: translate(`organizer.overrideModal.options.mainTypes.${opt.value}`, opt.label),
+    }));
+  }, [t, isScenesMode]);
+
+  return {
+    translatedLanguageOptions,
+    translatedSubcategoriesByCategory,
+    translatedSourceOptions,
+    translatedEditionOptions,
+    translatedAudioTypeOptions,
+    translatedMainTypeOptions,
+  };
+}

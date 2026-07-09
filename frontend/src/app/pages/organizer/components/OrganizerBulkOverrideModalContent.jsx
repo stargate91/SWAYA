@@ -14,12 +14,7 @@ import BulkOverrideFieldRow from './BulkOverrideFieldRow';
 
 
 import {
-  SUBCATEGORIES_BY_CATEGORY,
-  LANGUAGE_OPTIONS,
-  SOURCE_OPTIONS,
-  EDITION_OPTIONS,
-  AUDIO_TYPE_OPTIONS,
-  MAIN_TYPE_OPTIONS,
+  useTranslatedOverrideOptions,
 } from './overrideConstants';
 
 const DOT = '.';
@@ -37,74 +32,19 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
   const [mainType, setMainType] = useState(initialMainType);
   const [applyMainType, setApplyMainType] = useState(false);
 
-  // Options Translations
-  const translatedLanguageOptions = useMemo(() =>
-    LANGUAGE_OPTIONS.map((opt) => {
-      const key = `languages.${opt.value}`;
-      const val = t(key);
-      return {
-        ...opt,
-        label: val === key ? opt.label : val,
-      };
-    }),
-    [t]
-  );
-
-  const translatedSubcategoriesByCategory = useMemo(() => {
-    const result = {};
-    Object.keys(SUBCATEGORIES_BY_CATEGORY).forEach((catKey) => {
-      result[catKey] = SUBCATEGORIES_BY_CATEGORY[catKey].map((opt) => {
-        const key = `organizer.overrideModal.options.subcategories.${opt.value}`;
-        const val = t(key);
-        return {
-          ...opt,
-          label: val === key ? opt.label : val,
-        };
-      });
-    });
-    return result;
-  }, [t]);
-
-  const translatedSourceOptions = useMemo(() =>
-    SOURCE_OPTIONS.map((opt) => {
-      const key = `organizer.overrideModal.options.sources.${opt.value}`;
-      const val = t(key);
-      return {
-        ...opt,
-        label: val === key ? opt.label : val,
-      };
-    }),
-    [t]
-  );
-
-  const translatedEditionOptions = useMemo(() =>
-    EDITION_OPTIONS.map((opt) => {
-      const key = `organizer.overrideModal.options.editions.${opt.value}`;
-      const val = t(key);
-      return {
-        ...opt,
-        label: val === key ? opt.label : val,
-      };
-    }),
-    [t]
-  );
-
-  const translatedAudioTypeOptions = useMemo(() =>
-    AUDIO_TYPE_OPTIONS.map((opt) => {
-      const key = `organizer.overrideModal.options.audioTypes.${opt.value}`;
-      const val = t(key);
-      return {
-        ...opt,
-        label: val === key ? opt.label : val,
-      };
-    }),
-    [t]
-  );
-
   const isScenesMode = useMemo(() =>
     rows.some((r) => r.rawPayload?.scan_mode === 'scenes' || r.rawPayload?.parent_scan_mode === 'scenes'),
     [rows]
   );
+
+  const {
+    translatedLanguageOptions,
+    translatedSubcategoriesByCategory,
+    translatedSourceOptions,
+    translatedEditionOptions,
+    translatedAudioTypeOptions,
+    translatedMainTypeOptions,
+  } = useTranslatedOverrideOptions(t, isScenesMode);
 
   const hideLanguage = useMemo(() => {
     const hasAdultMatch = rows.some((r) => {
@@ -113,23 +53,6 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
     });
     return isScenesMode || hasAdultMatch;
   }, [rows, isScenesMode]);
-
-  const translatedMainTypeOptions = useMemo(() => {
-    if (isScenesMode) {
-      return [
-        { value: 'scene', label: t('organizer.overrideModal.options.mainTypes.scene') || 'Scene' },
-        { value: 'bonus', label: t('organizer.overrideModal.options.mainTypes.bonus') || 'Bonus Video' },
-      ];
-    }
-    return MAIN_TYPE_OPTIONS.map((opt) => {
-      const key = `organizer.overrideModal.options.mainTypes.${opt.value}`;
-      const val = t(key);
-      return {
-        ...opt,
-        label: val === key ? opt.label : val,
-      };
-    });
-  }, [t, isScenesMode]);
 
   const subcategoryList = translatedSubcategoriesByCategory[mainType === 'bonus' ? 'video' : category] || [];
 

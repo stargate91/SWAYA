@@ -2,17 +2,8 @@ import { Clapperboard } from '@/ui/icons';
 import Badge from '../../../ui/Badge';
 import PosterCard from '../../../ui/PosterCard';
 import CardMetadata from '../../../ui/CardMetadata';
-import { buildTmdbImageUrl, TMDB_IMAGE_SIZES } from '@/lib/imageUrls';
+import { resolveMediaImageUrl, TMDB_IMAGE_SIZES } from '@/lib/imageUrls';
 import { API_BASE } from '@/lib/backend';
-
-const getImageUrl = (path, size = TMDB_IMAGE_SIZES.posterThumb) => {
-  if (!path) return '';
-  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('//')) {
-    const url = path.startsWith('//') ? `https:${path}` : path;
-    return `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(url)}`;
-  }
-  return buildTmdbImageUrl(path, size);
-};
 
 export default function MatchSeasonCard({
   seasonEntry,
@@ -21,7 +12,7 @@ export default function MatchSeasonCard({
   isActive = false,
   t,
 }) {
-  const posterUrl = getImageUrl(seasonEntry.poster_path, TMDB_IMAGE_SIZES.posterThumb);
+  const posterUrl = resolveMediaImageUrl(seasonEntry.poster_path, 'posterThumb');
   const displayTitle = seasonEntry.name || t('organizer.details.matchModal.seasonNum').replace('{number}', seasonEntry.season_number);
   
   const year = seasonEntry.air_date ? String(seasonEntry.air_date).slice(0, 4) : null;
