@@ -444,6 +444,51 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     }
   }, [libraryData?.items, currentPage, paginationMode, isServerPaged]);
 
+  useEffect(() => {
+    if (paginationMode !== 'infinite') return;
+
+    const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
+      if (event.type === 'updated' && event.query.queryKey[0] === 'library') {
+        const queryData = event.query.state.data;
+        if (queryData?.items) {
+          setAccumulatedItems((prev) => {
+            const freshMap = new Map(queryData.items.map(item => [item.id, item]));
+            let changed = false;
+            const updated = prev.map(item => {
+              if (freshMap.has(item.id)) {
+                const freshItem = freshMap.get(item.id);
+                if (
+                  item.poster_path !== freshItem.poster_path ||
+                  item.displayPoster !== freshItem.displayPoster ||
+                  item.profile_path !== freshItem.profile_path ||
+                  item.local_profile_path !== freshItem.local_profile_path ||
+                  item.local_poster_path !== freshItem.local_poster_path ||
+                  item.tv_poster_path !== freshItem.tv_poster_path
+                ) {
+                  changed = true;
+                  return {
+                    ...item,
+                    poster_path: freshItem.poster_path,
+                    displayPoster: freshItem.displayPoster,
+                    profile_path: freshItem.profile_path,
+                    local_profile_path: freshItem.local_profile_path,
+                    local_poster_path: freshItem.local_poster_path,
+                    tv_poster_path: freshItem.tv_poster_path,
+                  };
+                }
+              }
+              return item;
+            });
+            return changed ? updated : prev;
+          });
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, [queryClient, paginationMode]);
+
+
   const { sortedItems, paginatedItems, totalItems, totalPages } = useMemo(() => {
     if (isServerPaged) {
       return {
