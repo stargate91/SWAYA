@@ -377,3 +377,123 @@
 .recommend-card:hover .ui-icon-button--play-overlay:disabled {
   opacity: 0.48;
 }
+
+/* UI Split Button */
+.ui-split-button {
+  display: inline-flex;
+  align-items: stretch;
+  position: relative;
+  border-radius: var(--radius-input);
+  overflow: visible;
+  transition: all var(--motion-fast);
+}
+
+.ui-split-button:hover:not(.is-disabled) {
+  transform: translateY(var(--motion-lift-distance-sm));
+}
+
+.ui-split-button--primary {
+  background: var(--button-primary-bg);
+  box-shadow: var(--button-primary-shadow);
+}
+
+.ui-split-button--primary:hover:not(.is-disabled) {
+  filter: var(--button-primary-hover-filter);
+}
+
+.ui-split-button--secondary {
+  background: var(--button-secondary-bg);
+  border: 1px solid var(--button-secondary-border);
+}
+
+.ui-split-button--secondary:hover:not(.is-disabled) {
+  background: var(--button-secondary-hover-bg);
+}
+
+.ui-split-button__action {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  height: 100% !important;
+  cursor: pointer;
+  transform: none !important; /* disable hover translation on child */
+}
+
+.ui-split-button--primary .ui-split-button__action {
+  color: var(--button-primary-color) !important;
+  border-right: 1px solid color-mix(in srgb, white 15%, transparent) !important;
+}
+
+.ui-split-button--secondary .ui-split-button__action {
+  color: var(--button-secondary-color) !important;
+  border-right: 1px solid var(--button-secondary-border) !important;
+}
+
+.ui-split-button__arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  background: transparent;
+  border: none;
+  border-top-right-radius: var(--radius-input);
+  border-bottom-right-radius: var(--radius-input);
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+  transition: background-color var(--motion-fast);
+}
+
+.ui-split-button--primary .ui-split-button__arrow {
+  color: var(--button-primary-color);
+}
+
+.ui-split-button--primary .ui-split-button__arrow:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.ui-split-button--secondary .ui-split-button__arrow {
+  color: var(--button-secondary-color);
+}
+
+.ui-split-button--secondary .ui-split-button__arrow:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.ui-split-button__menu {
+  position: absolute;
+  background: var(--color-dropdown-bg, var(--dropdown-menu-bg));
+  backdrop-filter: var(--dropdown-backdrop-filter, blur(12px));
+  border: 1px solid var(--ui-control-border-strong);
+  border-radius: var(--ui-control-radius);
+  box-shadow: var(--shadow-overlay-strong, var(--dropdown-menu-shadow));
+  z-index: 2100;
+  padding: var(--space-1);
+  display: flex;
+  flex-direction: column;
+  animation: dropdown-fade-in var(--motion-duration-fast) var(--motion-ease-emphasized);
+}
+
+.ui-split-button__menu-item {
+  background: transparent;
+  border: none;
+  border-radius: var(--ui-control-radius-xs);
+  color: var(--color-text-primary);
+  padding: 0 var(--space-3);
+  height: 36px;
+  line-height: 36px;
+  text-align: left;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color var(--motion-fast), color var(--motion-fast);
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.ui-split-button__menu-item:hover {
+  background: var(--dropdown-option-hover-bg, rgba(255, 255, 255, 0.05));
+  color: var(--dropdown-option-hover-color, var(--color-text-primary));
+}

@@ -41,8 +41,7 @@ export default function HistoryCard({
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const isUndone = batch.status === 'undone';
-  const isInPlace = batch.name?.startsWith('Organize in Place');
-  const isRevertDisabled = isUndone || isAnyTaskActive || isReverting || isInPlace;
+  const isRevertDisabled = isUndone || isAnyTaskActive || isReverting;
   const { icon, accentColor } = getCardIconAndClass(batch.status);
   const hasLogs = batch.logs && batch.logs.length > 0;
 
@@ -137,9 +136,7 @@ export default function HistoryCard({
               content={
                 isUndone
                   ? (t('historyPage.alreadyRevertedTooltip') || 'This batch has already been reverted.')
-                  : isInPlace
-                    ? (t('historyPage.inPlaceNoRevertTooltip') || 'This batch was organized in place and does not require reversion.')
-                    : null
+                  : null
               }
               side="left"
             >

@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import OrganizerPageContent from './components/OrganizerPageContent';
 import Button from '../../ui/Button';
 import SegmentedControl from '../../ui/SegmentedControl';
+import SplitButton from '../../ui/SplitButton';
 import { getFirstEnabledProvider, getOrganizerProviderOptions } from '../../lib/providerAvailability';
 
 import { useOrganizerCountQuery, useOrganizerQuery, useScanStatusQuery, useSettingsQuery } from '../../queries';
@@ -408,15 +409,25 @@ export default function OrganizerPage() {
               {loadRestButtonLabel}
             </Button>
           ) : null}
-          <Button
+          <SplitButton
             variant="primary"
             size="sm"
-            className="organizer-panel__browse-btn"
-            onClick={handleRename}
+            label={renameButtonLabel}
+            onClick={() => handleRename(false)}
             disabled={isScanActive || isRenamePending || isRenameStarting}
-          >
-            {renameButtonLabel}
-          </Button>
+            className="organizer-panel__browse-btn"
+            style={{ marginLeft: 'var(--app-shell-space-2)' }}
+            options={[
+              {
+                label: renameButtonLabel,
+                onClick: () => handleRename(false),
+              },
+              {
+                label: t('organizer.renameModal.organizeInPlace') || 'Organize in Place',
+                onClick: () => handleRename(true),
+              }
+            ]}
+          />
         </>
       ) : null}
     </>
@@ -478,13 +489,13 @@ export default function OrganizerPage() {
           />
           {sessionMode === 'nsfw' && scanMode !== 'offline' && providerOptions.length > 0 && (
             <div key={scanMode} className="provider-segmented-control-wrapper animate-slide-in">
-               <SegmentedControl
-                 variant="filter"
-                 value={provider}
-                 onChange={setProvider}
-                 options={providerOptions}
-               />
-             </div>
+              <SegmentedControl
+                variant="filter"
+                value={provider}
+                onChange={setProvider}
+                options={providerOptions}
+              />
+            </div>
           )}
         </div>,
         utilityBarTarget

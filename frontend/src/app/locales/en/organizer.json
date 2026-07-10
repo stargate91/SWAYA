@@ -122,8 +122,8 @@
     "noMatching": "No matching files found!",
     "currentFilename": "Current Filename",
     "newFilename": "New Filename",
-    "organizeInPlaceCheckbox": "Keep original filenames (Organize in Place)",
-    "organizeInPlace": "Organize in Place"
+    "organizeInPlaceCheckbox": "Add to Library as-is (Keep original filenames)",
+    "organizeInPlace": "Add to Library as-is"
   },
   "overrideModal": {
     "title": "Change settings for this {type}",

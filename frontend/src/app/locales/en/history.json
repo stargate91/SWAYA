@@ -18,7 +18,6 @@
   "badgeExtras": "Extras",
   "revertButton": "Undo Batch",
   "alreadyRevertedTooltip": "This batch has already been undone.",
-  "inPlaceNoRevertTooltip": "This batch was organized in place and does not require reversion.",
   "batchLabel": "Batch:",
   "filesLabel": "Files:",
   "renamedFilesTitle": "Renamed Files:",

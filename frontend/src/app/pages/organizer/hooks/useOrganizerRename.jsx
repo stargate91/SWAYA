@@ -20,7 +20,7 @@ export function useOrganizerRename({
 }) {
   const [isRenameStarting, setIsRenameStarting] = useState(false);
 
-  const handleRename = async () => {
+  const handleRename = async (organizeInPlaceDefault = false) => {
     if (isRenameStarting || isScanActive) {
       return;
     }
@@ -109,7 +109,11 @@ export function useOrganizerRename({
       });
     };
 
-    showModal(false);
+    if (organizeInPlaceDefault) {
+      executeRename(true);
+    } else {
+      showModal(false);
+    }
   };
 
   return {

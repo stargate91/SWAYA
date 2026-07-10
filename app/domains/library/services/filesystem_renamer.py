@@ -275,13 +275,16 @@ class FilesystemRenamer:
                 return False
 
             from app.infrastructure.filesystem.folder_watcher import ignore_path
-            paths_to_ignore.append(str(old_path.resolve()))
-            paths_to_ignore.append(str(new_path.resolve()))
-            for p in paths_to_ignore:
-                ignore_path(p)
+            is_same_path = old_path.resolve() == new_path.resolve()
 
-            old_path.parent.mkdir(parents=True, exist_ok=True)
-            shutil.move(str(new_path), str(old_path))
+            if not is_same_path:
+                paths_to_ignore.append(str(old_path.resolve()))
+                paths_to_ignore.append(str(new_path.resolve()))
+                for p in paths_to_ignore:
+                    ignore_path(p)
+
+                old_path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(str(new_path), str(old_path))
 
             if log.media_item_id:
                 self.library_port.update_item_path_and_status(log.media_item_id, str(old_path), ItemStatus.MATCHED)
@@ -289,7 +292,8 @@ class FilesystemRenamer:
                 self.library_port.update_extra_path(log.extra_file_id, str(old_path))
 
             self.library_port.update_action_log_status(log.id, ActionStatus.UNDONE)
-            self._cleanup_empty_parent(new_path.parent)
+            if not is_same_path:
+                self._cleanup_empty_parent(new_path.parent)
             return True
 
         except Exception as e:
