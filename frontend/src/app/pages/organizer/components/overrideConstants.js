@@ -103,20 +103,20 @@ export const MAIN_TYPE_OPTIONS = [
   { value: 'bonus', label: 'Bonus Video' },
 ];
 
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 
 export function useTranslatedOverrideOptions(t, isScenesMode = false) {
-  const translate = (key, fallback) => {
+  const translate = useCallback((key, fallback) => {
     const val = t(key);
     return (val && val !== key) ? val : fallback;
-  };
+  }, [t]);
 
   const translatedLanguageOptions = useMemo(() =>
     LANGUAGE_OPTIONS.map((opt) => ({
       ...opt,
       label: translate(`languages.${opt.value}`, opt.label),
     })),
-    [t]
+    [translate]
   );
 
   const translatedSubcategoriesByCategory = useMemo(() => {
@@ -128,14 +128,14 @@ export function useTranslatedOverrideOptions(t, isScenesMode = false) {
       }));
     });
     return result;
-  }, [t]);
+  }, [translate]);
 
   const translatedSourceOptions = useMemo(() =>
     SOURCE_OPTIONS.map((opt) => ({
       ...opt,
       label: translate(`organizer.overrideModal.options.sources.${opt.value}`, opt.label),
     })),
-    [t]
+    [translate]
   );
 
   const translatedEditionOptions = useMemo(() =>
@@ -143,7 +143,7 @@ export function useTranslatedOverrideOptions(t, isScenesMode = false) {
       ...opt,
       label: translate(`organizer.overrideModal.options.editions.${opt.value}`, opt.label),
     })),
-    [t]
+    [translate]
   );
 
   const translatedAudioTypeOptions = useMemo(() =>
@@ -151,7 +151,7 @@ export function useTranslatedOverrideOptions(t, isScenesMode = false) {
       ...opt,
       label: translate(`organizer.overrideModal.options.audioTypes.${opt.value}`, opt.label),
     })),
-    [t]
+    [translate]
   );
 
   const translatedMainTypeOptions = useMemo(() => {
@@ -165,7 +165,7 @@ export function useTranslatedOverrideOptions(t, isScenesMode = false) {
       ...opt,
       label: translate(`organizer.overrideModal.options.mainTypes.${opt.value}`, opt.label),
     }));
-  }, [t, isScenesMode]);
+  }, [translate, isScenesMode]);
 
   return {
     translatedLanguageOptions,

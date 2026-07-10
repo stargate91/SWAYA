@@ -55,7 +55,7 @@
 }
 
 .shell__content:has(.dashboard-page) {
-  padding-bottom: var(--space-8, 32px);
+  padding-bottom: var(--app-shell-space-7);
 }
 
 .dashboard-widget__loading {
@@ -176,18 +176,18 @@
 
 /* Error widget styles to avoid forbidden style props */
 .dashboard-widget--error {
-  padding: var(--space-6xl, 40px);
+  padding: var(--app-shell-space-8);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: var(--space-md, 12px);
+  gap: var(--app-shell-space-3);
   min-height: 200px;
 }
 
 .dashboard-widget-error-icon {
-  color: var(--color-status-danger, #e53e3e);
+  color: var(--color-state-danger);
 }
 
 .dashboard-widget-error-title {

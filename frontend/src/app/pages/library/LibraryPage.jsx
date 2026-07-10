@@ -89,7 +89,11 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
           state.setCurrentPage(state.currentPage + 1);
         }
       },
-      { threshold: 0.1 }
+      {
+        root: document.querySelector('.shell__content'),
+        rootMargin: '0px 0px 1200px 0px',
+        threshold: 0
+      }
     );
 
     const currentSentinel = sentinelRef.current;

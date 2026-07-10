@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { createPortal } from 'react-dom';
 import UtilityButton from '../../ui/UtilityButton';
 import Button from '../../ui/Button';
 import Tooltip from '../../ui/Tooltip';
@@ -9,7 +8,7 @@ import PosterCard from '../../ui/PosterCard';
 import BackdropCard from '../../ui/BackdropCard';
 import Lightbox from '../../ui/Lightbox';
 import EmptyState from '../../ui/EmptyState';
-import { ChevronLeft, ChevronRight, FileJson, Info, X } from '@/ui/icons';
+import { ChevronLeft, ChevronRight, FileJson, Info } from '@/ui/icons';
 import { API_BASE } from '../../lib/backend';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { useTranslation } from '../../providers/LanguageContext';

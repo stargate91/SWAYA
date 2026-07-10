@@ -6,7 +6,6 @@ import PosterCard from '@/ui/PosterCard';
 import CompactCard from '@/ui/CompactCard';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { MEDIA_TYPES, isTvLikeMediaType, toMetadataMediaType } from '@/lib/mediaTypes';
-import { API_BASE } from '@/lib/backend';
 
 const getDisplayTitle = (candidate, mediaType, t) => (
   candidate?.title
@@ -58,11 +57,9 @@ export default function MatchCandidateCard({
   const posterUrl = resolveMediaImageUrl(candidate.poster_path, mediaType === 'scene' ? 'backdrop' : 'poster');
   const isDisabled = isResolvingId === candidateId || isBrowserLoading;
   const [prevPosterUrl, setPrevPosterUrl] = useState(posterUrl);
-  const [imageError, setImageError] = useState(false);
 
   if (posterUrl !== prevPosterUrl) {
     setPrevPosterUrl(posterUrl);
-    setImageError(false);
   }
 
   if (variant === 'poster') {

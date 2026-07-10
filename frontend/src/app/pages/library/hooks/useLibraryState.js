@@ -72,7 +72,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     setCurrentPage(1);
   };
 
-  const [accumulatedItems, setAccumulatedItems] = useState([]);
+  const [accumulatedItems, setAccumulatedItems] = useState(savedState.accumulatedItems ?? []);
 
   const { sessionMode, setSessionMode } = useLibraryModeStore();
 
@@ -133,7 +133,8 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
       pageSize,
       sortKey,
       sortDirection,
-      paginationMode
+      paginationMode,
+      accumulatedItems
     });
   }, [
     currentPath,
@@ -164,7 +165,8 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     pageSize,
     sortKey,
     sortDirection,
-    paginationMode
+    paginationMode,
+    accumulatedItems
   ]);
 
   const isCollections = isLibraryCollectionTab(activeTab);
@@ -424,9 +426,16 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
           setAccumulatedItems(libraryData.items);
         } else {
           setAccumulatedItems((prev) => {
+            const freshMap = new Map(libraryData.items.map(item => [item.id, item]));
+            const updatedPrev = prev.map(item => {
+              if (freshMap.has(item.id)) {
+                return freshMap.get(item.id);
+              }
+              return item;
+            });
             const prevIds = new Set(prev.map(item => item.id));
             const newItems = libraryData.items.filter(item => !prevIds.has(item.id));
-            return [...prev, ...newItems];
+            return [...updatedPrev, ...newItems];
           });
         }
       }

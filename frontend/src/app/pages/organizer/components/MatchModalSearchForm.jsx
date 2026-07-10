@@ -3,7 +3,6 @@ import IconButton from '../../../ui/IconButton';
 import SegmentedControl from '../../../ui/SegmentedControl';
 import Tooltip from '../../../ui/Tooltip';
 import Input from '../../../ui/Input';
-import Dropdown from '../../../ui/Dropdown';
 import SearchInputCombo from '../../../ui/SearchInputCombo';
 
 export default function MatchModalSearchForm({

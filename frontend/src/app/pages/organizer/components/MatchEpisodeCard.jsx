@@ -5,8 +5,7 @@ import Badge from '../../../ui/Badge';
 import PosterCard from '../../../ui/PosterCard';
 import CardMetadata from '../../../ui/CardMetadata';
 import Button from '../../../ui/Button';
-import { resolveMediaImageUrl, TMDB_IMAGE_SIZES } from '@/lib/imageUrls';
-import { API_BASE } from '@/lib/backend';
+import { resolveMediaImageUrl } from '@/lib/imageUrls';
 
 export default function MatchEpisodeCard({
   episodeEntry,
@@ -47,7 +46,7 @@ export default function MatchEpisodeCard({
         onClick={() => onSelect(episodeEntry)}
         disabled={isDisabled}
       >
-        Select
+        {t('common.select') || 'Select'}
       </Button>
     </div>
   );

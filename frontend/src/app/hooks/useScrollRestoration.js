@@ -16,14 +16,27 @@ export function useScrollRestoration(selector, dependencies = []) {
     // Restore scroll position
     const savedState = useNavigationStateStore.getState().getPageState(currentPath);
     if (savedState.scrollTop !== undefined) {
-      const timers = [50, 150, 300, 600].map((delay) =>
-        setTimeout(() => {
-          if (container) {
-            container.scrollTop = savedState.scrollTop;
-          }
-        }, delay)
-      );
-      return () => timers.forEach(clearTimeout);
+      container.scrollTop = savedState.scrollTop;
+
+      let frameId;
+      let count = 0;
+      const target = savedState.scrollTop;
+
+      const performScroll = () => {
+        if (!container) return;
+        container.scrollTop = target;
+        if (Math.abs(container.scrollTop - target) < 1 || count++ > 5) {
+          return;
+        }
+        frameId = requestAnimationFrame(performScroll);
+      };
+
+      frameId = requestAnimationFrame(performScroll);
+      return () => {
+        if (frameId) {
+          cancelAnimationFrame(frameId);
+        }
+      };
     }
     return undefined;
   }, [currentPath, selector, navType, ...dependencies]); // eslint-disable-line react-hooks/exhaustive-deps

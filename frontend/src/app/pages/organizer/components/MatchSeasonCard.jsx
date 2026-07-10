@@ -2,8 +2,7 @@ import { Clapperboard } from '@/ui/icons';
 import Badge from '../../../ui/Badge';
 import PosterCard from '../../../ui/PosterCard';
 import CardMetadata from '../../../ui/CardMetadata';
-import { resolveMediaImageUrl, TMDB_IMAGE_SIZES } from '@/lib/imageUrls';
-import { API_BASE } from '@/lib/backend';
+import { resolveMediaImageUrl } from '@/lib/imageUrls';
 
 export default function MatchSeasonCard({
   seasonEntry,

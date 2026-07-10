@@ -72,7 +72,12 @@ const installConsoleLogging = () => {
   console.error = (...args) => {
     try {
       const [firstArg, ...restArgs] = args;
-      const normalizedMessage = typeof firstArg === 'string' ? firstArg : String(firstArg);
+      let normalizedMessage = '';
+      try {
+        normalizedMessage = typeof firstArg === 'string' ? firstArg : String(firstArg);
+      } catch (e) {
+        normalizedMessage = '';
+      }
 
       if (
         normalizedMessage.includes('Maximum update depth exceeded')
@@ -94,8 +99,12 @@ const installConsoleLogging = () => {
             try {
               return JSON.parse(JSON.stringify(arg));
             } catch (err) {
-              console.error(err);
-              return String(arg);
+              originalConsoleError(err);
+              try {
+                return String(arg);
+              } catch (e) {
+                return '[Unformattable Object]';
+              }
             }
           }),
           stack: new Error('Console error stack').stack,
@@ -103,7 +112,7 @@ const installConsoleLogging = () => {
         });
       }
     } catch (err) {
-      console.error(err);
+      originalConsoleError(err);
     }
 
     originalConsoleError(...args);

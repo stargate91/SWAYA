@@ -103,7 +103,11 @@ export default function HistoryPage() {
       if (entries[0].isIntersecting) {
         fetchNextHistoryPage();
       }
-    }, { threshold: 0.1 });
+    }, {
+      root: document.querySelector('.shell__content'),
+      rootMargin: '0px 0px 1200px 0px',
+      threshold: 0
+    });
 
     observer.observe(sentinel);
     return () => observer.disconnect();
@@ -118,7 +122,11 @@ export default function HistoryPage() {
       if (entries[0].isIntersecting) {
         fetchNextWatchedPage();
       }
-    }, { threshold: 0.1 });
+    }, {
+      root: document.querySelector('.shell__content'),
+      rootMargin: '0px 0px 1200px 0px',
+      threshold: 0
+    });
 
     observer.observe(sentinel);
     return () => observer.disconnect();
