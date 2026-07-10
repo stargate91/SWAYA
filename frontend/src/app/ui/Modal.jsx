@@ -28,19 +28,17 @@ export default function Modal({ open, title, description, children, footer, onCl
               ) : null}
               {description ? <p className="ui-modal__description">{description}</p> : null}
             </div>
-            <div className={`ui-modal__close-wrapper ${variant ? `ui-modal__close-wrapper--${variant}` : ''}`.trim()}>
-              <IconButton
-                type="button"
-                variant="close"
-                className="ui-modal__close"
-                onClick={onClose}
-                label={t('common.close')}
-                title={null}
-                size="sm"
-              >
-                <X size={16} />
-              </IconButton>
-            </div>
+            <IconButton
+              type="button"
+              variant="close"
+              onClick={onClose}
+              label={t('common.close')}
+              title={null}
+              size="sm"
+              wrapped={true}
+            >
+              <X size={16} />
+            </IconButton>
           </header>
           <div className="ui-modal__body">{children}</div>
           {footer ? <footer className="ui-modal__footer">{footer}</footer> : null}

@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { Link2, Upload } from '@/ui/icons';
 import Input from '@/ui/Input';
-import './UniversalImagePickerModal.css';
+import '../components/UniversalImagePicker.css';
 
 export default function ImageUploadPanel({
   imageType,

@@ -21,28 +21,24 @@ export default function PhysicalAttributesSection({
       <div className="custom-values-card__body">
         <div className="custom-values-card__grid-2">
           {!isUnderage && (
-            <div className="ui-field">
-              <label className="ui-field__label">{t('library.performerEdit.heightCm') || 'Height (cm)'}</label>
-              <Input
-                type="number"
-                placeholder="e.g. 170"
-                value={form.height}
-                onChange={e => handleChange('height', e.target.value)}
-                error={errors.height}
-              />
-            </div>
+            <Input
+              label={t('library.performerEdit.heightCm') || 'Height (cm)'}
+              type="number"
+              placeholder="e.g. 170"
+              value={form.height}
+              onChange={e => handleChange('height', e.target.value)}
+              error={errors.height}
+            />
           )}
           {!isUnderage && includeAdult && (
-            <div className="ui-field">
-              <label className="ui-field__label">{t('library.performerEdit.weightKg') || 'Weight (kg)'}</label>
-              <Input
-                type="number"
-                placeholder="e.g. 60"
-                value={form.weight}
-                onChange={e => handleChange('weight', e.target.value)}
-                error={errors.weight}
-              />
-            </div>
+            <Input
+              label={t('library.performerEdit.weightKg') || 'Weight (kg)'}
+              type="number"
+              placeholder="e.g. 60"
+              value={form.weight}
+              onChange={e => handleChange('weight', e.target.value)}
+              error={errors.weight}
+            />
           )}
           {!isUnderage && (
             <Dropdown

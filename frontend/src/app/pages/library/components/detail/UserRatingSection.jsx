@@ -1,22 +1,20 @@
 /* eslint-disable react/forbid-dom-props */
 import { PenLine } from '@/ui/icons';
 import Pill from '@/ui/Pill';
+import SegmentedRating from '@/ui/SegmentedRating';
 import { useMediaDetailContext } from './MediaDetailContext';
 import './UserRatingSection.css';
-
 
 export default function UserRatingSection() {
   const { state, actions, t } = useMediaDetailContext();
   const {
-    displayRating,
+    currentRating,
     verticalBarText
   } = state;
 
   const {
     handleOpenReviewModal,
-    handleMouseMove,
-    handleMouseLeave,
-    handleClick
+    handleRatingChange
   } = actions;
 
   return (
@@ -31,40 +29,11 @@ export default function UserRatingSection() {
         </button>
         <span className="pill-vertical-separator">{verticalBarText}</span>
 
-        <div
-          className="rating-segmented-bar"
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-          onMouseUp={handleClick}
-          role="slider"
-          tabIndex={0}
-          aria-label={t('library.details.yourRating') || 'Your Rating'}
-          aria-valuemin={0}
-          aria-valuemax={10}
-          aria-valuenow={displayRating ?? 0}
-        >
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((val) => {
-            let fill = 0;
-            if (displayRating >= val) {
-              fill = 100;
-            } else if (displayRating > val - 1) {
-              fill = (displayRating - (val - 1)) * 100;
-            }
-            return (
-              <div key={val} className="rating-segment">
-                <div
-                  className="rating-segment-fill"
-                  style={{ width: `${fill}%` }}
-                />
-              </div>
-            );
-          })}
-        </div>
-        <span className={`user-rating-label ${displayRating !== undefined && displayRating !== null ? 'has-value' : ''}`}>
-          {displayRating !== undefined && displayRating !== null
-            ? displayRating.toFixed(1)
-            : (t('library.details.yourRating') || 'Your Rating')}
-        </span>
+        <SegmentedRating
+          value={currentRating}
+          onChange={handleRatingChange}
+          t={t}
+        />
       </Pill>
     </div>
   );

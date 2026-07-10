@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import Page from '@/ui/Page';
+import Spinner from '@/ui/Spinner';
 import { Eye, EyeOff } from '@/ui/icons';
 import HeroSection from './HeroSection';
 import '../../MediaDetailPage.css';
@@ -66,9 +67,7 @@ export default function DetailPageShell({
   if (isLoading) {
     return (
       <Page className={combinedClassName}>
-        <div className="library-loading">
-          <div className="library-spinner" />
-        </div>
+        <Spinner />
       </Page>
     );
   }

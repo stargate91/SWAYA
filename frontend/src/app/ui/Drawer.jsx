@@ -73,6 +73,8 @@ export default function Drawer({
             label={t('common.close') || 'Close'}
             title={null}
             size="sm"
+            wrapped={true}
+            wrapperHoverOnly={true}
           >
             <X size={18} />
           </IconButton>

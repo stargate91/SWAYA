@@ -147,13 +147,4 @@ export const people = {
       body: JSON.stringify(body),
     });
   },
-  bulkImport: (payload) => fetchJson('/api/people/bulk-import', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  }),
-  bulkImportReport: (role, { adultOnly } = {}) => {
-    const params = new URLSearchParams({ role });
-    if (adultOnly !== undefined) params.append('adult_only', String(adultOnly));
-    return fetchJson(`/api/people/bulk-import-report?${params.toString()}`);
-  },
 };

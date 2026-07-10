@@ -7,11 +7,13 @@ export default function IconButton({
   size = 'md',
   label,
   title,
+  wrapped = false,
+  wrapperHoverOnly = false,
   ...props
 }) {
   const accessibleLabel = label || title;
 
-  return (
+  const button = (
     <button
       className={`ui-icon-button ui-icon-button--${variant} ui-icon-button--${size} ${className}`.trim()}
       aria-label={accessibleLabel}
@@ -21,4 +23,15 @@ export default function IconButton({
       {children}
     </button>
   );
+
+  if (wrapped) {
+    const wrapperClass = `ui-icon-button-wrapper ${wrapperHoverOnly ? 'ui-icon-button-wrapper--hover-only' : ''}`.trim();
+    return (
+      <div className={wrapperClass}>
+        {button}
+      </div>
+    );
+  }
+
+  return button;
 }

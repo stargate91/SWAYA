@@ -1,4 +1,5 @@
 import Page from '@/ui/Page';
+import Spinner from '@/ui/Spinner';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import LibraryPagination from './components/LibraryPagination';
 import { useLibraryState } from './hooks/useLibraryState';
@@ -7,7 +8,7 @@ import LibraryHeader from './components/LibraryHeader';
 import LibraryFilters from './components/LibraryFilters';
 import LibraryGrid from './components/LibraryGrid';
 import { useDeleteTagMutation } from '@/queries';
-import { X } from '@/ui/icons';
+import Drawer from '@/ui/Drawer';
 import IconButton from '@/ui/IconButton';
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
@@ -15,7 +16,7 @@ import { isLibraryTagsTab } from '@/lib/libraryTabs';
 import { useUi } from '@/providers/UiProvider';
 import { useQueryClient } from '@tanstack/react-query';
 import { QK } from '@/lib/queryKeys';
-import UniversalImagePickerModal from './modals/UniversalImagePickerModal';
+import UniversalImagePicker from './components/UniversalImagePicker';
 import SegmentedControl from '@/ui/SegmentedControl';
 import './LibraryPage.css';
 
@@ -38,16 +39,7 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
   const utilityBarTarget = typeof document !== 'undefined' ? document.getElementById('shell-utility-bar-center') : null;
   const showOwnershipSegment = state.resolvedTab === 'movies' || state.resolvedTab === 'tv' || state.resolvedTab === 'scenes';
 
-  useEffect(() => {
-    if (imagePickerData) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [imagePickerData]);
+
 
   useEffect(() => {
     if (!state.isTags && focusedTagName !== null) {
@@ -123,9 +115,7 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
   if (state.isLoading) {
     return (
       <Page className="library-page">
-        <div className="library-loading">
-          <div className="library-spinner" />
-        </div>
+        <Spinner />
       </Page>
     );
   }
@@ -290,56 +280,34 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
         </div>
       </div>
 
-      {/* Image Picker Drawer */}
-      {imagePickerData && typeof document !== 'undefined' && createPortal(
-        <>
-          <div
-            className="entity-detail-page__drawer-backdrop ui-drawer-backdrop entity-detail-page__drawer-backdrop--transparent"
-            role="button"
-            tabIndex={-1}
-            onClick={() => setImagePickerData(null)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                setImagePickerData(null);
-              }
-            }}
-          />
-          <div className="entity-detail-page__drawer ui-drawer ui-drawer--md entity-detail-page__drawer--poster">
-            <div className="entity-detail-page__drawer-header">
-              <h3 className="entity-detail-page__drawer-title">
-                {imagePickerData.title}
-              </h3>
-              <IconButton
-                type="button"
-                variant="close"
-                onClick={() => setImagePickerData(null)}
-                label={state.t('common.close') || 'Close'}
-                size="sm"
-              >
-                <X size={16} />
-              </IconButton>
-            </div>
-            <div className="entity-detail-page__drawer-content entity-detail-page__drawer-content--padded">
-              <UniversalImagePickerModal
-                entityId={imagePickerData.entityId}
-                tmdbId={imagePickerData.tmdbId}
-                imageType={imagePickerData.imageType}
-                entityType={imagePickerData.entityType}
-                currentPath={imagePickerData.currentPath}
-                t={state.t}
-                toast={toast}
-                externalIds={imagePickerData.externalIds}
-                item={imagePickerData.item}
-                onClose={() => {
-                  queryClient.invalidateQueries({ queryKey: QK.library });
-                  queryClient.invalidateQueries({ queryKey: QK.libraryCollections });
-                }}
-              />
-            </div>
+      <Drawer
+        isOpen={!!imagePickerData}
+        onClose={() => setImagePickerData(null)}
+        title={imagePickerData?.title}
+        size="md"
+        className="entity-detail-page__drawer--poster"
+        variant="glass"
+      >
+        {imagePickerData && (
+          <div className="entity-detail-page__drawer-content entity-detail-page__drawer-content--padded">
+            <UniversalImagePicker
+              entityId={imagePickerData.entityId}
+              tmdbId={imagePickerData.tmdbId}
+              imageType={imagePickerData.imageType}
+              entityType={imagePickerData.entityType}
+              currentPath={imagePickerData.currentPath}
+              t={state.t}
+              toast={toast}
+              externalIds={imagePickerData.externalIds}
+              item={imagePickerData.item}
+              onClose={() => {
+                queryClient.invalidateQueries({ queryKey: QK.library });
+                queryClient.invalidateQueries({ queryKey: QK.libraryCollections });
+              }}
+            />
           </div>
-        </>,
-        document.body
-      )}
+        )}
+      </Drawer>
     </Page>
   );
 }

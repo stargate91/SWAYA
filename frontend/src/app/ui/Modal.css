@@ -67,47 +67,7 @@
   border-bottom: 1px solid var(--modal-divider);
 }
 
-.ui-modal__close-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-sm, 4px);
-  background: var(--color-surface-glass) !important;
-  border: 1px solid var(--color-border-subtle) !important;
-  transition: all var(--motion-fast, 0.15s);
-  cursor: pointer;
-}
 
-.ui-modal__close-wrapper:hover {
-  background: var(--color-surface-glass-strong) !important;
-  border-color: var(--color-border-default) !important;
-  transform: translateY(-0.5px);
-}
-
-.ui-modal__close-wrapper:focus-within {
-  box-shadow: var(--focus-ring);
-}
-
-.ui-modal__close {
-  background: transparent !important;
-  border: none !important;
-  color: var(--modal-close-color) !important;
-  width: 100% !important;
-  height: 100% !important;
-  padding: 0 !important;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: inherit !important;
-}
-
-.ui-modal__close-wrapper:hover .ui-modal__close {
-  color: var(--modal-close-color-hover) !important;
-}
 
 .ui-modal__title {
   display: inline-flex;
@@ -208,30 +168,30 @@
   color: color-mix(in srgb, var(--color-state-danger) 28%, var(--color-muted));
 }
 
-.ui-modal__close-wrapper--danger {
+.ui-modal--danger .ui-icon-button-wrapper {
   border-radius: var(--radius-sm, 4px) !important;
   border-color: color-mix(in srgb, var(--color-state-danger) 30%, var(--color-border-heavy)) !important;
   background: color-mix(in srgb, var(--color-state-danger) 10%, var(--color-surface-glass)) !important;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
 }
 
-.ui-modal__close-wrapper--danger:hover {
+.ui-modal--danger .ui-icon-button-wrapper:hover {
   background: color-mix(in srgb, var(--color-state-danger) 24%, var(--color-surface-glass)) !important;
   border-color: color-mix(in srgb, var(--color-state-danger) 46%, var(--color-border-heavy)) !important;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important;
   transform: translateY(-0.5px) !important;
 }
 
-.ui-modal__close-wrapper--danger:focus-within {
+.ui-modal--danger .ui-icon-button-wrapper:focus-within {
   border-color: color-mix(in srgb, var(--color-state-danger) 62%, var(--color-border-heavy)) !important;
   box-shadow: var(--focus-ring-danger) !important;
 }
 
-.ui-modal__close-wrapper--danger .ui-modal__close {
+.ui-modal--danger .ui-icon-button-wrapper .ui-icon-button {
   color: color-mix(in srgb, var(--color-state-danger) 40%, white 60%) !important;
 }
 
-.ui-modal__close-wrapper--danger:hover .ui-modal__close {
+.ui-modal--danger .ui-icon-button-wrapper:hover .ui-icon-button {
   color: white !important;
 }
 

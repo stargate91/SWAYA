@@ -3,8 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
-import { Plus, Minus, ChevronDown, ChevronUp, X } from '@/ui/icons';
-import IconButton from '@/ui/IconButton';
+import { Plus, Minus, ChevronDown, ChevronUp } from '@/ui/icons';
+import Drawer from '@/ui/Drawer';
 import DetailPageShell from './components/detail/DetailPageShell';
 import EntityDetailTopControls from './components/entityDetail/EntityDetailTopControls';
 import EntityDetailStatusSection from './components/entityDetail/EntityDetailStatusSection';
@@ -13,7 +13,7 @@ import PersonCreditsSections from './components/entityDetail/PersonCreditsSectio
 import CollectionDetailSections from './components/entityDetail/CollectionDetailSections';
 import { CollectionBackdropsPanel } from './components/entityDetail/EntityDetailSections';
 import usePeopleCollectionDetailController from './usePeopleCollectionDetailController.jsx';
-import UniversalImagePickerModal from './modals/UniversalImagePickerModal';
+import UniversalImagePicker from './components/UniversalImagePicker';
 import PersonBackdropPickerModal from './components/entityDetail/PersonBackdropPickerModal';
 import UtilityBarBottomPortal from '../../../components/UtilityBarBottomPortal';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
@@ -271,114 +271,62 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
       )}
 
       {/* Image Picker Drawer */}
-      {isImagePickerDrawerOpen && typeof document !== 'undefined' && createPortal(
-        (() => {
-          const idToUse = isPeople ? item?.id : `collection_${item?.tmdb_id}`;
-          return (
-            <>
-              <div
-                className="entity-detail-page__drawer-backdrop ui-drawer-backdrop entity-detail-page__drawer-backdrop--transparent"
-                role="button"
-                tabIndex={-1}
-                onClick={() => setIsImagePickerDrawerOpen(false)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    setIsImagePickerDrawerOpen(false);
-                  }
-                }}
-              />
-              <div className="entity-detail-page__drawer ui-drawer ui-drawer--md entity-detail-page__drawer--poster">
-                <div className="entity-detail-page__drawer-header">
-                  <h3 className="entity-detail-page__drawer-title">
-                    {isPeople ? (t('library.details.changeProfile') || 'Change Profile Picture') : (t('library.details.changePoster') || 'Change Poster')}
-                  </h3>
-                  <IconButton
-                    type="button"
-                    variant="close"
-                    onClick={() => setIsImagePickerDrawerOpen(false)}
-                    label={t('common.close') || 'Close'}
-                    size="sm"
-                  >
-                    <X size={16} />
-                  </IconButton>
-                </div>
-                <div className="entity-detail-page__drawer-content entity-detail-page__drawer-content--padded">
-                  <UniversalImagePickerModal
-                    entityId={idToUse}
-                    entityType={isPeople ? 'person' : 'collection'}
-                    imageType={isPeople ? 'profile' : 'poster'}
-                    externalIds={item?.external_ids}
-                    item={item}
-                    t={t}
-                    toast={toast}
-                    onImageSelected={() => {
-                      toast.success(t('library.details.imageUpdatedSuccessfully') || 'Image updated successfully');
-                    }}
-                  />
-                </div>
-              </div>
-            </>
-          );
-        })(),
-        document.body
-      )}
+      <Drawer
+        isOpen={isImagePickerDrawerOpen}
+        onClose={() => setIsImagePickerDrawerOpen(false)}
+        title={isPeople ? (t('library.details.changeProfile') || 'Change Profile Picture') : (t('library.details.changePoster') || 'Change Poster')}
+        size="md"
+        className="entity-detail-page__drawer--poster"
+        variant="glass"
+      >
+        <div className="entity-detail-page__drawer-content entity-detail-page__drawer-content--padded" style={{ padding: '24px' }}>
+          <UniversalImagePicker
+            entityId={isPeople ? item?.id : `collection_${item?.tmdb_id}`}
+            entityType={isPeople ? 'person' : 'collection'}
+            imageType={isPeople ? 'profile' : 'poster'}
+            externalIds={item?.external_ids}
+            item={item}
+            t={t}
+            toast={toast}
+            onClose={() => setIsImagePickerDrawerOpen(false)}
+            closeOnSelect={false}
+          />
+        </div>
+      </Drawer>
 
       {/* Backdrop Picker Drawer */}
-      {isBackdropDrawerOpen && typeof document !== 'undefined' && createPortal(
-        <>
-          <div
-            className="entity-detail-page__drawer-backdrop ui-drawer-backdrop entity-detail-page__drawer-backdrop--transparent"
-            role="button"
-            tabIndex={-1}
-            onClick={() => setIsBackdropDrawerOpen(false)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                setIsBackdropDrawerOpen(false);
-              }
-            }}
-          />
-          <div className="entity-detail-page__drawer ui-drawer ui-drawer--md entity-detail-page__drawer--backdrop">
-            <div className="entity-detail-page__drawer-header">
-              <h3 className="entity-detail-page__drawer-title">
-                {t('library.details.chooseBackdrop') || 'Choose Backdrop'}
-              </h3>
-              <IconButton
-                type="button"
-                variant="close"
-                onClick={() => setIsBackdropDrawerOpen(false)}
-                label={t('common.close') || 'Close'}
-                size="sm"
-              >
-                <X size={16} />
-              </IconButton>
-            </div>
-            <div className="entity-detail-page__drawer-content entity-detail-page__drawer-content--padded">
-              {isPeople ? (
-                <PersonBackdropPickerModal
-                  key={item?.id}
-                  personId={item?.id}
-                  item={item}
-                  t={t}
-                  toast={toast}
-                  overridePersonBackdropMutation={overridePersonBackdropMutation}
-                  uploadPersonBackdropMutation={uploadPersonBackdropMutation}
-                />
-              ) : (
-                <CollectionBackdropsPanel
-                  key={item?.tmdb_id}
-                  item={item}
-                  collectionId={item?.tmdb_id}
-                  t={t}
-                  toast={toast}
-                  overrideBackdropMutation={overrideBackdropMutation}
-                  uploadBackdropMutation={uploadBackdropMutation}
-                />
-              )}
-            </div>
-          </div>
-        </>,
-        document.body
-      )}
+      <Drawer
+        isOpen={isBackdropDrawerOpen}
+        onClose={() => setIsBackdropDrawerOpen(false)}
+        title={t('library.details.chooseBackdrop') || 'Choose Backdrop'}
+        size="md"
+        className="entity-detail-page__drawer--backdrop"
+        variant="glass"
+      >
+        <div className="entity-detail-page__drawer-content entity-detail-page__drawer-content--padded" style={{ padding: '24px' }}>
+          {isPeople ? (
+            <PersonBackdropPickerModal
+              key={item?.id}
+              personId={item?.id}
+              item={item}
+              t={t}
+              toast={toast}
+              overridePersonBackdropMutation={overridePersonBackdropMutation}
+              uploadPersonBackdropMutation={uploadPersonBackdropMutation}
+            />
+          ) : (
+            <CollectionBackdropsPanel
+              key={item?.tmdb_id}
+              item={item}
+              collectionId={item?.tmdb_id}
+              t={t}
+              toast={toast}
+              overrideBackdropMutation={overrideBackdropMutation}
+              uploadBackdropMutation={uploadBackdropMutation}
+            />
+          )}
+        </div>
+      </Drawer>
     </DetailPageShell>
   );
 }

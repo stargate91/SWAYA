@@ -1,7 +1,6 @@
 import { useUi } from '@/providers/UiProvider';
 import Button from '@/ui/Button';
 import AddPeopleModalContent from '../modals/add-people/AddPeopleModalContent';
-import BulkImportResolveModalContent from '../modals/BulkImportResolveModalContent';
 import CreateTagModalContent from '../modals/CreateTagModalContent';
 import { Pencil, Tag, Trash2, Users, AlertCircle } from '@/ui/icons';
 
@@ -131,33 +130,10 @@ export function useLibraryModals({ state, focusedTagName, setFocusedTagName, del
     });
   };
 
-  const openBulkImportResolveModal = () => {
-    const isAdult = state.activeSessionMode === 'nsfw';
-    openModal({
-      title: state.t(isAdult ? 'library.addPeople.adultResolveModalTitle' : 'library.addPeople.resolveModalTitle'),
-      description: state.t(isAdult ? 'library.addPeople.adultResolveModalDescription' : 'library.addPeople.resolveModalDescription'),
-      icon: AlertCircle,
-      className: 'ui-modal--extra-wide',
-      content: (
-        <BulkImportResolveModalContent
-          onClose={closeModal}
-          t={state.t}
-          isAdult={isAdult}
-        />
-      ),
-      footer: (
-        <Button variant="secondary-neutral" onClick={closeModal}>
-          {state.t('common.close') || 'Close'}
-        </Button>
-      ),
-    });
-  };
-
   return {
     openAddPeopleModal,
     openCreateTagModal,
     openEditTagModal,
     openDeleteTagModal,
-    openBulkImportResolveModal,
   };
 }

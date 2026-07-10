@@ -1,0 +1,85 @@
+/* Segmented Rating Control */
+.table-segmented-rating-container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.table-segmented-rating-container .rating-segmented-bar {
+  display: flex;
+  width: 164px;
+  height: 20px;
+  --local-gap: 2px;
+  gap: var(--local-gap);
+  cursor: pointer;
+  outline: none;
+  align-items: center;
+}
+
+.table-segmented-rating-container .rating-segment {
+  flex: 1;
+  height: 100%;
+  --local-bg: color-mix(in srgb, var(--color-ink) 8%, transparent);
+  background: var(--local-bg);
+  border-radius: 1.5px;
+  overflow: hidden;
+  --local-border: 1px solid var(--color-border-subtle);
+  border: var(--local-border);
+  --local-transition: all var(--motion-duration-base) var(--motion-ease-standard);
+  transition: var(--local-transition);
+}
+
+.table-segmented-rating-container .rating-segmented-bar:hover .rating-segment {
+  --local-bg: color-mix(in srgb, var(--color-ink) 12%, transparent);
+  background: var(--local-bg);
+  --local-border-color: var(--color-border-default);
+  border-color: var(--local-border-color);
+}
+
+.table-segmented-rating-container .rating-segment-fill {
+  height: 100%;
+  background: var(--color-accent-blue);
+  opacity: 0.85;
+  --local-transition: opacity var(--motion-duration-base) var(--motion-ease-standard), box-shadow var(--motion-duration-base) var(--motion-ease-standard), width var(--motion-duration-fast) var(--motion-ease-standard);
+  transition: var(--local-transition);
+}
+
+.table-segmented-rating-container .rating-segmented-bar:hover .rating-segment-fill {
+  opacity: 1;
+  box-shadow: 0 0 6px var(--color-accent-blue);
+}
+
+.table-segmented-rating-container .user-rating-label {
+  margin-left: var(--space-xs);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  transition: color var(--motion-fast), font-weight var(--motion-fast);
+  color: color-mix(in srgb, var(--color-text-primary) 58%, var(--color-text-muted));
+  min-width: 4.5ch;
+  width: 4.5ch;
+  text-align: left;
+  white-space: nowrap;
+  flex: 0 0 4.5ch;
+}
+
+.table-segmented-rating-container .user-rating-label.has-value {
+  color: color-mix(in srgb, var(--color-accent-blue) 84%, var(--color-text-secondary));
+  font-weight: 700;
+}
+
+.table-segmented-rating-container.layout-column {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-xs);
+}
+
+.table-segmented-rating-container.layout-column .user-rating-label-under {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.table-segmented-rating-container.layout-column .rating-value-bold {
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-left: var(--space-xs);
+}

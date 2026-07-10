@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import TMDBImageGrid from '../components/entityDetail/TMDBImageGrid';
+import TMDBImageGrid from './entityDetail/TMDBImageGrid';
 import SegmentedControl from '@/ui/SegmentedControl';
 import {
   useOverrideBackdropMutation,
@@ -13,9 +13,9 @@ import {
   useOverridePersonProfileMutation,
   useUploadPersonProfileMutation,
 } from '@/queries';
-import ImageUploadPanel from './ImageUploadPanel';
+import ImageUploadPanel from '../modals/ImageUploadPanel';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
-import './UniversalImagePickerModal.css';
+import './UniversalImagePicker.css';
 
 
 const pathsMatch = (pathA, pathB) => {
@@ -25,7 +25,7 @@ const pathsMatch = (pathA, pathB) => {
   return cleanA === cleanB;
 };
 
-export default function UniversalImagePickerModal({
+export default function UniversalImagePicker({
   entityId,
   tmdbId,
   imageType = 'backdrop',
@@ -60,7 +60,7 @@ export default function UniversalImagePickerModal({
     if (hasFans) sources.push({ value: 'fansdb', label: 'FansDB' });
     if (hasPornDb) sources.push({ value: 'theporndb', label: 'THEPornDB' });
 
-    console.log('UniversalImagePickerModal: Performer sources computed:', {
+    console.log('UniversalImagePicker: Performer sources computed:', {
       externalIds,
       tmdbId,
       hasStash,

@@ -253,6 +253,16 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
       });
     }
   };
+  const handleRatingChange = (targetRating) => {
+    updateStatusMutation.mutate({
+      itemId: effectiveId,
+      tvId: cleanId,
+      payload: {
+        user_rating: targetRating,
+        media_type: type
+      }
+    });
+  };
 
   const handleOpenReviewModal = () => {
     const currentComment = item?.user_comment !== undefined ? item.user_comment : item?.overrides?.user_comment;
@@ -708,6 +718,7 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
       handleMouseMove,
       handleMouseLeave,
       handleClick,
+      handleRatingChange,
       handleOpenReviewModal,
       handleTrailerClick,
       handlePlayClick,

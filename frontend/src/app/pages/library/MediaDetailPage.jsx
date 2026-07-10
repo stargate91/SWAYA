@@ -44,8 +44,8 @@ import BespokeCompaniesSection from './components/detail/sections/BespokeCompani
 import BespokeRatingsSection from './components/detail/sections/BespokeRatingsSection';
 import CompactWatchStatsSection from './components/detail/sections/CompactWatchStatsSection';
 
-import LogoSelectorDrawer from './components/detail/modals/LogoSelectorDrawer';
-import PosterSelectorDrawer from './components/detail/modals/PosterSelectorDrawer';
+import Drawer from '@/ui/Drawer';
+import UniversalImagePicker from './components/UniversalImagePicker';
 import BackdropSelectorDrawer from './components/detail/modals/BackdropSelectorDrawer';
 import Lightbox from '@/ui/Lightbox';
 
@@ -336,25 +336,53 @@ export default function MediaDetailPage({ type = 'movie' }) {
         t={t}
       />
 
-      <LogoSelectorDrawer
+      <Drawer
         isOpen={isLogoDrawerOpen}
         onClose={() => setIsLogoDrawerOpen(false)}
-        id={id}
-        item={item}
-        normalizedType={normalizedType}
-        t={t}
-        toast={toast}
-      />
+        title={t('library.details.chooseLogo') || 'Choose Logo'}
+        size="md"
+        className="entity-detail-page__drawer--logo"
+        variant="glass"
+      >
+        <div className="entity-detail-page__drawer-content" style={{ padding: '24px' }}>
+          <UniversalImagePicker
+            entityId={id}
+            tmdbId={item?.tmdb_id || item?.tv_tmdb_id}
+            imageType="logo"
+            entityType={normalizedType}
+            currentPath={item?.logo_path}
+            t={t}
+            toast={toast}
+            onClose={() => setIsLogoDrawerOpen(false)}
+            closeOnSelect={false}
+            item={item}
+          />
+        </div>
+      </Drawer>
 
-      <PosterSelectorDrawer
+      <Drawer
         isOpen={isPosterDrawerOpen}
         onClose={() => setIsPosterDrawerOpen(false)}
-        id={id}
-        item={item}
-        normalizedType={normalizedType}
-        t={t}
-        toast={toast}
-      />
+        title={t('library.details.choosePoster') || 'Choose Poster'}
+        size="md"
+        className="entity-detail-page__drawer--poster"
+        variant="glass"
+      >
+        <div className="entity-detail-page__drawer-content" style={{ padding: '24px' }}>
+          <UniversalImagePicker
+            entityId={id}
+            tmdbId={item?.tmdb_id || item?.tv_tmdb_id}
+            imageType="poster"
+            entityType={normalizedType}
+            currentPath={item?.poster_path}
+            t={t}
+            toast={toast}
+            onClose={() => setIsPosterDrawerOpen(false)}
+            closeOnSelect={false}
+            item={item}
+          />
+        </div>
+      </Drawer>
 
       <BackdropSelectorDrawer
         isOpen={isBackdropDrawerOpen}

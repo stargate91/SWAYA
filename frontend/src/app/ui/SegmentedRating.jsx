@@ -1,5 +1,6 @@
 /* eslint-disable react/forbid-dom-props */
 import { useState } from 'react';
+import './SegmentedRating.css';
 
 export default function SegmentedRating({ value, onChange, t, labelUnder = false }) {
   const [hoveredRating, setHoveredRating] = useState(null);

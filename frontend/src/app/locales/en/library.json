@@ -68,17 +68,7 @@
     "adultSearchEmptyTitle": "Search for any adult star",
     "adultSearchEmptyDesc": "Find adult stars and creators on the remote database and follow them.",
     "adultSearchNoResultsTitle": "No matching stars found",
-    "adultSearchNoResultsDesc": "No adult stars on the remote database matched this search. Try another name.",
-    "importResults": "Import Results",
-    "adultImportResults": "Import Results",
-    "addedCount": "Added:",
-    "alreadyInLibraryCount": "Already in library:",
-    "multipleMatchCountBanner": "Ambiguous matches needing review:",
-    "noMatchCountBanner": "Unmatched lines requiring manual search:",
-    "selectMatchingPeople": "Select matching artists",
-    "adultSelectMatchingPeople": "Select matching stars",
-    "rematch": "Rematch",
-    "importedState": "Imported"
+    "adultSearchNoResultsDesc": "No adult stars on the remote database matched this search. Try another name."
   },
   "emptyStates": {
     "movies": {

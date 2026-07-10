@@ -22,14 +22,4 @@
   flex: 1;
   overflow-y: auto;
 }
-
-.ui-drawer__header .ui-icon-button--close {
-  background: transparent !important;
-  border-radius: var(--radius-sm, 4px) !important;
-  transition: background-color var(--motion-fast, 0.15s), color var(--motion-fast, 0.15s) !important;
-}
-
-.ui-drawer__header .ui-icon-button--close:hover:not(:disabled) {
-  background: var(--ui-utility-button-bg-hover, rgba(255, 255, 255, 0.08)) !important;
-  color: var(--color-text-primary) !important;
-}
+

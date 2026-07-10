@@ -62,24 +62,20 @@ export default function BioSection({
               placeholder={t('common.select') || 'Select...'}
             />
           )}
-          <div className="ui-field">
-            <label className="ui-field__label">{t('library.performerEdit.birthday') || 'Birthday'}</label>
-            <Input
-              type="date"
-              value={form.birthday}
-              onChange={e => handleChange('birthday', e.target.value)}
-              error={errors.birthday}
-            />
-          </div>
-          <div className="ui-field">
-            <label className="ui-field__label">{t('library.performerEdit.placeOfBirth') || 'Place of Birth'}</label>
-            <Input
-              type="text"
-              placeholder="e.g. Los Angeles, California"
-              value={form.place_of_birth}
-              onChange={e => handleChange('place_of_birth', e.target.value)}
-            />
-          </div>
+          <Input
+            label={t('library.performerEdit.birthday') || 'Birthday'}
+            type="date"
+            value={form.birthday}
+            onChange={e => handleChange('birthday', e.target.value)}
+            error={errors.birthday}
+          />
+          <Input
+            label={t('library.performerEdit.placeOfBirth') || 'Place of Birth'}
+            type="text"
+            placeholder="e.g. Los Angeles, California"
+            value={form.place_of_birth}
+            onChange={e => handleChange('place_of_birth', e.target.value)}
+          />
           {person?.is_adult && (
             <Dropdown
               label={t('library.performerEdit.sameSexOnly') || 'Same Sex Only'}
