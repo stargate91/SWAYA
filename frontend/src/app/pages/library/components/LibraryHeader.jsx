@@ -18,7 +18,7 @@ const SearchInput = React.memo(({ placeholder, onSearchChange }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onSearchChangeRef.current?.(value);
-    }, 80);
+    }, 300);
     return () => clearTimeout(timer);
   }, [value]);
 

@@ -31,6 +31,7 @@ export function useOrganizerFilteredRows({
   activeExtrasTab,
   activeManualTab,
   dismissedRowIds,
+  pendingResolvedIds,
   scanMode,
   sessionMode,
 }) {
@@ -145,10 +146,11 @@ export function useOrganizerFilteredRows({
     matchedOrganizerMedia.filter((item) => {
       const id = `item-${item.id}`;
       return !dismissedRowIds.has(id)
+        && !pendingResolvedIds?.has(id)
         && isModeType(item, scanMode)
         && MATCHED_STATUSES.has(normalizeItemStatus(item.status));
     })
-  ), [dismissedRowIds, matchedOrganizerMedia, scanMode]);
+  ), [dismissedRowIds, pendingResolvedIds, matchedOrganizerMedia, scanMode]);
 
   const modeVisibleMatchedItemIds = useMemo(
     () => new Set(modeVisibleMatchedItems.map((item) => item.id)),
@@ -163,14 +165,17 @@ export function useOrganizerFilteredRows({
       return isExtraForMode(item, scanMode)
         && modeVisibleMatchedItemIds.has(parentId)
         && !dismissedRowIds.has(id)
-        && !dismissedRowIds.has(parentRowId);
+        && !pendingResolvedIds?.has(id)
+        && !dismissedRowIds.has(parentRowId)
+        && !pendingResolvedIds?.has(parentRowId);
     })
-  ), [dismissedRowIds, filteredExtras, modeVisibleMatchedItemIds, scanMode]);
+  ), [dismissedRowIds, pendingResolvedIds, filteredExtras, modeVisibleMatchedItemIds, scanMode]);
 
   const tabCounts = useMemo(() => {
     const visibleReview = reviewOrganizerMedia.filter((item) => {
       const id = `item-${item.id}`;
       return !dismissedRowIds.has(id)
+        && !pendingResolvedIds?.has(id)
         && isModeType(item, scanMode)
         && MANUAL_REVIEW_STATUSES.has(normalizeItemStatus(item.status));
     });
@@ -196,7 +201,7 @@ export function useOrganizerFilteredRows({
       scenesCount,
       extrasCount,
     };
-  }, [dismissedRowIds, modeVisibleExtrasForRename.length, modeVisibleMatchedItems, reviewOrganizerMedia, scanMode]);
+  }, [dismissedRowIds, pendingResolvedIds, modeVisibleExtrasForRename.length, modeVisibleMatchedItems, reviewOrganizerMedia, scanMode]);
 
   const tabFilteredRows = useMemo(() => {
     let rows = [];
@@ -231,9 +236,10 @@ export function useOrganizerFilteredRows({
 
     return rows.filter(
       (row) => !dismissedRowIds.has(row.id)
-        && (row.rawType !== 'extra' || !dismissedRowIds.has(`item-${row.parent_id}`)),
+        && !pendingResolvedIds?.has(row.id)
+        && (row.rawType !== 'extra' || (!dismissedRowIds.has(`item-${row.parent_id}`) && !pendingResolvedIds?.has(`item-${row.parent_id}`))),
     );
-  }, [activeExtrasTab, activeManualTab, activeMainTab, matchedOrganizerMedia, reviewOrganizerMedia, t, dismissedRowIds, scanMode, filteredExtras]);
+  }, [activeExtrasTab, activeManualTab, activeMainTab, matchedOrganizerMedia, reviewOrganizerMedia, t, dismissedRowIds, pendingResolvedIds, scanMode, filteredExtras]);
 
   return {
     visibleMediaCount,

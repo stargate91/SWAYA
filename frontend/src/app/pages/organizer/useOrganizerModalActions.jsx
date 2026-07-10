@@ -22,6 +22,7 @@ export function useOrganizerModalActions({
   scanMode,
   sessionMode,
   provider,
+  addPendingResolvedIds,
 }) {
   const { t } = useTranslation();
   const { closeModal, openModal, toast } = useUi();
@@ -43,6 +44,7 @@ export function useOrganizerModalActions({
     clearSelectedRows,
     scanMode,
     sessionMode,
+    addPendingResolvedIds,
   });
 
   const isPlayableOrganizerRow = useCallback((row) => {

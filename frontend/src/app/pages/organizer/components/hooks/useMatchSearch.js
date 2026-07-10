@@ -84,21 +84,21 @@ export function useMatchSearch({ rows = [], t, toast, scanMode }) {
     scanMode,
     rawType: primaryRow?.rawType,
     scan_mode: primaryRow?.rawPayload?.scan_mode,
-    providerOptions,
   });
 
   if (
     prevDeps.scanMode !== scanMode ||
     prevDeps.rawType !== primaryRow?.rawType ||
-    prevDeps.scan_mode !== primaryRow?.rawPayload?.scan_mode ||
-    prevDeps.providerOptions !== providerOptions
+    prevDeps.scan_mode !== primaryRow?.rawPayload?.scan_mode
   ) {
     setPrevDeps({
       scanMode,
       rawType: primaryRow?.rawType,
       scan_mode: primaryRow?.rawPayload?.scan_mode,
-      providerOptions,
     });
+    const isSceneModeOrType = scanMode === 'scenes' || primaryRow?.rawType === 'scene' || primaryRow?.rawPayload?.scan_mode === 'scenes';
+    const fallbackProvider = isSceneModeOrType ? 'stashdb' : 'tmdb';
+    const nextProvider = getFirstEnabledProvider(providerOptions, fallbackProvider);
     if (nextProvider !== provider) {
       setProvider(nextProvider);
     }

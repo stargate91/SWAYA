@@ -10,6 +10,7 @@ export function OrganizerModalProvider({
   scanMode,
   sessionMode,
   provider,
+  addPendingResolvedIds,
 }) {
   const {
     openDeleteModal,
@@ -28,6 +29,7 @@ export function OrganizerModalProvider({
     scanMode,
     sessionMode,
     provider,
+    addPendingResolvedIds,
   });
 
   const contextValue = {

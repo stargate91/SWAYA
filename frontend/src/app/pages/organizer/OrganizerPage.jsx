@@ -211,6 +211,8 @@ export default function OrganizerPage() {
     restoreDismissedRows,
     dismissedCount,
     dismissedRowIds,
+    pendingResolvedIds,
+    addPendingResolvedIds,
     visibleExtraCount,
     visibleMediaCount,
     modeVisibleMatchedItems,
@@ -442,6 +444,7 @@ export default function OrganizerPage() {
     clearSelectedRows,
     scanMode,
     sessionMode,
+    addPendingResolvedIds,
   });
 
   useEffect(() => {
@@ -478,6 +481,7 @@ export default function OrganizerPage() {
       scanMode={scanMode}
       sessionMode={sessionMode}
       provider={provider}
+      addPendingResolvedIds={addPendingResolvedIds}
     >
       {utilityBarTarget && scanModeOptions.length > 1 && createPortal(
         <div className="organizer-utility-bar-wrapper">

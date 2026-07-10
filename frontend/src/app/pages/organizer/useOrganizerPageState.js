@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useOrganizerTabState } from './hooks/useOrganizerTabState';
 import { useOrganizerPaginationSort } from './hooks/useOrganizerPaginationSort';
 import { useOrganizerDetailsState } from './hooks/useOrganizerDetailsState';
@@ -11,6 +11,23 @@ const isPornDbMovieMode = (scanMode) => scanMode === 'porndb_movie';
 
 export function useOrganizerPageState({ organizer, t, scanMode, sessionMode }) {
   const dismissScopeKey = `${sessionMode || 'sfw'}:${scanMode || 'movies_tv'}`;
+  const [pendingResolvedIds, setPendingResolvedIds] = useState(new Set());
+
+  const addPendingResolvedIds = useCallback((ids) => {
+    setPendingResolvedIds((prev) => {
+      const next = new Set(prev);
+      ids.forEach((id) => next.add(id));
+      return next;
+    });
+    setTimeout(() => {
+      setPendingResolvedIds((prev) => {
+        const next = new Set(prev);
+        ids.forEach((id) => next.delete(id));
+        return next;
+      });
+    }, 4000);
+  }, []);
+
   const {
     activeMainTab,
     setActiveMainTab,
@@ -43,6 +60,7 @@ export function useOrganizerPageState({ organizer, t, scanMode, sessionMode }) {
     activeExtrasTab,
     activeManualTab,
     dismissedRowIds,
+    pendingResolvedIds,
     scanMode,
     sessionMode,
   });
@@ -146,6 +164,7 @@ export function useOrganizerPageState({ organizer, t, scanMode, sessionMode }) {
     activeMainTab,
     activeManualTab,
     activeExtrasTab,
+    pendingResolvedIds,
   });
 
   return {
@@ -153,6 +172,8 @@ export function useOrganizerPageState({ organizer, t, scanMode, sessionMode }) {
     restoreDismissedRows,
     dismissedCount,
     dismissedRowIds,
+    pendingResolvedIds,
+    addPendingResolvedIds,
     visibleMediaCount,
     visibleExtraCount,
     sessionVisibleMediaCount,

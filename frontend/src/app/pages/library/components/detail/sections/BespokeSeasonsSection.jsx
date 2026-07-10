@@ -11,7 +11,7 @@ import { useMediaDetailContext } from '../MediaDetailContext';
 import { useTranslation as useLangTranslation } from '@/providers/LanguageContext';
 import api from '@/lib/api';
 import BespokeEpisodeDetail from './BespokeEpisodeDetail';
-import BespokeLightbox from './BespokeLightbox';
+import Lightbox from '@/ui/Lightbox';
 import './BespokeSeasonsSection.css';
 
 export default function BespokeSeasonsSection() {
@@ -348,8 +348,8 @@ export default function BespokeSeasonsSection() {
         />
       </div>
 
-      <BespokeLightbox
-        lightboxUrl={lightboxUrl}
+      <Lightbox
+        imageUrl={lightboxUrl}
         onClose={() => setLightboxUrl(null)}
         t={t}
       />

@@ -2,8 +2,8 @@ import { memo } from 'react';
 import { Minus } from '@/ui/icons';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import { useSettingsQuery } from '@/queries';
-import CardMetadata from '@/ui/CardMetadata';
-import Badge from '@/ui/Badge';
+import PosterCard from '@/ui/PosterCard';
+import AdultOverlay from '@/ui/AdultOverlay';
 import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
 
 export const TagPosterCard = memo(({
@@ -55,52 +55,26 @@ export const TagPosterCard = memo(({
     ) : undefined;
   }
 
+  const overlay = shouldBlur ? (
+    <AdultOverlay
+      variant="blur"
+      badgeText={t('common.adult_badge', { defaultValue: '18+' })}
+    />
+  ) : null;
+
   return (
-    <div className={`lists-card ${isScene ? 'lists-card--scene' : 'lists-card--poster'}`}>
-      <div
-        className={`lists-card__media ${shouldBlur ? 'is-blurred' : ''}`}
-        onClick={onClick}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            onClick();
-          }
-        }}
-      >
-        {removeButton}
-        {posterUrl ? (
-          <img
-            src={posterUrl}
-            alt={item.title || item.name}
-            className="lists-card__img"
-          />
-        ) : (
-          <div className="lists-card__placeholder">
-            {EmptyIcon && <EmptyIcon size={32} className="lists-card__placeholder-icon" />}
-          </div>
-        )}
-        {shouldBlur && (
-          <div className="recommend-card-blur-overlay">
-            <Badge family="adult" tone="danger">
-              {t('common.adult_badge', { defaultValue: '18+' })}
-            </Badge>
-          </div>
-        )}
-      </div>
-      <CardMetadata
-        title={item.title || item.name}
-        onTitleClick={onClick}
-        subtitle={subtitle}
-        performers={performers}
-        ratingPill={ratingPill}
-        className="lists-card__info"
-        titleClassName="lists-card__title"
-        subtitleRowClassName=""
-        subtitleClassName="lists-card__subtitle"
-      />
-    </div>
+    <PosterCard
+      aspect={isScene ? 'landscape' : 'poster'}
+      onClick={onClick}
+      title={item.title || item.name}
+      subtitle={subtitle}
+      imageUrl={posterUrl}
+      icon={EmptyIcon}
+      ratingPill={ratingPill}
+      performers={performers}
+      topRightAction={removeButton}
+      overlay={overlay}
+    />
   );
 });
 

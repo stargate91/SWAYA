@@ -112,7 +112,11 @@ export default function useMatchModalViewModel({
     }
   };
 
-  const handleProviderChange = async (nextProvider) => {
+  const handleProviderChange = async (nextProviderOrEvent) => {
+    const nextProvider = typeof nextProviderOrEvent === 'object' && nextProviderOrEvent !== null && 'target' in nextProviderOrEvent
+      ? nextProviderOrEvent.target.value
+      : nextProviderOrEvent;
+
     if (nextProvider === provider) {
       return;
     }
@@ -121,17 +125,23 @@ export default function useMatchModalViewModel({
     resetBrowser();
 
     let nextMode = mode;
-    if (scanMode === 'scenes') {
+    if (nextProvider === 'stashdb' || nextProvider === 'fansdb' || scanMode === 'scenes') {
       nextMode = 'scene';
       setMode('scene');
     } else if (nextProvider === 'porndb') {
       nextMode = 'movie';
       setMode('movie');
+    } else if (nextProvider === 'tmdb') {
+      if (mode === 'scene') {
+        const defaultType = toMetadataMediaType(row?.rawType, MEDIA_TYPES.MOVIE);
+        nextMode = isBulk ? MEDIA_TYPES.TV : defaultType;
+        setMode(nextMode);
+      }
     }
 
     if (hasSearched && !isSearching) {
       const searchResults = await performSearch(resetBrowser, nextMode, nextProvider);
-      if (searchResults && searchResults.length === 1 && nextMode === MEDIA_TYPES.TV && nextProvider !== 'porndb') {
+      if (searchResults && searchResults.length === 1 && nextMode === MEDIA_TYPES.TV && !['porndb', 'stashdb', 'fansdb'].includes(nextProvider)) {
         const parsedSeason = Number.parseInt(season, 10);
         if (Number.isFinite(parsedSeason)) {
           handleDirectBrowse(searchResults[0], parsedSeason);

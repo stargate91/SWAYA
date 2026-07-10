@@ -109,13 +109,20 @@ export default function MatchModalSearchForm({
             </IconButton>
           </Tooltip>
         </div>
-        {!isBulk && provider !== 'porndb' && scanMode !== 'scenes' ? (
+        {!isBulk && ['tmdb', 'porndb'].includes(provider) && scanMode !== 'scenes' ? (
           <SegmentedControl
             className="organizer-match-modal__mode-toggle"
-            options={[
-              { value: 'movie', label: t('organizer.details.matchModal.movie') },
-              { value: 'tv', label: t('organizer.details.matchModal.tv') },
-            ]}
+            options={
+              provider === 'porndb'
+                ? [
+                    { value: 'movie', label: t('organizer.typeLabels.movie') || 'Movie' },
+                    { value: 'scene', label: t('organizer.typeLabels.scene') || 'Scene' },
+                  ]
+                : [
+                    { value: 'movie', label: t('organizer.details.matchModal.movie') },
+                    { value: 'tv', label: t('organizer.details.matchModal.tv') },
+                  ]
+            }
             value={mode}
             onChange={onModeChange}
             ariaLabel={t('organizer.details.matchModal.type')}

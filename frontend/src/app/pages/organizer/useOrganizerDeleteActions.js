@@ -40,6 +40,7 @@ export function useOrganizerDeleteActions({
   clearSelectedRows,
   scanMode,
   sessionMode,
+  addPendingResolvedIds,
 }) {
   const queryKey = getOrganizerQueryKey(scanMode, sessionMode);
 
@@ -53,6 +54,9 @@ export function useOrganizerDeleteActions({
 
   const handleResolveOrganizerRow = useCallback(async (row) => {
     closeModal();
+    if (addPendingResolvedIds) {
+      addPendingResolvedIds([row.id]);
+    }
     const previousOrganizer = queryClient.getQueryData(queryKey);
     const nextOrganizer = removeOrganizerRow(previousOrganizer, row);
     if (nextOrganizer) {
@@ -72,10 +76,13 @@ export function useOrganizerDeleteActions({
       queryClient.invalidateQueries({ queryKey: QK.organizerCount });
       queryClient.invalidateQueries({ queryKey: QK.stats });
     }
-  }, [closeModal, queryClient, focusFirstAvailableResult, refreshOrganizer, queryKey]);
+  }, [closeModal, queryClient, focusFirstAvailableResult, refreshOrganizer, queryKey, addPendingResolvedIds]);
 
   const handleResolveOrganizerRows = useCallback(async (rows, performMutationFn) => {
     closeModal();
+    if (addPendingResolvedIds) {
+      addPendingResolvedIds(rows.map((row) => row.id));
+    }
     const previousOrganizer = queryClient.getQueryData(queryKey);
     const nextOrganizer = removeOrganizerRows(previousOrganizer, rows);
     if (nextOrganizer) {
@@ -99,10 +106,13 @@ export function useOrganizerDeleteActions({
       queryClient.invalidateQueries({ queryKey: QK.stats });
       throw error;
     }
-  }, [closeModal, queryClient, focusFirstAvailableResult, refreshOrganizer, queryKey]);
+  }, [closeModal, queryClient, focusFirstAvailableResult, refreshOrganizer, queryKey, addPendingResolvedIds]);
 
   const handleDeleteOrganizerRow = useCallback(async (row, mode) => {
     closeModal();
+    if (addPendingResolvedIds) {
+      addPendingResolvedIds([row.id]);
+    }
     const previousOrganizer = queryClient.getQueryData(queryKey);
     const nextOrganizer = removeOrganizerRow(previousOrganizer, row);
     if (nextOrganizer) {
@@ -132,11 +142,14 @@ export function useOrganizerDeleteActions({
       queryClient.invalidateQueries({ queryKey: QK.stats });
       throw error;
     }
-  }, [closeModal, queryClient, focusFirstAvailableResult, refreshOrganizer, toast, t, queryKey]);
+  }, [closeModal, queryClient, focusFirstAvailableResult, refreshOrganizer, toast, t, queryKey, addPendingResolvedIds]);
 
   const handleDeleteOrganizerRows = useCallback(async (rows, mode) => {
     closeModal();
     clearSelectedRows();
+    if (addPendingResolvedIds) {
+      addPendingResolvedIds(rows.map((row) => row.id));
+    }
     const previousOrganizer = queryClient.getQueryData(queryKey);
     const nextOrganizer = removeOrganizerRows(previousOrganizer, rows);
     if (nextOrganizer) {
@@ -167,7 +180,7 @@ export function useOrganizerDeleteActions({
       queryClient.invalidateQueries({ queryKey: QK.stats });
       throw error;
     }
-  }, [closeModal, clearSelectedRows, queryClient, focusFirstAvailableResult, refreshOrganizer, toast, t, queryKey]);
+  }, [closeModal, clearSelectedRows, queryClient, focusFirstAvailableResult, refreshOrganizer, toast, t, queryKey, addPendingResolvedIds]);
 
   return {
     refreshOrganizer,

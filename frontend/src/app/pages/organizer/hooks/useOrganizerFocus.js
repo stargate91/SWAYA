@@ -37,31 +37,37 @@ export function useOrganizerFocus({
   activeMainTab,
   activeManualTab,
   activeExtrasTab,
+  pendingResolvedIds,
 }) {
   const focusFirstAvailableResult = (nextOrganizer = organizer) => {
-    const modeExtras = (nextOrganizer.extras || []).filter((item) => isExtraForMode(item, scanMode));
+    const modeExtras = (nextOrganizer.extras || [])
+      .filter((item) => isExtraForMode(item, scanMode) && !pendingResolvedIds?.has(`extra-${item.id}`));
     if (activeRowId) {
-      const allIds = new Set([
-        ...(nextOrganizer.manual || []).map((i) => `item-${i.id}`),
-        ...(nextOrganizer.movies || []).map((i) => `item-${i.id}`),
-        ...(nextOrganizer.tv || []).map((i) => `item-${i.id}`),
-        ...(nextOrganizer.collisions || []).map((i) => `item-${i.id}`),
-        ...modeExtras.map((i) => `extra-${i.id}`),
-      ]);
-      if (allIds.has(activeRowId)) {
-        return;
+      if (pendingResolvedIds && pendingResolvedIds.has(activeRowId)) {
+        // Active row is pending resolved, need to find a new one
+      } else {
+        const allIds = new Set([
+          ...(nextOrganizer.manual || []).map((i) => `item-${i.id}`),
+          ...(nextOrganizer.movies || []).map((i) => `item-${i.id}`),
+          ...(nextOrganizer.tv || []).map((i) => `item-${i.id}`),
+          ...(nextOrganizer.collisions || []).map((i) => `item-${i.id}`),
+          ...modeExtras.map((i) => `extra-${i.id}`),
+        ]);
+        if (allIds.has(activeRowId)) {
+          return;
+        }
       }
     }
     const reviewMedia = [
       ...(nextOrganizer.manual || []),
       ...(nextOrganizer.movies || []),
       ...(nextOrganizer.tv || []),
-    ];
+    ].filter((item) => !pendingResolvedIds?.has(`item-${item.id}`));
     const matchedMedia = [
       ...(nextOrganizer.movies || []),
       ...(nextOrganizer.tv || []),
       ...(nextOrganizer.collisions || []),
-    ];
+    ].filter((item) => !pendingResolvedIds?.has(`item-${item.id}`));
     const movieRows = matchedMedia
       .filter((item) => isRegularMovieType(item.type) && MATCHED_STATUSES.has(normalizeItemStatus(item.status)))
       .map((item) => mapOrganizerItemRow(item, t));
