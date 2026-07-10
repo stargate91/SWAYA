@@ -29,7 +29,7 @@ export default function ScrollRow({
     if (!el) return;
 
     window.addEventListener('resize', updateArrows);
-    
+
     let handleWheel = null;
     if (enableWheelScroll) {
       handleWheel = (e) => {

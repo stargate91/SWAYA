@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Tuple, Any, List
 from sqlalchemy import func, or_, and_, desc
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, joinedload, aliased
 
 from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch, MetadataLocalization
@@ -99,21 +99,22 @@ class BaseQueryBuilder:
 
         # Tags filter
         if params.selected_tags:
-            if not joined_override:
-                query = query.outerjoin(UserOverride, and_(
-                    or_(
-                        UserOverride.metadata_match_id == MetadataMatch.id,
-                        and_(
-                            UserOverride.metadata_match_id == None,
-                            UserOverride.media_item_id == MetadataMatch.media_item_id
-                        )
+            query = query.filter(
+                or_(
+                    MetadataMatch.id.in_(
+                        self.db.query(UserOverride.metadata_match_id)
+                        .join(user_override_tags, user_override_tags.c.user_override_id == UserOverride.id)
+                        .join(Tag, Tag.id == user_override_tags.c.tag_id)
+                        .filter(Tag.name.in_(params.selected_tags), UserOverride.user_id == self.current_user_id)
                     ),
-                    UserOverride.user_id == self.current_user_id
-                ))
-                joined_override = True
-            query = query.join(user_override_tags, user_override_tags.c.user_override_id == UserOverride.id)\
-                         .join(Tag, Tag.id == user_override_tags.c.tag_id)\
-                         .filter(Tag.name.in_(params.selected_tags))
+                    MetadataMatch.media_item_id.in_(
+                        self.db.query(UserOverride.media_item_id)
+                        .join(user_override_tags, user_override_tags.c.user_override_id == UserOverride.id)
+                        .join(Tag, Tag.id == user_override_tags.c.tag_id)
+                        .filter(Tag.name.in_(params.selected_tags), UserOverride.metadata_match_id.is_(None), UserOverride.user_id == self.current_user_id)
+                    )
+                )
+            )
 
         return query, joined_localization, joined_override
 
@@ -131,20 +132,19 @@ class BaseQueryBuilder:
                     MetadataLocalization.locale == self.ui_lang
                 ))
                 joined_localization = True
-            if not joined_override:
-                query = query.outerjoin(UserOverride, and_(
-                    or_(
-                        UserOverride.metadata_match_id == MetadataMatch.id,
-                        and_(
-                            UserOverride.metadata_match_id == None,
-                            UserOverride.media_item_id == MetadataMatch.media_item_id
-                        )
-                    ),
-                    UserOverride.user_id == self.current_user_id
-                ))
-                joined_override = True
             
-            val_col = func.coalesce(UserOverride.custom_title, MetadataLocalization.title, MediaItem.filename)
+            override_match = aliased(UserOverride, name="override_match")
+            override_item = aliased(UserOverride, name="override_item")
+            query = query.outerjoin(override_match, and_(
+                override_match.metadata_match_id == MetadataMatch.id,
+                override_match.user_id == self.current_user_id
+            )).outerjoin(override_item, and_(
+                override_item.media_item_id == MetadataMatch.media_item_id,
+                override_item.metadata_match_id.is_(None),
+                override_item.user_id == self.current_user_id
+            ))
+            
+            val_col = func.coalesce(override_match.custom_title, override_item.custom_title, MetadataLocalization.title, MediaItem.filename)
             if params.sort_by == "title_desc":
                 query = query.order_by(desc(val_col))
             else:
@@ -154,38 +154,36 @@ class BaseQueryBuilder:
         elif params.sort_by in ("date_asc", "release_date_asc", "year_asc"):
             query = query.order_by(MetadataMatch.release_date.asc())
         elif params.sort_by in ("rating_desc", "user_rating_desc"):
-            if not joined_override:
-                query = query.outerjoin(UserOverride, and_(
-                    or_(
-                        UserOverride.metadata_match_id == MetadataMatch.id,
-                        and_(
-                            UserOverride.metadata_match_id == None,
-                            UserOverride.media_item_id == MetadataMatch.media_item_id
-                        )
-                    ),
-                    UserOverride.user_id == self.current_user_id
-                ))
-                joined_override = True
+            override_match = aliased(UserOverride, name="override_match")
+            override_item = aliased(UserOverride, name="override_item")
+            query = query.outerjoin(override_match, and_(
+                override_match.metadata_match_id == MetadataMatch.id,
+                override_match.user_id == self.current_user_id
+            )).outerjoin(override_item, and_(
+                override_item.media_item_id == MetadataMatch.media_item_id,
+                override_item.metadata_match_id.is_(None),
+                override_item.user_id == self.current_user_id
+            ))
             query = query.order_by(desc(func.coalesce(
-                UserOverride.user_rating,
+                override_match.user_rating,
+                override_item.user_rating,
                 MetadataMatch.rating_porndb,
                 MetadataMatch.rating_tmdb,
             )))
         elif params.sort_by == "user_rating_asc":
-            if not joined_override:
-                query = query.outerjoin(UserOverride, and_(
-                    or_(
-                        UserOverride.metadata_match_id == MetadataMatch.id,
-                        and_(
-                            UserOverride.metadata_match_id == None,
-                            UserOverride.media_item_id == MetadataMatch.media_item_id
-                        )
-                    ),
-                    UserOverride.user_id == self.current_user_id
-                ))
-                joined_override = True
+            override_match = aliased(UserOverride, name="override_match")
+            override_item = aliased(UserOverride, name="override_item")
+            query = query.outerjoin(override_match, and_(
+                override_match.metadata_match_id == MetadataMatch.id,
+                override_match.user_id == self.current_user_id
+            )).outerjoin(override_item, and_(
+                override_item.media_item_id == MetadataMatch.media_item_id,
+                override_item.metadata_match_id.is_(None),
+                override_item.user_id == self.current_user_id
+            ))
             query = query.order_by(func.coalesce(
-                UserOverride.user_rating,
+                override_match.user_rating,
+                override_item.user_rating,
                 MetadataMatch.rating_porndb,
                 MetadataMatch.rating_tmdb,
             ).asc())
@@ -202,74 +200,75 @@ class BaseQueryBuilder:
         elif params.sort_by in ("file_size_asc", "size_asc"):
             query = query.order_by(MediaItem.size.asc())
         elif params.sort_by == "last_watched_desc":
-            if not joined_override:
-                query = query.outerjoin(UserOverride, and_(
-                    or_(
-                        UserOverride.metadata_match_id == MetadataMatch.id,
-                        and_(
-                            UserOverride.metadata_match_id.is_(None),
-                            UserOverride.media_item_id == MetadataMatch.media_item_id
-                        )
-                    ),
-                    UserOverride.user_id == self.current_user_id
-                ))
-                joined_override = True
-            query = query.order_by(desc(UserOverride.last_watched_at))
+            override_match = aliased(UserOverride, name="override_match")
+            override_item = aliased(UserOverride, name="override_item")
+            query = query.outerjoin(override_match, and_(
+                override_match.metadata_match_id == MetadataMatch.id,
+                override_match.user_id == self.current_user_id
+            )).outerjoin(override_item, and_(
+                override_item.media_item_id == MetadataMatch.media_item_id,
+                override_item.metadata_match_id.is_(None),
+                override_item.user_id == self.current_user_id
+            ))
+            query = query.order_by(desc(func.coalesce(override_match.last_watched_at, override_item.last_watched_at)))
         elif params.sort_by == "last_watched_asc":
-            if not joined_override:
-                query = query.outerjoin(UserOverride, and_(
-                    or_(
-                        UserOverride.metadata_match_id == MetadataMatch.id,
-                        and_(
-                            UserOverride.metadata_match_id.is_(None),
-                            UserOverride.media_item_id == MetadataMatch.media_item_id
-                        )
-                    ),
-                    UserOverride.user_id == self.current_user_id
-                ))
-                joined_override = True
-            query = query.order_by(UserOverride.last_watched_at.asc())
+            override_match = aliased(UserOverride, name="override_match")
+            override_item = aliased(UserOverride, name="override_item")
+            query = query.outerjoin(override_match, and_(
+                override_match.metadata_match_id == MetadataMatch.id,
+                override_match.user_id == self.current_user_id
+            )).outerjoin(override_item, and_(
+                override_item.media_item_id == MetadataMatch.media_item_id,
+                override_item.metadata_match_id.is_(None),
+                override_item.user_id == self.current_user_id
+            ))
+            query = query.order_by(func.coalesce(override_match.last_watched_at, override_item.last_watched_at).asc())
         elif params.sort_by in ("watch_count_desc", "watch_count_asc"):
-            if not joined_override:
-                query = query.outerjoin(UserOverride, and_(
-                    or_(
-                        UserOverride.metadata_match_id == MetadataMatch.id,
-                        and_(
-                            UserOverride.metadata_match_id.is_(None),
-                            UserOverride.media_item_id == MetadataMatch.media_item_id
-                        )
-                    ),
-                    UserOverride.user_id == self.current_user_id
-                ))
-                joined_override = True
+            override_match = aliased(UserOverride, name="override_match")
+            override_item = aliased(UserOverride, name="override_item")
+            query = query.outerjoin(override_match, and_(
+                override_match.metadata_match_id == MetadataMatch.id,
+                override_match.user_id == self.current_user_id
+            )).outerjoin(override_item, and_(
+                override_item.media_item_id == MetadataMatch.media_item_id,
+                override_item.metadata_match_id.is_(None),
+                override_item.user_id == self.current_user_id
+            ))
+            val_col = func.coalesce(override_match.watch_count, override_item.watch_count, 0)
             if params.sort_by == "watch_count_desc":
-                query = query.order_by(desc(func.coalesce(UserOverride.watch_count, 0)))
+                query = query.order_by(desc(val_col))
             else:
-                query = query.order_by(func.coalesce(UserOverride.watch_count, 0).asc())
+                query = query.order_by(val_col.asc())
         elif params.sort_by in ("tag_count_desc", "tag_count_asc"):
-            if not joined_override:
-                query = query.outerjoin(UserOverride, and_(
-                    or_(
-                        UserOverride.metadata_match_id == MetadataMatch.id,
-                        and_(
-                            UserOverride.metadata_match_id.is_(None),
-                            UserOverride.media_item_id == MetadataMatch.media_item_id
-                        )
-                    ),
-                    UserOverride.user_id == self.current_user_id
-                ))
-                joined_override = True
-            tag_subquery = self.db.query(
+            override_match = aliased(UserOverride, name="override_match")
+            override_item = aliased(UserOverride, name="override_item")
+            query = query.outerjoin(override_match, and_(
+                override_match.metadata_match_id == MetadataMatch.id,
+                override_match.user_id == self.current_user_id
+            )).outerjoin(override_item, and_(
+                override_item.media_item_id == MetadataMatch.media_item_id,
+                override_item.metadata_match_id.is_(None),
+                override_item.user_id == self.current_user_id
+            ))
+            tag_sub_match = self.db.query(
                 UserOverride.id.label("override_id"),
                 func.count(user_override_tags.c.tag_id).label("tag_count")
             ).join(
                 user_override_tags, UserOverride.id == user_override_tags.c.user_override_id
             ).group_by(UserOverride.id).subquery()
-            query = query.outerjoin(tag_subquery, UserOverride.id == tag_subquery.c.override_id)
+            tag_sub_item = self.db.query(
+                UserOverride.id.label("override_id"),
+                func.count(user_override_tags.c.tag_id).label("tag_count")
+            ).join(
+                user_override_tags, UserOverride.id == user_override_tags.c.user_override_id
+            ).group_by(UserOverride.id).subquery()
+            query = query.outerjoin(tag_sub_match, override_match.id == tag_sub_match.c.override_id)
+            query = query.outerjoin(tag_sub_item, override_item.id == tag_sub_item.c.override_id)
+            val_col = func.coalesce(tag_sub_match.c.tag_count, 0) + func.coalesce(tag_sub_item.c.tag_count, 0)
             if params.sort_by == "tag_count_desc":
-                query = query.order_by(desc(func.coalesce(tag_subquery.c.tag_count, 0)))
+                query = query.order_by(desc(val_col))
             else:
-                query = query.order_by(func.coalesce(tag_subquery.c.tag_count, 0).asc())
+                query = query.order_by(val_col.asc())
         elif params.sort_by in ("finish_count_desc", "finish_count_asc"):
             from app.domains.history.models import PlaybackPeakLog
             peak_subquery = self.db.query(
