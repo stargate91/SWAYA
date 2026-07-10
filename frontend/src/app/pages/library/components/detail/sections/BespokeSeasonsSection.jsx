@@ -12,6 +12,7 @@ import { useTranslation as useLangTranslation } from '@/providers/LanguageContex
 import api from '@/lib/api';
 import BespokeEpisodeDetail from './BespokeEpisodeDetail';
 import Lightbox from '@/ui/Lightbox';
+import PosterCard from '@/ui/PosterCard';
 import './BespokeSeasonsSection.css';
 
 export default function BespokeSeasonsSection() {
@@ -218,33 +219,13 @@ export default function BespokeSeasonsSection() {
         <div className="bespoke-browser-card__body bespoke-browser-card__body--season">
           {/* Left Column: Large Season Poster */}
           <div className="bespoke-season-detail-card__poster-col">
-            <div
-              className={`bespoke-season-detail-card__poster-wrapper ${getPosterUrl(activeSeason.poster_path) ? 'is-clickable' : ''}`}
-              role="button"
-              tabIndex={getPosterUrl(activeSeason.poster_path) ? 0 : -1}
-              onKeyDown={(e) => {
-                if (getPosterUrl(activeSeason.poster_path) && (e.key === 'Enter' || e.key === ' ')) {
-                  handleOpenLightbox(getOriginalPosterUrl(activeSeason.poster_path));
-                }
-              }}
-              onClick={() => {
-                if (getPosterUrl(activeSeason.poster_path)) {
-                  handleOpenLightbox(getOriginalPosterUrl(activeSeason.poster_path));
-                }
-              }}
-            >
-              {getPosterUrl(activeSeason.poster_path) ? (
-                <img
-                  src={getPosterUrl(activeSeason.poster_path)}
-                  alt={activeSeason.title}
-                  className="bespoke-season-detail-card__poster"
-                />
-              ) : (
-                <div className="bespoke-season-detail-card__poster-placeholder">
-                  <Clapperboard size={36} />
-                </div>
-              )}
-            </div>
+            <PosterCard
+              className="bespoke-season-detail-card__poster"
+              imageUrl={getPosterUrl(activeSeason.poster_path)}
+              onClick={getPosterUrl(activeSeason.poster_path) ? () => handleOpenLightbox(getOriginalPosterUrl(activeSeason.poster_path)) : undefined}
+              icon={Clapperboard}
+              disableHoverAnimation={true}
+            />
           </div>
 
           {/* Right Column: Metadata & Overview */}

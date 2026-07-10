@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, ChevronRight, ChevronLeft, Check, Eye, Play, Clapperboard, Calendar, Tv, Star, Droplets, Trash2 } from '@/ui/icons';
 import IconButton from '@/ui/IconButton';
 import Pill from '@/ui/Pill';
+import PosterCard from '@/ui/PosterCard';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { formatEpisodeNumber, formatTime } from '../../../utils/detailUtils';
 import { useMediaDetailContext } from '../MediaDetailContext';
@@ -242,26 +243,17 @@ export default function SeasonsPanel() {
             const title = season.title || `Season ${season.season_number}`;
 
             return (
-              <button
+              <PosterCard
                 key={season.season_number}
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                className={`season-poster-card ${isActive ? 'is-active' : ''}`}
+                className="season-poster-card"
+                active={isActive}
+                imageUrl={posterUrl}
+                title={title}
                 onClick={() => setSelectedSeasonNumber(season.season_number)}
-              >
-                <div className="season-poster-card__image-wrapper">
-                  {posterUrl ? (
-                    <img src={posterUrl} alt={title} className="season-poster-card__image" />
-                  ) : (
-                    <div className="season-poster-card__placeholder">
-                      <Clapperboard size={32} />
-                    </div>
-                  )}
-                </div>
-                <span className="season-poster-card__title" title={title}>
-                  {title}
-                </span>
-              </button>
+                onMouseDown={(e) => e.preventDefault()}
+                icon={Clapperboard}
+                disableHoverAnimation={true}
+              />
             );
           })}
         </div>

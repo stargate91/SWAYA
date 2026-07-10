@@ -33,6 +33,7 @@ const PosterCard = memo(function PosterCard({
   onClick,
   disabled = false,
   active = false,
+  disableHoverAnimation = false,
   style,
   customStyle,
   children,
@@ -108,7 +109,7 @@ const PosterCard = memo(function PosterCard({
     }
   };
 
-  const cardClassName = `ui-poster-card ui-poster-card--aspect-${aspect} ${isOverlayTitle ? 'ui-poster-card--overlay-title' : ''} ${active ? 'is-active' : ''} ${className}`.trim();
+  const cardClassName = `ui-poster-card ui-poster-card--aspect-${aspect} ${isOverlayTitle ? 'ui-poster-card--overlay-title' : ''} ${active ? 'is-active' : ''} ${disableHoverAnimation ? 'no-hover-animation' : ''} ${className}`.trim();
 
   const interactiveProps = {};
   if (DefaultComponent === 'div' && isInteractive) {

@@ -1,6 +1,7 @@
 import { ChevronRight, ChevronLeft, Check, Eye, Play, Clapperboard, Star, Droplets, Trash2 } from '@/ui/icons';
 import IconButton from '@/ui/IconButton';
 import Pill from '@/ui/Pill';
+import PosterCard from '@/ui/PosterCard';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { formatEpisodeNumber, formatTime } from '../../../utils/detailUtils';
 import { useMediaDetailContext } from '../MediaDetailContext';
@@ -57,46 +58,22 @@ export default function BespokeEpisodeDetail({
 
       {/* Left Column: Large Cinematic 16:9 Still */}
       <div className="bespoke-episode-detail-card__still-col">
-        <div
-          className={`bespoke-episode-detail-card__still-wrapper ${getStillUrl(activeEpisode.still_path) ? 'is-clickable' : ''}`}
-          role="button"
-          tabIndex={getStillUrl(activeEpisode.still_path) ? 0 : -1}
-          onKeyDown={(e) => {
-            if (getStillUrl(activeEpisode.still_path) && (e.key === 'Enter' || e.key === ' ')) {
-              handleOpenLightbox(getOriginalStillUrl(activeEpisode.still_path));
-            }
-          }}
-          onClick={() => {
-            if (getStillUrl(activeEpisode.still_path)) {
-              handleOpenLightbox(getOriginalStillUrl(activeEpisode.still_path));
-            }
-          }}
-        >
-          {getStillUrl(activeEpisode.still_path) ? (
-            <img
-              src={getStillUrl(activeEpisode.still_path)}
-              alt={activeEpisode.title}
-              className="bespoke-episode-detail-card__still"
-            />
-          ) : (
-            <div className="bespoke-episode-detail-card__still-placeholder">
-              <Clapperboard size={48} />
-            </div>
-          )}
-
-          {activeEpisode.path && !activeEpisode.is_missing && (
-            <IconButton
-              variant="play-overlay"
-              onClick={(e) => {
-                e.stopPropagation();
-                playMutation.mutate(activeEpisode.id);
-              }}
-              title={t('library.details.playEpisode') || 'Play Episode'}
-            >
-              <Play size={20} fill="currentColor" />
-            </IconButton>
-          )}
-        </div>
+        <PosterCard
+          className="bespoke-episode-detail-card__still"
+          aspect="landscape"
+          imageUrl={getStillUrl(activeEpisode.still_path)}
+          onClick={getStillUrl(activeEpisode.still_path) ? () => handleOpenLightbox(getOriginalStillUrl(activeEpisode.still_path)) : undefined}
+          icon={Clapperboard}
+          disableHoverAnimation={true}
+          playOverlay={activeEpisode.path && !activeEpisode.is_missing ? {
+            onClick: (e) => {
+              e.stopPropagation();
+              playMutation.mutate(activeEpisode.id);
+            },
+            label: t('library.details.playEpisode') || 'Play Episode',
+            icon: <Play size={20} fill="currentColor" />,
+          } : null}
+        />
       </div>
 
       {/* Right Column: Metadata & Copy */}

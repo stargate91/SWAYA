@@ -562,3 +562,15 @@ button.ui-poster-card__image-wrapper:hover:not(:disabled) {
   border-radius: 50%;
   animation: ui-poster-card-spin 0.6s linear infinite;
 }
+
+.ui-poster-card.no-hover-animation:hover {
+  transform: none !important;
+}
+
+.ui-poster-card.no-hover-animation:hover .ui-poster-card__image {
+  transform: none !important;
+}
+
+.ui-poster-card.no-hover-animation:hover .ui-poster-card__image-wrapper {
+  box-shadow: none;
+}

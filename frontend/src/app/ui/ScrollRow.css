@@ -11,3 +11,9 @@
   overflow-x: auto;
   scroll-behavior: smooth;
 }
+
+background: color-mix(in srgb, var(--color-text-primary) 12%, var(--color-surface-glass));
+border-color: var(--color-border-heavy);
+color: var(--color-text-primary);
+transform: none !important;
+}
