@@ -25,6 +25,7 @@ export default function DetailPageShell({
   containerRef,
   isPreviewPlaying,
   previewSrc,
+  isPeople = false,
 }) {
 
   useEffect(() => {
@@ -67,6 +68,91 @@ export default function DetailPageShell({
   const combinedClassName = `media-detail-page ${isScene ? 'media-detail-page--scene' : ''} ${pageClassName}`.trim();
 
   if (isLoading) {
+    if (isPeople) {
+      return (
+        <Page className={`${combinedClassName} entity-detail-page--people`}>
+          <div className="entity-detail-page__hero-section-wrapper" style={{ display: 'flex', flexDirection: 'row', gap: 'var(--space-4xl)', width: '100%', height: 'calc(100vh - var(--page-top-offset, 4rem) - 120px)', alignItems: 'stretch', boxSizing: 'border-box' }}>
+            {/* Left Sidebar Panel (Glass panel structure) */}
+            <div className="entity-detail-page__media-column" style={{
+              width: '320px',
+              flexShrink: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'var(--space-md)',
+              padding: 'var(--space-xl)',
+              borderRadius: '24px',
+              background: 'color-mix(in srgb, var(--app-shell-color-panel, var(--color-panel)) 22%, transparent)',
+              border: '1px solid color-mix(in srgb, var(--color-border-default) 40%, transparent)',
+              backdropFilter: 'blur(16px)',
+              boxSizing: 'border-box',
+              height: '100%'
+            }}>
+              {/* Title & aliases */}
+              <div>
+                <Skeleton style={{ width: '80%', height: '24px', marginBottom: 'var(--space-xs)' }} variant="text" />
+                <Skeleton style={{ width: '60%', height: '14px', marginBottom: 'var(--space-md)' }} variant="text" />
+              </div>
+
+              {/* Profile image card */}
+              <Skeleton style={{ width: '100%', aspectRatio: '2 / 3', borderRadius: '16px' }} variant="rect" />
+
+              {/* Action row (Heart, check, pencil buttons) */}
+              <div style={{ display: 'flex', gap: 'var(--space-sm)', margin: 'var(--space-xs) 0' }}>
+                <Skeleton style={{ flex: 1, height: '32px', borderRadius: '8px' }} variant="rect" />
+                <Skeleton style={{ flex: 1, height: '32px', borderRadius: '8px' }} variant="rect" />
+                <Skeleton style={{ flex: 1, height: '32px', borderRadius: '8px' }} variant="rect" />
+              </div>
+
+              {/* Rating representation */}
+              <Skeleton style={{ width: '100%', height: '12px', borderRadius: '4px', margin: 'var(--space-xs) 0' }} variant="rect" />
+
+              {/* Info grid (Gender, Role, Born, Age, etc.) */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)', margin: 'var(--space-sm) 0' }}>
+                <div>
+                  <Skeleton style={{ width: '50%', height: '10px', marginBottom: '4px' }} variant="text" />
+                  <Skeleton style={{ width: '80%', height: '14px' }} variant="text" />
+                </div>
+                <div>
+                  <Skeleton style={{ width: '50%', height: '10px', marginBottom: '4px' }} variant="text" />
+                  <Skeleton style={{ width: '80%', height: '14px' }} variant="text" />
+                </div>
+                <div>
+                  <Skeleton style={{ width: '50%', height: '10px', marginBottom: '4px' }} variant="text" />
+                  <Skeleton style={{ width: '80%', height: '14px' }} variant="text" />
+                </div>
+                <div>
+                  <Skeleton style={{ width: '50%', height: '10px', marginBottom: '4px' }} variant="text" />
+                  <Skeleton style={{ width: '80%', height: '14px' }} variant="text" />
+                </div>
+              </div>
+
+              {/* Biography button */}
+              <Skeleton style={{ width: '100%', height: '36px', borderRadius: '10px', marginTop: 'auto' }} variant="rect" />
+            </div>
+
+            {/* Right side area: Known For horizontal cards list at the bottom */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', paddingBottom: 'var(--space-xl)', boxSizing: 'border-box' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+                {/* Title: KNOWN FOR */}
+                <Skeleton style={{ width: '120px', height: '18px', marginBottom: 'var(--space-xs)' }} variant="text" />
+                
+                {/* Horizontal row of cards */}
+                <div style={{ display: 'flex', gap: 'var(--space-md)', overflow: 'hidden' }}>
+                  {[...Array(8)].map((_, idx) => (
+                    <div key={idx} style={{ width: '120px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-xs)' }}>
+                      <Skeleton style={{ width: '100%', height: '180px', borderRadius: '12px' }} variant="rect" />
+                      <Skeleton style={{ width: '90%', height: '12px' }} variant="text" />
+                      <Skeleton style={{ width: '60%', height: '10px' }} variant="text" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </Page>
+      );
+    }
+
     return (
       <Page className={combinedClassName}>
         <div style={{ width: '100%' }}>

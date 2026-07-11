@@ -6,6 +6,7 @@ import { OverviewContent } from './EntityDetailSections';
 import { API_BASE } from '@/lib/backend';
 import EditableMediaCard from './EditableMediaCard';
 import { getOriginalImageUrlHelper } from '../../utils/heroSectionUtils';
+import EntityDetailDrawer from './EntityDetailDrawer';
 import './EntityDetailHeroSection.css';
 
 export default function MovieCollectionHeroSection({
@@ -16,6 +17,8 @@ export default function MovieCollectionHeroSection({
   metaPills = [],
   t,
   onMediaCardClick,
+  isDrawerOpen,
+  setIsDrawerOpen,
 }) {
   const [lightboxUrl, setLightboxUrl] = useState(null);
 
@@ -68,6 +71,7 @@ export default function MovieCollectionHeroSection({
                   <OverviewContent
                     text={overviewText}
                     t={t}
+                    openDrawer={() => setIsDrawerOpen(true)}
                   />
                 </div>
               </div>
@@ -75,6 +79,16 @@ export default function MovieCollectionHeroSection({
           )}
         </div>
       </section>
+
+      <EntityDetailDrawer
+        isDrawerOpen={isDrawerOpen}
+        setIsDrawerOpen={setIsDrawerOpen}
+        item={item || {}}
+        overviewTitle={overviewTitle}
+        drawerAliases={[]}
+        overviewText={overviewText}
+        t={t}
+      />
 
       {lightboxUrl && (
         <Lightbox

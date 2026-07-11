@@ -176,11 +176,60 @@ def get_library_filters(
     db: Session = Depends(get_db),
     tab: str = "movies",
     filter_ownership: str = "owned",
-    filter_status: str = "active"
+    filter_status: str = "active",
+    include_adult: bool = False,
+    selected_tags: Optional[str] = None,
+    selected_genre: Optional[str] = None,
+    selected_decade: Optional[str] = None,
+    selected_year: Optional[int] = None,
+    filter_favorite: str = "all",
+    filter_watched: str = "all",
+    filter_gender: str = "all",
+    people_role: str = "all",
+    selected_performer_id: Optional[int] = None,
+    selected_studio_id: Optional[int] = None,
+    filter_hair_color: Optional[str] = None,
+    filter_ethnicity: Optional[str] = None,
+    filter_eye_color: Optional[str] = None,
+    filter_tattoos: Optional[str] = None,
+    filter_piercings: Optional[str] = None,
+    filter_breast_type: Optional[str] = None,
+    filter_butt_shape: Optional[str] = None,
+    filter_butt_size: Optional[str] = None,
 ):
     from app.infrastructure.repositories.db_user_repository import DbUserRepository
+    from app.domains.library.services.listing.filter_params import ListingFilterParams
     user_repo = DbUserRepository(db)
-    return LibraryFilterService(db, user_repository=user_repo).get_library_filter_options(tab, filter_ownership, filter_status)
+    
+    tags_list = None
+    if selected_tags:
+        tags_list = [t.strip() for t in selected_tags.split(",") if t.strip()]
+
+    params = ListingFilterParams(
+        tab=tab,
+        selected_tags=tags_list,
+        selected_genre=selected_genre,
+        selected_decade=selected_decade,
+        selected_year=selected_year,
+        filter_favorite=filter_favorite,
+        filter_watched=filter_watched,
+        filter_ownership=filter_ownership,
+        filter_status=filter_status,
+        filter_gender=filter_gender,
+        people_role=people_role,
+        include_adult=include_adult,
+        selected_performer_id=selected_performer_id,
+        selected_studio_id=selected_studio_id,
+        filter_hair_color=filter_hair_color,
+        filter_ethnicity=filter_ethnicity,
+        filter_eye_color=filter_eye_color,
+        filter_tattoos=filter_tattoos,
+        filter_piercings=filter_piercings,
+        filter_breast_type=filter_breast_type,
+        filter_butt_shape=filter_butt_shape,
+        filter_butt_size=filter_butt_size,
+    )
+    return LibraryFilterService(db, user_repository=user_repo).get_library_filter_options(params)
 
 
 @library_router.get("/library/collections", response_model=MovieCollectionsResponse)

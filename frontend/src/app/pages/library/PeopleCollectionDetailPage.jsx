@@ -129,6 +129,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
       fallbackUrl={mediaUrl}
       backLabel={t('common.back') || 'Back'}
       isLoading={isLoading}
+      isPeople={isPeople}
       pageClassName={`entity-detail-page ${isPeople ? 'entity-detail-page--people' : 'entity-detail-page--collection'} ${isScrolled ? 'is-scrolled' : ''} ${(isImagePickerDrawerOpen || isBackdropDrawerOpen || isDetailsDrawerOpen) ? 'logo-drawer-open' : ''}`}
       topRightControls={
         <EntityDetailTopControls

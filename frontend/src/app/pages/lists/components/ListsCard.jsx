@@ -2,6 +2,7 @@ import { Minus } from '@/ui/icons';
 import CardMetadata from '@/ui/CardMetadata';
 import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
 import AdultOverlay from '@/ui/AdultOverlay';
+import { API_BASE } from '@/lib/backend';
 
 export default function ListsCard({
   item,
@@ -19,7 +20,10 @@ export default function ListsCard({
 
   const isScene = n.isScene;
   const shouldBlur = n.shouldBlur;
-  const posterUrl = n.imageUrl;
+  const rawPosterUrl = n.imageUrl;
+  const posterUrl = (shouldBlur && rawPosterUrl)
+    ? `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(rawPosterUrl)}&blur=true`
+    : rawPosterUrl;
 
   let subtitle = n.subtitle;
   let ratingPill;
@@ -69,7 +73,7 @@ export default function ListsCard({
           <div className="lists-card__placeholder" />
         )}
         {shouldBlur && (
-          <AdultOverlay variant="blur" badgeText={t('common.adult_badge', { defaultValue: '18+' })} />
+          <AdultOverlay variant="obscure" badgeText={t('common.adult_badge', { defaultValue: '18+' })} />
         )}
       </div>
       <CardMetadata

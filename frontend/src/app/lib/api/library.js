@@ -41,12 +41,15 @@ export const library = {
     if (selected_tags) params.append('selected_tags', selected_tags);
     return fetchJson(`/api/library?${params.toString()}`, options);
   },
-  getFilters: ({ tab, filter_ownership, filter_status, include_adult }, options = {}) => {
+  getFilters: (filterParams, options = {}) => {
     const params = new URLSearchParams();
-    if (tab) params.append('tab', tab);
-    if (include_adult !== undefined) params.append('include_adult', String(include_adult));
-    if (filter_ownership) params.append('filter_ownership', filter_ownership);
-    if (filter_status) params.append('filter_status', filter_status);
+    if (filterParams) {
+      for (const key in filterParams) {
+        if (filterParams[key] !== undefined && filterParams[key] !== null) {
+          params.append(key, String(filterParams[key]));
+        }
+      }
+    }
     return fetchJson(`/api/library/filters?${params.toString()}`, options);
   },
   getCollections: ({ page, pageSize, search, tab, include_adult }, options = {}) => {

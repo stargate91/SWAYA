@@ -13,10 +13,11 @@ class LibraryFilterService:
         self.db = db_session
         self.user_repository = user_repository
 
-    def get_library_filter_options(self, tab: str, filter_ownership: str = "owned", filter_status: str = "active") -> FilterOptionsResponse:
+    def get_library_filter_options(self, params) -> FilterOptionsResponse:
         """
         Retrieves filter options available for the specified library tab.
         """
+        tab = params.tab
         is_adult = "adult" in tab.lower() or tab.lower() == "scenes"
         
         from app.domains.library.models import MediaItem
@@ -25,82 +26,30 @@ class LibraryFilterService:
         
         lib_statuses = [ItemStatus.ORGANIZED, ItemStatus.RENAMED]
         
-        # Determine the set of active MetadataMatch IDs for the current tab based on ownership
-        if filter_ownership in ("tracked", "unowned"):
-            from app.domains.users.models import UserOverride
-            from app.shared_kernel.user_context import get_current_user_id
-            current_uid = get_current_user_id() or 1
-            
-            if tab == "movies":
-                match_ids_subquery = select(MetadataMatch.id).join(UserOverride, UserOverride.metadata_match_id == MetadataMatch.id).filter(
-                    MetadataMatch.media_item_id.is_(None),
-                    UserOverride.is_tracked,
-                    UserOverride.user_id == current_uid,
-                    MetadataMatch.media_type == MediaType.MOVIE,
-                    MetadataMatch.is_adult == is_adult
-                ).scalar_subquery()
-            elif tab in ("scenes", "adult_scenes"):
-                match_ids_subquery = select(MetadataMatch.id).join(UserOverride, UserOverride.metadata_match_id == MetadataMatch.id).filter(
-                    MetadataMatch.media_item_id.is_(None),
-                    UserOverride.is_tracked,
-                    UserOverride.user_id == current_uid,
-                    MetadataMatch.media_type == MediaType.SCENE,
-                    MetadataMatch.is_adult == is_adult
-                ).scalar_subquery()
-            elif tab in ("tv", "series", "tv_shows", "adult_tv", "adult_series"):
-                match_ids_subquery = select(MetadataMatch.id).join(UserOverride, UserOverride.metadata_match_id == MetadataMatch.id).filter(
-                    MetadataMatch.media_item_id.is_(None),
-                    UserOverride.is_tracked,
-                    UserOverride.user_id == current_uid,
-                    MetadataMatch.media_type == MediaType.TV,
-                    MetadataMatch.is_adult == is_adult
-                ).scalar_subquery()
-            else:
-                match_ids_subquery = select(MetadataMatch.id).join(UserOverride, UserOverride.metadata_match_id == MetadataMatch.id).filter(
-                    MetadataMatch.media_item_id.is_(None),
-                    UserOverride.is_tracked,
-                    UserOverride.user_id == current_uid,
-                    MetadataMatch.is_adult == is_adult
-                ).scalar_subquery()
+        # Use query builders to dynamically construct the filtered MetadataMatch IDs list
+        if tab == "movies":
+            from app.domains.library.services.listing.builders.movie import MovieQueryBuilder
+            q, _, _ = MovieQueryBuilder(self.db).build_query(params)
+            match_ids_subquery = q.with_entities(MetadataMatch.id).scalar_subquery()
+        elif tab in ("scenes", "adult_scenes"):
+            from app.domains.library.services.listing.builders.scene import SceneQueryBuilder
+            q, _, _ = SceneQueryBuilder(self.db).build_query(params)
+            match_ids_subquery = q.with_entities(MetadataMatch.id).scalar_subquery()
+        elif tab in ("tv", "series", "tv_shows", "adult_tv", "adult_series"):
+            from app.domains.library.services.listing.builders.tv import TvQueryBuilder
+            q, _, _ = TvQueryBuilder(self.db).build_query(params)
+            match_ids_subquery = q.with_entities(MetadataMatch.id).scalar_subquery()
+        elif tab in ("videos", "adult_videos"):
+            from app.domains.library.services.listing.builders.video import VideoQueryBuilder
+            q, _, _ = VideoQueryBuilder(self.db).build_query(params)
+            match_ids_subquery = q.with_entities(MetadataMatch.id).scalar_subquery()
         else:
-            if tab == "movies":
-                match_ids_subquery = select(MetadataMatch.id).join(MediaItem).filter(
-                    MediaItem.status.in_(lib_statuses),
-                    MetadataMatch.media_type == MediaType.MOVIE,
-                    MetadataMatch.is_active,
-                    MetadataMatch.is_adult == is_adult
-                ).scalar_subquery()
-            elif tab in ("scenes", "adult_scenes"):
-                match_ids_subquery = select(MetadataMatch.id).join(MediaItem).filter(
-                    MediaItem.status.in_(lib_statuses),
-                    MetadataMatch.media_type == MediaType.SCENE,
-                    MetadataMatch.is_active,
-                    MetadataMatch.is_adult == is_adult
-                ).scalar_subquery()
-            elif tab in ("tv", "series", "tv_shows", "adult_tv", "adult_series"):
-                season_parent_ids = select(MetadataMatch.parent_id).join(MediaItem).filter(
-                    MediaItem.status.in_(lib_statuses),
-                    MetadataMatch.media_type == MediaType.EPISODE,
-                    MetadataMatch.is_active,
-                    MetadataMatch.is_adult == is_adult
-                ).scalar_subquery()
-                
-                tv_ids = select(MetadataMatch.parent_id).filter(
-                    MetadataMatch.id.in_(season_parent_ids),
-                    MetadataMatch.parent_id.isnot(None)
-                ).scalar_subquery()
-                
-                match_ids_subquery = select(MetadataMatch.id).filter(
-                    MetadataMatch.id.in_(tv_ids),
-                    MetadataMatch.media_type == MediaType.TV,
-                    MetadataMatch.is_adult == is_adult
-                ).scalar_subquery()
-            else:
-                match_ids_subquery = select(MetadataMatch.id).join(MediaItem).filter(
-                    MediaItem.status.in_(lib_statuses),
-                    MetadataMatch.is_active,
-                    MetadataMatch.is_adult == is_adult
-                ).scalar_subquery()
+            # Fallback static query if tab is unknown
+            match_ids_subquery = select(MetadataMatch.id).join(MediaItem).filter(
+                MediaItem.status.in_(lib_statuses),
+                MetadataMatch.is_active,
+                MetadataMatch.is_adult == is_adult
+            ).scalar_subquery()
             
         # 1. Fetch years
         query_years = self.db.query(MetadataMatch.release_date).filter(
@@ -155,10 +104,84 @@ class LibraryFilterService:
             gender_pref = settings_adapter.get_setting("adult_gender_preference") if is_adult else "all"
 
             if "people" in tab.lower():
-                active_people_ids = select(Person.id).filter(
+                people_q = select(Person.id).filter(
                     Person.is_adult == is_adult,
                     Person.is_active == True
-                ).scalar_subquery()
+                )
+
+                # Apply role filter
+                if params.people_role and params.people_role != "all":
+                    role_lower = params.people_role.strip().lower()
+                    if role_lower in ("actor", "actors"):
+                        people_q = people_q.filter(Person.known_for_department == "Acting")
+                    elif role_lower in ("director", "directors"):
+                        people_q = people_q.filter(Person.known_for_department.in_(["Directing", "Creator"]))
+                    elif role_lower in ("writer", "writers"):
+                        people_q = people_q.filter(Person.known_for_department == "Writing")
+                    elif role_lower == "sound":
+                        people_q = people_q.filter(Person.known_for_department == "Sound")
+
+                # Apply gender filter
+                if params.filter_gender and params.filter_gender != "all":
+                    if params.filter_gender == "female":
+                        people_q = people_q.filter(Person.gender.in_([1, "1"]))
+                    elif params.filter_gender == "male":
+                        people_q = people_q.filter(Person.gender.in_([2, "2"]))
+
+                # Apply favorite filter
+                if params.filter_favorite and params.filter_favorite != "all":
+                    from app.domains.users.models import UserOverride
+                    fav_person_ids = select(UserOverride.person_id).filter(
+                        UserOverride.person_id.isnot(None),
+                        UserOverride.is_favorite == True
+                    ).scalar_subquery()
+                    if params.filter_favorite == "favorite":
+                        people_q = people_q.filter(Person.id.in_(fav_person_ids))
+                    elif params.filter_favorite == "not_favorite":
+                        people_q = people_q.filter(~Person.id.in_(fav_person_ids))
+
+                # Apply attribute filters
+                def _apply_attr_filter(q, column, value):
+                    if not value:
+                        return q
+                    return q.filter(column.isnot(None), column != "", column.ilike(value.replace("_", " ").strip()))
+
+                people_q = _apply_attr_filter(people_q, Person.hair_color, params.filter_hair_color)
+                people_q = _apply_attr_filter(people_q, Person.ethnicity, params.filter_ethnicity)
+                people_q = _apply_attr_filter(people_q, Person.eye_color, params.filter_eye_color)
+                people_q = _apply_attr_filter(people_q, Person.breast_type, params.filter_breast_type)
+                people_q = _apply_attr_filter(people_q, Person.butt_shape, params.filter_butt_shape)
+                people_q = _apply_attr_filter(people_q, Person.butt_size, params.filter_butt_size)
+
+                # Apply tattoos/piercings (yes/no toggle)
+                if params.filter_tattoos:
+                    if params.filter_tattoos.lower() == "yes":
+                        people_q = people_q.filter(Person.tattoos.isnot(None), Person.tattoos != "", ~Person.tattoos.in_(["No", "None", "Nincs", "no", "none", "nincs"]))
+                    else:
+                        from sqlalchemy import or_
+                        people_q = people_q.filter(or_(Person.tattoos.is_(None), Person.tattoos == "", Person.tattoos.in_(["No", "None", "Nincs", "no", "none", "nincs"])))
+
+                if params.filter_piercings:
+                    if params.filter_piercings.lower() == "yes":
+                        people_q = people_q.filter(Person.piercings.isnot(None), Person.piercings != "", ~Person.piercings.in_(["No", "None", "Nincs", "no", "none", "nincs"]))
+                    else:
+                        from sqlalchemy import or_
+                        people_q = people_q.filter(or_(Person.piercings.is_(None), Person.piercings == "", Person.piercings.in_(["No", "None", "Nincs", "no", "none", "nincs"])))
+
+                # Apply tags filter
+                if params.selected_tags:
+                    from app.domains.users.models import UserOverride, Tag as UserTag, user_override_tags
+                    tagged_person_ids = select(UserOverride.person_id).join(
+                        user_override_tags, UserOverride.id == user_override_tags.c.user_override_id
+                    ).join(
+                        UserTag, UserTag.id == user_override_tags.c.tag_id
+                    ).filter(
+                        UserTag.name.in_(params.selected_tags),
+                        UserOverride.person_id.isnot(None)
+                    ).scalar_subquery()
+                    people_q = people_q.filter(Person.id.in_(tagged_person_ids))
+
+                active_people_ids = people_q.scalar_subquery()
             else:
                 active_people_ids = select(MediaPersonLink.person_id).filter(
                     MediaPersonLink.match_id.in_(match_ids_subquery)
@@ -270,21 +293,42 @@ class LibraryFilterService:
             ).distinct().all()
             eye_colors = normalize_options([r[0] for r in eye_colors_query])
 
-            tattoos_query = self.db.query(Person.tattoos).filter(
+            from sqlalchemy import or_
+            _no_values = ["No", "None", "Nincs", "no", "none", "nincs"]
+
+            _tattoo_yes = self.db.query(Person.id).filter(
                 Person.id.in_(active_people_ids),
                 Person.is_adult == is_adult,
                 Person.tattoos.isnot(None),
-                Person.tattoos != ""
-            ).distinct().all()
-            tattoos = [r[0] for r in tattoos_query]
+                Person.tattoos != "",
+                ~Person.tattoos.in_(_no_values)
+            ).first() is not None
+            _tattoo_no = self.db.query(Person.id).filter(
+                Person.id.in_(active_people_ids),
+                Person.is_adult == is_adult,
+                or_(Person.tattoos.is_(None), Person.tattoos == "", Person.tattoos.in_(_no_values))
+            ).first() is not None
+            if _tattoo_yes:
+                tattoos.append("yes")
+            if _tattoo_no:
+                tattoos.append("no")
 
-            piercings_query = self.db.query(Person.piercings).filter(
+            _piercing_yes = self.db.query(Person.id).filter(
                 Person.id.in_(active_people_ids),
                 Person.is_adult == is_adult,
                 Person.piercings.isnot(None),
-                Person.piercings != ""
-            ).distinct().all()
-            piercings = [r[0] for r in piercings_query]
+                Person.piercings != "",
+                ~Person.piercings.in_(_no_values)
+            ).first() is not None
+            _piercing_no = self.db.query(Person.id).filter(
+                Person.id.in_(active_people_ids),
+                Person.is_adult == is_adult,
+                or_(Person.piercings.is_(None), Person.piercings == "", Person.piercings.in_(_no_values))
+            ).first() is not None
+            if _piercing_yes:
+                piercings.append("yes")
+            if _piercing_no:
+                piercings.append("no")
 
             breast_types_query = self.db.query(Person.breast_type).filter(
                 Person.id.in_(active_people_ids),

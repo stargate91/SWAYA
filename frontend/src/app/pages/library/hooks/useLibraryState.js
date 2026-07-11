@@ -251,15 +251,65 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     selectedTags
   ]);
 
+  const filtersQueryParams = useMemo(() => {
+    if (isCollections || isTags || !activeSessionMode) return null;
+    return {
+      tab: backendTab,
+      filter_ownership: ownershipFilter,
+      include_adult: activeSessionMode === 'nsfw',
+      lang: settings?.primary_metadata_language,
+      search: searchQuery || undefined,
+      selected_genre: genreFilter || undefined,
+      people_role: isPeople ? peopleRoleFilter : undefined,
+      filter_gender: resolvedGenderFilter,
+      filter_favorite: isPeople ? favoriteFilter : undefined,
+      selected_decade: decadeFilter !== 'all' ? decadeFilter : undefined,
+      selected_year: yearFilter !== '' ? Number(yearFilter) : undefined,
+      selected_performer_id: performerFilter !== '' ? Number(performerFilter) : undefined,
+      selected_studio_id: studioFilter !== '' ? Number(studioFilter) : undefined,
+      filter_hair_color: hairColorFilter !== '' ? hairColorFilter : undefined,
+      filter_ethnicity: ethnicityFilter !== '' ? ethnicityFilter : undefined,
+      filter_eye_color: eyeColorFilter !== '' ? eyeColorFilter : undefined,
+      filter_tattoos: tattoosFilter !== '' ? tattoosFilter : undefined,
+      filter_piercings: piercingsFilter !== '' ? piercingsFilter : undefined,
+      filter_breast_type: breastTypeFilter !== '' ? breastTypeFilter : undefined,
+      filter_butt_shape: buttShapeFilter !== '' ? buttShapeFilter : undefined,
+      filter_butt_size: buttSizeFilter !== '' ? buttSizeFilter : undefined,
+      selected_tags: selectedTags.length > 0 ? selectedTags.join(',') : undefined,
+    };
+  }, [
+    isCollections,
+    isTags,
+    activeSessionMode,
+    backendTab,
+    ownershipFilter,
+    settings?.primary_metadata_language,
+    searchQuery,
+    genreFilter,
+    isPeople,
+    peopleRoleFilter,
+    resolvedGenderFilter,
+    favoriteFilter,
+    decadeFilter,
+    yearFilter,
+    performerFilter,
+    studioFilter,
+    hairColorFilter,
+    ethnicityFilter,
+    eyeColorFilter,
+    tattoosFilter,
+    piercingsFilter,
+    breastTypeFilter,
+    buttShapeFilter,
+    buttSizeFilter,
+    selectedTags,
+  ]);
+
   const { data: libraryData, isLoading: isLibraryLoading } = useLibraryQuery(
     libraryQueryParams || { tab: 'movies', page: 1, pageSize: 1, include_adult: activeSessionMode === 'nsfw' }
   );
 
-  const { data: filterData } = useLibraryFiltersQuery(
-    !isCollections && !isTags && activeSessionMode
-      ? { tab: backendTab, filter_ownership: ownershipFilter, include_adult: activeSessionMode === 'nsfw', lang: settings?.primary_metadata_language }
-      : null
-  );
+  const { data: filterData } = useLibraryFiltersQuery(filtersQueryParams);
 
   const { data: collectionsData, isLoading: isCollectionsLoading } = useCollectionsQuery(
     isCollections && activeSessionMode

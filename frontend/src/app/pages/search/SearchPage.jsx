@@ -17,6 +17,7 @@ import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import AdultOverlay from '@/ui/AdultOverlay';
+import { API_BASE } from '@/lib/backend';
 import './SearchPage.css';
 
 const SOURCES = [
@@ -301,7 +302,14 @@ export default function SearchPage() {
             <PosterGrid className={`search-page-grid ${urlType === 'scene' ? 'library-scenes-grid' : ''}`}>
               {filteredResults.map((item, idx) => {
                 const n = normalizeMediaEntity(item, { context: 'search', settings });
-                const posterUrl = item.poster_path ? resolveMediaImageUrl(item.poster_path, 'posterThumb') : null;
+                const isAdultItem = urlSource !== 'tmdb' || item.is_adult || item.media_type === 'scene';
+                const showBlurOverlay = sessionMode === 'sfw' && isAdultItem;
+
+                const imgType = showBlurOverlay ? (item.media_type === 'scene' ? 'backdrop' : 'poster') : 'posterThumb';
+                const rawPosterUrl = item.poster_path ? resolveMediaImageUrl(item.poster_path, imgType) : null;
+                const posterUrl = (showBlurOverlay && rawPosterUrl)
+                  ? `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(rawPosterUrl)}&blur=true`
+                  : rawPosterUrl;
 
                 let subtitle = n.subtitle || undefined;
                 let ratingPill;
@@ -316,9 +324,6 @@ export default function SearchPage() {
                     <span className="search-page-card-date">{displayDate}</span>
                   ) : undefined;
                 }
-
-                const isAdultItem = urlSource !== 'tmdb' || item.is_adult || item.media_type === 'scene';
-                const showBlurOverlay = sessionMode === 'sfw' && isAdultItem;
 
                 return (
                   <PosterCard
