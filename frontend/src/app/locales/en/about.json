@@ -10,7 +10,16 @@
   },
   "resources": {
     "docs": "Documentation",
-    "changelog": "Changelog"
+    "changelog": "Changelog",
+    "docs_items": {
+      "tmdb": "TMDb API Key",
+      "omdb": "OMDb API Key",
+      "stashdb": "StashDB",
+      "fansdb": "FansDB",
+      "porndb": "ThePornDB",
+      "offline": "Offline Scan",
+      "features": "Feature Tour"
+    }
   },
   "notices": {
     "privacy": "Privacy Policy",

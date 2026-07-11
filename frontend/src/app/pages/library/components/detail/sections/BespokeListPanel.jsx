@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   useListsQuery,
   useItemMembershipQuery,
@@ -7,7 +7,6 @@ import {
   useCreateListMutation
 } from '@/queries';
 import { useMediaDetailContext } from '../MediaDetailContext';
-import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import { useSettingsQuery } from '@/queries/settingsQueries';
 import { Plus, Check, Loader2 } from '@/ui/icons';
 import './BespokeListPanel.css';
@@ -27,9 +26,9 @@ export default function BespokeListPanel() {
     : (item?.id || cleanId);
 
   // Queries
-  const { data: lists = [], isLoading: listsLoading } = useListsQuery(includeAdult);
   const { data: membershipData = { list_ids: [], memberships: [] }, isLoading: membershipLoading } =
     useItemMembershipQuery(membershipItemId);
+  const { data: lists = [], isLoading: listsLoading } = useListsQuery(includeAdult);
 
   // Mutations
   const addMutation = useAddListItemMutation();
@@ -39,11 +38,13 @@ export default function BespokeListPanel() {
   const [newListName, setNewListName] = useState('');
   const [creating, setCreating] = useState(false);
 
+  const [prevListIds, setPrevListIds] = useState(membershipData.list_ids);
   const [optimisticListIds, setOptimisticListIds] = useState(null);
 
-  useEffect(() => {
+  if (membershipData.list_ids !== prevListIds) {
+    setPrevListIds(membershipData.list_ids);
     setOptimisticListIds(null);
-  }, [membershipData.list_ids]);
+  }
 
   const actualListIds = optimisticListIds !== null ? optimisticListIds : (membershipData.list_ids || []);
 
@@ -69,7 +70,7 @@ export default function BespokeListPanel() {
             listId,
             itemId: membership.list_item_id
           });
-        } catch (err) {
+        } catch {
           setOptimisticListIds(membershipData.list_ids);
         }
       }
@@ -91,7 +92,7 @@ export default function BespokeListPanel() {
             year: item.year ? parseInt(item.year, 10) : undefined
           }
         });
-      } catch (err) {
+      } catch {
         setOptimisticListIds(membershipData.list_ids);
       }
     }

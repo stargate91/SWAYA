@@ -1,7 +1,6 @@
 /* eslint-disable react/forbid-dom-props, react/forbid-component-props */
 import { useEffect } from 'react';
 import Page from '@/ui/Page';
-import Spinner from '@/ui/Spinner';
 import Skeleton from '@/ui/Skeleton';
 import { Eye, EyeOff } from '@/ui/icons';
 import HeroSection from './HeroSection';

@@ -6,7 +6,6 @@ import {
   useRemoveListItemMutation,
   useCreateListMutation
 } from '@/queries';
-import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import { useSettingsQuery } from '@/queries/settingsQueries';
 import { List, Plus, Check, Loader2 } from '@/ui/icons';
 import './BespokeListPanel.css';
@@ -43,11 +42,13 @@ export default function ListsPopover({ item, type, t }) {
   const [newListName, setNewListName] = useState('');
   const [creating, setCreating] = useState(false);
 
+  const [prevListIds, setPrevListIds] = useState(membershipData.list_ids);
   const [optimisticListIds, setOptimisticListIds] = useState(null);
 
-  useEffect(() => {
+  if (membershipData.list_ids !== prevListIds) {
+    setPrevListIds(membershipData.list_ids);
     setOptimisticListIds(null);
-  }, [membershipData.list_ids]);
+  }
 
   const actualListIds = optimisticListIds !== null ? optimisticListIds : (membershipData.list_ids || []);
 
@@ -86,7 +87,7 @@ export default function ListsPopover({ item, type, t }) {
             listId,
             itemId: membership.list_item_id
           });
-        } catch (err) {
+        } catch {
           setOptimisticListIds(membershipData.list_ids);
         }
       }
@@ -120,7 +121,7 @@ export default function ListsPopover({ item, type, t }) {
           listId,
           payload
         });
-      } catch (err) {
+      } catch {
         setOptimisticListIds(membershipData.list_ids);
       }
     }

@@ -6,7 +6,6 @@ export default function DetailsMetadataDrawer({
   isOpen,
   onClose,
   item,
-  isMovie,
   isScene,
   t
 }) {

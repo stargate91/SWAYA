@@ -1,6 +1,5 @@
 /* eslint-disable react/forbid-dom-props, react/forbid-component-props */
 import Page from '@/ui/Page';
-import Spinner from '@/ui/Spinner';
 import Skeleton from '@/ui/Skeleton';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';

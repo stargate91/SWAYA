@@ -521,17 +521,17 @@
 .ratings-row-name-link {
   color: var(--color-text-primary);
   cursor: pointer;
-  transition: color var(--transition-fast, 0.2s) ease;
+  transition: color var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 .ratings-row-name-link:hover {
-  color: var(--color-primary-active, var(--color-primary, #3b82f6));
+  color: var(--color-accent);
 }
 
 .ratings-title-inline {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: calc(var(--space-1) + calc(var(--space-1) / 2));
 }
 
 .ratings-title-sup {

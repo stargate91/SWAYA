@@ -112,6 +112,7 @@ export default function ListsHeader({
               </Button>
             </Tooltip>
             <span
+              // eslint-disable-next-line react/forbid-dom-props
               style={activeList?.color ? {
                 '--button-primary-bg': (activeList.color.includes('success') || activeList.color.includes('warning'))
                   ? `color-mix(in srgb, ${activeList.color} 80%, black)`

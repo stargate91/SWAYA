@@ -1,3 +1,4 @@
+/* eslint-disable react/forbid-dom-props */
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { User, ChevronLeft, ChevronRight } from '@/ui/icons';
 import { useMediaDetailContext } from '../MediaDetailContext';
@@ -10,8 +11,6 @@ export default function BespokeCastSection({ item, t, navigate }) {
   const isAdult = item.is_adult;
   const genderPref = settings?.adult_gender_preference;
 
-  const isMovie = item.type === 'movie';
-  const isScene = item.type === 'scene';
   const isTv = item.type === 'tv';
 
   const [activeTab, setActiveTab] = useState('cast'); // 'cast', 'companies', 'networks'

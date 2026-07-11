@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../providers/LanguageContext';
 import { shell } from '../../lib/electron';
@@ -33,6 +33,26 @@ import Lightbox from '../../ui/Lightbox';
 import './AboutPage.css';
 
 const tmdbAttributionLogoSrc = 'https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_2-d537fb228cf3ded904ef09b136fe3fec72548ebc1fea3fbbd1ad9e36364db38b.svg';
+
+const CAMERA_EMOJI = '📷 ';
+const COLON_SEPARATOR = ': ';
+const CHECKMARK_EMOJI = '✓ ';
+const CROSS_EMOJI = '✗ ';
+
+const LOGO_LETTER = 'S';
+const APP_TITLE_TEXT = 'SWAYA';
+const VERSION_CHAR = 'v';
+const DEV_AVATAR_LETTER = 'L';
+const GITHUB_LABEL = 'GitHub';
+const NSFW_TEXT = 'NSFW';
+
+const SILUR_NAME = 'Silur';
+const KERRIGAN_NAME = 'Kerrigan';
+const GITHUB_1_LABEL = 'GitHub 1';
+const GITHUB_2_LABEL = 'GitHub 2';
+const BULLET_SEP = '•';
+const YASHOCK_NAME = 'YaShock';
+const DATA_NAME = 'Data';
 
 const GitHubIcon = ({ size = 16 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="about-social-icon">
@@ -75,11 +95,13 @@ export default function AboutPage() {
   const [activeTourIndex, setActiveTourIndex] = useState(0);
   const [activeSubFeatureIndex, setActiveSubFeatureIndex] = useState(null);
   const showAdult = Boolean(settings?.include_adult);
+  const [prevShowAdult, setPrevShowAdult] = useState(showAdult);
   const [showNsfwDocs, setShowNsfwDocs] = useState(showAdult);
 
-  useEffect(() => {
+  if (showAdult !== prevShowAdult) {
+    setPrevShowAdult(showAdult);
     setShowNsfwDocs(showAdult);
-  }, [showAdult]);
+  }
 
   const [wizardInputs, setWizardInputs] = useState(null);
 
@@ -192,7 +214,7 @@ export default function AboutPage() {
             </button>
           ) : step.screenshotPlaceholder && (
             <div className="docs-wizard-screenshot-placeholder">
-              {'📷 '}{t('about.docs_wizard.screenshot_placeholder') || 'Screenshot'}{': '}{step.screenshotPlaceholder}
+              {CAMERA_EMOJI}{t('about.docs_wizard.screenshot_placeholder') || 'Screenshot'}{COLON_SEPARATOR}{step.screenshotPlaceholder}
             </div>
           )}
 
@@ -207,8 +229,8 @@ export default function AboutPage() {
               >
                 {saveStatus === 'saving' ? (t('about.docs_wizard.saving') || 'Saving...') : (t('about.docs_wizard.save') || 'Save')}
               </button>
-              {saveStatus === 'success' && <span className="docs-wizard-save-status-success">{'✓ '}{t('about.docs_wizard.saved') || 'Saved successfully!'}</span>}
-              {saveStatus === 'error' && <span className="docs-wizard-save-status-error">{'✗ '}{t('about.docs_wizard.save_failed') || 'Failed to save'}</span>}
+              {saveStatus === 'success' && <span className="docs-wizard-save-status-success">{CHECKMARK_EMOJI}{t('about.docs_wizard.saved') || 'Saved successfully!'}</span>}
+              {saveStatus === 'error' && <span className="docs-wizard-save-status-error">{CROSS_EMOJI}{t('about.docs_wizard.save_failed') || 'Failed to save'}</span>}
             </div>
           )}
         </div>
@@ -804,18 +826,18 @@ export default function AboutPage() {
   ];
 
   const docSubItems = [
-    { id: 'docs_tmdb', label: 'TMDb API Key' },
-    { id: 'docs_omdb', label: 'OMDb API Key' },
-    { id: 'docs_stashdb', label: 'StashDB' },
-    { id: 'docs_fansdb', label: 'FansDB' },
-    { id: 'docs_porndb', label: 'ThePornDB' },
-    { id: 'docs_offline', label: 'Offline Scan' },
-    { id: 'docs_features', label: 'Feature Tour' },
+    { id: 'docs_tmdb', label: t('about.resources.docs_items.tmdb') || 'TMDb API Key' },
+    { id: 'docs_omdb', label: t('about.resources.docs_items.omdb') || 'OMDb API Key' },
+    { id: 'docs_stashdb', label: t('about.resources.docs_items.stashdb') || 'StashDB' },
+    { id: 'docs_fansdb', label: t('about.resources.docs_items.fansdb') || 'FansDB' },
+    { id: 'docs_porndb', label: t('about.resources.docs_items.porndb') || 'ThePornDB' },
+    { id: 'docs_offline', label: t('about.resources.docs_items.offline') || 'Offline Scan' },
+    { id: 'docs_features', label: t('about.resources.docs_items.features') || 'Feature Tour' },
   ];
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     navigate(-1);
-  };
+  }, [navigate]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -831,26 +853,28 @@ export default function AboutPage() {
   }, [handleClose]);
 
   useEffect(() => {
-    if (activeTab === 'changelog' && !hasLoadedChangelog && !isLoadingChangelog) {
+    if (activeTab !== 'changelog' || hasLoadedChangelog || isLoadingChangelog) return;
+
+    const loadChangelog = async () => {
       setIsLoadingChangelog(true);
       setChangelogError(null);
-      fetchJson('/api/settings/changelog')
-        .then((data) => {
-          if (data.status === 'success') {
-            setChangelogContent(data.content || '');
-            setHasLoadedChangelog(true);
-          } else {
-            throw new Error(data.message || 'Failed to load changelog');
-          }
-        })
-        .catch((err) => {
-          setChangelogError(err.message || 'Failed to load changelog');
+      try {
+        const data = await fetchJson('/api/settings/changelog');
+        if (data.status === 'success') {
+          setChangelogContent(data.content || '');
           setHasLoadedChangelog(true);
-        })
-        .finally(() => {
-          setIsLoadingChangelog(false);
-        });
-    }
+        } else {
+          throw new Error(data.message || 'Failed to load changelog');
+        }
+      } catch (err) {
+        setChangelogError(err.message || 'Failed to load changelog');
+        setHasLoadedChangelog(true);
+      } finally {
+        setIsLoadingChangelog(false);
+      }
+    };
+
+    loadChangelog();
   }, [activeTab, hasLoadedChangelog, isLoadingChangelog]);
 
   const tabs = [
@@ -874,12 +898,7 @@ export default function AboutPage() {
     },
   };
 
-  const developerLinks = [
-    { href: `mailto:${appInfo.developer.email}`, icon: <Mail size={16} />, label: t('about.links.email') },
-    { href: appInfo.developer.website, icon: <Globe size={16} />, label: t('about.links.website') },
-    { href: appInfo.developer.github, icon: <GitHubIcon size={16} />, label: t('about.links.github') },
-    { href: appInfo.developer.discordServer, icon: <DiscordIcon size={16} />, label: t('about.links.discord_server') },
-  ];
+
 
   const isDocsTabActive = activeTab === 'docs' || activeTab.startsWith('docs_');
   const sidebarGroups = tabs.map((tab) => {
@@ -933,16 +952,16 @@ export default function AboutPage() {
 
       <main className="ui-overlay__content-wrapper">
 
-        <div className="ui-overlay__content" style={activeTab === 'docs_features' ? { maxWidth: '1200px' } : undefined}>
+        <div className={`ui-overlay__content ${activeTab === 'docs_features' ? 'ui-overlay__content--wide' : ''}`}>
           <div className="settings-tab-content">
             {activeTab === 'info' && (
               <div className="about-tab-panel info-panel">
                 <div className="about-app-brand-card">
-                  <div className="about-app-logo">S</div>
+                  <div className="about-app-logo">{LOGO_LETTER}</div>
                   <div className="about-app-details">
                     <div className="about-app-name-row">
-                      <span className="about-app-title">SWAYA</span>
-                      <span className="about-app-version">v{appInfo.version}</span>
+                      <span className="about-app-title">{APP_TITLE_TEXT}</span>
+                      <span className="about-app-version">{VERSION_CHAR}{appInfo.version}</span>
                     </div>
                     <p className="about-app-description">{t('about.subtitle') || 'Organize, enrich, and keep your media library clean.'}</p>
                   </div>
@@ -955,7 +974,7 @@ export default function AboutPage() {
                       <p>{t('about.app_info.developer_intro') || 'Reach out directly if you want to report bugs, collaborate, or share feedback.'}</p>
                     </div>
                     <div className="developer-profile-card">
-                      <div className="developer-avatar">L</div>
+                      <div className="developer-avatar">{DEV_AVATAR_LETTER}</div>
                       <div className="developer-info">
                         <span className="developer-name">{t('about.app_info.developer_name') || 'Levente Gáll'}</span>
                         <span className="developer-email">{t('about.app_info.developer_email') || 'leventegall@proton.me'}</span>
@@ -968,15 +987,15 @@ export default function AboutPage() {
                       </a>
                       <a href="https://swaya.io" className="ui-button ui-button--secondary ui-button--md" onClick={(e) => { e.preventDefault(); openExternalLink('https://swaya.io'); }}>
                         <Globe size={16} />
-                        <span>Website</span>
+                        <span>{t('about.links.website') || 'Website'}</span>
                       </a>
                       <a href="https://github.com/stargate91/SWAYA" className="ui-button ui-button--secondary ui-button--md" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/stargate91/SWAYA'); }}>
                         <GitHubIcon size={16} />
-                        <span>GitHub</span>
+                        <span>{t('about.links.github') || 'GitHub'}</span>
                       </a>
                       <a href="https://discord.gg/swaya" className="ui-button ui-button--secondary ui-button--md" onClick={(e) => { e.preventDefault(); openExternalLink('https://discord.gg/swaya'); }}>
                         <DiscordIcon size={16} />
-                        <span>Discord Server</span>
+                        <span>{t('about.links.discord_server') || 'Discord Server'}</span>
                       </a>
                     </div>
                   </div>
@@ -1020,7 +1039,7 @@ export default function AboutPage() {
             {activeTab === 'docs_tmdb' && (
               <div className="about-tab-panel docs-panel">
                 <Card className="about-card docs-card">
-                  <h2 className="about-section-title">TMDb API Key</h2>
+                  <h2 className="about-section-title">{t('about.resources.docs_items.tmdb') || 'TMDb API Key'}</h2>
                   {renderWizard(tmdbWizardSteps)}
                 </Card>
               </div>
@@ -1028,7 +1047,7 @@ export default function AboutPage() {
             {activeTab === 'docs_omdb' && (
               <div className="about-tab-panel docs-panel">
                 <Card className="about-card docs-card">
-                  <h2 className="about-section-title">OMDb API Key</h2>
+                  <h2 className="about-section-title">{t('about.resources.docs_items.omdb') || 'OMDb API Key'}</h2>
                   {renderWizard(omdbWizardSteps)}
                 </Card>
               </div>
@@ -1036,7 +1055,7 @@ export default function AboutPage() {
             {activeTab === 'docs_stashdb' && (
               <div className="about-tab-panel docs-panel">
                 <Card className="about-card docs-card">
-                  <h2 className="about-section-title">StashDB</h2>
+                  <h2 className="about-section-title">{t('about.resources.docs_items.stashdb') || 'StashDB'}</h2>
                   {renderWizard(stashdbWizardSteps)}
                 </Card>
               </div>
@@ -1044,7 +1063,7 @@ export default function AboutPage() {
             {activeTab === 'docs_fansdb' && (
               <div className="about-tab-panel docs-panel">
                 <Card className="about-card docs-card">
-                  <h2 className="about-section-title">FansDB</h2>
+                  <h2 className="about-section-title">{t('about.resources.docs_items.fansdb') || 'FansDB'}</h2>
                   {renderWizard(fansdbWizardSteps)}
                 </Card>
               </div>
@@ -1052,7 +1071,7 @@ export default function AboutPage() {
             {activeTab === 'docs_porndb' && (
               <div className="about-tab-panel docs-panel">
                 <Card className="about-card docs-card">
-                  <h2 className="about-section-title">ThePornDB</h2>
+                  <h2 className="about-section-title">{t('about.resources.docs_items.porndb') || 'ThePornDB'}</h2>
                   {renderWizard(porndbWizardSteps)}
                 </Card>
               </div>
@@ -1060,7 +1079,7 @@ export default function AboutPage() {
             {activeTab === 'docs_offline' && (
               <div className="about-tab-panel docs-panel">
                 <Card className="about-card docs-card">
-                  <h2 className="about-section-title">Offline Scan</h2>
+                  <h2 className="about-section-title">{t('about.resources.docs_items.offline') || 'Offline Scan'}</h2>
                   {renderWizard(offlineWizardSteps)}
                 </Card>
               </div>
@@ -1075,13 +1094,13 @@ export default function AboutPage() {
               const displayImage = (showNsfwDocs && currentItemObj.image_nsfw) ? currentItemObj.image_nsfw : currentItemObj.image;
 
               return (
-                <div className="about-tab-panel docs-panel" style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: '10px 20px 20px 20px' }}>
-                  <h2 style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--color-text-primary)', margin: '0 0 20px 0' }}>Feature Tour</h2>
-                  <div style={{ display: 'flex', flex: 1, gap: '30px', minHeight: 0 }}>
+                <div className="about-features-tour-container">
+                  <h2 className="about-features-tour-title">{t('about.resources.docs_items.features') || 'Feature Tour'}</h2>
+                  <div className="about-features-tour-body">
                     {/* Left Sidebar List of Pages & Sub-features */}
-                    <div style={{ width: '280px', borderRight: '1px solid var(--color-border-subtle)', paddingRight: '20px', display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--color-bg-subtle, rgba(255,255,255,0.01))', borderRadius: '8px', border: '1px solid var(--color-border-subtle)', marginBottom: '8px', flexShrink: 0 }}>
-                        <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-secondary)' }}>
+                    <div className="about-features-tour-sidebar">
+                      <div className="about-features-nsfw-toggle">
+                        <span className="about-features-nsfw-label">
                           {t('about.docs_wizard.show_nsfw_features') || 'Show NSFW Features'}
                         </span>
                         <Switch
@@ -1102,29 +1121,38 @@ export default function AboutPage() {
                         const activeSubIndex = f.details ? filteredDetails.findIndex(detail => f.details.indexOf(detail) === activeSubFeatureIndex) : -1;
 
                         return (
-                          <div key={f.id} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <div key={f.id} className="about-features-sidebar-group">
                             <div
                               className={`ui-sidebar-item ${isMainActive ? 'active' : ''}`}
                               onClick={() => {
                                 setActiveTourIndex(idx);
                                 setActiveSubFeatureIndex(null);
                               }}
-                              style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
+                              role="button"
+                              tabIndex={0}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  setActiveTourIndex(idx);
+                                  setActiveSubFeatureIndex(null);
+                                }
+                              }}
                             >
-                              <span className="ui-sidebar-item-icon" style={{ display: 'flex', alignItems: 'center', color: 'inherit' }}>{f.icon}</span>
-                              <span className="ui-sidebar-label" style={{ color: 'inherit' }}>{f.title}</span>
+                              <span className="ui-sidebar-item-icon about-features-item-icon">{f.icon}</span>
+                              <span className="ui-sidebar-label about-features-item-label">{f.title}</span>
                               {f.details && (
-                                <span style={{ fontSize: '10px', opacity: 0.7, color: 'inherit' }}>
+                                <span className="about-features-item-expand">
                                   {isAnyActive ? '▼' : '▶'}
                                 </span>
                               )}
                             </div>
 
                             {f.details && isAnyActive && filteredDetails.length > 0 && (
-                              <div className="ui-sidebar-sub-menu is-open" style={{ marginLeft: '1.25rem', paddingLeft: '1.25rem', position: 'relative' }}>
+                              <div className="ui-sidebar-sub-menu is-open about-features-sub-menu">
                                 {activeSubIndex !== -1 && (
                                   <div
-                                    className="ui-sidebar-sub-indicator"
+                                    className="ui-sidebar-sub-indicator about-features-sub-indicator"
+                                    // eslint-disable-next-line react/forbid-dom-props
                                     style={{ top: `${activeSubIndex * 32}px` }}
                                   />
                                 )}
@@ -1139,12 +1167,20 @@ export default function AboutPage() {
                                         setActiveTourIndex(idx);
                                         setActiveSubFeatureIndex(originalIndex);
                                       }}
-                                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px', width: '100%' }}
+                                      role="button"
+                                      tabIndex={0}
+                                      onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                          e.preventDefault();
+                                          setActiveTourIndex(idx);
+                                          setActiveSubFeatureIndex(originalIndex);
+                                        }
+                                      }}
                                     >
-                                      <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{detail.title}</span>
+                                      <span className="about-features-sub-item-text">{detail.title}</span>
                                       {detail.nsfw && (
-                                        <span style={{ fontSize: '9px', fontWeight: 'bold', color: 'var(--color-danger, #ef4444)', background: 'rgba(239, 68, 68, 0.15)', padding: '1px 4px', borderRadius: '4px', textTransform: 'uppercase', flexShrink: 0 }}>
-                                          NSFW
+                                        <span className="about-features-nsfw-badge">
+                                          {NSFW_TEXT}
                                         </span>
                                       )}
                                     </div>
@@ -1158,66 +1194,50 @@ export default function AboutPage() {
                     </div>
 
                     {/* Right Content Panel (Split details + image) */}
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px', minWidth: 0, overflowY: 'auto', paddingRight: '15px' }}>
-                      <h3 style={{ fontSize: '20px', fontWeight: 'bold', margin: 0, color: 'var(--color-text-primary)' }}>
+                    <div className="about-features-content-panel">
+                      <h3 className="about-features-content-title">
                         {displayTitle}
                       </h3>
 
                       {/* Screenshot / Image Showcase */}
                       <div
-                        style={{
-                          width: '100%',
-                          maxWidth: '800px',
-                          height: '360px',
-                          background: displayImage ? 'transparent' : 'var(--color-bg-subtle, rgba(255,255,255,0.01))',
-                          border: displayImage ? 'none' : '1px dashed var(--color-border-default)',
-                          borderRadius: '12px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: displayImage ? 'pointer' : 'default',
-                          overflow: 'hidden',
-                          position: 'relative',
-                          flexShrink: 0
-                        }}
+                        className={`about-features-screenshot-wrapper ${displayImage ? '' : 'about-features-screenshot-wrapper--placeholder'}`}
                         onClick={() => {
                           if (displayImage) {
                             setActiveLightboxUrl(displayImage);
                           }
                         }}
+                        role="button"
+                        tabIndex={displayImage ? 0 : -1}
+                        onKeyDown={displayImage ? (e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setActiveLightboxUrl(displayImage);
+                          }
+                        } : undefined}
                       >
                         {displayImage ? (
                           <img
                             src={displayImage}
                             alt={displayTitle}
-                            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                            className="about-features-screenshot-image"
                           />
                         ) : (
-                          <div style={{ textAlign: 'center', padding: '25px', color: 'var(--color-text-muted)' }}>
-                            <span style={{ fontSize: '32px', display: 'block', marginBottom: '10px' }}>📷</span>
-                            <span style={{ fontSize: '12px', fontWeight: 600 }}>{t('about.docs_wizard.screenshot_placeholder') || 'Screenshot Placeholder'}</span>
-                            <span style={{ fontSize: '11px', display: 'block', color: 'var(--color-text-secondary)', marginTop: '6px' }}>{displayTitle}</span>
+                          <div className="about-features-placeholder-content">
+                            <span className="about-features-placeholder-icon">{CAMERA_EMOJI}</span>
+                            <span className="about-features-placeholder-label">{t('about.docs_wizard.screenshot_placeholder') || 'Screenshot Placeholder'}</span>
+                            <span className="about-features-placeholder-title">{displayTitle}</span>
                           </div>
                         )}
                       </div>
 
                       {/* Features / Details of the selected page */}
-                      <div style={{ fontSize: '14px', lineHeight: '1.7', color: 'var(--color-text-secondary)', margin: '0 0 15px 0', maxWidth: '800px' }}>
-                        <p style={{ whiteSpace: 'pre-wrap', margin: '0 0 12px 0' }}>
-                          {hasSubFeature ? currentItemObj.description : activeItem.description}
+                      <div className="about-features-description-container">
+                        <p className="about-features-description-text">
+                          {displayDescription}
                         </p>
                         {showNsfwDocs && currentItemObj.description_nsfw && (
-                          <div style={{
-                            padding: '12px 16px',
-                            background: 'rgba(239, 68, 68, 0.05)',
-                            borderLeft: '3px solid var(--color-danger, #ef4444)',
-                            borderRadius: '0 6px 6px 0',
-                            color: 'color-mix(in srgb, var(--color-text-primary) 85%, var(--color-danger, #ef4444))',
-                            fontSize: '13px',
-                            whiteSpace: 'pre-wrap',
-                            marginTop: '12px',
-                            animation: 'fadeIn var(--motion-duration-fast) var(--motion-ease-emphasized)'
-                          }}>
+                          <div className="about-features-nsfw-description">
                             {/* Extract only the nsfw specific extension part if description_nsfw starts with base description */}
                             {currentItemObj.description_nsfw.replace(currentItemObj.description, '').trim().replace(/^\n+/, '')}
                           </div>
@@ -1290,43 +1310,43 @@ export default function AboutPage() {
                     <p className="special-thanks-intro">{t('about.notices.special_thanks_intro')}</p>
                     <div className="special-thanks-grid">
                       <div className="thanks-item">
-                        <span className="thanks-name">Silur</span>
+                        <span className="thanks-name">{SILUR_NAME}</span>
                         <div className="thanks-links">
                           <a href="https://github.com/Silur" className="thanks-link" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/Silur'); }}>
                             <GitHubIcon size={12} />
-                            <span>GitHub</span>
+                            <span>{GITHUB_LABEL}</span>
                           </a>
                         </div>
                       </div>
                       <div className="thanks-item">
-                        <span className="thanks-name">Kerrigan</span>
+                        <span className="thanks-name">{KERRIGAN_NAME}</span>
                         <div className="thanks-links">
                           <a href="https://github.com/rasztasd" className="thanks-link" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/rasztasd'); }}>
                             <GitHubIcon size={12} />
-                            <span>GitHub 1</span>
+                            <span>{GITHUB_1_LABEL}</span>
                           </a>
-                          <span className="thanks-divider">•</span>
+                          <span className="thanks-divider">{BULLET_SEP}</span>
                           <a href="https://github.com/danielmcallisterSG" className="thanks-link" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/danielmcallisterSG'); }}>
                             <GitHubIcon size={12} />
-                            <span>GitHub 2</span>
+                            <span>{GITHUB_2_LABEL}</span>
                           </a>
                         </div>
                       </div>
                       <div className="thanks-item">
-                        <span className="thanks-name">YaShock</span>
+                        <span className="thanks-name">{YASHOCK_NAME}</span>
                         <div className="thanks-links">
                           <a href="https://github.com/YaShock" className="thanks-link" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/YaShock'); }}>
                             <GitHubIcon size={12} />
-                            <span>GitHub</span>
+                            <span>{GITHUB_LABEL}</span>
                           </a>
                         </div>
                       </div>
                       <div className="thanks-item">
-                        <span className="thanks-name">Data</span>
+                        <span className="thanks-name">{DATA_NAME}</span>
                         <div className="thanks-links">
                           <a href="https://github.com/adamgyongyosi" className="thanks-link" onClick={(e) => { e.preventDefault(); openExternalLink('https://github.com/adamgyongyosi'); }}>
                             <GitHubIcon size={12} />
-                            <span>GitHub</span>
+                            <span>{GITHUB_LABEL}</span>
                           </a>
                         </div>
                       </div>
