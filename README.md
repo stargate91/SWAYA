@@ -1,22 +1,22 @@
 # Swaya
 
-A desktop media library manager for movies, TV shows, and scenes. Scans your local folders, pulls metadata from several online databases, downloads artwork, tracks what you've watched, and plays files with an embedded MPV player — all from one app.
+A desktop media library manager for movies, TV shows, and scenes. Scans your local folders, pulls metadata from several online databases, downloads artwork, tracks what you've watched, and plays files with an embedded MPV player - all from one app.
 
 ## What It Does
 
-- **Folder scanning** — Point it at a directory and it will find video files, identify them using `guessit`, and match them against TMDB, OMDb, StashDB, PornDB, or FansDB.
-- **Metadata resolution** — Automated pipeline resolves titles, cast, genres, ratings, and artwork. Supports mainstream and adult content pipelines separately.
-- **Image handling** — Downloads posters, backdrops, logos, and headshots. Resizes originals, generates thumbnails, and filters logos/backdrops by brightness so you don't end up with invisible art on dark UIs.
-- **Embedded playback** — MPV runs as a child process controlled over a JSON IPC socket. Supports picture-in-picture, chapter navigation, subtitle/audio track switching, and playback speed controls.
-- **Watch history** — Tracks progress per file. Resume where you left off.
-- **File organization** — Organizer module can rename and move matched files into a clean folder structure based on configurable strategies (movie, episode, scene).
-- **Recommendations** — Basic recommendation engine surfaces titles based on your library and history.
-- **Background tasks** — Long-running operations (scanning, metadata sync, image downloads, people enrichment) run in background workers with status tracking and abort support.
-- **System tray** — Minimizes to tray on close. Tray context menu for quick access or quit.
-- **SFW/NSFW modes** — Separate content views with persisted toggle. Adult content is filtered at both the API and UI level.
-- **Custom lists & tags** — Create and manage personal collections and tag items freely.
-- **Hotkeys** — Global hotkey listener on Windows for media control.
-- **Live folder watching** — Watchdog monitors library directories for changes and auto-updates the database.
+- **Folder scanning** - Point it at a directory and it will find video files, identify them using `guessit`, and match them against TMDB, OMDb, StashDB, PornDB, or FansDB.
+- **Metadata resolution** - Automated pipeline resolves titles, cast, genres, ratings, and artwork. Supports mainstream and adult content pipelines separately.
+- **Image handling** - Downloads posters, backdrops, logos, and headshots. Resizes originals, generates thumbnails, and filters logos/backdrops by brightness so you don't end up with invisible art on dark UIs.
+- **Embedded playback** - MPV runs as a child process controlled over a JSON IPC socket. Supports picture-in-picture, chapter navigation, subtitle/audio track switching, and playback speed controls.
+- **Watch history** - Tracks progress per file. Resume where you left off.
+- **File organization** - Organizer module can rename and move matched files into a clean folder structure based on configurable strategies (movie, episode, scene).
+- **Recommendations** - Basic recommendation engine surfaces titles based on your library and history.
+- **Background tasks** - Long-running operations (scanning, metadata sync, image downloads, people enrichment) run in background workers with status tracking and abort support.
+- **System tray** - Minimizes to tray on close. Tray context menu for quick access or quit.
+- **SFW/NSFW modes** - Separate content views with persisted toggle. Adult content is filtered at both the API and UI level.
+- **Custom lists & tags** - Create and manage personal collections and tag items freely.
+- **Hotkeys** - Global hotkey listener on Windows for media control.
+- **Live folder watching** - Watchdog monitors library directories for changes and auto-updates the database.
 
 ## Architecture
 
@@ -68,8 +68,8 @@ app/
 ```
 
 Key design decisions:
-- Read/write separation — readers are pure query classes, services handle mutations.
-- Two SQLite databases — `swaya.db` for application data, `cache.db` for API response caching with configurable TTLs.
+- Read/write separation - readers are pure query classes, services handle mutations.
+- Two SQLite databases - `swaya.db` for application data, `cache.db` for API response caching with configurable TTLs.
 - Background workers run on the main event loop via async, with a thread pool executor for blocking I/O.
 - Scraper gateway provides a unified interface over all provider clients with rate limiting.
 
@@ -115,7 +115,7 @@ Frontend details:
 - Hash router (required for Electron `file://` protocol in production builds).
 - Global search with keyboard shortcut support.
 - Skeleton loading states, infinite scroll, scroll position restoration.
-- Renderer heartbeat watchdog — Electron main process monitors responsiveness and auto-reloads on crash.
+- Renderer heartbeat watchdog - Electron main process monitors responsiveness and auto-reloads on crash.
 - Production builds bundled with `electron-builder` (Windows `.exe`, Linux `AppImage`).
 - Backend is bundled as a PyInstaller executable shipped in `extraResources`.
 
@@ -250,8 +250,8 @@ npm run lint:style
 ├── app/                Python backend (FastAPI)
 ├── frontend/           Electron + React frontend
 ├── alembic/            Database migration scripts
-├── data/               Runtime data (DBs, images, previews) — gitignored
-├── logs/               Application logs — gitignored
+├── data/               Runtime data (DBs, images, previews) - gitignored
+├── logs/               Application logs - gitignored
 ├── requirements.txt    Python dependencies
 ├── alembic.ini         Alembic configuration
 ├── run.py              Backend entry point
