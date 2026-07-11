@@ -51,25 +51,37 @@ class BaseQueryBuilder:
                     )
                 )
 
-        # Favorite filter
-        if params.filter_favorite in ("favorite", "not_favorite"):
-            if not joined_override:
-                query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == self.current_user_id))
-                joined_override = True
-            if params.filter_favorite == "favorite":
-                query = query.filter(UserOverride.is_favorite)
-            else:
-                query = query.filter(or_(~UserOverride.is_favorite, UserOverride.is_favorite.is_(None)))
+        # Favorite and Watched filters
+        if params.filter_favorite in ("favorite", "not_favorite") or params.filter_watched in ("watched", "unwatched"):
+            from sqlalchemy.orm import aliased
+            override_match = aliased(UserOverride, name="filter_override_match")
+            override_item = aliased(UserOverride, name="filter_override_item")
+            
+            query = query.outerjoin(override_match, and_(
+                override_match.metadata_match_id == MetadataMatch.id,
+                override_match.user_id == self.current_user_id
+            )).outerjoin(override_item, and_(
+                override_item.media_item_id == MetadataMatch.media_item_id,
+                override_item.metadata_match_id.is_(None),
+                override_item.user_id == self.current_user_id
+            ))
+            joined_override = True
 
-        # Watched filter
-        if params.filter_watched in ("watched", "unwatched"):
-            if not joined_override:
-                query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == self.current_user_id))
-                joined_override = True
+            if params.filter_favorite == "favorite":
+                query = query.filter(or_(override_match.is_favorite, override_item.is_favorite))
+            elif params.filter_favorite == "not_favorite":
+                query = query.filter(
+                    or_(~override_match.is_favorite, override_match.is_favorite.is_(None)),
+                    or_(~override_item.is_favorite, override_item.is_favorite.is_(None))
+                )
+
             if params.filter_watched == "watched":
-                query = query.filter(UserOverride.is_watched)
-            else:
-                query = query.filter(or_(~UserOverride.is_watched, UserOverride.is_watched.is_(None)))
+                query = query.filter(or_(override_match.is_watched, override_item.is_watched))
+            elif params.filter_watched == "unwatched":
+                query = query.filter(
+                    or_(~override_match.is_watched, override_match.is_watched.is_(None)),
+                    or_(~override_item.is_watched, override_item.is_watched.is_(None))
+                )
 
         # Genre filter
         if params.selected_genre:
@@ -298,15 +310,24 @@ class BaseQueryBuilder:
 
     def format_results(self, items: List[MetadataMatch]) -> List[dict]:
         match_ids = [m.id for m in items]
-        overrides_dict = {}
+        media_item_ids = [m.media_item_id for m in items if m.media_item_id is not None]
+        metadata_overrides = {}
+        physical_overrides = {}
         people_links_dict = {}
         if match_ids:
+            ov_filters = [UserOverride.metadata_match_id.in_(match_ids)]
+            if media_item_ids:
+                ov_filters.append(UserOverride.media_item_id.in_(media_item_ids))
+            
             ovs = self.db.query(UserOverride).filter(
                 UserOverride.user_id == self.current_user_id,
-                UserOverride.metadata_match_id.in_(match_ids)
+                or_(*ov_filters)
             ).all()
             for ov in ovs:
-                overrides_dict[ov.metadata_match_id] = ov
+                if ov.metadata_match_id:
+                    metadata_overrides[ov.metadata_match_id] = ov
+                if ov.media_item_id and not ov.metadata_match_id:
+                    physical_overrides[ov.media_item_id] = ov
                 
             links = self.db.query(MediaPersonLink).options(
                 joinedload(MediaPersonLink.person)
@@ -334,11 +355,13 @@ class BaseQueryBuilder:
                 ).first() is not None
                 in_library = has_local_eps
             
-            o = overrides_dict.get(match.id)
-            title = (o.custom_title if (o and o.custom_title) else None) or (loc.title if loc else (item.filename if item else "Unknown"))
-            poster_path = (o.custom_poster if (o and o.custom_poster) else None) or (loc.local_poster_path if (loc and loc.local_poster_path) else (loc.poster_path if loc else None))
-            backdrop_path = (o.custom_backdrop if (o and o.custom_backdrop) else None) or (match.local_backdrop_path or match.backdrop_path or None)
-            rating = (o.user_rating if (o and o.user_rating is not None) else None)
+            o = metadata_overrides.get(match.id)
+            p = physical_overrides.get(item.id) if item else None
+
+            title = (o.custom_title if (o and o.custom_title) else (p.custom_title if (p and p.custom_title) else None)) or (loc.title if loc else (item.filename if item else "Unknown"))
+            poster_path = (o.custom_poster if (o and o.custom_poster) else (p.custom_poster if (p and p.custom_poster) else None)) or (loc.local_poster_path if (loc and loc.local_poster_path) else (loc.poster_path if loc else None))
+            backdrop_path = (o.custom_backdrop if (o and o.custom_backdrop) else (p.custom_backdrop if (p and p.custom_backdrop) else None)) or (match.local_backdrop_path or match.backdrop_path or None)
+            rating = (o.user_rating if (o and o.user_rating is not None) else (p.user_rating if (p and p.user_rating is not None) else None))
             if rating is None:
                 rating = match.rating_porndb or match.rating_tmdb or 0.0
 
@@ -359,6 +382,40 @@ class BaseQueryBuilder:
                             "role": link.role.value if hasattr(link.role, "value") else str(link.role),
                         })
 
+            is_watched = False
+            if o and o.is_watched:
+                is_watched = True
+            elif p and p.is_watched:
+                is_watched = True
+
+            is_favorite = False
+            if o and o.is_favorite:
+                is_favorite = True
+            elif p and p.is_favorite:
+                is_favorite = True
+
+            resume_position = 0
+            if p and p.resume_position:
+                resume_position = p.resume_position
+            elif o and o.resume_position:
+                resume_position = o.resume_position
+
+            watch_count = 0
+            if o and o.watch_count:
+                watch_count = o.watch_count
+            if p and p.watch_count and p.watch_count > watch_count:
+                watch_count = p.watch_count
+
+            last_watched_at = None
+            o_lw = o.last_watched_at if o else None
+            p_lw = p.last_watched_at if p else None
+            if o_lw and p_lw:
+                last_watched_at = max(o_lw, p_lw).isoformat()
+            elif o_lw:
+                last_watched_at = o_lw.isoformat()
+            elif p_lw:
+                last_watched_at = p_lw.isoformat()
+
             formatted_items.append({
                 "id": item.id if item else f"stash_{match.external_id}" if match.media_type == MediaType.SCENE else f"tmdb_{match.external_id}",
                 "title": title,
@@ -376,8 +433,13 @@ class BaseQueryBuilder:
                 "size": (item.size or 0) if item else 0,
                 "in_library": in_library,
                 "release_date": match.release_date.isoformat() if match.release_date else None,
-                "user_rating": o.user_rating if o else None,
-                "user_comment": o.user_comment if (o and o.user_comment) else None,
+                "user_rating": o.user_rating if o else (p.user_rating if p else None),
+                "user_comment": o.user_comment if (o and o.user_comment) else (p.user_comment if (p and p.user_comment) else None),
+                "is_watched": is_watched,
+                "is_favorite": is_favorite,
+                "resume_position": resume_position,
+                "watch_count": watch_count,
+                "last_watched_at": last_watched_at,
                 "people": people_list,
                 "is_adult": bool(match.is_adult) or match.provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB),
                 "is_home_video": bool(match.is_home_video),

@@ -16,7 +16,51 @@ class TitleLockReader:
         media_item_id, metadata_match_id = self.resolver.resolve_ids(item_id, media_type)
 
         if not media_item_id and not metadata_match_id:
-            return None
+            if isinstance(item_id, str) and "_" in item_id:
+                prefix, val = item_id.split("_", 1)
+                if prefix in ("tmdb", "porndb", "theporndb", "stash", "stashdb", "fansdb"):
+                    from app.shared_kernel.enums import Provider, MediaType
+                    from app.domains.metadata.models import MetadataMatch
+                    
+                    provider = Provider.TMDB
+                    if prefix == "tmdb":
+                        provider = Provider.TMDB
+                    elif prefix in ("porndb", "theporndb"):
+                        provider = Provider.PORNDB
+                    elif prefix in ("stash", "stashdb"):
+                        provider = Provider.STASHDB
+                    elif prefix == "fansdb":
+                        provider = Provider.FANSDB
+                    external_id = val
+                    
+                    match = self.db.query(MetadataMatch).filter(
+                        MetadataMatch.provider == provider,
+                        MetadataMatch.external_id == str(external_id)
+                    ).first()
+                    
+                    if not match:
+                        m_type = MediaType.MOVIE
+                        if media_type:
+                            try:
+                                m_type = MediaType(media_type.lower())
+                            except ValueError:
+                                m_type = MediaType.SCENE if media_type == "scene" else MediaType.MOVIE
+                        elif prefix in ("porndb", "theporndb", "stash", "stashdb", "fansdb"):
+                            m_type = MediaType.SCENE
+                        
+                        is_adult_item = (provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB)) or (m_type == MediaType.SCENE)
+                        match = MetadataMatch(
+                            provider=provider,
+                            external_id=str(external_id),
+                            media_type=m_type,
+                            is_adult=is_adult_item
+                        )
+                        self.db.add(match)
+                        self.db.commit()
+                    
+                    metadata_match_id = match.id
+            if not metadata_match_id:
+                return None
 
         if media_item_id and not metadata_match_id:
             metadata_match_id = self.library_port.get_active_match_id(media_item_id)

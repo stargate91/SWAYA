@@ -3,7 +3,7 @@ from typing import Any
 from sqlalchemy.orm import joinedload
 from fastapi.responses import JSONResponse
 
-from app.shared_kernel.enums import Provider
+from app.shared_kernel.enums import Provider, MediaType
 from app.domains.library.models import MediaItem
 from app.domains.metadata.models import MetadataMatch, MediaCollection
 from app.domains.users.models import UserOverride
@@ -32,6 +32,7 @@ class LocalMovieFormatter(MovieDetailFormatter):
         
         item = db.query(MediaItem).options(
             joinedload(MediaItem.matches).joinedload(MetadataMatch.localizations),
+            joinedload(MediaItem.matches).joinedload(MetadataMatch.parent).joinedload(MetadataMatch.parent).joinedload(MetadataMatch.localizations),
             joinedload(MediaItem.matches).joinedload(MetadataMatch.studios),
             joinedload(MediaItem.matches).joinedload(MetadataMatch.collection).joinedload(MediaCollection.localizations),
             joinedload(MediaItem.extras),
@@ -128,9 +129,33 @@ class LocalMovieFormatter(MovieDetailFormatter):
 
         suggested_tags = active_match.suggested_tags if (active_match and active_match.suggested_tags) else keywords_list
 
+        tv_title = None
+        still_path = None
+        season_number = None
+        episode_number = None
+        if active_match and active_match.media_type == MediaType.EPISODE:
+            season_number = active_match.season_number
+            episode_number = active_match.episode_number
+            still_path = active_match.local_still_path or active_match.still_path
+            
+            # Resolve parent show title
+            tv_match = None
+            if active_match.parent and active_match.parent.parent:
+                tv_match = active_match.parent.parent
+            elif active_match.parent:
+                tv_match = active_match.parent
+            if tv_match:
+                tv_loc = LanguageService.get_best_localization(tv_match.localizations, ui_lang) if tv_match.localizations else None
+                tv_title = tv_loc.title if tv_loc else tv_match.original_title
+
         result = {
             "id": item.id,
             "title": title,
+            "tv_title": tv_title,
+            "episode_title": title,
+            "still_path": self._resolve_img(still_path, "stills") if still_path else None,
+            "season_number": season_number,
+            "episode_number": episode_number,
             "keywords": keywords_list,
             "trailer_key": trailer_key,
             "extras": extras_list,

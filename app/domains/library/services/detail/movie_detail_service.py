@@ -24,6 +24,16 @@ class MovieDetailService(DetailFormatter):
         from app.shared_kernel.user_context import get_current_user_id
         current_uid = get_current_user_id()
 
+        # Resolve TV Episode string (e.g. tmdb_1863_1_1) to local media item ID if possible
+        if isinstance(item_id, str) and "_" in item_id:
+            parts = item_id.split("_")
+            if len(parts) >= 4 and parts[0] in ("tmdb", "tv"):
+                from app.infrastructure.repositories.db_playback_repository import DbPlaybackRepository
+                playback_repo = DbPlaybackRepository(self.db)
+                resolved_id = playback_repo.resolve_item_id_from_external(item_id)
+                if resolved_id:
+                    item_id = resolved_id
+
         # Tracked / External PornDB Movie Detail
         if isinstance(item_id, str) and item_id.startswith("porndb_"):
             return self.porndb_formatter.format(item_id, self.db, self.scrapers, current_uid)

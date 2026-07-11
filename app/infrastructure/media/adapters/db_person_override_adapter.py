@@ -20,6 +20,7 @@ class DbPersonOverrideAdapter(PersonOverridePort):
             "is_favorite": override.is_favorite,
             "user_rating": override.user_rating,
             "user_comment": override.user_comment,
+            "custom_tags": [t.name for t in override.tags] if override.tags else [],
         }
 
     def update_person_user_override(

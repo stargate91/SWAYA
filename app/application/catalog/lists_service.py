@@ -400,13 +400,16 @@ class ListsService:
                 if prefix == "tmdb":
                     tmdb_id = int(val) if val.isdigit() else val
                     media_item_id = None
+                elif prefix in ("porndb", "theporndb", "stash", "stashdb", "fansdb"):
+                    tmdb_id = media_item_id
+                    media_item_id = None
                 elif val.isdigit():
                     media_item_id = int(val)
             elif media_item_id.isdigit():
                 media_item_id = int(media_item_id)
 
         # Determine provider and clean external ID
-        provider = Provider.TMDB
+        provider = Provider.PORNDB if media_type == "scene" else Provider.TMDB
         external_id = str(tmdb_id) if tmdb_id else None
         
         if tmdb_id and isinstance(tmdb_id, str):
@@ -662,15 +665,28 @@ class ListsService:
         tmdb_id = None
         media_item_id = None
         person_id = None
+        provider = None
+        external_id = None
 
         if item_id.startswith("tmdb_"):
             tmdb_id = item_id.split("_")[1]
+            provider = Provider.TMDB
+            external_id = tmdb_id
         elif item_id.startswith("person_"):
             p_val = item_id.split("_")[1]
             if p_val.isdigit():
                 person_id = int(p_val)
             else:
                 person_id = p_val
+        elif "_" in item_id:
+            prefix, val = item_id.split("_", 1)
+            if prefix in ("porndb", "theporndb", "stash", "stashdb", "fansdb"):
+                provider = Provider.PORNDB
+                if prefix in ("stash", "stashdb"):
+                    provider = Provider.STASHDB
+                elif prefix == "fansdb":
+                    provider = Provider.FANSDB
+                external_id = val
         else:
             try:
                 media_item_id = int(item_id)
@@ -680,10 +696,23 @@ class ListsService:
         query = self.db.query(CustomListItem)
         if media_item_id:
             query = query.filter(CustomListItem.media_item_id == media_item_id)
-        elif tmdb_id:
-            match = self.db.query(MetadataMatch).filter(MetadataMatch.provider == Provider.TMDB, MetadataMatch.external_id == tmdb_id).first()
+        elif provider and external_id:
+            local_item = self.db.query(MediaItem).join(MediaItem.matches).filter(
+                MetadataMatch.provider == provider,
+                MetadataMatch.external_id == str(external_id)
+            ).first()
+            match = self.db.query(MetadataMatch).filter(
+                MetadataMatch.provider == provider,
+                MetadataMatch.external_id == str(external_id)
+            ).first()
+            filters = []
             if match:
-                query = query.filter(CustomListItem.match_id == match.id)
+                filters.append(CustomListItem.match_id == match.id)
+            if local_item:
+                filters.append(CustomListItem.media_item_id == local_item.id)
+            if filters:
+                from sqlalchemy import or_
+                query = query.filter(or_(*filters))
             else:
                 return ListMembershipResponse(list_ids=[])
         elif person_id:

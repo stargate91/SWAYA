@@ -1,5 +1,5 @@
 import logging
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union
 from sqlalchemy.orm import Session, aliased
 
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
@@ -185,24 +185,45 @@ class RecommendationsService:
             recently_activated_people=recently_activated_people
         )
 
-    def add_to_watchlist(self, tmdb_id: int, media_type: str) -> ActionResponse:
+    def add_to_watchlist(self, tmdb_id: Optional[Union[int, str]], media_type: str, media_item_id: Optional[int] = None) -> ActionResponse:
         # Get watchlist ID
         lists = self.lists_service.get_all_lists()
         watchlist = next((lst for lst in lists if lst.name == "Watchlist"), None)
         if not watchlist:
             return ActionResponse(status="error", message="Watchlist not found")
         
-        item = self.lists_service.add_item_to_list(watchlist.id, {"tmdb_id": tmdb_id, "media_type": media_type})
+        payload = {"media_type": media_type}
+        if media_item_id:
+            payload["media_item_id"] = media_item_id
+        else:
+            payload["tmdb_id"] = tmdb_id
+
+        item = self.lists_service.add_item_to_list(watchlist.id, payload)
         return ActionResponse(status="success", id=item.id)
 
-    def remove_from_watchlist(self, tmdb_id: int) -> ActionResponse:
+    def remove_from_watchlist(self, tmdb_id: Union[int, str]) -> ActionResponse:
         watchlist = self.db.query(CustomList).filter(CustomList.name == "Watchlist").first()
         if not watchlist:
             return ActionResponse(status="error", message="Watchlist not found")
         
+        provider = Provider.TMDB
+        external_id = str(tmdb_id)
+        if isinstance(tmdb_id, str) and "_" in tmdb_id:
+            prefix, val = tmdb_id.split("_", 1)
+            if prefix in ("porndb", "theporndb", "stash", "stashdb", "fansdb"):
+                provider = Provider.PORNDB
+                if prefix in ("stash", "stashdb"):
+                    provider = Provider.STASHDB
+                elif prefix == "fansdb":
+                    provider = Provider.FANSDB
+                external_id = val
+
         list_item_id = None
         for item in watchlist.items:
-            if item.match and item.match.provider == Provider.TMDB and item.match.external_id == str(tmdb_id):
+            if item.match and item.match.provider == provider and item.match.external_id == external_id:
+                list_item_id = item.id
+                break
+            if item.media_item_id and str(item.media_item_id) == str(tmdb_id):
                 list_item_id = item.id
                 break
         
@@ -532,10 +553,10 @@ class RecommendationsService:
                         })
 
             recently_added.append({
-                "id": int(match.external_id) if match.external_id and match.external_id.isdigit() else item.id,
+                "id": int(show_match.external_id) if show_match.external_id and show_match.external_id.isdigit() else item.id,
                 "title": title,
                 "name": title,
-                "media_type": match.media_type.value,
+                "media_type": "tv" if match.media_type == MediaType.EPISODE else match.media_type.value,
                 "in_library": True,
                 "media_item_id": item.id,
                 "is_adult": bool(match.is_adult),

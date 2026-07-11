@@ -197,7 +197,12 @@ class LibraryTabItem(BaseModel):
     in_library: Optional[bool] = True
     release_date: Optional[str] = None
     user_rating: Optional[float] = None
+    user_comment: Optional[str] = None
     is_favorite: Optional[bool] = None
+    is_watched: Optional[bool] = None
+    resume_position: Optional[int] = None
+    watch_count: Optional[int] = None
+    last_watched_at: Optional[str] = None
     is_active: Optional[bool] = None
     gender: Optional[int] = None
     library_count: Optional[int] = None

@@ -89,13 +89,15 @@ class DbPlaybackRepository(PlaybackRepositoryPort):
         if not match_db and "_" in item_str:
             parts = item_str.split("_", 1)
             uuid_or_id = parts[1]
+            id_filter = MetadataMatch.id == int(uuid_or_id) if uuid_or_id.isdigit() else False
             match_db = db.query(MetadataMatch).filter(
-                (MetadataMatch.external_id == uuid_or_id) | (MetadataMatch.id == uuid_or_id)
+                (MetadataMatch.external_id == uuid_or_id) | id_filter
             ).first()
         
         if not match_db:
+            id_filter = MetadataMatch.id == int(item_str) if item_str.isdigit() else False
             match_db = db.query(MetadataMatch).filter(
-                (MetadataMatch.external_id == item_str) | (MetadataMatch.id == item_str)
+                (MetadataMatch.external_id == item_str) | id_filter
             ).first()
             
         if match_db and match_db.media_item_id:

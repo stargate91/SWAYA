@@ -4,7 +4,6 @@
   "searchPlaceholder": "Search {{tab}}...",
   "addPeak": "Add Finish",
   "yourRating": "Your Rating",
-
   "tabs": {
     "movies": "Movies",
     "collections": "Collections",
@@ -37,9 +36,9 @@
   },
   "addPeople": {
     "modalTitle": "Follow Artists",
-    "modalDescription": "Find and follow artists!",
+    "modalDescription": "Find and follow your favorite artists!",
     "adultModalTitle": "Follow Stars",
-    "adultModalDescription": "Find and follow stars.",
+    "adultModalDescription": "Find and follow your favorite adult stars!",
     "adultSearchPlaceholder": "Search stars...",
     "modes": {
       "local": "Suggestions"
@@ -48,15 +47,15 @@
     "loading": "Loading artists...",
     "searching": "Searching...",
     "noInactive": "No new suggestions right now",
-    "noInactiveDesc": "This could mean everyone we found is already followed, or you haven't scanned and organized any new movies or TV shows yet. Try organizing some files to discover new cast and crew!",
+    "noInactiveDesc": "Everyone we found is already followed, or you haven't scanned and organized any new movies or TV shows yet. Try organizing some files to discover new cast and crew!",
     "adultNoInactive": "No new suggestions right now",
-    "adultNoInactiveDesc": "Everyone we found might already be followed, or you haven't scanned and organized any new adult titles yet. Try organizing some files to discover new stars!",
+    "adultNoInactiveDesc": "Everyone we found is already followed, or you haven't scanned and organized any new adult titles yet. Try organizing some files to discover new stars!",
     "noSearchResultsTitle": "No matching artists found",
-    "noSearchResultsDesc": "We couldn't find anyone locally with that name. Try searching again!",
+    "noSearchResultsDesc": "We couldn't find anyone locally with that name. Let's try searching again!",
     "noFilterResultsTitle": "No matches for these filters",
     "noFilterResultsDesc": "Try clearing or changing your filters to see more suggestions.",
     "adultNoSearchResultsTitle": "No matching stars found",
-    "adultNoSearchResultsDesc": "We couldn't find any adult stars locally with that name. Try another name.",
+    "adultNoSearchResultsDesc": "We couldn't find any adult stars locally with that name. Let's try another name!",
     "adultNoFilterResultsTitle": "Nothing fits these filters",
     "adultNoFilterResultsDesc": "Try clearing or relaxing the local star filters to see more suggestions.",
     "tmdbSearchPlaceholder": "Search for actors, directors, writers...",
@@ -68,68 +67,68 @@
     "adultSearchEmptyTitle": "Search for any adult star",
     "adultSearchEmptyDesc": "Find adult stars and creators on the remote database and follow them.",
     "adultSearchNoResultsTitle": "No matching stars found",
-    "adultSearchNoResultsDesc": "No adult stars on the remote database matched this search. Try another name."
+    "adultSearchNoResultsDesc": "No adult stars on the remote database matched this search. Let's try another name!"
   },
   "emptyStates": {
     "movies": {
       "title": "No Movies Found",
-      "description": "Your movies library is currently empty. Run a scan or add media in the organizer."
+      "description": "Your movie library is empty. Let's run a scan or organize some media to fill it up!"
     },
     "collections": {
       "title": "No Collections Found",
-      "description": "Your collections library is currently empty. Group movies and tv into custom collections."
+      "description": "No custom collections here yet. You can group your movies and TV shows into collections to keep things organized!"
     },
     "tv": {
       "title": "No TV Shows Found",
-      "description": "Your TV shows library is currently empty. Scan and match tv in the organizer."
+      "description": "Your TV show library is empty. Let's scan and match some shows in the organizer!"
     },
     "people": {
       "title": "No Artists Found",
-      "description": "No directors, actors, or writers here yet. Try scanning your files to find the cast and crew details!"
+      "description": "No directors, actors, or writers followed yet. Try scanning your files to find the cast and crew details!"
     },
     "adult": {
       "title": "No Adult Content Found",
-      "description": "Your adult media library is empty. Ensure files are correctly matched and organized."
+      "description": "Your adult media library is empty. Let's make sure your files are correctly matched and organized in the organizer!"
     },
     "adult_tv": {
       "title": "No Adult TV Shows Found",
-      "description": "Your adult TV shows library is empty. Ensure files are correctly matched and organized."
+      "description": "Your adult TV shows library is empty. Let's get them matched and organized!"
     },
     "scenes": {
       "title": "No Scenes Found",
-      "description": "Your scenes library is empty. Scan and match adult content in the organizer."
+      "description": "Your scenes library is empty. Let's scan and match some adult content in the organizer!"
     },
     "adult_scenes": {
       "title": "No Scenes Found",
-      "description": "Your scenes library is empty. Scan and match adult content in the organizer."
+      "description": "Your scenes library is empty. Let's scan and match some adult content in the organizer!"
     },
     "videos": {
       "title": "No Videos Found",
-      "description": "Your videos library is empty. Scan and organize your home videos in the organizer."
+      "description": "Your videos library is empty. Scan and organize your home videos in the organizer to see them here!"
     },
     "adult_videos": {
       "title": "No Videos Found",
-      "description": "Your videos library is empty. Scan and organize your adult home videos in the organizer."
+      "description": "Your videos library is empty. Scan and organize your adult home videos in the organizer to see them here!"
     },
     "adultPeople": {
       "title": "No Stars Found",
-      "description": "No stars or creators from adult media have been registered yet."
+      "description": "No stars or creators from adult media followed yet. Go follow some stars!"
     },
     "adultCollections": {
       "title": "No Adult Collections Found",
-      "description": "Your adult collections library is currently empty. Group adult media into custom collections."
+      "description": "Your adult collections library is empty. Group your adult media into collections to keep them organized!"
     },
     "adultTags": {
       "title": "No Adult Tags Created",
-      "description": "Organize your adult media with custom tags. You can add tags in the media details page."
+      "description": "No custom tags yet. You can add tags on any adult media details page to easily group them!"
     },
     "tags": {
       "title": "No Tags Created",
-      "description": "Organize your media with custom tags. You can add tags in the media details page."
+      "description": "No custom tags yet. You can add tags on any media details page to easily group them!"
     },
     "search": {
       "title": "No matching {tab} found",
-      "description": "Try a different search term or check the spelling."
+      "description": "Let's try a different search term or check the spelling."
     },
     "filter": {
       "title": "Nothing fits these filters",
@@ -146,7 +145,7 @@
     "focusTitle": "Items tagged with \"{name}\"",
     "backToTags": "Back to Tags",
     "emptyFocusTitle": "This tag is ready to use.",
-    "emptyFocusDescription": "Add this tag to movies, shows, artists, or stars and they will appear here.",
+    "emptyFocusDescription": "Add this tag to movies, shows, artists, or stars and they will show up here!",
     "createBtn": "Create Tag",
     "editBtn": "Edit Tag",
     "deleteBtn": "Delete Tag",
@@ -341,12 +340,12 @@
     "scenes": "Scenes",
     "stashdb": "StashDB",
     "fansdb": "FansDB",
-    "noOverviewAvailable": "No overview available.",
-    "lowResolutionWarning": "Warning: This scene image resolution is low ({{width}}x{{height}}). Minimum recommended is 1280 width.",
-    "primarySourceSetFailed": "Failed to set primary source",
-    "unlinkSourceFailed": "Failed to unlink source",
-    "unlinkSuccess": "Successfully unlinked from {{source}}.",
-    "noItemsFound": "No items found.",
+    "noOverviewAvailable": "No description available yet.",
+    "lowResolutionWarning": "Heads up! This scene's image resolution is a bit low ({{width}}x{{height}}). We recommend at least 1280 width for the best look.",
+    "primarySourceSetFailed": "Oops! We couldn't set the primary source. Let's try again!",
+    "unlinkSourceFailed": "Oops! We couldn't unlink this source right now.",
+    "unlinkSuccess": "All done! Successfully unlinked from {{source}}.",
+    "noItemsFound": "We couldn't find any items.",
     "have": "Have",
     "inLibrary": "In Library",
     "missing": "Missing",
@@ -393,7 +392,7 @@
     "writeReview": "Write Review",
     "reviewPlaceholder": "Write your review here...",
     "ratingsSection": "Ratings",
-    "noRatingsAvailable": "No ratings available.",
+    "noRatingsAvailable": "No ratings yet. Be the first to add one!",
     "watchStats": "Watch Stats",
     "watchCount": "Watch Count",
     "watchStatus": "Status",
@@ -403,7 +402,7 @@
     "movieProgress": "Progress",
     "lastWatched": "Last Watched",
     "never": "Never",
-    "noActivity": "No recorded watch logs.",
+    "noActivity": "No watch history recorded yet.",
     "watchActivity": "Watch Activity",
     "boxOffice": "Box Office",
     "budget": "Budget",
@@ -436,11 +435,11 @@
     "allKeywordsTagged": "All keywords already exist as tags.",
     "noKeywordsAvailable": "No keywords available.",
     "technicalInfo": "Technical Info",
-    "noTechnicalInfo": "No technical info available.",
+    "noTechnicalInfo": "No technical details available for this file.",
     "bitDepth": "Bit Depth",
     "framerate": "Framerate",
     "externalLinks": "External Links",
-    "noExternalLinks": "No external links available.",
+    "noExternalLinks": "No external links found for this item.",
     "imdb": "IMDb",
     "website": "Website",
     "tvInfo": "Tv Info",
@@ -454,11 +453,11 @@
     "backdrops": "Choose Backdrop",
     "chooseBackdrop": "Choose Backdrop",
     "collectionBackdrop": "Collection backdrop",
-    "noBackdropsAvailable": "No good backdrop options found for this title.",
-    "backdropUpdated": "Backdrop updated successfully!",
-    "backdropUpdateFailed": "Failed to update backdrop",
-    "backdropFilterRunning": "Checking title backdrops ({{checked}}/{{total}}). You can keep browsing.",
-    "backdropFilterFinishing": "Finalizing backdrop availability. You can keep browsing.",
+    "noBackdropsAvailable": "We couldn't find any good backdrop choices for this title.",
+    "backdropUpdated": "Nice choice! Backdrop updated successfully.",
+    "backdropUpdateFailed": "Oops! We couldn't update the backdrop.",
+    "backdropFilterRunning": "Looking for background choices ({{checked}}/{{total}})... Feel free to keep browsing!",
+    "backdropFilterFinishing": "Wrapping up backdrop checks... Feel free to keep browsing!",
     "keywords": "Keywords",
     "tracked": "Tracked",
     "choosePoster": "Choose Poster",
@@ -467,10 +466,10 @@
     "changePoster": "Change Poster",
     "posters": "Choose Poster",
     "logo": "Choose Logo",
-    "imageUpdated": "Image updated successfully!",
-    "imageUpdateFailed": "Failed to update image",
-    "imageUploaded": "Image uploaded and updated successfully!",
-    "imageUploadFailed": "Failed to upload image",
+    "imageUpdated": "All set! The image was updated successfully.",
+    "imageUpdateFailed": "Oops! We couldn't update the image.",
+    "imageUploaded": "All set! Your image was uploaded and updated.",
+    "imageUploadFailed": "Oops! We couldn't upload the image.",
     "defaultBlurredProfile": "Blurred Profile Picture",
     "defaultBackdrop": "Default Backdrop",
     "availableBackdrops": "Available Backdrops",
@@ -479,20 +478,20 @@
     "originalSceneLogo": "Original Scene Logo",
     "tmdbOptions": "TMDB Options",
     "uploadCustom": "Upload Custom",
-    "noImagesAvailable": "No images found.",
+    "noImagesAvailable": "We couldn't find any images.",
     "linkSource": "Link External Source",
-    "sourceLinked": "Source linked successfully!",
+    "sourceLinked": "Awesome! Source linked successfully.",
     "deletePerformerTitle": "Delete Star?",
     "deletePerformerWarning": "Are you sure you want to permanently delete this star? You'll lose any custom bio, ratings, and attributes you've set for them. If you want to keep this data, you can just unfollow them from their profile page instead.",
     "deletePerformerConfirmBtn": "Delete Star",
-    "primarySourceSet": "Primary details source updated successfully!",
+    "primarySourceSet": "All set! The primary source for details has been updated.",
     "peaksTitle": "Finish Count",
     "peakDate": "Date",
     "peakPosition": "Position",
     "addPeak": "Add Finish",
     "deletePeakBtn": "Delete Finish",
-    "noPeaks": "No finishes recorded yet.",
-    "noEpisodesFound": "No episodes found.",
+    "noPeaks": "No finishes recorded yet. Tap the button below to add one!",
+    "noEpisodesFound": "We couldn't find any episodes.",
     "loadingSeason": "Loading season...",
     "sharedFile": "Shared File",
     "finishedCredits": "All credits loaded.",
@@ -506,7 +505,7 @@
     "audioStyle": "Audio Style",
     "hdr": "HDR",
     "releaseDate": "Release Date",
-    "noProfileAvailable": "No profile pictures available.",
+    "noProfileAvailable": "No profile pictures found.",
     "originalSceneStill": "Original Scene Still",
     "deleting": "Deleting..."
   },
@@ -541,7 +540,7 @@
   },
   "performerEdit": {
     "loadingPerformer": "Loading Star...",
-    "failedToLoadPerformer": "Failed to load star",
+    "failedToLoadPerformer": "Oops! We couldn't load the adult star's details.",
     "editPerformer": "Edit Star",
     "editArtist": "Edit Artist",
     "esc": "ESC",
@@ -625,7 +624,7 @@
     "backToSources": "Back to Sources",
     "link": "Link",
     "noResultsMatch": "We couldn't find anyone matching that query. Let's try another name!",
-    "typeANameHint": "Type a name above and search to look up details for this star online!",
+    "typeANameHint": "Type a name above and hit search to find details for this star online!",
     "idLabel": "ID:",
     "notConnected": "Not Connected",
     "split": "Split",
@@ -647,24 +646,24 @@
       "bandSize": "Band size has to be between 10 and 100",
       "waist": "Waist has to be between 10 and 100",
       "hip": "Hip has to be between 10 and 100",
-      "correctErrors": "Please fix the details above before saving!",
+      "correctErrors": "Please fix the errors above before saving!",
       "underage": "Star must be at least 18 years and 2 weeks old"
     },
     "mixer": {
-      "routing_updated": "Metadata routing updated successfully!",
-      "routing_update_failed": "Failed to update routing"
+      "routing_updated": "Nice! Metadata routing updated successfully.",
+      "routing_update_failed": "Oops! We couldn't update the metadata routing."
     },
     "linking": {
-      "link_source_failed": "Failed to link source",
-      "performer_deleted": "Star removed from database successfully.",
-      "delete_performer_failed": "Failed to delete star"
+      "link_source_failed": "Oops! We couldn't link this source.",
+      "performer_deleted": "All done! The adult star has been removed from the database.",
+      "delete_performer_failed": "Oops! We couldn't delete the star."
     },
     "custom": {
       "autoPrefix": "Auto: ",
-      "values_saved": "Custom values saved successfully!",
-      "save_values_failed": "Failed to save custom values",
-      "fetch_healthyceleb_success": "Successfully fetched statistics from HealthyCeleb!",
-      "fetch_healthyceleb_failed": "Failed to fetch statistics from HealthyCeleb",
+      "values_saved": "All set! Custom values saved successfully.",
+      "save_values_failed": "Oops! We couldn't save your custom values.",
+      "fetch_healthyceleb_success": "Awesome! Successfully fetched stats from HealthyCeleb.",
+      "fetch_healthyceleb_failed": "Oops! We couldn't fetch stats from HealthyCeleb.",
       "import_healthyceleb_title": "Import physical statistics from HealthyCeleb",
       "import_healthyceleb_placeholder": "HealthyCeleb URL (optional, e.g. https://healthyceleb.com/james-cameron/)",
       "import_healthyceleb_btn": "Import Data",

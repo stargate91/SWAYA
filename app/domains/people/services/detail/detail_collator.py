@@ -292,6 +292,7 @@ class PersonDetailCollator:
             "is_favorite": override_dict.get("is_favorite") if override_dict else False,
             "user_rating": override_dict.get("user_rating") if override_dict else None,
             "user_comment": override_dict.get("user_comment") if override_dict else None,
+            "custom_tags": override_dict.get("custom_tags") if override_dict else [],
             "homepage": person.homepage,
             "external_ids": external_ids,
             "images": [self._resolve_img(img, "people") for img in (person.images or [])],

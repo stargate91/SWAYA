@@ -357,18 +357,23 @@ export const useRecommendationActions = () => {
   const playMutation = usePlayMediaMutation();
 
   const handlePlayClick = useCallback(async (item) => {
+    console.log('[handlePlayClick] Received item:', item);
     if (playMutation.isPending) return;
 
-    const isTv = item.media_type === 'tv' || item.type === 'tv' || String(item.id).startsWith('tv_');
+    const isTv = item.media_type === 'tv' || item.media_type === 'episode' || item.type === 'tv' || item.type === 'episode' || String(item.id).startsWith('tv_');
+    console.log('[handlePlayClick] isTv:', isTv, 'media_type:', item.media_type, 'type:', item.type);
     if (!isTv) {
       const playId = item.in_library ? item.media_item_id : item.id;
+      console.log('[handlePlayClick] Playing as non-TV. playId:', playId);
       playMutation.mutate(playId);
       return;
     }
 
     try {
       const tvId = String(item.id).replace('tv_', '').replace('tmdb_', '');
-      const tvDetail = await api.library.getTvDetail(tvId);
+      console.log('[handlePlayClick] TV ID resolved:', tvId);
+      const tvDetail = await api.library.getTvDetail(tvId, { seasonsLimit: 99, initialEpisodesLimit: 999 });
+      console.log('[handlePlayClick] Fetched tvDetail:', tvDetail);
       
       const seasons = Array.isArray(tvDetail?.seasons)
         ? [...tvDetail.seasons]
@@ -413,11 +418,23 @@ export const useRecommendationActions = () => {
         }
       }
 
+      console.log('[handlePlayClick] Resolved nextEpisode:', nextEpisode);
+
       if (nextEpisode?.id) {
+        console.log('[handlePlayClick] Mutating with nextEpisode.id:', nextEpisode.id);
         playMutation.mutate(nextEpisode.id);
+      } else if (item.media_item_id) {
+        console.log('[handlePlayClick] Fallback: mutating with item.media_item_id:', item.media_item_id);
+        playMutation.mutate(item.media_item_id);
+      } else {
+        console.log('[handlePlayClick] No episode or media_item_id found!');
       }
     } catch (err) {
       console.error('Failed to play TV show:', err);
+      if (item.media_item_id) {
+        console.log('[handlePlayClick] Catch fallback: mutating with item.media_item_id:', item.media_item_id);
+        playMutation.mutate(item.media_item_id);
+      }
     }
   }, [playMutation]);
 
