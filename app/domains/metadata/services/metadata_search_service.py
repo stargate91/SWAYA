@@ -23,7 +23,7 @@ class MetadataSearchService:
         self.tmdb_resolver = TmdbSearchResolver()
         self.details_fetcher = DetailsFetcher()
 
-    def search_metadata(self, query: str, item_type: str = "movie", year: Optional[int] = None, language: Optional[str] = None, provider: Optional[str] = None, include_adult: bool = False, season: Optional[int] = None, episode: Optional[int] = None) -> List[Dict[str, Any]]:
+    def search_metadata(self, query: str, item_type: str = "movie", year: Optional[int] = None, language: Optional[str] = None, provider: Optional[str] = None, include_adult: bool = False, season: Optional[int] = None, episode: Optional[int] = None, page: int = 1) -> List[Dict[str, Any]]:
         """Coordinates metadata searches for movies, tv shows, or scenes across multiple providers."""
         prov_enum = None
         if provider:
@@ -51,7 +51,8 @@ class MetadataSearchService:
             item_type=item_type,
             year=year,
             language=language,
-            include_adult=include_adult
+            include_adult=include_adult,
+            page=page
         )
 
     def get_seasons(self, tmdb_id: int) -> List[Dict[str, Any]]:
@@ -62,7 +63,7 @@ class MetadataSearchService:
         """Retrieves episodes list for a TV season."""
         return self.details_fetcher.get_episodes(self.tmdb, tmdb_id, season_number)
 
-    def global_search(self, query: str, source: str, search_type: str, include_adult: bool = False, language: Optional[str] = None) -> List[Dict[str, Any]]:
+    def global_search(self, query: str, source: str, search_type: str, include_adult: bool = False, language: Optional[str] = None, page: int = 1) -> List[Dict[str, Any]]:
         """Executes a global search across either mainstream (TMDB) or adult scraper sources."""
         if not include_adult and source.lower() != "tmdb":
             return []
@@ -72,13 +73,13 @@ class MetadataSearchService:
 
         if source_lower == "tmdb":
             if type_lower == "all":
-                return self.tmdb_resolver.global_search_all(self.tmdb, query, include_adult, language)
+                return self.tmdb_resolver.global_search_all(self.tmdb, query, include_adult, language, page=page)
             elif type_lower == "movie":
-                return self.search_metadata(query, item_type="movie", provider="tmdb", include_adult=include_adult, language=language)
+                return self.search_metadata(query, item_type="movie", provider="tmdb", include_adult=include_adult, language=language, page=page)
             elif type_lower == "tv":
-                return self.search_metadata(query, item_type="tv", provider="tmdb", include_adult=include_adult, language=language)
+                return self.search_metadata(query, item_type="tv", provider="tmdb", include_adult=include_adult, language=language, page=page)
             elif type_lower == "person":
-                return self.tmdb_resolver.global_search_person(self.tmdb, query, include_adult, language)
+                return self.tmdb_resolver.global_search_person(self.tmdb, query, include_adult, language, page=page)
         else:
             try:
                 prov_enum = Provider(source_lower)
@@ -86,11 +87,11 @@ class MetadataSearchService:
                 return []
 
             if type_lower == "scene":
-                return self.search_metadata(query, item_type="scene", provider=source_lower, include_adult=include_adult, language=language)
+                return self.search_metadata(query, item_type="scene", provider=source_lower, include_adult=include_adult, language=language, page=page)
             elif type_lower == "movie":
-                return self.search_metadata(query, item_type="movie", provider=source_lower, include_adult=include_adult, language=language)
+                return self.search_metadata(query, item_type="movie", provider=source_lower, include_adult=include_adult, language=language, page=page)
             elif type_lower == "person":
-                return self.adult_resolver.search_performers(self.db, self.scrapers, query, prov_enum)
+                return self.adult_resolver.search_performers(self.db, self.scrapers, query, prov_enum, page=page)
 
         return []
 

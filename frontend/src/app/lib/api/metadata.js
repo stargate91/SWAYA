@@ -1,7 +1,7 @@
 import { fetchJson } from '../http';
 
 export const metadata = {
-  globalSearch: ({ query, source, searchType, includeAdult }) => {
+  globalSearch: ({ query, source, searchType, includeAdult, page }) => {
     const params = new URLSearchParams({
       query: query.trim(),
       source: source || 'tmdb',
@@ -9,6 +9,9 @@ export const metadata = {
     });
     if (includeAdult !== undefined && includeAdult !== null) {
       params.set('include_adult', includeAdult ? 'true' : 'false');
+    }
+    if (page !== undefined && page !== null) {
+      params.set('page', String(page));
     }
     return fetchJson(`/api/metadata/search/global?${params.toString()}`);
   },

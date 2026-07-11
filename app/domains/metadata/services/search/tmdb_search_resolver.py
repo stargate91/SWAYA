@@ -12,10 +12,11 @@ class TmdbSearchResolver:
         item_type: str,
         year: Optional[int],
         language: Optional[str],
-        include_adult: bool
+        include_adult: bool,
+        page: int = 1
     ) -> List[Dict[str, Any]]:
         """Searches TMDB for movies and TV shows, fetching season information concurrently for TV shows."""
-        results = tmdb_client.search(query, item_type=item_type, year=year, language=language, include_adult=include_adult)
+        results = tmdb_client.search(query, item_type=item_type, year=year, language=language, include_adult=include_adult, page=page)
 
         if item_type == "tv" and results:
             from concurrent.futures import ThreadPoolExecutor
@@ -65,7 +66,8 @@ class TmdbSearchResolver:
                 "provider": "tmdb",
                 "seasons": r.get("seasons") or [],
                 "last_air_date": r.get("last_air_date"),
-                "release_status": r.get("release_status")
+                "release_status": r.get("release_status"),
+                "is_adult": bool(r.get("adult"))
             })
         return formatted
 
@@ -74,13 +76,15 @@ class TmdbSearchResolver:
         tmdb_client: Any,
         query: str,
         include_adult: bool,
-        language: Optional[str]
+        language: Optional[str],
+        page: int = 1
     ) -> List[Dict[str, Any]]:
         """Performs multi-type global searches on TMDB."""
         params = {
             "query": query,
             "include_adult": "true" if include_adult else "false",
-            "language": language or DEFAULT_FALLBACK_LANGUAGE
+            "language": language or DEFAULT_FALLBACK_LANGUAGE,
+            "page": max(1, int(page or 1))
         }
         data = tmdb_client._call_api("/search/multi", params)
         results = data.get("results", []) or []
@@ -123,7 +127,8 @@ class TmdbSearchResolver:
                 "media_type": media_type,
                 "provider": "tmdb",
                 "last_air_date": r.get("last_air_date"),
-                "release_status": r.get("release_status")
+                "release_status": r.get("release_status"),
+                "is_adult": bool(r.get("adult"))
             })
         return formatted
 
@@ -132,10 +137,11 @@ class TmdbSearchResolver:
         tmdb_client: Any,
         query: str,
         include_adult: bool,
-        language: Optional[str]
+        language: Optional[str],
+        page: int = 1
     ) -> List[Dict[str, Any]]:
         """Performs global performer search on TMDB."""
-        results = tmdb_client.search_person(query, language=language or DEFAULT_FALLBACK_LANGUAGE, include_adult=include_adult)
+        results = tmdb_client.search_person(query, language=language or DEFAULT_FALLBACK_LANGUAGE, include_adult=include_adult, page=page)
         formatted = []
         for r in results:
             formatted.append({
@@ -149,6 +155,7 @@ class TmdbSearchResolver:
                 "backdrop_path": None,
                 "rating": r.get("popularity") or 0.0,
                 "media_type": "person",
-                "provider": "tmdb"
+                "provider": "tmdb",
+                "is_adult": bool(r.get("adult"))
             })
         return formatted

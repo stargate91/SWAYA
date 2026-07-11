@@ -14,6 +14,8 @@ import { useSettingsQuery } from '@/queries/settingsQueries';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
 import { useTranslation } from '@/providers/LanguageContext';
+import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
+import AdultOverlay from '@/ui/AdultOverlay';
 import './SearchPage.css';
 
 const SOURCES = [
@@ -49,6 +51,7 @@ export default function SearchPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: settings } = useSettingsQuery();
+  const { sessionMode } = useLibraryModeStore();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Read URL query params
@@ -62,7 +65,9 @@ export default function SearchPage() {
   // Component states for results and loading
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(12);
+  const [isMoreLoading, setIsMoreLoading] = useState(false);
+  const [loadedPage, setLoadedPage] = useState(1);
+  const [hasMorePages, setHasMorePages] = useState(true);
 
   const hasAdult = settings?.include_adult;
   const filteredSources = useMemo(() => {
@@ -78,13 +83,14 @@ export default function SearchPage() {
   const [prevCriteria, setPrevCriteria] = useState({ query: urlQuery, source: urlSource, type: urlType });
   if (urlQuery !== prevCriteria.query || urlSource !== prevCriteria.source || urlType !== prevCriteria.type) {
     setPrevCriteria({ query: urlQuery, source: urlSource, type: urlType });
-    setVisibleCount(12);
+    setLoadedPage(1);
+    setHasMorePages(true);
     if (!urlQuery.trim()) {
       setResults([]);
     }
   }
 
-  // Execute search when URL params change
+  // Execute search when URL params change or loadedPage increases
   useEffect(() => {
     if (!urlQuery.trim()) {
       return;
@@ -92,25 +98,41 @@ export default function SearchPage() {
 
     let isCancelled = false;
     const fetchSearch = async () => {
-      setIsLoading(true);
+      if (loadedPage === 1) {
+        setIsLoading(true);
+      } else {
+        setIsMoreLoading(true);
+      }
       try {
         const data = await api.metadata.globalSearch({
           query: urlQuery,
           source: urlSource,
           searchType: urlType,
           includeAdult: hasAdult,
+          page: loadedPage,
         });
         if (!isCancelled) {
-          setResults(data || []);
+          if (loadedPage === 1) {
+            setResults(data || []);
+          } else {
+            setResults((prev) => [...prev, ...(data || [])]);
+          }
+          if (!data || data.length < 20) {
+            setHasMorePages(false);
+          }
         }
       } catch (err) {
         console.error('Search error:', err);
         if (!isCancelled) {
-          setResults([]);
+          if (loadedPage === 1) {
+            setResults([]);
+          }
+          setHasMorePages(false);
         }
       } finally {
         if (!isCancelled) {
           setIsLoading(false);
+          setIsMoreLoading(false);
         }
       }
     };
@@ -120,7 +142,7 @@ export default function SearchPage() {
     return () => {
       isCancelled = true;
     };
-  }, [urlQuery, urlSource, urlType, hasAdult]);
+  }, [urlQuery, urlSource, urlType, hasAdult, loadedPage]);
 
   // Client-side preference filtering for adult performers
   const filteredResults = useMemo(() => {
@@ -202,11 +224,7 @@ export default function SearchPage() {
   const activeTypeObj = (TYPES_BY_SOURCE[urlSource] || []).find(t => t.id === urlType) || { name: urlType, icon: Clapperboard };
   const FallbackIcon = activeTypeObj.icon;
 
-  const visibleResults = useMemo(() => {
-    return filteredResults.slice(0, visibleCount);
-  }, [filteredResults, visibleCount]);
 
-  const remainingCount = filteredResults.length - visibleCount;
 
   return (
     <Page className="search-page-layout">
@@ -275,7 +293,7 @@ export default function SearchPage() {
         ) : (
           <>
             <PosterGrid className={`search-page-grid ${urlType === 'scene' ? 'library-scenes-grid' : ''}`}>
-              {visibleResults.map((item, idx) => {
+              {filteredResults.map((item, idx) => {
                 const n = normalizeMediaEntity(item, { context: 'search', settings });
                 const posterUrl = item.poster_path ? resolveMediaImageUrl(item.poster_path, 'posterThumb') : null;
 
@@ -293,6 +311,9 @@ export default function SearchPage() {
                   ) : undefined;
                 }
 
+                const isAdultItem = urlSource !== 'tmdb' || item.is_adult || item.media_type === 'scene';
+                const showBlurOverlay = sessionMode === 'sfw' && isAdultItem;
+
                 return (
                   <PosterCard
                     key={`${item.id}-${item.media_type}-${idx}`}
@@ -305,20 +326,22 @@ export default function SearchPage() {
                     imageUrl={posterUrl}
                     icon={FallbackIcon}
                     onClick={() => handleCardClick(item)}
+                    overlay={showBlurOverlay ? <AdultOverlay variant="obscure" /> : null}
                   />
                 );
               })}
             </PosterGrid>
 
-            {remainingCount > 0 && (
+            {hasMorePages && (
               <div className="search-page-more-container">
                 <Button
                   variant="secondary-neutral"
-                  onClick={() => setVisibleCount((prev) => prev + 12)}
+                  onClick={() => setLoadedPage((prev) => prev + 1)}
+                  disabled={isMoreLoading}
                 >
-                  {t('search.moreMatches', {
-                    count: remainingCount,
-                    defaultValue: `More matches (+${remainingCount})`
+                  {isMoreLoading ? <Spinner size="sm" /> : t('search.moreMatches', {
+                    count: 20,
+                    defaultValue: 'Load More Results (+20)'
                   })}
                 </Button>
               </div>

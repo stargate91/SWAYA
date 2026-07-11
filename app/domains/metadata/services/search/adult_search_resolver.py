@@ -38,7 +38,8 @@ class AdultSearchResolver:
         query: str,
         item_type: str,
         year: Optional[int],
-        prov_enum: Provider
+        prov_enum: Provider,
+        page: int = 1
     ) -> List[Dict[str, Any]]:
         """Handles searches on adult metadata providers (StashDB, PornDB, FansDB) for movies and scenes."""
         scraper = None
@@ -54,7 +55,14 @@ class AdultSearchResolver:
 
         if prov_enum == Provider.PORNDB and item_type == "movie":
             try:
-                movies = scraper.search_movies(query, year=year)
+                # Add page to request params
+                movies = scraper.search_movies(query, year=year, page=page) if hasattr(scraper, "search_movies") else []
+                if not movies and hasattr(scraper, "search_movies"):
+                    # fallback if signature doesn't take page
+                    try:
+                        movies = scraper.search_movies(query, year=year)
+                    except TypeError:
+                        movies = []
                 formatted = []
                 for m in movies:
                     poster = (
@@ -100,7 +108,7 @@ class AdultSearchResolver:
 
         if prov_enum == Provider.PORNDB and item_type in ("scene", "scenes", "adult"):
             try:
-                params = {"q": query}
+                params = {"q": query, "page": page}
                 if year:
                     params["year"] = year
                 api_token = scraper.get_setting("porndb_api_key") or scraper.get_setting("porndb_api_token")
@@ -237,13 +245,19 @@ class AdultSearchResolver:
             logger.error(f"Search failed on adult provider {prov_enum.value}: {e}")
             return []
 
-    def search_performers(self, db: Session, scrapers: Any, query: str, prov_enum: Provider) -> List[Dict[str, Any]]:
+    def search_performers(self, db: Session, scrapers: Any, query: str, prov_enum: Provider, page: int = 1) -> List[Dict[str, Any]]:
         """Handles performer searches on adult metadata providers."""
         scraper = scrapers.adult(prov_enum, db)
         if not scraper:
             return []
         try:
-            results = scraper.search_performers(query)
+            # Pass page parameter if supported
+            results = scraper.search_performers(query, page=page) if hasattr(scraper, "search_performers") and prov_enum == Provider.PORNDB else scraper.search_performers(query)
+            if not results and prov_enum == Provider.PORNDB and hasattr(scraper, "search_performers"):
+                try:
+                    results = scraper.search_performers(query)
+                except TypeError:
+                    results = []
             source_name = _provider_source_name(prov_enum)
             formatted = []
             for p in results:

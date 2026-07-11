@@ -5,7 +5,7 @@ import './AdultOverlay.css';
 export default function AdultOverlay({ variant = 'obscure', badgeText = '18+' }) {
   return (
     <div className={`ui-adult-overlay ui-adult-overlay--${variant}`}>
-      <Badge family="adult" tone="danger">{badgeText}</Badge>
+      {badgeText && <Badge family="adult" tone="danger">{badgeText}</Badge>}
     </div>
   );
 }

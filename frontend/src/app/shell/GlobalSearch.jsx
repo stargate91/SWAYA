@@ -8,6 +8,8 @@ import api from '../lib/api';
 import { useSettingsQuery } from '../queries/settingsQueries';
 import { resolveMediaImageUrl } from '../lib/imageUrls';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useLibraryModeStore } from '../stores/useLibraryModeStore';
+import AdultOverlay from '../ui/AdultOverlay';
 import './GlobalSearch.css';
 
 const SOURCES = [
@@ -123,6 +125,16 @@ export default function GlobalSearch() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const { sessionMode } = useLibraryModeStore();
+
+  const isAdultItem = (item) => {
+    return selectedSource !== 'tmdb' || item.is_adult || item.media_type === 'scene';
+  };
+
+  const shouldBlur = (item) => {
+    return sessionMode === 'sfw' && isAdultItem(item);
+  };
 
   // Perform search
   const performSearch = useCallback(async (searchQuery) => {
@@ -333,13 +345,21 @@ export default function GlobalSearch() {
                         tabIndex={0}
                         onKeyDown={(e) => e.key === 'Enter' && handleResultClick(item)}
                       >
-                        {item.poster_path ? (
-                          <img src={resolveMediaImageUrl(item.poster_path, 'posterThumb')} alt="" className="global-search__item-poster" loading="lazy" />
-                        ) : (
-                          <div className="global-search__item-poster-placeholder">
-                            <GroupTypeIcon size={16} />
-                          </div>
-                        )}
+                        <div className="global-search__poster-container">
+                          {item.poster_path ? (
+                            <img
+                              src={resolveMediaImageUrl(item.poster_path, 'posterThumb')}
+                              alt=""
+                              className="global-search__item-poster"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="global-search__item-poster-placeholder">
+                              <GroupTypeIcon size={16} />
+                            </div>
+                          )}
+                          {shouldBlur(item) && <AdultOverlay variant="blur" badgeText={null} />}
+                        </div>
                         <div className="global-search__item-info">
                           <div className="global-search__item-title-row">
                             <span className="global-search__item-title">{item.title}</span>
@@ -369,13 +389,21 @@ export default function GlobalSearch() {
                   tabIndex={0}
                   onKeyDown={(e) => e.key === 'Enter' && handleResultClick(item)}
                 >
-                  {item.poster_path ? (
-                    <img src={resolveMediaImageUrl(item.poster_path, 'posterThumb')} alt="" className="global-search__item-poster" loading="lazy" />
-                  ) : (
-                    <div className="global-search__item-poster-placeholder">
-                      <ActiveTypeIcon size={16} />
-                    </div>
-                  )}
+                  <div className="global-search__poster-container">
+                    {item.poster_path ? (
+                      <img
+                        src={resolveMediaImageUrl(item.poster_path, 'posterThumb')}
+                        alt=""
+                        className="global-search__item-poster"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="global-search__item-poster-placeholder">
+                        <ActiveTypeIcon size={16} />
+                      </div>
+                    )}
+                    {shouldBlur(item) && <AdultOverlay variant="blur" badgeText={null} />}
+                  </div>
                   <div className="global-search__item-info">
                     <div className="global-search__item-title-row">
                       <span className="global-search__item-title">{item.title}</span>

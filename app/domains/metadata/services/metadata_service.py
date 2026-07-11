@@ -37,10 +37,10 @@ class MetadataService:
     def get_episodes(self, tmdb_id: int, season_number: int) -> List[Dict[str, Any]]:
         return self.search_service.get_episodes(tmdb_id, season_number)
 
-    def global_search(self, query: str, source: str, search_type: str, include_adult: bool = False, language: Optional[str] = None) -> List[Dict[str, Any]]:
+    def global_search(self, query: str, source: str, search_type: str, include_adult: bool = False, language: Optional[str] = None, page: int = 1) -> List[Dict[str, Any]]:
         return self.search_service.global_search(
             query=query, source=source, search_type=search_type,
-            include_adult=include_adult, language=language
+            include_adult=include_adult, language=language, page=page
         )
 
     def resolve_item(self, request: MetadataResolveRequest) -> Dict[str, Any]:

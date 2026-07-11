@@ -15,8 +15,8 @@ def search_metadata(query: str, item_type: str = "movie", year: Optional[int] = 
     return MetadataService(db, scraper_gateway).search_metadata(query, item_type=item_type, year=year, provider=provider, include_adult=include_adult, season=season, episode=episode)
 
 @library_router.get("/metadata/search/global")
-def global_search_metadata(query: str, source: str = "tmdb", search_type: str = "all", include_adult: bool = False, db: Session = Depends(get_db)):
-    return MetadataService(db, scraper_gateway).global_search(query, source=source, search_type=search_type, include_adult=include_adult)
+def global_search_metadata(query: str, source: str = "tmdb", search_type: str = "all", include_adult: bool = False, page: int = 1, db: Session = Depends(get_db)):
+    return MetadataService(db, scraper_gateway).global_search(query, source=source, search_type=search_type, include_adult=include_adult, page=page)
 
 @library_router.get("/metadata/tv/{tmdb_id}/seasons")
 def get_metadata_seasons(tmdb_id: int, db: Session = Depends(get_db)):

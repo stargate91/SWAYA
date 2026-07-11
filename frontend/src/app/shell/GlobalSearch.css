@@ -233,13 +233,33 @@
   outline: none;
 }
 
-.global-search__item-poster {
+.global-search__poster-container {
+  position: relative;
   width: 32px;
   height: 48px;
-  object-fit: cover;
   border-radius: var(--border-radius-xs, 3px);
+  overflow: hidden;
   box-shadow: 0 2px 5px color-mix(in srgb, black 30%, transparent);
+}
+
+.global-search__item-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   background: color-mix(in srgb, black 20%, transparent);
+}
+
+/* Ensure AdultOverlay unblurs on result item hover */
+.global-search__poster-container .ui-adult-overlay {
+  background: transparent !important;
+  inset: 0;
+}
+
+.global-search__result-item:hover .ui-adult-overlay--blur {
+  backdrop-filter: blur(0px) !important;
+  -webkit-backdrop-filter: blur(0px) !important;
+  background: transparent;
+  opacity: 0;
 }
 
 .global-search__item-poster-placeholder {
