@@ -173,7 +173,7 @@ export default function RatingsPage() {
     {
       key: 'rating',
       label: t('ratings.table.rating', { defaultValue: 'My Rating' }),
-      width: '200px',
+      width: '240px',
       render: (val, row) => (
         <SegmentedRating
           value={row.user_rating}

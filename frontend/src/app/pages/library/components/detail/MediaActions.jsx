@@ -83,7 +83,7 @@ export default function MediaActions() {
         </Button>
       )}
 
-      {!isScene && !(isMovie && !isOwned) && (
+      {!isScene && !(isMovie && !isOwned) && (item?.extras?.length > 0 || item?.technical) && (
         <Button
           variant="ghost"
           onClick={() => setIsDrawerOpen(true)}

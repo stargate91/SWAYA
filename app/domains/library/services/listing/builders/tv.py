@@ -25,11 +25,29 @@ class TvQueryBuilder(BaseQueryBuilder):
         if params.filter_ownership in ("tracked", "unowned"):
             query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == self.current_user_id))
             joined_override = True
+
+            # Compute TV show IDs that have local episodes (these are "owned", not "tracked")
+            local_parent_ids = set()
+            current_parents = {
+                r[0] for r in self.db.query(MetadataMatch.parent_id).join(
+                    MediaItem, MetadataMatch.media_item_id == MediaItem.id
+                ).filter(MediaItem.status.in_(self.lib_statuses), MetadataMatch.parent_id.isnot(None)).all()
+            }
+            while current_parents:
+                local_parent_ids.update(current_parents)
+                current_parents = {
+                    r[0] for r in self.db.query(MetadataMatch.parent_id).filter(
+                        MetadataMatch.id.in_(current_parents), MetadataMatch.parent_id.isnot(None)
+                    ).all()
+                }
+
             query = query.filter(
                 MetadataMatch.media_item_id.is_(None),
                 UserOverride.is_tracked,
                 MetadataMatch.media_type == MediaType.TV
             )
+            if local_parent_ids:
+                query = query.filter(~MetadataMatch.id.in_(local_parent_ids))
         elif params.filter_ownership == "all":
             query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == self.current_user_id))
             joined_override = True

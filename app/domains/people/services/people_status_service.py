@@ -98,6 +98,48 @@ class PersonEnrichmentQueue:
                 enricher.apply_enriched_data(person, fetched_data)
                 db.commit()
                 logger.info(f"Successfully enriched activated person: {person.name}")
+
+            # Automatic HealthyCeleb enrichment for SFW performers
+            if not person.is_adult and person.birthday:
+                try:
+                    from app.domains.people.services.people_detail_service import PeopleDetailService
+                    # Instantiate with db session and self.scrapers (configured on queue)
+                    detail_service = PeopleDetailService(db, scrapers=self.scrapers)
+                    
+                    hc_data = detail_service.scrape_healthyceleb(person.id)
+                    
+                    person_bday = person.birthday
+                    if hasattr(person_bday, "date"):
+                        person_bday = person_bday.date()
+                    
+                    hc_bday = hc_data.get("date_of_birth")
+                    
+                    if hc_bday and hc_bday == person_bday:
+                        if hc_data.get("height") and not person.height:
+                            person.height = hc_data["height"]
+                        if hc_data.get("weight") and not person.weight:
+                            person.weight = hc_data["weight"]
+                        if hc_data.get("hair_color") and not person.hair_color:
+                            person.hair_color = hc_data["hair_color"]
+                        if hc_data.get("eye_color") and not person.eye_color:
+                            person.eye_color = hc_data["eye_color"]
+                        if hc_data.get("ethnicity") and not person.ethnicity:
+                            person.ethnicity = hc_data["ethnicity"]
+                        if hc_data.get("waist") and not person.waist:
+                            person.waist = hc_data["waist"]
+                        if hc_data.get("hip") and not person.hip:
+                            person.hip = hc_data["hip"]
+                        if hc_data.get("cup_size") and not person.cup_size:
+                            person.cup_size = hc_data["cup_size"]
+                        if hc_data.get("band_size") and not person.band_size:
+                            person.band_size = hc_data["band_size"]
+                        if hc_data.get("place_of_birth") and not person.place_of_birth:
+                            person.place_of_birth = hc_data["place_of_birth"]
+                        
+                        db.commit()
+                        logger.info(f"Successfully auto-enriched SFW performer {person.name} from HealthyCeleb.")
+                except Exception as e:
+                    logger.debug(f"Auto-HealthyCeleb enrichment skipped/failed for {person.name}: {e}")
         except Exception as e:
             logger.error(f"Failed to enrich person {person_id} in background queue: {e}", exc_info=True)
         finally:

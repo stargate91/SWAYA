@@ -131,6 +131,7 @@ class PeopleDetailService:
         import re
         import requests
         import unicodedata
+        from datetime import datetime
         from html.parser import HTMLParser
         from fastapi import HTTPException
         from app.domains.people.models import Person
@@ -281,6 +282,20 @@ class PeopleDetailService:
 
         if "born place" in data:
             extracted["place_of_birth"] = data["born place"]
+
+        if "date of birth" in data:
+            raw_dob = data["date of birth"].strip()
+            # Clean up text inside parentheses if any (e.g. "June 1, 1990 (age 30)")
+            clean_dob = re.sub(r'\s*\([^)]*\)', '', raw_dob).strip()
+            parsed_date = None
+            for fmt in ("%B %d, %Y", "%d %B %Y", "%B %d %Y", "%Y-%m-%d"):
+                try:
+                    parsed_date = datetime.strptime(clean_dob, fmt).date()
+                    break
+                except ValueError:
+                    continue
+            if parsed_date:
+                extracted["date_of_birth"] = parsed_date
 
         extracted["source_url"] = url
 

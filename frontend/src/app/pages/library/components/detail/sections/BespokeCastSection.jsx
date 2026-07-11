@@ -3,11 +3,18 @@ import { User, ChevronLeft, ChevronRight } from '@/ui/icons';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { API_BASE } from '@/lib/backend';
+import Tooltip from '@/ui/Tooltip';
 
 export default function BespokeCastSection({ item, t, navigate }) {
   const settings = useMediaDetailContext()?.state?.settings;
   const isAdult = item.is_adult;
   const genderPref = settings?.adult_gender_preference;
+
+  const isMovie = item.type === 'movie';
+  const isScene = item.type === 'scene';
+  const isTv = item.type === 'tv';
+
+  const [activeTab, setActiveTab] = useState('cast'); // 'cast', 'companies', 'networks'
 
   const processPeople = (list) => {
     if (!list) return [];
@@ -30,6 +37,7 @@ export default function BespokeCastSection({ item, t, navigate }) {
   const filteredSound = processPeople(item.sound);
   const filteredCast = processPeople(item.cast);
   const resolvePersonAvatarUrl = (path) => resolveMediaImageUrl(path, 'person', API_BASE);
+  const resolveCompanyLogoUrl = (path) => resolveMediaImageUrl(path, 'logo', API_BASE);
 
   const maxTotal = 15;
 
@@ -83,6 +91,10 @@ export default function BespokeCastSection({ item, t, navigate }) {
     return list;
   }, [filteredDirectors, filteredCast, filteredWriters, filteredSound, maxTotal, t]);
 
+  const showCompanies = isTv && item.companies && item.companies.length > 0;
+  const showNetworks = isTv && item.networks && item.networks.length > 0;
+  const showTabs = isTv && (showCompanies || showNetworks);
+
   const castScrollRef = useRef(null);
   const [castScrollState, setCastScrollState] = useState({ left: false, right: false });
 
@@ -99,7 +111,7 @@ export default function BespokeCastSection({ item, t, navigate }) {
   useEffect(() => {
     const timer = setTimeout(handleScrollState, 100);
     return () => clearTimeout(timer);
-  }, [allPeople]);
+  }, [allPeople, activeTab, item]);
 
   const scrollCast = (direction) => {
     const container = castScrollRef.current;
@@ -111,15 +123,75 @@ export default function BespokeCastSection({ item, t, navigate }) {
     });
   };
 
-  if (allPeople.length === 0) return null;
+  if (activeTab === 'cast' && allPeople.length === 0) return null;
 
   return (
     <div className="bespoke-cast-section">
       <div className="bespoke-cast-browser-card">
-        <div className="bespoke-browser-card__pills-header">
-          <span className="bespoke-cast-title">
-            {t('library.details.cast') || 'Cast & Crew'}
-          </span>
+        <div className="bespoke-browser-card__pills-header" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+          {showTabs ? (
+            <div className="bespoke-cast-tabs" style={{ display: 'flex', gap: 'var(--space-xs)' }}>
+              <button
+                type="button"
+                className={`bespoke-cast-tab-btn ${activeTab === 'cast' ? 'is-active' : ''}`}
+                onClick={() => setActiveTab('cast')}
+                style={{
+                  background: activeTab === 'cast' ? 'var(--color-bg-subtle)' : 'transparent',
+                  border: 'none',
+                  color: activeTab === 'cast' ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
+                  padding: 'var(--space-xs) var(--space-md)',
+                  borderRadius: 'var(--radius-md, 8px)',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  fontSize: '13px'
+                }}
+              >
+                {t('library.details.cast') || 'Cast & Crew'}
+              </button>
+              {showCompanies && (
+                <button
+                  type="button"
+                  className={`bespoke-cast-tab-btn ${activeTab === 'companies' ? 'is-active' : ''}`}
+                  onClick={() => setActiveTab('companies')}
+                  style={{
+                    background: activeTab === 'companies' ? 'var(--color-bg-subtle)' : 'transparent',
+                    border: 'none',
+                    color: activeTab === 'companies' ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
+                    padding: 'var(--space-xs) var(--space-md)',
+                    borderRadius: 'var(--radius-md, 8px)',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                    fontSize: '13px'
+                  }}
+                >
+                  {t('library.details.productionCompanies') || 'Production Companies'}
+                </button>
+              )}
+              {showNetworks && (
+                <button
+                  type="button"
+                  className={`bespoke-cast-tab-btn ${activeTab === 'networks' ? 'is-active' : ''}`}
+                  onClick={() => setActiveTab('networks')}
+                  style={{
+                    background: activeTab === 'networks' ? 'var(--color-bg-subtle)' : 'transparent',
+                    border: 'none',
+                    color: activeTab === 'networks' ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
+                    padding: 'var(--space-xs) var(--space-md)',
+                    borderRadius: 'var(--radius-md, 8px)',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                    fontSize: '13px'
+                  }}
+                >
+                  {t('library.details.platformsNetworks') || 'Networks'}
+                </button>
+              )}
+            </div>
+          ) : (
+            <span className="bespoke-cast-title">
+              {t('library.details.cast') || 'Cast & Crew'}
+            </span>
+          )}
         </div>
         <div className="bespoke-cast-browser-card__body">
           <button
@@ -132,11 +204,20 @@ export default function BespokeCastSection({ item, t, navigate }) {
 
           <div className={`dashboard-cast-carousel-container bespoke-fade-container ${castScrollState.left ? 'has-fade-left' : ''} ${castScrollState.right ? 'has-fade-right' : ''}`}>
             <div
-              className="dashboard-cast-grid"
+              className={activeTab === 'cast' ? "dashboard-cast-grid" : "bespoke-companies-body"}
               ref={castScrollRef}
               onScroll={handleScrollState}
+              style={activeTab !== 'cast' ? {
+                display: 'flex',
+                gap: 'var(--space-2xl)',
+                overflowX: 'auto',
+                padding: 'var(--space-md) var(--space-xl)',
+                alignItems: 'center',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none'
+              } : undefined}
             >
-              {allPeople.map(person => (
+              {activeTab === 'cast' && allPeople.map(person => (
                 <div
                   key={person.id}
                   className={`dashboard-cast-card ${person.isFilteredOut ? 'dashboard-cast-card--filtered' : ''}`}
@@ -164,6 +245,40 @@ export default function BespokeCastSection({ item, t, navigate }) {
                   )}
                 </div>
               ))}
+
+              {activeTab === 'companies' && item.companies.map((c, i) => (
+                <div key={i} className="bespoke-company-item" style={{ flexShrink: 0 }}>
+                  <Tooltip content={c.name} side="top">
+                    {c.logo_path ? (
+                      <img
+                        src={resolveCompanyLogoUrl(c.logo_path)}
+                        alt={c.name}
+                        className="bespoke-company-logo"
+                        style={{ maxHeight: '40px', objectFit: 'contain' }}
+                      />
+                    ) : (
+                      <span className="bespoke-company-name-only">{c.name}</span>
+                    )}
+                  </Tooltip>
+                </div>
+              ))}
+
+              {activeTab === 'networks' && item.networks.map((n, i) => (
+                <div key={i} className="bespoke-company-item" style={{ flexShrink: 0 }}>
+                  <Tooltip content={n.name} side="top">
+                    {n.logo_path ? (
+                      <img
+                        src={resolveCompanyLogoUrl(n.logo_path)}
+                        alt={n.name}
+                        className="bespoke-company-logo"
+                        style={{ maxHeight: '40px', objectFit: 'contain' }}
+                      />
+                    ) : (
+                      <span className="bespoke-company-name-only">{n.name}</span>
+                    )}
+                  </Tooltip>
+                </div>
+              ))}
             </div>
           </div>
           <button
@@ -178,3 +293,4 @@ export default function BespokeCastSection({ item, t, navigate }) {
     </div>
   );
 }
+

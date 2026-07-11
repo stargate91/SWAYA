@@ -84,7 +84,6 @@ export default function ListsCard({
         ratingPill={ratingPill}
         className="lists-card__info"
         titleClassName="lists-card__title"
-        subtitleRowClassName=""
         subtitleClassName="lists-card__subtitle"
       />
     </div>

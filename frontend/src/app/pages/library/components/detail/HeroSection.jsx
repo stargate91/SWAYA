@@ -42,6 +42,7 @@ export default function HeroSection({ backdropUrl, isFallback, isPreviewPlaying,
             }
           }}
           src={previewSrc}
+          poster={backdropUrl}
           muted
           loop
           playsInline
