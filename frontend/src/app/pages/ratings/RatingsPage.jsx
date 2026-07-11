@@ -1,4 +1,4 @@
-
+/* eslint-disable react/forbid-dom-props, react/forbid-component-props */
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
@@ -9,7 +9,7 @@ import Table from '@/ui/Table';
 import { Tabs } from '@/ui/Tabs';
 import Button from '@/ui/Button';
 import SearchInputCombo from '@/ui/SearchInputCombo';
-import Spinner from '@/ui/Spinner';
+import Skeleton from '@/ui/Skeleton';
 import SegmentedControl from '@/ui/SegmentedControl';
 import SegmentedRating from '@/ui/SegmentedRating';
 import { useTranslation } from '@/providers/LanguageContext';
@@ -298,8 +298,14 @@ export default function RatingsPage() {
               <div className="organizer-table-block">
                 <div className="organizer-content">
                   {state.isLoading ? (
-                    <div className="ratings-loading-container">
-                      <Spinner size="md" />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', padding: 'var(--space-md) 0' }}>
+                      {Array.from({ length: 6 }).map((_, idx) => (
+                        <div key={idx} style={{ display: 'flex', gap: 'var(--space-xl)', padding: 'var(--space-lg) var(--space-md)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-md)' }}>
+                          <Skeleton style={{ width: '150px', height: '18px' }} variant="rect" />
+                          <Skeleton style={{ width: '80px', height: '18px' }} variant="rect" />
+                          <Skeleton style={{ width: '100px', height: '18px', marginLeft: 'auto' }} variant="rect" />
+                        </div>
+                      ))}
                     </div>
                   ) : (
                     <Table

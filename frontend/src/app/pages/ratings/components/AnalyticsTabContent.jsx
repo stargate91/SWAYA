@@ -1,7 +1,7 @@
-/* eslint-disable react/forbid-dom-props */
+/* eslint-disable react/forbid-dom-props, react/forbid-component-props */
 import { BarChart2, CheckCircle, Users, Heart } from '@/ui/icons';
 import SegmentedControl from '@/ui/SegmentedControl';
-import Spinner from '@/ui/Spinner';
+import Skeleton from '@/ui/Skeleton';
 
 const bulletSep = '\u2022';
 
@@ -20,8 +20,17 @@ export default function AnalyticsTabContent({
 }) {
   if (state.isStatsLoading) {
     return (
-      <div className="ratings-loading-container">
-        <Spinner size="md" />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--space-xl)', padding: 'var(--space-md) 0' }}>
+        {Array.from({ length: 4 }).map((_, idx) => (
+          <div key={idx} style={{ padding: 'var(--space-xl)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border-default)', minHeight: '180px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-xl)' }}>
+              <div style={{ width: '120px' }}><Skeleton style={{ height: '20px' }} variant="rect" /></div>
+              <div style={{ width: '20px' }}><Skeleton style={{ height: '20px' }} variant="circle" /></div>
+            </div>
+            <Skeleton style={{ height: '36px', width: '80px', marginBottom: 'var(--space-md)' }} variant="rect" />
+            <Skeleton style={{ height: '14px', width: '100%' }} variant="text" />
+          </div>
+        ))}
       </div>
     );
   }

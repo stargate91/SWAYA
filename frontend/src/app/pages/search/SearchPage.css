@@ -181,3 +181,21 @@
   font-size: 0.75rem;
   flex-shrink: 0;
 }
+
+.search-skeleton-card-scene {
+  width: 100% !important;
+  height: 0 !important;
+  padding-bottom: 56.25% !important; /* 16:9 ratio */
+  min-width: 0 !important;
+  min-height: 0 !important;
+  border-radius: var(--radius-2xl, 16px);
+}
+
+.search-skeleton-card-poster {
+  width: 100% !important;
+  height: 0 !important;
+  padding-bottom: 150% !important; /* 2:3 ratio */
+  min-width: 0 !important;
+  min-height: 0 !important;
+  border-radius: var(--radius-2xl, 16px);
+}

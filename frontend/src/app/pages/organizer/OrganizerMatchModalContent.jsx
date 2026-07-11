@@ -1,5 +1,7 @@
+/* eslint-disable react/forbid-dom-props, react/forbid-component-props */
 import { useState } from 'react';
 import Spinner from '../../ui/Spinner';
+import Skeleton from '../../ui/Skeleton';
 import MatchModalSearchForm from './components/MatchModalSearchForm';
 import MatchModalBrowserToolbar from './components/MatchModalBrowserToolbar';
 import MatchModalBucket from './components/MatchModalBucket';
@@ -193,10 +195,14 @@ export default function OrganizerMatchModalContent({
               />
             ) : null}
 
-            {isBrowserLoading || isResolvingId || isSearching ? (
-              <Spinner
-                label={isResolvingId ? t('organizer.details.matchModal.applying') : t('common.loading')}
-              />
+            {isBrowserLoading || isSearching ? (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 'var(--space-md)', padding: 'var(--space-md) 0', width: '100%' }}>
+                {Array.from({ length: 6 }).map((_, idx) => (
+                  <Skeleton.Card key={idx} style={{ width: '100%', height: '180px', minWidth: 0 }} />
+                ))}
+              </div>
+            ) : isResolvingId ? (
+              <Spinner label={t('organizer.details.matchModal.applying')} />
             ) : null}
 
             <MatchModalResults

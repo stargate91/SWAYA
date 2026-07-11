@@ -1,3 +1,4 @@
+/* eslint-disable react/forbid-dom-props, react/forbid-component-props */
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +9,7 @@ import Page from '@/ui/Page';
 import EmptyState from '@/ui/EmptyState';
 import Button from '@/ui/Button';
 import Spinner from '@/ui/Spinner';
+import Skeleton from '@/ui/Skeleton';
 import PageHeader from '@/ui/PageHeader';
 import SegmentedControl from '@/ui/SegmentedControl';
 import { useTranslation } from '@/providers/LanguageContext';
@@ -173,8 +175,17 @@ export default function HistoryPage() {
   const renderRenameContent = () => {
     if (isHistoryLoading) {
       return (
-        <div className="history-page__loading-container">
-          <Spinner size={32} />
+        <div className="history-list" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <div key={idx} style={{ padding: 'var(--space-xl)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border-default)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-md)' }}>
+                <div style={{ width: '200px' }}><Skeleton style={{ height: '24px' }} variant="rect" /></div>
+                <div style={{ width: '80px' }}><Skeleton style={{ height: '24px' }} variant="rect" /></div>
+              </div>
+              <Skeleton style={{ height: '16px', width: '60%', marginBottom: 'var(--space-sm)' }} variant="text" />
+              <Skeleton style={{ height: '16px', width: '40%' }} variant="text" />
+            </div>
+          ))}
         </div>
       );
     }
@@ -216,8 +227,18 @@ export default function HistoryPage() {
   const renderWatchedContent = () => {
     if (isWatchedLoading) {
       return (
-        <div className="watched-history-page__loading-container">
-          <Spinner size={32} />
+        <div className="watched-history-list" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <div key={idx} style={{ display: 'flex', gap: 'var(--space-xl)', padding: 'var(--space-xl)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border-default)' }}>
+              <div style={{ width: '100px', height: '56px', borderRadius: 'var(--radius-md)', overflow: 'hidden', flexShrink: 0 }}>
+                <Skeleton style={{ width: '100%', height: '100%' }} variant="rect" />
+              </div>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', justifyContent: 'center' }}>
+                <div style={{ width: '250px' }}><Skeleton style={{ height: '20px' }} variant="rect" /></div>
+                <div style={{ width: '150px' }}><Skeleton style={{ height: '14px' }} variant="rect" /></div>
+              </div>
+            </div>
+          ))}
         </div>
       );
     }

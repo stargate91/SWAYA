@@ -6,6 +6,7 @@ import Page from '@/ui/Page';
 import Input from '@/ui/Input';
 import SegmentedControl from '@/ui/SegmentedControl';
 import Spinner from '@/ui/Spinner';
+import Skeleton from '@/ui/Skeleton';
 import EmptyState from '@/ui/EmptyState';
 import PosterGrid from '@/ui/PosterGrid';
 import PosterCard from '@/ui/PosterCard';
@@ -275,9 +276,14 @@ export default function SearchPage() {
 
       <div className="search-page-content">
         {isLoading ? (
-          <div className="search-page-loading">
-            <Spinner size="md" />
-          </div>
+          <PosterGrid className={`search-page-grid ${urlType === 'scene' ? 'library-scenes-grid' : ''}`}>
+            {Array.from({ length: 12 }).map((_, idx) => (
+              <Skeleton.Card
+                key={idx}
+                className={urlType === 'scene' ? 'search-skeleton-card-scene' : 'search-skeleton-card-poster'}
+              />
+            ))}
+          </PosterGrid>
         ) : !urlQuery.trim() ? (
           <EmptyState
             icon={Search}
