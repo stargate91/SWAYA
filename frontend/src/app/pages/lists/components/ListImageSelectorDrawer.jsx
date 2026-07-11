@@ -1,4 +1,4 @@
-import ImageUploadPanel from '../../library/modals/ImageUploadPanel';
+import ImageUploadPanel from '@/ui/ImageUploadPanel';
 import Drawer from '@/ui/Drawer';
 
 export default function ListImageSelectorDrawer({

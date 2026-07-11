@@ -1,7 +1,7 @@
- 
 import { ChevronLeft } from '@/ui/icons';
 import NavButton from '@/ui/NavButton';
 import TMDBImageGrid from './TMDBImageGrid';
+import { useOverridePersonBackdropMutation } from '@/queries';
 
 export default function PersonBackdropBrowser({
   selectedCredit,
@@ -10,11 +10,11 @@ export default function PersonBackdropBrowser({
   selectedBackdropPath,
   item,
   handleSelectDetailedBackdrop,
-  overridePersonBackdropMutation,
   isUploadPending,
   t,
   handleBackToCredits
 }) {
+  const overridePersonBackdropMutation = useOverridePersonBackdropMutation();
   return (
     <>
       <div className="person-backdrop-picker__detail-toolbar">

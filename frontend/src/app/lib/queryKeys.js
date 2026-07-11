@@ -126,6 +126,7 @@ export const invalidatePerson = (qc, personId, opts = {}) => {
   qc.invalidateQueries({ queryKey: ['person-detail'] });
   qc.invalidateQueries({ queryKey: QK.people });
   qc.invalidateQueries({ queryKey: QK.peopleInfinite });
+  qc.invalidateQueries({ queryKey: QK.libraryFilters });
 
   if (opts.lists)           qc.invalidateQueries({ queryKey: QK.library });
   if (opts.stats)           qc.invalidateQueries({ queryKey: QK.stats });

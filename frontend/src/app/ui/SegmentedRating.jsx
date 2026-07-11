@@ -1,23 +1,25 @@
 /* eslint-disable react/forbid-dom-props */
-import { useState } from 'react';
+import useRatingHover from '@/pages/library/hooks/useRatingHover';
 import './SegmentedRating.css';
 
-export default function SegmentedRating({ value, onChange, t, labelUnder = false }) {
-  const [hoveredRating, setHoveredRating] = useState(null);
-
-  const displayRating = hoveredRating !== null ? hoveredRating : value;
-
-  const handleMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const percent = (e.clientX - rect.left) / rect.width;
-    let val = Math.ceil(percent * 20) / 2;
-    val = Math.max(0.5, Math.min(10.0, val));
-    setHoveredRating(val);
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredRating(null);
-  };
+export default function SegmentedRating({
+  value,
+  onChange,
+  t,
+  labelUnder = false,
+  className = 'table-segmented-rating-container',
+  barClassName = 'rating-segmented-bar',
+  segmentClassName = 'rating-segment',
+  segmentFillClassName = 'rating-segment-fill',
+  labelClassName = 'user-rating-label',
+  formatLabel,
+}) {
+  const {
+    hoveredRating,
+    displayRating,
+    handleMouseMove,
+    handleMouseLeave
+  } = useRatingHover(value);
 
   const handleClick = (e) => {
     e.stopPropagation();
@@ -28,10 +30,41 @@ export default function SegmentedRating({ value, onChange, t, labelUnder = false
     }
   };
 
+  const renderLabel = () => {
+    if (formatLabel) {
+      return (
+        <span className={`${labelClassName} ${displayRating !== undefined && displayRating !== null ? 'has-value' : ''}`}>
+          {formatLabel(displayRating)}
+        </span>
+      );
+    }
+
+    if (labelUnder) {
+      return (
+        <span className={`user-rating-label-under ${displayRating !== undefined && displayRating !== null ? 'has-value' : ''}`}>
+          {t('library.yourRating', { defaultValue: 'Your Rating' })}
+          <span className="rating-value-bold">
+            {displayRating !== undefined && displayRating !== null
+              ? displayRating.toFixed(1)
+              : '-.-'}
+          </span>
+        </span>
+      );
+    }
+
+    return (
+      <span className={`${labelClassName} ${displayRating !== undefined && displayRating !== null ? 'has-value' : ''}`}>
+        {displayRating !== undefined && displayRating !== null
+          ? displayRating.toFixed(1)
+          : '-.-'}
+      </span>
+    );
+  };
+
   return (
-    <div className={`table-segmented-rating-container ${labelUnder ? 'layout-column' : ''}`}>
+    <div className={`${className} ${labelUnder ? 'layout-column' : ''}`}>
       <div
-        className="rating-segmented-bar"
+        className={barClassName}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         onMouseUp={handleClick}
@@ -50,31 +83,17 @@ export default function SegmentedRating({ value, onChange, t, labelUnder = false
             fill = (displayRating - (val - 1)) * 100;
           }
           return (
-            <div key={val} className="rating-segment">
+            <div key={val} className={segmentClassName}>
               <div
-                className="rating-segment-fill"
+                className={segmentFillClassName}
                 style={{ width: `${fill}%` }}
               />
             </div>
           );
         })}
       </div>
-      {labelUnder ? (
-        <span className={`user-rating-label-under ${displayRating !== undefined && displayRating !== null ? 'has-value' : ''}`}>
-          {t('library.yourRating', { defaultValue: 'Your Rating' })}
-          <span className="rating-value-bold">
-            {displayRating !== undefined && displayRating !== null
-              ? displayRating.toFixed(1)
-              : '-.-'}
-          </span>
-        </span>
-      ) : (
-        <span className={`user-rating-label ${displayRating !== undefined && displayRating !== null ? 'has-value' : ''}`}>
-          {displayRating !== undefined && displayRating !== null
-            ? displayRating.toFixed(1)
-            : '-.-'}
-        </span>
-      )}
+      {renderLabel()}
     </div>
   );
 }
+

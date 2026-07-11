@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { usePreservedState } from '@/hooks/usePreservedState';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
+import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import Page from '@/ui/Page';
 import EmptyState from '@/ui/EmptyState';
 import Button from '@/ui/Button';
@@ -93,44 +94,17 @@ export default function HistoryPage() {
     playMutation.mutate({ itemId, start: videoPosition });
   };
 
-  // Infinite scroll handlers
-  useEffect(() => {
-    if (!hasNextHistoryPage || isFetchingNextHistoryPage || activeTab !== 'rename') return;
-    const sentinel = document.getElementById('history-sentinel');
-    if (!sentinel) return;
+  const historySentinelRef = useInfiniteScroll({
+    onIntersect: fetchNextHistoryPage,
+    enabled: hasNextHistoryPage && !isFetchingNextHistoryPage && activeTab === 'rename',
+    root: '.shell__content',
+  });
 
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        fetchNextHistoryPage();
-      }
-    }, {
-      root: document.querySelector('.shell__content'),
-      rootMargin: '0px 0px 1200px 0px',
-      threshold: 0
-    });
-
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [hasNextHistoryPage, isFetchingNextHistoryPage, fetchNextHistoryPage, activeTab]);
-
-  useEffect(() => {
-    if (!hasNextWatchedPage || isFetchingNextWatchedPage || activeTab !== 'watched') return;
-    const sentinel = document.getElementById('watched-sentinel');
-    if (!sentinel) return;
-
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        fetchNextWatchedPage();
-      }
-    }, {
-      root: document.querySelector('.shell__content'),
-      rootMargin: '0px 0px 1200px 0px',
-      threshold: 0
-    });
-
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [hasNextWatchedPage, isFetchingNextWatchedPage, fetchNextWatchedPage, activeTab]);
+  const watchedSentinelRef = useInfiniteScroll({
+    onIntersect: fetchNextWatchedPage,
+    enabled: hasNextWatchedPage && !isFetchingNextWatchedPage && activeTab === 'watched',
+    root: '.shell__content',
+  });
 
   const handleConfirmUndo = (batch) => {
     openModal({
@@ -231,7 +205,7 @@ export default function HistoryPage() {
           />
         ))}
         {hasNextHistoryPage && (
-          <div id="history-sentinel" className="history-sentinel">
+          <div ref={historySentinelRef} id="history-sentinel" className="history-sentinel">
             {isFetchingNextHistoryPage && <Spinner size={20} />}
           </div>
         )}
@@ -389,7 +363,7 @@ export default function HistoryPage() {
           );
         })}
         {hasNextWatchedPage && (
-          <div id="watched-sentinel" className="watched-sentinel">
+          <div ref={watchedSentinelRef} id="watched-sentinel" className="watched-sentinel">
             {isFetchingNextWatchedPage && <Spinner size={20} />}
           </div>
         )}

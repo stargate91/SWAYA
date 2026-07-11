@@ -1,4 +1,3 @@
-/* eslint-disable react/forbid-dom-props */
 import { PenLine } from '@/ui/icons';
 import Pill from '@/ui/Pill';
 import SegmentedRating from '@/ui/SegmentedRating';

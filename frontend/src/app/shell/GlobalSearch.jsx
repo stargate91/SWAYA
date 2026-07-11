@@ -7,6 +7,7 @@ import { useTranslation } from '@/providers/LanguageContext';
 import api from '../lib/api';
 import { useSettingsQuery } from '../queries/settingsQueries';
 import { resolveMediaImageUrl } from '../lib/imageUrls';
+import { useDebounce } from '@/hooks/useDebounce';
 import './GlobalSearch.css';
 
 const SOURCES = [
@@ -38,15 +39,24 @@ const TYPES_BY_SOURCE = {
   ],
 };
 
+const getYearLabel = (year) => {
+  if (!year) return '';
+  const yStr = String(year);
+  return yStr.includes('-') ? yStr.split('-')[0] : yStr;
+};
+
 export default function GlobalSearch() {
-  const { data: settings } = useSettingsQuery();
   const navigate = useNavigate();
   const { t } = useTranslation();
   
-  const getYearLabel = (year) => year ? `(${year})` : '';
-  
+  // Search query input state
   const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 300);
+  
+  // Search results state
   const [results, setResults] = useState([]);
+  
+  const { data: settings = {} } = useSettingsQuery();
   
   // Selection state
   const [selectedSource, setSelectedSource] = useState('tmdb');
@@ -58,7 +68,8 @@ export default function GlobalSearch() {
   
   const containerRef = useRef(null);
   const selectorRef = useRef(null);
-  const debounceTimer = useRef(null);
+
+
 
   const hasAdult = settings?.include_adult;
   const filteredSources = SOURCES.filter(s => !s.adult || hasAdult);
@@ -136,16 +147,12 @@ export default function GlobalSearch() {
 
   // Debounced search trigger
   useEffect(() => {
-    if (debounceTimer.current) {
-      clearTimeout(debounceTimer.current);
+    if (debouncedQuery.trim().length >= 2) {
+      Promise.resolve().then(() => {
+        performSearch(debouncedQuery);
+      });
     }
-    if (query.trim().length >= 2) {
-      debounceTimer.current = setTimeout(() => {
-        performSearch(query);
-      }, 300);
-    }
-    return () => clearTimeout(debounceTimer.current);
-  }, [query, performSearch]);
+  }, [debouncedQuery, performSearch]);
 
   const handleInputChange = (e) => {
     const val = e.target.value;

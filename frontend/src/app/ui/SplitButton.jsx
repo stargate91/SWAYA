@@ -80,6 +80,8 @@ export default function SplitButton({
         <div
           className="ui-split-button__menu"
           onClick={(e) => e.stopPropagation()}
+          role="presentation"
+          // eslint-disable-next-line react/forbid-dom-props
           style={{
             position: 'absolute',
             top: `${menuCoords.top}px`,

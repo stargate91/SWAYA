@@ -117,9 +117,9 @@ export const recommendations = {
     if (includeAdult !== undefined) params.append('include_adult', includeAdult);
     return fetchJson(`/api/recommendations/recently-activated-people?${params.toString()}`);
   },
-  addToWatchlist: (tmdbId, type) => fetchJson('/api/watchlist', {
+  addToWatchlist: ({ tmdbId, mediaItemId, type }) => fetchJson('/api/watchlist', {
     method: 'POST',
-    body: JSON.stringify({ tmdb_id: tmdbId, type }),
+    body: JSON.stringify({ tmdb_id: tmdbId, media_item_id: mediaItemId, type }),
   }),
   removeFromWatchlist: (tmdbId) => fetchJson(`/api/watchlist/${tmdbId}`, {
     method: 'DELETE',

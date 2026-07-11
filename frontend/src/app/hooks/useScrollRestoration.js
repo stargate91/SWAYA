@@ -29,10 +29,16 @@ export function useScrollRestoration(selector, dependencies = []) {
       let frameId;
       let count = 0;
       const target = savedState.scrollTop;
-      const firstChild = container.firstElementChild;
 
-      if (savedState.scrollHeight !== undefined && firstChild) {
-        firstChild.style.minHeight = `${savedState.scrollHeight}px`;
+      // Find the main page content container instead of the absolute header
+      const children = Array.from(container.children);
+      const contentEl = children.find(el =>
+        !el.classList.contains('shell__utility-bar') &&
+        !el.classList.contains('shell__utility-bar-bottom')
+      ) || container.firstElementChild;
+
+      if (savedState.scrollHeight !== undefined && contentEl) {
+        contentEl.style.minHeight = `${savedState.scrollHeight}px`;
       }
 
       console.log('[scrollRestoration] Restoring scroll to:', target, 'scrollHeight:', savedState.scrollHeight);
@@ -42,8 +48,8 @@ export function useScrollRestoration(selector, dependencies = []) {
         container.scrollTop = target;
         console.log('[scrollRestoration] Scroll iteration:', count, 'current scrollTop:', container.scrollTop);
         if (Math.abs(container.scrollTop - target) < 1 || count++ > 5) {
-          if (firstChild) {
-            firstChild.style.minHeight = '';
+          if (contentEl) {
+            contentEl.style.minHeight = '';
           }
           isRestoringRef.current = false;
           console.log('[scrollRestoration] Restoration finished');
@@ -57,8 +63,8 @@ export function useScrollRestoration(selector, dependencies = []) {
         if (frameId) {
           cancelAnimationFrame(frameId);
         }
-        if (firstChild) {
-          firstChild.style.minHeight = '';
+        if (contentEl) {
+          contentEl.style.minHeight = '';
         }
         isRestoringRef.current = false;
       };
@@ -91,8 +97,6 @@ export function useScrollRestoration(selector, dependencies = []) {
         scrollHeight: container.scrollHeight,
       });
     };
-
-
 
     container.addEventListener('scroll', handleScroll, { passive: true });
     return () => {

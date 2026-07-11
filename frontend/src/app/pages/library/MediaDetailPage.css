@@ -171,11 +171,11 @@
 }
 
 /* Ambient cinema-mode transitions when preview is active */
-.media-detail-page__hero-content-section > *:not(.media-detail-page__center-play-btn) {
+.media-detail-page__hero-content-section>*:not(.media-detail-page__center-play-btn) {
   transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
 }
 
-.media-detail-page.is-preview-playing .media-detail-page__hero-content-section > *:not(.media-detail-page__center-play-btn) {
+.media-detail-page.is-preview-playing .media-detail-page__hero-content-section>*:not(.media-detail-page__center-play-btn) {
   opacity: 0 !important;
   pointer-events: none !important;
   visibility: hidden !important;
@@ -1072,12 +1072,6 @@
 
 .entity-detail-page__drawer-backdrop--transparent {
   background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-.entity-detail-page__drawer--logo {
-  background: var(--color-surface-overlay, var(--color-panel-strong)) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }

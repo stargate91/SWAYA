@@ -17,6 +17,7 @@ import { useRatingsPageState } from './useRatingsPageState';
 import LibraryPagination from '../library/components/LibraryPagination';
 import RatingsReviewDrawer from './components/RatingsReviewDrawer';
 import AnalyticsTabContent from './components/AnalyticsTabContent';
+import { useDebounce } from '@/hooks/useDebounce';
 import './RatingsPage.css';
 
 export default function RatingsPage() {
@@ -69,6 +70,7 @@ export default function RatingsPage() {
 
   // Local Search Input with Debounce Sync
   const [localSearch, setLocalSearch] = useState(state.searchQuery);
+  const debouncedSearch = useDebounce(localSearch, 150);
 
   const stateRef = useRef(state);
   useEffect(() => {
@@ -76,13 +78,10 @@ export default function RatingsPage() {
   });
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (localSearch !== stateRef.current.searchQuery) {
-        stateRef.current.setSearchQuery(localSearch);
-      }
-    }, 150);
-    return () => clearTimeout(timer);
-  }, [localSearch]);
+    if (debouncedSearch !== stateRef.current.searchQuery) {
+      stateRef.current.setSearchQuery(debouncedSearch);
+    }
+  }, [debouncedSearch]);
 
   // Tabs configurations
   const ratingTabs = [

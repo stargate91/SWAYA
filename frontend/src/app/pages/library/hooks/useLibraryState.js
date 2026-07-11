@@ -74,6 +74,12 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
 
   const [accumulatedItems, setAccumulatedItems] = useState(savedState.accumulatedItems ?? []);
 
+  const [prevFilterParamsHash, setPrevFilterParamsHash] = useState('');
+  const [prevLibraryItems, setPrevLibraryItems] = useState(null);
+  const [prevCurrentPage, setPrevCurrentPage] = useState(1);
+  const [prevPaginationMode, setPrevPaginationMode] = useState('');
+  const [prevIsServerPaged, setPrevIsServerPaged] = useState(false);
+
   const { sessionMode, setSessionMode } = useLibraryModeStore();
 
   const hasAdultSupport = settings?.include_adult;
@@ -366,13 +372,22 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
   };
 
   const handleFilterChange = (setter) => (val) => {
-    setter(val);
-    setCurrentPage(1);
+    setter((prev) => {
+      const newVal = typeof val === 'function' ? val(prev) : val;
+      if (prev !== newVal) {
+        setCurrentPage(1);
+      }
+      return newVal;
+    });
   };
 
   const handleSearchQueryChange = (val) => {
-    setSearchQuery(val);
-    setCurrentPage(1);
+    setSearchQuery((prev) => {
+      if (prev !== val) {
+        setCurrentPage(1);
+      }
+      return val;
+    });
   };
 
   const handlePageChange = (page) => {
@@ -380,8 +395,12 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
   };
 
   const handlePageSizeChange = (size) => {
-    setPageSize(size);
-    setCurrentPage(1);
+    setPageSize((prev) => {
+      if (prev !== size) {
+        setCurrentPage(1);
+      }
+      return size;
+    });
   };
 
   const getEmptyStateIcon = () => {
@@ -411,15 +430,29 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
 
   const filterParamsHash = useMemo(() => {
     if (!libraryQueryParams) return '';
-    const { page, ...rest } = libraryQueryParams;
+    const rest = { ...libraryQueryParams };
+    delete rest.page;
     return JSON.stringify(rest);
   }, [libraryQueryParams]);
 
-  useEffect(() => {
+  if (filterParamsHash !== prevFilterParamsHash) {
+    setPrevFilterParamsHash(filterParamsHash);
     setAccumulatedItems([]);
-  }, [filterParamsHash]);
+    setPrevLibraryItems(null);
+    setPrevCurrentPage(1);
+    setPrevPaginationMode('');
+    setPrevIsServerPaged(false);
+  } else if (
+    libraryData?.items !== prevLibraryItems ||
+    currentPage !== prevCurrentPage ||
+    paginationMode !== prevPaginationMode ||
+    isServerPaged !== prevIsServerPaged
+  ) {
+    setPrevLibraryItems(libraryData?.items);
+    setPrevCurrentPage(currentPage);
+    setPrevPaginationMode(paginationMode);
+    setPrevIsServerPaged(isServerPaged);
 
-  useEffect(() => {
     if (paginationMode === 'infinite') {
       if (isServerPaged && libraryData?.items) {
         if (currentPage === 1) {
@@ -442,7 +475,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     } else {
       setAccumulatedItems([]);
     }
-  }, [libraryData?.items, currentPage, paginationMode, isServerPaged]);
+  }
 
   useEffect(() => {
     if (paginationMode !== 'infinite') return;

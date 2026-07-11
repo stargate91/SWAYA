@@ -34,7 +34,7 @@ export default function Drawer({
     if (!isOpen || actualHasBackdrop) return;
     const handleDocumentClick = (e) => {
       const drawerEl = document.querySelector('.ui-drawer');
-      if (drawerEl && !drawerEl.contains(e.target)) {
+      if (drawerEl && !drawerEl.contains(e.target) && document.body.contains(e.target)) {
         onClose();
       }
     };
@@ -60,6 +60,7 @@ export default function Drawer({
       )}
       <div
         className={`ui-drawer ui-drawer--${size} ui-drawer--${variant} ${className}`.trim()}
+        // eslint-disable-next-line react/forbid-dom-props
         style={style}
         role="dialog"
         aria-modal="true"
@@ -95,7 +96,7 @@ Drawer.propTypes = {
   size: PropTypes.oneOf(['sm', 'md', 'lg', '720']),
   className: PropTypes.string,
   style: PropTypes.object,
-  variant: PropTypes.oneOf(['default', 'glass']),
+  variant: PropTypes.oneOf(['default', 'glass', 'contrast']),
   hasBackdrop: PropTypes.bool,
   children: PropTypes.node,
 };

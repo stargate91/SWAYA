@@ -11,6 +11,7 @@ import {
   sortBackdropCredits,
 } from '../utils/personCreditsUtils';
 import { checkImageResolution } from '../utils/personBackdropUtils';
+import useImagePicker from './useImagePicker';
 
 const PERSON_BACKDROP_INITIAL_ROWS = 2;
 const PERSON_BACKDROP_COLUMNS = 4;
@@ -21,8 +22,6 @@ export default function usePersonBackdropPicker({
   item,
   t,
   toast,
-  overridePersonBackdropMutation,
-  uploadPersonBackdropMutation,
   viewportRef,
 }) {
   const person = item;
@@ -56,6 +55,18 @@ export default function usePersonBackdropPicker({
   const selectedBackdropMediaType = isTvLikeMediaType(selectedCredit?.media_type || selectedCredit?.type) ? 'tv' : 'movie';
   const selectedBackdropMetadataQuery = usePersonCreditBackdropsQuery(personId, selectedBackdropTmdbId, selectedBackdropMediaType, {
     enabled: Boolean(personId) && Number.isFinite(selectedBackdropTmdbId) && selectedBackdropTmdbId > 0 && isTmdbPerformer,
+  });
+
+  const { isPending: isImagePickerPending, handleSaveUrl, handleUploadFile } = useImagePicker({
+    entityId: personId,
+    entityType: 'person',
+    imageType: 'backdrop',
+    toast,
+    t,
+    closeOnSelect: false,
+    onUploadSuccess: (data) => {
+      patchSession(personId, { selectedBackdropPath: data?.backdrop_path || item?.backdrop_path || '' });
+    }
   });
 
   useEffect(() => {
@@ -209,7 +220,7 @@ export default function usePersonBackdropPicker({
         : false));
 
   const loadMore = async () => {
-    if (!personId || overridePersonBackdropMutation.isPending) {
+    if (!personId || isImagePickerPending) {
       return;
     }
 
@@ -375,7 +386,7 @@ export default function usePersonBackdropPicker({
 
   const handleSelectSceneBackdrop = async (credit) => {
     const path = credit.backdrop_path || credit.original_backdrop_path;
-    if (!path || overridePersonBackdropMutation.isPending) return;
+    if (!path || isImagePickerPending) return;
 
     try {
       const dimensions = await checkImageResolution(path);
@@ -391,15 +402,7 @@ export default function usePersonBackdropPicker({
       currentSourceCreditKey: String(credit.id || ''),
     });
 
-    try {
-      await overridePersonBackdropMutation.mutateAsync({
-        personId,
-        backdropPath: path,
-      });
-      toast(t('library.details.backdropUpdated') || 'Backdrop updated successfully!', 'success');
-    } catch (err) {
-      toast(err.message || t('library.details.backdropUpdateFailed') || 'Failed to update backdrop', 'danger');
-    }
+    await handleSaveUrl(path);
   };
 
   const handleOpenBackdropBrowser = (credit) => {
@@ -426,58 +429,33 @@ export default function usePersonBackdropPicker({
   };
 
   const handleUploadBackdrop = async (file) => {
-    if (!file || uploadPersonBackdropMutation?.isPending) {
+    if (!file || isImagePickerPending) {
       return;
     }
-    try {
-      const data = await uploadPersonBackdropMutation.mutateAsync({
-        personId,
-        file,
-      });
-      patchSession(personId, { selectedBackdropPath: data?.backdrop_path || item?.backdrop_path || '' });
-      toast(t('library.details.imageUploaded') || 'Image uploaded and updated successfully!', 'success');
-    } catch (err) {
-      toast(err.message || t('library.details.imageUploadFailed') || 'Failed to upload image', 'danger');
-    }
+    await handleUploadFile(file);
   };
 
   const handleSaveBackdropUrl = async (backdropPath) => {
-    if (backdropPath === undefined || overridePersonBackdropMutation.isPending) {
+    if (backdropPath === undefined || isImagePickerPending) {
       return;
     }
     patchSession(personId, { selectedBackdropPath: backdropPath });
-    try {
-      await overridePersonBackdropMutation.mutateAsync({
-        personId,
-        backdropPath,
-      });
-      toast(t('library.details.backdropUpdated') || 'Backdrop updated successfully!', 'success');
-    } catch (err) {
-      toast(err.message || t('library.details.backdropUpdateFailed') || 'Failed to update backdrop', 'danger');
-    }
+    await handleSaveUrl(backdropPath);
   };
 
   const handleSelectDetailedBackdrop = async (backdropPath) => {
-    if (!backdropPath || overridePersonBackdropMutation.isPending) {
+    if (!backdropPath || isImagePickerPending) {
       return;
     }
     patchSession(personId, {
       selectedBackdropPath: backdropPath,
       currentSourceCreditKey: String(selectedCredit?.tmdb_id || selectedCredit?.id || ''),
     });
-    try {
-      await overridePersonBackdropMutation.mutateAsync({
-        personId,
-        backdropPath,
-      });
-      toast(t('library.details.backdropUpdated') || 'Backdrop updated successfully!', 'success');
-    } catch (err) {
-      toast(err.message || t('library.details.backdropUpdateFailed') || 'Failed to update backdrop', 'danger');
-    }
+    await handleSaveUrl(backdropPath);
   };
 
   const isBackdropBrowserOpen = Boolean(selectedCredit);
-  const isUploadPending = Boolean(uploadPersonBackdropMutation?.isPending);
+  const isUploadPending = isImagePickerPending;
   const headerDescription = isTmdbPerformer && !isBackdropBrowserOpen && activeTab !== 'scenes' && (validationPendingCount > 0 || isLoading)
     ? t('library.details.backdropFilterRunning', {
       checked: validatedCount,

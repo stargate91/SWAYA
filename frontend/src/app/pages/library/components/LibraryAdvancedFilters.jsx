@@ -1,17 +1,4 @@
-import Dropdown from '@/ui/Dropdown';
-
-const formatPhysicalAttributeLabel = (val) => {
-  if (!val) return '';
-  if (val.toUpperCase() === 'NA' || val.toUpperCase() === 'N/A') return 'N/A';
-  return val
-    .toLowerCase()
-    .split(' ')
-    .map(word => {
-      if (word === 'na' || word === 'n/a') return 'N/A';
-      return word.charAt(0).toUpperCase() + word.slice(1);
-    })
-    .join(' ');
-};
+import AttributeFilterDropdown from './AttributeFilterDropdown';
 
 export default function LibraryAdvancedFilters({
   t,
@@ -36,139 +23,93 @@ export default function LibraryAdvancedFilters({
   return (
     <div className="organizer-panel__row library-filters-row library-filters-advanced-row">
       <div className="library-filters-left">
-        {filterData?.hair_colors && filterData.hair_colors.length > 0 && (
-          <div className="library-sorter-container">
-            <span className="library-sorter-label">{t('library.filter.hairColorLabel') || 'Hair Color:'}</span>
-            <Dropdown
-              variant="sorter"
-              value={hairColorFilter}
-              onChange={(e) => {
-                setHairColorFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-              options={[
-                { value: '', label: t('library.filter.allHairColors') || 'All Hair Colors' },
-                ...(filterData.hair_colors).map(hc => ({ value: hc, label: formatPhysicalAttributeLabel(hc) })),
-              ]}
-            />
-          </div>
-        )}
+        <AttributeFilterDropdown
+          label={t('library.filter.hairColorLabel') || 'Hair Color:'}
+          value={hairColorFilter}
+          onChange={setHairColorFilter}
+          items={filterData?.hair_colors}
+          allLabel={t('library.filter.allHairColors') || 'All Hair Colors'}
+          setCurrentPage={setCurrentPage}
+        />
 
+        <AttributeFilterDropdown
+          label={t('library.filter.eyeColorLabel') || 'Eye Color:'}
+          value={eyeColorFilter}
+          onChange={setEyeColorFilter}
+          items={filterData?.eye_colors}
+          allLabel={t('library.filter.allEyeColors') || 'All Eye Colors'}
+          setCurrentPage={setCurrentPage}
+        />
 
-        {filterData?.eye_colors && filterData.eye_colors.length > 0 && (
-          <div className="library-sorter-container">
-            <span className="library-sorter-label">{t('library.filter.eyeColorLabel') || 'Eye Color:'}</span>
-            <Dropdown
-              variant="sorter"
-              value={eyeColorFilter}
-              onChange={(e) => {
-                setEyeColorFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-              options={[
-                { value: '', label: t('library.filter.allEyeColors') || 'All Eye Colors' },
-                ...(filterData.eye_colors).map(ec => ({ value: ec, label: formatPhysicalAttributeLabel(ec) })),
-              ]}
-            />
-          </div>
-        )}
-
-        {settings?.include_adult && filterData?.breast_types && filterData.breast_types.length > 0 && (
-          <div className="library-sorter-container">
-            <span className="library-sorter-label">{t('library.filter.breastTypeLabel') || 'Breast Type:'}</span>
-            <Dropdown
-              variant="sorter"
-              value={breastTypeFilter}
-              onChange={(e) => {
-                setBreastTypeFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-              options={[
-                { value: '', label: t('library.filter.allBreastTypes') || 'All' },
-                ...(filterData.breast_types).map(bt => ({ value: bt, label: formatPhysicalAttributeLabel(bt) })),
-              ]}
-            />
-          </div>
+        {settings?.include_adult && (
+          <AttributeFilterDropdown
+            label={t('library.filter.breastTypeLabel') || 'Breast Type:'}
+            value={breastTypeFilter}
+            onChange={setBreastTypeFilter}
+            items={filterData?.breast_types}
+            allLabel={t('library.filter.allBreastTypes') || 'All'}
+            setCurrentPage={setCurrentPage}
+          />
         )}
 
         {settings?.include_adult && filterData?.butt_shapes && filterData.butt_shapes.length > 0 && (
-          <div className="library-sorter-container">
-            <span className="library-sorter-label">{t('library.filter.buttShapeLabel') || 'Butt Shape:'}</span>
-            <Dropdown
-              variant="sorter"
-              value={buttShapeFilter}
-              onChange={(e) => {
-                setButtShapeFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-              options={[
-                { value: '', label: t('library.filter.allButtShapes') || 'All' },
-                { value: 'BUBBLE', label: t('library.performerEdit.buttShapes.bubble') || 'Bubble' },
-                { value: 'HEART', label: t('library.performerEdit.buttShapes.heart') || 'Heart' },
-                { value: 'SQUARE', label: t('library.performerEdit.buttShapes.square') || 'Square' },
-                { value: 'FLAT', label: t('library.performerEdit.buttShapes.flat') || 'Flat' },
-              ]}
-            />
-          </div>
+          <AttributeFilterDropdown
+            label={t('library.filter.buttShapeLabel') || 'Butt Shape:'}
+            value={buttShapeFilter}
+            onChange={setButtShapeFilter}
+            items={[
+              { value: 'BUBBLE', label: t('library.performerEdit.buttShapes.bubble') || 'Bubble' },
+              { value: 'HEART', label: t('library.performerEdit.buttShapes.heart') || 'Heart' },
+              { value: 'SQUARE', label: t('library.performerEdit.buttShapes.square') || 'Square' },
+              { value: 'FLAT', label: t('library.performerEdit.buttShapes.flat') || 'Flat' },
+            ]}
+            allLabel={t('library.filter.allButtShapes') || 'All'}
+            setCurrentPage={setCurrentPage}
+          />
         )}
 
         {settings?.include_adult && filterData?.butt_sizes && filterData.butt_sizes.length > 0 && (
-          <div className="library-sorter-container">
-            <span className="library-sorter-label">{t('library.filter.buttSizeLabel') || 'Butt Size:'}</span>
-            <Dropdown
-              variant="sorter"
-              value={buttSizeFilter}
-              onChange={(e) => {
-                setButtSizeFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-              options={[
-                { value: '', label: t('library.filter.allButtSizes') || 'All' },
-                { value: 'SMALL', label: t('library.performerEdit.buttSizes.small') || 'Small' },
-                { value: 'MEDIUM', label: t('library.performerEdit.buttSizes.medium') || 'Medium' },
-                { value: 'BIG', label: t('library.performerEdit.buttSizes.big') || 'Big' },
-                { value: 'EXTRA_BIG', label: t('library.performerEdit.buttSizes.extra_big') || 'Extra Big' },
-              ]}
-            />
-          </div>
+          <AttributeFilterDropdown
+            label={t('library.filter.buttSizeLabel') || 'Butt Size:'}
+            value={buttSizeFilter}
+            onChange={setButtSizeFilter}
+            items={[
+              { value: 'SMALL', label: t('library.performerEdit.buttSizes.small') || 'Small' },
+              { value: 'MEDIUM', label: t('library.performerEdit.buttSizes.medium') || 'Medium' },
+              { value: 'BIG', label: t('library.performerEdit.buttSizes.big') || 'Big' },
+              { value: 'EXTRA_BIG', label: t('library.performerEdit.buttSizes.extra_big') || 'Extra Big' },
+            ]}
+            allLabel={t('library.filter.allButtSizes') || 'All'}
+            setCurrentPage={setCurrentPage}
+          />
         )}
 
         {filterData?.tattoos && filterData.tattoos.length > 0 && (
-          <div className="library-sorter-container">
-            <span className="library-sorter-label">{t('library.filter.tattoosLabel') || 'Tattoos:'}</span>
-            <Dropdown
-              variant="sorter"
-              value={tattoosFilter}
-              onChange={(e) => {
-                setTattoosFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-              options={[
-                { value: '', label: t('library.filter.allTattoos') || 'All Options' },
-                { value: 'yes', label: t('library.filter.yes') || 'Yes' },
-                { value: 'no', label: t('library.filter.no') || 'No' },
-              ]}
-            />
-          </div>
+          <AttributeFilterDropdown
+            label={t('library.filter.tattoosLabel') || 'Tattoos:'}
+            value={tattoosFilter}
+            onChange={setTattoosFilter}
+            items={[
+              { value: 'yes', label: t('library.filter.yes') || 'Yes' },
+              { value: 'no', label: t('library.filter.no') || 'No' },
+            ]}
+            allLabel={t('library.filter.allTattoos') || 'All Options'}
+            setCurrentPage={setCurrentPage}
+          />
         )}
 
         {filterData?.piercings && filterData.piercings.length > 0 && (
-          <div className="library-sorter-container">
-            <span className="library-sorter-label">{t('library.filter.piercingsLabel') || 'Piercings:'}</span>
-            <Dropdown
-              variant="sorter"
-              value={piercingsFilter}
-              onChange={(e) => {
-                setPiercingsFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-              options={[
-                { value: '', label: t('library.filter.allPiercings') || 'All Options' },
-                { value: 'yes', label: t('library.filter.yes') || 'Yes' },
-                { value: 'no', label: t('library.filter.no') || 'No' },
-              ]}
-            />
-          </div>
+          <AttributeFilterDropdown
+            label={t('library.filter.piercingsLabel') || 'Piercings:'}
+            value={piercingsFilter}
+            onChange={setPiercingsFilter}
+            items={[
+              { value: 'yes', label: t('library.filter.yes') || 'Yes' },
+              { value: 'no', label: t('library.filter.no') || 'No' },
+            ]}
+            allLabel={t('library.filter.allPiercings') || 'All Options'}
+            setCurrentPage={setCurrentPage}
+          />
         )}
       </div>
     </div>

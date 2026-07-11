@@ -211,7 +211,6 @@ export default function OrganizerPage() {
     restoreDismissedRows,
     dismissedCount,
     dismissedRowIds,
-    pendingResolvedIds,
     addPendingResolvedIds,
     visibleExtraCount,
     visibleMediaCount,
@@ -417,8 +416,7 @@ export default function OrganizerPage() {
             label={renameButtonLabel}
             onClick={() => handleRename(false)}
             disabled={isScanActive || isRenamePending || isRenameStarting}
-            className="organizer-panel__browse-btn"
-            style={{ marginLeft: 'var(--app-shell-space-2)' }}
+            className="organizer-panel__browse-btn organizer-panel__rename-btn"
             options={[
               {
                 label: renameButtonLabel,

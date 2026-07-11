@@ -3,24 +3,31 @@ import { UserPlus, Plus } from '@/ui/icons';
 import { Tabs } from '@/ui/Tabs';
 import SearchInputCombo from '@/ui/SearchInputCombo';
 import Button from '@/ui/Button';
-import Dropdown from '@/ui/Dropdown';
+import FilterDropdown from '@/ui/FilterDropdown';
 import Badge from '@/ui/Badge';
 import { isLibraryPeopleTab, isLibraryTagsTab } from '@/lib/libraryTabs';
+import { useDebounce } from '@/hooks/useDebounce';
 
-const SearchInput = React.memo(({ placeholder, onSearchChange }) => {
-  const [value, setValue] = useState('');
+const SearchInput = React.memo(({ placeholder, onSearchChange, initialValue = '' }) => {
+  const [value, setValue] = useState(initialValue);
+  const debouncedValue = useDebounce(value, 300);
   const onSearchChangeRef = useRef(onSearchChange);
 
   useEffect(() => {
     onSearchChangeRef.current = onSearchChange;
   }, [onSearchChange]);
 
+  const isFirstRender = useRef(true);
+
   useEffect(() => {
-    const timer = setTimeout(() => {
-      onSearchChangeRef.current?.(value);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [value]);
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      if (debouncedValue === initialValue) {
+        return;
+      }
+    }
+    onSearchChangeRef.current?.(debouncedValue);
+  }, [debouncedValue, initialValue]);
 
   return (
     <SearchInputCombo
@@ -33,6 +40,7 @@ const SearchInput = React.memo(({ placeholder, onSearchChange }) => {
   );
 });
 
+
 SearchInput.displayName = 'SearchInput';
 
 export default function LibraryHeader({
@@ -43,6 +51,7 @@ export default function LibraryHeader({
   setActiveTab,
   searchPlaceholder,
   setSearchQuery,
+  searchQuery = '',
   onAddPeople,
   onCreateTag,
   showTabs = true,
@@ -98,26 +107,23 @@ export default function LibraryHeader({
         ) : (
           <div className="library-header__inline-tools">
             {showInlineSorter ? (
-              <div className="library-sorter-container">
-                <span className="library-sorter-label">{t('library.sort.label') || 'Sort:'}</span>
-                <Dropdown
-                  variant="sorter"
-                  value={sortKey}
-                  onChange={(e) => {
-                    setSortKey(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  sortDirection={sortDirection}
-                  onSortDirectionToggle={() => {
-                    setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
-                    setCurrentPage(1);
-                  }}
-                  options={[
-                    { value: 'total_count', label: t('library.sort.itemCount') || 'Item Count' },
-                    { value: 'name', label: t('library.sort.name') || 'Name' },
-                  ]}
-                />
-              </div>
+              <FilterDropdown
+                label={t('library.sort.label') || 'Sort:'}
+                value={sortKey}
+                onChange={(e) => {
+                  setSortKey(e.target.value);
+                  setCurrentPage(1);
+                }}
+                sortDirection={sortDirection}
+                onSortDirectionToggle={() => {
+                  setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+                  setCurrentPage(1);
+                }}
+                options={[
+                  { value: 'total_count', label: t('library.sort.itemCount') || 'Item Count' },
+                  { value: 'name', label: t('library.sort.name') || 'Name' },
+                ]}
+              />
             ) : null}
           </div>
         )}
@@ -126,6 +132,7 @@ export default function LibraryHeader({
             key={resolvedTab}
             placeholder={searchPlaceholder}
             onSearchChange={setSearchQuery}
+            initialValue={searchQuery}
           />
         )}
       </div>

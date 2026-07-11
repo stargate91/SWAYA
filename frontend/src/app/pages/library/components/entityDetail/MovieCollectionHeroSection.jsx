@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { createPortal } from 'react-dom';
-import { Layers, PenLine, X, Maximize2 } from '@/ui/icons';
 import Pill from '@/ui/Pill';
 import Lightbox from '@/ui/Lightbox';
+import ParsedParagraphs from '@/ui/ParsedParagraphs';
 import { OverviewContent } from './EntityDetailSections';
 import { API_BASE } from '@/lib/backend';
-import { getPosterImagePath } from '@/lib/imageUrls';
-import { resolveDetailsImageUrl } from '../../utils/detailUtils';
+import EditableMediaCard from './EditableMediaCard';
+import { getOriginalImageUrlHelper } from '../../utils/heroSectionUtils';
 import './EntityDetailHeroSection.css';
 
 export default function MovieCollectionHeroSection({
@@ -15,77 +14,28 @@ export default function MovieCollectionHeroSection({
   overviewText,
   overviewTitle,
   metaPills = [],
-  displayRating,
-  isActivateHovered,
   t,
-  setIsActivateHovered,
-  handleToggleFavorite,
-  handleToggleActive,
-  handlePeopleRatingMouseMove,
-  handlePeopleRatingMouseLeave,
-  handlePeopleRatingClick,
   onMediaCardClick,
-  openModal,
 }) {
   const [lightboxUrl, setLightboxUrl] = useState(null);
 
-  const getOriginalUrl = () => {
-    const rawPath = getPosterImagePath(item);
-    if (!rawPath) return mediaUrl || '';
-    return resolveDetailsImageUrl(rawPath, API_BASE, 'originalPoster');
-  };
+  const getOriginalUrl = () => getOriginalImageUrlHelper(false, item, mediaUrl, API_BASE);
 
   return (
     <>
       <section className="entity-detail-page__hero-grid">
         <div className="entity-detail-page__media-column">
-          <div
-            className="entity-detail-page__media-card entity-detail-page__media-card--editable"
+          <EditableMediaCard
+            mediaUrl={mediaUrl}
             onClick={() => {
               const url = getOriginalUrl();
               if (url) setLightboxUrl(url);
             }}
-            title={t('library.details.viewOriginalImage') || 'View Original Image'}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                const url = getOriginalUrl();
-                if (url) setLightboxUrl(url);
-              }
-            }}
-          >
-            {mediaUrl ? (
-              <>
-                <img
-                  src={mediaUrl}
-                  alt={item?.name || item?.title || 'Detail artwork'}
-                  className="entity-detail-page__media-image"
-                />
-                <div className="entity-detail-page__media-card-hover-overlay">
-                  <div className="entity-detail-page__media-card-hover-icon">
-                    <Maximize2 size={16} />
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="entity-detail-page__media-placeholder">
-                <Layers size={44} />
-              </div>
-            )}
-            <button
-              type="button"
-              className="entity-detail-page__media-edit-badge"
-              onClick={(event) => {
-                event.stopPropagation();
-                onMediaCardClick?.();
-              }}
-              title={t('library.details.changePoster') || 'Change Poster'}
-              aria-label={t('library.details.changePoster') || 'Change Poster'}
-            >
-              <PenLine size={14} />
-            </button>
-          </div>
+            onEditClick={onMediaCardClick}
+            editTitle={t('library.details.changePoster') || 'Change Poster'}
+            viewOriginalTitle={t('library.details.viewOriginalImage') || 'View Original Image'}
+            type="poster"
+          />
         </div>
 
         <div className="entity-detail-page__summary">
@@ -106,27 +56,18 @@ export default function MovieCollectionHeroSection({
             <div className="entity-detail-page__summary-layout">
               <div className="entity-detail-page__summary-text">
                 {overviewTitle && <h3 className="entity-detail-page__summary-title">{overviewTitle}</h3>}
-                <div className="entity-detail-page__description">
-                  {overviewText.split(/\n{2,}/).map((paragraph, index) => (
-                    <p key={index} className="entity-detail-page__description-paragraph">{paragraph}</p>
-                  ))}
-                </div>
+                <ParsedParagraphs
+                  text={overviewText}
+                  className="entity-detail-page__description"
+                  paragraphClassName="entity-detail-page__description-paragraph"
+                />
               </div>
 
               <div className="entity-detail-page__sidebar-layout">
                 <div className="entity-detail-page__sidebar-section">
                   <OverviewContent
-                    item={item}
-                    displayRating={displayRating}
-                    isActivateHovered={isActivateHovered}
-                    setIsActivateHovered={setIsActivateHovered}
-                    handleToggleFavorite={handleToggleFavorite}
-                    handleToggleActive={handleToggleActive}
-                    handleOpenReviewMouseMove={handlePeopleRatingMouseMove}
-                    handleOpenReviewMouseLeave={handlePeopleRatingMouseLeave}
-                    handleOpenReviewClick={handlePeopleRatingClick}
+                    text={overviewText}
                     t={t}
-                    openModal={openModal}
                   />
                 </div>
               </div>

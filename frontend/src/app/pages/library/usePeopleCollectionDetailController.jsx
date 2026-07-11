@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Button from '@/ui/Button';
 import { useTranslation } from '@/providers/LanguageContext';
-import { useOverridePersonBackdropMutation, useUploadPersonBackdropMutation, useUpdatePersonStatusMutation } from '@/queries';
+import { useUpdatePersonStatusMutation } from '@/queries';
 import { useOverrideBackdropMutation, useUploadBackdropMutation } from '@/queries';
 import {
   useLibraryCollectionDetailQuery,
@@ -13,12 +13,10 @@ import { API_BASE } from '@/lib/backend';
 import { resolveDetailsImageUrl } from './utils/detailUtils';
 import {
   buildPersonExternalLinks,
+  resolveSocialLinks,
 } from './utils/externalLinksUtils';
 import { getPosterImagePath, getProfileImagePath } from '@/lib/imageUrls';
-import PersonBackdropPickerModal from './components/entityDetail/PersonBackdropPickerModal';
-import {
-  CollectionBackdropsPanel,
-} from './components/entityDetail/EntityDetailSections';
+import UniversalImagePicker from './components/UniversalImagePicker';
 import ReviewModalContent from './components/detail/modals/ReviewModalContent';
 
 export default function usePeopleCollectionDetailController({
@@ -31,7 +29,6 @@ export default function usePeopleCollectionDetailController({
 }) {
   const { locale } = useTranslation();
   const metadataLanguage = locale === 'en' ? 'en-US' : locale;
-  const [hoveredRating, setHoveredRating] = useState(null);
   const [isActivateHovered, setIsActivateHovered] = useState(false);
 
   const personQuery = usePersonDetailQuery(id, { enabled: isPeople && Boolean(id) });
@@ -42,8 +39,6 @@ export default function usePeopleCollectionDetailController({
   const updatePersonStatusMutation = useUpdatePersonStatusMutation();
   const overrideBackdropMutation = useOverrideBackdropMutation();
   const uploadBackdropMutation = useUploadBackdropMutation();
-  const overridePersonBackdropMutation = useOverridePersonBackdropMutation();
-  const uploadPersonBackdropMutation = useUploadPersonBackdropMutation();
 
   const item = isPeople ? personQuery.data : collectionQuery.data;
   const isLoading = isPeople ? personQuery.isLoading : collectionQuery.isLoading;
@@ -84,81 +79,7 @@ export default function usePeopleCollectionDetailController({
   );
   const socialLinks = useMemo(() => {
     if (!isPeople || !item) return [];
-    // Only show links that have a real specific icon file in /links/ (including homepage/website)
-    const knownIcons = new Set([
-      '/links/tmdb.png', '/links/stashdb.png', '/links/fansdb.webp', '/links/theporndb.png',
-      '/links/imdb.png', '/links/instagram.ico', '/links/instagram.svg',
-      '/links/facebook.ico', '/links/facebook.svg', '/links/x.svg',
-      '/links/tiktok.png', '/links/tiktok.svg', '/links/youtube.ico', '/links/youtube.svg',
-      '/links/onylfans.ico', '/links/fansly.png', '/links/pornhub.ico',
-      '/links/manyvids.ico', '/links/patreon.ico', '/links/linktree.png',
-      '/links/threads.png', '/links/twitch.jpg', '/links/kick.ico',
-      '/links/bluesky.png', '/links/clip4sale.ico', '/links/allmylinks.ico',
-      '/links/beacons.png', '/links/iafd.ico', '/links/babepedia.ico',
-      '/links/freeones.png', '/links/data18.ico', '/links/homepage.png',
-      '/links/twitter.png', '/links/website.svg'
-    ]);
-    const allLinks = externalLinks.filter(link =>
-      link.iconSrc && knownIcons.has(link.iconSrc)
-    );
-    // Left-to-right display priority order (imdb, website, homepage on the far right / highest priority)
-    const order = [
-      'clip4sale', 'manyvids', 'pornhub', 'data18', 'babepedia', 'iafd', 'freeones',
-      'facebook', 'threads', 'bluesky', 'kick', 'twitch', 'fansly', 'onlyfans', 'patreon', 'beacons', 'linktree', 'youtube', 'tiktok', 'twitter', 'x', 'instagram',
-      'theporndb', 'porndb', 'fansdb', 'stashdb', 'stash', 'tmdb', 'imdb', 'website', 'homepage'
-    ];
-    const getCleanKey = (link) => {
-      const icon = String(link.iconSrc || '').toLowerCase();
-      if (icon.includes('tmdb')) return 'tmdb';
-      if (icon.includes('imdb')) return 'imdb';
-      if (icon.includes('stashdb')) return 'stashdb';
-      if (icon.includes('fansdb')) return 'fansdb';
-      if (icon.includes('theporndb') || icon.includes('porndb')) return 'porndb';
-      if (icon.includes('instagram')) return 'instagram';
-      if (icon.includes('x.svg')) return 'x';
-      if (icon.includes('twitter')) return 'twitter';
-      if (icon.includes('tiktok')) return 'tiktok';
-      if (icon.includes('youtube')) return 'youtube';
-      if (icon.includes('onlyfans') || icon.includes('onylfans')) return 'onlyfans';
-      if (icon.includes('fansly')) return 'fansly';
-      if (icon.includes('patreon')) return 'patreon';
-      if (icon.includes('pornhub')) return 'pornhub';
-      if (icon.includes('manyvids')) return 'manyvids';
-      if (icon.includes('linktree')) return 'linktree';
-      if (icon.includes('threads')) return 'threads';
-      if (icon.includes('twitch')) return 'twitch';
-      if (icon.includes('kick')) return 'kick';
-      if (icon.includes('bluesky')) return 'bluesky';
-      if (icon.includes('clip4sale')) return 'clip4sale';
-      if (icon.includes('allmylinks')) return 'allmylinks';
-      if (icon.includes('beacons')) return 'beacons';
-      if (icon.includes('iafd')) return 'iafd';
-      if (icon.includes('babepedia')) return 'babepedia';
-      if (icon.includes('freeones')) return 'freeones';
-      if (icon.includes('data18')) return 'data18';
-      if (icon.includes('homepage') || icon.includes('website')) return 'homepage';
-      return String(link.key || '').toLowerCase();
-    };
-    const sorted = [...allLinks].sort((a, b) => {
-      const keyA = getCleanKey(a);
-      const keyB = getCleanKey(b);
-      const idxA = order.indexOf(keyA);
-      const idxB = order.indexOf(keyB);
-      
-      const cleanIdxA = idxA === -1 ? 999 : idxA;
-      const cleanIdxB = idxB === -1 ? 999 : idxB;
-      
-      return cleanIdxA - cleanIdxB;
-    });
-    const seenIcons = new Set();
-    const uniqueLinks = [];
-    for (const link of sorted) {
-      if (!link.iconSrc) continue;
-      if (!seenIcons.has(link.iconSrc)) {
-        seenIcons.add(link.iconSrc);
-        uniqueLinks.push(link);
-      }
-    }
+    const uniqueLinks = resolveSocialLinks(externalLinks);
     console.log('uniqueLinks keys sorted LTR:', uniqueLinks.map(l => l.key));
     return uniqueLinks;
   }, [isPeople, externalLinks, item]);
@@ -168,40 +89,10 @@ export default function usePeopleCollectionDetailController({
     API_BASE,
     isPeople ? 'person' : 'poster'
   );
-  const currentRating = item?.user_rating ?? null;
-  const displayRating = hoveredRating !== null ? hoveredRating : currentRating;
-  const starsFillPercent = displayRating ? (displayRating / 10) * 100 : 0;
-  const starsStyleSheetText = `.rating-stars-overlay-dynamic { width: ${starsFillPercent}% !important; }`;
   const canChoosePeopleBackdrop = isPeople;
   const canChooseCollectionBackdrop = Boolean(
     item?.collection_backdrops?.some((bd) => !bd?.iso_639_1 || bd.iso_639_1 === 'null' || bd.iso_639_1 === '')
   );
-
-  const handlePeopleRatingMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const percent = (e.clientX - rect.left) / rect.width;
-    let val = Math.ceil(percent * 20) / 2;
-    val = Math.max(0.5, Math.min(10.0, val));
-    setHoveredRating(val);
-  };
-
-  const handlePeopleRatingMouseLeave = () => {
-    setHoveredRating(null);
-  };
-
-  const handlePeopleRatingClick = () => {
-    if (!isPeople || hoveredRating === null || !item?.id) {
-      return;
-    }
-    const isSame = currentRating !== null && currentRating !== undefined && Number(currentRating) === Number(hoveredRating);
-    updatePersonStatusMutation.mutate({
-      personId: item.id,
-      routeId: id,
-      payload: {
-        user_rating: isSame ? null : hoveredRating,
-      },
-    });
-  };
 
   const handleToggleFavorite = () => {
     if (!isPeople || !item?.id) {
@@ -274,14 +165,18 @@ export default function usePeopleCollectionDetailController({
       title: t('library.details.chooseBackdrop') || 'Choose Backdrop',
       variant: 'extra-wide',
       content: (
-        <CollectionBackdropsPanel
+        <UniversalImagePicker
           key={item.tmdb_id}
-          item={item}
-          collectionId={item.tmdb_id}
+          entityId={`collection_${item.tmdb_id || item.id}`}
+          tmdbId={item.tmdb_id || item.id}
+          imageType="backdrop"
+          entityType="collection"
+          currentPath={item.backdrop_path}
           t={t}
           toast={toast}
-          overrideBackdropMutation={overrideBackdropMutation}
-          uploadBackdropMutation={uploadBackdropMutation}
+          item={item}
+          closeOnSelect={true}
+          onClose={closeModal}
         />
       ),
     });
@@ -297,14 +192,15 @@ export default function usePeopleCollectionDetailController({
       variant: 'extra-wide',
       className: 'person-backdrop-picker-modal',
       content: (
-        <PersonBackdropPickerModal
+        <UniversalImagePicker
           key={item.id}
-          personId={item.id}
+          entityId={item.id}
           item={item}
+          entityType="person"
+          imageType="backdrop"
           t={t}
           toast={toast}
-          overridePersonBackdropMutation={overridePersonBackdropMutation}
-          uploadPersonBackdropMutation={uploadPersonBackdropMutation}
+          onClose={closeModal}
         />
       ),
     });
@@ -323,16 +219,11 @@ export default function usePeopleCollectionDetailController({
     socialLinks,
     backdropUrl,
     mediaUrl,
-    displayRating,
     isActivateHovered,
-    starsStyleSheetText,
     canChoosePeopleBackdrop,
     canChooseCollectionBackdrop,
     updatePersonStatusMutation,
     setIsActivateHovered,
-    handlePeopleRatingMouseMove,
-    handlePeopleRatingMouseLeave,
-    handlePeopleRatingClick,
     handleToggleFavorite,
     handleToggleActive,
     handleOpenReviewModal,
@@ -340,7 +231,5 @@ export default function usePeopleCollectionDetailController({
     handleOpenPeopleBackdropModal,
     overrideBackdropMutation,
     uploadBackdropMutation,
-    overridePersonBackdropMutation,
-    uploadPersonBackdropMutation,
   };
 }

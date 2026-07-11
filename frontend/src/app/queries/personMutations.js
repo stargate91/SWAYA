@@ -194,6 +194,7 @@ export const useUpdatePersonStatusMutation = () => {
         if ('is_active' in payload) updates.is_active = payload.is_active;
         if ('user_rating' in payload) updates.user_rating = payload.user_rating;
         if ('user_comment' in payload) updates.user_comment = payload.user_comment;
+        if ('custom_tags' in payload) updates.custom_tags = payload.custom_tags;
       }
 
       if (Object.keys(updates).length > 0) {

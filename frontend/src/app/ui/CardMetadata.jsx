@@ -22,11 +22,6 @@ const CardMetadata = memo(function CardMetadata({
     return null;
   }
 
-  const handlePerformerClick = (e, p) => {
-    e.stopPropagation();
-    window.location.hash = `/library/people/${p.id}`;
-  };
-
   const renderRating = () => {
     if (ratingPill) return ratingPill;
 
@@ -62,55 +57,47 @@ const CardMetadata = memo(function CardMetadata({
     return null;
   };
 
-  const titleStyle = onTitleClick ? { cursor: 'pointer' } : undefined;
-
-  return (
-    <div className={className}>
-      {title && (
-        typeof title === 'string' ? (
-          <Tooltip content={title} side="top">
-            <div
-              className={titleClassName}
-              onClick={onTitleClick}
-              style={titleStyle}
-              role={onTitleClick ? 'button' : undefined}
-              tabIndex={onTitleClick ? 0 : undefined}
-              onKeyDown={onTitleClick ? (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  onTitleClick(e);
-                }
-              } : undefined}
-            >
-              {title}
-            </div>
-          </Tooltip>
-        ) : (
-          title
-        )
-      )}
-      {(subtitle || performers?.length > 0 || ratingImdb || ratingTmdb || ratingPorndb || ratingPill) && (
-        <div className={subtitleRowClassName}>
-          {performers && performers.length > 0 ? (
-            <div className={subtitleClassName} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {performers.map((p, idx) => (
-                <span key={p.id}>
-                  {idx > 0 && ', '}
-                  <span
-                    role="button"
-                    tabIndex={0}
-                    className="ui-poster-card__performer-link"
-                    onClick={(e) => handlePerformerClick(e, p)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        handlePerformerClick(e, p);
-                      }
-                    }}
-                  >
-                    {p.name}
-                  </span>
-                </span>
-              ))}
-            </div>
+   return (
+     <div className={className}>
+       {title && (
+         typeof title === 'string' ? (
+           <Tooltip content={title} side="top">
+             {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+             <div
+               className={titleClassName}
+               onClick={onTitleClick}
+               role={onTitleClick ? 'button' : undefined}
+               tabIndex={onTitleClick ? 0 : undefined}
+               onKeyDown={onTitleClick ? (e) => {
+                 if (e.key === 'Enter' || e.key === ' ') {
+                   onTitleClick(e);
+                 }
+               } : undefined}
+             >
+               {title}
+             </div>
+           </Tooltip>
+         ) : (
+           title
+         )
+       )}
+       {(subtitle || performers?.length > 0 || ratingImdb || ratingTmdb || ratingPorndb || ratingPill) && (
+         <div className={subtitleRowClassName}>
+           {performers && performers.length > 0 ? (
+             <div className={subtitleClassName}>
+               {performers.map((p, idx) => (
+                 <span key={p.id}>
+                   {idx > 0 && ', '}
+                   <a
+                     href={`#/library/people/${p.id}`}
+                     className="ui-poster-card__performer-link"
+                     onClick={(e) => e.stopPropagation()}
+                   >
+                     {p.name}
+                   </a>
+                 </span>
+               ))}
+             </div>
           ) : (
             subtitle && (
               typeof subtitle === 'string' ? (

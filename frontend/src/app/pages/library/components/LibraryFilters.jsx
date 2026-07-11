@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import Dropdown from '@/ui/Dropdown';
+import FilterDropdown from '@/ui/FilterDropdown';
 import SegmentedControl from '@/ui/SegmentedControl';
 import Pill from '@/ui/Pill';
 import {
@@ -10,25 +10,11 @@ import {
   isLibraryVideoTab,
   isLibraryScenesTab,
 } from '@/lib/libraryTabs';
-import TagFilterDropdown from './TagFilterDropdown';
-import DecadeFilterDropdown from './DecadeFilterDropdown';
 import LibraryAdvancedFilters from './LibraryAdvancedFilters';
+import AttributeFilterDropdown from './AttributeFilterDropdown';
 
 
 const dummyFunc = () => { };
-
-const formatPhysicalAttributeLabel = (val) => {
-  if (!val) return '';
-  if (val.toUpperCase() === 'NA' || val.toUpperCase() === 'N/A') return 'N/A';
-  return val
-    .toLowerCase()
-    .split(' ')
-    .map(word => {
-      if (word === 'na' || word === 'n/a') return 'N/A';
-      return word.charAt(0).toUpperCase() + word.slice(1);
-    })
-    .join(' ');
-};
 
 export default function LibraryFilters({
   t,
@@ -108,6 +94,7 @@ export default function LibraryFilters({
   const hasAdvancedFilters = !!(
     (filterData?.hair_colors && filterData.hair_colors.length > 0) ||
     (filterData?.eye_colors && filterData.eye_colors.length > 0) ||
+    (filterData?.ethnicities && filterData.ethnicities.length > 0) ||
     (settings?.include_adult && filterData?.breast_types && filterData.breast_types.length > 0) ||
     (settings?.include_adult && filterData?.butt_shapes && filterData.butt_shapes.length > 0) ||
     (settings?.include_adult && filterData?.butt_sizes && filterData.butt_sizes.length > 0) ||
@@ -120,279 +107,255 @@ export default function LibraryFilters({
       <div className="organizer-panel__row library-filters-row">
         <div className="library-filters-left">
           {(isVideoTab || isCollectionTab || isPeopleTab || isTagsTab) && (
-            <div className="library-sorter-container">
-              <span className="library-sorter-label">{t('library.sort.label') || 'Sort:'}</span>
-              <Dropdown
-                variant="sorter"
-                value={sortKey}
-                onChange={(e) => {
-                  setSortKey(e.target.value);
-                  setCurrentPage(1);
-                }}
-                sortDirection={sortDirection}
-                onSortDirectionToggle={() => {
-                  setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
-                  setCurrentPage(1);
-                }}
-                options={
-                  isCollectionTab
+            <FilterDropdown
+              label={t('library.sort.label') || 'Sort:'}
+              value={sortKey}
+              onChange={(e) => {
+                setSortKey(e.target.value);
+                setCurrentPage(1);
+              }}
+              sortDirection={sortDirection}
+              onSortDirectionToggle={() => {
+                setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+                setCurrentPage(1);
+              }}
+              options={
+                isCollectionTab
+                  ? [
+                    { value: 'owned_count', label: t('library.sort.ownedCount') || 'Item Count' },
+                    { value: 'title', label: t('library.sort.title') || 'Title' },
+                  ]
+                  : isTagsTab
                     ? [
-                      { value: 'owned_count', label: t('library.sort.ownedCount') || 'Item Count' },
-                      { value: 'title', label: t('library.sort.title') || 'Title' },
+                      { value: 'total_count', label: t('library.sort.itemCount') || 'Item Count' },
+                      { value: 'name', label: t('library.sort.name') || 'Name' },
                     ]
-                    : isTagsTab
+                    : isPeopleTab
                       ? [
-                        { value: 'total_count', label: t('library.sort.itemCount') || 'Item Count' },
-                        { value: 'name', label: t('library.sort.name') || 'Name' },
-                      ]
-                      : isPeopleTab
-                        ? [
-                            { value: 'name', label: t('library.sort.name') || 'Name' },
-                            { value: 'rating', label: activeSessionMode === 'nsfw' ? (t('library.sort.porndbPerformerRating') || 'PornDB performer rating') : (t('library.sort.popularity') || 'Popularity') },
-                            ...(activeSessionMode === 'nsfw' ? [
-                              { value: 'popularity', label: t('library.sort.popularity') || 'Popularity' },
-                            ] : []),
-                            { value: 'user_rating', label: t('library.sort.userRating') || 'User Rating' },
-                            { value: 'library_count', label: t('library.sort.libraryCount') || 'Library Count' },
-                            { value: 'birthday', label: t('library.sort.birthday') || 'Birthdate' },
-                            { value: 'last_watched', label: t('library.sort.lastWatched') || 'Last Watched' },
-                            { value: 'watch_count', label: t('library.sort.watchCount') || 'Watch Count' },
-                            ...(activeSessionMode === 'nsfw' ? [
-                              { value: 'finish_count', label: t('library.sort.finishCount') || 'Finish Count' },
-                              { value: 'last_finish', label: t('library.sort.lastFinish') || 'Last Finish' },
-                            ] : []),
-                            { value: 'tag_count', label: t('library.sort.tagCount') || 'Tag Count' },
-                            { value: 'height', label: t('library.sort.height') || 'Height' },
-                            ...(settings?.include_adult ? [
-                              { value: 'weight', label: t('library.sort.weight') || 'Weight' },
-                              { value: 'cup_size', label: t('library.sort.cupSize') || 'Breast Size' },
-                              { value: 'waist', label: t('library.sort.waist') || 'Waist Size' },
-                              { value: 'hip', label: t('library.sort.hip') || 'Hip Size' },
-                              { value: 'hourglass_ratio', label: t('library.sort.hourglassRatio') || 'Hourglass Ratio' },
-                              { value: 'body_slender', label: t('library.sort.bodySlender') || 'Slender / Athletic' },
-                              { value: 'body_curvy', label: t('library.sort.bodyCurvy') || 'Hourglass / Curvy' },
-                            ] : []),
-                            { value: 'random', label: t('library.sort.random') || 'Random' }
-                          ]
-                        : [
-                          { value: 'title', label: t('library.sort.title') || 'Title' },
-                          { value: 'year', label: isTvTab ? (t('library.sort.firstAirYear') || 'First Air Year') : (t('library.sort.year') || 'Year') },
-                          { value: 'release_date', label: isTvTab ? (t('library.sort.firstAirDate') || 'First Air Date') : (t('library.sort.releaseDate') || 'Release Date') },
-                          ...(!isScenesTab ? [
-                            { value: 'rating_imdb', label: t('library.sort.imdbRating') || 'IMDb Rating' },
-                            { value: 'rating', label: t('library.sort.tmdbRating') || 'TMDb Rating' },
+                          { value: 'name', label: t('library.sort.name') || 'Name' },
+                          { value: 'rating', label: activeSessionMode === 'nsfw' ? (t('library.sort.porndbPerformerRating') || 'PornDB performer rating') : (t('library.sort.popularity') || 'Popularity') },
+                          ...(activeSessionMode === 'nsfw' ? [
+                            { value: 'popularity', label: t('library.sort.popularity') || 'Popularity' },
                           ] : []),
                           { value: 'user_rating', label: t('library.sort.userRating') || 'User Rating' },
-                          { value: 'duration', label: t('library.sort.duration') || 'Duration' },
+                          { value: 'library_count', label: t('library.sort.libraryCount') || 'Library Count' },
+                          { value: 'birthday', label: t('library.sort.birthday') || 'Birthdate' },
+                          { value: 'last_watched', label: t('library.sort.lastWatched') || 'Last Watched' },
+                          { value: 'watch_count', label: t('library.sort.watchCount') || 'Watch Count' },
+                          ...(activeSessionMode === 'nsfw' ? [
+                            { value: 'finish_count', label: t('library.sort.finishCount') || 'Finish Count' },
+                            { value: 'last_finish', label: t('library.sort.lastFinish') || 'Last Finish' },
+                          ] : []),
                           { value: 'tag_count', label: t('library.sort.tagCount') || 'Tag Count' },
-                          ...(ownershipFilter !== 'unowned' ? [
-                            { value: 'file_size', label: t('library.sort.fileSize') || 'File Size' },
-                            { value: 'last_watched', label: t('library.sort.lastWatched') || 'Last Watched' },
-                            { value: 'watch_count', label: t('library.sort.watchCount') || 'Watch Count' },
-                            ...(activeSessionMode === 'nsfw' ? [
-                              { value: 'finish_count', label: t('library.sort.finishCount') || 'Finish Count' },
-                              { value: 'last_finish', label: t('library.sort.lastFinish') || 'Last Finish' },
-                            ] : []),
+                          { value: 'height', label: t('library.sort.height') || 'Height' },
+                          ...(settings?.include_adult ? [
+                            { value: 'weight', label: t('library.sort.weight') || 'Weight' },
+                            { value: 'cup_size', label: t('library.sort.cupSize') || 'Breast Size' },
+                            { value: 'waist', label: t('library.sort.waist') || 'Waist Size' },
+                            { value: 'hip', label: t('library.sort.hip') || 'Hip Size' },
+                            { value: 'hourglass_ratio', label: t('library.sort.hourglassRatio') || 'Hourglass Ratio' },
+                            { value: 'body_slender', label: t('library.sort.bodySlender') || 'Slender / Athletic' },
+                            { value: 'body_curvy', label: t('library.sort.bodyCurvy') || 'Hourglass / Curvy' },
                           ] : []),
                           { value: 'random', label: t('library.sort.random') || 'Random' }
                         ]
-                }
-              />
-            </div>
+                      : [
+                        { value: 'title', label: t('library.sort.title') || 'Title' },
+                        { value: 'year', label: isTvTab ? (t('library.sort.firstAirYear') || 'First Air Year') : (t('library.sort.year') || 'Year') },
+                        { value: 'release_date', label: isTvTab ? (t('library.sort.firstAirDate') || 'First Air Date') : (t('library.sort.releaseDate') || 'Release Date') },
+                        ...(!isScenesTab ? [
+                          { value: 'rating_imdb', label: t('library.sort.imdbRating') || 'IMDb Rating' },
+                          { value: 'rating', label: t('library.sort.tmdbRating') || 'TMDb Rating' },
+                        ] : []),
+                        { value: 'user_rating', label: t('library.sort.userRating') || 'User Rating' },
+                        { value: 'duration', label: t('library.sort.duration') || 'Duration' },
+                        { value: 'tag_count', label: t('library.sort.tagCount') || 'Tag Count' },
+                        ...(ownershipFilter !== 'unowned' ? [
+                          { value: 'file_size', label: t('library.sort.fileSize') || 'File Size' },
+                          { value: 'last_watched', label: t('library.sort.lastWatched') || 'Last Watched' },
+                          { value: 'watch_count', label: t('library.sort.watchCount') || 'Watch Count' },
+                          ...(activeSessionMode === 'nsfw' ? [
+                            { value: 'finish_count', label: t('library.sort.finishCount') || 'Finish Count' },
+                            { value: 'last_finish', label: t('library.sort.lastFinish') || 'Last Finish' },
+                          ] : []),
+                        ] : []),
+                        { value: 'random', label: t('library.sort.random') || 'Random' }
+                      ]
+              }
+            />
           )}
 
           {isCollections && (
-            <div className="library-sorter-container">
-              <span className="library-sorter-label">{t('library.filter.statusLabel') || 'Status:'}</span>
-              <Dropdown
-                variant="sorter"
-                value={collectionStatusFilter}
-                onChange={(e) => {
-                  setCollectionStatusFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-                options={[
-                  { value: 'all', label: t('library.filter.all') || 'All' },
-                  { value: 'complete', label: t('library.filter.complete') || 'Complete' },
-                  { value: 'in_progress', label: t('library.filter.inProgress') || 'In Progress' },
-                ]}
-              />
-            </div>
+            <FilterDropdown
+              label={t('library.filter.statusLabel') || 'Status:'}
+              value={collectionStatusFilter}
+              onChange={(e) => {
+                setCollectionStatusFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              options={[
+                { value: 'all', label: t('library.filter.all') || 'All' },
+                { value: 'complete', label: t('library.filter.complete') || 'Complete' },
+                { value: 'in_progress', label: t('library.filter.inProgress') || 'In Progress' },
+              ]}
+            />
           )}
 
           {isPeople && (
-            <div className="library-sorter-container">
-              <span className="library-sorter-label">{t('library.filter.roleLabel') || 'Role:'}</span>
-              <Dropdown
-                variant="sorter"
-                value={peopleRoleFilter}
-                onChange={(e) => {
-                  setPeopleRoleFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-                options={[
-                  { value: 'all', label: t('library.filter.all') || 'All' },
-                  { value: 'actor', label: t('library.people.roles.actor') || 'Actor' },
-                  { value: 'director', label: t('library.people.roles.director') || 'Director' },
-                  { value: 'writer', label: t('library.people.roles.writer') || 'Writer' },
-                  { value: 'sound', label: t('library.people.roles.sound') || 'Composer' },
-                ]}
-              />
-            </div>
+            <FilterDropdown
+              label={t('library.filter.roleLabel') || 'Role:'}
+              value={peopleRoleFilter}
+              onChange={(e) => {
+                setPeopleRoleFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              options={[
+                { value: 'all', label: t('library.filter.all') || 'All' },
+                { value: 'actor', label: t('library.people.roles.actor') || 'Actor' },
+                { value: 'director', label: t('library.people.roles.director') || 'Director' },
+                { value: 'writer', label: t('library.people.roles.writer') || 'Writer' },
+                { value: 'sound', label: t('library.people.roles.sound') || 'Composer' },
+              ]}
+            />
           )}
 
           {isPeople && (activeSessionMode !== 'nsfw' || !settings?.adult_gender_preference || settings.adult_gender_preference === 'all') && (
-            <div className="library-sorter-container">
-              <span className="library-sorter-label">{t('library.filter.genderLabel') || 'Gender:'}</span>
-              <Dropdown
-                variant="sorter"
-                value={genderFilter}
-                onChange={(e) => {
-                  setGenderFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-                options={[
-                  { value: 'all', label: t('library.filter.all') || 'All' },
-                  { value: 'female', label: t('library.filter.female') || 'Female' },
-                  { value: 'male', label: t('library.filter.male') || 'Male' },
-                ]}
-              />
-            </div>
+            <FilterDropdown
+              label={t('library.filter.genderLabel') || 'Gender:'}
+              value={genderFilter}
+              onChange={(e) => {
+                setGenderFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              options={[
+                { value: 'all', label: t('library.filter.all') || 'All' },
+                { value: 'female', label: t('library.filter.female') || 'Female' },
+                { value: 'male', label: t('library.filter.male') || 'Male' },
+              ]}
+            />
           )}
-
-          {isPeople && filterData?.ethnicities && filterData.ethnicities.length > 0 && (
-            <div className="library-sorter-container">
-              <span className="library-sorter-label">{t('library.filter.ethnicityLabel') || 'Ethnicity:'}</span>
-              <Dropdown
-                variant="sorter"
-                value={ethnicityFilter}
-                onChange={(e) => {
-                  setEthnicityFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-                options={[
-                  { value: '', label: t('library.filter.allEthnicities') || 'All Ethnicities' },
-                  ...(filterData.ethnicities).map(eth => ({ value: eth, label: formatPhysicalAttributeLabel(eth) })),
-                ]}
-              />
-            </div>
+          {isPeople && (
+            <AttributeFilterDropdown
+              label={t('library.filter.ethnicityLabel') || 'Ethnicity:'}
+              value={ethnicityFilter}
+              onChange={setEthnicityFilter}
+              items={filterData?.ethnicities}
+              allLabel={t('library.filter.allEthnicities') || 'All Ethnicities'}
+              setCurrentPage={setCurrentPage}
+            />
           )}
-
-
-
           {isVideoTab && (
-            <div className="library-sorter-container">
-              <span className="library-sorter-label">{t('library.filter.statusLabel') || 'Status:'}</span>
-              <Dropdown
-                variant="sorter"
-                value={watchedFilter}
-                onChange={(e) => {
-                  setWatchedFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-                options={[
-                  { value: 'all', label: t('library.filter.all') || 'All' },
-                  { value: 'watched', label: t('library.filter.watched') || 'Watched' },
-                  { value: 'unwatched', label: t('library.filter.unwatched') || 'Unwatched' },
-                ]}
-              />
-            </div>
+            <FilterDropdown
+              label={t('library.filter.statusLabel') || 'Status:'}
+              value={watchedFilter}
+              onChange={(e) => {
+                setWatchedFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              options={[
+                { value: 'all', label: t('library.filter.all') || 'All' },
+                { value: 'watched', label: t('library.filter.watched') || 'Watched' },
+                { value: 'unwatched', label: t('library.filter.unwatched') || 'Unwatched' },
+              ]}
+            />
           )}
 
           {isVideoTab && !isScenesTab && activeSessionMode !== 'nsfw' && (
-            <div className="library-sorter-container">
-              <span className="library-sorter-label">{t('library.filter.genreLabel') || 'Genre:'}</span>
-              <Dropdown
-                variant="sorter"
-                value={genreFilter}
-                onChange={(e) => {
-                  setGenreFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-                options={[
-                  { value: '', label: t('library.filter.allGenres') || 'All Genres' },
-                  ...(filterData?.genres || []).map(g => ({ value: g, label: t(`library.genres.${g}`, { defaultValue: g }) })),
-                ]}
-              />
-            </div>
+            <FilterDropdown
+              label={t('library.filter.genreLabel') || 'Genre:'}
+              value={genreFilter}
+              onChange={(e) => {
+                setGenreFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              options={[
+                { value: '', label: t('library.filter.allGenres') || 'All Genres' },
+                ...(filterData?.genres || []).map(g => ({ value: g, label: t(`library.genres.${g}`, { defaultValue: g }) })),
+              ]}
+            />
           )}
 
           {isScenesTab && activeSessionMode === 'nsfw' && filterData?.performers && filterData.performers.length > 0 && (
-            <div className="library-sorter-container">
-              <span className="library-sorter-label">{t('library.filter.performerLabel') || 'Performer:'}</span>
-              <Dropdown
-                variant="sorter"
-                value={performerFilter}
-                searchable={true}
-                onChange={(e) => {
-                  setPerformerFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-                options={[
-                  { value: '', label: t('library.filter.allPerformers') || 'All Performers' },
-                  ...(filterData.performers).map(p => ({ value: String(p.id), label: p.name })),
-                ]}
-              />
-            </div>
+            <FilterDropdown
+              label={t('library.filter.performerLabel') || 'Performer:'}
+              value={performerFilter}
+              searchable={true}
+              onChange={(e) => {
+                setPerformerFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              options={[
+                { value: '', label: t('library.filter.allPerformers') || 'All Performers' },
+                ...(filterData.performers).map(p => ({ value: String(p.id), label: p.name })),
+              ]}
+            />
           )}
 
           {isScenesTab && activeSessionMode === 'nsfw' && filterData?.studios && filterData.studios.length > 0 && (
-            <div className="library-sorter-container">
-              <span className="library-sorter-label">{t('library.filter.studioLabel') || 'Studio:'}</span>
-              <Dropdown
-                variant="sorter"
-                value={studioFilter}
-                searchable={true}
-                onChange={(e) => {
-                  setStudioFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-                options={[
-                  { value: '', label: t('library.filter.allStudios') || 'All Studios' },
-                  ...(filterData.studios).map(s => ({ value: String(s.id), label: s.name })),
-                ]}
-              />
-            </div>
+            <FilterDropdown
+              label={t('library.filter.studioLabel') || 'Studio:'}
+              value={studioFilter}
+              searchable={true}
+              onChange={(e) => {
+                setStudioFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              options={[
+                { value: '', label: t('library.filter.allStudios') || 'All Studios' },
+                ...(filterData.studios).map(s => ({ value: String(s.id), label: s.name })),
+              ]}
+            />
           )}
 
-          {(isVideoTab || isPeopleTab) && (
-            <TagFilterDropdown
-              t={t}
-              actualSelectedTags={actualSelectedTags}
-              actualSetSelectedTags={actualSetSelectedTags}
-              filterData={filterData}
-              setCurrentPage={setCurrentPage}
+          {(isVideoTab || isPeopleTab) && filterData?.tags && filterData.tags.length > 0 && (
+            <FilterDropdown
+              label={t('library.filter.tagsLabel') || 'Tags:'}
+              searchable={true}
+              multiple={true}
+              value={actualSelectedTags}
+              onChange={(e) => {
+                actualSetSelectedTags(e.target.value);
+                setCurrentPage(1);
+              }}
+              options={filterData.tags.map((tag) => ({
+                value: tag.name,
+                label: tag.name,
+                color: tag.color,
+              }))}
+              placeholder={t('library.filter.allTags') || 'All Tags'}
             />
           )}
 
           {isVideoTab && timeFilterMode === 'decade' && (
-            <DecadeFilterDropdown
-              t={t}
-              decadeFilter={decadeFilter}
-              setDecadeFilter={setDecadeFilter}
-              setYearFilter={setYearFilter}
-              setCurrentPage={setCurrentPage}
-              decades={decades}
+            <FilterDropdown
+              label={t('library.filter.decadeLabel') || 'Decade:'}
+              value={decadeFilter}
+              onChange={(e) => {
+                setDecadeFilter(e.target.value);
+                setYearFilter('');
+                setCurrentPage(1);
+              }}
+              options={[
+                { value: 'all', label: t('library.filter.allDecades') || 'All Decades' },
+                ...(decades || []).map(d => ({ value: d, label: d })),
+              ]}
             />
           )}
 
           {isVideoTab && timeFilterMode === 'year' && (
-            <div className="library-sorter-container">
-              <span className="library-sorter-label">{t('library.filter.yearLabel') || 'Year:'}</span>
-              <Dropdown
-                variant="sorter"
-                value={yearFilter}
-                onChange={(e) => {
-                  setYearFilter(e.target.value);
-                  setDecadeFilter('all');
-                  setCurrentPage(1);
-                }}
-                options={[
-                  { value: '', label: t('library.filter.allYears') || 'All Years' },
-                  ...(filterData?.years || []).map(y => ({ value: String(y), label: String(y) })),
-                ]}
-              />
-            </div>
+            <FilterDropdown
+              label={t('library.filter.yearLabel') || 'Year:'}
+              value={yearFilter}
+              onChange={(e) => {
+                setYearFilter(e.target.value);
+                setDecadeFilter('all');
+                setCurrentPage(1);
+              }}
+              options={[
+                { value: '', label: t('library.filter.allYears') || 'All Years' },
+                ...(filterData?.years || []).map(y => ({ value: String(y), label: String(y) })),
+              ]}
+            />
           )}
         </div>
 

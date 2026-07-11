@@ -188,7 +188,7 @@ export const useOverridePosterMutation = () => {
     onSuccess: (data, variables) => {
       const { itemId } = variables;
       syncPosterCaches(queryClient, itemId, data);
-      invalidateEntity(queryClient, itemId, { listsList: true });
+      invalidateEntity(queryClient, itemId, { lists: true, listsList: true });
     },
   });
 };
@@ -200,7 +200,7 @@ export const useUploadPosterMutation = () => {
     onSuccess: (data, variables) => {
       const { itemId } = variables;
       syncPosterCaches(queryClient, itemId, data);
-      invalidateEntity(queryClient, itemId, { listsList: true });
+      invalidateEntity(queryClient, itemId, { lists: true, listsList: true });
     },
   });
 };

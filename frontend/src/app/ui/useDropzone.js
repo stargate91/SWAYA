@@ -19,7 +19,7 @@ const getDroppedPaths = (dataTransfer) => {
   return [...new Set(paths)];
 };
 
-export function useDropzone({ disabled = false, onDropPaths }) {
+export function useDropzone({ disabled = false, onDropPaths, onDropFiles }) {
   const [isDropActive, setIsDropActive] = useState(false);
   const dragDepthRef = useRef(0);
 
@@ -89,12 +89,16 @@ export function useDropzone({ disabled = false, onDropPaths }) {
     dragDepthRef.current = 0;
     setIsDropActive(false);
  
-    const paths = getDroppedPaths(event.dataTransfer);
-    if (paths.length === 0) {
-      return;
+    if (onDropFiles) {
+      const files = Array.from(event.dataTransfer?.files || []);
+      await onDropFiles?.(files);
+    } else {
+      const paths = getDroppedPaths(event.dataTransfer);
+      if (paths.length === 0) {
+        return;
+      }
+      await onDropPaths?.(paths);
     }
-
-    await onDropPaths?.(paths);
   };
 
   return {

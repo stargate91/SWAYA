@@ -73,59 +73,38 @@ export default function EntityExtraMetaPills({ isPeople, item, t }) {
   return (
     <>
       {attrs.height && (
-        <Pill variant="meta">
-          <span className="entity-detail-page__meta-pill-content">
-            <Ruler size={14} />
-            <span>{attrs.height}{CM_SUFFIX}</span>
-          </span>
+        <Pill variant="meta" icon={<Ruler size={14} />}>
+          {attrs.height}{CM_SUFFIX}
         </Pill>
       )}
       {attrs.measurements && (
-        <Pill variant="meta">
-          <span className="entity-detail-page__meta-pill-content">
-            <Ruler size={14} />
-            <span>{attrs.measurements}</span>
-          </span>
+        <Pill variant="meta" icon={<Ruler size={14} />}>
+          {attrs.measurements}
         </Pill>
       )}
       {attrs.ethnicity && (
-        <Pill variant="meta">
-          <span className="entity-detail-page__meta-pill-content">
-            <Globe size={14} />
-            <span>{toTitleCase(attrs.ethnicity)}</span>
-          </span>
+        <Pill variant="meta" icon={<Globe size={14} />}>
+          {toTitleCase(attrs.ethnicity)}
         </Pill>
       )}
       {attrs.eye_color && (
-        <Pill variant="meta">
-          <span className="entity-detail-page__meta-pill-content">
-            <Eye size={14} />
-            <span>{toTitleCase(attrs.eye_color)}</span>
-          </span>
+        <Pill variant="meta" icon={<Eye size={14} />}>
+          {toTitleCase(attrs.eye_color)}
         </Pill>
       )}
       {attrs.hair_color && (
-        <Pill variant="meta">
-          <span className="entity-detail-page__meta-pill-content">
-            <Palette size={14} />
-            <span>{toTitleCase(attrs.hair_color)}</span>
-          </span>
+        <Pill variant="meta" icon={<Palette size={14} />}>
+          {toTitleCase(attrs.hair_color)}
         </Pill>
       )}
       {tattooPillText && (
-        <Pill variant="meta" title={tattooTooltip || undefined}>
-          <span className="entity-detail-page__meta-pill-content">
-            <Brush size={14} />
-            <span>{tattooPillText}</span>
-          </span>
+        <Pill variant="meta" title={tattooTooltip || undefined} icon={<Brush size={14} />}>
+          {tattooPillText}
         </Pill>
       )}
       {piercingPillText && (
-        <Pill variant="meta" title={piercingTooltip || undefined}>
-          <span className="entity-detail-page__meta-pill-content">
-            <Gem size={14} />
-            <span>{piercingPillText}</span>
-          </span>
+        <Pill variant="meta" title={piercingTooltip || undefined} icon={<Gem size={14} />}>
+          {piercingPillText}
         </Pill>
       )}
     </>

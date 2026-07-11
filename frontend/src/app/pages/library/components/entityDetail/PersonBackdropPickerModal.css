@@ -92,11 +92,11 @@
   align-items: center;
   gap: var(--space-xs);
   margin-bottom: var(--space-md);
-  --pulse-anim: pulse 2s infinite ease-in-out;
+  --pulse-anim: backdrop-progress-fade 2s infinite ease-in-out;
   animation: var(--pulse-anim);
 }
 
-@keyframes pulse {
+@keyframes backdrop-progress-fade {
   0%, 100% { opacity: 0.85; }
   50% { opacity: 1; }
 }

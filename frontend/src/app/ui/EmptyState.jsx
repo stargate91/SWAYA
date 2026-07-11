@@ -16,6 +16,7 @@ export default function EmptyState({
   return (
     <div
       className={`ui-empty-state ui-empty-state--${variant} ${borderClass} ${animateClass} ${className}`.trim()}
+      // eslint-disable-next-line react/forbid-dom-props
       style={style}
     >
       {Icon ? (

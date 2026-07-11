@@ -11,29 +11,19 @@ export default function EntityMetaPills({ isPeople, item, t }) {
     return (
       <>
         {totalCount !== undefined && (
-          <Pill variant="meta">
-            <span className="entity-detail-page__meta-pill-content">
-              <Layers size={14} />
-              <span>
-                {t('library.details.totalCount', {
-                  count: totalCount,
-                  defaultValue: `${totalCount} total`,
-                })}
-              </span>
-            </span>
+          <Pill variant="meta" icon={<Layers size={14} />}>
+            {t('library.details.totalCount', {
+              count: totalCount,
+              defaultValue: `${totalCount} total`,
+            })}
           </Pill>
         )}
         {ownedCount !== undefined && (
-          <Pill variant="meta">
-            <span className="entity-detail-page__meta-pill-content">
-              {Number(ownedCount) === 0 ? <X size={14} /> : <Check size={14} />}
-              <span>
-                {t('library.details.inLibraryCount', {
-                  count: ownedCount,
-                  defaultValue: `${ownedCount} in library`,
-                })}
-              </span>
-            </span>
+          <Pill variant="meta" icon={Number(ownedCount) === 0 ? <X size={14} /> : <Check size={14} />}>
+            {t('library.details.inLibraryCount', {
+              count: ownedCount,
+              defaultValue: `${ownedCount} in library`,
+            })}
           </Pill>
         )}
       </>
@@ -45,45 +35,28 @@ export default function EntityMetaPills({ isPeople, item, t }) {
   return (
     <>
       {genderLabel && (
-        <Pill variant="meta">
-          <span className="entity-detail-page__meta-pill-content">
-            {createElement(getGenderIcon(item?.gender), { size: 14 })}
-            <span>{genderLabel}</span>
-          </span>
+        <Pill variant="meta" icon={createElement(getGenderIcon(item?.gender), { size: 14 })}>
+          {genderLabel}
         </Pill>
       )}
       {item?.known_for_department && (
-        <Pill variant="meta">
-          <span className="entity-detail-page__meta-pill-content">
-            <Briefcase size={14} />
-            <span>
-              {t(`library.people.roles.${item.known_for_department.toLowerCase()}`) || item.known_for_department}
-            </span>
-          </span>
+        <Pill variant="meta" icon={<Briefcase size={14} />}>
+          {t(`library.people.roles.${item.known_for_department.toLowerCase()}`) || item.known_for_department}
         </Pill>
       )}
       {item?.birthday && (
-        <Pill variant="meta">
-          <span className="entity-detail-page__meta-pill-content">
-            <Calendar size={14} />
-            <span>{item.birthday}</span>
-          </span>
+        <Pill variant="meta" icon={<Calendar size={14} />}>
+          {item.birthday}
         </Pill>
       )}
       {item?.deathday && (
-        <Pill variant="meta">
-          <span className="entity-detail-page__meta-pill-content">
-            <CalendarX2 size={14} />
-            <span>{item.deathday}</span>
-          </span>
+        <Pill variant="meta" icon={<CalendarX2 size={14} />}>
+          {item.deathday}
         </Pill>
       )}
       {item?.place_of_birth && (
-        <Pill variant="meta">
-          <span className="entity-detail-page__meta-pill-content">
-            <MapPin size={14} />
-            <span>{item.place_of_birth}</span>
-          </span>
+        <Pill variant="meta" icon={<MapPin size={14} />}>
+          {item.place_of_birth}
         </Pill>
       )}
     </>

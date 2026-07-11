@@ -5,13 +5,15 @@ import Tooltip from '@/ui/Tooltip';
 import EmptyState from '@/ui/EmptyState';
 import SegmentedControl from '@/ui/SegmentedControl';
 import BackdropCard from '@/ui/BackdropCard';
-import ImageUploadPanel from '../../modals/ImageUploadPanel';
+import ImageUploadPanel from '@/ui/ImageUploadPanel';
 import { API_BASE } from '@/lib/backend';
 import { getPosterImagePath } from '@/lib/imageUrls';
 import { isTvLikeMediaType } from '@/lib/mediaTypes';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
 import { pathsMatch } from '../../utils/personBackdropUtils';
 import PersonBackdropBrowser from './PersonBackdropBrowser';
+import ImageOptionCard from './ImageOptionCard';
+import { useOverridePersonBackdropMutation } from '@/queries';
 import usePersonBackdropPicker from '../../hooks/usePersonBackdropPicker';
 import './PersonBackdropPickerModal.css';
 
@@ -19,11 +21,10 @@ export default function PersonBackdropPickerModal({
   personId,
   item,
   t,
-  toast,
-  overridePersonBackdropMutation,
-  uploadPersonBackdropMutation
+  toast
 }) {
   const viewportRef = useRef(null);
+  const overridePersonBackdropMutation = useOverridePersonBackdropMutation();
 
   const {
     activeTab,
@@ -54,8 +55,6 @@ export default function PersonBackdropPickerModal({
     item,
     t,
     toast,
-    overridePersonBackdropMutation,
-    uploadPersonBackdropMutation,
     viewportRef,
   });
 
@@ -124,22 +123,16 @@ export default function PersonBackdropPickerModal({
           <div className="person-backdrop-picker__default-tab-content">
             {profileUrl ? (
               <div className="scene-image-picker-grid">
-                <div 
-                  className={`scene-image-picker-card ${!selectedBackdropPath ? 'active' : ''} person-backdrop-picker__fallback-card`}
-                  role="button"
-                  tabIndex={0}
+                <ImageOptionCard
+                  imageUrl={profileUrl}
+                  alt="Default blurred fallback"
+                  label={t('library.details.defaultBlurredProfile') || 'Blurred Profile Picture'}
+                  isSelected={!selectedBackdropPath}
                   onClick={() => handleSaveBackdropUrl("")}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      handleSaveBackdropUrl("");
-                    }
-                  }}
-                >
-                  <div className="scene-image-picker-img-wrapper backdrop-variant person-backdrop-fallback-blur">
-                    <img src={profileUrl} alt="Default blurred fallback" />
-                  </div>
-                  <span className="scene-image-picker-label">{t('library.details.defaultBlurredProfile') || 'Blurred Profile Picture'}</span>
-                </div>
+                  aspect="backdrop"
+                  className="person-backdrop-picker__fallback-card"
+                  imgClassName="person-backdrop-fallback-blur"
+                />
               </div>
             ) : (
               <EmptyState

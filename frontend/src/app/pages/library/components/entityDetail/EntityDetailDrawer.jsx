@@ -1,6 +1,8 @@
  
 import { toTitleCase, formatListAttr } from '../../utils/heroSectionUtils';
 import Drawer from '@/ui/Drawer';
+import ParsedParagraphs from '@/ui/ParsedParagraphs';
+import DescriptionList from '@/ui/DescriptionList';
 
 const DASH_CHAR = ' - ';
 const CM_CHAR = ' cm';
@@ -18,6 +20,22 @@ export default function EntityDetailDrawer({
   const tattooVal = formatListAttr(item.tattoos);
   const piercingVal = formatListAttr(item.piercings);
   const hasAnySpecs = item?.height || item?.weight || item?.measurements || item?.breast_type || item?.hair_color || item?.eye_color || item?.ethnicity || item?.tattoos || item?.piercings || item?.career_start_year || item?.place_of_birth || item?.butt_shape || item?.butt_size;
+
+  const specItems = [
+    { label: t('library.details.placeOfBirth'), value: item.place_of_birth, fullWidth: true },
+    { label: t('library.details.activeYears'), value: item.career_start_year ? `${item.career_start_year}${DASH_CHAR}${item.career_end_year || t('library.details.present')}` : null },
+    { label: t('library.details.height'), value: item.height ? `${item.height}${CM_CHAR}` : null },
+    { label: t('library.details.weight'), value: item.weight ? `${item.weight}${KG_CHAR}` : null },
+    { label: t('library.details.measurements'), value: item.measurements },
+    { label: t('library.details.breastType'), value: item.breast_type ? (t(`library.performerEdit.breastTypes.${item.breast_type.toLowerCase()}`) || toTitleCase(item.breast_type)) : null },
+    { label: t('library.details.buttShape') || 'Butt Shape', value: item.butt_shape ? (t(`library.performerEdit.buttShapes.${item.butt_shape.toLowerCase()}`) || toTitleCase(item.butt_shape)) : null },
+    { label: t('library.details.buttSize') || 'Butt Size', value: item.butt_size ? (t(`library.performerEdit.buttSizes.${item.butt_size.toLowerCase()}`) || toTitleCase(item.butt_size)) : null },
+    { label: t('library.details.hairColor'), value: item.hair_color ? (t(`library.performerEdit.hairColors.${item.hair_color.toLowerCase()}`) || toTitleCase(item.hair_color)) : null },
+    { label: t('library.details.eyeColor'), value: item.eye_color ? (t(`library.performerEdit.eyeColors.${item.eye_color.toLowerCase()}`) || toTitleCase(item.eye_color)) : null },
+    { label: t('library.details.ethnicity'), value: item.ethnicity ? (t(`library.performerEdit.ethnicities.${item.ethnicity.toLowerCase()}`) || toTitleCase(item.ethnicity)) : null },
+    { label: t('library.details.tattoos'), value: tattooVal, fullWidth: true },
+    { label: t('library.details.piercings'), value: piercingVal, fullWidth: true },
+  ];
 
   return (
     <Drawer
@@ -40,93 +58,12 @@ export default function EntityDetailDrawer({
           )}
 
           {/* Section 2: Physical Specs */}
-          {hasAnySpecs && (
+           {hasAnySpecs && (
             <div className="entity-detail-page__drawer-section">
               <h4 className="entity-detail-page__drawer-section-title">
                 {t('library.details.specsTitle') || 'Physical Specs'}
               </h4>
-              <div className="entity-detail-page__drawer-specs-grid">
-                {item.place_of_birth && (
-                  <div className="entity-detail-page__specs-item entity-detail-page__specs-item--full">
-                    <span className="entity-detail-page__specs-label">{t('library.details.placeOfBirth')}</span>
-                    <span className="entity-detail-page__specs-value">{item.place_of_birth}</span>
-                  </div>
-                )}
-                {item.career_start_year && (
-                  <div className="entity-detail-page__specs-item">
-                    <span className="entity-detail-page__specs-label">{t('library.details.activeYears')}</span>
-                    <span className="entity-detail-page__specs-value">
-                      {item.career_start_year}{DASH_CHAR}{item.career_end_year || t('library.details.present')}
-                    </span>
-                  </div>
-                )}
-                {item.height && (
-                  <div className="entity-detail-page__specs-item">
-                    <span className="entity-detail-page__specs-label">{t('library.details.height')}</span>
-                    <span className="entity-detail-page__specs-value">{item.height}{CM_CHAR}</span>
-                  </div>
-                )}
-                {item.weight && (
-                  <div className="entity-detail-page__specs-item">
-                    <span className="entity-detail-page__specs-label">{t('library.details.weight')}</span>
-                    <span className="entity-detail-page__specs-value">{item.weight}{KG_CHAR}</span>
-                  </div>
-                )}
-                {item.measurements && (
-                  <div className="entity-detail-page__specs-item">
-                    <span className="entity-detail-page__specs-label">{t('library.details.measurements')}</span>
-                    <span className="entity-detail-page__specs-value">{item.measurements}</span>
-                  </div>
-                )}
-                {item.breast_type && (
-                  <div className="entity-detail-page__specs-item">
-                    <span className="entity-detail-page__specs-label">{t('library.details.breastType')}</span>
-                    <span className="entity-detail-page__specs-value">{t(`library.performerEdit.breastTypes.${item.breast_type.toLowerCase()}`) || toTitleCase(item.breast_type)}</span>
-                  </div>
-                )}
-                {item.butt_shape && (
-                  <div className="entity-detail-page__specs-item">
-                    <span className="entity-detail-page__specs-label">{t('library.details.buttShape') || 'Butt Shape'}</span>
-                    <span className="entity-detail-page__specs-value">{t(`library.performerEdit.buttShapes.${item.butt_shape.toLowerCase()}`) || toTitleCase(item.butt_shape)}</span>
-                  </div>
-                )}
-                {item.butt_size && (
-                  <div className="entity-detail-page__specs-item">
-                    <span className="entity-detail-page__specs-label">{t('library.details.buttSize') || 'Butt Size'}</span>
-                    <span className="entity-detail-page__specs-value">{t(`library.performerEdit.buttSizes.${item.butt_size.toLowerCase()}`) || toTitleCase(item.butt_size)}</span>
-                  </div>
-                )}
-                {item.hair_color && (
-                  <div className="entity-detail-page__specs-item">
-                    <span className="entity-detail-page__specs-label">{t('library.details.hairColor')}</span>
-                    <span className="entity-detail-page__specs-value">{t(`library.performerEdit.hairColors.${item.hair_color.toLowerCase()}`) || toTitleCase(item.hair_color)}</span>
-                  </div>
-                )}
-                {item.eye_color && (
-                  <div className="entity-detail-page__specs-item">
-                    <span className="entity-detail-page__specs-label">{t('library.details.eyeColor')}</span>
-                    <span className="entity-detail-page__specs-value">{t(`library.performerEdit.eyeColors.${item.eye_color.toLowerCase()}`) || toTitleCase(item.eye_color)}</span>
-                  </div>
-                )}
-                {item.ethnicity && (
-                  <div className="entity-detail-page__specs-item">
-                    <span className="entity-detail-page__specs-label">{t('library.details.ethnicity')}</span>
-                    <span className="entity-detail-page__specs-value">{t(`library.performerEdit.ethnicities.${item.ethnicity.toLowerCase()}`) || toTitleCase(item.ethnicity)}</span>
-                  </div>
-                )}
-                {tattooVal && (
-                  <div className="entity-detail-page__specs-item entity-detail-page__specs-item--full">
-                    <span className="entity-detail-page__specs-label">{t('library.details.tattoos')}</span>
-                    <span className="entity-detail-page__specs-value">{tattooVal}</span>
-                  </div>
-                )}
-                {piercingVal && (
-                  <div className="entity-detail-page__specs-item entity-detail-page__specs-item--full">
-                    <span className="entity-detail-page__specs-label">{t('library.details.piercings')}</span>
-                    <span className="entity-detail-page__specs-value">{piercingVal}</span>
-                  </div>
-                )}
-              </div>
+              <DescriptionList items={specItems} className="ui-description-list ui-description-list--spaced" />
             </div>
           )}
 
@@ -136,11 +73,11 @@ export default function EntityDetailDrawer({
               <h4 className="entity-detail-page__drawer-section-title">
                 {t('library.details.biographyTitle') || 'Biography'}
               </h4>
-              <div className="entity-detail-page__drawer-bio">
-                {overviewText.split(/\n{2,}/).map((paragraph, index) => (
-                  <p key={index} className="entity-detail-page__drawer-paragraph">{paragraph}</p>
-                ))}
-              </div>
+              <ParsedParagraphs
+                text={overviewText}
+                className="entity-detail-page__drawer-bio"
+                paragraphClassName="entity-detail-page__drawer-paragraph"
+              />
             </div>
           )}
         </div>

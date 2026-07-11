@@ -48,7 +48,8 @@ export const SpotlightBanner = ({ item, watchlistIds, onWatchlist, onCardClick, 
           <Button
             onClick={(e) => {
               e.stopPropagation();
-              onWatchlist(item.id, item.title ? 'movie' : 'tv');
+              const type = item.media_type || item.type || (item.title ? 'movie' : 'tv');
+              onWatchlist(item, type);
             }}
             className={`recommend-watchlist-btn ${isWatchlisted ? 'is-watchlisted' : ''}`}
             variant="secondary"
@@ -275,7 +276,8 @@ export const RecommendationCarousel = ({
                     <Button
                       onClick={(e) => {
                         e.stopPropagation();
-                        onWatchlist(item.id, item.title ? 'movie' : 'tv');
+                        const type = n.isScene ? 'scene' : (item.media_type || item.type || (item.title ? 'movie' : 'tv'));
+                        onWatchlist(item, type);
                       }}
                       className={`ui-card-action-btn ${isWatchlisted ? '' : 'ui-card-action-btn--neutral'}`}
                       variant="unstyled"
@@ -365,14 +367,20 @@ export const useRecommendationActions = () => {
     }
 
     try {
-      const tvId = String(item.in_library ? item.media_item_id : item.id).replace('tv_', '').replace('tmdb_', '');
+      const tvId = String(item.id).replace('tv_', '').replace('tmdb_', '');
       const tvDetail = await api.library.getTvDetail(tvId);
       
-      const seasons = Array.isArray(tvDetail?.seasons) ? tvDetail.seasons : [];
+      const seasons = Array.isArray(tvDetail?.seasons)
+        ? [...tvDetail.seasons]
+            .filter((s) => s.season_number > 0)
+            .sort((a, b) => Number(a.season_number || 0) - Number(b.season_number || 0))
+        : [];
       let nextEpisode = null;
 
       for (const season of seasons) {
-        const ownedEpisodes = (season.episodes || []).filter((episode) => episode.path && !episode.is_missing);
+        const ownedEpisodes = (season.episodes || [])
+          .filter((episode) => episode.path && !episode.is_missing)
+          .sort((a, b) => Number(a.episode_number || 0) - Number(b.episode_number || 0));
         const inProgress = ownedEpisodes.find((episode) => episode.resume_position > 0);
         if (inProgress) {
           nextEpisode = inProgress;
@@ -382,7 +390,9 @@ export const useRecommendationActions = () => {
 
       if (!nextEpisode) {
         for (const season of seasons) {
-          const ownedEpisodes = (season.episodes || []).filter((episode) => episode.path && !episode.is_missing);
+          const ownedEpisodes = (season.episodes || [])
+            .filter((episode) => episode.path && !episode.is_missing)
+            .sort((a, b) => Number(a.episode_number || 0) - Number(b.episode_number || 0));
           const unwatched = ownedEpisodes.find((episode) => !episode.is_watched);
           if (unwatched) {
             nextEpisode = unwatched;
@@ -393,7 +403,9 @@ export const useRecommendationActions = () => {
 
       if (!nextEpisode) {
         for (const season of seasons) {
-          const ownedEpisodes = (season.episodes || []).filter((episode) => episode.path && !episode.is_missing);
+          const ownedEpisodes = (season.episodes || [])
+            .filter((episode) => episode.path && !episode.is_missing)
+            .sort((a, b) => Number(a.episode_number || 0) - Number(b.episode_number || 0));
           if (ownedEpisodes.length > 0) {
             nextEpisode = ownedEpisodes[0];
             break;
@@ -439,14 +451,19 @@ export const useWatchlistHandler = (watchlistIdsFromQuery, addToWatchlistMutatio
     return optimisticWatchlistIds !== null ? optimisticWatchlistIds : (watchlistIdsFromQuery || []);
   }, [optimisticWatchlistIds, watchlistIdsFromQuery]);
 
-  const handleWatchlist = useCallback((id, type) => {
+  const handleWatchlist = useCallback((item, type) => {
+    const id = item.id;
     const isWatchlisted = actualWatchlistIds.includes(id);
     if (isWatchlisted) {
       setOptimisticWatchlistIds((prev) => (prev || watchlistIdsFromQuery || []).filter((i) => i !== id));
       removeFromWatchlistMutation.mutate(id);
     } else {
       setOptimisticWatchlistIds((prev) => [...(prev || watchlistIdsFromQuery || []), id]);
-      addToWatchlistMutation.mutate({ tmdbId: id, type });
+      addToWatchlistMutation.mutate({
+        tmdbId: item.in_library ? undefined : id,
+        mediaItemId: item.in_library ? id : undefined,
+        type
+      });
     }
   }, [actualWatchlistIds, watchlistIdsFromQuery, addToWatchlistMutation, removeFromWatchlistMutation]);
 

@@ -153,6 +153,7 @@ export default function PaginationBar({
         ) : (
           <div className="ui-pagination__nav">
             {onPaginationModeChange ? (
+              // eslint-disable-next-line react/forbid-dom-props
               <div className="ui-pagination__modes" style={{ marginRight: '16px' }}>
                 <Button
                   type="button"

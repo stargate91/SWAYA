@@ -8,6 +8,7 @@ export default function ScrollRow({
   className = '',
   showArrows = true,
   enableWheelScroll = false,
+  onScroll,
 }) {
   const scrollRef = useRef(null);
   const [showLeft, setShowLeft] = useState(false);
@@ -79,7 +80,10 @@ export default function ScrollRow({
 
       <div
         ref={scrollRef}
-        onScroll={updateArrows}
+        onScroll={(e) => {
+          updateArrows();
+          onScroll?.(e);
+        }}
         className={`ui-scroll-row-track no-scrollbar ${className}`.trim()}
       >
         {children}
@@ -93,4 +97,5 @@ ScrollRow.propTypes = {
   className: PropTypes.string,
   showArrows: PropTypes.bool,
   enableWheelScroll: PropTypes.bool,
+  onScroll: PropTypes.func,
 };

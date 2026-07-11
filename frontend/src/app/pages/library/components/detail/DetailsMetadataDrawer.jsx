@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-no-literals */
 import TechnicalPanel from './panels/TechnicalPanel';
 import ExtrasPanel from './panels/ExtrasPanel';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';

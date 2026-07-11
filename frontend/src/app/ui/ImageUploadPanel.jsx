@@ -1,7 +1,9 @@
 import { useRef, useState } from 'react';
-import { Link2, Upload } from '@/ui/icons';
-import Input from '@/ui/Input';
-import '../components/UniversalImagePicker.css';
+import { Link2, Upload } from './icons';
+import Input from './Input';
+import Button from './Button';
+import FileDropZone from './FileDropZone';
+import './ImageUploadPanel.css';
 
 export default function ImageUploadPanel({
   imageType,
@@ -40,7 +42,26 @@ export default function ImageUploadPanel({
   const hasUploadPreview = Boolean(uploadPreview);
 
   return (
-    <section className="universal-image-picker__upload-panel">
+    <FileDropZone
+      disabled={isPending}
+      onDropFiles={(files) => {
+        const file = files?.[0];
+        if (file && file.type.startsWith('image/')) {
+          setUploadFile(file);
+
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setUploadPreview(reader.result);
+          };
+          reader.readAsDataURL(file);
+
+          void onUploadFile(file);
+        }
+      }}
+      label={t?.('dropzone.label') || 'Drop image here'}
+      description={t?.('dropzone.description') || 'to upload as custom cover'}
+      className="universal-image-picker__upload-panel"
+    >
       <input
         ref={fileInputRef}
         type="file"
@@ -68,24 +89,28 @@ export default function ImageUploadPanel({
           />
         </div>
 
-        <button
+        <Button
           type="button"
           onClick={handleSaveUrl}
           disabled={!urlInput.trim() || isPending}
-          className="ui-button ui-button--secondary-neutral ui-button--md universal-image-picker__save-button"
+          variant="secondary-neutral"
+          size="md"
+          className="universal-image-picker__save-button"
         >
           {t?.('common.save') || 'Save'}
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
-          className="ui-button ui-button--secondary-neutral ui-button--md universal-image-picker__upload-button"
+          variant="secondary-neutral"
+          size="md"
+          className="universal-image-picker__upload-button"
           disabled={isPending}
           onClick={() => fileInputRef.current?.click()}
         >
           <Upload size={16} />
           <span>{t?.('library.details.uploadCustom') || 'Upload Custom'}</span>
-        </button>
+        </Button>
       </div>
 
       {hasUploadPreview || uploadFile || isPending ? (
@@ -110,6 +135,6 @@ export default function ImageUploadPanel({
           </div>
         </div>
       ) : null}
-    </section>
+    </FileDropZone>
   );
 }

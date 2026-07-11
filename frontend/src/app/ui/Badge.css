@@ -67,7 +67,7 @@ sup .ui-badge--adult.ui-badge--danger {
   font-size: 10px !important;
   letter-spacing: normal !important;
   border-radius: 3px !important;
-  padding: 2px 7px !important;
+  padding: var(--space-2xs) var(--space-xs) !important;
   height: auto !important;
   min-height: 0 !important;
   line-height: 1.1 !important;

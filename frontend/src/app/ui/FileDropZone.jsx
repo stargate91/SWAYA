@@ -4,6 +4,7 @@ import { useDropzone } from './useDropzone';
 export default function FileDropZone({
   children,
   onDropPaths,
+  onDropFiles,
   disabled = false,
   label,
   description,
@@ -16,6 +17,7 @@ export default function FileDropZone({
   const { dropzoneProps, isDropActive } = useDropzone({
     disabled,
     onDropPaths,
+    onDropFiles,
   });
 
   return (

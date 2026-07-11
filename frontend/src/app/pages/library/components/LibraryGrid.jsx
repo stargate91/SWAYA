@@ -27,7 +27,6 @@ import {
 import { isMovieMediaType, isPersonMediaType, isTvLikeMediaType, isSceneMediaType } from '@/lib/mediaTypes';
 import { Pencil, Plus, Trash2, UserPlus } from '@/ui/icons';
 import { LibraryPosterCard } from './LibraryPosterCard';
-import { TagPosterCard } from './TagPosterCard';
 
 export default function LibraryGrid({
   t,
@@ -127,7 +126,11 @@ export default function LibraryGrid({
       ? 'person'
       : isCollections
         ? 'collection'
-        : (isLibraryTvTab(resolvedTab) ? 'tv' : 'movie');
+        : isLibraryTvTab(resolvedTab)
+          ? 'tv'
+          : isLibraryScenesTab(resolvedTab)
+            ? 'scene'
+            : 'movie';
     const imageType = isPeopleCard ? 'profile' : 'poster';
     const currentPath = isPeopleCard
       ? getProfileImagePath(item)
@@ -327,7 +330,7 @@ export default function LibraryGrid({
   );
 }
 
-function ExpandedTagPanel({ tag, t, resolvePosterUrl, emptyIcon, isFocusMode = false, activeSessionMode }) {
+function ExpandedTagPanel({ tag, t, emptyIcon, isFocusMode = false, activeSessionMode }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -406,15 +409,13 @@ function ExpandedTagPanel({ tag, t, resolvePosterUrl, emptyIcon, isFocusMode = f
       ) : null}
       <PosterGrid>
         {paginatedItems.map((item) => (
-          <TagPosterCard
+          <LibraryPosterCard
             key={item.id}
             item={item}
             t={t}
-            resolvePosterUrl={resolvePosterUrl}
             emptyIcon={emptyIcon}
-            isFocusMode={isFocusMode}
             onRemove={(targetItem) => removeTagMutation.mutate(targetItem)}
-            onClick={() => {
+            onItemClick={() => {
               const isPerson = isPersonMediaType(item.type);
               if (isPerson) {
                 navigate(`/library/people/${item.id}`, { state: { allowAdult: true } });

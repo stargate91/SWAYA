@@ -296,7 +296,7 @@
 }
 
 .ui-empty-state--animated-icon .ui-empty-state__icon {
-  transition: transform var(--motion-expressive, 0.25s), opacity var(--motion-base, 0.15s), color var(--motion-base, 0.15s);
+  transition: transform var(--motion-expressive), opacity var(--motion-base), color var(--motion-base);
 }
 
 .ui-empty-state--animated-icon:hover .ui-empty-state__icon {

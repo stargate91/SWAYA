@@ -1,4 +1,4 @@
-import { Suspense, useState, useEffect, useRef } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation, useNavigationType } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { QK, invalidateEntity } from '@/lib/queryKeys';
@@ -7,10 +7,7 @@ import WindowTitlebar from './WindowTitlebar';
 import PlayerControlBar from './PlayerControlBar';
 import Sidebar from './Sidebar';
 import Spinner from '../ui/Spinner';
-import { useSettingsQuery, useScanStatusQuery } from '../queries';
-import { useUi } from '@/providers/UiProvider';
-import { useTranslation } from '../providers/LanguageContext';
-import api from '../lib/api';
+import { useSettingsQuery } from '../queries';
 import { useNavigationStore } from '../stores/useNavigationStore';
 
 

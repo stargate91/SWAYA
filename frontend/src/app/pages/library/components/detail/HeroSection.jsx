@@ -1,11 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function HeroSection({ backdropUrl, isFallback, isPreviewPlaying, previewSrc }) {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const videoRef = useRef(null);
 
-  useEffect(() => {
+  const [prevIsPreviewPlaying, setPrevIsPreviewPlaying] = useState(isPreviewPlaying);
+  if (isPreviewPlaying !== prevIsPreviewPlaying) {
+    setPrevIsPreviewPlaying(isPreviewPlaying);
     if (!isPreviewPlaying) {
       setIsVideoPlaying(false);
+    }
+  }
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (isPreviewPlaying) {
+      video.play().catch(() => {});
+    } else {
+      video.pause();
     }
   }, [isPreviewPlaying]);
 
@@ -15,25 +29,25 @@ export default function HeroSection({ backdropUrl, isFallback, isPreviewPlaying,
         <img
           src={backdropUrl}
           alt="Backdrop"
-          className={`media-detail-page__hero-backdrop ${isFallback ? 'media-detail-page__hero-backdrop--blurred' : ''} ${isVideoPlaying ? 'media-detail-page__hero-backdrop--hidden' : ''}`}
+          className={`media-detail-page__hero-backdrop ${isFallback ? 'media-detail-page__hero-backdrop--blurred' : ''} ${isVideoPlaying && isPreviewPlaying ? 'media-detail-page__hero-backdrop--hidden' : ''}`}
         />
       )}
-      {isPreviewPlaying && previewSrc && (
+      {previewSrc && (
         <video
           ref={(el) => {
+            videoRef.current = el;
             if (el) {
               el.muted = true;
               el.defaultMuted = true;
             }
           }}
           src={previewSrc}
-          autoPlay
           muted
           loop
           playsInline
           onPlay={() => setIsVideoPlaying(true)}
           onPlaying={() => setIsVideoPlaying(true)}
-          className={`media-detail-page__hero-video ${isVideoPlaying ? 'media-detail-page__hero-video--visible' : ''}`}
+          className={`media-detail-page__hero-video ${isVideoPlaying && isPreviewPlaying ? 'media-detail-page__hero-video--visible' : ''}`}
         />
       )}
       <div className="media-detail-page__hero-overlay" />

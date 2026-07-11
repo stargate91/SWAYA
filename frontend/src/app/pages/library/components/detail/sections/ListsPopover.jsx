@@ -6,6 +6,8 @@ import {
   useRemoveListItemMutation,
   useCreateListMutation
 } from '@/queries';
+import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
+import { useSettingsQuery } from '@/queries/settingsQueries';
 import { List, Plus, Check, Loader2 } from '@/ui/icons';
 import './BespokeListPanel.css';
 import './ListsPopover.css';
@@ -18,6 +20,9 @@ export default function ListsPopover({ item, type, t }) {
   const [isOpen, setIsOpen] = useState(false);
   const popoverRef = useRef(null);
 
+  const { data: settings = {} } = useSettingsQuery();
+  const includeAdult = (settings?.include_adult === true || settings?.include_adult === 'true') || !!item?.is_adult || type === 'scene';
+
   // Construct item_id for membership check
   const membershipItemId = isPerson
     ? (item?.id ? `person_${item.id}` : undefined)
@@ -26,7 +31,7 @@ export default function ListsPopover({ item, type, t }) {
         : item?.id);
 
   // Queries
-  const { data: lists = [], isLoading: listsLoading } = useListsQuery();
+  const { data: lists = [], isLoading: listsLoading } = useListsQuery(includeAdult);
   const { data: membershipData = { list_ids: [], memberships: [] }, isLoading: membershipLoading } =
     useItemMembershipQuery(membershipItemId);
 
@@ -38,6 +43,14 @@ export default function ListsPopover({ item, type, t }) {
   const [newListName, setNewListName] = useState('');
   const [creating, setCreating] = useState(false);
 
+  const [optimisticListIds, setOptimisticListIds] = useState(null);
+
+  useEffect(() => {
+    setOptimisticListIds(null);
+  }, [membershipData.list_ids]);
+
+  const actualListIds = optimisticListIds !== null ? optimisticListIds : (membershipData.list_ids || []);
+
   // Filter lists by correct type (person vs media)
   const filteredLists = lists.filter(l => l.list_type === listType);
 
@@ -45,7 +58,7 @@ export default function ListsPopover({ item, type, t }) {
   const watchlist = !isPerson ? filteredLists.find(l => l.is_watchlist) : null;
   const otherLists = !isPerson ? filteredLists.filter(l => !l.is_watchlist) : filteredLists;
 
-  const isWatchlistAdded = watchlist ? membershipData.list_ids.includes(watchlist.id) : false;
+  const isWatchlistAdded = watchlist ? actualListIds.includes(watchlist.id) : false;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -62,44 +75,54 @@ export default function ListsPopover({ item, type, t }) {
 
   const handleToggleList = async (list) => {
     const listId = list.id;
-    const isAdded = membershipData.list_ids.includes(listId);
+    const isAdded = actualListIds.includes(listId);
 
     if (isAdded) {
+      setOptimisticListIds((prev) => (prev || membershipData.list_ids || []).filter(id => id !== listId));
       const membership = membershipData.memberships?.find(m => m.list_id === listId);
       if (membership) {
-        await removeMutation.mutateAsync({
-          listId,
-          itemId: membership.list_item_id
-        });
+        try {
+          await removeMutation.mutateAsync({
+            listId,
+            itemId: membership.list_item_id
+          });
+        } catch (err) {
+          setOptimisticListIds(membershipData.list_ids);
+        }
       }
     } else {
-      let payload = {};
-      if (isPerson) {
-        payload = {
-          person_id: item.id,
-          media_type: 'person',
-          title: item.name,
-          poster_path: item.profile_path
-        };
-      } else {
-        const isTvItem = type === 'tv';
-        const isSceneItem = type === 'scene';
-        const poster = isSceneItem ? (item.backdrop_path || item.poster_path) : item.poster_path;
+      setOptimisticListIds((prev) => [...(prev || membershipData.list_ids || []), listId]);
+      try {
+        let payload;
+        if (isPerson) {
+          payload = {
+            person_id: item.id,
+            media_type: 'person',
+            title: item.name,
+            poster_path: item.profile_path
+          };
+        } else {
+          const isTvItem = type === 'tv';
+          const isSceneItem = type === 'scene';
+          const poster = isSceneItem ? (item.backdrop_path || item.poster_path) : item.poster_path;
 
-        payload = {
-          media_item_id: !isTvItem ? item.id : undefined,
-          tmdb_id: isTvItem ? item.id : undefined,
-          media_type: type,
-          title: item.title || item.name || item.filename,
-          poster_path: poster,
-          year: item.year ? parseInt(item.year, 10) : undefined
-        };
+          payload = {
+            media_item_id: !isTvItem ? item.id : undefined,
+            tmdb_id: isTvItem ? item.id : undefined,
+            media_type: type,
+            title: item.title || item.name || item.filename,
+            poster_path: poster,
+            year: item.year ? parseInt(item.year, 10) : undefined
+          };
+        }
+
+        await addMutation.mutateAsync({
+          listId,
+          payload
+        });
+      } catch (err) {
+        setOptimisticListIds(membershipData.list_ids);
       }
-
-      await addMutation.mutateAsync({
-        listId,
-        payload
-      });
     }
   };
 
@@ -179,11 +202,10 @@ export default function ListsPopover({ item, type, t }) {
                 type="button"
                 className={`bespoke-list-panel-watchlist-btn ${isWatchlistAdded ? 'is-active' : ''}`}
                 onClick={() => handleToggleList(watchlist)}
-                disabled={addMutation.isPending || removeMutation.isPending}
                 title={isWatchlistAdded ? (t('lists.remove_from_watchlist') || 'Remove from Watchlist') : (t('lists.add_to_watchlist') || 'Add to Watchlist')}
               >
                 {isWatchlistAdded ? <Check size={14} /> : <Plus size={14} />}
-                <span>Watchlist</span>
+                <span>{t('lists.watchlist_name') || 'Watchlist'}</span>
               </button>
             )}
           </div>
@@ -198,12 +220,21 @@ export default function ListsPopover({ item, type, t }) {
                 {otherLists.length > 0 ? (
                   <div className="bespoke-list-panel-list custom-scrollbar">
                     {otherLists.map((list) => {
-                      const isAdded = membershipData.list_ids.includes(list.id);
+                      const isAdded = actualListIds.includes(list.id);
                       return (
                         <div
                           key={list.id}
                           className={`bespoke-list-panel-item ${isAdded ? 'is-added' : ''}`}
                           onClick={() => handleToggleList(list)}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handleToggleList(list);
+                            }
+                          }}
+                          /* eslint-disable-next-line react/forbid-dom-props */
                           style={{ '--list-color': list.color || 'var(--color-accent-blue)' }}
                         >
                           <div className="bespoke-list-panel-item-checkbox">

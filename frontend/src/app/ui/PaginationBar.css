@@ -120,7 +120,7 @@
   gap: var(--space-2xs);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-sm);
-  padding: 2px;
+  padding: calc(var(--space-2xs) / 2);
   background: var(--color-surface-sunken);
 }
 
@@ -134,6 +134,6 @@
 .ui-pagination__modes .ui-pagination__button.is-active {
   background: var(--color-surface-card);
   color: var(--color-accent-blue);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 

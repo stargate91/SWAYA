@@ -162,10 +162,14 @@ const resolveSubtitle = (item, opts = {}) => {
     const airDateStr = item.first_air_date || item.release_date;
     const firstYear = airDateStr ? new Date(airDateStr).getFullYear() : null;
     const lastYear = item.last_air_date ? new Date(item.last_air_date).getFullYear() : null;
-    const isEnded = item.release_status?.toLowerCase() === 'ended';
+    const isEnded = ['ended', 'canceled', 'cancelled'].includes(item.release_status?.toLowerCase());
     let tvYear;
     if (firstYear) {
-      tvYear = isEnded && lastYear ? `${firstYear} - ${lastYear}` : `${firstYear} - `;
+      if (isEnded && lastYear) {
+        tvYear = firstYear === lastYear ? `${firstYear}` : `${firstYear} - ${lastYear}`;
+      } else {
+        tvYear = `${firstYear} - `;
+      }
     } else {
       tvYear = item.year || '';
     }

@@ -1,29 +1,13 @@
 import { useState } from 'react';
 import TMDBImageGrid from './entityDetail/TMDBImageGrid';
 import SegmentedControl from '@/ui/SegmentedControl';
-import {
-  useOverrideBackdropMutation,
-  useUploadBackdropMutation,
-  useOverridePosterMutation,
-  useUploadPosterMutation,
-  useOverrideLogoMutation,
-  useUploadLogoMutation,
-} from '@/queries';
-import {
-  useOverridePersonProfileMutation,
-  useUploadPersonProfileMutation,
-} from '@/queries';
-import ImageUploadPanel from '../modals/ImageUploadPanel';
-import { resolveMediaImageUrl } from '@/lib/imageUrls';
+import useImagePicker from '../hooks/useImagePicker';
+import ImageUploadPanel from '@/ui/ImageUploadPanel';
+import ImageOptionCard from './entityDetail/ImageOptionCard';
+import { resolveMediaImageUrl, pathsMatch } from '@/lib/imageUrls';
+import PersonBackdropPickerModal from './entityDetail/PersonBackdropPickerModal';
 import './UniversalImagePicker.css';
 
-
-const pathsMatch = (pathA, pathB) => {
-  if (!pathA || !pathB) return false;
-  const cleanA = String(pathA).split(/[/\\]/).pop().toLowerCase();
-  const cleanB = String(pathB).split(/[/\\]/).pop().toLowerCase();
-  return cleanA === cleanB;
-};
 
 export default function UniversalImagePicker({
   entityId,
@@ -38,15 +22,6 @@ export default function UniversalImagePicker({
   externalIds,
   item,
 }) {
-  const overrideBackdropMutation = useOverrideBackdropMutation();
-  const uploadBackdropMutation = useUploadBackdropMutation();
-  const overridePosterMutation = useOverridePosterMutation();
-  const uploadPosterMutation = useUploadPosterMutation();
-  const overrideLogoMutation = useOverrideLogoMutation();
-  const uploadLogoMutation = useUploadLogoMutation();
-  const overridePersonProfileMutation = useOverridePersonProfileMutation();
-  const uploadPersonProfileMutation = useUploadPersonProfileMutation();
-
   // Compute available sources
   const sources = [];
   if (entityType === 'person') {
@@ -77,88 +52,29 @@ export default function UniversalImagePicker({
     return sources.length > 0 ? sources[0].value : 'tmdb';
   });
 
-  const handleSelectTmdbImage = async (path) => {
-    setSelectedPath(path);
-    try {
-      if (imageType === 'backdrop') {
-        await overrideBackdropMutation.mutateAsync({
-          itemId: entityId,
-          backdropPath: path,
-          mediaType: entityType,
-        });
-      } else if (imageType === 'poster') {
-        await overridePosterMutation.mutateAsync({
-          itemId: entityId,
-          posterPath: path,
-          mediaType: entityType,
-        });
-      } else if (imageType === 'logo') {
-        await overrideLogoMutation.mutateAsync({
-          itemId: entityId,
-          logoPath: path,
-          mediaType: entityType,
-        });
-      } else if (imageType === 'profile' && entityType === 'person') {
-        await overridePersonProfileMutation.mutateAsync({
-          personId: entityId,
-          profilePath: path,
-        });
-      }
-      toast(t?.('library.details.imageUpdated') || 'Image updated successfully!', 'success');
-      if (closeOnSelect) {
-        onClose?.();
-      }
-    } catch (err) {
-      toast(err.message || t?.('library.details.imageUpdateFailed') || 'Failed to update image', 'danger');
-    }
-  };
+  const { isPending, handleSaveUrl, handleUploadFile } = useImagePicker({
+    entityId,
+    entityType,
+    imageType,
+    toast,
+    t,
+    onClose,
+    closeOnSelect,
+    onBeforeSave: (path) => setSelectedPath(path),
+  });
 
-  const handleUploadFile = async (file) => {
-    if (!file) return;
+  if (entityType === 'person' && imageType === 'backdrop') {
+    return (
+      <PersonBackdropPickerModal
+        personId={entityId}
+        item={item}
+        t={t}
+        toast={toast}
+      />
+    );
+  }
 
-    try {
-      if (imageType === 'backdrop') {
-        await uploadBackdropMutation.mutateAsync({
-          itemId: entityId,
-          file,
-          mediaType: entityType,
-        });
-      } else if (imageType === 'poster') {
-        await uploadPosterMutation.mutateAsync({
-          itemId: entityId,
-          file,
-          mediaType: entityType,
-        });
-      } else if (imageType === 'logo') {
-        await uploadLogoMutation.mutateAsync({
-          itemId: entityId,
-          file,
-          mediaType: entityType,
-        });
-      } else if (imageType === 'profile' && entityType === 'person') {
-        await uploadPersonProfileMutation.mutateAsync({
-          personId: entityId,
-          file,
-        });
-      }
-      toast(t?.('library.details.imageUploaded') || 'Image uploaded and updated successfully!', 'success');
-      if (closeOnSelect) {
-        onClose?.();
-      }
-    } catch (err) {
-      toast(err.message || t?.('library.details.imageUploadFailed') || 'Failed to upload image', 'danger');
-    }
-  };
-
-  const isPending =
-    overrideBackdropMutation.isPending ||
-    uploadBackdropMutation.isPending ||
-    overridePosterMutation.isPending ||
-    uploadPosterMutation.isPending ||
-    overrideLogoMutation.isPending ||
-    uploadLogoMutation.isPending ||
-    overridePersonProfileMutation.isPending ||
-    uploadPersonProfileMutation.isPending;
+  const handleSelectTmdbImage = handleSaveUrl;
 
   const isScene = entityType === 'scene' || item?.type === 'scene' || (typeof entityId === 'string' && entityId.startsWith('stash_'));
   const imageLookupId = entityType === 'tv' && tmdbId ? tmdbId : entityId;
@@ -209,23 +125,15 @@ export default function UniversalImagePicker({
               }
 
               return logoOptions.map((opt, idx) => (
-                <div
+                <ImageOptionCard
                   key={idx}
-                  className={`scene-image-picker-card ${pathsMatch(selectedPath || currentPath, opt.path) ? 'active' : ''}`}
-                  role="button"
-                  tabIndex={0}
+                  imageUrl={resolveMediaImageUrl(opt.path, 'logo')}
+                  alt={opt.alt}
+                  label={opt.label}
+                  isSelected={pathsMatch(selectedPath || currentPath, opt.path)}
                   onClick={() => handleSelectTmdbImage(opt.path)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      handleSelectTmdbImage(opt.path);
-                    }
-                  }}
-                >
-                  <div className="scene-image-picker-img-wrapper">
-                    <img src={resolveMediaImageUrl(opt.path, 'logo')} alt={opt.alt} />
-                  </div>
-                  <span className="scene-image-picker-label">{opt.label}</span>
-                </div>
+                  aspect="square"
+                />
               ));
             })()}
           </div>
@@ -251,23 +159,15 @@ export default function UniversalImagePicker({
               }
 
               return options.map((opt, idx) => (
-                <div
+                <ImageOptionCard
                   key={idx}
-                  className={`scene-image-picker-card ${pathsMatch(selectedPath || currentPath, opt.path) ? 'active' : ''}`}
-                  role="button"
-                  tabIndex={0}
+                  imageUrl={resolveMediaImageUrl(opt.path, imageType)}
+                  alt={opt.alt}
+                  label={opt.label}
+                  isSelected={pathsMatch(selectedPath || currentPath, opt.path)}
                   onClick={() => handleSelectTmdbImage(opt.path)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      handleSelectTmdbImage(opt.path);
-                    }
-                  }}
-                >
-                  <div className="scene-image-picker-img-wrapper backdrop-variant">
-                    <img src={resolveMediaImageUrl(opt.path, imageType)} alt={opt.alt} />
-                  </div>
-                  <span className="scene-image-picker-label">{opt.label}</span>
-                </div>
+                  aspect="backdrop"
+                />
               ));
             })()}
           </div>

@@ -1,63 +1,15 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { ImageOff } from '@/ui/icons';
 import { useFullMetadataQuery, usePersonDetailQuery, useLibraryCollectionDetailQuery } from '@/queries/metadataQueries';
 import { useTranslation } from '@/providers/LanguageContext';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
-import { buildTmdbImageUrl, TMDB_IMAGE_SIZES } from '@/lib/imageUrls';
+import { buildTmdbImageUrl, TMDB_IMAGE_SIZES, pathsMatch } from '@/lib/imageUrls';
 import { API_BASE } from '@/lib/backend';
 import EmptyState from '@/ui/EmptyState';
 import BackdropCard from '@/ui/BackdropCard';
+import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import '../detail/panels/BackdropsPanel.css'; // Reuse existing backdrop panel grid styles
 
-const fnv1aHash = (str) => {
-  let hash = 2166136261;
-  const encoder = new TextEncoder();
-  const bytes = encoder.encode(str);
-  for (let i = 0; i < bytes.length; i++) {
-    hash ^= bytes[i];
-    hash = Math.imul(hash, 16777619) >>> 0;
-  }
-  return hash.toString(16).padStart(8, '0');
-};
-
-const pathsMatch = (path, currentPath) => {
-  if (!path || !currentPath) return false;
-  const pathLower = path.toLowerCase();
-  const currentLower = currentPath.toLowerCase();
-
-  if (pathLower === currentLower) return true;
-
-  const isPathHttp = pathLower.startsWith('http://') || pathLower.startsWith('https://');
-  const isCurrentHttp = currentLower.startsWith('http://') || currentLower.startsWith('https://');
-
-  if (isPathHttp && isCurrentHttp) {
-    return pathLower === currentLower;
-  }
-
-  // Handle local vs remote override matching
-  const currentFilename = currentLower.split(/[/\\]/).pop().split('?')[0];
-  const optionFilename = pathLower.split(/[/\\]/).pop().split('?')[0];
-
-  // Try exact filename match first
-  if (currentFilename === optionFilename) return true;
-
-  // If option is remote, calculate its FNV-1a hash and see if it is in the current local filename
-  if (isPathHttp && !isCurrentHttp) {
-    const urlHash = fnv1aHash(path);
-    const hashPattern = `_${urlHash}`;
-    if (currentFilename.includes(hashPattern)) {
-      return true;
-    }
-  }
-
-  // Fallback to suffix match of cleaned filename
-  const cleanCurrent = currentFilename.replace('user_override_', '');
-  if (cleanCurrent.includes(optionFilename)) {
-    return true;
-  }
-
-  return false;
-};
 
 export default function TMDBImageGrid({
   itemId,
@@ -77,7 +29,6 @@ export default function TMDBImageGrid({
   const isPerson = mediaType === 'person';
   const isCollection = mediaType === 'collection';
   const [loadMoreCount, setLoadMoreCount] = useState(0);
-  const loadMoreRef = useRef(null);
   const metadataLanguage = locale === 'en' ? 'en-US' : locale;
   const normalizedMediaType = mediaType === 'tv' ? 'tv' : mediaType;
 
@@ -231,6 +182,41 @@ export default function TMDBImageGrid({
     }
 
     if (isCollection) {
+      if (imageType === 'backdrop') {
+        const collectionBackdropOptions = Array.isArray(collectionDetail?.collection_backdrops)
+          ? collectionDetail.collection_backdrops
+          : Array.isArray(collectionDetail?.backdrops)
+            ? collectionDetail.backdrops
+            : Array.isArray(collectionDetail?.images?.backdrops)
+              ? collectionDetail.images.backdrops
+              : [];
+
+        const seen = new Set();
+        return collectionBackdropOptions
+          .map((bd, index) => {
+            const cleanPath = bd.file_path || bd.backdrop_path || bd.path || '';
+            const key = cleanPath.split(/[/\\]/).pop().toLowerCase().replace(/\.[^/.]+$/, "");
+            return {
+              file_path: cleanPath,
+              key,
+              width: bd.width,
+              height: bd.height,
+              vote_average: bd.vote_average,
+              sort_score: Number(bd.vote_average) || 0,
+              sort_votes: Number(bd.vote_count) || 0,
+              sort_index: index,
+              iso_639_1: bd.iso_639_1,
+            };
+          })
+          .filter((opt) => opt.file_path && opt.key && (!opt.iso_639_1 || opt.iso_639_1 === 'null'))
+          .sort((a, b) => (b.sort_score - a.sort_score) || (b.sort_votes - a.sort_votes) || (a.sort_index - b.sort_index))
+          .filter((opt) => {
+            if (seen.has(opt.key)) return false;
+            seen.add(opt.key);
+            return true;
+          });
+      }
+
       const collectionPosterOptions = Array.isArray(collectionDetail?.collection_posters)
         ? collectionDetail.collection_posters
         : Array.isArray(collectionDetail?.posters)
@@ -390,9 +376,13 @@ export default function TMDBImageGrid({
     [images, currentPath]
   );
 
-  useEffect(() => {
+  const [prevImages, setPrevImages] = useState(images);
+  const [prevInitialVisibleCount, setPrevInitialVisibleCount] = useState(initialVisibleCount);
+  if (prevImages !== images || prevInitialVisibleCount !== initialVisibleCount) {
+    setPrevImages(images);
+    setPrevInitialVisibleCount(initialVisibleCount);
     setLoadMoreCount(0);
-  }, [images, initialVisibleCount]);
+  }
 
   const baseVisibleCount = initialVisibleCount ?? Number.POSITIVE_INFINITY;
   const minimumVisibleCount = selectedIndex >= 0
@@ -413,27 +403,12 @@ export default function TMDBImageGrid({
     setLoadMoreCount((prev) => prev + 1);
   }, []);
 
-  useEffect(() => {
-    if (!hasMore || !loadMoreRef.current) {
-      return undefined;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting) {
-          handleLoadMore();
-        }
-      },
-      {
-        root: null,
-        rootMargin: '240px 0px',
-        threshold: 0.01,
-      }
-    );
-
-    observer.observe(loadMoreRef.current);
-    return () => observer.disconnect();
-  }, [hasMore, handleLoadMore]);
+  const loadMoreRef = useInfiniteScroll({
+    onIntersect: handleLoadMore,
+    enabled: hasMore,
+    rootMargin: '240px 0px',
+    threshold: 0.01,
+  });
 
   const handleSelectImage = (path) => {
     if (onSelect) {

@@ -9,6 +9,7 @@ import { formatEpisodeNumber, formatTime } from '../../../utils/detailUtils';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import { useTranslation as useLangTranslation } from '@/providers/LanguageContext';
 import api from '@/lib/api';
+import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import './SeasonsPanel.css';
 
 const LPAR = '(';
@@ -43,7 +44,6 @@ export default function SeasonsPanel() {
   const [prevSelectedSeasonNumber, setPrevSelectedSeasonNumber] = useState(selectedSeasonNumber);
 
   const scrollContainerRef = useRef(null);
-  const loadMoreTriggerRef = useRef(null);
 
   if (selectedSeasonNumber !== prevSelectedSeasonNumber) {
     setPrevSelectedSeasonNumber(selectedSeasonNumber);
@@ -159,30 +159,17 @@ export default function SeasonsPanel() {
   const visibleEpisodes = activeSeason?.episodes?.slice(0, visibleEpisodesCount) || [];
   const hasMoreEpisodes = visibleEpisodes.length < (activeSeason?.episodes?.length || 0);
 
-  useEffect(() => {
-    const trigger = loadMoreTriggerRef.current;
-    if (!trigger || !hasMoreEpisodes) return undefined;
-
-    const scrollRoot = trigger.closest('.media-detail-page__side-panel-content');
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const firstEntry = entries[0];
-        if (!firstEntry?.isIntersecting) return;
-
-        setVisibleEpisodesCount((prev) => (
-          Math.min(prev + EPISODES_BATCH_SIZE, activeSeason?.episodes?.length || prev)
-        ));
-      },
-      {
-        root: scrollRoot || null,
-        rootMargin: '0px 0px 960px 0px',
-        threshold: 0.01,
-      }
-    );
-
-    observer.observe(trigger);
-    return () => observer.disconnect();
-  }, [activeSeason?.episodes?.length, hasMoreEpisodes, visibleEpisodes.length]);
+  const loadMoreTriggerRef = useInfiniteScroll({
+    onIntersect: () => {
+      setVisibleEpisodesCount((prev) => (
+        Math.min(prev + EPISODES_BATCH_SIZE, activeSeason?.episodes?.length || prev)
+      ));
+    },
+    enabled: hasMoreEpisodes,
+    root: '.media-detail-page__side-panel-content',
+    rootMargin: '0px 0px 960px 0px',
+    threshold: 0.01,
+  });
 
   if (!activeSeason) {
     return (

@@ -10,7 +10,7 @@
   gap: var(--space-lg);
   max-height: 320px;
   overflow-y: auto;
-  padding-right: 4px;
+  padding-right: var(--space-2xs);
 }
 
 .extras-panel__group {

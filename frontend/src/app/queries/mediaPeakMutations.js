@@ -6,13 +6,21 @@ import { invalidateEntity, invalidateTvDetail } from '@/lib/queryKeys';
 export const useToggleTrackedMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ tmdbId, mediaType, isTracked }) => (
-      isTracked
-        ? api.media.untrackItem(tmdbId, mediaType)
-        : api.media.trackItem(tmdbId, mediaType)
-    ),
+    mutationFn: ({ tmdbId, externalId, mediaType, isTracked, track }) => {
+      const id = tmdbId || externalId;
+      let shouldTrack = false;
+      if (track !== undefined) {
+        shouldTrack = !!track;
+      } else if (isTracked !== undefined) {
+        shouldTrack = !isTracked;
+      }
+      return shouldTrack
+        ? api.media.trackItem(id, mediaType)
+        : api.media.untrackItem(id, mediaType);
+    },
     onSuccess: (data, variables) => {
-      invalidateEntity(queryClient, variables.tmdbId, { lists: true, stats: true });
+      const id = variables.tmdbId || variables.externalId;
+      invalidateEntity(queryClient, id, { lists: true, stats: true });
     },
   });
 };

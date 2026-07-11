@@ -1,16 +1,13 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import PosterGrid from '@/ui/PosterGrid';
 import PosterCard from '@/ui/PosterCard';
 import Pill from '@/ui/Pill';
-import EmptyState from '@/ui/EmptyState';
-import BackdropCard from '@/ui/BackdropCard';
-import ImageUploadPanel from '../../modals/ImageUploadPanel';
+import ScrollRow from '@/ui/ScrollRow';
 import { API_BASE } from '@/lib/backend';
 import { isTvLikeMediaType } from '@/lib/mediaTypes';
-import { getPosterImagePath, buildTmdbImageUrl, TMDB_IMAGE_SIZES } from '@/lib/imageUrls';
-import { ImageOff, ENTITY_ICONS } from '@/ui/icons';
+import { getPosterImagePath } from '@/lib/imageUrls';
+import { ENTITY_ICONS } from '@/ui/icons';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
-import { normalizeBackdropKey } from '../../utils/personCreditsUtils';
 import { navigateToCreditDetail } from '../../utils/mediaNavigation';
 import './PersonCreditsShared.css';
 
@@ -78,6 +75,8 @@ export function OverviewContent({ text, emptyText, t, openDrawer, className = ''
       ) : (
         <p className="entity-detail-page__overview-text entity-detail-page__overview-text--muted">
           {emptyText}
+
+
         </p>
       )}
     </div>
@@ -129,7 +128,7 @@ export function EntityCardGrid({ items, type, navigate, t }) {
   );
 }
 
-function HorizontalCollectionItemsList({ items, navigate, t }) {
+function HorizontalCollectionItemsList({ items, navigate, t, customStyle }) {
   if (!items?.length) {
     return null;
   }
@@ -139,7 +138,11 @@ function HorizontalCollectionItemsList({ items, navigate, t }) {
   };
 
   return (
-    <div className="entity-detail-page__credits-list entity-detail-page__credits-list--collection-items">
+    <div
+      className="entity-detail-page__credits-list entity-detail-page__credits-list--collection-items"
+      /* eslint-disable-next-line react/forbid-dom-props */
+      style={customStyle}
+    >
       {items.map((item, index) => {
         const isTv = isTvLikeMediaType(item.media_type || item.type);
         const posterPath = getPosterImagePath(item) || item.backdrop_path || item.local_backdrop_path;
@@ -173,165 +176,44 @@ function HorizontalCollectionItemsList({ items, navigate, t }) {
   );
 }
 
-export function CollectionBackdropsPanel({ item, collectionId, t, toast, overrideBackdropMutation, uploadBackdropMutation }) {
-  const [selectedBackdropPath, setSelectedBackdropPath] = useState(item?.backdrop_path || '');
-  const backdropOptions = useMemo(() => {
-    const seen = new Set();
-    const collectionBackdrops = [];
-
-    for (const option of (item?.collection_backdrops || [])
-      .map((bd, index) => ({
-        backdrop_path: bd.file_path,
-        backdrop_key: normalizeBackdropKey(bd.file_path),
-        width: bd.width,
-        height: bd.height,
-        vote_average: bd.vote_average,
-        sort_score: Number(bd.vote_average) || 0,
-        sort_votes: Number(bd.vote_count) || 0,
-        sort_index: index,
-        iso_639_1: bd.iso_639_1,
-      }))
-      .filter((option) => option.backdrop_path && option.backdrop_key && (!option.iso_639_1 || option.iso_639_1 === 'null'))
-      .sort((a, b) => (
-        (b.sort_score - a.sort_score)
-        || (b.sort_votes - a.sort_votes)
-        || (a.sort_index - b.sort_index)
-      ))) {
-      if (seen.has(option.backdrop_key)) {
-        continue;
-      }
-      seen.add(option.backdrop_key);
-      collectionBackdrops.push({
-        backdrop_path: option.backdrop_path,
-        backdrop_key: option.backdrop_key,
-        width: option.width,
-        height: option.height,
-        vote_average: option.vote_average,
-      });
-    }
-
-    return collectionBackdrops;
-  }, [item]);
-
-  const currentBackdropPath = selectedBackdropPath || item?.backdrop_path || '';
-  const currentBackdropKey = normalizeBackdropKey(currentBackdropPath);
-
-  const handleUploadBackdrop = async (file) => {
-    if (!file || uploadBackdropMutation?.isPending) return;
-    try {
-      const data = await uploadBackdropMutation.mutateAsync({ itemId: 'collection_' + collectionId, file });
-      setSelectedBackdropPath(data?.backdrop_path || item?.backdrop_path || '');
-      toast(t('library.details.imageUploaded') || 'Image uploaded and updated successfully!', 'success');
-    } catch (err) {
-      toast(err.message || t('library.details.imageUploadFailed') || 'Failed to upload image', 'danger');
-    }
-  };
-
-  const handleSelectBackdrop = async (backdropPath) => {
-    setSelectedBackdropPath(backdropPath);
-    try {
-      await overrideBackdropMutation.mutateAsync({
-        itemId: `collection_${collectionId}`,
-        backdropPath,
-      });
-      toast(t('library.details.backdropUpdated') || 'Backdrop updated successfully!', 'success');
-    } catch (err) {
-      toast(err.message || t('library.details.backdropUpdateFailed') || 'Failed to update backdrop', 'danger');
-    }
-  };
-
-  return (
-    <div className="backdrops-panel">
-      <ImageUploadPanel
-        imageType="backdrop"
-        isPending={overrideBackdropMutation.isPending || Boolean(uploadBackdropMutation?.isPending)}
-        t={t}
-        onSaveUrl={handleSelectBackdrop}
-        onUploadFile={handleUploadBackdrop}
-      />
-
-      <div className="backdrops-grid">
-        {backdropOptions.map((option, idx) => {
-          const backdropUrl = option.backdrop_path.startsWith('/')
-            ? buildTmdbImageUrl(option.backdrop_path, TMDB_IMAGE_SIZES.backdropThumb)
-            : resolveDetailsImageUrl(option.backdrop_path, API_BASE, 'backdropThumb');
-          const isPending = overrideBackdropMutation.isPending && overrideBackdropMutation.variables?.backdropPath === option.backdrop_path;
-          const isSelected = (currentBackdropKey !== '' && currentBackdropKey === option.backdrop_key) || isPending;
-          const resolutionLabel = option.width && option.height ? `${option.width}×${option.height}` : '';
-          const ratingLabel = option.vote_average ? `★ ${Number(option.vote_average).toFixed(1)}` : '';
-
-          return (
-            <BackdropCard
-              key={`${option.backdrop_path}-${idx}`}
-              imageUrl={backdropUrl}
-              alt={option.backdrop_path}
-              isSelected={isSelected}
-              isPending={isPending || Boolean(uploadBackdropMutation?.isPending)}
-              infoLeft={resolutionLabel}
-              infoRight={ratingLabel}
-              onClick={() => handleSelectBackdrop(option.backdrop_path)}
-            />
-          );
-        })}
-        {backdropOptions.length === 0 && (
-          <EmptyState
-            icon={ImageOff}
-            title={t('library.details.noBackdropsAvailable') || 'No good backdrop options found for this title.'}
-            className="backdrops-panel__empty-state"
-          />
-        )}
-      </div>
-    </div>
-  );
-}
-
 export function CollectionItemsSection({ items, navigate, t }) {
-  const [prevItems, setPrevItems] = useState(null);
+  const [prevItems, setPrevItems] = useState(items);
   const [limit, setLimit] = useState(30);
-  const scrollContainerRef = useRef(null);
 
   if (items !== prevItems) {
     setPrevItems(items);
     setLimit(30);
   }
 
-  useEffect(() => {
-    const container = scrollContainerRef.current;
+  const handleScroll = (e) => {
+    const container = e.currentTarget;
     if (!container) return;
-
-    const handleScroll = () => {
-      const { scrollLeft, scrollWidth, clientWidth } = container;
-      if (scrollWidth - scrollLeft - clientWidth < 300) {
-        setLimit((prev) => Math.min(items.length, prev + 20));
-      }
-    };
-
-    container.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      container.removeEventListener('scroll', handleScroll);
-    };
-  }, [items.length]);
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+    if (scrollWidth - scrollLeft - clientWidth < 300) {
+      setLimit((prev) => Math.min(items.length, prev + 20));
+    }
+  };
 
   const visibleItems = (items || []).slice(0, limit);
   const cols = Math.max(1, visibleItems.length <= 12 ? visibleItems.length : Math.ceil(visibleItems.length / 2));
-
-  useEffect(() => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.style.setProperty('--cols', cols);
-    }
-  }, [cols]);
 
   return (
     <section className="entity-detail-page__content-section">
       <div className="entity-detail-page__section-header">
         <h2>{t('library.details.collectionItemsTitle') || 'Collection Items'}</h2>
       </div>
-      <div 
-        ref={scrollContainerRef} 
+      <ScrollRow
+        onScroll={handleScroll}
         className="collection-items-horizontal-grid-wrapper"
+        showArrows={true}
       >
-        <HorizontalCollectionItemsList items={visibleItems} navigate={navigate} t={t} />
-      </div>
+        <HorizontalCollectionItemsList
+          items={visibleItems}
+          navigate={navigate}
+          t={t}
+          customStyle={{ '--cols': cols }}
+        />
+      </ScrollRow>
     </section>
   );
 }

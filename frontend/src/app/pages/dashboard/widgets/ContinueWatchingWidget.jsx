@@ -81,7 +81,7 @@ const ContinueWatchingWidget = ({ T }) => {
                 const newItem = {
                   id: detail.id,
                   title: detail.title,
-                  series_title: detail.series_title,
+                  tv_title: detail.tv_title,
                   still_path: detail.still_path,
                   backdrop_path: detail.backdrop_path,
                   poster_path: detail.poster_path,
@@ -114,9 +114,13 @@ const ContinueWatchingWidget = ({ T }) => {
         });
       } else if (data.event === 'close') {
         setActivePlayback(null);
+        queryClient.invalidateQueries({ queryKey: ['continue-watching'] });
         setTimeout(() => {
           queryClient.invalidateQueries({ queryKey: ['continue-watching'] });
         }, 500);
+        setTimeout(() => {
+          queryClient.invalidateQueries({ queryKey: ['continue-watching'] });
+        }, 2000);
       }
     };
 
@@ -163,7 +167,7 @@ const ContinueWatchingWidget = ({ T }) => {
           const isEpisode = item.type === 'episode';
           const episodeCode = isEpisode ? formatEpisodeCode(item.season_number, item.episode_number) : null;
           const minutesLeft = Math.max(0, Math.floor(currentDuration / 60) - Math.floor(currentResumePos / 60));
-          const episodeMeta = episodeCode ? `${episodeCode} - ${item.episode_title || item.title}` : null;
+          const episodeMeta = episodeCode ? `${episodeCode} - ${(item.tv_title || '')}` : null;
           const imagePath = item.still_path || item.backdrop_path;
           const resolvedImageUrl = resolveMediaImageUrl(imagePath, item.still_path ? 'still' : 'backdrop');
 
@@ -214,7 +218,7 @@ const ContinueWatchingWidget = ({ T }) => {
               </div>
               <div className="continue-watching-copy">
                 <div className="continue-watching-title">
-                  {item.series_title || item.title}
+                  {item.title}
                 </div>
                 <div className={`continue-watching-meta${episodeMeta ? ' continue-watching-meta--has-episode' : ''}`}>
                   <span className="continue-watching-meta-default">

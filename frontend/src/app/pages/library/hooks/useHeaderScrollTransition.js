@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export default function useHeaderScrollTransition(id, isAnyDrawerOpen, isPreviewPlaying) {
+export default function useHeaderScrollTransition(id, isAnyDrawerOpen, isPreviewPlaying, scrollSectionSelector = '.media-detail-page__inline-sections') {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -33,8 +33,12 @@ export default function useHeaderScrollTransition(id, isAnyDrawerOpen, isPreview
           if (e.target.closest('.custom-scrollbar')) {
             return;
           }
-          const isInsideSection = e.target.closest('.media-detail-page__inline-sections');
+          const isInsideSection = e.target.closest(scrollSectionSelector);
           if (isInsideSection) {
+            const scrollable = isInsideSection.querySelector('.person-credits-discover-grid-wrapper, .person-credits-discover-grid');
+            if (scrollable && scrollable.scrollTop > 0) {
+              return;
+            }
             if (isInsideSection.scrollTop > 0) {
               return;
             }
@@ -46,11 +50,11 @@ export default function useHeaderScrollTransition(id, isAnyDrawerOpen, isPreview
 
     window.addEventListener('wheel', handleWheel, { passive: true });
     return () => window.removeEventListener('wheel', handleWheel);
-  }, [isScrolled, isAnyDrawerOpen, isPreviewPlaying]);
+  }, [isScrolled, isAnyDrawerOpen, isPreviewPlaying, scrollSectionSelector]);
 
   const handleScrollToggle = () => {
     setIsScrolled((prev) => !prev);
   };
 
-  return [isScrolled, handleScrollToggle];
+  return [isScrolled, handleScrollToggle, setIsScrolled];
 }

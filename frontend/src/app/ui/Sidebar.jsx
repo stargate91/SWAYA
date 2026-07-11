@@ -42,6 +42,7 @@ export default function Sidebar({ header, groups, onTabSelect }) {
                   {activeSubIndex !== -1 && (
                     <div
                       className="ui-sidebar-sub-indicator"
+                      // eslint-disable-next-line react/forbid-dom-props
                       style={{ top: `${activeSubIndex * 32}px` }}
                     />
                   )}

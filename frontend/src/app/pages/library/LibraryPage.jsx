@@ -1,6 +1,7 @@
 import Page from '@/ui/Page';
 import Spinner from '@/ui/Spinner';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
+import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import LibraryPagination from './components/LibraryPagination';
 import { useLibraryState } from './hooks/useLibraryState';
 import { useLibraryModals } from './hooks/useLibraryModals';
@@ -8,15 +9,13 @@ import LibraryHeader from './components/LibraryHeader';
 import LibraryFilters from './components/LibraryFilters';
 import LibraryGrid from './components/LibraryGrid';
 import { useDeleteTagMutation } from '@/queries';
-import Drawer from '@/ui/Drawer';
-import IconButton from '@/ui/IconButton';
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { isLibraryTagsTab } from '@/lib/libraryTabs';
 import { useUi } from '@/providers/UiProvider';
 import { useQueryClient } from '@tanstack/react-query';
 import { QK } from '@/lib/queryKeys';
-import UniversalImagePicker from './components/UniversalImagePicker';
+import ImagePickerDrawer from './components/ImagePickerDrawer';
 import SegmentedControl from '@/ui/SegmentedControl';
 import './LibraryPage.css';
 
@@ -48,58 +47,38 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
     }
   }, [state.isTags, focusedTagName]);
   
+  const lastPageRef = useRef(state.currentPage);
+  
   // Smooth scroll to top after page change finishes loading new data
   useEffect(() => {
     if (state.paginationMode === 'infinite') return;
     if (isInitialLoadRef.current) {
       if (!state.isDataLoading && !state.isLoading) {
         isInitialLoadRef.current = false;
+        lastPageRef.current = state.currentPage;
       }
       return;
     }
     if (!state.isDataLoading) {
-      const container = document.querySelector('.shell__content');
-      if (container) {
-        container.scrollTo({ top: 0, behavior: 'smooth' });
+      if (state.currentPage !== lastPageRef.current) {
+        lastPageRef.current = state.currentPage;
+        const container = document.querySelector('.shell__content');
+        if (container) {
+          container.scrollTo({ top: 0, behavior: 'smooth' });
+        }
       }
     }
   }, [state.currentPage, state.isDataLoading, state.isLoading, state.paginationMode]);
 
+
   // Save & Restore scroll position
   useScrollRestoration('.shell__content', [state.isLoading, state.isDataLoading]);
 
-  const sentinelRef = useRef(null);
-
-  useEffect(() => {
-    if (state.paginationMode !== 'infinite') return;
-    if (state.currentPage >= state.totalPages) return;
-    if (state.isDataLoading) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          state.setCurrentPage(state.currentPage + 1);
-        }
-      },
-      {
-        root: document.querySelector('.shell__content'),
-        rootMargin: '0px 0px 1200px 0px',
-        threshold: 0
-      }
-    );
-
-    const currentSentinel = sentinelRef.current;
-    if (currentSentinel) {
-      observer.observe(currentSentinel);
-    }
-
-    return () => {
-      if (currentSentinel) {
-        observer.unobserve(currentSentinel);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.paginationMode, state.currentPage, state.totalPages, state.isDataLoading, state.setCurrentPage]);
+  const sentinelRef = useInfiniteScroll({
+    onIntersect: () => state.setCurrentPage(state.currentPage + 1),
+    enabled: state.paginationMode === 'infinite' && state.currentPage < state.totalPages && !state.isDataLoading,
+    root: '.shell__content',
+  });
 
 
 
@@ -146,6 +125,7 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
             setActiveTab={state.setActiveTab}
             searchPlaceholder={state.searchPlaceholder}
             setSearchQuery={state.setSearchQuery}
+            searchQuery={state.searchQuery}
             onAddPeople={modals.openAddPeopleModal}
             onCreateTag={modals.openCreateTagModal}
             showTabs={showTabs}
@@ -280,34 +260,25 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
         </div>
       </div>
 
-      <Drawer
+      <ImagePickerDrawer
         isOpen={!!imagePickerData}
         onClose={() => setImagePickerData(null)}
         title={imagePickerData?.title}
-        size="md"
-        className="entity-detail-page__drawer--poster"
-        variant="glass"
-      >
-        {imagePickerData && (
-          <div className="entity-detail-page__drawer-content entity-detail-page__drawer-content--padded">
-            <UniversalImagePicker
-              entityId={imagePickerData.entityId}
-              tmdbId={imagePickerData.tmdbId}
-              imageType={imagePickerData.imageType}
-              entityType={imagePickerData.entityType}
-              currentPath={imagePickerData.currentPath}
-              t={state.t}
-              toast={toast}
-              externalIds={imagePickerData.externalIds}
-              item={imagePickerData.item}
-              onClose={() => {
-                queryClient.invalidateQueries({ queryKey: QK.library });
-                queryClient.invalidateQueries({ queryKey: QK.libraryCollections });
-              }}
-            />
-          </div>
-        )}
-      </Drawer>
+        entityId={imagePickerData?.entityId}
+        tmdbId={imagePickerData?.tmdbId}
+        imageType={imagePickerData?.imageType}
+        entityType={imagePickerData?.entityType}
+        currentPath={imagePickerData?.currentPath}
+        t={state.t}
+        toast={toast}
+        externalIds={imagePickerData?.externalIds}
+        item={imagePickerData?.item}
+        closeOnSelect={false}
+        onClosePicker={() => {
+          queryClient.invalidateQueries({ queryKey: QK.library });
+          queryClient.invalidateQueries({ queryKey: QK.libraryCollections });
+        }}
+      />
     </Page>
   );
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import './CompactCard.css';
 
 export default function CompactCard({
@@ -17,10 +17,11 @@ export default function CompactCard({
   ...props
 }) {
   const [imageError, setImageError] = useState(false);
-
-  useEffect(() => {
+  const [prevImageUrl, setPrevImageUrl] = useState(imageUrl);
+  if (prevImageUrl !== imageUrl) {
+    setPrevImageUrl(imageUrl);
     setImageError(false);
-  }, [imageUrl]);
+  }
 
   const hasInteractive = typeof onClick === 'function' && !disabled;
   const Component = hasInteractive ? 'button' : 'div';

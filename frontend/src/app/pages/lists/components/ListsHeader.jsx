@@ -62,7 +62,18 @@ export default function ListsHeader({
         <div className="lists-header__top-row">
           <div className="lists-header__left-group">
             <div className="lists-header__cover-container">
-              <div className="lists-header__cover-wrapper" onClick={onImageClick}>
+              <div
+                className="lists-header__cover-wrapper"
+                onClick={onImageClick}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onImageClick(e);
+                  }
+                }}
+              >
                 <ListCollageIcon
                   samplePosters={activeList.sample_posters}
                   listType={activeList.list_type}
@@ -100,20 +111,24 @@ export default function ListsHeader({
                 <span>{t('lists.export') || 'Export JSON'}</span>
               </Button>
             </Tooltip>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={handleStartAddItems}
+            <span
               style={activeList?.color ? {
                 '--button-primary-bg': (activeList.color.includes('success') || activeList.color.includes('warning'))
                   ? `color-mix(in srgb, ${activeList.color} 80%, black)`
                   : activeList.color,
                 '--button-primary-color': '#ffffff',
-              } : null}
+                display: 'contents',
+              } : { display: 'contents' }}
             >
-              <Plus size={14} />
-              <span>{activeList.list_type === 'person' ? (t('lists.add_people') || 'Add People') : (t('lists.add_titles') || 'Add Titles')}</span>
-            </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleStartAddItems}
+              >
+                <Plus size={14} />
+                <span>{activeList.list_type === 'person' ? (t('lists.add_people') || 'Add People') : (t('lists.add_titles') || 'Add Titles')}</span>
+              </Button>
+            </span>
           </div>
         </div>
       </div>

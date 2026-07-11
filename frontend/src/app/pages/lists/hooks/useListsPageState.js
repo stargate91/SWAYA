@@ -23,8 +23,9 @@ export default function useListsPageState() {
   const navigate = useNavigate();
   const { toast, openModal } = useUi();
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
-  const { data: lists = [], isLoading } = useListsQuery(sessionMode === 'nsfw');
   const { data: settings } = useSettingsQuery();
+  const isAdultSettingEnabled = settings?.include_adult === true || settings?.include_adult === 'true';
+  const { data: lists = [], isLoading } = useListsQuery(isAdultSettingEnabled);
 
   const createMutation = useCreateListMutation();
   const updateMutation = useUpdateListMutation();

@@ -30,29 +30,29 @@
 .bespoke-list-panel-watchlist-btn {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-xs, 6px);
-  padding: 4px 10px;
+  gap: var(--space-xs);
+  padding: var(--space-2xs) var(--space-md);
   border-radius: 6px;
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-surface-glass);
+  border: 1px solid var(--color-border-default);
   color: var(--color-text-secondary);
   transition: all var(--motion-fast);
 }
 
 .bespoke-list-panel-watchlist-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: var(--color-surface-glass-strong);
+  border-color: var(--color-border-strong);
   color: var(--color-text-primary);
 }
 
 .bespoke-list-panel-watchlist-btn.is-active {
-  background: color-mix(in srgb, var(--color-accent-blue, #3b82f6) 15%, rgba(0, 0, 0, 0.2));
-  border-color: var(--color-accent-blue, #3b82f6);
-  color: var(--color-accent-blue, #3b82f6);
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-accent-blue, #3b82f6) 20%, transparent);
+  background: color-mix(in srgb, var(--color-accent) 15%, var(--color-surface-overlay));
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-accent) 20%, transparent);
 }
 
 .bespoke-list-panel-content {
@@ -86,7 +86,7 @@
   gap: var(--space-xs);
   max-height: 160px;
   overflow-y: auto;
-  padding-right: 4px;
+  padding-right: var(--space-2xs);
 }
 
 /* Custom Scrollbar for list */
@@ -94,41 +94,41 @@
   width: 4px;
 }
 .bespoke-list-panel-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--app-shell-scrollbar-thumb);
   border-radius: 99px;
 }
 .bespoke-list-panel-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--color-surface-glass-heavy);
 }
 
 .bespoke-list-panel-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
   border-radius: 8px;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border-subtle);
   transition: all var(--motion-fast);
 }
 
 .bespoke-list-panel-item:hover {
-  background: color-mix(in srgb, var(--list-color) 8%, rgba(255, 255, 255, 0.04));
-  border-color: color-mix(in srgb, var(--list-color) 20%, rgba(255, 255, 255, 0.08));
+  background: color-mix(in srgb, var(--list-color) 8%, var(--color-surface-glass));
+  border-color: color-mix(in srgb, var(--list-color) 20%, var(--color-border-default));
 }
 
 .bespoke-list-panel-item.is-added {
-  background: color-mix(in srgb, var(--list-color) 12%, rgba(255, 255, 255, 0.03));
-  border-color: color-mix(in srgb, var(--list-color) 45%, rgba(255, 255, 255, 0.1));
+  background: color-mix(in srgb, var(--list-color) 12%, var(--color-surface-glass));
+  border-color: color-mix(in srgb, var(--list-color) 45%, var(--color-border-strong));
 }
 
 .bespoke-list-panel-item-checkbox {
   width: 16px;
   height: 16px;
   border-radius: 4px;
-  border: 1.5px solid var(--color-border-heavy, rgba(255, 255, 255, 0.2));
-  background: rgba(0, 0, 0, 0.2);
+  border: 1.5px solid var(--color-border-heavy);
+  background: var(--dropdown-search-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -162,8 +162,8 @@
 .bespoke-list-panel-create-form {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 4px;
+  gap: var(--space-sm);
+  margin-top: var(--space-2xs);
   width: 100%;
   box-sizing: border-box;
 }
@@ -226,5 +226,5 @@
 }
 
 .animate-spin {
-  animation: spin 1s linear infinite;
+  animation: spin var(--motion-duration-spinner) var(--motion-ease-linear) infinite;
 }

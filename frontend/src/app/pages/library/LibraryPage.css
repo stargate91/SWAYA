@@ -1247,7 +1247,7 @@
 
 .library-infinite-sentinel {
   height: 30px;
-  margin: 20px 0;
+  margin: var(--space-3xl) 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1261,7 +1261,7 @@
 .library-title-group {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-xs);
 }
 
 .library-nsfw-badge-sup {

@@ -14,11 +14,16 @@ export default function useListsAddDrawer({
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const [isAdultActive, setIsAdultActive] = useState(sessionMode === 'nsfw');
 
-  useEffect(() => {
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  const [prevSessionMode, setPrevSessionMode] = useState(sessionMode);
+
+  if (isOpen !== prevIsOpen || sessionMode !== prevSessionMode) {
+    setPrevIsOpen(isOpen);
+    setPrevSessionMode(sessionMode);
     if (isOpen) {
       setIsAdultActive(sessionMode === 'nsfw');
     }
-  }, [isOpen, sessionMode]);
+  }
 
   const toggleAdultMode = () => {
     setIsAdultActive((prev) => !prev);

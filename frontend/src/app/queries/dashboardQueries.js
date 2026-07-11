@@ -15,7 +15,7 @@ export const useRecommendationsQuery = (language, includeAdult) => useQuery({
 export const useAddToWatchlistMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ tmdbId, type }) => api.recommendations.addToWatchlist(tmdbId, type),
+    mutationFn: ({ tmdbId, mediaItemId, type }) => api.recommendations.addToWatchlist({ tmdbId, mediaItemId, type }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QK.recommendations });
       queryClient.invalidateQueries({ queryKey: QK.lists });

@@ -5,7 +5,6 @@ export default function SettingsSidebar({
   t,
   tabGroups,
   visibleOrganizationTabs,
-  activeOrganizationIndex,
   activeTab,
   isOrgExpanded,
   isOrganizationTabActive,

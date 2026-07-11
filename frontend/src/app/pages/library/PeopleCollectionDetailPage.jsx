@@ -1,20 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { createPortal } from 'react-dom';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
 import { Plus, Minus, ChevronDown, ChevronUp } from '@/ui/icons';
-import Drawer from '@/ui/Drawer';
+import ImagePickerDrawer from './components/ImagePickerDrawer';
 import DetailPageShell from './components/detail/DetailPageShell';
 import EntityDetailTopControls from './components/entityDetail/EntityDetailTopControls';
 import EntityDetailStatusSection from './components/entityDetail/EntityDetailStatusSection';
 import EntityDetailHeroSection from './components/entityDetail/EntityDetailHeroSection';
 import PersonCreditsSections from './components/entityDetail/PersonCreditsSections';
 import CollectionDetailSections from './components/entityDetail/CollectionDetailSections';
-import { CollectionBackdropsPanel } from './components/entityDetail/EntityDetailSections';
 import usePeopleCollectionDetailController from './usePeopleCollectionDetailController.jsx';
-import UniversalImagePicker from './components/UniversalImagePicker';
-import PersonBackdropPickerModal from './components/entityDetail/PersonBackdropPickerModal';
 import UtilityBarBottomPortal from '../../../components/UtilityBarBottomPortal';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import './PeopleCollectionDetailPage.css';
@@ -39,23 +35,14 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
     socialLinks,
     backdropUrl,
     mediaUrl,
-    displayRating,
     isActivateHovered,
-    starsStyleSheetText,
     canChoosePeopleBackdrop,
     canChooseCollectionBackdrop,
     updatePersonStatusMutation,
     setIsActivateHovered,
-    handlePeopleRatingMouseMove,
-    handlePeopleRatingMouseLeave,
-    handlePeopleRatingClick,
     handleToggleFavorite,
     handleToggleActive,
     handleOpenReviewModal,
-    overrideBackdropMutation,
-    uploadBackdropMutation,
-    overridePersonBackdropMutation,
-    uploadPersonBackdropMutation,
   } = usePeopleCollectionDetailController({
     id,
     isPeople,
@@ -186,18 +173,13 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
             overviewText={overviewText}
             overviewTitle={overviewTitle}
             overviewEmptyText={overviewEmptyText}
-            displayRating={displayRating}
             isActivateHovered={isActivateHovered}
-            starsStyleSheetText={starsStyleSheetText}
             t={t}
             openModal={openModal}
             setIsActivateHovered={setIsActivateHovered}
             handleToggleFavorite={handleToggleFavorite}
             handleToggleActive={handleToggleActive}
             handleOpenReviewModal={handleOpenReviewModal}
-            handlePeopleRatingMouseMove={handlePeopleRatingMouseMove}
-            handlePeopleRatingMouseLeave={handlePeopleRatingMouseLeave}
-            handlePeopleRatingClick={handlePeopleRatingClick}
             onMediaCardClick={handleOpenImagePickerModal}
             updatePersonStatusMutation={updatePersonStatusMutation}
             isDrawerOpen={isDetailsDrawerOpen}
@@ -271,62 +253,37 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
       )}
 
       {/* Image Picker Drawer */}
-      <Drawer
+      <ImagePickerDrawer
         isOpen={isImagePickerDrawerOpen}
         onClose={() => setIsImagePickerDrawerOpen(false)}
         title={isPeople ? (t('library.details.changeProfile') || 'Change Profile Picture') : (t('library.details.changePoster') || 'Change Poster')}
-        size="md"
         className="entity-detail-page__drawer--poster"
-        variant="glass"
-      >
-        <div className="entity-detail-page__drawer-content entity-detail-page__drawer-content--padded" style={{ padding: '24px' }}>
-          <UniversalImagePicker
-            entityId={isPeople ? item?.id : `collection_${item?.tmdb_id}`}
-            entityType={isPeople ? 'person' : 'collection'}
-            imageType={isPeople ? 'profile' : 'poster'}
-            externalIds={item?.external_ids}
-            item={item}
-            t={t}
-            toast={toast}
-            onClose={() => setIsImagePickerDrawerOpen(false)}
-            closeOnSelect={false}
-          />
-        </div>
-      </Drawer>
+        entityId={isPeople ? item?.id : `collection_${item?.tmdb_id}`}
+        entityType={isPeople ? 'person' : 'collection'}
+        imageType={isPeople ? 'profile' : 'poster'}
+        externalIds={item?.external_ids}
+        item={item}
+        t={t}
+        toast={toast}
+        closeOnSelect={false}
+      />
 
       {/* Backdrop Picker Drawer */}
-      <Drawer
+      <ImagePickerDrawer
         isOpen={isBackdropDrawerOpen}
         onClose={() => setIsBackdropDrawerOpen(false)}
         title={t('library.details.chooseBackdrop') || 'Choose Backdrop'}
-        size="md"
         className="entity-detail-page__drawer--backdrop"
-        variant="glass"
-      >
-        <div className="entity-detail-page__drawer-content entity-detail-page__drawer-content--padded" style={{ padding: '24px' }}>
-          {isPeople ? (
-            <PersonBackdropPickerModal
-              key={item?.id}
-              personId={item?.id}
-              item={item}
-              t={t}
-              toast={toast}
-              overridePersonBackdropMutation={overridePersonBackdropMutation}
-              uploadPersonBackdropMutation={uploadPersonBackdropMutation}
-            />
-          ) : (
-            <CollectionBackdropsPanel
-              key={item?.tmdb_id}
-              item={item}
-              collectionId={item?.tmdb_id}
-              t={t}
-              toast={toast}
-              overrideBackdropMutation={overrideBackdropMutation}
-              uploadBackdropMutation={uploadBackdropMutation}
-            />
-          )}
-        </div>
-      </Drawer>
+        entityId={isPeople ? item?.id : `collection_${item?.tmdb_id || item?.id}`}
+        tmdbId={isPeople ? undefined : (item?.tmdb_id || item?.id)}
+        item={item}
+        entityType={isPeople ? 'person' : 'collection'}
+        imageType="backdrop"
+        currentPath={item?.backdrop_path}
+        t={t}
+        toast={toast}
+        closeOnSelect={false}
+      />
     </DetailPageShell>
   );
 }

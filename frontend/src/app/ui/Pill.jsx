@@ -1,7 +1,7 @@
 /* eslint-disable react/forbid-component-props */
 import './Pill.css';
 
-export default function Pill({ children, variant = 'default', className = '', as: Component = 'span', customStyle, style, ...props }) {
+export default function Pill({ children, variant = 'default', className = '', as: Component = 'span', customStyle, style, icon, ...props }) {
   const DefaultComponent = props.onClick ? 'button' : Component;
   return (
     <DefaultComponent
@@ -10,7 +10,8 @@ export default function Pill({ children, variant = 'default', className = '', as
       style={customStyle || style}
       {...props}
     >
-      {children}
+      {icon}
+      {icon && children !== undefined ? <span>{children}</span> : children}
     </DefaultComponent>
   );
 }

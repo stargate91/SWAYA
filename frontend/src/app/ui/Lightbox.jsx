@@ -18,6 +18,8 @@ export default function Lightbox({ imageUrl, onClose, t }) {
 
   if (!imageUrl || typeof document === 'undefined') return null;
 
+  const escText = 'ESC';
+
   return createPortal(
     <div
       className="ui-lightbox"
@@ -26,7 +28,7 @@ export default function Lightbox({ imageUrl, onClose, t }) {
       aria-label={t?.('common.close') || 'Close image preview'}
       onClick={onClose}
     >
-      <div className="ui-close-container ui-lightbox__close-container" onClick={(e) => e.stopPropagation()}>
+      <div className="ui-close-container ui-lightbox__close-container" onClick={(e) => e.stopPropagation()} role="presentation">
         <IconButton
           className="ui-close-btn ui-lightbox__close-btn"
           onClick={onClose}
@@ -36,7 +38,7 @@ export default function Lightbox({ imageUrl, onClose, t }) {
         >
           <X size={18} />
         </IconButton>
-        <span className="ui-close-esc-hint">ESC</span>
+        <span className="ui-close-esc-hint">{escText}</span>
       </div>
       <img
         src={imageUrl}

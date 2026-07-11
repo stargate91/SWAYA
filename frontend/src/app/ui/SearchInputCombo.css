@@ -6,31 +6,31 @@
 .search-input-combo--sm .search-input-combo__bar {
   height: 32px;
   border-radius: var(--radius-input, var(--radius-md));
-  padding: 0 var(--space-2, 8px);
+  padding: 0 var(--space-sm);
 }
 
 .search-input-combo--sm .search-input-combo__selector-btn {
-  padding: 2px 6px;
+  padding: calc(var(--space-2xs) / 2) var(--space-xs);
   font-size: 10px;
 }
 
 .search-input-combo--sm .search-input-combo__divider {
-  margin: 0 6px;
+  margin: 0 var(--space-xs);
 }
 
 .search-input-combo--lg .search-input-combo__bar {
   height: var(--ui-control-height-md, 48px);
   border-radius: var(--ui-control-radius, var(--radius-md));
-  padding: 0 var(--space-4, 16px);
+  padding: 0 var(--space-2xl);
 }
 
 .search-input-combo--lg .search-input-combo__selector-btn {
-  padding: 6px 10px;
+  padding: var(--space-xs) var(--space-md);
   font-size: 13px;
 }
 
 .search-input-combo--lg .search-input-combo__divider {
-  margin: 0 12px;
+  margin: 0 var(--space-lg);
   height: 20px;
 }
 
@@ -45,7 +45,7 @@
   background: var(--color-input-bg, var(--ui-control-bg));
   border: 1px solid var(--ui-control-border);
   border-radius: var(--ui-control-radius, var(--radius-md, 12px));
-  padding: 0 var(--space-3, 12px);
+  padding: 0 var(--space-lg);
   transition: all var(--motion-fast);
   box-sizing: border-box;
 }
@@ -67,7 +67,7 @@
 .search-input-combo__selector-btn {
   display: flex;
   align-items: center;
-  gap: var(--space-xs, 6px);
+  gap: var(--space-xs);
   background: none;
   border: none;
   color: var(--color-text-secondary);
@@ -75,7 +75,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 4px 8px;
+  padding: var(--space-2xs) var(--space-sm);
   border-radius: 4px;
   cursor: pointer;
   transition: all var(--motion-fast);
@@ -83,7 +83,7 @@
 
 .search-input-combo__selector-btn:hover {
   color: var(--color-text-primary);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--color-surface-glass);
 }
 
 .search-input-combo__active-icon {
@@ -105,8 +105,8 @@
 .search-input-combo__divider {
   width: 1px;
   height: 14px;
-  background: var(--color-border-default, rgba(255, 255, 255, 0.08));
-  margin: 0 10px;
+  background: var(--color-border-default);
+  margin: 0 var(--space-md);
   flex-shrink: 0;
 }
 
@@ -114,7 +114,7 @@
 .search-input-combo__input-wrapper {
   display: flex;
   align-items: center;
-  gap: var(--space-xs, 6px);
+  gap: var(--space-xs);
   flex: 1;
   position: relative;
   min-width: 0;
@@ -150,23 +150,23 @@
   background: color-mix(in srgb, var(--color-text-inverse) 72%, transparent) !important;
   border: 1px solid color-mix(in srgb, var(--color-text-primary) 9%, transparent) !important;
   border-radius: var(--radius-md, 12px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  box-shadow: var(--dropdown-menu-shadow) !important;
   backdrop-filter: blur(20px) saturate(125%) !important;
   -webkit-backdrop-filter: blur(20px) saturate(125%) !important;
-  padding: 6px;
+  padding: var(--space-xs);
   z-index: 100;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-2xs);
   min-width: 150px;
 }
 
 .search-input-combo__dropdown-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
   width: 100%;
-  padding: 8px 12px;
+  padding: var(--space-sm) var(--space-lg);
   background: transparent;
   border: none;
   border-radius: 6px;
@@ -179,11 +179,11 @@
 
 .search-input-combo__dropdown-item:hover {
   color: var(--color-text-primary);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--color-surface-glass);
 }
 
 .search-input-combo__dropdown-item.is-active {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--color-surface-glass-strong);
   color: var(--color-text-primary);
 }
 

@@ -476,45 +476,7 @@
   min-width: 260px;
 }
 
-.entity-detail-page__specs-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-2) var(--space-3);
-}
 
-.entity-detail-page__specs-item {
-  display: flex;
-  flex-direction: column;
-  --specs-item-gap: 2px;
-  gap: var(--specs-item-gap);
-}
-
-.entity-detail-page__specs-item--full {
-  grid-column: span 2;
-}
-
-.entity-detail-page__specs-item--full .entity-detail-page__specs-value {
-  white-space: normal;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-
-.entity-detail-page__specs-label {
-  font-size: 10px;
-  color: var(--color-text-faint);
-  font-weight: 500;
-  text-transform: uppercase;
-}
-
-.entity-detail-page__specs-value {
-  font-size: 13px;
-  color: var(--color-text-primary);
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
 .entity-detail-page__meta-row {
   display: flex;
@@ -683,38 +645,10 @@
 }
 
 
-.entity-detail-page__media-edit-badge {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-full, 9999px);
-  border: 1px solid color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border));
-  background-color: color-mix(in srgb, var(--app-shell-color-panel) 82%, transparent);
-  background-image: var(--button-secondary-bg);
-  box-shadow: 0 4px 10px color-mix(in srgb, black 22%, transparent);
-  backdrop-filter: blur(10px);
-  opacity: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--button-secondary-color);
-  transition: opacity var(--motion-base), color var(--motion-base), border-color var(--motion-base);
-  z-index: 5;
-  cursor: pointer;
-}
-
-.entity-detail-page__media-card--editable:hover .entity-detail-page__media-edit-badge,
-.entity-detail-page__media-card--editable:focus-within .entity-detail-page__media-edit-badge {
+.entity-detail-page__media-card--editable:hover .ui-image-edit-badge,
+.entity-detail-page__media-card--editable:focus-within .ui-image-edit-badge {
   opacity: 1;
-}
-
-.entity-detail-page__media-edit-badge:hover,
-.entity-detail-page__media-edit-badge:focus-visible {
-  color: var(--color-text-primary);
-  border-color: color-mix(in srgb, var(--color-accent-blue) 72%, var(--button-secondary-border));
-  outline: none;
+  transform: translateY(0);
 }
 
 .entity-detail-page__social-overlay {
@@ -757,55 +691,7 @@
   object-fit: contain;
 }
 
-/* Sliding Drawer Styles */
-.entity-detail-page__drawer-backdrop {
-  z-index: 99999998 !important;
-  top: var(--layout-window-titlebar-height, 46px) !important;
-}
 
-.entity-detail-page__drawer {
-  --drawer-bg: var(--color-surface-overlay, var(--color-panel-strong));
-  background: var(--drawer-bg);
-  z-index: 99999999 !important;
-  top: var(--layout-window-titlebar-height, 46px) !important;
-  height: calc(100vh - var(--layout-window-titlebar-height, 46px)) !important;
-}
-
-@keyframes drawerFadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes drawerSlideIn {
-  from {
-    transform: translateX(100%);
-  }
-
-  to {
-    transform: translateX(0);
-  }
-}
-
-.entity-detail-page__drawer-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-md) var(--space-lg);
-  --drawer-header-border: 1px solid rgba(255, 255, 255, 0.08);
-  border-bottom: var(--drawer-header-border);
-}
-
-.entity-detail-page__drawer-title {
-  margin: 0;
-  font-size: var(--font-size-lg, 18px);
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
 
 
 
@@ -849,11 +735,7 @@
   color: var(--color-text-secondary);
 }
 
-.entity-detail-page__drawer-specs-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3) var(--space-4);
-}
+
 
 /* Segmented Rating Bar under Image */
 .entity-detail-page__segmented-rating-container {
@@ -1246,7 +1128,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 1;
+  flex: 1 !important;
+  width: auto !important;
   /* Stretch action buttons to equal widths */
   height: 36px;
   border-radius: 10px;

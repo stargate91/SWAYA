@@ -129,6 +129,12 @@
   -webkit-backdrop-filter: blur(20px);
 }
 
+.ui-drawer--contrast {
+  background: var(--color-surface-overlay, var(--color-panel-strong)) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
 /* Sizes */
 .ui-drawer--sm {
   width: 320px;
@@ -199,9 +205,9 @@
   width: var(--ui-overlay-close-size, 36px) !important;
   height: var(--ui-overlay-close-size, 36px) !important;
   border-radius: 50% !important;
-  border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.1)) !important;
-  background: var(--ui-overlay-close-bg, rgba(255, 255, 255, 0.03)) !important;
-  color: var(--color-text-secondary, #b3b3b3) !important;
+  border: 1px solid var(--color-border-default) !important;
+  background: var(--ui-overlay-close-bg) !important;
+  color: var(--color-text-secondary) !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -210,8 +216,8 @@
 }
 
 .ui-close-btn:hover {
-  background-color: var(--ui-overlay-close-bg-hover, rgba(255, 255, 255, 0.08)) !important;
-  border-color: var(--color-border-default, rgba(255, 255, 255, 0.2)) !important;
+  background-color: var(--ui-overlay-close-bg-hover) !important;
+  border-color: var(--color-border-default) !important;
   color: var(--color-text-primary, white) !important;
 }
 
@@ -226,8 +232,8 @@
 .ui-close-esc-hint {
   font-size: 9px;
   font-weight: var(--font-weight-bold, 700);
-  color: var(--color-muted, #888);
-  margin-top: 6px;
+  color: var(--color-muted);
+  margin-top: var(--space-xs);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   user-select: none;
@@ -269,7 +275,7 @@
 .ui-overlay__content {
   max-width: var(--ui-overlay-content-max-width, 760px);
   width: 100%;
-  padding: var(--ui-overlay-content-padding, 29px 40px 120px 40px);
+  padding: var(--ui-overlay-content-padding);
   margin: 0 auto;
 }
 
@@ -278,3 +284,48 @@
   right: var(--ui-overlay-close-right, 40px);
   z-index: var(--ui-overlay-close-z, 1010);
 }
+
+/* Generic Description List Primitive */
+.ui-description-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2) var(--space-3);
+}
+
+.ui-description-list--spaced {
+  gap: var(--space-3) var(--space-4);
+}
+
+.ui-description-list__item {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-2xs) / 2);
+}
+
+.ui-description-list__item--full {
+  grid-column: span 2;
+}
+
+.ui-description-list__item--full .ui-description-list__value {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.ui-description-list__label {
+  font-size: 10px;
+  color: var(--color-text-faint);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ui-description-list__value {
+  font-size: 13px;
+  color: var(--color-text-primary);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

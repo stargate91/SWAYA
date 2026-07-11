@@ -172,13 +172,13 @@
   border-radius: var(--radius-sm, 4px) !important;
   border-color: color-mix(in srgb, var(--color-state-danger) 30%, var(--color-border-heavy)) !important;
   background: color-mix(in srgb, var(--color-state-danger) 10%, var(--color-surface-glass)) !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: var(--shadow-sm) !important;
 }
 
 .ui-modal--danger .ui-icon-button-wrapper:hover {
   background: color-mix(in srgb, var(--color-state-danger) 24%, var(--color-surface-glass)) !important;
   border-color: color-mix(in srgb, var(--color-state-danger) 46%, var(--color-border-heavy)) !important;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important;
+  box-shadow: var(--shadow-md) !important;
   transform: translateY(-0.5px) !important;
 }
 

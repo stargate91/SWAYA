@@ -1,13 +1,15 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { usePlayMediaMutation } from '@/queries';
 import { usePersonCreditsQuery, usePersonCreditsInfiniteQuery } from '@/queries/metadataQueries';
 import { usePersonCreditsStore } from '@/stores/usePersonCreditsStore';
 import Spinner from '@/ui/Spinner';
 import { X, Play } from '@/ui/icons';
+import { Tabs } from '@/ui/Tabs';
 import PersonCreditsRow from './PersonCreditsRow';
 import PersonCreditsCard from './PersonCreditsCard';
 import { API_BASE } from '@/lib/backend';
+import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import './PersonCreditsShared.css';
 
 
@@ -92,6 +94,14 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
     return tabs;
   }, [myMovies, myTv, myScenes, t]);
 
+  const formattedLibraryTabs = useMemo(() => {
+    return myLibraryTabs.map((tab) => ({
+      value: tab.id,
+      label: tab.label,
+      count: tab.items.length,
+    }));
+  }, [myLibraryTabs]);
+
   const [activeLibraryTabState, setActiveLibraryTab] = useState('');
 
   const activeLibraryTab = useMemo(() => {
@@ -101,6 +111,25 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
     }
     return myLibraryTabs[0].id;
   }, [myLibraryTabs, activeLibraryTabState]);
+
+  const movieTabs = useMemo(() => {
+    const tabs = [];
+    if (hasTmdbMovies) tabs.push({ value: 'movies_tmdb', label: t('library.details.tmdb') || 'TMDb' });
+    if (item?.is_adult && hasPornDb) tabs.push({ value: 'movies_porndb', label: t('library.details.porndb') || 'PornDB' });
+    return tabs;
+  }, [hasTmdbMovies, hasPornDb, item?.is_adult, t]);
+
+  const tvTabs = useMemo(() => {
+    return [{ value: 'tv', label: t('library.details.tmdb') || 'TMDb' }];
+  }, [t]);
+
+  const sceneTabs = useMemo(() => {
+    const tabs = [];
+    if (hasStashDb) tabs.push({ value: 'scenes_stashdb', label: t('library.details.stashdb') || 'StashDB' });
+    if (hasFansDb) tabs.push({ value: 'scenes_fansdb', label: t('library.details.fansdb') || 'FansDB' });
+    if (item?.is_adult && hasPornDb) tabs.push({ value: 'scenes_porndb', label: t('library.details.porndb') || 'PornDB' });
+    return tabs;
+  }, [hasStashDb, hasFansDb, hasPornDb, item?.is_adult, t]);
 
   // Discover state from Zustand store
   const { activeDiscoverTab, setActiveDiscoverTab } = usePersonCreditsStore();
@@ -152,29 +181,12 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
   const isFetchingNextPage = activeGridQuery.isFetchingNextPage;
 
   // Infinite Scroll Sentinel Observer
-  const observerRef = useRef(null);
-
-  useEffect(() => {
-    const sentinel = observerRef.current;
-    if (!sentinel) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isFetchingNextPage) {
-          activeGridQuery.fetchNextPage();
-        }
-      },
-      {
-        root: sentinel.closest('.person-credits-discover-grid-wrapper'),
-        threshold: 0.1
-      }
-    );
-
-    observer.observe(sentinel);
-    return () => {
-      observer.disconnect();
-    };
-  }, [hasMore, isFetchingNextPage, activeGridQuery]);
+  const observerRef = useInfiniteScroll({
+    onIntersect: () => activeGridQuery.fetchNextPage(),
+    enabled: hasMore && !isFetchingNextPage,
+    root: '.person-credits-discover-grid-wrapper',
+    threshold: 0.1,
+  });
 
   // View mode state: 'library', 'discover' or 'gallery'
   const [viewModeState, setViewMode] = useState('library');
@@ -227,21 +239,12 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
             </div>
 
             <div className="person-credits-discover-groups person-credits-discover-groups-style">
-              <div className="person-credits-discover-group">
-                <div className="person-credits-discover-buttons">
-                  {myLibraryTabs.map((tab) => (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      className={`discover-btn ${activeLibraryTab === tab.id ? 'active' : ''}`}
-                      onClick={() => setActiveLibraryTab(tab.id)}
-                    >
-                      {tab.label}
-                      <span className="person-credits-tab-count person-credits-tab-count-style">{tab.items.length}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <Tabs
+                tabs={formattedLibraryTabs}
+                value={activeLibraryTab}
+                onChange={setActiveLibraryTab}
+                variant="sub"
+              />
             </div>
 
             <div className="person-credits-discover-grid-wrapper">
@@ -288,76 +291,36 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
               {hasMovies && (
                 <div className="person-credits-discover-group">
                   <span className="person-credits-discover-group-title">{t('library.details.movies') || 'Movies'}</span>
-                  <div className="person-credits-discover-buttons">
-                    {hasTmdbMovies && (
-                      <button
-                        type="button"
-                        className={`discover-btn ${activeDiscoverTab === 'movies_tmdb' ? 'active' : ''}`}
-                        onClick={() => setActiveDiscoverTab('movies_tmdb')}
-                      >
-                        {t('library.details.tmdb') || 'TMDb'}
-                      </button>
-                    )}
-                    {item?.is_adult && hasPornDb && (
-                      <button
-                        type="button"
-                        className={`discover-btn ${activeDiscoverTab === 'movies_porndb' ? 'active' : ''}`}
-                        onClick={() => setActiveDiscoverTab('movies_porndb')}
-                      >
-                        {t('library.details.porndb') || 'PornDB'}
-                      </button>
-                    )}
-                  </div>
+                  <Tabs
+                    tabs={movieTabs}
+                    value={activeDiscoverTab}
+                    onChange={setActiveDiscoverTab}
+                    variant="sub"
+                  />
                 </div>
               )}
 
               {hasTv && (
                 <div className="person-credits-discover-group">
                   <span className="person-credits-discover-group-title">{t('library.details.tvShows') || 'TV Shows'}</span>
-                  <div className="person-credits-discover-buttons">
-                    <button
-                      type="button"
-                      className={`discover-btn ${activeDiscoverTab === 'tv' ? 'active' : ''}`}
-                      onClick={() => setActiveDiscoverTab('tv')}
-                    >
-                      {t('library.details.tmdb') || 'TMDb'}
-                    </button>
-                  </div>
+                  <Tabs
+                    tabs={tvTabs}
+                    value={activeDiscoverTab}
+                    onChange={setActiveDiscoverTab}
+                    variant="sub"
+                  />
                 </div>
               )}
 
               {hasScenes && (
                 <div className="person-credits-discover-group">
                   <span className="person-credits-discover-group-title">{t('library.details.scenes') || 'Scenes'}</span>
-                  <div className="person-credits-discover-buttons">
-                    {hasStashDb && (
-                      <button
-                        type="button"
-                        className={`discover-btn ${activeDiscoverTab === 'scenes_stashdb' ? 'active' : ''}`}
-                        onClick={() => setActiveDiscoverTab('scenes_stashdb')}
-                      >
-                        {t('library.details.stashdb') || 'StashDB'}
-                      </button>
-                    )}
-                    {hasFansDb && (
-                      <button
-                        type="button"
-                        className={`discover-btn ${activeDiscoverTab === 'scenes_fansdb' ? 'active' : ''}`}
-                        onClick={() => setActiveDiscoverTab('scenes_fansdb')}
-                      >
-                        {t('library.details.fansdb') || 'FansDB'}
-                      </button>
-                    )}
-                    {item?.is_adult && hasPornDb && (
-                      <button
-                        type="button"
-                        className={`discover-btn ${activeDiscoverTab === 'scenes_porndb' ? 'active' : ''}`}
-                        onClick={() => setActiveDiscoverTab('scenes_porndb')}
-                      >
-                        {t('library.details.porndb') || 'PornDB'}
-                      </button>
-                    )}
-                  </div>
+                  <Tabs
+                    tabs={sceneTabs}
+                    value={activeDiscoverTab}
+                    onChange={setActiveDiscoverTab}
+                    variant="sub"
+                  />
                 </div>
               )}
             </div>

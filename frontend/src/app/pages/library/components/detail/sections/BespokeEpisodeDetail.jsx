@@ -1,5 +1,4 @@
 import { ChevronRight, ChevronLeft, Check, Eye, Play, Clapperboard, Star, Droplets, Trash2 } from '@/ui/icons';
-import IconButton from '@/ui/IconButton';
 import Pill from '@/ui/Pill';
 import PosterCard from '@/ui/PosterCard';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';

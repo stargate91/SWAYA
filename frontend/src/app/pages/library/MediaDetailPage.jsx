@@ -1,10 +1,8 @@
 /* eslint-disable react/forbid-dom-props */
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Image as ImageIcon,
-  ChevronUp, ChevronDown,
-  Maximize2, PenLine,
   Play, Pause
 } from '@/ui/icons';
 import { useTranslation } from '@/providers/LanguageContext';
@@ -44,14 +42,14 @@ import BespokeCompaniesSection from './components/detail/sections/BespokeCompani
 import BespokeRatingsSection from './components/detail/sections/BespokeRatingsSection';
 import CompactWatchStatsSection from './components/detail/sections/CompactWatchStatsSection';
 
-import Drawer from '@/ui/Drawer';
-import UniversalImagePicker from './components/UniversalImagePicker';
-import BackdropSelectorDrawer from './components/detail/modals/BackdropSelectorDrawer';
+import ImagePickerDrawer from './components/ImagePickerDrawer';
 import Lightbox from '@/ui/Lightbox';
+import EditableMediaCard from './components/entityDetail/EditableMediaCard';
 
 import DetailsMetadataDrawer from './components/detail/DetailsMetadataDrawer';
 import BespokeBoxOfficeSection from './components/detail/sections/BespokeBoxOfficeSection';
 import BottomSocialsBar from './components/detail/sections/BottomSocialsBar';
+import ScrollToggleButton from '@/ui/ScrollToggleButton';
 
 
 
@@ -92,12 +90,13 @@ export default function MediaDetailPage({ type = 'movie' }) {
   const [activeSideTab, setActiveSideTab] = useState('activity');
   const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
   const [previewSrc, setPreviewSrc] = useState(null);
-  const containerRef = useRef(null);
-
-  useEffect(() => {
+  const [prevId, setPrevId] = useState(id);
+  if (id !== prevId) {
+    setPrevId(id);
     setIsPreviewPlaying(false);
     setPreviewSrc(null);
-  }, [id]);
+  }
+  const containerRef = useRef(null);
 
   const handleTogglePreview = () => {
     if (isPreviewPlaying) {
@@ -189,41 +188,19 @@ export default function MediaDetailPage({ type = 'movie' }) {
             )}
             {(!state.logoUrl && state.posterUrl && !isScene) ? (
               <div className="media-detail-page__fallback-grid">
-                <div
-                  className="media-detail-page__fallback-poster-col entity-detail-page__media-card--editable"
-                  role="button"
-                  tabIndex={0}
+                <EditableMediaCard
+                  mediaUrl={state.posterUrl}
+                  altText={state.title}
                   onClick={() => {
                     const url = getOriginalPosterUrl();
                     if (url) setLightboxUrl(url);
                   }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      const url = getOriginalPosterUrl();
-                      if (url) setLightboxUrl(url);
-                    }
-                  }}
-                  title={t('library.details.viewOriginalImage') || 'View Original Image'}
-                >
-                  <img src={state.posterUrl} alt={state.title} className="media-detail-page__fallback-poster" />
-                  <div className="entity-detail-page__media-card-hover-overlay">
-                    <div className="entity-detail-page__media-card-hover-icon">
-                      <Maximize2 size={16} />
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    className="entity-detail-page__media-edit-badge"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      handleOpenPosterModal();
-                    }}
-                    title={t('library.details.changePoster') || 'Change Poster'}
-                    aria-label={t('library.details.changePoster') || 'Change Poster'}
-                  >
-                    <PenLine size={14} />
-                  </button>
-                </div>
+                  onEditClick={handleOpenPosterModal}
+                  editTitle={t('library.details.changePoster') || 'Change Poster'}
+                  viewOriginalTitle={t('library.details.viewOriginalImage') || 'View Original Image'}
+                  type="poster"
+                  className="media-detail-page__fallback-poster-col"
+                />
                 <div className="media-detail-page__fallback-content-col">
                   <MediaHeaderInfo isFallbackGrid={true} />
                   <UserRatingSection />
@@ -314,14 +291,11 @@ export default function MediaDetailPage({ type = 'movie' }) {
         </UtilityBarBottomPortal>
 
         <UtilityBarBottomPortal side="center">
-          <button
-            type="button"
-            className="entity-detail-page__scroll-toggle-btn"
+          <ScrollToggleButton
+            isScrolled={isScrolled}
             onClick={handleScrollToggle}
-            title={isScrolled ? (t('library.details.backToProfile') || 'Back to Profile') : (t('library.details.scrollToCredits') || 'Scroll to Details')}
-          >
-            {isScrolled ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-          </button>
+            t={t}
+          />
         </UtilityBarBottomPortal>
 
         <BottomSocialsBar socialLinks={socialLinks} t={t} />
@@ -336,63 +310,53 @@ export default function MediaDetailPage({ type = 'movie' }) {
         t={t}
       />
 
-      <Drawer
+      <ImagePickerDrawer
         isOpen={isLogoDrawerOpen}
         onClose={() => setIsLogoDrawerOpen(false)}
         title={t('library.details.chooseLogo') || 'Choose Logo'}
-        size="md"
         className="entity-detail-page__drawer--logo"
-        variant="glass"
-      >
-        <div className="entity-detail-page__drawer-content" style={{ padding: '24px' }}>
-          <UniversalImagePicker
-            entityId={id}
-            tmdbId={item?.tmdb_id || item?.tv_tmdb_id}
-            imageType="logo"
-            entityType={normalizedType}
-            currentPath={item?.logo_path}
-            t={t}
-            toast={toast}
-            onClose={() => setIsLogoDrawerOpen(false)}
-            closeOnSelect={false}
-            item={item}
-          />
-        </div>
-      </Drawer>
+        entityId={id}
+        tmdbId={item?.tmdb_id || item?.tv_tmdb_id}
+        imageType="logo"
+        entityType={normalizedType}
+        currentPath={item?.logo_path}
+        t={t}
+        toast={toast}
+        item={item}
+        closeOnSelect={false}
+        variant="contrast"
+      />
 
-      <Drawer
+      <ImagePickerDrawer
         isOpen={isPosterDrawerOpen}
         onClose={() => setIsPosterDrawerOpen(false)}
         title={t('library.details.choosePoster') || 'Choose Poster'}
-        size="md"
         className="entity-detail-page__drawer--poster"
-        variant="glass"
-      >
-        <div className="entity-detail-page__drawer-content" style={{ padding: '24px' }}>
-          <UniversalImagePicker
-            entityId={id}
-            tmdbId={item?.tmdb_id || item?.tv_tmdb_id}
-            imageType="poster"
-            entityType={normalizedType}
-            currentPath={item?.poster_path}
-            t={t}
-            toast={toast}
-            onClose={() => setIsPosterDrawerOpen(false)}
-            closeOnSelect={false}
-            item={item}
-          />
-        </div>
-      </Drawer>
+        entityId={id}
+        tmdbId={item?.tmdb_id || item?.tv_tmdb_id}
+        imageType="poster"
+        entityType={normalizedType}
+        currentPath={item?.poster_path}
+        t={t}
+        toast={toast}
+        item={item}
+        closeOnSelect={false}
+      />
 
-      <BackdropSelectorDrawer
+      <ImagePickerDrawer
         isOpen={isBackdropDrawerOpen}
         onClose={() => setIsBackdropDrawerOpen(false)}
-        id={id}
-        normalizedType={normalizedType}
-        detailState={detailState}
+        title={t('library.details.backdrops') || 'Choose Backdrop'}
+        className="entity-detail-page__drawer--backdrop"
+        entityId={id}
+        tmdbId={item?.tmdb_id || item?.tv_tmdb_id}
+        imageType="backdrop"
+        entityType={normalizedType}
+        currentPath={item?.backdrop_path}
         t={t}
-        navigate={navigate}
         toast={toast}
+        item={item}
+        closeOnSelect={false}
       />
 
       <Lightbox

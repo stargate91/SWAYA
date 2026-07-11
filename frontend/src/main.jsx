@@ -75,7 +75,7 @@ const installConsoleLogging = () => {
       let normalizedMessage = '';
       try {
         normalizedMessage = typeof firstArg === 'string' ? firstArg : String(firstArg);
-      } catch (e) {
+      } catch {
         normalizedMessage = '';
       }
 
@@ -102,7 +102,7 @@ const installConsoleLogging = () => {
               originalConsoleError(err);
               try {
                 return String(arg);
-              } catch (e) {
+              } catch {
                 return '[Unformattable Object]';
               }
             }

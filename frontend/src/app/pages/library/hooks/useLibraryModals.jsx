@@ -2,7 +2,7 @@ import { useUi } from '@/providers/UiProvider';
 import Button from '@/ui/Button';
 import AddPeopleModalContent from '../modals/add-people/AddPeopleModalContent';
 import CreateTagModalContent from '../modals/CreateTagModalContent';
-import { Pencil, Tag, Trash2, Users, AlertCircle } from '@/ui/icons';
+import { Pencil, Tag, Trash2, Users } from '@/ui/icons';
 
 export function useLibraryModals({ state, focusedTagName, setFocusedTagName, deleteTagMutation }) {
   const { openModal, closeModal, toast } = useUi();

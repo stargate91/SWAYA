@@ -81,6 +81,10 @@
   box-shadow: 0 0 0 2px var(--color-accent-blue);
 }
 
+.organizer-panel__rename-btn {
+  margin-left: var(--app-shell-space-2);
+}
+
 .organizer-scan-mode {
   display: flex;
   align-items: center;

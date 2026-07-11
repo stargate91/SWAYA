@@ -76,10 +76,6 @@ export function useMatchSearch({ rows = [], t, toast, scanMode }) {
     return getFirstEnabledProvider(providerOptions, fallbackProvider);
   });
 
-  const isSceneModeOrType = scanMode === 'scenes' || primaryRow?.rawType === 'scene' || primaryRow?.rawPayload?.scan_mode === 'scenes';
-  const fallbackProvider = isSceneModeOrType ? 'stashdb' : 'tmdb';
-  const nextProvider = getFirstEnabledProvider(providerOptions, provider || fallbackProvider);
-
   const [prevDeps, setPrevDeps] = useState({
     scanMode,
     rawType: primaryRow?.rawType,
