@@ -1,7 +1,6 @@
 /* eslint-disable react/forbid-dom-props, react/forbid-component-props */
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createPortal } from 'react-dom';
 import { Star, Heart, Edit3, Clapperboard, Tv, Video, Users, CheckCircle } from '@/ui/icons';
 import Page from '@/ui/Page';
 import Badge from '@/ui/Badge';
@@ -10,13 +9,11 @@ import { Tabs } from '@/ui/Tabs';
 import Button from '@/ui/Button';
 import SearchInputCombo from '@/ui/SearchInputCombo';
 import Skeleton from '@/ui/Skeleton';
-import SegmentedControl from '@/ui/SegmentedControl';
 import SegmentedRating from '@/ui/SegmentedRating';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useRatingsPageState } from './useRatingsPageState';
 import LibraryPagination from '../library/components/LibraryPagination';
 import RatingsReviewDrawer from './components/RatingsReviewDrawer';
-import AnalyticsTabContent from './components/AnalyticsTabContent';
 import { useDebounce } from '@/hooks/useDebounce';
 import './RatingsPage.css';
 
@@ -55,18 +52,7 @@ export default function RatingsPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const utilityBarTarget = typeof document !== 'undefined' ? document.getElementById('shell-utility-bar-center') : null;
 
-  // View Mode derived from activeTab
-  const viewMode = state.activeTab === 'analytics' ? 'stats' : 'ratings';
-
-  const handleSetViewMode = (mode) => {
-    if (mode === 'stats') {
-      state.setActiveTab('analytics');
-    } else {
-      state.setActiveTab('unrated');
-    }
-  };
 
   // Local Search Input with Debounce Sync
   const [localSearch, setLocalSearch] = useState(state.searchQuery);
@@ -98,13 +84,7 @@ export default function RatingsPage() {
     { value: 'people', label: t('ratings.subtabs.people', { defaultValue: 'People' }), icon: Users },
   ];
 
-  const distTabs = [
-    { value: 'movies', label: t('ratings.subtabs.movies', { defaultValue: 'Movies' }), icon: Clapperboard },
-    { value: 'tv', label: t('ratings.subtabs.tvShows', { defaultValue: 'TV Shows' }), icon: Tv },
-    ...(state.hasAdultSupport ? [{ value: 'scenes', label: t('ratings.subtabs.scenes', { defaultValue: 'Scenes' }), icon: Video }] : []),
-    { value: 'videos', label: t('library.tabs.videos') || 'Videos', icon: Video },
-    { value: 'people', label: t('ratings.subtabs.people', { defaultValue: 'People' }), icon: Users },
-  ];
+
 
   // Define table columns dynamically based on state
   const columns = [
@@ -211,118 +191,92 @@ export default function RatingsPage() {
 
   return (
     <Page className="organizer-page">
-      {utilityBarTarget && createPortal(
-        <SegmentedControl
-          value={viewMode}
-          onChange={handleSetViewMode}
-          options={[
-            { value: 'ratings', label: t('ratings.viewMode.ratings') || 'Ratings' },
-            { value: 'stats', label: t('ratings.viewMode.stats') || 'Stats' }
-          ]}
-        />,
-        utilityBarTarget
-      )}
       <div className={`organizer-main is-details-hidden ${isAdultMode ? 'organizer-main--nsfw' : ''}`}>
         <div className="organizer-main__content">
-          {viewMode === 'ratings' && (
-            <div className={`organizer-panel ${isAdultMode ? 'organizer-panel--nsfw' : ''}`}>
-              <div className="organizer-panel__row">
-                <span className="organizer-panel__title ratings-title-inline">
-                  {t('ratings.title') || 'Ratings & Reviews'}
-                  {isAdultMode && (
-                    <sup className="ratings-title-sup">
-                      <Badge family="adult" tone="danger" className="ratings-title-adult-badge">
-                        {t('common.adult_badge', { defaultValue: '18+' })}
-                      </Badge>
-                    </sup>
-                  )}
-                </span>
-              </div>
-
-              <div className="organizer-panel__row">
-                <Tabs
-                  tabs={ratingTabs}
-                  value={state.activeTab}
-                  onChange={state.setActiveTab}
-                />
-
-                <SearchInputCombo
-                  placeholder={t('common.search') || 'Search...'}
-                  value={localSearch}
-                  onChange={(e) => setLocalSearch(e.target.value)}
-                  className="organizer-search"
-                  size="sm"
-                />
-              </div>
-
-              <div className="organizer-panel__row">
-                <Tabs
-                  tabs={subTabs}
-                  value={state.mediaType}
-                  onChange={state.setMediaType}
-                  variant="sub"
-                />
-              </div>
+          <div className={`organizer-panel ${isAdultMode ? 'organizer-panel--nsfw' : ''}`}>
+            <div className="organizer-panel__row">
+              <span className="organizer-panel__title ratings-title-inline">
+                {t('ratings.title') || 'Ratings & Reviews'}
+                {isAdultMode && (
+                  <sup className="ratings-title-sup">
+                    <Badge family="adult" tone="danger" className="ratings-title-adult-badge">
+                      {t('common.adult_badge', { defaultValue: '18+' })}
+                    </Badge>
+                  </sup>
+                )}
+              </span>
             </div>
-          )}
+
+            <div className="organizer-panel__row">
+              <Tabs
+                tabs={ratingTabs}
+                value={state.activeTab}
+                onChange={state.setActiveTab}
+              />
+
+              <SearchInputCombo
+                placeholder={t('common.search') || 'Search...'}
+                value={localSearch}
+                onChange={(e) => setLocalSearch(e.target.value)}
+                className="organizer-search"
+                size="sm"
+              />
+            </div>
+
+            <div className="organizer-panel__row">
+              <Tabs
+                tabs={subTabs}
+                value={state.mediaType}
+                onChange={state.setMediaType}
+                variant="sub"
+              />
+            </div>
+          </div>
 
           <div className="organizer-results">
             {/* Upper Pagination Panel */}
-            {viewMode === 'ratings' && (
-              <LibraryPagination
-                state={{
-                  paginatedItems: state.paginatedItems,
-                  shouldShowPagination: state.totalPages > 1,
-                  summaryText: state.totalItems > 0
-                    ? `${(state.currentPage - 1) * state.pageSize + 1}-${Math.min(state.currentPage * state.pageSize, state.totalItems)} / ${state.totalItems}`
-                    : '0-0 / 0',
-                  currentPage: state.currentPage,
-                  totalPages: state.totalPages,
-                  pageSize: state.pageSize,
-                  setCurrentPage: state.setCurrentPage,
-                  setPageSize: state.setPageSize,
-                  t: t
-                }}
-                showPageSizes
-              />
-            )}
+            <LibraryPagination
+              state={{
+                paginatedItems: state.paginatedItems,
+                shouldShowPagination: state.totalPages > 1,
+                summaryText: state.totalItems > 0
+                  ? `${(state.currentPage - 1) * state.pageSize + 1}-${Math.min(state.currentPage * state.pageSize, state.totalItems)} / ${state.totalItems}`
+                  : '0-0 / 0',
+                currentPage: state.currentPage,
+                totalPages: state.totalPages,
+                pageSize: state.pageSize,
+                setCurrentPage: state.setCurrentPage,
+                setPageSize: state.setPageSize,
+                t: t
+              }}
+              showPageSizes
+            />
 
-            {/* Content Tabs */}
-            {viewMode === 'stats' ? (
-              <AnalyticsTabContent
-                state={state}
-                t={t}
-                distTabs={distTabs}
-                effectiveDistTab={effectiveDistTab}
-                setDistTab={setDistTab}
-              />
-            ) : (
-              /* Table of Rated / Unrated items */
-              <div className="organizer-table-block">
-                <div className="organizer-content">
-                  {state.isLoading ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', padding: 'var(--space-md) 0' }}>
-                      {Array.from({ length: 6 }).map((_, idx) => (
-                        <div key={idx} style={{ display: 'flex', gap: 'var(--space-xl)', padding: 'var(--space-lg) var(--space-md)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-md)' }}>
-                          <Skeleton style={{ width: '150px', height: '18px' }} variant="rect" />
-                          <Skeleton style={{ width: '80px', height: '18px' }} variant="rect" />
-                          <Skeleton style={{ width: '100px', height: '18px', marginLeft: 'auto' }} variant="rect" />
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <Table
-                      columns={columns}
-                      rows={state.paginatedItems}
-                      emptyText={t('ratings.table.empty', { defaultValue: 'No items match selected criteria.' })}
-                      sortKey={state.sortKey}
-                      sortDirection={state.sortDirection}
-                      onSort={state.handleSortToggle}
-                    />
-                  )}
-                </div>
+            {/* Table of Rated / Unrated items */}
+            <div className="organizer-table-block">
+              <div className="organizer-content">
+                {state.isLoading ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', padding: 'var(--space-md) 0' }}>
+                    {Array.from({ length: 6 }).map((_, idx) => (
+                      <div key={idx} style={{ display: 'flex', gap: 'var(--space-xl)', padding: 'var(--space-lg) var(--space-md)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-md)' }}>
+                        <Skeleton style={{ width: '150px', height: '18px' }} variant="rect" />
+                        <Skeleton style={{ width: '80px', height: '18px' }} variant="rect" />
+                        <Skeleton style={{ width: '100px', height: '18px', marginLeft: 'auto' }} variant="rect" />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <Table
+                    columns={columns}
+                    rows={state.paginatedItems}
+                    emptyText={t('ratings.table.empty', { defaultValue: 'No items match selected criteria.' })}
+                    sortKey={state.sortKey}
+                    sortDirection={state.sortDirection}
+                    onSort={state.handleSortToggle}
+                  />
+                )}
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>

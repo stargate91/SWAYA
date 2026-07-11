@@ -109,30 +109,49 @@ class PersonEnrichmentQueue:
                     hc_data = detail_service.scrape_healthyceleb(person.id)
                     
                     person_bday = person.birthday
-                    if hasattr(person_bday, "date"):
+                    if person_bday and isinstance(person_bday, str):
+                        try:
+                            from datetime import datetime as dt
+                            person_bday = dt.strptime(person_bday.split("T")[0].strip(), "%Y-%m-%d").date()
+                        except ValueError:
+                            pass
+                    elif hasattr(person_bday, "date"):
                         person_bday = person_bday.date()
                     
                     hc_bday = hc_data.get("date_of_birth")
                     
                     if hc_bday and hc_bday == person_bday:
-                        if hc_data.get("height") and not person.height:
-                            person.height = hc_data["height"]
-                        if hc_data.get("weight") and not person.weight:
-                            person.weight = hc_data["weight"]
-                        if hc_data.get("hair_color") and not person.hair_color:
-                            person.hair_color = hc_data["hair_color"]
-                        if hc_data.get("eye_color") and not person.eye_color:
-                            person.eye_color = hc_data["eye_color"]
+                        is_underage = False
+                        if person_bday:
+                            from datetime import date, timedelta
+                            today = date.today()
+                            try:
+                                threshold = person_bday.replace(year=person_bday.year + 18) + timedelta(days=14)
+                                if threshold > today:
+                                    is_underage = True
+                            except Exception:
+                                pass
+
+                        if not is_underage:
+                            if hc_data.get("height") and not person.height:
+                                person.height = hc_data["height"]
+                            if hc_data.get("weight") and not person.weight:
+                                person.weight = hc_data["weight"]
+                            if hc_data.get("hair_color") and not person.hair_color:
+                                person.hair_color = hc_data["hair_color"]
+                            if hc_data.get("eye_color") and not person.eye_color:
+                                person.eye_color = hc_data["eye_color"]
+                            if hc_data.get("waist") and not person.waist:
+                                person.waist = hc_data["waist"]
+                            if hc_data.get("hip") and not person.hip:
+                                person.hip = hc_data["hip"]
+                            if hc_data.get("cup_size") and not person.cup_size:
+                                person.cup_size = hc_data["cup_size"]
+                            if hc_data.get("band_size") and not person.band_size:
+                                person.band_size = hc_data["band_size"]
+
                         if hc_data.get("ethnicity") and not person.ethnicity:
                             person.ethnicity = hc_data["ethnicity"]
-                        if hc_data.get("waist") and not person.waist:
-                            person.waist = hc_data["waist"]
-                        if hc_data.get("hip") and not person.hip:
-                            person.hip = hc_data["hip"]
-                        if hc_data.get("cup_size") and not person.cup_size:
-                            person.cup_size = hc_data["cup_size"]
-                        if hc_data.get("band_size") and not person.band_size:
-                            person.band_size = hc_data["band_size"]
                         if hc_data.get("place_of_birth") and not person.place_of_birth:
                             person.place_of_birth = hc_data["place_of_birth"]
                         

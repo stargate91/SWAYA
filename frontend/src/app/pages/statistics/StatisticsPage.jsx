@@ -1,21 +1,111 @@
+import { useState, useMemo } from 'react';
 import Page from '@/ui/Page';
+import Badge from '@/ui/Badge';
 import { useTranslation } from '@/providers/LanguageContext';
+import { Clapperboard, Tv, Video, Users } from '@/ui/icons';
 import StatisticsWidget from './StatisticsWidget';
-import LibraryInsightsWidget from './LibraryInsightsWidget';
+import { LibraryDNA, TimeTravelTimeline } from './LibraryInsightsWidget';
+import { RatingsSummary, RatingDistribution } from './components/RatingsAnalytics';
+import { useRatingsPageState } from '../ratings/useRatingsPageState';
+import { useStatsQuery } from '../../queries';
+import { useLibraryModeStore } from '../../stores/useLibraryModeStore';
 import './StatisticsPage.css';
 
 export default function StatisticsPage() {
   const { t } = useTranslation();
+  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
+  const { data: stats = {}, isLoading: statsLoading } = useStatsQuery(sessionMode === 'nsfw');
+  const ratingsState = useRatingsPageState();
+  const [distTab, setDistTab] = useState('movies');
+
+  const isAdultMode = ratingsState.activeSessionMode === 'nsfw';
+  const effectiveDistTab = !isAdultMode && distTab === 'scenes' ? 'movies' : distTab;
+
+  const distTabs = [
+    { value: 'movies', label: t('ratings.subtabs.movies', { defaultValue: 'Movies' }), icon: Clapperboard },
+    { value: 'tv', label: t('ratings.subtabs.tvShows', { defaultValue: 'TV Shows' }), icon: Tv },
+    ...(ratingsState.hasAdultSupport ? [{ value: 'scenes', label: t('ratings.subtabs.scenes', { defaultValue: 'Scenes' }), icon: Video }] : []),
+    { value: 'videos', label: t('library.tabs.videos') || 'Videos', icon: Video },
+    { value: 'people', label: t('ratings.subtabs.people', { defaultValue: 'People' }), icon: Users },
+  ];
+
+  const insightTitleCount = useMemo(
+    () => Object.values(stats?.decade_distribution || {}).reduce((sum, value) => sum + Number(value || 0), 0),
+    [stats?.decade_distribution]
+  );
+
+  const pageTitle = (
+    <span className="ratings-title-inline" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+      {t('sidebar.statistics') || 'Statistics'}
+      {isAdultMode && (
+        <sup className="ratings-title-sup" style={{ fontSize: '0.45em', top: '-0.7em', position: 'relative' }}>
+          <Badge family="adult" tone="danger" className="ratings-title-adult-badge" style={{ padding: '2px 6px', fontSize: '11px' }}>
+            {t('common.adult_badge', { defaultValue: '18+' })}
+          </Badge>
+        </sup>
+      )}
+    </span>
+  );
 
   return (
     <Page
-      title={t('sidebar.statistics') || 'Statistics'}
+      title={pageTitle}
       description={t('statistics.description') || 'Visual overview and breakdown of your media library'}
       className="statistics-page-container"
     >
       <div className="statistics-page-content">
-        <StatisticsWidget T={t} />
-        <LibraryInsightsWidget T={t} />
+        {/* Section 1: Overview */}
+        <section className="stats-section">
+          <h2 className="stats-section-title">{t('statistics.sections.overview') || 'Overview'}</h2>
+          <StatisticsWidget T={t} />
+        </section>
+
+        {/* Section 2: Ratings & Reviews */}
+        <section className="stats-section">
+          <h2 className="stats-section-title">{t('statistics.sections.ratings') || 'Ratings & Reviews'}</h2>
+          <div className="statistics-bento-grid">
+            {/* Box 1: Ratings Averages and Counts */}
+            <div className="bento-box bento-box--ratings-summary">
+              <RatingsSummary state={ratingsState} t={t} />
+            </div>
+
+            {/* Box 2: Rating Distribution Chart */}
+            <div className="bento-box bento-box--ratings-dist">
+              <RatingDistribution
+                state={ratingsState}
+                t={t}
+                distTabs={distTabs}
+                effectiveDistTab={effectiveDistTab}
+                setDistTab={setDistTab}
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Section 3: Library DNA & Timeline */}
+        <section className="stats-section">
+          <h2 className="stats-section-title">{t('statistics.sections.insights') || 'Library DNA & Timeline'}</h2>
+          <div className="statistics-bento-grid">
+            {/* Box 3: Library DNA Radar */}
+            <div className="bento-box bento-box--dna">
+              <LibraryDNA
+                constellation={stats?.genre_constellation}
+                genres={stats?.genre_distribution}
+                insightTitleCount={insightTitleCount}
+                T={t}
+              />
+            </div>
+
+            {/* Box 4: Time Travel Timeline */}
+            <div className="bento-box bento-box--timeline">
+              <TimeTravelTimeline
+                decades={stats?.decade_distribution}
+                insightTitleCount={insightTitleCount}
+                T={t}
+              />
+            </div>
+          </div>
+        </section>
       </div>
     </Page>
   );

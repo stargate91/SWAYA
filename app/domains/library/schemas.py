@@ -147,6 +147,7 @@ class LibraryStatsResponse(BaseModel):
     total_tv: int
     total_episodes: int
     total_scenes: int
+    total_videos: Optional[int] = 0
     storage: str
     drive_count: int
     unmatched: int

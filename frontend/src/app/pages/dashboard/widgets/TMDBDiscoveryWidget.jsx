@@ -10,7 +10,7 @@ import {
 } from '../../../queries/dashboardQueries';
 import Button from '../../../ui/Button';
 import Dropdown from '../../../ui/Dropdown';
-import DashboardWidgetShell from './DashboardWidgetShell';
+import WidgetShell from '@/ui/WidgetShell';
 import { API_BASE } from '../../../lib/backend';
 import PosterCard from '../../../ui/PosterCard';
 
@@ -189,7 +189,7 @@ const TMDBDiscoveryWidget = ({ T }) => {
         </div>
       </div>
 
-      <DashboardWidgetShell loading={loading} size="lg" transparent={true}>
+      <WidgetShell loading={loading} size="lg" transparent={true}>
         {items.length === 0 ? (
           <div className="recommend-carousel-no-results">
             {T('dashboard.recommendations.discovery_no_results') || 'No popular movies found matching filters.'}
@@ -268,7 +268,7 @@ const TMDBDiscoveryWidget = ({ T }) => {
             </div>
           </div>
         )}
-      </DashboardWidgetShell>
+      </WidgetShell>
     </div>
   );
 };

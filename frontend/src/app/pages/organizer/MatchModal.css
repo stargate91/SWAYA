@@ -929,6 +929,79 @@
   z-index: 3;
 }
 
+/* Skeletons */
+.organizer-match-modal__skeleton-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  width: 100%;
+}
+
+.organizer-match-modal__skeleton-list-item {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 12px;
+}
+
+.organizer-match-modal__skeleton-image {
+  flex-shrink: 0;
+  border-radius: 6px;
+}
+
+.organizer-match-modal__skeleton-text-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  flex: 1;
+  justify-content: center;
+}
+
+.organizer-match-modal__skeleton-poster-container {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.organizer-match-modal__skeleton-image--scene {
+  width: 120px;
+  height: 68px;
+}
+
+.organizer-match-modal__skeleton-image--poster {
+  width: 75px;
+  height: 100px;
+}
+
+.organizer-match-modal__skeleton-card--scene {
+  width: 240px;
+  height: 135px;
+}
+
+.organizer-match-modal__skeleton-card--poster {
+  width: 130px;
+  height: 180px;
+}
+
+.organizer-match-modal__skeleton-text-title {
+  height: 18px;
+  width: 40%;
+}
+
+.organizer-match-modal__skeleton-text-subtitle {
+  height: 14px;
+  width: 20%;
+}
+
+.organizer-match-modal__skeleton-text-body {
+  height: 14px;
+  width: 90%;
+}
+
 
 
 

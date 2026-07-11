@@ -299,5 +299,28 @@ class PeopleDetailService:
 
         extracted["source_url"] = url
 
+        # Child protection check: filter out physical fields if underage (SFW < 18y + 2w)
+        if not person.is_adult:
+            effective_bday = person.birthday
+            if effective_bday and isinstance(effective_bday, str):
+                try:
+                    effective_bday = datetime.strptime(effective_bday.split("T")[0].strip(), "%Y-%m-%d").date()
+                except ValueError:
+                    pass
+            elif hasattr(effective_bday, "date"):
+                effective_bday = effective_bday.date()
+
+            effective_bday = effective_bday or extracted.get("date_of_birth")
+            if effective_bday:
+                from datetime import date, timedelta
+                today = date.today()
+                try:
+                    threshold = effective_bday.replace(year=effective_bday.year + 18) + timedelta(days=14)
+                    if threshold > today:
+                        for k in ["height", "weight", "hair_color", "eye_color", "measurements", "cup_size", "band_size", "waist", "hip", "breast_type", "butt_shape", "butt_size"]:
+                            extracted.pop(k, None)
+                except Exception:
+                    pass
+
         return extracted
 

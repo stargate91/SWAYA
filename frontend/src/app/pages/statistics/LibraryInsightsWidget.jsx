@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import DashboardWidgetShell from '../dashboard/widgets/DashboardWidgetShell';
+import WidgetShell from '@/ui/WidgetShell';
 import { useStatsQuery } from '../../queries';
 import { useLibraryModeStore } from '../../stores/useLibraryModeStore';
 import './LibraryInsightsWidget.css';
@@ -26,7 +26,7 @@ const RADAR_GENRE_LIMIT = 6;
 const MIN_DNA_TITLES = 4;
 const MIN_TIMELINE_TITLES = 5;
 
-const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
+export const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
   const insightData = useMemo(() => {
     const sanitizeNodes = (nodes = []) => (
       nodes.filter((node) => isSingleGenreLabel(node?.label))
@@ -108,7 +108,6 @@ const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
   return (
     <div className="insights-panel">
       <h3 className="insights-panel-title">
-        <span className="insights-panel-dot is-pink" />
         {T('statistics.stats.library_dna') || 'Library DNA'}
       </h3>
       {hasEnoughData ? (
@@ -212,7 +211,7 @@ LibraryDNA.propTypes = {
   T: PropTypes.func.isRequired,
 };
 
-const TimeTravelTimeline = ({ decades, insightTitleCount, T }) => {
+export const TimeTravelTimeline = ({ decades, insightTitleCount, T }) => {
   if (!decades || Object.keys(decades).length === 0) return null;
   const sorted = Object.entries(decades).sort((a, b) => a[0].localeCompare(b[0]));
   const maxCount = Math.max(...sorted.map(([, count]) => count));
@@ -227,7 +226,6 @@ const TimeTravelTimeline = ({ decades, insightTitleCount, T }) => {
   return (
     <div className="insights-panel">
       <h3 className="insights-panel-title">
-        <span className="insights-panel-dot is-blue" />
         {T('statistics.stats.timeline') || 'Time Travel'}
       </h3>
       <p className="insights-panel-subtitle">
@@ -300,7 +298,7 @@ const LibraryInsightsWidget = ({ T, showDna = true, showTimeline = true }) => {
   }
 
   return (
-    <DashboardWidgetShell loading={isLoading} size="lg" transparent={true}>
+    <WidgetShell loading={isLoading} size="lg" transparent={true}>
       <div className="insights-layout">
         {showDna && (
           <LibraryDNA
@@ -318,7 +316,7 @@ const LibraryInsightsWidget = ({ T, showDna = true, showTimeline = true }) => {
           />
         )}
       </div>
-    </DashboardWidgetShell>
+    </WidgetShell>
   );
 };
 

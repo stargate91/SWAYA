@@ -202,8 +202,36 @@ def save_custom_fields(
         db.add(manual_link)
         person.external_links.append(manual_link)
 
+    # Check if target birthday makes them underage (under 18y + 2w)
+    target_birthday = payload.fields.get("birthday") if "birthday" in payload.fields else person.birthday
+    is_underage = False
+    if target_birthday:
+        from datetime import date, datetime as dt, timedelta
+        parsed_bday = None
+        if isinstance(target_birthday, str):
+            try:
+                parsed_bday = dt.strptime(target_birthday.split("T")[0].strip(), "%Y-%m-%d").date()
+            except ValueError:
+                pass
+        elif hasattr(target_birthday, "date"):
+            parsed_bday = target_birthday.date()
+        
+        if parsed_bday:
+            today = date.today()
+            try:
+                threshold = parsed_bday.replace(year=parsed_bday.year + 18) + timedelta(days=14)
+                if threshold > today:
+                    is_underage = True
+            except Exception:
+                pass
+
+    if person.is_adult and is_underage:
+        raise HTTPException(status_code=400, detail="NSFW performers must be at least 18 years and 2 weeks old.")
+
     source_data = dict(manual_link.source_data or {})
     for k, v in payload.fields.items():
+        if not person.is_adult and is_underage and k in ["height", "weight", "hair_color", "eye_color", "measurements", "cup_size", "band_size", "waist", "hip", "breast_type", "butt_shape", "butt_size"]:
+            continue
         if v == "" or v is None or v == {}:
             source_data.pop(k, None)
             if k == "biography" or k == "biographies":

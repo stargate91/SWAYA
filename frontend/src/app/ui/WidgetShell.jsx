@@ -1,12 +1,13 @@
 /* eslint-disable react/forbid-dom-props, react/forbid-component-props */
 import PropTypes from 'prop-types';
 import Skeleton from '@/ui/Skeleton';
+import './WidgetShell.css';
 
-const DashboardWidgetShell = ({ children, loading, size, transparent }) => {
+const WidgetShell = ({ children, loading, size, transparent }) => {
   return (
-    <div className={`dashboard-widget dashboard-widget--${size || 'md'} ${transparent ? 'dashboard-widget--transparent' : ''}`}>
+    <div className={`widget-shell widget-shell--${size || 'md'} ${transparent ? 'widget-shell--transparent' : ''}`}>
       {loading ? (
-        <div className="dashboard-widget__loading-skeleton" style={{ padding: 'var(--space-xl) 0', width: '100%' }}>
+        <div className="widget-shell__loading-skeleton" style={{ padding: 'var(--space-xl) 0', width: '100%' }}>
           <div style={{ width: '150px', marginBottom: 'var(--space-xl)' }}>
             <Skeleton.Title style={{ marginBottom: 0 }} />
           </div>
@@ -24,17 +25,17 @@ const DashboardWidgetShell = ({ children, loading, size, transparent }) => {
           )}
         </div>
       ) : (
-        <div className="dashboard-widget__content">{children}</div>
+        <div className="widget-shell__content">{children}</div>
       )}
     </div>
   );
 };
 
-DashboardWidgetShell.propTypes = {
+WidgetShell.propTypes = {
   children: PropTypes.node,
   loading: PropTypes.bool,
   size: PropTypes.oneOf(['sm', 'md', 'lg']),
   transparent: PropTypes.bool,
 };
 
-export default DashboardWidgetShell;
+export default WidgetShell;

@@ -196,30 +196,47 @@ export default function OrganizerMatchModalContent({
             ) : null}
 
             {isBrowserLoading || isSearching ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 'var(--space-md)', padding: 'var(--space-md) 0', width: '100%' }}>
-                {Array.from({ length: 6 }).map((_, idx) => (
-                  <Skeleton.Card key={idx} style={{ width: '100%', height: '180px', minWidth: 0 }} />
-                ))}
-              </div>
+              hasSearched ? (
+                <div className="organizer-match-modal__skeleton-list-container">
+                  {Array.from({ length: 3 }).map((_, idx) => (
+                    <div key={idx} className="organizer-match-modal__skeleton-list-item">
+                      <Skeleton className={`organizer-match-modal__skeleton-image ${mode === 'scene' ? 'organizer-match-modal__skeleton-image--scene' : 'organizer-match-modal__skeleton-image--poster'}`} variant="rect" />
+                      <div className="organizer-match-modal__skeleton-text-container">
+                        <Skeleton className="organizer-match-modal__skeleton-text-title" variant="text" />
+                        <Skeleton className="organizer-match-modal__skeleton-text-subtitle" variant="text" />
+                        <Skeleton className="organizer-match-modal__skeleton-text-body" variant="text" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="organizer-match-modal__skeleton-poster-container">
+                  {Array.from({ length: 6 }).map((_, idx) => (
+                    <Skeleton.Card key={idx} className={mode === 'scene' ? 'organizer-match-modal__skeleton-card--scene' : 'organizer-match-modal__skeleton-card--poster'} />
+                  ))}
+                </div>
+              )
             ) : isResolvingId ? (
               <Spinner label={t('organizer.details.matchModal.applying')} />
             ) : null}
 
-            <MatchModalResults
-              results={results}
-              visibleResultCandidates={visibleResultCandidates}
-              shouldShowPosterResults={shouldShowPosterResults}
-              shouldShowListResults={shouldShowListResults}
-              mode={mode}
-              isResolvingId={isResolvingId}
-              isBrowserLoading={isBrowserLoading}
-              isSearching={isSearching}
-              onCandidateSelect={handleCandidateSelect}
-              row={row}
-              t={t}
-              hasSearched={hasSearched}
-              view={browserState.view}
-            />
+            {!isBrowserLoading && !isSearching ? (
+              <MatchModalResults
+                results={results}
+                visibleResultCandidates={visibleResultCandidates}
+                shouldShowPosterResults={shouldShowPosterResults}
+                shouldShowListResults={shouldShowListResults}
+                mode={mode}
+                isResolvingId={isResolvingId}
+                isBrowserLoading={isBrowserLoading}
+                isSearching={isSearching}
+                onCandidateSelect={handleCandidateSelect}
+                row={row}
+                t={t}
+                hasSearched={hasSearched}
+                view={browserState.view}
+              />
+            ) : null}
 
             <MatchModalBrowser
               browserState={browserState}

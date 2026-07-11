@@ -40,22 +40,28 @@ class LibraryStatsService:
             MetadataMatch.media_type == MediaType.MOVIE,
             MetadataMatch.is_active
         )
-        if not include_adult:
+        if include_adult:
+            movie_query = movie_query.filter(MetadataMatch.is_adult)
+        else:
             movie_query = movie_query.filter(~MetadataMatch.is_adult)
         total_movies = movie_query.scalar() or 0
 
         # Resolve TV Shows count by climbing the parent hierarchy from active episodes
+        episode_match_query = self.db.query(MetadataMatch.parent_id).join(
+            MediaItem, MetadataMatch.media_item_id == MediaItem.id
+        ).filter(
+            MediaItem.status.in_(library_statuses),
+            MetadataMatch.media_type == MediaType.EPISODE,
+            MetadataMatch.parent_id.isnot(None),
+            MetadataMatch.is_active
+        )
+        if include_adult:
+            episode_match_query = episode_match_query.filter(MetadataMatch.is_adult)
+        else:
+            episode_match_query = episode_match_query.filter(~MetadataMatch.is_adult)
+
         parent_ids = set()
-        current_parents = {
-            r[0] for r in self.db.query(MetadataMatch.parent_id).join(
-                MediaItem, MetadataMatch.media_item_id == MediaItem.id
-            ).filter(
-                MediaItem.status.in_(library_statuses),
-                MetadataMatch.media_type == MediaType.EPISODE,
-                MetadataMatch.parent_id.isnot(None),
-                MetadataMatch.is_active
-            ).all()
-        }
+        current_parents = {r[0] for r in episode_match_query.all()}
         while current_parents:
             parent_ids.update(current_parents)
             current_parents = {
@@ -70,7 +76,9 @@ class LibraryStatsService:
             MetadataMatch.media_type == MediaType.TV,
             MetadataMatch.is_active
         )
-        if not include_adult:
+        if include_adult:
+            tv_count_query = tv_count_query.filter(MetadataMatch.is_adult)
+        else:
             tv_count_query = tv_count_query.filter(~MetadataMatch.is_adult)
         total_tv = tv_count_query.scalar() or 0
 
@@ -81,7 +89,9 @@ class LibraryStatsService:
             MetadataMatch.media_type == MediaType.EPISODE,
             MetadataMatch.is_active
         )
-        if not include_adult:
+        if include_adult:
+            episodes_query = episodes_query.filter(MetadataMatch.is_adult)
+        else:
             episodes_query = episodes_query.filter(~MetadataMatch.is_adult)
         total_episodes = episodes_query.scalar() or 0
 
@@ -96,17 +106,21 @@ class LibraryStatsService:
         include_adult_setting_val = settings_adapter.get_setting("include_adult", user_id=current_user_id)
         include_adult_setting = str(include_adult_setting_val).lower() == "true"
 
-        total_scenes = 0
-        if include_adult_setting and include_adult:
-            scenes_query = self.db.query(func.count(MediaItem.id)).select_from(MediaItem).join(
-                MetadataMatch, (MetadataMatch.media_item_id == MediaItem.id)
-            ).filter(
-                MediaItem.status.in_(library_statuses),
-                MetadataMatch.media_type == MediaType.SCENE,
-                MetadataMatch.is_active,
-                MetadataMatch.is_adult
-            )
+        scenes_query = self.db.query(func.count(MediaItem.id)).select_from(MediaItem).join(
+            MetadataMatch, (MetadataMatch.media_item_id == MediaItem.id)
+        ).filter(
+            MediaItem.status.in_(library_statuses),
+            MetadataMatch.media_type == MediaType.SCENE,
+            MetadataMatch.is_active
+        )
+        if include_adult:
+            scenes_query = scenes_query.filter(MetadataMatch.is_adult)
+            total_scenes = scenes_query.filter(MetadataMatch.is_home_video == False).scalar() or 0
+            total_videos = scenes_query.filter(MetadataMatch.is_home_video == True).scalar() or 0
+        else:
+            scenes_query = scenes_query.filter(~MetadataMatch.is_adult)
             total_scenes = scenes_query.scalar() or 0
+            total_videos = 0
 
         # Calculate storage sizes
         items = self.db.query(MediaItem).select_from(MediaItem).join(MetadataMatch).filter(
@@ -138,8 +152,12 @@ class LibraryStatsService:
                 elif m.media_type == MediaType.SCENE:
                     is_scene = True
 
-            if is_adult_item and not include_adult:
-                continue
+            if include_adult:
+                if not is_adult_item:
+                    continue
+            else:
+                if is_adult_item:
+                    continue
 
             if is_tv:
                 tv_bytes += size
@@ -152,9 +170,44 @@ class LibraryStatsService:
         storage_str = self._format_size(total_bytes)
 
         # Unmatched / manual reviews
-        unmatched = self.db.query(func.count(MediaItem.id)).filter(
+        unmatched_items = self.db.query(MediaItem).filter(
             MediaItem.status.in_([ItemStatus.NEW, ItemStatus.ERROR, ItemStatus.NO_MATCH, ItemStatus.UNCERTAIN, ItemStatus.MULTIPLE])
-        ).scalar() or 0
+        ).options(joinedload(MediaItem.matches)).all()
+
+        unmatched = 0
+        unmatched_new = 0
+        unmatched_error = 0
+        unmatched_uncertain = 0
+        unmatched_no_match = 0
+        unmatched_multiple = 0
+
+        for item in unmatched_items:
+            # Check if item is adult
+            item_scan_mode = (item.parsed_info or {}).get("scan_mode") or ""
+            if str(item_scan_mode).strip().lower() in {"scenes", "porndb_movie"}:
+                is_adult = True
+            else:
+                active_match = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
+                is_adult = active_match.is_adult if active_match else False
+
+            if include_adult:
+                if not is_adult:
+                    continue
+            else:
+                if is_adult:
+                    continue
+
+            unmatched += 1
+            if item.status == ItemStatus.NEW:
+                unmatched_new += 1
+            elif item.status == ItemStatus.ERROR:
+                unmatched_error += 1
+            elif item.status == ItemStatus.UNCERTAIN:
+                unmatched_uncertain += 1
+            elif item.status == ItemStatus.NO_MATCH:
+                unmatched_no_match += 1
+            elif item.status == ItemStatus.MULTIPLE:
+                unmatched_multiple += 1
 
         # Dynamic genre and decade calculations
         matches = self.db.query(MetadataMatch).join(
@@ -169,9 +222,16 @@ class LibraryStatsService:
         seen_tv = set()
         unique_matches = []
         for m in matches:
-            if not include_adult and m.is_adult:
-                continue
+            if include_adult:
+                if not m.is_adult:
+                    continue
+            else:
+                if m.is_adult:
+                    continue
+
             if m.media_type == MediaType.MOVIE:
+                unique_matches.append(m)
+            elif m.media_type == MediaType.SCENE:
                 unique_matches.append(m)
             elif m.media_type == MediaType.EPISODE:
                 tv_match = None
@@ -181,8 +241,6 @@ class LibraryStatsService:
                     tv_match = m.parent
                 
                 if tv_match:
-                    if not include_adult and tv_match.is_adult:
-                        continue
                     if tv_match.id not in seen_tv:
                         seen_tv.add(tv_match.id)
                         unique_matches.append(tv_match)
@@ -208,9 +266,18 @@ class LibraryStatsService:
                 decade_dist[decade_str] = decade_dist.get(decade_str, 0) + 1
 
             # Genres
-            loc = m.localizations[0] if m.localizations else None
-            if loc and loc.genres:
-                split_names = _split_genres(loc.genres)
+            split_names = []
+            if include_adult and m.is_adult and m.suggested_tags:
+                for t in m.suggested_tags:
+                    if t:
+                        truncated = t if len(t) <= 20 else t[:17] + "..."
+                        split_names.append(truncated)
+            else:
+                loc = m.localizations[0] if m.localizations else None
+                if loc and loc.genres:
+                    split_names = _split_genres(loc.genres)
+
+            if split_names:
                 unique_genre_keys = []
                 for name in split_names:
                     genre_key = name
@@ -256,6 +323,7 @@ class LibraryStatsService:
             total_tv=total_tv,
             total_episodes=total_episodes,
             total_scenes=total_scenes,
+            total_videos=total_videos,
             storage=storage_str,
             drive_count=len(drives) or 1,
             unmatched=unmatched,
@@ -267,11 +335,11 @@ class LibraryStatsService:
             },
             manual_review_total=unmatched,
             manual_review_breakdown={
-                "new": self.db.query(func.count(MediaItem.id)).filter(MediaItem.status == ItemStatus.NEW).scalar() or 0,
-                "error": self.db.query(func.count(MediaItem.id)).filter(MediaItem.status == ItemStatus.ERROR).scalar() or 0,
-                "uncertain": self.db.query(func.count(MediaItem.id)).filter(MediaItem.status == ItemStatus.UNCERTAIN).scalar() or 0,
-                "no_match": self.db.query(func.count(MediaItem.id)).filter(MediaItem.status == ItemStatus.NO_MATCH).scalar() or 0,
-                "multiple": self.db.query(func.count(MediaItem.id)).filter(MediaItem.status == ItemStatus.MULTIPLE).scalar() or 0
+                "new": unmatched_new,
+                "error": unmatched_error,
+                "uncertain": unmatched_uncertain,
+                "no_match": unmatched_no_match,
+                "multiple": unmatched_multiple
             },
             genre_distribution=genre_dist,
             genre_distribution_ids=genre_dist_ids,

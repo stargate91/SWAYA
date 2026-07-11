@@ -1,16 +1,26 @@
 {
   "description": "Visual overview and breakdown of your media library",
+  "sections": {
+    "overview": "Overview",
+    "ratings": "Ratings & Reviews",
+    "insights": "Library DNA & Timeline"
+  },
   "stats": {
     "total_movies": "Total Movies",
     "movies_sub": "In Library",
     "total_scenes": "Total Scenes",
     "scenes_sub": "Scenes in library",
+    "total_videos": "Total Videos",
+    "videos_sub": "Videos in library",
     "tv_series": "TV Shows",
+    "total_tv": "TV Shows",
+    "tv_sub": "{count} Episodes",
     "episodes_sub": "Episodes",
     "storage_used": "Storage Used",
     "storage_sub": "across {count} drives",
     "unmatched": "Unmatched",
     "unmatched_sub": "Pending in Organizer",
+    "total_scenes_videos": "Scenes & Videos",
     "library_dna": "Library DNA",
     "timeline": "Time-Travel Timeline",
     "decade_label": "{decade}s",
