@@ -676,8 +676,10 @@ export default function AboutPage() {
         },
         {
           title: t('about.docs_wizard.features_tour.dashboard_details.widgets_title') || 'Context-Sensitive Content Widgets',
-          description: t('about.docs_wizard.features_tour.dashboard_details.widgets_desc') || 'Includes Continue Watching, Trending (Spotlight), Fresh Arrivals, lately tracked artists/stars, and recommendations. Adapts dynamically to SFW/NSFW session settings.',
-          image: '/documentations/dashboard/dashboard4.png'
+          description: t('about.docs_wizard.features_tour.dashboard_details.widgets_desc') || 'Includes Continue Watching, Trending (Spotlight), Fresh Arrivals, lately tracked artists, and recommendations.',
+          description_nsfw: (t('about.docs_wizard.features_tour.dashboard_details.widgets_desc') || 'Includes Continue Watching, Trending (Spotlight), Fresh Arrivals, lately tracked artists, and recommendations.') + '\n\nIn NSFW mode, SFW widgets are updated to show adult stars, and recommendations are adjusted accordingly.',
+          image: '/documentations/dashboard/dashboard4.png',
+          image_nsfw: '/documentations/dashboard/dashboard4_nsfw.png'
         },
         {
           title: t('about.docs_wizard.features_tour.dashboard_details.adult_widget_title') || 'Adult Recommendations',
@@ -692,14 +694,77 @@ export default function AboutPage() {
       icon: <FolderSync size={16} />,
       title: t('about.docs_wizard.features_tour.organizer_title') || 'Organizer',
       description: t('about.docs_wizard.features_tour.organizer_desc') || 'The control center for scanning and sorting. Input folder paths to parse video metadata, index files offline, check collisions, and match videos with online databases.',
-      image: '/documentations/features/organizer.png'
+      image: '/documentations/features/organizer.png',
+      details: [
+        {
+          title: t('about.docs_wizard.features_tour.organizer_details.modes_title') || 'Scan Modes',
+          description: t('about.docs_wizard.features_tour.organizer_details.modes_desc') || 'Run directory scans across Movies & TV Shows (TMDb) or Offline lists depending on your library setup. In SFW mode, the Offline scan organizes files under a general \'Videos\' tab, which dynamically converts to a \'Scenes\' tab when the application\'s global NSFW toggle is active.',
+          description_nsfw: t('about.docs_wizard.features_tour.organizer_details.modes_desc_nsfw') || 'Run directory scans across Movies & TV Shows (TMDb) or Offline lists depending on your library setup. In SFW mode, the Offline scan organizes files under a general \'Videos\' tab, which dynamically converts to a \'Scenes\' tab when the application\'s global NSFW toggle is active.\n\nIn NSFW mode, the Movies & TV Shows scan can also query adult movies from PornDB and TMDb (including adult TV shows from TMDb). Adult matches are completely filtered out from TMDb in SFW mode, whereas in NSFW mode, the resolver specifically targets adult entries. Additionally, you can unlock the Scenes scan mode to parse performer and studio metadata using StashDB, FansDB, or PornDB.',
+          image: '/documentations/features/organizer_modes.png',
+          image_nsfw: '/documentations/features/organizer_modes_nsfw.png'
+        },
+        {
+          title: t('about.docs_wizard.features_tour.organizer_details.statuses_title') || 'Statuses, Overrides & Extras',
+          description: t('about.docs_wizard.features_tour.organizer_details.statuses_desc') || 'Track scan results using color-coded match statuses (Matched, Unmatched, Manual, Collision). Set custom overrides to lock matches, and let the parser automatically catalog media Extras like trailers, deleted scenes, or featurettes.',
+          image: '/documentations/features/organizer_statuses.png'
+        },
+        {
+          title: t('about.docs_wizard.features_tour.organizer_details.renaming_title') || 'Automated Renaming & In-Place Indexing',
+          description: t('about.docs_wizard.features_tour.organizer_details.renaming_desc') || 'Customize your library naming layouts and automatically rename or reorganize files. For torrent seeders or users with pre-arranged collections, you can disable folder organization completely in settings, letting the program index the files in-place without moving or renaming them.',
+          image: '/documentations/features/organizer_rename.png'
+        },
+        {
+          title: t('about.docs_wizard.features_tour.organizer_details.matching_title') || 'Manual Match & Bulk Resolving',
+          description: t('about.docs_wizard.features_tour.organizer_details.matching_desc') || 'Manually query and link metadata using the Match Resolver. For TV Shows, resolve matching conflicts in bulk at the series level to link entire seasons or show runs at once.',
+          image: '/documentations/features/organizer_match.png'
+        },
+        {
+          title: t('about.docs_wizard.features_tour.organizer_details.context_title') || 'Context Menus & File Deletion',
+          description: t('about.docs_wizard.features_tour.organizer_details.context_desc') || 'Quickly trigger actions via right-click context menus or hover action overlay shortcuts. Manage unwanted files safely with 3 deletion levels: remove item only from database, move file to system Recycle Bin, or delete file permanently from disk.',
+          image: '/documentations/features/organizer_context.png'
+        },
+        {
+          title: t('about.docs_wizard.features_tour.organizer_details.scenes_title') || 'NSFW Scenes Scan',
+          description: t('about.docs_wizard.features_tour.organizer_details.scenes_desc') || 'Retrieve performers, studio details, categories, and high-quality scene covers automatically.',
+          image: '/documentations/features/organizer_scenes.png',
+          nsfw: true
+        }
+      ]
     },
     {
       id: 'library',
       icon: <Library size={16} />,
       title: t('about.docs_wizard.features_tour.library_title') || 'Media Library',
       description: t('about.docs_wizard.features_tour.library_desc') || 'Browse and filter your entire collection. Filter by performers, studios, release year, tags, resolution, or type. Edit video settings, change posters, and add custom details.',
-      image: '/documentations/features/library.png'
+      image: '/documentations/features/library.png',
+      details: [
+        {
+          title: t('about.docs_wizard.features_tour.library_details.browsing_title') || 'Library Browsing & Filtering',
+          description: t('about.docs_wizard.features_tour.library_details.browsing_desc') || 'Navigate through your collection using dedicated tabs for Movies, TV Shows, and People. Find files instantly with live search, sorting criteria, and advanced filtering options.',
+          image: '/documentations/features/library_browsing.png'
+        },
+        {
+          title: t('about.docs_wizard.features_tour.library_details.metadata_profiles_title') || 'Detailed Metadata Profiles',
+          description: t('about.docs_wizard.features_tour.library_details.metadata_profiles_desc') || 'Dive into comprehensive detail pages. Access synopses, company production info, external ratings, cast lists, and interactive seasons/episodes selectors.',
+          description_nsfw: t('about.docs_wizard.features_tour.library_details.metadata_profiles_desc_nsfw') || 'Each media item opens into an immersive full-screen detail hub. SWAYA parses and displays high-fidelity backdrops, logos, movie/show posters, structural cast lists, budget details, box office stats, external rating scores, and studio links. For TV Shows, it renders interactive season grids and episode selectors, letting you easily track your progress.\n\nIn NSFW mode, Scenes detail pages are enriched with technical video stream specifications, explicit category tag lists, and an interactive Peaks panel. The Peaks panel displays player heatmaps showing crowd-sourced high-activity points of the video, letting you skip directly to the highlights of any matched scene.',
+          image: '/documentations/features/library_detail.png',
+          image_nsfw: '/documentations/features/library_detail_nsfw.png'
+        },
+        {
+          title: t('about.docs_wizard.features_tour.library_details.tagging_title') || 'Tagging, Playlists & Watch History',
+          description: t('about.docs_wizard.features_tour.library_details.tagging_desc') || 'Manage and organize cataloged files on-the-fly. Edit tags, add items to custom lists/playlists, and keep track of your watch counts and play history.',
+          description_nsfw: t('about.docs_wizard.features_tour.library_details.tagging_desc_nsfw') || 'Manage and organize cataloged files on-the-fly. Edit tags, add items to custom lists/playlists, and keep track of your watch counts and play history.\n\nIn NSFW mode, you can also track interactive player peaks, video markers, and customize a distinct "Finish Count" widget on the activity panel.',
+          image: '/documentations/features/library_tagging.png',
+          image_nsfw: '/documentations/features/library_tagging_nsfw.png'
+        },
+        {
+          title: t('about.docs_wizard.features_tour.library_details.people_title') || 'People & Cast Profiles',
+          description: t('about.docs_wizard.features_tour.library_details.people_desc') || 'Explore cast, crew, and director profiles. Browse performer bios, birth details, and discover all linked media files available in your collections.',
+          description_nsfw: t('about.docs_wizard.features_tour.library_details.people_desc_nsfw') || 'Explore cast, crew, and director profiles. Browse performer bios, birth details, and discover all linked media files available in your collections.\n\nIn NSFW mode, performer profiles display interactive adult links, aliases, anatomical stats, and custom social link integrations (e.g. OnlyFans, Twitter).',
+          image: '/documentations/features/library_people.png',
+          image_nsfw: '/documentations/features/library_people_nsfw.png'
+        }
+      ]
     },
     {
       id: 'lists',
@@ -1003,9 +1068,11 @@ export default function AboutPage() {
             {activeTab === 'docs_features' && (() => {
               const activeItem = featuresTourData[activeTourIndex];
               const hasSubFeature = activeSubFeatureIndex !== null && activeItem.details && activeItem.details[activeSubFeatureIndex];
-              const displayTitle = hasSubFeature ? activeItem.details[activeSubFeatureIndex].title : activeItem.title;
-              const displayDescription = hasSubFeature ? activeItem.details[activeSubFeatureIndex].description : activeItem.description;
-              const displayImage = hasSubFeature ? activeItem.details[activeSubFeatureIndex].image : activeItem.image;
+              const currentItemObj = hasSubFeature ? activeItem.details[activeSubFeatureIndex] : activeItem;
+              
+              const displayTitle = (showNsfwDocs && currentItemObj.title_nsfw) ? currentItemObj.title_nsfw : currentItemObj.title;
+              const displayDescription = (showNsfwDocs && currentItemObj.description_nsfw) ? currentItemObj.description_nsfw : currentItemObj.description;
+              const displayImage = (showNsfwDocs && currentItemObj.image_nsfw) ? currentItemObj.image_nsfw : currentItemObj.image;
 
               return (
                 <div className="about-tab-panel docs-panel" style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: '10px 20px 20px 20px' }}>
@@ -1102,13 +1169,13 @@ export default function AboutPage() {
                           width: '100%',
                           maxWidth: '800px',
                           height: '360px',
-                          background: 'var(--color-bg-subtle, rgba(255,255,255,0.01))',
-                          border: '1px dashed var(--color-border-default)',
+                          background: displayImage ? 'transparent' : 'var(--color-bg-subtle, rgba(255,255,255,0.01))',
+                          border: displayImage ? 'none' : '1px dashed var(--color-border-default)',
                           borderRadius: '12px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          cursor: 'pointer',
+                          cursor: displayImage ? 'pointer' : 'default',
                           overflow: 'hidden',
                           position: 'relative',
                           flexShrink: 0
@@ -1135,9 +1202,27 @@ export default function AboutPage() {
                       </div>
 
                       {/* Features / Details of the selected page */}
-                      <p style={{ fontSize: '14px', lineHeight: '1.7', color: 'var(--color-text-secondary)', margin: '0 0 15px 0', whiteSpace: 'pre-wrap', maxWidth: '800px' }}>
-                        {displayDescription}
-                      </p>
+                      <div style={{ fontSize: '14px', lineHeight: '1.7', color: 'var(--color-text-secondary)', margin: '0 0 15px 0', maxWidth: '800px' }}>
+                        <p style={{ whiteSpace: 'pre-wrap', margin: '0 0 12px 0' }}>
+                          {hasSubFeature ? currentItemObj.description : activeItem.description}
+                        </p>
+                        {showNsfwDocs && currentItemObj.description_nsfw && (
+                          <div style={{
+                            padding: '12px 16px',
+                            background: 'rgba(239, 68, 68, 0.05)',
+                            borderLeft: '3px solid var(--color-danger, #ef4444)',
+                            borderRadius: '0 6px 6px 0',
+                            color: 'color-mix(in srgb, var(--color-text-primary) 85%, var(--color-danger, #ef4444))',
+                            fontSize: '13px',
+                            whiteSpace: 'pre-wrap',
+                            marginTop: '12px',
+                            animation: 'fadeIn var(--motion-duration-fast) var(--motion-ease-emphasized)'
+                          }}>
+                            {/* Extract only the nsfw specific extension part if description_nsfw starts with base description */}
+                            {currentItemObj.description_nsfw.replace(currentItemObj.description, '').trim().replace(/^\n+/, '')}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
