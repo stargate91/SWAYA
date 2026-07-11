@@ -6,6 +6,9 @@
         "/rgba?\\(/"
       ],
       "/^(?!--).*(?:padding|margin|gap)/": ["/\\d+px/"],
+      "/^(?!--).*(?:border-radius)/": ["/\\d+px/"],
+      "/^(?!--).*(?:font-size)/": ["/\\d+px/"],
+      "/^(?!--).*(?:font-weight)/": ["/^[0-9]+$/"],
       "/^(?!--).*(?:transition|animation)/": [
         "/\\b\\d+(?:\\.\\d+)?m?s\\b/",
         "/cubic-bezier/",

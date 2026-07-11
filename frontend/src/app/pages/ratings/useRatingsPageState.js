@@ -185,12 +185,25 @@ export function useRatingsPageState() {
   const sortedItems = useMemo(() => {
     const items = [...searchFilteredItems];
     items.sort((a, b) => {
-      let valA = a.name || a.title || a.displayTitle || '';
-      let valB = b.name || b.title || b.displayTitle || '';
+      let valA = '';
+      let valB = '';
 
       if (sortKey === 'rating') {
         valA = a.user_rating ?? -1;
         valB = b.user_rating ?? -1;
+      } else if (sortKey === 'comment') {
+        valA = a.user_comment || '';
+        valB = b.user_comment || '';
+      } else {
+        // Default to name / title sorting
+        valA = a.name || a.title || a.displayTitle || '';
+        valB = b.name || b.title || b.displayTitle || '';
+      }
+
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return sortDirection === 'asc'
+          ? valA.localeCompare(valB, undefined, { numeric: true, sensitivity: 'base' })
+          : valB.localeCompare(valA, undefined, { numeric: true, sensitivity: 'base' });
       }
 
       if (valA < valB) return sortDirection === 'asc' ? -1 : 1;

@@ -41,7 +41,14 @@ export default function BespokeListPanel() {
   const [prevListIds, setPrevListIds] = useState(membershipData.list_ids);
   const [optimisticListIds, setOptimisticListIds] = useState(null);
 
-  if (membershipData.list_ids !== prevListIds) {
+  const arraysEqual = (a, b) => {
+    if (a === b) return true;
+    if (!a || !b) return false;
+    if (a.length !== b.length) return false;
+    return a.every((val, i) => val === b[i]);
+  };
+
+  if (!arraysEqual(membershipData.list_ids, prevListIds)) {
     setPrevListIds(membershipData.list_ids);
     setOptimisticListIds(null);
   }

@@ -110,6 +110,7 @@ export default function RatingsPage() {
   const columns = [
     {
       key: 'name',
+      sortable: true,
       label: state.mediaType === 'people'
         ? t('ratings.table.name', { defaultValue: 'Name' })
         : t('ratings.table.title', { defaultValue: 'Title' }),
@@ -145,6 +146,7 @@ export default function RatingsPage() {
     },
     {
       key: 'comment',
+      sortable: true,
       label: t('ratings.table.comment', { defaultValue: 'Review' }),
       render: (val, row) => {
         const hasComment = row.user_comment && String(row.user_comment).trim();
@@ -172,6 +174,7 @@ export default function RatingsPage() {
     },
     {
       key: 'rating',
+      sortable: true,
       label: t('ratings.table.rating', { defaultValue: 'My Rating' }),
       width: '240px',
       render: (val, row) => (
@@ -312,6 +315,9 @@ export default function RatingsPage() {
                       columns={columns}
                       rows={state.paginatedItems}
                       emptyText={t('ratings.table.empty', { defaultValue: 'No items match selected criteria.' })}
+                      sortKey={state.sortKey}
+                      sortDirection={state.sortDirection}
+                      onSort={state.handleSortToggle}
                     />
                   )}
                 </div>
