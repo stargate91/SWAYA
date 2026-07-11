@@ -552,6 +552,57 @@ class RecommendationsService:
                             "gender": link.person.gender,
                         })
 
+            # Determine is_watched status
+            is_watched = False
+            if o_match and o_match.is_watched:
+                is_watched = True
+            elif o_media and o_media.is_watched:
+                is_watched = True
+            elif match.media_type == MediaType.EPISODE:
+                # Check directly on the episode override
+                is_watched = bool(o_media and o_media.is_watched)
+            elif match.media_type == MediaType.TV or (match.media_type == MediaType.EPISODE and show_match != match):
+                # Count total episodes and check how many are watched
+                total_episodes_query = self.db.query(MetadataMatch.id).outerjoin(
+                    parent_season, MetadataMatch.parent_id == parent_season.id
+                ).filter(
+                    MetadataMatch.media_type == MediaType.EPISODE,
+                    or_(
+                        MetadataMatch.parent_id == show_match.id,
+                        parent_season.parent_id == show_match.id
+                    )
+                )
+                total_episode_ids = [r[0] for r in total_episodes_query.all()]
+                if total_episode_ids:
+                    mapping_query = self.db.query(MetadataMatch.id, MetadataMatch.media_item_id).filter(
+                        MetadataMatch.id.in_(total_episode_ids)
+                    ).all()
+                    match_to_media = {m_id: mi_id for m_id, mi_id in mapping_query}
+                    media_ids_eps = [mi_id for mi_id in match_to_media.values() if mi_id is not None]
+                    
+                    overrides_eps = self.db.query(UserOverride).filter(
+                        UserOverride.user_id == current_uid,
+                        or_(
+                            UserOverride.metadata_match_id.in_(total_episode_ids),
+                            UserOverride.media_item_id.in_(media_ids_eps)
+                        )
+                    ).all()
+                    
+                    watched_matches = set()
+                    watched_media = set()
+                    for ov in overrides_eps:
+                         if ov.is_watched:
+                             if ov.metadata_match_id:
+                                 watched_matches.add(ov.metadata_match_id)
+                             if ov.media_item_id:
+                                 watched_media.add(ov.media_item_id)
+                    watched_count = 0
+                    for ep_id in total_episode_ids:
+                        media_id = match_to_media.get(ep_id)
+                        if ep_id in watched_matches or (media_id is not None and media_id in watched_media):
+                            watched_count += 1
+                    is_watched = watched_count >= len(total_episode_ids)
+
             recently_added.append({
                 "id": int(show_match.external_id) if show_match.external_id and show_match.external_id.isdigit() else item.id,
                 "title": title,
@@ -565,6 +616,7 @@ class RecommendationsService:
                 "rating_porndb": rating_porndb,
                 "user_rating": user_rating,
                 "is_favorite": is_favorite,
+                "is_watched": is_watched,
                 "poster_path": poster_path,
                 "backdrop_path": backdrop_path,
                 "release_date": release_date,

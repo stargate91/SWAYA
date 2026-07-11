@@ -387,6 +387,61 @@ class BaseQueryBuilder:
                 is_watched = True
             elif p and p.is_watched:
                 is_watched = True
+            elif match.media_type == MediaType.TV:
+                # Check if all episodes in metadata are watched.
+                # Find all MetadataMatch entries of type EPISODE belonging to this TV show
+                # and count how many are marked as watched.
+                from sqlalchemy.orm import aliased
+                parent_season = aliased(MetadataMatch)
+                
+                # 1. Get all episode matches for this TV show
+                total_episodes_query = self.db.query(MetadataMatch.id).outerjoin(
+                    parent_season, MetadataMatch.parent_id == parent_season.id
+                ).filter(
+                    MetadataMatch.media_type == MediaType.EPISODE,
+                    or_(
+                        MetadataMatch.parent_id == match.id,
+                        parent_season.parent_id == match.id
+                    )
+                )
+                total_episode_ids = [r[0] for r in total_episodes_query.all()]
+                
+                if total_episode_ids:
+                    # 2. Get watched overrides matching either these episode match IDs or their associated local media items
+                    # First map match IDs to their local media item IDs (if any)
+                    mapping_query = self.db.query(MetadataMatch.id, MetadataMatch.media_item_id).filter(
+                        MetadataMatch.id.in_(total_episode_ids)
+                    ).all()
+                    
+                    match_to_media = {m_id: mi_id for m_id, mi_id in mapping_query}
+                    media_ids = [mi_id for mi_id in match_to_media.values() if mi_id is not None]
+                    
+                    # Fetch overrides for these match IDs or media item IDs
+                    overrides_query = self.db.query(UserOverride).filter(
+                        UserOverride.user_id == self.current_user_id,
+                        or_(
+                            UserOverride.metadata_match_id.in_(total_episode_ids),
+                            UserOverride.media_item_id.in_(media_ids)
+                        )
+                    ).all()
+                    
+                    watched_matches = set()
+                    watched_media = set()
+                    for ov in overrides_query:
+                        if ov.is_watched:
+                            if ov.metadata_match_id:
+                                watched_matches.add(ov.metadata_match_id)
+                            if ov.media_item_id:
+                                watched_media.add(ov.media_item_id)
+                    
+                    # An episode is watched if its match ID or its media item ID is in the watched sets
+                    watched_count = 0
+                    for ep_id in total_episode_ids:
+                        media_id = match_to_media.get(ep_id)
+                        if ep_id in watched_matches or (media_id is not None and media_id in watched_media):
+                            watched_count += 1
+                            
+                    is_watched = watched_count >= len(total_episode_ids)
 
             is_favorite = False
             if o and o.is_favorite:

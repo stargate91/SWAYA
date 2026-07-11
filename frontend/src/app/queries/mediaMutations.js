@@ -341,6 +341,7 @@ export const useUpdateMediaStatusMutation = () => {
       if ('user_rating' in payload || 'is_watched' in payload || 'user_comment' in payload) {
         queryClient.invalidateQueries({ queryKey: QK.stats });
         queryClient.invalidateQueries({ queryKey: QK.watchedHistory });
+        queryClient.invalidateQueries({ queryKey: QK.recommendations });
       }
       if ('custom_tags' in payload || 'is_tracked' in payload) {
         queryClient.invalidateQueries({ queryKey: QK.libraryTags });

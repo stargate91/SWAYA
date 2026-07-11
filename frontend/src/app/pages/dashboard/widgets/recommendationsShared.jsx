@@ -250,6 +250,7 @@ export const RecommendationCarousel = ({
                 className={`recommend-card ${n.isScene ? 'recommend-card--scene' : ''} ${n.shouldBlur ? 'is-blurred' : ''}`}
                 imageUrl={posterUrl}
                 onClick={() => onCardClick(item)}
+                isWatched={item.is_watched}
                 title={item.title || item.name}
                 subtitle={subtitle}
                 ratingImdb={n.ratingImdb}

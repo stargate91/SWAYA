@@ -479,13 +479,17 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
   );
 
   const getIsTvWatched = () => {
-    if (!item?.seasons) return false;
-    const regularSeasons = item.seasons.filter(s => s.season_number > 0);
-    const episodes = regularSeasons.flatMap(s => s.episodes || []);
-    if (episodes.length === 0) return false;
-    return episodes.every(e => e.is_watched);
+    if (!item) return false;
+    // Check if the user override has explicitly set is_watched on the show
+    if (item.is_watched) return true;
+    if (item.overrides?.is_watched) return true;
+    
+    // Otherwise check if the watched episodes count equals or exceeds the total episodes count
+    const totalEps = item.watch_stats?.total_episodes_count || item.number_of_episodes || 0;
+    const watchedEps = item.watch_stats?.watched_episodes_count || 0;
+    return totalEps > 0 && watchedEps >= totalEps;
   };
-  const isWatched = (isMovie || isScene) ? item?.is_watched : getIsTvWatched();
+  const isWatched = (isMovie || isScene) ? (item?.is_watched || item?.overrides?.is_watched) : getIsTvWatched();
 
 
   const canToggleWatched = (isMovie || isScene)
