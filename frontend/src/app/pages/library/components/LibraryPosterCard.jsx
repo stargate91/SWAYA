@@ -16,7 +16,7 @@ import {
 } from '@/lib/libraryTabs';
 import { isSceneMediaType } from '@/lib/mediaTypes';
 import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
-import { formatPerformerSubtitle } from '../utils/performerStats';
+import { formatPerformerSubtitle, formatMediaSubtitle } from '../utils/performerStats';
 
 const renderUserRatingBadge = (item) => {
   const rating = Number(item?.user_rating);
@@ -71,7 +71,7 @@ export const LibraryPosterCard = memo(({
   let title = item.title || item.name;
   let subtitle;
   let imageUrl;
-  let ratingImdb = (isPeople || onRemove) ? undefined : n.ratingImdb;
+  let ratingImdb = (isPeople || onRemove) ? undefined : (sortKey === 'rating' ? undefined : n.ratingImdb);
   let ratingTmdb = (isPeople || onRemove) ? undefined : n.ratingTmdb;
   const ratingPorndb = (isPeople || onRemove) ? undefined : item.rating_porndb;
   const isScene = isSceneMediaType(item.type) || isLibraryScenes;
@@ -150,9 +150,41 @@ export const LibraryPosterCard = memo(({
       performers = n.performers;
 
       const displayDate = item.release_date ? item.release_date.substring(0, 10) : item.year;
-      ratingPill = displayDate ? (
-        <span className="library-scene-date">{displayDate}</span>
+      
+      let pillText = displayDate;
+      if (sortKey === 'release_date') {
+        pillText = item.release_date ? item.release_date.substring(0, 10) : item.year;
+      } else if (sortKey === 'duration') {
+        const runTime = item.duration || item.runtime || item.run_time;
+        if (runTime) {
+          const mins = runTime > 500 ? Math.round(runTime / 60) : Math.round(runTime);
+          pillText = `${mins} mins`;
+        }
+      } else if (sortKey === 'file_size') {
+        const sizeVal = Number(item.file_size || item.size || item.size_mb);
+        if (sizeVal) {
+          const isBytes = sizeVal > 50000;
+          const sizeMb = isBytes ? (sizeVal / (1024 * 1024)) : sizeVal;
+          pillText = sizeMb > 1024 ? `${(sizeMb / 1024).toFixed(2)} GB` : `${sizeMb.toFixed(0)} MB`;
+        }
+      } else if (sortKey === 'last_watched') {
+        pillText = item.last_watched_at ? item.last_watched_at.substring(0, 10) : '—';
+      } else if (sortKey === 'watch_count') {
+        pillText = `${item.watch_count || 0}x`;
+      } else if (sortKey === 'tag_count') {
+        const tCount = item.tag_count || (item.custom_tags || []).length;
+        pillText = `${tCount} tags`;
+      } else if (sortKey === 'finish_count') {
+        pillText = `${item.finish_count || 0} f`;
+      } else if (sortKey === 'last_finish') {
+        const fDate = item.last_finish_at || item.last_finish;
+        pillText = fDate ? fDate.substring(0, 10) : '—';
+      }
+
+      ratingPill = pillText ? (
+        <span className="library-scene-date">{pillText}</span>
       ) : undefined;
+
       imageUrl = resolvePosterUrl(item.backdrop_path) || item.displayPosterRemote || resolvePosterUrl(getPosterImagePath(item));
       className = 'library-scene-card';
       topRightAction = editButton;
@@ -170,7 +202,7 @@ export const LibraryPosterCard = memo(({
         };
       }
     } else {
-      subtitle = n.subtitle;
+      subtitle = formatMediaSubtitle(item, sortKey, t, n.subtitle);
       imageUrl = resolvePosterUrl(isLibraryTv ? getTvPosterImagePath(item) : getPosterImagePath(item));
       topRightAction = editButton;
 

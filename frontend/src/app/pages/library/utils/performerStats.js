@@ -92,3 +92,64 @@ export function formatPerformerSubtitle(item, sortKey, t) {
 
   return item.people_role ? t(`library.people.roles.${item.people_role}`, { defaultValue: item.people_role }) : '';
 }
+
+export function formatMediaSubtitle(item, sortKey, t, defaultSubtitle = '') {
+  if (!sortKey) return defaultSubtitle;
+
+  if (sortKey === 'release_date') {
+    const date = item.release_date ? item.release_date.substring(0, 10) : item.year;
+    return date || defaultSubtitle;
+  }
+  if (sortKey === 'year') {
+    return item.year ? `${t('library.sort.year') || 'Year'}: ${item.year}` : defaultSubtitle;
+  }
+  if (sortKey === 'rating_imdb') {
+    return item.rating_imdb ? `IMDb: ${Number(item.rating_imdb).toFixed(1)}` : defaultSubtitle;
+  }
+  if (sortKey === 'rating') {
+    return defaultSubtitle;
+  }
+  if (sortKey === 'user_rating') {
+    return item.user_rating ? `${t('library.sort.userRating') || 'User Rating'}: ${Number(item.user_rating).toFixed(1)}` : defaultSubtitle;
+  }
+  if (sortKey === 'duration') {
+    const runTime = item.duration || item.runtime || item.run_time;
+    if (runTime) {
+      // Check if it's stored in seconds (like local files) or minutes (like TMDb)
+      // Usually, if it's > 500, it's seconds.
+      const mins = runTime > 500 ? Math.round(runTime / 60) : Math.round(runTime);
+      return `${t('library.sort.duration') || 'Duration'}: ${mins} ${t('library.sort.mins') || 'mins'}`;
+    }
+    return defaultSubtitle;
+  }
+  if (sortKey === 'file_size') {
+    const sizeVal = Number(item.file_size || item.size || item.size_mb);
+    if (sizeVal) {
+      const isBytes = sizeVal > 50000;
+      const sizeMb = isBytes ? (sizeVal / (1024 * 1024)) : sizeVal;
+      if (sizeMb > 1024) {
+        return `${t('library.sort.fileSize') || 'Size'}: ${(sizeMb / 1024).toFixed(2)} GB`;
+      }
+      return `${t('library.sort.fileSize') || 'Size'}: ${sizeMb.toFixed(0)} MB`;
+    }
+    return defaultSubtitle;
+  }
+  if (sortKey === 'last_watched') {
+    return item.last_watched_at ? `${t('library.sort.lastWatched') || 'Last Watched'}: ${item.last_watched_at.substring(0, 10)}` : defaultSubtitle;
+  }
+  if (sortKey === 'watch_count') {
+    return `${t('library.sort.watchCount') || 'Watch Count'}: ${item.watch_count || 0}`;
+  }
+  if (sortKey === 'tag_count') {
+    return `${t('library.sort.tags') || 'Tags'}: ${item.tag_count || (item.custom_tags || []).length}`;
+  }
+  if (sortKey === 'finish_count') {
+    return `${t('library.sort.finishCount') || 'Finish Count'}: ${item.finish_count || 0}`;
+  }
+  if (sortKey === 'last_finish') {
+    const finishDate = item.last_finish_at || item.last_finish;
+    return finishDate ? `${t('library.sort.lastFinish') || 'Last Finish'}: ${finishDate.substring(0, 10)}` : defaultSubtitle;
+  }
+
+  return defaultSubtitle;
+}

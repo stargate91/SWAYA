@@ -217,7 +217,9 @@
     "curvyScore": "Curvy Score",
     "libraryCountValue_one": "{{count}} item",
     "libraryCountValue_other": "{{count}} items",
-    "libraryCountValue": "{{count}} items"
+    "libraryCountValue": "{{count}} items",
+    "mins": "mins",
+    "tags": "Tags"
   },
   "filter": {
     "label": "Collection:",
@@ -464,6 +466,7 @@
     "chooseLogo": "Choose Logo",
     "changeProfile": "Change Profile Picture",
     "changePoster": "Change Poster",
+    "changeBackdrop": "Change Backdrop",
     "posters": "Choose Poster",
     "logo": "Choose Logo",
     "imageUpdated": "All set! The image was updated successfully.",
