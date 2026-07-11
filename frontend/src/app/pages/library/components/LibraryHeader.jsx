@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { UserPlus, Plus } from '@/ui/icons';
+import { UserPlus, Plus, Play } from '@/ui/icons';
 import { Tabs } from '@/ui/Tabs';
 import SearchInputCombo from '@/ui/SearchInputCombo';
 import Button from '@/ui/Button';
@@ -62,6 +62,8 @@ export default function LibraryHeader({
   setCurrentPage,
   activeSessionMode,
   showSearch = true,
+  isPlayableTab = false,
+  onRandomPlay,
 }) {
   const currentTabObj = tabs.find(tab => tab.value === resolvedTab);
   const hasItems = currentTabObj ? (currentTabObj.count > 0) : false;
@@ -92,6 +94,12 @@ export default function LibraryHeader({
           <Button variant={btnVariant} size="sm" onClick={onCreateTag} className="library-header-btn">
             <Plus size={14} />
             {t('library.tags.createBtn') || 'Create Tag'}
+          </Button>
+        )}
+        {isPlayableTab && hasItems && onRandomPlay && (
+          <Button variant="secondary" size="sm" onClick={onRandomPlay} className="library-header-btn">
+            <Play size={12} fill="currentColor" />
+            {t('library.playRandom') || 'Play Random'}
           </Button>
         )}
       </div>

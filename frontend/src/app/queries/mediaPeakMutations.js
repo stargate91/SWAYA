@@ -21,6 +21,8 @@ export const useToggleTrackedMutation = () => {
     onSuccess: (data, variables) => {
       const id = variables.tmdbId || variables.externalId;
       invalidateEntity(queryClient, id, { lists: true, stats: true });
+      queryClient.invalidateQueries({ queryKey: ['library-item-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['library-tv-detail'] });
     },
   });
 };

@@ -504,18 +504,18 @@
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 12px;
+  font-size: var(--font-size-xs);
 }
 
 .mixer-th-field,
 .mixer-th-source {
-  --th-padding: 6px 12px;
+  --th-padding: var(--space-xs) var(--space-sm);
   padding: var(--th-padding);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-secondary);
-  --th-border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.08));
+  --th-border: 1px solid var(--color-border-subtle);
   border-bottom: var(--th-border);
-  --th-bg: rgba(0, 0, 0, 0.2);
+  --th-bg: color-mix(in srgb, var(--color-bg-canvas) 90%, transparent);
   background: var(--th-bg);
   position: sticky;
   top: 0;
@@ -527,31 +527,31 @@
 }
 
 .mixer-row {
-  --row-border: 1px solid rgba(255, 255, 255, 0.04);
+  --row-border: 1px solid var(--color-border-subtle);
   border-bottom: var(--row-border);
   --row-transition: background-color var(--motion-fast) ease;
   transition: var(--row-transition);
 }
 
 .mixer-row:hover {
-  --row-hover-bg: rgba(255, 255, 255, 0.01);
+  --row-hover-bg: color-mix(in srgb, var(--color-text-primary) 1%, transparent);
   background: var(--row-hover-bg);
 }
 
 .mixer-td-field-label {
-  --td-padding: 6px 12px;
+  --td-padding: var(--space-xs) var(--space-sm);
   padding: var(--td-padding);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
   width: 140px;
-  --td-bg: rgba(0, 0, 0, 0.1);
+  --td-bg: color-mix(in srgb, var(--color-bg-canvas) 60%, transparent);
   background: var(--td-bg);
-  --td-border: 1px solid rgba(255, 255, 255, 0.04);
+  --td-border: 1px solid var(--color-border-subtle);
   border-right: var(--td-border);
 }
 
 .mixer-td-cell {
-  --td-padding: 6px 12px;
+  --td-padding: var(--space-xs) var(--space-sm);
   padding: var(--td-padding);
   cursor: pointer;
   --cell-transition: all var(--motion-fast) ease;
@@ -566,7 +566,7 @@
 }
 
 .mixer-td-cell:not(.mixer-td-cell--disabled):hover {
-  --cell-hover-bg: rgba(255, 255, 255, 0.04);
+  --cell-hover-bg: color-mix(in srgb, var(--color-text-primary) 4%, transparent);
   background: var(--cell-hover-bg);
 }
 
@@ -596,7 +596,7 @@
 .mixer-td-cell--active .mixer-cell-value {
   --green-color: var(--color-state-success);
   color: var(--green-color) !important;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .mixer-td-cell--auto.mixer-td-cell--active {

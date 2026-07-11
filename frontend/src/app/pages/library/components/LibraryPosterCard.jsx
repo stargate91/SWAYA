@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Heart, Pencil, Play, Star, Minus } from '@/ui/icons';
+import { Heart, Pencil, Play, Star, Minus, Check } from '@/ui/icons';
 import Badge from '@/ui/Badge';
 import PosterCard from '@/ui/PosterCard';
 import {
@@ -55,6 +55,7 @@ export const LibraryPosterCard = memo(({
   onPlayOverlayClick,
   onEditImageClick,
   onRemove,
+  onUnfollow,
   settings,
   sortKey,
 }) => {
@@ -228,6 +229,24 @@ export const LibraryPosterCard = memo(({
     ? (item.library_item_id || item.id)
     : undefined;
 
+  const unfollowButton = (onUnfollow && isPeople) ? (
+    <button
+      type="button"
+      className="ui-card-action-btn"
+      onClick={(e) => {
+        e.stopPropagation();
+        onUnfollow(item);
+      }}
+    >
+      <span className="action-btn-state-default">
+        <Check size={12} strokeWidth={3} /> {t('library.people.followed') || 'Followed'}
+      </span>
+      <span className="action-btn-state-hover">
+        <Minus size={12} strokeWidth={3} /> {t('library.people.unfollow') || 'Unfollow'}
+      </span>
+    </button>
+  ) : null;
+
   return (
     <PosterCard
       aspect={isScene ? 'landscape' : 'poster'}
@@ -251,8 +270,10 @@ export const LibraryPosterCard = memo(({
       className={className}
       previewItemId={previewItemId}
       previewEnabled={onRemove ? false : Boolean(settings?.hover_previews_enabled ?? true)}
-      previewDelay={onRemove ? 500 : Number(settings?.hover_previews_delay ?? 500)}
-    />
+      previewDelay={onRemove ? 800 : Number(settings?.hover_previews_delay ?? 800)}
+    >
+      {unfollowButton}
+    </PosterCard>
   );
 });
 

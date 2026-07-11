@@ -105,7 +105,7 @@ export const SETTINGS_BASE_DEFAULTS = {
   extras_folder_mode: EXTRAS_FOLDER_MODES.SUBFOLDER,
   extras_subfolder_name: 'Extras',
   hover_previews_enabled: true,
-  hover_previews_delay: 500,
+  hover_previews_delay: 800,
   hover_previews_duration: 16,
   previews_cache_max_size_mb: 2048,
   previews_cache_max_age_days: 30,

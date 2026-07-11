@@ -4,6 +4,7 @@
   "searchPlaceholder": "Search {{tab}}...",
   "addPeak": "Add Finish",
   "yourRating": "Your Rating",
+  "playRandom": "Play Random",
   "tabs": {
     "movies": "Movies",
     "collections": "Collections",
@@ -21,6 +22,7 @@
     "addPeopleBtn": "Follow Artists",
     "follow": "Follow",
     "unfollow": "Unfollow",
+    "followed": "Followed",
     "roles": {
       "actor": "Actor",
       "director": "Director",
@@ -37,7 +39,7 @@
   "addPeople": {
     "modalTitle": "Follow Artists",
     "modalDescription": "Find and follow your favorite artists!",
-    "adultModalTitle": "Follow Stars",
+    "adultModalTitle": "Follow Adult Stars",
     "adultModalDescription": "Find and follow your favorite adult stars!",
     "adultSearchPlaceholder": "Search stars...",
     "modes": {
@@ -215,9 +217,9 @@
     "random": "Random",
     "slenderScore": "Slender Score",
     "curvyScore": "Curvy Score",
-    "libraryCountValue_one": "{{count}} item",
-    "libraryCountValue_other": "{{count}} items",
-    "libraryCountValue": "{{count}} items",
+    "libraryCountValue_one": "{{count}} appearance",
+    "libraryCountValue_other": "{{count}} appearances",
+    "libraryCountValue": "{{count}} appearances",
     "mins": "mins",
     "tags": "Tags"
   },

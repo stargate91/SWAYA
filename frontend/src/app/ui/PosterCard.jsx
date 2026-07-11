@@ -39,7 +39,7 @@ const PosterCard = memo(function PosterCard({
   children,
   previewItemId,
   previewEnabled = true,
-  previewDelay = 500,
+  previewDelay = 800,
   ...props
 }) {
   const isInteractive = !!onClick;

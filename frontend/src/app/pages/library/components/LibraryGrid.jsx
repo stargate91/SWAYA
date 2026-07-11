@@ -50,6 +50,7 @@ export default function LibraryGrid({
   activeSessionMode,
   onEditImage,
   sortKey,
+  onUnfollowPerson,
 }) {
   const navigate = useNavigate();
   const playMutation = usePlayMediaMutation();
@@ -304,6 +305,7 @@ export default function LibraryGrid({
                 onItemClick={handleItemClick}
                 onPlayOverlayClick={handlePlayOverlayClick}
                 onEditImageClick={openImagePicker}
+                onUnfollow={onUnfollowPerson}
                 settings={settings}
                 sortKey={sortKey}
               />

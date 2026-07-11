@@ -76,7 +76,7 @@ export function formatPerformerSubtitle(item, sortKey, t) {
       return item.popularity ? `Popularity: ${Number(item.popularity).toFixed(1)}` : '—';
     } else if (sortKey === 'library_count') {
       const count = item.library_count || 0;
-      return t('library.sort.libraryCountValue', { count }) || `${count} items`;
+      return t('library.sort.libraryCountValue', { count }) || `${count} ${count === 1 ? 'appearance' : 'appearances'}`;
     } else if (sortKey === 'last_watched') {
       return item.last_watched_at ? `Last Watched: ${item.last_watched_at.substring(0, 10)}` : '—';
     } else if (sortKey === 'watch_count') {

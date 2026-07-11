@@ -8,9 +8,10 @@ import LibraryPagination from './components/LibraryPagination';
 import { useLibraryState } from './hooks/useLibraryState';
 import { useLibraryModals } from './hooks/useLibraryModals';
 import LibraryHeader from './components/LibraryHeader';
-import LibraryFilters from './components/LibraryFilters';
 import LibraryGrid from './components/LibraryGrid';
-import { useDeleteTagMutation } from '@/queries';
+import LibraryFilters from './components/LibraryFilters';
+import { useDeleteTagMutation, usePlayMediaMutation, useUpdatePersonStatusMutation } from '@/queries';
+import api from '@/lib/api';
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { isLibraryTagsTab } from '@/lib/libraryTabs';
@@ -35,6 +36,77 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
     setFocusedTagName,
     deleteTagMutation,
   });
+
+  const playMutation = usePlayMediaMutation();
+
+  const handleRandomPlay = async () => {
+    const playableItems = state.paginatedItems.filter(item => 
+      item.type !== 'person' && item.type !== 'people' && item.type !== 'tag' && item.type !== 'tags'
+    );
+    if (!playableItems.length) return;
+
+    const randomItem = playableItems[Math.floor(Math.random() * playableItems.length)];
+    
+    const isTv = randomItem.type === 'tv' || String(randomItem.id).startsWith('tv_');
+    if (!isTv) {
+      playMutation.mutate(randomItem.id);
+      return;
+    }
+
+    try {
+      const tvId = String(randomItem.id).replace('tv_', '').replace('tmdb_', '');
+      const tvDetail = await api.library.getTvDetail(tvId);
+      const seasons = Array.isArray(tvDetail?.seasons) ? tvDetail.seasons : [];
+      let nextEpisode = null;
+
+      for (const season of seasons) {
+        const owned = (season.episodes || []).filter(ep => ep.path && !ep.is_missing);
+        const inProgress = owned.find(ep => ep.resume_position > 0);
+        if (inProgress) {
+          nextEpisode = inProgress;
+          break;
+        }
+      }
+      if (!nextEpisode) {
+        for (const season of seasons) {
+          const owned = (season.episodes || []).filter(ep => ep.path && !ep.is_missing);
+          const unwatched = owned.find(ep => !ep.is_watched);
+          if (unwatched) {
+            nextEpisode = unwatched;
+            break;
+          }
+        }
+      }
+      if (!nextEpisode) {
+        for (const season of seasons) {
+          const owned = (season.episodes || []).filter(ep => ep.path && !ep.is_missing);
+          if (owned.length > 0) {
+            nextEpisode = owned[0];
+            break;
+          }
+        }
+      }
+
+      if (nextEpisode?.id) {
+        playMutation.mutate(nextEpisode.id);
+      }
+    } catch (err) {
+      console.error("Failed to play random TV show:", err);
+    }
+  };
+
+  const isPlayableTab = ['movies', 'tv', 'scenes', 'videos', 'adult_scenes', 'adult_videos'].includes(state.resolvedTab);
+
+  const updatePersonStatusMutation = useUpdatePersonStatusMutation();
+
+  const handleUnfollowPerson = (person) => {
+    updatePersonStatusMutation.mutate({
+      personId: person.id,
+      payload: {
+        is_active: false,
+      },
+    });
+  };
 
   const isAdultMode = state.activeSessionMode === 'nsfw';
   const utilityBarTarget = typeof document !== 'undefined' ? document.getElementById('shell-utility-bar-center') : null;
@@ -157,6 +229,8 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
             setSortDirection={state.setSortDirection}
             setCurrentPage={state.setCurrentPage}
             activeSessionMode={state.activeSessionMode}
+            isPlayableTab={isPlayableTab}
+            onRandomPlay={handleRandomPlay}
           />
 
           {!(isLibraryTagsTab(state.resolvedTab) && !showTabs) ? (
@@ -267,6 +341,7 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
             activeSessionMode={state.activeSessionMode}
             onEditImage={setImagePickerData}
             sortKey={state.sortKey}
+            onUnfollowPerson={handleUnfollowPerson}
           />
 
           {state.paginationMode === 'infinite' && state.currentPage < state.totalPages && (
