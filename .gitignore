@@ -76,3 +76,6 @@ tests/
 
 # Logs
 logs/
+
+# Plans
+plans/

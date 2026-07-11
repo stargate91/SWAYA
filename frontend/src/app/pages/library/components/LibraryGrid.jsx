@@ -119,6 +119,7 @@ export default function LibraryGrid({
 
   const openImagePicker = useCallback((item) => {
     const isPeopleCard = isLibraryPeopleTab(resolvedTab);
+    const isSceneCard = isLibraryScenesTab(resolvedTab);
     const entityId = isCollections
       ? `collection_${item.tmdb_id || item.id}`
       : item.id;
@@ -128,15 +129,17 @@ export default function LibraryGrid({
         ? 'collection'
         : isLibraryTvTab(resolvedTab)
           ? 'tv'
-          : isLibraryScenesTab(resolvedTab)
+          : isSceneCard
             ? 'scene'
             : 'movie';
-    const imageType = isPeopleCard ? 'profile' : 'poster';
+    const imageType = isPeopleCard ? 'profile' : (isSceneCard ? 'backdrop' : 'poster');
     const currentPath = isPeopleCard
       ? getProfileImagePath(item)
       : isLibraryTvTab(resolvedTab)
         ? getTvPosterImagePath(item)
-        : getPosterImagePath(item);
+        : isSceneCard
+          ? (item.backdrop_path || item.local_backdrop_path || item.still_path)
+          : getPosterImagePath(item);
     const tmdbId = isPeopleCard ? item.id : (item.tmdb_id || item.tv_tmdb_id || item.id);
 
     onEditImage({
@@ -149,7 +152,9 @@ export default function LibraryGrid({
       item,
       title: isPeopleCard
         ? (t('library.details.changeProfile') || 'Change Profile Picture')
-        : (t('library.details.changePoster') || 'Change Poster'),
+        : isSceneCard
+          ? (t('library.details.changeBackdrop') || 'Change Backdrop')
+          : (t('library.details.changePoster') || 'Change Poster'),
     });
   }, [resolvedTab, isCollections, t, onEditImage]);
 

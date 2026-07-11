@@ -1,170 +1,262 @@
 # Swaya
 
-Swaya is a desktop-oriented media library management application consisting of a React and Electron frontend and a modular FastAPI backend. The system is designed to scan local directories, identify media files, resolve metadata from external databases, and track user playback state.
+A desktop media library manager for movies, TV shows, and scenes. Scans your local folders, pulls metadata from several online databases, downloads artwork, tracks what you've watched, and plays files with an embedded MPV player — all from one app.
 
-## Current Project Status and Architecture
+## What It Does
 
-Swaya is built on a highly modular, decoupled architecture following Domain-Driven Design (DDD) principles.
+- **Folder scanning** — Point it at a directory and it will find video files, identify them using `guessit`, and match them against TMDB, OMDb, StashDB, PornDB, or FansDB.
+- **Metadata resolution** — Automated pipeline resolves titles, cast, genres, ratings, and artwork. Supports mainstream and adult content pipelines separately.
+- **Image handling** — Downloads posters, backdrops, logos, and headshots. Resizes originals, generates thumbnails, and filters logos/backdrops by brightness so you don't end up with invisible art on dark UIs.
+- **Embedded playback** — MPV runs as a child process controlled over a JSON IPC socket. Supports picture-in-picture, chapter navigation, subtitle/audio track switching, and playback speed controls.
+- **Watch history** — Tracks progress per file. Resume where you left off.
+- **File organization** — Organizer module can rename and move matched files into a clean folder structure based on configurable strategies (movie, episode, scene).
+- **Recommendations** — Basic recommendation engine surfaces titles based on your library and history.
+- **Background tasks** — Long-running operations (scanning, metadata sync, image downloads, people enrichment) run in background workers with status tracking and abort support.
+- **System tray** — Minimizes to tray on close. Tray context menu for quick access or quit.
+- **SFW/NSFW modes** — Separate content views with persisted toggle. Adult content is filtered at both the API and UI level.
+- **Custom lists & tags** — Create and manage personal collections and tag items freely.
+- **Hotkeys** — Global hotkey listener on Windows for media control.
+- **Live folder watching** — Watchdog monitors library directories for changes and auto-updates the database.
 
-### Current State and Achievements
+## Architecture
 
-- **State Persistence**: The SFW/NSFW view context persists across application restarts by using persistent local storage (`localStorage`) instead of transient session storage.
-- **Backend Modularization**: Decoupled Python architecture following Domain-Driven Design (DDD) principles. Large endpoint routes are split into domain-specific sub-routers, and heavy operations (such as cast building, media assets download, and metadata syncing) are delegated to sub-services and background workers.
-- **Scraper Clients**: Integration with external metadata databases (TMDB, OMDb, StashDB, PornDB, FansDB) utilizing rate limiting and negative caching strategies.
-- **Read-Write Separation**: Strict segregation between database reading patterns (e.g., TitleLockReader) and sync/mutation operations (e.g., TitleLockService).
-- **Media Playback**: Embedded MPV playback with dynamic event listener handling and system volume control.
+The project is split into two parts: a Python backend and a JavaScript frontend.
 
----
+### Backend (`app/`)
 
-## Repository Structure
-
-- **frontend/**: React 19 and Electron client application.
-- **app/**: FastAPI backend engine (application services, domain models, infrastructure adapters, and scrapers).
-
----
-
-## Backend Architecture
-
-The backend follows a DDD layered structure:
+FastAPI server, structured in a DDD-inspired layered layout:
 
 ```
 app/
-  application/       -- HTTP layer: routes, schemas, validation, and use cases
-    catalog/           organizer/discovery API
-    history/           watch history queries
-    library/           library endpoints (listing, filtering, details)
-    media/             media playback, preview, and logging delegation
-    metadata/          metadata queries (TMDB search, details)
-    organizer/         organizer page API and strategies
-    people/            people endpoints and route packages
-    recommendations/   recommendation API
-    settings/          application settings
-    tasks/             background task control and status
-    users/             user management, overrides, custom lists
-
-  domains/            -- Core business logic: entities, value objects, domain services
-    history/           watch and audit log models
-    library/           library, media item, and extra file models; scanners and formatters
-    media/             media access and playback logic
-    media_assets/      image processing (download, crop, thumbnails)
-    metadata/          metadata match models
-    people/            person models and detail resolvers
-    recommendations/   recommendation algorithms
-    settings/          system settings models
-    tasks/             background task managers and workers
-    users/             user overrides, custom lists, and tag models
-
-  infrastructure/     -- External system integrations, repositories, and scrapers
-    cache/             SQLite-based API cache (TTL, negative cache)
-    filesystem/        file system operations and watchdog
-    media/             DB adapters, mixins, and resolvers
-    playback/          playback monitoring (player detector, monitor)
-    repositories/      generic database repository implementations
-    scrapers/          API providers (TMDB, OMDb, StashDB, PornDB, FansDB) and normalizers
-    settings/          settings persistence adapters
-    tasks/             task-specific adapters
-
-  shared_kernel/      -- Shared components: enums, constants, DB session, and ports
+├── application/        Routes, schemas, request handling
+│   ├── catalog/        Discovery/browsing API
+│   ├── history/        Watch history endpoints
+│   ├── library/        Library listing, filtering, details
+│   ├── maintenance/    DB maintenance operations
+│   ├── media/          Playback control and media serving
+│   ├── metadata/       TMDB search, detail lookups
+│   ├── organizer/      File rename/move strategies
+│   ├── people/         Person detail and enrichment endpoints
+│   ├── recommendations/Recommendation API
+│   ├── settings/       App config endpoints
+│   ├── tasks/          Background task control
+│   └── users/          User management, overrides, lists
+│
+├── domains/            Core business logic, models, services
+│   ├── history/        Watch log and audit trail models
+│   ├── library/        Media item models, scanner, file categorizer
+│   ├── media/          Media access and playback logic
+│   ├── media_assets/   Image download, crop, thumbnail generation
+│   ├── metadata/       Match models and lock management
+│   ├── people/         Person models, detail resolution
+│   ├── recommendations/Rec engine logic
+│   ├── settings/       Settings models
+│   ├── tasks/          Task manager, download worker, background jobs
+│   └── users/          User overrides, custom lists, tags
+│
+├── infrastructure/     External integrations and adapters
+│   ├── cache/          SQLite API response cache with TTL + negative caching
+│   ├── filesystem/     Folder watcher (watchdog), file utilities
+│   ├── media/          DB adapters and query mixins
+│   ├── playback/       Player detection, playback monitor, hotkey listener
+│   ├── repositories/   Generic SQLAlchemy repository base
+│   ├── scrapers/       Provider clients (TMDB, OMDb, StashDB, PornDB, FansDB)
+│   ├── settings/       Settings persistence
+│   └── tasks/          Task-specific adapters
+│
+└── shared_kernel/      Enums, constants, DB session, logging, ports
 ```
 
-### Tech Stack
+Key design decisions:
+- Read/write separation — readers are pure query classes, services handle mutations.
+- Two SQLite databases — `swaya.db` for application data, `cache.db` for API response caching with configurable TTLs.
+- Background workers run on the main event loop via async, with a thread pool executor for blocking I/O.
+- Scraper gateway provides a unified interface over all provider clients with rate limiting.
 
-| Category            | Tool                      |
-|---------------------|---------------------------|
-| Web framework       | FastAPI + Uvicorn          |
-| Validation          | Pydantic v2                |
-| ORM                 | SQLAlchemy 2.0             |
-| Database            | SQLite                     |
-| Migrations          | Alembic                    |
-| Image processing    | Pillow                     |
-| File identification | guessit                    |
-| File watching       | watchdog                   |
-| Testing             | pytest + anyio             |
-| Platform            | Windows, Linux             |
+### Frontend (`frontend/`)
+
+Electron shell wrapping a Vite + React 19 SPA.
+
+```
+frontend/
+├── main.js             Electron main process, window management, tray, IPC
+├── mpvPlayer.js        MPV child process management over JSON IPC socket
+├── dev-runner.js       Dev mode launcher (Vite + Electron concurrently)
+├── src/
+│   ├── main.jsx        React entry point
+│   └── app/
+│       ├── shell/      App shell, sidebar, titlebar, global search
+│       ├── pages/      Route-level page components
+│       │   ├── dashboard/
+│       │   ├── library/
+│       │   ├── organizer/
+│       │   ├── player/
+│       │   ├── history/
+│       │   ├── search/
+│       │   ├── settings/
+│       │   ├── lists/
+│       │   ├── tags/
+│       │   ├── ratings/
+│       │   ├── statistics/
+│       │   ├── about/
+│       │   └── onboarding/
+│       ├── ui/         Shared component library (~50 primitives)
+│       ├── queries/    TanStack Query hooks and mutations
+│       ├── stores/     Zustand state stores
+│       ├── hooks/      Shared utility hooks
+│       ├── routes/     Route definitions (core, library, organizer)
+│       ├── providers/  React context providers
+│       ├── locales/    i18n translations (English)
+│       └── styles/     Global CSS, design tokens
+```
+
+Frontend details:
+- Custom frameless window with a hand-built titlebar (minimize, maximize, close).
+- Hash router (required for Electron `file://` protocol in production builds).
+- Global search with keyboard shortcut support.
+- Skeleton loading states, infinite scroll, scroll position restoration.
+- Renderer heartbeat watchdog — Electron main process monitors responsiveness and auto-reloads on crash.
+- Production builds bundled with `electron-builder` (Windows `.exe`, Linux `AppImage`).
+- Backend is bundled as a PyInstaller executable shipped in `extraResources`.
+
+## Tech Stack
+
+### Backend
+
+| Component         | Technology              |
+|-------------------|-------------------------|
+| Framework         | FastAPI + Uvicorn       |
+| Validation        | Pydantic v2             |
+| ORM               | SQLAlchemy 2.0          |
+| Database          | SQLite (WAL mode)       |
+| Migrations        | Alembic                 |
+| Image processing  | Pillow                  |
+| File ID           | guessit                 |
+| File watching     | watchdog                |
+| HTTP client       | requests                |
+| Packaging         | PyInstaller             |
+| Testing           | pytest + anyio + httpx  |
+
+### Frontend
+
+| Component         | Technology              |
+|-------------------|-------------------------|
+| Runtime           | Electron                |
+| Bundler           | Vite                    |
+| UI                | React 19                |
+| State             | Zustand                 |
+| Data fetching     | TanStack Query v5       |
+| Routing           | React Router 7          |
+| Icons             | Lucide React            |
+| Linting           | ESLint + Stylelint      |
+| E2E testing       | Playwright              |
+| Packaging         | electron-builder        |
+
+## Getting Started
 
 ### Prerequisites
 
 - Python 3.10+
-- FFmpeg and FFprobe available on PATH
-- **For Linux users**: `mpv` installed via your package manager (e.g., `sudo apt install mpv` on Debian/Ubuntu).
+- Node.js 18+
+- FFmpeg and FFprobe on your PATH
+- MPV installed (`mpv` binary accessible, or placed in `frontend/bin/win/` for bundled builds)
+- **Linux only**: install MPV via your package manager (e.g. `sudo apt install mpv`)
 
-### Setup and Running
+### Backend Setup
 
-Install dependencies:
 ```bash
-# Windows
+# Install Python dependencies
 pip install -r requirements.txt
 
-# Linux / macOS (ignores Windows-only dependencies)
-pip install -r requirements.txt --r-requirements-ignore pywin32 || pip install fastapi uvicorn pydantic SQLAlchemy alembic guessit pillow watchdog requests python-multipart pytest anyio httpx
-```
+# Run database migrations
+alembic upgrade head
 
-Start the server:
-```bash
+# Start the API server
 python run.py
 ```
 
-Or directly via Uvicorn:
+The server starts on `http://127.0.0.1:8000`. Databases and data directories are created automatically on first launch.
+
+You can also run via Uvicorn directly:
 ```bash
 uvicorn app.main:app --reload --port 8000
 ```
 
-Databases and directories are created automatically on first run.
+### Frontend Setup
+
+```bash
+cd frontend
+
+# Install Node dependencies
+npm install
+
+# Start development mode (Vite dev server + Electron window)
+npm run dev
+```
+
+### Building for Production
+
+```bash
+cd frontend
+
+# Build the React app
+npm run build
+
+# Package into a distributable
+npm run dist
+```
+
+The packaged output goes to `frontend/dist-electron/`.
 
 ### Migrations
 
-Managing Alembic migrations:
 ```bash
-# Apply current schema
+# Apply all pending migrations
 alembic upgrade head
 
-# Generate a new migration after model changes
-alembic revision --autogenerate -m "description"
+# Create a new migration after changing models
+alembic revision --autogenerate -m "describe your change"
 ```
 
-### Tests
+### Running Tests
 
+Backend:
 ```bash
 python -m pytest
 ```
 
----
-
-## Frontend
-
-The frontend is built with React 19, Vite, and runs inside Electron.
-
-### Tech Stack
-
-| Category            | Tool                      |
-|---------------------|---------------------------|
-| Shell/Runtime       | Electron                  |
-| Bundler/Dev server  | Vite                      |
-| UI Library          | React 19                  |
-| State management    | Zustand                   |
-| Data fetching       | TanStack Query (v5)       |
-| Routing             | React Router 7            |
-
-### Setup and Running
-
-Go to the frontend directory:
+Frontend (smoke tests):
 ```bash
 cd frontend
+npx playwright test
 ```
 
-Install dependencies:
+### Linting
+
 ```bash
-npm install
+cd frontend
+
+# JS/JSX
+npm run lint
+
+# CSS
+npm run lint:style
 ```
 
-Start in development mode (launches Vite dev server and Electron window):
-```bash
-npm run dev
+## Project Layout
+
 ```
-
-Build and package instructions are defined in the `package.json` scripts.
-
----
+.
+├── app/                Python backend (FastAPI)
+├── frontend/           Electron + React frontend
+├── alembic/            Database migration scripts
+├── data/               Runtime data (DBs, images, previews) — gitignored
+├── logs/               Application logs — gitignored
+├── requirements.txt    Python dependencies
+├── alembic.ini         Alembic configuration
+├── run.py              Backend entry point
+└── LICENSE             Source-available license
+```
 
 ## Licensing & Sustainability
 
@@ -174,4 +266,3 @@ Swaya is built with a commitment to transparency, open collaboration, and long-t
 * **For Convenience & Support:** Official pre-built installers (.exe), automatic background updates, and certain premium features require a commercial license (subscription or one-time lifetime purchase). 
 
 This hybrid model ensures that I can dedicate the massive amount of time required to actively maintain and improve Swaya as a solo developer, while keeping the codebase fully transparent to everyone.
-
