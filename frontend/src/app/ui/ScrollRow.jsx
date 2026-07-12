@@ -1,18 +1,23 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback, forwardRef, useImperativeHandle } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronLeft, ChevronRight } from '@/ui/icons';
 import './ScrollRow.css';
 
-export default function ScrollRow({
+const ScrollRow = forwardRef(({
   children,
   className = '',
   showArrows = true,
   enableWheelScroll = false,
+  arrowsLayout = 'overlay', // 'overlay' | 'column'
+  size = 'default', // 'default' | 'sm'
   onScroll,
-}) {
+}, ref) => {
+  const containerRef = useRef(null);
   const scrollRef = useRef(null);
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(false);
+
+  useImperativeHandle(ref, () => scrollRef.current);
 
   const updateArrows = useCallback(() => {
     const el = scrollRef.current;
@@ -26,8 +31,9 @@ export default function ScrollRow({
   }, [children, updateArrows]);
 
   useEffect(() => {
+    const container = containerRef.current;
     const el = scrollRef.current;
-    if (!el) return;
+    if (!container || !el) return;
 
     window.addEventListener('resize', updateArrows);
 
@@ -36,15 +42,15 @@ export default function ScrollRow({
       handleWheel = (e) => {
         if (e.deltaY === 0) return;
         e.preventDefault();
-        el.scrollLeft += e.deltaY * 4;
+        el.scrollLeft += e.deltaY * 3;
       };
-      el.addEventListener('wheel', handleWheel, { passive: false });
+      container.addEventListener('wheel', handleWheel, { passive: false });
     }
 
     return () => {
       window.removeEventListener('resize', updateArrows);
       if (handleWheel) {
-        el.removeEventListener('wheel', handleWheel);
+        container.removeEventListener('wheel', handleWheel);
       }
     };
   }, [updateArrows, enableWheelScroll]);
@@ -56,25 +62,26 @@ export default function ScrollRow({
     el.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
   };
 
-  return (
-    <div className="ui-scroll-row-container">
-      {showArrows && showLeft && (
-        <button
-          type="button"
-          className="ui-carousel-arrow is-left"
-          onClick={() => scroll('left')}
-        >
-          <ChevronLeft size={20} />
-        </button>
-      )}
+  const containerClass = [
+    'ui-scroll-row-container',
+    `ui-scroll-row-container--layout-${arrowsLayout}`,
+    `ui-scroll-row-container--size-${size}`,
+  ].join(' ');
 
-      {showArrows && showRight && (
+  const leftHidden = !showLeft || !showArrows;
+  const rightHidden = !showRight || !showArrows;
+  const arrowIconSize = size === 'sm' ? 12 : 20;
+
+  return (
+    <div ref={containerRef} className={containerClass}>
+      {showArrows && (
         <button
           type="button"
-          className="ui-carousel-arrow is-right"
-          onClick={() => scroll('right')}
+          className={`ui-carousel-arrow is-left ${leftHidden ? 'is-hidden' : ''}`}
+          onClick={() => scroll('left')}
+          style={leftHidden ? { visibility: 'hidden', pointerEvents: 'none' } : undefined}
         >
-          <ChevronRight size={20} />
+          <ChevronLeft size={arrowIconSize} />
         </button>
       )}
 
@@ -88,14 +95,31 @@ export default function ScrollRow({
       >
         {children}
       </div>
+
+      {showArrows && (
+        <button
+          type="button"
+          className={`ui-carousel-arrow is-right ${rightHidden ? 'is-hidden' : ''}`}
+          onClick={() => scroll('right')}
+          style={rightHidden ? { visibility: 'hidden', pointerEvents: 'none' } : undefined}
+        >
+          <ChevronRight size={arrowIconSize} />
+        </button>
+      )}
     </div>
   );
-}
+});
+
+ScrollRow.displayName = 'ScrollRow';
 
 ScrollRow.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
   showArrows: PropTypes.bool,
   enableWheelScroll: PropTypes.bool,
+  arrowsLayout: PropTypes.oneOf(['overlay', 'column']),
+  size: PropTypes.oneOf(['default', 'sm']),
   onScroll: PropTypes.func,
 };
+
+export default ScrollRow;

@@ -2,8 +2,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
-  ChevronRight, ChevronLeft, Check,
-  Clapperboard, Calendar, Tv
+  Check, Clapperboard, Calendar, Tv
 } from '@/ui/icons';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { formatEpisodeNumber } from '../../../utils/detailUtils';
@@ -13,6 +12,7 @@ import api from '@/lib/api';
 import BespokeEpisodeDetail from './BespokeEpisodeDetail';
 import Lightbox from '@/ui/Lightbox';
 import PosterCard from '@/ui/PosterCard';
+import ScrollRow from '@/ui/ScrollRow';
 import './BespokeSeasonsSection.css';
 
 export default function BespokeSeasonsSection() {
@@ -105,31 +105,9 @@ export default function BespokeSeasonsSection() {
 
   const activeEpisode = episodes[activeEpisodeIndex];
 
-  // Carousel scroll handling
+  // Carousel scroll refs (forwarded)
   const seasonsScrollRef = useRef(null);
   const episodesScrollRef = useRef(null);
-
-
-
-  const scrollSeasons = (direction) => {
-    const container = seasonsScrollRef.current;
-    if (!container) return;
-    const scrollAmount = container.clientWidth * 0.6;
-    container.scrollBy({
-      left: direction === 'left' ? -scrollAmount : scrollAmount,
-      behavior: 'smooth'
-    });
-  };
-
-  const scrollEpisodes = (direction) => {
-    const container = episodesScrollRef.current;
-    if (!container) return;
-    const scrollAmount = container.clientWidth * 0.6;
-    container.scrollBy({
-      left: direction === 'left' ? -scrollAmount : scrollAmount,
-      behavior: 'smooth'
-    });
-  };
 
   // Episode stepping
   const stepEpisode = (direction) => {
@@ -178,15 +156,7 @@ export default function BespokeSeasonsSection() {
         
         {/* Row 1 Header: Seasons Horizontal Pills */}
         <div className="bespoke-browser-card__pills-header">
-          <button
-            type="button"
-            className="bespoke-carousel-nav bespoke-carousel-nav--left"
-            onClick={() => scrollSeasons('left')}
-          >
-            <ChevronLeft size={14} />
-          </button>
-
-          <div className="bespoke-seasons-pills" ref={seasonsScrollRef}>
+          <ScrollRow ref={seasonsScrollRef} className="bespoke-seasons-pills" showArrows={true} enableWheelScroll={true} arrowsLayout="column" size="sm">
             {seasonsList.map((season) => {
               const isActive = season.season_number === selectedSeasonNumber;
               const title = season.title || `Season ${season.season_number}`;
@@ -204,15 +174,7 @@ export default function BespokeSeasonsSection() {
                 </button>
               );
             })}
-          </div>
-
-          <button
-            type="button"
-            className="bespoke-carousel-nav bespoke-carousel-nav--right"
-            onClick={() => scrollSeasons('right')}
-          >
-            <ChevronRight size={14} />
-          </button>
+          </ScrollRow>
         </div>
 
         {/* Row 1 Body: Season Details */}
@@ -279,15 +241,7 @@ export default function BespokeSeasonsSection() {
         {/* Row 2 Header: Episode Pills */}
         {episodes.length > 0 && (
           <div className="bespoke-browser-card__pills-header">
-            <button
-              type="button"
-              className="bespoke-carousel-nav bespoke-carousel-nav--left"
-              onClick={() => scrollEpisodes('left')}
-            >
-              <ChevronLeft size={14} />
-            </button>
-
-            <div className="bespoke-episodes-pills" ref={episodesScrollRef}>
+            <ScrollRow ref={episodesScrollRef} className="bespoke-episodes-pills" showArrows={true} enableWheelScroll={true} arrowsLayout="column" size="sm">
               {episodes.map((episode) => {
                 const isActive = episode.id === selectedEpisodeId;
                 const formattedEpNum = formatEpisodeNumber(episode.episode_number);
@@ -307,15 +261,7 @@ export default function BespokeSeasonsSection() {
                   </button>
                 );
               })}
-            </div>
-
-            <button
-              type="button"
-              className="bespoke-carousel-nav bespoke-carousel-nav--right"
-              onClick={() => scrollEpisodes('right')}
-            >
-              <ChevronRight size={14} />
-            </button>
+            </ScrollRow>
           </div>
         )}
 

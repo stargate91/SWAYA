@@ -110,32 +110,56 @@
   box-shadow: 0 0 6px color-mix(in srgb, var(--app-shell-color-accent, var(--color-accent-blue)) 50%, transparent);
 }
 
-/* Horizontal pill navigation arrows */
-.bespoke-carousel-nav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
+/* Custom small arrow style for horizontal pill rows inside headers */
+.bespoke-browser-card__pills-header .ui-scroll-row-container {
+  flex: 1;
+}
+
+.bespoke-browser-card__pills-header .ui-carousel-arrow {
+  width: 26px;
+  height: 26px;
+  background: color-mix(in srgb, var(--color-bg-elevated) 55%, var(--color-surface-glass-strong));
   border: 1px solid var(--color-border-default);
-  background: var(--color-surface-glass);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: all var(--motion-fast), opacity var(--motion-base);
-  opacity: 0;
-  pointer-events: none;
+  opacity: 0.85;
 }
 
-.bespoke-browser-card__pills-header:hover .bespoke-carousel-nav {
-  opacity: 1;
-  pointer-events: auto;
+.bespoke-browser-card__pills-header .ui-carousel-arrow.is-left {
+  left: 4px;
 }
 
-.bespoke-carousel-nav:hover {
-  background: var(--color-border-default);
+.bespoke-browser-card__pills-header .ui-carousel-arrow.is-right {
+  right: 4px;
+}
+
+.bespoke-browser-card__pills-header .ui-carousel-arrow:hover {
+  background: var(--color-surface-glass-heavy);
   color: var(--color-text-primary);
-  border-color: var(--color-border-heavy);
+  border-color: var(--color-border-strong);
+  opacity: 1;
+}
+
+.bespoke-browser-card__pills-header .ui-carousel-arrow svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Premium soft glass style for main body scroll chevrons */
+.bespoke-cast-browser-card__body .ui-carousel-arrow,
+.bespoke-companies-section .ui-carousel-arrow {
+  background: color-mix(in srgb, var(--color-bg-elevated) 45%, var(--color-surface-glass-strong));
+  border: 1px solid var(--color-border-default);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  color: var(--color-text-secondary);
+  transition: all var(--motion-fast);
+}
+
+.bespoke-cast-browser-card__body .ui-carousel-arrow:hover,
+.bespoke-companies-section .ui-carousel-arrow:hover {
+  background: var(--color-surface-glass-heavy);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
 }
 
 /* Card Bodies */
@@ -560,17 +584,13 @@
   width: 100%;
 }
 
-.bespoke-cast-browser-card__body:hover .bespoke-carousel-nav {
-  opacity: 1;
-  pointer-events: auto;
+.bespoke-cast-browser-card__body .ui-scroll-row-container {
+  margin: 0 calc(var(--space-lg) * -1);
+  width: calc(100% + calc(var(--space-lg) * 2));
 }
 
-.bespoke-cast-browser-card__body .dashboard-cast-carousel-container {
-  display: flex;
-  overflow: hidden;
-  margin: 0 calc(var(--space-lg) * -1);
+.bespoke-cast-browser-card__body .ui-scroll-row-track {
   padding: 0 var(--space-lg);
-  width: calc(100% + calc(var(--space-lg) * 2));
 }
 
 .bespoke-cast-browser-card__body .dashboard-cast-grid {
