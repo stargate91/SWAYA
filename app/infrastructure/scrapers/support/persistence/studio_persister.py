@@ -11,33 +11,6 @@ from app.shared_kernel.ports.metadata_repository_port import MetadataRepositoryP
 
 logger = logging.getLogger(__name__)
 
-STUDIO_PARENT_MAPPING = {
-    "1000 facials": "Blowpass",
-    "facial abuse": "Blowpass",
-    "monster facials": "Blowpass",
-    "my first sex teacher": "Naughty America",
-    "naughty bookworms": "Naughty America",
-    "tonight's girlfriend": "Naughty America",
-    "milf hunter": "Reality Kings",
-    "big naturals": "Reality Kings",
-    "monster curves": "Reality Kings",
-    "rk prime": "Reality Kings",
-    "bangbus": "Bang Bros",
-    "monsters of cock": "Bang Bros",
-    "dirty wives club": "Brazzers",
-    "doctor adventures": "Brazzers",
-    "pornstar spa": "Brazzers",
-    "mommy got boobs": "Brazzers",
-    "real wife stories": "Brazzers",
-    "baby got boobs": "Brazzers",
-    "big wet butts": "Brazzers",
-    "big tits at school": "Brazzers",
-    "big tits at work": "Brazzers",
-    "zz series": "Brazzers",
-    "teens like it big": "Brazzers",
-    "milfs like it big": "Brazzers",
-    "brazzers exxtra": "Brazzers",
-}
 
 def _detect_remote_image_extension(url: str, fallback_name: str = "") -> str:
     fallback_ext = Path(urlparse(fallback_name).path).suffix.lower()
@@ -106,6 +79,14 @@ def _detect_remote_image_extension(url: str, fallback_name: str = "") -> str:
 
     return '.jpg'
 
+def clean_studio_name(name: str) -> str:
+    if not name:
+        return ""
+    # Strip common network suffixes
+    name = re.sub(r"\s*\(?Network\)?\s*$", "", name, flags=re.IGNORECASE)
+    name = re.sub(r"\s*Network\s*$", "", name, flags=re.IGNORECASE)
+    return name.strip()
+
 class StudioPersister:
     def __init__(self, parent_persister):
         self.persister = parent_persister
@@ -150,17 +131,37 @@ class StudioPersister:
         self.image_downloader.enqueue_download(url, "logos", filename)
 
     def persist_studios(self, studios_info: List[Dict[str, Any]], match: MetadataMatch):
+        from sqlalchemy import func
         for studio_info in studios_info:
-            s_name = studio_info["name"]
-            studio = self.metadata_repo.get_studio_by_name(s_name)
+            raw_s_name = studio_info["name"]
+            cleaned_s_name = clean_studio_name(raw_s_name)
+            
+            # Resolve using aliases & clean canonical name
+            studio = self.metadata_repo.resolve_studio_by_name(cleaned_s_name)
             if not studio:
                 try:
                     with self.db.begin_nested():
-                        studio = self.metadata_repo.create_studio(name=s_name, logo_path=studio_info["logo_path"])
+                        studio = self.metadata_repo.create_studio(name=cleaned_s_name, logo_path=studio_info["logo_path"])
                         self.metadata_repo.flush()
                 except Exception:
-                    studio = self.metadata_repo.get_studio_by_name(s_name)
-            elif studio_info.get("logo_path") and (
+                    studio = self.metadata_repo.resolve_studio_by_name(cleaned_s_name)
+            
+            # If the scraper name is different from the canonical name, create a StudioAlias
+            if studio and raw_s_name and raw_s_name.strip().lower() != studio.name.lower():
+                from app.domains.metadata.models import StudioAlias
+                alias_exists = self.db.query(StudioAlias).filter(
+                    func.lower(StudioAlias.alias_name) == func.lower(raw_s_name.strip())
+                ).first()
+                if not alias_exists:
+                    try:
+                        with self.db.begin_nested():
+                            new_alias = StudioAlias(alias_name=raw_s_name.strip(), studio=studio)
+                            self.db.add(new_alias)
+                            self.db.flush()
+                    except Exception:
+                        pass
+            
+            if studio_info.get("logo_path") and (
                 not studio.logo_path 
                 or not self._local_image_exists(studio.logo_path, "logos")
                 or (studio.logo_path.startswith("logos/") and studio.logo_path.lower().endswith((".jpg", ".jpeg")))
@@ -169,41 +170,37 @@ class StudioPersister:
             
             # Map parent studio
             parent_info = studio_info.get("parent")
-            if not parent_info:
-                s_name_lower = s_name.lower().strip()
-                fallback_parent_name = None
-                if s_name_lower in STUDIO_PARENT_MAPPING:
-                    fallback_parent_name = STUDIO_PARENT_MAPPING[s_name_lower]
-                elif "brazzers" in s_name_lower and s_name_lower != "brazzers":
-                    fallback_parent_name = "Brazzers"
-                elif "naughty america" in s_name_lower and s_name_lower != "naughty america":
-                    fallback_parent_name = "Naughty America"
-                elif "reality kings" in s_name_lower and s_name_lower != "reality kings":
-                    fallback_parent_name = "Reality Kings"
-                elif "bang bros" in s_name_lower and s_name_lower != "bang bros":
-                    fallback_parent_name = "Bang Bros"
-                
-                if fallback_parent_name:
-                    parent_info = {"name": fallback_parent_name, "logo_path": None}
 
-            if parent_info:
+            if parent_info and parent_info.get("name"):
+                raw_p_name = parent_info["name"]
+                cleaned_p_name = clean_studio_name(raw_p_name)
+                # Loop prevention
+                if cleaned_p_name.lower() == cleaned_s_name.lower():
+                    parent_info = None
+                else:
+                    parent_info = {"name": cleaned_p_name, "logo_path": parent_info.get("logo_path")}
+            
+            # Parent Locking: Only set/change parent if the studio currently does NOT have a parent in the database
+            if parent_info and not studio.parent_studio_id:
                 p_name = parent_info["name"]
-                parent_studio = self.metadata_repo.get_studio_by_name(p_name)
+                parent_studio = self.metadata_repo.resolve_studio_by_name(p_name)
                 if not parent_studio:
                     try:
                         with self.db.begin_nested():
                             parent_studio = self.metadata_repo.create_studio(name=p_name, logo_path=parent_info["logo_path"])
                             self.metadata_repo.flush()
                     except Exception:
-                        parent_studio = self.metadata_repo.get_studio_by_name(p_name)
+                        parent_studio = self.metadata_repo.resolve_studio_by_name(p_name)
                 elif parent_info.get("logo_path") and (
                     not parent_studio.logo_path 
                     or not self._local_image_exists(parent_studio.logo_path, "logos")
                     or (parent_studio.logo_path.startswith("logos/") and parent_studio.logo_path.lower().endswith((".jpg", ".jpeg")))
                 ):
                     parent_studio.logo_path = parent_info["logo_path"]
-                studio.parent_studio = parent_studio
-                self.queue_studio_logo(parent_studio)
+                
+                if parent_studio and parent_studio.id != studio.id:
+                    studio.parent_studio = parent_studio
+                    self.queue_studio_logo(parent_studio)
 
             self.queue_studio_logo(studio)
 

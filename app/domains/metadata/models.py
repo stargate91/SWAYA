@@ -42,6 +42,7 @@ class Studio(Base):
     matches: Mapped[List["MetadataMatch"]] = relationship("MetadataMatch", secondary=metadata_match_studios, back_populates="studios")
     overrides: Mapped[Optional["UserOverride"]] = relationship("UserOverride", back_populates="studio", cascade="all, delete-orphan")
     external_links: Mapped[List["ExternalStudioLink"]] = relationship("ExternalStudioLink", back_populates="studio", cascade="all, delete-orphan")
+    aliases: Mapped[List["StudioAlias"]] = relationship("StudioAlias", back_populates="studio", cascade="all, delete-orphan")
 
 
 class MetadataMatch(Base):
@@ -230,6 +231,20 @@ class ExternalStudioLink(Base):
 
     # Relationships
     studio: Mapped["Studio"] = relationship("Studio", back_populates="external_links")
+
+
+class StudioAlias(Base):
+    """
+    Alternative names, typos, or provider-specific suffixes for a canonical Studio.
+    """
+    __tablename__ = "studio_aliases"
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    alias_name: Mapped[str] = mapped_column(String, unique=True, index=True)
+    studio_id: Mapped[int] = mapped_column(ForeignKey("studios.id", ondelete="CASCADE"), index=True)
+    
+    # Relationships
+    studio: Mapped["Studio"] = relationship("Studio", back_populates="aliases")
 
 
 class ExternalCollectionLink(Base):

@@ -2,7 +2,7 @@ from typing import Any, Optional
 from sqlalchemy.orm import Session
 from app.shared_kernel.ports.metadata_repository_port import MetadataRepositoryPort
 from app.shared_kernel.enums import Provider, MediaType
-from app.domains.metadata.models import MetadataMatch, Studio, MediaCollection, MetadataLocalization, MediaCollectionLocalization
+from app.domains.metadata.models import MetadataMatch, Studio, MediaCollection, MetadataLocalization, MediaCollectionLocalization, StudioAlias
 
 class DbMetadataRepository(MetadataRepositoryPort):
     def __init__(self, db: Session):
@@ -61,6 +61,27 @@ class DbMetadataRepository(MetadataRepositoryPort):
                 return obj
                 
         return self.db.query(Studio).filter(func.lower(Studio.name) == func.lower(cleaned_name)).first()
+
+    def resolve_studio_by_name(self, name: str) -> Optional[Any]:
+        from sqlalchemy import func
+        cleaned_name = name.strip() if name else ""
+        if not cleaned_name:
+            return None
+
+        # 1. Check pending/unsaved objects in session first
+        for obj in self.db.new:
+            if isinstance(obj, StudioAlias) and obj.alias_name and obj.alias_name.lower() == cleaned_name.lower():
+                return obj.studio
+            if isinstance(obj, Studio) and obj.name and obj.name.lower() == cleaned_name.lower():
+                return obj
+
+        # 2. Check aliases table
+        alias = self.db.query(StudioAlias).filter(func.lower(StudioAlias.alias_name) == func.lower(cleaned_name)).first()
+        if alias:
+            return alias.studio
+
+        # 3. Fallback to canonical name check
+        return self.get_studio_by_name(cleaned_name)
 
     def create_studio(self, name: str, logo_path: Optional[str] = None) -> Any:
         cleaned_name = name.strip() if name else ""

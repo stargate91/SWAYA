@@ -14,6 +14,10 @@ class MetadataRepositoryPort(Protocol):
         """Finds a Studio by name."""
         ...
 
+    def resolve_studio_by_name(self, name: str) -> Optional[Any]:
+        """Finds a Studio by name, checking aliases first."""
+        ...
+
     def create_studio(self, name: str, logo_path: Optional[str] = None) -> Any:
         """Creates and returns a new Studio record."""
         ...

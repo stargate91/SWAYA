@@ -15,7 +15,7 @@ query FindSceneByHash($hash: String!) {
       duration
       date
       tags { name }
-      studio { id name images { url } }
+      studio { id name images { url } parent { id name images { url } } }
       performers {
         performer {
           id name gender scene_count birth_date images { url } ethnicity hair_color eye_color height
@@ -37,7 +37,7 @@ query SearchScenes($q: String!) {
     date
     duration
     tags { name }
-    studio { id name images { url } }
+    studio { id name images { url } parent { id name images { url } } }
     performers {
       performer {
         id name gender scene_count birth_date images { url } ethnicity hair_color eye_color height
