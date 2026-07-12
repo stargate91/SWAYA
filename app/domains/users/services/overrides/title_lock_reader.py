@@ -38,6 +38,17 @@ class TitleLockReader:
                         MetadataMatch.external_id == str(external_id)
                     ).first()
                     
+                    # When multiple matches share the same external_id (e.g. TMDB TV shows
+                    # and their episodes), prefer the parent type over episodes
+                    if match and match.media_type == MediaType.EPISODE:
+                        preferred = self.db.query(MetadataMatch).filter(
+                            MetadataMatch.provider == provider,
+                            MetadataMatch.external_id == str(external_id),
+                            MetadataMatch.media_type.in_([MediaType.TV, MediaType.MOVIE])
+                        ).first()
+                        if preferred:
+                            match = preferred
+                    
                     if not match:
                         m_type = MediaType.MOVIE
                         if media_type:

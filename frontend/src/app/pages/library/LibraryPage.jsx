@@ -307,6 +307,8 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
               setPerformerFilter={state.setPerformerFilter}
               studioFilter={state.studioFilter}
               setStudioFilter={state.setStudioFilter}
+              networkFilter={state.networkFilter}
+              setNetworkFilter={state.setNetworkFilter}
               filterData={state.filterData}
             />
           ) : null}

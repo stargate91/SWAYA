@@ -22,6 +22,7 @@ const PosterCard = memo(function PosterCard({
   badge,
   topRightBadge,
   topRightAction,
+  topLeftAction,
   isWatched = false,
   overlay,
   playOverlay,
@@ -211,6 +212,7 @@ const PosterCard = memo(function PosterCard({
             {children}
           </MediaCard>
         </DefaultComponent>
+        {topLeftAction}
         {topRightAction}
         {playOverlay ? (
           <IconButton

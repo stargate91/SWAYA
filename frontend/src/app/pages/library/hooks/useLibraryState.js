@@ -43,6 +43,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
   const [yearFilter, setYearFilter] = useState(savedState.yearFilter ?? '');
   const [performerFilter, setPerformerFilter] = useState(savedState.performerFilter ?? '');
   const [studioFilter, setStudioFilter] = useState(savedState.studioFilter ?? '');
+  const [networkFilter, setNetworkFilter] = useState(savedState.networkFilter ?? '');
   const [hairColorFilter, setHairColorFilter] = useState(savedState.hairColorFilter ?? '');
   const [ethnicityFilter, setEthnicityFilter] = useState(savedState.ethnicityFilter ?? '');
   const [eyeColorFilter, setEyeColorFilter] = useState(savedState.eyeColorFilter ?? '');
@@ -100,6 +101,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     setYearFilter('');
     setPerformerFilter('');
     setStudioFilter('');
+    setNetworkFilter('');
     setHairColorFilter('');
     setEthnicityFilter('');
     setEyeColorFilter('');
@@ -126,6 +128,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
       yearFilter,
       performerFilter,
       studioFilter,
+      networkFilter,
       hairColorFilter,
       ethnicityFilter,
       eyeColorFilter,
@@ -159,6 +162,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     yearFilter,
     performerFilter,
     studioFilter,
+    networkFilter,
     hairColorFilter,
     ethnicityFilter,
     eyeColorFilter,
@@ -212,6 +216,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
       include_adult: activeSessionMode === 'nsfw',
       selected_performer_id: performerFilter !== '' ? Number(performerFilter) : undefined,
       selected_studio_id: studioFilter !== '' ? Number(studioFilter) : undefined,
+      selected_network_id: networkFilter !== '' ? Number(networkFilter) : undefined,
       filter_hair_color: hairColorFilter !== '' ? hairColorFilter : undefined,
       filter_ethnicity: ethnicityFilter !== '' ? ethnicityFilter : undefined,
       filter_eye_color: eyeColorFilter !== '' ? eyeColorFilter : undefined,
@@ -244,6 +249,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     yearFilter,
     performerFilter,
     studioFilter,
+    networkFilter,
     hairColorFilter,
     ethnicityFilter,
     eyeColorFilter,
@@ -272,6 +278,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
       selected_year: yearFilter !== '' ? Number(yearFilter) : undefined,
       selected_performer_id: performerFilter !== '' ? Number(performerFilter) : undefined,
       selected_studio_id: studioFilter !== '' ? Number(studioFilter) : undefined,
+      selected_network_id: networkFilter !== '' ? Number(networkFilter) : undefined,
       filter_hair_color: hairColorFilter !== '' ? hairColorFilter : undefined,
       filter_ethnicity: ethnicityFilter !== '' ? ethnicityFilter : undefined,
       filter_eye_color: eyeColorFilter !== '' ? eyeColorFilter : undefined,
@@ -300,6 +307,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     yearFilter,
     performerFilter,
     studioFilter,
+    networkFilter,
     hairColorFilter,
     ethnicityFilter,
     eyeColorFilter,
@@ -678,7 +686,9 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
       watchedFilter !== 'all' ||
       genreFilter !== '' ||
       decadeFilter !== 'all' ||
-      yearFilter !== ''
+      yearFilter !== '' ||
+      networkFilter !== '' ||
+      studioFilter !== ''
     ))
   );
   const hasActiveFilters = tabTotalCount > 0 && totalItems === 0 && (hasSearchQuery || hasFilterSelection);
@@ -748,6 +758,8 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     setPerformerFilter: handleFilterChange(setPerformerFilter),
     studioFilter,
     setStudioFilter: handleFilterChange(setStudioFilter),
+    networkFilter,
+    setNetworkFilter: handleFilterChange(setNetworkFilter),
     hairColorFilter,
     setHairColorFilter: handleFilterChange(setHairColorFilter),
     ethnicityFilter,

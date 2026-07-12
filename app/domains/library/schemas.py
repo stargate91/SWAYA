@@ -285,6 +285,7 @@ class FilterOptionsResponse(BaseModel):
     tags: List[TagItem]
     performers: Optional[List[PerformerFilterItem]] = None
     studios: Optional[List[StudioFilterItem]] = None
+    networks: Optional[List[StudioFilterItem]] = None
     hair_colors: Optional[List[str]] = None
     ethnicities: Optional[List[str]] = None
     eye_colors: Optional[List[str]] = None

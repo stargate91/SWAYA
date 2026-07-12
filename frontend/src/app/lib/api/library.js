@@ -12,7 +12,7 @@ export const library = {
     if (include_adult !== undefined) params.append('include_adult', String(include_adult));
     return fetchJson(`/api/library/continue-watching?${params.toString()}`);
   },
-  getItems: ({ tab, page, pageSize, search, sortBy, filter_ownership, filter_watched, selected_genre, people_role, filter_gender, filter_favorite, selected_decade, selected_year, include_adult, selected_performer_id, selected_studio_id, filter_hair_color, filter_ethnicity, filter_eye_color, filter_tattoos, filter_piercings, filter_breast_type, filter_breast_size, filter_butt_shape, filter_butt_size, selected_tags }, options = {}) => {
+  getItems: ({ tab, page, pageSize, search, sortBy, filter_ownership, filter_watched, selected_genre, people_role, filter_gender, filter_favorite, selected_decade, selected_year, include_adult, selected_performer_id, selected_studio_id, selected_network_id, filter_hair_color, filter_ethnicity, filter_eye_color, filter_tattoos, filter_piercings, filter_breast_type, filter_breast_size, filter_butt_shape, filter_butt_size, selected_tags }, options = {}) => {
     const params = new URLSearchParams();
     if (tab) params.append('tab', tab);
     if (include_adult !== undefined) params.append('include_adult', String(include_adult));
@@ -30,6 +30,7 @@ export const library = {
     if (selected_year) params.append('selected_year', selected_year);
     if (selected_performer_id) params.append('selected_performer_id', selected_performer_id);
     if (selected_studio_id) params.append('selected_studio_id', selected_studio_id);
+    if (selected_network_id) params.append('selected_network_id', selected_network_id);
     if (filter_hair_color) params.append('filter_hair_color', filter_hair_color);
     if (filter_ethnicity) params.append('filter_ethnicity', filter_ethnicity);
     if (filter_eye_color) params.append('filter_eye_color', filter_eye_color);

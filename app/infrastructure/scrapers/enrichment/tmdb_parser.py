@@ -81,6 +81,34 @@ class TMDBEnrichmentParser:
                 if studio not in match.studios:
                     match.studios.append(studio)
 
+        # Networks mapping (TV shows only)
+        for net in details.get("networks") or []:
+            n_name = net.get("name")
+            if n_name:
+                studio = self.metadata_repo.get_studio_by_name(n_name)
+                if not studio:
+                    studio = self.metadata_repo.create_studio(name=n_name, logo_path=net.get("logo_path"))
+
+                if studio.logo_path and not studio.logo_path.startswith("logos/"):
+                    local_logo = self.enricher._queue_image(studio.logo_path, "logos", f"studio_{studio.name}")
+                    if local_logo:
+                        studio.logo_path = local_logo
+
+                from app.domains.metadata.models import metadata_match_studios
+                conn_exists = self.db.query(metadata_match_studios).filter(
+                    metadata_match_studios.c.metadata_match_id == match.id,
+                    metadata_match_studios.c.studio_id == studio.id,
+                    metadata_match_studios.c.relation_type == 'network'
+                ).first() is not None
+                if not conn_exists:
+                    self.db.execute(
+                        metadata_match_studios.insert().values(
+                            metadata_match_id=match.id,
+                            studio_id=studio.id,
+                            relation_type='network'
+                        )
+                    )
+
         # OMDb Ratings
         if include_ratings and imdb_id:
             omdb_data = self.enricher._get_omdb_ratings_cached(imdb_id)

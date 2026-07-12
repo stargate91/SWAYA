@@ -94,6 +94,15 @@ class TvQueryBuilder(BaseQueryBuilder):
                 MetadataMatch.is_active,
             )
 
+        if params.selected_network_id:
+            from app.domains.metadata.models import metadata_match_studios
+            query = query.join(
+                metadata_match_studios, metadata_match_studios.c.metadata_match_id == MetadataMatch.id
+            ).filter(
+                metadata_match_studios.c.studio_id == params.selected_network_id,
+                metadata_match_studios.c.relation_type == 'network'
+            )
+
         query, joined_localization, joined_override = self._apply_common_filters(
             query, params, joined_localization, joined_override
         )

@@ -1,7 +1,8 @@
 import { memo } from 'react';
-import { Heart, Pencil, Play, Star, Minus, Check } from '@/ui/icons';
+import { Heart, Pencil, Play, Star, Minus, Check, Eye, EyeOff } from '@/ui/icons';
 import Badge from '@/ui/Badge';
 import PosterCard from '@/ui/PosterCard';
+import { useBulkUpdateWatchedMutation } from '@/queries';
 import {
   getPosterImagePath,
   getProfileImagePath,
@@ -63,6 +64,8 @@ export const LibraryPosterCard = memo(({
   const isLibraryTv = isLibraryTvTab(resolvedTab);
   const isLibraryMovie = isLibraryMovieTab(resolvedTab);
   const isLibraryScenes = isLibraryScenesTab(resolvedTab);
+
+  const bulkUpdateWatchedMutation = useBulkUpdateWatchedMutation();
 
   const resolvePosterUrl = (path) => resolveMediaImageUrl(path, 'poster');
 
@@ -247,6 +250,34 @@ export const LibraryPosterCard = memo(({
     </button>
   ) : null;
 
+  const handleWatchToggleClick = (e) => {
+    e.stopPropagation();
+    if (bulkUpdateWatchedMutation.isPending) return;
+    bulkUpdateWatchedMutation.mutate({
+      itemIds: [String(item.id)],
+      isWatched: !item.is_watched,
+      entityId: String(item.id),
+      tvId: isLibraryTv ? (item.tv_tmdb_id || item.tmdb_id) : undefined,
+    });
+  };
+
+  const watchToggleButton = (!isCollections && !isPeople && !onRemove) ? (
+    <button
+      type="button"
+      className="ui-poster-card__watch-toggle"
+      title={item.is_watched
+        ? (t('library.details.markUnwatched') || 'Mark as Unwatched')
+        : (t('library.details.markWatched') || 'Mark as Watched')}
+      aria-label={item.is_watched
+        ? (t('library.details.markUnwatched') || 'Mark as Unwatched')
+        : (t('library.details.markWatched') || 'Mark as Watched')}
+      onClick={handleWatchToggleClick}
+      disabled={bulkUpdateWatchedMutation.isPending}
+    >
+      {item.is_watched ? <EyeOff size={14} /> : <Eye size={14} />}
+    </button>
+  ) : null;
+
   return (
     <PosterCard
       aspect={isScene ? 'landscape' : 'poster'}
@@ -263,6 +294,7 @@ export const LibraryPosterCard = memo(({
       ratingPorndb={ratingPorndb}
       ratingPill={ratingPill}
       performers={performers}
+      topLeftAction={watchToggleButton}
       topRightAction={topRightAction}
       badge={badge}
       topRightBadge={topRightBadge}

@@ -21,6 +21,7 @@ class ListingFilterParams:
         include_adult: bool = False,
         selected_performer_id: Optional[int] = None,
         selected_studio_id: Optional[int] = None,
+        selected_network_id: Optional[int] = None,
         filter_hair_color: Optional[str] = None,
         filter_ethnicity: Optional[str] = None,
         filter_eye_color: Optional[str] = None,
@@ -49,6 +50,7 @@ class ListingFilterParams:
         self.include_adult = include_adult
         self.selected_performer_id = selected_performer_id
         self.selected_studio_id = selected_studio_id
+        self.selected_network_id = selected_network_id
         self.filter_hair_color = filter_hair_color
         self.filter_ethnicity = filter_ethnicity
         self.filter_eye_color = filter_eye_color

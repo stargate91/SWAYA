@@ -133,6 +133,18 @@ class DbMediaResolver(
                     query = query.filter(MetadataMatch.media_type == resolved_type)
                 
                 match = query.first()
+                
+                # When multiple matches share the same external_id (e.g. TMDB TV shows
+                # and their episodes), prefer the parent type over episodes
+                if match and match.media_type == MediaType.EPISODE and not media_type:
+                    preferred = self.db.query(MetadataMatch).filter(
+                        MetadataMatch.provider == Provider.TMDB,
+                        MetadataMatch.external_id == tmdb_id,
+                        MetadataMatch.media_type.in_([MediaType.TV, MediaType.MOVIE])
+                    ).first()
+                    if preferred:
+                        match = preferred
+                
                 if not match:
                     resolved_type = MediaType.MOVIE
                     if media_type:

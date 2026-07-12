@@ -87,6 +87,7 @@ class LibraryFilterService:
 
         performers = []
         studios = []
+        networks = []
         hair_colors = []
         ethnicities = []
         eye_colors = []
@@ -266,6 +267,17 @@ class LibraryFilterService:
                     name = f"  ↳ {name}"
                 studios.append({"id": s.id, "name": name})
 
+            # Fetch networks for TV Shows
+            from app.domains.metadata.models import metadata_match_studios
+            active_networks = self.db.query(Studio).join(
+                metadata_match_studios, metadata_match_studios.c.studio_id == Studio.id
+            ).filter(
+                metadata_match_studios.c.metadata_match_id.in_(match_ids_subquery),
+                metadata_match_studios.c.relation_type == 'network'
+            ).distinct().all()
+            networks = [{"id": n.id, "name": n.name} for n in active_networks]
+            networks.sort(key=lambda x: (x["name"] or "").lower())
+
             def normalize_options(raw_list):
                 seen = set()
                 result = []
@@ -417,6 +429,7 @@ class LibraryFilterService:
             tags=tags,
             performers=performers,
             studios=studios,
+            networks=networks,
             hair_colors=hair_colors,
             ethnicities=ethnicities,
             eye_colors=eye_colors,

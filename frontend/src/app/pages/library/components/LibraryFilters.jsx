@@ -9,6 +9,7 @@ import {
   isLibraryTagsTab,
   isLibraryVideoTab,
   isLibraryScenesTab,
+  isLibraryMovieTab,
 } from '@/lib/libraryTabs';
 import LibraryAdvancedFilters from './LibraryAdvancedFilters';
 import AttributeFilterDropdown from './AttributeFilterDropdown';
@@ -55,6 +56,8 @@ export default function LibraryFilters({
   setPerformerFilter,
   studioFilter,
   setStudioFilter,
+  networkFilter,
+  setNetworkFilter,
   hairColorFilter,
   setHairColorFilter,
   ethnicityFilter,
@@ -84,6 +87,7 @@ export default function LibraryFilters({
   const isTagsTab = isLibraryTagsTab(resolvedTab);
   const isTvTab = isLibraryTvTab(resolvedTab);
   const isScenesTab = isLibraryScenesTab(resolvedTab);
+  const isMovieTab = isLibraryMovieTab(resolvedTab);
 
   const yearsList = filterData?.years;
   const decades = useMemo(() => {
@@ -328,9 +332,14 @@ export default function LibraryFilters({
             />
           )}
 
-          {isScenesTab && activeSessionMode === 'nsfw' && filterData?.studios && filterData.studios.length > 0 && (
+          {((isMovieTab && filterData?.studios && filterData.studios.length > 0) ||
+            (isScenesTab && activeSessionMode === 'nsfw' && filterData?.studios && filterData.studios.length > 0)) && (
             <FilterDropdown
-              label={t('library.filter.studioLabel') || 'Studio:'}
+              label={
+                activeSessionMode === 'nsfw'
+                  ? (t('library.filter.studioLabel') || 'Studio:')
+                  : (t('library.filter.companyLabel') || 'Company:')
+              }
               value={studioFilter}
               searchable={true}
               onChange={(e) => {
@@ -338,8 +347,29 @@ export default function LibraryFilters({
                 setCurrentPage(1);
               }}
               options={[
-                { value: '', label: t('library.filter.allStudios') || 'All Studios' },
+                {
+                  value: '',
+                  label: activeSessionMode === 'nsfw'
+                    ? (t('library.filter.allStudios') || 'All Studios')
+                    : (t('library.filter.allCompanies') || 'All Companies'),
+                },
                 ...(filterData.studios).map(s => ({ value: String(s.id), label: s.name })),
+              ]}
+            />
+          )}
+
+          {isTvTab && filterData?.networks && filterData.networks.length > 0 && (
+            <FilterDropdown
+              label={t('library.filter.networkLabel') || 'Network:'}
+              value={networkFilter}
+              searchable={true}
+              onChange={(e) => {
+                setNetworkFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              options={[
+                { value: '', label: t('library.filter.allNetworks') || 'All Networks' },
+                ...(filterData.networks).map(n => ({ value: String(n.id), label: n.name })),
               ]}
             />
           )}

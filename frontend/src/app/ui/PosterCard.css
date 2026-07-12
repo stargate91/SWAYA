@@ -186,6 +186,43 @@ div.ui-poster-card__image-wrapper:focus-visible {
   transform: translateY(0);
 }
 
+/* Watch Toggle Button (Top-Left on Hover) */
+.ui-poster-card__watch-toggle {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full, 9999px);
+  border: 1px solid color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border));
+  background-color: color-mix(in srgb, var(--app-shell-color-panel) 82%, transparent);
+  background-image: var(--button-secondary-bg);
+  color: var(--button-secondary-color);
+  box-shadow: 0 4px 10px color-mix(in srgb, black 22%, transparent);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity var(--motion-fast), transform var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast);
+}
+
+.ui-poster-card__watch-toggle:hover,
+.ui-poster-card__watch-toggle:focus-visible {
+  color: var(--color-text-primary);
+  border-color: color-mix(in srgb, var(--color-accent-blue) 72%, var(--button-secondary-border));
+  outline: none;
+}
+
+.ui-poster-card__media-shell:hover .ui-poster-card__watch-toggle,
+.ui-poster-card__media-shell:focus-within .ui-poster-card__watch-toggle {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* Card Action Button (e.g. Added / Remove) */
 .ui-card-action-btn {
   position: absolute;

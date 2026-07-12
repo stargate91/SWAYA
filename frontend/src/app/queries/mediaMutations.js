@@ -358,12 +358,27 @@ export const useBulkUpdateWatchedMutation = () => {
     mutationFn: ({ itemIds, isWatched }) => api.media.bulkWatched(itemIds, isWatched),
     onMutate: async (variables) => {
       const { itemIds, isWatched, tvId } = variables;
+      const idsSet = new Set(itemIds.map(id => String(id)));
       
       if (tvId) {
         await queryClient.cancelQueries({ queryKey: ['library-tv-detail', tvId] });
         await queryClient.cancelQueries({ queryKey: ['library-tv-detail', `tv_${tvId}`] });
       }
       await queryClient.cancelQueries({ queryKey: ['library'] });
+
+      // Optimistically update library listing cache
+      const prevLibraryQueries = queryClient.getQueriesData({ queryKey: ['library'] });
+      queryClient.setQueriesData({ queryKey: ['library'] }, (oldData) => {
+        if (!oldData || !oldData.items) return oldData;
+        return {
+          ...oldData,
+          items: oldData.items.map(item =>
+            idsSet.has(String(item.id))
+              ? { ...item, is_watched: isWatched, watch_count: isWatched ? Math.max(item.watch_count || 0, 1) : 0 }
+              : item
+          ),
+        };
+      });
 
       const prevTvDetail = tvId ? queryClient.getQueryData(['library-tv-detail', tvId]) : null;
       const prevTvDetailWithPrefix = tvId ? queryClient.getQueryData(['library-tv-detail', `tv_${tvId}`]) : null;
@@ -372,7 +387,6 @@ export const useBulkUpdateWatchedMutation = () => {
         if (!oldData) return oldData;
         let updatedSeasons = oldData.seasons;
         if (oldData.seasons) {
-          const idsSet = new Set(itemIds.map(id => String(id)));
           updatedSeasons = oldData.seasons.map(season => {
             if (!season.episodes) return season;
             const updatedEpisodes = season.episodes.map(ep => {
@@ -396,9 +410,14 @@ export const useBulkUpdateWatchedMutation = () => {
         queryClient.setQueryData(['library-tv-detail', `tv_${tvId}`], updateTvCache);
       }
 
-      return { prevTvDetail, prevTvDetailWithPrefix };
+      return { prevTvDetail, prevTvDetailWithPrefix, prevLibraryQueries };
     },
     onError: (err, variables, context) => {
+      if (context?.prevLibraryQueries) {
+        for (const [queryKey, data] of context.prevLibraryQueries) {
+          queryClient.setQueryData(queryKey, data);
+        }
+      }
       if (variables.tvId && context) {
         if (context.prevTvDetail) {
           queryClient.setQueryData(['library-tv-detail', variables.tvId], context.prevTvDetail);
@@ -410,9 +429,7 @@ export const useBulkUpdateWatchedMutation = () => {
     },
     onSuccess: (data, variables) => {
       if (variables.tvId) invalidateTvDetail(queryClient, variables.tvId);
-      queryClient.invalidateQueries({ queryKey: QK.library });
-      queryClient.invalidateQueries({ queryKey: QK.stats });
-      queryClient.invalidateQueries({ queryKey: QK.watchedHistory });
+      invalidateEntity(queryClient, variables.entityId || variables.itemIds?.[0], { lists: true, stats: true, continueWatching: true, watchedHistory: true });
     },
   });
 };

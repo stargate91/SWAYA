@@ -250,6 +250,7 @@ class OverridePersister:
         request: BulkWatchedUpdate
     ) -> Dict[str, Any]:
         """Toggles watched status in bulk across multiple items."""
+        from app.domains.users.models import UserOverride
         item_ids = request.item_ids or []
         is_watched = bool(request.is_watched)
         watched_at = request.watched_at or request.last_watched_at
@@ -266,8 +267,10 @@ class OverridePersister:
             override = title_lock_reader.get_or_create_override(str(item_id))
             if override:
                 overrides_map[item_id] = override
-                if override.media_item_id:
-                    media_item_ids.append(override.media_item_id)
+                m_item_id, _ = title_lock_reader.resolver.resolve_ids(str(item_id))
+                resolved_id = m_item_id or override.media_item_id
+                if resolved_id:
+                    media_item_ids.append(resolved_id)
 
         from app.domains.history.models import PlaybackLog
         has_playback_log = set()
@@ -280,26 +283,149 @@ class OverridePersister:
         for item_id in item_ids:
             override = overrides_map.get(item_id)
             if override:
+                m_item_id, _ = title_lock_reader.resolver.resolve_ids(str(item_id))
+                resolved_media_item_id = m_item_id or override.media_item_id
+                
+                physical_override = None
+                if resolved_media_item_id:
+                    physical_override = db.query(UserOverride).filter(
+                        UserOverride.user_id == override.user_id,
+                        UserOverride.media_item_id == resolved_media_item_id,
+                        UserOverride.metadata_match_id.is_(None)
+                    ).first()
+
+                is_tv = False
+                match = None
+                if override.metadata_match_id:
+                    from app.domains.metadata.models import MetadataMatch
+                    from app.shared_kernel.enums import MediaType
+                    match = db.query(MetadataMatch).filter(MetadataMatch.id == override.metadata_match_id).first()
+                    if match and match.media_type == MediaType.TV:
+                        is_tv = True
+
                 # Skip changing status if the item has a real play-button playback history and we're marking as watched
-                if is_watched and override.media_item_id in has_playback_log:
+                if not is_tv and is_watched and resolved_media_item_id in has_playback_log:
                     continue
 
                 if is_watched:
-                    if override.is_watched:
+                    if override.is_watched and not is_tv:
                         continue
                     override.is_watched = True
                     override.watch_count = max(override.watch_count or 0, 1)
                     if watched_at:
                         override.last_watched_at = parsed_date
                     override.is_tracked = True
-                    self._track_parent_tv_show_if_episode(db, str(item_id), override.media_item_id, override.metadata_match_id, track_item_fn, tracked_parent_ids)
+                    
+                    if physical_override:
+                        physical_override.is_watched = True
+                        physical_override.watch_count = max(physical_override.watch_count or 0, 1)
+                        if watched_at:
+                            physical_override.last_watched_at = parsed_date
+                        physical_override.is_tracked = True
+                        physical_override.resume_position = 0
+                    
+                    if is_tv and match:
+                        from sqlalchemy import or_
+                        from sqlalchemy.orm import aliased
+                        parent_season = aliased(MetadataMatch)
+                        episodes = db.query(MetadataMatch).outerjoin(
+                            parent_season, MetadataMatch.parent_id == parent_season.id
+                        ).filter(
+                            MetadataMatch.media_type == MediaType.EPISODE,
+                            or_(
+                                MetadataMatch.parent_id == match.id,
+                                parent_season.parent_id == match.id
+                            )
+                        ).all()
+                        
+                        episode_ids = [ep.id for ep in episodes]
+                        episode_media_item_ids = [ep.media_item_id for ep in episodes if ep.media_item_id is not None]
+                        
+                        existing_ep_ovs = db.query(UserOverride).filter(
+                            UserOverride.user_id == override.user_id,
+                            or_(
+                                UserOverride.metadata_match_id.in_(episode_ids),
+                                UserOverride.media_item_id.in_(episode_media_item_ids)
+                            )
+                        ).all()
+                        
+                        ep_ovs_by_match = {ov.metadata_match_id: ov for ov in existing_ep_ovs if ov.metadata_match_id}
+                        ep_ovs_by_media = {ov.media_item_id: ov for ov in existing_ep_ovs if ov.media_item_id and not ov.metadata_match_id}
+                        
+                        for ep in episodes:
+                            ep_ov = ep_ovs_by_match.get(ep.id)
+                            if not ep_ov and ep.media_item_id:
+                                ep_ov = ep_ovs_by_media.get(ep.media_item_id)
+                            if not ep_ov:
+                                ep_ov = UserOverride(user_id=override.user_id, metadata_match_id=ep.id)
+                                db.add(ep_ov)
+                            ep_ov.is_watched = True
+                            ep_ov.watch_count = max(ep_ov.watch_count or 0, 1)
+                            ep_ov.is_tracked = True
+                            if watched_at:
+                                ep_ov.last_watched_at = parsed_date
+                            ep_ov.resume_position = 0
+                    else:
+                        self._track_parent_tv_show_if_episode(db, str(item_id), resolved_media_item_id, override.metadata_match_id, track_item_fn, tracked_parent_ids)
                 else:
                     override.is_watched = False
                     override.watch_count = 0
                     override.last_watched_at = None
-                    if override.media_item_id:
-                        from app.domains.history.models import PlaybackLog
-                        db.query(PlaybackLog).filter(PlaybackLog.media_item_id == override.media_item_id).delete()
+                    override.resume_position = 0
+                    
+                    if physical_override:
+                        physical_override.is_watched = False
+                        physical_override.watch_count = 0
+                        physical_override.last_watched_at = None
+                        physical_override.resume_position = 0
+                    
+                    if is_tv and match:
+                        from sqlalchemy import or_
+                        from sqlalchemy.orm import aliased
+                        parent_season = aliased(MetadataMatch)
+                        episodes = db.query(MetadataMatch).outerjoin(
+                            parent_season, MetadataMatch.parent_id == parent_season.id
+                        ).filter(
+                            MetadataMatch.media_type == MediaType.EPISODE,
+                            or_(
+                                MetadataMatch.parent_id == match.id,
+                                parent_season.parent_id == match.id
+                            )
+                        ).all()
+                        
+                        episode_ids = [ep.id for ep in episodes]
+                        episode_media_item_ids = [ep.media_item_id for ep in episodes if ep.media_item_id is not None]
+                        
+                        existing_ep_ovs = db.query(UserOverride).filter(
+                            UserOverride.user_id == override.user_id,
+                            or_(
+                                UserOverride.metadata_match_id.in_(episode_ids),
+                                UserOverride.media_item_id.in_(episode_media_item_ids)
+                            )
+                        ).all()
+                        
+                        ep_ovs_by_match = {ov.metadata_match_id: ov for ov in existing_ep_ovs if ov.metadata_match_id}
+                        ep_ovs_by_media = {ov.media_item_id: ov for ov in existing_ep_ovs if ov.media_item_id and not ov.metadata_match_id}
+                        
+                        for ep in episodes:
+                            ep_ov = ep_ovs_by_match.get(ep.id)
+                            if not ep_ov and ep.media_item_id:
+                                ep_ov = ep_ovs_by_media.get(ep.media_item_id)
+                            if not ep_ov:
+                                ep_ov = UserOverride(user_id=override.user_id, metadata_match_id=ep.id)
+                                db.add(ep_ov)
+                            ep_ov.is_watched = False
+                            ep_ov.watch_count = 0
+                            ep_ov.last_watched_at = None
+                            ep_ov.resume_position = 0
+                        
+                        if episode_media_item_ids:
+                            from app.domains.history.models import PlaybackLog
+                            db.query(PlaybackLog).filter(PlaybackLog.media_item_id.in_(episode_media_item_ids)).delete()
+                    else:
+                        if resolved_media_item_id:
+                            from app.domains.history.models import PlaybackLog
+                            db.query(PlaybackLog).filter(PlaybackLog.media_item_id == resolved_media_item_id).delete()
                 count += 1
 
         db.commit()
