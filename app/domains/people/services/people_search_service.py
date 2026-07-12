@@ -287,9 +287,13 @@ class PeopleSearchService:
             else:
                 person = person_query.first()
             if person:
+                newly_activated = is_active and not person.is_active
                 if is_active:
                     person.is_active = True
                     db.commit()
+                if newly_activated:
+                    from app.domains.people.services.people_status_service import enqueue_person_enrichment
+                    enqueue_person_enrichment(person.id)
                 return {"status": "success", "id": person.id, "name": person.name}
                 
             tmdb_details = None
@@ -324,4 +328,7 @@ class PeopleSearchService:
             
             person.is_active = is_active
             db.commit()
+            if is_active:
+                from app.domains.people.services.people_status_service import enqueue_person_enrichment
+                enqueue_person_enrichment(person.id)
             return {"status": "success", "id": person.id, "name": person.name}

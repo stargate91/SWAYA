@@ -248,14 +248,32 @@ class PeopleDetailService:
             return "OTHER"
 
         if "height" in data:
-            match = re.search(r'(\d+)\s*cm', data["height"])
+            h = None
+            match = re.search(r'(\d+(?:\.\d+)?)\s*cm', data["height"])
             if match:
-                extracted["height"] = int(match.group(1))
+                h = int(float(match.group(1)))
+            else:
+                # Fallback: feet/inches → cm (e.g. "5 ft 4 in", "5'4\"", "5 feet 4 inches")
+                ft_match = re.search(r"(\d+)\s*(?:ft|feet|')\s*(\d+)?\s*(?:in|inches|\")?", data["height"])
+                if ft_match:
+                    feet = int(ft_match.group(1))
+                    inches = int(ft_match.group(2)) if ft_match.group(2) else 0
+                    h = int((feet * 12 + inches) * 2.54)
+            if h and 100 <= h <= 250:
+                extracted["height"] = h
 
         if "weight" in data:
-            match = re.search(r'(\d+)\s*kg', data["weight"])
+            w = None
+            match = re.search(r'(\d+(?:\.\d+)?)\s*kg', data["weight"])
             if match:
-                extracted["weight"] = int(match.group(1))
+                w = int(float(match.group(1)))
+            else:
+                # Fallback: lbs → kg (e.g. "121 lbs", "121 pounds")
+                lb_match = re.search(r'(\d+(?:\.\d+)?)\s*(?:lbs?|pounds?)', data["weight"])
+                if lb_match:
+                    w = int(float(lb_match.group(1)) * 0.4536)
+            if w and 20 <= w <= 300:
+                extracted["weight"] = w
 
         if "measurements" in data:
             match = re.search(r'(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)', data["measurements"])

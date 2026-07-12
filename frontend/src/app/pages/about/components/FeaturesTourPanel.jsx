@@ -25,12 +25,12 @@ export default function FeaturesTourPanel({
   const displayImage = showNsfwDocs && currentItemObj.image_nsfw ? currentItemObj.image_nsfw : currentItemObj.image;
 
   return (
-    <div className="about-tab-panel features-panel">
-      <div className="about-features-container">
+    <div className="about-tab-panel features-panel about-features-tour-container">
+      <div className="about-features-tour-body">
         {/* Left Sub-sidebar (Navigation of features) */}
-        <div className="about-features-sidebar">
-          <div className="about-features-nsfw-toggle-row">
-            <span className="about-features-nsfw-toggle-label">{t('about.docs_wizard.show_nsfw_features') || 'Show NSFW features'}</span>
+        <div className="about-features-tour-sidebar">
+          <div className="about-features-nsfw-toggle">
+            <span className="about-features-nsfw-label">{t('about.docs_wizard.show_nsfw_features') || 'Show NSFW features'}</span>
             <Switch
               checked={showNsfwDocs}
               onChange={() => {

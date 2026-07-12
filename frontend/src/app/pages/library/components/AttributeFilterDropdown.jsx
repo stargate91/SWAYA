@@ -10,7 +10,7 @@ export default function AttributeFilterDropdown({
   setCurrentPage,
   ...props
 }) {
-  if (!items || items.length === 0) return null;
+  const isDisabled = (!items || items.length === 0) && !value;
 
   const options = [
     { value: '', label: allLabel },
@@ -27,6 +27,7 @@ export default function AttributeFilterDropdown({
       onFilterChange={onChange}
       setCurrentPage={setCurrentPage}
       options={options}
+      disabled={isDisabled}
       {...props}
     />
   );

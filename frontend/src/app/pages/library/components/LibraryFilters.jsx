@@ -148,8 +148,8 @@ export default function LibraryFilters({
                           ] : []),
                           { value: 'tag_count', label: t('library.sort.tagCount') || 'Tag Count' },
                           { value: 'height', label: t('library.sort.height') || 'Height' },
+                          { value: 'weight', label: t('library.sort.weight') || 'Weight' },
                           ...(settings?.include_adult ? [
-                            { value: 'weight', label: t('library.sort.weight') || 'Weight' },
                             { value: 'cup_size', label: t('library.sort.cupSize') || 'Breast Size' },
                             { value: 'waist', label: t('library.sort.waist') || 'Waist Size' },
                             { value: 'hip', label: t('library.sort.hip') || 'Hip Size' },

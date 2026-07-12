@@ -234,13 +234,16 @@ class Person(Base):
         has_manual_butt_size = manual_link and manual_link.source_data and manual_link.source_data.get("butt_size")
         
         if not has_manual_butt_size:
-            if height is not None and waist is not None and hip is not None:
+            calc_height = height if height is not None else self.height
+            calc_waist = waist if waist is not None else self.waist
+            calc_hip = hip if hip is not None else self.hip
+            if calc_height is not None and calc_waist is not None and calc_hip is not None:
                 try:
-                    height_in = float(height) / 2.54
-                    fah = float(hip) / (height_in * 0.53)
-                    whr = float(waist) / float(hip)
+                    height_in = float(calc_height) / 2.54
+                    fah = float(calc_hip) / (height_in * 0.53)
+                    whr = float(calc_waist) / float(calc_hip)
                     ccf = 0.72 / whr
-                    bcs = float(hip) * fah * ccf
+                    bcs = float(calc_hip) * fah * ccf
                     
                     if bcs < 33:
                         butt_size = "SMALL"

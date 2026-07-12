@@ -144,7 +144,17 @@ class LibraryFilterService:
                 def _apply_attr_filter(q, column, value):
                     if not value:
                         return q
-                    return q.filter(column.isnot(None), column != "", column.ilike(value.replace("_", " ").strip()))
+                    from sqlalchemy import or_
+                    val_str = str(value).strip()
+                    return q.filter(
+                        column.isnot(None),
+                        column != "",
+                        or_(
+                            column.ilike(val_str),
+                            column.ilike(val_str.replace("_", " ")),
+                            column.ilike(val_str.replace(" ", "_"))
+                        )
+                    )
 
                 people_q = _apply_attr_filter(people_q, Person.hair_color, params.filter_hair_color)
                 people_q = _apply_attr_filter(people_q, Person.ethnicity, params.filter_ethnicity)

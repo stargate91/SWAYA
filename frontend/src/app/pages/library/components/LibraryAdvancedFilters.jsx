@@ -84,7 +84,7 @@ export default function LibraryAdvancedFilters({
           />
         )}
 
-        {settings?.include_adult && buttShapeItems.length > 0 && (
+        {settings?.include_adult && (
           <AttributeFilterDropdown
             label={t('library.filter.buttShapeLabel') || 'Butt Shape:'}
             value={buttShapeFilter}
@@ -95,7 +95,7 @@ export default function LibraryAdvancedFilters({
           />
         )}
 
-        {settings?.include_adult && buttSizeItems.length > 0 && (
+        {settings?.include_adult && (
           <AttributeFilterDropdown
             label={t('library.filter.buttSizeLabel') || 'Butt Size:'}
             value={buttSizeFilter}
@@ -106,27 +106,23 @@ export default function LibraryAdvancedFilters({
           />
         )}
 
-        {tattooItems.length > 0 && (
-          <AttributeFilterDropdown
-            label={t('library.filter.tattoosLabel') || 'Tattoos:'}
-            value={tattoosFilter}
-            onChange={setTattoosFilter}
-            items={tattooItems}
-            allLabel={t('library.filter.allTattoos') || 'All Options'}
-            setCurrentPage={setCurrentPage}
-          />
-        )}
+        <AttributeFilterDropdown
+          label={t('library.filter.tattoosLabel') || 'Tattoos:'}
+          value={tattoosFilter}
+          onChange={setTattoosFilter}
+          items={tattooItems}
+          allLabel={t('library.filter.allTattoos') || 'All Options'}
+          setCurrentPage={setCurrentPage}
+        />
 
-        {piercingItems.length > 0 && (
-          <AttributeFilterDropdown
-            label={t('library.filter.piercingsLabel') || 'Piercings:'}
-            value={piercingsFilter}
-            onChange={setPiercingsFilter}
-            items={piercingItems}
-            allLabel={t('library.filter.allPiercings') || 'All Options'}
-            setCurrentPage={setCurrentPage}
-          />
-        )}
+        <AttributeFilterDropdown
+          label={t('library.filter.piercingsLabel') || 'Piercings:'}
+          value={piercingsFilter}
+          onChange={setPiercingsFilter}
+          items={piercingItems}
+          allLabel={t('library.filter.allPiercings') || 'All Options'}
+          setCurrentPage={setCurrentPage}
+        />
       </div>
     </div>
   );

@@ -100,65 +100,93 @@ class PersonEnrichmentQueue:
                 logger.info(f"Successfully enriched activated person: {person.name}")
 
             # Automatic HealthyCeleb enrichment for SFW performers
+            logger.info(f"HC enrichment check for {person.name}: is_adult={person.is_adult}, birthday={person.birthday!r}")
             if not person.is_adult and person.birthday:
                 try:
                     from app.domains.people.services.people_detail_service import PeopleDetailService
-                    # Instantiate with db session and self.scrapers (configured on queue)
-                    detail_service = PeopleDetailService(db, scrapers=self.scrapers)
+                    # Call scrape_healthyceleb as an unbound method to avoid
+                    # PeopleDetailService.__init__ which requires full scrapers
+                    # (PerformerDetailReader calls scrapers.tmdb(db) eagerly).
+                    # scrape_healthyceleb only uses self.db internally.
+                    _dummy = object.__new__(PeopleDetailService)
+                    _dummy.db = db
                     
-                    hc_data = detail_service.scrape_healthyceleb(person.id)
+                    hc_data = _dummy.scrape_healthyceleb(person.id)
                     
+                    # Birthday-based underage check
                     person_bday = person.birthday
                     if person_bday and isinstance(person_bday, str):
                         try:
                             from datetime import datetime as dt
                             person_bday = dt.strptime(person_bday.split("T")[0].strip(), "%Y-%m-%d").date()
                         except ValueError:
-                            pass
+                            person_bday = None
                     elif hasattr(person_bday, "date"):
                         person_bday = person_bday.date()
                     
                     hc_bday = hc_data.get("date_of_birth")
                     
-                    if hc_bday and hc_bday == person_bday:
-                        is_underage = False
-                        if person_bday:
-                            from datetime import date, timedelta
-                            today = date.today()
+                    if hc_bday and person_bday and hc_bday != person_bday:
+                        logger.warning(f"HC birthday mismatch for {person.name}: HC={hc_bday}, DB={person_bday} — applying data anyway")
+
+                    is_underage = False
+                    effective_bday = person_bday or hc_bday
+                    if effective_bday:
+                        from datetime import date, timedelta
+                        today = date.today()
+                        try:
+                            threshold = effective_bday.replace(year=effective_bday.year + 18) + timedelta(days=14)
+                            if threshold > today:
+                                is_underage = True
+                        except Exception:
+                            pass
+
+                    if not is_underage:
+                        if hc_data.get("height") and (not person.height or person.height < 100):
+                            person.height = hc_data["height"]
+                        if hc_data.get("weight") and (not person.weight or person.weight < 20):
+                            person.weight = hc_data["weight"]
+                        if hc_data.get("hair_color") and not person.hair_color:
+                            person.hair_color = hc_data["hair_color"]
+                        if hc_data.get("eye_color") and not person.eye_color:
+                            person.eye_color = hc_data["eye_color"]
+                        if hc_data.get("waist") and not person.waist:
+                            person.waist = hc_data["waist"]
+                        if hc_data.get("hip") and not person.hip:
+                            person.hip = hc_data["hip"]
+                        if hc_data.get("cup_size") and not person.cup_size:
+                            person.cup_size = hc_data["cup_size"]
+                        if hc_data.get("band_size") and not person.band_size:
+                            person.band_size = hc_data["band_size"]
+
+                        # Auto-calculate butt_size from height/waist/hip
+                        if person.height and person.waist and person.hip and not person.butt_size:
                             try:
-                                threshold = person_bday.replace(year=person_bday.year + 18) + timedelta(days=14)
-                                if threshold > today:
-                                    is_underage = True
-                            except Exception:
+                                height_in = float(person.height) / 2.54
+                                fah = float(person.hip) / (height_in * 0.53)
+                                whr = float(person.waist) / float(person.hip)
+                                ccf = 0.72 / whr
+                                bcs = float(person.hip) * fah * ccf
+                                if bcs < 33:
+                                    person.butt_size = "SMALL"
+                                elif bcs < 40:
+                                    person.butt_size = "MEDIUM"
+                                elif bcs < 50:
+                                    person.butt_size = "BIG"
+                                else:
+                                    person.butt_size = "EXTRA_BIG"
+                            except (ValueError, TypeError, ZeroDivisionError):
                                 pass
 
-                        if not is_underage:
-                            if hc_data.get("height") and not person.height:
-                                person.height = hc_data["height"]
-                            if hc_data.get("weight") and not person.weight:
-                                person.weight = hc_data["weight"]
-                            if hc_data.get("hair_color") and not person.hair_color:
-                                person.hair_color = hc_data["hair_color"]
-                            if hc_data.get("eye_color") and not person.eye_color:
-                                person.eye_color = hc_data["eye_color"]
-                            if hc_data.get("waist") and not person.waist:
-                                person.waist = hc_data["waist"]
-                            if hc_data.get("hip") and not person.hip:
-                                person.hip = hc_data["hip"]
-                            if hc_data.get("cup_size") and not person.cup_size:
-                                person.cup_size = hc_data["cup_size"]
-                            if hc_data.get("band_size") and not person.band_size:
-                                person.band_size = hc_data["band_size"]
-
-                        if hc_data.get("ethnicity") and not person.ethnicity:
-                            person.ethnicity = hc_data["ethnicity"]
-                        if hc_data.get("place_of_birth") and not person.place_of_birth:
-                            person.place_of_birth = hc_data["place_of_birth"]
-                        
-                        db.commit()
-                        logger.info(f"Successfully auto-enriched SFW performer {person.name} from HealthyCeleb.")
+                    if hc_data.get("ethnicity") and not person.ethnicity:
+                        person.ethnicity = hc_data["ethnicity"]
+                    if hc_data.get("place_of_birth") and not person.place_of_birth:
+                        person.place_of_birth = hc_data["place_of_birth"]
+                    
+                    db.commit()
+                    logger.info(f"Successfully auto-enriched SFW performer {person.name} from HealthyCeleb.")
                 except Exception as e:
-                    logger.debug(f"Auto-HealthyCeleb enrichment skipped/failed for {person.name}: {e}")
+                    logger.warning(f"Auto-HealthyCeleb enrichment skipped/failed for {person.name}: {e}")
         except Exception as e:
             logger.error(f"Failed to enrich person {person_id} in background queue: {e}", exc_info=True)
         finally:
