@@ -1,4 +1,3 @@
-/* eslint-disable react/forbid-dom-props, react/forbid-component-props */
 import { useState } from 'react';
 import Spinner from '../../ui/Spinner';
 import Skeleton from '../../ui/Skeleton';

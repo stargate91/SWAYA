@@ -27,10 +27,6 @@ export default function RatingsPage() {
   const [editingItem, setEditingItem] = useState(null);
   const [reviewText, setReviewText] = useState('');
 
-  // Distribution chart tab state
-  const [distTab, setDistTab] = useState('movies');
-  const effectiveDistTab = !isAdultMode && distTab === 'scenes' ? 'movies' : distTab;
-
   const handleOpenReviewDrawer = (e, item) => {
     e.stopPropagation();
     setEditingItem(item);

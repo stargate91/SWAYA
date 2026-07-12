@@ -169,5 +169,14 @@
   "widget": {
     "failed_to_load": "Failed to load",
     "unknown_error": "An unknown error occurred while loading this widget."
+  },
+  "toast": {
+    "enrichment": {
+      "success_sfw_one": "✓ 1 artist enriched",
+      "success_sfw_other": "✓ {{count}} artists enriched",
+      "success_nsfw_one": "✓ 1 adult star enriched",
+      "success_nsfw_other": "✓ {{count}} adult stars enriched",
+      "active": "Enriching {{name}}"
+    }
   }
 }

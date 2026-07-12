@@ -2,12 +2,15 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { X } from '@/ui/icons';
 import api from '@/lib/api';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
+import { useTranslation } from '@/providers/LanguageContext';
 import './ToastViewport.css';
 
 function EnrichmentProgress() {
+  const { t } = useTranslation();
   const [status, setStatus] = useState(null);
   const [dismissed, setDismissed] = useState(false);
   const [showDone, setShowDone] = useState(false);
+  const [lastTotal, setLastTotal] = useState(0);
   const lastTotalRef = useRef(0);
   const pollRef = useRef(null);
   const doneTimerRef = useRef(null);
@@ -21,6 +24,7 @@ function EnrichmentProgress() {
 
       if (data.active) {
         lastTotalRef.current = data.total;
+        setLastTotal(data.total);
         setDismissed(false);
         setShowDone(false);
       } else if (lastTotalRef.current > 0) {
@@ -30,6 +34,7 @@ function EnrichmentProgress() {
         doneTimerRef.current = setTimeout(() => {
           setShowDone(false);
           lastTotalRef.current = 0;
+          setLastTotal(0);
         }, 4000);
       }
     } catch (err) {
@@ -38,6 +43,7 @@ function EnrichmentProgress() {
   }, []);
 
   useEffect(() => {
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
     poll();
     pollRef.current = setInterval(poll, 1500);
     return () => {
@@ -48,19 +54,24 @@ function EnrichmentProgress() {
 
   const isActive = status?.active && !dismissed;
   const pct = status?.total > 0 ? Math.round((status.completed / status.total) * 100) : 0;
+  const progressText = status ? `${status.completed}/${status.total}` : '';
 
   if (showDone && !dismissed) {
     const isNsfw = sessionMode === 'nsfw';
-    const count = lastTotalRef.current;
-    const label = isNsfw
-      ? (count === 1 ? 'adult star' : 'adult stars')
-      : (count === 1 ? 'artist' : 'artists');
+    const count = lastTotal;
+    const successMsg = isNsfw
+      ? (count === 1
+        ? t('toast.enrichment.success_nsfw_one', { count, defaultValue: '✓ 1 adult star enriched' })
+        : t('toast.enrichment.success_nsfw_other', { count, defaultValue: `✓ ${count} adult stars enriched` }))
+      : (count === 1
+        ? t('toast.enrichment.success_sfw_one', { count, defaultValue: '✓ 1 artist enriched' })
+        : t('toast.enrichment.success_sfw_other', { count, defaultValue: `✓ ${count} artists enriched` }));
 
     return (
       <div className="ui-toast ui-toast--success">
         <div className="ui-toast__header">
           <h4 className="ui-toast__title">
-            ✓ {count === 1 ? label : `${count} ${label}`} enriched
+            {successMsg}
           </h4>
           <button
             type="button"
@@ -81,10 +92,10 @@ function EnrichmentProgress() {
     <div className="ui-toast">
       <div className="ui-toast__header">
         <h4 className="ui-toast__title enrichment-progress__title">
-          Enriching {status.current_name || '…'}
+          {t('toast.enrichment.active', { name: status.current_name || '…', defaultValue: `Enriching ${status.current_name || '…'}` })}
         </h4>
         <span className="enrichment-progress__count">
-          {status.completed}/{status.total}
+          {progressText}
         </span>
         <button
           type="button"
@@ -97,10 +108,8 @@ function EnrichmentProgress() {
       </div>
       <div className="ui-toast__description">
         <div className="enrichment-progress__track">
-          <div
-            className="enrichment-progress__bar"
-            style={{ width: `${pct}%` }}
-          />
+          {/* eslint-disable-next-line react/forbid-dom-props */}
+          <div className="enrichment-progress__bar" style={{ width: `${pct}%` }} />
         </div>
       </div>
     </div>

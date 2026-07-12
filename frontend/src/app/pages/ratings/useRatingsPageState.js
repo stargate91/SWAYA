@@ -185,8 +185,8 @@ export function useRatingsPageState() {
   const sortedItems = useMemo(() => {
     const items = [...searchFilteredItems];
     items.sort((a, b) => {
-      let valA = '';
-      let valB = '';
+      let valA;
+      let valB;
 
       if (sortKey === 'rating') {
         valA = a.user_rating ?? -1;

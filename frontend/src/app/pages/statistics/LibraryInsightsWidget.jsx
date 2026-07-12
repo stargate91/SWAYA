@@ -223,10 +223,8 @@ export const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
               </span>
             </div>
             <div className="insights-overlay-progress-track">
-              <div 
-                className="insights-overlay-progress-bar"
-                style={{ width: `${Math.min(100, (insightTitleCount / MIN_DNA_TITLES) * 100)}%` }}
-              />
+              {/* eslint-disable-next-line react/forbid-dom-props */}
+              <div className="insights-overlay-progress-bar" style={{ width: `${Math.min(100, (insightTitleCount / MIN_DNA_TITLES) * 100)}%` }} />
             </div>
           </div>
         </div>
@@ -246,7 +244,7 @@ export const TimeTravelTimeline = ({ decades, insightTitleCount, T }) => {
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const isNsfw = sessionMode === 'nsfw';
 
-  const { sorted, maxCount, topDecade, topDecadeLabel, isMocked } = useMemo(() => {
+  const { sorted, maxCount, topDecadeLabel, isMocked } = useMemo(() => {
     let mockDecades = decades;
     const isMocked = !decades || Object.keys(decades).length < 2;
     if (isMocked) {
@@ -347,10 +345,8 @@ export const TimeTravelTimeline = ({ decades, insightTitleCount, T }) => {
               </span>
             </div>
             <div className="insights-overlay-progress-track">
-              <div 
-                className="insights-overlay-progress-bar"
-                style={{ width: `${Math.min(100, (insightTitleCount / MIN_TIMELINE_TITLES) * 100)}%` }}
-              />
+              {/* eslint-disable-next-line react/forbid-dom-props */}
+              <div className="insights-overlay-progress-bar" style={{ width: `${Math.min(100, (insightTitleCount / MIN_TIMELINE_TITLES) * 100)}%` }} />
             </div>
           </div>
         </div>

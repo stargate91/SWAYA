@@ -79,7 +79,6 @@ const ScrollRow = forwardRef(({
           type="button"
           className={`ui-carousel-arrow is-left ${leftHidden ? 'is-hidden' : ''}`}
           onClick={() => scroll('left')}
-          style={leftHidden ? { visibility: 'hidden', pointerEvents: 'none' } : undefined}
         >
           <ChevronLeft size={arrowIconSize} />
         </button>
@@ -101,7 +100,6 @@ const ScrollRow = forwardRef(({
           type="button"
           className={`ui-carousel-arrow is-right ${rightHidden ? 'is-hidden' : ''}`}
           onClick={() => scroll('right')}
-          style={rightHidden ? { visibility: 'hidden', pointerEvents: 'none' } : undefined}
         >
           <ChevronRight size={arrowIconSize} />
         </button>

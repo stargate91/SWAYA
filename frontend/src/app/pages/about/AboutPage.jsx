@@ -41,15 +41,8 @@ export default function AboutPage() {
   const [activeTourIndex, setActiveTourIndex] = useState(0);
   const [activeSubFeatureIndex, setActiveSubFeatureIndex] = useState(null);
   const showAdult = Boolean(settings?.include_adult);
-  const [showNsfwDocs, setShowNsfwDocs] = useState(false);
-  const [hasSetDefaultNsfw, setHasSetDefaultNsfw] = useState(false);
-
-  useEffect(() => {
-    if (settings && Object.keys(settings).length > 0 && !hasSetDefaultNsfw) {
-      setShowNsfwDocs(showAdult);
-      setHasSetDefaultNsfw(true);
-    }
-  }, [settings, showAdult, hasSetDefaultNsfw]);
+  const [showNsfwDocsState, setShowNsfwDocsState] = useState(null);
+  const showNsfwDocs = showNsfwDocsState !== null ? showNsfwDocsState : showAdult;
 
   const handleSetActiveTab = (tabId) => {
     setActiveTab(tabId);
@@ -191,7 +184,7 @@ export default function AboutPage() {
                 activeSubFeatureIndex={activeSubFeatureIndex}
                 setActiveSubFeatureIndex={setActiveSubFeatureIndex}
                 showNsfwDocs={showNsfwDocs}
-                setShowNsfwDocs={setShowNsfwDocs}
+                setShowNsfwDocs={setShowNsfwDocsState}
                 setActiveLightboxUrl={setActiveLightboxUrl}
                 t={t}
               />

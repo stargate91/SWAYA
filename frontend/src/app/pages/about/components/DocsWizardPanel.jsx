@@ -72,7 +72,7 @@ export default function DocsWizardPanel({
 
   let steps = [];
   if (activeTab === 'docs_tmdb') {
-    steps = getTmdbWizardSteps(t, getWizardInputValue, handleInputChange, handleSaveSetting, setActiveLightboxUrl);
+    steps = getTmdbWizardSteps(t, getWizardInputValue, handleInputChange, handleSaveSetting);
   } else if (activeTab === 'docs_omdb') {
     steps = getOmdbWizardSteps(t, getWizardInputValue, handleInputChange, handleSaveSetting);
   } else if (activeTab === 'docs_stashdb') {

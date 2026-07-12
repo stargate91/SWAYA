@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useStatsQuery, useSettingsQuery } from '../../queries';
+import { useStatsQuery } from '../../queries';
 import { useLibraryModeStore } from '../../stores/useLibraryModeStore';
 import WidgetShell from '@/ui/WidgetShell';
 import './StatisticsWidget.css';

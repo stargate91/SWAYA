@@ -7,17 +7,10 @@ import {
   Star,
   BarChart2,
   History,
-  Settings,
-  Film,
-  Tv,
-  Layers,
-  Video,
-  Users,
-  PenLine
+  Settings
 } from 'lucide-react';
-import { CAMERA_EMOJI, COLON_SEPARATOR, openExternalLink } from './aboutHelpers';
 
-export const getTmdbWizardSteps = (t, getWizardInputValue, handleInputChange, handleSaveSetting, setActiveLightboxUrl) => [
+export const getTmdbWizardSteps = (t, getWizardInputValue, handleInputChange, handleSaveSetting) => [
   {
     title: t('about.docs_wizard.tmdb.title') || 'TMDb API Integration',
     description: t('about.docs_wizard.tmdb.desc') || 'TMDb is a free movie and TV show database...'

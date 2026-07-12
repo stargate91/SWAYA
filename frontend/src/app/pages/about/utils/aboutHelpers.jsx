@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { shell } from '../../../lib/electron';
 
 export const LOGO_LETTER = 'S';

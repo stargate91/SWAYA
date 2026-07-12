@@ -73,3 +73,8 @@
   border-color: var(--color-border-strong) !important;
   opacity: 1;
 }
+
+.ui-carousel-arrow.is-hidden {
+  visibility: hidden;
+  pointer-events: none;
+}

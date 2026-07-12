@@ -283,6 +283,8 @@
     "yearMode": "Year"
   },
   "details": {
+    "markWatched": "Mark as Watched",
+    "markUnwatched": "Mark as Unwatched",
     "tab_activity": "Activity",
     "tab_organize": "Organize",
     "viewOriginalImage": "View Original Image",

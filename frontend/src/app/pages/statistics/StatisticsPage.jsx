@@ -14,7 +14,7 @@ import './StatisticsPage.css';
 export default function StatisticsPage() {
   const { t } = useTranslation();
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
-  const { data: stats = {}, isLoading: statsLoading } = useStatsQuery(sessionMode === 'nsfw');
+  const { data: stats = {} } = useStatsQuery(sessionMode === 'nsfw');
   const ratingsState = useRatingsPageState();
   const [distTab, setDistTab] = useState('movies');
 
@@ -35,11 +35,11 @@ export default function StatisticsPage() {
   );
 
   const pageTitle = (
-    <span className="ratings-title-inline" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+    <span className="stats-title-inline">
       {t('sidebar.statistics') || 'Statistics'}
       {isAdultMode && (
-        <sup className="ratings-title-sup" style={{ fontSize: '0.45em', top: '-0.7em', position: 'relative' }}>
-          <Badge family="adult" tone="danger" className="ratings-title-adult-badge" style={{ padding: '2px 6px', fontSize: '11px' }}>
+        <sup className="stats-title-sup">
+          <Badge family="adult" tone="danger" className="stats-title-adult-badge">
             {t('common.adult_badge', { defaultValue: '18+' })}
           </Badge>
         </sup>
