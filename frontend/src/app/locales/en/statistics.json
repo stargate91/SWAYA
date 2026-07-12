@@ -28,6 +28,14 @@
     "other_genres": "Other Genres",
     "items_count_tooltip": "{label}: {count} items",
     "library_dna_low_data": "Your Library DNA needs a few more organized titles before the radar view becomes meaningful. For now, these are your strongest genre signals from {count} organized title(s).",
-    "timeline_low_data": "The timeline needs a bit more organized history before it can draw a real spread. Right now it is based on {count} organized title(s)."
+    "timeline_low_data": "The timeline needs a bit more organized history before it can draw a real spread. Right now it is based on {count} organized title(s).",
+    "dna_overlay_title": "Library DNA Blueprint",
+    "dna_overlay_copy_sfw": "Scan and match SFW movies to reveal your library's unique genre DNA blueprint.",
+    "dna_overlay_copy_nsfw": "Match and organize adult scenes to map your library's NSFW genre footprint.",
+    "dna_progress_text": "{count} of {limit} titles",
+    "timeline_overlay_title": "Time-Travel Timeline",
+    "timeline_overlay_copy_sfw": "Add more movies to map your collection across the history of cinema.",
+    "timeline_overlay_copy_nsfw": "Match more adult scenes to build a chronological timeline of your collection.",
+    "timeline_progress_text": "{count} of {limit} items"
   }
 }

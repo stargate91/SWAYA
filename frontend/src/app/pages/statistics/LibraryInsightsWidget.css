@@ -319,3 +319,123 @@
   font-size: 13px;
   font-weight: 800;
 }
+
+/* Ghost state / Low data premium empty states */
+.insights-dna-stage--ghost,
+.insights-timeline-stage--ghost {
+  opacity: 0.15;
+  filter: grayscale(1) blur(0.5px);
+  pointer-events: none;
+  transition: opacity 0.4s ease, filter 0.4s ease;
+}
+
+.insights-overlay-card {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4xl) var(--space-3xl);
+  background: radial-gradient(circle at center, color-mix(in srgb, var(--color-bg-elevated) 72%, transparent) 0%, var(--color-surface-overlay-heavy) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 10;
+  text-align: center;
+}
+
+.insights-overlay-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  margin-bottom: var(--space-md);
+  border: 1px solid var(--color-border-default);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.insights-overlay-icon-wrapper--dna {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--color-accent-blue) 18%, transparent), color-mix(in srgb, var(--color-accent-purple) 18%, transparent));
+  color: var(--color-accent-blue-soft);
+  animation: floatDna 5s ease-in-out infinite;
+}
+
+.insights-overlay-icon-wrapper--timeline {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--color-accent-blue) 18%, transparent), color-mix(in srgb, var(--color-brand-fansdb) 18%, transparent));
+  color: var(--color-brand-fansdb);
+  animation: floatTimeline 5s ease-in-out infinite;
+}
+
+.insights-overlay-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.insights-overlay-title {
+  margin: 0 0 var(--space-xs) 0;
+  color: var(--color-text-primary);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.insights-overlay-copy {
+  margin: 0 0 var(--space-lg) 0;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+  max-width: 260px;
+}
+
+.insights-overlay-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: 100%;
+  max-width: 180px;
+}
+
+.insights-overlay-progress-header {
+  display: flex;
+  justify-content: center;
+}
+
+.insights-overlay-progress-text {
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.insights-overlay-progress-track {
+  height: 5px;
+  border-radius: 999px;
+  background: var(--color-surface-glass-heavy);
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+}
+
+.insights-overlay-progress-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-accent-blue-soft), var(--color-accent-purple));
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.insights-overlay-icon-wrapper--timeline + * + * + .insights-overlay-progress .insights-overlay-progress-bar {
+  background: linear-gradient(90deg, var(--color-accent-blue-soft), var(--color-brand-fansdb));
+}
+
+@keyframes floatDna {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-4px) rotate(4deg); }
+}
+
+@keyframes floatTimeline {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.03); }
+}
+

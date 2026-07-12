@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { X } from '@/ui/icons';
 import api from '@/lib/api';
+import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import './ToastViewport.css';
 
 function EnrichmentProgress() {
@@ -10,6 +11,8 @@ function EnrichmentProgress() {
   const lastTotalRef = useRef(0);
   const pollRef = useRef(null);
   const doneTimerRef = useRef(null);
+  
+  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
 
   const poll = useCallback(async () => {
     try {
@@ -47,11 +50,17 @@ function EnrichmentProgress() {
   const pct = status?.total > 0 ? Math.round((status.completed / status.total) * 100) : 0;
 
   if (showDone && !dismissed) {
+    const isNsfw = sessionMode === 'nsfw';
+    const count = lastTotalRef.current;
+    const label = isNsfw
+      ? (count === 1 ? 'adult star' : 'adult stars')
+      : (count === 1 ? 'artist' : 'artists');
+
     return (
       <div className="ui-toast ui-toast--success">
         <div className="ui-toast__header">
           <h4 className="ui-toast__title">
-            ✓ {lastTotalRef.current} performers enriched
+            ✓ {count === 1 ? label : `${count} ${label}`} enriched
           </h4>
           <button
             type="button"
@@ -153,12 +162,15 @@ function ToastItem({ toast, onRemove }) {
 }
 
 export default function ToastViewport({ toasts, onRemoveToast }) {
+  const isControlsWindow = new URLSearchParams(window.location.search).get('controls_only') === 'true';
+
   return (
     <div className="ui-toast-viewport" aria-live="polite">
       {toasts.map((toast) => (
         <ToastItem key={toast.id} toast={toast} onRemove={onRemoveToast} />
       ))}
-      <EnrichmentProgress />
+      {!isControlsWindow && <EnrichmentProgress />}
     </div>
   );
 }
+
