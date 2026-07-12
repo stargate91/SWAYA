@@ -1,6 +1,6 @@
 .media-detail-page__overview {
   font-family: var(--font-family-base, sans-serif);
-  font-size: var(--font-size-md, 16px);
+  font-size: var(--font-size-md);
   line-height: 1.6;
   color: color-mix(in srgb, var(--color-text-primary) 80%, transparent);
   margin-top: var(--space-sm);
@@ -21,8 +21,8 @@
   border: none;
   color: var(--color-accent-blue);
   cursor: pointer;
-  font-size: var(--font-size-sm, 14px);
-  font-weight: 500;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   padding: 0;
   margin-top: var(--space-xs);
   text-decoration: none;

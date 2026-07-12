@@ -61,7 +61,7 @@
     radial-gradient(ellipse at 16% 22%, color-mix(in srgb, black 22%, transparent) 0%, color-mix(in srgb, black 14%, transparent) 22%, transparent 56%),
     radial-gradient(ellipse at 28% 56%, color-mix(in srgb, black 16%, transparent) 0%, color-mix(in srgb, black 10%, transparent) 24%, transparent 58%),
     radial-gradient(ellipse at 58% 42%, color-mix(in srgb, black 10%, transparent) 0%, color-mix(in srgb, black 6%, transparent) 18%, transparent 48%);
-  border-radius: 32px;
+  border-radius: var(--radius-2xl);
   pointer-events: none;
   z-index: 0;
   filter: blur(14px);
@@ -75,7 +75,7 @@
 .media-detail-page__original-title {
   font-family: var(--font-family-display, sans-serif);
   font-size: var(--font-size-md);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   font-style: italic;
   color: color-mix(in srgb, var(--color-text-secondary) 50%, var(--color-text-muted));
   margin: 0;
@@ -84,7 +84,7 @@
 .media-detail-page__tagline {
   font-family: var(--font-family-base, sans-serif);
   font-size: var(--font-size-md);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   font-style: italic;
   color: color-mix(in srgb, var(--app-shell-color-accent) 88%, var(--color-text-primary));
   margin: 0;
@@ -103,13 +103,13 @@
   height: 16px;
   width: auto;
   display: block;
-  border-radius: 2px;
+  border-radius: var(--radius-5xs);
 }
 
 .media-detail-page__logo-container.clickable {
   position: relative;
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: var(--radius-xs);
 }
 
 .media-detail-page__logo {

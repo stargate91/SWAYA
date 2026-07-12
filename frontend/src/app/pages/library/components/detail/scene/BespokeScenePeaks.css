@@ -1,7 +1,7 @@
 .bespoke-scene-peaks-card {
   background: var(--color-surface-card);
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-lg, 16px);
+  border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
   overflow: visible;
@@ -34,8 +34,8 @@
 }
 
 .bespoke-scene-peaks-title {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-text-muted);
@@ -79,7 +79,7 @@
 
 .bespoke-scene-peaks-list::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--color-ink) 15%, transparent);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
 }
 
 .bespoke-scene-peaks-item {
@@ -87,7 +87,7 @@
   justify-content: space-between;
   align-items: center;
   padding: var(--space-xs) var(--space-md);
-  border-radius: var(--radius-md, 8px);
+  border-radius: var(--radius-xs);
   background: var(--color-surface-card);
   border: 1px solid var(--color-border-default);
   transition: all var(--motion-duration-fast) var(--motion-ease-standard);
@@ -115,8 +115,8 @@
 }
 
 .bespoke-scene-peaks-item-time {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
 }
 
@@ -128,7 +128,7 @@
 }
 
 .bespoke-scene-peaks-item-date {
-  font-size: 11px;
+  font-size: var(--font-size-2xs);
   color: var(--color-text-muted);
 }
 

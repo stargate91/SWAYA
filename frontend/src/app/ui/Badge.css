@@ -5,7 +5,7 @@
   min-height: 20px;
   padding: 0 var(--space-sm);
   padding-left: calc(var(--space-sm) + 0.04em);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.04em;
@@ -51,10 +51,10 @@
 }
 
 .ui-badge--adult.ui-badge--danger {
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   font-weight: bold;
   padding: 0.125rem var(--space-sm) !important;
-  border-radius: 3px !important;
+  border-radius: var(--radius-4xs) !important;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   line-height: 1.2;
@@ -64,9 +64,9 @@
 }
 
 sup .ui-badge--adult.ui-badge--danger {
-  font-size: 10px !important;
+  font-size: var(--font-size-3xs) !important;
   letter-spacing: normal !important;
-  border-radius: 3px !important;
+  border-radius: var(--radius-4xs) !important;
   padding: var(--space-2xs) var(--space-xs) !important;
   height: auto !important;
   min-height: 0 !important;

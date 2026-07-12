@@ -41,7 +41,7 @@
 
 .entity-detail-page__status-card {
   padding: var(--space-3xl);
-  border-radius: 24px;
+  border-radius: var(--radius-lg);
   background: var(--media-detail-panel-section-bg);
   border: 1px solid var(--media-detail-panel-section-border);
   box-shadow: var(--media-detail-panel-section-shadow);
@@ -94,7 +94,7 @@
   background-color: var(--socials-bg);
   --socials-border: 1px solid color-mix(in srgb, var(--color-border-default) 35%, transparent);
   border: var(--socials-border);
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   --socials-padding: 5px;
   padding: var(--socials-padding);
   box-shadow: 0 8px 24px color-mix(in srgb, black 25%, transparent);
@@ -119,7 +119,7 @@
   justify-content: center;
   width: 38px;
   height: 38px;
-  border-radius: var(--radius-md, 12px);
+  border-radius: var(--radius-md);
   --scroll-border: 1px solid color-mix(in srgb, var(--color-border-default) 45%, transparent);
   border: var(--scroll-border);
   --scroll-bg: color-mix(in srgb, var(--app-shell-color-panel, var(--color-panel)) 75%, transparent);
@@ -200,7 +200,7 @@
   width: 32px;
   height: 32px;
   padding: 0;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background-color: transparent;
   border: 1px solid transparent;
   color: var(--color-text-secondary);
@@ -234,7 +234,7 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   border: 1px solid transparent;
   background-color: transparent;
   color: var(--color-text-muted);

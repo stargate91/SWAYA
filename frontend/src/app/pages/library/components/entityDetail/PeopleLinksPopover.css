@@ -14,7 +14,7 @@
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
   border: 1px solid var(--dropdown-menu-border, var(--color-border-default)) !important;
-  border-radius: var(--radius-md, 16px);
+  border-radius: var(--radius-lg);
   box-shadow: var(--dropdown-menu-shadow) !important;
   z-index: 100;
   display: flex;
@@ -38,7 +38,7 @@
   --header-padding: var(--space-sm, 10px) var(--space-md, 16px);
   padding: var(--header-padding);
   font-size: 0.72rem;
-  font-weight: 800;
+  font-weight: var(--font-weight-extrabold);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-text-muted);
@@ -60,12 +60,12 @@
   justify-content: center;
   min-height: 26px;
   padding: 0.25rem 0.65rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   border: 1px solid color-mix(in srgb, var(--color-border-default) 25%, transparent);
   background: color-mix(in srgb, var(--color-surface-glass) 8%, transparent);
   color: color-mix(in srgb, var(--color-text-secondary) 90%, transparent);
   font-size: 0.64rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   line-height: 1;
   text-decoration: none;
   letter-spacing: 0.05em;
@@ -93,7 +93,7 @@
 
 .entity-detail-page__links-popover::-webkit-scrollbar-thumb {
   background-color: color-mix(in srgb, var(--color-border-default) 30%, transparent);
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
 }
 
 .entity-detail-page__links-popover::-webkit-scrollbar-thumb:hover {

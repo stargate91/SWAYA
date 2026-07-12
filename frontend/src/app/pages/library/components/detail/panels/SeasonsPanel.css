@@ -82,7 +82,7 @@
 .season-poster-card__image-wrapper {
   width: 100%;
   aspect-ratio: 2 / 3;
-  border-radius: var(--radius-md, 8px);
+  border-radius: var(--radius-xs);
   overflow: hidden;
   background: var(--color-surface-glass);
   border: 1px solid var(--color-border-default);
@@ -120,8 +120,8 @@
 }
 
 .season-poster-card__title {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-secondary);
   width: 100%;
   white-space: nowrap;
@@ -136,14 +136,14 @@
 
 .season-poster-card.is-active .season-poster-card__title {
   color: var(--color-accent-blue);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 /* Active Season Info */
 .active-season-info {
   background: var(--media-detail-panel-section-bg, var(--color-panel-soft));
   border: 1px solid var(--media-detail-panel-section-border, var(--color-surface-glass));
-  border-radius: var(--radius-lg, 16px);
+  border-radius: var(--radius-lg);
   padding: var(--space-lg) var(--space-xl);
   display: flex;
   flex-direction: column;
@@ -160,13 +160,13 @@
 
 .active-season-info__title {
   margin: 0;
-  font-size: var(--font-size-md, 16px);
-  font-weight: 700;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
 }
 
 .active-season-info__meta {
-  font-size: var(--font-size-xs, 12px);
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   display: flex;
   align-items: center;
@@ -196,7 +196,7 @@
 
 .active-season-info__overview {
   margin: var(--space-xs) 0 0 0;
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   line-height: 1.5;
   color: var(--color-text-secondary);
 }
@@ -207,9 +207,9 @@
   align-items: center;
   gap: var(--space-xs);
   padding: var(--space-xs) var(--space-lg);
-  border-radius: var(--radius-sm, 6px);
-  font-size: var(--font-size-xs, 12px);
-  font-weight: 600;
+  border-radius: var(--radius-2xs);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
   background: var(--color-surface-glass);
   border: 1px solid var(--color-border-default);
@@ -255,7 +255,7 @@
   padding: var(--space-md);
   background: var(--media-detail-panel-card-bg, var(--color-surface-card));
   border: 1px solid var(--media-detail-panel-card-border, var(--color-border-default));
-  border-radius: var(--radius-lg, 12px);
+  border-radius: var(--radius-md);
   cursor: pointer;
   position: relative;
   transition: all var(--motion-emphasized);
@@ -296,7 +296,7 @@
   width: 100%;
   height: 73px;
   aspect-ratio: 16 / 9;
-  border-radius: var(--radius-sm, 6px);
+  border-radius: var(--radius-2xs);
   overflow: hidden;
   background: var(--color-surface-glass);
   border: 1px solid var(--color-border-default);
@@ -308,11 +308,11 @@
   gap: calc(var(--space-md) / 2);
   padding: calc(var(--space-2xs) / 4) var(--space-xs);
   min-height: 20px;
-  font-size: 10px;
+  font-size: var(--font-size-3xs);
   line-height: 1;
-  border-radius: 4px;
+  border-radius: var(--radius-3xs);
   backdrop-filter: none;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   box-sizing: border-box;
 }
 
@@ -359,8 +359,8 @@
 
 .episode-card__title {
   margin: 0;
-  font-size: var(--font-size-sm, 14px);
-  font-weight: 600;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
   line-height: 1.25;
   white-space: nowrap;
@@ -373,8 +373,8 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-xs);
-  font-size: 10px;
-  font-weight: 500;
+  font-size: var(--font-size-3xs);
+  font-weight: var(--font-weight-medium);
   color: var(--color-text-muted);
   margin-top: calc(var(--space-2xs) / 4);
 }
@@ -382,13 +382,13 @@
 .episode-card__meta-item {
   background: var(--color-border-subtle);
   padding: calc(var(--space-2xs) / 4) var(--space-xs);
-  border-radius: 4px;
+  border-radius: var(--radius-3xs);
   border: 1px solid var(--color-surface-glass);
 }
 
 .episode-card__overview {
   margin: var(--space-xs) 0 0 0;
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   line-height: 1.45;
   color: var(--color-text-secondary);
 }
@@ -493,8 +493,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  font-size: 11px;
-  font-weight: 600;
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
 }
 
@@ -516,8 +516,8 @@
   gap: var(--space-md);
   background: var(--color-border-subtle);
   padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-sm, 6px);
-  font-size: 11px;
+  border-radius: var(--radius-2xs);
+  font-size: var(--font-size-2xs);
 }
 
 .episode-card__peak-date {
@@ -525,12 +525,12 @@
 }
 
 .episode-card__peak-position {
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
   background: var(--color-surface-glass);
   --peak-padding: 2px 6px;
   padding: var(--peak-padding);
-  border-radius: 4px;
+  border-radius: var(--radius-3xs);
 }
 
 .episode-card__peak-delete {
@@ -539,7 +539,7 @@
   color: var(--color-text-muted);
   cursor: pointer;
   padding: var(--space-2xs);
-  border-radius: 4px;
+  border-radius: var(--radius-3xs);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -14,7 +14,7 @@
   height: 100%;
   --local-bg: rgba(255, 255, 255, 0.08);
   background: var(--local-bg);
-  border-radius: 2px;
+  border-radius: var(--radius-5xs);
   overflow: hidden;
   --local-border: 1px solid rgba(255, 255, 255, 0.04);
   border: var(--local-border);
@@ -45,7 +45,7 @@
 .user-rating-label {
   margin-left: var(--space-sm);
   font-size: var(--font-size-sm);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   transition: color var(--motion-fast), font-weight var(--motion-fast);
   color: color-mix(in srgb, var(--color-text-primary) 58%, var(--color-text-muted));
   min-width: 7.5ch;
@@ -57,7 +57,7 @@
 
 .user-rating-label.has-value {
   color: color-mix(in srgb, var(--color-ink) 84%, var(--color-text-secondary));
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 .rating-pill--large {
@@ -78,7 +78,7 @@
   align-items: center;
   padding: var(--btn-padding);
   margin-right: var(--btn-padding);
-  border-radius: 4px;
+  border-radius: var(--radius-3xs);
   transition: all var(--motion-base);
 }
 

@@ -1,7 +1,7 @@
 .bespoke-list-panel-card {
   background: var(--color-surface-card);
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-lg, 16px);
+  border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
   overflow: visible;
@@ -20,8 +20,8 @@
 }
 
 .bespoke-list-panel-title {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-text-muted);
@@ -32,9 +32,9 @@
   align-items: center;
   gap: var(--space-xs);
   padding: var(--space-2xs) var(--space-md);
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
+  border-radius: var(--radius-2xs);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
   background: var(--color-surface-glass);
   border: 1px solid var(--color-border-default);
@@ -72,7 +72,7 @@
 }
 
 .bespoke-list-panel-empty {
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   font-style: italic;
   text-align: center;
@@ -95,7 +95,7 @@
 }
 .bespoke-list-panel-list::-webkit-scrollbar-thumb {
   background: var(--app-shell-scrollbar-thumb);
-  border-radius: 99px;
+  border-radius: var(--radius-full);
 }
 .bespoke-list-panel-list::-webkit-scrollbar-thumb:hover {
   background: var(--color-surface-glass-heavy);
@@ -106,7 +106,7 @@
   align-items: center;
   gap: var(--space-md);
   padding: var(--space-sm) var(--space-md);
-  border-radius: 8px;
+  border-radius: var(--radius-xs);
   cursor: pointer;
   background: var(--color-surface-card);
   border: 1px solid var(--color-border-subtle);
@@ -126,7 +126,7 @@
 .bespoke-list-panel-item-checkbox {
   width: 16px;
   height: 16px;
-  border-radius: 4px;
+  border-radius: var(--radius-3xs);
   border: 1.5px solid var(--color-border-heavy);
   background: var(--dropdown-search-bg);
   display: flex;
@@ -143,8 +143,8 @@
 }
 
 .bespoke-list-panel-item-name {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--font-size-xs-sm);
+  font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
   transition: color var(--motion-fast);
 }
@@ -155,7 +155,7 @@
 
 .bespoke-list-panel-item.is-added .bespoke-list-panel-item-name {
   color: var(--color-text-primary);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
 /* Quick Create Form */
@@ -174,7 +174,7 @@
   box-sizing: border-box;
   background: var(--dropdown-field-bg, var(--color-surface-glass));
   border: 1px solid var(--dropdown-field-border, var(--color-border-default));
-  border-radius: var(--radius-md, 12px);
+  border-radius: var(--radius-md);
   padding: var(--space-sm) var(--space-lg);
   height: 38px;
   color: var(--color-text-primary);
@@ -196,10 +196,10 @@
   height: 38px;
   background: var(--button-secondary-neutral-bg, var(--color-surface-glass));
   border: 1px solid var(--button-secondary-neutral-border, var(--color-border-heavy));
-  border-radius: var(--radius-md, 12px);
+  border-radius: var(--radius-md);
   color: var(--color-text-primary);
-  font-size: var(--font-size-lg, 18px);
-  font-weight: 600;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: all var(--motion-base);
   outline: none;

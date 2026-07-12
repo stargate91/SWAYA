@@ -1,7 +1,7 @@
 .bespoke-scene-tagger-card {
   background: var(--color-surface-card);
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-lg, 16px);
+  border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
   overflow: visible;
@@ -22,8 +22,8 @@
 }
 
 .bespoke-scene-tagger-title {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-text-muted);
@@ -46,8 +46,8 @@
 }
 
 .bespoke-scene-tagger-label {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: color-mix(in srgb, var(--color-ink) 45%, transparent);
@@ -66,8 +66,8 @@
   --local-gap: 4px;
   gap: var(--local-gap);
   padding: var(--space-1) var(--space-2) !important;
-  font-size: 11px !important;
-  font-weight: 600 !important;
+  font-size: var(--font-size-2xs) !important;
+  font-weight: var(--font-weight-semibold) !important;
   cursor: pointer;
   transition: opacity var(--motion-duration-fast) var(--motion-ease-standard), transform var(--motion-duration-fast) var(--motion-ease-standard);
 }
@@ -105,7 +105,7 @@
   border: 1px solid var(--color-border-subtle);
   background: var(--color-surface-glass);
   backdrop-filter: blur(4px);
-  border-radius: var(--radius-md, 8px);
+  border-radius: var(--radius-xs);
   padding: 0 var(--space-md);
   height: 38px;
   transition: border-color var(--motion-duration-fast) var(--motion-ease-standard);
@@ -123,7 +123,7 @@
   border: none;
   outline: none;
   color: var(--color-text-primary);
-  font-size: 13px;
+  font-size: var(--font-size-xs-sm);
   width: 100%;
   height: 100%;
 }
@@ -157,7 +157,7 @@
   margin-top: var(--space-1);
   background: var(--color-surface-overlay);
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-lg, 12px);
+  border-radius: var(--radius-md);
   box-shadow: var(--app-shell-shadow-lg);
   z-index: 100;
   max-height: 200px;
@@ -174,8 +174,8 @@
   border: none;
   padding: var(--space-2) var(--space-3);
   color: var(--color-text-primary);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
   text-align: left;
   cursor: pointer;
   --local-gap: 8px;
@@ -190,7 +190,7 @@
 .bespoke-scene-tagger-dropdown-color-dot {
   width: 8px;
   height: 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   flex-shrink: 0;
 }
 
@@ -207,9 +207,9 @@
   --local-gap: 4px;
   gap: var(--local-gap);
   padding: var(--space-1) var(--space-2);
-  font-size: 11px;
-  font-weight: 600;
-  border-radius: var(--radius-md, 6px);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-2xs);
   border: 1px dashed var(--color-border-heavy);
   background: color-mix(in srgb, black 35%, transparent);
   color: color-mix(in srgb, var(--color-ink) 85%, transparent);
@@ -252,7 +252,7 @@
   background: color-mix(in srgb, var(--color-ink) 5%, transparent);
   border: 1px solid var(--color-border-default);
   color: var(--color-text-secondary);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   width: 20px;
   height: 20px;
   display: flex;

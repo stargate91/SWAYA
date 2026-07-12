@@ -288,7 +288,7 @@
 
 .organizer-drop-overlay__description {
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: var(--font-size-xs-sm);
   line-height: 1.6;
   max-width: 340px;
 }

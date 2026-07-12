@@ -10,7 +10,7 @@
   height: 32px;
   background: color-mix(in srgb, var(--color-canvas) 60%, transparent);
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-input, 8px);
+  border-radius: var(--radius-input);
   padding: 0 var(--space-3);
   transition: all var(--motion-duration-base) var(--motion-ease-standard);
   box-shadow: inset 0 1px 2px color-mix(in srgb, black 20%, transparent);
@@ -34,12 +34,12 @@
   background: none;
   border: none;
   color: var(--color-text-secondary);
-  font-size: 11px;
-  font-weight: 700;
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: var(--space-1) var(--space-2);
-  border-radius: var(--border-radius-sm, 4px);
+  border-radius: var(--radius-3xs);
   cursor: pointer;
   transition: color var(--motion-duration-fast) var(--motion-ease-standard), background-color var(--motion-duration-fast) var(--motion-ease-standard);
 }
@@ -88,7 +88,7 @@
   border: none;
   outline: none;
   color: var(--color-text-primary);
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   width: 100%;
   padding-right: var(--space-8);
 }
@@ -107,7 +107,7 @@
   justify-content: center;
   color: var(--color-text-muted);
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--radius-3xs);
   transition: color var(--motion-duration-fast) var(--motion-ease-standard), background-color var(--motion-duration-fast) var(--motion-ease-standard);
   z-index: 2;
 }
@@ -132,7 +132,7 @@
   display: flex;
   background: color-mix(in srgb, var(--color-panel-strong) 98%, transparent);
   border: 1px solid var(--color-border-strong);
-  border-radius: var(--border-radius-md, 8px);
+  border-radius: var(--radius-xs);
   box-shadow: var(--shadow-lg);
   backdrop-filter: blur(12px);
   z-index: 100;
@@ -153,8 +153,8 @@
 }
 
 .global-search__dropdown-header {
-  font-size: 10px;
-  font-weight: 800;
+  font-size: var(--font-size-3xs);
+  font-weight: var(--font-weight-extrabold);
   text-transform: uppercase;
   color: var(--color-text-muted);
   letter-spacing: 0.1em;
@@ -168,7 +168,7 @@
   background: none;
   border: none;
   color: var(--color-text-secondary);
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   text-align: left;
   padding: var(--space-xs) var(--space-3);
   cursor: pointer;
@@ -184,7 +184,7 @@
 .global-search__dropdown-item.is-active {
   background: color-mix(in srgb, var(--color-accent) 15%, transparent);
   color: var(--color-accent);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
 .global-search__item-icon {
@@ -200,7 +200,7 @@
   max-height: 400px;
   background: color-mix(in srgb, var(--color-panel-strong) 98%, transparent);
   border: 1px solid var(--color-border-strong);
-  border-radius: var(--border-radius-md, 8px);
+  border-radius: var(--radius-xs);
   box-shadow: var(--shadow-lg);
   backdrop-filter: blur(12px);
   z-index: 99;
@@ -219,7 +219,7 @@
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-2);
-  border-radius: var(--border-radius-sm, 6px);
+  border-radius: var(--radius-2xs);
   cursor: pointer;
   transition: all var(--motion-duration-fast) var(--motion-ease-standard);
 }
@@ -237,7 +237,7 @@
   position: relative;
   width: 32px;
   height: 48px;
-  border-radius: var(--border-radius-xs, 3px);
+  border-radius: var(--radius-4xs);
   overflow: hidden;
   box-shadow: 0 2px 5px color-mix(in srgb, black 30%, transparent);
 }
@@ -269,7 +269,7 @@
   align-items: center;
   justify-content: center;
   background: color-mix(in srgb, var(--color-ink) 3%, transparent);
-  border-radius: var(--border-radius-xs, 3px);
+  border-radius: var(--radius-4xs);
   border: 1px dashed var(--color-border-strong);
   color: var(--color-text-muted);
 }
@@ -289,8 +289,8 @@
 }
 
 .global-search__item-title {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--font-size-xs-sm);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
   white-space: nowrap;
   overflow: hidden;
@@ -298,7 +298,7 @@
 }
 
 .global-search__item-year {
-  font-size: 11px;
+  font-size: var(--font-size-2xs);
   color: var(--color-text-muted);
   flex-shrink: 0;
 }
@@ -307,18 +307,18 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  font-size: 11px;
+  font-size: var(--font-size-2xs);
   color: var(--color-text-secondary);
   min-width: 0;
 }
 
 .global-search__item-badge {
-  font-size: 9px;
-  font-weight: 800;
+  font-size: var(--font-size-4xs);
+  font-weight: var(--font-weight-extrabold);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: var(--space-px) var(--space-1);
-  border-radius: 3px;
+  border-radius: var(--radius-4xs);
   background: color-mix(in srgb, var(--color-ink) 8%, transparent);
   color: var(--color-text-secondary);
   flex-shrink: 0;
@@ -331,7 +331,7 @@
   max-width: 100px;
   flex-shrink: 0;
   color: var(--color-accent-blue);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .global-search__item-overview {
@@ -356,7 +356,7 @@
 
 .global-search__group-header {
   font-size: 0.65rem;
-  font-weight: 800;
+  font-weight: var(--font-weight-extrabold);
   text-transform: uppercase;
   color: var(--color-text-muted);
   letter-spacing: 0.1em;

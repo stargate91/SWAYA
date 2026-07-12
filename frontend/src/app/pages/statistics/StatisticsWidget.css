@@ -36,21 +36,21 @@
   position: relative;
   overflow: hidden;
   padding: var(--space-5xl);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--color-border-default);
   border-radius: var(--radius-2xl);
   background:
     radial-gradient(circle at top right, color-mix(in srgb, var(--color-accent-blue-soft) 12%, transparent), transparent 42%),
     linear-gradient(180deg, color-mix(in srgb, var(--color-surface-glass) 72%, transparent), var(--color-surface-card));
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  transition: border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              background 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: border-color var(--motion-duration-emphasized) var(--motion-ease-emphasized),
+              background var(--motion-duration-emphasized) var(--motion-ease-emphasized),
+              transform var(--motion-duration-emphasized) var(--motion-ease-emphasized),
+              box-shadow var(--motion-duration-emphasized) var(--motion-ease-emphasized);
 }
 
 .stat-card:hover {
-  border-color: rgba(255, 255, 255, 0.16);
+  border-color: var(--color-border-heavy);
   background:
     radial-gradient(circle at top right, color-mix(in srgb, var(--color-accent-blue-soft) 22%, transparent), transparent 48%),
     linear-gradient(180deg, color-mix(in srgb, var(--color-surface-glass) 82%, transparent), var(--color-surface-card));
@@ -72,26 +72,26 @@
 }
 
 .stat-label {
-  font-size: 11px;
+  font-size: var(--font-size-2xs);
   text-transform: uppercase;
   letter-spacing: 2px;
   color: var(--color-text-secondary);
   margin-bottom: var(--space-3xl);
-  font-weight: 800;
+  font-weight: var(--font-weight-extrabold);
 }
 
 .stat-value {
-  font-size: 36px;
-  font-weight: 800;
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-extrabold);
   color: var(--color-text-primary);
   margin-bottom: var(--space-sm);
   letter-spacing: -1px;
 }
 
 .stat-sub {
-  font-size: 13px;
+  font-size: var(--font-size-xs-sm);
   color: var(--color-accent-blue);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   display: flex;
   align-items: center;
   gap: var(--space-xs);

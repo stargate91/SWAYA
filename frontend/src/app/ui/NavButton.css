@@ -54,7 +54,7 @@
 .ui-nav-button--onboarding-back {
   min-height: 46px;
   padding: 0 var(--space-3xl);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   border-color: color-mix(in srgb, var(--button-secondary-border) 42%, var(--color-border-default));
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--color-text-primary) 2.5%, transparent), color-mix(in srgb, var(--color-text-primary) 0.8%, transparent)),
@@ -100,7 +100,7 @@
 .ui-nav-button--onboarding-continue {
   min-height: 46px;
   padding: 0 var(--space-3xl);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   border-color: color-mix(in srgb, var(--button-secondary-color) 22%, var(--color-border-default));
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--color-text-primary) 7%, transparent), color-mix(in srgb, var(--color-text-primary) 1.8%, transparent)),

@@ -9,7 +9,7 @@
 .universal-image-picker__upload-panel.is-dragging {
   border: 2px dashed var(--color-accent);
   background: color-mix(in srgb, var(--color-accent) 8%, transparent);
-  border-radius: var(--radius-lg, 16px);
+  border-radius: var(--radius-lg);
   padding: var(--space-md);
 }
 
@@ -32,7 +32,7 @@
   flex: 1 1 100%;
   padding-left: var(--space-xl);
   border: 1px solid var(--ui-control-border);
-  border-radius: 14px;
+  border-radius: var(--radius-md-lg);
   background: var(--color-input-bg, var(--ui-control-bg));
   color: var(--ui-control-text);
   transition:
@@ -87,7 +87,7 @@
   width: 72px;
   height: 108px;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--color-border-subtle);
   background: var(--modal-surface-card-strong);
   flex: 0 0 auto;

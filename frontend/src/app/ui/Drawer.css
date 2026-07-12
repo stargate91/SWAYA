@@ -11,8 +11,8 @@
 
 .ui-drawer__title {
   margin: 0;
-  font-size: var(--font-size-lg, 18px);
-  font-weight: 600;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
 }
 

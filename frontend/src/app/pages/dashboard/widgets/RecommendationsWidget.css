@@ -4,7 +4,7 @@
   height: 400px;
   margin-bottom: var(--space-6xl);
   overflow: hidden;
-  border-radius: 24px;
+  border-radius: var(--radius-1.5xl);
   background: var(--color-bg-elevated);
   box-shadow: 0 20px 40px color-mix(in srgb, black 40%, transparent);
   border: 1px solid var(--color-border-subtle);
@@ -42,8 +42,8 @@
 .recommend-spotlight-title {
   margin: 0 0 var(--space-md);
   color: var(--color-text-primary);
-  font-size: 42px;
-  font-weight: 900;
+  font-size: var(--font-size-5xl);
+  font-weight: var(--font-weight-black);
   text-shadow: 0 4px 8px color-mix(in srgb, black 80%, transparent);
   transition: color var(--motion-duration-fast) var(--motion-ease-standard), opacity var(--motion-duration-fast) var(--motion-ease-standard);
   cursor: pointer;
@@ -67,7 +67,7 @@
   gap: var(--space-2xl);
   margin-bottom: var(--space-3xl);
   color: var(--color-text-primary);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 .recommend-spotlight-rating {
@@ -75,7 +75,7 @@
   align-items: center;
   gap: var(--space-xs);
   padding: var(--space-xs) var(--space-md);
-  border-radius: 8px;
+  border-radius: var(--radius-xs);
   border: 1px solid color-mix(in srgb, var(--color-text-primary, white) 15%, transparent);
   background: color-mix(in srgb, var(--color-text-primary, white) 10%, transparent);
   backdrop-filter: blur(4px);
@@ -104,7 +104,7 @@
   overflow: hidden;
   margin-bottom: var(--space-4xl);
   color: color-mix(in srgb, var(--color-text-primary) 80%, transparent);
-  font-size: 15px;
+  font-size: var(--font-size-sm-md);
   line-height: 1.5;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -113,9 +113,9 @@
 .recommend-watchlist-btn {
   gap: var(--space-md);
   padding: var(--space-lg) var(--space-4xl);
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 700;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
 }
 
 .recommend-carousel {
@@ -125,8 +125,8 @@
 
 .recommend-carousel-title {
   margin: 0 0 var(--space-3xl);
-  font-size: 22px;
-  font-weight: 800;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-extrabold);
   color: var(--color-text-primary);
 }
 
@@ -162,7 +162,7 @@
 }
 
 .ui-poster-card.recommend-card .ui-poster-card__image-wrapper {
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border-subtle);
   box-shadow: 0 10px 24px color-mix(in srgb, var(--color-bg-app, black) 28%, transparent);
@@ -194,7 +194,7 @@
 }
 
 .recommend-card-person-subtitle {
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   margin-top: var(--space-2xs);
 }

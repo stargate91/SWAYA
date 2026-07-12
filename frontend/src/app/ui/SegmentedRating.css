@@ -21,7 +21,7 @@
   height: 100%;
   --local-bg: color-mix(in srgb, var(--color-ink) 8%, transparent);
   background: var(--local-bg);
-  border-radius: 1.5px;
+  border-radius: var(--radius-6xs);
   overflow: hidden;
   --local-border: 1px solid var(--color-border-subtle);
   border: var(--local-border);
@@ -52,7 +52,7 @@
 .table-segmented-rating-container .user-rating-label {
   margin-left: var(--space-xs);
   font-size: var(--font-size-xs);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   transition: color var(--motion-fast), font-weight var(--motion-fast);
   color: color-mix(in srgb, var(--color-text-primary) 58%, var(--color-text-muted));
   min-width: 4.5ch;
@@ -64,7 +64,7 @@
 
 .table-segmented-rating-container .user-rating-label.has-value {
   color: color-mix(in srgb, var(--color-accent-blue) 84%, var(--color-text-secondary));
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 .table-segmented-rating-container.layout-column {
@@ -79,7 +79,7 @@
 }
 
 .table-segmented-rating-container.layout-column .rating-value-bold {
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
   margin-left: var(--space-xs);
 }

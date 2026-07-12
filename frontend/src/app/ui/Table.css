@@ -194,7 +194,7 @@
 .ui-table.ui-table--minimal th,
 .ui-table.ui-table--minimal td {
   padding: var(--ui-table-cell-padding, var(--space-xs) var(--space-sm));
-  font-size: var(--ui-table-cell-font-size, var(--font-size-xs, 13px));
+  font-size: var(--ui-table-cell-font-size, var(--font-size-xs-sm));
 }
 
 .ui-table.ui-table--minimal th {

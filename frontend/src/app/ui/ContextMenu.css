@@ -37,7 +37,7 @@
   padding: var(--space-sm) var(--space-3);
   background: transparent;
   border: 0;
-  border-radius: calc(var(--radius-md) - 3px);
+  border-radius: calc(var(--radius-md) - var(--radius-4xs));
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
@@ -85,7 +85,7 @@
 }
 
 .ui-context-menu__shortcut {
-  font-size: 10px;
+  font-size: var(--font-size-3xs);
   color: var(--color-muted);
   opacity: 0.6;
 }

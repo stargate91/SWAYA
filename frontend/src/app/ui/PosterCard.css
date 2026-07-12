@@ -25,7 +25,7 @@
   box-shadow: none;
   text-align: left;
   cursor: default;
-  border-radius: calc(var(--radius-md, 8px) - 2px);
+  border-radius: calc(var(--radius-md, var(--radius-xs)) - var(--radius-5xs));
   overflow: hidden;
   transition: transform var(--motion-duration-fast) var(--motion-ease-emphasized), box-shadow var(--motion-duration-slow) var(--motion-ease-standard);
 }
@@ -83,7 +83,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
   width: 100%;
   height: 100%;
   color: var(--color-muted);
-  font-size: var(--font-size-xs, 12px);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold, 600);
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -97,7 +97,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
 }
 
 .ui-poster-card__placeholder-text {
-  font-size: var(--font-size-xs, 12px);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold, 600);
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -148,7 +148,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
   right: 12px;
   width: 28px;
   height: 28px;
-  border-radius: var(--radius-full, 9999px);
+  border-radius: var(--radius-full);
   border: 1px solid color-mix(in srgb, var(--color-state-success) 48%, var(--button-secondary-border));
   background-color: color-mix(in srgb, var(--app-shell-color-panel) 82%, transparent);
   background-image: var(--button-secondary-bg);
@@ -167,7 +167,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
   right: 12px;
   width: 28px;
   height: 28px;
-  border-radius: var(--radius-full, 9999px);
+  border-radius: var(--radius-full);
   border: 1px solid color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border));
   background-color: color-mix(in srgb, var(--app-shell-color-panel) 82%, transparent);
   background-image: var(--button-secondary-bg);
@@ -193,7 +193,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
   left: 12px;
   width: 28px;
   height: 28px;
-  border-radius: var(--radius-full, 9999px);
+  border-radius: var(--radius-full);
   border: 1px solid color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border));
   background-color: color-mix(in srgb, var(--app-shell-color-panel) 82%, transparent);
   background-image: var(--button-secondary-bg);
@@ -236,7 +236,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
   gap: var(--space-xs);
   min-height: 28px;
   padding: 0 var(--space-lg);
-  border-radius: var(--radius-full, 9999px);
+  border-radius: var(--radius-full);
   border: 1px solid color-mix(in srgb, var(--color-state-success) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
   background-color: color-mix(in srgb, var(--app-shell-color-panel, black) 82%, transparent);
   color: var(--color-state-success);
@@ -245,8 +245,8 @@ div.ui-poster-card__image-wrapper:focus-visible {
   -webkit-backdrop-filter: blur(10px);
   cursor: pointer;
   opacity: 0;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
   transition: opacity var(--motion-base), transform var(--motion-base), color var(--motion-base), border-color var(--motion-base), background-color var(--motion-base);
   pointer-events: auto;
   white-space: nowrap;
@@ -338,7 +338,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
   right: 12px;
   bottom: 12px;
   font-family: var(--font-family-display);
-  font-size: var(--font-size-sm, 12px);
+  font-size: var(--font-size-sm, var(--font-size-xs));
   font-weight: var(--font-weight-bold, 700);
   line-height: 1.35;
   color: var(--color-ink);
@@ -358,7 +358,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
 
 .ui-poster-card__title {
   font-family: var(--font-family-display);
-  font-size: var(--font-size-sm, 12px);
+  font-size: var(--font-size-sm, var(--font-size-xs));
   font-weight: var(--font-weight-bold, 700);
   color: var(--color-ink);
   white-space: nowrap;
@@ -380,7 +380,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
 }
 
 .ui-poster-card__subtitle {
-  font-size: var(--font-size-2xs, 10px);
+  font-size: var(--font-size-2xs, var(--font-size-3xs));
   color: var(--color-muted);
   line-height: 1.4;
   white-space: nowrap;
@@ -450,7 +450,7 @@ button.ui-poster-card__image-wrapper:hover:not(:disabled) {
   width: 100%;
   position: relative;
   background: var(--ui-surface-ghost);
-  border-radius: var(--radius-md, 12px);
+  border-radius: var(--radius-md);
   overflow: hidden;
   border: 1px solid var(--color-border-subtle);
   transition: border-color var(--motion-fast), box-shadow var(--motion-base);
@@ -500,8 +500,8 @@ button.ui-poster-card__image-wrapper:hover:not(:disabled) {
 }
 
 .lists-card__title {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--font-size-xs-sm);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -509,7 +509,7 @@ button.ui-poster-card__image-wrapper:hover:not(:disabled) {
 }
 
 .lists-card__subtitle {
-  font-size: 11px;
+  font-size: var(--font-size-2xs);
   color: var(--color-text-secondary);
   opacity: 0.6;
 }

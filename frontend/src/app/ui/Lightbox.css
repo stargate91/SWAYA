@@ -32,6 +32,6 @@
   max-width: min(92vw, 1400px);
   max-height: 88vh;
   object-fit: contain;
-  border-radius: 14px;
+  border-radius: var(--radius-md-lg);
   box-shadow: 0 20px 60px color-mix(in srgb, black 55%, transparent);
 }

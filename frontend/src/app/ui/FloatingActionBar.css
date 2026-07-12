@@ -46,7 +46,7 @@
   right: 22px;
   bottom: 0;
   height: 1px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--ui-floating-surface-bottom-line);
   pointer-events: none;
 }
@@ -68,8 +68,8 @@
 }
 
 .ui-floating-bar__title {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
   color: var(--color-ink);
   letter-spacing: 0.01em;
   display: inline-flex;

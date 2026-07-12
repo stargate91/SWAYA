@@ -37,7 +37,7 @@
   background: var(--card-bg);
   --card-border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.08));
   border: var(--card-border);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -169,9 +169,9 @@
   color: var(--color-text-secondary);
   --badge-padding: 4px 8px;
   padding: var(--badge-padding);
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 700;
+  border-radius: var(--radius-3xs);
+  font-size: var(--font-size-3xs);
+  font-weight: var(--font-weight-bold);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -194,8 +194,8 @@
 }
 
 .performer-linker-card__name {
-  font-size: var(--font-size-sm, 14px);
-  font-weight: var(--font-weight-semibold, 600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
   white-space: nowrap;
   overflow: hidden;
@@ -203,13 +203,13 @@
 }
 
 .performer-linker-card__ext-id {
-  font-size: 11px;
+  font-size: var(--font-size-2xs);
   color: var(--color-text-muted);
   font-family: monospace;
 }
 
 .performer-linker-card__unlinked-text {
-  font-size: var(--font-size-xs, 12px);
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   font-style: italic;
 }
@@ -257,8 +257,8 @@
 }
 
 .performer-linker__title {
-  font-size: var(--font-size-md, 16px);
-  font-weight: var(--font-weight-semibold, 600);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
 }
 
@@ -292,7 +292,7 @@
   background: var(--card-bg);
   --card-border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.06));
   border: var(--card-border);
-  border-radius: 8px;
+  border-radius: var(--radius-xs);
   overflow: hidden;
   --card-transition: all 0.2s ease;
   transition: var(--card-transition);
@@ -353,8 +353,8 @@
 }
 
 .performer-linker__result-name {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--font-size-xs-sm);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -364,7 +364,7 @@
 }
 
 .performer-linker__result-disambiguation {
-  font-size: 10px;
+  font-size: var(--font-size-3xs);
   color: var(--color-text-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -380,7 +380,7 @@
   --loading-padding: 40px;
   padding: var(--loading-padding);
   color: var(--color-text-muted);
-  font-size: var(--font-size-sm, 14px);
+  font-size: var(--font-size-sm);
 }
 
 .performer-linker__error,
@@ -389,9 +389,9 @@
   padding: var(--wrapper-padding);
   text-align: center;
   color: var(--color-text-muted);
-  font-size: var(--font-size-sm, 14px);
+  font-size: var(--font-size-sm);
   background: var(--color-surface-glass);
-  border-radius: 8px;
+  border-radius: var(--radius-xs);
   border: 1px dashed var(--color-border-subtle);
 }
 
@@ -416,7 +416,7 @@
 
 /* Page Layout Cleanups */
 .performer-edit-sidebar-header {
-  font-size: var(--font-size-sm, 15px);
+  font-size: var(--font-size-sm-md);
   color: var(--color-text-primary);
 }
 
@@ -428,8 +428,8 @@
 }
 
 .performer-edit-sidebar-name {
-  font-size: var(--font-size-lg, 18px);
-  font-weight: var(--font-weight-semibold, 600);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
   margin: 0;
 }
 
@@ -490,7 +490,7 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: auto;
-  border-radius: var(--radius-lg, 12px);
+  border-radius: var(--radius-md);
   --mixer-border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.08));
   border: var(--mixer-border);
   --mixer-bg: var(--color-surface-glass, rgba(255, 255, 255, 0.02));
@@ -650,11 +650,11 @@
   background: var(--input-bg) !important;
   --input-border: 1px solid rgba(255, 255, 255, 0.15);
   border: var(--input-border) !important;
-  border-radius: 4px !important;
+  border-radius: var(--radius-3xs) !important;
   color: var(--color-text-primary) !important;
   --input-padding: 4px 8px;
   padding: var(--input-padding) !important;
-  font-size: 13px !important;
+  font-size: var(--font-size-xs-sm) !important;
   font-family: inherit !important;
   outline: none !important;
   box-sizing: border-box !important;
@@ -727,7 +727,7 @@
   background: var(--card-bg);
   --card-border: 1px solid var(--color-border-default, rgba(255, 255, 255, 0.08));
   border: var(--card-border);
-  border-radius: 8px;
+  border-radius: var(--radius-xs);
   --card-padding: 14px 18px;
   padding: var(--card-padding);
   backdrop-filter: blur(8px);
@@ -743,8 +743,8 @@
 }
 
 .custom-values-card__title {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
   letter-spacing: 0.02em;
 }
@@ -817,7 +817,7 @@
 }
 
 .performer-custom-values-language-label {
-  font-size: var(--font-size-sm, 12px);
+  font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
   white-space: nowrap;
 }
@@ -885,9 +885,9 @@
 }
 
 .performer-linker-card__linking-msg {
-  font-size: var(--font-size-xs, 12px);
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -912,8 +912,8 @@
 
 .healthyceleb-import-title {
   margin: 0;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--font-size-xs-sm);
+  font-weight: var(--font-weight-semibold);
 }
 
 .healthyceleb-import-row {
@@ -924,28 +924,28 @@
 .healthyceleb-import-input {
   flex: 1;
   padding: var(--space-xs) var(--space-lg);
-  border-radius: 6px;
+  border-radius: var(--radius-2xs);
   border: 1px solid var(--color-border-default);
   background: var(--color-surface-card);
   color: var(--color-text-primary, white);
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   outline: none;
 }
 
 .healthyceleb-import-desc {
   margin: 0;
-  font-size: 11px;
+  font-size: var(--font-size-2xs);
   color: var(--color-text-secondary);
 }
 
 .mixer-cell-auto-label {
   opacity: 0.45;
-  font-size: 10px;
+  font-size: var(--font-size-3xs);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-right: var(--space-2xs);
 }
 
 .mixer-cell-auto-value {
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }

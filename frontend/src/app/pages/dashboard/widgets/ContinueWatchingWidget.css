@@ -8,8 +8,8 @@
   align-items: center;
   gap: var(--space-md);
   margin-bottom: var(--space-2xl);
-  font-size: 20px;
-  font-weight: 800;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-extrabold);
   color: var(--color-text-primary);
 }
 
@@ -40,7 +40,7 @@
 }
 
 .ui-poster-card.continue-watching-card .ui-poster-card__image-wrapper {
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   box-shadow: 0 10px 25px color-mix(in srgb, black 30%, transparent);
   border: 1px solid var(--color-border-subtle);
   background: var(--color-bg-elevated);
@@ -69,7 +69,7 @@
   justify-content: center;
   padding: var(--space-xs);
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--radius-xs);
   background: color-mix(in srgb, black 60%, transparent);
   cursor: pointer;
   color: color-mix(in srgb, white 70%, transparent);
@@ -157,8 +157,8 @@
 .continue-watching-title {
   overflow: hidden;
   color: var(--color-text-primary);
-  font-size: 14px;
-  font-weight: 700;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
   text-overflow: ellipsis;
   white-space: nowrap;
   margin-bottom: var(--space-2xs);
@@ -168,7 +168,7 @@
   position: relative;
   min-height: 18px;
   color: var(--color-text-secondary);
-  font-size: 12px;
+  font-size: var(--font-size-xs);
 }
 
 .continue-watching-meta-default,

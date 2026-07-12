@@ -25,7 +25,7 @@
   display: flex;
   justify-content: space-between;
   font-size: var(--font-size-xs);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-secondary);
 }
 
@@ -33,7 +33,7 @@
   width: 100%;
   height: 6px;
   margin-top: var(--space-xs);
-  border-radius: 3px;
+  border-radius: var(--radius-4xs);
   overflow: hidden;
   background: var(--color-border-default);
   border: none;
@@ -41,17 +41,17 @@
 
 .specs-card__progress::-webkit-progress-bar {
   background: var(--color-border-default);
-  border-radius: 3px;
+  border-radius: var(--radius-4xs);
 }
 
 .specs-card__progress::-webkit-progress-value {
   background: linear-gradient(90deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, white) 100%);
-  border-radius: 3px;
+  border-radius: var(--radius-4xs);
 }
 
 .specs-card__progress::-moz-progress-bar {
   background: linear-gradient(90deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, white) 100%);
-  border-radius: 3px;
+  border-radius: var(--radius-4xs);
 }
 
 .watched-panel__activity-header {
@@ -83,7 +83,7 @@
   margin: 0;
   padding: 0;
   font-size: var(--font-size-xs);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--color-text-secondary);
@@ -123,7 +123,7 @@
 .activity-item__date {
   font-size: var(--font-size-sm);
   color: var(--color-text-primary);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .activity-list__empty {
@@ -134,7 +134,7 @@
 }
 
 .specs-card__value--in-progress {
-  font-size: 13px;
+  font-size: var(--font-size-xs-sm);
   white-space: normal;
   line-break: anywhere;
 }
@@ -148,7 +148,7 @@
 .watched-panel .season-progress-card {
   padding: var(--space-lg) var(--space-2xl);
   border: 1px solid var(--media-detail-panel-card-border) !important;
-  border-radius: var(--radius-lg, 16px) !important;
+  border-radius: var(--radius-lg) !important;
   background: var(--media-detail-panel-card-bg) !important;
   box-shadow: var(--media-detail-panel-card-shadow) !important;
   display: flex;
@@ -171,21 +171,21 @@
 }
 
 .season-progress-card__title {
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
   font-size: var(--font-size-sm);
 }
 
 .season-progress-card__meta {
   font-size: var(--font-size-xs);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-secondary);
 }
 
 .season-progress-card__progress {
   width: 100%;
   height: 4px;
-  border-radius: 2px;
+  border-radius: var(--radius-5xs);
   overflow: hidden;
   background: var(--color-border-default);
   border: none;
@@ -193,17 +193,17 @@
 
 .season-progress-card__progress::-webkit-progress-bar {
   background: var(--color-border-default);
-  border-radius: 2px;
+  border-radius: var(--radius-5xs);
 }
 
 .season-progress-card__progress::-webkit-progress-value {
   background: linear-gradient(90deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, white) 100%);
-  border-radius: 2px;
+  border-radius: var(--radius-5xs);
 }
 
 .season-progress-card__progress::-moz-progress-bar {
   background: linear-gradient(90deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, white) 100%);
-  border-radius: 2px;
+  border-radius: var(--radius-5xs);
 }
 
 .activity-item--tv {
@@ -224,9 +224,9 @@
   align-items: center;
   justify-content: center;
   padding: var(--token-pad-y) var(--space-sm);
-  font-size: 10px;
-  font-weight: 700;
-  border-radius: 4px;
+  font-size: var(--font-size-3xs);
+  font-weight: var(--font-weight-bold);
+  border-radius: var(--radius-3xs);
   background: color-mix(in srgb, var(--color-accent-blue) 12%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-accent-blue) 30%, transparent);
   color: var(--color-accent-blue);
@@ -245,7 +245,7 @@
 .activity-item__title {
   font-size: var(--font-size-sm);
   color: var(--color-text-primary);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;

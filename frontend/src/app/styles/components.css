@@ -230,7 +230,7 @@
 }
 
 .ui-close-esc-hint {
-  font-size: 9px;
+  font-size: var(--font-size-4xs);
   font-weight: var(--font-weight-bold, 700);
   color: var(--color-muted);
   margin-top: var(--space-xs);
@@ -314,17 +314,17 @@
 }
 
 .ui-description-list__label {
-  font-size: 10px;
+  font-size: var(--font-size-3xs);
   color: var(--color-text-faint);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .ui-description-list__value {
-  font-size: 13px;
+  font-size: var(--font-size-xs-sm);
   color: var(--color-text-primary);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

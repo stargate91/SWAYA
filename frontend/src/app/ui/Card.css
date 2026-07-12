@@ -13,7 +13,7 @@
 
 .ui-media-card {
   border: 0;
-  border-radius: calc(var(--radius-md) - 2px);
+  border-radius: calc(var(--radius-md) - var(--radius-5xs));
   overflow: hidden;
   background: var(--ui-surface-card-media);
   box-shadow: none;

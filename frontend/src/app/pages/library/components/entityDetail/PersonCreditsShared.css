@@ -228,7 +228,7 @@
   border: none;
   color: var(--color-text-secondary);
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
@@ -285,7 +285,7 @@
   border: var(--local-border);
   --local-padding: 24px;
   padding: var(--local-padding);
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   --local-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
@@ -312,7 +312,7 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-text-primary);
-  font-weight: 800;
+  font-weight: var(--font-weight-extrabold);
   margin: 0;
   line-height: 1.2;
 }
@@ -325,7 +325,7 @@
   background: var(--source-selector-bg);
   --source-selector-padding: 3px;
   padding: var(--source-selector-padding);
-  border-radius: 8px;
+  border-radius: var(--radius-xs);
   --source-selector-border: 1px solid rgba(255, 255, 255, 0.05);
   border: var(--source-selector-border);
 }
@@ -335,11 +335,11 @@
   border: none;
   color: var(--color-text-secondary);
   font-size: 0.65rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   padding: var(--space-1) var(--space-2);
-  border-radius: 6px;
+  border-radius: var(--radius-2xs);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -368,7 +368,7 @@
   background: var(--badge-bg);
   --badge-padding: 1px 4px;
   padding: var(--badge-padding);
-  border-radius: 4px;
+  border-radius: var(--radius-3xs);
   color: var(--color-text-muted);
 }
 
@@ -472,7 +472,7 @@
   width: 100%;
   position: relative;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: var(--radius-xs);
   --poster-container-bg: rgba(255, 255, 255, 0.02);
   background: var(--poster-container-bg);
   --poster-container-border: 1px solid rgba(255, 255, 255, 0.08);
@@ -532,7 +532,7 @@
 .person-credits-card__poster-placeholder.skeleton-shimmer {
   width: 100%;
   height: 100%;
-  border-radius: 8px;
+  border-radius: var(--radius-xs);
   --shimmer-bg: linear-gradient(90deg, rgba(255, 255, 255, 0.02) 25%, rgba(255, 255, 255, 0.06) 50%, rgba(255, 255, 255, 0.02) 75%);
   background: var(--shimmer-bg);
   background-size: 200% 100%;
@@ -556,12 +556,12 @@
   bottom: 6px;
   left: 6px;
   font-size: 0.52rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   --badge-padding: 1px 4px;
   padding: var(--badge-padding);
-  border-radius: 3px;
+  border-radius: var(--radius-4xs);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   --badge-border: 1px solid rgba(255, 255, 255, 0.06);
@@ -662,7 +662,7 @@
 .person-credits-card__title {
   display: block;
   font-size: 0.78rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
   margin-top: var(--space-2);
   text-overflow: ellipsis;
@@ -685,7 +685,7 @@
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   flex: 1;
   min-width: 0;
 }
@@ -693,7 +693,7 @@
 .person-credits-card__year {
   font-size: 0.74rem;
   color: color-mix(in srgb, var(--color-text-primary) 40%, transparent);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   flex-shrink: 0;
 }
 
@@ -707,7 +707,7 @@
   text-transform: uppercase;
   color: var(--color-text-primary);
   /* More visible header color */
-  font-weight: 800;
+  font-weight: var(--font-weight-extrabold);
   --discover-label-border: 1px solid rgba(255, 255, 255, 0.08);
   border-bottom: var(--discover-label-border);
   --discover-label-pb: 10px;
@@ -733,7 +733,7 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--color-text-muted);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   white-space: nowrap;
 }
 
@@ -745,7 +745,7 @@
   background: var(--discover-buttons-bg);
   --discover-buttons-padding: 3px;
   padding: var(--discover-buttons-padding);
-  border-radius: 8px;
+  border-radius: var(--radius-xs);
   --discover-buttons-border: 1px solid rgba(255, 255, 255, 0.03);
   border: var(--discover-buttons-border);
 }
@@ -755,12 +755,12 @@
   border: none;
   color: var(--color-text-secondary);
   font-size: 0.68rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   --discover-btn-padding: 5px 12px;
   padding: var(--discover-btn-padding);
-  border-radius: 6px;
+  border-radius: var(--radius-2xs);
   cursor: pointer;
   --discover-btn-transition: all 0.2s ease;
   transition: var(--discover-btn-transition);
@@ -833,11 +833,11 @@
   border: var(--switch-btn-border);
   color: var(--color-accent-blue);
   font-size: 0.68rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   padding: var(--space-1) var(--space-2);
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   cursor: pointer;
   --switch-btn-transition: all 0.2s ease;
   transition: var(--switch-btn-transition);
@@ -862,7 +862,7 @@
 
 .person-credits-card__studio {
   font-size: 0.82rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-secondary);
   white-space: nowrap;
   overflow: hidden;
@@ -908,7 +908,7 @@
   background: var(--dropdown-search-bg);
   border: 1px solid var(--color-border-subtle);
   padding: var(--space-2xs);
-  border-radius: 8px;
+  border-radius: var(--radius-xs);
   height: 32px;
   width: max-content;
 }
@@ -916,9 +916,9 @@
 .person-credits-discover-groups-style .ui-tab--sub {
   background: transparent;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-2xs);
   font-size: 0.68rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   padding: 0 var(--space-lg);
@@ -940,7 +940,7 @@
   font-size: 0.72rem;
   background: var(--color-surface-overlay-strong);
   padding: calc(var(--space-2xs) / 2) var(--space-xs);
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   margin-left: var(--space-xs);
   font-weight: normal;
   display: inline-flex;
@@ -962,7 +962,7 @@
   background: var(--dropdown-search-bg);
   border: 1px solid var(--color-border-subtle);
   padding: var(--space-2xs);
-  border-radius: 8px;
+  border-radius: var(--radius-xs);
   height: 32px;
   width: max-content;
 }
@@ -970,9 +970,9 @@
 .person-credits-discover-groups-discover-style .ui-tab--sub {
   background: transparent;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-2xs);
   font-size: 0.68rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   padding: 0 var(--space-lg);
@@ -1078,7 +1078,7 @@
 
 .person-credits-gallery-title {
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   color: var(--color-text-primary);
   white-space: nowrap;
   overflow: hidden;

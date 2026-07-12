@@ -169,7 +169,7 @@
 }
 
 .ui-modal--danger .ui-icon-button-wrapper {
-  border-radius: var(--radius-sm, 4px) !important;
+  border-radius: var(--radius-sm, var(--radius-3xs)) !important;
   border-color: color-mix(in srgb, var(--color-state-danger) 30%, var(--color-border-heavy)) !important;
   background: color-mix(in srgb, var(--color-state-danger) 10%, var(--color-surface-glass)) !important;
   box-shadow: var(--shadow-sm) !important;

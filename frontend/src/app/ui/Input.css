@@ -28,14 +28,14 @@
 
 .ui-input--sm {
   min-height: var(--ui-control-height-sm);
-  font-size: 13px;
+  font-size: var(--font-size-xs-sm);
   padding: 0 var(--space-3);
   border-radius: var(--ui-control-radius-sm);
 }
 
 .ui-input--xs {
   min-height: var(--ui-control-height-xs);
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   padding: 0 var(--space-2);
   border-radius: var(--ui-control-radius-xs);
 }

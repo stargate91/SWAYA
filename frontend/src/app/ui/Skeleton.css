@@ -29,21 +29,21 @@
   min-width: 200px;
   width: 200px;
   min-height: 300px;
-  border-radius: var(--radius-2xl, 16px);
+  border-radius: var(--radius-lg);
   flex-shrink: 0;
 }
 
 .ui-skeleton-banner {
   min-height: 400px;
   margin-bottom: var(--space-6xl);
-  border-radius: var(--radius-3xl, 24px);
+  border-radius: var(--radius-1.5xl);
 }
 
 .ui-skeleton-title {
   width: 220px;
   min-height: 26px;
   margin-bottom: var(--space-3xl);
-  border-radius: var(--radius-lg, 10px);
+  border-radius: var(--radius-sm);
 }
 
 @keyframes uiSkeletonShimmer {
