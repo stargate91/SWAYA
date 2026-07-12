@@ -364,6 +364,43 @@ class LibraryFilterService:
             ).distinct().all()
             butt_sizes = normalize_options([r[0] for r in butt_sizes_query])
 
+            # Query available genders
+            genders_query = self.db.query(Person.gender).filter(
+                Person.id.in_(active_people_ids),
+                Person.is_adult == is_adult,
+                Person.gender.isnot(None)
+            ).distinct().all()
+            
+            genders_set = set()
+            for r in genders_query:
+                g = str(r[0]).strip()
+                if g in ("1", "1.0"):
+                    genders_set.add("female")
+                elif g in ("2", "2.0"):
+                    genders_set.add("male")
+            genders = list(genders_set)
+
+            # Query available roles
+            roles_query = self.db.query(Person.known_for_department).filter(
+                Person.id.in_(active_people_ids),
+                Person.is_adult == is_adult,
+                Person.known_for_department.isnot(None),
+                Person.known_for_department != ""
+            ).distinct().all()
+            
+            roles_set = set()
+            for r in roles_query:
+                role = str(r[0]).strip().lower()
+                if role == "acting":
+                    roles_set.add("actor")
+                elif role in ("directing", "creator"):
+                    roles_set.add("director")
+                elif role == "writing":
+                    roles_set.add("writer")
+                elif role == "sound":
+                    roles_set.add("sound")
+            roles = list(roles_set)
+
         return FilterOptionsResponse(
             genres=genres,
             years=years,
@@ -377,7 +414,9 @@ class LibraryFilterService:
             piercings=piercings,
             breast_types=breast_types,
             butt_shapes=butt_shapes,
-            butt_sizes=butt_sizes
+            butt_sizes=butt_sizes,
+            genders=genders,
+            roles=roles
         )
 
     def get_tag_groups(self, is_adult: bool = False) -> List[TagGroupItem]:

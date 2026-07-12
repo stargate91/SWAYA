@@ -293,6 +293,8 @@ class FilterOptionsResponse(BaseModel):
     breast_types: Optional[List[str]] = None
     butt_shapes: Optional[List[str]] = None
     butt_sizes: Optional[List[str]] = None
+    genders: Optional[List[str]] = None
+    roles: Optional[List[str]] = None
 
 
 # --- Dynamic Detail Response DTOs ---

@@ -2,10 +2,6 @@ import AttributeFilterDropdown from './AttributeFilterDropdown';
 
 export default function LibraryAdvancedFilters({
   t,
-  hairColorFilter,
-  setHairColorFilter,
-  eyeColorFilter,
-  setEyeColorFilter,
   breastTypeFilter,
   setBreastTypeFilter,
   buttShapeFilter,
@@ -55,23 +51,6 @@ export default function LibraryAdvancedFilters({
   return (
     <div className="organizer-panel__row library-filters-row library-filters-advanced-row">
       <div className="library-filters-left">
-        <AttributeFilterDropdown
-          label={t('library.filter.hairColorLabel') || 'Hair Color:'}
-          value={hairColorFilter}
-          onChange={setHairColorFilter}
-          items={filterData?.hair_colors}
-          allLabel={t('library.filter.allHairColors') || 'All Hair Colors'}
-          setCurrentPage={setCurrentPage}
-        />
-
-        <AttributeFilterDropdown
-          label={t('library.filter.eyeColorLabel') || 'Eye Color:'}
-          value={eyeColorFilter}
-          onChange={setEyeColorFilter}
-          items={filterData?.eye_colors}
-          allLabel={t('library.filter.allEyeColors') || 'All Eye Colors'}
-          setCurrentPage={setCurrentPage}
-        />
 
         {settings?.include_adult && (
           <AttributeFilterDropdown

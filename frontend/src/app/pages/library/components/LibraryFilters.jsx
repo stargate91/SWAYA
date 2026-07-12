@@ -92,8 +92,6 @@ export default function LibraryFilters({
 
   const [showAdvanced, setShowAdvanced] = useState(false);
   const hasAdvancedFilters = !!(
-    (filterData?.hair_colors && filterData.hair_colors.length > 0) ||
-    (filterData?.eye_colors && filterData.eye_colors.length > 0) ||
     (filterData?.ethnicities && filterData.ethnicities.length > 0) ||
     (settings?.include_adult && filterData?.breast_types && filterData.breast_types.length > 0) ||
     (settings?.include_adult && filterData?.butt_shapes && filterData.butt_shapes.length > 0) ||
@@ -201,39 +199,55 @@ export default function LibraryFilters({
             />
           )}
 
-          {isPeople && (
-            <FilterDropdown
-              label={t('library.filter.roleLabel') || 'Role:'}
-              value={peopleRoleFilter}
-              onChange={(e) => {
-                setPeopleRoleFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-              options={[
-                { value: 'all', label: t('library.filter.all') || 'All' },
-                { value: 'actor', label: t('library.people.roles.actor') || 'Actor' },
-                { value: 'director', label: t('library.people.roles.director') || 'Director' },
-                { value: 'writer', label: t('library.people.roles.writer') || 'Writer' },
-                { value: 'sound', label: t('library.people.roles.sound') || 'Composer' },
-              ]}
-            />
-          )}
+          {isPeople && (() => {
+            const roleOptions = [
+              { value: 'all', label: t('library.filter.all') || 'All' },
+              { value: 'actor', label: t('library.people.roles.actor') || 'Actor' },
+              { value: 'director', label: t('library.people.roles.director') || 'Director' },
+              { value: 'writer', label: t('library.people.roles.writer') || 'Writer' },
+              { value: 'sound', label: t('library.people.roles.sound') || 'Composer' },
+            ];
+            const filteredRoleOptions = roleOptions.filter(opt => {
+              if (opt.value === 'all') return true;
+              if (peopleRoleFilter === opt.value) return true;
+              return filterData?.roles && filterData.roles.includes(opt.value);
+            });
+            return (
+              <FilterDropdown
+                label={t('library.filter.roleLabel') || 'Role:'}
+                value={peopleRoleFilter}
+                onChange={(e) => {
+                  setPeopleRoleFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+                options={filteredRoleOptions}
+              />
+            );
+          })()}
 
-          {isPeople && (activeSessionMode !== 'nsfw' || !settings?.adult_gender_preference || settings.adult_gender_preference === 'all') && (
-            <FilterDropdown
-              label={t('library.filter.genderLabel') || 'Gender:'}
-              value={genderFilter}
-              onChange={(e) => {
-                setGenderFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-              options={[
-                { value: 'all', label: t('library.filter.all') || 'All' },
-                { value: 'female', label: t('library.filter.female') || 'Female' },
-                { value: 'male', label: t('library.filter.male') || 'Male' },
-              ]}
-            />
-          )}
+          {isPeople && (activeSessionMode !== 'nsfw' || !settings?.adult_gender_preference || settings.adult_gender_preference === 'all') && (() => {
+            const genderOptions = [
+              { value: 'all', label: t('library.filter.all') || 'All' },
+              { value: 'female', label: t('library.filter.female') || 'Female' },
+              { value: 'male', label: t('library.filter.male') || 'Male' },
+            ];
+            const filteredGenderOptions = genderOptions.filter(opt => {
+              if (opt.value === 'all') return true;
+              if (genderFilter === opt.value) return true;
+              return filterData?.genders && filterData.genders.includes(opt.value);
+            });
+            return (
+              <FilterDropdown
+                label={t('library.filter.genderLabel') || 'Gender:'}
+                value={genderFilter}
+                onChange={(e) => {
+                  setGenderFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+                options={filteredGenderOptions}
+              />
+            );
+          })()}
           {isPeople && (
             <AttributeFilterDropdown
               label={t('library.filter.ethnicityLabel') || 'Ethnicity:'}
@@ -241,6 +255,26 @@ export default function LibraryFilters({
               onChange={setEthnicityFilter}
               items={filterData?.ethnicities}
               allLabel={t('library.filter.allEthnicities') || 'All Ethnicities'}
+              setCurrentPage={setCurrentPage}
+            />
+          )}
+          {isPeople && (
+            <AttributeFilterDropdown
+              label={t('library.filter.hairColorLabel') || 'Hair Color:'}
+              value={hairColorFilter}
+              onChange={setHairColorFilter}
+              items={filterData?.hair_colors}
+              allLabel={t('library.filter.allHairColors') || 'All'}
+              setCurrentPage={setCurrentPage}
+            />
+          )}
+          {isPeople && (
+            <AttributeFilterDropdown
+              label={t('library.filter.eyeColorLabel') || 'Eye Color:'}
+              value={eyeColorFilter}
+              onChange={setEyeColorFilter}
+              items={filterData?.eye_colors}
+              allLabel={t('library.filter.allEyeColors') || 'All'}
               setCurrentPage={setCurrentPage}
             />
           )}
@@ -404,12 +438,8 @@ export default function LibraryFilters({
       {showAdvanced && isPeopleTab && (
         <LibraryAdvancedFilters
           t={t}
-          hairColorFilter={hairColorFilter}
-          setHairColorFilter={setHairColorFilter}
           ethnicityFilter={ethnicityFilter}
           setEthnicityFilter={setEthnicityFilter}
-          eyeColorFilter={eyeColorFilter}
-          setEyeColorFilter={setEyeColorFilter}
           breastTypeFilter={breastTypeFilter}
           setBreastTypeFilter={setBreastTypeFilter}
           buttShapeFilter={buttShapeFilter}
