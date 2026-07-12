@@ -7,24 +7,18 @@
   --font-family-base: 'Outfit', sans-serif;
   --font-family-sans: 'IBM Plex Sans', sans-serif;
   --font-family-display: 'Sora', sans-serif;
-  --font-size-4xs: 9px;
-  --font-size-3xs: 10px;
-  --font-size-2xs: 11px;
+  /* Standard Font Sizes */
+  --font-size-2xs: 10px;
   --font-size-xs: 12px;
-  --font-size-xs-sm: 13px;
   --font-size-sm: 14px;
-  --font-size-sm-md: 15px;
   --font-size-md: 16px;
   --font-size-lg: 18px;
   --font-size-xl: 20px;
-  --font-size-2xl: 22px;
-  --font-size-3xl: 24px;
-  --font-size-3xl-lg: 28px;
-  --font-size-3.5xl: 32px;
-  --font-size-4xl-sm: 34px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 30px;
   --font-size-4xl: 36px;
-  --font-size-4xl-lg: 38px;
-  --font-size-5xl: 42px;
+  --font-size-5xl: 48px;
+
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
@@ -231,13 +225,13 @@
   --layout-modal-padding-lg: 32px;
 
   /* App Shell Tokens */
-  --app-shell-color-canvas: #090b0f;
-  --app-shell-color-panel: rgba(18, 21, 28, 0.9);
+  --app-shell-color-canvas: var(--color-bg-canvas);
+  --app-shell-color-panel: color-mix(in srgb, var(--color-bg-elevated) 90%, transparent);
   --app-shell-color-panel-strong: rgba(24, 28, 37, 0.98);
   --app-shell-color-panel-soft: rgba(255, 255, 255, 0.015);
-  --app-shell-color-ink: #f1f5f9;
-  --app-shell-color-muted: #94a3b8;
-  --app-shell-color-subtle: #64748b;
+  --app-shell-color-ink: var(--color-text-primary);
+  --app-shell-color-muted: var(--color-text-secondary);
+  --app-shell-color-subtle: var(--color-text-muted);
   --app-shell-color-line: rgba(255, 255, 255, 0.065);
   --app-shell-color-line-strong: rgba(255, 255, 255, 0.13);
   --app-shell-color-accent: var(--color-accent-blue);
@@ -246,7 +240,7 @@
   --app-shell-color-accent-glow: rgba(59, 130, 246, 0.24);
   --app-shell-color-signal: #60a5fa;
   --app-shell-color-signal-soft: rgba(96, 165, 250, 0.16);
-  --app-shell-color-info: #3b82f6;
+  --app-shell-color-info: var(--color-state-info);
   --app-shell-scrollbar-size: 10px;
   --app-shell-scrollbar-radius: 999px;
   --app-shell-scrollbar-track: rgba(255, 255, 255, 0.025);
@@ -255,16 +249,16 @@
   --app-shell-scrollbar-thumb-hover: rgba(0, 136, 255, 0.34);
   --app-shell-scrollbar-thumb-active: rgba(0, 136, 255, 0.48);
   --app-shell-scrollbar-border: rgba(255, 255, 255, 0.04);
-  --app-shell-space-1: 4px;
-  --app-shell-space-2: 8px;
-  --app-shell-space-3: 12px;
-  --app-shell-space-4: 16px;
-  --app-shell-space-5: 20px;
-  --app-shell-space-6: 24px;
-  --app-shell-space-7: 32px;
-  --app-shell-space-8: 40px;
-  --app-shell-space-9: 56px;
-  --app-shell-space-10: 72px;
+  --app-shell-space-1: var(--space-2xs); /* 4px */
+  --app-shell-space-2: var(--space-sm);  /* 8px */
+  --app-shell-space-3: var(--space-lg);  /* 12px */
+  --app-shell-space-4: var(--space-2xl); /* 16px */
+  --app-shell-space-5: var(--space-3xl); /* 20px */
+  --app-shell-space-6: var(--space-4xl); /* 24px */
+  --app-shell-space-7: var(--space-5xl); /* 32px */
+  --app-shell-space-8: var(--space-6xl); /* 40px */
+  --app-shell-space-9: var(--space-7xl);
+  --app-shell-space-10: var(--space-8xl);
   --app-shell-radius-sm: 10px;
   --app-shell-radius-md: 12px;
   --app-shell-radius-lg: 16px;
@@ -562,30 +556,8 @@
     linear-gradient(90deg, color-mix(in srgb, var(--color-accent-blue) 18%, transparent), transparent 28%),
     color-mix(in srgb, var(--color-panel-strong) 86%, var(--color-surface-glass));
 
-  /* Backwards-compatible aliases (prefer canonical --color-* / --layout-* tokens) */
-  --bg-main: var(--color-bg-canvas);
-  --bg-sidebar: var(--color-bg-elevated);
-  --bg-card: var(--color-surface-card);
-  --bg-glass: var(--color-surface-glass);
-  --accent-blue: var(--color-accent-blue);
-  --accent-glow: var(--color-accent-glow);
-  --accent-gradient: var(--color-accent-gradient);
-  --text-main: var(--color-text-primary);
-  --text-dim: var(--color-text-secondary);
-  --text-muted: var(--color-text-muted);
-  --border-card: var(--color-border-subtle);
-  --border-glass: var(--color-border-strong);
-  --danger: var(--color-state-danger);
-  --danger-bg: var(--color-state-danger-bg);
-  --success: var(--color-state-success);
-  --success-bg: var(--color-state-success-bg);
-  --warning: var(--color-state-warning);
-  --warning-bg: var(--color-state-warning-bg);
-  --amber: var(--color-state-amber);
-  --amber-bg: var(--color-state-amber-bg);
-  --info: var(--color-state-info);
 
-  /* Spacing */
+  /* Standard Spacing Primitives */
   --space-2xs: 4px;
   --space-xs: 6px;
   --space-sm: 8px;
@@ -597,43 +569,39 @@
   --space-4xl: 24px;
   --space-5xl: 32px;
   --space-6xl: 40px;
+  --space-7xl: 56px;
+  --space-8xl: 72px;
 
   /* Radius */
-  --radius-6xs: 1.5px;
-  --radius-5xs: 2px;
-  --radius-4xs: 3px;
-  --radius-3xs: 4px;
-  --radius-2xs: 6px;
-  --radius-xs: 8px;
-  --radius-xs-sm: 9px;
-  --radius-input: 12px;
-  --radius-sm: 10px;
+  /* Standard Border Radii */
+  --radius-none: 0px;
+  --radius-2xs: 2px;
+  --radius-xs: 4px;
+  --radius-sm: 8px;
   --radius-md: 12px;
-  --radius-md-lg: 14px;
   --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-1.5xl: 24px;
+  --radius-xl: 24px;
   --radius-2xl: 32px;
-  --radius-full: 999px;
+  --radius-full: 9999px;
 
   /* Shadow */
   --shadow-xs: 0 2px 8px rgba(0, 0, 0, 0.2);
   --shadow-sm-strong: 0 4px 16px rgba(0, 0, 0, 0.25);
-  --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.15);
-  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.4);
+  --shadow-sm: var(--app-shell-shadow-sm);
+  --shadow-md: var(--app-shell-shadow-md);
+  --shadow-lg: var(--app-shell-shadow-lg);
   --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.5);
   --shadow-focus-blue: 0 8px 20px rgba(59, 130, 246, 0.2);
 
   /* Motion */
-  --motion-duration-fast: 0.2s;
-  --motion-duration-base: 0.3s;
-  --motion-duration-emphasized: 0.4s;
-  --motion-duration-slow: 0.45s;
+  --motion-duration-fast: 140ms;
+  --motion-duration-base: 200ms;
+  --motion-duration-emphasized: 200ms;
+  --motion-duration-slow: 260ms;
   --motion-duration-slow-expressive: 0.8s;
   --motion-duration-lazy: 1.2s;
   --motion-duration-slow-idle: 5s;
-  --motion-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --motion-ease-expressive: cubic-bezier(0.34, 1.56, 0.64, 1);
   --motion-ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
   --motion-ease-linear: linear;
@@ -646,7 +614,13 @@
   --motion-delay-step: 15ms;
   --motion-fast: var(--motion-duration-fast) var(--motion-ease-standard);
   --motion-base: var(--motion-duration-base) var(--motion-ease-standard);
+  --motion-slow: var(--motion-duration-slow) var(--motion-ease-emphasized);
+  --motion-emphasized: var(--motion-duration-base) var(--motion-ease-emphasized);
   --motion-expressive: var(--motion-duration-base) var(--motion-ease-expressive);
+  --motion-spring: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --motion-zoom: transform 0.28s ease;
+  --motion-lift-distance-sm: -1px;
+  --motion-lift-distance-md: -2px;
 
   /* Effects */
   --glass-blur: blur(12px);

@@ -85,7 +85,7 @@
   padding: var(--space-xs) var(--space-sm);
   background: color-mix(in srgb, var(--color-accent-blue) 8%, var(--color-surface-card));
   border: 1px solid color-mix(in srgb, var(--color-accent-blue) 15%, var(--color-border-default));
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   font-size: 0.75rem;
   color: var(--color-text-secondary);
   display: flex;
@@ -134,7 +134,7 @@
   min-height: 28px;
   padding: 0 0.625rem;
   gap: 0.25rem;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   font-size: 0.72rem;
 }
 
@@ -154,8 +154,8 @@
 .person-backdrop-picker__default-tab-content {
   display: flex;
   justify-content: center;
-  padding-top: var(--space-6);
-  padding-bottom: var(--space-6);
+  padding-top: var(--space-4xl);
+  padding-bottom: var(--space-4xl);
 }
 
 .person-backdrop-picker__fallback-card {
@@ -186,7 +186,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 2 / 3;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--color-border-default) 82%, transparent);
   background: var(--color-bg-elevated);
@@ -223,8 +223,8 @@
   color: var(--color-text-primary);
   font-size: 0.6rem;
   font-weight: var(--font-weight-extrabold);
-  padding: calc(var(--space-1) / 2) var(--space-1);
-  border-radius: var(--radius-3xs);
+  padding: calc(var(--space-2xs) / 2) var(--space-2xs);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--color-border-strong);
   letter-spacing: 0.05em;
   backdrop-filter: blur(2px);
@@ -233,7 +233,7 @@
 .person-backdrop-picker__credit-info {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--space-1) / 2);
+  gap: calc(var(--space-2xs) / 2);
 }
 
 .person-backdrop-picker__credit-title {
@@ -256,7 +256,7 @@
 .person-backdrop-picker__credit-rating {
   display: inline-flex;
   align-items: center;
-  gap: calc(var(--space-1) / 2);
+  gap: calc(var(--space-2xs) / 2);
   color: var(--color-brand-imdb);
 }
 

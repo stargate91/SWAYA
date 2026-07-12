@@ -98,10 +98,10 @@
   --pill-color: var(--color-accent);
   color: var(--pill-color);
   font-weight: var(--font-weight-bold);
-  font-size: var(--font-size-3xs);
+  font-size: var(--font-size-2xs);
   --pill-padding: 1px 6px;
   padding: var(--pill-padding);
-  border-radius: var(--radius-3xs);
+  border-radius: var(--radius-sm);
 }
 
 .peak-position-pill__icon {
@@ -129,11 +129,11 @@
   border: none;
   color: var(--color-text-muted);
   cursor: pointer;
-  padding: var(--space-1);
+  padding: var(--space-2xs);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-3xs);
+  border-radius: var(--radius-sm);
   transition: all var(--motion-fast);
 }
 

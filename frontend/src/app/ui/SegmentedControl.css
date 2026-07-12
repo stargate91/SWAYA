@@ -4,7 +4,7 @@
   height: var(--ui-control-height-md, 36px);
   padding: 0.1875rem;
   border: 1px solid var(--ui-control-border, var(--color-border-default));
-  border-radius: var(--ui-control-radius, var(--radius-xs));
+  border-radius: var(--ui-control-radius, var(--radius-sm));
   background: var(--ui-control-bg, var(--ui-surface-ghost));
   gap: 0.125rem;
   box-sizing: border-box;
@@ -17,7 +17,7 @@
   flex: 1;
   padding: 0 var(--space-2xl);
   border: 0;
-  border-radius: calc(var(--ui-control-radius, var(--radius-xs)) - var(--radius-4xs));
+  border-radius: calc(var(--ui-control-radius, var(--radius-sm)) - var(--radius-sm));
   background: transparent;
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
@@ -55,17 +55,17 @@
   align-items: center;
   background-color: var(--color-surface-glass);
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-2xs);
+  border-radius: var(--radius-sm);
   padding: 0.125rem;
 }
 
 .ui-segmented-control--filter .ui-segmented-control__option {
   padding: var(--space-2xs) var(--space-sm);
-  font-size: var(--font-size-3xs);
+  font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-bold, 700);
   line-height: 1;
   color: var(--color-text-muted);
-  border-radius: var(--radius-3xs);
+  border-radius: var(--radius-sm);
 }
 
 .ui-segmented-control--filter .ui-segmented-control__option:hover:not(.is-active) {

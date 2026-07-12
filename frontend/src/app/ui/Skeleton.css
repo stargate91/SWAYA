@@ -36,7 +36,7 @@
 .ui-skeleton-banner {
   min-height: 400px;
   margin-bottom: var(--space-6xl);
-  border-radius: var(--radius-1.5xl);
+  border-radius: var(--radius-xl);
 }
 
 .ui-skeleton-title {

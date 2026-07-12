@@ -13,7 +13,7 @@
 .ui-select {
   width: 100%;
   min-height: var(--ui-control-height-md);
-  padding: 0 var(--space-4);
+  padding: 0 var(--space-2xl);
   border-radius: var(--ui-control-radius);
   border: 1px solid var(--ui-control-border);
   background: var(--color-input-bg, var(--ui-control-bg));
@@ -28,15 +28,15 @@
 
 .ui-input--sm {
   min-height: var(--ui-control-height-sm);
-  font-size: var(--font-size-xs-sm);
-  padding: 0 var(--space-3);
+  font-size: var(--font-size-xs);
+  padding: 0 var(--space-lg);
   border-radius: var(--ui-control-radius-sm);
 }
 
 .ui-input--xs {
   min-height: var(--ui-control-height-xs);
   font-size: var(--font-size-xs);
-  padding: 0 var(--space-2);
+  padding: 0 var(--space-sm);
   border-radius: var(--ui-control-radius-xs);
 }
 
@@ -151,7 +151,7 @@
 }
 
 .ui-field__error {
-  margin-top: var(--space-2);
+  margin-top: var(--space-sm);
   font-size: var(--font-size-xs);
   color: var(--color-state-danger);
 }

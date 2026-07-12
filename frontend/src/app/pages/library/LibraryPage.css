@@ -1,6 +1,6 @@
 .library-page {
   margin-top: calc(-1 * var(--page-top-offset, var(--space-4xl)));
-  margin-right: calc(-1 * var(--space-7, 1.75rem));
+  margin-right: calc(-1 * var(--space-5xl, 1.75rem));
   margin-bottom: 0;
 }
 
@@ -11,11 +11,11 @@
 .library-main {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5, var(--space-3xl));
+  gap: var(--space-3xl, var(--space-3xl));
   min-width: 0;
   min-height: 0;
   padding-top: var(--page-top-offset, var(--space-4xl));
-  padding-right: var(--space-7, 1.75rem);
+  padding-right: var(--space-5xl, 1.75rem);
   padding-bottom: 0;
 }
 
@@ -26,7 +26,7 @@
 .library-grid-container {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-3xl);
 }
 
 .library-grid-container > *:last-child {
@@ -69,7 +69,7 @@
 }
 
 .library-bulk-banner__text {
-  font-size: var(--font-size-xs-sm);
+  font-size: var(--font-size-xs);
   line-height: 1.45;
   color: var(--color-text-primary);
 }
@@ -120,13 +120,13 @@
 .library-filters-left {
   display: flex;
   align-items: center;
-  gap: var(--space-4, var(--space-2xl));
+  gap: var(--space-2xl, var(--space-2xl));
 }
 
 .library-filters-right {
   display: flex;
   align-items: center;
-  --filters-right-gap: var(--space-3, 12px);
+  --filters-right-gap: var(--space-lg, 12px);
   gap: var(--filters-right-gap);
 }
 
@@ -138,7 +138,7 @@
 .library-sorter-container {
   display: flex;
   align-items: center;
-  gap: var(--space-2, var(--space-sm));
+  gap: var(--space-sm, var(--space-sm));
 }
 
 .ui-dropdown__trigger--sorter-custom {
@@ -161,7 +161,7 @@
 .library-header__inline-tools {
   display: flex;
   align-items: center;
-  gap: var(--space-4, var(--space-2xl));
+  gap: var(--space-2xl, var(--space-2xl));
   min-width: 0;
 }
 
@@ -176,16 +176,16 @@
 .library-filter-group {
   display: flex;
   align-items: center;
-  gap: var(--space-2, var(--space-sm));
+  gap: var(--space-sm, var(--space-sm));
 }
 
 .library-filter-btn {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2, var(--space-sm));
+  gap: var(--space-sm, var(--space-sm));
   min-height: 28px;
   height: 28px;
-  padding: 0 var(--space-3, var(--space-lg)) !important;
+  padding: 0 var(--space-lg, var(--space-lg)) !important;
   font-size: var(--font-size-xs) !important;
 }
 
@@ -342,7 +342,7 @@
 
 .add-people-modal__card-name {
   color: var(--color-text-primary);
-  font-size: var(--font-size-sm-md);
+  font-size: var(--font-size-sm);
   line-height: 1.2;
 }
 
@@ -384,7 +384,7 @@
   flex: 1;
   align-items: center;
   border: 1px solid var(--ui-control-border, var(--color-border-default));
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   background: var(--color-bg-elevated);
   transition: border-color var(--motion-fast), box-shadow var(--motion-fast);
   overflow: hidden;
@@ -411,7 +411,7 @@
   box-shadow: none !important;
   padding-left: var(--space-md) !important;
   padding-right: var(--space-md) !important;
-  font-size: var(--font-size-xs-sm) !important;
+  font-size: var(--font-size-xs) !important;
   height: var(--ui-control-height, 36px) !important;
   min-height: 0 !important;
   color: var(--color-text-primary) !important;
@@ -695,7 +695,7 @@
 .library-tag-card__name {
   display: block;
   max-width: 100%;
-  font-size: var(--font-size-xs-sm);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold, 700);
   color: var(--color-text-primary);
   white-space: nowrap;
@@ -784,13 +784,13 @@
 
 .library-tag-expanded-panel__title {
   margin: 0;
-  font-size: clamp(var(--font-size-3xl), 3vw, var(--font-size-4xl-sm));
+  font-size: clamp(var(--font-size-3xl), 3vw, var(--font-size-4xl));
   line-height: 1;
   color: var(--color-text-primary);
 }
 
 .library-tag-expanded-panel__meta {
-  font-size: var(--font-size-xs-sm);
+  font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
 }
 
@@ -800,7 +800,7 @@
 }
 
 .library-tag-expanded-panel.is-focus-mode .ui-poster-card__image-wrapper {
-  border-radius: var(--radius-xs-sm);
+  border-radius: var(--radius-sm);
 }
 
 .library-tag-expanded-panel.is-focus-mode .ui-poster-card__media {
@@ -876,7 +876,7 @@
 }
 
 .library-chooser-title {
-  font-size: clamp(var(--font-size-3xl-lg), 4vw, var(--font-size-4xl-lg));
+  font-size: clamp(var(--font-size-3xl), 4vw, var(--font-size-4xl));
   font-weight: var(--font-weight-extrabold);
   color: var(--color-text-primary);
   margin-bottom: var(--space-lg);
@@ -884,7 +884,7 @@
 }
 
 .library-chooser-subtitle {
-  font-size: var(--font-size-sm-md);
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   max-width: 540px;
   margin: 0 auto;
@@ -927,7 +927,7 @@
 }
 
 .library-chooser-card__description {
-  font-size: var(--font-size-xs-sm);
+  font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
   line-height: 1.5;
 }
@@ -1013,7 +1013,7 @@
 .create-tag-form__color-hex-pill {
   flex: 1;
   height: 28px;
-  border-radius: var(--radius-2xs) !important;
+  border-radius: var(--radius-sm) !important;
   font-family: var(--font-family-mono, monospace);
   font-size: var(--font-size-2xs) !important;
   font-weight: var(--font-weight-bold) !important;
@@ -1023,7 +1023,7 @@
 .create-tag-form__custom-color-label {
   position: relative;
   height: 28px;
-  border-radius: var(--radius-2xs);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1090,7 +1090,7 @@
   position: relative;
   width: 80px;
   height: 80px;
-  border-radius: var(--radius-2xs);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--color-border-subtle);
   overflow: hidden;
 }
@@ -1117,7 +1117,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--font-size-3xs);
+  font-size: var(--font-size-2xs);
   line-height: 1;
   z-index: 2;
 }
@@ -1173,7 +1173,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-right: var(--space-2);
+  margin-right: var(--space-sm);
   flex: 1;
 }
 
@@ -1196,13 +1196,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  --discover-empty-padding: var(--space-8, 32px);
+  --discover-empty-padding: var(--space-6xl, 32px);
   padding: var(--discover-empty-padding);
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
   text-align: center;
   border: 1px dashed var(--color-line);
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--color-line) 3%, transparent);
   width: 100%;
   box-sizing: border-box;

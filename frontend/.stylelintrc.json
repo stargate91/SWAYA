@@ -13,6 +13,12 @@
         "/\\b\\d+(?:\\.\\d+)?m?s\\b/",
         "/cubic-bezier/",
         "/(?<![\\w-])(?:ease|ease-in|ease-out|ease-in-out|linear)(?![\\w-])/"
+      ],
+      "/^(?!--)/": [
+        "/var\\(--space-(?:10|[1-9])\\b/",
+        "/var\\(--app-shell-space-/",
+        "/var\\(--font-size-(?:4xs|3xs|xs-sm|sm-md|3xl-lg|3-5xl|4xl-sm|4xl-lg)\\b/",
+        "/var\\(--radius-(?:6xs|5xs|4xs|3xs|xs-sm|md-lg|1-5xl)\\b/"
       ]
     }
   }

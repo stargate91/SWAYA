@@ -19,8 +19,8 @@
 
 .ui-badge--overlay {
   position: absolute;
-  left: var(--space-3);
-  right: var(--space-3);
+  left: var(--space-lg);
+  right: var(--space-lg);
   bottom: var(--status-badge-bottom);
   min-height: 22px;
 }
@@ -54,7 +54,7 @@
   font-size: var(--font-size-xs);
   font-weight: bold;
   padding: 0.125rem var(--space-sm) !important;
-  border-radius: var(--radius-4xs) !important;
+  border-radius: var(--radius-sm) !important;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   line-height: 1.2;
@@ -64,9 +64,9 @@
 }
 
 sup .ui-badge--adult.ui-badge--danger {
-  font-size: var(--font-size-3xs) !important;
+  font-size: var(--font-size-2xs) !important;
   letter-spacing: normal !important;
-  border-radius: var(--radius-4xs) !important;
+  border-radius: var(--radius-sm) !important;
   padding: var(--space-2xs) var(--space-xs) !important;
   height: auto !important;
   min-height: 0 !important;

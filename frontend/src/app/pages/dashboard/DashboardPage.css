@@ -12,7 +12,7 @@
 }
 
 .dashboard-header__title {
-  font-size: var(--font-size-3.5xl);
+  font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-extrabold);
   color: var(--color-text-primary);
   margin-bottom: var(--space-sm);
@@ -34,7 +34,7 @@
 
 
 .shell__content:has(.dashboard-page) {
-  padding-bottom: var(--app-shell-space-7);
+  padding-bottom: var(--space-5xl);
 }
 
 .dashboard-widget__loading {
@@ -74,7 +74,7 @@
   transition: all var(--motion-duration-base) var(--motion-ease-standard);
   width: 40px;
   height: 40px;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
 }
 
 .ui-icon-button.ui-icon-button--dashboard-customizer:hover:not(:disabled) {
@@ -85,17 +85,17 @@
 }
 
 .dashboard-customizer-content {
-  padding: var(--space-6);
+  padding: var(--space-4xl);
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-3xl);
   max-height: calc(100vh - 80px);
   overflow-y: auto;
 }
 
 .dashboard-customizer-desc {
   margin: 0;
-  font-size: var(--font-size-xs-sm);
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   line-height: 1.5;
 }
@@ -103,20 +103,20 @@
 .dashboard-customizer-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-2xl);
 }
 
 .dashboard-customizer-child-switches {
-  padding-left: var(--space-8);
+  padding-left: var(--space-6xl);
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  margin-top: var(--space-3);
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
 }
 
 .dashboard-customizer-item {
   background: var(--color-bg-panel, color-mix(in srgb, white 2%, transparent));
-  padding: var(--space-4);
+  padding: var(--space-2xl);
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border, color-mix(in srgb, white 6%, transparent));
   box-shadow: none;
@@ -139,7 +139,7 @@
 .dashboard-customizer-item-left {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-lg);
 }
 
 .dashboard-customizer-grip {
@@ -155,13 +155,13 @@
 
 /* Error widget styles to avoid forbidden style props */
 .dashboard-widget--error {
-  padding: var(--app-shell-space-8);
+  padding: var(--space-6xl);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: var(--app-shell-space-3);
+  gap: var(--space-lg);
   min-height: 200px;
 }
 

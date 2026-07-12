@@ -65,7 +65,7 @@
   align-items: center;
   --local-gap: 4px;
   gap: var(--local-gap);
-  padding: var(--space-1) var(--space-2) !important;
+  padding: var(--space-2xs) var(--space-sm) !important;
   font-size: var(--font-size-2xs) !important;
   font-weight: var(--font-weight-semibold) !important;
   cursor: pointer;
@@ -105,7 +105,7 @@
   border: 1px solid var(--color-border-subtle);
   background: var(--color-surface-glass);
   backdrop-filter: blur(4px);
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   padding: 0 var(--space-md);
   height: 38px;
   transition: border-color var(--motion-duration-fast) var(--motion-ease-standard);
@@ -123,7 +123,7 @@
   border: none;
   outline: none;
   color: var(--color-text-primary);
-  font-size: var(--font-size-xs-sm);
+  font-size: var(--font-size-xs);
   width: 100%;
   height: 100%;
 }
@@ -154,7 +154,7 @@
   top: 100%;
   left: 0;
   right: 0;
-  margin-top: var(--space-1);
+  margin-top: var(--space-2xs);
   background: var(--color-surface-overlay);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-md);
@@ -162,7 +162,7 @@
   z-index: 100;
   max-height: 200px;
   overflow-y: auto;
-  padding: var(--space-1) 0;
+  padding: var(--space-2xs) 0;
   backdrop-filter: blur(16px);
 }
 
@@ -172,7 +172,7 @@
   width: 100%;
   background: transparent;
   border: none;
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-sm) var(--space-lg);
   color: var(--color-text-primary);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
@@ -197,7 +197,7 @@
 .bespoke-scene-tagger-dropdown-item--create {
   color: var(--color-accent-blue);
   border-top: 1px solid var(--color-border-default);
-  margin-top: var(--space-1);
+  margin-top: var(--space-2xs);
 }
 
 /* Suggested Tags */
@@ -206,10 +206,10 @@
   align-items: center;
   --local-gap: 4px;
   gap: var(--local-gap);
-  padding: var(--space-1) var(--space-2);
+  padding: var(--space-2xs) var(--space-sm);
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-semibold);
-  border-radius: var(--radius-2xs);
+  border-radius: var(--radius-sm);
   border: 1px dashed var(--color-border-heavy);
   background: color-mix(in srgb, black 35%, transparent);
   color: color-mix(in srgb, var(--color-ink) 85%, transparent);

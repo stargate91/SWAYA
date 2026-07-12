@@ -14,7 +14,7 @@
   height: 100%;
   --local-bg: rgba(255, 255, 255, 0.08);
   background: var(--local-bg);
-  border-radius: var(--radius-5xs);
+  border-radius: var(--radius-sm);
   overflow: hidden;
   --local-border: 1px solid rgba(255, 255, 255, 0.04);
   border: var(--local-border);
@@ -78,7 +78,7 @@
   align-items: center;
   padding: var(--btn-padding);
   margin-right: var(--btn-padding);
-  border-radius: var(--radius-3xs);
+  border-radius: var(--radius-sm);
   transition: all var(--motion-base);
 }
 

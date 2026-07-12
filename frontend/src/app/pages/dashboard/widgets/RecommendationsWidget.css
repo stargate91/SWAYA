@@ -4,7 +4,7 @@
   height: 400px;
   margin-bottom: var(--space-6xl);
   overflow: hidden;
-  border-radius: var(--radius-1.5xl);
+  border-radius: var(--radius-xl);
   background: var(--color-bg-elevated);
   box-shadow: 0 20px 40px color-mix(in srgb, black 40%, transparent);
   border: 1px solid var(--color-border-subtle);
@@ -75,7 +75,7 @@
   align-items: center;
   gap: var(--space-xs);
   padding: var(--space-xs) var(--space-md);
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   border: 1px solid color-mix(in srgb, var(--color-text-primary, white) 15%, transparent);
   background: color-mix(in srgb, var(--color-text-primary, white) 10%, transparent);
   backdrop-filter: blur(4px);
@@ -104,7 +104,7 @@
   overflow: hidden;
   margin-bottom: var(--space-4xl);
   color: color-mix(in srgb, var(--color-text-primary) 80%, transparent);
-  font-size: var(--font-size-sm-md);
+  font-size: var(--font-size-sm);
   line-height: 1.5;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -234,8 +234,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--space-4);
-  gap: var(--space-4);
+  margin-bottom: var(--space-2xl);
+  gap: var(--space-2xl);
   flex-wrap: wrap;
 }
 
@@ -245,7 +245,7 @@
 
 .recommend-carousel-filters {
   display: flex;
-  gap: var(--space-3);
+  gap: var(--space-lg);
 }
 
 .recommend-carousel-filters .recommend-carousel-filter-genre {
@@ -258,7 +258,7 @@
 
 .recommend-carousel-no-results {
   text-align: center;
-  padding: var(--space-10);
+  padding: var(--space-8xl);
   color: var(--color-text-muted);
 }
 

@@ -82,7 +82,7 @@
 .season-poster-card__image-wrapper {
   width: 100%;
   aspect-ratio: 2 / 3;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   overflow: hidden;
   background: var(--color-surface-glass);
   border: 1px solid var(--color-border-default);
@@ -207,7 +207,7 @@
   align-items: center;
   gap: var(--space-xs);
   padding: var(--space-xs) var(--space-lg);
-  border-radius: var(--radius-2xs);
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
@@ -296,7 +296,7 @@
   width: 100%;
   height: 73px;
   aspect-ratio: 16 / 9;
-  border-radius: var(--radius-2xs);
+  border-radius: var(--radius-sm);
   overflow: hidden;
   background: var(--color-surface-glass);
   border: 1px solid var(--color-border-default);
@@ -308,9 +308,9 @@
   gap: calc(var(--space-md) / 2);
   padding: calc(var(--space-2xs) / 4) var(--space-xs);
   min-height: 20px;
-  font-size: var(--font-size-3xs);
+  font-size: var(--font-size-2xs);
   line-height: 1;
-  border-radius: var(--radius-3xs);
+  border-radius: var(--radius-sm);
   backdrop-filter: none;
   font-weight: var(--font-weight-medium);
   box-sizing: border-box;
@@ -373,7 +373,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-xs);
-  font-size: var(--font-size-3xs);
+  font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-muted);
   margin-top: calc(var(--space-2xs) / 4);
@@ -382,7 +382,7 @@
 .episode-card__meta-item {
   background: var(--color-border-subtle);
   padding: calc(var(--space-2xs) / 4) var(--space-xs);
-  border-radius: var(--radius-3xs);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--color-surface-glass);
 }
 
@@ -516,7 +516,7 @@
   gap: var(--space-md);
   background: var(--color-border-subtle);
   padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-2xs);
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-2xs);
 }
 
@@ -530,7 +530,7 @@
   background: var(--color-surface-glass);
   --peak-padding: 2px 6px;
   padding: var(--peak-padding);
-  border-radius: var(--radius-3xs);
+  border-radius: var(--radius-sm);
 }
 
 .episode-card__peak-delete {
@@ -539,7 +539,7 @@
   color: var(--color-text-muted);
   cursor: pointer;
   padding: var(--space-2xs);
-  border-radius: var(--radius-3xs);
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;

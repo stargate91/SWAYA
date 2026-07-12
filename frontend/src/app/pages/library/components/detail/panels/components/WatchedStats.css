@@ -33,7 +33,7 @@
   width: 100%;
   height: 6px;
   margin-top: var(--space-xs);
-  border-radius: var(--radius-4xs);
+  border-radius: var(--radius-sm);
   overflow: hidden;
   background: var(--color-border-default);
   border: none;
@@ -41,17 +41,17 @@
 
 .specs-card__progress::-webkit-progress-bar {
   background: var(--color-border-default);
-  border-radius: var(--radius-4xs);
+  border-radius: var(--radius-sm);
 }
 
 .specs-card__progress::-webkit-progress-value {
   background: linear-gradient(90deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, white) 100%);
-  border-radius: var(--radius-4xs);
+  border-radius: var(--radius-sm);
 }
 
 .specs-card__progress::-moz-progress-bar {
   background: linear-gradient(90deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, white) 100%);
-  border-radius: var(--radius-4xs);
+  border-radius: var(--radius-sm);
 }
 
 .watched-panel__activity-header {
@@ -134,7 +134,7 @@
 }
 
 .specs-card__value--in-progress {
-  font-size: var(--font-size-xs-sm);
+  font-size: var(--font-size-xs);
   white-space: normal;
   line-break: anywhere;
 }
@@ -185,7 +185,7 @@
 .season-progress-card__progress {
   width: 100%;
   height: 4px;
-  border-radius: var(--radius-5xs);
+  border-radius: var(--radius-sm);
   overflow: hidden;
   background: var(--color-border-default);
   border: none;
@@ -193,17 +193,17 @@
 
 .season-progress-card__progress::-webkit-progress-bar {
   background: var(--color-border-default);
-  border-radius: var(--radius-5xs);
+  border-radius: var(--radius-sm);
 }
 
 .season-progress-card__progress::-webkit-progress-value {
   background: linear-gradient(90deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, white) 100%);
-  border-radius: var(--radius-5xs);
+  border-radius: var(--radius-sm);
 }
 
 .season-progress-card__progress::-moz-progress-bar {
   background: linear-gradient(90deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, white) 100%);
-  border-radius: var(--radius-5xs);
+  border-radius: var(--radius-sm);
 }
 
 .activity-item--tv {
@@ -224,9 +224,9 @@
   align-items: center;
   justify-content: center;
   padding: var(--token-pad-y) var(--space-sm);
-  font-size: var(--font-size-3xs);
+  font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-bold);
-  border-radius: var(--radius-3xs);
+  border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--color-accent-blue) 12%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-accent-blue) 30%, transparent);
   color: var(--color-accent-blue);

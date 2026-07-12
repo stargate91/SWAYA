@@ -86,7 +86,7 @@
 .organizer-details__content {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-sm);
 }
 
 .organizer-details__poster-card {
@@ -188,7 +188,7 @@
   left: 50%;
   bottom: 14px;
   transform: translateX(-50%);
-  padding: var(--space-1) var(--space-2);
+  padding: var(--space-2xs) var(--space-sm);
   border-radius: var(--radius-full);
   background: color-mix(in srgb, black 48%, transparent);
   color: color-mix(in srgb, white 84%, transparent);
@@ -255,7 +255,7 @@
 }
 
 .organizer-details__empty-state {
-  margin-top: var(--space-8);
+  margin-top: var(--space-6xl);
   animation: fadeIn var(--motion-base);
 }
 

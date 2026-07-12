@@ -94,7 +94,7 @@
 .media-detail-page__meta-row {
   display: flex;
   align-items: center;
-  gap: var(--space-3, var(--space-lg));
+  gap: var(--space-lg, var(--space-lg));
   margin: 0;
   flex-wrap: wrap;
 }
@@ -103,13 +103,13 @@
   height: 16px;
   width: auto;
   display: block;
-  border-radius: var(--radius-5xs);
+  border-radius: var(--radius-sm);
 }
 
 .media-detail-page__logo-container.clickable {
   position: relative;
   cursor: pointer;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
 }
 
 .media-detail-page__logo {

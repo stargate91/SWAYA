@@ -11,7 +11,7 @@
 
 .search-input-combo--sm .search-input-combo__selector-btn {
   padding: calc(var(--space-2xs) / 2) var(--space-xs);
-  font-size: var(--font-size-3xs);
+  font-size: var(--font-size-2xs);
 }
 
 .search-input-combo--sm .search-input-combo__divider {
@@ -26,7 +26,7 @@
 
 .search-input-combo--lg .search-input-combo__selector-btn {
   padding: var(--space-xs) var(--space-md);
-  font-size: var(--font-size-xs-sm);
+  font-size: var(--font-size-xs);
 }
 
 .search-input-combo--lg .search-input-combo__divider {
@@ -76,7 +76,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: var(--space-2xs) var(--space-sm);
-  border-radius: var(--radius-3xs);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all var(--motion-fast);
 }
@@ -169,7 +169,7 @@
   padding: var(--space-sm) var(--space-lg);
   background: transparent;
   border: none;
-  border-radius: var(--radius-2xs);
+  border-radius: var(--radius-sm);
   color: var(--color-text-secondary);
   font-size: var(--font-size-xs);
   text-align: left;

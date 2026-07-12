@@ -221,12 +221,12 @@
 
 .analytics-card__icon.text-success {
   color: var(--color-state-success);
-  filter: drop-shadow(0 0 var(--space-1) color-mix(in srgb, var(--color-state-success) 50%, transparent));
+  filter: drop-shadow(0 0 var(--space-2xs) color-mix(in srgb, var(--color-state-success) 50%, transparent));
 }
 
 .analytics-card__icon.text-danger {
   color: var(--color-accent-pink);
-  filter: drop-shadow(0 0 var(--space-1) var(--color-accent-pink));
+  filter: drop-shadow(0 0 var(--space-2xs) var(--color-accent-pink));
 }
 
 .analytics-card__icon.text-muted {
@@ -238,14 +238,14 @@
   display: flex;
   width: 100px;
   height: 8px;
-  gap: calc(var(--space-1) - var(--space-px));
+  gap: calc(var(--space-2xs) - var(--space-px));
 }
 
 .analytics-mini-segmented-bar .analytics-segment {
   flex: 1;
   height: 100%;
   background: color-mix(in srgb, var(--color-ink) 6%, transparent);
-  border-radius: var(--radius-5xs);
+  border-radius: var(--radius-sm);
   overflow: hidden;
   border: 1px solid var(--color-border-subtle);
 }
@@ -254,7 +254,7 @@
   height: 100%;
   background: var(--color-accent-blue);
   opacity: 0.85;
-  box-shadow: 0 0 var(--space-1) var(--color-accent-blue);
+  box-shadow: 0 0 var(--space-2xs) var(--color-accent-blue);
   animation: growWidth var(--motion-duration-lazy) var(--motion-ease-emphasized) forwards;
   transform-origin: left;
 }

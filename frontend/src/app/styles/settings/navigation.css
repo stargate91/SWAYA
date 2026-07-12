@@ -28,7 +28,7 @@
 .settings-sidebar-item {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-lg);
   padding: var(--sidebar-nav-link-padding-y) var(--space-xl);
   border-radius: var(--radius-md);
   color: var(--color-muted);

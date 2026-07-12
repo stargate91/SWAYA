@@ -172,13 +172,13 @@
 .entity-detail-page__bottom-socials-main {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-2xs);
 }
 
 .entity-detail-page__bottom-socials-extra {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-2xs);
   max-width: 0;
   opacity: 0;
   overflow: hidden;

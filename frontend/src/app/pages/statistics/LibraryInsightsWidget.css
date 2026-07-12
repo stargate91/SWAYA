@@ -141,7 +141,7 @@
 
 .insights-radar-label {
   fill: var(--color-text-primary);
-  font-size: var(--font-size-3xs);
+  font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-bold);
 }
 
@@ -316,7 +316,7 @@
   position: absolute;
   bottom: -25px;
   color: color-mix(in srgb, var(--color-text-primary) 60%, transparent);
-  font-size: var(--font-size-xs-sm);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-extrabold);
 }
 
@@ -376,7 +376,7 @@
 .insights-overlay-title {
   margin: 0 0 var(--space-xs) 0;
   color: var(--color-text-primary);
-  font-size: var(--font-size-sm-md);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-extrabold);
   letter-spacing: -0.01em;
 }
@@ -404,7 +404,7 @@
 
 .insights-overlay-progress-text {
   color: var(--color-text-secondary);
-  font-size: var(--font-size-3xs);
+  font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-extrabold);
   letter-spacing: 0.02em;
   text-transform: uppercase;

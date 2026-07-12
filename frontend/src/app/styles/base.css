@@ -2,15 +2,15 @@
   --font-sans: var(--font-family-sans);
   --font-display: var(--font-family-display);
 
-  --color-canvas: var(--app-shell-color-canvas);
-  --color-panel: var(--app-shell-color-panel);
+  --color-canvas: var(--color-bg-canvas);
+  --color-panel: var(--color-bg-elevated);
   --color-panel-strong: var(--app-shell-color-panel-strong);
   --color-panel-soft: var(--app-shell-color-panel-soft);
-  --color-ink: var(--app-shell-color-ink);
-  --color-muted: var(--app-shell-color-muted);
-  --color-subtle: var(--app-shell-color-subtle);
-  --color-line: var(--app-shell-color-line);
-  --color-line-strong: var(--app-shell-color-line-strong);
+  --color-ink: var(--color-text-primary);
+  --color-muted: var(--color-text-secondary);
+  --color-subtle: var(--color-text-muted);
+  --color-line: var(--color-border-default);
+  --color-line-strong: var(--color-border-strong);
   --color-accent: var(--app-shell-color-accent);
   --color-accent-strong: var(--app-shell-color-accent-strong);
   --color-accent-soft: var(--app-shell-color-accent-soft);
@@ -27,18 +27,6 @@
   --scrollbar-thumb-active: var(--app-shell-scrollbar-thumb-active);
   --scrollbar-border: var(--app-shell-scrollbar-border);
 
-  --space-px: 1px;
-  --space-2px: 2px;
-  --space-1: var(--app-shell-space-1);
-  --space-2: var(--app-shell-space-2);
-  --space-3: var(--app-shell-space-3);
-  --space-4: var(--app-shell-space-4);
-  --space-5: var(--app-shell-space-5);
-  --space-6: var(--app-shell-space-6);
-  --space-7: var(--app-shell-space-7);
-  --space-8: var(--app-shell-space-8);
-  --space-9: var(--app-shell-space-9);
-  --space-10: var(--app-shell-space-10);
   --sidebar-padding-top: var(--sidebar-first-nav-y);
   --sidebar-padding-bottom: 30px;
   --sidebar-padding-x: 18px;
@@ -55,38 +43,8 @@
   --utility-bar-top: 18px;
   --utility-bar-min-height: 40px;
 
-  --radius-sm: var(--app-shell-radius-sm);
-  --radius-md: var(--app-shell-radius-md);
-  --radius-lg: var(--app-shell-radius-lg);
-  --radius-xl: var(--app-shell-radius-xl);
-  --radius-xs: 8px;
-  --radius-input: var(--app-shell-radius-md);
-  --radius-pill: var(--app-shell-radius-pill);
-  --radius-full: var(--app-shell-radius-pill);
+  --radius-input: var(--radius-md);
 
-  --shadow-sm: var(--app-shell-shadow-sm);
-  --shadow-md: var(--app-shell-shadow-md);
-  --shadow-lg: var(--app-shell-shadow-lg);
-
-  --motion-duration-fast: 140ms;
-  --motion-duration-base: 200ms;
-  --motion-duration-slow: 260ms;
-  --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
-  --motion-ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
-  --motion-ease-linear: linear;
-  --motion-duration-spinner: 0.6s;
-  --motion-duration-spinner-slow: 0.8s;
-  --motion-duration-pulse: 1.6s;
-  --motion-duration-pulse-slow: 2s;
-  --motion-delay-step: 15ms;
-  --motion-fast: var(--motion-duration-fast) var(--motion-ease-standard);
-  --motion-base: var(--motion-duration-base) var(--motion-ease-standard);
-  --motion-slow: var(--motion-duration-slow) var(--motion-ease-emphasized);
-  --motion-emphasized: var(--motion-duration-base) var(--motion-ease-emphasized);
-  --motion-spring: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  --motion-zoom: transform 0.28s ease;
-  --motion-lift-distance-sm: -1px;
-  --motion-lift-distance-md: -2px;
   --focus-ring-width: 3px;
   --focus-ring-color: color-mix(in srgb, var(--color-accent) 18%, transparent);
   --focus-ring-color-danger: color-mix(in srgb, var(--color-state-danger) 26%, transparent);

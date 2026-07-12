@@ -1,10 +1,10 @@
 .structure-preview-container {
   background: var(--ui-preview-panel-bg);
   border: 1px solid var(--color-line);
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   padding: var(--space-2xl);
   font-family: var(--font-family-mono, monospace);
-  font-size: var(--font-size-xs-sm);
+  font-size: var(--font-size-xs);
   line-height: 1.6;
   color: var(--color-text-secondary);
   overflow-x: auto;
@@ -102,7 +102,7 @@
   color: var(--color-accent);
   background: var(--ui-preview-badge-bg);
   border: 1px solid var(--ui-preview-badge-border);
-  border-radius: var(--radius-2xs);
+  border-radius: var(--radius-sm);
   padding: var(--space-xs) var(--space-lg);
   margin-top: var(--space-md);
   font-family: var(--font-family-mono, monospace);
@@ -114,9 +114,9 @@
 .preview-badge-label {
   font-weight: bold;
   text-transform: uppercase;
-  font-size: var(--font-size-4xs);
+  font-size: var(--font-size-2xs);
   padding: 0.0625rem var(--space-2xs);
-  border-radius: var(--radius-4xs);
+  border-radius: var(--radius-sm);
   background: var(--ui-preview-label-bg);
   flex-shrink: 0;
 }

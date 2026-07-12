@@ -7,7 +7,7 @@
 
 .ui-scroll-row-track {
   display: flex;
-  gap: var(--space-3);
+  gap: var(--space-lg);
   overflow-x: auto;
   scroll-behavior: smooth;
 }
@@ -77,4 +77,4 @@
 .ui-carousel-arrow.is-hidden {
   visibility: hidden;
   pointer-events: none;
-}
+}

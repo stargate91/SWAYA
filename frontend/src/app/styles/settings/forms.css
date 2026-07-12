@@ -38,7 +38,7 @@
 
 .settings-choice-label-text {
   font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-xs-sm);
+  font-size: var(--font-size-xs);
   color: var(--color-ink);
 }
 
@@ -85,8 +85,8 @@
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-md) var(--space-xl);
-  border-radius: var(--radius-2xs);
-  font-size: var(--font-size-xs-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
 }
 
 .settings-alert--danger {
@@ -125,16 +125,16 @@
   border: 1px solid var(--color-line);
   border-radius: var(--radius-md);
   color: var(--color-muted);
-  font-size: var(--font-size-xs-sm);
+  font-size: var(--font-size-xs);
   line-height: var(--line-height-base);
 }
 
 .settings-instructions-box {
   background: var(--app-shell-color-panel-soft, color-mix(in srgb, var(--color-text-primary) 1.8%, transparent));
   border: 1px solid var(--color-line);
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   padding: var(--space-2xl);
-  font-size: var(--font-size-xs-sm);
+  font-size: var(--font-size-xs);
   line-height: var(--line-height-base);
   color: var(--color-text-secondary);
   margin-top: var(--space-sm);
@@ -170,7 +170,7 @@
 
 .settings-section-heading {
   color: var(--color-accent);
-  font-size: var(--font-size-xs-sm);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.05em;

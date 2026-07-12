@@ -226,7 +226,7 @@
 
 .scene-image-picker-title {
   margin: 0;
-  font-size: var(--font-size-sm-md);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   color: var(--modal-title-color, var(--color-text-primary));
 }
@@ -274,7 +274,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   --img-wrapper-bg: rgba(0, 0, 0, 0.1);
   background: var(--img-wrapper-bg);
   padding: var(--space-xs);
@@ -289,18 +289,18 @@
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  border-radius: var(--radius-3xs);
+  border-radius: var(--radius-sm);
 }
 
 .scene-image-picker-img-wrapper.backdrop-variant img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
 }
 
 .scene-image-picker-label {
-  font-size: var(--font-size-xs-sm);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
   width: 100%;

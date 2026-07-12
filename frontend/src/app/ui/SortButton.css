@@ -19,6 +19,6 @@
 
 .ui-sort-button:focus-visible {
   outline: none;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   box-shadow: 0 0 0 2px var(--color-accent-blue);
 }

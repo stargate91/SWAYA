@@ -5,7 +5,7 @@
 }
 
 .ui-tab-icon {
-  margin-right: var(--space-2);
+  margin-right: var(--space-sm);
   opacity: 0.6;
   flex-shrink: 0;
   transition: opacity var(--motion-fast);
@@ -20,15 +20,15 @@
 .ui-tab {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-sm);
   height: 100%;
-  padding: 0 var(--space-5);
+  padding: 0 var(--space-3xl);
   background: transparent;
   border: 0;
   border-right: 1px solid var(--color-line);
   color: var(--color-text-secondary);
   font-family: var(--font-family-base);
-  font-size: var(--font-size-xs-sm);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: all var(--motion-fast);
@@ -95,9 +95,9 @@
 .ui-tab--sub {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-sm);
   height: 100%;
-  padding: 0 var(--space-5);
+  padding: 0 var(--space-3xl);
   background: transparent;
   border: 0;
   border-right: 1px solid var(--color-line);
@@ -128,5 +128,5 @@
 .ui-tab--panel {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-2xl);
 }

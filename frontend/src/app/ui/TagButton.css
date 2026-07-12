@@ -1,6 +1,6 @@
 .ui-tag-button {
   padding: 0.1875rem var(--space-sm);
-  border-radius: var(--radius-3xs);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--color-line);
   background: var(--color-tag-button-bg, var(--color-surface-glass));
   color: var(--color-text-secondary);

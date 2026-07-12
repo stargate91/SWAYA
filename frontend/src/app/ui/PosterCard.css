@@ -25,7 +25,7 @@
   box-shadow: none;
   text-align: left;
   cursor: default;
-  border-radius: calc(var(--radius-md, var(--radius-xs)) - var(--radius-5xs));
+  border-radius: calc(var(--radius-md, var(--radius-sm)) - var(--radius-sm));
   overflow: hidden;
   transition: transform var(--motion-duration-fast) var(--motion-ease-emphasized), box-shadow var(--motion-duration-slow) var(--motion-ease-standard);
 }
@@ -380,7 +380,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
 }
 
 .ui-poster-card__subtitle {
-  font-size: var(--font-size-2xs, var(--font-size-3xs));
+  font-size: var(--font-size-2xs, var(--font-size-2xs));
   color: var(--color-muted);
   line-height: 1.4;
   white-space: nowrap;
@@ -429,7 +429,7 @@ button.ui-poster-card__image-wrapper:hover:not(:disabled) {
 .lists-card {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2, 0.5rem);
+  gap: var(--space-sm, 0.5rem);
   transition: transform var(--motion-expressive);
   width: 100%;
 }
@@ -493,14 +493,14 @@ button.ui-poster-card__image-wrapper:hover:not(:disabled) {
 }
 
 .lists-card__info {
-  padding: 0 var(--space-1, 0.25rem);
+  padding: 0 var(--space-2xs, 0.25rem);
   display: flex;
   flex-direction: column;
   gap: calc(var(--space-2xs) / 2);
 }
 
 .lists-card__title {
-  font-size: var(--font-size-xs-sm);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
   overflow: hidden;

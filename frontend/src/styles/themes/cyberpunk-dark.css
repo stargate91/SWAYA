@@ -66,22 +66,17 @@
   --color-accent-gradient: linear-gradient(135deg, #ff007f 0%, #00f0ff 100%);
 
   /* App Shell */
-  --app-shell-color-canvas: #0c0714;
   --app-shell-color-panel: rgba(23, 14, 40, 0.95);
   --app-shell-color-panel-strong: rgba(23, 14, 40, 0.98);
   --app-shell-color-panel-soft: rgba(255, 255, 255, 0.02);
   --app-shell-color-ink: #f0ecf9;
-  --app-shell-color-muted: #908caa;
-  --app-shell-color-subtle: #5c5678;
   --app-shell-color-line: rgba(0, 240, 255, 0.12);
   --app-shell-color-line-strong: rgba(255, 0, 127, 0.2);
-  --app-shell-color-accent: #00f0ff;
   --app-shell-color-accent-strong: #00a4b0;
   --app-shell-color-accent-soft: rgba(0, 240, 255, 0.12);
   --app-shell-color-accent-glow: rgba(0, 240, 255, 0.28);
   --app-shell-color-signal: #ff007f;
   --app-shell-color-signal-soft: rgba(255, 0, 127, 0.16);
-  --app-shell-color-info: #00f0ff;
 
   --app-shell-scrollbar-track: rgba(12, 7, 20, 0.25);
   --app-shell-scrollbar-track-hover: rgba(12, 7, 20, 0.4);

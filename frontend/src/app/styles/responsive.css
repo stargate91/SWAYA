@@ -4,7 +4,7 @@
   }
 
   .shell__sidebar {
-    gap: var(--space-5);
+    gap: var(--space-3xl);
     border-right: 0;
     border-bottom: 1px solid var(--color-line);
   }

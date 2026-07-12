@@ -17,8 +17,8 @@
 .history-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  margin-top: var(--space-5);
+  gap: var(--space-2xl);
+  margin-top: var(--space-3xl);
 }
 
 .history-card {
@@ -59,7 +59,7 @@
   box-shadow: inset 0 0 0 1px var(--color-border-subtle);
   color: var(--accent-color, var(--color-accent));
   flex-shrink: 0;
-  margin-right: var(--space-4);
+  margin-right: var(--space-2xl);
   position: relative;
   z-index: 2;
   transition: all var(--motion-base);
@@ -68,7 +68,7 @@
 .history-card__left {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-sm);
   flex: 1;
   min-width: 0;
   position: relative;
@@ -78,14 +78,14 @@
 .history-card__header {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-lg);
   flex-wrap: wrap;
 }
 
 .history-card__meta {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--space-2xl);
   font-size: var(--font-size-sm);
   color: var(--text-color-secondary);
   flex-wrap: wrap;
@@ -95,7 +95,7 @@
 .history-card__meta-item {
   display: flex;
   align-items: center;
-  gap: calc(var(--space-1) * 1.5);
+  gap: calc(var(--space-2xs) * 1.5);
 }
 
 .history-card__right {
@@ -108,7 +108,7 @@
 .history-card__detailed-stats {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-lg);
   flex-wrap: wrap;
 }
 
@@ -119,7 +119,7 @@
   background: var(--ui-control-bg-subtle);
   border: 1px solid color-mix(in srgb, var(--accent-color) 12%, var(--color-border-subtle));
   padding: var(--space-2xs) var(--space-md);
-  border-radius: var(--radius-2xs);
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
 }
 
@@ -180,7 +180,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-5);
+  padding: var(--space-3xl);
   width: 100%;
 }
 
@@ -193,7 +193,7 @@
   .history-card__main-row {
     flex-direction: column;
     align-items: stretch;
-    gap: var(--space-4);
+    gap: var(--space-2xl);
   }
 
   .history-card__right {
@@ -210,7 +210,7 @@
 .history-card__details {
   border-top: 1px solid var(--color-border-subtle);
   background: color-mix(in srgb, var(--color-bg-canvas) 35%, transparent);
-  padding: var(--space-4) var(--space-5) var(--space-5) var(--space-5);
+  padding: var(--space-2xl) var(--space-3xl) var(--space-3xl) var(--space-3xl);
 }
 
 .history-card__files-title {
@@ -219,16 +219,16 @@
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-lg);
 }
 
 .history-card__files-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-sm);
   max-height: 240px;
   overflow-y: auto;
-  padding-right: var(--space-2);
+  padding-right: var(--space-sm);
 }
 
 .history-card__files-list::-webkit-scrollbar {
@@ -248,18 +248,18 @@
 .history-card__file-item {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
-  padding: var(--space-2) var(--space-3);
+  gap: var(--space-2xs);
+  padding: var(--space-sm) var(--space-lg);
   background: var(--ui-control-bg-subtle);
   border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-2xs);
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
 }
 
 .history-card__file-paths {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-lg);
   flex-wrap: nowrap;
   min-width: 0;
 }
@@ -273,7 +273,7 @@
 
 .history-card__file-dir {
   color: var(--color-text-muted);
-  font-size: var(--font-size-3xs);
+  font-size: var(--font-size-2xs);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -305,21 +305,21 @@
 
 /* Reversion Modal Styles */
 .history-undo-modal {
-  padding: var(--space-2) 0;
+  padding: var(--space-sm) 0;
 }
 
 .history-undo-modal__warning {
   color: var(--text-color-primary);
   font-size: var(--font-size-md);
-  margin: 0 0 var(--space-4) 0;
+  margin: 0 0 var(--space-2xl) 0;
 }
 
 .history-undo-modal__details {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-sm);
   background: var(--ui-surface-soft);
-  padding: var(--space-3);
+  padding: var(--space-lg);
   border-radius: var(--border-radius-md);
 }
 
@@ -353,18 +353,18 @@
 .history-page__loading-container {
   display: flex;
   justify-content: center;
-  padding: var(--space-8);
+  padding: var(--space-6xl);
 }
 
 .history-page__empty-container {
-  margin-top: var(--space-5);
+  margin-top: var(--space-3xl);
 }
 
 .history-page__tab-selector {
   display: flex;
   justify-content: center;
-  margin-top: var(--space-4);
-  margin-bottom: var(--space-4);
+  margin-top: var(--space-2xl);
+  margin-bottom: var(--space-2xl);
 }
 
 /* Watched History Styles */
@@ -375,14 +375,14 @@
 .watched-history-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  margin-top: var(--space-5);
+  gap: var(--space-2xl);
+  margin-top: var(--space-3xl);
 }
 
 .watched-history-card {
   display: flex;
   align-items: center;
-  padding: var(--space-4);
+  padding: var(--space-2xl);
   border-radius: var(--radius-md);
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border-subtle, var(--color-surface-glass));
@@ -409,14 +409,14 @@
 .watched-history-card__poster-wrapper {
   width: 48px;
   height: 72px;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   overflow: hidden;
   background: var(--ui-surface-soft);
   --poster-shadow: inset 0 0 0 1px var(--color-border-subtle),
                   0 4px 8px rgba(0, 0, 0, 0.2);
   box-shadow: var(--poster-shadow);
   flex-shrink: 0;
-  margin-right: var(--space-4);
+  margin-right: var(--space-2xl);
   position: relative;
   z-index: 2;
   --local-transition: width 0.2s ease;
@@ -455,7 +455,7 @@
 .watched-history-card__title-group {
   display: flex;
   align-items: baseline;
-  gap: var(--space-2);
+  gap: var(--space-sm);
   flex-wrap: wrap;
 }
 
@@ -484,7 +484,7 @@
 .watched-history-card__meta {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--space-2xl);
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   flex-wrap: wrap;
@@ -502,7 +502,7 @@
   gap: var(--space-2xs);
   --status-padding: 2px var(--space-sm);
   padding: var(--status-padding);
-  border-radius: var(--radius-3xs);
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-semibold);
 }
@@ -540,7 +540,7 @@
   border-radius: 50%;
   background: var(--color-accent);
   display: inline-block;
-  margin-right: var(--space-1);
+  margin-right: var(--space-2xs);
 }
 
 .watched-history-card__status-dot--pulsing {
@@ -623,24 +623,24 @@
   align-items: center;
   position: relative;
   z-index: 2;
-  margin-left: var(--space-4);
+  margin-left: var(--space-2xl);
 }
 
 .watched-history-page__loading-container {
   display: flex;
   justify-content: center;
-  padding: var(--space-8);
+  padding: var(--space-6xl);
 }
 
 .watched-history-page__empty-container {
-  margin-top: var(--space-5);
+  margin-top: var(--space-3xl);
 }
 
 @media (max-width: 640px) {
   .watched-history-card {
     flex-direction: column;
     align-items: stretch;
-    gap: var(--space-4);
+    gap: var(--space-2xl);
   }
 
   .watched-history-card__right {
@@ -656,7 +656,7 @@
 .history-sentinel,
 .watched-sentinel {
   height: 40px;
-  margin: var(--space-4) 0;
+  margin: var(--space-2xl) 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -672,11 +672,11 @@
 }
 
 .history-card__toggle-btn {
-  margin-right: var(--space-2);
+  margin-right: var(--space-sm);
 }
 
 .history-card__toggle-btn span {
-  margin-left: var(--space-1);
+  margin-left: var(--space-2xs);
 }
 
 .watched-history-card__poster.is-zoomable {

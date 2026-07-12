@@ -14,10 +14,10 @@
   width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
-  padding-top: var(--space-2);
-  padding-bottom: var(--space-2);
-  margin-top: calc(-1 * var(--space-2));
-  margin-bottom: calc(-1 * var(--space-2));
+  padding-top: var(--space-sm);
+  padding-bottom: var(--space-sm);
+  margin-top: calc(-1 * var(--space-sm));
+  margin-bottom: calc(-1 * var(--space-sm));
 }
 
 .collection-items-horizontal-grid-wrapper .entity-detail-page__credits-list--collection-items {
@@ -196,7 +196,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-lg);
 }
 
 .is-scrolled .person-credits-discover-grid-wrapper {
@@ -204,7 +204,7 @@
   min-height: 0;
   --local-padding-top: 10px;
   padding-top: var(--local-padding-top);
-  padding-bottom: var(--space-6);
+  padding-bottom: var(--space-4xl);
 }
 
 .person-credits-section-container>* {
@@ -216,7 +216,7 @@
   background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  padding: var(--space-3) var(--space-6);
+  padding: var(--space-lg) var(--space-4xl);
   --scrolled-ml: -24px;
   margin-left: var(--scrolled-ml);
   --scrolled-mr: -24px;
@@ -290,14 +290,14 @@
   -webkit-backdrop-filter: blur(16px);
   --local-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
   box-shadow: var(--local-shadow);
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-4xl);
 }
 
 .person-credits-row__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-sm);
   /* Reduced header margin */
   --header-pb: 6px;
   padding-bottom: var(--header-pb);
@@ -325,7 +325,7 @@
   background: var(--source-selector-bg);
   --source-selector-padding: 3px;
   padding: var(--source-selector-padding);
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   --source-selector-border: 1px solid rgba(255, 255, 255, 0.05);
   border: var(--source-selector-border);
 }
@@ -338,8 +338,8 @@
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-2xs);
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -368,7 +368,7 @@
   background: var(--badge-bg);
   --badge-padding: 1px 4px;
   padding: var(--badge-padding);
-  border-radius: var(--radius-3xs);
+  border-radius: var(--radius-sm);
   color: var(--color-text-muted);
 }
 
@@ -385,7 +385,7 @@
 
 .person-credits-row__scroll-container {
   display: flex;
-  gap: var(--space-3);
+  gap: var(--space-lg);
   overflow-x: auto;
   --container-padding: 4px 4px 6px 4px;
   padding: var(--container-padding);
@@ -472,7 +472,7 @@
   width: 100%;
   position: relative;
   overflow: hidden;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   --poster-container-bg: rgba(255, 255, 255, 0.02);
   background: var(--poster-container-bg);
   --poster-container-border: 1px solid rgba(255, 255, 255, 0.08);
@@ -532,7 +532,7 @@
 .person-credits-card__poster-placeholder.skeleton-shimmer {
   width: 100%;
   height: 100%;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   --shimmer-bg: linear-gradient(90deg, rgba(255, 255, 255, 0.02) 25%, rgba(255, 255, 255, 0.06) 50%, rgba(255, 255, 255, 0.02) 75%);
   background: var(--shimmer-bg);
   background-size: 200% 100%;
@@ -561,7 +561,7 @@
   letter-spacing: 0.04em;
   --badge-padding: 1px 4px;
   padding: var(--badge-padding);
-  border-radius: var(--radius-4xs);
+  border-radius: var(--radius-sm);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   --badge-border: 1px solid rgba(255, 255, 255, 0.06);
@@ -664,7 +664,7 @@
   font-size: 0.78rem;
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
-  margin-top: var(--space-2);
+  margin-top: var(--space-sm);
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -674,8 +674,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--space-2);
-  margin-top: calc(var(--space-1) / 2);
+  gap: var(--space-sm);
+  margin-top: calc(var(--space-2xs) / 2);
 }
 
 .person-credits-card__role {
@@ -718,7 +718,7 @@
 .person-credits-discover-groups {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-6);
+  gap: var(--space-4xl);
 }
 
 .person-credits-discover-group {
@@ -745,7 +745,7 @@
   background: var(--discover-buttons-bg);
   --discover-buttons-padding: 3px;
   padding: var(--discover-buttons-padding);
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   --discover-buttons-border: 1px solid rgba(255, 255, 255, 0.03);
   border: var(--discover-buttons-border);
 }
@@ -760,7 +760,7 @@
   letter-spacing: 0.04em;
   --discover-btn-padding: 5px 12px;
   padding: var(--discover-btn-padding);
-  border-radius: var(--radius-2xs);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   --discover-btn-transition: all 0.2s ease;
   transition: var(--discover-btn-transition);
@@ -785,14 +785,14 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-3xl);
   --local-padding-top: 10px;
   padding-top: var(--local-padding-top);
 }
 
 .person-credits-discover-grid {
   display: grid;
-  gap: var(--space-4) var(--space-3);
+  gap: var(--space-2xl) var(--space-lg);
   width: 100%;
 }
 
@@ -818,7 +818,7 @@
   font-size: 0.72rem;
   color: var(--color-text-muted);
   text-align: center;
-  padding: var(--space-6) 0;
+  padding: var(--space-4xl) 0;
   --finished-border-top: 1px solid rgba(255, 255, 255, 0.03);
   border-top: var(--finished-border-top);
 }
@@ -836,7 +836,7 @@
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  padding: var(--space-1) var(--space-2);
+  padding: var(--space-2xs) var(--space-sm);
   border-radius: var(--radius-xl);
   cursor: pointer;
   --switch-btn-transition: all 0.2s ease;
@@ -908,7 +908,7 @@
   background: var(--dropdown-search-bg);
   border: 1px solid var(--color-border-subtle);
   padding: var(--space-2xs);
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   height: 32px;
   width: max-content;
 }
@@ -916,7 +916,7 @@
 .person-credits-discover-groups-style .ui-tab--sub {
   background: transparent;
   border: none;
-  border-radius: var(--radius-2xs);
+  border-radius: var(--radius-sm);
   font-size: 0.68rem;
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
@@ -962,7 +962,7 @@
   background: var(--dropdown-search-bg);
   border: 1px solid var(--color-border-subtle);
   padding: var(--space-2xs);
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   height: 32px;
   width: max-content;
 }
@@ -970,7 +970,7 @@
 .person-credits-discover-groups-discover-style .ui-tab--sub {
   background: transparent;
   border: none;
-  border-radius: var(--radius-2xs);
+  border-radius: var(--radius-sm);
   font-size: 0.68rem;
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
@@ -1008,7 +1008,7 @@
 .person-credits-discover-loading {
   display: flex;
   justify-content: center;
-  padding: calc(var(--space-10) + var(--space-2)) 0;
+  padding: calc(var(--space-8xl) + var(--space-sm)) 0;
   width: 100%;
 }
 

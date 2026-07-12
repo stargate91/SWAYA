@@ -32,7 +32,7 @@
   flex: 1 1 100%;
   padding-left: var(--space-xl);
   border: 1px solid var(--ui-control-border);
-  border-radius: var(--radius-md-lg);
+  border-radius: var(--radius-lg);
   background: var(--color-input-bg, var(--ui-control-bg));
   color: var(--ui-control-text);
   transition:
