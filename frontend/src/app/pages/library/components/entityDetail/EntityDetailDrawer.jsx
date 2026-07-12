@@ -9,6 +9,7 @@ import { useSettingsQuery } from '@/queries';
 const DASH_CHAR = ' - ';
 const CM_CHAR = ' cm';
 const KG_CHAR = ' kg';
+const INCH_CHAR = ' ″'; // or ' in'
 
 export default function EntityDetailDrawer({
   isDrawerOpen,
@@ -25,11 +26,19 @@ export default function EntityDetailDrawer({
   const tattooVal = formatListAttr(item.tattoos);
   const piercingVal = formatListAttr(item.piercings);
 
+  // Helper to format values that could be in inches or cm
+  const formatBodyDim = (val) => {
+    if (!val) return null;
+    const num = Number(val);
+    if (isNaN(num)) return val;
+    return num < 50 ? `${num}${INCH_CHAR}` : `${num}${CM_CHAR}`;
+  };
+
   // Safe spec fields (magasság, súly, hajszín, szemszín, etnikum, születési hely, tetoválások, piercingek, aktív évek)
   const hasSafeSpecs = item?.height || item?.weight || item?.hair_color || item?.eye_color || item?.ethnicity || item?.tattoos || item?.piercings || item?.career_start_year || item?.place_of_birth;
   
-  // Non-safe / Spicy / Explicit spec fields (measurements, cup_size, band_size, waist, hip, breast_type, butt_shape, butt_size)
-  const hasSpicySpecs = item?.measurements || item?.cup_size || item?.band_size || item?.waist || item?.hip || item?.breast_type || item?.butt_shape || item?.butt_size;
+  // Non-safe / Spicy / Explicit spec fields (measurements, cup_size, band_size, waist, hip, breast_type, breast_size, butt_shape, butt_size)
+  const hasSpicySpecs = item?.measurements || item?.cup_size || item?.band_size || item?.waist || item?.hip || item?.breast_type || item?.breast_size || item?.butt_shape || item?.butt_size;
 
   const hasAnySpecs = includeAdult ? (hasSafeSpecs || hasSpicySpecs) : hasSafeSpecs;
 
@@ -42,9 +51,10 @@ export default function EntityDetailDrawer({
       { label: t('library.details.measurements'), value: item.measurements },
       { label: t('library.details.cupSize') || 'Cup Size', value: item.cup_size },
       { label: t('library.details.bandSize') || 'Band Size', value: item.band_size },
-      { label: t('library.details.waist') || 'Waist', value: item.waist ? `${item.waist}${CM_CHAR}` : null },
-      { label: t('library.details.hip') || 'Hip', value: item.hip ? `${item.hip}${CM_CHAR}` : null },
+      { label: t('library.details.waist') || 'Waist', value: formatBodyDim(item.waist) },
+      { label: t('library.details.hip') || 'Hip', value: formatBodyDim(item.hip) },
       { label: t('library.details.breastType'), value: item.breast_type ? (t(`library.performerEdit.breastTypes.${item.breast_type.toLowerCase()}`) || toTitleCase(item.breast_type)) : null },
+      { label: t('library.details.breastSize') || 'Breast Size', value: item.breast_size ? (t(`library.performerEdit.breastSizes.${item.breast_size.toLowerCase()}`) || toTitleCase(item.breast_size)) : null },
       { label: t('library.details.buttShape') || 'Butt Shape', value: item.butt_shape ? (t(`library.performerEdit.buttShapes.${item.butt_shape.toLowerCase()}`) || toTitleCase(item.butt_shape)) : null },
       { label: t('library.details.buttSize') || 'Butt Size', value: item.butt_size ? (t(`library.performerEdit.buttSizes.${item.butt_size.toLowerCase()}`) || toTitleCase(item.butt_size)) : null },
     ] : []),

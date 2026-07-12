@@ -160,6 +160,7 @@ class LibraryFilterService:
                 people_q = _apply_attr_filter(people_q, Person.ethnicity, params.filter_ethnicity)
                 people_q = _apply_attr_filter(people_q, Person.eye_color, params.filter_eye_color)
                 people_q = _apply_attr_filter(people_q, Person.breast_type, params.filter_breast_type)
+                people_q = _apply_attr_filter(people_q, Person.breast_size, params.filter_breast_size)
                 people_q = _apply_attr_filter(people_q, Person.butt_shape, params.filter_butt_shape)
                 people_q = _apply_attr_filter(people_q, Person.butt_size, params.filter_butt_size)
 
@@ -316,13 +317,13 @@ class LibraryFilterService:
             _tattoo_no = self.db.query(Person.id).filter(
                 Person.id.in_(active_people_ids),
                 Person.is_adult == is_adult,
-                or_(Person.tattoos.is_(None), Person.tattoos == "", Person.tattoos.in_(_no_values))
+                Person.tattoos.in_(_no_values)
             ).first() is not None
             if _tattoo_yes:
                 tattoos.append("yes")
             if _tattoo_no:
                 tattoos.append("no")
-
+ 
             _piercing_yes = self.db.query(Person.id).filter(
                 Person.id.in_(active_people_ids),
                 Person.is_adult == is_adult,
@@ -333,7 +334,7 @@ class LibraryFilterService:
             _piercing_no = self.db.query(Person.id).filter(
                 Person.id.in_(active_people_ids),
                 Person.is_adult == is_adult,
-                or_(Person.piercings.is_(None), Person.piercings == "", Person.piercings.in_(_no_values))
+                Person.piercings.in_(_no_values)
             ).first() is not None
             if _piercing_yes:
                 piercings.append("yes")
@@ -401,6 +402,15 @@ class LibraryFilterService:
                     roles_set.add("sound")
             roles = list(roles_set)
 
+            # Query available breast sizes
+            breast_sizes_query = self.db.query(Person.breast_size).filter(
+                Person.id.in_(active_people_ids),
+                Person.is_adult == is_adult,
+                Person.breast_size.isnot(None),
+                Person.breast_size != ""
+            ).distinct().all()
+            breast_sizes = normalize_options([r[0] for r in breast_sizes_query])
+
         return FilterOptionsResponse(
             genres=genres,
             years=years,
@@ -413,6 +423,7 @@ class LibraryFilterService:
             tattoos=tattoos,
             piercings=piercings,
             breast_types=breast_types,
+            breast_sizes=breast_sizes,
             butt_shapes=butt_shapes,
             butt_sizes=butt_sizes,
             genders=genders,

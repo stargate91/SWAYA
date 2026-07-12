@@ -291,6 +291,7 @@ class FilterOptionsResponse(BaseModel):
     tattoos: Optional[List[str]] = None
     piercings: Optional[List[str]] = None
     breast_types: Optional[List[str]] = None
+    breast_sizes: Optional[List[str]] = None
     butt_shapes: Optional[List[str]] = None
     butt_sizes: Optional[List[str]] = None
     genders: Optional[List[str]] = None

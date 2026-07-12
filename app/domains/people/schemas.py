@@ -91,6 +91,7 @@ class PeopleGroupItem(BaseModel, NumericAttributesMixin):
     tattoos: Optional[str] = None
     piercings: Optional[str] = None
     breast_type: Optional[str] = None
+    breast_size: Optional[str] = None
     butt_shape: Optional[str] = None
     butt_size: Optional[str] = None
     last_watched_at: Optional[str] = None

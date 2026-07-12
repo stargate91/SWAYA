@@ -47,14 +47,16 @@ class PeopleQueryBuilder:
             if params.filter_tattoos.lower() == "yes":
                 people_items = [item for item in people_items if item.tattoos and str(item.tattoos).strip().lower() not in ("no", "none", "nincs")]
             else:
-                people_items = [item for item in people_items if not item.tattoos or str(item.tattoos).strip().lower() in ("no", "none", "nincs")]
+                people_items = [item for item in people_items if item.tattoos and str(item.tattoos).strip().lower() in ("no", "none", "nincs")]
         if params.filter_piercings:
             if params.filter_piercings.lower() == "yes":
                 people_items = [item for item in people_items if item.piercings and str(item.piercings).strip().lower() not in ("no", "none", "nincs")]
             else:
-                people_items = [item for item in people_items if not item.piercings or str(item.piercings).strip().lower() in ("no", "none", "nincs")]
+                people_items = [item for item in people_items if item.piercings and str(item.piercings).strip().lower() in ("no", "none", "nincs")]
         if params.filter_breast_type:
             people_items = [item for item in people_items if norm_cmp(item.breast_type, params.filter_breast_type)]
+        if params.filter_breast_size:
+            people_items = [item for item in people_items if norm_cmp(item.breast_size, params.filter_breast_size)]
         if params.filter_butt_shape:
             people_items = [item for item in people_items if norm_cmp(item.butt_shape, params.filter_butt_shape)]
         if params.filter_butt_size:
@@ -133,15 +135,25 @@ class PeopleQueryBuilder:
             people_items.sort(key=lambda item: (item.birthday or "9999-99-99", (item.name or "").lower()))
         elif params.sort_by in ("cup_size_desc", "cup_size_asc"):
             cup_order = {
-                'A': 1, 'B': 2, 'C': 3, 'D': 4, 'DD': 5, 'DDD': 6, 'E': 7, 'EE': 8, 'F': 9, 'FF': 10,
-                'G': 11, 'GG': 12, 'H': 13, 'HH': 14, 'I': 15, 'J': 16, 'K': 17
+                'A': 1, 'B': 2, 'C': 3, 'D': 4, 'DD': 5, 'E': 5,
+                'DDD': 6, 'F': 6, 'DDDD': 7, 'G': 7, 'H': 8, 'I': 9, 'J': 10, 'K': 11
             }
             def get_volume_score(item):
-                cup_val = cup_order.get(str(item.cup_size or "").strip().upper(), 0)
+                cup_str = str(item.cup_size or "").strip().upper()
+                cup_val = cup_order.get(cup_str, 0)
                 if cup_val == 0:
-                    return None
-                band_val = float(item.band_size) if item.band_size else 34.0
-                return cup_val + (band_val - 30.0) / 2.0
+                    if cup_str.startswith("A"): cup_val = 1
+                    elif cup_str.startswith("B"): cup_val = 2
+                    elif cup_str.startswith("C"): cup_val = 3
+                    elif cup_str.startswith("D"): cup_val = 4
+                    elif "E" in cup_str: cup_val = 5
+                    elif "F" in cup_str: cup_val = 6
+                    elif "G" in cup_str: cup_val = 7
+                    elif "H" in cup_str: cup_val = 8
+                    else: return None
+                band_val = float(item.band_size) if item.band_size else 32.0
+                height_val = float(item.height) if item.height else 165.0
+                return cup_val + (band_val - 32.0) * 0.5 - (height_val - 165.0) * 0.05
 
             if params.sort_by == "cup_size_desc":
                 people_items.sort(key=lambda item: (

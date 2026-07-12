@@ -63,7 +63,7 @@ export const getFlagEmoji = (countryISO) => {
 export const calculateAliases = (alternateNames) => {
   const candidateAliases = alternateNames || [];
   let accumulatedLength = 0;
-  
+
   const sidebarAliases = candidateAliases.slice(0, 4).map((alias, idx) => {
     accumulatedLength += alias.length + (idx > 0 ? 2 : 0);
     const isTruncated = accumulatedLength > 20 || idx >= 2;

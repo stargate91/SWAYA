@@ -245,6 +245,7 @@ class PeopleLibraryService:
                 tattoos=person.tattoos,
                 piercings=person.piercings,
                 breast_type=person.breast_type,
+                breast_size=person.breast_size,
                 butt_shape=person.butt_shape,
                 butt_size=person.butt_size,
                 last_watched_at=person_last_watch.get(person.id).isoformat() if person_last_watch.get(person.id) else None,

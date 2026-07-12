@@ -307,6 +307,7 @@ class PersonDetailCollator:
             "waist": person.waist,
             "hip": person.hip,
             "breast_type": person.breast_type,
+            "breast_size": person.breast_size,
             "butt_shape": person.butt_shape,
             "butt_size": person.butt_size,
             "tattoos": person.tattoos,

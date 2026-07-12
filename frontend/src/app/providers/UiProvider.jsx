@@ -1,5 +1,6 @@
 import { createContext, useContext, useMemo, useState, useCallback } from 'react';
 import ToastViewport from '../ui/ToastViewport';
+import EnrichmentProgress from '../ui/EnrichmentProgress';
 import Modal from '../ui/Modal';
 import Button from '../ui/Button';
 import { useTranslation } from './LanguageContext';
@@ -32,6 +33,7 @@ export const UiProvider = ({ children }) => {
     <UiContext.Provider value={value}>
       {children}
       <ToastViewport toasts={toasts} onRemoveToast={removeToast} />
+      <EnrichmentProgress />
       <Modal
         open={Boolean(modal)}
         title={modal?.title}

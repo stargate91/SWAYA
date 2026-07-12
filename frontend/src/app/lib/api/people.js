@@ -147,4 +147,5 @@ export const people = {
       body: JSON.stringify(body),
     });
   },
+  getEnrichmentStatus: () => fetchJson('/api/v1/people/enrichment-status'),
 };

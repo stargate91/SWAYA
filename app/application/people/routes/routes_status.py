@@ -10,6 +10,10 @@ _enrichment_queue.configure(scraper_gateway)
 
 router = APIRouter(prefix="/api/v1/people", tags=["General People"])
 
+@router.get("/enrichment-status")
+def get_enrichment_status():
+    return _enrichment_queue.get_status()
+
 def _people_status_service(db: Session, scrapers=None) -> PeopleStatusService:
     from app.infrastructure.media.db_media_resolver import DbMediaResolver
     return PeopleStatusService(db, scrapers=scrapers, library_port=DbMediaResolver(db))

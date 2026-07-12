@@ -295,6 +295,8 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
               setPiercingsFilter={state.setPiercingsFilter}
               breastTypeFilter={state.breastTypeFilter}
               setBreastTypeFilter={state.setBreastTypeFilter}
+              breastSizeFilter={state.breastSizeFilter}
+              setBreastSizeFilter={state.setBreastSizeFilter}
               buttShapeFilter={state.buttShapeFilter}
               setButtShapeFilter={state.setButtShapeFilter}
               buttSizeFilter={state.buttSizeFilter}

@@ -31,6 +31,9 @@ class PersonEnrichmentQueue:
         self.scrapers = None
         self.session_factory = None
         self.enqueued_ids = set()
+        self._current_person_name = None
+        self._total_enqueued = 0
+        self._completed_count = 0
         self.worker_thread = threading.Thread(target=self._worker, daemon=True, name="PersonEnrichmentWorker")
         self.worker_thread.start()
 
@@ -43,7 +46,18 @@ class PersonEnrichmentQueue:
         with self._lock:
             if person_id not in self.enqueued_ids:
                 self.enqueued_ids.add(person_id)
+                self._total_enqueued += 1
                 self.queue.put(person_id)
+
+    def get_status(self):
+        with self._lock:
+            active = bool(self.enqueued_ids) or self._current_person_name is not None
+            return {
+                "active": active,
+                "current_name": self._current_person_name,
+                "total": self._total_enqueued,
+                "completed": self._completed_count,
+            }
 
     def _worker(self):
         while True:
@@ -54,8 +68,17 @@ class PersonEnrichmentQueue:
                 self._enrich_person(person_id)
                 with self._lock:
                     self.enqueued_ids.discard(person_id)
+                    self._completed_count += 1
+                    # Reset counters when batch is done
+                    if not self.enqueued_ids:
+                        self._current_person_name = None
+                        self._total_enqueued = 0
+                        self._completed_count = 0
             except Exception as e:
                 logger.error(f"Error in PersonEnrichmentQueue worker: {e}", exc_info=True)
+                with self._lock:
+                    self.enqueued_ids.discard(person_id)
+                    self._completed_count += 1
             finally:
                 self.queue.task_done()
 
@@ -73,6 +96,8 @@ class PersonEnrichmentQueue:
             if not person:
                 return
 
+            with self._lock:
+                self._current_person_name = person.name
             logger.info(f"Background enriching activated person: {person.name} (ID: {person_id})")
             enricher = PeopleEnricher(db, scrapers=self.scrapers)
             
@@ -176,6 +201,42 @@ class PersonEnrichmentQueue:
                                 else:
                                     person.butt_size = "EXTRA_BIG"
                             except (ValueError, TypeError, ZeroDivisionError):
+                                pass
+
+                        # Auto-calculate breast_size from cup_size/band_size/height
+                        if person.cup_size and person.band_size and not person.breast_size:
+                            try:
+                                cup_str = str(person.cup_size).strip().upper()
+                                cup_map = {
+                                    "A": 1, "B": 2, "C": 3, "D": 4, "DD": 5, "E": 5,
+                                    "DDD": 6, "F": 6, "DDDD": 7, "G": 7, "H": 8, "I": 9, "J": 10, "K": 11
+                                }
+                                cup_val = cup_map.get(cup_str, 0)
+                                if cup_val == 0:
+                                    if cup_str.startswith("A"): cup_val = 1
+                                    elif cup_str.startswith("B"): cup_val = 2
+                                    elif cup_str.startswith("C"): cup_val = 3
+                                    elif cup_str.startswith("D"): cup_val = 4
+                                    elif "E" in cup_str: cup_val = 5
+                                    elif "F" in cup_str: cup_val = 6
+                                    elif "G" in cup_str: cup_val = 7
+                                    elif "H" in cup_str: cup_val = 8
+                                    else: cup_val = 4
+
+                                band_val = float(person.band_size)
+                                height_val = float(person.height) if person.height else 165.0
+
+                                index = cup_val + (band_val - 32.0) * 0.5 - (height_val - 165.0) * 0.05
+
+                                if index < 2.5:
+                                    person.breast_size = "SMALL"
+                                elif index < 4.5:
+                                    person.breast_size = "MEDIUM"
+                                elif index < 6.5:
+                                    person.breast_size = "BIG"
+                                else:
+                                    person.breast_size = "EXTRA_BIG"
+                            except (ValueError, TypeError):
                                 pass
 
                     if hc_data.get("ethnicity") and not person.ethnicity:

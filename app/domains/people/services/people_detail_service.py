@@ -317,6 +317,18 @@ class PeopleDetailService:
 
         extracted["source_url"] = url
 
+        # Fallback to celebrityinside.com if HealthyCeleb yielded no physical stats or failed
+        if not extracted.get("measurements") or not extracted.get("height") or not extracted.get("weight"):
+            try:
+                ci_data = self.scrape_celebrityinside(person.id)
+                if ci_data:
+                    logger.info(f"Applying CelebrityInside fallback data for {person.name}")
+                    for k, v in ci_data.items():
+                        if v is not None and not extracted.get(k):
+                            extracted[k] = v
+            except Exception as ex:
+                logger.error(f"CelebrityInside fallback failed for {person.name}: {ex}")
+
         # Child protection check: filter out physical fields if underage (SFW < 18y + 2w)
         if not person.is_adult:
             effective_bday = person.birthday
@@ -339,6 +351,107 @@ class PeopleDetailService:
                             extracted.pop(k, None)
                 except Exception:
                     pass
+
+        return extracted
+
+    def scrape_celebrityinside(self, person_id: Any) -> Dict[str, Any]:
+        import re
+        import requests
+        import unicodedata
+        from app.domains.people.models import Person
+
+        person = self.db.query(Person).filter(Person.id == person_id).first()
+        if not person:
+            return {}
+
+        # Clean name to form the slug
+        clean_name = person.name.lower().strip()
+        clean_name = "".join(c for c in unicodedata.normalize('NFD', clean_name) if unicodedata.category(c) != 'Mn')
+        clean_name = re.sub(r'[^a-z0-9\s-]', '', clean_name)
+        clean_name = re.sub(r'[\s-]+', '-', clean_name)
+
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'
+        }
+
+        # Try various category endpoints with multiple URL patterns
+        categories = ["actress", "actor", "singer", "model", "celebrity"]
+        slug_patterns = [
+            "body-measurements/{cat}/{name}-height-weight-bra-size-shoe-vital-stats/",
+            "body-measurements/{cat}/{name}-height-weight-bra-size-body-measurements/",
+            "body-measurements/{cat}/{name}-height-weight-shoe-size-vital-stats/",
+            "{cat}/{name}-body-measurements-height-weight-shoe-size-vital-stats/",
+        ]
+        html_content = None
+        target_url = None
+
+        for cat in categories:
+            for pattern in slug_patterns:
+                url = "https://celebrityinside.com/" + pattern.format(cat=cat, name=clean_name)
+                try:
+                    res = requests.get(url, headers=headers, timeout=8)
+                    if res.status_code == 200 and "Page Not Found" not in res.text[:500]:
+                        html_content = res.text
+                        target_url = url
+                        break
+                except Exception:
+                    continue
+            if html_content:
+                break
+
+        if not html_content:
+            return {}
+
+        extracted = {"source_url": target_url}
+
+        # Strip HTML tags for cleaner regex matching on visible text
+        text_content = re.sub(r'<[^>]+>', ' ', html_content)
+        text_content = re.sub(r'\s+', ' ', text_content)
+
+        # Height — match "Height in Centimeters ... 174 cm" within a narrow window
+        h_match = re.search(r'Height\s+in\s+Centimeters\s*[:\-]?\s*(\d+)\s*cm', text_content, re.IGNORECASE)
+        if not h_match:
+            h_match = re.search(r'Height\s*[:\-]\s*(\d+)\s*cm', text_content, re.IGNORECASE)
+        if h_match:
+            val = int(h_match.group(1))
+            if 100 <= val <= 250:
+                extracted["height"] = val
+
+        # Weight — match "Weight in Kilograms ... 57 kg"
+        w_match = re.search(r'Weight\s+in\s+Kilograms\s*[:\-]?\s*(\d+)\s*kg', text_content, re.IGNORECASE)
+        if not w_match:
+            w_match = re.search(r'Weight\s*[:\-]\s*(\d+)\s*kg', text_content, re.IGNORECASE)
+        if w_match:
+            val = int(w_match.group(1))
+            if 20 <= val <= 300:
+                extracted["weight"] = val
+
+        # Measurements — match "Body Measurements: 36-25-35" or "Breast-Waist-Hips: 36-25-35"
+        m_match = re.search(r'(?:Body\s+Measurements|Measurements|Breast[- ]Waist[- ]Hips|Vital\s+Stats)\s*[:\-]\s*(\d+)\s*-\s*(\d+)\s*-\s*(\d+)', text_content, re.IGNORECASE)
+        if m_match:
+            bust = int(m_match.group(1))
+            waist = int(m_match.group(2))
+            hip = int(m_match.group(3))
+            extracted["measurements"] = f"{bust}-{waist}-{hip}"
+            extracted["waist"] = waist
+            extracted["hip"] = hip
+
+        # Bra Size — explicit "Bra Size: 34B" format (band + cup together)
+        bra_match = re.search(r'Bra\s+Size\s*[:\-]\s*(\d+)\s*([A-Z]{1,4})', text_content, re.IGNORECASE)
+        if bra_match:
+            extracted["band_size"] = int(bra_match.group(1))
+            extracted["cup_size"] = bra_match.group(2).upper()
+        else:
+            # Cup Size — standalone "Cup Size: B" format
+            cup_match = re.search(r'(?:Bra\s+)?Cup\s+Size\s*[:\-]\s*([A-Z]{1,4})', text_content, re.IGNORECASE)
+            if cup_match:
+                cup_letter = cup_match.group(1).upper()
+                extracted["cup_size"] = cup_letter
+                # Derive band_size from bust measurement if available
+                if m_match:
+                    cup_offset = {"A": 1, "B": 2, "C": 3, "D": 4, "DD": 5, "E": 5, "DDD": 6, "F": 6, "G": 7, "H": 8}
+                    offset = cup_offset.get(cup_letter, 2)
+                    extracted["band_size"] = bust - offset
 
         return extracted
 

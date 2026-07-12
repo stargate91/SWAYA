@@ -252,6 +252,8 @@
     "allEyeColors": "All",
     "breastTypeLabel": "Breast Type:",
     "allBreastTypes": "All",
+    "breastSizeLabel": "Breast Size:",
+    "allBreastSizes": "All",
     "buttShapeLabel": "Butt Shape:",
     "allButtShapes": "All",
     "buttSizeLabel": "Butt Size:",
@@ -330,6 +332,7 @@
     "waist": "Waist",
     "hip": "Hip",
     "breastType": "Breast Type",
+    "breastSize": "Breast Size",
     "buttShape": "Butt Shape",
     "buttSize": "Butt Size",
     "hairColor": "Hair Color",
@@ -590,6 +593,12 @@
       "flat": "Flat"
     },
     "buttSizes": {
+      "small": "Small",
+      "medium": "Medium",
+      "big": "Big",
+      "extra_big": "Extra Big"
+    },
+    "breastSizes": {
       "small": "Small",
       "medium": "Medium",
       "big": "Big",

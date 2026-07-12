@@ -4,6 +4,8 @@ export default function LibraryAdvancedFilters({
   t,
   breastTypeFilter,
   setBreastTypeFilter,
+  breastSizeFilter,
+  setBreastSizeFilter,
   buttShapeFilter,
   setButtShapeFilter,
   buttSizeFilter,
@@ -23,6 +25,13 @@ export default function LibraryAdvancedFilters({
     const available = new Set(dataValues.map(v => normVal(v)));
     return items.filter(item => available.has(normVal(item.value)));
   };
+
+  const breastSizeItems = filterItemsByData([
+    { value: 'SMALL', label: t('library.performerEdit.breastSizes.small') || 'Small' },
+    { value: 'MEDIUM', label: t('library.performerEdit.breastSizes.medium') || 'Medium' },
+    { value: 'BIG', label: t('library.performerEdit.breastSizes.big') || 'Big' },
+    { value: 'EXTRA_BIG', label: t('library.performerEdit.breastSizes.extra_big') || 'Extra Big' },
+  ], filterData?.breast_sizes);
 
   const buttShapeItems = filterItemsByData([
     { value: 'BUBBLE', label: t('library.performerEdit.buttShapes.bubble') || 'Bubble' },
@@ -59,6 +68,16 @@ export default function LibraryAdvancedFilters({
             onChange={setBreastTypeFilter}
             items={filterData?.breast_types}
             allLabel={t('library.filter.allBreastTypes') || 'All'}
+            setCurrentPage={setCurrentPage}
+          />
+        )}
+        {settings?.include_adult && (
+          <AttributeFilterDropdown
+            label={t('library.filter.breastSizeLabel') || 'Breast Size:'}
+            value={breastSizeFilter}
+            onChange={setBreastSizeFilter}
+            items={breastSizeItems}
+            allLabel={t('library.filter.allBreastSizes') || 'All'}
             setCurrentPage={setCurrentPage}
           />
         )}

@@ -49,6 +49,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
   const [tattoosFilter, setTattoosFilter] = useState(savedState.tattoosFilter ?? '');
   const [piercingsFilter, setPiercingsFilter] = useState(savedState.piercingsFilter ?? '');
   const [breastTypeFilter, setBreastTypeFilter] = useState(savedState.breastTypeFilter ?? '');
+  const [breastSizeFilter, setBreastSizeFilter] = useState(savedState.breastSizeFilter ?? '');
   const [buttShapeFilter, setButtShapeFilter] = useState(savedState.buttShapeFilter ?? '');
   const [buttSizeFilter, setButtSizeFilter] = useState(savedState.buttSizeFilter ?? '');
   const [selectedTags, setSelectedTags] = useState(savedState.selectedTags ?? []);
@@ -131,6 +132,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
       tattoosFilter,
       piercingsFilter,
       breastTypeFilter,
+      breastSizeFilter,
       buttShapeFilter,
       buttSizeFilter,
       selectedTags,
@@ -163,6 +165,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     tattoosFilter,
     piercingsFilter,
     breastTypeFilter,
+    breastSizeFilter,
     buttShapeFilter,
     buttSizeFilter,
     selectedTags,
@@ -215,6 +218,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
       filter_tattoos: tattoosFilter !== '' ? tattoosFilter : undefined,
       filter_piercings: piercingsFilter !== '' ? piercingsFilter : undefined,
       filter_breast_type: breastTypeFilter !== '' ? breastTypeFilter : undefined,
+      filter_breast_size: breastSizeFilter !== '' ? breastSizeFilter : undefined,
       filter_butt_shape: buttShapeFilter !== '' ? buttShapeFilter : undefined,
       filter_butt_size: buttSizeFilter !== '' ? buttSizeFilter : undefined,
       selected_tags: selectedTags.length > 0 ? selectedTags.join(',') : undefined,
@@ -246,6 +250,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     tattoosFilter,
     piercingsFilter,
     breastTypeFilter,
+    breastSizeFilter,
     buttShapeFilter,
     buttSizeFilter,
     selectedTags
@@ -273,6 +278,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
       filter_tattoos: tattoosFilter !== '' ? tattoosFilter : undefined,
       filter_piercings: piercingsFilter !== '' ? piercingsFilter : undefined,
       filter_breast_type: breastTypeFilter !== '' ? breastTypeFilter : undefined,
+      filter_breast_size: breastSizeFilter !== '' ? breastSizeFilter : undefined,
       filter_butt_shape: buttShapeFilter !== '' ? buttShapeFilter : undefined,
       filter_butt_size: buttSizeFilter !== '' ? buttSizeFilter : undefined,
       selected_tags: selectedTags.length > 0 ? selectedTags.join(',') : undefined,
@@ -300,6 +306,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     tattoosFilter,
     piercingsFilter,
     breastTypeFilter,
+    breastSizeFilter,
     buttShapeFilter,
     buttSizeFilter,
     selectedTags,
@@ -662,6 +669,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
       tattoosFilter !== '' ||
       piercingsFilter !== '' ||
       breastTypeFilter !== '' ||
+      breastSizeFilter !== '' ||
       buttShapeFilter !== '' ||
       buttSizeFilter !== ''
     )) ||
@@ -752,6 +760,8 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     setPiercingsFilter: handleFilterChange(setPiercingsFilter),
     breastTypeFilter,
     setBreastTypeFilter: handleFilterChange(setBreastTypeFilter),
+    breastSizeFilter,
+    setBreastSizeFilter: handleFilterChange(setBreastSizeFilter),
     buttShapeFilter,
     setButtShapeFilter: handleFilterChange(setButtShapeFilter),
     buttSizeFilter,

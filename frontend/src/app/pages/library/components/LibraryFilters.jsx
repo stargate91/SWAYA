@@ -67,6 +67,8 @@ export default function LibraryFilters({
   setPiercingsFilter,
   breastTypeFilter,
   setBreastTypeFilter,
+  breastSizeFilter,
+  setBreastSizeFilter,
   buttShapeFilter,
   setButtShapeFilter,
   buttSizeFilter,
@@ -94,6 +96,7 @@ export default function LibraryFilters({
   const hasAdvancedFilters = !!(
     (filterData?.ethnicities && filterData.ethnicities.length > 0) ||
     (settings?.include_adult && filterData?.breast_types && filterData.breast_types.length > 0) ||
+    (settings?.include_adult && filterData?.breast_sizes && filterData.breast_sizes.length > 0) ||
     (settings?.include_adult && filterData?.butt_shapes && filterData.butt_shapes.length > 0) ||
     (settings?.include_adult && filterData?.butt_sizes && filterData.butt_sizes.length > 0) ||
     (filterData?.tattoos && filterData.tattoos.length > 0) ||
@@ -442,6 +445,8 @@ export default function LibraryFilters({
           setEthnicityFilter={setEthnicityFilter}
           breastTypeFilter={breastTypeFilter}
           setBreastTypeFilter={setBreastTypeFilter}
+          breastSizeFilter={breastSizeFilter}
+          setBreastSizeFilter={setBreastSizeFilter}
           buttShapeFilter={buttShapeFilter}
           setButtShapeFilter={setButtShapeFilter}
           buttSizeFilter={buttSizeFilter}

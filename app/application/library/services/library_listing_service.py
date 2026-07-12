@@ -263,6 +263,7 @@ class LibraryListingService:
         filter_tattoos: Optional[str] = None,
         filter_piercings: Optional[str] = None,
         filter_breast_type: Optional[str] = None,
+        filter_breast_size: Optional[str] = None,
         filter_butt_shape: Optional[str] = None,
         filter_butt_size: Optional[str] = None,
     ) -> LibraryTabResponse:
@@ -294,6 +295,7 @@ class LibraryListingService:
             filter_tattoos=filter_tattoos,
             filter_piercings=filter_piercings,
             filter_breast_type=filter_breast_type,
+            filter_breast_size=filter_breast_size,
             filter_butt_shape=filter_butt_shape,
             filter_butt_size=filter_butt_size,
         )
