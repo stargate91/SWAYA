@@ -50,7 +50,8 @@ MEDIA_THUMBNAIL_LIMITS = {
     "posters": {"max_width": 500},
     "people": {"max_height": 632},
     "stills": {"max_width": 500},
-    "scene_stills": {"max_width": 500}
+    "scene_stills": {"max_width": 500},
+    "avatars": {"max_width": 200}
 }
 
 # Image Selection and Download Settings

@@ -46,13 +46,10 @@ const StatisticsWidget = ({ T }) => {
         <div className="stat-card">
           <div className="stat-label">{T('statistics.stats.storage_used') || 'Storage Used'}</div>
           <div className="stat-value">
-            {stats.storage_size && stats.storage_unit 
-              ? `${stats.storage_size.toFixed(1)} ${stats.storage_unit}` 
-              : '0.0 GB'
-            }
+            {stats.storage || '0.0 GB'}
           </div>
           <div className="stat-sub">
-            {T('statistics.stats.storage_sub', { count: stats.total_drives || 0 }) || `across ${stats.total_drives || 0} drives`}
+            {T('statistics.stats.storage_sub', { count: stats.drive_count || 0 }) || `across ${stats.drive_count || 0} drives`}
           </div>
         </div>
         <div className="stat-card">
