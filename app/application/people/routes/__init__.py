@@ -11,7 +11,7 @@ from app.application.people.routes.routes_status import router as status_router
 
 # Core aggregator router for people APIs
 router = APIRouter()
+router.include_router(status_router)
 router.include_router(detail_router)
 router.include_router(images_router)
 router.include_router(linking_router)
-router.include_router(status_router)

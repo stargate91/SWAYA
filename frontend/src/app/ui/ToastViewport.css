@@ -69,3 +69,35 @@
   background: var(--toast-danger-bg);
   border-color: var(--toast-danger-border);
 }
+
+.enrichment-progress__title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.enrichment-progress__count {
+  font: var(--text-caption);
+  color: var(--color-muted);
+  white-space: nowrap;
+  margin-left: auto;
+  margin-right: var(--space-2);
+}
+
+/* Progress track inside ui-toast__description */
+.enrichment-progress__track {
+  margin-top: var(--space-1);
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+  overflow: hidden;
+}
+
+.enrichment-progress__bar {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  transition: width var(--motion-duration-normal) var(--motion-ease-expressive);
+}
+
