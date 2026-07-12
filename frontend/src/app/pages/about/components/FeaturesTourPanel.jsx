@@ -50,73 +50,73 @@ export default function FeaturesTourPanel({
 
             return (
               <div key={f.id} className="about-features-sidebar-group">
-                <div
-                  className={`ui-sidebar-item ${isMainActive ? 'active' : ''}`}
-                  onClick={() => {
-                    setActiveTourIndex(idx);
-                    setActiveSubFeatureIndex(null);
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
+                  <div
+                    className={`ui-sidebar-item ${isMainActive ? 'active' : ''}`}
+                    onClick={() => {
                       setActiveTourIndex(idx);
                       setActiveSubFeatureIndex(null);
-                    }
-                  }}
-                >
-                  <span className="ui-sidebar-item-icon about-features-item-icon">{f.icon}</span>
-                  <span className="ui-sidebar-label about-features-item-label">{f.title}</span>
-                  {f.details && (
-                    <span className="about-features-item-expand">
-                      {isAnyActive ? '▼' : '▶'}
-                    </span>
-                  )}
-                </div>
-
-                {f.details && isAnyActive && filteredDetails.length > 0 && (
-                  <div className="ui-sidebar-sub-menu is-open about-features-sub-menu">
-                    {activeSubIndex !== -1 && (
-                      <div
-                        className="ui-sidebar-sub-indicator about-features-sub-indicator"
-                        // eslint-disable-next-line react/forbid-dom-props
-                        style={{ top: `${activeSubIndex * 32}px` }}
-                      />
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setActiveTourIndex(idx);
+                        setActiveSubFeatureIndex(null);
+                      }
+                    }}
+                  >
+                    <span className="ui-sidebar-item-icon about-features-item-icon">{f.icon}</span>
+                    <span className="ui-sidebar-label about-features-item-label">{f.title}</span>
+                    {f.details && (
+                      <span className="about-features-item-expand">
+                        {isAnyActive ? '▼' : '▶'}
+                      </span>
                     )}
-                    {filteredDetails.map((detail) => {
-                      const originalIndex = f.details.indexOf(detail);
-                      const isSubActive = activeTourIndex === idx && activeSubFeatureIndex === originalIndex;
-                      return (
+                  </div>
+
+                  {f.details && isAnyActive && filteredDetails.length > 0 && (
+                    <div className="ui-sidebar-sub-menu is-open about-features-sub-menu">
+                      {activeSubIndex !== -1 && (
                         <div
-                          key={originalIndex}
-                          className={`ui-sidebar-sub-item ${isSubActive ? 'active' : ''}`}
-                          onClick={() => {
-                            setActiveTourIndex(idx);
-                            setActiveSubFeatureIndex(originalIndex);
-                          }}
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
+                          className="ui-sidebar-sub-indicator about-features-sub-indicator"
+                          // eslint-disable-next-line react/forbid-dom-props
+                          style={{ top: `${activeSubIndex * 32}px` }}
+                        />
+                      )}
+                      {filteredDetails.map((detail) => {
+                        const originalIndex = f.details.indexOf(detail);
+                        const isSubActive = activeTourIndex === idx && activeSubFeatureIndex === originalIndex;
+                        return (
+                          <div
+                            key={originalIndex}
+                            className={`ui-sidebar-sub-item ${isSubActive ? 'active' : ''}`}
+                            onClick={() => {
                               setActiveTourIndex(idx);
                               setActiveSubFeatureIndex(originalIndex);
-                            }
-                          }}
-                        >
-                          <span className="about-features-sub-item-text">{detail.title}</span>
-                          {detail.nsfw && (
-                            <span className="about-features-nsfw-badge">
-                              {NSFW_TEXT}
-                            </span>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+                            }}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                setActiveTourIndex(idx);
+                                setActiveSubFeatureIndex(originalIndex);
+                              }
+                            }}
+                          >
+                            <span className="about-features-sub-item-text">{detail.title}</span>
+                            {detail.nsfw && (
+                              <span className="about-features-nsfw-badge">
+                                {NSFW_TEXT}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
             );
           })}
         </div>

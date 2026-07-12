@@ -7,7 +7,13 @@ import {
   Star,
   BarChart2,
   History,
-  Settings
+  Settings,
+  Film,
+  Tv,
+  Layers,
+  Video,
+  Users,
+  PenLine
 } from 'lucide-react';
 import { CAMERA_EMOJI, COLON_SEPARATOR, openExternalLink } from './aboutHelpers';
 
@@ -511,11 +517,38 @@ export const getFeaturesTourData = (t) => [
         image: '/documentations/features/library_browsing.png'
       },
       {
-        title: t('about.docs_wizard.features_tour.library_details.metadata_profiles_title') || 'Detailed Metadata Profiles',
-        description: t('about.docs_wizard.features_tour.library_details.metadata_profiles_desc') || 'Dive into comprehensive detail pages. Access synopses, company production info, external ratings, cast lists, and interactive seasons/episodes selectors.',
-        description_nsfw: t('about.docs_wizard.features_tour.library_details.metadata_profiles_desc_nsfw') || 'Each media item opens into an immersive full-screen detail hub. SWAYA parses and displays high-fidelity backdrops, logos, movie/show posters, structural cast lists, budget details, box office stats, external rating scores, and studio links. For TV Shows, it renders interactive season grids and episode selectors, letting you easily track your progress.\n\nIn NSFW mode, Scenes detail pages are enriched with technical video stream specifications, explicit category tag lists, and an interactive Peaks panel. The Peaks panel displays player heatmaps showing crowd-sourced high-activity points of the video, letting you skip directly to the highlights of any matched scene.',
-        image: '/documentations/features/library_detail.png',
-        image_nsfw: '/documentations/features/library_detail_nsfw.png'
+        title: t('about.docs_wizard.features_tour.library_details.movie_detail_title') || 'Movie Details',
+        description: t('about.docs_wizard.features_tour.library_details.movie_detail_desc') || 'Explore comprehensive film profiles featuring box office financial statistics, production companies, critical rating matrices, cast listings, and detailed playback stats.',
+        image: '/documentations/features/library_detail.png'
+      },
+      {
+        title: t('about.docs_wizard.features_tour.library_details.tv_detail_title') || 'TV Show Details',
+        description: t('about.docs_wizard.features_tour.library_details.tv_detail_desc') || 'Navigate unified seasons and episodes browsers with progressive metadata caching, next-up episode suggestion, and watch counters across individual series.',
+        image: '/documentations/features/library_detail.png'
+      },
+      {
+        title: t('about.docs_wizard.features_tour.library_details.collection_detail_title') || 'Collection Details',
+        description: t('about.docs_wizard.features_tour.library_details.collection_detail_desc') || 'Browse movie/TV show groupings with integrated horizontal scroll rows and ownership badges to quickly view what items are already owned or missing from your library.',
+        image: '/documentations/features/library.png'
+      },
+      {
+        title: t('about.docs_wizard.features_tour.library_details.scene_detail_title') || 'Scene / Video Details',
+        description: t('about.docs_wizard.features_tour.library_details.scene_detail_desc') || 'Immersion-first scene profiles equipped with direct 1080p streamable video previews, explicit performer/studio credits, critical network scores, and interactive watch histories.',
+        description_nsfw: (t('about.docs_wizard.features_tour.library_details.scene_detail_desc') || 'Immersion-first scene profiles equipped with direct 1080p streamable video previews, explicit performer/studio credits, critical network scores, and interactive watch histories.') + '\n\nIn NSFW mode, Scenes detail pages are enriched with technical video stream specifications, explicit category tag lists, and an interactive Peaks panel. The Peaks panel displays player heatmaps showing crowd-sourced high-activity points of the video, letting you skip directly to the highlights of any matched scene.',
+        image: '/documentations/features/library_detail_nsfw.png',
+        nsfw: true
+      },
+      {
+        title: t('about.docs_wizard.features_tour.library_details.people_detail_title') || 'People & Stars',
+        description: t('about.docs_wizard.features_tour.library_details.people_detail_desc') || 'Dive into performer biographic entries showing anatomical measurements, career information, and dynamic grids highlighting all matching media items in your local storage.',
+        description_nsfw: (t('about.docs_wizard.features_tour.library_details.people_detail_desc') || 'Dive into performer biographic entries showing anatomical measurements, career information, and dynamic grids highlighting all matching media items in your local storage.') + '\n\nIn NSFW mode, Performer profiles expand to display detailed adult profiles, including aliases, body measurements, height, weight, career spans, and interactive links to official platforms (such as Twitter/X, Instagram, and OnlyFans) to easily browse their online catalogs.',
+        image: '/documentations/features/library_people.png',
+        image_nsfw: '/documentations/features/library_people_nsfw.png'
+      },
+      {
+        title: t('about.docs_wizard.features_tour.library_details.people_edit_title') || 'Performer Editor',
+        description: t('about.docs_wizard.features_tour.library_details.people_edit_desc') || 'A comprehensive editor featuring linked profile registries search, data routing priority grids, manual value overrides with computed measurements generator, and age restriction validations.',
+        image: '/documentations/features/library_people.png'
       },
       {
         title: t('about.docs_wizard.features_tour.library_details.tagging_title') || 'Tagging, Playlists & Watch History',
@@ -523,41 +556,34 @@ export const getFeaturesTourData = (t) => [
         description_nsfw: t('about.docs_wizard.features_tour.library_details.tagging_desc_nsfw') || 'Manage and organize cataloged files on-the-fly. Edit tags, add items to custom lists/playlists, and keep track of your watch counts and play history.\n\nIn NSFW mode, you can also track interactive player peaks, video markers, and customize a distinct "Finish Count" widget on the activity panel.',
         image: '/documentations/features/library_tagging.png',
         image_nsfw: '/documentations/features/library_tagging_nsfw.png'
-      },
-      {
-        title: t('about.docs_wizard.features_tour.library_details.people_title') || 'People & Cast Profiles',
-        description: t('about.docs_wizard.features_tour.library_details.people_desc') || 'Explore cast, crew, and director profiles. Browse performer bios, birth details, and discover all linked media files available in your collections.',
-        description_nsfw: t('about.docs_wizard.features_tour.library_details.people_desc_nsfw') || 'Explore cast, crew, and director profiles. Browse performer bios, birth details, and discover all linked media files available in your collections.\n\nIn NSFW mode, performer profiles display interactive adult links, aliases, anatomical stats, and custom social link integrations (e.g. OnlyFans, Twitter).',
-        image: '/documentations/features/library_people.png',
-        image_nsfw: '/documentations/features/library_people_nsfw.png'
       }
     ]
   },
   {
     id: 'lists',
     icon: <Bookmark size={16} />,
-    title: t('about.docs_wizard.features_tour.lists_title') || 'Lists & Playlists',
+    title: t('about.docs_wizard.features_tour.lists_title') || 'Lists',
     description: t('about.docs_wizard.features_tour.lists_desc') || 'Organize your videos into custom playlists or watch lists. Perfect for cataloguing files by genre, custom series, performer playlists, or personal favorites.',
     image: '/documentations/features/lists.png'
   },
   {
     id: 'ratings',
     icon: <Star size={16} />,
-    title: t('about.docs_wizard.features_tour.ratings_title') || 'Ratings System',
+    title: t('about.docs_wizard.features_tour.ratings_title') || 'Ratings',
     description: t('about.docs_wizard.features_tour.ratings_desc') || 'Rate your videos using a clean star system. Sort your media library by rating to quickly locate your top-rated films and media.',
     image: '/documentations/features/ratings.png'
   },
   {
     id: 'statistics',
     icon: <BarChart2 size={16} />,
-    title: t('about.docs_wizard.features_tour.statistics_title') || 'Statistics & Insights',
+    title: t('about.docs_wizard.features_tour.statistics_title') || 'Statistics',
     description: t('about.docs_wizard.features_tour.statistics_desc') || 'Analyze your collection. View size breakdowns, distribution by resolution, performer/studio counts, and total library duration.',
     image: '/documentations/features/statistics.png'
   },
   {
     id: 'history',
     icon: <History size={16} />,
-    title: t('about.docs_wizard.features_tour.history_title') || 'Watch History',
+    title: t('about.docs_wizard.features_tour.history_title') || 'History',
     description: t('about.docs_wizard.features_tour.history_desc') || 'Track your watching habits. See what files you watched, how many times they were played, and resume from exactly where you left off.',
     image: '/documentations/features/history.png'
   },

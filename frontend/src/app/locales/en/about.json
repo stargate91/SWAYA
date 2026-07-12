@@ -193,6 +193,7 @@
       "step_single_desc": "SWAYA works fully offline without any API keys!\n\n• Video Snapshotting: The program automatically extracts technical file metadata and captures a video frame to use as the cover and backdrop image.\n• File Safety & Indexing: Physical files are kept safe. You have two options during organization: SWAYA can either organize files into a single target directory (configurable in settings) leaving the filenames untouched, or you can choose to skip moving/renaming entirely (available before running the organizer) and just index them in-place into the database.\n• Library Categorization: SWAYA automatically groups scanned items in the Organizer into Movies, TV Shows, Extras (trailers, clips, samples), or Collisions (naming conflicts). Offline scanning matches and registers everything immediately without requiring manual matching.\n• Video Classification: Offline scanning imports all video files under a generic category. Although folder or file name guessing is sometimes possible, doing so without an online database is unreliable and we want to avoid inaccurate guessing to prevent disappointment. Connecting external APIs guarantees high-precision movie/show classification.\n• Full Library Experience: All core features work identically—you can rate movies, add comments, track watch history/counters, create playlists, select custom covers, and assign tags.\n• Home Videos: Perfect for importing and cataloguing personal recordings.\n\nNote: If you want the full SWAYA experience (automatic high-res posters, trailers, synopses, and cast profiles), you will need to add API keys. Read more details on the Organizer page or start the Feature Tour in the media library."
     },
     "features_tour": {
+      "detail_pages_group": "Detail Pages",
       "general_layout_title": "Interface & Navigation",
       "general_layout_desc": "Get familiar with the general layout of SWAYA, including the sidebar navigation, session mode controls, and real-time background task monitors.",
       "general_layout_details": {
@@ -243,23 +244,29 @@
       "library_details": {
         "browsing_title": "Library Browsing & Filtering",
         "browsing_desc": "Effortlessly manage your media footprint. The main library view organizes your import history into dedicated viewports for Movies, TV Shows, and People. Using the top action bar, you can instantly sort items by Date Added, Release Year, User Rating, or Title. The advanced filter drawer enables precision search, letting you isolate videos by resolution (e.g. 4K, 1080p), tags, production studios, release year ranges, or performer associations, so you can locate exactly what you want within seconds.",
-        "metadata_profiles_title": "Detailed Metadata Profiles",
-        "metadata_profiles_desc": "Each media item opens into an immersive full-screen detail hub. SWAYA parses and displays high-fidelity backdrops, logos, movie/show posters, structural cast lists, budget details, box office stats, external rating scores, and studio links. For TV Shows, it renders interactive season grids and episode selectors, letting you easily track your progress.",
-        "metadata_profiles_desc_nsfw": "Each media item opens into an immersive full-screen detail hub. SWAYA parses and displays high-fidelity backdrops, logos, movie/show posters, structural cast lists, budget details, box office stats, external rating scores, and studio links. For TV Shows, it renders interactive season grids and episode selectors, letting you easily track your progress.\n\nIn NSFW mode, Scenes detail pages are enriched with technical video stream specifications, explicit category tag lists, and an interactive Peaks panel. The Peaks panel displays player heatmaps showing crowd-sourced high-activity points of the video, letting you skip directly to the highlights of any matched scene.",
+        "movie_detail_title": "Movie Details",
+        "movie_detail_desc": "Explore comprehensive film profiles featuring box office financial statistics, production companies, critical rating matrices, cast listings, and detailed playback stats.",
+        "tv_detail_title": "TV Show Details",
+        "tv_detail_desc": "Navigate unified seasons and episodes browsers with progressive metadata caching, next-up episode suggestion, and watch counters across individual series.",
+        "collection_detail_title": "Collection Details",
+        "collection_detail_desc": "Browse movie/TV show groupings with integrated horizontal scroll rows and ownership badges to quickly view what items are already owned or missing from your library.",
+        "scene_detail_title": "Scene / Video Details",
+        "scene_detail_desc": "Immersion-first scene profiles equipped with direct 1080p streamable video previews, explicit performer/studio credits, critical network scores, and interactive watch histories.",
+        "people_detail_title": "People & Stars",
+        "people_detail_desc": "Dive into performer biographic entries showing anatomical measurements, career information, and dynamic grids highlighting all matching media items in your local storage.",
+        "people_edit_title": "Performer Editor",
+        "people_edit_desc": "A comprehensive editor featuring linked profile registries search, data routing priority grids, manual value overrides with computed measurements generator, and age restriction validations.",
         "tagging_title": "Tagging, Playlists & Watch History",
         "tagging_desc": "Personalize and organize your content collections. Use the interactive metadata editor to change posters, backdrops, titles, or tags. Add movies or videos directly to custom playlists, watch lists, or favorites. The activity panel records every watch attempt, incrementing your play count and tracking the exact date and progress of your last play so you can resume at any time.",
-        "tagging_desc_nsfw": "Personalize and organize your content collections. Use the interactive metadata editor to change posters, backdrops, titles, or tags. Add movies or videos directly to custom playlists, watch lists, or favorites. The activity panel records every watch attempt, incrementing your play count and tracking the exact date and progress of your last play so you can resume at any time.\n\nIn NSFW mode, the Activity panel gains support for a specialized 'Finish Count' counter. This lets you manually log complete watch sessions separately from simple video clicks. The Organize tab also unlocks interactive video peaks, scene taggers, and segment markers to bookmark key moments in your adult video files.",
-        "people_title": "People & Cast Profiles",
-        "people_desc": "SWAYA creates rich biographies for actors, directors, and crew members. View comprehensive profile pictures, birth dates, death dates, biography overviews, and social links. The page dynamically queries your database, instantly displaying a grid of all movies or TV shows in your local library that feature the selected individual.",
-        "people_desc_nsfw": "SWAYA creates rich biographies for actors, directors, and crew members. View comprehensive profile pictures, birth dates, death dates, biography overviews, and social links. The page dynamically queries your database, instantly displaying a grid of all movies or TV shows in your local library that feature the selected individual.\n\nIn NSFW mode, Performer profiles expand to display detailed adult profiles, including aliases, body measurements, height, weight, career spans, and interactive links to official platforms (such as Twitter/X, Instagram, and OnlyFans) to easily browse their online catalogs."
+        "tagging_desc_nsfw": "Personalize and organize your content collections. Use the interactive metadata editor to change posters, backdrops, titles, or tags. Add movies or videos directly to custom playlists, watch lists, or favorites. The activity panel records every watch attempt, incrementing your play count and tracking the exact date and progress of your last play so you can resume at any time.\n\nIn NSFW mode, the Activity panel gains support for a specialized 'Finish Count' counter. This lets you manually log complete watch sessions separately from simple video clicks. The Organize tab also unlocks interactive video peaks, scene taggers, and segment markers to bookmark key moments in your adult video files."
       },
-      "lists_title": "Lists & Playlists",
+      "lists_title": "Lists",
       "lists_desc": "Organize your videos into custom playlists or watch lists. Perfect for cataloguing files by genre, custom series, performer playlists, or personal favorites.",
-      "ratings_title": "Ratings System",
+      "ratings_title": "Ratings",
       "ratings_desc": "Rate your videos using a clean star system. Sort your media library by rating to quickly locate your top-rated films and media.",
-      "statistics_title": "Statistics & Insights",
+      "statistics_title": "Statistics",
       "statistics_desc": "Analyze your collection. View size breakdowns, distribution by resolution, performer/studio counts, and total library duration.",
-      "history_title": "Watch History",
+      "history_title": "History",
       "history_desc": "Track your watching habits. See what files you watched, how many times they were played, and resume from exactly where you left off.",
       "settings_title": "Settings & Presets",
       "settings_desc": "Configure the core application. Customize file naming patterns, target directories, metadata providers priority, and cache maintenance."
