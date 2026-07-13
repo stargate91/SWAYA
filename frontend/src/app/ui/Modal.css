@@ -2,7 +2,7 @@
 .ui-modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 2000;
+  z-index: var(--z-index-backdrop);
   display: grid;
   place-items: center;
   padding: var(--space-4xl);
@@ -275,7 +275,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: var(--z-index-backdrop);
   animation: ui-confirm-fade-in var(--motion-duration-base) var(--motion-ease-standard);
   padding: var(--space-2xl);
 }

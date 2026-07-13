@@ -7,7 +7,7 @@
   position: fixed;
   left: var(--tooltip-left, 0);
   top: var(--tooltip-top, 0);
-  z-index: 3000;
+  z-index: var(--z-index-toast);
   max-width: var(--tooltip-max-width, 260px);
   padding: var(--tooltip-padding);
   border-radius: var(--tooltip-radius);

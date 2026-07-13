@@ -103,7 +103,7 @@
   bottom: 0;
   background: var(--color-surface-overlay);
   backdrop-filter: blur(4px);
-  z-index: 99999998 !important;
+  z-index: var(--z-index-backdrop);
   animation: uiDrawerFadeIn var(--motion-duration-slow) var(--motion-ease-standard);
 }
 
@@ -115,7 +115,7 @@
   background: var(--color-bg-elevated);
   border-left: 1px solid var(--color-border-strong);
   box-shadow: -10px 0 35px color-mix(in srgb, black 60%, transparent);
-  z-index: 99999999 !important;
+  z-index: var(--z-index-modal);
   display: flex;
   flex-direction: column;
   max-width: 100%;

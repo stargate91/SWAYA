@@ -469,7 +469,7 @@
   border: 1px solid var(--ui-control-border-strong);
   border-radius: var(--ui-control-radius);
   box-shadow: var(--shadow-overlay-strong, var(--dropdown-menu-shadow));
-  z-index: 2100;
+  z-index: var(--z-index-dropdown);
   padding: var(--space-2xs);
   display: flex;
   flex-direction: column;

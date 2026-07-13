@@ -2,7 +2,7 @@
   position: fixed;
   top: var(--context-menu-top, 0);
   left: var(--context-menu-left, 0);
-  z-index: var(--z-index-context-menu, 9999);
+  z-index: var(--z-index-dropdown);
   min-width: 180px;
   background: color-mix(in srgb, var(--color-bg-elevated) 82%, transparent);
   backdrop-filter: var(--context-menu-backdrop-filter, blur(12px) saturate(140%));

@@ -154,7 +154,7 @@
   backdrop-filter: blur(20px) saturate(125%) !important;
   -webkit-backdrop-filter: blur(20px) saturate(125%) !important;
   padding: var(--space-xs);
-  z-index: 100;
+  z-index: var(--z-index-dropdown);
   display: flex;
   flex-direction: column;
   gap: var(--space-2xs);

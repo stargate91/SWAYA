@@ -57,7 +57,7 @@
 .ui-table th {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: var(--z-index-sticky);
   font: var(--text-caption);
   color: var(--color-muted);
   text-transform: uppercase;

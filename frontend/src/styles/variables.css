@@ -193,21 +193,6 @@
   --dropdown-option-hover-color: var(--color-text-primary);
   --dropdown-option-selected-bg: var(--color-state-info-bg);
   --dropdown-option-selected-color: var(--color-accent-blue);
-
-  /* Picker Popup Tokens */
-  --picker-popup-bg: var(--dropdown-menu-bg);
-  --picker-popup-border: var(--dropdown-menu-border);
-  --picker-popup-border-top: var(--dropdown-menu-border-top);
-  --picker-popup-shadow: var(--dropdown-menu-shadow);
-  --picker-popup-header-bg: var(--dropdown-search-bg);
-  --picker-popup-header-border: var(--dropdown-search-border);
-  --picker-popup-item-hover-bg: var(--dropdown-option-hover-bg);
-  --picker-popup-item-hover-color: var(--dropdown-option-hover-color);
-  --picker-popup-input-bg: var(--dropdown-field-bg);
-  --picker-popup-input-border: var(--dropdown-field-border);
-  --picker-popup-input-focus-bg: var(--dropdown-field-active);
-  --picker-popup-input-focus-border: var(--dropdown-field-active-border);
-
   /* Layout Tokens */
   --layout-sidebar-width-expanded: 220px;
   --layout-sidebar-width-collapsed: 78px;
@@ -621,6 +606,12 @@
   --motion-zoom: transform 0.28s ease;
   --motion-lift-distance-sm: -1px;
   --motion-lift-distance-md: -2px;
+  /* Z-Index Scale */
+  --z-index-dropdown: 100;
+  --z-index-sticky: 200;
+  --z-index-backdrop: 300;
+  --z-index-modal: 400;
+  --z-index-toast: 500;
 
   /* Effects */
   --glass-blur: blur(12px);
