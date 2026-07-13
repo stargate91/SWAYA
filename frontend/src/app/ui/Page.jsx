@@ -1,4 +1,5 @@
 import PageHeader from './PageHeader';
+import './Page.css';
 
 export default function Page({
   eyebrow,
@@ -6,13 +7,14 @@ export default function Page({
   description,
   actions,
   centered = false,
+  viewport = false,
   contentBottom = false,
   className = '',
   children,
 }) {
   return (
     <div
-      className={`ui-page${centered ? ' ui-page--centered' : ''}${contentBottom ? ' ui-page--content-bottom' : ''} ${className}`.trim()}
+      className={`ui-page${centered ? ' ui-page--centered' : ''}${contentBottom ? ' ui-page--content-bottom' : ''}${viewport ? ' ui-page--viewport' : ''} ${className}`.trim()}
     >
       {(title || description || eyebrow || actions) ? (
         <PageHeader

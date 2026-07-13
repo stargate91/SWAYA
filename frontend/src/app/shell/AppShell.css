@@ -325,7 +325,7 @@
   padding-bottom: 0;
 }
 
-.shell:has(#shell-utility-bar-bottom-center > *:not(:empty)) .ui-page:not(.lists-page):not(.organizer-page) {
+.shell:has(#shell-utility-bar-bottom-center > *:not(:empty)) .ui-page:not(.ui-page--viewport) {
   --page-pb: 72px;
   padding-bottom: var(--page-pb);
 }

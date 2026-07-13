@@ -1,10 +1,5 @@
 /* stylelint-disable declaration-property-value-disallowed-list */
 /* Lists Page Layout Styles */
-.ui-page.lists-page {
-  height: 100%;
-  overflow: hidden;
-}
-
 .lists-layout {
   display: flex;
   flex: 1 1 auto;

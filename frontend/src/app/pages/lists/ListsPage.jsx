@@ -173,7 +173,7 @@ export default function ListsPage() {
   };
 
   return (
-    <Page className="lists-page">
+    <Page viewport={true} className="lists-page">
       <div className="lists-layout">
         <ListsSidebar
           t={t}
