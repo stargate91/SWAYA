@@ -161,25 +161,25 @@
   border-color: var(--button-danger-border);
 }
 
-.ui-icon-button--close {
-  background: none !important;
-  border: none !important;
-  color: var(--color-text-secondary) !important;
-  cursor: pointer !important;
-  transition: color var(--motion-base) !important;
+.ui-icon-button.ui-icon-button--close {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--motion-base);
 }
 
-.ui-icon-button--close svg {
-  transition: transform var(--motion-base) !important;
+.ui-icon-button.ui-icon-button--close svg {
+  transition: transform var(--motion-base);
 }
 
-.ui-icon-button--close:hover:not(:disabled) {
-  color: var(--color-text-primary) !important;
-  background: none !important;
+.ui-icon-button.ui-icon-button--close:hover:not(:disabled) {
+  color: var(--color-text-primary);
+  background: none;
 }
 
-.ui-icon-button--close:hover:not(:disabled) svg {
-  transform: rotate(90deg) !important;
+.ui-icon-button.ui-icon-button--close:hover:not(:disabled) svg {
+  transform: rotate(90deg);
 }
 
 .ui-button--sm {
@@ -359,8 +359,8 @@
   pointer-events: auto;
 }
 
-.ui-icon-button--play-overlay:hover {
-  transform: translate(-50%, -50%) !important;
+.ui-icon-button.ui-icon-button--play-overlay:hover {
+  transform: translate(-50%, -50%);
   background-color: var(--app-shell-color-panel-strong);
   background-image: var(--button-secondary-hover-bg);
   border-color: var(--button-secondary-border);
@@ -410,25 +410,25 @@
   background: var(--button-secondary-hover-bg);
 }
 
-.ui-split-button__action {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  border-top-right-radius: 0 !important;
-  border-bottom-right-radius: 0 !important;
-  height: 100% !important;
+.ui-split-button .ui-split-button__action {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  height: 100%;
   cursor: pointer;
-  transform: none !important; /* disable hover translation on child */
+  transform: none; /* disable hover translation on child */
 }
 
 .ui-split-button--primary .ui-split-button__action {
-  color: var(--button-primary-color) !important;
-  border-right: 1px solid color-mix(in srgb, white 15%, transparent) !important;
+  color: var(--button-primary-color);
+  border-right: 1px solid color-mix(in srgb, white 15%, transparent);
 }
 
 .ui-split-button--secondary .ui-split-button__action {
-  color: var(--button-secondary-color) !important;
-  border-right: 1px solid var(--button-secondary-border) !important;
+  color: var(--button-secondary-color);
+  border-right: 1px solid var(--button-secondary-border);
 }
 
 .ui-split-button__arrow {
@@ -524,16 +524,16 @@
 }
 
 .ui-icon-button-wrapper .ui-icon-button {
-  background: transparent !important;
-  border: none !important;
-  width: 100% !important;
-  height: 100% !important;
-  padding: 0 !important;
+  background: transparent;
+  border: none;
+  width: 100%;
+  height: 100%;
+  padding: 0;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-md) !important;
+  border-radius: var(--radius-md);
 }
 
 .ui-icon-button-wrapper--hover-only {

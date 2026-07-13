@@ -189,6 +189,6 @@
 
 .ui-floating-bar-shell.is-shaking .ui-floating-bar {
   animation: ui-bar-shake var(--motion-base);
-  border-color: var(--color-state-danger) !important;
-  box-shadow: 0 0 20px color-mix(in srgb, var(--color-state-danger) 40%, transparent), var(--ui-floating-surface-shadow) !important;
+  border-color: var(--color-state-danger);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--color-state-danger) 40%, transparent), var(--ui-floating-surface-shadow);
 }

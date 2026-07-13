@@ -522,7 +522,7 @@
 }
 
 .entity-detail-page--collection .media-detail-page__overview-text {
-  -webkit-line-clamp: 5;
+  -webkit-line-clamp: 3;
 }
 
 .entity-detail-page .media-detail-page__read-more-btn {
@@ -908,8 +908,8 @@
   box-shadow: var(--badge-shadow);
 }
 
-.entity-detail-page__meta-row--secondary {
-  margin-top: var(--space-xs) !important;
+.entity-detail-page__meta-row.entity-detail-page__meta-row--secondary {
+  margin-top: var(--space-xs);
 }
 
 /* Known For Grid */
@@ -1124,12 +1124,12 @@
   margin-top: var(--space-2xs);
 }
 
-.entity-detail-page__sidebar-action {
+.entity-detail-page__sidebar-actions .entity-detail-page__sidebar-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 1 !important;
-  width: auto !important;
+  flex: 1;
+  width: auto;
   /* Stretch action buttons to equal widths */
   height: 36px;
   border-radius: var(--radius-sm);

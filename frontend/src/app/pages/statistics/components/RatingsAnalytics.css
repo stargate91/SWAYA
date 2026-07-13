@@ -5,8 +5,8 @@
   height: 100%;
 }
 
-.compact-stats-card {
-  padding: var(--space-lg) var(--space-xl) !important;
+.ui-card.compact-stats-card {
+  padding: var(--space-lg) var(--space-xl);
   flex: 1;
   display: flex;
   flex-direction: column;

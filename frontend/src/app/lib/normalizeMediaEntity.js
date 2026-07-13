@@ -93,7 +93,7 @@ const resolveRatings = (item) => {
 // ─── Performers (gender-preference filtered) ─────────────────────
 
 const resolvePerformers = (item, settings, maxCount = 4, opts = {}) => {
-  const allPeople = item.people || [];
+  const allPeople = item.people || item.performers || item.cast || [];
   if (!allPeople.length) return [];
 
   const pref = settings?.adult_gender_preference;

@@ -16,11 +16,11 @@
 }
 
 .player-page.player-page--transparent {
-  background-color: transparent !important;
+  background-color: transparent;
 }
 
 .player-page.player-page--transparent .player-page__video-container {
-  background-color: transparent !important;
+  background-color: transparent;
 }
 
 .player-page__video-container {
@@ -212,10 +212,10 @@
 }
 
 /* Picture-in-Picture Mode Overlay */
-.player-page--pip {
+.player-page.player-page--pip {
   cursor: default;
-  width: 100% !important;
-  height: 100% !important;
+  width: 100%;
+  height: 100%;
   -webkit-app-region: no-drag;
 }
 
@@ -267,8 +267,8 @@
   transform: scale(1.1);
 }
 
-.player-page__pip-btn--close:hover {
-  background: var(--color-state-danger) !important;
+.player-page__pip-btn.player-page__pip-btn--close:hover {
+  background: var(--color-state-danger);
 }
 
 /* Header Left & Right Layouts */
@@ -450,19 +450,19 @@
   }
 }
 
-.player-page__btn--peak {
-  color: var(--color-accent-red-soft) !important;
+.ui-button.player-page__btn--peak {
+  color: var(--color-accent-red-soft);
   transition: color var(--motion-duration-base) var(--motion-ease-standard), transform var(--motion-duration-base) var(--motion-ease-standard);
 }
 
-.player-page__btn--peak:hover {
-  color: var(--color-state-danger) !important;
+.ui-button.player-page__btn--peak:hover {
+  color: var(--color-state-danger);
   transform: scale(1.1);
 }
 
-.player-page__btn--peak-success {
+.ui-button.player-page__btn--peak-success {
   --peak-pop-anim: peak-pop var(--motion-duration-slow) cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  color: var(--color-state-success) !important;
+  color: var(--color-state-success);
   animation: var(--peak-pop-anim);
 }
 
@@ -1327,7 +1327,7 @@
 }
 
 .player-page__card--single:hover .player-page__card-media {
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.08);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
 }
 
@@ -1408,14 +1408,13 @@
   margin: auto 0;
 }
 
-/* Static card override to disable hover effects */
-.player-page__card--static {
-  cursor: default !important;
+.player-page__card.player-page__card--static {
+  cursor: default;
 }
-.player-page__card--static:hover .player-page__card-media {
-  border-color: rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4) !important;
+.player-page__card.player-page__card--static:hover .player-page__card-media {
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
 }
-.player-page__card--static:hover .player-page__card-img {
-  transform: none !important;
+.player-page__card.player-page__card--static:hover .player-page__card-img {
+  transform: none;
 }

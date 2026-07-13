@@ -60,14 +60,14 @@
   gap: var(--local-gap);
 }
 
-.bespoke-scene-tagger-pill-active {
+.ui-pill.bespoke-scene-tagger-pill-active {
   display: inline-flex;
   align-items: center;
   --local-gap: 4px;
   gap: var(--local-gap);
-  padding: var(--space-2xs) var(--space-sm) !important;
-  font-size: var(--font-size-2xs) !important;
-  font-weight: var(--font-weight-semibold) !important;
+  padding: var(--space-2xs) var(--space-sm);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: opacity var(--motion-duration-fast) var(--motion-ease-standard), transform var(--motion-duration-fast) var(--motion-ease-standard);
 }
@@ -129,7 +129,7 @@
 }
 
 .bespoke-scene-tagger-input::placeholder {
-  color: color-mix(in srgb, var(--color-ink) 50%, transparent) !important;
+  color: color-mix(in srgb, var(--color-ink) 50%, transparent);
   opacity: 1;
 }
 
@@ -200,7 +200,6 @@
   margin-top: var(--space-2xs);
 }
 
-/* Suggested Tags */
 .bespoke-scene-tagger-pill-suggested {
   display: inline-flex;
   align-items: center;
@@ -215,6 +214,7 @@
   color: color-mix(in srgb, var(--color-ink) 85%, transparent);
   cursor: pointer;
   transition: all var(--motion-duration-fast) var(--motion-ease-standard);
+  flex-shrink: 0;
 }
 
 .bespoke-scene-tagger-pill-suggested:hover {
@@ -240,10 +240,8 @@
   overflow-x: auto;
   scroll-behavior: smooth;
 }
-
-.bespoke-scene-tagger-pill-active,
-.bespoke-scene-tagger-pill-suggested {
-  flex-shrink: 0 !important;
+.ui-pill.bespoke-scene-tagger-pill-active {
+  flex-shrink: 0;
 }
 
 .bespoke-scene-tagger-scroller-btn {

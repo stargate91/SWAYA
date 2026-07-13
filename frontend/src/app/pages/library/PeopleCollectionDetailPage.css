@@ -1,7 +1,7 @@
-.entity-detail-page--people .media-detail-page__container,
-.entity-detail-page--collection .media-detail-page__container {
+.entity-detail-page.entity-detail-page--people .media-detail-page__container,
+.entity-detail-page.entity-detail-page--collection .media-detail-page__container {
   gap: var(--space-4xl);
-  overflow: hidden !important; /* Force disable scrollbar */
+  overflow: hidden; /* Force disable scrollbar */
   margin-top: var(--page-top-offset, 4rem);
   padding-top: 0;
   height: calc(100% - var(--page-top-offset, 4rem));
@@ -250,39 +250,39 @@
 
 /* Missing collection items opacity styling */
 .collection-items-horizontal-grid-wrapper .ui-poster-card.is-missing {
-  opacity: 0.8 !important;
+  opacity: 0.8;
 }
 
 .collection-items-horizontal-grid-wrapper .ui-poster-card.is-missing:hover {
-  opacity: 1 !important;
+  opacity: 1;
 }
 
 .collection-items-horizontal-grid-wrapper .ui-poster-card.is-missing .ui-poster-card__image {
-  opacity: 0.7 !important;
+  opacity: 0.7;
 }
 
 .collection-items-horizontal-grid-wrapper .ui-poster-card.is-missing:hover .ui-poster-card__image {
-  opacity: 1 !important;
+  opacity: 1;
 }
 
-.collection-items-horizontal-grid-wrapper {
+.ui-scroll-row-container.collection-items-horizontal-grid-wrapper {
   --wrapper-pt: 8px;
   --wrapper-pb: 8px;
   --wrapper-mt: -8px;
   --wrapper-mb: -8px;
-  padding-top: var(--wrapper-pt) !important;
-  padding-bottom: var(--wrapper-pb) !important;
-  margin-top: var(--wrapper-mt) !important;
-  margin-bottom: var(--wrapper-mb) !important;
+  padding-top: var(--wrapper-pt);
+  padding-bottom: var(--wrapper-pb);
+  margin-top: var(--wrapper-mt);
+  margin-bottom: var(--wrapper-mb);
 }
 
 .collection-items-horizontal-grid-wrapper .ui-poster-card {
   --card-transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-  transition: var(--card-transition) !important;
+  transition: var(--card-transition);
 }
 
 .collection-items-horizontal-grid-wrapper .ui-poster-card:hover {
-  transform: translateY(-4px) !important;
+  transform: translateY(-4px);
 }
 
 .collection-items-horizontal-grid-wrapper .ui-pill--default {

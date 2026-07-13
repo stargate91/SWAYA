@@ -123,16 +123,16 @@
   transition: transform var(--motion-fast), width var(--motion-duration-slow) var(--motion-ease-standard);
 }
 
-.ui-drawer--glass {
-  background: color-mix(in srgb, var(--color-bg-elevated) 70%, transparent) !important;
+.ui-drawer.ui-drawer--glass {
+  background: color-mix(in srgb, var(--color-bg-elevated) 70%, transparent);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 
-.ui-drawer--contrast {
-  background: var(--color-surface-overlay, var(--color-panel-strong)) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+.ui-drawer.ui-drawer--contrast {
+  background: var(--color-surface-overlay, var(--color-panel-strong));
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 /* Sizes */
@@ -175,7 +175,7 @@
 /* Ensure all drawer headers are solid (not transparent) by default */
 .entity-detail-page__drawer-header,
 .review-drawer__header {
-  background: var(--color-bg-elevated) !important;
+  background: var(--color-bg-elevated);
   position: relative;
   z-index: 10;
 }
@@ -184,7 +184,7 @@
 .ui-drawer--glass .ui-drawer__header,
 .ui-drawer--glass .entity-detail-page__drawer-header,
 .ui-drawer--glass .review-drawer__header {
-  background: transparent !important;
+  background: transparent;
 }
 
 
@@ -202,12 +202,12 @@
 }
 
 .ui-close-btn {
-  width: var(--ui-overlay-close-size, 36px) !important;
-  height: var(--ui-overlay-close-size, 36px) !important;
-  border-radius: 50% !important;
-  border: 1px solid var(--color-border-default) !important;
-  background: var(--ui-overlay-close-bg) !important;
-  color: var(--color-text-secondary) !important;
+  width: var(--ui-overlay-close-size, 36px);
+  height: var(--ui-overlay-close-size, 36px);
+  border-radius: 50%;
+  border: 1px solid var(--color-border-default);
+  background: var(--ui-overlay-close-bg);
+  color: var(--color-text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -216,17 +216,17 @@
 }
 
 .ui-close-btn:hover {
-  background-color: var(--ui-overlay-close-bg-hover) !important;
-  border-color: var(--color-border-default) !important;
-  color: var(--color-text-primary, white) !important;
+  background-color: var(--ui-overlay-close-bg-hover);
+  border-color: var(--color-border-default);
+  color: var(--color-text-primary, white);
 }
 
 .ui-close-btn svg {
-  transition: transform var(--motion-fast) !important;
+  transition: transform var(--motion-fast);
 }
 
 .ui-close-btn:hover svg {
-  transform: rotate(90deg) !important;
+  transform: rotate(90deg);
 }
 
 .ui-close-esc-hint {

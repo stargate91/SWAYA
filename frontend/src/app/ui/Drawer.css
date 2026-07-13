@@ -4,7 +4,7 @@
   justify-content: space-between;
   padding: var(--space-2xl) var(--space-4xl);
   border-bottom: 1px solid var(--color-border-default);
-  background: var(--color-bg-elevated) !important;
+  background: var(--color-bg-elevated);
   position: relative;
   z-index: 10;
 }

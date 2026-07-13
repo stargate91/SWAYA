@@ -8,7 +8,7 @@
 }
 
 .ui-poster-card:hover {
-  transform: translateY(-4px) !important;
+  transform: translateY(-4px);
 }
 
 .ui-poster-card__media-shell {
@@ -74,7 +74,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
 }
 
 .ui-poster-card:hover .ui-poster-card__image {
-  transform: scale(1.02) !important;
+  transform: scale(1.02);
 }
 
 .ui-poster-card__placeholder {
@@ -113,8 +113,8 @@ div.ui-poster-card__image-wrapper:focus-visible {
   z-index: 1;
 }
 
-.ui-poster-card__user-rating-badge {
-  position: absolute !important;
+.ui-poster-card .ui-poster-card__user-rating-badge {
+  position: absolute;
   top: 12px;
   left: 12px;
   min-height: 28px;
@@ -265,47 +265,59 @@ div.ui-poster-card__image-wrapper:focus-visible {
   gap: var(--space-xs);
 }
 
-.ui-card-action-btn .action-btn-state-hover {
-  display: none !important;
+.ui-poster-card__media-shell .ui-card-action-btn .action-btn-state-hover,
+.lists-card .ui-card-action-btn .action-btn-state-hover,
+.recommend-card .ui-card-action-btn .action-btn-state-hover {
+  display: none;
 }
 
-.ui-card-action-btn:hover {
-  border-color: color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent))) !important;
-  color: var(--color-state-danger) !important;
+.ui-poster-card__media-shell .ui-card-action-btn:hover,
+.lists-card .ui-card-action-btn:hover,
+.recommend-card .ui-card-action-btn:hover {
+  border-color: color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
+  color: var(--color-state-danger);
 }
 
-.ui-card-action-btn:hover .action-btn-state-default {
-  display: none !important;
+.ui-poster-card__media-shell .ui-card-action-btn:hover .action-btn-state-default,
+.lists-card .ui-card-action-btn:hover .action-btn-state-default,
+.recommend-card .ui-card-action-btn:hover .action-btn-state-default {
+  display: none;
 }
 
-.ui-card-action-btn:hover .action-btn-state-hover {
-  display: inline-flex !important;
+.ui-poster-card__media-shell .ui-card-action-btn:hover .action-btn-state-hover,
+.lists-card .ui-card-action-btn:hover .action-btn-state-hover,
+.recommend-card .ui-card-action-btn:hover .action-btn-state-hover {
+  display: inline-flex;
   align-items: center;
   gap: var(--space-xs);
 }
 
 /* Danger variant for direct remove actions (Lists, Tags) */
-.ui-card-action-btn--danger {
-  border-color: color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent))) !important;
-  color: var(--color-state-danger) !important;
+.ui-poster-card__media-shell .ui-card-action-btn--danger,
+.lists-card .ui-card-action-btn--danger {
+  border-color: color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
+  color: var(--color-state-danger);
 }
 
-.ui-card-action-btn--danger:hover {
-  border-color: color-mix(in srgb, var(--color-state-danger) 80%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent))) !important;
-  background-color: color-mix(in srgb, var(--color-state-danger) 15%, var(--app-shell-color-panel, black)) !important;
-  color: var(--color-state-danger) !important;
+.ui-poster-card__media-shell .ui-card-action-btn--danger:hover,
+.lists-card .ui-card-action-btn--danger:hover {
+  border-color: color-mix(in srgb, var(--color-state-danger) 80%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
+  background-color: color-mix(in srgb, var(--color-state-danger) 15%, var(--app-shell-color-panel, black));
+  color: var(--color-state-danger);
 }
 
 /* Neutral variant for default action state (e.g. Add to Watchlist on Dashboard) */
-.ui-card-action-btn--neutral {
-  border-color: color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent))) !important;
-  color: var(--color-accent-blue) !important;
+.ui-poster-card__media-shell .ui-card-action-btn--neutral,
+.recommend-card .ui-card-action-btn--neutral {
+  border-color: color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
+  color: var(--color-accent-blue);
 }
 
-.ui-card-action-btn--neutral:hover {
-  border-color: color-mix(in srgb, var(--color-accent-blue) 80%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent))) !important;
-  background-color: color-mix(in srgb, var(--color-accent-blue) 15%, var(--app-shell-color-panel, black)) !important;
-  color: var(--color-text-primary) !important;
+.ui-poster-card__media-shell .ui-card-action-btn--neutral:hover,
+.recommend-card .ui-card-action-btn--neutral:hover {
+  border-color: color-mix(in srgb, var(--color-accent-blue) 80%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
+  background-color: color-mix(in srgb, var(--color-accent-blue) 15%, var(--app-shell-color-panel, black));
+  color: var(--color-text-primary);
 }
 
 .ui-poster-card__favorite-badge svg {
@@ -397,7 +409,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
 }
 
 .ui-poster-card__performer-link:hover {
-  color: var(--color-accent) !important;
+  color: var(--color-accent);
 }
 
 /* Active Highlight States (e.g. for matching candidate or selected rows) */
@@ -435,7 +447,7 @@ button.ui-poster-card__image-wrapper:hover:not(:disabled) {
 }
 
 .lists-card:hover {
-  transform: translateY(-4px) !important;
+  transform: translateY(-4px);
 }
 
 .lists-card img {
@@ -443,7 +455,7 @@ button.ui-poster-card__image-wrapper:hover:not(:disabled) {
 }
 
 .lists-card:hover img {
-  transform: scale(1.02) !important;
+  transform: scale(1.02);
 }
 
 .lists-card__media {
@@ -462,7 +474,7 @@ button.ui-poster-card__image-wrapper:hover:not(:disabled) {
 }
 
 .lists-card__media.is-blurred {
-  border-color: transparent !important;
+  border-color: transparent;
   isolation: isolate;
   transform: translate3d(0, 0, 0);
   -webkit-transform: translate3d(0, 0, 0);
@@ -575,11 +587,11 @@ button.ui-poster-card__image-wrapper:hover:not(:disabled) {
 }
 
 .ui-poster-card.no-hover-animation:hover {
-  transform: none !important;
+  transform: none;
 }
 
 .ui-poster-card.no-hover-animation:hover .ui-poster-card__image {
-  transform: none !important;
+  transform: none;
 }
 
 .ui-poster-card.no-hover-animation:hover .ui-poster-card__image-wrapper {

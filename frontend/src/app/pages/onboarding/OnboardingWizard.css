@@ -145,11 +145,12 @@
   border: 1px solid transparent;
 }
 
-.onboarding-nav-button:disabled {
+.onboarding-nav-button:disabled,
+.onboarding-nav-button:disabled:hover {
   opacity: 0.5;
   cursor: not-allowed;
-  transform: none !important;
-  box-shadow: none !important;
+  transform: none;
+  box-shadow: none;
 }
 
 .onboarding-content {
@@ -558,16 +559,16 @@
   margin: 0;
 }
 
-.welcome-lang-panel {
+.onboarding-form-panel.welcome-lang-panel {
   display: flex;
   flex-direction: column;
-  align-items: stretch !important;
-  text-align: left !important;
-  justify-content: flex-start !important;
-  padding: 0 !important;
-  border: 1px solid var(--ui-overlay-panel-border) !important;
-  box-shadow: var(--ui-overlay-panel-shadow) !important;
-  background: var(--ui-surface-card-gradient) !important;
+  align-items: stretch;
+  text-align: left;
+  justify-content: flex-start;
+  padding: 0;
+  border: 1px solid var(--ui-overlay-panel-border);
+  box-shadow: var(--ui-overlay-panel-shadow);
+  background: var(--ui-surface-card-gradient);
   position: relative;
   overflow: hidden;
   border-radius: 20px;

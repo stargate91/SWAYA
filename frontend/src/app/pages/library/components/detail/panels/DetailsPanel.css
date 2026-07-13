@@ -129,13 +129,13 @@
   gap: var(--space-xs);
 }
 
-.details-panel__keyword-pill {
+.ui-pill.details-panel__keyword-pill {
   --kw-pad: 4px 10px;
-  background: var(--color-surface-glass) !important;
-  border: 1px solid var(--color-border-default) !important;
-  color: var(--color-text-secondary) !important;
-  font-size: var(--font-size-xs) !important;
-  padding: var(--kw-pad) !important;
-  border-radius: var(--radius-sm) !important;
-  backdrop-filter: blur(8px) !important;
+  background: var(--color-surface-glass);
+  border: 1px solid var(--color-border-default);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  padding: var(--kw-pad);
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(8px);
 }

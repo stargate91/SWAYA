@@ -251,12 +251,12 @@
   max-height: 240px;
   overflow-y: auto;
   z-index: 100;
-  background: color-mix(in srgb, var(--color-text-inverse) 72%, transparent) !important;
-  border: 1px solid color-mix(in srgb, var(--color-text-primary) 9%, transparent) !important;
+  background: color-mix(in srgb, var(--color-text-inverse) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 9%, transparent);
   border-radius: var(--radius-md);
   box-shadow: 0 10px 30px color-mix(in srgb, black 50%, transparent), inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 10%, transparent);
-  backdrop-filter: blur(20px) saturate(125%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(125%) !important;
+  backdrop-filter: blur(20px) saturate(125%);
+  -webkit-backdrop-filter: blur(20px) saturate(125%);
   padding: var(--space-xs);
   display: flex;
   flex-direction: column;

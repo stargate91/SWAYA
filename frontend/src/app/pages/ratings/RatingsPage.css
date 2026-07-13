@@ -40,26 +40,6 @@
   color: var(--color-text-primary);
 }
 
-.ratings-search {
-  display: flex;
-  align-items: center;
-  position: relative;
-  width: 300px;
-}
-
-.ratings-search__icon {
-  position: absolute;
-  left: 10px;
-  color: var(--color-text-muted);
-  pointer-events: none;
-}
-
-.ratings-search input {
-  --local-padding-left: 32px;
-  padding-left: var(--local-padding-left) !important;
-  width: 100%;
-}
-
 /* Heart Toggle Button */
 .fav-heart-btn {
   background: transparent;
@@ -102,22 +82,6 @@
   }
 }
 
-/* Table elements */
-.ratings-row-name {
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-primary);
-}
-
-.ratings-loading-container {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-4xl);
-}
-
-.ratings-pagination-container {
-  margin-top: var(--space-lg);
-}
-
 /* Inline Comment / Review UI */
 .review-preview-cell {
   display: flex;
@@ -141,9 +105,9 @@
   font-size: var(--font-size-xs);
 }
 
-.review-edit-btn {
-  padding: var(--space-xs) var(--space-sm) !important;
-  display: inline-flex !important;
+.ui-button.review-edit-btn {
+  padding: var(--space-xs) var(--space-sm);
+  display: inline-flex;
   gap: var(--space-xs);
   align-items: center;
 }

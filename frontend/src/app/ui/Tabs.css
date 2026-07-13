@@ -84,14 +84,18 @@
   color: var(--color-accent);
 }
 
-.ui-tab__count--warning {
-  background: var(--color-state-warning-bg) !important;
-  color: var(--color-state-warning) !important;
+.ui-tab .ui-tab__count--warning,
+.ui-tab:hover .ui-tab__count--warning,
+.ui-tab.is-active .ui-tab__count--warning {
+  background: var(--color-state-warning-bg);
+  color: var(--color-state-warning);
 }
 
-.ui-tab__count--success {
-  background: var(--color-state-success-bg) !important;
-  color: var(--color-state-success) !important;
+.ui-tab .ui-tab__count--success,
+.ui-tab:hover .ui-tab__count--success,
+.ui-tab.is-active .ui-tab__count--success {
+  background: var(--color-state-success-bg);
+  color: var(--color-state-success);
 }
 
 /* Sub / Secondary Tabs */

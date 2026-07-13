@@ -83,14 +83,22 @@ class SceneDetailService(DetailFormatter):
         
         match = None
         if prov_enum:
+            from sqlalchemy import or_
             match = db.query(MetadataMatch).filter(
                 MetadataMatch.provider == prov_enum,
-                MetadataMatch.external_id == scene_uuid,
+                or_(
+                    MetadataMatch.external_id == scene_uuid,
+                    MetadataMatch.external_id == f"scene_{scene_uuid}"
+                ) if prov_enum == Provider.PORNDB else MetadataMatch.external_id == scene_uuid,
                 MetadataMatch.media_type == MediaType.SCENE
             ).first()
         else:
+            from sqlalchemy import or_
             match = db.query(MetadataMatch).filter(
-                MetadataMatch.external_id == scene_uuid,
+                or_(
+                    MetadataMatch.external_id == scene_uuid,
+                    MetadataMatch.external_id == f"scene_{scene_uuid}"
+                ),
                 MetadataMatch.media_type == MediaType.SCENE
             ).first()
             
@@ -111,6 +119,8 @@ class SceneDetailService(DetailFormatter):
             porndb_scraper = self.scrapers.adult(Provider.PORNDB, db)
             try:
                 scene_data = porndb_scraper.fetch_scene(scene_uuid)
+                if not scene_data:
+                    scene_data = porndb_scraper.fetch_scene(f"scene_{scene_uuid}")
             except Exception:
                 scene_data = None
         else:
@@ -252,7 +262,7 @@ class SceneDetailService(DetailFormatter):
             parent_images = parent_data.get("images") or []
             parent_logo = parent_images[0].get("url") if parent_images else (parent_data.get("logo") or parent_data.get("image") or parent_data.get("poster"))
 
-        match_db = db.query(MetadataMatch).filter(
+        match_db = match or db.query(MetadataMatch).filter(
             MetadataMatch.external_id == scene_uuid,
             MetadataMatch.media_type == MediaType.SCENE
         ).first()
@@ -291,6 +301,8 @@ class SceneDetailService(DetailFormatter):
             self.metadata_syncer.sync_metadata(
                 db, match_db, title, scene_data, poster_url, ext_background, date_str
             )
+            # 2b. Sync performer links so they appear in list views
+            self._sync_performer_links(db, match_db, scene_data, provider_prefix)
 
         local_poster = override.custom_poster if override else None
         local_backdrop = override.custom_backdrop if override else None
@@ -387,3 +399,68 @@ class SceneDetailService(DetailFormatter):
         
         ExternalLinksBuilder.append_links(result, result["external_ids"], "scene")
         return SceneDetailResponse(**result)
+
+    def _sync_performer_links(self, db: Session, match_db: MetadataMatch, scene_data: dict, provider_prefix: str):
+        """Ensure performer links exist in the DB for this match so list views can display them."""
+        from app.domains.people.models import Person, MediaPersonLink, ExternalSourceLink
+        from app.shared_kernel.enums import RoleType
+
+        performers = scene_data.get("performers") or []
+        if not performers:
+            return
+
+        existing_person_ids = {link.person_id for link in match_db.people_links}
+        if existing_person_ids:
+            return  # already has links, skip
+
+        prov_enum = None
+        if provider_prefix in ("stashdb", "stash"):
+            prov_enum = Provider.STASHDB
+        elif provider_prefix == "fansdb":
+            prov_enum = Provider.FANSDB
+        elif provider_prefix in ("porndb", "theporndb"):
+            prov_enum = Provider.PORNDB
+
+        order = 0
+        for p_entry in performers:
+            perf = p_entry.get("performer") or p_entry
+            perf_name = perf.get("name")
+            if not perf_name:
+                continue
+
+            person_db = None
+            perf_ext_id = perf.get("id")
+            if perf_ext_id and prov_enum:
+                link = db.query(ExternalSourceLink).filter(
+                    ExternalSourceLink.provider == prov_enum,
+                    ExternalSourceLink.external_id == str(perf_ext_id)
+                ).first()
+                if link:
+                    person_db = link.person
+
+            if not person_db:
+                person_db = db.query(Person).filter(Person.name == perf_name).first()
+
+            if not person_db:
+                order += 1
+                continue
+
+            if person_db.id in existing_person_ids:
+                order += 1
+                continue
+
+            new_link = MediaPersonLink(
+                match_id=match_db.id,
+                person_id=person_db.id,
+                role=RoleType.ACTOR,
+                order=order
+            )
+            db.add(new_link)
+            existing_person_ids.add(person_db.id)
+            order += 1
+
+        try:
+            db.commit()
+        except Exception as e:
+            logger.debug(f"Failed to sync performer links: {e}")
+            db.rollback()

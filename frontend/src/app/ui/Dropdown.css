@@ -263,8 +263,8 @@
   box-shadow: var(--focus-ring);
 }
 
-.ui-dropdown__menu--sorter {
-  width: auto !important;
+.ui-dropdown__menu.ui-dropdown__menu--sorter {
+  width: auto;
   min-width: 160px;
 }
 

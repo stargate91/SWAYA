@@ -13,7 +13,7 @@
 }
 
 .media-detail-page::after {
-  display: none !important;
+  display: none;
 }
 
 .media-detail-page__hero {
@@ -29,13 +29,13 @@
 .media-detail-page__hero::before,
 .media-detail-page__hero::after,
 .media-detail-page__hero-backdrop::after {
-  display: none !important;
+  display: none;
 }
 
 .media-detail-page__hero-overlay {
   position: absolute;
   inset: 0;
-  display: block !important;
+  display: block;
   background:
     radial-gradient(circle at 50% 22%, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 20%, transparent 44%),
     radial-gradient(circle at 50% 50%, transparent 48%, rgba(0, 0, 0, 0.16) 78%, rgba(0, 0, 0, 0.28) 100%),
@@ -94,7 +94,7 @@
 }
 
 .media-detail-page--scroll-transition .media-detail-page__container {
-  overflow: hidden !important;
+  overflow: hidden;
   height: calc(100vh - var(--page-top-offset, 4rem) - 80px);
   margin-top: var(--page-top-offset, 4rem);
   padding-top: 0;
@@ -176,9 +176,9 @@
 }
 
 .media-detail-page.is-preview-playing .media-detail-page__hero-content-section>*:not(.media-detail-page__center-play-btn) {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  visibility: hidden !important;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
 }
 
 .media-detail-page__top-right-controls {
@@ -186,9 +186,9 @@
 }
 
 .media-detail-page.is-preview-playing .media-detail-page__top-right-controls {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  visibility: hidden !important;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
 }
 
 .shell__utility-bar-bottom {
@@ -196,9 +196,9 @@
 }
 
 .shell:has(.media-detail-page.is-preview-playing) .shell__utility-bar-bottom {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  visibility: hidden !important;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
 }
 
 
@@ -244,38 +244,38 @@
 
 
 /* Theater modal for trailers */
-.theater-modal {
-  background: var(--color-bg-canvas) !important;
-  border-color: var(--color-border-strong) !important;
-  box-shadow: var(--shadow-xl) !important;
+.ui-modal.theater-modal {
+  background: var(--color-bg-canvas);
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-xl);
 }
 
-.theater-modal .ui-modal__header {
-  background: var(--color-bg-canvas) !important;
-  border-bottom-color: var(--color-border-default) !important;
+.ui-modal.theater-modal .ui-modal__header {
+  background: var(--color-bg-canvas);
+  border-bottom-color: var(--color-border-default);
 }
 
-.theater-modal .ui-modal__title {
-  color: var(--color-text-primary) !important;
+.ui-modal.theater-modal .ui-modal__title {
+  color: var(--color-text-primary);
 }
 
-.theater-modal .ui-modal__body {
-  padding: 0 !important;
-  background: black !important;
+.ui-modal.theater-modal .ui-modal__body {
+  padding: 0;
+  background: black;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.theater-modal .ui-modal__close {
-  background: var(--color-bg-elevated) !important;
-  border-color: var(--color-border-strong) !important;
-  color: var(--color-text-secondary) !important;
+.ui-modal.theater-modal .ui-modal__close {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-border-strong);
+  color: var(--color-text-secondary);
 }
 
-.theater-modal .ui-modal__close:hover {
-  background: var(--color-border-heavy) !important;
-  color: var(--color-text-primary) !important;
+.ui-modal.theater-modal .ui-modal__close:hover {
+  background: var(--color-border-heavy);
+  color: var(--color-text-primary);
 }
 
 /* Side Navigation Button Bar */
@@ -493,7 +493,7 @@
 
 @media (max-width: 920px) {
   .media-detail-page__container {
-    padding-right: var(--space-5xl, 24px) !important;
+    padding-right: var(--space-5xl, 24px);
   }
 
   .media-detail-page__side-panel {
@@ -633,8 +633,8 @@
   min-width: 0;
 }
 
-.media-detail-page__header-layout--fallback {
-  margin-top: 0 !important;
+.media-detail-page__header-layout.media-detail-page__header-layout--fallback {
+  margin-top: 0;
 }
 
 @media (max-width: 768px) {
@@ -1070,40 +1070,40 @@
   }
 }
 
-.entity-detail-page__drawer-backdrop--transparent {
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+.ui-drawer-backdrop.entity-detail-page__drawer-backdrop--transparent {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
-.entity-detail-page__drawer--logo .backdrops-grid--logo {
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+.entity-detail-page__drawer--logo .backdrops-grid.backdrops-grid--logo {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .entity-detail-page__drawer--logo .scene-image-picker-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 /* Prevent scrolling when logo drawer is open */
 .logo-drawer-open,
 .logo-drawer-open .media-detail-page__container,
 .logo-drawer-open .media-detail-page__inline-sections {
-  overflow: hidden !important;
-  overflow-y: hidden !important;
+  overflow: hidden;
+  overflow-y: hidden;
 }
 
 /* Glassmorphic cards legibility improvements (Vibrant Shaded Glass) */
-.bespoke-unified-browser-card,
-.bespoke-cast-browser-card,
-.bespoke-boxoffice-card,
-.bespoke-companies-card,
-.bespoke-ratings-card,
-.bespoke-scene-tagger-card,
-.bespoke-scene-peaks-card,
-.bespoke-list-panel-card {
-  background: color-mix(in srgb, var(--color-bg-elevated) 78%, transparent) !important;
-  border: 1px solid var(--color-border-default) !important;
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 16px 40px 0 rgba(0, 0, 0, 0.45) !important;
+.media-detail-page .bespoke-unified-browser-card,
+.media-detail-page .bespoke-cast-browser-card,
+.media-detail-page .bespoke-boxoffice-card,
+.media-detail-page .bespoke-companies-card,
+.media-detail-page .bespoke-ratings-card,
+.media-detail-page .bespoke-scene-tagger-card,
+.media-detail-page .bespoke-scene-peaks-card,
+.media-detail-page .bespoke-list-panel-card {
+  background: color-mix(in srgb, var(--color-bg-elevated) 78%, transparent);
+  border: 1px solid var(--color-border-default);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 16px 40px 0 rgba(0, 0, 0, 0.45);
   /* GPU layer isolation */
   transform: translate3d(0, 0, 0);
   will-change: transform;

@@ -17,15 +17,15 @@
   z-index: calc(var(--z-index-backdrop) + 10);
 }
 
-.ui-lightbox__close-btn {
-  background: var(--color-surface-overlay) !important;
-  color: white !important;
-  border-color: var(--color-border-heavy) !important;
+.ui-lightbox .ui-lightbox__close-btn {
+  background: var(--color-surface-overlay);
+  color: white;
+  border-color: var(--color-border-heavy);
 }
 
-.ui-lightbox__close-btn:hover {
-  background-color: var(--button-primary-neutral-bg) !important;
-  border-color: var(--button-secondary-neutral-border) !important;
+.ui-lightbox .ui-lightbox__close-btn:hover {
+  background-color: var(--button-primary-neutral-bg);
+  border-color: var(--button-secondary-neutral-border);
 }
 
 .ui-lightbox__image {

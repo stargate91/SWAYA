@@ -161,8 +161,8 @@ a {
 .person-credits-row__scroll-container,
 .entity-detail-page--people .entity-detail-page__media-column,
 .entity-detail-page__known-for-grid {
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .no-scrollbar::-webkit-scrollbar,
@@ -178,7 +178,7 @@ a {
 .person-credits-row__scroll-container::-webkit-scrollbar,
 .entity-detail-page--people .entity-detail-page__media-column::-webkit-scrollbar,
 .entity-detail-page__known-for-grid::-webkit-scrollbar {
-  display: none !important;
+  display: none;
 }
 
 .ui-carousel-arrow {
@@ -214,6 +214,6 @@ a {
 
 .ui-carousel-arrow:hover {
   background: color-mix(in srgb, var(--color-text-primary, white) 15%, transparent);
-  transform: translateY(-50%) !important;
+  transform: translateY(-50%);
 }
 

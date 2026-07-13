@@ -37,6 +37,12 @@ class TitleLockReader:
                         MetadataMatch.provider == provider,
                         MetadataMatch.external_id == str(external_id)
                     ).first()
+                    # PornDB stores scene external_ids with 'scene_' prefix
+                    if not match and provider == Provider.PORNDB:
+                        match = self.db.query(MetadataMatch).filter(
+                            MetadataMatch.provider == provider,
+                            MetadataMatch.external_id == f"scene_{external_id}"
+                        ).first()
                     
                     # When multiple matches share the same external_id (e.g. TMDB TV shows
                     # and their episodes), prefer the parent type over episodes

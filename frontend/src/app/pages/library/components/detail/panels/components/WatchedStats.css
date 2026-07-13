@@ -145,22 +145,22 @@
   gap: var(--space-sm);
 }
 
-.watched-panel .season-progress-card {
+.watched-panel .ui-card.season-progress-card {
   padding: var(--space-lg) var(--space-2xl);
-  border: 1px solid var(--media-detail-panel-card-border) !important;
-  border-radius: var(--radius-lg) !important;
-  background: var(--media-detail-panel-card-bg) !important;
-  box-shadow: var(--media-detail-panel-card-shadow) !important;
+  border: 1px solid var(--media-detail-panel-card-border);
+  border-radius: var(--radius-lg);
+  background: var(--media-detail-panel-card-bg);
+  box-shadow: var(--media-detail-panel-card-shadow);
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
   transition: transform var(--motion-emphasized), border-color var(--motion-base), box-shadow var(--motion-base), background var(--motion-base);
 }
 
-.watched-panel .season-progress-card:hover {
-  background: var(--media-detail-panel-card-bg-hover) !important;
-  border-color: var(--media-detail-panel-card-border-hover) !important;
-  box-shadow: var(--media-detail-panel-card-shadow-hover) !important;
+.watched-panel .ui-card.season-progress-card:hover {
+  background: var(--media-detail-panel-card-bg-hover);
+  border-color: var(--media-detail-panel-card-border-hover);
+  box-shadow: var(--media-detail-panel-card-shadow-hover);
   transform: translateY(-1px);
 }
 

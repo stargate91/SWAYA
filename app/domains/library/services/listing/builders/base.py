@@ -36,17 +36,24 @@ class BaseQueryBuilder:
         # Search filter
         if params.search:
             if not joined_localization:
-                query = query.outerjoin(MetadataLocalization, and_(
-                    MetadataLocalization.match_id == MetadataMatch.id,
-                    MetadataLocalization.locale == self.ui_lang
+                from sqlalchemy import case
+                from sqlalchemy.orm import aliased
+                loc_alias = aliased(MetadataLocalization, name="search_loc")
+                target_locale = case(
+                    (MetadataMatch.provider == Provider.TMDB, self.ui_lang),
+                    else_="en"
+                )
+                query = query.outerjoin(loc_alias, and_(
+                    loc_alias.match_id == MetadataMatch.id,
+                    loc_alias.locale == target_locale
                 ))
                 joined_localization = True
             if params.filter_ownership == "tracked":
-                query = query.filter(MetadataLocalization.title.ilike(f"%{params.search}%"))
+                query = query.filter(loc_alias.title.ilike(f"%{params.search}%"))
             else:
                 query = query.filter(
                     or_(
-                        MetadataLocalization.title.ilike(f"%{params.search}%"),
+                        loc_alias.title.ilike(f"%{params.search}%"),
                         MediaItem.filename.ilike(f"%{params.search}%")
                     )
                 )
@@ -86,12 +93,19 @@ class BaseQueryBuilder:
         # Genre filter
         if params.selected_genre:
             if not joined_localization:
-                query = query.outerjoin(MetadataLocalization, and_(
-                    MetadataLocalization.match_id == MetadataMatch.id,
-                    MetadataLocalization.locale == self.ui_lang
+                from sqlalchemy import case
+                from sqlalchemy.orm import aliased
+                loc_alias = aliased(MetadataLocalization, name="search_loc")
+                target_locale = case(
+                    (MetadataMatch.provider == Provider.TMDB, self.ui_lang),
+                    else_="en"
+                )
+                query = query.outerjoin(loc_alias, and_(
+                    loc_alias.match_id == MetadataMatch.id,
+                    loc_alias.locale == target_locale
                 ))
                 joined_localization = True
-            query = query.filter(MetadataLocalization.genres.like(f'%"{params.selected_genre}"%'))
+            query = query.filter(loc_alias.genres.like(f'%"{params.selected_genre}"%'))
 
         # Decade filter
         if params.selected_decade and params.selected_decade.endswith("s") and params.selected_decade[:-1].isdigit():
@@ -139,9 +153,16 @@ class BaseQueryBuilder:
     ) -> Any:
         if params.sort_by in ("title_asc", "title_desc", "default"):
             if not joined_localization:
-                query = query.outerjoin(MetadataLocalization, and_(
-                    MetadataLocalization.match_id == MetadataMatch.id,
-                    MetadataLocalization.locale == self.ui_lang
+                from sqlalchemy import case
+                from sqlalchemy.orm import aliased
+                loc_alias = aliased(MetadataLocalization, name="search_loc")
+                target_locale = case(
+                    (MetadataMatch.provider == Provider.TMDB, self.ui_lang),
+                    else_="en"
+                )
+                query = query.outerjoin(loc_alias, and_(
+                    loc_alias.match_id == MetadataMatch.id,
+                    loc_alias.locale == target_locale
                 ))
                 joined_localization = True
             
@@ -156,7 +177,7 @@ class BaseQueryBuilder:
                 override_item.user_id == self.current_user_id
             ))
             
-            val_col = func.coalesce(override_match.custom_title, override_item.custom_title, MetadataLocalization.title, MediaItem.filename)
+            val_col = func.coalesce(override_match.custom_title, override_item.custom_title, loc_alias.title, MediaItem.filename)
             if params.sort_by == "title_desc":
                 query = query.order_by(desc(val_col))
             else:
@@ -358,7 +379,7 @@ class BaseQueryBuilder:
             o = metadata_overrides.get(match.id)
             p = physical_overrides.get(item.id) if item else None
 
-            title = (o.custom_title if (o and o.custom_title) else (p.custom_title if (p and p.custom_title) else None)) or (loc.title if loc else (item.filename if item else "Unknown"))
+            title = (o.custom_title if (o and o.custom_title) else (p.custom_title if (p and p.custom_title) else None)) or (loc.title if loc else (match.original_title if match.original_title else (item.filename if item else "Unknown")))
             poster_path = (o.custom_poster if (o and o.custom_poster) else (p.custom_poster if (p and p.custom_poster) else None)) or (loc.local_poster_path if (loc and loc.local_poster_path) else (loc.poster_path if loc else None))
             backdrop_path = (o.custom_backdrop if (o and o.custom_backdrop) else (p.custom_backdrop if (p and p.custom_backdrop) else None)) or (match.local_backdrop_path or match.backdrop_path or None)
             rating = (o.user_rating if (o and o.user_rating is not None) else (p.user_rating if (p and p.user_rating is not None) else None))
@@ -472,7 +493,7 @@ class BaseQueryBuilder:
                 last_watched_at = p_lw.isoformat()
 
             formatted_items.append({
-                "id": item.id if item else f"stash_{match.external_id}" if match.media_type == MediaType.SCENE else f"tmdb_{match.external_id}",
+                "id": item.id if item else (f"{match.provider.value}_{match.external_id}" if (match.media_type == MediaType.SCENE and match.provider in (Provider.PORNDB, Provider.FANSDB)) else (f"stash_{match.external_id}" if match.media_type == MediaType.SCENE else f"tmdb_{match.external_id}")),
                 "title": title,
                 "year": match.release_date.year if match.release_date else None,
                 "poster_path": resolved_poster,

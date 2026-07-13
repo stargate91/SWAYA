@@ -545,7 +545,7 @@ class LibraryFilterService:
                                     })
 
                         m_item = {
-                            "id": item.id if item else f"stash_{match.external_id}" if match.media_type == MediaType.SCENE else f"tmdb_{match.external_id}",
+                            "id": item.id if item else (f"{match.provider.value}_{match.external_id}" if (match.media_type == MediaType.SCENE and match.provider in (Provider.PORNDB, Provider.FANSDB)) else (f"stash_{match.external_id}" if match.media_type == MediaType.SCENE else f"tmdb_{match.external_id}")),
                             "title": title,
                             "poster_path": resolved_poster,
                             "backdrop_path": resolved_backdrop,

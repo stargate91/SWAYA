@@ -31,9 +31,9 @@
 }
 
 .person-backdrop-picker__tabs.ui-segmented-control {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fit, minmax(0, 1fr)) !important;
-  width: 100% !important;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  width: 100%;
   min-width: 0;
   overflow: hidden;
 }
@@ -51,9 +51,9 @@
 }
 
 .person-backdrop-picker__source-selector .ui-segmented-control {
-  display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  width: 100% !important;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
 }
 
 .person-backdrop-picker__viewport {
@@ -78,7 +78,7 @@
 }
 
 .person-backdrop-picker__grid.person-backdrop-picker__grid--scenes {
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .person-backdrop-picker__progress-banner {

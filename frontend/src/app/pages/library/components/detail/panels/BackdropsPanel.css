@@ -52,17 +52,17 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.ui-backdrop-card--logo {
-  padding-bottom: 40% !important;
+.ui-backdrop-card.ui-backdrop-card--logo {
+  padding-bottom: 40%;
 }
 
-.ui-backdrop-card--logo .ui-backdrop-card__img {
-  object-fit: contain !important;
+.ui-backdrop-card.ui-backdrop-card--logo .ui-backdrop-card__img {
+  object-fit: contain;
   background: var(--color-surface-glass);
   padding: var(--space-md);
   box-sizing: border-box;
 }
 
-.ui-backdrop-card--poster {
-  padding-bottom: 150% !important; /* 2:3 aspect ratio */
+.ui-backdrop-card.ui-backdrop-card--poster {
+  padding-bottom: 150%; /* 2:3 aspect ratio */
 }

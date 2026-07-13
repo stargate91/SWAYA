@@ -123,40 +123,40 @@
   font-size: var(--font-size-xs);
 }
 
-.history-card__stat-badge--total {
-  background: color-mix(in srgb, var(--accent-color) 6%, var(--ui-control-bg-subtle)) !important;
-  border-color: color-mix(in srgb, var(--accent-color) 25%, var(--color-border-default)) !important;
+.history-card__stat-badge.history-card__stat-badge--total {
+  background: color-mix(in srgb, var(--accent-color) 6%, var(--ui-control-bg-subtle));
+  border-color: color-mix(in srgb, var(--accent-color) 25%, var(--color-border-default));
 }
 
-.history-card__stat-badge--total .history-card__badge-val {
-  color: var(--accent-color, var(--color-state-success)) !important;
+.history-card__stat-badge.history-card__stat-badge--total .history-card__badge-val {
+  color: var(--accent-color, var(--color-state-success));
 }
 
-.history-card__stat-badge--failed {
-  background: color-mix(in srgb, var(--color-state-danger) 6%, transparent) !important;
-  border-color: color-mix(in srgb, var(--color-state-danger) 15%, transparent) !important;
+.history-card__stat-badge.history-card__stat-badge--failed {
+  background: color-mix(in srgb, var(--color-state-danger) 6%, transparent);
+  border-color: color-mix(in srgb, var(--color-state-danger) 15%, transparent);
 }
 
-.history-card__stat-badge--failed .history-card__badge-val {
-  color: var(--color-state-danger) !important;
+.history-card__stat-badge.history-card__stat-badge--failed .history-card__badge-val {
+  color: var(--color-state-danger);
 }
 
-.history-card__stat-badge--undone {
-  background: color-mix(in srgb, var(--color-text-muted) 6%, transparent) !important;
-  border-color: color-mix(in srgb, var(--color-text-muted) 15%, transparent) !important;
+.history-card__stat-badge.history-card__stat-badge--undone {
+  background: color-mix(in srgb, var(--color-text-muted) 6%, transparent);
+  border-color: color-mix(in srgb, var(--color-text-muted) 15%, transparent);
 }
 
-.history-card__stat-badge--undone .history-card__badge-val {
-  color: var(--color-text-muted) !important;
+.history-card__stat-badge.history-card__stat-badge--undone .history-card__badge-val {
+  color: var(--color-text-muted);
 }
 
-.history-card__stat-badge--remaining {
-  background: color-mix(in srgb, var(--color-state-warning) 6%, transparent) !important;
-  border-color: color-mix(in srgb, var(--color-state-warning) 15%, transparent) !important;
+.history-card__stat-badge.history-card__stat-badge--remaining {
+  background: color-mix(in srgb, var(--color-state-warning) 6%, transparent);
+  border-color: color-mix(in srgb, var(--color-state-warning) 15%, transparent);
 }
 
-.history-card__stat-badge--remaining .history-card__badge-val {
-  color: var(--color-state-warning) !important;
+.history-card__stat-badge.history-card__stat-badge--remaining .history-card__badge-val {
+  color: var(--color-state-warning);
 }
 
 .history-card__badge-val {
@@ -172,8 +172,8 @@
 }
 
 /* For undone (closed) cards, bring all stat values (including total) to match the icon color */
-.history-card--undone .history-card__badge-val {
-  color: var(--accent-color) !important;
+.history-card.history-card--undone .history-card__badge-val {
+  color: var(--accent-color);
 }
 
 .history-card__main-row {

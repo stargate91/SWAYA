@@ -169,30 +169,30 @@
 }
 
 .ui-modal--danger .ui-icon-button-wrapper {
-  border-radius: var(--radius-sm, var(--radius-sm)) !important;
-  border-color: color-mix(in srgb, var(--color-state-danger) 30%, var(--color-border-heavy)) !important;
-  background: color-mix(in srgb, var(--color-state-danger) 10%, var(--color-surface-glass)) !important;
-  box-shadow: var(--shadow-sm) !important;
+  border-radius: var(--radius-sm, var(--radius-sm));
+  border-color: color-mix(in srgb, var(--color-state-danger) 30%, var(--color-border-heavy));
+  background: color-mix(in srgb, var(--color-state-danger) 10%, var(--color-surface-glass));
+  box-shadow: var(--shadow-sm);
 }
 
 .ui-modal--danger .ui-icon-button-wrapper:hover {
-  background: color-mix(in srgb, var(--color-state-danger) 24%, var(--color-surface-glass)) !important;
-  border-color: color-mix(in srgb, var(--color-state-danger) 46%, var(--color-border-heavy)) !important;
-  box-shadow: var(--shadow-md) !important;
-  transform: translateY(-0.5px) !important;
+  background: color-mix(in srgb, var(--color-state-danger) 24%, var(--color-surface-glass));
+  border-color: color-mix(in srgb, var(--color-state-danger) 46%, var(--color-border-heavy));
+  box-shadow: var(--shadow-md);
+  transform: translateY(-0.5px);
 }
 
 .ui-modal--danger .ui-icon-button-wrapper:focus-within {
-  border-color: color-mix(in srgb, var(--color-state-danger) 62%, var(--color-border-heavy)) !important;
-  box-shadow: var(--focus-ring-danger) !important;
+  border-color: color-mix(in srgb, var(--color-state-danger) 62%, var(--color-border-heavy));
+  box-shadow: var(--focus-ring-danger);
 }
 
 .ui-modal--danger .ui-icon-button-wrapper .ui-icon-button {
-  color: color-mix(in srgb, var(--color-state-danger) 40%, white 60%) !important;
+  color: color-mix(in srgb, var(--color-state-danger) 40%, white 60%);
 }
 
 .ui-modal--danger .ui-icon-button-wrapper:hover .ui-icon-button {
-  color: white !important;
+  color: white;
 }
 
 .ui-modal__actions-list {

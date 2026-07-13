@@ -56,15 +56,15 @@
   padding: var(--space-3xl);
 }
 
-.ui-card--danger {
-  border: 1px solid var(--ui-surface-danger-border) !important;
+.ui-card.ui-card--danger {
+  border: 1px solid var(--ui-surface-danger-border);
   background: 
     linear-gradient(180deg, var(--ui-surface-danger-tint) 0%, transparent 50%),
-    var(--ui-surface-card-gradient) !important;
-  box-shadow: var(--ui-surface-danger-shadow), var(--shadow-md) !important;
+    var(--ui-surface-card-gradient);
+  box-shadow: var(--ui-surface-danger-shadow), var(--shadow-md);
 }
 
-.ui-card--danger .ui-card__eyebrow {
-  color: var(--color-state-danger) !important;
+.ui-card.ui-card--danger .ui-card__eyebrow {
+  color: var(--color-state-danger);
   font-weight: var(--font-weight-semibold);
 }

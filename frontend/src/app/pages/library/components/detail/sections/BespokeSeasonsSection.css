@@ -594,9 +594,9 @@
 }
 
 .bespoke-cast-browser-card__body .dashboard-cast-grid {
-  display: flex !important;
-  justify-content: flex-start !important;
-  grid-template-columns: none !important;
+  display: flex;
+  justify-content: flex-start;
+  grid-template-columns: none;
   overflow-x: auto;
   gap: var(--space-md);
   flex: 1;
@@ -844,7 +844,7 @@
 .ui-drawer .details-panel__section-title {
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-text-faint) !important;
+  color: var(--color-text-faint);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-top: 0;
@@ -882,20 +882,20 @@
 }
 
 /* Filtered Cast Card (nsfw gender preference) */
-.dashboard-cast-card--filtered {
-  cursor: default !important;
+.dashboard-cast-card.dashboard-cast-card--filtered {
+  cursor: default;
   opacity: 0.45;
 }
 
-.dashboard-cast-card--filtered:hover {
-  transform: none !important;
+.dashboard-cast-card.dashboard-cast-card--filtered:hover {
+  transform: none;
 }
 
-.dashboard-cast-card__avatar-wrapper--filtered {
+.dashboard-cast-card__avatar-wrapper.dashboard-cast-card__avatar-wrapper--filtered {
   --local-border: 1px dashed rgba(255, 255, 255, 0.3);
-  border: var(--local-border) !important;
+  border: var(--local-border);
   --local-bg: rgba(255, 255, 255, 0.02);
-  background: var(--local-bg) !important;
+  background: var(--local-bg);
 }
 
 /* Lightbox styles */

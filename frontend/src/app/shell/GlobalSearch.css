@@ -251,13 +251,13 @@
 
 /* Ensure AdultOverlay unblurs on result item hover */
 .global-search__poster-container .ui-adult-overlay {
-  background: transparent !important;
+  background: transparent;
   inset: 0;
 }
 
 .global-search__result-item:hover .ui-adult-overlay--blur {
-  backdrop-filter: blur(0px) !important;
-  -webkit-backdrop-filter: blur(0px) !important;
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
   background: transparent;
   opacity: 0;
 }

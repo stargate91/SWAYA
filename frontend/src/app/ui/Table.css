@@ -114,15 +114,15 @@
   text-align: right;
 }
 
-.ui-table__empty {
-  text-align: center !important;
+.ui-table td.ui-table__empty {
+  text-align: center;
   color: var(--color-muted);
-  padding: var(--space-sm) var(--space-2xl) !important;
+  padding: var(--space-sm) var(--space-2xl);
   font-style: italic;
 }
 
 .ui-table tr:hover td:last-child {
-  overflow: visible !important;
+  overflow: visible;
 }
 
 .ui-table__row-actions {

@@ -113,10 +113,10 @@
   color: var(--color-ink);
 }
 
-.window-titlebar__button--close:hover {
+.window-titlebar__button.window-titlebar__button--close:hover {
   --close-hover-bg: var(--color-state-danger);
-  background: var(--close-hover-bg) !important;
-  color: var(--color-text-primary) !important;
+  background: var(--close-hover-bg);
+  color: var(--color-text-primary);
 }
 
 .window-titlebar__button:active {
@@ -124,34 +124,34 @@
   background: var(--btn-active-bg);
 }
 
-.window-titlebar__button--close:active {
+.window-titlebar__button.window-titlebar__button--close:active {
   --close-active-bg: color-mix(in srgb, var(--color-state-danger) 60%, white);
-  background: var(--close-active-bg) !important;
-  color: var(--color-text-primary) !important;
+  background: var(--close-active-bg);
+  color: var(--color-text-primary);
 }
 
-.window-titlebar__button--adult-toggle {
+.window-titlebar__button.window-titlebar__button--adult-toggle {
   margin-right: var(--space-4xl);
   color: var(--color-muted);
   width: 32px;
   height: 32px;
   border-radius: var(--radius-sm);
-  box-shadow: none !important;
-  background: transparent !important;
+  box-shadow: none;
+  background: transparent;
   align-self: center;
 }
 
-.window-titlebar__button--adult-toggle:hover {
-  background: var(--ui-utility-button-bg-hover) !important;
+.window-titlebar__button.window-titlebar__button--adult-toggle:hover {
+  background: var(--ui-utility-button-bg-hover);
   color: var(--color-text-primary);
 }
 
-.window-titlebar__button--adult-toggle.is-nsfw {
-  color: var(--color-state-danger) !important;
+.window-titlebar__button.window-titlebar__button--adult-toggle.is-nsfw {
+  color: var(--color-state-danger);
 }
 
-.window-titlebar__button--adult-toggle.is-nsfw:hover {
-  background: var(--ui-utility-button-bg-hover) !important;
+.window-titlebar__button.window-titlebar__button--adult-toggle.is-nsfw:hover {
+  background: var(--ui-utility-button-bg-hover);
 }
 
 .window-titlebar__actions .ui-tooltip {
@@ -170,29 +170,29 @@
   -webkit-app-region: no-drag;
 }
 
-.window-titlebar__nav-btn {
-  width: 32px !important;
-  height: 32px !important;
-  padding: 0 !important;
+.window-titlebar__nav-btn.window-titlebar__nav-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-sm, var(--radius-sm)) !important;
-  background: transparent !important;
-  border: none !important;
-  color: var(--color-text-secondary) !important;
+  border-radius: var(--radius-sm, var(--radius-sm));
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
   cursor: pointer;
   transition: background var(--motion-fast), color var(--motion-fast);
 }
 
-.window-titlebar__nav-btn:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--color-ink) 5%, transparent) !important;
-  color: var(--color-ink) !important;
+.window-titlebar__nav-btn.window-titlebar__nav-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-ink) 5%, transparent);
+  color: var(--color-ink);
 }
 
-.window-titlebar__nav-btn:focus-visible {
-  outline: none !important;
-  box-shadow: inset 0 0 0 2px var(--color-accent) !important;
+.window-titlebar__nav-btn.window-titlebar__nav-btn:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--color-accent);
 }
 
 .window-titlebar__nav-btn:disabled {
