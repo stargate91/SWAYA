@@ -32,7 +32,7 @@
 @import './styles/layout_clean.css';
 @import './styles/components.css';
 @import './pages/organizer/OrganizerPage.css';
-@import './styles/SettingsPage.css';
+@import './pages/settings/SettingsPage.css';
 @import './pages/about/AboutPage.css';
 @import './styles/responsive.css';
 @import './ui/PosterCard.css';

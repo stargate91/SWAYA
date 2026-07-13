@@ -17,7 +17,7 @@ const files = [
   'src/app/pages/dashboard/DashboardPage.css',
   'src/app/pages/history/HistoryPage.css',
   'src/app/pages/library/LibraryPage.css',
-  'src/app/styles/settings/forms.css',
+  'src/app/pages/settings/styles/forms.css',
   'src/app/pages/library/components/detail/MediaHeaderInfo.css',
   'src/app/pages/library/components/detail/MediaOverview.css',
   'src/app/pages/library/components/detail/UserRatingSection.css',
