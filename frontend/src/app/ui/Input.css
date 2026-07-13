@@ -13,7 +13,7 @@
 .ui-select {
   width: 100%;
   min-height: var(--ui-control-height-md);
-  padding: 0 var(--space-2xl);
+  padding: 0 var(--space-lg);
   border-radius: var(--ui-control-radius);
   border: 1px solid var(--ui-control-border);
   background: var(--color-input-bg, var(--ui-control-bg));
@@ -29,7 +29,7 @@
 .ui-input--sm {
   min-height: var(--ui-control-height-sm);
   font-size: var(--font-size-xs);
-  padding: 0 var(--space-lg);
+  padding: 0 var(--space-md);
   border-radius: var(--ui-control-radius-sm);
 }
 
@@ -78,13 +78,13 @@
 
 .ui-input__toggle {
   position: absolute;
-  right: var(--space-lg);
+  right: var(--space-md);
   top: 50%;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-2xs);
+  padding: var(--space-xs);
   border: 0;
   background: none;
   color: var(--color-text-secondary);
@@ -111,7 +111,7 @@
 
 .ui-input__left-element {
   position: absolute;
-  left: var(--space-lg);
+  left: var(--space-md);
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -126,7 +126,7 @@
 
 .ui-input__right-element {
   position: absolute;
-  right: var(--space-lg);
+  right: var(--space-md);
   top: 50%;
   transform: translateY(-50%);
   display: flex;

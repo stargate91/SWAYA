@@ -35,7 +35,7 @@
 }
 
 .entity-detail-page__links-popover-header {
-  --header-padding: var(--space-sm) var(--space-lg);
+  --header-padding: var(--space-sm) var(--space-md);
   padding: var(--header-padding);
   font-size: 0.72rem;
   font-weight: var(--font-weight-extrabold);
@@ -50,7 +50,7 @@
   flex-wrap: wrap;
   --popover-gap: 0.375rem;
   gap: var(--popover-gap);
-  --popover-grid-padding: var(--space-lg);
+  --popover-grid-padding: var(--space-md);
   padding: var(--popover-grid-padding);
 }
 

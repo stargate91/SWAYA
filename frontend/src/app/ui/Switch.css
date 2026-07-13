@@ -1,7 +1,7 @@
 .ui-switch-container {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   cursor: pointer;
   user-select: none;
   font-family: var(--font-sans);
@@ -17,7 +17,7 @@
 .ui-switch {
   position: relative;
   width: var(--button-height-md);
-  height: var(--space-4xl);
+  height: var(--space-2xl);
   flex-shrink: 0;
 }
 
@@ -49,7 +49,7 @@
   height: var(--font-size-lg);
   border-radius: 50%;
   background: var(--color-text-secondary);
-  box-shadow: 0 var(--radius-2xs) var(--space-2xs) color-mix(in srgb, black 25%, transparent);
+  box-shadow: 0 var(--radius-2xs) var(--space-xs) color-mix(in srgb, black 25%, transparent);
   transition: transform var(--motion-emphasized), background-color var(--motion-emphasized);
 }
 
@@ -59,7 +59,7 @@
 }
 
 .ui-switch__input:checked + .ui-switch__track .ui-switch__thumb {
-  transform: translateX(var(--space-3xl));
+  transform: translateX(var(--space-xl));
   background: var(--color-text-primary);
 }
 

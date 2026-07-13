@@ -1,7 +1,7 @@
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(var(--space-lg));
+    transform: translateY(var(--space-md));
   }
 
   to {
@@ -17,8 +17,8 @@
 .history-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xl);
-  margin-top: var(--space-3xl);
+  gap: var(--space-lg);
+  margin-top: var(--space-xl);
 }
 
 .history-card {
@@ -28,7 +28,7 @@
   border-radius: var(--radius-md);
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border-subtle, var(--color-surface-glass));
-  box-shadow: 0 var(--space-2xs) var(--space-lg) color-mix(in srgb, black 15%, transparent);
+  box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, black 15%, transparent);
   transition: all var(--motion-slow);
   position: relative;
   overflow: hidden;
@@ -59,7 +59,7 @@
   box-shadow: inset 0 0 0 1px var(--color-border-subtle);
   color: var(--accent-color, var(--color-accent));
   flex-shrink: 0;
-  margin-right: var(--space-2xl);
+  margin-right: var(--space-lg);
   position: relative;
   z-index: 2;
   transition: all var(--motion-base);
@@ -78,14 +78,14 @@
 .history-card__header {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   flex-wrap: wrap;
 }
 
 .history-card__meta {
   display: flex;
   align-items: center;
-  gap: var(--space-2xl);
+  gap: var(--space-lg);
   font-size: var(--font-size-sm);
   color: var(--text-color-secondary);
   flex-wrap: wrap;
@@ -95,7 +95,7 @@
 .history-card__meta-item {
   display: flex;
   align-items: center;
-  gap: calc(var(--space-2xs) * 1.5);
+  gap: calc(var(--space-xs) * 1.5);
 }
 
 .history-card__right {
@@ -108,17 +108,17 @@
 .history-card__detailed-stats {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   flex-wrap: wrap;
 }
 
 .history-card__stat-badge {
   display: inline-flex;
   align-items: baseline;
-  gap: var(--space-2xs);
+  gap: var(--space-xs);
   background: var(--ui-control-bg-subtle);
   border: 1px solid color-mix(in srgb, var(--accent-color) 12%, var(--color-border-subtle));
-  padding: var(--space-2xs) var(--space-lg);
+  padding: var(--space-xs) var(--space-md);
   border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
 }
@@ -180,7 +180,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-3xl);
+  padding: var(--space-xl);
   width: 100%;
 }
 
@@ -193,7 +193,7 @@
   .history-card__main-row {
     flex-direction: column;
     align-items: stretch;
-    gap: var(--space-2xl);
+    gap: var(--space-lg);
   }
 
   .history-card__right {
@@ -210,7 +210,7 @@
 .history-card__details {
   border-top: 1px solid var(--color-border-subtle);
   background: color-mix(in srgb, var(--color-bg-canvas) 35%, transparent);
-  padding: var(--space-2xl) var(--space-3xl) var(--space-3xl) var(--space-3xl);
+  padding: var(--space-lg) var(--space-xl) var(--space-xl) var(--space-xl);
 }
 
 .history-card__files-title {
@@ -219,7 +219,7 @@
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-md);
 }
 
 .history-card__files-list {
@@ -248,8 +248,8 @@
 .history-card__file-item {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xs);
-  padding: var(--space-sm) var(--space-lg);
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
   background: var(--ui-control-bg-subtle);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-sm);
@@ -259,7 +259,7 @@
 .history-card__file-paths {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   flex-wrap: nowrap;
   min-width: 0;
 }
@@ -311,7 +311,7 @@
 .history-undo-modal__warning {
   color: var(--text-color-primary);
   font-size: var(--font-size-md);
-  margin: 0 0 var(--space-2xl) 0;
+  margin: 0 0 var(--space-lg) 0;
 }
 
 .history-undo-modal__details {
@@ -319,7 +319,7 @@
   flex-direction: column;
   gap: var(--space-sm);
   background: var(--ui-surface-soft);
-  padding: var(--space-lg);
+  padding: var(--space-md);
   border-radius: var(--radius-md);
 }
 
@@ -346,25 +346,25 @@
 .history-undo-modal__footer {
   display: flex;
   justify-content: flex-end;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   width: 100%;
 }
 
 .history-page__loading-container {
   display: flex;
   justify-content: center;
-  padding: var(--space-6xl);
+  padding: var(--space-4xl);
 }
 
 .history-page__empty-container {
-  margin-top: var(--space-3xl);
+  margin-top: var(--space-xl);
 }
 
 .history-page__tab-selector {
   display: flex;
   justify-content: center;
-  margin-top: var(--space-2xl);
-  margin-bottom: var(--space-2xl);
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-lg);
 }
 
 /* Watched History Styles */
@@ -375,18 +375,18 @@
 .watched-history-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xl);
-  margin-top: var(--space-3xl);
+  gap: var(--space-lg);
+  margin-top: var(--space-xl);
 }
 
 .watched-history-card {
   display: flex;
   align-items: center;
-  padding: var(--space-2xl);
+  padding: var(--space-lg);
   border-radius: var(--radius-md);
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border-subtle, var(--color-surface-glass));
-  box-shadow: 0 var(--space-2xs) var(--space-lg) color-mix(in srgb, black 15%, transparent);
+  box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, black 15%, transparent);
   transition: all var(--motion-slow);
   position: relative;
   overflow: hidden;
@@ -408,7 +408,7 @@
 
 .watched-history-card__poster-wrapper {
   width: var(--layout-window-titlebar-height);
-  height: var(--space-8xl);
+  height: var(--space-6xl);
   border-radius: var(--radius-sm);
   overflow: hidden;
   background: var(--ui-surface-soft);
@@ -416,7 +416,7 @@
                   0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
   box-shadow: var(--poster-shadow);
   flex-shrink: 0;
-  margin-right: var(--space-2xl);
+  margin-right: var(--space-lg);
   position: relative;
   z-index: 2;
   --local-transition: width 0.2s ease;
@@ -484,7 +484,7 @@
 .watched-history-card__meta {
   display: flex;
   align-items: center;
-  gap: var(--space-2xl);
+  gap: var(--space-lg);
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   flex-wrap: wrap;
@@ -493,13 +493,13 @@
 .watched-history-card__meta-item {
   display: flex;
   align-items: center;
-  gap: var(--space-2xs);
+  gap: var(--space-xs);
 }
 
 .watched-history-card__status {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2xs);
+  gap: var(--space-xs);
   --status-padding: var(--radius-2xs) var(--space-sm);
   padding: var(--status-padding);
   border-radius: var(--radius-sm);
@@ -523,8 +523,8 @@
 
 .watched-history-card.is-active {
   border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border-subtle));
-  box-shadow: 0 0 var(--space-lg) color-mix(in srgb, var(--color-accent) 15%, transparent),
-              0 var(--space-2xs) var(--space-lg) color-mix(in srgb, black 25%, transparent);
+  box-shadow: 0 0 var(--space-md) color-mix(in srgb, var(--color-accent) 15%, transparent),
+              0 var(--space-xs) var(--space-md) color-mix(in srgb, black 25%, transparent);
 }
 
 .watched-history-card__status--active {
@@ -540,7 +540,7 @@
   border-radius: 50%;
   background: var(--color-accent);
   display: inline-block;
-  margin-right: var(--space-2xs);
+  margin-right: var(--space-xs);
 }
 
 .watched-history-card__status-dot--pulsing {
@@ -570,7 +570,7 @@
 .watched-history-card__active-info {
   display: flex;
   align-items: center;
-  gap: var(--space-2xs);
+  gap: var(--space-xs);
   color: var(--color-text-secondary);
 }
 
@@ -584,7 +584,7 @@
 }
 
 .watched-history-card__progress-bar-wrapper {
-  height: var(--space-2xs);
+  height: var(--space-xs);
   width: 15rem;
   background: var(--color-border-subtle);
   border-radius: var(--radius-full);
@@ -623,24 +623,24 @@
   align-items: center;
   position: relative;
   z-index: 2;
-  margin-left: var(--space-2xl);
+  margin-left: var(--space-lg);
 }
 
 .watched-history-page__loading-container {
   display: flex;
   justify-content: center;
-  padding: var(--space-6xl);
+  padding: var(--space-4xl);
 }
 
 .watched-history-page__empty-container {
-  margin-top: var(--space-3xl);
+  margin-top: var(--space-xl);
 }
 
 @media (max-width: 40rem) {
   .watched-history-card {
     flex-direction: column;
     align-items: stretch;
-    gap: var(--space-2xl);
+    gap: var(--space-lg);
   }
 
   .watched-history-card__right {
@@ -655,8 +655,8 @@
 
 .history-sentinel,
 .watched-sentinel {
-  height: calc(2 * var(--space-3xl));
-  margin: var(--space-2xl) 0;
+  height: calc(2 * var(--space-xl));
+  margin: var(--space-lg) 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -676,7 +676,7 @@
 }
 
 .history-card__toggle-btn span {
-  margin-left: var(--space-2xs);
+  margin-left: var(--space-xs);
 }
 
 .watched-history-card__poster.is-zoomable {

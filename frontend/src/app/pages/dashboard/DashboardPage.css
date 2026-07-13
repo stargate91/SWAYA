@@ -8,7 +8,7 @@
 }
 
 .dashboard-header {
-  margin-bottom: var(--space-6xl);
+  margin-bottom: var(--space-4xl);
 }
 
 .dashboard-header__title {
@@ -34,20 +34,20 @@
 
 
 .shell__content:has(.dashboard-page) {
-  padding-bottom: var(--space-5xl);
+  padding-bottom: var(--space-3xl);
 }
 
 .dashboard-widget__loading {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-6xl);
+  padding: var(--space-4xl);
 }
 
 /* Dashboard Drawer Customizer Styles */
 .ui-drawer.dashboard-customizer-drawer {
   background: var(--color-surface-overlay, var(--color-panel-strong));
-  box-shadow: var(--shadow-overlay-strong, 0 var(--space-lg) 2.5rem color-mix(in srgb, black 40%, transparent));
+  box-shadow: var(--shadow-overlay-strong, 0 var(--space-md) 2.5rem color-mix(in srgb, black 40%, transparent));
 }
 
 .dashboard-utility-bar-wrapper {
@@ -69,7 +69,7 @@
   border: 1px solid var(--media-detail-side-nav-border, color-mix(in srgb, white 8%, transparent));
   color: var(--color-text-secondary);
   backdrop-filter: var(--glass-blur);
-  box-shadow: 0 var(--space-2xs) var(--space-lg) color-mix(in srgb, black 10%, transparent);
+  box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, black 10%, transparent);
   opacity: 0.6;
   transition: all var(--motion-duration-base) var(--motion-ease-standard);
   width: 2.5rem;
@@ -85,10 +85,10 @@
 }
 
 .dashboard-customizer-content {
-  padding: var(--space-4xl);
+  padding: var(--space-2xl);
   display: flex;
   flex-direction: column;
-  gap: var(--space-3xl);
+  gap: var(--space-xl);
   max-height: calc(100vh - 5rem);
   overflow-y: auto;
 }
@@ -103,20 +103,20 @@
 .dashboard-customizer-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xl);
+  gap: var(--space-lg);
 }
 
 .dashboard-customizer-child-switches {
-  padding-left: var(--space-6xl);
+  padding-left: var(--space-4xl);
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
-  margin-top: var(--space-lg);
+  gap: var(--space-md);
+  margin-top: var(--space-md);
 }
 
 .dashboard-customizer-item {
   background: var(--color-bg-panel, color-mix(in srgb, white 2%, transparent));
-  padding: var(--space-2xl);
+  padding: var(--space-lg);
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border, color-mix(in srgb, white 6%, transparent));
   box-shadow: none;
@@ -127,7 +127,7 @@
 .dashboard-customizer-item.is-drag-over {
   background: var(--color-surface-hover, color-mix(in srgb, var(--color-accent-blue) 8%, transparent));
   border: 1px dashed var(--color-accent-blue);
-  box-shadow: 0 0 var(--space-lg) color-mix(in srgb, var(--color-accent-blue) 15%, transparent);
+  box-shadow: 0 0 var(--space-md) color-mix(in srgb, var(--color-accent-blue) 15%, transparent);
 }
 
 .dashboard-customizer-item-header {
@@ -139,7 +139,7 @@
 .dashboard-customizer-item-left {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .dashboard-customizer-grip {
@@ -155,13 +155,13 @@
 
 /* Error widget styles to avoid forbidden style props */
 .dashboard-widget--error {
-  padding: var(--space-6xl);
+  padding: var(--space-4xl);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   min-height: var(--ui-overlay-sidebar-width);
 }
 

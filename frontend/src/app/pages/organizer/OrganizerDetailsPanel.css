@@ -68,7 +68,7 @@
   display: flex;
   align-items: center;
   min-height: 2.5rem;
-  padding: 0 var(--space-2xl);
+  padding: 0 var(--space-lg);
 }
 
 .organizer-details__title {
@@ -188,7 +188,7 @@
   left: 50%;
   bottom: 0.875rem;
   transform: translateX(-50%);
-  padding: var(--space-2xs) var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-full);
   background: color-mix(in srgb, black 48%, transparent);
   color: color-mix(in srgb, white 84%, transparent);
@@ -214,7 +214,7 @@
 
 .organizer-details__field {
   min-width: 0;
-  padding: var(--space-lg) var(--space-lg);
+  padding: var(--space-md) var(--space-md);
 }
 
 .organizer-details__field .ui-tooltip {
@@ -224,7 +224,7 @@
 .organizer-details__actions {
   display: flex;
   justify-content: flex-start;
-  padding-top: var(--space-2xs);
+  padding-top: var(--space-xs);
 }
 
 .organizer-details__inspect-button.ui-button {
@@ -255,14 +255,14 @@
 }
 
 .organizer-details__empty-state {
-  margin-top: var(--space-6xl);
+  margin-top: var(--space-4xl);
   animation: fadeIn var(--motion-base);
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(var(--space-2xs));
+    transform: translateY(var(--space-xs));
   }
   to {
     opacity: 1;
@@ -274,7 +274,7 @@
   margin: 0;
   max-height: 60vh;
   overflow: auto;
-  padding: var(--space-2xl);
+  padding: var(--space-lg);
   border-radius: var(--radius-md);
   background: var(--color-surface-glass);
   border: 1px solid var(--color-border-subtle);
@@ -305,7 +305,7 @@
 .organizer-main.is-details-collapsed .organizer-details__poster-card,
 .organizer-main.is-details-collapsed .organizer-details__backdrop-card {
   opacity: 0;
-  transform: translateX(var(--space-lg)) scale(0.96);
+  transform: translateX(var(--space-md)) scale(0.96);
 }
 
 .organizer-main.is-details-collapsed .organizer-details__poster-image {

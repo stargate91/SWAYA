@@ -7,7 +7,7 @@
 
 .ui-scroll-row-track {
   display: flex;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   overflow-x: auto;
   scroll-behavior: smooth;
 }
@@ -60,11 +60,11 @@
 }
 
 .ui-scroll-row-container--size-sm .ui-carousel-arrow.is-left {
-  left: var(--space-2xs);
+  left: var(--space-xs);
 }
 
 .ui-scroll-row-container--size-sm .ui-carousel-arrow.is-right {
-  right: var(--space-2xs);
+  right: var(--space-xs);
 }
 
 .ui-scroll-row-container--size-sm .ui-carousel-arrow:hover {

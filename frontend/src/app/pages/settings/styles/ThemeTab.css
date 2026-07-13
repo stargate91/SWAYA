@@ -1,7 +1,7 @@
 .theme-tab-container {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3xl);
+  gap: var(--space-xl);
 }
 
 .theme-tab-header {
@@ -25,7 +25,7 @@
 .theme-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(13.125rem, 1fr));
-  gap: var(--space-2xl);
+  gap: var(--space-lg);
   margin-top: var(--space-sm);
 }
 
@@ -33,7 +33,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 var(--space-2xs);
+  padding: 0 var(--space-xs);
   width: 100%;
 }
 

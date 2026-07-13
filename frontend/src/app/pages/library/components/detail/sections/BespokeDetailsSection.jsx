@@ -30,7 +30,7 @@ export default function BespokeDetailsSection({ item, t }) {
   const companies = item.companies || [];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4xl)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2xl)' }}>
       {ratings.length > 0 && (
         <div className="dashboard-section">
           <h4 className="dashboard-section__title">{t('library.details.ratingsSection') || 'Ratings'}</h4>

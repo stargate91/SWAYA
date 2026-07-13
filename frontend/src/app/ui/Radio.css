@@ -22,8 +22,8 @@
 
 .ui-radio {
   display: inline-block;
-  width: var(--space-2xl);
-  height: var(--space-2xl);
+  width: var(--space-lg);
+  height: var(--space-lg);
   border-radius: var(--radius-full);
   border: 1px solid var(--color-border-heavy);
   background: var(--color-surface-glass);
@@ -49,8 +49,8 @@
   content: '';
   position: absolute;
   display: none;
-  left: var(--space-2xs);
-  top: var(--space-2xs);
+  left: var(--space-xs);
+  top: var(--space-xs);
   width: var(--space-sm);
   height: var(--space-sm);
   border-radius: var(--radius-full);

@@ -72,8 +72,8 @@
 }
 
 .ui-backdrop-card__spinner {
-  width: var(--space-4xl);
-  height: var(--space-4xl);
+  width: var(--space-2xl);
+  height: var(--space-2xl);
   border: 2px solid var(--color-border-strong);
   border-top-color: var(--color-text-primary);
   border-radius: var(--radius-full);
@@ -92,7 +92,7 @@
   left: 0;
   right: 0;
   background: linear-gradient(to top, var(--color-surface-overlay-strong) 0%, transparent 100%);
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -115,7 +115,7 @@
   align-items: center;
   color: var(--color-text-secondary);
   font-size: var(--font-size-xs);
-  padding: var(--space-lg);
+  padding: var(--space-md);
   text-align: center;
   box-sizing: border-box;
 }

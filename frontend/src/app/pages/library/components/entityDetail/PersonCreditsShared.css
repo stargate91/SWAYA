@@ -1,13 +1,13 @@
 .entity-detail-page__credits-list {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .entity-detail-page__credits-list--collection-items {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .collection-items-horizontal-grid-wrapper {
@@ -25,7 +25,7 @@
   grid-template-rows: repeat(2, minmax(0, 1fr));
   grid-template-columns: repeat(var(--cols, 1), 6.875rem);
   grid-auto-flow: row;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .ui-scroll-row-container.collection-items-horizontal-grid-wrapper .ui-poster-card {
@@ -85,7 +85,7 @@
 .entity-detail-page__credits-list--people-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .entity-detail-page__credits-list--fetching {
@@ -147,7 +147,7 @@
 
 .person-credits-tabs {
   display: flex;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   --tabs-border: 1px solid rgba(255, 255, 255, 0.08);
   border-bottom: var(--tabs-border);
   padding-bottom: var(--space-sm);
@@ -161,7 +161,7 @@
 .person-credits-section-container {
   display: grid;
   grid-template-columns: minmax(15rem, 20.625rem) minmax(0, 1fr);
-  gap: var(--space-4xl);
+  gap: var(--space-2xl);
   width: 100%;
   --container-margin-top: 7.5rem;
   margin-top: var(--container-margin-top);
@@ -196,7 +196,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-md);
 }
 
 .is-scrolled .person-credits-discover-grid-wrapper {
@@ -204,7 +204,7 @@
   min-height: 0;
   --local-padding-top: 0.625rem;
   padding-top: var(--local-padding-top);
-  padding-bottom: var(--space-4xl);
+  padding-bottom: var(--space-2xl);
 }
 
 .person-credits-section-container>* {
@@ -216,7 +216,7 @@
   background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  padding: var(--space-lg) var(--space-4xl);
+  padding: var(--space-md) var(--space-2xl);
   --scrolled-ml: -1.5rem;
   margin-left: var(--scrolled-ml);
   --scrolled-mr: -1.5rem;
@@ -232,7 +232,7 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-md);
   transition: all var(--motion-fast);
   display: flex;
@@ -290,7 +290,7 @@
   -webkit-backdrop-filter: blur(1rem);
   --local-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.2);
   box-shadow: var(--local-shadow);
-  margin-bottom: var(--space-4xl);
+  margin-bottom: var(--space-2xl);
 }
 
 .person-credits-row__header {
@@ -338,7 +338,7 @@
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  padding: var(--space-2xs) var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-sm);
   cursor: pointer;
   display: flex;
@@ -385,7 +385,7 @@
 
 .person-credits-row__scroll-container {
   display: flex;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   overflow-x: auto;
   --container-padding: 0.25rem 0.25rem 0.375rem 0.25rem;
   padding: var(--container-padding);
@@ -440,7 +440,7 @@
 .person-credits-row__empty {
   font-size: 0.76rem;
   color: var(--color-text-muted);
-  padding: var(--space-lg) var(--space-sm);
+  padding: var(--space-md) var(--space-sm);
 }
 
 /* Card Aspect Ratios & Styling */
@@ -675,7 +675,7 @@
   justify-content: space-between;
   align-items: center;
   gap: var(--space-sm);
-  margin-top: calc(var(--space-2xs) / 2);
+  margin-top: calc(var(--space-xs) / 2);
 }
 
 .person-credits-card__role {
@@ -718,7 +718,7 @@
 .person-credits-discover-groups {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-4xl);
+  gap: var(--space-2xl);
 }
 
 .person-credits-discover-group {
@@ -785,14 +785,14 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3xl);
+  gap: var(--space-xl);
   --local-padding-top: 0.625rem;
   padding-top: var(--local-padding-top);
 }
 
 .person-credits-discover-grid {
   display: grid;
-  gap: var(--space-2xl) var(--space-lg);
+  gap: var(--space-lg) var(--space-md);
   width: 100%;
 }
 
@@ -818,7 +818,7 @@
   font-size: 0.72rem;
   color: var(--color-text-muted);
   text-align: center;
-  padding: var(--space-4xl) 0;
+  padding: var(--space-2xl) 0;
   --finished-border-top: 1px solid rgba(255, 255, 255, 0.03);
   border-top: var(--finished-border-top);
 }
@@ -836,7 +836,7 @@
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  padding: var(--space-2xs) var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-xl);
   cursor: pointer;
   --switch-btn-transition: all 0.2s ease;
@@ -848,7 +848,7 @@
 
 .person-credits-header-actions {
   display: flex;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .person-credits-row__mode-switch-btn:hover {
@@ -907,7 +907,7 @@
   display: flex;
   background: var(--dropdown-search-bg);
   border: 1px solid var(--color-border-subtle);
-  padding: var(--space-2xs);
+  padding: var(--space-xs);
   border-radius: var(--radius-sm);
   height: 2rem;
   width: max-content;
@@ -921,7 +921,7 @@
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  padding: 0 var(--space-lg);
+  padding: 0 var(--space-md);
   height: 100%;
 }
 
@@ -939,7 +939,7 @@
 .person-credits-discover-groups-style .ui-tab--sub .ui-tab__count {
   font-size: 0.72rem;
   background: var(--color-surface-overlay-strong);
-  padding: calc(var(--space-2xs) / 2) var(--space-sm);
+  padding: calc(var(--space-xs) / 2) var(--space-sm);
   border-radius: var(--radius-sm);
   margin-left: var(--space-sm);
   font-weight: normal;
@@ -961,7 +961,7 @@
   display: flex;
   background: var(--dropdown-search-bg);
   border: 1px solid var(--color-border-subtle);
-  padding: var(--space-2xs);
+  padding: var(--space-xs);
   border-radius: var(--radius-sm);
   height: 2rem;
   width: max-content;
@@ -975,7 +975,7 @@
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  padding: 0 var(--space-lg);
+  padding: 0 var(--space-md);
   height: 100%;
 }
 
@@ -1008,7 +1008,7 @@
 .person-credits-discover-loading {
   display: flex;
   justify-content: center;
-  padding: calc(var(--space-8xl) + var(--space-sm)) 0;
+  padding: calc(var(--space-6xl) + var(--space-sm)) 0;
   width: 100%;
 }
 
@@ -1016,8 +1016,8 @@
 .person-credits-gallery-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr));
-  gap: var(--space-lg);
-  padding: var(--space-lg) 0;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
   overflow-y: auto;
   flex: 1;
 }
@@ -1056,7 +1056,7 @@
   left: 0;
   right: 0;
   background: linear-gradient(transparent, var(--color-surface-overlay-strong));
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1072,7 +1072,7 @@
 .person-credits-gallery-info {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--space-2xs) / 2);
+  gap: calc(var(--space-xs) / 2);
   min-width: 0;
 }
 

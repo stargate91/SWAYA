@@ -1,7 +1,7 @@
 .bespoke-seasons-section {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   user-select: none;
   margin-top: 0;
   padding-top: 0;
@@ -23,7 +23,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   --local-bg: rgba(0, 0, 0, 0.15);
   background: var(--local-bg);
   border-bottom: 1px solid var(--color-border-default);
@@ -53,7 +53,7 @@
 /* Pills styling */
 .bespoke-season-pill,
 .bespoke-episode-pill {
-  padding: var(--space-2xs) var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
@@ -166,8 +166,8 @@
 .bespoke-browser-card__body {
   position: relative;
   display: flex;
-  gap: var(--space-lg);
-  padding: var(--space-lg) var(--space-lg);
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-md);
   min-height: 0;
 }
 
@@ -220,7 +220,7 @@
 .bespoke-episode-detail-card__content-col {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xs);
+  gap: var(--space-xs);
   flex: 1;
   min-width: 0;
   overflow-y: auto;
@@ -243,7 +243,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .bespoke-season-meta__title,
@@ -258,7 +258,7 @@
 .bespoke-episode-detail-card__meta {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   margin-top: 0;
 }
 
@@ -274,7 +274,7 @@
 .bespoke-season-meta__item::after,
 .bespoke-episode-detail-card__meta-item::after {
   content: "•";
-  margin-left: var(--space-lg);
+  margin-left: var(--space-md);
   color: var(--color-text-muted);
   opacity: 0.4;
 }
@@ -301,7 +301,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-sm);
-  padding: var(--space-2xs) var(--space-lg);
+  padding: var(--space-xs) var(--space-md);
   border-radius: var(--radius-sm);
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-semibold);
@@ -478,9 +478,9 @@
 
 /* Peaks History list */
 .bespoke-episode-detail-card__peaks {
-  margin-top: var(--space-2xs);
+  margin-top: var(--space-xs);
   border-top: 1px solid var(--color-border-default);
-  padding-top: var(--space-2xs);
+  padding-top: var(--space-xs);
 }
 
 .bespoke-episode-detail-card__peaks-title {
@@ -497,7 +497,7 @@
 .bespoke-episode-detail-card__peaks-list {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2xs);
+  gap: var(--space-xs);
 }
 
 .bespoke-episode-detail-card__peak-item {
@@ -538,7 +538,7 @@
 
 .bespoke-browser-card__empty {
   text-align: center;
-  padding: var(--space-2xl);
+  padding: var(--space-lg);
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
   display: flex;
@@ -551,7 +551,7 @@
 .bespoke-cast-section {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   user-select: none;
   margin-top: var(--space-sm);
   margin-bottom: var(--space-sm);
@@ -578,19 +578,19 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
-  padding: var(--space-lg) var(--space-lg);
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-md);
   min-height: 0;
   width: 100%;
 }
 
 .bespoke-cast-browser-card__body .ui-scroll-row-container {
-  margin: 0 calc(var(--space-lg) * -1);
-  width: calc(100% + calc(var(--space-lg) * 2));
+  margin: 0 calc(var(--space-md) * -1);
+  width: calc(100% + calc(var(--space-md) * 2));
 }
 
 .bespoke-cast-browser-card__body .ui-scroll-row-track {
-  padding: 0 var(--space-lg);
+  padding: 0 var(--space-md);
 }
 
 .bespoke-cast-browser-card__body .dashboard-cast-grid {
@@ -598,9 +598,9 @@
   justify-content: flex-start;
   grid-template-columns: none;
   overflow-x: auto;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   flex: 1;
-  padding: var(--space-2xs) 0;
+  padding: var(--space-xs) 0;
   scroll-behavior: smooth;
   width: 100%;
 }
@@ -694,7 +694,7 @@
 
 /* Box Office Section */
 .bespoke-boxoffice-section {
-  margin-top: var(--space-lg);
+  margin-top: var(--space-md);
 }
 
 .bespoke-boxoffice-card {
@@ -709,15 +709,15 @@
 .bespoke-boxoffice-body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(11.25rem, 1fr));
-  gap: var(--space-lg);
-  padding: var(--space-lg) var(--space-lg);
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-md);
 }
 
 .bespoke-boxoffice-stat {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
-  padding: var(--space-sm) var(--space-lg);
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
   --local-bg: rgba(255, 255, 255, 0.02);
   background: var(--local-bg);
   border: 1px solid var(--color-border-default);
@@ -772,7 +772,7 @@
 
 /* Production Companies / Networks */
 .bespoke-companies-section {
-  margin-top: var(--space-lg);
+  margin-top: var(--space-md);
 }
 
 .bespoke-companies-card {
@@ -787,8 +787,8 @@
 .bespoke-companies-body {
   display: flex;
   flex-wrap: nowrap;
-  gap: var(--space-lg);
-  padding: var(--space-lg) var(--space-lg);
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-md);
   align-items: center;
   overflow-x: auto;
 }
@@ -798,7 +798,7 @@
   align-items: center;
   justify-content: center;
   height: 4rem;
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   --local-bg: rgba(255, 255, 255, 0.02);
   background: var(--local-bg);
   border: 1px solid var(--color-border-default);
@@ -906,7 +906,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  --local-padding: var(--space-4xl);
+  --local-padding: var(--space-2xl);
   padding: var(--local-padding);
   --local-bg: color-mix(in srgb, black 82%, transparent);
   background: var(--local-bg);
@@ -942,7 +942,7 @@
 
 /* Ratings Section */
 .bespoke-ratings-section {
-  margin-top: var(--space-lg);
+  margin-top: var(--space-md);
 }
 
 .bespoke-ratings-card {
@@ -957,8 +957,8 @@
 .bespoke-ratings-body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(8.125rem, 1fr));
-  gap: var(--space-lg);
-  padding: var(--space-lg) var(--space-lg);
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-md);
 }
 
 .bespoke-rating-item {
@@ -968,7 +968,7 @@
   justify-content: center;
   gap: var(--space-sm);
   height: 4.5rem;
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   background: var(--color-surface-card);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-sm);

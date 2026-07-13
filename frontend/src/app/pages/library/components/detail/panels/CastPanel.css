@@ -1,11 +1,11 @@
 .cast-panel {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3xl);
+  gap: var(--space-xl);
 }
 
 .cast-panel__title {
-  margin: 0 0 var(--space-lg) 0;
+  margin: 0 0 var(--space-md) 0;
   font-size: var(--font-size-sm);
   text-transform: uppercase;
   color: var(--color-text-muted);
@@ -14,22 +14,22 @@
 .cast-panel__list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .cast-panel__list--actors {
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .person-card {
   position: relative;
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   border: 1px solid var(--media-detail-panel-card-border);
   border-radius: var(--radius-lg);
   background: var(--media-detail-panel-card-bg);
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   cursor: pointer;
   transition: transform var(--motion-emphasized), border-color var(--motion-base), box-shadow var(--motion-base), background var(--motion-base);
   overflow: hidden;

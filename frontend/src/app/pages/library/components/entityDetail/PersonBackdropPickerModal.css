@@ -1,10 +1,10 @@
 .person-backdrop-picker {
   --person-backdrop-row-height: 4.875rem;
-  --person-backdrop-row-gap: var(--space-lg);
+  --person-backdrop-row-gap: var(--space-md);
   --person-backdrop-viewport-height: min(calc((var(--person-backdrop-row-height) * 5) + (var(--person-backdrop-row-gap) * 4)), 84vh);
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xl);
+  gap: var(--space-lg);
   min-height: 0;
   height: 100%;
   width: 100%;
@@ -68,9 +68,9 @@
 .person-backdrop-picker__grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-lg);
-  padding-top: var(--space-2xs);
-  padding-bottom: var(--space-2xs);
+  gap: var(--space-md);
+  padding-top: var(--space-xs);
+  padding-bottom: var(--space-xs);
   align-content: start;
   width: 100%;
   box-sizing: border-box;
@@ -91,7 +91,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-md);
   --pulse-anim: backdrop-progress-fade 2s infinite ease-in-out;
   animation: var(--pulse-anim);
 }
@@ -102,22 +102,22 @@
 }
 
 .person-backdrop-picker__detail-view {
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .person-backdrop-picker__detail-view .backdrops-grid {
-  padding-top: var(--space-2xs);
-  padding-bottom: var(--space-2xs);
+  padding-top: var(--space-xs);
+  padding-bottom: var(--space-xs);
 }
 
 .person-backdrop-picker__detail-toolbar {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   min-width: 0;
   flex: 0 0 auto;
   min-height: 2.5rem;
-  padding: var(--space-2xs) 0;
+  padding: var(--space-xs) 0;
 }
 
 .person-backdrop-picker__detail-title {
@@ -154,8 +154,8 @@
 .person-backdrop-picker__default-tab-content {
   display: flex;
   justify-content: center;
-  padding-top: var(--space-4xl);
-  padding-bottom: var(--space-4xl);
+  padding-top: var(--space-2xl);
+  padding-bottom: var(--space-2xl);
 }
 
 .person-backdrop-picker__fallback-card {
@@ -223,7 +223,7 @@
   color: var(--color-text-primary);
   font-size: 0.6rem;
   font-weight: var(--font-weight-extrabold);
-  padding: calc(var(--space-2xs) / 2) var(--space-2xs);
+  padding: calc(var(--space-xs) / 2) var(--space-xs);
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border-strong);
   letter-spacing: 0.05em;
@@ -233,7 +233,7 @@
 .person-backdrop-picker__credit-info {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--space-2xs) / 2);
+  gap: calc(var(--space-xs) / 2);
 }
 
 .person-backdrop-picker__credit-title {
@@ -256,7 +256,7 @@
 .person-backdrop-picker__credit-rating {
   display: inline-flex;
   align-items: center;
-  gap: calc(var(--space-2xs) / 2);
+  gap: calc(var(--space-xs) / 2);
   color: var(--color-brand-imdb);
 }
 

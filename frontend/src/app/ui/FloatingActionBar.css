@@ -1,13 +1,13 @@
 .ui-floating-bar-shell {
   position: fixed;
   left: 50%;
-  bottom: calc(var(--space-5xl) + env(safe-area-inset-bottom, 0px));
+  bottom: calc(var(--space-3xl) + env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%);
   z-index: 6;
   display: flex;
   justify-content: center;
   pointer-events: none;
-  width: min(45rem, calc(100vw - (var(--space-4xl) * 2)));
+  width: min(45rem, calc(100vw - (var(--space-2xl) * 2)));
   margin: 0;
 }
 
@@ -15,9 +15,9 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: var(--space-2xl);
+  gap: var(--space-lg);
   width: 100%;
-  padding: var(--space-2xl) var(--space-2xl) var(--space-2xl) var(--font-size-lg);
+  padding: var(--space-lg) var(--space-lg) var(--space-lg) var(--font-size-lg);
   border: 1px solid var(--ui-floating-surface-border);
   border-radius: var(--radius-xl);
   background: var(--ui-floating-surface-bg);
@@ -42,8 +42,8 @@
 .ui-floating-bar::after {
   content: "";
   position: absolute;
-  left: calc(var(--space-2xl) + var(--space-sm));
-  right: calc(var(--space-2xl) + var(--space-sm));
+  left: calc(var(--space-lg) + var(--space-sm));
+  right: calc(var(--space-lg) + var(--space-sm));
   bottom: 0;
   height: 1px;
   border-radius: var(--radius-full);
@@ -63,7 +63,7 @@
   min-width: 0;
   display: flex;
   align-items: center;
-  min-height: var(--space-6xl);
+  min-height: var(--space-4xl);
   flex: 1 1 auto;
 }
 
@@ -91,7 +91,7 @@
   justify-content: center;
   gap: var(--space-sm);
   min-height: 2.375rem;
-  padding: 0 var(--space-2xl);
+  padding: 0 var(--space-lg);
   border: 1px solid var(--ui-floating-action-border);
   border-radius: var(--radius-input);
   background: var(--ui-floating-action-bg);
@@ -155,8 +155,8 @@
 
 @media (max-width: 57.5rem) {
   .ui-floating-bar-shell {
-    bottom: calc(var(--space-4xl) + env(safe-area-inset-bottom, 0px));
-    width: calc(100vw - (var(--space-2xl) * 2));
+    bottom: calc(var(--space-2xl) + env(safe-area-inset-bottom, 0px));
+    width: calc(100vw - (var(--space-lg) * 2));
   }
 
   .ui-floating-bar {
@@ -164,8 +164,8 @@
     width: 100%;
     flex-direction: column;
     align-items: stretch;
-    gap: var(--space-lg);
-    padding: var(--space-2xl);
+    gap: var(--space-md);
+    padding: var(--space-lg);
   }
 
   .ui-floating-bar__actions {
@@ -190,5 +190,5 @@
 .ui-floating-bar-shell.is-shaking .ui-floating-bar {
   animation: ui-bar-shake var(--motion-base);
   border-color: var(--color-state-danger);
-  box-shadow: 0 0 var(--space-3xl) color-mix(in srgb, var(--color-state-danger) 40%, transparent), var(--ui-floating-surface-shadow);
+  box-shadow: 0 0 var(--space-xl) color-mix(in srgb, var(--color-state-danger) 40%, transparent), var(--ui-floating-surface-shadow);
 }

@@ -1,14 +1,14 @@
 .player-control-bar {
   position: fixed;
-  bottom: var(--space-4xl);
-  right: var(--space-4xl);
+  bottom: var(--space-2xl);
+  right: var(--space-2xl);
   width: 20rem;
   background: color-mix(in srgb, var(--color-canvas) 75%, transparent);
   backdrop-filter: blur(0.75rem) saturate(180%);
   -webkit-backdrop-filter: blur(0.75rem) saturate(180%);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
-  padding: var(--space-lg) var(--space-2xl);
+  padding: var(--space-md) var(--space-lg);
   box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
@@ -25,7 +25,7 @@
 
 @keyframes slide-in-bar {
   from {
-    transform: translateY(var(--space-3xl));
+    transform: translateY(var(--space-xl));
     opacity: 0;
   }
   to {
@@ -38,7 +38,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .player-control-bar__title {
@@ -64,7 +64,7 @@
 
 .player-control-bar__progress-bg {
   width: 100%;
-  height: var(--space-2xs);
+  height: var(--space-xs);
   background: color-mix(in srgb, var(--color-ink) 15%, transparent);
   border-radius: var(--radius-xs);
   overflow: hidden;

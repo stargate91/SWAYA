@@ -104,8 +104,8 @@
 }
 
 .ui-icon-button--xs {
-  width: var(--space-2xl);
-  height: var(--space-2xl);
+  width: var(--space-lg);
+  height: var(--space-lg);
   border-radius: var(--radius-sm);
 }
 
@@ -476,7 +476,7 @@
   border-radius: var(--ui-control-radius);
   box-shadow: var(--shadow-overlay-strong, var(--dropdown-menu-shadow));
   z-index: var(--z-index-dropdown);
-  padding: var(--space-2xs);
+  padding: var(--space-xs);
   display: flex;
   flex-direction: column;
   animation: dropdown-fade-in var(--motion-duration-fast) var(--motion-ease-emphasized);
@@ -487,7 +487,7 @@
   border: none;
   border-radius: var(--ui-control-radius-xs);
   color: var(--color-text-primary);
-  padding: 0 var(--space-lg);
+  padding: 0 var(--space-md);
   height: var(--button-height-sm);
   line-height: var(--button-height-sm);
   text-align: left;
@@ -555,10 +555,10 @@
 /* Image Edit Badge Overlay */
 .ui-image-edit-badge {
   position: absolute;
-  top: var(--space-lg);
-  right: var(--space-lg);
-  width: calc(2 * var(--space-2xl));
-  height: calc(2 * var(--space-2xl));
+  top: var(--space-md);
+  right: var(--space-md);
+  width: calc(2 * var(--space-lg));
+  height: calc(2 * var(--space-lg));
   border-radius: var(--radius-full);
   border: 1px solid color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border));
   background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);

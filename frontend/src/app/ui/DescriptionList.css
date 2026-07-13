@@ -2,17 +2,17 @@
 .ui-description-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-sm) var(--space-lg);
+  gap: var(--space-sm) var(--space-md);
 }
 
 .ui-description-list--spaced {
-  gap: var(--space-lg) var(--space-2xl);
+  gap: var(--space-md) var(--space-lg);
 }
 
 .ui-description-list__item {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--space-2xs) / 2);
+  gap: calc(var(--space-xs) / 2);
 }
 
 .ui-description-list__item--full {

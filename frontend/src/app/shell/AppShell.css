@@ -45,13 +45,13 @@
 .shell__utility-bar {
   position: absolute;
   top: var(--utility-bar-top);
-  right: var(--space-5xl);
-  left: var(--space-5xl);
+  right: var(--space-3xl);
+  left: var(--space-3xl);
   z-index: 5;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--space-2xl);
+  gap: var(--space-lg);
   height: var(--utility-bar-min-height);
   pointer-events: none;
 }
@@ -66,14 +66,14 @@
 
 .shell__utility-bar-bottom {
   position: absolute;
-  bottom: calc(2 * var(--space-2xl));
-  right: var(--space-5xl);
-  left: var(--space-5xl);
+  bottom: calc(2 * var(--space-lg));
+  right: var(--space-3xl);
+  left: var(--space-3xl);
   z-index: 100;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--space-2xl);
+  gap: var(--space-lg);
   height: var(--button-height-md);
   pointer-events: none;
 }
@@ -124,7 +124,7 @@
   border-radius: calc(var(--radius-sm) - var(--radius-sm));
   font: var(--text-caption);
   font-weight: var(--font-weight-semibold);
-  padding: 0 var(--space-2xl);
+  padding: 0 var(--space-lg);
 }
 
 
@@ -139,7 +139,7 @@
   min-width: 0;
   min-height: 0;
   overflow: auto;
-  padding: var(--page-top-offset) var(--space-5xl) var(--page-bottom-offset);
+  padding: var(--page-top-offset) var(--space-3xl) var(--page-bottom-offset);
   box-sizing: border-box;
   background: var(--color-canvas);
 }
@@ -151,7 +151,7 @@
 }
 
 .shell:has(#shell-utility-bar-bottom-center > *:not(:empty)) .ui-page:not(.ui-page--viewport) {
-  --page-pb: var(--space-8xl);
+  --page-pb: var(--space-6xl);
   padding-bottom: var(--page-pb);
 }
 
@@ -160,5 +160,5 @@
   justify-content: center;
   align-items: center;
   height: 100%;
-  padding: var(--space-6xl);
+  padding: var(--space-4xl);
 }

@@ -20,10 +20,10 @@
 .window-titlebar__drag-region {
   display: flex;
   align-items: center;
-  gap: var(--space-2xl);
+  gap: var(--space-lg);
   flex: 0 0 5.625rem;
   min-width: 5.625rem;
-  padding: 0 0 0 var(--space-lg);
+  padding: 0 0 0 var(--space-md);
   -webkit-app-region: drag;
 }
 
@@ -31,11 +31,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2xl);
+  gap: var(--space-lg);
   flex: 1 1 auto;
   min-width: 0;
   height: 100%;
-  padding: 0 var(--space-2xl);
+  padding: 0 var(--space-lg);
   -webkit-app-region: drag;
 }
 
@@ -64,7 +64,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   z-index: 10;
 }
 
@@ -128,7 +128,7 @@
 }
 
 .window-titlebar__button.window-titlebar__button--adult-toggle {
-  margin-right: var(--space-4xl);
+  margin-right: var(--space-2xl);
   color: var(--color-muted);
   width: var(--ui-control-height-xs);
   height: var(--ui-control-height-xs);
@@ -163,7 +163,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  padding: 0 var(--space-lg);
+  padding: 0 var(--space-md);
   -webkit-app-region: no-drag;
 }
 

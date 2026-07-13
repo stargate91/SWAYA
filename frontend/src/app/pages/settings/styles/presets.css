@@ -20,14 +20,14 @@
   font-size: var(--font-size-2xs);
   color: var(--color-muted);
   line-height: 1.4;
-  margin-top: calc(var(--space-2xs) / 2);
+  margin-top: calc(var(--space-xs) / 2);
 }
 
 .settings-mode-grid {
   display: grid;
   grid-template-columns: 1.5fr 1.5fr;
-  gap: var(--space-2xl);
-  margin-top: var(--space-2xs);
+  gap: var(--space-lg);
+  margin-top: var(--space-xs);
 }
 
 .settings-mode-card {
@@ -37,8 +37,8 @@
 .settings-preset-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(13.75rem, 1fr));
-  gap: var(--space-lg);
-  margin-bottom: var(--space-2xl);
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 
 .settings-preset-card {
@@ -52,7 +52,7 @@
   font-weight: bold;
   color: var(--color-accent);
   background: var(--settings-accent-border-soft);
-  padding: calc(var(--space-2xs) / 2) var(--space-sm);
+  padding: calc(var(--space-xs) / 2) var(--space-sm);
   border-radius: var(--radius-sm);
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);

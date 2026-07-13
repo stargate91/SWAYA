@@ -17,7 +17,7 @@
   font: var(--text-caption);
   text-transform: none;
   letter-spacing: var(--letter-spacing-normal);
-  margin-top: calc(var(--space-2xs) / 2);
+  margin-top: calc(var(--space-xs) / 2);
 }
 
 .ui-field__error {

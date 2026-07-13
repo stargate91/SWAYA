@@ -1,7 +1,7 @@
 .ui-poster-grid {
   display: grid;
   grid-template-columns: repeat(8, minmax(0, 1fr));
-  gap: var(--space-3xl);
+  gap: var(--space-xl);
   width: 100%;
 }
 

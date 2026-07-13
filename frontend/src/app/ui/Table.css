@@ -18,7 +18,7 @@
 
 .ui-table th,
 .ui-table td {
-  padding: var(--space-sm) var(--space-2xl);
+  padding: var(--space-sm) var(--space-lg);
   text-align: left;
   border-bottom: 1px solid var(--color-line);
   transition: background var(--motion-fast);
@@ -34,7 +34,7 @@
 
 .ui-table__cell-content {
   position: relative;
-  min-height: calc(2 * var(--space-2xl));
+  min-height: calc(2 * var(--space-lg));
   display: flex;
   align-items: center;
 }
@@ -46,7 +46,7 @@
 .ui-table__cell-value {
   display: inline-flex;
   align-items: center;
-  min-height: calc(2 * var(--space-2xl));
+  min-height: calc(2 * var(--space-lg));
   min-width: 0;
 }
 
@@ -109,7 +109,7 @@
 .ui-table td.ui-table__empty {
   text-align: center;
   color: var(--color-muted);
-  padding: var(--space-sm) var(--space-2xl);
+  padding: var(--space-sm) var(--space-lg);
   font-style: italic;
 }
 
@@ -127,7 +127,7 @@
   justify-content: flex-end;
   gap: var(--space-sm);
   width: max-content;
-  padding: 0 var(--space-2xl);
+  padding: 0 var(--space-lg);
   background: transparent;
 }
 
@@ -143,8 +143,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: calc(2 * var(--space-2xl));
-  height: calc(2 * var(--space-2xl));
+  width: calc(2 * var(--space-lg));
+  height: calc(2 * var(--space-lg));
   border: 1px solid var(--color-control-border-subtle, var(--color-border-default));
   border-radius: var(--radius-sm);
   background: var(--color-surface-hover, var(--color-surface-glass));

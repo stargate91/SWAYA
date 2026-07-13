@@ -515,16 +515,16 @@
     color-mix(in srgb, var(--color-panel-strong) 86%, var(--color-surface-glass));
 
   /* Standard Spacing Primitives */
-  --space-2xs: 0.25rem;
+  --space-xs: 0.25rem;
   --space-sm: 0.5rem;
-  --space-lg: 0.75rem;
-  --space-2xl: 1rem;
-  --space-3xl: 1.25rem;
-  --space-4xl: 1.5rem;
-  --space-5xl: 2rem;
-  --space-6xl: 2.5rem;
-  --space-7xl: 3.5rem;
-  --space-8xl: 4.5rem;
+  --space-md: 0.75rem;
+  --space-lg: 1rem;
+  --space-xl: 1.25rem;
+  --space-2xl: 1.5rem;
+  --space-3xl: 2rem;
+  --space-4xl: 2.5rem;
+  --space-5xl: 3.5rem;
+  --space-6xl: 4.5rem;
 
   /* Radius */
   /* Standard Border Radii */

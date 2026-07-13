@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: column;
   overflow: visible;
-  margin-top: var(--space-lg);
+  margin-top: var(--space-md);
 }
 
 .bespoke-scene-tagger-header {
@@ -14,7 +14,7 @@
   align-items: center;
   --local-gap: var(--space-sm);
   gap: var(--local-gap);
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   background: color-mix(in srgb, black 15%, transparent);
   border-top-left-radius: var(--radius-lg);
   border-top-right-radius: var(--radius-lg);
@@ -30,10 +30,10 @@
 }
 
 .bespoke-scene-tagger-body {
-  padding: var(--space-lg);
+  padding: var(--space-md);
   display: flex;
   flex-direction: column;
-  --local-gap: var(--space-lg);
+  --local-gap: var(--space-md);
   gap: var(--local-gap);
 }
 
@@ -65,7 +65,7 @@
   align-items: center;
   --local-gap: 0.25rem;
   gap: var(--local-gap);
-  padding: var(--space-2xs) var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
@@ -106,7 +106,7 @@
   background: var(--color-surface-glass);
   backdrop-filter: blur(0.25rem);
   border-radius: var(--radius-sm);
-  padding: 0 var(--space-lg);
+  padding: 0 var(--space-md);
   height: 2.375rem;
   transition: border-color var(--motion-duration-fast) var(--motion-ease-standard);
 }
@@ -154,7 +154,7 @@
   top: 100%;
   left: 0;
   right: 0;
-  margin-top: var(--space-2xs);
+  margin-top: var(--space-xs);
   background: var(--color-surface-overlay);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-md);
@@ -162,7 +162,7 @@
   z-index: 100;
   max-height: 12.5rem;
   overflow-y: auto;
-  padding: var(--space-2xs) 0;
+  padding: var(--space-xs) 0;
   backdrop-filter: blur(1rem);
 }
 
@@ -172,7 +172,7 @@
   width: 100%;
   background: transparent;
   border: none;
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   color: var(--color-text-primary);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
@@ -197,7 +197,7 @@
 .bespoke-scene-tagger-dropdown-item--create {
   color: var(--color-accent-blue);
   border-top: 1px solid var(--color-border-default);
-  margin-top: var(--space-2xs);
+  margin-top: var(--space-xs);
 }
 
 .bespoke-scene-tagger-pill-suggested {
@@ -205,7 +205,7 @@
   align-items: center;
   --local-gap: 0.25rem;
   gap: var(--local-gap);
-  padding: var(--space-2xs) var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-semibold);
   border-radius: var(--radius-sm);
@@ -269,5 +269,5 @@
 }
 
 .bespoke-scene-tagger-card--spaced {
-  margin-top: var(--space-2xl);
+  margin-top: var(--space-lg);
 }

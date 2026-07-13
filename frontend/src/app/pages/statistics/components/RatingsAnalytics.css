@@ -1,12 +1,12 @@
 .analytics-summary-container {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5xl);
+  gap: var(--space-3xl);
   height: 100%;
 }
 
 .ui-card.compact-stats-card {
-  padding: var(--space-lg) var(--space-2xl);
+  padding: var(--space-md) var(--space-lg);
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -33,7 +33,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   min-height: 2rem;
 }
 
@@ -46,7 +46,7 @@
 .compact-stats-row__value-wrapper {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .compact-stats-row__value {
@@ -93,9 +93,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-md);
   flex-wrap: wrap;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   border-bottom: 1px solid var(--color-border-subtle);
   padding-bottom: var(--space-sm);
 }
@@ -103,7 +103,7 @@
 @media (max-width: 62rem) {
   .analytics-dashboard-compact {
     grid-template-columns: 1fr;
-    gap: var(--space-lg);
+    gap: var(--space-md);
   }
 }
 
@@ -115,10 +115,10 @@
   border-radius: var(--radius-2xl);
   backdrop-filter: blur(1rem);
   -webkit-backdrop-filter: blur(1rem);
-  padding: var(--space-2xl);
+  padding: var(--space-lg);
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   position: relative;
   overflow: hidden;
   box-shadow: var(--shadow-md);
@@ -139,7 +139,7 @@
 
 .analytics-summary-panel {
   display: grid;
-  gap: var(--space-2xl);
+  gap: var(--space-lg);
 }
 
 .analytics-summary-panel.has-3-cols {
@@ -159,7 +159,7 @@
 
 .analytics-summary-item+.analytics-summary-item {
   border-left: 1px solid var(--color-border-subtle);
-  padding-left: var(--space-2xl);
+  padding-left: var(--space-lg);
 }
 
 .analytics-summary-item__header {
@@ -172,14 +172,14 @@
   .analytics-summary-panel.has-3-cols,
   .analytics-summary-panel.has-4-cols {
     grid-template-columns: 1fr;
-    gap: var(--space-lg);
+    gap: var(--space-md);
   }
 
   .analytics-summary-item+.analytics-summary-item {
     border-left: none;
     padding-left: 0;
     border-top: 1px solid var(--color-border-subtle);
-    padding-top: var(--space-lg);
+    padding-top: var(--space-md);
   }
 }
 
@@ -221,12 +221,12 @@
 
 .analytics-card__icon.text-success {
   color: var(--color-state-success);
-  filter: drop-shadow(0 0 var(--space-2xs) color-mix(in srgb, var(--color-state-success) 50%, transparent));
+  filter: drop-shadow(0 0 var(--space-xs) color-mix(in srgb, var(--color-state-success) 50%, transparent));
 }
 
 .analytics-card__icon.text-danger {
   color: var(--color-accent-pink);
-  filter: drop-shadow(0 0 var(--space-2xs) var(--color-accent-pink));
+  filter: drop-shadow(0 0 var(--space-xs) var(--color-accent-pink));
 }
 
 .analytics-card__icon.text-muted {
@@ -238,7 +238,7 @@
   display: flex;
   width: 6.25rem;
   height: 0.5rem;
-  gap: calc(var(--space-2xs) - var(--space-px));
+  gap: calc(var(--space-xs) - var(--space-px));
 }
 
 .analytics-mini-segmented-bar .analytics-segment {
@@ -254,7 +254,7 @@
   height: 100%;
   background: var(--color-accent-blue);
   opacity: 0.85;
-  box-shadow: 0 0 var(--space-2xs) var(--color-accent-blue);
+  box-shadow: 0 0 var(--space-xs) var(--color-accent-blue);
   animation: growWidth var(--motion-duration-lazy) var(--motion-ease-emphasized) forwards;
   transform-origin: left;
 }
@@ -270,7 +270,7 @@
 .analytics-distribution__row {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   font-size: var(--font-size-xs);
 }
 

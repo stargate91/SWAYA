@@ -1,13 +1,13 @@
 .continue-watching-widget {
-  margin-bottom: var(--space-6xl);
+  margin-bottom: var(--space-4xl);
   animation: fadeIn var(--motion-duration-fade) var(--motion-ease-out);
 }
 
 .continue-watching-header {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
-  margin-bottom: var(--space-2xl);
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-extrabold);
   color: var(--color-text-primary);
@@ -19,9 +19,9 @@
 
 .continue-watching-row {
   display: flex;
-  gap: var(--space-3xl);
+  gap: var(--space-xl);
   overflow-x: auto;
-  padding-bottom: var(--space-3xl);
+  padding-bottom: var(--space-xl);
 }
 
 .continue-watching-shell {
@@ -41,7 +41,7 @@
 
 .ui-poster-card.continue-watching-card .ui-poster-card__image-wrapper {
   border-radius: var(--radius-lg);
-  box-shadow: 0 var(--space-lg) calc(2.5 * var(--space-lg)) color-mix(in srgb, black 30%, transparent);
+  box-shadow: 0 var(--space-md) calc(2.5 * var(--space-md)) color-mix(in srgb, black 30%, transparent);
   border: 1px solid var(--color-border-subtle);
   background: var(--color-bg-elevated);
 }
@@ -58,8 +58,8 @@
 
 .continue-watching-card .ui-tooltip {
   position: absolute;
-  top: var(--space-lg);
-  right: var(--space-lg);
+  top: var(--space-md);
+  right: var(--space-md);
   z-index: 10;
 }
 
@@ -103,7 +103,7 @@
 
   50% {
     transform: translate(-50%, -50%) scale(1.08);
-    box-shadow: 0 0 var(--space-3xl) var(--space-sm) color-mix(in srgb, var(--color-accent-blue) 35%, transparent);
+    box-shadow: 0 0 var(--space-xl) var(--space-sm) color-mix(in srgb, var(--color-accent-blue) 35%, transparent);
   }
 
   100% {
@@ -127,7 +127,7 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  height: var(--space-2xs);
+  height: var(--space-xs);
   background: color-mix(in srgb, var(--color-text-primary, white) 20%, transparent);
 }
 
@@ -143,7 +143,7 @@
 
 .continue-watching-progress-fill {
   fill: var(--color-accent-blue-soft);
-  filter: drop-shadow(0 0 var(--space-lg) color-mix(in srgb, var(--color-accent-blue-soft) 80%, transparent));
+  filter: drop-shadow(0 0 var(--space-md) color-mix(in srgb, var(--color-accent-blue-soft) 80%, transparent));
 }
 
 .continue-watching-copy {
@@ -161,7 +161,7 @@
   font-weight: var(--font-weight-bold);
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-bottom: var(--space-2xs);
+  margin-bottom: var(--space-xs);
 }
 
 .continue-watching-meta {
@@ -203,7 +203,7 @@
   50% {
     transform: scale(1.05);
     opacity: 1;
-    filter: drop-shadow(0 0 var(--space-2xs) color-mix(in srgb, var(--color-accent-blue) 40%, transparent));
+    filter: drop-shadow(0 0 var(--space-xs) color-mix(in srgb, var(--color-accent-blue) 40%, transparent));
   }
 
   100% {

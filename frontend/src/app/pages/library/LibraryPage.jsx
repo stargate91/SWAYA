@@ -167,22 +167,22 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
   if (state.isLoading) {
     return (
       <Page className="library-page">
-        <div style={{ padding: 'var(--space-2xl) 0', width: '100%' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4xl)' }}>
+        <div style={{ padding: 'var(--space-lg) 0', width: '100%' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2xl)' }}>
             <div style={{ width: '250px' }}>
               <Skeleton.Title style={{ marginBottom: 0 }} />
             </div>
-            <div style={{ display: 'flex', gap: 'var(--space-lg)' }}>
+            <div style={{ display: 'flex', gap: 'var(--space-md)' }}>
               <Skeleton style={{ width: '80px', height: '36px' }} variant="rect" />
               <Skeleton style={{ width: '80px', height: '36px' }} variant="rect" />
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 'var(--space-2xl)', marginBottom: 'var(--space-4xl)', padding: 'var(--space-lg)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-lg)' }}>
+          <div style={{ display: 'flex', gap: 'var(--space-lg)', marginBottom: 'var(--space-2xl)', padding: 'var(--space-md)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-lg)' }}>
             <Skeleton style={{ width: '120px', height: '32px' }} variant="rect" />
             <Skeleton style={{ width: '100px', height: '32px' }} variant="rect" />
             <Skeleton style={{ width: '150px', height: '32px' }} variant="rect" />
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 'var(--space-2xl)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 'var(--space-lg)' }}>
             {Array.from({ length: 12 }).map((_, idx) => (
               <Skeleton.Card key={idx} style={{ width: '100%', height: '270px', minWidth: 0 }} />
             ))}

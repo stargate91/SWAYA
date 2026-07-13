@@ -2,7 +2,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: var(--space-3xl);
+  min-height: var(--space-xl);
   padding: 0 var(--space-sm);
   padding-left: calc(var(--space-sm) + var(--letter-spacing-wide));
   border-radius: var(--radius-full);
@@ -19,10 +19,10 @@
 
 .ui-badge--overlay {
   position: absolute;
-  left: var(--space-lg);
-  right: var(--space-lg);
+  left: var(--space-md);
+  right: var(--space-md);
   bottom: var(--status-badge-bottom);
-  min-height: calc(var(--space-2xl) + var(--space-sm));
+  min-height: calc(var(--space-lg) + var(--space-sm));
 }
 
 .ui-badge--status.ui-badge--accent {
@@ -53,7 +53,7 @@
 .ui-badge.ui-badge--adult.ui-badge--danger {
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
-  padding: calc(var(--space-2xs) / 2) var(--space-sm);
+  padding: calc(var(--space-xs) / 2) var(--space-sm);
   border-radius: var(--radius-xs);
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);
@@ -67,7 +67,7 @@ sup .ui-badge.ui-badge--adult.ui-badge--danger {
   font-size: var(--font-size-2xs);
   letter-spacing: var(--letter-spacing-normal);
   border-radius: var(--radius-xs);
-  padding: var(--space-2xs) var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
   height: auto;
   min-height: 0;
   line-height: 1.1;

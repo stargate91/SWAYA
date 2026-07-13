@@ -1,17 +1,17 @@
 .details-panel--custom {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3xl);
+  gap: var(--space-xl);
 }
 
 .details-panel__section {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .details-panel__section-title {
-  margin: 0 0 var(--space-2xs) 0;
+  margin: 0 0 var(--space-xs) 0;
   font-size: var(--font-size-xs);
   text-transform: uppercase;
   color: var(--color-text-muted);
@@ -20,7 +20,7 @@
 .specs-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .specs-card {
@@ -29,7 +29,7 @@
   flex-direction: column;
   gap: var(--space-sm);
   min-height: 4.25rem;
-  padding: var(--space-lg) var(--space-lg);
+  padding: var(--space-md) var(--space-md);
   background: var(--media-detail-panel-card-bg);
   border: 1px solid var(--media-detail-panel-card-border);
   border-radius: var(--radius-lg);
@@ -40,7 +40,7 @@
 .specs-card::after {
   content: '';
   position: absolute;
-  inset: auto var(--space-2xl) 0 var(--space-2xl);
+  inset: auto var(--space-lg) 0 var(--space-lg);
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--color-border-default), transparent);
 }
@@ -64,7 +64,7 @@
 
 .specs-card--tall {
   min-height: 4.875rem;
-  padding: var(--space-lg) var(--space-2xl);
+  padding: var(--space-md) var(--space-lg);
 }
 
 .specs-card--span-2 {

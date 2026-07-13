@@ -1,6 +1,6 @@
 .global-search {
   position: relative;
-  margin: 0 var(--space-2xl);
+  margin: 0 var(--space-lg);
   -webkit-app-region: no-drag;
 }
 
@@ -11,7 +11,7 @@
   background: color-mix(in srgb, var(--color-canvas) 60%, transparent);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-input);
-  padding: 0 var(--space-lg);
+  padding: 0 var(--space-md);
   transition: all var(--motion-duration-base) var(--motion-ease-standard);
   box-shadow: inset 0 1px 2px color-mix(in srgb, black 20%, transparent);
 }
@@ -38,7 +38,7 @@
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);
-  padding: var(--space-2xs) var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: color var(--motion-duration-fast) var(--motion-ease-standard), background-color var(--motion-duration-fast) var(--motion-ease-standard);
@@ -65,9 +65,9 @@
 /* Divider */
 .global-search__divider {
   width: 1px;
-  height: var(--space-2xl);
+  height: var(--space-lg);
   background: color-mix(in srgb, var(--color-ink) 10%, transparent);
-  margin: 0 var(--space-lg);
+  margin: 0 var(--space-md);
 }
 
 /* Input Area */
@@ -90,7 +90,7 @@
   color: var(--color-text-primary);
   font-size: var(--font-size-xs);
   width: 100%;
-  padding-right: var(--space-6xl);
+  padding-right: var(--space-4xl);
 }
 
 .global-search__input::placeholder {
@@ -100,7 +100,7 @@
 .global-search__more-btn {
   background: none;
   border: none;
-  padding: var(--space-2xs);
+  padding: var(--space-xs);
   margin: 0;
   display: flex;
   align-items: center;
@@ -114,7 +114,7 @@
 
 .global-search__input-wrapper > .ui-tooltip {
   position: absolute;
-  right: var(--space-lg);
+  right: var(--space-md);
   display: flex;
   align-items: center;
 }
@@ -158,7 +158,7 @@
   text-transform: uppercase;
   color: var(--color-text-muted);
   letter-spacing: calc(2.5 * var(--letter-spacing-wide));
-  padding: var(--space-2xs) var(--space-lg) var(--space-sm);
+  padding: var(--space-xs) var(--space-md) var(--space-sm);
 }
 
 .global-search__dropdown-item {
@@ -170,7 +170,7 @@
   color: var(--color-text-secondary);
   font-size: var(--font-size-xs);
   text-align: left;
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   cursor: pointer;
   transition: all var(--motion-duration-fast) var(--motion-ease-standard);
   width: 100%;
@@ -217,7 +217,7 @@
 .global-search__result-item {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   padding: var(--space-sm);
   border-radius: var(--radius-sm);
   cursor: pointer;
@@ -239,7 +239,7 @@
   height: var(--layout-window-titlebar-height);
   border-radius: var(--radius-sm);
   overflow: hidden;
-  box-shadow: 0 var(--radius-2xs) calc(var(--space-lg) / 2) color-mix(in srgb, black 30%, transparent);
+  box-shadow: 0 var(--radius-2xs) calc(var(--space-md) / 2) color-mix(in srgb, black 30%, transparent);
 }
 
 .global-search__item-poster {
@@ -279,13 +279,13 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xs);
+  gap: var(--space-xs);
 }
 
 .global-search__item-title-row {
   display: flex;
   align-items: baseline;
-  gap: var(--space-2xs);
+  gap: var(--space-xs);
 }
 
 .global-search__item-title {
@@ -317,7 +317,7 @@
   font-weight: var(--font-weight-extrabold);
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);
-  padding: var(--space-px) var(--space-2xs);
+  padding: var(--space-px) var(--space-xs);
   border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--color-ink) 8%, transparent);
   color: var(--color-text-secondary);
@@ -360,8 +360,8 @@
   text-transform: uppercase;
   color: var(--color-text-muted);
   letter-spacing: calc(2.5 * var(--letter-spacing-wide));
-  padding: var(--space-sm) var(--space-lg) var(--space-2xs) var(--space-lg);
-  margin-top: var(--space-2xs);
+  padding: var(--space-sm) var(--space-md) var(--space-xs) var(--space-md);
+  margin-top: var(--space-xs);
 }
 
 .global-search__group-divider {

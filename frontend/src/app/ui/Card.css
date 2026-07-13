@@ -25,15 +25,15 @@
   border-radius: var(--radius-lg);
   background: var(--ui-surface-card-gradient);
   box-shadow: var(--shadow-md);
-  backdrop-filter: blur(var(--space-4xl)) saturate(118%);
+  backdrop-filter: blur(var(--space-2xl)) saturate(118%);
 }
 
 .ui-card__header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: var(--space-2xl);
-  padding: var(--space-3xl) var(--space-3xl) 0;
+  gap: var(--space-lg);
+  padding: var(--space-xl) var(--space-xl) 0;
 }
 
 .ui-card__title {
@@ -42,7 +42,7 @@
 }
 
 .ui-card__body {
-  padding: var(--space-3xl);
+  padding: var(--space-xl);
 }
 
 .ui-card.ui-card--danger {

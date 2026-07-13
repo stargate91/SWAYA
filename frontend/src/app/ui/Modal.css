@@ -5,7 +5,7 @@
   z-index: var(--z-index-backdrop);
   display: grid;
   place-items: center;
-  padding: var(--space-4xl);
+  padding: var(--space-2xl);
   background: var(--ui-overlay-backdrop-bg);
   backdrop-filter: var(--ui-overlay-backdrop-blur);
   animation: ui-modal-backdrop-fade-in var(--motion-duration-base) var(--motion-ease-emphasized) forwards;
@@ -23,7 +23,7 @@
 
 .ui-modal {
   width: var(--modal-width, min(36.25rem, 100%));
-  max-height: min(88vh, calc(100vh - (var(--space-4xl) * 2)));
+  max-height: min(88vh, calc(100vh - (var(--space-2xl) * 2)));
   border-radius: var(--radius-lg);
   background: var(--modal-surface-base);
   border: 1px solid var(--modal-border);
@@ -59,8 +59,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--space-2xl);
-  padding: var(--space-2xl) var(--space-3xl);
+  gap: var(--space-lg);
+  padding: var(--space-lg) var(--space-xl);
   background:
     var(--modal-header-highlight),
     var(--modal-surface-header);
@@ -72,7 +72,7 @@
 .ui-modal__title {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   margin: 0;
   font: var(--text-section);
   text-transform: uppercase;
@@ -102,7 +102,7 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
-  padding: var(--space-3xl);
+  padding: var(--space-xl);
   font: var(--text-body);
   color: var(--modal-title-color);
   line-height: 1.6;
@@ -110,7 +110,7 @@
 }
 
 .ui-modal__body-text {
-  padding: var(--space-2xs) 0;
+  padding: var(--space-xs) 0;
   font-size: var(--font-size-sm);
   color: var(--modal-description-color);
 }
@@ -124,8 +124,8 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: var(--space-lg);
-  padding: var(--space-2xl) var(--space-3xl);
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-xl);
   border-top: 1px solid var(--modal-divider-subtle);
   background:
     var(--modal-footer-highlight),
@@ -139,7 +139,7 @@
       var(--color-bg-canvas));
   border-color: color-mix(in srgb, var(--color-state-danger) 42%, var(--color-border-default));
   box-shadow:
-    0 calc(2 * var(--space-2xl)) 4.5rem color-mix(in srgb, black 66%, transparent),
+    0 calc(2 * var(--space-lg)) 4.5rem color-mix(in srgb, black 66%, transparent),
     0 0 0 1px color-mix(in srgb, var(--color-state-danger) 28%, transparent),
     0 0 2rem color-mix(in srgb, var(--color-state-danger) 16%, transparent),
     0 0.625rem 1.5rem color-mix(in srgb, black 28%, transparent),
@@ -197,7 +197,7 @@
 
 .ui-modal__actions-list {
   display: grid;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .ui-modal__action-card {
@@ -205,7 +205,7 @@
   gap: var(--space-sm);
   justify-items: start;
   width: 100%;
-  padding: var(--space-2xl);
+  padding: var(--space-lg);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--ui-surface-soft) 60%, transparent);
@@ -249,7 +249,7 @@
 
 .ui-modal__action-copy {
   display: grid;
-  gap: calc(var(--space-2xs) / 2);
+  gap: calc(var(--space-xs) / 2);
 }
 
 .ui-modal__action-title {
@@ -277,7 +277,7 @@
   justify-content: center;
   z-index: var(--z-index-backdrop);
   animation: ui-confirm-fade-in var(--motion-duration-base) var(--motion-ease-standard);
-  padding: var(--space-2xl);
+  padding: var(--space-lg);
 }
 
 .ui-confirm-dialog {
@@ -286,20 +286,20 @@
   background: var(--ui-surface-card-gradient);
   border: 1px solid color-mix(in srgb, var(--color-accent) 24%, var(--color-border-default));
   border-radius: var(--radius-lg);
-  padding: var(--space-4xl);
+  padding: var(--space-2xl);
   box-shadow:
-    0 calc(2 * var(--space-2xl)) 4.5rem color-mix(in srgb, black 76%, transparent),
+    0 calc(2 * var(--space-lg)) 4.5rem color-mix(in srgb, black 76%, transparent),
     0 0.625rem 1.5rem color-mix(in srgb, black 38%, transparent),
     inset 0 0 0 1px var(--color-surface-glass);
   display: grid;
-  gap: var(--space-2xl);
+  gap: var(--space-lg);
   animation: ui-confirm-scale-up var(--motion-duration-slow) var(--motion-ease-emphasized);
 }
 
 .ui-confirm-header {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .ui-confirm-icon {
@@ -353,6 +353,6 @@
 }
 
 .ui-modal__body-paragraph {
-  margin-bottom: var(--space-2xl);
+  margin-bottom: var(--space-lg);
   line-height: 1.5;
 }

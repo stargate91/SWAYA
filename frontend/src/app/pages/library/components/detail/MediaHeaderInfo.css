@@ -47,10 +47,10 @@
 .media-detail-page__details-group {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   max-width: min(56.25rem, calc(100% - 2rem));
   position: relative;
-  padding: 0 var(--space-lg) var(--space-lg) 0;
+  padding: 0 var(--space-md) var(--space-md) 0;
 }
 
 .media-detail-page__details-group::before {
@@ -94,7 +94,7 @@
 .media-detail-page__meta-row {
   display: flex;
   align-items: center;
-  gap: var(--space-lg, var(--space-lg));
+  gap: var(--space-lg, var(--space-md));
   margin: 0;
   flex-wrap: wrap;
 }

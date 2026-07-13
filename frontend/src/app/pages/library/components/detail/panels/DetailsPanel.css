@@ -1,5 +1,5 @@
 .details-panel__ratings-title {
-  margin: 0 0 var(--space-lg) 0;
+  margin: 0 0 var(--space-md) 0;
   font-size: var(--font-size-sm);
   text-transform: uppercase;
   color: var(--color-text-muted);
@@ -8,7 +8,7 @@
 .ratings-container {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .rating-card {
@@ -17,11 +17,11 @@
   align-items: center;
   justify-content: space-between;
   min-height: 3.25rem;
-  padding: var(--space-lg) var(--space-lg);
+  padding: var(--space-md) var(--space-md);
   background: var(--media-detail-panel-card-bg);
   border: 1px solid var(--media-detail-panel-card-border);
   border-radius: var(--radius-lg);
-  gap: var(--space-lg);
+  gap: var(--space-md);
   box-shadow: var(--media-detail-panel-card-shadow);
 }
 
@@ -46,7 +46,7 @@
 .companies-networks-container {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .companies-networks-container .specs-card--company:last-child:nth-child(odd) {
@@ -58,9 +58,9 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   min-height: 3.625rem;
-  padding: var(--space-lg) var(--space-2xl);
+  padding: var(--space-md) var(--space-lg);
 }
 
 .specs-card__company-logo {
@@ -85,7 +85,7 @@
 
 .external-links-container {
   display: flex;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .external-link-btn {

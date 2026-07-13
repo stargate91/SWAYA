@@ -227,7 +227,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
                         {t('library.details.technicalInfo') || 'Technical Info'}
                       </span>
                     </div>
-                    <div style={{ padding: 'var(--space-lg) var(--space-lg)' }}>
+                    <div style={{ padding: 'var(--space-md) var(--space-md)' }}>
                       <TechnicalPanel showTitle={false} />
                     </div>
                   </div>

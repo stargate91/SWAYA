@@ -2,7 +2,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-2xs);
+  gap: var(--space-xs);
 }
 
 .ui-meta-row__item {
@@ -12,6 +12,6 @@
 
 .ui-meta-row__item+.ui-meta-row__item::before {
   content: "-";
-  margin-right: var(--space-2xs);
+  margin-right: var(--space-xs);
   opacity: 0.4;
 }

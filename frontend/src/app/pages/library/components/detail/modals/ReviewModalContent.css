@@ -1,9 +1,9 @@
 .review-modal-form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   width: 100%;
-  padding: var(--space-2xs) 0;
+  padding: var(--space-xs) 0;
 }
 
 .review-modal-wrapper {
@@ -17,7 +17,7 @@
   background: var(--color-bg-canvas);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
-  padding: var(--space-lg) var(--space-2xl);
+  padding: var(--space-md) var(--space-lg);
   color: var(--color-text-primary);
   font-size: var(--font-size-sm);
   font-family: var(--font-sans);

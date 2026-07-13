@@ -5,15 +5,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-4xl);
+  padding: var(--space-2xl);
   background: color-mix(in srgb, black 82%, transparent);
   backdrop-filter: var(--glass-blur-md);
   -webkit-backdrop-filter: var(--glass-blur-md);
 }
 
 .ui-lightbox__close-container {
-  top: var(--space-4xl);
-  right: var(--space-4xl);
+  top: var(--space-2xl);
+  right: var(--space-2xl);
   z-index: calc(var(--z-index-backdrop) + 10);
 }
 
@@ -33,5 +33,5 @@
   max-height: 88vh;
   object-fit: contain;
   border-radius: var(--radius-lg);
-  box-shadow: 0 var(--space-3xl) 3.75rem color-mix(in srgb, black 55%, transparent);
+  box-shadow: 0 var(--space-xl) 3.75rem color-mix(in srgb, black 55%, transparent);
 }

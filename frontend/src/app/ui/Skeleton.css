@@ -21,7 +21,7 @@
 
 .ui-skeleton-row {
   display: flex;
-  gap: var(--space-3xl);
+  gap: var(--space-xl);
   overflow: hidden;
 }
 
@@ -35,14 +35,14 @@
 
 .ui-skeleton-banner {
   min-height: 25rem;
-  margin-bottom: var(--space-6xl);
+  margin-bottom: var(--space-4xl);
   border-radius: var(--radius-xl);
 }
 
 .ui-skeleton-title {
   width: var(--tooltip-max-width);
   min-height: 1.625rem;
-  margin-bottom: var(--space-3xl);
+  margin-bottom: var(--space-xl);
   border-radius: var(--radius-sm);
 }
 

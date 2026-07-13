@@ -1,9 +1,9 @@
 .ui-compact-card {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   width: 100%;
-  padding: var(--space-lg);
+  padding: var(--space-md);
   background: var(--ui-control-bg-subtle);
   border: 1px solid var(--ui-control-border);
   border-radius: var(--radius-md);
@@ -66,14 +66,14 @@
 }
 
 .ui-compact-card--aspect-square .ui-compact-card__poster-wrapper {
-  width: calc(4 * var(--space-2xl));
-  height: calc(4 * var(--space-2xl));
+  width: calc(4 * var(--space-lg));
+  height: calc(4 * var(--space-lg));
   border-radius: var(--radius-sm, var(--radius-sm));
 }
 
 .ui-compact-card--aspect-circle .ui-compact-card__poster-wrapper {
-  width: var(--space-7xl);
-  height: var(--space-7xl);
+  width: var(--space-5xl);
+  height: var(--space-5xl);
   border-radius: var(--radius-full);
 }
 
@@ -83,14 +83,14 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xs);
+  gap: var(--space-xs);
 }
 
 .ui-compact-card__topline {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   width: 100%;
 }
 

@@ -6,7 +6,7 @@
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   overflow: hidden;
-  margin-bottom: var(--space-6xl);
+  margin-bottom: var(--space-4xl);
 }
 
 .widget-shell.widget-shell--transparent {

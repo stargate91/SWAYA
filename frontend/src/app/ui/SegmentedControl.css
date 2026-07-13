@@ -6,7 +6,7 @@
   border: 1px solid var(--ui-control-border, var(--color-border-default));
   border-radius: var(--ui-control-radius, var(--radius-sm));
   background: var(--ui-control-bg, var(--ui-surface-ghost));
-  gap: calc(var(--space-2xs) / 2);
+  gap: calc(var(--space-xs) / 2);
   box-sizing: border-box;
 }
 
@@ -15,7 +15,7 @@
   align-items: center;
   justify-content: center;
   flex: 1;
-  padding: 0 var(--space-2xl);
+  padding: 0 var(--space-lg);
   border: 0;
   border-radius: calc(var(--ui-control-radius, var(--radius-sm)) - var(--radius-sm));
   background: transparent;
@@ -56,11 +56,11 @@
   background-color: var(--color-surface-glass);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-sm);
-  padding: calc(var(--space-2xs) / 2);
+  padding: calc(var(--space-xs) / 2);
 }
 
 .ui-segmented-control--filter .ui-segmented-control__option {
-  padding: var(--space-2xs) var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-bold, 700);
   line-height: 1;

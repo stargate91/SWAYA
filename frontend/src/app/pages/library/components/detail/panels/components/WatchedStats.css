@@ -1,7 +1,7 @@
 .watched-panel {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3xl);
+  gap: var(--space-xl);
 }
 
 .watched-panel .specs-card__value.status-watched {
@@ -59,7 +59,7 @@
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-md);
   background: var(--color-surface-glass);
   border: 1px solid var(--media-detail-panel-card-border);
@@ -97,7 +97,7 @@
 .activity-list {
   display: flex;
   flex-direction: column;
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   border: 1px solid var(--media-detail-panel-card-border);
   border-radius: var(--radius-md);
   background: var(--color-panel-soft);
@@ -106,10 +106,10 @@
 }
 
 .activity-item {
-  padding: var(--space-sm) var(--space-2xs);
+  padding: var(--space-sm) var(--space-xs);
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .activity-item+.activity-item {
@@ -127,7 +127,7 @@
 }
 
 .activity-list__empty {
-  padding: var(--space-lg) var(--space-2xl);
+  padding: var(--space-md) var(--space-lg);
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   font-style: italic;
@@ -146,7 +146,7 @@
 }
 
 .watched-panel .ui-card.season-progress-card {
-  padding: var(--space-lg) var(--space-2xl);
+  padding: var(--space-md) var(--space-lg);
   border: 1px solid var(--media-detail-panel-card-border);
   border-radius: var(--radius-lg);
   background: var(--media-detail-panel-card-bg);
@@ -215,7 +215,7 @@
 .activity-item__tv-top {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .activity-item__token {

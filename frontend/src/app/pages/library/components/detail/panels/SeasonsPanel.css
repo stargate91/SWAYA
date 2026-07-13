@@ -1,7 +1,7 @@
 .seasons-panel {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xl);
+  gap: var(--space-lg);
   user-select: none;
   overflow-x: hidden;
 }
@@ -57,8 +57,8 @@
 .seasons-carousel {
   display: flex;
   overflow-x: auto;
-  gap: var(--space-lg);
-  padding: var(--space-sm) 0 var(--space-lg) 0;
+  gap: var(--space-md);
+  padding: var(--space-sm) 0 var(--space-md) 0;
   scroll-behavior: smooth;
   flex: 1;
 }
@@ -144,7 +144,7 @@
   background: var(--media-detail-panel-section-bg, var(--color-panel-soft));
   border: 1px solid var(--media-detail-panel-section-border, var(--color-surface-glass));
   border-radius: var(--radius-lg);
-  padding: var(--space-lg) var(--space-2xl);
+  padding: var(--space-md) var(--space-lg);
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
@@ -155,7 +155,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .active-season-info__title {
@@ -170,14 +170,14 @@
   color: var(--color-text-muted);
   display: flex;
   align-items: center;
-  gap: var(--space-2xl);
-  margin-top: calc(var(--space-2xs) / 2);
+  gap: var(--space-lg);
+  margin-top: calc(var(--space-xs) / 2);
 }
 
 .active-season-info__meta-date {
   display: inline-flex;
   align-items: center;
-  gap: calc(var(--space-lg) / 2);
+  gap: calc(var(--space-md) / 2);
   min-width: 5.625rem;
   flex-shrink: 0;
 }
@@ -185,7 +185,7 @@
 .active-season-info__meta-episodes {
   display: inline-flex;
   align-items: center;
-  gap: calc(var(--space-lg) / 2);
+  gap: calc(var(--space-md) / 2);
 }
 
 .active-season-info__meta-date svg,
@@ -206,7 +206,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-sm);
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
@@ -251,8 +251,8 @@
 /* Individual Episode Card */
 .episode-card {
   display: flex;
-  gap: var(--space-lg);
-  padding: var(--space-lg);
+  gap: var(--space-md);
+  padding: var(--space-md);
   background: var(--media-detail-panel-card-bg, var(--color-surface-card));
   border: 1px solid var(--media-detail-panel-card-border, var(--color-border-default));
   border-radius: var(--radius-md);
@@ -305,8 +305,8 @@
 }
 
 .episode-card__tmdb-pill {
-  gap: calc(var(--space-lg) / 2);
-  padding: calc(var(--space-2xs) / 4) var(--space-sm);
+  gap: calc(var(--space-md) / 2);
+  padding: calc(var(--space-xs) / 4) var(--space-sm);
   min-height: 1.25rem;
   font-size: var(--font-size-2xs);
   line-height: 1;
@@ -376,12 +376,12 @@
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-muted);
-  margin-top: calc(var(--space-2xs) / 4);
+  margin-top: calc(var(--space-xs) / 4);
 }
 
 .episode-card__meta-item {
   background: var(--color-border-subtle);
-  padding: calc(var(--space-2xs) / 4) var(--space-sm);
+  padding: calc(var(--space-xs) / 4) var(--space-sm);
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-surface-glass);
 }
@@ -451,7 +451,7 @@
 /* Empty states */
 .seasons-panel__empty,
 .episodes-list__empty {
-  padding: var(--space-2xl);
+  padding: var(--space-lg);
   text-align: center;
   color: var(--color-text-muted);
   font-style: italic;
@@ -481,8 +481,8 @@
 
 /* Episode Peaks */
 .episode-card__peaks-list {
-  margin-top: var(--space-lg);
-  padding-top: var(--space-lg);
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
   border-top: 1px dashed var(--color-border-default);
   display: flex;
   flex-direction: column;
@@ -506,14 +506,14 @@
 .episode-card__peaks-items {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xs);
+  gap: var(--space-xs);
 }
 
 .episode-card__peak-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   background: var(--color-border-subtle);
   padding: var(--space-sm) var(--space-sm);
   border-radius: var(--radius-sm);
@@ -538,7 +538,7 @@
   border: none;
   color: var(--color-text-muted);
   cursor: pointer;
-  padding: var(--space-2xs);
+  padding: var(--space-xs);
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;

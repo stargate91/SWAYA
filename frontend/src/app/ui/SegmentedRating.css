@@ -8,7 +8,7 @@
 .table-segmented-rating-container .rating-segmented-bar {
   display: flex;
   width: 10.25rem;
-  height: var(--space-3xl);
+  height: var(--space-xl);
   --local-gap: var(--radius-2xs);
   gap: var(--local-gap);
   cursor: pointer;

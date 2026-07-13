@@ -21,7 +21,7 @@
 /* Default Variant */
 .ui-selectable-card--default {
   gap: var(--space-sm);
-  padding: var(--space-2xl);
+  padding: var(--space-lg);
   border-radius: var(--ui-control-radius);
   border: 1.5px solid var(--color-line);
   background: var(--color-selectable-card-bg, var(--ui-surface-ghost));
@@ -47,8 +47,8 @@
 
 /* Theme Tab Variant */
 .ui-selectable-card--theme {
-  gap: var(--space-lg);
-  padding: var(--space-lg);
+  gap: var(--space-md);
+  padding: var(--space-md);
   background: var(--ui-control-bg-subtle, var(--color-surface-card));
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-md);
@@ -71,5 +71,5 @@
 .ui-selectable-card--theme.is-selected {
   background: var(--color-state-info-bg, color-mix(in srgb, var(--color-accent-blue) 8%, transparent));
   border-color: var(--color-accent-blue);
-  box-shadow: 0 0 var(--space-lg) color-mix(in srgb, var(--color-accent-blue) 20%, transparent);
+  box-shadow: 0 0 var(--space-md) color-mix(in srgb, var(--color-accent-blue) 20%, transparent);
 }
