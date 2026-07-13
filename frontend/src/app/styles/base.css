@@ -216,4 +216,3 @@ a {
   background: color-mix(in srgb, var(--color-text-primary, white) 15%, transparent);
   transform: translateY(-50%);
 }
-

@@ -234,14 +234,22 @@
   --app-shell-scrollbar-thumb-hover: rgba(0, 136, 255, 0.34);
   --app-shell-scrollbar-thumb-active: rgba(0, 136, 255, 0.48);
   --app-shell-scrollbar-border: rgba(255, 255, 255, 0.04);
-  --app-shell-space-1: var(--space-2xs); /* 4px */
-  --app-shell-space-2: var(--space-sm);  /* 8px */
-  --app-shell-space-3: var(--space-lg);  /* 12px */
-  --app-shell-space-4: var(--space-2xl); /* 16px */
-  --app-shell-space-5: var(--space-3xl); /* 20px */
-  --app-shell-space-6: var(--space-4xl); /* 24px */
-  --app-shell-space-7: var(--space-5xl); /* 32px */
-  --app-shell-space-8: var(--space-6xl); /* 40px */
+  --app-shell-space-1: var(--space-2xs);
+  /* 4px */
+  --app-shell-space-2: var(--space-sm);
+  /* 8px */
+  --app-shell-space-3: var(--space-lg);
+  /* 12px */
+  --app-shell-space-4: var(--space-2xl);
+  /* 16px */
+  --app-shell-space-5: var(--space-3xl);
+  /* 20px */
+  --app-shell-space-6: var(--space-4xl);
+  /* 24px */
+  --app-shell-space-7: var(--space-5xl);
+  /* 32px */
+  --app-shell-space-8: var(--space-6xl);
+  /* 40px */
   --app-shell-space-9: var(--space-7xl);
   --app-shell-space-10: var(--space-8xl);
   --app-shell-radius-sm: 10px;
