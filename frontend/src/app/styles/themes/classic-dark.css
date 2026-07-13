@@ -66,27 +66,27 @@
   --color-accent-gradient: linear-gradient(135deg, #0e639c 0%, #007acc 100%);
 
   /* App Shell */
-  --app-shell-color-panel: rgba(37, 37, 38, 0.95);
-  --app-shell-color-panel-strong: rgba(37, 37, 38, 0.98);
-  --app-shell-color-panel-soft: rgba(255, 255, 255, 0.015);
-  --app-shell-color-line: rgba(212, 212, 212, 0.12);
-  --app-shell-color-line-strong: rgba(0, 122, 204, 0.22);
-  --app-shell-color-accent-strong: #569cd6;
-  --app-shell-color-accent-soft: rgba(0, 122, 204, 0.12);
-  --app-shell-color-accent-glow: rgba(0, 122, 204, 0.28);
-  --app-shell-color-signal: #007acc;
-  --app-shell-color-signal-soft: rgba(0, 122, 204, 0.16);
+  --color-panel-translucent: rgba(37, 37, 38, 0.95);
+  --color-panel-strong: rgba(37, 37, 38, 0.98);
+  --color-panel-soft: rgba(255, 255, 255, 0.015);
+  --color-line: rgba(212, 212, 212, 0.12);
+  --color-line-strong: rgba(0, 122, 204, 0.22);
+  --color-accent-strong: #569cd6;
+  --color-accent-soft: rgba(0, 122, 204, 0.12);
+  --color-accent-glow: rgba(0, 122, 204, 0.28);
+  --color-signal: #007acc;
+  --color-signal-soft: rgba(0, 122, 204, 0.16);
 
-  --app-shell-scrollbar-track: rgba(30, 30, 30, 0.25);
-  --app-shell-scrollbar-track-hover: rgba(30, 30, 30, 0.4);
-  --app-shell-scrollbar-thumb: rgba(0, 122, 204, 0.25);
-  --app-shell-scrollbar-thumb-hover: rgba(86, 156, 214, 0.45);
-  --app-shell-scrollbar-thumb-active: rgba(0, 122, 204, 0.6);
+  --scrollbar-track: rgba(30, 30, 30, 0.25);
+  --scrollbar-track-hover: rgba(30, 30, 30, 0.4);
+  --scrollbar-thumb: rgba(0, 122, 204, 0.25);
+  --scrollbar-thumb-hover: rgba(86, 156, 214, 0.45);
+  --scrollbar-thumb-active: rgba(0, 122, 204, 0.6);
 
   /* Shadow overrides */
-  --app-shell-shadow-sm: 0 0.375rem 1rem rgba(30, 30, 30, 0.3);
-  --app-shell-shadow-md: 0 0.75rem 1.75rem rgba(30, 30, 30, 0.38);
-  --app-shell-shadow-lg: 0 1.25rem 3rem rgba(30, 30, 30, 0.48);
+  --shadow-sm: 0 0.375rem 1rem rgba(30, 30, 30, 0.3);
+  --shadow-md: 0 0.75rem 1.75rem rgba(30, 30, 30, 0.38);
+  --shadow-lg: 0 1.25rem 3rem rgba(30, 30, 30, 0.48);
 
   /* Button overrides */
   --button-primary-bg: linear-gradient(135deg, #0e639c, #007acc);
@@ -105,5 +105,5 @@
   --media-detail-hero-overlay:
     linear-gradient(125deg, rgba(30, 30, 30, 0.85) 0%, rgba(30, 30, 30, 0.7) 20%, rgba(30, 30, 30, 0.35) 45%, rgba(30, 30, 30, 0.05) 70%, transparent 90%),
     linear-gradient(to top, var(--color-bg-canvas) 0%, rgba(30, 30, 30, 0.4) 15%, transparent 45%),
-    radial-gradient(35% 45% at 20% 30%, color-mix(in srgb, var(--app-shell-color-accent) 10%, transparent) 0%, transparent 100%);
+    radial-gradient(35% 45% at 20% 30%, color-mix(in srgb, var(--color-accent) 10%, transparent) 0%, transparent 100%);
 }

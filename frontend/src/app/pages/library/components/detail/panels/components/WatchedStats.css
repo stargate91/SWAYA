@@ -230,7 +230,7 @@
   background: color-mix(in srgb, var(--color-accent-blue) 12%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-accent-blue) 30%, transparent);
   color: var(--color-accent-blue);
-  letter-spacing: 0.0.3125rem;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
   height: 1.125rem;
   line-height: 1.125rem;

@@ -32,7 +32,7 @@
 }
 
 .lists-sidebar__title {
-  font-family: var(--font-family-display);
+  font-family: var(--font-display);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.1em;
@@ -209,7 +209,7 @@
 }
 
 .lists-sidebar__collage--2 .lists-sidebar__collage-img {
-  width: calc(50% - 0.0.3125rem);
+  width: calc(50% - 0.5px);
   height: 100%;
 }
 
@@ -233,33 +233,33 @@
 /* 4 ITEMS: Asymmetric masonry split */
 .lists-sidebar__collage--4 .lists-sidebar__collage-img {
   position: absolute;
-  width: calc(50% - 0.0.3125rem);
+  width: calc(50% - 0.5px);
 }
 
 /* Left Column */
 .lists-sidebar__collage--4 .lists-sidebar__collage-img--0 {
   left: 0;
   top: 0;
-  height: calc(69% - 0.0.3125rem);
+  height: calc(69% - 0.5px);
 }
 
 .lists-sidebar__collage--4 .lists-sidebar__collage-img--1 {
   left: 0;
   bottom: 0;
-  height: calc(31% - 0.0.3125rem);
+  height: calc(31% - 0.5px);
 }
 
 /* Right Column */
 .lists-sidebar__collage--4 .lists-sidebar__collage-img--2 {
   right: 0;
   top: 0;
-  height: calc(31% - 0.0.3125rem);
+  height: calc(31% - 0.5px);
 }
 
 .lists-sidebar__collage--4 .lists-sidebar__collage-img--3 {
   right: 0;
   bottom: 0;
-  height: calc(69% - 0.0.3125rem);
+  height: calc(69% - 0.5px);
 }
 
 /* Hover micro-zoom effect */

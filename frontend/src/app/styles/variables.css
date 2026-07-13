@@ -4,9 +4,9 @@
 :root,
 [data-theme="dark"] {
   /* Foundation */
-  --font-family-base: 'Outfit', sans-serif;
-  --font-family-sans: 'IBM Plex Sans', sans-serif;
-  --font-family-display: 'Sora', sans-serif;
+  --font-base: 'Outfit', sans-serif;
+  --font-sans: 'IBM Plex Sans', sans-serif;
+  --font-display: 'Sora', sans-serif;
   /* Standard Font Sizes */
   --font-size-2xs: 0.625rem;
   --font-size-xs: 0.75rem;
@@ -158,14 +158,14 @@
   --modal-footer-highlight: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.01));
   --modal-divider: color-mix(in srgb, var(--color-text-primary) 6%, transparent);
   --modal-divider-subtle: color-mix(in srgb, var(--color-text-primary) 4%, transparent);
-  --modal-title-color: var(--app-shell-color-ink);
-  --modal-description-color: var(--app-shell-color-muted);
+  --modal-title-color: var(--color-ink);
+  --modal-description-color: var(--color-muted);
   --modal-close-bg: color-mix(in srgb, var(--modal-surface-card-strong) 78%, transparent);
   --modal-close-bg-hover: color-mix(in srgb, var(--modal-surface-card-strong) 96%, rgba(255, 255, 255, 0.03));
   --modal-close-border: var(--color-border-strong);
   --modal-close-border-hover: color-mix(in srgb, var(--color-text-primary) 18%, transparent);
-  --modal-close-color: var(--app-shell-color-muted);
-  --modal-close-color-hover: var(--app-shell-color-ink);
+  --modal-close-color: var(--color-muted);
+  --modal-close-color-hover: var(--color-ink);
   --modal-field-bg: color-mix(in srgb, var(--color-bg-elevated) 76%, var(--color-bg-canvas) 24%);
   --modal-field-hover: color-mix(in srgb, var(--color-bg-elevated) 69%, var(--color-bg-canvas) 31%);
   --modal-field-active: color-mix(in srgb, var(--color-bg-elevated) 64%, var(--color-bg-canvas) 36%);
@@ -179,7 +179,7 @@
   --dropdown-field-border: var(--color-border-subtle);
   --dropdown-field-hover-border: color-mix(in srgb, var(--color-text-primary) 20%, transparent);
   --dropdown-field-active-border: var(--color-accent-blue);
-  --dropdown-field-shadow: 0 0.25rem 0.625rem color-mix(in srgb, var(--app-shell-color-accent) 10%, transparent);
+  --dropdown-field-shadow: 0 0.25rem 0.625rem color-mix(in srgb, var(--color-accent) 10%, transparent);
   --dropdown-menu-bg: color-mix(in srgb, var(--color-bg-canvas) 95%, transparent);
   --dropdown-menu-border: var(--color-border-subtle);
   --dropdown-menu-border-top: var(--color-surface-glass-heavy);
@@ -194,77 +194,42 @@
   --dropdown-option-selected-bg: var(--color-state-info-bg);
   --dropdown-option-selected-color: var(--color-accent-blue);
   /* Layout Tokens */
-  --layout-sidebar-width-expanded: 13.75rem;
-  --layout-sidebar-width-collapsed: 4.875rem;
-  --layout-inspector-width: 21.875rem;
-  --layout-main-content-padding-x: 3.75rem;
-  --layout-window-titlebar-height: 2.875rem;
-  --layout-main-content-padding-top: 5.25rem;
-  --layout-main-content-padding-bottom: 0px;
-  --layout-main-content-padding: var(--layout-main-content-padding-top) var(--layout-main-content-padding-x) var(--layout-main-content-padding-bottom);
-  --layout-top-control-anchor: calc(var(--layout-window-titlebar-height) + 1.375rem);
-  --layout-top-control-height: 2.375rem;
-  --layout-side-toggle-size: 1.5rem;
-  --layout-top-control-center-y: calc(var(--layout-top-control-anchor) + (var(--layout-top-control-height) / 2));
-  --layout-modal-padding-md: 1.5rem;
-  --layout-modal-padding-lg: 2rem;
+  --layout-window-titlebar-height: 3rem;
 
   /* App Shell Tokens */
-  --app-shell-color-canvas: var(--color-bg-canvas);
-  --app-shell-color-panel: color-mix(in srgb, var(--color-bg-elevated) 90%, transparent);
-  --app-shell-color-panel-strong: rgba(24, 28, 37, 0.98);
-  --app-shell-color-panel-soft: rgba(255, 255, 255, 0.015);
-  --app-shell-color-ink: var(--color-text-primary);
-  --app-shell-color-muted: var(--color-text-secondary);
-  --app-shell-color-subtle: var(--color-text-muted);
-  --app-shell-color-line: rgba(255, 255, 255, 0.065);
-  --app-shell-color-line-strong: rgba(255, 255, 255, 0.13);
-  --app-shell-color-accent: var(--color-accent-blue);
-  --app-shell-color-accent-strong: #1d4ed8;
-  --app-shell-color-accent-soft: rgba(59, 130, 246, 0.12);
-  --app-shell-color-accent-glow: rgba(59, 130, 246, 0.24);
-  --app-shell-color-signal: #60a5fa;
-  --app-shell-color-signal-soft: rgba(96, 165, 250, 0.16);
-  --app-shell-color-info: var(--color-state-info);
-  --app-shell-scrollbar-size: 0.625rem;
-  --app-shell-scrollbar-radius: 62.4375rem;
-  --app-shell-scrollbar-track: rgba(255, 255, 255, 0.025);
-  --app-shell-scrollbar-track-hover: rgba(255, 255, 255, 0.04);
-  --app-shell-scrollbar-thumb: rgba(255, 255, 255, 0.12);
-  --app-shell-scrollbar-thumb-hover: rgba(0, 136, 255, 0.34);
-  --app-shell-scrollbar-thumb-active: rgba(0, 136, 255, 0.48);
-  --app-shell-scrollbar-border: rgba(255, 255, 255, 0.04);
-  --app-shell-space-1: var(--space-2xs);
-  /* 0.25rem */
-  --app-shell-space-2: var(--space-sm);
-  /* 0.5rem */
-  --app-shell-space-3: var(--space-lg);
-  /* 0.75rem */
-  --app-shell-space-4: var(--space-2xl);
-  /* 1rem */
-  --app-shell-space-5: var(--space-3xl);
-  /* 1.25rem */
-  --app-shell-space-6: var(--space-4xl);
-  /* 1.5rem */
-  --app-shell-space-7: var(--space-5xl);
-  /* 2rem */
-  --app-shell-space-8: var(--space-6xl);
-  /* 2.5rem */
-  --app-shell-space-9: var(--space-7xl);
-  --app-shell-space-10: var(--space-8xl);
-  --app-shell-radius-sm: 0.625rem;
-  --app-shell-radius-md: 0.75rem;
-  --app-shell-radius-lg: 1rem;
-  --app-shell-radius-xl: 1.25rem;
-  --app-shell-radius-pill: 62.4375rem;
-  --app-shell-shadow-sm: 0 0.875rem 1.875rem rgba(0, 0, 0, 0.32);
-  --app-shell-shadow-md: 0 1.5rem 3.25rem rgba(0, 0, 0, 0.42);
-  --app-shell-shadow-lg: 0 2.25rem 5.125rem rgba(0, 0, 0, 0.56);
-  --app-shell-text-hero: 800 clamp(2.2rem, 3vw, 3.6rem) / 0.96 var(--font-family-display);
-  --app-shell-text-title: 700 clamp(1.45rem, 1.6vw, 2rem) / 1.05 var(--font-family-display);
-  --app-shell-text-section: 600 1rem / 1.2 var(--font-family-display);
-  --app-shell-text-body: 400 0.98rem / 1.6 var(--font-family-sans);
-  --app-shell-text-caption: 500 0.78rem / 1.35 var(--font-family-sans);
+  --color-canvas: var(--color-bg-canvas);
+  --color-panel-translucent: color-mix(in srgb, var(--color-bg-elevated) 90%, transparent);
+  --color-panel-strong: rgba(24, 28, 37, 0.98);
+  --color-panel-soft: rgba(255, 255, 255, 0.015);
+  --color-ink: var(--color-text-primary);
+  --color-muted: var(--color-text-secondary);
+  --color-subtle: var(--color-text-muted);
+  --color-line: rgba(255, 255, 255, 0.065);
+  --color-line-strong: rgba(255, 255, 255, 0.13);
+  --color-accent: var(--color-accent-blue);
+  --color-accent-strong: #1d4ed8;
+  --color-accent-soft: rgba(59, 130, 246, 0.12);
+  --color-accent-glow: rgba(59, 130, 246, 0.24);
+  --color-signal: #60a5fa;
+  --color-signal-soft: rgba(96, 165, 250, 0.16);
+  --scrollbar-size: 0.625rem;
+  --scrollbar-radius: 9999px;
+  --scrollbar-track: rgba(255, 255, 255, 0.025);
+  --scrollbar-track-hover: rgba(255, 255, 255, 0.04);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.12);
+  --scrollbar-thumb-hover: rgba(0, 136, 255, 0.34);
+  --scrollbar-thumb-active: rgba(0, 136, 255, 0.48);
+  --scrollbar-border: rgba(255, 255, 255, 0.04);
+
+
+  --shadow-sm: 0 0.75rem 1.75rem rgba(0, 0, 0, 0.32);
+  --shadow-md: 0 1.5rem 3.25rem rgba(0, 0, 0, 0.42);
+  --shadow-lg: 0 2.25rem 5.125rem rgba(0, 0, 0, 0.56);
+  --text-hero: 800 clamp(2.2rem, 3vw, 3.6rem) / 0.96 var(--font-display);
+  --text-title: 700 clamp(1.45rem, 1.6vw, 2rem) / 1.05 var(--font-display);
+  --text-section: 600 1rem / 1.2 var(--font-display);
+  --text-body: 400 0.98rem / 1.6 var(--font-sans);
+  --text-caption: 500 0.78rem / 1.35 var(--font-sans);
 
   /* Button Tokens */
   --button-height-sm: 2.25rem;
@@ -276,7 +241,7 @@
   --button-focus-ring: 0 0 0 2px var(--color-accent-blue);
   --button-primary-bg: linear-gradient(135deg, #1493ff, #0064d1);
   --button-primary-color: #ffffff;
-  --button-primary-shadow: 0 0.25rem 0.75rem color-mix(in srgb, var(--app-shell-color-accent) 14%, transparent);
+  --button-primary-shadow: 0 0.25rem 0.75rem color-mix(in srgb, var(--color-accent) 14%, transparent);
   --button-primary-hover-filter: brightness(1.05);
   --button-primary-neutral-bg: rgba(255, 255, 255, 0.08);
   --button-primary-neutral-color: #f4f8fc;
@@ -345,7 +310,7 @@
   --ui-empty-page-filter-icon-border: color-mix(in srgb, var(--color-accent) 10%, transparent);
   --ui-empty-page-filter-description-color: color-mix(in srgb, var(--color-muted) 86%, var(--color-text-faint, var(--color-muted)));
   --ui-overlay-backdrop-bg: rgba(3, 4, 7, 0.74);
-  --ui-overlay-backdrop-blur: blur(0.875rem) saturate(125%);
+  --ui-overlay-backdrop-blur: blur(0.75rem) saturate(125%);
   --ui-overlay-panel-border: color-mix(in srgb, var(--color-line-strong) 72%, rgba(255, 255, 255, 0.04));
   --ui-overlay-panel-shadow:
     0 1.75rem 4.5rem rgba(0, 0, 0, 0.66),
@@ -365,7 +330,7 @@
     linear-gradient(180deg,
       color-mix(in srgb, var(--color-panel-strong) 97%, black),
       color-mix(in srgb, var(--color-canvas) 94%, black));
-  --ui-floating-surface-blur: blur(1.375rem) saturate(125%);
+  --ui-floating-surface-blur: blur(1.25rem) saturate(125%);
   --ui-floating-surface-highlight:
     linear-gradient(180deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0.01) 18%, transparent 44%);
   --ui-floating-surface-bottom-line: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.035), transparent);
@@ -384,7 +349,7 @@
     radial-gradient(circle at 15% 75%, rgba(9, 11, 15, 0.76) 0%, rgba(9, 11, 15, 0.4) 40%, transparent 80%),
     linear-gradient(90deg, rgba(9, 11, 15, 0.38) 0%, rgba(9, 11, 15, 0.12) 30%, transparent 70%),
     linear-gradient(to top, var(--color-bg-canvas) 0%, rgba(9, 11, 15, 0.1) 15%, transparent 50%),
-    radial-gradient(35% 45% at 18% 45%, color-mix(in srgb, var(--app-shell-color-accent) 15%, transparent) 0%, transparent 100%);
+    radial-gradient(35% 45% at 18% 45%, color-mix(in srgb, var(--color-accent) 15%, transparent) 0%, transparent 100%);
   --media-detail-backdrop-filter: saturate(1.1) contrast(1.05) brightness(0.92);
   --media-detail-backdrop-tint:
     linear-gradient(180deg, rgba(4, 16, 36, 0.38) 0%, rgba(2, 8, 20, 0.26) 100%),
@@ -392,16 +357,16 @@
     radial-gradient(60% 70% at 25% 75%, rgba(0, 60, 130, 0.22) 0%, transparent 70%);
   --media-detail-backdrop-tint-opacity: 0.86;
   --media-detail-backdrop-tint-blend-mode: soft-light;
-  --media-detail-side-nav-bg: color-mix(in srgb, var(--app-shell-color-panel) 82%, transparent);
-  --media-detail-side-nav-bg-hover: color-mix(in srgb, var(--app-shell-color-panel-strong) 88%, transparent);
+  --media-detail-side-nav-bg: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
+  --media-detail-side-nav-bg-hover: color-mix(in srgb, var(--color-panel-strong) 88%, transparent);
   --media-detail-side-nav-border: color-mix(in srgb, var(--color-border-default) 92%, transparent);
   --media-detail-side-nav-border-hover: color-mix(in srgb, var(--color-border-strong) 96%, transparent);
   --media-detail-side-nav-shadow: 0 1.125rem 2.125rem rgba(0, 0, 0, 0.22);
   --media-detail-side-nav-blur: blur(0.875rem) saturate(130%);
   --media-detail-side-panel-bg:
     linear-gradient(180deg, rgba(255, 255, 255, 0.024) 0%, rgba(255, 255, 255, 0.006) 100%),
-    linear-gradient(180deg, color-mix(in srgb, var(--app-shell-color-panel-strong) 86%, transparent) 0%, color-mix(in srgb, var(--app-shell-color-panel) 82%, transparent) 100%);
-  --media-detail-side-panel-border: color-mix(in srgb, var(--app-shell-color-line) 92%, transparent);
+    linear-gradient(180deg, color-mix(in srgb, var(--color-panel-strong) 86%, transparent) 0%, color-mix(in srgb, var(--color-panel-translucent) 82%, transparent) 100%);
+  --media-detail-side-panel-border: color-mix(in srgb, var(--color-line) 92%, transparent);
   --media-detail-side-panel-shadow:
     0 1.375rem 3.375rem rgba(0, 0, 0, 0.34),
     0 0.5rem 1.375rem rgba(0, 0, 0, 0.2),
@@ -412,7 +377,7 @@
     linear-gradient(180deg, rgba(255, 255, 255, 0.022) 0%, rgba(255, 255, 255, 0.008) 14%, transparent 30%);
   --media-detail-panel-section-bg:
     linear-gradient(180deg, rgba(255, 255, 255, 0.014) 0%, rgba(255, 255, 255, 0.005) 100%);
-  --media-detail-panel-section-border: color-mix(in srgb, var(--app-shell-color-line) 78%, transparent);
+  --media-detail-panel-section-border: color-mix(in srgb, var(--color-line) 78%, transparent);
   --media-detail-panel-section-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.02),
     inset 0 0 0 1px rgba(255, 255, 255, 0.008);
@@ -420,8 +385,8 @@
     linear-gradient(180deg, rgba(255, 255, 255, 0.012) 0%, rgba(255, 255, 255, 0.004) 100%);
   --media-detail-panel-card-bg-hover:
     linear-gradient(180deg, rgba(255, 255, 255, 0.016) 0%, rgba(255, 255, 255, 0.006) 100%);
-  --media-detail-panel-card-border: color-mix(in srgb, var(--app-shell-color-line) 72%, transparent);
-  --media-detail-panel-card-border-hover: color-mix(in srgb, var(--app-shell-color-line-strong) 86%, transparent);
+  --media-detail-panel-card-border: color-mix(in srgb, var(--color-line) 72%, transparent);
+  --media-detail-panel-card-border-hover: color-mix(in srgb, var(--color-line-strong) 86%, transparent);
   --media-detail-panel-card-shadow:
     0 0.625rem 1.5rem rgba(0, 0, 0, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.014);
@@ -429,8 +394,8 @@
     0 0.875rem 1.875rem rgba(0, 0, 0, 0.16),
     inset 0 1px 0 rgba(255, 255, 255, 0.02);
   --media-detail-panel-pill-bg: rgba(255, 255, 255, 0.01);
-  --media-detail-panel-pill-border: color-mix(in srgb, var(--app-shell-color-line) 80%, transparent);
-  --media-detail-panel-accent: var(--app-shell-color-accent);
+  --media-detail-panel-pill-border: color-mix(in srgb, var(--color-line) 80%, transparent);
+  --media-detail-panel-accent: var(--color-accent);
   --media-detail-tag-pill-bg:
     linear-gradient(180deg, color-mix(in srgb, var(--color-bg-elevated) 93%, white 7%), color-mix(in srgb, var(--color-bg-canvas) 85%, white 5%));
   --media-detail-tag-pill-bg-hover:
@@ -439,7 +404,7 @@
     linear-gradient(90deg, color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 18%, transparent) 0%, color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 9%, transparent) 34%, transparent 78%);
   --media-detail-tag-pill-accent-hover:
     linear-gradient(90deg, color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 22%, transparent) 0%, color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 11%, transparent) 34%, transparent 78%);
-  --media-detail-tag-pill-border: color-mix(in srgb, var(--app-shell-color-line-strong) 70%, transparent);
+  --media-detail-tag-pill-border: color-mix(in srgb, var(--color-line-strong) 70%, transparent);
   --media-detail-tag-pill-highlight:
     linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.025) 40%, transparent 100%);
   --media-detail-tag-pill-shadow:
@@ -485,7 +450,7 @@
   --ui-overlay-sidebar-padding: 1.8125rem 1.125rem 1.875rem 1.125rem;
   --ui-overlay-sidebar-bg:
     linear-gradient(180deg, var(--color-panel-strong), var(--color-panel)),
-    var(--app-shell-color-panel-soft, rgba(255, 255, 255, 0.018));
+    var(--color-panel-soft, rgba(255, 255, 255, 0.018));
   --ui-overlay-sidebar-blur: blur(1.375rem) saturate(120%);
   --ui-overlay-content-max-width: 47.5rem;
   --ui-overlay-content-padding: 1.8125rem 2.5rem 7.5rem 2.5rem;
@@ -549,7 +514,6 @@
     linear-gradient(90deg, color-mix(in srgb, var(--color-accent-blue) 18%, transparent), transparent 28%),
     color-mix(in srgb, var(--color-panel-strong) 86%, var(--color-surface-glass));
 
-
   /* Standard Spacing Primitives */
   --space-2xs: 0.25rem;
   --space-xs: 0.375rem;
@@ -575,14 +539,11 @@
   --radius-lg: 1rem;
   --radius-xl: 1.5rem;
   --radius-2xl: 2rem;
-  --radius-full: 624.9375rem;
+  --radius-full: 9999px;
 
   /* Shadow */
   --shadow-xs: 0 2px 0.5rem rgba(0, 0, 0, 0.2);
   --shadow-sm-strong: 0 0.25rem 1rem rgba(0, 0, 0, 0.25);
-  --shadow-sm: var(--app-shell-shadow-sm);
-  --shadow-md: var(--app-shell-shadow-md);
-  --shadow-lg: var(--app-shell-shadow-lg);
   --shadow-xl: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.5);
   --shadow-focus-blue: 0 0.5rem 1.25rem rgba(59, 130, 246, 0.2);
 
@@ -612,8 +573,9 @@
   --motion-expressive: var(--motion-duration-base) var(--motion-ease-expressive);
   --motion-spring: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   --motion-zoom: transform 0.28s ease;
-  --motion-lift-distance-sm: -1px;
-  --motion-lift-distance-md: -2px;
+  --motion-lift-distance-sm: -3px;
+  --motion-lift-distance-md: -5px;
+
   /* Z-Index Scale */
   --z-index-dropdown: 100;
   --z-index-sticky: 200;
@@ -629,7 +591,7 @@
   /* Dropzone Tokens */
   --color-dropzone-panel-bg: color-mix(in srgb, var(--color-bg-elevated) 95%, black);
   --shadow-overlay-dropzone:
-    0 0.75rem 1.75rem color-mix(in srgb, var(--app-shell-color-accent) 12%, transparent),
+    0 0.75rem 1.75rem color-mix(in srgb, var(--color-accent) 12%, transparent),
     0 0.375rem 0.875rem rgba(0, 0, 0, 0.25),
     0 0 0 1px var(--color-border-subtle);
 }

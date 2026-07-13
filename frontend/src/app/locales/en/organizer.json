@@ -99,6 +99,12 @@
     "loadAllSuccess": "All files loaded successfully.",
     "noMediaPlayerConfigured": "No media player configured.",
     "deleteActionFailed": "Oops, we couldn't delete that file.",
+    "deleteIgnoreSuccess": "File hidden from list.",
+    "deleteIgnoreSuccessPlural": "{count} files hidden from list.",
+    "deleteTrashSuccess": "File moved to trash.",
+    "deleteTrashSuccessPlural": "{count} files moved to trash.",
+    "deleteDbOnlySuccess": "File removed from SWAYA.",
+    "deleteDbOnlySuccessPlural": "{count} files removed from SWAYA.",
     "previewFailed": "Could not preview this file.",
     "showInFolderFailed": "Could not locate this file in your folders.",
     "abortTaskFailed": "Could not stop the current task."

@@ -193,7 +193,7 @@
   background: var(--ui-table-header-bg, transparent);
   backdrop-filter: var(--ui-table-header-backdrop-filter, none);
   -webkit-backdrop-filter: var(--ui-table-header-backdrop-filter, none);
-  border-bottom: var(--ui-table-header-border-bottom, 1.0.3125rem solid var(--color-border-subtle));
+  border-bottom: var(--ui-table-header-border-bottom, 1.5px solid var(--color-border-subtle));
   padding-bottom: var(--ui-table-header-padding-bottom, var(--space-sm));
 }
 

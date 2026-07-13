@@ -74,7 +74,7 @@
 
 .bespoke-scene-tagger-pill-active:hover {
   opacity: 0.8;
-  transform: translateY(-0.0.3125rem);
+  transform: translateY(-0.5px);
 }
 
 .bespoke-scene-tagger-pill-remove-icon {
@@ -158,7 +158,7 @@
   background: var(--color-surface-overlay);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-md);
-  box-shadow: var(--app-shell-shadow-lg);
+  box-shadow: var(--shadow-lg);
   z-index: 100;
   max-height: 12.5rem;
   overflow-y: auto;

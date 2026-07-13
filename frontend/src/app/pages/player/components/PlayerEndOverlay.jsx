@@ -120,7 +120,7 @@ export default function PlayerEndOverlay({
           </h2>
         </div>
 
-        <div className="player-page__drawer-content">
+        <div className="player-page__drawer-content no-scrollbar">
           <div className="player-page__drawer-media-container">
             <div className={`player-page__card player-page__card--static ${(mediaType === 'episode' || mediaType === 'scene') ? 'player-page__card--hero' : 'player-page__card--single'}`}>
               <div className="player-page__card-media">
@@ -237,7 +237,7 @@ export default function PlayerEndOverlay({
           </div>
         )}
 
-        <div className={`player-page__discovery-content ${isDiscoveryEmpty ? 'player-page__discovery-content--empty' : ''}`}>
+        <div className={`player-page__discovery-content no-scrollbar ${isDiscoveryEmpty ? 'player-page__discovery-content--empty' : ''}`}>
           {/* TV SHOWS: Up Next Episode */}
           {isTv && (
             <div className="player-page__tv-next">

@@ -260,14 +260,14 @@
 
 .scene-image-picker-card:hover {
   transform: translateY(-2px);
-  border-color: var(--color-accent, var(--app-shell-color-accent));
+  border-color: var(--color-accent, var(--color-accent));
   box-shadow: var(--shadow-md);
 }
 
 .scene-image-picker-card.active,
 .scene-image-picker-card.is-selected {
-  border-color: var(--color-accent, var(--app-shell-color-accent));
-  box-shadow: 0 0 0 2px var(--color-accent, var(--app-shell-color-accent));
+  border-color: var(--color-accent, var(--color-accent));
+  box-shadow: 0 0 0 2px var(--color-accent, var(--color-accent));
   background: color-mix(in srgb, var(--color-accent) 6%, transparent);
 }
 
@@ -329,13 +329,13 @@
 }
 
 .scene-image-picker-options--logo .scene-image-picker-card:hover {
-  border-color: var(--color-accent, var(--app-shell-color-accent));
+  border-color: var(--color-accent, var(--color-accent));
 }
 
 .scene-image-picker-options--logo .scene-image-picker-card.active,
 .scene-image-picker-options--logo .scene-image-picker-card.is-selected {
-  border-color: var(--color-accent, var(--app-shell-color-accent));
-  box-shadow: 0 0 0 2px var(--color-accent, var(--app-shell-color-accent));
+  border-color: var(--color-accent, var(--color-accent));
+  box-shadow: 0 0 0 2px var(--color-accent, var(--color-accent));
   background: color-mix(in srgb, var(--color-accent) 6%, transparent);
 }
 

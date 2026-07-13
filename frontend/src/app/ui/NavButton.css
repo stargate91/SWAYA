@@ -79,7 +79,7 @@
 }
 
 .ui-nav-button--onboarding-back .ui-nav-button__icon {
-  color: color-mix(in srgb, var(--button-secondary-color) 48%, var(--app-shell-color-muted));
+  color: color-mix(in srgb, var(--button-secondary-color) 48%, var(--color-muted));
 }
 
 .ui-nav-button--onboarding-back:hover:not(:disabled) .ui-nav-button__icon {

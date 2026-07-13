@@ -72,7 +72,7 @@ export default function DetailPageShell({
         <Page className={`${combinedClassName} entity-detail-page--people`}>
           <div className="entity-detail-page__hero-section-wrapper" style={{ display: 'flex', flexDirection: 'row', gap: 'var(--space-4xl)', width: '100%', height: 'calc(100vh - var(--page-top-offset, 4rem) - 120px)', alignItems: 'stretch', boxSizing: 'border-box' }}>
             {/* Left Sidebar Panel (Glass panel structure) */}
-            <div className="entity-detail-page__media-column" style={{
+            <div className="entity-detail-page__media-column no-scrollbar" style={{
               width: '320px',
               flexShrink: 0,
               display: 'flex',
@@ -80,7 +80,7 @@ export default function DetailPageShell({
               gap: 'var(--space-md)',
               padding: 'var(--space-xl)',
               borderRadius: '24px',
-              background: 'color-mix(in srgb, var(--app-shell-color-panel, var(--color-panel)) 22%, transparent)',
+              background: 'color-mix(in srgb, var(--color-panel-translucent, var(--color-panel)) 22%, transparent)',
               border: '1px solid color-mix(in srgb, var(--color-border-default) 40%, transparent)',
               backdropFilter: 'blur(16px)',
               boxSizing: 'border-box',

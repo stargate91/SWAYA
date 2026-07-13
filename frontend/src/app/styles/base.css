@@ -1,39 +1,17 @@
 :root {
-  --font-sans: var(--font-family-sans);
-  --font-display: var(--font-family-display);
-
   --color-canvas: var(--color-bg-canvas);
   --color-panel: var(--color-bg-elevated);
-  --color-panel-strong: var(--app-shell-color-panel-strong);
-  --color-panel-soft: var(--app-shell-color-panel-soft);
   --color-ink: var(--color-text-primary);
   --color-muted: var(--color-text-secondary);
   --color-subtle: var(--color-text-muted);
   --color-line: var(--color-border-default);
   --color-line-strong: var(--color-border-strong);
-  --color-accent: var(--app-shell-color-accent);
-  --color-accent-strong: var(--app-shell-color-accent-strong);
-  --color-accent-soft: var(--app-shell-color-accent-soft);
-  --color-accent-glow: var(--app-shell-color-accent-glow);
-  --color-signal: var(--app-shell-color-signal);
-  --color-signal-soft: var(--app-shell-color-signal-soft);
-  --color-info: var(--app-shell-color-info);
-  --scrollbar-size: var(--app-shell-scrollbar-size);
-  --scrollbar-radius: var(--app-shell-scrollbar-radius);
-  --scrollbar-track: var(--app-shell-scrollbar-track);
-  --scrollbar-track-hover: var(--app-shell-scrollbar-track-hover);
-  --scrollbar-thumb: var(--app-shell-scrollbar-thumb);
-  --scrollbar-thumb-hover: var(--app-shell-scrollbar-thumb-hover);
-  --scrollbar-thumb-active: var(--app-shell-scrollbar-thumb-active);
-  --scrollbar-border: var(--app-shell-scrollbar-border);
 
   --sidebar-padding-top: var(--sidebar-first-nav-y);
   --sidebar-padding-bottom: 1.875rem;
   --sidebar-padding-x: 1.125rem;
   --sidebar-toggle-size: 1.75rem;
   --sidebar-nav-link-padding-y: 0.6875rem;
-  --sidebar-nav-icon-size: 1.125rem;
-  --sidebar-pre-nav-gap: 0px;
   --shell-top-band-height: calc(var(--utility-bar-top) + var(--utility-bar-min-height));
   --sidebar-nav-offset-y: 0.375rem;
   --sidebar-first-nav-y: var(--shell-top-band-height);
@@ -51,11 +29,6 @@
   --focus-ring: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
   --focus-ring-danger: 0 0 0 var(--focus-ring-width) var(--focus-ring-color-danger);
 
-  --text-hero: var(--app-shell-text-hero);
-  --text-title: var(--app-shell-text-title);
-  --text-section: var(--app-shell-text-section);
-  --text-body: var(--app-shell-text-body);
-  --text-caption: var(--app-shell-text-caption);
 
   /* Status Badge Tokens */
   --status-badge-bottom: 0.75rem;
@@ -66,7 +39,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: var(--font-family-base);
+  font-family: var(--font-base);
 }
 
 html,
@@ -148,36 +121,12 @@ a {
   }
 }
 
-.no-scrollbar,
-.player-page__drawer-content,
-.player-page__discovery-content,
-.lists-sidebar__content,
-.dashboard-cast-grid,
-.bespoke-seasons-pills,
-.bespoke-episodes-pills,
-.bespoke-keywords-container,
-.bespoke-companies-body,
-.bespoke-scene-tagger-pills-row--nowrap,
-.person-credits-row__scroll-container,
-.entity-detail-page--people .entity-detail-page__media-column,
-.entity-detail-page__known-for-grid {
+.no-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
-.no-scrollbar::-webkit-scrollbar,
-.player-page__drawer-content::-webkit-scrollbar,
-.player-page__discovery-content::-webkit-scrollbar,
-.lists-sidebar__content::-webkit-scrollbar,
-.dashboard-cast-grid::-webkit-scrollbar,
-.bespoke-seasons-pills::-webkit-scrollbar,
-.bespoke-episodes-pills::-webkit-scrollbar,
-.bespoke-keywords-container::-webkit-scrollbar,
-.bespoke-companies-body::-webkit-scrollbar,
-.bespoke-scene-tagger-pills-row--nowrap::-webkit-scrollbar,
-.person-credits-row__scroll-container::-webkit-scrollbar,
-.entity-detail-page--people .entity-detail-page__media-column::-webkit-scrollbar,
-.entity-detail-page__known-for-grid::-webkit-scrollbar {
+.no-scrollbar::-webkit-scrollbar {
   display: none;
 }
 

@@ -66,27 +66,27 @@
   --color-accent-gradient: linear-gradient(135deg, #00f3ff 0%, #b026ff 100%);
 
   /* App Shell */
-  --app-shell-color-panel: rgba(9, 9, 11, 0.95);
-  --app-shell-color-panel-strong: rgba(9, 9, 11, 0.98);
-  --app-shell-color-panel-soft: rgba(255, 255, 255, 0.015);
-  --app-shell-color-line: rgba(161, 161, 170, 0.14);
-  --app-shell-color-line-strong: rgba(0, 243, 255, 0.25);
-  --app-shell-color-accent-strong: #b026ff;
-  --app-shell-color-accent-soft: rgba(0, 243, 255, 0.12);
-  --app-shell-color-accent-glow: rgba(0, 243, 255, 0.3);
-  --app-shell-color-signal: #00f3ff;
-  --app-shell-color-signal-soft: rgba(0, 243, 255, 0.18);
+  --color-panel-translucent: rgba(9, 9, 11, 0.95);
+  --color-panel-strong: rgba(9, 9, 11, 0.98);
+  --color-panel-soft: rgba(255, 255, 255, 0.015);
+  --color-line: rgba(161, 161, 170, 0.14);
+  --color-line-strong: rgba(0, 243, 255, 0.25);
+  --color-accent-strong: #b026ff;
+  --color-accent-soft: rgba(0, 243, 255, 0.12);
+  --color-accent-glow: rgba(0, 243, 255, 0.3);
+  --color-signal: #00f3ff;
+  --color-signal-soft: rgba(0, 243, 255, 0.18);
 
-  --app-shell-scrollbar-track: rgba(0, 0, 0, 0.25);
-  --app-shell-scrollbar-track-hover: rgba(0, 0, 0, 0.4);
-  --app-shell-scrollbar-thumb: rgba(0, 243, 255, 0.25);
-  --app-shell-scrollbar-thumb-hover: rgba(176, 38, 255, 0.45);
-  --app-shell-scrollbar-thumb-active: rgba(0, 243, 255, 0.6);
+  --scrollbar-track: rgba(0, 0, 0, 0.25);
+  --scrollbar-track-hover: rgba(0, 0, 0, 0.4);
+  --scrollbar-thumb: rgba(0, 243, 255, 0.25);
+  --scrollbar-thumb-hover: rgba(176, 38, 255, 0.45);
+  --scrollbar-thumb-active: rgba(0, 243, 255, 0.6);
 
   /* Shadow overrides */
-  --app-shell-shadow-sm: 0 0.375rem 1rem rgba(0, 0, 0, 0.6);
-  --app-shell-shadow-md: 0 0.75rem 1.75rem rgba(0, 0, 0, 0.72);
-  --app-shell-shadow-lg: 0 1.25rem 3rem rgba(0, 0, 0, 0.85);
+  --shadow-sm: 0 0.375rem 1rem rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 0.75rem 1.75rem rgba(0, 0, 0, 0.72);
+  --shadow-lg: 0 1.25rem 3rem rgba(0, 0, 0, 0.85);
 
   /* Button overrides */
   --button-primary-bg: linear-gradient(135deg, #00f3ff, #0066ff);

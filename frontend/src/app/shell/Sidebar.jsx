@@ -4,6 +4,7 @@ import { useNavigationStateStore } from '@/stores/useNavigationStateStore';
 import UtilityButton from '../ui/UtilityButton';
 import Tooltip from '../ui/Tooltip';
 import { useSidebar } from './useSidebar';
+import './Sidebar.css';
 
 export default function Sidebar({ isCollapsed, onToggle }) {
   const { t, navItems, toggleAriaLabel, quitApp } = useSidebar(isCollapsed);

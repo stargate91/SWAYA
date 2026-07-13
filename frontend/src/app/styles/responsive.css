@@ -9,8 +9,6 @@
     border-bottom: 1px solid var(--color-line);
   }
 
-
-
   .shell__utility-bar,
   .page-header {
     flex-direction: column;

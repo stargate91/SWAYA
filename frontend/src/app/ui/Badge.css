@@ -54,19 +54,19 @@
   font-size: var(--font-size-xs);
   font-weight: bold;
   padding: 0.125rem var(--space-sm);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   line-height: 1.2;
   background: var(--color-state-danger-bg-strong);
   color: var(--color-state-danger);
-  border: 1.0.3125rem solid var(--color-state-danger);
+  border: 1.5px solid var(--color-state-danger);
 }
 
 sup .ui-badge.ui-badge--adult.ui-badge--danger {
   font-size: var(--font-size-2xs);
   letter-spacing: normal;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   padding: var(--space-2xs) var(--space-xs);
   height: auto;
   min-height: 0;

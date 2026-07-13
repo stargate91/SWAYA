@@ -43,7 +43,7 @@ export default function ListsSidebar({
         </div>
       </div>
 
-      <div className="lists-sidebar__content">
+      <div className="lists-sidebar__content no-scrollbar">
         {isLoading ? (
           <div className="lists-sidebar__loading">
             <Loader2 className="spinner" size={20} />

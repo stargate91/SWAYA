@@ -51,7 +51,7 @@
   gap: var(--space-sm);
   margin: 0 0 var(--space-3xl);
   color: var(--color-text-primary);
-  font-family: var(--font-family-display);
+  font-family: var(--font-display);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-extrabold);
   letter-spacing: -0.2px;
@@ -324,7 +324,7 @@
 .insights-dna-stage--ghost,
 .insights-timeline-stage--ghost {
   opacity: 0.15;
-  filter: grayscale(1) blur(0.0.3125rem);
+  filter: grayscale(1) blur(0.5px);
   pointer-events: none;
   transition: opacity var(--motion-duration-emphasized) var(--motion-ease-ease), filter var(--motion-duration-emphasized) var(--motion-ease-ease);
 }

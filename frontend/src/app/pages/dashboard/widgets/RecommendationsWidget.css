@@ -15,7 +15,7 @@
   height: 100%;
   object-fit: cover;
   opacity: 0.75;
-  filter: blur(0.0.5rem) contrast(1.08);
+  filter: blur(0.8px) contrast(1.08);
 }
 
 .recommend-spotlight-gradient {

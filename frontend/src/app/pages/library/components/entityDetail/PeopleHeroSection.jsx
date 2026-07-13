@@ -50,7 +50,7 @@ export default function PeopleHeroSection({
   return (
     <div className="entity-detail-page__hero-section-wrapper">
       <section className="entity-detail-page__hero-grid">
-        <div className="entity-detail-page__media-column">
+        <div className="entity-detail-page__media-column no-scrollbar">
           {/* 1. Elegant Header (Name & Aliases) */}
           <div className="entity-detail-page__headline-block">
             <h1 className="entity-detail-page__title">
@@ -255,7 +255,7 @@ export default function PeopleHeroSection({
               <h3 className="entity-detail-page__known-for-title">
                 {t('library.details.knownForTitle') || 'Known For'}
               </h3>
-              <div className="entity-detail-page__known-for-grid">
+              <div className="entity-detail-page__known-for-grid no-scrollbar">
                 {item.known_for.map((credit) => {
                   const creditTitle = credit.title || credit.name || 'Unknown';
                   const handleCardClick = () => {

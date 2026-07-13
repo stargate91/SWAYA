@@ -55,7 +55,7 @@ function HorizontalPillList({ children }) {
       <div
         ref={containerRef}
         onScroll={checkScroll}
-        className="bespoke-scene-tagger-pills-row bespoke-scene-tagger-pills-row--nowrap"
+        className="bespoke-scene-tagger-pills-row bespoke-scene-tagger-pills-row--nowrap no-scrollbar"
       >
         {children}
       </div>

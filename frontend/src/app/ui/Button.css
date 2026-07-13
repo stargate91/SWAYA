@@ -331,7 +331,7 @@
   width: 2.75rem;
   height: 2.75rem;
   border-radius: var(--radius-full);
-  background-color: var(--app-shell-color-panel);
+  background-color: var(--color-panel-translucent);
   background-image: var(--button-secondary-bg);
   color: var(--button-secondary-color);
   border: 1px solid var(--button-secondary-border);
@@ -361,7 +361,7 @@
 
 .ui-icon-button.ui-icon-button--play-overlay:hover {
   transform: translate(-50%, -50%);
-  background-color: var(--app-shell-color-panel-strong);
+  background-color: var(--color-panel-strong);
   background-image: var(--button-secondary-hover-bg);
   border-color: var(--button-secondary-border);
   box-shadow: 0 0.25rem 0.75rem color-mix(in srgb, black 40%, transparent);
@@ -517,7 +517,7 @@
 .ui-icon-button-wrapper:hover {
   background: var(--color-surface-glass-strong);
   border-color: var(--color-border-default);
-  transform: translateY(-0.0.3125rem);
+  transform: translateY(-0.5px);
 }
 
 .ui-icon-button-wrapper:focus-within {
@@ -556,7 +556,7 @@
   height: 1.75rem;
   border-radius: var(--radius-full);
   border: 1px solid color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border));
-  background-color: color-mix(in srgb, var(--app-shell-color-panel) 82%, transparent);
+  background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
   background-image: var(--button-secondary-bg);
   color: var(--button-secondary-color);
   box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, black 22%, transparent);

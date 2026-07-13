@@ -78,7 +78,7 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--modal-title-color);
-  font-family: var(--font-family-display);
+  font-family: var(--font-display);
   font-weight: var(--font-weight-bold);
 }
 
@@ -93,7 +93,7 @@
   margin: var(--space-sm) 0 0;
   color: var(--modal-description-color);
   font: var(--text-caption);
-  font-family: var(--font-family-sans);
+  font-family: var(--font-sans);
 }
 
 
@@ -179,7 +179,7 @@
   background: color-mix(in srgb, var(--color-state-danger) 24%, var(--color-surface-glass));
   border-color: color-mix(in srgb, var(--color-state-danger) 46%, var(--color-border-heavy));
   box-shadow: var(--shadow-md);
-  transform: translateY(-0.0.3125rem);
+  transform: translateY(-0.5px);
 }
 
 .ui-modal--danger .ui-icon-button-wrapper:focus-within {

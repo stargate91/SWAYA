@@ -186,7 +186,7 @@ export default function RatingsPage() {
   ];
 
   return (
-    <Page className="organizer-page">
+    <Page viewport={true} className="organizer-page">
       <div className={`organizer-main is-details-hidden ${isAdultMode ? 'organizer-main--nsfw' : ''}`}>
         <div className="organizer-main__content">
           <div className={`organizer-panel ${isAdultMode ? 'organizer-panel--nsfw' : ''}`}>

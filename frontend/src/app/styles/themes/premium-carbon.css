@@ -66,29 +66,29 @@
   --color-accent-gradient: linear-gradient(135deg, #b8860b 0%, #d4af37 100%);
 
   /* App Shell */
-  --app-shell-color-panel: rgba(25, 26, 30, 0.95);
-  --app-shell-color-panel-strong: rgba(25, 26, 30, 0.98);
-  --app-shell-color-panel-soft: rgba(255, 255, 255, 0.01);
-  --app-shell-color-subtle: #5a5c5f;
-  --app-shell-color-line: rgba(227, 228, 230, 0.1);
-  --app-shell-color-line-strong: rgba(212, 175, 55, 0.18);
-  --app-shell-color-accent: #d4af37;
-  --app-shell-color-accent-strong: #b8860b;
-  --app-shell-color-accent-soft: rgba(212, 175, 55, 0.1);
-  --app-shell-color-accent-glow: rgba(212, 175, 55, 0.22);
-  --app-shell-color-signal: #d4af37;
-  --app-shell-color-signal-soft: rgba(212, 175, 55, 0.14);
+  --color-panel-translucent: rgba(25, 26, 30, 0.95);
+  --color-panel-strong: rgba(25, 26, 30, 0.98);
+  --color-panel-soft: rgba(255, 255, 255, 0.01);
+  --color-subtle: #5a5c5f;
+  --color-line: rgba(227, 228, 230, 0.1);
+  --color-line-strong: rgba(212, 175, 55, 0.18);
+  --color-accent: #d4af37;
+  --color-accent-strong: #b8860b;
+  --color-accent-soft: rgba(212, 175, 55, 0.1);
+  --color-accent-glow: rgba(212, 175, 55, 0.22);
+  --color-signal: #d4af37;
+  --color-signal-soft: rgba(212, 175, 55, 0.14);
 
-  --app-shell-scrollbar-track: rgba(21, 22, 25, 0.25);
-  --app-shell-scrollbar-track-hover: rgba(21, 22, 25, 0.4);
-  --app-shell-scrollbar-thumb: rgba(212, 175, 55, 0.2);
-  --app-shell-scrollbar-thumb-hover: rgba(184, 134, 11, 0.38);
-  --app-shell-scrollbar-thumb-active: rgba(212, 175, 55, 0.5);
+  --scrollbar-track: rgba(21, 22, 25, 0.25);
+  --scrollbar-track-hover: rgba(21, 22, 25, 0.4);
+  --scrollbar-thumb: rgba(212, 175, 55, 0.2);
+  --scrollbar-thumb-hover: rgba(184, 134, 11, 0.38);
+  --scrollbar-thumb-active: rgba(212, 175, 55, 0.5);
 
   /* Shadow overrides */
-  --app-shell-shadow-sm: 0 0.375rem 1rem rgba(21, 22, 25, 0.3);
-  --app-shell-shadow-md: 0 0.75rem 1.75rem rgba(21, 22, 25, 0.38);
-  --app-shell-shadow-lg: 0 1.25rem 3rem rgba(21, 22, 25, 0.48);
+  --shadow-sm: 0 0.375rem 1rem rgba(21, 22, 25, 0.3);
+  --shadow-md: 0 0.75rem 1.75rem rgba(21, 22, 25, 0.38);
+  --shadow-lg: 0 1.25rem 3rem rgba(21, 22, 25, 0.48);
 
   /* Button overrides */
   --button-primary-bg: linear-gradient(135deg, #b8860b, #d4af37);

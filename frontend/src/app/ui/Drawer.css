@@ -1,7 +1,7 @@
 /* Drawer Primitive Styles */
 .ui-drawer-backdrop {
   position: fixed;
-  top: var(--layout-window-titlebar-height, 2.875rem);
+  top: var(--layout-window-titlebar-height, 3rem);
   left: 0;
   right: 0;
   bottom: 0;
@@ -13,9 +13,9 @@
 
 .ui-drawer {
   position: fixed;
-  top: var(--layout-window-titlebar-height, 2.875rem);
+  top: var(--layout-window-titlebar-height, 3rem);
   right: 0;
-  height: calc(100vh - var(--layout-window-titlebar-height, 2.875rem));
+  height: calc(100vh - var(--layout-window-titlebar-height, 3rem));
   background: var(--color-bg-elevated);
   border-left: 1px solid var(--color-border-strong);
   box-shadow: -0.625rem 0 2.1875rem color-mix(in srgb, black 60%, transparent);

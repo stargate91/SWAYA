@@ -23,7 +23,7 @@
   gap: var(--space-sm);
   padding: var(--space-2xl);
   border-radius: var(--ui-control-radius);
-  border: 1.0.3125rem solid var(--color-line);
+  border: 1.5px solid var(--color-line);
   background: var(--color-selectable-card-bg, var(--ui-surface-ghost));
   text-align: left;
 }
@@ -51,7 +51,7 @@
   padding: var(--space-lg);
   background: var(--ui-control-bg-subtle, var(--color-surface-card));
   border: 1px solid var(--color-border-default);
-  border-radius: var(--app-shell-radius-md);
+  border-radius: var(--radius-md);
   text-align: left;
 }
 
@@ -59,7 +59,7 @@
   transform: translateY(var(--motion-lift-distance-md));
   background: var(--ui-control-bg-hover, var(--color-surface-glass));
   border-color: var(--color-border-strong);
-  box-shadow: var(--app-shell-shadow-sm);
+  box-shadow: var(--shadow-sm);
 }
 
 .ui-selectable-card--theme:focus-visible {

@@ -78,12 +78,12 @@
 
 .bespoke-season-pill.is-active,
 .bespoke-episode-pill.is-active {
-  background: color-mix(in srgb, var(--app-shell-color-accent, var(--color-accent)) 15%, transparent);
-  --local-color: color-mix(in srgb, var(--app-shell-color-accent, var(--color-accent)) 88%, var(--color-text-primary));
+  background: color-mix(in srgb, var(--color-accent, var(--color-accent)) 15%, transparent);
+  --local-color: color-mix(in srgb, var(--color-accent, var(--color-accent)) 88%, var(--color-text-primary));
   color: var(--local-color);
-  --local-border-color: color-mix(in srgb, var(--app-shell-color-accent, var(--color-accent)) 88%, var(--color-text-primary));
+  --local-border-color: color-mix(in srgb, var(--color-accent, var(--color-accent)) 88%, var(--color-text-primary));
   border-color: var(--local-border-color);
-  box-shadow: 0 0 0.625rem color-mix(in srgb, var(--app-shell-color-accent, var(--color-accent)) 25%, transparent);
+  box-shadow: 0 0 0.625rem color-mix(in srgb, var(--color-accent, var(--color-accent)) 25%, transparent);
   font-weight: var(--font-weight-bold);
 }
 
@@ -98,16 +98,16 @@
 }
 
 .bespoke-episode-pill.is-next-up {
-  border-color: var(--app-shell-color-accent, var(--color-accent-blue));
+  border-color: var(--color-accent, var(--color-accent-blue));
 }
 
 .bespoke-episode-pill__next-dot {
   width: 0.375rem;
   height: 0.375rem;
   border-radius: 50%;
-  background: var(--app-shell-color-accent, var(--color-accent-blue));
+  background: var(--color-accent, var(--color-accent-blue));
   display: inline-block;
-  box-shadow: 0 0 0.375rem color-mix(in srgb, var(--app-shell-color-accent, var(--color-accent-blue)) 50%, transparent);
+  box-shadow: 0 0 0.375rem color-mix(in srgb, var(--color-accent, var(--color-accent-blue)) 50%, transparent);
 }
 
 /* Custom small arrow style for horizontal pill rows inside headers */
@@ -675,9 +675,9 @@
 .bespoke-keyword-toggle-btn {
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-semibold);
-  color: var(--app-shell-color-accent, var(--color-accent-blue));
-  background: color-mix(in srgb, var(--app-shell-color-accent, var(--color-accent-blue)) 10%, transparent);
-  border: 1px solid color-mix(in srgb, var(--app-shell-color-accent, var(--color-accent-blue)) 25%, transparent);
+  color: var(--color-accent, var(--color-accent-blue));
+  background: color-mix(in srgb, var(--color-accent, var(--color-accent-blue)) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent, var(--color-accent-blue)) 25%, transparent);
   border-radius: var(--radius-sm);
   --local-padding: 0.1875rem 0.625rem;
   padding: var(--local-padding);
@@ -687,8 +687,8 @@
 }
 
 .bespoke-keyword-toggle-btn:hover {
-  background: color-mix(in srgb, var(--app-shell-color-accent, var(--color-accent-blue)) 20%, transparent);
-  border-color: var(--app-shell-color-accent, var(--color-accent-blue));
+  background: color-mix(in srgb, var(--color-accent, var(--color-accent-blue)) 20%, transparent);
+  border-color: var(--color-accent, var(--color-accent-blue));
   color: var(--color-text-primary);
 }
 

@@ -27,7 +27,7 @@ export default function MovieCollectionHeroSection({
   return (
     <>
       <section className="entity-detail-page__hero-grid">
-        <div className="entity-detail-page__media-column">
+        <div className="entity-detail-page__media-column no-scrollbar">
           <EditableMediaCard
             mediaUrl={mediaUrl}
             onClick={() => {

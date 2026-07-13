@@ -8,7 +8,7 @@
 }
 
 .ui-poster-card:hover {
-  transform: translateY(-0.25rem);
+  transform: translateY(-0.375rem);
 }
 
 .ui-poster-card__media-shell {
@@ -31,7 +31,7 @@
 }
 
 .ui-poster-card:hover .ui-poster-card__image-wrapper {
-  box-shadow: 0 0.75rem 1.5rem var(--color-surface-overlay);
+  box-shadow: var(--shadow-md);
 }
 
 button.ui-poster-card__image-wrapper,
@@ -74,7 +74,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
 }
 
 .ui-poster-card:hover .ui-poster-card__image {
-  transform: scale(1.02);
+  transform: scale(1.06);
 }
 
 .ui-poster-card__placeholder {
@@ -121,7 +121,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
   padding: 0 var(--space-md);
   gap: var(--space-2xs);
   border: 1px solid var(--button-secondary-border);
-  background-color: color-mix(in srgb, var(--app-shell-color-panel) 82%, transparent);
+  background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
   background-image: var(--button-secondary-bg);
   color: var(--button-secondary-color);
   box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, black 22%, transparent);
@@ -150,7 +150,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
   height: 1.75rem;
   border-radius: var(--radius-full);
   border: 1px solid color-mix(in srgb, var(--color-state-success) 48%, var(--button-secondary-border));
-  background-color: color-mix(in srgb, var(--app-shell-color-panel) 82%, transparent);
+  background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
   background-image: var(--button-secondary-bg);
   color: var(--color-state-success);
   box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, black 22%, transparent);
@@ -169,7 +169,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
   height: 1.75rem;
   border-radius: var(--radius-full);
   border: 1px solid color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border));
-  background-color: color-mix(in srgb, var(--app-shell-color-panel) 82%, transparent);
+  background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
   background-image: var(--button-secondary-bg);
   color: var(--color-state-danger);
   box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, black 22%, transparent);
@@ -195,7 +195,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
   height: 1.75rem;
   border-radius: var(--radius-full);
   border: 1px solid color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border));
-  background-color: color-mix(in srgb, var(--app-shell-color-panel) 82%, transparent);
+  background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
   background-image: var(--button-secondary-bg);
   color: var(--button-secondary-color);
   box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, black 22%, transparent);
@@ -238,7 +238,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
   padding: 0 var(--space-lg);
   border-radius: var(--radius-full);
   border: 1px solid color-mix(in srgb, var(--color-state-success) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
-  background-color: color-mix(in srgb, var(--app-shell-color-panel, black) 82%, transparent);
+  background-color: color-mix(in srgb, var(--color-panel-translucent, black) 82%, transparent);
   color: var(--color-state-success);
   box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, black 35%, transparent);
   backdrop-filter: blur(0.625rem);
@@ -302,7 +302,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
 .ui-poster-card__media-shell .ui-card-action-btn--danger:hover,
 .lists-card .ui-card-action-btn--danger:hover {
   border-color: color-mix(in srgb, var(--color-state-danger) 80%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
-  background-color: color-mix(in srgb, var(--color-state-danger) 15%, var(--app-shell-color-panel, black));
+  background-color: color-mix(in srgb, var(--color-state-danger) 15%, var(--color-panel-translucent, black));
   color: var(--color-state-danger);
 }
 
@@ -316,14 +316,14 @@ div.ui-poster-card__image-wrapper:focus-visible {
 .ui-poster-card__media-shell .ui-card-action-btn--neutral:hover,
 .recommend-card .ui-card-action-btn--neutral:hover {
   border-color: color-mix(in srgb, var(--color-accent-blue) 80%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
-  background-color: color-mix(in srgb, var(--color-accent-blue) 15%, var(--app-shell-color-panel, black));
+  background-color: color-mix(in srgb, var(--color-accent-blue) 15%, var(--color-panel-translucent, black));
   color: var(--color-text-primary);
 }
 
 .ui-poster-card__favorite-badge svg {
   display: block;
   flex-shrink: 0;
-  transform: translate(0.0.3125rem, 0);
+  transform: translate(0.5px, 0);
   transform-origin: center;
 }
 
@@ -349,7 +349,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
   left: 0.75rem;
   right: 0.75rem;
   bottom: 0.75rem;
-  font-family: var(--font-family-display);
+  font-family: var(--font-display);
   font-size: var(--font-size-sm, var(--font-size-xs));
   font-weight: var(--font-weight-bold, 700);
   line-height: 1.35;
@@ -369,7 +369,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
 }
 
 .ui-poster-card__title {
-  font-family: var(--font-family-display);
+  font-family: var(--font-display);
   font-size: var(--font-size-sm, var(--font-size-xs));
   font-weight: var(--font-weight-bold, 700);
   color: var(--color-ink);

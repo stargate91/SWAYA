@@ -98,7 +98,29 @@ class LibraryScanner:
                 matched_lib = None
                 for lib in all_libs:
                     lib_p = lib.root_path.replace("\\", "/").rstrip("/")
-                    if lib_p == norm_p or norm_p.startswith(lib_p + "/") or lib_p.startswith(norm_p + "/"):
+                    if lib_p == norm_p or norm_p.startswith(lib_p + "/"):
+                        matched_lib = lib
+                        break
+                    elif lib_p.startswith(norm_p + "/"):
+                        # Promote/widen child library to parent path norm_p
+                        logger.info(f"Promoting library '{lib.name}' ({lib.id}) root path from {lib.root_path} to {p}")
+                        old_root = lib.root_path
+                        lib.root_path = p
+                        lib.name = os.path.basename(p) or "Library"
+                        
+                        # Update relative paths of media items in this library
+                        from app.domains.library.models import MediaItem, ExtraFile
+                        items = self.db.query(MediaItem).filter(MediaItem.library_id == lib.id).all()
+                        for item in items:
+                            abs_path = os.path.join(old_root, item.relative_path)
+                            item.relative_path = os.path.relpath(abs_path, p).replace("\\", "/")
+                            
+                        # Update ExtraFiles in the library
+                        extras = self.db.query(ExtraFile).join(MediaItem).filter(MediaItem.library_id == lib.id).all()
+                        for ex in extras:
+                            abs_path = os.path.join(old_root, ex.relative_path)
+                            ex.relative_path = os.path.relpath(abs_path, p).replace("\\", "/")
+                            
                         matched_lib = lib
                         break
                 if matched_lib:

@@ -698,7 +698,6 @@
 .library-tag-expanded-panel {
   width: 100%;
   background: transparent;
-  border: 1.0.3125rem dashed color-mix(in srgb, var(--tag-color, var(--color-accent)) 12%, transparent);
   border-radius: var(--radius-md);
   padding: var(--space-4xl);
   display: flex;

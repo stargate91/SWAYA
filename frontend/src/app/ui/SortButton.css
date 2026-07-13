@@ -7,10 +7,11 @@
   border: 0;
   background: transparent;
   color: var(--color-muted);
-  font-family: var(--font-sans);
-  font-size: var(--font-size-sm);
-  letter-spacing: normal;
-  text-transform: none;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
   cursor: pointer;
 }
 

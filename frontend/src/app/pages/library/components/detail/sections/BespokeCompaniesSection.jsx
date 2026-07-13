@@ -37,7 +37,7 @@ export default function BespokeCompaniesSection({ item, t }) {
         </div>
         <div className="bespoke-cast-browser-card__body">
           <ScrollRow
-            className="bespoke-companies-body"
+            className="bespoke-companies-body no-scrollbar"
             showArrows={true}
           >
             {allCompanies.map((c, i) => (

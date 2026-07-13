@@ -279,7 +279,7 @@
   grid-column: 2;
   display: flex;
   flex-direction: column;
-  --local-bg: color-mix(in srgb, var(--app-shell-color-panel, var(--color-panel)) 22%, transparent);
+  --local-bg: color-mix(in srgb, var(--color-panel-translucent, var(--color-panel)) 22%, transparent);
   background: var(--local-bg);
   --local-border: 1px solid color-mix(in srgb, var(--color-border-default) 40%, transparent);
   border: var(--local-border);
@@ -307,7 +307,7 @@
 }
 
 .person-credits-row__title {
-  font-family: var(--font-family-display, var(--font-display));
+  font-family: var(--font-display, var(--font-display));
   font-size: 0.8rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -700,7 +700,7 @@
 
 
 .person-credits-discover-label {
-  font-family: var(--font-family-display, var(--font-display));
+  font-family: var(--font-display, var(--font-display));
   font-size: 0.8rem;
   /* Slightly larger and more prominent */
   letter-spacing: 0.14em;
@@ -1092,7 +1092,7 @@
 
 .person-credits-gallery-play-btn {
   background: transparent;
-  border: 1.0.3125rem solid transparent;
+  border: 1.5px solid transparent;
   border-radius: var(--radius-sm);
   width: 2rem;
   height: 2rem;

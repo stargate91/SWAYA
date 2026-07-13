@@ -130,7 +130,7 @@
 }
 
 .settings-instructions-box {
-  background: var(--app-shell-color-panel-soft);
+  background: var(--color-panel-soft);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-sm);
   padding: var(--space-2xl);

@@ -38,7 +38,7 @@
   padding: var(--space-xl);
   /* Increased padding for breathing room */
   border-radius: var(--radius-xl);
-  --column-bg: color-mix(in srgb, var(--app-shell-color-panel, var(--color-panel)) 22%, transparent);
+  --column-bg: color-mix(in srgb, var(--color-panel-translucent, var(--color-panel)) 22%, transparent);
   background: var(--column-bg);
   /* More translucent background */
   --column-border: 1px solid color-mix(in srgb, var(--color-border-default) 40%, transparent);
@@ -175,7 +175,7 @@
 
 .entity-detail-page__title {
   margin: 0;
-  font-family: var(--font-family-display);
+  font-family: var(--font-display);
   font-size: var(--font-size-lg);
   /* Increased to lg (1.125rem) to match visual header size */
   font-weight: var(--font-weight-bold);
@@ -227,7 +227,7 @@
 
 .entity-detail-page__inline-link-label {
   display: inline-block;
-  transform: translateY(-0.0.3125rem);
+  transform: translateY(-0.5px);
 }
 
 .entity-detail-page__headline-block {
@@ -500,7 +500,7 @@
 }
 
 .entity-detail-page .media-detail-page__overview {
-  font-family: var(--font-family-base, sans-serif);
+  font-family: var(--font-base, sans-serif);
   font-size: var(--font-size-md);
   line-height: 1.6;
   color: color-mix(in srgb, var(--color-text-primary) 80%, transparent);
@@ -670,7 +670,7 @@
   justify-content: center;
   width: 1.75rem;
   height: 1.75rem;
-  background-color: color-mix(in srgb, var(--app-shell-color-panel) 82%, transparent);
+  background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-border-default) 60%, transparent);
   border-radius: var(--radius-sm);
   box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, black 22%, transparent);
@@ -765,7 +765,7 @@
   height: 100%;
   --segment-bg: rgba(255, 255, 255, 0.08);
   background: var(--segment-bg);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   overflow: hidden;
   --segment-border: 1px solid rgba(255, 255, 255, 0.04);
   border: var(--segment-border);
@@ -919,7 +919,7 @@
 }
 
 .entity-detail-page__known-for-title {
-  font-family: var(--font-family-display, var(--font-display));
+  font-family: var(--font-display, var(--font-display));
   font-size: 0.65rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -1390,7 +1390,7 @@
 }
 
 .entity-detail-page__media-card-hover-icon {
-  background: color-mix(in srgb, var(--app-shell-color-panel) 82%, transparent);
+  background: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
   border: 1px solid var(--button-secondary-border);
   box-shadow: 0 0.25rem 0.75rem color-mix(in srgb, black 32%, transparent);
   color: var(--color-text-primary);

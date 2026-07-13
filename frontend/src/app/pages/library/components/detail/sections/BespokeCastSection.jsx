@@ -167,7 +167,7 @@ export default function BespokeCastSection({ item, t, navigate }) {
         </div>
         <div className="bespoke-cast-browser-card__body">
           <ScrollRow
-            className={activeTab === 'cast' ? "dashboard-cast-grid" : "bespoke-companies-body"}
+            className={activeTab === 'cast' ? "dashboard-cast-grid no-scrollbar" : "bespoke-companies-body no-scrollbar"}
             showArrows={true}
           >
             {activeTab === 'cast' && allPeople.map(person => (

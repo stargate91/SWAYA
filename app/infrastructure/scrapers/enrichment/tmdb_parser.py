@@ -88,6 +88,7 @@ class TMDBEnrichmentParser:
                 studio = self.metadata_repo.get_studio_by_name(n_name)
                 if not studio:
                     studio = self.metadata_repo.create_studio(name=n_name, logo_path=net.get("logo_path"))
+                    self.db.flush()
 
                 if studio.logo_path and not studio.logo_path.startswith("logos/"):
                     local_logo = self.enricher._queue_image(studio.logo_path, "logos", f"studio_{studio.name}")

@@ -94,7 +94,7 @@
   width: 0.25rem;
 }
 .bespoke-list-panel-list::-webkit-scrollbar-thumb {
-  background: var(--app-shell-scrollbar-thumb);
+  background: var(--scrollbar-thumb);
   border-radius: var(--radius-full);
 }
 .bespoke-list-panel-list::-webkit-scrollbar-thumb:hover {
@@ -127,7 +127,7 @@
   width: 1rem;
   height: 1rem;
   border-radius: var(--radius-sm);
-  border: 1.0.3125rem solid var(--color-border-heavy);
+  border: 1.5px solid var(--color-border-heavy);
   background: var(--dropdown-search-bg);
   display: flex;
   align-items: center;
