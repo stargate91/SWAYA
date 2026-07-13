@@ -9,6 +9,7 @@ import Sidebar from './Sidebar';
 import Spinner from '../ui/Spinner';
 import { useSettingsQuery } from '../queries';
 import { useNavigationStore } from '../stores/useNavigationStore';
+import './AppShell.css';
 
 
 

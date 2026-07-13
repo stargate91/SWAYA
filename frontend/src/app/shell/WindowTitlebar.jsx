@@ -13,6 +13,7 @@ import { useLibraryModeStore } from '../stores/useLibraryModeStore';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useNavigationStore } from '../stores/useNavigationStore';
 import GlobalSearch from './GlobalSearch';
+import './WindowTitlebar.css';
 
 const BRAND_NAME = 'SWAYA';
 

@@ -1,0 +1,201 @@
+/* ==========================================================================
+   WINDOW TITLEBAR
+   ========================================================================== */
+.window-titlebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: stretch;
+  height: var(--layout-window-titlebar-height);
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: linear-gradient(180deg, var(--color-panel), var(--color-panel-strong));
+  backdrop-filter: blur(18px) saturate(120%);
+  box-shadow: var(--titlebar-shadow);
+  -webkit-app-region: drag;
+}
+
+.window-titlebar__drag-region {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xl);
+  flex: 0 0 90px;
+  min-width: 90px;
+  padding: 0 0 0 var(--space-lg);
+  -webkit-app-region: drag;
+}
+
+.window-titlebar__center-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xl);
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  padding: 0 var(--space-xl);
+  -webkit-app-region: drag;
+}
+
+.window-titlebar__center-container.has-progress {
+  justify-content: flex-start;
+}
+
+.window-titlebar__search-wrapper {
+  flex: 1 1 320px;
+  max-width: 480px;
+  min-width: 180px;
+  transition: max-width var(--motion-base), flex-basis var(--motion-base);
+  -webkit-app-region: no-drag;
+}
+
+.window-titlebar__search-wrapper.has-progress {
+  max-width: 360px;
+  flex-basis: 360px;
+}
+
+.window-titlebar__progress-wrapper {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-md);
+  z-index: 10;
+}
+
+.window-titlebar__progress-wrapper .ui-progress-bar-container {
+  flex: 1 1 380px;
+  max-width: 680px;
+  min-width: 320px;
+  width: 380px;
+}
+
+.window-titlebar__brand-text {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: 0.18em;
+  color: var(--color-accent-blue);
+  user-select: none;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.window-titlebar__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.0625rem;
+  -webkit-app-region: no-drag;
+}
+
+.window-titlebar__button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: var(--layout-window-titlebar-height);
+  height: var(--layout-window-titlebar-height);
+  border: none;
+  background: transparent;
+  color: var(--color-muted);
+  transition: background var(--motion-fast), color var(--motion-fast);
+}
+
+.window-titlebar__button:hover {
+  --btn-hover-bg: rgba(255, 255, 255, 0.05);
+  background: var(--btn-hover-bg);
+  color: var(--color-ink);
+}
+
+.window-titlebar__button--close:hover {
+  --close-hover-bg: var(--color-state-danger);
+  background: var(--close-hover-bg) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.window-titlebar__button:active {
+  --btn-active-bg: rgba(255, 255, 255, 0.08);
+  background: var(--btn-active-bg);
+}
+
+.window-titlebar__button--close:active {
+  --close-active-bg: color-mix(in srgb, var(--color-state-danger) 60%, white);
+  background: var(--close-active-bg) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.window-titlebar__button--adult-toggle {
+  margin-right: var(--space-4xl);
+  color: var(--color-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  box-shadow: none !important;
+  background: transparent !important;
+  align-self: center;
+}
+
+.window-titlebar__button--adult-toggle:hover {
+  background: var(--ui-utility-button-bg-hover) !important;
+  color: var(--color-text-primary);
+}
+
+.window-titlebar__button--adult-toggle.is-nsfw {
+  color: var(--color-state-danger) !important;
+}
+
+.window-titlebar__button--adult-toggle.is-nsfw:hover {
+  background: var(--ui-utility-button-bg-hover) !important;
+}
+
+.window-titlebar__actions .ui-tooltip {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+  -webkit-app-region: no-drag;
+}
+
+/* Titlebar Navigation Buttons */
+.window-titlebar__nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0 var(--space-md);
+  -webkit-app-region: no-drag;
+}
+
+.window-titlebar__nav-btn {
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm, var(--radius-sm)) !important;
+  background: transparent !important;
+  border: none !important;
+  color: var(--color-text-secondary) !important;
+  cursor: pointer;
+  transition: background var(--motion-fast), color var(--motion-fast);
+}
+
+.window-titlebar__nav-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-ink) 5%, transparent) !important;
+  color: var(--color-ink) !important;
+}
+
+.window-titlebar__nav-btn:focus-visible {
+  outline: none !important;
+  box-shadow: inset 0 0 0 2px var(--color-accent) !important;
+}
+
+.window-titlebar__nav-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
