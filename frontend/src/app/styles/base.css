@@ -125,11 +125,13 @@ body {
 button,
 input,
 select {
-  font: inherit;
+  font-family: var(--font-sans);
+  font-size: inherit;
+  color: var(--color-ink);
 }
 
 a {
-  color: inherit;
+  color: var(--color-accent);
 }
 
 .link-reset {
