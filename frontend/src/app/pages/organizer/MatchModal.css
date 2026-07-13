@@ -27,7 +27,7 @@
 }
 
 .organizer-match-modal__search-grid.is-tv {
-  grid-template-columns: minmax(0, 1fr) 6.5rem var(--space-6xl) var(--space-6xl);
+  grid-template-columns: minmax(0, 1fr) 6.5rem var(--space-7xl) var(--space-7xl);
 }
 
 .organizer-match-modal__search-grid.is-movie {
@@ -51,7 +51,7 @@
 }
 
 .organizer-match-modal__field--compact {
-  min-width: var(--space-6xl);
+  min-width: var(--space-7xl);
 }
 
 .organizer-match-modal__search-actions {

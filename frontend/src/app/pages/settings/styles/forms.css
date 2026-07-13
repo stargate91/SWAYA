@@ -282,11 +282,11 @@
 }
 
 .settings-profile-avatar {
-  width: var(--space-6xl);
-  height: var(--space-6xl);
+  width: var(--space-7xl);
+  height: var(--space-7xl);
   border-radius: var(--radius-full);
   overflow: hidden;
-  flex: 0 0 var(--space-6xl);
+  flex: 0 0 var(--space-7xl);
   display: grid;
   place-items: center;
   color: var(--color-muted);

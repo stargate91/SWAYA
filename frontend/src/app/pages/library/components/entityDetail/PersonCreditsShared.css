@@ -1008,7 +1008,7 @@
 .person-credits-discover-loading {
   display: flex;
   justify-content: center;
-  padding: calc(var(--space-6xl) + var(--space-sm)) 0;
+  padding: calc(var(--space-7xl) + var(--space-sm)) 0;
   width: 100%;
 }
 

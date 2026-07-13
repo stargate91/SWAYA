@@ -77,7 +77,7 @@
 }
 
 .ui-pagination__page {
-  min-width: var(--space-5xl);
+  min-width: var(--space-6xl);
   text-align: center;
   color: var(--color-ink);
   font-size: var(--font-size-xs);

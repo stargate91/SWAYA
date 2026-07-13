@@ -258,7 +258,7 @@
 
 .recommend-carousel-no-results {
   text-align: center;
-  padding: var(--space-6xl);
+  padding: var(--space-7xl);
   color: var(--color-text-muted);
 }
 

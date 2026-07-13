@@ -408,7 +408,7 @@
 
 .watched-history-card__poster-wrapper {
   width: var(--layout-window-titlebar-height);
-  height: var(--space-6xl);
+  height: var(--space-7xl);
   border-radius: var(--radius-sm);
   overflow: hidden;
   background: var(--ui-surface-soft);

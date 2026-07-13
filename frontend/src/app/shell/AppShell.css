@@ -151,7 +151,7 @@
 }
 
 .shell:has(#shell-utility-bar-bottom-center > *:not(:empty)) .ui-page:not(.ui-page--viewport) {
-  --page-pb: var(--space-6xl);
+  --page-pb: var(--space-7xl);
   padding-bottom: var(--page-pb);
 }
 

@@ -72,8 +72,8 @@
 }
 
 .ui-compact-card--aspect-circle .ui-compact-card__poster-wrapper {
-  width: var(--space-5xl);
-  height: var(--space-5xl);
+  width: var(--space-6xl);
+  height: var(--space-6xl);
   border-radius: var(--radius-full);
 }
 
