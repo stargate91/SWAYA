@@ -555,9 +555,9 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     return () => clearInterval(interval);
   }, [isPlaying, saveProgress]);
 
-  const handlePlayPause = () => {
+  const handlePlayPause = useCallback(() => {
     sendCommand(['cycle', 'pause']);
-  };
+  }, [sendCommand]);
 
   const handleSeek = (e) => {
     const val = parseFloat(e.target.value);
@@ -572,12 +572,12 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     sendCommand(['set_property', 'volume', val]);
   };
 
-  const toggleMute = () => {
+  const toggleMute = useCallback(() => {
     const nextMuted = !isMuted;
     setIsMuted(nextMuted);
     localStorage.setItem('player_mute', String(nextMuted));
     sendCommand(['set_property', 'mute', nextMuted]);
-  };
+  }, [isMuted, sendCommand]);
 
   const handleWheel = (e) => {
     const step = 5;
@@ -608,7 +608,7 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     sendCommand(['set_property', 'speed', nextSpeed]);
   };
 
-  const handleAddPeak = async (e) => {
+  const handleAddPeak = useCallback(async (e) => {
     if (e && e.currentTarget) {
       e.currentTarget.blur();
     }
@@ -640,7 +640,7 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     } catch (e) {
       console.error('Failed to add peak:', e);
     }
-  };
+  }, [itemId, currentTime]);
 
   const handlePlayNextRef = useRef(handlePlayNext);
   useEffect(() => {
@@ -748,6 +748,15 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     }
   }, [audioDelay, triggerOsd]);
 
+  const handleTogglePip = useCallback(() => {
+    try {
+      const { ipcRenderer } = window.require('electron');
+      ipcRenderer.send('mpv-toggle-pip');
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       // Enter for peaks
@@ -842,14 +851,7 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isAdult, sendCommand, isPaused, volume, isMuted, toggleMute, handlePlayPause, handleTogglePip, triggerOsd]);
 
-  function handleTogglePip() {
-    try {
-      const { ipcRenderer } = window.require('electron');
-      ipcRenderer.send('mpv-toggle-pip');
-    } catch {
-      /* ignore */
-    }
-  }
+
 
   function handleMinimizePip() {
     try {

@@ -1,15 +1,4 @@
-/* Sidebar Cards & Pills */
-.shell__sidebar-card,
-.shell__stat-pill {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-  padding: var(--space-2xl);
-  border-radius: var(--radius-md);
-  background: var(--ui-surface-card-gradient-soft);
-  border: 1px solid var(--color-border-subtle);
-  box-shadow: var(--shadow-sm);
-}
+
 
 .ui-media-card {
   border: 0;

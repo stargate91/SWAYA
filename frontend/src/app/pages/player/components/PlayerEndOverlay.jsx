@@ -36,13 +36,18 @@ export default function PlayerEndOverlay({
 
   const backendPort = window.location.search.match(/backend_port=(\d+)/)?.[1] || '8000';
 
+  const [prevMediaImage, setPrevMediaImage] = React.useState(mediaImage);
+  const [mediaStillError, setMediaStillError] = React.useState(false);
+  if (mediaImage !== prevMediaImage) {
+    setPrevMediaImage(mediaImage);
+    setMediaStillError(false);
+  }
+
   // Left drawer: current episode media image
   const mediaStillSrc = React.useMemo(() => {
     if (mediaImage) return mediaImage;
     return null;
   }, [mediaImage]);
-  const [mediaStillError, setMediaStillError] = React.useState(false);
-  React.useEffect(() => { setMediaStillError(false); }, [mediaImage]);
 
   // Right drawer: next episode still
   const nextStillSrc = React.useMemo(() => {
@@ -51,8 +56,13 @@ export default function PlayerEndOverlay({
     }
     return null;
   }, [nextEpisode, backendPort]);
+
+  const [prevNextEpisode, setPrevNextEpisode] = React.useState(nextEpisode);
   const [nextStillError, setNextStillError] = React.useState(false);
-  React.useEffect(() => { setNextStillError(false); }, [nextEpisode]);
+  if (nextEpisode !== prevNextEpisode) {
+    setPrevNextEpisode(nextEpisode);
+    setNextStillError(false);
+  }
 
   // Helper to open/play recommended item
   const playItem = (targetId) => {
@@ -112,7 +122,7 @@ export default function PlayerEndOverlay({
 
         <div className="player-page__drawer-content">
           <div className="player-page__drawer-media-container">
-            <div className={`player-page__card player-page__card--static ${(mediaType === 'episode' || mediaType === 'scene') ? 'player-page__card--hero' : 'player-page__card--single'}`} style={{ width: '100%' }}>
+            <div className={`player-page__card player-page__card--static ${(mediaType === 'episode' || mediaType === 'scene') ? 'player-page__card--hero' : 'player-page__card--single'}`}>
               <div className="player-page__card-media">
                 {mediaStillSrc && !mediaStillError ? (
                   <img 
@@ -232,7 +242,13 @@ export default function PlayerEndOverlay({
           {isTv && (
             <div className="player-page__tv-next">
               {nextEpisode ? (
-                <div className="player-page__card player-page__card--hero" onClick={handlePlayNext}>
+                <div 
+                  className="player-page__card player-page__card--hero" 
+                  onClick={handlePlayNext}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handlePlayNext(); } }}
+                >
                   <div className="player-page__card-media">
                     {nextStillSrc && !nextStillError ? (
                       <img 
@@ -273,7 +289,13 @@ export default function PlayerEndOverlay({
           {!isTv && !isScene && activeMovie && (
             <div className="player-page__discovery-container-vertical">
               <div className="player-page__discovery-grid">
-                <div className="player-page__card player-page__card--surprise player-page__card--single" onClick={() => playItem(activeMovie.id)}>
+                <div 
+                  className="player-page__card player-page__card--surprise player-page__card--single" 
+                  onClick={() => playItem(activeMovie.id)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); playItem(activeMovie.id); } }}
+                >
                   <div className="player-page__card-media">
                     {activeMovie.poster_path ? (
                       <img 
@@ -315,16 +337,22 @@ export default function PlayerEndOverlay({
             <div className="player-page__discovery-vertical-list">
               {studioUnwatched && (
                 <div className="player-page__discovery-section">
-                  <h3 className="player-page__discovery-header" style={{ marginBottom: '2px' }}>
+                  <h3 className="player-page__discovery-header player-page__discovery-header--compact">
                     {t('player.unwatched_studio_recommendation', { 
                       defaultValue: 'FANCY SOME MORE {{studio}}?', 
                       studio: studioUnwatched.studio_name ? studioUnwatched.studio_name.toUpperCase() : 'STUDIO' 
                     })}
                   </h3>
-                  <div className="player-page__discovery-item-title" style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-ink)', marginBottom: '8px' }}>
+                  <div className="player-page__discovery-item-title--compact">
                     {studioUnwatched.title}
                   </div>
-                  <div className="player-page__card player-page__card--16-9" onClick={() => playItem(studioUnwatched.id)}>
+                  <div 
+                    className="player-page__card player-page__card--16-9" 
+                    onClick={() => playItem(studioUnwatched.id)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); playItem(studioUnwatched.id); } }}
+                  >
                     <div className="player-page__card-media">
                       {studioUnwatched.poster_path ? (
                         <img 
@@ -343,16 +371,22 @@ export default function PlayerEndOverlay({
 
               {performerUnwatched && (
                 <div className="player-page__discovery-section">
-                  <h3 className="player-page__discovery-header" style={{ marginBottom: '2px' }}>
+                  <h3 className="player-page__discovery-header player-page__discovery-header--compact">
                     {t('player.unwatched_performer_recommendation', { 
                       defaultValue: 'CRAVING MORE {{performer}}?', 
                       performer: performerUnwatched.performer_name ? performerUnwatched.performer_name.toUpperCase() : 'PERFORMER' 
                     })}
                   </h3>
-                  <div className="player-page__discovery-item-title" style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-ink)', marginBottom: '8px' }}>
+                  <div className="player-page__discovery-item-title--compact">
                     {performerUnwatched.title}
                   </div>
-                  <div className="player-page__card player-page__card--16-9" onClick={() => playItem(performerUnwatched.id)}>
+                  <div 
+                    className="player-page__card player-page__card--16-9" 
+                    onClick={() => playItem(performerUnwatched.id)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); playItem(performerUnwatched.id); } }}
+                  >
                     <div className="player-page__card-media">
                       {performerUnwatched.poster_path ? (
                         <img 
@@ -371,15 +405,21 @@ export default function PlayerEndOverlay({
 
               {surpriseMe && (
                 <div className="player-page__discovery-section">
-                  <h3 className="player-page__discovery-header" style={{ marginBottom: '2px' }}>
+                  <h3 className="player-page__discovery-header player-page__discovery-header--compact">
                     {t('player.unwatched_library_recommendation', { 
                       defaultValue: 'SOMETHING UNSEEN FROM YOUR LIBRARY:' 
                     })}
                   </h3>
-                  <div className="player-page__discovery-item-title" style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-ink)', marginBottom: '8px' }}>
+                  <div className="player-page__discovery-item-title--compact">
                     {surpriseMe.title}
                   </div>
-                  <div className="player-page__card player-page__card--surprise player-page__card--16-9" onClick={() => playItem(surpriseMe.id)}>
+                  <div 
+                    className="player-page__card player-page__card--surprise player-page__card--16-9" 
+                    onClick={() => playItem(surpriseMe.id)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); playItem(surpriseMe.id); } }}
+                  >
                     <div className="player-page__card-media">
                       {surpriseMe.poster_path ? (
                         <img 

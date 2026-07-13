@@ -102,16 +102,8 @@
   background: var(--table-row-active-hover-bg);
 }
 
-.ui-table .text-left {
-  text-align: left;
-}
-
 .ui-table .text-center {
   text-align: center;
-}
-
-.ui-table .text-right {
-  text-align: right;
 }
 
 .ui-table td.ui-table__empty {

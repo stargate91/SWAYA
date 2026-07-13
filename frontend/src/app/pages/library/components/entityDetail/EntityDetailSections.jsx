@@ -153,7 +153,7 @@ function HorizontalCollectionItemsList({ items, navigate, t, customStyle }) {
             {t('library.details.have') || 'HAVE'}
           </Pill>
         ) : (
-          <Pill variant="default">
+          <Pill variant="missing">
             {t('library.details.missing') || 'MISSING'}
           </Pill>
         );

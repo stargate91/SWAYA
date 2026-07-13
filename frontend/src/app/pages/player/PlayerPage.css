@@ -1410,6 +1410,7 @@
 
 .player-page__card.player-page__card--static {
   cursor: default;
+  width: 100%;
 }
 .player-page__card.player-page__card--static:hover .player-page__card-media {
   border-color: rgba(255, 255, 255, 0.08);
@@ -1417,4 +1418,15 @@
 }
 .player-page__card.player-page__card--static:hover .player-page__card-img {
   transform: none;
+}
+
+.player-page__discovery-header--compact {
+  margin-bottom: 2px;
+}
+
+.player-page__discovery-item-title--compact {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin-bottom: 8px;
 }
