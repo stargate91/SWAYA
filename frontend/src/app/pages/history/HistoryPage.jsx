@@ -177,8 +177,8 @@ export default function HistoryPage() {
       return (
         <div className="history-list" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
           {Array.from({ length: 4 }).map((_, idx) => (
-            <div key={idx} style={{ padding: 'var(--space-xl)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border-default)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-md)' }}>
+            <div key={idx} style={{ padding: 'var(--space-2xl)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border-default)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-lg)' }}>
                 <div style={{ width: '200px' }}><Skeleton style={{ height: '24px' }} variant="rect" /></div>
                 <div style={{ width: '80px' }}><Skeleton style={{ height: '24px' }} variant="rect" /></div>
               </div>
@@ -229,7 +229,7 @@ export default function HistoryPage() {
       return (
         <div className="watched-history-list" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
           {Array.from({ length: 4 }).map((_, idx) => (
-            <div key={idx} style={{ display: 'flex', gap: 'var(--space-xl)', padding: 'var(--space-xl)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border-default)' }}>
+            <div key={idx} style={{ display: 'flex', gap: 'var(--space-2xl)', padding: 'var(--space-2xl)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border-default)' }}>
               <div style={{ width: '100px', height: '56px', borderRadius: 'var(--radius-md)', overflow: 'hidden', flexShrink: 0 }}>
                 <Skeleton style={{ width: '100%', height: '100%' }} variant="rect" />
               </div>

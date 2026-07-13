@@ -252,9 +252,9 @@ export default function RatingsPage() {
             <div className="organizer-table-block">
               <div className="organizer-content">
                 {state.isLoading ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', padding: 'var(--space-md) 0' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)', padding: 'var(--space-lg) 0' }}>
                     {Array.from({ length: 6 }).map((_, idx) => (
-                      <div key={idx} style={{ display: 'flex', gap: 'var(--space-xl)', padding: 'var(--space-lg) var(--space-md)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-md)' }}>
+                      <div key={idx} style={{ display: 'flex', gap: 'var(--space-2xl)', padding: 'var(--space-lg) var(--space-lg)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-md)' }}>
                         <Skeleton style={{ width: '150px', height: '18px' }} variant="rect" />
                         <Skeleton style={{ width: '80px', height: '18px' }} variant="rect" />
                         <Skeleton style={{ width: '100px', height: '18px', marginLeft: 'auto' }} variant="rect" />

@@ -252,7 +252,7 @@
 .organizer-match-modal__result-copy {
   min-width: 0;
   display: grid;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
   align-content: start;
 }
 
@@ -367,12 +367,12 @@
 
 .organizer-match-modal__load-more-sentinel {
   height: var(--space-3xl);
-  margin: var(--space-md) 0;
+  margin: var(--space-lg) 0;
 }
 
 .organizer-match-modal__browser-card {
   display: grid;
-  gap: var(--space-md);
+  gap: var(--space-lg);
   width: 100%;
   padding: 0;
   border: 0;
@@ -509,8 +509,8 @@
 }
 
 .organizer-match-modal__bucket-chip {
-  min-height: calc(2 * var(--space-xl));
-  padding: 0 var(--space-md);
+  min-height: calc(2 * var(--space-2xl));
+  padding: 0 var(--space-lg);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-input);
   background: var(--color-surface-glass-strong);
@@ -933,14 +933,14 @@
 .organizer-match-modal__skeleton-list-container {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-lg);
   width: 100%;
 }
 
 .organizer-match-modal__skeleton-list-item {
   display: flex;
-  gap: var(--space-md);
-  padding: var(--space-md);
+  gap: var(--space-lg);
+  padding: var(--space-lg);
   background: var(--color-surface-card);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-md);
@@ -961,8 +961,8 @@
 
 .organizer-match-modal__skeleton-poster-container {
   display: flex;
-  gap: var(--space-md);
-  padding: var(--space-md) 0;
+  gap: var(--space-lg);
+  padding: var(--space-lg) 0;
   width: 100%;
   overflow: hidden;
 }

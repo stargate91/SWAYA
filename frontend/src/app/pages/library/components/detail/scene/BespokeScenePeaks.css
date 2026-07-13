@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: column;
   overflow: visible;
-  margin-top: var(--space-md);
+  margin-top: var(--space-lg);
 }
 
 .bespoke-scene-peaks-header {
@@ -13,7 +13,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-xs) var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
   --local-bg: rgba(0, 0, 0, 0.15);
   background: var(--local-bg);
   border-top-left-radius: var(--radius-lg);
@@ -24,7 +24,7 @@
 .bespoke-scene-peaks-header-left {
   display: flex;
   align-items: center;
-  --local-gap: var(--space-xs);
+  --local-gap: var(--space-sm);
   gap: var(--local-gap);
 }
 
@@ -42,10 +42,10 @@
 }
 
 .bespoke-scene-peaks-body {
-  padding: var(--space-md);
+  padding: var(--space-lg);
   display: flex;
   flex-direction: column;
-  --local-gap: var(--space-xs);
+  --local-gap: var(--space-sm);
   gap: var(--local-gap);
 }
 
@@ -86,7 +86,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--space-xs) var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
   border-radius: var(--radius-sm);
   background: var(--color-surface-card);
   border: 1px solid var(--color-border-default);

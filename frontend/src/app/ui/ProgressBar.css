@@ -66,7 +66,7 @@
 .ui-progress-bar__track {
   flex: 1 1 auto;
   min-width: 5rem;
-  height: var(--space-md);
+  height: var(--space-lg);
   background: var(--color-progress-track, var(--color-border-default));
   border-radius: var(--radius-full);
   overflow: hidden;

@@ -47,7 +47,7 @@
 /* Dashboard Drawer Customizer Styles */
 .ui-drawer.dashboard-customizer-drawer {
   background: var(--color-surface-overlay, var(--color-panel-strong));
-  box-shadow: var(--shadow-overlay-strong, 0 var(--space-md) 2.5rem color-mix(in srgb, black 40%, transparent));
+  box-shadow: var(--shadow-overlay-strong, 0 var(--space-lg) 2.5rem color-mix(in srgb, black 40%, transparent));
 }
 
 .dashboard-utility-bar-wrapper {

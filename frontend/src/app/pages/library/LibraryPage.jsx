@@ -172,12 +172,12 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
             <div style={{ width: '250px' }}>
               <Skeleton.Title style={{ marginBottom: 0 }} />
             </div>
-            <div style={{ display: 'flex', gap: 'var(--space-md)' }}>
+            <div style={{ display: 'flex', gap: 'var(--space-lg)' }}>
               <Skeleton style={{ width: '80px', height: '36px' }} variant="rect" />
               <Skeleton style={{ width: '80px', height: '36px' }} variant="rect" />
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 'var(--space-xl)', marginBottom: 'var(--space-4xl)', padding: 'var(--space-lg)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-lg)' }}>
+          <div style={{ display: 'flex', gap: 'var(--space-2xl)', marginBottom: 'var(--space-4xl)', padding: 'var(--space-lg)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-lg)' }}>
             <Skeleton style={{ width: '120px', height: '32px' }} variant="rect" />
             <Skeleton style={{ width: '100px', height: '32px' }} variant="rect" />
             <Skeleton style={{ width: '150px', height: '32px' }} variant="rect" />

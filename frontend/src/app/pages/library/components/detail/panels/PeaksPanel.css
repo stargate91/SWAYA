@@ -1,7 +1,7 @@
 .peaks-panel {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xl);
+  gap: var(--space-2xl);
 }
 
 .peaks-panel__title {
@@ -33,7 +33,7 @@
   --header-bg: var(--color-surface-glass-strong, rgba(255, 255, 255, 0.05));
   background: var(--header-bg);
   border-bottom: 1px solid var(--media-detail-panel-card-border);
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
@@ -51,7 +51,7 @@
 .peaks-table__row {
   display: flex;
   align-items: center;
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
   transition: background-color var(--motion-fast);
 }
 

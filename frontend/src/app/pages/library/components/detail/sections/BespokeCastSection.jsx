@@ -100,9 +100,9 @@ export default function BespokeCastSection({ item, t, navigate }) {
   return (
     <div className="bespoke-cast-section">
       <div className="bespoke-cast-browser-card">
-        <div className="bespoke-browser-card__pills-header" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+        <div className="bespoke-browser-card__pills-header" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-lg)' }}>
           {showTabs ? (
-            <div className="bespoke-cast-tabs" style={{ display: 'flex', gap: 'var(--space-xs)' }}>
+            <div className="bespoke-cast-tabs" style={{ display: 'flex', gap: 'var(--space-sm)' }}>
               <button
                 type="button"
                 className={`bespoke-cast-tab-btn ${activeTab === 'cast' ? 'is-active' : ''}`}
@@ -111,7 +111,7 @@ export default function BespokeCastSection({ item, t, navigate }) {
                   background: activeTab === 'cast' ? 'var(--color-bg-subtle)' : 'transparent',
                   border: 'none',
                   color: activeTab === 'cast' ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
-                  padding: 'var(--space-xs) var(--space-md)',
+                  padding: 'var(--space-sm) var(--space-lg)',
                   borderRadius: 'var(--radius-md, 8px)',
                   cursor: 'pointer',
                   fontWeight: 600,
@@ -129,7 +129,7 @@ export default function BespokeCastSection({ item, t, navigate }) {
                     background: activeTab === 'companies' ? 'var(--color-bg-subtle)' : 'transparent',
                     border: 'none',
                     color: activeTab === 'companies' ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
-                    padding: 'var(--space-xs) var(--space-md)',
+                    padding: 'var(--space-sm) var(--space-lg)',
                     borderRadius: 'var(--radius-md, 8px)',
                     cursor: 'pointer',
                     fontWeight: 600,
@@ -148,7 +148,7 @@ export default function BespokeCastSection({ item, t, navigate }) {
                     background: activeTab === 'networks' ? 'var(--color-bg-subtle)' : 'transparent',
                     border: 'none',
                     color: activeTab === 'networks' ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
-                    padding: 'var(--space-xs) var(--space-md)',
+                    padding: 'var(--space-sm) var(--space-lg)',
                     borderRadius: 'var(--radius-md, 8px)',
                     cursor: 'pointer',
                     fontWeight: 600,

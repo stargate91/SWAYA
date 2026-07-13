@@ -1,10 +1,10 @@
 .person-backdrop-picker {
   --person-backdrop-row-height: 4.875rem;
-  --person-backdrop-row-gap: var(--space-md);
+  --person-backdrop-row-gap: var(--space-lg);
   --person-backdrop-viewport-height: min(calc((var(--person-backdrop-row-height) * 5) + (var(--person-backdrop-row-gap) * 4)), 84vh);
   display: flex;
   flex-direction: column;
-  gap: var(--space-xl);
+  gap: var(--space-2xl);
   min-height: 0;
   height: 100%;
   width: 100%;
@@ -41,7 +41,7 @@
 .person-backdrop-picker__tabs .ui-segmented-control__option {
   width: 100%;
   min-width: 0;
-  padding-inline: var(--space-xs);
+  padding-inline: var(--space-sm);
   box-sizing: border-box;
 }
 
@@ -68,7 +68,7 @@
 .person-backdrop-picker__grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-md);
+  gap: var(--space-lg);
   padding-top: var(--space-2xs);
   padding-bottom: var(--space-2xs);
   align-content: start;
@@ -82,7 +82,7 @@
 }
 
 .person-backdrop-picker__progress-banner {
-  padding: var(--space-xs) var(--space-sm);
+  padding: var(--space-sm) var(--space-sm);
   background: color-mix(in srgb, var(--color-accent-blue) 8%, var(--color-surface-card));
   border: 1px solid color-mix(in srgb, var(--color-accent-blue) 15%, var(--color-border-default));
   border-radius: var(--radius-sm);
@@ -90,8 +90,8 @@
   color: var(--color-text-secondary);
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
-  margin-bottom: var(--space-md);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
   --pulse-anim: backdrop-progress-fade 2s infinite ease-in-out;
   animation: var(--pulse-anim);
 }
@@ -113,7 +113,7 @@
 .person-backdrop-picker__detail-toolbar {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-lg);
   min-width: 0;
   flex: 0 0 auto;
   min-height: 2.5rem;
@@ -263,11 +263,11 @@
 .entity-detail-page__skeleton-block--credit-title {
   width: 80%;
   height: 0.875rem;
-  margin-top: var(--space-xs);
+  margin-top: var(--space-sm);
 }
 
 .entity-detail-page__skeleton-block--credit-meta {
   width: 40%;
   height: 0.625rem;
-  margin-top: var(--space-xs);
+  margin-top: var(--space-sm);
 }

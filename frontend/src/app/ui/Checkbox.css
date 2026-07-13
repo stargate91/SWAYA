@@ -49,7 +49,7 @@
   content: '';
   position: absolute;
   display: none;
-  left: calc(var(--space-md) / 2);
+  left: calc(var(--space-lg) / 2);
   top: var(--radius-2xs);
   width: var(--space-2xs);
   height: var(--space-sm);

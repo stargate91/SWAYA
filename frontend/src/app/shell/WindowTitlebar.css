@@ -31,11 +31,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-xl);
+  gap: var(--space-2xl);
   flex: 1 1 auto;
   min-width: 0;
   height: 100%;
-  padding: 0 var(--space-xl);
+  padding: 0 var(--space-2xl);
   -webkit-app-region: drag;
 }
 
@@ -64,7 +64,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-lg);
   z-index: 10;
 }
 
@@ -162,8 +162,8 @@
 .window-titlebar__nav-buttons {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
-  padding: 0 var(--space-md);
+  gap: var(--space-sm);
+  padding: 0 var(--space-lg);
   -webkit-app-region: no-drag;
 }
 

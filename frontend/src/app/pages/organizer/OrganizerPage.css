@@ -52,7 +52,7 @@
 .organizer-panel__title--nsfw-container {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
 }
 
 .organizer-panel__adult-sup {
@@ -64,8 +64,8 @@
 
 
 .organizer-panel__browse-btn {
-  min-height: calc(2 * var(--space-xl));
-  height: calc(2 * var(--space-xl));
+  min-height: calc(2 * var(--space-2xl));
+  height: calc(2 * var(--space-2xl));
   padding: 0 var(--space-2xl);
   font-size: var(--font-size-xs);
 }
@@ -323,7 +323,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
   flex-wrap: wrap;
 }
 

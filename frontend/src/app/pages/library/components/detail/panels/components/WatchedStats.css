@@ -32,7 +32,7 @@
 .specs-card__progress {
   width: 100%;
   height: 0.375rem;
-  margin-top: var(--space-xs);
+  margin-top: var(--space-sm);
   border-radius: var(--radius-sm);
   overflow: hidden;
   background: var(--color-border-default);
@@ -59,7 +59,7 @@
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
   border-radius: var(--radius-md);
   background: var(--color-surface-glass);
   border: 1px solid var(--media-detail-panel-card-border);
@@ -97,7 +97,7 @@
 .activity-list {
   display: flex;
   flex-direction: column;
-  padding: var(--space-xs) var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
   border: 1px solid var(--media-detail-panel-card-border);
   border-radius: var(--radius-md);
   background: var(--color-panel-soft);
@@ -109,7 +109,7 @@
   padding: var(--space-sm) var(--space-2xs);
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .activity-item+.activity-item {
@@ -153,7 +153,7 @@
   box-shadow: var(--media-detail-panel-card-shadow);
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
   transition: transform var(--motion-emphasized), border-color var(--motion-base), box-shadow var(--motion-base), background var(--motion-base);
 }
 
@@ -209,13 +209,13 @@
 .activity-item--tv {
   flex-direction: column;
   align-items: stretch;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
 }
 
 .activity-item__tv-top {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .activity-item__token {

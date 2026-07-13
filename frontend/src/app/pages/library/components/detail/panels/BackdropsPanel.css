@@ -7,7 +7,7 @@
 .backdrops-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-md);
+  gap: var(--space-lg);
   padding-inline: 0.25rem;
   padding-top: var(--space-2xs);
   padding-bottom: var(--space-2xs);
@@ -59,7 +59,7 @@
 .ui-backdrop-card.ui-backdrop-card--logo .ui-backdrop-card__img {
   object-fit: contain;
   background: var(--color-surface-glass);
-  padding: var(--space-md);
+  padding: var(--space-lg);
   box-sizing: border-box;
 }
 

@@ -16,7 +16,7 @@
 }
 
 .tags-panel__tag-btn {
-  padding: var(--space-xs) var(--space-xl);
+  padding: var(--space-sm) var(--space-2xl);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   border-radius: var(--radius-full);
@@ -170,7 +170,7 @@
   min-height: 2.375rem;
   max-height: calc((1.625rem * 3) + (0.5rem * 2) + 1.25rem);
   overflow-y: auto;
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-lg) var(--space-lg);
   border-radius: var(--radius-lg);
   background: var(--media-detail-panel-section-bg);
   border: 1px solid var(--media-detail-panel-section-border);
@@ -257,7 +257,7 @@
   box-shadow: 0 0.625rem 1.875rem color-mix(in srgb, black 50%, transparent), inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 10%, transparent);
   backdrop-filter: blur(1.25rem) saturate(125%);
   -webkit-backdrop-filter: blur(1.25rem) saturate(125%);
-  padding: var(--space-xs);
+  padding: var(--space-sm);
   display: flex;
   flex-direction: column;
   gap: var(--space-2xs);
@@ -267,7 +267,7 @@
   width: 100%;
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-lg);
   padding: var(--space-sm) var(--space-lg);
   border-radius: var(--radius-md);
   background: var(--dropdown-option-bg);

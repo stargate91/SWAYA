@@ -23,7 +23,7 @@
 .entity-detail-page__content-section {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xl);
+  gap: var(--space-2xl);
   max-width: 53.75rem;
 }
 
@@ -54,7 +54,7 @@
 
 .entity-detail-page__status-card h2 {
   font-size: 1.4rem;
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 
 .entity-detail-page__status-card p {
@@ -71,7 +71,7 @@
 
 @media (max-width: 45rem) {
   .entity-detail-page .media-detail-page__container {
-    gap: var(--space-xl);
+    gap: var(--space-2xl);
   }
 }
 
@@ -89,7 +89,7 @@
 .entity-detail-page__bottom-socials-wrapper {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
   --socials-bg: color-mix(in srgb, var(--color-panel-translucent, var(--color-panel)) 65%, transparent);
   background-color: var(--socials-bg);
   --socials-border: 1px solid color-mix(in srgb, var(--color-border-default) 35%, transparent);
@@ -105,7 +105,7 @@
 
 .entity-detail-page__scroll-toggle-container {
   position: fixed;
-  bottom: calc(2 * var(--space-xl));
+  bottom: calc(2 * var(--space-2xl));
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;

@@ -34,7 +34,7 @@
 
 .ui-table__cell-content {
   position: relative;
-  min-height: calc(2 * var(--space-xl));
+  min-height: calc(2 * var(--space-2xl));
   display: flex;
   align-items: center;
 }
@@ -46,7 +46,7 @@
 .ui-table__cell-value {
   display: inline-flex;
   align-items: center;
-  min-height: calc(2 * var(--space-xl));
+  min-height: calc(2 * var(--space-2xl));
   min-width: 0;
 }
 
@@ -125,7 +125,7 @@
   display: none;
   align-items: center;
   justify-content: flex-end;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
   width: max-content;
   padding: 0 var(--space-2xl);
   background: transparent;
@@ -143,8 +143,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: calc(2 * var(--space-xl));
-  height: calc(2 * var(--space-xl));
+  width: calc(2 * var(--space-2xl));
+  height: calc(2 * var(--space-2xl));
   border: 1px solid var(--color-control-border-subtle, var(--color-border-default));
   border-radius: var(--radius-sm);
   background: var(--color-surface-hover, var(--color-surface-glass));
@@ -185,7 +185,7 @@
 
 .ui-table.ui-table--minimal th,
 .ui-table.ui-table--minimal td {
-  padding: var(--ui-table-cell-padding, var(--space-xs) var(--space-sm));
+  padding: var(--ui-table-cell-padding, var(--space-sm) var(--space-sm));
   font-size: var(--ui-table-cell-font-size, var(--font-size-xs));
 }
 

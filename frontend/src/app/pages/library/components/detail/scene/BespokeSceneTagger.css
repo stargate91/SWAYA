@@ -5,16 +5,16 @@
   display: flex;
   flex-direction: column;
   overflow: visible;
-  margin-top: var(--space-md);
+  margin-top: var(--space-lg);
 }
 
 .bespoke-scene-tagger-header {
   position: relative;
   display: flex;
   align-items: center;
-  --local-gap: var(--space-xs);
+  --local-gap: var(--space-sm);
   gap: var(--local-gap);
-  padding: var(--space-xs) var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
   background: color-mix(in srgb, black 15%, transparent);
   border-top-left-radius: var(--radius-lg);
   border-top-right-radius: var(--radius-lg);
@@ -30,10 +30,10 @@
 }
 
 .bespoke-scene-tagger-body {
-  padding: var(--space-md);
+  padding: var(--space-lg);
   display: flex;
   flex-direction: column;
-  --local-gap: var(--space-md);
+  --local-gap: var(--space-lg);
   gap: var(--local-gap);
 }
 
@@ -41,7 +41,7 @@
 .bespoke-scene-tagger-suggested-section {
   display: flex;
   flex-direction: column;
-  --local-gap: var(--space-xs);
+  --local-gap: var(--space-sm);
   gap: var(--local-gap);
 }
 
@@ -106,7 +106,7 @@
   background: var(--color-surface-glass);
   backdrop-filter: blur(0.25rem);
   border-radius: var(--radius-sm);
-  padding: 0 var(--space-md);
+  padding: 0 var(--space-lg);
   height: 2.375rem;
   transition: border-color var(--motion-duration-fast) var(--motion-ease-standard);
 }
@@ -269,5 +269,5 @@
 }
 
 .bespoke-scene-tagger-card--spaced {
-  margin-top: var(--space-xl);
+  margin-top: var(--space-2xl);
 }

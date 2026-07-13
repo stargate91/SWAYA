@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2xl);
-  padding: var(--space-md) var(--space-xl);
+  padding: var(--space-lg) var(--space-2xl);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-md);
   background: var(--color-surface-card);
@@ -13,7 +13,7 @@
 
 .ui-pagination__meta {
   position: absolute;
-  left: var(--space-xl);
+  left: var(--space-2xl);
   color: var(--color-muted);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
@@ -37,7 +37,7 @@
 
 .ui-pagination__sizes {
   position: absolute;
-  right: var(--space-xl);
+  right: var(--space-2xl);
   order: 2;
 }
 
@@ -48,7 +48,7 @@
 .ui-pagination__size,
 .ui-pagination__button,
 .ui-pagination__page-display {
-  height: calc(2 * var(--space-xl));
+  height: calc(2 * var(--space-2xl));
   padding: 0 var(--space-lg);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
@@ -57,8 +57,8 @@
 .ui-pagination__button.ui-button,
 .ui-pagination__size.ui-button,
 .ui-pagination__page-display.ui-button {
-  min-height: calc(2 * var(--space-xl));
-  height: calc(2 * var(--space-xl));
+  min-height: calc(2 * var(--space-2xl));
+  height: calc(2 * var(--space-2xl));
   padding: 0 var(--space-lg);
   font-size: var(--font-size-xs);
 }
@@ -87,7 +87,7 @@
 .ui-pagination__page--editable {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
   min-width: 0;
 }
 
@@ -96,7 +96,7 @@
 }
 
 .ui-pagination__page--editable input {
-  width: calc(3 * var(--space-xl));
+  width: calc(3 * var(--space-2xl));
   height: var(--space-4xl);
   padding: 0 var(--space-2xs);
   border: 1px solid var(--color-border-default);

@@ -12,7 +12,7 @@
 }
 
 .shell.is-transitioning {
-  filter: blur(var(--space-xs));
+  filter: blur(var(--space-sm));
   transform: scale(0.985);
 }
 
@@ -66,7 +66,7 @@
 
 .shell__utility-bar-bottom {
   position: absolute;
-  bottom: calc(2 * var(--space-xl));
+  bottom: calc(2 * var(--space-2xl));
   right: var(--space-5xl);
   left: var(--space-5xl);
   z-index: 100;
@@ -124,7 +124,7 @@
   border-radius: calc(var(--radius-sm) - var(--radius-sm));
   font: var(--text-caption);
   font-weight: var(--font-weight-semibold);
-  padding: 0 var(--space-xl);
+  padding: 0 var(--space-2xl);
 }
 
 

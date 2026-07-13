@@ -509,7 +509,7 @@
 
 .mixer-th-field,
 .mixer-th-source {
-  --th-padding: var(--space-xs) var(--space-sm);
+  --th-padding: var(--space-sm) var(--space-sm);
   padding: var(--th-padding);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-secondary);
@@ -539,7 +539,7 @@
 }
 
 .mixer-td-field-label {
-  --td-padding: var(--space-xs) var(--space-sm);
+  --td-padding: var(--space-sm) var(--space-sm);
   padding: var(--td-padding);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
@@ -551,7 +551,7 @@
 }
 
 .mixer-td-cell {
-  --td-padding: var(--space-xs) var(--space-sm);
+  --td-padding: var(--space-sm) var(--space-sm);
   padding: var(--td-padding);
   cursor: pointer;
   --cell-transition: all var(--motion-fast) ease;
@@ -574,7 +574,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
 }
 
 .mixer-cell-value {
@@ -923,7 +923,7 @@
 
 .healthyceleb-import-input {
   flex: 1;
-  padding: var(--space-xs) var(--space-lg);
+  padding: var(--space-sm) var(--space-lg);
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border-default);
   background: var(--color-surface-card);

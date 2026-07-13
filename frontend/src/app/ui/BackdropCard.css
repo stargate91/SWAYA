@@ -92,7 +92,7 @@
   left: 0;
   right: 0;
   background: linear-gradient(to top, var(--color-surface-overlay-strong) 0%, transparent 100%);
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
   display: flex;
   justify-content: space-between;
   align-items: center;

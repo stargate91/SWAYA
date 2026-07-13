@@ -557,8 +557,8 @@
   position: absolute;
   top: var(--space-lg);
   right: var(--space-lg);
-  width: calc(2 * var(--space-xl));
-  height: calc(2 * var(--space-xl));
+  width: calc(2 * var(--space-2xl));
+  height: calc(2 * var(--space-2xl));
   border-radius: var(--radius-full);
   border: 1px solid color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border));
   background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);

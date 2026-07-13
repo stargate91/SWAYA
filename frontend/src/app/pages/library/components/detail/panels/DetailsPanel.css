@@ -1,5 +1,5 @@
 .details-panel__ratings-title {
-  margin: 0 0 var(--space-md) 0;
+  margin: 0 0 var(--space-lg) 0;
   font-size: var(--font-size-sm);
   text-transform: uppercase;
   color: var(--color-text-muted);
@@ -8,7 +8,7 @@
 .ratings-container {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .rating-card {
@@ -17,11 +17,11 @@
   align-items: center;
   justify-content: space-between;
   min-height: 3.25rem;
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-lg) var(--space-lg);
   background: var(--media-detail-panel-card-bg);
   border: 1px solid var(--media-detail-panel-card-border);
   border-radius: var(--radius-lg);
-  gap: var(--space-md);
+  gap: var(--space-lg);
   box-shadow: var(--media-detail-panel-card-shadow);
 }
 
@@ -46,7 +46,7 @@
 .companies-networks-container {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .companies-networks-container .specs-card--company:last-child:nth-child(odd) {
@@ -60,7 +60,7 @@
   justify-content: center;
   gap: var(--space-lg);
   min-height: 3.625rem;
-  padding: var(--space-md) var(--space-xl);
+  padding: var(--space-lg) var(--space-2xl);
 }
 
 .specs-card__company-logo {
@@ -85,7 +85,7 @@
 
 .external-links-container {
   display: flex;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .external-link-btn {
@@ -126,7 +126,7 @@
 .details-panel__keywords-list {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
 }
 
 .ui-pill.details-panel__keyword-pill {

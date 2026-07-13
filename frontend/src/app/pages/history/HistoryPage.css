@@ -118,7 +118,7 @@
   gap: var(--space-2xs);
   background: var(--ui-control-bg-subtle);
   border: 1px solid color-mix(in srgb, var(--accent-color) 12%, var(--color-border-subtle));
-  padding: var(--space-2xs) var(--space-md);
+  padding: var(--space-2xs) var(--space-lg);
   border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
 }
@@ -232,7 +232,7 @@
 }
 
 .history-card__files-list::-webkit-scrollbar {
-  width: var(--space-xs);
+  width: var(--space-sm);
 }
 .history-card__files-list::-webkit-scrollbar-track {
   background: transparent;
@@ -445,7 +445,7 @@
 .watched-history-card__content {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
   flex: 1;
   min-width: 0;
   position: relative;
@@ -535,8 +535,8 @@
 }
 
 .watched-history-card__status-dot {
-  width: var(--space-xs);
-  height: var(--space-xs);
+  width: var(--space-sm);
+  height: var(--space-sm);
   border-radius: 50%;
   background: var(--color-accent);
   display: inline-block;

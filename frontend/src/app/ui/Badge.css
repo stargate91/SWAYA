@@ -22,7 +22,7 @@
   left: var(--space-lg);
   right: var(--space-lg);
   bottom: var(--status-badge-bottom);
-  min-height: calc(var(--space-2xl) + var(--space-xs));
+  min-height: calc(var(--space-2xl) + var(--space-sm));
 }
 
 .ui-badge--status.ui-badge--accent {
@@ -67,7 +67,7 @@ sup .ui-badge.ui-badge--adult.ui-badge--danger {
   font-size: var(--font-size-2xs);
   letter-spacing: var(--letter-spacing-normal);
   border-radius: var(--radius-xs);
-  padding: var(--space-2xs) var(--space-xs);
+  padding: var(--space-2xs) var(--space-sm);
   height: auto;
   min-height: 0;
   line-height: 1.1;

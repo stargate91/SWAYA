@@ -7,12 +7,12 @@ const WidgetShell = ({ children, loading, size, transparent }) => {
   return (
     <div className={`widget-shell widget-shell--${size || 'md'} ${transparent ? 'widget-shell--transparent' : ''}`}>
       {loading ? (
-        <div className="widget-shell__loading-skeleton" style={{ padding: 'var(--space-xl) 0', width: '100%' }}>
-          <div style={{ width: '150px', marginBottom: 'var(--space-xl)' }}>
+        <div className="widget-shell__loading-skeleton" style={{ padding: 'var(--space-2xl) 0', width: '100%' }}>
+          <div style={{ width: '150px', marginBottom: 'var(--space-2xl)' }}>
             <Skeleton.Title style={{ marginBottom: 0 }} />
           </div>
           {size === 'sm' ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
               <Skeleton style={{ height: '32px' }} variant="rect" />
               <Skeleton style={{ height: '32px', width: '80%' }} variant="rect" />
             </div>

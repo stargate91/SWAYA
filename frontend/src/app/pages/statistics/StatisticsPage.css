@@ -10,8 +10,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-5xl);
-  margin-top: var(--space-xl);
-  padding: 0 var(--space-xs);
+  margin-top: var(--space-2xl);
+  padding: 0 var(--space-sm);
 }
 
 /* Bento Grid System */
@@ -37,7 +37,7 @@
 .stats-section {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xl);
+  gap: var(--space-2xl);
 }
 
 .stats-section-title {
@@ -48,14 +48,14 @@
   letter-spacing: calc(3 * var(--letter-spacing-wide));
   color: var(--color-text-muted);
   border-bottom: 1px solid var(--color-border-subtle);
-  padding-bottom: var(--space-md);
+  padding-bottom: var(--space-lg);
   margin: 0;
 }
 
 .stats-title-inline {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .stats-title-sup {
@@ -65,7 +65,7 @@
 }
 
 .stats-title-adult-badge {
-  padding: calc(var(--space-2xs) / 2) var(--space-xs);
+  padding: calc(var(--space-2xs) / 2) var(--space-sm);
   font-size: var(--font-size-2xs);
 }
 

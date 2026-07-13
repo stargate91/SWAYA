@@ -16,7 +16,7 @@
 .ui-scroll-row-container--layout-column {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
 }
 
 .ui-scroll-row-container--layout-column .ui-scroll-row-track {

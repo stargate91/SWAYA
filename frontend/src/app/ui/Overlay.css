@@ -85,7 +85,7 @@
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-bold);
   color: var(--color-muted);
-  margin-top: var(--space-xs);
+  margin-top: var(--space-sm);
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);
   user-select: none;

@@ -94,5 +94,5 @@
   font-weight: var(--font-weight-semibold);
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
 }

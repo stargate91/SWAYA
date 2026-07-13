@@ -41,7 +41,7 @@
 /* Rating variants */
 .ui-pill--imdb {
   gap: var(--space-2xs);
-  padding: calc(var(--space-2xs) / 2) calc(var(--space-md) / 2);
+  padding: calc(var(--space-2xs) / 2) calc(var(--space-lg) / 2);
   border-radius: var(--radius-xs);
   backdrop-filter: blur(var(--space-2xs));
   background-color: color-mix(in srgb, var(--color-brand-imdb) 10%, transparent);
@@ -51,7 +51,7 @@
 
 .ui-pill--tmdb {
   gap: var(--space-2xs);
-  padding: calc(var(--space-2xs) / 2) calc(var(--space-md) / 2);
+  padding: calc(var(--space-2xs) / 2) calc(var(--space-lg) / 2);
   border-radius: var(--radius-xs);
   backdrop-filter: blur(var(--space-2xs));
   background-color: color-mix(in srgb, var(--color-brand-tmdb) 10%, transparent);
@@ -61,7 +61,7 @@
 
 .ui-pill--porndb {
   gap: var(--space-2xs);
-  padding: calc(var(--space-2xs) / 2) calc(var(--space-md) / 2);
+  padding: calc(var(--space-2xs) / 2) calc(var(--space-lg) / 2);
   border-radius: var(--radius-xs);
   backdrop-filter: blur(var(--space-2xs));
   background-color: color-mix(in srgb, var(--color-brand-porndb) 10%, transparent);
@@ -80,7 +80,7 @@
 
 /* Favorite toggle variants */
 .ui-pill--favorite {
-  padding: var(--space-xs) var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
   cursor: pointer;
   transition: all var(--motion-base);
   background-color: var(--color-surface-glass);
@@ -96,7 +96,7 @@
 }
 
 .ui-pill--favorite-active {
-  padding: var(--space-xs) var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
   cursor: pointer;
   transition: all var(--motion-base);
   background-color: var(--color-state-danger-bg);
@@ -116,11 +116,11 @@
   font-family: var(--font-sans, sans-serif);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  padding: calc(var(--space-md) / 2) var(--space-lg);
+  padding: calc(var(--space-lg) / 2) var(--space-lg);
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border-subtle, var(--color-border-subtle));
   backdrop-filter: blur(var(--space-2xs));
-  gap: var(--space-xs);
+  gap: var(--space-sm);
 }
 
 .ui-pill--meta-large {
@@ -142,7 +142,7 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
   justify-content: flex-start;
   padding: 0.3rem 0.7rem;
   border-radius: var(--radius-sm);
@@ -218,12 +218,12 @@
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);
-  padding: calc(var(--space-2xs) / 2) calc(var(--space-md) / 2);
+  padding: calc(var(--space-2xs) / 2) calc(var(--space-lg) / 2);
   border-radius: var(--radius-sm);
 }
 
 .ui-pill--filter-active {
-  padding: var(--space-xs) var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
   cursor: pointer;
   transition: all var(--motion-base);
   background: var(--ui-surface-soft-strong);

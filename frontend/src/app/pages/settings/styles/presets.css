@@ -42,7 +42,7 @@
 }
 
 .settings-preset-card {
-  gap: var(--space-xs);
+  gap: var(--space-sm);
   position: relative;
 }
 
@@ -52,7 +52,7 @@
   font-weight: bold;
   color: var(--color-accent);
   background: var(--settings-accent-border-soft);
-  padding: calc(var(--space-2xs) / 2) var(--space-xs);
+  padding: calc(var(--space-2xs) / 2) var(--space-sm);
   border-radius: var(--radius-sm);
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);

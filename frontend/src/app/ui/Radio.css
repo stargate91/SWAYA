@@ -51,8 +51,8 @@
   display: none;
   left: var(--space-2xs);
   top: var(--space-2xs);
-  width: var(--space-xs);
-  height: var(--space-xs);
+  width: var(--space-sm);
+  height: var(--space-sm);
   border-radius: var(--radius-full);
   background: var(--button-primary-color);
 }

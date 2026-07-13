@@ -77,8 +77,8 @@ export default function DetailPageShell({
               flexShrink: 0,
               display: 'flex',
               flexDirection: 'column',
-              gap: 'var(--space-md)',
-              padding: 'var(--space-xl)',
+              gap: 'var(--space-lg)',
+              padding: 'var(--space-2xl)',
               borderRadius: '24px',
               background: 'color-mix(in srgb, var(--color-panel-translucent, var(--color-panel)) 22%, transparent)',
               border: '1px solid color-mix(in srgb, var(--color-border-default) 40%, transparent)',
@@ -88,25 +88,25 @@ export default function DetailPageShell({
             }}>
               {/* Title & aliases */}
               <div>
-                <Skeleton style={{ width: '80%', height: '24px', marginBottom: 'var(--space-xs)' }} variant="text" />
-                <Skeleton style={{ width: '60%', height: '14px', marginBottom: 'var(--space-md)' }} variant="text" />
+                <Skeleton style={{ width: '80%', height: '24px', marginBottom: 'var(--space-sm)' }} variant="text" />
+                <Skeleton style={{ width: '60%', height: '14px', marginBottom: 'var(--space-lg)' }} variant="text" />
               </div>
 
               {/* Profile image card */}
               <Skeleton style={{ width: '100%', aspectRatio: '2 / 3', borderRadius: '16px' }} variant="rect" />
 
               {/* Action row (Heart, check, pencil buttons) */}
-              <div style={{ display: 'flex', gap: 'var(--space-sm)', margin: 'var(--space-xs) 0' }}>
+              <div style={{ display: 'flex', gap: 'var(--space-sm)', margin: 'var(--space-sm) 0' }}>
                 <Skeleton style={{ flex: 1, height: '32px', borderRadius: '8px' }} variant="rect" />
                 <Skeleton style={{ flex: 1, height: '32px', borderRadius: '8px' }} variant="rect" />
                 <Skeleton style={{ flex: 1, height: '32px', borderRadius: '8px' }} variant="rect" />
               </div>
 
               {/* Rating representation */}
-              <Skeleton style={{ width: '100%', height: '12px', borderRadius: '4px', margin: 'var(--space-xs) 0' }} variant="rect" />
+              <Skeleton style={{ width: '100%', height: '12px', borderRadius: '4px', margin: 'var(--space-sm) 0' }} variant="rect" />
 
               {/* Info grid (Gender, Role, Born, Age, etc.) */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)', margin: 'var(--space-sm) 0' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-lg)', margin: 'var(--space-sm) 0' }}>
                 <div>
                   <Skeleton style={{ width: '50%', height: '10px', marginBottom: '4px' }} variant="text" />
                   <Skeleton style={{ width: '80%', height: '14px' }} variant="text" />
@@ -130,15 +130,15 @@ export default function DetailPageShell({
             </div>
 
             {/* Right side area: Known For horizontal cards list at the bottom */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', paddingBottom: 'var(--space-xl)', boxSizing: 'border-box' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', paddingBottom: 'var(--space-2xl)', boxSizing: 'border-box' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
                 {/* Title: KNOWN FOR */}
-                <Skeleton style={{ width: '120px', height: '18px', marginBottom: 'var(--space-xs)' }} variant="text" />
+                <Skeleton style={{ width: '120px', height: '18px', marginBottom: 'var(--space-sm)' }} variant="text" />
                 
                 {/* Horizontal row of cards */}
-                <div style={{ display: 'flex', gap: 'var(--space-md)', overflow: 'hidden' }}>
+                <div style={{ display: 'flex', gap: 'var(--space-lg)', overflow: 'hidden' }}>
                   {[...Array(8)].map((_, idx) => (
-                    <div key={idx} style={{ width: '120px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-xs)' }}>
+                    <div key={idx} style={{ width: '120px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
                       <Skeleton style={{ width: '100%', height: '180px', borderRadius: '12px' }} variant="rect" />
                       <Skeleton style={{ width: '90%', height: '12px' }} variant="text" />
                       <Skeleton style={{ width: '60%', height: '10px' }} variant="text" />
@@ -156,16 +156,16 @@ export default function DetailPageShell({
       <Page className={combinedClassName}>
         <div style={{ width: '100%' }}>
           <Skeleton.Banner style={{ height: '380px', borderRadius: 'var(--radius-3xl)', marginBottom: 'var(--space-3xl)' }} />
-          <div style={{ padding: '0 var(--space-4xl)', display: 'flex', flexDirection: 'column', gap: 'var(--space-xl)' }}>
+          <div style={{ padding: '0 var(--space-4xl)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2xl)' }}>
             <div style={{ width: '300px' }}>
-              <Skeleton.Title style={{ marginBottom: 'var(--space-md)' }} />
+              <Skeleton.Title style={{ marginBottom: 'var(--space-lg)' }} />
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-lg)' }}>
               <Skeleton style={{ width: '80px', height: '20px' }} variant="text" />
               <Skeleton style={{ width: '120px', height: '20px' }} variant="text" />
               <Skeleton style={{ width: '60px', height: '20px' }} variant="text" />
             </div>
-            <div style={{ marginTop: 'var(--space-xl)', display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            <div style={{ marginTop: 'var(--space-2xl)', display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
               <Skeleton style={{ height: '18px', width: '100%' }} variant="text" />
               <Skeleton style={{ height: '18px', width: '95%' }} variant="text" />
               <Skeleton style={{ height: '18px', width: '60%' }} variant="text" />

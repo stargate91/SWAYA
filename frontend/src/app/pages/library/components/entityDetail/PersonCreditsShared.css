@@ -1,13 +1,13 @@
 .entity-detail-page__credits-list {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .entity-detail-page__credits-list--collection-items {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .collection-items-horizontal-grid-wrapper {
@@ -25,7 +25,7 @@
   grid-template-rows: repeat(2, minmax(0, 1fr));
   grid-template-columns: repeat(var(--cols, 1), 6.875rem);
   grid-auto-flow: row;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .ui-scroll-row-container.collection-items-horizontal-grid-wrapper .ui-poster-card {
@@ -85,7 +85,7 @@
 .entity-detail-page__credits-list--people-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .entity-detail-page__credits-list--fetching {
@@ -147,7 +147,7 @@
 
 .person-credits-tabs {
   display: flex;
-  gap: var(--space-md);
+  gap: var(--space-lg);
   --tabs-border: 1px solid rgba(255, 255, 255, 0.08);
   border-bottom: var(--tabs-border);
   padding-bottom: var(--space-sm);
@@ -440,7 +440,7 @@
 .person-credits-row__empty {
   font-size: 0.76rem;
   color: var(--color-text-muted);
-  padding: var(--space-md) var(--space-sm);
+  padding: var(--space-lg) var(--space-sm);
 }
 
 /* Card Aspect Ratios & Styling */
@@ -939,9 +939,9 @@
 .person-credits-discover-groups-style .ui-tab--sub .ui-tab__count {
   font-size: 0.72rem;
   background: var(--color-surface-overlay-strong);
-  padding: calc(var(--space-2xs) / 2) var(--space-xs);
+  padding: calc(var(--space-2xs) / 2) var(--space-sm);
   border-radius: var(--radius-sm);
-  margin-left: var(--space-xs);
+  margin-left: var(--space-sm);
   font-weight: normal;
   display: inline-flex;
   align-items: center;
@@ -1017,7 +1017,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr));
   gap: var(--space-lg);
-  padding: var(--space-md) 0;
+  padding: var(--space-lg) 0;
   overflow-y: auto;
   flex: 1;
 }
@@ -1056,7 +1056,7 @@
   left: 0;
   right: 0;
   background: linear-gradient(transparent, var(--color-surface-overlay-strong));
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
   display: flex;
   align-items: center;
   justify-content: space-between;

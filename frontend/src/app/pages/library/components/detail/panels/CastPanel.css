@@ -5,7 +5,7 @@
 }
 
 .cast-panel__title {
-  margin: 0 0 var(--space-md) 0;
+  margin: 0 0 var(--space-lg) 0;
   font-size: var(--font-size-sm);
   text-transform: uppercase;
   color: var(--color-text-muted);
@@ -14,7 +14,7 @@
 .cast-panel__list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .cast-panel__list--actors {
@@ -29,7 +29,7 @@
   background: var(--media-detail-panel-card-bg);
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-lg);
   cursor: pointer;
   transition: transform var(--motion-emphasized), border-color var(--motion-base), box-shadow var(--motion-base), background var(--motion-base);
   overflow: hidden;

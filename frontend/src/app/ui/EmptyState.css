@@ -100,7 +100,7 @@
 .ui-empty-state--panel .ui-empty-state__body,
 .ui-empty-state--detail-panel .ui-empty-state__body {
   max-width: 26.25rem;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
 }
 
 .ui-empty-state--panel .ui-empty-state__title,
@@ -232,7 +232,7 @@
 
 .ui-empty-state--tag-focus .ui-empty-state__body {
   max-width: 32.5rem;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
 }
 
 .ui-empty-state--tag-focus .ui-empty-state__title {

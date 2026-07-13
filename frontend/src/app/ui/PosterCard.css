@@ -8,7 +8,7 @@
 }
 
 .ui-poster-card:hover {
-  transform: translateY(calc(-1 * var(--space-xs)));
+  transform: translateY(calc(-1 * var(--space-sm)));
 }
 
 .ui-poster-card__media-shell {
@@ -117,14 +117,14 @@ div.ui-poster-card__image-wrapper:focus-visible {
   position: absolute;
   top: var(--space-lg);
   left: var(--space-lg);
-  min-height: calc(2 * var(--space-xl));
-  padding: 0 var(--space-md);
+  min-height: calc(2 * var(--space-2xl));
+  padding: 0 var(--space-lg);
   gap: var(--space-2xs);
   border: 1px solid var(--button-secondary-border);
   background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
   background-image: var(--button-secondary-bg);
   color: var(--button-secondary-color);
-  box-shadow: 0 var(--space-2xs) var(--space-md) color-mix(in srgb, black 22%, transparent);
+  box-shadow: 0 var(--space-2xs) var(--space-lg) color-mix(in srgb, black 22%, transparent);
   backdrop-filter: var(--glass-blur-md);
   letter-spacing: 0;
   text-transform: none;
@@ -146,14 +146,14 @@ div.ui-poster-card__image-wrapper:focus-visible {
   position: absolute;
   top: var(--space-lg);
   right: var(--space-lg);
-  width: calc(2 * var(--space-xl));
-  height: calc(2 * var(--space-xl));
+  width: calc(2 * var(--space-2xl));
+  height: calc(2 * var(--space-2xl));
   border-radius: var(--radius-full);
   border: 1px solid color-mix(in srgb, var(--color-state-success) 48%, var(--button-secondary-border));
   background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
   background-image: var(--button-secondary-bg);
   color: var(--color-state-success);
-  box-shadow: 0 var(--space-2xs) var(--space-md) color-mix(in srgb, black 22%, transparent);
+  box-shadow: 0 var(--space-2xs) var(--space-lg) color-mix(in srgb, black 22%, transparent);
   backdrop-filter: var(--glass-blur-md);
   display: flex;
   align-items: center;
@@ -165,14 +165,14 @@ div.ui-poster-card__image-wrapper:focus-visible {
   position: absolute;
   top: var(--space-lg);
   right: var(--space-lg);
-  width: calc(2 * var(--space-xl));
-  height: calc(2 * var(--space-xl));
+  width: calc(2 * var(--space-2xl));
+  height: calc(2 * var(--space-2xl));
   border-radius: var(--radius-full);
   border: 1px solid color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border));
   background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
   background-image: var(--button-secondary-bg);
   color: var(--color-state-danger);
-  box-shadow: 0 var(--space-2xs) var(--space-md) color-mix(in srgb, black 22%, transparent);
+  box-shadow: 0 var(--space-2xs) var(--space-lg) color-mix(in srgb, black 22%, transparent);
   backdrop-filter: var(--glass-blur-md);
   display: flex;
   align-items: center;
@@ -191,14 +191,14 @@ div.ui-poster-card__image-wrapper:focus-visible {
   position: absolute;
   top: var(--space-lg);
   left: var(--space-lg);
-  width: calc(2 * var(--space-xl));
-  height: calc(2 * var(--space-xl));
+  width: calc(2 * var(--space-2xl));
+  height: calc(2 * var(--space-2xl));
   border-radius: var(--radius-full);
   border: 1px solid color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border));
   background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
   background-image: var(--button-secondary-bg);
   color: var(--button-secondary-color);
-  box-shadow: 0 var(--space-2xs) var(--space-md) color-mix(in srgb, black 22%, transparent);
+  box-shadow: 0 var(--space-2xs) var(--space-lg) color-mix(in srgb, black 22%, transparent);
   backdrop-filter: var(--glass-blur-md);
   display: flex;
   align-items: center;
@@ -233,14 +233,14 @@ div.ui-poster-card__image-wrapper:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-xs);
-  min-height: calc(2 * var(--space-xl));
+  gap: var(--space-sm);
+  min-height: calc(2 * var(--space-2xl));
   padding: 0 var(--space-lg);
   border-radius: var(--radius-full);
   border: 1px solid color-mix(in srgb, var(--color-state-success) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
   background-color: color-mix(in srgb, var(--color-panel-translucent, black) 82%, transparent);
   color: var(--color-state-success);
-  box-shadow: 0 var(--space-2xs) var(--space-md) color-mix(in srgb, black 35%, transparent);
+  box-shadow: 0 var(--space-2xs) var(--space-lg) color-mix(in srgb, black 35%, transparent);
   backdrop-filter: var(--glass-blur-md);
   -webkit-backdrop-filter: var(--glass-blur-md);
   cursor: pointer;
@@ -262,7 +262,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
 .ui-card-action-btn .action-btn-state-default {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
 }
 
 .ui-poster-card__media-shell .ui-card-action-btn .action-btn-state-hover,
@@ -289,7 +289,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
 .recommend-card .ui-card-action-btn:hover .action-btn-state-hover {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
 }
 
 /* Danger variant for direct remove actions (Lists, Tags) */
@@ -392,7 +392,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
 }
 
 .ui-poster-card__subtitle {
-  font-size: var(--font-size-sm, var(--font-size-sm));
+  font-size: var(--font-size-xs);
   color: var(--color-muted);
   line-height: 1.4;
   white-space: nowrap;
@@ -482,7 +482,7 @@ button.ui-poster-card__image-wrapper:hover:not(:disabled) {
 }
 
 .lists-card__media.is-blurred img {
-  filter: blur(calc(2 * var(--space-xl))) saturate(110%);
+  filter: blur(calc(2 * var(--space-2xl))) saturate(110%);
   transform: scale(1.08);
   transition: filter var(--motion-duration-slow) var(--motion-ease-standard), transform var(--motion-duration-slow) var(--motion-ease-standard);
 }

@@ -2,7 +2,7 @@
 .table-segmented-rating-container {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
 }
 
 .table-segmented-rating-container .rating-segmented-bar {
@@ -46,11 +46,11 @@
 
 .table-segmented-rating-container .rating-segmented-bar:hover .rating-segment-fill {
   opacity: 1;
-  box-shadow: 0 0 var(--space-xs) var(--color-accent-blue);
+  box-shadow: 0 0 var(--space-sm) var(--color-accent-blue);
 }
 
 .table-segmented-rating-container .user-rating-label {
-  margin-left: var(--space-xs);
+  margin-left: var(--space-sm);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   transition: color var(--motion-fast), font-weight var(--motion-fast);
@@ -70,7 +70,7 @@
 .table-segmented-rating-container.layout-column {
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
 }
 
 .table-segmented-rating-container.layout-column .user-rating-label-under {
@@ -81,5 +81,5 @@
 .table-segmented-rating-container.layout-column .rating-value-bold {
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
-  margin-left: var(--space-xs);
+  margin-left: var(--space-sm);
 }

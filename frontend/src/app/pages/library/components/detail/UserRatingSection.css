@@ -87,7 +87,7 @@
 }
 
 .pill-vertical-separator {
-  margin: 0 var(--space-sm) 0 var(--space-xs);
+  margin: 0 var(--space-sm) 0 var(--space-sm);
   color: color-mix(in srgb, var(--color-text-primary) 10%, transparent);
   user-select: none;
 }

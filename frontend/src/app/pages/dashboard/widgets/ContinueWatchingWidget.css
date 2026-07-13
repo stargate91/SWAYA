@@ -6,7 +6,7 @@
 .continue-watching-header {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-lg);
   margin-bottom: var(--space-2xl);
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-extrabold);
@@ -41,7 +41,7 @@
 
 .ui-poster-card.continue-watching-card .ui-poster-card__image-wrapper {
   border-radius: var(--radius-lg);
-  box-shadow: 0 var(--space-md) calc(2.5 * var(--space-md)) color-mix(in srgb, black 30%, transparent);
+  box-shadow: 0 var(--space-lg) calc(2.5 * var(--space-lg)) color-mix(in srgb, black 30%, transparent);
   border: 1px solid var(--color-border-subtle);
   background: var(--color-bg-elevated);
 }
@@ -58,8 +58,8 @@
 
 .continue-watching-card .ui-tooltip {
   position: absolute;
-  top: var(--space-md);
-  right: var(--space-md);
+  top: var(--space-lg);
+  right: var(--space-lg);
   z-index: 10;
 }
 
@@ -67,7 +67,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-xs);
+  padding: var(--space-sm);
   border: 0;
   border-radius: var(--radius-sm);
   background: color-mix(in srgb, black 60%, transparent);
@@ -143,7 +143,7 @@
 
 .continue-watching-progress-fill {
   fill: var(--color-accent-blue-soft);
-  filter: drop-shadow(0 0 var(--space-md) color-mix(in srgb, var(--color-accent-blue-soft) 80%, transparent));
+  filter: drop-shadow(0 0 var(--space-lg) color-mix(in srgb, var(--color-accent-blue-soft) 80%, transparent));
 }
 
 .continue-watching-copy {

@@ -2,7 +2,7 @@
   width: 16.875rem;
   background: var(--ui-overlay-sidebar-bg, var(--color-bg-canvas));
   border-right: 1px solid var(--color-line);
-  padding: var(--ui-overlay-sidebar-padding, var(--space-xl) var(--space-md));
+  padding: var(--ui-overlay-sidebar-padding, var(--space-2xl) var(--space-lg));
   display: flex;
   flex-direction: column;
   backdrop-filter: var(--ui-overlay-sidebar-blur, blur(0.625rem));
@@ -13,7 +13,7 @@
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
-  padding-left: var(--space-xl);
+  padding-left: var(--space-2xl);
   margin-bottom: var(--space-3xl);
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);
@@ -29,7 +29,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-lg);
-  padding: var(--sidebar-nav-link-padding-y, var(--space-md)) var(--space-xl);
+  padding: var(--sidebar-nav-link-padding-y, var(--space-lg)) var(--space-2xl);
   border-radius: var(--radius-md);
   color: var(--color-muted);
   font-weight: var(--font-weight-medium);
@@ -57,7 +57,7 @@
   padding-left: var(--space-2xl);
   border-left: 1.5px solid var(--color-line);
   margin-top: calc(var(--space-2xs) / 2);
-  margin-bottom: var(--space-xs);
+  margin-bottom: var(--space-sm);
   position: relative;
   overflow: hidden;
   max-height: 20rem;
@@ -74,7 +74,7 @@
 .ui-sidebar-sub-menu.is-closed {
   max-height: 0;
   opacity: 0;
-  transform: translateY(calc(-1 * var(--space-xs)));
+  transform: translateY(calc(-1 * var(--space-sm)));
   margin-top: 0;
   margin-bottom: 0;
   pointer-events: none;
@@ -84,7 +84,7 @@
   position: absolute;
   left: -1.5px;
   width: 2.5px;
-  height: calc(2 * var(--space-xl));
+  height: calc(2 * var(--space-2xl));
   background: var(--color-accent);
   border-radius: var(--radius-sm);
   transition: top var(--motion-slow), height var(--motion-base);
@@ -94,9 +94,9 @@
 .ui-sidebar-sub-item {
   display: flex;
   align-items: center;
-  height: calc(2 * var(--space-xl));
+  height: calc(2 * var(--space-2xl));
   margin-bottom: var(--space-2xs);
-  padding: 0 var(--space-xl);
+  padding: 0 var(--space-2xl);
   border-radius: var(--radius-md);
   color: var(--color-muted);
   font-weight: var(--font-weight-medium);

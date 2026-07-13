@@ -67,7 +67,7 @@
   justify-content: center;
   min-width: var(--space-3xl);
   height: var(--space-3xl);
-  padding: 0 var(--space-xs);
+  padding: 0 var(--space-sm);
   border-radius: var(--radius-full);
   background: var(--color-surface-glass-strong);
   color: var(--color-muted);

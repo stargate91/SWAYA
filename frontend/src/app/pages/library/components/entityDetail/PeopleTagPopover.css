@@ -16,7 +16,7 @@
   -webkit-backdrop-filter: blur(1.25rem) saturate(125%);
   z-index: 20;
   display: grid;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .entity-detail-page__tag-popover-section {
@@ -73,9 +73,9 @@
 .entity-detail-page__tag-suggestion {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
   min-height: 1.75rem;
-  padding: var(--space-2xs) var(--space-md);
+  padding: var(--space-2xs) var(--space-lg);
   border-radius: var(--radius-full);
   border: 1px solid var(--color-border-default);
   background: var(--color-surface-glass);
