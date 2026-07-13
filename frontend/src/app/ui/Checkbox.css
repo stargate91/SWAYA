@@ -22,8 +22,8 @@
 
 .ui-checkbox {
   display: inline-block;
-  width: 16px;
-  height: 16px;
+  width: 1rem;
+  height: 1rem;
   border-radius: var(--radius-xs);
   border: 1px solid var(--color-border-heavy);
   background: var(--color-surface-glass);
@@ -49,10 +49,10 @@
   content: '';
   position: absolute;
   display: none;
-  left: 5px;
+  left: 0.3125rem;
   top: 2px;
-  width: 4px;
-  height: 8px;
+  width: 0.25rem;
+  height: 0.5rem;
   border: solid white;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);

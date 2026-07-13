@@ -17,7 +17,7 @@
 
 .backdrops-grid > * {
   content-visibility: auto;
-  contain-intrinsic-size: 180px 108px;
+  contain-intrinsic-size: 11.25rem 6.75rem;
 }
 
 .backdrops-panel .ui-backdrop-card {
@@ -42,7 +42,7 @@
   height: 1px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 37.5rem) {
   .backdrops-grid {
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }

@@ -4,20 +4,20 @@
   align-items: center;
   gap: var(--space-lg);
   width: 100%;
-  max-width: 680px;
-  height: 38px;
+  max-width: 42.5rem;
+  height: 2.375rem;
   padding: 0 var(--space-lg);
   background: var(--color-progress-bg, var(--color-surface-card));
   border: 1px solid var(--color-progress-border, var(--color-border-subtle));
   border-radius: var(--radius-input);
-  backdrop-filter: var(--progress-backdrop-filter, blur(10px));
+  backdrop-filter: var(--progress-backdrop-filter, blur(0.625rem));
   -webkit-app-region: no-drag;
 }
 
 .ui-progress-bar__pulse-dot {
   position: relative;
-  width: 8px;
-  height: 8px;
+  width: 0.5rem;
+  height: 0.5rem;
   background: var(--color-accent-blue);
   border-radius: 50%;
   flex-shrink: 0;
@@ -56,7 +56,7 @@
   font-weight: var(--font-weight-semibold);
   color: var(--color-accent-blue);
   flex: 0 1 auto;
-  max-width: 180px;
+  max-width: 11.25rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -64,8 +64,8 @@
 
 .ui-progress-bar__track {
   flex: 1 1 auto;
-  min-width: 80px;
-  height: 10px;
+  min-width: 5rem;
+  height: 0.625rem;
   background: var(--color-progress-track, var(--color-border-default));
   border-radius: var(--radius-full);
   overflow: hidden;
@@ -78,7 +78,7 @@
   background: var(--color-accent-blue);
   border-radius: var(--radius-full);
   transition: width var(--motion-base);
-  box-shadow: 0 0 8px var(--color-accent-shadow-strong, color-mix(in srgb, var(--color-accent-blue) 30%, transparent));
+  box-shadow: 0 0 0.5rem var(--color-accent-shadow-strong, color-mix(in srgb, var(--color-accent-blue) 30%, transparent));
 }
 
 .ui-progress-bar__stats {
@@ -86,7 +86,7 @@
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   color: var(--color-muted);
-  width: 100px;
+  width: 6.25rem;
   flex-shrink: 0;
   text-align: right;
   white-space: nowrap;

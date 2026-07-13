@@ -78,7 +78,7 @@
 
 .ui-input__toggle {
   position: absolute;
-  right: 12px;
+  right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -111,7 +111,7 @@
 
 .ui-input__left-element {
   position: absolute;
-  left: 12px;
+  left: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -126,7 +126,7 @@
 
 .ui-input__right-element {
   position: absolute;
-  right: 12px;
+  right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -150,20 +150,4 @@
   width: auto;
 }
 
-.ui-field__error {
-  margin-top: var(--space-sm);
-  font-size: var(--font-size-xs);
-  color: var(--color-state-danger);
-}
 
-.ui-field__sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -0.0625rem;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}

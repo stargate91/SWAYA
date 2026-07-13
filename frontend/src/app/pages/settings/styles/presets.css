@@ -36,7 +36,7 @@
 
 .settings-preset-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(13.75rem, 1fr));
   gap: var(--space-lg);
   margin-bottom: var(--space-2xl);
 }

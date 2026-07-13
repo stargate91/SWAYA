@@ -9,10 +9,10 @@
 }
 
 .ui-spinner {
-  width: 36px;
-  height: 36px;
+  width: 2.25rem;
+  height: 2.25rem;
   border-radius: 50%;
-  border: 4px solid color-mix(in srgb, var(--color-accent) 14%, transparent);
+  border: 0.25rem solid color-mix(in srgb, var(--color-accent) 14%, transparent);
   border-top-color: var(--color-accent);
   animation: spin var(--motion-duration-spinner-slow) var(--motion-ease-linear) infinite;
 }

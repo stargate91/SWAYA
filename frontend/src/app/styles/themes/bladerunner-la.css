@@ -86,9 +86,9 @@
   --app-shell-scrollbar-thumb-active: rgba(219, 94, 149, 0.6);
 
   /* Shadow overrides */
-  --app-shell-shadow-sm: 0 6px 16px rgba(5, 5, 13, 0.4);
-  --app-shell-shadow-md: 0 12px 28px rgba(5, 5, 13, 0.48);
-  --app-shell-shadow-lg: 0 20px 48px rgba(5, 5, 13, 0.58);
+  --app-shell-shadow-sm: 0 0.375rem 1rem rgba(5, 5, 13, 0.4);
+  --app-shell-shadow-md: 0 0.75rem 1.75rem rgba(5, 5, 13, 0.48);
+  --app-shell-shadow-lg: 0 1.25rem 3rem rgba(5, 5, 13, 0.58);
 
   /* Button overrides */
   --button-primary-bg: #db5e95;

@@ -2,7 +2,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 20px;
+  min-height: 1.25rem;
   padding: 0 var(--space-sm);
   padding-left: calc(var(--space-sm) + 0.04em);
   border-radius: var(--radius-full);
@@ -22,7 +22,7 @@
   left: var(--space-lg);
   right: var(--space-lg);
   bottom: var(--status-badge-bottom);
-  min-height: 22px;
+  min-height: 1.375rem;
 }
 
 .ui-badge--status.ui-badge--accent {
@@ -60,7 +60,7 @@
   line-height: 1.2;
   background: var(--color-state-danger-bg-strong);
   color: var(--color-state-danger);
-  border: 1.5px solid var(--color-state-danger);
+  border: 1.0.3125rem solid var(--color-state-danger);
 }
 
 sup .ui-badge.ui-badge--adult.ui-badge--danger {

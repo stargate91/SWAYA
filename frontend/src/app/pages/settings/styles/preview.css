@@ -22,7 +22,7 @@
 
 .structure-preview-branch {
   margin-left: var(--space-2xl);
-  border-left: 1.5px dashed var(--color-line);
+  border-left: 1.0.3125rem dashed var(--color-line);
   padding-left: var(--space-lg);
 }
 

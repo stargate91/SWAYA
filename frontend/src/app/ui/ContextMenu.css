@@ -3,12 +3,12 @@
   top: var(--context-menu-top, 0);
   left: var(--context-menu-left, 0);
   z-index: var(--z-index-dropdown);
-  min-width: 180px;
+  min-width: 11.25rem;
   background: color-mix(in srgb, var(--color-bg-elevated) 82%, transparent);
-  backdrop-filter: var(--context-menu-backdrop-filter, blur(12px) saturate(140%));
+  backdrop-filter: var(--context-menu-backdrop-filter, blur(0.75rem) saturate(140%));
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-overlay-context, 0 10px 30px color-mix(in srgb, black 40%, transparent)), 0 1px 3px var(--color-border-subtle);
+  box-shadow: var(--shadow-overlay-context, 0 0.625rem 1.875rem color-mix(in srgb, black 40%, transparent)), 0 1px 0.1875rem var(--color-border-subtle);
   padding: var(--space-2xs);
   display: flex;
   flex-direction: column;

@@ -72,8 +72,8 @@
 }
 
 .ui-backdrop-card__spinner {
-  width: 24px;
-  height: 24px;
+  width: 1.5rem;
+  height: 1.5rem;
   border: 2px solid var(--color-border-strong);
   border-top-color: var(--color-text-primary);
   border-radius: var(--radius-full);

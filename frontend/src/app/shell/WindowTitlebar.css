@@ -12,7 +12,7 @@
   height: var(--layout-window-titlebar-height);
   border-bottom: 1px solid var(--color-border-subtle);
   background: linear-gradient(180deg, var(--color-panel), var(--color-panel-strong));
-  backdrop-filter: blur(18px) saturate(120%);
+  backdrop-filter: blur(1.125rem) saturate(120%);
   box-shadow: var(--titlebar-shadow);
   -webkit-app-region: drag;
 }
@@ -21,8 +21,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-2xl);
-  flex: 0 0 90px;
-  min-width: 90px;
+  flex: 0 0 5.625rem;
+  min-width: 5.625rem;
   padding: 0 0 0 var(--space-lg);
   -webkit-app-region: drag;
 }
@@ -44,16 +44,16 @@
 }
 
 .window-titlebar__search-wrapper {
-  flex: 1 1 320px;
-  max-width: 480px;
-  min-width: 180px;
+  flex: 1 1 20rem;
+  max-width: 30rem;
+  min-width: 11.25rem;
   transition: max-width var(--motion-base), flex-basis var(--motion-base);
   -webkit-app-region: no-drag;
 }
 
 .window-titlebar__search-wrapper.has-progress {
-  max-width: 360px;
-  flex-basis: 360px;
+  max-width: 22.5rem;
+  flex-basis: 22.5rem;
 }
 
 .window-titlebar__progress-wrapper {
@@ -69,10 +69,10 @@
 }
 
 .window-titlebar__progress-wrapper .ui-progress-bar-container {
-  flex: 1 1 380px;
-  max-width: 680px;
-  min-width: 320px;
-  width: 380px;
+  flex: 1 1 23.75rem;
+  max-width: 42.5rem;
+  min-width: 20rem;
+  width: 23.75rem;
 }
 
 .window-titlebar__brand-text {
@@ -133,8 +133,8 @@
 .window-titlebar__button.window-titlebar__button--adult-toggle {
   margin-right: var(--space-4xl);
   color: var(--color-muted);
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
   border-radius: var(--radius-sm);
   box-shadow: none;
   background: transparent;
@@ -171,8 +171,8 @@
 }
 
 .window-titlebar__nav-btn.window-titlebar__nav-btn {
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
   padding: 0;
   display: flex;
   align-items: center;

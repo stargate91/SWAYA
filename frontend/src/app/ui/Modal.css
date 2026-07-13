@@ -22,7 +22,7 @@
 }
 
 .ui-modal {
-  width: var(--modal-width, min(580px, 100%));
+  width: var(--modal-width, min(36.25rem, 100%));
   max-height: min(88vh, calc(100vh - (var(--space-4xl) * 2)));
   border-radius: var(--radius-lg);
   background: var(--modal-surface-base);
@@ -35,17 +35,17 @@
 }
 
 .ui-modal--wide {
-  --modal-width: min(760px, 100%);
+  --modal-width: min(47.5rem, 100%);
 }
 
 
 .ui-modal--extra-wide {
-  --modal-width: min(1080px, 100%);
+  --modal-width: min(67.5rem, 100%);
 }
 
 @keyframes ui-modal-scale-up {
   from {
-    transform: scale(0.97) translateY(8px);
+    transform: scale(0.97) translateY(0.5rem);
     opacity: 0;
   }
 
@@ -139,10 +139,10 @@
       var(--color-bg-canvas));
   border-color: color-mix(in srgb, var(--color-state-danger) 42%, var(--color-border-default));
   box-shadow:
-    0 28px 72px color-mix(in srgb, black 66%, transparent),
+    0 1.75rem 4.5rem color-mix(in srgb, black 66%, transparent),
     0 0 0 1px color-mix(in srgb, var(--color-state-danger) 28%, transparent),
-    0 0 32px color-mix(in srgb, var(--color-state-danger) 16%, transparent),
-    0 10px 24px color-mix(in srgb, black 28%, transparent),
+    0 0 2rem color-mix(in srgb, var(--color-state-danger) 16%, transparent),
+    0 0.625rem 1.5rem color-mix(in srgb, black 28%, transparent),
     inset 0 0 0 1px var(--color-surface-card);
 }
 
@@ -161,7 +161,7 @@
 
 .ui-modal--danger .ui-modal__title-icon {
   color: color-mix(in srgb, var(--color-state-danger) 88%, white 12%);
-  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--color-state-danger) 26%, transparent));
+  filter: drop-shadow(0 0 0.625rem color-mix(in srgb, var(--color-state-danger) 26%, transparent));
 }
 
 .ui-modal--danger .ui-modal__description {
@@ -179,7 +179,7 @@
   background: color-mix(in srgb, var(--color-state-danger) 24%, var(--color-surface-glass));
   border-color: color-mix(in srgb, var(--color-state-danger) 46%, var(--color-border-heavy));
   box-shadow: var(--shadow-md);
-  transform: translateY(-0.5px);
+  transform: translateY(-0.0.3125rem);
 }
 
 .ui-modal--danger .ui-icon-button-wrapper:focus-within {
@@ -239,7 +239,7 @@
 .ui-modal__action-card--danger:hover {
   border-color: color-mix(in srgb, var(--color-state-danger) 44%, color-mix(in srgb, var(--color-text-primary) 10%, transparent));
   background: color-mix(in srgb, var(--color-state-danger) 20%, color-mix(in srgb, var(--color-text-primary) 2.6%, transparent));
-  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-state-danger) 12%, transparent);
+  box-shadow: 0 0.625rem 1.5rem color-mix(in srgb, var(--color-state-danger) 12%, transparent);
 }
 
 .ui-modal__action-card--danger:focus-visible {
@@ -271,7 +271,7 @@
   right: 0;
   bottom: 0;
   background: color-mix(in srgb, black 75%, transparent);
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(0.375rem);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -282,14 +282,14 @@
 
 .ui-confirm-dialog {
   width: 100%;
-  max-width: 440px;
+  max-width: 27.5rem;
   background: var(--ui-surface-card-gradient);
   border: 1px solid color-mix(in srgb, var(--color-accent) 24%, var(--color-border-default));
   border-radius: var(--radius-lg);
   padding: var(--space-4xl);
   box-shadow:
-    0 28px 72px color-mix(in srgb, black 76%, transparent),
-    0 10px 24px color-mix(in srgb, black 38%, transparent),
+    0 1.75rem 4.5rem color-mix(in srgb, black 76%, transparent),
+    0 0.625rem 1.5rem color-mix(in srgb, black 38%, transparent),
     inset 0 0 0 1px var(--color-surface-glass);
   display: grid;
   gap: var(--space-2xl);

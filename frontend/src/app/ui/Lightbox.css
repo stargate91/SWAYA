@@ -7,13 +7,13 @@
   justify-content: center;
   padding: var(--space-4xl);
   background: color-mix(in srgb, black 82%, transparent);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(0.625rem);
+  -webkit-backdrop-filter: blur(0.625rem);
 }
 
 .ui-lightbox__close-container {
-  top: 24px;
-  right: 24px;
+  top: 1.5rem;
+  right: 1.5rem;
   z-index: calc(var(--z-index-backdrop) + 10);
 }
 
@@ -29,9 +29,9 @@
 }
 
 .ui-lightbox__image {
-  max-width: min(92vw, 1400px);
+  max-width: min(92vw, 87.5rem);
   max-height: 88vh;
   object-fit: contain;
   border-radius: var(--radius-lg);
-  box-shadow: 0 20px 60px color-mix(in srgb, black 55%, transparent);
+  box-shadow: 0 1.25rem 3.75rem color-mix(in srgb, black 55%, transparent);
 }

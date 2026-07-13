@@ -1,10 +1,11 @@
 /* eslint-disable react/forbid-dom-props */
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useId } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, ChevronUp } from '@/ui/icons';
 import Tooltip from './Tooltip';
 import Checkbox from './Checkbox';
 import { useTranslation } from '../providers/LanguageContext';
+import Field from './Field';
 import './Dropdown.css';
 
 function DropdownMenu({
@@ -145,6 +146,7 @@ export default function Dropdown({
   const containerRef = useRef(null);
   const triggerRef = useRef(null);
   const [menuCoords, setMenuCoords] = useState({ top: 0, left: 0, width: 0 });
+  const generatedId = useId();
 
   const { t } = useTranslation();
   const displayPlaceholder = placeholder ?? t('common.select');
@@ -226,9 +228,13 @@ export default function Dropdown({
   };
 
   return (
-    <div className={`ui-field ${isSorter ? 'ui-field--sorter' : ''} ${className}`.trim()} ref={containerRef}>
-      {label ? <span className="ui-field__label">{label}</span> : null}
-      {hint ? <span className="ui-field__hint">{hint}</span> : null}
+    <Field
+      label={label}
+      hint={hint}
+      className={`${isSorter ? 'ui-field--sorter' : ''} ${className}`.trim()}
+      htmlFor={generatedId}
+      ref={containerRef}
+    >
       <div
         className={`ui-dropdown ${isSorter ? 'ui-dropdown--sorter' : ''}`}
         style={themeColor ? { '--list-theme-color': themeColor } : undefined}
@@ -282,6 +288,6 @@ export default function Dropdown({
           multiple={multiple}
         />
       </div>
-    </div>
+    </Field>
   );
 }

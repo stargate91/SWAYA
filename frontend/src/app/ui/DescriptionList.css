@@ -1,0 +1,44 @@
+/* Generic Description List Primitive */
+.ui-description-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm) var(--space-lg);
+}
+
+.ui-description-list--spaced {
+  gap: var(--space-lg) var(--space-2xl);
+}
+
+.ui-description-list__item {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-2xs) / 2);
+}
+
+.ui-description-list__item--full {
+  grid-column: span 2;
+}
+
+.ui-description-list__item--full .ui-description-list__value {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.ui-description-list__label {
+  font-size: var(--font-size-2xs);
+  color: var(--color-text-faint);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ui-description-list__value {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

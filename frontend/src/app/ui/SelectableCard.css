@@ -23,7 +23,7 @@
   gap: var(--space-sm);
   padding: var(--space-2xl);
   border-radius: var(--ui-control-radius);
-  border: 1.5px solid var(--color-line);
+  border: 1.0.3125rem solid var(--color-line);
   background: var(--color-selectable-card-bg, var(--ui-surface-ghost));
   text-align: left;
 }
@@ -71,5 +71,5 @@
 .ui-selectable-card--theme.is-selected {
   background: var(--color-state-info-bg, color-mix(in srgb, var(--color-accent-blue) 8%, transparent));
   border-color: var(--color-accent-blue);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent-blue) 20%, transparent);
+  box-shadow: 0 0 0.75rem color-mix(in srgb, var(--color-accent-blue) 20%, transparent);
 }

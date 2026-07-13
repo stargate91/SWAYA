@@ -54,26 +54,26 @@
 
 /* Aspect ratios with separate rounded corners and sizes */
 .ui-compact-card--aspect-poster .ui-compact-card__poster-wrapper {
-  width: 52px;
-  height: 78px;
+  width: 3.25rem;
+  height: 4.875rem;
   border-radius: var(--radius-sm, var(--radius-sm));
 }
 
 .ui-compact-card--aspect-landscape .ui-compact-card__poster-wrapper {
-  width: 104px;
-  height: 58px;
+  width: 6.5rem;
+  height: 3.625rem;
   border-radius: var(--radius-sm, var(--radius-sm));
 }
 
 .ui-compact-card--aspect-square .ui-compact-card__poster-wrapper {
-  width: 64px;
-  height: 64px;
+  width: 4rem;
+  height: 4rem;
   border-radius: var(--radius-sm, var(--radius-sm));
 }
 
 .ui-compact-card--aspect-circle .ui-compact-card__poster-wrapper {
-  width: 56px;
-  height: 56px;
+  width: 3.5rem;
+  height: 3.5rem;
   border-radius: var(--radius-full);
 }
 

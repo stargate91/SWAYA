@@ -27,11 +27,11 @@
 }
 
 .organizer-match-modal__search-grid.is-tv {
-  grid-template-columns: minmax(0, 1fr) 104px 72px 72px;
+  grid-template-columns: minmax(0, 1fr) 6.5rem 4.5rem 4.5rem;
 }
 
 .organizer-match-modal__search-grid.is-movie {
-  grid-template-columns: minmax(0, 1fr) 104px;
+  grid-template-columns: minmax(0, 1fr) 6.5rem;
 }
 
 .organizer-match-modal__field {
@@ -47,11 +47,11 @@
 }
 
 .organizer-match-modal__field--year {
-  min-width: 104px;
+  min-width: 6.5rem;
 }
 
 .organizer-match-modal__field--compact {
-  min-width: 72px;
+  min-width: 4.5rem;
 }
 
 .organizer-match-modal__search-actions {
@@ -64,10 +64,10 @@
 }
 
 .organizer-match-modal__search-button {
-  width: 48px;
-  min-width: 48px;
-  height: 48px;
-  min-height: 48px;
+  width: 3rem;
+  min-width: 3rem;
+  height: 3rem;
+  min-height: 3rem;
   padding-inline: 0;
   border-radius: var(--radius-md);
 }
@@ -96,7 +96,7 @@
 .organizer-match-modal__results {
   display: grid;
   gap: var(--space-lg);
-  max-height: 360px;
+  max-height: 22.5rem;
   overflow: auto;
   padding: var(--space-2xs) var(--space-2xs) var(--space-2xs) 0.125rem;
 }
@@ -104,7 +104,7 @@
 .organizer-match-modal__poster-results {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(132px, 156px);
+  grid-auto-columns: minmax(8.25rem, 9.75rem);
   gap: var(--space-lg);
   overflow-x: auto;
   overflow-y: visible;
@@ -186,7 +186,7 @@
 
 .organizer-match-modal__result-card {
   display: grid;
-  grid-template-columns: 64px minmax(0, 1fr);
+  grid-template-columns: 4rem minmax(0, 1fr);
   gap: var(--space-lg);
   width: 100%;
   padding: var(--space-lg);
@@ -202,7 +202,7 @@
 .organizer-match-modal__result-card:hover:not(:disabled) {
   background: var(--color-surface-glass-strong);
   border-color: color-mix(in srgb, var(--color-accent-blue) 40%, transparent);
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-accent-blue) 8%, transparent);
+  box-shadow: 0 0.25rem 0.75rem color-mix(in srgb, var(--color-accent-blue) 8%, transparent);
   transform: translateY(-1px);
 }
 
@@ -220,12 +220,12 @@
 .organizer-match-modal__result-card.is-active:hover:not(:disabled) {
   border-color: color-mix(in srgb, var(--color-accent-blue) 60%, transparent);
   background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-glass-strong));
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-accent-blue) 8%, transparent);
+  box-shadow: 0 0.25rem 0.75rem color-mix(in srgb, var(--color-accent-blue) 8%, transparent);
 }
 
 .organizer-match-modal__poster {
-  width: 64px;
-  height: 96px;
+  width: 4rem;
+  height: 6rem;
   border-radius: var(--radius-sm);
   overflow: hidden;
   background: var(--color-surface-glass-strong);
@@ -352,21 +352,21 @@
 .organizer-match-modal__browser-grid {
   display: grid;
   gap: var(--space-lg);
-  max-height: 440px;
+  max-height: 27.5rem;
   overflow-y: auto;
   padding: 0.1875rem var(--space-2xs) 0.1875rem 0.1875rem;
 }
 
 .organizer-match-modal__browser-grid--seasons {
-  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(8.25rem, 1fr));
 }
 
 .organizer-match-modal__browser-grid--episodes {
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(11.25rem, 1fr));
 }
 
 .organizer-match-modal__load-more-sentinel {
-  height: 20px;
+  height: 1.25rem;
   margin: var(--space-md) 0;
 }
 
@@ -419,17 +419,17 @@
 
 .organizer-match-modal__browser-card-bucket-indicator {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 0.5rem;
+  right: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 1.375rem;
+  height: 1.375rem;
   border-radius: 50%;
   background: var(--color-accent);
   color: var(--color-text-inverse);
-  box-shadow: 0 2px 8px color-mix(in srgb, black 40%, transparent);
+  box-shadow: 0 2px 0.5rem color-mix(in srgb, black 40%, transparent);
   animation: scale-up var(--motion-duration-fast) var(--motion-ease-expressive);
   z-index: 2;
 }
@@ -509,7 +509,7 @@
 }
 
 .organizer-match-modal__bucket-chip {
-  min-height: 28px;
+  min-height: 1.75rem;
   padding: 0 var(--space-md);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-input);
@@ -525,7 +525,7 @@
   color: var(--color-accent-red-soft);
 }
 
-@media (max-width: 760px) {
+@media (max-width: 47.5rem) {
   .organizer-match-modal__mode-toggle {
     width: 100%;
   }
@@ -552,7 +552,7 @@
   }
 }
 
-@media (max-width: 620px) {
+@media (max-width: 38.75rem) {
   .organizer-match-modal__search-layout {
     grid-template-columns: 1fr;
   }
@@ -582,7 +582,7 @@
   flex-direction: column;
   gap: var(--space-2xl);
   padding: var(--space-sm) 0;
-  min-height: 480px;
+  min-height: 30rem;
 }
 
 .organizer-override-modal--clip-x {
@@ -701,14 +701,14 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-  max-height: 240px;
+  max-height: 15rem;
   overflow-y: auto;
   padding-right: var(--space-2xs);
 }
 
 .organizer-override-bulk-episodes__list--sidebar {
   flex: 1 1 auto;
-  max-height: 340px;
+  max-height: 21.25rem;
 }
 
 .organizer-override-bulk-episodes__item {
@@ -755,7 +755,7 @@
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
   color: var(--color-accent);
-  min-width: 24px;
+  min-width: 1.5rem;
 }
 
 .organizer-override-bulk-episodes__filename {
@@ -773,8 +773,8 @@
 }
 
 .organizer-override-bulk-episodes__item-actions .ui-icon-button {
-  width: 24px;
-  height: 24px;
+  width: 1.5rem;
+  height: 1.5rem;
   border-radius: var(--radius-sm);
 }
 
@@ -794,12 +794,12 @@
 
 /* Bulk Overrides Side Panel Expansion */
 .ui-modal--bulk-override {
-  width: min(580px, 100%);
+  width: min(36.25rem, 100%);
   transition: width var(--motion-slow);
 }
 
 .ui-modal.has-side-panel {
-  --modal-width: min(1040px, 100%);
+  --modal-width: min(65rem, 100%);
 }
 
 .bulk-override-layout {
@@ -815,7 +815,7 @@
 }
 
 .bulk-override-layout__side-panel {
-  width: 400px;
+  width: 25rem;
   flex-shrink: 0;
   border-left: 1px solid var(--color-line);
   padding-left: var(--space-4xl);
@@ -825,7 +825,7 @@
 @keyframes slideInRight {
   from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateX(1.25rem);
   }
   to {
     opacity: 1;
@@ -846,7 +846,7 @@
 }
 
 .single-override-layout__side-panel {
-  width: 320px;
+  width: 20rem;
   flex-shrink: 0;
   border-right: 1px solid var(--color-line);
   padding-right: var(--space-4xl);
@@ -859,7 +859,7 @@
 @keyframes slideInLeft {
   from {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateX(-1.25rem);
   }
   to {
     opacity: 1;
@@ -868,7 +868,7 @@
 }
 
 .ui-modal:has(.single-override-layout__side-panel) {
-  --modal-width: min(960px, 100%);
+  --modal-width: min(60rem, 100%);
 }
 
 .match-action-option {
@@ -909,23 +909,23 @@
 
 /* 16:9 aspect ratio style modifications for scene matches */
 .organizer-match-modal__poster-results.is-scene {
-  grid-auto-columns: minmax(280px, 320px);
+  grid-auto-columns: minmax(17.5rem, 20rem);
 }
 
 .organizer-match-modal__result-card.is-scene {
-  grid-template-columns: 170px minmax(0, 1fr);
+  grid-template-columns: 10.625rem minmax(0, 1fr);
 }
 
 .organizer-match-modal__result-card.is-scene .organizer-match-modal__poster {
-  width: 170px;
-  height: 96px;
+  width: 10.625rem;
+  height: 6rem;
   aspect-ratio: 16 / 9;
 }
 
 .organizer-match-modal__candidate-badge-wrapper {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: 0.5rem;
+  left: 0.5rem;
   z-index: 3;
 }
 
@@ -968,37 +968,37 @@
 }
 
 .organizer-match-modal__skeleton-image--scene {
-  width: 120px;
-  height: 68px;
+  width: 7.5rem;
+  height: 4.25rem;
 }
 
 .organizer-match-modal__skeleton-image--poster {
-  width: 75px;
-  height: 100px;
+  width: 4.6875rem;
+  height: 6.25rem;
 }
 
 .organizer-match-modal__skeleton-card--scene {
-  width: 240px;
-  height: 135px;
+  width: 15rem;
+  height: 8.4375rem;
 }
 
 .organizer-match-modal__skeleton-card--poster {
-  width: 130px;
-  height: 180px;
+  width: 8.125rem;
+  height: 11.25rem;
 }
 
 .organizer-match-modal__skeleton-text-title {
-  height: 18px;
+  height: 1.125rem;
   width: 40%;
 }
 
 .organizer-match-modal__skeleton-text-subtitle {
-  height: 14px;
+  height: 0.875rem;
   width: 20%;
 }
 
 .organizer-match-modal__skeleton-text-body {
-  height: 14px;
+  height: 0.875rem;
   width: 90%;
 }
 

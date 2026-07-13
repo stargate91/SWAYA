@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Tooltip from '@/ui/Tooltip';
 import Pill from '@/ui/Pill';
 import { Star } from '@/ui/icons';
+import './CardMetadata.css';
 
 const CardMetadata = memo(function CardMetadata({
   title,

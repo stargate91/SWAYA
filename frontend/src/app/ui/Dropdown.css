@@ -61,13 +61,13 @@
 
 .ui-dropdown__menu {
   position: absolute;
-  top: var(--dropdown-menu-top, calc(100% + 6px));
+  top: var(--dropdown-menu-top, calc(100% + 0.375rem));
   left: var(--dropdown-menu-left, 0);
   width: var(--dropdown-menu-width, 100%);
-  max-height: 280px;
+  max-height: 17.5rem;
   z-index: var(--z-index-dropdown);
   background: var(--color-dropdown-bg, var(--dropdown-menu-bg));
-  backdrop-filter: var(--dropdown-backdrop-filter, blur(12px));
+  backdrop-filter: var(--dropdown-backdrop-filter, blur(0.75rem));
   border: 1px solid var(--ui-control-border-strong);
   border-radius: var(--ui-control-radius);
   box-shadow: var(--shadow-overlay-strong, var(--dropdown-menu-shadow));
@@ -86,7 +86,7 @@
 @keyframes dropdown-fade-in {
   from {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateY(-0.25rem);
   }
 
   to {
@@ -98,7 +98,7 @@
 @keyframes dropdown-fade-in-upwards {
   from {
     opacity: 0;
-    transform: translateY(-100%) translateY(4px);
+    transform: translateY(-100%) translateY(0.25rem);
   }
 
   to {
@@ -149,8 +149,8 @@
 .ui-dropdown__item {
   display: block;
   width: 100%;
-  min-height: 40px;
-  line-height: 40px;
+  min-height: 2.5rem;
+  line-height: 2.5rem;
   padding: 0 var(--space-lg);
   border: none;
   border-radius: var(--ui-control-radius-xs);
@@ -208,7 +208,7 @@
 }
 
 .ui-dropdown--sorter {
-  width: 160px;
+  width: 10rem;
 }
 
 .ui-dropdown__sorter-wrapper {
@@ -219,7 +219,7 @@
 }
 
 .ui-dropdown__trigger--sorter {
-  min-height: 32px;
+  min-height: 2rem;
   padding: 0 var(--space-lg);
   font-size: var(--font-size-xs);
   border-radius: var(--radius-sm);
@@ -235,8 +235,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
   padding: 0;
   border-radius: var(--radius-sm);
   border: none;
@@ -265,13 +265,13 @@
 
 .ui-dropdown__menu.ui-dropdown__menu--sorter {
   width: auto;
-  min-width: 160px;
+  min-width: 10rem;
 }
 
 .ui-dropdown__menu--sorter .ui-dropdown__item {
   font-size: var(--font-size-xs);
-  min-height: 32px;
-  line-height: 32px;
+  min-height: 2rem;
+  line-height: 2rem;
 }
 
 .ui-dropdown__menu--sorter .ui-dropdown__item.is-active {

@@ -59,8 +59,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 1.75rem;
+  height: 1.75rem;
   flex-shrink: 0;
   border-radius: var(--radius-full);
   color: var(--color-text-secondary);
@@ -85,8 +85,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 1.75rem;
+  height: 1.75rem;
   padding: 0;
   border: 0;
   border-radius: var(--radius-full);
@@ -126,7 +126,7 @@
 .library-filters-right {
   display: flex;
   align-items: center;
-  --filters-right-gap: var(--space-lg, 12px);
+  --filters-right-gap: var(--space-lg);
   gap: var(--filters-right-gap);
 }
 
@@ -135,26 +135,22 @@
   background: color-mix(in srgb, var(--color-line) 5%, transparent);
 }
 
-.library-sorter-container {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm, var(--space-sm));
-}
+
 
 .ui-dropdown__trigger--sorter-custom {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  --sorter-custom-gap: 8px;
+  --sorter-custom-gap: 0.5rem;
   gap: var(--sorter-custom-gap);
-  min-width: 140px;
-  max-width: 240px;
+  min-width: 8.75rem;
+  max-width: 15rem;
 }
 
 .tags-dropdown-item .ui-checkbox-wrap.ui-checkbox-wrap {
   justify-content: flex-start;
   width: 100%;
-  --checkbox-wrap-padding: 6px 12px;
+  --checkbox-wrap-padding: 0.375rem 0.75rem;
   padding: var(--checkbox-wrap-padding);
 }
 
@@ -165,13 +161,7 @@
   min-width: 0;
 }
 
-.library-sorter-label {
-  font-size: var(--font-size-2xs);
-  font-weight: var(--font-weight-bold, 700);
-  color: var(--color-text-muted);
-  letter-spacing: 0.06em;
-  user-select: none;
-}
+
 
 .library-filter-group {
   display: flex;
@@ -183,8 +173,8 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-sm, var(--space-sm));
-  min-height: 28px;
-  height: 28px;
+  min-height: 1.75rem;
+  height: 1.75rem;
   padding: 0 var(--space-lg, var(--space-lg));
   font-size: var(--font-size-xs);
 }
@@ -219,12 +209,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 300px;
+  min-height: 18.75rem;
 }
 
 .library-spinner {
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
   border: 2px solid var(--color-border-subtle, var(--color-border-subtle));
   border-top-color: var(--color-accent-blue);
   border-radius: 50%;
@@ -260,7 +250,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2xl);
-  height: 480px;
+  height: 30rem;
   min-height: 0;
 }
 
@@ -299,7 +289,7 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--space-lg) var(--space-xl);
-  min-height: 72px;
+  min-height: 4.5rem;
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-md);
@@ -312,8 +302,8 @@
 }
 
 .add-people-modal__avatar {
-  width: 56px;
-  height: 56px;
+  width: 3.5rem;
+  height: 3.5rem;
   border-radius: 50%;
   overflow: hidden;
   background: var(--color-surface-glass-strong);
@@ -396,7 +386,7 @@
 }
 
 .add-people-modal__search-source {
-  width: 130px;
+  width: 8.125rem;
   flex-shrink: 0;
   border-right: 1px solid var(--ui-control-border, var(--color-border-default));
 }
@@ -412,7 +402,7 @@
   padding-left: var(--space-md);
   padding-right: var(--space-md);
   font-size: var(--font-size-xs);
-  height: var(--ui-control-height, 36px);
+  height: var(--ui-control-height);
   min-height: 0;
   color: var(--color-text-primary);
   position: relative;
@@ -459,7 +449,7 @@
   background: transparent;
   box-shadow: none;
   font-size: var(--font-size-sm);
-  height: var(--ui-control-height, 36px);
+  height: var(--ui-control-height);
   padding-left: var(--space-md);
 }
 
@@ -512,14 +502,14 @@
 
 .ui-modal:has(#create-tag-form) .ui-modal__title-icon {
   color: var(--current-tag-color, var(--color-accent));
-  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--current-tag-color, var(--color-accent)) 25%, transparent));
+  filter: drop-shadow(0 0 0.5rem color-mix(in srgb, var(--current-tag-color, var(--color-accent)) 25%, transparent));
   transition: color var(--motion-base), filter var(--motion-base);
 }
 
 /* Custom Tag Grid */
 .library-tags-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr));
   gap: var(--space-3xl);
   width: 100%;
 }
@@ -530,7 +520,7 @@
   align-items: flex-end;
   gap: var(--space-lg);
   width: 100%;
-  min-height: 130px;
+  min-height: 8.125rem;
   padding: var(--space-2xl);
   border-radius: var(--radius-md);
   background: var(--color-bg-elevated);
@@ -545,8 +535,8 @@
 
 .library-tag-card__actions {
   position: absolute;
-  right: 12px;
-  bottom: 12px;
+  right: 0.75rem;
+  bottom: 0.75rem;
   display: flex;
   align-items: center;
   gap: var(--space-xs);
@@ -563,8 +553,8 @@
 }
 
 .library-tag-card__actions .ui-icon-button {
-  width: 24px;
-  height: 24px;
+  width: 1.5rem;
+  height: 1.5rem;
   border-radius: var(--radius-full);
   background: color-mix(in srgb, var(--color-bg-elevated) 82%, transparent);
   border-color: color-mix(in srgb, var(--tag-color) 16%, transparent);
@@ -639,7 +629,7 @@
   border-color: color-mix(in srgb, var(--tag-color) 56%, transparent);
   box-shadow:
     var(--shadow-lg),
-    0 0 16px color-mix(in srgb, var(--tag-color) 12%, transparent);
+    0 0 1rem color-mix(in srgb, var(--tag-color) 12%, transparent);
 }
 
 /* Disable hover border for cards in the library page */
@@ -683,7 +673,7 @@
   border-color: color-mix(in srgb, var(--tag-color) 60%, transparent);
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--tag-color) 45%, transparent),
-    0 0 0 4px color-mix(in srgb, var(--tag-color) 16%, transparent),
+    0 0 0 0.25rem color-mix(in srgb, var(--tag-color) 16%, transparent),
     var(--shadow-lg);
 }
 
@@ -708,7 +698,7 @@
 .library-tag-expanded-panel {
   width: 100%;
   background: transparent;
-  border: 1.5px dashed color-mix(in srgb, var(--tag-color, var(--color-accent)) 12%, transparent);
+  border: 1.0.3125rem dashed color-mix(in srgb, var(--tag-color, var(--color-accent)) 12%, transparent);
   border-radius: var(--radius-md);
   padding: var(--space-4xl);
   display: flex;
@@ -804,17 +794,17 @@
 }
 
 .library-tag-expanded-panel.is-focus-mode .ui-poster-card__title-overlay-label {
-  bottom: 10px;
-  left: 10px;
-  right: 10px;
+  bottom: 0.625rem;
+  left: 0.625rem;
+  right: 0.625rem;
   font-size: var(--font-size-2xs);
-  text-shadow: 0 2px 10px color-mix(in srgb, black 34%, transparent);
+  text-shadow: 0 2px 0.625rem color-mix(in srgb, black 34%, transparent);
 }
 
 @keyframes slideDownFade {
   from {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translateY(-0.5rem);
   }
 
   to {
@@ -829,7 +819,7 @@
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(0.75rem);
   }
 
   to {
@@ -862,8 +852,8 @@
 }
 
 .library-header-btn.library-header-btn {
-  height: 28px;
-  min-height: 28px;
+  height: 1.75rem;
+  min-height: 1.75rem;
 }
 
 .create-tag-form {
@@ -887,8 +877,8 @@
 }
 
 .create-tag-form__color-btn {
-  width: 28px;
-  height: 28px;
+  width: 1.75rem;
+  height: 1.75rem;
   border-radius: 50%;
   outline: none;
   cursor: pointer;
@@ -902,7 +892,7 @@
 
 .create-tag-form__color-hex-pill.create-tag-form__color-hex-pill {
   flex: 1;
-  height: 28px;
+  height: 1.75rem;
   border-radius: var(--radius-sm);
   font-family: var(--font-family-mono, monospace);
   font-size: var(--font-size-2xs);
@@ -912,7 +902,7 @@
 
 .create-tag-form__custom-color-label {
   position: relative;
-  height: 28px;
+  height: 1.75rem;
   border-radius: var(--radius-sm);
   cursor: pointer;
   display: flex;
@@ -920,7 +910,7 @@
   justify-content: center;
   gap: var(--space-xs);
   flex: 1;
-  min-width: 80px;
+  min-width: 5rem;
   padding: 0 var(--space-md);
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-bold);
@@ -982,8 +972,8 @@
 
 .create-tag-form__image-preview-wrapper {
   position: relative;
-  width: 80px;
-  height: 80px;
+  width: 5rem;
+  height: 5rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border-subtle);
   overflow: hidden;
@@ -999,10 +989,10 @@
 
 .create-tag-form__remove-image-btn {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 20px;
-  height: 20px;
+  top: 0.25rem;
+  right: 0.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
   border-radius: 50%;
   background-color: color-mix(in srgb, black 60%, transparent);
   color: var(--color-text-primary);
@@ -1090,7 +1080,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  --discover-empty-padding: var(--space-6xl, 32px);
+  --discover-empty-padding: var(--space-6xl);
   padding: var(--discover-empty-padding);
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
@@ -1135,12 +1125,12 @@
 .add-people-modal .ui-select.ui-select:focus,
 .add-people-modal .ui-select.ui-select:focus-visible {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 15%, transparent);
+  box-shadow: 0 0 0 0.1875rem color-mix(in srgb, var(--color-accent) 15%, transparent);
   outline: none;
 }
 
 .library-infinite-sentinel {
-  height: 30px;
+  height: 1.875rem;
   margin: var(--space-3xl) 0;
   display: flex;
   justify-content: center;
@@ -1148,8 +1138,8 @@
 }
 
 .library-infinite-spinner {
-  width: 24px;
-  height: 24px;
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .library-title-group {

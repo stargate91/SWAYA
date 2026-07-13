@@ -9,7 +9,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
-  max-height: 320px;
+  max-height: 20rem;
   overflow-y: auto;
   padding-right: var(--space-2xs);
 }
@@ -30,7 +30,7 @@
   flex-direction: column;
   gap: var(--space-md);
   padding: var(--space-lg) var(--space-xl);
-  min-height: 96px;
+  min-height: 6rem;
   border: 1px solid var(--media-detail-panel-card-border);
   border-radius: var(--radius-lg);
   background: var(--media-detail-panel-card-bg);
@@ -84,8 +84,8 @@
 .extras-panel__browse-btn {
   flex-shrink: 0;
   align-self: center;
-  min-width: 36px;
-  width: 36px;
+  min-width: 2.25rem;
+  width: 2.25rem;
   padding-inline: 0;
 }
 
@@ -99,7 +99,7 @@
   max-width: 100%;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 56.25rem) {
   .extras-panel__header {
     flex-direction: column;
     align-items: stretch;

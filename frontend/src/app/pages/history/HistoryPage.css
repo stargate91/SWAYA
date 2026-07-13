@@ -1,7 +1,7 @@
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(0.75rem);
   }
 
   to {
@@ -28,7 +28,7 @@
   border-radius: var(--radius-md);
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border-subtle, var(--color-surface-glass));
-  box-shadow: 0 4px 12px color-mix(in srgb, black 15%, transparent);
+  box-shadow: 0 0.25rem 0.75rem color-mix(in srgb, black 15%, transparent);
   transition: all var(--motion-slow);
   position: relative;
   overflow: hidden;
@@ -52,8 +52,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: var(--radius-sm);
   background: var(--ui-surface-soft);
   box-shadow: inset 0 0 0 1px var(--color-border-subtle);
@@ -189,7 +189,7 @@
   align-items: center;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 40rem) {
   .history-card__main-row {
     flex-direction: column;
     align-items: stretch;
@@ -203,7 +203,7 @@
 }
 
 .history-card__actions .history-card__revert-btn {
-  min-width: 120px;
+  min-width: 7.5rem;
 }
 
 /* Collapsible Details Styles */
@@ -226,13 +226,13 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-  max-height: 240px;
+  max-height: 15rem;
   overflow-y: auto;
   padding-right: var(--space-sm);
 }
 
 .history-card__files-list::-webkit-scrollbar {
-  width: 6px;
+  width: 0.375rem;
 }
 .history-card__files-list::-webkit-scrollbar-track {
   background: transparent;
@@ -386,7 +386,7 @@
   border-radius: var(--radius-md);
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border-subtle, var(--color-surface-glass));
-  box-shadow: 0 4px 12px color-mix(in srgb, black 15%, transparent);
+  box-shadow: 0 0.25rem 0.75rem color-mix(in srgb, black 15%, transparent);
   transition: all var(--motion-slow);
   position: relative;
   overflow: hidden;
@@ -407,13 +407,13 @@
 
 
 .watched-history-card__poster-wrapper {
-  width: 48px;
-  height: 72px;
+  width: 3rem;
+  height: 4.5rem;
   border-radius: var(--radius-sm);
   overflow: hidden;
   background: var(--ui-surface-soft);
   --poster-shadow: inset 0 0 0 1px var(--color-border-subtle),
-                  0 4px 8px rgba(0, 0, 0, 0.2);
+                  0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
   box-shadow: var(--poster-shadow);
   flex-shrink: 0;
   margin-right: var(--space-2xl);
@@ -424,7 +424,7 @@
 }
 
 .watched-history-card__poster-wrapper.is-scene {
-  width: 128px;
+  width: 8rem;
 }
 
 .watched-history-card__poster {
@@ -467,7 +467,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 320px;
+  max-width: 20rem;
 }
 
 .watched-history-card__year {
@@ -523,8 +523,8 @@
 
 .watched-history-card.is-active {
   border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border-subtle));
-  box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent) 15%, transparent),
-              0 4px 12px color-mix(in srgb, black 25%, transparent);
+  box-shadow: 0 0 0.75rem color-mix(in srgb, var(--color-accent) 15%, transparent),
+              0 0.25rem 0.75rem color-mix(in srgb, black 25%, transparent);
 }
 
 .watched-history-card__status--active {
@@ -535,8 +535,8 @@
 }
 
 .watched-history-card__status-dot {
-  width: 6px;
-  height: 6px;
+  width: 0.375rem;
+  height: 0.375rem;
   border-radius: 50%;
   background: var(--color-accent);
   display: inline-block;
@@ -556,7 +556,7 @@
   }
   70% {
     transform: scale(1.1);
-    --pulse-shadow-70: 0 0 0 5px color-mix(in srgb, var(--color-accent) 0%, transparent);
+    --pulse-shadow-70: 0 0 0 0.3125rem color-mix(in srgb, var(--color-accent) 0%, transparent);
     box-shadow: var(--pulse-shadow-70);
   }
   100% {
@@ -584,8 +584,8 @@
 }
 
 .watched-history-card__progress-bar-wrapper {
-  height: 4px;
-  width: 240px;
+  height: 0.25rem;
+  width: 15rem;
   background: var(--color-border-subtle);
   border-radius: var(--radius-full);
   overflow: hidden;
@@ -605,7 +605,7 @@
   background-size: 200% 100%;
   --bar-active-animation: progressBarGlow 2s linear infinite;
   animation: var(--bar-active-animation);
-  --bar-active-shadow: 0 0 8px color-mix(in srgb, var(--color-accent) 60%, transparent);
+  --bar-active-shadow: 0 0 0.5rem color-mix(in srgb, var(--color-accent) 60%, transparent);
   box-shadow: var(--bar-active-shadow);
 }
 
@@ -636,7 +636,7 @@
   margin-top: var(--space-3xl);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 40rem) {
   .watched-history-card {
     flex-direction: column;
     align-items: stretch;
@@ -655,7 +655,7 @@
 
 .history-sentinel,
 .watched-sentinel {
-  height: 40px;
+  height: 2.5rem;
   margin: var(--space-2xl) 0;
   display: flex;
   justify-content: center;

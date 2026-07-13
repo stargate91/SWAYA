@@ -1,6 +1,6 @@
 .ui-adult-overlay {
   position: absolute;
-  inset: -10px;
+  inset: -0.625rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -18,8 +18,8 @@
 /* Blur variant - frosted glass/backdrop blur */
 .ui-adult-overlay--blur {
   background: color-mix(in srgb, black 70%, transparent);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
+  backdrop-filter: blur(1.75rem);
+  -webkit-backdrop-filter: blur(1.75rem);
   transition: backdrop-filter var(--motion-duration-slow) var(--motion-ease-standard),
               -webkit-backdrop-filter var(--motion-duration-slow) var(--motion-ease-standard),
               opacity var(--motion-duration-slow) var(--motion-ease-standard),

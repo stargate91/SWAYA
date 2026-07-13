@@ -10,6 +10,8 @@
  * @param {string} [props.fullWidthClassName='ui-description-list__item--full'] - Class name appended when item is full-width.
  * @returns {React.ReactElement|null}
  */
+import './DescriptionList.css';
+
 export default function DescriptionList({
   items,
   className = 'ui-description-list',

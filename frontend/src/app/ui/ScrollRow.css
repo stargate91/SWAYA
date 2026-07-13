@@ -50,8 +50,8 @@
 
 /* Compact size-sm variant for horizontal pill rows */
 .ui-scroll-row-container--size-sm .ui-carousel-arrow {
-  width: 26px;
-  height: 26px;
+  width: 1.625rem;
+  height: 1.625rem;
   background: color-mix(in srgb, var(--color-bg-elevated) 55%, var(--color-surface-glass-strong));
   border: 1px solid var(--color-border-default);
   box-shadow: var(--shadow-xs);
@@ -60,11 +60,11 @@
 }
 
 .ui-scroll-row-container--size-sm .ui-carousel-arrow.is-left {
-  left: 4px;
+  left: 0.25rem;
 }
 
 .ui-scroll-row-container--size-sm .ui-carousel-arrow.is-right {
-  right: 4px;
+  right: 0.25rem;
 }
 
 .ui-scroll-row-container--size-sm .ui-carousel-arrow:hover {

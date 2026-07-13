@@ -23,8 +23,8 @@
 }
 
 .ui-utility-button--titlebar {
-  width: 46px;
-  height: 46px;
+  width: 2.875rem;
+  height: 2.875rem;
   border-radius: 0;
   box-shadow: var(--ui-utility-button-titlebar-divider);
   background: transparent;
@@ -104,24 +104,24 @@
 }
 
 .ui-icon-button--xs {
-  width: 16px;
-  height: 16px;
+  width: 1rem;
+  height: 1rem;
   border-radius: var(--radius-sm);
 }
 
 .ui-icon-button--sm {
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
 }
 
 .ui-icon-button--md {
-  width: 48px;
-  height: 48px;
+  width: 3rem;
+  height: 3rem;
 }
 
 .ui-icon-button--lg {
-  width: 52px;
-  height: 52px;
+  width: 3.25rem;
+  height: 3.25rem;
 }
 
 .ui-icon-button--primary {
@@ -328,14 +328,14 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 44px;
-  height: 44px;
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: var(--radius-full);
   background-color: var(--app-shell-color-panel);
   background-image: var(--button-secondary-bg);
   color: var(--button-secondary-color);
   border: 1px solid var(--button-secondary-border);
-  box-shadow: 0 4px 10px color-mix(in srgb, black 30%, transparent);
+  box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, black 30%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -364,7 +364,7 @@
   background-color: var(--app-shell-color-panel-strong);
   background-image: var(--button-secondary-hover-bg);
   border-color: var(--button-secondary-border);
-  box-shadow: 0 4px 12px color-mix(in srgb, black 40%, transparent);
+  box-shadow: 0 0.25rem 0.75rem color-mix(in srgb, black 40%, transparent);
 }
 
 .ui-icon-button--play-overlay:disabled {
@@ -436,7 +436,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
+  width: 2rem;
   background: transparent;
   border: none;
   border-top-right-radius: var(--radius-input);
@@ -466,7 +466,7 @@
 .ui-split-button__menu {
   position: absolute;
   background: var(--color-dropdown-bg, var(--dropdown-menu-bg));
-  backdrop-filter: var(--dropdown-backdrop-filter, blur(12px));
+  backdrop-filter: var(--dropdown-backdrop-filter, blur(0.75rem));
   border: 1px solid var(--ui-control-border-strong);
   border-radius: var(--ui-control-radius);
   box-shadow: var(--shadow-overlay-strong, var(--dropdown-menu-shadow));
@@ -483,8 +483,8 @@
   border-radius: var(--ui-control-radius-xs);
   color: var(--color-text-primary);
   padding: 0 var(--space-lg);
-  height: 36px;
-  line-height: 36px;
+  height: 2.25rem;
+  line-height: 2.25rem;
   text-align: left;
   font-size: var(--font-size-xs);
   cursor: pointer;
@@ -505,8 +505,8 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
   border-radius: var(--radius-md, var(--radius-sm));
   background: var(--color-surface-glass);
   border: 1px solid var(--color-border-subtle);
@@ -517,7 +517,7 @@
 .ui-icon-button-wrapper:hover {
   background: var(--color-surface-glass-strong);
   border-color: var(--color-border-default);
-  transform: translateY(-0.5px);
+  transform: translateY(-0.0.3125rem);
 }
 
 .ui-icon-button-wrapper:focus-within {
@@ -550,24 +550,24 @@
 /* Image Edit Badge Overlay */
 .ui-image-edit-badge {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 28px;
-  height: 28px;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 1.75rem;
+  height: 1.75rem;
   border-radius: var(--radius-full);
   border: 1px solid color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border));
   background-color: color-mix(in srgb, var(--app-shell-color-panel) 82%, transparent);
   background-image: var(--button-secondary-bg);
   color: var(--button-secondary-color);
-  box-shadow: 0 4px 10px color-mix(in srgb, black 22%, transparent);
-  backdrop-filter: blur(10px);
+  box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, black 22%, transparent);
+  backdrop-filter: blur(0.625rem);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 6;
   cursor: pointer;
   opacity: 0;
-  transform: translateY(-4px);
+  transform: translateY(-0.25rem);
   transition: opacity var(--motion-fast), transform var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast);
 }
 

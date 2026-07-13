@@ -63,7 +63,7 @@
 }
 
 .settings-browse-button {
-  height: 48px;
+  height: 3rem;
   flex-shrink: 0;
 }
 
@@ -130,7 +130,7 @@
 }
 
 .settings-instructions-box {
-  background: var(--app-shell-color-panel-soft, color-mix(in srgb, var(--color-text-primary) 1.8%, transparent));
+  background: var(--app-shell-color-panel-soft);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-sm);
   padding: var(--space-2xl);
@@ -258,7 +258,7 @@
     inset 0 1px 0 var(--color-border-default),
     0 0 0 1px color-mix(in srgb, var(--color-state-danger) 26%, transparent),
     var(--shadow-md);
-  backdrop-filter: blur(20px) saturate(118%);
+  backdrop-filter: blur(1.25rem) saturate(118%);
 }
 
 .settings-danger-zone-card .ui-card__title {
@@ -282,11 +282,11 @@
 }
 
 .settings-profile-avatar {
-  width: 72px;
-  height: 72px;
+  width: 4.5rem;
+  height: 4.5rem;
   border-radius: 50%;
   overflow: hidden;
-  flex: 0 0 72px;
+  flex: 0 0 4.5rem;
   display: grid;
   place-items: center;
   color: var(--color-muted);

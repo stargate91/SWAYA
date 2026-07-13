@@ -84,8 +84,8 @@
 }
 
 .universal-image-picker__preview {
-  width: 72px;
-  height: 108px;
+  width: 4.5rem;
+  height: 6.75rem;
   overflow: hidden;
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border-subtle);
@@ -94,18 +94,18 @@
 }
 
 .universal-image-picker__preview.is-logo {
-  width: 112px;
-  height: 56px;
+  width: 7rem;
+  height: 3.5rem;
 }
 
 .universal-image-picker__preview.is-backdrop {
-  width: 128px;
-  height: 72px;
+  width: 8rem;
+  height: 4.5rem;
 }
 
 .universal-image-picker__preview.is-square {
-  width: 72px;
-  height: 72px;
+  width: 4.5rem;
+  height: 4.5rem;
 }
 
 .universal-image-picker__preview-image {
@@ -137,7 +137,7 @@
   color: var(--modal-description-color);
 }
 
-@media (max-width: 720px) {
+@media (max-width: 45rem) {
   .universal-image-picker__url-row {
     flex-direction: column;
     align-items: stretch;

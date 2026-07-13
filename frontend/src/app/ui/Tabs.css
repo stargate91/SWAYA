@@ -65,8 +65,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 20px;
-  height: 20px;
+  min-width: 1.25rem;
+  height: 1.25rem;
   padding: 0 var(--space-xs);
   border-radius: var(--radius-full);
   background: var(--color-surface-glass-strong);

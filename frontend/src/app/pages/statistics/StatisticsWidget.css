@@ -11,21 +11,21 @@
   grid-template-columns: repeat(4, 1fr);
 }
 
-@media (max-width: 1400px) {
+@media (max-width: 87.5rem) {
   .stats-grid--5,
   .stats-grid--4 {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 56.25rem) {
   .stats-grid--5,
   .stats-grid--4 {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 550px) {
+@media (max-width: 34.375rem) {
   .stats-grid--5,
   .stats-grid--4 {
     grid-template-columns: 1fr;
@@ -41,8 +41,8 @@
   background:
     radial-gradient(circle at top right, color-mix(in srgb, var(--color-accent-blue-soft) 12%, transparent), transparent 42%),
     linear-gradient(180deg, color-mix(in srgb, var(--color-surface-glass) 72%, transparent), var(--color-surface-card));
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(1rem);
+  -webkit-backdrop-filter: blur(1rem);
   transition: border-color var(--motion-duration-emphasized) var(--motion-ease-emphasized),
               background var(--motion-duration-emphasized) var(--motion-ease-emphasized),
               transform var(--motion-duration-emphasized) var(--motion-ease-emphasized),
@@ -55,7 +55,7 @@
     radial-gradient(circle at top right, color-mix(in srgb, var(--color-accent-blue-soft) 22%, transparent), transparent 48%),
     linear-gradient(180deg, color-mix(in srgb, var(--color-surface-glass) 82%, transparent), var(--color-surface-card));
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg), 0 0 15px color-mix(in srgb, var(--color-accent-blue-soft) 10%, transparent);
+  box-shadow: var(--shadow-lg), 0 0 0.9375rem color-mix(in srgb, var(--color-accent-blue-soft) 10%, transparent);
 }
 
 
@@ -64,8 +64,8 @@
   content: '';
   position: absolute;
   inset: auto -18% -42% auto;
-  width: 140px;
-  height: 140px;
+  width: 8.75rem;
+  height: 8.75rem;
   border-radius: 50%;
   background: radial-gradient(circle, color-mix(in srgb, var(--color-accent-blue) 18%, transparent) 0%, transparent 68%);
   pointer-events: none;

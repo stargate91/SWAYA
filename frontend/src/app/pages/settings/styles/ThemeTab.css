@@ -24,7 +24,7 @@
 
 .theme-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(13.125rem, 1fr));
   gap: var(--space-2xl);
   margin-top: var(--space-sm);
 }
@@ -48,8 +48,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 1.125rem;
+  height: 1.125rem;
   border-radius: var(--app-shell-radius-pill);
   border: 1px solid var(--color-border-strong);
   background: var(--color-bg-canvas);

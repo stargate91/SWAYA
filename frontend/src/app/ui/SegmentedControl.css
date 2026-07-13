@@ -1,7 +1,7 @@
 .ui-segmented-control {
   display: inline-flex;
   align-items: stretch;
-  height: var(--ui-control-height-md, 36px);
+  height: var(--ui-control-height-md);
   padding: 0.1875rem;
   border: 1px solid var(--ui-control-border, var(--color-border-default));
   border-radius: var(--ui-control-radius, var(--radius-sm));
@@ -40,7 +40,7 @@
   background: var(--ui-surface-soft-strong);
   color: var(--color-text-primary);
   box-shadow: 
-    0 1px 3px color-mix(in srgb, black 20%, transparent), 
+    0 1px 0.1875rem color-mix(in srgb, black 20%, transparent), 
     inset 0 1px 0 var(--color-border-subtle);
 }
 

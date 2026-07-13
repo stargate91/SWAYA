@@ -152,7 +152,7 @@
 .review-drawer__textarea {
   flex: 1;
   width: 100%;
-  min-height: 150px;
+  min-height: 9.375rem;
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-sm);

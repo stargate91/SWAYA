@@ -7,7 +7,7 @@
 .global-search__bar {
   display: flex;
   align-items: center;
-  height: 32px;
+  height: 2rem;
   background: color-mix(in srgb, var(--color-canvas) 60%, transparent);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-input);
@@ -19,7 +19,7 @@
 .global-search__bar:focus-within {
   border-color: var(--color-accent);
   background: color-mix(in srgb, var(--color-canvas) 80%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 15%, transparent), inset 0 1px 2px color-mix(in srgb, black 20%, transparent);
+  box-shadow: 0 0 0 0.1875rem color-mix(in srgb, var(--color-accent) 15%, transparent), inset 0 1px 2px color-mix(in srgb, black 20%, transparent);
 }
 
 /* Selector Button */
@@ -65,7 +65,7 @@
 /* Divider */
 .global-search__divider {
   width: 1px;
-  height: 14px;
+  height: 0.875rem;
   background: color-mix(in srgb, var(--color-ink) 10%, transparent);
   margin: 0 var(--space-lg);
 }
@@ -127,14 +127,14 @@
 /* Cascading Popover */
 .global-search__dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 0.5rem);
   left: 0;
   display: flex;
   background: color-mix(in srgb, var(--color-panel-strong) 98%, transparent);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-lg);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(0.75rem);
   z-index: 100;
   overflow: hidden;
   animation: slideDown var(--motion-duration-fast) var(--motion-ease-emphasized);
@@ -144,7 +144,7 @@
   display: flex;
   flex-direction: column;
   padding: var(--space-sm) 0;
-  min-width: 110px;
+  min-width: 6.875rem;
 }
 
 .global-search__dropdown-column--sources {
@@ -194,15 +194,15 @@
 /* Suggestions Overlay */
 .global-search__overlay {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 0.5rem);
   left: 0;
   right: 0;
-  max-height: 400px;
+  max-height: 25rem;
   background: color-mix(in srgb, var(--color-panel-strong) 98%, transparent);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-lg);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(0.75rem);
   z-index: 99;
   overflow-y: auto;
   animation: slideDown var(--motion-duration-fast) var(--motion-ease-emphasized);
@@ -235,11 +235,11 @@
 
 .global-search__poster-container {
   position: relative;
-  width: 32px;
-  height: 48px;
+  width: 2rem;
+  height: 3rem;
   border-radius: var(--radius-sm);
   overflow: hidden;
-  box-shadow: 0 2px 5px color-mix(in srgb, black 30%, transparent);
+  box-shadow: 0 2px 0.3125rem color-mix(in srgb, black 30%, transparent);
 }
 
 .global-search__item-poster {
@@ -263,8 +263,8 @@
 }
 
 .global-search__item-poster-placeholder {
-  width: 32px;
-  height: 48px;
+  width: 2rem;
+  height: 3rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -328,7 +328,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100px;
+  max-width: 6.25rem;
   flex-shrink: 0;
   color: var(--color-accent-blue);
   font-weight: var(--font-weight-medium);
@@ -345,7 +345,7 @@
   color: var(--color-text-muted);
   opacity: 0;
   transition: all var(--motion-duration-fast) var(--motion-ease-standard);
-  transform: translate(-3px, 3px);
+  transform: translate(-0.1875rem, 0.1875rem);
 }
 
 .global-search__result-item:hover .global-search__arrow-icon {
@@ -384,7 +384,7 @@
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translateY(-0.5rem);
   }
 
   to {

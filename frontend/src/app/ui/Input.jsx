@@ -1,12 +1,15 @@
 import { useId, useState } from 'react';
 import { Eye, EyeOff } from '@/ui/icons';
 import { useTranslation } from '../providers/LanguageContext';
+import Field from './Field';
 import './Input.css';
 
-export default function Input({ label, hint, error, type, className = '', size = 'md', inputRef, leftElement, rightElement, ...props }) {
+export default function Input({ label, hint, error, required, type, className = '', size = 'md', inputRef, leftElement, rightElement, ...props }) {
   const [showPassword, setShowPassword] = useState(false);
-  const hintId = useId();
-  const errorId = useId();
+  const generatedId = useId();
+  const inputId = props.id || generatedId;
+  const hintId = `${inputId}-hint`;
+  const errorId = `${inputId}-error`;
 
   const isPassword = type === 'password';
   const inputType = isPassword ? (showPassword ? 'text' : 'password') : type;
@@ -16,9 +19,14 @@ export default function Input({ label, hint, error, type, className = '', size =
   const { t } = useTranslation();
 
   return (
-    <label className={`ui-field ui-input-field ${className}`.trim()}>
-      {label ? <span className="ui-field__label">{label}</span> : null}
-      {hint ? <span className="ui-field__hint">{hint}</span> : null}
+    <Field
+      label={label}
+      hint={hint}
+      error={error}
+      required={required}
+      htmlFor={inputId}
+      className={`ui-input-field ${className}`.trim()}
+    >
       <div className="ui-input__wrapper">
         {leftElement && (
           <div className="ui-input__left-element">
@@ -26,6 +34,7 @@ export default function Input({ label, hint, error, type, className = '', size =
           </div>
         )}
         <input
+          id={inputId}
           ref={inputRef}
           className={`ui-input ui-input--${size}${hasRightElement ? ' ui-input--has-right-element' : ''}${hasLeftElement ? ' ui-input--has-left-element' : ''}${error ? ' ui-input--error' : ''}`}
           type={inputType}
@@ -54,7 +63,6 @@ export default function Input({ label, hint, error, type, className = '', size =
         )}
       </div>
       {hint ? <span id={hintId} className="ui-field__sr-only">{hint}</span> : null}
-      {error ? <span id={errorId} className="ui-field__error">{error}</span> : null}
-    </label>
+    </Field>
   );
 }

@@ -41,7 +41,7 @@
 
 .ui-poster-card.continue-watching-card .ui-poster-card__image-wrapper {
   border-radius: var(--radius-lg);
-  box-shadow: 0 10px 25px color-mix(in srgb, black 30%, transparent);
+  box-shadow: 0 0.625rem 1.5625rem color-mix(in srgb, black 30%, transparent);
   border: 1px solid var(--color-border-subtle);
   background: var(--color-bg-elevated);
 }
@@ -58,8 +58,8 @@
 
 .continue-watching-card .ui-tooltip {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 0.625rem;
+  right: 0.625rem;
   z-index: 10;
 }
 
@@ -103,7 +103,7 @@
 
   50% {
     transform: translate(-50%, -50%) scale(1.08);
-    box-shadow: 0 0 20px 8px color-mix(in srgb, var(--color-accent-blue) 35%, transparent);
+    box-shadow: 0 0 1.25rem 0.5rem color-mix(in srgb, var(--color-accent-blue) 35%, transparent);
   }
 
   100% {
@@ -127,7 +127,7 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 4px;
+  height: 0.25rem;
   background: color-mix(in srgb, var(--color-text-primary, white) 20%, transparent);
 }
 
@@ -143,14 +143,14 @@
 
 .continue-watching-progress-fill {
   fill: var(--color-accent-blue-soft);
-  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--color-accent-blue-soft) 80%, transparent));
+  filter: drop-shadow(0 0 0.625rem color-mix(in srgb, var(--color-accent-blue-soft) 80%, transparent));
 }
 
 .continue-watching-copy {
   position: absolute;
-  right: 15px;
-  bottom: 15px;
-  left: 15px;
+  right: 0.9375rem;
+  bottom: 0.9375rem;
+  left: 0.9375rem;
   pointer-events: none;
 }
 
@@ -166,7 +166,7 @@
 
 .continue-watching-meta {
   position: relative;
-  min-height: 18px;
+  min-height: 1.125rem;
   color: var(--color-text-secondary);
   font-size: var(--font-size-xs);
 }
@@ -203,7 +203,7 @@
   50% {
     transform: scale(1.05);
     opacity: 1;
-    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--color-accent-blue) 40%, transparent));
+    filter: drop-shadow(0 0 0.25rem color-mix(in srgb, var(--color-accent-blue) 40%, transparent));
   }
 
   100% {

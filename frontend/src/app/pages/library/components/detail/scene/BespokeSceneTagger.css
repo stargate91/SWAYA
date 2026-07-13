@@ -16,8 +16,8 @@
   gap: var(--local-gap);
   padding: var(--space-xs) var(--space-md);
   background: color-mix(in srgb, black 15%, transparent);
-  border-top-left-radius: var(--radius-lg, 16px);
-  border-top-right-radius: var(--radius-lg, 16px);
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
   border-bottom: 1px solid var(--color-border-default);
 }
 
@@ -56,14 +56,14 @@
 .bespoke-scene-tagger-pills-row {
   display: flex;
   flex-wrap: wrap;
-  --local-gap: 6px;
+  --local-gap: 0.375rem;
   gap: var(--local-gap);
 }
 
 .ui-pill.bespoke-scene-tagger-pill-active {
   display: inline-flex;
   align-items: center;
-  --local-gap: 4px;
+  --local-gap: 0.25rem;
   gap: var(--local-gap);
   padding: var(--space-2xs) var(--space-sm);
   font-size: var(--font-size-2xs);
@@ -74,7 +74,7 @@
 
 .bespoke-scene-tagger-pill-active:hover {
   opacity: 0.8;
-  transform: translateY(-0.5px);
+  transform: translateY(-0.0.3125rem);
 }
 
 .bespoke-scene-tagger-pill-remove-icon {
@@ -104,17 +104,17 @@
   gap: var(--local-gap);
   border: 1px solid var(--color-border-subtle);
   background: var(--color-surface-glass);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(0.25rem);
   border-radius: var(--radius-sm);
   padding: 0 var(--space-md);
-  height: 38px;
+  height: 2.375rem;
   transition: border-color var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 .bespoke-scene-tagger-input-container:focus-within {
   border-color: var(--color-accent-blue);
   background: var(--color-surface-glass-strong);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent-blue) 15%, transparent);
+  box-shadow: 0 0 0 0.1875rem color-mix(in srgb, var(--color-accent-blue) 15%, transparent);
 }
 
 .bespoke-scene-tagger-input {
@@ -160,10 +160,10 @@
   border-radius: var(--radius-md);
   box-shadow: var(--app-shell-shadow-lg);
   z-index: 100;
-  max-height: 200px;
+  max-height: 12.5rem;
   overflow-y: auto;
   padding: var(--space-2xs) 0;
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(1rem);
 }
 
 .bespoke-scene-tagger-dropdown-item {
@@ -178,7 +178,7 @@
   font-weight: var(--font-weight-medium);
   text-align: left;
   cursor: pointer;
-  --local-gap: 8px;
+  --local-gap: 0.5rem;
   gap: var(--local-gap);
   transition: background var(--motion-duration-fast) var(--motion-ease-standard);
 }
@@ -188,8 +188,8 @@
 }
 
 .bespoke-scene-tagger-dropdown-color-dot {
-  width: 8px;
-  height: 8px;
+  width: 0.5rem;
+  height: 0.5rem;
   border-radius: var(--radius-full);
   flex-shrink: 0;
 }
@@ -203,7 +203,7 @@
 .bespoke-scene-tagger-pill-suggested {
   display: inline-flex;
   align-items: center;
-  --local-gap: 4px;
+  --local-gap: 0.25rem;
   gap: var(--local-gap);
   padding: var(--space-2xs) var(--space-sm);
   font-size: var(--font-size-2xs);
@@ -228,7 +228,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  --local-gap: 6px;
+  --local-gap: 0.375rem;
   gap: var(--local-gap);
 }
 
@@ -251,8 +251,8 @@
   border: 1px solid var(--color-border-default);
   color: var(--color-text-secondary);
   border-radius: var(--radius-full);
-  width: 20px;
-  height: 20px;
+  width: 1.25rem;
+  height: 1.25rem;
   display: flex;
   align-items: center;
   justify-content: center;

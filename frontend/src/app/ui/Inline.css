@@ -1,0 +1,46 @@
+.ui-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+  align-items: center;
+}
+
+.ui-inline--gap-2xs {
+  gap: var(--space-2xs);
+}
+
+.ui-inline--gap-xs {
+  gap: var(--space-xs);
+}
+
+.ui-inline--gap-sm {
+  gap: var(--space-sm);
+}
+
+.ui-inline--gap-md {
+  gap: var(--space-md);
+}
+
+.ui-inline--gap-lg {
+  gap: var(--space-lg);
+}
+
+.ui-inline--gap-xl {
+  gap: var(--space-xl);
+}
+
+.ui-inline--gap-2xl {
+  gap: var(--space-2xl);
+}
+
+.ui-inline--align-start {
+  align-items: flex-start;
+}
+
+.ui-inline--align-center {
+  align-items: center;
+}
+
+.ui-inline--align-end {
+  align-items: flex-end;
+}

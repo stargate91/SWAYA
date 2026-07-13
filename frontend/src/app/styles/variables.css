@@ -8,16 +8,16 @@
   --font-family-sans: 'IBM Plex Sans', sans-serif;
   --font-family-display: 'Sora', sans-serif;
   /* Standard Font Sizes */
-  --font-size-2xs: 10px;
-  --font-size-xs: 12px;
-  --font-size-sm: 14px;
-  --font-size-md: 16px;
-  --font-size-lg: 18px;
-  --font-size-xl: 20px;
-  --font-size-2xl: 24px;
-  --font-size-3xl: 30px;
-  --font-size-4xl: 36px;
-  --font-size-5xl: 48px;
+  --font-size-2xs: 0.625rem;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
 
   --font-weight-regular: 400;
   --font-weight-medium: 500;
@@ -117,21 +117,21 @@
   --floating-batch-bar-bg: var(--color-bg-elevated);
   --floating-batch-bar-border: var(--color-border-strong);
   --floating-batch-bar-border-top: var(--color-border-strong);
-  --floating-batch-bar-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--color-surface-overlay-strong);
+  --floating-batch-bar-shadow: 0 1.875rem 3.75rem rgba(0, 0, 0, 0.6), 0 0 0 1px var(--color-surface-overlay-strong);
   --floating-batch-bar-accent-bg: var(--color-accent-blue);
   --floating-batch-bar-accent-border: var(--color-accent-blue);
   --floating-batch-bar-accent-color: var(--color-text-primary);
   --floating-batch-bar-accent-hover-bg: color-mix(in srgb, var(--color-accent-blue) 88%, white 12%);
   --floating-batch-bar-accent-hover-border: color-mix(in srgb, var(--color-accent-blue) 88%, white 12%);
   --floating-batch-bar-accent-hover-color: var(--color-text-primary);
-  --floating-batch-bar-accent-hover-shadow: 0 8px 20px color-mix(in srgb, var(--color-accent-blue) 24%, transparent);
+  --floating-batch-bar-accent-hover-shadow: 0 0.5rem 1.25rem color-mix(in srgb, var(--color-accent-blue) 24%, transparent);
   --danger-action-bg: color-mix(in srgb, var(--color-state-danger) 12%, transparent);
   --danger-action-border: color-mix(in srgb, var(--color-state-danger) 28%, transparent);
   --danger-action-color: var(--color-accent-red-soft);
   --danger-action-hover-bg: color-mix(in srgb, var(--color-state-danger) 20%, transparent);
   --danger-action-hover-border: color-mix(in srgb, var(--color-state-danger) 38%, transparent);
   --danger-action-hover-color: var(--color-text-primary);
-  --danger-action-hover-shadow: 0 8px 24px color-mix(in srgb, var(--color-state-danger) 18%, transparent);
+  --danger-action-hover-shadow: 0 0.5rem 1.5rem color-mix(in srgb, var(--color-state-danger) 18%, transparent);
   --floating-batch-bar-danger-bg: var(--danger-action-bg);
   --floating-batch-bar-danger-border: var(--danger-action-border);
   --floating-batch-bar-danger-color: var(--danger-action-color);
@@ -179,7 +179,7 @@
   --dropdown-field-border: var(--color-border-subtle);
   --dropdown-field-hover-border: color-mix(in srgb, var(--color-text-primary) 20%, transparent);
   --dropdown-field-active-border: var(--color-accent-blue);
-  --dropdown-field-shadow: 0 4px 10px color-mix(in srgb, var(--app-shell-color-accent) 10%, transparent);
+  --dropdown-field-shadow: 0 0.25rem 0.625rem color-mix(in srgb, var(--app-shell-color-accent) 10%, transparent);
   --dropdown-menu-bg: color-mix(in srgb, var(--color-bg-canvas) 95%, transparent);
   --dropdown-menu-border: var(--color-border-subtle);
   --dropdown-menu-border-top: var(--color-surface-glass-heavy);
@@ -194,20 +194,20 @@
   --dropdown-option-selected-bg: var(--color-state-info-bg);
   --dropdown-option-selected-color: var(--color-accent-blue);
   /* Layout Tokens */
-  --layout-sidebar-width-expanded: 220px;
-  --layout-sidebar-width-collapsed: 78px;
-  --layout-inspector-width: 350px;
-  --layout-main-content-padding-x: 60px;
-  --layout-window-titlebar-height: 46px;
-  --layout-main-content-padding-top: 84px;
+  --layout-sidebar-width-expanded: 13.75rem;
+  --layout-sidebar-width-collapsed: 4.875rem;
+  --layout-inspector-width: 21.875rem;
+  --layout-main-content-padding-x: 3.75rem;
+  --layout-window-titlebar-height: 2.875rem;
+  --layout-main-content-padding-top: 5.25rem;
   --layout-main-content-padding-bottom: 0px;
   --layout-main-content-padding: var(--layout-main-content-padding-top) var(--layout-main-content-padding-x) var(--layout-main-content-padding-bottom);
-  --layout-top-control-anchor: calc(var(--layout-window-titlebar-height) + 22px);
-  --layout-top-control-height: 38px;
-  --layout-side-toggle-size: 24px;
+  --layout-top-control-anchor: calc(var(--layout-window-titlebar-height) + 1.375rem);
+  --layout-top-control-height: 2.375rem;
+  --layout-side-toggle-size: 1.5rem;
   --layout-top-control-center-y: calc(var(--layout-top-control-anchor) + (var(--layout-top-control-height) / 2));
-  --layout-modal-padding-md: 24px;
-  --layout-modal-padding-lg: 32px;
+  --layout-modal-padding-md: 1.5rem;
+  --layout-modal-padding-lg: 2rem;
 
   /* App Shell Tokens */
   --app-shell-color-canvas: var(--color-bg-canvas);
@@ -226,8 +226,8 @@
   --app-shell-color-signal: #60a5fa;
   --app-shell-color-signal-soft: rgba(96, 165, 250, 0.16);
   --app-shell-color-info: var(--color-state-info);
-  --app-shell-scrollbar-size: 10px;
-  --app-shell-scrollbar-radius: 999px;
+  --app-shell-scrollbar-size: 0.625rem;
+  --app-shell-scrollbar-radius: 62.4375rem;
   --app-shell-scrollbar-track: rgba(255, 255, 255, 0.025);
   --app-shell-scrollbar-track-hover: rgba(255, 255, 255, 0.04);
   --app-shell-scrollbar-thumb: rgba(255, 255, 255, 0.12);
@@ -235,31 +235,31 @@
   --app-shell-scrollbar-thumb-active: rgba(0, 136, 255, 0.48);
   --app-shell-scrollbar-border: rgba(255, 255, 255, 0.04);
   --app-shell-space-1: var(--space-2xs);
-  /* 4px */
+  /* 0.25rem */
   --app-shell-space-2: var(--space-sm);
-  /* 8px */
+  /* 0.5rem */
   --app-shell-space-3: var(--space-lg);
-  /* 12px */
+  /* 0.75rem */
   --app-shell-space-4: var(--space-2xl);
-  /* 16px */
+  /* 1rem */
   --app-shell-space-5: var(--space-3xl);
-  /* 20px */
+  /* 1.25rem */
   --app-shell-space-6: var(--space-4xl);
-  /* 24px */
+  /* 1.5rem */
   --app-shell-space-7: var(--space-5xl);
-  /* 32px */
+  /* 2rem */
   --app-shell-space-8: var(--space-6xl);
-  /* 40px */
+  /* 2.5rem */
   --app-shell-space-9: var(--space-7xl);
   --app-shell-space-10: var(--space-8xl);
-  --app-shell-radius-sm: 10px;
-  --app-shell-radius-md: 12px;
-  --app-shell-radius-lg: 16px;
-  --app-shell-radius-xl: 20px;
-  --app-shell-radius-pill: 999px;
-  --app-shell-shadow-sm: 0 14px 30px rgba(0, 0, 0, 0.32);
-  --app-shell-shadow-md: 0 24px 52px rgba(0, 0, 0, 0.42);
-  --app-shell-shadow-lg: 0 36px 82px rgba(0, 0, 0, 0.56);
+  --app-shell-radius-sm: 0.625rem;
+  --app-shell-radius-md: 0.75rem;
+  --app-shell-radius-lg: 1rem;
+  --app-shell-radius-xl: 1.25rem;
+  --app-shell-radius-pill: 62.4375rem;
+  --app-shell-shadow-sm: 0 0.875rem 1.875rem rgba(0, 0, 0, 0.32);
+  --app-shell-shadow-md: 0 1.5rem 3.25rem rgba(0, 0, 0, 0.42);
+  --app-shell-shadow-lg: 0 2.25rem 5.125rem rgba(0, 0, 0, 0.56);
   --app-shell-text-hero: 800 clamp(2.2rem, 3vw, 3.6rem) / 0.96 var(--font-family-display);
   --app-shell-text-title: 700 clamp(1.45rem, 1.6vw, 2rem) / 1.05 var(--font-family-display);
   --app-shell-text-section: 600 1rem / 1.2 var(--font-family-display);
@@ -267,16 +267,16 @@
   --app-shell-text-caption: 500 0.78rem / 1.35 var(--font-family-sans);
 
   /* Button Tokens */
-  --button-height-sm: 36px;
-  --button-height-md: 44px;
-  --button-height-lg: 52px;
-  --button-padding-sm: 0 14px;
-  --button-padding-md: 0 20px;
-  --button-padding-lg: 0 24px;
+  --button-height-sm: 2.25rem;
+  --button-height-md: 2.75rem;
+  --button-height-lg: 3.25rem;
+  --button-padding-sm: 0 0.875rem;
+  --button-padding-md: 0 1.25rem;
+  --button-padding-lg: 0 1.5rem;
   --button-focus-ring: 0 0 0 2px var(--color-accent-blue);
   --button-primary-bg: linear-gradient(135deg, #1493ff, #0064d1);
   --button-primary-color: #ffffff;
-  --button-primary-shadow: 0 4px 12px color-mix(in srgb, var(--app-shell-color-accent) 14%, transparent);
+  --button-primary-shadow: 0 0.25rem 0.75rem color-mix(in srgb, var(--app-shell-color-accent) 14%, transparent);
   --button-primary-hover-filter: brightness(1.05);
   --button-primary-neutral-bg: rgba(255, 255, 255, 0.08);
   --button-primary-neutral-color: #f4f8fc;
@@ -302,12 +302,12 @@
   --button-danger-focus-ring: 0 0 0 2px var(--color-state-danger);
 
   /* Shared UI Surface Tokens */
-  --ui-control-height-md: 48px;
-  --ui-control-height-sm: 36px;
-  --ui-control-height-xs: 32px;
+  --ui-control-height-md: 3rem;
+  --ui-control-height-sm: 2.25rem;
+  --ui-control-height-xs: 2rem;
   --ui-control-radius: var(--radius-md);
   --ui-control-radius-sm: calc(var(--radius-md) - 2px);
-  --ui-control-radius-xs: calc(var(--radius-md) - 4px);
+  --ui-control-radius-xs: calc(var(--radius-md) - 0.25rem);
   --ui-control-bg: var(--color-bg-canvas);
   --ui-control-bg-subtle: rgba(255, 255, 255, 0.02);
   --ui-control-bg-hover: rgba(255, 255, 255, 0.04);
@@ -315,8 +315,8 @@
   --ui-control-border-strong: var(--color-line-strong);
   --ui-control-text: var(--color-ink);
   --ui-control-shadow-focus:
-    0 0 0 3px color-mix(in srgb, var(--color-accent-blue) 12%, transparent),
-    0 0 8px color-mix(in srgb, var(--color-accent-blue) 8%, transparent);
+    0 0 0 0.1875rem color-mix(in srgb, var(--color-accent-blue) 12%, transparent),
+    0 0 0.5rem color-mix(in srgb, var(--color-accent-blue) 8%, transparent);
   --ui-control-focus-ring: 0 0 0 2px var(--color-accent-blue);
   --ui-surface-ghost: rgba(255, 255, 255, 0.01);
   --ui-surface-soft: rgba(255, 255, 255, 0.03);
@@ -329,7 +329,7 @@
     linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.03));
   --ui-surface-danger-tint: rgba(239, 68, 68, 0.05);
   --ui-surface-danger-border: rgba(239, 68, 68, 0.22);
-  --ui-surface-danger-shadow: 0 0 24px rgba(239, 68, 68, 0.06);
+  --ui-surface-danger-shadow: 0 0 1.5rem rgba(239, 68, 68, 0.06);
   --ui-library-tag-focus-bg: #0d0e11;
   --ui-empty-page-search-bg: color-mix(in srgb, var(--color-surface-card) 70%, transparent);
   --ui-empty-page-search-border: color-mix(in srgb, var(--color-border-default) 78%, transparent);
@@ -345,18 +345,18 @@
   --ui-empty-page-filter-icon-border: color-mix(in srgb, var(--color-accent) 10%, transparent);
   --ui-empty-page-filter-description-color: color-mix(in srgb, var(--color-muted) 86%, var(--color-text-faint, var(--color-muted)));
   --ui-overlay-backdrop-bg: rgba(3, 4, 7, 0.74);
-  --ui-overlay-backdrop-blur: blur(14px) saturate(125%);
+  --ui-overlay-backdrop-blur: blur(0.875rem) saturate(125%);
   --ui-overlay-panel-border: color-mix(in srgb, var(--color-line-strong) 72%, rgba(255, 255, 255, 0.04));
   --ui-overlay-panel-shadow:
-    0 28px 72px rgba(0, 0, 0, 0.66),
-    0 10px 24px rgba(0, 0, 0, 0.28),
+    0 1.75rem 4.5rem rgba(0, 0, 0, 0.66),
+    0 0.625rem 1.5rem rgba(0, 0, 0, 0.28),
     inset 0 0 0 1px rgba(255, 255, 255, 0.03);
   --ui-overlay-panel-highlight:
     linear-gradient(180deg, rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0.008));
   --ui-floating-surface-border: color-mix(in srgb, var(--color-line-strong) 72%, rgba(255, 255, 255, 0.04));
   --ui-floating-surface-shadow:
-    0 12px 32px rgba(0, 0, 0, 0.4),
-    0 4px 12px rgba(0, 0, 0, 0.22),
+    0 0.75rem 2rem rgba(0, 0, 0, 0.4),
+    0 0.25rem 0.75rem rgba(0, 0, 0, 0.22),
     0 0 0 1px var(--color-border-subtle),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
   --ui-floating-surface-bg:
@@ -365,7 +365,7 @@
     linear-gradient(180deg,
       color-mix(in srgb, var(--color-panel-strong) 97%, black),
       color-mix(in srgb, var(--color-canvas) 94%, black));
-  --ui-floating-surface-blur: blur(22px) saturate(125%);
+  --ui-floating-surface-blur: blur(1.375rem) saturate(125%);
   --ui-floating-surface-highlight:
     linear-gradient(180deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0.01) 18%, transparent 44%);
   --ui-floating-surface-bottom-line: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.035), transparent);
@@ -379,7 +379,7 @@
   --ui-floating-action-border-hover: color-mix(in srgb, var(--color-line-strong) 84%, rgba(255, 255, 255, 0.05));
   --ui-floating-action-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    0 8px 16px rgba(0, 0, 0, 0.18);
+    0 0.5rem 1rem rgba(0, 0, 0, 0.18);
   --media-detail-hero-overlay:
     radial-gradient(circle at 15% 75%, rgba(9, 11, 15, 0.76) 0%, rgba(9, 11, 15, 0.4) 40%, transparent 80%),
     linear-gradient(90deg, rgba(9, 11, 15, 0.38) 0%, rgba(9, 11, 15, 0.12) 30%, transparent 70%),
@@ -396,18 +396,18 @@
   --media-detail-side-nav-bg-hover: color-mix(in srgb, var(--app-shell-color-panel-strong) 88%, transparent);
   --media-detail-side-nav-border: color-mix(in srgb, var(--color-border-default) 92%, transparent);
   --media-detail-side-nav-border-hover: color-mix(in srgb, var(--color-border-strong) 96%, transparent);
-  --media-detail-side-nav-shadow: 0 18px 34px rgba(0, 0, 0, 0.22);
-  --media-detail-side-nav-blur: blur(14px) saturate(130%);
+  --media-detail-side-nav-shadow: 0 1.125rem 2.125rem rgba(0, 0, 0, 0.22);
+  --media-detail-side-nav-blur: blur(0.875rem) saturate(130%);
   --media-detail-side-panel-bg:
     linear-gradient(180deg, rgba(255, 255, 255, 0.024) 0%, rgba(255, 255, 255, 0.006) 100%),
     linear-gradient(180deg, color-mix(in srgb, var(--app-shell-color-panel-strong) 86%, transparent) 0%, color-mix(in srgb, var(--app-shell-color-panel) 82%, transparent) 100%);
   --media-detail-side-panel-border: color-mix(in srgb, var(--app-shell-color-line) 92%, transparent);
   --media-detail-side-panel-shadow:
-    0 22px 54px rgba(0, 0, 0, 0.34),
-    0 8px 22px rgba(0, 0, 0, 0.2),
+    0 1.375rem 3.375rem rgba(0, 0, 0, 0.34),
+    0 0.5rem 1.375rem rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.028),
     inset 0 0 0 1px rgba(255, 255, 255, 0.01);
-  --media-detail-side-panel-blur: blur(24px) saturate(122%);
+  --media-detail-side-panel-blur: blur(1.5rem) saturate(122%);
   --media-detail-side-panel-highlight:
     linear-gradient(180deg, rgba(255, 255, 255, 0.022) 0%, rgba(255, 255, 255, 0.008) 14%, transparent 30%);
   --media-detail-panel-section-bg:
@@ -423,10 +423,10 @@
   --media-detail-panel-card-border: color-mix(in srgb, var(--app-shell-color-line) 72%, transparent);
   --media-detail-panel-card-border-hover: color-mix(in srgb, var(--app-shell-color-line-strong) 86%, transparent);
   --media-detail-panel-card-shadow:
-    0 10px 24px rgba(0, 0, 0, 0.12),
+    0 0.625rem 1.5rem rgba(0, 0, 0, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.014);
   --media-detail-panel-card-shadow-hover:
-    0 14px 30px rgba(0, 0, 0, 0.16),
+    0 0.875rem 1.875rem rgba(0, 0, 0, 0.16),
     inset 0 1px 0 rgba(255, 255, 255, 0.02);
   --media-detail-panel-pill-bg: rgba(255, 255, 255, 0.01);
   --media-detail-panel-pill-border: color-mix(in srgb, var(--app-shell-color-line) 80%, transparent);
@@ -443,10 +443,10 @@
   --media-detail-tag-pill-highlight:
     linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.025) 40%, transparent 100%);
   --media-detail-tag-pill-shadow:
-    0 6px 14px rgba(0, 0, 0, 0.16),
+    0 0.375rem 0.875rem rgba(0, 0, 0, 0.16),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
   --media-detail-tag-pill-shadow-hover:
-    0 10px 20px rgba(0, 0, 0, 0.2),
+    0 0.625rem 1.25rem rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
   --media-detail-tag-pill-suggested-bg:
     linear-gradient(180deg, color-mix(in srgb, var(--color-bg-elevated) 95%, var(--pill-tag-color, var(--color-accent-blue)) 5%), color-mix(in srgb, var(--color-bg-canvas) 86%, var(--pill-tag-color, var(--color-accent-blue)) 4%));
@@ -466,33 +466,33 @@
     linear-gradient(180deg, color-mix(in srgb, var(--color-state-danger) 82%, white 18%), color-mix(in srgb, var(--color-state-danger) 90%, #220812 10%));
 
   /* Tooltip Tokens */
-  --tooltip-max-width: 220px;
-  --tooltip-padding: 8px 10px;
-  --tooltip-radius: 12px;
-  --tooltip-offset: 10px;
+  --tooltip-max-width: 13.75rem;
+  --tooltip-padding: 0.5rem 0.625rem;
+  --tooltip-radius: 0.75rem;
+  --tooltip-offset: 0.625rem;
   --tooltip-bg:
     linear-gradient(180deg, color-mix(in srgb, var(--color-bg-elevated) 85%, transparent), color-mix(in srgb, var(--color-bg-canvas) 75%, transparent));
   --tooltip-border: var(--color-border-strong);
   --tooltip-color: var(--color-text-primary);
-  --tooltip-shadow: 0 16px 38px rgba(0, 0, 0, 0.34);
-  --tooltip-blur: blur(16px) saturate(135%);
+  --tooltip-shadow: 0 1rem 2.375rem rgba(0, 0, 0, 0.34);
+  --tooltip-blur: blur(1rem) saturate(135%);
 
   /* Fullscreen Overlay UI Tokens */
-  --ui-overlay-top: 46px;
+  --ui-overlay-top: 2.875rem;
   --ui-overlay-z: 1000;
   --ui-overlay-bg: var(--color-bg-canvas);
-  --ui-overlay-sidebar-width: 200px;
-  --ui-overlay-sidebar-padding: 29px 18px 30px 18px;
+  --ui-overlay-sidebar-width: 12.5rem;
+  --ui-overlay-sidebar-padding: 1.8125rem 1.125rem 1.875rem 1.125rem;
   --ui-overlay-sidebar-bg:
     linear-gradient(180deg, var(--color-panel-strong), var(--color-panel)),
     var(--app-shell-color-panel-soft, rgba(255, 255, 255, 0.018));
-  --ui-overlay-sidebar-blur: blur(22px) saturate(120%);
-  --ui-overlay-content-max-width: 760px;
-  --ui-overlay-content-padding: 29px 40px 120px 40px;
-  --ui-overlay-close-top: 30px;
-  --ui-overlay-close-right: 40px;
+  --ui-overlay-sidebar-blur: blur(1.375rem) saturate(120%);
+  --ui-overlay-content-max-width: 47.5rem;
+  --ui-overlay-content-padding: 1.8125rem 2.5rem 7.5rem 2.5rem;
+  --ui-overlay-close-top: 1.875rem;
+  --ui-overlay-close-right: 2.5rem;
   --ui-overlay-close-z: 1010;
-  --ui-overlay-close-size: 36px;
+  --ui-overlay-close-size: 2.25rem;
   --ui-overlay-close-bg: rgba(255, 255, 255, 0.03);
   --ui-overlay-close-bg-hover: rgba(255, 255, 255, 0.08);
   --ui-overlay-accent-surface: color-mix(in srgb, var(--color-state-info) 5%, transparent);
@@ -501,8 +501,8 @@
   --ui-overlay-accent-border-soft: color-mix(in srgb, var(--color-state-info) 12%, transparent);
   --ui-overlay-accent-border: color-mix(in srgb, var(--color-state-info) 40%, transparent);
   --ui-overlay-accent-fill-soft: color-mix(in srgb, var(--color-state-info) 15%, transparent);
-  --ui-overlay-accent-shadow: 0 0 16px color-mix(in srgb, var(--color-state-info) 8%, transparent);
-  --ui-overlay-accent-shadow-soft: 0 0 16px color-mix(in srgb, var(--color-state-info) 6%, transparent);
+  --ui-overlay-accent-shadow: 0 0 1rem color-mix(in srgb, var(--color-state-info) 8%, transparent);
+  --ui-overlay-accent-shadow-soft: 0 0 1rem color-mix(in srgb, var(--color-state-info) 6%, transparent);
   --ui-overlay-danger-bg: color-mix(in srgb, var(--color-state-danger) 8%, transparent);
   --ui-overlay-danger-border: color-mix(in srgb, var(--color-state-danger) 20%, transparent);
   --ui-overlay-warning-bg: color-mix(in srgb, var(--color-state-warning) 8%, transparent);
@@ -526,7 +526,7 @@
     linear-gradient(180deg, color-mix(in srgb, var(--color-bg-elevated) 96%, transparent), color-mix(in srgb, var(--color-bg-canvas) 92%, transparent));
   --toast-border: var(--color-border-strong);
   --toast-shadow: var(--ui-floating-surface-shadow);
-  --toast-blur: blur(12px) saturate(145%);
+  --toast-blur: blur(0.75rem) saturate(145%);
   --toast-success-bg:
     radial-gradient(circle at top left, color-mix(in srgb, var(--color-state-success) 12%, transparent), transparent 42%),
     linear-gradient(180deg, color-mix(in srgb, var(--color-bg-elevated) 98%, transparent), color-mix(in srgb, var(--color-bg-canvas) 95%, transparent));
@@ -551,40 +551,40 @@
 
 
   /* Standard Spacing Primitives */
-  --space-2xs: 4px;
-  --space-xs: 6px;
-  --space-sm: 8px;
-  --space-md: 10px;
-  --space-lg: 12px;
-  --space-xl: 14px;
-  --space-2xl: 16px;
-  --space-3xl: 20px;
-  --space-4xl: 24px;
-  --space-5xl: 32px;
-  --space-6xl: 40px;
-  --space-7xl: 56px;
-  --space-8xl: 72px;
+  --space-2xs: 0.25rem;
+  --space-xs: 0.375rem;
+  --space-sm: 0.5rem;
+  --space-md: 0.625rem;
+  --space-lg: 0.75rem;
+  --space-xl: 0.875rem;
+  --space-2xl: 1rem;
+  --space-3xl: 1.25rem;
+  --space-4xl: 1.5rem;
+  --space-5xl: 2rem;
+  --space-6xl: 2.5rem;
+  --space-7xl: 3.5rem;
+  --space-8xl: 4.5rem;
 
   /* Radius */
   /* Standard Border Radii */
   --radius-none: 0px;
   --radius-2xs: 2px;
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-2xl: 32px;
-  --radius-full: 9999px;
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-full: 624.9375rem;
 
   /* Shadow */
-  --shadow-xs: 0 2px 8px rgba(0, 0, 0, 0.2);
-  --shadow-sm-strong: 0 4px 16px rgba(0, 0, 0, 0.25);
+  --shadow-xs: 0 2px 0.5rem rgba(0, 0, 0, 0.2);
+  --shadow-sm-strong: 0 0.25rem 1rem rgba(0, 0, 0, 0.25);
   --shadow-sm: var(--app-shell-shadow-sm);
   --shadow-md: var(--app-shell-shadow-md);
   --shadow-lg: var(--app-shell-shadow-lg);
-  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.5);
-  --shadow-focus-blue: 0 8px 20px rgba(59, 130, 246, 0.2);
+  --shadow-xl: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.5);
+  --shadow-focus-blue: 0 0.5rem 1.25rem rgba(59, 130, 246, 0.2);
 
   /* Motion */
   --motion-duration-fast: 140ms;
@@ -622,14 +622,14 @@
   --z-index-toast: 500;
 
   /* Effects */
-  --glass-blur: blur(12px);
-  --glass-blur-sm: blur(8px);
-  --glass-blur-md: blur(10px);
+  --glass-blur: blur(0.75rem);
+  --glass-blur-sm: blur(0.5rem);
+  --glass-blur-md: blur(0.625rem);
 
   /* Dropzone Tokens */
   --color-dropzone-panel-bg: color-mix(in srgb, var(--color-bg-elevated) 95%, black);
   --shadow-overlay-dropzone:
-    0 12px 28px color-mix(in srgb, var(--app-shell-color-accent) 12%, transparent),
-    0 6px 14px rgba(0, 0, 0, 0.25),
+    0 0.75rem 1.75rem color-mix(in srgb, var(--app-shell-color-accent) 12%, transparent),
+    0 0.375rem 0.875rem rgba(0, 0, 0, 0.25),
     0 0 0 1px var(--color-border-subtle);
 }

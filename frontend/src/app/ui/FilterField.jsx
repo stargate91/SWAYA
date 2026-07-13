@@ -1,14 +1,13 @@
 import React from 'react';
+import './FilterField.css';
 
-const FilterField = React.forwardRef(({ label, children, className = '', ...props }, ref) => {
+export default function FilterField({ label, children, className = '', ref, ...props }) {
   return (
-    <div ref={ref} className={`library-sorter-container ${className}`.trim()} {...props}>
-      {label && <span className="library-sorter-label">{label}</span>}
+    <div ref={ref} className={`ui-filter-field ${className}`.trim()} {...props}>
+      {label && <span className="ui-filter-field__label">{label}</span>}
       {children}
     </div>
   );
-});
+}
 
-FilterField.displayName = 'FilterField';
 
-export default FilterField;

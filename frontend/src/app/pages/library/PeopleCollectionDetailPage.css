@@ -17,14 +17,14 @@
 }
 
 .is-scrolled .entity-detail-page__transition-wrapper {
-  transform: translateY(calc(-100vh + var(--page-top-offset, 4rem) + 120px - var(--space-4xl)));
+  transform: translateY(calc(-100vh + var(--page-top-offset, 4rem) + 7.5rem - var(--space-4xl)));
 }
 
 .entity-detail-page__content-section {
   display: flex;
   flex-direction: column;
   gap: var(--space-xl);
-  max-width: 860px;
+  max-width: 53.75rem;
 }
 
 .entity-detail-page--collection .entity-detail-page__content-section {
@@ -36,7 +36,7 @@
 }
 
 .entity-detail-page__content-section--status {
-  max-width: 720px;
+  max-width: 45rem;
 }
 
 .entity-detail-page__status-card {
@@ -69,7 +69,7 @@
   gap: var(--space-sm);
 }
 
-@media (max-width: 720px) {
+@media (max-width: 45rem) {
   .entity-detail-page .media-detail-page__container {
     gap: var(--space-xl);
   }
@@ -95,17 +95,17 @@
   --socials-border: 1px solid color-mix(in srgb, var(--color-border-default) 35%, transparent);
   border: var(--socials-border);
   border-radius: var(--radius-full);
-  --socials-padding: 5px;
+  --socials-padding: 0.3125rem;
   padding: var(--socials-padding);
-  box-shadow: 0 8px 24px color-mix(in srgb, black 25%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 0.5rem 1.5rem color-mix(in srgb, black 25%, transparent);
+  backdrop-filter: blur(0.75rem);
+  -webkit-backdrop-filter: blur(0.75rem);
   transition: border-color var(--motion-base), background-color var(--motion-base);
 }
 
 .entity-detail-page__scroll-toggle-container {
   position: fixed;
-  bottom: 28px;
+  bottom: 1.75rem;
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;
@@ -117,8 +117,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 2.375rem;
+  height: 2.375rem;
   border-radius: var(--radius-md);
   --scroll-border: 1px solid color-mix(in srgb, var(--color-border-default) 45%, transparent);
   border: var(--scroll-border);
@@ -126,10 +126,10 @@
   background-color: var(--scroll-bg);
   color: var(--color-text-primary);
   cursor: pointer;
-  --scroll-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --scroll-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.5);
   box-shadow: var(--scroll-shadow);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(1rem);
+  -webkit-backdrop-filter: blur(1rem);
   transition: all var(--motion-base);
   --scroll-animation: bounceArrowScroll 2s infinite;
   animation: var(--scroll-animation);
@@ -156,10 +156,10 @@
     transform: translateY(0);
   }
   40% {
-    transform: translateY(5px);
+    transform: translateY(0.3125rem);
   }
   60% {
-    transform: translateY(2.5px);
+    transform: translateY(2.0.3125rem);
   }
 }
 
@@ -188,7 +188,7 @@
 }
 
 .entity-detail-page__bottom-socials--expanded .entity-detail-page__bottom-socials-extra {
-  max-width: 1200px;
+  max-width: 75rem;
   opacity: 1;
   pointer-events: auto;
 }
@@ -197,8 +197,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
   padding: 0;
   border-radius: var(--radius-full);
   background-color: transparent;
@@ -217,8 +217,8 @@
 }
 
 .entity-detail-page__bottom-social-btn img {
-  width: 16px;
-  height: 16px;
+  width: 1rem;
+  height: 1rem;
   object-fit: contain;
   opacity: 0.75;
   transition: opacity var(--motion-fast);
@@ -232,8 +232,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
   border-radius: var(--radius-full);
   border: 1px solid transparent;
   background-color: transparent;
@@ -266,10 +266,10 @@
 }
 
 .ui-scroll-row-container.collection-items-horizontal-grid-wrapper {
-  --wrapper-pt: 8px;
-  --wrapper-pb: 8px;
-  --wrapper-mt: -8px;
-  --wrapper-mb: -8px;
+  --wrapper-pt: 0.5rem;
+  --wrapper-pb: 0.5rem;
+  --wrapper-mt: -0.5rem;
+  --wrapper-mb: -0.5rem;
   padding-top: var(--wrapper-pt);
   padding-bottom: var(--wrapper-pb);
   margin-top: var(--wrapper-mt);
@@ -282,7 +282,7 @@
 }
 
 .collection-items-horizontal-grid-wrapper .ui-poster-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-0.25rem);
 }
 
 .collection-items-horizontal-grid-wrapper .ui-pill--default {

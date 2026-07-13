@@ -44,7 +44,7 @@
 .peaks-table__body {
   display: flex;
   flex-direction: column;
-  max-height: 350px;
+  max-height: 21.875rem;
   overflow-y: auto;
 }
 
@@ -72,7 +72,7 @@
 
 .peaks-table__col-header--actions,
 .peaks-table__cell--actions {
-  flex: 0 0 40px;
+  flex: 0 0 2.5rem;
   display: flex;
   justify-content: flex-end;
 }
@@ -99,7 +99,7 @@
   color: var(--pill-color);
   font-weight: var(--font-weight-bold);
   font-size: var(--font-size-2xs);
-  --pill-padding: 1px 6px;
+  --pill-padding: 1px 0.375rem;
   padding: var(--pill-padding);
   border-radius: var(--radius-sm);
 }
