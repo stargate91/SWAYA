@@ -400,7 +400,7 @@ class ListsService:
                 if prefix == "tmdb":
                     tmdb_id = int(val) if val.isdigit() else val
                     media_item_id = None
-                elif prefix in ("porndb", "theporndb", "stash", "stashdb", "fansdb"):
+                elif prefix in ("porndb", "theporndb", "stash", "stashdb", "fansdb", "scene", "movie"):
                     tmdb_id = media_item_id
                     media_item_id = None
                 elif val.isdigit():
@@ -415,7 +415,7 @@ class ListsService:
         if tmdb_id and isinstance(tmdb_id, str):
             if "_" in tmdb_id:
                 prefix, val = tmdb_id.split("_", 1)
-                if prefix in ("tmdb", "porndb", "stash", "stashdb", "fansdb"):
+                if prefix in ("tmdb", "porndb", "theporndb", "stash", "stashdb", "fansdb", "scene", "movie"):
                     if prefix == "tmdb":
                         provider = Provider.TMDB
                     elif prefix in ("porndb", "theporndb"):
@@ -424,6 +424,14 @@ class ListsService:
                         provider = Provider.STASHDB
                     elif prefix == "fansdb":
                         provider = Provider.FANSDB
+                    elif prefix in ("scene", "movie"):
+                        # If prefix is generic scene/movie, try to detect the provider from existing matches
+                        import re
+                        is_uuid = bool(re.match(r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", val))
+                        if is_uuid:
+                            provider = Provider.STASHDB
+                        else:
+                            provider = Provider.PORNDB
                     external_id = val
                 else:
                     external_id = tmdb_id
@@ -460,10 +468,22 @@ class ListsService:
         if external_id:
             from app.domains.metadata.models import MetadataMatch
             from datetime import datetime
-            match = self.db.query(MetadataMatch).filter(
-                MetadataMatch.provider == provider,
-                MetadataMatch.external_id == str(external_id)
-            ).first()
+            # Use robust deduplicated lookup for adult scenes
+            if media_type == "scene" or provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB):
+                clean_id = str(external_id)
+                if clean_id.startswith("scene_"):
+                    clean_id = clean_id.split("_", 1)[1]
+                candidates = [clean_id, f"scene_{clean_id}"]
+                match = self.db.query(MetadataMatch).filter(
+                    MetadataMatch.provider.in_([Provider.STASHDB, Provider.PORNDB, Provider.FANSDB]),
+                    MetadataMatch.external_id.in_(candidates),
+                    MetadataMatch.media_type == MediaType.SCENE
+                ).first()
+            else:
+                match = self.db.query(MetadataMatch).filter(
+                    MetadataMatch.provider == provider,
+                    MetadataMatch.external_id == str(external_id)
+                ).first()
             if not match:
                 try:
                     m_type = MediaType(media_type.lower())

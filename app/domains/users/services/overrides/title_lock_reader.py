@@ -18,7 +18,7 @@ class TitleLockReader:
         if not media_item_id and not metadata_match_id:
             if isinstance(item_id, str) and "_" in item_id:
                 prefix, val = item_id.split("_", 1)
-                if prefix in ("tmdb", "porndb", "theporndb", "stash", "stashdb", "fansdb"):
+                if prefix in ("tmdb", "porndb", "theporndb", "stash", "stashdb", "fansdb", "scene", "movie"):
                     from app.shared_kernel.enums import Provider, MediaType
                     from app.domains.metadata.models import MetadataMatch
                     
@@ -31,17 +31,40 @@ class TitleLockReader:
                         provider = Provider.STASHDB
                     elif prefix == "fansdb":
                         provider = Provider.FANSDB
+                    elif prefix in ("scene", "movie"):
+                        # If prefix is generic scene/movie, try to detect the provider from existing matches
+                        import re
+                        is_uuid = bool(re.match(r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", val))
+                        if is_uuid:
+                            provider = Provider.STASHDB
+                        else:
+                            provider = Provider.PORNDB
                     external_id = val
                     
-                    match = self.db.query(MetadataMatch).filter(
-                        MetadataMatch.provider == provider,
-                        MetadataMatch.external_id == str(external_id)
-                    ).first()
-                    # PornDB stores scene external_ids with 'scene_' prefix
-                    if not match and provider == Provider.PORNDB:
+                    m_type_guessed = MediaType.MOVIE
+                    if media_type:
+                        try:
+                            m_type_guessed = MediaType(media_type.lower())
+                        except ValueError:
+                            m_type_guessed = MediaType.SCENE if media_type == "scene" else MediaType.MOVIE
+                    elif prefix in ("porndb", "theporndb", "stash", "stashdb", "fansdb", "scene"):
+                        m_type_guessed = MediaType.SCENE
+
+                    match = None
+                    if m_type_guessed == MediaType.SCENE or provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB):
+                        clean_id = str(external_id)
+                        if clean_id.startswith("scene_"):
+                            clean_id = clean_id.split("_", 1)[1]
+                        candidates = [clean_id, f"scene_{clean_id}"]
+                        match = self.db.query(MetadataMatch).filter(
+                            MetadataMatch.provider.in_([Provider.STASHDB, Provider.PORNDB, Provider.FANSDB]),
+                            MetadataMatch.external_id.in_(candidates),
+                            MetadataMatch.media_type == MediaType.SCENE
+                        ).first()
+                    else:
                         match = self.db.query(MetadataMatch).filter(
                             MetadataMatch.provider == provider,
-                            MetadataMatch.external_id == f"scene_{external_id}"
+                            MetadataMatch.external_id == str(external_id)
                         ).first()
                     
                     # When multiple matches share the same external_id (e.g. TMDB TV shows
@@ -62,8 +85,8 @@ class TitleLockReader:
                                 m_type = MediaType(media_type.lower())
                             except ValueError:
                                 m_type = MediaType.SCENE if media_type == "scene" else MediaType.MOVIE
-                        elif prefix in ("porndb", "theporndb", "stash", "stashdb", "fansdb"):
-                            m_type = MediaType.SCENE
+                        elif prefix in ("porndb", "theporndb", "stash", "stashdb", "fansdb", "scene", "movie"):
+                            m_type = MediaType.SCENE if prefix != "movie" else MediaType.MOVIE
                         
                         is_adult_item = (provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB)) or (m_type == MediaType.SCENE)
                         match = MetadataMatch(

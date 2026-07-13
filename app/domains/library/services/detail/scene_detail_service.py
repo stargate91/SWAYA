@@ -303,6 +303,7 @@ class SceneDetailService(DetailFormatter):
             )
             # 2b. Sync performer links so they appear in list views
             self._sync_performer_links(db, match_db, scene_data, provider_prefix)
+            self._sync_studios(db, match_db, scene_data)
 
         local_poster = override.custom_poster if override else None
         local_backdrop = override.custom_backdrop if override else None
@@ -400,6 +401,23 @@ class SceneDetailService(DetailFormatter):
         ExternalLinksBuilder.append_links(result, result["external_ids"], "scene")
         return SceneDetailResponse(**result)
 
+    def _get_sibling_matches(self, db: Session, match_db: MetadataMatch) -> list:
+        from app.domains.metadata.models import MetadataMatch
+        from app.shared_kernel.enums import MediaType
+        if not match_db or match_db.media_type != MediaType.SCENE:
+            return [match_db] if match_db else []
+        
+        clean_id = str(match_db.external_id)
+        if clean_id.startswith("scene_"):
+            clean_id = clean_id.split("_", 1)[1]
+            
+        candidates = [clean_id, f"scene_{clean_id}"]
+        siblings = db.query(MetadataMatch).filter(
+            MetadataMatch.media_type == MediaType.SCENE,
+            MetadataMatch.external_id.in_(candidates)
+        ).all()
+        return siblings
+
     def _sync_performer_links(self, db: Session, match_db: MetadataMatch, scene_data: dict, provider_prefix: str):
         """Ensure performer links exist in the DB for this match so list views can display them."""
         from app.domains.people.models import Person, MediaPersonLink, ExternalSourceLink
@@ -409,58 +427,138 @@ class SceneDetailService(DetailFormatter):
         if not performers:
             return
 
-        existing_person_ids = {link.person_id for link in match_db.people_links}
-        if existing_person_ids:
-            return  # already has links, skip
+        sibling_matches = self._get_sibling_matches(db, match_db)
+        for target_match in sibling_matches:
+            existing_person_ids = {link.person_id for link in target_match.people_links}
 
-        prov_enum = None
-        if provider_prefix in ("stashdb", "stash"):
-            prov_enum = Provider.STASHDB
-        elif provider_prefix == "fansdb":
-            prov_enum = Provider.FANSDB
-        elif provider_prefix in ("porndb", "theporndb"):
-            prov_enum = Provider.PORNDB
+            prov_enum = None
+            if provider_prefix in ("stashdb", "stash"):
+                prov_enum = Provider.STASHDB
+            elif provider_prefix == "fansdb":
+                prov_enum = Provider.FANSDB
+            elif provider_prefix in ("porndb", "theporndb"):
+                prov_enum = Provider.PORNDB
 
-        order = 0
-        for p_entry in performers:
-            perf = p_entry.get("performer") or p_entry
-            perf_name = perf.get("name")
-            if not perf_name:
-                continue
+            order = 0
+            for p_entry in performers:
+                perf = p_entry.get("performer") or p_entry
+                perf_name = perf.get("name")
+                if not perf_name:
+                    continue
 
-            person_db = None
-            perf_ext_id = perf.get("id")
-            if perf_ext_id and prov_enum:
-                link = db.query(ExternalSourceLink).filter(
-                    ExternalSourceLink.provider == prov_enum,
-                    ExternalSourceLink.external_id == str(perf_ext_id)
-                ).first()
-                if link:
-                    person_db = link.person
+                person_db = None
+                perf_ext_id = perf.get("id")
+                if perf_ext_id and prov_enum:
+                    link = db.query(ExternalSourceLink).filter(
+                        ExternalSourceLink.provider == prov_enum,
+                        ExternalSourceLink.external_id == str(perf_ext_id)
+                    ).first()
+                    if link:
+                        person_db = link.person
 
-            if not person_db:
-                person_db = db.query(Person).filter(Person.name == perf_name).first()
+                if not person_db:
+                    person_db = db.query(Person).filter(Person.name == perf_name).first()
 
-            if not person_db:
+                if not person_db:
+                    # Create the performer
+                    gender_str = str(perf.get("gender") or "").upper()
+                    mapped_gender = 0
+                    if "FEMALE" in gender_str:
+                        mapped_gender = 1
+                    elif "MALE" in gender_str:
+                        mapped_gender = 2
+                    elif gender_str:
+                        mapped_gender = 3
+                    
+                    p_images = perf.get("images") or []
+                    p_img = p_images[0].get("url") if p_images else (perf.get("image") or perf.get("profile_path"))
+                    
+                    person_db = Person(
+                        name=perf_name,
+                        is_adult=True,
+                        known_for_department="Acting",
+                        is_active=True,
+                        profile_path=p_img,
+                        gender=mapped_gender,
+                        popularity=perf.get("rating_porndb") or 0,
+                        rating_porndb=perf.get("rating_porndb"),
+                        scene_count=perf.get("scene_count"),
+                        external_ids={
+                            provider_prefix: str(perf_ext_id) if perf_ext_id else "",
+                            f"{provider_prefix}_id": str(perf_ext_id) if perf_ext_id else "",
+                            "source": provider_prefix
+                        } if provider_prefix else {}
+                    )
+                    db.add(person_db)
+                    db.flush()
+                    
+                    if perf_ext_id and prov_enum:
+                        link = ExternalSourceLink(
+                            person_id=person_db.id,
+                            provider=prov_enum,
+                            external_id=str(perf_ext_id),
+                            profile_url=p_img
+                        )
+                        db.add(link)
+                        db.flush()
+
+                if person_db.id in existing_person_ids:
+                    order += 1
+                    continue
+
+                new_link = MediaPersonLink(
+                    match_id=target_match.id,
+                    person_id=person_db.id,
+                    role=RoleType.ACTOR,
+                    order=order
+                )
+                db.add(new_link)
+                existing_person_ids.add(person_db.id)
                 order += 1
-                continue
-
-            if person_db.id in existing_person_ids:
-                order += 1
-                continue
-
-            new_link = MediaPersonLink(
-                match_id=match_db.id,
-                person_id=person_db.id,
-                role=RoleType.ACTOR,
-                order=order
-            )
-            db.add(new_link)
-            existing_person_ids.add(person_db.id)
-            order += 1
 
         try:
             db.commit()
         except Exception as e:
             logger.debug(f"Failed to sync performer links: {e}")
+            db.rollback()
+
+    def _sync_studios(self, db: Session, match_db: MetadataMatch, scene_data: dict):
+        """Ensure studios exist in the DB and are linked to the match."""
+        from app.domains.metadata.models import Studio
+
+        studio_data = scene_data.get("studio") or scene_data.get("site") or {}
+        studio_name = studio_data.get("name")
+        if not studio_name:
+            return
+
+        studio_images = studio_data.get("images") or []
+        studio_logo = studio_images[0].get("url") if studio_images else (studio_data.get("logo") or studio_data.get("image") or studio_data.get("poster"))
+
+        parent_data = studio_data.get("parent") or studio_data.get("network") or {}
+        parent_name = parent_data.get("name")
+        parent_images = parent_data.get("images") or []
+        parent_logo = parent_images[0].get("url") if parent_images else (parent_data.get("logo") or parent_data.get("image") or parent_data.get("poster"))
+
+        try:
+            studio_db = db.query(Studio).filter(Studio.name == studio_name).first()
+            if not studio_db:
+                studio_db = Studio(name=studio_name, logo_path=studio_logo)
+                db.add(studio_db)
+                db.flush()
+
+            if parent_name:
+                parent_studio_db = db.query(Studio).filter(Studio.name == parent_name).first()
+                if not parent_studio_db:
+                    parent_studio_db = Studio(name=parent_name, logo_path=parent_logo)
+                    db.add(parent_studio_db)
+                    db.flush()
+                studio_db.parent_studio_id = parent_studio_db.id
+
+            sibling_matches = self._get_sibling_matches(db, match_db)
+            for target_match in sibling_matches:
+                if studio_db not in target_match.studios:
+                    target_match.studios.append(studio_db)
+            db.commit()
+        except Exception as e:
+            logger.debug(f"Failed to sync studio: {e}")
             db.rollback()

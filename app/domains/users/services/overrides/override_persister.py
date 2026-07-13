@@ -8,7 +8,7 @@ from app.domains.users.schemas import (
     BulkOverridesUpdate,
     BulkWatchedUpdate,
 )
-from app.shared_kernel.exceptions import NotFoundException
+from app.shared_kernel.exceptions import NotFoundException, BadRequestException
 from app.domains.users.services.overrides.lock_validator import LockValidator
 
 logger = logging.getLogger(__name__)
@@ -468,9 +468,47 @@ class OverridePersister:
                 enrich_fn = _ENRICH_DISPATCH.get(media_type)
                 if enrich_fn:
                     try:
-                        enrich_fn()
+                        res = enrich_fn()
+                        if res and getattr(res, "status_code", 200) >= 400:
+                            raise Exception(f"Enrichment service returned status {res.status_code}")
+                        
+                        # Post-enrichment self-healing check:
+                        # If the match still has no localizations, release date, or backdrop, 
+                        # try to merge/redirect to a sibling match that does.
+                        if match and media_type == 'scene':
+                            from app.shared_kernel.enums import MediaType
+                            has_loc = db.query(MetadataMatch).filter(MetadataMatch.id == match.id).join(MetadataMatch.localizations).first() is not None
+                            if not has_loc and not match.release_date and not match.backdrop_path:
+                                # Look for a sibling match that is fully enriched
+                                clean_id = str(match.external_id)
+                                if clean_id.startswith("scene_"):
+                                    clean_id = clean_id.split("_", 1)[1]
+                                candidates = [clean_id, f"scene_{clean_id}"]
+                                sibling = db.query(MetadataMatch).filter(
+                                    MetadataMatch.id != match.id,
+                                    MetadataMatch.media_type == MediaType.SCENE,
+                                    MetadataMatch.external_id.in_(candidates)
+                                ).join(MetadataMatch.localizations).first()
+                                if sibling:
+                                    # Redirect override to the sibling match
+                                    override.metadata_match_id = sibling.id
+                                    # Safely delete the empty match
+                                    db.delete(match)
+                                    db.commit()
+                                    # Update reference to match for mainstream enrichment
+                                    match = sibling
                     except Exception as e:
                         logger.error(f"Auto-enrich failed for {media_type} {item_id}: {e}")
+                        # Clean up empty override/match to prevent "Unknown" black cards
+                        if override:
+                            if not override.custom_title and not override.custom_poster:
+                                db.delete(override)
+                        if match:
+                            has_loc = db.query(MetadataMatch).filter(MetadataMatch.id == match.id).join(MetadataMatch.localizations).first() is not None
+                            if not match.release_date and not match.backdrop_path and not has_loc:
+                                db.delete(match)
+                        db.commit()
+                        raise BadRequestException(f"Failed to track item: metadata enrichment failed. Error: {e}")
 
             if match and not match.is_adult and mainstream_enricher:
                 try:

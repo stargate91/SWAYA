@@ -47,8 +47,10 @@ class VideoQueryBuilder(BaseQueryBuilder):
             query, params, joined_localization, joined_override
         )
 
+        from sqlalchemy import select
+
         canonical_match_ids = self.db.query(
-            func.min(MetadataMatch.id)
+            func.min(MetadataMatch.id).label('min_id')
         ).filter(
             MetadataMatch.media_item_id.isnot(None),
             MetadataMatch.is_active,
@@ -56,7 +58,7 @@ class VideoQueryBuilder(BaseQueryBuilder):
             MetadataMatch.media_type == MediaType.SCENE,
             MetadataMatch.is_home_video == True
         ).group_by(MetadataMatch.media_item_id).subquery()
-        query = query.filter(MetadataMatch.id.in_(canonical_match_ids))
+        query = query.filter(MetadataMatch.id.in_(select(canonical_match_ids.c.min_id)))
 
         query = self._apply_sorting(query, params, joined_localization, joined_override)
         total_items = query.count()

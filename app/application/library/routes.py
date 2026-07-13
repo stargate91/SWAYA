@@ -311,7 +311,7 @@ def get_library_item_detail(
     # Auto-detect from ID prefix
     if "_" in item_id:
         prefix = item_id.split("_", 1)[0].lower()
-        if prefix in ("stash", "stashdb", "fansdb"):
+        if prefix in ("stash", "stashdb", "fansdb", "scene"):
             return DETAIL_DISPATCH["scene"](db, scrapers, item_id)
         elif prefix in ("porndb", "theporndb"):
             scene_uuid = item_id.split("_", 1)[1]
