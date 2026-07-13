@@ -5,7 +5,7 @@
   gap: var(--space-lg);
   width: 100%;
   max-width: 42.5rem;
-  height: 2rem;
+  height: var(--ui-control-height-xs);
   padding: 0 var(--space-lg);
   background: var(--color-progress-bg, var(--color-surface-glass));
   border: 1px solid var(--color-progress-border, var(--color-border-default));
@@ -17,8 +17,8 @@
 
 .ui-progress-bar__pulse-dot {
   position: relative;
-  width: 0.5rem;
-  height: 0.5rem;
+  width: var(--space-sm);
+  height: var(--space-sm);
   background: var(--color-accent-blue);
   border-radius: 50%;
   flex-shrink: 0;
@@ -66,7 +66,7 @@
 .ui-progress-bar__track {
   flex: 1 1 auto;
   min-width: 5rem;
-  height: 0.625rem;
+  height: var(--space-md);
   background: var(--color-progress-track, var(--color-border-default));
   border-radius: var(--radius-full);
   overflow: hidden;

@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import './Field.css';
 
+const REQUIRED_MARK = ' *';
+
 export default function Field({
   label,
   hint,
@@ -16,7 +18,7 @@ export default function Field({
       {label && (
         <label className="ui-field__label" htmlFor={htmlFor}>
           {label}
-          {required && <span className="ui-field__required" aria-hidden="true"> *</span>}
+          {required && <span className="ui-field__required" aria-hidden="true">{REQUIRED_MARK}</span>}
         </label>
       )}
       {hint && (

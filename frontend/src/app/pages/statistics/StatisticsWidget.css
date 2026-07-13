@@ -41,8 +41,8 @@
   background:
     radial-gradient(circle at top right, color-mix(in srgb, var(--color-accent-blue-soft) 12%, transparent), transparent 42%),
     linear-gradient(180deg, color-mix(in srgb, var(--color-surface-glass) 72%, transparent), var(--color-surface-card));
-  backdrop-filter: blur(1rem);
-  -webkit-backdrop-filter: blur(1rem);
+  backdrop-filter: var(--glass-blur-lg);
+  -webkit-backdrop-filter: var(--glass-blur-lg);
   transition: border-color var(--motion-duration-emphasized) var(--motion-ease-emphasized),
               background var(--motion-duration-emphasized) var(--motion-ease-emphasized),
               transform var(--motion-duration-emphasized) var(--motion-ease-emphasized),
@@ -74,7 +74,7 @@
 .stat-label {
   font-size: var(--font-size-2xs);
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: calc(2 * var(--letter-spacing-wide));
   color: var(--color-text-secondary);
   margin-bottom: var(--space-3xl);
   font-weight: var(--font-weight-extrabold);

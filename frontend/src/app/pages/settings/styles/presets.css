@@ -20,7 +20,7 @@
   font-size: var(--font-size-2xs);
   color: var(--color-muted);
   line-height: 1.4;
-  margin-top: 0.125rem;
+  margin-top: calc(var(--space-2xs) / 2);
 }
 
 .settings-mode-grid {
@@ -52,8 +52,8 @@
   font-weight: bold;
   color: var(--color-accent);
   background: var(--settings-accent-border-soft);
-  padding: 0.125rem var(--space-xs);
+  padding: calc(var(--space-2xs) / 2) var(--space-xs);
   border-radius: var(--radius-sm);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--letter-spacing-wide);
 }

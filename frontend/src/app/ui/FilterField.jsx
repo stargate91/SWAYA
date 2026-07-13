@@ -1,4 +1,3 @@
-import React from 'react';
 import './FilterField.css';
 
 export default function FilterField({ label, children, className = '', ref, ...props }) {

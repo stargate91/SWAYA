@@ -74,7 +74,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 12.5rem;
+  max-width: var(--ui-overlay-sidebar-width);
 }
 
 .enrichment-progress__count {
@@ -88,7 +88,7 @@
 /* Progress track inside ui-toast__description */
 .enrichment-progress__track {
   margin-top: var(--space-2xs);
-  height: 0.25rem;
+  height: var(--space-2xs);
   border-radius: var(--radius-pill);
   background: var(--color-surface-raised);
   overflow: hidden;

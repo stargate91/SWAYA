@@ -1,0 +1,113 @@
+/* src/app/pages/player/PlayerTokens.css */
+
+.player-page {
+  /* Font weights */
+  --player-weight-normal: 400;
+  --player-weight-medium: 500;
+  --player-weight-semibold: 600;
+  --player-weight-bold: 700;
+  --player-weight-extrabold: 800;
+
+  /* Font Families */
+  --player-font-family: Inter, system-ui, -apple-system, sans-serif;
+
+  /* Spacings */
+  --player-space-2px: 2px;
+  --player-space-2xs: 0.25rem;
+  --player-space-xs: 0.375rem;
+  --player-space-sm: 0.5rem;
+  --player-space-md: 0.625rem;
+  --player-space-lg: 0.75rem;
+  --player-space-xl: 0.875rem;
+  --player-space-2xl: 1rem;
+  --player-space-3xl: 1.25rem;
+  --player-space-4xl: 1.5rem;
+  --player-space-5xl: 1.75rem;
+  --player-space-6xl: 2rem;
+  --player-space-7xl: 3rem;
+
+  /* Border Radii */
+  --player-radius-xs: 2px;
+  --player-radius-sm: 4px;
+  --player-radius-md: 8px;
+  --player-radius-lg: 12px;
+  --player-radius-xl: 16px;
+  --player-radius-2xl: 24px;
+  --player-radius-full: 9999px;
+
+  /* Font Sizes */
+  --player-font-size-2xs: 0.6875rem;
+  --player-font-size-xs: 0.75rem;
+  --player-font-size-sm: 0.8125rem;
+  --player-font-size-md: 0.875rem;
+  --player-font-size-lg: 1rem;
+  --player-font-size-xl: 1.125rem;
+  --player-font-size-2xl: 1.25rem;
+  --player-font-size-3xl: 1.5rem;
+  --player-font-size-4xl: 1.75rem;
+
+  /* Colors and Backgrounds */
+  --player-accent: var(--color-accent); /* The allowed single global theme variable */
+  --player-accent-hover: var(--color-accent-strong);
+  --player-color-white: #ffffff;
+  --player-color-accent-default: #38bdf8;
+  --player-color-glass-faint-text: rgba(255, 255, 255, 0.15);
+  
+  --player-bg-overlay-heavy: rgba(0, 0, 0, 0.75);
+  --player-bg-overlay-medium: rgba(0, 0, 0, 0.45);
+  --player-bg-overlay-light: rgba(0, 0, 0, 0.4);
+  --player-bg-overlay-subtle: rgba(0, 0, 0, 0.2);
+  --player-bg-sidebar: rgba(15, 15, 18, 0.45);
+  
+  --player-bg-glass-subtle: rgba(255, 255, 255, 0.03);
+  --player-bg-glass-light: rgba(255, 255, 255, 0.05);
+  --player-bg-glass-medium: rgba(255, 255, 255, 0.1);
+
+  --player-color-ink: #ffffff;
+  --player-color-ink-muted: rgba(255, 255, 255, 0.75);
+  --player-color-ink-faint: rgba(255, 255, 255, 0.45);
+  --player-color-border-subtle: rgba(255, 255, 255, 0.08);
+  --player-color-border-default: rgba(255, 255, 255, 0.15);
+  --player-color-border-strong: rgba(255, 255, 255, 0.25);
+  --player-color-canvas: #0c0c0e;
+  --player-color-surface-glass: rgba(15, 15, 18, 0.6);
+  --player-color-surface-glass-strong: rgba(15, 15, 18, 0.85);
+  --player-color-state-danger: #ef4444;
+  --player-color-state-success: #22c55e;
+  --player-color-yellow: #fbbf24;
+  --player-bg-badge: rgba(15, 15, 18, 0.82);
+
+  /* Borders & Spacing elements */
+  --player-border-glass-subtle: rgba(255, 255, 255, 0.06);
+  --player-border-glass-default: rgba(255, 255, 255, 0.08);
+  --player-border-glass-medium: rgba(255, 255, 255, 0.1);
+  --player-border-glass-strong: rgba(255, 255, 255, 0.2);
+  --player-border-glass-faint: rgba(255, 255, 255, 0.15);
+
+  --player-border-osd: 1px solid var(--player-border-glass-medium);
+  --player-border-sidebar: 1px solid var(--player-border-glass-default);
+  --player-border-glass-thin: 1px solid var(--player-border-glass-default);
+  --player-border-glass-extra-thin: 1px solid var(--player-border-glass-subtle);
+  
+  --player-border-button-secondary-fallback: 1px solid var(--player-border-glass-faint);
+
+  /* Shadows */
+  --player-shadow-osd: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.5);
+  --player-shadow-sidebar: 0 0 3.125rem rgba(0, 0, 0, 0.6);
+  --player-shadow-tooltip: 0 0.75rem 2rem rgba(0, 0, 0, 0.4);
+  --player-shadow-dialog: 0 1rem 2.5rem rgba(0, 0, 0, 0.6);
+  --player-shadow-controls: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.4);
+  --player-shadow-header: 0 0.375rem 1.125rem rgba(0, 0, 0, 0.4);
+  --player-shadow-toast: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.5);
+
+  /* Transitions */
+  --player-transition-opacity: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --player-transition-transform: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  --player-transition-width: width 0.1s ease-out;
+
+  /* Animations */
+  --player-animation-fade: osd-fade-in 0.15s ease-out;
+  --player-animation-pulse: pulse 2s infinite ease-in-out;
+  
+  --player-shadow-card-hover: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.4);
+}

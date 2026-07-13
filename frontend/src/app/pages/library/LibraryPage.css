@@ -1,6 +1,6 @@
 .library-page {
   margin-top: calc(-1 * var(--page-top-offset, var(--space-4xl)));
-  margin-right: calc(-1 * var(--space-5xl, 1.75rem));
+  margin-right: calc(-1 * var(--space-5xl, calc(2 * var(--space-xl))));
   margin-bottom: 0;
 }
 
@@ -15,7 +15,7 @@
   min-width: 0;
   min-height: 0;
   padding-top: var(--page-top-offset, var(--space-4xl));
-  padding-right: var(--space-5xl, 1.75rem);
+  padding-right: var(--space-5xl, calc(2 * var(--space-xl)));
   padding-bottom: 0;
 }
 
@@ -59,8 +59,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
+  width: calc(2 * var(--space-xl));
+  height: calc(2 * var(--space-xl));
   flex-shrink: 0;
   border-radius: var(--radius-full);
   color: var(--color-text-secondary);
@@ -85,8 +85,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
+  width: calc(2 * var(--space-xl));
+  height: calc(2 * var(--space-xl));
   padding: 0;
   border: 0;
   border-radius: var(--radius-full);
@@ -141,7 +141,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  --sorter-custom-gap: 0.5rem;
+  --sorter-custom-gap: var(--space-sm);
   gap: var(--sorter-custom-gap);
   min-width: 8.75rem;
   max-width: 15rem;
@@ -173,8 +173,8 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-sm, var(--space-sm));
-  min-height: 1.75rem;
-  height: 1.75rem;
+  min-height: calc(2 * var(--space-xl));
+  height: calc(2 * var(--space-xl));
   padding: 0 var(--space-lg, var(--space-lg));
   font-size: var(--font-size-xs);
 }
@@ -213,8 +213,8 @@
 }
 
 .library-spinner {
-  width: 2rem;
-  height: 2rem;
+  width: var(--ui-control-height-xs);
+  height: var(--ui-control-height-xs);
   border: 2px solid var(--color-border-subtle, var(--color-border-subtle));
   border-top-color: var(--color-accent-blue);
   border-radius: 50%;
@@ -289,7 +289,7 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--space-lg) var(--space-xl);
-  min-height: 4.5rem;
+  min-height: var(--space-8xl);
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-md);
@@ -302,8 +302,8 @@
 }
 
 .add-people-modal__avatar {
-  width: 3.5rem;
-  height: 3.5rem;
+  width: var(--space-7xl);
+  height: var(--space-7xl);
   border-radius: 50%;
   overflow: hidden;
   background: var(--color-surface-glass-strong);
@@ -542,7 +542,7 @@
   gap: var(--space-xs);
   z-index: 3;
   opacity: 0;
-  transform: translateY(2px);
+  transform: translateY(var(--radius-2xs));
   transition: opacity var(--motion-fast), transform var(--motion-fast);
 }
 
@@ -553,8 +553,8 @@
 }
 
 .library-tag-card__actions .ui-icon-button {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: var(--space-4xl);
+  height: var(--space-4xl);
   border-radius: var(--radius-full);
   background: color-mix(in srgb, var(--color-bg-elevated) 82%, transparent);
   border-color: color-mix(in srgb, var(--tag-color) 16%, transparent);
@@ -581,7 +581,7 @@
   inset: 0;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.0625rem;
+  gap: var(--border-width-thin);
   padding: 0;
   opacity: 0.45;
   pointer-events: none;
@@ -625,11 +625,11 @@
 }
 
 .library-tag-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(calc(-1 * var(--radius-2xs)));
   border-color: color-mix(in srgb, var(--tag-color) 56%, transparent);
   box-shadow:
     var(--shadow-lg),
-    0 0 1rem color-mix(in srgb, var(--tag-color) 12%, transparent);
+    0 0 var(--space-2xl) color-mix(in srgb, var(--tag-color) 12%, transparent);
 }
 
 /* Disable hover border for cards in the library page */
@@ -647,7 +647,7 @@
   gap: 0.125rem;
   min-width: 0;
   flex: 1;
-  padding-right: 2.75rem;
+  padding-right: var(--button-height-md);
   position: relative;
   z-index: 2;
 }
@@ -673,7 +673,7 @@
   border-color: color-mix(in srgb, var(--tag-color) 60%, transparent);
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--tag-color) 45%, transparent),
-    0 0 0 0.25rem color-mix(in srgb, var(--tag-color) 16%, transparent),
+    0 0 0 var(--space-2xs) color-mix(in srgb, var(--tag-color) 16%, transparent),
     var(--shadow-lg);
 }
 
@@ -730,7 +730,7 @@
 .library-tag-expanded-panel__eyebrow {
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-bold);
-  letter-spacing: 0.12em;
+  letter-spacing: calc(3 * var(--letter-spacing-wide));
   text-transform: uppercase;
   color: color-mix(in srgb, var(--tag-color) 42%, var(--color-text-secondary));
 }
@@ -793,17 +793,17 @@
 }
 
 .library-tag-expanded-panel.is-focus-mode .ui-poster-card__title-overlay-label {
-  bottom: 0.625rem;
-  left: 0.625rem;
-  right: 0.625rem;
+  bottom: var(--space-md);
+  left: var(--space-md);
+  right: var(--space-md);
   font-size: var(--font-size-2xs);
-  text-shadow: 0 2px 0.625rem color-mix(in srgb, black 34%, transparent);
+  text-shadow: 0 var(--radius-2xs) var(--space-md) color-mix(in srgb, black 34%, transparent);
 }
 
 @keyframes slideDownFade {
   from {
     opacity: 0;
-    transform: translateY(-0.5rem);
+    transform: translateY(calc(-1 * var(--space-sm)));
   }
 
   to {
@@ -818,7 +818,7 @@
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(0.75rem);
+    transform: translateY(var(--space-lg));
   }
 
   to {
@@ -851,8 +851,8 @@
 }
 
 .library-header-btn.library-header-btn {
-  height: 1.75rem;
-  min-height: 1.75rem;
+  height: calc(2 * var(--space-xl));
+  min-height: calc(2 * var(--space-xl));
 }
 
 .create-tag-form {
@@ -876,8 +876,8 @@
 }
 
 .create-tag-form__color-btn {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: calc(2 * var(--space-xl));
+  height: calc(2 * var(--space-xl));
   border-radius: 50%;
   outline: none;
   cursor: pointer;
@@ -891,7 +891,7 @@
 
 .create-tag-form__color-hex-pill.create-tag-form__color-hex-pill {
   flex: 1;
-  height: 1.75rem;
+  height: calc(2 * var(--space-xl));
   border-radius: var(--radius-sm);
   font-family: var(--font-family-mono, monospace);
   font-size: var(--font-size-2xs);
@@ -901,7 +901,7 @@
 
 .create-tag-form__custom-color-label {
   position: relative;
-  height: 1.75rem;
+  height: calc(2 * var(--space-xl));
   border-radius: var(--radius-sm);
   cursor: pointer;
   display: flex;
@@ -988,10 +988,10 @@
 
 .create-tag-form__remove-image-btn {
   position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
-  width: 1.25rem;
-  height: 1.25rem;
+  top: var(--space-2xs);
+  right: var(--space-2xs);
+  width: var(--space-3xl);
+  height: var(--space-3xl);
   border-radius: 50%;
   background-color: color-mix(in srgb, black 60%, transparent);
   color: var(--color-text-primary);
@@ -1137,8 +1137,8 @@
 }
 
 .library-infinite-spinner {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: var(--space-4xl);
+  height: var(--space-4xl);
 }
 
 .library-title-group {
@@ -1157,7 +1157,7 @@
 
 .library-scene-date {
   opacity: 0.6;
-  font-size: 0.75rem;
+  font-size: var(--font-size-2xs);
   flex-shrink: 0;
 }
 

@@ -6,7 +6,7 @@
   right: 0;
   bottom: 0;
   background: var(--color-surface-overlay);
-  backdrop-filter: blur(0.25rem);
+  backdrop-filter: blur(var(--space-2xs));
   z-index: var(--z-index-backdrop);
   animation: uiDrawerFadeIn var(--motion-duration-slow) var(--motion-ease-standard);
 }
@@ -18,7 +18,7 @@
   height: calc(100vh - var(--layout-window-titlebar-height, 3rem));
   background: var(--color-bg-elevated);
   border-left: 1px solid var(--color-border-strong);
-  box-shadow: -0.625rem 0 2.1875rem color-mix(in srgb, black 60%, transparent);
+  box-shadow: calc(-1 * var(--space-md)) 0 2.1875rem color-mix(in srgb, black 60%, transparent);
   z-index: var(--z-index-modal);
   display: flex;
   flex-direction: column;
@@ -29,8 +29,8 @@
 
 .ui-drawer.ui-drawer--glass {
   background: color-mix(in srgb, var(--color-bg-elevated) 70%, transparent);
-  backdrop-filter: blur(1.25rem);
-  -webkit-backdrop-filter: blur(1.25rem);
+  backdrop-filter: blur(var(--space-3xl));
+  -webkit-backdrop-filter: blur(var(--space-3xl));
 }
 
 .ui-drawer.ui-drawer--contrast {

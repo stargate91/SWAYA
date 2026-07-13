@@ -173,7 +173,7 @@
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--letter-spacing-wide);
   margin-bottom: var(--space-2xs);
 }
 
@@ -258,7 +258,7 @@
     inset 0 1px 0 var(--color-border-default),
     0 0 0 1px color-mix(in srgb, var(--color-state-danger) 26%, transparent),
     var(--shadow-md);
-  backdrop-filter: blur(1.25rem) saturate(118%);
+  backdrop-filter: var(--glass-blur-lg) saturate(118%);
 }
 
 .settings-danger-zone-card .ui-card__title {
@@ -282,11 +282,11 @@
 }
 
 .settings-profile-avatar {
-  width: 4.5rem;
-  height: 4.5rem;
-  border-radius: 50%;
+  width: var(--space-8xl);
+  height: var(--space-8xl);
+  border-radius: var(--radius-full);
   overflow: hidden;
-  flex: 0 0 4.5rem;
+  flex: 0 0 var(--space-8xl);
   display: grid;
   place-items: center;
   color: var(--color-muted);

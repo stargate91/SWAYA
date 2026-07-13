@@ -16,8 +16,8 @@
 
 .ui-switch {
   position: relative;
-  width: 2.75rem;
-  height: 1.5rem;
+  width: var(--button-height-md);
+  height: var(--space-4xl);
   flex-shrink: 0;
 }
 
@@ -43,13 +43,13 @@
 
 .ui-switch__thumb {
   position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 1.125rem;
-  height: 1.125rem;
+  top: var(--radius-2xs);
+  left: var(--radius-2xs);
+  width: var(--font-size-lg);
+  height: var(--font-size-lg);
   border-radius: 50%;
   background: var(--color-text-secondary);
-  box-shadow: 0 2px 0.25rem color-mix(in srgb, black 25%, transparent);
+  box-shadow: 0 var(--radius-2xs) var(--space-2xs) color-mix(in srgb, black 25%, transparent);
   transition: transform var(--motion-emphasized), background-color var(--motion-emphasized);
 }
 
@@ -59,7 +59,7 @@
 }
 
 .ui-switch__input:checked + .ui-switch__track .ui-switch__thumb {
-  transform: translateX(1.25rem);
+  transform: translateX(var(--space-3xl));
   background: var(--color-text-primary);
 }
 

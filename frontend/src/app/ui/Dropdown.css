@@ -61,7 +61,7 @@
 
 .ui-dropdown__menu {
   position: absolute;
-  top: var(--dropdown-menu-top, calc(100% + 0.375rem));
+  top: var(--dropdown-menu-top, calc(100% + var(--space-xs)));
   left: var(--dropdown-menu-left, 0);
   width: var(--dropdown-menu-width, 100%);
   max-height: 17.5rem;
@@ -86,7 +86,7 @@
 @keyframes dropdown-fade-in {
   from {
     opacity: 0;
-    transform: translateY(-0.25rem);
+    transform: translateY(calc(-1 * var(--space-2xs)));
   }
 
   to {
@@ -98,7 +98,7 @@
 @keyframes dropdown-fade-in-upwards {
   from {
     opacity: 0;
-    transform: translateY(-100%) translateY(0.25rem);
+    transform: translateY(-100%) translateY(var(--space-2xs));
   }
 
   to {
@@ -149,8 +149,8 @@
 .ui-dropdown__item {
   display: block;
   width: 100%;
-  min-height: 2.5rem;
-  line-height: 2.5rem;
+  min-height: var(--space-6xl);
+  line-height: var(--space-6xl);
   padding: 0 var(--space-lg);
   border: none;
   border-radius: var(--ui-control-radius-xs);
@@ -219,7 +219,7 @@
 }
 
 .ui-dropdown__trigger--sorter {
-  min-height: 2rem;
+  min-height: var(--ui-control-height-xs);
   padding: 0 var(--space-lg);
   font-size: var(--font-size-xs);
   border-radius: var(--radius-sm);
@@ -235,8 +235,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: var(--ui-control-height-xs);
+  height: var(--ui-control-height-xs);
   padding: 0;
   border-radius: var(--radius-sm);
   border: none;
@@ -270,8 +270,8 @@
 
 .ui-dropdown__menu--sorter .ui-dropdown__item {
   font-size: var(--font-size-xs);
-  min-height: 2rem;
-  line-height: 2rem;
+  min-height: var(--ui-control-height-xs);
+  line-height: var(--ui-control-height-xs);
 }
 
 .ui-dropdown__menu--sorter .ui-dropdown__item.is-active {

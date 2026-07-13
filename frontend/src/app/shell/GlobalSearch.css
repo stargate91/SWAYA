@@ -7,7 +7,7 @@
 .global-search__bar {
   display: flex;
   align-items: center;
-  height: 2rem;
+  height: var(--ui-control-height-xs);
   background: color-mix(in srgb, var(--color-canvas) 60%, transparent);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-input);
@@ -37,7 +37,7 @@
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--letter-spacing-wide);
   padding: var(--space-2xs) var(--space-sm);
   border-radius: var(--radius-sm);
   cursor: pointer;
@@ -65,7 +65,7 @@
 /* Divider */
 .global-search__divider {
   width: 1px;
-  height: 0.875rem;
+  height: var(--space-xl);
   background: color-mix(in srgb, var(--color-ink) 10%, transparent);
   margin: 0 var(--space-lg);
 }
@@ -127,7 +127,7 @@
 /* Cascading Popover */
 .global-search__dropdown {
   position: absolute;
-  top: calc(100% + 0.5rem);
+  top: calc(100% + var(--space-sm));
   left: 0;
   display: flex;
   background: color-mix(in srgb, var(--color-panel-strong) 98%, transparent);
@@ -157,7 +157,7 @@
   font-weight: var(--font-weight-extrabold);
   text-transform: uppercase;
   color: var(--color-text-muted);
-  letter-spacing: 0.1em;
+  letter-spacing: calc(2.5 * var(--letter-spacing-wide));
   padding: var(--space-2xs) var(--space-lg) var(--space-sm);
 }
 
@@ -194,7 +194,7 @@
 /* Suggestions Overlay */
 .global-search__overlay {
   position: absolute;
-  top: calc(100% + 0.5rem);
+  top: calc(100% + var(--space-sm));
   left: 0;
   right: 0;
   max-height: 25rem;
@@ -235,11 +235,11 @@
 
 .global-search__poster-container {
   position: relative;
-  width: 2rem;
-  height: 3rem;
+  width: var(--ui-control-height-xs);
+  height: var(--layout-window-titlebar-height);
   border-radius: var(--radius-sm);
   overflow: hidden;
-  box-shadow: 0 2px 0.3125rem color-mix(in srgb, black 30%, transparent);
+  box-shadow: 0 var(--radius-2xs) calc(var(--space-md) / 2) color-mix(in srgb, black 30%, transparent);
 }
 
 .global-search__item-poster {
@@ -263,8 +263,8 @@
 }
 
 .global-search__item-poster-placeholder {
-  width: 2rem;
-  height: 3rem;
+  width: var(--ui-control-height-xs);
+  height: var(--layout-window-titlebar-height);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -316,7 +316,7 @@
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-extrabold);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--letter-spacing-wide);
   padding: var(--space-px) var(--space-2xs);
   border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--color-ink) 8%, transparent);
@@ -355,11 +355,11 @@
 }
 
 .global-search__group-header {
-  font-size: 0.65rem;
+  font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-extrabold);
   text-transform: uppercase;
   color: var(--color-text-muted);
-  letter-spacing: 0.1em;
+  letter-spacing: calc(2.5 * var(--letter-spacing-wide));
   padding: var(--space-sm) var(--space-lg) var(--space-2xs) var(--space-lg);
   margin-top: var(--space-2xs);
 }
@@ -384,7 +384,7 @@
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-0.5rem);
+    transform: translateY(calc(-1 * var(--space-sm)));
   }
 
   to {

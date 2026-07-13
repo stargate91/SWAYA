@@ -264,7 +264,7 @@
   border: 1px solid color-mix(in srgb, var(--color-accent) 25%, var(--color-border-subtle));
   border-radius: var(--radius-lg);
   margin-bottom: var(--space-2xl);
-  backdrop-filter: blur(0.625rem);
+  backdrop-filter: var(--glass-blur-md);
 }
 
 .about-app-logo {
@@ -299,7 +299,7 @@
 .about-app-title {
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-extrabold);
-  letter-spacing: 0.1em;
+  letter-spacing: calc(2.5 * var(--letter-spacing-wide));
   color: var(--color-text-primary);
 }
 
@@ -366,7 +366,7 @@
   background: linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 6%, color-mix(in srgb, black 45%, transparent)), color-mix(in srgb, var(--color-accent) 1.5%, color-mix(in srgb, black 25%, transparent)));
   border: 1px solid color-mix(in srgb, var(--color-accent) 12%, var(--color-border-subtle));
   border-radius: var(--radius-md);
-  backdrop-filter: blur(0.625rem);
+  backdrop-filter: var(--glass-blur-md);
 }
 
 .developer-avatar {
@@ -494,7 +494,7 @@
 
 .special-thanks-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(var(--ui-overlay-sidebar-width), 1fr));
   gap: var(--space-md);
 }
 
@@ -603,7 +603,7 @@
   justify-content: center;
   padding: var(--space-4xl);
   background: color-mix(in srgb, black 82%, transparent);
-  backdrop-filter: blur(0.625rem);
+  backdrop-filter: var(--glass-blur-md);
 }
 
 .organizer-details__lightbox-close {
@@ -1105,8 +1105,8 @@
 }
 
 .about-features-sub-menu {
-  margin-left: 1.25rem;
-  padding-left: 1.25rem;
+  margin-left: var(--space-3xl);
+  padding-left: var(--space-3xl);
   position: relative;
 }
 

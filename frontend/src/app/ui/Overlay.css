@@ -66,10 +66,11 @@
   transition: background-color var(--motion-fast), border-color var(--motion-fast);
 }
 
-.ui-close-btn.ui-icon-button:hover {
+.ui-close-btn.ui-icon-button:hover:not(:disabled) {
   background-color: var(--ui-overlay-close-bg-hover);
   border-color: var(--color-border-default);
   color: var(--color-text-primary);
+  transform: none;
 }
 
 .ui-close-btn.ui-icon-button svg {
@@ -86,6 +87,6 @@
   color: var(--color-muted);
   margin-top: var(--space-xs);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--letter-spacing-wide);
   user-select: none;
 }

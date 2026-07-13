@@ -23,9 +23,9 @@
 }
 
 .ui-utility-button--titlebar {
-  width: 2.875rem;
-  height: 2.875rem;
-  border-radius: 0;
+  width: var(--ui-overlay-top);
+  height: var(--ui-overlay-top);
+  border-radius: var(--radius-none);
   box-shadow: var(--ui-utility-button-titlebar-divider);
   background: transparent;
 }
@@ -54,7 +54,7 @@
 .ui-utility-button.is-danger:hover,
 .window-titlebar__button--close:hover {
   background: var(--ui-danger-utility-bg);
-  color: white;
+  color: var(--button-primary-color);
 }
 
 /* Buttons */
@@ -104,24 +104,24 @@
 }
 
 .ui-icon-button--xs {
-  width: 1rem;
-  height: 1rem;
+  width: var(--space-2xl);
+  height: var(--space-2xl);
   border-radius: var(--radius-sm);
 }
 
 .ui-icon-button--sm {
-  width: 2rem;
-  height: 2rem;
+  width: var(--ui-control-height-xs);
+  height: var(--ui-control-height-xs);
 }
 
 .ui-icon-button--md {
-  width: 3rem;
-  height: 3rem;
+  width: var(--ui-control-height-md);
+  height: var(--ui-control-height-md);
 }
 
 .ui-icon-button--lg {
-  width: 3.25rem;
-  height: 3.25rem;
+  width: var(--button-height-lg);
+  height: var(--button-height-lg);
 }
 
 .ui-icon-button--primary {
@@ -176,6 +176,11 @@
 .ui-icon-button.ui-icon-button--close:hover:not(:disabled) {
   color: var(--color-text-primary);
   background: none;
+  transform: none;
+}
+
+.ui-close-btn.ui-icon-button:hover:not(:disabled) {
+  transform: none;
 }
 
 .ui-icon-button.ui-icon-button--close:hover:not(:disabled) svg {
@@ -328,8 +333,8 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 2.75rem;
-  height: 2.75rem;
+  width: var(--button-height-md);
+  height: var(--button-height-md);
   border-radius: var(--radius-full);
   background-color: var(--color-panel-translucent);
   background-image: var(--button-secondary-bg);
@@ -436,7 +441,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
+  width: var(--ui-control-height-xs);
   background: transparent;
   border: none;
   border-top-right-radius: var(--radius-input);
@@ -483,8 +488,8 @@
   border-radius: var(--ui-control-radius-xs);
   color: var(--color-text-primary);
   padding: 0 var(--space-lg);
-  height: 2.25rem;
-  line-height: 2.25rem;
+  height: var(--button-height-sm);
+  line-height: var(--button-height-sm);
   text-align: left;
   font-size: var(--font-size-xs);
   cursor: pointer;
@@ -505,8 +510,8 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 2rem;
-  height: 2rem;
+  width: var(--ui-control-height-xs);
+  height: var(--ui-control-height-xs);
   border-radius: var(--radius-md, var(--radius-sm));
   background: var(--color-surface-glass);
   border: 1px solid var(--color-border-subtle);
@@ -550,10 +555,10 @@
 /* Image Edit Badge Overlay */
 .ui-image-edit-badge {
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  width: 1.75rem;
-  height: 1.75rem;
+  top: var(--space-lg);
+  right: var(--space-lg);
+  width: calc(2 * var(--space-xl));
+  height: calc(2 * var(--space-xl));
   border-radius: var(--radius-full);
   border: 1px solid color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border));
   background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);

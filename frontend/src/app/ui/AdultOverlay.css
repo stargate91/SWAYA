@@ -1,12 +1,12 @@
 .ui-adult-overlay {
   position: absolute;
-  inset: -0.625rem;
+  inset: calc(-1 * var(--space-md));
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
   z-index: 10;
-  border-radius: 0;
+  border-radius: var(--radius-none);
 }
 
 /* Obscure variant - solid dark background */
@@ -18,8 +18,8 @@
 /* Blur variant - frosted glass/backdrop blur */
 .ui-adult-overlay--blur {
   background: color-mix(in srgb, black 70%, transparent);
-  backdrop-filter: blur(1.75rem);
-  -webkit-backdrop-filter: blur(1.75rem);
+  backdrop-filter: blur(calc(2 * var(--space-xl)));
+  -webkit-backdrop-filter: blur(calc(2 * var(--space-xl)));
   transition: backdrop-filter var(--motion-duration-slow) var(--motion-ease-standard),
               -webkit-backdrop-filter var(--motion-duration-slow) var(--motion-ease-standard),
               opacity var(--motion-duration-slow) var(--motion-ease-standard),
@@ -35,8 +35,8 @@
 
 .ui-poster-card:hover .ui-adult-overlay--blur,
 .lists-card:hover .ui-adult-overlay--blur {
-  backdrop-filter: blur(0px);
-  -webkit-backdrop-filter: blur(0px);
+  backdrop-filter: blur(var(--radius-none));
+  -webkit-backdrop-filter: blur(var(--radius-none));
   background: transparent;
   opacity: 0;
 }

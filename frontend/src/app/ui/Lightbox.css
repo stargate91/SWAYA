@@ -7,19 +7,19 @@
   justify-content: center;
   padding: var(--space-4xl);
   background: color-mix(in srgb, black 82%, transparent);
-  backdrop-filter: blur(0.625rem);
-  -webkit-backdrop-filter: blur(0.625rem);
+  backdrop-filter: var(--glass-blur-md);
+  -webkit-backdrop-filter: var(--glass-blur-md);
 }
 
 .ui-lightbox__close-container {
-  top: 1.5rem;
-  right: 1.5rem;
+  top: var(--space-4xl);
+  right: var(--space-4xl);
   z-index: calc(var(--z-index-backdrop) + 10);
 }
 
 .ui-lightbox .ui-lightbox__close-btn {
   background: var(--color-surface-overlay);
-  color: white;
+  color: var(--button-primary-color);
   border-color: var(--color-border-heavy);
 }
 
@@ -33,5 +33,5 @@
   max-height: 88vh;
   object-fit: contain;
   border-radius: var(--radius-lg);
-  box-shadow: 0 1.25rem 3.75rem color-mix(in srgb, black 55%, transparent);
+  box-shadow: 0 var(--space-3xl) 3.75rem color-mix(in srgb, black 55%, transparent);
 }

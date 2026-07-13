@@ -31,7 +31,7 @@
   color: var(--color-text-faint);
   font-weight: var(--font-weight-medium);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--letter-spacing-wide);
 }
 
 .ui-description-list__value {

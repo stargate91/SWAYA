@@ -24,7 +24,7 @@
   margin: 0;
   color: var(--color-muted);
   font: var(--text-caption);
-  letter-spacing: 0.08em;
+  letter-spacing: calc(2 * var(--letter-spacing-wide));
   text-transform: uppercase;
 }
 
@@ -32,7 +32,7 @@
   margin: 0;
   max-width: 72ch;
   font-size: var(--font-size-sm);
-  color: var(--text-color-secondary);
+  color: var(--color-text-secondary);
 }
 
 .page-header__actions {

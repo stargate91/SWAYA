@@ -12,7 +12,7 @@
   padding: var(--space-2xs);
   display: flex;
   flex-direction: column;
-  gap: 0.125rem;
+  gap: calc(var(--space-2xs) / 2);
   animation: contextMenuScaleIn var(--motion-duration-fast) var(--motion-ease-emphasized) forwards;
   transform-origin: top left;
   pointer-events: auto;

@@ -71,5 +71,5 @@
 .ui-selectable-card--theme.is-selected {
   background: var(--color-state-info-bg, color-mix(in srgb, var(--color-accent-blue) 8%, transparent));
   border-color: var(--color-accent-blue);
-  box-shadow: 0 0 0.75rem color-mix(in srgb, var(--color-accent-blue) 20%, transparent);
+  box-shadow: 0 0 var(--space-lg) color-mix(in srgb, var(--color-accent-blue) 20%, transparent);
 }

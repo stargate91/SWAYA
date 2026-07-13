@@ -131,7 +131,7 @@ export default function MediaHeaderInfo({ isFallbackGrid = false }) {
                 </Pill>
               )}
               {activeRating && (
-                <Pill variant="meta">
+                <Pill variant="meta" className="media-detail-page__rating-pill">
                   <img
                     src={activeRating.logo}
                     alt={activeRating.type === 'imdb' ? 'IMDb' : activeRating.type === 'tmdb' ? 'TMDb' : 'ThePornDB'}

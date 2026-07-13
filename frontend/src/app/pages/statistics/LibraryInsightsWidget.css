@@ -15,8 +15,8 @@
   background:
     radial-gradient(circle at top right, color-mix(in srgb, var(--color-accent-blue-soft) 12%, transparent), transparent 42%),
     linear-gradient(180deg, color-mix(in srgb, var(--color-surface-glass) 72%, transparent), var(--color-surface-card));
-  backdrop-filter: blur(1rem);
-  -webkit-backdrop-filter: blur(1rem);
+  backdrop-filter: var(--glass-blur-lg);
+  -webkit-backdrop-filter: var(--glass-blur-lg);
   transition: border-color var(--motion-duration-emphasized) var(--motion-ease-emphasized),
               background var(--motion-duration-emphasized) var(--motion-ease-emphasized),
               transform var(--motion-duration-emphasized) var(--motion-ease-emphasized),
@@ -58,19 +58,19 @@
 }
 
 .insights-panel-dot {
-  width: 0.5rem;
-  height: 0.5rem;
+  width: var(--space-sm);
+  height: var(--space-sm);
   border-radius: 50%;
 }
 
 .insights-panel-dot.is-pink {
   background: var(--color-accent-pink);
-  box-shadow: 0 0 0.625rem var(--color-accent-pink-soft);
+  box-shadow: 0 0 var(--space-md) var(--color-accent-pink-soft);
 }
 
 .insights-panel-dot.is-blue {
   background: var(--color-accent-blue);
-  box-shadow: 0 0 0.625rem var(--color-accent-blue-soft);
+  box-shadow: 0 0 var(--space-md) var(--color-accent-blue-soft);
 }
 
 .insights-panel-subtitle {
@@ -338,8 +338,8 @@
   justify-content: center;
   padding: var(--space-4xl) var(--space-3xl);
   background: radial-gradient(circle at center, color-mix(in srgb, var(--color-bg-elevated) 72%, transparent) 0%, var(--color-surface-overlay-heavy) 100%);
-  backdrop-filter: blur(0.5rem);
-  -webkit-backdrop-filter: blur(0.5rem);
+  backdrop-filter: var(--glass-blur-md);
+  -webkit-backdrop-filter: var(--glass-blur-md);
   z-index: 10;
   text-align: center;
 }
@@ -369,8 +369,8 @@
 }
 
 .insights-overlay-icon {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: var(--space-4xl);
+  height: var(--space-4xl);
 }
 
 .insights-overlay-title {

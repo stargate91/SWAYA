@@ -27,7 +27,7 @@
 }
 
 .organizer-match-modal__search-grid.is-tv {
-  grid-template-columns: minmax(0, 1fr) 6.5rem 4.5rem 4.5rem;
+  grid-template-columns: minmax(0, 1fr) 6.5rem var(--space-8xl) var(--space-8xl);
 }
 
 .organizer-match-modal__search-grid.is-movie {
@@ -51,7 +51,7 @@
 }
 
 .organizer-match-modal__field--compact {
-  min-width: 4.5rem;
+  min-width: var(--space-8xl);
 }
 
 .organizer-match-modal__search-actions {
@@ -80,7 +80,7 @@
 
 .organizer-match-modal__section-header {
   display: grid;
-  gap: 0.125rem;
+  gap: calc(var(--space-2xs) / 2);
 }
 
 .organizer-match-modal__section-header strong {
@@ -98,7 +98,7 @@
   gap: var(--space-lg);
   max-height: 22.5rem;
   overflow: auto;
-  padding: var(--space-2xs) var(--space-2xs) var(--space-2xs) 0.125rem;
+  padding: var(--space-2xs) var(--space-2xs) var(--space-2xs) calc(var(--space-2xs) / 2);
 }
 
 .organizer-match-modal__poster-results {
@@ -366,7 +366,7 @@
 }
 
 .organizer-match-modal__load-more-sentinel {
-  height: 1.25rem;
+  height: var(--space-3xl);
   margin: var(--space-md) 0;
 }
 
@@ -419,8 +419,8 @@
 
 .organizer-match-modal__browser-card-bucket-indicator {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
+  top: var(--space-sm);
+  right: var(--space-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -429,7 +429,7 @@
   border-radius: 50%;
   background: var(--color-accent);
   color: var(--color-text-inverse);
-  box-shadow: 0 2px 0.5rem color-mix(in srgb, black 40%, transparent);
+  box-shadow: 0 var(--radius-2xs) var(--space-sm) color-mix(in srgb, black 40%, transparent);
   animation: scale-up var(--motion-duration-fast) var(--motion-ease-expressive);
   z-index: 2;
 }
@@ -509,7 +509,7 @@
 }
 
 .organizer-match-modal__bucket-chip {
-  min-height: 1.75rem;
+  min-height: calc(2 * var(--space-xl));
   padding: 0 var(--space-md);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-input);
@@ -755,7 +755,7 @@
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
   color: var(--color-accent);
-  min-width: 1.5rem;
+  min-width: var(--space-4xl);
 }
 
 .organizer-override-bulk-episodes__filename {
@@ -773,8 +773,8 @@
 }
 
 .organizer-override-bulk-episodes__item-actions .ui-icon-button {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: var(--space-4xl);
+  height: var(--space-4xl);
   border-radius: var(--radius-sm);
 }
 
@@ -825,7 +825,7 @@
 @keyframes slideInRight {
   from {
     opacity: 0;
-    transform: translateX(1.25rem);
+    transform: translateX(var(--space-3xl));
   }
   to {
     opacity: 1;
@@ -859,7 +859,7 @@
 @keyframes slideInLeft {
   from {
     opacity: 0;
-    transform: translateX(-1.25rem);
+    transform: translateX(calc(-1 * var(--space-3xl)));
   }
   to {
     opacity: 1;
@@ -924,8 +924,8 @@
 
 .organizer-match-modal__candidate-badge-wrapper {
   position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
+  top: var(--space-sm);
+  left: var(--space-sm);
   z-index: 3;
 }
 

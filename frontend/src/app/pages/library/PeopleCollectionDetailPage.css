@@ -105,7 +105,7 @@
 
 .entity-detail-page__scroll-toggle-container {
   position: fixed;
-  bottom: 1.75rem;
+  bottom: calc(2 * var(--space-xl));
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;
@@ -217,8 +217,8 @@
 }
 
 .entity-detail-page__bottom-social-btn img {
-  width: 1rem;
-  height: 1rem;
+  width: var(--space-2xl);
+  height: var(--space-2xl);
   object-fit: contain;
   opacity: 0.75;
   transition: opacity var(--motion-fast);
@@ -266,10 +266,10 @@
 }
 
 .ui-scroll-row-container.collection-items-horizontal-grid-wrapper {
-  --wrapper-pt: 0.5rem;
-  --wrapper-pb: 0.5rem;
-  --wrapper-mt: -0.5rem;
-  --wrapper-mb: -0.5rem;
+  --wrapper-pt: var(--space-sm);
+  --wrapper-pb: var(--space-sm);
+  --wrapper-mt: calc(-1 * var(--space-sm));
+  --wrapper-mb: calc(-1 * var(--space-sm));
   padding-top: var(--wrapper-pt);
   padding-bottom: var(--wrapper-pb);
   margin-top: var(--wrapper-mt);
@@ -282,10 +282,10 @@
 }
 
 .collection-items-horizontal-grid-wrapper .ui-poster-card:hover {
-  transform: translateY(-0.25rem);
+  transform: translateY(calc(-1 * var(--space-2xs)));
 }
 
 .collection-items-horizontal-grid-wrapper .ui-pill--default {
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: var(--letter-spacing-wide);
 }

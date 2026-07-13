@@ -58,7 +58,7 @@
   gap: var(--space-sm);
   padding: var(--space-2xl) var(--space-lg);
   border: 0;
-  border-radius: 0;
+  border-radius: var(--radius-none);
   background: transparent;
 }
 
@@ -70,7 +70,7 @@
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   color: var(--color-muted);
-  letter-spacing: 0;
+  letter-spacing: var(--letter-spacing-normal);
 }
 
 .ui-empty-state--inline .ui-empty-state__description {
@@ -107,7 +107,7 @@
 .ui-empty-state--detail-panel .ui-empty-state__title {
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold, 600);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--letter-spacing-tight);
   color: var(--color-text-primary);
 }
 
@@ -176,7 +176,7 @@
 .ui-empty-state--modal-search .ui-empty-state__title,
 .ui-empty-state--modal-filter .ui-empty-state__title {
   font-size: var(--font-size-lg);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--letter-spacing-tight);
 }
 
 .ui-empty-state--modal-default .ui-empty-state__description,
@@ -237,7 +237,7 @@
 
 .ui-empty-state--tag-focus .ui-empty-state__title {
   font-size: var(--font-size-md);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--letter-spacing-tight);
 }
 
 .ui-empty-state--tag-focus .ui-empty-state__description {
@@ -269,7 +269,7 @@
   color: var(--color-ink);
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-bold);
-  letter-spacing: -0.02em;
+  letter-spacing: calc(2 * var(--letter-spacing-tight));
 }
 
 .ui-empty-state__description {

@@ -88,7 +88,7 @@
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: var(--letter-spacing-wide);
 }
 
 .template-tag-selector-container {
@@ -115,7 +115,7 @@
   font-weight: bold;
   text-transform: uppercase;
   font-size: var(--font-size-2xs);
-  padding: 0.0625rem var(--space-2xs);
+  padding: var(--border-width-thin) var(--space-2xs);
   border-radius: var(--radius-sm);
   background: var(--ui-preview-label-bg);
   flex-shrink: 0;

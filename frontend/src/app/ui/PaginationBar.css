@@ -13,11 +13,11 @@
 
 .ui-pagination__meta {
   position: absolute;
-  left: 0.875rem;
+  left: var(--space-xl);
   color: var(--color-muted);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.04em;
+  letter-spacing: var(--letter-spacing-wide);
   white-space: nowrap;
 }
 
@@ -37,7 +37,7 @@
 
 .ui-pagination__sizes {
   position: absolute;
-  right: 0.875rem;
+  right: var(--space-xl);
   order: 2;
 }
 
@@ -48,7 +48,7 @@
 .ui-pagination__size,
 .ui-pagination__button,
 .ui-pagination__page-display {
-  height: 1.75rem;
+  height: calc(2 * var(--space-xl));
   padding: 0 var(--space-lg);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
@@ -57,8 +57,8 @@
 .ui-pagination__button.ui-button,
 .ui-pagination__size.ui-button,
 .ui-pagination__page-display.ui-button {
-  min-height: 1.75rem;
-  height: 1.75rem;
+  min-height: calc(2 * var(--space-xl));
+  height: calc(2 * var(--space-xl));
   padding: 0 var(--space-lg);
   font-size: var(--font-size-xs);
 }
@@ -77,7 +77,7 @@
 }
 
 .ui-pagination__page {
-  min-width: 3.5rem;
+  min-width: var(--space-7xl);
   text-align: center;
   color: var(--color-ink);
   font-size: var(--font-size-xs);
@@ -96,8 +96,8 @@
 }
 
 .ui-pagination__page--editable input {
-  width: 2.625rem;
-  height: 1.5rem;
+  width: calc(3 * var(--space-xl));
+  height: var(--space-4xl);
   padding: 0 var(--space-2xs);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-input);

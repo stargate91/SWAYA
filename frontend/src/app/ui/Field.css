@@ -8,7 +8,7 @@
 .ui-field__label {
   color: var(--color-muted);
   font: var(--text-caption);
-  letter-spacing: 0.08em;
+  letter-spacing: calc(2 * var(--letter-spacing-wide));
   text-transform: uppercase;
 }
 
@@ -16,8 +16,8 @@
   color: var(--color-muted);
   font: var(--text-caption);
   text-transform: none;
-  letter-spacing: normal;
-  margin-top: 0.125rem;
+  letter-spacing: var(--letter-spacing-normal);
+  margin-top: calc(var(--space-2xs) / 2);
 }
 
 .ui-field__error {

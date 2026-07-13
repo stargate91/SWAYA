@@ -84,7 +84,7 @@
 }
 
 .universal-image-picker__preview {
-  width: 4.5rem;
+  width: var(--space-8xl);
   height: 6.75rem;
   overflow: hidden;
   border-radius: var(--radius-md);
@@ -95,17 +95,17 @@
 
 .universal-image-picker__preview.is-logo {
   width: 7rem;
-  height: 3.5rem;
+  height: var(--space-7xl);
 }
 
 .universal-image-picker__preview.is-backdrop {
   width: 8rem;
-  height: 4.5rem;
+  height: var(--space-8xl);
 }
 
 .universal-image-picker__preview.is-square {
-  width: 4.5rem;
-  height: 4.5rem;
+  width: var(--space-8xl);
+  height: var(--space-8xl);
 }
 
 .universal-image-picker__preview-image {

@@ -46,7 +46,7 @@
 }
 
 .ui-input--password {
-  padding-right: 2.75rem;
+  padding-right: var(--button-height-md);
 }
 
 .ui-input:hover:not(:focus):not(.ui-input--error),
@@ -78,7 +78,7 @@
 
 .ui-input__toggle {
   position: absolute;
-  right: 0.75rem;
+  right: var(--space-lg);
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -102,16 +102,16 @@
 }
 
 .ui-input--has-right-element {
-  padding-right: 2.75rem;
+  padding-right: var(--button-height-md);
 }
 
 .ui-input--has-left-element {
-  padding-left: 2.75rem;
+  padding-left: var(--button-height-md);
 }
 
 .ui-input__left-element {
   position: absolute;
-  left: 0.75rem;
+  left: var(--space-lg);
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -126,7 +126,7 @@
 
 .ui-input__right-element {
   position: absolute;
-  right: 0.75rem;
+  right: var(--space-lg);
   top: 50%;
   transform: translateY(-50%);
   display: flex;

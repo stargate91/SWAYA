@@ -60,11 +60,11 @@
 }
 
 .ui-scroll-row-container--size-sm .ui-carousel-arrow.is-left {
-  left: 0.25rem;
+  left: var(--space-2xs);
 }
 
 .ui-scroll-row-container--size-sm .ui-carousel-arrow.is-right {
-  right: 0.25rem;
+  right: var(--space-2xs);
 }
 
 .ui-scroll-row-container--size-sm .ui-carousel-arrow:hover {
