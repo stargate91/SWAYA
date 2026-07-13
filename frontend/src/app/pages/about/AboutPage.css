@@ -432,7 +432,7 @@
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: all var(--motion-fast);
-  font-family: inherit;
+  font-family: var(--font-sans);
 }
 
 .notice-item-btn:hover {
@@ -1082,17 +1082,26 @@
 .about-features-item-icon {
   display: flex;
   align-items: center;
-  color: inherit;
+  color: var(--color-muted);
+  transition: color var(--motion-fast);
 }
 
 .about-features-item-label {
-  color: inherit;
+  color: var(--color-muted);
+  transition: color var(--motion-fast);
 }
 
 .about-features-item-expand {
   font-size: var(--font-size-2xs);
   opacity: 0.7;
-  color: inherit;
+  color: var(--color-muted);
+  transition: color var(--motion-fast);
+}
+
+.about-features-main-item:hover .about-features-item-icon,
+.about-features-main-item:hover .about-features-item-label,
+.about-features-main-item:hover .about-features-item-expand {
+  color: var(--color-ink);
 }
 
 .about-features-sub-menu {

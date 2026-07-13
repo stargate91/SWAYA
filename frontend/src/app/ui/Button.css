@@ -533,7 +533,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: inherit !important;
+  border-radius: var(--radius-md) !important;
 }
 
 .ui-icon-button-wrapper--hover-only {

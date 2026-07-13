@@ -468,36 +468,6 @@
   text-align: center;
   padding: var(--space-2xl);
 }
-
-.add-people-modal__bulk-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2xs);
-  flex-grow: 1;
-}
-
-.add-people-modal__bulk-textarea {
-  width: 100%;
-  flex-grow: 1;
-  min-height: 240px;
-  padding: var(--space-sm) var(--space-lg);
-  border-radius: var(--ui-control-radius);
-  border: 1px solid var(--ui-control-border);
-  background: var(--color-input-bg, var(--ui-control-bg));
-  color: var(--ui-control-text);
-  font-family: inherit;
-  font-size: var(--font-size-sm);
-  resize: none;
-  outline: none;
-}
-
-.add-people-modal__bulk-submit {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .add-people-modal__local-panel {
   display: flex;
   flex-direction: column;
@@ -661,7 +631,7 @@
   background:
     linear-gradient(90deg, color-mix(in srgb, var(--color-bg-elevated) 8%, transparent), transparent 55%),
     linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--color-bg-elevated) 60%, transparent) 100%);
-  border-radius: inherit;
+  border-radius: var(--radius-md);
 }
 
 .library-tag-card:hover {
@@ -1054,7 +1024,11 @@
 }
 
 .create-tag-form__paintbrush {
-  color: inherit;
+  color: var(--color-muted);
+}
+
+.create-tag-form__custom-color-label.is-active .create-tag-form__paintbrush {
+  color: var(--color-text-primary);
 }
 
 .create-tag-form__color-input {

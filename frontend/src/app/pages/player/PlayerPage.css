@@ -8,7 +8,7 @@
   z-index: 9999;
   overflow: hidden;
   user-select: none;
-  font-family: var(--font-family, inherit);
+  font-family: var(--font-family, var(--font-sans));
 }
 
 .player-page.player-page--hide-cursor {

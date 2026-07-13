@@ -2,14 +2,15 @@
 .ui-sort-button {
   display: inline-flex;
   align-items: center;
-  justify-content: inherit;
+  justify-content: center;
   gap: var(--space-xs);
   border: 0;
   background: transparent;
-  color: inherit;
-  font: inherit;
-  letter-spacing: inherit;
-  text-transform: inherit;
+  color: var(--color-muted);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  letter-spacing: normal;
+  text-transform: none;
   cursor: pointer;
 }
 

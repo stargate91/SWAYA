@@ -663,11 +663,11 @@
 }
 
 .watched-history-card__status--active .watched-history-card__percent {
-  color: inherit;
+  color: var(--color-accent);
 }
 
 .watched-history-card__status--active .watched-history-card__time {
-  color: inherit;
+  color: var(--color-accent);
   opacity: 0.8;
 }
 

@@ -4,7 +4,7 @@
   gap: var(--space-lg);
   cursor: pointer;
   user-select: none;
-  font-family: inherit;
+  font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   color: var(--color-ink);
 }

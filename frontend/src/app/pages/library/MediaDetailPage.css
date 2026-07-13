@@ -368,7 +368,7 @@
 }
 
 .media-detail-page__back-button .ui-nav-button__icon {
-  color: inherit;
+  color: var(--color-muted);
 }
 
 .media-detail-page__back-button:hover:not(:disabled) .ui-nav-button__icon {

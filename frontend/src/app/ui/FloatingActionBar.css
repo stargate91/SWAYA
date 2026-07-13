@@ -34,7 +34,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: inherit;
+  border-radius: var(--radius-xl);
   background: var(--ui-floating-surface-highlight);
   pointer-events: none;
 }

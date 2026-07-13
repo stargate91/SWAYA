@@ -187,7 +187,7 @@
   --remove-pad-left: 2px;
   border: none;
   background: transparent;
-  color: inherit;
+  color: var(--color-ink);
   font-size: var(--font-size-2xs);
   cursor: pointer;
   padding: 0 0 0 var(--remove-pad-left);

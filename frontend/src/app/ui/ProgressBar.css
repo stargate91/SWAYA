@@ -30,8 +30,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: inherit;
-  border-radius: inherit;
+  background: var(--color-accent-blue);
+  border-radius: 50%;
   animation: ui-progress-pulse var(--motion-duration-pulse) infinite var(--motion-ease-emphasized);
 }
 
@@ -103,6 +103,8 @@
 }
 
 .ui-progress-bar__pulse-dot--sub::after {
+  background: var(--color-text-disabled);
+  border-radius: 50%;
   animation: ui-progress-pulse-sub var(--motion-duration-pulse-slow) infinite var(--motion-ease-standard);
 }
 

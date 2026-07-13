@@ -141,7 +141,7 @@
   font-size: 14px;
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  font-family: inherit;
+  font-family: var(--font-sans);
   border: 1px solid transparent;
 }
 
@@ -679,7 +679,7 @@
   border: 1px solid var(--app-shell-color-line);
   border-radius: 14px;
   color: var(--app-shell-color-ink);
-  font-family: inherit;
+  font-family: var(--font-sans);
   font-size: 13px;
   box-sizing: border-box;
   transition: all 0.2s ease;
@@ -1428,7 +1428,7 @@
   border-radius: 14px;
   padding: 13px 14px;
   color: var(--app-shell-color-ink);
-  font-family: inherit;
+  font-family: var(--font-sans);
   font-size: 13px;
   box-sizing: border-box;
   transition: all 0.2s ease;

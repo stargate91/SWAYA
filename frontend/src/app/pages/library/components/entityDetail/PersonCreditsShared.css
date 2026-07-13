@@ -307,7 +307,7 @@
 }
 
 .person-credits-row__title {
-  font-family: var(--font-family-display, inherit);
+  font-family: var(--font-family-display, var(--font-display));
   font-size: 0.8rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -700,7 +700,7 @@
 
 
 .person-credits-discover-label {
-  font-family: var(--font-family-display, inherit);
+  font-family: var(--font-family-display, var(--font-display));
   font-size: 0.8rem;
   /* Slightly larger and more prominent */
   letter-spacing: 0.14em;

@@ -655,7 +655,7 @@
   --input-padding: 4px 8px;
   padding: var(--input-padding) !important;
   font-size: var(--font-size-xs) !important;
-  font-family: inherit !important;
+  font-family: var(--font-sans) !important;
   outline: none !important;
   box-sizing: border-box !important;
 }

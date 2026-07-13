@@ -20,7 +20,7 @@
   padding: var(--space-lg) var(--space-xl);
   color: var(--color-text-primary);
   font-size: var(--font-size-sm);
-  font-family: inherit;
+  font-family: var(--font-sans);
   resize: none;
   outline: none;
   box-sizing: border-box;
