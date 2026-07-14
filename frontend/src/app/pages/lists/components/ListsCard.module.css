@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-sm, 0.5rem);
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform var(--motion-expressive);
 }
 
 .lists-card:hover {
@@ -10,7 +10,7 @@
 }
 
 .lists-card img {
-  transition: transform 0.28s ease;
+  transition: transform var(--motion-base);
 }
 
 .lists-card:hover img {
@@ -107,4 +107,37 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.lists-card:hover :global(.ui-card-action-btn) {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.lists-card :global(.ui-card-action-btn--danger) {
+  border-color: color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
+  color: var(--color-state-danger);
+}
+
+.lists-card :global(.ui-card-action-btn--danger):hover {
+  border-color: color-mix(in srgb, var(--color-state-danger) 80%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
+  background-color: color-mix(in srgb, var(--color-state-danger) 15%, var(--color-panel-translucent, black));
+  color: var(--color-state-danger);
+}
+
+.lists-card:hover .lists-card__media.is-blurred img {
+  filter: blur(0px) saturate(100%);
+  transform: scale(1);
+}
+
+.lists-card:hover :global(.ui-adult-overlay--obscure) {
+  background: transparent;
+  opacity: 0;
+}
+
+.lists-card:hover :global(.ui-adult-overlay--blur) {
+  backdrop-filter: blur(var(--radius-none));
+  -webkit-backdrop-filter: blur(var(--radius-none));
+  background: transparent;
+  opacity: 0;
 }

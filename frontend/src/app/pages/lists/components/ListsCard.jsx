@@ -79,7 +79,6 @@ export default function ListsCard({
       </div>
       <CardMetadata
         title={item.title}
-        onTitleClick={() => handleCardClick(item)}
         subtitle={subtitle}
         performers={performers}
         ratingPill={ratingPill}

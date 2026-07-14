@@ -253,8 +253,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
 }
 
 .ui-poster-card__media-shell:hover .ui-card-action-btn,
-.ui-poster-card__media-shell:focus-within .ui-card-action-btn,
-.lists-card:hover .ui-card-action-btn {
+.ui-poster-card__media-shell:focus-within .ui-card-action-btn {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
@@ -266,26 +265,22 @@ div.ui-poster-card__image-wrapper:focus-visible {
 }
 
 .ui-poster-card__media-shell .ui-card-action-btn .action-btn-state-hover,
-.lists-card .ui-card-action-btn .action-btn-state-hover,
 .recommend-card .ui-card-action-btn .action-btn-state-hover {
   display: none;
 }
 
 .ui-poster-card__media-shell .ui-card-action-btn:hover,
-.lists-card .ui-card-action-btn:hover,
 .recommend-card .ui-card-action-btn:hover {
   border-color: color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
   color: var(--color-state-danger);
 }
 
 .ui-poster-card__media-shell .ui-card-action-btn:hover .action-btn-state-default,
-.lists-card .ui-card-action-btn:hover .action-btn-state-default,
 .recommend-card .ui-card-action-btn:hover .action-btn-state-default {
   display: none;
 }
 
 .ui-poster-card__media-shell .ui-card-action-btn:hover .action-btn-state-hover,
-.lists-card .ui-card-action-btn:hover .action-btn-state-hover,
 .recommend-card .ui-card-action-btn:hover .action-btn-state-hover {
   display: inline-flex;
   align-items: center;
@@ -293,14 +288,12 @@ div.ui-poster-card__image-wrapper:focus-visible {
 }
 
 /* Danger variant for direct remove actions (Lists, Tags) */
-.ui-poster-card__media-shell .ui-card-action-btn--danger,
-.lists-card .ui-card-action-btn--danger {
+.ui-poster-card__media-shell .ui-card-action-btn--danger {
   border-color: color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
   color: var(--color-state-danger);
 }
 
-.ui-poster-card__media-shell .ui-card-action-btn--danger:hover,
-.lists-card .ui-card-action-btn--danger:hover {
+.ui-poster-card__media-shell .ui-card-action-btn--danger:hover {
   border-color: color-mix(in srgb, var(--color-state-danger) 80%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
   background-color: color-mix(in srgb, var(--color-state-danger) 15%, var(--color-panel-translucent, black));
   color: var(--color-state-danger);
@@ -438,110 +431,7 @@ button.ui-poster-card__image-wrapper:hover:not(:disabled) {
   pointer-events: auto;
 }
 
-.lists-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm, 0.5rem);
-  transition: transform var(--motion-expressive);
-  width: 100%;
-}
 
-.lists-card:hover {
-  transform: translateY(calc(-1 * var(--space-xs)));
-}
-
-.lists-card img {
-  transition: transform var(--motion-base);
-}
-
-.lists-card:hover img {
-  transform: scale(1.02);
-}
-
-.lists-card__media {
-  width: 100%;
-  position: relative;
-  background: var(--ui-surface-ghost);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  border: 1px solid var(--color-border-subtle);
-  transition: border-color var(--motion-fast), box-shadow var(--motion-base);
-}
-
-.lists-card:hover .lists-card__media {
-  border-color: var(--color-border-default);
-  box-shadow: 0 var(--space-md) var(--space-2xl) var(--color-surface-overlay);
-}
-
-.lists-card__media.is-blurred {
-  border-color: transparent;
-  isolation: isolate;
-  transform: translate3d(0, 0, 0);
-  -webkit-transform: translate3d(0, 0, 0);
-  mask-image: -webkit-radial-gradient(white, black);
-}
-
-.lists-card__media.is-blurred img {
-  filter: blur(calc(2 * var(--space-lg))) saturate(110%);
-  transform: scale(1.08);
-  transition: filter var(--motion-duration-slow) var(--motion-ease-standard), transform var(--motion-duration-slow) var(--motion-ease-standard);
-}
-
-.lists-card:hover .lists-card__media.is-blurred img {
-  filter: blur(0px) saturate(100%);
-  transform: scale(1);
-}
-
-.lists-card--poster .lists-card__media {
-  aspect-ratio: 2 / 3;
-}
-
-.lists-card--scene {
-  grid-column: span 2;
-}
-
-.lists-card--scene .lists-card__media {
-  aspect-ratio: 1.38;
-}
-
-.lists-card__info {
-  padding: 0 var(--space-xs, 0.25rem);
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--space-xs) / 2);
-}
-
-.lists-card__title {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.lists-card__subtitle {
-  font-size: var(--font-size-2xs);
-  color: var(--color-text-secondary);
-  opacity: 0.6;
-}
-
-.lists-card__img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  border-bottom: 1px solid var(--color-border-subtle);
-}
-
-.lists-card__placeholder {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, var(--color-surface-glass), var(--color-surface-overlay-strong));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 @keyframes ui-poster-card-spin {
   0% {

@@ -26,15 +26,12 @@
               background-color var(--motion-duration-slow) var(--motion-ease-standard);
 }
 
-/* Reveal overlays on parent hover */
-.ui-poster-card:hover .ui-adult-overlay--obscure,
-.lists-card:hover .ui-adult-overlay--obscure {
+.ui-poster-card:hover .ui-adult-overlay--obscure {
   background: transparent;
   opacity: 0;
 }
 
-.ui-poster-card:hover .ui-adult-overlay--blur,
-.lists-card:hover .ui-adult-overlay--blur {
+.ui-poster-card:hover .ui-adult-overlay--blur {
   backdrop-filter: blur(var(--radius-none));
   -webkit-backdrop-filter: blur(var(--radius-none));
   background: transparent;
