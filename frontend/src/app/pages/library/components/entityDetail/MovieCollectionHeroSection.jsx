@@ -59,21 +59,11 @@ export default function MovieCollectionHeroSection({
             <div className="entity-detail-page__summary-layout">
               <div className="entity-detail-page__summary-text">
                 {overviewTitle && <h3 className="entity-detail-page__summary-title">{overviewTitle}</h3>}
-                <ParsedParagraphs
+                <OverviewContent
                   text={overviewText}
-                  className="entity-detail-page__description"
-                  paragraphClassName="entity-detail-page__description-paragraph"
+                  t={t}
+                  openDrawer={() => setIsDrawerOpen(true)}
                 />
-              </div>
-
-              <div className="entity-detail-page__sidebar-layout">
-                <div className="entity-detail-page__sidebar-section">
-                  <OverviewContent
-                    text={overviewText}
-                    t={t}
-                    openDrawer={() => setIsDrawerOpen(true)}
-                  />
-                </div>
               </div>
             </div>
           )}

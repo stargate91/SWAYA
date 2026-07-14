@@ -97,6 +97,15 @@
   --color-brand-babepedia: #ff0066;
   --color-brand-freeones: #0066cc;
 
+  /* App specific brands */
+  --brand-plex: #e5a93b;
+  --brand-jellyfin-start: #00a4dc;
+  --brand-jellyfin-end: #aa5cc3;
+  --brand-kodi-primary: #17b2e5;
+  --brand-kodi-secondary: #118cb5;
+  --brand-kodi-accent: #ffffff;
+  --brand-minimal: #10b981;
+
   --color-state-info: #0088ff;
   --color-state-danger: #ef4444;
   --color-state-success: #2fe07c;
@@ -114,37 +123,7 @@
   --color-danger-glow: rgba(239, 68, 68, 0.24);
   --color-canvas-glow: rgba(0, 136, 255, 0.08);
   --color-accent-gradient: linear-gradient(180deg, #1a94ff 0%, #007cf0 100%);
-  --floating-batch-bar-bg: var(--color-bg-elevated);
-  --floating-batch-bar-border: var(--color-border-strong);
-  --floating-batch-bar-border-top: var(--color-border-strong);
-  --floating-batch-bar-shadow: 0 var(--space-3xl) var(--space-6xl) rgba(0, 0, 0, 0.6), 0 0 0 1px var(--color-surface-overlay-strong);
-  --floating-batch-bar-accent-bg: var(--color-accent-blue);
-  --floating-batch-bar-accent-border: var(--color-accent-blue);
-  --floating-batch-bar-accent-color: var(--color-text-primary);
-  --floating-batch-bar-accent-hover-bg: color-mix(in srgb, var(--color-accent-blue) 88%, white 12%);
-  --floating-batch-bar-accent-hover-border: color-mix(in srgb, var(--color-accent-blue) 88%, white 12%);
-  --floating-batch-bar-accent-hover-color: var(--color-text-primary);
-  --floating-batch-bar-accent-hover-shadow: 0 var(--space-sm) var(--space-xl) color-mix(in srgb, var(--color-accent-blue) 24%, transparent);
-  --danger-action-bg: color-mix(in srgb, var(--color-state-danger) 12%, transparent);
-  --danger-action-border: color-mix(in srgb, var(--color-state-danger) 28%, transparent);
-  --danger-action-color: var(--color-accent-red-soft);
-  --danger-action-hover-bg: color-mix(in srgb, var(--color-state-danger) 20%, transparent);
-  --danger-action-hover-border: color-mix(in srgb, var(--color-state-danger) 38%, transparent);
-  --danger-action-hover-color: var(--color-text-primary);
-  --danger-action-hover-shadow: 0 var(--space-sm) var(--space-2xl) color-mix(in srgb, var(--color-state-danger) 18%, transparent);
-  --floating-batch-bar-danger-bg: var(--danger-action-bg);
-  --floating-batch-bar-danger-border: var(--danger-action-border);
-  --floating-batch-bar-danger-color: var(--danger-action-color);
-  --floating-batch-bar-danger-hover-bg: var(--danger-action-hover-bg);
-  --floating-batch-bar-danger-hover-border: var(--danger-action-hover-border);
-  --floating-batch-bar-danger-hover-color: var(--danger-action-hover-color);
-  --floating-batch-bar-danger-hover-shadow: var(--danger-action-hover-shadow);
-  --floating-batch-bar-neutral-bg: color-mix(in srgb, var(--color-text-primary) 6%, transparent);
-  --floating-batch-bar-neutral-border: var(--color-border-strong);
-  --floating-batch-bar-neutral-color: var(--color-text-primary);
-  --floating-batch-bar-neutral-hover-bg: var(--color-border-strong);
-  --floating-batch-bar-neutral-hover-border: color-mix(in srgb, var(--color-text-primary) 18%, transparent);
-  --floating-batch-bar-neutral-hover-color: var(--color-text-primary);
+
 
   /* Modal Tokens */
   --modal-surface-base: var(--color-bg-elevated);
@@ -160,17 +139,8 @@
   --modal-divider-subtle: color-mix(in srgb, var(--color-text-primary) 4%, transparent);
   --modal-title-color: var(--color-ink);
   --modal-description-color: var(--color-muted);
-  --modal-close-bg: color-mix(in srgb, var(--modal-surface-card-strong) 78%, transparent);
-  --modal-close-bg-hover: color-mix(in srgb, var(--modal-surface-card-strong) 96%, rgba(255, 255, 255, 0.03));
-  --modal-close-border: var(--color-border-strong);
-  --modal-close-border-hover: color-mix(in srgb, var(--color-text-primary) 18%, transparent);
-  --modal-close-color: var(--color-muted);
-  --modal-close-color-hover: var(--color-ink);
   --modal-field-bg: color-mix(in srgb, var(--color-bg-elevated) 76%, var(--color-bg-canvas) 24%);
-  --modal-field-hover: color-mix(in srgb, var(--color-bg-elevated) 69%, var(--color-bg-canvas) 31%);
   --modal-field-active: color-mix(in srgb, var(--color-bg-elevated) 64%, var(--color-bg-canvas) 36%);
-  --modal-dropdown-bg: color-mix(in srgb, var(--color-bg-elevated) 92%, var(--color-bg-canvas) 8%);
-  --modal-dropdown-search-bg: color-mix(in srgb, var(--color-bg-elevated) 84%, var(--color-bg-canvas) 16%);
 
   /* Dropdown Tokens */
   --dropdown-field-bg: rgba(0, 0, 0, 0.3);
@@ -179,15 +149,10 @@
   --dropdown-field-border: var(--color-border-subtle);
   --dropdown-field-hover-border: color-mix(in srgb, var(--color-text-primary) 20%, transparent);
   --dropdown-field-active-border: var(--color-accent-blue);
-  --dropdown-field-shadow: 0 0.25rem 0.625rem color-mix(in srgb, var(--color-accent) 10%, transparent);
   --dropdown-menu-bg: color-mix(in srgb, var(--color-bg-canvas) 95%, transparent);
   --dropdown-menu-border: var(--color-border-subtle);
-  --dropdown-menu-border-top: var(--color-surface-glass-heavy);
   --dropdown-menu-shadow: var(--ui-floating-surface-shadow);
   --dropdown-search-bg: rgba(0, 0, 0, 0.2);
-  --dropdown-search-border: var(--color-surface-glass);
-  --dropdown-scroll-bg: transparent;
-  --dropdown-scroll-track: rgba(0, 0, 0, 0.2);
   --dropdown-option-bg: transparent;
   --dropdown-option-hover-bg: var(--color-surface-glass);
   --dropdown-option-hover-color: var(--color-text-primary);
@@ -219,14 +184,12 @@
   --scrollbar-thumb: rgba(255, 255, 255, 0.12);
   --scrollbar-thumb-hover: rgba(0, 136, 255, 0.34);
   --scrollbar-thumb-active: rgba(0, 136, 255, 0.48);
-  --scrollbar-border: rgba(255, 255, 255, 0.04);
 
 
   --shadow-sm: 0 var(--space-md) var(--space-2xl) rgba(0, 0, 0, 0.32);
   --shadow-md: 0 var(--space-2xl) var(--space-6xl) rgba(0, 0, 0, 0.42);
   --shadow-lg: 0 var(--space-4xl) var(--space-7xl) rgba(0, 0, 0, 0.56);
-  --text-hero: 800 clamp(2.2rem, 3vw, 3.6rem) / 0.96 var(--font-display);
-  --text-title: 700 clamp(1.45rem, 1.6vw, 2rem) / 1.05 var(--font-display);
+  --text-title: 700 1.75rem / 1.05 var(--font-display);
   --text-section: 600 1rem / 1.2 var(--font-display);
   --text-body: 400 0.98rem / 1.6 var(--font-sans);
   --text-caption: 500 0.78rem / 1.35 var(--font-sans);
@@ -393,48 +356,19 @@
   --media-detail-panel-card-shadow-hover:
     0 0.875rem 1.875rem rgba(0, 0, 0, 0.16),
     inset 0 1px 0 rgba(255, 255, 255, 0.02);
-  --media-detail-panel-pill-bg: rgba(255, 255, 255, 0.01);
-  --media-detail-panel-pill-border: color-mix(in srgb, var(--color-line) 80%, transparent);
-  --media-detail-panel-accent: var(--color-accent);
-  --media-detail-tag-pill-bg:
-    linear-gradient(180deg, color-mix(in srgb, var(--color-bg-elevated) 93%, white 7%), color-mix(in srgb, var(--color-bg-canvas) 85%, white 5%));
-  --media-detail-tag-pill-bg-hover:
-    linear-gradient(180deg, color-mix(in srgb, var(--color-bg-elevated) 89%, white 11%), color-mix(in srgb, var(--color-bg-canvas) 79%, white 7%));
-  --media-detail-tag-pill-accent:
-    linear-gradient(90deg, color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 18%, transparent) 0%, color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 9%, transparent) 34%, transparent 78%);
-  --media-detail-tag-pill-accent-hover:
-    linear-gradient(90deg, color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 22%, transparent) 0%, color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 11%, transparent) 34%, transparent 78%);
-  --media-detail-tag-pill-border: color-mix(in srgb, var(--color-line-strong) 70%, transparent);
   --media-detail-tag-pill-highlight:
     linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.025) 40%, transparent 100%);
-  --media-detail-tag-pill-shadow:
-    0 var(--space-sm) var(--space-lg) rgba(0, 0, 0, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  --media-detail-tag-pill-shadow-hover:
-    0 var(--space-md) var(--space-xl) rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  --media-detail-tag-pill-suggested-bg:
-    linear-gradient(180deg, color-mix(in srgb, var(--color-bg-elevated) 95%, var(--pill-tag-color, var(--color-accent-blue)) 5%), color-mix(in srgb, var(--color-bg-canvas) 86%, var(--pill-tag-color, var(--color-accent-blue)) 4%));
-  --media-detail-tag-pill-suggested-bg-hover:
-    linear-gradient(180deg, color-mix(in srgb, var(--color-bg-elevated) 92%, var(--pill-tag-color, var(--color-accent-blue)) 8%), color-mix(in srgb, var(--color-bg-canvas) 82%, var(--pill-tag-color, var(--color-accent-blue)) 6%));
-  --media-detail-tag-pill-suggested-accent:
-    linear-gradient(90deg, color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 20%, transparent) 0%, color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 10%, transparent) 34%, transparent 78%);
-  --media-detail-tag-pill-suggested-accent-hover:
-    linear-gradient(90deg, color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 24%, transparent) 0%, color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 12%, transparent) 34%, transparent 78%);
-  --media-detail-tag-pill-suggested-border: color-mix(in srgb, var(--color-accent-blue) 58%, transparent);
-  --media-detail-tag-pill-text: var(--color-text-primary);
   --ui-utility-button-bg: rgba(255, 255, 255, 0.035);
   --ui-utility-button-bg-hover: rgba(255, 255, 255, 0.06);
   --ui-utility-button-inset-border: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
   --ui-utility-button-titlebar-divider: inset 1px 0 0 rgba(255, 255, 255, 0.05);
   --ui-danger-utility-bg:
     linear-gradient(180deg, color-mix(in srgb, var(--color-state-danger) 82%, white 18%), color-mix(in srgb, var(--color-state-danger) 90%, #220812 10%));
- 
+
   /* Tooltip Tokens */
   --tooltip-max-width: calc(5 * var(--space-4xl));
   --tooltip-padding: var(--space-sm) var(--space-md);
   --tooltip-radius: var(--radius-md);
-  --tooltip-offset: var(--space-md);
   --tooltip-bg:
     linear-gradient(180deg, color-mix(in srgb, var(--color-bg-elevated) 85%, transparent), color-mix(in srgb, var(--color-bg-canvas) 75%, transparent));
   --tooltip-border: var(--color-border-strong);
@@ -460,14 +394,6 @@
   --ui-overlay-close-size: var(--button-height-sm);
   --ui-overlay-close-bg: rgba(255, 255, 255, 0.03);
   --ui-overlay-close-bg-hover: rgba(255, 255, 255, 0.08);
-  --ui-overlay-accent-surface: color-mix(in srgb, var(--color-state-info) 5%, transparent);
-  --ui-overlay-accent-surface-soft: color-mix(in srgb, var(--color-state-info) 4%, transparent);
-  --ui-overlay-accent-surface-strong: color-mix(in srgb, var(--color-state-info) 8%, transparent);
-  --ui-overlay-accent-border-soft: color-mix(in srgb, var(--color-state-info) 12%, transparent);
-  --ui-overlay-accent-border: color-mix(in srgb, var(--color-state-info) 40%, transparent);
-  --ui-overlay-accent-fill-soft: color-mix(in srgb, var(--color-state-info) 15%, transparent);
-  --ui-overlay-accent-shadow: 0 0 var(--space-lg) color-mix(in srgb, var(--color-state-info) 8%, transparent);
-  --ui-overlay-accent-shadow-soft: 0 0 var(--space-lg) color-mix(in srgb, var(--color-state-info) 6%, transparent);
   --ui-overlay-danger-bg: color-mix(in srgb, var(--color-state-danger) 8%, transparent);
   --ui-overlay-danger-border: color-mix(in srgb, var(--color-state-danger) 20%, transparent);
   --ui-overlay-warning-bg: color-mix(in srgb, var(--color-state-warning) 8%, transparent);
@@ -476,14 +402,6 @@
   --ui-preview-label-bg: color-mix(in srgb, var(--color-state-info) 15%, transparent);
   --ui-preview-badge-bg: color-mix(in srgb, var(--color-state-info) 5%, transparent);
   --ui-preview-badge-border: color-mix(in srgb, var(--color-state-info) 12%, transparent);
-  /* Brand Colors */
-  --brand-plex: #e5a93b;
-  --brand-jellyfin-start: #00a4dc;
-  --brand-jellyfin-end: #aa5cc3;
-  --brand-kodi-primary: #17b2e5;
-  --brand-kodi-secondary: #118cb5;
-  --brand-kodi-accent: #ffffff;
-  --brand-minimal: #10b981;
 
   /* Toast Tokens */
   --toast-bg:
@@ -543,7 +461,6 @@
   --shadow-xs: 0 0.125rem var(--space-sm) rgba(0, 0, 0, 0.2);
   --shadow-sm-strong: 0 var(--space-xs) var(--space-lg) rgba(0, 0, 0, 0.25);
   --shadow-xl: 0 var(--space-xl) var(--space-4xl) rgba(0, 0, 0, 0.5);
-  --shadow-focus-blue: 0 var(--space-sm) var(--space-xl) rgba(59, 130, 246, 0.2);
 
   /* Motion */
   --motion-duration-fast: 140ms;
@@ -582,7 +499,6 @@
   --z-index-toast: 500;
 
   /* Effects */
-  --glass-blur-sm: blur(var(--space-sm));
   --glass-blur-md: blur(var(--space-md));
   --glass-blur: var(--glass-blur-md);
 

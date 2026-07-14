@@ -77,11 +77,17 @@ def pick_logo_path(
     if not logos:
         return (raw_data or {}).get("logo_path")
 
+    original_lang = str((raw_data or {}).get("original_language") or "").split("-", 1)[0].strip().lower()
+
     preferred_langs = []
     normalized_preferred = str(preferred_language or "").split("-", 1)[0].strip().lower()
     if normalized_preferred:
         preferred_langs.append(normalized_preferred)
-    preferred_langs.extend([DEFAULT_FALLBACK_LANGUAGE, None, ""])
+    if DEFAULT_FALLBACK_LANGUAGE not in preferred_langs:
+        preferred_langs.append(DEFAULT_FALLBACK_LANGUAGE)
+    if original_lang and original_lang not in preferred_langs:
+        preferred_langs.append(original_lang)
+    preferred_langs.extend([None, ""])
 
     def base_logo_score(logo):
         lang = logo.get("iso_639_1")
@@ -302,11 +308,17 @@ def pick_poster_path(
     if not posters:
         return None
 
+    original_lang = str(raw.get("original_language") or "").split("-", 1)[0].strip().lower()
+
     preferred_langs = []
     normalized_preferred = str(preferred_language or "").split("-", 1)[0].strip().lower()
     if normalized_preferred:
         preferred_langs.append(normalized_preferred)
-    preferred_langs.extend([DEFAULT_FALLBACK_LANGUAGE, None, ""])
+    if DEFAULT_FALLBACK_LANGUAGE not in preferred_langs:
+        preferred_langs.append(DEFAULT_FALLBACK_LANGUAGE)
+    if original_lang and original_lang not in preferred_langs:
+        preferred_langs.append(original_lang)
+    preferred_langs.extend([None, ""])
 
     def poster_score(poster):
         lang = poster.get("iso_639_1")

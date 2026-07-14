@@ -139,12 +139,11 @@ class TMDBScraper(BaseScraper):
                 append_parts = list(TMDB_MOVIE_APPEND_PARTS)
             else:
                 append_parts = list(TMDB_TV_APPEND_PARTS)
-            if include_images:
-                append_parts.append("images")
 
-        append = ",".join(append_parts)
+        # Do NOT include "images" in append_to_response to avoid filtering before we know original_language
+        actual_append_parts = [p for p in append_parts if p != "images"]
+        append = ",".join(actual_append_parts)
         normalized_lang = resolved_lang.split("-", 1)[0].strip() or DEFAULT_FALLBACK_LANGUAGE
-        include_image_language = ",".join(dict.fromkeys([normalized_lang, DEFAULT_FALLBACK_LANGUAGE, "null"]))
         include_video_language = ",".join(dict.fromkeys([normalized_lang, DEFAULT_FALLBACK_LANGUAGE, "null"]))
 
         params = {
@@ -152,25 +151,40 @@ class TMDBScraper(BaseScraper):
             "append_to_response": append,
             "include_video_language": include_video_language,
         }
-        if include_images:
-            params["include_image_language"] = include_image_language
 
+        details = {}
         try:
-            return self._call_api(endpoint, params, force_refresh=force_refresh)
+            details = self._call_api(endpoint, params, force_refresh=force_refresh)
         except Exception as e:
             # Fallback 1: Try without credits/translations
             try:
-                reduced_parts = [p for p in append_parts if p not in ("credits", "aggregate_credits", "translations")]
+                reduced_parts = [p for p in actual_append_parts if p not in ("credits", "aggregate_credits", "translations")]
                 params["append_to_response"] = ",".join(reduced_parts)
-                return self._call_api(endpoint, params, force_refresh=force_refresh)
+                details = self._call_api(endpoint, params, force_refresh=force_refresh)
             except Exception:
                 # Fallback 2: Try with no appends at all
                 try:
                     params.pop("append_to_response", None)
-                    return self._call_api(endpoint, params, force_refresh=force_refresh)
-                except Exception as e:
-                    logger.debug(f"Swallowed exception in infrastructure/scrapers/providers/tmdb.py:170: {e}", exc_info=True)
-            raise e
+                    details = self._call_api(endpoint, params, force_refresh=force_refresh)
+                except Exception as ex:
+                    logger.debug(f"Swallowed exception in infrastructure/scrapers/providers/tmdb.py:170: {ex}", exc_info=True)
+                    raise e
+
+        # If details were fetched successfully and images are requested, fetch them separately incorporating original_language
+        if include_images and details:
+            orig_lang = details.get("original_language")
+            img_langs = dict.fromkeys([normalized_lang, DEFAULT_FALLBACK_LANGUAGE, orig_lang, "null"])
+            img_params = {
+                "include_image_language": ",".join([l for l in img_langs if l])
+            }
+            try:
+                images_data = self._call_api(f"/{item_type}/{tmdb_id}/images", img_params, force_refresh=force_refresh)
+                details["images"] = images_data
+            except Exception as e:
+                logger.warning(f"Failed to fetch TMDB images separately: {e}")
+                details["images"] = {}
+
+        return details
 
     def get_episode_details(self, tv_id: int, season_number: int, episode_number: int, language: str = "en-US", force_refresh: bool = False) -> Dict[str, Any]:
         """Retrieve details for a specific episode."""

@@ -521,8 +521,12 @@
   overflow: hidden;
 }
 
+.entity-detail-page--collection .media-detail-page__overview {
+  max-width: 32rem;
+}
+
 .entity-detail-page--collection .media-detail-page__overview-text {
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 9;
 }
 
 .entity-detail-page .media-detail-page__read-more-btn {
