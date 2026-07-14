@@ -247,12 +247,12 @@ export default function RatingsPage() {
             <div className="organizer-table-block">
               <div className="organizer-content">
                 {state.isLoading ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', padding: 'var(--space-md) 0' }}>
+                  <div className={styles['ratings-skeleton-list']}>
                     {Array.from({ length: 6 }).map((_, idx) => (
-                      <div key={idx} style={{ display: 'flex', gap: 'var(--space-lg)', padding: 'var(--space-md) var(--space-md)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-md)' }}>
-                        <Skeleton style={{ width: '150px', height: '18px' }} variant="rect" />
-                        <Skeleton style={{ width: '80px', height: '18px' }} variant="rect" />
-                        <Skeleton style={{ width: '100px', height: '18px', marginLeft: 'auto' }} variant="rect" />
+                      <div key={idx} className={styles['ratings-skeleton-row']}>
+                        <Skeleton className={styles['ratings-skeleton-col-name']} variant="rect" />
+                        <Skeleton className={styles['ratings-skeleton-col-rating']} variant="rect" />
+                        <Skeleton className={styles['ratings-skeleton-col-action']} variant="rect" />
                       </div>
                     ))}
                   </div>

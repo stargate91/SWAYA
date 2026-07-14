@@ -106,8 +106,6 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
-  const allowAdult = location.state?.allowAdult;
 
   useEffect(() => {
     if (!isLoading && item && item.is_adult && !settings?.include_adult) {

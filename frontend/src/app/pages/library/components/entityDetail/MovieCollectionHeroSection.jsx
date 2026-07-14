@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import Pill from '@/ui/Pill';
 import Lightbox from '@/ui/Lightbox';
-import ParsedParagraphs from '@/ui/ParsedParagraphs';
 import { OverviewContent } from './EntityDetailSections';
 import { API_BASE } from '@/lib/backend';
 import EditableMediaCard from './EditableMediaCard';

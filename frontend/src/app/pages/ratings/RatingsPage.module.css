@@ -134,3 +134,34 @@
   position: relative;
   user-select: none;
 }
+
+.ratings-skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
+}
+
+.ratings-skeleton-row {
+  display: flex;
+  gap: var(--space-lg);
+  padding: var(--space-md) var(--space-md);
+  background: var(--color-panel-soft);
+  border-radius: var(--radius-md);
+}
+
+.ratings-skeleton-col-name {
+  width: 9.375rem;
+  height: 1.125rem;
+}
+
+.ratings-skeleton-col-rating {
+  width: 5rem;
+  height: 1.125rem;
+}
+
+.ratings-skeleton-col-action {
+  width: 6.25rem;
+  height: 1.125rem;
+  margin-left: auto;
+}

@@ -48,8 +48,6 @@ export default function usePeopleCollectionDetailController({
 
   const navigate = useNavigate();
   const location = useLocation();
-  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
-  const allowAdult = location.state?.allowAdult;
 
   const { data: settings } = useSettingsQuery();
 
