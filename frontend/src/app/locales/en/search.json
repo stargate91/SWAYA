@@ -9,6 +9,7 @@
     "desc": "Search metadata from TMDb, StashDB, FansDB, or PornDB"
   },
   "noResults": {
+    "title": "No Results Found",
     "desc": "Try another query or change search settings."
   },
   "moreMatches": "More matches (+{{count}})",

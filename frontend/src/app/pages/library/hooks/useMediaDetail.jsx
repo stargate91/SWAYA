@@ -110,10 +110,10 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
   const allowAdult = location.state?.allowAdult;
 
   useEffect(() => {
-    if (!isLoading && (!item || (item && item.is_adult)) && sessionMode !== 'nsfw' && !allowAdult) {
+    if (!isLoading && item && item.is_adult && !settings?.include_adult) {
       navigate('/dashboard', { replace: true });
     }
-  }, [isLoading, item, sessionMode, navigate, allowAdult]);
+  }, [isLoading, item, settings?.include_adult, navigate]);
 
   const prevIsPlaying = useRef(isPlaying);
   useEffect(() => {

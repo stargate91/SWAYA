@@ -9,6 +9,7 @@ import {
   usePersonDetailQuery,
 } from '@/queries/metadataQueries';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
+import { useSettingsQuery } from '@/queries/settingsQueries';
 import { API_BASE } from '@/lib/backend';
 import { resolveDetailsImageUrl } from './utils/detailUtils';
 import {
@@ -50,11 +51,13 @@ export default function usePeopleCollectionDetailController({
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const allowAdult = location.state?.allowAdult;
 
+  const { data: settings } = useSettingsQuery();
+
   useEffect(() => {
-    if (!isLoading && (!item || (item && item.is_adult)) && sessionMode !== 'nsfw' && !allowAdult) {
+    if (!isLoading && item && item.is_adult && !settings?.include_adult) {
       navigate('/dashboard', { replace: true });
     }
-  }, [isLoading, item, sessionMode, navigate, allowAdult]);
+  }, [isLoading, item, settings?.include_adult, navigate]);
 
   const overviewTitle = isPeople
     ? (t('library.details.biographyTitle') || 'Biography')

@@ -1,232 +1,41 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Search, Clapperboard, ENTITY_ICONS, ImageOff } from '@/ui/icons';
-import api from '@/lib/api';
+import { Search, Clapperboard, ImageOff } from '@/ui/icons';
 import Page from '@/ui/Page';
-import Input from '@/ui/Input';
-import SegmentedControl from '@/ui/SegmentedControl';
-import Spinner from '@/ui/Spinner';
 import Skeleton from '@/ui/Skeleton';
 import EmptyState from '@/ui/EmptyState';
 import PosterGrid from '@/ui/PosterGrid';
-import PosterCard from '@/ui/PosterCard';
-import Button from '@/ui/Button';
 import { useSettingsQuery } from '@/queries/settingsQueries';
-import { resolveMediaImageUrl } from '@/lib/imageUrls';
-import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
-import { useTranslation } from '@/providers/LanguageContext';
-import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
-import AdultOverlay from '@/ui/AdultOverlay';
-import { API_BASE } from '@/lib/backend';
+import useSearchPageController, { TYPES_BY_SOURCE } from './components/useSearchPageController';
+import SearchInput from './components/SearchInput';
+import SearchFilters from './components/SearchFilters';
+import SearchResults from './components/SearchResults';
 import './SearchPage.css';
 
-const SOURCES = [
-  { id: 'tmdb', name: 'TMDb', adult: false },
-  { id: 'stashdb', name: 'StashDB', adult: true },
-  { id: 'fansdb', name: 'FansDB', adult: true },
-  { id: 'porndb', name: 'PornDB', adult: true },
-];
-
-const TYPES_BY_SOURCE = {
-  tmdb: [
-    { id: 'all', name: 'All', icon: Clapperboard },
-    { id: 'movie', name: 'Movies', icon: ENTITY_ICONS.movie },
-    { id: 'tv', name: 'TV Shows', icon: ENTITY_ICONS.tv },
-    { id: 'person', name: 'People', icon: ENTITY_ICONS.performer },
-  ],
-  stashdb: [
-    { id: 'scene', name: 'Scenes', icon: ENTITY_ICONS.episode },
-    { id: 'person', name: 'Performers', icon: ENTITY_ICONS.performer },
-  ],
-  fansdb: [
-    { id: 'scene', name: 'Scenes', icon: ENTITY_ICONS.episode },
-    { id: 'person', name: 'Performers', icon: ENTITY_ICONS.performer },
-  ],
-  porndb: [
-    { id: 'movie', name: 'Movies', icon: ENTITY_ICONS.movie },
-    { id: 'scene', name: 'Scenes', icon: ENTITY_ICONS.episode },
-    { id: 'person', name: 'Performers', icon: ENTITY_ICONS.performer },
-  ],
-};
-
 export default function SearchPage() {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
   const { data: settings } = useSettingsQuery();
-  const { sessionMode } = useLibraryModeStore();
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  // Read URL query params
-  const urlQuery = searchParams.get('q') || '';
-  const urlSource = searchParams.get('source') || 'tmdb';
-  const urlType = searchParams.get('type') || 'all';
-
-  // Local state for the input field
-  const [localQuery, setLocalQuery] = useState(urlQuery);
-
-  // Component states for results and loading
-  const [results, setResults] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isMoreLoading, setIsMoreLoading] = useState(false);
-  const [loadedPage, setLoadedPage] = useState(1);
-  const [hasMorePages, setHasMorePages] = useState(true);
-
-  const hasAdult = settings?.include_adult;
-  const filteredSources = useMemo(() => {
-    return SOURCES.filter(s => !s.adult || hasAdult);
-  }, [hasAdult]);
-
-  const [prevUrlQuery, setPrevUrlQuery] = useState(urlQuery);
-  if (urlQuery !== prevUrlQuery) {
-    setPrevUrlQuery(urlQuery);
-    setLocalQuery(urlQuery);
-  }
-
-  const [prevCriteria, setPrevCriteria] = useState({ query: urlQuery, source: urlSource, type: urlType });
-  if (urlQuery !== prevCriteria.query || urlSource !== prevCriteria.source || urlType !== prevCriteria.type) {
-    setPrevCriteria({ query: urlQuery, source: urlSource, type: urlType });
-    setLoadedPage(1);
-    setHasMorePages(true);
-    if (!urlQuery.trim()) {
-      setResults([]);
-    }
-  }
-
-  // Execute search when URL params change or loadedPage increases
-  useEffect(() => {
-    if (!urlQuery.trim()) {
-      return;
-    }
-
-    let isCancelled = false;
-    const fetchSearch = async () => {
-      if (loadedPage === 1) {
-        setIsLoading(true);
-      } else {
-        setIsMoreLoading(true);
-      }
-      try {
-        const data = await api.metadata.globalSearch({
-          query: urlQuery,
-          source: urlSource,
-          searchType: urlType,
-          includeAdult: hasAdult,
-          page: loadedPage,
-        });
-        if (!isCancelled) {
-          if (loadedPage === 1) {
-            setResults(data || []);
-          } else {
-            setResults((prev) => [...prev, ...(data || [])]);
-          }
-          if (!data || data.length < 20) {
-            setHasMorePages(false);
-          }
-        }
-      } catch (err) {
-        console.error('Search error:', err);
-        if (!isCancelled) {
-          if (loadedPage === 1) {
-            setResults([]);
-          }
-          setHasMorePages(false);
-        }
-      } finally {
-        if (!isCancelled) {
-          setIsLoading(false);
-          setIsMoreLoading(false);
-        }
-      }
-    };
-
-    fetchSearch();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [urlQuery, urlSource, urlType, hasAdult, loadedPage]);
-
-  // Client-side preference filtering for adult performers
-  const filteredResults = useMemo(() => {
-    const pref = settings?.adult_gender_preference;
-    const isAdultSource = SOURCES.find((s) => s.id === urlSource)?.adult;
-    if (!isAdultSource || urlType !== 'person' || !pref || pref === 'all') {
-      return results;
-    }
-    return results.filter((item) => {
-      const g = item.gender;
-      if (pref === 'female') return g === 1 || g === '1';
-      if (pref === 'male') return g === 2 || g === '2';
-      return true;
-    });
-  }, [results, urlSource, urlType, settings?.adult_gender_preference]);
-
-  const handleCardClick = (item) => {
-    const provider = item.provider || urlSource;
-    if (item.media_type === 'movie') {
-      const prefix = provider === 'porndb' ? 'porndb_' : 'tmdb_';
-      const id = String(item.id).startsWith(prefix) ? item.id : `${prefix}${item.id}`;
-      navigate(`/library/movie/${id}`, { state: { allowAdult: true } });
-    } else if (item.media_type === 'tv') {
-      navigate(`/library/tv/${item.id}`, { state: { allowAdult: true } });
-    } else if (item.media_type === 'person') {
-      navigate(`/library/people/${item.id}`, { state: { allowAdult: true } });
-    } else if (item.media_type === 'scene') {
-      const prefix = provider === 'porndb' ? 'porndb' : provider === 'fansdb' ? 'fansdb' : 'stash';
-      const id = String(item.id).startsWith(`${prefix}_`) ? item.id : `${prefix}_${item.id}`;
-      navigate(`/library/scene/${id}`, { state: { allowAdult: true } });
-    }
-  };
-
-  // Handle changing source (applies type fallback logic)
-  const handleSourceChange = (newSource) => {
-    const availableTypes = TYPES_BY_SOURCE[newSource] || [];
-    const hasSameType = availableTypes.some(t => t.id === urlType);
-    const nextType = hasSameType ? urlType : (availableTypes[0]?.id || 'all');
-    
-    setSearchParams({
-      q: urlQuery,
-      source: newSource,
-      type: nextType,
-    });
-  };
-
-  const handleTypeChange = (newType) => {
-    setSearchParams({
-      q: urlQuery,
-      source: urlSource,
-      type: newType,
-    });
-  };
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    setSearchParams({
-      q: localQuery.trim(),
-      source: urlSource,
-      type: urlType,
-    });
-  };
-
-  const sourceOptions = useMemo(() => {
-    return filteredSources.map(s => ({
-      value: s.id,
-      label: s.name,
-    }));
-  }, [filteredSources]);
-
-  const typeOptions = useMemo(() => {
-    const types = TYPES_BY_SOURCE[urlSource] || [];
-    return types.map(t => ({
-      value: t.id,
-      label: t.name,
-    }));
-  }, [urlSource]);
+  
+  const {
+    t,
+    localQuery,
+    setLocalQuery,
+    urlQuery,
+    urlSource,
+    urlType,
+    isLoading,
+    isMoreLoading,
+    setLoadedPage,
+    hasMorePages,
+    filteredResults,
+    sourceOptions,
+    typeOptions,
+    handleSourceChange,
+    handleTypeChange,
+    handleSearchSubmit,
+    handleCardClick,
+    sessionMode,
+  } = useSearchPageController();
 
   const activeTypeObj = (TYPES_BY_SOURCE[urlSource] || []).find(t => t.id === urlType) || { name: urlType, icon: Clapperboard };
   const FallbackIcon = activeTypeObj.icon;
-
-
 
   return (
     <Page className="search-page-layout">
@@ -237,42 +46,22 @@ export default function SearchPage() {
       </div>
 
       <div className="search-page-filters">
-        <form onSubmit={handleSearchSubmit} className="search-page-input-form">
-          <Input
-            type="text"
-            className="search-page-input"
-            placeholder={t('search.inputPlaceholder', { defaultValue: 'Type query and press Enter...' })}
-            value={localQuery}
-            onChange={(e) => setLocalQuery(e.target.value)}
-            leftElement={
-              <button type="submit" className="search-page-input-btn" aria-label="Search">
-                <Search size={18} />
-              </button>
-            }
-          />
-        </form>
+        <SearchInput
+          localQuery={localQuery}
+          setLocalQuery={setLocalQuery}
+          handleSearchSubmit={handleSearchSubmit}
+          t={t}
+        />
 
-        <div className="search-page-controls">
-          <div className="search-page-control-group">
-            <span className="search-page-control-label">{t('search.sourceLabel', { defaultValue: 'Source' })}</span>
-            <SegmentedControl
-              options={sourceOptions}
-              value={urlSource}
-              onChange={handleSourceChange}
-              ariaLabel="Select search source"
-            />
-          </div>
-
-          <div className="search-page-control-group">
-            <span className="search-page-control-label">{t('search.typeLabel', { defaultValue: 'Type' })}</span>
-            <SegmentedControl
-              options={typeOptions}
-              value={urlType}
-              onChange={handleTypeChange}
-              ariaLabel="Select search type"
-            />
-          </div>
-        </div>
+        <SearchFilters
+          urlSource={urlSource}
+          handleSourceChange={handleSourceChange}
+          sourceOptions={sourceOptions}
+          urlType={urlType}
+          handleTypeChange={handleTypeChange}
+          typeOptions={typeOptions}
+          t={t}
+        />
       </div>
 
       <div className="search-page-content">
@@ -294,71 +83,23 @@ export default function SearchPage() {
         ) : filteredResults.length === 0 ? (
           <EmptyState
             icon={ImageOff}
-            title={t('common.noResults', { defaultValue: 'No Results Found' })}
+            title={t('search.noResults.title', { defaultValue: 'No Results Found' })}
             description={t('search.noResults.desc', { defaultValue: 'Try another query or change search settings.' })}
           />
         ) : (
-          <>
-            <PosterGrid className={`search-page-grid ${urlType === 'scene' ? 'library-scenes-grid' : ''}`}>
-              {filteredResults.map((item, idx) => {
-                const n = normalizeMediaEntity(item, { context: 'search', settings });
-                const isAdultItem = urlSource !== 'tmdb' || item.is_adult || item.media_type === 'scene';
-                const showBlurOverlay = sessionMode === 'sfw' && isAdultItem;
-
-                const imgType = showBlurOverlay ? (item.media_type === 'scene' ? 'backdrop' : 'poster') : 'posterThumb';
-                const rawPosterUrl = item.poster_path ? resolveMediaImageUrl(item.poster_path, imgType) : null;
-                const posterUrl = (showBlurOverlay && rawPosterUrl)
-                  ? `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(rawPosterUrl)}&blur=true`
-                  : rawPosterUrl;
-
-                let subtitle = n.subtitle || undefined;
-                let ratingPill;
-                let performers;
-
-                if (item.media_type === 'scene') {
-                  performers = n.performers;
-                  subtitle = undefined;
-
-                  const displayDate = item.release_date ? item.release_date.substring(0, 10) : item.year;
-                  ratingPill = displayDate ? (
-                    <span className="search-page-card-date">{displayDate}</span>
-                  ) : undefined;
-                }
-
-                return (
-                  <PosterCard
-                    key={`${item.id}-${item.media_type}-${idx}`}
-                    aspect={item.media_type === 'scene' ? 'landscape' : 'poster'}
-                    className={item.media_type === 'scene' ? 'library-scene-card' : ''}
-                    title={item.title || item.name}
-                    subtitle={subtitle}
-                    ratingPill={ratingPill}
-                    performers={performers}
-                    imageUrl={posterUrl}
-                    icon={FallbackIcon}
-                    onClick={() => handleCardClick(item)}
-                    overlay={showBlurOverlay ? <AdultOverlay variant="obscure" /> : null}
-                  />
-                );
-              })}
-            </PosterGrid>
-
-            {hasMorePages && (
-              <div className="search-page-more-container">
-                <Button
-                  variant="secondary-neutral"
-                  onClick={() => setLoadedPage((prev) => prev + 1)}
-                  disabled={isMoreLoading}
-                >
-                  {isMoreLoading ? <Spinner size="sm" /> : t('search.moreMatches', {
-                    count: 20,
-                    defaultValue: 'Load More Results (+20)'
-                  })}
-                </Button>
-              </div>
-            )}
-            
-          </>
+          <SearchResults
+            filteredResults={filteredResults}
+            urlType={urlType}
+            urlSource={urlSource}
+            settings={settings}
+            sessionMode={sessionMode}
+            FallbackIcon={FallbackIcon}
+            handleCardClick={handleCardClick}
+            hasMorePages={hasMorePages}
+            setLoadedPage={setLoadedPage}
+            isMoreLoading={isMoreLoading}
+            t={t}
+          />
         )}
       </div>
     </Page>
