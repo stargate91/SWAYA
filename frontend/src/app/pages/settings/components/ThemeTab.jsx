@@ -2,6 +2,7 @@ import { Check } from '@/ui/icons';
 import { useSettingsViewContext, useSettingsField } from '../SettingsFormContext.jsx';
 import Card from '@/ui/Card';
 import SelectableCard from '@/ui/SelectableCard';
+import styles from './ThemeTab.module.css';
 
 const THEME_LIST = [
   { value: 'dark', translationKey: 'settingsPage.sections.theme.options.dark' },
@@ -45,14 +46,14 @@ export default function ThemeTab() {
       title={t('settingsPage.sections.theme.title')}
       eyebrow={t('settingsPage.sections.theme.eyebrow')}
     >
-      <div className="theme-tab-container">
-        <div className="theme-tab-header">
-          <label className="theme-tab-description">
+      <div className={styles['theme-tab-container']}>
+        <div className={styles['theme-tab-header']}>
+          <label className={styles['theme-tab-description']}>
             {t('settingsPage.sections.theme.hint') || 'Choose how the app should look.'}
           </label>
         </div>
 
-        <div className="theme-grid">
+        <div className={styles['theme-grid']}>
           {THEME_LIST.map((theme) => {
             const isActive = currentTheme === theme.value;
             const label = t(theme.translationKey) || theme.value;
@@ -69,9 +70,9 @@ export default function ThemeTab() {
                   }
                 }}
               >
-                <div className="theme-card__header">
-                  <span className="theme-card__name">{label}</span>
-                  <div className="theme-card__indicator">
+                <div className={styles['theme-card__header']}>
+                  <span className={styles['theme-card__name']}>{label}</span>
+                  <div className={styles['theme-card__indicator']}>
                     <Check size={12} strokeWidth={3} />
                   </div>
                 </div>

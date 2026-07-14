@@ -10,6 +10,8 @@ import {
 } from './components';
 import { settingsTabGroups } from './settingsTabs.config.jsx';
 import { SETTINGS_TAB_IDS } from './settingsConstants.js';
+import styles from './SettingsPage.module.css';
+import './styles/SettingsForms.css';
 
 export default function SettingsPage() {
   const {
@@ -140,7 +142,7 @@ export default function SettingsPage() {
       <main className="ui-overlay__content-wrapper">
 
         <div className="ui-overlay__content">
-          <div className="settings-tab-content">
+          <div className={styles['settings-tab-content']}>
             <SettingsFormProvider
               form={form}
               validationErrors={validationErrors}

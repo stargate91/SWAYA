@@ -104,6 +104,7 @@
   cursor: pointer;
   transition: height var(--motion-slow), opacity var(--motion-base), margin var(--motion-slow), color var(--motion-fast);
   user-select: none;
+  line-height: 1;
 }
 
 .ui-sidebar-sub-item:hover,

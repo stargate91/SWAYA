@@ -4,6 +4,8 @@ import Switch from '@/ui/Switch';
 import { useSettingsPresets } from '../hooks';
 import SettingsLiveImpact from './SettingsLiveImpact.jsx';
 import { useSettingsFormContext } from '../SettingsFormContext.jsx';
+import styles from '../SettingsPage.module.css';
+import presetStyles from './PresetsTab.module.css';
 
 export default function PresetsTab() {
   const {
@@ -18,21 +20,21 @@ export default function PresetsTab() {
   const isScanActive = Boolean(renderContext?.isBackgroundActive);
 
   return (
-    <div className="settings-tab-stack">
+    <div className={styles['settings-tab-stack']}>
       <Card
         title={t('settingsPage.sections.mode.title')}
         eyebrow={t('settingsPage.sections.mode.eyebrow')}
       >
-        <div className="settings-section-stack">
+        <div className={styles['settings-section-stack']}>
           <span className="ui-field__hint settings-hint--tight-top">
             {t('settingsPage.sections.mode.hint')}
           </span>
-          <div className="settings-mode-grid">
+          <div className={presetStyles['settings-mode-grid']}>
             {/* Mode A: Library sorting */}
             <SelectableCard
               as="div"
               onClick={isScanActive ? undefined : () => setMoveToLibrary(true)}
-              className="settings-mode-card"
+              className={presetStyles['settings-mode-card']}
               selected={form.folder_move_to_library}
               disabled={isScanActive}
             >
@@ -57,7 +59,7 @@ export default function PresetsTab() {
             <SelectableCard
               as="div"
               onClick={isScanActive ? undefined : () => setMoveToLibrary(false)}
-              className="settings-mode-card"
+              className={presetStyles['settings-mode-card']}
               selected={!form.folder_move_to_library}
               disabled={isScanActive}
             >
@@ -85,12 +87,12 @@ export default function PresetsTab() {
         title={t('settingsPage.sections.organization.title')}
         eyebrow={t('settingsPage.sections.organization.eyebrow')}
       >
-        <div className="settings-section-stack">
+        <div className={styles['settings-section-stack']}>
           <span className="ui-field__label">{t('settingsPage.sections.organization.presetLabel')}</span>
           <span className="ui-field__hint settings-hint--compact">
             {t('settingsPage.sections.organization.presetHint')}
           </span>
-          <div className="settings-preset-grid">
+          <div className={presetStyles['settings-preset-grid']}>
             {presetCards.map((preset) => {
               const isSelected = form.organization_preset === preset.value;
               const isCardDisabled = isScanActive || (form.custom_organization_enabled && !isSelected);
@@ -99,22 +101,22 @@ export default function PresetsTab() {
                   as="div"
                   key={preset.value}
                   onClick={isScanActive || form.custom_organization_enabled ? undefined : () => applyPreset(preset.value)}
-                  className="settings-preset-card"
+                  className={presetStyles['settings-preset-card']}
                   selected={isSelected}
                   disabled={isCardDisabled}
                 >
                   <div className="settings-choice-header settings-choice-header--compact">
-                    <span className="settings-preset-icon">{preset.icon}</span>
-                    <span className={`settings-preset-title${isSelected ? ' is-active' : ''}`}>
+                    <span className={presetStyles['settings-preset-icon']}>{preset.icon}</span>
+                    <span className={`${presetStyles['settings-preset-title']}${isSelected ? ` ${presetStyles['is-active']}` : ''}`}>
                       {preset.label}
                     </span>
                     {isSelected && (
-                      <span className="settings-preset-badge">
+                      <span className={presetStyles['settings-preset-badge']}>
                         {t('settingsPage.sections.organization.activePreset')}
                       </span>
                     )}
                   </div>
-                  <span className="settings-preset-description">
+                  <span className={presetStyles['settings-preset-description']}>
                     {preset.desc}
                   </span>
                 </SelectableCard>
@@ -122,7 +124,7 @@ export default function PresetsTab() {
             })}
           </div>
           
-          <div className="settings-choice-stack">
+          <div className={styles['settings-choice-stack']}>
             <Switch
               id="custom_organization_enabled"
               checked={form.custom_organization_enabled}

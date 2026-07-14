@@ -43,7 +43,7 @@ export default function Sidebar({ header, groups, onTabSelect }) {
                     <div
                       className="ui-sidebar-sub-indicator"
                       // eslint-disable-next-line react/forbid-dom-props
-                      style={{ top: `${activeSubIndex * 32}px` }}
+                      style={{ top: `calc(${activeSubIndex} * (2 * var(--space-lg) + var(--space-xs)))` }}
                     />
                   )}
                   {group.subItems.map((sub) => {

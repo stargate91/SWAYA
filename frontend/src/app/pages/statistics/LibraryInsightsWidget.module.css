@@ -32,8 +32,6 @@
   box-shadow: var(--shadow-lg), 0 0 0.9375rem color-mix(in srgb, var(--color-accent-blue-soft) 10%, transparent);
 }
 
-
-
 .insights-panel::before {
   content: '';
   position: absolute;
@@ -320,7 +318,6 @@
   font-weight: var(--font-weight-extrabold);
 }
 
-/* Ghost state / Low data premium empty states */
 .insights-dna-stage--ghost,
 .insights-timeline-stage--ghost {
   opacity: 0.15;
@@ -438,4 +435,3 @@
   0%, 100% { transform: translateY(0) scale(1); }
   50% { transform: translateY(-0.25rem) scale(1.03); }
 }
-

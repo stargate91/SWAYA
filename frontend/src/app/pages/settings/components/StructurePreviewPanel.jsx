@@ -1,11 +1,12 @@
 import { buildStructurePreviewModel } from '../settingsPreviewModel.js';
+import styles from './StructurePreview.module.css';
 
 function PreviewLine({ children, tone = 'default', topSpacing = false, strike = false }) {
   const className = [
-    'structure-preview-line',
-    tone !== 'default' ? `structure-preview-line--${tone}` : '',
-    topSpacing ? 'structure-preview-line--top' : '',
-    strike ? 'structure-preview-line--strike' : '',
+    styles['structure-preview-line'],
+    tone !== 'default' ? styles[`structure-preview-line--${tone}`] : '',
+    topSpacing ? styles['structure-preview-line--top'] : '',
+    strike ? styles['structure-preview-line--strike'] : '',
   ].filter(Boolean).join(' ');
 
   return <div className={className}>{children}</div>;
@@ -13,14 +14,14 @@ function PreviewLine({ children, tone = 'default', topSpacing = false, strike = 
 
 function PreviewBranch({ children, topSpacing = false }) {
   return (
-    <div className={`structure-preview-branch${topSpacing ? ' structure-preview-branch--top' : ''}`}>
+    <div className={`${styles['structure-preview-branch']}${topSpacing ? ` ${styles['structure-preview-branch--top']}` : ''}`}>
       {children}
     </div>
   );
 }
 
 function PreviewArrow({ arrow }) {
-  return <span className="structure-preview-arrow">{arrow}</span>;
+  return <span className={styles['structure-preview-arrow']}>{arrow}</span>;
 }
 
 function renderTreeNode(node, icons) {
@@ -52,12 +53,12 @@ export default function StructurePreviewPanel({ form, t }) {
   const model = buildStructurePreviewModel(form, t);
 
   return (
-    <div className="structure-preview-container">
+    <div className={styles['structure-preview-container']}>
       <div>
-        <div className="structure-preview-root">
+        <div className={styles['structure-preview-root']}>
           {model.rootIcon} {model.rootLabel}
         </div>
-        <div className="structure-preview-indent">
+        <div className={styles['structure-preview-indent']}>
           {model.mode === 'tree' ? (
             model.nodes.map((node, index) => (
               <div key={`${node.label}-${index}`}>
@@ -68,14 +69,14 @@ export default function StructurePreviewPanel({ form, t }) {
               </div>
             ))
           ) : (
-            <div className="structure-preview-rename-list">
+            <div className={styles['structure-preview-rename-list']}>
               {model.items.map((item, index) => (
-                <div key={`${item.before}-${index}`} className={index === 0 ? '' : 'structure-preview-rename-item'}>
-                  <span className="structure-preview-line structure-preview-line--muted structure-preview-line--strike">
+                <div key={`${item.before}-${index}`} className={index === 0 ? '' : styles['structure-preview-rename-item']}>
+                  <span className={`${styles['structure-preview-line']} ${styles['structure-preview-line--muted']} ${styles['structure-preview-line--strike']}`}>
                     {model.fileIcon} {item.before}
                   </span>
                   <PreviewArrow arrow={model.arrow} />
-                  <span className={`structure-preview-line structure-preview-line--${item.afterTone}${item.strike ? ' structure-preview-line--strike' : ''}`}>
+                  <span className={`${styles['structure-preview-line']} ${styles[`structure-preview-line--${item.afterTone}`]}${item.strike ? ` ${styles['structure-preview-line--strike']}` : ''}`}>
                     {model.fileIcon} {item.after}
                   </span>
                 </div>

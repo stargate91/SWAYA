@@ -1,11 +1,12 @@
 import Spinner from '@/ui/Spinner';
+import styles from '../SettingsPage.module.css';
 
 export default function SettingsLoadingState({ t }) {
   return (
     <div className="settings-overlay settings-overlay--centered">
-      <div className="settings-loading-state">
+      <div className={styles['settings-loading-state']}>
         <Spinner label={t('settingsPage.loading')} />
-        <span className="settings-loading-text">
+        <span className={styles['settings-loading-text']}>
           {t('settingsPage.loading')}
         </span>
       </div>

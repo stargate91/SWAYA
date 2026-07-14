@@ -58,8 +58,6 @@
   box-shadow: var(--shadow-lg), 0 0 0.9375rem color-mix(in srgb, var(--color-accent-blue-soft) 10%, transparent);
 }
 
-
-
 .stat-card::before {
   content: '';
   position: absolute;

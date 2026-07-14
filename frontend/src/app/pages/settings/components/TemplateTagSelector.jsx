@@ -1,4 +1,5 @@
 import TagButton from '@/ui/TagButton';
+import styles from './StructurePreview.module.css';
 
 export default function TemplateTagSelector({ t, tags, fieldKey, inputRef, insertTag, disabled }) {
   const commonTags = tags.common || [];
@@ -6,13 +7,13 @@ export default function TemplateTagSelector({ t, tags, fieldKey, inputRef, inser
   const additionalTags = allTags.filter((tag) => !commonTags.includes(tag));
 
   return (
-    <div className="template-tag-selector">
+    <div className={styles['template-tag-selector']}>
       {commonTags.length > 0 && (
-        <div className="template-tag-selector-group">
-          <div className="template-tag-selector-label">
+        <div className={styles['template-tag-selector-group']}>
+          <div className={styles['template-tag-selector-label']}>
             {t('settingsPage.templateTags.common')}
           </div>
-          <div className="template-tag-selector-container">
+          <div className={styles['template-tag-selector-container']}>
             {commonTags.map((tag) => (
               <TagButton
                 key={tag}
@@ -26,11 +27,11 @@ export default function TemplateTagSelector({ t, tags, fieldKey, inputRef, inser
         </div>
       )}
       {additionalTags.length > 0 && (
-        <div className="template-tag-selector-group">
-          <div className="template-tag-selector-label">
+        <div className={styles['template-tag-selector-group']}>
+          <div className={styles['template-tag-selector-label']}>
             {t('settingsPage.templateTags.more')}
           </div>
-          <div className="template-tag-selector-container">
+          <div className={styles['template-tag-selector-container']}>
             {additionalTags.map((tag) => (
               <TagButton
                 key={tag}
