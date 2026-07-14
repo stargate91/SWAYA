@@ -1,5 +1,6 @@
 import { useTranslation } from '../providers/LanguageContext';
 import { useDropzone } from './useDropzone';
+import styles from './FileDropZone.module.css';
 
 export default function FileDropZone({
   children,
@@ -21,11 +22,11 @@ export default function FileDropZone({
   });
 
   return (
-    <div className={`ui-file-drop-zone ${className}`.trim()} {...dropzoneProps}>
-      <div className={`organizer-drop-overlay ${isDropActive ? 'is-active' : ''}`}>
-        <div className="organizer-drop-overlay__panel">
-          <span className="organizer-drop-overlay__label">{displayLabel}</span>
-          <span className="organizer-drop-overlay__description">{displayDescription}</span>
+    <div className={`${styles['drop-zone']} ui-file-drop-zone ${className}`.trim()} {...dropzoneProps}>
+      <div className={`${styles.overlay} ${isDropActive ? styles['is-active'] : ''}`}>
+        <div className={styles.panel}>
+          <span className={styles.label}>{displayLabel}</span>
+          <span className={styles.description}>{displayDescription}</span>
         </div>
       </div>
       {children}

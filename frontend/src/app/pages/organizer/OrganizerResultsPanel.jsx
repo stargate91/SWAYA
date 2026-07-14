@@ -4,8 +4,8 @@ import Spinner from '../../ui/Spinner';
 import Table from '../../ui/Table';
 import FileDropZone from '../../ui/FileDropZone';
 import { usePaginationVisibility } from '../../hooks/usePaginationVisibility';
-
 import { useOrganizerModals } from './useOrganizerModals';
+import styles from './OrganizerResultsPanel.module.css';
 
 export default function OrganizerResultsPanel({
   activeRowId,
@@ -45,27 +45,27 @@ export default function OrganizerResultsPanel({
 
   return (
     <FileDropZone
-      className="organizer-results"
+      className={styles['organizer-results']}
       onDropPaths={onDropPaths}
       disabled={isDropzoneDisabled}
       label={dropOverlayLabel}
       description={dropOverlayDescription}
     >
       {loadingState ? (
-        <div className="organizer-results organizer-results--empty">
-          <div className="organizer-empty-state organizer-empty-state--loading">
+        <div className={`${styles['organizer-results']} ${styles['organizer-results--empty']}`}>
+          <div className={`${styles['organizer-empty-state']} ${styles['organizer-empty-state--loading']}`}>
             <Spinner
-              className="organizer-spinner-state"
+              className={styles['organizer-spinner-state']}
               label={loadingState.label}
               description={loadingState.description}
             />
           </div>
         </div>
       ) : emptyState ? (
-        <div className="organizer-results organizer-results--empty">
+        <div className={`${styles['organizer-results']} ${styles['organizer-results--empty']}`}>
           <EmptyState
             actions={emptyActions}
-            className="organizer-empty-state"
+            className={styles['organizer-empty-state']}
             description={emptyState.description}
             icon={emptyState.icon}
             title={emptyState.title}
@@ -88,8 +88,8 @@ export default function OrganizerResultsPanel({
             />
           ) : null}
 
-          <div className="organizer-table-block">
-            <div className="organizer-content">
+          <div className={styles['organizer-table-block']}>
+            <div className={styles['organizer-content']}>
               <Table
                 columns={columns}
                 rows={rows}

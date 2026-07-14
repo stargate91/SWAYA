@@ -6,6 +6,7 @@ import PosterCard from '../../../ui/PosterCard';
 import CardMetadata from '../../../ui/CardMetadata';
 import Button from '../../../ui/Button';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
+import styles from '../MatchModal.module.css';
 
 export default function MatchEpisodeCard({
   episodeEntry,
@@ -30,9 +31,9 @@ export default function MatchEpisodeCard({
   }, [isHighlighted]);
 
   const subtitleNode = (
-    <div className="organizer-match-modal__browser-card-meta-row">
+    <div className={styles['organizer-match-modal__browser-card-meta-row']}>
       <CardMetadata.Row
-        className="organizer-match-modal__browser-card-meta"
+        className={styles['organizer-match-modal__browser-card-meta']}
         items={[
           `E${episodeEntry.episode_number}`,
           episodeEntry.air_date ? String(episodeEntry.air_date).slice(0, 10) : null,
@@ -42,7 +43,7 @@ export default function MatchEpisodeCard({
         type="button"
         variant="ghost"
         size="sm"
-        className="organizer-match-modal__select-button"
+        className={styles['organizer-match-modal__select-button']}
         onClick={() => onSelect(episodeEntry)}
         disabled={isDisabled}
       >
@@ -54,7 +55,7 @@ export default function MatchEpisodeCard({
   const badgeNode = (
     <>
       {isBucketed && (
-        <div className="organizer-match-modal__browser-card-bucket-indicator">
+        <div className={styles['organizer-match-modal__browser-card-bucket-indicator']}>
           <Check size={12} strokeWidth={3} />
         </div>
       )}
@@ -69,7 +70,7 @@ export default function MatchEpisodeCard({
   return (
     <div
       ref={cardRef}
-      className={`organizer-match-modal__browser-card organizer-match-modal__browser-card--episode${isBucketed ? ' is-selected' : ''}${isHighlighted ? ' is-highlighted' : ''}`.trim()}
+      className={`${styles['organizer-match-modal__browser-card']} ${styles['organizer-match-modal__browser-card--episode']} ${isBucketed ? styles['is-selected'] : ''} ${isHighlighted ? styles['is-highlighted'] : ''}`.trim()}
     >
       <PosterCard
         imageUrl={stillUrl}

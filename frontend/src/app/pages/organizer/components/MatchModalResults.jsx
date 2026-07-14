@@ -1,6 +1,7 @@
 import MatchCandidateCard from './MatchCandidateCard';
 import EmptyState from '../../../ui/EmptyState';
 import ScrollRow from '../../../ui/ScrollRow';
+import styles from '../MatchModal.module.css';
 
 export default function MatchModalResults({
   results,
@@ -23,7 +24,7 @@ export default function MatchModalResults({
         <ScrollRow
           enableWheelScroll
           showArrows
-          className={`organizer-match-modal__poster-results${mode === 'scene' || visibleResultCandidates.some(c => c.type === 'scene' || c.media_type === 'scene') ? ' is-scene' : ''}`}
+          className={`${styles['organizer-match-modal__poster-results']} ${mode === 'scene' || visibleResultCandidates.some(c => c.type === 'scene' || c.media_type === 'scene') ? styles['is-scene'] : ''}`}
         >
           {visibleResultCandidates.map((candidate) => (
             <MatchCandidateCard
@@ -43,7 +44,7 @@ export default function MatchModalResults({
       ) : null}
 
       {shouldShowListResults ? (
-        <div className="organizer-match-modal__results">
+        <div className={styles['organizer-match-modal__results']}>
           {results.map((candidate) => (
             <MatchCandidateCard
               key={`search-${candidate.tmdb_id || candidate.id}`}

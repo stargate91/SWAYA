@@ -1,0 +1,51 @@
+.drop-zone {
+  position: relative;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl);
+  background: var(--color-surface-overlay-strong);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--motion-fast);
+  z-index: 3;
+}
+
+.overlay.is-active {
+  opacity: 1;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: min(100%, 26.25rem);
+  padding: var(--space-3xl) var(--space-2xl);
+  border: 1px dashed color-mix(in srgb, var(--color-accent) 70%, transparent);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--color-accent) 16%, transparent), transparent 58%),
+    var(--color-dropzone-panel-bg, var(--color-surface-overlay-heavy));
+  box-shadow: var(--shadow-overlay-dropzone, 0 var(--space-xl) 3.125rem color-mix(in srgb, black 35%, transparent));
+  text-align: center;
+}
+
+.label {
+  color: var(--color-ink);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.02em;
+}
+
+.description {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.6;
+  max-width: 21.25rem;
+}

@@ -6,6 +6,7 @@ import PosterCard from '@/ui/PosterCard';
 import CompactCard from '@/ui/CompactCard';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { MEDIA_TYPES, isTvLikeMediaType, toMetadataMediaType } from '@/lib/mediaTypes';
+import styles from '../MatchModal.module.css';
 
 const getDisplayTitle = (candidate, mediaType, t) => (
   candidate?.title
@@ -66,7 +67,7 @@ export default function MatchCandidateCard({
     return (
       <PosterCard
         key={`${sourceLabel}-${candidateId}`}
-        className={`organizer-match-modal__poster-card${mediaType === 'scene' ? ' is-scene' : ''}`}
+        className={`${styles['organizer-match-modal__poster-card']} ${mediaType === 'scene' ? styles['is-scene'] : ''}`}
         aspect={mediaType === 'scene' ? 'landscape' : 'poster'}
         active={candidate.is_active}
         imageUrl={posterUrl}
@@ -76,7 +77,7 @@ export default function MatchCandidateCard({
         title={displayTitle}
         subtitle={
           <CardMetadata.Row
-            className="organizer-match-modal__poster-card-meta"
+            className={styles['organizer-match-modal__poster-card-meta']}
             items={[
               displayYear,
               mediaType === 'scene' ? t('organizer.details.matchModal.scene') : (isTvLikeMediaType(mediaType) ? t('organizer.details.matchModal.tv') : t('organizer.details.matchModal.movie')),
@@ -117,7 +118,7 @@ export default function MatchCandidateCard({
   ) : null;
 
   const rightAction = isResolvingId === candidateId ? (
-    <span className="organizer-match-modal__result-action">
+    <span className={styles['organizer-match-modal__result-action']}>
       {t('organizer.details.matchModal.applying')}
     </span>
   ) : null;
@@ -133,10 +134,10 @@ export default function MatchCandidateCard({
       active={candidate.is_active}
       disabled={isDisabled}
       onClick={() => onSelect(candidate)}
-      className={mediaType === 'scene' ? 'is-scene' : ''}
+      className={mediaType === 'scene' ? styles['is-scene'] : ''}
       meta={
         <CardMetadata.Row
-          className="organizer-match-modal__result-meta"
+          className={styles['organizer-match-modal__result-meta']}
           items={[
             displayYear,
             mediaType === 'scene' ? t('organizer.details.matchModal.scene') : (isTvLikeMediaType(mediaType) ? t('organizer.details.matchModal.tv') : t('organizer.details.matchModal.movie')),

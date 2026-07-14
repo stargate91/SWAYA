@@ -4,6 +4,7 @@ import SegmentedControl from '../../../ui/SegmentedControl';
 import Tooltip from '../../../ui/Tooltip';
 import Input from '../../../ui/Input';
 import SearchInputCombo from '../../../ui/SearchInputCombo';
+import styles from '../MatchModal.module.css';
 
 export default function MatchModalSearchForm({
   query,
@@ -28,14 +29,14 @@ export default function MatchModalSearchForm({
   providerOptions,
 }) {
   return (
-    <form className="organizer-match-modal__search" onSubmit={onSearch}>
-      <div className="organizer-match-modal__search-layout">
+    <form className={styles['organizer-match-modal__search']} onSubmit={onSearch}>
+      <div className={styles['organizer-match-modal__search-layout']}>
         <div
-          className={`organizer-match-modal__search-grid${isTvMode && !isBulk ? ' is-tv' : ' is-movie'}`}
+          className={`${styles['organizer-match-modal__search-grid']} ${isTvMode && !isBulk ? styles['is-tv'] : styles['is-movie']}`}
         >
           {sessionMode === 'nsfw' ? (
             <SearchInputCombo
-              className="organizer-match-modal__field organizer-match-modal__field--query"
+              className={`${styles['organizer-match-modal__field']} ${styles['organizer-match-modal__field--query']}`}
               size="lg"
               showSearchIcon={false}
               value={query}
@@ -52,7 +53,7 @@ export default function MatchModalSearchForm({
             />
           ) : (
             <Input
-              className="organizer-match-modal__field organizer-match-modal__field--query"
+              className={`${styles['organizer-match-modal__field']} ${styles['organizer-match-modal__field--query']}`}
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={
@@ -64,7 +65,7 @@ export default function MatchModalSearchForm({
             />
           )}
           <Input
-            className="organizer-match-modal__field organizer-match-modal__field--year"
+            className={`${styles['organizer-match-modal__field']} ${styles['organizer-match-modal__field--year']}`}
             value={year}
             onChange={(event) => setYear(event.target.value)}
             placeholder={t('organizer.details.matchModal.year')}
@@ -73,7 +74,7 @@ export default function MatchModalSearchForm({
           />
           {isTvMode && !isBulk ? (
             <Input
-              className="organizer-match-modal__field organizer-match-modal__field--compact"
+              className={`${styles['organizer-match-modal__field']} ${styles['organizer-match-modal__field--compact']}`}
               value={season}
               onChange={(event) => setSeason(event.target.value)}
               placeholder={t('organizer.details.matchModal.seasonShort')}
@@ -83,7 +84,7 @@ export default function MatchModalSearchForm({
           ) : null}
           {isTvMode && !isBulk ? (
             <Input
-              className="organizer-match-modal__field organizer-match-modal__field--compact"
+              className={`${styles['organizer-match-modal__field']} ${styles['organizer-match-modal__field--compact']}`}
               value={episode}
               onChange={(event) => setEpisode(event.target.value)}
               placeholder={t('organizer.details.matchModal.episodeShort')}
@@ -92,7 +93,7 @@ export default function MatchModalSearchForm({
             />
           ) : null}
         </div>
-        <div className="organizer-match-modal__search-actions">
+        <div className={styles['organizer-match-modal__search-actions']}>
           <Tooltip
             content={isSearching ? t('organizer.details.matchModal.searching') : t('common.search')}
             side="top"
@@ -100,7 +101,7 @@ export default function MatchModalSearchForm({
             <IconButton
               type="submit"
               variant="secondary"
-              className="organizer-match-modal__search-button"
+              className={styles['organizer-match-modal__search-button']}
               disabled={isSearching}
               label={isSearching ? t('organizer.details.matchModal.searching') : t('common.search')}
               title={null}
@@ -111,7 +112,7 @@ export default function MatchModalSearchForm({
         </div>
         {!isBulk && ['tmdb', 'porndb'].includes(provider) && scanMode !== 'scenes' ? (
           <SegmentedControl
-            className="organizer-match-modal__mode-toggle"
+            className={styles['organizer-match-modal__mode-toggle']}
             options={
               provider === 'porndb'
                 ? [

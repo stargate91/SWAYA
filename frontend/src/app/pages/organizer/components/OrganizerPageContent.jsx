@@ -4,6 +4,7 @@ import OrganizerHeaderPanel from '../OrganizerHeaderPanel';
 import OrganizerResultsPanel from '../OrganizerResultsPanel';
 import { useOrganizerColumns } from '../useOrganizerColumns.jsx';
 import { normalizeStatusTone, PAGE_SIZE_OPTIONS } from '../organizerMappers';
+import styles from '../OrganizerPage.module.css';
 
 export default function OrganizerPageContent({
   activeExtrasTab,
@@ -85,9 +86,9 @@ export default function OrganizerPageContent({
       : t('organizer.table.emptyCategory', { context: currentContextLabel }) || `No items in ${currentContextLabel}.`;
 
   return (
-    <Page viewport={true} className="organizer-page">
-      <div className={`organizer-main ${!shouldShowDetailsPanel ? 'is-details-hidden' : isDetailsCollapsed ? 'is-details-collapsed' : ''}`}>
-        <div className="organizer-main__content">
+    <Page viewport={true} className={`organizer-page ${styles['organizer-page']}`}>
+      <div className={`${styles['organizer-main']} ${!shouldShowDetailsPanel ? styles['is-details-hidden'] : isDetailsCollapsed ? styles['is-details-collapsed'] : ''}`}>
+        <div className={styles['organizer-main__content']}>
           <OrganizerHeaderPanel
             activeExtrasTab={activeExtrasTab}
             activeManualTab={activeManualTab}

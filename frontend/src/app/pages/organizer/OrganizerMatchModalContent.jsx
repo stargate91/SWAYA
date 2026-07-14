@@ -9,7 +9,7 @@ import MatchModalResults from './components/MatchModalResults';
 import MatchModalBrowser from './components/MatchModalBrowser';
 import useMatchModalViewModel from './components/useMatchModalViewModel';
 import EmptyState from '../../ui/EmptyState';
-import './MatchModal.css';
+import styles from './MatchModal.module.css';
 
 function getInitialMatchEmptyState({ row, mode, t }) {
   const isTvMode = mode === 'tv' || mode === 'tv';
@@ -33,10 +33,10 @@ function getInitialMatchEmptyState({ row, mode, t }) {
   }
 
   return {
-    title: t('organizer.details.matchModal.newDetectedMatchesTitle') || 'No automatic match yet',
+    title: t('organizer.details.matchModal.noDetectedMatchesTitle') || 'No detected matches',
     description: isTvMode
-      ? (t('organizer.details.matchModal.newDetectedMatchesTvDesc') || 'This item has not been matched to a show yet. Search above to find the correct tv.')
-      : (t('organizer.details.matchModal.newDetectedMatchesMovieDesc') || 'This item has not been matched to a movie yet. Search above to find the correct title.'),
+      ? (t('organizer.details.matchModal.noDetectedMatchesTvDesc') || 'We could not detect a usable tv match for this item. Search above to find the right show.')
+      : (t('organizer.details.matchModal.noDetectedMatchesMovieDesc') || 'We could not detect a usable movie match for this item. Search above to find the right title.'),
   };
 }
 
@@ -47,45 +47,45 @@ export default function OrganizerMatchModalContent({
   toast,
   onResolved,
   scanMode,
+  sessionMode,
 }) {
   const {
     query,
     setQuery,
-    mode,
     year,
     setYear,
     season,
     setSeason,
     episode,
     setEpisode,
-    results,
-    hasSearched,
-    isSearching,
-    isResolvingId,
-    browserState,
-    isBrowserLoading,
+    mode,
     isTvMode,
+    isSearching,
+    hasSearched,
+    isBrowserLoading,
     browserTitle,
     browserMetaItems,
+    results,
+    confirmState,
+    setConfirmState,
+    browserState,
     bucketEpisodeNumbers,
     visibleResultCandidates,
     shouldShowPosterResults,
     shouldShowListResults,
+    isResolvingId,
+    provider,
+    providerOptions,
     handleSearch,
     handleModeChange,
-    handleResolve,
-    handleBrowseSeason,
     handleCandidateSelect,
+    handleBrowseSeason,
+    handleSelectEpisode,
     handleBrowserBack,
+    handleResolve,
+    handleProviderChange,
     toggleBucketEpisode,
     handleApplyBucket,
-    handleSelectEpisode,
-    confirmState,
-    setConfirmState,
-    provider,
-    handleProviderChange,
-    sessionMode,
-    providerOptions,
   } = useMatchModalViewModel({ row, rows, t, toast, onResolved, scanMode });
 
   const targetRows = rows.length > 0 ? rows : (row ? [row] : []);
@@ -112,7 +112,7 @@ export default function OrganizerMatchModalContent({
   };
 
   return (
-    <div className="organizer-match-modal">
+    <div className={styles['organizer-match-modal']}>
       <MatchModalSearchForm
         query={query}
         setQuery={setQuery}
@@ -136,7 +136,7 @@ export default function OrganizerMatchModalContent({
         providerOptions={providerOptions}
       />
 
-      <section className="organizer-match-modal__section">
+      <section className={styles['organizer-match-modal__section']}>
         {isBulk && !hasSearched && browserState.view === 'results' ? (
           <EmptyState
             variant="modal-intro"
@@ -151,7 +151,7 @@ export default function OrganizerMatchModalContent({
           />
         ) : (
           <>
-            <div className="organizer-match-modal__section-header">
+            <div className={styles['organizer-match-modal__section-header']}>
               <strong>
                 {browserState.view === 'results'
                   ? (hasSearched
@@ -196,22 +196,22 @@ export default function OrganizerMatchModalContent({
 
             {isBrowserLoading || isSearching ? (
               hasSearched ? (
-                <div className="organizer-match-modal__skeleton-list-container">
+                <div className={styles['organizer-match-modal__skeleton-list-container']}>
                   {Array.from({ length: 3 }).map((_, idx) => (
-                    <div key={idx} className="organizer-match-modal__skeleton-list-item">
-                      <Skeleton className={`organizer-match-modal__skeleton-image ${mode === 'scene' ? 'organizer-match-modal__skeleton-image--scene' : 'organizer-match-modal__skeleton-image--poster'}`} variant="rect" />
-                      <div className="organizer-match-modal__skeleton-text-container">
-                        <Skeleton className="organizer-match-modal__skeleton-text-title" variant="text" />
-                        <Skeleton className="organizer-match-modal__skeleton-text-subtitle" variant="text" />
-                        <Skeleton className="organizer-match-modal__skeleton-text-body" variant="text" />
+                    <div key={idx} className={styles['organizer-match-modal__skeleton-list-item']}>
+                      <Skeleton className={`${styles['organizer-match-modal__skeleton-image']} ${mode === 'scene' ? styles['organizer-match-modal__skeleton-image--scene'] : styles['organizer-match-modal__skeleton-image--poster']}`} variant="rect" />
+                      <div className={styles['organizer-match-modal__skeleton-text-container']}>
+                        <Skeleton className={styles['organizer-match-modal__skeleton-text-title']} variant="text" />
+                        <Skeleton className={styles['organizer-match-modal__skeleton-text-subtitle']} variant="text" />
+                        <Skeleton className={styles['organizer-match-modal__skeleton-text-body']} variant="text" />
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="organizer-match-modal__skeleton-poster-container">
+                <div className={styles['organizer-match-modal__skeleton-poster-container']}>
                   {Array.from({ length: 6 }).map((_, idx) => (
-                    <Skeleton.Card key={idx} className={mode === 'scene' ? 'organizer-match-modal__skeleton-card--scene' : 'organizer-match-modal__skeleton-card--poster'} />
+                    <Skeleton.Card key={idx} className={mode === 'scene' ? styles['organizer-match-modal__skeleton-card--scene'] : styles['organizer-match-modal__skeleton-card--poster']} />
                   ))}
                 </div>
               )

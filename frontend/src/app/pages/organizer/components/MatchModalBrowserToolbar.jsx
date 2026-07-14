@@ -1,6 +1,7 @@
 import Button from '../../../ui/Button';
 import CardMetadata from '../../../ui/CardMetadata';
 import NavButton from '../../../ui/NavButton';
+import styles from '../MatchModal.module.css';
 
 export default function MatchModalBrowserToolbar({
   view,
@@ -19,13 +20,13 @@ export default function MatchModalBrowserToolbar({
   }
 
   return (
-    <div className="organizer-match-modal__browser-toolbar">
+    <div className={styles['organizer-match-modal__browser-toolbar']}>
       <NavButton onClick={onBack}>
         {t('common.back')}
       </NavButton>
-      <div className="organizer-match-modal__browser-copy">
-        <strong className="organizer-match-modal__browser-title">{browserTitle}</strong>
-        <CardMetadata.Row className="organizer-match-modal__browser-meta" items={browserMetaItems} />
+      <div className={styles['organizer-match-modal__browser-copy']}>
+        <strong className={styles['organizer-match-modal__browser-title']}>{browserTitle}</strong>
+        <CardMetadata.Row className={styles['organizer-match-modal__browser-meta']} items={browserMetaItems} />
       </div>
       {view === 'seasons' ? (
         <Button
@@ -38,7 +39,7 @@ export default function MatchModalBrowserToolbar({
         </Button>
       ) : null}
       {view === 'episodes' ? (
-        <div className="organizer-match-modal__browser-actions">
+        <div className={styles['organizer-match-modal__browser-actions']}>
           <Button
             type="button"
             variant="secondary-neutral"

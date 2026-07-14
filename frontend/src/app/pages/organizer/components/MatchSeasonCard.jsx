@@ -3,6 +3,7 @@ import Badge from '../../../ui/Badge';
 import PosterCard from '../../../ui/PosterCard';
 import CardMetadata from '../../../ui/CardMetadata';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
+import styles from '../MatchModal.module.css';
 
 export default function MatchSeasonCard({
   seasonEntry,
@@ -19,13 +20,13 @@ export default function MatchSeasonCard({
 
   return (
     <PosterCard
-      className="organizer-match-modal__browser-card"
+      className={styles['organizer-match-modal__browser-card']}
       imageUrl={posterUrl}
       icon={Clapperboard}
       title={displayTitle}
       subtitle={
         <CardMetadata.Row
-          className="organizer-match-modal__browser-card-meta"
+          className={styles['organizer-match-modal__browser-card-meta']}
           items={[year, eps]}
         />
       }

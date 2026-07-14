@@ -2,6 +2,7 @@ import { Tabs } from '../../ui/Tabs';
 import SearchInputCombo from '../../ui/SearchInputCombo';
 import Badge from '../../ui/Badge';
 import { useTranslation } from '@/providers/LanguageContext';
+import styles from './OrganizerHeaderPanel.module.css';
 
 export default function OrganizerHeaderPanel({
   activeExtrasTab,
@@ -21,27 +22,27 @@ export default function OrganizerHeaderPanel({
   sessionMode,
 }) {
   const { t } = useTranslation();
-  const panelClassName = `organizer-panel${sessionMode === 'nsfw' ? ' organizer-panel--nsfw' : ''}`;
+  const panelClassName = `${styles['organizer-panel']} ${sessionMode === 'nsfw' ? styles['organizer-panel--nsfw'] || '' : ''}`;
 
   return (
     <div className={panelClassName}>
-      <div className="organizer-panel__row">
-        <span className="organizer-panel__title organizer-panel__title--nsfw-container">
+      <div className={styles['organizer-panel__row']}>
+        <span className={`${styles['organizer-panel__title']} ${styles['organizer-panel__title--nsfw-container']}`}>
           {title}
           {sessionMode === 'nsfw' && (
-            <sup className="organizer-panel__adult-sup">
-              <Badge family="adult" tone="danger" className="organizer-panel__adult-badge-override">
+            <sup className={styles['organizer-panel__adult-sup']}>
+              <Badge family="adult" tone="danger" className={styles['organizer-panel__adult-badge-override']}>
                 {t('common.adult_badge', { defaultValue: '18+' })}
               </Badge>
             </sup>
           )}
         </span>
-        <div className="organizer-panel__actions">
+        <div className={styles['organizer-panel__actions']}>
           {actions}
         </div>
       </div>
 
-      <div className="organizer-panel__row">
+      <div className={styles['organizer-panel__row']}>
         <Tabs
           tabs={computedMainTabs}
           value={activeMainTab}
@@ -51,13 +52,13 @@ export default function OrganizerHeaderPanel({
           placeholder={searchPlaceholder}
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
-          className="organizer-search"
+          className={styles['organizer-search']}
           size="sm"
         />
       </div>
 
       {activeMainTab === 'manual' && computedManualTabs.length > 1 ? (
-        <div className="organizer-panel__row">
+        <div className={styles['organizer-panel__row']}>
           <Tabs
             tabs={computedManualTabs}
             value={activeManualTab}
@@ -68,7 +69,7 @@ export default function OrganizerHeaderPanel({
       ) : null}
 
       {activeMainTab === 'extras' ? (
-        <div className="organizer-panel__row">
+        <div className={styles['organizer-panel__row']}>
           <Tabs
             tabs={computedExtrasTabs}
             value={activeExtrasTab}

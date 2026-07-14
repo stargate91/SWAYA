@@ -18,6 +18,7 @@ import { useOrganizerViewModel } from './useOrganizerViewModel';
 import { OrganizerModalProvider } from './providers/OrganizerModalProvider';
 import { useOrganizerDeleteActions } from './useOrganizerDeleteActions';
 import { useLibraryModeStore } from '../../stores/useLibraryModeStore';
+import headerStyles from './OrganizerHeaderPanel.module.css';
 
 const EMPTY_SETTINGS = {};
 
@@ -382,7 +383,7 @@ export default function OrganizerPage() {
         <Button
           variant="secondary-neutral"
           size="sm"
-          className="organizer-panel__browse-btn"
+          className={headerStyles['organizer-panel__browse-btn']}
           onClick={restoreDismissedRows}
         >
           {getRestoreDismissedLabel(t, dismissedCount)}
@@ -393,7 +394,7 @@ export default function OrganizerPage() {
           <Button
             variant="secondary"
             size="sm"
-            className="organizer-panel__browse-btn"
+            className={headerStyles['organizer-panel__browse-btn']}
             onClick={handleBrowseAndScan}
             disabled={isScanActive || isBrowseStarting}
           >
@@ -403,7 +404,7 @@ export default function OrganizerPage() {
             <Button
               variant="secondary"
               size="sm"
-              className="organizer-panel__browse-btn"
+              className={headerStyles['organizer-panel__browse-btn']}
               onClick={handleLoadAll}
               disabled={isLoadingAll}
             >
@@ -416,7 +417,7 @@ export default function OrganizerPage() {
             label={renameButtonLabel}
             onClick={() => handleRename(false)}
             disabled={isScanActive || isRenamePending || isRenameStarting}
-            className="organizer-panel__browse-btn organizer-panel__rename-btn"
+            className={`${headerStyles['organizer-panel__browse-btn']} ${headerStyles['organizer-panel__rename-btn']}`}
             options={[
               {
                 label: renameButtonLabel,

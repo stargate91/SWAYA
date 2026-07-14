@@ -7,7 +7,7 @@ import Checkbox from '../../ui/Checkbox';
 import Table from '../../ui/Table';
 import { useOrganizerSort } from './useOrganizerSort';
 import { useLocalListSearch } from '../../hooks/useLocalListSearch';
-import './RenameModal.css';
+import styles from './RenameModal.module.css';
 
 const RENAME_SEARCH_KEYS = ['source', 'target', 'type'];
 
@@ -38,7 +38,7 @@ export default function OrganizerRenameModalContent({ items = [], t, organizeInP
       width: '45%',
       render: (value, row) => (
         <Tooltip content={row.sourcePath} side="top" align="start">
-          <span className="organizer-rename-modal__cell-text">
+          <span className={styles['organizer-rename-modal__cell-text']}>
             {row.source}
           </span>
         </Tooltip>
@@ -51,7 +51,7 @@ export default function OrganizerRenameModalContent({ items = [], t, organizeInP
       width: '45%',
       render: (value, row) => (
         <Tooltip content={organizeInPlace ? row.sourcePath : row.targetPath} side="top" align="start">
-          <span className={`organizer-rename-modal__cell-text ${organizeInPlace ? 'is-organize-in-place' : ''}`}>
+          <span className={`${styles['organizer-rename-modal__cell-text']} ${organizeInPlace ? styles['is-organize-in-place'] : ''}`}>
             {organizeInPlace ? row.source : row.target}
           </span>
         </Tooltip>
@@ -67,8 +67,8 @@ export default function OrganizerRenameModalContent({ items = [], t, organizeInP
   ], [t, organizeInPlace]);
 
   return (
-    <div className="organizer-rename-modal">
-      <div className="organizer-rename-modal__search">
+    <div className={styles['organizer-rename-modal']}>
+      <div className={styles['organizer-rename-modal__search']}>
         <Input
           type="text"
           placeholder={t('organizer.searchPlaceholder') || 'Search files...'}
@@ -78,7 +78,7 @@ export default function OrganizerRenameModalContent({ items = [], t, organizeInP
         />
       </div>
 
-      <div className="organizer-rename-modal__summary">
+      <div className={styles['organizer-rename-modal__summary']}>
         <span>
           {t('organizer.renameModal.showing')
             .replace('{count}', sortedItems.length)
@@ -92,7 +92,7 @@ export default function OrganizerRenameModalContent({ items = [], t, organizeInP
         </Checkbox>
       </div>
 
-      <div className="organizer-rename-modal__list-container">
+      <div className={styles['organizer-rename-modal__list-container']}>
         <Table
           variant="minimal"
           columns={columns}
