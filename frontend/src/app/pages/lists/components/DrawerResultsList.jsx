@@ -4,6 +4,7 @@ import DrawerItemImage from './DrawerItemImage';
 import ResultAddButton from './ResultAddButton';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
+import styles from './ListsAddDrawer.module.css';
 
 export default function DrawerResultsList({
   searching,
@@ -31,21 +32,21 @@ export default function DrawerResultsList({
   });
 
   return (
-    <div className="lists-drawer__results" onScroll={handleScroll}>
+    <div className={styles['lists-drawer__results']} onScroll={handleScroll}>
       {searching && (
-        <div className="lists-drawer__loader">
+        <div className={styles['lists-drawer__loader']}>
           <Loader2 className="spinner" size={24} />
         </div>
       )}
 
       {!searching && results.length === 0 && query && (
-        <div className="lists-drawer__empty">
+        <div className={styles['lists-drawer__empty']}>
           {t('common.noResults', { defaultValue: 'No results found.' })}
         </div>
       )}
 
       {!searching && results.length > 0 && filteredResults.length === 0 && (
-        <div className="lists-drawer__empty">
+        <div className={styles['lists-drawer__empty']}>
           {t('lists.no_status_match', { defaultValue: 'No items match the selected status filter.' })}
         </div>
       )}
@@ -65,8 +66,8 @@ export default function DrawerResultsList({
         const isBlurred = sessionMode === 'sfw' && isAdultItem;
 
         return (
-          <div key={item.id} className={`lists-drawer__item ${isSceneItem ? 'lists-drawer__item--scene' : ''}`}>
-            <div className="lists-drawer__item-media">
+          <div key={item.id} className={`${styles['lists-drawer__item']} ${isSceneItem ? styles['lists-drawer__item--scene'] : ''}`}>
+            <div className={styles['lists-drawer__item-media']}>
               <DrawerItemImage
                 src={poster ? resolveMediaImageUrl(poster, imageSize) : ''}
                 listType={listType}
@@ -76,9 +77,9 @@ export default function DrawerResultsList({
                 isBlurred={isBlurred}
               />
             </div>
-            <div className="lists-drawer__item-info">
-              <span className="lists-drawer__item-title">{n.title}</span>
-              <span className="lists-drawer__item-subtitle">{n.subtitle}</span>
+            <div className={styles['lists-drawer__item-info']}>
+              <span className={styles['lists-drawer__item-title']}>{n.title}</span>
+              <span className={styles['lists-drawer__item-subtitle']}>{n.subtitle}</span>
             </div>
             <ResultAddButton
               added={added}
@@ -90,7 +91,7 @@ export default function DrawerResultsList({
       })}
 
       {loadingMore && (
-        <div className="lists-drawer__loader lists-drawer__loader--small">
+        <div className={`${styles['lists-drawer__loader']} ${styles['lists-drawer__loader--small']}`}>
           <Loader2 className="spinner" size={20} />
         </div>
       )}

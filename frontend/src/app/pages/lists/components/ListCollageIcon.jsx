@@ -1,6 +1,7 @@
 import { ENTITY_ICONS } from '@/ui/icons';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
+import styles from './ListsSidebar.module.css';
 
 export default function ListCollageIcon({ samplePosters, listType, color, customImagePath, iconSize = 20 }) {
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
@@ -10,10 +11,10 @@ export default function ListCollageIcon({ samplePosters, listType, color, custom
     const isAdult = customImagePath.includes('#adult');
     const shouldBlur = isAdult && sessionMode !== 'nsfw';
     return (
-      <div className="lists-sidebar__collage lists-sidebar__collage--1">
+      <div className={`${styles['lists-sidebar__collage']} ${styles['lists-sidebar__collage--1']}`}>
         <img
           src={resolveMediaImageUrl(customImagePath)}
-          className={`lists-sidebar__collage-img lists-sidebar__collage-img--0 ${shouldBlur ? 'lists-sidebar__collage-img--blurred-heavy' : ''}`}
+          className={`${styles['lists-sidebar__collage-img']} ${styles['lists-sidebar__collage-img--0']} ${shouldBlur ? styles['lists-sidebar__collage-img--blurred-heavy'] : ''}`}
           alt=""
         />
       </div>
@@ -21,8 +22,9 @@ export default function ListCollageIcon({ samplePosters, listType, color, custom
   }
 
   if (samplePosters && samplePosters.length > 0) {
+    const count = Math.min(4, samplePosters.length);
     return (
-      <div className={`lists-sidebar__collage lists-sidebar__collage--${Math.min(4, samplePosters.length)}`}>
+      <div className={`${styles['lists-sidebar__collage']} ${styles[`lists-sidebar__collage--${count}`]}`}>
         {samplePosters.slice(0, 4).map((path, idx) => {
           const isAdult = path.includes('#adult');
           const shouldBlur = isAdult && sessionMode !== 'nsfw';
@@ -30,7 +32,7 @@ export default function ListCollageIcon({ samplePosters, listType, color, custom
             <img
               key={idx}
               src={resolveMediaImageUrl(path, 'posterThumb')}
-              className={`lists-sidebar__collage-img lists-sidebar__collage-img--${idx} ${shouldBlur ? 'lists-sidebar__collage-img--blurred-light' : ''}`}
+              className={`${styles['lists-sidebar__collage-img']} ${styles[`lists-sidebar__collage-img--${idx}`]} ${shouldBlur ? (count === 1 ? styles['lists-sidebar__collage-img--blurred-heavy'] : styles['lists-sidebar__collage-img--blurred-light']) : ''}`}
               alt=""
             />
           );
@@ -43,7 +45,7 @@ export default function ListCollageIcon({ samplePosters, listType, color, custom
 
   return (
     <div
-      className="lists-sidebar__collage lists-sidebar__collage--fallback"
+      className={`${styles['lists-sidebar__collage']} ${styles['lists-sidebar__collage--fallback']}`}
       // eslint-disable-next-line react/forbid-dom-props
       style={{
         backgroundColor: `color-mix(in srgb, ${iconColor} 15%, rgba(255, 255, 255, 0.02))`,
@@ -53,7 +55,7 @@ export default function ListCollageIcon({ samplePosters, listType, color, custom
         justifyContent: 'center',
         width: '100%',
         height: '100%',
-        borderRadius: '6px',
+        borderRadius: 'inherit',
       }}
     >
       {/* eslint-disable-next-line react/forbid-component-props */}

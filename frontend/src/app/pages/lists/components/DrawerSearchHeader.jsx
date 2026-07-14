@@ -1,5 +1,6 @@
 import SegmentedControl from '@/ui/SegmentedControl';
 import { Search } from '@/ui/icons';
+import styles from './ListsAddDrawer.module.css';
 
 export default function DrawerSearchHeader({
   listType,
@@ -17,7 +18,7 @@ export default function DrawerSearchHeader({
   setResults,
 }) {
   return (
-    <div className="lists-drawer__search-area">
+    <div className={styles['lists-drawer__search-area']}>
       <SegmentedControl
         options={[
           { label: 'My Library', value: 'library' },
@@ -102,8 +103,8 @@ export default function DrawerSearchHeader({
         />
       )}
 
-      <div className="lists-drawer__search-input-wrap">
-        <Search size={16} className="lists-drawer__search-icon" />
+      <div className={styles['lists-drawer__search-input-wrap']}>
+        <Search size={16} className={styles['lists-drawer__search-icon']} />
         <input
           type="text"
           value={query}

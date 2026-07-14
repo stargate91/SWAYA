@@ -3,6 +3,7 @@ import Pill from '@/ui/Pill';
 import DrawerSearchHeader from './DrawerSearchHeader';
 import DrawerResultsList from './DrawerResultsList';
 import Drawer from '@/ui/Drawer';
+import styles from './ListsAddDrawer.module.css';
 
 export default function ListsAddDrawer({
   isOpen,
@@ -25,14 +26,14 @@ export default function ListsAddDrawer({
   const listType = activeList.list_type;
 
   const headerTitle = (
-    <div className="lists-add-drawer-header-title">
+    <div className={styles['lists-add-drawer-header-title']}>
       <span>{listType === 'person' ? (t('lists.add_people_title') || 'Add People') : (t('lists.add_titles_title') || 'Add Titles')}</span>
       {settings?.include_adult && (
         <Pill
           as="button"
           variant={state.isAdultActive ? 'favorite-active' : 'favorite'}
           onClick={state.toggleAdultMode}
-          className="lists-add-drawer-nsfw-toggle"
+          className={styles['lists-add-drawer-nsfw-toggle']}
         >
           {state.isAdultActive ? 'NSFW' : 'SFW'}
         </Pill>
@@ -46,7 +47,7 @@ export default function ListsAddDrawer({
       onClose={onClose}
       title={headerTitle}
       size="lg"
-      className="lists-drawer"
+      className={styles['lists-drawer']}
     >
       <DrawerSearchHeader
         listType={listType}

@@ -5,6 +5,7 @@ import Dropdown from '@/ui/Dropdown';
 import Tooltip from '@/ui/Tooltip';
 import { Plus, Download, Search, PenLine } from '@/ui/icons';
 import ListCollageIcon from './ListCollageIcon';
+import styles from './ListsHeader.module.css';
 
 export default function ListsHeader({
   activeList,
@@ -58,12 +59,12 @@ export default function ListsHeader({
   return (
     // eslint-disable-next-line react/forbid-dom-props
     <div style={{ '--list-theme-color': activeList.color || 'var(--color-accent-blue)', display: 'contents' }}>
-      <div ref={heroRef} className="lists-header-hero">
-        <div className="lists-header__top-row">
-          <div className="lists-header__left-group">
-            <div className="lists-header__cover-container">
+      <div ref={heroRef} className={styles['lists-header-hero']}>
+        <div className={styles['lists-header__top-row']}>
+          <div className={styles['lists-header__left-group']}>
+            <div className={styles['lists-header__cover-container']}>
               <div
-                className="lists-header__cover-wrapper"
+                className={styles['lists-header__cover-wrapper']}
                 onClick={onImageClick}
                 role="button"
                 tabIndex={0}
@@ -81,26 +82,26 @@ export default function ListsHeader({
                   customImagePath={activeList.custom_image_path}
                   iconSize={48}
                 />
-                <div className="lists-header__cover-overlay">
+                <div className={styles['lists-header__cover-overlay']}>
                   <PenLine size={20} />
                 </div>
               </div>
             </div>
-            <div className="lists-header__meta-stack">
-              <div className="lists-header__title-row">
-                <h1 className="lists-header__title">{activeList.name}</h1>
+            <div className={styles['lists-header__meta-stack']}>
+              <div className={styles['lists-header__title-row']}>
+                <h1 className={styles['lists-header__title']}>{activeList.name}</h1>
               </div>
               {activeList.description && (
-                <p className="lists-header__description">{activeList.description}</p>
+                <p className={styles['lists-header__description']}>{activeList.description}</p>
               )}
               {activeList.created_at && (
-                <div className="lists-header__meta-row">
-                  <span className="lists-header__date">{createdLabel}</span>
+                <div className={styles['lists-header__meta-row']}>
+                  <span className={styles['lists-header__date']}>{createdLabel}</span>
                 </div>
               )}
             </div>
           </div>
-          <div className="lists-header__right">
+          <div className={styles['lists-header__right']}>
             <Tooltip content={t('lists.export') || 'Export JSON'} side="top">
               <Button
                 variant="secondary-neutral"
@@ -134,12 +135,12 @@ export default function ListsHeader({
         </div>
       </div>
 
-      <div className={`lists-header-filters ${isStuck ? 'is-stuck' : ''}`}>
-        <div className="lists-header__bottom-left">
-          <div className="lists-header__search-wrapper">
+      <div className={`${styles['lists-header-filters']} ${isStuck ? styles['is-stuck'] : ''}`}>
+        <div className={styles['lists-header__bottom-left']}>
+          <div className={styles['lists-header__search-wrapper']}>
             <Input
               type="text"
-              className="lists-header__search-input"
+              className={styles['lists-header__search-input']}
               placeholder={t('common.searchPlaceholder') || 'Search in this list...'}
               value={listSearchQuery}
               onChange={(e) => setListSearchQuery(e.target.value)}
@@ -147,8 +148,8 @@ export default function ListsHeader({
             />
           </div>
           {activeList.list_type !== 'person' && (
-            <div className="lists-header__filter-wrapper">
-              <span className="library-sorter-label">{t('library.filter.statusLabel') || 'Status:'}</span>
+            <div className={styles['lists-header__filter-wrapper']}>
+              <span className={styles['library-sorter-label']}>{t('library.filter.statusLabel') || 'Status:'}</span>
               <Dropdown
                 value={watchedFilter}
                 onChange={(e) => setWatchedFilter(e.target.value)}
@@ -163,8 +164,8 @@ export default function ListsHeader({
             </div>
           )}
           {activeList.list_type !== 'person' && (
-            <div className="lists-header__filter-wrapper">
-              <span className="library-sorter-label">{t('lists.filter_media_type_label') || 'Type:'}</span>
+            <div className={styles['lists-header__filter-wrapper']}>
+              <span className={styles['library-sorter-label']}>{t('lists.filter_media_type_label') || 'Type:'}</span>
               <Dropdown
                 value={mediaTypeFilter}
                 onChange={(e) => setMediaTypeFilter(e.target.value)}
@@ -181,8 +182,8 @@ export default function ListsHeader({
             </div>
           )}
           {activeList.list_type !== 'person' && (
-            <div className="lists-header__filter-wrapper">
-              <span className="library-sorter-label">{t('library.filter.genreLabel') || 'Genre:'}</span>
+            <div className={styles['lists-header__filter-wrapper']}>
+              <span className={styles['library-sorter-label']}>{t('library.filter.genreLabel') || 'Genre:'}</span>
               <Dropdown
                 value={genreFilter}
                 onChange={(e) => setGenreFilter(e.target.value)}
@@ -196,8 +197,8 @@ export default function ListsHeader({
             </div>
           )}
           {activeList.list_type === 'person' && (
-            <div className="lists-header__filter-wrapper">
-              <span className="library-sorter-label">{t('library.filter.genderLabel') || 'Gender:'}</span>
+            <div className={styles['lists-header__filter-wrapper']}>
+              <span className={styles['library-sorter-label']}>{t('library.filter.genderLabel') || 'Gender:'}</span>
               <Dropdown
                 value={genderFilter}
                 onChange={(e) => setGenderFilter(e.target.value)}
@@ -212,8 +213,8 @@ export default function ListsHeader({
             </div>
           )}
           {activeList.list_type === 'person' && (
-            <div className="lists-header__filter-wrapper">
-              <span className="library-sorter-label">{t('lists.filter_role_label') || 'Role:'}</span>
+            <div className={styles['lists-header__filter-wrapper']}>
+              <span className={styles['library-sorter-label']}>{t('lists.filter_role_label') || 'Role:'}</span>
               <Dropdown
                 value={jobFilter}
                 onChange={(e) => setJobFilter(e.target.value)}
@@ -230,8 +231,8 @@ export default function ListsHeader({
             </div>
           )}
         </div>
-        <div className="lists-header__sorting-wrapper">
-          <span className="library-sorter-label">{t('lists.sort_label') || 'Sort:'}</span>
+        <div className={styles['lists-header__sorting-wrapper']}>
+          <span className={styles['library-sorter-label']}>{t('lists.sort_label') || 'Sort:'}</span>
           <Dropdown
             value={sortKey}
             options={sortOptions}

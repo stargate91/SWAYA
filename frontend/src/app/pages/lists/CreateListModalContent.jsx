@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Input from '@/ui/Input';
 import Radio from '@/ui/Radio';
 import Tooltip from '@/ui/Tooltip';
+import styles from './CreateListModalContent.module.css';
 
 const PRESET_COLORS = [
   'var(--color-accent-blue)',
@@ -16,7 +17,7 @@ function ColorPresetBtn({ colorValue, isSelected, onClick }) {
   return (
     <button
       type="button"
-      className="create-list-form__color-btn"
+      className={styles['create-list-form__color-btn']}
       // eslint-disable-next-line react/forbid-dom-props
       style={{
         backgroundColor: colorValue,
@@ -67,7 +68,7 @@ export default function CreateListModalContent({
   };
 
   return (
-    <form id="create-list-form" onSubmit={handleSubmit} className="create-list-form">
+    <form id="create-list-form" onSubmit={handleSubmit} className={styles['create-list-form']}>
       <div className="ui-field">
         <label className="ui-field__label" htmlFor="list-name">
           {t('lists.name_label') || 'Name'}
@@ -85,7 +86,7 @@ export default function CreateListModalContent({
           required
         />
         {error && (
-          <span className="ui-field__error-text create-list-form__error">
+          <span className={`ui-field__error-text ${styles['create-list-form__error']}`}>
             {error}
           </span>
         )}
@@ -97,7 +98,7 @@ export default function CreateListModalContent({
         </label>
         <textarea
           id="list-desc"
-          className="ui-input create-list-form__desc-textarea"
+          className={`ui-input ${styles['create-list-form__desc-textarea']}`}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder={t('lists.desc_placeholder') || 'Description...'}
@@ -108,7 +109,7 @@ export default function CreateListModalContent({
         <label className="ui-field__label">
           {t('lists.type_label') || 'List Type'}
         </label>
-        <div className="create-list-form__type-radio-group">
+        <div className={styles['create-list-form__type-radio-group']}>
           <Radio
             name="listType"
             value="media"
@@ -134,7 +135,7 @@ export default function CreateListModalContent({
         <label className="ui-field__label">
           {t('lists.theme_color_label') || 'Theme Color'}
         </label>
-        <div className="create-list-form__colors">
+        <div className={styles['create-list-form__colors']}>
           {PRESET_COLORS.map((c) => {
             const isSelected = color === c;
             return (

@@ -1,5 +1,6 @@
 import ImageUploadPanel from '@/ui/ImageUploadPanel';
 import Drawer from '@/ui/Drawer';
+import styles from './ListImageSelectorDrawer.module.css';
 
 export default function ListImageSelectorDrawer({
   isOpen,
@@ -15,7 +16,7 @@ export default function ListImageSelectorDrawer({
       size="md"
       className="entity-detail-page__drawer--poster"
     >
-      <div className="entity-detail-page__drawer-content list-image-selector-drawer-content">
+      <div className={`entity-detail-page__drawer-content ${styles['list-image-selector-drawer-content']}`}>
         <ImageUploadPanel
           imageType="square"
           isPending={state.uploadImageMutation.isPending || state.overrideImageMutation.isPending}
@@ -34,10 +35,10 @@ export default function ListImageSelectorDrawer({
           }}
         />
         {list?.custom_image_path && (
-          <div className="list-image-selector-drawer-reset-container">
+          <div className={styles['list-image-selector-drawer-reset-container']}>
             <button
               type="button"
-              className="ui-button ui-button--secondary-neutral ui-button--md list-image-selector-drawer-reset-btn"
+              className={`ui-button ui-button--secondary-neutral ui-button--md ${styles['list-image-selector-drawer-reset-btn']}`}
               onClick={() => {
                 state.overrideImageMutation.mutate(
                   { listId: list.id, path: null },

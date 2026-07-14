@@ -1,0 +1,14 @@
+.lists-grid {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: var(--space-2xl, 1rem);
+  grid-auto-flow: dense;
+}
+
+.lists-content__loading {
+  padding: var(--space-4xl) 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}

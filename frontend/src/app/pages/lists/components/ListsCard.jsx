@@ -3,6 +3,7 @@ import CardMetadata from '@/ui/CardMetadata';
 import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
 import AdultOverlay from '@/ui/AdultOverlay';
 import { API_BASE } from '@/lib/backend';
+import styles from './ListsCard.module.css';
 
 export default function ListsCard({
   item,
@@ -35,14 +36,14 @@ export default function ListsCard({
 
     const displayDate = item.release_date ? item.release_date.substring(0, 10) : item.year;
     ratingPill = displayDate ? (
-      <span className="lists-card__date">{displayDate}</span>
+      <span className={styles['lists-card__date']}>{displayDate}</span>
     ) : undefined;
   }
 
   return (
-    <div className={`lists-card ${isScene ? 'lists-card--scene' : 'lists-card--poster'}`}>
+    <div className={`${styles['lists-card']} ${isScene ? styles['lists-card--scene'] : styles['lists-card--poster']}`}>
       <div
-        className={`lists-card__media ${shouldBlur ? 'is-blurred' : ''}`}
+        className={`${styles['lists-card__media']} ${shouldBlur ? styles['is-blurred'] : ''}`}
         onClick={() => handleCardClick(item)}
         role="button"
         tabIndex={0}
@@ -67,10 +68,10 @@ export default function ListsCard({
           <img
             src={posterUrl}
             alt={item.title}
-            className="lists-card__img"
+            className={styles['lists-card__img']}
           />
         ) : (
-          <div className="lists-card__placeholder" />
+          <div className={styles['lists-card__placeholder']} />
         )}
         {shouldBlur && (
           <AdultOverlay variant="obscure" badgeText={t('common.adult_badge', { defaultValue: '18+' })} />
@@ -82,9 +83,9 @@ export default function ListsCard({
         subtitle={subtitle}
         performers={performers}
         ratingPill={ratingPill}
-        className="lists-card__info"
-        titleClassName="lists-card__title"
-        subtitleClassName="lists-card__subtitle"
+        className={styles['lists-card__info']}
+        titleClassName={styles['lists-card__title']}
+        subtitleClassName={styles['lists-card__subtitle']}
       />
     </div>
   );

@@ -1,6 +1,7 @@
 import { Loader2, Search, List as ListIcon } from '@/ui/icons';
 import EmptyState from '@/ui/EmptyState';
 import ListsCard from './ListsCard';
+import styles from './ListsGrid.module.css';
 
 export default function ListsGrid({
   isDetailsLoading,
@@ -15,7 +16,7 @@ export default function ListsGrid({
 }) {
   if (isDetailsLoading) {
     return (
-      <div className="lists-content__loading">
+      <div className={styles['lists-content__loading']}>
         <Loader2 className="spinner" size={24} />
       </div>
     );
@@ -56,7 +57,7 @@ export default function ListsGrid({
   }
 
   return (
-    <div className="lists-grid">
+    <div className={styles['lists-grid']}>
       {filteredListItems.map((item) => (
         <ListsCard
           key={item.id}

@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { ENTITY_ICONS } from '@/ui/icons';
+import styles from './ListsAddDrawer.module.css';
 
 export default function DrawerItemImage({ src, listType, isSceneItem, mediaType, itemMediaType, isBlurred }) {
   const [hasError, setHasError] = useState(!src);
 
   if (!src || hasError) {
     return (
-      <div className="lists-drawer__item-media-placeholder">
+      <div className={styles['lists-drawer__item-media-placeholder']}>
         {listType === 'person' ? (
           <ENTITY_ICONS.performer size={14} />
         ) : isSceneItem ? (
@@ -24,7 +25,7 @@ export default function DrawerItemImage({ src, listType, isSceneItem, mediaType,
     <img
       src={src}
       alt=""
-      className={isBlurred ? 'is-blurred' : ''}
+      className={isBlurred ? styles['is-blurred'] : ''}
       onError={() => setHasError(true)}
     />
   );

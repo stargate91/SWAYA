@@ -1,0 +1,110 @@
+.lists-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm, 0.5rem);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.lists-card:hover {
+  transform: translateY(calc(-1 * var(--space-xs)));
+}
+
+.lists-card img {
+  transition: transform 0.28s ease;
+}
+
+.lists-card:hover img {
+  transform: scale(1.02);
+}
+
+.lists-card__media {
+  width: 100%;
+  position: relative;
+  background: rgba(255, 255, 255, 0.01);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.05));
+  transition: border-color var(--motion-fast), box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.lists-card__date {
+  opacity: 0.6;
+  font-size: var(--font-size-2xs);
+  flex-shrink: 0;
+}
+
+.lists-card:hover .lists-card__media {
+  border-color: var(--color-border-default, rgba(255, 255, 255, 0.12));
+  box-shadow: 0 0.75rem 1.5rem var(--color-surface-overlay);
+}
+
+.lists-card__media.is-blurred {
+  border-color: transparent;
+  isolation: isolate;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  mask-image: -webkit-radial-gradient(white, black);
+}
+
+.lists-card__media.is-blurred img {
+  filter: blur(1.75rem) saturate(110%);
+  transform: scale(1.08);
+  transition: filter var(--motion-duration-slow) var(--motion-ease-standard), transform var(--motion-duration-slow) var(--motion-ease-standard);
+}
+
+.lists-card--poster .lists-card__media {
+  aspect-ratio: 2 / 3;
+}
+
+.lists-card--scene {
+  grid-column: span 2;
+}
+
+.lists-card--scene .lists-card__media {
+  aspect-ratio: 1.38;
+}
+
+.lists-card__info {
+  padding: 0 var(--space-xs, 0.25rem);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lists-card__title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lists-card__subtitle {
+  font-size: 0.6875rem;
+  color: var(--color-text-secondary);
+  opacity: 0.6;
+}
+
+.lists-card__media {
+  position: relative;
+  overflow: hidden;
+}
+
+.lists-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-bottom: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.05));
+}
+
+.lists-card__placeholder {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.4));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

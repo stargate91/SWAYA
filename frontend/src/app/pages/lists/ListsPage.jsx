@@ -11,7 +11,7 @@ import ListsAddDrawer from './components/ListsAddDrawer';
 import CreateListModalContent from './CreateListModalContent';
 import DeleteListModalContent from './components/DeleteListModalContent';
 import ListImageSelectorDrawer from './components/ListImageSelectorDrawer';
-import './ListsPage.css';
+import styles from './ListsPage.module.css';
 
 export default function ListsPage() {
   const { openModal, closeModal } = useUi();
@@ -87,7 +87,7 @@ export default function ListsPage() {
         />
       ),
       footer: (
-        <div className="lists-modal-footer">
+        <div className={styles['lists-modal-footer']}>
           <Button variant="secondary-neutral" onClick={closeModal}>
             {t('common.cancel') || 'Cancel'}
           </Button>
@@ -127,7 +127,7 @@ export default function ListsPage() {
         />
       ),
       footer: (
-        <div className="lists-modal-footer">
+        <div className={styles['lists-modal-footer']}>
           <Button variant="secondary-neutral" onClick={closeModal}>
             {t('common.cancel') || 'Cancel'}
           </Button>
@@ -173,8 +173,8 @@ export default function ListsPage() {
   };
 
   return (
-    <Page viewport={true} className="lists-page">
-      <div className="lists-layout">
+    <Page viewport={true} className={styles['lists-page']}>
+      <div className={styles['lists-layout']}>
         <ListsSidebar
           t={t}
           isLoading={isLoading}
@@ -194,7 +194,7 @@ export default function ListsPage() {
           hidden
         />
 
-        <main className="lists-main">
+        <main className={styles['lists-main']}>
           {activeList ? (
             <>
               <ListsHeader
@@ -223,7 +223,7 @@ export default function ListsPage() {
                 availableGenres={availableGenres}
                 onImageClick={() => setIsImageDrawerOpen(true)}
               />
-              <div className="lists-content">
+              <div className={styles['lists-content']}>
                 <ListsGrid
                   isDetailsLoading={isDetailsLoading}
                   activeList={activeList}
@@ -238,9 +238,9 @@ export default function ListsPage() {
               </div>
             </>
           ) : (
-            <div className="lists-main__placeholder">
-              <ListIcon size={32} className="lists-main__placeholder-icon" />
-              <span className="lists-main__placeholder-text">
+            <div className={styles['lists-main__placeholder']}>
+              <ListIcon size={32} className={styles['lists-main__placeholder-icon']} />
+              <span className={styles['lists-main__placeholder-text']}>
                 {t('lists.no_list_selected_desc') || 'Select a list from the sidebar to view its items.'}
               </span>
             </div>

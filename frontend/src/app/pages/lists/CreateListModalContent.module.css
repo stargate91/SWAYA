@@ -1,0 +1,53 @@
+/* Create/Edit List Modal Form */
+.create-list-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-sm) 0;
+}
+
+.create-list-form__colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+}
+
+.create-list-form__color-btn {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  padding: 0;
+  transition: all var(--motion-fast);
+}
+
+.create-list-form__color-btn:hover {
+  transform: scale(1.15);
+}
+
+.create-list-form__error {
+  color: var(--color-state-danger);
+  font-size: var(--font-size-2xs);
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.create-list-form__desc-textarea {
+  min-height: 5rem;
+  resize: vertical;
+  padding: var(--space-md);
+}
+
+.create-list-form__type-radio-group {
+  display: flex;
+  gap: var(--space-lg);
+  margin-top: var(--space-sm);
+}
+
+.lists-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-lg, 0.75rem);
+  width: 100%;
+}

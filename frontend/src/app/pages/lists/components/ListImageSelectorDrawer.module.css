@@ -1,0 +1,15 @@
+.list-image-selector-drawer-content {
+  padding: var(--space-2xl);
+}
+
+.list-image-selector-drawer-reset-container {
+  margin-top: var(--space-2xl);
+  display: flex;
+  justify-content: center;
+}
+
+.list-image-selector-drawer-reset-btn {
+  width: 100%;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--color-text-muted);
+}
