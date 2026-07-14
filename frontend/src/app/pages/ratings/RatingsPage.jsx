@@ -182,9 +182,9 @@ export default function RatingsPage() {
 
   return (
     <Page viewport={true} className={styles['ratings-page']}>
-      <div className={`${styles['ratings-main']} ${isAdultMode ? 'organizer-main--nsfw' : ''}`}>
-        <div className="organizer-main__content">
-          <div className={`${styles['ratings-panel']} ${isAdultMode ? 'organizer-panel--nsfw' : ''}`}>
+      <div className={styles['ratings-main']}>
+        <div className={styles['ratings-main__content']}>
+          <div className={styles['ratings-panel']}>
             <div className={styles['ratings-panel__row']}>
               <span className={`${styles['ratings-panel__title']} ${styles['ratings-title-inline']}`}>
                 {t('ratings.title') || 'Ratings & Reviews'}
@@ -209,7 +209,7 @@ export default function RatingsPage() {
                 placeholder={t('common.search') || 'Search...'}
                 value={localSearch}
                 onChange={(e) => setLocalSearch(e.target.value)}
-                className="organizer-search"
+                className={styles['ratings-search']}
                 size="sm"
               />
             </div>
@@ -224,7 +224,7 @@ export default function RatingsPage() {
             </div>
           </div>
 
-          <div className="organizer-results">
+          <div className={styles['ratings-results']}>
             {/* Upper Pagination Panel */}
             <LibraryPagination
               state={{
@@ -244,8 +244,8 @@ export default function RatingsPage() {
             />
 
             {/* Table of Rated / Unrated items */}
-            <div className="organizer-table-block">
-              <div className="organizer-content">
+            <div className={styles['ratings-table-block']}>
+              <div className={styles['ratings-content']}>
                 {state.isLoading ? (
                   <div className={styles['ratings-skeleton-list']}>
                     {Array.from({ length: 6 }).map((_, idx) => (
