@@ -112,7 +112,12 @@
 }
 
 .organizer-match-modal__poster-card {
-  width: 100%;
+  width: 9rem;
+  flex-shrink: 0;
+}
+
+.organizer-match-modal__poster-card.is-scene {
+  width: 17.5rem;
 }
 
 .organizer-match-modal__poster-card-image {
