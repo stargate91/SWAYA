@@ -240,11 +240,11 @@
 }
 
 .ui-button:hover:not(:disabled) {
-  transform: translateY(var(--motion-lift-distance-sm));
+  transform: translateY(var(--motion-lift-distance-xs));
 }
 
 .ui-icon-button:hover:not(:disabled) {
-  transform: translateY(var(--motion-lift-distance-sm));
+  transform: translateY(var(--motion-lift-distance-xs));
 }
 
 .ui-button--primary:hover:not(:disabled) {
@@ -394,7 +394,7 @@
 }
 
 .ui-split-button:hover:not(.is-disabled) {
-  transform: translateY(var(--motion-lift-distance-sm));
+  transform: translateY(var(--motion-lift-distance-xs));
 }
 
 .ui-split-button--primary {

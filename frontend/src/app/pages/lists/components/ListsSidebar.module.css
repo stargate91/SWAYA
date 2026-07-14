@@ -44,7 +44,7 @@
 }
 
 .lists-sidebar__create-btn:hover:not(:disabled) {
-  transform: translateY(var(--motion-lift-distance-sm));
+  transform: translateY(var(--motion-lift-distance-xs));
   background: var(--button-secondary-hover-bg);
   border-color: var(--button-secondary-border);
 }
@@ -75,7 +75,7 @@
 }
 
 .lists-sidebar__import-btn:hover:not(:disabled) {
-  transform: translateY(var(--motion-lift-distance-sm));
+  transform: translateY(var(--motion-lift-distance-xs));
   background: var(--button-secondary-neutral-hover-bg);
   border-color: var(--button-secondary-neutral-border);
 }

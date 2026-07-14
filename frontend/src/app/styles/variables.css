@@ -488,6 +488,7 @@
   --motion-expressive: var(--motion-duration-base) var(--motion-ease-expressive);
   --motion-spring: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
   --motion-zoom: transform 280ms ease;
+  --motion-lift-distance-xs: -0.0625rem;
   --motion-lift-distance-sm: -0.1875rem;
   --motion-lift-distance-md: -0.3125rem;
 
