@@ -9,7 +9,6 @@ import {
   useRecommendationActions,
   useWatchlistHandler,
 } from './recommendationsShared';
-import './RecommendationsWidget.css';
 
 export default function TvDiscoveryWidget({ T }) {
   const { data: recommendations, isLoading } = useRecommendationsQuery();

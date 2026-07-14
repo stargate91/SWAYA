@@ -135,8 +135,7 @@ div.ui-poster-card__image-wrapper:focus-visible {
 }
 
 .ui-poster-card__media-shell:hover .ui-poster-card__user-rating-badge,
-.ui-poster-card__media-shell:focus-within .ui-poster-card__user-rating-badge,
-.recommend-card:hover .ui-poster-card__user-rating-badge {
+.ui-poster-card__media-shell:focus-within .ui-poster-card__user-rating-badge {
   opacity: 0;
   transform: translateY(calc(-1 * var(--space-xs)));
   pointer-events: none;
@@ -264,24 +263,20 @@ div.ui-poster-card__image-wrapper:focus-visible {
   gap: var(--space-sm);
 }
 
-.ui-poster-card__media-shell .ui-card-action-btn .action-btn-state-hover,
-.recommend-card .ui-card-action-btn .action-btn-state-hover {
+.ui-poster-card__media-shell .ui-card-action-btn .action-btn-state-hover {
   display: none;
 }
 
-.ui-poster-card__media-shell .ui-card-action-btn:hover,
-.recommend-card .ui-card-action-btn:hover {
+.ui-poster-card__media-shell .ui-card-action-btn:hover {
   border-color: color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
   color: var(--color-state-danger);
 }
 
-.ui-poster-card__media-shell .ui-card-action-btn:hover .action-btn-state-default,
-.recommend-card .ui-card-action-btn:hover .action-btn-state-default {
+.ui-poster-card__media-shell .ui-card-action-btn:hover .action-btn-state-default {
   display: none;
 }
 
-.ui-poster-card__media-shell .ui-card-action-btn:hover .action-btn-state-hover,
-.recommend-card .ui-card-action-btn:hover .action-btn-state-hover {
+.ui-poster-card__media-shell .ui-card-action-btn:hover .action-btn-state-hover {
   display: inline-flex;
   align-items: center;
   gap: var(--space-sm);
@@ -300,14 +295,12 @@ div.ui-poster-card__image-wrapper:focus-visible {
 }
 
 /* Neutral variant for default action state (e.g. Add to Watchlist on Dashboard) */
-.ui-poster-card__media-shell .ui-card-action-btn--neutral,
-.recommend-card .ui-card-action-btn--neutral {
+.ui-poster-card__media-shell .ui-card-action-btn--neutral {
   border-color: color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
   color: var(--color-accent-blue);
 }
 
-.ui-poster-card__media-shell .ui-card-action-btn--neutral:hover,
-.recommend-card .ui-card-action-btn--neutral:hover {
+.ui-poster-card__media-shell .ui-card-action-btn--neutral:hover {
   border-color: color-mix(in srgb, var(--color-accent-blue) 80%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
   background-color: color-mix(in srgb, var(--color-accent-blue) 15%, var(--color-panel-translucent, black));
   color: var(--color-text-primary);

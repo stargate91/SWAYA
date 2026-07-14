@@ -161,7 +161,7 @@
   --ui-poster-card-min-width: 25.875rem;
 }
 
-.ui-poster-card.recommend-card .ui-poster-card__image-wrapper {
+.recommend-card :global(.ui-poster-card__image-wrapper) {
   border-radius: var(--radius-lg);
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border-subtle);
@@ -169,11 +169,11 @@
   transition: box-shadow var(--motion-duration-slow) var(--motion-ease-standard);
 }
 
-.ui-poster-card.recommend-card:hover .ui-poster-card__image-wrapper {
+.recommend-card:hover :global(.ui-poster-card__image-wrapper) {
   box-shadow: 0 0.75rem 1.5rem var(--color-surface-overlay);
 }
 
-.recommend-card--scene.ui-poster-card .ui-poster-card__media {
+.recommend-card--scene :global(.ui-poster-card__media) {
   aspect-ratio: 414 / 300;
 }
 
@@ -191,6 +191,52 @@
 
 .recommend-card:hover .recommend-card-overlay {
   opacity: 1;
+}
+
+.recommend-card:hover :global(.ui-poster-card__user-rating-badge) {
+  opacity: 0;
+  transform: translateY(calc(-1 * var(--space-xs)));
+  pointer-events: none;
+}
+
+.recommend-card :global(.ui-card-action-btn) :global(.action-btn-state-hover) {
+  display: none;
+}
+
+.recommend-card :global(.ui-card-action-btn):hover {
+  border-color: color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
+  color: var(--color-state-danger);
+}
+
+.recommend-card :global(.ui-card-action-btn):hover :global(.action-btn-state-default) {
+  display: none;
+}
+
+.recommend-card :global(.ui-card-action-btn):hover :global(.action-btn-state-hover) {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.recommend-card :global(.ui-card-action-btn--neutral) {
+  border-color: color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
+  color: var(--color-accent-blue);
+}
+
+.recommend-card :global(.ui-card-action-btn--neutral):hover {
+  border-color: color-mix(in srgb, var(--color-accent-blue) 80%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
+  background-color: color-mix(in srgb, var(--color-accent-blue) 15%, var(--color-panel-translucent, black));
+  color: var(--color-text-primary);
+}
+
+.recommend-card:hover :global(.ui-icon-button--play-overlay) {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+
+.recommend-card:hover :global(.ui-icon-button--play-overlay):disabled {
+  opacity: 0.48;
 }
 
 .recommend-card-person-subtitle {
@@ -226,7 +272,7 @@
   height: 14.0625rem;
 }
 
-.recommend-card-loading-wrapper .ui-spinner {
+.recommend-card-loading-wrapper :global(.ui-spinner) {
   color: var(--color-accent-blue-soft);
 }
 

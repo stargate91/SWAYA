@@ -16,7 +16,7 @@ import AdultRecommendationsWidget from './widgets/AdultRecommendationsWidget';
 import TMDBDiscoveryWidget from './widgets/TMDBDiscoveryWidget';
 import DashboardCustomizerDrawer from './widgets/DashboardCustomizerDrawer';
 import WidgetErrorBoundary from '../../../components/WidgetErrorBoundary';
-import './DashboardPage.css';
+import styles from './DashboardView.module.css';
 
 const DEFAULT_WIDGETS = {
   continue_watching: true,
@@ -132,7 +132,7 @@ const DashboardView = () => {
   return (
     <>
       <UtilityBarPortal>
-        <div className="dashboard-utility-bar-wrapper">
+        <div className={styles['dashboard-utility-bar-wrapper']}>
           <Tooltip content={t('dashboard.customize') || 'Customize Dashboard'} side="bottom">
             <IconButton
               onClick={() => setIsCustomizerOpen(true)}
@@ -145,9 +145,9 @@ const DashboardView = () => {
         </div>
       </UtilityBarPortal>
 
-      <div className="dashboard-header">
-        <h1 className="dashboard-header__title">{welcomeTitle}</h1>
-        <p className="dashboard-header__subtitle">{t('dashboard.subtitle') || 'Here is an overview of your media library.'}</p>
+      <div className={styles['dashboard-header']}>
+        <h1 className={styles['dashboard-header__title']}>{welcomeTitle}</h1>
+        <p className={styles['dashboard-header__subtitle']}>{t('dashboard.subtitle') || 'Here is an overview of your media library.'}</p>
       </div>
 
       {widgetOrder.map((key) => {
@@ -201,6 +201,7 @@ const DashboardView = () => {
         handleOrderChange={handleOrderChange}
         showAdult={showAdult}
         t={t}
+        styles={styles}
       />
     </>
   );

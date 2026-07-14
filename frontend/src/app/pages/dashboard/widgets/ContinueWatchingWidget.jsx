@@ -8,7 +8,7 @@ import { usePlayMediaMutation, useResetProgressMutation, useSettingsQuery } from
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 import Tooltip from '../../../ui/Tooltip';
-import './ContinueWatchingWidget.css';
+import styles from './ContinueWatchingWidget.module.css';
 
 import { formatEpisodeCode } from '../../../lib/episodeFormat';
 import api from '../../../lib/api';
@@ -142,11 +142,11 @@ const ContinueWatchingWidget = ({ T }) => {
   }
 
   return (
-    <div className="continue-watching-widget">
-      <div className="continue-watching-header">
+    <div className={styles['continue-watching-widget']}>
+      <div className={styles['continue-watching-header']}>
         {T('dashboard.continue_watching.title') || 'Continue Watching'}
       </div>
-      <div className="continue-watching-shell">
+      <div className={styles['continue-watching-shell']}>
         {showLeft && (
           <button className="ui-carousel-arrow is-left" onClick={() => scroll('left')}>
             <ChevronLeft size={24} />
@@ -157,7 +157,7 @@ const ContinueWatchingWidget = ({ T }) => {
             <ChevronRight size={24} />
           </button>
         )}
-        <div ref={scrollRef} onScroll={updateArrows} className="continue-watching-row no-scrollbar">
+        <div ref={scrollRef} onScroll={updateArrows} className={`${styles['continue-watching-row']} no-scrollbar`}>
         {localItems.map((item) => {
           const isCurrentlyPlaying = activePlayback && String(activePlayback.itemId) === String(item.id);
           const currentResumePos = isCurrentlyPlaying ? activePlayback.currentTime : item.resume_position;
@@ -175,7 +175,7 @@ const ContinueWatchingWidget = ({ T }) => {
             <PosterCard
               key={`cw-${item.id}`}
               aspect="landscape"
-              className={`continue-watching-card ${item.is_active ? 'continue-watching-card--active' : ''}`}
+              className={`${styles['continue-watching-card']} ${item.is_active ? styles['continue-watching-card--active'] : ''}`}
               imageUrl={resolvedImageUrl}
               onClick={() => {
                 const preferredPlayer = settings.preferred_player || 'swaya';
@@ -187,7 +187,7 @@ const ContinueWatchingWidget = ({ T }) => {
               topRightAction={
                 <Tooltip content={T('dashboard.continue_watching.remove') || 'Remove progress'} side="top">
                   <button
-                    className="continue-watching-remove"
+                    className={styles['continue-watching-remove']}
                     onClick={async (e) => {
                       e.stopPropagation();
                       resetProgressMutation.mutate(item.id);
@@ -209,23 +209,23 @@ const ContinueWatchingWidget = ({ T }) => {
                 }
               }}
             >
-              <div className="continue-watching-overlay" />
-              <div className="continue-watching-progress-track">
-                <svg viewBox="0 0 100 4" preserveAspectRatio="none" className="continue-watching-progress-svg">
-                  <rect x="0" y="0" width="100" height="4" className="continue-watching-progress-bg" />
-                  <rect x="0" y="0" width={progressPercent} height="4" className="continue-watching-progress-fill" />
+              <div className={styles['continue-watching-overlay']} />
+              <div className={styles['continue-watching-progress-track']}>
+                <svg viewBox="0 0 100 4" preserveAspectRatio="none" className={styles['continue-watching-progress-svg']}>
+                  <rect x="0" y="0" width="100" height="4" className={styles['continue-watching-progress-bg']} />
+                  <rect x="0" y="0" width={progressPercent} height="4" className={styles['continue-watching-progress-fill']} />
                 </svg>
               </div>
-              <div className="continue-watching-copy">
-                <div className="continue-watching-title">
+              <div className={styles['continue-watching-copy']}>
+                <div className={styles['continue-watching-title']}>
                   {item.title}
                 </div>
-                <div className={`continue-watching-meta${episodeMeta ? ' continue-watching-meta--has-episode' : ''}`}>
-                  <span className="continue-watching-meta-default">
+                <div className={`${styles['continue-watching-meta']} ${episodeMeta ? styles['continue-watching-meta--has-episode'] : ''}`}>
+                  <span className={styles['continue-watching-meta-default']}>
                     {T('dashboard.continue_watching.minutes_left', { minutes: minutesLeft }) || `${minutesLeft}m left`}
                   </span>
                   {episodeMeta ? (
-                    <span className="continue-watching-meta-episode">
+                    <span className={styles['continue-watching-meta-episode']}>
                       {episodeMeta}
                     </span>
                   ) : null}

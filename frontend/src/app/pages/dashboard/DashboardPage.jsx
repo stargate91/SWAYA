@@ -3,7 +3,7 @@ import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import Page from '@/ui/Page';
 import Spinner from '@/ui/Spinner';
 import DashboardView from './DashboardView';
-import './DashboardPage.css';
+import styles from './DashboardPage.module.css';
 
 export default function DashboardPage() {
   const { isLoading: isSettingsLoading } = useSettingsQuery();
@@ -12,8 +12,8 @@ export default function DashboardPage() {
 
   if (isSettingsLoading) {
     return (
-      <Page className="dashboard-page">
-        <div className="dashboard-loading">
+      <Page className={styles['dashboard-page']}>
+        <div className={styles['dashboard-loading']}>
           <Spinner />
         </div>
       </Page>
@@ -21,8 +21,8 @@ export default function DashboardPage() {
   }
 
   return (
-    <Page className="dashboard-page" contentBottom={false}>
-      <div className="dashboard-container">
+    <Page className={styles['dashboard-page']} contentBottom={false}>
+      <div className={styles['dashboard-container']}>
         <DashboardView />
       </div>
     </Page>

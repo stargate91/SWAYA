@@ -13,6 +13,7 @@ import Dropdown from '../../../ui/Dropdown';
 import WidgetShell from '@/ui/WidgetShell';
 import { API_BASE } from '../../../lib/backend';
 import PosterCard from '../../../ui/PosterCard';
+import styles from './RecommendationsWidget.module.css';
 
 const GENRES = [
   { value: '', label: 'All Genres' },
@@ -166,36 +167,36 @@ const TMDBDiscoveryWidget = ({ T }) => {
   }, [T]);
 
   return (
-    <div className="recommend-carousel">
-      <div className="recommend-carousel-header">
-        <h3 className="recommend-carousel-title recommend-carousel-title--header">
+    <div className={styles['recommend-carousel']}>
+      <div className={styles['recommend-carousel-header']}>
+        <h3 className={`${styles['recommend-carousel-title']} ${styles['recommend-carousel-title--header']}`}>
           {T('dashboard.recommendations.discovery_title') || 'Top 20 Discoveries'}
         </h3>
         
-        <div className="recommend-carousel-filters">
+        <div className={styles['recommend-carousel-filters']}>
           <Dropdown
             options={translatedGenres}
             value={genreId}
             onChange={(e) => setGenreId(e.target.value)}
-            className="recommend-carousel-filter-genre"
+            className={styles['recommend-carousel-filter-genre']}
           />
 
           <Dropdown
             options={translatedYears}
             value={year}
             onChange={(e) => setYear(e.target.value)}
-            className="recommend-carousel-filter-year"
+            className={styles['recommend-carousel-filter-year']}
           />
         </div>
       </div>
 
       <WidgetShell loading={loading} size="lg" transparent={true}>
         {items.length === 0 ? (
-          <div className="recommend-carousel-no-results">
+          <div className={styles['recommend-carousel-no-results']}>
             {T('dashboard.recommendations.discovery_no_results') || 'No popular movies found matching filters.'}
           </div>
         ) : (
-          <div className="recommend-carousel-shell">
+          <div className={styles['recommend-carousel-shell']}>
             {showLeft && (
               <button
                 className="ui-carousel-arrow is-left"
@@ -216,7 +217,7 @@ const TMDBDiscoveryWidget = ({ T }) => {
 
             <div
               ref={scrollRef}
-              className={`recommend-carousel-track no-scrollbar ${loading ? 'is-loading' : ''}`}
+              className={`${styles['recommend-carousel-track']} no-scrollbar ${loading ? styles['is-loading'] : ''}`}
               onScroll={updateArrows}
             >
               {items.map((item) => {
@@ -229,7 +230,7 @@ const TMDBDiscoveryWidget = ({ T }) => {
                 return (
                   <PosterCard
                     key={item.id}
-                    className="recommend-card"
+                    className={styles['recommend-card']}
                     imageUrl={posterUrl}
                     onClick={() => handleCardClick(item)}
                     title={item.title}
@@ -237,7 +238,7 @@ const TMDBDiscoveryWidget = ({ T }) => {
                     ratingImdb={ratingImdb}
                     ratingTmdb={ratingTmdb}
                   >
-                    <div className="recommend-card-overlay">
+                    <div className={styles['recommend-card-overlay']}>
                       <Button
                         onClick={(e) => {
                           e.stopPropagation();

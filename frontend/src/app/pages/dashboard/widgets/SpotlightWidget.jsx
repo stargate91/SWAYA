@@ -10,7 +10,6 @@ import {
   useRecommendationActions,
   useWatchlistHandler,
 } from './recommendationsShared';
-import './RecommendationsWidget.css';
 
 export default function SpotlightWidget({ T }) {
   const { data: recommendations, isLoading } = useRecommendationsQuery();

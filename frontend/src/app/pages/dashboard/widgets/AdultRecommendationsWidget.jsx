@@ -10,7 +10,6 @@ import {
   useRecommendationActions,
   useWatchlistHandler,
 } from './recommendationsShared';
-import './RecommendationsWidget.css';
 
 export default function AdultRecommendationsWidget({ T }) {
   const { data: settings = {} } = useSettingsQuery();

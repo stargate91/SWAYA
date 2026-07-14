@@ -1,0 +1,29 @@
+.history-page {
+  padding: 0;
+}
+
+.history-page__loading-container {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-4xl);
+}
+
+.history-page__empty-container {
+  margin-top: var(--space-xl);
+}
+
+.history-page__tab-selector {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.history-sentinel,
+.watched-sentinel {
+  height: calc(2 * var(--space-xl));
+  margin: var(--space-lg) 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

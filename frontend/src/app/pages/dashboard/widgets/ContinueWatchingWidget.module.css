@@ -28,35 +28,35 @@
   position: relative;
 }
 
-.ui-poster-card.continue-watching-card {
+.continue-watching-card {
   --ui-poster-card-width: 17.5rem;
   --ui-poster-card-min-width: 17.5rem;
   transform: none;
   transition: none;
 }
 
-.ui-poster-card.continue-watching-card:hover {
+.continue-watching-card:hover {
   transform: none;
 }
 
-.ui-poster-card.continue-watching-card .ui-poster-card__image-wrapper {
+.continue-watching-card :global(.ui-poster-card__image-wrapper) {
   border-radius: var(--radius-lg);
   box-shadow: 0 var(--space-md) calc(2.5 * var(--space-md)) color-mix(in srgb, black 30%, transparent);
   border: 1px solid var(--color-border-subtle);
   background: var(--color-bg-elevated);
 }
 
-.ui-poster-card.continue-watching-card .ui-poster-card__image {
+.continue-watching-card :global(.ui-poster-card__image) {
   opacity: 0.75;
   transition: opacity var(--motion-duration-hover) var(--motion-ease-hover), transform var(--motion-duration-hover) var(--motion-ease-hover);
 }
 
-.ui-poster-card.continue-watching-card:hover .ui-poster-card__image {
+.continue-watching-card:hover :global(.ui-poster-card__image) {
   opacity: 0.9;
   transform: scale(1.06);
 }
 
-.continue-watching-card .ui-tooltip {
+.continue-watching-card :global(.ui-tooltip) {
   position: absolute;
   top: var(--space-md);
   right: var(--space-md);
@@ -85,11 +85,11 @@
   cursor: default;
 }
 
-.continue-watching-card.continue-watching-card--active .ui-poster-card__image {
+.continue-watching-card.continue-watching-card--active :global(.ui-poster-card__image) {
   opacity: 0.45;
 }
 
-.continue-watching-play-active.continue-watching-play-active {
+.continue-watching-play-active {
   opacity: 1;
   pointer-events: none;
   animation: continue-watching-play-pulse var(--motion-duration-pulse-slow) infinite var(--motion-ease-standard);
@@ -118,7 +118,7 @@
   background: linear-gradient(to top, color-mix(in srgb, var(--color-bg-app, black) 90%, transparent) 0%, color-mix(in srgb, var(--color-bg-app, black) 30%, transparent) 60%, transparent 100%);
 }
 
-.continue-watching-card:hover .ui-icon-button--play-overlay {
+.continue-watching-card:hover :global(.ui-icon-button--play-overlay) {
   opacity: 1;
 }
 

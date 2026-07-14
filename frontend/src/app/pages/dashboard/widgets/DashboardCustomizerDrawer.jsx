@@ -14,6 +14,7 @@ export default function DashboardCustomizerDrawer({
   handleOrderChange,
   showAdult,
   t,
+  styles = {},
 }) {
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const isNsfw = showAdult && sessionMode === 'nsfw';
@@ -61,12 +62,12 @@ export default function DashboardCustomizerDrawer({
       className="dashboard-customizer-drawer"
       variant="glass"
     >
-      <div className="dashboard-customizer-content">
-        <p className="dashboard-customizer-desc">
+      <div className={styles['dashboard-customizer-content']}>
+        <p className={styles['dashboard-customizer-desc']}>
           {t('dashboard.customize_desc') || 'Select which widgets you want to display on your dashboard.'}
         </p>
 
-        <div className="dashboard-customizer-list">
+        <div className={styles['dashboard-customizer-list']}>
           {widgetOrder.map((key, index) => {
             let label;
             let switchKey = key;
@@ -103,14 +104,14 @@ export default function DashboardCustomizerDrawer({
                   onDragLeave={handleDragLeave}
                   onDrop={(e) => handleDrop(e, index)}
                   onDragEnd={handleDragEnd}
-                  className={`dashboard-customizer-item ${isDragOver ? 'is-drag-over' : ''}`}
+                  className={`${styles['dashboard-customizer-item']} ${isDragOver ? styles['is-drag-over'] : ''}`}
                 >
-                  <div className="dashboard-customizer-item-header">
-                    <div className="dashboard-customizer-item-left">
-                      <div className="dashboard-customizer-grip">
+                  <div className={styles['dashboard-customizer-item-header']}>
+                    <div className={styles['dashboard-customizer-item-left']}>
+                      <div className={styles['dashboard-customizer-grip']}>
                         <GripVertical size={16} />
                       </div>
-                      <span className="dashboard-customizer-item-label">{label}</span>
+                      <span className={styles['dashboard-customizer-item-label']}>{label}</span>
                     </div>
 
                     <Switch

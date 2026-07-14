@@ -12,7 +12,6 @@ import {
   useWatchlistHandler,
 } from './recommendationsShared';
 import api from '../../../lib/api';
-import './RecommendationsWidget.css';
 
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 

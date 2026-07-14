@@ -14,6 +14,8 @@ import Skeleton from '../../../ui/Skeleton';
 import PosterCard from '../../../ui/PosterCard';
 import AdultOverlay from '../../../ui/AdultOverlay';
 
+import styles from './RecommendationsWidget.module.css';
+
 export const ADULT_LABEL = '18+';
 
 export const SpotlightBanner = ({ item, watchlistIds, onWatchlist, onCardClick, T }) => {
@@ -28,30 +30,30 @@ export const SpotlightBanner = ({ item, watchlistIds, onWatchlist, onCardClick, 
   const year = item.release_date ? new Date(item.release_date).getFullYear() : null;
 
   return (
-    <div className="recommend-spotlight">
-      {imageUrl && <img src={imageUrl} alt={title} className="recommend-spotlight-image" />}
-      <div className="recommend-spotlight-gradient recommend-spotlight-gradient--side" />
-      <div className="recommend-spotlight-gradient recommend-spotlight-gradient--bottom" />
+    <div className={styles['recommend-spotlight']}>
+      {imageUrl && <img src={imageUrl} alt={title} className={styles['recommend-spotlight-image']} />}
+      <div className={`${styles['recommend-spotlight-gradient']} ${styles['recommend-spotlight-gradient--side']}`} />
+      <div className={`${styles['recommend-spotlight-gradient']} ${styles['recommend-spotlight-gradient--bottom']}`} />
 
-      <div className="recommend-spotlight-copy">
-        <h2 className="recommend-spotlight-title" onClick={() => onCardClick(item)}>{title}</h2>
-        <div className="recommend-spotlight-meta">
+      <div className={styles['recommend-spotlight-copy']}>
+        <h2 className={styles['recommend-spotlight-title']} onClick={() => onCardClick(item)}>{title}</h2>
+        <div className={styles['recommend-spotlight-meta']}>
           {ratingToDisplay ? (
-            <span className={`recommend-spotlight-rating is-${ratingSource}`}>
+            <span className={`${styles['recommend-spotlight-rating']} ${styles[`is-${ratingSource}`]}`}>
               <Star size={14} fill="currentColor" /> {ratingToDisplay.toFixed(1)}
             </span>
           ) : null}
-          {year ? <span className="recommend-spotlight-year">{year}</span> : null}
+          {year ? <span className={styles['recommend-spotlight-year']}>{year}</span> : null}
         </div>
-        <p className="recommend-spotlight-overview">{item.overview}</p>
-        <div className="recommend-spotlight-actions">
+        <p className={styles['recommend-spotlight-overview']}>{item.overview}</p>
+        <div className={styles['recommend-spotlight-actions']}>
           <Button
             onClick={(e) => {
               e.stopPropagation();
               const type = item.media_type || item.type || (item.title ? 'movie' : 'tv');
               onWatchlist(item, type);
             }}
-            className={`recommend-watchlist-btn ${isWatchlisted ? 'is-watchlisted' : ''}`}
+            className={`${styles['recommend-watchlist-btn']} ${isWatchlisted ? 'is-watchlisted' : ''}`}
             variant="secondary"
           >
             {isWatchlisted ? (
@@ -159,10 +161,10 @@ export const RecommendationCarousel = ({
   };
 
   return (
-    <div className="recommend-carousel">
-      <h3 className="recommend-carousel-title">{title}</h3>
+    <div className={styles['recommend-carousel']}>
+      <h3 className={styles['recommend-carousel-title']}>{title}</h3>
 
-      <div className="recommend-carousel-shell">
+      <div className={styles['recommend-carousel-shell']}>
         {showLeft && (
           <button
             className="ui-carousel-arrow is-left"
@@ -184,7 +186,7 @@ export const RecommendationCarousel = ({
         <div
           ref={scrollRef}
           onScroll={updateArrows}
-          className="recommend-carousel-track no-scrollbar"
+          className={`${styles['recommend-carousel-track']} no-scrollbar`}
         >
           {items.map((item) => {
             const n = normalizeMediaEntity(item, {
@@ -237,7 +239,7 @@ export const RecommendationCarousel = ({
                       </span>
                     ))}
                   </span>
-                  {displayDate && <span className="ui-poster-card__subtitle recommend-card-scene-date">{displayDate}</span>}
+                  {displayDate && <span className={`ui-poster-card__subtitle ${styles['recommend-card-scene-date']}`}>{displayDate}</span>}
                 </div>
               );
             } else {
@@ -247,7 +249,7 @@ export const RecommendationCarousel = ({
             return (
               <PosterCard
                 key={item.id}
-                className={`recommend-card ${n.isScene ? 'recommend-card--scene' : ''} ${n.shouldBlur ? 'is-blurred' : ''}`}
+                className={`${styles['recommend-card']} ${n.isScene ? styles['recommend-card--scene'] : ''} ${n.shouldBlur ? 'is-blurred' : ''}`}
                 imageUrl={posterUrl}
                 onClick={() => onCardClick(item)}
                 isWatched={item.is_watched}
@@ -273,7 +275,7 @@ export const RecommendationCarousel = ({
                 }
               >
                 {!n.isPerson && (
-                  <div className="recommend-card-overlay">
+                  <div className={styles['recommend-card-overlay']}>
                     <Button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -309,7 +311,7 @@ export const RecommendationCarousel = ({
             );
           })}
           {isLoadingMore && (
-            <div className="recommend-card recommend-card-loading-wrapper">
+            <div className={`${styles['recommend-card']} ${styles['recommend-card-loading-wrapper']}`}>
               <span className="ui-spinner" />
             </div>
           )}
@@ -336,7 +338,7 @@ RecommendationCarousel.propTypes = {
 };
 
 export const RecommendationSkeleton = ({ showBanner = false }) => (
-  <div className="recommend-skeleton">
+  <div className={styles['recommend-skeleton']}>
     {showBanner && <Skeleton.Banner />}
     <Skeleton.Title />
     <Skeleton.Row>

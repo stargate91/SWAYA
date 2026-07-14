@@ -357,8 +357,7 @@
 
 .ui-poster-card__media-shell:hover .ui-icon-button--play-overlay,
 .ui-poster-card__media-shell:focus-within .ui-icon-button--play-overlay,
-.episode-card__still-wrapper:hover .ui-icon-button--play-overlay,
-.recommend-card:hover .ui-icon-button--play-overlay {
+.episode-card__still-wrapper:hover .ui-icon-button--play-overlay {
   opacity: 1;
   transform: translate(-50%, -50%);
   pointer-events: auto;
@@ -378,8 +377,7 @@
 
 .ui-poster-card__media-shell:hover .ui-icon-button--play-overlay:disabled,
 .ui-poster-card__media-shell:focus-within .ui-icon-button--play-overlay:disabled,
-.episode-card__still-wrapper:hover .ui-icon-button--play-overlay:disabled,
-.recommend-card:hover .ui-icon-button--play-overlay:disabled {
+.episode-card__still-wrapper:hover .ui-icon-button--play-overlay:disabled {
   opacity: 0.48;
 }
 
