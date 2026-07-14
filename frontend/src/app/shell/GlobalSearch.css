@@ -286,6 +286,7 @@
   display: flex;
   align-items: baseline;
   gap: var(--space-xs);
+  width: 100%;
 }
 
 .global-search__item-title {
@@ -295,6 +296,8 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
 }
 
 .global-search__item-year {
@@ -310,6 +313,7 @@
   font-size: var(--font-size-2xs);
   color: var(--color-text-secondary);
   min-width: 0;
+  width: 100%;
 }
 
 .global-search__item-badge {
@@ -335,6 +339,8 @@
 }
 
 .global-search__item-overview {
+  flex: 1;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

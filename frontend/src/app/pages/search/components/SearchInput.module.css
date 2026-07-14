@@ -1,0 +1,19 @@
+.search-page-input-form {
+  width: 100%;
+}
+
+.search-page-input-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-sm);
+  transition: color var(--motion-fast);
+}
+
+.search-page-input-btn:hover {
+  color: var(--color-text-primary);
+}

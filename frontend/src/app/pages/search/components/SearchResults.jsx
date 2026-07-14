@@ -6,6 +6,7 @@ import Spinner from '@/ui/Spinner';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
 import { API_BASE } from '@/lib/backend';
+import styles from './SearchResults.module.css';
 
 export default function SearchResults({
   filteredResults,
@@ -22,7 +23,7 @@ export default function SearchResults({
 }) {
   return (
     <>
-      <PosterGrid className={`search-page-grid ${urlType === 'scene' ? 'library-scenes-grid' : ''}`}>
+      <PosterGrid className={`${styles['search-page-grid']} ${urlType === 'scene' ? 'library-scenes-grid' : ''}`}>
         {filteredResults.map((item, idx) => {
           const n = normalizeMediaEntity(item, { context: 'search', settings });
           const isAdultItem = urlSource !== 'tmdb' || item.is_adult || item.media_type === 'scene';
@@ -44,7 +45,7 @@ export default function SearchResults({
 
             const displayDate = item.release_date ? item.release_date.substring(0, 10) : item.year;
             ratingPill = displayDate ? (
-              <span className="search-page-card-date">{displayDate}</span>
+              <span className={styles['search-page-card-date']}>{displayDate}</span>
             ) : undefined;
           }
 
@@ -52,7 +53,7 @@ export default function SearchResults({
             <PosterCard
               key={`${item.id}-${item.media_type}-${idx}`}
               aspect={item.media_type === 'scene' ? 'landscape' : 'poster'}
-              className={item.media_type === 'scene' ? 'library-scene-card' : ''}
+              className={item.media_type === 'scene' ? styles['library-scene-card'] : ''}
               title={item.title || item.name}
               subtitle={subtitle}
               ratingPill={ratingPill}
@@ -67,7 +68,7 @@ export default function SearchResults({
       </PosterGrid>
 
       {hasMorePages && (
-        <div className="search-page-more-container">
+        <div className={styles['search-page-more-container']}>
           {isMoreLoading ? (
             <Spinner label={t('common.loading') || 'Loading...'} />
           ) : (

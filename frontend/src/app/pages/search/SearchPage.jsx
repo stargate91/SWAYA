@@ -8,7 +8,8 @@ import useSearchPageController, { TYPES_BY_SOURCE } from './components/useSearch
 import SearchInput from './components/SearchInput';
 import SearchFilters from './components/SearchFilters';
 import SearchResults from './components/SearchResults';
-import './SearchPage.css';
+import styles from './SearchPage.module.css';
+import searchResultStyles from './components/SearchResults.module.css';
 
 export default function SearchPage() {
   const { data: settings } = useSettingsQuery();
@@ -38,14 +39,14 @@ export default function SearchPage() {
   const FallbackIcon = activeTypeObj.icon;
 
   return (
-    <Page className="search-page-layout">
-      <div className="search-page-header">
-        <h1 className="search-page-title">
+    <Page className={styles['search-page-layout']}>
+      <div className={styles['search-page-header']}>
+        <h1 className={styles['search-page-title']}>
           {urlQuery ? t('search.resultsFor', { query: urlQuery, defaultValue: `Search Results for "${urlQuery}"` }) : t('search.title', { defaultValue: 'Global Search' })}
         </h1>
       </div>
 
-      <div className="search-page-filters">
+      <div className={styles['search-page-filters']}>
         <SearchInput
           localQuery={localQuery}
           setLocalQuery={setLocalQuery}
@@ -64,13 +65,13 @@ export default function SearchPage() {
         />
       </div>
 
-      <div className="search-page-content">
+      <div className={styles['search-page-content']}>
         {isLoading ? (
-          <PosterGrid className={`search-page-grid ${urlType === 'scene' ? 'library-scenes-grid' : ''}`}>
+          <PosterGrid className={`${searchResultStyles['search-page-grid']} ${urlType === 'scene' ? 'library-scenes-grid' : ''}`}>
             {Array.from({ length: 12 }).map((_, idx) => (
               <Skeleton.Card
                 key={idx}
-                className={urlType === 'scene' ? 'search-skeleton-card-scene' : 'search-skeleton-card-poster'}
+                className={urlType === 'scene' ? searchResultStyles['search-skeleton-card-scene'] : searchResultStyles['search-skeleton-card-poster']}
               />
             ))}
           </PosterGrid>

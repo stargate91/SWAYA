@@ -1,9 +1,10 @@
 import { Search } from '@/ui/icons';
 import Input from '@/ui/Input';
+import styles from './SearchInput.module.css';
 
 export default function SearchInput({ localQuery, setLocalQuery, handleSearchSubmit, t }) {
   return (
-    <form onSubmit={handleSearchSubmit} className="search-page-input-form">
+    <form onSubmit={handleSearchSubmit} className={styles['search-page-input-form']}>
       <Input
         type="text"
         className="search-page-input"
@@ -11,7 +12,7 @@ export default function SearchInput({ localQuery, setLocalQuery, handleSearchSub
         value={localQuery}
         onChange={(e) => setLocalQuery(e.target.value)}
         leftElement={
-          <button type="submit" className="search-page-input-btn" aria-label="Search">
+          <button type="submit" className={styles['search-page-input-btn']} aria-label="Search">
             <Search size={18} />
           </button>
         }

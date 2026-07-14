@@ -1,9 +1,9 @@
- 
 import { useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Button from '@/ui/Button';
 import IconButton from '@/ui/IconButton';
 import { X } from '@/ui/icons';
+import styles from './RatingsReviewDrawer.module.css';
 
 export default function RatingsReviewDrawer({
   editingItem,
@@ -34,9 +34,9 @@ export default function RatingsReviewDrawer({
         role="button"
         tabIndex={0}
       />
-      <div ref={drawerRef} className={`review-drawer ui-drawer ui-drawer--sm ${editingItem ? 'is-open' : ''}`}>
-        <div className="review-drawer__header">
-          <span className="review-drawer__title">
+      <div ref={drawerRef} className={`${styles['review-drawer']} ui-drawer ui-drawer--sm ${editingItem ? 'is-open' : ''}`}>
+        <div className={styles['review-drawer__header']}>
+          <span className={styles['review-drawer__title']}>
             {t('ratings.dialog.editReview', { defaultValue: 'Edit Review' })}
           </span>
           <IconButton
@@ -49,19 +49,19 @@ export default function RatingsReviewDrawer({
             <X size={18} />
           </IconButton>
         </div>
-        <div className="review-drawer__content">
-          <span className="review-drawer-media-title">
+        <div className={styles['review-drawer__content']}>
+          <span className={styles['review-drawer-media-title']}>
             {editingItem.name || editingItem.title || editingItem.displayTitle}
           </span>
           <textarea
-            className="review-drawer__textarea"
+            className={styles['review-drawer__textarea']}
             placeholder={t('ratings.dialog.placeholder', { defaultValue: 'Write review...' })}
             value={reviewText}
             onChange={(e) => setReviewText(e.target.value)}
             autoFocus
           />
         </div>
-        <div className="review-drawer__footer">
+        <div className={styles['review-drawer__footer']}>
           <Button variant="secondary-neutral" onClick={() => setEditingItem(null)}>
             {t('common.cancel', { defaultValue: 'Cancel' })}
           </Button>

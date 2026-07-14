@@ -1,4 +1,5 @@
 import SegmentedControl from '@/ui/SegmentedControl';
+import styles from './SearchFilters.module.css';
 
 export default function SearchFilters({
   urlSource,
@@ -10,9 +11,9 @@ export default function SearchFilters({
   t,
 }) {
   return (
-    <div className="search-page-controls">
-      <div className="search-page-control-group">
-        <span className="search-page-control-label">{t('search.sourceLabel', { defaultValue: 'Source' })}</span>
+    <div className={styles['search-page-controls']}>
+      <div className={styles['search-page-control-group']}>
+        <span className={styles['search-page-control-label']}>{t('search.sourceLabel', { defaultValue: 'Source' })}</span>
         <SegmentedControl
           options={sourceOptions}
           value={urlSource}
@@ -21,8 +22,8 @@ export default function SearchFilters({
         />
       </div>
 
-      <div className="search-page-control-group">
-        <span className="search-page-control-label">{t('search.typeLabel', { defaultValue: 'Type' })}</span>
+      <div className={styles['search-page-control-group']}>
+        <span className={styles['search-page-control-label']}>{t('search.typeLabel', { defaultValue: 'Type' })}</span>
         <SegmentedControl
           options={typeOptions}
           value={urlType}

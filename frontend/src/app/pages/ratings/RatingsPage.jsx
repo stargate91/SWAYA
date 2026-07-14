@@ -1,4 +1,3 @@
-/* eslint-disable react/forbid-dom-props, react/forbid-component-props */
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Star, Heart, Edit3, Clapperboard, Tv, Video, Users, CheckCircle } from '@/ui/icons';
@@ -15,7 +14,7 @@ import { useRatingsPageState } from './useRatingsPageState';
 import LibraryPagination from '../library/components/LibraryPagination';
 import RatingsReviewDrawer from './components/RatingsReviewDrawer';
 import { useDebounce } from '@/hooks/useDebounce';
-import './RatingsPage.css';
+import styles from './RatingsPage.module.css';
 
 export default function RatingsPage() {
   const navigate = useNavigate();
@@ -48,8 +47,6 @@ export default function RatingsPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-
-
   // Local Search Input with Debounce Sync
   const [localSearch, setLocalSearch] = useState(state.searchQuery);
   const debouncedSearch = useDebounce(localSearch, 150);
@@ -80,8 +77,6 @@ export default function RatingsPage() {
     { value: 'people', label: t('ratings.subtabs.people', { defaultValue: 'People' }), icon: Users },
   ];
 
-
-
   // Define table columns dynamically based on state
   const columns = [
     {
@@ -105,7 +100,7 @@ export default function RatingsPage() {
 
         return (
           <span 
-            className="ratings-row-name ratings-row-name-link"
+            className={`ratings-row-name ${styles['ratings-row-name-link']}`}
             onClick={handleClick}
             role="button"
             tabIndex={0}
@@ -127,18 +122,18 @@ export default function RatingsPage() {
       render: (val, row) => {
         const hasComment = row.user_comment && String(row.user_comment).trim();
         return (
-          <div className="review-preview-cell">
+          <div className={styles['review-preview-cell']}>
             {hasComment ? (
-              <span className="review-preview-text">{row.user_comment}</span>
+              <span className={styles['review-preview-text']}>{row.user_comment}</span>
             ) : (
-              <span className="review-preview-empty">
+              <span className={styles['review-preview-empty']}>
                 {t('ratings.dialog.placeholder', { defaultValue: 'Write a review...' })}
               </span>
             )}
             <Button
               variant="secondary-neutral"
               size="xs"
-              className="review-edit-btn"
+              className={styles['review-edit-btn']}
               onClick={(e) => handleOpenReviewDrawer(e, row)}
             >
               <Edit3 size={12} />
@@ -171,7 +166,7 @@ export default function RatingsPage() {
           render: (val, row) => (
             <button
               type="button"
-              className={`fav-heart-btn ${row.is_favorite ? 'is-favorite' : ''}`}
+              className={`${styles['fav-heart-btn']} ${row.is_favorite ? styles['is-favorite'] : ''}`}
               onClick={(e) => {
                 e.stopPropagation();
                 state.handleToggleFavorite(row);
@@ -186,15 +181,15 @@ export default function RatingsPage() {
   ];
 
   return (
-    <Page viewport={true} className="organizer-page">
-      <div className={`organizer-main is-details-hidden ${isAdultMode ? 'organizer-main--nsfw' : ''}`}>
+    <Page viewport={true} className={styles['ratings-page']}>
+      <div className={`${styles['ratings-main']} ${isAdultMode ? 'organizer-main--nsfw' : ''}`}>
         <div className="organizer-main__content">
-          <div className={`organizer-panel ${isAdultMode ? 'organizer-panel--nsfw' : ''}`}>
-            <div className="organizer-panel__row">
-              <span className="organizer-panel__title ratings-title-inline">
+          <div className={`${styles['ratings-panel']} ${isAdultMode ? 'organizer-panel--nsfw' : ''}`}>
+            <div className={styles['ratings-panel__row']}>
+              <span className={`${styles['ratings-panel__title']} ${styles['ratings-title-inline']}`}>
                 {t('ratings.title') || 'Ratings & Reviews'}
                 {isAdultMode && (
-                  <sup className="ratings-title-sup">
+                  <sup className={styles['ratings-title-sup']}>
                     <Badge family="adult" tone="danger" className="ratings-title-adult-badge">
                       {t('common.adult_badge', { defaultValue: '18+' })}
                     </Badge>
@@ -203,7 +198,7 @@ export default function RatingsPage() {
               </span>
             </div>
 
-            <div className="organizer-panel__row">
+            <div className={styles['ratings-panel__row']}>
               <Tabs
                 tabs={ratingTabs}
                 value={state.activeTab}
@@ -219,7 +214,7 @@ export default function RatingsPage() {
               />
             </div>
 
-            <div className="organizer-panel__row">
+            <div className={styles['ratings-panel__row']}>
               <Tabs
                 tabs={subTabs}
                 value={state.mediaType}
