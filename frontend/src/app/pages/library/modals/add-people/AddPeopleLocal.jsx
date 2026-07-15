@@ -65,69 +65,65 @@ export default function AddPeopleLocal({
     <div className="add-people-modal__local-panel">
 
       <div className="add-people-modal__filter-row">
-        <div className="library-sorter-container">
-          <span className="library-sorter-label">{t('library.sort.label') || 'Sort:'}</span>
-          <Dropdown
-            className="add-people-dropdown"
-            variant="sorter"
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            sortDirection={sortDirection}
-            onSortDirectionToggle={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
-            options={[
-              { value: 'library_count', label: t('library.sort.libraryCount') || 'Library Count' },
-              { value: 'name', label: t('library.sort.name') || 'Name' },
-            ]}
-          />
-        </div>
+        <Dropdown
+          className="add-people-dropdown"
+          variant="sorter"
+          layout="inline"
+          label={t('library.sort.label') || 'Sort:'}
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          sortDirection={sortDirection}
+          onSortDirectionToggle={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+          options={[
+            { value: 'library_count', label: t('library.sort.libraryCount') || 'Library Count' },
+            { value: 'name', label: t('library.sort.name') || 'Name' },
+          ]}
+        />
 
-        <div className="library-sorter-container">
-          <span className="library-sorter-label">{t('library.filter.roleLabel') || 'Role:'}</span>
-          <Dropdown
-            className="add-people-dropdown"
-            variant="sorter"
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            options={[
-              { value: 'all', label: t('library.filter.all') || 'All Roles' },
-              { value: 'actor', label: t('library.people.roles.actor') || 'Actor' },
-              { value: 'director', label: t('library.people.roles.director') || 'Director' },
-              { value: 'writer', label: t('library.people.roles.writer') || 'Writer' },
-              { value: 'sound', label: t('library.people.roles.sound') || 'Composer' },
-            ]}
-          />
-        </div>
+        <Dropdown
+          className="add-people-dropdown"
+          variant="sorter"
+          layout="inline"
+          label={t('library.filter.roleLabel') || 'Role:'}
+          value={roleFilter}
+          onChange={(e) => setRoleFilter(e.target.value)}
+          options={[
+            { value: 'all', label: t('library.filter.all') || 'All Roles' },
+            { value: 'actor', label: t('library.people.roles.actor') || 'Actor' },
+            { value: 'director', label: t('library.people.roles.director') || 'Director' },
+            { value: 'writer', label: t('library.people.roles.writer') || 'Writer' },
+            { value: 'sound', label: t('library.people.roles.sound') || 'Composer' },
+          ]}
+        />
 
         {!hideGenderFilter && (
-          <div className="library-sorter-container">
-            <span className="library-sorter-label">{t('library.filter.genderLabel') || 'Gender:'}</span>
-            <Dropdown
-              className="add-people-dropdown"
-              variant="sorter"
-              value={genderFilter}
-              onChange={(e) => setGenderFilter(e.target.value)}
-              options={[
-                { value: 'all', label: t('library.filter.all') || 'All Genders' },
-                { value: 'female', label: t('library.filter.female') || 'Female' },
-                { value: 'male', label: t('library.filter.male') || 'Male' },
-              ]}
-            />
-          </div>
-        )}
-
-        <div className="library-sorter-container">
-          <span className="library-sorter-label">{t('library.filter.statusLabel') || 'Status:'}</span>
           <Dropdown
             className="add-people-dropdown"
             variant="sorter"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            layout="inline"
+            label={t('library.filter.genderLabel') || 'Gender:'}
+            value={genderFilter}
+            onChange={(e) => setGenderFilter(e.target.value)}
             options={[
-              { value: 'not_added', label: t('library.filter.notAdded') || 'Not Added' },
-              { value: 'added', label: t('library.filter.added') || 'Added' },
+              { value: 'all', label: t('library.filter.all') || 'All Genders' },
+              { value: 'female', label: t('library.filter.female') || 'Female' },
+              { value: 'male', label: t('library.filter.male') || 'Male' },
             ]}
           />
-        </div>
+        )}
+
+        <Dropdown
+          className="add-people-dropdown"
+          variant="sorter"
+          layout="inline"
+          label={t('library.filter.statusLabel') || 'Status:'}
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          options={[
+            { value: 'not_added', label: t('library.filter.notAdded') || 'Not Added' },
+            { value: 'added', label: t('library.filter.added') || 'Added' },
+          ]}
+        />
       </div>
 
       {isLoading ? (

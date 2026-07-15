@@ -199,10 +199,10 @@
   flex-direction: row;
   padding: 0;
   min-width: auto;
-  background: color-mix(in srgb, var(--color-panel-strong) 98%, transparent);
-  border: 0.0625rem solid var(--color-border-strong);
-  box-shadow: var(--shadow-lg);
-  backdrop-filter: blur(0.75rem);
+  background: var(--dropdown-menu-bg);
+  border: 1px solid var(--dropdown-menu-border);
+  box-shadow: var(--dropdown-menu-shadow);
+  backdrop-filter: blur(1.5rem);
 }
 
 .dropdown-column {

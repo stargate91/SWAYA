@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { useUpdatePersonStatusMutation, useAddPersonTmdbMutation } from '@/queries';
 import SearchInputCombo from '@/ui/SearchInputCombo';
+import './AddPeopleModalContent.css';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import api from '@/lib/api';
 import AddPeopleLocal from './AddPeopleLocal';

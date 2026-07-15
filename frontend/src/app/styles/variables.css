@@ -149,9 +149,9 @@
   --dropdown-field-border: var(--color-border-subtle);
   --dropdown-field-hover-border: color-mix(in srgb, var(--color-text-primary) 20%, transparent);
   --dropdown-field-active-border: var(--color-accent-blue);
-  --dropdown-menu-bg: color-mix(in srgb, var(--color-panel-strong) 98%, transparent);
-  --dropdown-menu-border: var(--color-border-strong);
-  --dropdown-menu-shadow: var(--shadow-lg);
+  --dropdown-menu-bg: color-mix(in srgb, var(--color-panel-strong) 82%, transparent);
+  --dropdown-menu-border: color-mix(in srgb, white 10%, transparent);
+  --dropdown-menu-shadow: 0 12px 32px color-mix(in srgb, black 55%, transparent), 0 2px 8px color-mix(in srgb, black 30%, transparent);
   --dropdown-search-bg: rgba(0, 0, 0, 0.2);
   --dropdown-option-bg: transparent;
   --dropdown-option-hover-bg: var(--color-surface-glass);
@@ -236,7 +236,7 @@
   --ui-control-radius: var(--radius-md);
   --ui-control-radius-sm: calc(var(--radius-md) - 2px);
   --ui-control-radius-xs: calc(var(--radius-md) - 0.25rem);
-  --ui-control-bg: color-mix(in srgb, var(--color-panel-strong) 65%, black);
+  --ui-control-bg: color-mix(in srgb, black 25%, transparent);
   --ui-control-bg-subtle: rgba(255, 255, 255, 0.02);
   --ui-control-bg-hover: rgba(255, 255, 255, 0.04);
   --ui-control-border: var(--color-line);

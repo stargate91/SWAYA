@@ -5,6 +5,7 @@
 
 .trigger {
   composes: input-wrapper from "./Input.module.css";
+  width: 100%;
   background: var(--ui-control-bg);
   cursor: pointer;
   justify-content: space-between;
@@ -54,7 +55,7 @@
   max-height: 17.5rem;
   z-index: var(--z-index-dropdown);
   background: var(--dropdown-menu-bg);
-  backdrop-filter: var(--ui-floating-surface-blur);
+  backdrop-filter: blur(1.5rem);
   border: 1px solid var(--dropdown-menu-border);
   border-radius: var(--ui-control-radius);
   box-shadow: var(--dropdown-menu-shadow);
@@ -227,6 +228,12 @@
   width: 100%;
 }
 
+.sorterWrapper .trigger {
+  flex: 1;
+  min-width: 0;
+  width: 0;
+}
+
 .trigger--xs {
   composes: input-wrapper input-wrapper--xs from "./Input.module.css";
   background: var(--ui-control-bg);
@@ -355,7 +362,14 @@
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-muted);
+  text-transform: uppercase;
   letter-spacing: calc(1.5 * var(--letter-spacing-wide));
   user-select: none;
   white-space: nowrap;
+}
+
+.inlineContainer:global(.add-people-dropdown) .dropdownSorter {
+  flex: 1;
+  min-width: 0;
+  width: 0;
 }

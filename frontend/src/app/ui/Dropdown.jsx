@@ -7,6 +7,38 @@ import { useTranslation } from '../providers/LanguageContext';
 import Field from './Field';
 import styles from './Dropdown.module.css';
 
+function DropdownOptionItem({ opt, value, onOptionClick }) {
+  const [isTruncated, setIsTruncated] = useState(false);
+  const buttonRef = useRef(null);
+
+  const checkTruncation = () => {
+    if (buttonRef.current) {
+      const isTextTruncated = buttonRef.current.scrollWidth > buttonRef.current.clientWidth;
+      setIsTruncated(isTextTruncated);
+    }
+  };
+
+  useEffect(() => {
+    checkTruncation();
+  }, [opt.label]);
+
+  return (
+    <Tooltip content={isTruncated ? opt.label : null} side="right" triggerClassName={styles.tooltipTrigger}>
+      <button
+        ref={buttonRef}
+        type="button"
+        className={`${styles.item} ${opt.value === value ? styles.isActive : ''} ${opt.disabled ? styles.isDisabled : ''}`.trim()}
+        onClick={() => !opt.disabled && onOptionClick(opt.value)}
+        onMouseEnter={checkTruncation}
+        title={null}
+        disabled={Boolean(opt.disabled)}
+      >
+        {opt.label}
+      </button>
+    </Tooltip>
+  );
+}
+
 function DropdownMenu({
   isOpen,
   menuCoords,
@@ -97,17 +129,12 @@ function DropdownMenu({
           }
 
           return (
-            <Tooltip content={opt.label} side="right" key={opt.value} triggerClassName={styles.tooltipTrigger}>
-              <button
-                type="button"
-                className={`${styles.item} ${opt.value === value ? styles.isActive : ''} ${opt.disabled ? styles.isDisabled : ''}`.trim()}
-                onClick={() => !opt.disabled && onOptionClick(opt.value)}
-                title={null}
-                disabled={Boolean(opt.disabled)}
-              >
-                {opt.label}
-              </button>
-            </Tooltip>
+            <DropdownOptionItem
+              key={opt.value}
+              opt={opt}
+              value={value}
+              onOptionClick={onOptionClick}
+            />
           );
         })}
         {filteredOptions.length === 0 ? (
