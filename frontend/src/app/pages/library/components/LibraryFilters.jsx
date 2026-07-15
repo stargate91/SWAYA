@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import FilterDropdown from '@/ui/FilterDropdown';
+import Dropdown from '@/ui/Dropdown';
 import SegmentedControl from '@/ui/SegmentedControl';
 import Pill from '@/ui/Pill';
 import {
@@ -13,6 +13,7 @@ import {
 } from '@/lib/libraryTabs';
 import LibraryAdvancedFilters from './LibraryAdvancedFilters';
 import AttributeFilterDropdown from './AttributeFilterDropdown';
+import PanelHeader from '@/ui/PanelHeader';
 
 
 const dummyFunc = () => { };
@@ -109,10 +110,11 @@ export default function LibraryFilters({
 
   return (
     <>
-      <div className="organizer-panel__row library-filters-row">
+      <PanelHeader.Row className="library-filters-row">
         <div className="library-filters-left">
           {(isVideoTab || isCollectionTab || isPeopleTab || isTagsTab) && (
-            <FilterDropdown
+            <Dropdown
+              layout="inline"
               label={t('library.sort.label') || 'Sort:'}
               value={sortKey}
               onChange={(e) => {
@@ -191,7 +193,8 @@ export default function LibraryFilters({
           )}
 
           {isCollections && (
-            <FilterDropdown
+            <Dropdown
+              layout="inline"
               label={t('library.filter.statusLabel') || 'Status:'}
               value={collectionStatusFilter}
               onChange={(e) => {
@@ -220,7 +223,8 @@ export default function LibraryFilters({
               return filterData?.roles && filterData.roles.includes(opt.value);
             });
             return (
-              <FilterDropdown
+              <Dropdown
+                layout="inline"
                 label={t('library.filter.roleLabel') || 'Role:'}
                 value={peopleRoleFilter}
                 onChange={(e) => {
@@ -244,7 +248,8 @@ export default function LibraryFilters({
               return filterData?.genders && filterData.genders.includes(opt.value);
             });
             return (
-              <FilterDropdown
+              <Dropdown
+                layout="inline"
                 label={t('library.filter.genderLabel') || 'Gender:'}
                 value={genderFilter}
                 onChange={(e) => {
@@ -286,7 +291,8 @@ export default function LibraryFilters({
             />
           )}
           {isVideoTab && (
-            <FilterDropdown
+            <Dropdown
+              layout="inline"
               label={t('library.filter.statusLabel') || 'Status:'}
               value={watchedFilter}
               onChange={(e) => {
@@ -302,7 +308,8 @@ export default function LibraryFilters({
           )}
 
           {isVideoTab && !isScenesTab && activeSessionMode !== 'nsfw' && (
-            <FilterDropdown
+            <Dropdown
+              layout="inline"
               label={t('library.filter.genreLabel') || 'Genre:'}
               value={genreFilter}
               onChange={(e) => {
@@ -317,7 +324,8 @@ export default function LibraryFilters({
           )}
 
           {isScenesTab && activeSessionMode === 'nsfw' && filterData?.performers && filterData.performers.length > 0 && (
-            <FilterDropdown
+            <Dropdown
+              layout="inline"
               label={t('library.filter.performerLabel') || 'Performer:'}
               value={performerFilter}
               searchable={true}
@@ -334,7 +342,8 @@ export default function LibraryFilters({
 
           {((isMovieTab && filterData?.studios && filterData.studios.length > 0) ||
             (isScenesTab && activeSessionMode === 'nsfw' && filterData?.studios && filterData.studios.length > 0)) && (
-            <FilterDropdown
+            <Dropdown
+              layout="inline"
               label={
                 activeSessionMode === 'nsfw'
                   ? (t('library.filter.studioLabel') || 'Studio:')
@@ -359,7 +368,8 @@ export default function LibraryFilters({
           )}
 
           {isTvTab && filterData?.networks && filterData.networks.length > 0 && (
-            <FilterDropdown
+            <Dropdown
+              layout="inline"
               label={t('library.filter.networkLabel') || 'Network:'}
               value={networkFilter}
               searchable={true}
@@ -375,7 +385,8 @@ export default function LibraryFilters({
           )}
 
           {(isVideoTab || isPeopleTab) && filterData?.tags && filterData.tags.length > 0 && (
-            <FilterDropdown
+            <Dropdown
+              layout="inline"
               label={t('library.filter.tagsLabel') || 'Tags:'}
               searchable={true}
               multiple={true}
@@ -394,7 +405,8 @@ export default function LibraryFilters({
           )}
 
           {isVideoTab && timeFilterMode === 'decade' && (
-            <FilterDropdown
+            <Dropdown
+              layout="inline"
               label={t('library.filter.decadeLabel') || 'Decade:'}
               value={decadeFilter}
               onChange={(e) => {
@@ -410,7 +422,8 @@ export default function LibraryFilters({
           )}
 
           {isVideoTab && timeFilterMode === 'year' && (
-            <FilterDropdown
+            <Dropdown
+              layout="inline"
               label={t('library.filter.yearLabel') || 'Year:'}
               value={yearFilter}
               onChange={(e) => {
@@ -466,7 +479,7 @@ export default function LibraryFilters({
             />
           )}
         </div>
-      </div>
+      </PanelHeader.Row>
 
       {showAdvanced && isPeopleTab && (
         <LibraryAdvancedFilters

@@ -1,23 +1,21 @@
-/* Tabs */
-.ui-tabs {
+.tabs {
   display: flex;
   height: 100%;
 }
 
-.ui-tab-icon {
+.tab-icon {
   margin-right: var(--space-sm);
   opacity: 0.6;
   flex-shrink: 0;
   transition: opacity var(--motion-fast);
 }
 
-.is-active > .ui-tab-icon,
-.ui-tab:hover > .ui-tab-icon,
-.ui-tab--sub:hover > .ui-tab-icon {
+.tab:hover > .tab-icon,
+.tab-sub:hover > .tab-icon {
   opacity: 0.95;
 }
 
-.ui-tab {
+.tab {
   display: inline-flex;
   align-items: center;
   gap: var(--space-sm);
@@ -35,28 +33,30 @@
   outline: none;
 }
 
-.ui-tab:hover {
+.tab:hover {
   background: var(--color-surface-card);
   color: var(--color-text-primary);
 }
 
-.ui-tab:active {
+.tab:active {
   transform: scale(0.97);
 }
 
-.ui-tab.is-active {
+.tab.is-active {
   background: color-mix(in srgb, var(--color-accent) 10%, transparent);
   color: var(--color-accent);
   box-shadow: inset 0 calc(-1 * var(--radius-2xs)) 0 var(--color-accent);
 }
 
+.tab.is-active > .tab-icon {
+  opacity: 0.95;
+}
 
-
-.ui-tab__label {
+.tab-label {
   white-space: nowrap;
 }
 
-.ui-tab__count {
+.tab-count {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -71,35 +71,35 @@
   line-height: 1;
 }
 
-.ui-tab:hover .ui-tab__count {
+.tab:hover .tab-count {
   color: var(--color-text-primary);
 }
 
-.ui-tab.is-active .ui-tab__count {
+.tab.is-active .tab-count {
   color: var(--color-accent);
 }
 
-.ui-tab .ui-tab__count--warning,
-.ui-tab:hover .ui-tab__count--warning,
-.ui-tab.is-active .ui-tab__count--warning {
+.tab .tab-count--warning,
+.tab:hover .tab-count--warning,
+.tab.is-active .tab-count--warning {
   background: var(--color-state-warning-bg);
   color: var(--color-state-warning);
 }
 
-.ui-tab .ui-tab__count--success,
-.ui-tab:hover .ui-tab__count--success,
-.ui-tab.is-active .ui-tab__count--success {
+.tab .tab-count--success,
+.tab:hover .tab-count--success,
+.tab.is-active .tab-count--success {
   background: var(--color-state-success-bg);
   color: var(--color-state-success);
 }
 
 /* Sub / Secondary Tabs */
-.ui-tabs--sub {
+.tabs--sub {
   display: flex;
   height: 100%;
 }
 
-.ui-tab--sub {
+.tab--sub {
   display: inline-flex;
   align-items: center;
   gap: var(--space-sm);
@@ -117,42 +117,34 @@
   outline: none;
 }
 
-.ui-tab:focus-visible,
-.ui-tab--sub:focus-visible {
+.tab:focus-visible,
+.tab--sub:focus-visible {
   position: relative;
   z-index: var(--z-index-step-1);
   box-shadow: 0 0 0 2px var(--color-accent-blue);
 }
 
-.ui-tab--sub:hover {
+.tab--sub:hover {
   background: var(--color-surface-card);
   color: var(--color-text-secondary);
 }
 
-.ui-tab--sub:active {
+.tab--sub:active {
   transform: scale(0.97);
 }
 
-.ui-tab--sub.is-active {
+.tab--sub.is-active {
   background: var(--color-surface-card);
   color: var(--color-text-primary);
   box-shadow: inset 0 calc(-1 * var(--radius-2xs)) 0 color-mix(in srgb, var(--color-accent) 52%, transparent);
 }
 
-.ui-tab--panel {
+.tab--sub.is-active > .tab-icon {
+  opacity: 0.95;
+}
+
+.tab-panel {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
-}
-
-/* Customizations for organizer panels */
-.organizer-panel .ui-tab,
-.organizer-panel .ui-tab--sub {
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wide);
-}
-
-.organizer-panel__row > .ui-tabs,
-.organizer-panel__row > .ui-tabs--sub {
-  margin-left: calc(-1 * var(--space-lg));
 }

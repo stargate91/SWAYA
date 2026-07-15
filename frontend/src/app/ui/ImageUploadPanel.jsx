@@ -72,22 +72,20 @@ export default function ImageUploadPanel({
       />
 
       <div className="universal-image-picker__url-row">
-        <div className="universal-image-picker__url-input-shell">
-          <Link2 size={15} />
-          <Input
-            placeholder="https://example.com/image.jpg"
-            value={urlInput}
-            onChange={(event) => setUrlInput(event.target.value)}
-            disabled={isPending}
-            className="universal-image-picker__url-input"
-            onKeyDown={(event) => {
-              if (event.key === 'Enter') {
-                event.preventDefault();
-                handleSaveUrl();
-              }
-            }}
-          />
-        </div>
+        <Input
+          placeholder="https://example.com/image.jpg"
+          value={urlInput}
+          onChange={(event) => setUrlInput(event.target.value)}
+          disabled={isPending}
+          className="universal-image-picker__url-input"
+          leftElement={<Link2 size={15} />}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              handleSaveUrl();
+            }
+          }}
+        />
 
         <Button
           type="button"

@@ -61,26 +61,7 @@
   overflow: hidden;
   margin-bottom: var(--space-xl);
 }
-.ratings-search:global(.search-input-combo) {
-  margin-left: auto;
-  width: 13.75rem;
-  transition: width var(--motion-base);
-}
 
-.ratings-search:global(.search-input-combo):focus-within {
-  width: 17.5rem;
-}
-
-.ratings-search :global(.search-input-combo__bar) {
-  background: var(--ui-control-bg-subtle);
-  border-color: var(--ui-control-border);
-}
-
-.ratings-search :global(.search-input-combo__bar):focus-within {
-  background: var(--ui-control-bg);
-  border-color: var(--color-accent-blue);
-  box-shadow: none;
-}
 
 /* Heart Toggle Button */
 .fav-heart-btn {

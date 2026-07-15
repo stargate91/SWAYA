@@ -1,27 +1,33 @@
-import './Tabs.css';
+import PropTypes from 'prop-types';
+import styles from './Tabs.module.css';
 
-export function Tabs({ tabs, value, onChange, variant }) {
+export function Tabs({ tabs, value, onChange, variant, className = '', tabClassName = '' }) {
   const isSub = variant === 'sub';
-  const containerClass = isSub ? 'ui-tabs--sub' : 'ui-tabs';
-  const tabClass = isSub ? 'ui-tab--sub' : 'ui-tab';
+  const containerClass = `${isSub ? styles['tabs--sub'] : styles['tabs']} ${className}`.trim();
+  const tabClassBase = isSub ? styles['tab--sub'] : styles['tab'];
 
   return (
     <div className={containerClass} role="tablist" aria-label="Sections">
       {tabs.map((tab) => {
         const Icon = tab.icon;
+        const buttonClass = `${tabClassBase} ${tabClassName} ${value === tab.value ? styles['is-active'] : ''}`.trim();
+        const countClass = `${styles['tab-count']} ${
+          tab.count > 0 && tab.tone ? styles[`tab-count--${tab.tone}`] : ''
+        }`.trim();
+
         return (
           <button
             key={tab.value}
             type="button"
             role="tab"
             aria-selected={value === tab.value}
-            className={`${tabClass} ${value === tab.value ? 'is-active' : ''}`}
+            className={buttonClass}
             onClick={() => onChange(tab.value)}
           >
-            {Icon && <Icon size={isSub ? 12 : 14} className="ui-tab-icon" />}
-            <span className="ui-tab__label">{tab.label}</span>
+            {Icon && <Icon size={isSub ? 12 : 14} className={styles['tab-icon']} />}
+            <span className={styles['tab-label']}>{tab.label}</span>
             {typeof tab.count === 'number' ? (
-              <strong className={`ui-tab__count ${tab.count > 0 && tab.tone ? `ui-tab__count--${tab.tone}` : ''}`}>
+              <strong className={countClass}>
                 {tab.count}
               </strong>
             ) : null}
@@ -31,3 +37,20 @@ export function Tabs({ tabs, value, onChange, variant }) {
     </div>
   );
 }
+
+Tabs.propTypes = {
+  tabs: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+      icon: PropTypes.elementType,
+      count: PropTypes.number,
+      tone: PropTypes.string,
+    })
+  ).isRequired,
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  variant: PropTypes.oneOf(['sub']),
+  className: PropTypes.string,
+  tabClassName: PropTypes.string,
+};

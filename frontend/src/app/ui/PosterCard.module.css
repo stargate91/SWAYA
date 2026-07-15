@@ -580,6 +580,14 @@ button.image-wrapper:hover:not(:disabled) {
   color: var(--color-ink);
 }
 
+.card:hover .title {
+  color: var(--color-ink);
+}
+
+.card[data-clickable="true"]:hover .title {
+  color: var(--color-ink);
+}
+
 .card[data-clickable="true"]:hover:not(:has(a:hover)):not(:has(button:not(.image-wrapper):hover)) .title {
   color: var(--color-accent-blue-soft);
 }

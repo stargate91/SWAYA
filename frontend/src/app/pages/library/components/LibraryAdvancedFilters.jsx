@@ -1,4 +1,5 @@
 import AttributeFilterDropdown from './AttributeFilterDropdown';
+import PanelHeader from '@/ui/PanelHeader';
 
 export default function LibraryAdvancedFilters({
   t,
@@ -58,7 +59,7 @@ export default function LibraryAdvancedFilters({
   ], filterData?.piercings);
 
   return (
-    <div className="organizer-panel__row library-filters-row library-filters-advanced-row">
+    <PanelHeader.Row className="library-filters-row library-filters-advanced-row">
       <div className="library-filters-left">
 
         {settings?.include_adult && (
@@ -122,7 +123,7 @@ export default function LibraryAdvancedFilters({
           setCurrentPage={setCurrentPage}
         />
       </div>
-    </div>
+    </PanelHeader.Row>
   );
 }
 

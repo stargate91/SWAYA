@@ -5,6 +5,7 @@ import './Tooltip.css';
 export default function Tooltip({
   content,
   className = '',
+  triggerClassName = '',
   side = 'top',
   delay = 600,
   children,
@@ -15,7 +16,7 @@ export default function Tooltip({
     <RadixTooltip.Provider delayDuration={delay}>
       <RadixTooltip.Root>
         <RadixTooltip.Trigger asChild>
-          <span className="ui-tooltip">
+          <span className={`ui-tooltip ${triggerClassName}`.trim()}>
             {children}
           </span>
         </RadixTooltip.Trigger>
@@ -36,6 +37,7 @@ export default function Tooltip({
 Tooltip.propTypes = {
   content: PropTypes.node,
   className: PropTypes.string,
+  triggerClassName: PropTypes.string,
   side: PropTypes.oneOf(['top', 'bottom', 'left', 'right']),
   delay: PropTypes.number,
   children: PropTypes.node.isRequired,

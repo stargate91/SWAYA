@@ -1,0 +1,146 @@
+.input-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  gap: var(--space-sm);
+
+  /* Visual input box defaults (md size) */
+  min-height: var(--ui-control-height-md);
+  padding: 0 var(--space-md);
+  border-radius: var(--ui-control-radius);
+  border: 1px solid var(--color-border-default);
+  background: var(--ui-control-bg);
+  box-shadow: inset 0 0.0625rem 0.125rem color-mix(in srgb, black 20%, transparent);
+  transition:
+    border-color var(--motion-fast),
+    box-shadow var(--motion-fast),
+    background-color var(--motion-fast),
+    color var(--motion-fast),
+    width var(--motion-base);
+}
+
+/* Size modifiers on wrapper */
+.input-wrapper--sm {
+  min-height: var(--ui-control-height-sm);
+  padding: 0 var(--space-sm);
+  border-radius: var(--ui-control-radius-sm);
+}
+
+.input-wrapper--xs {
+  min-height: var(--ui-control-height-xs);
+  padding: 0 var(--space-xs);
+  border-radius: var(--ui-control-radius-xs);
+}
+
+/* Hover/focus/error states on wrapper */
+.input-wrapper:focus-within {
+  border-color: var(--color-accent);
+  background: var(--ui-control-bg);
+  box-shadow: 0 0 0 0.1875rem color-mix(in srgb, var(--color-accent) 15%, transparent), inset 0 0.0625rem 0.125rem color-mix(in srgb, black 20%, transparent);
+}
+
+.input-wrapper:hover:not(:focus-within):not(.input-wrapper--error) {
+  border-color: color-mix(in srgb, var(--color-accent) 35%, var(--ui-control-border));
+}
+
+.input-wrapper--error {
+  border-color: var(--color-state-danger);
+}
+
+.input-wrapper--error:focus-within {
+  border-color: var(--color-state-danger);
+  box-shadow: var(--focus-ring-danger);
+}
+
+/* Input element styling */
+.input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--ui-control-text);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  padding: 0;
+  min-width: 0;
+  width: 100%;
+}
+
+.input--sm,
+.input--xs {
+  font-size: var(--font-size-xs);
+}
+
+.input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.65;
+}
+
+/* Elements */
+.left-element,
+.right-element {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.left-element button,
+.right-element button {
+  pointer-events: auto;
+}
+
+.input-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xs);
+  border: 0;
+  background: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--motion-fast), transform var(--motion-fast);
+  flex-shrink: 0;
+}
+
+.input-toggle:hover {
+  color: var(--color-ink);
+}
+
+.input-toggle:focus-visible {
+  outline: none;
+  color: var(--color-ink);
+}
+
+/* Optional expanding on focus — right-aligned, expands left */
+.input-field--expand-on-focus {
+  width: var(--input-width, 13.75rem);
+  margin-left: auto;
+  transition: width var(--motion-base);
+}
+
+.input-field--expand-on-focus:focus-within {
+  width: var(--input-focus-width, 17.5rem);
+}
+
+/* Hide native calendar icon and make entire input clickable for date picker */
+.input[type="date"]::-webkit-calendar-picker-indicator {
+  background: transparent;
+  bottom: 0;
+  color: transparent;
+  cursor: pointer;
+  height: auto;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: auto;
+}

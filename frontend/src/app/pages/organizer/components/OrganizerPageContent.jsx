@@ -1,6 +1,7 @@
 import Page from '../../../ui/Page';
 import OrganizerDetailsPanel from '../OrganizerDetailsPanel';
-import OrganizerHeaderPanel from '../OrganizerHeaderPanel';
+import PanelHeader from '../../../ui/PanelHeader';
+import { Tabs } from '../../../ui/Tabs';
 import OrganizerResultsPanel from '../OrganizerResultsPanel';
 import { useOrganizerColumns } from '../useOrganizerColumns.jsx';
 import { normalizeStatusTone, PAGE_SIZE_OPTIONS } from '../organizerMappers';
@@ -50,12 +51,7 @@ export default function OrganizerPageContent({
   headerActions,
   onDropPaths,
   isDropzoneDisabled,
-  scanMode,
-  scanModeOptions,
-  setScanMode,
   sessionMode,
-  provider,
-  setProvider,
   t,
 }) {
   const { columns } = useOrganizerColumns({
@@ -89,24 +85,14 @@ export default function OrganizerPageContent({
     <Page viewport={true} className={`organizer-page ${styles['organizer-page']}`}>
       <div className={`organizer-main ${!shouldShowDetailsPanel ? 'is-details-hidden' : isDetailsCollapsed ? 'is-details-collapsed' : ''}`}>
         <div className={styles['organizer-main__content']}>
-          <OrganizerHeaderPanel
-            activeExtrasTab={activeExtrasTab}
-            activeManualTab={activeManualTab}
-            activeMainTab={activeMainTab}
-            actions={headerActions}
-            scanMode={scanMode}
-            scanModeLabel={t('organizer.scanModeLabel')}
-            scanModeOptions={scanModeOptions}
-            onChangeScanMode={setScanMode}
-            computedExtrasTabs={computedExtrasTabs}
-            computedManualTabs={computedManualTabs}
-            computedMainTabs={computedMainTabs}
-            onChangeExtrasTab={setActiveExtrasTab}
-            onChangeManualTab={setActiveManualTab}
-            onChangeMainTab={setActiveMainTab}
-            provider={provider}
-            onChangeProvider={setProvider}
+          <PanelHeader
+            title={t('organizer.title')}
             sessionMode={sessionMode}
+            actions={headerActions}
+            tabs={computedMainTabs}
+            activeTab={activeMainTab}
+            onTabChange={setActiveMainTab}
+            showSearch={true}
             searchPlaceholder={
               activeMainTab === 'manual'
                 ? t('organizer.searchPlaceholderManual')
@@ -119,9 +105,29 @@ export default function OrganizerPageContent({
                       : t('organizer.searchPlaceholder')
             }
             searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            title={t('organizer.title')}
-          />
+            onSearchQueryChange={(event) => setSearchQuery(event.target.value)}
+          >
+            {activeMainTab === 'manual' && computedManualTabs.length > 1 && (
+              <PanelHeader.Row>
+                <Tabs
+                  tabs={computedManualTabs}
+                  value={activeManualTab}
+                  onChange={setActiveManualTab}
+                  variant="sub"
+                />
+              </PanelHeader.Row>
+            )}
+            {activeMainTab === 'extras' && (
+              <PanelHeader.Row>
+                <Tabs
+                  tabs={computedExtrasTabs}
+                  value={activeExtrasTab}
+                  onChange={setActiveExtrasTab}
+                  variant="sub"
+                />
+              </PanelHeader.Row>
+            )}
+          </PanelHeader>
 
           <OrganizerResultsPanel
             activeRowId={activeRow?.id || null}

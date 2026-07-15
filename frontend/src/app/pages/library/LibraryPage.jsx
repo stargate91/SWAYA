@@ -5,20 +5,63 @@ import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import LibraryPagination from './components/LibraryPagination';
 import { useLibraryState } from './hooks/useLibraryState';
 import { useLibraryModals } from './hooks/useLibraryModals';
-import LibraryHeader from './components/LibraryHeader';
+import PanelHeader from '@/ui/PanelHeader';
+import Button from '@/ui/Button';
+import { UserPlus, Plus, Play } from '@/ui/icons';
 import LibraryGrid from './components/LibraryGrid';
 import LibraryFilters from './components/LibraryFilters';
 import { useDeleteTagMutation, usePlayMediaMutation, useUpdatePersonStatusMutation } from '@/queries';
 import api from '@/lib/api';
-import { useEffect, useMemo, useState, useRef } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { isLibraryTagsTab } from '@/lib/libraryTabs';
+import { Tabs } from '@/ui/Tabs';
+import { isLibraryTagsTab, isLibraryPeopleTab } from '@/lib/libraryTabs';
 import { useUi } from '@/providers/UiProvider';
 import { useQueryClient } from '@tanstack/react-query';
 import { QK } from '@/lib/queryKeys';
 import ImagePickerDrawer from './components/ImagePickerDrawer';
 import SegmentedControl from '@/ui/SegmentedControl';
+import Dropdown from '@/ui/Dropdown';
+import Input from '@/ui/Input';
+import { Search } from '@/ui/icons';
+import { useDebounce } from '@/hooks/useDebounce';
 import './LibraryPage.css';
+
+const SearchInput = React.memo(({ placeholder, onSearchChange, initialValue = '' }) => {
+  const [value, setValue] = useState(initialValue);
+  const debouncedValue = useDebounce(value, 300);
+  const onSearchChangeRef = useRef(onSearchChange);
+
+  useEffect(() => {
+    onSearchChangeRef.current = onSearchChange;
+  }, [onSearchChange]);
+
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      if (debouncedValue === initialValue) {
+        return;
+      }
+    }
+    onSearchChangeRef.current?.(debouncedValue);
+  }, [debouncedValue, initialValue]);
+
+  return (
+    <Input
+      type="search"
+      placeholder={placeholder}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      leftElement={<Search size={14} />}
+      size="sm"
+      expandOnFocus
+    />
+  );
+});
+
+SearchInput.displayName = 'SearchInput';
 
 export default function LibraryPage({ initialTab = 'movies', lockTab = false, showTabs = true, pageTitle = null }) {
   const queryClient = useQueryClient();
@@ -161,7 +204,32 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
 
   const isTagFocusMode = state.isTags && !!focusedTag;
 
+  const currentTabObj = state.tabs.find(tab => tab.value === state.resolvedTab);
+  const hasItems = currentTabObj ? (currentTabObj.count > 0) : false;
+  const showInlineSorter = !showTabs && isLibraryTagsTab(state.resolvedTab) && state.setSortKey && state.setSortDirection && state.setCurrentPage;
 
+  const headerActions = (
+    <>
+      {isLibraryPeopleTab(state.resolvedTab) && hasItems && modals.openAddPeopleModal && (
+        <Button variant="primary" size="sm" onClick={modals.openAddPeopleModal} className="library-header-btn">
+          <UserPlus size={14} />
+          {state.t('library.people.addPeopleBtn') || 'Add People'}
+        </Button>
+      )}
+      {isLibraryTagsTab(state.resolvedTab) && hasItems && modals.openCreateTagModal && (
+        <Button variant="primary" size="sm" onClick={modals.openCreateTagModal} className="library-header-btn">
+          <Plus size={14} />
+          {state.t('library.tags.createBtn') || 'Create Tag'}
+        </Button>
+      )}
+      {isPlayableTab && hasItems && handleRandomPlay && (
+        <Button variant="secondary" size="sm" onClick={handleRandomPlay} className="library-header-btn">
+          <Play size={12} fill="currentColor" />
+          {state.t('library.playRandom') || 'Play Random'}
+        </Button>
+      )}
+    </>
+  );
 
   if (state.isLoading) {
     return (
@@ -208,30 +276,53 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
         utilityBarTarget
       )}
       <div className="library-main">
-        <div className={`organizer-panel ${isAdultMode ? 'organizer-panel--nsfw' : ''}`}>
-          <LibraryHeader
-            t={state.t}
-            pageTitle={pageTitle}
-            tabs={state.tabs}
-            resolvedTab={state.resolvedTab}
-            setActiveTab={state.setActiveTab}
-            searchPlaceholder={state.searchPlaceholder}
-            setSearchQuery={state.setSearchQuery}
-            searchQuery={state.searchQuery}
-            onAddPeople={modals.openAddPeopleModal}
-            onCreateTag={modals.openCreateTagModal}
-            showTabs={showTabs}
-            sortKey={state.sortKey}
-            setSortKey={state.setSortKey}
-            sortDirection={state.sortDirection}
-            setSortDirection={state.setSortDirection}
-            setCurrentPage={state.setCurrentPage}
-            activeSessionMode={state.activeSessionMode}
-            isPlayableTab={isPlayableTab}
-            onRandomPlay={handleRandomPlay}
-          />
+        <PanelHeader
+          title={pageTitle || state.t('library.title')}
+          sessionMode={state.activeSessionMode}
+          actions={headerActions}
+        >
+          {/* Row 2: Tabs and Search */}
+          <PanelHeader.Row>
+            {showTabs ? (
+              <Tabs
+                tabs={state.tabs}
+                value={state.resolvedTab}
+                onChange={state.setActiveTab}
+              />
+            ) : (
+              <div className="library-header__inline-tools">
+                {showInlineSorter ? (
+                  <Dropdown
+                    layout="inline"
+                    label={state.t('library.sort.label') || 'Sort:'}
+                    value={state.sortKey}
+                    onChange={(e) => {
+                      state.setSortKey(e.target.value);
+                      state.setCurrentPage(1);
+                    }}
+                    sortDirection={state.sortDirection}
+                    onSortDirectionToggle={() => {
+                      state.setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+                      state.setCurrentPage(1);
+                    }}
+                    options={[
+                      { value: 'total_count', label: state.t('library.sort.itemCount') || 'Item Count' },
+                      { value: 'name', label: state.t('library.sort.name') || 'Name' },
+                    ]}
+                  />
+                ) : null}
+              </div>
+            )}
+            <SearchInput
+              key={state.resolvedTab}
+              placeholder={state.searchPlaceholder}
+              onSearchChange={state.setSearchQuery}
+              initialValue={state.searchQuery}
+            />
+          </PanelHeader.Row>
 
-          {!(isLibraryTagsTab(state.resolvedTab) && !showTabs) ? (
+          {/* Row 3+: LibraryFilters */}
+          {!(isLibraryTagsTab(state.resolvedTab) && !showTabs) && (
             <LibraryFilters
               t={state.t}
               settings={state.settings}
@@ -310,8 +401,8 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
               setNetworkFilter={state.setNetworkFilter}
               filterData={state.filterData}
             />
-          ) : null}
-        </div>
+          )}
+        </PanelHeader>
 
         <LibraryPagination
           state={state}

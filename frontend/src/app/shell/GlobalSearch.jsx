@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ChevronDown, ArrowUpRight, Clapperboard, ExternalLink } from '@/ui/icons';
+import { ArrowUpRight, Clapperboard, ExternalLink } from '@/ui/icons';
 import { ENTITY_ICONS } from '../ui/icons';
 import Tooltip from '../ui/Tooltip';
 import { useTranslation } from '@/providers/LanguageContext';
@@ -11,6 +11,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useLibraryModeStore } from '../stores/useLibraryModeStore';
 import AdultOverlay from '../ui/AdultOverlay';
 import CompactCard from '../ui/CompactCard';
+import SearchInputCombo from '../ui/SearchInputCombo';
 import './GlobalSearch.css';
 
 const SOURCES = [
@@ -66,13 +67,9 @@ export default function GlobalSearch() {
   const [selectedType, setSelectedType] = useState('all');
   
   // UI visibility states
-  const [isSelectorOpen, setIsSelectorOpen] = useState(false);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   
   const containerRef = useRef(null);
-  const selectorRef = useRef(null);
-
-
 
   const hasAdult = settings?.include_adult;
   const filteredSources = SOURCES.filter(s => !s.adult || hasAdult);
@@ -118,9 +115,6 @@ export default function GlobalSearch() {
     const handleClickOutside = (event) => {
       if (containerRef.current && !containerRef.current.contains(event.target)) {
         setIsOverlayOpen(false);
-      }
-      if (selectorRef.current && !selectorRef.current.contains(event.target)) {
-        setIsSelectorOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -221,100 +215,46 @@ export default function GlobalSearch() {
 
   return (
     <div className="global-search" ref={containerRef}>
-      <div className="global-search__bar">
-        {/* Source & Type Selector Trigger */}
-        <div className="global-search__selector-wrapper" ref={selectorRef}>
-          <button
-            type="button"
-            className="global-search__selector-btn"
-            onClick={() => setIsSelectorOpen(!isSelectorOpen)}
-          >
-            <ActiveTypeIcon className="global-search__active-icon" size={14} />
-            <span className="global-search__active-label">
-              {t(`search.types.${activeTypeObj.id}`) || activeTypeObj.name}
-            </span>
-            <ChevronDown className={`global-search__chevron ${isSelectorOpen ? 'is-open' : ''}`} size={12} />
-          </button>
-
-          {/* 2-Level Cascading Dropdown */}
-          {isSelectorOpen && (
-            <div className="global-search__dropdown">
-              {/* Left Column: Sources */}
-              <div className="global-search__dropdown-column global-search__dropdown-column--sources">
-                <div className="global-search__dropdown-header">{t('search.source') || 'Source'}</div>
-                {filteredSources.map(source => (
-                  <button
-                    key={source.id}
-                    type="button"
-                    className={`global-search__dropdown-item ${selectedSource === source.id ? 'is-active' : ''}`}
-                    onClick={() => handleSourceSelect(source.id)}
-                  >
-                    {source.name}
-                  </button>
-                ))}
-              </div>
-              
-              {/* Right Column: Types */}
-              <div className="global-search__dropdown-column global-search__dropdown-column--types">
-                <div className="global-search__dropdown-header">{t('search.type') || 'Type'}</div>
-                {(TYPES_BY_SOURCE[selectedSource] || []).map(type => {
-                  const TypeIcon = type.icon;
-                  return (
-                    <button
-                      key={type.id}
-                      type="button"
-                      className={`global-search__dropdown-item ${selectedType === type.id ? 'is-active' : ''}`}
-                      onClick={() => {
-                        setSelectedType(type.id);
-                        setIsSelectorOpen(false);
-                      }}
-                    >
-                      <TypeIcon size={12} className="global-search__item-icon" />
-                      {t(`search.types.${type.id}`) || type.name}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="global-search__divider" />
-
-        {/* Input Field */}
-        <div className="global-search__input-wrapper">
-          <Search className="global-search__search-icon" size={14} />
-          <input
-            type="text"
-            className="global-search__input"
-            placeholder={
-              selectedSource === 'tmdb'
-                ? t('search.placeholderTmdb', { type: (t(`search.types.${activeTypeObj.id}`) || activeTypeObj.name).toLowerCase() }) || `Search ${(t(`search.types.${activeTypeObj.id}`) || activeTypeObj.name).toLowerCase()}...`
-                : t('search.placeholderPattern', { type: (t(`search.types.${activeTypeObj.id}`) || activeTypeObj.name).toLowerCase(), source: activeSourceObj.name }) || `Search ${(t(`search.types.${activeTypeObj.id}`) || activeTypeObj.name).toLowerCase()} on ${activeSourceObj.name}...`
-            }
-            value={query}
-            onChange={handleInputChange}
-            onFocus={() => query.trim().length >= 2 && setIsOverlayOpen(true)}
-            onKeyDown={handleKeyDown}
-          />
-          {query.trim() && (
-            <Tooltip content={t('common.advancedSearch') || 'Advanced Search'} side="bottom">
-              <button
-                type="button"
-                className="global-search__more-btn"
-                onClick={() => {
-                  setIsOverlayOpen(false);
-                  navigate(`/search?q=${encodeURIComponent(query.trim())}&source=${selectedSource}&type=${selectedType}`);
-                  setQuery('');
-                }}
-                title={null}
-              >
-                <ExternalLink size={12} />
-              </button>
-            </Tooltip>
-          )}
-        </div>
-      </div>
+      <SearchInputCombo
+        value={query}
+        onChange={handleInputChange}
+        placeholder={
+          selectedSource === 'tmdb'
+            ? t('search.placeholderTmdb', { type: (t(`search.types.${activeTypeObj.id}`) || activeTypeObj.name).toLowerCase() }) || `Search ${(t(`search.types.${activeTypeObj.id}`) || activeTypeObj.name).toLowerCase()}...`
+            : t('search.placeholderPattern', { type: (t(`search.types.${activeTypeObj.id}`) || activeTypeObj.name).toLowerCase(), source: activeSourceObj.name }) || `Search ${(t(`search.types.${activeTypeObj.id}`) || activeTypeObj.name).toLowerCase()} on ${activeSourceObj.name}...`
+        }
+        onFocus={() => query.trim().length >= 2 && setIsOverlayOpen(true)}
+        onKeyDown={handleKeyDown}
+        sources={filteredSources}
+        selectedSource={selectedSource}
+        onSourceChange={handleSourceSelect}
+        sourceLabel={t('search.source') || 'Source'}
+        optionLabel={t('search.type') || 'Type'}
+        options={(TYPES_BY_SOURCE[selectedSource] || []).map(t => ({
+          value: t.id,
+          label: t.name,
+          icon: t.icon
+        }))}
+        selectedOption={selectedType}
+        onOptionChange={setSelectedType}
+        size="xs"
+        rightElement={query.trim() && (
+          <Tooltip content={t('common.advancedSearch') || 'Advanced Search'} side="bottom">
+            <button
+              type="button"
+              className="global-search__more-btn"
+              onClick={() => {
+                setIsOverlayOpen(false);
+                navigate(`/search?q=${encodeURIComponent(query.trim())}&source=${selectedSource}&type=${selectedType}`);
+                setQuery('');
+              }}
+              title={null}
+            >
+              <ExternalLink size={12} />
+            </button>
+          </Tooltip>
+        )}
+      />
 
       {/* Suggestion Results Overlay */}
       {isOverlayOpen && filteredResults.length > 0 && (

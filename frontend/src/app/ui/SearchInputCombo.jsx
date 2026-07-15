@@ -1,6 +1,8 @@
+import PropTypes from 'prop-types';
 import { useState, useRef, useEffect } from 'react';
 import { Search, ChevronDown } from '@/ui/icons';
-import './SearchInputCombo.css';
+import Input from './Input';
+import styles from './SearchInputCombo.module.css';
 
 export default function SearchInputCombo({
   value,
@@ -9,6 +11,11 @@ export default function SearchInputCombo({
   selectedOption,
   onOptionChange,
   options = [],
+  sources = [],
+  selectedSource,
+  onSourceChange,
+  sourceLabel,
+  optionLabel,
   rightElement,
   className = '',
   size = 'md',
@@ -28,71 +35,155 @@ export default function SearchInputCombo({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const activeOption = options.find(o => o.value === selectedOption) || options[0];
+  const activeOption = options.find(o => (o.value || o.id) === selectedOption) || options[0];
   const ActiveIcon = activeOption?.icon;
+  const hasOptions = options.length > 0;
+  const hasSources = sources && sources.length > 0;
+
+  const normalizedSources = (sources || []).map(s => ({
+    value: s.value || s.id,
+    label: s.label || s.name,
+  }));
+
+  const iconSizeMap = {
+    xs: 10,
+    sm: 12,
+    md: 12,
+    lg: 14,
+  };
+  const activeIconSize = iconSizeMap[size] || 12;
+
+  // Custom leftElement configuration
+  const leftElement = (hasOptions || hasSources) ? (
+    <div className={styles['left-wrapper']}>
+      <button
+        type="button"
+        className={styles['selector-btn']}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {ActiveIcon && <ActiveIcon size={activeIconSize} className={styles['active-icon']} />}
+        <span>{activeOption?.label || activeOption?.name}</span>
+        <ChevronDown className={`${styles['chevron']} ${isOpen ? styles['is-open'] : ''}`} size={activeIconSize} />
+      </button>
+      <div className={styles['divider']} />
+    </div>
+  ) : showSearchIcon ? (
+    <Search size={14} />
+  ) : null;
+
+  const wrapperClass = `${styles['search-input-combo-wrapper']} ${styles[`size-${size}`]} ${className}`.trim();
 
   return (
-    <div className={`search-input-combo search-input-combo--${size} ${className}`.trim()} ref={containerRef}>
-      <div className="search-input-combo__bar">
-        {/* Selector Dropdown */}
-        {options.length > 0 && (
-          <div className="search-input-combo__selector-wrapper">
-            <button
-              type="button"
-              className="search-input-combo__selector-btn"
-              onClick={() => setIsOpen(!isOpen)}
-            >
-              {ActiveIcon && <ActiveIcon size={12} className="search-input-combo__active-icon" />}
-              <span className="search-input-combo__active-label">
-                {activeOption?.label}
-              </span>
-              <ChevronDown className={`search-input-combo__chevron ${isOpen ? 'is-open' : ''}`} size={12} />
-            </button>
+    <div className={wrapperClass} ref={containerRef}>
+      <Input
+        type="text"
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        size={size}
+        leftElement={leftElement}
+        rightElement={rightElement}
+        {...props}
+      />
+      {(hasOptions || hasSources) && isOpen && (
+        <div className={`${styles['dropdown']} ${hasSources ? styles['dropdown--cascading'] : ''}`}>
+          {hasSources ? (
+            <>
+              {/* Left Column: Sources */}
+              <div className={`${styles['dropdown-column']} ${styles['dropdown-column--sources']}`}>
+                {sourceLabel && <div className={styles['dropdown-header']}>{sourceLabel}</div>}
+                {normalizedSources.map(source => (
+                  <button
+                    key={source.value}
+                    type="button"
+                    className={`${styles['dropdown-item']} ${selectedSource === source.value ? styles.isActive : ''}`}
+                    onClick={() => onSourceChange?.(source.value)}
+                  >
+                    {source.label}
+                  </button>
+                ))}
+              </div>
 
-            {isOpen && (
-              <div className="search-input-combo__dropdown">
+              {/* Right Column: Types */}
+              <div className={`${styles['dropdown-column']} ${styles['dropdown-column--types']}`}>
+                {optionLabel && <div className={styles['dropdown-header']}>{optionLabel}</div>}
                 {options.map(option => {
                   const Icon = option.icon;
+                  const optVal = option.value || option.id;
+                  const optLabel = option.label || option.name;
                   return (
                     <button
-                      key={option.value}
+                      key={optVal}
                       type="button"
-                      className={`search-input-combo__dropdown-item ${selectedOption === option.value ? 'is-active' : ''}`}
+                      className={`${styles['dropdown-item']} ${selectedOption === optVal ? styles.isActive : ''}`}
                       onClick={() => {
-                        onOptionChange(option.value);
+                        onOptionChange?.(optVal);
                         setIsOpen(false);
                       }}
                     >
-                      {Icon && <Icon size={12} className="search-input-combo__item-icon" />}
-                      <span>{option.label}</span>
+                      {Icon && <Icon size={activeIconSize} className={styles['item-icon']} />}
+                      <span>{optLabel}</span>
                     </button>
                   );
                 })}
               </div>
-            )}
-          </div>
-        )}
-
-        {options.length > 0 && <div className="search-input-combo__divider" />}
-
-        {/* Input area */}
-        <div className="search-input-combo__input-wrapper">
-          {showSearchIcon && <Search className="search-input-combo__search-icon" size={14} />}
-          <input
-            type="text"
-            className="search-input-combo__input"
-            placeholder={placeholder}
-            value={value}
-            onChange={onChange}
-            {...props}
-          />
-          {rightElement && (
-            <div className="search-input-combo__right-element">
-              {rightElement}
-            </div>
+            </>
+          ) : (
+            options.map(option => {
+              const Icon = option.icon;
+              const optVal = option.value || option.id;
+              const optLabel = option.label || option.name;
+              return (
+                <button
+                  key={optVal}
+                  type="button"
+                  className={`${styles['dropdown-item']} ${selectedOption === optVal ? styles.isActive : ''}`}
+                  onClick={() => {
+                    onOptionChange?.(optVal);
+                    setIsOpen(false);
+                  }}
+                >
+                  {Icon && <Icon size={activeIconSize} className={styles['item-icon']} />}
+                  <span>{optLabel}</span>
+                </button>
+              );
+            })
           )}
         </div>
-      </div>
+      )}
     </div>
   );
 }
+
+SearchInputCombo.propTypes = {
+  value: PropTypes.string,
+  onChange: PropTypes.func,
+  placeholder: PropTypes.string,
+  selectedOption: PropTypes.string,
+  onOptionChange: PropTypes.func,
+  options: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.string,
+      id: PropTypes.string,
+      label: PropTypes.string,
+      name: PropTypes.string,
+      icon: PropTypes.elementType,
+    })
+  ),
+  sources: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.string,
+      id: PropTypes.string,
+      label: PropTypes.string,
+      name: PropTypes.string,
+    })
+  ),
+  selectedSource: PropTypes.string,
+  onSourceChange: PropTypes.func,
+  sourceLabel: PropTypes.string,
+  optionLabel: PropTypes.string,
+  rightElement: PropTypes.node,
+  className: PropTypes.string,
+  size: PropTypes.oneOf(['xs', 'sm', 'md', 'lg']),
+  showSearchIcon: PropTypes.bool,
+};

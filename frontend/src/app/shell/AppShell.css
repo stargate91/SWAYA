@@ -144,6 +144,10 @@
   background: var(--color-canvas);
 }
 
+.shell__content--dashboard {
+  padding-bottom: var(--space-7xl);
+}
+
 .shell:has(.organizer-page) .shell__content {
   padding-top: 0;
   padding-right: 0;

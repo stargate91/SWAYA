@@ -6,7 +6,7 @@
   animation: fadeIn var(--motion-duration-fade) var(--motion-ease-out);
 }
 
-.dashboard-container > *:last-child {
+.dashboard-container>*:last-child {
   margin-bottom: 0;
 }
 
@@ -19,8 +19,4 @@
 
 .dashboard-page {
   /* local class target */
-}
-
-:global(.shell__content):has(.dashboard-page) {
-  padding-bottom: var(--space-3xl);
 }

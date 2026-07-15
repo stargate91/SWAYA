@@ -140,6 +140,7 @@ export default function ListsHeader({
           <div className={styles['lists-header__search-wrapper']}>
             <Input
               type="text"
+              size="xs"
               className={styles['lists-header__search-input']}
               placeholder={t('common.searchPlaceholder') || 'Search in this list...'}
               value={listSearchQuery}

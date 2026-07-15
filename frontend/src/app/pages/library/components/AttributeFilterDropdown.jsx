@@ -1,4 +1,4 @@
-import FilterDropdown from '@/ui/FilterDropdown';
+import Dropdown from '@/ui/Dropdown';
 import { formatPhysicalAttributeLabel } from '../utils/formatPhysicalAttributeLabel';
 
 export default function AttributeFilterDropdown({
@@ -21,7 +21,8 @@ export default function AttributeFilterDropdown({
   ];
 
   return (
-    <FilterDropdown
+    <Dropdown
+      layout="inline"
       label={label}
       value={value}
       onFilterChange={onChange}

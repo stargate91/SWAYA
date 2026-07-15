@@ -5,7 +5,7 @@ import Page from '@/ui/Page';
 import Table from '@/ui/Table';
 import { Tabs } from '@/ui/Tabs';
 import Button from '@/ui/Button';
-import SearchInputCombo from '@/ui/SearchInputCombo';
+import PanelHeader from '@/ui/PanelHeader';
 import Skeleton from '@/ui/Skeleton';
 import SegmentedRating from '@/ui/SegmentedRating';
 import { useTranslation } from '@/providers/LanguageContext';
@@ -183,31 +183,21 @@ export default function RatingsPage() {
     <Page viewport={true} className={styles['ratings-page']}>
       <div className={styles['ratings-main']}>
         <div className={styles['ratings-main__content']}>
-          <div className="organizer-panel">
-            <div className="organizer-panel__row">
-              <span className={`organizer-panel__title ${styles['ratings-title-inline']}`}>
-                {t('ratings.title') || 'Ratings & Reviews'}
-              </span>
-            </div>
-
-            <div className="organizer-panel__row">
-              <Tabs
-                tabs={ratingTabs}
-                value={state.ratingMode}
-                onChange={(val) => {
-                  state.setRatingMode(val);
-                  state.setCurrentPage(1);
-                }}
-              />
-              <SearchInputCombo
-                placeholder={t('common.search') || 'Search...'}
-                value={localSearch}
-                onChange={(e) => setLocalSearch(e.target.value)}
-                className={styles['ratings-search']}
-              />
-            </div>
-
-            <div className="organizer-panel__row">
+          <PanelHeader
+            title={t('ratings.title') || 'Ratings & Reviews'}
+            sessionMode={state.activeSessionMode}
+            tabs={ratingTabs}
+            activeTab={state.ratingMode}
+            onTabChange={(val) => {
+              state.setRatingMode(val);
+              state.setCurrentPage(1);
+            }}
+            showSearch={true}
+            searchPlaceholder={t('common.search') || 'Search...'}
+            searchQuery={localSearch}
+            onSearchQueryChange={(e) => setLocalSearch(e.target.value)}
+          >
+            <PanelHeader.Row>
               <Tabs
                 tabs={subTabs}
                 value={state.mediaType}
@@ -217,8 +207,8 @@ export default function RatingsPage() {
                 }}
                 variant="sub"
               />
-            </div>
-          </div>
+            </PanelHeader.Row>
+          </PanelHeader>
 
           <div className={styles['ratings-results']}>
             {/* Upper Pagination Panel */}

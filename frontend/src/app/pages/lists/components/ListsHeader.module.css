@@ -166,68 +166,9 @@
   user-select: none;
 }
 
-.lists-header__search-input {
-  width: 100%;
-}
 
-.lists-header__search-input :global(.ui-input) {
-  height: 2.125rem;
-  min-height: 2.125rem;
-  font-size: 0.8125rem;
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-}
 
-.lists-header__search-input :global(.ui-input__left-element) {
-  height: 2.125rem;
-  display: flex;
-  align-items: center;
-}
 
-/* Color customizations using --list-theme-color */
-
-.lists-header__search-input :global(.ui-input):hover:not(:focus) {
-  border-color: color-mix(in srgb, var(--list-theme-color) 45%, var(--ui-control-border));
-}
-
-.lists-header__search-input :global(.ui-input):focus {
-  border-color: var(--list-theme-color);
-  box-shadow: 0 0 0 0.1875rem color-mix(in srgb, var(--list-theme-color) 15%, transparent);
-}
-
-:global(.ui-dropdown) :global(.ui-dropdown__trigger--sorter):hover {
-  border-color: color-mix(in srgb, var(--list-theme-color) 45%, var(--ui-control-border));
-}
-
-:global(.ui-dropdown) :global(.ui-dropdown__trigger--sorter).is-open,
-:global(.ui-dropdown) :global(.ui-dropdown__trigger--sorter):focus {
-  border-color: var(--list-theme-color);
-  box-shadow: 0 0 0 0.1875rem color-mix(in srgb, var(--list-theme-color) 15%, transparent);
-}
-
-:global(.ui-dropdown__menu)[style*="--list-theme-color"] :global(.ui-dropdown__item).is-active {
-  background: color-mix(in srgb, var(--list-theme-color) 10%, transparent);
-  color: var(--list-theme-color);
-}
-
-:global(.ui-dropdown__menu)[style*="--list-theme-color"] :global(.ui-dropdown__item):hover {
-  background: color-mix(in srgb, var(--list-theme-color) 15%, transparent);
-  color: var(--color-text-primary);
-}
-
-:global(.ui-dropdown__menu)[style*="--list-theme-color"] :global(.ui-dropdown__search-input):hover:not(:focus) {
-  border-color: color-mix(in srgb, var(--list-theme-color) 45%, var(--ui-control-border));
-}
-
-:global(.ui-dropdown__menu)[style*="--list-theme-color"] :global(.ui-dropdown__search-input):focus {
-  border-color: var(--list-theme-color);
-  box-shadow: 0 0 0 0.1875rem color-mix(in srgb, var(--list-theme-color) 15%, transparent);
-}
-
-:global(.ui-dropdown) :global(.ui-dropdown__direction-btn):hover {
-  color: var(--list-theme-color);
-  background: color-mix(in srgb, var(--list-theme-color) 10%, transparent);
-}
 
 .lists-header__right {
   display: flex;

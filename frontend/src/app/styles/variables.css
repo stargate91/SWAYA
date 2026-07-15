@@ -149,15 +149,15 @@
   --dropdown-field-border: var(--color-border-subtle);
   --dropdown-field-hover-border: color-mix(in srgb, var(--color-text-primary) 20%, transparent);
   --dropdown-field-active-border: var(--color-accent-blue);
-  --dropdown-menu-bg: color-mix(in srgb, var(--color-bg-canvas) 95%, transparent);
-  --dropdown-menu-border: var(--color-border-subtle);
-  --dropdown-menu-shadow: var(--ui-floating-surface-shadow);
+  --dropdown-menu-bg: color-mix(in srgb, var(--color-panel-strong) 98%, transparent);
+  --dropdown-menu-border: var(--color-border-strong);
+  --dropdown-menu-shadow: var(--shadow-lg);
   --dropdown-search-bg: rgba(0, 0, 0, 0.2);
   --dropdown-option-bg: transparent;
   --dropdown-option-hover-bg: var(--color-surface-glass);
   --dropdown-option-hover-color: var(--color-text-primary);
-  --dropdown-option-selected-bg: var(--color-state-info-bg);
-  --dropdown-option-selected-color: var(--color-accent-blue);
+  --dropdown-option-selected-bg: color-mix(in srgb, var(--color-accent) 15%, transparent);
+  --dropdown-option-selected-color: var(--color-accent);
   /* Layout Tokens */
   --layout-window-titlebar-height: 3rem;
 
@@ -236,7 +236,7 @@
   --ui-control-radius: var(--radius-md);
   --ui-control-radius-sm: calc(var(--radius-md) - 2px);
   --ui-control-radius-xs: calc(var(--radius-md) - 0.25rem);
-  --ui-control-bg: var(--color-bg-canvas);
+  --ui-control-bg: color-mix(in srgb, var(--color-panel-strong) 65%, black);
   --ui-control-bg-subtle: rgba(255, 255, 255, 0.02);
   --ui-control-bg-hover: rgba(255, 255, 255, 0.04);
   --ui-control-border: var(--color-line);
@@ -508,7 +508,7 @@
   --z-index-step-20: 20;
 
   /* Global stacking layers */
-  --z-index-dropdown: 100;
+  --z-index-dropdown: 450;
   --z-index-popover: 150;
   --z-index-sticky: 200;
   --z-index-backdrop: 300;

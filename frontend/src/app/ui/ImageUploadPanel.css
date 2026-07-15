@@ -24,49 +24,9 @@
   width: 100%;
 }
 
-.universal-image-picker__url-input-shell {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  width: 100%;
-  flex: 1 1 100%;
-  padding-left: var(--space-lg);
-  border: 1px solid var(--ui-control-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-input-bg);
-  color: var(--ui-control-text);
-  transition:
-    border-color var(--motion-fast),
-    box-shadow var(--motion-fast),
-    background-color var(--motion-fast),
-    color var(--motion-fast);
-}
-
-.universal-image-picker__url-input-shell:hover {
-  border-color: color-mix(in srgb, var(--color-accent) 35%, var(--ui-control-border));
-}
-
-.universal-image-picker__url-input-shell:focus-within {
-  border-color: var(--color-accent);
-  box-shadow: var(--ui-control-shadow-focus);
-}
-
-.universal-image-picker__url-input-shell .ui-input-field,
-.universal-image-picker__url-input-shell .ui-input__wrapper {
-  min-width: 0;
+.universal-image-picker__url-input {
   flex: 1 1 auto;
-}
-
-.universal-image-picker__url-input-shell .ui-input {
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-}
-
-.universal-image-picker__url-input-shell .ui-input:focus,
-.universal-image-picker__url-input-shell .ui-input:focus-visible {
-  border-color: transparent;
-  box-shadow: none;
+  min-width: 0;
 }
 
 .universal-image-picker__save-button,

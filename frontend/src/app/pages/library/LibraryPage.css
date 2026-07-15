@@ -429,29 +429,7 @@
   transform: translateY(-50%);
 }
 
-.add-people-modal__form-input-wrapper {
-  flex: 1;
-}
 
-.add-people-modal .add-people-modal__form-input-wrapper .ui-field.ui-field {
-  margin: 0;
-  width: 100%;
-}
-
-.add-people-modal .add-people-modal__form-input-wrapper .ui-input__wrapper.ui-input__wrapper {
-  border: none;
-  background: transparent;
-  box-shadow: none;
-}
-
-.add-people-modal .add-people-modal__form-input-wrapper input.ui-input.ui-input {
-  border: none;
-  background: transparent;
-  box-shadow: none;
-  font-size: var(--font-size-sm);
-  height: var(--ui-control-height);
-  padding-left: var(--space-md);
-}
 
 .add-people-modal__error-message {
   color: var(--color-state-danger);
@@ -804,77 +782,6 @@
   line-height: 1.6;
 }
 
-.organizer-panel {
-  flex: 0 0 auto;
-  flex-shrink: 0;
-  position: relative;
-  z-index: var(--z-index-base);
-  isolation: isolate;
-  background: var(--ui-surface-card-gradient);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-md);
-}
-
-.organizer-panel__row {
-  display: flex;
-  align-items: center;
-  height: var(--layout-window-titlebar-height);
-  padding: 0 var(--space-lg);
-  border-bottom: 1px solid var(--color-border-subtle);
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.organizer-panel__row:first-child {
-  height: 3.75rem;
-  padding: 0 var(--space-xl);
-}
-
-.organizer-panel__row:last-child {
-  border-bottom: 0;
-}
-
-.organizer-panel__row:nth-child(even) {
-  background: color-mix(in srgb, var(--color-border-subtle) 25%, transparent);
-}
-
-.organizer-panel__title {
-  font-family: var(--font-display);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wide);
-  color: var(--color-text-primary);
-}
-
-.organizer-panel__row:first-child .organizer-panel__title {
-  font-size: var(--font-size-lg);
-  letter-spacing: calc(2.5 * var(--letter-spacing-wide));
-}
-
-/* Organizer Search Input */
-.organizer-search.search-input-combo {
-  margin-left: auto;
-  width: 13.75rem;
-  transition: width var(--motion-base);
-}
-
-.organizer-search.search-input-combo:focus-within {
-  width: 17.5rem;
-}
-
-.organizer-search .search-input-combo__bar {
-  background: var(--ui-control-bg-subtle);
-  border-color: var(--ui-control-border);
-}
-
-.organizer-search .search-input-combo__bar:focus-within {
-  background: var(--ui-control-bg);
-  border-color: var(--color-accent-blue);
-  box-shadow: none;
-}
 
 .library-header-row {
   justify-content: space-between;
@@ -1101,20 +1008,12 @@
 .library-page .ui-dropdown__trigger.ui-dropdown__trigger.is-open,
 .library-page .ui-dropdown__trigger.ui-dropdown__trigger:focus,
 .library-page .ui-dropdown__trigger.ui-dropdown__trigger:focus-visible,
-.library-page .ui-input.ui-input:focus,
-.library-page .ui-input.ui-input:focus-visible,
-.library-page .ui-select.ui-select:focus,
-.library-page .ui-select.ui-select:focus-visible,
 .add-people-modal .ui-dropdown__trigger--sorter.ui-dropdown__trigger--sorter.is-open,
 .add-people-modal .ui-dropdown__trigger--sorter.ui-dropdown__trigger--sorter:focus,
 .add-people-modal .ui-dropdown__trigger--sorter.ui-dropdown__trigger--sorter:focus-visible,
 .add-people-modal .ui-dropdown__trigger.ui-dropdown__trigger.is-open,
 .add-people-modal .ui-dropdown__trigger.ui-dropdown__trigger:focus,
-.add-people-modal .ui-dropdown__trigger.ui-dropdown__trigger:focus-visible,
-.add-people-modal .ui-input.ui-input:focus,
-.add-people-modal .ui-input.ui-input:focus-visible,
-.add-people-modal .ui-select.ui-select:focus,
-.add-people-modal .ui-select.ui-select:focus-visible {
+.add-people-modal .ui-dropdown__trigger.ui-dropdown__trigger:focus-visible {
   border-color: var(--color-accent);
   box-shadow: 0 0 0 0.1875rem color-mix(in srgb, var(--color-accent) 15%, transparent);
   outline: none;
@@ -1122,12 +1021,8 @@
 
 .library-page .ui-dropdown__trigger--sorter.ui-dropdown__trigger--sorter:hover:not(:disabled),
 .library-page .ui-dropdown__trigger.ui-dropdown__trigger:hover:not(:disabled),
-.library-page .ui-input.ui-input:hover:not(:focus),
-.library-page .ui-select.ui-select:hover:not(:focus),
 .add-people-modal .ui-dropdown__trigger--sorter.ui-dropdown__trigger--sorter:hover:not(:disabled),
-.add-people-modal .ui-dropdown__trigger.ui-dropdown__trigger:hover:not(:disabled),
-.add-people-modal .ui-input.ui-input:hover:not(:focus),
-.add-people-modal .ui-select.ui-select:hover:not(:focus) {
+.add-people-modal .ui-dropdown__trigger.ui-dropdown__trigger:hover:not(:disabled) {
   border-color: color-mix(in srgb, var(--color-accent) 45%, var(--ui-control-border));
 }
 

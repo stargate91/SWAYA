@@ -176,7 +176,7 @@ export default function AppShell() {
       <Sidebar isCollapsed={isSidebarCollapsed} onToggle={handleToggleSidebar} />
 
       <div className="shell__main">
-        <main className="shell__content">
+        <main className={`shell__content ${location.pathname === '/dashboard' ? 'shell__content--dashboard' : ''}`.trim()}>
           <header className="shell__utility-bar">
             <div className="shell__utility-bar-left" aria-label="Context actions placeholder" />
             <div className="shell__utility-bar-center" id="shell-utility-bar-center" />

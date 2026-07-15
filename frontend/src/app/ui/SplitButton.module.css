@@ -84,11 +84,11 @@
 
 .split-button-menu {
   position: absolute;
-  background: var(--color-dropdown-bg);
-  backdrop-filter: var(--dropdown-backdrop-filter);
-  border: 0.0625rem solid var(--ui-control-border-strong);
+  background: var(--dropdown-menu-bg);
+  backdrop-filter: var(--ui-floating-surface-blur);
+  border: 0.0625rem solid var(--dropdown-menu-border);
   border-radius: var(--ui-control-radius);
-  box-shadow: var(--shadow-overlay-strong);
+  box-shadow: var(--dropdown-menu-shadow);
   z-index: var(--z-index-dropdown);
   padding: var(--space-xs);
   display: flex;

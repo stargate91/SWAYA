@@ -5,7 +5,7 @@ import Tooltip from './Tooltip';
 import Checkbox from './Checkbox';
 import { useTranslation } from '../providers/LanguageContext';
 import Field from './Field';
-import './Dropdown.css';
+import styles from './Dropdown.module.css';
 
 function DropdownMenu({
   isOpen,
@@ -53,16 +53,16 @@ function DropdownMenu({
   return createPortal(
     <div
       ref={menuRef}
-      className={`ui-dropdown__menu ${searchable ? 'has-search' : ''} ${menuCoords.openUpwards ? 'is-upwards' : ''} ${variant === 'sorter' ? 'ui-dropdown__menu--sorter' : ''} ${className}`.trim()}
+      className={`${styles.menu} ${searchable ? styles.hasSearch : ''} ${menuCoords.openUpwards ? styles.isUpwards : ''} ${variant === 'sorter' ? styles.menuSorter : ''} ${className}`.trim()}
       // eslint-disable-next-line react/forbid-dom-props
       style={themeColor ? { '--list-theme-color': themeColor } : undefined}
     >
       {searchable ? (
-        <div className="ui-dropdown__search-container">
+        <div className={styles.searchContainer}>
           <input
             ref={searchInputRef}
             type="text"
-            className="ui-dropdown__search-input"
+            className={styles.searchInput}
             placeholder={t('common.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -70,14 +70,14 @@ function DropdownMenu({
           />
         </div>
       ) : null}
-      <div className={`ui-dropdown__items-wrapper ${multiple ? 'ui-dropdown__items-wrapper--multiple' : ''}`.trim()}>
+      <div className={`${styles.itemsWrapper} ${multiple ? styles.itemsWrapperMultiple : ''}`.trim()}>
         {filteredOptions.map((opt) => {
           if (multiple) {
             const isChecked = Array.isArray(value) && value.includes(opt.value);
             return (
               <div
                 key={opt.value}
-                className="ui-dropdown__item tags-dropdown-item ui-dropdown__item--checkbox"
+                className={`${styles.item} tags-dropdown-item ${styles.itemCheckbox}`}
               >
                 <Checkbox
                   checked={isChecked}
@@ -85,7 +85,7 @@ function DropdownMenu({
                   disabled={Boolean(opt.disabled)}
                 >
                   <span
-                    className="ui-dropdown__item-label"
+                    className={styles.itemLabel}
                     // eslint-disable-next-line react/forbid-dom-props
                     style={opt.color ? { color: opt.color } : undefined}
                   >
@@ -97,10 +97,10 @@ function DropdownMenu({
           }
 
           return (
-            <Tooltip content={opt.label} side="right" key={opt.value}>
+            <Tooltip content={opt.label} side="right" key={opt.value} triggerClassName={styles.tooltipTrigger}>
               <button
                 type="button"
-                className={`ui-dropdown__item ${opt.value === value ? 'is-active' : ''}${opt.disabled ? ' is-disabled' : ''}`}
+                className={`${styles.item} ${opt.value === value ? styles.isActive : ''} ${opt.disabled ? styles.isDisabled : ''}`.trim()}
                 onClick={() => !opt.disabled && onOptionClick(opt.value)}
                 title={null}
                 disabled={Boolean(opt.disabled)}
@@ -111,7 +111,7 @@ function DropdownMenu({
           );
         })}
         {filteredOptions.length === 0 ? (
-          <div className="ui-dropdown__no-results">
+          <div className={styles.noResults}>
             {t('common.noResults')}
           </div>
         ) : null}
@@ -137,6 +137,10 @@ export default function Dropdown({
   menuClassName = '',
   themeColor = '',
   multiple = false,
+  layout = 'stacked',
+  onFilterChange,
+  setCurrentPage,
+  size = 'md',
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
@@ -147,7 +151,17 @@ export default function Dropdown({
   const { t } = useTranslation();
   const displayPlaceholder = placeholder ?? t('common.select');
   const selectedOption = options.find((opt) => opt.value === value);
-  const isSorter = variant === 'sorter';
+
+  const isSorter = variant === 'sorter' || layout === 'inline';
+  const controlSize = isSorter ? 'xs' : size;
+
+  const chevronSizeMap = {
+    xs: 10,
+    sm: 12,
+    md: 12,
+    lg: 14,
+  };
+  const chevronSize = chevronSizeMap[controlSize] || 12;
 
   const updateMenuCoords = useCallback(() => {
     if (triggerRef.current) {
@@ -182,7 +196,7 @@ export default function Dropdown({
   useEffect(() => {
     function handleClickOutside(event) {
       if (containerRef.current && !containerRef.current.contains(event.target)) {
-        if (event.target.closest('.ui-dropdown__menu')) return;
+        if (event.target.closest(`.${styles.menu}`)) return;
         setIsOpen(false);
       }
     }
@@ -191,7 +205,9 @@ export default function Dropdown({
   }, []);
 
   const handleOptionClick = (val) => {
-    if (onChange) {
+    if (onFilterChange) {
+      onFilterChange(val);
+    } else if (onChange) {
       let newValue;
       if (multiple) {
         const currentArray = Array.isArray(value) ? value : [];
@@ -204,6 +220,9 @@ export default function Dropdown({
         newValue = val;
       }
       onChange({ target: { value: newValue } });
+    }
+    if (setCurrentPage) {
+      setCurrentPage(1);
     }
     if (!multiple) {
       setIsOpen(false);
@@ -223,68 +242,81 @@ export default function Dropdown({
     return selectedOption ? selectedOption.label : displayPlaceholder;
   };
 
+  const dropdownContent = (
+    <div
+      className={`${styles.dropdown} ${isSorter ? styles.dropdownSorter : ''}`.trim()}
+      // eslint-disable-next-line react/forbid-dom-props
+      style={themeColor ? { '--list-theme-color': themeColor } : undefined}
+    >
+      
+      <div className={styles.sorterWrapper}>
+        <button
+          ref={triggerRef}
+          type="button"
+          className={`${styles.trigger} ${styles['trigger--' + controlSize]} ${multiple ? 'ui-dropdown__trigger--sorter-custom' : ''} ${disabled ? styles.isDisabled : ''} ${isOpen ? styles.isOpen : ''}`.trim()}
+          onClick={() => !disabled && setIsOpen(!isOpen)}
+          disabled={disabled}
+        >
+          <span className={styles.triggerText}>
+            {getTriggerText()}
+          </span>
+          {(!isSorter || multiple) && (
+            <span className={`${styles.chevron} ${isOpen ? styles.isOpen : ''} ${multiple ? styles.chevronMultiple : ''}`.trim()}>
+              <ChevronDown size={chevronSize} />
+            </span>
+          )}
+        </button>
+
+        {isSorter && !multiple && onSortDirectionToggle && (
+          <Tooltip content={sortDirection === 'asc' ? t('dropdown.ascending') : t('dropdown.descending')} side="top">
+            <button
+              type="button"
+              className={styles.directionBtn}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onSortDirectionToggle) onSortDirectionToggle();
+              }}
+              title={null}
+            >
+              {sortDirection === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            </button>
+          </Tooltip>
+        )}
+      </div>
+
+      <DropdownMenu
+        isOpen={isOpen}
+        menuCoords={menuCoords}
+        options={options}
+        value={value}
+        onOptionClick={handleOptionClick}
+        searchable={searchable}
+        variant={variant === 'default' && layout === 'inline' ? 'sorter' : variant}
+        className={menuClassName}
+        themeColor={themeColor}
+        multiple={multiple}
+      />
+    </div>
+  );
+
+  if (layout === 'inline') {
+    return (
+      <div ref={containerRef} className={`${styles.inlineContainer} ${className}`.trim()}>
+        {label && <span className={styles.inlineLabel}>{label}</span>}
+        {dropdownContent}
+      </div>
+    );
+  }
+
   return (
     <Field
       label={label}
       hint={hint}
-      className={`${isSorter ? 'ui-field--sorter' : ''} ${className}`.trim()}
+      className={`${isSorter ? styles.fieldSorter : ''} ${className}`.trim()}
       htmlFor={generatedId}
       ref={containerRef}
     >
-      <div
-        className={`ui-dropdown ${isSorter ? 'ui-dropdown--sorter' : ''}`}
-        // eslint-disable-next-line react/forbid-dom-props
-        style={themeColor ? { '--list-theme-color': themeColor } : undefined}
-      >
-        
-        <div className="ui-dropdown__sorter-wrapper">
-          <button
-            ref={triggerRef}
-            type="button"
-            className={`ui-dropdown__trigger ${isSorter ? 'ui-dropdown__trigger--sorter' : ''} ${multiple ? 'ui-dropdown__trigger--sorter-custom' : ''} ${disabled ? 'is-disabled' : ''}`.trim()}
-            onClick={() => !disabled && setIsOpen(!isOpen)}
-            disabled={disabled}
-          >
-            <span className="ui-dropdown__trigger-text">
-              {getTriggerText()}
-            </span>
-            {(!isSorter || multiple) && (
-              <span className={`ui-dropdown__chevron ${isOpen ? 'is-open' : ''} ${multiple ? 'ui-dropdown__chevron--multiple' : ''}`.trim()}>
-                <ChevronDown size={12} />
-              </span>
-            )}
-          </button>
-
-          {isSorter && !multiple && onSortDirectionToggle && (
-            <Tooltip content={sortDirection === 'asc' ? t('dropdown.ascending') : t('dropdown.descending')} side="top">
-              <button
-                type="button"
-                className="ui-dropdown__direction-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (onSortDirectionToggle) onSortDirectionToggle();
-                }}
-                title={null}
-              >
-                {sortDirection === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-              </button>
-            </Tooltip>
-          )}
-        </div>
-
-        <DropdownMenu
-          isOpen={isOpen}
-          menuCoords={menuCoords}
-          options={options}
-          value={value}
-          onOptionClick={handleOptionClick}
-          searchable={searchable}
-          variant={variant}
-          className={menuClassName}
-          themeColor={themeColor}
-          multiple={multiple}
-        />
-      </div>
+      {dropdownContent}
     </Field>
   );
 }
