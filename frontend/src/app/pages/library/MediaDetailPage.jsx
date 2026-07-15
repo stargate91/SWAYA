@@ -1,4 +1,3 @@
-/* eslint-disable react/forbid-dom-props */
 import { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -227,7 +226,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
                         {t('library.details.technicalInfo') || 'Technical Info'}
                       </span>
                     </div>
-                    <div style={{ padding: 'var(--space-md) var(--space-md)' }}>
+                    <div className="media-detail-page__technical-container">
                       <TechnicalPanel showTitle={false} />
                     </div>
                   </div>

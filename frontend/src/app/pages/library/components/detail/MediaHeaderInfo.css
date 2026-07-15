@@ -73,7 +73,7 @@
 }
 
 .media-detail-page__original-title {
-  font-family: var(--font-display, sans-serif);
+  font-family: var(--font-display);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
   font-style: italic;
@@ -82,7 +82,7 @@
 }
 
 .media-detail-page__tagline {
-  font-family: var(--font-base, sans-serif);
+  font-family: var(--font-base);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
   font-style: italic;
@@ -94,7 +94,7 @@
 .media-detail-page__meta-row {
   display: flex;
   align-items: center;
-  gap: var(--space-lg, var(--space-md));
+  gap: var(--space-lg);
   margin: 0;
   flex-wrap: wrap;
 }
@@ -132,5 +132,5 @@
 .media-detail-page__logo-container.clickable:hover .media-detail-page__fallback-title,
 .media-detail-page__logo-container.clickable:hover .media-detail-page__scene-title-below-logo {
   transform: scale(1.01);
-  color: var(--color-accent, var(--color-text-primary));
+  color: var(--color-accent);
 }

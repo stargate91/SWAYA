@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useLibraryItemDetailQuery, useLibraryTvDetailQuery, useActiveSessionsQuery } from '@/queries/metadataQueries';
 import { useSettingsQuery } from '@/queries/settingsQueries';
-import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import { API_BASE } from '@/lib/backend';
 import api from '@/lib/api';
 import { QK } from '@/lib/queryKeys';
@@ -105,7 +104,6 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
 
 
   const navigate = useNavigate();
-  const location = useLocation();
 
   useEffect(() => {
     if (!isLoading && item && item.is_adult && !settings?.include_adult) {

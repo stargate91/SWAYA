@@ -1,4 +1,3 @@
-/* eslint-disable react/forbid-dom-props, react/forbid-component-props */
 import { useEffect } from 'react';
 import Page from '@/ui/Page';
 import Skeleton from '@/ui/Skeleton';
@@ -70,78 +69,65 @@ export default function DetailPageShell({
     if (isPeople) {
       return (
         <Page className={`${combinedClassName} entity-detail-page--people`}>
-          <div className="entity-detail-page__hero-section-wrapper" style={{ display: 'flex', flexDirection: 'row', gap: 'var(--space-2xl)', width: '100%', height: 'calc(100vh - var(--page-top-offset, 4rem) - 120px)', alignItems: 'stretch', boxSizing: 'border-box' }}>
+          <div className="detail-shell-people-loading-hero">
             {/* Left Sidebar Panel (Glass panel structure) */}
-            <div className="entity-detail-page__media-column no-scrollbar" style={{
-              width: '320px',
-              flexShrink: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 'var(--space-md)',
-              padding: 'var(--space-lg)',
-              borderRadius: '24px',
-              background: 'color-mix(in srgb, var(--color-panel-translucent, var(--color-panel)) 22%, transparent)',
-              border: '1px solid color-mix(in srgb, var(--color-border-default) 40%, transparent)',
-              backdropFilter: 'blur(16px)',
-              boxSizing: 'border-box',
-              height: '100%'
-            }}>
+            <div className="entity-detail-page__media-column no-scrollbar detail-shell-people-loading-sidebar">
               {/* Title & aliases */}
               <div>
-                <Skeleton style={{ width: '80%', height: '24px', marginBottom: 'var(--space-sm)' }} variant="text" />
-                <Skeleton style={{ width: '60%', height: '14px', marginBottom: 'var(--space-md)' }} variant="text" />
+                <Skeleton className="detail-shell-people-loading-title-line" variant="text" />
+                <Skeleton className="detail-shell-people-loading-subtitle-line" variant="text" />
               </div>
 
               {/* Profile image card */}
-              <Skeleton style={{ width: '100%', aspectRatio: '2 / 3', borderRadius: '16px' }} variant="rect" />
+              <Skeleton className="detail-shell-people-loading-profile" variant="rect" />
 
               {/* Action row (Heart, check, pencil buttons) */}
-              <div style={{ display: 'flex', gap: 'var(--space-sm)', margin: 'var(--space-sm) 0' }}>
-                <Skeleton style={{ flex: 1, height: '32px', borderRadius: '8px' }} variant="rect" />
-                <Skeleton style={{ flex: 1, height: '32px', borderRadius: '8px' }} variant="rect" />
-                <Skeleton style={{ flex: 1, height: '32px', borderRadius: '8px' }} variant="rect" />
+              <div className="detail-shell-people-loading-actions">
+                <Skeleton className="detail-shell-people-loading-action-btn" variant="rect" />
+                <Skeleton className="detail-shell-people-loading-action-btn" variant="rect" />
+                <Skeleton className="detail-shell-people-loading-action-btn" variant="rect" />
               </div>
 
               {/* Rating representation */}
-              <Skeleton style={{ width: '100%', height: '12px', borderRadius: '4px', margin: 'var(--space-sm) 0' }} variant="rect" />
+              <Skeleton className="detail-shell-people-loading-rating" variant="rect" />
 
               {/* Info grid (Gender, Role, Born, Age, etc.) */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)', margin: 'var(--space-sm) 0' }}>
+              <div className="detail-shell-people-loading-infogrid">
                 <div>
-                  <Skeleton style={{ width: '50%', height: '10px', marginBottom: '4px' }} variant="text" />
-                  <Skeleton style={{ width: '80%', height: '14px' }} variant="text" />
+                  <Skeleton className="detail-shell-people-loading-info-label" variant="text" />
+                  <Skeleton className="detail-shell-people-loading-info-value" variant="text" />
                 </div>
                 <div>
-                  <Skeleton style={{ width: '50%', height: '10px', marginBottom: '4px' }} variant="text" />
-                  <Skeleton style={{ width: '80%', height: '14px' }} variant="text" />
+                  <Skeleton className="detail-shell-people-loading-info-label" variant="text" />
+                  <Skeleton className="detail-shell-people-loading-info-value" variant="text" />
                 </div>
                 <div>
-                  <Skeleton style={{ width: '50%', height: '10px', marginBottom: '4px' }} variant="text" />
-                  <Skeleton style={{ width: '80%', height: '14px' }} variant="text" />
+                  <Skeleton className="detail-shell-people-loading-info-label" variant="text" />
+                  <Skeleton className="detail-shell-people-loading-info-value" variant="text" />
                 </div>
                 <div>
-                  <Skeleton style={{ width: '50%', height: '10px', marginBottom: '4px' }} variant="text" />
-                  <Skeleton style={{ width: '80%', height: '14px' }} variant="text" />
+                  <Skeleton className="detail-shell-people-loading-info-label" variant="text" />
+                  <Skeleton className="detail-shell-people-loading-info-value" variant="text" />
                 </div>
               </div>
 
               {/* Biography button */}
-              <Skeleton style={{ width: '100%', height: '36px', borderRadius: '10px', marginTop: 'auto' }} variant="rect" />
+              <Skeleton className="detail-shell-people-loading-bio-btn" variant="rect" />
             </div>
 
             {/* Right side area: Known For horizontal cards list at the bottom */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', paddingBottom: 'var(--space-lg)', boxSizing: 'border-box' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            <div className="detail-shell-people-loading-right-area">
+              <div className="detail-shell-people-loading-knownfor-container">
                 {/* Title: KNOWN FOR */}
-                <Skeleton style={{ width: '120px', height: '18px', marginBottom: 'var(--space-sm)' }} variant="text" />
+                <Skeleton className="detail-shell-people-loading-knownfor-title" variant="text" />
                 
                 {/* Horizontal row of cards */}
-                <div style={{ display: 'flex', gap: 'var(--space-md)', overflow: 'hidden' }}>
+                <div className="detail-shell-people-loading-cards-row">
                   {[...Array(8)].map((_, idx) => (
-                    <div key={idx} style={{ width: '120px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
-                      <Skeleton style={{ width: '100%', height: '180px', borderRadius: '12px' }} variant="rect" />
-                      <Skeleton style={{ width: '90%', height: '12px' }} variant="text" />
-                      <Skeleton style={{ width: '60%', height: '10px' }} variant="text" />
+                    <div key={idx} className="detail-shell-people-loading-card-item">
+                      <Skeleton className="detail-shell-people-loading-card-poster" variant="rect" />
+                      <Skeleton className="detail-shell-people-loading-card-title" variant="text" />
+                      <Skeleton className="detail-shell-people-loading-card-meta" variant="text" />
                     </div>
                   ))}
                 </div>
@@ -154,21 +140,21 @@ export default function DetailPageShell({
 
     return (
       <Page className={combinedClassName}>
-        <div style={{ width: '100%' }}>
-          <Skeleton.Banner style={{ height: '380px', borderRadius: 'var(--radius-3xl)', marginBottom: 'var(--space-xl)' }} />
-          <div style={{ padding: '0 var(--space-2xl)', display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
-            <div style={{ width: '300px' }}>
-              <Skeleton.Title style={{ marginBottom: 'var(--space-md)' }} />
+        <div className="detail-shell-loading-wrapper">
+          <Skeleton.Banner className="detail-shell-loading-banner" />
+          <div className="detail-shell-loading-content">
+            <div className="detail-shell-loading-title">
+              <Skeleton.Title className="detail-shell-loading-title-skeleton" />
             </div>
-            <div style={{ display: 'flex', gap: 'var(--space-md)' }}>
-              <Skeleton style={{ width: '80px', height: '20px' }} variant="text" />
-              <Skeleton style={{ width: '120px', height: '20px' }} variant="text" />
-              <Skeleton style={{ width: '60px', height: '20px' }} variant="text" />
+            <div className="detail-shell-loading-meta">
+              <Skeleton className="detail-shell-loading-meta-item-1" variant="text" />
+              <Skeleton className="detail-shell-loading-meta-item-2" variant="text" />
+              <Skeleton className="detail-shell-loading-meta-item-3" variant="text" />
             </div>
-            <div style={{ marginTop: 'var(--space-lg)', display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-              <Skeleton style={{ height: '18px', width: '100%' }} variant="text" />
-              <Skeleton style={{ height: '18px', width: '95%' }} variant="text" />
-              <Skeleton style={{ height: '18px', width: '60%' }} variant="text" />
+            <div className="detail-shell-loading-description">
+              <Skeleton className="detail-shell-loading-desc-line-1" variant="text" />
+              <Skeleton className="detail-shell-loading-desc-line-2" variant="text" />
+              <Skeleton className="detail-shell-loading-desc-line-3" variant="text" />
             </div>
           </div>
         </div>

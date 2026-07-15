@@ -13,7 +13,7 @@
 }
 
 .watched-panel .specs-card__value.status-unwatched {
-  color: var(--color-text-muted, color-mix(in srgb, var(--color-text-primary) 40%, transparent));
+  color: var(--color-text-muted);
 }
 
 .specs-card--progress {

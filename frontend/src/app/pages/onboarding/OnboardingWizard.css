@@ -325,7 +325,7 @@
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.018)),
     var(--ui-surface-card-gradient);
   border: 1px solid var(--ui-overlay-panel-border);
-  box-shadow: 0 1.125rem 2.5rem rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  box-shadow: 0 1.125rem 2.5rem color-mix(in srgb, black 24%, transparent), inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 4%, transparent);
   transform: perspective(56.25rem) rotateX(6deg);
   z-index: var(--z-index-underlay);
 }
@@ -368,7 +368,7 @@
   gap: 0.5rem;
   padding: 0.375rem 0.625rem;
   border-radius: var(--radius-full);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 16%, rgba(255, 255, 255, 0.08));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 16%, color-mix(in srgb, var(--color-text-primary) 8%, transparent));
   background: color-mix(in srgb, var(--color-accent-soft) 70%, transparent);
   color: var(--color-signal);
   font: 600 0.6875rem/1.2 var(--font-sans);
@@ -466,7 +466,7 @@
   text-align: left;
   padding: 1.25rem 1.375rem;
   border-radius: 1.125rem;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 6%, transparent);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.024), rgba(255, 255, 255, 0.01)),
     linear-gradient(180deg, rgba(12, 17, 26, 0.94), rgba(9, 13, 21, 0.98));
@@ -485,7 +485,7 @@
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.018)),
     linear-gradient(180deg, rgba(12, 18, 28, 0.94), rgba(8, 13, 20, 0.98));
-  border: 1px solid color-mix(in srgb, var(--color-accent) 16%, rgba(255, 255, 255, 0.08));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 16%, color-mix(in srgb, var(--color-text-primary) 8%, transparent));
   box-shadow:
     0 0.75rem 1.625rem rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
@@ -534,14 +534,14 @@
 
 .feature-icon {
   font-size: 1.125rem;
-  background: linear-gradient(180deg, rgba(20, 147, 255, 0.08), rgba(0, 124, 240, 0.025));
+  background: linear-gradient(180deg, color-mix(in srgb, rgb(20, 147, 255) 8%, transparent), color-mix(in srgb, rgb(0, 124, 240) 3%, transparent));
   width: var(--button-height-sm);
   height: var(--button-height-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 0.6875rem;
-  border: 1px solid color-mix(in srgb, var(--color-accent) 14%, rgba(255, 255, 255, 0.06));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 14%, color-mix(in srgb, var(--color-text-primary) 6%, transparent));
   flex-shrink: 0;
   color: var(--color-signal);
 }
@@ -633,12 +633,12 @@
   gap: 0.5rem;
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-full);
-  background: linear-gradient(180deg, rgba(20, 147, 255, 0.12), rgba(0, 100, 209, 0.06));
-  border: 1px solid color-mix(in srgb, var(--color-accent) 28%, rgba(255, 255, 255, 0.08));
+  background: linear-gradient(180deg, color-mix(in srgb, rgb(20, 147, 255) 12%, transparent), color-mix(in srgb, rgb(0, 100, 209) 6%, transparent));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 28%, color-mix(in srgb, var(--color-text-primary) 8%, transparent));
   color: color-mix(in srgb, var(--color-signal) 72%, white 28%);
   font: 600 0.6875rem/1.1 var(--font-sans);
   white-space: nowrap;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 5%, transparent);
 }
 
 .welcome-lang-panel h3 {
@@ -789,7 +789,7 @@
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
     linear-gradient(135deg, rgba(18, 26, 38, 0.96), rgba(12, 17, 26, 0.98));
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 8%, transparent);
   box-shadow:
     0 0.625rem 1.375rem rgba(0, 0, 0, 0.26),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
@@ -801,7 +801,7 @@
   position: absolute;
   inset: auto -20% -35% -20%;
   height: 70%;
-  background: radial-gradient(circle, rgba(20, 147, 255, 0.22), transparent 72%);
+  background: radial-gradient(circle, color-mix(in srgb, rgb(20, 147, 255) 22%, transparent), transparent 72%);
   pointer-events: none;
 }
 
@@ -810,7 +810,7 @@
   height: 1.375rem;
   object-fit: cover;
   border-radius: var(--radius-full);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 16%, transparent);
   box-shadow:
     0 0.1875rem 0.5rem rgba(0, 0, 0, 0.24),
     0 0 0 1px rgba(255, 255, 255, 0.04);
@@ -826,19 +826,19 @@
 }
 
 .language-row-item:hover:not(.is-disabled) .lang-row-flag-frame {
-  border-color: rgba(255, 255, 255, 0.14);
+  border-color: color-mix(in srgb, var(--color-text-primary) 14%, transparent);
   transform: translateY(-1px);
 }
 
 .language-row-item.is-selected .lang-row-flag-frame {
-  border-color: rgba(110, 187, 255, 0.3);
+  border-color: color-mix(in srgb, rgb(110, 187, 255) 30%, transparent);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03)),
     linear-gradient(135deg, rgba(22, 76, 123, 0.92), rgba(12, 20, 31, 0.98));
 }
 
 .language-row-item.is-selected .lang-row-flag-glow {
-  background: radial-gradient(circle, rgba(67, 160, 255, 0.34), transparent 72%);
+  background: radial-gradient(circle, color-mix(in srgb, rgb(67, 160, 255) 34%, transparent), transparent 72%);
 }
 
 .lang-checked-icon {
@@ -954,7 +954,7 @@
   background:
     linear-gradient(135deg, rgba(22, 94, 152, 0.18), rgba(13, 25, 40, 0.94) 55%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.014));
-  border-color: color-mix(in srgb, var(--color-accent) 44%, rgba(255, 255, 255, 0.1));
+  border-color: color-mix(in srgb, var(--color-accent) 44%, color-mix(in srgb, var(--color-text-primary) 10%, transparent));
   box-shadow:
     0 1.125rem 2.25rem rgba(0, 0, 0, 0.22),
     0 0 0 1px rgba(20, 147, 255, 0.08),
@@ -968,7 +968,7 @@
   background:
     linear-gradient(180deg, rgba(20, 147, 255, 0.12), rgba(0, 100, 209, 0.05)),
     var(--color-panel-soft);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 16%, rgba(255, 255, 255, 0.08));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 16%, color-mix(in srgb, var(--color-text-primary) 8%, transparent));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1017,7 +1017,7 @@
 
 /* Drag & Drop Zone */
 .onboarding-dropzone {
-  border: 1px dashed color-mix(in srgb, var(--color-accent) 28%, rgba(255, 255, 255, 0.1));
+  border: 1px dashed color-mix(in srgb, var(--color-accent) 28%, color-mix(in srgb, var(--color-text-primary) 10%, transparent));
   border-radius: 0.875rem;
   padding: 1.125rem;
   text-align: center;
@@ -1029,7 +1029,7 @@
 }
 
 .onboarding-dropzone:hover {
-  border-color: color-mix(in srgb, var(--color-signal) 42%, rgba(255, 255, 255, 0.12));
+  border-color: color-mix(in srgb, var(--color-signal) 42%, color-mix(in srgb, var(--color-text-primary) 12%, transparent));
   background:
     linear-gradient(180deg, rgba(20, 147, 255, 0.08), rgba(0, 124, 240, 0.03)),
     color-mix(in srgb, var(--color-panel-translucent) 92%, transparent);
@@ -1159,7 +1159,7 @@
 
 .tmdb-guide-browser {
   border-radius: 1.25rem;
-  border: 1px solid color-mix(in srgb, var(--color-accent) 18%, rgba(255, 255, 255, 0.08));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 18%, color-mix(in srgb, var(--color-text-primary) 8%, transparent));
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)),
     linear-gradient(180deg, rgba(12, 17, 26, 0.96), rgba(9, 13, 21, 0.99));
@@ -1173,26 +1173,26 @@
   display: flex;
   gap: 0.5rem;
   padding: 0.75rem 0.875rem 0.625rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text-primary) 5%, transparent);
 }
 
 .tmdb-guide-browser-top span {
   width: 0.5625rem;
   height: 0.5625rem;
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.14);
+  background: color-mix(in srgb, var(--color-text-primary) 14%, transparent);
 }
 
 .tmdb-guide-browser-top span:first-child {
-  background: rgba(255, 99, 99, 0.6);
+  background: color-mix(in srgb, rgb(255, 99, 99) 60%, transparent);
 }
 
 .tmdb-guide-browser-top span:nth-child(2) {
-  background: rgba(255, 201, 87, 0.66);
+  background: color-mix(in srgb, rgb(255, 201, 87) 66%, transparent);
 }
 
 .tmdb-guide-browser-top span:nth-child(3) {
-  background: rgba(74, 222, 128, 0.62);
+  background: color-mix(in srgb, rgb(74, 222, 128) 62%, transparent);
 }
 
 .tmdb-guide-browser-bar {
@@ -1201,7 +1201,7 @@
   justify-content: space-between;
   gap: 0.875rem;
   padding: 0.75rem 0.875rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text-primary) 5%, transparent);
 }
 
 .tmdb-guide-browser-url {
@@ -1214,8 +1214,8 @@
   align-items: center;
   padding: 0.375rem 0.625rem;
   border-radius: var(--radius-full);
-  background: linear-gradient(180deg, rgba(20, 147, 255, 0.16), rgba(0, 100, 209, 0.06));
-  border: 1px solid color-mix(in srgb, var(--color-accent) 24%, rgba(255, 255, 255, 0.08));
+  background: linear-gradient(180deg, color-mix(in srgb, rgb(20, 147, 255) 16%, transparent), color-mix(in srgb, rgb(0, 100, 209) 6%, transparent));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 24%, color-mix(in srgb, var(--color-text-primary) 8%, transparent));
   color: var(--color-signal);
   font: 700 0.625rem/1 var(--font-sans);
   letter-spacing: 0.08em;
@@ -1233,20 +1233,20 @@
   align-content: start;
   gap: 0.625rem;
   padding: 1.125rem 0.875rem;
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.01));
+  border-right: 1px solid color-mix(in srgb, var(--color-text-primary) 5%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-text-primary) 3%, transparent), color-mix(in srgb, var(--color-text-primary) 1%, transparent));
 }
 
 .tmdb-guide-browser-sidebar span {
   display: block;
   height: 0.6875rem;
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
 }
 
 .tmdb-guide-browser-sidebar span.is-strong {
-  background: linear-gradient(90deg, rgba(20, 147, 255, 0.42), rgba(0, 124, 240, 0.12));
-  box-shadow: 0 0 0 1px rgba(20, 147, 255, 0.1);
+  background: linear-gradient(90deg, color-mix(in srgb, rgb(20, 147, 255) 42%, transparent), color-mix(in srgb, rgb(0, 124, 240) 12%, transparent));
+  box-shadow: 0 0 0 1px color-mix(in srgb, rgb(20, 147, 255) 10%, transparent);
 }
 
 .tmdb-guide-browser-focus {
@@ -1272,7 +1272,7 @@
   gap: 0.625rem;
   padding: 0.875rem;
   border-radius: var(--radius-xl);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 5%, transparent);
   background:
     linear-gradient(180deg, rgba(20, 147, 255, 0.08), rgba(0, 124, 240, 0.02)),
     linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
@@ -1292,7 +1292,7 @@
   flex-shrink: 0;
   border-radius: var(--radius-full);
   background: var(--color-signal);
-  box-shadow: 0 0 0.75rem rgba(20, 147, 255, 0.3);
+  box-shadow: 0 0 0.75rem color-mix(in srgb, rgb(20, 147, 255) 30%, transparent);
 }
 
 .tmdb-guide-stage-copy {
@@ -1318,7 +1318,7 @@
   gap: 0.75rem;
   padding: 0.875rem 1rem;
   border-radius: var(--radius-xl);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 6%, transparent);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.012)),
     linear-gradient(180deg, rgba(12, 17, 26, 0.9), rgba(9, 13, 21, 0.94));
@@ -1349,7 +1349,7 @@
   flex-shrink: 0;
   border-radius: var(--radius-full);
   background: color-mix(in srgb, var(--color-signal) 82%, white 18%);
-  box-shadow: 0 0 0.625rem rgba(20, 147, 255, 0.24);
+  box-shadow: 0 0 0.625rem color-mix(in srgb, rgb(20, 147, 255) 24%, transparent);
 }
 
 .tmdb-guide-stage-actions {
@@ -1505,12 +1505,12 @@
 
   70% {
     transform: scale(1.05);
-    box-shadow: 0 0 0 0.9375rem rgba(65, 184, 131, 0);
+    box-shadow: 0 0 0 0.9375rem color-mix(in srgb, rgb(65, 184, 131) 0%, transparent);
   }
 
   100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(65, 184, 131, 0);
+    box-shadow: 0 0 0 0 color-mix(in srgb, rgb(65, 184, 131) 0%, transparent);
   }
 }
 

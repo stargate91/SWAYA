@@ -1,0 +1,28 @@
+.error-boundary-crash {
+  padding: var(--space-3xl);
+  color: var(--color-text-primary);
+  background: var(--color-state-danger);
+  height: 100vh;
+  overflow: auto;
+  z-index: var(--z-index-toast);
+  position: relative;
+}
+
+.error-boundary-crash__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--space-lg);
+}
+
+.error-boundary-crash__subtitle {
+  font-size: var(--font-size-md);
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-sm);
+}
+
+.error-boundary-crash__stack {
+  background: color-mix(in srgb, black 30%, transparent);
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+  white-space: pre-wrap;
+}

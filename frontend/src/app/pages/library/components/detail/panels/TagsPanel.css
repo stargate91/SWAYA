@@ -93,8 +93,8 @@
 .tags-panel__submit-btn {
   width: 2.375rem;
   height: 2.375rem;
-  background: var(--button-secondary-neutral-bg, var(--color-surface-glass));
-  border: 1px solid var(--button-secondary-neutral-border, var(--color-border-heavy));
+  background: var(--button-secondary-neutral-bg);
+  border: 1px solid var(--button-secondary-neutral-border);
   border-radius: var(--radius-md);
   color: var(--color-text-primary);
   font-size: var(--font-size-lg);

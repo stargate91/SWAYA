@@ -56,19 +56,19 @@
 .ui-compact-card--aspect-poster .ui-compact-card__poster-wrapper {
   width: var(--button-height-lg);
   height: 4.875rem;
-  border-radius: var(--radius-sm, var(--radius-sm));
+  border-radius: var(--radius-sm);
 }
 
 .ui-compact-card--aspect-landscape .ui-compact-card__poster-wrapper {
   width: 6.5rem;
   height: 3.625rem;
-  border-radius: var(--radius-sm, var(--radius-sm));
+  border-radius: var(--radius-sm);
 }
 
 .ui-compact-card--aspect-square .ui-compact-card__poster-wrapper {
   width: calc(4 * var(--space-lg));
   height: calc(4 * var(--space-lg));
-  border-radius: var(--radius-sm, var(--radius-sm));
+  border-radius: var(--radius-sm);
 }
 
 .ui-compact-card--aspect-circle .ui-compact-card__poster-wrapper {
@@ -95,8 +95,8 @@
 }
 
 .ui-compact-card__title {
-  font-size: var(--font-size-sm, var(--font-size-xs));
-  font-weight: var(--font-weight-semibold, 600);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
   line-height: 1.35;
   color: var(--color-ink);
   white-space: nowrap;

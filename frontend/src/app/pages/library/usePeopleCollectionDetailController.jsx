@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Button from '@/ui/Button';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUpdatePersonStatusMutation } from '@/queries';
@@ -8,7 +8,6 @@ import {
   useLibraryCollectionDetailQuery,
   usePersonDetailQuery,
 } from '@/queries/metadataQueries';
-import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import { useSettingsQuery } from '@/queries/settingsQueries';
 import { API_BASE } from '@/lib/backend';
 import { resolveDetailsImageUrl } from './utils/detailUtils';
@@ -47,7 +46,6 @@ export default function usePeopleCollectionDetailController({
   const hasError = isPeople ? personQuery.isError : collectionQuery.isError;
 
   const navigate = useNavigate();
-  const location = useLocation();
 
   const { data: settings } = useSettingsQuery();
 

@@ -141,8 +141,8 @@
 
 /* Active Season Info */
 .active-season-info {
-  background: var(--media-detail-panel-section-bg, var(--color-panel-soft));
-  border: 1px solid var(--media-detail-panel-section-border, var(--color-surface-glass));
+  background: var(--media-detail-panel-section-bg);
+  border: 1px solid var(--media-detail-panel-section-border);
   border-radius: var(--radius-lg);
   padding: var(--space-md) var(--space-lg);
   display: flex;
@@ -253,8 +253,8 @@
   display: flex;
   gap: var(--space-md);
   padding: var(--space-md);
-  background: var(--media-detail-panel-card-bg, var(--color-surface-card));
-  border: 1px solid var(--media-detail-panel-card-border, var(--color-border-default));
+  background: var(--media-detail-panel-card-bg);
+  border: 1px solid var(--media-detail-panel-card-border);
   border-radius: var(--radius-md);
   cursor: pointer;
   position: relative;
@@ -262,16 +262,16 @@
 }
 
 .episode-card:hover {
-  background: var(--media-detail-panel-card-bg-hover, var(--color-surface-glass));
-  border-color: var(--media-detail-panel-card-border-hover, var(--color-border-heavy));
+  background: var(--media-detail-panel-card-bg-hover);
+  border-color: var(--media-detail-panel-card-border-hover);
 }
 
 .episode-card.is-unowned {
-  border-color: color-mix(in srgb, var(--color-accent-yellow) 12%, var(--media-detail-panel-card-border, var(--color-border-default)));
+  border-color: color-mix(in srgb, var(--color-accent-yellow) 12%, var(--media-detail-panel-card-border));
 }
 
 .episode-card.is-unowned:hover {
-  border-color: color-mix(in srgb, var(--color-accent-yellow) 22%, var(--media-detail-panel-card-border-hover, var(--color-border-heavy)));
+  border-color: color-mix(in srgb, var(--color-accent-yellow) 22%, var(--media-detail-panel-card-border-hover));
 }
 
 .episode-card.is-unowned.is-expanded {

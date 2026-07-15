@@ -31,8 +31,8 @@
   border-radius: var(--radius-lg);
   background:
     radial-gradient(circle at top, color-mix(in srgb, var(--color-accent) 16%, transparent), transparent 58%),
-    var(--color-dropzone-panel-bg, var(--color-surface-overlay-heavy));
-  box-shadow: var(--shadow-overlay-dropzone, 0 var(--space-xl) 3.125rem color-mix(in srgb, black 35%, transparent));
+    var(--color-dropzone-panel-bg);
+  box-shadow: var(--shadow-overlay-dropzone);
   text-align: center;
 }
 

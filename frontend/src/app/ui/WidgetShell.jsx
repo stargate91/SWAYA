@@ -1,4 +1,3 @@
-/* eslint-disable react/forbid-dom-props, react/forbid-component-props */
 import PropTypes from 'prop-types';
 import Skeleton from '@/ui/Skeleton';
 import './WidgetShell.css';
@@ -7,19 +6,19 @@ const WidgetShell = ({ children, loading, size, transparent }) => {
   return (
     <div className={`widget-shell widget-shell--${size || 'md'} ${transparent ? 'widget-shell--transparent' : ''}`}>
       {loading ? (
-        <div className="widget-shell__loading-skeleton" style={{ padding: 'var(--space-lg) 0', width: '100%' }}>
-          <div style={{ width: '150px', marginBottom: 'var(--space-lg)' }}>
-            <Skeleton.Title style={{ marginBottom: 0 }} />
+        <div className="widget-shell__loading-skeleton">
+          <div className="widget-shell__loading-title">
+            <Skeleton.Title className="widget-shell__loading-title-skeleton" />
           </div>
           {size === 'sm' ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-              <Skeleton style={{ height: '32px' }} variant="rect" />
-              <Skeleton style={{ height: '32px', width: '80%' }} variant="rect" />
+            <div className="widget-shell__loading-column">
+              <Skeleton className="widget-shell__loading-skeleton-row-item-1" variant="rect" />
+              <Skeleton className="widget-shell__loading-skeleton-row-item-2" variant="rect" />
             </div>
           ) : (
             <Skeleton.Row>
               {Array.from({ length: size === 'lg' ? 4 : 3 }).map((_, idx) => (
-                <Skeleton.Card key={idx} style={{ flex: 1, minWidth: '100px', height: '180px' }} />
+                <Skeleton.Card key={idx} className="widget-shell__loading-card" />
               ))}
             </Skeleton.Row>
           )}

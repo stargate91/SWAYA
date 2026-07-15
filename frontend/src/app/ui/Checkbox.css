@@ -2,7 +2,7 @@
 .ui-checkbox-wrap {
   display: inline-flex;
   align-items: center;
-  justify-content: var(--ui-checkbox-justify, center);
+  justify-content: var(--ui-checkbox-justify);
   cursor: pointer;
   user-select: none;
   position: relative;

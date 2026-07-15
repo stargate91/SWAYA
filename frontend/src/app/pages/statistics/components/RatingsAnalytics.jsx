@@ -1,4 +1,3 @@
-/* eslint-disable react/forbid-dom-props, react/forbid-component-props */
 import { BarChart2, CheckCircle, Users, Heart } from '@/ui/icons';
 import SegmentedControl from '@/ui/SegmentedControl';
 import Skeleton from '@/ui/Skeleton';
@@ -15,11 +14,11 @@ const getPercentageText = (rated, unrated) => {
 export function RatingsSummary({ state, t }) {
   if (state.isStatsLoading) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', width: '100%' }}>
+      <div className="ratings-analytics-loading-summary">
         {Array.from({ length: 3 }).map((_, idx) => (
-          <div key={idx} style={{ padding: 'var(--space-lg)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border-default)', minHeight: '120px' }}>
-            <Skeleton style={{ height: '20px', width: '120px', marginBottom: 'var(--space-md)' }} variant="rect" />
-            <Skeleton style={{ height: '14px', width: '100%' }} variant="text" />
+          <div key={idx} className="ratings-analytics-loading-card">
+            <Skeleton className="ratings-analytics-loading-skeleton-title" variant="rect" />
+            <Skeleton className="ratings-analytics-loading-skeleton-text" variant="text" />
           </div>
         ))}
       </div>
@@ -52,6 +51,7 @@ export function RatingsSummary({ state, t }) {
                   else if (avg > val - 1) fill = (avg - (val - 1)) * 100;
                   return (
                     <div key={val} className="analytics-segment">
+                      {/* eslint-disable-next-line react/forbid-dom-props */}
                       <div className="analytics-segment-fill" style={{ width: `${fill}%` }} />
                     </div>
                   );
@@ -75,6 +75,7 @@ export function RatingsSummary({ state, t }) {
                   else if (avg > val - 1) fill = (avg - (val - 1)) * 100;
                   return (
                     <div key={val} className="analytics-segment">
+                      {/* eslint-disable-next-line react/forbid-dom-props */}
                       <div className="analytics-segment-fill" style={{ width: `${fill}%` }} />
                     </div>
                   );
@@ -99,6 +100,7 @@ export function RatingsSummary({ state, t }) {
                     else if (avg > val - 1) fill = (avg - (val - 1)) * 100;
                     return (
                       <div key={val} className="analytics-segment">
+                        {/* eslint-disable-next-line react/forbid-dom-props */}
                         <div className="analytics-segment-fill" style={{ width: `${fill}%` }} />
                       </div>
                     );
@@ -123,6 +125,7 @@ export function RatingsSummary({ state, t }) {
                   else if (avg > val - 1) fill = (avg - (val - 1)) * 100;
                   return (
                     <div key={val} className="analytics-segment">
+                      {/* eslint-disable-next-line react/forbid-dom-props */}
                       <div className="analytics-segment-fill" style={{ width: `${fill}%` }} />
                     </div>
                   );
@@ -230,6 +233,7 @@ export function RatingsSummary({ state, t }) {
                   else if (avg > val - 1) fill = (avg - (val - 1)) * 100;
                   return (
                     <div key={val} className="analytics-segment">
+                      {/* eslint-disable-next-line react/forbid-dom-props */}
                       <div className="analytics-segment-fill" style={{ width: `${fill}%` }} />
                     </div>
                   );
@@ -280,10 +284,10 @@ export function RatingDistribution({
 }) {
   if (state.isStatsLoading) {
     return (
-      <div style={{ padding: 'var(--space-lg)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border-default)', minHeight: '340px', width: '100%' }}>
-        <Skeleton style={{ height: '24px', width: '200px', marginBottom: 'var(--space-md)' }} variant="rect" />
+      <div className="ratings-analytics-loading-dist">
+        <Skeleton className="ratings-analytics-dist-skeleton-title" variant="rect" />
         {Array.from({ length: 10 }).map((_, idx) => (
-          <Skeleton key={idx} style={{ height: '14px', width: '100%', marginBottom: 'var(--space-sm)' }} variant="text" />
+          <Skeleton key={idx} className="ratings-analytics-dist-skeleton-text" variant="text" />
         ))}
       </div>
     );
@@ -320,6 +324,7 @@ export function RatingDistribution({
                 <div className="analytics-distribution__bar-container">
                   <div
                     className="analytics-distribution__bar"
+                    // eslint-disable-next-line react/forbid-dom-props
                     style={{ width: `${percentage}%` }}
                   />
                 </div>

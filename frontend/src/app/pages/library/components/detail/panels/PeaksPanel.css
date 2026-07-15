@@ -30,7 +30,7 @@
 
 .peaks-table__header {
   display: flex;
-  --header-bg: var(--color-surface-glass-strong, rgba(255, 255, 255, 0.05));
+  --header-bg: var(--color-surface-glass-strong);
   background: var(--header-bg);
   border-bottom: 1px solid var(--media-detail-panel-card-border);
   padding: var(--space-sm) var(--space-md);
@@ -56,7 +56,7 @@
 }
 
 .peaks-table__row:hover {
-  --row-hover-bg: var(--color-surface-glass, rgba(255, 255, 255, 0.03));
+  --row-hover-bg: var(--color-surface-glass);
   background-color: var(--row-hover-bg);
 }
 

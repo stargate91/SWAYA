@@ -1,7 +1,7 @@
 .lists-card {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm, 0.5rem);
+  gap: var(--space-sm);
   transition: transform var(--motion-expressive);
 }
 
@@ -20,11 +20,11 @@
 .lists-card__media {
   width: 100%;
   position: relative;
-  background: rgba(255, 255, 255, 0.01);
+  background: color-mix(in srgb, var(--color-text-primary) 1%, transparent);
   border-radius: var(--radius-md);
   overflow: hidden;
-  border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.05));
-  transition: border-color var(--motion-fast), box-shadow 0.3s ease;
+  border: 1px solid var(--color-border-subtle);
+  transition: border-color var(--motion-fast), box-shadow var(--motion-fast);
   cursor: pointer;
 }
 
@@ -35,7 +35,7 @@
 }
 
 .lists-card:hover .lists-card__media {
-  border-color: var(--color-border-default, rgba(255, 255, 255, 0.12));
+  border-color: var(--color-border-default);
   box-shadow: 0 0.75rem 1.5rem var(--color-surface-overlay);
 }
 
@@ -66,15 +66,15 @@
 }
 
 .lists-card__info {
-  padding: 0 var(--space-xs, 0.25rem);
+  padding: 0 var(--space-xs);
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: calc(var(--space-xs) / 2);
 }
 
 .lists-card__title {
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -97,13 +97,13 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  border-bottom: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.05));
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .lists-card__placeholder {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.4));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--color-text-primary) 5%, transparent), color-mix(in srgb, black 40%, transparent));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -115,13 +115,13 @@
 }
 
 .lists-card :global(.ui-card-action-btn--danger) {
-  border-color: color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
+  border-color: color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border));
   color: var(--color-state-danger);
 }
 
 .lists-card :global(.ui-card-action-btn--danger):hover {
-  border-color: color-mix(in srgb, var(--color-state-danger) 80%, var(--button-secondary-border, color-mix(in srgb, var(--color-text-primary, white) 15%, transparent)));
-  background-color: color-mix(in srgb, var(--color-state-danger) 15%, var(--color-panel-translucent, black));
+  border-color: color-mix(in srgb, var(--color-state-danger) 80%, var(--button-secondary-border));
+  background-color: color-mix(in srgb, var(--color-state-danger) 15%, var(--color-panel-translucent));
   color: var(--color-state-danger);
 }
 

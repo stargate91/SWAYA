@@ -16,7 +16,7 @@
   padding: 0 var(--space-lg);
   border-radius: var(--ui-control-radius);
   border: 1px solid var(--ui-control-border);
-  background: var(--color-input-bg, var(--ui-control-bg));
+  background: var(--color-input-bg);
   color: var(--ui-control-text);
   outline: none;
   transition:
@@ -59,7 +59,7 @@
 .ui-select:focus,
 .ui-select:focus-visible {
   border-color: var(--color-accent);
-  box-shadow: var(--ui-control-shadow-focus, var(--focus-ring));
+  box-shadow: var(--ui-control-shadow-focus);
 }
 
 .ui-input--error {

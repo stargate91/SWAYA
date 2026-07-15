@@ -22,7 +22,7 @@
 }
 
 .ui-modal {
-  width: var(--modal-width, min(36.25rem, 100%));
+  width: var(--modal-width);
   max-height: min(88vh, calc(100vh - (var(--space-2xl) * 2)));
   border-radius: var(--radius-lg);
   background: var(--modal-surface-base);
@@ -169,7 +169,7 @@
 }
 
 .ui-modal--danger .ui-icon-button-wrapper {
-  border-radius: var(--radius-sm, var(--radius-sm));
+  border-radius: var(--radius-sm);
   border-color: color-mix(in srgb, var(--color-state-danger) 30%, var(--color-border-heavy));
   background: color-mix(in srgb, var(--color-state-danger) 10%, var(--color-surface-glass));
   box-shadow: var(--shadow-sm);

@@ -24,8 +24,8 @@
 
 /* Dashboard Drawer Customizer Styles */
 :global(.ui-drawer).dashboard-customizer-drawer {
-  background: var(--color-surface-overlay, var(--color-panel-strong));
-  box-shadow: var(--shadow-overlay-strong, 0 var(--space-md) 2.5rem color-mix(in srgb, black 40%, transparent));
+  background: var(--color-surface-overlay);
+  box-shadow: var(--shadow-overlay-strong);
 }
 
 .dashboard-utility-bar-wrapper {
@@ -43,8 +43,8 @@
 }
 
 :global(.ui-icon-button.ui-icon-button--dashboard-customizer) {
-  background: var(--media-detail-side-nav-bg, color-mix(in srgb, black 60%, transparent));
-  border: 1px solid var(--media-detail-side-nav-border, color-mix(in srgb, white 8%, transparent));
+  background: var(--media-detail-side-nav-bg);
+  border: 1px solid var(--media-detail-side-nav-border);
   color: var(--color-text-secondary);
   backdrop-filter: var(--glass-blur);
   box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, black 10%, transparent);
@@ -58,8 +58,8 @@
 :global(.ui-icon-button.ui-icon-button--dashboard-customizer:hover:not(:disabled)) {
   color: var(--color-text-primary);
   opacity: 1;
-  background: var(--media-detail-side-nav-bg, color-mix(in srgb, black 60%, transparent));
-  border-color: var(--media-detail-side-nav-border, color-mix(in srgb, white 8%, transparent));
+  background: var(--media-detail-side-nav-bg);
+  border-color: var(--media-detail-side-nav-border);
 }
 
 .dashboard-customizer-content {
@@ -93,17 +93,17 @@
 }
 
 .dashboard-customizer-item {
-  background: var(--color-bg-panel, color-mix(in srgb, white 2%, transparent));
+  background: var(--color-bg-panel);
   padding: var(--space-lg);
   border-radius: var(--radius-md);
-  border: 1px solid var(--color-border, color-mix(in srgb, white 6%, transparent));
+  border: 1px solid var(--color-border);
   box-shadow: none;
   cursor: grab;
   transition: all var(--motion-duration-base) var(--motion-ease-standard);
 }
 
 .dashboard-customizer-item.is-drag-over {
-  background: var(--color-surface-hover, color-mix(in srgb, var(--color-accent-blue) 8%, transparent));
+  background: var(--color-surface-hover);
   border: 1px dashed var(--color-accent-blue);
   box-shadow: 0 0 var(--space-md) color-mix(in srgb, var(--color-accent-blue) 15%, transparent);
 }

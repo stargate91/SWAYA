@@ -1,4 +1,3 @@
-/* eslint-disable react/forbid-dom-props */
 import { useState, useMemo } from 'react';
 import { User } from '@/ui/icons';
 import { useMediaDetailContext } from '../MediaDetailContext';
@@ -100,23 +99,13 @@ export default function BespokeCastSection({ item, t, navigate }) {
   return (
     <div className="bespoke-cast-section">
       <div className="bespoke-cast-browser-card">
-        <div className="bespoke-browser-card__pills-header" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+        <div className="bespoke-browser-card__pills-header">
           {showTabs ? (
-            <div className="bespoke-cast-tabs" style={{ display: 'flex', gap: 'var(--space-sm)' }}>
+            <div className="bespoke-cast-tabs">
               <button
                 type="button"
                 className={`bespoke-cast-tab-btn ${activeTab === 'cast' ? 'is-active' : ''}`}
                 onClick={() => setActiveTab('cast')}
-                style={{
-                  background: activeTab === 'cast' ? 'var(--color-bg-subtle)' : 'transparent',
-                  border: 'none',
-                  color: activeTab === 'cast' ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
-                  padding: 'var(--space-sm) var(--space-md)',
-                  borderRadius: 'var(--radius-md, 8px)',
-                  cursor: 'pointer',
-                  fontWeight: 600,
-                  fontSize: '13px'
-                }}
               >
                 {t('library.details.cast') || 'Cast & Crew'}
               </button>
@@ -125,16 +114,6 @@ export default function BespokeCastSection({ item, t, navigate }) {
                   type="button"
                   className={`bespoke-cast-tab-btn ${activeTab === 'companies' ? 'is-active' : ''}`}
                   onClick={() => setActiveTab('companies')}
-                  style={{
-                    background: activeTab === 'companies' ? 'var(--color-bg-subtle)' : 'transparent',
-                    border: 'none',
-                    color: activeTab === 'companies' ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
-                    padding: 'var(--space-sm) var(--space-md)',
-                    borderRadius: 'var(--radius-md, 8px)',
-                    cursor: 'pointer',
-                    fontWeight: 600,
-                    fontSize: '13px'
-                  }}
                 >
                   {t('library.details.productionCompanies') || 'Production Companies'}
                 </button>
@@ -144,16 +123,6 @@ export default function BespokeCastSection({ item, t, navigate }) {
                   type="button"
                   className={`bespoke-cast-tab-btn ${activeTab === 'networks' ? 'is-active' : ''}`}
                   onClick={() => setActiveTab('networks')}
-                  style={{
-                    background: activeTab === 'networks' ? 'var(--color-bg-subtle)' : 'transparent',
-                    border: 'none',
-                    color: activeTab === 'networks' ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
-                    padding: 'var(--space-sm) var(--space-md)',
-                    borderRadius: 'var(--radius-md, 8px)',
-                    cursor: 'pointer',
-                    fontWeight: 600,
-                    fontSize: '13px'
-                  }}
                 >
                   {t('library.details.platformsNetworks') || 'Networks'}
                 </button>
@@ -200,14 +169,13 @@ export default function BespokeCastSection({ item, t, navigate }) {
             ))}
 
             {activeTab === 'companies' && item.companies.map((c, i) => (
-              <div key={i} className="bespoke-company-item" style={{ flexShrink: 0 }}>
+              <div key={i} className="bespoke-company-item">
                 <Tooltip content={c.name} side="top">
                   {c.logo_path ? (
                     <img
                       src={resolveCompanyLogoUrl(c.logo_path)}
                       alt={c.name}
                       className="bespoke-company-logo"
-                      style={{ maxHeight: '40px', objectFit: 'contain' }}
                     />
                   ) : (
                     <span className="bespoke-company-name-only">{c.name}</span>
@@ -217,14 +185,13 @@ export default function BespokeCastSection({ item, t, navigate }) {
             ))}
 
             {activeTab === 'networks' && item.networks.map((n, i) => (
-              <div key={i} className="bespoke-company-item" style={{ flexShrink: 0 }}>
+              <div key={i} className="bespoke-company-item">
                 <Tooltip content={n.name} side="top">
                   {n.logo_path ? (
                     <img
                       src={resolveCompanyLogoUrl(n.logo_path)}
                       alt={n.name}
                       className="bespoke-company-logo"
-                      style={{ maxHeight: '40px', objectFit: 'contain' }}
                     />
                   ) : (
                     <span className="bespoke-company-name-only">{n.name}</span>

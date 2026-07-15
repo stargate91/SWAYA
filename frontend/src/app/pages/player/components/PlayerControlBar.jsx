@@ -1,4 +1,3 @@
-/* eslint-disable react/forbid-dom-props */
 import { Play, Pause, Volume2, VolumeX, Languages, Captions, PictureInPicture2, Square, Rewind, FastForward, SkipBack, SkipForward, Droplets, Minimize2 } from '@/ui/icons';
 import Badge from '../../../ui/Badge';
 
@@ -35,6 +34,7 @@ export default function PlayerControlBar({
   const speedText = `${speed}x`;
 
   return (
+    // eslint-disable-next-line react/forbid-dom-props
     <div className="player-page__bottom" style={bottomOffset > 0 ? { transform: `translateY(-${bottomOffset}px)` } : undefined}>
 
       {/* Progress Bar */}
@@ -56,6 +56,7 @@ export default function PlayerControlBar({
               <div
                 key={`chap-${index}`}
                 className="player-page__chapter-marker"
+                // eslint-disable-next-line react/forbid-dom-props
                 style={{ left: `${pct}%` }}
               />
             );

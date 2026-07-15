@@ -40,15 +40,15 @@ export default function WatchedHistoryList({
 }) {
   if (isLoading) {
     return (
-      <div className={styles['watched-history-list']} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+      <div className={styles['watched-history-list--loading']}>
         {Array.from({ length: 4 }).map((_, idx) => (
-          <div key={idx} style={{ display: 'flex', gap: 'var(--space-lg)', padding: 'var(--space-lg)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border-default)' }}>
-            <div style={{ width: '100px', height: '56px', borderRadius: 'var(--radius-md)', overflow: 'hidden', flexShrink: 0 }}>
-              <Skeleton style={{ width: '100%', height: '100%' }} variant="rect" />
+          <div key={idx} className={styles['watched-history-skeleton-card']}>
+            <div className={styles['watched-history-skeleton-poster-wrapper']}>
+              <Skeleton className={styles['watched-history-skeleton-poster']} variant="rect" />
             </div>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', justifyContent: 'center' }}>
-              <div style={{ width: '250px' }}><Skeleton style={{ height: '20px' }} variant="rect" /></div>
-              <div style={{ width: '150px' }}><Skeleton style={{ height: '14px' }} variant="rect" /></div>
+            <div className={styles['watched-history-skeleton-content']}>
+              <div className={styles['watched-history-skeleton-title']}><Skeleton variant="rect" /></div>
+              <div className={styles['watched-history-skeleton-text']}><Skeleton variant="rect" /></div>
             </div>
           </div>
         ))}

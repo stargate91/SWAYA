@@ -1,4 +1,3 @@
-/* eslint-disable react/forbid-dom-props */
 import { useState, useRef, useEffect, useCallback, useId } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, ChevronUp } from '@/ui/icons';
@@ -55,6 +54,7 @@ function DropdownMenu({
     <div
       ref={menuRef}
       className={`ui-dropdown__menu ${searchable ? 'has-search' : ''} ${menuCoords.openUpwards ? 'is-upwards' : ''} ${variant === 'sorter' ? 'ui-dropdown__menu--sorter' : ''} ${className}`.trim()}
+      // eslint-disable-next-line react/forbid-dom-props
       style={themeColor ? { '--list-theme-color': themeColor } : undefined}
     >
       {searchable ? (
@@ -70,29 +70,25 @@ function DropdownMenu({
           />
         </div>
       ) : null}
-      <div className="ui-dropdown__items-wrapper" style={multiple ? { maxHeight: '240px', overflowY: 'auto' } : undefined}>
+      <div className={`ui-dropdown__items-wrapper ${multiple ? 'ui-dropdown__items-wrapper--multiple' : ''}`.trim()}>
         {filteredOptions.map((opt) => {
           if (multiple) {
             const isChecked = Array.isArray(value) && value.includes(opt.value);
             return (
               <div
                 key={opt.value}
-                className="ui-dropdown__item tags-dropdown-item"
-                style={{ padding: 0, cursor: 'pointer', width: '100%' }}
+                className="ui-dropdown__item tags-dropdown-item ui-dropdown__item--checkbox"
               >
                 <Checkbox
                   checked={isChecked}
                   onChange={() => !opt.disabled && onOptionClick(opt.value)}
                   disabled={Boolean(opt.disabled)}
                 >
-                  <span style={{
-                    fontSize: '14px',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    color: opt.color || 'var(--color-text-primary)',
-                    fontWeight: 500
-                  }}>
+                  <span
+                    className="ui-dropdown__item-label"
+                    // eslint-disable-next-line react/forbid-dom-props
+                    style={opt.color ? { color: opt.color } : undefined}
+                  >
                     {opt.label}
                   </span>
                 </Checkbox>
@@ -237,6 +233,7 @@ export default function Dropdown({
     >
       <div
         className={`ui-dropdown ${isSorter ? 'ui-dropdown--sorter' : ''}`}
+        // eslint-disable-next-line react/forbid-dom-props
         style={themeColor ? { '--list-theme-color': themeColor } : undefined}
       >
         
@@ -248,11 +245,11 @@ export default function Dropdown({
             onClick={() => !disabled && setIsOpen(!isOpen)}
             disabled={disabled}
           >
-            <span className="ui-dropdown__trigger-text" style={multiple ? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } : undefined}>
+            <span className="ui-dropdown__trigger-text">
               {getTriggerText()}
             </span>
             {(!isSorter || multiple) && (
-              <span className={`ui-dropdown__chevron ${isOpen ? 'is-open' : ''}`} style={multiple ? { display: 'flex', alignItems: 'center' } : undefined}>
+              <span className={`ui-dropdown__chevron ${isOpen ? 'is-open' : ''} ${multiple ? 'ui-dropdown__chevron--multiple' : ''}`.trim()}>
                 <ChevronDown size={12} />
               </span>
             )}

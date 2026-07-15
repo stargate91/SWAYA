@@ -10,16 +10,16 @@
   width: 17.5rem;
   max-height: 23.75rem;
   overflow-y: auto;
-  background-color: var(--dropdown-menu-bg, color-mix(in srgb, var(--color-bg-canvas) 92%, transparent));
+  background-color: var(--dropdown-menu-bg);
   backdrop-filter: blur(1rem);
   -webkit-backdrop-filter: blur(1rem);
-  border: 1px solid var(--dropdown-menu-border, var(--color-border-default));
+  border: 1px solid var(--dropdown-menu-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--dropdown-menu-shadow);
   z-index: var(--z-index-popover);
   display: flex;
   flex-direction: column;
-  --popover-animation: linksPopoverFadeIn 0.16s var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+  --popover-animation: linksPopoverFadeIn 0.16s var(--ease-out);
   animation: var(--popover-animation);
 }
 
@@ -70,7 +70,7 @@
   text-decoration: none;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  --popover-transition: all var(--motion-fast, 0.12s);
+  --popover-transition: all var(--motion-fast);
   transition: var(--popover-transition);
 }
 

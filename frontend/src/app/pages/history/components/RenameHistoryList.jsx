@@ -20,15 +20,15 @@ export default function RenameHistoryList({
 }) {
   if (isLoading) {
     return (
-      <div className={styles['history-list']} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+      <div className={styles['history-list--loading']}>
         {Array.from({ length: 4 }).map((_, idx) => (
-          <div key={idx} style={{ padding: 'var(--space-lg)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border-default)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-md)' }}>
-              <div style={{ width: '200px' }}><Skeleton style={{ height: '24px' }} variant="rect" /></div>
-              <div style={{ width: '80px' }}><Skeleton style={{ height: '24px' }} variant="rect" /></div>
+          <div key={idx} className={styles['history-skeleton-card']}>
+            <div className={styles['history-skeleton-header']}>
+              <div className={styles['history-skeleton-title']}><Skeleton variant="rect" /></div>
+              <div className={styles['history-skeleton-badge']}><Skeleton variant="rect" /></div>
             </div>
-            <Skeleton style={{ height: '16px', width: '60%', marginBottom: 'var(--space-sm)' }} variant="text" />
-            <Skeleton style={{ height: '16px', width: '40%' }} variant="text" />
+            <Skeleton className={styles['history-skeleton-line-1']} variant="text" />
+            <Skeleton className={styles['history-skeleton-line-2']} variant="text" />
           </div>
         ))}
       </div>

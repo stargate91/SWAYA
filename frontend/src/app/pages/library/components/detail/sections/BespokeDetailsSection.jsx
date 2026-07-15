@@ -1,4 +1,3 @@
-/* eslint-disable react/forbid-dom-props */
 import { resolveMediaImageUrl, buildTmdbImageUrl, TMDB_IMAGE_SIZES } from '@/lib/imageUrls';
 import Tooltip from '@/ui/Tooltip';
 
@@ -30,7 +29,7 @@ export default function BespokeDetailsSection({ item, t }) {
   const companies = item.companies || [];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2xl)' }}>
+    <div className="media-detail-dashboard-container">
       {ratings.length > 0 && (
         <div className="dashboard-section">
           <h4 className="dashboard-section__title">{t('library.details.ratingsSection') || 'Ratings'}</h4>

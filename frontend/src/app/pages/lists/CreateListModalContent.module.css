@@ -48,6 +48,6 @@
 .lists-modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: var(--space-lg, 0.75rem);
+  gap: var(--space-lg);
   width: 100%;
 }

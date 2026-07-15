@@ -1,7 +1,10 @@
-/* eslint-disable react/jsx-no-literals, i18next/no-literal-string */
 import Inline from '@/ui/Inline';
 import Badge from '@/ui/Badge';
 import SettingsInstructionsBox from '../components/SettingsInstructionsBox.jsx';
+
+const STASHDB_DOMAIN = 'stashdb.org';
+const FANSDB_DOMAIN = 'fansdb.cc';
+const THEPORNDB_DOMAIN = 'theporndb.net';
 
 export function createAdultGeneralSection(t, adultGenderPreferenceOptions) {
   return {
@@ -63,7 +66,7 @@ export function createAdultStashdbSection(t) {
           <SettingsInstructionsBox
             title={t('settingsPage.sections.stashdb.stepsTitle')}
             steps={[
-              <>{t('settingsPage.sections.stashdb.step1Start')}<a href="https://stashdb.org/" target="_blank" rel="noopener noreferrer" className="settings-link">stashdb.org</a>{t('settingsPage.sections.stashdb.step1End')}</>,
+              <>{t('settingsPage.sections.stashdb.step1Start')}<a href="https://stashdb.org/" target="_blank" rel="noopener noreferrer" className="settings-link">{STASHDB_DOMAIN}</a>{t('settingsPage.sections.stashdb.step1End')}</>,
               <>{t('settingsPage.sections.stashdb.step2Start')}<a href="https://stashdb.org/users" target="_blank" rel="noopener noreferrer" className="settings-link">{t('settingsPage.sections.stashdb.step2Link')}</a>{t('settingsPage.sections.stashdb.step2End')}</>,
               t('settingsPage.sections.stashdb.step3'),
               t('settingsPage.sections.stashdb.step4'),
@@ -103,7 +106,7 @@ export function createAdultFansdbSection(t) {
           <SettingsInstructionsBox
             title={t('settingsPage.sections.fansdb.stepsTitle')}
             steps={[
-              <>{t('settingsPage.sections.fansdb.step1Start')}<a href="https://fansdb.cc/" target="_blank" rel="noopener noreferrer" className="settings-link">fansdb.cc</a>{t('settingsPage.sections.fansdb.step1End')}</>,
+              <>{t('settingsPage.sections.fansdb.step1Start')}<a href="https://fansdb.cc/" target="_blank" rel="noopener noreferrer" className="settings-link">{FANSDB_DOMAIN}</a>{t('settingsPage.sections.fansdb.step1End')}</>,
               <>{t('settingsPage.sections.fansdb.step2Start')}<strong>{t('settingsPage.sections.fansdb.step2Link')}</strong>{t('settingsPage.sections.fansdb.step2End')}</>,
               t('settingsPage.sections.fansdb.step3'),
               t('settingsPage.sections.fansdb.step4'),
@@ -143,7 +146,7 @@ export function createAdultTheporndbSection(t) {
           <SettingsInstructionsBox
             title={t('settingsPage.sections.theporndb.stepsTitle')}
             steps={[
-              <>{t('settingsPage.sections.theporndb.step1Start')}<a href="https://theporndb.net/" target="_blank" rel="noopener noreferrer" className="settings-link">theporndb.net</a>{t('settingsPage.sections.theporndb.step1End')}</>,
+              <>{t('settingsPage.sections.theporndb.step1Start')}<a href="https://theporndb.net/" target="_blank" rel="noopener noreferrer" className="settings-link">{THEPORNDB_DOMAIN}</a>{t('settingsPage.sections.theporndb.step1End')}</>,
               <>{t('settingsPage.sections.theporndb.step2Start')}<strong>{t('settingsPage.sections.theporndb.step2Link')}</strong>{t('settingsPage.sections.theporndb.step2End')}</>,
               t('settingsPage.sections.theporndb.step3'),
               t('settingsPage.sections.theporndb.step4'),

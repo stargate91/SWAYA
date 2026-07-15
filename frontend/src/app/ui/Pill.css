@@ -2,13 +2,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--font-size-2xs, var(--font-size-2xs));
-  font-weight: var(--font-weight-bold, 700);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
   line-height: 1;
   padding: calc(var(--space-xs) / 2) var(--space-sm);
-  border-radius: var(--radius-sm, var(--radius-sm));
+  border-radius: var(--radius-sm);
   user-select: none;
-  font-family: var(--font-sans, sans-serif);
+  font-family: var(--font-sans);
 }
 
 /* Status variants */
@@ -113,12 +113,12 @@
 .ui-pill--meta {
   background: var(--color-surface-glass);
   color: color-mix(in srgb, var(--color-text-primary) 80%, transparent);
-  font-family: var(--font-sans, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   padding: calc(var(--space-md) / 2) var(--space-md);
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border-subtle, var(--color-border-subtle));
+  border: 1px solid var(--color-border-subtle);
   backdrop-filter: blur(var(--space-xs));
   gap: var(--space-sm);
 }
@@ -126,12 +126,12 @@
 .ui-pill--meta-large {
   background: var(--color-surface-glass);
   color: color-mix(in srgb, var(--color-text-primary) 80%, transparent);
-  font-family: var(--font-sans, sans-serif);
+  font-family: var(--font-sans);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
   padding: var(--space-sm) var(--space-lg);
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border-subtle, var(--color-border-subtle));
+  border: 1px solid var(--color-border-subtle);
   backdrop-filter: blur(var(--space-xs));
   gap: var(--space-sm);
   display: inline-flex;
@@ -146,11 +146,11 @@
   justify-content: flex-start;
   padding: 0.3rem 0.7rem;
   border-radius: var(--radius-sm);
-  --pill-border: 1px solid color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 30%, var(--color-border-subtle, rgba(255, 255, 255, 0.08)));
-  --pill-bg: color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 12%, var(--color-bg-elevated, rgba(30, 30, 30, 0.6)));
-  --pill-color: color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 85%, var(--color-text-primary));
+  --pill-border: 1px solid color-mix(in srgb, var(--pill-tag-color) 30%, var(--color-border-subtle));
+  --pill-bg: color-mix(in srgb, var(--pill-tag-color) 12%, var(--color-bg-elevated));
+  --pill-color: color-mix(in srgb, var(--pill-tag-color) 85%, var(--color-text-primary));
   --pill-shadow: 0 var(--radius-2xs) var(--space-sm) rgba(0, 0, 0, 0.15);
-  --pill-transition: border-color var(--motion-fast, 0.15s), background-color var(--motion-fast, 0.15s), transform var(--motion-fast, 0.15s), box-shadow var(--motion-fast, 0.15s);
+  --pill-transition: border-color var(--motion-fast), background-color var(--motion-fast), transform var(--motion-fast), box-shadow var(--motion-fast);
 
   border: var(--pill-border);
   background: var(--pill-bg);
@@ -170,7 +170,7 @@
   position: absolute;
   inset: 0;
   border-radius: var(--radius-sm);
-  background: var(--media-detail-tag-pill-highlight, transparent);
+  background: var(--media-detail-tag-pill-highlight);
   opacity: 0.9;
   pointer-events: none;
 }
@@ -181,8 +181,8 @@
 }
 
 .ui-pill--tag:hover {
-  --pill-bg-hover: color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 18%, var(--color-bg-elevated, rgba(30, 30, 30, 0.8)));
-  --pill-border-hover: color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 50%, var(--color-border-default, rgba(255, 255, 255, 0.15)));
+  --pill-bg-hover: color-mix(in srgb, var(--pill-tag-color) 18%, var(--color-bg-elevated));
+  --pill-border-hover: color-mix(in srgb, var(--pill-tag-color) 50%, var(--color-border-default));
   --pill-shadow-hover: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.25);
 
   background: var(--pill-bg-hover);
@@ -195,16 +195,16 @@
   border-style: dashed;
   background: transparent;
   --pill-suggested-color: var(--color-text-muted);
-  --pill-suggested-border: var(--color-border-subtle, rgba(255, 255, 255, 0.08));
+  --pill-suggested-border: var(--color-border-subtle);
 
   color: var(--pill-suggested-color);
   border-color: var(--pill-suggested-border);
 }
 
 .ui-pill--tag-suggested:hover {
-  --pill-suggested-bg-hover: color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 12%, var(--color-bg-elevated, rgba(30, 30, 30, 0.6)));
-  --pill-suggested-border-hover: color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 30%, var(--color-border-subtle, rgba(255, 255, 255, 0.08)));
-  --pill-suggested-color-hover: color-mix(in srgb, var(--pill-tag-color, var(--color-accent-blue)) 85%, var(--color-text-primary));
+  --pill-suggested-bg-hover: color-mix(in srgb, var(--pill-tag-color) 12%, var(--color-bg-elevated));
+  --pill-suggested-border-hover: color-mix(in srgb, var(--pill-tag-color) 30%, var(--color-border-subtle));
+  --pill-suggested-color-hover: color-mix(in srgb, var(--pill-tag-color) 85%, var(--color-text-primary));
 
   background: var(--pill-suggested-bg-hover);
   border-color: var(--pill-suggested-border-hover);

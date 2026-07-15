@@ -49,7 +49,7 @@
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
-  color: var(--color-text-muted, color-mix(in srgb, var(--color-text-primary) 40%, transparent));
+  color: var(--color-text-muted);
   letter-spacing: 0.5px;
 }
 

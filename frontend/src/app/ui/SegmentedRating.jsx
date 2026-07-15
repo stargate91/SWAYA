@@ -1,4 +1,3 @@
-/* eslint-disable react/forbid-dom-props */
 import useRatingHover from '@/pages/library/hooks/useRatingHover';
 import './SegmentedRating.css';
 
@@ -86,6 +85,7 @@ export default function SegmentedRating({
             <div key={val} className={segmentClassName}>
               <div
                 className={segmentFillClassName}
+                // eslint-disable-next-line react/forbid-dom-props
                 style={{ width: `${fill}%` }}
               />
             </div>

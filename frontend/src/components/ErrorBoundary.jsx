@@ -1,5 +1,5 @@
-/* eslint-disable react/forbid-dom-props, react/jsx-no-literals, i18next/no-literal-string */
 import React from 'react';
+import './ErrorBoundary.css';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -19,13 +19,15 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: 40, color: '#fff', background: '#e91e63', height: '100vh', overflow: 'auto', zIndex: 'var(--z-index-fullscreen-overlay)', position: 'relative' }}>
-          <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '20px' }}>Frontend Crash</h1>
-          <pre style={{ background: 'rgba(0,0,0,0.3)', padding: '20px', borderRadius: '8px', whiteSpace: 'pre-wrap' }}>
+        <div className="error-boundary-crash">
+          {/* eslint-disable-next-line react/jsx-no-literals, i18next/no-literal-string */}
+          <h1 className="error-boundary-crash__title">Frontend Crash</h1>
+          <pre className="error-boundary-crash__stack">
             {this.state.error && this.state.error.toString()}
           </pre>
-          <h2 style={{ fontSize: '18px', marginTop: '20px', marginBottom: '10px' }}>Component Stack:</h2>
-          <pre style={{ background: 'rgba(0,0,0,0.3)', padding: '20px', borderRadius: '8px', whiteSpace: 'pre-wrap' }}>
+          {/* eslint-disable-next-line react/jsx-no-literals, i18next/no-literal-string */}
+          <h2 className="error-boundary-crash__subtitle">Component Stack:</h2>
+          <pre className="error-boundary-crash__stack">
             {this.state.info && this.state.info.componentStack}
           </pre>
         </div>

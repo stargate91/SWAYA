@@ -33,7 +33,7 @@
   padding-left: var(--space-lg);
   border: 1px solid var(--ui-control-border);
   border-radius: var(--radius-lg);
-  background: var(--color-input-bg, var(--ui-control-bg));
+  background: var(--color-input-bg);
   color: var(--ui-control-text);
   transition:
     border-color var(--motion-fast),
@@ -48,7 +48,7 @@
 
 .universal-image-picker__url-input-shell:focus-within {
   border-color: var(--color-accent);
-  box-shadow: var(--ui-control-shadow-focus, var(--focus-ring));
+  box-shadow: var(--ui-control-shadow-focus);
 }
 
 .universal-image-picker__url-input-shell .ui-input-field,

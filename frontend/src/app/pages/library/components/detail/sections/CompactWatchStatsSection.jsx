@@ -1,7 +1,7 @@
-/* eslint-disable react/forbid-dom-props, react/jsx-no-literals, i18next/no-literal-string */
 import { useState } from 'react';
 import { ChevronDown, ChevronRight } from '@/ui/icons';
 import { countEpisodesInNumber } from '@/pages/library/utils/detailUtils';
+import './CompactWatchStatsSection.css';
 
 export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) {
   const [isHistoryExpanded, setIsHistoryExpanded] = useState(false);
@@ -131,6 +131,9 @@ export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) 
   }
 
   const statusClass = watchStatus === 'Watched' ? 'watched' : (watchStatus === 'In Progress' ? 'progress' : 'unwatched');
+  const watchCountText = watchCount > 0 ? `(${watchCount}x)` : '';
+  const progressPercentText = `${progressPercent}%`;
+  const watchActivityText = `${t('library.details.watchActivity') || 'Watch History'} (${logs.length})`;
 
   return (
     <div className="bespoke-boxoffice-section compact-watch-stats-section">
@@ -149,8 +152,8 @@ export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) 
               <span className={`specs-card__value status-${statusClass} bespoke-boxoffice-value`}>
                 {watchStatus}
                 {((isMovie || isScene) && watchCount > 0) && (
-                  <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', marginLeft: '6px', fontWeight: 'normal' }}>
-                    ({watchCount}x)
+                  <span className="compact-watch-stats__count">
+                    {watchCountText}
                   </span>
                 )}
               </span>
@@ -158,19 +161,18 @@ export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) 
           </div>
 
           <div className="bespoke-boxoffice-stat">
-            <div className="bespoke-boxoffice-info" style={{ width: '100%' }}>
+            <div className="bespoke-boxoffice-info compact-watch-stats__info-full">
               <span className="bespoke-boxoffice-label">
                 {t('library.details.movieProgress') || 'Progress'}
               </span>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', marginBottom: '4px' }}>
+              <div className="compact-watch-stats__progress-labels">
                 <span>{progressText}</span>
-                <span>{progressPercent}%</span>
+                <span>{progressPercentText}</span>
               </div>
               <progress
-                className="specs-card__progress"
+                className="specs-card__progress compact-watch-stats__progress-bar"
                 value={progressPercent}
                 max={100}
-                style={{ width: '100%', height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.1)' }}
               />
             </div>
           </div>
@@ -180,34 +182,24 @@ export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) 
               <span className="bespoke-boxoffice-label">
                 {t('library.details.lastWatched') || 'Last Watched'}
               </span>
-              <span className="bespoke-boxoffice-value" style={{ fontSize: '0.8rem', whiteSpace: 'normal' }}>{lastWatchedText}</span>
+              <span className="bespoke-boxoffice-value compact-watch-stats__last-watched">{lastWatchedText}</span>
             </div>
           </div>
 
           {logs.length > 0 && (
-            <div className="bespoke-boxoffice-stat" style={{ gridColumn: '1 / -1', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '10px', marginTop: '10px', flexDirection: 'column', alignItems: 'stretch', width: '100%' }}>
+            <div className="bespoke-boxoffice-stat compact-watch-stats__history-wrapper">
               <button
                 type="button"
                 onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}
-                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', background: 'none', border: 'none', padding: 0, color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: '0.85rem' }}
+                className="compact-watch-stats__toggle-btn"
               >
-                <span>{t('library.details.watchActivity') || 'Watch History'} ({logs.length})</span>
+                <span>{watchActivityText}</span>
                 {isHistoryExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
               </button>
 
               {isHistoryExpanded && (
                 <div
-                  style={{
-                     marginTop: '8px',
-                     maxHeight: logs.length > 3 ? '115px' : 'none',
-                     overflowY: logs.length > 3 ? 'auto' : 'visible',
-                     display: 'flex',
-                     flexDirection: 'column',
-                     gap: '6px',
-                     width: '100%',
-                     paddingRight: logs.length > 3 ? '4px' : '0'
-                  }}
-                  className={logs.length > 3 ? 'custom-scrollbar' : ''}
+                  className={`compact-watch-stats__history-list ${logs.length > 3 ? 'compact-watch-stats__history-list--scrollable custom-scrollbar' : ''}`}
                 >
                   {logs.map((log, idx) => {
                     const dateStr = formatLogDate(log.watched_at);
@@ -215,9 +207,9 @@ export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) 
                       ? `S${log.seasonNumber.toString().padStart(2, '0')}E${log.episodeNumber.toString().padStart(2, '0')}`
                       : '';
                     return (
-                      <div key={log.id || idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px', borderRadius: '4px', background: 'rgba(255,255,255,0.03)', fontSize: '0.75rem', color: 'rgba(255,255,255,0.8)', width: '100%' }}>
-                        <span style={{ fontWeight: 'bold' }}>{epText || (t('library.details.playSession') || 'Session')}</span>
-                        <span style={{ opacity: 0.6 }}>{dateStr}</span>
+                      <div key={log.id || idx} className="compact-watch-stats__history-item">
+                        <span className="compact-watch-stats__history-label">{epText || (t('library.details.playSession') || 'Session')}</span>
+                        <span className="compact-watch-stats__history-date">{dateStr}</span>
                       </div>
                     );
                   })}

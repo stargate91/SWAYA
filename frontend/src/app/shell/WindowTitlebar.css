@@ -12,7 +12,7 @@
   height: var(--layout-window-titlebar-height);
   border-bottom: 1px solid var(--color-border-subtle);
   background: linear-gradient(180deg, var(--color-panel), var(--color-panel-strong));
-  backdrop-filter: var(--glass-blur-lg, blur(1.25rem)) saturate(120%);
+  backdrop-filter: var(--glass-blur-lg) saturate(120%);
   box-shadow: var(--titlebar-shadow);
   -webkit-app-region: drag;
 }
@@ -174,7 +174,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-sm, var(--radius-sm));
+  border-radius: var(--radius-sm);
   background: transparent;
   border: none;
   color: var(--color-text-secondary);

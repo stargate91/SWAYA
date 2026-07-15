@@ -24,6 +24,37 @@
 
 .widget-shell__loading-skeleton {
   width: 100%;
+  padding: var(--space-lg) 0;
+}
+
+.widget-shell__loading-title {
+  width: 9.375rem;
+  margin-bottom: var(--space-lg);
+}
+
+.widget-shell__loading-title-skeleton {
+  margin-bottom: 0;
+}
+
+.widget-shell__loading-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.widget-shell__loading-skeleton-row-item-1 {
+  height: 2rem;
+}
+
+.widget-shell__loading-skeleton-row-item-2 {
+  height: 2rem;
+  width: 80%;
+}
+
+.widget-shell__loading-card {
+  flex: 1;
+  min-width: 6.25rem;
+  height: 11.25rem;
 }
 
 .widget-shell__content {

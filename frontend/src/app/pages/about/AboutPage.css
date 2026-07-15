@@ -202,7 +202,7 @@
   background: var(--color-bg-subtle);
   padding: var(--space-lg);
   border-radius: var(--radius-md);
-  font-family: var(--font-family-mono, monospace);
+  font-family: var(--font-family-mono);
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
   max-height: 21.875rem;
@@ -653,7 +653,7 @@
   flex: 1;
   height: 0.25rem;
   border-radius: var(--radius-sm);
-  background-color: var(--color-border-subtle, var(--color-line));
+  background-color: var(--color-border-subtle);
   transition: all var(--motion-duration-base) var(--motion-ease-standard);
 }
 
@@ -662,7 +662,7 @@
 }
 
 .docs-wizard-progress-step.is-passed {
-  background-color: var(--color-accent-subtle, var(--color-muted));
+  background-color: var(--color-accent-subtle);
 }
 
 .docs-wizard-slide {
@@ -721,7 +721,7 @@
 }
 
 .docs-wizard-screenshot-placeholder {
-  background: var(--color-bg-subtle, color-mix(in srgb, white 2%, transparent));
+  background: var(--color-bg-subtle);
   border: 1px dashed var(--color-border-default);
   border-radius: var(--radius-md);
   padding: calc(var(--space-3xl) - calc(var(--space-xs) / 2)) var(--space-xl);
@@ -780,7 +780,7 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-sm);
   margin-top: calc(var(--space-sm) + calc(var(--space-xs) / 2));
-  background: var(--color-bg-subtle, color-mix(in srgb, white 1%, transparent));
+  background: var(--color-bg-subtle);
   padding: var(--space-md);
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border-subtle);
@@ -792,7 +792,7 @@
   justify-content: space-between;
   align-items: center;
   padding: var(--space-xs) var(--space-sm);
-  background: var(--color-bg-canvas, color-mix(in srgb, black 20%, transparent));
+  background: var(--color-bg-canvas);
   border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
   border: 1px solid var(--color-border-default);
@@ -956,7 +956,7 @@
   width: 100%;
   max-width: 50rem;
   height: 22.5rem;
-  background: var(--color-bg-subtle, color-mix(in srgb, white 1%, transparent));
+  background: var(--color-bg-subtle);
   border: 1px dashed var(--color-border-default);
   border-radius: var(--radius-md);
   display: flex;
@@ -1059,7 +1059,7 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--space-sm) var(--space-md);
-  background: var(--color-bg-subtle, color-mix(in srgb, white 1%, transparent));
+  background: var(--color-bg-subtle);
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border-subtle);
   margin-bottom: var(--space-sm);
@@ -1164,7 +1164,7 @@
 }
 
 .about-features-screenshot-wrapper--placeholder {
-  background: var(--color-bg-subtle, color-mix(in srgb, white 1%, transparent));
+  background: var(--color-bg-subtle);
   border: 1px dashed var(--color-border-default);
 }
 

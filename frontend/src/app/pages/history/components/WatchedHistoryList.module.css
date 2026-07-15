@@ -17,20 +17,66 @@
   margin-top: var(--space-xl);
 }
 
+.watched-history-list--loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.watched-history-skeleton-card {
+  display: flex;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  background: var(--color-panel-soft);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-default);
+}
+
+.watched-history-skeleton-poster-wrapper {
+  width: 100px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.watched-history-skeleton-poster {
+  width: 100%;
+  height: 100%;
+}
+
+.watched-history-skeleton-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  justify-content: center;
+}
+
+.watched-history-skeleton-title {
+  width: 250px;
+  height: 20px;
+}
+
+.watched-history-skeleton-text {
+  width: 150px;
+  height: 14px;
+}
+
 .watched-history-card {
   display: flex;
   align-items: center;
   padding: var(--space-lg);
   border-radius: var(--radius-md);
   background: var(--color-bg-elevated);
-  border: 1px solid var(--color-border-subtle, var(--color-surface-glass));
+  border: 1px solid var(--color-border-subtle);
   box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, black 15%, transparent);
   transition: all var(--motion-slow);
   position: relative;
   overflow: hidden;
   opacity: 0;
   animation: fadeInUp var(--motion-duration-slow) var(--motion-ease-emphasized) both;
-  animation-delay: calc(var(--item-index, 0) * var(--motion-delay-step));
+  animation-delay: calc(var(--item-index) * var(--motion-delay-step));
 }
 
 .watched-history-card::before {

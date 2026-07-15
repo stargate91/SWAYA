@@ -133,7 +133,7 @@
 
 .insights-radar-point {
   fill: var(--color-accent-blue);
-  stroke: var(--color-text-primary, white);
+  stroke: var(--color-text-primary);
   stroke-width: 1.5;
 }
 

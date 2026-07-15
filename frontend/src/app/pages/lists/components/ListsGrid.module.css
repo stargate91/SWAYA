@@ -1,7 +1,7 @@
 .lists-grid {
   display: grid;
   grid-template-columns: repeat(8, minmax(0, 1fr));
-  gap: var(--space-xl, 1rem);
+  gap: var(--space-xl);
   grid-auto-flow: dense;
 }
 

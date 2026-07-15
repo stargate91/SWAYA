@@ -115,7 +115,7 @@
 .continue-watching-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, color-mix(in srgb, var(--color-bg-app, black) 90%, transparent) 0%, color-mix(in srgb, var(--color-bg-app, black) 30%, transparent) 60%, transparent 100%);
+  background: linear-gradient(to top, color-mix(in srgb, var(--color-bg-app) 90%, transparent) 0%, color-mix(in srgb, var(--color-bg-app) 30%, transparent) 60%, transparent 100%);
 }
 
 .continue-watching-card:hover :global(.ui-icon-button--play-overlay) {
@@ -128,7 +128,7 @@
   left: 0;
   width: 100%;
   height: var(--space-xs);
-  background: color-mix(in srgb, var(--color-text-primary, white) 20%, transparent);
+  background: color-mix(in srgb, var(--color-text-primary) 20%, transparent);
 }
 
 .continue-watching-progress-svg {
@@ -138,7 +138,7 @@
 }
 
 .continue-watching-progress-bg {
-  fill: color-mix(in srgb, var(--color-text-primary, white) 20%, transparent);
+  fill: color-mix(in srgb, var(--color-text-primary) 20%, transparent);
 }
 
 .continue-watching-progress-fill {

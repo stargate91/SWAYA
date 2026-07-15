@@ -5,7 +5,7 @@
   flex: 1 1 auto;
   min-height: 0;
   height: 100%;
-  gap: var(--space-4xl, 1.5rem);
+  gap: var(--space-4xl);
 }
 
 .lists-main {
@@ -26,10 +26,10 @@
   flex: 1;
   gap: var(--space-lg);
   color: var(--color-muted);
-  background: var(--color-surface-card, rgba(255, 255, 255, 0.02));
-  border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.05));
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-md);
-  padding: var(--space-3xl, 1.25rem);
+  padding: var(--space-3xl);
   box-sizing: border-box;
 }
 

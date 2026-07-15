@@ -23,7 +23,7 @@
 .collection-items-horizontal-grid-wrapper .entity-detail-page__credits-list--collection-items {
   display: grid;
   grid-template-rows: repeat(2, minmax(0, 1fr));
-  grid-template-columns: repeat(var(--cols, 1), 6.875rem);
+  grid-template-columns: repeat(var(--cols), 6.875rem);
   grid-auto-flow: row;
   gap: var(--space-md);
 }
@@ -135,7 +135,7 @@
 
 .entity-detail-page__section-pager-btn:hover:not(:disabled) {
   transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--color-border-strong, color-mix(in srgb, var(--color-text-primary) 18%, transparent)) 88%, transparent);
+  border-color: color-mix(in srgb, var(--color-border-strong) 88%, transparent);
   background: color-mix(in srgb, var(--color-surface-glass-heavy) 76%, transparent);
   color: var(--color-text-primary);
 }
@@ -181,7 +181,7 @@
   --container-scrolled-mt: -1.5rem;
   margin-top: var(--container-scrolled-mt);
   /* Pull up to align top Y-axis with the profile card when scrolled */
-  height: calc(100vh - var(--page-top-offset, 4rem) - 7.5rem);
+  height: calc(100vh - var(--page-top-offset) - 7.5rem);
   overflow: hidden;
   grid-template-rows: auto 1fr;
   row-gap: 0;
@@ -279,7 +279,7 @@
   grid-column: 2;
   display: flex;
   flex-direction: column;
-  --local-bg: color-mix(in srgb, var(--color-panel-translucent, var(--color-panel)) 22%, transparent);
+  --local-bg: color-mix(in srgb, var(--color-panel-translucent) 22%, transparent);
   background: var(--local-bg);
   --local-border: 1px solid color-mix(in srgb, var(--color-border-default) 40%, transparent);
   border: var(--local-border);
@@ -307,7 +307,7 @@
 }
 
 .person-credits-row__title {
-  font-family: var(--font-display, var(--font-display));
+  font-family: var(--font-display);
   font-size: 0.8rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -633,7 +633,7 @@
   border-radius: 50%;
   background-color: var(--color-panel);
   background-image: var(--button-secondary-bg);
-  color: var(--button-secondary-color, white);
+  color: var(--button-secondary-color);
   border: 1px solid var(--color-border-strong);
   box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, black 30%, transparent);
   display: flex;
@@ -700,7 +700,7 @@
 
 
 .person-credits-discover-label {
-  font-family: var(--font-display, var(--font-display));
+  font-family: var(--font-display);
   font-size: 0.8rem;
   /* Slightly larger and more prominent */
   letter-spacing: 0.14em;

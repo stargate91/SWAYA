@@ -1,4 +1,4 @@
-/* eslint-disable react/jsx-no-literals, react-hooks/set-state-in-effect */
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -41,6 +41,11 @@ export default function BespokeSeasonsSection() {
   const activeSeason = useMemo(() => {
     return seasonsList.find((s) => s.season_number === selectedSeasonNumber) || seasonsList[0];
   }, [seasonsList, selectedSeasonNumber]);
+
+  const episodesText = useMemo(() => {
+    if (!activeSeason) return '';
+    return `${activeSeason.episode_count} ${t('library.details.episodes') || 'Episodes'}`;
+  }, [activeSeason, t]);
 
   // Load season detail (episodes) progressive loading
   useEffect(() => {
@@ -207,7 +212,7 @@ export default function BespokeSeasonsSection() {
                   {activeSeason.episode_count > 0 && (
                     <span className="bespoke-season-meta__item">
                       <Tv size={12} />
-                      {`${activeSeason.episode_count} ${t('library.details.episodes') || 'Episodes'}`}
+                      {episodesText}
                     </span>
                   )}
                 </div>

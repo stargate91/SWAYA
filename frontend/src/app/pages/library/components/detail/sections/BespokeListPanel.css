@@ -172,8 +172,8 @@
   flex: 1;
   min-width: 0;
   box-sizing: border-box;
-  background: var(--dropdown-field-bg, var(--color-surface-glass));
-  border: 1px solid var(--dropdown-field-border, var(--color-border-default));
+  background: var(--dropdown-field-bg);
+  border: 1px solid var(--dropdown-field-border);
   border-radius: var(--radius-md);
   padding: var(--space-sm) var(--space-md);
   height: 2.375rem;
@@ -184,8 +184,8 @@
 }
 
 .bespoke-list-panel-input:focus {
-  background: var(--dropdown-field-active, var(--color-border-default));
-  border-color: var(--dropdown-field-active-border, var(--color-accent-blue));
+  background: var(--dropdown-field-active);
+  border-color: var(--dropdown-field-active-border);
 }
 
 .bespoke-list-panel-add-btn {
@@ -194,8 +194,8 @@
   justify-content: center;
   width: 2.375rem;
   height: 2.375rem;
-  background: var(--button-secondary-neutral-bg, var(--color-surface-glass));
-  border: 1px solid var(--button-secondary-neutral-border, var(--color-border-heavy));
+  background: var(--button-secondary-neutral-bg);
+  border: 1px solid var(--button-secondary-neutral-border);
   border-radius: var(--radius-md);
   color: var(--color-text-primary);
   font-size: var(--font-size-lg);
