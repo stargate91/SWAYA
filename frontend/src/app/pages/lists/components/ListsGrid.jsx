@@ -1,5 +1,6 @@
 import { Loader2, Search, List as ListIcon } from '@/ui/icons';
 import EmptyState from '@/ui/EmptyState';
+import Grid from '@/ui/Grid';
 import ListsCard from './ListsCard';
 import styles from './ListsGrid.module.css';
 
@@ -57,7 +58,7 @@ export default function ListsGrid({
   }
 
   return (
-    <div className={styles['lists-grid']}>
+    <Grid variant="mixed">
       {filteredListItems.map((item) => (
         <ListsCard
           key={item.id}
@@ -69,6 +70,6 @@ export default function ListsGrid({
           handleRemoveListItem={handleRemoveListItem}
         />
       ))}
-    </div>
+    </Grid>
   );
 }

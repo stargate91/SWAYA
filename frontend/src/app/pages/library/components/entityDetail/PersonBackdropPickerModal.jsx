@@ -4,7 +4,8 @@ import { ImageOff, ENTITY_ICONS } from '@/ui/icons';
 import Tooltip from '@/ui/Tooltip';
 import EmptyState from '@/ui/EmptyState';
 import SegmentedControl from '@/ui/SegmentedControl';
-import BackdropCard from '@/ui/BackdropCard';
+import SelectableCard from '@/ui/SelectableCard';
+import Grid from '@/ui/Grid';
 import ImageUploadPanel from '@/ui/ImageUploadPanel';
 import { API_BASE } from '@/lib/backend';
 import { getPosterImagePath } from '@/lib/imageUrls';
@@ -143,10 +144,10 @@ export default function PersonBackdropPickerModal({
             )}
           </div>
         ) : (
-          <div className={`person-backdrop-picker__grid ${activeTab === 'scenes' ? 'person-backdrop-picker__grid--scenes' : ''}`}>
+          <Grid variant={activeTab === 'scenes' ? 'backdrop' : 'logo'}>
             {isLoading && visibleItems.length === 0 && Array.from({ length: initialTabPageSize }).map((_, index) => (
               activeTab === 'scenes' ? (
-                <BackdropCard key={`person-backdrop-skeleton-${activeTab}-${index}`} disabled={true} />
+                <SelectableCard key={`person-backdrop-skeleton-${activeTab}-${index}`} disabled={true} aspect="landscape" />
               ) : (
                 <div key={`person-backdrop-skeleton-${activeTab}-${index}`} className="person-backdrop-picker__credit-card skeleton">
                   <div className="person-backdrop-picker__credit-poster-wrap skeleton-shimmer" />
@@ -187,12 +188,13 @@ export default function PersonBackdropPickerModal({
                   ? resolveDetailsImageUrl(path, API_BASE, 'backdrop')
                   : path;
                 return (
-                  <BackdropCard
+                  <SelectableCard
                     key={`person-scene-backdrop-${credit.id}-${idx}`}
                     imageUrl={thumbUrl}
                     alt={credit.title || `Scene backdrop ${idx + 1}`}
-                    isSelected={isSelected}
+                    selected={isSelected}
                     isPending={isPending}
+                    aspect="landscape"
                     onClick={() => handleSelectSceneBackdrop(credit)}
                     disabled={overridePersonBackdropMutation.isPending || isUploadPending}
                   />
@@ -231,7 +233,7 @@ export default function PersonBackdropPickerModal({
                 </button>
               );
             })}
-          </div>
+          </Grid>
         )}
       </div>
     </div>

@@ -1,4 +1,4 @@
-import PosterGrid from '@/ui/PosterGrid';
+import Grid from '@/ui/Grid';
 import PosterCard from '@/ui/PosterCard';
 import AdultOverlay from '@/ui/AdultOverlay';
 import Button from '@/ui/Button';
@@ -23,7 +23,7 @@ export default function SearchResults({
 }) {
   return (
     <>
-      <PosterGrid className={`${styles['search-page-grid']} ${urlType === 'scene' ? 'library-scenes-grid' : ''}`}>
+      <Grid variant={urlType === 'scene' ? 'scene' : 'poster'} className={styles['search-page-grid']}>
         {filteredResults.map((item, idx) => {
           const n = normalizeMediaEntity(item, { context: 'search', settings });
           const isAdultItem = urlSource !== 'tmdb' || item.is_adult || item.media_type === 'scene';
@@ -65,7 +65,7 @@ export default function SearchResults({
             />
           );
         })}
-      </PosterGrid>
+      </Grid>
 
       {hasMorePages && (
         <div className={styles['search-page-more-container']}>

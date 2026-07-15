@@ -49,9 +49,6 @@
   gap: var(--space-md);
 }
 
-.companies-networks-container .specs-card--company:last-child:nth-child(odd) {
-  grid-column: span 2;
-}
 
 .specs-card--company {
   display: flex;
@@ -61,6 +58,10 @@
   gap: var(--space-md);
   min-height: 3.625rem;
   padding: var(--space-md) var(--space-lg);
+}
+
+.companies-networks-container .specs-card--company:last-child:nth-child(odd) {
+  grid-column: span 2;
 }
 
 .specs-card__company-logo {

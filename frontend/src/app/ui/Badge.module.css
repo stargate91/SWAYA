@@ -1,0 +1,111 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  line-height: 1;
+  text-transform: uppercase;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+/* Size mappings */
+.badge[data-size="sm"] {
+  height: auto;
+  min-height: 0;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--font-size-2xs);
+  line-height: 1.1;
+}
+
+.badge[data-size="md"] {
+  min-height: var(--space-xl);
+  padding: 0 var(--space-sm);
+  padding-left: calc(var(--space-sm) + var(--letter-spacing-wide));
+  font-size: var(--font-size-2xs);
+}
+
+.badge[data-size="lg"] {
+  min-height: calc(var(--space-xl) + var(--space-xs));
+  padding: 0 var(--space-md);
+  font-size: var(--font-size-xs);
+}
+
+/* Roundness mappings */
+.badge[data-roundness="none"] {
+  border-radius: 0;
+}
+
+.badge[data-roundness="sm"] {
+  border-radius: var(--radius-xs);
+}
+
+.badge[data-roundness="md"] {
+  border-radius: var(--radius-sm);
+}
+
+.badge[data-roundness="full"] {
+  border-radius: var(--radius-full);
+}
+
+/* Position variants */
+
+.badge[data-variant="overlay"] {
+  position: absolute;
+  left: var(--space-md);
+  right: var(--space-md);
+  bottom: var(--status-badge-bottom);
+  min-height: calc(var(--space-lg) + var(--space-sm));
+}
+
+/* Colors and states */
+.badge[data-family="status"][data-tone="accent"] {
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  color: var(--color-accent);
+}
+
+.badge[data-family="status"][data-tone="success"] {
+  background: var(--color-state-success-bg);
+  color: var(--color-state-success);
+}
+
+.badge[data-family="status"][data-tone="danger"] {
+  background: var(--color-state-danger-bg);
+  color: var(--color-state-danger);
+}
+
+.badge[data-family="status"][data-tone="warning"] {
+  background: var(--color-state-warning-bg);
+  color: var(--color-state-warning);
+}
+
+.badge[data-family="status"][data-tone="overlay"] {
+  background: var(--status-badge-overlay-bg);
+  color: var(--button-primary-color);
+}
+
+/* Custom Adult Badge styles override */
+.badge[data-family="adult"][data-tone="danger"] {
+  background: var(--color-state-danger-bg-strong);
+  color: var(--color-state-danger);
+  border: 0.09375rem solid var(--color-state-danger);
+}
+
+
+/* Icon layout styles */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon svg {
+  width: 1em;
+  height: 1em;
+}
+
+.content {
+  display: inline-flex;
+  align-items: center;
+}

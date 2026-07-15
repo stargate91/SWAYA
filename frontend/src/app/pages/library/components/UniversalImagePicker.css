@@ -157,44 +157,44 @@
 }
 
 /* Selected state matching settings mode selection (using main accent color) */
-.universal-image-picker .ui-backdrop-card--selected,
-.person-backdrop-picker .ui-backdrop-card--selected,
-.backdrops-panel .ui-backdrop-card--selected {
+.universal-image-picker :global(.ui-selectable-card)[data-selected="true"],
+.person-backdrop-picker :global(.ui-selectable-card)[data-selected="true"],
+.backdrops-panel :global(.ui-selectable-card)[data-selected="true"] {
   border-color: var(--color-accent);
   box-shadow: 0 0 0 0.125rem var(--color-accent);
   background: color-mix(in srgb, var(--color-accent) 10%, transparent);
 }
 
 /* Hide checkmark inside selected overlay, but keep overlay for tinting */
-.universal-image-picker .ui-backdrop-card__selected-overlay svg,
-.person-backdrop-picker .ui-backdrop-card__selected-overlay svg,
-.backdrops-panel .ui-backdrop-card__selected-overlay svg {
+.universal-image-picker :global(.ui-selectable-card__selected-overlay) svg,
+.person-backdrop-picker :global(.ui-selectable-card__selected-overlay) svg,
+.backdrops-panel :global(.ui-selectable-card__selected-overlay) svg {
   display: none;
 }
 
-.universal-image-picker .ui-backdrop-card__selected-overlay,
-.person-backdrop-picker .ui-backdrop-card__selected-overlay,
-.backdrops-panel .ui-backdrop-card__selected-overlay {
+.universal-image-picker :global(.ui-selectable-card__selected-overlay),
+.person-backdrop-picker :global(.ui-selectable-card__selected-overlay),
+.backdrops-panel :global(.ui-selectable-card__selected-overlay) {
   background: color-mix(in srgb, var(--color-accent) 10%, transparent);
 }
 
 /* No hover translation or shadow effects in the picker */
-.universal-image-picker .ui-backdrop-card:hover:not(.ui-backdrop-card--disabled),
-.person-backdrop-picker .ui-backdrop-card:hover:not(.ui-backdrop-card--disabled),
-.backdrops-panel .ui-backdrop-card:hover:not(.ui-backdrop-card--disabled) {
+.universal-image-picker :global(.ui-selectable-card):hover:not([data-disabled="true"]),
+.person-backdrop-picker :global(.ui-selectable-card):hover:not([data-disabled="true"]),
+.backdrops-panel :global(.ui-selectable-card):hover:not([data-disabled="true"]) {
   transform: none;
 }
 
-.universal-image-picker .ui-backdrop-card:hover:not(.ui-backdrop-card--disabled):not(.ui-backdrop-card--selected),
-.person-backdrop-picker .ui-backdrop-card:hover:not(.ui-backdrop-card--disabled):not(.ui-backdrop-card--selected),
-.backdrops-panel .ui-backdrop-card:hover:not(.ui-backdrop-card--disabled):not(.ui-backdrop-card--selected) {
+.universal-image-picker :global(.ui-selectable-card):hover:not([data-disabled="true"]):not([data-selected="true"]),
+.person-backdrop-picker :global(.ui-selectable-card):hover:not([data-disabled="true"]):not([data-selected="true"]),
+.backdrops-panel :global(.ui-selectable-card):hover:not([data-disabled="true"]):not([data-selected="true"]) {
   border-color: var(--color-accent);
   box-shadow: 0 0 0 0.125rem var(--color-accent);
 }
 
-.universal-image-picker .ui-backdrop-card.ui-backdrop-card--selected:hover:not(.ui-backdrop-card--disabled),
-.person-backdrop-picker .ui-backdrop-card.ui-backdrop-card--selected:hover:not(.ui-backdrop-card--disabled),
-.backdrops-panel .ui-backdrop-card.ui-backdrop-card--selected:hover:not(.ui-backdrop-card--disabled) {
+.universal-image-picker :global(.ui-selectable-card)[data-selected="true"]:hover:not([data-disabled="true"]),
+.person-backdrop-picker :global(.ui-selectable-card)[data-selected="true"]:hover:not([data-disabled="true"]),
+.backdrops-panel :global(.ui-selectable-card)[data-selected="true"]:hover:not([data-disabled="true"]) {
   border-color: var(--color-accent);
   box-shadow: 0 0 0 0.125rem var(--color-accent);
 }

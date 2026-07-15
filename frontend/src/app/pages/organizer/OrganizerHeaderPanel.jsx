@@ -31,7 +31,7 @@ export default function OrganizerHeaderPanel({
           {title}
           {sessionMode === 'nsfw' && (
             <sup className={styles['organizer-panel__adult-sup']}>
-              <Badge family="adult" tone="danger" className={styles['organizer-panel__adult-badge-override']}>
+              <Badge family="adult" tone="danger" size="sm" className={styles['organizer-panel__adult-badge-override']}>
                 {t('common.adult_badge', { defaultValue: '18+' })}
               </Badge>
             </sup>

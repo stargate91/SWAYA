@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import PosterGrid from '@/ui/PosterGrid';
+import Grid from '@/ui/Grid';
 import PosterCard from '@/ui/PosterCard';
 import Pill from '@/ui/Pill';
 import ScrollRow from '@/ui/ScrollRow';
@@ -93,7 +93,7 @@ export function EntityCardGrid({ items, type, navigate, t }) {
   };
 
   return (
-    <PosterGrid>
+    <Grid variant="poster">
       {items.map((item, index) => {
         const resolvedType = item.media_type || item.type || type;
         const posterPath = getPosterImagePath(item) || item.backdrop_path || item.local_backdrop_path;
@@ -124,7 +124,7 @@ export function EntityCardGrid({ items, type, navigate, t }) {
           />
         );
       })}
-    </PosterGrid>
+    </Grid>
   );
 }
 

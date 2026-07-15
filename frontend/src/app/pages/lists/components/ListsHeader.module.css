@@ -14,7 +14,6 @@
   flex-shrink: 0;
   box-sizing: border-box;
   backdrop-filter: blur(0.75rem);
-  -webkit-backdrop-filter: blur(0.75rem);
   overflow: hidden;
   margin-bottom: 0;
   transform: translate3d(0, 0, 0);
@@ -47,7 +46,6 @@
   border-top-color: var(--color-border-default);
   background: color-mix(in srgb, var(--color-canvas) 88%, transparent);
   backdrop-filter: blur(1rem);
-  -webkit-backdrop-filter: blur(1rem);
 }
 
 .lists-header-hero::before {
@@ -56,7 +54,7 @@
   top: 0;
   left: var(--space-lg);
   right: var(--space-lg);
-  height: 2px;
+  height: 0.125rem;
   background: linear-gradient(90deg, color-mix(in srgb, var(--list-theme-color) 10%, transparent), var(--list-theme-color) 50%, color-mix(in srgb, var(--list-theme-color) 10%, transparent));
   pointer-events: none;
 }

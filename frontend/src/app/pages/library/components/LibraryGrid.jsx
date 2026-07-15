@@ -9,7 +9,7 @@ import EmptyState from '@/ui/EmptyState';
 import Button from '@/ui/Button';
 import IconButton from '@/ui/IconButton';
 import NavButton from '@/ui/NavButton';
-import PosterGrid from '@/ui/PosterGrid';
+import Grid from '@/ui/Grid';
 import {
   getPosterImagePath,
   getProfileImagePath,
@@ -291,7 +291,7 @@ export default function LibraryGrid({
             </div>
           )
         ) : (
-          <PosterGrid className={isLibraryScenesTab(resolvedTab) ? 'library-scenes-grid' : ''}>
+          <Grid variant={isLibraryScenesTab(resolvedTab) ? 'scene' : 'poster'}>
             {paginatedItems.map((item, index) => (
               <LibraryPosterCard
                 key={item.id}
@@ -310,7 +310,7 @@ export default function LibraryGrid({
                 sortKey={sortKey}
               />
             ))}
-          </PosterGrid>
+          </Grid>
         )
       ) : (
         <EmptyState
@@ -414,7 +414,7 @@ function ExpandedTagPanel({ tag, t, emptyIcon, isFocusMode = false, activeSessio
           </div>
         </div>
       ) : null}
-      <PosterGrid>
+      <Grid variant="poster">
         {paginatedItems.map((item) => (
           <LibraryPosterCard
             key={item.id}
@@ -438,7 +438,7 @@ function ExpandedTagPanel({ tag, t, emptyIcon, isFocusMode = false, activeSessio
             }}
           />
         ))}
-      </PosterGrid>
+      </Grid>
 
       {hasMore && (
         <div className="library-grid-load-more">

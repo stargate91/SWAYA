@@ -93,13 +93,13 @@
   gap: var(--space-xs);
   --pill-bg: color-mix(in srgb, var(--color-accent) 12%, transparent);
   background: var(--pill-bg);
-  --pill-border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+  --pill-border: 0.0625rem solid color-mix(in srgb, var(--color-accent) 30%, transparent);
   border: var(--pill-border);
   --pill-color: var(--color-accent);
   color: var(--pill-color);
   font-weight: var(--font-weight-bold);
   font-size: var(--font-size-2xs);
-  --pill-padding: 1px 0.375rem;
+  --pill-padding: 0.0625rem 0.375rem;
   padding: var(--pill-padding);
   border-radius: var(--radius-sm);
 }

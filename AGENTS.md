@@ -53,7 +53,7 @@ Bad example:
 6. **No Uncontrolled Dynamic Inline Styles:** Inline styles are strictly limited to purely dynamic runtime values.
 7. **Component State vs. Styling:** Use native CSS pseudo-classes or HTML `data-` attributes for custom states.
 8. **Scrollbars:** Use `scrollbar-gutter: stable` on containers where dynamic length causes shifts.
-9. **Media Queries:** Always use standard breakpoint tokens (e.g., `--sys-bp-tablet`).
+9. **Media Queries:** Not applicable — this is a desktop-only Electron app. Do not add viewport breakpoint tokens.
 10. **Z-Index Scale:** Use central z-index tokens (dropdown: 100, sticky: 200, backdrop: 300, modal: 400, toast: 500).
 
 ## Frontend V2 Architecture Rules

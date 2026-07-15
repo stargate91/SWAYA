@@ -1,7 +1,6 @@
 :global(.ui-drawer).lists-drawer {
   background: var(--color-surface-overlay);
   backdrop-filter: blur(1.5rem);
-  -webkit-backdrop-filter: blur(1.5rem);
 }
 
 .lists-drawer__header {
@@ -176,11 +175,7 @@
   opacity: 0.6;
 }
 
-.lists-drawer__search-area {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
+
 
 .lists-drawer__loader--small {
   padding: 0.5rem 0;

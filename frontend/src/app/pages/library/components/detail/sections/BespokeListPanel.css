@@ -206,14 +206,14 @@
   flex-shrink: 0;
 }
 
-.bespoke-list-panel-add-btn:hover:not(:disabled) {
-  background: var(--color-border-default);
-  border-color: color-mix(in srgb, var(--color-text-primary) 25%, transparent);
-}
-
 .bespoke-list-panel-add-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.bespoke-list-panel-add-btn:hover:not(:disabled) {
+  background: var(--color-border-default);
+  border-color: color-mix(in srgb, var(--color-text-primary) 25%, transparent);
 }
 
 @keyframes spin {

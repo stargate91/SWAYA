@@ -24,14 +24,14 @@
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
-  --local-bg: rgba(0, 0, 0, 0.15);
+  --local-bg: color-mix(in srgb, black 15%, transparent);
   background: var(--local-bg);
   border-bottom: 1px solid var(--color-border-default);
 }
 
 /* Horizontal Divider inside Card */
 .bespoke-browser-card__divider {
-  height: 1px;
+  height: 0.0625rem;
   background: var(--color-border-default);
   width: 100%;
 }
@@ -133,6 +133,15 @@
   right: 0.25rem;
 }
 
+/* Premium soft glass style for main body scroll chevrons */
+.bespoke-cast-browser-card__body .ui-carousel-arrow,
+.bespoke-companies-section .ui-carousel-arrow {
+  background: color-mix(in srgb, var(--color-bg-elevated) 45%, var(--color-surface-glass-strong));
+  border: 1px solid var(--color-border-default);
+  box-shadow: var(--shadow-sm-strong);
+  color: var(--color-text-secondary);
+  transition: all var(--motion-fast);
+}
 .bespoke-browser-card__pills-header .ui-carousel-arrow:hover {
   background: var(--color-surface-glass-heavy);
   color: var(--color-text-primary);
@@ -145,15 +154,6 @@
   height: 0.75rem;
 }
 
-/* Premium soft glass style for main body scroll chevrons */
-.bespoke-cast-browser-card__body .ui-carousel-arrow,
-.bespoke-companies-section .ui-carousel-arrow {
-  background: color-mix(in srgb, var(--color-bg-elevated) 45%, var(--color-surface-glass-strong));
-  border: 1px solid var(--color-border-default);
-  box-shadow: var(--shadow-sm-strong);
-  color: var(--color-text-secondary);
-  transition: all var(--motion-fast);
-}
 
 .bespoke-cast-browser-card__body .ui-carousel-arrow:hover,
 .bespoke-companies-section .ui-carousel-arrow:hover {
@@ -334,7 +334,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  --local-bg: linear-gradient(to right, rgba(0, 0, 0, 0.3), transparent);
+  --local-bg: linear-gradient(to right, color-mix(in srgb, black 30%, transparent), transparent);
   background: var(--local-bg);
   border: none;
   color: var(--color-text-muted);
@@ -345,6 +345,10 @@
   pointer-events: none;
 }
 
+.bespoke-card-nav:disabled {
+  opacity: 0.03;
+  cursor: not-allowed;
+}
 .bespoke-browser-card__body--episode:hover .bespoke-card-nav {
   opacity: 0.5;
   pointer-events: auto;
@@ -352,13 +356,13 @@
 
 .bespoke-card-nav--left {
   left: 0;
-  --local-bg: linear-gradient(to right, rgba(0, 0, 0, 0.4), transparent);
+  --local-bg: linear-gradient(to right, color-mix(in srgb, black 40%, transparent), transparent);
   background: var(--local-bg);
 }
 
 .bespoke-card-nav--right {
   right: 0;
-  --local-bg: linear-gradient(to left, rgba(0, 0, 0, 0.4), transparent);
+  --local-bg: linear-gradient(to left, color-mix(in srgb, black 40%, transparent), transparent);
   background: var(--local-bg);
 }
 
@@ -367,10 +371,6 @@
   color: var(--color-text-primary);
 }
 
-.bespoke-card-nav:disabled {
-  opacity: 0.03;
-  cursor: not-allowed;
-}
 
 /* Left side still image styling (Cinematic 16:9) */
 .bespoke-episode-detail-card__still-col {
@@ -416,7 +416,7 @@
 .bespoke-episode-detail-card__still-watched-overlay {
   position: absolute;
   inset: 0;
-  --local-bg: rgba(0, 0, 0, 0.4);
+  --local-bg: color-mix(in srgb, black 40%, transparent);
   background: var(--local-bg);
   display: flex;
   align-items: center;
@@ -469,7 +469,7 @@
 .bespoke-episode-detail-card__tmdb-pill {
   --local-gap: 0.1875rem;
   gap: var(--local-gap);
-  --local-padding: 1px var(--space-sm);
+  --local-padding: 0.0625rem var(--space-sm);
   padding: var(--local-padding);
   min-height: 1.125rem;
   font-size: var(--font-size-2xs);
@@ -506,7 +506,7 @@
   gap: var(--space-sm);
   background: var(--color-surface-glass);
   border: 1px solid var(--color-border-default);
-  --local-padding: 1px var(--space-sm);
+  --local-padding: 0.0625rem var(--space-sm);
   padding: var(--local-padding);
   border-radius: var(--radius-sm);
   font-size: var(--font-size-2xs);
@@ -609,26 +609,22 @@
 
 /* Dynamic Scroll Fade Masks */
 .bespoke-fade-container {
-  transition: mask-image var(--motion-base), -webkit-mask-image var(--motion-base);
+  transition: mask-image var(--motion-base);
   mask-image: none;
-  -webkit-mask-image: none;
 }
 
 /* 1. Only scrolled right (fade right) */
 .bespoke-fade-container.has-fade-right:not(.has-fade-left) {
-  -webkit-mask-image: linear-gradient(to right, #000 92%, transparent 100%);
   mask-image: linear-gradient(to right, #000 92%, transparent 100%);
 }
 
 /* 2. Only scrolled left (fade left) */
 .bespoke-fade-container.has-fade-left:not(.has-fade-right) {
-  -webkit-mask-image: linear-gradient(to left, #000 92%, transparent 100%);
   mask-image: linear-gradient(to left, #000 92%, transparent 100%);
 }
 
 /* 3. Scrolled both ways (fade both sides) */
 .bespoke-fade-container.has-fade-left.has-fade-right {
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%);
   mask-image: linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%);
 }
 
@@ -718,7 +714,7 @@
   align-items: center;
   gap: var(--space-md);
   padding: var(--space-sm) var(--space-md);
-  --local-bg: rgba(255, 255, 255, 0.02);
+  --local-bg: color-mix(in srgb, white 2%, transparent);
   background: var(--local-bg);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-sm);
@@ -731,7 +727,7 @@
   width: 2.25rem;
   height: 2.25rem;
   border-radius: 50%;
-  --local-bg: rgba(255, 255, 255, 0.04);
+  --local-bg: color-mix(in srgb, white 4%, transparent);
   background: var(--local-bg);
   color: var(--color-text-secondary);
 }
@@ -739,7 +735,7 @@
 .bespoke-boxoffice-info {
   display: flex;
   flex-direction: column;
-  --local-gap: 2px;
+  --local-gap: 0.125rem;
   gap: var(--local-gap);
 }
 
@@ -748,7 +744,7 @@
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  --local-color: rgba(255, 255, 255, 0.45);
+  --local-color: color-mix(in srgb, white 45%, transparent);
   color: var(--local-color);
 }
 
@@ -799,7 +795,7 @@
   justify-content: center;
   height: 4rem;
   padding: var(--space-sm) var(--space-md);
-  --local-bg: rgba(255, 255, 255, 0.02);
+  --local-bg: color-mix(in srgb, white 2%, transparent);
   background: var(--local-bg);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-sm);
@@ -811,15 +807,15 @@
   max-width: 10rem;
   object-fit: contain;
   opacity: 0.9;
-  filter: drop-shadow(0px 0px 1px color-mix(in srgb, var(--color-text-primary) 85%, transparent)) 
-          drop-shadow(0px 0px 0.1875rem rgba(255, 255, 255, 0.25));
+  filter: drop-shadow(0 0 0.0625rem color-mix(in srgb, var(--color-text-primary) 85%, transparent)) 
+          drop-shadow(0 0 0.1875rem color-mix(in srgb, white 25%, transparent));
   transition: filter var(--motion-duration-fast) var(--motion-ease-standard), opacity var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 .bespoke-company-logo:hover {
   opacity: 1;
-  filter: drop-shadow(0px 0px 1px color-mix(in srgb, var(--color-text-primary) 95%, transparent)) 
-          drop-shadow(0px 0px 0.3125rem rgba(255, 255, 255, 0.4));
+  filter: drop-shadow(0 0 0.0625rem color-mix(in srgb, var(--color-text-primary) 95%, transparent)) 
+          drop-shadow(0 0 0.3125rem color-mix(in srgb, white 40%, transparent));
 }
 
 .bespoke-company-name-only {
@@ -850,7 +846,7 @@
   margin-top: 0;
   --local-margin: 0.75rem;
   margin-bottom: var(--local-margin);
-  --local-border: 1px solid rgba(255, 255, 255, 0.08);
+  --local-border: 0.0625rem solid color-mix(in srgb, white 8%, transparent);
   border-bottom: var(--local-border);
   --local-padding: 0.375rem;
   padding-bottom: var(--local-padding);
@@ -892,9 +888,9 @@
 }
 
 .dashboard-cast-card__avatar-wrapper.dashboard-cast-card__avatar-wrapper--filtered {
-  --local-border: 1px dashed rgba(255, 255, 255, 0.3);
+  --local-border: 0.0625rem dashed color-mix(in srgb, white 30%, transparent);
   border: var(--local-border);
-  --local-bg: rgba(255, 255, 255, 0.02);
+  --local-bg: color-mix(in srgb, white 2%, transparent);
   background: var(--local-bg);
 }
 
@@ -919,7 +915,7 @@
   right: 1.125rem;
   width: 2.375rem;
   height: 2.375rem;
-  --local-border: 1px solid color-mix(in srgb, white 18%, transparent);
+  --local-border: 0.0625rem solid color-mix(in srgb, white 18%, transparent);
   border: var(--local-border);
   border-radius: var(--radius-full);
   --local-bg: color-mix(in srgb, black 42%, transparent);
@@ -979,7 +975,7 @@
   height: 1.25rem;
   max-width: 5.625rem;
   object-fit: contain;
-  filter: drop-shadow(0 2px 0.25rem color-mix(in srgb, black 30%, transparent));
+  filter: drop-shadow(0 0.125rem 0.25rem color-mix(in srgb, black 30%, transparent));
 }
 
 .bespoke-rating-value {

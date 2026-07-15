@@ -12,20 +12,20 @@
 .rating-segment {
   flex: 1;
   height: 100%;
-  --local-bg: rgba(255, 255, 255, 0.08);
+  --local-bg: color-mix(in srgb, white 8%, transparent);
   background: var(--local-bg);
   border-radius: var(--radius-sm);
   overflow: hidden;
-  --local-border: 1px solid rgba(255, 255, 255, 0.04);
+  --local-border: 0.0625rem solid color-mix(in srgb, white 4%, transparent);
   border: var(--local-border);
   --local-transition: all 0.2s ease;
   transition: var(--local-transition);
 }
 
 .rating-segmented-bar:hover .rating-segment {
-  --local-bg: rgba(255, 255, 255, 0.12);
+  --local-bg: color-mix(in srgb, white 12%, transparent);
   background: var(--local-bg);
-  --local-border-color: rgba(255, 255, 255, 0.08);
+  --local-border-color: color-mix(in srgb, white 8%, transparent);
   border-color: var(--local-border-color);
 }
 
@@ -69,7 +69,7 @@
 }
 
 .review-trigger-btn {
-  --btn-padding: 2px;
+  --btn-padding: 0.125rem;
   background: none;
   border: none;
   color: color-mix(in srgb, var(--color-text-primary) 58%, var(--color-text-muted));

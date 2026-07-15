@@ -5,7 +5,6 @@ import Tooltip from '../../ui/Tooltip';
 import MediaCard from '../../ui/MediaCard';
 import Stack from '../../ui/Stack';
 import PosterCard from '../../ui/PosterCard';
-import BackdropCard from '../../ui/BackdropCard';
 import Lightbox from '../../ui/Lightbox';
 import EmptyState from '../../ui/EmptyState';
 import { ChevronLeft, ChevronRight, FileJson, Info } from '@/ui/icons';
@@ -205,13 +204,14 @@ export default function OrganizerDetailsPanel({
               <div className={styles['organizer-details__content']}>
                 {shouldShowDetailsPoster ? (
                   activeRow?.rawType === 'scene' ? (
-                    <BackdropCard
+                    <PosterCard
+                      aspect="landscape"
                       className={styles['organizer-details__backdrop-card']}
                       imageUrl={activeImageUrl}
-                      onClick={handleOpenLightbox}
+                      onClick={activeImageUrl ? handleOpenLightbox : undefined}
                     >
                       {renderImageNavigation()}
-                    </BackdropCard>
+                    </PosterCard>
                   ) : (
                     <PosterCard
                       className={`${styles['organizer-details__poster-card']} ${activeImageUrl ? styles['has-image'] : ''}`}

@@ -34,17 +34,13 @@
   flex-shrink: 0;
 }
 
-.lists-card:hover .lists-card__media {
-  border-color: var(--color-border-default);
-  box-shadow: 0 0.75rem 1.5rem var(--color-surface-overlay);
-}
+
 
 .lists-card__media.is-blurred {
   border-color: transparent;
   isolation: isolate;
   transform: translate3d(0, 0, 0);
-  -webkit-transform: translate3d(0, 0, 0);
-  mask-image: -webkit-radial-gradient(white, black);
+  mask-image: radial-gradient(white, black);
 }
 
 .lists-card__media.is-blurred img {
@@ -63,6 +59,11 @@
 
 .lists-card--scene .lists-card__media {
   aspect-ratio: 1.38;
+}
+
+.lists-card:hover .lists-card__media {
+  border-color: var(--color-border-default);
+  box-shadow: 0 0.75rem 1.5rem var(--color-surface-overlay);
 }
 
 .lists-card__info {
@@ -87,10 +88,7 @@
   opacity: 0.6;
 }
 
-.lists-card__media {
-  position: relative;
-  overflow: hidden;
-}
+
 
 .lists-card__img {
   width: 100%;
@@ -126,7 +124,7 @@
 }
 
 .lists-card:hover .lists-card__media.is-blurred img {
-  filter: blur(0px) saturate(100%);
+  filter: blur(0) saturate(100%);
   transform: scale(1);
 }
 
@@ -137,7 +135,6 @@
 
 .lists-card:hover :global(.ui-adult-overlay--blur) {
   backdrop-filter: blur(var(--radius-none));
-  -webkit-backdrop-filter: blur(var(--radius-none));
   background: transparent;
   opacity: 0;
 }

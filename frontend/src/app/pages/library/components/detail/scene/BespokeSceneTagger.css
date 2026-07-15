@@ -70,11 +70,12 @@
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: opacity var(--motion-duration-fast) var(--motion-ease-standard), transform var(--motion-duration-fast) var(--motion-ease-standard);
+  flex-shrink: 0;
 }
 
 .bespoke-scene-tagger-pill-active:hover {
   opacity: 0.8;
-  transform: translateY(-0.5px);
+  transform: translateY(-0.03125rem);
 }
 
 .bespoke-scene-tagger-pill-remove-icon {
@@ -240,9 +241,7 @@
   overflow-x: auto;
   scroll-behavior: smooth;
 }
-.ui-pill.bespoke-scene-tagger-pill-active {
-  flex-shrink: 0;
-}
+
 
 .bespoke-scene-tagger-scroller-btn {
   flex-shrink: 0;

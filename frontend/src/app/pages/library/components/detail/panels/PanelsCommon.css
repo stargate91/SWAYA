@@ -41,7 +41,7 @@
   content: '';
   position: absolute;
   inset: auto var(--space-lg) 0 var(--space-lg);
-  height: 1px;
+  height: 0.0625rem;
   background: linear-gradient(90deg, transparent, var(--color-border-default), transparent);
 }
 
@@ -50,7 +50,7 @@
   font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   color: var(--color-text-muted);
-  letter-spacing: 0.5px;
+  letter-spacing: 0.03125rem;
 }
 
 .specs-card__value {

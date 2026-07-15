@@ -2,7 +2,7 @@ import { Search, Clapperboard, ImageOff } from '@/ui/icons';
 import Page from '@/ui/Page';
 import Skeleton from '@/ui/Skeleton';
 import EmptyState from '@/ui/EmptyState';
-import PosterGrid from '@/ui/PosterGrid';
+import Grid from '@/ui/Grid';
 import { useSettingsQuery } from '@/queries/settingsQueries';
 import useSearchPageController, { TYPES_BY_SOURCE } from './components/useSearchPageController';
 import SearchInput from './components/SearchInput';
@@ -67,14 +67,14 @@ export default function SearchPage() {
 
       <div className={styles['search-page-content']}>
         {isLoading ? (
-          <PosterGrid className={`${searchResultStyles['search-page-grid']} ${urlType === 'scene' ? 'library-scenes-grid' : ''}`}>
+          <Grid variant={urlType === 'scene' ? 'scene' : 'poster'} className={searchResultStyles['search-page-grid']}>
             {Array.from({ length: 12 }).map((_, idx) => (
               <Skeleton.Card
                 key={idx}
                 className={urlType === 'scene' ? searchResultStyles['search-skeleton-card-scene'] : searchResultStyles['search-skeleton-card-poster']}
               />
             ))}
-          </PosterGrid>
+          </Grid>
         ) : !urlQuery.trim() ? (
           <EmptyState
             icon={Search}

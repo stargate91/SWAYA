@@ -1,4 +1,5 @@
 import { usePlayMediaMutation } from '@/queries';
+import Grid from '@/ui/Grid';
 import PersonCreditsCard from './PersonCreditsCard';
 
 export default function PersonCreditsRow({
@@ -11,7 +12,7 @@ export default function PersonCreditsRow({
   const playMutation = usePlayMediaMutation();
 
   return (
-    <div className={`person-credits-discover-grid ${isScene ? 'grid-16-9' : 'grid-2-3'}`}>
+    <Grid variant={isScene ? 'auto-scene' : 'auto-poster'}>
       {items.map((item) => (
         <PersonCreditsCard
           key={`${item.id}-${item.type || mediaType}`}
@@ -25,6 +26,6 @@ export default function PersonCreditsRow({
           placeholderIconSize={18}
         />
       ))}
-    </div>
+    </Grid>
   );
 }

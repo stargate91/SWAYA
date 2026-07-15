@@ -39,7 +39,7 @@ export default function StatisticsPage() {
       {t('sidebar.statistics') || 'Statistics'}
       {isAdultMode && (
         <sup className={styles['stats-title-sup']}>
-          <Badge family="adult" tone="danger" className={styles['stats-title-adult-badge']}>
+          <Badge family="adult" tone="danger" size="sm" className={styles['stats-title-adult-badge']}>
             {t('common.adult_badge', { defaultValue: '18+' })}
           </Badge>
         </sup>

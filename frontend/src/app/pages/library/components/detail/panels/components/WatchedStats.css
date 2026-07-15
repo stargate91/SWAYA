@@ -161,7 +161,7 @@
   background: var(--media-detail-panel-card-bg-hover);
   border-color: var(--media-detail-panel-card-border-hover);
   box-shadow: var(--media-detail-panel-card-shadow-hover);
-  transform: translateY(-1px);
+  transform: translateY(-0.0625rem);
 }
 
 .season-progress-card__header {
@@ -219,7 +219,7 @@
 }
 
 .activity-item__token {
-  --token-pad-y: 2px;
+  --token-pad-y: 0.125rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -230,7 +230,7 @@
   background: color-mix(in srgb, var(--color-accent-blue) 12%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-accent-blue) 30%, transparent);
   color: var(--color-accent-blue);
-  letter-spacing: 0.5px;
+  letter-spacing: 0.03125rem;
   text-transform: uppercase;
   height: 1.125rem;
   line-height: 1.125rem;

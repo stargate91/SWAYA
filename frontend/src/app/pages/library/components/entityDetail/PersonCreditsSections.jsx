@@ -4,6 +4,7 @@ import { usePlayMediaMutation } from '@/queries';
 import { usePersonCreditsQuery, usePersonCreditsInfiniteQuery } from '@/queries/metadataQueries';
 import { usePersonCreditsStore } from '@/stores/usePersonCreditsStore';
 import Spinner from '@/ui/Spinner';
+import Grid from '@/ui/Grid';
 import { X, Play } from '@/ui/icons';
 import { Tabs } from '@/ui/Tabs';
 import PersonCreditsRow from './PersonCreditsRow';
@@ -342,7 +343,7 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
                 </div>
               ) : (
                 <>
-                  <div className={`person-credits-discover-grid ${isSceneGrid ? 'grid-16-9' : 'grid-2-3'}`}>
+                  <Grid variant={isSceneGrid ? 'auto-scene' : 'auto-poster'}>
                     {accumulatedItems.map((credit, i) => (
                       <PersonCreditsCard
                         key={`${credit.id}-${credit.type || activeMediaType}-discover-${i}`}
@@ -366,7 +367,7 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
                         <div className="person-credits-card__poster-container skeleton-shimmer" />
                       </div>
                     ))}
-                  </div>
+                  </Grid>
 
                   {/* Sentinel element to trigger next page load */}
                   {hasMore && <div ref={observerRef} className="person-credits-grid__sentinel" />}

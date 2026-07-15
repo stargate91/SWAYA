@@ -20,7 +20,6 @@
   min-width: 0;
 }
 
-
 .media-detail-page__logo {
   display: block;
   width: auto;
@@ -28,7 +27,8 @@
   height: 13.75rem;
   object-fit: contain;
   filter:
-    drop-shadow(0 0.625rem 2.125rem rgba(0, 0, 0, 0.56)) drop-shadow(0 0 1.5rem var(--color-border-default));
+    drop-shadow(0 0.625rem 2.125rem color-mix(in srgb, black 56%, transparent)) drop-shadow(0 0 1.5rem var(--color-border-default));
+  transition: transform var(--motion-base), filter var(--motion-base);
 }
 
 .media-detail-page__fallback-title,
@@ -42,6 +42,7 @@
   text-shadow:
     0 0.625rem 1.875rem color-mix(in srgb, black 62%, transparent),
     0 0 1.125rem var(--color-surface-glass);
+  transition: transform var(--motion-base), color var(--motion-base);
 }
 
 .media-detail-page__details-group {
@@ -114,15 +115,6 @@
   position: relative;
   cursor: pointer;
   border-radius: var(--radius-sm);
-}
-
-.media-detail-page__logo {
-  transition: transform var(--motion-base), filter var(--motion-base);
-}
-
-.media-detail-page__fallback-title,
-.media-detail-page__scene-title-below-logo {
-  transition: transform var(--motion-base), color var(--motion-base);
 }
 
 .media-detail-page__logo-container.clickable:hover .media-detail-page__logo {

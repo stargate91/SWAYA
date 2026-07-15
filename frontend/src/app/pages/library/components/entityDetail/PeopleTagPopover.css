@@ -13,7 +13,6 @@
   background: var(--color-panel-translucent);
   box-shadow: var(--dropdown-menu-shadow);
   backdrop-filter: blur(1.25rem) saturate(125%);
-  -webkit-backdrop-filter: blur(1.25rem) saturate(125%);
   z-index: var(--z-index-popover);
   display: grid;
   gap: var(--space-md);
@@ -66,6 +65,11 @@
   padding: 0 0 0 0.2rem;
 }
 
+.entity-detail-page__tag-pill-remove:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .entity-detail-page__tag-pill-remove:hover:not(:disabled) {
   opacity: 1;
 }
@@ -85,8 +89,13 @@
   transition: all var(--motion-base);
 }
 
+.entity-detail-page__tag-suggestion:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .entity-detail-page__tag-suggestion:hover:not(:disabled) {
-  transform: translateY(-1px);
+  transform: translateY(-0.0625rem);
   color: var(--color-text-primary);
   border-color: color-mix(in srgb, var(--color-text-primary) 25%, transparent);
   background: var(--color-border-default);
@@ -162,16 +171,14 @@
   outline: none;
 }
 
+.entity-detail-page__tag-create-submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .entity-detail-page__tag-create-submit:hover:not(:disabled) {
   background: var(--color-border-default);
   border-color: color-mix(in srgb, var(--color-text-primary) 25%, transparent);
-}
-
-.entity-detail-page__tag-create-submit:disabled,
-.entity-detail-page__tag-suggestion:disabled,
-.entity-detail-page__tag-pill-remove:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
 }
 
 .entity-detail-page__tag-create-error {

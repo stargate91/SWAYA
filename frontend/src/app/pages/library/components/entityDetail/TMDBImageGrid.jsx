@@ -6,7 +6,8 @@ import { resolveDetailsImageUrl } from '../../utils/detailUtils';
 import { buildTmdbImageUrl, TMDB_IMAGE_SIZES, pathsMatch } from '@/lib/imageUrls';
 import { API_BASE } from '@/lib/backend';
 import EmptyState from '@/ui/EmptyState';
-import BackdropCard from '@/ui/BackdropCard';
+import SelectableCard from '@/ui/SelectableCard';
+import Grid from '@/ui/Grid';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import '../detail/panels/BackdropsPanel.css'; // Reuse existing backdrop panel grid styles
 
@@ -418,17 +419,17 @@ export default function TMDBImageGrid({
 
   if (isLoading) {
     return (
-      <div className="backdrops-grid">
+      <Grid variant={imageType === 'backdrop' ? 'backdrop' : imageType}>
         {Array.from({ length: 8 }).map((_, index) => (
-          <BackdropCard key={`skeleton-${index}`} disabled={true} />
+          <SelectableCard key={`skeleton-${index}`} disabled={true} aspect={imageType === 'backdrop' ? 'landscape' : imageType} />
         ))}
-      </div>
+      </Grid>
     );
   }
 
   return (
     <div className="backdrops-panel">
-      <div className={`backdrops-grid ${imageType === 'logo' ? 'backdrops-grid--logo' : ''}`}>
+      <Grid variant={imageType === 'logo' ? 'logo' : 'backdrop'}>
         {displayedImages.map((img, idx) => {
           const path = img.file_path || img.backdrop_path || img.poster_path || img.logo_path;
           if (!path) return null;
@@ -461,16 +462,16 @@ export default function TMDBImageGrid({
           const infoRight = img.vote_average ? `★ ${img.vote_average.toFixed(1)}` : '';
 
           return (
-            <BackdropCard
+            <SelectableCard
               key={`${path}-${idx}`}
               imageUrl={thumbUrl}
               alt={`${imageType} ${idx + 1}`}
-              isSelected={isSelected}
+              selected={isSelected}
               isPending={isImagePending}
+              aspect={imageType === 'backdrop' ? 'landscape' : imageType}
               infoLeft={infoLeft}
               infoRight={infoRight}
               onClick={() => handleSelectImage(path)}
-              className={imageType === 'logo' ? 'ui-backdrop-card--logo' : (imageType === 'poster' ? 'ui-backdrop-card--poster' : '')}
             />
           );
         })}
@@ -487,7 +488,7 @@ export default function TMDBImageGrid({
         {hasMore && (
           <div ref={loadMoreRef} className="backdrops-panel__load-more-trigger" aria-hidden="true" />
         )}
-      </div>
+      </Grid>
     </div>
   );
 }

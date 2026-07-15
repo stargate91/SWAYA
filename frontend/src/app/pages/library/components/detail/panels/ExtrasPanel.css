@@ -21,7 +21,7 @@
 }
 
 .extras-panel__group-title {
-  --mb-offset: 2px;
+  --mb-offset: 0.125rem;
   margin-bottom: var(--mb-offset);
 }
 

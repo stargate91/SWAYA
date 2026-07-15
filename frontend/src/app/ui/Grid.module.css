@@ -1,0 +1,124 @@
+.grid {
+  display: grid;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Default / Poster Variant (8 cols descending) */
+.grid[data-variant="default"],
+.grid[data-variant="poster"] {
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: var(--space-xl);
+}
+
+@media (max-width: 100rem) {
+  .grid[data-variant="default"],
+  .grid[data-variant="poster"] {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 75rem) {
+  .grid[data-variant="default"],
+  .grid[data-variant="poster"] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 48rem) {
+  .grid[data-variant="default"],
+  .grid[data-variant="poster"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Scene Variant (4 cols descending) */
+.grid[data-variant="scene"] {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-xl);
+}
+
+@media (max-width: 100rem) {
+  .grid[data-variant="scene"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 75rem) {
+  .grid[data-variant="scene"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 48rem) {
+  .grid[data-variant="scene"] {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
+
+/* Backdrop Variant (2 cols descending) */
+.grid[data-variant="backdrop"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md);
+  contain: layout paint;
+}
+
+.grid[data-variant="backdrop"] > * {
+  content-visibility: auto;
+  contain-intrinsic-size: 11.25rem 6.75rem;
+}
+
+@media (max-width: 37.5rem) {
+  .grid[data-variant="backdrop"] {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
+
+/* Logo Variant (3 cols) */
+.grid[data-variant="logo"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-md);
+  contain: layout paint;
+}
+
+.grid[data-variant="logo"] > * {
+  content-visibility: auto;
+  contain-intrinsic-size: 11.25rem 6.75rem;
+}
+
+/* Mixed List Variant (8 cols dense flow) */
+.grid[data-variant="mixed"] {
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: var(--space-xl);
+  grid-auto-flow: dense;
+}
+
+@media (max-width: 100rem) {
+  .grid[data-variant="mixed"] {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 75rem) {
+  .grid[data-variant="mixed"] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 48rem) {
+  .grid[data-variant="mixed"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Auto-fill Poster Variant (Credits 2:3) */
+.grid[data-variant="auto-poster"] {
+  grid-template-columns: repeat(auto-fill, minmax(11.5625rem, 1fr));
+  gap: var(--space-lg) var(--space-md);
+}
+
+/* Auto-fill Scene Variant (Credits 16:9) */
+.grid[data-variant="auto-scene"] {
+  grid-template-columns: repeat(auto-fill, minmax(20.625rem, 1fr));
+  gap: var(--space-lg) var(--space-md);
+}

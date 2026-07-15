@@ -173,11 +173,11 @@
   height: 100%;
 }
 
-.organizer-match-modal :global(.ui-badge--overlay) {
+.organizer-match-modal :global([data-variant="overlay"]) {
   background: color-mix(in srgb, var(--color-accent-blue) 60%, transparent);
 }
 
-.organizer-match-modal :global(.ui-badge--overlay.ui-badge--warning) {
+.organizer-match-modal :global([data-variant="overlay"][data-tone="warning"]) {
   background: color-mix(in srgb, var(--color-state-warning) 75%, transparent);
   color: var(--color-text-inverse);
 }

@@ -1,6 +1,13 @@
 {
   "rules": {
-    "unit-disallowed-list": ["px"],
+    "unit-disallowed-list": [
+      ["px"],
+      {
+        "ignoreProperties": {
+          "px": ["border", "border-width", "border-top", "border-right", "border-bottom", "border-left", "box-shadow"]
+        }
+      }
+    ],
     "function-disallowed-list": ["rgb", "rgba"],
     "declaration-property-value-disallowed-list": {
       "/^(?!--).*(?:color|background|border|outline|box-shadow|text-shadow)/": [
