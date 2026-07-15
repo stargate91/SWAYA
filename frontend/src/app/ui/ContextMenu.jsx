@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import './ContextMenu.css';
+import styles from './ContextMenu.module.css';
 
 export default function ContextMenu({ x, y, onClose, items = [] }) {
   const menuRef = useRef(null);
@@ -45,29 +45,35 @@ export default function ContextMenu({ x, y, onClose, items = [] }) {
     <div
       ref={menuRef}
       role="menu"
-      className="ui-context-menu"
+      className={styles.menu}
       onClick={(e) => e.stopPropagation()}
     >
       {items.map((item, idx) => {
         if (item.divider) {
-          return <div key={`div-${idx}`} className="ui-context-menu__divider" />;
+          return <div key={`div-${idx}`} className={styles.divider} />;
         }
 
         const Icon = item.icon;
+        const itemClassName = `
+          ${styles.item}
+          ${item.className || ''}
+          ${item.className?.includes('is-danger') ? styles['item--danger'] : ''}
+        `.trim();
+
         return (
           <button
             key={item.key || idx}
             type="button"
-            className={`ui-context-menu__item ${item.className || ''}`.trim()}
+            className={itemClassName}
             onClick={() => {
               item.onClick?.();
               onClose();
             }}
             disabled={item.disabled}
           >
-            {Icon && <Icon className="ui-context-menu__icon" size={14} />}
-            <span className="ui-context-menu__label">{item.label}</span>
-            {item.shortcut && <span className="ui-context-menu__shortcut">{item.shortcut}</span>}
+            {Icon && <Icon className={styles.icon} size={14} />}
+            <span className={styles.label}>{item.label}</span>
+            {item.shortcut && <span className={styles.shortcut}>{item.shortcut}</span>}
           </button>
         );
       })}

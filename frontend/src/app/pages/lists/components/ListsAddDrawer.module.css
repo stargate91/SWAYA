@@ -1,4 +1,4 @@
-:global(.ui-drawer).lists-drawer {
+.lists-drawer {
   background: var(--color-surface-overlay);
   backdrop-filter: blur(1.5rem);
 }
@@ -187,8 +187,7 @@
   gap: 0.75rem;
 }
 
-:global(.ui-pill).lists-add-drawer-nsfw-toggle,
-:global(.ui-button).lists-add-drawer-nsfw-toggle {
+.lists-add-drawer-nsfw-toggle {
   font-size: 0.6875rem;
   font-weight: var(--font-weight-semibold);
   border-radius: var(--radius-sm);
@@ -196,7 +195,7 @@
   padding: var(--space-xs) var(--space-md);
 }
 
-:global(.ui-button).add-people-modal__activation-btn--active {
+.add-people-modal__activation-btn--active {
   color: var(--color-state-success);
   background: var(--color-state-success-bg);
   border-color: color-mix(in srgb, var(--color-state-success) 40%, transparent);

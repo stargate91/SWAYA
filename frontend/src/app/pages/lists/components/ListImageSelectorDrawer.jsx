@@ -1,3 +1,4 @@
+import Button from '@/ui/Button';
 import ImageUploadPanel from '@/ui/ImageUploadPanel';
 import Drawer from '@/ui/Drawer';
 import styles from './ListImageSelectorDrawer.module.css';
@@ -13,20 +14,13 @@ export default function ListImageSelectorDrawer({
       isOpen={isOpen}
       onClose={onClose}
       title={state.t('lists.edit_image_title') || 'Edit List Image'}
-      size="md"
-      className="entity-detail-page__drawer--poster"
+      size="sm"
     >
-      <div className={`entity-detail-page__drawer-content ${styles['list-image-selector-drawer-content']}`}>
+      <div className={styles['list-image-selector-drawer-content']}>
         <ImageUploadPanel
-          imageType="square"
-          isPending={state.uploadImageMutation.isPending || state.overrideImageMutation.isPending}
-          t={state.t}
-          onSaveUrl={(url) => {
-            state.overrideImageMutation.mutate(
-              { listId: list.id, path: url },
-              { onSuccess: onClose }
-            );
-          }}
+          aspect="landscape"
+          label={state.t('lists.upload_image_label') || 'Upload custom cover image'}
+          isLoading={state.uploadImageMutation.isPending}
           onUploadFile={(file) => {
             state.uploadImageMutation.mutate(
               { listId: list.id, file },
@@ -36,9 +30,9 @@ export default function ListImageSelectorDrawer({
         />
         {list?.custom_image_path && (
           <div className={styles['list-image-selector-drawer-reset-container']}>
-            <button
-              type="button"
-              className={`ui-button ui-button--secondary-neutral ui-button--md ${styles['list-image-selector-drawer-reset-btn']}`}
+            <Button
+              variant="secondary-neutral"
+              className={styles['list-image-selector-drawer-reset-btn']}
               onClick={() => {
                 state.overrideImageMutation.mutate(
                   { listId: list.id, path: null },
@@ -48,7 +42,7 @@ export default function ListImageSelectorDrawer({
               disabled={state.overrideImageMutation.isPending || state.uploadImageMutation.isPending}
             >
               {state.t('lists.reset_to_default_collage') || 'Reset to Default Collage'}
-            </button>
+            </Button>
           </div>
         )}
       </div>

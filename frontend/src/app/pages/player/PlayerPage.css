@@ -452,17 +452,17 @@
   }
 }
 
-.ui-button.player-page__btn--peak {
+.player-page__btn--peak {
   color: var(--player-color-state-danger);
   transition: color var(--motion-duration-base) var(--motion-ease-standard), transform var(--motion-duration-base) var(--motion-ease-standard);
 }
 
-.ui-button.player-page__btn--peak:hover {
+.player-page__btn--peak:hover {
   color: var(--player-color-state-danger);
   transform: scale(1.1);
 }
 
-.ui-button.player-page__btn--peak-success {
+.player-page__btn--peak-success {
   --peak-pop-anim: peak-pop var(--motion-duration-slow) cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   color: var(--player-color-state-success);
   animation: var(--peak-pop-anim);

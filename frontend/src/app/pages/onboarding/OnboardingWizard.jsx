@@ -1,5 +1,5 @@
-import NavButton from '@/ui/NavButton';
-import { ArrowRight } from '@/ui/icons';
+import Button from '@/ui/Button';
+import { ArrowRight, ArrowLeft } from '@/ui/icons';
 import './OnboardingWizard.css';
 import { useTranslation } from '@/providers/LanguageContext';
 
@@ -185,34 +185,34 @@ export default function OnboardingWizard() {
             <>
               <div />
               <div className="onboarding-footer-actions-cluster">
-                <NavButton className="ui-nav-button--onboarding-back" onClick={handlePrev}>
+                <Button variant="onboarding-back" leftIcon={<ArrowLeft size={14} />} animateIcon onClick={handlePrev}>
                   {t('common.back')}
-                </NavButton>
-                <NavButton
-                  className="ui-nav-button--onboarding-continue"
-                  icon={ArrowRight}
-                  iconPosition="right"
+                </Button>
+                <Button
+                  variant="onboarding-continue"
+                  rightIcon={<ArrowRight size={14} />}
+                  animateIcon
                   onClick={handleNext}
                 >
                   {t('onboarding.buttons.continue')}
-                </NavButton>
+                </Button>
               </div>
             </>
           ) : (
             <>
               {step > 1 && step < 6 ? (
-                <NavButton className="ui-nav-button--onboarding-back" onClick={handlePrev}>
+                <Button variant="onboarding-back" leftIcon={<ArrowLeft size={14} />} animateIcon onClick={handlePrev}>
                   {t('common.back')}
-                </NavButton>
+                </Button>
               ) : (
                 <div />
               )}
 
               {step < 5 ? (
-                <NavButton
-                  className="ui-nav-button--onboarding-continue"
-                  icon={ArrowRight}
-                  iconPosition="right"
+                <Button
+                  variant="onboarding-continue"
+                  rightIcon={<ArrowRight size={14} />}
+                  animateIcon
                   onClick={handleNext}
                   disabled={
                     (step === 2 && configChoice === 'import') ||
@@ -221,26 +221,25 @@ export default function OnboardingWizard() {
                   }
                 >
                   {t('onboarding.buttons.continue')}
-                </NavButton>
+                </Button>
               ) : step === 5 ? (
-                <NavButton
-                  className="ui-nav-button--onboarding-continue"
-                  icon={ArrowRight}
-                  iconPosition="right"
+                <Button
+                  variant="onboarding-continue"
+                  rightIcon={<ArrowRight size={14} />}
+                  animateIcon
                   onClick={handleNext}
                   disabled={folderValidation.valid !== true}
                 >
                   {t('onboarding.buttons.continue')}
-                </NavButton>
+                </Button>
               ) : (
-                <NavButton
-                  className="ui-nav-button--onboarding-continue"
-                  icon={null}
+                <Button
+                  variant="onboarding-continue"
                   onClick={handleFinish}
                   disabled={isFinishing}
                 >
                   {isFinishing ? t('onboarding.buttons.saving') : t('onboarding.buttons.finishSetup')}
-                </NavButton>
+                </Button>
               )}
             </>
           )}

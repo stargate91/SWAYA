@@ -1,10 +1,22 @@
 import PropTypes from 'prop-types';
 import Badge from './Badge';
-import './AdultOverlay.css';
+import styles from './AdultOverlay.module.css';
 
-export default function AdultOverlay({ variant = 'obscure', badgeText = '18+' }) {
+/**
+ * AdultOverlay applies a solid dark overlay (obscure) or glassmorphism blur (blur)
+ * on NSFW/adult content blocks, fading out on container hover.
+ *
+ * @param {object} props
+ * @param {'obscure' | 'blur'} [props.variant] - The overlay rendering style flavor
+ * @param {string} [props.badgeText] - Indicator label text inside the badge (defaults to "18+")
+ * @param {string} [props.className] - Additional class name
+ */
+export default function AdultOverlay({ variant = 'obscure', badgeText = '18+', className = '' }) {
   return (
-    <div className={`ui-adult-overlay ui-adult-overlay--${variant}`}>
+    <div
+      data-variant={variant}
+      className={`${styles.overlay} ${className}`.trim()}
+    >
       {badgeText && <Badge family="adult" tone="danger">{badgeText}</Badge>}
     </div>
   );
@@ -13,4 +25,5 @@ export default function AdultOverlay({ variant = 'obscure', badgeText = '18+' })
 AdultOverlay.propTypes = {
   variant: PropTypes.oneOf(['obscure', 'blur']),
   badgeText: PropTypes.string,
+  className: PropTypes.string,
 };

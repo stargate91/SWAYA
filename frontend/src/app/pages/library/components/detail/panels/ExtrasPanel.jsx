@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { FolderOpen } from '@/ui/icons';
 import Button from '@/ui/Button';
 import Tooltip from '@/ui/Tooltip';
@@ -7,7 +8,7 @@ import './ExtrasPanel.css';
 import { showItemInFolder } from '@/lib/ipc';
 
 
-export default function ExtrasPanel() {
+export default function ExtrasPanel({ variant }) {
   const { state, t, toast } = useMediaDetailContext();
   const {
     item,
@@ -51,7 +52,7 @@ export default function ExtrasPanel() {
   };
 
   return (
-    <div className="details-panel details-panel--custom extras-panel">
+    <div className={`details-panel details-panel--custom extras-panel ${variant === 'drawer' ? 'details-panel--drawer' : ''}`.trim()}>
       <h4 className="details-panel__section-title">
         {t('library.details.extras') || 'Film Extras'}
       </h4>
@@ -124,3 +125,7 @@ export default function ExtrasPanel() {
     </div>
   );
 }
+
+ExtrasPanel.propTypes = {
+  variant: PropTypes.string,
+};

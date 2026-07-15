@@ -5,7 +5,7 @@
   height: 100%;
 }
 
-.ui-card.compact-stats-card {
+.compact-stats-card {
   padding: var(--space-md) var(--space-lg);
   flex: 1;
   display: flex;

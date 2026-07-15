@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Card from '../../../ui/Card';
+import Button from '@/ui/Button';
 import {
   CAMERA_EMOJI,
   COLON_SEPARATOR,
@@ -119,13 +120,14 @@ export default function DocsWizardPanel({
             {step.links && (
               <div className="docs-wizard-slide-links">
                 {step.links.map((link, lidx) => (
-                  <button
+                  <Button
                     key={lidx}
-                    className="ui-button ui-button--secondary ui-button--md docs-wizard-link-btn-inline"
+                    variant="secondary"
+                    className="docs-wizard-link-btn-inline"
                     onClick={(e) => { e.preventDefault(); window.open(link.url, '_blank', 'noopener,noreferrer'); }}
                   >
                     <span>{link.label}</span>
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}
@@ -152,13 +154,14 @@ export default function DocsWizardPanel({
 
             {step.onSave && (
               <div className="docs-wizard-save-container">
-                <button
-                  className="ui-button ui-button--primary ui-button--md docs-wizard-save-btn"
+                <Button
+                  variant="primary"
+                  className="docs-wizard-save-btn"
                   onClick={step.onSave}
                   disabled={saveStatus === 'saving'}
                 >
                   {saveStatus === 'saving' ? (t('about.docs_wizard.saving') || 'Saving...') : (t('about.docs_wizard.save') || 'Save')}
-                </button>
+                </Button>
                 {saveStatus === 'success' && <span className="docs-wizard-save-status-success">{CHECKMARK_EMOJI}{t('about.docs_wizard.saved') || 'Saved successfully!'}</span>}
                 {saveStatus === 'error' && <span className="docs-wizard-save-status-error">{CROSS_EMOJI}{t('about.docs_wizard.save_failed') || 'Failed to save'}</span>}
               </div>
@@ -168,27 +171,29 @@ export default function DocsWizardPanel({
           {steps.length > 1 && (
             <div className="docs-wizard-footer">
               {!isFirst ? (
-                <button
-                  className="ui-button ui-button--secondary ui-button--md docs-wizard-btn-auto"
+                <Button
+                  variant="secondary"
+                  className="docs-wizard-btn-auto"
                   onClick={() => {
                     setWizardStep(currentStepIdx - 1);
                     setSaveStatus(null);
                   }}
                 >
                   {t('about.docs_wizard.back') || 'Back'}
-                </button>
+                </Button>
               ) : <div />}
 
               {!isLast && (
-                <button
-                  className="ui-button ui-button--secondary ui-button--md docs-wizard-btn-next"
+                <Button
+                  variant="secondary"
+                  className="docs-wizard-btn-next"
                   onClick={() => {
                     setWizardStep(currentStepIdx + 1);
                     setSaveStatus(null);
                   }}
                 >
                   {isFirst ? (t('about.docs_wizard.start') || "Let's get it!") : (t('about.docs_wizard.next') || 'Next Step')}
-                </button>
+                </Button>
               )}
             </div>
           )}

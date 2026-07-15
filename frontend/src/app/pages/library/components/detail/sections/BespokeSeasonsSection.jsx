@@ -161,7 +161,7 @@ export default function BespokeSeasonsSection() {
         
         {/* Row 1 Header: Seasons Horizontal Pills */}
         <div className="bespoke-browser-card__pills-header">
-          <ScrollRow ref={seasonsScrollRef} className="bespoke-seasons-pills no-scrollbar" showArrows={true} enableWheelScroll={true} arrowsLayout="column" size="sm">
+          <ScrollRow ref={seasonsScrollRef} containerClassName="bespoke-browser-card__pills-header-scroll-container" className="bespoke-seasons-pills no-scrollbar" showArrows={true} enableWheelScroll={true} arrowsLayout="column" size="sm">
             {seasonsList.map((season) => {
               const isActive = season.season_number === selectedSeasonNumber;
               const title = season.title || `Season ${season.season_number}`;
@@ -246,7 +246,7 @@ export default function BespokeSeasonsSection() {
         {/* Row 2 Header: Episode Pills */}
         {episodes.length > 0 && (
           <div className="bespoke-browser-card__pills-header">
-            <ScrollRow ref={episodesScrollRef} className="bespoke-episodes-pills no-scrollbar" showArrows={true} enableWheelScroll={true} arrowsLayout="column" size="sm">
+            <ScrollRow ref={episodesScrollRef} containerClassName="bespoke-browser-card__pills-header-scroll-container" className="bespoke-episodes-pills no-scrollbar" showArrows={true} enableWheelScroll={true} arrowsLayout="column" size="sm">
               {episodes.map((episode) => {
                 const isActive = episode.id === selectedEpisodeId;
                 const formattedEpNum = formatEpisodeNumber(episode.episode_number);

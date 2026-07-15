@@ -1,5 +1,6 @@
 import { Layers, User, PenLine, Maximize2 } from '@/ui/icons';
 import PosterCard from '@/ui/PosterCard';
+import buttonStyles from '@/ui/IconButton.module.css';
 
 export default function EditableMediaCard({
   mediaUrl,
@@ -17,7 +18,7 @@ export default function EditableMediaCard({
   const editButton = onEditClick ? (
     <button
       type="button"
-      className="ui-image-edit-badge"
+      className={`${buttonStyles['image-edit-badge']} ui-image-edit-badge`}
       onClick={(event) => {
         event.stopPropagation();
         onEditClick();

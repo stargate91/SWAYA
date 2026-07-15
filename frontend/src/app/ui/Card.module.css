@@ -1,24 +1,4 @@
-
-
-.ui-media-card {
-  border: 0;
-  border-radius: calc(var(--radius-md) - var(--radius-sm));
-  overflow: hidden;
-  background: var(--ui-surface-card-media);
-  box-shadow: none;
-}
-
-
-
-.ui-card__eyebrow {
-  color: var(--color-muted);
-  font: var(--text-caption);
-  letter-spacing: calc(2 * var(--letter-spacing-wide));
-  text-transform: uppercase;
-}
-
-/* Card */
-.ui-card {
+.card {
   border: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 7%, transparent);
   border-radius: var(--radius-lg);
   background: var(--ui-surface-card-gradient);
@@ -26,7 +6,7 @@
   backdrop-filter: blur(var(--space-2xl)) saturate(118%);
 }
 
-.ui-card__header {
+.header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -34,16 +14,23 @@
   padding: var(--space-xl) var(--space-xl) 0;
 }
 
-.ui-card__title {
+.eyebrow {
+  color: var(--color-muted);
+  font: var(--text-caption);
+  letter-spacing: calc(2 * var(--letter-spacing-wide));
+  text-transform: uppercase;
+}
+
+.title {
   margin: var(--space-sm) 0 0;
   font: var(--text-title);
 }
 
-.ui-card__body {
+.body {
   padding: var(--space-xl);
 }
 
-.ui-card.ui-card--danger {
+.card[data-variant="danger"] {
   border: 0.0625rem solid var(--ui-surface-danger-border);
   background: 
     linear-gradient(180deg, var(--ui-surface-danger-tint) 0%, transparent 50%),
@@ -51,7 +38,11 @@
   box-shadow: var(--ui-surface-danger-shadow), var(--shadow-md);
 }
 
-.ui-card.ui-card--danger .ui-card__eyebrow {
+.card[data-variant="danger"] .eyebrow {
   color: var(--color-state-danger);
   font-weight: var(--font-weight-semibold);
+}
+
+.card[data-variant="danger"] .title {
+  color: color-mix(in srgb, var(--color-state-danger) 26%, white);
 }

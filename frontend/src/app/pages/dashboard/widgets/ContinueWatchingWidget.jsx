@@ -8,6 +8,7 @@ import { usePlayMediaMutation, useResetProgressMutation, useSettingsQuery } from
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 import Tooltip from '../../../ui/Tooltip';
+import IconButton from '../../../ui/IconButton';
 import styles from './ContinueWatchingWidget.module.css';
 
 import { formatEpisodeCode } from '../../../lib/episodeFormat';
@@ -148,14 +149,22 @@ const ContinueWatchingWidget = ({ T }) => {
       </div>
       <div className={styles['continue-watching-shell']}>
         {showLeft && (
-          <button className="ui-carousel-arrow is-left" onClick={() => scroll('left')}>
+          <IconButton
+            variant="carousel-arrow"
+            className={styles['is-left']}
+            onClick={() => scroll('left')}
+          >
             <ChevronLeft size={24} />
-          </button>
+          </IconButton>
         )}
         {showRight && (
-          <button className="ui-carousel-arrow is-right" onClick={() => scroll('right')}>
+          <IconButton
+            variant="carousel-arrow"
+            className={styles['is-right']}
+            onClick={() => scroll('right')}
+          >
             <ChevronRight size={24} />
-          </button>
+          </IconButton>
         )}
         <div ref={scrollRef} onScroll={updateArrows} className={`${styles['continue-watching-row']} no-scrollbar`}>
         {localItems.map((item) => {
@@ -176,6 +185,8 @@ const ContinueWatchingWidget = ({ T }) => {
               key={`cw-${item.id}`}
               aspect="landscape"
               className={`${styles['continue-watching-card']} ${item.is_active ? styles['continue-watching-card--active'] : ''}`}
+              imageWrapperClassName={styles['continue-watching-card-image-wrapper']}
+              imageClassName={styles['continue-watching-card-image']}
               imageUrl={resolvedImageUrl}
               onClick={() => {
                 const preferredPlayer = settings.preferred_player || 'swaya';

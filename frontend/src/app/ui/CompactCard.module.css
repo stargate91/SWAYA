@@ -1,4 +1,4 @@
-.ui-compact-card {
+.card {
   display: flex;
   align-items: center;
   gap: var(--space-md);
@@ -13,23 +13,23 @@
   box-sizing: border-box;
 }
 
-.ui-compact-card:not(.is-disabled) {
+button.card:not([data-disabled="true"]) {
   cursor: pointer;
 }
 
-.ui-compact-card:not(.is-disabled):hover {
+button.card:not([data-disabled="true"]):hover {
   background: var(--ui-control-bg-hover);
   border-color: var(--color-border-heavy);
 }
 
-.ui-compact-card.is-active {
+.card[data-active="true"] {
   background: var(--ui-control-bg);
   border-color: var(--color-accent);
   box-shadow: 0 0 0 0.0625rem var(--color-accent);
 }
 
 /* Poster container */
-.ui-compact-card__poster-wrapper {
+.poster-wrapper {
   position: relative;
   flex-shrink: 0;
   overflow: hidden;
@@ -37,14 +37,14 @@
   border: 0.0625rem solid var(--ui-control-border);
 }
 
-.ui-compact-card__image {
+.image {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.ui-compact-card__placeholder {
+.placeholder {
   display: grid;
   place-items: center;
   width: 100%;
@@ -53,32 +53,32 @@
 }
 
 /* Aspect ratios with separate rounded corners and sizes */
-.ui-compact-card--aspect-poster .ui-compact-card__poster-wrapper {
+.card[data-aspect="poster"] .poster-wrapper {
   width: var(--button-height-lg);
   height: 4.875rem;
   border-radius: var(--radius-sm);
 }
 
-.ui-compact-card--aspect-landscape .ui-compact-card__poster-wrapper {
+.card[data-aspect="landscape"] .poster-wrapper {
   width: 6.5rem;
   height: 3.625rem;
   border-radius: var(--radius-sm);
 }
 
-.ui-compact-card--aspect-square .ui-compact-card__poster-wrapper {
+.card[data-aspect="square"] .poster-wrapper {
   width: calc(4 * var(--space-lg));
   height: calc(4 * var(--space-lg));
   border-radius: var(--radius-sm);
 }
 
-.ui-compact-card--aspect-circle .ui-compact-card__poster-wrapper {
+.card[data-aspect="circle"] .poster-wrapper {
   width: var(--space-6xl);
   height: var(--space-6xl);
   border-radius: var(--radius-full);
 }
 
 /* Body and Typography */
-.ui-compact-card__body {
+.body {
   flex: 1;
   min-width: 0;
   display: flex;
@@ -86,7 +86,7 @@
   gap: var(--space-xs);
 }
 
-.ui-compact-card__topline {
+.topline {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -94,7 +94,7 @@
   width: 100%;
 }
 
-.ui-compact-card__title {
+.title {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   line-height: 1.35;
@@ -104,11 +104,11 @@
   text-overflow: ellipsis;
 }
 
-.ui-compact-card__badge {
+.badge {
   flex-shrink: 0;
 }
 
-.ui-compact-card__meta {
+.meta {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
@@ -118,7 +118,7 @@
   flex-wrap: wrap;
 }
 
-.ui-compact-card__description {
+.description {
   margin: 0;
   font-size: var(--font-size-xs);
   line-height: 1.5;
@@ -129,10 +129,46 @@
   overflow: hidden;
 }
 
-.ui-compact-card__right {
+.right {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   margin-left: auto;
 }
+
+/* Compact sm variant overrides */
+.card[data-size="sm"] {
+  padding: var(--space-sm);
+  gap: var(--space-sm);
+}
+
+.card[data-size="sm"][data-aspect="poster"] .poster-wrapper {
+  width: 2.25rem;
+  height: 3.375rem;
+}
+
+.card[data-size="sm"][data-aspect="landscape"] .poster-wrapper {
+  width: 4rem;
+  height: 2.25rem;
+}
+
+.card[data-size="sm"][data-aspect="square"] .poster-wrapper {
+  width: 2rem;
+  height: 2rem;
+}
+
+.card[data-size="sm"][data-aspect="circle"] .poster-wrapper {
+  width: 2rem;
+  height: 2rem;
+}
+
+.card[data-size="sm"] .title {
+  font-size: var(--font-size-xs);
+}
+
+.card[data-size="sm"] .meta,
+.card[data-size="sm"] .description {
+  font-size: var(--font-size-2xs);
+}
+

@@ -48,19 +48,15 @@
 .ui-pagination__size,
 .ui-pagination__button,
 .ui-pagination__page-display {
+  min-height: calc(2 * var(--space-lg));
   height: calc(2 * var(--space-lg));
   padding: 0 var(--space-md);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
 }
 
-.ui-pagination__button.ui-button,
-.ui-pagination__size.ui-button,
-.ui-pagination__page-display.ui-button {
-  min-height: calc(2 * var(--space-lg));
-  height: calc(2 * var(--space-lg));
-  padding: 0 var(--space-md);
-  font-size: var(--font-size-xs);
+.ui-pagination__page-display {
+  padding: 0 var(--space-sm);
 }
 
 .ui-pagination__size.is-active {
@@ -89,10 +85,6 @@
   align-items: center;
   gap: var(--space-sm);
   min-width: 0;
-}
-
-.ui-pagination__page-display.ui-button {
-  padding: 0 var(--space-sm);
 }
 
 .ui-pagination__page--editable input {

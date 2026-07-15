@@ -1,6 +1,6 @@
 import Button from '../../../ui/Button';
 import CardMetadata from '../../../ui/CardMetadata';
-import NavButton from '../../../ui/NavButton';
+import { ArrowLeft } from '../../../ui/icons';
 import styles from '../MatchModal.module.css';
 
 export default function MatchModalBrowserToolbar({
@@ -21,9 +21,9 @@ export default function MatchModalBrowserToolbar({
 
   return (
     <div className={styles['organizer-match-modal__browser-toolbar']}>
-      <NavButton onClick={onBack}>
+      <Button variant="secondary-neutral" leftIcon={<ArrowLeft size={14} />} animateIcon onClick={onBack}>
         {t('common.back')}
-      </NavButton>
+      </Button>
       <div className={styles['organizer-match-modal__browser-copy']}>
         <strong className={styles['organizer-match-modal__browser-title']}>{browserTitle}</strong>
         <CardMetadata.Row className={styles['organizer-match-modal__browser-meta']} items={browserMetaItems} />

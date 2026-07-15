@@ -1,16 +1,16 @@
-.ui-meta-row {
+.row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-xs);
 }
 
-.ui-meta-row__item {
+.item {
   display: inline-flex;
   align-items: center;
 }
 
-.ui-meta-row__item+.ui-meta-row__item::before {
+.item + .item::before {
   content: "-";
   margin-right: var(--space-xs);
   opacity: 0.4;

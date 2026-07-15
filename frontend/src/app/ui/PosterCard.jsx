@@ -1,26 +1,28 @@
 import { memo, useState, useEffect } from 'react';
-import MediaCard from './MediaCard';
+import PropTypes from 'prop-types';
+
 import IconButton from './IconButton';
 import CardMetadata from './CardMetadata';
 import Tooltip from './Tooltip';
-import { Check } from '@/ui/icons';
+import Badge from './Badge';
+import { Check, Star, Heart } from '@/ui/icons';
 import { API_BASE } from '@/lib/backend';
 import { useSettingsQuery } from '@/queries/settingsQueries';
-import './PosterCard.css';
+import styles from './PosterCard.module.css';
 
 const PosterCard = memo(function PosterCard({
   as: Component,
   className = '',
   variant = 'default',
-  aspect = 'poster', // 'poster' or 'landscape'
+  aspect = 'poster', // 'poster', 'landscape', or 'mixed-landscape'
   imageUrl,
   backgroundColor,
   icon: IconComponent,
   placeholderText,
   title,
   subtitle,
-  badge,
-  topRightBadge,
+  userRating = 0,
+  isFavorite = false,
   topRightAction,
   topLeftAction,
   isWatched = false,
@@ -31,21 +33,25 @@ const PosterCard = memo(function PosterCard({
   ratingPorndb,
   ratingPill,
   performers,
+  date,
   onClick,
   disabled = false,
   active = false,
   disableHoverAnimation = false,
+  fillHeight = false,
+  imageWrapperClassName = '',
+  imageClassName = '',
   style,
   customStyle,
   children,
   previewItemId,
   previewEnabled = true,
   previewDelay = 800,
+  isMissing = false,
   ...props
 }) {
   const isInteractive = !!onClick;
-  const hasInteractiveChildren = Boolean(children);
-  const DefaultComponent = Component || ((isInteractive && !hasInteractiveChildren) ? 'button' : 'div');
+  const DefaultComponent = Component || 'div';
   const isOverlayTitle = variant === 'overlay-title';
 
   const [imageError, setImageError] = useState(false);
@@ -110,7 +116,12 @@ const PosterCard = memo(function PosterCard({
     }
   };
 
-  const cardClassName = `ui-poster-card ui-poster-card--aspect-${aspect} ${isOverlayTitle ? 'ui-poster-card--overlay-title' : ''} ${active ? 'is-active' : ''} ${disableHoverAnimation ? 'no-hover-animation' : ''} ${className}`.trim();
+  const cardClassName = `
+    ${styles.card}
+    ${active ? styles['is-active'] : ''}
+    ${disableHoverAnimation ? styles['no-hover-animation'] : ''}
+    ${className}
+  `.trim();
 
   const interactiveProps = {};
   if (DefaultComponent === 'div' && isInteractive) {
@@ -119,45 +130,47 @@ const PosterCard = memo(function PosterCard({
     interactiveProps.onKeyDown = handleKeyDown;
   }
 
-
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
       className={cardClassName}
+      data-aspect={aspect}
+      data-variant={variant}
+      data-fill-height={fillHeight}
+      data-clickable={!!onClick || undefined}
+      data-missing={isMissing || undefined}
       // eslint-disable-next-line react/forbid-dom-props
       style={customStyle || style}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={disabled ? undefined : onClick}
+      {...interactiveProps}
+      {...props}
     >
-      <div className="ui-poster-card__media-shell">
+      <div className={styles['media-shell']}>
         <DefaultComponent
-          type={DefaultComponent === 'button' ? 'button' : undefined}
-          className="ui-poster-card__image-wrapper"
-          onClick={onClick}
-          disabled={disabled || undefined}
-          {...interactiveProps}
-          {...props}
+          className={`${styles['image-wrapper']} ${imageWrapperClassName}`.trim()}
         >
-          <MediaCard className="ui-poster-card__media">
+          <div className={styles.media}>
             {imageUrl && !imageError ? (
               <img
                 src={imageUrl}
                 alt=""
-                className="ui-poster-card__image"
+                className={`${styles.image} ${imageClassName}`.trim()}
                 onError={() => setImageError(true)}
               />
             ) : (
               <div
-                className="ui-poster-card__placeholder"
+                className={styles.placeholder}
                 // eslint-disable-next-line react/forbid-dom-props
                 style={backgroundColor ? { background: backgroundColor } : undefined}
               >
-                {IconComponent && <IconComponent size={32} className="ui-poster-card__placeholder-icon" />}
-                {placeholderText && <span className="ui-poster-card__placeholder-text">{placeholderText}</span>}
+                {IconComponent && <IconComponent size={32} className={styles['placeholder-icon']} />}
+                {placeholderText && <span className={styles['placeholder-text']}>{placeholderText}</span>}
               </div>
             )}
             {isHovered && previewItemId && previewEnabled && hoverPreviewsEnabled && !isVideoPlaying && (
-              <div className="ui-poster-card__hover-overlay" />
+              <div className={styles['hover-overlay']} />
             )}
             {previewSrc && (
               <video
@@ -174,43 +187,47 @@ const PosterCard = memo(function PosterCard({
                 playsInline
                 onPlay={() => setIsVideoPlaying(true)}
                 onPlaying={() => setIsVideoPlaying(true)}
-                className="ui-poster-card__image"
+                className={`${styles.image} ${styles['preview-video']} ${imageClassName}`.trim()}
                 // eslint-disable-next-line react/forbid-dom-props
                 style={{
-                  position: 'absolute',
-                  inset: 0,
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  zIndex: 'var(--z-index-step-3)',
                   opacity: isVideoPlaying ? 1 : 0,
-                  transition: 'opacity 0.35s ease-in-out',
                 }}
               />
             )}
             {isLoadingPreview && (
-              <div className="ui-poster-card__loader-overlay">
-                <div className="ui-poster-card__loader-spinner" />
+              <div className={styles['loader-overlay']}>
+                <div className={styles['loader-spinner']} />
               </div>
             )}
             {overlay}
-            {badge}
-            {topRightBadge}
+            {userRating > 0 && (
+              <Badge
+                className={styles['user-rating-badge']}
+                leftIcon={<Star size={10} fill="currentColor" />}
+              >
+                {Number.isInteger(userRating) ? String(userRating) : userRating.toFixed(1)}
+              </Badge>
+            )}
+            {isFavorite && (
+              <div className={styles['favorite-badge']}>
+                <Heart size={14} fill="currentColor" strokeWidth={2.2} />
+              </div>
+            )}
             {isWatched && (
-              <div className="ui-poster-card__watched-badge">
+              <div className={styles['watched-badge']}>
                 <Check size={14} strokeWidth={3} />
               </div>
             )}
             {isOverlayTitle && title ? (
-              <div className="ui-poster-card__title-overlay">
-                <div className="ui-poster-card__title-overlay-gradient" />
+              <div className={styles['title-overlay']}>
+                <div className={styles['title-overlay-gradient']} />
                 <Tooltip content={title} side="top">
-                  <div className="ui-poster-card__title-overlay-label">{title}</div>
+                  <div className={styles['title-overlay-label']}>{title}</div>
                 </Tooltip>
               </div>
             ) : null}
             {children}
-          </MediaCard>
+          </div>
         </DefaultComponent>
         {topLeftAction}
         {topRightAction}
@@ -236,10 +253,68 @@ const PosterCard = memo(function PosterCard({
           ratingTmdb={ratingTmdb}
           ratingPorndb={ratingPorndb}
           ratingPill={ratingPill}
+          date={date}
+          className={styles.details}
+          titleClassName={styles.title}
+          subtitleRowClassName={styles['subtitle-row']}
+          subtitleClassName={styles.subtitle}
+          performerLinkClassName={styles['performer-link']}
+          metaRightClassName={styles['meta-right']}
+          dateClassName={styles.date}
         />
       )}
     </div>
   );
 });
+
+PosterCard.propTypes = {
+  as: PropTypes.oneOfType([PropTypes.string, PropTypes.elementType]),
+  className: PropTypes.string,
+  variant: PropTypes.string,
+  aspect: PropTypes.string,
+  imageUrl: PropTypes.string,
+  backgroundColor: PropTypes.string,
+  icon: PropTypes.elementType,
+  placeholderText: PropTypes.string,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  subtitle: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  userRating: PropTypes.number,
+  isFavorite: PropTypes.bool,
+  topRightAction: PropTypes.node,
+  topLeftAction: PropTypes.node,
+  isWatched: PropTypes.bool,
+  overlay: PropTypes.node,
+  playOverlay: PropTypes.shape({
+    onClick: PropTypes.func.isRequired,
+    icon: PropTypes.node.isRequired,
+    label: PropTypes.string,
+    disabled: PropTypes.bool,
+  }),
+  ratingImdb: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  ratingTmdb: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  ratingPorndb: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  ratingPill: PropTypes.node,
+  performers: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      name: PropTypes.string.isRequired,
+    })
+  ),
+  date: PropTypes.string,
+  onClick: PropTypes.func,
+  disabled: PropTypes.bool,
+  active: PropTypes.bool,
+  disableHoverAnimation: PropTypes.bool,
+  fillHeight: PropTypes.bool,
+  imageWrapperClassName: PropTypes.string,
+  imageClassName: PropTypes.string,
+  style: PropTypes.object,
+  customStyle: PropTypes.object,
+  children: PropTypes.node,
+  previewItemId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  previewEnabled: PropTypes.bool,
+  previewDelay: PropTypes.number,
+  isMissing: PropTypes.bool,
+};
 
 export default PosterCard;

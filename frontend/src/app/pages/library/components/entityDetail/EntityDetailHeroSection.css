@@ -647,11 +647,10 @@
   box-shadow: var(--shadow-lg);
 }
 
-
-.entity-detail-page__media-card--editable:hover .ui-image-edit-badge,
-.entity-detail-page__media-card--editable:focus-within .ui-image-edit-badge {
-  opacity: 1;
-  transform: translateY(0);
+.entity-detail-page__media-card--editable:hover,
+.entity-detail-page__media-card--editable:focus-within {
+  --image-edit-badge-opacity: 1;
+  --image-edit-badge-translate-y: 0;
 }
 
 .entity-detail-page__social-overlay {

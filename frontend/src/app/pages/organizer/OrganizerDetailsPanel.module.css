@@ -140,25 +140,6 @@
   box-shadow: var(--shadow-sm);
 }
 
-.organizer-details__poster-card.has-image:hover :global(.ui-poster-card__image-wrapper),
-.organizer-details__poster-card.has-image:focus-within :global(.ui-poster-card__image-wrapper) {
-  transform: translateY(var(--motion-lift-distance-md));
-  box-shadow: inset 0 0 0 1px var(--color-border-strong);
-}
-
-.organizer-details__poster-card button:global(.ui-poster-card__image-wrapper):hover:not(:disabled),
-.organizer-details__poster-card div:global(.ui-poster-card__image-wrapper):hover,
-.organizer-details__poster-card :global(.ui-poster-card__image-wrapper):focus-visible,
-.organizer-details__poster-card.is-active button:global(.ui-poster-card__image-wrapper):hover:not(:disabled) {
-  box-shadow: none;
-}
-
-.organizer-details__poster-card.is-active :global(.ui-poster-card__image-wrapper) {
-  box-shadow: none;
-}
-
-
-
 .organizer-details__poster-image {
   display: block;
   aspect-ratio: 2 / 3;
@@ -169,20 +150,6 @@
   transform: scale(1);
   transform-origin: right center;
   transition: transform var(--motion-duration-fast) var(--motion-ease-emphasized);
-}
-
-.organizer-details :global(.ui-carousel-arrow) {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--motion-fast), background var(--motion-fast), transform var(--motion-fast);
-}
-
-.organizer-details__poster-card:hover :global(.ui-carousel-arrow),
-.organizer-details__poster-card:focus-within :global(.ui-carousel-arrow),
-.organizer-details__backdrop-card:hover :global(.ui-carousel-arrow),
-.organizer-details__backdrop-card:focus-within :global(.ui-carousel-arrow) {
-  opacity: 1;
-  pointer-events: auto;
 }
 
 .organizer-details__image-count {
@@ -218,6 +185,11 @@
 .organizer-details__field {
   min-width: 0;
   padding: var(--space-md) var(--space-md);
+  border: 0;
+  border-radius: calc(var(--radius-md) - var(--radius-sm));
+  overflow: hidden;
+  background: var(--ui-surface-card-media);
+  box-shadow: none;
 }
 
 .organizer-details__field :global(.ui-tooltip) {
@@ -230,7 +202,7 @@
   padding-top: var(--space-xs);
 }
 
-.organizer-details__inspect-button:global(.ui-button) {
+.organizer-details__inspect-button {
   width: 100%;
   justify-content: center;
   border-radius: var(--radius-md);

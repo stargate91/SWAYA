@@ -1,11 +1,12 @@
 import { useRef, useState, useEffect, useCallback, forwardRef, useImperativeHandle } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronLeft, ChevronRight } from '@/ui/icons';
-import './ScrollRow.css';
+import styles from './ScrollRow.module.css';
 
 const ScrollRow = forwardRef(({
   children,
   className = '',
+  containerClassName = '',
   showArrows = true,
   enableWheelScroll = false,
   arrowsLayout = 'overlay', // 'overlay' | 'column'
@@ -62,11 +63,12 @@ const ScrollRow = forwardRef(({
     el.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
   };
 
-  const containerClass = [
-    'ui-scroll-row-container',
-    `ui-scroll-row-container--layout-${arrowsLayout}`,
-    `ui-scroll-row-container--size-${size}`,
-  ].join(' ');
+  const containerClass = `
+    ${styles.container}
+    ${styles[`container--layout-${arrowsLayout}`]}
+    ${styles[`container--size-${size}`]}
+    ${containerClassName}
+  `.trim();
 
   const leftHidden = !showLeft || !showArrows;
   const rightHidden = !showRight || !showArrows;
@@ -77,7 +79,7 @@ const ScrollRow = forwardRef(({
       {showArrows && (
         <button
           type="button"
-          className={`ui-carousel-arrow is-left ${leftHidden ? 'is-hidden' : ''}`}
+          className={`${styles.arrow} ${styles['is-left']} ${leftHidden ? styles['is-hidden'] : ''}`.trim()}
           onClick={() => scroll('left')}
         >
           <ChevronLeft size={arrowIconSize} />
@@ -90,7 +92,7 @@ const ScrollRow = forwardRef(({
           updateArrows();
           onScroll?.(e);
         }}
-        className={`ui-scroll-row-track no-scrollbar ${className}`.trim()}
+        className={`${styles.track} no-scrollbar ${className}`.trim()}
       >
         {children}
       </div>
@@ -98,7 +100,7 @@ const ScrollRow = forwardRef(({
       {showArrows && (
         <button
           type="button"
-          className={`ui-carousel-arrow is-right ${rightHidden ? 'is-hidden' : ''}`}
+          className={`${styles.arrow} ${styles['is-right']} ${rightHidden ? styles['is-hidden'] : ''}`.trim()}
           onClick={() => scroll('right')}
         >
           <ChevronRight size={arrowIconSize} />
@@ -113,6 +115,7 @@ ScrollRow.displayName = 'ScrollRow';
 ScrollRow.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
+  containerClassName: PropTypes.string,
   showArrows: PropTypes.bool,
   enableWheelScroll: PropTypes.bool,
   arrowsLayout: PropTypes.oneOf(['overlay', 'column']),

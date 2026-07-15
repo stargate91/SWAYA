@@ -9,6 +9,7 @@ import {
   History,
   Settings
 } from 'lucide-react';
+import Button from '@/ui/Button';
 
 export const getTmdbWizardSteps = (t, getWizardInputValue, handleInputChange, handleSaveSetting) => [
   {
@@ -76,12 +77,13 @@ export const getTmdbWizardSteps = (t, getWizardInputValue, handleInputChange, ha
                 <span className="about-wizard-dummy-value">{d.value}</span>
               </div>
               {!d.noCopy && (
-                <button
-                  className="ui-button ui-button--secondary ui-button--md about-wizard-dummy-copy-btn"
+                <Button
+                  variant="secondary"
+                  className="about-wizard-dummy-copy-btn"
                   onClick={(e) => { e.preventDefault(); navigator.clipboard.writeText(d.value); }}
                 >
                   {t('about.docs_wizard.copy') || 'Copy'}
-                </button>
+                </Button>
               )}
             </div>
           ))}
@@ -156,12 +158,13 @@ export const getOmdbWizardSteps = (t, getWizardInputValue, handleInputChange, ha
                 <span className="about-wizard-dummy-value">{d.value}</span>
               </div>
               {!d.noCopy && (
-                <button
-                  className="ui-button ui-button--secondary ui-button--md about-wizard-dummy-copy-btn"
+                <Button
+                  variant="secondary"
+                  className="about-wizard-dummy-copy-btn"
                   onClick={(e) => { e.preventDefault(); navigator.clipboard.writeText(d.value); }}
                 >
                   {t('about.docs_wizard.copy') || 'Copy'}
-                </button>
+                </Button>
               )}
             </div>
           ))}
@@ -224,12 +227,13 @@ export const getStashdbWizardSteps = (t, getWizardInputValue, handleInputChange,
                 <strong className="about-wizard-dummy-label">{c.label}</strong>
                 <span className="about-wizard-dummy-value">{c.value}</span>
               </div>
-              <button
-                className="ui-button ui-button--secondary ui-button--md about-wizard-dummy-copy-btn"
+              <Button
+                variant="secondary"
+                className="about-wizard-dummy-copy-btn"
                 onClick={(e) => { e.preventDefault(); navigator.clipboard.writeText(c.value); }}
               >
                 {t('about.docs_wizard.copy') || 'Copy'}
-              </button>
+              </Button>
             </div>
           ))}
         </div>

@@ -245,7 +245,7 @@
   margin-top: var(--space-sm);
 }
 
-.settings-danger-zone-card.ui-card {
+.settings-danger-zone-card {
   border-color: color-mix(in srgb, var(--color-state-danger) 46%, var(--color-border-default));
   background:
     radial-gradient(circle at top right, color-mix(in srgb, var(--color-state-danger) 20%, transparent), transparent 34%),
@@ -259,10 +259,6 @@
     0 0 0 1px color-mix(in srgb, var(--color-state-danger) 26%, transparent),
     var(--shadow-md);
   backdrop-filter: var(--glass-blur-lg) saturate(118%);
-}
-
-.settings-danger-zone-card .ui-card__title {
-  color: color-mix(in srgb, var(--color-state-danger) 26%, white);
 }
 
 .settings-danger-zone-card__hint {

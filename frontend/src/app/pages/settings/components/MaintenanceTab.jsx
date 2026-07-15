@@ -45,7 +45,7 @@ export default function MaintenanceTab({
         </Stack>
       </Card>
 
-      <Card title={t('settingsPage.dangerZone.wipeCacheTitle')} eyebrow={t('settingsPage.dangerZone.eyebrow')} className="ui-card--danger settings-danger-zone-card">
+      <Card title={t('settingsPage.dangerZone.wipeCacheTitle')} eyebrow={t('settingsPage.dangerZone.eyebrow')} variant="danger" className="settings-danger-zone-card">
         <Stack>
           <span className="ui-field__hint settings-danger-zone-card__hint">
             {t('settingsPage.dangerZone.wipeCacheDesc')}
@@ -58,7 +58,7 @@ export default function MaintenanceTab({
         </Stack>
       </Card>
 
-      <Card title={t('settingsPage.dangerZone.title')} eyebrow={t('settingsPage.dangerZone.eyebrow')} className="ui-card--danger settings-danger-zone-card">
+      <Card title={t('settingsPage.dangerZone.title')} eyebrow={t('settingsPage.dangerZone.eyebrow')} variant="danger" className="settings-danger-zone-card">
         <Stack>
           <span className="ui-field__hint settings-danger-zone-card__hint">
             {t('settingsPage.dangerZone.desc')}

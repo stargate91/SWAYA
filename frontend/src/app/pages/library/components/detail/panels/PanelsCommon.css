@@ -127,3 +127,24 @@
   display: block;
   width: 100%;
 }
+
+/* Drawer-specific overrides */
+.details-panel--drawer .details-panel__section {
+  --local-margin: 1.75rem;
+  margin-bottom: var(--local-margin);
+}
+
+.details-panel--drawer .details-panel__section-title {
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 0;
+  --local-margin: 0.75rem;
+  margin-bottom: var(--local-margin);
+  --local-border: 0.0625rem solid color-mix(in srgb, white 8%, transparent);
+  border-bottom: var(--local-border);
+  --local-padding: 0.375rem;
+  padding-bottom: var(--local-padding);
+}

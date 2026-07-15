@@ -1,4 +1,5 @@
 import { Mail, Globe } from 'lucide-react';
+import Button from '@/ui/Button';
 import {
   LOGO_LETTER,
   APP_TITLE_TEXT,
@@ -37,22 +38,22 @@ export default function GeneralPanel({ t, appInfo }) {
             </div>
           </div>
           <div className="developer-links-grid">
-            <a href={`mailto:${t('about.app_info.developer_email') || 'leventegall@proton.me'}`} className="ui-button ui-button--secondary ui-button--md" onClick={(e) => { e.preventDefault(); openExternalLink(`mailto:${t('about.app_info.developer_email') || 'leventegall@proton.me'}`); }}>
+            <Button as="a" href={`mailto:${t('about.app_info.developer_email') || 'leventegall@proton.me'}`} variant="secondary" onClick={(e) => { e.preventDefault(); openExternalLink(`mailto:${t('about.app_info.developer_email') || 'leventegall@proton.me'}`); }}>
               <Mail size={16} />
               <span>{t('about.links.email') || 'Email'}</span>
-            </a>
-            <a href={appInfo.developer.website} className="ui-button ui-button--secondary ui-button--md" onClick={(e) => { e.preventDefault(); openExternalLink(appInfo.developer.website); }}>
+            </Button>
+            <Button as="a" href={appInfo.developer.website} variant="secondary" onClick={(e) => { e.preventDefault(); openExternalLink(appInfo.developer.website); }}>
               <Globe size={16} />
               <span>{t('about.links.website') || 'Website'}</span>
-            </a>
-            <a href={appInfo.developer.github} className="ui-button ui-button--secondary ui-button--md" onClick={(e) => { e.preventDefault(); openExternalLink(appInfo.developer.github); }}>
+            </Button>
+            <Button as="a" href={appInfo.developer.github} variant="secondary" onClick={(e) => { e.preventDefault(); openExternalLink(appInfo.developer.github); }}>
               <GitHubIcon size={16} />
               <span>{t('about.links.github') || 'GitHub'}</span>
-            </a>
-            <a href={appInfo.developer.discordServer} className="ui-button ui-button--secondary ui-button--md" onClick={(e) => { e.preventDefault(); openExternalLink(appInfo.developer.discordServer); }}>
+            </Button>
+            <Button as="a" href={appInfo.developer.discordServer} variant="secondary" onClick={(e) => { e.preventDefault(); openExternalLink(appInfo.developer.discordServer); }}>
               <DiscordIcon size={16} />
               <span>{t('about.links.discord_server') || 'Discord Server'}</span>
-            </a>
+            </Button>
           </div>
         </div>
       </div>

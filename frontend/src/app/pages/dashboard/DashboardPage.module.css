@@ -6,11 +6,19 @@
   animation: fadeIn var(--motion-duration-fade) var(--motion-ease-out);
 }
 
+.dashboard-container > *:last-child {
+  margin-bottom: 0;
+}
+
 .dashboard-loading {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: calc(100vh - 7.5rem);
+}
+
+.dashboard-page {
+  /* local class target */
 }
 
 :global(.shell__content):has(.dashboard-page) {

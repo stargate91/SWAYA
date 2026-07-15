@@ -93,6 +93,11 @@
   grid-auto-flow: dense;
 }
 
+.grid[data-variant="mixed"] > *[data-aspect="mixed-landscape"],
+.grid[data-variant="mixed"] > *[data-aspect="landscape"] {
+  grid-column: span 2;
+}
+
 @media (max-width: 100rem) {
   .grid[data-variant="mixed"] {
     grid-template-columns: repeat(6, minmax(0, 1fr));

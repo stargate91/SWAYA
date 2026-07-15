@@ -16,10 +16,6 @@
   overflow: visible;
 }
 
-.dashboard-container .widget-shell:last-child {
-  margin-bottom: 0;
-}
-
 .widget-shell__loading-skeleton {
   width: 100%;
   padding: var(--space-lg) 0;

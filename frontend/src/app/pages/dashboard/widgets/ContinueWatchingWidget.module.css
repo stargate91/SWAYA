@@ -39,21 +39,26 @@
   transform: none;
 }
 
-.continue-watching-card :global(.ui-poster-card__image-wrapper) {
+.continue-watching-card-image-wrapper {
   border-radius: var(--radius-lg);
   box-shadow: 0 var(--space-md) calc(2.5 * var(--space-md)) color-mix(in srgb, black 30%, transparent);
   border: 1px solid var(--color-border-subtle);
   background: var(--color-bg-elevated);
+  isolation: isolate;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
-.continue-watching-card :global(.ui-poster-card__image) {
-  opacity: 0.75;
-  transition: opacity var(--motion-duration-hover) var(--motion-ease-hover), transform var(--motion-duration-hover) var(--motion-ease-hover);
+.continue-watching-card-image {
+  opacity: 0.7;
+  filter: brightness(0.85);
+  transition: opacity var(--motion-duration-hover) var(--motion-ease-hover), filter var(--motion-duration-hover) var(--motion-ease-hover), transform var(--motion-duration-hover) var(--motion-ease-hover);
 }
 
-.continue-watching-card:hover :global(.ui-poster-card__image) {
-  opacity: 0.9;
-  transform: scale(1.06);
+.continue-watching-card:hover .continue-watching-card-image {
+  opacity: 1;
+  filter: brightness(1);
+  transform: scale(1.03);
 }
 
 .continue-watching-card :global(.ui-tooltip) {
@@ -85,7 +90,7 @@
   cursor: default;
 }
 
-.continue-watching-card.continue-watching-card--active :global(.ui-poster-card__image) {
+.continue-watching-card.continue-watching-card--active .continue-watching-card-image {
   opacity: 0.45;
 }
 
@@ -115,12 +120,9 @@
 .continue-watching-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, color-mix(in srgb, var(--color-bg-app) 90%, transparent) 0%, color-mix(in srgb, var(--color-bg-app) 30%, transparent) 60%, transparent 100%);
+  background: linear-gradient(to top, color-mix(in srgb, var(--color-bg-canvas) 90%, transparent) 0%, color-mix(in srgb, var(--color-bg-canvas) 30%, transparent) 60%, transparent 100%);
 }
 
-.continue-watching-card:hover :global(.ui-icon-button--play-overlay) {
-  opacity: 1;
-}
 
 .continue-watching-progress-track {
   position: absolute;
@@ -211,3 +213,12 @@
     opacity: 0.9;
   }
 }
+
+.is-left {
+  left: 0.625rem;
+}
+
+.is-right {
+  right: 0.625rem;
+}
+

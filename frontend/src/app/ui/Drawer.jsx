@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import { X } from '@/ui/icons';
 import { useTranslation } from '../providers/LanguageContext';
 import IconButton from './IconButton';
-import './Drawer.css';
+import styles from './Drawer.module.css';
 
 export default function Drawer({
   isOpen,
@@ -18,6 +18,7 @@ export default function Drawer({
   children,
 }) {
   const { t } = useTranslation();
+  const drawerRef = useRef(null);
 
   const actualHasBackdrop = hasBackdrop !== undefined ? hasBackdrop : (variant !== 'glass');
 
@@ -33,8 +34,7 @@ export default function Drawer({
   useEffect(() => {
     if (!isOpen || actualHasBackdrop) return;
     const handleDocumentClick = (e) => {
-      const drawerEl = document.querySelector('.ui-drawer');
-      if (drawerEl && !drawerEl.contains(e.target) && document.body.contains(e.target)) {
+      if (drawerRef.current && !drawerRef.current.contains(e.target) && document.body.contains(e.target)) {
         onClose();
       }
     };
@@ -49,24 +49,32 @@ export default function Drawer({
 
   if (!isOpen || typeof document === 'undefined') return null;
 
+  const drawerClass = `
+    ${styles.drawer}
+    ${styles[`drawer--${size}`]}
+    ${styles[`drawer--${variant}`]}
+    ${className}
+  `.trim();
+
   return createPortal(
     <>
       {actualHasBackdrop && (
         <div
-          className="ui-drawer-backdrop"
+          className={styles.backdrop}
           onClick={onClose}
           role="presentation"
         />
       )}
       <div
-        className={`ui-drawer ui-drawer--${size} ui-drawer--${variant} ${className}`.trim()}
+        ref={drawerRef}
+        className={drawerClass}
         // eslint-disable-next-line react/forbid-dom-props
         style={style}
         role="dialog"
         aria-modal="true"
       >
-        <div className="ui-drawer__header">
-          {title && <h3 className="ui-drawer__title">{title}</h3>}
+        <div className={styles.header}>
+          {title && <h3 className={styles.title}>{title}</h3>}
           <IconButton
             type="button"
             variant="close"
@@ -80,7 +88,7 @@ export default function Drawer({
             <X size={18} />
           </IconButton>
         </div>
-        <div className="ui-drawer__content">
+        <div className={styles.content}>
           {children}
         </div>
       </div>

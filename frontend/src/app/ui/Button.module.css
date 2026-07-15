@@ -1,0 +1,233 @@
+/* Basic Buttons */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  border: 0.0625rem solid transparent;
+  border-radius: var(--radius-input);
+  font: var(--text-caption);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition:
+    background-color var(--motion-fast),
+    border-color var(--motion-fast),
+    color var(--motion-fast),
+    box-shadow var(--motion-fast),
+    filter var(--motion-fast),
+    transform var(--motion-fast),
+    opacity var(--motion-fast);
+  outline: none;
+  text-decoration: none;
+  text-align: center;
+}
+
+/* Inner Icon and Content layouts */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--color-muted);
+  transition: transform var(--motion-fast), color var(--motion-fast);
+}
+
+.content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  line-height: 1;
+  margin-top: calc(var(--space-xs) / 4);
+}
+
+/* Icon hover animations when enabled */
+.button[data-animate-icon="true"]:hover:not(:disabled) span[data-button-icon="left"] {
+  transform: translateX(calc(-1 * var(--radius-2xs)));
+}
+
+.button[data-animate-icon="true"]:hover:not(:disabled) span[data-button-icon="right"] {
+  transform: translateX(var(--radius-2xs));
+}
+
+.button[data-size="sm"] {
+  min-height: var(--button-height-sm);
+  padding: var(--button-padding-sm);
+}
+
+.button[data-size="md"] {
+  min-height: var(--button-height-md);
+  padding: var(--button-padding-md);
+}
+
+.button[data-size="lg"] {
+  min-height: var(--button-height-lg);
+  padding: var(--button-padding-lg);
+}
+
+.button[data-variant="primary"] {
+  background: var(--button-primary-bg);
+  color: var(--button-primary-color);
+  box-shadow: var(--button-primary-shadow);
+  border: 0;
+}
+
+.button[data-variant="primary-neutral"] {
+  background: var(--button-primary-neutral-bg);
+  color: var(--button-primary-neutral-color);
+  border-color: var(--button-primary-neutral-border);
+}
+
+.button[data-variant="secondary"] {
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-color);
+  border-color: var(--button-secondary-border);
+}
+
+.button[data-variant="secondary-neutral"] {
+  background: var(--button-secondary-neutral-bg);
+  color: var(--button-secondary-neutral-color);
+  border-color: var(--button-secondary-neutral-border);
+}
+
+.button[data-variant="ghost"] {
+  background: var(--button-ghost-bg);
+  color: var(--button-ghost-color-override);
+  border-color: var(--button-ghost-border);
+}
+
+.button[data-variant="danger"] {
+  background: var(--button-danger-bg);
+  color: var(--button-danger-color);
+  border-color: var(--button-danger-border);
+}
+
+/* Onboarding Wizard Variants (migrated from NavButton) */
+.button[data-variant="onboarding-back"] {
+  min-height: var(--ui-overlay-top);
+  padding: 0 var(--space-xl);
+  border-radius: var(--radius-lg);
+  border-color: color-mix(in srgb, var(--button-secondary-border) 42%, var(--color-border-default));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-text-primary) 2.5%, transparent), color-mix(in srgb, var(--color-text-primary) 0.8%, transparent)),
+    linear-gradient(180deg, color-mix(in srgb, var(--color-text-inverse) 92%, transparent), color-mix(in srgb, var(--color-text-inverse) 98%, transparent));
+  color: color-mix(in srgb, var(--button-secondary-color) 52%, var(--color-text-secondary) 48%);
+  box-shadow:
+    0 0.625rem 1.5rem color-mix(in srgb, black 18%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-text-primary) 1.2%, transparent),
+    inset 0 1px 0 var(--color-surface-glass);
+}
+
+.button[data-variant="onboarding-back"] .icon {
+  color: color-mix(in srgb, var(--button-secondary-color) 48%, var(--color-muted));
+}
+
+.button[data-variant="onboarding-back"] .content {
+  font-weight: var(--font-weight-semibold);
+}
+
+.button[data-variant="onboarding-continue"] {
+  min-height: var(--ui-overlay-top);
+  padding: 0 var(--space-xl);
+  border-radius: var(--radius-lg);
+  border-color: color-mix(in srgb, var(--button-secondary-color) 22%, var(--color-border-default));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-text-primary) 7%, transparent), color-mix(in srgb, var(--color-text-primary) 1.8%, transparent)),
+    linear-gradient(180deg, color-mix(in srgb, var(--button-secondary-border) 82%, transparent), color-mix(in srgb, var(--button-secondary-border) 98%, transparent));
+  color: color-mix(in srgb, var(--button-secondary-color) 78%, white 22%);
+  box-shadow:
+    0 0.875rem 1.875rem color-mix(in srgb, black 24%, transparent),
+    0 0 0 1px var(--color-surface-card),
+    inset 0 1px 0 var(--color-border-default);
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.01em;
+}
+
+.button[data-variant="onboarding-continue"] .icon {
+  color: color-mix(in srgb, var(--button-secondary-color) 82%, white 18%);
+}
+
+.button[data-variant="onboarding-continue"] .content {
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.015em;
+}
+
+.button:hover:not(:disabled) .icon {
+  color: var(--color-ink);
+}
+
+.button[data-variant="onboarding-back"]:hover:not(:disabled) {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-text-primary) 3.5%, transparent), color-mix(in srgb, var(--color-text-primary) 1.2%, transparent)),
+    linear-gradient(180deg, color-mix(in srgb, var(--color-text-inverse) 96%, transparent), var(--color-text-inverse));
+  border-color: color-mix(in srgb, var(--button-secondary-color) 18%, var(--color-border-default));
+  color: color-mix(in srgb, var(--button-secondary-color) 68%, white 8%);
+  box-shadow:
+    0 0.75rem 1.75rem color-mix(in srgb, black 22%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-text-primary) 1.8%, transparent),
+    inset 0 1px 0 var(--var-color-border-default, var(--color-border-default));
+}
+
+.button[data-variant="onboarding-back"]:hover:not(:disabled) .icon {
+  color: color-mix(in srgb, var(--button-secondary-color) 74%, white 10%);
+}
+
+.button[data-variant="onboarding-continue"]:hover:not(:disabled) {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-text-primary) 9%, transparent), color-mix(in srgb, var(--color-text-primary) 2.4%, transparent)),
+    linear-gradient(180deg, color-mix(in srgb, var(--button-secondary-border) 98%, transparent), color-mix(in srgb, var(--button-secondary-border) 98%, transparent));
+  border-color: color-mix(in srgb, var(--button-secondary-color) 36%, var(--color-border-default));
+  color: color-mix(in srgb, var(--button-secondary-color) 84%, white 16%);
+  box-shadow:
+    0 1rem 2.125rem color-mix(in srgb, black 28%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-text-primary) 2.8%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 10%, transparent);
+}
+
+.button[data-variant="onboarding-continue"]:hover:not(:disabled) .icon {
+  color: white;
+}
+
+.button:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.button:focus-visible {
+  outline: none;
+  box-shadow: var(--button-focus-ring);
+}
+
+.button[data-variant="danger"]:focus-visible {
+  box-shadow: var(--button-danger-focus-ring);
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(var(--motion-lift-distance-xs));
+}
+
+.button[data-variant="primary"]:hover:not(:disabled) {
+  filter: var(--button-primary-hover-filter);
+}
+
+.button[data-variant="primary-neutral"]:hover:not(:disabled) {
+  background: var(--button-primary-neutral-hover-bg);
+}
+
+.button[data-variant="secondary"]:hover:not(:disabled) {
+  background: var(--button-secondary-hover-bg);
+}
+
+.button[data-variant="secondary-neutral"]:hover:not(:disabled) {
+  background: var(--button-secondary-neutral-hover-bg);
+}
+
+.button[data-variant="ghost"]:hover:not(:disabled) {
+  background: var(--button-ghost-hover-bg);
+  color: var(--button-ghost-hover-color-override);
+}
+
+.button[data-variant="danger"]:hover:not(:disabled) {
+  background: var(--button-danger-hover-bg);
+}

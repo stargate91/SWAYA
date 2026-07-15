@@ -120,58 +120,7 @@
   width: 17.5rem;
 }
 
-.organizer-match-modal__poster-card-image {
-  position: relative;
-  aspect-ratio: 2 / 3;
-  overflow: hidden;
-  padding: 0;
-  border-radius: var(--radius-sm);
-  border: none;
-  background: transparent;
-  width: 100%;
-  display: block;
-  cursor: pointer;
-}
 
-.organizer-match-modal__poster-card-image :global(.ui-media-card) {
-  width: 100%;
-  height: 100%;
-}
-
-.organizer-match-modal__poster-card-image:focus-visible,
-.organizer-match-modal__poster-card-image:hover:not(:disabled) {
-  box-shadow: 0 0 0 2px var(--color-accent-blue);
-}
-
-.organizer-match-modal__poster-card.is-active .organizer-match-modal__poster-card-image {
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 32%, transparent);
-}
-
-.organizer-match-modal__poster-card.is-active .organizer-match-modal__poster-card-image:hover:not(:disabled) {
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 32%, transparent), 0 0 0 2px var(--color-accent-blue);
-}
-
-.organizer-match-modal__poster-image,
-.organizer-match-modal__poster-placeholder {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  height: 100%;
-}
-
-.organizer-match-modal__poster-image {
-  object-fit: cover;
-}
-
-.organizer-match-modal__poster-placeholder {
-  color: var(--color-muted);
-  background: var(--ui-surface-card-gradient-soft);
-}
-
-.organizer-match-modal__poster-card-image .organizer-match-modal__poster-image,
-.organizer-match-modal__poster-card-image .organizer-match-modal__poster-placeholder {
-  height: 100%;
-}
 
 .organizer-match-modal :global([data-variant="overlay"]) {
   background: color-mix(in srgb, var(--color-accent-blue) 60%, transparent);
@@ -416,10 +365,7 @@
 
 
 
-.organizer-match-modal__browser-card-image :global(.ui-media-card) {
-  width: 100%;
-  height: 100%;
-}
+
 
 .organizer-match-modal__browser-card-bucket-indicator {
   position: absolute;
@@ -542,7 +488,7 @@
     justify-content: stretch;
   }
 
-  .organizer-match-modal__search-actions :global(.ui-button) {
+  .organizer-match-modal__search-actions button {
     width: 100%;
     justify-content: center;
   }
@@ -575,7 +521,7 @@
     min-width: 0;
   }
 
-  .organizer-match-modal__search-actions :global(.ui-button) {
+  .organizer-match-modal__search-actions button {
     width: 100%;
     justify-content: center;
   }

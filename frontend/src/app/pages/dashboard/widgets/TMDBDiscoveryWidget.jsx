@@ -13,6 +13,8 @@ import Dropdown from '../../../ui/Dropdown';
 import WidgetShell from '@/ui/WidgetShell';
 import { API_BASE } from '../../../lib/backend';
 import PosterCard from '../../../ui/PosterCard';
+import IconButton from '../../../ui/IconButton';
+import posterCardStyles from '../../../ui/PosterCard.module.css';
 import styles from './RecommendationsWidget.module.css';
 
 const GENRES = [
@@ -198,21 +200,23 @@ const TMDBDiscoveryWidget = ({ T }) => {
         ) : (
           <div className={styles['recommend-carousel-shell']}>
             {showLeft && (
-              <button
-                className="ui-carousel-arrow is-left"
+              <IconButton
+                variant="carousel-arrow"
+                className={styles['is-left']}
                 onClick={() => scroll('left')}
               >
                 <ChevronLeft size={24} />
-              </button>
+              </IconButton>
             )}
 
             {showRight && (
-              <button
-                className="ui-carousel-arrow is-right"
+              <IconButton
+                variant="carousel-arrow"
+                className={styles['is-right']}
                 onClick={() => scroll('right')}
               >
                 <ChevronRight size={24} />
-              </button>
+              </IconButton>
             )}
 
             <div
@@ -231,6 +235,7 @@ const TMDBDiscoveryWidget = ({ T }) => {
                   <PosterCard
                     key={item.id}
                     className={styles['recommend-card']}
+                    imageWrapperClassName={styles['recommend-card-image-wrapper']}
                     imageUrl={posterUrl}
                     onClick={() => handleCardClick(item)}
                     title={item.title}
@@ -244,15 +249,15 @@ const TMDBDiscoveryWidget = ({ T }) => {
                           e.stopPropagation();
                           handleWatchlist(item.id, isWatchlisted);
                         }}
-                        className={`ui-card-action-btn ${isWatchlisted ? '' : 'ui-card-action-btn--neutral'}`}
+                        className={`${posterCardStyles['action-btn']} ${isWatchlisted ? '' : posterCardStyles['action-btn--neutral']}`}
                         variant="unstyled"
                       >
                         {isWatchlisted ? (
                           <>
-                            <span className="action-btn-state-default">
+                            <span className={posterCardStyles['action-btn-state-default']}>
                               <Check size={12} strokeWidth={3} /> {T('dashboard.watchlist.added') || 'Watchlisted'}
                             </span>
-                            <span className="action-btn-state-hover">
+                            <span className={posterCardStyles['action-btn-state-hover']}>
                               <Minus size={12} strokeWidth={3} /> {T('common.remove') || 'Remove'}
                             </span>
                           </>

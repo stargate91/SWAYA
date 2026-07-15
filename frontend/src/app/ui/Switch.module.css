@@ -1,4 +1,4 @@
-.ui-switch-container {
+.container {
   display: inline-flex;
   align-items: center;
   gap: var(--space-md);
@@ -9,19 +9,19 @@
   color: var(--color-ink);
 }
 
-.ui-switch-container.is-disabled {
+.container[data-disabled="true"] {
   cursor: not-allowed;
   opacity: 0.5;
 }
 
-.ui-switch {
+.switch {
   position: relative;
   width: var(--button-height-md);
   height: var(--space-2xl);
   flex-shrink: 0;
 }
 
-.ui-switch__input {
+.input {
   position: absolute;
   width: 0.0625rem;
   height: 0.0625rem;
@@ -32,7 +32,7 @@
   border: 0;
 }
 
-.ui-switch__track {
+.track {
   position: absolute;
   inset: 0;
   border-radius: var(--radius-full);
@@ -41,7 +41,7 @@
   transition: background-color var(--motion-emphasized), border-color var(--motion-emphasized);
 }
 
-.ui-switch__thumb {
+.thumb {
   position: absolute;
   top: var(--radius-2xs);
   left: var(--radius-2xs);
@@ -53,25 +53,25 @@
   transition: transform var(--motion-emphasized), background-color var(--motion-emphasized);
 }
 
-.ui-switch__input:checked + .ui-switch__track {
+.input:checked + .track {
   background: var(--color-accent-blue);
   border-color: var(--color-accent-blue-soft);
 }
 
-.ui-switch__input:checked + .ui-switch__track .ui-switch__thumb {
+.input:checked + .track .thumb {
   transform: translateX(var(--space-xl));
   background: var(--color-text-primary);
 }
 
-.ui-switch__input:focus-visible + .ui-switch__track {
+.input:focus-visible + .track {
   outline: none;
   box-shadow: 0 0 0 2px var(--color-accent-blue-soft);
 }
 
-.ui-switch-container:hover .ui-switch__track {
+.container:hover .track {
   border-color: var(--color-line-strong);
 }
 
-.ui-switch-container:hover .ui-switch__input:checked + .ui-switch__track {
+.container:hover .input:checked + .track {
   background: var(--color-accent-blue-soft);
 }

@@ -15,11 +15,11 @@ import Input from '@/ui/Input';
 import Button from '@/ui/Button';
 import IconButton from '@/ui/IconButton';
 import Tooltip from '@/ui/Tooltip';
-import NavButton from '@/ui/NavButton';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import Spinner from '@/ui/Spinner';
 import { Search, Link as LinkIcon, User, Trash2, GitFork, Star, ArrowLeft, AlertTriangle } from '@/ui/icons';
 import Modal from '@/ui/Modal';
+import Grid from '@/ui/Grid';
 
 const FemaleSilhouette = () => (
   <div className="performer-gender-silhouette performer-gender-silhouette--mask performer-gender-silhouette--female" />
@@ -280,17 +280,19 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
     return (
       <div className="performer-linker performer-linker--search">
         <div className="performer-linker__header">
-          <NavButton
+          <Button
+            variant="secondary-neutral"
+            leftIcon={<ArrowLeft size={14} />}
+            animateIcon
             onClick={() => {
               setActiveSearchSource(null);
               setResults([]);
               setHasSearched(false);
             }}
             className="performer-linker__back"
-            icon={ArrowLeft}
           >
             {t('library.performerEdit.backToSources') || 'Back to Sources'}
-          </NavButton>
+          </Button>
           <span className="performer-linker__title">
             {t('common.search') || 'Search'} {SOURCE_BUCKETS.find((b) => b.key === activeSearchSource)?.label}
           </span>
@@ -325,7 +327,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
           ) : error ? (
             <div className="performer-linker__error">{error}</div>
           ) : filteredResults.length > 0 ? (
-            <div className="performer-linker__results-grid">
+            <Grid variant="auto-poster">
               {filteredResults.map((item) => {
                 const rawProfileUrl = item.profile_path || item.poster_path;
                 const profileUrl = rawProfileUrl ? resolveMediaImageUrl(rawProfileUrl, 'personThumb') : null;
@@ -363,7 +365,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
                   </div>
                 );
               })}
-            </div>
+            </Grid>
           ) : hasSearched ? (
             <div className="performer-linker__placeholder">{t('library.performerEdit.noResultsMatch') || 'No results match the query. Try a different name.'}</div>
           ) : (
@@ -378,7 +380,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
 
   return (
     <div className="performer-linker performer-linker--grid">
-      <div className="performer-linker-grid">
+      <Grid variant="scene">
         {SOURCE_BUCKETS.map((bucket) => {
           const linkedInfo = getLinkedInfo(bucket);
           const isLinked = !!linkedInfo;
@@ -490,7 +492,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
             </div>
           );
         })}
-      </div>
+      </Grid>
       <Modal
         open={showDeleteConfirm}
         title={t('library.details.deletePerformerTitle') || 'Delete Performer?'}

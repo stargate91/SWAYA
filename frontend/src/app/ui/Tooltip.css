@@ -4,9 +4,6 @@
 }
 
 .ui-tooltip__content {
-  position: fixed;
-  left: var(--tooltip-left);
-  top: var(--tooltip-top);
   z-index: var(--z-index-toast);
   max-width: var(--tooltip-max-width);
   padding: var(--tooltip-padding);
@@ -21,17 +18,4 @@
   white-space: normal;
   word-break: break-word;
   pointer-events: none;
-  transform: translate3d(-50%, -100%, 0);
-}
-
-.ui-tooltip__content[data-side='bottom'] {
-  transform: translate3d(-50%, 0, 0);
-}
-
-.ui-tooltip__content[data-side='right'] {
-  transform: translate3d(0, -50%, 0);
-}
-
-.ui-tooltip__content[data-side='left'] {
-  transform: translate3d(-100%, -50%, 0);
 }

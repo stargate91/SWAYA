@@ -91,7 +91,7 @@ export default function EntityDetailDrawer({
               <h4 className="entity-detail-page__drawer-section-title">
                 {t('library.details.specsTitle') || 'Physical Specs'}
               </h4>
-              <DescriptionList items={specItems} className="ui-description-list ui-description-list--spaced" />
+              <DescriptionList items={specItems} spaced />
             </div>
           )}
 

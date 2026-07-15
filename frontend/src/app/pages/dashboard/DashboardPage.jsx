@@ -12,7 +12,7 @@ export default function DashboardPage() {
 
   if (isSettingsLoading) {
     return (
-      <Page className={`dashboard-page ${styles['dashboard-page']}`}>
+      <Page className={styles['dashboard-page']}>
         <div className={styles['dashboard-loading']}>
           <Spinner />
         </div>
@@ -21,7 +21,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <Page className={`dashboard-page ${styles['dashboard-page']}`} contentBottom={false}>
+    <Page className={styles['dashboard-page']} contentBottom={false}>
       <div className={styles['dashboard-container']}>
         <DashboardView />
       </div>

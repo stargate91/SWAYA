@@ -1,5 +1,5 @@
 /* Drawer Primitive Styles */
-.ui-drawer-backdrop {
+.backdrop {
   position: fixed;
   top: var(--layout-window-titlebar-height);
   left: 0;
@@ -11,7 +11,7 @@
   animation: uiDrawerFadeIn var(--motion-duration-slow) var(--motion-ease-standard);
 }
 
-.ui-drawer {
+.drawer {
   position: fixed;
   top: var(--layout-window-titlebar-height);
   right: 0;
@@ -27,30 +27,30 @@
   transition: transform var(--motion-fast), width var(--motion-duration-slow) var(--motion-ease-standard);
 }
 
-.ui-drawer.ui-drawer--glass {
+.drawer--glass {
   background: color-mix(in srgb, var(--color-bg-elevated) 70%, transparent);
   backdrop-filter: blur(var(--space-xl));
 }
 
-.ui-drawer.ui-drawer--contrast {
+.drawer--contrast {
   background: var(--color-surface-overlay);
   backdrop-filter: none;
 }
 
 /* Sizes */
-.ui-drawer--sm {
+.drawer--sm {
   width: 20rem;
 }
 
-.ui-drawer--md {
+.drawer--md {
   width: 30rem;
 }
 
-.ui-drawer--lg {
+.drawer--lg {
   width: 40rem;
 }
 
-.ui-drawer--720 {
+.drawer--720 {
   width: 45rem;
 }
 
@@ -58,6 +58,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -67,20 +68,13 @@
   from {
     transform: translateX(100%);
   }
+
   to {
     transform: translateX(0);
   }
 }
 
-/* Ensure all drawer headers are solid (not transparent) by default */
-.entity-detail-page__drawer-header,
-.review-drawer__header {
-  background: var(--color-bg-elevated);
-  position: relative;
-  z-index: var(--z-index-step-10);
-}
-
-.ui-drawer__header {
+.header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -92,20 +86,18 @@
 }
 
 /* Let the glassmorphic blur show through for the glass variant headers */
-.ui-drawer--glass .ui-drawer__header,
-.ui-drawer--glass .entity-detail-page__drawer-header,
-.ui-drawer--glass .review-drawer__header {
+.drawer--glass .header {
   background: transparent;
 }
 
-.ui-drawer__title {
+.title {
   margin: 0;
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
 }
 
-.ui-drawer__content {
+.content {
   flex: 1;
   overflow-y: auto;
 }

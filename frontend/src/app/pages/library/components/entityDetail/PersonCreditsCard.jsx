@@ -3,6 +3,7 @@ import { resolveDetailsImageUrl } from '../../utils/detailUtils';
 import { API_BASE } from '@/lib/backend';
 import { getCreditSource, navigateToCreditDetail } from '../../utils/mediaNavigation';
 import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
+import PosterCard from '@/ui/PosterCard';
 
 export default function PersonCreditsCard({
   item,
@@ -12,7 +13,6 @@ export default function PersonCreditsCard({
   t,
   alwaysShowSourceBadge = false,
   showLibraryBadge = false,
-  placeholderIconSize = 18
 }) {
   const n = normalizeMediaEntity(item, { context: 'credits' });
   const creditTitle = n.title;
@@ -34,68 +34,44 @@ export default function PersonCreditsCard({
   const rightText = isSceneOrPornDbMovie ? '' : item.year || '';
   const isTvItem = itemType === 'tv' || itemType === 'tvshows';
 
-  return (
-    <div
-      className="person-credits-card"
-      onClick={handleCardClick}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          handleCardClick();
-        }
-      }}
-    >
-      <div className="person-credits-card__poster-container">
-        {posterUrl ? (
-          <img
-            src={posterUrl}
-            alt={creditTitle}
-            className="person-credits-card__poster"
-            loading="lazy"
-            onError={(e) => console.error("Image load failed in Card:", { src: posterUrl, resolvedSource, creditTitle, e })}
-          />
-        ) : (
-          <div className="person-credits-card__placeholder">
-            <Layers size={placeholderIconSize} />
-          </div>
-        )}
+  const subtitleText = rightText ? `${leftText} (${rightText})` : leftText;
 
-        {(alwaysShowSourceBadge || (showLibraryBadge && item.in_library)) && (
-          <span className={`person-credits-card__source-badge source-${resolvedSource}`}>
-            {resolvedSource === 'porndb' || resolvedSource === 'theporndb' ? 'PornDB' : resolvedSource === 'stashdb' ? 'Stash' : resolvedSource === 'fansdb' ? 'Fans' : 'TMDb'}
-          </span>
-        )}
-
-        {showLibraryBadge && item.in_library && (
-          <div className="person-credits-card__library-badge" title={t('library.details.inLibrary') || 'In Library'}>
-            <Bookmark size={10} />
-          </div>
-        )}
-
-        {item.in_library && !isTvItem && (
-          <button
-            type="button"
-            className="person-credits-card__play-btn"
-            onClick={(e) => {
-              e.stopPropagation();
-              playMutation.mutate(item.library_item_id || item.id);
-            }}
-          >
-            <Play size={14} fill="currentColor" />
-          </button>
-        )}
-      </div>
-
-      <span className="person-credits-card__title" title={creditTitle}>{creditTitle}</span>
-      <div className="person-credits-card__meta-row">
-        <span className="person-credits-card__role" title={leftText}>
-          {leftText}
+  const overlay = (
+    <>
+      {(alwaysShowSourceBadge || (showLibraryBadge && item.in_library)) && (
+        <span className={`person-credits-card__source-badge source-${resolvedSource}`}>
+          {resolvedSource === 'porndb' || resolvedSource === 'theporndb' ? 'PornDB' : resolvedSource === 'stashdb' ? 'Stash' : resolvedSource === 'fansdb' ? 'Fans' : 'TMDb'}
         </span>
-        {rightText && (
-          <span className="person-credits-card__year">{rightText}</span>
-        )}
-      </div>
-    </div>
+      )}
+
+      {showLibraryBadge && item.in_library && (
+        <div className="person-credits-card__library-badge" title={t('library.details.inLibrary') || 'In Library'}>
+          <Bookmark size={10} />
+        </div>
+      )}
+    </>
+  );
+
+  const playOverlay = item.in_library && !isTvItem ? {
+    onClick: (e) => {
+      e.stopPropagation();
+      playMutation.mutate(item.library_item_id || item.id);
+    },
+    icon: <Play size={14} fill="currentColor" />,
+    label: 'Play'
+  } : null;
+
+  return (
+    <PosterCard
+      className="person-credits-card"
+      aspect={isScene ? 'landscape' : 'poster'}
+      imageUrl={posterUrl}
+      title={creditTitle}
+      subtitle={subtitleText}
+      overlay={overlay}
+      playOverlay={playOverlay}
+      onClick={handleCardClick}
+      icon={Layers}
+    />
   );
 }

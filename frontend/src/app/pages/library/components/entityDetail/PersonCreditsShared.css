@@ -28,58 +28,9 @@
   gap: var(--space-md);
 }
 
-.ui-scroll-row-container.collection-items-horizontal-grid-wrapper .ui-poster-card {
-  transition: var(--motion-spring);
-}
-
-.collection-items-horizontal-grid-wrapper .ui-poster-card.is-missing {
-  opacity: 0.65;
-}
-
-.collection-items-horizontal-grid-wrapper .ui-poster-card.is-missing:hover {
-  opacity: 1;
-}
-
-.collection-items-horizontal-grid-wrapper .ui-poster-card .ui-poster-card__image {
-  opacity: 0.8;
-  filter: grayscale(10%);
-  --opacity-filter-transition: transform 0.28s ease, opacity 0.25s cubic-bezier(0.25, 1, 0.5, 1), filter 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-  transition: var(--opacity-filter-transition);
-}
-.collection-items-horizontal-grid-wrapper .ui-poster-card.is-missing .ui-poster-card__image {
-  opacity: 0.55;
-}
-
-.collection-items-horizontal-grid-wrapper .ui-poster-card.is-missing:hover .ui-poster-card__image {
-  opacity: 1;
-}
-
-.ui-scroll-row-container.collection-items-horizontal-grid-wrapper .ui-poster-card:hover {
-  transform: translateY(-0.25rem);
-}
-
 .collection-items-horizontal-grid-wrapper .ui-pill--default {
   text-transform: uppercase;
   letter-spacing: 0.04em;
-}
-
-.collection-items-horizontal-grid-wrapper .ui-poster-card .ui-poster-card__image-wrapper {
-  transition: box-shadow var(--motion-duration-slow) var(--motion-ease-standard);
-  --poster-shadow: 0 0.25rem 0.75rem color-mix(in srgb, black 15%, transparent);
-  box-shadow: var(--poster-shadow);
-  border: 1px solid var(--color-border-default);
-}
-
-.ui-scroll-row-container.collection-items-horizontal-grid-wrapper .ui-poster-card:hover .ui-poster-card__image-wrapper {
-  border-color: color-mix(in srgb, var(--color-ink) 20%, transparent);
-  box-shadow: 0 0.75rem 1.5rem var(--color-surface-overlay);
-}
-
-
-.ui-scroll-row-container.collection-items-horizontal-grid-wrapper .ui-poster-card:hover .ui-poster-card__image {
-  opacity: 1;
-  filter: grayscale(0%);
-  transform: scale(1.02);
 }
 
 .entity-detail-page__credits-list--people-grid {
@@ -453,83 +404,17 @@
 
 /* Card Aspect Ratios & Styling */
 .person-credits-card {
-  display: flex;
-  flex-direction: column;
   min-width: 0;
-  transition: var(--motion-spring);
-  cursor: pointer;
   content-visibility: auto;
   contain-intrinsic-size: auto 18.75rem;
 }
 
-.person-credits-card:hover {
-  transform: translateY(-0.25rem);
-}
-
 .person-credits-card.aspect-2-3 {
   flex: 0 0 5.75rem;
-  /* Matching the Known For width */
 }
 
 .person-credits-card.aspect-16-9 {
   flex: 0 0 10.25rem;
-  /* 16:9 landscape aspect ratio card */
-}
-
-.person-credits-card__poster-container {
-  width: 100%;
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--radius-sm);
-  --poster-container-bg: color-mix(in srgb, white 2%, transparent);
-  background: var(--poster-container-bg);
-  --poster-container-border: 0.0625rem solid color-mix(in srgb, white 8%, transparent);
-  border: var(--poster-container-border);
-  transition: box-shadow var(--motion-duration-slow) var(--motion-ease-standard);
-  --poster-container-shadow: 0 0.25rem 0.75rem color-mix(in srgb, black 15%, transparent);
-  box-shadow: var(--poster-container-shadow);
-}
-
-.person-credits-card.aspect-2-3 .person-credits-card__poster-container {
-  aspect-ratio: 2 / 3;
-}
-
-.person-credits-card.aspect-16-9 .person-credits-card__poster-container {
-  aspect-ratio: 16 / 9;
-}
-
-.person-credits-card:hover .person-credits-card__poster-container {
-  --poster-hover-bc: color-mix(in srgb, white 20%, transparent);
-  border-color: var(--poster-hover-bc);
-  box-shadow: 0 0.75rem 1.5rem var(--color-surface-overlay);
-}
-
-.person-credits-card__poster {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  opacity: 0.8;
-  filter: grayscale(10%);
-  --opacity-filter-transition: transform 0.28s ease, opacity 0.25s cubic-bezier(0.25, 1, 0.5, 1), filter 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-  transition: var(--opacity-filter-transition);
-}
-
-.person-credits-card:hover .person-credits-card__poster {
-  opacity: 1;
-  filter: grayscale(0%);
-  transform: scale(1.02);
-}
-
-.person-credits-card__placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-muted);
-  --placeholder-bg: color-mix(in srgb, white 1%, transparent);
-  background: var(--placeholder-bg);
 }
 
 /* Skeletons */
@@ -628,80 +513,6 @@
   --badge-lib-shadow: 0 0.125rem 0.375rem color-mix(in srgb, black 30%, transparent);
   box-shadow: var(--badge-lib-shadow);
   color: var(--color-text-primary);
-}
-
-.person-credits-card__play-btn {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.9);
-  width: 2.375rem;
-  height: 2.375rem;
-  border-radius: 50%;
-  background-color: var(--color-panel);
-  background-image: var(--button-secondary-bg);
-  color: var(--button-secondary-color);
-  border: 1px solid var(--color-border-strong);
-  box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, black 30%, transparent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity var(--motion-fast), transform var(--motion-fast), background-color var(--motion-fast), background-image var(--motion-fast), border-color var(--motion-fast);
-  cursor: pointer;
-  z-index: var(--z-index-step-2);
-}
-
-.person-credits-card__play-btn:hover {
-  background-color: var(--color-panel-strong);
-  background-image: var(--button-secondary-hover-bg);
-  border-color: var(--button-secondary-border);
-  box-shadow: 0 0.25rem 0.75rem color-mix(in srgb, black 40%, transparent);
-  transform: translate(-50%, -50%) scale(1.05);
-}
-.person-credits-card:hover .person-credits-card__play-btn {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
-}
-
-
-/* Card details underneath the poster */
-.person-credits-card__title {
-  display: block;
-  font-size: 0.78rem;
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-  margin-top: var(--space-sm);
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.person-credits-card__meta-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-sm);
-  margin-top: calc(var(--space-xs) / 2);
-}
-
-.person-credits-card__role {
-  display: block;
-  font-size: 0.76rem;
-  color: color-mix(in srgb, var(--color-text-primary) 70%, transparent);
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-  font-weight: var(--font-weight-medium);
-  flex: 1;
-  min-width: 0;
-}
-
-.person-credits-card__year {
-  font-size: 0.74rem;
-  color: color-mix(in srgb, var(--color-text-primary) 40%, transparent);
-  font-weight: var(--font-weight-medium);
-  flex-shrink: 0;
 }
 
 

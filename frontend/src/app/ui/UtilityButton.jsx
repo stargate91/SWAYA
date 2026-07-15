@@ -1,5 +1,14 @@
-import './Button.css';
+import styles from './UtilityButton.module.css';
 
+/**
+ * Presentational and window control UtilityButton.
+ *
+ * @param {object} props
+ * @param {React.ReactNode} props.children
+ * @param {'sm' | 'titlebar'} [props.size] - Sizing mode
+ * @param {boolean} [props.danger] - Apply warning/danger variant styling
+ * @param {string} [props.className] - Additional custom class names
+ */
 export default function UtilityButton({
   children,
   className = '',
@@ -9,7 +18,9 @@ export default function UtilityButton({
 }) {
   return (
     <button
-      className={`ui-utility-button ui-utility-button--${size}${danger ? ' is-danger' : ''} ${className}`.trim()}
+      data-size={size}
+      data-danger={danger}
+      className={`${styles['utility-button']} ui-utility-button ${className}`.trim()}
       {...props}
     >
       {children}

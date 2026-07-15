@@ -1,21 +1,20 @@
-/* Generic Description List Primitive */
-.ui-description-list {
+.list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-sm) var(--space-md);
 }
 
-.ui-description-list--spaced {
+.list--spaced {
   gap: var(--space-md) var(--space-lg);
 }
 
-.ui-description-list__item {
+.item {
   display: flex;
   flex-direction: column;
   gap: calc(var(--space-xs) / 2);
 }
 
-.ui-description-list__value {
+.value {
   font-size: var(--font-size-xs);
   color: var(--color-text-primary);
   font-weight: var(--font-weight-medium);
@@ -24,18 +23,18 @@
   white-space: nowrap;
 }
 
-.ui-description-list__item--full {
+.item--full {
   grid-column: span 2;
 }
 
-.ui-description-list__item--full .ui-description-list__value {
+.item--full .value {
   white-space: normal;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
 }
 
-.ui-description-list__label {
+.label {
   font-size: var(--font-size-2xs);
   color: var(--color-text-faint);
   font-weight: var(--font-weight-medium);

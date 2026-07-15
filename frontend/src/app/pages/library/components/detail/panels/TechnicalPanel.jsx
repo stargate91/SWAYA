@@ -1,8 +1,9 @@
+import PropTypes from 'prop-types';
 import { EDITION_LABELS, SOURCE_LABELS, AUDIO_TYPE_LABELS, formatTime } from '../../../utils/detailUtils';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import './PanelsCommon.css';
 
-export default function TechnicalPanel({ showTitle = true }) {
+export default function TechnicalPanel({ showTitle = true, variant }) {
   const { state, t } = useMediaDetailContext();
   const {
     item,
@@ -33,7 +34,7 @@ export default function TechnicalPanel({ showTitle = true }) {
   const hasSpecs = !!item?.technical;
 
   return (
-    <div className="details-panel details-panel--custom">
+    <div className={`details-panel details-panel--custom ${variant === 'drawer' ? 'details-panel--drawer' : ''}`.trim()}>
       {showTitle && hasEditionSource && (
         <div className="details-panel__section">
           <h4 className="details-panel__section-title">
@@ -130,3 +131,8 @@ export default function TechnicalPanel({ showTitle = true }) {
     </div>
   );
 }
+
+TechnicalPanel.propTypes = {
+  showTitle: PropTypes.bool,
+  variant: PropTypes.string,
+};

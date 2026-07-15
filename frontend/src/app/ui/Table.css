@@ -67,7 +67,41 @@
   backdrop-filter: blur(0.75rem);
 }
 
+.ui-table th.text-center {
+  text-align: center;
+}
 
+.ui-table th.text-right {
+  text-align: right;
+}
+
+.ui-table__sort-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  min-height: auto;
+  font: var(--text-caption);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: calc(2 * var(--letter-spacing-wide));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  cursor: pointer;
+  outline: none;
+  transition: color var(--motion-fast);
+}
+
+.ui-table__sort-btn:hover,
+.ui-table__sort-btn:focus-visible {
+  color: var(--color-ink);
+}
+
+.ui-table__sort-btn[data-sort-active="true"] {
+  color: var(--color-ink);
+}
 
 .ui-table.ui-table--minimal th,
 .ui-table.ui-table--minimal td {

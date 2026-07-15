@@ -2,7 +2,7 @@ import { useState } from 'react';
 import UtilityButton from '../../ui/UtilityButton';
 import Button from '../../ui/Button';
 import Tooltip from '../../ui/Tooltip';
-import MediaCard from '../../ui/MediaCard';
+
 import Stack from '../../ui/Stack';
 import PosterCard from '../../ui/PosterCard';
 import Lightbox from '../../ui/Lightbox';
@@ -223,14 +223,14 @@ export default function OrganizerDetailsPanel({
                     </PosterCard>
                   )
                 ) : null}
-                <MediaCard className={styles['organizer-details__field']}>
+                <div className={styles['organizer-details__field']}>
                   <Stack size="sm">
                     <span className={styles['organizer-details__label']}>{t('organizer.details.fields.source')}</span>
                     <Tooltip content={activeRow.sourcePath} side="top">
                       <span className={styles['organizer-details__value']}>{activeRow.sourcePath}</span>
                     </Tooltip>
                   </Stack>
-                </MediaCard>
+                </div>
                 {(() => {
                   const unmatchedStatuses = ['new', 'no_match', 'uncertain', 'multiple', 'error'];
                   const isUnmatchedExtra = activeRow.rawType === 'extra' && activeRow.parentStatus && unmatchedStatuses.includes(activeRow.parentStatus.toLowerCase());
@@ -241,14 +241,14 @@ export default function OrganizerDetailsPanel({
                   }
 
                   return (
-                    <MediaCard className={styles['organizer-details__field']}>
+                    <div className={styles['organizer-details__field']}>
                       <Stack size="sm">
                         <span className={styles['organizer-details__label']}>{t('organizer.details.fields.target')}</span>
                         <Tooltip content={activeRow.targetPath} side="top">
                           <span className={styles['organizer-details__value']}>{activeRow.targetPath}</span>
                         </Tooltip>
                       </Stack>
-                    </MediaCard>
+                    </div>
                   );
                 })()}
                 <div className={styles['organizer-details__actions']}>

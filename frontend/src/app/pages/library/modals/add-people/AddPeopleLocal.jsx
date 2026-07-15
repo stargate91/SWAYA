@@ -3,9 +3,9 @@ import { usePeopleInfiniteQuery, useSettingsQuery } from '@/queries';
 import Spinner from '@/ui/Spinner';
 import EmptyState from '@/ui/EmptyState';
 import Dropdown from '@/ui/Dropdown';
+import CompactCard from '@/ui/CompactCard';
 import ActivationButton from './ActivationButton';
 
-const QUESTION_MARK = '?';
 
 export default function AddPeopleLocal({
   isAdult,
@@ -180,45 +180,30 @@ export default function AddPeopleLocal({
               : person.is_active;
             const isPendingForPerson = loadingIds.has(person.id) || queuedIds.has(person.id);
 
+            const metaContent = person.known_for 
+              ? (t(`library.people.roles.${person.known_for.toLowerCase()}`) || person.known_for)
+              : '';
+
             return (
-              <div
+              <CompactCard
                 key={person.id}
-                className="add-people-modal__card"
-              >
-                <div className="add-people-modal__card-left">
-                  <div className="add-people-modal__avatar">
-                    {person.profile_path ? (
-                      <img
-                        src={resolveProfileUrl(person.profile_path)}
-                        alt={person.name}
-                        className="add-people-modal__avatar-img"
-                      />
-                    ) : (
-                      <div className="add-people-modal__avatar-placeholder">
-                        {QUESTION_MARK}
-                      </div>
-                    )}
-                  </div>
-                  <div className="add-people-modal__card-info">
-                    <strong className="add-people-modal__card-name">{person.name}</strong>
-                    <span className="add-people-modal__card-meta">
-                      {person.known_for 
-                        ? (t(`library.people.roles.${person.known_for.toLowerCase()}`) || person.known_for)
-                        : ''}
-                    </span>
-                  </div>
-                </div>
-                <ActivationButton
-                  isActive={isActive}
-                  onClick={(newActiveStatus) => enqueueToggleStatus({
-                    personId: person.id,
-                    newActiveStatus,
-                    previousStatus: isActive,
-                    source: 'local',
-                  })}
-                  disabled={isPendingForPerson}
-                />
-              </div>
+                aspect="circle"
+                imageUrl={person.profile_path ? resolveProfileUrl(person.profile_path) : null}
+                title={person.name}
+                meta={metaContent}
+                rightElement={
+                  <ActivationButton
+                    isActive={isActive}
+                    onClick={(newActiveStatus) => enqueueToggleStatus({
+                      personId: person.id,
+                      newActiveStatus,
+                      previousStatus: isActive,
+                      source: 'local',
+                    })}
+                    disabled={isPendingForPerson}
+                  />
+                }
+              />
             );
           })}
         </div>

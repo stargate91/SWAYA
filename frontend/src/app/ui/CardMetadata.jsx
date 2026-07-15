@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Tooltip from '@/ui/Tooltip';
 import Pill from '@/ui/Pill';
 import { Star } from '@/ui/icons';
-import './CardMetadata.css';
+import styles from './CardMetadata.module.css';
 
 const CardMetadata = memo(function CardMetadata({
   title,
@@ -14,52 +14,48 @@ const CardMetadata = memo(function CardMetadata({
   ratingTmdb,
   ratingPorndb,
   ratingPill,
-  className = 'ui-poster-card__details',
-  titleClassName = 'ui-poster-card__title',
-  subtitleRowClassName = 'ui-poster-card__subtitle-row',
-  subtitleClassName = 'ui-poster-card__subtitle',
+  date,
+  className = '',
+  titleClassName = '',
+  subtitleRowClassName = '',
+  subtitleClassName = '',
+  performerLinkClassName = '',
+  metaRightClassName = '',
+  dateClassName = '',
+  ...props
 }) {
-  if (!title && !subtitle && (!performers || performers.length === 0) && !ratingImdb && !ratingTmdb && !ratingPorndb && !ratingPill) {
+  if (!title && !subtitle && (!performers || performers.length === 0) && !ratingImdb && !ratingTmdb && !ratingPorndb && !ratingPill && !date) {
     return null;
   }
 
   const renderRating = () => {
     if (ratingPill) return ratingPill;
 
-    const hasImdb = ratingImdb !== undefined && ratingImdb !== null && ratingImdb !== '' && parseFloat(ratingImdb) > 0;
-    const hasTmdb = ratingTmdb !== undefined && ratingTmdb !== null && ratingTmdb !== '' && parseFloat(ratingTmdb) > 0;
-    const hasPorndb = ratingPorndb !== undefined && ratingPorndb !== null && ratingPorndb !== '' && parseFloat(ratingPorndb) > 0;
+    const sources = [
+      { val: ratingImdb, variant: 'imdb' },
+      { val: ratingTmdb, variant: 'tmdb' },
+      { val: ratingPorndb, variant: 'porndb' },
+    ];
 
-    if (hasImdb) {
-      const val = parseFloat(ratingImdb);
+    const activeRating = sources.find(
+      (r) => r.val !== undefined && r.val !== null && r.val !== '' && parseFloat(r.val) > 0
+    );
+
+    if (activeRating) {
+      const val = parseFloat(activeRating.val);
       return (
-        <Pill variant="imdb">
+        <Pill variant={activeRating.variant}>
           <Star size={10} fill="currentColor" strokeWidth={1.8} />
-          {isNaN(val) ? ratingImdb : val.toFixed(1)}
-        </Pill>
-      );
-    } else if (hasTmdb) {
-      const val = parseFloat(ratingTmdb);
-      return (
-        <Pill variant="tmdb">
-          <Star size={10} fill="currentColor" strokeWidth={1.8} />
-          {isNaN(val) ? ratingTmdb : val.toFixed(1)}
-        </Pill>
-      );
-    } else if (hasPorndb) {
-      const val = parseFloat(ratingPorndb);
-      return (
-        <Pill variant="porndb">
-          <Star size={10} fill="currentColor" strokeWidth={1.8} />
-          {isNaN(val) ? ratingPorndb : val.toFixed(1)}
+          {isNaN(val) ? activeRating.val : val.toFixed(1)}
         </Pill>
       );
     }
+
     return null;
   };
 
-   return (
-     <div className={className}>
+  return (
+    <div className={className} {...props}>
        {title && (
          typeof title === 'string' ? (
            <Tooltip content={title} side="top">
@@ -82,7 +78,7 @@ const CardMetadata = memo(function CardMetadata({
            title
          )
        )}
-       {(subtitle || performers?.length > 0 || ratingImdb || ratingTmdb || ratingPorndb || ratingPill) && (
+       {(subtitle || performers?.length > 0 || ratingImdb || ratingTmdb || ratingPorndb || ratingPill || date) && (
          <div className={subtitleRowClassName}>
            {performers && performers.length > 0 ? (
              <div className={subtitleClassName}>
@@ -91,7 +87,7 @@ const CardMetadata = memo(function CardMetadata({
                    {idx > 0 && ', '}
                    <a
                      href={`#/library/people/${p.id}`}
-                     className="ui-poster-card__performer-link"
+                     className={performerLinkClassName}
                      onClick={(e) => e.stopPropagation()}
                    >
                      {p.name}
@@ -101,14 +97,17 @@ const CardMetadata = memo(function CardMetadata({
              </div>
           ) : (
             subtitle && (
-              typeof subtitle === 'string' ? (
-                <div className={subtitleClassName}>{subtitle}</div>
-              ) : (
-                subtitle
-              )
+              <div className={subtitleClassName}>
+                {subtitle}
+              </div>
             )
           )}
-          {renderRating()}
+          {(date || ratingImdb || ratingTmdb || ratingPorndb || ratingPill) && (
+            <div className={metaRightClassName}>
+              {date && <span className={dateClassName}>{date}</span>}
+              {renderRating()}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -129,19 +128,23 @@ CardMetadata.propTypes = {
   ratingTmdb: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   ratingPorndb: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   ratingPill: PropTypes.node,
+  date: PropTypes.string,
   className: PropTypes.string,
   titleClassName: PropTypes.string,
   subtitleRowClassName: PropTypes.string,
   subtitleClassName: PropTypes.string,
+  performerLinkClassName: PropTypes.string,
+  metaRightClassName: PropTypes.string,
+  dateClassName: PropTypes.string,
 };
 
 export const CardMetadataRow = function CardMetadataRow({ items = [], className = '' }) {
   const filteredItems = items.filter((item) => item !== null && item !== undefined && item !== '');
 
   return (
-    <div className={`ui-meta-row ${className}`.trim()}>
+    <div className={`${styles.row} ${className}`.trim()}>
       {filteredItems.map((item, index) => (
-        <span key={`${String(item)}-${index}`} className="ui-meta-row__item">
+        <span key={`${String(item)}-${index}`} className={styles.item}>
           {item}
         </span>
       ))}

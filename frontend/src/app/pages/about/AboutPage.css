@@ -737,11 +737,11 @@
   padding-top: calc(var(--space-md) + calc(var(--space-xs) / 2) + var(--space-px));
 }
 
-.ui-button.docs-wizard-btn-back {
+.docs-wizard-btn-back {
   width: auto;
 }
 
-.ui-button.docs-wizard-btn-next {
+.docs-wizard-btn-next {
   background-color: var(--color-bg-hover);
   width: auto;
 }
@@ -794,7 +794,7 @@
   display: block;
 }
 
-.ui-button.about-wizard-dummy-copy-btn {
+.about-wizard-dummy-copy-btn {
   padding: calc(var(--space-xs) - var(--space-px)) var(--space-sm);
   font-size: var(--font-size-2xs);
   width: auto;

@@ -7,7 +7,7 @@
   border-radius: var(--radius-xl);
   background: var(--color-bg-elevated);
   box-shadow: 0 var(--space-xl) 2.5rem color-mix(in srgb, black 40%, transparent);
-  border: 0.0625rem solid var(--color-border-subtle);
+  border: 0;
 }
 
 .recommend-spotlight-image {
@@ -24,11 +24,11 @@
 }
 
 .recommend-spotlight-gradient--side {
-  background: linear-gradient(90deg, color-mix(in srgb, var(--color-bg-app) 95%, transparent) 0%, color-mix(in srgb, var(--color-bg-app) 60%, transparent) 35%, transparent 65%);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--color-bg-canvas) 95%, transparent) 0%, color-mix(in srgb, var(--color-bg-canvas) 60%, transparent) 35%, transparent 65%);
 }
 
 .recommend-spotlight-gradient--bottom {
-  background: linear-gradient(0deg, color-mix(in srgb, var(--color-bg-app) 96%, transparent) 0%, transparent 50%);
+  background: linear-gradient(0deg, color-mix(in srgb, var(--color-bg-canvas) 96%, transparent) 0%, transparent 50%);
 }
 
 .recommend-spotlight-copy {
@@ -73,12 +73,14 @@
 .recommend-spotlight-rating {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-sm) var(--space-md);
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-sm);
   border: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 15%, transparent);
   background: color-mix(in srgb, var(--color-text-primary) 10%, transparent);
   backdrop-filter: blur(var(--space-sm));
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
 }
 
 .recommend-spotlight-rating.is-tmdb {
@@ -160,20 +162,16 @@
   --ui-poster-card-min-width: 25.875rem;
 }
 
-.recommend-card :global(.ui-poster-card__image-wrapper) {
+.recommend-card-image-wrapper {
   border-radius: var(--radius-lg);
   background: var(--color-bg-elevated);
   border: 0.0625rem solid var(--color-border-subtle);
-  box-shadow: 0 var(--space-md) var(--space-2xl) color-mix(in srgb, var(--color-bg-app) 28%, transparent);
+  box-shadow: 0 var(--space-md) var(--space-2xl) color-mix(in srgb, var(--color-bg-canvas) 28%, transparent);
   transition: box-shadow var(--motion-duration-slow) var(--motion-ease-standard);
 }
 
-.recommend-card:hover :global(.ui-poster-card__image-wrapper) {
+.recommend-card:hover .recommend-card-image-wrapper {
   box-shadow: 0 0.75rem 1.5rem var(--color-surface-overlay);
-}
-
-.recommend-card--scene :global(.ui-poster-card__media) {
-  aspect-ratio: 414 / 300;
 }
 
 .recommend-card-overlay {
@@ -192,76 +190,12 @@
   opacity: 1;
 }
 
-.recommend-card:hover :global(.ui-poster-card__user-rating-badge) {
-  opacity: 0;
-  transform: translateY(calc(-1 * var(--space-xs)));
-  pointer-events: none;
-}
 
-.recommend-card :global(.ui-card-action-btn) :global(.action-btn-state-hover) {
-  display: none;
-}
 
-.recommend-card :global(.ui-card-action-btn):hover {
-  border-color: color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border));
-  color: var(--color-state-danger);
-}
 
-.recommend-card :global(.ui-card-action-btn):hover :global(.action-btn-state-default) {
-  display: none;
-}
 
-.recommend-card :global(.ui-card-action-btn):hover :global(.action-btn-state-hover) {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
 
-.recommend-card :global(.ui-card-action-btn--neutral) {
-  border-color: color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border));
-  color: var(--color-accent-blue);
-}
 
-.recommend-card :global(.ui-card-action-btn--neutral):hover {
-  border-color: color-mix(in srgb, var(--color-accent-blue) 80%, var(--button-secondary-border));
-  background-color: color-mix(in srgb, var(--color-accent-blue) 15%, var(--color-panel-translucent));
-  color: var(--color-text-primary);
-}
-
-.recommend-card:hover :global(.ui-icon-button--play-overlay) {
-  opacity: 1;
-  transform: translate(-50%, -50%);
-  pointer-events: auto;
-}
-
-.recommend-card:hover :global(.ui-icon-button--play-overlay):disabled {
-  opacity: 0.48;
-}
-
-.recommend-card-person-subtitle {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-  margin-top: var(--space-xs);
-}
-
-.recommend-card-scene-subtitle {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
-
-.recommend-card-performers {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 70%;
-}
-
-.recommend-card-performer-link {
-  cursor: pointer;
-  color: var(--color-accent-blue-soft);
-}
 
 .recommend-card-loading-wrapper {
   display: flex;
@@ -307,7 +241,14 @@
   color: var(--color-text-muted);
 }
 
-.recommend-card-scene-date {
-  text-align: right;
-  flex: none;
+.is-left {
+  left: 0.625rem;
 }
+
+.is-right {
+  right: 0.625rem;
+}
+
+
+
+

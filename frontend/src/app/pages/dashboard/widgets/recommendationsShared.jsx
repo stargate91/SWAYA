@@ -1,19 +1,22 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
+
 import { useNavigate } from 'react-router-dom';
-import { Check, ChevronLeft, ChevronRight, Star, Plus, Heart, Play, Minus } from '@/ui/icons';
+import { Check, ChevronLeft, ChevronRight, Star, Plus, Play, Minus } from '@/ui/icons';
 import { usePlayMediaMutation } from '../../../queries';
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
 import { normalizeMediaEntity } from '../../../lib/normalizeMediaEntity';
 import { API_BASE } from '../../../lib/backend';
 import Button from '../../../ui/Button';
-import Badge from '../../../ui/Badge';
+import Spinner from '../../../ui/Spinner';
 import Skeleton from '../../../ui/Skeleton';
 import PosterCard from '../../../ui/PosterCard';
 import AdultOverlay from '../../../ui/AdultOverlay';
+import IconButton from '../../../ui/IconButton';
 
+import posterCardStyles from '../../../ui/PosterCard.module.css';
 import styles from './RecommendationsWidget.module.css';
 
 export const ADULT_LABEL = '18+';
@@ -80,30 +83,7 @@ SpotlightBanner.propTypes = {
   T: PropTypes.func.isRequired,
 };
 
-export const renderUserRatingBadge = (item) => {
-  const rating = Number(item?.user_rating);
-  if (!Number.isFinite(rating) || rating <= 0) return null;
-  const label = Number.isInteger(rating) ? String(rating) : rating.toFixed(1);
-  return (
-    <Badge className="ui-poster-card__user-rating-badge">
-      <Star size={10} fill="currentColor" />
-      {label}
-    </Badge>
-  );
-};
 
-export const renderFavoriteBadge = (item, T) => {
-  if (!item?.is_favorite) return null;
-  return (
-    <div
-      className="ui-poster-card__favorite-badge"
-      title={T('library.filter.favorite') || 'Favourite'}
-      aria-label={T('library.filter.favorite') || 'Favourite'}
-    >
-      <Heart size={14} fill="currentColor" strokeWidth={2.2} />
-    </div>
-  );
-};
 
 export const RecommendationCarousel = ({
   title,
@@ -121,7 +101,7 @@ export const RecommendationCarousel = ({
   playMutationPending,
 }) => {
   const scrollRef = useRef(null);
-  const navigate = useNavigate();
+
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(false);
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
@@ -166,21 +146,23 @@ export const RecommendationCarousel = ({
 
       <div className={styles['recommend-carousel-shell']}>
         {showLeft && (
-          <button
-            className="ui-carousel-arrow is-left"
+          <IconButton
+            variant="carousel-arrow"
+            className={styles['is-left']}
             onClick={() => scroll('left')}
           >
             <ChevronLeft size={24} />
-          </button>
+          </IconButton>
         )}
 
         {showRight && (
-          <button
-            className="ui-carousel-arrow is-right"
+          <IconButton
+            variant="carousel-arrow"
+            className={styles['is-right']}
             onClick={() => scroll('right')}
           >
             <ChevronRight size={24} />
-          </button>
+          </IconButton>
         )}
 
         <div
@@ -212,37 +194,10 @@ export const RecommendationCarousel = ({
               roleLabel = T(`lists.roles.${dept.toLowerCase()}`) || dept;
             }
 
-            let subtitle;
+            let subtitle = null;
             if (n.isPerson) {
-              subtitle = (
-                <div className="ui-poster-card__subtitle">
-                  {roleLabel}
-                </div>
-              );
-            } else if (n.isScene) {
-              subtitle = (
-                <div className="ui-poster-card__subtitle-row">
-                  <span className="ui-poster-card__subtitle">
-                    {performers.map((p, idx) => (
-                      <span
-                        key={p.id}
-                        role="button"
-                        tabIndex={0}
-                        className="ui-poster-card__performer-link"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/library/people/${p.id}`, { state: { allowAdult: true } });
-                        }}
-                      >
-                        {idx > 0 && ', '}
-                        {p.name}
-                      </span>
-                    ))}
-                  </span>
-                  {displayDate && <span className={`ui-poster-card__subtitle ${styles['recommend-card-scene-date']}`}>{displayDate}</span>}
-                </div>
-              );
-            } else {
+              subtitle = roleLabel;
+            } else if (!n.isScene) {
               subtitle = yearLabel;
             }
 
@@ -250,16 +205,20 @@ export const RecommendationCarousel = ({
               <PosterCard
                 key={item.id}
                 className={`${styles['recommend-card']} ${n.isScene ? styles['recommend-card--scene'] : ''} ${n.shouldBlur ? 'is-blurred' : ''}`}
+                aspect={n.isScene ? 'mixed-landscape' : 'poster'}
+                imageWrapperClassName={styles['recommend-card-image-wrapper']}
                 imageUrl={posterUrl}
                 onClick={() => onCardClick(item)}
                 isWatched={item.is_watched}
                 title={item.title || item.name}
                 subtitle={subtitle}
+                performers={n.isScene ? performers : null}
+                date={n.isScene ? displayDate : null}
                 ratingImdb={n.ratingImdb}
                 ratingTmdb={n.ratingTmdb}
                 ratingPill={null}
-                badge={renderUserRatingBadge(item)}
-                topRightBadge={renderFavoriteBadge(item, T)}
+                userRating={Number(item?.user_rating) || 0}
+                isFavorite={!!item?.is_favorite}
                 playOverlay={
                   !n.isPerson && item.in_library && onPlayClick
                     ? {
@@ -282,15 +241,15 @@ export const RecommendationCarousel = ({
                         const type = n.isScene ? 'scene' : (item.media_type || item.type || (item.title ? 'movie' : 'tv'));
                         onWatchlist(item, type);
                       }}
-                      className={`ui-card-action-btn ${isWatchlisted ? '' : 'ui-card-action-btn--neutral'}`}
+                      className={`${posterCardStyles['action-btn']} ${isWatchlisted ? '' : posterCardStyles['action-btn--neutral']}`}
                       variant="unstyled"
                     >
                       {isWatchlisted ? (
                         <>
-                          <span className="action-btn-state-default">
+                          <span className={posterCardStyles['action-btn-state-default']}>
                             <Check size={12} strokeWidth={3} /> {T('dashboard.watchlist.added') || 'Watchlisted'}
                           </span>
-                          <span className="action-btn-state-hover">
+                          <span className={posterCardStyles['action-btn-state-hover']}>
                             <Minus size={12} strokeWidth={3} /> {T('common.remove') || 'Remove'}
                           </span>
                         </>
@@ -312,7 +271,7 @@ export const RecommendationCarousel = ({
           })}
           {isLoadingMore && (
             <div className={`${styles['recommend-card']} ${styles['recommend-card-loading-wrapper']}`}>
-              <span className="ui-spinner" />
+              <Spinner />
             </div>
           )}
         </div>

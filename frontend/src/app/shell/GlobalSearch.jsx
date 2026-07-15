@@ -10,6 +10,7 @@ import { resolveMediaImageUrl } from '../lib/imageUrls';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useLibraryModeStore } from '../stores/useLibraryModeStore';
 import AdultOverlay from '../ui/AdultOverlay';
+import CompactCard from '../ui/CompactCard';
 import './GlobalSearch.css';
 
 const SOURCES = [
@@ -337,88 +338,40 @@ export default function GlobalSearch() {
                     {groupIdx > 0 && <div className="global-search__group-divider" />}
                     <div className="global-search__group-header">{groupTitles[type]}</div>
                     {items.map((item, idx) => (
-                      <div
+                      <CompactCard
                         key={`${item.id}-${item.media_type}-${idx}`}
-                        className="global-search__result-item"
+                        className="global-search__card"
+                        size="sm"
+                        aspect={item.media_type === 'scene' ? 'landscape' : (item.media_type === 'person' ? 'circle' : 'poster')}
+                        imageUrl={item.poster_path ? resolveMediaImageUrl(item.poster_path, 'posterThumb') : null}
+                        fallbackIcon={GroupTypeIcon}
+                        title={item.title}
+                        meta={item.year ? getYearLabel(item.year) : null}
+                        description={item.overview ? (item.overview.length > 60 ? item.overview.slice(0, 60) + '...' : item.overview) : null}
+                        rightElement={<ArrowUpRight className="global-search__arrow-icon" size={14} />}
+                        overlay={shouldBlur(item) && <AdultOverlay variant="blur" badgeText={null} className="global-search__adult-overlay" />}
                         onClick={() => handleResultClick(item)}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => e.key === 'Enter' && handleResultClick(item)}
-                      >
-                        <div className="global-search__poster-container">
-                          {item.poster_path ? (
-                            <img
-                              src={resolveMediaImageUrl(item.poster_path, 'posterThumb')}
-                              alt=""
-                              className="global-search__item-poster"
-                              loading="lazy"
-                            />
-                          ) : (
-                            <div className="global-search__item-poster-placeholder">
-                              <GroupTypeIcon size={16} />
-                            </div>
-                          )}
-                          {shouldBlur(item) && <AdultOverlay variant="blur" badgeText={null} />}
-                        </div>
-                        <div className="global-search__item-info">
-                          <div className="global-search__item-title-row">
-                            <span className="global-search__item-title">{item.title}</span>
-                            {item.year && <span className="global-search__item-year">{getYearLabel(item.year)}</span>}
-                          </div>
-                          <div className="global-search__item-meta">
-                            {item.overview && (
-                              <span className="global-search__item-overview">
-                                {item.overview.length > 60 ? item.overview.slice(0, 60) + '...' : item.overview}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <ArrowUpRight className="global-search__arrow-icon" size={14} />
-                      </div>
+                      />
                     ))}
                   </div>
                 );
               })
             ) : (
               filteredResults.map((item, idx) => (
-                <div
+                <CompactCard
                   key={`${item.id}-${item.media_type}-${idx}`}
-                  className="global-search__result-item"
+                  className="global-search__card"
+                  size="sm"
+                  aspect={item.media_type === 'scene' ? 'landscape' : (item.media_type === 'person' ? 'circle' : 'poster')}
+                  imageUrl={item.poster_path ? resolveMediaImageUrl(item.poster_path, 'posterThumb') : null}
+                  fallbackIcon={ActiveTypeIcon}
+                  title={item.title}
+                  meta={item.year ? getYearLabel(item.year) : null}
+                  description={item.overview ? (item.overview.length > 60 ? item.overview.slice(0, 60) + '...' : item.overview) : null}
+                  rightElement={<ArrowUpRight className="global-search__arrow-icon" size={14} />}
+                  overlay={shouldBlur(item) && <AdultOverlay variant="blur" badgeText={null} className="global-search__adult-overlay" />}
                   onClick={() => handleResultClick(item)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && handleResultClick(item)}
-                >
-                  <div className="global-search__poster-container">
-                    {item.poster_path ? (
-                      <img
-                        src={resolveMediaImageUrl(item.poster_path, 'posterThumb')}
-                        alt=""
-                        className="global-search__item-poster"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="global-search__item-poster-placeholder">
-                        <ActiveTypeIcon size={16} />
-                      </div>
-                    )}
-                    {shouldBlur(item) && <AdultOverlay variant="blur" badgeText={null} />}
-                  </div>
-                  <div className="global-search__item-info">
-                    <div className="global-search__item-title-row">
-                      <span className="global-search__item-title">{item.title}</span>
-                      {item.year && <span className="global-search__item-year">{getYearLabel(item.year)}</span>}
-                    </div>
-                    <div className="global-search__item-meta">
-                      {item.overview && (
-                        <span className="global-search__item-overview">
-                          {item.overview.length > 60 ? item.overview.slice(0, 60) + '...' : item.overview}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <ArrowUpRight className="global-search__arrow-icon" size={14} />
-                </div>
+                />
               ))
             )}
           </div>

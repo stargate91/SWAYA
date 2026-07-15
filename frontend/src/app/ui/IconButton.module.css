@@ -1,0 +1,303 @@
+/* Icon Buttons */
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 0.0625rem solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    background-color var(--motion-fast),
+    border-color var(--motion-fast),
+    color var(--motion-fast),
+    box-shadow var(--motion-fast),
+    filter var(--motion-fast),
+    transform var(--motion-fast),
+    opacity var(--motion-fast);
+  outline: none;
+  text-decoration: none;
+  line-height: 1;
+}
+
+.icon-button-wrapper .icon-button {
+  background: transparent;
+  border: none;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+}
+
+.icon-button[data-size="xs"] {
+  width: var(--space-lg);
+  height: var(--space-lg);
+  border-radius: var(--radius-sm);
+}
+
+.icon-button[data-size="sm"] {
+  width: var(--ui-control-height-xs);
+  height: var(--ui-control-height-xs);
+}
+
+.icon-button[data-size="md"] {
+  width: var(--ui-control-height-md);
+  height: var(--ui-control-height-md);
+}
+
+.icon-button[data-size="lg"] {
+  width: var(--button-height-lg);
+  height: var(--button-height-lg);
+}
+
+.icon-button[data-variant="primary"] {
+  background: var(--button-primary-bg);
+  color: var(--button-primary-color);
+  box-shadow: var(--button-primary-shadow);
+  border: 0;
+}
+
+.icon-button[data-variant="primary-neutral"] {
+  background: var(--button-primary-neutral-bg);
+  color: var(--button-primary-neutral-color);
+  border-color: var(--button-primary-neutral-border);
+}
+
+.icon-button[data-variant="secondary"] {
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-color);
+  border-color: var(--button-secondary-border);
+}
+
+.icon-button[data-variant="secondary-neutral"] {
+  background: var(--button-secondary-neutral-bg);
+  color: var(--button-secondary-neutral-color);
+  border-color: var(--button-secondary-neutral-border);
+}
+
+.icon-button[data-variant="ghost"] {
+  background: var(--button-ghost-bg);
+  color: var(--button-ghost-color);
+  border-color: var(--button-ghost-border);
+}
+
+.icon-button[data-variant="danger"] {
+  background: var(--button-danger-bg);
+  color: var(--button-danger-color);
+  border-color: var(--button-danger-border);
+}
+
+.icon-button[data-variant="close"] {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--motion-base);
+}
+
+.icon-button[data-variant="close"] svg {
+  transition: transform var(--motion-base);
+}
+
+.icon-button[data-variant="close"]:hover:not(:disabled) {
+  color: var(--color-text-primary);
+  background: none;
+  transform: none;
+}
+
+
+
+.icon-button[data-variant="close"]:hover:not(:disabled) svg {
+  transform: rotate(90deg);
+}
+
+.icon-button:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.icon-button:focus-visible {
+  outline: none;
+  box-shadow: var(--button-focus-ring);
+}
+
+.icon-button[data-variant="danger"]:focus-visible {
+  box-shadow: var(--button-danger-focus-ring);
+}
+
+.icon-button:hover:not(:disabled) {
+  transform: translateY(var(--motion-lift-distance-xs));
+}
+
+.icon-button[data-variant="primary"]:hover:not(:disabled) {
+  filter: var(--button-primary-hover-filter);
+}
+
+.icon-button[data-variant="primary-neutral"]:hover:not(:disabled) {
+  background: var(--button-primary-neutral-hover-bg);
+}
+
+.icon-button[data-variant="secondary"]:hover:not(:disabled) {
+  background: var(--button-secondary-hover-bg);
+}
+
+.icon-button[data-variant="secondary-neutral"]:hover:not(:disabled) {
+  background: var(--button-secondary-neutral-hover-bg);
+}
+
+.icon-button[data-variant="ghost"]:hover:not(:disabled) {
+  background: var(--button-ghost-hover-bg);
+  color: var(--button-ghost-hover-color);
+}
+
+.icon-button[data-variant="danger"]:hover:not(:disabled) {
+  background: var(--button-danger-hover-bg);
+}
+
+:global(.ui-close-btn).icon-button:hover:not(:disabled) {
+  transform: none;
+}
+
+/* Play Overlay Variant for Posters & Stills */
+.icon-button[data-variant="play-overlay"] {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--play-overlay-width, var(--button-height-md));
+  height: var(--play-overlay-height, var(--button-height-md));
+  border-radius: var(--radius-full);
+  background-color: var(--color-panel-translucent);
+  background-image: var(--button-secondary-bg);
+  color: var(--button-secondary-color);
+  border: 0.0625rem solid var(--button-secondary-border);
+  box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, black 30%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: var(--play-overlay-opacity, 0);
+  pointer-events: var(--play-overlay-pointer-events, none);
+  transition:
+    opacity var(--motion-fast),
+    transform var(--motion-fast),
+    background-color var(--motion-fast),
+    background-image var(--motion-fast),
+    border-color var(--motion-fast),
+    box-shadow var(--motion-fast);
+  z-index: var(--z-index-step-5);
+}
+
+.icon-button[data-variant="play-overlay"]:disabled {
+  opacity: calc(var(--play-overlay-opacity, 0) * 0.48);
+}
+
+.icon-button[data-variant="play-overlay"]:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.icon-button[data-variant="play-overlay"]:hover:not(:disabled) {
+  transform: translate(-50%, -50%) scale(1.06);
+}
+
+/* IconButton Optional Wrapper */
+.icon-button-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--ui-control-height-xs);
+  height: var(--ui-control-height-xs);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-glass);
+  border: 0.0625rem solid var(--color-border-subtle);
+  transition: all var(--motion-fast);
+  cursor: pointer;
+}
+
+.icon-button-wrapper:hover {
+  background: var(--color-surface-glass-strong);
+  border-color: var(--color-border-default);
+  transform: translateY(-0.03125rem);
+}
+
+.icon-button-wrapper:focus-within {
+  box-shadow: var(--focus-ring);
+}
+
+.icon-button-wrapper[data-hover-only="true"] {
+  background: transparent;
+  border-color: transparent;
+}
+
+.icon-button-wrapper[data-hover-only="true"]:hover {
+  background: var(--color-surface-glass-strong);
+  border-color: var(--color-border-default);
+}
+
+
+
+/* Image Edit Badge Overlay */
+.image-edit-badge {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  width: calc(2 * var(--space-lg));
+  height: calc(2 * var(--space-lg));
+  border-radius: var(--radius-full);
+  border: 0.0625rem solid color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border));
+  background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
+  background-image: var(--button-secondary-bg);
+  color: var(--button-secondary-color);
+  box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, black 22%, transparent);
+  backdrop-filter: blur(0.625rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-index-step-6);
+  cursor: pointer;
+  opacity: var(--image-edit-badge-opacity, 0);
+  transform: translateY(var(--image-edit-badge-translate-y, -0.25rem));
+  transition: opacity var(--motion-fast), transform var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast);
+}
+
+.image-edit-badge:hover,
+.image-edit-badge:focus-visible {
+  color: var(--color-text-primary);
+  border-color: color-mix(in srgb, var(--color-accent-blue) 72%, var(--button-secondary-border));
+  outline: none;
+}
+
+/* Carousel Navigation Arrow */
+.icon-button[data-variant="carousel-arrow"] {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: var(--z-index-step-20);
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, black 75%, transparent);
+  backdrop-filter: blur(0.5rem);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  box-shadow: 0 0.25rem 0.9375rem color-mix(in srgb, black 50%, transparent);
+  transition: background-color var(--motion-duration-fast) var(--motion-ease-standard), opacity var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.icon-button[data-variant="carousel-arrow"]:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-text-primary) 15%, transparent);
+  transform: translateY(-50%);
+}
+

@@ -10,36 +10,37 @@
  * @param {string} [props.fullWidthClassName='ui-description-list__item--full'] - Class name appended when item is full-width.
  * @returns {React.ReactElement|null}
  */
-import './DescriptionList.css';
+import styles from './DescriptionList.module.css';
 
 export default function DescriptionList({
   items,
-  className = 'ui-description-list',
-  itemClassName = 'ui-description-list__item',
-  labelClassName = 'ui-description-list__label',
-  valueClassName = 'ui-description-list__value',
-  fullWidthClassName = 'ui-description-list__item--full',
+  spaced = false,
+  className = '',
 }) {
   if (!Array.isArray(items) || items.length === 0) return null;
 
   const activeItems = items.filter((item) => item && item.value !== undefined && item.value !== null && item.value !== '');
   if (activeItems.length === 0) return null;
 
+  const containerClassName = `
+    ${styles.list}
+    ${spaced ? styles['list--spaced'] : ''}
+    ${className}
+  `.trim();
+
   return (
-    <div className={className}>
+    <div className={containerClassName}>
       {activeItems.map((item, idx) => {
-        const classes = [
-          itemClassName,
-          item.fullWidth && fullWidthClassName,
-          item.className,
-        ]
-          .filter(Boolean)
-          .join(' ');
+        const itemClassName = `
+          ${styles.item}
+          ${item.fullWidth ? styles['item--full'] : ''}
+          ${item.className || ''}
+        `.trim();
 
         return (
-          <div key={idx} className={classes}>
-            <span className={labelClassName}>{item.label}</span>
-            <span className={valueClassName}>{item.value}</span>
+          <div key={idx} className={itemClassName}>
+            <span className={styles.label}>{item.label}</span>
+            <span className={styles.value}>{item.value}</span>
           </div>
         );
       })}

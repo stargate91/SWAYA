@@ -1,7 +1,8 @@
 import { memo } from 'react';
-import { Heart, Pencil, Play, Star, Minus, Check, Eye, EyeOff } from '@/ui/icons';
-import Badge from '@/ui/Badge';
+import { Pencil, Play, Minus, Check, Eye, EyeOff } from '@/ui/icons';
 import PosterCard from '@/ui/PosterCard';
+import posterCardStyles from '@/ui/PosterCard.module.css';
+import buttonStyles from '@/ui/IconButton.module.css';
 import { useBulkUpdateWatchedMutation } from '@/queries';
 import {
   getPosterImagePath,
@@ -19,30 +20,7 @@ import { isSceneMediaType } from '@/lib/mediaTypes';
 import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
 import { formatPerformerSubtitle, formatMediaSubtitle } from '../utils/performerStats';
 
-const renderUserRatingBadge = (item) => {
-  const rating = Number(item?.user_rating);
-  if (!Number.isFinite(rating) || rating <= 0) return null;
-  const label = Number.isInteger(rating) ? String(rating) : rating.toFixed(1);
-  return (
-    <Badge className="ui-poster-card__user-rating-badge">
-      <Star size={10} fill="currentColor" />
-      {label}
-    </Badge>
-  );
-};
 
-const renderFavoriteBadge = (item, t) => {
-  if (!item?.is_favorite) return null;
-  return (
-    <div
-      className="ui-poster-card__favorite-badge"
-      title={t('library.filter.favorite') || 'Favourite'}
-      aria-label={t('library.filter.favorite') || 'Favourite'}
-    >
-      <Heart size={14} fill="currentColor" strokeWidth={2.2} />
-    </div>
-  );
-};
 
 export const LibraryPosterCard = memo(({
   item,
@@ -81,8 +59,6 @@ export const LibraryPosterCard = memo(({
   const isScene = isSceneMediaType(item.type) || isLibraryScenes;
 
   let topRightAction;
-  let badge = onRemove ? null : renderUserRatingBadge(item);
-  let topRightBadge = null;
   let playOverlay = null;
   let className = '';
   let ratingPill;
@@ -93,7 +69,7 @@ export const LibraryPosterCard = memo(({
     topRightAction = (
       <button
         type="button"
-        className="ui-card-action-btn ui-card-action-btn--danger"
+        className={`${posterCardStyles['action-btn']} ${posterCardStyles['action-btn--danger']}`}
         title={t('common.remove') || 'Remove'}
         aria-label={t('common.remove') || 'Remove'}
         onClick={(e) => {
@@ -125,7 +101,7 @@ export const LibraryPosterCard = memo(({
     const editButton = onEditImageClick ? (
       <button
         type="button"
-        className="ui-image-edit-badge"
+        className={`${buttonStyles['image-edit-badge']} ui-image-edit-badge`}
         title={isPeople
           ? (t('library.details.changeProfile') || 'Change Profile Picture')
           : (t('library.details.changePoster') || 'Change Poster')}
@@ -148,7 +124,6 @@ export const LibraryPosterCard = memo(({
       subtitle = formatPerformerSubtitle(item, sortKey, t);
       imageUrl = resolvePosterUrl(getProfileImagePath(item));
       className = 'library-person-card';
-      topRightBadge = renderFavoriteBadge(item, t);
       topRightAction = editButton;
     } else if (isLibraryScenes) {
       performers = n.performers;
@@ -235,16 +210,16 @@ export const LibraryPosterCard = memo(({
   const unfollowButton = (onUnfollow && isPeople) ? (
     <button
       type="button"
-      className="ui-card-action-btn"
+      className={posterCardStyles['action-btn']}
       onClick={(e) => {
         e.stopPropagation();
         onUnfollow(item);
       }}
     >
-      <span className="action-btn-state-default">
+      <span className={posterCardStyles['action-btn-state-default']}>
         <Check size={12} strokeWidth={3} /> {t('library.people.followed') || 'Followed'}
       </span>
-      <span className="action-btn-state-hover">
+      <span className={posterCardStyles['action-btn-state-hover']}>
         <Minus size={12} strokeWidth={3} /> {t('library.people.unfollow') || 'Unfollow'}
       </span>
     </button>
@@ -264,7 +239,7 @@ export const LibraryPosterCard = memo(({
   const watchToggleButton = (!isCollections && !isPeople && !onRemove) ? (
     <button
       type="button"
-      className="ui-poster-card__watch-toggle"
+      className={posterCardStyles['watch-toggle']}
       title={item.is_watched
         ? (t('library.details.markUnwatched') || 'Mark as Unwatched')
         : (t('library.details.markWatched') || 'Mark as Watched')}
@@ -296,10 +271,11 @@ export const LibraryPosterCard = memo(({
       performers={performers}
       topLeftAction={watchToggleButton}
       topRightAction={topRightAction}
-      badge={badge}
-      topRightBadge={topRightBadge}
+      userRating={onRemove ? 0 : (Number(item.user_rating) || 0)}
+      isFavorite={Boolean(item.is_favorite)}
       playOverlay={playOverlay}
       className={className}
+      isMissing={item.in_library === false}
       previewItemId={previewItemId}
       previewEnabled={onRemove ? false : Boolean(settings?.hover_previews_enabled ?? true)}
       previewDelay={onRemove ? 800 : Number(settings?.hover_previews_delay ?? 800)}

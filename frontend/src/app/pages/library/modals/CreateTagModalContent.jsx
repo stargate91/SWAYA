@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAllTagsQuery, useCreateTagMutation, useUpdateTagMutation } from '@/queries';
 import Input from '@/ui/Input';
 import Tooltip from '@/ui/Tooltip';
+import Button from '@/ui/Button';
 import { API_BASE } from '@/lib/backend';
 
 const REMOVE_SYMBOL = '✕';
@@ -205,15 +206,18 @@ export default function CreateTagModalContent({ onClose, t, initialTag = null, m
               onChange={(e) => setNewUrl(e.target.value)}
               className="create-tag-form__input-wrapper"
             />
-            <button
+            <Button
               type="button"
               onClick={handleAddUrl}
-              className="ui-button ui-button--secondary ui-button--md create-tag-form__action-btn"
+              variant="secondary"
+              className="create-tag-form__action-btn"
             >
               {t('library.tags.addImageUrl') || 'Add URL'}
-            </button>
-            <label
-              className="ui-button ui-button--secondary ui-button--md create-tag-form__action-btn create-tag-form__action-btn--upload"
+            </Button>
+            <Button
+              as="label"
+              variant="secondary"
+              className="create-tag-form__action-btn create-tag-form__action-btn--upload"
             >
               {t('library.tags.uploadImage') || 'Upload'}
               <input
@@ -222,7 +226,7 @@ export default function CreateTagModalContent({ onClose, t, initialTag = null, m
                 onChange={handleFileUpload}
                 className="create-tag-form__file-input"
               />
-            </label>
+            </Button>
           </div>
         )}
 

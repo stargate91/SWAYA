@@ -168,7 +168,7 @@ function HorizontalCollectionItemsList({ items, navigate, t, customStyle }) {
             icon={isTv ? ENTITY_ICONS.tv : ENTITY_ICONS.movie}
             onClick={() => openItem(item)}
             customStyle={{ '--item-index': index }}
-            className={item.in_library ? 'is-owned' : 'is-missing'}
+            isMissing={!item.in_library}
           />
         );
       })}
@@ -204,7 +204,7 @@ export function CollectionItemsSection({ items, navigate, t }) {
       </div>
       <ScrollRow
         onScroll={handleScroll}
-        className="collection-items-horizontal-grid-wrapper"
+        containerClassName="collection-items-horizontal-grid-wrapper"
         showArrows={true}
       >
         <HorizontalCollectionItemsList

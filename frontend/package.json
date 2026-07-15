@@ -17,6 +17,7 @@
     "test:smoke": "playwright test"
   },
   "dependencies": {
+    "@radix-ui/react-tooltip": "^1.2.12",
     "@tanstack/react-query": "^5.101.0",
     "electron-is-dev": "^3.0.1",
     "lucide-react": "^1.14.0",

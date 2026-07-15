@@ -136,7 +136,7 @@ const DashboardView = () => {
           <Tooltip content={t('dashboard.customize') || 'Customize Dashboard'} side="bottom">
             <IconButton
               onClick={() => setIsCustomizerOpen(true)}
-              variant="dashboard-customizer"
+              className={styles['dashboard-customizer-btn']}
               title={null}
             >
               <SlidersHorizontal size={18} />

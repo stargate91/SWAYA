@@ -1,4 +1,4 @@
-import './Switch.css';
+import styles from './Switch.module.css';
 
 export default function Switch({
   checked = false,
@@ -16,21 +16,25 @@ export default function Switch({
   };
 
   return (
-    <label className={`ui-switch-container ${className} ${disabled ? 'is-disabled' : ''}`.trim()} htmlFor={id}>
-      <div className="ui-switch">
+    <label
+      className={`${styles.container} ${className}`.trim()}
+      data-disabled={disabled || undefined}
+      htmlFor={id}
+    >
+      <div className={styles.switch}>
         <input
           id={id}
           type="checkbox"
           checked={checked}
           onChange={handleChange}
           disabled={disabled}
-          className="ui-switch__input"
+          className={styles.input}
         />
-        <div className="ui-switch__track">
-          <div className="ui-switch__thumb" />
+        <div className={styles.track}>
+          <div className={styles.thumb} />
         </div>
       </div>
-      {children ? <span className="ui-switch__label">{children}</span> : null}
+      {children ? <span className={styles.label}>{children}</span> : null}
     </label>
   );
 }

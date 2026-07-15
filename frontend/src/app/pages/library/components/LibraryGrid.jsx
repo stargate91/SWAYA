@@ -8,7 +8,7 @@ import { QK } from '@/lib/queryKeys';
 import EmptyState from '@/ui/EmptyState';
 import Button from '@/ui/Button';
 import IconButton from '@/ui/IconButton';
-import NavButton from '@/ui/NavButton';
+
 import Grid from '@/ui/Grid';
 import {
   getPosterImagePath,
@@ -25,7 +25,7 @@ import {
   isLibraryScenesTab,
 } from '@/lib/libraryTabs';
 import { isMovieMediaType, isPersonMediaType, isTvLikeMediaType, isSceneMediaType } from '@/lib/mediaTypes';
-import { Pencil, Plus, Trash2, UserPlus } from '@/ui/icons';
+import { Pencil, Plus, Trash2, UserPlus, ArrowLeft } from '@/ui/icons';
 import { LibraryPosterCard } from './LibraryPosterCard';
 
 export default function LibraryGrid({
@@ -180,9 +180,9 @@ export default function LibraryGrid({
           focusedTag ? (
             <div className="library-tag-focus-view">
               <div className="library-tag-focus-view__toolbar">
-                <NavButton className="library-tag-focus-view__back" onClick={onExitTagFocus}>
+                <Button variant="secondary-neutral" leftIcon={<ArrowLeft size={14} />} animateIcon className="library-tag-focus-view__back" onClick={onExitTagFocus}>
                   {t('library.tags.backToTags') || 'Back to Tags'}
-                </NavButton>
+                </Button>
               </div>
               <ExpandedTagPanel
                 key={focusedTag.name}

@@ -1,12 +1,11 @@
 import { memo, useMemo } from 'react';
-import { EyeOff, Trash2, Search, Sliders, X } from '@/ui/icons';
+import { EyeOff, Trash2, Search, Sliders, X, ChevronUp, ChevronDown } from '@/ui/icons';
 import { useTranslation } from '../providers/LanguageContext';
 import EmptyState from './EmptyState';
 import Tooltip from './Tooltip';
 import IconButton from './IconButton';
 import ContextMenu from './ContextMenu';
 import { useContextMenu } from './useContextMenu';
-import SortButton from './SortButton';
 import './Table.css';
 
 function TableHeader({ columns, sortKey, sortDirection, onSort }) {
@@ -25,12 +24,18 @@ function TableHeader({ columns, sortKey, sortDirection, onSort }) {
               className={`${col.align ? `text-${col.align}` : ''} ${col.width ? 'ui-table__cell--truncate' : ''}`.trim()}
             >
               {isSortable && onSort ? (
-                <SortButton
-                  isActive={isCurrentSort}
-                  label={col.label}
-                  onToggle={() => onSort(col.key)}
-                  sortDirection={sortDirection}
-                />
+                <button
+                  type="button"
+                  className="ui-table__sort-btn"
+                  data-sort-active={isCurrentSort}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSort(col.key);
+                  }}
+                >
+                  <span>{col.label}</span>
+                  {isCurrentSort ? (sortDirection === 'asc' ? <ChevronUp size={12} /> : <ChevronDown size={12} />) : null}
+                </button>
               ) : (
                 col.label
               )}

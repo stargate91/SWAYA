@@ -1,5 +1,5 @@
 import { ChevronLeft } from '@/ui/icons';
-import NavButton from '@/ui/NavButton';
+import Button from '@/ui/Button';
 import TMDBImageGrid from './TMDBImageGrid';
 import { useOverridePersonBackdropMutation } from '@/queries';
 
@@ -18,9 +18,9 @@ export default function PersonBackdropBrowser({
   return (
     <>
       <div className="person-backdrop-picker__detail-toolbar">
-        <NavButton className="person-backdrop-picker__back-btn" onClick={handleBackToCredits} icon={ChevronLeft}>
+        <Button variant="secondary-neutral" leftIcon={<ChevronLeft size={14} />} animateIcon className="person-backdrop-picker__back-btn" onClick={handleBackToCredits}>
           {t('common.back') || 'Back'}
-        </NavButton>
+        </Button>
         <h4 className="details-panel__section-title person-backdrop-picker__detail-title">
           {selectedBackdropMetadataQuery.data?.title || selectedCredit?.title}
         </h4>

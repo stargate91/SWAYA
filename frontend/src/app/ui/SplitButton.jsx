@@ -2,8 +2,20 @@ import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import Button from './Button';
 import { ChevronDown } from './icons';
-import './Button.css';
+import styles from './SplitButton.module.css';
 
+/**
+ * SplitButton provides a primary action button and an arrow button to open a dropdown options menu.
+ *
+ * @param {object} props
+ * @param {string} props.label - Label of primary action button
+ * @param {() => void} props.onClick - Click event for primary action
+ * @param {Array<{label: string, onClick: () => void}>} [props.options] - Options array
+ * @param {'primary' | 'secondary'} [props.variant] - SplitButton styling variant
+ * @param {'sm' | 'md'} [props.size] - SplitButton sizing
+ * @param {boolean} [props.disabled] - Disabled state
+ * @param {string} [props.className] - Additional custom class names
+ */
 export default function SplitButton({
   label,
   onClick,
@@ -43,7 +55,7 @@ export default function SplitButton({
   useEffect(() => {
     function handleClickOutside(event) {
       if (containerRef.current && !containerRef.current.contains(event.target)) {
-        if (event.target.closest('.ui-split-button__menu')) return;
+        if (event.target.closest(`.${styles['split-button-menu']}`)) return;
         setIsOpen(false);
       }
     }
@@ -53,13 +65,16 @@ export default function SplitButton({
 
   return (
     <div
-      className={`ui-split-button ui-split-button--${variant} ui-split-button--${size} ${disabled ? 'is-disabled' : ''} ${className}`.trim()}
+      data-variant={variant}
+      data-size={size}
+      data-disabled={disabled}
+      className={`${styles['split-button']} ui-split-button ${className}`.trim()}
       ref={containerRef}
     >
       <Button
         variant={variant}
         size={size}
-        className="ui-split-button__action"
+        className={`${styles['split-button-action']} ui-split-button__action`}
         onClick={onClick}
         disabled={disabled}
       >
@@ -67,7 +82,7 @@ export default function SplitButton({
       </Button>
       <button
         type="button"
-        className="ui-split-button__arrow"
+        className={`${styles['split-button-arrow']} ui-split-button__arrow`}
         onClick={(e) => {
           e.stopPropagation();
           setIsOpen(!isOpen);
@@ -78,7 +93,7 @@ export default function SplitButton({
       </button>
       {isOpen && createPortal(
         <div
-          className="ui-split-button__menu"
+          className={`${styles['split-button-menu']} ui-split-button__menu`}
           onClick={(e) => e.stopPropagation()}
           role="presentation"
           // eslint-disable-next-line react/forbid-dom-props
@@ -93,7 +108,7 @@ export default function SplitButton({
             <button
               key={index}
               type="button"
-              className="ui-split-button__menu-item"
+              className={`${styles['split-button-menu-item']} ui-split-button__menu-item`}
               onClick={(e) => {
                 e.stopPropagation();
                 setIsOpen(false);

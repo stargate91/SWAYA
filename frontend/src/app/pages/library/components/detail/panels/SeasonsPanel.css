@@ -302,6 +302,13 @@
   border: 1px solid var(--color-border-default);
   flex-shrink: 0;
   position: relative;
+  --play-overlay-width: 2rem;
+  --play-overlay-height: 2rem;
+}
+
+.episode-card__still-wrapper:hover {
+  --play-overlay-opacity: 1;
+  --play-overlay-pointer-events: auto;
 }
 
 .episode-card__tmdb-pill {
@@ -314,11 +321,6 @@
   backdrop-filter: none;
   font-weight: var(--font-weight-medium);
   box-sizing: border-box;
-}
-
-.episode-card__still-wrapper .ui-icon-button--play-overlay {
-  width: 2rem;
-  height: 2rem;
 }
 
 .episode-card__still {
