@@ -57,7 +57,7 @@
   transition: all var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
-:global(.ui-selectable-card--theme.is-selected) .theme-card__indicator {
+.theme-card__indicator--active {
   background: var(--color-accent-blue);
   border-color: var(--color-accent-blue);
   color: var(--color-text-inverse);

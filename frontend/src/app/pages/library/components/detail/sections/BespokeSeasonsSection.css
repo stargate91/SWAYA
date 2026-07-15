@@ -340,7 +340,7 @@
   color: var(--color-text-muted);
   cursor: pointer;
   transition: all var(--motion-base), opacity var(--motion-base);
-  z-index: 2;
+  z-index: var(--z-index-step-2);
   opacity: 0;
   pointer-events: none;
 }
@@ -902,7 +902,7 @@
 .organizer-details__lightbox {
   position: fixed;
   inset: 0;
-  z-index: 1200;
+  z-index: var(--z-index-backdrop);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -352,7 +352,7 @@
     background-image var(--motion-fast),
     border-color var(--motion-fast),
     box-shadow var(--motion-fast);
-  z-index: 5;
+  z-index: var(--z-index-step-5);
 }
 
 .ui-poster-card__media-shell:hover .ui-icon-button--play-overlay,
@@ -567,7 +567,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 6;
+  z-index: var(--z-index-step-6);
   cursor: pointer;
   opacity: 0;
   transform: translateY(-0.25rem);

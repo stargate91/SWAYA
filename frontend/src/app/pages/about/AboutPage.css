@@ -597,7 +597,7 @@
 .organizer-details__lightbox {
   position: fixed;
   inset: 0;
-  z-index: 1200;
+  z-index: var(--z-index-backdrop);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -988,7 +988,7 @@
   padding: calc(var(--space-2xl) + var(--space-px));
   color: var(--color-text-muted);
   position: absolute;
-  z-index: 1;
+  z-index: var(--z-index-base);
 }
 
 .features-tour-placeholder-icon {

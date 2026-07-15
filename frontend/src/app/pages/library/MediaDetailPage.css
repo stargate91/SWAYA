@@ -23,7 +23,7 @@
   right: 0;
   bottom: 0;
   overflow: hidden;
-  z-index: 1;
+  z-index: var(--z-index-zero);
 }
 
 .media-detail-page__hero::before,
@@ -65,7 +65,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  z-index: 1;
+  z-index: var(--z-index-zero);
   opacity: 0;
   transition: opacity 0.5s ease-in-out;
 }
@@ -85,18 +85,18 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-xl);
-  z-index: 2;
+  z-index: var(--z-index-base);
   position: relative;
   flex: 1;
   min-height: 0;
-  padding: var(--page-top-offset, 4rem) var(--space-5xl, var(--space-2xl)) 1.875rem var(--space-5xl, var(--space-2xl));
+  padding: var(--page-top-offset) var(--space-5xl) 1.875rem var(--space-5xl);
   overflow-y: auto;
 }
 
 .media-detail-page--scroll-transition .media-detail-page__container {
   overflow: hidden;
-  height: calc(100vh - var(--page-top-offset, 4rem) - 5rem);
-  margin-top: var(--page-top-offset, 4rem);
+  height: calc(100vh - var(--page-top-offset) - 5rem);
+  margin-top: var(--page-top-offset);
   padding-top: 0;
   padding-bottom: 0;
 }
@@ -140,7 +140,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 10;
+  z-index: var(--z-index-step-2);
   transition: transform var(--motion-fast) var(--motion-ease-spring), background var(--motion-fast), border-color var(--motion-fast), color var(--motion-fast), box-shadow var(--motion-fast);
   box-shadow: 0 0.5rem 2rem 0 rgba(0, 0, 0, 0.37);
   outline: none;
@@ -287,7 +287,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
-  z-index: 10;
+  z-index: var(--z-index-step-2);
 }
 
 .media-detail-page__side-nav-btn {
@@ -396,7 +396,7 @@
   box-shadow: var(--media-detail-side-panel-shadow);
   display: flex;
   flex-direction: column;
-  z-index: 10;
+  z-index: var(--z-index-step-2);
   overflow: hidden;
   transform: translateX(calc(100% + 5rem));
   opacity: 0;
@@ -481,7 +481,7 @@
 
 .media-detail-page__side-panel>* {
   position: relative;
-  z-index: 1;
+  z-index: var(--z-index-base);
 }
 
 @media (max-width: 73.75rem) {
@@ -508,7 +508,7 @@
 .media-detail-page__actions-row {
   display: flex;
   align-items: center;
-  gap: var(--space-lg, var(--space-md));
+  gap: var(--space-lg);
   flex-wrap: wrap;
 }
 
@@ -546,7 +546,7 @@
   width: 100%;
   height: 100%;
   position: relative;
-  z-index: 2;
+  z-index: var(--z-index-base);
 }
 
 .media-detail-page__top-right-controls {
@@ -556,7 +556,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-sm);
-  z-index: 11;
+  z-index: var(--z-index-step-3);
 }
 
 .media-detail-page__top-right-controls.hidden-state .media-detail-page__side-nav-toggle {
@@ -611,7 +611,7 @@
   overflow: hidden;
   box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08);
   cursor: pointer;
-  transition: transform var(--motion-base, 0.25s), box-shadow var(--motion-base, 0.25s);
+  transition: transform var(--motion-base), box-shadow var(--motion-base);
   align-self: flex-start;
 }
 
@@ -666,7 +666,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  --socials-bg: color-mix(in srgb, var(--color-panel-translucent, var(--color-panel)) 65%, transparent);
+  --socials-bg: color-mix(in srgb, var(--color-panel-translucent) 65%, transparent);
   background-color: var(--socials-bg);
   --socials-border: 1px solid color-mix(in srgb, var(--color-border-default) 35%, transparent);
   border: var(--socials-border);
@@ -681,7 +681,7 @@
 
 .entity-detail-page__bottom-socials-wrapper:hover {
   border-color: color-mix(in srgb, var(--color-border-default) 70%, transparent);
-  --wrapper-hover-bg: color-mix(in srgb, var(--color-panel-translucent, var(--color-panel)) 85%, transparent);
+  --wrapper-hover-bg: color-mix(in srgb, var(--color-panel-translucent) 85%, transparent);
   background-color: var(--wrapper-hover-bg);
 }
 
@@ -774,7 +774,7 @@
   border-radius: var(--radius-md);
   --scroll-border: 1px solid color-mix(in srgb, var(--color-border-default) 45%, transparent);
   border: var(--scroll-border);
-  --scroll-bg: color-mix(in srgb, var(--color-panel-translucent, var(--color-panel)) 75%, transparent);
+  --scroll-bg: color-mix(in srgb, var(--color-panel-translucent) 75%, transparent);
   background-color: var(--scroll-bg);
   color: var(--color-text-primary);
   cursor: pointer;
@@ -788,7 +788,7 @@
 }
 
 .entity-detail-page__scroll-toggle-btn:hover {
-  --scroll-hover-bg: color-mix(in srgb, var(--color-panel-translucent, var(--color-panel)) 85%, transparent);
+  --scroll-hover-bg: color-mix(in srgb, var(--color-panel-translucent) 85%, transparent);
   background-color: var(--scroll-hover-bg);
   border-color: color-mix(in srgb, var(--color-border-default) 70%, transparent);
   transform: scale(1.1);

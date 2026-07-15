@@ -10,7 +10,7 @@
   border-left: 1px solid var(--color-line);
   backdrop-filter: var(--glass-blur-lg) saturate(120%);
   overflow: hidden;
-  z-index: 4;
+  z-index: var(--z-index-base);
   transition: transform var(--motion-fast);
   will-change: transform;
 }
@@ -39,7 +39,7 @@
   justify-content: flex-start;
   align-items: center;
   height: var(--sidebar-toggle-size);
-  z-index: 5;
+  z-index: var(--z-index-step-2);
   pointer-events: auto;
 }
 

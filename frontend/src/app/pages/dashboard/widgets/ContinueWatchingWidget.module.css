@@ -60,7 +60,7 @@
   position: absolute;
   top: var(--space-md);
   right: var(--space-md);
-  z-index: 10;
+  z-index: var(--z-index-step-2);
 }
 
 .continue-watching-remove {

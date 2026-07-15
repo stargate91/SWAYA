@@ -16,7 +16,7 @@
   border: 1px solid var(--dropdown-menu-border, var(--color-border-default));
   border-radius: var(--radius-lg);
   box-shadow: var(--dropdown-menu-shadow);
-  z-index: 100;
+  z-index: var(--z-index-popover);
   display: flex;
   flex-direction: column;
   --popover-animation: linksPopoverFadeIn 0.16s var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));

@@ -337,7 +337,7 @@
   background: radial-gradient(circle at center, color-mix(in srgb, var(--color-bg-elevated) 72%, transparent) 0%, var(--color-surface-overlay-heavy) 100%);
   backdrop-filter: var(--glass-blur-md);
   -webkit-backdrop-filter: var(--glass-blur-md);
-  z-index: 10;
+  z-index: var(--z-index-step-2);
   text-align: center;
 }
 

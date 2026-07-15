@@ -22,7 +22,7 @@
   height: var(--space-7xl);
   display: flex;
   align-items: center;
-  z-index: 10;
+  z-index: var(--z-index-step-10);
 }
 
 .shell.is-sidebar-collapsed .shell__sidebar-toggle-row {

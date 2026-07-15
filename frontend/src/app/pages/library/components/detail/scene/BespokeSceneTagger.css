@@ -159,7 +159,7 @@
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
-  z-index: 100;
+  z-index: var(--z-index-dropdown);
   max-height: 12.5rem;
   overflow-y: auto;
   padding: var(--space-xs) 0;
@@ -246,7 +246,7 @@
 
 .bespoke-scene-tagger-scroller-btn {
   flex-shrink: 0;
-  z-index: 10;
+  z-index: var(--z-index-step-2);
   background: color-mix(in srgb, var(--color-ink) 5%, transparent);
   border: 1px solid var(--color-border-default);
   color: var(--color-text-secondary);

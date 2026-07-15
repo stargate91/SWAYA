@@ -250,7 +250,7 @@
   right: 0;
   max-height: 15rem;
   overflow-y: auto;
-  z-index: 100;
+  z-index: var(--z-index-dropdown);
   background: color-mix(in srgb, var(--color-text-inverse) 72%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-text-primary) 9%, transparent);
   border-radius: var(--radius-md);

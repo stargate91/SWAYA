@@ -1,11 +1,11 @@
 .ui-sidebar {
   width: 16.875rem;
-  background: var(--ui-overlay-sidebar-bg, var(--color-bg-canvas));
+  background: var(--ui-overlay-sidebar-bg);
   border-right: 1px solid var(--color-line);
-  padding: var(--ui-overlay-sidebar-padding, var(--space-lg) var(--space-md));
+  padding: var(--ui-overlay-sidebar-padding);
   display: flex;
   flex-direction: column;
-  backdrop-filter: var(--ui-overlay-sidebar-blur, blur(0.625rem));
+  backdrop-filter: var(--ui-overlay-sidebar-blur);
 }
 
 .ui-sidebar-header {
@@ -29,7 +29,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-md);
-  padding: var(--sidebar-nav-link-padding-y, var(--space-md)) var(--space-lg);
+  padding: var(--sidebar-nav-link-padding-y) var(--space-lg);
   border-radius: var(--radius-md);
   color: var(--color-muted);
   font-weight: var(--font-weight-medium);

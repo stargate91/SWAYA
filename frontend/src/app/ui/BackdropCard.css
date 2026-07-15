@@ -64,7 +64,7 @@
   display: grid;
   place-items: center;
   color: var(--color-text-primary);
-  z-index: 2;
+  z-index: var(--z-index-step-2);
 }
 
 .ui-backdrop-card__selected-overlay {
@@ -100,7 +100,7 @@
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-medium);
   text-shadow: 0 1px 2px color-mix(in srgb, black 80%, transparent);
-  z-index: 1;
+  z-index: var(--z-index-step-1);
 }
 
 .ui-backdrop-card__placeholder {

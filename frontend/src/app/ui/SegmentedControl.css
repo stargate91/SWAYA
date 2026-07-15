@@ -3,9 +3,9 @@
   align-items: stretch;
   height: var(--ui-control-height-md);
   padding: 0.1875rem;
-  border: 1px solid var(--ui-control-border, var(--color-border-default));
-  border-radius: var(--ui-control-radius, var(--radius-sm));
-  background: var(--ui-control-bg, var(--ui-surface-ghost));
+  border: 1px solid var(--ui-control-border);
+  border-radius: var(--ui-control-radius);
+  background: var(--ui-control-bg);
   gap: calc(var(--space-xs) / 2);
   box-sizing: border-box;
 }
@@ -17,11 +17,11 @@
   flex: 1;
   padding: 0 var(--space-lg);
   border: 0;
-  border-radius: calc(var(--ui-control-radius, var(--radius-sm)) - var(--radius-sm));
+  border-radius: calc(var(--ui-control-radius) - var(--radius-sm));
   background: transparent;
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold, 600);
+  font-weight: var(--font-weight-semibold);
   white-space: nowrap;
   cursor: pointer;
   transition:
@@ -62,7 +62,7 @@
 .ui-segmented-control--filter .ui-segmented-control__option {
   padding: var(--space-xs) var(--space-sm);
   font-size: var(--font-size-2xs);
-  font-weight: var(--font-weight-bold, 700);
+  font-weight: var(--font-weight-bold);
   line-height: 1;
   color: var(--color-text-muted);
   border-radius: var(--radius-sm);

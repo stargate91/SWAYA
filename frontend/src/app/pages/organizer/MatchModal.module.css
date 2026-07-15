@@ -436,7 +436,7 @@
   color: var(--color-text-inverse);
   box-shadow: 0 var(--radius-2xs) var(--space-sm) color-mix(in srgb, black 40%, transparent);
   animation: scale-up var(--motion-duration-fast) var(--motion-ease-expressive);
-  z-index: 2;
+  z-index: var(--z-index-base);
 }
 
 @keyframes scale-up {
@@ -931,7 +931,7 @@
   position: absolute;
   top: var(--space-sm);
   left: var(--space-sm);
-  z-index: 3;
+  z-index: var(--z-index-base);
 }
 
 /* Skeletons */

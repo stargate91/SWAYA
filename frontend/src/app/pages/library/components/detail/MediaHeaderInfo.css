@@ -63,13 +63,13 @@
     radial-gradient(ellipse at 58% 42%, color-mix(in srgb, black 10%, transparent) 0%, color-mix(in srgb, black 6%, transparent) 18%, transparent 48%);
   border-radius: var(--radius-2xl);
   pointer-events: none;
-  z-index: 0;
+  z-index: var(--z-index-zero);
   filter: blur(0.875rem);
 }
 
 .media-detail-page__details-group>* {
   position: relative;
-  z-index: 1;
+  z-index: var(--z-index-step-1);
 }
 
 .media-detail-page__original-title {

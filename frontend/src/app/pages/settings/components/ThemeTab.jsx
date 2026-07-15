@@ -72,7 +72,7 @@ export default function ThemeTab() {
               >
                 <div className={styles['theme-card__header']}>
                   <span className={styles['theme-card__name']}>{label}</span>
-                  <div className={styles['theme-card__indicator']}>
+                  <div className={`${styles['theme-card__indicator']} ${isActive ? styles['theme-card__indicator--active'] : ''}`}>
                     <Check size={12} strokeWidth={3} />
                   </div>
                 </div>

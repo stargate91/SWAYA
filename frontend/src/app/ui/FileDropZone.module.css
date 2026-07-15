@@ -13,7 +13,7 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--motion-fast);
-  z-index: 3;
+  z-index: var(--z-index-step-3);
 }
 
 .overlay.is-active {

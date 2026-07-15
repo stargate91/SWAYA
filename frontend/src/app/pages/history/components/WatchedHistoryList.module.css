@@ -55,7 +55,7 @@
   flex-shrink: 0;
   margin-right: var(--space-lg);
   position: relative;
-  z-index: 2;
+  z-index: var(--z-index-step-2);
   --local-transition: width 0.2s ease;
   transition: var(--local-transition);
 }
@@ -90,7 +90,7 @@
   flex: 1;
   min-width: 0;
   position: relative;
-  z-index: 2;
+  z-index: var(--z-index-step-2);
 }
 
 .watched-history-card__title-group {
@@ -263,7 +263,7 @@
   display: flex;
   align-items: center;
   position: relative;
-  z-index: 2;
+  z-index: var(--z-index-step-2);
   margin-left: var(--space-lg);
 }
 

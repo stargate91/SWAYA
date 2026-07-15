@@ -1,14 +1,6 @@
 .search-page-grid {
   width: 100%;
-}
-
-.search-page-grid :global(.ui-poster-card) {
-  --card-transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-  transition: var(--card-transition);
-}
-
-.search-page-grid :global(.ui-poster-card) :global(.ui-poster-card__image-wrapper) {
-  cursor: pointer;
+  --ui-poster-card-transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .search-page-more-container {
@@ -26,30 +18,8 @@
   flex-shrink: 0;
 }
 
-.library-scene-card :global(.ui-poster-card__subtitle-row) {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
-
-.library-scene-card :global(.ui-poster-card__subtitle) {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  margin-right: var(--space-sm);
-  flex: 1;
-}
-
-.library-scene-card :global(.ui-poster-card__performer-link) {
-  cursor: pointer;
-  color: var(--color-muted);
-  text-decoration: none;
-  transition: color var(--motion-base);
-}
-
-.library-scene-card :global(.ui-poster-card__performer-link):hover {
-  color: var(--color-accent, var(--color-accent-blue));
+.library-scene-card {
+  /* Styled globally via PosterCard */
 }
 
 .search-skeleton-card-scene {

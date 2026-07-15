@@ -87,7 +87,7 @@ export default function OrganizerPageContent({
 
   return (
     <Page viewport={true} className={`organizer-page ${styles['organizer-page']}`}>
-      <div className={`${styles['organizer-main']} ${!shouldShowDetailsPanel ? styles['is-details-hidden'] : isDetailsCollapsed ? styles['is-details-collapsed'] : ''}`}>
+      <div className={`organizer-main ${!shouldShowDetailsPanel ? 'is-details-hidden' : isDetailsCollapsed ? 'is-details-collapsed' : ''}`}>
         <div className={styles['organizer-main__content']}>
           <OrganizerHeaderPanel
             activeExtrasTab={activeExtrasTab}

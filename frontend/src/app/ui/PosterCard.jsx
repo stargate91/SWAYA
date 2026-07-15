@@ -182,7 +182,7 @@ const PosterCard = memo(function PosterCard({
                   width: '100%',
                   height: '100%',
                   objectFit: 'cover',
-                  zIndex: 3,
+                  zIndex: 'var(--z-index-step-3)',
                   opacity: isVideoPlaying ? 1 : 0,
                   transition: 'opacity 0.35s ease-in-out',
                 }}

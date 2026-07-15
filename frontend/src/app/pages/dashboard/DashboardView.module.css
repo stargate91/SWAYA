@@ -42,7 +42,7 @@
   height: 100%;
 }
 
-:global(.ui-icon-button).ui-icon-button--dashboard-customizer {
+:global(.ui-icon-button.ui-icon-button--dashboard-customizer) {
   background: var(--media-detail-side-nav-bg, color-mix(in srgb, black 60%, transparent));
   border: 1px solid var(--media-detail-side-nav-border, color-mix(in srgb, white 8%, transparent));
   color: var(--color-text-secondary);
@@ -55,7 +55,7 @@
   border-radius: var(--radius-sm);
 }
 
-:global(.ui-icon-button).ui-icon-button--dashboard-customizer:hover:not(:disabled) {
+:global(.ui-icon-button.ui-icon-button--dashboard-customizer:hover:not(:disabled)) {
   color: var(--color-text-primary);
   opacity: 1;
   background: var(--media-detail-side-nav-bg, color-mix(in srgb, black 60%, transparent));

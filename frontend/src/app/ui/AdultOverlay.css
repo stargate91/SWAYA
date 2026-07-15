@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  z-index: 10;
+  z-index: var(--z-index-step-10);
   border-radius: var(--radius-none);
 }
 

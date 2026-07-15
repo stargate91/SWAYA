@@ -6,7 +6,7 @@
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
+  z-index: var(--z-index-fullscreen);
   display: flex;
   align-items: stretch;
   height: var(--layout-window-titlebar-height);
@@ -65,7 +65,7 @@
   flex-direction: row;
   align-items: center;
   gap: var(--space-md);
-  z-index: 10;
+  z-index: var(--z-index-step-10);
 }
 
 .window-titlebar__progress-wrapper .ui-progress-bar-container {

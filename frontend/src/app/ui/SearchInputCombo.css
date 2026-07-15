@@ -5,7 +5,7 @@
 
 .search-input-combo--sm .search-input-combo__bar {
   height: var(--ui-control-height-xs);
-  border-radius: var(--radius-input, var(--radius-md));
+  border-radius: var(--radius-input);
   padding: 0 var(--space-sm);
 }
 
@@ -20,7 +20,7 @@
 
 .search-input-combo--lg .search-input-combo__bar {
   height: var(--ui-control-height-md);
-  border-radius: var(--ui-control-radius, var(--radius-md));
+  border-radius: var(--ui-control-radius);
   padding: 0 var(--space-lg);
 }
 
@@ -42,9 +42,9 @@
   display: flex;
   align-items: center;
   height: 2.375rem;
-  background: var(--color-input-bg, var(--ui-control-bg));
+  background: var(--color-input-bg);
   border: 1px solid var(--ui-control-border);
-  border-radius: var(--ui-control-radius, var(--radius-md));
+  border-radius: var(--ui-control-radius);
   padding: 0 var(--space-md);
   transition: all var(--motion-fast);
   box-sizing: border-box;
@@ -56,7 +56,7 @@
 
 .search-input-combo__bar:focus-within {
   border-color: var(--color-accent);
-  box-shadow: var(--ui-control-shadow-focus, var(--focus-ring));
+  box-shadow: var(--ui-control-shadow-focus);
 }
 
 /* Selector Button */

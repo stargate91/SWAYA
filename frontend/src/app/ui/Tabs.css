@@ -53,7 +53,7 @@
 .ui-tab:focus-visible,
 .ui-tab--sub:focus-visible {
   position: relative;
-  z-index: 1;
+  z-index: var(--z-index-step-1);
   box-shadow: 0 0 0 2px var(--color-accent-blue);
 }
 
@@ -141,4 +141,16 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
+}
+
+/* Customizations for organizer panels */
+.organizer-panel .ui-tab,
+.organizer-panel .ui-tab--sub {
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.organizer-panel__row > .ui-tabs,
+.organizer-panel__row > .ui-tabs--sub {
+  margin-left: calc(-1 * var(--space-lg));
 }

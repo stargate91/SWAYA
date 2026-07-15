@@ -9,7 +9,7 @@
   display: none;
 }
 
-.organizer-main {
+:global(.organizer-main) {
   display: flex;
   flex-direction: column;
   gap: var(--space-xl);
@@ -33,10 +33,10 @@
   will-change: padding-right;
 }
 
-.organizer-main.is-details-collapsed .organizer-main__content {
+:global(.organizer-main.is-details-collapsed) .organizer-main__content {
   padding-right: calc(var(--button-height-md) + var(--space-xl));
 }
 
-.organizer-main.is-details-hidden .organizer-main__content {
+:global(.organizer-main.is-details-hidden) .organizer-main__content {
   padding-right: var(--space-3xl);
 }

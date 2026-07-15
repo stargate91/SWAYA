@@ -3,7 +3,7 @@
   left: 50%;
   bottom: calc(var(--space-3xl) + env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%);
-  z-index: 6;
+  z-index: var(--z-index-step-6);
   display: flex;
   justify-content: center;
   pointer-events: none;
@@ -59,7 +59,7 @@
 
 .ui-floating-bar__copy {
   position: relative;
-  z-index: 1;
+  z-index: var(--z-index-step-1);
   min-width: 0;
   display: flex;
   align-items: center;
@@ -78,7 +78,7 @@
 
 .ui-floating-bar__actions {
   position: relative;
-  z-index: 1;
+  z-index: var(--z-index-step-1);
   display: flex;
   align-items: center;
   gap: var(--space-sm);

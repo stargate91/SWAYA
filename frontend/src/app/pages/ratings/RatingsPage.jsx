@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Star, Heart, Edit3, Clapperboard, Tv, Video, Users, CheckCircle } from '@/ui/icons';
 import Page from '@/ui/Page';
-import Badge from '@/ui/Badge';
 import Table from '@/ui/Table';
 import { Tabs } from '@/ui/Tabs';
 import Button from '@/ui/Button';
@@ -184,41 +183,38 @@ export default function RatingsPage() {
     <Page viewport={true} className={styles['ratings-page']}>
       <div className={styles['ratings-main']}>
         <div className={styles['ratings-main__content']}>
-          <div className={styles['ratings-panel']}>
-            <div className={styles['ratings-panel__row']}>
-              <span className={`${styles['ratings-panel__title']} ${styles['ratings-title-inline']}`}>
+          <div className="organizer-panel">
+            <div className="organizer-panel__row">
+              <span className={`organizer-panel__title ${styles['ratings-title-inline']}`}>
                 {t('ratings.title') || 'Ratings & Reviews'}
-                {isAdultMode && (
-                  <sup className={styles['ratings-title-sup']}>
-                    <Badge family="adult" tone="danger" className="ratings-title-adult-badge">
-                      {t('common.adult_badge', { defaultValue: '18+' })}
-                    </Badge>
-                  </sup>
-                )}
               </span>
             </div>
 
-            <div className={styles['ratings-panel__row']}>
+            <div className="organizer-panel__row">
               <Tabs
                 tabs={ratingTabs}
-                value={state.activeTab}
-                onChange={state.setActiveTab}
+                value={state.ratingMode}
+                onChange={(val) => {
+                  state.setRatingMode(val);
+                  state.setCurrentPage(1);
+                }}
               />
-
               <SearchInputCombo
                 placeholder={t('common.search') || 'Search...'}
                 value={localSearch}
                 onChange={(e) => setLocalSearch(e.target.value)}
                 className={styles['ratings-search']}
-                size="sm"
               />
             </div>
 
-            <div className={styles['ratings-panel__row']}>
+            <div className="organizer-panel__row">
               <Tabs
                 tabs={subTabs}
                 value={state.mediaType}
-                onChange={state.setMediaType}
+                onChange={(val) => {
+                  state.setMediaType(val);
+                  state.setCurrentPage(1);
+                }}
                 variant="sub"
               />
             </div>

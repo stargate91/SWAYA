@@ -493,11 +493,29 @@
   --motion-lift-distance-md: -0.3125rem;
 
   /* Z-Index Scale */
+  --z-index-underlay: -10;
+  --z-index-zero: 0;
+  --z-index-base: 1;
+
+  /* Low-level component stacking steps */
+  --z-index-step-1: 1;
+  --z-index-step-2: 2;
+  --z-index-step-3: 3;
+  --z-index-step-4: 4;
+  --z-index-step-5: 5;
+  --z-index-step-6: 6;
+  --z-index-step-10: 10;
+  --z-index-step-20: 20;
+
+  /* Global stacking layers */
   --z-index-dropdown: 100;
+  --z-index-popover: 150;
   --z-index-sticky: 200;
   --z-index-backdrop: 300;
   --z-index-modal: 400;
   --z-index-toast: 500;
+  --z-index-fullscreen: 1000;
+  --z-index-fullscreen-overlay: 1010;
 
   /* Effects */
   --glass-blur-md: blur(var(--space-md));

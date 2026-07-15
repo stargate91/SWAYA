@@ -23,7 +23,7 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  z-index: 10;
+  z-index: var(--z-index-base);
   transition: all 0.3s ease;
   margin: 0 auto;
   padding: var(--space-2xl) 0;
@@ -161,7 +161,7 @@
   justify-content: center;
   min-height: 0;
   position: relative;
-  z-index: 1;
+  z-index: var(--z-index-base);
 }
 
 .onboarding-footer {
@@ -171,7 +171,7 @@
   align-items: center;
   flex-shrink: 0;
   position: relative;
-  z-index: 30;
+  z-index: var(--z-index-step-2);
 }
 
 .onboarding-footer--guided-actions {
@@ -301,7 +301,7 @@
 
 .welcome-logo-badge .badge-icon {
   color: var(--color-accent-blue);
-  z-index: 2;
+  z-index: var(--z-index-step-2);
   animation: heroIconOrbit 14s linear infinite;
 }
 
@@ -327,7 +327,7 @@
   border: 1px solid var(--ui-overlay-panel-border);
   box-shadow: 0 1.125rem 2.5rem rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.04);
   transform: perspective(56.25rem) rotateX(6deg);
-  z-index: -2;
+  z-index: var(--z-index-underlay);
 }
 
 .welcome-hero-shell::after {
@@ -340,7 +340,7 @@
     radial-gradient(circle at bottom left, color-mix(in srgb, var(--color-accent-blue) 6%, transparent), transparent 30%);
   border: 1px solid color-mix(in srgb, var(--ui-overlay-panel-border) 88%, transparent);
   opacity: 0.42;
-  z-index: -1;
+  z-index: calc(var(--z-index-underlay) + 1);
 }
 
 .welcome-hero-orbit {
@@ -600,7 +600,7 @@
 .welcome-lang-panel-body,
 .welcome-lang-panel-footer {
   position: relative;
-  z-index: 1;
+  z-index: var(--z-index-base);
 }
 
 .welcome-lang-panel-shell {
@@ -816,7 +816,7 @@
     0 0 0 1px rgba(255, 255, 255, 0.04);
   display: block;
   position: relative;
-  z-index: 1;
+  z-index: var(--z-index-base);
 }
 
 .lang-row-name {

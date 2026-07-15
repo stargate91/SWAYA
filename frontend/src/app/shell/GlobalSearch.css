@@ -109,7 +109,7 @@
   cursor: pointer;
   border-radius: var(--radius-sm);
   transition: color var(--motion-duration-fast) var(--motion-ease-standard), background-color var(--motion-duration-fast) var(--motion-ease-standard);
-  z-index: 2;
+  z-index: var(--z-index-step-2);
 }
 
 .global-search__input-wrapper > .ui-tooltip {
@@ -135,7 +135,7 @@
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-lg);
   backdrop-filter: blur(0.75rem);
-  z-index: 100;
+  z-index: var(--z-index-dropdown);
   overflow: hidden;
   animation: slideDown var(--motion-duration-fast) var(--motion-ease-emphasized);
 }
@@ -203,7 +203,7 @@
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-lg);
   backdrop-filter: blur(0.75rem);
-  z-index: 99;
+  z-index: calc(var(--z-index-dropdown) - 1);
   overflow-y: auto;
   animation: slideDown var(--motion-duration-fast) var(--motion-ease-emphasized);
 }

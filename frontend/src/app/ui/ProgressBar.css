@@ -7,11 +7,11 @@
   max-width: 42.5rem;
   height: var(--ui-control-height-xs);
   padding: 0 var(--space-md);
-  background: var(--color-progress-bg, var(--color-surface-glass));
-  border: 1px solid var(--color-progress-border, var(--color-border-default));
+  background: var(--color-progress-bg);
+  border: 1px solid var(--color-progress-border);
   border-radius: var(--radius-input);
-  backdrop-filter: var(--progress-backdrop-filter, var(--glass-blur));
-  -webkit-backdrop-filter: var(--progress-backdrop-filter, var(--glass-blur));
+  backdrop-filter: var(--progress-backdrop-filter);
+  -webkit-backdrop-filter: var(--progress-backdrop-filter);
   -webkit-app-region: no-drag;
 }
 
@@ -67,19 +67,19 @@
   flex: 1 1 auto;
   min-width: 5rem;
   height: var(--space-md);
-  background: var(--color-progress-track, var(--color-border-default));
+  background: var(--color-progress-track);
   border-radius: var(--radius-full);
   overflow: hidden;
   position: relative;
 }
 
 .ui-progress-bar__fill {
-  width: var(--ui-progress-value, 0%);
+  width: var(--ui-progress-value);
   height: 100%;
   background: var(--color-accent-blue);
   border-radius: var(--radius-full);
   transition: width var(--motion-base);
-  box-shadow: 0 0 0.5rem var(--color-accent-shadow-strong, color-mix(in srgb, var(--color-accent-blue) 30%, transparent));
+  box-shadow: 0 0 0.5rem var(--color-accent-shadow-strong);
 }
 
 .ui-progress-bar__stats {
@@ -95,8 +95,8 @@
 
 /* Sub Progress Bar Styles (Background / Informational Tasks) */
 .ui-progress-bar-container--sub {
-  background: var(--color-progress-bg-sub, var(--color-surface-glass));
-  border-color: var(--color-progress-border-subtle, var(--color-surface-glass-strong));
+  background: var(--color-progress-bg-sub);
+  border-color: var(--color-progress-border-subtle);
 }
 
 .ui-progress-bar__pulse-dot--sub {
