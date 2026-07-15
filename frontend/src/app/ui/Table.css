@@ -65,10 +65,26 @@
   font-weight: var(--font-weight-semibold);
   background: var(--color-table-header-bg);
   backdrop-filter: blur(0.75rem);
-  -webkit-backdrop-filter: blur(0.75rem);
 }
 
 
+
+.ui-table.ui-table--minimal th,
+.ui-table.ui-table--minimal td {
+  padding: var(--ui-table-cell-padding);
+  font-size: var(--ui-table-cell-font-size);
+}
+
+.ui-table.ui-table--minimal th {
+  background: var(--ui-table-header-bg);
+  backdrop-filter: var(--ui-table-header-backdrop-filter);
+  border-bottom: var(--ui-table-header-border-bottom);
+  padding-bottom: var(--ui-table-header-padding-bottom);
+}
+
+.ui-table.ui-table--minimal td {
+  border-bottom: var(--ui-table-cell-border-bottom);
+}
 
 .ui-table tbody tr {
   transition: background-color var(--motion-fast);
@@ -78,16 +94,16 @@
   background: color-mix(in srgb, var(--color-line) 12%, transparent);
 }
 
-.ui-table tbody tr:not(.is-empty):hover {
-  background: var(--table-row-hover-bg);
-}
-
-.ui-table tbody tr:not(.is-empty):hover td:first-child {
-  box-shadow: var(--table-row-hover-shadow);
+.ui-table.ui-table--minimal tbody tr:nth-child(even) {
+  background: transparent;
 }
 
 .ui-table tbody tr.is-clickable {
   cursor: pointer;
+}
+
+.ui-table tr:hover td:last-child {
+  overflow: visible;
 }
 
 .ui-table tbody tr.is-active {
@@ -98,12 +114,8 @@
   box-shadow: var(--table-row-active-shadow);
 }
 
-.ui-table tbody tr.is-active:hover {
-  background: var(--table-row-active-hover-bg);
-}
-
-.ui-table .text-center {
-  text-align: center;
+.ui-table tbody tr:not(.is-empty):hover td:first-child {
+  box-shadow: var(--table-row-hover-shadow);
 }
 
 .ui-table td.ui-table__empty {
@@ -111,10 +123,6 @@
   color: var(--color-muted);
   padding: var(--space-sm) var(--space-lg);
   font-style: italic;
-}
-
-.ui-table tr:hover td:last-child {
-  overflow: visible;
 }
 
 .ui-table__row-actions {
@@ -131,14 +139,6 @@
   background: transparent;
 }
 
-.ui-table tbody tr:hover .ui-table__row-actions {
-  display: inline-flex;
-}
-
-.ui-table tbody tr:hover .ui-table__cell-value.hide-on-hover {
-  visibility: hidden;
-}
-
 .ui-table__row-action {
   display: inline-flex;
   align-items: center;
@@ -153,15 +153,37 @@
   transition: var(--motion-fast);
 }
 
-.ui-table__row-action:hover {
-  background: var(--color-surface-hover-strong);
-  color: var(--color-ink);
-}
-
 .ui-table__row-action.is-danger {
   border-color: color-mix(in srgb, var(--color-state-danger) 22%, transparent);
   color: var(--color-accent-red-soft);
   background: color-mix(in srgb, var(--color-state-danger) 6%, transparent);
+}
+
+.ui-table__row-action:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-accent-blue);
+}
+
+/* Hover & Active hover states */
+.ui-table tbody tr:not(.is-empty):hover {
+  background: var(--table-row-hover-bg);
+}
+
+.ui-table tbody tr.is-active:hover {
+  background: var(--table-row-active-hover-bg);
+}
+
+.ui-table tbody tr:hover .ui-table__row-actions {
+  display: inline-flex;
+}
+
+.ui-table tbody tr:hover .ui-table__cell-value.hide-on-hover {
+  visibility: hidden;
+}
+
+.ui-table__row-action:hover {
+  background: var(--color-surface-hover-strong);
+  color: var(--color-ink);
 }
 
 .ui-table__row-action.is-danger:hover {
@@ -170,41 +192,14 @@
   color: var(--color-text-primary);
 }
 
-.ui-table__row-action:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--color-accent-blue);
+.ui-table.ui-table--minimal tbody tr:hover {
+  background: color-mix(in srgb, var(--color-line) 6%, transparent);
 }
 
-/* Minimal Table Variant */
+/* Minimal Table Variant wrapper */
 .ui-table-wrap--minimal {
   border: none;
   background: transparent;
   border-radius: var(--radius-none);
   box-shadow: none;
-}
-
-.ui-table.ui-table--minimal th,
-.ui-table.ui-table--minimal td {
-  padding: var(--ui-table-cell-padding);
-  font-size: var(--ui-table-cell-font-size);
-}
-
-.ui-table.ui-table--minimal th {
-  background: var(--ui-table-header-bg);
-  backdrop-filter: var(--ui-table-header-backdrop-filter);
-  -webkit-backdrop-filter: var(--ui-table-header-backdrop-filter);
-  border-bottom: var(--ui-table-header-border-bottom);
-  padding-bottom: var(--ui-table-header-padding-bottom);
-}
-
-.ui-table.ui-table--minimal td {
-  border-bottom: var(--ui-table-cell-border-bottom);
-}
-
-.ui-table.ui-table--minimal tbody tr:nth-child(even) {
-  background: transparent;
-}
-
-.ui-table.ui-table--minimal tbody tr:hover {
-  background: color-mix(in srgb, var(--color-line) 6%, transparent);
 }

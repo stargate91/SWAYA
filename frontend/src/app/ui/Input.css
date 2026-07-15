@@ -49,17 +49,17 @@
   padding-right: var(--button-height-md);
 }
 
-.ui-input:hover:not(:focus):not(.ui-input--error),
-.ui-select:hover:not(:focus) {
-  border-color: color-mix(in srgb, var(--color-accent) 35%, var(--ui-control-border));
-}
-
 .ui-input:focus,
 .ui-input:focus-visible,
 .ui-select:focus,
 .ui-select:focus-visible {
   border-color: var(--color-accent);
   box-shadow: var(--ui-control-shadow-focus);
+}
+
+.ui-input:hover:not(:focus):not(.ui-input--error),
+.ui-select:hover:not(:focus) {
+  border-color: color-mix(in srgb, var(--color-accent) 35%, var(--ui-control-border));
 }
 
 .ui-input--error {

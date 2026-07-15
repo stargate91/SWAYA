@@ -11,7 +11,6 @@
   border: 1px solid var(--color-progress-border);
   border-radius: var(--radius-input);
   backdrop-filter: var(--progress-backdrop-filter);
-  -webkit-backdrop-filter: var(--progress-backdrop-filter);
   -webkit-app-region: no-drag;
 }
 

@@ -41,5 +41,14 @@
     "font-family-no-missing-generic-family-keyword": true,
     "keyframe-declaration-no-important": true,
     "custom-property-pattern": "^([a-z0-9]+-)*[a-z0-9]+$"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/app/styles/themes/**/*.css"],
+      "rules": {
+        "color-function-notation": null,
+        "function-disallowed-list": null
+      }
+    }
+  ]
 }

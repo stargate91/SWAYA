@@ -19,7 +19,7 @@
 }
 
 .universal-image-picker__upload-panel.is-dragging {
-  border: 2px dashed var(--color-accent);
+  border: 0.125rem dashed var(--color-accent);
   background: color-mix(in srgb, var(--color-accent) 8%, transparent);
   border-radius: var(--radius-lg);
   padding: var(--space-md);
@@ -43,7 +43,7 @@
   width: 100%;
   flex: 1 1 100%;
   padding-left: var(--space-lg);
-  border: 1px solid var(--ui-control-border);
+  border: 0.0625rem solid var(--ui-control-border);
   border-radius: var(--radius-md);
   background: var(--color-input-bg);
   color: var(--ui-control-text);
@@ -83,7 +83,7 @@
 
 .universal-image-picker__save-button,
 .universal-image-picker__upload-button {
-  flex: 1 1 0px;
+  flex: 1 1 0;
   justify-content: center;
 }
 
@@ -100,7 +100,7 @@
   height: 6.75rem;
   overflow: hidden;
   border-radius: var(--radius-md);
-  border: 1px solid var(--color-border-subtle);
+  border: 0.0625rem solid var(--color-border-subtle);
   background: var(--modal-surface-card-strong);
   flex: 0 0 auto;
 }
@@ -161,7 +161,7 @@
 .person-backdrop-picker .ui-backdrop-card--selected,
 .backdrops-panel .ui-backdrop-card--selected {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 2px var(--color-accent);
+  box-shadow: 0 0 0 0.125rem var(--color-accent);
   background: color-mix(in srgb, var(--color-accent) 10%, transparent);
 }
 
@@ -189,14 +189,14 @@
 .person-backdrop-picker .ui-backdrop-card:hover:not(.ui-backdrop-card--disabled):not(.ui-backdrop-card--selected),
 .backdrops-panel .ui-backdrop-card:hover:not(.ui-backdrop-card--disabled):not(.ui-backdrop-card--selected) {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 2px var(--color-accent);
+  box-shadow: 0 0 0 0.125rem var(--color-accent);
 }
 
 .universal-image-picker .ui-backdrop-card.ui-backdrop-card--selected:hover:not(.ui-backdrop-card--disabled),
 .person-backdrop-picker .ui-backdrop-card.ui-backdrop-card--selected:hover:not(.ui-backdrop-card--disabled),
 .backdrops-panel .ui-backdrop-card.ui-backdrop-card--selected:hover:not(.ui-backdrop-card--disabled) {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 2px var(--color-accent);
+  box-shadow: 0 0 0 0.125rem var(--color-accent);
 }
 
 
@@ -210,7 +210,7 @@
   align-items: center;
   justify-content: center;
   padding-bottom: var(--space-md);
-  border-bottom: 1px solid var(--color-border-subtle);
+  border-bottom: 0.0625rem solid var(--color-border-subtle);
   margin-bottom: var(--space-sm);
   width: 100%;
 }
@@ -248,7 +248,7 @@
   gap: var(--space-sm);
   padding: var(--space-sm);
   background: var(--modal-surface-card);
-  border: 1px solid var(--modal-border);
+  border: 0.0625rem solid var(--modal-border);
   border-radius: var(--radius-lg);
   cursor: pointer;
   --card-transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -259,7 +259,7 @@
 }
 
 .scene-image-picker-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-0.125rem);
   border-color: var(--color-accent);
   box-shadow: var(--shadow-md);
 }
@@ -267,7 +267,7 @@
 .scene-image-picker-card.active,
 .scene-image-picker-card.is-selected {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 2px var(--color-accent);
+  box-shadow: 0 0 0 0.125rem var(--color-accent);
   background: color-mix(in srgb, var(--color-accent) 6%, transparent);
 }
 
@@ -279,7 +279,7 @@
   justify-content: center;
   overflow: hidden;
   border-radius: var(--radius-sm);
-  --img-wrapper-bg: rgba(0, 0, 0, 0.1);
+  --img-wrapper-bg: color-mix(in srgb, black 10%, transparent);
   background: var(--img-wrapper-bg);
   padding: var(--space-sm);
 }
@@ -294,6 +294,11 @@
   max-height: 100%;
   object-fit: contain;
   border-radius: var(--radius-sm);
+}
+
+.person-backdrop-fallback-blur img {
+  filter: blur(0.5rem) brightness(0.6);
+  transform: scale(1.2);
 }
 
 .scene-image-picker-img-wrapper.backdrop-variant img {
@@ -313,10 +318,7 @@
   white-space: nowrap;
 }
 
-.person-backdrop-fallback-blur img {
-  filter: blur(0.5rem) brightness(0.6);
-  transform: scale(1.2);
-}
+
 
 .person-backdrop-fallback-section {
   margin-bottom: var(--space-md);
@@ -335,13 +337,13 @@
 .scene-image-picker-options--logo .scene-image-picker-card.active,
 .scene-image-picker-options--logo .scene-image-picker-card.is-selected {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 2px var(--color-accent);
+  box-shadow: 0 0 0 0.125rem var(--color-accent);
   background: color-mix(in srgb, var(--color-accent) 6%, transparent);
 }
 
 .scene-image-picker-options--logo .scene-image-picker-img-wrapper {
   background: var(--color-surface-glass);
-  border: 1px solid var(--color-border-subtle);
+  border: 0.0625rem solid var(--color-border-subtle);
 }
 
 .universal-image-picker__preview.is-square {

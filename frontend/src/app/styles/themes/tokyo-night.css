@@ -100,6 +100,6 @@
   --button-secondary-hover-bg: linear-gradient(180deg, rgba(122, 162, 247, 0.25), rgba(22, 22, 30, 0.35));
 
   /* Table overrides */
-  --table-row-hover-shadow: inset 1px 0 0 #bb9af3;
-  --table-row-active-shadow: inset 2px 0 0 #bb9af3;
+  --table-row-hover-shadow: inset 0.0625rem 0 0 #bb9af3;
+  --table-row-active-shadow: inset 0.125rem 0 0 #bb9af3;
 }

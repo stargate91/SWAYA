@@ -28,15 +28,15 @@
   text-align: left;
 }
 
-.ui-selectable-card--default:hover:not(:disabled):not(.is-selected) {
-  border-color: var(--color-line-strong);
-  background: var(--color-selectable-card-bg-hover);
-}
-
 .ui-selectable-card--default:focus-visible {
   outline: none;
   border-color: var(--color-accent);
   box-shadow: var(--ui-control-focus-ring);
+}
+
+.ui-selectable-card--default:hover:not(:disabled):not(.is-selected) {
+  border-color: var(--color-line-strong);
+  background: var(--color-selectable-card-bg-hover);
 }
 
 .ui-selectable-card--default.is-selected {
@@ -55,17 +55,17 @@
   text-align: left;
 }
 
+.ui-selectable-card--theme:focus-visible {
+  outline: none;
+  border-color: var(--color-accent-blue);
+  box-shadow: var(--ui-control-focus-ring);
+}
+
 .ui-selectable-card--theme:hover:not(:disabled):not(.is-selected) {
   transform: translateY(var(--motion-lift-distance-md));
   background: var(--ui-control-bg-hover);
   border-color: var(--color-border-strong);
   box-shadow: var(--shadow-sm);
-}
-
-.ui-selectable-card--theme:focus-visible {
-  outline: none;
-  border-color: var(--color-accent-blue);
-  box-shadow: var(--ui-control-focus-ring);
 }
 
 .ui-selectable-card--theme.is-selected {

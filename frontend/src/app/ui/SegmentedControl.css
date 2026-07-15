@@ -31,11 +31,6 @@
     transform var(--motion-fast);
 }
 
-.ui-segmented-control__option:hover:not(.is-active) {
-  color: var(--color-text-primary);
-  background: var(--ui-surface-soft);
-}
-
 .ui-segmented-control__option.is-active {
   background: var(--ui-surface-soft-strong);
   color: var(--color-text-primary);
@@ -68,12 +63,17 @@
   border-radius: var(--radius-sm);
 }
 
-.ui-segmented-control--filter .ui-segmented-control__option:hover:not(.is-active) {
-  color: var(--color-text-primary);
-}
-
 .ui-segmented-control--filter .ui-segmented-control__option.is-active {
   background-color: var(--color-surface-glass-strong);
   color: var(--color-text-primary);
   box-shadow: none;
+}
+
+.ui-segmented-control__option:hover:not(.is-active) {
+  color: var(--color-text-primary);
+  background: var(--ui-surface-soft);
+}
+
+.ui-segmented-control--filter .ui-segmented-control__option:hover:not(.is-active) {
+  color: var(--color-text-primary);
 }

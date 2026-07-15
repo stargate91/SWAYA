@@ -19,13 +19,6 @@
   flex-direction: row-reverse;
 }
 
-.ui-nav-button:hover:not(:disabled) {
-  background: var(--color-surface-glass-strong);
-  border-color: var(--color-border-heavy);
-  color: var(--color-ink);
-  box-shadow: 0 var(--radius-2xs) var(--space-sm) color-mix(in srgb, black 15%, transparent);
-}
-
 .ui-nav-button:disabled {
   opacity: 0.48;
   cursor: not-allowed;
@@ -36,10 +29,25 @@
   box-shadow: var(--button-focus-ring);
 }
 
+.ui-nav-button:hover:not(:disabled) {
+  background: var(--color-surface-glass-strong);
+  border-color: var(--color-border-heavy);
+  color: var(--color-ink);
+  box-shadow: 0 var(--radius-2xs) var(--space-sm) color-mix(in srgb, black 15%, transparent);
+}
+
 .ui-nav-button__icon {
   flex-shrink: 0;
   color: var(--color-muted);
   transition: transform var(--motion-fast), color var(--motion-fast);
+}
+
+.ui-nav-button--onboarding-back .ui-nav-button__icon {
+  color: color-mix(in srgb, var(--button-secondary-color) 48%, var(--color-muted));
+}
+
+.ui-nav-button--onboarding-continue .ui-nav-button__icon {
+  color: color-mix(in srgb, var(--button-secondary-color) 82%, white 18%);
 }
 
 .ui-nav-button:hover:not(:disabled) .ui-nav-button__icon {
@@ -49,6 +57,14 @@
 
 .ui-nav-button--icon-right:hover:not(:disabled) .ui-nav-button__icon {
   transform: translateX(var(--radius-2xs));
+}
+
+.ui-nav-button--onboarding-back:hover:not(:disabled) .ui-nav-button__icon {
+  color: color-mix(in srgb, var(--button-secondary-color) 74%, white 10%);
+}
+
+.ui-nav-button--onboarding-continue:hover:not(:disabled) .ui-nav-button__icon {
+  color: white;
 }
 
 .ui-nav-button--onboarding-back {
@@ -75,26 +91,20 @@
   box-shadow:
     0 0.75rem 1.75rem color-mix(in srgb, black 22%, transparent),
     0 0 0 1px color-mix(in srgb, var(--color-text-primary) 1.8%, transparent),
-    inset 0 1px 0 var(--color-border-default);
+    inset 0 1px 0 var(--var-color-border-default, var(--color-border-default));
 }
 
-.ui-nav-button--onboarding-back .ui-nav-button__icon {
-  color: color-mix(in srgb, var(--button-secondary-color) 48%, var(--color-muted));
-}
 
-.ui-nav-button--onboarding-back:hover:not(:disabled) .ui-nav-button__icon {
-  color: color-mix(in srgb, var(--button-secondary-color) 74%, white 10%);
-}
-
-.ui-nav-button--onboarding-back .ui-nav-button__label {
-  font-weight: var(--font-weight-semibold);
-}
 
 .ui-nav-button__label {
   display: inline-flex;
   align-items: center;
   line-height: 1;
   margin-top: calc(var(--space-xs) / 4);
+}
+
+.ui-nav-button--onboarding-back .ui-nav-button__label {
+  font-weight: var(--font-weight-semibold);
 }
 
 .ui-nav-button--onboarding-continue {
@@ -126,13 +136,7 @@
     inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 10%, transparent);
 }
 
-.ui-nav-button--onboarding-continue .ui-nav-button__icon {
-  color: color-mix(in srgb, var(--button-secondary-color) 82%, white 18%);
-}
 
-.ui-nav-button--onboarding-continue:hover:not(:disabled) .ui-nav-button__icon {
-  color: white;
-}
 
 .ui-nav-button--onboarding-continue .ui-nav-button__label {
   font-weight: var(--font-weight-bold);

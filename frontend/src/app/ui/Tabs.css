@@ -50,12 +50,7 @@
   box-shadow: inset 0 calc(-1 * var(--radius-2xs)) 0 var(--color-accent);
 }
 
-.ui-tab:focus-visible,
-.ui-tab--sub:focus-visible {
-  position: relative;
-  z-index: var(--z-index-step-1);
-  box-shadow: 0 0 0 2px var(--color-accent-blue);
-}
+
 
 .ui-tab__label {
   white-space: nowrap;
@@ -120,6 +115,13 @@
   cursor: pointer;
   transition: all var(--motion-fast);
   outline: none;
+}
+
+.ui-tab:focus-visible,
+.ui-tab--sub:focus-visible {
+  position: relative;
+  z-index: var(--z-index-step-1);
+  box-shadow: 0 0 0 2px var(--color-accent-blue);
 }
 
 .ui-tab--sub:hover {

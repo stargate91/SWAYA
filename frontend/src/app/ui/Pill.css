@@ -75,7 +75,7 @@
   align-self: center;
   flex-shrink: 0;
   position: relative;
-  top: -0.5px;
+  top: -0.03125rem;
 }
 
 /* Favorite toggle variants */
@@ -146,10 +146,10 @@
   justify-content: flex-start;
   padding: 0.3rem 0.7rem;
   border-radius: var(--radius-sm);
-  --pill-border: 1px solid color-mix(in srgb, var(--pill-tag-color) 30%, var(--color-border-subtle));
+  --pill-border: 0.0625rem solid color-mix(in srgb, var(--pill-tag-color) 30%, var(--color-border-subtle));
   --pill-bg: color-mix(in srgb, var(--pill-tag-color) 12%, var(--color-bg-elevated));
   --pill-color: color-mix(in srgb, var(--pill-tag-color) 85%, var(--color-text-primary));
-  --pill-shadow: 0 var(--radius-2xs) var(--space-sm) rgba(0, 0, 0, 0.15);
+  --pill-shadow: 0 var(--radius-2xs) var(--space-sm) color-mix(in srgb, black 15%, transparent);
   --pill-transition: border-color var(--motion-fast), background-color var(--motion-fast), transform var(--motion-fast), box-shadow var(--motion-fast);
 
   border: var(--pill-border);
@@ -161,7 +161,6 @@
   line-height: 1.2;
   box-shadow: var(--pill-shadow);
   backdrop-filter: blur(var(--space-sm));
-  -webkit-backdrop-filter: blur(var(--space-sm));
   transition: var(--pill-transition);
 }
 
@@ -183,12 +182,12 @@
 .ui-pill--tag:hover {
   --pill-bg-hover: color-mix(in srgb, var(--pill-tag-color) 18%, var(--color-bg-elevated));
   --pill-border-hover: color-mix(in srgb, var(--pill-tag-color) 50%, var(--color-border-default));
-  --pill-shadow-hover: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.25);
+  --pill-shadow-hover: 0 0.25rem 0.75rem color-mix(in srgb, black 25%, transparent);
 
   background: var(--pill-bg-hover);
   border-color: var(--pill-border-hover);
   box-shadow: var(--pill-shadow-hover);
-  transform: translateY(-1px);
+  transform: translateY(-0.0625rem);
 }
 
 .ui-pill--tag-suggested {

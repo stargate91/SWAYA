@@ -6,7 +6,7 @@
   .shell__sidebar {
     gap: var(--space-xl);
     border-right: 0;
-    border-bottom: 1px solid var(--color-line);
+    border-bottom: 0.0625rem solid var(--color-line);
   }
 
   .shell__utility-bar,

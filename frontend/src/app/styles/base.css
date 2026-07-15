@@ -32,7 +32,7 @@
 
   /* Status Badge Tokens */
   --status-badge-bottom: 0.75rem;
-  --status-badge-overlay-bg: rgba(0, 136, 255, 0.88);
+  --status-badge-overlay-bg: color-mix(in srgb, var(--color-state-info) 88%, transparent);
 }
 
 * {
@@ -71,19 +71,19 @@ body {
 *::-webkit-scrollbar-thumb {
   background: var(--scrollbar-thumb);
   border-radius: var(--scrollbar-radius);
-  border: 2px solid transparent;
+  border: 0.125rem solid transparent;
   background-clip: padding-box;
 }
 
 *::-webkit-scrollbar-thumb:hover {
   background: var(--scrollbar-thumb-hover);
-  border: 2px solid transparent;
+  border: 0.125rem solid transparent;
   background-clip: padding-box;
 }
 
 *::-webkit-scrollbar-thumb:active {
   background: var(--scrollbar-thumb-active);
-  border: 2px solid transparent;
+  border: 0.125rem solid transparent;
   background-clip: padding-box;
 }
 
@@ -116,8 +116,8 @@ a {
     --motion-duration-fast: 0.01ms;
     --motion-duration-base: 0.01ms;
     --motion-duration-slow: 0.01ms;
-    --motion-lift-distance-sm: 0px;
-    --motion-lift-distance-md: 0px;
+    --motion-lift-distance-sm: 0;
+    --motion-lift-distance-md: 0;
   }
 }
 
@@ -144,7 +144,6 @@ a {
   border-radius: 50%;
   background: color-mix(in srgb, black 75%, transparent);
   backdrop-filter: blur(0.5rem);
-  -webkit-backdrop-filter: blur(0.5rem);
   color: var(--color-text-primary);
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-bold);

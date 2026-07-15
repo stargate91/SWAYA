@@ -30,12 +30,12 @@
 /* Brand color variables */
 .performer-linker-card {
   --brand-color: var(--color-text-muted);
-  --brand-glow: rgba(255, 255, 255, 0.02);
+  --brand-glow: color-mix(in srgb, white 2%, transparent);
 
   position: relative;
   --card-bg: var(--color-surface-card);
   background: var(--card-bg);
-  --card-border: 1px solid var(--color-border-default);
+  --card-border: 0.0625rem solid var(--color-border-default);
   border: var(--card-border);
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -67,10 +67,12 @@
   --brand-glow: color-mix(in srgb, var(--color-brand-porndb) 15%, transparent);
 }
 
+
+
 .performer-linker-card:hover {
   --card-hover-bg: var(--color-surface-card-hover);
   background: var(--card-hover-bg);
-  --card-hover-shadow: 0 0.25rem 1.25rem rgba(0, 0, 0, 0.15);
+  --card-hover-shadow: 0 0.25rem 1.25rem color-mix(in srgb, black 15%, transparent);
   box-shadow: var(--card-hover-shadow);
 }
 
@@ -80,7 +82,7 @@
 }
 
 .performer-linker-card--unlinked {
-  --unlinked-border: 1px solid var(--color-border-default);
+  --unlinked-border: 0.0625rem solid var(--color-border-default);
   border: var(--unlinked-border);
   opacity: 0.65;
 }
@@ -93,13 +95,13 @@
   position: relative;
   width: 100%;
   aspect-ratio: 2 / 3;
-  --img-wrapper-bg: rgba(0, 0, 0, 0.3);
+  --img-wrapper-bg: color-mix(in srgb, black 30%, transparent);
   background: var(--img-wrapper-bg);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  --img-wrapper-bb: 1px solid var(--color-border-subtle);
+  --img-wrapper-bb: 0.0625rem solid var(--color-border-subtle);
   border-bottom: var(--img-wrapper-bb);
 }
 
@@ -109,9 +111,25 @@
   object-fit: cover;
 }
 
+.performer-linker-card--linking .performer-linker-card__img {
+  --linking-pulse: performer-linking-pulse 1.8s infinite ease-in-out;
+  animation: var(--linking-pulse);
+}
+
 .performer-linker-card__avatar-placeholder {
   color: var(--color-text-faint);
   opacity: 0.5;
+}
+
+.performer-linker-card.performer-linker-card--linking {
+  opacity: 1;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 var(--space-md) color-mix(in srgb, var(--color-accent) 25%, transparent);
+}
+
+.performer-linker-card--linking .performer-linker-card__avatar-placeholder {
+  --linking-pulse: performer-linking-pulse 1.8s infinite ease-in-out;
+  animation: var(--linking-pulse);
 }
 
 .performer-linker-card:hover .performer-linker-card__avatar-placeholder {
@@ -134,17 +152,18 @@
   transition: var(--sil-transition);
 }
 
+.performer-linker-card--linking .performer-gender-silhouette {
+  --linking-pulse: performer-linking-pulse 1.8s infinite ease-in-out;
+  animation: var(--linking-pulse);
+}
+
 .performer-gender-silhouette--mask {
   width: 100%;
   height: 90%;
-  background-color: currentColor;
-  -webkit-mask-image: var(--silhouette-url);
+  background-color: currentcolor;
   mask-image: var(--silhouette-url);
-  -webkit-mask-size: contain;
   mask-size: contain;
-  -webkit-mask-position: center;
   mask-position: center;
-  -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
 }
 
@@ -164,7 +183,7 @@
   --badge-bg: var(--color-surface-overlay-strong);
   background: var(--badge-bg);
   backdrop-filter: blur(0.375rem);
-  --badge-border: 1px solid var(--color-border-subtle);
+  --badge-border: 0.0625rem solid var(--color-border-subtle);
   border: var(--badge-border);
   color: var(--color-text-secondary);
   --badge-padding: 0.25rem 0.5rem;
@@ -175,6 +194,8 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+
+
 
 .performer-linker-card__content {
   --content-padding: 1.125rem;
@@ -246,7 +267,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2xl);
-  --fade-animation: fadeIn 0.3s ease;
+  --fade-animation: fadein 0.3s ease;
   animation: var(--fade-animation);
 }
 
@@ -290,7 +311,7 @@
   flex-direction: column;
   --card-bg: var(--color-surface-glass);
   background: var(--card-bg);
-  --card-border: 1px solid var(--color-border-subtle);
+  --card-border: 0.0625rem solid var(--color-border-subtle);
   border: var(--card-border);
   border-radius: var(--radius-sm);
   overflow: hidden;
@@ -303,20 +324,20 @@
   border-color: var(--hover-bc);
   --hover-bg: var(--color-surface-card-hover);
   background: var(--hover-bg);
-  transform: translateY(-2px);
+  transform: translateY(-0.125rem);
 }
 
 .performer-linker__result-image-wrapper {
   position: relative;
   width: 100%;
   aspect-ratio: 2 / 3;
-  --img-bg: rgba(0, 0, 0, 0.2);
+  --img-bg: color-mix(in srgb, black 20%, transparent);
   background: var(--img-bg);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  --img-bb: 1px solid var(--color-border-subtle);
+  --img-bb: 0.0625rem solid var(--color-border-subtle);
   border-bottom: var(--img-bb);
 }
 
@@ -348,7 +369,7 @@
 .performer-linker__result-info {
   display: flex;
   flex-direction: column;
-  --info-gap: 2px;
+  --info-gap: 0.125rem;
   gap: var(--info-gap);
 }
 
@@ -392,16 +413,16 @@
   font-size: var(--font-size-sm);
   background: var(--color-surface-glass);
   border-radius: var(--radius-sm);
-  border: 1px dashed var(--color-border-subtle);
+  border: 0.0625rem dashed var(--color-border-subtle);
 }
 
 .performer-linker__error {
   color: var(--color-state-danger);
-  --error-bc: rgba(239, 68, 68, 0.2);
+  --error-bc: color-mix(in srgb, #ef4444 20%, transparent);
   border-color: var(--error-bc);
 }
 
-@keyframes fadeIn {
+@keyframes fadein {
   from {
     opacity: 0;
     transform: translateY(0.25rem);
@@ -423,7 +444,7 @@
 .performer-edit-sidebar-title-container {
   --container-padding: 0 1.25rem 0.9375rem 1.25rem;
   padding: var(--container-padding);
-  --container-bb: 1px solid var(--color-border-subtle);
+  --container-bb: 0.0625rem solid var(--color-border-subtle);
   border-bottom: var(--container-bb);
 }
 
@@ -474,16 +495,7 @@
   margin-top: var(--grid-mt);
 }
 
-.performer-custom-values-bio {
-  min-height: 7.5rem;
-}
 
-.performer-custom-values-actions {
-  --actions-mt: 1.875rem;
-  margin-top: var(--actions-mt);
-  display: flex;
-  justify-content: flex-end;
-}
 
 /* Data Mixer Tab */
 .data-mixer-grid-container {
@@ -491,12 +503,12 @@
   overflow-y: auto;
   overflow-x: auto;
   border-radius: var(--radius-md);
-  --mixer-border: 1px solid var(--color-border-default);
+  --mixer-border: 0.0625rem solid var(--color-border-default);
   border: var(--mixer-border);
   --mixer-bg: var(--color-surface-glass);
   background: var(--mixer-bg);
   margin-top: var(--space-sm);
-  --mixer-padding: 1px;
+  --mixer-padding: 0.0625rem;
   padding: var(--mixer-padding);
 }
 
@@ -513,7 +525,7 @@
   padding: var(--th-padding);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-secondary);
-  --th-border: 1px solid var(--color-border-subtle);
+  --th-border: 0.0625rem solid var(--color-border-subtle);
   border-bottom: var(--th-border);
   --th-bg: color-mix(in srgb, var(--color-bg-canvas) 90%, transparent);
   background: var(--th-bg);
@@ -527,7 +539,7 @@
 }
 
 .mixer-row {
-  --row-border: 1px solid var(--color-border-subtle);
+  --row-border: 0.0625rem solid var(--color-border-subtle);
   border-bottom: var(--row-border);
   --row-transition: background-color var(--motion-fast) ease;
   transition: var(--row-transition);
@@ -546,7 +558,7 @@
   width: 8.75rem;
   --td-bg: color-mix(in srgb, var(--color-bg-canvas) 60%, transparent);
   background: var(--td-bg);
-  --td-border: 1px solid var(--color-border-subtle);
+  --td-border: 0.0625rem solid var(--color-border-subtle);
   border-right: var(--td-border);
 }
 
@@ -587,7 +599,7 @@
 .mixer-td-cell.mixer-td-cell--active {
   --active-bg: linear-gradient(135deg, color-mix(in srgb, var(--color-state-success) 8%, transparent) 0%, color-mix(in srgb, var(--color-state-success) 2%, transparent) 100%);
   background: var(--active-bg);
-  --active-border: 1px solid color-mix(in srgb, var(--color-state-success) 30%, transparent);
+  --active-border: 0.0625rem solid color-mix(in srgb, var(--color-state-success) 30%, transparent);
   border: var(--active-border);
   --active-shadow: inset 0 0 0.5rem color-mix(in srgb, var(--color-state-success) 5%, transparent);
   box-shadow: var(--active-shadow);
@@ -602,7 +614,7 @@
 .mixer-td-cell.mixer-td-cell--auto.mixer-td-cell--active {
   --auto-bg: linear-gradient(135deg, color-mix(in srgb, var(--color-state-info) 8%, transparent) 0%, color-mix(in srgb, var(--color-state-info) 2%, transparent) 100%);
   background: var(--auto-bg);
-  --auto-border: 1px solid color-mix(in srgb, var(--color-state-info) 30%, transparent);
+  --auto-border: 0.0625rem solid color-mix(in srgb, var(--color-state-info) 30%, transparent);
   border: var(--auto-border);
 }
 
@@ -642,13 +654,18 @@
   opacity: 1;
 }
 
+.mixer-custom-textarea {
+  resize: vertical;
+  min-height: 3rem;
+}
+
 .mixer-td-cell .mixer-custom-input,
 .mixer-td-cell .mixer-custom-select,
 .mixer-td-cell .mixer-custom-textarea {
   width: 100%;
   --input-bg: var(--color-bg-dark);
   background: var(--input-bg);
-  --input-border: 1px solid rgba(255, 255, 255, 0.15);
+  --input-border: 0.0625rem solid color-mix(in srgb, white 15%, transparent);
   border: var(--input-border);
   border-radius: var(--radius-sm);
   color: var(--color-text-primary);
@@ -663,22 +680,19 @@
 .mixer-td-cell .mixer-custom-input:focus,
 .mixer-td-cell .mixer-custom-select:focus,
 .mixer-td-cell .mixer-custom-textarea:focus {
-  --focus-border: rgba(168, 85, 247, 0.6);
+  --focus-border: color-mix(in srgb, #a855f7 60%, transparent);
   border-color: var(--focus-border);
-  --focus-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
+  --focus-shadow: 0 0 0 0.125rem color-mix(in srgb, #a855f7 20%, transparent);
   box-shadow: var(--focus-shadow);
 }
 
-.mixer-custom-textarea {
-  resize: vertical;
-  min-height: 3rem;
-}
+
 
 /* Specific active styling for manual route */
 .mixer-td-cell.mixer-td-cell--manual.mixer-td-cell--active {
   --manual-bg: linear-gradient(135deg, color-mix(in srgb, var(--color-accent-purple) 8%, transparent) 0%, color-mix(in srgb, var(--color-accent-purple) 2%, transparent) 100%);
   background: var(--manual-bg);
-  --manual-border: 1px solid color-mix(in srgb, var(--color-accent-purple) 30%, transparent);
+  --manual-border: 0.0625rem solid color-mix(in srgb, var(--color-accent-purple) 30%, transparent);
   border: var(--manual-border);
 }
 
@@ -693,7 +707,7 @@
 }
 
 .mixer-td-cell.mixer-td-cell--editing {
-  --edit-padding: 2px;
+  --edit-padding: 0.125rem;
   padding: var(--edit-padding);
 }
 
@@ -725,7 +739,7 @@
 .custom-values-card {
   --card-bg: var(--color-surface-card);
   background: var(--card-bg);
-  --card-border: 1px solid var(--color-border-default);
+  --card-border: 0.0625rem solid var(--color-border-default);
   border: var(--card-border);
   border-radius: var(--radius-sm);
   --card-padding: 0.875rem 1.125rem;
@@ -734,7 +748,7 @@
 }
 
 .custom-values-card__header {
-  --header-bb: 1px solid var(--color-border-subtle);
+  --header-bb: 0.0625rem solid var(--color-border-subtle);
   border-bottom: var(--header-bb);
   --header-pb: 0.375rem;
   padding-bottom: var(--header-pb);
@@ -871,18 +885,7 @@
   }
 }
 
-.performer-linker-card.performer-linker-card--linking {
-  opacity: 1;
-  border-color: var(--color-accent);
-  box-shadow: 0 0 var(--space-md) color-mix(in srgb, var(--color-accent) 25%, transparent);
-}
 
-.performer-linker-card--linking .performer-gender-silhouette,
-.performer-linker-card--linking .performer-linker-card__avatar-placeholder,
-.performer-linker-card--linking .performer-linker-card__img {
-  --linking-pulse: performer-linking-pulse 1.8s infinite ease-in-out;
-  animation: var(--linking-pulse);
-}
 
 .performer-linker-card__linking-msg {
   font-size: var(--font-size-xs);
@@ -901,7 +904,7 @@
 
 .healthyceleb-import-box {
   padding: var(--space-lg);
-  border: 1px solid var(--color-border-subtle);
+  border: 0.0625rem solid var(--color-border-subtle);
   border-radius: var(--radius-sm);
   background: var(--color-surface-card);
   margin-bottom: var(--space-xl);
@@ -925,7 +928,7 @@
   flex: 1;
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border-default);
+  border: 0.0625rem solid var(--color-border-default);
   background: var(--color-surface-card);
   color: var(--color-text-primary);
   font-size: var(--font-size-xs);

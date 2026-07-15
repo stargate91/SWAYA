@@ -92,14 +92,13 @@
   gap: var(--space-sm);
   --socials-bg: color-mix(in srgb, var(--color-panel-translucent) 65%, transparent);
   background-color: var(--socials-bg);
-  --socials-border: 1px solid color-mix(in srgb, var(--color-border-default) 35%, transparent);
+  --socials-border: 0.0625rem solid color-mix(in srgb, var(--color-border-default) 35%, transparent);
   border: var(--socials-border);
   border-radius: var(--radius-full);
   --socials-padding: 0.3125rem;
   padding: var(--socials-padding);
   box-shadow: 0 0.5rem 1.5rem color-mix(in srgb, black 25%, transparent);
   backdrop-filter: blur(0.75rem);
-  -webkit-backdrop-filter: blur(0.75rem);
   transition: border-color var(--motion-base), background-color var(--motion-base);
 }
 
@@ -120,18 +119,17 @@
   width: 2.375rem;
   height: 2.375rem;
   border-radius: var(--radius-md);
-  --scroll-border: 1px solid color-mix(in srgb, var(--color-border-default) 45%, transparent);
+  --scroll-border: 0.0625rem solid color-mix(in srgb, var(--color-border-default) 45%, transparent);
   border: var(--scroll-border);
   --scroll-bg: color-mix(in srgb, var(--color-panel-translucent) 75%, transparent);
   background-color: var(--scroll-bg);
   color: var(--color-text-primary);
   cursor: pointer;
-  --scroll-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.5);
+  --scroll-shadow: 0 0.5rem 2rem color-mix(in srgb, black 50%, transparent);
   box-shadow: var(--scroll-shadow);
   backdrop-filter: blur(1rem);
-  -webkit-backdrop-filter: blur(1rem);
   transition: all var(--motion-base);
-  --scroll-animation: bounceArrowScroll 2s infinite;
+  --scroll-animation: bouncearrowscroll 2s infinite;
   animation: var(--scroll-animation);
 }
 
@@ -151,7 +149,7 @@
   animation: none;
 }
 
-@keyframes bounceArrowScroll {
+@keyframes bouncearrowscroll {
   0%, 20%, 50%, 80%, 100% {
     transform: translateY(0);
   }
@@ -159,7 +157,7 @@
     transform: translateY(0.3125rem);
   }
   60% {
-    transform: translateY(2.5px);
+    transform: translateY(0.15625rem);
   }
 }
 
@@ -206,12 +204,11 @@
   color: var(--color-text-secondary);
   box-shadow: none;
   backdrop-filter: none;
-  -webkit-backdrop-filter: none;
   transition: all var(--motion-fast);
 }
 
 .entity-detail-page__bottom-social-btn:hover {
-  transform: translateY(-1px);
+  transform: translateY(-0.0625rem);
   color: var(--color-text-primary);
   background-color: color-mix(in srgb, var(--color-surface-glass-strong) 30%, transparent);
 }

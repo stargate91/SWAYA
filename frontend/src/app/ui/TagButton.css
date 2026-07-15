@@ -10,13 +10,13 @@
   transition: background var(--motion-fast), border-color var(--motion-fast), color var(--motion-fast);
 }
 
+.ui-tag-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-accent-glow);
+}
+
 .ui-tag-button:hover:not(:disabled) {
   background: var(--color-tag-button-bg-hover);
   border-color: var(--color-tag-button-border-hover);
   color: var(--color-accent);
-}
-
-.ui-tag-button:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--color-accent-glow);
 }

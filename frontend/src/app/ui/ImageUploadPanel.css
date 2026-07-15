@@ -71,7 +71,7 @@
 
 .universal-image-picker__save-button,
 .universal-image-picker__upload-button {
-  flex: 1 1 0px;
+  flex: 1 1 0;
   justify-content: center;
 }
 

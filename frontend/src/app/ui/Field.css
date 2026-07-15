@@ -28,8 +28,8 @@
 
 .ui-field__sr-only {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  width: 0.0625rem;
+  height: 0.0625rem;
   padding: 0;
   margin: -0.0625rem;
   overflow: hidden;

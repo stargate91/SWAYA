@@ -82,8 +82,8 @@
 
 .ui-sidebar-sub-indicator {
   position: absolute;
-  left: -1.5px;
-  width: 2.5px;
+  left: -0.09375rem;
+  width: 0.15625rem;
   height: calc(2 * var(--space-lg));
   background: var(--color-accent);
   border-radius: var(--radius-sm);

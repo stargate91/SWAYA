@@ -21,14 +21,14 @@
   background-color: transparent;
 }
 
-.player-page.player-page--transparent .player-page__video-container {
-  background-color: transparent;
-}
-
 .player-page__video-container {
   width: 100%;
   height: 100%;
   background-color: black;
+}
+
+.player-page.player-page--transparent .player-page__video-container {
+  background-color: transparent;
 }
 
 /* Custom Controls Overlay */
@@ -300,7 +300,7 @@
   font-size: 1.0625rem;
   font-weight: var(--player-weight-normal);
   line-height: 1.1;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.0125rem;
 }
 
 /* Audio/Subtitle Selection Dropdowns */
@@ -329,7 +329,7 @@
   font-size: 0.6875rem;
   font-weight: var(--player-weight-bold);
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.05rem;
   padding: var(--player-space-xs) var(--player-space-sm) var(--player-space-2xs) var(--player-space-sm);
   border-bottom: 1px solid var(--player-color-border-default);
   margin-bottom: var(--player-space-2xs);
@@ -398,7 +398,7 @@
 
 .player-page__chapter-marker {
   position: absolute;
-  width: 2px;
+  width: 0.125rem;
   height: var(--player-space-xs);
   background-color: color-mix(in srgb, var(--player-color-ink) 40%, transparent);
   pointer-events: none;
@@ -469,18 +469,7 @@
 }
 
 /* Ending Overlay */
-.player-page__end-overlay {
-  position: absolute;
-  inset: 0;
-  background: color-mix(in srgb, var(--player-color-canvas) 75%, transparent);
-  backdrop-filter: blur(1.25rem);
-  -webkit-backdrop-filter: blur(1.25rem);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: var(--z-index-dropdown);
-  animation: fadeIn var(--motion-duration-slow) var(--motion-ease-standard);
-}
+
 
 @keyframes fadeIn {
   from {
@@ -519,7 +508,7 @@
 .player-page__end-title {
   font-size: var(--player-font-size-xs);
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 0.125rem;
   color: var(--player-accent);
   margin-bottom: var(--player-space-sm);
   font-weight: var(--player-weight-extrabold);
@@ -745,7 +734,7 @@
   text-transform: uppercase;
   font-size: 0.6875rem;
   font-weight: var(--player-weight-bold);
-  letter-spacing: 2px;
+  letter-spacing: 0.125rem;
   margin-bottom: var(--player-space-sm);
 }
 
@@ -819,7 +808,7 @@
 }
 
 .player-page__tv-divider {
-  height: 1px;
+  height: 0.0625rem;
   background: var(--player-border-glass-default);
   margin: var(--player-space-sm) 0;
   border: none;
@@ -904,7 +893,7 @@
   text-transform: uppercase;
   font-size: 0.6875rem;
   font-weight: var(--player-weight-bold);
-  letter-spacing: 1.5px;
+  letter-spacing: 0.09375rem;
 }
 
 .player-page__tv-season-title-top {
@@ -918,7 +907,7 @@
   color: color-mix(in srgb, var(--player-color-ink) 60%, transparent);
   font-size: 0.8125rem;
   font-weight: var(--player-weight-medium);
-  letter-spacing: 0.3px;
+  letter-spacing: 0.01875rem;
   text-align: center;
 }
 
@@ -950,17 +939,14 @@
   align-items: center;
 }
 
-.player-page__segmented-rater-container .layout-column .rating-segmented-bar {
-  flex: none;
-  width: 100%;
-}
+
 
 .player-page__segmented-rater-container .user-rating-label-under {
   color: var(--player-color-ink);
   font-size: var(--player-font-size-2xs);
   font-weight: var(--player-weight-bold);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.0625rem;
 }
 
 .player-page__segmented-rater-container .user-rating-label-under.has-value {
@@ -990,6 +976,11 @@
 .player-page__tv-rate-card .rating-segmented-bar {
   max-width: 17.5rem;
   margin: 0 auto;
+}
+
+.player-page__segmented-rater-container .layout-column .rating-segmented-bar {
+  flex: none;
+  width: 100%;
 }
 
 .player-page__segmented-rater-container .rating-segment {
@@ -1053,7 +1044,7 @@
 .player-page__drawer-footer {
   display: flex;
   gap: var(--player-space-lg);
-  margin-top: var(--player-space-6xl);
+  margin-top: auto;
 }
 
 .player-page__action-btn {
@@ -1094,7 +1085,7 @@
   color: color-mix(in srgb, var(--player-color-ink) 70%, transparent);
   font-size: 0.6875rem;
   font-weight: var(--player-weight-bold);
-  letter-spacing: 2px;
+  letter-spacing: 0.125rem;
   text-transform: uppercase;
   margin-bottom: var(--player-space-sm);
 }
@@ -1126,6 +1117,20 @@
   line-height: 1.3;
 }
 
+.player-page__card {
+  position: relative;
+  flex: 1;
+  max-width: calc(50% - var(--player-space-md));
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: 2 / 3;
+}
+
 .player-page__discovery-vertical-list .player-page__card {
   max-width: 100%;
   width: 100%;
@@ -1144,19 +1149,7 @@
   max-width: none;
 }
 
-.player-page__card {
-  position: relative;
-  flex: 1;
-  max-width: calc(50% - var(--player-space-md));
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  overflow: visible;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  aspect-ratio: 2 / 3;
-}
+
 
 .player-page__card--16-9 {
   aspect-ratio: 16 / 9;
@@ -1180,7 +1173,7 @@
   font-size: 0.625rem;
   font-weight: var(--player-weight-bold);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.0625rem;
   border: 1px solid color-mix(in srgb, var(--player-accent) 20%, transparent);
   z-index: var(--z-index-step-2);
 }
@@ -1198,10 +1191,7 @@
   transition: border-color var(--motion-duration-base) var(--motion-ease-standard), box-shadow var(--motion-duration-base) var(--motion-ease-standard);
 }
 
-.player-page__card:hover .player-page__card-media {
-  border-color: var(--player-border-glass-default);
-  box-shadow: var(--player-shadow-card-hover);
-}
+
 
 .player-page__card-img {
   width: 100%;
@@ -1210,9 +1200,7 @@
   transition: transform var(--motion-duration-slow) var(--motion-ease-standard);
 }
 
-.player-page__card:hover .player-page__card-img {
-  transform: scale(1.02);
-}
+
 
 .player-page__card-placeholder-icon {
   color: var(--player-color-glass-faint-text);
@@ -1344,8 +1332,13 @@
   transform: scale(1.02);
 }
 
-.player-page__drawer-footer {
-  margin-top: auto;
+.player-page__card:hover .player-page__card-media {
+  border-color: var(--player-border-glass-default);
+  box-shadow: var(--player-shadow-card-hover);
+}
+
+.player-page__card:hover .player-page__card-img {
+  transform: scale(1.02);
 }
 
 .player-page__discovery-container-vertical {

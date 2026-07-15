@@ -10,7 +10,7 @@
   display: flex;
   align-items: stretch;
   height: var(--layout-window-titlebar-height);
-  border-bottom: 1px solid var(--color-border-subtle);
+  border-bottom: 0.0625rem solid var(--color-border-subtle);
   background: linear-gradient(180deg, var(--color-panel), var(--color-panel-strong));
   backdrop-filter: var(--glass-blur-lg) saturate(120%);
   box-shadow: var(--titlebar-shadow);
@@ -105,7 +105,7 @@
 }
 
 .window-titlebar__button:hover {
-  --btn-hover-bg: rgba(255, 255, 255, 0.05);
+  --btn-hover-bg: color-mix(in srgb, #ffffff 5%, transparent);
   background: var(--btn-hover-bg);
   color: var(--color-ink);
 }
@@ -117,7 +117,7 @@
 }
 
 .window-titlebar__button:active {
-  --btn-active-bg: rgba(255, 255, 255, 0.08);
+  --btn-active-bg: color-mix(in srgb, #ffffff 8%, transparent);
   background: var(--btn-active-bg);
 }
 
@@ -182,14 +182,14 @@
   transition: background var(--motion-fast), color var(--motion-fast);
 }
 
+.window-titlebar__nav-btn.window-titlebar__nav-btn:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 0.125rem var(--color-accent);
+}
+
 .window-titlebar__nav-btn.window-titlebar__nav-btn:hover:not(:disabled) {
   background: color-mix(in srgb, var(--color-ink) 5%, transparent);
   color: var(--color-ink);
-}
-
-.window-titlebar__nav-btn.window-titlebar__nav-btn:focus-visible {
-  outline: none;
-  box-shadow: inset 0 0 0 2px var(--color-accent);
 }
 
 .window-titlebar__nav-btn:disabled {

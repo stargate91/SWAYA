@@ -8,7 +8,6 @@
   padding: var(--space-2xl);
   background: color-mix(in srgb, black 82%, transparent);
   backdrop-filter: var(--glass-blur-md);
-  -webkit-backdrop-filter: var(--glass-blur-md);
 }
 
 .ui-lightbox__close-container {

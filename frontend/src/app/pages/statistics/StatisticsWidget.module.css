@@ -42,7 +42,6 @@
     radial-gradient(circle at top right, color-mix(in srgb, var(--color-accent-blue-soft) 12%, transparent), transparent 42%),
     linear-gradient(180deg, color-mix(in srgb, var(--color-surface-glass) 72%, transparent), var(--color-surface-card));
   backdrop-filter: var(--glass-blur-lg);
-  -webkit-backdrop-filter: var(--glass-blur-lg);
   transition: border-color var(--motion-duration-emphasized) var(--motion-ease-emphasized),
               background var(--motion-duration-emphasized) var(--motion-ease-emphasized),
               transform var(--motion-duration-emphasized) var(--motion-ease-emphasized),
@@ -54,7 +53,7 @@
   background:
     radial-gradient(circle at top right, color-mix(in srgb, var(--color-accent-blue-soft) 22%, transparent), transparent 48%),
     linear-gradient(180deg, color-mix(in srgb, var(--color-surface-glass) 82%, transparent), var(--color-surface-card));
-  transform: translateY(-2px);
+  transform: translateY(-0.125rem);
   box-shadow: var(--shadow-lg), 0 0 0.9375rem color-mix(in srgb, var(--color-accent-blue-soft) 10%, transparent);
 }
 
@@ -83,7 +82,7 @@
   font-weight: var(--font-weight-extrabold);
   color: var(--color-text-primary);
   margin-bottom: var(--space-sm);
-  letter-spacing: -1px;
+  letter-spacing: -0.0625rem;
 }
 
 .stat-sub {

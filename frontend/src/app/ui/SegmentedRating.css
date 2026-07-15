@@ -23,7 +23,7 @@
   background: var(--local-bg);
   border-radius: var(--radius-xs);
   overflow: hidden;
-  --local-border: 1px solid var(--color-border-subtle);
+  --local-border: 0.0625rem solid var(--color-border-subtle);
   border: var(--local-border);
   --local-transition: all var(--motion-duration-base) var(--motion-ease-standard);
   transition: var(--local-transition);

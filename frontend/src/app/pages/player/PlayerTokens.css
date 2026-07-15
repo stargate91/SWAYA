@@ -9,10 +9,10 @@
   --player-weight-extrabold: 800;
 
   /* Font Families */
-  --player-font-family: Inter, system-ui, -apple-system, sans-serif;
+  --player-font-family: inter, system-ui, -apple-system, sans-serif;
 
   /* Spacings */
-  --player-space-2px: 2px;
+  --player-space-2px: 0.125rem;
   --player-space-2xs: 0.25rem;
   --player-space-xs: 0.375rem;
   --player-space-sm: 0.5rem;
@@ -27,13 +27,13 @@
   --player-space-7xl: 3rem;
 
   /* Border Radii */
-  --player-radius-xs: 2px;
-  --player-radius-sm: 4px;
-  --player-radius-md: 8px;
-  --player-radius-lg: 12px;
-  --player-radius-xl: 16px;
-  --player-radius-2xl: 24px;
-  --player-radius-full: 9999px;
+  --player-radius-xs: 0.125rem;
+  --player-radius-sm: 0.25rem;
+  --player-radius-md: 0.5rem;
+  --player-radius-lg: 0.75rem;
+  --player-radius-xl: 1rem;
+  --player-radius-2xl: 1.5rem;
+  --player-radius-full: 9999rem;
 
   /* Font Sizes */
   --player-font-size-2xs: 0.6875rem;
@@ -51,54 +51,54 @@
   --player-accent-hover: var(--color-accent-strong);
   --player-color-white: #ffffff;
   --player-color-accent-default: #38bdf8;
-  --player-color-glass-faint-text: rgba(255, 255, 255, 0.15);
+  --player-color-glass-faint-text: color-mix(in srgb, white 15%, transparent);
   
-  --player-bg-overlay-heavy: rgba(0, 0, 0, 0.75);
-  --player-bg-overlay-medium: rgba(0, 0, 0, 0.45);
-  --player-bg-overlay-light: rgba(0, 0, 0, 0.4);
-  --player-bg-overlay-subtle: rgba(0, 0, 0, 0.2);
-  --player-bg-sidebar: rgba(15, 15, 18, 0.45);
+  --player-bg-overlay-heavy: color-mix(in srgb, black 75%, transparent);
+  --player-bg-overlay-medium: color-mix(in srgb, black 45%, transparent);
+  --player-bg-overlay-light: color-mix(in srgb, black 40%, transparent);
+  --player-bg-overlay-subtle: color-mix(in srgb, black 20%, transparent);
+  --player-bg-sidebar: color-mix(in srgb, #0f0f12 45%, transparent);
   
-  --player-bg-glass-subtle: rgba(255, 255, 255, 0.03);
-  --player-bg-glass-light: rgba(255, 255, 255, 0.05);
-  --player-bg-glass-medium: rgba(255, 255, 255, 0.1);
+  --player-bg-glass-subtle: color-mix(in srgb, white 3%, transparent);
+  --player-bg-glass-light: color-mix(in srgb, white 5%, transparent);
+  --player-bg-glass-medium: color-mix(in srgb, white 10%, transparent);
 
   --player-color-ink: #ffffff;
-  --player-color-ink-muted: rgba(255, 255, 255, 0.75);
-  --player-color-ink-faint: rgba(255, 255, 255, 0.45);
-  --player-color-border-subtle: rgba(255, 255, 255, 0.08);
-  --player-color-border-default: rgba(255, 255, 255, 0.15);
-  --player-color-border-strong: rgba(255, 255, 255, 0.25);
+  --player-color-ink-muted: color-mix(in srgb, white 75%, transparent);
+  --player-color-ink-faint: color-mix(in srgb, white 45%, transparent);
+  --player-color-border-subtle: color-mix(in srgb, white 8%, transparent);
+  --player-color-border-default: color-mix(in srgb, white 15%, transparent);
+  --player-color-border-strong: color-mix(in srgb, white 25%, transparent);
   --player-color-canvas: #0c0c0e;
-  --player-color-surface-glass: rgba(15, 15, 18, 0.6);
-  --player-color-surface-glass-strong: rgba(15, 15, 18, 0.85);
+  --player-color-surface-glass: color-mix(in srgb, #0f0f12 60%, transparent);
+  --player-color-surface-glass-strong: color-mix(in srgb, #0f0f12 85%, transparent);
   --player-color-state-danger: #ef4444;
   --player-color-state-success: #22c55e;
   --player-color-yellow: #fbbf24;
-  --player-bg-badge: rgba(15, 15, 18, 0.82);
+  --player-bg-badge: color-mix(in srgb, #0f0f12 82%, transparent);
 
   /* Borders & Spacing elements */
-  --player-border-glass-subtle: rgba(255, 255, 255, 0.06);
-  --player-border-glass-default: rgba(255, 255, 255, 0.08);
-  --player-border-glass-medium: rgba(255, 255, 255, 0.1);
-  --player-border-glass-strong: rgba(255, 255, 255, 0.2);
-  --player-border-glass-faint: rgba(255, 255, 255, 0.15);
+  --player-border-glass-subtle: color-mix(in srgb, white 6%, transparent);
+  --player-border-glass-default: color-mix(in srgb, white 8%, transparent);
+  --player-border-glass-medium: color-mix(in srgb, white 10%, transparent);
+  --player-border-glass-strong: color-mix(in srgb, white 20%, transparent);
+  --player-border-glass-faint: color-mix(in srgb, white 15%, transparent);
 
-  --player-border-osd: 1px solid var(--player-border-glass-medium);
-  --player-border-sidebar: 1px solid var(--player-border-glass-default);
-  --player-border-glass-thin: 1px solid var(--player-border-glass-default);
-  --player-border-glass-extra-thin: 1px solid var(--player-border-glass-subtle);
+  --player-border-osd: 0.0625rem solid var(--player-border-glass-medium);
+  --player-border-sidebar: 0.0625rem solid var(--player-border-glass-default);
+  --player-border-glass-thin: 0.0625rem solid var(--player-border-glass-default);
+  --player-border-glass-extra-thin: 0.0625rem solid var(--player-border-glass-subtle);
   
-  --player-border-button-secondary-fallback: 1px solid var(--player-border-glass-faint);
+  --player-border-button-secondary-fallback: 0.0625rem solid var(--player-border-glass-faint);
 
   /* Shadows */
-  --player-shadow-osd: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.5);
-  --player-shadow-sidebar: 0 0 3.125rem rgba(0, 0, 0, 0.6);
-  --player-shadow-tooltip: 0 0.75rem 2rem rgba(0, 0, 0, 0.4);
-  --player-shadow-dialog: 0 1rem 2.5rem rgba(0, 0, 0, 0.6);
-  --player-shadow-controls: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.4);
-  --player-shadow-header: 0 0.375rem 1.125rem rgba(0, 0, 0, 0.4);
-  --player-shadow-toast: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.5);
+  --player-shadow-osd: 0 0.25rem 0.75rem color-mix(in srgb, black 50%, transparent);
+  --player-shadow-sidebar: 0 0 3.125rem color-mix(in srgb, black 60%, transparent);
+  --player-shadow-tooltip: 0 0.75rem 2rem color-mix(in srgb, black 40%, transparent);
+  --player-shadow-dialog: 0 1rem 2.5rem color-mix(in srgb, black 60%, transparent);
+  --player-shadow-controls: 0 0.25rem 0.625rem color-mix(in srgb, black 40%, transparent);
+  --player-shadow-header: 0 0.375rem 1.125rem color-mix(in srgb, black 40%, transparent);
+  --player-shadow-toast: 0 0.5rem 1.5rem color-mix(in srgb, black 50%, transparent);
 
   /* Transitions */
   --player-transition-opacity: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -109,5 +109,5 @@
   --player-animation-fade: osd-fade-in 0.15s ease-out;
   --player-animation-pulse: pulse 2s infinite ease-in-out;
   
-  --player-shadow-card-hover: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.4);
+  --player-shadow-card-hover: 0 0.75rem 1.5rem color-mix(in srgb, black 40%, transparent);
 }

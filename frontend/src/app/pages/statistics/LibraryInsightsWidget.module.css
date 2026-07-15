@@ -16,7 +16,6 @@
     radial-gradient(circle at top right, color-mix(in srgb, var(--color-accent-blue-soft) 12%, transparent), transparent 42%),
     linear-gradient(180deg, color-mix(in srgb, var(--color-surface-glass) 72%, transparent), var(--color-surface-card));
   backdrop-filter: var(--glass-blur-lg);
-  -webkit-backdrop-filter: var(--glass-blur-lg);
   transition: border-color var(--motion-duration-emphasized) var(--motion-ease-emphasized),
               background var(--motion-duration-emphasized) var(--motion-ease-emphasized),
               transform var(--motion-duration-emphasized) var(--motion-ease-emphasized),
@@ -28,7 +27,7 @@
   background:
     radial-gradient(circle at top right, color-mix(in srgb, var(--color-accent-blue-soft) 22%, transparent), transparent 48%),
     linear-gradient(180deg, color-mix(in srgb, var(--color-surface-glass) 82%, transparent), var(--color-surface-card));
-  transform: translateY(-2px);
+  transform: translateY(-0.125rem);
   box-shadow: var(--shadow-lg), 0 0 0.9375rem color-mix(in srgb, var(--color-accent-blue-soft) 10%, transparent);
 }
 
@@ -52,7 +51,7 @@
   font-family: var(--font-display);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-extrabold);
-  letter-spacing: -0.2px;
+  letter-spacing: -0.0125rem;
 }
 
 .insights-panel-dot {
@@ -321,7 +320,7 @@
 .insights-dna-stage--ghost,
 .insights-timeline-stage--ghost {
   opacity: 0.15;
-  filter: grayscale(1) blur(0.5px);
+  filter: grayscale(1) blur(0.03125rem);
   pointer-events: none;
   transition: opacity var(--motion-duration-emphasized) var(--motion-ease-ease), filter var(--motion-duration-emphasized) var(--motion-ease-ease);
 }
@@ -336,7 +335,6 @@
   padding: var(--space-2xl) var(--space-xl);
   background: radial-gradient(circle at center, color-mix(in srgb, var(--color-bg-elevated) 72%, transparent) 0%, var(--color-surface-overlay-heavy) 100%);
   backdrop-filter: var(--glass-blur-md);
-  -webkit-backdrop-filter: var(--glass-blur-md);
   z-index: var(--z-index-step-2);
   text-align: center;
 }

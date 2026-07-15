@@ -5,7 +5,7 @@
   padding-bottom: 56.25%; /* 16:9 aspect ratio */
   border-radius: var(--radius-lg);
   overflow: hidden;
-  border: 1px solid var(--media-detail-panel-card-border);
+  border: 0.0625rem solid var(--media-detail-panel-card-border);
   background: var(--media-detail-panel-card-bg);
   cursor: pointer;
   transition:
@@ -16,25 +16,25 @@
   box-shadow: var(--media-detail-panel-card-shadow);
 }
 
+.ui-backdrop-card:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
 .ui-backdrop-card:hover:not(.ui-backdrop-card--disabled) {
   transform: translateY(var(--motion-lift-distance-md));
   border-color: var(--color-border-heavy);
   box-shadow: var(--shadow-md);
 }
 
-.ui-backdrop-card:focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring);
-}
-
 .ui-backdrop-card--selected {
   border-color: var(--color-accent-blue);
-  box-shadow: 0 0 0 2px var(--color-accent-blue);
+  box-shadow: 0 0 0 0.125rem var(--color-accent-blue);
 }
 
 .ui-backdrop-card--selected:focus-visible {
   box-shadow:
-    0 0 0 2px var(--color-accent-blue),
+    0 0 0 0.125rem var(--color-accent-blue),
     var(--focus-ring);
 }
 
@@ -74,7 +74,7 @@
 .ui-backdrop-card__spinner {
   width: var(--space-2xl);
   height: var(--space-2xl);
-  border: 2px solid var(--color-border-strong);
+  border: 0.125rem solid var(--color-border-strong);
   border-top-color: var(--color-text-primary);
   border-radius: var(--radius-full);
   animation: ui-backdrop-spin var(--motion-duration-spinner) var(--motion-ease-linear) infinite;
@@ -99,7 +99,7 @@
   color: var(--color-text-primary);
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-medium);
-  text-shadow: 0 1px 2px color-mix(in srgb, black 80%, transparent);
+  text-shadow: 0 0.0625rem 0.125rem color-mix(in srgb, black 80%, transparent);
   z-index: var(--z-index-step-1);
 }
 

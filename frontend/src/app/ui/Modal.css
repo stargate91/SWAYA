@@ -179,7 +179,7 @@
   background: color-mix(in srgb, var(--color-state-danger) 24%, var(--color-surface-glass));
   border-color: color-mix(in srgb, var(--color-state-danger) 46%, var(--color-border-heavy));
   box-shadow: var(--shadow-md);
-  transform: translateY(-0.5px);
+  transform: translateY(-0.03125rem);
 }
 
 .ui-modal--danger .ui-icon-button-wrapper:focus-within {

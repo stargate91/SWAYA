@@ -17,7 +17,7 @@
   right: 0;
   height: calc(100vh - var(--layout-window-titlebar-height));
   background: var(--color-bg-elevated);
-  border-left: 1px solid var(--color-border-strong);
+  border-left: 0.0625rem solid var(--color-border-strong);
   box-shadow: calc(-1 * var(--space-md)) 0 2.1875rem color-mix(in srgb, black 60%, transparent);
   z-index: var(--z-index-modal);
   display: flex;
@@ -30,13 +30,11 @@
 .ui-drawer.ui-drawer--glass {
   background: color-mix(in srgb, var(--color-bg-elevated) 70%, transparent);
   backdrop-filter: blur(var(--space-xl));
-  -webkit-backdrop-filter: blur(var(--space-xl));
 }
 
 .ui-drawer.ui-drawer--contrast {
   background: var(--color-surface-overlay);
   backdrop-filter: none;
-  -webkit-backdrop-filter: none;
 }
 
 /* Sizes */
@@ -82,22 +80,22 @@
   z-index: var(--z-index-step-10);
 }
 
-/* Let the glassmorphic blur show through for the glass variant headers */
-.ui-drawer--glass .ui-drawer__header,
-.ui-drawer--glass .entity-detail-page__drawer-header,
-.ui-drawer--glass .review-drawer__header {
-  background: transparent;
-}
-
 .ui-drawer__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: var(--space-lg) var(--space-2xl);
-  border-bottom: 1px solid var(--color-border-default);
+  border-bottom: 0.0625rem solid var(--color-border-default);
   background: var(--color-bg-elevated);
   position: relative;
   z-index: var(--z-index-step-10);
+}
+
+/* Let the glassmorphic blur show through for the glass variant headers */
+.ui-drawer--glass .ui-drawer__header,
+.ui-drawer--glass .entity-detail-page__drawer-header,
+.ui-drawer--glass .review-drawer__header {
+  background: transparent;
 }
 
 .ui-drawer__title {

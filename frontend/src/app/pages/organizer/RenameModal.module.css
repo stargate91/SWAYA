@@ -28,6 +28,10 @@
   max-height: 45vh;
   background: var(--color-surface-glass);
   flex-grow: 1;
+  --ui-table-cell-padding: var(--space-md) var(--space-lg);
+  --ui-table-header-bg: color-mix(in srgb, var(--color-accent) 4%, color-mix(in srgb, white 1.5%, transparent));
+  --ui-table-header-border-bottom: 0.0625rem solid var(--color-border-subtle);
+  --ui-table-cell-border-bottom: 0.0625rem solid var(--color-border-subtle);
 }
 
 /* Styling the Table component when placed inside the rename modal */
@@ -36,12 +40,7 @@
   background: transparent;
 }
 
-.organizer-rename-modal__list-container {
-  --ui-table-cell-padding: var(--space-md) var(--space-lg);
-  --ui-table-header-bg: color-mix(in srgb, var(--color-accent) 4%, rgba(255, 255, 255, 0.015));
-  --ui-table-header-border-bottom: 1px solid var(--color-border-subtle);
-  --ui-table-cell-border-bottom: 1px solid var(--color-border-subtle);
-}
+
 
 .organizer-rename-modal__list-container :global(.ui-table.ui-table--minimal) th {
   color: var(--color-text-secondary);
@@ -56,10 +55,6 @@
   border-right: none;
 }
 
-.organizer-rename-modal__list-container :global(.ui-table.ui-table--minimal) tbody tr:last-child td {
-  border-bottom: none;
-}
-
 /* Source column (original file) style */
 .organizer-rename-modal__list-container :global(.ui-table.ui-table--minimal) td:nth-child(1) {
   color: var(--color-text-secondary);
@@ -69,6 +64,10 @@
 .organizer-rename-modal__list-container :global(.ui-table.ui-table--minimal) td:nth-child(2) {
   color: var(--color-accent-blue);
   font-weight: var(--font-weight-medium);
+}
+
+.organizer-rename-modal__list-container :global(.ui-table.ui-table--minimal) tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .organizer-rename-modal__cell-text {

@@ -118,6 +118,12 @@
     box-shadow var(--motion-fast);
 }
 
+.organizer-details__poster-card:focus-visible,
+.organizer-details__backdrop-card:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
 .organizer-details__backdrop-card:hover:not(:global(.ui-backdrop-card--disabled)) {
   transform: translateY(var(--motion-lift-distance-md));
   border-color: var(--color-border-strong);
@@ -151,11 +157,7 @@
   box-shadow: none;
 }
 
-.organizer-details__poster-card:focus-visible,
-.organizer-details__backdrop-card:focus-visible {
-  outline: none;
-  box-shadow: none;
-}
+
 
 .organizer-details__poster-image {
   display: block;

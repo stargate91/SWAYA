@@ -8,9 +8,7 @@
   box-shadow: none;
 }
 
-.ui-card__title {
-  font-family: var(--font-display);
-}
+
 
 .ui-card__eyebrow {
   color: var(--color-muted);
@@ -21,7 +19,7 @@
 
 /* Card */
 .ui-card {
-  border: 1px solid color-mix(in srgb, var(--color-text-primary) 7%, transparent);
+  border: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 7%, transparent);
   border-radius: var(--radius-lg);
   background: var(--ui-surface-card-gradient);
   box-shadow: var(--shadow-md);
@@ -46,7 +44,7 @@
 }
 
 .ui-card.ui-card--danger {
-  border: 1px solid var(--ui-surface-danger-border);
+  border: 0.0625rem solid var(--ui-surface-danger-border);
   background: 
     linear-gradient(180deg, var(--ui-surface-danger-tint) 0%, transparent 50%),
     var(--ui-surface-card-gradient);

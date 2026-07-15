@@ -5,8 +5,7 @@
   width: 20rem;
   background: color-mix(in srgb, var(--color-canvas) 75%, transparent);
   backdrop-filter: blur(0.75rem) saturate(180%);
-  -webkit-backdrop-filter: blur(0.75rem) saturate(180%);
-  border: 1px solid var(--color-border-strong);
+  border: 0.0625rem solid var(--color-border-strong);
   border-radius: var(--radius-md);
   padding: var(--space-md) var(--space-lg);
   box-shadow: var(--shadow-lg);
@@ -86,7 +85,7 @@
 
 .player-control-bar__btn {
   background: color-mix(in srgb, var(--color-ink) 5%, transparent);
-  border: 1px solid var(--color-border-default);
+  border: 0.0625rem solid var(--color-border-default);
   border-radius: var(--radius-sm);
   color: var(--color-ink);
   width: var(--ui-control-height-xs);

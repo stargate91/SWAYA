@@ -19,9 +19,7 @@
 .ui-adult-overlay--blur {
   background: color-mix(in srgb, black 70%, transparent);
   backdrop-filter: blur(calc(2 * var(--space-lg)));
-  -webkit-backdrop-filter: blur(calc(2 * var(--space-lg)));
   transition: backdrop-filter var(--motion-duration-slow) var(--motion-ease-standard),
-              -webkit-backdrop-filter var(--motion-duration-slow) var(--motion-ease-standard),
               opacity var(--motion-duration-slow) var(--motion-ease-standard),
               background-color var(--motion-duration-slow) var(--motion-ease-standard);
 }
@@ -33,7 +31,6 @@
 
 .ui-poster-card:hover .ui-adult-overlay--blur {
   backdrop-filter: blur(var(--radius-none));
-  -webkit-backdrop-filter: blur(var(--radius-none));
   background: transparent;
   opacity: 0;
 }

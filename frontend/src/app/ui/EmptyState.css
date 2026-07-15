@@ -15,6 +15,46 @@
   text-align: center;
 }
 
+.ui-empty-state__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--button-height-lg);
+  height: var(--button-height-lg);
+  border-radius: var(--radius-full);
+  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
+}
+
+.ui-empty-state__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  max-width: 28.75rem;
+}
+
+.ui-empty-state__title {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: calc(2 * var(--letter-spacing-tight));
+}
+
+.ui-empty-state__description {
+  margin: 0;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.ui-empty-state__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+}
+
 .ui-empty-state--page-search {
   min-height: 17.5rem;
   padding: var(--space-4xl) var(--space-2xl);
@@ -245,45 +285,7 @@
   line-height: 1.55;
 }
 
-.ui-empty-state__icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--button-height-lg);
-  height: var(--button-height-lg);
-  border-radius: var(--radius-full);
-  color: var(--color-accent);
-  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
-}
 
-.ui-empty-state__body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-  max-width: 28.75rem;
-}
-
-.ui-empty-state__title {
-  margin: 0;
-  color: var(--color-ink);
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: calc(2 * var(--letter-spacing-tight));
-}
-
-.ui-empty-state__description {
-  margin: 0;
-  color: var(--color-muted);
-  line-height: 1.6;
-}
-
-.ui-empty-state__actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-md);
-}
 
 .ui-empty-state--no-border {
   border: 0;

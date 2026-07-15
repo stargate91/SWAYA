@@ -63,7 +63,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-sm);
-  border: 1px solid transparent;
+  border: 0.0625rem solid transparent;
   border-radius: var(--radius-input);
   font: var(--text-caption);
   line-height: 1;
@@ -87,7 +87,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 1px solid transparent;
+  border: 0.0625rem solid transparent;
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition:
@@ -239,6 +239,49 @@
   border-color: var(--button-danger-border);
 }
 
+.ui-icon-button-wrapper .ui-icon-button {
+  background: transparent;
+  border: none;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+}
+
+.ui-button:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.ui-icon-button:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.ui-button:focus-visible {
+  outline: none;
+  box-shadow: var(--button-focus-ring);
+}
+
+.ui-icon-button:focus-visible {
+  outline: none;
+  box-shadow: var(--button-focus-ring);
+}
+
+.ui-button--danger:focus-visible {
+  box-shadow: var(--button-danger-focus-ring);
+}
+
+.ui-icon-button--danger:focus-visible {
+  box-shadow: var(--button-danger-focus-ring);
+}
+
 .ui-button:hover:not(:disabled) {
   transform: translateY(var(--motion-lift-distance-xs));
 }
@@ -297,36 +340,6 @@
   background: var(--button-danger-hover-bg);
 }
 
-.ui-button:disabled {
-  opacity: 0.48;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.ui-icon-button:disabled {
-  opacity: 0.48;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.ui-button:focus-visible {
-  outline: none;
-  box-shadow: var(--button-focus-ring);
-}
-
-.ui-icon-button:focus-visible {
-  outline: none;
-  box-shadow: var(--button-focus-ring);
-}
-
-.ui-button--danger:focus-visible {
-  box-shadow: var(--button-danger-focus-ring);
-}
-
-.ui-icon-button--danger:focus-visible {
-  box-shadow: var(--button-danger-focus-ring);
-}
-
 /* Play Overlay Variant for Posters & Stills */
 .ui-icon-button--play-overlay {
   position: absolute;
@@ -339,7 +352,7 @@
   background-color: var(--color-panel-translucent);
   background-image: var(--button-secondary-bg);
   color: var(--button-secondary-color);
-  border: 1px solid var(--button-secondary-border);
+  border: 0.0625rem solid var(--button-secondary-border);
   box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, black 30%, transparent);
   display: flex;
   align-items: center;
@@ -355,24 +368,16 @@
   z-index: var(--z-index-step-5);
 }
 
+.ui-icon-button--play-overlay:disabled {
+  opacity: 0;
+}
+
 .ui-poster-card__media-shell:hover .ui-icon-button--play-overlay,
 .ui-poster-card__media-shell:focus-within .ui-icon-button--play-overlay,
 .episode-card__still-wrapper:hover .ui-icon-button--play-overlay {
   opacity: 1;
   transform: translate(-50%, -50%);
   pointer-events: auto;
-}
-
-.ui-icon-button.ui-icon-button--play-overlay:hover {
-  transform: translate(-50%, -50%);
-  background-color: var(--color-panel-strong);
-  background-image: var(--button-secondary-hover-bg);
-  border-color: var(--button-secondary-border);
-  box-shadow: 0 0.25rem 0.75rem color-mix(in srgb, black 40%, transparent);
-}
-
-.ui-icon-button--play-overlay:disabled {
-  opacity: 0;
 }
 
 .ui-poster-card__media-shell:hover .ui-icon-button--play-overlay:disabled,
@@ -406,7 +411,7 @@
 
 .ui-split-button--secondary {
   background: var(--button-secondary-bg);
-  border: 1px solid var(--button-secondary-border);
+  border: 0.0625rem solid var(--button-secondary-border);
 }
 
 .ui-split-button--secondary:hover:not(.is-disabled) {
@@ -427,12 +432,12 @@
 
 .ui-split-button--primary .ui-split-button__action {
   color: var(--button-primary-color);
-  border-right: 1px solid color-mix(in srgb, white 15%, transparent);
+  border-right: 0.0625rem solid color-mix(in srgb, white 15%, transparent);
 }
 
 .ui-split-button--secondary .ui-split-button__action {
   color: var(--button-secondary-color);
-  border-right: 1px solid var(--button-secondary-border);
+  border-right: 0.0625rem solid var(--button-secondary-border);
 }
 
 .ui-split-button__arrow {
@@ -454,12 +459,12 @@
   color: var(--button-primary-color);
 }
 
-.ui-split-button--primary .ui-split-button__arrow:hover {
-  background: var(--color-surface-glass-heavy);
-}
-
 .ui-split-button--secondary .ui-split-button__arrow {
   color: var(--button-secondary-color);
+}
+
+.ui-split-button--primary .ui-split-button__arrow:hover {
+  background: var(--color-surface-glass-heavy);
 }
 
 .ui-split-button--secondary .ui-split-button__arrow:hover {
@@ -470,7 +475,7 @@
   position: absolute;
   background: var(--color-dropdown-bg);
   backdrop-filter: var(--dropdown-backdrop-filter);
-  border: 1px solid var(--ui-control-border-strong);
+  border: 0.0625rem solid var(--ui-control-border-strong);
   border-radius: var(--ui-control-radius);
   box-shadow: var(--shadow-overlay-strong);
   z-index: var(--z-index-dropdown);
@@ -512,7 +517,7 @@
   height: var(--ui-control-height-xs);
   border-radius: var(--radius-md);
   background: var(--color-surface-glass);
-  border: 1px solid var(--color-border-subtle);
+  border: 0.0625rem solid var(--color-border-subtle);
   transition: all var(--motion-fast);
   cursor: pointer;
 }
@@ -520,25 +525,14 @@
 .ui-icon-button-wrapper:hover {
   background: var(--color-surface-glass-strong);
   border-color: var(--color-border-default);
-  transform: translateY(-0.5px);
+  transform: translateY(-0.03125rem);
 }
 
 .ui-icon-button-wrapper:focus-within {
   box-shadow: var(--focus-ring);
 }
 
-.ui-icon-button-wrapper .ui-icon-button {
-  background: transparent;
-  border: none;
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-md);
-}
+
 
 .ui-icon-button-wrapper--hover-only {
   background: transparent;
@@ -558,7 +552,7 @@
   width: calc(2 * var(--space-lg));
   height: calc(2 * var(--space-lg));
   border-radius: var(--radius-full);
-  border: 1px solid color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border));
+  border: 0.0625rem solid color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border));
   background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
   background-image: var(--button-secondary-bg);
   color: var(--button-secondary-color);

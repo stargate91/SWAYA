@@ -60,7 +60,7 @@
   line-height: 1.2;
   background: var(--color-state-danger-bg-strong);
   color: var(--color-state-danger);
-  border: 1.5px solid var(--color-state-danger);
+  border: 0.09375rem solid var(--color-state-danger);
 }
 
 sup .ui-badge.ui-badge--adult.ui-badge--danger {

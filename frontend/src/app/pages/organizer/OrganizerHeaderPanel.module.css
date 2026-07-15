@@ -67,6 +67,10 @@
   font-size: var(--font-size-xs);
 }
 
+.organizer-panel__browse-btn:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-accent-blue);
+}
+
 .organizer-panel__row:first-child .organizer-panel__browse-btn {
   min-height: var(--button-height-sm);
   height: var(--button-height-sm);
@@ -74,9 +78,6 @@
   font-size: var(--font-size-sm);
 }
 
-.organizer-panel__browse-btn:focus-visible {
-  box-shadow: 0 0 0 2px var(--color-accent-blue);
-}
 
 .organizer-panel__rename-btn {
   margin-left: var(--space-sm);
