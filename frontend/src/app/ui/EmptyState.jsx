@@ -1,4 +1,4 @@
-import './EmptyState.css';
+import styles from './EmptyState.module.css';
 
 export default function EmptyState({
   title,
@@ -11,24 +11,25 @@ export default function EmptyState({
   hasBorder = true,
   animateIcon = false,
 }) {
-  const borderClass = hasBorder ? '' : 'ui-empty-state--no-border';
-  const animateClass = animateIcon ? 'ui-empty-state--animated-icon' : '';
+  const borderClass = hasBorder ? '' : styles['no-border'];
+  const animateClass = animateIcon ? styles['animated-icon'] : '';
+  const variantClass = styles[variant] || '';
   return (
     <div
-      className={`ui-empty-state ui-empty-state--${variant} ${borderClass} ${animateClass} ${className}`.trim()}
+      className={`${styles.root} ${variantClass} ${borderClass} ${animateClass} ${className}`.trim()}
       // eslint-disable-next-line react/forbid-dom-props
       style={style}
     >
       {Icon ? (
-        <div className="ui-empty-state__icon" aria-hidden="true">
+        <div className={styles.icon} aria-hidden="true">
           <Icon size={22} />
         </div>
       ) : null}
-      <div className="ui-empty-state__body">
-        <h3 className="ui-empty-state__title">{title}</h3>
-        {description ? <p className="ui-empty-state__description">{description}</p> : null}
+      <div className={styles.body}>
+        <h3 className={styles.title}>{title}</h3>
+        {description ? <p className={styles.description}>{description}</p> : null}
       </div>
-      {actions ? <div className="ui-empty-state__actions">{actions}</div> : null}
+      {actions ? <div className={styles.actions}>{actions}</div> : null}
     </div>
   );
 }
