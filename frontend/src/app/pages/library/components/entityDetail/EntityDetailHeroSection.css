@@ -186,15 +186,7 @@
   color: var(--color-text-primary);
 }
 
-.entity-detail-page__inline-links {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  padding: 0.1rem 0;
-  margin-top: 0.1rem;
-}
+
 
 .entity-detail-page__inline-link {
   display: inline-flex;
@@ -232,14 +224,7 @@
   gap: var(--space-md);
 }
 
-.entity-detail-page__aliases-container {
-  display: flex;
-  align-items: center;
-  margin-bottom: var(--space-sm);
-  min-height: 1.75rem;
-  position: relative;
-  z-index: var(--z-index-base);
-}
+
 
 .entity-detail-page__aliases-trigger-pill {
   display: inline-flex;
@@ -809,21 +794,7 @@
 
 
 
-.entity-detail-page__title-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-sm);
-  width: 100%;
-  margin-bottom: var(--space-sm);
-}
 
-.entity-detail-page__headline-actions {
-  display: flex;
-  align-items: center;
-  --actions-gap: 0.375rem;
-  gap: var(--actions-gap);
-}
 
 .entity-detail-page__headline-action {
   display: inline-flex;

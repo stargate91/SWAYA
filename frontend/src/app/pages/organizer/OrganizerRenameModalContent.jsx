@@ -98,7 +98,6 @@ export default function OrganizerRenameModalContent({ items = [], t, organizeInP
       <div className={styles['organizer-rename-modal__list-container']}>
         <Table
           variant="minimal"
-          className={styles['modal-table']}
           columns={columns}
           rows={sortedItems}
           sortKey={sortConfig.key}

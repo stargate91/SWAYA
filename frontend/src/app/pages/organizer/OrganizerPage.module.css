@@ -9,7 +9,7 @@
   display: none;
 }
 
-:global(.organizer-main) {
+.organizer-main {
   display: flex;
   flex-direction: column;
   gap: var(--space-xl);
@@ -33,12 +33,10 @@
   will-change: padding-right;
 }
 
-:global(.organizer-main.is-details-collapsed) .organizer-main__content {
+.organizer-main[data-details-collapsed="true"] .organizer-main__content {
   padding-right: calc(var(--button-height-md) + var(--space-xl));
 }
 
-:global(.organizer-main.is-details-hidden) .organizer-main__content {
+.organizer-main[data-details-hidden="true"] .organizer-main__content {
   padding-right: var(--space-3xl);
 }
-
-

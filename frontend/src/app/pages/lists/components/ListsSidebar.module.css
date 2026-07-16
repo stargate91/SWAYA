@@ -169,6 +169,12 @@
   border-radius: var(--radius-md);
 }
 
+.lists-sidebar__collage--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .lists-sidebar__collage-img {
   object-fit: cover;
   transition: transform var(--motion-slow);

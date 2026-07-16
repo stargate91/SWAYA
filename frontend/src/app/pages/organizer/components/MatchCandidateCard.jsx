@@ -84,7 +84,7 @@ export default function MatchCandidateCard({
             ]}
           />
         }
-        badge={
+        overlay={
           candidate.is_active ? (
             rowStatus === 'uncertain' ? (
               <Badge family="status" variant="overlay" tone="warning">

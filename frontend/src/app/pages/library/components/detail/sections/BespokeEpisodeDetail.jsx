@@ -4,6 +4,7 @@ import PosterCard from '@/ui/PosterCard';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { formatEpisodeNumber, formatTime } from '../../../utils/detailUtils';
 import { useMediaDetailContext } from '../MediaDetailContext';
+import Inline from '@/ui/Inline';
 
 const LPAR = '(';
 const RPAR = ')';
@@ -85,7 +86,7 @@ export default function BespokeEpisodeDetail({
             }`}
           </h4>
 
-          <div className="bespoke-episode-detail-card__actions">
+          <Inline gap="sm" align="center" className="bespoke-episode-detail-card__actions">
             {/* Flame/Peak button */}
             {item.is_adult && activeEpisode.path && !activeEpisode.is_missing && (
               <button
@@ -122,11 +123,11 @@ export default function BespokeEpisodeDetail({
             >
               {activeEpisode.is_watched ? <Check size={15} /> : <Eye size={15} />}
             </button>
-          </div>
+          </Inline>
         </div>
 
         {/* Episode Meta details */}
-        <div className="bespoke-episode-detail-card__meta">
+        <Inline gap="md" align="center" className="bespoke-episode-detail-card__meta">
           {activeEpisode.air_date && (
             <span className="bespoke-episode-detail-card__meta-item">
               {String(activeEpisode.air_date).slice(0, 10)}
@@ -160,7 +161,7 @@ export default function BespokeEpisodeDetail({
               {parseFloat(activeEpisode.vote_average).toFixed(1)}
             </Pill>
           )}
-        </div>
+        </Inline>
 
         {/* Episode description */}
         {activeEpisode.overview && (
@@ -172,13 +173,13 @@ export default function BespokeEpisodeDetail({
         {/* Adult Peaks History */}
         {item.is_adult && activeEpisode.peaks_history && activeEpisode.peaks_history.length > 0 && (
           <div className="bespoke-episode-detail-card__peaks">
-            <div className="bespoke-episode-detail-card__peaks-title">
+            <Inline gap="sm" align="center" className="bespoke-episode-detail-card__peaks-title">
               <Droplets size={12} fill="currentColor" />
               <span>{t('library.details.peaksTitle') || 'Peak Moments'} {LPAR}{activeEpisode.peaks_history.length}{RPAR}</span>
-            </div>
+            </Inline>
             <div className="bespoke-episode-detail-card__peaks-list">
               {activeEpisode.peaks_history.map((log) => (
-                <div key={log.id} className="bespoke-episode-detail-card__peak-item">
+                <Inline key={log.id} justify="between" gap="sm" align="center" className="bespoke-episode-detail-card__peak-item">
                   <span className="bespoke-episode-detail-card__peak-date">
                     {new Date(log.watched_at).toLocaleDateString()}
                   </span>
@@ -198,7 +199,7 @@ export default function BespokeEpisodeDetail({
                   >
                     <Trash2 size={12} />
                   </button>
-                </div>
+                </Inline>
               ))}
             </div>
           </div>

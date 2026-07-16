@@ -1,6 +1,8 @@
+import { createPortal } from 'react-dom';
 import { HelpCircle } from '@/ui/icons';
 import Button from '../../../ui/Button';
 import Checkbox from '../../../ui/Checkbox';
+import styles from '@/ui/Modal.module.css';
 
 export default function MatchModalConfirmDialog({
   confirmState,
@@ -10,25 +12,25 @@ export default function MatchModalConfirmDialog({
   onConfirm,
   t,
 }) {
-  if (!confirmState) return null;
+  if (!confirmState || typeof document === 'undefined') return null;
 
-  return (
-    <div className="ui-confirm-overlay">
-      <div className="ui-confirm-dialog">
-        <div className="ui-confirm-header">
-          <HelpCircle size={20} className="ui-confirm-icon" />
-          <strong className="ui-confirm-title">
+  return createPortal(
+    <div className={styles['confirm-overlay']}>
+      <div className={styles['confirm-dialog']}>
+        <div className={styles['confirm-header']}>
+          <HelpCircle size={20} className={styles['confirm-icon']} />
+          <strong className={styles['confirm-title']}>
             {t(`organizer.details.matchModal.confirm.${confirmState.type}.title`)}
           </strong>
         </div>
-        <p className="ui-confirm-description">
+        <p className={styles['confirm-description']}>
           {confirmState.type === 'bucket'
             ? t('organizer.details.matchModal.confirm.bucket.desc')
             : confirmState.hasExisting
               ? t(`organizer.details.matchModal.confirm.${confirmState.type}.descWithExisting`).replace('{existing}', confirmState.existingDetails)
               : t(`organizer.details.matchModal.confirm.${confirmState.type}.descNoExisting`)}
         </p>
-        <div className="ui-confirm-optout">
+        <div className={styles['confirm-optout']}>
           <Checkbox
             checked={dontShowAgain}
             onChange={(e) => setDontShowAgain(e.target.checked)}
@@ -36,7 +38,7 @@ export default function MatchModalConfirmDialog({
             {t('organizer.details.matchModal.confirm.dontShowAgain')}
           </Checkbox>
         </div>
-        <div className="ui-confirm-actions">
+        <div className={styles['confirm-actions']}>
           <Button
             type="button"
             variant="secondary-neutral"
@@ -55,6 +57,7 @@ export default function MatchModalConfirmDialog({
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

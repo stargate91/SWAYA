@@ -179,8 +179,13 @@ export default function OrganizerDetailsPanel({
       </div>
     </>
   ) : null;
+
   return (
-    <aside className={styles['organizer-details']} aria-label={t('organizer.details.title')}>
+    <aside
+      className={styles['organizer-details']}
+      data-collapsed={isDetailsCollapsed || undefined}
+      aria-label={t('organizer.details.title')}
+    >
       <div className={styles['organizer-details__toggle-row']}>
         <Tooltip content={isDetailsCollapsed ? t('organizer.details.expand') : t('organizer.details.collapse')} side="left">
           <UtilityButton

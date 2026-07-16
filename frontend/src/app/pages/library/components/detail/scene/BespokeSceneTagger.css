@@ -10,10 +10,6 @@
 
 .bespoke-scene-tagger-header {
   position: relative;
-  display: flex;
-  align-items: center;
-  --local-gap: var(--space-sm);
-  gap: var(--local-gap);
   padding: var(--space-sm) var(--space-md);
   background: color-mix(in srgb, var(--color-bg-canvas) 15%, transparent);
   border-top-left-radius: var(--radius-lg);
@@ -99,10 +95,6 @@
 }
 
 .bespoke-scene-tagger-input-container {
-  display: flex;
-  align-items: center;
-  --local-gap: var(--space-sm);
-  gap: var(--local-gap);
   border: 1px solid var(--color-border-subtle);
   background: var(--color-surface-glass);
   backdrop-filter: blur(0.25rem);
@@ -168,8 +160,6 @@
 }
 
 .bespoke-scene-tagger-dropdown-item {
-  display: flex;
-  align-items: center;
   width: 100%;
   background: transparent;
   border: none;
@@ -179,8 +169,6 @@
   font-weight: var(--font-weight-medium);
   text-align: left;
   cursor: pointer;
-  --local-gap: 0.5rem;
-  gap: var(--local-gap);
   transition: background var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
@@ -224,14 +212,7 @@
   background: color-mix(in srgb, var(--color-accent-blue) 8%, transparent);
 }
 
-/* Horizontal scroller layout and buttons (flex layout next to the container) */
-.bespoke-scene-tagger-scroller-wrapper {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  --local-gap: 0.375rem;
-  gap: var(--local-gap);
-}
+
 
 .bespoke-scene-tagger-pills-row--nowrap {
   flex: 1;

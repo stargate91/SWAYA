@@ -11,6 +11,7 @@ import PersonCreditsRow from './PersonCreditsRow';
 import PersonCreditsCard from './PersonCreditsCard';
 import { API_BASE } from '@/lib/backend';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
+import Inline from '@/ui/Inline';
 import './PersonCreditsShared.css';
 
 
@@ -215,7 +216,7 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
     <div className="person-credits-section-container">
       {viewMode === 'library' && myLibraryTabs.length > 0 && (
         <div className="person-credits-detail-panel">
-            <div className="person-credits-discover-header person-credits-discover-header-layout">
+            <Inline justify="between" align="center" className="person-credits-discover-header person-credits-discover-header-layout">
               <h4 className="person-credits-row__title person-credits-row-title-style">{t('library.details.inLibrary') || 'My Library'}</h4>
 
               {/* Toggle button to switch to Discover mode */}
@@ -237,7 +238,7 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
                   {t('library.details.wantToDiscover') || 'Want to discover?'}
                 </button>
               </div>
-            </div>
+            </Inline>
 
             <div className="person-credits-discover-groups person-credits-discover-groups-style">
               <Tabs
@@ -262,69 +263,69 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
       {/* STATE 2: DISCOVER PICKER PANEL & INFINITE GRID */}
       {viewMode === 'discover' && (
         <div className="person-credits-detail-panel">
-            <div className="person-credits-discover-header person-credits-discover-header-layout">
-              <h4 className="person-credits-row__title person-credits-row-title-style">{t('library.details.discoverFilmography') || 'Discover Filmography'}</h4>
+          <Inline justify="between" align="center" className="person-credits-discover-header person-credits-discover-header-layout">
+            <h4 className="person-credits-row__title person-credits-row-title-style">{t('library.details.discoverFilmography') || 'Discover Filmography'}</h4>
 
-              {/* Back to Library button (only shown if user has library items) */}
-              {myLibraryTabs.length > 0 && (
-                <div className="person-credits-header-actions">
-                  {item?.is_adult && item?.finishes?.length > 0 && (
-                    <button
-                      type="button"
-                      className="person-credits-row__mode-switch-btn"
-                      onClick={() => setViewMode('gallery')}
-                    >
-                      {t('library.details.gallery') || 'Climax Gallery'}
-                    </button>
-                  )}
+            {/* Back to Library button (only shown if user has library items) */}
+            {myLibraryTabs.length > 0 && (
+              <div className="person-credits-header-actions">
+                {item?.is_adult && item?.finishes?.length > 0 && (
                   <button
                     type="button"
                     className="person-credits-row__mode-switch-btn"
-                    onClick={() => setViewMode('library')}
+                    onClick={() => setViewMode('gallery')}
                   >
-                    {t('library.details.backToMyLibrary') || 'Back to My Library'}
+                    {t('library.details.gallery') || 'Climax Gallery'}
                   </button>
-                </div>
-              )}
-            </div>
+                )}
+                <button
+                  type="button"
+                  className="person-credits-row__mode-switch-btn"
+                  onClick={() => setViewMode('library')}
+                >
+                  {t('library.details.backToMyLibrary') || 'Back to My Library'}
+                </button>
+              </div>
+            )}
+          </Inline>
 
-            <div className="person-credits-discover-groups person-credits-discover-groups-discover-style">
-              {hasMovies && (
-                <div className="person-credits-discover-group">
-                  <span className="person-credits-discover-group-title">{t('library.details.movies') || 'Movies'}</span>
-                  <Tabs
-                    tabs={movieTabs}
-                    value={activeDiscoverTab}
-                    onChange={setActiveDiscoverTab}
-                    variant="sub"
-                  />
-                </div>
-              )}
+          <div className="person-credits-discover-groups person-credits-discover-groups-discover-style">
+            {hasMovies && (
+              <Inline gap="sm" align="center" className="person-credits-discover-group">
+                <span className="person-credits-discover-group-title">{t('library.details.movies') || 'Movies'}</span>
+                <Tabs
+                  tabs={movieTabs}
+                  value={activeDiscoverTab}
+                  onChange={setActiveDiscoverTab}
+                  variant="sub"
+                />
+              </Inline>
+            )}
 
-              {hasTv && (
-                <div className="person-credits-discover-group">
-                  <span className="person-credits-discover-group-title">{t('library.details.tvShows') || 'TV Shows'}</span>
-                  <Tabs
-                    tabs={tvTabs}
-                    value={activeDiscoverTab}
-                    onChange={setActiveDiscoverTab}
-                    variant="sub"
-                  />
-                </div>
-              )}
+            {hasTv && (
+              <Inline gap="sm" align="center" className="person-credits-discover-group">
+                <span className="person-credits-discover-group-title">{t('library.details.tvShows') || 'TV Shows'}</span>
+                <Tabs
+                  tabs={tvTabs}
+                  value={activeDiscoverTab}
+                  onChange={setActiveDiscoverTab}
+                  variant="sub"
+                />
+              </Inline>
+            )}
 
-              {hasScenes && (
-                <div className="person-credits-discover-group">
-                  <span className="person-credits-discover-group-title">{t('library.details.scenes') || 'Scenes'}</span>
-                  <Tabs
-                    tabs={sceneTabs}
-                    value={activeDiscoverTab}
-                    onChange={setActiveDiscoverTab}
-                    variant="sub"
-                  />
-                </div>
-              )}
-            </div>
+            {hasScenes && (
+              <Inline gap="sm" align="center" className="person-credits-discover-group">
+                <span className="person-credits-discover-group-title">{t('library.details.scenes') || 'Scenes'}</span>
+                <Tabs
+                  tabs={sceneTabs}
+                  value={activeDiscoverTab}
+                  onChange={setActiveDiscoverTab}
+                  variant="sub"
+                />
+              </Inline>
+            )}
+          </div>
 
           {/* DISCOVER INFINITE GRID */}
           {activeDiscoverTab && (

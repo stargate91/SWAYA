@@ -28,20 +28,10 @@
   --ui-table-header-bg: color-mix(in srgb, var(--color-accent) 4%, color-mix(in srgb, var(--color-text-primary) 1.5%, transparent));
   --ui-table-header-border-bottom: 0.0625rem solid var(--color-border-subtle);
   --ui-table-cell-border-bottom: 0.0625rem solid var(--color-border-subtle);
-}
-
-/* Styling the Table component when placed inside the rename modal */
-.modal-table th {
-  color: var(--color-text-secondary);
-  font-weight: var(--font-weight-semibold);
-}
-
-.modal-table td {
-  border-right: 1px solid var(--color-border-subtle);
-}
-
-.modal-table td:last-child {
-  border-right: none;
+  --ui-table-cell-border-right: 1px solid var(--color-border-subtle);
+  --ui-table-header-color: var(--color-text-secondary);
+  --ui-table-header-font-weight: var(--font-weight-semibold);
+  --ui-table-last-row-cell-border-bottom: none;
 }
 
 /* Source column (original file) style */
@@ -53,10 +43,6 @@
 .target-column {
   color: var(--color-accent-blue);
   font-weight: var(--font-weight-medium);
-}
-
-.modal-table tbody tr:last-child td {
-  border-bottom: none;
 }
 
 .organizer-rename-modal__cell-text {

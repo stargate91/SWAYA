@@ -6,6 +6,7 @@ import Table from '@/ui/Table';
 import { Tabs } from '@/ui/Tabs';
 import Button from '@/ui/Button';
 import PanelHeader from '@/ui/PanelHeader';
+import panelHeaderStyles from '@/ui/PanelHeader.module.css';
 import Skeleton from '@/ui/Skeleton';
 import SegmentedRating from '@/ui/SegmentedRating';
 import { useTranslation } from '@/providers/LanguageContext';
@@ -207,6 +208,7 @@ export default function RatingsPage() {
                   state.setCurrentPage(1);
                 }}
                 variant="sub"
+                tabClassName={panelHeaderStyles['panel-tab']}
               />
             </PanelHeader.Row>
           </PanelHeader>

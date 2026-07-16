@@ -1,6 +1,7 @@
 import { Droplets, X } from '@/ui/icons';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import { formatTime } from '../../../utils/detailUtils';
+import Inline from '@/ui/Inline';
 import './BespokeScenePeaks.css';
 
 const LPAR = '(';
@@ -31,14 +32,14 @@ export default function BespokeScenePeaks() {
 
   return (
     <div className="bespoke-scene-peaks-card">
-      <div className="bespoke-scene-peaks-header">
-        <div className="bespoke-scene-peaks-header-left">
+      <Inline justify="between" align="center" className="bespoke-scene-peaks-header">
+        <Inline gap="sm" align="center" className="bespoke-scene-peaks-header-left">
           <Droplets size={12} className="bespoke-scene-peaks-title-icon" />
           <span className="bespoke-scene-peaks-title">
             {t('library.details.peaksTitle') || 'Peak Moments'} {LPAR}{peaks.length}{RPAR}
           </span>
-        </div>
-      </div>
+        </Inline>
+      </Inline>
 
       <div className="bespoke-scene-peaks-body">
         {peaks.length > 0 ? (
@@ -46,7 +47,9 @@ export default function BespokeScenePeaks() {
             {peaks.map((log, index) => {
               const hasPosition = log.video_position != null && log.video_position > 0;
               return (
-                <div
+                <Inline
+                  justify="between"
+                  align="center"
                   key={log.id || index}
                   className={`bespoke-scene-peaks-item ${hasPosition ? 'bespoke-scene-peaks-item--playable' : ''}`}
                   onClick={hasPosition ? handlePlayMedia : undefined}
@@ -59,14 +62,14 @@ export default function BespokeScenePeaks() {
                   } : undefined}
                   title={hasPosition ? (t('library.details.playVideo') || PLAY_VIDEO_FALLBACK) : undefined}
                 >
-                  <div className="bespoke-scene-peaks-item-left">
+                  <Inline gap="xs" align="center" className="bespoke-scene-peaks-item-left">
                     <Droplets size={11} className="bespoke-scene-peaks-item-icon" />
                     <span className="bespoke-scene-peaks-item-time">
                       {hasPosition ? formatTime(log.video_position) : (t('library.details.playSession') || 'Play Session')}
                     </span>
-                  </div>
+                  </Inline>
 
-                  <div className="bespoke-scene-peaks-item-right">
+                  <Inline gap="sm" align="center" className="bespoke-scene-peaks-item-right">
                     <span className="bespoke-scene-peaks-item-date">
                       {new Date(log.watched_at).toLocaleDateString()}
                     </span>
@@ -79,8 +82,8 @@ export default function BespokeScenePeaks() {
                     >
                       <X size={12} />
                     </button>
-                  </div>
-                </div>
+                  </Inline>
+                </Inline>
               );
             })}
           </div>

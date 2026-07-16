@@ -4,6 +4,7 @@
   gap: var(--space-sm);
   width: var(--ui-poster-card-width);
   min-width: var(--ui-poster-card-min-width);
+  height: var(--ui-poster-card-height, auto);
   transition: var(--ui-poster-card-transition);
 }
 
@@ -35,8 +36,8 @@
 }
 
 .card:hover .image-wrapper {
-  transform: translateY(calc(-1 * var(--space-xs))) scale(1.02);
-  box-shadow: var(--shadow-sm);
+  transform: var(--ui-poster-card-hover-transform, translateY(calc(-1 * var(--space-xs))) scale(1.02));
+  box-shadow: var(--ui-poster-card-hover-shadow, var(--shadow-sm));
 }
 
 .card.no-hover-animation:hover .image-wrapper {
@@ -84,17 +85,17 @@ div.image-wrapper:focus-visible {
 
 .card[data-aspect="poster"] .media,
 .card[data-aspect="poster"] .placeholder {
-  aspect-ratio: 2 / 3;
+  aspect-ratio: var(--ui-poster-card-aspect-ratio, 2 / 3);
 }
 
 .card[data-aspect="landscape"] .media,
 .card[data-aspect="landscape"] .placeholder {
-  aspect-ratio: 16 / 9;
+  aspect-ratio: var(--ui-poster-card-aspect-ratio, 16 / 9);
 }
 
 .card[data-aspect="mixed-landscape"] .media,
 .card[data-aspect="mixed-landscape"] .placeholder {
-  aspect-ratio: 1.38;
+  aspect-ratio: var(--ui-poster-card-aspect-ratio, 1.38);
 }
 
 .image {

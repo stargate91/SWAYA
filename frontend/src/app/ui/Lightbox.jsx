@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import { X } from '@/ui/icons';
 import IconButton from './IconButton';
-import './Lightbox.css';
+import styles from './Lightbox.module.css';
 
 export default function Lightbox({ imageUrl, onClose, t }) {
   useEffect(() => {
@@ -22,15 +22,15 @@ export default function Lightbox({ imageUrl, onClose, t }) {
 
   return createPortal(
     <div
-      className="ui-lightbox"
+      className={styles.lightbox}
       role="button"
       tabIndex={0}
       aria-label={t?.('common.close') || 'Close image preview'}
       onClick={onClose}
     >
-      <div className="ui-close-container ui-lightbox__close-container" onClick={(e) => e.stopPropagation()} role="presentation">
+      <div className={`ui-close-container ${styles.closeContainer}`} onClick={(e) => e.stopPropagation()} role="presentation">
         <IconButton
-          className="ui-close-btn ui-lightbox__close-btn"
+          className={`ui-close-btn ${styles.closeBtn}`}
           onClick={onClose}
           label={t?.('common.close') || 'Close'}
           title={null}
@@ -43,7 +43,7 @@ export default function Lightbox({ imageUrl, onClose, t }) {
       <img
         src={imageUrl}
         alt="Enlarged preview"
-        className="ui-lightbox__image"
+        className={styles.image}
         onClick={(e) => e.stopPropagation()}
       />
     </div>,

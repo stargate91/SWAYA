@@ -10,6 +10,7 @@ import { useMediaDetailContext } from '../MediaDetailContext';
 import { useTranslation as useLangTranslation } from '@/providers/LanguageContext';
 import api from '@/lib/api';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
+import Inline from '@/ui/Inline';
 import './SeasonsPanel.css';
 
 const LPAR = '(';
@@ -193,11 +194,11 @@ export default function SeasonsPanel() {
   return (
     <div className="seasons-panel">
       {/* Title with navigation arrows */}
-      <div className="seasons-panel__header">
+      <Inline justify="between" className="seasons-panel__header">
         <h4 className="details-panel__section-title">
           {t('library.details.seasons') || 'Seasons'}
         </h4>
-        <div className="seasons-panel__nav-arrows">
+        <Inline gap="sm" align="center" className="seasons-panel__nav-arrows">
           <button
             type="button"
             onMouseDown={(e) => e.preventDefault()}
@@ -218,8 +219,8 @@ export default function SeasonsPanel() {
           >
             <ChevronRight size={16} />
           </button>
-        </div>
-      </div>
+        </Inline>
+      </Inline>
 
       {/* Seasons Posters Carousel (no absolute scroll buttons) */}
       <div className="seasons-carousel-wrapper">
@@ -248,12 +249,12 @@ export default function SeasonsPanel() {
 
       {/* Selected Season Header / Details */}
       <div className="active-season-info">
-        <div className="active-season-info__header">
+        <Inline justify="between" gap="md" align="center" className="active-season-info__header">
           <div>
             <h3 className="active-season-info__title">
               {activeSeason.title || `Season ${activeSeason.season_number}`}
             </h3>
-            <div className="active-season-info__meta">
+            <Inline gap="lg" align="center" className="active-season-info__meta">
               {activeSeason.air_date && (
                 <span className="active-season-info__meta-date">
                   <Calendar size={12} />
@@ -269,7 +270,7 @@ export default function SeasonsPanel() {
                     : `${totalEpisodesCount} ${t('library.details.episodes') || 'Episodes'}`}
                 </span>
               )}
-            </div>
+            </Inline>
           </div>
 
           {!isSeasonWatchedWithDate && (
@@ -288,7 +289,7 @@ export default function SeasonsPanel() {
               </span>
             </button>
           )}
-        </div>
+        </Inline>
 
         {activeSeason.overview && (
           <p className="active-season-info__overview">{activeSeason.overview}</p>
@@ -363,7 +364,7 @@ export default function SeasonsPanel() {
                 <h4 className="episode-card__title">{episodeText}</h4>
                 
                 {(metaItems.length > 0 || episode.is_multi_episode || (episodeTmdbRating !== undefined && episodeTmdbRating !== null && episodeTmdbRating !== '' && Number(episodeTmdbRating) > 0)) && (
-                  <div className="episode-card__meta">
+                  <Inline gap="sm" align="center" className="episode-card__meta">
                     {episode.is_multi_episode && (
                       <Pill variant="neutral" className="episode-card__shared-pill">
                         {t('library.details.sharedFile') || 'Shared File'}
@@ -382,7 +383,7 @@ export default function SeasonsPanel() {
                           : parseFloat(episodeTmdbRating).toFixed(1)}
                       </Pill>
                     )}
-                  </div>
+                  </Inline>
                 )}
 
                 {episode.overview && (
@@ -393,13 +394,13 @@ export default function SeasonsPanel() {
 
                 {item.is_adult && episode.peaks_history && episode.peaks_history.length > 0 && isExpanded && (
                   <div className="episode-card__peaks-list" role="presentation" onClick={(e) => e.stopPropagation()}>
-                    <div className="episode-card__peaks-title">
+                    <Inline gap="sm" align="center" className="episode-card__peaks-title">
                       <Droplets size={12} fill="currentColor" />
                       <span>{t('library.details.peaksTitle') || 'Peak Moments'} {LPAR}{episode.peaks_history.length}{RPAR}</span>
-                    </div>
+                    </Inline>
                     <div className="episode-card__peaks-items">
                       {episode.peaks_history.map((log) => (
-                        <div key={log.id} className="episode-card__peak-item">
+                        <Inline key={log.id} justify="between" gap="md" align="center" className="episode-card__peak-item">
                           <span className="episode-card__peak-date">
                             {new Date(log.watched_at).toLocaleString()}
                           </span>
@@ -420,7 +421,7 @@ export default function SeasonsPanel() {
                           >
                             <Trash2 size={12} />
                           </button>
-                        </div>
+                        </Inline>
                       ))}
                     </div>
                   </div>
@@ -429,7 +430,7 @@ export default function SeasonsPanel() {
 
               {/* Right Side: Actions */}
               {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-              <div className="episode-card__actions" onClick={(e) => e.stopPropagation()}>
+              <Inline gap="sm" align="center" className="episode-card__actions" onClick={(e) => e.stopPropagation()}>
                 {isExpanded && (
                   <>
                     {/* Flame/Peak button */}
@@ -484,7 +485,7 @@ export default function SeasonsPanel() {
                 >
                   <ChevronDown size={16} />
                 </button>
-              </div>
+              </Inline>
             </div>
           );
         })}

@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import Dropdown from '../../../ui/Dropdown';
 import SelectableCard from '../../../ui/SelectableCard';
 import Radio from '../../../ui/Radio';
+import styles from './OrganizerOverrideModalContent.module.css';
 import { useTranslation } from '../../../providers/LanguageContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUpdateMediaMutation, getOrganizerQueryKey } from '../../../queries';
@@ -260,20 +261,20 @@ export default function OrganizerOverrideModalContent({ row, onClose, toast, sca
   );
 
   return (
-    <form id="organizer-override-form" className="organizer-override-modal organizer-override-modal--clip-x" onSubmit={handleSubmit}>
+    <form id="organizer-override-form" className={`${styles['organizer-override-modal']} ${styles['organizer-override-modal--clip-x']}`} onSubmit={handleSubmit}>
       {showSelector ? (
-        <div className="single-override-layout">
-          <div className="single-override-layout__side-panel">
-            <h4 className="organizer-override-modal__section-title">
+        <div className={styles['single-override-layout']}>
+          <div className={`${styles['single-override-layout__side-panel']} has-single-override-side-panel`}>
+            <h4 className={styles['organizer-override-modal__section-title']}>
               {t('organizer.overrideModal.matchAction.title') || 'Match Action'}
             </h4>
-            <p className="organizer-override-field__label-text organizer-override-field__label-text--support organizer-override-field__label-text--spaced">
+            <p className={`${styles['organizer-override-field__label-text']} ${styles['organizer-override-field__label-text--support']} ${styles['organizer-override-field__label-text--spaced']}`}>
               {t('organizer.overrideModal.matchAction.description') || 'Choose what to do with the current tv match since season or episode changed:'}
             </p>
 
             <SelectableCard
               as="div"
-              className="match-action-option"
+              className={styles['match-action-option']}
               selected={matchAction === 'keep'}
               onClick={() => setMatchAction('keep')}
             >
@@ -281,18 +282,18 @@ export default function OrganizerOverrideModalContent({ row, onClose, toast, sca
                 name="matchAction"
                 checked={matchAction === 'keep'}
                 onChange={() => setMatchAction('keep')}
-                className="match-action-option__radio-label"
+                className={styles['match-action-option__radio-label']}
               >
                 {t('organizer.overrideModal.matchAction.keep') || 'Keep current tv match'}
               </Radio>
-              <span className="match-action-option__description">
+              <span className={styles['match-action-option__description']}>
                 {t('organizer.overrideModal.matchAction.keepDesc') || 'Update season/episode under the tv.'}
               </span>
             </SelectableCard>
 
             <SelectableCard
               as="div"
-              className="match-action-option"
+              className={styles['match-action-option']}
               selected={matchAction === 'reset'}
               onClick={() => setMatchAction('reset')}
             >
@@ -300,16 +301,16 @@ export default function OrganizerOverrideModalContent({ row, onClose, toast, sca
                 name="matchAction"
                 checked={matchAction === 'reset'}
                 onChange={() => setMatchAction('reset')}
-                className="match-action-option__radio-label"
+                className={styles['match-action-option__radio-label']}
               >
                 {t('organizer.overrideModal.matchAction.reset') || 'Reset match (Pending)'}
               </Radio>
-              <span className="match-action-option__description">
+              <span className={styles['match-action-option__description']}>
                 {t('organizer.overrideModal.matchAction.resetDesc') || 'Remove match and return to Review Needed.'}
               </span>
             </SelectableCard>
           </div>
-          <div className="single-override-layout__form">
+          <div className={styles['single-override-layout__form']}>
             {renderFormFields()}
           </div>
         </div>

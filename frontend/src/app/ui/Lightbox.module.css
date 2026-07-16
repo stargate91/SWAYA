@@ -1,4 +1,4 @@
-.ui-lightbox {
+.lightbox {
   position: fixed;
   inset: 0;
   z-index: var(--z-index-backdrop);
@@ -10,24 +10,24 @@
   backdrop-filter: var(--glass-blur-md);
 }
 
-.ui-lightbox__close-container {
+.closeContainer {
   top: var(--space-2xl);
   right: var(--space-2xl);
   z-index: calc(var(--z-index-backdrop) + 10);
 }
 
-.ui-lightbox .ui-lightbox__close-btn {
+.closeBtn {
   background: var(--color-surface-overlay);
   color: var(--button-primary-color);
   border-color: var(--color-border-heavy);
 }
 
-.ui-lightbox .ui-lightbox__close-btn:hover {
+.closeBtn:hover {
   background-color: var(--button-primary-neutral-bg);
   border-color: var(--button-secondary-neutral-border);
 }
 
-.ui-lightbox__image {
+.image {
   max-width: min(92vw, 87.5rem);
   max-height: 88vh;
   object-fit: contain;

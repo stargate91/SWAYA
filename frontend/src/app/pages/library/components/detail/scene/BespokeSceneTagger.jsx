@@ -3,6 +3,7 @@ import { Plus, X, Search, ChevronLeft, ChevronRight } from '@/ui/icons';
 import Pill from '@/ui/Pill';
 import { useAllTagsQuery } from '@/queries/libraryQueries';
 import { useMediaDetailContext } from '../MediaDetailContext';
+import Inline from '@/ui/Inline';
 import './BespokeSceneTagger.css';
 
 function HorizontalPillList({ children }) {
@@ -43,7 +44,7 @@ function HorizontalPillList({ children }) {
   };
 
   return (
-    <div className="bespoke-scene-tagger-scroller-wrapper">
+    <Inline gap="xs" align="center" className="bespoke-scene-tagger-scroller-wrapper">
       {showLeft && (
         <button
           type="button"
@@ -69,7 +70,7 @@ function HorizontalPillList({ children }) {
           <ChevronRight size={12} />
         </button>
       )}
-    </div>
+    </Inline>
   );
 }
 
@@ -160,11 +161,11 @@ export default function BespokeSceneTagger() {
 
   return (
     <div className="bespoke-scene-tagger-card">
-      <div className="bespoke-scene-tagger-header">
+      <Inline gap="sm" align="center" className="bespoke-scene-tagger-header">
         <span className="bespoke-scene-tagger-title">
           {t('library.details.tagger') || 'Tags & Keywords'}
         </span>
-      </div>
+      </Inline>
 
       <div className="bespoke-scene-tagger-body">
         {/* Active Tags */}
@@ -204,7 +205,7 @@ export default function BespokeSceneTagger() {
 
         {/* Add Tag Autocomplete Input */}
         <div className="bespoke-scene-tagger-input-wrapper" ref={dropdownRef}>
-          <div className="bespoke-scene-tagger-input-container">
+          <Inline gap="sm" align="center" className="bespoke-scene-tagger-input-container">
             <Search size={13} className="bespoke-scene-tagger-search-icon" />
             <input
               type="text"
@@ -227,7 +228,7 @@ export default function BespokeSceneTagger() {
                 <X size={12} />
               </button>
             )}
-          </div>
+          </Inline>
 
           {isDropdownOpen && (filteredTags.length > 0 || searchQuery.trim()) && (
             <div className="bespoke-scene-tagger-dropdown">
@@ -238,8 +239,10 @@ export default function BespokeSceneTagger() {
                   onClick={() => handleAddTag(tag.name)}
                   className="bespoke-scene-tagger-dropdown-item"
                 >
-                  <TagColorDot color={tag.color} />
-                  <span>{tag.name}</span>
+                  <Inline gap="sm" align="center">
+                    <TagColorDot color={tag.color} />
+                    <span>{tag.name}</span>
+                  </Inline>
                 </button>
               ))}
               {searchQuery.trim() && !allTags.some((t) => t.name.toLowerCase() === searchQuery.trim().toLowerCase()) && (

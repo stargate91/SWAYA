@@ -20,9 +20,6 @@
 /* Card Header with Pills */
 .bespoke-browser-card__pills-header {
   position: relative;
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
   --local-bg: color-mix(in srgb, var(--color-bg-canvas) 15%, transparent);
   background: var(--local-bg);
@@ -118,8 +115,6 @@
 /* Card Bodies */
 .bespoke-browser-card__body {
   position: relative;
-  display: flex;
-  gap: var(--space-md);
   padding: var(--space-md) var(--space-md);
   min-height: 0;
 }
@@ -191,13 +186,7 @@
   border-radius: var(--radius-sm);
 }
 
-.bespoke-season-meta__header,
-.bespoke-episode-detail-card__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--space-md);
-}
+
 
 .bespoke-season-meta__title,
 .bespoke-episode-detail-card__title {
@@ -209,9 +198,6 @@
 
 .bespoke-season-meta__sub,
 .bespoke-episode-detail-card__meta {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
   margin-top: 0;
 }
 
@@ -383,12 +369,7 @@
 }
 
 /* Actions */
-.bespoke-episode-detail-card__actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  margin-right: var(--space-sm);
-}
+
 
 .bespoke-action-btn {
   display: flex;
@@ -437,9 +418,6 @@
 }
 
 .bespoke-episode-detail-card__peaks-title {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-semibold);
   --local-color: var(--color-state-danger);
@@ -454,9 +432,6 @@
 }
 
 .bespoke-episode-detail-card__peak-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
   background: var(--color-surface-glass);
   border: 1px solid var(--color-border-default);
   --local-padding: 0.0625rem var(--space-sm);

@@ -1,6 +1,7 @@
 import Page from '../../../ui/Page';
 import OrganizerDetailsPanel from '../OrganizerDetailsPanel';
 import PanelHeader from '../../../ui/PanelHeader';
+import panelHeaderStyles from '../../../ui/PanelHeader.module.css';
 import { Tabs } from '../../../ui/Tabs';
 import OrganizerResultsPanel from '../OrganizerResultsPanel';
 import { useOrganizerColumns } from '../useOrganizerColumns.jsx';
@@ -83,7 +84,11 @@ export default function OrganizerPageContent({
 
   return (
     <Page viewport={true} className={`organizer-page ${styles['organizer-page']}`}>
-      <div className={`organizer-main ${!shouldShowDetailsPanel ? 'is-details-hidden' : isDetailsCollapsed ? 'is-details-collapsed' : ''}`}>
+      <div
+        className={styles['organizer-main']}
+        data-details-hidden={!shouldShowDetailsPanel || undefined}
+        data-details-collapsed={isDetailsCollapsed || undefined}
+      >
         <div className={styles['organizer-main__content']}>
           <PanelHeader
             title={t('organizer.title')}
@@ -114,6 +119,7 @@ export default function OrganizerPageContent({
                   value={activeManualTab}
                   onChange={setActiveManualTab}
                   variant="sub"
+                  tabClassName={panelHeaderStyles['panel-tab']}
                 />
               </PanelHeader.Row>
             )}
@@ -124,6 +130,7 @@ export default function OrganizerPageContent({
                   value={activeExtrasTab}
                   onChange={setActiveExtrasTab}
                   variant="sub"
+                  tabClassName={panelHeaderStyles['panel-tab']}
                 />
               </PanelHeader.Row>
             )}

@@ -185,7 +185,9 @@ export function useMatchResolve({ rows = [], t, toast, onResolved, mode, session
       return;
     }
 
-    if (isMatchedEpisode) {
+    const isEpisodeRow = rows.some((r) => isEpisodeMediaType(r.rawType));
+
+    if (isEpisodeRow) {
       if (mode === MEDIA_TYPES.TV && effectiveSeason === null && effectiveEpisode === null) {
         requestConfirm('tv', 'swaya_skip_confirm_tv', performResolve);
         return;

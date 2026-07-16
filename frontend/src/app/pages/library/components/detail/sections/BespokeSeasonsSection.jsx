@@ -13,6 +13,7 @@ import BespokeEpisodeDetail from './BespokeEpisodeDetail';
 import Lightbox from '@/ui/Lightbox';
 import PosterCard from '@/ui/PosterCard';
 import ScrollRow from '@/ui/ScrollRow';
+import Inline from '@/ui/Inline';
 import './BespokeSeasonsSection.css';
 
 export default function BespokeSeasonsSection() {
@@ -160,7 +161,7 @@ export default function BespokeSeasonsSection() {
       <div className="bespoke-unified-browser-card">
         
         {/* Row 1 Header: Seasons Horizontal Pills */}
-        <div className="bespoke-browser-card__pills-header">
+        <Inline gap="sm" align="center" className="bespoke-browser-card__pills-header">
           <ScrollRow ref={seasonsScrollRef} containerClassName="bespoke-browser-card__pills-header-scroll-container" className="bespoke-seasons-pills no-scrollbar" showArrows={true} enableWheelScroll={true} arrowsLayout="column" size="sm">
             {seasonsList.map((season) => {
               const isActive = season.season_number === selectedSeasonNumber;
@@ -180,10 +181,10 @@ export default function BespokeSeasonsSection() {
               );
             })}
           </ScrollRow>
-        </div>
+        </Inline>
 
         {/* Row 1 Body: Season Details */}
-        <div className="bespoke-browser-card__body bespoke-browser-card__body--season">
+        <Inline gap="md" className="bespoke-browser-card__body bespoke-browser-card__body--season">
           {/* Left Column: Large Season Poster */}
           <div className="bespoke-season-detail-card__poster-col">
             <PosterCard
@@ -197,12 +198,12 @@ export default function BespokeSeasonsSection() {
 
           {/* Right Column: Metadata & Overview */}
           <div className="bespoke-season-meta__content-col">
-            <div className="bespoke-season-meta__header">
+            <Inline justify="between" align="center" className="bespoke-season-meta__header">
               <div>
                 <h3 className="bespoke-season-meta__title">
                   {activeSeason.title || `Season ${activeSeason.season_number}`}
                 </h3>
-                <div className="bespoke-season-meta__sub">
+                <Inline gap="sm" align="center" className="bespoke-season-meta__sub">
                   {activeSeason.air_date && (
                     <span className="bespoke-season-meta__item">
                       <Calendar size={12} />
@@ -215,7 +216,7 @@ export default function BespokeSeasonsSection() {
                       {episodesText}
                     </span>
                   )}
-                </div>
+                </Inline>
               </div>
 
               <button
@@ -232,20 +233,20 @@ export default function BespokeSeasonsSection() {
                     : (t('library.details.markWatched') || 'Mark Watched')}
                 </span>
               </button>
-            </div>
+            </Inline>
 
             {activeSeason.overview && (
               <p className="bespoke-season-meta__overview">{activeSeason.overview}</p>
             )}
           </div>
-        </div>
+        </Inline>
 
         {/* Subtle Divider Line */}
         <div className="bespoke-browser-card__divider" />
 
         {/* Row 2 Header: Episode Pills */}
         {episodes.length > 0 && (
-          <div className="bespoke-browser-card__pills-header">
+          <Inline gap="sm" align="center" className="bespoke-browser-card__pills-header">
             <ScrollRow ref={episodesScrollRef} containerClassName="bespoke-browser-card__pills-header-scroll-container" className="bespoke-episodes-pills no-scrollbar" showArrows={true} enableWheelScroll={true} arrowsLayout="column" size="sm">
               {episodes.map((episode) => {
                 const isActive = episode.id === selectedEpisodeId;
@@ -267,7 +268,7 @@ export default function BespokeSeasonsSection() {
                 );
               })}
             </ScrollRow>
-          </div>
+          </Inline>
         )}
 
         {/* Row 2 Body: Episode Details */}

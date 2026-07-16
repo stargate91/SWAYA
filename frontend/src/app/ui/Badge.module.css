@@ -60,8 +60,8 @@
 
 /* Colors and states */
 .badge[data-family="status"][data-tone="accent"] {
-  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
-  color: var(--color-accent);
+  background: var(--ui-badge-accent-bg, color-mix(in srgb, var(--color-accent) 14%, transparent));
+  color: var(--ui-badge-accent-color, var(--color-accent));
 }
 
 .badge[data-family="status"][data-tone="success"] {
@@ -75,8 +75,8 @@
 }
 
 .badge[data-family="status"][data-tone="warning"] {
-  background: var(--color-state-warning-bg);
-  color: var(--color-state-warning);
+  background: var(--ui-badge-warning-bg, var(--color-state-warning-bg));
+  color: var(--ui-badge-warning-color, var(--color-state-warning));
 }
 
 .badge[data-family="status"][data-tone="overlay"] {

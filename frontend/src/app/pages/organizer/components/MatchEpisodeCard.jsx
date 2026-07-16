@@ -82,7 +82,7 @@ export default function MatchEpisodeCard({
         disabled={isDisabled}
         active={isActive}
         aspect="landscape"
-        badge={badgeNode}
+        overlay={badgeNode}
       />
     </div>
   );

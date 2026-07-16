@@ -9,6 +9,7 @@ import { getPosterImagePath } from '@/lib/imageUrls';
 import { ENTITY_ICONS } from '@/ui/icons';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
 import { navigateToCreditDetail } from '../../utils/mediaNavigation';
+import Inline from '@/ui/Inline';
 import './PersonCreditsShared.css';
 
 export function OverviewContent({ text, emptyText, t, openDrawer, className = '' }) {
@@ -199,9 +200,9 @@ export function CollectionItemsSection({ items, navigate, t }) {
 
   return (
     <section className="entity-detail-page__content-section">
-      <div className="entity-detail-page__section-header">
+      <Inline justify="between" className="entity-detail-page__section-header">
         <h2>{t('library.details.collectionItemsTitle') || 'Collection Items'}</h2>
-      </div>
+      </Inline>
       <ScrollRow
         onScroll={handleScroll}
         containerClassName="collection-items-horizontal-grid-wrapper"

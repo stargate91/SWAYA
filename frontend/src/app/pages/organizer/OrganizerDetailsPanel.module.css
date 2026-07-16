@@ -15,7 +15,7 @@
   will-change: transform;
 }
 
-:global(.organizer-main.is-details-collapsed) .organizer-details {
+.organizer-details[data-collapsed="true"] {
   transform: translateX(17.25rem);
   pointer-events: none;
 }
@@ -57,7 +57,7 @@
     transform var(--motion-fast);
 }
 
-:global(.organizer-main.is-details-collapsed) .organizer-details__panel {
+.organizer-details[data-collapsed="true"] .organizer-details__panel {
   opacity: 0;
   max-width: 0;
   transform: translateX(var(--space-sm));
@@ -236,6 +236,7 @@
     opacity: 0;
     transform: translateY(var(--space-xs));
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -256,35 +257,35 @@
   overflow-wrap: anywhere;
 }
 
-:global(.organizer-main.is-details-collapsed) .organizer-details__sticky-container {
+.organizer-details[data-collapsed="true"] .organizer-details__sticky-container {
   padding-left: var(--space-sm);
   padding-right: var(--space-sm);
   overflow: hidden;
 }
 
-:global(.organizer-main.is-details-collapsed) .organizer-details__toggle-row {
+.organizer-details[data-collapsed="true"] .organizer-details__toggle-row {
   left: 0;
   width: var(--button-height-md);
   justify-content: center;
   pointer-events: auto;
 }
 
-:global(.organizer-main.is-details-collapsed) .organizer-details__title {
+.organizer-details[data-collapsed="true"] .organizer-details__title {
   opacity: 0;
   max-width: 0;
 }
 
-:global(.organizer-main.is-details-collapsed) .organizer-details__poster-card,
-:global(.organizer-main.is-details-collapsed) .organizer-details__backdrop-card {
+.organizer-details[data-collapsed="true"] .organizer-details__poster-card,
+.organizer-details[data-collapsed="true"] .organizer-details__backdrop-card {
   opacity: 0;
   transform: translateX(var(--space-md)) scale(0.96);
 }
 
-:global(.organizer-main.is-details-collapsed) .organizer-details__poster-image {
+.organizer-details[data-collapsed="true"] .organizer-details__poster-image {
   transform: scale(0.97);
 }
 
-:global(.organizer-main.is-details-collapsed) .organizer-details__image-nav,
-:global(.organizer-main.is-details-collapsed) .organizer-details__image-count {
+.organizer-details[data-collapsed="true"] .organizer-details__image-nav,
+.organizer-details[data-collapsed="true"] .organizer-details__image-count {
   opacity: 0;
 }

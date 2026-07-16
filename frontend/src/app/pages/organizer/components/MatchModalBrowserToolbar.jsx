@@ -21,7 +21,7 @@ export default function MatchModalBrowserToolbar({
 
   return (
     <div className={styles['organizer-match-modal__browser-toolbar']}>
-      <Button variant="secondary-neutral" leftIcon={<ArrowLeft size={14} />} animateIcon onClick={onBack}>
+      <Button variant="secondary-neutral" size="sm" leftIcon={<ArrowLeft size={14} />} animateIcon onClick={onBack}>
         {t('common.back')}
       </Button>
       <div className={styles['organizer-match-modal__browser-copy']}>

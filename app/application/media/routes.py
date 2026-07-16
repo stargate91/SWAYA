@@ -125,7 +125,7 @@ def image_proxy(url: str = Query(..., description="The remote image URL to proxy
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             "Referer": f"{parsed.scheme}://{parsed.netloc}/"
         }
-        response = requests.get(url, headers=headers, stream=True, timeout=10, verify=False)
+        response = requests.get(url, headers=headers, stream=True, timeout=1.5, verify=False)
         response.raise_for_status()
         
         content_type = response.headers.get("Content-Type", "image/jpeg")
@@ -148,8 +148,9 @@ def image_proxy(url: str = Query(..., description="The remote image URL to proxy
             
         return StreamingResponse(response.iter_content(chunk_size=4096), media_type=content_type)
     except Exception as e:
-        logger.exception(f"Image proxy failed for URL {url}")
-        raise HTTPException(status_code=502, detail=f"Failed to fetch remote image: {e}")
+        logger.warning(f"Image proxy failed for URL {url}, redirecting client directly: {e}")
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url)
 
 
 @router.get("/media/{item_id}/preview")

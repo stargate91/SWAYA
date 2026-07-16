@@ -237,11 +237,8 @@
 
 /* Confirm Overlay */
 .confirm-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  position: fixed;
+  inset: 0;
   background: color-mix(in srgb, var(--color-bg-canvas) 75%, transparent);
   backdrop-filter: blur(var(--space-sm));
   display: flex;

@@ -10,9 +10,6 @@
 
 .bespoke-scene-peaks-header {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   padding: var(--space-sm) var(--space-md);
   --local-bg: color-mix(in srgb, var(--color-bg-canvas) 15%, transparent);
   background: var(--local-bg);
@@ -21,12 +18,7 @@
   border-bottom: 1px solid var(--color-border-default);
 }
 
-.bespoke-scene-peaks-header-left {
-  display: flex;
-  align-items: center;
-  --local-gap: var(--space-sm);
-  gap: var(--local-gap);
-}
+
 
 .bespoke-scene-peaks-title-icon {
   --peaks-color: var(--color-state-danger);
@@ -83,9 +75,6 @@
 }
 
 .bespoke-scene-peaks-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-sm);
   background: var(--color-surface-card);
@@ -103,12 +92,7 @@
   transform: translateY(-0.0625rem);
 }
 
-.bespoke-scene-peaks-item-left {
-  display: flex;
-  align-items: center;
-  --local-gap: 0.5rem;
-  gap: var(--local-gap);
-}
+
 
 .bespoke-scene-peaks-item-icon {
   color: var(--color-state-danger);
@@ -120,12 +104,7 @@
   color: var(--color-text-primary);
 }
 
-.bespoke-scene-peaks-item-right {
-  display: flex;
-  align-items: center;
-  --local-gap: 0.75rem;
-  gap: var(--local-gap);
-}
+
 
 .bespoke-scene-peaks-item-date {
   font-size: var(--font-size-2xs);

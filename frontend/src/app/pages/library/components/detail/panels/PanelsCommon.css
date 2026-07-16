@@ -23,6 +23,11 @@
   gap: var(--space-md);
 }
 
+.details-panel--custom:not(.details-panel--drawer) .specs-grid {
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-sm);
+}
+
 .specs-card {
   position: relative;
   display: flex;
@@ -35,6 +40,13 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--media-detail-panel-card-shadow);
+}
+
+.details-panel--custom:not(.details-panel--drawer) .specs-card {
+  min-height: 3.25rem;
+  padding: var(--space-sm) var(--space-md);
+  gap: var(--space-xs);
+  border-radius: var(--radius-md);
 }
 
 .specs-card::after {
@@ -61,6 +73,8 @@
   overflow: hidden;
   white-space: nowrap;
 }
+
+
 
 .specs-card--tall {
   min-height: 4.875rem;
