@@ -1,6 +1,6 @@
 import { Play, Pause, Maximize2, X } from '@/ui/icons';
 import Inline from '../ui/Inline';
-import './PlayerControlBar.css';
+import styles from './PlayerControlBar.module.css';
 
 export default function PlayerControlBar({ state, onTogglePlay, onMaximize, onClose }) {
   if (!state || !state.active || !state.isMinimized) {
@@ -23,43 +23,43 @@ export default function PlayerControlBar({ state, onTogglePlay, onMaximize, onCl
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="player-control-bar">
-      <div className="player-control-bar__info">
-        <span className="player-control-bar__title">
+    <div className={styles['player-control-bar']}>
+      <div className={styles.info}>
+        <span className={styles.title}>
           {title}
         </span>
-        <span className="player-control-bar__time">
+        <span className={styles.time}>
           {formatTime(currentTime) + timeSeparator + formatTime(duration)}
         </span>
       </div>
 
-      <div className="player-control-bar__progress-wrapper">
-        <div className="player-control-bar__progress-bg">
+      <div className={styles['progress-wrapper']}>
+        <div className={styles['progress-bg']}>
           <div
-            className="player-control-bar__progress-fill"
+            className={styles['progress-fill']}
             // eslint-disable-next-line react/forbid-dom-props
             style={{ width: `${progressPercent}%` }}
           />
         </div>
       </div>
 
-      <Inline gap="sm" align="center" className="player-control-bar__actions">
+      <Inline gap="sm" align="center" className={styles.actions}>
         <button
-          className="player-control-bar__btn player-control-bar__btn--play"
+          className={`${styles.btn} ${styles['btn-play']}`}
           onClick={onTogglePlay}
         >
           {isPaused ? <Play size={16} fill="currentColor" /> : <Pause size={16} fill="currentColor" />}
         </button>
 
         <button
-          className="player-control-bar__btn player-control-bar__btn--maximize"
+          className={styles.btn}
           onClick={onMaximize}
         >
           <Maximize2 size={16} />
         </button>
 
         <button
-          className="player-control-bar__btn player-control-bar__btn--close"
+          className={`${styles.btn} ${styles['btn-close']}`}
           onClick={onClose}
         >
           <X size={16} />

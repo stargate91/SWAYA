@@ -11,7 +11,7 @@
   will-change: filter, transform;
 }
 
-.shell.is-transitioning {
+.shell:global(.is-transitioning) {
   filter: blur(var(--space-sm));
   transform: scale(0.985);
 }
@@ -20,7 +20,7 @@
   grid-template-columns: 5.25rem minmax(0, 1fr);
 }
 
-.shell__main {
+.main {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -28,7 +28,7 @@
   min-height: 0;
 }
 
-.shell__focus-sentinel {
+.focus-sentinel {
   position: absolute;
   width: 0.0625rem;
   height: 0.0625rem;
@@ -42,7 +42,7 @@
 /* ==========================================================================
    UTILITY BARS (FLOATING)
    ========================================================================== */
-.shell__utility-bar {
+.utility-bar {
   position: absolute;
   top: var(--utility-bar-top);
   right: var(--space-3xl);
@@ -56,7 +56,7 @@
   pointer-events: none;
 }
 
-.shell__utility-bar-left {
+.utility-bar-left {
   display: flex;
   align-items: center;
   height: 100%;
@@ -64,7 +64,7 @@
   pointer-events: auto;
 }
 
-.shell__utility-bar-bottom {
+.utility-bar-bottom {
   position: absolute;
   bottom: calc(2 * var(--space-lg));
   right: var(--space-3xl);
@@ -78,14 +78,14 @@
   pointer-events: none;
 }
 
-.shell__utility-bar-bottom-left {
+.utility-bar-bottom-left {
   display: flex;
   align-items: center;
   height: 100%;
   pointer-events: auto;
 }
 
-.shell__utility-bar-bottom-center {
+.utility-bar-bottom-center {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -95,14 +95,14 @@
   pointer-events: auto;
 }
 
-.shell__utility-bar-bottom-right {
+.utility-bar-bottom-right {
   display: flex;
   align-items: center;
   height: 100%;
   pointer-events: auto;
 }
 
-.shell__utility-bar-center {
+.utility-bar-center {
   position: absolute;
   left: 50%;
   transform: translateX(calc(-50% - (var(--utility-bar-right-inset, 0rem) / 2)));
@@ -113,14 +113,10 @@
   transition: transform var(--motion-fast);
 }
 
-
-
-
-
 /* ==========================================================================
    SCROLL AND CONTENT AREA
    ========================================================================== */
-.shell__content {
+.content {
   position: relative;
   display: block;
   height: 100%;
@@ -133,17 +129,16 @@
   background: var(--color-canvas);
 }
 
-.shell__content--dashboard {
+.content-dashboard {
   padding-bottom: var(--space-7xl);
 }
 
-
-.shell:has(#shell-utility-bar-bottom-center > *:not(:empty)) .shell__content > div:not([data-viewport]) {
+.shell:has(:global(#shell-utility-bar-bottom-center) > *:not(:empty)) .content > div:not([data-viewport]) {
   --page-pb: var(--space-7xl);
   padding-bottom: var(--page-pb);
 }
 
-.shell__suspense-fallback {
+.suspense-fallback {
   display: flex;
   justify-content: center;
   align-items: center;

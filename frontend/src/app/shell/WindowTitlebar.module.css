@@ -1,7 +1,7 @@
 /* ==========================================================================
    WINDOW TITLEBAR
    ========================================================================== */
-.window-titlebar {
+.titlebar {
   position: fixed;
   top: 0;
   left: 0;
@@ -17,7 +17,7 @@
   -webkit-app-region: drag;
 }
 
-.window-titlebar__drag-region {
+.drag-region {
   display: flex;
   align-items: center;
   gap: var(--space-lg);
@@ -27,7 +27,7 @@
   -webkit-app-region: drag;
 }
 
-.window-titlebar__center-container {
+.center-container {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,11 +39,11 @@
   -webkit-app-region: drag;
 }
 
-.window-titlebar__center-container.has-progress {
+.center-container.has-progress {
   justify-content: flex-start;
 }
 
-.window-titlebar__search-wrapper {
+.search-wrapper {
   flex: 1 1 20rem;
   max-width: 30rem;
   min-width: 11.25rem;
@@ -51,12 +51,12 @@
   -webkit-app-region: no-drag;
 }
 
-.window-titlebar__search-wrapper.has-progress {
+.search-wrapper.has-progress {
   max-width: 22.5rem;
   flex-basis: 22.5rem;
 }
 
-.window-titlebar__progress-wrapper {
+.progress-wrapper {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -68,14 +68,14 @@
   z-index: var(--z-index-step-10);
 }
 
-.window-titlebar__progress-wrapper .ui-progress-bar-container {
+.progress-wrapper :global(.ui-progress-bar-container) {
   flex: 1 1 23.75rem;
   max-width: 42.5rem;
   min-width: 20rem;
   width: 23.75rem;
 }
 
-.window-titlebar__brand-text {
+.brand-text {
   font-family: var(--font-display);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-extrabold);
@@ -85,14 +85,14 @@
   line-height: 1;
 }
 
-.window-titlebar__actions {
+.actions {
   display: flex;
   align-items: center;
   gap: var(--border-width-thin);
   -webkit-app-region: no-drag;
 }
 
-.window-titlebar__button {
+.button {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -104,36 +104,36 @@
   transition: background var(--motion-fast), color var(--motion-fast);
 }
 
-.window-titlebar__button:focus,
-.window-titlebar__button:focus-visible {
+.button:focus,
+.button:focus-visible {
   outline: none;
   box-shadow: var(--ui-utility-button-titlebar-divider);
 }
 
-.window-titlebar__button:hover {
-  --btn-hover-bg: color-mix(in srgb, #ffffff 5%, transparent);
+.button:hover {
+  --btn-hover-bg: color-mix(in srgb, var(--color-text-primary) 5%, transparent);
   background: var(--btn-hover-bg);
   color: var(--color-ink);
 }
 
-.window-titlebar__button.window-titlebar__button--close:hover {
+.button.close-btn:hover {
   --close-hover-bg: var(--color-state-danger);
   background: var(--close-hover-bg);
   color: var(--color-text-primary);
 }
 
-.window-titlebar__button:active {
-  --btn-active-bg: color-mix(in srgb, #ffffff 8%, transparent);
+.button:active {
+  --btn-active-bg: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
   background: var(--btn-active-bg);
 }
 
-.window-titlebar__button.window-titlebar__button--close:active {
+.button.close-btn:active {
   --close-active-bg: color-mix(in srgb, var(--color-state-danger) 60%, var(--color-text-primary));
   background: var(--close-active-bg);
   color: var(--color-text-primary);
 }
 
-.window-titlebar__button.window-titlebar__button--adult-toggle {
+.button.adult-toggle {
   margin-right: var(--space-2xl);
   color: var(--color-muted);
   width: var(--ui-control-height-xs);
@@ -144,20 +144,20 @@
   align-self: center;
 }
 
-.window-titlebar__button.window-titlebar__button--adult-toggle:hover {
+.button.adult-toggle:hover {
   background: var(--ui-utility-button-bg-hover);
   color: var(--color-text-primary);
 }
 
-.window-titlebar__button.window-titlebar__button--adult-toggle.is-nsfw {
+.button.adult-toggle.is-nsfw {
   color: var(--color-state-danger);
 }
 
-.window-titlebar__button.window-titlebar__button--adult-toggle.is-nsfw:hover {
+.button.adult-toggle.is-nsfw:hover {
   background: var(--ui-utility-button-bg-hover);
 }
 
-.window-titlebar__actions .window-titlebar__tooltip-trigger {
+.actions .tooltip-trigger {
   display: flex;
   align-items: stretch;
   height: 100%;
@@ -165,12 +165,12 @@
 }
 
 /* Titlebar Navigation Buttons */
-.window-titlebar__nav-buttons {
+.nav-buttons {
   padding: 0 var(--space-md);
   -webkit-app-region: no-drag;
 }
 
-.window-titlebar__nav-btn.window-titlebar__nav-btn {
+.nav-btn {
   width: var(--ui-control-height-xs);
   height: var(--ui-control-height-xs);
   padding: 0;
@@ -185,17 +185,17 @@
   transition: background var(--motion-fast), color var(--motion-fast);
 }
 
-.window-titlebar__nav-btn.window-titlebar__nav-btn:focus-visible {
+.nav-btn:focus-visible {
   outline: none;
   box-shadow: inset 0 0 0 0.125rem var(--color-accent);
 }
 
-.window-titlebar__nav-btn.window-titlebar__nav-btn:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--color-ink) 5%, transparent);
-  color: var(--color-ink);
-}
-
-.window-titlebar__nav-btn:disabled {
+.nav-btn:disabled {
   opacity: 0.35;
   cursor: not-allowed;
+}
+
+.nav-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-ink) 5%, transparent);
+  color: var(--color-ink);
 }

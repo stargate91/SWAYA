@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Play, Minus, ChevronLeft, ChevronRight } from '@/ui/icons';
 import PosterCard from '../../../ui/PosterCard';
@@ -20,9 +20,10 @@ const ContinueWatchingWidget = () => {
   const { t: T } = useTranslation();
   const queryClient = useQueryClient();
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
-  const { data: items = [], isLoading } = useContinueWatchingQuery({
+  const { data: itemsData, isLoading } = useContinueWatchingQuery({
     include_adult: sessionMode === 'nsfw',
   });
+  const items = useMemo(() => itemsData || [], [itemsData]);
   const playMutation = usePlayMediaMutation();
   const resetProgressMutation = useResetProgressMutation();
   const { data: settings = {} } = useSettingsQuery();
@@ -38,13 +39,11 @@ const ContinueWatchingWidget = () => {
     setShowRight(scrollLeft + clientWidth < scrollWidth - 10);
   }, []);
 
-  const [prevItems, setPrevItems] = useState(items);
   const [localItems, setLocalItems] = useState(items);
 
-  if (items !== prevItems) {
-    setPrevItems(items);
+  useEffect(() => {
     setLocalItems(items);
-  }
+  }, [items]);
 
   useEffect(() => {
     updateArrows();

@@ -4,18 +4,18 @@ import { useNavigationStateStore } from '@/stores/useNavigationStateStore';
 import UtilityButton from '../ui/UtilityButton';
 import Tooltip from '../ui/Tooltip';
 import { useSidebar } from './useSidebar';
-import './Sidebar.css';
+import styles from './Sidebar.module.css';
 
 export default function Sidebar({ isCollapsed, onToggle }) {
   const { t, navItems, toggleAriaLabel, quitApp } = useSidebar(isCollapsed);
 
   return (
-    <aside className="shell__sidebar">
-      <div className="shell__sidebar-toggle-row">
+    <aside className={`${styles.sidebar} ${isCollapsed ? styles['is-collapsed'] : ''}`}>
+      <div className={styles['toggle-row']}>
         <Tooltip content={isCollapsed ? t('sidebar.expand') || 'Expand' : t('sidebar.collapse') || 'Collapse'} side="right">
           <UtilityButton
             type="button"
-            className="shell__sidebar-toggle"
+            className={styles.toggle}
             size="sm"
             aria-label={toggleAriaLabel}
             onClick={onToggle}
@@ -24,7 +24,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
           </UtilityButton>
         </Tooltip>
       </div>
-      <nav className="shell__nav">
+      <nav className={styles.nav}>
         {navItems.map((item) => {
           const Icon = item.icon;
           const label = t(item.translationKey);
@@ -41,10 +41,10 @@ export default function Sidebar({ isCollapsed, onToggle }) {
             <NavLink
               to={item.to}
               onClick={handleNavClick}
-              className={({ isActive }) => `shell__nav-link ${isActive ? 'is-active' : ''}`}
+              className={({ isActive }) => `${styles['nav-link']} ${isActive ? styles['is-active'] : ''}`}
             >
               <Icon size={18} />
-              <span className="shell__nav-link-label">{label}</span>
+              <span className={styles['nav-link-label']}>{label}</span>
             </NavLink>
           );
 
@@ -57,7 +57,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
           );
         })}
       </nav>
-      <div className="shell__sidebar-footer">
+      <div className={styles.footer}>
         {(() => {
           const handleAboutClick = () => {
             if (window.location.pathname === '/about') {
@@ -73,20 +73,20 @@ export default function Sidebar({ isCollapsed, onToggle }) {
               <NavLink
                 to="/about"
                 onClick={handleAboutClick}
-                className={({ isActive }) => `shell__nav-link shell__nav-link--footer ${isActive ? 'is-active' : ''}`}
+                className={({ isActive }) => `${styles['nav-link']} ${styles['nav-link-footer']} ${isActive ? styles['is-active'] : ''}`}
               >
                 <CircleHelp size={18} />
-                <span className="shell__nav-link-label">{t('sidebar.about') || 'About'}</span>
+                <span className={styles['nav-link-label']}>{t('sidebar.about') || 'About'}</span>
               </NavLink>
             </Tooltip>
           ) : (
             <NavLink
               to="/about"
               onClick={handleAboutClick}
-              className={({ isActive }) => `shell__nav-link shell__nav-link--footer ${isActive ? 'is-active' : ''}`}
+              className={({ isActive }) => `${styles['nav-link']} ${styles['nav-link-footer']} ${isActive ? styles['is-active'] : ''}`}
             >
               <CircleHelp size={18} />
-              <span className="shell__nav-link-label">{t('sidebar.about') || 'About'}</span>
+              <span className={styles['nav-link-label']}>{t('sidebar.about') || 'About'}</span>
             </NavLink>
           );
         })()}
@@ -94,21 +94,21 @@ export default function Sidebar({ isCollapsed, onToggle }) {
           <Tooltip content={t('sidebar.quit')} side="right">
             <button
               type="button"
-              className="shell__nav-link shell__nav-link--footer shell__nav-link--danger"
+              className={`${styles['nav-link']} ${styles['nav-link-footer']} ${styles['nav-link-danger']}`}
               onClick={quitApp}
             >
               <Power size={18} />
-              <span className="shell__nav-link-label">{t('sidebar.quit')}</span>
+              <span className={styles['nav-link-label']}>{t('sidebar.quit')}</span>
             </button>
           </Tooltip>
         ) : (
           <button
             type="button"
-            className="shell__nav-link shell__nav-link--footer shell__nav-link--danger"
+            className={`${styles['nav-link']} ${styles['nav-link-footer']} ${styles['nav-link-danger']}`}
             onClick={quitApp}
           >
             <Power size={18} />
-            <span className="shell__nav-link-label">{t('sidebar.quit')}</span>
+            <span className={styles['nav-link-label']}>{t('sidebar.quit')}</span>
           </button>
         )}
       </div>

@@ -13,7 +13,7 @@ import { useLibraryModeStore } from '../stores/useLibraryModeStore';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useNavigationStore } from '../stores/useNavigationStore';
 import GlobalSearch from './GlobalSearch';
-import './WindowTitlebar.css';
+import styles from './WindowTitlebar.module.css';
 import modalStyles from '../ui/Modal.module.css';
 import Inline from '../ui/Inline';
 
@@ -99,20 +99,20 @@ export default function WindowTitlebar() {
   };
 
   return (
-    <header className="window-titlebar">
+    <header className={styles.titlebar}>
       {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
       <div
-        className="window-titlebar__drag-region"
+        className={styles['drag-region']}
         onDoubleClick={resizeToMinimum}
       >
-        <span className="window-titlebar__brand-text">{BRAND_NAME}</span>
+        <span className={styles['brand-text']}>{BRAND_NAME}</span>
       </div>
 
-      <Inline gap="sm" align="center" className="window-titlebar__nav-buttons">
+      <Inline gap="sm" align="center" className={styles['nav-buttons']}>
         <Tooltip content={t('common.back')} side="bottom">
           <button
             type="button"
-            className="window-titlebar__nav-btn"
+            className={styles['nav-btn']}
             disabled={!canGoBack}
             onClick={() => goBack(navigate)}
             aria-label="Back"
@@ -123,7 +123,7 @@ export default function WindowTitlebar() {
         <Tooltip content={t('common.forward')} side="bottom">
           <button
             type="button"
-            className="window-titlebar__nav-btn"
+            className={styles['nav-btn']}
             disabled={!canGoForward}
             onClick={() => goForward(navigate)}
             aria-label="Forward"
@@ -133,12 +133,12 @@ export default function WindowTitlebar() {
         </Tooltip>
       </Inline>
 
-      <div className={`window-titlebar__center-container ${hasProgress ? 'has-progress' : ''}`}>
-        <div className={`window-titlebar__search-wrapper ${hasProgress ? 'has-progress' : ''}`}>
+      <div className={`${styles['center-container']} ${hasProgress ? styles['has-progress'] : ''}`}>
+        <div className={`${styles['search-wrapper']} ${hasProgress ? styles['has-progress'] : ''}`}>
           <GlobalSearch />
         </div>
         {hasProgress && (
-          <div className="window-titlebar__progress-wrapper">
+          <div className={styles['progress-wrapper']}>
             {scanProgress ? <ProgressBar {...scanProgress} onAbort={handleAbort} /> : null}
             {imageProgress ? <ProgressBar {...imageProgress} variant="sub" /> : null}
             {hydrateProgress ? <ProgressBar {...hydrateProgress} variant="sub" /> : null}
@@ -147,16 +147,16 @@ export default function WindowTitlebar() {
         )}
       </div>
 
-      <div className="window-titlebar__actions">
+      <div className={styles.actions}>
         {settings?.include_adult && (
           <Tooltip
             content={sessionMode === 'nsfw' ? (t('common.sfwMode') || 'SFW Mode') : (t('common.nsfwMode') || 'NSFW Mode')}
             side="bottom"
-            triggerClassName="window-titlebar__tooltip-trigger"
+            triggerClassName={styles['tooltip-trigger']}
           >
             <UtilityButton
               type="button"
-              className={`window-titlebar__button window-titlebar__button--adult-toggle ${sessionMode === 'nsfw' ? 'is-nsfw' : ''}`.trim()}
+              className={`${styles.button} ${styles['adult-toggle']} ${sessionMode === 'nsfw' ? styles['is-nsfw'] : ''}`.trim()}
               tabIndex={-1}
               aria-label="Toggle Adult Mode"
               onClick={handleToggleClick}
@@ -167,7 +167,7 @@ export default function WindowTitlebar() {
         )}
         <UtilityButton
           type="button"
-          className="window-titlebar__button"
+          className={styles.button}
           size="titlebar"
           tabIndex={-1}
           aria-label={t('titlebar.minimizeWindow')}
@@ -177,7 +177,7 @@ export default function WindowTitlebar() {
         </UtilityButton>
         <UtilityButton
           type="button"
-          className="window-titlebar__button"
+          className={styles.button}
           size="titlebar"
           tabIndex={-1}
           aria-label={t('titlebar.maximizeWindow')}
@@ -187,7 +187,7 @@ export default function WindowTitlebar() {
         </UtilityButton>
         <UtilityButton
           type="button"
-          className="window-titlebar__button window-titlebar__button--close"
+          className={`${styles.button} ${styles['close-btn']}`}
           size="titlebar"
           danger
           tabIndex={-1}

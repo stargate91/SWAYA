@@ -12,7 +12,7 @@ import { useLibraryModeStore } from '../stores/useLibraryModeStore';
 import AdultOverlay from '../ui/AdultOverlay';
 import CompactCard from '../ui/CompactCard';
 import SearchInputCombo from '../ui/SearchInputCombo';
-import './GlobalSearch.css';
+import styles from './GlobalSearch.module.css';
 
 const SOURCES = [
   { id: 'tmdb', name: 'TMDb', adult: false },
@@ -214,7 +214,7 @@ export default function GlobalSearch() {
   const ActiveTypeIcon = activeTypeObj.icon;
 
   return (
-    <div className="global-search" ref={containerRef}>
+    <div className={styles['global-search']} ref={containerRef}>
       <SearchInputCombo
         value={query}
         onChange={handleInputChange}
@@ -242,7 +242,7 @@ export default function GlobalSearch() {
           <Tooltip content={t('common.advancedSearch') || 'Advanced Search'} side="bottom">
             <button
               type="button"
-              className="global-search__more-btn"
+              className={styles['more-btn']}
               onClick={() => {
                 setIsOverlayOpen(false);
                 navigate(`/search?q=${encodeURIComponent(query.trim())}&source=${selectedSource}&type=${selectedType}`);
@@ -258,8 +258,8 @@ export default function GlobalSearch() {
 
       {/* Suggestion Results Overlay */}
       {isOverlayOpen && filteredResults.length > 0 && (
-        <div className="global-search__overlay">
-          <div className="global-search__results-list">
+        <div className={styles.overlay}>
+          <div className={styles['results-list']}>
             {selectedType === 'all' ? (
               Object.entries(groupedResults).map(([type, items], groupIdx) => {
                 if (items.length === 0) return null;
@@ -274,13 +274,13 @@ export default function GlobalSearch() {
                 const GroupTypeIcon = activeGroupTypeObj.icon;
 
                 return (
-                  <div key={type} className="global-search__group">
-                    {groupIdx > 0 && <div className="global-search__group-divider" />}
-                    <div className="global-search__group-header">{groupTitles[type]}</div>
+                  <div key={type} className={styles.group}>
+                    {groupIdx > 0 && <div className={styles['group-divider']} />}
+                    <div className={styles['group-header']}>{groupTitles[type]}</div>
                     {items.map((item, idx) => (
                       <CompactCard
                         key={`${item.id}-${item.media_type}-${idx}`}
-                        className="global-search__card"
+                        className={styles.card}
                         size="sm"
                         aspect={item.media_type === 'scene' ? 'landscape' : (item.media_type === 'person' ? 'circle' : 'poster')}
                         imageUrl={item.poster_path ? resolveMediaImageUrl(item.poster_path, 'posterThumb') : null}
@@ -288,8 +288,8 @@ export default function GlobalSearch() {
                         title={item.title}
                         meta={item.year ? getYearLabel(item.year) : null}
                         description={item.overview ? (item.overview.length > 60 ? item.overview.slice(0, 60) + '...' : item.overview) : null}
-                        rightElement={<ArrowUpRight className="global-search__arrow-icon" size={14} />}
-                        overlay={shouldBlur(item) && <AdultOverlay variant="blur" badgeText={null} className="global-search__adult-overlay" />}
+                        rightElement={<ArrowUpRight className={styles['arrow-icon']} size={14} />}
+                        overlay={shouldBlur(item) && <AdultOverlay variant="blur" badgeText={null} className={styles['adult-overlay']} />}
                         onClick={() => handleResultClick(item)}
                       />
                     ))}
@@ -300,7 +300,7 @@ export default function GlobalSearch() {
               filteredResults.map((item, idx) => (
                 <CompactCard
                   key={`${item.id}-${item.media_type}-${idx}`}
-                  className="global-search__card"
+                  className={styles.card}
                   size="sm"
                   aspect={item.media_type === 'scene' ? 'landscape' : (item.media_type === 'person' ? 'circle' : 'poster')}
                   imageUrl={item.poster_path ? resolveMediaImageUrl(item.poster_path, 'posterThumb') : null}
@@ -308,8 +308,8 @@ export default function GlobalSearch() {
                   title={item.title}
                   meta={item.year ? getYearLabel(item.year) : null}
                   description={item.overview ? (item.overview.length > 60 ? item.overview.slice(0, 60) + '...' : item.overview) : null}
-                  rightElement={<ArrowUpRight className="global-search__arrow-icon" size={14} />}
-                  overlay={shouldBlur(item) && <AdultOverlay variant="blur" badgeText={null} className="global-search__adult-overlay" />}
+                  rightElement={<ArrowUpRight className={styles['arrow-icon']} size={14} />}
+                  overlay={shouldBlur(item) && <AdultOverlay variant="blur" badgeText={null} className={styles['adult-overlay']} />}
                   onClick={() => handleResultClick(item)}
                 />
               ))

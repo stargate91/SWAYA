@@ -9,9 +9,7 @@ import Sidebar from './Sidebar';
 import Spinner from '../ui/Spinner';
 import { useSettingsQuery } from '../queries';
 import { useNavigationStore } from '../stores/useNavigationStore';
-import './AppShell.css';
-
-
+import styles from './AppShell.module.css';
 
 export default function AppShell() {
   const { data: settings } = useSettingsQuery();
@@ -164,34 +162,34 @@ export default function AppShell() {
   };
 
   return (
-    <div className={`shell ${isSidebarCollapsed ? 'is-sidebar-collapsed' : ''}`}>
+    <div className={`${styles.shell} shell ${isSidebarCollapsed ? styles['is-sidebar-collapsed'] : ''}`}>
       <button
         type="button"
         tabIndex={0}
         autoFocus
-        className="shell__focus-sentinel"
+        className={styles['focus-sentinel']}
         aria-hidden="true"
       />
       <WindowTitlebar />
       <Sidebar isCollapsed={isSidebarCollapsed} onToggle={handleToggleSidebar} />
 
-      <div className="shell__main">
-        <main className={`shell__content ${location.pathname === '/dashboard' ? 'shell__content--dashboard' : ''}`.trim()}>
-          <header className="shell__utility-bar">
-            <div className="shell__utility-bar-left" aria-label="Context actions placeholder" />
-            <div className="shell__utility-bar-center" id="shell-utility-bar-center" />
+      <div className={styles.main}>
+        <main className={`${styles.content} shell__content ${location.pathname === '/dashboard' ? styles['content-dashboard'] : ''}`.trim()}>
+          <header className={styles['utility-bar']}>
+            <div className={styles['utility-bar-left']} aria-label="Context actions placeholder" />
+            <div className={styles['utility-bar-center']} id="shell-utility-bar-center" />
           </header>
           <Suspense fallback={
-            <div className="shell__suspense-fallback">
+            <div className={styles['suspense-fallback']}>
               <Spinner label="Loading page..." />
             </div>
           }>
             <Outlet />
           </Suspense>
-          <footer className="shell__utility-bar-bottom">
-            <div className="shell__utility-bar-bottom-left" aria-label="Context bottom-left actions placeholder" />
-            <div className="shell__utility-bar-bottom-center" id="shell-utility-bar-bottom-center" />
-            <div className="shell__utility-bar-bottom-right" aria-label="Context bottom-right actions placeholder" />
+          <footer className={styles['utility-bar-bottom']}>
+            <div className={styles['utility-bar-bottom-left']} aria-label="Context bottom-left actions placeholder" />
+            <div className={styles['utility-bar-bottom-center']} id="shell-utility-bar-bottom-center" />
+            <div className={styles['utility-bar-bottom-right']} aria-label="Context bottom-right actions placeholder" />
           </footer>
         </main>
       </div>
