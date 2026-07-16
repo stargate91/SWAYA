@@ -125,6 +125,16 @@ const TableRow = memo(function TableRow({
       })}
     </tr>
   );
+}, (prevProps, nextProps) => {
+  if (prevProps.row !== nextProps.row) return false;
+  if (prevProps.columns !== nextProps.columns) return false;
+  if (prevProps.rowActions !== nextProps.rowActions) return false;
+  
+  const wasActive = prevProps.activeRowId === prevProps.row.id;
+  const isActive = nextProps.activeRowId === nextProps.row.id;
+  if (wasActive !== isActive) return false;
+  
+  return true;
 });
 
 export default function Table({

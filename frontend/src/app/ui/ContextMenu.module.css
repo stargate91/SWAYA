@@ -4,7 +4,7 @@
   left: var(--context-menu-left);
   z-index: var(--z-index-dropdown);
   min-width: 11.25rem;
-  background: color-mix(in srgb, var(--color-bg-elevated) 82%, transparent);
+  background: color-mix(in srgb, var(--color-bg-elevated) 95%, transparent);
   backdrop-filter: var(--context-menu-backdrop-filter);
   border: 0.0625rem solid var(--color-border-subtle);
   border-radius: var(--radius-md);

@@ -78,7 +78,6 @@ export function useOrganizerViewModel({
       renameButtonLabel: isRenameStarting || isRenameActive
         ? t('organizer.buttons.organizing')
         : t('organizer.buttons.rename'),
-      shouldShowDetailsPanel: !emptyState && !loadingState,
       shouldShowLoadRest,
       summaryText,
     };

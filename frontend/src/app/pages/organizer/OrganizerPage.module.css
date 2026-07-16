@@ -26,17 +26,18 @@
   flex: 1 1 auto;
   height: 100%;
   min-height: 0;
-  padding-top: var(--page-top-offset);
-  padding-right: calc(20rem + var(--space-xl));
-  padding-bottom: var(--page-bottom-offset);
-  transition: padding-right var(--motion-fast);
-  will-change: padding-right;
 }
 
-.organizer-main[data-details-collapsed="true"] .organizer-main__content {
-  padding-right: calc(var(--button-height-md) + var(--space-xl));
-}
-
-.organizer-main[data-details-hidden="true"] .organizer-main__content {
-  padding-right: var(--space-3xl);
+.organizer-inspect-json {
+  margin: 0;
+  max-height: 60vh;
+  overflow: auto;
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-glass);
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-ink);
+  font: var(--font-size-2xs)/1.5 var(--font-mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }

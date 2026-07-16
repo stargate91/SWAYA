@@ -271,10 +271,6 @@
     "emptyCategory": "No items in {context}."
   },
   "details": {
-    "title": "Details",
-    "collapse": "Collapse details",
-    "expand": "Expand details",
-    "empty": "Click on any item in the list to see its details here!",
     "delete": {
       "title": "What should we do with this file?",
       "descriptionMedia": "What would you like to do with this file? Linked extras will move along automatically.",
@@ -384,11 +380,6 @@
           "desc": "This will assign multiple episodes to this file—great for double-episodes!"
         }
       }
-    },
-    "posterPlaceholder": "Poster preview",
-    "fields": {
-      "source": "Original Path",
-      "target": "Planned Path"
     }
   },
   "bulkBar": {

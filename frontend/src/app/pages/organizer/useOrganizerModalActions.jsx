@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from 'react';
-import { FolderOpen, Play, Search, Sliders, Trash2, X, EyeOff } from '@/ui/icons';
+import { FolderOpen, Play, Search, Sliders, Trash2, X, EyeOff, FileJson } from '@/ui/icons';
 import { useQueryClient } from '@tanstack/react-query';
 import Button from '../../ui/Button';
 import FloatingActionBar from '../../ui/FloatingActionBar';
@@ -11,9 +11,10 @@ import { showItemInFolder } from '../../lib/ipc';
 import { useUi } from '@/providers/UiProvider';
 import { useTranslation } from '../../providers/LanguageContext';
 import { useOrganizerDeleteActions } from './useOrganizerDeleteActions';
-import { useSettingsQuery } from '../../queries';
+import { useSettingsQuery, useFullMetadataQuery } from '../../queries';
 import { mapOrganizerTypeLabel } from './organizerMappers';
 import modalStyles from '../../ui/Modal.module.css';
+import styles from './OrganizerPage.module.css';
 
 export function useOrganizerModalActions({
   focusFirstAvailableResult,
@@ -294,6 +295,119 @@ export function useOrganizerModalActions({
     });
   };
 
+  const openInspectModal = useCallback((row) => {
+    const buildInspectPayload = async () => {
+      if (!row) {
+        return '';
+      }
+
+      if (row.rawType === 'extra') {
+        return JSON.stringify({
+          kind: 'extra',
+          summary: {
+            id: row.itemId,
+            source: row.source,
+            target: row.target,
+            source_path: row.sourcePath,
+            target_path: row.targetPath,
+          },
+          organizer: row.rawPayload,
+        }, null, 2);
+      }
+
+      try {
+        const metadata = await api.metadata.getItemFullMetadata(row.itemId);
+        return JSON.stringify({
+          kind: row.rawType,
+          summary: {
+            id: row.itemId,
+            source: row.source,
+            target: row.target,
+            source_path: row.sourcePath,
+            target_path: row.targetPath,
+            status: row.rawStatus,
+            action: row.rawAction || null,
+            has_collision: row.hasCollision,
+          },
+          organizer: row.rawPayload,
+          metadata,
+        }, null, 2);
+      } catch (err) {
+        console.error(err);
+        return JSON.stringify({
+          kind: row.rawType,
+          summary: {
+            id: row.itemId,
+            source: row.source,
+            target: row.target,
+            source_path: row.sourcePath,
+            target_path: row.targetPath,
+            status: row.rawStatus,
+            action: row.rawAction || null,
+            has_collision: row.hasCollision,
+          },
+          organizer: row.rawPayload,
+          error: err.message || String(err),
+        }, null, 2);
+      }
+    };
+
+    const handleOpen = async () => {
+      try {
+        const inspectJson = await buildInspectPayload();
+
+        const handleCopyInspect = async () => {
+          try {
+            await navigator.clipboard.writeText(inspectJson);
+            toast(t('organizer.toasts.inspectCopySuccess') || 'Inspect payload copied', 'success');
+          } catch {
+            toast(t('organizer.toasts.inspectCopyFailed') || 'Copy failed', 'danger');
+          }
+        };
+
+        const handleDownloadInspect = () => {
+          const blob = new Blob([inspectJson], { type: 'application/json;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const anchor = document.createElement('a');
+          anchor.href = url;
+          anchor.download = `${row.source || 'organizer-item'}.json`;
+          document.body.appendChild(anchor);
+          anchor.click();
+          document.body.removeChild(anchor);
+          URL.revokeObjectURL(url);
+        };
+
+        openModal({
+          title: t('organizer.details.inspect.title') || 'Inspect Item Data',
+          description: t('organizer.details.inspect.description') || 'Raw database state and metadata payload',
+          icon: FileJson,
+          variant: 'wide',
+          content: (
+            <pre className={styles['organizer-inspect-json']}>
+              {inspectJson}
+            </pre>
+          ),
+          footer: (
+            <>
+              <Button type="button" variant="secondary-neutral" onClick={handleCopyInspect}>
+                {t('organizer.details.inspect.copy') || 'Copy JSON'}
+              </Button>
+              <Button type="button" variant="secondary-neutral" onClick={handleDownloadInspect}>
+                {t('organizer.details.inspect.download') || 'Download'}
+              </Button>
+              <Button variant="secondary-neutral" onClick={closeModal}>
+                {t('common.close') || 'Close'}
+              </Button>
+            </>
+          ),
+        });
+      } catch (error) {
+        toast(error.message || t('organizer.toasts.inspectLoadFailed') || 'Load failed', 'danger');
+      }
+    };
+
+    handleOpen();
+  }, [closeModal, openModal, toast, t]);
 
   const rowActions = useMemo(() => [
     {
@@ -308,6 +422,12 @@ export function useOrganizerModalActions({
       label: t('organizer.actions.override'),
       icon: Sliders,
       onClick: (row) => openOverrideModal(row),
+    },
+    {
+      key: 'inspect',
+      label: t('organizer.details.inspect.open') || 'Inspect',
+      icon: FileJson,
+      onClick: (row) => openInspectModal(row),
     },
     {
       key: 'preview',
@@ -353,6 +473,7 @@ export function useOrganizerModalActions({
     dismissRows,
     openMatchModal,
     openOverrideModal,
+    openInspectModal,
     openDeleteModal,
     isPlayableOrganizerRow,
     handlePreviewRow,
@@ -413,6 +534,7 @@ export function useOrganizerModalActions({
     openMatchModal,
     openOverrideModal,
     openBulkOverrideModal,
+    openInspectModal,
     rowActions,
     bulkActionBar,
     refreshOrganizer,

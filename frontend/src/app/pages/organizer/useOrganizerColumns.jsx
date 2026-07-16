@@ -16,6 +16,9 @@ export function useOrganizerColumns({
   selectedRowIds,
   sortConfig,
   t,
+  onMouseEnterSource,
+  onMouseMoveSource,
+  onMouseLeaveSource,
 }) {
   const { openMatchModal, openOverrideModal } = useOrganizerModals();
 
@@ -51,6 +54,9 @@ export function useOrganizerColumns({
       t,
       onOpenMatch: (row) => openMatchModal(row),
       onOpenOverride: (row) => openOverrideModal(row),
+      onMouseEnterSource,
+      onMouseMoveSource,
+      onMouseLeaveSource,
     });
   }, [
     activeExtrasTab,
@@ -67,6 +73,9 @@ export function useOrganizerColumns({
     sortConfig.key,
     sortConfig.direction,
     handleSortToggle,
+    onMouseEnterSource,
+    onMouseMoveSource,
+    onMouseLeaveSource,
   ]);
 
   return { columns };

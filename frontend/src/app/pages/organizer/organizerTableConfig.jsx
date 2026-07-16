@@ -143,10 +143,25 @@ export function buildOrganizerColumns({
   t,
   onOpenMatch,
   onOpenOverride,
+  onMouseEnterSource,
+  onMouseMoveSource,
+  onMouseLeaveSource,
 }) {
   const columns = [
     renderSelectColumn(paginatedRows, selectedRowIds, handleToggleAll, handleToggleRow),
-    { key: 'source', label: renderSortableLabel(t('organizer.table.originalFilename'), 'source') },
+    {
+      key: 'source',
+      label: renderSortableLabel(t('organizer.table.originalFilename'), 'source'),
+      render: (value, row) => (
+        <span
+          onMouseEnter={(e) => onMouseEnterSource && onMouseEnterSource(e, row)}
+          onMouseMove={(e) => onMouseMoveSource && onMouseMoveSource(e)}
+          onMouseLeave={() => onMouseLeaveSource && onMouseLeaveSource()}
+        >
+          {value}
+        </span>
+      ),
+    },
     {
       key: 'arrow',
       label: '',

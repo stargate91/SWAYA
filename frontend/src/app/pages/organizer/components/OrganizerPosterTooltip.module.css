@@ -1,0 +1,30 @@
+.organizer-poster-tooltip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-index-dropdown);
+  pointer-events: none;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-surface-glass);
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow-lg);
+  animation: fadeIn var(--motion-fast);
+  will-change: transform;
+}
+
+.organizer-poster-tooltip__image {
+  display: block;
+  width: 10rem;
+  height: 15rem;
+  object-fit: cover;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

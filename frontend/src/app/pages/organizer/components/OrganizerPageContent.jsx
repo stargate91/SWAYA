@@ -1,28 +1,23 @@
+import { useState, useRef } from 'react';
 import Page from '../../../ui/Page';
-import OrganizerDetailsPanel from '../OrganizerDetailsPanel';
 import PanelHeader from '../../../ui/PanelHeader';
 import panelHeaderStyles from '../../../ui/PanelHeader.module.css';
 import { Tabs } from '../../../ui/Tabs';
 import OrganizerResultsPanel from '../OrganizerResultsPanel';
 import { useOrganizerColumns } from '../useOrganizerColumns.jsx';
 import { normalizeStatusTone, PAGE_SIZE_OPTIONS } from '../organizerMappers';
+import OrganizerPosterTooltip from './OrganizerPosterTooltip';
 import styles from '../OrganizerPage.module.css';
 
 export default function OrganizerPageContent({
   activeExtrasTab,
   activeManualTab,
-  activeImage,
-  activeImageIndex,
-  setActiveImageIndex,
-  activeImages,
   activeMainTab,
   activeRow,
   currentPage,
   handleSortToggle,
   handleToggleAll,
-  handleToggleDetails,
   handleToggleRow,
-  isDetailsCollapsed,
   pageSize,
   paginatedRows,
   searchQuery,
@@ -34,8 +29,6 @@ export default function OrganizerPageContent({
   setPageAndScrollToTop,
   setPageSize,
   setSearchQuery,
-  shouldShowDetailsCarousel,
-  shouldShowDetailsPoster,
   sortConfig,
   sortedRows,
   totalPages,
@@ -46,7 +39,6 @@ export default function OrganizerPageContent({
   computedMainTabs,
   organizerEmptyState,
   organizerLoadingState,
-  shouldShowDetailsPanel,
   summaryText,
   emptyStateActions,
   headerActions,
@@ -55,6 +47,28 @@ export default function OrganizerPageContent({
   sessionMode,
   t,
 }) {
+  const [tooltipRow, setTooltipRow] = useState(null);
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [tooltipInitialCoords, setTooltipInitialCoords] = useState({ x: 0, y: 0 });
+  const tooltipRef = useRef(null);
+
+  const handleMouseEnterSource = (e, row) => {
+    setTooltipRow(row);
+    setTooltipInitialCoords({ x: e.clientX, y: e.clientY });
+    setTooltipVisible(true);
+  };
+
+  const handleMouseMoveSource = (e) => {
+    if (tooltipRef.current) {
+      tooltipRef.current.style.transform = `translate3d(${e.clientX + 15}px, ${e.clientY + 15}px, 0)`;
+    }
+  };
+
+  const handleMouseLeaveSource = () => {
+    setTooltipVisible(false);
+    setTooltipRow(null);
+  };
+
   const { columns } = useOrganizerColumns({
     activeExtrasTab,
     activeMainTab,
@@ -67,6 +81,9 @@ export default function OrganizerPageContent({
     selectedRowIds,
     sortConfig,
     t,
+    onMouseEnterSource: handleMouseEnterSource,
+    onMouseMoveSource: handleMouseMoveSource,
+    onMouseLeaveSource: handleMouseLeaveSource,
   });
 
   const currentContextLabel =
@@ -84,11 +101,7 @@ export default function OrganizerPageContent({
 
   return (
     <Page viewport={true} className={`organizer-page ${styles['organizer-page']}`}>
-      <div
-        className={styles['organizer-main']}
-        data-details-hidden={!shouldShowDetailsPanel || undefined}
-        data-details-collapsed={isDetailsCollapsed || undefined}
-      >
+      <div className={styles['organizer-main']}>
         <div className={styles['organizer-main__content']}>
           <PanelHeader
             title={t('organizer.title')}
@@ -161,21 +174,15 @@ export default function OrganizerPageContent({
             totalPages={totalPages}
           />
         </div>
-
-        {shouldShowDetailsPanel ? (
-          <OrganizerDetailsPanel
-            activeImage={activeImage}
-            activeImageIndex={activeImageIndex}
-            activeImages={activeImages}
-            activeRow={activeRow}
-            isDetailsCollapsed={isDetailsCollapsed}
-            onSelectImage={setActiveImageIndex}
-            onToggleDetails={handleToggleDetails}
-            shouldShowDetailsCarousel={shouldShowDetailsCarousel}
-            shouldShowDetailsPoster={shouldShowDetailsPoster}
-          />
-        ) : null}
       </div>
+
+      <OrganizerPosterTooltip
+        ref={tooltipRef}
+        activeRow={tooltipRow}
+        visible={tooltipVisible}
+        initialX={tooltipInitialCoords.x}
+        initialY={tooltipInitialCoords.y}
+      />
     </Page>
   );
 }

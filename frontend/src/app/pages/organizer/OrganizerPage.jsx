@@ -174,20 +174,12 @@ export default function OrganizerPage() {
   const {
     activeExtrasTab,
     activeManualTab,
-    activeImage,
-    activeImageIndex,
-    setActiveImageIndex,
-    activeImages,
     activeMainTab,
     activeRow,
     currentPage,
-    focusFirstAvailableResult,
-    handleAdvanceDetailsImage,
     handleSortToggle,
     handleToggleAll,
-    handleToggleDetails,
     handleToggleRow,
-    isDetailsCollapsed,
     pageSize,
     pageStart,
     pageEnd,
@@ -203,8 +195,7 @@ export default function OrganizerPage() {
     setPageAndScrollToTop,
     setPageSize,
     setSearchQuery,
-    shouldShowDetailsCarousel,
-    shouldShowDetailsPoster,
+    focusFirstAvailableResult,
     sortConfig,
     sortedRows,
     tabCounts,
@@ -270,7 +261,6 @@ export default function OrganizerPage() {
     loadRestButtonLabel,
     loadingState: organizerLoadingState,
     renameButtonLabel,
-    shouldShowDetailsPanel,
     shouldShowLoadRest,
     summaryText,
   } = useOrganizerViewModel({
@@ -289,19 +279,6 @@ export default function OrganizerPage() {
     visibleExtraCount,
     visibleMediaCount,
   });
-
-  useEffect(() => {
-    if (!utilityBarTarget) {
-      return undefined;
-    }
-
-    const detailsInset = !shouldShowDetailsPanel ? '0px' : isDetailsCollapsed ? '44px' : '320px';
-    utilityBarTarget.style.setProperty('--utility-bar-right-inset', detailsInset);
-
-    return () => {
-      utilityBarTarget.style.removeProperty('--utility-bar-right-inset');
-    };
-  }, [isDetailsCollapsed, shouldShowDetailsPanel, utilityBarTarget]);
   const emptyStateActions = organizerEmptyState ? (
     <>
       {hasDatabaseItems ? (
@@ -491,7 +468,7 @@ export default function OrganizerPage() {
           />
           {sessionMode === 'nsfw' && scanMode !== 'offline' && providerOptions.length > 0 && (
             <div key={scanMode} className="provider-segmented-control-wrapper animate-slide-in">
-               <SegmentedControl
+              <SegmentedControl
                 variant="filter"
                 size="sm"
                 animated={true}
@@ -507,19 +484,12 @@ export default function OrganizerPage() {
       <OrganizerPageContent
         activeExtrasTab={activeExtrasTab}
         activeManualTab={activeManualTab}
-        activeImage={activeImage}
-        activeImageIndex={activeImageIndex}
-        setActiveImageIndex={setActiveImageIndex}
-        activeImages={activeImages}
         activeMainTab={activeMainTab}
         activeRow={activeRow}
         currentPage={currentPage}
-        handleAdvanceDetailsImage={handleAdvanceDetailsImage}
         handleSortToggle={handleSortToggle}
         handleToggleAll={handleToggleAll}
-        handleToggleDetails={handleToggleDetails}
         handleToggleRow={handleToggleRow}
-        isDetailsCollapsed={isDetailsCollapsed}
         pageSize={pageSize}
         paginatedRows={paginatedRows}
         searchQuery={searchQuery}
@@ -531,8 +501,6 @@ export default function OrganizerPage() {
         setPageAndScrollToTop={setPageAndScrollToTop}
         setPageSize={setPageSize}
         setSearchQuery={setSearchQuery}
-        shouldShowDetailsCarousel={shouldShowDetailsCarousel}
-        shouldShowDetailsPoster={shouldShowDetailsPoster}
         sortConfig={sortConfig}
         sortedRows={sortedRows}
         totalPages={totalPages}
@@ -543,7 +511,6 @@ export default function OrganizerPage() {
         computedMainTabs={computedMainTabs}
         organizerEmptyState={organizerEmptyState}
         organizerLoadingState={organizerLoadingState}
-        shouldShowDetailsPanel={shouldShowDetailsPanel}
         summaryText={summaryText}
         emptyStateActions={emptyStateActions}
         headerActions={headerActions}
