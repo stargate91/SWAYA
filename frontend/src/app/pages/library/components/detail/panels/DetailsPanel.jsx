@@ -11,7 +11,7 @@ function SpecCard({ label, value, className = '' }) {
   if (!value) return null;
   return (
     <div className={`specs-card ${className}`}>
-      <Tooltip content={String(value)} side="top">
+      <Tooltip content={String(value)} side="top" triggerClassName="specs-card__tooltip-trigger">
         <span className="specs-card__label">{label}</span>
         <span className="specs-card__value">{value}</span>
       </Tooltip>
@@ -118,7 +118,7 @@ export default function DetailsPanel() {
                 : null;
               return (
                 <Inline key={idx} gap="md" align="center" justify="center" className="specs-card specs-card--company">
-                  <Tooltip content={it.name} side="top">
+                  <Tooltip content={it.name} side="top" triggerClassName="specs-card--company__tooltip-trigger">
                     {logoUrl && (
                       <img
                         src={logoUrl}
@@ -153,7 +153,7 @@ export default function DetailsPanel() {
                 : null;
               return (
                 <Inline key={idx} gap="md" align="center" justify="center" className="specs-card specs-card--company">
-                  <Tooltip content={it.name} side="top">
+                  <Tooltip content={it.name} side="top" triggerClassName="specs-card--company__tooltip-trigger">
                     {logoUrl && (
                       <img
                         src={logoUrl}

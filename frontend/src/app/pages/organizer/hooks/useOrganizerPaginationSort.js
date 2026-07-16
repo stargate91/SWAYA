@@ -17,16 +17,29 @@ export function useOrganizerPaginationSort({
   const [pageSize, setPageSize] = useState(40);
   const { sortConfig, setSortConfig, handleSortToggle } = useOrganizerSort('source', 'asc');
 
-  // Reset currentPage to 1 on tab or search query change
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setCurrentPage(1);
-  }, [activeMainTab, activeExtrasTab, activeManualTab, searchQuery]);
+  const [prevTabs, setPrevTabs] = useState({
+    main: activeMainTab,
+    extras: activeExtrasTab,
+    manual: activeManualTab,
+    search: searchQuery,
+  });
 
-  // Reset sort config on tab changes
-  useEffect(() => {
-    setSortConfig({ key: 'source', direction: 'asc' });
-  }, [activeExtrasTab, activeMainTab, activeManualTab, setSortConfig]);
+  const tabChanged = activeMainTab !== prevTabs.main ||
+    activeExtrasTab !== prevTabs.extras ||
+    activeManualTab !== prevTabs.manual;
+
+  if (tabChanged || searchQuery !== prevTabs.search) {
+    setPrevTabs({
+      main: activeMainTab,
+      extras: activeExtrasTab,
+      manual: activeManualTab,
+      search: searchQuery,
+    });
+    setCurrentPage(1);
+    if (tabChanged) {
+      setSortConfig({ key: 'source', direction: 'asc' });
+    }
+  }
 
   const filteredRows = useLocalListSearch(tabFilteredRows, searchQuery, ORGANIZER_SEARCH_KEYS);
 
@@ -41,6 +54,11 @@ export function useOrganizerPaginationSort({
 
   const totalPages = Math.max(1, Math.ceil(sortedRows.length / pageSize));
 
+  // Sync current page with total pages during render
+  if (currentPage > totalPages) {
+    setCurrentPage(totalPages);
+  }
+
   const paginatedRows = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
     return sortedRows.slice(startIndex, startIndex + pageSize);
@@ -48,12 +66,6 @@ export function useOrganizerPaginationSort({
 
   const pageStart = sortedRows.length === 0 ? 0 : ((currentPage - 1) * pageSize) + 1;
   const pageEnd = Math.min(sortedRows.length, currentPage * pageSize);
-
-  // Sync current page with total pages
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setCurrentPage((current) => Math.min(current, totalPages));
-  }, [totalPages]);
 
   const setPageAndScrollToTop = (nextPage) => {
     setCurrentPage(nextPage);

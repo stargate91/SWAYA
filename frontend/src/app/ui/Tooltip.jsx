@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import * as RadixTooltip from '@radix-ui/react-tooltip';
-import './Tooltip.css';
+import styles from './Tooltip.module.css';
 
 export default function Tooltip({
   content,
@@ -16,13 +16,13 @@ export default function Tooltip({
     <RadixTooltip.Provider delayDuration={delay}>
       <RadixTooltip.Root>
         <RadixTooltip.Trigger asChild>
-          <span className={`ui-tooltip ${triggerClassName}`.trim()}>
+          <span className={`${styles.tooltip} ${triggerClassName}`.trim()}>
             {children}
           </span>
         </RadixTooltip.Trigger>
         <RadixTooltip.Portal>
           <RadixTooltip.Content
-            className={`ui-tooltip__content ${className}`.trim()}
+            className={`${styles.content} ${className}`.trim()}
             side={side}
             sideOffset={10}
           >

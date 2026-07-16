@@ -157,7 +157,7 @@
   min-width: 0;
 }
 
-.organizer-override-bulk-episodes__item-left :global(.ui-tooltip) {
+.organizer-override-bulk-episodes__item-left .tooltip-trigger {
   min-width: 0;
   flex: 1;
 }
@@ -188,7 +188,7 @@
   gap: var(--space-xs);
 }
 
-.organizer-override-bulk-episodes__item-actions :global(.ui-icon-button) {
+.episode-action-btn {
   width: var(--space-2xl);
   height: var(--space-2xl);
   border-radius: var(--radius-sm);

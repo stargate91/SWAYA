@@ -1,4 +1,4 @@
-.ui-pill {
+.pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -12,34 +12,34 @@
 }
 
 /* Status variants */
-.ui-pill--success {
+.success {
   background: var(--color-state-success-bg);
   color: var(--color-state-success);
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);
 }
 
-.ui-pill--danger {
+.danger {
   background: var(--color-state-danger-bg);
   color: var(--color-state-danger);
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);
 }
 
-.ui-pill--warning {
+.warning {
   background: var(--color-state-warning-bg);
   color: var(--color-state-warning);
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);
 }
 
-.ui-pill--default {
+.default {
   background: var(--color-surface-glass-strong);
   color: var(--color-muted);
 }
 
 /* Rating variants */
-.ui-pill--imdb {
+.imdb {
   gap: var(--space-xs);
   padding: calc(var(--space-xs) / 2) calc(var(--space-md) / 2);
   border-radius: var(--radius-xs);
@@ -49,7 +49,7 @@
   color: var(--color-brand-imdb);
 }
 
-.ui-pill--tmdb {
+.tmdb {
   gap: var(--space-xs);
   padding: calc(var(--space-xs) / 2) calc(var(--space-md) / 2);
   border-radius: var(--radius-xs);
@@ -59,7 +59,7 @@
   color: var(--color-brand-tmdb);
 }
 
-.ui-pill--porndb {
+.porndb {
   gap: var(--space-xs);
   padding: calc(var(--space-xs) / 2) calc(var(--space-md) / 2);
   border-radius: var(--radius-xs);
@@ -69,8 +69,8 @@
   color: var(--color-brand-porndb);
 }
 
-.ui-pill--imdb svg,
-.ui-pill--tmdb svg {
+.imdb svg,
+.tmdb svg {
   display: block;
   align-self: center;
   flex-shrink: 0;
@@ -79,7 +79,7 @@
 }
 
 /* Favorite toggle variants */
-.ui-pill--favorite {
+.favorite {
   padding: var(--space-sm) var(--space-md);
   cursor: pointer;
   transition: all var(--motion-base);
@@ -89,13 +89,13 @@
   outline: none;
 }
 
-.ui-pill--favorite:hover {
+.favorite:hover {
   background-color: var(--color-surface-glass-strong);
   border-color: var(--color-border-strong);
   color: var(--color-text-primary);
 }
 
-.ui-pill--favorite-active {
+.favorite-active {
   padding: var(--space-sm) var(--space-md);
   cursor: pointer;
   transition: all var(--motion-base);
@@ -105,12 +105,12 @@
   outline: none;
 }
 
-.ui-pill--favorite-active:hover {
+.favorite-active:hover {
   background-color: var(--color-state-danger-bg-strong);
   border-color: color-mix(in srgb, var(--color-state-danger) 45%, transparent);
 }
 
-.ui-pill--meta {
+.meta {
   background: var(--color-surface-glass);
   color: color-mix(in srgb, var(--color-text-primary) 80%, transparent);
   font-family: var(--font-sans);
@@ -123,7 +123,7 @@
   gap: var(--space-sm);
 }
 
-.ui-pill--meta-large {
+.meta-large {
   background: var(--color-surface-glass);
   color: color-mix(in srgb, var(--color-text-primary) 80%, transparent);
   font-family: var(--font-sans);
@@ -138,7 +138,7 @@
   align-items: center;
 }
 
-.ui-pill--tag {
+.tag {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -164,7 +164,7 @@
   transition: var(--pill-transition);
 }
 
-.ui-pill--tag::before {
+.tag::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -174,12 +174,12 @@
   pointer-events: none;
 }
 
-.ui-pill--tag>* {
+.tag>* {
   position: relative;
   z-index: var(--z-index-step-1);
 }
 
-.ui-pill--tag:hover {
+.tag:hover {
   --pill-bg-hover: color-mix(in srgb, var(--pill-tag-color) 18%, var(--color-bg-elevated));
   --pill-border-hover: color-mix(in srgb, var(--pill-tag-color) 50%, var(--color-border-default));
   --pill-shadow-hover: 0 0.25rem 0.75rem color-mix(in srgb, var(--color-bg-canvas) 25%, transparent);
@@ -190,7 +190,7 @@
   transform: translateY(-0.0625rem);
 }
 
-.ui-pill--tag-suggested {
+.tag-suggested {
   border-style: dashed;
   background: transparent;
   --pill-suggested-color: var(--color-text-muted);
@@ -200,7 +200,7 @@
   border-color: var(--pill-suggested-border);
 }
 
-.ui-pill--tag-suggested:hover {
+.tag-suggested:hover {
   --pill-suggested-bg-hover: color-mix(in srgb, var(--pill-tag-color) 12%, var(--color-bg-elevated));
   --pill-suggested-border-hover: color-mix(in srgb, var(--pill-tag-color) 30%, var(--color-border-subtle));
   --pill-suggested-color-hover: color-mix(in srgb, var(--pill-tag-color) 85%, var(--color-text-primary));
@@ -211,7 +211,7 @@
   color: var(--pill-suggested-color-hover);
 }
 
-.ui-pill--missing {
+.missing {
   background-color: color-mix(in srgb, var(--color-text-muted) 12%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-text-muted) 24%, transparent);
   color: var(--color-text-muted);
@@ -221,7 +221,7 @@
   border-radius: var(--radius-sm);
 }
 
-.ui-pill--filter-active {
+.filter-active {
   padding: var(--space-sm) var(--space-md);
   cursor: pointer;
   transition: all var(--motion-base);
@@ -234,7 +234,7 @@
   outline: none;
 }
 
-.ui-pill--filter-active:hover {
+.filter-active:hover {
   background: var(--ui-surface-soft-strong);
   border-color: var(--color-border-strong);
 }

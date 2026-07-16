@@ -149,7 +149,11 @@ export default function WindowTitlebar() {
 
       <div className="window-titlebar__actions">
         {settings?.include_adult && (
-          <Tooltip content={sessionMode === 'nsfw' ? (t('common.sfwMode') || 'SFW Mode') : (t('common.nsfwMode') || 'NSFW Mode')} side="bottom">
+          <Tooltip
+            content={sessionMode === 'nsfw' ? (t('common.sfwMode') || 'SFW Mode') : (t('common.nsfwMode') || 'NSFW Mode')}
+            side="bottom"
+            triggerClassName="window-titlebar__tooltip-trigger"
+          >
             <UtilityButton
               type="button"
               className={`window-titlebar__button window-titlebar__button--adult-toggle ${sessionMode === 'nsfw' ? 'is-nsfw' : ''}`.trim()}

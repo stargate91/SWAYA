@@ -1,9 +1,8 @@
-/* Tooltip */
-.ui-tooltip {
+.tooltip {
   display: inline-flex;
 }
 
-.ui-tooltip__content {
+.content {
   z-index: var(--z-index-toast);
   max-width: var(--tooltip-max-width);
   padding: var(--tooltip-padding);

@@ -1068,7 +1068,7 @@
   backface-visibility: hidden;
 }
 
-.dashboard-metadata-card .ui-tooltip {
+.dashboard-metadata-card .dashboard-metadata-card__tooltip-trigger {
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
@@ -1078,11 +1078,11 @@
   min-width: 0;
 }
 
-.dashboard-metadata-card .ui-tooltip .dashboard-metadata-card__value {
+.dashboard-metadata-card .dashboard-metadata-card__tooltip-trigger .dashboard-metadata-card__value {
   width: 100%;
 }
 
-.dashboard-rating-box .ui-tooltip {
+.dashboard-rating-box .dashboard-rating-box__tooltip-trigger {
   display: flex;
   flex-direction: column;
   align-items: center;

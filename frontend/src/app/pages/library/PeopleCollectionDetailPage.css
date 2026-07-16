@@ -248,9 +248,4 @@
   padding-bottom: var(--wrapper-pb);
   margin-top: var(--wrapper-mt);
   margin-bottom: var(--wrapper-mb);
-}
-
-.collection-items-horizontal-grid-wrapper .ui-pill--default {
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wide);
-}
+}

@@ -151,7 +151,7 @@
   background: var(--ui-utility-button-bg-hover);
 }
 
-.window-titlebar__actions .ui-tooltip {
+.window-titlebar__actions .window-titlebar__tooltip-trigger {
   display: flex;
   align-items: stretch;
   height: 100%;

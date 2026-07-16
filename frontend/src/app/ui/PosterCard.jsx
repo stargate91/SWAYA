@@ -221,7 +221,7 @@ const PosterCard = memo(function PosterCard({
             {isOverlayTitle && title ? (
               <div className={styles['title-overlay']}>
                 <div className={styles['title-overlay-gradient']} />
-                <Tooltip content={title} side="top">
+                <Tooltip content={title} side="top" triggerClassName={styles['tooltip-trigger']}>
                   <div className={styles['title-overlay-label']}>{title}</div>
                 </Tooltip>
               </div>
@@ -233,10 +233,11 @@ const PosterCard = memo(function PosterCard({
         {topRightAction}
         {playOverlay ? (
           <IconButton
-            variant="play-overlay"
+            type="button"
+            className={styles['play-overlay']}
             onClick={playOverlay.onClick}
-            title={null}
             label={playOverlay.label}
+            title={null}
             disabled={playOverlay.disabled}
           >
             {playOverlay.icon}
@@ -261,6 +262,7 @@ const PosterCard = memo(function PosterCard({
           performerLinkClassName={styles['performer-link']}
           metaRightClassName={styles['meta-right']}
           dateClassName={styles.date}
+          tooltipTriggerClassName={styles['tooltip-trigger']}
         />
       )}
     </div>

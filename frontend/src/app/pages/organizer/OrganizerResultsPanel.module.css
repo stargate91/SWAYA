@@ -77,7 +77,7 @@
   justify-content: center;
 }
 
-.organizer-status-cell__policy:global(.ui-status-pill) {
+.organizer-status-cell__policy {
   background: var(--color-surface-glass);
   color: var(--color-subtle);
   border: 1px solid var(--color-border-subtle);

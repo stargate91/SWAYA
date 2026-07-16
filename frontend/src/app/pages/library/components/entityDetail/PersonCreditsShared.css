@@ -28,10 +28,6 @@
   gap: var(--space-md);
 }
 
-.collection-items-horizontal-grid-wrapper .ui-pill--default {
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
 
 .entity-detail-page__credits-list--people-grid {
   display: grid;

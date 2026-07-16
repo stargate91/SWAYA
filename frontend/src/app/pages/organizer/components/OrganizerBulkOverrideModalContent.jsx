@@ -537,7 +537,7 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
                     <Inline gap="sm" align="center" className={styles['organizer-override-bulk-episodes__item-left']}>
                       <GripVertical className={styles['organizer-override-bulk-episodes__grip']} size={14} />
                       <span className={styles['organizer-override-bulk-episodes__index']}>{index + parseInt(startEpisodeNum, 10) || (index + 1)}{DOT}</span>
-                      <Tooltip content={item.source} side="top">
+                      <Tooltip content={item.source} side="top" triggerClassName={styles['tooltip-trigger']}>
                         <span className={styles['organizer-override-bulk-episodes__filename']}>
                           {item.source}
                         </span>
@@ -547,6 +547,7 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
                       <IconButton
                         type="button"
                         size="xs"
+                        className={styles['episode-action-btn']}
                         onClick={() => handleMoveUp(index)}
                         disabled={index === 0}
                       >
@@ -555,6 +556,7 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
                       <IconButton
                         type="button"
                         size="xs"
+                        className={styles['episode-action-btn']}
                         onClick={() => handleMoveDown(index)}
                         disabled={index === orderedItems.length - 1}
                       >

@@ -471,8 +471,8 @@ button.image-wrapper:hover:not(:disabled) {
   gap: 0;
 }
 
-.details :global(.ui-tooltip),
-.title-overlay :global(.ui-tooltip) {
+.details .tooltip-trigger,
+.title-overlay .tooltip-trigger {
   display: block;
 }
 

@@ -120,7 +120,7 @@
 }
 
 
-.ui-pill.details-panel__keyword-pill {
+.details-panel__keyword-pill {
   --kw-pad: 0.25rem 0.625rem;
   background: var(--color-surface-glass);
   border: 1px solid var(--color-border-default);

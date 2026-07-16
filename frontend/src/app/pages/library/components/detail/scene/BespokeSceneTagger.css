@@ -56,7 +56,7 @@
   gap: var(--local-gap);
 }
 
-.ui-pill.bespoke-scene-tagger-pill-active {
+.bespoke-scene-tagger-pill-active {
   display: inline-flex;
   align-items: center;
   --local-gap: 0.25rem;

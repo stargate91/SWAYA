@@ -38,7 +38,7 @@ export default function BespokeRatingsSection({ item, t }) {
         <div className="bespoke-ratings-body">
           {ratings.map(rating => (
             <div key={rating.id} className="bespoke-rating-item">
-              <Tooltip content={rating.alt} side="top">
+              <Tooltip content={rating.alt} side="top" triggerClassName="bespoke-rating-item__tooltip-trigger">
                 <img src={rating.logo} alt={rating.alt} className="bespoke-rating-logo" />
                 <span className="bespoke-rating-value">{rating.value}</span>
               </Tooltip>

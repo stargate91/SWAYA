@@ -23,6 +23,7 @@ const CardMetadata = memo(function CardMetadata({
   performerLinkClassName = '',
   metaRightClassName = '',
   dateClassName = '',
+  tooltipTriggerClassName = '',
   ...props
 }) {
   if (!title && !subtitle && (!performers || performers.length === 0) && !ratingImdb && !ratingTmdb && !ratingPorndb && !ratingPill && !date) {
@@ -59,7 +60,7 @@ const CardMetadata = memo(function CardMetadata({
     <div className={className} {...props}>
        {title && (
          typeof title === 'string' ? (
-           <Tooltip content={title} side="top">
+           <Tooltip content={title} side="top" triggerClassName={tooltipTriggerClassName}>
              {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
              <div
                className={titleClassName}

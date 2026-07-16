@@ -72,21 +72,21 @@ export default function ExtrasPanel({ variant }) {
                 <div className="extras-panel__header">
                   <div className="extras-panel__header-copy">
                     <div className="extras-panel__title-row">
-                      <Tooltip content={extra.name} side="top">
+                      <Tooltip content={extra.name} side="top" triggerClassName="extras-panel__tooltip-trigger">
                         <div className="extras-panel__filename">
                           {extra.name}
                         </div>
                       </Tooltip>
                     </div>
                     {extra.path ? (
-                      <Tooltip content={extra.path} side="top">
+                      <Tooltip content={extra.path} side="top" triggerClassName="extras-panel__tooltip-trigger">
                         <div className="extras-panel__path">
                           {extra.path}
                         </div>
                       </Tooltip>
                     ) : null}
                     {getExtraMeta(extra) ? (
-                      <Tooltip content={getExtraMeta(extra)} side="top">
+                      <Tooltip content={getExtraMeta(extra)} side="top" triggerClassName="extras-panel__tooltip-trigger">
                         <span className="extras-panel__inline-meta">
                           {getExtraMeta(extra)}
                         </span>

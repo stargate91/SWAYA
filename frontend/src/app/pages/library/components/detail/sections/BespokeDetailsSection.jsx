@@ -36,7 +36,7 @@ export default function BespokeDetailsSection({ item, t }) {
           <div className="dashboard-ratings-grid">
             {ratings.map(rating => (
               <div key={rating.id} className="dashboard-rating-box">
-                <Tooltip content={rating.alt} side="top">
+                <Tooltip content={rating.alt} side="top" triggerClassName="dashboard-rating-box__tooltip-trigger">
                   <img src={rating.logo} alt={rating.alt} className="dashboard-rating-box__logo" />
                   <span className="dashboard-rating-box__value">{rating.value}</span>
                 </Tooltip>
@@ -51,7 +51,7 @@ export default function BespokeDetailsSection({ item, t }) {
         <div className="dashboard-metadata-grid">
           {item.release_date && (
             <div className="dashboard-metadata-card">
-              <Tooltip content={item.release_date} side="top">
+              <Tooltip content={item.release_date} side="top" triggerClassName="dashboard-metadata-card__tooltip-trigger">
                 <span className="dashboard-metadata-card__label">{t('library.details.releaseDate') || 'Release Date'}</span>
                 <span className="dashboard-metadata-card__value">{item.release_date}</span>
               </Tooltip>
@@ -59,7 +59,7 @@ export default function BespokeDetailsSection({ item, t }) {
           )}
           {item.release_status && (
             <div className="dashboard-metadata-card">
-              <Tooltip content={item.release_status} side="top">
+              <Tooltip content={item.release_status} side="top" triggerClassName="dashboard-metadata-card__tooltip-trigger">
                 <span className="dashboard-metadata-card__label">{t('library.details.status') || 'Status'}</span>
                 <span className="dashboard-metadata-card__value">{item.release_status}</span>
               </Tooltip>

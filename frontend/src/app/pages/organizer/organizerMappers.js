@@ -64,10 +64,12 @@ const mapItemType = (type, t) => mapOrganizerTypeLabel(type, t);
 export const normalizeItemStatus = (status) => String(status || '').toLowerCase();
 export const getFilenameFromPath = (value) => String(value || '').split(/[/\\]/).pop() || '-';
 
+const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+
 export const compareOrganizerValues = (left, right) => {
   const a = String(left ?? '').trim().toLowerCase();
   const b = String(right ?? '').trim().toLowerCase();
-  return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+  return collator.compare(a, b);
 };
 
 export const mapOrganizerItemRow = (item, t) => ({
