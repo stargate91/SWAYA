@@ -88,18 +88,18 @@
   border: 1px solid var(--color-border-default);
   position: relative;
   transition: all var(--motion-slow);
-  box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, black 25%, transparent);
+  box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, var(--color-bg-canvas) 25%, transparent);
 }
 
 .season-poster-card:hover .season-poster-card__image-wrapper {
   transform: translateY(-0.1875rem);
   border-color: color-mix(in srgb, var(--color-text-primary) 18%, transparent);
-  box-shadow: 0 0.5rem 1.125rem color-mix(in srgb, black 40%, transparent);
+  box-shadow: 0 0.5rem 1.125rem color-mix(in srgb, var(--color-bg-canvas) 40%, transparent);
 }
 
 .season-poster-card.is-active .season-poster-card__image-wrapper {
   border-color: var(--color-accent-blue);
-  box-shadow: 0 0 0.75rem color-mix(in srgb, var(--color-accent-blue) 32%, transparent), 0 0.25rem 0.75rem color-mix(in srgb, black 35%, transparent);
+  box-shadow: 0 0 0.75rem color-mix(in srgb, var(--color-accent-blue) 32%, transparent), 0 0.25rem 0.75rem color-mix(in srgb, var(--color-bg-canvas) 35%, transparent);
   transform: translateY(-0.125rem);
 }
 
@@ -341,7 +341,7 @@
 .episode-card__still-watched-overlay {
   position: absolute;
   inset: 0;
-  background: color-mix(in srgb, black 40%, transparent);
+  background: color-mix(in srgb, var(--color-bg-canvas) 40%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;

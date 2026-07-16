@@ -379,7 +379,7 @@
   border-radius: 50%;
   background: var(--color-accent);
   color: var(--color-text-inverse);
-  box-shadow: 0 var(--radius-2xs) var(--space-sm) color-mix(in srgb, black 40%, transparent);
+  box-shadow: 0 var(--radius-2xs) var(--space-sm) color-mix(in srgb, var(--color-bg-canvas) 40%, transparent);
   animation: scale-up var(--motion-duration-fast) var(--motion-ease-expressive);
   z-index: var(--z-index-base);
 }
@@ -480,9 +480,6 @@
     width: 100%;
   }
 
-  .organizer-match-modal__mode-toggle :global(.ui-segmented-control__option) {
-    flex: 1 1 0;
-  }
 
   .organizer-match-modal__search-actions {
     justify-content: stretch;

@@ -4,14 +4,12 @@ import {
   useAddToWatchlistMutation,
   useRemoveFromWatchlistMutation,
 } from '../../../queries/dashboardQueries';
-import {
-  SpotlightBanner,
-  RecommendationSkeleton,
-  useRecommendationActions,
-  useWatchlistHandler,
-} from './recommendationsShared';
+import SpotlightBanner from './components/SpotlightBanner';
+import RecommendationSkeleton from './components/RecommendationSkeleton';
+import useRecommendationActions from './hooks/useRecommendationActions';
+import useWatchlistHandler from './hooks/useWatchlistHandler';
 
-export default function SpotlightWidget({ T }) {
+export default function SpotlightWidget() {
   const { data: recommendations, isLoading } = useRecommendationsQuery();
   const watchlistIdsFromQuery = recommendations?.watchlist_item_ids;
 
@@ -40,11 +38,6 @@ export default function SpotlightWidget({ T }) {
       watchlistIds={actualWatchlistIds}
       onWatchlist={handleWatchlist}
       onCardClick={handleCardClick}
-      T={T}
     />
   );
 }
-
-SpotlightWidget.propTypes = {
-  T: PropTypes.func.isRequired,
-};

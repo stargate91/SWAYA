@@ -113,19 +113,7 @@
   transition: transform var(--motion-fast);
 }
 
-.shell__utility-bar-center .ui-segmented-control {
-  height: var(--ui-control-height-xs);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface-card);
-  border: 0.0625rem solid var(--color-border-default);
-}
 
-.shell__utility-bar-center .ui-segmented-control__option {
-  border-radius: calc(var(--radius-sm) - var(--radius-sm));
-  font: var(--text-caption);
-  font-weight: var(--font-weight-semibold);
-  padding: 0 var(--space-lg);
-}
 
 
 

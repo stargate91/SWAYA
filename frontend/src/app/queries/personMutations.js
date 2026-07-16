@@ -121,6 +121,9 @@ const syncPersonProfileCaches = (queryClient, personId, data) => {
   queryClient.setQueriesData({ queryKey: ['library-item-detail'] }, updateMediaDetailCache);
   queryClient.setQueriesData({ queryKey: ['library-tv-detail'] }, updateMediaDetailCache);
   queryClient.invalidateQueries({ queryKey: QK.recommendations });
+  queryClient.invalidateQueries({ queryKey: QK.recentlyAdded });
+  queryClient.invalidateQueries({ queryKey: QK.recentlyActivated });
+  queryClient.invalidateQueries({ queryKey: QK.discover });
 };
 
 const syncPersonBackdropCaches = (queryClient, personId, data) => {

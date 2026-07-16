@@ -49,7 +49,7 @@
   height: var(--font-size-lg);
   border-radius: 50%;
   background: var(--color-text-secondary);
-  box-shadow: 0 var(--radius-2xs) var(--space-xs) color-mix(in srgb, black 25%, transparent);
+  box-shadow: 0 var(--radius-2xs) var(--space-xs) color-mix(in srgb, var(--color-bg-canvas) 25%, transparent);
   transition: transform var(--motion-emphasized), background-color var(--motion-emphasized);
 }
 

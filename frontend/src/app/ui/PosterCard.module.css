@@ -121,7 +121,7 @@ div.image-wrapper:focus-visible {
 .overlay-gradient {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, color-mix(in srgb, black 10%, transparent), color-mix(in srgb, black 80%, transparent));
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--color-bg-canvas) 10%, transparent), color-mix(in srgb, var(--color-bg-canvas) 80%, transparent));
   opacity: 0.8;
   pointer-events: none;
   z-index: var(--z-index-step-1);
@@ -138,7 +138,7 @@ div.image-wrapper:focus-visible {
   background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
   background-image: var(--button-secondary-bg);
   color: var(--button-secondary-color);
-  box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, black 22%, transparent);
+  box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, var(--color-bg-canvas) 22%, transparent);
   backdrop-filter: var(--glass-blur-md);
   letter-spacing: 0;
   text-transform: none;
@@ -159,7 +159,7 @@ div.image-wrapper:focus-visible {
   background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
   background-image: var(--button-secondary-bg);
   color: var(--color-state-success);
-  box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, black 22%, transparent);
+  box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, var(--color-bg-canvas) 22%, transparent);
   backdrop-filter: var(--glass-blur-md);
   display: flex;
   align-items: center;
@@ -180,7 +180,7 @@ div.image-wrapper:focus-visible {
   background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
   background-image: var(--button-secondary-bg);
   color: var(--color-state-danger);
-  box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, black 22%, transparent);
+  box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, var(--color-bg-canvas) 22%, transparent);
   backdrop-filter: var(--glass-blur-md);
   display: flex;
   align-items: center;
@@ -225,7 +225,7 @@ div.image-wrapper:focus-visible {
   background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
   background-image: var(--button-secondary-bg);
   color: var(--color-text-primary);
-  box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, black 22%, transparent);
+  box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, var(--color-bg-canvas) 22%, transparent);
   backdrop-filter: var(--glass-blur-md);
   display: flex;
   align-items: center;
@@ -265,7 +265,7 @@ div.image-wrapper:focus-visible {
   border: 1px solid color-mix(in srgb, var(--color-state-success) 48%, var(--button-secondary-border));
   background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
   color: var(--color-state-success);
-  box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, black 35%, transparent);
+  box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, var(--color-bg-canvas) 35%, transparent);
   backdrop-filter: var(--glass-blur-md);
   cursor: pointer;
   opacity: 0;
@@ -372,7 +372,7 @@ div.image-wrapper:focus-visible {
   font-weight: var(--font-weight-bold);
   line-height: 1.35;
   color: var(--color-ink);
-  text-shadow: 0 var(--radius-2xs) var(--space-md) color-mix(in srgb, black 40%, transparent);
+  text-shadow: 0 var(--radius-2xs) var(--space-md) color-mix(in srgb, var(--color-bg-canvas) 40%, transparent);
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -482,7 +482,7 @@ button.image-wrapper:hover:not(:disabled) {
   position: absolute;
   inset: 0;
   backdrop-filter: blur(var(--space-sm));
-  background: color-mix(in srgb, black 15%, transparent);
+  background: color-mix(in srgb, var(--color-bg-canvas) 15%, transparent);
   z-index: var(--z-index-step-2);
   pointer-events: none;
   transition: opacity var(--motion-base);
@@ -576,11 +576,11 @@ button.image-wrapper:hover:not(:disabled) {
   box-shadow: none;
 }
 
-.card.no-hover-animation:hover .title {
+.card:hover .title {
   color: var(--color-ink);
 }
 
-.card:hover .title {
+.card.no-hover-animation:hover .title {
   color: var(--color-ink);
 }
 

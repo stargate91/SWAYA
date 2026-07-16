@@ -23,11 +23,11 @@ function DropdownOptionItem({ opt, value, onOptionClick }) {
   }, [opt.label]);
 
   return (
-    <Tooltip content={isTruncated ? opt.label : null} side="right" triggerClassName={styles.tooltipTrigger}>
+    <Tooltip content={isTruncated ? opt.label : null} side="right" triggerClassName={styles['tooltip-trigger']}>
       <button
         ref={buttonRef}
         type="button"
-        className={`${styles.item} ${opt.value === value ? styles.isActive : ''} ${opt.disabled ? styles.isDisabled : ''}`.trim()}
+        className={`${styles.item} ${opt.value === value ? styles['is-active'] : ''} ${opt.disabled ? styles['is-disabled'] : ''}`.trim()}
         onClick={() => !opt.disabled && onOptionClick(opt.value)}
         onMouseEnter={checkTruncation}
         title={null}
@@ -85,16 +85,16 @@ function DropdownMenu({
   return createPortal(
     <div
       ref={menuRef}
-      className={`${styles.menu} ${searchable ? styles.hasSearch : ''} ${menuCoords.openUpwards ? styles.isUpwards : ''} ${variant === 'sorter' ? styles.menuSorter : ''} ${className}`.trim()}
+      className={`${styles.menu} ${searchable ? styles.hasSearch : ''} ${menuCoords.openUpwards ? styles['is-upwards'] : ''} ${variant === 'sorter' ? styles['menu-sorter'] : ''} ${className}`.trim()}
       // eslint-disable-next-line react/forbid-dom-props
       style={themeColor ? { '--list-theme-color': themeColor } : undefined}
     >
       {searchable ? (
-        <div className={styles.searchContainer}>
+        <div className={styles['search-container']}>
           <input
             ref={searchInputRef}
             type="text"
-            className={styles.searchInput}
+            className={styles['search-input']}
             placeholder={t('common.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -102,14 +102,14 @@ function DropdownMenu({
           />
         </div>
       ) : null}
-      <div className={`${styles.itemsWrapper} ${multiple ? styles.itemsWrapperMultiple : ''}`.trim()}>
+      <div className={`${styles['items-wrapper']} ${multiple ? styles['items-wrapper-multiple'] : ''}`.trim()}>
         {filteredOptions.map((opt) => {
           if (multiple) {
             const isChecked = Array.isArray(value) && value.includes(opt.value);
             return (
               <div
                 key={opt.value}
-                className={`${styles.item} tags-dropdown-item ${styles.itemCheckbox}`}
+                className={`${styles.item} tags-dropdown-item ${styles['item-checkbox']}`}
               >
                 <Checkbox
                   checked={isChecked}
@@ -117,7 +117,7 @@ function DropdownMenu({
                   disabled={Boolean(opt.disabled)}
                 >
                   <span
-                    className={styles.itemLabel}
+                    className={styles['item-label']}
                     // eslint-disable-next-line react/forbid-dom-props
                     style={opt.color ? { color: opt.color } : undefined}
                   >
@@ -138,7 +138,7 @@ function DropdownMenu({
           );
         })}
         {filteredOptions.length === 0 ? (
-          <div className={styles.noResults}>
+          <div className={styles['no-results']}>
             {t('common.noResults')}
           </div>
         ) : null}
@@ -271,24 +271,24 @@ export default function Dropdown({
 
   const dropdownContent = (
     <div
-      className={`${styles.dropdown} ${isSorter ? styles.dropdownSorter : ''}`.trim()}
+      className={`${styles.dropdown} ${isSorter ? styles['dropdown-sorter'] : ''}`.trim()}
       // eslint-disable-next-line react/forbid-dom-props
       style={themeColor ? { '--list-theme-color': themeColor } : undefined}
     >
       
-      <div className={styles.sorterWrapper}>
+      <div className={styles['sorter-wrapper']}>
         <button
           ref={triggerRef}
           type="button"
-          className={`${styles.trigger} ${styles['trigger--' + controlSize]} ${multiple ? 'ui-dropdown__trigger--sorter-custom' : ''} ${disabled ? styles.isDisabled : ''} ${isOpen ? styles.isOpen : ''}`.trim()}
+          className={`${styles.trigger} ${styles['trigger--' + controlSize]} ${multiple ? 'ui-dropdown__trigger--sorter-custom' : ''} ${disabled ? styles['is-disabled'] : ''} ${isOpen ? styles['is-open'] : ''}`.trim()}
           onClick={() => !disabled && setIsOpen(!isOpen)}
           disabled={disabled}
         >
-          <span className={styles.triggerText}>
+          <span className={styles['trigger-text']}>
             {getTriggerText()}
           </span>
           {(!isSorter || multiple) && (
-            <span className={`${styles.chevron} ${isOpen ? styles.isOpen : ''} ${multiple ? styles.chevronMultiple : ''}`.trim()}>
+            <span className={`${styles.chevron} ${isOpen ? styles['is-open'] : ''} ${multiple ? styles['chevron-multiple'] : ''}`.trim()}>
               <ChevronDown size={chevronSize} />
             </span>
           )}
@@ -298,7 +298,7 @@ export default function Dropdown({
           <Tooltip content={sortDirection === 'asc' ? t('dropdown.ascending') : t('dropdown.descending')} side="top">
             <button
               type="button"
-              className={styles.directionBtn}
+              className={styles['direction-btn']}
               onClick={(e) => {
                 e.stopPropagation();
                 if (onSortDirectionToggle) onSortDirectionToggle();
@@ -328,8 +328,8 @@ export default function Dropdown({
 
   if (layout === 'inline') {
     return (
-      <div ref={containerRef} className={`${styles.inlineContainer} ${className}`.trim()}>
-        {label && <span className={styles.inlineLabel}>{label}</span>}
+      <div ref={containerRef} className={`${styles['inline-container']} ${className}`.trim()}>
+        {label && <span className={styles['inline-label']}>{label}</span>}
         {dropdownContent}
       </div>
     );
@@ -339,7 +339,7 @@ export default function Dropdown({
     <Field
       label={label}
       hint={hint}
-      className={`${isSorter ? styles.fieldSorter : ''} ${className}`.trim()}
+      className={`${isSorter ? styles['field-sorter'] : ''} ${className}`.trim()}
       htmlFor={generatedId}
       ref={containerRef}
     >

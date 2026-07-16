@@ -15,7 +15,7 @@
   --local-gap: var(--space-sm);
   gap: var(--local-gap);
   padding: var(--space-sm) var(--space-md);
-  background: color-mix(in srgb, black 15%, transparent);
+  background: color-mix(in srgb, var(--color-bg-canvas) 15%, transparent);
   border-top-left-radius: var(--radius-lg);
   border-top-right-radius: var(--radius-lg);
   border-bottom: 1px solid var(--color-border-default);
@@ -211,7 +211,7 @@
   font-weight: var(--font-weight-semibold);
   border-radius: var(--radius-sm);
   border: 1px dashed var(--color-border-heavy);
-  background: color-mix(in srgb, black 35%, transparent);
+  background: color-mix(in srgb, var(--color-bg-canvas) 35%, transparent);
   color: color-mix(in srgb, var(--color-ink) 85%, transparent);
   cursor: pointer;
   transition: all var(--motion-duration-fast) var(--motion-ease-standard);

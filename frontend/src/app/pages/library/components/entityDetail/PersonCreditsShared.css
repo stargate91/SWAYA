@@ -99,7 +99,7 @@
 .person-credits-tabs {
   display: flex;
   gap: var(--space-md);
-  --tabs-border: 0.0625rem solid color-mix(in srgb, white 8%, transparent);
+  --tabs-border: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 8%, transparent);
   border-bottom: var(--tabs-border);
   padding-bottom: var(--space-sm);
   align-items: center;
@@ -153,7 +153,7 @@
   padding: var(--local-padding);
   border-radius: var(--radius-xl);
   backdrop-filter: blur(1rem);
-  --local-shadow: 0 1rem 2.5rem color-mix(in srgb, black 20%, transparent);
+  --local-shadow: 0 1rem 2.5rem color-mix(in srgb, var(--color-bg-canvas) 20%, transparent);
   box-shadow: var(--local-shadow);
   margin-bottom: var(--space-2xl);
 }
@@ -221,13 +221,13 @@
 
 .person-credits-tab-btn:hover {
   color: var(--color-text-primary);
-  --tab-hover-bg: color-mix(in srgb, white 4%, transparent);
+  --tab-hover-bg: color-mix(in srgb, var(--color-text-primary) 4%, transparent);
   background: var(--tab-hover-bg);
 }
 
 .person-credits-tab-btn.active {
   color: var(--color-text-primary);
-  --tab-active-bg: color-mix(in srgb, white 8%, transparent);
+  --tab-active-bg: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
   background: var(--tab-active-bg);
   box-shadow: inset 0 -2px 0 var(--color-accent);
 }
@@ -235,7 +235,7 @@
 .person-credits-tab-count {
   font-size: 0.75rem;
   opacity: 0.8;
-  --count-bg: color-mix(in srgb, black 30%, transparent);
+  --count-bg: color-mix(in srgb, var(--color-bg-canvas) 30%, transparent);
   background: var(--count-bg);
   --count-padding: 0.0625rem 0.375rem;
   padding: var(--count-padding);
@@ -262,7 +262,7 @@
   --header-pb: 0.375rem;
   padding-bottom: var(--header-pb);
   /* Reduced header padding */
-  --header-bb: 0.0625rem solid color-mix(in srgb, white 5%, transparent);
+  --header-bb: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 5%, transparent);
   border-bottom: var(--header-bb);
 }
 
@@ -281,12 +281,12 @@
   display: flex;
   --source-gap: 0.375rem;
   gap: var(--source-gap);
-  --source-selector-bg: color-mix(in srgb, white 3%, transparent);
+  --source-selector-bg: color-mix(in srgb, var(--color-text-primary) 3%, transparent);
   background: var(--source-selector-bg);
   --source-selector-padding: 0.1875rem;
   padding: var(--source-selector-padding);
   border-radius: var(--radius-sm);
-  --source-selector-border: 0.0625rem solid color-mix(in srgb, white 5%, transparent);
+  --source-selector-border: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 5%, transparent);
   border: var(--source-selector-border);
 }
 
@@ -315,16 +315,16 @@
 }
 
 .person-credits-row__source-btn.active {
-  --btn-active-bg: color-mix(in srgb, white 8%, transparent);
+  --btn-active-bg: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
   background: var(--btn-active-bg);
   color: var(--color-text-primary);
-  --btn-active-shadow: 0 0.125rem 0.375rem color-mix(in srgb, black 20%, transparent);
+  --btn-active-shadow: 0 0.125rem 0.375rem color-mix(in srgb, var(--color-bg-canvas) 20%, transparent);
   box-shadow: var(--btn-active-shadow);
 }
 
 .person-credits-row__badge-count {
   font-size: 0.6rem;
-  --badge-bg: color-mix(in srgb, white 10%, transparent);
+  --badge-bg: color-mix(in srgb, var(--color-text-primary) 10%, transparent);
   background: var(--badge-bg);
   --badge-padding: 0.0625rem 0.25rem;
   padding: var(--badge-padding);
@@ -364,14 +364,14 @@
   border-radius: 50%;
   --scroll-btn-bg: color-mix(in srgb, #0f141e 70%, transparent);
   background: var(--scroll-btn-bg);
-  --scroll-btn-border: 0.0625rem solid color-mix(in srgb, white 10%, transparent);
+  --scroll-btn-border: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 10%, transparent);
   border: var(--scroll-btn-border);
   color: var(--color-text-primary);
   cursor: pointer;
   opacity: 0;
   --scroll-btn-transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
   transition: var(--scroll-btn-transition);
-  --scroll-btn-shadow: 0 0.25rem 0.75rem color-mix(in srgb, black 35%, transparent);
+  --scroll-btn-shadow: 0 0.25rem 0.75rem color-mix(in srgb, var(--color-bg-canvas) 35%, transparent);
   box-shadow: var(--scroll-btn-shadow);
   backdrop-filter: blur(0.5rem);
 }
@@ -379,7 +379,7 @@
 .person-credits-row__scroll-btn:hover {
   --scroll-btn-hover-bg: color-mix(in srgb, #191e2d 95%, transparent);
   background: var(--scroll-btn-hover-bg);
-  --scroll-btn-hover-bc: color-mix(in srgb, white 25%, transparent);
+  --scroll-btn-hover-bc: color-mix(in srgb, var(--color-text-primary) 25%, transparent);
   border-color: var(--scroll-btn-hover-bc);
   transform: scale(1.1);
 }
@@ -426,7 +426,7 @@
   width: 100%;
   height: 100%;
   border-radius: var(--radius-sm);
-  --shimmer-bg: linear-gradient(90deg, color-mix(in srgb, white 2%, transparent) 25%, color-mix(in srgb, white 6%, transparent) 50%, color-mix(in srgb, white 2%, transparent) 75%);
+  --shimmer-bg: linear-gradient(90deg, color-mix(in srgb, var(--color-text-primary) 2%, transparent) 25%, color-mix(in srgb, var(--color-text-primary) 6%, transparent) 50%, color-mix(in srgb, var(--color-text-primary) 2%, transparent) 75%);
   background: var(--shimmer-bg);
   background-size: 200% 100%;
   --shimmer-animation: loadingshimmer 1.5s infinite;
@@ -456,7 +456,7 @@
   padding: var(--badge-padding);
   border-radius: var(--radius-sm);
   backdrop-filter: blur(0.25rem);
-  --badge-border: 0.0625rem solid color-mix(in srgb, white 6%, transparent);
+  --badge-border: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 6%, transparent);
   border: var(--badge-border);
   opacity: 0;
   transform: translateY(0.25rem);
@@ -508,9 +508,9 @@
   border-radius: 50%;
   --badge-lib-bg: color-mix(in srgb, #0a9650 75%, transparent);
   background: var(--badge-lib-bg);
-  --badge-lib-border: 0.0625rem solid color-mix(in srgb, white 15%, transparent);
+  --badge-lib-border: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 15%, transparent);
   border: var(--badge-lib-border);
-  --badge-lib-shadow: 0 0.125rem 0.375rem color-mix(in srgb, black 30%, transparent);
+  --badge-lib-shadow: 0 0.125rem 0.375rem color-mix(in srgb, var(--color-bg-canvas) 30%, transparent);
   box-shadow: var(--badge-lib-shadow);
   color: var(--color-text-primary);
 }
@@ -526,7 +526,7 @@
   color: var(--color-text-primary);
   /* More visible header color */
   font-weight: var(--font-weight-extrabold);
-  --discover-label-border: 0.0625rem solid color-mix(in srgb, white 8%, transparent);
+  --discover-label-border: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 8%, transparent);
   border-bottom: var(--discover-label-border);
   --discover-label-pb: 0.625rem;
   padding-bottom: var(--discover-label-pb);
@@ -559,12 +559,12 @@
   display: flex;
   --discover-btn-gap: 0.375rem;
   gap: var(--discover-btn-gap);
-  --discover-buttons-bg: color-mix(in srgb, black 20%, transparent);
+  --discover-buttons-bg: color-mix(in srgb, var(--color-bg-canvas) 20%, transparent);
   background: var(--discover-buttons-bg);
   --discover-buttons-padding: 0.1875rem;
   padding: var(--discover-buttons-padding);
   border-radius: var(--radius-sm);
-  --discover-buttons-border: 0.0625rem solid color-mix(in srgb, white 3%, transparent);
+  --discover-buttons-border: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 3%, transparent);
   border: var(--discover-buttons-border);
 }
 
@@ -590,10 +590,10 @@
 }
 
 .discover-btn.active {
-  --discover-btn-active-bg: color-mix(in srgb, white 8%, transparent);
+  --discover-btn-active-bg: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
   background: var(--discover-btn-active-bg);
   color: var(--color-text-primary);
-  --discover-btn-active-shadow: 0 0.125rem 0.375rem color-mix(in srgb, black 25%, transparent);
+  --discover-btn-active-shadow: 0 0.125rem 0.375rem color-mix(in srgb, var(--color-bg-canvas) 25%, transparent);
   box-shadow: var(--discover-btn-active-shadow);
 }
 
@@ -614,7 +614,7 @@
   color: var(--color-text-muted);
   text-align: center;
   padding: var(--space-2xl) 0;
-  --finished-border-top: 0.0625rem solid color-mix(in srgb, white 3%, transparent);
+  --finished-border-top: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 3%, transparent);
   border-top: var(--finished-border-top);
 }
 
@@ -622,9 +622,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  --switch-btn-bg: color-mix(in srgb, white 4%, transparent);
+  --switch-btn-bg: color-mix(in srgb, var(--color-text-primary) 4%, transparent);
   background: var(--switch-btn-bg);
-  --switch-btn-border: 0.0625rem solid color-mix(in srgb, white 8%, transparent);
+  --switch-btn-border: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 8%, transparent);
   border: var(--switch-btn-border);
   color: var(--color-accent-blue);
   font-size: 0.68rem;
@@ -647,9 +647,9 @@
 }
 
 .person-credits-row__mode-switch-btn:hover {
-  --switch-btn-hover-bg: color-mix(in srgb, white 8%, transparent);
+  --switch-btn-hover-bg: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
   background: var(--switch-btn-hover-bg);
-  --switch-btn-hover-bc: color-mix(in srgb, white 15%, transparent);
+  --switch-btn-hover-bc: color-mix(in srgb, var(--color-text-primary) 15%, transparent);
   border-color: var(--switch-btn-hover-bc);
   transform: translateY(-0.0625rem);
   color: var(--color-text-primary);
@@ -694,7 +694,7 @@
   margin-top: var(--layout-mt);
   --layout-pt: 0.875rem;
   padding-top: var(--layout-pt);
-  --layout-bt: 0.0625rem solid color-mix(in srgb, white 5%, transparent);
+  --layout-bt: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 5%, transparent);
   border-top: var(--layout-bt);
 }
 
@@ -759,7 +759,7 @@
   margin-top: var(--layout-mt2);
   --layout-pt2: 0.875rem;
   padding-top: var(--layout-pt2);
-  --layout-bt2: 0.0625rem solid color-mix(in srgb, white 5%, transparent);
+  --layout-bt2: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 5%, transparent);
   border-top: var(--layout-bt2);
 }
 

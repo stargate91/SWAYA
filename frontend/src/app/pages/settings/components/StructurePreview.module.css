@@ -39,7 +39,7 @@
 }
 
 .structure-preview-line--adult {
-  color: color-mix(in srgb, var(--color-state-danger) 78%, white 22%);
+  color: color-mix(in srgb, var(--color-state-danger) 78%, var(--color-text-primary) 22%);
 }
 
 .structure-preview-line--muted {

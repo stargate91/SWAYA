@@ -6,7 +6,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: black;
+  background-color: var(--color-bg-canvas);
   z-index: var(--z-index-fullscreen);
   overflow: hidden;
   user-select: none;
@@ -24,7 +24,7 @@
 .player-page__video-container {
   width: 100%;
   height: 100%;
-  background-color: black;
+  background-color: var(--color-bg-canvas);
 }
 
 .player-page.player-page--transparent .player-page__video-container {
@@ -41,7 +41,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background: linear-gradient(to bottom, color-mix(in srgb, black 60%, transparent) 0%, transparent 20%, transparent 80%, color-mix(in srgb, black 70%, transparent) 100%);
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--color-bg-canvas) 60%, transparent) 0%, transparent 20%, transparent 80%, color-mix(in srgb, var(--color-bg-canvas) 70%, transparent) 100%);
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--motion-duration-slow) var(--motion-ease-standard);
@@ -61,7 +61,7 @@
   gap: var(--player-space-md);
   padding: var(--player-space-4xl) var(--player-space-xl) 0 var(--player-space-xl);
   height: 8.75rem;
-  background: linear-gradient(to bottom, color-mix(in srgb, black 85%, transparent) 0%, color-mix(in srgb, black 30%, transparent) 60%, transparent 100%);
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--color-bg-canvas) 85%, transparent) 0%, color-mix(in srgb, var(--color-bg-canvas) 30%, transparent) 60%, transparent 100%);
   width: 100%;
 }
 
@@ -69,7 +69,7 @@
   color: var(--player-color-ink);
   font-size: var(--player-font-size-md);
   font-weight: var(--player-weight-semibold);
-  text-shadow: 0 var(--player-space-2px) var(--player-space-2xs) color-mix(in srgb, black 50%, transparent);
+  text-shadow: 0 var(--player-space-2px) var(--player-space-2xs) color-mix(in srgb, var(--color-bg-canvas) 50%, transparent);
 }
 
 .player-page__logo {
@@ -78,7 +78,7 @@
   max-height: 4rem;
   max-width: 20rem;
   object-fit: contain;
-  filter: drop-shadow(0 var(--player-space-2px) var(--player-space-2xs) color-mix(in srgb, black 60%, transparent));
+  filter: drop-shadow(0 var(--player-space-2px) var(--player-space-2xs) color-mix(in srgb, var(--color-bg-canvas) 60%, transparent));
 }
 
 /* Bottom Controls */
@@ -257,7 +257,7 @@
   height: var(--ui-control-height-xs);
   border-radius: 50%;
   border: none;
-  background: color-mix(in srgb, black 60%, transparent);
+  background: color-mix(in srgb, var(--color-bg-canvas) 60%, transparent);
   backdrop-filter: blur(calc(var(--player-space-sm) / 2));
   color: var(--player-color-ink);
   cursor: pointer;
@@ -265,7 +265,7 @@
 }
 
 .player-page__pip-btn:hover {
-  background: color-mix(in srgb, black 80%, transparent);
+  background: color-mix(in srgb, var(--color-bg-canvas) 80%, transparent);
   transform: scale(1.1);
 }
 
@@ -421,7 +421,7 @@
   font-size: var(--player-font-size-lg);
   font-weight: var(--player-weight-semibold);
   color: color-mix(in srgb, var(--player-color-ink) 85%, transparent);
-  text-shadow: 0 var(--player-space-2px) var(--player-space-2xs) color-mix(in srgb, black 50%, transparent);
+  text-shadow: 0 var(--player-space-2px) var(--player-space-2xs) color-mix(in srgb, var(--color-bg-canvas) 50%, transparent);
   pointer-events: none;
   max-width: 40%;
   white-space: nowrap;
@@ -1380,7 +1380,7 @@
   height: 3.375rem;
   border-radius: 50%;
   background: var(--player-accent);
-  color: white;
+  color: var(--color-text-primary);
   display: flex;
   justify-content: center;
   align-items: center;

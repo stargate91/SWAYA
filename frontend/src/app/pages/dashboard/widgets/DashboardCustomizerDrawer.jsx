@@ -4,6 +4,7 @@ import { GripVertical } from '@/ui/icons';
 import Switch from '@/ui/Switch';
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 import Drawer from '@/ui/Drawer';
+import { useTranslation } from '../../../providers/LanguageContext';
 
 export default function DashboardCustomizerDrawer({
   isOpen,
@@ -13,9 +14,10 @@ export default function DashboardCustomizerDrawer({
   widgetOrder = [],
   handleOrderChange,
   showAdult,
-  t,
   styles = {},
+  widgetRegistry = {},
 }) {
+  const { t } = useTranslation();
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const isNsfw = showAdult && sessionMode === 'nsfw';
   const draggedItemRef = useRef(null);
@@ -69,29 +71,27 @@ export default function DashboardCustomizerDrawer({
 
         <div className={styles['dashboard-customizer-list']}>
           {widgetOrder.map((key, index) => {
-            let label;
-            let switchKey = key;
+            const widgetConfig = widgetRegistry[key];
+            if (!widgetConfig) return null;
 
-            if (key === 'continue_watching') {
-              label = t('dashboard.widget_continue_watching') || 'Continue Watching';
-            } else if (key === 'spotlight') {
-              label = t('dashboard.widget_spotlight') || 'Spotlight (Trending)';
-            } else if (key === 'recently_added') {
-              label = t('dashboard.widget_recently_added') || 'Recently Added';
-            } else if (key === 'recently_activated_people') {
-              label = t(isNsfw ? 'dashboard.widget_recently_activated_people_adult' : 'dashboard.widget_recently_activated_people') || (isNsfw ? 'Lately Tracked Adult Stars' : 'Lately Tracked Artists');
-            } else if (key === 'movies_discovery') {
-              label = t('dashboard.widget_movies_discovery') || 'Discover Movies';
-            } else if (key === 'tv_discovery') {
-              label = t('dashboard.widget_tv_discovery') || 'Discover TV Shows';
-            } else if (key === 'top_20') {
-              label = t('dashboard.widget_top_20') || 'Top 20 Discoveries';
-            } else if (key === 'adult') {
-              if (!showAdult) return null;
-              label = t('dashboard.widget_adult') || 'Adult recommendations';
-            } else {
-              return null;
+            if (widgetConfig.show && !widgetConfig.show(null, isNsfw)) {
+              // Note: settings query is not passed down directly here. However, settings is only 
+              // needed for checking `tmdb_api_key` for top_20.
+              // In this case we can allow the user to toggle/order it even if key is missing,
+              // or let `DashboardView` hide it in main view. If we need strict checks, we can pass settings.
             }
+            if (key === 'adult' && !showAdult) return null;
+
+            const titleKey = typeof widgetConfig.titleKey === 'function'
+              ? widgetConfig.titleKey(isNsfw)
+              : widgetConfig.titleKey;
+
+            const fallbackTitle = typeof widgetConfig.fallbackTitle === 'function'
+              ? widgetConfig.fallbackTitle(isNsfw)
+              : widgetConfig.fallbackTitle;
+
+            const label = t(titleKey) || fallbackTitle;
+            const switchKey = key;
             const isDragOver = index === dragOverIndex;
 
             return (
@@ -136,5 +136,5 @@ DashboardCustomizerDrawer.propTypes = {
   widgetOrder: PropTypes.array.isRequired,
   handleOrderChange: PropTypes.func.isRequired,
   showAdult: PropTypes.bool.isRequired,
-  t: PropTypes.func.isRequired,
+  widgetRegistry: PropTypes.object,
 };

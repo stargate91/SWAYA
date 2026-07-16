@@ -17,6 +17,9 @@ export const QK = Object.freeze({
   continueWatching:    ['continue-watching'],
   watchedHistory:      ['watched-history'],
   recommendations:     ['recommendations'],
+  recentlyAdded:       ['recently-added'],
+  recentlyActivated:   ['recently-activated-people'],
+  discover:            ['discover'],
   lists:               ['lists'],
   organizer:           ['organizer'],
   organizerCount:      ['organizer-count'],
@@ -90,7 +93,12 @@ export const invalidateEntity = (qc, rawId, opts = {}) => {
     qc.invalidateQueries({ queryKey: QK.allTags });
     qc.invalidateQueries({ queryKey: QK.libraryFilters });
   }
-  if (opts.recommendations)  qc.invalidateQueries({ queryKey: QK.recommendations });
+  if (opts.recommendations) {
+    qc.invalidateQueries({ queryKey: QK.recommendations });
+    qc.invalidateQueries({ queryKey: QK.recentlyAdded });
+    qc.invalidateQueries({ queryKey: QK.recentlyActivated });
+    qc.invalidateQueries({ queryKey: QK.discover });
+  }
   if (opts.continueWatching) qc.invalidateQueries({ queryKey: QK.continueWatching });
   if (opts.watchedHistory)   qc.invalidateQueries({ queryKey: QK.watchedHistory });
   if (opts.organizer) {
@@ -130,6 +138,11 @@ export const invalidatePerson = (qc, personId, opts = {}) => {
 
   if (opts.lists)           qc.invalidateQueries({ queryKey: QK.library });
   if (opts.stats)           qc.invalidateQueries({ queryKey: QK.stats });
-  if (opts.recommendations) qc.invalidateQueries({ queryKey: QK.recommendations });
+  if (opts.recommendations) {
+    qc.invalidateQueries({ queryKey: QK.recommendations });
+    qc.invalidateQueries({ queryKey: QK.recentlyAdded });
+    qc.invalidateQueries({ queryKey: QK.recentlyActivated });
+    qc.invalidateQueries({ queryKey: QK.discover });
+  }
   if (opts.listsList)       qc.invalidateQueries({ queryKey: QK.lists });
 };

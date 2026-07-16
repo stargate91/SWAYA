@@ -262,7 +262,7 @@
 }
 
 .settings-danger-zone-card__hint {
-  color: color-mix(in srgb, var(--color-state-danger) 40%, white 60%);
+  color: color-mix(in srgb, var(--color-state-danger) 40%, var(--color-text-primary) 60%);
   line-height: 1.55;
 }
 

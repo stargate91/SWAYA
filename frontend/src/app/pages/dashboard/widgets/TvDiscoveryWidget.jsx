@@ -4,13 +4,14 @@ import {
   useAddToWatchlistMutation,
   useRemoveFromWatchlistMutation,
 } from '../../../queries/dashboardQueries';
-import {
-  RecommendationCarousel,
-  useRecommendationActions,
-  useWatchlistHandler,
-} from './recommendationsShared';
+import RecommendationCarousel from './components/RecommendationCarousel';
+import RecommendationSkeleton from './components/RecommendationSkeleton';
+import useRecommendationActions from './hooks/useRecommendationActions';
+import useWatchlistHandler from './hooks/useWatchlistHandler';
+import { useTranslation } from '../../../providers/LanguageContext';
 
-export default function TvDiscoveryWidget({ T }) {
+export default function TvDiscoveryWidget() {
+  const { t: T } = useTranslation();
   const { data: recommendations, isLoading } = useRecommendationsQuery();
   const watchlistIdsFromQuery = recommendations?.watchlist_item_ids;
 
@@ -25,7 +26,11 @@ export default function TvDiscoveryWidget({ T }) {
 
   const { handlePlayClick, handleCardClick, playMutationPending } = useRecommendationActions();
 
-  if (isLoading || !recommendations?.discover_tv?.length) {
+  if (isLoading) {
+    return <RecommendationSkeleton />;
+  }
+
+  if (!recommendations?.discover_tv?.length) {
     return null;
   }
 
@@ -36,13 +41,8 @@ export default function TvDiscoveryWidget({ T }) {
       watchlistIds={actualWatchlistIds}
       onWatchlist={handleWatchlist}
       onCardClick={handleCardClick}
-      T={T}
       onPlayClick={handlePlayClick}
       playMutationPending={playMutationPending}
     />
   );
 }
-
-TvDiscoveryWidget.propTypes = {
-  T: PropTypes.func.isRequired,
-};

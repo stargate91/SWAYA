@@ -7,7 +7,7 @@
 /* Brand color variables */
 .performer-linker-card {
   --brand-color: var(--color-text-muted);
-  --brand-glow: color-mix(in srgb, white 2%, transparent);
+  --brand-glow: color-mix(in srgb, var(--color-text-primary) 2%, transparent);
 
   position: relative;
   --card-bg: var(--color-surface-card);
@@ -49,7 +49,7 @@
 .performer-linker-card:hover {
   --card-hover-bg: var(--color-surface-card-hover);
   background: var(--card-hover-bg);
-  --card-hover-shadow: 0 0.25rem 1.25rem color-mix(in srgb, black 15%, transparent);
+  --card-hover-shadow: 0 0.25rem 1.25rem color-mix(in srgb, var(--color-bg-canvas) 15%, transparent);
   box-shadow: var(--card-hover-shadow);
 }
 
@@ -72,7 +72,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 2 / 3;
-  --img-wrapper-bg: color-mix(in srgb, black 30%, transparent);
+  --img-wrapper-bg: color-mix(in srgb, var(--color-bg-canvas) 30%, transparent);
   background: var(--img-wrapper-bg);
   display: flex;
   align-items: center;
@@ -303,7 +303,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 2 / 3;
-  --img-bg: color-mix(in srgb, black 20%, transparent);
+  --img-bg: color-mix(in srgb, var(--color-bg-canvas) 20%, transparent);
   background: var(--img-bg);
   display: flex;
   align-items: center;
@@ -637,7 +637,7 @@
   width: 100%;
   --input-bg: var(--color-bg-dark);
   background: var(--input-bg);
-  --input-border: 0.0625rem solid color-mix(in srgb, white 15%, transparent);
+  --input-border: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 15%, transparent);
   border: var(--input-border);
   border-radius: var(--radius-sm);
   color: var(--color-text-primary);

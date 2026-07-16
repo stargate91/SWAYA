@@ -17,7 +17,7 @@
   padding-left: var(--space-lg);
 }
 
-.triggerText {
+.trigger-text {
   flex: 1;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -37,12 +37,12 @@
   flex-shrink: 0;
 }
 
-.chevronMultiple {
+.chevron-multiple {
   display: flex;
   align-items: center;
 }
 
-.chevron.isOpen {
+.chevron.is-open {
   color: var(--color-accent);
   transform: rotate(180deg);
 }
@@ -66,7 +66,7 @@
   overflow: hidden;
 }
 
-.menu.isUpwards {
+.menu.is-upwards {
   transform: translateY(-100%);
   animation: dropdown-fade-in-upwards var(--motion-duration-fast) var(--motion-ease-emphasized);
 }
@@ -95,13 +95,13 @@
   }
 }
 
-.searchContainer {
+.search-container {
   padding: var(--space-sm);
   border-bottom: 1px solid var(--color-line);
   margin-bottom: var(--space-xs);
 }
 
-.searchInput {
+.search-input {
   width: 100%;
   height: var(--ui-control-height-sm);
   padding: 0 var(--space-md);
@@ -118,39 +118,39 @@
     box-shadow var(--motion-fast);
 }
 
-.searchInput:focus {
+.search-input:focus {
   border-color: var(--color-accent);
   background: var(--ui-control-bg);
   box-shadow: var(--ui-control-shadow-focus);
 }
 
-.searchInput:hover:not(:focus) {
+.search-input:hover:not(:focus) {
   border-color: color-mix(in srgb, var(--color-accent) 35%, var(--ui-control-border));
 }
 
-.itemsWrapper {
+.items-wrapper {
   overflow-y: auto;
   overflow-x: hidden;
   flex: 1;
 }
 
-.itemsWrapperMultiple {
+.items-wrapper-multiple {
   max-height: 15rem;
 }
 
-.itemCheckbox {
+.item-checkbox {
   padding: 0;
   cursor: pointer;
   width: 100%;
 }
 
-.itemCheckbox>label {
+.item-checkbox>label {
   justify-content: flex-start;
   width: 100%;
   padding: 0.375rem 0.75rem;
 }
 
-.itemLabel {
+.item-label {
   font-size: var(--font-size-sm);
   white-space: nowrap;
   overflow: hidden;
@@ -193,42 +193,42 @@
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
-.item.isActive {
+.item.is-active {
   background: var(--dropdown-option-selected-bg);
   color: var(--dropdown-option-selected-color);
   font-weight: var(--font-weight-semibold);
 }
 
-.noResults {
+.no-results {
   padding: var(--space-lg) var(--space-md);
   color: var(--color-muted);
   text-align: center;
   font-size: var(--font-size-xs);
 }
 
-.trigger.isDisabled {
+.trigger.is-disabled {
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
 }
 
 /* Sorter Variant CSS */
-.fieldSorter {
+.field-sorter {
   margin-bottom: 0;
 }
 
-.dropdownSorter {
+.dropdown-sorter {
   width: 10rem;
 }
 
-.sorterWrapper {
+.sorter-wrapper {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
   width: 100%;
 }
 
-.sorterWrapper .trigger {
+.sorter-wrapper .trigger {
   flex: 1;
   min-width: 0;
   width: 0;
@@ -262,7 +262,7 @@
   padding-left: var(--space-md);
 }
 
-.directionBtn {
+.direction-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -282,53 +282,53 @@
   flex-shrink: 0;
 }
 
-.directionBtn:hover {
+.direction-btn:hover {
   background: var(--color-surface-glass-strong);
   color: var(--ui-control-text);
 }
 
-.directionBtn:focus-visible {
+.direction-btn:focus-visible {
   outline: none;
   background: var(--color-surface-glass-strong);
   color: var(--ui-control-text);
   box-shadow: var(--focus-ring);
 }
 
-.menu.menuSorter {
+.menu.menu-sorter {
   width: auto;
   min-width: 10rem;
 }
 
-.menuSorter .item {
+.menu-sorter .item {
   font-size: var(--font-size-xs);
   min-height: var(--ui-control-height-xs);
   line-height: var(--ui-control-height-xs);
 }
 
 
-.menuSorter .item:hover,
-.menuSorter .item.isActive:hover {
+.menu-sorter .item:hover,
+.menu-sorter .item.is-active:hover {
   background: var(--color-surface-hover);
   color: var(--ui-control-text);
 }
 
-.tooltipTrigger {
+.tooltip-trigger {
   display: block;
   width: 100%;
 }
 
 /* Theme Color System rules built directly into the component module */
-.dropdown[style*="--list-theme-color"] .triggerSorter:hover {
+.dropdown[style*="--list-theme-color"] .trigger-sorter:hover {
   border-color: color-mix(in srgb, var(--list-theme-color) 45%, var(--ui-control-border));
 }
 
-.dropdown[style*="--list-theme-color"] .triggerSorter.isOpen,
-.dropdown[style*="--list-theme-color"] .triggerSorter:focus {
+.dropdown[style*="--list-theme-color"] .trigger-sorter.is-open,
+.dropdown[style*="--list-theme-color"] .trigger-sorter:focus {
   border-color: var(--list-theme-color);
   box-shadow: 0 0 0 0.1875rem color-mix(in srgb, var(--list-theme-color) 15%, transparent);
 }
 
-.menu[style*="--list-theme-color"] .item.isActive {
+.menu[style*="--list-theme-color"] .item.is-active {
   background: color-mix(in srgb, var(--list-theme-color) 10%, transparent);
   color: var(--list-theme-color);
 }
@@ -338,27 +338,27 @@
   color: var(--color-text-primary);
 }
 
-.menu[style*="--list-theme-color"] .searchInput:hover:not(:focus) {
-  border-color: color-mix(in srgb, var(--list-theme-color) 45%, var(--ui-control-border));
-}
-
-.menu[style*="--list-theme-color"] .searchInput:focus {
+.menu[style*="--list-theme-color"] .search-input:focus {
   border-color: var(--list-theme-color);
   box-shadow: 0 0 0 0.1875rem color-mix(in srgb, var(--list-theme-color) 15%, transparent);
 }
 
-.dropdown[style*="--list-theme-color"] .directionBtn:hover {
+.menu[style*="--list-theme-color"] .search-input:hover:not(:focus) {
+  border-color: color-mix(in srgb, var(--list-theme-color) 45%, var(--ui-control-border));
+}
+
+.dropdown[style*="--list-theme-color"] .direction-btn:hover {
   color: var(--list-theme-color);
   background: color-mix(in srgb, var(--list-theme-color) 10%, transparent);
 }
 
-.inlineContainer {
+.inline-container {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
 }
 
-.inlineLabel {
+.inline-label {
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-muted);
@@ -368,7 +368,7 @@
   white-space: nowrap;
 }
 
-.inlineContainer:global(.add-people-dropdown) .dropdownSorter {
+.inline-container:global(.add-people-dropdown) .dropdown-sorter {
   flex: 1;
   min-width: 0;
   width: 0;

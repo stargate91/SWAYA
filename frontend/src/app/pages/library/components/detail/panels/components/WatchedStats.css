@@ -45,12 +45,12 @@
 }
 
 .specs-card__progress::-webkit-progress-value {
-  background: linear-gradient(90deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, white) 100%);
+  background: linear-gradient(90deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, var(--color-text-primary)) 100%);
   border-radius: var(--radius-sm);
 }
 
 .specs-card__progress::-moz-progress-bar {
-  background: linear-gradient(90deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, white) 100%);
+  background: linear-gradient(90deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, var(--color-text-primary)) 100%);
   border-radius: var(--radius-sm);
 }
 
@@ -197,12 +197,12 @@
 }
 
 .season-progress-card__progress::-webkit-progress-value {
-  background: linear-gradient(90deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, white) 100%);
+  background: linear-gradient(90deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, var(--color-text-primary)) 100%);
   border-radius: var(--radius-sm);
 }
 
 .season-progress-card__progress::-moz-progress-bar {
-  background: linear-gradient(90deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, white) 100%);
+  background: linear-gradient(90deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, var(--color-text-primary)) 100%);
   border-radius: var(--radius-sm);
 }
 

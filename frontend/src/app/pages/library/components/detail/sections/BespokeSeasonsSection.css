@@ -24,7 +24,7 @@
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
-  --local-bg: color-mix(in srgb, black 15%, transparent);
+  --local-bg: color-mix(in srgb, var(--color-bg-canvas) 15%, transparent);
   background: var(--local-bg);
   border-bottom: 1px solid var(--color-border-default);
 }
@@ -287,7 +287,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  --local-bg: linear-gradient(to right, color-mix(in srgb, black 30%, transparent), transparent);
+  --local-bg: linear-gradient(to right, color-mix(in srgb, var(--color-bg-canvas) 30%, transparent), transparent);
   background: var(--local-bg);
   border: none;
   color: var(--color-text-muted);
@@ -309,13 +309,13 @@
 
 .bespoke-card-nav--left {
   left: 0;
-  --local-bg: linear-gradient(to right, color-mix(in srgb, black 40%, transparent), transparent);
+  --local-bg: linear-gradient(to right, color-mix(in srgb, var(--color-bg-canvas) 40%, transparent), transparent);
   background: var(--local-bg);
 }
 
 .bespoke-card-nav--right {
   right: 0;
-  --local-bg: linear-gradient(to left, color-mix(in srgb, black 40%, transparent), transparent);
+  --local-bg: linear-gradient(to left, color-mix(in srgb, var(--color-bg-canvas) 40%, transparent), transparent);
   background: var(--local-bg);
 }
 
@@ -369,7 +369,7 @@
 .bespoke-episode-detail-card__still-watched-overlay {
   position: absolute;
   inset: 0;
-  --local-bg: color-mix(in srgb, black 40%, transparent);
+  --local-bg: color-mix(in srgb, var(--color-bg-canvas) 40%, transparent);
   background: var(--local-bg);
   display: flex;
   align-items: center;
@@ -667,7 +667,7 @@
   align-items: center;
   gap: var(--space-md);
   padding: var(--space-sm) var(--space-md);
-  --local-bg: color-mix(in srgb, white 2%, transparent);
+  --local-bg: color-mix(in srgb, var(--color-text-primary) 2%, transparent);
   background: var(--local-bg);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-sm);
@@ -680,7 +680,7 @@
   width: 2.25rem;
   height: 2.25rem;
   border-radius: 50%;
-  --local-bg: color-mix(in srgb, white 4%, transparent);
+  --local-bg: color-mix(in srgb, var(--color-text-primary) 4%, transparent);
   background: var(--local-bg);
   color: var(--color-text-secondary);
 }
@@ -697,7 +697,7 @@
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  --local-color: color-mix(in srgb, white 45%, transparent);
+  --local-color: color-mix(in srgb, var(--color-text-primary) 45%, transparent);
   color: var(--local-color);
 }
 
@@ -748,7 +748,7 @@
   justify-content: center;
   height: 4rem;
   padding: var(--space-sm) var(--space-md);
-  --local-bg: color-mix(in srgb, white 2%, transparent);
+  --local-bg: color-mix(in srgb, var(--color-text-primary) 2%, transparent);
   background: var(--local-bg);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-sm);
@@ -761,14 +761,14 @@
   object-fit: contain;
   opacity: 0.9;
   filter: drop-shadow(0 0 0.0625rem color-mix(in srgb, var(--color-text-primary) 85%, transparent)) 
-          drop-shadow(0 0 0.1875rem color-mix(in srgb, white 25%, transparent));
+          drop-shadow(0 0 0.1875rem color-mix(in srgb, var(--color-text-primary) 25%, transparent));
   transition: filter var(--motion-duration-fast) var(--motion-ease-standard), opacity var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 .bespoke-company-logo:hover {
   opacity: 1;
   filter: drop-shadow(0 0 0.0625rem color-mix(in srgb, var(--color-text-primary) 95%, transparent)) 
-          drop-shadow(0 0 0.3125rem color-mix(in srgb, white 40%, transparent));
+          drop-shadow(0 0 0.3125rem color-mix(in srgb, var(--color-text-primary) 40%, transparent));
 }
 
 .bespoke-company-name-only {
@@ -790,9 +790,9 @@
 }
 
 .dashboard-cast-card__avatar-wrapper.dashboard-cast-card__avatar-wrapper--filtered {
-  --local-border: 0.0625rem dashed color-mix(in srgb, white 30%, transparent);
+  --local-border: 0.0625rem dashed color-mix(in srgb, var(--color-text-primary) 30%, transparent);
   border: var(--local-border);
-  --local-bg: color-mix(in srgb, white 2%, transparent);
+  --local-bg: color-mix(in srgb, var(--color-text-primary) 2%, transparent);
   background: var(--local-bg);
 }
 
@@ -806,7 +806,7 @@
   justify-content: center;
   --local-padding: var(--space-2xl);
   padding: var(--local-padding);
-  --local-bg: color-mix(in srgb, black 82%, transparent);
+  --local-bg: color-mix(in srgb, var(--color-bg-canvas) 82%, transparent);
   background: var(--local-bg);
   backdrop-filter: blur(0.625rem);
 }
@@ -817,12 +817,12 @@
   right: 1.125rem;
   width: 2.375rem;
   height: 2.375rem;
-  --local-border: 0.0625rem solid color-mix(in srgb, white 18%, transparent);
+  --local-border: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 18%, transparent);
   border: var(--local-border);
   border-radius: var(--radius-full);
-  --local-bg: color-mix(in srgb, black 42%, transparent);
+  --local-bg: color-mix(in srgb, var(--color-bg-canvas) 42%, transparent);
   background: var(--local-bg);
-  color: white;
+  color: var(--color-text-primary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -834,7 +834,7 @@
   max-height: 88vh;
   object-fit: contain;
   border-radius: var(--radius-lg);
-  --local-shadow: 0 1.25rem 3.75rem color-mix(in srgb, black 55%, transparent);
+  --local-shadow: 0 1.25rem 3.75rem color-mix(in srgb, var(--color-bg-canvas) 55%, transparent);
   box-shadow: var(--local-shadow);
 }
 
@@ -877,7 +877,7 @@
   height: 1.25rem;
   max-width: 5.625rem;
   object-fit: contain;
-  filter: drop-shadow(0 0.125rem 0.25rem color-mix(in srgb, black 30%, transparent));
+  filter: drop-shadow(0 0.125rem 0.25rem color-mix(in srgb, var(--color-bg-canvas) 30%, transparent));
 }
 
 .bespoke-rating-value {

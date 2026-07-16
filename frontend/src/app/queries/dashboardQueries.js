@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import api from '../lib/api';
 import { QK } from '../lib/queryKeys';
 
@@ -10,6 +10,24 @@ export const useContinueWatchingQuery = (params) => useQuery({
 export const useRecommendationsQuery = (language, includeAdult) => useQuery({
   queryKey: ['recommendations', language, includeAdult],
   queryFn: () => api.recommendations.get(language, includeAdult),
+});
+
+export const useRecentlyActivatedPeopleInfiniteQuery = (includeAdult) => useInfiniteQuery({
+  queryKey: ['recently-activated-people', includeAdult],
+  queryFn: ({ pageParam = 1 }) => api.recommendations.getRecentlyActivatedPeople(pageParam, 20, includeAdult),
+  initialPageParam: 1,
+  getNextPageParam: (lastPage, allPages) => {
+    return lastPage.length === 20 ? allPages.length + 1 : undefined;
+  },
+});
+
+export const useRecentlyAddedInfiniteQuery = (language, includeAdult) => useInfiniteQuery({
+  queryKey: ['recently-added', language, includeAdult],
+  queryFn: ({ pageParam = 1 }) => api.recommendations.getRecentlyAdded(pageParam, 20, includeAdult, language),
+  initialPageParam: 1,
+  getNextPageParam: (lastPage, allPages) => {
+    return lastPage.length === 20 ? allPages.length + 1 : undefined;
+  },
 });
 
 export const useAddToWatchlistMutation = () => {
@@ -35,3 +53,8 @@ export const useRemoveFromWatchlistMutation = () => {
     },
   });
 };
+
+export const useDiscoverQuery = (genreId, year) => useQuery({
+  queryKey: ['discover', genreId, year],
+  queryFn: () => api.recommendations.discover(genreId, year),
+});

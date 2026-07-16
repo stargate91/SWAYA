@@ -176,7 +176,7 @@
   background-image: var(--button-secondary-bg);
   color: var(--button-secondary-color);
   border: 0.0625rem solid var(--button-secondary-border);
-  box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, black 30%, transparent);
+  box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, var(--color-bg-canvas) 30%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -254,7 +254,7 @@
   background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
   background-image: var(--button-secondary-bg);
   color: var(--button-secondary-color);
-  box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, black 22%, transparent);
+  box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, var(--color-bg-canvas) 22%, transparent);
   backdrop-filter: blur(0.625rem);
   display: flex;
   align-items: center;
@@ -286,13 +286,13 @@
   justify-content: center;
   border: 0;
   border-radius: 50%;
-  background: color-mix(in srgb, black 75%, transparent);
+  background: color-mix(in srgb, var(--color-bg-canvas) 75%, transparent);
   backdrop-filter: blur(0.5rem);
   color: var(--color-text-primary);
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-bold);
   cursor: pointer;
-  box-shadow: 0 0.25rem 0.9375rem color-mix(in srgb, black 50%, transparent);
+  box-shadow: 0 0.25rem 0.9375rem color-mix(in srgb, var(--color-bg-canvas) 50%, transparent);
   transition: background-color var(--motion-duration-fast) var(--motion-ease-standard), opacity var(--motion-duration-fast) var(--motion-ease-standard);
 }
 

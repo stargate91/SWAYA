@@ -142,7 +142,7 @@
   cursor: pointer;
   z-index: var(--z-index-step-2);
   transition: transform var(--motion-fast) var(--motion-ease-spring), background var(--motion-fast), border-color var(--motion-fast), color var(--motion-fast), box-shadow var(--motion-fast);
-  box-shadow: 0 0.5rem 2rem 0 color-mix(in srgb, black 37%, transparent);
+  box-shadow: 0 0.5rem 2rem 0 color-mix(in srgb, var(--color-bg-canvas) 37%, transparent);
   outline: none;
 }
 
@@ -261,7 +261,7 @@
 
 .ui-modal.theater-modal .ui-modal__body {
   padding: 0;
-  background: black;
+  background: var(--color-bg-canvas);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -609,7 +609,7 @@
   flex-shrink: 0;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 1.25rem 2.5rem color-mix(in srgb, black 50%, transparent), 0 0 0 1px color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+  box-shadow: 0 1.25rem 2.5rem color-mix(in srgb, var(--color-bg-canvas) 50%, transparent), 0 0 0 1px color-mix(in srgb, var(--color-text-primary) 8%, transparent);
   cursor: pointer;
   transition: transform var(--motion-base), box-shadow var(--motion-base);
   align-self: flex-start;
@@ -673,7 +673,7 @@
   border-radius: var(--radius-full);
   --socials-padding: 0.3125rem;
   padding: var(--socials-padding);
-  box-shadow: 0 0.5rem 1.5rem color-mix(in srgb, black 25%, transparent);
+  box-shadow: 0 0.5rem 1.5rem color-mix(in srgb, var(--color-bg-canvas) 25%, transparent);
   backdrop-filter: blur(0.75rem);
   -webkit-backdrop-filter: blur(0.75rem);
   transition: border-color var(--motion-base), background-color var(--motion-base);
@@ -1103,7 +1103,7 @@
 .media-detail-page .bespoke-list-panel-card {
   background: color-mix(in srgb, var(--color-bg-elevated) 78%, transparent);
   border: 1px solid var(--color-border-default);
-  box-shadow: inset 0 1px 0 0 color-mix(in srgb, var(--color-text-primary) 5%, transparent), 0 1rem 2.5rem 0 color-mix(in srgb, black 45%, transparent);
+  box-shadow: inset 0 1px 0 0 color-mix(in srgb, var(--color-text-primary) 5%, transparent), 0 1rem 2.5rem 0 color-mix(in srgb, var(--color-bg-canvas) 45%, transparent);
   /* GPU layer isolation */
   transform: translate3d(0, 0, 0);
   will-change: transform;
@@ -1174,7 +1174,7 @@
   background: color-mix(in srgb, var(--color-surface-glass-strong) 40%, color-mix(in srgb, var(--color-text-primary) 5%, transparent));
   border: 1px solid color-mix(in srgb, var(--color-text-primary) 5%, transparent);
   color: var(--color-text-primary);
-  box-shadow: 0 0.25rem 0.75rem color-mix(in srgb, black 25%, transparent);
+  box-shadow: 0 0.25rem 0.75rem color-mix(in srgb, var(--color-bg-canvas) 25%, transparent);
 }
 
 .media-detail-page__technical-container {

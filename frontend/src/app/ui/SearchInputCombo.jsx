@@ -96,7 +96,7 @@ export default function SearchInputCombo({
                   <button
                     key={source.value}
                     type="button"
-                    className={`${styles['dropdown-item']} ${selectedSource === source.value ? styles.isActive : ''}`}
+                    className={`${styles['dropdown-item']} ${selectedSource === source.value ? styles['is-active'] : ''}`}
                     onClick={() => onSourceChange?.(source.value)}
                   >
                     {source.label}
@@ -115,7 +115,7 @@ export default function SearchInputCombo({
                     <button
                       key={optVal}
                       type="button"
-                      className={`${styles['dropdown-item']} ${selectedOption === optVal ? styles.isActive : ''}`}
+                      className={`${styles['dropdown-item']} ${selectedOption === optVal ? styles['is-active'] : ''}`}
                       onClick={() => {
                         onOptionChange?.(optVal);
                         setIsOpen(false);
@@ -137,7 +137,7 @@ export default function SearchInputCombo({
                 <button
                   key={optVal}
                   type="button"
-                  className={`${styles['dropdown-item']} ${selectedOption === optVal ? styles.isActive : ''}`}
+                  className={`${styles['dropdown-item']} ${selectedOption === optVal ? styles['is-active'] : ''}`}
                   onClick={() => {
                     onOptionChange?.(optVal);
                     setIsOpen(false);

@@ -21,7 +21,7 @@
 }
 
 .error-boundary-crash__stack {
-  background: color-mix(in srgb, black 30%, transparent);
+  background: color-mix(in srgb, var(--color-bg-canvas) 30%, transparent);
   padding: var(--space-lg);
   border-radius: var(--radius-md);
   white-space: pre-wrap;

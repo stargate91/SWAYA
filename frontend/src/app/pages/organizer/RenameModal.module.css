@@ -29,7 +29,7 @@
   background: var(--color-surface-glass);
   flex-grow: 1;
   --ui-table-cell-padding: var(--space-md) var(--space-lg);
-  --ui-table-header-bg: color-mix(in srgb, var(--color-accent) 4%, color-mix(in srgb, white 1.5%, transparent));
+  --ui-table-header-bg: color-mix(in srgb, var(--color-accent) 4%, color-mix(in srgb, var(--color-text-primary) 1.5%, transparent));
   --ui-table-header-border-bottom: 0.0625rem solid var(--color-border-subtle);
   --ui-table-cell-border-bottom: 0.0625rem solid var(--color-border-subtle);
 }

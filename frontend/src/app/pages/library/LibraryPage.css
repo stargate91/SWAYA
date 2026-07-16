@@ -530,7 +530,7 @@
   box-shadow:
     var(--shadow-lg),
     0 0 0 1px var(--color-border-subtle),
-    inset 0 1px 0 color-mix(in srgb, white 4%, transparent);
+    inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 4%, transparent);
 }
 
 .library-tag-expanded-panel__header {
@@ -753,7 +753,7 @@
   width: var(--space-xl);
   height: var(--space-xl);
   border-radius: 50%;
-  background-color: color-mix(in srgb, black 60%, transparent);
+  background-color: color-mix(in srgb, var(--color-bg-canvas) 60%, transparent);
   color: var(--color-text-primary);
   border: none;
   cursor: pointer;

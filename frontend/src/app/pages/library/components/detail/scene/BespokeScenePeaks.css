@@ -14,7 +14,7 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--space-sm) var(--space-md);
-  --local-bg: color-mix(in srgb, black 15%, transparent);
+  --local-bg: color-mix(in srgb, var(--color-bg-canvas) 15%, transparent);
   background: var(--local-bg);
   border-top-left-radius: var(--radius-lg);
   border-top-right-radius: var(--radius-lg);

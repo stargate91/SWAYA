@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-2xl);
-  background: color-mix(in srgb, black 82%, transparent);
+  background: color-mix(in srgb, var(--color-bg-canvas) 82%, transparent);
   backdrop-filter: var(--glass-blur-md);
 }
 
@@ -32,5 +32,5 @@
   max-height: 88vh;
   object-fit: contain;
   border-radius: var(--radius-lg);
-  box-shadow: 0 var(--space-xl) 3.75rem color-mix(in srgb, black 55%, transparent);
+  box-shadow: 0 var(--space-xl) 3.75rem color-mix(in srgb, var(--color-bg-canvas) 55%, transparent);
 }

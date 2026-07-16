@@ -342,6 +342,9 @@ export const useUpdateMediaStatusMutation = () => {
         queryClient.invalidateQueries({ queryKey: QK.stats });
         queryClient.invalidateQueries({ queryKey: QK.watchedHistory });
         queryClient.invalidateQueries({ queryKey: QK.recommendations });
+        queryClient.invalidateQueries({ queryKey: QK.recentlyAdded });
+        queryClient.invalidateQueries({ queryKey: QK.recentlyActivated });
+        queryClient.invalidateQueries({ queryKey: QK.discover });
       }
       if ('custom_tags' in payload || 'is_tracked' in payload) {
         queryClient.invalidateQueries({ queryKey: QK.libraryTags });
@@ -429,7 +432,7 @@ export const useBulkUpdateWatchedMutation = () => {
     },
     onSuccess: (data, variables) => {
       if (variables.tvId) invalidateTvDetail(queryClient, variables.tvId);
-      invalidateEntity(queryClient, variables.entityId || variables.itemIds?.[0], { lists: true, stats: true, continueWatching: true, watchedHistory: true });
+      invalidateEntity(queryClient, variables.entityId || variables.itemIds?.[0], { lists: true, stats: true, continueWatching: true, watchedHistory: true, recommendations: true });
     },
   });
 };

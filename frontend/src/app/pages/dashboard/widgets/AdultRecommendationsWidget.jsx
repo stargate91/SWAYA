@@ -5,13 +5,14 @@ import {
   useAddToWatchlistMutation,
   useRemoveFromWatchlistMutation,
 } from '../../../queries/dashboardQueries';
-import {
-  RecommendationCarousel,
-  useRecommendationActions,
-  useWatchlistHandler,
-} from './recommendationsShared';
+import RecommendationCarousel from './components/RecommendationCarousel';
+import RecommendationSkeleton from './components/RecommendationSkeleton';
+import useRecommendationActions from './hooks/useRecommendationActions';
+import useWatchlistHandler from './hooks/useWatchlistHandler';
+import { useTranslation } from '../../../providers/LanguageContext';
 
-export default function AdultRecommendationsWidget({ T }) {
+export default function AdultRecommendationsWidget() {
+  const { t: T } = useTranslation();
   const { data: settings = {} } = useSettingsQuery();
   const includeAdult = settings?.include_adult;
 
@@ -29,7 +30,15 @@ export default function AdultRecommendationsWidget({ T }) {
 
   const { handlePlayClick, handleCardClick, playMutationPending } = useRecommendationActions();
 
-  if (isLoading || !includeAdult || !recommendations?.discover_adult?.length) {
+  if (!includeAdult) {
+    return null;
+  }
+
+  if (isLoading) {
+    return <RecommendationSkeleton />;
+  }
+
+  if (!recommendations?.discover_adult?.length) {
     return null;
   }
 
@@ -40,14 +49,9 @@ export default function AdultRecommendationsWidget({ T }) {
       watchlistIds={actualWatchlistIds}
       onWatchlist={handleWatchlist}
       onCardClick={handleCardClick}
-      T={T}
       isAdultCarousel={true}
       onPlayClick={handlePlayClick}
       playMutationPending={playMutationPending}
     />
   );
 }
-
-AdultRecommendationsWidget.propTypes = {
-  T: PropTypes.func.isRequired,
-};

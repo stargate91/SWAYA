@@ -1,21 +1,24 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
-import { Check, Plus, Minus, ChevronLeft, ChevronRight } from '@/ui/icons';
+import { ChevronLeft, ChevronRight } from '@/ui/icons';
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
 import {
   useRecommendationsQuery,
   useAddToWatchlistMutation,
   useRemoveFromWatchlistMutation,
+  useDiscoverQuery,
 } from '../../../queries/dashboardQueries';
-import Button from '../../../ui/Button';
 import Dropdown from '../../../ui/Dropdown';
 import WidgetShell from '@/ui/WidgetShell';
-import { API_BASE } from '../../../lib/backend';
 import PosterCard from '../../../ui/PosterCard';
 import IconButton from '../../../ui/IconButton';
 import posterCardStyles from '../../../ui/PosterCard.module.css';
 import styles from './RecommendationsWidget.module.css';
+import { useWatchlistHandler } from './hooks/useWatchlistHandler';
+import Button from '../../../ui/Button';
+import { Check, Plus, Minus } from '@/ui/icons';
+import { useTranslation } from '../../../providers/LanguageContext';
 
 const GENRES = [
   { value: '', label: 'All Genres' },
@@ -48,12 +51,11 @@ const YEARS = (() => {
   return list;
 })();
 
-const TMDBDiscoveryWidget = ({ T }) => {
+const TMDBDiscoveryWidget = () => {
+  const { t: T } = useTranslation();
   const navigate = useNavigate();
   const [genreId, setGenreId] = useState('');
   const [year, setYear] = useState('');
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   const scrollRef = useRef(null);
   const [showLeft, setShowLeft] = useState(false);
@@ -61,18 +63,17 @@ const TMDBDiscoveryWidget = ({ T }) => {
 
   const { data: recommendations } = useRecommendationsQuery();
   const watchlistIdsFromQuery = recommendations?.watchlist_item_ids;
-  const [prevWatchlistIds, setPrevWatchlistIds] = useState(null);
-  const [optimisticWatchlistIds, setOptimisticWatchlistIds] = useState(null);
-
-  if (watchlistIdsFromQuery !== prevWatchlistIds) {
-    setPrevWatchlistIds(watchlistIdsFromQuery);
-    setOptimisticWatchlistIds(null);
-  }
-
-  const actualWatchlistIds = optimisticWatchlistIds !== null ? optimisticWatchlistIds : (watchlistIdsFromQuery || []);
 
   const addToWatchlistMutation = useAddToWatchlistMutation();
   const removeFromWatchlistMutation = useRemoveFromWatchlistMutation();
+
+  const { actualWatchlistIds, handleWatchlist } = useWatchlistHandler(
+    watchlistIdsFromQuery,
+    addToWatchlistMutation,
+    removeFromWatchlistMutation
+  );
+
+  const { data: items = [], isLoading: loading } = useDiscoverQuery(genreId, year);
 
   const updateArrows = useCallback(() => {
     const element = scrollRef.current;
@@ -82,64 +83,11 @@ const TMDBDiscoveryWidget = ({ T }) => {
   }, []);
 
   useEffect(() => {
-    let active = true;
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        let url = `${API_BASE}/api/v1/recommendations/discover?`;
-        if (genreId) url += `genre_id=${genreId}&`;
-        if (year) url += `year=${year}&`;
-        const res = await fetch(url);
-        if (res.ok) {
-          const data = await res.json();
-          if (active) {
-            setItems(data || []);
-            // Reset scroll position and recalculate arrows
-            if (scrollRef.current) {
-              scrollRef.current.scrollLeft = 0;
-            }
-            setTimeout(updateArrows, 100);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to discover items:', err);
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchData();
-    return () => {
-      active = false;
-    };
-  }, [genreId, year, updateArrows]);
-
-  const handleWatchlist = async (tmdbId, isWatchlisted) => {
-    // Optimistic toggle
-    if (isWatchlisted) {
-      setOptimisticWatchlistIds(actualWatchlistIds.filter((id) => id !== tmdbId));
-    } else {
-      setOptimisticWatchlistIds([...actualWatchlistIds, tmdbId]);
+    if (scrollRef.current) {
+      scrollRef.current.scrollLeft = 0;
     }
-
-    try {
-      if (isWatchlisted) {
-        await removeFromWatchlistMutation.mutateAsync(tmdbId);
-      } else {
-        await addToWatchlistMutation.mutateAsync({ tmdbId, type: 'movie' });
-      }
-    } catch (error) {
-      console.error(error);
-      // Revert optimistic update
-      if (isWatchlisted) {
-        setOptimisticWatchlistIds(actualWatchlistIds.filter((id) => id !== tmdbId).concat(tmdbId));
-      } else {
-        setOptimisticWatchlistIds(actualWatchlistIds.filter((id) => id !== tmdbId));
-      }
-    }
-  };
+    setTimeout(updateArrows, 100);
+  }, [genreId, year, items, updateArrows]);
 
   const handleCardClick = (item) => {
     const type = item.media_type || 'movie';
@@ -247,7 +195,8 @@ const TMDBDiscoveryWidget = ({ T }) => {
                       <Button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleWatchlist(item.id, isWatchlisted);
+                          const type = item.media_type || 'movie';
+                          handleWatchlist(item, type);
                         }}
                         className={`${posterCardStyles['action-btn']} ${isWatchlisted ? '' : posterCardStyles['action-btn--neutral']}`}
                         variant="unstyled"
@@ -277,10 +226,6 @@ const TMDBDiscoveryWidget = ({ T }) => {
       </WidgetShell>
     </div>
   );
-};
-
-TMDBDiscoveryWidget.propTypes = {
-  T: PropTypes.func.isRequired,
 };
 
 export default TMDBDiscoveryWidget;

@@ -49,26 +49,26 @@
   /* Colors and Backgrounds */
   --player-accent: var(--color-accent); /* The allowed single global theme variable */
   --player-accent-hover: var(--color-accent-strong);
-  --player-color-white: #ffffff;
+  --player-color-white: var(--color-text-primary);
   --player-color-accent-default: #38bdf8;
-  --player-color-glass-faint-text: color-mix(in srgb, white 15%, transparent);
+  --player-color-glass-faint-text: color-mix(in srgb, var(--color-text-primary) 15%, transparent);
   
-  --player-bg-overlay-heavy: color-mix(in srgb, black 75%, transparent);
-  --player-bg-overlay-medium: color-mix(in srgb, black 45%, transparent);
-  --player-bg-overlay-light: color-mix(in srgb, black 40%, transparent);
-  --player-bg-overlay-subtle: color-mix(in srgb, black 20%, transparent);
+  --player-bg-overlay-heavy: color-mix(in srgb, var(--color-bg-canvas) 75%, transparent);
+  --player-bg-overlay-medium: color-mix(in srgb, var(--color-bg-canvas) 45%, transparent);
+  --player-bg-overlay-light: color-mix(in srgb, var(--color-bg-canvas) 40%, transparent);
+  --player-bg-overlay-subtle: color-mix(in srgb, var(--color-bg-canvas) 20%, transparent);
   --player-bg-sidebar: color-mix(in srgb, #0f0f12 45%, transparent);
   
-  --player-bg-glass-subtle: color-mix(in srgb, white 3%, transparent);
-  --player-bg-glass-light: color-mix(in srgb, white 5%, transparent);
-  --player-bg-glass-medium: color-mix(in srgb, white 10%, transparent);
+  --player-bg-glass-subtle: color-mix(in srgb, var(--color-text-primary) 3%, transparent);
+  --player-bg-glass-light: color-mix(in srgb, var(--color-text-primary) 5%, transparent);
+  --player-bg-glass-medium: color-mix(in srgb, var(--color-text-primary) 10%, transparent);
 
   --player-color-ink: #ffffff;
-  --player-color-ink-muted: color-mix(in srgb, white 75%, transparent);
-  --player-color-ink-faint: color-mix(in srgb, white 45%, transparent);
-  --player-color-border-subtle: color-mix(in srgb, white 8%, transparent);
-  --player-color-border-default: color-mix(in srgb, white 15%, transparent);
-  --player-color-border-strong: color-mix(in srgb, white 25%, transparent);
+  --player-color-ink-muted: color-mix(in srgb, var(--color-text-primary) 75%, transparent);
+  --player-color-ink-faint: color-mix(in srgb, var(--color-text-primary) 45%, transparent);
+  --player-color-border-subtle: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+  --player-color-border-default: color-mix(in srgb, var(--color-text-primary) 15%, transparent);
+  --player-color-border-strong: color-mix(in srgb, var(--color-text-primary) 25%, transparent);
   --player-color-canvas: #0c0c0e;
   --player-color-surface-glass: color-mix(in srgb, #0f0f12 60%, transparent);
   --player-color-surface-glass-strong: color-mix(in srgb, #0f0f12 85%, transparent);
@@ -78,11 +78,11 @@
   --player-bg-badge: color-mix(in srgb, #0f0f12 82%, transparent);
 
   /* Borders & Spacing elements */
-  --player-border-glass-subtle: color-mix(in srgb, white 6%, transparent);
-  --player-border-glass-default: color-mix(in srgb, white 8%, transparent);
-  --player-border-glass-medium: color-mix(in srgb, white 10%, transparent);
-  --player-border-glass-strong: color-mix(in srgb, white 20%, transparent);
-  --player-border-glass-faint: color-mix(in srgb, white 15%, transparent);
+  --player-border-glass-subtle: color-mix(in srgb, var(--color-text-primary) 6%, transparent);
+  --player-border-glass-default: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+  --player-border-glass-medium: color-mix(in srgb, var(--color-text-primary) 10%, transparent);
+  --player-border-glass-strong: color-mix(in srgb, var(--color-text-primary) 20%, transparent);
+  --player-border-glass-faint: color-mix(in srgb, var(--color-text-primary) 15%, transparent);
 
   --player-border-osd: 0.0625rem solid var(--player-border-glass-medium);
   --player-border-sidebar: 0.0625rem solid var(--player-border-glass-default);
@@ -92,13 +92,13 @@
   --player-border-button-secondary-fallback: 0.0625rem solid var(--player-border-glass-faint);
 
   /* Shadows */
-  --player-shadow-osd: 0 0.25rem 0.75rem color-mix(in srgb, black 50%, transparent);
-  --player-shadow-sidebar: 0 0 3.125rem color-mix(in srgb, black 60%, transparent);
-  --player-shadow-tooltip: 0 0.75rem 2rem color-mix(in srgb, black 40%, transparent);
-  --player-shadow-dialog: 0 1rem 2.5rem color-mix(in srgb, black 60%, transparent);
-  --player-shadow-controls: 0 0.25rem 0.625rem color-mix(in srgb, black 40%, transparent);
-  --player-shadow-header: 0 0.375rem 1.125rem color-mix(in srgb, black 40%, transparent);
-  --player-shadow-toast: 0 0.5rem 1.5rem color-mix(in srgb, black 50%, transparent);
+  --player-shadow-osd: 0 0.25rem 0.75rem color-mix(in srgb, var(--color-bg-canvas) 50%, transparent);
+  --player-shadow-sidebar: 0 0 3.125rem color-mix(in srgb, var(--color-bg-canvas) 60%, transparent);
+  --player-shadow-tooltip: 0 0.75rem 2rem color-mix(in srgb, var(--color-bg-canvas) 40%, transparent);
+  --player-shadow-dialog: 0 1rem 2.5rem color-mix(in srgb, var(--color-bg-canvas) 60%, transparent);
+  --player-shadow-controls: 0 0.25rem 0.625rem color-mix(in srgb, var(--color-bg-canvas) 40%, transparent);
+  --player-shadow-header: 0 0.375rem 1.125rem color-mix(in srgb, var(--color-bg-canvas) 40%, transparent);
+  --player-shadow-toast: 0 0.5rem 1.5rem color-mix(in srgb, var(--color-bg-canvas) 50%, transparent);
 
   /* Transitions */
   --player-transition-opacity: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -109,5 +109,5 @@
   --player-animation-fade: osd-fade-in 0.15s ease-out;
   --player-animation-pulse: pulse 2s infinite ease-in-out;
   
-  --player-shadow-card-hover: 0 0.75rem 1.5rem color-mix(in srgb, black 40%, transparent);
+  --player-shadow-card-hover: 0 0.75rem 1.5rem color-mix(in srgb, var(--color-bg-canvas) 40%, transparent);
 }

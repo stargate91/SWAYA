@@ -159,8 +159,8 @@
   transform: translateX(-50%);
   padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-full);
-  background: color-mix(in srgb, black 48%, transparent);
-  color: color-mix(in srgb, white 84%, transparent);
+  background: color-mix(in srgb, var(--color-bg-canvas) 48%, transparent);
+  color: color-mix(in srgb, var(--color-text-primary) 84%, transparent);
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-semibold);
   letter-spacing: 0.04em;

@@ -36,7 +36,7 @@
   align-items: center;
 }
 
-.dashboard-utility-bar-wrapper .ui-tooltip {
+.dashboard-utility-bar-tooltip {
   display: flex;
   align-items: center;
   height: 100%;
@@ -47,11 +47,11 @@
   border: 1px solid var(--media-detail-side-nav-border);
   color: var(--color-text-secondary);
   backdrop-filter: var(--glass-blur);
-  box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, black 10%, transparent);
+  box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, var(--color-bg-canvas) 10%, transparent);
   opacity: 0.6;
   transition: all var(--motion-duration-base) var(--motion-ease-standard);
-  width: 2.5rem;
-  height: 2.5rem;
+  width: var(--space-4xl);
+  height: var(--space-4xl);
   border-radius: var(--radius-sm);
 }
 
@@ -131,32 +131,4 @@
   font-weight: var(--font-weight-semibold);
 }
 
-/* Error widget styles to avoid forbidden style props */
-.dashboard-widget--error {
-  padding: var(--space-4xl);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: var(--space-md);
-  min-height: var(--ui-overlay-sidebar-width);
-}
 
-.dashboard-widget-error-icon {
-  color: var(--color-state-danger);
-}
-
-.dashboard-widget-error-title {
-  margin: 0;
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
-}
-
-.dashboard-widget-error-desc {
-  margin: 0;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  max-width: 28.125rem;
-}

@@ -254,7 +254,7 @@
   background: color-mix(in srgb, var(--color-text-inverse) 72%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-text-primary) 9%, transparent);
   border-radius: var(--radius-md);
-  box-shadow: 0 0.625rem 1.875rem color-mix(in srgb, black 50%, transparent), inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 10%, transparent);
+  box-shadow: 0 0.625rem 1.875rem color-mix(in srgb, var(--color-bg-canvas) 50%, transparent), inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 10%, transparent);
   backdrop-filter: blur(1.25rem) saturate(125%);
   padding: var(--space-sm);
   display: flex;

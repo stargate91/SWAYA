@@ -122,7 +122,7 @@
 }
 
 .window-titlebar__button.window-titlebar__button--close:active {
-  --close-active-bg: color-mix(in srgb, var(--color-state-danger) 60%, white);
+  --close-active-bg: color-mix(in srgb, var(--color-state-danger) 60%, var(--color-text-primary));
   background: var(--close-active-bg);
   color: var(--color-text-primary);
 }

@@ -97,7 +97,7 @@
   border-radius: var(--radius-full);
   --socials-padding: 0.3125rem;
   padding: var(--socials-padding);
-  box-shadow: 0 0.5rem 1.5rem color-mix(in srgb, black 25%, transparent);
+  box-shadow: 0 0.5rem 1.5rem color-mix(in srgb, var(--color-bg-canvas) 25%, transparent);
   backdrop-filter: blur(0.75rem);
   transition: border-color var(--motion-base), background-color var(--motion-base);
 }
@@ -125,7 +125,7 @@
   background-color: var(--scroll-bg);
   color: var(--color-text-primary);
   cursor: pointer;
-  --scroll-shadow: 0 0.5rem 2rem color-mix(in srgb, black 50%, transparent);
+  --scroll-shadow: 0 0.5rem 2rem color-mix(in srgb, var(--color-bg-canvas) 50%, transparent);
   box-shadow: var(--scroll-shadow);
   backdrop-filter: blur(1rem);
   transition: all var(--motion-base);

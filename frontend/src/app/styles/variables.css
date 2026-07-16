@@ -150,8 +150,8 @@
   --dropdown-field-hover-border: color-mix(in srgb, var(--color-text-primary) 20%, transparent);
   --dropdown-field-active-border: var(--color-accent-blue);
   --dropdown-menu-bg: color-mix(in srgb, var(--color-panel-strong) 82%, transparent);
-  --dropdown-menu-border: color-mix(in srgb, white 10%, transparent);
-  --dropdown-menu-shadow: 0 12px 32px color-mix(in srgb, black 55%, transparent), 0 2px 8px color-mix(in srgb, black 30%, transparent);
+  --dropdown-menu-border: color-mix(in srgb, var(--color-text-primary) 10%, transparent);
+  --dropdown-menu-shadow: 0 12px 32px color-mix(in srgb, var(--color-bg-canvas) 55%, transparent), 0 2px 8px color-mix(in srgb, var(--color-bg-canvas) 30%, transparent);
   --dropdown-search-bg: rgba(0, 0, 0, 0.2);
   --dropdown-option-bg: transparent;
   --dropdown-option-hover-bg: var(--color-surface-glass);
@@ -236,7 +236,10 @@
   --ui-control-radius: var(--radius-md);
   --ui-control-radius-sm: calc(var(--radius-md) - 2px);
   --ui-control-radius-xs: calc(var(--radius-md) - 0.25rem);
-  --ui-control-bg: color-mix(in srgb, black 25%, transparent);
+  --ui-card-width-poster: 17.5rem;
+  --ui-spotlight-height: 25rem;
+  --ui-spotlight-max-width: 31.25rem;
+  --ui-control-bg: color-mix(in srgb, var(--color-bg-canvas) 25%, transparent);
   --ui-control-bg-subtle: rgba(255, 255, 255, 0.02);
   --ui-control-bg-hover: rgba(255, 255, 255, 0.04);
   --ui-control-border: var(--color-line);
@@ -291,18 +294,18 @@
     radial-gradient(120% 150% at 50% -20%, rgba(255, 255, 255, 0.025), transparent 38%),
     radial-gradient(140% 180% at 0% 100%, rgba(255, 255, 255, 0.018), transparent 44%),
     linear-gradient(180deg,
-      color-mix(in srgb, var(--color-panel-strong) 97%, black),
-      color-mix(in srgb, var(--color-canvas) 94%, black));
+      color-mix(in srgb, var(--color-panel-strong) 97%, var(--color-bg-canvas)),
+      color-mix(in srgb, var(--color-canvas) 94%, var(--color-bg-canvas)));
   --ui-floating-surface-blur: blur(var(--space-xl)) saturate(125%);
   --ui-floating-surface-highlight:
     linear-gradient(180deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0.01) 18%, transparent 44%);
   --ui-floating-surface-bottom-line: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.035), transparent);
   --ui-floating-action-bg:
     linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.004)),
-    color-mix(in srgb, var(--color-panel) 95%, black);
+    color-mix(in srgb, var(--color-panel) 95%, var(--color-bg-canvas));
   --ui-floating-action-bg-hover:
     linear-gradient(180deg, rgba(255, 255, 255, 0.024), rgba(255, 255, 255, 0.008)),
-    color-mix(in srgb, var(--color-panel-strong) 96%, black);
+    color-mix(in srgb, var(--color-panel-strong) 96%, var(--color-bg-canvas));
   --ui-floating-action-border: color-mix(in srgb, var(--color-line) 82%, rgba(255, 255, 255, 0.04));
   --ui-floating-action-border-hover: color-mix(in srgb, var(--color-line-strong) 84%, rgba(255, 255, 255, 0.05));
   --ui-floating-action-shadow:
@@ -363,7 +366,7 @@
   --ui-utility-button-inset-border: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
   --ui-utility-button-titlebar-divider: inset 1px 0 0 rgba(255, 255, 255, 0.05);
   --ui-danger-utility-bg:
-    linear-gradient(180deg, color-mix(in srgb, var(--color-state-danger) 82%, white 18%), color-mix(in srgb, var(--color-state-danger) 90%, #220812 10%));
+    linear-gradient(180deg, color-mix(in srgb, var(--color-state-danger) 82%, var(--color-text-primary) 18%), color-mix(in srgb, var(--color-state-danger) 90%, #220812 10%));
 
   /* Tooltip Tokens */
   --tooltip-max-width: calc(5 * var(--space-4xl));
@@ -522,7 +525,7 @@
   --glass-blur: var(--glass-blur-md);
 
   /* Dropzone Tokens */
-  --color-dropzone-panel-bg: color-mix(in srgb, var(--color-bg-elevated) 95%, black);
+  --color-dropzone-panel-bg: color-mix(in srgb, var(--color-bg-elevated) 95%, var(--color-bg-canvas));
   --shadow-overlay-dropzone:
     0 var(--space-md) var(--space-2xl) color-mix(in srgb, var(--color-accent) 12%, transparent),
     0 var(--space-sm) var(--space-lg) rgba(0, 0, 0, 0.25),

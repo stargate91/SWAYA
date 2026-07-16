@@ -43,7 +43,7 @@
 
 .split-button[data-variant="primary"] .split-button-action {
   color: var(--button-primary-color);
-  border-right: 0.0625rem solid color-mix(in srgb, white 15%, transparent);
+  border-right: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 15%, transparent);
 }
 
 .split-button[data-variant="secondary"] .split-button-action {

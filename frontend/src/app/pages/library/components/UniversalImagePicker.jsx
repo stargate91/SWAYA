@@ -177,6 +177,7 @@ export default function UniversalImagePicker({
       {sources.length > 1 && (
         <div className="universal-image-picker__source-filter">
           <SegmentedControl
+            className="universal-image-picker__segmented-control"
             value={imageSource}
             onChange={(val) => setImageSource(val)}
             options={sources}

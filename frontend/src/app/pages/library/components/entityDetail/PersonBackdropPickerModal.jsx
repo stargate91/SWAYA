@@ -108,6 +108,7 @@ export default function PersonBackdropPickerModal({
       {activeTab === 'scenes' && sceneSourceOptions.length >= 2 && (
         <div className="person-backdrop-picker__source-selector">
           <SegmentedControl
+            className="person-backdrop-picker__source-control"
             options={sceneSourceOptions}
             value={activeSceneSource}
             onChange={(val) => patchSession(personId, { selectedSceneSource: val, scenesPages: [], scenesNextPage: 2 })}

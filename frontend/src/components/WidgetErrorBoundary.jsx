@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
+import styles from './WidgetErrorBoundary.module.css';
 
 const DEFAULT_ERROR_TITLE = 'Failed to load';
 const DEFAULT_ERROR_DESC = 'An unknown error occurred while loading this widget.';
@@ -22,12 +23,12 @@ class WidgetErrorBoundary extends React.Component {
     const { t } = this.props;
     if (this.state.hasError) {
       return (
-        <div className="dashboard-widget dashboard-widget--error">
-          <AlertTriangle className="dashboard-widget-error-icon" size={32} />
-          <h3 className="dashboard-widget-error-title">
+        <div className={styles['dashboard-widget--error']}>
+          <AlertTriangle className={styles['dashboard-widget-error-icon']} size={32} />
+          <h3 className={styles['dashboard-widget-error-title']}>
             {this.props.title || (t ? t('widget.failed_to_load') : DEFAULT_ERROR_TITLE)}
           </h3>
-          <p className="dashboard-widget-error-desc">
+          <p className={styles['dashboard-widget-error-desc']}>
             {this.state.error?.message || (t ? t('widget.unknown_error') : DEFAULT_ERROR_DESC)}
           </p>
         </div>

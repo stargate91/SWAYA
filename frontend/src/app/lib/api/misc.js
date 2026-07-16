@@ -124,4 +124,10 @@ export const recommendations = {
   removeFromWatchlist: (tmdbId) => fetchJson(`/api/watchlist/${tmdbId}`, {
     method: 'DELETE',
   }),
+  discover: (genreId, year) => {
+    const params = new URLSearchParams();
+    if (genreId) params.append('genre_id', genreId);
+    if (year) params.append('year', year);
+    return fetchJson(`/api/recommendations/discover?${params.toString()}`);
+  },
 };

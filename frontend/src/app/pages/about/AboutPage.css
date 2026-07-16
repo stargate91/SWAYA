@@ -334,7 +334,7 @@
   align-items: center;
   gap: var(--space-md);
   padding: var(--space-lg);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 6%, color-mix(in srgb, black 45%, transparent)), color-mix(in srgb, var(--color-accent) 1.5%, color-mix(in srgb, black 25%, transparent)));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 6%, color-mix(in srgb, var(--color-bg-canvas) 45%, transparent)), color-mix(in srgb, var(--color-accent) 1.5%, color-mix(in srgb, var(--color-bg-canvas) 25%, transparent)));
   border: 1px solid color-mix(in srgb, var(--color-accent) 12%, var(--color-border-subtle));
   border-radius: var(--radius-md);
   backdrop-filter: var(--glass-blur-md);
@@ -343,8 +343,8 @@
 .developer-avatar {
   width: 2.5rem;
   height: 2.5rem;
-  background: color-mix(in srgb, var(--color-accent) 4%, color-mix(in srgb, black 35%, transparent));
-  border: 1px solid color-mix(in srgb, var(--color-accent) 15%, color-mix(in srgb, white 5%, transparent));
+  background: color-mix(in srgb, var(--color-accent) 4%, color-mix(in srgb, var(--color-bg-canvas) 35%, transparent));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 15%, color-mix(in srgb, var(--color-text-primary) 5%, transparent));
   box-shadow: inset 0 0 0.5rem color-mix(in srgb, var(--color-accent) 6%, transparent);
   border-radius: var(--radius-md);
   display: flex;
@@ -417,7 +417,7 @@
   align-items: center;
   gap: var(--space-lg);
   padding: var(--space-lg);
-  background: linear-gradient(135deg, color-mix(in srgb, color-mix(in srgb, var(--color-brand-tmdb) 25%, black) 30%, transparent), color-mix(in srgb, var(--color-brand-tmdb) 8%, transparent));
+  background: linear-gradient(135deg, color-mix(in srgb, color-mix(in srgb, var(--color-brand-tmdb) 25%, var(--color-bg-canvas)) 30%, transparent), color-mix(in srgb, var(--color-brand-tmdb) 8%, transparent));
   border: 1px solid color-mix(in srgb, var(--color-brand-tmdb) 20%, var(--color-border-subtle));
   border-radius: var(--radius-md);
   margin: var(--space-lg) 0;
@@ -503,7 +503,7 @@
 }
 
 .thanks-link:hover {
-  color: color-mix(in srgb, var(--color-accent) 80%, white);
+  color: color-mix(in srgb, var(--color-accent) 80%, var(--color-text-primary));
   text-decoration: underline;
 }
 
@@ -573,7 +573,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-2xl);
-  background: color-mix(in srgb, black 82%, transparent);
+  background: color-mix(in srgb, var(--color-bg-canvas) 82%, transparent);
   backdrop-filter: var(--glass-blur-md);
 }
 
@@ -583,10 +583,10 @@
   right: 1.125rem;
   width: 2.375rem;
   height: 2.375rem;
-  border: 1px solid color-mix(in srgb, white 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 18%, transparent);
   border-radius: var(--radius-full);
-  background: color-mix(in srgb, black 42%, transparent);
-  color: white;
+  background: color-mix(in srgb, var(--color-bg-canvas) 42%, transparent);
+  color: var(--color-text-primary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -598,7 +598,7 @@
   max-height: 88vh;
   object-fit: contain;
   border-radius: var(--radius-lg);
-  box-shadow: 0 1.25rem 3.75rem color-mix(in srgb, black 55%, transparent);
+  box-shadow: 0 1.25rem 3.75rem color-mix(in srgb, var(--color-bg-canvas) 55%, transparent);
 }
 
 .about-social-icon {

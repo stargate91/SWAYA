@@ -18,7 +18,7 @@
   height: calc(100vh - var(--layout-window-titlebar-height));
   background: var(--color-bg-elevated);
   border-left: 0.0625rem solid var(--color-border-strong);
-  box-shadow: calc(-1 * var(--space-md)) 0 2.1875rem color-mix(in srgb, black 60%, transparent);
+  box-shadow: calc(-1 * var(--space-md)) 0 2.1875rem color-mix(in srgb, var(--color-bg-canvas) 60%, transparent);
   z-index: var(--z-index-modal);
   display: flex;
   flex-direction: column;

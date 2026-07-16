@@ -84,7 +84,7 @@
 
 .ui-modal__title-icon {
   flex-shrink: 0;
-  color: color-mix(in srgb, var(--color-accent) 88%, white 12%);
+  color: color-mix(in srgb, var(--color-accent) 88%, var(--color-text-primary) 12%);
 }
 
 
@@ -139,10 +139,10 @@
       var(--color-bg-canvas));
   border-color: color-mix(in srgb, var(--color-state-danger) 42%, var(--color-border-default));
   box-shadow:
-    0 calc(2 * var(--space-lg)) 4.5rem color-mix(in srgb, black 66%, transparent),
+    0 calc(2 * var(--space-lg)) 4.5rem color-mix(in srgb, var(--color-bg-canvas) 66%, transparent),
     0 0 0 1px color-mix(in srgb, var(--color-state-danger) 28%, transparent),
     0 0 2rem color-mix(in srgb, var(--color-state-danger) 16%, transparent),
-    0 0.625rem 1.5rem color-mix(in srgb, black 28%, transparent),
+    0 0.625rem 1.5rem color-mix(in srgb, var(--color-bg-canvas) 28%, transparent),
     inset 0 0 0 1px var(--color-surface-card);
 }
 
@@ -156,11 +156,11 @@
 }
 
 .ui-modal--danger .ui-modal__title {
-  color: color-mix(in srgb, var(--color-state-danger) 18%, white);
+  color: color-mix(in srgb, var(--color-state-danger) 18%, var(--color-text-primary));
 }
 
 .ui-modal--danger .ui-modal__title-icon {
-  color: color-mix(in srgb, var(--color-state-danger) 88%, white 12%);
+  color: color-mix(in srgb, var(--color-state-danger) 88%, var(--color-text-primary) 12%);
   filter: drop-shadow(0 0 0.625rem color-mix(in srgb, var(--color-state-danger) 26%, transparent));
 }
 
@@ -188,11 +188,11 @@
 }
 
 .ui-modal--danger .ui-icon-button-wrapper .ui-icon-button {
-  color: color-mix(in srgb, var(--color-state-danger) 40%, white 60%);
+  color: color-mix(in srgb, var(--color-state-danger) 40%, var(--color-text-primary) 60%);
 }
 
 .ui-modal--danger .ui-icon-button-wrapper:hover .ui-icon-button {
-  color: white;
+  color: var(--color-text-primary);
 }
 
 .ui-modal__actions-list {
@@ -227,7 +227,7 @@
 
 .ui-modal__action-card:focus-visible {
   outline: none;
-  border-color: color-mix(in srgb, var(--color-accent) 55%, white);
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-text-primary));
   box-shadow: var(--focus-ring);
 }
 
@@ -270,7 +270,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: color-mix(in srgb, black 75%, transparent);
+  background: color-mix(in srgb, var(--color-bg-canvas) 75%, transparent);
   backdrop-filter: blur(var(--space-sm));
   display: flex;
   align-items: center;
@@ -288,8 +288,8 @@
   border-radius: var(--radius-lg);
   padding: var(--space-2xl);
   box-shadow:
-    0 calc(2 * var(--space-lg)) 4.5rem color-mix(in srgb, black 76%, transparent),
-    0 0.625rem 1.5rem color-mix(in srgb, black 38%, transparent),
+    0 calc(2 * var(--space-lg)) 4.5rem color-mix(in srgb, var(--color-bg-canvas) 76%, transparent),
+    0 0.625rem 1.5rem color-mix(in srgb, var(--color-bg-canvas) 38%, transparent),
     inset 0 0 0 1px var(--color-surface-glass);
   display: grid;
   gap: var(--space-lg);

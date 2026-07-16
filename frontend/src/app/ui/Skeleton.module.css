@@ -1,31 +1,31 @@
-.ui-skeleton {
+.skeleton {
   display: block;
   background: var(--color-surface-card);
   border-radius: var(--radius-md);
 }
 
-.ui-skeleton--circle {
+.circle {
   border-radius: var(--radius-full);
 }
 
-.ui-skeleton--text {
+.text {
   height: 1em;
   border-radius: var(--radius-sm);
 }
 
-.ui-skeleton--shimmer {
+.shimmer {
   background: linear-gradient(90deg, var(--color-surface-card), color-mix(in srgb, var(--color-text-primary) 6%, transparent), var(--color-surface-card));
   background-size: 200% 100%;
-  animation: uiSkeletonShimmer var(--motion-duration-pulse-slow) var(--motion-ease-linear) infinite;
+  animation: shimmer-animation var(--motion-duration-pulse-slow) var(--motion-ease-linear) infinite;
 }
 
-.ui-skeleton-row {
+.row {
   display: flex;
   gap: var(--space-xl);
   overflow: hidden;
 }
 
-.ui-skeleton-card {
+.card {
   min-width: var(--ui-overlay-sidebar-width);
   width: var(--ui-overlay-sidebar-width);
   min-height: 18.75rem;
@@ -33,20 +33,20 @@
   flex-shrink: 0;
 }
 
-.ui-skeleton-banner {
-  min-height: 25rem;
+.banner {
+  min-height: var(--ui-spotlight-height, 25rem);
   margin-bottom: var(--space-4xl);
   border-radius: var(--radius-xl);
 }
 
-.ui-skeleton-title {
+.title {
   width: var(--tooltip-max-width);
   min-height: 1.625rem;
   margin-bottom: var(--space-xl);
   border-radius: var(--radius-sm);
 }
 
-@keyframes uiSkeletonShimmer {
+@keyframes shimmer-animation {
   0% {
     background-position: 200% 0;
   }

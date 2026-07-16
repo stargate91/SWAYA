@@ -1,5 +1,6 @@
 {
   "rules": {
+    "color-named": "never",
     "unit-disallowed-list": [
       ["px"],
       {

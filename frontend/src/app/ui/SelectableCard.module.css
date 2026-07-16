@@ -187,7 +187,7 @@
   color: var(--color-text-primary);
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-medium);
-  text-shadow: 0 0.0625rem 0.125rem color-mix(in srgb, black 80%, transparent);
+  text-shadow: 0 0.0625rem 0.125rem color-mix(in srgb, var(--color-bg-canvas) 80%, transparent);
   z-index: var(--z-index-step-1);
 }
 

@@ -14,11 +14,11 @@
 
 /* Obscure variant - solid dark background */
 .overlay[data-variant="obscure"] {
-  background: color-mix(in srgb, black 95%, transparent);
+  background: color-mix(in srgb, var(--color-bg-canvas) 95%, transparent);
 }
 
 /* Blur variant - frosted glass/backdrop blur */
 .overlay[data-variant="blur"] {
-  background: var(--adult-overlay-bg, color-mix(in srgb, black 70%, transparent));
+  background: var(--adult-overlay-bg, color-mix(in srgb, var(--color-bg-canvas) 70%, transparent));
   backdrop-filter: blur(var(--adult-overlay-blur, calc(2 * var(--space-lg))));
 }

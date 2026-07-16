@@ -29,8 +29,8 @@
 }
 
 .continue-watching-card {
-  --ui-poster-card-width: 17.5rem;
-  --ui-poster-card-min-width: 17.5rem;
+  --ui-poster-card-width: var(--ui-card-width-poster);
+  --ui-poster-card-min-width: var(--ui-card-width-poster);
   transform: none;
   transition: none;
 }
@@ -41,11 +41,10 @@
 
 .continue-watching-card-image-wrapper {
   border-radius: var(--radius-lg);
-  box-shadow: 0 var(--space-md) calc(2.5 * var(--space-md)) color-mix(in srgb, black 30%, transparent);
+  box-shadow: 0 var(--space-md) calc(2.5 * var(--space-md)) color-mix(in srgb, var(--color-bg-canvas) 30%, transparent);
   border: 1px solid var(--color-border-subtle);
   background: var(--color-bg-elevated);
   isolation: isolate;
-  will-change: transform;
   transform: translateZ(0);
 }
 
@@ -56,12 +55,13 @@
 }
 
 .continue-watching-card:hover .continue-watching-card-image {
+  will-change: opacity, filter, transform;
   opacity: 1;
   filter: brightness(1);
   transform: scale(1.03);
 }
 
-.continue-watching-card :global(.ui-tooltip) {
+.card-tooltip {
   position: absolute;
   top: var(--space-md);
   right: var(--space-md);
@@ -75,15 +75,15 @@
   padding: var(--space-sm);
   border: 0;
   border-radius: var(--radius-sm);
-  background: color-mix(in srgb, black 60%, transparent);
+  background: color-mix(in srgb, var(--color-bg-canvas) 60%, transparent);
   cursor: pointer;
-  color: color-mix(in srgb, white 70%, transparent);
+  color: color-mix(in srgb, var(--color-text-primary) 70%, transparent);
   transition: background var(--motion-duration-hover) var(--motion-ease-hover), color var(--motion-duration-hover) var(--motion-ease-hover);
 }
 
 .continue-watching-remove:hover {
   background: var(--color-state-danger);
-  color: white;
+  color: var(--color-text-primary);
 }
 
 .continue-watching-card.continue-watching-card--active {
@@ -150,9 +150,9 @@
 
 .continue-watching-copy {
   position: absolute;
-  right: 0.9375rem;
-  bottom: 0.9375rem;
-  left: 0.9375rem;
+  right: var(--space-lg);
+  bottom: var(--space-lg);
+  left: var(--space-lg);
   pointer-events: none;
 }
 
@@ -215,10 +215,22 @@
 }
 
 .is-left {
-  left: 0.625rem;
+  left: var(--space-md);
 }
 
 .is-right {
-  right: 0.625rem;
+  right: var(--space-md);
+}
+
+.continue-watching-title-skeleton {
+  width: calc(12 * var(--space-lg));
+  height: calc(1.75 * var(--space-lg));
+}
+
+.continue-watching-card-skeleton {
+  width: var(--ui-card-width-poster);
+  height: calc(9.84 * var(--space-lg));
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
 }
 

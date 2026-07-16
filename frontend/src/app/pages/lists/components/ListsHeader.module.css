@@ -36,7 +36,7 @@
   border-radius: 0 0 var(--radius-md) var(--radius-md);
   box-sizing: border-box;
   margin-bottom: var(--space-lg);
-  box-shadow: 0 0.9375rem var(--space-xl) -var(--space-md) color-mix(in srgb, black 60%, transparent);
+  box-shadow: 0 0.9375rem var(--space-xl) -var(--space-md) color-mix(in srgb, var(--color-bg-canvas) 60%, transparent);
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   transition: border-radius var(--motion-fast), border-top-color var(--motion-fast);

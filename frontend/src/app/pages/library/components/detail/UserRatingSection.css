@@ -12,20 +12,20 @@
 .rating-segment {
   flex: 1;
   height: 100%;
-  --local-bg: color-mix(in srgb, white 8%, transparent);
+  --local-bg: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
   background: var(--local-bg);
   border-radius: var(--radius-sm);
   overflow: hidden;
-  --local-border: 0.0625rem solid color-mix(in srgb, white 4%, transparent);
+  --local-border: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 4%, transparent);
   border: var(--local-border);
   --local-transition: all 0.2s ease;
   transition: var(--local-transition);
 }
 
 .rating-segmented-bar:hover .rating-segment {
-  --local-bg: color-mix(in srgb, white 12%, transparent);
+  --local-bg: color-mix(in srgb, var(--color-text-primary) 12%, transparent);
   background: var(--local-bg);
-  --local-border-color: color-mix(in srgb, white 8%, transparent);
+  --local-border-color: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
   border-color: var(--local-border-color);
 }
 

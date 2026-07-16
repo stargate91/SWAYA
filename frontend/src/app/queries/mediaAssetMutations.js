@@ -138,6 +138,9 @@ const syncPosterCaches = (queryClient, rawItemId, data) => {
   });
 
   queryClient.invalidateQueries({ queryKey: ['recommendations'] });
+  queryClient.invalidateQueries({ queryKey: ['recently-added'] });
+  queryClient.invalidateQueries({ queryKey: ['recently-activated-people'] });
+  queryClient.invalidateQueries({ queryKey: ['discover'] });
 };
 
 const syncLogoCaches = (queryClient, rawItemId, data) => {
@@ -165,7 +168,7 @@ export const useOverrideBackdropMutation = () => {
     mutationFn: ({ itemId, backdropPath, mediaType }) => api.media.overrideBackdrop(itemId, backdropPath, mediaType),
     onSuccess: (data, variables) => {
       const { itemId } = variables;
-      invalidateEntity(queryClient, itemId, { lists: true });
+      invalidateEntity(queryClient, itemId, { lists: true, recommendations: true, continueWatching: true });
     },
   });
 };
@@ -176,7 +179,7 @@ export const useUploadBackdropMutation = () => {
     mutationFn: ({ itemId, file, mediaType }) => api.media.uploadBackdrop(itemId, file, mediaType),
     onSuccess: (data, variables) => {
       const { itemId } = variables;
-      invalidateEntity(queryClient, itemId, { lists: true });
+      invalidateEntity(queryClient, itemId, { lists: true, recommendations: true, continueWatching: true });
     },
   });
 };

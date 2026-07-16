@@ -9,12 +9,16 @@ import { resolveMediaImageUrl } from '../../../lib/imageUrls';
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 import Tooltip from '../../../ui/Tooltip';
 import IconButton from '../../../ui/IconButton';
+import Skeleton from '../../../ui/Skeleton';
 import styles from './ContinueWatchingWidget.module.css';
 
 import { formatEpisodeCode } from '../../../lib/episodeFormat';
 import api from '../../../lib/api';
+import { onIpc } from '../../../lib/electron';
+import { useTranslation } from '../../../providers/LanguageContext';
 
-const ContinueWatchingWidget = ({ T }) => {
+const ContinueWatchingWidget = () => {
+  const { t: T } = useTranslation();
   const queryClient = useQueryClient();
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const { data: items = [], isLoading } = useContinueWatchingQuery({
@@ -35,14 +39,11 @@ const ContinueWatchingWidget = ({ T }) => {
     setShowRight(scrollLeft + clientWidth < scrollWidth - 10);
   }, []);
 
-  const [prevItems, setPrevItems] = useState(items);
   const [localItems, setLocalItems] = useState(items);
 
-  const itemsChanged = items.length !== prevItems.length || items.some((item, idx) => item.id !== prevItems[idx]?.id);
-  if (itemsChanged) {
-    setPrevItems(items);
+  useEffect(() => {
     setLocalItems(items);
-  }
+  }, [items]);
 
   useEffect(() => {
     updateArrows();
@@ -53,17 +54,6 @@ const ContinueWatchingWidget = ({ T }) => {
   const [activePlayback, setActivePlayback] = useState(null);
 
   useEffect(() => {
-    let ipcRenderer = null;
-    try {
-      if (window.require) {
-        ipcRenderer = window.require('electron').ipcRenderer;
-      }
-    } catch {
-      // ignore
-    }
-
-    if (!ipcRenderer) return;
-
     const handlePlayerStateUpdate = async (event, data) => {
       if (data.event === 'start') {
         setActivePlayback({
@@ -76,8 +66,11 @@ const ContinueWatchingWidget = ({ T }) => {
         setLocalItems((prev) => {
           const exists = prev.some(item => String(item.id) === String(data.itemId));
           if (!exists) {
-            // Fetch detail asynchronously
-            api.library.getItemDetail(data.itemId).then((detail) => {
+            // Fetch detail asynchronously via queryClient
+            queryClient.fetchQuery({
+              queryKey: ['item-detail', data.itemId],
+              queryFn: () => api.library.getItemDetail(data.itemId),
+            }).then((detail) => {
               if (detail) {
                 const newItem = {
                   id: detail.id,
@@ -115,19 +108,12 @@ const ContinueWatchingWidget = ({ T }) => {
         });
       } else if (data.event === 'close') {
         setActivePlayback(null);
-        queryClient.invalidateQueries({ queryKey: ['continue-watching'] });
-        setTimeout(() => {
-          queryClient.invalidateQueries({ queryKey: ['continue-watching'] });
-        }, 500);
-        setTimeout(() => {
-          queryClient.invalidateQueries({ queryKey: ['continue-watching'] });
-        }, 2000);
       }
     };
 
-    ipcRenderer.on('player-state-update', handlePlayerStateUpdate);
+    const unsubscribe = onIpc('player-state-update', handlePlayerStateUpdate);
     return () => {
-      ipcRenderer.off('player-state-update', handlePlayerStateUpdate);
+      unsubscribe();
     };
   }, [queryClient]);
 
@@ -138,7 +124,26 @@ const ContinueWatchingWidget = ({ T }) => {
     el.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
   };
 
-  if (isLoading || (!localItems.length && !activePlayback)) {
+  if (isLoading) {
+    return (
+      <div className={styles['continue-watching-widget']}>
+        <div className={styles['continue-watching-header']}>
+          <Skeleton variant="text" className={styles['continue-watching-title-skeleton']} />
+        </div>
+        <Skeleton.Row>
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <Skeleton
+              key={idx}
+              variant="rect"
+              className={styles['continue-watching-card-skeleton']}
+            />
+          ))}
+        </Skeleton.Row>
+      </div>
+    );
+  }
+
+  if (!localItems.length && !activePlayback) {
     return null;
   }
 
@@ -170,8 +175,10 @@ const ContinueWatchingWidget = ({ T }) => {
         {localItems.map((item) => {
           const isCurrentlyPlaying = activePlayback && String(activePlayback.itemId) === String(item.id);
           const currentResumePos = isCurrentlyPlaying ? activePlayback.currentTime : item.resume_position;
-          const currentDuration = item.duration || 1;
-
+          const currentDuration = isCurrentlyPlaying
+            ? (activePlayback.duration || item.duration || 1)
+            : (item.duration || 1);
+ 
           const progressPercent = Math.min(100, (currentResumePos / currentDuration) * 100);
           const isEpisode = item.type === 'episode';
           const episodeCode = isEpisode ? formatEpisodeCode(item.season_number, item.episode_number) : null;
@@ -196,7 +203,11 @@ const ContinueWatchingWidget = ({ T }) => {
                 }
               }}
               topRightAction={
-                <Tooltip content={T('dashboard.continue_watching.remove') || 'Remove progress'} side="top">
+                <Tooltip
+                  content={T('dashboard.continue_watching.remove') || 'Remove progress'}
+                  side="top"
+                  triggerClassName={styles['card-tooltip']}
+                >
                   <button
                     className={styles['continue-watching-remove']}
                     onClick={async (e) => {
@@ -249,10 +260,6 @@ const ContinueWatchingWidget = ({ T }) => {
       </div>
     </div>
   );
-};
-
-ContinueWatchingWidget.propTypes = {
-  T: PropTypes.func.isRequired,
 };
 
 export default ContinueWatchingWidget;

@@ -140,7 +140,7 @@
       color-mix(in srgb, var(--color-state-danger) 8%, transparent)),
     color-mix(in srgb, var(--color-state-danger) 10%, color-mix(in srgb, var(--color-text-inverse) 62%, transparent));
   border-color: color-mix(in srgb, var(--color-state-danger) 26%, transparent);
-  color: color-mix(in srgb, var(--color-accent-red-soft) 88%, white 12%);
+  color: color-mix(in srgb, var(--color-accent-red-soft) 88%, var(--color-text-primary) 12%);
 }
 
 .ui-floating-bar__action--danger:hover:not(:disabled),

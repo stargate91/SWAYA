@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import OrganizerPageContent from './components/OrganizerPageContent';
+import styles from './OrganizerPage.module.css';
 import Button from '../../ui/Button';
 import SegmentedControl from '../../ui/SegmentedControl';
 import SplitButton from '../../ui/SplitButton';
@@ -478,17 +479,21 @@ export default function OrganizerPage() {
       addPendingResolvedIds={addPendingResolvedIds}
     >
       {utilityBarTarget && scanModeOptions.length > 1 && createPortal(
-        <div className="organizer-utility-bar-wrapper">
+        <div className={styles['utility-bar-wrapper']}>
           <SegmentedControl
             value={scanMode}
             onChange={setScanMode}
             options={scanModeOptions}
+            size="sm"
+            animated={true}
             className="main-scan-mode"
           />
           {sessionMode === 'nsfw' && scanMode !== 'offline' && providerOptions.length > 0 && (
             <div key={scanMode} className="provider-segmented-control-wrapper animate-slide-in">
               <SegmentedControl
                 variant="filter"
+                size="sm"
+                animated={true}
                 value={provider}
                 onChange={setProvider}
                 options={providerOptions}

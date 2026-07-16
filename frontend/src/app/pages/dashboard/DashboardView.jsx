@@ -18,27 +18,59 @@ import DashboardCustomizerDrawer from './widgets/DashboardCustomizerDrawer';
 import WidgetErrorBoundary from '../../../components/WidgetErrorBoundary';
 import styles from './DashboardView.module.css';
 
-const DEFAULT_WIDGETS = {
-  continue_watching: true,
-  spotlight: true,
-  recently_added: true,
-  recently_activated_people: true,
-  movies_discovery: true,
-  tv_discovery: true,
-  top_20: true,
-  adult: true,
+const WIDGET_REGISTRY = {
+  continue_watching: {
+    component: ContinueWatchingWidget,
+    titleKey: 'dashboard.widget_continue_watching',
+    fallbackTitle: 'Continue Watching',
+  },
+  spotlight: {
+    component: SpotlightWidget,
+    titleKey: 'dashboard.widget_spotlight',
+    fallbackTitle: 'Spotlight (Trending)',
+  },
+  recently_added: {
+    component: RecentlyAddedWidget,
+    titleKey: 'dashboard.widget_recently_added',
+    fallbackTitle: 'Recently Added',
+    getProps: (settings, lang) => ({ language: lang }),
+  },
+  recently_activated_people: {
+    component: RecentlyActivePeopleWidget,
+    titleKey: (isNsfw) => isNsfw ? 'dashboard.widget_recently_activated_people_adult' : 'dashboard.widget_recently_activated_people',
+    fallbackTitle: (isNsfw) => isNsfw ? 'Lately Tracked Adult Stars' : 'Lately Tracked Artists',
+    getProps: (settings, lang) => ({ language: lang }),
+  },
+  movies_discovery: {
+    component: MoviesDiscoveryWidget,
+    titleKey: 'dashboard.widget_movies_discovery',
+    fallbackTitle: 'Discover Movies',
+  },
+  tv_discovery: {
+    component: TvDiscoveryWidget,
+    titleKey: 'dashboard.widget_tv_discovery',
+    fallbackTitle: 'Discover TV Shows',
+  },
+  top_20: {
+    component: TMDBDiscoveryWidget,
+    titleKey: 'dashboard.widget_top_20',
+    fallbackTitle: 'Top 20 Discoveries',
+    show: (settings) => Boolean(settings?.tmdb_api_key),
+  },
+  adult: {
+    component: AdultRecommendationsWidget,
+    titleKey: 'dashboard.widget_adult',
+    fallbackTitle: 'Adult recommendations',
+    show: (settings) => Boolean(settings?.include_adult),
+  },
 };
 
-const DEFAULT_ORDER = [
-  'continue_watching',
-  'spotlight',
-  'recently_added',
-  'recently_activated_people',
-  'movies_discovery',
-  'tv_discovery',
-  'top_20',
-  'adult'
-];
+const DEFAULT_WIDGETS = Object.keys(WIDGET_REGISTRY).reduce((acc, key) => {
+  acc[key] = true;
+  return acc;
+}, {});
+
+const DEFAULT_ORDER = Object.keys(WIDGET_REGISTRY);
 
 const DashboardView = () => {
   const { data: settings = {} } = useSettingsQuery();
@@ -93,11 +125,12 @@ const DashboardView = () => {
 
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const showAdult = Boolean(settings?.include_adult);
+  const isNsfw = showAdult && sessionMode === 'nsfw';
 
   const { data: stats = {}, isLoading: statsLoading } = useStatsQuery(sessionMode === 'nsfw');
 
   const getGreetingKey = () => {
-    const isNsfw = showAdult && sessionMode === 'nsfw';
+    const isNsfwGreet = showAdult && sessionMode === 'nsfw';
 
     const hasItems = (
       (stats.genre_distribution && Object.keys(stats.genre_distribution).length > 0) ||
@@ -105,7 +138,7 @@ const DashboardView = () => {
     );
 
     if (!statsLoading && !hasItems) {
-      return isNsfw ? 'onboarding_nsfw' : 'onboarding';
+      return isNsfwGreet ? 'onboarding_nsfw' : 'onboarding';
     }
 
     const hour = new Date().getHours();
@@ -120,7 +153,7 @@ const DashboardView = () => {
       timeKey = 'night';
     }
 
-    return isNsfw ? `${timeKey}_nsfw` : timeKey;
+    return isNsfwGreet ? `${timeKey}_nsfw` : timeKey;
   };
 
   const displayName = settings.user_name?.trim();
@@ -133,7 +166,11 @@ const DashboardView = () => {
     <>
       <UtilityBarPortal>
         <div className={styles['dashboard-utility-bar-wrapper']}>
-          <Tooltip content={t('dashboard.customize') || 'Customize Dashboard'} side="bottom">
+          <Tooltip
+            content={t('dashboard.customize') || 'Customize Dashboard'}
+            side="bottom"
+            triggerClassName={styles['dashboard-utility-bar-tooltip']}
+          >
             <IconButton
               onClick={() => setIsCustomizerOpen(true)}
               className={styles['dashboard-customizer-btn']}
@@ -151,36 +188,28 @@ const DashboardView = () => {
       </div>
 
       {widgetOrder.map((key) => {
-        const lang = settings?.ui_language || settings?.primary_metadata_language;
-        const isNsfw = showAdult && sessionMode === 'nsfw';
-        let widgetEl = null;
-        let title = '';
+        const widgetConfig = WIDGET_REGISTRY[key];
+        if (!widgetConfig) return null;
 
-        if (key === 'continue_watching') {
-          title = t('dashboard.widget_continue_watching') || 'Continue Watching';
-          widgetEl = visibleWidgets.continue_watching && <ContinueWatchingWidget T={t} />;
-        } else if (key === 'spotlight') {
-          title = t('dashboard.widget_spotlight') || 'Spotlight (Trending)';
-          widgetEl = visibleWidgets.spotlight && <SpotlightWidget T={t} />;
-        } else if (key === 'recently_added') {
-          title = t('dashboard.widget_recently_added') || 'Recently Added';
-          widgetEl = visibleWidgets.recently_added && <RecentlyAddedWidget T={t} language={lang} />;
-        } else if (key === 'recently_activated_people') {
-          title = t(isNsfw ? 'dashboard.widget_recently_activated_people_adult' : 'dashboard.widget_recently_activated_people') || (isNsfw ? 'Lately Tracked Adult Stars' : 'Lately Tracked Artists');
-          widgetEl = visibleWidgets.recently_activated_people && <RecentlyActivePeopleWidget T={t} language={lang} />;
-        } else if (key === 'movies_discovery') {
-          title = t('dashboard.widget_movies_discovery') || 'Discover Movies';
-          widgetEl = visibleWidgets.movies_discovery && <MoviesDiscoveryWidget T={t} />;
-        } else if (key === 'tv_discovery') {
-          title = t('dashboard.widget_tv_discovery') || 'Discover TV Shows';
-          widgetEl = visibleWidgets.tv_discovery && <TvDiscoveryWidget T={t} />;
-        } else if (key === 'top_20') {
-          title = t('dashboard.widget_top_20') || 'Top 20 Discoveries';
-          widgetEl = visibleWidgets.top_20 && settings?.tmdb_api_key && <TMDBDiscoveryWidget T={t} />;
-        } else if (key === 'adult') {
-          title = t('dashboard.widget_adult') || 'Adult recommendations';
-          widgetEl = visibleWidgets.adult && <AdultRecommendationsWidget T={t} />;
+        const lang = settings?.ui_language || settings?.primary_metadata_language;
+
+        if (widgetConfig.show && !widgetConfig.show(settings, isNsfw)) {
+          return null;
         }
+
+        const titleKey = typeof widgetConfig.titleKey === 'function'
+          ? widgetConfig.titleKey(isNsfw)
+          : widgetConfig.titleKey;
+
+        const fallbackTitle = typeof widgetConfig.fallbackTitle === 'function'
+          ? widgetConfig.fallbackTitle(isNsfw)
+          : widgetConfig.fallbackTitle;
+
+        const title = t(titleKey) || fallbackTitle;
+        const WidgetComponent = widgetConfig.component;
+        const customProps = widgetConfig.getProps ? widgetConfig.getProps(settings, lang) : {};
+
+        const widgetEl = visibleWidgets[key] && <WidgetComponent {...customProps} />;
 
         if (widgetEl) {
           return (
@@ -200,8 +229,8 @@ const DashboardView = () => {
         widgetOrder={widgetOrder}
         handleOrderChange={handleOrderChange}
         showAdult={showAdult}
-        t={t}
         styles={styles}
+        widgetRegistry={WIDGET_REGISTRY}
       />
     </>
   );

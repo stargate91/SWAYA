@@ -1,0 +1,229 @@
+.container {
+  display: inline-flex;
+  align-items: stretch;
+  gap: calc(var(--space-xs) / 2);
+  box-sizing: border-box;
+  padding: 0.1875rem;
+  position: relative; /* Required for absolute indicator */
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--motion-fast),
+    color var(--motion-fast),
+    box-shadow var(--motion-fast),
+    transform var(--motion-fast);
+}
+
+.option:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.option.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   ANIMATED INDICATOR
+   ========================================================================== */
+
+.indicator {
+  position: absolute;
+  top: 0.1875rem;
+  bottom: 0.1875rem;
+  left: var(--active-offset, 0);
+  width: var(--active-width, 0);
+  z-index: var(--z-index-zero);
+  transition:
+    left var(--motion-duration-base) var(--motion-ease-emphasized),
+    width var(--motion-duration-base) var(--motion-ease-emphasized);
+}
+
+/* ==========================================================================
+   SIZES
+   ========================================================================== */
+
+/* Size: xs */
+.size-xs {
+  height: var(--ui-control-height-xs);
+  border-radius: var(--ui-control-radius-sm);
+}
+
+.size-xs .option {
+  padding: 0 var(--space-sm);
+  font-size: var(--font-size-2xs);
+  border-radius: var(--radius-sm);
+}
+
+.size-xs .indicator {
+  border-radius: var(--radius-sm);
+}
+
+/* Size: sm */
+.size-sm {
+  height: var(--ui-control-height-sm);
+  border-radius: var(--ui-control-radius-sm);
+}
+
+.size-sm .option {
+  padding: 0 var(--space-md);
+  font-size: var(--font-size-xs);
+  border-radius: var(--radius-sm);
+}
+
+.size-sm .indicator {
+  border-radius: var(--radius-sm);
+}
+
+/* Size: md */
+.size-md {
+  height: var(--ui-control-height-md);
+  border-radius: var(--ui-control-radius);
+}
+
+.size-md .option {
+  padding: 0 var(--space-lg);
+  font-size: var(--font-size-xs);
+  border-radius: calc(var(--ui-control-radius) - var(--radius-sm));
+}
+
+.size-md .indicator {
+  border-radius: calc(var(--ui-control-radius) - var(--radius-sm));
+}
+
+/* Size: lg */
+.size-lg {
+  height: var(--ui-control-height-lg);
+  border-radius: var(--ui-control-radius);
+}
+
+.size-lg .option {
+  padding: 0 var(--space-xl);
+  font-size: var(--font-size-sm);
+  border-radius: calc(var(--ui-control-radius) - var(--radius-sm));
+}
+
+.size-lg .indicator {
+  border-radius: calc(var(--ui-control-radius) - var(--radius-sm));
+}
+
+/* ==========================================================================
+   ROUNDNESS OVERRIDES
+   ========================================================================== */
+
+.roundness-full {
+  border-radius: var(--radius-full);
+}
+.roundness-full .option,
+.roundness-full .indicator {
+  border-radius: var(--radius-full);
+}
+
+.roundness-md {
+  border-radius: var(--ui-control-radius);
+}
+.roundness-md .option,
+.roundness-md .indicator {
+  border-radius: calc(var(--ui-control-radius) - var(--radius-sm));
+}
+
+.roundness-sm {
+  border-radius: var(--ui-control-radius-sm);
+}
+.roundness-sm .option,
+.roundness-sm .indicator {
+  border-radius: var(--radius-sm);
+}
+
+.roundness-none {
+  border-radius: var(--radius-none);
+}
+.roundness-none .option,
+.roundness-none .indicator {
+  border-radius: var(--radius-none);
+}
+
+/* ==========================================================================
+   ANIMATED CONTAINER SPECIFICITY OVERRIDES
+   ========================================================================== */
+
+/* When animated, option buttons stack above indicator, active option has no local styling */
+.container.animated .option {
+  position: relative;
+  z-index: var(--z-index-base);
+}
+
+.container.animated .option.is-active {
+  background: transparent;
+  box-shadow: none;
+}
+
+/* ==========================================================================
+   VISUAL VARIANTS
+   ========================================================================== */
+
+/* Variant: default */
+.variant-default {
+  border: 1px solid var(--ui-control-border);
+  background: var(--ui-control-bg);
+}
+
+.variant-default:not(.animated) .option.is-active {
+  background: var(--ui-surface-soft-strong);
+  color: var(--color-text-primary);
+  box-shadow:
+    0 1px 0.1875rem color-mix(in srgb, var(--color-bg-canvas) 20%, transparent),
+    inset 0 1px 0 var(--color-border-subtle);
+}
+
+/* Default indicator style */
+.variant-default .indicator {
+  background: var(--ui-surface-soft-strong);
+  box-shadow:
+    0 1px 0.1875rem color-mix(in srgb, var(--color-bg-canvas) 20%, transparent),
+    inset 0 1px 0 var(--color-border-subtle);
+}
+
+/* Variant: filter */
+.variant-filter {
+  background-color: transparent;
+  border: 1px solid var(--color-border-subtle);
+}
+
+.variant-filter:not(.animated) .option.is-active {
+  background-color: var(--ui-surface-soft-strong);
+  color: var(--color-text-primary);
+  box-shadow: none;
+}
+
+/* Filter indicator style */
+.variant-filter .indicator {
+  background-color: var(--ui-surface-soft-strong);
+  box-shadow: none;
+}
+
+/* ==========================================================================
+   HOVER STATES (MUST BE AT THE BOTTOM TO COMPLY WITH SPECIFICITY ORDERING)
+   ========================================================================== */
+
+.option:hover:not(.is-active):not(.is-disabled) {
+  color: var(--color-text-primary);
+  background: var(--ui-surface-soft);
+}
+
+.variant-filter .option:hover:not(.is-active):not(.is-disabled) {
+  color: var(--color-text-primary);
+  background: transparent;
+}

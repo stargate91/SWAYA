@@ -175,7 +175,7 @@
   width: 100%;
 }
 
-.universal-image-picker__source-filter .ui-segmented-control {
+.universal-image-picker__segmented-control {
   width: 100%;
 }
 
@@ -239,7 +239,7 @@
   justify-content: center;
   overflow: hidden;
   border-radius: var(--radius-sm);
-  --img-wrapper-bg: color-mix(in srgb, black 10%, transparent);
+  --img-wrapper-bg: color-mix(in srgb, var(--color-bg-canvas) 10%, transparent);
   background: var(--img-wrapper-bg);
   padding: var(--space-sm);
 }

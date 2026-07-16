@@ -1,12 +1,12 @@
 .recommend-spotlight {
   position: relative;
   width: 100%;
-  height: 25rem;
+  height: var(--ui-spotlight-height);
   margin-bottom: var(--space-4xl);
   overflow: hidden;
   border-radius: var(--radius-xl);
   background: var(--color-bg-elevated);
-  box-shadow: 0 var(--space-xl) 2.5rem color-mix(in srgb, black 40%, transparent);
+  box-shadow: 0 var(--space-xl) 2.5rem color-mix(in srgb, var(--color-bg-canvas) 40%, transparent);
   border: 0;
 }
 
@@ -33,10 +33,10 @@
 
 .recommend-spotlight-copy {
   position: absolute;
-  bottom: 2.5rem;
-  left: 2.5rem;
+  bottom: var(--space-4xl);
+  left: var(--space-4xl);
   z-index: var(--z-index-base);
-  max-width: 31.25rem;
+  max-width: var(--ui-spotlight-max-width);
 }
 
 .recommend-spotlight-title {
@@ -44,7 +44,7 @@
   color: var(--color-text-primary);
   font-size: var(--font-size-5xl);
   font-weight: var(--font-weight-black);
-  text-shadow: 0 0.25rem 0.5rem color-mix(in srgb, black 80%, transparent);
+  text-shadow: 0 0.25rem 0.5rem color-mix(in srgb, var(--color-bg-canvas) 80%, transparent);
   transition: color var(--motion-duration-fast) var(--motion-ease-standard), opacity var(--motion-duration-fast) var(--motion-ease-standard);
   cursor: pointer;
   display: inline-block;
@@ -97,7 +97,7 @@
 
 .recommend-spotlight-year {
   color: color-mix(in srgb, var(--color-text-primary) 92%, transparent);
-  text-shadow: 0 0.125rem 0.25rem color-mix(in srgb, black 80%, transparent);
+  text-shadow: 0 0.125rem 0.25rem color-mix(in srgb, var(--color-bg-canvas) 80%, transparent);
 }
 
 .recommend-spotlight-overview {
@@ -153,8 +153,11 @@
 .recommend-card {
   --ui-poster-card-width: 12.5rem;
   --ui-poster-card-min-width: 12.5rem;
-  will-change: transform;
   transform: translate3d(0, 0, 0);
+}
+
+.recommend-card:hover {
+  will-change: transform;
 }
 
 .recommend-card--scene {
@@ -190,22 +193,16 @@
   opacity: 1;
 }
 
-
-
-
-
-
-
-
 .recommend-card-loading-wrapper {
+  --ui-loading-card-width: 9.375rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 9.375rem;
-  height: 14.0625rem;
+  min-width: var(--ui-loading-card-width);
+  height: calc(var(--ui-loading-card-width) * 1.5);
 }
 
-.recommend-card-loading-wrapper :global(.ui-spinner) {
+.custom-spinner {
   color: var(--color-accent-blue-soft);
 }
 
@@ -227,12 +224,14 @@
   gap: var(--space-md);
 }
 
-.recommend-carousel-filters .recommend-carousel-filter-genre {
-  width: 10rem;
+.recommend-carousel-filter-genre {
+  width: calc(4 * var(--space-4xl));
+  /* 10rem */
 }
 
-.recommend-carousel-filters .recommend-carousel-filter-year {
-  width: 8.125rem;
+.recommend-carousel-filter-year {
+  --ui-dropdown-year-width: 8.125rem;
+  width: var(--ui-dropdown-year-width);
 }
 
 .recommend-carousel-no-results {
@@ -242,13 +241,9 @@
 }
 
 .is-left {
-  left: 0.625rem;
+  left: var(--space-md);
 }
 
 .is-right {
-  right: 0.625rem;
+  right: var(--space-md);
 }
-
-
-
-
