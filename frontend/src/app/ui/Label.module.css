@@ -1,0 +1,6 @@
+.root {
+  color: var(--color-muted);
+  font: var(--text-caption);
+  letter-spacing: calc(2 * var(--letter-spacing-wide));
+  text-transform: uppercase;
+}

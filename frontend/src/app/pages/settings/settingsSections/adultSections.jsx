@@ -1,6 +1,7 @@
 import Inline from '@/ui/Inline';
 import Badge from '@/ui/Badge';
 import SettingsInstructionsBox from '../components/SettingsInstructionsBox.jsx';
+import styles from '../SettingsPage.module.css';
 
 const STASHDB_DOMAIN = 'stashdb.org';
 const FANSDB_DOMAIN = 'fansdb.cc';
@@ -16,7 +17,7 @@ export function createAdultGeneralSection(t, adultGenderPreferenceOptions) {
         field: 'include_adult',
         id: 'include_adult',
         hint: t('settingsPage.sections.adult.includeAdultHint'),
-        hintClassName: 'settings-field-hint settings-hint--spaced',
+        hintClassName: `settings-field-hint ${styles['hint-spaced']}`,
         children: (
           <Inline gap="sm" align="center" className="settings-inline-switch">
             <span>{t('settingsPage.sections.adult.includeAdult')}</span>

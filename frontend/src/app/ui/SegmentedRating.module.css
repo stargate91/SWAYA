@@ -82,3 +82,19 @@
   color: var(--color-text-primary);
   margin-left: var(--space-sm);
 }
+
+.bar[data-readonly] {
+  cursor: default;
+}
+
+.bar[data-readonly]:hover .segment {
+  --local-bg: color-mix(in srgb, var(--color-ink) 8%, transparent);
+  background: var(--local-bg);
+  border-color: var(--color-border-subtle);
+}
+
+.bar[data-readonly]:hover .fill {
+  opacity: 0.85;
+  box-shadow: none;
+}
+

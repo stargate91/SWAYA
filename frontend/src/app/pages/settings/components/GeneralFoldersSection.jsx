@@ -1,8 +1,10 @@
 import { AlertTriangle } from '@/ui/icons';
 import Card from '@/ui/Card';
 import Stack from '@/ui/Stack';
+import Alert from '@/ui/Alert';
 import { useSettingsField, useSettingsFormContext, useSettingsInputRef } from '../SettingsFormContext.jsx';
 import SettingsPathField from './fields/SettingsPathField.jsx';
+import styles from '../SettingsPage.module.css';
 
 export default function GeneralFoldersSection({ t }) {
   const { validationErrors } = useSettingsFormContext();
@@ -18,13 +20,13 @@ export default function GeneralFoldersSection({ t }) {
     >
       <Stack>
         {validationErrors.folders && !validationErrors.scanFolder && !validationErrors.targetFolder && (
-          <div className="settings-alert settings-alert--danger settings-alert--spaced">
+          <Alert variant="danger">
             <AlertTriangle size={16} />
             <span>{validationErrors.folders}</span>
-          </div>
+          </Alert>
         )}
 
-        <div className="settings-field-stack">
+        <Stack gap="xs">
           <SettingsPathField
             field="default_scan_dir"
             t={t}
@@ -32,10 +34,10 @@ export default function GeneralFoldersSection({ t }) {
             placeholder={t('settingsPage.sections.folders.scanFolderPlaceholder')}
             inputRef={scanFolderInputRef}
           />
-        </div>
+        </Stack>
 
         {moveToLibraryField.checked && (
-          <div className="settings-field-stack settings-field-stack--spaced">
+          <Stack gap="xs" className={styles['nested-block-top']}>
             <SettingsPathField
               field="folder_library_path"
               t={t}
@@ -44,12 +46,12 @@ export default function GeneralFoldersSection({ t }) {
               inputRef={targetFolderInputRef}
             />
             {!(targetFolderField.value || '').trim() && (
-              <div className="settings-alert settings-alert--warning settings-alert--soft">
+              <Alert variant="warning">
                 <AlertTriangle size={16} className="settings-icon-shrink-0" />
                 <span>{t('settingsPage.sections.mode.warningHint')}</span>
-              </div>
+              </Alert>
             )}
-          </div>
+          </Stack>
         )}
       </Stack>
     </Card>

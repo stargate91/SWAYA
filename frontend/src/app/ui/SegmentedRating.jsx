@@ -4,7 +4,7 @@ import styles from './SegmentedRating.module.css';
 
 export default function SegmentedRating({
   value,
-  onChange,
+  onChange = () => {},
   t,
   labelUnder = false,
   className = '',
@@ -13,13 +13,15 @@ export default function SegmentedRating({
   segmentFillClassName = '',
   labelClassName = '',
   formatLabel,
+  readonly = false,
+  showLabel = true,
 }) {
   const {
     hoveredRating,
     displayRating,
     handleMouseMove,
     handleMouseLeave
-  } = useRatingHover(value);
+  } = useRatingHover(readonly ? value : value);
 
   const handleClick = (e) => {
     e.stopPropagation();
@@ -65,26 +67,29 @@ export default function SegmentedRating({
   const segmentClass = `${styles.segment} ${segmentClassName}`.trim();
   const segmentFillClass = `${styles.fill} ${segmentFillClassName}`.trim();
 
+  const displayVal = readonly ? parseFloat(value) || 0 : displayRating;
+
   return (
     <div className={containerClass}>
       <div
         className={barClass}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        onMouseUp={handleClick}
-        role="slider"
-        tabIndex={0}
+        onMouseMove={readonly ? undefined : handleMouseMove}
+        onMouseLeave={readonly ? undefined : handleMouseLeave}
+        onMouseUp={readonly ? undefined : handleClick}
+        role={readonly ? undefined : "slider"}
+        tabIndex={readonly ? undefined : 0}
         aria-label={t('library.yourRating') || 'Your Rating'}
         aria-valuemin={0}
         aria-valuemax={10}
-        aria-valuenow={displayRating ?? 0}
+        aria-valuenow={displayVal}
+        data-readonly={readonly || undefined}
       >
         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((val) => {
           let fill = 0;
-          if (displayRating >= val) {
+          if (displayVal >= val) {
             fill = 100;
-          } else if (displayRating > val - 1) {
-            fill = (displayRating - (val - 1)) * 100;
+          } else if (displayVal > val - 1) {
+            fill = (displayVal - (val - 1)) * 100;
           }
           return (
             <div key={val} className={segmentClass}>
@@ -97,14 +102,14 @@ export default function SegmentedRating({
           );
         })}
       </div>
-      {renderLabel()}
+      {showLabel && renderLabel()}
     </div>
   );
 }
 
 SegmentedRating.propTypes = {
   value: PropTypes.number,
-  onChange: PropTypes.func.isRequired,
+  onChange: PropTypes.func,
   t: PropTypes.func.isRequired,
   labelUnder: PropTypes.bool,
   className: PropTypes.string,
@@ -113,4 +118,7 @@ SegmentedRating.propTypes = {
   segmentFillClassName: PropTypes.string,
   labelClassName: PropTypes.string,
   formatLabel: PropTypes.func,
+  readonly: PropTypes.bool,
+  showLabel: PropTypes.bool,
 };
+

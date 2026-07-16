@@ -3,6 +3,8 @@ import Card from '@/ui/Card';
 import Stack from '@/ui/Stack';
 import Inline from '@/ui/Inline';
 import Button from '@/ui/Button';
+import Hint from '@/ui/Hint';
+import styles from '../SettingsPage.module.css';
 
 export default function MaintenanceTab({
   t,
@@ -24,10 +26,10 @@ export default function MaintenanceTab({
         eyebrow={t('settingsPage.sections.backup.eyebrow')}
       >
         <Stack>
-          <span className="settings-field-hint">
+          <Hint>
             {t('settingsPage.sections.backup.description')}
-          </span>
-          <Inline gap="md" className="settings-inline-actions">
+          </Hint>
+          <Inline gap="md" justify="end" className={styles['action-row-right']}>
             <Button variant="secondary" onClick={handleExportSettings} disabled={isSaving}>
               {t('settingsPage.sections.backup.exportBtn')}
             </Button>
@@ -39,18 +41,23 @@ export default function MaintenanceTab({
               ref={formInputs.backupFile}
               onChange={handleImportSettings}
               accept=".json"
-              className="settings-hidden-input"
+              className={styles['hidden-input']}
             />
           </Inline>
         </Stack>
       </Card>
 
-      <Card title={t('settingsPage.dangerZone.wipeCacheTitle')} eyebrow={t('settingsPage.dangerZone.eyebrow')} variant="danger" className="settings-danger-zone-card">
+      <Card
+        title={t('settingsPage.dangerZone.wipeCacheTitle')}
+        eyebrow={t('settingsPage.dangerZone.eyebrow')}
+        variant="danger"
+        className={styles['danger-zone-card']}
+      >
         <Stack>
-          <span className="settings-field-hint settings-danger-zone-card__hint">
+          <Hint className={styles['danger-zone-card-hint']}>
             {t('settingsPage.dangerZone.wipeCacheDesc')}
-          </span>
-          <Inline className="settings-inline-actions settings-danger-zone-card__actions">
+          </Hint>
+          <Inline justify="end" className={styles['danger-zone-card-actions']}>
             <Button variant="danger" onClick={handleWipeCache} disabled={isWipingCache || isSaving || isScanActive}>
               {isWipingCache ? t('settingsPage.dangerZone.wipeCacheWiping') : t('settingsPage.dangerZone.wipeCacheBtn')}
             </Button>
@@ -58,12 +65,17 @@ export default function MaintenanceTab({
         </Stack>
       </Card>
 
-      <Card title={t('settingsPage.dangerZone.title')} eyebrow={t('settingsPage.dangerZone.eyebrow')} variant="danger" className="settings-danger-zone-card">
+      <Card
+        title={t('settingsPage.dangerZone.title')}
+        eyebrow={t('settingsPage.dangerZone.eyebrow')}
+        variant="danger"
+        className={styles['danger-zone-card']}
+      >
         <Stack>
-          <span className="settings-field-hint settings-danger-zone-card__hint">
+          <Hint className={styles['danger-zone-card-hint']}>
             {t('settingsPage.dangerZone.desc')}
-          </span>
-          <Inline className="settings-inline-actions settings-danger-zone-card__actions">
+          </Hint>
+          <Inline justify="end" className={styles['danger-zone-card-actions']}>
             <Button variant="danger" onClick={handleWipeDatabase} disabled={isWiping || isSaving || isScanActive}>
               {isWiping ? t('settingsPage.dangerZone.buttonWiping') : t('settingsPage.dangerZone.button')}
             </Button>

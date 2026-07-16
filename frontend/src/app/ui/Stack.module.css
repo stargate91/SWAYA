@@ -20,3 +20,10 @@
 .gap-2xl { gap: var(--space-lg); }
 .gap-3xl { gap: var(--space-xl); }
 .gap-4xl { gap: var(--space-2xl); }
+.gap-5xl { gap: var(--space-3xl); }
+
+.justify-center {
+  justify-content: center;
+}
+
+

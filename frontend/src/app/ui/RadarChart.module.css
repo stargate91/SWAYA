@@ -1,0 +1,10 @@
+.chart {
+  display: block;
+  width: 100%;
+  max-width: 16.25rem;
+  overflow: visible;
+}
+
+.value-polygon {
+  filter: drop-shadow(0 0 1.125rem color-mix(in srgb, var(--color-accent-blue-soft) 22%, transparent));
+}

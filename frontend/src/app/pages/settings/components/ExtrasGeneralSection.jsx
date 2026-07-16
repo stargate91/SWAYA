@@ -1,10 +1,12 @@
 import Card from '@/ui/Card';
 import Stack from '@/ui/Stack';
+import InfoBox from '@/ui/InfoBox';
 import { useSettingsField, useSettingsViewContext } from '../SettingsFormContext.jsx';
 import { EXTRAS_FOLDER_MODES } from '../settingsConstants.js';
 import SettingsSwitchField from './fields/SettingsSwitchField.jsx';
 import SettingsSelectField from './fields/SettingsSelectField.jsx';
 import SettingsTextField from './fields/SettingsTextField.jsx';
+import styles from '../SettingsPage.module.css';
 
 export default function ExtrasGeneralSection({ t }) {
   const { extrasFolderModeOptions } = useSettingsViewContext();
@@ -24,7 +26,7 @@ export default function ExtrasGeneralSection({ t }) {
         >
           {t('settingsPage.sections.extras.extrasEnabled')}
         </SettingsSwitchField>
-        <span className="settings-field-hint settings-hint--medium">
+        <span className={`settings-field-hint ${styles['hint-compact-bottom']}`}>
           {t('settingsPage.sections.extras.extrasEnabledHint')}
         </span>
 
@@ -48,9 +50,9 @@ export default function ExtrasGeneralSection({ t }) {
                 )}
               </>
             ) : (
-              <div className="settings-info-box">
+              <InfoBox>
                 {t('settingsPage.sections.extras.inplaceInfo')}
-              </div>
+              </InfoBox>
             )}
           </>
         )}

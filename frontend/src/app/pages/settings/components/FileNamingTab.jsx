@@ -28,7 +28,6 @@ export default function FileNamingTab({
         eyebrow={t('settingsPage.sections.fileNaming.eyebrow')}
       >
         <Stack gap="xl">
-          <div className="settings-section-stack">
             <h3 className="settings-section-heading">
               {t('settingsPage.sections.fileNaming.styleTitle')}
             </h3>
@@ -50,13 +49,11 @@ export default function FileNamingTab({
                 onChange={handleChange('naming_word_separator')}
               />
             </Stack>
-          </div>
 
-          <div className="settings-section-stack">
-            <h3 className="settings-section-heading">
-              {t('settingsPage.sections.fileNaming.templatesTitle')}
-            </h3>
             <Stack gap="lg">
+              <h3 className="settings-section-heading">
+                {t('settingsPage.sections.fileNaming.templatesTitle')}
+              </h3>
               <Input
                 label={t('settingsPage.sections.fileNaming.customTagLabel')}
                 hint={t('settingsPage.sections.fileNaming.customTagHint')}
@@ -96,12 +93,11 @@ export default function FileNamingTab({
                 previewText={getPreview(form.naming_episode_template, 'episode')}
               />
             </Stack>
-          </div>
 
-          <div className="settings-section-stack">
-            <h3 className="settings-section-heading">
-              {t('settingsPage.sections.fileNaming.fileTypesTitle')}
-            </h3>
+            <Stack gap="lg">
+              <h3 className="settings-section-heading">
+                {t('settingsPage.sections.fileNaming.fileTypesTitle')}
+              </h3>
             <Input
               label={t('settingsPage.sections.fileNaming.videoExtsLabel')}
               hint={t('settingsPage.sections.fileNaming.videoExtsHint')}
@@ -110,7 +106,7 @@ export default function FileNamingTab({
               onChange={handleChange('naming_video_exts')}
               placeholder=".mkv, .mp4, .avi, .m4v, .mov, .wmv, .mpg, .mpeg"
             />
-          </div>
+            </Stack>
         </Stack>
       </Card>
 

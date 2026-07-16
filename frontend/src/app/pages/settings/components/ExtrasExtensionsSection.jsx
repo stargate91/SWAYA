@@ -9,7 +9,6 @@ export default function ExtrasExtensionsSection({ t }) {
       eyebrow={t('settingsPage.sections.extras.extensionsEyebrow')}
     >
       <Stack gap="xl">
-        <div className="settings-section-stack">
           <h3 className="settings-section-heading">
             {t('settingsPage.sections.extras.mediaSideFilesTitle')}
           </h3>
@@ -25,8 +24,6 @@ export default function ExtrasExtensionsSection({ t }) {
               placeholder=".mka, .ac3, .dts"
             />
           </Stack>
-        </div>
-        <div className="settings-section-stack">
           <h3 className="settings-section-heading">
             {t('settingsPage.sections.extras.supportFilesTitle')}
           </h3>
@@ -42,7 +39,6 @@ export default function ExtrasExtensionsSection({ t }) {
               placeholder=".nfo, .xml, .txt"
             />
           </Stack>
-        </div>
       </Stack>
     </Card>
   );

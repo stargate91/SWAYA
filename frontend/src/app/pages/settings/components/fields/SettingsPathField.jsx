@@ -2,6 +2,7 @@ import Button from '@/ui/Button';
 import SettingsTextField from './SettingsTextField.jsx';
 import { useSettingsFormContext, useSettingsField } from '../../SettingsFormContext.jsx';
 import Inline from '@/ui/Inline';
+import styles from '../../SettingsPage.module.css';
 
 export default function SettingsPathField({
   field,
@@ -9,7 +10,7 @@ export default function SettingsPathField({
   picker = 'folder',
   disabled = false,
   buttonLabel,
-  className = 'settings-browse-button',
+  className = '',
   ...props
 }) {
   const { actions, isSaving } = useSettingsFormContext();
@@ -22,14 +23,14 @@ export default function SettingsPathField({
 
   return (
     <Inline gap="md" align="end" className="settings-input-row">
-      <div className="settings-input-grow">
+      <div className="u-flex-1">
         <SettingsTextField field={field} {...props} />
       </div>
       <Button
         variant="secondary"
         onClick={handlePick}
         disabled={isFieldDisabled || isSaving}
-        className={className}
+        className={`${styles['browse-button']} ${className}`}
       >
         {buttonLabel || t('settingsPage.sections.folders.browse')}
       </Button>

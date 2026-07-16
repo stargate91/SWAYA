@@ -1,5 +1,6 @@
 import SettingsSelectField from './fields/SettingsSelectField.jsx';
 import TemplateFieldSection from './TemplateFieldSection.jsx';
+import styles from '../SettingsPage.module.css';
 
 export default function TemplateRuleField({
   t,
@@ -38,9 +39,10 @@ export default function TemplateRuleField({
           fieldKey={templateFieldKey}
           insertTag={insertTag}
           previewText={previewText}
-          className="settings-nested-block settings-nested-block--top"
+          className={`${styles['nested-block']} ${styles['nested-block-top']}`}
         />
       )}
     </div>
   );
 }
+

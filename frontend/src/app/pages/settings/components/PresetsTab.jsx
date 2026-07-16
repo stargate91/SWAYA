@@ -5,8 +5,14 @@ import { useSettingsPresets } from '../hooks';
 import SettingsLiveImpact from './SettingsLiveImpact.jsx';
 import { useSettingsFormContext } from '../SettingsFormContext.jsx';
 import styles from '../SettingsPage.module.css';
-import presetStyles from './PresetsTab.module.css';
 import Inline from '@/ui/Inline';
+import ChoiceField from '@/ui/ChoiceField';
+import Label from '@/ui/Label';
+import Hint from '@/ui/Hint';
+import Stack from '@/ui/Stack';
+import Badge from '@/ui/Badge';
+import Text from '@/ui/Text';
+import Grid from '@/ui/Grid';
 
 export default function PresetsTab() {
   const {
@@ -21,79 +27,79 @@ export default function PresetsTab() {
   const isScanActive = Boolean(renderContext?.isBackgroundActive);
 
   return (
-    <div className={styles['settings-tab-stack']}>
+    <Stack gap="3xl">
       <Card
         title={t('settingsPage.sections.mode.title')}
         eyebrow={t('settingsPage.sections.mode.eyebrow')}
       >
-        <div className={styles['settings-section-stack']}>
-          <span className="settings-field-hint settings-hint--tight-top">
+        <Stack gap="lg">
+          <Hint className={styles['hint-tight-top']}>
             {t('settingsPage.sections.mode.hint')}
-          </span>
-          <div className={presetStyles['settings-mode-grid']}>
+          </Hint>
+          <Grid variant="split">
             {/* Mode A: Library sorting */}
             <SelectableCard
               as="div"
               onClick={isScanActive ? undefined : () => setMoveToLibrary(true)}
-              className={presetStyles['settings-mode-card']}
               selected={form.folder_move_to_library}
               disabled={isScanActive}
             >
-              <Inline gap="md" align="center" className="settings-choice-header">
-                <input
-                  type="radio"
-                  checked={form.folder_move_to_library}
-                  onChange={() => {}}
-                  disabled={isScanActive}
-                  className="settings-choice-input"
-                />
-                <span className={`settings-choice-title${form.folder_move_to_library ? ' is-active' : ''}`}>
-                  {t('settingsPage.sections.mode.library')}
-                </span>
-              </Inline>
-              <span className="settings-choice-description">
-                {t('settingsPage.sections.mode.libraryHint')}
-              </span>
+              <Stack gap="sm">
+                <Inline gap="md" align="center" className="settings-choice-header">
+                  <ChoiceField.Input
+                    type="radio"
+                    checked={form.folder_move_to_library}
+                    onChange={() => {}}
+                    disabled={isScanActive}
+                  />
+                  <ChoiceField.Title isActive={form.folder_move_to_library}>
+                    {t('settingsPage.sections.mode.library')}
+                  </ChoiceField.Title>
+                </Inline>
+                <ChoiceField.Description>
+                  {t('settingsPage.sections.mode.libraryHint')}
+                </ChoiceField.Description>
+              </Stack>
             </SelectableCard>
 
             {/* Mode B: In-place Rename */}
             <SelectableCard
               as="div"
               onClick={isScanActive ? undefined : () => setMoveToLibrary(false)}
-              className={presetStyles['settings-mode-card']}
               selected={!form.folder_move_to_library}
               disabled={isScanActive}
             >
-              <Inline gap="md" align="center" className="settings-choice-header">
-                <input
-                  type="radio"
-                  checked={!form.folder_move_to_library}
-                  onChange={() => {}}
-                  disabled={isScanActive}
-                  className="settings-choice-input"
-                />
-                <span className={`settings-choice-title${!form.folder_move_to_library ? ' is-active' : ''}`}>
-                  {t('settingsPage.sections.mode.inplace')}
-                </span>
-              </Inline>
-              <span className="settings-choice-description">
-                {t('settingsPage.sections.mode.inplaceHint')}
-              </span>
+              <Stack gap="sm">
+                <Inline gap="md" align="center" className="settings-choice-header">
+                  <ChoiceField.Input
+                    type="radio"
+                    checked={!form.folder_move_to_library}
+                    onChange={() => {}}
+                    disabled={isScanActive}
+                  />
+                  <ChoiceField.Title isActive={!form.folder_move_to_library}>
+                    {t('settingsPage.sections.mode.inplace')}
+                  </ChoiceField.Title>
+                </Inline>
+                <ChoiceField.Description>
+                  {t('settingsPage.sections.mode.inplaceHint')}
+                </ChoiceField.Description>
+              </Stack>
             </SelectableCard>
-          </div>
-        </div>
+          </Grid>
+        </Stack>
       </Card>
 
       <Card
         title={t('settingsPage.sections.organization.title')}
         eyebrow={t('settingsPage.sections.organization.eyebrow')}
       >
-        <div className={styles['settings-section-stack']}>
-          <span className="settings-field-label">{t('settingsPage.sections.organization.presetLabel')}</span>
-          <span className="settings-field-hint settings-hint--compact">
+        <Stack gap="lg">
+          <Label>{t('settingsPage.sections.organization.presetLabel')}</Label>
+          <Hint className={styles['hint-compact-bottom']}>
             {t('settingsPage.sections.organization.presetHint')}
-          </span>
-          <div className={presetStyles['settings-preset-grid']}>
+          </Hint>
+          <Grid variant="auto-card">
             {presetCards.map((preset) => {
               const isSelected = form.organization_preset === preset.value;
               const isCardDisabled = isScanActive || (form.custom_organization_enabled && !isSelected);
@@ -102,45 +108,46 @@ export default function PresetsTab() {
                   as="div"
                   key={preset.value}
                   onClick={isScanActive || form.custom_organization_enabled ? undefined : () => applyPreset(preset.value)}
-                  className={presetStyles['settings-preset-card']}
                   selected={isSelected}
                   disabled={isCardDisabled}
                 >
-                  <Inline gap="sm" align="center" className="settings-choice-header settings-choice-header--compact">
-                    <span className={presetStyles['settings-preset-icon']}>{preset.icon}</span>
-                    <span className={`${presetStyles['settings-preset-title']}${isSelected ? ` ${presetStyles['is-active']}` : ''}`}>
-                      {preset.label}
-                    </span>
-                    {isSelected && (
-                      <span className={presetStyles['settings-preset-badge']}>
-                        {t('settingsPage.sections.organization.activePreset')}
-                      </span>
-                    )}
-                  </Inline>
-                  <span className={presetStyles['settings-preset-description']}>
-                    {preset.desc}
-                  </span>
+                  <Stack gap="sm">
+                    <Inline gap="sm" align="center" className="settings-choice-header settings-choice-header--compact">
+                      <Text variant="display">{preset.icon}</Text>
+                      <Text variant="small" weight={isSelected ? 'semibold' : 'normal'} color={isSelected ? 'accent' : 'primary'}>
+                        {preset.label}
+                      </Text>
+                      {isSelected && (
+                        <Badge tone="accent" size="sm" className="u-margin-left-auto">
+                          {t('settingsPage.sections.organization.activePreset')}
+                        </Badge>
+                      )}
+                    </Inline>
+                    <Text variant="caption" color="muted">
+                      {preset.desc}
+                    </Text>
+                  </Stack>
                 </SelectableCard>
               );
             })}
-          </div>
+          </Grid>
           
-          <div className={styles['settings-choice-stack']}>
+          <Stack gap="xs">
             <Switch
               id="custom_organization_enabled"
               checked={form.custom_organization_enabled}
               disabled={isScanActive}
               onChange={(e) => setCustomOrganizationEnabled(e.target.checked)}
             >
-              <span className="settings-choice-label-text">
+              <ChoiceField.LabelText>
                 {t('settingsPage.sections.organization.customToggleLabel')}
-              </span>
+              </ChoiceField.LabelText>
             </Switch>
-            <span className="settings-field-hint settings-hint--indented">
+            <Hint className={styles['hint-indented']}>
               {t('settingsPage.sections.organization.customToggleHint')}
-            </span>
-          </div>
-        </div>
+            </Hint>
+          </Stack>
+        </Stack>
       </Card>
 
       <SettingsLiveImpact
@@ -150,6 +157,6 @@ export default function PresetsTab() {
         eyebrow={t('settingsPage.sections.organization.previewEyebrow')}
         hint={t('settingsPage.sections.organization.previewHint')}
       />
-    </div>
+    </Stack>
   );
 }

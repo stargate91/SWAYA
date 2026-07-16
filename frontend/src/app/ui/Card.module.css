@@ -30,6 +30,20 @@
   padding: var(--space-xl);
 }
 
+.card[data-padding="md"] .body {
+  padding: var(--space-md) var(--space-lg);
+}
+
+.card[data-padding="xl"] .body {
+  padding: var(--space-3xl);
+}
+
+.card[data-padding="none"] .body {
+  padding: 0;
+}
+
+
+
 .card[data-variant="danger"] {
   border: 0.0625rem solid var(--ui-surface-danger-border);
   background: 
@@ -46,3 +60,66 @@
 .card[data-variant="danger"] .title {
   color: color-mix(in srgb, var(--color-state-danger) 26%, var(--color-text-primary));
 }
+
+.card[data-variant="flat-glass"] {
+  border: 1px solid color-mix(in srgb, var(--color-border-subtle) 88%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-surface-card) 58%, transparent);
+}
+
+.card[data-variant="interactive-glass"] {
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--color-accent-blue-soft) 12%, transparent), transparent 42%),
+    linear-gradient(180deg, color-mix(in srgb, var(--color-surface-glass) 72%, transparent), var(--color-surface-card));
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-2xl);
+  backdrop-filter: blur(1rem);
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--motion-duration-emphasized) var(--motion-ease-emphasized),
+              background var(--motion-duration-emphasized) var(--motion-ease-emphasized),
+              transform var(--motion-duration-emphasized) var(--motion-ease-emphasized),
+              box-shadow var(--motion-duration-emphasized) var(--motion-ease-emphasized);
+}
+
+.card[data-variant="interactive-glass"]:hover {
+  border-color: var(--color-border-heavy);
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--color-accent-blue-soft) 22%, transparent), transparent 48%),
+    linear-gradient(180deg, color-mix(in srgb, var(--color-surface-glass) 82%, transparent), var(--color-surface-card));
+  transform: translateY(-0.125rem);
+  box-shadow: var(--shadow-lg), 0 0 0.9375rem color-mix(in srgb, var(--color-accent-blue-soft) 10%, transparent);
+}
+
+.header[data-divider="true"] {
+  border-bottom: 0.0625rem solid var(--color-border-subtle);
+  padding-bottom: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.glow-blob {
+  position: absolute;
+  inset: auto -18% -42% auto;
+  width: 8.75rem;
+  height: 8.75rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-accent-blue) 18%, transparent) 0%, transparent 68%);
+  pointer-events: none;
+}
+
+.card[data-variant="soft"] {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-panel-soft);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.card[data-variant="soft"] a {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+
+
+

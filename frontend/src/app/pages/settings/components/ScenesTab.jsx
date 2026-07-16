@@ -8,6 +8,8 @@ import { useTemplatePreview } from '../hooks';
 import { useSettingsFormContext } from '../SettingsFormContext.jsx';
 import TemplateFieldSection from './TemplateFieldSection.jsx';
 import SettingsLiveImpact from './SettingsLiveImpact.jsx';
+import styles from '../SettingsPage.module.css';
+
 
 const formatPreviewDate = (format) => String(format || '%Y-%m-%d')
   .replaceAll('%Y', '2024')
@@ -153,7 +155,7 @@ export default function ScenesTab({
           >
             {t('settingsPage.sections.scenes.preventTitlePerformer')}
           </Switch>
-          <span className="settings-field-hint settings-hint--tight-top">
+          <span className={`settings-field-hint ${styles['hint-tight-top']}`}>
             {t('settingsPage.sections.scenes.preventTitlePerformerHint')}
           </span>
         </Stack>
@@ -178,7 +180,7 @@ export default function ScenesTab({
             >
               {t('settingsPage.sections.scenes.createSceneSubdir') || 'Create separate folder for each scene'}
             </Switch>
-            <span className="settings-field-hint settings-hint--block-compact">
+            <span className={`settings-field-hint ${styles['hint-block-compact']}`}>
               {t('settingsPage.sections.scenes.createSceneSubdirHint') || 'Organize each scene into its own directory.'}
             </span>
 
@@ -195,7 +197,7 @@ export default function ScenesTab({
                 fieldKey="folder_scene_template"
                 insertTag={insertTag}
                 previewText={folderPreview}
-                className="settings-nested-block settings-nested-block--top"
+                className={`${styles['nested-block']} ${styles['nested-block-top']}`}
               />
             )}
           </div>
@@ -281,7 +283,7 @@ export default function ScenesTab({
           >
             {t('settingsPage.sections.scenes.squeezeStudioNames')}
           </Switch>
-          <span className="settings-field-hint settings-hint--tight-top">
+          <span className={`settings-field-hint ${styles['hint-tight-top']}`}>
             {t('settingsPage.sections.scenes.squeezeStudioNamesHint')}
           </span>
         </Stack>

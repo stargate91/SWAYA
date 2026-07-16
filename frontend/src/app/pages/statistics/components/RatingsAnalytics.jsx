@@ -2,7 +2,11 @@ import { BarChart2, CheckCircle, Users, Heart } from '@/ui/icons';
 import SegmentedControl from '@/ui/SegmentedControl';
 import Skeleton from '@/ui/Skeleton';
 import Inline from '@/ui/Inline';
-import './RatingsAnalytics.css';
+import Card from '@/ui/Card';
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
+import LinearProgress from '@/ui/LinearProgress';
+import SegmentedRating from '@/ui/SegmentedRating';
 
 const bulletSep = '\u2022';
 
@@ -15,264 +19,227 @@ const getPercentageText = (rated, unrated) => {
 export function RatingsSummary({ state, t }) {
   if (state.isStatsLoading) {
     return (
-      <div className="ratings-analytics-loading-summary">
+      <Stack gap="md" className="u-w-full">
         {Array.from({ length: 3 }).map((_, idx) => (
-          <div key={idx} className="ratings-analytics-loading-card">
-            <Skeleton className="ratings-analytics-loading-skeleton-title" variant="rect" />
-            <Skeleton className="ratings-analytics-loading-skeleton-text" variant="text" />
-          </div>
+          <Card key={idx} variant="interactive-glass" className="u-min-h-card-loading">
+            <Skeleton className="u-skeleton-title" variant="rect" />
+            <Skeleton className="u-skeleton-text" variant="text" />
+          </Card>
         ))}
-      </div>
+      </Stack>
     );
   }
 
   return (
-    <div className="analytics-summary-container">
+    <Stack gap="5xl" fill>
       {/* CARD 1: Media Average Ratings */}
-      <div className="analytics-card compact-stats-card">
-        <Inline align="center" className="compact-stats-card__header">
-          <span className="analytics-card__title">
-            {t('ratings.stats.mediaAverages', { defaultValue: 'Average Ratings' })}
-          </span>
-          <BarChart2 size={16} className="analytics-card__icon text-accent-blue" />
-        </Inline>
-        <div className="compact-stats-card__content">
+      <Card
+        variant="interactive-glass"
+        padding="md"
+        divider
+        className="u-flex-1 u-flex-column"
+        eyebrow={t('ratings.stats.mediaAverages', { defaultValue: 'Average Ratings' })}
+        actions={<BarChart2 size={16} className="icon-glow-blue" />}
+      >
+        <Stack gap="sm" fill justify="center">
           {/* Movies Row */}
-          <Inline gap="md" align="center" className="compact-stats-row">
-            <div className="compact-stats-row__label">
+          <Inline gap="md" align="center" justify="between" className="u-min-h-row">
+            <Text variant="body" color="muted" weight="medium">
               {t('ratings.subtabs.movies', { defaultValue: 'Movies' })}
-            </div>
-            <Inline gap="md" align="center" className="compact-stats-row__value-wrapper">
-              <span className="compact-stats-row__value">{state.moviesStats.average}</span>
-              <div className="analytics-mini-segmented-bar">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((val) => {
-                  const avg = parseFloat(state.moviesStats.average) || 0;
-                  let fill = 0;
-                  if (avg >= val) fill = 100;
-                  else if (avg > val - 1) fill = (avg - (val - 1)) * 100;
-                  return (
-                    <div key={val} className="analytics-segment">
-                      {/* eslint-disable-next-line react/forbid-dom-props */}
-                      <div className="analytics-segment-fill" style={{ width: `${fill}%` }} />
-                    </div>
-                  );
-                })}
-              </div>
+            </Text>
+            <Inline gap="md" align="center">
+              <Text variant="title" color="primary" weight="bold">{state.moviesStats.average}</Text>
+              <SegmentedRating
+                readonly
+                showLabel={false}
+                value={parseFloat(state.moviesStats.average) || 0}
+                t={t}
+              />
             </Inline>
           </Inline>
 
           {/* TV Shows Row */}
-          <Inline gap="md" align="center" className="compact-stats-row">
-            <div className="compact-stats-row__label">
+          <Inline gap="md" align="center" justify="between" className="u-min-h-row">
+            <Text variant="body" color="muted" weight="medium">
               {t('ratings.subtabs.tvShows', { defaultValue: 'TV Shows' })}
-            </div>
-            <Inline gap="md" align="center" className="compact-stats-row__value-wrapper">
-              <span className="compact-stats-row__value">{state.tvStats.average}</span>
-              <div className="analytics-mini-segmented-bar">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((val) => {
-                  const avg = parseFloat(state.tvStats.average) || 0;
-                  let fill = 0;
-                  if (avg >= val) fill = 100;
-                  else if (avg > val - 1) fill = (avg - (val - 1)) * 100;
-                  return (
-                    <div key={val} className="analytics-segment">
-                      {/* eslint-disable-next-line react/forbid-dom-props */}
-                      <div className="analytics-segment-fill" style={{ width: `${fill}%` }} />
-                    </div>
-                  );
-                })}
-              </div>
+            </Text>
+            <Inline gap="md" align="center">
+              <Text variant="title" color="primary" weight="bold">{state.tvStats.average}</Text>
+              <SegmentedRating
+                readonly
+                showLabel={false}
+                value={parseFloat(state.tvStats.average) || 0}
+                t={t}
+              />
             </Inline>
           </Inline>
 
           {/* Scenes Row */}
           {state.activeSessionMode === 'nsfw' && (
-            <Inline gap="md" align="center" className="compact-stats-row">
-              <div className="compact-stats-row__label">
+            <Inline gap="md" align="center" justify="between" className="u-min-h-row">
+              <Text variant="body" color="muted" weight="medium">
                 {t('ratings.subtabs.scenes', { defaultValue: 'Scenes' })}
-              </div>
-              <Inline gap="md" align="center" className="compact-stats-row__value-wrapper">
-                <span className="compact-stats-row__value">{state.scenesStats.average}</span>
-                <div className="analytics-mini-segmented-bar">
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((val) => {
-                    const avg = parseFloat(state.scenesStats.average) || 0;
-                    let fill = 0;
-                    if (avg >= val) fill = 100;
-                    else if (avg > val - 1) fill = (avg - (val - 1)) * 100;
-                    return (
-                      <div key={val} className="analytics-segment">
-                        {/* eslint-disable-next-line react/forbid-dom-props */}
-                        <div className="analytics-segment-fill" style={{ width: `${fill}%` }} />
-                      </div>
-                    );
-                  })}
-                </div>
+              </Text>
+              <Inline gap="md" align="center">
+                <Text variant="title" color="primary" weight="bold">{state.scenesStats.average}</Text>
+                <SegmentedRating
+                  readonly
+                  showLabel={false}
+                  value={parseFloat(state.scenesStats.average) || 0}
+                  t={t}
+                />
               </Inline>
             </Inline>
           )}
 
           {/* Videos Row */}
-          <Inline gap="md" align="center" className="compact-stats-row">
-            <div className="compact-stats-row__label">
+          <Inline gap="md" align="center" justify="between" className="u-min-h-row">
+            <Text variant="body" color="muted" weight="medium">
               {t('library.tabs.videos') || 'Videos'}
-            </div>
-            <Inline gap="md" align="center" className="compact-stats-row__value-wrapper">
-              <span className="compact-stats-row__value">{state.videosStats.average}</span>
-              <div className="analytics-mini-segmented-bar">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((val) => {
-                  const avg = parseFloat(state.videosStats.average) || 0;
-                  let fill = 0;
-                  if (avg >= val) fill = 100;
-                  else if (avg > val - 1) fill = (avg - (val - 1)) * 100;
-                  return (
-                    <div key={val} className="analytics-segment">
-                      {/* eslint-disable-next-line react/forbid-dom-props */}
-                      <div className="analytics-segment-fill" style={{ width: `${fill}%` }} />
-                    </div>
-                  );
-                })}
-              </div>
+            </Text>
+            <Inline gap="md" align="center">
+              <Text variant="title" color="primary" weight="bold">{state.videosStats.average}</Text>
+              <SegmentedRating
+                readonly
+                showLabel={false}
+                value={parseFloat(state.videosStats.average) || 0}
+                t={t}
+              />
             </Inline>
           </Inline>
-        </div>
-      </div>
+        </Stack>
+      </Card>
 
       {/* CARD 2: Media Counts */}
-      <div className="analytics-card compact-stats-card">
-        <Inline align="center" className="compact-stats-card__header">
-          <span className="analytics-card__title">
-            {t('ratings.stats.mediaItems', { defaultValue: 'Library Items' })}
-          </span>
-          <CheckCircle size={16} className="analytics-card__icon text-success" />
-        </Inline>
-        <div className="compact-stats-card__content">
+      <Card
+        variant="interactive-glass"
+        padding="md"
+        divider
+        className="u-flex-1 u-flex-column"
+        eyebrow={t('ratings.stats.mediaItems', { defaultValue: 'Library Items' })}
+        actions={<CheckCircle size={16} className="icon-glow-success" />}
+      >
+        <Stack gap="sm" fill justify="center">
           {/* Movies counts */}
-          <Inline gap="md" align="center" className="compact-stats-row">
-            <div className="compact-stats-row__label">
+          <Inline gap="md" align="center" justify="between" className="u-min-h-row">
+            <Text variant="body" color="muted" weight="medium">
               {t('ratings.subtabs.movies', { defaultValue: 'Movies' })}
-            </div>
-            <Inline gap="sm" align="center" className="compact-stats-counts">
-              <span className="compact-count-rated">{state.moviesStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</span>
-              <span className="compact-count-sep">{bulletSep}</span>
-              <span className="compact-count-unrated">
+            </Text>
+            <Inline gap="sm" align="center">
+              <Text variant="body" color="primary" weight="semibold">{state.moviesStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</Text>
+              <Text variant="body" color="muted">{bulletSep}</Text>
+              <Text variant="body" color="muted">
                 {state.moviesStats.totalUnrated} {t('ratings.stats.unrated', { defaultValue: 'unrated' })}
                 {getPercentageText(state.moviesStats.totalRated, state.moviesStats.totalUnrated)}
-              </span>
+              </Text>
             </Inline>
           </Inline>
 
           {/* TV Shows counts */}
-          <Inline gap="md" align="center" className="compact-stats-row">
-            <div className="compact-stats-row__label">
+          <Inline gap="md" align="center" justify="between" className="u-min-h-row">
+            <Text variant="body" color="muted" weight="medium">
               {t('ratings.subtabs.tvShows', { defaultValue: 'TV Shows' })}
-            </div>
-            <Inline gap="sm" align="center" className="compact-stats-counts">
-              <span className="compact-count-rated">{state.tvStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</span>
-              <span className="compact-count-sep">{bulletSep}</span>
-              <span className="compact-count-unrated">
+            </Text>
+            <Inline gap="sm" align="center">
+              <Text variant="body" color="primary" weight="semibold">{state.tvStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</Text>
+              <Text variant="body" color="muted">{bulletSep}</Text>
+              <Text variant="body" color="muted">
                 {state.tvStats.totalUnrated} {t('ratings.stats.unrated', { defaultValue: 'unrated' })}
                 {getPercentageText(state.tvStats.totalRated, state.tvStats.totalUnrated)}
-              </span>
+              </Text>
             </Inline>
           </Inline>
 
           {/* Scenes counts */}
           {state.activeSessionMode === 'nsfw' && (
-            <Inline gap="md" align="center" className="compact-stats-row">
-              <div className="compact-stats-row__label">
+            <Inline gap="md" align="center" justify="between" className="u-min-h-row">
+              <Text variant="body" color="muted" weight="medium">
                 {t('ratings.subtabs.scenes', { defaultValue: 'Scenes' })}
-              </div>
-              <Inline gap="sm" align="center" className="compact-stats-counts">
-                <span className="compact-count-rated">{state.scenesStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</span>
-                <span className="compact-count-sep">{bulletSep}</span>
-                <span className="compact-count-unrated">
+              </Text>
+              <Inline gap="sm" align="center">
+                <Text variant="body" color="primary" weight="semibold">{state.scenesStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</Text>
+                <Text variant="body" color="muted">{bulletSep}</Text>
+                <Text variant="body" color="muted">
                   {state.scenesStats.totalUnrated} {t('ratings.stats.unrated', { defaultValue: 'unrated' })}
                   {getPercentageText(state.scenesStats.totalRated, state.scenesStats.totalUnrated)}
-                </span>
+                </Text>
               </Inline>
             </Inline>
           )}
 
           {/* Videos counts */}
-          <Inline gap="md" align="center" className="compact-stats-row">
-            <div className="compact-stats-row__label">
+          <Inline gap="md" align="center" justify="between" className="u-min-h-row">
+            <Text variant="body" color="muted" weight="medium">
               {t('library.tabs.videos') || 'Videos'}
-            </div>
-            <Inline gap="sm" align="center" className="compact-stats-counts">
-              <span className="compact-count-rated">{state.videosStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</span>
-              <span className="compact-count-sep">{bulletSep}</span>
-              <span className="compact-count-unrated">
+            </Text>
+            <Inline gap="sm" align="center">
+              <Text variant="body" color="primary" weight="semibold">{state.videosStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</Text>
+              <Text variant="body" color="muted">{bulletSep}</Text>
+              <Text variant="body" color="muted">
                 {state.videosStats.totalUnrated} {t('ratings.stats.unrated', { defaultValue: 'unrated' })}
                 {getPercentageText(state.videosStats.totalRated, state.videosStats.totalUnrated)}
-              </span>
+              </Text>
             </Inline>
           </Inline>
-        </div>
-      </div>
+        </Stack>
+      </Card>
 
       {/* CARD 3: People Stats */}
-      <div className="analytics-card compact-stats-card">
-        <Inline align="center" className="compact-stats-card__header">
-          <span className="analytics-card__title">
-            {t('ratings.subtabs.people', { defaultValue: 'People' })}
-          </span>
-          <Users size={16} className="analytics-card__icon text-muted" />
-        </Inline>
-        <div className="compact-stats-card__content">
+      <Card
+        variant="interactive-glass"
+        padding="md"
+        divider
+        className="u-flex-1 u-flex-column"
+        eyebrow={t('ratings.subtabs.people', { defaultValue: 'People' })}
+        actions={<Users size={16} className="icon-glow-muted" />}
+      >
+        <Stack gap="sm" fill justify="center">
           {/* People Avg Rating */}
-          <Inline gap="md" align="center" className="compact-stats-row">
-            <div className="compact-stats-row__label">
+          <Inline gap="md" align="center" justify="between" className="u-min-h-row">
+            <Text variant="body" color="muted" weight="medium">
               {t('ratings.stats.average', { defaultValue: 'Average Rating' })}
-            </div>
-            <Inline gap="md" align="center" className="compact-stats-row__value-wrapper">
-              <span className="compact-stats-row__value">{state.peopleStats.average}</span>
-              <div className="analytics-mini-segmented-bar">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((val) => {
-                  const avg = parseFloat(state.peopleStats.average) || 0;
-                  let fill = 0;
-                  if (avg >= val) fill = 100;
-                  else if (avg > val - 1) fill = (avg - (val - 1)) * 100;
-                  return (
-                    <div key={val} className="analytics-segment">
-                      {/* eslint-disable-next-line react/forbid-dom-props */}
-                      <div className="analytics-segment-fill" style={{ width: `${fill}%` }} />
-                    </div>
-                  );
-                })}
-              </div>
+            </Text>
+            <Inline gap="md" align="center">
+              <Text variant="title" color="primary" weight="bold">{state.peopleStats.average}</Text>
+              <SegmentedRating
+                readonly
+                showLabel={false}
+                value={parseFloat(state.peopleStats.average) || 0}
+                t={t}
+              />
             </Inline>
           </Inline>
 
           {/* People counts */}
-          <Inline gap="md" align="center" className="compact-stats-row">
-            <div className="compact-stats-row__label">
+          <Inline gap="md" align="center" justify="between" className="u-min-h-row">
+            <Text variant="body" color="muted" weight="medium">
               {t('ratings.stats.totalRated', { defaultValue: 'Items' })}
-            </div>
-            <Inline gap="sm" align="center" className="compact-stats-counts">
-              <span className="compact-count-rated">{state.peopleStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</span>
-              <span className="compact-count-sep">{bulletSep}</span>
-              <span className="compact-count-unrated">
+            </Text>
+            <Inline gap="sm" align="center">
+              <Text variant="body" color="primary" weight="semibold">{state.peopleStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</Text>
+              <Text variant="body" color="muted">{bulletSep}</Text>
+              <Text variant="body" color="muted">
                 {state.peopleStats.totalUnrated} {t('ratings.stats.unrated', { defaultValue: 'unrated' })}
                 {getPercentageText(state.peopleStats.totalRated, state.peopleStats.totalUnrated)}
-              </span>
+              </Text>
             </Inline>
           </Inline>
 
           {/* People Favorites */}
-          <Inline gap="md" align="center" className="compact-stats-row">
-            <div className="compact-stats-row__label">
+          <Inline gap="md" align="center" justify="between" className="u-min-h-row">
+            <Text variant="body" color="muted" weight="medium">
               {state.activeSessionMode === 'nsfw'
                 ? (t('ratings.stats.favoritePerformers') || 'Favorite Performers')
                 : (t('ratings.stats.favoriteArtists') || 'Favorite Artists')}
-            </div>
-            <Inline gap="sm" align="center" className="compact-stats-favorites">
-              <span className="compact-stats-row__value">{state.peopleStats.favoritesCount}</span>
-              <Heart size={14} className="analytics-card__icon text-danger" fill="currentColor" />
+            </Text>
+            <Inline gap="sm" align="center">
+              <Text variant="title" color="primary" weight="bold">{state.peopleStats.favoritesCount}</Text>
+              <Heart size={14} className="icon-glow-danger" fill="currentColor" />
             </Inline>
           </Inline>
-        </div>
-      </div>
-    </div>
+        </Stack>
+      </Card>
+    </Stack>
   );
 }
 
@@ -285,29 +252,31 @@ export function RatingDistribution({
 }) {
   if (state.isStatsLoading) {
     return (
-      <div className="ratings-analytics-loading-dist">
-        <Skeleton className="ratings-analytics-dist-skeleton-title" variant="rect" />
+      <Card variant="interactive-glass" className="u-min-h-dist-card-loading">
+        <Skeleton className="u-skeleton-dist-title" variant="rect" />
         {Array.from({ length: 10 }).map((_, idx) => (
-          <Skeleton key={idx} className="ratings-analytics-dist-skeleton-text" variant="text" />
+          <Skeleton key={idx} className="u-skeleton-dist-bar" variant="text" />
         ))}
-      </div>
+      </Card>
     );
   }
 
   return (
-    <div className="analytics-card analytics-card--distribution compact-distribution-card">
-      <Inline gap="md" align="center" className="compact-distribution-header">
-        <span className="analytics-card__title">
-          {t('ratings.stats.distribution', { defaultValue: 'Rating Distribution' })}
-        </span>
+    <Card
+      variant="interactive-glass"
+      divider
+      className="u-h-full"
+      eyebrow={t('ratings.stats.distribution', { defaultValue: 'Rating Distribution' })}
+      actions={
         <SegmentedControl
           options={distTabs}
           value={effectiveDistTab}
           onChange={setDistTab}
           variant="filter"
         />
-      </Inline>
-      <div className="analytics-distribution">
+      }
+    >
+      <Stack gap="sm" className="u-mt-sm">
         {(() => {
           const activeDistStats = 
             effectiveDistTab === 'people' ? state.peopleStats :
@@ -320,21 +289,25 @@ export function RatingDistribution({
             const percentage = (count / maxCount) * 100;
             const ratingLabel = ((index + 1) / 2).toString();
             return (
-              <Inline key={index} gap="md" align="center" className="analytics-distribution__row">
-                <span className="analytics-distribution__label">{ratingLabel}</span>
-                <div className="analytics-distribution__bar-container">
-                  <div
-                    className="analytics-distribution__bar"
-                    // eslint-disable-next-line react/forbid-dom-props
-                    style={{ width: `${percentage}%` }}
-                  />
-                </div>
-                <span className="analytics-distribution__count">{count}</span>
+              <Inline key={index} gap="md" align="center" justify="between">
+                {/* eslint-disable-next-line react/forbid-dom-props */}
+                <span style={{ width: '1.25rem', textAlign: 'right', display: 'inline-block' }}>
+                  <Text variant="small" color="secondary" weight="bold">
+                    {ratingLabel}
+                  </Text>
+                </span>
+                <LinearProgress value={percentage} />
+                {/* eslint-disable-next-line react/forbid-dom-props */}
+                <span style={{ width: '1.875rem', textAlign: 'left', display: 'inline-block' }}>
+                  <Text variant="small" color="muted" weight="medium">
+                    {count}
+                  </Text>
+                </span>
               </Inline>
             );
           });
         })()}
-      </div>
-    </div>
+      </Stack>
+    </Card>
   );
 }

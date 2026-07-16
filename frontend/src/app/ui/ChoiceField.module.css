@@ -1,0 +1,27 @@
+.input {
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+.title {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink);
+  font-size: var(--font-size-sm);
+}
+
+.title.is-active {
+  color: var(--color-accent);
+}
+
+.description {
+  font-size: var(--font-size-xs);
+  color: var(--color-muted);
+  line-height: var(--line-height-base);
+}
+
+.label-text {
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-xs);
+  color: var(--color-ink);
+}
+

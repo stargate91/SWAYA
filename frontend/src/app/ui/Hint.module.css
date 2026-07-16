@@ -1,0 +1,7 @@
+.root {
+  color: var(--color-muted);
+  font: var(--text-caption);
+  text-transform: none;
+  letter-spacing: var(--letter-spacing-normal);
+  margin-top: calc(var(--space-xs) / 2);
+}

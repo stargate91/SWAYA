@@ -8,10 +8,9 @@ import {
   SettingsSidebar,
 } from './components';
 import Overlay from '@/ui/Overlay';
+import Stack from '@/ui/Stack';
 import { settingsTabGroups } from './settingsTabs.config.jsx';
 import { SETTINGS_TAB_IDS } from './settingsConstants.js';
-import styles from './SettingsPage.module.css';
-import './styles/SettingsForms.css';
 
 export default function SettingsPage() {
   const {
@@ -141,7 +140,7 @@ export default function SettingsPage() {
       <Overlay.ContentWrapper>
 
         <Overlay.Content>
-          <div className={styles['settings-tab-content']}>
+          <Stack gap="3xl">
             <SettingsFormProvider
               form={form}
               validationErrors={validationErrors}
@@ -154,7 +153,7 @@ export default function SettingsPage() {
                 <activeTabDefinition.component {...(activeTabDefinition.getProps ? activeTabDefinition.getProps(renderContext) : {})} />
               )}
             </SettingsFormProvider>
-          </div>
+          </Stack>
         </Overlay.Content>
       </Overlay.ContentWrapper>
 

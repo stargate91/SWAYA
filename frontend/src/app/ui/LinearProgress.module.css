@@ -1,0 +1,47 @@
+.container {
+  flex: 1;
+  height: 0.5rem;
+  background: color-mix(in srgb, var(--color-ink) 4%, transparent);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+}
+
+.bar {
+  height: 100%;
+  border-radius: var(--radius-full);
+  animation: growWidth var(--motion-duration-lazy) var(--motion-ease-emphasized) forwards;
+  transform-origin: left;
+  transition: width var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.bar[data-variant="blue"] {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent-blue) 30%, transparent), var(--color-accent-blue));
+  box-shadow: 0 0 0.375rem var(--color-accent-blue);
+}
+
+.bar[data-variant="accent"] {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 30%, transparent), var(--color-accent));
+  box-shadow: 0 0 0.375rem var(--color-accent);
+}
+
+.bar[data-variant="success"] {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--color-state-success) 30%, transparent), var(--color-state-success));
+  box-shadow: 0 0 0.375rem var(--color-state-success);
+}
+
+.bar[data-variant="danger"] {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent-pink) 30%, transparent), var(--color-accent-pink));
+  box-shadow: 0 0 0.375rem var(--color-accent-pink);
+}
+
+.bar[data-variant="dna"] {
+  background: linear-gradient(90deg, var(--color-accent-blue-soft), var(--color-accent-purple));
+  transition: width var(--motion-duration-slow-expressive) var(--motion-ease-emphasized);
+}
+
+.bar[data-variant="timeline"] {
+  background: linear-gradient(90deg, var(--color-accent-blue-soft), var(--color-brand-fansdb));
+  transition: width var(--motion-duration-slow-expressive) var(--motion-ease-emphasized);
+}
+

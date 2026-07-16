@@ -46,7 +46,6 @@ export default function ExtrasRulesSection({ t }) {
       eyebrow={t('settingsPage.sections.extras.rulesEyebrow')}
     >
       <Stack gap="xl">
-        <div className="settings-section-stack">
           <h3 className="settings-section-heading">
             {t('settingsPage.sections.extras.commonExtrasTitle')}
           </h3>
@@ -84,8 +83,6 @@ export default function ExtrasRulesSection({ t }) {
               previewText={getPreview(subTemplateField.value, 'extraSub')}
             />
           </Stack>
-        </div>
-        <div className="settings-section-stack">
           <h3 className="settings-section-heading">
             {t('settingsPage.sections.extras.otherExtrasTitle')}
           </h3>
@@ -139,7 +136,6 @@ export default function ExtrasRulesSection({ t }) {
               previewText={getPreview(metaTemplateField.value, 'extraMeta')}
             />
           </Stack>
-        </div>
       </Stack>
     </Card>
   );

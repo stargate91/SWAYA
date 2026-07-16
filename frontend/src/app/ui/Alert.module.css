@@ -1,0 +1,20 @@
+.root {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+}
+
+.danger {
+  background: var(--ui-overlay-danger-bg);
+  border: 1px solid var(--ui-overlay-danger-border);
+  color: var(--color-state-danger);
+}
+
+.warning {
+  background: var(--ui-overlay-warning-bg);
+  border: 1px solid var(--ui-overlay-warning-border);
+  color: var(--color-state-warning);
+}

@@ -1,6 +1,7 @@
 import SettingsSelectField from '../components/fields/SettingsSelectField.jsx';
 import Button from '@/ui/Button';
 import Inline from '@/ui/Inline';
+import styles from '../SettingsPage.module.css';
 
 export function createAdvancedThresholdSection(t) {
   return {
@@ -37,7 +38,7 @@ export function createAdvancedLanguageSection(t, metadataLanguageOptions, target
         field: 'follow_app_language_for_media_library',
         id: 'follow_app_language_for_media_library',
         hint: t('settingsPage.sections.advancedLanguage.metadataFollowsUiHint'),
-        hintClassName: 'settings-field-hint settings-hint--compact-bottom',
+        hintClassName: `settings-field-hint ${styles['hint-compact-bottom']}`,
         children: t('settingsPage.sections.advancedLanguage.metadataFollowsUi'),
       },
       {
@@ -50,7 +51,7 @@ export function createAdvancedLanguageSection(t, metadataLanguageOptions, target
             label={t('settingsPage.sections.advancedLanguage.metadataLanguage')}
             hint={t('settingsPage.sections.advancedLanguage.metadataLanguageHint')}
             options={metadataLanguageOptions}
-            className="settings-dropdown-nested settings-dropdown-nested--spaced"
+            className={`${styles['dropdown-nested']} ${styles['dropdown-nested-spaced']}`}
           />
         ),
       },
@@ -64,7 +65,7 @@ export function createAdvancedLanguageSection(t, metadataLanguageOptions, target
             label={t('settingsPage.sections.advancedLanguage.fallbackMetadataLanguage')}
             hint={t('settingsPage.sections.advancedLanguage.fallbackMetadataLanguageHint')}
             options={metadataLanguageOptions}
-            className="settings-dropdown-nested settings-dropdown-nested--spaced"
+            className={`${styles['dropdown-nested']} ${styles['dropdown-nested-spaced']}`}
           />
         ),
       },
@@ -73,7 +74,7 @@ export function createAdvancedLanguageSection(t, metadataLanguageOptions, target
         field: 'follow_app_language_for_naming',
         id: 'follow_app_language_for_naming',
         hint: t('settingsPage.sections.advancedLanguage.targetFollowsUiHint'),
-        hintClassName: 'settings-field-hint settings-hint--compact-bottom',
+        hintClassName: `settings-field-hint ${styles['hint-compact-bottom']}`,
         children: t('settingsPage.sections.advancedLanguage.targetFollowsUi'),
       },
       {
@@ -86,7 +87,7 @@ export function createAdvancedLanguageSection(t, metadataLanguageOptions, target
             label={t('settingsPage.sections.advancedLanguage.targetLanguage')}
             hint={t('settingsPage.sections.advancedLanguage.targetLanguageHint')}
             options={targetLanguageOptions}
-            className="settings-dropdown-nested"
+            className={styles['dropdown-nested']}
           />
         ),
       },
@@ -94,7 +95,7 @@ export function createAdvancedLanguageSection(t, metadataLanguageOptions, target
         type: 'custom',
         key: 'sync_language_button_container',
         render: () => (
-          <Inline align="center" justify="end" className="settings-action-row-right">
+          <Inline align="center" justify="end" className={styles['action-row-right']}>
             <Button
               variant="secondary"
               type="button"

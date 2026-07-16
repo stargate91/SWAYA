@@ -39,11 +39,14 @@ const ContinueWatchingWidget = () => {
     setShowRight(scrollLeft + clientWidth < scrollWidth - 10);
   }, []);
 
+  const [prevItems, setPrevItems] = useState(items);
   const [localItems, setLocalItems] = useState(items);
 
-  useEffect(() => {
+  if (items !== prevItems) {
+    setPrevItems(items);
     setLocalItems(items);
-  }, [items]);
+  }
+
 
   useEffect(() => {
     updateArrows();

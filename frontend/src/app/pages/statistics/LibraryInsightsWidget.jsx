@@ -3,8 +3,13 @@ import PropTypes from 'prop-types';
 import WidgetShell from '@/ui/WidgetShell';
 import { useStatsQuery } from '../../queries';
 import { useLibraryModeStore } from '../../stores/useLibraryModeStore';
-import styles from './LibraryInsightsWidget.module.css';
 import Inline from '@/ui/Inline';
+import Card from '@/ui/Card';
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
+import LinearProgress from '@/ui/LinearProgress';
+import RadarChart from '@/ui/RadarChart';
+import BarChart from '@/ui/BarChart';
 
 const translateGenreLabel = (label, T) => {
   if (!label) return '';
@@ -26,6 +31,36 @@ const isSingleGenreLabel = (label) => {
 const RADAR_GENRE_LIMIT = 6;
 const MIN_DNA_TITLES = 4;
 const MIN_TIMELINE_TITLES = 5;
+
+// Shared styles to achieve 0 lines of CSS in the widget module
+const STAGE_STYLE_BASE = {
+  position: 'relative',
+  minHeight: '13.75rem',
+  overflow: 'hidden',
+  borderRadius: 'var(--radius-xl)',
+  background: 'radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--color-accent-blue-soft) 14%, transparent), color-mix(in srgb, var(--color-accent-blue) 4%, transparent) 35%, color-mix(in srgb, var(--color-bg-elevated) 8%, transparent) 70%, transparent 100%)',
+};
+
+const GHOST_STYLE = {
+  opacity: 0.15,
+  filter: 'grayscale(1) blur(0.03125rem)',
+  pointerEvents: 'none',
+  transition: 'opacity var(--motion-duration-emphasized) var(--motion-ease-ease), filter var(--motion-duration-emphasized) var(--motion-ease-ease)',
+};
+
+const OVERLAY_CARD_STYLE = {
+  position: 'absolute',
+  inset: 0,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: 'var(--space-2xl) var(--space-xl)',
+  background: 'radial-gradient(circle at center, color-mix(in srgb, var(--color-bg-elevated) 72%, transparent) 0%, var(--color-surface-overlay-heavy) 100%)',
+  backdropFilter: 'var(--glass-blur-md)',
+  zIndex: 'var(--z-index-step-2)',
+  textAlign: 'center',
+};
 
 export const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
@@ -121,75 +156,82 @@ export const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
   const isMocked = insightData?.isMocked;
   const hasEnoughData = !isMocked && insightTitleCount >= MIN_DNA_TITLES && insightData.nodes.length >= 3;
 
+  const stageStyle = useMemo(() => ({
+    ...STAGE_STYLE_BASE,
+    padding: 'var(--space-lg)',
+    display: 'grid',
+    gridTemplateColumns: 'minmax(0, 1.35fr) minmax(11.25rem, 0.8fr)',
+    gap: 'var(--space-xl)',
+    alignItems: 'center',
+    ...(!hasEnoughData ? GHOST_STYLE : {})
+  }), [hasEnoughData]);
+
   return (
-    <div className={styles['insights-panel']}>
-      <h3 className={styles['insights-panel-title']}>
-        {T('statistics.stats.library_dna') || 'Library DNA'}
-      </h3>
+    <Card variant="interactive-glass" padding="xl" glowBlob={true} className="u-insights-panel u-flex-1">
+      {/* eslint-disable-next-line react/forbid-dom-props */}
+      <div style={{ marginBottom: 'var(--space-xl)' }}>
+        <Text variant="title" color="primary" weight="extrabold" as="h3">
+          {T('statistics.stats.library_dna') || 'Library DNA'}
+        </Text>
+      </div>
       
-      <div className={`${styles['insights-dna-stage']} ${styles['insights-dna-stage--radar']} ${!hasEnoughData ? styles['insights-dna-stage--ghost'] : ''}`}>
-        <div className={styles['insights-radar-stage']}>
-          <svg viewBox="0 0 300 300" className={styles['insights-radar-svg']} aria-hidden="true">
-            {insightData.rings.map((ring) => (
-              <polygon key={ring.key} points={ring.points} className={styles['insights-radar-ring']} />
-            ))}
-            {insightData.nodes.map((node) => (
-              <line
-                key={`axis-${node.id}`}
-                x1="150"
-                y1="150"
-                x2={node.axisX}
-                y2={node.axisY}
-                className={styles['insights-radar-axis']}
-              />
-            ))}
-            <polygon points={insightData.polygonPoints} className={styles['insights-radar-shape']} />
-            {insightData.nodes.map((node) => (
-              <circle
-                key={`point-${node.id}`}
-                cx={node.pointX}
-                cy={node.pointY}
-                r="4"
-                className={styles['insights-radar-point']}
-              />
-            ))}
-            {insightData.nodes.map((node) => (
-              <text
-                key={`label-${node.id}`}
-                x={node.labelX}
-                y={node.labelY}
-                textAnchor={node.labelX < 126 ? 'end' : (node.labelX > 174 ? 'start' : 'middle')}
-                className={styles['insights-radar-label']}
-              >
-                {node.translatedLabel}
-              </text>
-            ))}
-          </svg>
+      {/* eslint-disable-next-line react/forbid-dom-props */}
+      <div style={stageStyle}>
+        {/* eslint-disable-next-line react/forbid-dom-props */}
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <RadarChart
+            nodes={insightData.nodes}
+            rings={insightData.rings}
+            polygonPoints={insightData.polygonPoints}
+          />
         </div>
 
         {hasEnoughData && (
-          <div className={styles['insights-radar-legend']}>
+          <Stack gap="sm">
             {insightData.nodes.map((node) => (
-              <Inline
-                key={node.id}
-                gap="md"
-                align="center"
-                className={styles['insights-radar-legend-row']}
-                title={T('statistics.stats.items_count_tooltip', { label: node.translatedLabel, count: node.count }) || `${node.translatedLabel}: ${node.count}`}
-              >
-                <span className={styles['insights-radar-legend-label']}>{node.translatedLabel}</span>
-                <strong className={styles['insights-radar-legend-count']}>{node.count}</strong>
-              </Inline>
+              <Card key={node.id} variant="flat-glass" padding="none">
+                {/* eslint-disable-next-line react/forbid-dom-props */}
+                <div style={{ padding: 'var(--space-sm) var(--space-md)' }}>
+                  <Inline
+                    gap="md"
+                    align="center"
+                    justify="between"
+                    title={T('statistics.stats.items_count_tooltip', { label: node.translatedLabel, count: node.count }) || `${node.translatedLabel}: ${node.count}`}
+                  >
+                    <Text variant="small" color="primary" weight="bold">
+                      {node.translatedLabel}
+                    </Text>
+                    <Text variant="small" color="accent" weight="extrabold" as="strong">
+                      {node.count}
+                    </Text>
+                  </Inline>
+                </div>
+              </Card>
             ))}
 
             {insightData.otherGenres.length > 0 && (
-              <div className={styles['insights-radar-other']}>
-                <span className={styles['insights-radar-other__title']}>{T('statistics.stats.other_genres') || 'Other Genres'}</span>
-                <Inline gap="sm" className={styles['insights-radar-other__list']}>
+              // eslint-disable-next-line react/forbid-dom-props
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', marginTop: 'var(--space-xs)' }}>
+                <Text variant="caption" color="secondary" weight="extrabold" uppercase as="span">
+                  {T('statistics.stats.other_genres') || 'Other Genres'}
+                </Text>
+                <Inline gap="sm">
                   {insightData.otherGenres.map((node) => (
                     <span
                       key={`other-${node.id}`}
-                      className={styles['insights-radar-other__chip']}
+                      // eslint-disable-next-line react/forbid-dom-props
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        minHeight: '1.875rem',
+                        padding: '0 var(--space-md)',
+                        border: '1px solid color-mix(in srgb, var(--color-border-subtle) 88%, transparent)',
+                        borderRadius: 'var(--radius-full)',
+                        background: 'color-mix(in srgb, var(--color-surface-card) 52%, transparent)',
+                        color: 'var(--color-text-secondary)',
+                        fontSize: 'var(--font-size-2xs)',
+                        fontWeight: 'var(--font-weight-bold)'
+                      }}
                       title={T('statistics.stats.items_count_tooltip', { label: node.translatedLabel, count: node.count }) || `${node.translatedLabel}: ${node.count}`}
                     >
                       {node.translatedLabel} {node.count}
@@ -198,41 +240,48 @@ export const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
                 </Inline>
               </div>
             )}
-          </div>
+          </Stack>
         )}
       </div>
 
       {!hasEnoughData && (
-        <div className={styles['insights-overlay-card']}>
-          <div className={`${styles['insights-overlay-icon-wrapper']} ${styles['insights-overlay-icon-wrapper--dna']}`}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={styles['insights-overlay-icon']}>
+        // eslint-disable-next-line react/forbid-dom-props
+        <div style={OVERLAY_CARD_STYLE}>
+          <div className="u-insights-overlay-icon-wrapper u-insights-overlay-icon-wrapper--dna">
+            {/* eslint-disable-next-line react/forbid-dom-props */}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: 'var(--space-2xl)', height: 'var(--space-2xl)' }}>
               <path d="M4.5 10.5C4.5 7.46243 6.96243 5 10 5C13.0376 5 15.5 7.46243 15.5 10.5M19.5 13.5C19.5 16.5376 17.0376 19 14 19C10.9624 19 8.5 16.5376 8.5 13.5" />
               <path d="M4.5 10.5L8.5 13.5M15.5 10.5L19.5 13.5" />
               <path d="M10 5L14 19" />
             </svg>
           </div>
-          <h4 className={styles['insights-overlay-title']}>
-            {T('statistics.stats.dna_overlay_title') || 'Library DNA Blueprint'}
-          </h4>
-          <p className={styles['insights-overlay-copy']}>
+          {/* eslint-disable-next-line react/forbid-dom-props */}
+          <div style={{ marginBottom: 'var(--space-sm)' }}>
+            <Text variant="body" color="primary" weight="extrabold" as="h4">
+              {T('statistics.stats.dna_overlay_title') || 'Library DNA Blueprint'}
+            </Text>
+          </div>
+          {/* eslint-disable-next-line react/forbid-dom-props */}
+          <p style={{ margin: '0 0 var(--space-md) 0', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-xs)', lineHeight: '1.5', maxWidth: '16.25rem' }}>
             {isNsfw
               ? (T('statistics.stats.dna_overlay_copy_nsfw') || 'Match and organize adult scenes to map your library\'s NSFW genre footprint.')
               : (T('statistics.stats.dna_overlay_copy_sfw') || 'Scan and match SFW movies to reveal your library\'s unique genre DNA blueprint.')}
           </p>
-          <div className={styles['insights-overlay-progress']}>
-            <div className={styles['insights-overlay-progress-header']}>
-              <span className={styles['insights-overlay-progress-text']}>
+          {/* eslint-disable-next-line react/forbid-dom-props */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', width: '100%', maxWidth: '11.25rem', alignItems: 'center' }}>
+            <Inline justify="center">
+              <Text variant="caption" color="secondary" weight="extrabold" uppercase>
                 {T('statistics.stats.dna_progress_text', { count: insightTitleCount, limit: MIN_DNA_TITLES }) || `${insightTitleCount} of ${MIN_DNA_TITLES} titles`}
-              </span>
-            </div>
-            <div className={styles['insights-overlay-progress-track']}>
-              {/* eslint-disable-next-line react/forbid-dom-props */}
-              <div className={styles['insights-overlay-progress-bar']} style={{ width: `${Math.min(100, (insightTitleCount / MIN_DNA_TITLES) * 100)}%` }} />
-            </div>
+              </Text>
+            </Inline>
+            <LinearProgress
+              value={(insightTitleCount / MIN_DNA_TITLES) * 100}
+              variant="dna"
+            />
           </div>
         </div>
       )}
-    </div>
+    </Card>
   );
 };
 
@@ -285,76 +334,78 @@ export const TimeTravelTimeline = ({ decades, insightTitleCount, T }) => {
     return match ? T('statistics.stats.decade_label', { decade: match[1] }) || `${match[1]}s` : decade;
   };
 
+  const stageStyle = useMemo(() => ({
+    ...STAGE_STYLE_BASE,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...(!hasEnoughData ? GHOST_STYLE : {})
+  }), [hasEnoughData]);
+
   return (
-    <div className={`${styles['insights-panel']} ${styles['insights-panel--timeline']}`}>
-      <h3 className={styles['insights-panel-title']}>
-        {T('statistics.stats.timeline') || 'Time Travel'}
-      </h3>
+    <Card variant="interactive-glass" padding="xl" glowBlob={true} className="u-insights-panel u-flex-1">
+      {/* eslint-disable-next-line react/forbid-dom-props */}
+      <div style={{ marginBottom: 'var(--space-xl)' }}>
+        <Text variant="title" color="primary" weight="extrabold" as="h3">
+          {T('statistics.stats.timeline') || 'Time Travel'}
+        </Text>
+      </div>
       {hasEnoughData && (
-        <p className={styles['insights-panel-subtitle']}>
-          {T('statistics.stats.top_decade', { decade: topDecadeLabel }) || `Most files are from the ${topDecadeLabel}`}
-        </p>
+        // eslint-disable-next-line react/forbid-dom-props
+        <div style={{ marginBottom: 'var(--space-2xl)' }}>
+          <Text variant="body" color="accent" weight="semibold" as="p">
+            {T('statistics.stats.top_decade', { decade: topDecadeLabel }) || `Most files are from the ${topDecadeLabel}`}
+          </Text>
+        </div>
       )}
 
-      <div className={`${styles['insights-timeline-stage']} ${!hasEnoughData ? styles['insights-timeline-stage--ghost'] : ''}`}>
-        <div className={styles['insights-timeline']}>
-          {sorted.map(([decade, count]) => {
-            const heightPct = Math.max(5, (count / maxCount) * 100);
-            const decadeLabel = formatDecade(decade);
-            return (
-              <div key={decade} className={styles['insights-timeline-column']}>
-                <svg viewBox="0 0 100 100" preserveAspectRatio="none" className={styles['insights-timeline-bar-shell']}>
-                  <rect
-                    x="0"
-                    y={100 - heightPct}
-                    width="100"
-                    height={heightPct}
-                    rx="6"
-                    ry="6"
-                    className={styles['insights-timeline-bar']}
-                  >
-                    <title>{T('statistics.stats.items_count_tooltip', { label: decadeLabel, count }) || `${decadeLabel}: ${count} files`}</title>
-                  </rect>
-                </svg>
-                <div className={styles['insights-timeline-label']}>
-                  {decadeLabel}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+      {/* eslint-disable-next-line react/forbid-dom-props */}
+      <div style={stageStyle}>
+        <BarChart
+          sortedData={sorted}
+          maxCount={maxCount}
+          T={T}
+          formatDecade={formatDecade}
+        />
       </div>
 
       {!hasEnoughData && (
-        <div className={styles['insights-overlay-card']}>
-          <div className={`${styles['insights-overlay-icon-wrapper']} ${styles['insights-overlay-icon-wrapper--timeline']}`}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={styles['insights-overlay-icon']}>
+        // eslint-disable-next-line react/forbid-dom-props
+        <div style={OVERLAY_CARD_STYLE}>
+          <div className="u-insights-overlay-icon-wrapper u-insights-overlay-icon-wrapper--timeline">
+            {/* eslint-disable-next-line react/forbid-dom-props */}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: 'var(--space-2xl)', height: 'var(--space-2xl)' }}>
               <circle cx="12" cy="12" r="10" />
               <polyline points="12 6 12 12 16 14" />
             </svg>
           </div>
-          <h4 className={styles['insights-overlay-title']}>
-            {T('statistics.stats.timeline_overlay_title') || 'Time-Travel Timeline'}
-          </h4>
-          <p className={styles['insights-overlay-copy']}>
+          {/* eslint-disable-next-line react/forbid-dom-props */}
+          <div style={{ marginBottom: 'var(--space-sm)' }}>
+            <Text variant="body" color="primary" weight="extrabold" as="h4">
+              {T('statistics.stats.timeline_overlay_title') || 'Time-Travel Timeline'}
+            </Text>
+          </div>
+          {/* eslint-disable-next-line react/forbid-dom-props */}
+          <p style={{ margin: '0 0 var(--space-md) 0', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-xs)', lineHeight: '1.5', maxWidth: '16.25rem' }}>
             {isNsfw
               ? (T('statistics.stats.timeline_overlay_copy_nsfw') || 'Match more adult scenes to build a chronological timeline of your collection.')
               : (T('statistics.stats.timeline_overlay_copy_sfw') || 'Add more movies to map your collection across the history of cinema.')}
           </p>
-          <div className={styles['insights-overlay-progress']}>
-            <div className={styles['insights-overlay-progress-header']}>
-              <span className={styles['insights-overlay-progress-text']}>
+          {/* eslint-disable-next-line react/forbid-dom-props */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', width: '100%', maxWidth: '11.25rem', alignItems: 'center' }}>
+            <Inline justify="center">
+              <Text variant="caption" color="secondary" weight="extrabold" uppercase>
                 {T('statistics.stats.timeline_progress_text', { count: insightTitleCount, limit: MIN_TIMELINE_TITLES }) || `${insightTitleCount} of ${MIN_TIMELINE_TITLES} items`}
-              </span>
-            </div>
-            <div className={styles['insights-overlay-progress-track']}>
-              {/* eslint-disable-next-line react/forbid-dom-props */}
-              <div className={styles['insights-overlay-progress-bar']} style={{ width: `${Math.min(100, (insightTitleCount / MIN_TIMELINE_TITLES) * 100)}%` }} />
-            </div>
+              </Text>
+            </Inline>
+            <LinearProgress
+              value={(insightTitleCount / MIN_TIMELINE_TITLES) * 100}
+              variant="timeline"
+            />
           </div>
         </div>
       )}
-    </div>
+    </Card>
   );
 };
 
@@ -374,7 +425,8 @@ const LibraryInsightsWidget = ({ T, showDna = true, showTimeline = true }) => {
 
   return (
     <WidgetShell loading={isLoading} size="lg" transparent={true}>
-      <Inline gap="xl" className={styles['insights-layout']}>
+      {/* eslint-disable-next-line react/forbid-dom-props */}
+      <div style={{ display: 'flex', gap: 'var(--space-xl)', alignItems: 'stretch', width: '100%' }}>
         {showDna && (
           <LibraryDNA
             constellation={stats?.genre_constellation}
@@ -390,7 +442,7 @@ const LibraryInsightsWidget = ({ T, showDna = true, showTimeline = true }) => {
             T={T}
           />
         )}
-      </Inline>
+      </div>
     </WidgetShell>
   );
 };

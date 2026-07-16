@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Upload, UserRound } from '@/ui/icons';
+import { Upload } from '@/ui/icons';
 import api from '@/lib/api';
 import { API_BASE } from '@/lib/backend';
 import Button from '@/ui/Button';
@@ -7,6 +7,8 @@ import SettingsSectionRenderer from './SettingsSectionRenderer.jsx';
 import { useSettingsFormContext } from '../SettingsFormContext.jsx';
 import { createGeneralProfileSection } from '../settingsSectionConfigs.jsx';
 import Inline from '@/ui/Inline';
+import Avatar from '@/ui/Avatar';
+import styles from '../SettingsPage.module.css';
 
 export default function GeneralProfileSection({ t }) {
   const inputRef = useRef(null);
@@ -39,24 +41,18 @@ export default function GeneralProfileSection({ t }) {
     type: 'custom',
     key: 'avatar',
     render: () => (
-      <Inline gap="md" align="center" className="settings-profile-avatar-field">
-        <div className="settings-profile-avatar">
-          {avatarUrl ? (
-            <img src={avatarUrl} alt={t('settingsPage.sections.profile.avatarAlt')} />
-          ) : (
-            <UserRound size={30} />
-          )}
-        </div>
-        <div className="settings-profile-avatar-copy">
+      <Inline gap="md" align="center">
+        <Avatar src={avatarUrl} alt={t('settingsPage.sections.profile.avatarAlt')} />
+        <div className={styles['avatar-copy']}>
           <strong>{t('settingsPage.sections.profile.avatar')}</strong>
-          <span>{t('settingsPage.sections.profile.avatarHint')}</span>
-          {error ? <span className="settings-profile-avatar-error">{error}</span> : null}
+          <span className={styles['avatar-hint']}>{t('settingsPage.sections.profile.avatarHint')}</span>
+          {error ? <span className={styles['avatar-error']}>{error}</span> : null}
         </div>
         <input
           ref={inputRef}
           type="file"
           accept="image/jpeg,image/png,image/webp,image/gif"
-          className="settings-hidden-input"
+          className={styles['hidden-input']}
           onChange={handleAvatarChange}
         />
         <Button

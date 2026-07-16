@@ -7,6 +7,8 @@ import { useTemplatePreview } from '../hooks';
 import { FOLDER_COLLECTION_MODES } from '../settingsConstants.js';
 import TemplateFieldSection from './TemplateFieldSection.jsx';
 import { useSettingsFormContext } from '../SettingsFormContext.jsx';
+import styles from '../SettingsPage.module.css';
+import Hint from '@/ui/Hint';
 
 export default function CollectionsTab({
   form,
@@ -53,12 +55,12 @@ export default function CollectionsTab({
         >
           {t('settingsPage.sections.collections.createCollectionDir')}
         </Switch>
-        <span className="settings-field-hint settings-hint--spaced">
+        <Hint className={styles['hint-spaced']}>
           {t('settingsPage.sections.collections.createCollectionDirHint')}
-        </span>
+        </Hint>
 
         {form.folder_create_collection_dir && (
-          <>
+          <Stack gap="lg">
             <Dropdown
               label={t('settingsPage.sections.collections.collectionMode')}
               value={form.folder_collection_mode}
@@ -69,18 +71,16 @@ export default function CollectionsTab({
             />
 
             {shouldShowCollectionThreshold && (
-              <div className="settings-block-top">
-                <Input
-                  label={t('settingsPage.sections.collections.collectionThreshold')}
-                  value={form.folder_collection_threshold}
-                  disabled={isScanActive}
-                  onChange={handleChange('folder_collection_threshold')}
-                  placeholder="3"
-                  type="number"
-                  min="1"
-                  hint={t('settingsPage.sections.collections.collectionThresholdHint')}
-                />
-              </div>
+              <Input
+                label={t('settingsPage.sections.collections.collectionThreshold')}
+                value={form.folder_collection_threshold}
+                disabled={isScanActive}
+                onChange={handleChange('folder_collection_threshold')}
+                placeholder="3"
+                type="number"
+                min="1"
+                hint={t('settingsPage.sections.collections.collectionThresholdHint')}
+              />
             )}
 
             <TemplateFieldSection
@@ -95,9 +95,8 @@ export default function CollectionsTab({
               fieldKey="folder_collection_template"
               insertTag={insertTag}
               previewText={getPreview(form.folder_collection_template, 'collection', { isFile: false, sortOptions })}
-              className="settings-block-top"
             />
-          </>
+          </Stack>
         )}
       </Stack>
     </Card>

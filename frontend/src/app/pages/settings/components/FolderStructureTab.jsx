@@ -7,6 +7,7 @@ import { useTemplatePreview } from '../hooks';
 import SettingsLiveImpact from './SettingsLiveImpact.jsx';
 import TemplateFieldSection from './TemplateFieldSection.jsx';
 import { useSettingsFormContext } from '../SettingsFormContext.jsx';
+import styles from '../SettingsPage.module.css';
 
 export default function FolderStructureTab({
   form,
@@ -40,17 +41,15 @@ export default function FolderStructureTab({
           >
             {t('settingsPage.sections.folderStructure.orgEnabled')}
           </Switch>
-          <span className="settings-field-hint settings-hint--tight-top">
+          <span className={`settings-field-hint ${styles['hint-tight-top']}`}>
             {t('settingsPage.sections.folderStructure.orgEnabledHint')}
           </span>
 
           {form.folder_organization_enabled && (
             <>
-              <div className="settings-section-stack">
-                <h3 className="settings-section-heading">
-                  {t('settingsPage.sections.folderStructure.destinationTitle')}
-                </h3>
-              </div>
+              <h3 className="settings-section-heading">
+                {t('settingsPage.sections.folderStructure.destinationTitle')}
+              </h3>
               <Switch
                 id="folder_move_to_library"
                 checked={form.folder_move_to_library}
@@ -59,15 +58,13 @@ export default function FolderStructureTab({
               >
                 {t('settingsPage.sections.folderStructure.moveToLibrary')}
               </Switch>
-              <span className="settings-field-hint settings-hint--tight-top">
+              <span className={`settings-field-hint ${styles['hint-tight-top']}`}>
                 {t('settingsPage.sections.folderStructure.moveToLibraryHint')}
               </span>
 
-              <div className="settings-section-stack">
-                <h3 className="settings-section-heading">
-                  {t('settingsPage.sections.folderStructure.rootFoldersTitle')}
-                </h3>
-              </div>
+              <h3 className="settings-section-heading">
+                {t('settingsPage.sections.folderStructure.rootFoldersTitle')}
+              </h3>
               <Switch
                 id="folder_sort_by_type"
                 checked={form.folder_sort_by_type}
@@ -76,12 +73,12 @@ export default function FolderStructureTab({
               >
                 {t('settingsPage.sections.folderStructure.sortByType')}
               </Switch>
-              <span className="settings-field-hint settings-hint--tight-top">
+              <span className={`settings-field-hint ${styles['hint-tight-top']}`}>
                 {t('settingsPage.sections.folderStructure.sortByTypeHint')}
               </span>
 
               {form.folder_sort_by_type && (
-                <div className="settings-nested-block">
+                <div className={styles['nested-block']}>
                   <Stack gap="md">
                     <Input
                       label={t('settingsPage.sections.folderStructure.moviesDirName')}
@@ -110,11 +107,10 @@ export default function FolderStructureTab({
               )}
 
               {form.include_adult && (
-                <div className="settings-section-stack">
+                <Stack gap="md">
                   <h3 className="settings-section-heading">
                     {t('settingsPage.sections.folderStructure.adultFoldersTitle')}
                   </h3>
-                  <Stack gap="md">
                     <Input
                       label={t('settingsPage.sections.folderStructure.adultDirName')}
                       value={form.folder_adult_name}
@@ -130,11 +126,11 @@ export default function FolderStructureTab({
                     >
                       {t('settingsPage.sections.folderStructure.organizeAdultByType')}
                     </Switch>
-                    <span className="settings-field-hint settings-hint--tight-top">
+                    <span className={`settings-field-hint ${styles['hint-tight-top']}`}>
                       {t('settingsPage.sections.folderStructure.organizeAdultByTypeHint')}
                     </span>
                     {form.naming_adult_subfolders_enabled && (
-                      <div className="settings-nested-block">
+                      <div className={styles['nested-block']}>
                         <Stack gap="md">
                           <Input
                             label={t('settingsPage.sections.folderStructure.adultMoviesDirName')}
@@ -169,7 +165,6 @@ export default function FolderStructureTab({
                       </div>
                     )}
                   </Stack>
-                </div>
               )}
 
               <Switch
@@ -180,7 +175,7 @@ export default function FolderStructureTab({
               >
                 {t('settingsPage.sections.folderStructure.removeEmpty')}
               </Switch>
-              <span className="settings-field-hint settings-hint--tight-top">
+              <span className={`settings-field-hint ${styles['hint-tight-top']}`}>
                 {t('settingsPage.sections.folderStructure.removeEmptyHint')}
               </span>
             </>
@@ -194,156 +189,150 @@ export default function FolderStructureTab({
           eyebrow={t('settingsPage.sections.folderStructure.structureEyebrow')}
         >
           <Stack gap="xl">
-            <div className="settings-section-stack">
-              <h3 className="settings-section-heading">
-                {t('settingsPage.sections.folderStructure.movieShowFoldersTitle')}
-              </h3>
-              <Stack gap="xl">
-                <div>
-                  <Switch
-                    id="folder_create_movie_subdir"
-                    checked={form.folder_create_movie_subdir}
-                    disabled={isScanActive}
-                    onChange={handleCheckboxChange('folder_create_movie_subdir')}
-                  >
-                    {t('settingsPage.sections.folderStructure.createMovieSubdir')}
-                  </Switch>
-                  <span className="settings-field-hint settings-hint--block-compact">
-                    {t('settingsPage.sections.folderStructure.createMovieSubdirHint')}
-                  </span>
+            <h3 className="settings-section-heading">
+              {t('settingsPage.sections.folderStructure.movieShowFoldersTitle')}
+            </h3>
 
-                  {form.folder_create_movie_subdir && (
-                    <TemplateFieldSection
-                      t={t}
-                      inputRef={formInputs.folderMovie}
-                      label={t('settingsPage.sections.folderStructure.movieTemplate')}
-                      value={form.folder_movie_template}
-                      disabled={isScanActive}
-                      onChange={handleChange('folder_movie_template')}
-                      placeholder="{title} ({year})"
-                      tags={FOLDER_MOVIE_TAGS}
-                      fieldKey="folder_movie_template"
-                      insertTag={insertTag}
-                      previewText={getPreview(form.folder_movie_template, 'movie', { isFile: false, sortOptions })}
-                      className="settings-nested-block settings-nested-block--top"
-                    />
-                  )}
-                </div>
+            <div>
+              <Switch
+                id="folder_create_movie_subdir"
+                checked={form.folder_create_movie_subdir}
+                disabled={isScanActive}
+                onChange={handleCheckboxChange('folder_create_movie_subdir')}
+              >
+                {t('settingsPage.sections.folderStructure.createMovieSubdir')}
+              </Switch>
+              <span className={`settings-field-hint ${styles['hint-block-compact']}`}>
+                {t('settingsPage.sections.folderStructure.createMovieSubdirHint')}
+              </span>
 
-                <div>
-                  <Switch
-                    id="folder_create_show_dir"
-                    checked={form.folder_create_show_dir}
-                    disabled={isScanActive}
-                    onChange={handleCheckboxChange('folder_create_show_dir')}
-                  >
-                    {t('settingsPage.sections.folderStructure.createShowDir')}
-                  </Switch>
-                  <span className="settings-field-hint settings-hint--block-compact">
-                    {t('settingsPage.sections.folderStructure.createShowDirHint')}
-                  </span>
-
-                  {form.folder_create_show_dir && (
-                    <TemplateFieldSection
-                      t={t}
-                      inputRef={formInputs.folderTv}
-                      label={t('settingsPage.sections.folderStructure.showTemplate')}
-                      value={form.folder_tv_template}
-                      disabled={isScanActive}
-                      onChange={handleChange('folder_tv_template')}
-                      placeholder="{tv_title} ({year_range})"
-                      tags={FOLDER_SHOW_TAGS}
-                      fieldKey="folder_tv_template"
-                      insertTag={insertTag}
-                      previewText={getPreview(form.folder_tv_template, 'tv', { isFile: false, sortOptions })}
-                      className="settings-nested-block settings-nested-block--top"
-                    />
-                  )}
-                </div>
-
-                <div>
-                  <Switch
-                    id="folder_create_video_subdir"
-                    checked={form.folder_create_video_subdir}
-                    disabled={isScanActive}
-                    onChange={handleCheckboxChange('folder_create_video_subdir')}
-                  >
-                    {t('settingsPage.sections.folderStructure.createVideoSubdir')}
-                  </Switch>
-                  <span className="settings-field-hint settings-hint--block-compact">
-                    {t('settingsPage.sections.folderStructure.createVideoSubdirHint')}
-                  </span>
-                </div>
-              </Stack>
+              {form.folder_create_movie_subdir && (
+                <TemplateFieldSection
+                  t={t}
+                  inputRef={formInputs.folderMovie}
+                  label={t('settingsPage.sections.folderStructure.movieTemplate')}
+                  value={form.folder_movie_template}
+                  disabled={isScanActive}
+                  onChange={handleChange('folder_movie_template')}
+                  placeholder="{title} ({year})"
+                  tags={FOLDER_MOVIE_TAGS}
+                  fieldKey="folder_movie_template"
+                  insertTag={insertTag}
+                  previewText={getPreview(form.folder_movie_template, 'movie', { isFile: false, sortOptions })}
+                  className={`${styles['nested-block']} ${styles['nested-block-top']}`}
+                />
+              )}
             </div>
 
-            <div className="settings-section-stack">
-              <h3 className="settings-section-heading">
-                {t('settingsPage.sections.folderStructure.seasonEpisodeFoldersTitle')}
-              </h3>
-              <Stack gap="xl">
-                <div>
-                  <Switch
-                    id="folder_create_season_dir"
-                    checked={form.folder_create_season_dir}
-                    disabled={isScanActive}
-                    onChange={handleCheckboxChange('folder_create_season_dir')}
-                  >
-                    {t('settingsPage.sections.folderStructure.createSeasonDir')}
-                  </Switch>
-                  <span className="settings-field-hint settings-hint--block-compact">
-                    {t('settingsPage.sections.folderStructure.createSeasonDirHint')}
-                  </span>
+            <div>
+              <Switch
+                id="folder_create_show_dir"
+                checked={form.folder_create_show_dir}
+                disabled={isScanActive}
+                onChange={handleCheckboxChange('folder_create_show_dir')}
+              >
+                {t('settingsPage.sections.folderStructure.createShowDir')}
+              </Switch>
+              <span className={`settings-field-hint ${styles['hint-block-compact']}`}>
+                {t('settingsPage.sections.folderStructure.createShowDirHint')}
+              </span>
 
-                  {form.folder_create_season_dir && (
-                    <TemplateFieldSection
-                      t={t}
-                      inputRef={formInputs.folderSeason}
-                      label={t('settingsPage.sections.folderStructure.seasonTemplate')}
-                      value={form.folder_season_template}
-                      disabled={isScanActive}
-                      onChange={handleChange('folder_season_template')}
-                      placeholder={t('settingsPage.sections.folderStructure.seasonTemplatePlaceholder')}
-                      tags={FOLDER_SEASON_TAGS}
-                      fieldKey="folder_season_template"
-                      insertTag={insertTag}
-                      previewText={getPreview(form.folder_season_template, 'season', { isFile: false, sortOptions })}
-                      className="settings-nested-block settings-nested-block--top"
-                    />
-                  )}
-                </div>
+              {form.folder_create_show_dir && (
+                <TemplateFieldSection
+                  t={t}
+                  inputRef={formInputs.folderTv}
+                  label={t('settingsPage.sections.folderStructure.showTemplate')}
+                  value={form.folder_tv_template}
+                  disabled={isScanActive}
+                  onChange={handleChange('folder_tv_template')}
+                  placeholder="{tv_title} ({year_range})"
+                  tags={FOLDER_SHOW_TAGS}
+                  fieldKey="folder_tv_template"
+                  insertTag={insertTag}
+                  previewText={getPreview(form.folder_tv_template, 'tv', { isFile: false, sortOptions })}
+                  className={`${styles['nested-block']} ${styles['nested-block-top']}`}
+                />
+              )}
+            </div>
 
-                <div>
-                  <Switch
-                    id="folder_create_episode_dir"
-                    checked={form.folder_create_episode_dir}
-                    disabled={isScanActive}
-                    onChange={handleCheckboxChange('folder_create_episode_dir')}
-                  >
-                    {t('settingsPage.sections.folderStructure.createEpisodeDir')}
-                  </Switch>
-                  <span className="settings-field-hint settings-hint--block-compact">
-                    {t('settingsPage.sections.folderStructure.createEpisodeDirHint')}
-                  </span>
+            <div>
+              <Switch
+                id="folder_create_video_subdir"
+                checked={form.folder_create_video_subdir}
+                disabled={isScanActive}
+                onChange={handleCheckboxChange('folder_create_video_subdir')}
+              >
+                {t('settingsPage.sections.folderStructure.createVideoSubdir')}
+              </Switch>
+              <span className={`settings-field-hint ${styles['hint-block-compact']}`}>
+                {t('settingsPage.sections.folderStructure.createVideoSubdirHint')}
+              </span>
+            </div>
 
-                  {form.folder_create_episode_dir && (
-                    <TemplateFieldSection
-                      t={t}
-                      inputRef={formInputs.folderEpisode}
-                      label={t('settingsPage.sections.folderStructure.episodeTemplate')}
-                      value={form.folder_episode_template}
-                      disabled={isScanActive}
-                      onChange={handleChange('folder_episode_template')}
-                      placeholder="{tv_title} - {season}{episode}"
-                      tags={FOLDER_EPISODE_TAGS}
-                      fieldKey="folder_episode_template"
-                      insertTag={insertTag}
-                      previewText={getPreview(form.folder_episode_template, 'episode', { isFile: false, sortOptions })}
-                      className="settings-nested-block settings-nested-block--top"
-                    />
-                  )}
-                </div>
-              </Stack>
+            <h3 className="settings-section-heading">
+              {t('settingsPage.sections.folderStructure.seasonEpisodeFoldersTitle')}
+            </h3>
+
+            <div>
+              <Switch
+                id="folder_create_season_dir"
+                checked={form.folder_create_season_dir}
+                disabled={isScanActive}
+                onChange={handleCheckboxChange('folder_create_season_dir')}
+              >
+                {t('settingsPage.sections.folderStructure.createSeasonDir')}
+              </Switch>
+              <span className={`settings-field-hint ${styles['hint-block-compact']}`}>
+                {t('settingsPage.sections.folderStructure.createSeasonDirHint')}
+              </span>
+
+              {form.folder_create_season_dir && (
+                <TemplateFieldSection
+                  t={t}
+                  inputRef={formInputs.folderSeason}
+                  label={t('settingsPage.sections.folderStructure.seasonTemplate')}
+                  value={form.folder_season_template}
+                  disabled={isScanActive}
+                  onChange={handleChange('folder_season_template')}
+                  placeholder={t('settingsPage.sections.folderStructure.seasonTemplatePlaceholder')}
+                  tags={FOLDER_SEASON_TAGS}
+                  fieldKey="folder_season_template"
+                  insertTag={insertTag}
+                  previewText={getPreview(form.folder_season_template, 'season', { isFile: false, sortOptions })}
+                  className={`${styles['nested-block']} ${styles['nested-block-top']}`}
+                />
+              )}
+            </div>
+
+            <div>
+              <Switch
+                id="folder_create_episode_dir"
+                checked={form.folder_create_episode_dir}
+                disabled={isScanActive}
+                onChange={handleCheckboxChange('folder_create_episode_dir')}
+              >
+                {t('settingsPage.sections.folderStructure.createEpisodeDir')}
+              </Switch>
+              <span className={`settings-field-hint ${styles['hint-block-compact']}`}>
+                {t('settingsPage.sections.folderStructure.createEpisodeDirHint')}
+              </span>
+
+              {form.folder_create_episode_dir && (
+                <TemplateFieldSection
+                  t={t}
+                  inputRef={formInputs.folderEpisode}
+                  label={t('settingsPage.sections.folderStructure.episodeTemplate')}
+                  value={form.folder_episode_template}
+                  disabled={isScanActive}
+                  onChange={handleChange('folder_episode_template')}
+                  placeholder="{tv_title} - {season}{episode}"
+                  tags={FOLDER_EPISODE_TAGS}
+                  fieldKey="folder_episode_template"
+                  insertTag={insertTag}
+                  previewText={getPreview(form.folder_episode_template, 'episode', { isFile: false, sortOptions })}
+                  className={`${styles['nested-block']} ${styles['nested-block-top']}`}
+                />
+              )}
             </div>
           </Stack>
         </Card>

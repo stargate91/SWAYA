@@ -12,6 +12,7 @@
 }
 
 @media (max-width: 100rem) {
+
   .grid[data-variant="default"],
   .grid[data-variant="poster"] {
     grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -19,6 +20,7 @@
 }
 
 @media (max-width: 75rem) {
+
   .grid[data-variant="default"],
   .grid[data-variant="poster"] {
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -26,6 +28,7 @@
 }
 
 @media (max-width: 48rem) {
+
   .grid[data-variant="default"],
   .grid[data-variant="poster"] {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -63,7 +66,7 @@
   contain: layout paint;
 }
 
-.grid[data-variant="backdrop"] > * {
+.grid[data-variant="backdrop"]>* {
   content-visibility: auto;
   contain-intrinsic-size: 11.25rem 6.75rem;
 }
@@ -81,7 +84,7 @@
   contain: layout paint;
 }
 
-.grid[data-variant="logo"] > * {
+.grid[data-variant="logo"]>* {
   content-visibility: auto;
   contain-intrinsic-size: 11.25rem 6.75rem;
 }
@@ -93,8 +96,8 @@
   grid-auto-flow: dense;
 }
 
-.grid[data-variant="mixed"] > *[data-aspect="mixed-landscape"],
-.grid[data-variant="mixed"] > *[data-aspect="landscape"] {
+.grid[data-variant="mixed"]>*[data-aspect="mixed-landscape"],
+.grid[data-variant="mixed"]>*[data-aspect="landscape"] {
   grid-column: span 2;
 }
 
@@ -126,4 +129,58 @@
 .grid[data-variant="auto-scene"] {
   grid-template-columns: repeat(auto-fill, minmax(20.625rem, 1fr));
   gap: var(--space-lg) var(--space-md);
+}
+
+/* Stats Overview Variant (5 cols descending) */
+.grid[data-variant="stats"] {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-3xl);
+}
+
+@media (max-width: 87.5rem) {
+  .grid[data-variant="stats"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 56.25rem) {
+  .grid[data-variant="stats"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 34.375rem) {
+  .grid[data-variant="stats"] {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
+
+/* Bento Layout Variant (2 cols wrapping to 1 col) */
+.grid[data-variant="bento"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3xl);
+}
+
+@media (max-width: 68.75rem) {
+  .grid[data-variant="bento"] {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
+
+/* Split Layout Variant (2 cols wrapping to 1 col) */
+.grid[data-variant="split"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-lg);
+}
+
+@media (max-width: 48rem) {
+  .grid[data-variant="split"] {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
+
+/* Auto-fill Settings Card Variant */
+.grid[data-variant="auto-card"] {
+  grid-template-columns: repeat(auto-fill, minmax(13.75rem, 1fr));
+  gap: var(--space-md);
 }

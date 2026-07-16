@@ -1,5 +1,7 @@
 import Card from '@/ui/Card';
 import StructurePreviewPanel from './StructurePreviewPanel.jsx';
+import Stack from '@/ui/Stack';
+import Hint from '@/ui/Hint';
 
 export default function SettingsLiveImpact({
   form,
@@ -10,12 +12,12 @@ export default function SettingsLiveImpact({
 }) {
   return (
     <Card title={title} eyebrow={eyebrow}>
-      <div className="settings-preview-stack">
-        <span className="settings-field-hint">
+      <Stack gap="md">
+        <Hint>
           {hint}
-        </span>
+        </Hint>
         <StructurePreviewPanel form={form} t={t} />
-      </div>
+      </Stack>
     </Card>
   );
 }

@@ -9,8 +9,10 @@ import { RatingsSummary, RatingDistribution } from './components/RatingsAnalytic
 import { useRatingsPageState } from '../ratings/useRatingsPageState';
 import { useStatsQuery } from '../../queries';
 import { useLibraryModeStore } from '../../stores/useLibraryModeStore';
-import styles from './StatisticsPage.module.css';
 import Inline from '@/ui/Inline';
+import Stack from '@/ui/Stack';
+import Grid from '@/ui/Grid';
+import SectionHeader from '@/ui/SectionHeader';
 
 export default function StatisticsPage() {
   const { t } = useTranslation();
@@ -36,11 +38,17 @@ export default function StatisticsPage() {
   );
 
   const pageTitle = (
-    <Inline gap="md" align="center" className={styles['stats-title-inline']}>
+    <Inline gap="md" align="center">
       {t('sidebar.statistics') || 'Statistics'}
       {isAdultMode && (
-        <sup className={styles['stats-title-sup']}>
-          <Badge family="adult" tone="danger" size="sm" className={styles['stats-title-adult-badge']}>
+        // eslint-disable-next-line react/forbid-dom-props
+        <sup style={{ fontSize: '0.45em', top: '-0.7em', position: 'relative' }}>
+          <Badge
+            family="adult"
+            tone="danger"
+            size="sm"
+            className="u-stats-title-badge"
+          >
             {t('common.adult_badge', { defaultValue: '18+' })}
           </Badge>
         </sup>
@@ -52,61 +60,54 @@ export default function StatisticsPage() {
     <Page
       title={pageTitle}
       description={t('statistics.description') || 'Visual overview and breakdown of your media library'}
-      className={styles['statistics-page-container']}
+      className="u-fade-in"
     >
-      <div className={styles['statistics-page-content']}>
+      {/* eslint-disable-next-line react/forbid-dom-props */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3xl)', marginTop: 'var(--space-lg)', padding: '0 var(--space-sm)' }}>
         {/* Section 1: Overview */}
-        <section className={styles['stats-section']}>
-          <h2 className={styles['stats-section-title']}>{t('statistics.sections.overview') || 'Overview'}</h2>
+        <Stack gap="lg">
+          <SectionHeader title={t('statistics.sections.overview') || 'Overview'} />
           <StatisticsWidget T={t} />
-        </section>
+        </Stack>
 
         {/* Section 2: Ratings & Reviews */}
-        <section className={styles['stats-section']}>
-          <h2 className={styles['stats-section-title']}>{t('statistics.sections.ratings') || 'Ratings & Reviews'}</h2>
-          <div className={styles['statistics-bento-grid']}>
+        <Stack gap="lg">
+          <SectionHeader title={t('statistics.sections.ratings') || 'Ratings & Reviews'} />
+          <Grid variant="bento">
             {/* Box 1: Ratings Averages and Counts */}
-            <div className={styles['bento-box']}>
-              <RatingsSummary state={ratingsState} t={t} />
-            </div>
+            <RatingsSummary state={ratingsState} t={t} />
 
             {/* Box 2: Rating Distribution Chart */}
-            <div className={styles['bento-box']}>
-              <RatingDistribution
-                state={ratingsState}
-                t={t}
-                distTabs={distTabs}
-                effectiveDistTab={effectiveDistTab}
-                setDistTab={setDistTab}
-              />
-            </div>
-          </div>
-        </section>
+            <RatingDistribution
+              state={ratingsState}
+              t={t}
+              distTabs={distTabs}
+              effectiveDistTab={effectiveDistTab}
+              setDistTab={setDistTab}
+            />
+          </Grid>
+        </Stack>
 
         {/* Section 3: Library DNA & Timeline */}
-        <section className={styles['stats-section']}>
-          <h2 className={styles['stats-section-title']}>{t('statistics.sections.insights') || 'Library DNA & Timeline'}</h2>
-          <div className={styles['statistics-bento-grid']}>
+        <Stack gap="lg">
+          <SectionHeader title={t('statistics.sections.insights') || 'Library DNA & Timeline'} />
+          <Grid variant="bento">
             {/* Box 3: Library DNA Radar */}
-            <div className={styles['bento-box']}>
-              <LibraryDNA
-                constellation={stats?.genre_constellation}
-                genres={stats?.genre_distribution}
-                insightTitleCount={insightTitleCount}
-                T={t}
-              />
-            </div>
+            <LibraryDNA
+              constellation={stats?.genre_constellation}
+              genres={stats?.genre_distribution}
+              insightTitleCount={insightTitleCount}
+              T={t}
+            />
 
             {/* Box 4: Time Travel Timeline */}
-            <div className={styles['bento-box']}>
-              <TimeTravelTimeline
-                decades={stats?.decade_distribution}
-                insightTitleCount={insightTitleCount}
-                T={t}
-              />
-            </div>
-          </div>
-        </section>
+            <TimeTravelTimeline
+              decades={stats?.decade_distribution}
+              insightTitleCount={insightTitleCount}
+              T={t}
+            />
+          </Grid>
+        </Stack>
       </div>
     </Page>
   );

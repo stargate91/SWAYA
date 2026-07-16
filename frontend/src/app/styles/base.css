@@ -107,10 +107,6 @@ a {
   color: var(--color-accent);
 }
 
-.link-reset {
-  text-decoration: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
   :root {
     --motion-duration-fast: 0.01ms;
@@ -120,16 +116,6 @@ a {
     --motion-lift-distance-md: 0;
   }
 }
-
-.no-scrollbar {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
 .ui-carousel-arrow {
   position: absolute;
   top: 50%;
@@ -164,3 +150,27 @@ a {
   background: color-mix(in srgb, var(--color-text-primary) 15%, transparent);
   transform: translateY(-50%);
 }
+
+@keyframes growWidth {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes floatDna {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-0.25rem) rotate(4deg); }
+}
+
+@keyframes floatTimeline {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-0.25rem) scale(1.03); }
+}
+
+
+
+
+
