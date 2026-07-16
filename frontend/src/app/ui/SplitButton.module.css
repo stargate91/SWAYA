@@ -111,6 +111,7 @@
   display: flex;
   align-items: center;
   width: 100%;
+  white-space: nowrap;
 }
 
 .split-button-menu-item:hover {

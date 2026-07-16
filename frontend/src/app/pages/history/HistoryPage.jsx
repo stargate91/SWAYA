@@ -221,6 +221,8 @@ export default function HistoryPage() {
           value={activeTab}
           onChange={setActiveTab}
           options={tabOptions}
+          size="sm"
+          animated={true}
         />,
         utilityBarTarget
       )}

@@ -1,5 +1,5 @@
 /* Pagination */
-.ui-pagination {
+.container {
   position: relative;
   display: flex;
   align-items: center;
@@ -11,7 +11,7 @@
   background: var(--color-surface-card);
 }
 
-.ui-pagination__meta {
+.meta {
   position: absolute;
   left: var(--space-lg);
   color: var(--color-muted);
@@ -21,33 +21,33 @@
   white-space: nowrap;
 }
 
-.ui-pagination__controls {
+.controls {
   display: flex;
   align-items: center;
   justify-content: center;
   width: fit-content;
 }
 
-.ui-pagination__sizes,
-.ui-pagination__nav {
+.sizes,
+.nav {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
 }
 
-.ui-pagination__sizes {
+.sizes {
   position: absolute;
   right: var(--space-lg);
   order: 2;
 }
 
-.ui-pagination__nav {
+.nav {
   order: 1;
 }
 
-.ui-pagination__size,
-.ui-pagination__button,
-.ui-pagination__page-display {
+.size,
+.button,
+.page-display {
   min-height: calc(2 * var(--space-lg));
   height: calc(2 * var(--space-lg));
   padding: 0 var(--space-md);
@@ -55,24 +55,24 @@
   font-weight: var(--font-weight-semibold);
 }
 
-.ui-pagination__page-display {
+.page-display {
   padding: 0 var(--space-sm);
 }
 
-.ui-pagination__size.is-active {
+.size.isActive {
   color: var(--color-accent-blue);
   border-color: color-mix(in srgb, var(--color-accent-blue) 55%, transparent);
   background: color-mix(in srgb, var(--color-accent-blue) 14%, transparent);
 }
 
-.ui-pagination__size:disabled,
-.ui-pagination__button:disabled,
-.ui-pagination__page-display:disabled {
+.size:disabled,
+.button:disabled,
+.page-display:disabled {
   opacity: 0.45;
   cursor: default;
 }
 
-.ui-pagination__page {
+.page {
   min-width: var(--space-6xl);
   text-align: center;
   color: var(--color-ink);
@@ -80,14 +80,14 @@
   font-weight: var(--font-weight-semibold);
 }
 
-.ui-pagination__page--editable {
+.page-editable {
   display: inline-flex;
   align-items: center;
   gap: var(--space-sm);
   min-width: 0;
 }
 
-.ui-pagination__page--editable input {
+.page-editable input {
   width: calc(3 * var(--space-lg));
   height: var(--space-2xl);
   padding: 0 var(--space-xs);
@@ -101,12 +101,12 @@
   outline: none;
 }
 
-.ui-pagination__page--editable input:focus {
+.page-editable input:focus {
   border-color: var(--color-accent-blue);
   box-shadow: 0 0 0 1px var(--color-accent-blue);
 }
 
-.ui-pagination__modes {
+.modes {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
@@ -116,16 +116,15 @@
   background: var(--color-surface-sunken);
 }
 
-.ui-pagination__modes .ui-pagination__button {
+.modes .button {
   border: none;
   background: transparent;
   cursor: pointer;
   border-radius: var(--radius-sm);
 }
 
-.ui-pagination__modes .ui-pagination__button.is-active {
+.modes .button.isActive {
   background: var(--color-surface-card);
   color: var(--color-accent-blue);
   box-shadow: var(--shadow-sm);
 }
-

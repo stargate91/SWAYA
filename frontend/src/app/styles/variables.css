@@ -524,6 +524,15 @@
   --glass-blur-md: blur(var(--space-md));
   --glass-blur: var(--glass-blur-md);
 
+  /* Progress Bar Tokens */
+  --color-progress-bg: var(--color-surface-glass);
+  --color-progress-border: var(--color-border-default);
+  --progress-backdrop-filter: var(--glass-blur);
+  --color-progress-track: var(--color-border-default);
+  --color-accent-shadow-strong: color-mix(in srgb, var(--color-accent-blue) 30%, transparent);
+  --color-progress-bg-sub: var(--color-surface-glass);
+  --color-progress-border-subtle: var(--color-surface-glass-strong);
+
   /* Dropzone Tokens */
   --color-dropzone-panel-bg: color-mix(in srgb, var(--color-bg-elevated) 95%, var(--color-bg-canvas));
   --shadow-overlay-dropzone:

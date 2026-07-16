@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from '../providers/LanguageContext';
 import Button from './Button';
-import './PaginationBar.css';
+import styles from './PaginationBar.module.css';
 
 const SLASH_SEPARATOR = '/ ';
 const SLASH_SPACED = ' / ';
@@ -9,14 +9,14 @@ const SLASH_SPACED = ' / ';
 
 function PaginationPageSizes({ pageSize, pageSizeOptions, onPageSizeChange, ariaLabel }) {
   return (
-    <div className="ui-pagination__sizes" role="group" aria-label={ariaLabel}>
+    <div className={styles.sizes} role="group" aria-label={ariaLabel}>
       {pageSizeOptions.map((option) => (
         <Button
           key={option}
           type="button"
           variant="secondary-neutral"
           size="sm"
-          className={`ui-pagination__size ${pageSize === option ? 'is-active' : ''}`.trim()}
+          className={`${styles.size} ${pageSize === option ? styles.isActive : ''}`.trim()}
           onClick={() => onPageSizeChange?.(option)}
         >
           {option}
@@ -57,7 +57,7 @@ function PaginationPageEditor({ currentPage, totalPages, onPageChange }) {
   };
 
   return (
-    <div className="ui-pagination__page ui-pagination__page--editable">
+    <div className={`${styles.page} ${styles['page-editable']}`}>
       {isEditing ? (
         <>
           <input
@@ -85,7 +85,7 @@ function PaginationPageEditor({ currentPage, totalPages, onPageChange }) {
           type="button"
           variant="ghost"
           size="sm"
-          className="ui-pagination__page-display"
+          className={styles['page-display']}
           onClick={() => setIsEditing(true)}
         >
           {currentPage}{SLASH_SPACED}{totalPages}
@@ -111,11 +111,11 @@ export default function PaginationBar({
   const { t } = useTranslation();
 
   return (
-    <div className="ui-pagination">
-      <div className="ui-pagination__meta">
+    <div className={styles.container}>
+      <div className={styles.meta}>
         <span>{summaryText}</span>
       </div>
-      <div className="ui-pagination__controls">
+      <div className={styles.controls}>
         {showPageSizes && paginationMode !== 'infinite' ? (
           <PaginationPageSizes
             pageSize={pageSize}
@@ -126,14 +126,14 @@ export default function PaginationBar({
         ) : null}
         
         {paginationMode === 'infinite' ? (
-          <div className="ui-pagination__nav">
+          <div className={styles.nav}>
             {onPaginationModeChange ? (
-              <div className="ui-pagination__modes">
+              <div className={styles.modes}>
                 <Button
                   type="button"
                   variant="secondary-neutral"
                   size="sm"
-                  className="ui-pagination__button"
+                  className={styles.button}
                   onClick={() => onPaginationModeChange('pages')}
                 >
                   {t('pagination.modePages') || 'Pages'}
@@ -142,7 +142,7 @@ export default function PaginationBar({
                   type="button"
                   variant="secondary-neutral"
                   size="sm"
-                  className="ui-pagination__button is-active"
+                  className={`${styles.button} ${styles.isActive}`}
                   onClick={() => onPaginationModeChange('infinite')}
                 >
                   {t('pagination.modeInfinite') || 'Infinite'}
@@ -151,15 +151,15 @@ export default function PaginationBar({
             ) : null}
           </div>
         ) : (
-          <div className="ui-pagination__nav">
+          <div className={styles.nav}>
             {onPaginationModeChange ? (
               // eslint-disable-next-line react/forbid-dom-props
-              <div className="ui-pagination__modes" style={{ marginRight: '16px' }}>
+              <div className={styles.modes} style={{ marginRight: '16px' }}>
                 <Button
                   type="button"
                   variant="secondary-neutral"
                   size="sm"
-                  className="ui-pagination__button is-active"
+                  className={`${styles.button} ${styles.isActive}`}
                   onClick={() => onPaginationModeChange('pages')}
                 >
                   {t('pagination.modePages') || 'Pages'}
@@ -168,7 +168,7 @@ export default function PaginationBar({
                   type="button"
                   variant="secondary-neutral"
                   size="sm"
-                  className="ui-pagination__button"
+                  className={styles.button}
                   onClick={() => onPaginationModeChange('infinite')}
                 >
                   {t('pagination.modeInfinite') || 'Infinite'}
@@ -179,7 +179,7 @@ export default function PaginationBar({
               type="button"
               variant="secondary-neutral"
               size="sm"
-              className="ui-pagination__button"
+              className={styles.button}
               onClick={() => onPageChange?.(1)}
               disabled={currentPage === 1}
             >
@@ -189,7 +189,7 @@ export default function PaginationBar({
               type="button"
               variant="secondary-neutral"
               size="sm"
-              className="ui-pagination__button"
+              className={styles.button}
               onClick={() => onPageChange?.(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
             >
@@ -200,7 +200,7 @@ export default function PaginationBar({
               type="button"
               variant="secondary-neutral"
               size="sm"
-              className="ui-pagination__button"
+              className={styles.button}
               onClick={() => onPageChange?.(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
             >
@@ -210,7 +210,7 @@ export default function PaginationBar({
               type="button"
               variant="secondary-neutral"
               size="sm"
-              className="ui-pagination__button"
+              className={styles.button}
               onClick={() => onPageChange?.(totalPages)}
               disabled={currentPage === totalPages}
             >

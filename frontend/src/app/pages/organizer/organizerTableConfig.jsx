@@ -4,6 +4,7 @@ import Pill from '../../ui/Pill';
 import Tooltip from '../../ui/Tooltip';
 import { isEpisodeMediaType, isMovieMediaType, isMovieOrEpisodeMediaType, isSceneMediaType } from '@/lib/mediaTypes';
 import { mapCollisionStrategyLabel, shouldShowCollisionStrategy } from './organizerMappers';
+import styles from './OrganizerResultsPanel.module.css';
 
 const renderSelectColumn = (paginatedRows, selectedRowIds, handleToggleAll, handleToggleRow) => ({
   key: 'select',
@@ -36,17 +37,17 @@ const renderProposedFilename = (value, row, activeMainTab, onOpenMatch, onOpenOv
     if (row.rawType === 'extra') {
       const unmatchedParentStatuses = ['new', 'uncertain', 'no_match', 'multiple', 'error'];
       if (row.parentStatus && unmatchedParentStatuses.includes(row.parentStatus.toLowerCase())) {
-        return <span className="organizer-target-note organizer-target-note--warning">{t('organizer.table.targetNotes.fixParentFirst')}</span>;
+        return <span className={`${styles['organizer-target-note']} ${styles['organizer-target-note--warning']}`}>{t('organizer.table.targetNotes.fixParentFirst')}</span>;
       }
       if (row.rawAction === 'skip') {
-        return <span className="organizer-target-note organizer-target-note--muted">{t('organizer.table.targetNotes.skip')}</span>;
+        return <span className={`${styles['organizer-target-note']} ${styles['organizer-target-note--muted']}`}>{t('organizer.table.targetNotes.skip')}</span>;
       }
       if (row.rawAction === 'delete') {
-        return <span className="organizer-target-note organizer-target-note--danger">{t('organizer.table.targetNotes.delete')}</span>;
+        return <span className={`${styles['organizer-target-note']} ${styles['organizer-target-note--danger']}`}>{t('organizer.table.targetNotes.delete')}</span>;
       }
     }
     return (
-      <span className="organizer-target-proposed">
+      <span className={styles['organizer-target-proposed']}>
         {value}
       </span>
     );
@@ -69,10 +70,10 @@ const renderProposedFilename = (value, row, activeMainTab, onOpenMatch, onOpenOv
       })();
 
       return (
-        <div className="organizer-target-cell">
+        <div className={styles['organizer-target-cell']}>
           <button
             type="button"
-            className="organizer-target-action organizer-target-action--warning"
+            className={`${styles['organizer-target-action']} ${styles['organizer-target-action--warning']}`}
             onClick={(e) => {
               e.stopPropagation();
               onOpenOverride(row);
@@ -85,10 +86,10 @@ const renderProposedFilename = (value, row, activeMainTab, onOpenMatch, onOpenOv
     }
 
     return (
-      <div className="organizer-target-cell">
+      <div className={styles['organizer-target-cell']}>
         <button
           type="button"
-          className="organizer-target-action"
+          className={styles['organizer-target-action']}
           onClick={(e) => {
             e.stopPropagation();
             onOpenMatch(row);
@@ -104,23 +105,23 @@ const renderProposedFilename = (value, row, activeMainTab, onOpenMatch, onOpenOv
 };
 
 const renderStatusCell = (value, row, collisionStrategy, normalizeStatusTone, t) => (
-  <span className="organizer-status-cell">
+  <span className={styles['organizer-status-cell']}>
     <Pill variant={normalizeStatusTone(value, t)}>{value}</Pill>
     {isMovieOrEpisodeMediaType(row.rawType) && shouldShowCollisionStrategy(row) ? (
-      <Pill className="organizer-status-cell__policy" variant="default">
+      <Pill className={styles['organizer-status-cell__policy']} variant="default">
         {mapCollisionStrategyLabel(row.rawAction || collisionStrategy, t)}
       </Pill>
     ) : null}
     {row.rawStatus === 'uncertain' && !isMovieMediaType(row.rawType) && !isSceneMediaType(row.rawType) && (row.season === null || row.season === undefined || row.season === '') ? (
       <Tooltip content={t('organizer.status.missingSeasonTooltip')} side="top">
-        <Pill className="organizer-status-cell__policy" variant="default">
+        <Pill className={styles['organizer-status-cell__policy']} variant="default">
           {t('organizer.status.missingSeason')}
         </Pill>
       </Tooltip>
     ) : null}
     {row.rawStatus === 'uncertain' && !isMovieMediaType(row.rawType) && !isSceneMediaType(row.rawType) && (row.episode === null || row.episode === undefined || row.episode === '') ? (
       <Tooltip content={t('organizer.status.missingEpisodeTooltip')} side="top">
-        <Pill className="organizer-status-cell__policy" variant="default">
+        <Pill className={styles['organizer-status-cell__policy']} variant="default">
           {t('organizer.status.missingEpisode')}
         </Pill>
       </Tooltip>
@@ -164,7 +165,7 @@ export function buildOrganizerColumns({
             return <></>;
           }
         }
-        return <ArrowRight size={14} className="organizer-target-arrow" />;
+        return <ArrowRight size={14} className={styles['organizer-target-arrow']} />;
       },
     },
     {

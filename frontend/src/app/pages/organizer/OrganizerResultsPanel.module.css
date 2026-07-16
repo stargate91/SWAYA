@@ -119,6 +119,10 @@
   opacity: 0.8;
 }
 
+.organizer-target-action--warning {
+  color: var(--color-accent-yellow-soft);
+}
+
 .organizer-target-proposed {
   display: inline-flex;
   align-items: center;

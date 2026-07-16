@@ -6,6 +6,7 @@ import LibraryPagination from './components/LibraryPagination';
 import { useLibraryState } from './hooks/useLibraryState';
 import { useLibraryModals } from './hooks/useLibraryModals';
 import PanelHeader from '@/ui/PanelHeader';
+import panelHeaderStyles from '@/ui/PanelHeader.module.css';
 import Button from '@/ui/Button';
 import { UserPlus, Plus, Play } from '@/ui/icons';
 import LibraryGrid from './components/LibraryGrid';
@@ -272,6 +273,8 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
             { value: 'owned', label: state.t('library.filter.have') || 'Have' },
             { value: 'unowned', label: state.t('library.filter.missing') || 'Missing' },
           ]}
+          size="sm"
+          animated={true}
         />,
         utilityBarTarget
       )}
@@ -288,6 +291,8 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
                 tabs={state.tabs}
                 value={state.resolvedTab}
                 onChange={state.setActiveTab}
+                className={panelHeaderStyles['panel-tabs']}
+                tabClassName={panelHeaderStyles['panel-tab']}
               />
             ) : (
               <div className="library-header__inline-tools">

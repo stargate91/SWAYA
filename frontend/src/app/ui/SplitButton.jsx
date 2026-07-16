@@ -101,7 +101,7 @@ export default function SplitButton({
             position: 'absolute',
             top: `${menuCoords.top}px`,
             left: `${menuCoords.left}px`,
-            width: `${menuCoords.width}px`,
+            minWidth: `${menuCoords.width}px`,
           }}
         >
           {options.map((opt, index) => (
