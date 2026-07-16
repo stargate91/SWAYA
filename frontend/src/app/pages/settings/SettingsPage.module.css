@@ -22,8 +22,6 @@
 }
 
 .settings-error-actions {
-  display: flex;
-  gap: var(--space-md);
   margin-top: var(--space-lg);
 }
 

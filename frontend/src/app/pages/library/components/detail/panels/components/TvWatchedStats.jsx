@@ -4,6 +4,7 @@ import { useMediaDetailContext } from '../../MediaDetailContext';
 import '../PanelsCommon.css';
 import './WatchedStats.css';
 import Pill from '@/ui/Pill';
+import Inline from '@/ui/Inline';
 
 
 export default function TvWatchedStats() {
@@ -193,14 +194,14 @@ export default function TvWatchedStats() {
                     key={log.id || index}
                     className="activity-item activity-item--tv"
                   >
-                    <div className="activity-item__tv-top">
+                    <Inline gap="md" align="center" className="activity-item__tv-top">
                       <Pill variant="meta" className="activity-item__token">
                         {logCodeText}
                       </Pill>
                       <span className="activity-item__title" title={log.episodeTitle}>
                         {log.episodeTitle}
                       </span>
-                    </div>
+                    </Inline>
                     <span className="activity-item__date">
                       {formatLogDate(log.watched_at)}
                     </span>

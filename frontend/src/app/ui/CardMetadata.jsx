@@ -4,6 +4,7 @@ import Tooltip from '@/ui/Tooltip';
 import Pill from '@/ui/Pill';
 import { Star } from '@/ui/icons';
 import styles from './CardMetadata.module.css';
+import Inline from '@/ui/Inline';
 
 const CardMetadata = memo(function CardMetadata({
   title,
@@ -142,13 +143,13 @@ export const CardMetadataRow = function CardMetadataRow({ items = [], className 
   const filteredItems = items.filter((item) => item !== null && item !== undefined && item !== '');
 
   return (
-    <div className={`${styles.row} ${className}`.trim()}>
+    <Inline gap="xs" align="center" className={`${styles.row} ${className}`.trim()}>
       {filteredItems.map((item, index) => (
         <span key={`${String(item)}-${index}`} className={styles.item}>
           {item}
         </span>
       ))}
-    </div>
+    </Inline>
   );
 };
 

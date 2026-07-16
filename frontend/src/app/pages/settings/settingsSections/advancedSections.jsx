@@ -1,5 +1,6 @@
 import SettingsSelectField from '../components/fields/SettingsSelectField.jsx';
 import Button from '@/ui/Button';
+import Inline from '@/ui/Inline';
 
 export function createAdvancedThresholdSection(t) {
   return {
@@ -93,7 +94,7 @@ export function createAdvancedLanguageSection(t, metadataLanguageOptions, target
         type: 'custom',
         key: 'sync_language_button_container',
         render: () => (
-          <div className="settings-action-row-right">
+          <Inline align="center" justify="end" className="settings-action-row-right">
             <Button
               variant="secondary"
               type="button"
@@ -102,7 +103,7 @@ export function createAdvancedLanguageSection(t, metadataLanguageOptions, target
             >
               {t('settingsPage.languageChangeInfo.syncButton')}
             </Button>
-          </div>
+          </Inline>
         ),
       },
     ],

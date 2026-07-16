@@ -52,11 +52,6 @@
   margin: 0;
 }
 
-.stats-title-inline {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-md);
-}
 
 .stats-title-sup {
   font-size: 0.45em;

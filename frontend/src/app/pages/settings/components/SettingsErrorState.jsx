@@ -1,5 +1,6 @@
 import Card from '@/ui/Card';
 import Button from '@/ui/Button';
+import Inline from '@/ui/Inline';
 import styles from '../SettingsPage.module.css';
 
 export default function SettingsErrorState({ t, onRetry, onClose }) {
@@ -13,14 +14,14 @@ export default function SettingsErrorState({ t, onRetry, onClose }) {
           <span className="ui-field__hint">
             {t('settingsPage.errorText')}
           </span>
-          <div className={styles['settings-error-actions']}>
+          <Inline gap="md" align="center" className={styles['settings-error-actions']}>
             <Button variant="primary" onClick={onRetry}>
               {t('settingsPage.retry')}
             </Button>
             <Button variant="secondary" onClick={onClose}>
               {t('common.cancel')}
             </Button>
-          </div>
+          </Inline>
         </div>
       </Card>
     </div>

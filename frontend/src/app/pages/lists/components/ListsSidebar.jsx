@@ -2,6 +2,7 @@ import { Loader2, Plus, Download, Edit2, Trash2 } from '@/ui/icons';
 import Tooltip from '@/ui/Tooltip';
 import ListCollageIcon from './ListCollageIcon';
 import styles from './ListsSidebar.module.css';
+import Inline from '@/ui/Inline';
 
 export default function ListsSidebar({
   t,
@@ -20,7 +21,7 @@ export default function ListsSidebar({
         <span className={styles['lists-sidebar__title']}>
           {t('lists.sidebar_title') || 'My Lists'}
         </span>
-        <div className={styles['lists-sidebar__actions']}>
+        <Inline gap="sm" align="center" className={styles['lists-sidebar__actions']}>
           <Tooltip content={t('lists.import_title') || 'Import List'} side="top">
             <button
               type="button"
@@ -41,7 +42,7 @@ export default function ListsSidebar({
               <Plus size={18} />
             </button>
           </Tooltip>
-        </div>
+        </Inline>
       </div>
 
       <div className={`${styles['lists-sidebar__content']} no-scrollbar`}>
@@ -65,7 +66,7 @@ export default function ListsSidebar({
                   // eslint-disable-next-line react/forbid-dom-props
                   style={{ '--list-theme-color': list.color || 'var(--color-accent-blue)' }}
                 >
-                  <div className={styles['lists-sidebar__item-left']}>
+                  <Inline gap="lg" align="center" className={styles['lists-sidebar__item-left']}>
                     <div className={styles['lists-sidebar__item-icon-wrap']}>
                       <ListCollageIcon
                         samplePosters={list.sample_posters}
@@ -85,9 +86,9 @@ export default function ListsSidebar({
                         {list.item_count} {t('lists.items_suffix') || 'ITEMS'}
                       </span>
                     </div>
-                  </div>
+                  </Inline>
 
-                  <div className={styles['lists-sidebar__item-right']}>
+                  <Inline gap="md" align="center" className={styles['lists-sidebar__item-right']}>
                     {!list.is_watchlist && (
                       <div className={styles['lists-sidebar__item-actions']}>
                         <Tooltip content={t('common.edit') || 'Edit'} side="top">
@@ -112,7 +113,7 @@ export default function ListsSidebar({
                         </Tooltip>
                       </div>
                     )}
-                  </div>
+                  </Inline>
                 </div>
               );
             })}

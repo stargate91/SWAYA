@@ -5,6 +5,7 @@ import Badge from '@/ui/Badge';
 import { Search } from '@/ui/icons';
 import { useTranslation } from '@/providers/LanguageContext';
 import styles from './PanelHeader.module.css';
+import Inline from '@/ui/Inline';
 
 /**
  * PanelHeader provides a unified, consistent header panel layout
@@ -56,9 +57,9 @@ export default function PanelHeader({
           )}
         </span>
         {actions && (
-          <div className={styles['panel-header__actions']}>
+          <Inline gap="sm" align="center" className={styles['panel-header__actions']}>
             {actions}
-          </div>
+          </Inline>
         )}
       </div>
 

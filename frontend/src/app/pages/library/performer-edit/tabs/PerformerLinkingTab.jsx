@@ -20,6 +20,7 @@ import Spinner from '@/ui/Spinner';
 import { Search, Link as LinkIcon, User, Trash2, GitFork, Star, ArrowLeft, AlertTriangle } from '@/ui/icons';
 import Modal from '@/ui/Modal';
 import Grid from '@/ui/Grid';
+import Inline from '@/ui/Inline';
 
 const FemaleSilhouette = () => (
   <div className="performer-gender-silhouette performer-gender-silhouette--mask performer-gender-silhouette--female" />
@@ -279,7 +280,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
   if (activeSearchSource) {
     return (
       <div className="performer-linker performer-linker--search">
-        <div className="performer-linker__header">
+        <Inline gap="lg" align="center" className="performer-linker__header">
           <Button
             variant="secondary-neutral"
             leftIcon={<ArrowLeft size={14} />}
@@ -296,9 +297,9 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
           <span className="performer-linker__title">
             {t('common.search') || 'Search'} {SOURCE_BUCKETS.find((b) => b.key === activeSearchSource)?.label}
           </span>
-        </div>
+        </Inline>
 
-        <form onSubmit={handleSearch} className="performer-linker__search-form">
+        <Inline as="form" onSubmit={handleSearch} gap="md" align="center" className="performer-linker__search-form">
           <div className="performer-linker__input-wrapper">
             <Input
               type="text"
@@ -317,7 +318,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
               <Search size={16} />
             </IconButton>
           </Tooltip>
-        </form>
+        </Inline>
 
         <div className="performer-linker__results">
           {isSearching ? (
@@ -500,7 +501,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
         variant="danger"
         icon={AlertTriangle}
         footer={
-          <div className="performer-linker-modal-footer">
+          <Inline gap="md" align="center" justify="end" className="performer-linker-modal-footer">
             <Button
               variant="secondary-neutral"
               onClick={() => setShowDeleteConfirm(false)}
@@ -515,7 +516,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
             >
               {deleteMutation.isPending ? (t('library.details.deleting') || 'Deleting...') : (t('library.details.deletePerformerConfirmBtn') || 'Delete Performer')}
             </Button>
-          </div>
+          </Inline>
         }
       >
         <p className="performer-linker-modal-body">

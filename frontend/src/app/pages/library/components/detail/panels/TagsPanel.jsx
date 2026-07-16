@@ -5,6 +5,7 @@ import { useAllTagsQuery, useCreateTagMutation } from '@/queries';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import './PanelsCommon.css';
 import './TagsPanel.css';
+import Inline from '@/ui/Inline';
 
 
 export default function TagsPanel() {
@@ -106,7 +107,7 @@ export default function TagsPanel() {
         <span className="tags-panel__section-subtitle">
           {t('library.tags.assignedTitle') || 'Assigned'}
         </span>
-        <div className="tags-panel__assigned-list">
+        <Inline gap="sm" align="center" className="tags-panel__assigned-list">
           {currentTags.map(tagName => {
             const tagObj = allTags.find(t => t.name === tagName);
             const color = tagObj?.color || 'var(--color-accent)';
@@ -134,7 +135,7 @@ export default function TagsPanel() {
               {t('library.tags.noTagsAssigned') || 'No tags assigned.'}
             </div>
           )}
-        </div>
+        </Inline>
       </div>
 
       {/* Suggested Tags */}
@@ -143,7 +144,7 @@ export default function TagsPanel() {
           <span className="tags-panel__section-subtitle">
             {t('library.details.suggestedTags') || 'Suggested Tags'}
           </span>
-          <div className="tags-panel__assigned-list">
+          <Inline gap="sm" align="center" className="tags-panel__assigned-list">
             {item.suggested_tags.map(tagName => {
               const isAssigned = currentTags.includes(tagName);
               if (isAssigned) return null;
@@ -163,7 +164,7 @@ export default function TagsPanel() {
                 {t('library.tags.allTagsAssigned') || 'All suggested tags assigned.'}
               </div>
             )}
-          </div>
+          </Inline>
         </div>
       )}
 

@@ -54,13 +54,6 @@
   min-height: 0;
 }
 
-.add-people-modal__search-form {
-  display: flex;
-  gap: var(--space-sm);
-  width: 100%;
-  align-items: center;
-  flex-shrink: 0;
-}
 
 .add-people-modal__search-input-group {
   display: flex;
@@ -140,11 +133,3 @@
   flex-shrink: 0;
 }
 
-.add-people-modal__filter-row {
-  display: flex;
-  align-items: center;
-  flex-wrap: nowrap;
-  gap: var(--space-md);
-  width: 100%;
-  flex-shrink: 0;
-}

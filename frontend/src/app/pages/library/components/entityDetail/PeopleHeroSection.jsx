@@ -17,6 +17,7 @@ import { useTranslation } from '@/providers/LanguageContext';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import { API_BASE } from '@/lib/backend';
 import './EntityDetailHeroSection.css';
+import Inline from '@/ui/Inline';
 
 export default function PeopleHeroSection({
   item,
@@ -80,7 +81,7 @@ export default function PeopleHeroSection({
           />
 
           {/* 3. Integrated Sidebar Action Toolbar (Clean 3-button row, no rating pill) */}
-          <div className="entity-detail-page__sidebar-actions">
+          <Inline gap="sm" align="center" className="entity-detail-page__sidebar-actions">
             <IconButton
               variant="none"
               size="none"
@@ -114,7 +115,7 @@ export default function PeopleHeroSection({
             >
               <PenLine size={15} />
             </IconButton>
-          </div>
+          </Inline>
 
           {/* 4. Interactive rating bar */}
           <SegmentedRating

@@ -2,6 +2,7 @@ import { Image as ImageIcon, Settings } from '@/ui/icons';
 import { useNavigate } from 'react-router-dom';
 import PeopleTagPopover from './PeopleTagPopover';
 import ListsPopover from '../detail/sections/ListsPopover';
+import Inline from '@/ui/Inline';
 
 export default function EntityDetailTopControls({
   isPeople,
@@ -17,7 +18,7 @@ export default function EntityDetailTopControls({
 
   if (isPeople) {
     return (
-      <div className="entity-detail-page__top-controls">
+      <Inline gap="sm" align="center" className="entity-detail-page__top-controls">
         <ListsPopover
           item={item}
           type="person"
@@ -46,7 +47,7 @@ export default function EntityDetailTopControls({
             <ImageIcon size={18} />
           </button>
         ) : null}
-      </div>
+      </Inline>
     );
   }
 

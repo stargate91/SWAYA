@@ -27,9 +27,6 @@
   border: 1px solid var(--media-detail-panel-card-border);
   border-radius: var(--radius-lg);
   background: var(--media-detail-panel-card-bg);
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
   cursor: pointer;
   transition: transform var(--motion-emphasized), border-color var(--motion-base), box-shadow var(--motion-base), background var(--motion-base);
   overflow: hidden;

@@ -1,6 +1,7 @@
 import Button from '@/ui/Button';
 import SettingsTextField from './SettingsTextField.jsx';
 import { useSettingsFormContext, useSettingsField } from '../../SettingsFormContext.jsx';
+import Inline from '@/ui/Inline';
 
 export default function SettingsPathField({
   field,
@@ -20,7 +21,7 @@ export default function SettingsPathField({
   const isFieldDisabled = disabled || fieldState.disabled;
 
   return (
-    <div className="settings-input-row">
+    <Inline gap="md" align="end" className="settings-input-row">
       <div className="settings-input-grow">
         <SettingsTextField field={field} {...props} />
       </div>
@@ -32,6 +33,6 @@ export default function SettingsPathField({
       >
         {buttonLabel || t('settingsPage.sections.folders.browse')}
       </Button>
-    </div>
+    </Inline>
   );
 }

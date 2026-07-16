@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Minus, Plus } from '@/ui/icons';
 import UtilityBarBottomPortal from '../../../../../../components/UtilityBarBottomPortal';
+import Inline from '@/ui/Inline';
 
 export default function BottomSocialsBar({
   socialLinks,
@@ -18,7 +19,7 @@ export default function BottomSocialsBar({
   return (
     <UtilityBarBottomPortal side="right">
       <div className={`entity-detail-page__bottom-socials ${isSocialExpanded ? 'entity-detail-page__bottom-socials--expanded' : ''}`}>
-        <div className="entity-detail-page__bottom-socials-wrapper">
+        <Inline gap="sm" align="center" className="entity-detail-page__bottom-socials-wrapper">
           {hasExtraSocials && (
             <div className="entity-detail-page__bottom-socials-extra">
               {extraSocialLinks.map((link) => (
@@ -61,7 +62,7 @@ export default function BottomSocialsBar({
               {isSocialExpanded ? <Minus size={14} /> : <Plus size={14} />}
             </button>
           )}
-        </div>
+        </Inline>
       </div>
     </UtilityBarBottomPortal>
   );

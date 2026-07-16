@@ -1,6 +1,7 @@
 import { BarChart2, CheckCircle, Users, Heart } from '@/ui/icons';
 import SegmentedControl from '@/ui/SegmentedControl';
 import Skeleton from '@/ui/Skeleton';
+import Inline from '@/ui/Inline';
 import './RatingsAnalytics.css';
 
 const bulletSep = '\u2022';
@@ -29,19 +30,19 @@ export function RatingsSummary({ state, t }) {
     <div className="analytics-summary-container">
       {/* CARD 1: Media Average Ratings */}
       <div className="analytics-card compact-stats-card">
-        <div className="compact-stats-card__header">
+        <Inline align="center" className="compact-stats-card__header">
           <span className="analytics-card__title">
             {t('ratings.stats.mediaAverages', { defaultValue: 'Average Ratings' })}
           </span>
           <BarChart2 size={16} className="analytics-card__icon text-accent-blue" />
-        </div>
+        </Inline>
         <div className="compact-stats-card__content">
           {/* Movies Row */}
-          <div className="compact-stats-row">
+          <Inline gap="md" align="center" className="compact-stats-row">
             <div className="compact-stats-row__label">
               {t('ratings.subtabs.movies', { defaultValue: 'Movies' })}
             </div>
-            <div className="compact-stats-row__value-wrapper">
+            <Inline gap="md" align="center" className="compact-stats-row__value-wrapper">
               <span className="compact-stats-row__value">{state.moviesStats.average}</span>
               <div className="analytics-mini-segmented-bar">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((val) => {
@@ -57,15 +58,15 @@ export function RatingsSummary({ state, t }) {
                   );
                 })}
               </div>
-            </div>
-          </div>
+            </Inline>
+          </Inline>
 
           {/* TV Shows Row */}
-          <div className="compact-stats-row">
+          <Inline gap="md" align="center" className="compact-stats-row">
             <div className="compact-stats-row__label">
               {t('ratings.subtabs.tvShows', { defaultValue: 'TV Shows' })}
             </div>
-            <div className="compact-stats-row__value-wrapper">
+            <Inline gap="md" align="center" className="compact-stats-row__value-wrapper">
               <span className="compact-stats-row__value">{state.tvStats.average}</span>
               <div className="analytics-mini-segmented-bar">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((val) => {
@@ -81,16 +82,16 @@ export function RatingsSummary({ state, t }) {
                   );
                 })}
               </div>
-            </div>
-          </div>
+            </Inline>
+          </Inline>
 
           {/* Scenes Row */}
           {state.activeSessionMode === 'nsfw' && (
-            <div className="compact-stats-row">
+            <Inline gap="md" align="center" className="compact-stats-row">
               <div className="compact-stats-row__label">
                 {t('ratings.subtabs.scenes', { defaultValue: 'Scenes' })}
               </div>
-              <div className="compact-stats-row__value-wrapper">
+              <Inline gap="md" align="center" className="compact-stats-row__value-wrapper">
                 <span className="compact-stats-row__value">{state.scenesStats.average}</span>
                 <div className="analytics-mini-segmented-bar">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((val) => {
@@ -106,16 +107,16 @@ export function RatingsSummary({ state, t }) {
                     );
                   })}
                 </div>
-              </div>
-            </div>
+              </Inline>
+            </Inline>
           )}
 
           {/* Videos Row */}
-          <div className="compact-stats-row">
+          <Inline gap="md" align="center" className="compact-stats-row">
             <div className="compact-stats-row__label">
               {t('library.tabs.videos') || 'Videos'}
             </div>
-            <div className="compact-stats-row__value-wrapper">
+            <Inline gap="md" align="center" className="compact-stats-row__value-wrapper">
               <span className="compact-stats-row__value">{state.videosStats.average}</span>
               <div className="analytics-mini-segmented-bar">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((val) => {
@@ -131,99 +132,99 @@ export function RatingsSummary({ state, t }) {
                   );
                 })}
               </div>
-            </div>
-          </div>
+            </Inline>
+          </Inline>
         </div>
       </div>
 
       {/* CARD 2: Media Counts */}
       <div className="analytics-card compact-stats-card">
-        <div className="compact-stats-card__header">
+        <Inline align="center" className="compact-stats-card__header">
           <span className="analytics-card__title">
             {t('ratings.stats.mediaItems', { defaultValue: 'Library Items' })}
           </span>
           <CheckCircle size={16} className="analytics-card__icon text-success" />
-        </div>
+        </Inline>
         <div className="compact-stats-card__content">
           {/* Movies counts */}
-          <div className="compact-stats-row">
+          <Inline gap="md" align="center" className="compact-stats-row">
             <div className="compact-stats-row__label">
               {t('ratings.subtabs.movies', { defaultValue: 'Movies' })}
             </div>
-            <div className="compact-stats-counts">
+            <Inline gap="sm" align="center" className="compact-stats-counts">
               <span className="compact-count-rated">{state.moviesStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</span>
               <span className="compact-count-sep">{bulletSep}</span>
               <span className="compact-count-unrated">
                 {state.moviesStats.totalUnrated} {t('ratings.stats.unrated', { defaultValue: 'unrated' })}
                 {getPercentageText(state.moviesStats.totalRated, state.moviesStats.totalUnrated)}
               </span>
-            </div>
-          </div>
+            </Inline>
+          </Inline>
 
           {/* TV Shows counts */}
-          <div className="compact-stats-row">
+          <Inline gap="md" align="center" className="compact-stats-row">
             <div className="compact-stats-row__label">
               {t('ratings.subtabs.tvShows', { defaultValue: 'TV Shows' })}
             </div>
-            <div className="compact-stats-counts">
+            <Inline gap="sm" align="center" className="compact-stats-counts">
               <span className="compact-count-rated">{state.tvStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</span>
               <span className="compact-count-sep">{bulletSep}</span>
               <span className="compact-count-unrated">
                 {state.tvStats.totalUnrated} {t('ratings.stats.unrated', { defaultValue: 'unrated' })}
                 {getPercentageText(state.tvStats.totalRated, state.tvStats.totalUnrated)}
               </span>
-            </div>
-          </div>
+            </Inline>
+          </Inline>
 
           {/* Scenes counts */}
           {state.activeSessionMode === 'nsfw' && (
-            <div className="compact-stats-row">
+            <Inline gap="md" align="center" className="compact-stats-row">
               <div className="compact-stats-row__label">
                 {t('ratings.subtabs.scenes', { defaultValue: 'Scenes' })}
               </div>
-              <div className="compact-stats-counts">
+              <Inline gap="sm" align="center" className="compact-stats-counts">
                 <span className="compact-count-rated">{state.scenesStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</span>
                 <span className="compact-count-sep">{bulletSep}</span>
                 <span className="compact-count-unrated">
                   {state.scenesStats.totalUnrated} {t('ratings.stats.unrated', { defaultValue: 'unrated' })}
                   {getPercentageText(state.scenesStats.totalRated, state.scenesStats.totalUnrated)}
                 </span>
-              </div>
-            </div>
+              </Inline>
+            </Inline>
           )}
 
           {/* Videos counts */}
-          <div className="compact-stats-row">
+          <Inline gap="md" align="center" className="compact-stats-row">
             <div className="compact-stats-row__label">
               {t('library.tabs.videos') || 'Videos'}
             </div>
-            <div className="compact-stats-counts">
+            <Inline gap="sm" align="center" className="compact-stats-counts">
               <span className="compact-count-rated">{state.videosStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</span>
               <span className="compact-count-sep">{bulletSep}</span>
               <span className="compact-count-unrated">
                 {state.videosStats.totalUnrated} {t('ratings.stats.unrated', { defaultValue: 'unrated' })}
                 {getPercentageText(state.videosStats.totalRated, state.videosStats.totalUnrated)}
               </span>
-            </div>
-          </div>
+            </Inline>
+          </Inline>
         </div>
       </div>
 
       {/* CARD 3: People Stats */}
       <div className="analytics-card compact-stats-card">
-        <div className="compact-stats-card__header">
+        <Inline align="center" className="compact-stats-card__header">
           <span className="analytics-card__title">
             {t('ratings.subtabs.people', { defaultValue: 'People' })}
           </span>
           <Users size={16} className="analytics-card__icon text-muted" />
-        </div>
+        </Inline>
         <div className="compact-stats-card__content">
           {/* People Avg Rating */}
-          <div className="compact-stats-row">
+          <Inline gap="md" align="center" className="compact-stats-row">
             <div className="compact-stats-row__label">
               {t('ratings.stats.average', { defaultValue: 'Average Rating' })}
             </div>
-            <div className="compact-stats-row__value-wrapper">
+            <Inline gap="md" align="center" className="compact-stats-row__value-wrapper">
               <span className="compact-stats-row__value">{state.peopleStats.average}</span>
               <div className="analytics-mini-segmented-bar">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((val) => {
@@ -239,26 +240,26 @@ export function RatingsSummary({ state, t }) {
                   );
                 })}
               </div>
-            </div>
-          </div>
+            </Inline>
+          </Inline>
 
           {/* People counts */}
-          <div className="compact-stats-row">
+          <Inline gap="md" align="center" className="compact-stats-row">
             <div className="compact-stats-row__label">
               {t('ratings.stats.totalRated', { defaultValue: 'Items' })}
             </div>
-            <div className="compact-stats-counts">
+            <Inline gap="sm" align="center" className="compact-stats-counts">
               <span className="compact-count-rated">{state.peopleStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</span>
               <span className="compact-count-sep">{bulletSep}</span>
               <span className="compact-count-unrated">
                 {state.peopleStats.totalUnrated} {t('ratings.stats.unrated', { defaultValue: 'unrated' })}
                 {getPercentageText(state.peopleStats.totalRated, state.peopleStats.totalUnrated)}
               </span>
-            </div>
-          </div>
+            </Inline>
+          </Inline>
 
           {/* People Favorites */}
-          <div className="compact-stats-row">
+          <Inline gap="md" align="center" className="compact-stats-row">
             <div className="compact-stats-row__label">
               {state.activeSessionMode === 'nsfw'
                 ? (t('ratings.stats.favoritePerformers') || 'Favorite Performers')
@@ -268,7 +269,7 @@ export function RatingsSummary({ state, t }) {
               <span className="compact-stats-row__value">{state.peopleStats.favoritesCount}</span>
               <Heart size={14} className="analytics-card__icon text-danger" fill="currentColor" />
             </div>
-          </div>
+          </Inline>
         </div>
       </div>
     </div>

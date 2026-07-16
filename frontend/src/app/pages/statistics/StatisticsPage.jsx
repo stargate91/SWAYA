@@ -10,6 +10,7 @@ import { useRatingsPageState } from '../ratings/useRatingsPageState';
 import { useStatsQuery } from '../../queries';
 import { useLibraryModeStore } from '../../stores/useLibraryModeStore';
 import styles from './StatisticsPage.module.css';
+import Inline from '@/ui/Inline';
 
 export default function StatisticsPage() {
   const { t } = useTranslation();
@@ -35,7 +36,7 @@ export default function StatisticsPage() {
   );
 
   const pageTitle = (
-    <span className={styles['stats-title-inline']}>
+    <Inline gap="md" align="center" className={styles['stats-title-inline']}>
       {t('sidebar.statistics') || 'Statistics'}
       {isAdultMode && (
         <sup className={styles['stats-title-sup']}>
@@ -44,7 +45,7 @@ export default function StatisticsPage() {
           </Badge>
         </sup>
       )}
-    </span>
+    </Inline>
   );
 
   return (

@@ -19,8 +19,6 @@
 }
 
 .history-skeleton-header {
-  display: flex;
-  justify-content: space-between;
   margin-bottom: var(--space-md);
 }
 
@@ -66,8 +64,6 @@
 }
 
 .history-undo-modal__row {
-  display: flex;
-  justify-content: space-between;
   font-size: var(--font-size-sm);
 }
 
@@ -86,8 +82,5 @@
 }
 
 .history-undo-modal__footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-md);
   width: 100%;
 }

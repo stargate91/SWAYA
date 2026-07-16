@@ -3,6 +3,7 @@ import { useSettingsViewContext, useSettingsField } from '../SettingsFormContext
 import Card from '@/ui/Card';
 import SelectableCard from '@/ui/SelectableCard';
 import styles from './ThemeTab.module.css';
+import Inline from '@/ui/Inline';
 
 const THEME_LIST = [
   { value: 'dark', translationKey: 'settingsPage.sections.theme.options.dark' },
@@ -70,12 +71,12 @@ export default function ThemeTab() {
                   }
                 }}
               >
-                <div className={styles['theme-card__header']}>
+                <Inline align="center" justify="between" className={styles['theme-card__header']}>
                   <span className={styles['theme-card__name']}>{label}</span>
                   <div className={`${styles['theme-card__indicator']} ${isActive ? styles['theme-card__indicator--active'] : ''}`}>
                     <Check size={12} strokeWidth={3} />
                   </div>
-                </div>
+                </Inline>
               </SelectableCard>
             );
           })}

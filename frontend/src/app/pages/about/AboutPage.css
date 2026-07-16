@@ -1026,8 +1026,6 @@
 }
 
 .about-features-nsfw-toggle {
-  display: flex;
-  align-items: center;
   justify-content: space-between;
   padding: var(--space-sm) var(--space-md);
   background: var(--color-bg-subtle);

@@ -1,4 +1,5 @@
 import { Play, Pause, Maximize2, X } from '@/ui/icons';
+import Inline from '../ui/Inline';
 import './PlayerControlBar.css';
 
 export default function PlayerControlBar({ state, onTogglePlay, onMaximize, onClose }) {
@@ -42,7 +43,7 @@ export default function PlayerControlBar({ state, onTogglePlay, onMaximize, onCl
         </div>
       </div>
 
-      <div className="player-control-bar__actions">
+      <Inline gap="sm" align="center" className="player-control-bar__actions">
         <button
           className="player-control-bar__btn player-control-bar__btn--play"
           onClick={onTogglePlay}
@@ -63,7 +64,7 @@ export default function PlayerControlBar({ state, onTogglePlay, onMaximize, onCl
         >
           <X size={16} />
         </button>
-      </div>
+      </Inline>
     </div>
   );
 }

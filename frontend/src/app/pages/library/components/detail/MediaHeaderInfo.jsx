@@ -4,6 +4,7 @@ import Pill from '@/ui/Pill';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useMediaDetailContext } from './MediaDetailContext';
 import './MediaHeaderInfo.css';
+import Inline from '@/ui/Inline';
 
 
 export default function MediaHeaderInfo({ isFallbackGrid = false }) {
@@ -90,7 +91,7 @@ export default function MediaHeaderInfo({ isFallbackGrid = false }) {
           )}
 
           {(metaDate || formattedDuration || seasonsText || episodesText || langText || ratingImdb || ratingTmdb || showStudioPill || showNetworkPill) && (
-            <div className="media-detail-page__meta-row">
+            <Inline gap="lg" align="center" className="media-detail-page__meta-row">
               {showStudioPill && (
                 <Pill variant="meta">
                   <Video size={14} />
@@ -144,17 +145,17 @@ export default function MediaHeaderInfo({ isFallbackGrid = false }) {
                   </span>
                 </Pill>
               )}
-            </div>
+            </Inline>
           )}
 
           {normalizedGenres && normalizedGenres.length > 0 && (
-            <div className="media-detail-page__meta-row">
+            <Inline gap="lg" align="center" className="media-detail-page__meta-row">
               {normalizedGenres.map((genre, idx) => (
                 <Pill key={idx} variant="meta">
                   {t(`library.genres.${genre}`, { defaultValue: genre }).toUpperCase()}
                 </Pill>
               ))}
-            </div>
+            </Inline>
           )}
         </div>
       </div>

@@ -248,12 +248,6 @@
   animation: var(--fade-animation);
 }
 
-.performer-linker__header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-lg);
-}
-
 .performer-linker__title {
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
@@ -261,8 +255,6 @@
 }
 
 .performer-linker__search-form {
-  display: flex;
-  gap: var(--space-md);
   max-width: 31.25rem;
   width: 100%;
 }
@@ -829,11 +821,6 @@
   color: var(--purple-color);
 }
 
-.performer-linker-modal-footer {
-  display: flex;
-  gap: var(--space-md);
-  justify-content: flex-end;
-}
 
 .performer-linker-modal-body {
   margin: 0;

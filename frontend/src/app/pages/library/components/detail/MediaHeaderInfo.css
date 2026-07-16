@@ -93,11 +93,7 @@
 }
 
 .media-detail-page__meta-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-lg);
   margin: 0;
-  flex-wrap: wrap;
 }
 
 .media-detail-page__rating-pill {

@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import Button from '@/ui/Button';
 import Drawer from '@/ui/Drawer';
 import styles from './RatingsReviewDrawer.module.css';
+import Inline from '@/ui/Inline';
 
 export default function RatingsReviewDrawer({
   editingItem,
@@ -35,14 +36,14 @@ export default function RatingsReviewDrawer({
           autoFocus
         />
       </div>
-      <div className={styles['review-drawer__footer']}>
+      <Inline gap="md" align="center" justify="end" className={styles['review-drawer__footer']}>
         <Button variant="secondary-neutral" onClick={() => setEditingItem(null)}>
           {t('common.cancel', { defaultValue: 'Cancel' })}
         </Button>
         <Button variant="primary" onClick={handleSaveReview}>
           {t('ratings.dialog.save', { defaultValue: 'Save Review' })}
         </Button>
-      </div>
+      </Inline>
     </Drawer>
   );
 }

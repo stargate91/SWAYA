@@ -8,6 +8,7 @@ import Table from '../../ui/Table';
 import { useOrganizerSort } from './useOrganizerSort';
 import { useLocalListSearch } from '../../hooks/useLocalListSearch';
 import styles from './RenameModal.module.css';
+import Inline from '../../ui/Inline';
 
 const RENAME_SEARCH_KEYS = ['source', 'target', 'type'];
 
@@ -80,7 +81,7 @@ export default function OrganizerRenameModalContent({ items = [], t, organizeInP
         />
       </div>
 
-      <div className={styles['organizer-rename-modal__summary']}>
+      <Inline gap="lg" align="center" className={styles['organizer-rename-modal__summary']}>
         <span>
           {t('organizer.renameModal.showing')
             .replace('{count}', sortedItems.length)
@@ -92,7 +93,7 @@ export default function OrganizerRenameModalContent({ items = [], t, organizeInP
         >
           {t('organizer.renameModal.organizeInPlaceCheckbox') || 'Keep original filenames (Organize in Place)'}
         </Checkbox>
-      </div>
+      </Inline>
 
       <div className={styles['organizer-rename-modal__list-container']}>
         <Table

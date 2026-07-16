@@ -7,6 +7,7 @@ import EditableMediaCard from './EditableMediaCard';
 import { getOriginalImageUrlHelper } from '../../utils/heroSectionUtils';
 import EntityDetailDrawer from './EntityDetailDrawer';
 import './EntityDetailHeroSection.css';
+import Inline from '@/ui/Inline';
 
 export default function MovieCollectionHeroSection({
   item,
@@ -46,11 +47,11 @@ export default function MovieCollectionHeroSection({
               {item?.title || item?.name || 'Unknown Collection'}
             </h1>
             {metaPills.length > 0 && (
-              <div className="entity-detail-page__meta-row">
+              <Inline gap="md" className="entity-detail-page__meta-row">
                 {metaPills.map((metaItem) => (
                   <Pill key={metaItem.key} variant="meta">{metaItem.content}</Pill>
                 ))}
-              </div>
+              </Inline>
             )}
           </div>
 

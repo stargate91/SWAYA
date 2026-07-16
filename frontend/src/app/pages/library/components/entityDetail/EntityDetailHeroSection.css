@@ -475,12 +475,7 @@
   min-width: 16.25rem;
 }
 
-
-
 .entity-detail-page__meta-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-md);
   position: relative;
   z-index: var(--z-index-step-1);
 }
@@ -904,9 +899,6 @@
   box-shadow: var(--badge-shadow);
 }
 
-.entity-detail-page__meta-row.entity-detail-page__meta-row--secondary {
-  margin-top: var(--space-sm);
-}
 
 /* Known For Grid */
 .entity-detail-page__known-for-section {
@@ -1114,9 +1106,6 @@
 
 /* Sidebar Integrated Action Bar */
 .entity-detail-page__sidebar-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
   width: 100%;
   margin-top: var(--space-xs);
 }

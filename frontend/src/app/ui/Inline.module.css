@@ -1,46 +1,46 @@
-.ui-inline {
+.root {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-md);
   align-items: center;
 }
 
-.ui-inline--gap-2xs {
+.gap-2xs {
   gap: var(--space-xs);
 }
 
-.ui-inline--gap-xs {
+.gap-xs {
   gap: var(--space-sm);
 }
 
-.ui-inline--gap-sm {
+.gap-sm {
   gap: var(--space-sm);
 }
 
-.ui-inline--gap-md {
+.gap-md {
   gap: var(--space-md);
 }
 
-.ui-inline--gap-lg {
+.gap-lg {
   gap: var(--space-md);
 }
 
-.ui-inline--gap-xl {
+.gap-xl {
   gap: var(--space-lg);
 }
 
-.ui-inline--gap-2xl {
+.gap-2xl {
   gap: var(--space-lg);
 }
 
-.ui-inline--align-start {
+.align-start {
   align-items: flex-start;
 }
 
-.ui-inline--align-center {
+.align-center {
   align-items: center;
 }
 
-.ui-inline--align-end {
+.align-end {
   align-items: flex-end;
 }

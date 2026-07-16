@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from '../providers/LanguageContext';
 import Button from './Button';
+import Inline from './Inline';
 import styles from './PaginationBar.module.css';
 
 const SLASH_SEPARATOR = '/ ';
@@ -9,7 +10,7 @@ const SLASH_SPACED = ' / ';
 
 function PaginationPageSizes({ pageSize, pageSizeOptions, onPageSizeChange, ariaLabel }) {
   return (
-    <div className={styles.sizes} role="group" aria-label={ariaLabel}>
+    <Inline gap="sm" align="center" className={styles.sizes} role="group" aria-label={ariaLabel}>
       {pageSizeOptions.map((option) => (
         <Button
           key={option}
@@ -22,7 +23,7 @@ function PaginationPageSizes({ pageSize, pageSizeOptions, onPageSizeChange, aria
           {option}
         </Button>
       ))}
-    </div>
+    </Inline>
   );
 }
 
@@ -124,11 +125,11 @@ export default function PaginationBar({
             ariaLabel={labels.pageSizesAriaLabel ?? t('pagination.rowsPerPage')}
           />
         ) : null}
-        
+
         {paginationMode === 'infinite' ? (
-          <div className={styles.nav}>
+          <Inline gap="sm" align="center" className={styles.nav}>
             {onPaginationModeChange ? (
-              <div className={styles.modes}>
+              <Inline gap="xs" align="center" className={styles.modes}>
                 <Button
                   type="button"
                   variant="secondary-neutral"
@@ -147,14 +148,14 @@ export default function PaginationBar({
                 >
                   {t('pagination.modeInfinite') || 'Infinite'}
                 </Button>
-              </div>
+              </Inline>
             ) : null}
-          </div>
+          </Inline>
         ) : (
-          <div className={styles.nav}>
+          <Inline gap="sm" align="center" className={styles.nav}>
             {onPaginationModeChange ? (
               // eslint-disable-next-line react/forbid-dom-props
-              <div className={styles.modes} style={{ marginRight: '16px' }}>
+              <Inline gap="xs" align="center" className={styles.modes} style={{ marginRight: '16px' }}>
                 <Button
                   type="button"
                   variant="secondary-neutral"
@@ -173,7 +174,7 @@ export default function PaginationBar({
                 >
                   {t('pagination.modeInfinite') || 'Infinite'}
                 </Button>
-              </div>
+              </Inline>
             ) : null}
             <Button
               type="button"
@@ -216,7 +217,7 @@ export default function PaginationBar({
             >
               {(labels.last ?? t('pagination.last')) || 'Last'}
             </Button>
-          </div>
+          </Inline>
         )}
       </div>
     </div>

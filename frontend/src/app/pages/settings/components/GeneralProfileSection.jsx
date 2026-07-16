@@ -1,4 +1,4 @@
-﻿import { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Upload, UserRound } from '@/ui/icons';
 import api from '@/lib/api';
 import { API_BASE } from '@/lib/backend';
@@ -6,6 +6,7 @@ import Button from '@/ui/Button';
 import SettingsSectionRenderer from './SettingsSectionRenderer.jsx';
 import { useSettingsFormContext } from '../SettingsFormContext.jsx';
 import { createGeneralProfileSection } from '../settingsSectionConfigs.jsx';
+import Inline from '@/ui/Inline';
 
 export default function GeneralProfileSection({ t }) {
   const inputRef = useRef(null);
@@ -38,7 +39,7 @@ export default function GeneralProfileSection({ t }) {
     type: 'custom',
     key: 'avatar',
     render: () => (
-      <div className="settings-profile-avatar-field">
+      <Inline gap="md" align="center" className="settings-profile-avatar-field">
         <div className="settings-profile-avatar">
           {avatarUrl ? (
             <img src={avatarUrl} alt={t('settingsPage.sections.profile.avatarAlt')} />
@@ -69,7 +70,7 @@ export default function GeneralProfileSection({ t }) {
             ? t('settingsPage.sections.profile.avatarUploading')
             : t('settingsPage.sections.profile.avatarUpload')}
         </Button>
-      </div>
+      </Inline>
     ),
   });
 

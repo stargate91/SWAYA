@@ -74,11 +74,7 @@
 }
 
 .organizer-status-cell {
-  display: inline-flex;
-  align-items: center;
   justify-content: center;
-  gap: var(--space-sm);
-  flex-wrap: wrap;
 }
 
 .organizer-status-cell__policy:global(.ui-status-pill) {

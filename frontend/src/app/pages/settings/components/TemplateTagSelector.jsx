@@ -1,5 +1,6 @@
 import TagButton from '@/ui/TagButton';
 import styles from './StructurePreview.module.css';
+import Inline from '@/ui/Inline';
 
 export default function TemplateTagSelector({ t, tags, fieldKey, inputRef, insertTag, disabled }) {
   const commonTags = tags.common || [];
@@ -13,7 +14,7 @@ export default function TemplateTagSelector({ t, tags, fieldKey, inputRef, inser
           <div className={styles['template-tag-selector-label']}>
             {t('settingsPage.templateTags.common')}
           </div>
-          <div className={styles['template-tag-selector-container']}>
+          <Inline gap="sm" className={styles['template-tag-selector-container']}>
             {commonTags.map((tag) => (
               <TagButton
                 key={tag}
@@ -23,7 +24,7 @@ export default function TemplateTagSelector({ t, tags, fieldKey, inputRef, inser
                 {tag}
               </TagButton>
             ))}
-          </div>
+          </Inline>
         </div>
       )}
       {additionalTags.length > 0 && (
@@ -31,7 +32,7 @@ export default function TemplateTagSelector({ t, tags, fieldKey, inputRef, inser
           <div className={styles['template-tag-selector-label']}>
             {t('settingsPage.templateTags.more')}
           </div>
-          <div className={styles['template-tag-selector-container']}>
+          <Inline gap="sm" className={styles['template-tag-selector-container']}>
             {additionalTags.map((tag) => (
               <TagButton
                 key={tag}
@@ -41,7 +42,7 @@ export default function TemplateTagSelector({ t, tags, fieldKey, inputRef, inser
                 {tag}
               </TagButton>
             ))}
-          </div>
+          </Inline>
         </div>
       )}
     </div>

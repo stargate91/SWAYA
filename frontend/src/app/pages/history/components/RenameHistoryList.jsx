@@ -5,6 +5,7 @@ import { RotateCcw } from '@/ui/icons';
 import HistoryCard from './HistoryCard';
 import styles from './RenameHistoryList.module.css';
 import historyPageStyles from '../HistoryPage.module.css';
+import Inline from '@/ui/Inline';
 
 export default function RenameHistoryList({
   isLoading,
@@ -23,10 +24,10 @@ export default function RenameHistoryList({
       <div className={styles['history-list--loading']}>
         {Array.from({ length: 4 }).map((_, idx) => (
           <div key={idx} className={styles['history-skeleton-card']}>
-            <div className={styles['history-skeleton-header']}>
+            <Inline align="center" justify="between" className={styles['history-skeleton-header']}>
               <div className={styles['history-skeleton-title']}><Skeleton variant="rect" /></div>
               <div className={styles['history-skeleton-badge']}><Skeleton variant="rect" /></div>
-            </div>
+            </Inline>
             <Skeleton className={styles['history-skeleton-line-1']} variant="text" />
             <Skeleton className={styles['history-skeleton-line-2']} variant="text" />
           </div>

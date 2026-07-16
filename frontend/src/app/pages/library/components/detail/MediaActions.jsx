@@ -2,6 +2,7 @@ import { FolderOpen, Video, Check, Eye, Play, BellPlus, Droplets, Info } from '@
 import Button from '@/ui/Button';
 import { formatEpisodeNumber } from '../../utils/detailUtils';
 import { useMediaDetailContext } from './MediaDetailContext';
+import Inline from '@/ui/Inline';
 
 export default function MediaActions() {
   const { state, actions, mutations, t, navigate, setIsDrawerOpen } = useMediaDetailContext();
@@ -40,7 +41,7 @@ export default function MediaActions() {
   if (!isOwned && !canToggleTracked && !canToggleWatched && !hasCollection && !hasTrailer) return null;
 
   return (
-    <div className="media-detail-page__actions-row">
+    <Inline gap="lg" align="center" className="media-detail-page__actions-row">
       {hasCollection && (
         <Button
           variant="ghost"
@@ -129,6 +130,6 @@ export default function MediaActions() {
           )}
         </>
       )}
-    </div>
+    </Inline>
   );
 }

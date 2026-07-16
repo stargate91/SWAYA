@@ -2,6 +2,7 @@ import { PenLine } from '@/ui/icons';
 import Pill from '@/ui/Pill';
 import SegmentedRating from '@/ui/SegmentedRating';
 import { useMediaDetailContext } from './MediaDetailContext';
+import Inline from '@/ui/Inline';
 import './UserRatingSection.css';
 
 export default function UserRatingSection() {
@@ -17,7 +18,7 @@ export default function UserRatingSection() {
   } = actions;
 
   return (
-    <div className="media-detail-page__meta-row">
+    <Inline gap="lg" align="center" className="media-detail-page__meta-row">
       <Pill variant="meta-large" className="rating-pill--large">
         <button
           onClick={handleOpenReviewModal}
@@ -34,6 +35,6 @@ export default function UserRatingSection() {
           t={t}
         />
       </Pill>
-    </div>
+    </Inline>
   );
 }

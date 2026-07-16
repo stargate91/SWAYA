@@ -17,6 +17,7 @@ import posterCardStyles from '../../../ui/PosterCard.module.css';
 import styles from './RecommendationsWidget.module.css';
 import { useWatchlistHandler } from './hooks/useWatchlistHandler';
 import Button from '../../../ui/Button';
+import Inline from '../../../ui/Inline';
 import { Check, Plus, Minus } from '@/ui/icons';
 import { useTranslation } from '../../../providers/LanguageContext';
 
@@ -118,12 +119,12 @@ const TMDBDiscoveryWidget = () => {
 
   return (
     <div className={styles['recommend-carousel']}>
-      <div className={styles['recommend-carousel-header']}>
+      <Inline gap="lg" align="center" className={styles['recommend-carousel-header']}>
         <h3 className={`${styles['recommend-carousel-title']} ${styles['recommend-carousel-title--header']}`}>
           {T('dashboard.recommendations.discovery_title') || 'Top 20 Discoveries'}
         </h3>
         
-        <div className={styles['recommend-carousel-filters']}>
+        <Inline gap="md" align="center" className={styles['recommend-carousel-filters']}>
           <Dropdown
             options={translatedGenres}
             value={genreId}
@@ -137,8 +138,8 @@ const TMDBDiscoveryWidget = () => {
             onChange={(e) => setYear(e.target.value)}
             className={styles['recommend-carousel-filter-year']}
           />
-        </div>
-      </div>
+        </Inline>
+      </Inline>
 
       <WidgetShell loading={loading} size="lg" transparent={true}>
         {items.length === 0 ? (

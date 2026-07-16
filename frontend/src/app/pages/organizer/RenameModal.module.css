@@ -14,11 +14,7 @@
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
   margin-bottom: var(--space-xs);
-  display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: var(--space-lg);
-  flex-wrap: wrap;
 }
 
 .organizer-rename-modal__list-container {

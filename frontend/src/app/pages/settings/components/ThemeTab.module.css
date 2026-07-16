@@ -30,11 +30,9 @@
 }
 
 .theme-card__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   padding: 0 var(--space-xs);
   width: 100%;
+  justify-content: space-between;
 }
 
 .theme-card__name {

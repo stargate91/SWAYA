@@ -75,17 +75,11 @@
 }
 
 .lists-header__bottom-left {
-  display: flex;
-  align-items: center;
-  gap: var(--space-lg);
   flex: 1;
   min-width: 0;
 }
 
 .lists-header__filter-wrapper {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
 }
 
 .lists-header__meta-stack {
@@ -95,9 +89,6 @@
 }
 
 .lists-header__title-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
 }
 
 .lists-header__icon-wrap {

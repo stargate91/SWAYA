@@ -18,6 +18,7 @@ import RenameHistoryList from './components/RenameHistoryList';
 import WatchedHistoryList from './components/WatchedHistoryList';
 import PeaksHistoryList from './components/PeaksHistoryList';
 import styles from './HistoryPage.module.css';
+import Inline from '@/ui/Inline';
 
 export default function HistoryPage() {
   const { t } = useTranslation();
@@ -95,21 +96,21 @@ export default function HistoryPage() {
             {t('historyPage.confirmWarning') || 'Are you sure you want to revert this batch?'}
           </p>
           <div className="history-undo-modal__details">
-            <div className="history-undo-modal__row">
+            <Inline align="center" justify="between" className="history-undo-modal__row">
               <span className="history-undo-modal__label">{t('historyPage.batchLabel') || 'Batch:'}</span>
               <span className="history-undo-modal__value">{batch.name}</span>
-            </div>
-            <div className="history-undo-modal__row">
+            </Inline>
+            <Inline align="center" justify="between" className="history-undo-modal__row">
               <span className="history-undo-modal__label">{t('historyPage.filesLabel') || 'Files:'}</span>
               <span className="history-undo-modal__value--success">
                 {t('historyPage.succeededCount', { defaultValue: '{{count}} succeeded', count: batch.success_count })}
               </span>
-            </div>
+            </Inline>
           </div>
         </div>
       ),
       footer: (
-        <div className="history-undo-modal__footer">
+        <Inline gap="md" align="center" justify="end" className="history-undo-modal__footer">
           <Button variant="secondary-neutral" onClick={closeModal}>
             {t('common.cancel') || 'Cancel'}
           </Button>
@@ -139,7 +140,7 @@ export default function HistoryPage() {
           >
             {t('historyPage.confirmButton') || 'Revert Action'}
           </Button>
-        </div>
+        </Inline>
       ),
     });
   };

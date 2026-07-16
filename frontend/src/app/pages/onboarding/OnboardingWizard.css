@@ -179,9 +179,6 @@
 }
 
 .onboarding-footer-actions-cluster {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
   margin-left: auto;
   animation: onboardingFooterClusterEnter 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -772,11 +769,6 @@
   border-color: color-mix(in srgb, var(--color-accent) 56%, var(--color-text-primary) 10%);
 }
 
-.lang-row-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
 
 .lang-row-flag-frame {
   position: relative;

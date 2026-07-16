@@ -1,10 +1,11 @@
-import './Inline.css';
+import PropTypes from 'prop-types';
+import styles from './Inline.module.css';
 
 export default function Inline({ gap, align, className = '', children, ...props }) {
   const classes = [
-    'ui-inline',
-    gap && `ui-inline--gap-${gap}`,
-    align && `ui-inline--align-${align}`,
+    styles.root,
+    gap && styles[`gap-${gap}`],
+    align && styles[`align-${align}`],
     className
   ].filter(Boolean).join(' ');
 
@@ -14,3 +15,10 @@ export default function Inline({ gap, align, className = '', children, ...props 
     </div>
   );
 }
+
+Inline.propTypes = {
+  gap: PropTypes.oneOf(['2xs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl']),
+  align: PropTypes.oneOf(['start', 'center', 'end']),
+  className: PropTypes.string,
+  children: PropTypes.node,
+};

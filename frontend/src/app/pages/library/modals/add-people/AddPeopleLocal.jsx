@@ -5,6 +5,7 @@ import EmptyState from '@/ui/EmptyState';
 import Dropdown from '@/ui/Dropdown';
 import CompactCard from '@/ui/CompactCard';
 import ActivationButton from './ActivationButton';
+import Inline from '@/ui/Inline';
 
 
 export default function AddPeopleLocal({
@@ -64,7 +65,7 @@ export default function AddPeopleLocal({
   return (
     <div className="add-people-modal__local-panel">
 
-      <div className="add-people-modal__filter-row">
+      <Inline gap="md" align="center" className="add-people-modal__filter-row">
         <Dropdown
           className="add-people-dropdown"
           variant="sorter"
@@ -124,7 +125,7 @@ export default function AddPeopleLocal({
             { value: 'added', label: t('library.filter.added') || 'Added' },
           ]}
         />
-      </div>
+      </Inline>
 
       {isLoading ? (
         <div className="add-people-modal__loading-wrapper">

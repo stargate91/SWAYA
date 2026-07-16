@@ -164,9 +164,6 @@
 }
 
 .tags-panel__assigned-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
   min-height: 2.375rem;
   max-height: calc((1.625rem * 3) + (0.5rem * 2) + 1.25rem);
   overflow-y: auto;
@@ -175,7 +172,6 @@
   background: var(--media-detail-panel-section-bg);
   border: 1px solid var(--media-detail-panel-section-border);
   box-shadow: var(--media-detail-panel-section-shadow);
-  align-items: center;
   align-content: flex-start;
 }
 

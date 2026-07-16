@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Globe } from '@/ui/icons';
 import './PeopleLinksPopover.css';
+import Inline from '@/ui/Inline';
 
 export default function PeopleLinksPopover({ extraLinks, t }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,7 +43,7 @@ export default function PeopleLinksPopover({ extraLinks, t }) {
           <div className="entity-detail-page__links-popover-header">
             {t?.('library.details.externalLinks') || 'External Links'}
           </div>
-          <div className="entity-detail-page__links-popover-grid">
+          <Inline gap="xs" className="entity-detail-page__links-popover-grid">
             {extraLinks.map((link) => (
               <a
                 key={link.key}
@@ -54,7 +55,7 @@ export default function PeopleLinksPopover({ extraLinks, t }) {
                 {link.label}
               </a>
             ))}
-          </div>
+          </Inline>
         </div>
       )}
     </div>

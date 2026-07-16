@@ -472,12 +472,6 @@
   }
 }
 
-.media-detail-page__actions-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-lg);
-  flex-wrap: wrap;
-}
 
 .trailer-iframe {
   aspect-ratio: 16/9;
@@ -630,9 +624,6 @@
 }
 
 .entity-detail-page__bottom-socials-wrapper {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
   --socials-bg: color-mix(in srgb, var(--color-panel-translucent) 65%, transparent);
   background-color: var(--socials-bg);
   --socials-border: 1px solid color-mix(in srgb, var(--color-border-default) 35%, transparent);

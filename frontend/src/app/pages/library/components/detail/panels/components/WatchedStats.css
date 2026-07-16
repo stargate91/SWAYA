@@ -107,9 +107,6 @@
 
 .activity-item {
   padding: var(--space-sm) var(--space-xs);
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
 }
 
 .activity-item+.activity-item {
@@ -212,11 +209,6 @@
   gap: var(--space-sm);
 }
 
-.activity-item__tv-top {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-}
 
 .activity-item__token {
   --token-pad-y: 0.125rem;

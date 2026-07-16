@@ -51,11 +51,6 @@
 
 
 .specs-card--company {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-md);
   min-height: 3.625rem;
   padding: var(--space-md) var(--space-lg);
 }
@@ -124,11 +119,6 @@
   }
 }
 
-.details-panel__keywords-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
-}
 
 .ui-pill.details-panel__keyword-pill {
   --kw-pad: 0.25rem 0.625rem;

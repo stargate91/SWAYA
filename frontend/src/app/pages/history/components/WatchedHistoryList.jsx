@@ -6,6 +6,7 @@ import { Clock, CheckCircle2, RotateCcw, Play, ENTITY_ICONS } from '@/ui/icons';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import styles from './WatchedHistoryList.module.css';
 import historyPageStyles from '../HistoryPage.module.css';
+import Inline from '@/ui/Inline';
 
 const LPAR = '(';
 const RPAR = ')';
@@ -128,11 +129,11 @@ export default function WatchedHistoryList({
                 )}
               </div>
 
-              <div className={styles['watched-history-card__meta']}>
-                <div className={styles['watched-history-card__meta-item']}>
+              <Inline gap="lg" align="center" className={styles['watched-history-card__meta']}>
+                <Inline gap="xs" align="center" className={styles['watched-history-card__meta-item']}>
                   <Clock size={12} />
                   <span>{new Date(log.watched_at).toLocaleString()}</span>
-                </div>
+                </Inline>
 
                 {log.is_watched ? (
                   <div className={`${styles['watched-history-card__status']} ${styles['watched-history-card__status--watched']}`}>
@@ -156,7 +157,7 @@ export default function WatchedHistoryList({
                     </div>
                   )
                 )}
-              </div>
+              </Inline>
 
               {!log.is_watched && (log.is_active || percent > 0) && (
                 <div className={styles['watched-history-card__progress-bar-wrapper']}>

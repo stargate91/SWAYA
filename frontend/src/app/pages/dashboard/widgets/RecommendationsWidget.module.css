@@ -62,9 +62,6 @@
 }
 
 .recommend-spotlight-meta {
-  display: flex;
-  align-items: center;
-  gap: var(--space-lg);
   margin-bottom: var(--space-xl);
   color: var(--color-text-primary);
   font-weight: var(--font-weight-bold);
@@ -207,12 +204,8 @@
 }
 
 .recommend-carousel-header {
-  display: flex;
-  align-items: center;
   justify-content: space-between;
   margin-bottom: var(--space-lg);
-  gap: var(--space-lg);
-  flex-wrap: wrap;
 }
 
 .recommend-carousel-header .recommend-carousel-title--header {
@@ -220,8 +213,6 @@
 }
 
 .recommend-carousel-filters {
-  display: flex;
-  gap: var(--space-md);
 }
 
 .recommend-carousel-filter-genre {

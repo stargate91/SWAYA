@@ -1,6 +1,7 @@
 import { Users } from '@/ui/icons';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import './CastPanel.css';
+import Inline from '@/ui/Inline';
 
 import { API_BASE } from '@/lib/backend';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
@@ -40,9 +41,10 @@ export default function CastPanel() {
           <div className="cast-panel__list">
             {filteredDirectors.map(director => {
               return (
-                // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-                <div
+                <Inline
                   key={director.id}
+                  gap="md"
+                  align="center"
                   className="person-card"
                   onClick={() => navigate(`/library/people/${director.id}`, { state: { allowAdult: true } })}
                 >
@@ -63,7 +65,7 @@ export default function CastPanel() {
                       {t(`library.people.roles.${String(director.job || 'director').toLowerCase()}`, director.job || 'Director')}
                     </span>
                   </div>
-                </div>
+                </Inline>
               );
             })}
           </div>
@@ -78,9 +80,10 @@ export default function CastPanel() {
           <div className="cast-panel__list">
             {filteredWriters.map(writer => {
               return (
-                // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-                <div
+                <Inline
                   key={writer.id}
+                  gap="md"
+                  align="center"
                   className="person-card"
                   onClick={() => navigate(`/library/people/${writer.id}`, { state: { allowAdult: true } })}
                 >
@@ -101,7 +104,7 @@ export default function CastPanel() {
                       {t(`library.people.roles.${String(writer.job || 'writer').toLowerCase()}`, writer.job || 'Writer')}
                     </span>
                   </div>
-                </div>
+                </Inline>
               );
             })}
           </div>
@@ -116,9 +119,10 @@ export default function CastPanel() {
           <div className="cast-panel__list cast-panel__list--actors">
             {filteredCast.map(actor => {
               return (
-                // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-                <div
+                <Inline
                   key={actor.id}
+                  gap="md"
+                  align="center"
                   className="person-card"
                   onClick={() => navigate(`/library/people/${actor.id}`, { state: { allowAdult: true } })}
                 >
@@ -139,7 +143,7 @@ export default function CastPanel() {
                       {actor.character || t('library.people.roles.actor') || 'Actor'}
                     </span>
                   </div>
-                </div>
+                </Inline>
               );
             })}
           </div>

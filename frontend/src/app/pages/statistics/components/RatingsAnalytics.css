@@ -13,8 +13,6 @@
 }
 
 .compact-stats-card__header {
-  display: flex;
-  align-items: center;
   justify-content: space-between;
   margin-bottom: var(--space-sm);
   border-bottom: 1px solid var(--color-border-subtle);
@@ -30,10 +28,7 @@
 }
 
 .compact-stats-row {
-  display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: var(--space-md);
   min-height: 2rem;
 }
 
@@ -43,11 +38,6 @@
   font-weight: var(--font-weight-medium);
 }
 
-.compact-stats-row__value-wrapper {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-}
 
 .compact-stats-row__value {
   font-family: var(--font-display);
@@ -57,9 +47,6 @@
 }
 
 .compact-stats-counts {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
   font-size: var(--font-size-sm);
 }
 

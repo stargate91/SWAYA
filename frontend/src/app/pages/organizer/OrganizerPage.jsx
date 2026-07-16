@@ -7,6 +7,7 @@ import Button from '../../ui/Button';
 import SegmentedControl from '../../ui/SegmentedControl';
 import SplitButton from '../../ui/SplitButton';
 import { getFirstEnabledProvider, getOrganizerProviderOptions } from '../../lib/providerAvailability';
+import Inline from '../../ui/Inline';
 
 import { useOrganizerCountQuery, useOrganizerQuery, useScanStatusQuery, useSettingsQuery } from '../../queries';
 import { useUi } from '@/providers/UiProvider';
@@ -479,7 +480,7 @@ export default function OrganizerPage() {
       addPendingResolvedIds={addPendingResolvedIds}
     >
       {utilityBarTarget && scanModeOptions.length > 1 && createPortal(
-        <div className={styles['utility-bar-wrapper']}>
+        <Inline gap="md" align="center" className={styles['utility-bar-wrapper']}>
           <SegmentedControl
             value={scanMode}
             onChange={setScanMode}
@@ -490,7 +491,7 @@ export default function OrganizerPage() {
           />
           {sessionMode === 'nsfw' && scanMode !== 'offline' && providerOptions.length > 0 && (
             <div key={scanMode} className="provider-segmented-control-wrapper animate-slide-in">
-              <SegmentedControl
+               <SegmentedControl
                 variant="filter"
                 size="sm"
                 animated={true}
@@ -500,7 +501,7 @@ export default function OrganizerPage() {
               />
             </div>
           )}
-        </div>,
+        </Inline>,
         utilityBarTarget
       )}
       <OrganizerPageContent

@@ -62,10 +62,7 @@
 
 .panel-header__actions {
   flex: 1 1 auto;
-  display: flex;
-  align-items: center;
   justify-content: flex-end;
-  gap: var(--space-sm);
 }
 
 .panel-tabs {

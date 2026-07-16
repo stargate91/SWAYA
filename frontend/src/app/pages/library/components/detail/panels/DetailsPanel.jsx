@@ -2,6 +2,7 @@ import { countEpisodesInNumber } from '../../../utils/detailUtils';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import Pill from '@/ui/Pill';
 import Tooltip from '@/ui/Tooltip';
+import Inline from '@/ui/Inline';
 import { buildTmdbImageUrl, resolveMediaImageUrl, TMDB_IMAGE_SIZES } from '@/lib/imageUrls';
 import './PanelsCommon.css';
 import './DetailsPanel.css';
@@ -116,7 +117,7 @@ export default function DetailsPanel() {
                   : buildTmdbImageUrl(it.logo_path, TMDB_IMAGE_SIZES.posterThumb)
                 : null;
               return (
-                <div key={idx} className="specs-card specs-card--company">
+                <Inline key={idx} gap="md" align="center" justify="center" className="specs-card specs-card--company">
                   <Tooltip content={it.name} side="top">
                     {logoUrl && (
                       <img
@@ -131,7 +132,7 @@ export default function DetailsPanel() {
                       </span>
                     )}
                   </Tooltip>
-                </div>
+                </Inline>
               );
             })}
           </div>
@@ -151,7 +152,7 @@ export default function DetailsPanel() {
                   : buildTmdbImageUrl(it.logo_path, TMDB_IMAGE_SIZES.posterThumb)
                 : null;
               return (
-                <div key={idx} className="specs-card specs-card--company">
+                <Inline key={idx} gap="md" align="center" justify="center" className="specs-card specs-card--company">
                   <Tooltip content={it.name} side="top">
                     {logoUrl && (
                       <img
@@ -166,7 +167,7 @@ export default function DetailsPanel() {
                       </span>
                     )}
                   </Tooltip>
-                </div>
+                </Inline>
               );
             })}
           </div>
@@ -178,7 +179,7 @@ export default function DetailsPanel() {
           <h4 className="details-panel__section-title">
             {t('library.details.keywords') || 'Keywords'}
           </h4>
-          <div className="details-panel__keywords-list">
+          <Inline gap="sm" className="details-panel__keywords-list">
             {item.keywords.filter(Boolean).map((keyword, idx) => (
               <Pill
                 key={idx}
@@ -188,7 +189,7 @@ export default function DetailsPanel() {
                 {keyword}
               </Pill>
             ))}
-          </div>
+          </Inline>
         </div>
       )}
     </div>

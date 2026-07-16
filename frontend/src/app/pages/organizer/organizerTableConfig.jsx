@@ -5,6 +5,7 @@ import Tooltip from '../../ui/Tooltip';
 import { isEpisodeMediaType, isMovieMediaType, isMovieOrEpisodeMediaType, isSceneMediaType } from '@/lib/mediaTypes';
 import { mapCollisionStrategyLabel, shouldShowCollisionStrategy } from './organizerMappers';
 import styles from './OrganizerResultsPanel.module.css';
+import Inline from '../../ui/Inline';
 
 const renderSelectColumn = (paginatedRows, selectedRowIds, handleToggleAll, handleToggleRow) => ({
   key: 'select',
@@ -105,7 +106,7 @@ const renderProposedFilename = (value, row, activeMainTab, onOpenMatch, onOpenOv
 };
 
 const renderStatusCell = (value, row, collisionStrategy, normalizeStatusTone, t) => (
-  <span className={styles['organizer-status-cell']}>
+  <Inline gap="sm" align="center" className={styles['organizer-status-cell']}>
     <Pill variant={normalizeStatusTone(value, t)}>{value}</Pill>
     {isMovieOrEpisodeMediaType(row.rawType) && shouldShowCollisionStrategy(row) ? (
       <Pill className={styles['organizer-status-cell__policy']} variant="default">
@@ -126,7 +127,7 @@ const renderStatusCell = (value, row, collisionStrategy, normalizeStatusTone, t)
         </Pill>
       </Tooltip>
     ) : null}
-  </span>
+  </Inline>
 );
 
 export function buildOrganizerColumns({

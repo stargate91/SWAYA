@@ -14,6 +14,7 @@ import LibraryPagination from '../library/components/LibraryPagination';
 import RatingsReviewDrawer from './components/RatingsReviewDrawer';
 import { useDebounce } from '@/hooks/useDebounce';
 import styles from './RatingsPage.module.css';
+import Inline from '@/ui/Inline';
 
 export default function RatingsPage() {
   const navigate = useNavigate();
@@ -121,7 +122,7 @@ export default function RatingsPage() {
       render: (val, row) => {
         const hasComment = row.user_comment && String(row.user_comment).trim();
         return (
-          <div className={styles['review-preview-cell']}>
+          <Inline gap="md" align="center" className={styles['review-preview-cell']}>
             {hasComment ? (
               <span className={styles['review-preview-text']}>{row.user_comment}</span>
             ) : (
@@ -138,7 +139,7 @@ export default function RatingsPage() {
               <Edit3 size={12} />
               {hasComment ? t('common.edit') || 'Edit' : t('common.add') || 'Add'}
             </Button>
-          </div>
+          </Inline>
         );
       },
     },
@@ -235,11 +236,11 @@ export default function RatingsPage() {
                 {state.isLoading ? (
                   <div className={styles['ratings-skeleton-list']}>
                     {Array.from({ length: 6 }).map((_, idx) => (
-                      <div key={idx} className={styles['ratings-skeleton-row']}>
+                      <Inline key={idx} gap="lg" align="center" className={styles['ratings-skeleton-row']}>
                         <Skeleton className={styles['ratings-skeleton-col-name']} variant="rect" />
                         <Skeleton className={styles['ratings-skeleton-col-rating']} variant="rect" />
                         <Skeleton className={styles['ratings-skeleton-col-action']} variant="rect" />
-                      </div>
+                      </Inline>
                     ))}
                   </div>
                 ) : (

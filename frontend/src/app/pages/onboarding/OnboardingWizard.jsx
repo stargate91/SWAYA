@@ -2,6 +2,7 @@ import Button from '@/ui/Button';
 import { ArrowRight, ArrowLeft } from '@/ui/icons';
 import './OnboardingWizard.css';
 import { useTranslation } from '@/providers/LanguageContext';
+import Inline from '@/ui/Inline';
 
 import useOnboardingState from './hooks/useOnboardingState';
 
@@ -184,7 +185,7 @@ export default function OnboardingWizard() {
           {isAnyGuideOpen ? (
             <>
               <div />
-              <div className="onboarding-footer-actions-cluster">
+              <Inline gap="md" align="center" className="onboarding-footer-actions-cluster">
                 <Button variant="onboarding-back" leftIcon={<ArrowLeft size={14} />} animateIcon onClick={handlePrev}>
                   {t('common.back')}
                 </Button>
@@ -196,7 +197,7 @@ export default function OnboardingWizard() {
                 >
                   {t('onboarding.buttons.continue')}
                 </Button>
-              </div>
+              </Inline>
             </>
           ) : (
             <>

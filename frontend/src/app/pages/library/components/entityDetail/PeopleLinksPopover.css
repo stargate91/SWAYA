@@ -45,10 +45,6 @@
 }
 
 .entity-detail-page__links-popover-grid {
-  display: flex;
-  flex-wrap: wrap;
-  --popover-gap: 0.375rem;
-  gap: var(--popover-gap);
   --popover-grid-padding: var(--space-md);
   padding: var(--popover-grid-padding);
 }

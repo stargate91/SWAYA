@@ -107,9 +107,6 @@
 
 /* Inline Comment / Review UI */
 .review-preview-cell {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
   max-width: 100%;
 }
 
@@ -145,11 +142,6 @@
   color: var(--color-accent);
 }
 
-.ratings-title-inline {
-  display: inline-flex;
-  align-items: center;
-  gap: calc(var(--space-xs) + calc(var(--space-xs) / 2));
-}
 
 .ratings-title-sup {
   font-size: 0.5em;
@@ -166,8 +158,6 @@
 }
 
 .ratings-skeleton-row {
-  display: flex;
-  gap: var(--space-lg);
   padding: var(--space-md) var(--space-md);
   background: var(--color-panel-soft);
   border-radius: var(--radius-md);

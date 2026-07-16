@@ -15,6 +15,7 @@ import { useNavigationStore } from '../stores/useNavigationStore';
 import GlobalSearch from './GlobalSearch';
 import './WindowTitlebar.css';
 import modalStyles from '../ui/Modal.module.css';
+import Inline from '../ui/Inline';
 
 const BRAND_NAME = 'SWAYA';
 
@@ -107,7 +108,7 @@ export default function WindowTitlebar() {
         <span className="window-titlebar__brand-text">{BRAND_NAME}</span>
       </div>
 
-      <div className="window-titlebar__nav-buttons">
+      <Inline gap="sm" align="center" className="window-titlebar__nav-buttons">
         <Tooltip content={t('common.back')} side="bottom">
           <button
             type="button"
@@ -130,7 +131,7 @@ export default function WindowTitlebar() {
             <ArrowRight size={16} />
           </button>
         </Tooltip>
-      </div>
+      </Inline>
 
       <div className={`window-titlebar__center-container ${hasProgress ? 'has-progress' : ''}`}>
         <div className={`window-titlebar__search-wrapper ${hasProgress ? 'has-progress' : ''}`}>

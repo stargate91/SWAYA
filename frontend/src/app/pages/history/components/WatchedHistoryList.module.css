@@ -169,18 +169,11 @@
 }
 
 .watched-history-card__meta {
-  display: flex;
-  align-items: center;
-  gap: var(--space-lg);
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
-  flex-wrap: wrap;
 }
 
 .watched-history-card__meta-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
 }
 
 .watched-history-card__status {

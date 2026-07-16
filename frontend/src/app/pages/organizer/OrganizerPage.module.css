@@ -41,8 +41,4 @@
   padding-right: var(--space-3xl);
 }
 
-.utility-bar-wrapper {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-}
+

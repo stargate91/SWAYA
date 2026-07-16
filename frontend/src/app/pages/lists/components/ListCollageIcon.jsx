@@ -48,14 +48,7 @@ export default function ListCollageIcon({ samplePosters, listType, color, custom
       className={`${styles['lists-sidebar__collage']} ${styles['lists-sidebar__collage--fallback']}`}
       // eslint-disable-next-line react/forbid-dom-props
       style={{
-        backgroundColor: `color-mix(in srgb, ${iconColor} 15%, rgba(255, 255, 255, 0.02))`,
-        border: `1px solid color-mix(in srgb, ${iconColor} 30%, rgba(255, 255, 255, 0.08))`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
-        height: '100%',
-        borderRadius: 'inherit',
+        '--fallback-color': iconColor,
       }}
     >
       {/* eslint-disable-next-line react/forbid-component-props */}

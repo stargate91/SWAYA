@@ -5,6 +5,7 @@ import Tooltip from '@/ui/Tooltip';
 import Spinner from '@/ui/Spinner';
 import { useTranslation } from '@/providers/LanguageContext';
 import styles from './HistoryCard.module.css';
+import Inline from '@/ui/Inline';
 
 const getCardIconAndClass = (status) => {
   switch (status) {
@@ -63,7 +64,7 @@ export default function HistoryCard({
         <div className={styles['history-card__left']}>
           <div className={styles['history-card__header']}>
             {batch.success_count > 0 && (
-              <div className={styles['history-card__detailed-stats']}>
+              <Inline gap="md" align="center" className={styles['history-card__detailed-stats']}>
                 {batch.movie_count > 0 && (
                   <div className={styles['history-card__stat-badge']}>
                     <span className={styles['history-card__badge-val']}>{batch.movie_count}</span>
@@ -98,7 +99,7 @@ export default function HistoryCard({
                     </div>
                   </>
                 )}
-              </div>
+              </Inline>
             )}
             {batch.failed_count > 0 && (
               <div className={`${styles['history-card__stat-badge']} ${styles['history-card__stat-badge--failed']}`}>
@@ -107,16 +108,16 @@ export default function HistoryCard({
               </div>
             )}
           </div>
-          <div className={styles['history-card__meta']}>
-            <div className={styles['history-card__meta-item']}>
+          <Inline gap="lg" align="center" className={styles['history-card__meta']}>
+            <Inline gap="xs" align="center" className={styles['history-card__meta-item']}>
               <Calendar size={14} />
               <span>{new Date(batch.created_at).toLocaleString()}</span>
-            </div>
-            <div className={styles['history-card__meta-item']}>
+            </Inline>
+            <Inline gap="xs" align="center" className={styles['history-card__meta-item']}>
               <Clock size={14} />
               <span>{t('historyPage.batchIdLabel', { defaultValue: 'ID: #{{id}}', id: batch.id })}</span>
-            </div>
-          </div>
+            </Inline>
+          </Inline>
         </div>
         <div className={styles['history-card__right']}>
           <div className={styles['history-card__actions']}>
@@ -168,7 +169,7 @@ export default function HistoryCard({
               const newDir = log.new_value ? log.new_value.substring(0, log.new_value.length - newFile.length) : '';
               return (
                 <div key={log.id} className={`${styles['history-card__file-item']} ${styles[`history-card__file-item--${log.status}`]}`}>
-                  <div className={styles['history-card__file-paths']}>
+                  <Inline gap="md" align="center" className={styles['history-card__file-paths']}>
                     <div className={styles['history-card__file-path-group']}>
                       <span className={styles['history-card__file-dir']}>{oldDir}</span>
                       <span className={styles['history-card__file-name']}>{oldFile}</span>
@@ -178,7 +179,7 @@ export default function HistoryCard({
                       <span className={styles['history-card__file-dir']}>{newDir}</span>
                       <span className={`${styles['history-card__file-name']} ${styles['history-card__file-name--new']}`}>{newFile}</span>
                     </div>
-                  </div>
+                  </Inline>
                   {log.error_message && (
                     <div className={styles['history-card__file-error']}>{log.error_message}</div>
                   )}

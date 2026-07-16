@@ -71,9 +71,6 @@
 }
 
 .person-backdrop-picker__detail-toolbar {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
   min-width: 0;
   flex: 0 0 auto;
   min-height: 2.5rem;

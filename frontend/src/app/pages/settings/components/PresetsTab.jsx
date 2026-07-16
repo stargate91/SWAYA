@@ -6,6 +6,7 @@ import SettingsLiveImpact from './SettingsLiveImpact.jsx';
 import { useSettingsFormContext } from '../SettingsFormContext.jsx';
 import styles from '../SettingsPage.module.css';
 import presetStyles from './PresetsTab.module.css';
+import Inline from '@/ui/Inline';
 
 export default function PresetsTab() {
   const {
@@ -38,7 +39,7 @@ export default function PresetsTab() {
               selected={form.folder_move_to_library}
               disabled={isScanActive}
             >
-              <div className="settings-choice-header">
+              <Inline gap="md" align="center" className="settings-choice-header">
                 <input
                   type="radio"
                   checked={form.folder_move_to_library}
@@ -49,7 +50,7 @@ export default function PresetsTab() {
                 <span className={`settings-choice-title${form.folder_move_to_library ? ' is-active' : ''}`}>
                   {t('settingsPage.sections.mode.library')}
                 </span>
-              </div>
+              </Inline>
               <span className="settings-choice-description">
                 {t('settingsPage.sections.mode.libraryHint')}
               </span>
@@ -63,7 +64,7 @@ export default function PresetsTab() {
               selected={!form.folder_move_to_library}
               disabled={isScanActive}
             >
-              <div className="settings-choice-header">
+              <Inline gap="md" align="center" className="settings-choice-header">
                 <input
                   type="radio"
                   checked={!form.folder_move_to_library}
@@ -74,7 +75,7 @@ export default function PresetsTab() {
                 <span className={`settings-choice-title${!form.folder_move_to_library ? ' is-active' : ''}`}>
                   {t('settingsPage.sections.mode.inplace')}
                 </span>
-              </div>
+              </Inline>
               <span className="settings-choice-description">
                 {t('settingsPage.sections.mode.inplaceHint')}
               </span>
@@ -105,7 +106,7 @@ export default function PresetsTab() {
                   selected={isSelected}
                   disabled={isCardDisabled}
                 >
-                  <div className="settings-choice-header settings-choice-header--compact">
+                  <Inline gap="sm" align="center" className="settings-choice-header settings-choice-header--compact">
                     <span className={presetStyles['settings-preset-icon']}>{preset.icon}</span>
                     <span className={`${presetStyles['settings-preset-title']}${isSelected ? ` ${presetStyles['is-active']}` : ''}`}>
                       {preset.label}
@@ -115,7 +116,7 @@ export default function PresetsTab() {
                         {t('settingsPage.sections.organization.activePreset')}
                       </span>
                     )}
-                  </div>
+                  </Inline>
                   <span className={presetStyles['settings-preset-description']}>
                     {preset.desc}
                   </span>

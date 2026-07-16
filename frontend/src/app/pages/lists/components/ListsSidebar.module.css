@@ -53,11 +53,6 @@
   border-color: var(--button-secondary-border);
 }
 
-.lists-sidebar__actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
 
 .lists-sidebar__import-btn {
   display: flex;
@@ -134,9 +129,6 @@
 }
 
 .lists-sidebar__item-left {
-  display: flex;
-  align-items: center;
-  gap: var(--space-lg);
   min-width: 0;
   flex: 1;
 }
@@ -315,9 +307,6 @@
   position: absolute;
   bottom: var(--space-md);
   right: var(--space-md);
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
 }
 
 .lists-sidebar__item-count {
@@ -345,8 +334,6 @@
   display: flex;
 }
 
-
-
 .lists-sidebar__action-btn {
   display: flex;
   align-items: center;
@@ -369,106 +356,4 @@
 .lists-sidebar__action-btn--delete:hover {
   background: color-mix(in srgb, var(--color-state-danger) 15%, transparent);
   color: var(--color-state-danger);
-}
-
-/* Edit / Create Form */
-.lists-sidebar__form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
-  padding: var(--space-lg);
-  background: color-mix(in srgb, var(--color-ink) 3%, transparent);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--space-sm);
-}
-
-.lists-sidebar__form.is-editing {
-  margin-bottom: 0;
-}
-
-.lists-sidebar__form-input {
-  width: 100%;
-  background: color-mix(in srgb, var(--color-ink) 5%, transparent);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-sm);
-  color: var(--color-text-primary);
-  font-size: 0.8125rem;
-  padding: var(--space-sm) var(--space-md);
-  box-sizing: border-box;
-  outline: none;
-  transition: border-color var(--motion-fast);
-}
-
-.lists-sidebar__form-input:focus {
-  border-color: var(--color-accent);
-}
-
-.lists-sidebar__form-colors {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
-}
-
-.lists-sidebar__form-color-option {
-  width: 1rem;
-  height: 1rem;
-  border-radius: var(--radius-full);
-  border: 2px solid transparent;
-  cursor: pointer;
-  padding: 0;
-  transition: transform var(--motion-fast), border-color var(--motion-fast);
-}
-
-.lists-sidebar__form-color-option:hover {
-  transform: scale(1.15);
-}
-
-.lists-sidebar__form-color-option.is-selected {
-  border-color: var(--color-text-primary);
-  transform: scale(1.1);
-}
-
-.lists-sidebar__form-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--space-sm);
-}
-
-.lists-sidebar__form-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--space-2xl);
-  height: var(--space-2xl);
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: all var(--motion-fast);
-}
-
-.lists-sidebar__form-btn--save {
-  background: var(--color-accent);
-  color: var(--color-text-inverse);
-}
-
-.lists-sidebar__form-btn--save:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.lists-sidebar__form-btn--save:hover:not(:disabled) {
-  opacity: 0.9;
-}
-
-.lists-sidebar__form-btn--cancel {
-  background: color-mix(in srgb, var(--color-text-primary) 5%, transparent);
-  border-color: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
-  color: var(--color-text-secondary);
-}
-
-.lists-sidebar__form-btn--cancel:hover {
-  background: color-mix(in srgb, var(--color-text-primary) 10%, transparent);
-  color: var(--color-text-primary);
 }

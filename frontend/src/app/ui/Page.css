@@ -25,11 +25,3 @@
   max-width: 72ch;
   color: var(--color-muted);
 }
-
-.ui-inline,
-.inline-note {
-  display: flex;
-  gap: var(--space-md);
-  align-items: center;
-  flex-wrap: wrap;
-}

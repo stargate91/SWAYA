@@ -10,6 +10,7 @@ import Spinner from '../ui/Spinner';
 import { useSettingsQuery } from '../queries';
 import { useNavigationStore } from '../stores/useNavigationStore';
 import './AppShell.css';
+import Inline from '../ui/Inline';
 
 
 

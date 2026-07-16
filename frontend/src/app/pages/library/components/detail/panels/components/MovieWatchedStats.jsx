@@ -4,6 +4,7 @@ import { useMediaDetailContext } from '../../MediaDetailContext';
 import '../PanelsCommon.css';
 import './WatchedStats.css';
 import Pill from '@/ui/Pill';
+import Inline from '@/ui/Inline';
 
 
 export default function MovieWatchedStats() {
@@ -94,8 +95,10 @@ export default function MovieWatchedStats() {
           <div className="activity-list">
             {item.playback_logs && item.playback_logs.length > 0 ? (
               item.playback_logs.map((log, index) => (
-                <div
+                <Inline
                   key={log.id || index}
+                  gap="md"
+                  align="center"
                   className="activity-item"
                 >
                   <Pill variant="success" className="activity-item__token">
@@ -104,7 +107,7 @@ export default function MovieWatchedStats() {
                   <span className="activity-item__date">
                     {formatLogDate(log.watched_at)}
                   </span>
-                </div>
+                </Inline>
               ))
             ) : (
               <div className="activity-list__empty">

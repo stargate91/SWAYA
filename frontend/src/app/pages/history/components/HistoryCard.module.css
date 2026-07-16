@@ -71,19 +71,12 @@
 }
 
 .history-card__meta {
-  display: flex;
-  align-items: center;
-  gap: var(--space-lg);
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
-  flex-wrap: wrap;
   margin-top: var(--border-width-thin);
 }
 
 .history-card__meta-item {
-  display: flex;
-  align-items: center;
-  gap: calc(var(--space-xs) * 1.5);
 }
 
 .history-card__right {
@@ -93,12 +86,6 @@
   z-index: var(--z-index-step-2);
 }
 
-.history-card__detailed-stats {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  flex-wrap: wrap;
-}
 
 .history-card__stat-badge {
   display: inline-flex;
@@ -245,9 +232,6 @@
 }
 
 .history-card__file-paths {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
   flex-wrap: nowrap;
   min-width: 0;
 }

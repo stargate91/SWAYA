@@ -91,11 +91,6 @@
   letter-spacing: var(--letter-spacing-wide);
 }
 
-.template-tag-selector-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
-}
 
 .preview-badge-container {
   font-size: var(--font-size-2xs);
@@ -106,9 +101,6 @@
   padding: var(--space-sm) var(--space-md);
   margin-top: var(--space-md);
   font-family: var(--font-family-mono);
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
 }
 
 .preview-badge-label {
