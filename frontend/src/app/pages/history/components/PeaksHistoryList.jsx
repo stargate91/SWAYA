@@ -39,6 +39,9 @@ export default function PeaksHistoryList({
     return (
       <div className={historyPageStyles['history-page__empty-container']}>
         <EmptyState
+          size="lg"
+          border="dashed"
+          background="solid"
           title={t('historyPage.peaksEmptyTitle') || 'No marked finishes'}
           description={t('historyPage.peaksEmptyDesc') || 'Moments you mark with the finish button during NSFW playback will be listed here.'}
           icon={Droplets}

@@ -40,14 +40,14 @@ export default function CreateTagModalContent({ onClose, t, initialTag = null, m
   const formId = mode === 'edit' ? 'edit-tag-form' : 'create-tag-form';
 
   useEffect(() => {
-    const formElement = document.getElementById('create-tag-form');
+    const formElement = document.getElementById(formId);
     if (formElement) {
-      const modalElement = formElement.closest('.ui-modal');
+      const modalElement = formElement.closest('[data-modal="true"]');
       if (modalElement) {
         modalElement.style.setProperty('--current-tag-color', color);
       }
     }
-  }, [color]);
+  }, [color, formId]);
 
   const handleDragStart = (index, e) => {
     e.preventDefault();

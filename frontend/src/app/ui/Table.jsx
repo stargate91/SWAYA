@@ -87,9 +87,15 @@ const TableRow = memo(function TableRow({
             className={tdClass}
           >
             <div className={styles['cell-content']}>
-              <span className={`${styles['cell-value']} ${hideOnHoverClass}`.trim()}>
-                {isEmpty ? '-' : renderedValue}
-              </span>
+              {col.render ? (
+                <div className={`${styles['cell-value-custom']} ${hideOnHoverClass}`.trim()}>
+                  {isEmpty ? '-' : renderedValue}
+                </div>
+              ) : (
+                <span className={`${styles['cell-value']} ${hideOnHoverClass}`.trim()}>
+                  {isEmpty ? '-' : renderedValue}
+                </span>
+              )}
               {hasActionsInCell ? (
                 /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
                 <div className={styles['row-actions']} onClick={(event) => event.stopPropagation()}>
@@ -246,7 +252,7 @@ export default function Table({
           {rows.length === 0 ? (
             <tr className={styles.isEmpty}>
               <td colSpan={columns.length} className={styles.empty}>
-                {emptyContent || <EmptyState variant="inline" title={displayEmptyText} />}
+                {emptyContent || <EmptyState size="sm" border="none" background="none" title={displayEmptyText} />}
               </td>
             </tr>
           ) : (

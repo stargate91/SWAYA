@@ -139,13 +139,17 @@ export default function OrganizerMatchModalContent({
       <section className={styles['organizer-match-modal__section']}>
         {isBulk && !hasSearched && browserState.view === 'results' ? (
           <EmptyState
-            variant="modal-intro"
+            size="md"
+            border="dashed"
+            background="translucent"
             title={t('organizer.details.matchModal.bulkSearchIntroTitle')}
             description={t('organizer.details.matchModal.bulkSearchIntroDesc')}
           />
         ) : shouldShowStatusEmptyState ? (
           <EmptyState
-            variant="modal-default"
+            size="md"
+            border="dashed"
+            background="translucent"
             title={initialMatchEmptyState.title}
             description={initialMatchEmptyState.description}
           />

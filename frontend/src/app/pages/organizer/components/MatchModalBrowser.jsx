@@ -90,7 +90,9 @@ export default function MatchModalBrowser({
           </div>
         ) : (
           <EmptyState
-            variant="modal-default"
+            size="md"
+            border="dashed"
+            background="translucent"
             title={t('organizer.details.matchModal.noSeasons')}
           />
         )
@@ -136,7 +138,9 @@ export default function MatchModalBrowser({
           </>
         ) : (
           <EmptyState
-            variant="modal-default"
+            size="md"
+            border="dashed"
+            background="translucent"
             title={t('organizer.details.matchModal.noEpisodes')}
           />
         )

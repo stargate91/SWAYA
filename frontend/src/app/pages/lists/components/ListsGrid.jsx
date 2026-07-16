@@ -29,12 +29,14 @@ export default function ListsGrid({
         title={t('lists.empty_list_title') || 'List is Empty'}
         description={t('lists.empty_list_desc') || 'This list has no items yet.'}
         icon={ListIcon}
-        variant="page-filter"
+        size="lg"
+        border="dashed"
+        background="solid"
         // eslint-disable-next-line react/forbid-component-props
         style={activeList?.color ? {
-          '--ui-empty-page-filter-icon-color': activeList.color,
-          '--ui-empty-page-filter-icon-bg': `color-mix(in srgb, ${activeList.color} 14%, transparent)`,
-          '--ui-empty-page-filter-icon-border': `color-mix(in srgb, ${activeList.color} 20%, transparent)`,
+          '--ui-empty-icon-color': activeList.color,
+          '--ui-empty-icon-bg': `color-mix(in srgb, ${activeList.color} 14%, transparent)`,
+          '--ui-empty-icon-border': `color-mix(in srgb, ${activeList.color} 20%, transparent)`,
         } : null}
       />
     );
@@ -46,12 +48,14 @@ export default function ListsGrid({
         title={t('lists.no_search_results_title') || 'No Matches Found'}
         description={t('lists.no_search_results_desc') || 'Try refining your search query.'}
         icon={Search}
-        variant="page-filter"
+        size="lg"
+        border="dashed"
+        background="solid"
         // eslint-disable-next-line react/forbid-component-props
         style={activeList?.color ? {
-          '--ui-empty-page-filter-icon-color': activeList.color,
-          '--ui-empty-page-filter-icon-bg': `color-mix(in srgb, ${activeList.color} 14%, transparent)`,
-          '--ui-empty-page-filter-icon-border': `color-mix(in srgb, ${activeList.color} 20%, transparent)`,
+          '--ui-empty-icon-color': activeList.color,
+          '--ui-empty-icon-bg': `color-mix(in srgb, ${activeList.color} 14%, transparent)`,
+          '--ui-empty-icon-border': `color-mix(in srgb, ${activeList.color} 20%, transparent)`,
         } : null}
       />
     );

@@ -72,7 +72,9 @@ export default function MatchModalResults({
             ? (t('organizer.details.matchModal.noResultsTvDesc') || 'We could not find any tv matching your search. Try adjusting the title or year.')
             : (t('organizer.details.matchModal.noResultsMovieDesc') || 'We could not find any movies matching your search. Try adjusting the title or year.')
           }
-          variant="modal-search"
+          size="md"
+          border="dashed"
+          background="translucent"
         />
       ) : null}
     </>

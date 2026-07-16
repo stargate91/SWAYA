@@ -155,56 +155,6 @@ export default function usePeopleCollectionDetailController({
     });
   };
 
-  const handleOpenCollectionBackdropModal = () => {
-    if (isPeople || !item?.tmdb_id) {
-      return;
-    }
-
-    openModal({
-      title: t('library.details.chooseBackdrop') || 'Choose Backdrop',
-      variant: 'extra-wide',
-      content: (
-        <UniversalImagePicker
-          key={item.tmdb_id}
-          entityId={`collection_${item.tmdb_id || item.id}`}
-          tmdbId={item.tmdb_id || item.id}
-          imageType="backdrop"
-          entityType="collection"
-          currentPath={item.backdrop_path}
-          t={t}
-          toast={toast}
-          item={item}
-          closeOnSelect={true}
-          onClose={closeModal}
-        />
-      ),
-    });
-  };
-
-  const handleOpenPeopleBackdropModal = () => {
-    if (!isPeople || !item?.id) {
-      return;
-    }
-
-    openModal({
-      title: t('library.details.chooseBackdrop') || 'Choose Backdrop',
-      variant: 'extra-wide',
-      className: 'person-backdrop-picker-modal',
-      content: (
-        <UniversalImagePicker
-          key={item.id}
-          entityId={item.id}
-          item={item}
-          entityType="person"
-          imageType="backdrop"
-          t={t}
-          toast={toast}
-          onClose={closeModal}
-        />
-      ),
-    });
-  };
-
   return {
     item,
     isLoading,
@@ -226,8 +176,6 @@ export default function usePeopleCollectionDetailController({
     handleToggleFavorite,
     handleToggleActive,
     handleOpenReviewModal,
-    handleOpenCollectionBackdropModal,
-    handleOpenPeopleBackdropModal,
     overrideBackdropMutation,
     uploadBackdropMutation,
   };

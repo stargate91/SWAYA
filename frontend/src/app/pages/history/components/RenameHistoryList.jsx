@@ -39,6 +39,9 @@ export default function RenameHistoryList({
     return (
       <div className={historyPageStyles['history-page__empty-container']}>
         <EmptyState
+          size="lg"
+          border="dashed"
+          background="solid"
           title={t('historyPage.emptyTitle') || 'No action history'}
           description={t('historyPage.emptyDesc') || 'Reversible file organization batches will be listed here.'}
           icon={RotateCcw}

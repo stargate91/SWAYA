@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { AlertTriangle } from '@/ui/icons';
 import { useClearDatabaseMutation } from '@/queries';
 import Button from '@/ui/Button';
+import modalStyles from '@/ui/Modal.module.css';
 
 export default function useSettingsDangerZone({
   t,
@@ -20,7 +21,7 @@ export default function useSettingsDangerZone({
       icon: AlertTriangle,
       variant: 'danger',
       content: (
-        <p className="ui-modal__body-text">
+        <p className={modalStyles['body-text']}>
           {t('settingsPage.dangerZone.confirm')}
         </p>
       ),
@@ -59,7 +60,7 @@ export default function useSettingsDangerZone({
       icon: AlertTriangle,
       variant: 'danger',
       content: (
-        <p className="ui-modal__body-text">
+        <p className={modalStyles['body-text']}>
           {t('settingsPage.dangerZone.confirmWipeCache') || 'Are you sure you want to clear the entire scraped metadata cache? This will reset all match results but will keep your libraries, physical file records, manually saved overrides, and downloaded images.'}
         </p>
       ),

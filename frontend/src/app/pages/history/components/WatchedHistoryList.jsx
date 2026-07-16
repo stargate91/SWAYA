@@ -60,6 +60,9 @@ export default function WatchedHistoryList({
     return (
       <div className={historyPageStyles['history-page__empty-container']}>
         <EmptyState
+          size="lg"
+          border="dashed"
+          background="solid"
           title={t('historyPage.watchedEmptyTitle') || 'No playback history'}
           description={t('historyPage.watchedEmptyDesc') || 'Your recently watched movies and tv will be listed here.'}
           icon={Clock}

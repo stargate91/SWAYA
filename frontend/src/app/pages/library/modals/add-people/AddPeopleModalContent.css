@@ -1,10 +1,4 @@
-/* Center the add-people-modal content vertically in the modal body */
-.ui-modal:has(.add-people-modal) .ui-modal__body {
-  display: flex;
-  flex-direction: column;
-}
-
-.ui-modal:has(.add-people-modal) .add-people-modal {
+.add-people-modal {
   flex-grow: 1;
 }
 

@@ -243,40 +243,7 @@
 }
 
 
-/* Theater modal for trailers */
-.ui-modal.theater-modal {
-  background: var(--color-bg-canvas);
-  border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-xl);
-}
 
-.ui-modal.theater-modal .ui-modal__header {
-  background: var(--color-bg-canvas);
-  border-bottom-color: var(--color-border-default);
-}
-
-.ui-modal.theater-modal .ui-modal__title {
-  color: var(--color-text-primary);
-}
-
-.ui-modal.theater-modal .ui-modal__body {
-  padding: 0;
-  background: var(--color-bg-canvas);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ui-modal.theater-modal .ui-modal__close {
-  background: var(--color-bg-elevated);
-  border-color: var(--color-border-strong);
-  color: var(--color-text-secondary);
-}
-
-.ui-modal.theater-modal .ui-modal__close:hover {
-  background: var(--color-border-heavy);
-  color: var(--color-text-primary);
-}
 
 /* Side Navigation Button Bar */
 .media-detail-page__side-nav {

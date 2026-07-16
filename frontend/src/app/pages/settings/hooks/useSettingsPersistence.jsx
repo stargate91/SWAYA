@@ -8,6 +8,8 @@ import Button from '@/ui/Button';
 import Checkbox from '@/ui/Checkbox';
 import { Info } from '@/ui/icons';
 
+import modalStyles from '@/ui/Modal.module.css';
+
 export default function useSettingsPersistence({
   t,
   toast,
@@ -140,8 +142,8 @@ export default function useSettingsPersistence({
           icon: Info,
           variant: 'info',
           content: (
-            <div className="ui-modal__body-text">
-              <p className="ui-modal__body-paragraph">
+            <div className={modalStyles['body-text']}>
+              <p className={modalStyles['body-paragraph']}>
                 {t('settingsPage.languageChangeInfo.description')}
               </p>
               <Checkbox onChange={(e) => { dontShowAgain = e.target.checked; }}>

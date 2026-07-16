@@ -25,8 +25,6 @@
   white-space: nowrap;
   vertical-align: middle;
   max-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .cell-content {
@@ -64,7 +62,14 @@
   line-height: calc(2 * var(--space-lg));
 }
 
-.cell-value.isHidden {
+.cell-value-custom {
+  display: block;
+  min-width: 0;
+  width: 100%;
+}
+
+.cell-value.isHidden,
+.cell-value-custom.isHidden {
   visibility: hidden;
 }
 
@@ -217,7 +222,8 @@
   display: inline-flex;
 }
 
-.table tbody tr:hover .cell-value.hideOnHover {
+.table tbody tr:hover .cell-value.hideOnHover,
+.table tbody tr:hover .cell-value-custom.hideOnHover {
   visibility: hidden;
 }
 

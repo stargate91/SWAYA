@@ -51,7 +51,10 @@ export default function AddPeopleSearch({
           <EmptyState
             title={t(textKey('library.addPeople.adultSearchEmptyTitle', 'library.addPeople.searchEmptyTitle'))}
             description={t(textKey('library.addPeople.adultSearchEmptyDesc', 'library.addPeople.searchEmptyDesc'))}
-            variant="modal-intro"
+            size="md"
+            border="dashed"
+            background="translucent"
+            fillHeight={true}
           />
         </div>
       ) : filteredTmdbResults.length === 0 ? (
@@ -59,7 +62,10 @@ export default function AddPeopleSearch({
           <EmptyState
             title={t(textKey('library.addPeople.adultSearchNoResultsTitle', 'library.addPeople.searchNoResultsTitle'))}
             description={t(textKey('library.addPeople.adultSearchNoResultsDesc', 'library.addPeople.searchNoResultsDesc'))}
-            variant="modal-search"
+            size="md"
+            border="dashed"
+            background="translucent"
+            fillHeight={true}
           />
         </div>
       ) : (

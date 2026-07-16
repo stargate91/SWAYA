@@ -37,7 +37,15 @@ export const UiProvider = ({ children }) => {
         title={modal?.title}
         description={modal?.description}
         variant={modal?.variant}
+        width={modal?.width}
+        height={modal?.height}
+        closeOnBackdropClick={modal?.closeOnBackdropClick}
+        showCloseButton={modal?.showCloseButton}
+        showHeader={modal?.showHeader}
         className={modal?.className}
+        bodyClassName={modal?.bodyClassName}
+        headerClassName={modal?.headerClassName}
+        headerStyle={modal?.headerStyle}
         icon={modal?.icon}
         onClose={() => setModal(null)}
         footer={modal?.footer ?? (

@@ -157,7 +157,10 @@ export default function AddPeopleLocal({
                     ? (t('library.addPeople.adultNoInactiveDesc') || 'Scan and organize new adult titles to find more cast and creator suggestions.')
                     : (t('library.addPeople.noInactiveDesc') || 'All people from organized items are already active.'))
             }
-            variant={hasSearchQuery ? 'modal-search' : hasActiveFilters ? 'modal-filter' : 'modal-default'}
+            size="md"
+            border="dashed"
+            background="translucent"
+            fillHeight={true}
           />
         </div>
       ) : (

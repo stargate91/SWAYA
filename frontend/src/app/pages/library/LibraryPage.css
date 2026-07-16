@@ -261,11 +261,6 @@
   justify-content: center;
 }
 
-.library-content .ui-empty-state {
-  width: 100%;
-  box-sizing: border-box;
-}
-
 .library-loading {
   display: flex;
   align-items: center;
@@ -294,26 +289,8 @@
   min-height: 0;
 }
 
-.add-people-modal__empty-fill .ui-empty-state {
-  width: 100%;
-  min-height: 100%;
-  flex: 1 1 auto;
-}
 
 
-/* Dynamic header gradient for Tag creation modal */
-.ui-modal:has(#create-tag-form) .ui-modal__header {
-  background: linear-gradient(135deg,
-      color-mix(in srgb, var(--current-tag-color) 16%, transparent),
-      transparent);
-  transition: background-color var(--motion-base), border-color var(--motion-base);
-}
-
-.ui-modal:has(#create-tag-form) .ui-modal__title-icon {
-  color: var(--current-tag-color);
-  filter: drop-shadow(0 0 0.5rem color-mix(in srgb, var(--current-tag-color) 25%, transparent));
-  transition: color var(--motion-base), filter var(--motion-base);
-}
 
 /* Custom Tag Grid */
 .library-tags-grid {

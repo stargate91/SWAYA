@@ -544,8 +544,8 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
     } else {
       openModal({
         title: `${title}${trailerSuffix}`,
-        variant: 'extra-wide',
-        className: 'theater-modal',
+        variant: 'theater',
+        width: 'xl',
         content: (
           <iframe
             width="100%"

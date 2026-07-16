@@ -187,9 +187,9 @@ export default function RatingsPage() {
             title={t('ratings.title') || 'Ratings & Reviews'}
             sessionMode={state.activeSessionMode}
             tabs={ratingTabs}
-            activeTab={state.ratingMode}
+            activeTab={state.activeTab}
             onTabChange={(val) => {
-              state.setRatingMode(val);
+              state.setActiveTab(val);
               state.setCurrentPage(1);
             }}
             showSearch={true}

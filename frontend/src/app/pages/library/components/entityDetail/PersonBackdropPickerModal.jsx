@@ -138,7 +138,10 @@ export default function PersonBackdropPickerModal({
               </div>
             ) : (
               <EmptyState
-                variant="detail-panel"
+                size="md"
+                border="dashed"
+                background="translucent"
+                iconColor="muted"
                 icon={ImageOff}
                 title={t('library.details.noProfileAvailable') || 'No profile picture available for default backdrop.'}
               />
@@ -162,7 +165,10 @@ export default function PersonBackdropPickerModal({
 
             {!isLoading && visibleItems.length === 0 && (
               <EmptyState
-                variant="detail-panel"
+                size="md"
+                border="dashed"
+                background="translucent"
+                iconColor="muted"
                 icon={ImageOff}
                 className="backdrops-panel__empty-state person-backdrop-picker__empty"
                 title={t('library.details.noBackdropsAvailable') || 'No good backdrop options found.'}

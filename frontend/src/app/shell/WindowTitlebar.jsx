@@ -14,6 +14,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useNavigationStore } from '../stores/useNavigationStore';
 import GlobalSearch from './GlobalSearch';
 import './WindowTitlebar.css';
+import modalStyles from '../ui/Modal.module.css';
 
 const BRAND_NAME = 'SWAYA';
 
@@ -38,7 +39,7 @@ export default function WindowTitlebar() {
       icon: AlertTriangle,
       variant: 'danger',
       content: (
-        <div className="ui-modal__body-text">
+        <div className={modalStyles['body-text']}>
           {t('progress.abortConfirm.body')}
         </div>
       ),

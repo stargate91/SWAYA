@@ -478,7 +478,10 @@ export default function TMDBImageGrid({
 
         {images.length === 0 && (
           <EmptyState
-            variant="detail-panel"
+            size="md"
+            border="dashed"
+            background="translucent"
+            iconColor="muted"
             icon={ImageOff}
             className="backdrops-panel__empty-state"
             title={t?.('library.details.noImagesAvailable') || `No ${imageType} options found.`}

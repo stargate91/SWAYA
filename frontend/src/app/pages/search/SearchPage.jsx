@@ -77,12 +77,18 @@ export default function SearchPage() {
           </Grid>
         ) : !urlQuery.trim() ? (
           <EmptyState
+            size="lg"
+            border="dashed"
+            background="solid"
             icon={Search}
             title={t('search.empty.title', { defaultValue: 'Start Searching' })}
             description={t('search.empty.desc', { defaultValue: 'Search metadata from TMDb, StashDB, FansDB, or PornDB' })}
           />
         ) : filteredResults.length === 0 ? (
           <EmptyState
+            size="lg"
+            border="dashed"
+            background="solid"
             icon={ImageOff}
             title={t('search.noResults.title', { defaultValue: 'No Results Found' })}
             description={t('search.noResults.desc', { defaultValue: 'Try another query or change search settings.' })}

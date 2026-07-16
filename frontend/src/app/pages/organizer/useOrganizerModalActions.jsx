@@ -13,6 +13,7 @@ import { useTranslation } from '../../providers/LanguageContext';
 import { useOrganizerDeleteActions } from './useOrganizerDeleteActions';
 import { useSettingsQuery } from '../../queries';
 import { mapOrganizerTypeLabel } from './organizerMappers';
+import modalStyles from '../../ui/Modal.module.css';
 
 export function useOrganizerModalActions({
   focusFirstAvailableResult,
@@ -102,7 +103,7 @@ export function useOrganizerModalActions({
         key: 'trash',
         label: t('organizer.details.delete.trash.label'),
         description: t(isExtra ? 'organizer.details.delete.trash.descriptionExtra' : 'organizer.details.delete.trash.descriptionMedia'),
-        className: 'ui-modal__action-card--danger',
+        className: modalStyles['action-card--danger'],
       },
     ].filter(Boolean);
 
@@ -112,21 +113,21 @@ export function useOrganizerModalActions({
       icon: Trash2,
       variant: 'danger',
       content: (
-        <div className="ui-modal__actions-list">
+        <div className={modalStyles['actions-list']}>
           {actionCards.map((action) => (
             <button
               key={action.key}
               type="button"
-              className={`ui-modal__action-card ${action.className || ''}`.trim()}
+              className={`${modalStyles['action-card']} ${action.className || ''}`.trim()}
               onClick={() => {
                 handleDeleteOrganizerRow(row, action.key).catch((error) => {
                   toast(error.message || t('organizer.toasts.deleteActionFailed'), 'danger');
                 });
               }}
             >
-              <div className="ui-modal__action-copy">
-                <strong className="ui-modal__action-title">{action.label}</strong>
-                <span className="ui-modal__action-description">{action.description}</span>
+              <div className={modalStyles['action-copy']}>
+                <strong className={modalStyles['action-title']}>{action.label}</strong>
+                <span className={modalStyles['action-description']}>{action.description}</span>
               </div>
             </button>
           ))}
@@ -166,7 +167,7 @@ export function useOrganizerModalActions({
           : hasExtras
             ? t('organizer.details.bulkDelete.trash.descriptionExtra')
             : t('organizer.details.bulkDelete.trash.descriptionMedia'),
-        className: 'ui-modal__action-card--danger',
+        className: modalStyles['action-card--danger'],
       },
     ].filter(Boolean);
 
@@ -176,21 +177,21 @@ export function useOrganizerModalActions({
       icon: Trash2,
       variant: 'danger',
       content: (
-        <div className="ui-modal__actions-list">
+        <div className={modalStyles['actions-list']}>
           {actionCards.map((action) => (
             <button
               key={action.key}
               type="button"
-              className={`ui-modal__action-card ${action.className || ''}`.trim()}
+              className={`${modalStyles['action-card']} ${action.className || ''}`.trim()}
               onClick={() => {
                 handleDeleteOrganizerRows(rows, action.key).catch((error) => {
                   toast(error.message || t('organizer.toasts.deleteActionFailed'), 'danger');
                 });
               }}
             >
-              <div className="ui-modal__action-copy">
-                <strong className="ui-modal__action-title">{action.label}</strong>
-                <span className="ui-modal__action-description">{action.description}</span>
+              <div className={modalStyles['action-copy']}>
+                <strong className={modalStyles['action-title']}>{action.label}</strong>
+                <span className={modalStyles['action-description']}>{action.description}</span>
               </div>
             </button>
           ))}

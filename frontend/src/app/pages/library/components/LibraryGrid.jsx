@@ -314,7 +314,9 @@ export default function LibraryGrid({
         )
       ) : (
         <EmptyState
-          variant={emptyStateVariant}
+          size="lg"
+          border={emptyStateVariant === 'default' ? 'solid' : 'dashed'}
+          background="solid"
           title={emptyTitle}
           description={emptyDescription}
           icon={emptyIcon}
@@ -391,7 +393,10 @@ function ExpandedTagPanel({ tag, t, emptyIcon, isFocusMode = false, activeSessio
           </div>
         ) : null}
         <EmptyState
-          variant="tag-focus"
+          layout="left"
+          size="md"
+          border="none"
+          background="none"
           title={(t('library.tags.emptyFocusTitle') || 'This tag is ready to use.').replace('{name}', tag.name)}
           description={(t('library.tags.emptyFocusDescription') || 'Add this tag to movies, shows, or people and they will appear here.').replace('{name}', tag.name)}
         />

@@ -269,12 +269,14 @@ export default function OrganizerDetailsPanel({
             </>
           ) : (
             <EmptyState
-              variant="panel"
+              size="md"
+              border="none"
+              background="none"
+              iconColor="muted"
               title={t('organizer.details.title')}
               description={t('organizer.details.empty')}
               icon={Info}
               className={styles['organizer-details__empty-state']}
-              hasBorder={false}
               animateIcon={true}
             />
           )}
