@@ -176,7 +176,7 @@ export default function AppShell() {
       <div className={styles.main}>
         <main className={`${styles.content} shell__content ${location.pathname === '/dashboard' ? styles['content-dashboard'] : ''}`.trim()}>
           <header className={styles['utility-bar']}>
-            <div className={styles['utility-bar-left']} aria-label="Context actions placeholder" />
+            <div className={`${styles['utility-bar-left']} shell__utility-bar-left`} aria-label="Context actions placeholder" />
             <div className={styles['utility-bar-center']} id="shell-utility-bar-center" />
           </header>
           <Suspense fallback={

@@ -123,7 +123,6 @@
   min-width: 0;
   min-height: 0;
   overflow: auto;
-  scrollbar-gutter: stable both-edges;
   padding: var(--page-top-offset) var(--space-3xl) var(--page-bottom-offset);
   box-sizing: border-box;
   background: var(--color-canvas);

@@ -108,8 +108,7 @@ export default function OrganizerPageContent({
   return (
     <Page viewport={true}>
       <Stack fill gap="3xl">
-        <Stack fill gap="3xl">
-          <PanelHeader
+        <PanelHeader
             title={t('organizer.title')}
             sessionMode={sessionMode}
             actions={headerActions}
@@ -179,7 +178,6 @@ export default function OrganizerPageContent({
             totalItems={sortedRows.length}
             totalPages={totalPages}
           />
-        </Stack>
       </Stack>
 
       <ImageTooltip

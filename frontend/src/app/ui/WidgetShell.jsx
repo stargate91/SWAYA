@@ -13,9 +13,10 @@ const WidgetShell = ({ children, loading, size, transparent }) => {
             <Skeleton.Title className={styles['loading-title-skeleton']} />
           </div>
           {size === 'sm' ? (
-            <div className={styles['loading-column']}>
-              <Skeleton className={styles['loading-skeleton-row-item-1']} variant="rect" />
-              <Skeleton className={styles['loading-skeleton-row-item-2']} variant="rect" />
+            <div className={styles['loading-stats-grid']}>
+              {Array.from({ length: 5 }).map((_, idx) => (
+                <Skeleton key={idx} className={styles['loading-stats-card']} variant="rect" />
+              ))}
             </div>
           ) : (
             <Skeleton.Row>

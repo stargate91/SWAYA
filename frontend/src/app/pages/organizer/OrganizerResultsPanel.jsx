@@ -60,7 +60,7 @@ export default function OrganizerResultsPanel({
           />
         </Stack>
       ) : emptyState ? (
-        <Stack fill align="center" justify="center">
+        <Stack>
           <EmptyState
             actions={emptyActions}
             description={emptyState.description}
