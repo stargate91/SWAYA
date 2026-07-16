@@ -265,10 +265,10 @@ export function RatingsSummary({ state, t }) {
                 ? (t('ratings.stats.favoritePerformers') || 'Favorite Performers')
                 : (t('ratings.stats.favoriteArtists') || 'Favorite Artists')}
             </div>
-            <div className="compact-stats-favorites">
+            <Inline gap="sm" align="center" className="compact-stats-favorites">
               <span className="compact-stats-row__value">{state.peopleStats.favoritesCount}</span>
               <Heart size={14} className="analytics-card__icon text-danger" fill="currentColor" />
-            </div>
+            </Inline>
           </Inline>
         </div>
       </div>
@@ -296,7 +296,7 @@ export function RatingDistribution({
 
   return (
     <div className="analytics-card analytics-card--distribution compact-distribution-card">
-      <div className="compact-distribution-header">
+      <Inline gap="md" align="center" className="compact-distribution-header">
         <span className="analytics-card__title">
           {t('ratings.stats.distribution', { defaultValue: 'Rating Distribution' })}
         </span>
@@ -306,7 +306,7 @@ export function RatingDistribution({
           onChange={setDistTab}
           variant="filter"
         />
-      </div>
+      </Inline>
       <div className="analytics-distribution">
         {(() => {
           const activeDistStats = 
@@ -320,7 +320,7 @@ export function RatingDistribution({
             const percentage = (count / maxCount) * 100;
             const ratingLabel = ((index + 1) / 2).toString();
             return (
-              <div key={index} className="analytics-distribution__row">
+              <Inline key={index} gap="md" align="center" className="analytics-distribution__row">
                 <span className="analytics-distribution__label">{ratingLabel}</span>
                 <div className="analytics-distribution__bar-container">
                   <div
@@ -330,7 +330,7 @@ export function RatingDistribution({
                   />
                 </div>
                 <span className="analytics-distribution__count">{count}</span>
-              </div>
+              </Inline>
             );
           });
         })()}

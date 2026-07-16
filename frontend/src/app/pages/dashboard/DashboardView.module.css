@@ -109,15 +109,10 @@
 }
 
 .dashboard-customizer-item-header {
-  display: flex;
-  align-items: center;
   justify-content: space-between;
 }
 
 .dashboard-customizer-item-left {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
 }
 
 .dashboard-customizer-grip {

@@ -60,9 +60,7 @@
 }
 
 .lists-header__top-row {
-  display: flex;
   justify-content: space-between;
-  align-items: flex-start;
   width: 100%;
 }
 
@@ -162,9 +160,6 @@
 
 
 .lists-header__right {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
   flex-shrink: 0;
 }
 

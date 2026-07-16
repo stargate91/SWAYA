@@ -5,6 +5,7 @@ import Switch from '@/ui/Switch';
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 import Drawer from '@/ui/Drawer';
 import { useTranslation } from '../../../providers/LanguageContext';
+import Inline from '@/ui/Inline';
 
 export default function DashboardCustomizerDrawer({
   isOpen,
@@ -106,19 +107,19 @@ export default function DashboardCustomizerDrawer({
                   onDragEnd={handleDragEnd}
                   className={`${styles['dashboard-customizer-item']} ${isDragOver ? styles['is-drag-over'] : ''}`}
                 >
-                  <div className={styles['dashboard-customizer-item-header']}>
-                    <div className={styles['dashboard-customizer-item-left']}>
+                  <Inline align="center" className={styles['dashboard-customizer-item-header']}>
+                    <Inline gap="md" align="center" className={styles['dashboard-customizer-item-left']}>
                       <div className={styles['dashboard-customizer-grip']}>
                         <GripVertical size={16} />
                       </div>
                       <span className={styles['dashboard-customizer-item-label']}>{label}</span>
-                    </div>
+                    </Inline>
 
                     <Switch
                       checked={Boolean(visibleWidgets[switchKey])}
                       onChange={() => toggleWidget(switchKey)}
                     />
-                  </div>
+                  </Inline>
                 </div>
               );
             })}

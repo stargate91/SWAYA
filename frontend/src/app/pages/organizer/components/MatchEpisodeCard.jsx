@@ -7,6 +7,7 @@ import CardMetadata from '../../../ui/CardMetadata';
 import Button from '../../../ui/Button';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import styles from '../MatchModal.module.css';
+import Inline from '../../../ui/Inline';
 
 export default function MatchEpisodeCard({
   episodeEntry,
@@ -31,7 +32,7 @@ export default function MatchEpisodeCard({
   }, [isHighlighted]);
 
   const subtitleNode = (
-    <div className={styles['organizer-match-modal__browser-card-meta-row']}>
+    <Inline align="center" gap="sm" className={styles['organizer-match-modal__browser-card-meta-row']}>
       <CardMetadata.Row
         className={styles['organizer-match-modal__browser-card-meta']}
         items={[
@@ -49,7 +50,7 @@ export default function MatchEpisodeCard({
       >
         {t('common.select') || 'Select'}
       </Button>
-    </div>
+    </Inline>
   );
 
   const badgeNode = (

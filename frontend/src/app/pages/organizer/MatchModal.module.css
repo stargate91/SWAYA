@@ -418,10 +418,7 @@
 }
 
 .organizer-match-modal__browser-card-meta-row {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: var(--space-sm);
   width: 100%;
 }
 
@@ -659,8 +656,6 @@
 }
 
 .organizer-override-bulk-episodes__item {
-  display: flex;
-  align-items: center;
   justify-content: space-between;
   padding: var(--space-sm) var(--space-md);
   background: var(--color-bg-elevated);
@@ -682,9 +677,6 @@
 }
 
 .organizer-override-bulk-episodes__item-left {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
   min-width: 0;
 }
 

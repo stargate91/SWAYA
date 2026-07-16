@@ -57,7 +57,7 @@ export default function HistoryCard({
         }
       }}
     >
-      <div className={styles['history-card__main-row']}>
+      <Inline align="center" className={styles['history-card__main-row']}>
         <div className={styles['history-card__icon-wrapper']}>
           {icon}
         </div>
@@ -120,7 +120,7 @@ export default function HistoryCard({
           </Inline>
         </div>
         <div className={styles['history-card__right']}>
-          <div className={styles['history-card__actions']}>
+          <Inline align="center" className={styles['history-card__actions']}>
             {hasLogs && (
               <Button
                 variant="ghost"
@@ -152,9 +152,9 @@ export default function HistoryCard({
                 {t('historyPage.revertButton') || 'Revert'}
               </Button>
             </Tooltip>
-          </div>
+          </Inline>
         </div>
-      </div>
+      </Inline>
 
       {isExpanded && hasLogs && (
         <div className={styles['history-card__details']}>

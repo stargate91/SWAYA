@@ -4,6 +4,7 @@ import WidgetShell from '@/ui/WidgetShell';
 import { useStatsQuery } from '../../queries';
 import { useLibraryModeStore } from '../../stores/useLibraryModeStore';
 import styles from './LibraryInsightsWidget.module.css';
+import Inline from '@/ui/Inline';
 
 const translateGenreLabel = (label, T) => {
   if (!label) return '';
@@ -169,20 +170,22 @@ export const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
         {hasEnoughData && (
           <div className={styles['insights-radar-legend']}>
             {insightData.nodes.map((node) => (
-              <div
+              <Inline
                 key={node.id}
+                gap="md"
+                align="center"
                 className={styles['insights-radar-legend-row']}
                 title={T('statistics.stats.items_count_tooltip', { label: node.translatedLabel, count: node.count }) || `${node.translatedLabel}: ${node.count}`}
               >
                 <span className={styles['insights-radar-legend-label']}>{node.translatedLabel}</span>
                 <strong className={styles['insights-radar-legend-count']}>{node.count}</strong>
-              </div>
+              </Inline>
             ))}
 
             {insightData.otherGenres.length > 0 && (
               <div className={styles['insights-radar-other']}>
                 <span className={styles['insights-radar-other__title']}>{T('statistics.stats.other_genres') || 'Other Genres'}</span>
-                <div className={styles['insights-radar-other__list']}>
+                <Inline gap="sm" className={styles['insights-radar-other__list']}>
                   {insightData.otherGenres.map((node) => (
                     <span
                       key={`other-${node.id}`}
@@ -192,7 +195,7 @@ export const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
                       {node.translatedLabel} {node.count}
                     </span>
                   ))}
-                </div>
+                </Inline>
               </div>
             )}
           </div>
@@ -371,7 +374,7 @@ const LibraryInsightsWidget = ({ T, showDna = true, showTimeline = true }) => {
 
   return (
     <WidgetShell loading={isLoading} size="lg" transparent={true}>
-      <div className={styles['insights-layout']}>
+      <Inline gap="xl" className={styles['insights-layout']}>
         {showDna && (
           <LibraryDNA
             constellation={stats?.genre_constellation}
@@ -387,7 +390,7 @@ const LibraryInsightsWidget = ({ T, showDna = true, showTimeline = true }) => {
             T={T}
           />
         )}
-      </div>
+      </Inline>
     </WidgetShell>
   );
 };

@@ -11,6 +11,7 @@ import { useTranslation } from '../../../providers/LanguageContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { useBulkUpdateMediaMutation, getOrganizerQueryKey } from '../../../queries';
 import BulkOverrideFieldRow from './BulkOverrideFieldRow';
+import Inline from '../../../ui/Inline';
 
 
 import {
@@ -523,15 +524,16 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
               {orderedItems.map((item, index) => {
                 return (
                   // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-                  <div
+                  <Inline
                     key={item.id}
                     draggable
                     onDragStart={(e) => handleDragStart(e, index)}
                     onDragOver={(e) => handleDragOver(e, index)}
                     onDragEnd={handleDragEnd}
+                    align="center"
                     className={`organizer-override-bulk-episodes__item ${draggedIndex === index ? 'is-dragging' : ''}`}
                   >
-                    <div className="organizer-override-bulk-episodes__item-left">
+                    <Inline gap="sm" align="center" className="organizer-override-bulk-episodes__item-left">
                       <GripVertical className="organizer-override-bulk-episodes__grip" size={14} />
                       <span className="organizer-override-bulk-episodes__index">{index + parseInt(startEpisodeNum, 10) || (index + 1)}{DOT}</span>
                       <Tooltip content={item.source} side="top">
@@ -539,7 +541,7 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
                           {item.source}
                         </span>
                       </Tooltip>
-                    </div>
+                    </Inline>
                     <div className="organizer-override-bulk-episodes__item-actions">
                       <IconButton
                         type="button"
@@ -558,7 +560,7 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
                         <ArrowDown size={12} />
                       </IconButton>
                     </div>
-                  </div>
+                  </Inline>
                 );
               })}
             </div>

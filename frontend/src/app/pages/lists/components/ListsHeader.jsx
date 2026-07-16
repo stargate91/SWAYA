@@ -61,7 +61,7 @@ export default function ListsHeader({
     // eslint-disable-next-line react/forbid-dom-props
     <div style={{ '--list-theme-color': activeList.color || 'var(--color-accent-blue)', display: 'contents' }}>
       <div ref={heroRef} className={styles['lists-header-hero']}>
-        <div className={styles['lists-header__top-row']}>
+        <Inline align="start" className={styles['lists-header__top-row']}>
           <div className={styles['lists-header__left-group']}>
             <div className={styles['lists-header__cover-container']}>
               <div
@@ -102,7 +102,7 @@ export default function ListsHeader({
               )}
             </div>
           </div>
-          <div className={styles['lists-header__right']}>
+          <Inline gap="md" align="center" className={styles['lists-header__right']}>
             <Tooltip content={t('lists.export') || 'Export JSON'} side="top">
               <Button
                 variant="secondary-neutral"
@@ -132,8 +132,8 @@ export default function ListsHeader({
                 <span>{activeList.list_type === 'person' ? (t('lists.add_people') || 'Add People') : (t('lists.add_titles') || 'Add Titles')}</span>
               </Button>
             </span>
-          </div>
-        </div>
+          </Inline>
+        </Inline>
       </div>
 
       <div className={`${styles['lists-header-filters']} ${isStuck ? styles['is-stuck'] : ''}`}>
