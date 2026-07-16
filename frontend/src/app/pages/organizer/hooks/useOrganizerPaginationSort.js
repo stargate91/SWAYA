@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useOrganizerSort } from '../useOrganizerSort';
 import { compareOrganizerValues } from '../organizerMappers';
 import { scrollOrganizerToTop } from '../organizerScroll';

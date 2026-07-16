@@ -119,7 +119,7 @@
   width: 100%;
 }
 
-.specs-card--company .specs-card--company__tooltip-trigger {
+.specs-card--company .specs-card-company__tooltip-trigger {
   display: flex;
   align-items: center;
   justify-content: center;

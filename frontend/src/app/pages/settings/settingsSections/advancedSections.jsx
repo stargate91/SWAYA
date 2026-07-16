@@ -37,7 +37,7 @@ export function createAdvancedLanguageSection(t, metadataLanguageOptions, target
         field: 'follow_app_language_for_media_library',
         id: 'follow_app_language_for_media_library',
         hint: t('settingsPage.sections.advancedLanguage.metadataFollowsUiHint'),
-        hintClassName: 'ui-field__hint settings-hint--compact-bottom',
+        hintClassName: 'settings-field-hint settings-hint--compact-bottom',
         children: t('settingsPage.sections.advancedLanguage.metadataFollowsUi'),
       },
       {
@@ -73,7 +73,7 @@ export function createAdvancedLanguageSection(t, metadataLanguageOptions, target
         field: 'follow_app_language_for_naming',
         id: 'follow_app_language_for_naming',
         hint: t('settingsPage.sections.advancedLanguage.targetFollowsUiHint'),
-        hintClassName: 'ui-field__hint settings-hint--compact-bottom',
+        hintClassName: 'settings-field-hint settings-hint--compact-bottom',
         children: t('settingsPage.sections.advancedLanguage.targetFollowsUi'),
       },
       {

@@ -1,15 +1,16 @@
+import PropTypes from 'prop-types';
 import { X } from '@/ui/icons';
 import { useEffect, useRef } from 'react';
 import IconButton from './IconButton';
 import Tooltip from './Tooltip';
-import './ProgressBar.css';
+import styles from './ProgressBar.module.css';
 
 export default function ProgressBar({ taskName, progress = 0, timeRemaining = '--:--', active = true, variant = 'primary', onAbort }) {
   const isSub = variant === 'sub';
   const fillRef = useRef(null);
-  const containerClass = `ui-progress-bar-container ${isSub ? 'ui-progress-bar-container--sub' : ''}`.trim();
-  const dotClass = `ui-progress-bar__pulse-dot ${isSub ? 'ui-progress-bar__pulse-dot--sub' : ''}`.trim();
-  const fillClass = `ui-progress-bar__fill ${isSub ? 'ui-progress-bar__fill--sub' : ''}`.trim();
+  const containerClass = `${styles.container} ${isSub ? styles['container--sub'] : ''}`.trim();
+  const dotClass = `${styles['pulse-dot']} ${isSub ? styles['pulse-dot--sub'] : ''}`.trim();
+  const fillClass = `${styles.fill} ${isSub ? styles['fill--sub'] : ''}`.trim();
 
   useEffect(() => {
     if (!fillRef.current) return;
@@ -19,13 +20,13 @@ export default function ProgressBar({ taskName, progress = 0, timeRemaining = '-
   return (
     <div className={containerClass}>
       {active && <span className={dotClass} />}
-      <span className="ui-progress-bar__text">
+      <span className={styles.text}>
         {taskName}
       </span>
-      <div className="ui-progress-bar__track">
+      <div className={styles.track}>
         <div ref={fillRef} className={fillClass} />
       </div>
-      <span className="ui-progress-bar__stats">
+      <span className={styles.stats}>
         {/* eslint-disable-next-line react/jsx-no-literals */}
         {progress}{'% | '}{timeRemaining}
       </span>
@@ -45,3 +46,11 @@ export default function ProgressBar({ taskName, progress = 0, timeRemaining = '-
   );
 }
 
+ProgressBar.propTypes = {
+  taskName: PropTypes.string.isRequired,
+  progress: PropTypes.number,
+  timeRemaining: PropTypes.string,
+  active: PropTypes.bool,
+  variant: PropTypes.oneOf(['primary', 'sub']),
+  onAbort: PropTypes.func,
+};

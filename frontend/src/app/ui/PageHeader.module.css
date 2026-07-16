@@ -1,24 +1,23 @@
-/* PageHeader */
-.page-header {
+.root {
   display: flex;
   justify-content: space-between;
   gap: var(--space-2xl);
   align-items: flex-end;
 }
 
-.page-header > div:first-child {
+.title-wrapper {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
 }
 
-.page-header__title {
+.title {
   margin: 0;
   font: var(--text-title);
   font-family: var(--font-display);
 }
 
-.page-header__eyebrow {
+.eyebrow {
   display: block;
   line-height: 1;
   margin: 0;
@@ -28,14 +27,14 @@
   text-transform: uppercase;
 }
 
-.page-header__description {
+.description {
   margin: 0;
   max-width: 72ch;
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
 }
 
-.page-header__actions {
+.actions {
   display: flex;
   gap: var(--space-md);
   align-items: center;

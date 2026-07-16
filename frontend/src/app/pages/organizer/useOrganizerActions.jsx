@@ -81,7 +81,7 @@ export function useOrganizerActions({
     sortedRows,
     modeVisibleMatchedItems,
     modeVisibleExtrasForRename,
-    isScanActive,
+    scanStatusQuery,
     renameMutation,
     queryClient,
     renameStartedRef,

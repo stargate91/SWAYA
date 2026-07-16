@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { usePersonDetailQuery } from '@/queries/metadataQueries';
-import { Link2, GitMerge, Sliders, X } from '@/ui/icons';
-import IconButton from '@/ui/IconButton';
+import { Link2, GitMerge, Sliders } from '@/ui/icons';
 import PerformerLinkingTab from './tabs/PerformerLinkingTab';
 import PerformerMixerTab from './tabs/PerformerMixerTab';
 import PerformerCustomValuesTab from './tabs/PerformerCustomValuesTab';
 import { useTranslation } from '@/providers/LanguageContext';
 import Sidebar from '@/ui/Sidebar';
+import Overlay from '@/ui/Overlay';
 import './PerformerEditPage.css';
 
 export default function PerformerEditPage() {
@@ -107,26 +107,15 @@ export default function PerformerEditPage() {
   );
 
   return (
-    <div className="ui-overlay">
-      <div className="ui-close-container ui-overlay__close-container">
-        <IconButton
-          className="ui-close-btn"
-          onClick={handleClose}
-          size="md"
-        >
-          <X size={18} />
-        </IconButton>
-        <span className="ui-close-esc-hint">{t('library.performerEdit.esc') || 'ESC'}</span>
-      </div>
+    <Overlay onClose={handleClose} escHint={t('library.performerEdit.esc')}>
       <Sidebar
         header={sidebarHeader}
         groups={sidebarGroups}
         onTabSelect={handleTabClick}
       />
 
-      <main className="ui-overlay__content-wrapper">
-
-        <div className="ui-overlay__content performer-edit-content-wrapper--wide">
+      <Overlay.ContentWrapper>
+        <Overlay.Content className="performer-edit-content-wrapper--wide">
           {activeTab === 'linking' && (
             <div className="performer-edit-section">
               <h3 className="settings-section-title performer-edit-section-title">{t('library.performerEdit.linkedProfiles') || 'Linked Profiles'}</h3>
@@ -161,8 +150,8 @@ export default function PerformerEditPage() {
               />
             </div>
           )}
-        </div>
-      </main>
-    </div>
+        </Overlay.Content>
+      </Overlay.ContentWrapper>
+    </Overlay>
   );
 }

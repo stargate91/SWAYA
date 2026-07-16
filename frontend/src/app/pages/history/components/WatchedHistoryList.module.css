@@ -173,9 +173,6 @@
   color: var(--color-text-muted);
 }
 
-.watched-history-card__meta-item {
-}
-
 .watched-history-card__status {
   display: inline-flex;
   align-items: center;

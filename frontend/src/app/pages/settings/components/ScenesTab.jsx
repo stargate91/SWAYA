@@ -153,7 +153,7 @@ export default function ScenesTab({
           >
             {t('settingsPage.sections.scenes.preventTitlePerformer')}
           </Switch>
-          <span className="ui-field__hint settings-hint--tight-top">
+          <span className="settings-field-hint settings-hint--tight-top">
             {t('settingsPage.sections.scenes.preventTitlePerformerHint')}
           </span>
         </Stack>
@@ -178,7 +178,7 @@ export default function ScenesTab({
             >
               {t('settingsPage.sections.scenes.createSceneSubdir') || 'Create separate folder for each scene'}
             </Switch>
-            <span className="ui-field__hint settings-hint--block-compact">
+            <span className="settings-field-hint settings-hint--block-compact">
               {t('settingsPage.sections.scenes.createSceneSubdirHint') || 'Organize each scene into its own directory.'}
             </span>
 
@@ -281,7 +281,7 @@ export default function ScenesTab({
           >
             {t('settingsPage.sections.scenes.squeezeStudioNames')}
           </Switch>
-          <span className="ui-field__hint settings-hint--tight-top">
+          <span className="settings-field-hint settings-hint--tight-top">
             {t('settingsPage.sections.scenes.squeezeStudioNamesHint')}
           </span>
         </Stack>

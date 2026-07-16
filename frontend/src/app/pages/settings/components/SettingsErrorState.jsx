@@ -11,7 +11,7 @@ export default function SettingsErrorState({ t, onRetry, onClose }) {
         className={styles['settings-error-card']}
       >
         <div className={styles['settings-error-content']}>
-          <span className="ui-field__hint">
+          <span className="settings-field-hint">
             {t('settingsPage.errorText')}
           </span>
           <Inline gap="md" align="center" className={styles['settings-error-actions']}>

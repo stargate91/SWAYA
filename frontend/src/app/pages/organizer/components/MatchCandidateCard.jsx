@@ -67,9 +67,12 @@ export default function MatchCandidateCard({
     return (
       <PosterCard
         key={`${sourceLabel}-${candidateId}`}
-        className={`${styles['organizer-match-modal__poster-card']} ${mediaType === 'scene' ? styles['is-scene'] : ''}`}
+        /* eslint-disable-next-line react/forbid-component-props */
+        style={{
+          '--ui-poster-card-width': mediaType === 'scene' ? '17.5rem' : '9rem',
+          flexShrink: 0,
+        }}
         aspect={mediaType === 'scene' ? 'landscape' : 'poster'}
-        active={candidate.is_active}
         imageUrl={posterUrl}
         icon={mediaType === 'tv' ? ENTITY_ICONS.tv : (mediaType === 'scene' ? ENTITY_ICONS.episode : ENTITY_ICONS.movie)}
         onClick={() => onSelect(candidate)}
@@ -77,7 +80,6 @@ export default function MatchCandidateCard({
         title={displayTitle}
         subtitle={
           <CardMetadata.Row
-            className={styles['organizer-match-modal__poster-card-meta']}
             items={[
               displayYear,
               mediaType === 'scene' ? t('organizer.details.matchModal.scene') : (isTvLikeMediaType(mediaType) ? t('organizer.details.matchModal.tv') : t('organizer.details.matchModal.movie')),
@@ -118,7 +120,7 @@ export default function MatchCandidateCard({
   ) : null;
 
   const rightAction = isResolvingId === candidateId ? (
-    <span className={styles['organizer-match-modal__result-action']}>
+    <span className={styles['applying-text']}>
       {t('organizer.details.matchModal.applying')}
     </span>
   ) : null;
@@ -134,10 +136,8 @@ export default function MatchCandidateCard({
       active={candidate.is_active}
       disabled={isDisabled}
       onClick={() => onSelect(candidate)}
-      className={mediaType === 'scene' ? styles['is-scene'] : ''}
       meta={
         <CardMetadata.Row
-          className={styles['organizer-match-modal__result-meta']}
           items={[
             displayYear,
             mediaType === 'scene' ? t('organizer.details.matchModal.scene') : (isTvLikeMediaType(mediaType) ? t('organizer.details.matchModal.tv') : t('organizer.details.matchModal.movie')),

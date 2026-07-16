@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { X } from './icons';
 import IconButton from './IconButton';
 import { useTranslation } from '../providers/LanguageContext';
-import './Overlay.css';
+import styles from './Overlay.module.css';
 
 export default function Overlay({
   children,
@@ -29,11 +30,11 @@ export default function Overlay({
   }, [onClose]);
 
   return (
-    <div className={`ui-overlay${centered ? ' ui-overlay--centered' : ''} ${className}`.trim()}>
+    <div className={`${styles.root} ${centered ? styles['is-centered'] : ''} ${className}`.trim()}>
       {onClose && (
-        <div className="ui-close-container ui-overlay__close-container">
+        <div className={styles['close-container']}>
           <IconButton
-            className="ui-close-btn"
+            variant="close-overlay"
             onClick={onClose}
             label={closeLabel || t('common.close')}
             title={null}
@@ -41,7 +42,7 @@ export default function Overlay({
           >
             <X size={18} />
           </IconButton>
-          <span className="ui-close-esc-hint">
+          <span className={styles['esc-hint']}>
             {escHint || t('settingsPage.closeShortcut') || 'ESC'}
           </span>
         </div>
@@ -50,3 +51,30 @@ export default function Overlay({
     </div>
   );
 }
+
+Overlay.propTypes = {
+  children: PropTypes.node,
+  onClose: PropTypes.func,
+  centered: PropTypes.bool,
+  className: PropTypes.string,
+  closeLabel: PropTypes.string,
+  escHint: PropTypes.string,
+};
+
+Overlay.ContentWrapper = function ContentWrapper({ children, className = '' }) {
+  return <main className={`${styles['content-wrapper']} ${className}`.trim()}>{children}</main>;
+};
+
+Overlay.ContentWrapper.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+};
+
+Overlay.Content = function Content({ children, className = '' }) {
+  return <div className={`${styles.content} ${className}`.trim()}>{children}</div>;
+};
+
+Overlay.Content.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+};

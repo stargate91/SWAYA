@@ -20,7 +20,7 @@ export default function UtilityButton({
     <button
       data-size={size}
       data-danger={danger}
-      className={`${styles['utility-button']} ui-utility-button ${className}`.trim()}
+      className={`${styles['utility-button']} ${className}`.trim()}
       {...props}
     >
       {children}

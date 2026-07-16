@@ -16,7 +16,6 @@ import {
   resolveSocialLinks,
 } from './utils/externalLinksUtils';
 import { getPosterImagePath, getProfileImagePath } from '@/lib/imageUrls';
-import UniversalImagePicker from './components/UniversalImagePicker';
 import ReviewModalContent from './components/detail/modals/ReviewModalContent';
 
 export default function usePeopleCollectionDetailController({
@@ -25,7 +24,6 @@ export default function usePeopleCollectionDetailController({
   t,
   openModal,
   closeModal,
-  toast,
 }) {
   const { locale } = useTranslation();
   const metadataLanguage = locale === 'en' ? 'en-US' : locale;

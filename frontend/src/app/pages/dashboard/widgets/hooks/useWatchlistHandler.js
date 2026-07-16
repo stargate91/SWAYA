@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 
 export const useWatchlistHandler = (watchlistIdsFromQuery, addToWatchlistMutation, removeFromWatchlistMutation) => {
   const [optimisticWatchlistIds, setOptimisticWatchlistIds] = useState(null);
@@ -9,7 +9,9 @@ export const useWatchlistHandler = (watchlistIdsFromQuery, addToWatchlistMutatio
     setOptimisticWatchlistIds(null);
   }
 
-  const actualWatchlistIds = optimisticWatchlistIds !== null ? optimisticWatchlistIds : (watchlistIdsFromQuery || []);
+  const actualWatchlistIds = useMemo(() => {
+    return optimisticWatchlistIds !== null ? optimisticWatchlistIds : (watchlistIdsFromQuery || []);
+  }, [optimisticWatchlistIds, watchlistIdsFromQuery]);
 
   const handleWatchlist = useCallback((item, type) => {
     const id = item.id;

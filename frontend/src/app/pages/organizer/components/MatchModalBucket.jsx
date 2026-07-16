@@ -1,3 +1,5 @@
+import Chip from '../../../ui/Chip';
+import Inline from '../../../ui/Inline';
 import styles from '../MatchModal.module.css';
 
 const getEpisodeLabel = (num) => `E${num}`;
@@ -17,18 +19,16 @@ export default function MatchModalBucket({
       <strong className={styles['organizer-match-modal__bucket-title']}>
         {t('organizer.details.matchModal.bucketTitle')}
       </strong>
-      <div className={styles['organizer-match-modal__bucket-items']}>
+      <Inline gap="sm" className={styles['organizer-match-modal__bucket-items']}>
         {bucketEpisodeNumbers.map((episodeNumber) => (
-          <button
+          <Chip
             key={`bucket-${episodeNumber}`}
-            type="button"
-            className={styles['organizer-match-modal__bucket-chip']}
-            onClick={() => onToggle(episodeNumber)}
+            onRemove={() => onToggle(episodeNumber)}
           >
             {getEpisodeLabel(episodeNumber)}
-          </button>
+          </Chip>
         ))}
-      </div>
+      </Inline>
     </div>
   );
 }

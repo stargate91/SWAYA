@@ -1,5 +1,4 @@
-/* Toast */
-.ui-toast-viewport {
+.toast-viewport {
   position: fixed;
   right: var(--space-2xl);
   bottom: var(--space-2xl);
@@ -11,7 +10,7 @@
   max-width: 100%;
 }
 
-.ui-toast {
+.toast {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -25,19 +24,30 @@
   animation: toast-in var(--motion-duration-slow) var(--motion-ease-expressive);
 }
 
-.ui-toast__header {
+@keyframes toast-in {
+  from {
+    transform: translateY(1.5rem);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.ui-toast__title {
+.title {
   margin: 0;
   font: var(--text-section);
   color: var(--color-ink);
 }
 
-.ui-toast__close {
+.close {
   border: 0;
   background: transparent;
   color: var(--color-subtle);
@@ -45,39 +55,39 @@
   transition: color var(--motion-fast);
 }
 
-.ui-toast__close:hover {
+.close:hover {
   color: var(--color-state-danger);
 }
 
-.ui-toast__description {
+.description {
   margin: 0;
   color: var(--color-muted);
   font: var(--text-caption);
   line-height: 1.4;
 }
 
-.ui-toast--success {
+.toast--success {
   background: var(--toast-success-bg);
   border-color: var(--toast-success-border);
 }
 
-.ui-toast--success .ui-toast__title {
+.toast--success .title {
   color: color-mix(in srgb, var(--color-state-success) 72%, var(--color-text-primary) 18%);
 }
 
-.ui-toast--danger {
+.toast--danger {
   background: var(--toast-danger-bg);
   border-color: var(--toast-danger-border);
 }
 
-.enrichment-progress__title {
+.enrichment-title {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: var(--ui-overlay-sidebar-width);
 }
 
-.enrichment-progress__count {
+.enrichment-count {
   font: var(--text-caption);
   color: var(--color-muted);
   white-space: nowrap;
@@ -85,8 +95,7 @@
   margin-right: var(--space-sm);
 }
 
-/* Progress track inside ui-toast__description */
-.enrichment-progress__track {
+.enrichment-track {
   margin-top: var(--space-xs);
   height: var(--space-xs);
   border-radius: var(--radius-pill);
@@ -94,10 +103,9 @@
   overflow: hidden;
 }
 
-.enrichment-progress__bar {
+.enrichment-bar {
   height: 100%;
   border-radius: var(--radius-pill);
   background: var(--color-accent);
   transition: width var(--motion-duration-normal) var(--motion-ease-expressive);
 }
-

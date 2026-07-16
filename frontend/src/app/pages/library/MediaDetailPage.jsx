@@ -48,7 +48,8 @@ import EditableMediaCard from './components/entityDetail/EditableMediaCard';
 import DetailsMetadataDrawer from './components/detail/DetailsMetadataDrawer';
 import BespokeBoxOfficeSection from './components/detail/sections/BespokeBoxOfficeSection';
 import BottomSocialsBar from './components/detail/sections/BottomSocialsBar';
-import ScrollToggleButton from '@/ui/ScrollToggleButton';
+import IconButton from '@/ui/IconButton';
+import { ChevronDown, ChevronUp } from '@/ui/icons';
 
 
 
@@ -290,11 +291,18 @@ export default function MediaDetailPage({ type = 'movie' }) {
         </UtilityBarBottomPortal>
 
         <UtilityBarBottomPortal side="center">
-          <ScrollToggleButton
-            isScrolled={isScrolled}
+          <IconButton
+            variant="ghost"
+            className="entity-detail-page__scroll-toggle-btn"
             onClick={handleScrollToggle}
-            t={t}
-          />
+            title={
+              isScrolled
+                ? (t('library.details.backToProfile') || 'Back to Profile')
+                : (t('library.details.scrollToCredits') || 'Scroll to Details')
+            }
+          >
+            {isScrolled ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+          </IconButton>
         </UtilityBarBottomPortal>
 
         <BottomSocialsBar socialLinks={socialLinks} t={t} />

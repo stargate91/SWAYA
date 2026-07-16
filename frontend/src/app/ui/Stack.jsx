@@ -1,9 +1,16 @@
-import './Stack.css';
+import styles from './Stack.module.css';
 
-export default function Stack({ size, gap, className = '', children, ...props }) {
+export default function Stack({ size, gap, fill = false, className = '', children, ...props }) {
   const finalSize = gap || size || 'md';
+  const classes = [
+    styles.root,
+    styles[`gap-${finalSize}`],
+    fill && styles.fill,
+    className,
+  ].filter(Boolean).join(' ');
+
   return (
-    <div className={`ui-stack ui-stack--${finalSize} ${className}`.trim()} {...props}>
+    <div className={classes} {...props}>
       {children}
     </div>
   );

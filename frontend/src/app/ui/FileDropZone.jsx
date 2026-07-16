@@ -9,6 +9,7 @@ export default function FileDropZone({
   disabled = false,
   label,
   description,
+  fill = false,
   className = '',
 }) {
   const { t } = useTranslation();
@@ -21,8 +22,14 @@ export default function FileDropZone({
     onDropFiles,
   });
 
+  const classes = [
+    styles['drop-zone'],
+    fill && styles.fill,
+    className,
+  ].filter(Boolean).join(' ');
+
   return (
-    <div className={`${styles['drop-zone']} ui-file-drop-zone ${className}`.trim()} {...dropzoneProps}>
+    <div className={classes} {...dropzoneProps}>
       <div className={`${styles.overlay} ${isDropActive ? styles['is-active'] : ''}`}>
         <div className={styles.panel}>
           <span className={styles.label}>{displayLabel}</span>

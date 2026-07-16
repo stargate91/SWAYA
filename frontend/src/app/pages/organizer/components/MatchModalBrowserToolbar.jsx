@@ -1,6 +1,7 @@
 import Button from '../../../ui/Button';
 import CardMetadata from '../../../ui/CardMetadata';
 import { ArrowLeft } from '../../../ui/icons';
+import Inline from '../../../ui/Inline';
 import styles from '../MatchModal.module.css';
 
 export default function MatchModalBrowserToolbar({
@@ -25,7 +26,9 @@ export default function MatchModalBrowserToolbar({
         {t('common.back')}
       </Button>
       <div className={styles['organizer-match-modal__browser-copy']}>
-        <strong className={styles['organizer-match-modal__browser-title']}>{browserTitle}</strong>
+        <strong className={styles['organizer-match-modal__browser-title']}>
+          {browserTitle}
+        </strong>
         <CardMetadata.Row className={styles['organizer-match-modal__browser-meta']} items={browserMetaItems} />
       </div>
       {view === 'seasons' ? (
@@ -39,7 +42,7 @@ export default function MatchModalBrowserToolbar({
         </Button>
       ) : null}
       {view === 'episodes' ? (
-        <div className={styles['organizer-match-modal__browser-actions']}>
+        <Inline align="center" gap="sm" className={styles['organizer-match-modal__browser-actions']}>
           <Button
             type="button"
             variant="secondary-neutral"
@@ -60,7 +63,7 @@ export default function MatchModalBrowserToolbar({
           >
             {t('organizer.details.matchModal.useBucket')}
           </Button>
-        </div>
+        </Inline>
       ) : null}
     </div>
   );

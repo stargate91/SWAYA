@@ -1,0 +1,36 @@
+.meta-row {
+  justify-content: space-between;
+  width: 100%;
+}
+
+.select-button {
+  --button-ghost-color-override: var(--color-accent);
+  --button-ghost-hover-color-override: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.bucket-indicator {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.375rem;
+  height: 1.375rem;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  box-shadow: 0 var(--radius-2xs) var(--space-sm) color-mix(in srgb, var(--color-bg-canvas) 40%, transparent);
+  animation: scale-up var(--motion-duration-fast) var(--motion-ease-expressive);
+  z-index: var(--z-index-base);
+}
+
+@keyframes scale-up {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}

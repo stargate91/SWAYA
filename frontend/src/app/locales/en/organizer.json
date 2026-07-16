@@ -89,6 +89,8 @@
     "matchAlreadyActive": "This match is already selected!",
     "noMatchedItems": "No matched items found to rename.",
     "renameStartFailed": "Could not start the renaming process.",
+    "pausingBackgroundTask": "Pausing background tasks...",
+    "failedToPauseTask": "Failed to stop active background task.",
     "renameAborted": "Renaming canceled.",
     "renameComplete": "All done! Files renamed successfully.",
     "scanComplete": "Scan finished! We found all your files.",

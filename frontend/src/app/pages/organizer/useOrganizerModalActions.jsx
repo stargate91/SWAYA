@@ -11,10 +11,10 @@ import { showItemInFolder } from '../../lib/ipc';
 import { useUi } from '@/providers/UiProvider';
 import { useTranslation } from '../../providers/LanguageContext';
 import { useOrganizerDeleteActions } from './useOrganizerDeleteActions';
-import { useSettingsQuery, useFullMetadataQuery } from '../../queries';
+import { useSettingsQuery } from '../../queries';
 import { mapOrganizerTypeLabel } from './organizerMappers';
 import modalStyles from '../../ui/Modal.module.css';
-import styles from './OrganizerPage.module.css';
+import styles from './MatchModal.module.css';
 
 export function useOrganizerModalActions({
   focusFirstAvailableResult,
@@ -25,6 +25,7 @@ export function useOrganizerModalActions({
   sessionMode,
   provider,
   addPendingResolvedIds,
+  removePendingResolvedIds,
 }) {
   const { t } = useTranslation();
   const { closeModal, openModal, toast } = useUi();
@@ -47,6 +48,7 @@ export function useOrganizerModalActions({
     scanMode,
     sessionMode,
     addPendingResolvedIds,
+    removePendingResolvedIds,
   });
 
   const isPlayableOrganizerRow = useCallback((row) => {
@@ -383,7 +385,7 @@ export function useOrganizerModalActions({
           icon: FileJson,
           variant: 'wide',
           content: (
-            <pre className={styles['organizer-inspect-json']}>
+            <pre className={styles['inspect-json']}>
               {inspectJson}
             </pre>
           ),

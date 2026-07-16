@@ -176,6 +176,21 @@
   margin-bottom: var(--space-md);
 }
 
+.settings-field-label {
+  color: var(--color-muted);
+  font: var(--text-caption);
+  letter-spacing: calc(2 * var(--letter-spacing-wide));
+  text-transform: uppercase;
+}
+
+.settings-field-hint {
+  color: var(--color-muted);
+  font: var(--text-caption);
+  text-transform: none;
+  letter-spacing: var(--letter-spacing-normal);
+  margin-top: calc(var(--space-xs) / 2);
+}
+
 .settings-hint--tight-top {
   margin-top: calc(-1 * var(--space-sm));
 }

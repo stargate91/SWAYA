@@ -4,11 +4,12 @@ import Button from '../../../ui/Button';
 import { QK } from '@/lib/queryKeys';
 import OrganizerRenameModalContent from '../OrganizerRenameModalContent.jsx';
 import { mapOrganizerItemRow, mapExtraRow } from '../organizerMappers';
+import api from '../../../lib/api';
 
 export function useOrganizerRename({
   modeVisibleMatchedItems,
   modeVisibleExtrasForRename,
-  isScanActive,
+  scanStatusQuery,
   renameMutation,
   queryClient,
   renameStartedRef,
@@ -21,7 +22,11 @@ export function useOrganizerRename({
   const [isRenameStarting, setIsRenameStarting] = useState(false);
 
   const handleRename = async (organizeInPlaceDefault = false) => {
-    if (isRenameStarting || isScanActive) {
+    const scanStatus = scanStatusQuery?.data || null;
+    const isScanActive = Boolean(scanStatus?.active);
+    const scanPhase = scanStatus?.phase || '';
+
+    if (isRenameStarting || (isScanActive && scanPhase === 'organizing')) {
       return;
     }
 
@@ -48,6 +53,28 @@ export function useOrganizerRename({
           renameStartedRef.current = true;
         }
         setIsRenamePending(true);
+
+        // Pause/stop active background task first to avoid locks/conflicts
+        const currentStatus = await api.scan.getStatus();
+        if (currentStatus?.active && currentStatus?.phase !== 'organizing') {
+          toast(t('organizer.toasts.pausingBackgroundTask') || 'Pausing background tasks...', 'info');
+          await api.task.stop();
+
+          let stopped = false;
+          for (let i = 0; i < 30; i++) {
+            const checkStatus = await api.scan.getStatus();
+            if (!checkStatus?.active) {
+              stopped = true;
+              break;
+            }
+            await new Promise((resolve) => setTimeout(resolve, 500));
+          }
+
+          if (!stopped) {
+            throw new Error(t('organizer.toasts.failedToPauseTask') || 'Failed to stop active background task.');
+          }
+        }
+
         queryClient.setQueryData(['scan-status'], (current) => ({
           ...(current || {}),
           active: true,

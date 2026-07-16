@@ -1,5 +1,4 @@
-/* Progress Bar Styles */
-.ui-progress-bar-container {
+.container {
   display: inline-flex;
   align-items: center;
   gap: var(--space-md);
@@ -14,7 +13,7 @@
   -webkit-app-region: no-drag;
 }
 
-.ui-progress-bar__pulse-dot {
+.pulse-dot {
   position: relative;
   width: var(--space-sm);
   height: var(--space-sm);
@@ -23,7 +22,7 @@
   flex-shrink: 0;
 }
 
-.ui-progress-bar__pulse-dot::after {
+.pulse-dot::after {
   content: '';
   position: absolute;
   top: 0;
@@ -32,10 +31,10 @@
   height: 100%;
   background: var(--color-accent-blue);
   border-radius: 50%;
-  animation: ui-progress-pulse var(--motion-duration-pulse) infinite var(--motion-ease-emphasized);
+  animation: pulse var(--motion-duration-pulse) infinite var(--motion-ease-emphasized);
 }
 
-@keyframes ui-progress-pulse {
+@keyframes pulse {
   0% {
     transform: scale(1);
     opacity: 0.75;
@@ -50,7 +49,7 @@
   }
 }
 
-.ui-progress-bar__text {
+.text {
   font-family: var(--font-base);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
@@ -62,7 +61,7 @@
   text-overflow: ellipsis;
 }
 
-.ui-progress-bar__track {
+.track {
   flex: 1 1 auto;
   min-width: 5rem;
   height: var(--space-md);
@@ -72,7 +71,7 @@
   position: relative;
 }
 
-.ui-progress-bar__fill {
+.fill {
   width: var(--ui-progress-value);
   height: 100%;
   background: var(--color-accent-blue);
@@ -81,7 +80,7 @@
   box-shadow: 0 0 0.5rem var(--color-accent-shadow-strong);
 }
 
-.ui-progress-bar__stats {
+.stats {
   font-family: monospace;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
@@ -93,22 +92,22 @@
 }
 
 /* Sub Progress Bar Styles (Background / Informational Tasks) */
-.ui-progress-bar-container--sub {
+.container--sub {
   background: var(--color-progress-bg-sub);
   border-color: var(--color-progress-border-subtle);
 }
 
-.ui-progress-bar__pulse-dot--sub {
+.pulse-dot--sub {
   background: var(--color-text-disabled);
 }
 
-.ui-progress-bar__pulse-dot--sub::after {
+.pulse-dot--sub::after {
   background: var(--color-text-disabled);
   border-radius: 50%;
-  animation: ui-progress-pulse-sub var(--motion-duration-pulse-slow) infinite var(--motion-ease-standard);
+  animation: pulse-sub var(--motion-duration-pulse-slow) infinite var(--motion-ease-standard);
 }
 
-@keyframes ui-progress-pulse-sub {
+@keyframes pulse-sub {
   0% {
     transform: scale(1);
     opacity: 0.6;
@@ -123,16 +122,16 @@
   }
 }
 
-.ui-progress-bar-container--sub .ui-progress-bar__text,
-.ui-progress-bar-container--sub .ui-progress-bar__stats {
+.container--sub .text,
+.container--sub .stats {
   color: var(--color-subtle);
 }
 
-.ui-progress-bar__fill--sub {
+.fill--sub {
   background: var(--color-text-faint);
   box-shadow: none;
 }
 
-.ui-progress-bar-container .ui-icon-button {
+.container :global(.ui-icon-button) {
   border-radius: var(--radius-2xs);
 }

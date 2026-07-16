@@ -50,7 +50,7 @@ function renderItem(item, context) {
           {item.children}
         </SettingsSwitchField>
         {item.hint ? (
-          <span className={item.hintClassName || 'ui-field__hint'}>
+          <span className={item.hintClassName || 'settings-field-hint'}>
             {item.hint}
           </span>
         ) : null}

@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../providers/LanguageContext';
-import { X } from 'lucide-react';
 import {
   Info,
   ScrollText,
@@ -9,10 +8,10 @@ import {
   Library,
   CircleHelp,
 } from '../../ui/icons';
-import IconButton from '../../ui/IconButton';
 import { fetchJson } from '../../lib/http';
 import { useSettingsQuery, useUpdateSettingsMutation } from '../../queries';
 import Lightbox from '../../ui/Lightbox';
+import Overlay from '../../ui/Overlay';
 
 import AboutSidebar from './components/AboutSidebar';
 import GeneralPanel from './components/GeneralPanel';
@@ -127,19 +126,7 @@ export default function AboutPage() {
   };
 
   return (
-    <div className="ui-overlay">
-      <div className="ui-close-container ui-overlay__close-container">
-        <IconButton
-          className="ui-close-btn"
-          onClick={handleClose}
-          label={t('common.close')}
-          title={null}
-          size="md"
-        >
-          <X size={18} />
-        </IconButton>
-        <span className="ui-close-esc-hint">{t('settingsPage.closeShortcut') || 'ESC'}</span>
-      </div>
+    <Overlay onClose={handleClose}>
       <AboutSidebar
         activeTab={activeTab}
         isDocsExpanded={isDocsExpanded}
@@ -149,8 +136,8 @@ export default function AboutPage() {
         t={t}
       />
 
-      <main className="ui-overlay__content-wrapper">
-        <div className={`ui-overlay__content ${activeTab === 'docs_features' ? 'ui-overlay__content--wide' : ''}`}>
+      <Overlay.ContentWrapper>
+        <Overlay.Content className={activeTab === 'docs_features' ? 'ui-overlay__content--wide' : ''}>
           <div className="settings-tab-content">
             {activeTab === 'info' && (
               <GeneralPanel t={t} appInfo={appInfo} />
@@ -198,9 +185,9 @@ export default function AboutPage() {
               <ThirdPartyPanel t={t} />
             )}
           </div>
-        </div>
-      </main>
+        </Overlay.Content>
+      </Overlay.ContentWrapper>
       <Lightbox imageUrl={activeLightboxUrl} onClose={() => setActiveLightboxUrl(null)} t={t} />
-    </div>
+    </Overlay>
   );
 }

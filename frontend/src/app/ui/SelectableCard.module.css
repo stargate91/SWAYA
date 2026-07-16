@@ -207,3 +207,26 @@
   text-align: center;
   box-sizing: border-box;
 }
+
+/* --- Picker SelectableCard Variant --- */
+.card[data-variant="picker"] {
+  /* Restores default layout but disables translate animation */
+}
+
+.card[data-variant="picker"]:hover:not([data-disabled="true"]) {
+  transform: none;
+}
+
+.card[data-variant="picker"]:hover:not([data-disabled="true"]):not([data-selected="true"]) {
+  border-color: var(--color-accent);
+}
+
+.card[data-variant="picker"][data-selected="true"] {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 0.125rem var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+
+.card[data-variant="picker"] .selected-overlay {
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}

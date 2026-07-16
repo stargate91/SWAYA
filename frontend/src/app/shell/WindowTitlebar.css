@@ -104,6 +104,12 @@
   transition: background var(--motion-fast), color var(--motion-fast);
 }
 
+.window-titlebar__button:focus,
+.window-titlebar__button:focus-visible {
+  outline: none;
+  box-shadow: var(--ui-utility-button-titlebar-divider);
+}
+
 .window-titlebar__button:hover {
   --btn-hover-bg: color-mix(in srgb, #ffffff 5%, transparent);
   background: var(--btn-hover-bg);

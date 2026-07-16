@@ -40,7 +40,7 @@ export default function FolderStructureTab({
           >
             {t('settingsPage.sections.folderStructure.orgEnabled')}
           </Switch>
-          <span className="ui-field__hint settings-hint--tight-top">
+          <span className="settings-field-hint settings-hint--tight-top">
             {t('settingsPage.sections.folderStructure.orgEnabledHint')}
           </span>
 
@@ -59,7 +59,7 @@ export default function FolderStructureTab({
               >
                 {t('settingsPage.sections.folderStructure.moveToLibrary')}
               </Switch>
-              <span className="ui-field__hint settings-hint--tight-top">
+              <span className="settings-field-hint settings-hint--tight-top">
                 {t('settingsPage.sections.folderStructure.moveToLibraryHint')}
               </span>
 
@@ -76,7 +76,7 @@ export default function FolderStructureTab({
               >
                 {t('settingsPage.sections.folderStructure.sortByType')}
               </Switch>
-              <span className="ui-field__hint settings-hint--tight-top">
+              <span className="settings-field-hint settings-hint--tight-top">
                 {t('settingsPage.sections.folderStructure.sortByTypeHint')}
               </span>
 
@@ -130,7 +130,7 @@ export default function FolderStructureTab({
                     >
                       {t('settingsPage.sections.folderStructure.organizeAdultByType')}
                     </Switch>
-                    <span className="ui-field__hint settings-hint--tight-top">
+                    <span className="settings-field-hint settings-hint--tight-top">
                       {t('settingsPage.sections.folderStructure.organizeAdultByTypeHint')}
                     </span>
                     {form.naming_adult_subfolders_enabled && (
@@ -180,7 +180,7 @@ export default function FolderStructureTab({
               >
                 {t('settingsPage.sections.folderStructure.removeEmpty')}
               </Switch>
-              <span className="ui-field__hint settings-hint--tight-top">
+              <span className="settings-field-hint settings-hint--tight-top">
                 {t('settingsPage.sections.folderStructure.removeEmptyHint')}
               </span>
             </>
@@ -208,7 +208,7 @@ export default function FolderStructureTab({
                   >
                     {t('settingsPage.sections.folderStructure.createMovieSubdir')}
                   </Switch>
-                  <span className="ui-field__hint settings-hint--block-compact">
+                  <span className="settings-field-hint settings-hint--block-compact">
                     {t('settingsPage.sections.folderStructure.createMovieSubdirHint')}
                   </span>
 
@@ -239,7 +239,7 @@ export default function FolderStructureTab({
                   >
                     {t('settingsPage.sections.folderStructure.createShowDir')}
                   </Switch>
-                  <span className="ui-field__hint settings-hint--block-compact">
+                  <span className="settings-field-hint settings-hint--block-compact">
                     {t('settingsPage.sections.folderStructure.createShowDirHint')}
                   </span>
 
@@ -270,7 +270,7 @@ export default function FolderStructureTab({
                   >
                     {t('settingsPage.sections.folderStructure.createVideoSubdir')}
                   </Switch>
-                  <span className="ui-field__hint settings-hint--block-compact">
+                  <span className="settings-field-hint settings-hint--block-compact">
                     {t('settingsPage.sections.folderStructure.createVideoSubdirHint')}
                   </span>
                 </div>
@@ -291,7 +291,7 @@ export default function FolderStructureTab({
                   >
                     {t('settingsPage.sections.folderStructure.createSeasonDir')}
                   </Switch>
-                  <span className="ui-field__hint settings-hint--block-compact">
+                  <span className="settings-field-hint settings-hint--block-compact">
                     {t('settingsPage.sections.folderStructure.createSeasonDirHint')}
                   </span>
 
@@ -322,7 +322,7 @@ export default function FolderStructureTab({
                   >
                     {t('settingsPage.sections.folderStructure.createEpisodeDir')}
                   </Switch>
-                  <span className="ui-field__hint settings-hint--block-compact">
+                  <span className="settings-field-hint settings-hint--block-compact">
                     {t('settingsPage.sections.folderStructure.createEpisodeDirHint')}
                   </span>
 

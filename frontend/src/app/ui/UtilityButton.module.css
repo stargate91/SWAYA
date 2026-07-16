@@ -46,13 +46,7 @@
   box-shadow: var(--focus-ring);
 }
 
-:global(.window-titlebar__button):focus,
-:global(.window-titlebar__button):focus-visible {
-  box-shadow: var(--ui-utility-button-titlebar-divider);
-}
-
-.utility-button[data-danger="true"]:hover,
-:global(.window-titlebar__button--close):hover {
+.utility-button[data-danger="true"]:hover {
   background: var(--ui-danger-utility-bg);
   color: var(--button-primary-color);
 }

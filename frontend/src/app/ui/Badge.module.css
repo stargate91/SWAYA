@@ -58,6 +58,16 @@
   min-height: calc(var(--space-lg) + var(--space-sm));
 }
 
+.badge[data-variant="overlay"][data-family="status"][data-tone="accent"] {
+  --ui-badge-accent-bg: var(--color-accent-blue);
+  --ui-badge-accent-color: var(--color-text-primary);
+}
+
+.badge[data-variant="overlay"][data-family="status"][data-tone="warning"] {
+  --ui-badge-warning-bg: var(--color-state-warning);
+  --ui-badge-warning-color: var(--color-bg-canvas);
+}
+
 /* Colors and states */
 .badge[data-family="status"][data-tone="accent"] {
   background: var(--ui-badge-accent-bg, color-mix(in srgb, var(--color-accent) 14%, transparent));

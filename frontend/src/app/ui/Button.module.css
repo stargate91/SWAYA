@@ -231,3 +231,27 @@
 .button[data-variant="danger"]:hover:not(:disabled) {
   background: var(--button-danger-hover-bg);
 }
+
+.button[data-variant="tag"] {
+  min-height: auto;
+  height: auto;
+  padding: 0.1875rem var(--space-sm);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-line);
+  background: var(--color-tag-button-bg);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-2xs);
+  font-family: var(--font-family-mono);
+  box-shadow: none;
+}
+
+.button[data-variant="tag"]:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-accent-glow);
+}
+
+.button[data-variant="tag"]:hover:not(:disabled) {
+  background: var(--color-tag-button-bg-hover);
+  border-color: var(--color-tag-button-border-hover);
+  color: var(--color-accent);
+  transform: none;
+}

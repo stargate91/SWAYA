@@ -1,4 +1,4 @@
-.ui-page {
+.root {
   display: flex;
   flex-direction: column;
   height: auto;
@@ -7,13 +7,13 @@
 }
 
 /* Viewport-Restricted Layouts (Lists, Organizer, Ratings) */
-.ui-page--viewport {
+.viewport {
   height: 100%;
   overflow: hidden;
   padding-bottom: 0;
 }
 
-.ui-page--centered {
+.centered {
   align-items: center;
   justify-content: center;
   min-height: calc(100vh - 13.75rem);

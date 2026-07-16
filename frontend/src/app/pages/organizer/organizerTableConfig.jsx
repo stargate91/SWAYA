@@ -4,8 +4,9 @@ import Pill from '../../ui/Pill';
 import Tooltip from '../../ui/Tooltip';
 import { isEpisodeMediaType, isMovieMediaType, isMovieOrEpisodeMediaType, isSceneMediaType } from '@/lib/mediaTypes';
 import { mapCollisionStrategyLabel, shouldShowCollisionStrategy } from './organizerMappers';
-import styles from './OrganizerResultsPanel.module.css';
 import Inline from '../../ui/Inline';
+import Button from '../../ui/Button';
+import Badge from '../../ui/Badge';
 
 const renderSelectColumn = (paginatedRows, selectedRowIds, handleToggleAll, handleToggleRow) => ({
   key: 'select',
@@ -32,26 +33,23 @@ const renderSelectColumn = (paginatedRows, selectedRowIds, handleToggleAll, hand
 });
 
 const renderProposedFilename = (value, row, activeMainTab, onOpenMatch, onOpenOverride, t) => {
+  /* eslint-disable react/forbid-component-props */
   const isManualReview = activeMainTab === 'manual';
 
   const content = (() => {
     if (row.rawType === 'extra') {
       const unmatchedParentStatuses = ['new', 'uncertain', 'no_match', 'multiple', 'error'];
       if (row.parentStatus && unmatchedParentStatuses.includes(row.parentStatus.toLowerCase())) {
-        return <span className={`${styles['organizer-target-note']} ${styles['organizer-target-note--warning']}`}>{t('organizer.table.targetNotes.fixParentFirst')}</span>;
+        return <Badge family="status" tone="warning">{t('organizer.table.targetNotes.fixParentFirst')}</Badge>;
       }
       if (row.rawAction === 'skip') {
-        return <span className={`${styles['organizer-target-note']} ${styles['organizer-target-note--muted']}`}>{t('organizer.table.targetNotes.skip')}</span>;
+        return <Badge family="status" tone="neutral">{t('organizer.table.targetNotes.skip')}</Badge>;
       }
       if (row.rawAction === 'delete') {
-        return <span className={`${styles['organizer-target-note']} ${styles['organizer-target-note--danger']}`}>{t('organizer.table.targetNotes.delete')}</span>;
+        return <Badge family="status" tone="danger">{t('organizer.table.targetNotes.delete')}</Badge>;
       }
     }
-    return (
-      <span className={styles['organizer-target-proposed']}>
-        {value}
-      </span>
-    );
+    return value;
   })();
 
   if (isManualReview && row.rawType !== 'extra') {
@@ -71,58 +69,59 @@ const renderProposedFilename = (value, row, activeMainTab, onOpenMatch, onOpenOv
       })();
 
       return (
-        <div className={styles['organizer-target-cell']}>
-          <button
-            type="button"
-            className={`${styles['organizer-target-action']} ${styles['organizer-target-action--warning']}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpenOverride(row);
-            }}
-          >
-            {label}
-          </button>
-        </div>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          style={{ color: 'var(--color-accent-yellow-soft)' }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenOverride(row);
+          }}
+        >
+          {label}
+        </Button>
       );
     }
 
     return (
-      <div className={styles['organizer-target-cell']}>
-        <button
-          type="button"
-          className={styles['organizer-target-action']}
-          onClick={(e) => {
-            e.stopPropagation();
-            onOpenMatch(row);
-          }}
-        >
-          {t('organizer.actions.fixMatch')}
-        </button>
-      </div>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        style={{ color: 'var(--color-accent)' }}
+        onClick={(e) => {
+          e.stopPropagation();
+          onOpenMatch(row);
+        }}
+      >
+        {t('organizer.actions.fixMatch')}
+      </Button>
     );
   }
 
+  /* eslint-enable react/forbid-component-props */
   return content;
 };
 
 const renderStatusCell = (value, row, collisionStrategy, normalizeStatusTone, t) => (
-  <Inline gap="sm" align="center" className={styles['organizer-status-cell']}>
+  <Inline gap="sm" align="center" justify="center">
     <Pill variant={normalizeStatusTone(value, t)}>{value}</Pill>
     {isMovieOrEpisodeMediaType(row.rawType) && shouldShowCollisionStrategy(row) ? (
-      <Pill className={styles['organizer-status-cell__policy']} variant="default">
+      <Pill variant="default">
         {mapCollisionStrategyLabel(row.rawAction || collisionStrategy, t)}
       </Pill>
     ) : null}
     {row.rawStatus === 'uncertain' && !isMovieMediaType(row.rawType) && !isSceneMediaType(row.rawType) && (row.season === null || row.season === undefined || row.season === '') ? (
       <Tooltip content={t('organizer.status.missingSeasonTooltip')} side="top">
-        <Pill className={styles['organizer-status-cell__policy']} variant="default">
+        <Pill variant="default">
           {t('organizer.status.missingSeason')}
         </Pill>
       </Tooltip>
     ) : null}
     {row.rawStatus === 'uncertain' && !isMovieMediaType(row.rawType) && !isSceneMediaType(row.rawType) && (row.episode === null || row.episode === undefined || row.episode === '') ? (
       <Tooltip content={t('organizer.status.missingEpisodeTooltip')} side="top">
-        <Pill className={styles['organizer-status-cell__policy']} variant="default">
+        <Pill variant="default">
           {t('organizer.status.missingEpisode')}
         </Pill>
       </Tooltip>
@@ -153,6 +152,7 @@ export function buildOrganizerColumns({
       key: 'source',
       label: renderSortableLabel(t('organizer.table.originalFilename'), 'source'),
       render: (value, row) => (
+        /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
         <span
           onMouseEnter={(e) => onMouseEnterSource && onMouseEnterSource(e, row)}
           onMouseMove={(e) => onMouseMoveSource && onMouseMoveSource(e)}
@@ -181,7 +181,8 @@ export function buildOrganizerColumns({
             return <></>;
           }
         }
-        return <ArrowRight size={14} className={styles['organizer-target-arrow']} />;
+        /* eslint-disable-next-line react/forbid-component-props */
+        return <ArrowRight size={14} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />;
       },
     },
     {

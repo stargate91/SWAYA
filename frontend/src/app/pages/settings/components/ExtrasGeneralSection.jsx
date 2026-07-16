@@ -24,7 +24,7 @@ export default function ExtrasGeneralSection({ t }) {
         >
           {t('settingsPage.sections.extras.extrasEnabled')}
         </SettingsSwitchField>
-        <span className="ui-field__hint settings-hint--medium">
+        <span className="settings-field-hint settings-hint--medium">
           {t('settingsPage.sections.extras.extrasEnabledHint')}
         </span>
 

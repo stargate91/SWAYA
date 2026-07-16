@@ -6,8 +6,10 @@ import { Tabs } from '../../../ui/Tabs';
 import OrganizerResultsPanel from '../OrganizerResultsPanel';
 import { useOrganizerColumns } from '../useOrganizerColumns.jsx';
 import { normalizeStatusTone, PAGE_SIZE_OPTIONS } from '../organizerMappers';
-import OrganizerPosterTooltip from './OrganizerPosterTooltip';
-import styles from '../OrganizerPage.module.css';
+import { resolveMediaImageUrl } from '@/lib/imageUrls';
+import { API_BASE } from '../../../lib/backend';
+import ImageTooltip from '../../../ui/ImageTooltip';
+import Stack from '../../../ui/Stack';
 
 export default function OrganizerPageContent({
   activeExtrasTab,
@@ -99,10 +101,14 @@ export default function OrganizerPageContent({
       ? t('organizer.table.emptySearch', { context: currentContextLabel }) || `No items match your search in ${currentContextLabel}.`
       : t('organizer.table.emptyCategory', { context: currentContextLabel }) || `No items in ${currentContextLabel}.`;
 
+  const tooltipImageUrl = tooltipRow?.images?.length > 0
+    ? resolveMediaImageUrl(tooltipRow.images[0].path, 'poster', API_BASE)
+    : null;
+
   return (
-    <Page viewport={true} className={`organizer-page ${styles['organizer-page']}`}>
-      <div className={styles['organizer-main']}>
-        <div className={styles['organizer-main__content']}>
+    <Page viewport={true}>
+      <Stack fill gap="3xl">
+        <Stack fill gap="3xl">
           <PanelHeader
             title={t('organizer.title')}
             sessionMode={sessionMode}
@@ -173,15 +179,15 @@ export default function OrganizerPageContent({
             totalItems={sortedRows.length}
             totalPages={totalPages}
           />
-        </div>
-      </div>
+        </Stack>
+      </Stack>
 
-      <OrganizerPosterTooltip
+      <ImageTooltip
         ref={tooltipRef}
-        activeRow={tooltipRow}
+        imageUrl={tooltipImageUrl}
         visible={tooltipVisible}
-        initialX={tooltipInitialCoords.x}
-        initialY={tooltipInitialCoords.y}
+        x={tooltipInitialCoords.x}
+        y={tooltipInitialCoords.y}
       />
     </Page>
   );

@@ -79,7 +79,7 @@ const ScrollRow = forwardRef(({
       {showArrows && (
         <button
           type="button"
-          className={`${styles.arrow} ${styles['is-left']} ${leftHidden ? styles['is-hidden'] : ''}`.trim()}
+          className={`ui-carousel-arrow ${styles.arrow} ${styles['is-left']} ${leftHidden ? styles['is-hidden'] : ''}`.trim()}
           onClick={() => scroll('left')}
         >
           <ChevronLeft size={arrowIconSize} />
@@ -100,7 +100,7 @@ const ScrollRow = forwardRef(({
       {showArrows && (
         <button
           type="button"
-          className={`${styles.arrow} ${styles['is-right']} ${rightHidden ? styles['is-hidden'] : ''}`.trim()}
+          className={`ui-carousel-arrow ${styles.arrow} ${styles['is-right']} ${rightHidden ? styles['is-hidden'] : ''}`.trim()}
           onClick={() => scroll('right')}
         >
           <ChevronRight size={arrowIconSize} />

@@ -116,19 +116,6 @@
   transition: color var(--motion-base), filter var(--motion-base);
 }
 
-.root:has(#create-tag-form) .header,
-.root:has(#edit-tag-form) .header {
-  background: linear-gradient(135deg,
-      color-mix(in srgb, var(--current-tag-color, transparent) 16%, transparent),
-      transparent);
-}
-
-.root:has(#create-tag-form) .title-icon,
-.root:has(#edit-tag-form) .title-icon {
-  color: var(--current-tag-color);
-  filter: drop-shadow(0 0 0.5rem color-mix(in srgb, var(--current-tag-color, transparent) 25%, transparent));
-}
-
 .description {
   margin: var(--space-sm) 0 0;
   color: var(--modal-description-color);
@@ -386,4 +373,17 @@
   color: var(--color-muted);
   font: var(--text-caption);
   line-height: 1.5;
+}
+
+.root:has(#create-tag-form) .header,
+.root:has(#edit-tag-form) .header {
+  background: linear-gradient(135deg,
+      color-mix(in srgb, var(--current-tag-color, transparent) 16%, transparent),
+      transparent);
+}
+
+.root:has(#create-tag-form) .title-icon,
+.root:has(#edit-tag-form) .title-icon {
+  color: var(--current-tag-color);
+  filter: drop-shadow(0 0 0.5rem color-mix(in srgb, var(--current-tag-color, transparent) 25%, transparent));
 }

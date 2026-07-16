@@ -202,6 +202,8 @@ export default function PersonBackdropPickerModal({
                     selected={isSelected}
                     isPending={isPending}
                     aspect="landscape"
+                    variant="picker"
+                    showCheckmark={false}
                     onClick={() => handleSelectSceneBackdrop(credit)}
                     disabled={overridePersonBackdropMutation.isPending || isUploadPending}
                   />

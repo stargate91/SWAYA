@@ -3,11 +3,11 @@ import { useSettingsForm, useSettingsOptions, useSettingsRenderContext } from '.
 import { SettingsFormProvider } from './SettingsFormContext.jsx';
 import {
   SettingsActionBar,
-  SettingsChrome,
   SettingsErrorState,
   SettingsLoadingState,
   SettingsSidebar,
 } from './components';
+import Overlay from '@/ui/Overlay';
 import { settingsTabGroups } from './settingsTabs.config.jsx';
 import { SETTINGS_TAB_IDS } from './settingsConstants.js';
 import styles from './SettingsPage.module.css';
@@ -122,8 +122,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="ui-overlay">
-      <SettingsChrome t={t} onClose={handleClose} />
+    <Overlay onClose={handleClose} closeLabel={t('settingsPage.closeSettings')}>
       <SettingsSidebar
         t={t}
         tabGroups={settingsTabGroups}
@@ -139,9 +138,9 @@ export default function SettingsPage() {
         }}
       />
 
-      <main className="ui-overlay__content-wrapper">
+      <Overlay.ContentWrapper>
 
-        <div className="ui-overlay__content">
+        <Overlay.Content>
           <div className={styles['settings-tab-content']}>
             <SettingsFormProvider
               form={form}
@@ -156,8 +155,8 @@ export default function SettingsPage() {
               )}
             </SettingsFormProvider>
           </div>
-        </div>
-      </main>
+        </Overlay.Content>
+      </Overlay.ContentWrapper>
 
       <SettingsActionBar
         t={t}
@@ -167,6 +166,6 @@ export default function SettingsPage() {
         onSave={handleSave}
         className={isShaking ? 'is-shaking' : ''}
       />
-    </div>
+    </Overlay>
   );
 }

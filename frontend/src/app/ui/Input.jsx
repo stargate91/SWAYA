@@ -84,7 +84,7 @@ export default function Input({
           </div>
         )}
       </div>
-      {hint ? <span id={hintId} className="ui-field__sr-only">{hint}</span> : null}
+      {hint ? <span id={hintId} className={styles['sr-only']}>{hint}</span> : null}
     </Field>
   );
 }

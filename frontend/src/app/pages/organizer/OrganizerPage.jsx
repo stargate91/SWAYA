@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import OrganizerPageContent from './components/OrganizerPageContent';
-import styles from './OrganizerPage.module.css';
 import Button from '../../ui/Button';
 import SegmentedControl from '../../ui/SegmentedControl';
 import SplitButton from '../../ui/SplitButton';
@@ -205,6 +204,7 @@ export default function OrganizerPage() {
     dismissedCount,
     dismissedRowIds,
     addPendingResolvedIds,
+    removePendingResolvedIds,
     visibleExtraCount,
     visibleMediaCount,
     modeVisibleMatchedItems,
@@ -391,7 +391,7 @@ export default function OrganizerPage() {
             size="sm"
             label={renameButtonLabel}
             onClick={() => handleRename(false)}
-            disabled={isScanActive || isRenamePending || isRenameStarting}
+            disabled={(isScanActive && scanStatus?.phase === 'organizing') || isRenamePending || isRenameStarting}
             options={[
               {
                 label: renameButtonLabel,
@@ -418,6 +418,7 @@ export default function OrganizerPage() {
     scanMode,
     sessionMode,
     addPendingResolvedIds,
+    removePendingResolvedIds,
   });
 
   useEffect(() => {
@@ -455,9 +456,10 @@ export default function OrganizerPage() {
       sessionMode={sessionMode}
       provider={provider}
       addPendingResolvedIds={addPendingResolvedIds}
+      removePendingResolvedIds={removePendingResolvedIds}
     >
       {utilityBarTarget && scanModeOptions.length > 1 && createPortal(
-        <Inline gap="md" align="center" className={styles['utility-bar-wrapper']}>
+        <Inline gap="md" align="center" className="utility-bar-wrapper">
           <SegmentedControl
             value={scanMode}
             onChange={setScanMode}

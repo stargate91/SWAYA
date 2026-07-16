@@ -1,4 +1,4 @@
-import TagButton from '@/ui/TagButton';
+import Button from '@/ui/Button';
 import styles from './StructurePreview.module.css';
 import Inline from '@/ui/Inline';
 
@@ -16,13 +16,14 @@ export default function TemplateTagSelector({ t, tags, fieldKey, inputRef, inser
           </div>
           <Inline gap="sm" className={styles['template-tag-selector-container']}>
             {commonTags.map((tag) => (
-              <TagButton
+              <Button
                 key={tag}
+                variant="tag"
                 disabled={disabled}
                 onClick={disabled ? undefined : () => insertTag(fieldKey, inputRef, tag)}
               >
                 {tag}
-              </TagButton>
+              </Button>
             ))}
           </Inline>
         </div>
@@ -34,13 +35,14 @@ export default function TemplateTagSelector({ t, tags, fieldKey, inputRef, inser
           </div>
           <Inline gap="sm" className={styles['template-tag-selector-container']}>
             {additionalTags.map((tag) => (
-              <TagButton
+              <Button
                 key={tag}
+                variant="tag"
                 disabled={disabled}
                 onClick={disabled ? undefined : () => insertTag(fieldKey, inputRef, tag)}
               >
                 {tag}
-              </TagButton>
+              </Button>
             ))}
           </Inline>
         </div>

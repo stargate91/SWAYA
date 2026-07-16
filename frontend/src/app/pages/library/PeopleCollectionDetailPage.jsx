@@ -49,7 +49,6 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
     t,
     openModal,
     closeModal,
-    toast,
   });
 
   useScrollRestoration('.media-detail-page__container', [isLoading]);

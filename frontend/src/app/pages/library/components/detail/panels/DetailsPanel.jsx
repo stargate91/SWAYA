@@ -118,7 +118,7 @@ export default function DetailsPanel() {
                 : null;
               return (
                 <Inline key={idx} gap="md" align="center" justify="center" className="specs-card specs-card--company">
-                  <Tooltip content={it.name} side="top" triggerClassName="specs-card--company__tooltip-trigger">
+                  <Tooltip content={it.name} side="top" triggerClassName="specs-card-company__tooltip-trigger">
                     {logoUrl && (
                       <img
                         src={logoUrl}
@@ -153,7 +153,7 @@ export default function DetailsPanel() {
                 : null;
               return (
                 <Inline key={idx} gap="md" align="center" justify="center" className="specs-card specs-card--company">
-                  <Tooltip content={it.name} side="top" triggerClassName="specs-card--company__tooltip-trigger">
+                  <Tooltip content={it.name} side="top" triggerClassName="specs-card-company__tooltip-trigger">
                     {logoUrl && (
                       <img
                         src={logoUrl}

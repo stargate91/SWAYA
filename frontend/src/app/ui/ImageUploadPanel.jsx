@@ -3,7 +3,7 @@ import { Link2, Upload } from './icons';
 import Input from './Input';
 import Button from './Button';
 import FileDropZone from './FileDropZone';
-import './ImageUploadPanel.css';
+import styles from './ImageUploadPanel.module.css';
 
 export default function ImageUploadPanel({
   imageType,
@@ -60,7 +60,7 @@ export default function ImageUploadPanel({
       }}
       label={t?.('dropzone.label') || 'Drop image here'}
       description={t?.('dropzone.description') || 'to upload as custom cover'}
-      className="universal-image-picker__upload-panel"
+      className={styles.panel}
     >
       <input
         ref={fileInputRef}
@@ -68,16 +68,16 @@ export default function ImageUploadPanel({
         accept="image/*"
         onChange={handleFileChange}
         disabled={isPending}
-        className="universal-image-picker__file-input"
+        className={styles['file-input']}
       />
 
-      <div className="universal-image-picker__url-row">
+      <div className={styles['url-row']}>
         <Input
           placeholder="https://example.com/image.jpg"
           value={urlInput}
           onChange={(event) => setUrlInput(event.target.value)}
           disabled={isPending}
-          className="universal-image-picker__url-input"
+          className={styles['url-input']}
           leftElement={<Link2 size={15} />}
           onKeyDown={(event) => {
             if (event.key === 'Enter') {
@@ -93,7 +93,7 @@ export default function ImageUploadPanel({
           disabled={!urlInput.trim() || isPending}
           variant="secondary-neutral"
           size="md"
-          className="universal-image-picker__save-button"
+          className={styles['save-button']}
         >
           {t?.('common.save') || 'Save'}
         </Button>
@@ -102,7 +102,7 @@ export default function ImageUploadPanel({
           type="button"
           variant="secondary-neutral"
           size="md"
-          className="universal-image-picker__upload-button"
+          className={styles['upload-button']}
           disabled={isPending}
           onClick={() => fileInputRef.current?.click()}
         >
@@ -112,18 +112,18 @@ export default function ImageUploadPanel({
       </div>
 
       {hasUploadPreview || uploadFile || isPending ? (
-        <div className="universal-image-picker__upload-status">
+        <div className={styles['upload-status']}>
           {hasUploadPreview ? (
-            <div className={`universal-image-picker__preview${imageType === 'logo' ? ' is-logo' : ''}${imageType === 'backdrop' ? ' is-backdrop' : ''}${imageType === 'square' ? ' is-square' : ''}`}>
+            <div className={`${styles.preview} ${imageType === 'logo' ? styles.logo : ''} ${imageType === 'backdrop' ? styles.backdrop : ''} ${imageType === 'square' ? styles.square : ''}`.trim()}>
               <img
                 src={uploadPreview}
                 alt="Upload preview"
-                className="universal-image-picker__preview-image"
+                className={styles['preview-image']}
               />
             </div>
           ) : null}
 
-          <div className="universal-image-picker__status-copy">
+          <div className={styles['status-copy']}>
             <strong>{uploadFile?.name || (t?.('common.uploading') || 'Uploading...')}</strong>
             <span>
               {isPending

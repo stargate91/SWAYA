@@ -1,16 +1,17 @@
+import PropTypes from 'prop-types';
 import useRatingHover from '@/pages/library/hooks/useRatingHover';
-import './SegmentedRating.css';
+import styles from './SegmentedRating.module.css';
 
 export default function SegmentedRating({
   value,
   onChange,
   t,
   labelUnder = false,
-  className = 'table-segmented-rating-container',
-  barClassName = 'rating-segmented-bar',
-  segmentClassName = 'rating-segment',
-  segmentFillClassName = 'rating-segment-fill',
-  labelClassName = 'user-rating-label',
+  className = '',
+  barClassName = '',
+  segmentClassName = '',
+  segmentFillClassName = '',
+  labelClassName = '',
   formatLabel,
 }) {
   const {
@@ -30,9 +31,12 @@ export default function SegmentedRating({
   };
 
   const renderLabel = () => {
+    const hasVal = displayRating !== undefined && displayRating !== null;
+    const labelClass = `${styles.label} ${hasVal ? styles['has-value'] : ''} ${labelClassName}`.trim();
+
     if (formatLabel) {
       return (
-        <span className={`${labelClassName} ${displayRating !== undefined && displayRating !== null ? 'has-value' : ''}`}>
+        <span className={labelClass}>
           {formatLabel(displayRating)}
         </span>
       );
@@ -40,30 +44,31 @@ export default function SegmentedRating({
 
     if (labelUnder) {
       return (
-        <span className={`user-rating-label-under ${displayRating !== undefined && displayRating !== null ? 'has-value' : ''}`}>
+        <span className={`${styles['label-under']} ${hasVal ? styles['has-value'] : ''}`.trim()}>
           {t('library.yourRating', { defaultValue: 'Your Rating' })}
-          <span className="rating-value-bold">
-            {displayRating !== undefined && displayRating !== null
-              ? displayRating.toFixed(1)
-              : '-.-'}
+          <span className={styles['value-bold']}>
+            {hasVal ? displayRating.toFixed(1) : '-.-'}
           </span>
         </span>
       );
     }
 
     return (
-      <span className={`${labelClassName} ${displayRating !== undefined && displayRating !== null ? 'has-value' : ''}`}>
-        {displayRating !== undefined && displayRating !== null
-          ? displayRating.toFixed(1)
-          : '-.-'}
+      <span className={labelClass}>
+        {hasVal ? displayRating.toFixed(1) : '-.-'}
       </span>
     );
   };
 
+  const containerClass = `${styles.container} ${labelUnder ? styles['layout-column'] : ''} ${className}`.trim();
+  const barClass = `${styles.bar} ${barClassName}`.trim();
+  const segmentClass = `${styles.segment} ${segmentClassName}`.trim();
+  const segmentFillClass = `${styles.fill} ${segmentFillClassName}`.trim();
+
   return (
-    <div className={`${className} ${labelUnder ? 'layout-column' : ''}`}>
+    <div className={containerClass}>
       <div
-        className={barClassName}
+        className={barClass}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         onMouseUp={handleClick}
@@ -82,9 +87,9 @@ export default function SegmentedRating({
             fill = (displayRating - (val - 1)) * 100;
           }
           return (
-            <div key={val} className={segmentClassName}>
+            <div key={val} className={segmentClass}>
               <div
-                className={segmentFillClassName}
+                className={segmentFillClass}
                 // eslint-disable-next-line react/forbid-dom-props
                 style={{ width: `${fill}%` }}
               />
@@ -97,3 +102,15 @@ export default function SegmentedRating({
   );
 }
 
+SegmentedRating.propTypes = {
+  value: PropTypes.number,
+  onChange: PropTypes.func.isRequired,
+  t: PropTypes.func.isRequired,
+  labelUnder: PropTypes.bool,
+  className: PropTypes.string,
+  barClassName: PropTypes.string,
+  segmentClassName: PropTypes.string,
+  segmentFillClassName: PropTypes.string,
+  labelClassName: PropTypes.string,
+  formatLabel: PropTypes.func,
+};

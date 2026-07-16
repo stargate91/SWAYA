@@ -28,9 +28,10 @@ export default function Lightbox({ imageUrl, onClose, t }) {
       aria-label={t?.('common.close') || 'Close image preview'}
       onClick={onClose}
     >
-      <div className={`ui-close-container ${styles.closeContainer}`} onClick={(e) => e.stopPropagation()} role="presentation">
+      <div className={styles['close-container']} onClick={(e) => e.stopPropagation()} role="presentation">
         <IconButton
-          className={`ui-close-btn ${styles.closeBtn}`}
+          variant="close"
+          className={styles['close-btn']}
           onClick={onClose}
           label={t?.('common.close') || 'Close'}
           title={null}
@@ -38,7 +39,7 @@ export default function Lightbox({ imageUrl, onClose, t }) {
         >
           <X size={18} />
         </IconButton>
-        <span className="ui-close-esc-hint">{escText}</span>
+        <span className={styles['esc-hint']}>{escText}</span>
       </div>
       <img
         src={imageUrl}

@@ -1,4 +1,4 @@
-.organizer-poster-tooltip {
+.tooltip {
   position: fixed;
   top: 0;
   left: 0;
@@ -6,21 +6,29 @@
   pointer-events: none;
   border-radius: var(--radius-md);
   overflow: hidden;
-  background: var(--color-surface-glass);
-  border: 1px solid var(--color-border-subtle);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-strong);
   box-shadow: var(--shadow-lg);
-  animation: fadeIn var(--motion-fast);
+  animation: fade-in var(--motion-fast);
   will-change: transform;
 }
 
-.organizer-poster-tooltip__image {
+.image {
   display: block;
-  width: 10rem;
-  height: 15rem;
   object-fit: cover;
 }
 
-@keyframes fadeIn {
+.tooltip[data-aspect="poster"] .image {
+  width: 10rem;
+  height: 15rem;
+}
+
+.tooltip[data-aspect="landscape"] .image {
+  width: 16rem;
+  height: 9rem;
+}
+
+@keyframes fade-in {
   from {
     opacity: 0;
   }

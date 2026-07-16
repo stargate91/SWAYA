@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import './Field.css';
+import styles from './Field.module.css';
 
 const REQUIRED_MARK = ' *';
 
@@ -14,21 +14,21 @@ export default function Field({
   ref,
 }) {
   return (
-    <div className={`ui-field ${className}`.trim()} ref={ref}>
+    <div className={`${styles.field} ${className}`.trim()} ref={ref}>
       {label && (
-        <label className="ui-field__label" htmlFor={htmlFor}>
+        <label className={styles.label} htmlFor={htmlFor}>
           {label}
-          {required && <span className="ui-field__required" aria-hidden="true">{REQUIRED_MARK}</span>}
+          {required && <span className={styles.required} aria-hidden="true">{REQUIRED_MARK}</span>}
         </label>
       )}
       {hint && (
-        <span className="ui-field__hint">
+        <span className={styles.hint}>
           {hint}
         </span>
       )}
       {children}
       {error && (
-        <span className="ui-field__error">
+        <span className={styles.error}>
           {error}
         </span>
       )}

@@ -70,7 +70,9 @@ export default function MatchModalBrowser({
     <>
       {browserState.view === 'seasons' && !isBrowserLoading ? (
         browserState.seasons.length > 0 ? (
-          <div className={`${styles['organizer-match-modal__browser-grid']} ${styles['organizer-match-modal__browser-grid--seasons']}`}>
+          <div
+            className={`${styles['organizer-match-modal__browser-grid']} ${styles['organizer-match-modal__browser-grid--seasons']}`}
+          >
             {browserState.seasons.map((seasonEntry) => {
               const candidateId = Number(browserState.tvCandidate?.tmdb_id || browserState.tvCandidate?.id || 0);
               const rowTvId = Number(row?.rawPayload?.tv_tmdb_id || row?.rawPayload?.tmdb_id || 0);
@@ -101,7 +103,9 @@ export default function MatchModalBrowser({
       {browserState.view === 'episodes' && !isBrowserLoading ? (
         browserState.episodes.length > 0 ? (
           <>
-            <div className={`${styles['organizer-match-modal__browser-grid']} ${styles['organizer-match-modal__browser-grid--episodes']}`}>
+            <div
+              className={`${styles['organizer-match-modal__browser-grid']} ${styles['organizer-match-modal__browser-grid--episodes']}`}
+            >
               {visibleEpisodes.map((episodeEntry) => {
                 const candidateId = Number(browserState.tvCandidate?.tmdb_id || browserState.tvCandidate?.id || 0);
                 const rowTvId = Number(row?.rawPayload?.tv_tmdb_id || row?.rawPayload?.tmdb_id || 0);

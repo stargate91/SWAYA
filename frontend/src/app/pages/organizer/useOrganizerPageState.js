@@ -19,13 +19,22 @@ export function useOrganizerPageState({ organizer, t, scanMode, sessionMode }) {
       ids.forEach((id) => next.add(id));
       return next;
     });
+    // Safety net fallback in case API or refresh fails/stalls
     setTimeout(() => {
       setPendingResolvedIds((prev) => {
         const next = new Set(prev);
         ids.forEach((id) => next.delete(id));
         return next;
       });
-    }, 4000);
+    }, 15000);
+  }, []);
+
+  const removePendingResolvedIds = useCallback((ids) => {
+    setPendingResolvedIds((prev) => {
+      const next = new Set(prev);
+      ids.forEach((id) => next.delete(id));
+      return next;
+    });
   }, []);
 
   const {
@@ -164,6 +173,7 @@ export function useOrganizerPageState({ organizer, t, scanMode, sessionMode }) {
     dismissedRowIds,
     pendingResolvedIds,
     addPendingResolvedIds,
+    removePendingResolvedIds,
     visibleMediaCount,
     visibleExtraCount,
     sessionVisibleMediaCount,

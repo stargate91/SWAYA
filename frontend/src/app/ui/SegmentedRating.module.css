@@ -1,11 +1,10 @@
-/* Segmented Rating Control */
-.table-segmented-rating-container {
+.container {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
 }
 
-.table-segmented-rating-container .rating-segmented-bar {
+.bar {
   display: flex;
   width: 10.25rem;
   height: var(--space-xl);
@@ -16,7 +15,7 @@
   align-items: center;
 }
 
-.table-segmented-rating-container .rating-segment {
+.segment {
   flex: 1;
   height: 100%;
   --local-bg: color-mix(in srgb, var(--color-ink) 8%, transparent);
@@ -29,14 +28,14 @@
   transition: var(--local-transition);
 }
 
-.table-segmented-rating-container .rating-segmented-bar:hover .rating-segment {
+.bar:hover .segment {
   --local-bg: color-mix(in srgb, var(--color-ink) 12%, transparent);
   background: var(--local-bg);
   --local-border-color: var(--color-border-default);
   border-color: var(--local-border-color);
 }
 
-.table-segmented-rating-container .rating-segment-fill {
+.fill {
   height: 100%;
   background: var(--color-accent-blue);
   opacity: 0.85;
@@ -44,12 +43,12 @@
   transition: var(--local-transition);
 }
 
-.table-segmented-rating-container .rating-segmented-bar:hover .rating-segment-fill {
+.bar:hover .fill {
   opacity: 1;
   box-shadow: 0 0 var(--space-sm) var(--color-accent-blue);
 }
 
-.table-segmented-rating-container .user-rating-label {
+.label {
   margin-left: var(--space-sm);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
@@ -62,23 +61,23 @@
   flex: 0 0 4.5ch;
 }
 
-.table-segmented-rating-container .user-rating-label.has-value {
+.label.has-value {
   color: color-mix(in srgb, var(--color-accent-blue) 84%, var(--color-text-secondary));
   font-weight: var(--font-weight-bold);
 }
 
-.table-segmented-rating-container.layout-column {
+.container.layout-column {
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-sm);
 }
 
-.table-segmented-rating-container.layout-column .user-rating-label-under {
+.label-under {
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
 
-.table-segmented-rating-container.layout-column .rating-value-bold {
+.value-bold {
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
   margin-left: var(--space-sm);

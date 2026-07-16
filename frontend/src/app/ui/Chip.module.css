@@ -1,0 +1,42 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: calc(2 * var(--space-lg));
+  padding: 0 var(--space-md);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-input);
+  background: var(--color-surface-glass-strong);
+  color: var(--color-ink);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--motion-fast);
+  user-select: none;
+  outline: none;
+}
+
+.chip:hover {
+  background: var(--color-surface-glass-stronger);
+  border-color: var(--color-border-strong);
+}
+
+/* Removable style (when closable/deletable) */
+.chip[data-variant="removable"]:hover {
+  background: color-mix(in srgb, var(--color-state-danger-bg) 70%, transparent);
+  border-color: color-mix(in srgb, var(--color-state-danger) 45%, transparent);
+  color: var(--color-state-danger);
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.6;
+  transition: opacity var(--motion-fast);
+}
+
+.chip:hover .icon {
+  opacity: 1;
+}

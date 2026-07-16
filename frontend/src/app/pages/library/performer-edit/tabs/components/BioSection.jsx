@@ -1,5 +1,7 @@
 import Dropdown from '@/ui/Dropdown';
 import Input from '@/ui/Input';
+import Field from '@/ui/Field';
+import fieldStyles from '@/ui/Field.module.css';
 import { TARGET_LANGUAGE_OPTIONS } from '@/pages/settings/settingsLanguageOptions';
 
 export default function BioSection({
@@ -21,9 +23,9 @@ export default function BioSection({
         <h4 className="custom-values-card__title">{t('library.performerEdit.profileIdentity') || 'Profile & Identity'}</h4>
       </div>
       <div className="custom-values-card__body">
-        <div className="ui-field custom-values-field--full">
+        <Field className="custom-values-field--full">
           <div className="performer-custom-values-header-row">
-            <label className="ui-field__label performer-custom-values-biography-label">{t('library.performerEdit.biography') || 'Biography'}</label>
+            <span className={`${fieldStyles.label} performer-custom-values-biography-label`}>{t('library.performerEdit.biography') || 'Biography'}</span>
             <div className="performer-custom-values-language-selector-wrapper">
               <span className="performer-custom-values-language-label">{t('library.performerEdit.language') || 'Language:'}</span>
               <div className="performer-custom-values-language-dropdown-container">
@@ -51,7 +53,7 @@ export default function BioSection({
             }}
             placeholder={`Write a custom biography in ${TARGET_LANGUAGE_OPTIONS.find(o => o.value === selectedBioLang)?.label || selectedBioLang}...`}
           />
-        </div>
+        </Field>
         <div className="custom-values-card__grid-2">
           {person?.is_adult && (
             <Dropdown

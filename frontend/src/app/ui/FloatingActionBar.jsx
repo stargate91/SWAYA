@@ -1,4 +1,4 @@
-import './FloatingActionBar.css';
+import styles from './FloatingActionBar.module.css';
 
 export default function FloatingActionBar({
   visible = false,
@@ -9,19 +9,19 @@ export default function FloatingActionBar({
   className = '',
 }) {
   return (
-    <div className={`ui-floating-bar-shell${visible ? ' is-visible' : ''} ${className}`.trim()}>
-      <div className="ui-floating-bar" aria-hidden={visible ? undefined : true}>
-        <div className="ui-floating-bar__copy">
-          {eyebrow ? <span className="ui-floating-bar__eyebrow">{eyebrow}</span> : null}
-          {title ? <strong className="ui-floating-bar__title">{title}</strong> : null}
-          {description ? <span className="ui-floating-bar__description">{description}</span> : null}
+    <div className={`${styles.shell} ${visible ? styles.visible : ''} ${className}`.trim()}>
+      <div className={styles.bar} aria-hidden={visible ? undefined : true}>
+        <div className={styles.copy}>
+          {eyebrow ? <span className={styles.eyebrow}>{eyebrow}</span> : null}
+          {title ? <strong className={styles.title}>{title}</strong> : null}
+          {description ? <span className={styles.description}>{description}</span> : null}
         </div>
-        <div className="ui-floating-bar__actions">
+        <div className={styles.actions}>
           {actions.map((action) => (
             <button
               key={action.key}
               type="button"
-              className={`ui-floating-bar__action ui-floating-bar__action--${action.variant || 'default'} ${action.className || ''}`.trim()}
+              className={`${styles.action} ${action.variant === 'primary' ? styles['action-primary'] : action.variant === 'danger' ? styles['action-danger'] : ''} ${action.className || ''}`.trim()}
               onClick={action.onClick}
               disabled={action.disabled}
               aria-label={action.label}

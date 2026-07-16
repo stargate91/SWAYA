@@ -1,4 +1,4 @@
-.ui-floating-bar-shell {
+.shell {
   position: fixed;
   left: 50%;
   bottom: calc(var(--space-3xl) + env(safe-area-inset-bottom, 0));
@@ -11,7 +11,7 @@
   margin: 0;
 }
 
-.ui-floating-bar {
+.bar {
   position: relative;
   display: flex;
   align-items: center;
@@ -30,7 +30,7 @@
   overflow: hidden;
 }
 
-.ui-floating-bar::before {
+.bar::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -39,7 +39,7 @@
   pointer-events: none;
 }
 
-.ui-floating-bar::after {
+.bar::after {
   content: "";
   position: absolute;
   left: calc(var(--space-lg) + var(--space-sm));
@@ -51,13 +51,13 @@
   pointer-events: none;
 }
 
-.ui-floating-bar-shell.is-visible .ui-floating-bar {
+.shell.visible .bar {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0) scale(1);
 }
 
-.ui-floating-bar__copy {
+.copy {
   position: relative;
   z-index: var(--z-index-step-1);
   min-width: 0;
@@ -67,7 +67,7 @@
   flex: 1 1 auto;
 }
 
-.ui-floating-bar__title {
+.title {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   color: var(--color-ink);
@@ -76,7 +76,7 @@
   align-items: center;
 }
 
-.ui-floating-bar__actions {
+.actions {
   position: relative;
   z-index: var(--z-index-step-1);
   display: flex;
@@ -85,7 +85,7 @@
   flex: 0 0 auto;
 }
 
-.ui-floating-bar__action {
+.action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -101,39 +101,38 @@
   transition: background var(--motion-fast), border-color var(--motion-fast), transform var(--motion-fast), color var(--motion-fast);
 }
 
-.ui-floating-bar__action:focus-visible {
+.action:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px var(--color-accent-blue);
 }
 
-.ui-floating-bar__action:disabled {
+.action:disabled {
   opacity: 0.45;
   cursor: not-allowed;
   transform: none;
 }
 
-.ui-floating-bar__action:hover:not(:disabled) {
+.action:hover:not(:disabled) {
   background: var(--ui-floating-action-bg-hover);
   border-color: var(--ui-floating-action-border-hover);
   transform: translateY(-0.0625rem);
 }
 
-.ui-floating-bar__action--primary {
+.action-primary {
   background: var(--button-primary-bg);
   border: 0;
   color: var(--button-primary-color);
   box-shadow: var(--button-primary-shadow);
 }
 
-.ui-floating-bar__action--primary:hover:not(:disabled) {
+.action-primary:hover:not(:disabled) {
   background: var(--button-primary-bg);
   border: 0;
   color: var(--button-primary-color);
   filter: var(--button-primary-hover-filter);
 }
 
-.ui-floating-bar__action--danger,
-.ui-floating-bar__action.is-danger {
+.action-danger {
   background:
     linear-gradient(180deg,
       color-mix(in srgb, var(--color-accent-red-soft) 10%, transparent),
@@ -143,8 +142,7 @@
   color: color-mix(in srgb, var(--color-accent-red-soft) 88%, var(--color-text-primary) 12%);
 }
 
-.ui-floating-bar__action--danger:hover:not(:disabled),
-.ui-floating-bar__action.is-danger:hover:not(:disabled) {
+.action-danger:hover:not(:disabled) {
   background:
     linear-gradient(180deg,
       color-mix(in srgb, var(--color-accent-red-soft) 12%, transparent),
@@ -155,12 +153,12 @@
 
 
 @media (max-width: 57.5rem) {
-  .ui-floating-bar-shell {
+  .shell {
     bottom: calc(var(--space-2xl) + env(safe-area-inset-bottom, 0));
     width: calc(100vw - (var(--space-lg) * 2));
   }
 
-  .ui-floating-bar {
+  .bar {
     min-width: 0;
     width: 100%;
     flex-direction: column;
@@ -169,15 +167,15 @@
     padding: var(--space-lg);
   }
 
-  .ui-floating-bar__actions {
+  .actions {
     width: 100%;
   }
 
-  .ui-floating-bar__copy {
+  .copy {
     min-height: 0;
   }
 
-  .ui-floating-bar__action {
+  .action {
     flex: 1 1 0;
   }
 }
@@ -188,7 +186,7 @@
   40%, 80% { transform: translateX(var(--space-sm)); }
 }
 
-.ui-floating-bar-shell.is-shaking .ui-floating-bar {
+.shell.shaking .bar {
   animation: ui-bar-shake var(--motion-base);
   border-color: var(--color-state-danger);
   box-shadow: 0 0 var(--space-xl) color-mix(in srgb, var(--color-state-danger) 40%, transparent), var(--ui-floating-surface-shadow);

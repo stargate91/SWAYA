@@ -471,6 +471,8 @@ export default function TMDBImageGrid({
               aspect={imageType === 'backdrop' ? 'landscape' : imageType}
               infoLeft={infoLeft}
               infoRight={infoRight}
+              variant="picker"
+              showCheckmark={false}
               onClick={() => handleSelectImage(path)}
             />
           );

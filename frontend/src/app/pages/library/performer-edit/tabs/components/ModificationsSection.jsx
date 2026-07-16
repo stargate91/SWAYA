@@ -12,24 +12,22 @@ export default function ModificationsSection({
       </div>
       <div className="custom-values-card__body">
         <div className="custom-values-card__grid-2">
-          <div className="ui-field custom-values-field--full-grid">
-            <label className="ui-field__label">{t('library.details.tattoos') || 'Tattoos'}</label>
-            <Input
-              type="text"
-              placeholder="e.g. Rose on left shoulder"
-              value={form.tattoos}
-              onChange={e => handleChange('tattoos', e.target.value)}
-            />
-          </div>
-          <div className="ui-field custom-values-field--full-grid">
-            <label className="ui-field__label">{t('library.details.piercings') || 'Piercings'}</label>
-            <Input
-              type="text"
-              placeholder="e.g. Nose ring"
-              value={form.piercings}
-              onChange={e => handleChange('piercings', e.target.value)}
-            />
-          </div>
+          <Input
+            label={t('library.details.tattoos') || 'Tattoos'}
+            type="text"
+            placeholder="e.g. Rose on left shoulder"
+            value={form.tattoos}
+            onChange={e => handleChange('tattoos', e.target.value)}
+            className="custom-values-field--full-grid"
+          />
+          <Input
+            label={t('library.details.piercings') || 'Piercings'}
+            type="text"
+            placeholder="e.g. Nose ring"
+            value={form.piercings}
+            onChange={e => handleChange('piercings', e.target.value)}
+            className="custom-values-field--full-grid"
+          />
         </div>
       </div>
     </div>

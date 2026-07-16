@@ -37,6 +37,7 @@ export default function SelectableCard({
   className = '',
   onClick,
   ref,
+  showCheckmark = true,
   ...props
 }) {
   const [prevImageUrl, setPrevImageUrl] = useState(imageUrl);
@@ -102,7 +103,7 @@ export default function SelectableCard({
           )}
           {selected && !isPending && (
             <div className={`${styles['selected-overlay']} ui-selectable-card__selected-overlay`}>
-              <Check size={18} />
+              {showCheckmark && <Check size={18} />}
             </div>
           )}
           {(infoLeft || infoRight) && (

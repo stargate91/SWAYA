@@ -1,6 +1,6 @@
 .ratings-page {
   margin-top: calc(-1 * var(--page-top-offset));
-  margin-right: calc(-1 * var(--space-5xl));
+  margin-right: 0;
   margin-bottom: calc(-1 * var(--shell-top-band-height));
   height: 100%;
   min-height: 0;
@@ -14,7 +14,7 @@
   min-width: 0;
   min-height: 0;
   padding-top: var(--page-top-offset);
-  padding-right: var(--space-5xl);
+  padding-right: 0;
   padding-bottom: 0;
   flex: 1 1 auto;
   height: 100%;

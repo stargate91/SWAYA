@@ -17,7 +17,7 @@ function PaginationPageSizes({ pageSize, pageSizeOptions, onPageSizeChange, aria
           type="button"
           variant="secondary-neutral"
           size="sm"
-          className={`${styles.size} ${pageSize === option ? styles.isActive : ''}`.trim()}
+          className={`${styles.size} ${pageSize === option ? styles['is-active'] : ''}`.trim()}
           onClick={() => onPageSizeChange?.(option)}
         >
           {option}
@@ -143,7 +143,7 @@ export default function PaginationBar({
                   type="button"
                   variant="secondary-neutral"
                   size="sm"
-                  className={`${styles.button} ${styles.isActive}`}
+                  className={`${styles.button} ${styles['is-active']}`}
                   onClick={() => onPaginationModeChange('infinite')}
                 >
                   {t('pagination.modeInfinite') || 'Infinite'}
@@ -154,13 +154,13 @@ export default function PaginationBar({
         ) : (
           <Inline gap="sm" align="center" className={styles.nav}>
             {onPaginationModeChange ? (
-              // eslint-disable-next-line react/forbid-dom-props
+              /* eslint-disable-next-line react/forbid-component-props */
               <Inline gap="xs" align="center" className={styles.modes} style={{ marginRight: '16px' }}>
                 <Button
                   type="button"
                   variant="secondary-neutral"
                   size="sm"
-                  className={`${styles.button} ${styles.isActive}`}
+                  className={`${styles.button} ${styles['is-active']}`}
                   onClick={() => onPaginationModeChange('pages')}
                 >
                   {t('pagination.modePages') || 'Pages'}

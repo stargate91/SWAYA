@@ -11,7 +11,7 @@ export default function SettingsLiveImpact({
   return (
     <Card title={title} eyebrow={eyebrow}>
       <div className="settings-preview-stack">
-        <span className="ui-field__hint">
+        <span className="settings-field-hint">
           {hint}
         </span>
         <StructurePreviewPanel form={form} t={t} />

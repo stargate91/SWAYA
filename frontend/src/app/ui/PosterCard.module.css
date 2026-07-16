@@ -8,8 +8,18 @@
   transition: var(--ui-poster-card-transition);
 }
 
+.card[data-fluid="true"] {
+  width: 100%;
+  min-width: 0;
+}
+
 .card[data-clickable="true"] {
   cursor: pointer;
+}
+
+.card:focus,
+.card:focus-visible {
+  outline: none;
 }
 
 .card:hover {
@@ -38,11 +48,6 @@
 .card:hover .image-wrapper {
   transform: var(--ui-poster-card-hover-transform, translateY(calc(-1 * var(--space-xs))) scale(1.02));
   box-shadow: var(--ui-poster-card-hover-shadow, var(--shadow-sm));
-}
-
-.card.no-hover-animation:hover .image-wrapper {
-  transform: none;
-  box-shadow: none;
 }
 
 button.image-wrapper,
@@ -456,7 +461,12 @@ div.image-wrapper:focus-visible {
 }
 
 .card.is-active .image-wrapper {
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 32%, transparent);
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+
+.card[data-selected="true"] .image-wrapper {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 42%, transparent),
+    0 0 0 2px color-mix(in srgb, var(--color-accent) 16%, transparent);
 }
 
 button.image-wrapper:hover:not(:disabled) {
@@ -464,7 +474,7 @@ button.image-wrapper:hover:not(:disabled) {
 }
 
 .card.is-active button.image-wrapper:hover:not(:disabled) {
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 32%, transparent);
+  box-shadow: 0 0 0 2px var(--color-accent);
 }
 
 .card[data-variant="overlay-title"] {

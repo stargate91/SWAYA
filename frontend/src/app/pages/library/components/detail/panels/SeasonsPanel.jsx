@@ -428,8 +428,6 @@ export default function SeasonsPanel() {
                 )}
               </div>
 
-              {/* Right Side: Actions */}
-              {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
               <Inline gap="sm" align="center" className="episode-card__actions" onClick={(e) => e.stopPropagation()}>
                 {isExpanded && (
                   <>

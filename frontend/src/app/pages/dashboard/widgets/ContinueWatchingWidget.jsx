@@ -1,6 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import PropTypes from 'prop-types';
 import { Play, Minus, ChevronLeft, ChevronRight } from '@/ui/icons';
 import PosterCard from '../../../ui/PosterCard';
 import { useContinueWatchingQuery } from '../../../queries';
@@ -39,11 +38,13 @@ const ContinueWatchingWidget = () => {
     setShowRight(scrollLeft + clientWidth < scrollWidth - 10);
   }, []);
 
+  const [prevItems, setPrevItems] = useState(items);
   const [localItems, setLocalItems] = useState(items);
 
-  useEffect(() => {
+  if (items !== prevItems) {
+    setPrevItems(items);
     setLocalItems(items);
-  }, [items]);
+  }
 
   useEffect(() => {
     updateArrows();

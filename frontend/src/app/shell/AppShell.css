@@ -127,6 +127,7 @@
   min-width: 0;
   min-height: 0;
   overflow: auto;
+  scrollbar-gutter: stable both-edges;
   padding: var(--page-top-offset) var(--space-3xl) var(--page-bottom-offset);
   box-sizing: border-box;
   background: var(--color-canvas);
@@ -137,7 +138,7 @@
 }
 
 
-.shell:has(#shell-utility-bar-bottom-center > *:not(:empty)) .ui-page:not(.ui-page--viewport) {
+.shell:has(#shell-utility-bar-bottom-center > *:not(:empty)) .shell__content > div:not([data-viewport]) {
   --page-pb: var(--space-7xl);
   padding-bottom: var(--page-pb);
 }

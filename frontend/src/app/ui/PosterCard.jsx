@@ -37,8 +37,10 @@ const PosterCard = memo(function PosterCard({
   onClick,
   disabled = false,
   active = false,
+  selected = false,
   disableHoverAnimation = false,
   fillHeight = false,
+  fluid = false,
   imageWrapperClassName = '',
   imageClassName = '',
   style,
@@ -137,6 +139,8 @@ const PosterCard = memo(function PosterCard({
       data-aspect={aspect}
       data-variant={variant}
       data-fill-height={fillHeight}
+      data-fluid={fluid || undefined}
+      data-selected={selected || undefined}
       data-clickable={!!onClick || undefined}
       data-missing={isMissing || undefined}
       // eslint-disable-next-line react/forbid-dom-props
@@ -234,6 +238,7 @@ const PosterCard = memo(function PosterCard({
         {playOverlay ? (
           <IconButton
             type="button"
+            variant="play-overlay"
             className={styles['play-overlay']}
             onClick={playOverlay.onClick}
             label={playOverlay.label}

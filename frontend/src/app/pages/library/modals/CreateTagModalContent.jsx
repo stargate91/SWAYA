@@ -3,6 +3,7 @@ import { useAllTagsQuery, useCreateTagMutation, useUpdateTagMutation } from '@/q
 import Input from '@/ui/Input';
 import Tooltip from '@/ui/Tooltip';
 import Button from '@/ui/Button';
+import Field from '@/ui/Field';
 import { API_BASE } from '@/lib/backend';
 
 const REMOVE_SYMBOL = '✕';
@@ -161,9 +162,7 @@ export default function CreateTagModalContent({ onClose, t, initialTag = null, m
         autoFocus
       />
 
-      <div className="create-tag-form__field-group">
-        <span className="ui-field__label">{t('library.tags.customImagesLabel') || 'Custom Images (Max 3)'}</span>
-        
+      <Field label={t('library.tags.customImagesLabel') || 'Custom Images (Max 3)'}>
         {customImages.length > 0 && (
           <div className="create-tag-form__image-list">
             {customImages.map((img, idx) => {
@@ -234,14 +233,12 @@ export default function CreateTagModalContent({ onClose, t, initialTag = null, m
           {customImages.length <= 1 ? (
             <div>{BULLET_POINT}{t('library.tags.aspectRatioOne') || 'Ideal aspect ratio is 16:9 (landscape/backdrop)'}</div>
           ) : (
-            <div>{BULLET_POINT}{t('library.tags.aspectRatioMultiple') || 'Ideal aspect ratio is 2:3 (portrait/poster)'}</div>
+            <div>{BULLET_POINT}{t('library.tags.aspectRatioMultiple') || 'Ideal aspect ratio is 2:3 (portrait/portrait)'}</div>
           )}
         </div>
-      </div>
+      </Field>
 
-      <div className="create-tag-form__field-group">
-        <span className="ui-field__label">{t('library.tags.colorLabel') || 'Select Color'}</span>
-        
+      <Field label={t('library.tags.colorLabel') || 'Select Color'}>
         <div className="create-tag-form__color-list">
           {PREDEFINED_COLORS.map((c) => {
             const isSelected = color === c;
@@ -265,7 +262,7 @@ export default function CreateTagModalContent({ onClose, t, initialTag = null, m
           })}
 
         </div>
-      </div>
+      </Field>
     </form>
   );
 }

@@ -32,7 +32,13 @@ export default function MatchModalSearchForm({
     <form className={styles['organizer-match-modal__search']} onSubmit={onSearch}>
       <div className={styles['organizer-match-modal__search-layout']}>
         <div
-          className={`${styles['organizer-match-modal__search-grid']} ${isTvMode && !isBulk ? styles['is-tv'] : styles['is-movie']}`}
+          className={styles['organizer-match-modal__search-grid']}
+          /* eslint-disable-next-line react/forbid-dom-props */
+          style={{
+            gridTemplateColumns: isTvMode && !isBulk
+              ? 'minmax(0, 1fr) var(--year-column-width) var(--space-7xl) var(--space-7xl)'
+              : 'minmax(0, 1fr) var(--year-column-width)',
+          }}
         >
           {sessionMode === 'nsfw' ? (
             <SearchInputCombo
@@ -65,7 +71,7 @@ export default function MatchModalSearchForm({
             />
           )}
           <Input
-            className={`${styles['organizer-match-modal__field']} ${styles['organizer-match-modal__field--year']}`}
+            className={`${styles['organizer-match-modal__field']} ${styles['year-field']}`}
             value={year}
             onChange={(event) => setYear(event.target.value)}
             placeholder={t('organizer.details.matchModal.year')}
@@ -74,7 +80,7 @@ export default function MatchModalSearchForm({
           />
           {isTvMode && !isBulk ? (
             <Input
-              className={`${styles['organizer-match-modal__field']} ${styles['organizer-match-modal__field--compact']}`}
+              className={`${styles['organizer-match-modal__field']} ${styles['compact-field']}`}
               value={season}
               onChange={(event) => setSeason(event.target.value)}
               placeholder={t('organizer.details.matchModal.seasonShort')}
@@ -84,7 +90,7 @@ export default function MatchModalSearchForm({
           ) : null}
           {isTvMode && !isBulk ? (
             <Input
-              className={`${styles['organizer-match-modal__field']} ${styles['organizer-match-modal__field--compact']}`}
+              className={`${styles['organizer-match-modal__field']} ${styles['compact-field']}`}
               value={episode}
               onChange={(event) => setEpisode(event.target.value)}
               placeholder={t('organizer.details.matchModal.episodeShort')}
@@ -101,7 +107,6 @@ export default function MatchModalSearchForm({
             <IconButton
               type="submit"
               variant="secondary"
-              className={styles['organizer-match-modal__search-button']}
               disabled={isSearching}
               label={isSearching ? t('organizer.details.matchModal.searching') : t('common.search')}
               title={null}

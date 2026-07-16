@@ -26,34 +26,42 @@ class LibraryFilterService:
         
         lib_statuses = [ItemStatus.ORGANIZED, ItemStatus.RENAMED]
         
-        # Use query builders to dynamically construct the filtered MetadataMatch IDs list
-        if tab == "movies":
-            from app.domains.library.services.listing.builders.movie import MovieQueryBuilder
-            q, _, _ = MovieQueryBuilder(self.db).build_query(params)
-            match_ids_subquery = q.with_entities(MetadataMatch.id).scalar_subquery()
-        elif tab in ("scenes", "adult_scenes"):
-            from app.domains.library.services.listing.builders.scene import SceneQueryBuilder
-            q, _, _ = SceneQueryBuilder(self.db).build_query(params)
-            match_ids_subquery = q.with_entities(MetadataMatch.id).scalar_subquery()
-        elif tab in ("tv", "series", "tv_shows", "adult_tv", "adult_series"):
-            from app.domains.library.services.listing.builders.tv import TvQueryBuilder
-            q, _, _ = TvQueryBuilder(self.db).build_query(params)
-            match_ids_subquery = q.with_entities(MetadataMatch.id).scalar_subquery()
-        elif tab in ("videos", "adult_videos"):
-            from app.domains.library.services.listing.builders.video import VideoQueryBuilder
-            q, _, _ = VideoQueryBuilder(self.db).build_query(params)
-            match_ids_subquery = q.with_entities(MetadataMatch.id).scalar_subquery()
-        else:
-            # Fallback static query if tab is unknown
-            match_ids_subquery = select(MetadataMatch.id).join(MediaItem).filter(
-                MediaItem.status.in_(lib_statuses),
-                MetadataMatch.is_active,
-                MetadataMatch.is_adult == is_adult
-            ).scalar_subquery()
+        def get_subquery(exclude_fields=None):
+            import copy
+            p_copy = copy.copy(params)
+            if exclude_fields:
+                for field in exclude_fields:
+                    if hasattr(p_copy, field):
+                        setattr(p_copy, field, None)
+
+            if tab == "movies":
+                from app.domains.library.services.listing.builders.movie import MovieQueryBuilder
+                q, _, _ = MovieQueryBuilder(self.db).build_query(p_copy)
+                return q.with_entities(MetadataMatch.id).scalar_subquery()
+            elif tab in ("scenes", "adult_scenes"):
+                from app.domains.library.services.listing.builders.scene import SceneQueryBuilder
+                q, _, _ = SceneQueryBuilder(self.db).build_query(p_copy)
+                return q.with_entities(MetadataMatch.id).scalar_subquery()
+            elif tab in ("tv", "series", "tv_shows", "adult_tv", "adult_series"):
+                from app.domains.library.services.listing.builders.tv import TvQueryBuilder
+                q, _, _ = TvQueryBuilder(self.db).build_query(p_copy)
+                return q.with_entities(MetadataMatch.id).scalar_subquery()
+            elif tab in ("videos", "adult_videos"):
+                from app.domains.library.services.listing.builders.video import VideoQueryBuilder
+                q, _, _ = VideoQueryBuilder(self.db).build_query(p_copy)
+                return q.with_entities(MetadataMatch.id).scalar_subquery()
+            else:
+                return select(MetadataMatch.id).join(MediaItem).filter(
+                    MediaItem.status.in_(lib_statuses),
+                    MetadataMatch.is_active,
+                    MetadataMatch.is_adult == is_adult
+                ).scalar_subquery()
+
+        match_ids_subquery = get_subquery()
             
         # 1. Fetch years
         query_years = self.db.query(MetadataMatch.release_date).filter(
-            MetadataMatch.id.in_(match_ids_subquery),
+            MetadataMatch.id.in_(get_subquery(["selected_year", "selected_decade"])),
             MetadataMatch.release_date.isnot(None)
         ).distinct().all()
         
@@ -62,7 +70,7 @@ class LibraryFilterService:
         # 2. Fetch genres
         from app.shared_kernel.genre_utils import split_genres as _split_genres
         query_genres = self.db.query(MetadataLocalization.genres).filter(
-            MetadataLocalization.match_id.in_(match_ids_subquery),
+            MetadataLocalization.match_id.in_(get_subquery(["selected_genre"])),
             MetadataLocalization.genres.isnot(None)
         ).all()
         
@@ -202,7 +210,7 @@ class LibraryFilterService:
             performers_query = self.db.query(Person.id, Person.name).join(
                 MediaPersonLink, MediaPersonLink.person_id == Person.id
             ).filter(
-                MediaPersonLink.match_id.in_(match_ids_subquery)
+                MediaPersonLink.match_id.in_(get_subquery(["selected_performer_id"]))
             )
 
             if gender_pref == "female":
@@ -216,7 +224,7 @@ class LibraryFilterService:
             active_studios = self.db.query(Studio).join(
                 Studio.matches
             ).filter(
-                MetadataMatch.id.in_(match_ids_subquery)
+                MetadataMatch.id.in_(get_subquery(["selected_studio_id"]))
             ).distinct().all()
             
             studio_map = {}
@@ -272,7 +280,7 @@ class LibraryFilterService:
             active_networks = self.db.query(Studio).join(
                 metadata_match_studios, metadata_match_studios.c.studio_id == Studio.id
             ).filter(
-                metadata_match_studios.c.metadata_match_id.in_(match_ids_subquery),
+                metadata_match_studios.c.metadata_match_id.in_(get_subquery(["selected_network_id"])),
                 metadata_match_studios.c.relation_type == 'network'
             ).distinct().all()
             networks = [{"id": n.id, "name": n.name} for n in active_networks]

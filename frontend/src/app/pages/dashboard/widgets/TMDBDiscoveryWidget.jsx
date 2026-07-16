@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from '@/ui/icons';
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';

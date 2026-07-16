@@ -1,14 +1,22 @@
-import './PageHeader.css';
+import PropTypes from 'prop-types';
+import styles from './PageHeader.module.css';
 
 export default function PageHeader({ eyebrow, title, description, actions }) {
   return (
-    <header className="page-header">
-      <div>
-        {eyebrow ? <div className="page-header__eyebrow">{eyebrow}</div> : null}
-        <h1 className="page-header__title">{title}</h1>
-        {description ? <p className="page-header__description">{description}</p> : null}
+    <header className={styles.root}>
+      <div className={styles['title-wrapper']}>
+        {eyebrow ? <div className={styles.eyebrow}>{eyebrow}</div> : null}
+        <h1 className={styles.title}>{title}</h1>
+        {description ? <p className={styles.description}>{description}</p> : null}
       </div>
-      {actions ? <div className="page-header__actions">{actions}</div> : null}
+      {actions ? <div className={styles.actions}>{actions}</div> : null}
     </header>
   );
 }
+
+PageHeader.propTypes = {
+  eyebrow: PropTypes.node,
+  title: PropTypes.node.isRequired,
+  description: PropTypes.node,
+  actions: PropTypes.node,
+};

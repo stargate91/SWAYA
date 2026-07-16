@@ -524,7 +524,6 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
             <div className={`${styles['organizer-override-bulk-episodes__list']} ${styles['organizer-override-bulk-episodes__list--sidebar']}`}>
               {orderedItems.map((item, index) => {
                 return (
-                  // eslint-disable-next-line jsx-a11y/no-static-element-interactions
                   <Inline
                     key={item.id}
                     draggable

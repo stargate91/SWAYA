@@ -1,5 +1,5 @@
 import PageHeader from './PageHeader';
-import './Page.css';
+import styles from './Page.module.css';
 
 export default function Page({
   eyebrow,
@@ -12,10 +12,16 @@ export default function Page({
   className = '',
   children,
 }) {
+  const classes = [
+    styles.root,
+    centered && styles.centered,
+    contentBottom && styles['content-bottom'],
+    viewport && styles.viewport,
+    className,
+  ].filter(Boolean).join(' ');
+
   return (
-    <div
-      className={`ui-page${centered ? ' ui-page--centered' : ''}${contentBottom ? ' ui-page--content-bottom' : ''}${viewport ? ' ui-page--viewport' : ''} ${className}`.trim()}
-    >
+    <div className={classes} data-viewport={viewport || undefined}>
       {(title || description || eyebrow || actions) ? (
         <PageHeader
           eyebrow={eyebrow}

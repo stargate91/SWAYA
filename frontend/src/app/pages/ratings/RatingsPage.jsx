@@ -11,9 +11,11 @@ import Skeleton from '@/ui/Skeleton';
 import SegmentedRating from '@/ui/SegmentedRating';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useRatingsPageState } from './useRatingsPageState';
+import { useDebounce } from '@/hooks/useDebounce';
 import LibraryPagination from '../library/components/LibraryPagination';
 import RatingsReviewDrawer from './components/RatingsReviewDrawer';
-import { useDebounce } from '@/hooks/useDebounce';
+import { resolveMediaImageUrl } from '@/lib/imageUrls';
+import ImageTooltip from '@/ui/ImageTooltip';
 import styles from './RatingsPage.module.css';
 import Inline from '@/ui/Inline';
 
@@ -22,6 +24,43 @@ export default function RatingsPage() {
   const { t } = useTranslation();
   const state = useRatingsPageState();
   const isAdultMode = state.activeSessionMode === 'nsfw';
+
+  // Tooltip state
+  const [tooltipRow, setTooltipRow] = useState(null);
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [tooltipInitialCoords, setTooltipInitialCoords] = useState({ x: 0, y: 0 });
+  const tooltipRef = useRef(null);
+
+  const handleMouseEnter = (e, row) => {
+    setTooltipRow(row);
+    setTooltipInitialCoords({ x: e.clientX, y: e.clientY });
+    setTooltipVisible(true);
+  };
+
+  const handleMouseMove = (e) => {
+    if (tooltipRef.current) {
+      tooltipRef.current.style.transform = `translate3d(${e.clientX + 15}px, ${e.clientY + 15}px, 0)`;
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setTooltipVisible(false);
+    setTooltipRow(null);
+  };
+
+  const getTooltipImageUrl = () => {
+    if (!tooltipRow) return null;
+    if (state.mediaType === 'people') {
+      return tooltipRow.profile_path ? resolveMediaImageUrl(tooltipRow.profile_path, 'poster') : null;
+    }
+    if (state.mediaType === 'scenes' || state.mediaType === 'videos') {
+      return tooltipRow.still_path ? resolveMediaImageUrl(tooltipRow.still_path, 'backdrop') : (tooltipRow.backdrop ? resolveMediaImageUrl(tooltipRow.backdrop, 'backdrop') : null);
+    }
+    return tooltipRow.poster_path ? resolveMediaImageUrl(tooltipRow.poster_path, 'poster') : null;
+  };
+
+  const tooltipImageUrl = getTooltipImageUrl();
+  const tooltipAspect = (state.mediaType === 'scenes' || state.mediaType === 'videos') ? 'landscape' : 'poster';
 
   // Review Drawer state
   const [editingItem, setEditingItem] = useState(null);
@@ -110,6 +149,9 @@ export default function RatingsPage() {
                 handleClick();
               }
             }}
+            onMouseEnter={(e) => handleMouseEnter(e, row)}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
           >
             {row.name || row.title || row.displayTitle}
           </span>
@@ -268,6 +310,14 @@ export default function RatingsPage() {
         setReviewText={setReviewText}
         handleSaveReview={handleSaveReview}
         t={t}
+      />
+      <ImageTooltip
+        ref={tooltipRef}
+        imageUrl={tooltipImageUrl}
+        visible={tooltipVisible}
+        x={tooltipInitialCoords.x}
+        y={tooltipInitialCoords.y}
+        aspect={tooltipAspect}
       />
     </Page>
   );

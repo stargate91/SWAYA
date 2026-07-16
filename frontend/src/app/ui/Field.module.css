@@ -1,18 +1,22 @@
 /* Common Form Field Layout Styles */
-.ui-field {
+.field {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
 }
 
-.ui-field__label {
+.label {
   color: var(--color-muted);
   font: var(--text-caption);
   letter-spacing: calc(2 * var(--letter-spacing-wide));
   text-transform: uppercase;
 }
 
-.ui-field__hint {
+.required {
+  color: var(--color-state-danger);
+}
+
+.hint {
   color: var(--color-muted);
   font: var(--text-caption);
   text-transform: none;
@@ -20,13 +24,13 @@
   margin-top: calc(var(--space-xs) / 2);
 }
 
-.ui-field__error {
+.error {
   margin-top: var(--space-sm);
   font-size: var(--font-size-xs);
   color: var(--color-state-danger);
 }
 
-.ui-field__sr-only {
+.sr-only {
   position: absolute;
   width: 0.0625rem;
   height: 0.0625rem;
@@ -37,4 +41,3 @@
   white-space: nowrap;
   border: 0;
 }
-

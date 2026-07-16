@@ -16,7 +16,7 @@ export function createAdultGeneralSection(t, adultGenderPreferenceOptions) {
         field: 'include_adult',
         id: 'include_adult',
         hint: t('settingsPage.sections.adult.includeAdultHint'),
-        hintClassName: 'ui-field__hint settings-hint--spaced',
+        hintClassName: 'settings-field-hint settings-hint--spaced',
         children: (
           <Inline gap="sm" align="center" className="settings-inline-switch">
             <span>{t('settingsPage.sections.adult.includeAdult')}</span>

@@ -22,6 +22,7 @@ class BaseQueryBuilder:
         from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
         settings_port = DbSettingsAdapter(self.db)
         self.ui_lang = get_user_ui_language(settings_port)
+        self.loc_alias = aliased(MetadataLocalization, name="search_loc")
 
     def _apply_common_filters(
         self,
@@ -37,30 +38,33 @@ class BaseQueryBuilder:
         if params.search:
             if not joined_localization:
                 from sqlalchemy import case
-                from sqlalchemy.orm import aliased
-                loc_alias = aliased(MetadataLocalization, name="search_loc")
                 target_locale = case(
                     (MetadataMatch.provider == Provider.TMDB, self.ui_lang),
                     else_="en"
                 )
-                query = query.outerjoin(loc_alias, and_(
-                    loc_alias.match_id == MetadataMatch.id,
-                    loc_alias.locale == target_locale
+                query = query.outerjoin(self.loc_alias, and_(
+                    self.loc_alias.match_id == MetadataMatch.id,
+                    self.loc_alias.locale == target_locale
                 ))
                 joined_localization = True
             if params.filter_ownership == "tracked":
-                query = query.filter(loc_alias.title.ilike(f"%{params.search}%"))
+                query = query.filter(
+                    or_(
+                        self.loc_alias.title.ilike(f"%{params.search}%"),
+                        MetadataMatch.original_title.ilike(f"%{params.search}%")
+                    )
+                )
             else:
                 query = query.filter(
                     or_(
-                        loc_alias.title.ilike(f"%{params.search}%"),
+                        self.loc_alias.title.ilike(f"%{params.search}%"),
+                        MetadataMatch.original_title.ilike(f"%{params.search}%"),
                         MediaItem.filename.ilike(f"%{params.search}%")
                     )
                 )
 
         # Favorite and Watched filters
         if params.filter_favorite in ("favorite", "not_favorite") or params.filter_watched in ("watched", "unwatched"):
-            from sqlalchemy.orm import aliased
             override_match = aliased(UserOverride, name="filter_override_match")
             override_item = aliased(UserOverride, name="filter_override_item")
             
@@ -94,18 +98,16 @@ class BaseQueryBuilder:
         if params.selected_genre:
             if not joined_localization:
                 from sqlalchemy import case
-                from sqlalchemy.orm import aliased
-                loc_alias = aliased(MetadataLocalization, name="search_loc")
                 target_locale = case(
                     (MetadataMatch.provider == Provider.TMDB, self.ui_lang),
                     else_="en"
                 )
-                query = query.outerjoin(loc_alias, and_(
-                    loc_alias.match_id == MetadataMatch.id,
-                    loc_alias.locale == target_locale
+                query = query.outerjoin(self.loc_alias, and_(
+                    self.loc_alias.match_id == MetadataMatch.id,
+                    self.loc_alias.locale == target_locale
                 ))
                 joined_localization = True
-            query = query.filter(loc_alias.genres.like(f'%"{params.selected_genre}"%'))
+            query = query.filter(self.loc_alias.genres.like(f'%"{params.selected_genre}"%'))
 
         # Decade filter
         if params.selected_decade and params.selected_decade.endswith("s") and params.selected_decade[:-1].isdigit():
@@ -154,15 +156,13 @@ class BaseQueryBuilder:
         if params.sort_by in ("title_asc", "title_desc", "default"):
             if not joined_localization:
                 from sqlalchemy import case
-                from sqlalchemy.orm import aliased
-                loc_alias = aliased(MetadataLocalization, name="search_loc")
                 target_locale = case(
                     (MetadataMatch.provider == Provider.TMDB, self.ui_lang),
                     else_="en"
                 )
-                query = query.outerjoin(loc_alias, and_(
-                    loc_alias.match_id == MetadataMatch.id,
-                    loc_alias.locale == target_locale
+                query = query.outerjoin(self.loc_alias, and_(
+                    self.loc_alias.match_id == MetadataMatch.id,
+                    self.loc_alias.locale == target_locale
                 ))
                 joined_localization = True
             
@@ -177,7 +177,7 @@ class BaseQueryBuilder:
                 override_item.user_id == self.current_user_id
             ))
             
-            val_col = func.coalesce(override_match.custom_title, override_item.custom_title, loc_alias.title, MediaItem.filename)
+            val_col = func.coalesce(override_match.custom_title, override_item.custom_title, self.loc_alias.title, MediaItem.filename)
             if params.sort_by == "title_desc":
                 query = query.order_by(desc(val_col))
             else:
@@ -412,7 +412,6 @@ class BaseQueryBuilder:
                 # Check if all episodes in metadata are watched.
                 # Find all MetadataMatch entries of type EPISODE belonging to this TV show
                 # and count how many are marked as watched.
-                from sqlalchemy.orm import aliased
                 parent_season = aliased(MetadataMatch)
                 
                 # 1. Get all episode matches for this TV show

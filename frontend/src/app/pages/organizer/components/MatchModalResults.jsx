@@ -18,13 +18,19 @@ export default function MatchModalResults({
   hasSearched,
   view,
 }) {
+  const isScene = mode === 'scene' || visibleResultCandidates.some(c => c.type === 'scene' || c.media_type === 'scene');
+
   return (
     <>
       {shouldShowPosterResults ? (
         <ScrollRow
           enableWheelScroll
           showArrows
-          className={`${styles['organizer-match-modal__poster-results']} ${mode === 'scene' || visibleResultCandidates.some(c => c.type === 'scene' || c.media_type === 'scene') ? styles['is-scene'] : ''}`}
+          className={styles['organizer-match-modal__poster-results']}
+          /* eslint-disable-next-line react/forbid-component-props */
+          style={{
+            gridAutoColumns: isScene ? 'minmax(17.5rem, 20rem)' : 'minmax(8.25rem, 9.75rem)',
+          }}
         >
           {visibleResultCandidates.map((candidate) => (
             <MatchCandidateCard

@@ -24,26 +24,12 @@
   min-width: 0;
 }
 
-/* Base Arrow styling copied from global ui-carousel-arrow for full modular isolation */
+/* Base Arrow layout positioning */
 .arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   z-index: var(--z-index-step-20);
-  width: 2.5rem;
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--color-border-default);
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--color-bg-elevated) 45%, var(--color-surface-glass-strong));
-  box-shadow: var(--shadow-sm-strong);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
-  cursor: pointer;
-  transition: background-color var(--motion-duration-fast) var(--motion-ease-standard), opacity var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 .arrow.is-hidden {
@@ -59,21 +45,10 @@
   right: 0.625rem;
 }
 
-.arrow:hover {
-  background: var(--color-surface-glass-heavy);
-  color: var(--color-text-primary);
-  border-color: var(--color-border-strong);
-  transform: translateY(-50%);
-}
-
 /* ScrollRow-specific size-sm overrides */
 .container--size-sm .arrow {
   width: 1.625rem;
   height: 1.625rem;
-  background: color-mix(in srgb, var(--color-bg-elevated) 55%, var(--color-surface-glass-strong));
-  border: 1px solid var(--color-border-default);
-  box-shadow: var(--shadow-xs);
-  color: var(--color-text-secondary);
   opacity: 0.85;
 }
 
@@ -82,17 +57,6 @@
   position: static;
   transform: none;
   flex-shrink: 0;
-}
-
-.container--size-sm .arrow:hover {
-  background: var(--color-surface-glass-heavy);
-  color: var(--color-text-primary);
-  border-color: var(--color-border-strong);
-  opacity: 1;
-}
-
-.container--layout-column .arrow:hover {
-  transform: none;
 }
 
 .container--size-sm .arrow.is-left {

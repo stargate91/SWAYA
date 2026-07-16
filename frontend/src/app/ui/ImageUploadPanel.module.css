@@ -1,4 +1,4 @@
-.universal-image-picker__upload-panel {
+.panel {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
@@ -6,36 +6,36 @@
   transition: background-color var(--motion-fast), border-color var(--motion-fast);
 }
 
-.universal-image-picker__upload-panel.is-dragging {
+.panel.dragging {
   border: 2px dashed var(--color-accent);
   background: color-mix(in srgb, var(--color-accent) 8%, transparent);
   border-radius: var(--radius-lg);
   padding: var(--space-md);
 }
 
-.universal-image-picker__file-input {
+.file-input {
   display: none;
 }
 
-.universal-image-picker__url-row {
+.url-row {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);
   width: 100%;
 }
 
-.universal-image-picker__url-input {
+.url-input {
   flex: 1 1 auto;
   min-width: 0;
 }
 
-.universal-image-picker__save-button,
-.universal-image-picker__upload-button {
+.save-button,
+.upload-button {
   flex: 1 1 0;
   justify-content: center;
 }
 
-.universal-image-picker__upload-status {
+.upload-status {
   display: flex;
   align-items: center;
   gap: var(--space-md);
@@ -43,7 +43,7 @@
   padding-top: var(--space-xs);
 }
 
-.universal-image-picker__preview {
+.preview {
   width: var(--space-7xl);
   height: 6.75rem;
   overflow: hidden;
@@ -53,58 +53,58 @@
   flex: 0 0 auto;
 }
 
-.universal-image-picker__preview.is-logo {
+.preview.logo {
   width: 7rem;
   height: var(--space-6xl);
 }
 
-.universal-image-picker__preview.is-backdrop {
+.preview.backdrop {
   width: 8rem;
   height: var(--space-7xl);
 }
 
-.universal-image-picker__preview.is-square {
+.preview.square {
   width: var(--space-7xl);
   height: var(--space-7xl);
 }
 
-.universal-image-picker__preview-image {
+.preview-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.universal-image-picker__status-copy {
+.status-copy {
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
   min-width: 0;
 }
 
-.universal-image-picker__status-copy strong,
-.universal-image-picker__status-copy span {
+.status-copy strong,
+.status-copy span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.universal-image-picker__status-copy strong {
+.status-copy strong {
   color: var(--modal-title-color);
 }
 
-.universal-image-picker__status-copy span {
+.status-copy span {
   font-size: 0.82rem;
   color: var(--modal-description-color);
 }
 
 @media (max-width: 45rem) {
-  .universal-image-picker__url-row {
+  .url-row {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .universal-image-picker__save-button,
-  .universal-image-picker__upload-button {
+  .save-button,
+  .upload-button {
     width: 100%;
     justify-content: center;
   }

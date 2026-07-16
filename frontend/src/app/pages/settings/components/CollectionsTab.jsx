@@ -53,7 +53,7 @@ export default function CollectionsTab({
         >
           {t('settingsPage.sections.collections.createCollectionDir')}
         </Switch>
-        <span className="ui-field__hint settings-hint--spaced">
+        <span className="settings-field-hint settings-hint--spaced">
           {t('settingsPage.sections.collections.createCollectionDirHint')}
         </span>
 

@@ -212,9 +212,6 @@
   margin: 0;
 }
 
-.recommend-carousel-filters {
-}
-
 .recommend-carousel-filter-genre {
   width: calc(4 * var(--space-4xl));
   /* 10rem */

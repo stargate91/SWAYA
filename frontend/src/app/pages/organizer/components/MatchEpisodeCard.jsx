@@ -6,7 +6,7 @@ import PosterCard from '../../../ui/PosterCard';
 import CardMetadata from '../../../ui/CardMetadata';
 import Button from '../../../ui/Button';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
-import styles from '../MatchModal.module.css';
+import styles from './MatchEpisodeCard.module.css';
 import Inline from '../../../ui/Inline';
 
 export default function MatchEpisodeCard({
@@ -32,9 +32,8 @@ export default function MatchEpisodeCard({
   }, [isHighlighted]);
 
   const subtitleNode = (
-    <Inline align="center" gap="sm" className={styles['organizer-match-modal__browser-card-meta-row']}>
+    <Inline align="center" gap="sm" justify="between" className={styles['meta-row']}>
       <CardMetadata.Row
-        className={styles['organizer-match-modal__browser-card-meta']}
         items={[
           `E${episodeEntry.episode_number}`,
           episodeEntry.air_date ? String(episodeEntry.air_date).slice(0, 10) : null,
@@ -44,8 +43,11 @@ export default function MatchEpisodeCard({
         type="button"
         variant="ghost"
         size="sm"
-        className={styles['organizer-match-modal__select-button']}
-        onClick={() => onSelect(episodeEntry)}
+        className={styles['select-button']}
+        onClick={(e) => {
+          e.stopPropagation();
+          onSelect(episodeEntry);
+        }}
         disabled={isDisabled}
       >
         {t('common.select') || 'Select'}
@@ -56,7 +58,7 @@ export default function MatchEpisodeCard({
   const badgeNode = (
     <>
       {isBucketed && (
-        <div className={styles['organizer-match-modal__browser-card-bucket-indicator']}>
+        <div className={styles['bucket-indicator']}>
           <Check size={12} strokeWidth={3} />
         </div>
       )}
@@ -69,21 +71,19 @@ export default function MatchEpisodeCard({
   );
 
   return (
-    <div
+    <PosterCard
       ref={cardRef}
-      className={`${styles['organizer-match-modal__browser-card']} ${styles['organizer-match-modal__browser-card--episode']} ${isBucketed ? styles['is-selected'] : ''} ${isHighlighted ? styles['is-highlighted'] : ''}`.trim()}
-    >
-      <PosterCard
-        imageUrl={stillUrl}
-        icon={ENTITY_ICONS.episode}
-        title={episodeEntry.name || t('organizer.details.matchModal.episodeNum').replace('{number}', episodeEntry.episode_number)}
-        subtitle={subtitleNode}
-        onClick={() => onToggle(episodeEntry.episode_number)}
-        disabled={isDisabled}
-        active={isActive}
-        aspect="landscape"
-        overlay={badgeNode}
-      />
-    </div>
+      imageUrl={stillUrl}
+      icon={ENTITY_ICONS.episode}
+      title={episodeEntry.name || t('organizer.details.matchModal.episodeNum').replace('{number}', episodeEntry.episode_number)}
+      subtitle={subtitleNode}
+      onClick={() => onToggle(episodeEntry.episode_number)}
+      disabled={isDisabled}
+      active={isHighlighted}
+      selected={isBucketed}
+      aspect="landscape"
+      fluid={true}
+      overlay={badgeNode}
+    />
   );
 }

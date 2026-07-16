@@ -77,10 +77,6 @@
   border-right: 1px solid var(--ui-control-border);
 }
 
-.add-people-modal .add-people-modal__search-source .ui-field.ui-field {
-  margin: 0;
-}
-
 .add-people-modal .add-people-modal__search-source .ui-dropdown__trigger.ui-dropdown__trigger {
   border: none;
   background: transparent;

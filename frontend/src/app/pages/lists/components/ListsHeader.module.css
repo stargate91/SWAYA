@@ -77,16 +77,10 @@
   min-width: 0;
 }
 
-.lists-header__filter-wrapper {
-}
-
 .lists-header__meta-stack {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-}
-
-.lists-header__title-row {
 }
 
 .lists-header__icon-wrap {

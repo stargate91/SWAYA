@@ -10,7 +10,6 @@ export { default as MaintenanceTab } from './MaintenanceTab.jsx';
 export { default as PresetsTab } from './PresetsTab.jsx';
 export { default as ScenesTab } from './ScenesTab.jsx';
 export { default as SettingsActionBar } from './SettingsActionBar.jsx';
-export { default as SettingsChrome } from './SettingsChrome.jsx';
 export { default as SettingsErrorState } from './SettingsErrorState.jsx';
 export { default as SettingsLoadingState } from './SettingsLoadingState.jsx';
 export { default as SettingsLiveImpact } from './SettingsLiveImpact.jsx';

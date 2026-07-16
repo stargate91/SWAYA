@@ -27,7 +27,7 @@ export default function PresetsTab() {
         eyebrow={t('settingsPage.sections.mode.eyebrow')}
       >
         <div className={styles['settings-section-stack']}>
-          <span className="ui-field__hint settings-hint--tight-top">
+          <span className="settings-field-hint settings-hint--tight-top">
             {t('settingsPage.sections.mode.hint')}
           </span>
           <div className={presetStyles['settings-mode-grid']}>
@@ -89,8 +89,8 @@ export default function PresetsTab() {
         eyebrow={t('settingsPage.sections.organization.eyebrow')}
       >
         <div className={styles['settings-section-stack']}>
-          <span className="ui-field__label">{t('settingsPage.sections.organization.presetLabel')}</span>
-          <span className="ui-field__hint settings-hint--compact">
+          <span className="settings-field-label">{t('settingsPage.sections.organization.presetLabel')}</span>
+          <span className="settings-field-hint settings-hint--compact">
             {t('settingsPage.sections.organization.presetHint')}
           </span>
           <div className={presetStyles['settings-preset-grid']}>
@@ -136,7 +136,7 @@ export default function PresetsTab() {
                 {t('settingsPage.sections.organization.customToggleLabel')}
               </span>
             </Switch>
-            <span className="ui-field__hint settings-hint--indented">
+            <span className="settings-field-hint settings-hint--indented">
               {t('settingsPage.sections.organization.customToggleHint')}
             </span>
           </div>

@@ -9,6 +9,8 @@ import MatchModalResults from './components/MatchModalResults';
 import MatchModalBrowser from './components/MatchModalBrowser';
 import useMatchModalViewModel from './components/useMatchModalViewModel';
 import EmptyState from '../../ui/EmptyState';
+import Stack from '../../ui/Stack';
+import Inline from '../../ui/Inline';
 import styles from './MatchModal.module.css';
 
 function getInitialMatchEmptyState({ row, mode, t }) {
@@ -112,7 +114,7 @@ export default function OrganizerMatchModalContent({
   };
 
   return (
-    <div className={styles['organizer-match-modal']}>
+    <Stack gap="lg">
       <MatchModalSearchForm
         query={query}
         setQuery={setQuery}
@@ -136,7 +138,7 @@ export default function OrganizerMatchModalContent({
         providerOptions={providerOptions}
       />
 
-      <section className={styles['organizer-match-modal__section']}>
+      <Stack gap="md" as="section">
         {isBulk && !hasSearched && browserState.view === 'results' ? (
           <EmptyState
             size="md"
@@ -155,7 +157,7 @@ export default function OrganizerMatchModalContent({
           />
         ) : (
           <>
-            <div className={styles['organizer-match-modal__section-header']}>
+            <Stack gap="2xs">
               <strong>
                 {browserState.view === 'results'
                   ? (hasSearched
@@ -174,7 +176,7 @@ export default function OrganizerMatchModalContent({
                     ? t('organizer.details.matchModal.seasonsHint')
                     : t('organizer.details.matchModal.episodesHint')}
               </span>
-            </div>
+            </Stack>
 
             <MatchModalBrowserToolbar
               view={browserState.view}
@@ -200,24 +202,24 @@ export default function OrganizerMatchModalContent({
 
             {isBrowserLoading || isSearching ? (
               hasSearched ? (
-                <div className={styles['organizer-match-modal__skeleton-list-container']}>
+                <Stack gap="md">
                   {Array.from({ length: 3 }).map((_, idx) => (
-                    <div key={idx} className={styles['organizer-match-modal__skeleton-list-item']}>
+                    <Inline key={idx} gap="md" className={styles['organizer-match-modal__skeleton-list-item']}>
                       <Skeleton className={`${styles['organizer-match-modal__skeleton-image']} ${mode === 'scene' ? styles['organizer-match-modal__skeleton-image--scene'] : styles['organizer-match-modal__skeleton-image--poster']}`} variant="rect" />
                       <div className={styles['organizer-match-modal__skeleton-text-container']}>
                         <Skeleton className={styles['organizer-match-modal__skeleton-text-title']} variant="text" />
                         <Skeleton className={styles['organizer-match-modal__skeleton-text-subtitle']} variant="text" />
                         <Skeleton className={styles['organizer-match-modal__skeleton-text-body']} variant="text" />
                       </div>
-                    </div>
+                    </Inline>
                   ))}
-                </div>
+                </Stack>
               ) : (
-                <div className={styles['organizer-match-modal__skeleton-poster-container']}>
+                <Inline gap="md" className={styles['organizer-match-modal__skeleton-poster-container']}>
                   {Array.from({ length: 6 }).map((_, idx) => (
                     <Skeleton.Card key={idx} className={mode === 'scene' ? styles['organizer-match-modal__skeleton-card--scene'] : styles['organizer-match-modal__skeleton-card--poster']} />
                   ))}
-                </div>
+                </Inline>
               )
             ) : isResolvingId ? (
               <Spinner label={t('organizer.details.matchModal.applying')} />
@@ -255,7 +257,7 @@ export default function OrganizerMatchModalContent({
             />
           </>
         )}
-      </section>
+      </Stack>
 
       <MatchModalConfirmDialog
         confirmState={confirmState}
@@ -265,6 +267,6 @@ export default function OrganizerMatchModalContent({
         onConfirm={handleConfirmMatch}
         t={t}
       />
-    </div>
+    </Stack>
   );
 }

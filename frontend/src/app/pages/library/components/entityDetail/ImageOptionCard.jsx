@@ -16,6 +16,7 @@ export default function ImageOptionCard({
       onClick={onClick}
       className={`scene-image-picker-card ${className}`.trim()}
       as="div"
+      variant="picker"
     >
       <div className={`scene-image-picker-img-wrapper ${aspect === 'backdrop' ? 'backdrop-variant' : ''} ${imgClassName}`.trim()}>
         {imageUrl ? (

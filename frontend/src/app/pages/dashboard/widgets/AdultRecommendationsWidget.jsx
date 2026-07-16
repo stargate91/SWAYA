@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { useSettingsQuery } from '../../../queries/settingsQueries';
 import {
   useRecommendationsQuery,

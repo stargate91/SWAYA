@@ -52,7 +52,7 @@
   padding: 0 var(--space-sm);
 }
 
-.size.isActive {
+.size.is-active {
   color: var(--color-accent-blue);
   border-color: color-mix(in srgb, var(--color-accent-blue) 55%, transparent);
   background: color-mix(in srgb, var(--color-accent-blue) 14%, transparent);
@@ -113,7 +113,7 @@
   border-radius: var(--radius-sm);
 }
 
-.modes .button.isActive {
+.modes .button.is-active {
   background: var(--color-surface-card);
   color: var(--color-accent-blue);
   box-shadow: var(--shadow-sm);

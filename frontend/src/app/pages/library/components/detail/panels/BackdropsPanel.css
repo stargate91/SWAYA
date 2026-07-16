@@ -4,10 +4,6 @@
   gap: var(--space-lg);
 }
 
-.backdrops-panel :global(.ui-selectable-card) {
-  contain: paint;
-}
-
 .backdrops-panel__empty {
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);

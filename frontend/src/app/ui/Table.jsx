@@ -67,13 +67,13 @@ const TableRow = memo(function TableRow({
     <tr
       onClick={onRowClick ? () => onRowClick(row) : undefined}
       onContextMenu={onContextMenu ? (e) => onContextMenu(e, row) : undefined}
-      className={`${onRowClick ? styles.isClickable : ''} ${activeRowId === row.id ? styles.isActive : ''}`.trim()}
+      className={`${onRowClick ? styles['is-clickable'] : ''} ${activeRowId === row.id ? styles['is-active'] : ''}`.trim()}
     >
       {columns.map((col) => {
         const rawValue = row[col.key];
         const renderedValue = col.render ? col.render(rawValue, row) : rawValue;
         const hasActionsInCell = visibleRowActions.length > 0 && col.key === lastColumnKey;
-        const hideOnHoverClass = (hasActionsInCell || col.hideOnHover) ? styles.hideOnHover : '';
+        const hideOnHoverClass = (hasActionsInCell || col.hideOnHover) ? styles['hide-on-hover'] : '';
         const isEmpty = renderedValue === undefined || renderedValue === null || renderedValue === '';
         const alignClass = col.align === 'center' ? styles['align-center'] : col.align === 'right' ? styles['align-right'] : '';
         const tdClass = `${alignClass} ${col.className || ''}`.trim();
@@ -100,7 +100,7 @@ const TableRow = memo(function TableRow({
                 /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
                 <div className={styles['row-actions']} onClick={(event) => event.stopPropagation()}>
                   {visibleRowActions.map((action) => {
-                    const actionClass = `${styles['row-action']} ${action.className === 'is-danger' ? styles.isDanger : (action.className || '')
+                    const actionClass = `${styles['row-action']} ${action.className === 'is-danger' ? styles['is-danger'] : (action.className || '')
                       }`.trim();
                     return (
                       <Tooltip key={action.key} content={action.tooltip || action.label} side="top">
@@ -260,7 +260,7 @@ export default function Table({
         />
         <tbody>
           {rows.length === 0 ? (
-            <tr className={styles.isEmpty}>
+            <tr className={styles['is-empty']}>
               <td colSpan={columns.length} className={styles.empty}>
                 {emptyContent || <EmptyState size="sm" border="none" background="none" title={displayEmptyText} />}
               </td>

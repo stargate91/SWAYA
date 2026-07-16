@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Input from '@/ui/Input';
 import Radio from '@/ui/Radio';
 import Tooltip from '@/ui/Tooltip';
+import Field from '@/ui/Field';
 import styles from './CreateListModalContent.module.css';
 
 const PRESET_COLORS = [
@@ -69,33 +70,25 @@ export default function CreateListModalContent({
 
   return (
     <form id="create-list-form" onSubmit={handleSubmit} className={styles['create-list-form']}>
-      <div className="ui-field">
-        <label className="ui-field__label" htmlFor="list-name">
-          {t('lists.name_label') || 'Name'}
-        </label>
-        <Input
-          id="list-name"
-          type="text"
-          value={name}
-          onChange={(e) => {
-            setName(e.target.value);
-            setError('');
-          }}
-          placeholder={t('lists.name_placeholder') || 'List name...'}
-          autoFocus
-          required
-        />
-        {error && (
-          <span className={`ui-field__error-text ${styles['create-list-form__error']}`}>
-            {error}
-          </span>
-        )}
-      </div>
+      <Input
+        id="list-name"
+        type="text"
+        label={t('lists.name_label') || 'Name'}
+        value={name}
+        onChange={(e) => {
+          setName(e.target.value);
+          setError('');
+        }}
+        placeholder={t('lists.name_placeholder') || 'List name...'}
+        autoFocus
+        required
+        error={error}
+      />
 
-      <div className="ui-field">
-        <label className="ui-field__label" htmlFor="list-desc">
-          {t('lists.description_label') || 'Description'}
-        </label>
+      <Field
+        label={t('lists.description_label') || 'Description'}
+        htmlFor="list-desc"
+      >
         <textarea
           id="list-desc"
           className={`ui-input ${styles['create-list-form__desc-textarea']}`}
@@ -103,12 +96,9 @@ export default function CreateListModalContent({
           onChange={(e) => setDescription(e.target.value)}
           placeholder={t('lists.desc_placeholder') || 'Description...'}
         />
-      </div>
+      </Field>
 
-      <div className="ui-field">
-        <label className="ui-field__label">
-          {t('lists.type_label') || 'List Type'}
-        </label>
+      <Field label={t('lists.type_label') || 'List Type'}>
         <div className={styles['create-list-form__type-radio-group']}>
           <Radio
             name="listType"
@@ -129,12 +119,9 @@ export default function CreateListModalContent({
             {t('lists.type_person') || 'People'}
           </Radio>
         </div>
-      </div>
+      </Field>
 
-      <div className="ui-field">
-        <label className="ui-field__label">
-          {t('lists.theme_color_label') || 'Theme Color'}
-        </label>
+      <Field label={t('lists.theme_color_label') || 'Theme Color'}>
         <div className={styles['create-list-form__colors']}>
           {PRESET_COLORS.map((c) => {
             const isSelected = color === c;
@@ -149,7 +136,7 @@ export default function CreateListModalContent({
             );
           })}
         </div>
-      </div>
+      </Field>
     </form>
   );
 }

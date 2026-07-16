@@ -9,8 +9,7 @@
     border-bottom: 0.0625rem solid var(--color-line);
   }
 
-  .shell__utility-bar,
-  .page-header {
+  .shell__utility-bar {
     flex-direction: column;
     align-items: stretch;
   }

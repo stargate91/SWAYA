@@ -3,6 +3,7 @@ import PaginationBar from '../../ui/PaginationBar';
 import Spinner from '../../ui/Spinner';
 import Table from '../../ui/Table';
 import FileDropZone from '../../ui/FileDropZone';
+import Stack from '../../ui/Stack';
 import { usePaginationVisibility } from '../../hooks/usePaginationVisibility';
 import { useOrganizerModals } from './useOrganizerModals';
 import styles from './OrganizerResultsPanel.module.css';
@@ -45,34 +46,30 @@ export default function OrganizerResultsPanel({
 
   return (
     <FileDropZone
-      className={styles['organizer-results']}
+      fill={true}
       onDropPaths={onDropPaths}
       disabled={isDropzoneDisabled}
       label={dropOverlayLabel}
       description={dropOverlayDescription}
     >
       {loadingState ? (
-        <div className={`${styles['organizer-results']} ${styles['organizer-results--empty']}`}>
-          <div className={`${styles['organizer-empty-state']} ${styles['organizer-empty-state--loading']}`}>
-            <Spinner
-              className={styles['organizer-spinner-state']}
-              label={loadingState.label}
-              description={loadingState.description}
-            />
-          </div>
-        </div>
+        <Stack fill align="center" justify="center">
+          <Spinner
+            label={loadingState.label}
+            description={loadingState.description}
+          />
+        </Stack>
       ) : emptyState ? (
-        <div className={`${styles['organizer-results']} ${styles['organizer-results--empty']}`}>
+        <Stack fill align="center" justify="center">
           <EmptyState
             actions={emptyActions}
-            className={styles['organizer-empty-state']}
             description={emptyState.description}
             icon={emptyState.icon}
             title={emptyState.title}
           />
-        </div>
+        </Stack>
       ) : (
-        <>
+        <Stack fill gap="xl">
           {bulkActionBar}
           {shouldShowPagination ? (
             <PaginationBar
@@ -88,8 +85,8 @@ export default function OrganizerResultsPanel({
             />
           ) : null}
 
-          <div className={styles['organizer-table-block']}>
-            <div className={styles['organizer-content']}>
+          <div className={styles['table-wrapper']}>
+            <Stack fill>
               <Table
                 columns={columns}
                 rows={rows}
@@ -105,9 +102,9 @@ export default function OrganizerResultsPanel({
                 dismissRows={dismissRows}
                 clearSelectedRows={clearSelectedRows}
               />
-            </div>
+            </Stack>
           </div>
-        </>
+        </Stack>
       )}
     </FileDropZone>
   );
