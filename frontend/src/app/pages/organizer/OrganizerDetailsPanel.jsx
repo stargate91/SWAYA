@@ -128,6 +128,7 @@ export default function OrganizerDetailsPanel({
         title: t('organizer.details.inspect.title'),
         description: t('organizer.details.inspect.description'),
         icon: FileJson,
+        variant: 'wide',
         content: (
           <pre className={styles['organizer-details__inspect-json']}>
             {inspectJson}
@@ -206,6 +207,7 @@ export default function OrganizerDetailsPanel({
                   activeRow?.rawType === 'scene' ? (
                     <PosterCard
                       aspect="landscape"
+                      disableHoverAnimation={true}
                       className={styles['organizer-details__backdrop-card']}
                       imageUrl={activeImageUrl}
                       onClick={activeImageUrl ? handleOpenLightbox : undefined}
@@ -214,6 +216,7 @@ export default function OrganizerDetailsPanel({
                     </PosterCard>
                   ) : (
                     <PosterCard
+                      disableHoverAnimation={true}
                       className={`${styles['organizer-details__poster-card']} ${activeImageUrl ? styles['has-image'] : ''}`}
                       imageUrl={activeImageUrl}
                       placeholderText={!activeImage ? t('organizer.details.posterPlaceholder') : undefined}

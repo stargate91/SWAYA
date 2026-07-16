@@ -35,38 +35,31 @@
 }
 
 /* Styling the Table component when placed inside the rename modal */
-.organizer-rename-modal__list-container :global(.ui-table-wrap--minimal) {
-  border: none;
-  background: transparent;
-}
-
-
-
-.organizer-rename-modal__list-container :global(.ui-table.ui-table--minimal) th {
+.modal-table th {
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-semibold);
 }
 
-.organizer-rename-modal__list-container :global(.ui-table.ui-table--minimal) td {
+.modal-table td {
   border-right: 1px solid var(--color-border-subtle);
 }
 
-.organizer-rename-modal__list-container :global(.ui-table.ui-table--minimal) td:last-child {
+.modal-table td:last-child {
   border-right: none;
 }
 
 /* Source column (original file) style */
-.organizer-rename-modal__list-container :global(.ui-table.ui-table--minimal) td:nth-child(1) {
+.source-column {
   color: var(--color-text-secondary);
 }
 
 /* Target column (proposed rename) style - highlight with accent color */
-.organizer-rename-modal__list-container :global(.ui-table.ui-table--minimal) td:nth-child(2) {
+.target-column {
   color: var(--color-accent-blue);
   font-weight: var(--font-weight-medium);
 }
 
-.organizer-rename-modal__list-container :global(.ui-table.ui-table--minimal) tbody tr:last-child td {
+.modal-table tbody tr:last-child td {
   border-bottom: none;
 }
 
@@ -78,7 +71,7 @@
 }
 
 .organizer-rename-modal__cell-text.is-organize-in-place,
-.organizer-rename-modal__list-container :global(.ui-table.ui-table--minimal) td:nth-child(2) .organizer-rename-modal__cell-text.is-organize-in-place {
+.target-column .organizer-rename-modal__cell-text.is-organize-in-place {
   opacity: 0.5;
   font-style: italic;
   color: var(--color-text-muted);

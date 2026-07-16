@@ -125,9 +125,7 @@
 }
 
 .organizer-details__backdrop-card:hover {
-  transform: translateY(var(--motion-lift-distance-md));
   border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-sm);
 }
 
 .organizer-details__poster-card.has-image {
@@ -136,8 +134,7 @@
 
 .organizer-details__poster-card.has-image:hover,
 .organizer-details__poster-card.has-image:focus-within {
-  transform: translateY(var(--motion-lift-distance-md));
-  box-shadow: var(--shadow-sm);
+  /* No shadow hover */
 }
 
 .organizer-details__poster-image {

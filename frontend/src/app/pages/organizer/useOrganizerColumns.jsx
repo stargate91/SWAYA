@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { ChevronUp, ChevronDown } from '../../ui/icons';
 import { buildOrganizerColumns } from './organizerTableConfig';
 import { useOrganizerModals } from './useOrganizerModals';
+import tableStyles from '../../ui/Table.module.css';
 
 export function useOrganizerColumns({
   activeExtrasTab,
@@ -24,7 +25,7 @@ export function useOrganizerColumns({
       return (
         <button
           type="button"
-          className="ui-table__sort-btn"
+          className={tableStyles['sort-btn']}
           data-sort-active={isActive}
           onClick={(e) => {
             e.stopPropagation();

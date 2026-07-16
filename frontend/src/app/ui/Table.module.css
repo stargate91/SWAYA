@@ -1,5 +1,5 @@
 /* Tables */
-.ui-table-wrap {
+.wrap {
   height: auto;
   max-height: 100%;
   min-height: 0;
@@ -9,52 +9,66 @@
   background: var(--color-surface-card);
 }
 
-.ui-table {
+.table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   table-layout: fixed;
 }
 
-.ui-table th,
-.ui-table td {
+.table th,
+.table td {
   padding: var(--space-sm) var(--space-lg);
   text-align: left;
   border-bottom: 1px solid var(--color-line);
   transition: background var(--motion-fast);
   white-space: nowrap;
-}
-
-.ui-table__cell--truncate {
+  vertical-align: middle;
   max-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.ui-table__cell-content {
+.cell-content {
   position: relative;
   min-height: calc(2 * var(--space-lg));
   display: flex;
   align-items: center;
+  min-width: 0;
+  width: 100%;
 }
 
-.ui-table td.text-center .ui-table__cell-content {
+.align-center {
+  text-align: center;
+}
+
+.align-center .cell-content {
   justify-content: center;
 }
 
-.ui-table__cell-value {
-  display: inline-flex;
-  align-items: center;
-  min-height: calc(2 * var(--space-lg));
-  min-width: 0;
+.align-right {
+  text-align: right;
 }
 
-.ui-table__cell-value.is-hidden {
+.align-right .cell-content {
+  justify-content: flex-end;
+}
+
+.cell-value {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  width: 100%;
+  line-height: calc(2 * var(--space-lg));
+}
+
+.cell-value.isHidden {
   visibility: hidden;
 }
 
-.ui-table th {
+.table th {
   position: sticky;
   top: 0;
   z-index: var(--z-index-sticky);
@@ -67,15 +81,7 @@
   backdrop-filter: blur(0.75rem);
 }
 
-.ui-table th.text-center {
-  text-align: center;
-}
-
-.ui-table th.text-right {
-  text-align: right;
-}
-
-.ui-table__sort-btn {
+.sort-btn {
   background: transparent;
   border: none;
   padding: 0;
@@ -88,78 +94,78 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  vertical-align: middle;
   gap: var(--space-sm);
   cursor: pointer;
   outline: none;
   transition: color var(--motion-fast);
 }
 
-.ui-table__sort-btn:hover,
-.ui-table__sort-btn:focus-visible {
+.sort-btn:hover,
+.sort-btn:focus-visible {
   color: var(--color-ink);
 }
 
-.ui-table__sort-btn[data-sort-active="true"] {
+.sort-btn[data-sort-active="true"] {
   color: var(--color-ink);
 }
 
-.ui-table.ui-table--minimal th,
-.ui-table.ui-table--minimal td {
+.table.table-minimal th,
+.table.table-minimal td {
   padding: var(--ui-table-cell-padding);
   font-size: var(--ui-table-cell-font-size);
 }
 
-.ui-table.ui-table--minimal th {
+.table.table-minimal th {
   background: var(--ui-table-header-bg);
   backdrop-filter: var(--ui-table-header-backdrop-filter);
   border-bottom: var(--ui-table-header-border-bottom);
-  padding-bottom: var(--ui-table-header-padding-bottom);
 }
 
-.ui-table.ui-table--minimal td {
+.table.table-minimal td {
   border-bottom: var(--ui-table-cell-border-bottom);
 }
 
-.ui-table tbody tr {
+.table tbody tr {
   transition: background-color var(--motion-fast);
 }
 
-.ui-table tbody tr:nth-child(even) {
+.table tbody tr:nth-child(even) {
   background: color-mix(in srgb, var(--color-line) 12%, transparent);
 }
 
-.ui-table.ui-table--minimal tbody tr:nth-child(even) {
+.table.table-minimal tbody tr:nth-child(even) {
   background: transparent;
 }
 
-.ui-table tbody tr.is-clickable {
+.table tbody tr.isClickable {
   cursor: pointer;
 }
 
-.ui-table tr:hover td:last-child {
+.table tr:hover td:last-child {
   overflow: visible;
 }
 
-.ui-table tbody tr.is-active {
+.table tbody tr.isActive {
   background: var(--table-row-active-bg);
 }
 
-.ui-table tbody tr.is-active td:first-child {
+.table tbody tr.isActive td:first-child {
   box-shadow: var(--table-row-active-shadow);
 }
 
-.ui-table tbody tr:not(.is-empty):hover td:first-child {
+.table tbody tr:not(.isEmpty):hover td:first-child {
   box-shadow: var(--table-row-hover-shadow);
 }
 
-.ui-table td.ui-table__empty {
+.table td.empty {
   text-align: center;
   color: var(--color-muted);
   padding: var(--space-sm) var(--space-lg);
   font-style: italic;
 }
 
-.ui-table__row-actions {
+.row-actions {
   position: absolute;
   right: 0;
   top: 0;
@@ -173,7 +179,7 @@
   background: transparent;
 }
 
-.ui-table__row-action {
+.row-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -187,51 +193,51 @@
   transition: var(--motion-fast);
 }
 
-.ui-table__row-action.is-danger {
+.row-action.isDanger {
   border-color: color-mix(in srgb, var(--color-state-danger) 22%, transparent);
   color: var(--color-accent-red-soft);
   background: color-mix(in srgb, var(--color-state-danger) 6%, transparent);
 }
 
-.ui-table__row-action:focus-visible {
+.row-action:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px var(--color-accent-blue);
 }
 
 /* Hover & Active hover states */
-.ui-table tbody tr:not(.is-empty):hover {
+.table tbody tr:not(.isEmpty):hover {
   background: var(--table-row-hover-bg);
 }
 
-.ui-table tbody tr.is-active:hover {
+.table tbody tr.isActive:hover {
   background: var(--table-row-active-hover-bg);
 }
 
-.ui-table tbody tr:hover .ui-table__row-actions {
+.table tbody tr:hover .row-actions {
   display: inline-flex;
 }
 
-.ui-table tbody tr:hover .ui-table__cell-value.hide-on-hover {
+.table tbody tr:hover .cell-value.hideOnHover {
   visibility: hidden;
 }
 
-.ui-table__row-action:hover {
+.row-action:hover {
   background: var(--color-surface-hover-strong);
   color: var(--color-ink);
 }
 
-.ui-table__row-action.is-danger:hover {
+.row-action.isDanger:hover {
   background: color-mix(in srgb, var(--color-state-danger) 14%, transparent);
   border-color: color-mix(in srgb, var(--color-state-danger) 36%, transparent);
   color: var(--color-text-primary);
 }
 
-.ui-table.ui-table--minimal tbody tr:hover {
+.table.table-minimal tbody tr:hover {
   background: color-mix(in srgb, var(--color-line) 6%, transparent);
 }
 
 /* Minimal Table Variant wrapper */
-.ui-table-wrap--minimal {
+.wrap-minimal {
   border: none;
   background: transparent;
   border-radius: var(--radius-none);

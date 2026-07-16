@@ -36,6 +36,7 @@ export default function OrganizerRenameModalContent({ items = [], t, organizeInP
       label: t('organizer.renameModal.currentFilename') || 'Current Filename',
       sortable: true,
       width: '45%',
+      className: styles['source-column'],
       render: (value, row) => (
         <Tooltip content={row.sourcePath} side="top" align="start">
           <span className={styles['organizer-rename-modal__cell-text']}>
@@ -49,6 +50,7 @@ export default function OrganizerRenameModalContent({ items = [], t, organizeInP
       label: t('organizer.renameModal.newFilename') || 'New Filename',
       sortable: true,
       width: '45%',
+      className: styles['target-column'],
       render: (value, row) => (
         <Tooltip content={organizeInPlace ? row.sourcePath : row.targetPath} side="top" align="start">
           <span className={`${styles['organizer-rename-modal__cell-text']} ${organizeInPlace ? styles['is-organize-in-place'] : ''}`}>
@@ -95,6 +97,7 @@ export default function OrganizerRenameModalContent({ items = [], t, organizeInP
       <div className={styles['organizer-rename-modal__list-container']}>
         <Table
           variant="minimal"
+          className={styles['modal-table']}
           columns={columns}
           rows={sortedItems}
           sortKey={sortConfig.key}

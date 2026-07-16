@@ -6,7 +6,7 @@ import Tooltip from './Tooltip';
 import IconButton from './IconButton';
 import ContextMenu from './ContextMenu';
 import { useContextMenu } from './useContextMenu';
-import './Table.css';
+import styles from './Table.module.css';
 
 function TableHeader({ columns, sortKey, sortDirection, onSort }) {
   return (
@@ -15,18 +15,20 @@ function TableHeader({ columns, sortKey, sortDirection, onSort }) {
         {columns.map((col) => {
           const isSortable = col.sortable;
           const isCurrentSort = sortKey === col.key;
+          const alignClass = col.align === 'center' ? styles['align-center'] : col.align === 'right' ? styles['align-right'] : '';
+          const thClass = `${alignClass} ${col.className || ''}`.trim();
           return (
             <th
               key={col.key}
               width={col.width || undefined}
               // eslint-disable-next-line react/forbid-dom-props
               style={col.width ? { width: col.width, minWidth: col.width } : undefined}
-              className={`${col.align ? `text-${col.align}` : ''} ${col.width ? 'ui-table__cell--truncate' : ''}`.trim()}
+              className={thClass}
             >
               {isSortable && onSort ? (
                 <button
                   type="button"
-                  className="ui-table__sort-btn"
+                  className={styles['sort-btn']}
                   data-sort-active={isCurrentSort}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -65,14 +67,16 @@ const TableRow = memo(function TableRow({
     <tr
       onClick={onRowClick ? () => onRowClick(row) : undefined}
       onContextMenu={onContextMenu ? (e) => onContextMenu(e, row) : undefined}
-      className={`${onRowClick ? 'is-clickable' : ''} ${activeRowId === row.id ? 'is-active' : ''}`.trim()}
+      className={`${onRowClick ? styles.isClickable : ''} ${activeRowId === row.id ? styles.isActive : ''}`.trim()}
     >
       {columns.map((col) => {
         const rawValue = row[col.key];
         const renderedValue = col.render ? col.render(rawValue, row) : rawValue;
         const hasActionsInCell = visibleRowActions.length > 0 && col.key === lastColumnKey;
-        const hideOnHoverClass = (hasActionsInCell || col.hideOnHover) ? 'hide-on-hover' : '';
+        const hideOnHoverClass = (hasActionsInCell || col.hideOnHover) ? styles.hideOnHover : '';
         const isEmpty = renderedValue === undefined || renderedValue === null || renderedValue === '';
+        const alignClass = col.align === 'center' ? styles['align-center'] : col.align === 'right' ? styles['align-right'] : '';
+        const tdClass = `${alignClass} ${col.className || ''}`.trim();
 
         return (
           <td
@@ -80,29 +84,33 @@ const TableRow = memo(function TableRow({
             width={col.width || undefined}
             // eslint-disable-next-line react/forbid-dom-props
             style={col.width ? { width: col.width, minWidth: col.width } : undefined}
-            className={`${col.align ? `text-${col.align}` : ''} ${col.width ? 'ui-table__cell--truncate' : ''}`.trim()}
+            className={tdClass}
           >
-            <div className="ui-table__cell-content">
-              <span className={`ui-table__cell-value ${hideOnHoverClass}`.trim()}>
+            <div className={styles['cell-content']}>
+              <span className={`${styles['cell-value']} ${hideOnHoverClass}`.trim()}>
                 {isEmpty ? '-' : renderedValue}
               </span>
               {hasActionsInCell ? (
                 /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
-                <div className="ui-table__row-actions" onClick={(event) => event.stopPropagation()}>
-                  {visibleRowActions.map((action) => (
-                    <Tooltip key={action.key} content={action.tooltip || action.label} side="top">
-                      <IconButton
-                        type="button"
-                        className={`ui-table__row-action ${action.className || ''}`.trim()}
-                        onClick={() => action.onClick(row)}
-                        label={action.tooltip || action.label}
-                        title={null}
-                        size="sm"
-                      >
-                        <action.icon size={15} />
-                      </IconButton>
-                    </Tooltip>
-                  ))}
+                <div className={styles['row-actions']} onClick={(event) => event.stopPropagation()}>
+                  {visibleRowActions.map((action) => {
+                    const actionClass = `${styles['row-action']} ${action.className === 'is-danger' ? styles.isDanger : (action.className || '')
+                      }`.trim();
+                    return (
+                      <Tooltip key={action.key} content={action.tooltip || action.label} side="top">
+                        <IconButton
+                          type="button"
+                          className={actionClass}
+                          onClick={() => action.onClick(row)}
+                          label={action.tooltip || action.label}
+                          title={null}
+                          size="sm"
+                        >
+                          <action.icon size={15} />
+                        </IconButton>
+                      </Tooltip>
+                    );
+                  })}
                 </div>
               ) : null}
             </div>
@@ -131,6 +139,7 @@ export default function Table({
   sortKey = null,
   sortDirection = null,
   onSort = null,
+  className = '',
 }) {
   const {
     contextMenu,
@@ -202,12 +211,12 @@ export default function Table({
       }
     } else if (rowActions.length > 0) {
       const visibleActions = rowActions.filter((action) => (action.isVisible ? action.isVisible(activeRow) : true));
-      
+
       visibleActions.forEach((action) => {
         if ((action.key === 'dismiss' || action.key === 'delete') && items.length > 0 && !items[items.length - 1].divider) {
           items.push({ divider: true });
         }
-        
+
         items.push({
           key: action.key,
           label: action.tooltip || action.label,
@@ -221,9 +230,12 @@ export default function Table({
     return items;
   }, [activeRow, useBulkActions, selectedRows, dismissRows, clearSelectedRows, openBulkDeleteModal, openMatchModal, openBulkOverrideModal, rowActions, t]);
 
+  const wrapClass = `${styles.wrap} ${variant === 'minimal' ? styles['wrap-minimal'] : ''} ${className}`.trim();
+  const tableClass = `${styles.table} ${variant === 'minimal' ? styles['table-minimal'] : ''}`.trim();
+
   return (
-    <div className={`ui-table-wrap ${variant === 'minimal' ? 'ui-table-wrap--minimal' : ''}`.trim()}>
-      <table className={`ui-table ${variant === 'minimal' ? 'ui-table--minimal' : ''}`.trim()}>
+    <div className={wrapClass}>
+      <table className={tableClass}>
         <TableHeader
           columns={columns}
           sortKey={sortKey}
@@ -232,8 +244,8 @@ export default function Table({
         />
         <tbody>
           {rows.length === 0 ? (
-            <tr className="is-empty">
-              <td colSpan={columns.length} className="ui-table__empty">
+            <tr className={styles.isEmpty}>
+              <td colSpan={columns.length} className={styles.empty}>
                 {emptyContent || <EmptyState variant="inline" title={displayEmptyText} />}
               </td>
             </tr>

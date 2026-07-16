@@ -36,7 +36,12 @@
 
 .card:hover .image-wrapper {
   transform: translateY(calc(-1 * var(--space-xs))) scale(1.02);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.card.no-hover-animation:hover .image-wrapper {
+  transform: none;
+  box-shadow: none;
 }
 
 button.image-wrapper,
@@ -385,6 +390,8 @@ div.image-wrapper:focus-visible {
   display: flex;
   flex-direction: column;
   gap: calc(var(--space-xs) / 2);
+  position: relative;
+  z-index: var(--z-index-step-1);
 }
 
 .title {
