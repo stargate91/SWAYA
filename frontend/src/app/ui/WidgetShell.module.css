@@ -4,7 +4,6 @@
   border-radius: var(--radius-2xl);
   backdrop-filter: var(--glass-blur);
   overflow: hidden;
-  margin-bottom: var(--space-4xl);
 }
 
 .shell--transparent {
