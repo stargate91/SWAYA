@@ -9,35 +9,36 @@ import {
   DiscordIcon,
   openExternalLink
 } from '../utils/aboutHelpers';
+import styles from './GeneralPanel.module.css';
 
 export default function GeneralPanel({ t, appInfo }) {
   return (
     <div className="about-tab-panel info-panel">
-      <div className="about-app-brand-card">
-        <div className="about-app-logo">{LOGO_LETTER}</div>
-        <div className="about-app-details">
-          <div className="about-app-name-row">
-            <span className="about-app-title">{APP_TITLE_TEXT}</span>
-            <span className="about-app-version">{VERSION_CHAR}{appInfo.version}</span>
+      <div className={styles['about-app-brand-card']}>
+        <div className={styles['about-app-logo']}>{LOGO_LETTER}</div>
+        <div className={styles['about-app-details']}>
+          <div className={styles['about-app-name-row']}>
+            <span className={styles['about-app-title']}>{APP_TITLE_TEXT}</span>
+            <span className={styles['about-app-version']}>{VERSION_CHAR}{appInfo.version}</span>
           </div>
-          <p className="about-app-description">{t('about.subtitle') || 'Organize, enrich, and keep your media library clean.'}</p>
+          <p className={styles['about-app-description']}>{t('about.subtitle') || 'Organize, enrich, and keep your media library clean.'}</p>
         </div>
       </div>
 
-      <div className="about-single-layout">
-        <div className="about-column">
-          <div className="about-section-header">
+      <div className={styles['about-single-layout']}>
+        <div className={styles['about-column']}>
+          <div className={styles['about-section-header']}>
             <h3>{t('about.app_info.developer') || 'Developer'}</h3>
             <p>{t('about.app_info.developer_intro') || 'Reach out directly if you want to report bugs, collaborate, or share feedback.'}</p>
           </div>
-          <div className="developer-profile-card">
-            <div className="developer-avatar">{DEV_AVATAR_LETTER}</div>
-            <div className="developer-info">
-              <span className="developer-name">{t('about.app_info.developer_name') || 'Levente Gáll'}</span>
-              <span className="developer-email">{t('about.app_info.developer_email') || 'leventegall@proton.me'}</span>
+          <div className={styles['developer-profile-card']}>
+            <div className={styles['developer-avatar']}>{DEV_AVATAR_LETTER}</div>
+            <div className={styles['developer-info']}>
+              <span className={styles['developer-name']}>{t('about.app_info.developer_name') || 'Levente Gáll'}</span>
+              <span className={styles['developer-email']}>{t('about.app_info.developer_email') || 'leventegall@proton.me'}</span>
             </div>
           </div>
-          <div className="developer-links-grid">
+          <div className={styles['developer-links-grid']}>
             <Button as="a" href={`mailto:${t('about.app_info.developer_email') || 'leventegall@proton.me'}`} variant="secondary" onClick={(e) => { e.preventDefault(); openExternalLink(`mailto:${t('about.app_info.developer_email') || 'leventegall@proton.me'}`); }}>
               <Mail size={16} />
               <span>{t('about.links.email') || 'Email'}</span>

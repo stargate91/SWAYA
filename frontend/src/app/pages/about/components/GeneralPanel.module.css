@@ -1,0 +1,144 @@
+.about-app-brand-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 12%, transparent), color-mix(in srgb, var(--color-accent) 3%, transparent));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 25%, var(--color-border-subtle));
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-lg);
+  backdrop-filter: var(--glass-blur-md);
+}
+
+.about-app-logo {
+  width: 4rem;
+  height: 4rem;
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-bg-card));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
+  box-shadow:
+    inset 0 0 0.75rem color-mix(in srgb, var(--color-accent) 15%, transparent),
+    0 0.25rem 1.25rem color-mix(in srgb, var(--color-accent) 10%, transparent);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-accent);
+}
+
+.about-app-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.about-app-name-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-md);
+}
+
+.about-app-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: calc(2.5 * var(--letter-spacing-wide));
+  color: var(--color-text-primary);
+}
+
+.about-app-version {
+  font-size: var(--font-size-2xs);
+  padding: calc(var(--space-xs) / 2) var(--space-sm);
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+  border-radius: var(--radius-xl);
+  color: var(--color-accent);
+  font-weight: var(--font-weight-bold);
+}
+
+.about-app-description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.about-single-layout {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.about-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.about-section-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.about-section-header h3 {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.about-section-header p {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.developer-profile-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 6%, color-mix(in srgb, var(--color-bg-canvas) 45%, transparent)), color-mix(in srgb, var(--color-accent) 1.5%, color-mix(in srgb, var(--color-bg-canvas) 25%, transparent)));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 12%, var(--color-border-subtle));
+  border-radius: var(--radius-md);
+  backdrop-filter: var(--glass-blur-md);
+}
+
+.developer-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: color-mix(in srgb, var(--color-accent) 4%, color-mix(in srgb, var(--color-bg-canvas) 35%, transparent));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 15%, color-mix(in srgb, var(--color-text-primary) 5%, transparent));
+  box-shadow: inset 0 0 0.5rem color-mix(in srgb, var(--color-accent) 6%, transparent);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: color-mix(in srgb, var(--color-accent) 65%, var(--color-text-secondary));
+}
+
+.developer-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.developer-name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.developer-email {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.developer-links-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}

@@ -15,6 +15,8 @@ import {
   getPorndbWizardSteps,
   getOfflineWizardSteps
 } from '../utils/aboutData';
+import baseStyles from '../AboutPage.module.css';
+import styles from './DocsWizardPanel.module.css';
 
 export default function DocsWizardPanel({
   activeTab,
@@ -94,36 +96,36 @@ export default function DocsWizardPanel({
 
   return (
     <div className="about-tab-panel docs-panel">
-      <Card className="about-card docs-card">
-        <h2 className="about-section-title">{t(`about.resources.docs_items.${activeTab.replace('docs_', '')}`) || step.title}</h2>
-        <div className="docs-wizard-container">
+      <Card className={`${baseStyles['about-card']} docs-card`}>
+        <h2 className={baseStyles['about-section-title']}>{t(`about.resources.docs_items.${activeTab.replace('docs_', '')}`) || step.title}</h2>
+        <div className={styles['docs-wizard-container']}>
           {steps.length > 1 && (
-            <div className="docs-wizard-progress">
+            <div className={styles['docs-wizard-progress']}>
               {steps.map((_, idx) => (
                 <div
                   key={idx}
-                  className={`docs-wizard-progress-step ${idx === currentStepIdx ? 'is-active' : idx < currentStepIdx ? 'is-passed' : ''}`}
+                  className={`${styles['docs-wizard-progress-step']} ${idx === currentStepIdx ? styles['is-active'] : idx < currentStepIdx ? styles['is-passed'] : ''}`}
                 />
               ))}
             </div>
           )}
 
-          <div className="docs-wizard-slide">
-            <h3 className="docs-wizard-slide-title">
+          <div className={styles['docs-wizard-slide']}>
+            <h3 className={styles['docs-wizard-slide-title']}>
               {step.title}
             </h3>
 
-            <p className="docs-wizard-slide-desc">
+            <p className={styles['docs-wizard-slide-desc']}>
               {step.description}
             </p>
 
             {step.links && (
-              <div className="docs-wizard-slide-links">
+              <div className={styles['docs-wizard-slide-links']}>
                 {step.links.map((link, lidx) => (
                   <Button
                     key={lidx}
                     variant="secondary"
-                    className="docs-wizard-link-btn-inline"
+                    className={styles['docs-wizard-link-btn-inline']}
                     onClick={(e) => { e.preventDefault(); window.open(link.url, '_blank', 'noopener,noreferrer'); }}
                   >
                     <span>{link.label}</span>
@@ -135,17 +137,17 @@ export default function DocsWizardPanel({
             {step.image ? (
               <button
                 type="button"
-                className="about-wizard-image-btn"
+                className={styles['about-wizard-image-btn']}
                 onClick={() => setActiveLightboxUrl(step.image)}
               >
                 <img
                   src={step.image}
                   alt={step.title}
-                  className="about-wizard-image"
+                  className={styles['about-wizard-image']}
                 />
               </button>
             ) : step.screenshotPlaceholder && (
-              <div className="docs-wizard-screenshot-placeholder">
+              <div className={styles['docs-wizard-screenshot-placeholder']}>
                 {CAMERA_EMOJI}{t('about.docs_wizard.screenshot_placeholder') || 'Screenshot'}{COLON_SEPARATOR}{step.screenshotPlaceholder}
               </div>
             )}
@@ -153,27 +155,27 @@ export default function DocsWizardPanel({
             {step.renderInputs && step.renderInputs()}
 
             {step.onSave && (
-              <div className="docs-wizard-save-container">
+              <div className={styles['docs-wizard-save-container']}>
                 <Button
                   variant="primary"
-                  className="docs-wizard-save-btn"
+                  className={styles['docs-wizard-save-btn']}
                   onClick={step.onSave}
                   disabled={saveStatus === 'saving'}
                 >
                   {saveStatus === 'saving' ? (t('about.docs_wizard.saving') || 'Saving...') : (t('about.docs_wizard.save') || 'Save')}
                 </Button>
-                {saveStatus === 'success' && <span className="docs-wizard-save-status-success">{CHECKMARK_EMOJI}{t('about.docs_wizard.saved') || 'Saved successfully!'}</span>}
-                {saveStatus === 'error' && <span className="docs-wizard-save-status-error">{CROSS_EMOJI}{t('about.docs_wizard.save_failed') || 'Failed to save'}</span>}
+                {saveStatus === 'success' && <span className={styles['docs-wizard-save-status-success']}>{CHECKMARK_EMOJI}{t('about.docs_wizard.saved') || 'Saved successfully!'}</span>}
+                {saveStatus === 'error' && <span className={styles['docs-wizard-save-status-error']}>{CROSS_EMOJI}{t('about.docs_wizard.save_failed') || 'Failed to save'}</span>}
               </div>
             )}
           </div>
 
           {steps.length > 1 && (
-            <div className="docs-wizard-footer">
+            <div className={styles['docs-wizard-footer']}>
               {!isFirst ? (
                 <Button
                   variant="secondary"
-                  className="docs-wizard-btn-auto"
+                  className={styles['docs-wizard-btn-back']}
                   onClick={() => {
                     setWizardStep(currentStepIdx - 1);
                     setSaveStatus(null);
@@ -186,7 +188,7 @@ export default function DocsWizardPanel({
               {!isLast && (
                 <Button
                   variant="secondary"
-                  className="docs-wizard-btn-next"
+                  className={styles['docs-wizard-btn-next']}
                   onClick={() => {
                     setWizardStep(currentStepIdx + 1);
                     setSaveStatus(null);

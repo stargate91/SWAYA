@@ -1,0 +1,38 @@
+.privacy-intro,
+.license-intro {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-lg);
+  line-height: 1.5;
+}
+
+.privacy-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding-left: var(--space-lg);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.privacy-list li {
+  list-style-type: square;
+}
+
+.license-text-box {
+  background: var(--color-bg-subtle);
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  max-height: 21.875rem;
+  overflow-y: auto;
+  line-height: 1.6;
+  border: 1px solid var(--color-border-subtle);
+}
+
+.license-text-box p {
+  margin-bottom: var(--space-md);
+}

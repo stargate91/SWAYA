@@ -30,7 +30,7 @@ export default function Lightbox({ imageUrl, onClose, t }) {
     >
       <div className={styles['close-container']} onClick={(e) => e.stopPropagation()} role="presentation">
         <IconButton
-          variant="close"
+          variant="close-overlay"
           className={styles['close-btn']}
           onClick={onClose}
           label={t?.('common.close') || 'Close'}

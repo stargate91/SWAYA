@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import styles from './OnboardingOrbitHero.module.css';
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
@@ -98,18 +99,18 @@ export default function OnboardingOrbitHero({
   const chipLayout = useMemo(() => createChipLayout(chips), [chips]);
 
   return (
-    <div className={`welcome-hero-shell ${className}`.trim()}>
-      <div className="welcome-hero-orbit welcome-hero-orbit-primary" />
-      <div className="welcome-hero-orbit welcome-hero-orbit-secondary" />
-      <div className="welcome-logo-badge">
-        <div className="badge-glow" />
-        {Icon ? <Icon size={40} className="badge-icon" /> : null}
+    <div className={`${styles['welcome-hero-shell']} ${className}`.trim()}>
+      <div className={`${styles['welcome-hero-orbit']} ${styles['welcome-hero-orbit-primary']}`} />
+      <div className={`${styles['welcome-hero-orbit']} ${styles['welcome-hero-orbit-secondary']}`} />
+      <div className={styles['welcome-logo-badge']}>
+        <div className={styles['badge-glow']} />
+        {Icon ? <Icon size={40} className={styles['badge-icon']} /> : null}
       </div>
 
       {chips.map((chip, index) => (
         <div
           key={`${chip.label}-${index}`}
-          className="welcome-hero-chip-orbit"
+          className={styles['welcome-hero-chip-orbit']}
           /* eslint-disable-next-line react/forbid-dom-props */
           style={{
             left: `${chipLayout[index]?.x ?? 160}px`,
@@ -118,7 +119,7 @@ export default function OnboardingOrbitHero({
             animationDelay: `${index * -0.9}s`,
           }}
         >
-          <div className="welcome-hero-chip">
+          <div className={styles['welcome-hero-chip']}>
             <span>{chip.label}</span>
           </div>
         </div>

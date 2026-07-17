@@ -1,0 +1,88 @@
+.onboarding-info-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.welcome-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.625rem;
+  border-radius: var(--radius-full);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 16%, color-mix(in srgb, var(--color-text-primary) 8%, transparent));
+  background: color-mix(in srgb, var(--color-accent-soft) 70%, transparent);
+  color: var(--color-signal);
+  font: 600 0.6875rem/1.2 var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  width: fit-content;
+}
+
+.onboarding-info-panel h2 {
+  font: 800 clamp(2rem, 2.3vw, 2.7rem) / 1.02 var(--font-display);
+  letter-spacing: -0.035em;
+  max-width: 12ch;
+  color: var(--color-ink);
+  background: linear-gradient(180deg, var(--color-ink), color-mix(in srgb, var(--color-ink) 72%, var(--color-signal) 28%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
+}
+
+.onboarding-info-panel > p {
+  max-width: 46ch;
+  font: 400 0.94rem/1.6 var(--font-sans);
+  color: var(--color-muted);
+  margin: 0;
+}
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  margin-top: 0.625rem;
+  text-align: left;
+  padding: 1.25rem 1.375rem;
+  border-radius: 1.125rem;
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 6%, transparent);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.024), rgba(255, 255, 255, 0.01)),
+    linear-gradient(180deg, rgba(12, 17, 26, 0.94), rgba(9, 13, 21, 0.98));
+  box-shadow:
+    0 1.125rem 2.5rem rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.feature-item {
+  display: flex;
+  gap: 0.875rem;
+  align-items: flex-start;
+}
+
+.feature-icon {
+  font-size: 1.125rem;
+  background: linear-gradient(180deg, color-mix(in srgb, rgb(20, 147, 255) 8%, transparent), color-mix(in srgb, rgb(0, 124, 240) 3%, transparent));
+  width: var(--button-height-sm);
+  height: var(--button-height-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.6875rem;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 14%, color-mix(in srgb, var(--color-text-primary) 6%, transparent));
+  flex-shrink: 0;
+  color: var(--color-signal);
+}
+
+.feature-item strong {
+  font-size: var(--font-size-xs);
+  color: var(--color-ink);
+  display: block;
+  margin-bottom: 0.1875rem;
+}
+
+.feature-item p {
+  font-size: var(--font-size-2xs);
+  color: var(--color-muted);
+  margin: 0;
+}

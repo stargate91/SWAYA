@@ -10,7 +10,7 @@ import { buildSettingsPayload } from '@/lib/api/settings';
 import { validateImportedSettings } from '@/lib/validation';
 import { getInitialFormValues } from '@/pages/settings/settingsFormValues';
 import { TARGET_LANGUAGE_OPTIONS } from '@/pages/settings/settingsLanguageOptions';
-import { TMDB_GUIDE_STEPS, OMDB_GUIDE_STEPS, getFlagUrl } from '../onboarding.constants';
+import { getFlagUrl } from '../onboarding.constants';
 
 export default function useOnboardingState() {
   const { locale, setLocale, t } = useTranslation();
@@ -23,12 +23,8 @@ export default function useOnboardingState() {
   const [configChoice, setConfigChoice] = useState('new'); // 'new' or 'import'
   const [isImporting, setIsImporting] = useState(false);
   const [langSearch, setLangSearch] = useState('');
-  const [isTmdbGuideOpen, setIsTmdbGuideOpen] = useState(false);
-  const [tmdbGuideStep, setTmdbGuideStep] = useState(0);
-  const [tmdbGuideDirection, setTmdbGuideDirection] = useState('forward');
-  const [isOmdbGuideOpen, setIsOmdbGuideOpen] = useState(false);
-  const [omdbGuideStep, setOmdbGuideStep] = useState(0);
-  const [omdbGuideDirection, setOmdbGuideDirection] = useState('forward');
+  const [docsModal, setDocsModal] = useState(null); // null | 'docs_tmdb' | 'docs_omdb'
+
 
   const AVAILABLE_LANGUAGES = TARGET_LANGUAGE_OPTIONS.map(lang => {
     const nativeMatch = lang.label.match(/\(([^)]+)\)/);
@@ -43,6 +39,10 @@ export default function useOnboardingState() {
   const filteredLanguages = AVAILABLE_LANGUAGES.filter(lang => 
     lang.name.toLowerCase().includes(langSearch.toLowerCase())
   );
+
+  // Profile builder state
+  const [userName, setUserName] = useState('');
+  const [avatarPath, setAvatarPath] = useState('');
 
   // API credentials state
   const [tmdbApiKey, setTmdbApiKey] = useState('');
@@ -65,66 +65,11 @@ export default function useOnboardingState() {
 
   const goToStep = (nextStep, direction = 'forward') => {
     setStepDirection(direction);
-    setStep(Math.max(1, Math.min(nextStep, 6)));
+    setStep(Math.max(1, Math.min(nextStep, 7)));
   };
 
   const handleNext = () => goToStep(step + 1, 'forward');
   const handlePrev = () => goToStep(step - 1, 'backward');
-  const activeTmdbGuideStep = TMDB_GUIDE_STEPS[tmdbGuideStep];
-  const activeOmdbGuideStep = OMDB_GUIDE_STEPS[omdbGuideStep];
-  const isAnyGuideOpen = (step === 3 && isTmdbGuideOpen) || (step === 4 && isOmdbGuideOpen);
-
-  const openTmdbGuide = () => {
-    setTmdbGuideDirection('forward');
-    setTmdbGuideStep(0);
-    setIsTmdbGuideOpen(true);
-  };
-
-  const closeTmdbGuide = () => {
-    setTmdbGuideDirection('backward');
-    setIsTmdbGuideOpen(false);
-    setTmdbGuideStep(0);
-  };
-
-  const goToTmdbGuideStep = (nextIndex, direction = 'forward') => {
-    setTmdbGuideDirection(direction);
-    setTmdbGuideStep(Math.max(0, Math.min(nextIndex, TMDB_GUIDE_STEPS.length - 1)));
-  };
-
-  const openGuideLink = (href) => {
-    if (!href) return;
-    window.open(href, '_blank', 'noopener,noreferrer');
-  };
-
-  const openOmdbGuide = () => {
-    setOmdbGuideDirection('forward');
-    setOmdbGuideStep(0);
-    setIsOmdbGuideOpen(true);
-  };
-
-  const closeOmdbGuide = () => {
-    setOmdbGuideDirection('backward');
-    setIsOmdbGuideOpen(false);
-    setOmdbGuideStep(0);
-  };
-
-  const goToOmdbGuideStep = (nextIndex, direction = 'forward') => {
-    setOmdbGuideDirection(direction);
-    setOmdbGuideStep(Math.max(0, Math.min(nextIndex, OMDB_GUIDE_STEPS.length - 1)));
-  };
-
-  useEffect(() => {
-    if (step !== 3 && isTmdbGuideOpen) {
-      setIsTmdbGuideOpen(false);
-      setTmdbGuideStep(0);
-      setTmdbGuideDirection('forward');
-    }
-    if (step !== 4 && isOmdbGuideOpen) {
-      setIsOmdbGuideOpen(false);
-      setOmdbGuideStep(0);
-      setOmdbGuideDirection('forward');
-    }
-  }, [isOmdbGuideOpen, isTmdbGuideOpen, step]);
 
   // Step 2: Handle config JSON import
   const handleFileImport = async (event) => {
@@ -156,7 +101,7 @@ export default function useOnboardingState() {
         toast(t('settingsPage.sections.backup.importSuccess') || 'Settings imported successfully!', 'success');
         
         // Skip straight to completion/finish step
-        goToStep(6, 'forward');
+        goToStep(7, 'forward');
       } catch (err) {
         console.error(err);
         toast(t('settingsPage.sections.backup.importError') || 'Failed to import settings file.', 'danger');
@@ -300,6 +245,8 @@ export default function useOnboardingState() {
       
       const payload = {
         ...currentSettings,
+        user_name: userName,
+        avatar_path: avatarPath,
         tmdb_api_key: tmdbApiKey,
         tmdb_bearer_token: tmdbBearerToken,
         omdb_api_key: omdbApiKey,
@@ -339,6 +286,10 @@ export default function useOnboardingState() {
     setLangSearch,
     AVAILABLE_LANGUAGES,
     filteredLanguages,
+    userName,
+    setUserName,
+    avatarPath,
+    setAvatarPath,
     tmdbApiKey,
     setTmdbApiKey,
     tmdbBearerToken,
@@ -346,25 +297,10 @@ export default function useOnboardingState() {
     tmdbValidation,
     validateTmdb,
     isValidatingApi,
-    isTmdbGuideOpen,
-    openTmdbGuide,
-    closeTmdbGuide,
-    tmdbGuideStep,
-    goToTmdbGuideStep,
-    tmdbGuideDirection,
-    activeTmdbGuideStep,
-    openGuideLink,
     omdbApiKey,
     setOmdbApiKey,
     omdbValidation,
     validateOmdb,
-    isOmdbGuideOpen,
-    openOmdbGuide,
-    closeOmdbGuide,
-    omdbGuideStep,
-    goToOmdbGuideStep,
-    omdbGuideDirection,
-    activeOmdbGuideStep,
     scanDir,
     setScanDir,
     pickScanDir,
@@ -378,6 +314,7 @@ export default function useOnboardingState() {
     handleFinish,
     handlePrev,
     handleNext,
-    isAnyGuideOpen,
+    docsModal,
+    setDocsModal,
   };
 }

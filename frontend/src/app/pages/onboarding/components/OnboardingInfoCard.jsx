@@ -1,3 +1,5 @@
+import styles from './OnboardingInfoCard.module.css';
+
 export default function OnboardingInfoCard({
   visual,
   kicker,
@@ -6,17 +8,17 @@ export default function OnboardingInfoCard({
   items = [],
 }) {
   return (
-    <div className="onboarding-info-panel">
+    <div className={styles['onboarding-info-panel']}>
       {visual}
-      {kicker ? <span className="welcome-kicker">{kicker}</span> : null}
+      {kicker ? <span className={styles['welcome-kicker']}>{kicker}</span> : null}
       <h2>{title}</h2>
       {description ? <p>{description}</p> : null}
 
       {items.length > 0 ? (
-        <div className="feature-list">
+        <div className={styles['feature-list']}>
           {items.map(({ icon: Icon, title: itemTitle, description: itemDescription }) => (
-            <div className="feature-item" key={itemTitle}>
-              <span className="feature-icon">{Icon ? <Icon size={18} /> : null}</span>
+            <div className={styles['feature-item']} key={itemTitle}>
+              <span className={styles['feature-icon']}>{Icon ? <Icon size={18} /> : null}</span>
               <div>
                 <strong>{itemTitle}</strong>
                 <p>{itemDescription}</p>

@@ -1,0 +1,110 @@
+.onboarding-form-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: left;
+  justify-content: flex-start;
+  padding: 0;
+  border: 1px solid var(--ui-overlay-panel-border);
+  box-shadow: var(--ui-overlay-panel-shadow);
+  background: var(--ui-surface-card-gradient);
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.25rem;
+}
+
+.onboarding-form-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 5.5rem;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--color-accent-blue) 18%, transparent), color-mix(in srgb, var(--color-accent-blue) 8%, transparent) 40%, transparent 78%),
+    var(--ui-overlay-panel-highlight);
+  pointer-events: none;
+}
+
+.onboarding-form-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--color-accent-blue) 12%, transparent), transparent 34%),
+    radial-gradient(circle at bottom left, color-mix(in srgb, var(--color-accent-blue) 8%, transparent), transparent 30%);
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.welcome-lang-panel-shell,
+.welcome-lang-panel-body,
+.welcome-lang-panel-footer {
+  position: relative;
+  z-index: var(--z-index-base);
+}
+
+.welcome-lang-panel-shell {
+  display: grid;
+  gap: 0.625rem;
+  padding: 1.375rem 1.5rem 1.125rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text-primary) 6%, transparent);
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--color-accent-blue) 6%, transparent);
+}
+
+.welcome-lang-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.welcome-lang-eyebrow {
+  display: inline-block;
+  margin-bottom: var(--space-sm);
+  color: var(--color-signal);
+  font: 700 0.6875rem/1 var(--font-sans);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.onboarding-form-panel h3 {
+  font: 700 clamp(1.35rem, 1.5vw, 1.75rem) / 1.1 var(--font-display);
+  margin: 0;
+  letter-spacing: -0.03em;
+}
+
+.onboarding-form-panel p {
+  font: var(--text-caption);
+  color: var(--color-muted);
+  margin: 0;
+}
+
+.welcome-lang-panel-body {
+  display: grid;
+  gap: var(--space-lg);
+  padding: var(--space-xl) var(--space-2xl);
+  min-height: 0;
+}
+
+.welcome-lang-panel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: var(--space-lg) var(--space-2xl);
+  border-top: 1px solid color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+  background:
+    linear-gradient(90deg, rgba(20, 147, 255, 0.06), transparent 40%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.012));
+}
+
+.welcome-lang-footer-label {
+  color: var(--color-subtle);
+  font: 600 0.6875rem/1.1 var(--font-sans);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.welcome-lang-panel-footer strong {
+  color: var(--color-ink);
+  font: 700 0.875rem/1.2 var(--font-display);
+}

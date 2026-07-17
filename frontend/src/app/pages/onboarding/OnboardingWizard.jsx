@@ -1,19 +1,52 @@
+import { useState } from 'react';
 import Button from '@/ui/Button';
 import { ArrowRight, ArrowLeft } from '@/ui/icons';
 import './OnboardingWizard.css';
 import { useTranslation } from '@/providers/LanguageContext';
-import Inline from '@/ui/Inline';
-
+import { useSettingsQuery, useUpdateSettingsMutation } from '@/queries';
+import Overlay from '@/ui/Overlay';
+import Lightbox from '@/ui/Lightbox';
+import DocsWizardPanel from '@/pages/about/components/DocsWizardPanel';
 import useOnboardingState from './hooks/useOnboardingState';
 
 const BRAND_TEXT = 'SWAYA';
 
 import WelcomeStep from './steps/WelcomeStep';
 import ChoiceStep from './steps/ChoiceStep';
+import ProfileStep from './steps/ProfileStep';
 import TmdbStep from './steps/TmdbStep';
 import OmdbStep from './steps/OmdbStep';
 import FolderStep from './steps/FolderStep';
 import CompletionStep from './steps/CompletionStep';
+import OnboardingTimeline from './components/OnboardingTimeline';
+
+function DocsModalOverlay({ docsModal, onClose, settings, updateSettingsMutation, t }) {
+  const [wizardStep, setWizardStep] = useState(0);
+  const [lightboxUrl, setLightboxUrl] = useState(null);
+
+  return (
+    <Overlay centered onClose={onClose}>
+      <Overlay.ContentWrapper className="onboarding-docs-modal">
+        <Overlay.Content>
+          <div className="settings-tab-content">
+            <DocsWizardPanel
+              activeTab={docsModal}
+              wizardStep={wizardStep}
+              setWizardStep={setWizardStep}
+              settings={settings}
+              updateSettingsMutation={updateSettingsMutation}
+              setActiveLightboxUrl={setLightboxUrl}
+              t={t}
+            />
+          </div>
+        </Overlay.Content>
+      </Overlay.ContentWrapper>
+      {lightboxUrl && (
+        <Lightbox imageUrl={lightboxUrl} onClose={() => setLightboxUrl(null)} />
+      )}
+    </Overlay>
+  );
+}
 
 export default function OnboardingWizard() {
   const { t } = useTranslation();
@@ -30,6 +63,10 @@ export default function OnboardingWizard() {
     setLangSearch,
     AVAILABLE_LANGUAGES,
     filteredLanguages,
+    userName,
+    setUserName,
+    avatarPath,
+    setAvatarPath,
     tmdbApiKey,
     setTmdbApiKey,
     tmdbBearerToken,
@@ -37,25 +74,10 @@ export default function OnboardingWizard() {
     tmdbValidation,
     validateTmdb,
     isValidatingApi,
-    isTmdbGuideOpen,
-    openTmdbGuide,
-    closeTmdbGuide,
-    tmdbGuideStep,
-    goToTmdbGuideStep,
-    tmdbGuideDirection,
-    activeTmdbGuideStep,
-    openGuideLink,
     omdbApiKey,
     setOmdbApiKey,
     omdbValidation,
     validateOmdb,
-    isOmdbGuideOpen,
-    openOmdbGuide,
-    closeOmdbGuide,
-    omdbGuideStep,
-    goToOmdbGuideStep,
-    omdbGuideDirection,
-    activeOmdbGuideStep,
     scanDir,
     setScanDir,
     pickScanDir,
@@ -69,8 +91,12 @@ export default function OnboardingWizard() {
     handleFinish,
     handlePrev,
     handleNext,
-    isAnyGuideOpen,
+    docsModal,
+    setDocsModal,
   } = useOnboardingState();
+
+  const { data: settings = {} } = useSettingsQuery();
+  const updateSettingsMutation = useUpdateSettingsMutation();
 
   return (
     <div className="onboarding-wizard">
@@ -78,17 +104,10 @@ export default function OnboardingWizard() {
 
         {/* Header */}
         <div className="onboarding-header">
-          <div className={`onboarding-title-group ${isAnyGuideOpen ? 'is-hidden' : ''}`}>
+          <div className="onboarding-title-group">
             <h1>{BRAND_TEXT}</h1>
           </div>
-          <div className={`onboarding-timeline ${isAnyGuideOpen ? 'is-hidden' : ''}`}>
-            {[1, 2, 3, 4, 5, 6].map((num) => (
-              <div key={num} className={`timeline-dot-wrapper ${num <= step ? 'is-active' : ''} ${num === step ? 'is-current' : ''}`}>
-                <div className="timeline-dot" />
-                {num < 6 && <div className="timeline-line" />}
-              </div>
-            ))}
-          </div>
+          <OnboardingTimeline step={step} isAnyGuideOpen={false} />
         </div>
 
         {/* Content Panel */}
@@ -117,8 +136,18 @@ export default function OnboardingWizard() {
               />
             )}
 
-            {/* Step 3: TMDB API Setup */}
+            {/* Step 3: Profile Builder */}
             {step === 3 && (
+              <ProfileStep
+                userName={userName}
+                setUserName={setUserName}
+                avatarPath={avatarPath}
+                setAvatarPath={setAvatarPath}
+              />
+            )}
+
+            {/* Step 4: TMDB API Setup */}
+            {step === 4 && (
               <TmdbStep
                 tmdbApiKey={tmdbApiKey}
                 setTmdbApiKey={setTmdbApiKey}
@@ -127,40 +156,24 @@ export default function OnboardingWizard() {
                 tmdbValidation={tmdbValidation}
                 validateTmdb={validateTmdb}
                 isValidatingApi={isValidatingApi}
-                isTmdbGuideOpen={isTmdbGuideOpen}
-                openTmdbGuide={openTmdbGuide}
-                closeTmdbGuide={closeTmdbGuide}
-                tmdbGuideStep={tmdbGuideStep}
-                goToTmdbGuideStep={goToTmdbGuideStep}
-                tmdbGuideDirection={tmdbGuideDirection}
-                activeTmdbGuideStep={activeTmdbGuideStep}
-                openGuideLink={openGuideLink}
-                step={step}
+                onOpenDocs={() => setDocsModal('docs_tmdb')}
               />
             )}
 
-            {/* Step 4: OMDB API Setup */}
-            {step === 4 && (
+            {/* Step 5: OMDB API Setup */}
+            {step === 5 && (
               <OmdbStep
                 omdbApiKey={omdbApiKey}
                 setOmdbApiKey={setOmdbApiKey}
                 omdbValidation={omdbValidation}
                 validateOmdb={validateOmdb}
                 isValidatingApi={isValidatingApi}
-                isOmdbGuideOpen={isOmdbGuideOpen}
-                openOmdbGuide={openOmdbGuide}
-                closeOmdbGuide={closeOmdbGuide}
-                omdbGuideStep={omdbGuideStep}
-                goToOmdbGuideStep={goToOmdbGuideStep}
-                omdbGuideDirection={omdbGuideDirection}
-                activeOmdbGuideStep={activeOmdbGuideStep}
-                openGuideLink={openGuideLink}
-                step={step}
+                onOpenDocs={() => setDocsModal('docs_omdb')}
               />
             )}
 
-            {/* Step 5: Folders Setup */}
-            {step === 5 && (
+            {/* Step 6: Folders Setup */}
+            {step === 6 && (
               <FolderStep
                 scanDir={scanDir}
                 setScanDir={setScanDir}
@@ -174,79 +187,69 @@ export default function OnboardingWizard() {
               />
             )}
 
-            {/* Step 6: Completion */}
-            {step === 6 && <CompletionStep />}
+            {/* Step 7: Completion */}
+            {step === 7 && <CompletionStep />}
 
           </div>
         </div>
 
         {/* Footer */}
-        <div className={`onboarding-footer ${isAnyGuideOpen ? 'onboarding-footer--guided-actions' : ''}`}>
-          {isAnyGuideOpen ? (
-            <>
+        <div className="onboarding-footer">
+          <>
+            {step > 1 && step < 7 ? (
+              <Button variant="onboarding-back" leftIcon={<ArrowLeft size={14} />} animateIcon onClick={handlePrev}>
+                {t('common.back')}
+              </Button>
+            ) : (
               <div />
-              <Inline gap="md" align="center" className="onboarding-footer-actions-cluster">
-                <Button variant="onboarding-back" leftIcon={<ArrowLeft size={14} />} animateIcon onClick={handlePrev}>
-                  {t('common.back')}
-                </Button>
-                <Button
-                  variant="onboarding-continue"
-                  rightIcon={<ArrowRight size={14} />}
-                  animateIcon
-                  onClick={handleNext}
-                >
-                  {t('onboarding.buttons.continue')}
-                </Button>
-              </Inline>
-            </>
-          ) : (
-            <>
-              {step > 1 && step < 6 ? (
-                <Button variant="onboarding-back" leftIcon={<ArrowLeft size={14} />} animateIcon onClick={handlePrev}>
-                  {t('common.back')}
-                </Button>
-              ) : (
-                <div />
-              )}
+            )}
 
-              {step < 5 ? (
-                <Button
-                  variant="onboarding-continue"
-                  rightIcon={<ArrowRight size={14} />}
-                  animateIcon
-                  onClick={handleNext}
-                  disabled={
-                    (step === 2 && configChoice === 'import') ||
-                    (step === 3 && tmdbValidation.valid !== true) ||
-                    (step === 4 && omdbValidation.valid !== true)
-                  }
-                >
-                  {t('onboarding.buttons.continue')}
-                </Button>
-              ) : step === 5 ? (
-                <Button
-                  variant="onboarding-continue"
-                  rightIcon={<ArrowRight size={14} />}
-                  animateIcon
-                  onClick={handleNext}
-                  disabled={folderValidation.valid !== true}
-                >
-                  {t('onboarding.buttons.continue')}
-                </Button>
-              ) : (
-                <Button
-                  variant="onboarding-continue"
-                  onClick={handleFinish}
-                  disabled={isFinishing}
-                >
-                  {isFinishing ? t('onboarding.buttons.saving') : t('onboarding.buttons.finishSetup')}
-                </Button>
-              )}
-            </>
-          )}
+            {step < 6 ? (
+              <Button
+                variant="onboarding-continue"
+                rightIcon={<ArrowRight size={14} />}
+                animateIcon
+                onClick={handleNext}
+                disabled={
+                  (step === 2 && configChoice === 'import') ||
+                  (step === 3 && !userName.trim())
+                }
+              >
+                {t('onboarding.buttons.continue')}
+              </Button>
+            ) : step === 6 ? (
+              <Button
+                variant="onboarding-continue"
+                rightIcon={<ArrowRight size={14} />}
+                animateIcon
+                onClick={handleNext}
+              >
+                {t('onboarding.buttons.continue')}
+              </Button>
+            ) : (
+              <Button
+                variant="onboarding-continue"
+                onClick={handleFinish}
+                disabled={isFinishing}
+              >
+                {isFinishing ? t('onboarding.buttons.saving') : t('onboarding.buttons.finishSetup')}
+              </Button>
+            )}
+          </>
         </div>
 
       </div>
+
+      {/* Docs Modal Overlay */}
+      {docsModal && (
+        <DocsModalOverlay
+          docsModal={docsModal}
+          onClose={() => setDocsModal(null)}
+          settings={settings}
+          updateSettingsMutation={updateSettingsMutation}
+          t={t}
+        />
+      )}
     </div>
   );
 }

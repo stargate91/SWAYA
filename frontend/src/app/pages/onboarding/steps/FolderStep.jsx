@@ -1,9 +1,10 @@
 import { FolderOpen, CheckCircle } from '@/ui/icons';
 import Button from '@/ui/Button';
-import OnboardingInfoCard from '../OnboardingInfoCard';
-import OnboardingPanelCard from '../OnboardingPanelCard';
-import OnboardingOrbitHero from '../OnboardingOrbitHero';
+import OnboardingInfoCard from '../components/OnboardingInfoCard';
+import OnboardingPanelCard from '../components/OnboardingPanelCard';
+import OnboardingOrbitHero from '../components/OnboardingOrbitHero';
 import { useTranslation } from '@/providers/LanguageContext';
+import styles from './FormStep.module.css';
 
 export default function FolderStep({
   scanDir,
@@ -37,7 +38,7 @@ export default function FolderStep({
         items={[
           {
             icon: FolderOpen,
-            title: t('onboarding.folder.step5Title') || 'Step 5 of 6',
+            title: t('onboarding.folder.step5Title') || 'Step 6 of 7',
             description: t('onboarding.folder.step5Desc') || 'This tells SWAYA where your unorganized files live and where finished media can go.',
           },
           {
@@ -49,16 +50,16 @@ export default function FolderStep({
       />
 
       <OnboardingPanelCard
-        eyebrow={t('onboarding.folder.eyebrow') || 'Step 5'}
+        eyebrow={t('onboarding.folder.eyebrow') || 'Step 6'}
         title={t('onboarding.folder.title') || 'Set your library folders'}
         meta={<div className="welcome-lang-pill">{t('onboarding.folder.pathsRequired')}</div>}
         description={t('onboarding.folder.description') || 'Pick the folders SWAYA should read from and organize into.'}
         footerLabel={t('onboarding.folder.footerLabel') || 'Required to continue'}
         footerValue={t('onboarding.folder.footerValue') || 'Validate the folder setup first'}
       >
-        <div className="onboarding-form-group">
+        <div className={styles['onboarding-form-group']}>
           <label>{t('onboarding.folder.scanSourceDirectory')}</label>
-          <div className="onboarding-input-wrapper">
+          <div className={styles['onboarding-input-wrapper']}>
             <input 
               type="text" 
               value={scanDir}
@@ -68,9 +69,9 @@ export default function FolderStep({
             <Button variant="secondary" onClick={pickScanDir}>{t('onboarding.folder.browse')}</Button>
           </div>
         </div>
-        <div className="onboarding-form-group">
+        <div className={styles['onboarding-form-group']}>
           <label>{t('onboarding.folder.targetLibraryDirectory')}</label>
-          <div className="onboarding-input-wrapper">
+          <div className={styles['onboarding-input-wrapper']}>
             <input 
               type="text" 
               value={libraryPath}
@@ -88,7 +89,7 @@ export default function FolderStep({
           {isValidatingFolders ? (t('onboarding.folder.validating') || 'Validating...') : (t('onboarding.folder.validateBtn') || 'Validate Folders')}
         </Button>
         {folderValidation.valid !== null && (
-          <div className={`onboarding-validation-status ${folderValidation.valid ? 'success' : 'error'}`}>
+          <div className={`${styles['onboarding-validation-status']} ${folderValidation.valid ? styles['success'] : styles['error']}`}>
             {folderValidation.message}
           </div>
         )}

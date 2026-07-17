@@ -2,6 +2,8 @@ import Switch from '../../../ui/Switch';
 import Inline from '@/ui/Inline';
 import { CAMERA_EMOJI, NSFW_TEXT } from '../utils/aboutHelpers';
 import { getFeaturesTourData } from '../utils/aboutData';
+import sidebarStyles from '../../../ui/Sidebar.module.css';
+import styles from './FeaturesTourPanel.module.css';
 
 export default function FeaturesTourPanel({
   activeTourIndex,
@@ -26,12 +28,12 @@ export default function FeaturesTourPanel({
   const displayImage = showNsfwDocs && currentItemObj.image_nsfw ? currentItemObj.image_nsfw : currentItemObj.image;
 
   return (
-    <div className="about-tab-panel features-panel about-features-tour-container">
-      <div className="about-features-tour-body">
+    <div className={`about-tab-panel features-panel ${styles['about-features-tour-container']}`}>
+      <div className={styles['about-features-tour-body']}>
         {/* Left Sub-sidebar (Navigation of features) */}
-        <div className="about-features-tour-sidebar">
-          <Inline align="center" className="about-features-nsfw-toggle">
-            <span className="about-features-nsfw-label">{t('about.docs_wizard.show_nsfw_features') || 'Show NSFW features'}</span>
+        <div className={styles['about-features-tour-sidebar']}>
+          <Inline align="center" className={styles['about-features-nsfw-toggle']}>
+            <span className={styles['about-features-nsfw-label']}>{t('about.docs_wizard.show_nsfw_features') || 'Show NSFW features'}</span>
             <Switch
               checked={showNsfwDocs}
               onChange={() => {
@@ -52,7 +54,7 @@ export default function FeaturesTourPanel({
             return (
               <div key={f.id} className="about-features-sidebar-group">
                 <div
-                  className={`ui-sidebar-item ${isMainActive ? 'active' : ''}`}
+                  className={`${sidebarStyles.item} ${isMainActive ? sidebarStyles.active : ''}`}
                   onClick={() => {
                     setActiveTourIndex(idx);
                     setActiveSubFeatureIndex(null);
@@ -67,20 +69,20 @@ export default function FeaturesTourPanel({
                     }
                   }}
                 >
-                  <span className="ui-sidebar-item-icon about-features-item-icon">{f.icon}</span>
-                  <span className="ui-sidebar-label about-features-item-label">{f.title}</span>
+                  <span className={`${sidebarStyles['item-icon']} ${styles['about-features-item-icon']}`}>{f.icon}</span>
+                  <span className={`${sidebarStyles.label} ${styles['about-features-item-label']}`}>{f.title}</span>
                   {f.details && (
-                    <span className="about-features-item-expand">
+                    <span className={styles['about-features-item-expand']}>
                       {isAnyActive ? '▼' : '▶'}
                     </span>
                   )}
                 </div>
 
                 {f.details && isAnyActive && filteredDetails.length > 0 && (
-                  <div className="ui-sidebar-sub-menu is-open about-features-sub-menu">
+                  <div className={`${sidebarStyles['sub-menu']} ${sidebarStyles['is-open']} ${styles['about-features-sub-menu']}`}>
                     {activeSubIndex !== -1 && (
                       <div
-                        className="ui-sidebar-sub-indicator about-features-sub-indicator"
+                        className={`${sidebarStyles['sub-indicator']} ${styles['about-features-sub-indicator']}`}
                         // eslint-disable-next-line react/forbid-dom-props
                         style={{ top: `${activeSubIndex * 32}px` }}
                       />
@@ -91,7 +93,7 @@ export default function FeaturesTourPanel({
                       return (
                         <div
                           key={originalIndex}
-                          className={`ui-sidebar-sub-item ${isSubActive ? 'active' : ''}`}
+                          className={`${sidebarStyles['sub-item']} ${isSubActive ? sidebarStyles.active : ''}`}
                           onClick={() => {
                             setActiveTourIndex(idx);
                             setActiveSubFeatureIndex(originalIndex);
@@ -106,9 +108,9 @@ export default function FeaturesTourPanel({
                             }
                           }}
                         >
-                          <span className="about-features-sub-item-text">{detail.title}</span>
+                          <span className={styles['about-features-sub-item-text']}>{detail.title}</span>
                           {detail.nsfw && (
-                            <span className="about-features-nsfw-badge">
+                            <span className={styles['about-features-nsfw-badge']}>
                               {NSFW_TEXT}
                             </span>
                           )}
@@ -123,14 +125,14 @@ export default function FeaturesTourPanel({
         </div>
 
         {/* Right Content Panel (Split details + image) */}
-        <div className="about-features-content-panel">
-          <h3 className="about-features-content-title">
+        <div className={styles['about-features-content-panel']}>
+          <h3 className={styles['about-features-content-title']}>
             {displayTitle}
           </h3>
 
           {/* Screenshot / Image Showcase */}
           <div
-            className={`about-features-screenshot-wrapper ${displayImage ? '' : 'about-features-screenshot-wrapper--placeholder'}`}
+            className={`${styles['about-features-screenshot-wrapper']} ${displayImage ? '' : styles['about-features-screenshot-wrapper--placeholder']}`}
             onClick={() => {
               if (displayImage) {
                 setActiveLightboxUrl(displayImage);
@@ -149,24 +151,24 @@ export default function FeaturesTourPanel({
               <img
                 src={displayImage}
                 alt={displayTitle}
-                className="about-features-screenshot-image"
+                className={styles['about-features-screenshot-image']}
               />
             ) : (
-              <div className="about-features-placeholder-content">
-                <span className="about-features-placeholder-icon">{CAMERA_EMOJI}</span>
-                <span className="about-features-placeholder-label">{t('about.docs_wizard.screenshot_placeholder') || 'Screenshot Placeholder'}</span>
-                <span className="about-features-placeholder-title">{displayTitle}</span>
+              <div className={styles['about-features-placeholder-content']}>
+                <span className={styles['about-features-placeholder-icon']}>{CAMERA_EMOJI}</span>
+                <span className={styles['about-features-placeholder-label']}>{t('about.docs_wizard.screenshot_placeholder') || 'Screenshot Placeholder'}</span>
+                <span className={styles['about-features-placeholder-title']}>{displayTitle}</span>
               </div>
             )}
           </div>
 
           {/* Features / Details of the selected page */}
-          <div className="about-features-description-container">
-            <p className="about-features-description-text">
+          <div className={styles['about-features-description-container']}>
+            <p className={styles['about-features-description-text']}>
               {displayDescription}
             </p>
             {showNsfwDocs && currentItemObj.description_nsfw && (
-              <div className="about-features-nsfw-description">
+              <div className={styles['about-features-nsfw-description']}>
                 {/* Extract only the nsfw specific extension part if description_nsfw starts with base description */}
                 {currentItemObj.description_nsfw.replace(currentItemObj.description, '').trim().replace(/^\n+/, '')}
               </div>

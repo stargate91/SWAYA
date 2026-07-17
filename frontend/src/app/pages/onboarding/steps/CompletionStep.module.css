@@ -1,0 +1,49 @@
+.onboarding-completion-step {
+  text-align: center;
+  max-width: 30rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.onboarding-completion-step h2 {
+  font-size: calc(2 * var(--space-lg));
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(90deg, var(--color-state-success), var(--color-accent-blue-pale));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.success-icon-animation {
+  width: 5rem;
+  height: 5rem;
+  border-radius: var(--radius-full);
+  background: var(--color-state-success-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-state-success);
+  font-size: 2.5rem;
+  box-shadow: 0 0 1.5rem var(--color-state-success-bg);
+  animation: pulseSuccess 2s infinite;
+}
+
+@keyframes pulseSuccess {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 var(--color-state-success-bg);
+  }
+
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 0.9375rem color-mix(in srgb, rgb(65, 184, 131) 0%, transparent);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 color-mix(in srgb, rgb(65, 184, 131) 0%, transparent);
+  }
+}

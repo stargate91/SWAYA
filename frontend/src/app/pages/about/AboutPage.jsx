@@ -21,7 +21,7 @@ import DocsWizardPanel from './components/DocsWizardPanel';
 import FeaturesTourPanel from './components/FeaturesTourPanel';
 import ChangelogPanel from './components/ChangelogPanel';
 
-import './AboutPage.css';
+import AboutPageStyles from './AboutPage.module.css';
 
 export default function AboutPage() {
   const { t } = useTranslation();
@@ -137,7 +137,7 @@ export default function AboutPage() {
       />
 
       <Overlay.ContentWrapper>
-        <Overlay.Content className={activeTab === 'docs_features' ? 'ui-overlay__content--wide' : ''}>
+        <Overlay.Content className={activeTab === 'docs_features' ? AboutPageStyles.wideContent : ''}>
           <div className="settings-tab-content">
             {activeTab === 'info' && (
               <GeneralPanel t={t} appInfo={appInfo} />

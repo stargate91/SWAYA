@@ -30,16 +30,6 @@
   user-select: none;
 }
 
-.close-btn[data-variant="close"] {
-  background: var(--color-surface-overlay);
-  color: var(--button-primary-color);
-  border: 1px solid var(--color-border-heavy);
-}
-
-.close-btn[data-variant="close"]:hover {
-  background-color: var(--button-primary-neutral-bg);
-  border-color: var(--button-secondary-neutral-border);
-}
 
 .image {
   max-width: min(92vw, 87.5rem);

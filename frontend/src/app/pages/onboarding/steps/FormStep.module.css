@@ -1,0 +1,102 @@
+.onboarding-form-panel {
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-xl);
+  padding: calc(2 * var(--space-lg));
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.onboarding-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.onboarding-form-group label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.onboarding-input-wrapper {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.onboarding-input-wrapper input {
+  flex: 1;
+  background: var(--modal-field-bg);
+  border: 1px solid var(--color-line);
+  border-radius: 0.875rem;
+  padding: 0.8125rem 0.875rem;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.onboarding-input-wrapper input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  background: var(--modal-field-active);
+  box-shadow: 0 0 0 var(--space-xs) color-mix(in srgb, var(--color-accent-glow) 45%, transparent);
+}
+
+.onboarding-validation-status {
+  font-size: 0.8125rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.onboarding-validation-status.success {
+  background: var(--color-state-success-bg);
+  color: var(--color-state-success);
+  border: 1px solid var(--color-border-default);
+}
+
+.onboarding-validation-status.error {
+  background: var(--color-state-danger-bg);
+  color: var(--color-state-danger);
+  border: 1px solid var(--color-border-default);
+}
+
+.documentation-link-box {
+  background: var(--color-panel-soft);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-xl);
+  padding: 1.125rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  text-align: left;
+}
+
+.documentation-link-box p {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+}
+
+.documentation-link-box span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-signal);
+  text-decoration: underline;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.documentation-link-box span:hover {
+  color: var(--color-accent-blue-pale);
+}

@@ -1,9 +1,10 @@
 import { Globe, Languages, SlidersHorizontal, Search, CheckCircle, Check } from '@/ui/icons';
-import OnboardingInfoCard from '../OnboardingInfoCard';
-import OnboardingOrbitHero from '../OnboardingOrbitHero';
-import OnboardingPanelCard from '../OnboardingPanelCard';
+import OnboardingInfoCard from '../components/OnboardingInfoCard';
+import OnboardingOrbitHero from '../components/OnboardingOrbitHero';
+import OnboardingPanelCard from '../components/OnboardingPanelCard';
 import { useTranslation } from '@/providers/LanguageContext';
 import Inline from '@/ui/Inline';
+import styles from './WelcomeStep.module.css';
 
 export default function WelcomeStep({
   locale,
@@ -55,8 +56,8 @@ export default function WelcomeStep({
         footerLabel={t('onboarding.welcome.footerLabel') || 'Current selection'}
         footerValue={availableLanguages.find((lang) => lang.code === locale)?.name || 'English'}
       >
-        <div className="lang-search-wrapper">
-          <Search size={16} className="lang-search-icon" />
+        <div className={styles['lang-search-wrapper']}>
+          <Search size={16} className={styles['lang-search-icon']} />
           <input 
             type="text" 
             placeholder={t('onboarding.welcome.searchPlaceholder') || 'Search languages...'} 
@@ -65,29 +66,29 @@ export default function WelcomeStep({
           />
         </div>
 
-        <div className="welcome-lang-active-note">
+        <div className={styles['welcome-lang-active-note']}>
           <CheckCircle size={16} />
           {t('onboarding.welcome.englishOnlyActiveNote')}
         </div>
 
-        <div className="language-list-scroll">
+        <div className={styles['language-list-scroll']}>
           {filteredLanguages.map((lang) => {
             return (
               // eslint-disable-next-line jsx-a11y/no-static-element-interactions
               <div 
                 key={lang.code}
-                className={`language-row-item ${locale === lang.code ? 'is-selected' : ''} ${!lang.active ? 'is-disabled' : ''}`}
+                className={`${styles['language-row-item']} ${locale === lang.code ? styles['is-selected'] : ''} ${!lang.active ? styles['is-disabled'] : ''}`}
                 onClick={() => lang.active && setLocale(lang.code)}
               >
                 <Inline gap="md" align="center" className="lang-row-left">
-                  <span className="lang-row-flag-frame">
-                    <span className="lang-row-flag-glow" />
-                    <img src={lang.flagUrl} alt={lang.name} className="lang-row-flag-img" />
+                  <span className={styles['lang-row-flag-frame']}>
+                    <span className={styles['lang-row-flag-glow']} />
+                    <img src={lang.flagUrl} alt={lang.name} className={styles['lang-row-flag-img']} />
                   </span>
-                  <span className="lang-row-name">{lang.name}</span>
+                  <span className={styles['lang-row-name']}>{lang.name}</span>
                 </Inline>
-                {locale === lang.code && <Check size={16} className="lang-checked-icon" />}
-                {!lang.active && <span className="lang-coming-soon">{t('onboarding.welcome.comingSoon')}</span>}
+                {locale === lang.code && <Check size={16} className={styles['lang-checked-icon']} />}
+                {!lang.active && <span className={styles['lang-coming-soon']}>{t('onboarding.welcome.comingSoon')}</span>}
               </div>
             );
           })}

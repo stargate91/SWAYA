@@ -1,0 +1,68 @@
+.changelog-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-2xl) 0;
+  color: var(--color-text-secondary);
+}
+
+.changelog-spinner {
+  animation: aboutSpin var(--motion-duration-pulse) var(--motion-ease-linear) infinite;
+}
+
+@keyframes aboutSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.changelog-error {
+  color: var(--color-danger);
+  padding: var(--space-lg);
+  text-align: center;
+}
+
+.changelog-markdown {
+  max-height: 31.25rem;
+  overflow-y: auto;
+  padding-right: var(--space-md);
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.changelog-markdown h1 {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-md);
+}
+
+.changelog-markdown h2 {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-md);
+}
+
+.changelog-markdown h3 {
+  font-size: var(--font-size-md);
+  color: var(--color-text-primary);
+  margin-top: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.changelog-markdown p {
+  margin-bottom: var(--space-md);
+}
+
+.changelog-markdown li {
+  margin-left: var(--space-lg);
+  margin-bottom: var(--space-sm);
+  list-style-type: disc;
+}
+
+.changelog-space {
+  height: var(--space-md);
+}

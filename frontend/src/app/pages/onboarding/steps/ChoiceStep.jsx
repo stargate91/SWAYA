@@ -1,8 +1,9 @@
 import { Cpu, FileJson } from '@/ui/icons';
-import OnboardingInfoCard from '../OnboardingInfoCard';
-import OnboardingOrbitHero from '../OnboardingOrbitHero';
-import OnboardingPanelCard from '../OnboardingPanelCard';
+import OnboardingInfoCard from '../components/OnboardingInfoCard';
+import OnboardingOrbitHero from '../components/OnboardingOrbitHero';
+import OnboardingPanelCard from '../components/OnboardingPanelCard';
 import { useTranslation } from '@/providers/LanguageContext';
+import styles from './ChoiceStep.module.css';
 
 export default function ChoiceStep({
   configChoice,
@@ -51,13 +52,13 @@ export default function ChoiceStep({
         footerLabel={t('onboarding.choice.footerLabel') || 'Current mode'}
         footerValue={configChoice === 'new' ? (t('onboarding.choice.configScratch') || 'Configure from scratch') : (t('onboarding.choice.importBackup') || 'Import from backup')}
       >
-        <div className="onboarding-choice-step">
+        <div className={styles['onboarding-choice-step']}>
           {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
           <div 
-            className={`onboarding-choice-card ${configChoice === 'new' ? 'is-selected' : ''}`}
+            className={`${styles['onboarding-choice-card']} ${configChoice === 'new' ? styles['is-selected'] : ''}`}
             onClick={() => setConfigChoice('new')}
           >
-            <div className="choice-icon-wrapper">
+            <div className={styles['choice-icon-wrapper']}>
               <Cpu size={24} />
             </div>
             <h3>{t('onboarding.choice.configureNewSetup')}</h3>
@@ -66,18 +67,18 @@ export default function ChoiceStep({
 
           {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
           <div 
-            className={`onboarding-choice-card ${configChoice === 'import' ? 'is-selected' : ''}`}
+            className={`${styles['onboarding-choice-card']} ${configChoice === 'import' ? styles['is-selected'] : ''}`}
             onClick={() => setConfigChoice('import')}
           >
-            <div className="choice-icon-wrapper">
+            <div className={styles['choice-icon-wrapper']}>
               <FileJson size={24} />
             </div>
             <h3>{t('onboarding.choice.importBackupProfile')}</h3>
             <p>{t('onboarding.choice.importBackupProfileDesc')}</p>
             
-            <div className={`onboarding-choice-action-slot ${configChoice === 'import' ? 'is-active' : ''}`}>
+            <div className={`${styles['onboarding-choice-action-slot']} ${configChoice === 'import' ? styles['is-active'] : ''}`}>
               {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-              <div className="onboarding-dropzone" onClick={(e) => e.stopPropagation()}>
+              <div className={styles['onboarding-dropzone']} onClick={(e) => e.stopPropagation()}>
                 <label className="onboarding-dropzone-label">
                   <p>{isImporting ? (t('onboarding.choice.importingSettings') || 'Importing settings...') : (t('onboarding.choice.browseJson') || 'Click to Browse JSON')}</p>
                   <input 
