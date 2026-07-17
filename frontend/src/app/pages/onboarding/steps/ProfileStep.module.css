@@ -11,12 +11,22 @@
   margin-top: 0.5rem;
 }
 
+.avatar-img {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-full);
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 12%, transparent);
+  display: block;
+}
+
 .avatar-preset-btn {
+  --avatar-trans-dur: 0.22s;
+  --avatar-trans-ease: cubic-bezier(0.16, 1, 0.3, 1);
   background: transparent;
   border: none;
   padding: 0;
   cursor: pointer;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all var(--avatar-trans-dur) var(--avatar-trans-ease);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -25,23 +35,15 @@
 
 .avatar-preset-btn:hover .avatar-img {
   border-color: var(--color-line-strong);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-0.125rem);
+  box-shadow: 0 0.25rem 0.75rem hsl(0 0% 0% / 0.2);
 }
 
 .avatar-preset-btn.is-selected .avatar-img {
   border-color: var(--color-accent);
   box-shadow:
     0 0 0 2px var(--color-accent),
-    0 8px 20px rgba(0, 0, 0, 0.35);
-}
-
-.avatar-img {
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: var(--radius-full);
-  border: 1px solid color-mix(in srgb, var(--color-text-primary) 12%, transparent);
-  display: block;
+    0 0.5rem 1.25rem hsl(0 0% 0% / 0.35);
 }
 
 .avatar-upload-row {
@@ -66,12 +68,12 @@
 .avatar-upload-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0.125rem;
 }
 
 .avatar-upload-title {
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   color: var(--color-ink);
 }
 
@@ -82,7 +84,38 @@
 
 .avatar-presets-title {
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-secondary);
   margin-top: 0.5rem;
+}
+
+.avatar-error {
+  color: var(--color-state-danger);
+  font-size: 0.6875rem;
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.upload-btn {
+  margin-left: auto;
+}
+
+.badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--color-signal);
+  border-radius: var(--radius-full);
+  width: 0.875rem;
+  height: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-bg-canvas);
+}
+
+.check-icon {
+  margin: auto;
 }

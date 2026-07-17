@@ -3,10 +3,11 @@ import PosterCard from '@/ui/PosterCard';
 import AdultOverlay from '@/ui/AdultOverlay';
 import Button from '@/ui/Button';
 import Spinner from '@/ui/Spinner';
+import Stack from '@/ui/Stack';
+import Inline from '@/ui/Inline';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
 import { API_BASE } from '@/lib/backend';
-import styles from './SearchResults.module.css';
 
 export default function SearchResults({
   filteredResults,
@@ -23,7 +24,7 @@ export default function SearchResults({
 }) {
   return (
     <>
-      <Grid variant={urlType === 'scene' ? 'scene' : 'poster'} className={styles['search-page-grid']}>
+      <Grid variant={urlType === 'scene' ? 'scene' : 'poster'} className="u-w-full">
         {filteredResults.map((item, idx) => {
           const n = normalizeMediaEntity(item, { context: 'search', settings });
           const isAdultItem = urlSource !== 'tmdb' || item.is_adult || item.media_type === 'scene';
@@ -36,27 +37,23 @@ export default function SearchResults({
             : rawPosterUrl;
 
           let subtitle = n.subtitle || undefined;
-          let ratingPill;
+          let date;
           let performers;
 
           if (item.media_type === 'scene') {
             performers = n.performers;
             subtitle = undefined;
 
-            const displayDate = item.release_date ? item.release_date.substring(0, 10) : item.year;
-            ratingPill = displayDate ? (
-              <span className={styles['search-page-card-date']}>{displayDate}</span>
-            ) : undefined;
+            date = item.release_date ? item.release_date.substring(0, 10) : item.year;
           }
 
           return (
             <PosterCard
               key={`${item.id}-${item.media_type}-${idx}`}
               aspect={item.media_type === 'scene' ? 'landscape' : 'poster'}
-              className={item.media_type === 'scene' ? styles['library-scene-card'] : ''}
               title={item.title || item.name}
               subtitle={subtitle}
-              ratingPill={ratingPill}
+              date={date}
               performers={performers}
               imageUrl={posterUrl}
               icon={FallbackIcon}
@@ -68,21 +65,24 @@ export default function SearchResults({
       </Grid>
 
       {hasMorePages && (
-        <div className={styles['search-page-more-container']}>
-          {isMoreLoading ? (
-            <Spinner label={t('common.loading') || 'Loading...'} />
-          ) : (
-            <Button
-              variant="secondary-neutral"
-              onClick={() => setLoadedPage((prev) => prev + 1)}
-            >
-              {t('search.moreMatches', {
-                count: 20,
-                defaultValue: 'Load More Results (+20)'
-              })}
-            </Button>
-          )}
-        </div>
+        <Stack gap="lg" className="u-w-full u-mt-sm">
+          <hr className="u-divider" />
+          <Inline justify="center" className="u-w-full">
+            {isMoreLoading ? (
+              <Spinner label={t('common.loading') || 'Loading...'} />
+            ) : (
+              <Button
+                variant="secondary-neutral"
+                onClick={() => setLoadedPage((prev) => prev + 1)}
+              >
+                {t('search.moreMatches', {
+                  count: 20,
+                  defaultValue: 'Load More Results (+20)'
+                })}
+              </Button>
+            )}
+          </Inline>
+        </Stack>
       )}
     </>
   );

@@ -57,7 +57,10 @@
     "apiKeyPlaceholder": "Enter TMDB API Key",
     "bearerTokenPlaceholder": "Enter TMDB bearer token",
     "validating": "Validating...",
-    "validateBtn": "Validate Credentials"
+    "validateBtn": "Validate Credentials",
+    "optionalFields": "Optional fields",
+    "offlineScan": "Offline Mode",
+    "offlineScanActive": "Leave empty for local file scanning only"
   },
   "omdb": {
     "optionalButRecommended": "Optional but highly recommended",
@@ -72,7 +75,10 @@
     "footerValue": "Validate the OMDb key to continue onboarding",
     "apiKeyPlaceholder": "Enter OMDb API Key",
     "validating": "Validating...",
-    "validateBtn": "Validate Key"
+    "validateBtn": "Validate Key",
+    "optionalField": "Optional field",
+    "offlineScan": "Offline Mode",
+    "offlineScanActive": "Leave empty for local file scanning only"
   },
   "completion": {
     "title": "Setup Complete!",
@@ -109,7 +115,11 @@
     "scanningLimitedDesc": "SWAYA needs TMDB before scanning can do real metadata matching, artwork lookups, and clean organization.",
     "closeGuide": "Close guide",
     "ready": "Ready",
-    "backToForm": "Back to form"
+    "backToForm": "Back to form",
+    "eyebrow": "Metadata Access",
+    "helpNeeded": "Need help?",
+    "readDocs": "Read the documentation →",
+    "needHelpText": "Need help finding or generating your TMDb API credentials? Detailed instructions are available in the app settings help section."
   },
   "omdbGuide": {
     "activateRatings": "Unlock OMDb ratings to continue",
@@ -121,7 +131,11 @@
     "ratingsMetricsDesc": "These ratings are what you see on the movie and show detail pages.",
     "closeGuide": "Close guide",
     "ready": "Ready",
-    "backToForm": "Back to form"
+    "backToForm": "Back to form",
+    "eyebrow": "Ratings Integration",
+    "helpNeeded": "Need help?",
+    "readDocs": "Read the documentation →",
+    "needHelpText": "Need a free OMDb API key to fetch movie ratings? You can request a free key on the OMDb website."
   },
   "profile": {
     "pill1": "Nickname",

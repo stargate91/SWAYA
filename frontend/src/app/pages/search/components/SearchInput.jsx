@@ -1,10 +1,10 @@
 import { Search } from '@/ui/icons';
 import Input from '@/ui/Input';
-import styles from './SearchInput.module.css';
+import IconButton from '@/ui/IconButton';
 
 export default function SearchInput({ localQuery, setLocalQuery, handleSearchSubmit, t }) {
   return (
-    <form onSubmit={handleSearchSubmit} className={styles['search-page-input-form']}>
+    <form onSubmit={handleSearchSubmit} className="u-w-full">
       <Input
         type="text"
         className="search-page-input"
@@ -12,9 +12,9 @@ export default function SearchInput({ localQuery, setLocalQuery, handleSearchSub
         value={localQuery}
         onChange={(e) => setLocalQuery(e.target.value)}
         leftElement={
-          <button type="submit" className={styles['search-page-input-btn']} aria-label="Search">
+          <IconButton type="submit" variant="ghost" size="xs" label="Search">
             <Search size={18} />
-          </button>
+          </IconButton>
         }
       />
     </form>

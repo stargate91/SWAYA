@@ -1,6 +1,6 @@
 import SegmentedControl from '@/ui/SegmentedControl';
 import Inline from '@/ui/Inline';
-import styles from './SearchFilters.module.css';
+import Field from '@/ui/Field';
 
 export default function SearchFilters({
   urlSource,
@@ -12,26 +12,24 @@ export default function SearchFilters({
   t,
 }) {
   return (
-    <Inline gap="lg" align="center" className={styles['search-page-controls']}>
-      <div className={styles['search-page-control-group']}>
-        <span className={styles['search-page-control-label']}>{t('search.sourceLabel', { defaultValue: 'Source' })}</span>
+    <Inline gap="lg" align="center">
+      <Field label={t('search.sourceLabel', { defaultValue: 'Source' })}>
         <SegmentedControl
           options={sourceOptions}
           value={urlSource}
           onChange={handleSourceChange}
           ariaLabel="Select search source"
         />
-      </div>
+      </Field>
 
-      <div className={styles['search-page-control-group']}>
-        <span className={styles['search-page-control-label']}>{t('search.typeLabel', { defaultValue: 'Type' })}</span>
+      <Field label={t('search.typeLabel', { defaultValue: 'Type' })}>
         <SegmentedControl
           options={typeOptions}
           value={urlType}
           onChange={handleTypeChange}
           ariaLabel="Select search type"
         />
-      </div>
+      </Field>
     </Inline>
   );
 }

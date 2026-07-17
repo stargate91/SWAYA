@@ -5,7 +5,6 @@ import OnboardingInfoCard from '../components/OnboardingInfoCard';
 import OnboardingOrbitHero from '../components/OnboardingOrbitHero';
 import OnboardingPanelCard from '../components/OnboardingPanelCard';
 import { useTranslation } from '@/providers/LanguageContext';
-import Inline from '@/ui/Inline';
 import api from '@/lib/api';
 import { API_BASE } from '@/lib/backend';
 import styles from './ProfileStep.module.css';
@@ -118,18 +117,18 @@ export default function ProfileStep({
             <div className={styles['avatar-upload-info']}>
               <span className={styles['avatar-upload-title']}>{t('onboarding.profile.avatarUploadTitle', { defaultValue: 'Upload Custom Avatar' })}</span>
               <span className={styles['avatar-upload-hint']}>{t('onboarding.profile.avatarUploadHint', { defaultValue: 'Supports PNG, JPG, WEBP' })}</span>
-              {error && <span className="avatar-error" style={{ color: 'var(--color-state-danger)', fontSize: '11px' }}>{error}</span>}
+              {error && <span className={styles['avatar-error']}>{error}</span>}
             </div>
             <input 
               type="file" 
               ref={fileInputRef} 
               accept="image/*" 
-              style={{ display: 'none' }} 
+              className={styles['hidden-file-input']} 
               onChange={handleAvatarUpload}
             />
             <Button 
               variant="secondary" 
-              style={{ marginLeft: 'auto' }} 
+              className={styles['upload-btn']} 
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
             >
@@ -158,8 +157,8 @@ export default function ProfileStep({
                   >
                     <img src={presetUrl} alt={preset.seed} className={styles['avatar-img']} />
                     {isSelected && (
-                      <div style={{ position: 'absolute', bottom: '0px', right: '0px', background: 'var(--color-signal)', borderRadius: '50%', width: '14px', height: '14px', display: 'flex', alignItems: 'center', justifySelf: 'center', color: '#fff' }}>
-                        <Check size={10} style={{ margin: 'auto' }} />
+                      <div className={styles.badge}>
+                        <Check size={10} className={styles['check-icon']} />
                       </div>
                     )}
                   </button>

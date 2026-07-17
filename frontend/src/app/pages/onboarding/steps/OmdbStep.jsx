@@ -34,12 +34,13 @@ export default function OmdbStep({
         description={t('onboarding.omdbGuide.ratingsPurposeDesc', { defaultValue: 'SWAYA uses OMDb for IMDb, Metascore, and Rotten Tomatoes ratings during enrichment.' })}
         footerLabel={t('onboarding.omdbGuide.helpNeeded', { defaultValue: 'Need help?' })}
         footerValue={(
-          <span 
-            style={{ cursor: 'pointer', textDecoration: 'underline', color: 'var(--color-signal)' }}
+          <button 
+            type="button"
+            className={styles['footer-link-btn']}
             onClick={onOpenDocs}
           >
             {t('onboarding.omdbGuide.readDocs', { defaultValue: 'Read the documentation' })}
-          </span>
+          </button>
         )}
         items={[
           {
@@ -84,9 +85,9 @@ export default function OmdbStep({
           )}
           <div className={styles['documentation-link-box']}>
             <p>{t('onboarding.omdbGuide.needHelpText', { defaultValue: 'Need a free OMDb API key to fetch movie ratings? You can request a free key on the OMDb website.' })}</p>
-            <span onClick={onOpenDocs}>
-              {t('onboarding.omdbGuide.readDocs', { defaultValue: 'Read the documentation' })} &rarr;
-            </span>
+            <button type="button" className={styles['doc-link-btn']} onClick={onOpenDocs}>
+              {t('onboarding.omdbGuide.readDocs', { defaultValue: 'Read the documentation →' })}
+            </button>
           </div>
         </OnboardingPanelCard>
       </div>

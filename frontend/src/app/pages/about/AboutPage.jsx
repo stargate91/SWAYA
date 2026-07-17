@@ -137,7 +137,7 @@ export default function AboutPage() {
       />
 
       <Overlay.ContentWrapper>
-        <Overlay.Content className={activeTab === 'docs_features' ? AboutPageStyles.wideContent : ''}>
+        <Overlay.Content className={activeTab === 'docs_features' ? AboutPageStyles['wide-content'] : ''}>
           <div className="settings-tab-content">
             {activeTab === 'info' && (
               <GeneralPanel t={t} appInfo={appInfo} />

@@ -16,7 +16,7 @@
 
 .onboarding-form-group label {
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-secondary);
 }
 
@@ -26,6 +26,8 @@
 }
 
 .onboarding-input-wrapper input {
+  --input-trans-dur: 0.2s;
+  --input-trans-ease: ease;
   flex: 1;
   background: var(--modal-field-bg);
   border: 1px solid var(--color-line);
@@ -35,7 +37,7 @@
   font-family: var(--font-sans);
   font-size: 0.8125rem;
   box-sizing: border-box;
-  transition: all 0.2s ease;
+  transition: all var(--input-trans-dur) var(--input-trans-ease);
 }
 
 .onboarding-input-wrapper input:focus {
@@ -90,7 +92,7 @@
   align-items: center;
   gap: 0.375rem;
   font-size: 0.8125rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: var(--color-signal);
   text-decoration: underline;
   cursor: pointer;
@@ -99,4 +101,32 @@
 
 .documentation-link-box span:hover {
   color: var(--color-accent-blue-pale);
+}
+
+.doc-link-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-signal);
+  text-decoration: underline;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.doc-link-btn:hover {
+  color: var(--color-accent-blue-pale);
+}
+
+.footer-link-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  color: var(--color-signal);
 }

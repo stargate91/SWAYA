@@ -14,8 +14,8 @@
   inset: 1.625rem 2rem;
   border-radius: 1.75rem;
   background:
-    linear-gradient(90deg, rgba(20, 147, 255, 0.12), rgba(0, 100, 209, 0.05) 42%, transparent 78%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.018)),
+    linear-gradient(90deg, hsl(205 100% 53.9% / 0.12), hsl(211 100% 41% / 0.05) 42%, transparent 78%),
+    linear-gradient(180deg, hsl(0 0% 100% / 0.05), hsl(0 0% 100% / 0.018)),
     var(--ui-surface-card-gradient);
   border: 1px solid var(--ui-overlay-panel-border);
   box-shadow: 0 1.125rem 2.5rem color-mix(in srgb, var(--color-bg-canvas) 24%, transparent), inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 4%, transparent);
@@ -43,16 +43,20 @@
 }
 
 .welcome-hero-orbit-primary {
+  --drift-primary-dur: 8s;
+  --drift-primary-ease: ease-in-out;
   inset: 0 var(--space-2xl);
   transform: rotate(-12deg);
-  animation: orbitDriftPrimary 8s ease-in-out infinite;
+  animation: orbitDriftPrimary var(--drift-primary-dur) var(--drift-primary-ease) infinite;
 }
 
 .welcome-hero-orbit-secondary {
+  --drift-secondary-dur: 9s;
+  --drift-secondary-ease: ease-in-out;
   inset: 1.375rem 0;
   transform: rotate(18deg);
   opacity: 0.38;
-  animation: orbitDriftSecondary 9s ease-in-out infinite;
+  animation: orbitDriftSecondary var(--drift-secondary-dur) var(--drift-secondary-ease) infinite;
 }
 
 .welcome-logo-badge {
@@ -67,12 +71,14 @@
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-full);
   box-shadow:
-    0 1.5rem 3.75rem rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 1.5rem 3.75rem hsl(0 0% 0% / 0.45),
+    inset 0 1px 0 hsl(0 0% 100% / 0.08);
   backdrop-filter: var(--glass-blur-lg);
 }
 
 .welcome-logo-badge .badge-glow {
+  --pulse-glow-dur: 3s;
+  --pulse-glow-ease: ease-in-out;
   position: absolute;
   top: 0;
   left: 0;
@@ -82,13 +88,15 @@
   background: var(--color-accent-blue);
   opacity: 0.15;
   filter: blur(var(--space-md));
-  animation: pulseGlow 3s infinite ease-in-out;
+  animation: pulseGlow var(--pulse-glow-dur) infinite var(--pulse-glow-ease);
 }
 
 .welcome-logo-badge .badge-icon {
+  --icon-orbit-dur: 14s;
+  --icon-orbit-ease: linear;
   color: var(--color-accent-blue);
   z-index: var(--z-index-step-2);
-  animation: heroIconOrbit 14s linear infinite;
+  animation: heroIconOrbit var(--icon-orbit-dur) var(--icon-orbit-ease) infinite;
 }
 
 .welcome-hero-chip {
@@ -99,12 +107,12 @@
   padding: 0 var(--space-md);
   border-radius: var(--radius-full);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.018)),
-    linear-gradient(180deg, rgba(12, 18, 28, 0.94), rgba(8, 13, 20, 0.98));
+    linear-gradient(180deg, hsl(0 0% 100% / 0.05), hsl(0 0% 100% / 0.018)),
+    linear-gradient(180deg, hsl(218 40% 7.8% / 0.94), hsl(220 42.9% 5.5% / 0.98));
   border: 1px solid color-mix(in srgb, var(--color-accent) 16%, color-mix(in srgb, var(--color-text-primary) 8%, transparent));
   box-shadow:
-    0 0.75rem 1.625rem rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    0 0.75rem 1.625rem hsl(0 0% 0% / 0.2),
+    inset 0 1px 0 hsl(0 0% 100% / 0.04);
   color: color-mix(in srgb, var(--color-signal) 70%, var(--color-text-primary) 30%);
   font: 600 0.6875rem/1 var(--font-sans);
   letter-spacing: 0.06em;
@@ -118,10 +126,12 @@
 }
 
 .welcome-hero-chip-orbit {
+  --hero-float-dur: 5.2s;
+  --hero-float-ease: ease-in-out;
   position: absolute;
   transform: translate(-50%, -50%);
   pointer-events: none;
-  animation: heroFloat 5.2s ease-in-out infinite;
+  animation: heroFloat var(--hero-float-dur) var(--hero-float-ease) infinite;
 }
 
 @keyframes pulseGlow {

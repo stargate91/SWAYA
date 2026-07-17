@@ -1,8 +1,10 @@
 .onboarding-timeline {
+  --timeline-trans-dur: 0.24s;
+  --timeline-trans-ease: ease;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  transition: opacity 0.24s ease, transform 0.24s ease;
+  transition: opacity var(--timeline-trans-dur) var(--timeline-trans-ease), transform var(--timeline-trans-dur) var(--timeline-trans-ease);
 }
 
 .onboarding-timeline.is-hidden {
@@ -18,6 +20,8 @@
 }
 
 .timeline-dot-wrapper.is-current::after {
+  --pulse-ring-dur: 1.9s;
+  --pulse-ring-ease: ease-out;
   content: "";
   position: absolute;
   top: 50%;
@@ -28,15 +32,17 @@
   background: color-mix(in srgb, var(--color-accent-blue) 28%, transparent);
   transform: translate(-50%, -50%);
   pointer-events: none;
-  animation: onboardingTimelinePulseRing 1.9s ease-out infinite;
+  animation: onboardingTimelinePulseRing var(--pulse-ring-dur) var(--pulse-ring-ease) infinite;
 }
 
 .timeline-dot {
+  --dot-trans-dur: 0.3s;
+  --dot-trans-ease: ease;
   width: var(--space-md);
   height: var(--space-md);
   border-radius: 50%;
   background: var(--color-border-heavy);
-  transition: all 0.3s ease;
+  transition: all var(--dot-trans-dur) var(--dot-trans-ease);
   box-shadow: 0 0 0 2px transparent;
 }
 
@@ -45,18 +51,22 @@
 }
 
 .timeline-dot-wrapper.is-current .timeline-dot {
+  --pulse-dur: 1.9s;
+  --pulse-ease: ease-in-out;
   background: var(--color-accent-blue);
   box-shadow: 0 0 var(--space-lg) var(--color-accent-blue);
   transform: scale(1.25);
-  animation: onboardingTimelinePulse 1.9s ease-in-out infinite;
+  animation: onboardingTimelinePulse var(--pulse-dur) var(--pulse-ease) infinite;
 }
 
 .timeline-line {
+  --line-trans-dur: 0.3s;
+  --line-trans-ease: ease;
   width: var(--space-2xl);
-  height: 2px;
+  height: 0.125rem;
   background: var(--color-border-subtle);
   margin-left: 0.5rem;
-  transition: all 0.3s ease;
+  transition: all var(--line-trans-dur) var(--line-trans-ease);
 }
 
 .timeline-dot-wrapper.is-active .timeline-line {

@@ -26,10 +26,17 @@ Skeleton.Row.propTypes = {
   className: PropTypes.string,
 };
 
-Skeleton.Card = function SkeletonCard({ className = '', ...props }) {
-  return <div className={`${styles.card} ${styles.shimmer} ${className}`.trim()} {...props} />;
+Skeleton.Card = function SkeletonCard({ aspect, className = '', ...props }) {
+  const classes = [
+    styles.card,
+    styles.shimmer,
+    aspect && styles[`card--aspect-${aspect}`],
+    className
+  ].filter(Boolean).join(' ');
+  return <div className={classes} {...props} />;
 };
 Skeleton.Card.propTypes = {
+  aspect: PropTypes.oneOf(['scene', 'poster']),
   className: PropTypes.string,
 };
 

@@ -3,13 +3,13 @@ import Page from '@/ui/Page';
 import Skeleton from '@/ui/Skeleton';
 import EmptyState from '@/ui/EmptyState';
 import Grid from '@/ui/Grid';
+import Stack from '@/ui/Stack';
+import Card from '@/ui/Card';
 import { useSettingsQuery } from '@/queries/settingsQueries';
 import useSearchPageController, { TYPES_BY_SOURCE } from './components/useSearchPageController';
 import SearchInput from './components/SearchInput';
 import SearchFilters from './components/SearchFilters';
 import SearchResults from './components/SearchResults';
-import styles from './SearchPage.module.css';
-import searchResultStyles from './components/SearchResults.module.css';
 
 export default function SearchPage() {
   const { data: settings } = useSettingsQuery();
@@ -38,40 +38,40 @@ export default function SearchPage() {
   const activeTypeObj = (TYPES_BY_SOURCE[urlSource] || []).find(t => t.id === urlType) || { name: urlType, icon: Clapperboard };
   const FallbackIcon = activeTypeObj.icon;
 
+  const pageTitle = urlQuery 
+    ? t('search.resultsFor', { query: urlQuery, defaultValue: `Search Results for "${urlQuery}"` }) 
+    : t('search.title', { defaultValue: 'Global Search' });
+
   return (
-    <Page className={styles['search-page-layout']}>
-      <div className={styles['search-page-header']}>
-        <h1 className={styles['search-page-title']}>
-          {urlQuery ? t('search.resultsFor', { query: urlQuery, defaultValue: `Search Results for "${urlQuery}"` }) : t('search.title', { defaultValue: 'Global Search' })}
-        </h1>
-      </div>
+    <Page title={pageTitle}>
+      <Card variant="soft" padding="md" className="u-mb-xl">
+        <Stack gap="lg">
+          <SearchInput
+            localQuery={localQuery}
+            setLocalQuery={setLocalQuery}
+            handleSearchSubmit={handleSearchSubmit}
+            t={t}
+          />
 
-      <div className={styles['search-page-filters']}>
-        <SearchInput
-          localQuery={localQuery}
-          setLocalQuery={setLocalQuery}
-          handleSearchSubmit={handleSearchSubmit}
-          t={t}
-        />
+          <SearchFilters
+            urlSource={urlSource}
+            handleSourceChange={handleSourceChange}
+            sourceOptions={sourceOptions}
+            urlType={urlType}
+            handleTypeChange={handleTypeChange}
+            typeOptions={typeOptions}
+            t={t}
+          />
+        </Stack>
+      </Card>
 
-        <SearchFilters
-          urlSource={urlSource}
-          handleSourceChange={handleSourceChange}
-          sourceOptions={sourceOptions}
-          urlType={urlType}
-          handleTypeChange={handleTypeChange}
-          typeOptions={typeOptions}
-          t={t}
-        />
-      </div>
-
-      <div className={styles['search-page-content']}>
+      <Stack gap="md">
         {isLoading ? (
-          <Grid variant={urlType === 'scene' ? 'scene' : 'poster'} className={searchResultStyles['search-page-grid']}>
+          <Grid variant={urlType === 'scene' ? 'scene' : 'poster'} className="u-w-full">
             {Array.from({ length: 12 }).map((_, idx) => (
               <Skeleton.Card
                 key={idx}
-                className={urlType === 'scene' ? searchResultStyles['search-skeleton-card-scene'] : searchResultStyles['search-skeleton-card-poster']}
+                aspect={urlType === 'scene' ? 'scene' : 'poster'}
               />
             ))}
           </Grid>
@@ -108,7 +108,7 @@ export default function SearchPage() {
             t={t}
           />
         )}
-      </div>
+      </Stack>
     </Page>
   );
 }

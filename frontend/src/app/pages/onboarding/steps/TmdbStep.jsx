@@ -36,12 +36,13 @@ export default function TmdbStep({
         description={t('onboarding.tmdbGuide.scanningLimitedDesc', { defaultValue: 'SWAYA needs TMDB before scanning can do real metadata matching, artwork lookups, and clean organization.' })}
         footerLabel={t('onboarding.tmdbGuide.helpNeeded', { defaultValue: 'Need help?' })}
         footerValue={(
-          <span 
-            style={{ cursor: 'pointer', textDecoration: 'underline', color: 'var(--color-signal)' }}
+          <button 
+            type="button"
+            className={styles['footer-link-btn']}
             onClick={onOpenDocs}
           >
             {t('onboarding.tmdbGuide.readDocs', { defaultValue: 'Read the documentation' })}
-          </span>
+          </button>
         )}
         items={[
           {
@@ -97,9 +98,9 @@ export default function TmdbStep({
           )}
           <div className={styles['documentation-link-box']}>
             <p>{t('onboarding.tmdbGuide.needHelpText', { defaultValue: 'Need help finding or generating your TMDb API credentials? Detailed instructions are available in the app settings help section.' })}</p>
-            <span onClick={onOpenDocs}>
-              {t('onboarding.tmdbGuide.readDocs', { defaultValue: 'Read the documentation' })} &rarr;
-            </span>
+            <button type="button" className={styles['doc-link-btn']} onClick={onOpenDocs}>
+              {t('onboarding.tmdbGuide.readDocs', { defaultValue: 'Read the documentation →' })}
+            </button>
           </div>
         </OnboardingPanelCard>
       </div>

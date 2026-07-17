@@ -11,7 +11,7 @@
   padding-bottom: var(--space-md);
 }
 
-.wideContent {
-  max-width: 75rem !important;
+.wide-content {
+  max-width: 75rem;
 }
 
