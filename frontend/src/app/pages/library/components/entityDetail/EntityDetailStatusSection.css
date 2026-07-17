@@ -1,0 +1,26 @@
+.entity-detail-page__content-section--status {
+  max-width: 45rem;
+}
+
+.entity-detail-page__status-card {
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  background: var(--media-detail-panel-section-bg);
+  border: 1px solid var(--media-detail-panel-section-border);
+  box-shadow: var(--media-detail-panel-section-shadow);
+}
+
+.entity-detail-page__status-card h2,
+.entity-detail-page__status-card p {
+  margin: 0;
+}
+
+.entity-detail-page__status-card h2 {
+  font-size: 1.4rem;
+  margin-bottom: var(--space-md);
+}
+
+.entity-detail-page__status-card p {
+  color: var(--color-text-secondary);
+  line-height: 1.65;
+}

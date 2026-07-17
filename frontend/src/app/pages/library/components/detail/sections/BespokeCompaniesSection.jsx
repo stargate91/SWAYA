@@ -4,6 +4,7 @@ import { API_BASE } from '@/lib/backend';
 import Tooltip from '@/ui/Tooltip';
 import ScrollRow from '@/ui/ScrollRow';
 import Card from '@/ui/Card';
+import Text from '@/ui/Text';
 import './BespokeCompaniesSection.css';
 
 export default function BespokeCompaniesSection({ item, t }) {
@@ -43,12 +44,14 @@ export default function BespokeCompaniesSection({ item, t }) {
             showArrows={true}
           >
             {allCompanies.map((c, i) => (
-              <div key={i} className="bespoke-company-item">
+              <div key={i} className="bespoke-company-card">
                 <Tooltip content={c.name} side="top">
                   {c.logo_path ? (
                     <img src={resolveMediaImageUrl(c.logo_path, 'logo', API_BASE)} alt={c.name} className="bespoke-company-logo" />
                   ) : (
-                    <span className="bespoke-company-name-only">{c.name}</span>
+                    <Text variant="small" weight="bold" color="secondary" className="bespoke-company-text">
+                      {c.name}
+                    </Text>
                   )}
                 </Tooltip>
               </div>

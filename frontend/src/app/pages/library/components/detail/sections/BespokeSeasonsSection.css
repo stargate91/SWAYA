@@ -166,8 +166,7 @@
 }
 
 /* Metadata content columns */
-.bespoke-season-meta__content-col,
-.bespoke-episode-detail-card__content-col {
+.bespoke-season-meta__content-col {
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
@@ -177,34 +176,29 @@
   padding-right: var(--space-sm);
 }
 
-.bespoke-season-meta__content-col::-webkit-scrollbar,
-.bespoke-episode-detail-card__content-col::-webkit-scrollbar {
+.bespoke-season-meta__content-col::-webkit-scrollbar {
   width: 0.25rem;
 }
 
-.bespoke-season-meta__content-col::-webkit-scrollbar-thumb,
-.bespoke-episode-detail-card__content-col::-webkit-scrollbar-thumb {
+.bespoke-season-meta__content-col::-webkit-scrollbar-thumb {
   background: var(--color-border-default);
   border-radius: var(--radius-sm);
 }
 
 
 
-.bespoke-season-meta__title,
-.bespoke-episode-detail-card__title {
+.bespoke-season-meta__title {
   margin: 0;
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
 }
 
-.bespoke-season-meta__sub,
-.bespoke-episode-detail-card__meta {
+.bespoke-season-meta__sub {
   margin-top: 0;
 }
 
-.bespoke-season-meta__item,
-.bespoke-episode-detail-card__meta-item {
+.bespoke-season-meta__item {
   display: inline-flex;
   align-items: center;
   gap: var(--space-sm);
@@ -212,21 +206,18 @@
   color: var(--color-text-muted);
 }
 
-.bespoke-season-meta__item::after,
-.bespoke-episode-detail-card__meta-item::after {
+.bespoke-season-meta__item::after {
   content: "•";
   margin-left: var(--space-md);
   color: var(--color-text-muted);
   opacity: 0.4;
 }
 
-.bespoke-season-meta__item:last-of-type::after,
-.bespoke-episode-detail-card__meta-item:last-of-type::after {
+.bespoke-season-meta__item:last-of-type::after {
   content: "";
 }
 
-.bespoke-season-meta__overview,
-.bespoke-episode-detail-card__overview {
+.bespoke-season-meta__overview {
   margin: var(--space-3xs) 0 0 0;
   font-size: var(--font-size-xs);
   line-height: 1.5;
@@ -266,216 +257,6 @@
   color: var(--color-state-success);
 }
 
-/* Card Overlaid Nav buttons for Episode Block */
-.bespoke-card-nav {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 2.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  --local-bg: linear-gradient(to right, color-mix(in srgb, var(--color-bg-canvas) 30%, transparent), transparent);
-  background: var(--local-bg);
-  border: none;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  transition: all var(--motion-base), opacity var(--motion-base);
-  z-index: var(--z-index-step-2);
-  opacity: 0;
-  pointer-events: none;
-}
-
-.bespoke-card-nav:disabled {
-  opacity: 0.03;
-  cursor: not-allowed;
-}
-.bespoke-browser-card__body--episode:hover .bespoke-card-nav {
-  opacity: 0.5;
-  pointer-events: auto;
-}
-
-.bespoke-card-nav--left {
-  left: 0;
-  --local-bg: linear-gradient(to right, color-mix(in srgb, var(--color-bg-canvas) 40%, transparent), transparent);
-  background: var(--local-bg);
-}
-
-.bespoke-card-nav--right {
-  right: 0;
-  --local-bg: linear-gradient(to left, color-mix(in srgb, var(--color-bg-canvas) 40%, transparent), transparent);
-  background: var(--local-bg);
-}
-
-.bespoke-browser-card__body--episode:hover .bespoke-card-nav:hover:not(:disabled) {
-  opacity: 1;
-  color: var(--color-text-primary);
-}
-
-
-/* Left side still image styling (Cinematic 16:9) */
-.bespoke-episode-detail-card__still-col {
-  width: 17.3125rem;
-  flex-shrink: 0;
-}
-
-.bespoke-episode-detail-card__still-wrapper {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  background: var(--color-surface-glass);
-  border: 1px solid var(--color-border-default);
-  position: relative;
-  box-shadow: var(--shadow-sm);
-}
-
-.bespoke-episode-detail-card__still-wrapper.is-clickable {
-  cursor: pointer;
-}
-
-.bespoke-episode-detail-card__still {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform var(--motion-slow);
-}
-
-.bespoke-episode-detail-card__still-wrapper:hover .bespoke-episode-detail-card__still {
-  transform: scale(1.05);
-}
-
-.bespoke-episode-detail-card__still-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-muted);
-}
-
-.bespoke-episode-detail-card__still-watched-overlay {
-  position: absolute;
-  inset: 0;
-  --local-bg: color-mix(in srgb, var(--color-bg-canvas) 40%, transparent);
-  background: var(--local-bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-state-success);
-}
-
-.bespoke-episode-detail-card__still-wrapper:hover .ui-icon-button--play-overlay {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* Actions */
-
-
-.bespoke-action-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.625rem;
-  height: 1.625rem;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border-default);
-  background: var(--color-surface-glass);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: all var(--motion-fast);
-}
-
-.bespoke-action-btn:hover {
-  background: var(--color-border-default);
-  color: var(--color-text-primary);
-}
-
-.bespoke-action-btn--watch.is-watched {
-  border-color: color-mix(in srgb, var(--color-state-success) 24%, transparent);
-  color: var(--color-state-success);
-}
-
-.bespoke-action-btn--peak {
-  --local-color: var(--color-state-danger);
-  color: var(--local-color);
-}
-
-.bespoke-episode-detail-card__tmdb-pill {
-  --local-gap: 0.1875rem;
-  gap: var(--local-gap);
-  --local-padding: 0.0625rem var(--space-sm);
-  padding: var(--local-padding);
-  min-height: 1.125rem;
-  font-size: var(--font-size-2xs);
-  border-radius: var(--radius-sm);
-}
-
-/* Peaks History list */
-.bespoke-episode-detail-card__peaks {
-  margin-top: var(--space-xs);
-  border-top: 1px solid var(--color-border-default);
-  padding-top: var(--space-xs);
-}
-
-.bespoke-episode-detail-card__peaks-title {
-  font-size: var(--font-size-2xs);
-  font-weight: var(--font-weight-semibold);
-  --local-color: var(--color-state-danger);
-  color: var(--local-color);
-  margin-bottom: var(--space-3xs);
-}
-
-.bespoke-episode-detail-card__peaks-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-}
-
-.bespoke-episode-detail-card__peak-item {
-  background: var(--color-surface-glass);
-  border: 1px solid var(--color-border-default);
-  --local-padding: 0.0625rem var(--space-sm);
-  padding: var(--local-padding);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-2xs);
-}
-
-.bespoke-episode-detail-card__peak-date {
-  color: var(--color-text-muted);
-}
-
-.bespoke-episode-detail-card__peak-position {
-  color: var(--color-text-primary);
-  font-weight: var(--font-weight-semibold);
-}
-
-.bespoke-episode-detail-card__peak-delete {
-  background: none;
-  border: none;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-}
-
-.bespoke-episode-detail-card__peak-delete:hover {
-  --local-color: var(--color-state-danger);
-  color: var(--local-color);
-}
-
-.bespoke-browser-card__empty {
-  text-align: center;
-  padding: var(--space-lg);
-  color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 11.25rem;
-}
 
 /* Cast Card Styling matching Seasons & Episodes */
 .bespoke-cast-section {
@@ -618,141 +399,6 @@
   color: var(--color-text-primary);
 }
 
-/* Box Office Section */
-.bespoke-boxoffice-section {
-  margin-top: var(--space-md);
-}
-
-.bespoke-boxoffice-card {
-  background: var(--color-surface-card);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-lg);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.bespoke-boxoffice-body {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11.25rem, 1fr));
-  gap: var(--space-md);
-  padding: var(--space-md) var(--space-md);
-}
-
-.bespoke-boxoffice-stat {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-sm) var(--space-md);
-  --local-bg: color-mix(in srgb, var(--color-text-primary) 2%, transparent);
-  background: var(--local-bg);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-sm);
-}
-
-.bespoke-boxoffice-icon-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 50%;
-  --local-bg: color-mix(in srgb, var(--color-text-primary) 4%, transparent);
-  background: var(--local-bg);
-  color: var(--color-text-secondary);
-}
-
-.bespoke-boxoffice-info {
-  display: flex;
-  flex-direction: column;
-  --local-gap: 0.125rem;
-  gap: var(--local-gap);
-}
-
-.bespoke-boxoffice-label {
-  font-size: var(--font-size-2xs);
-  font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  --local-color: color-mix(in srgb, var(--color-text-primary) 45%, transparent);
-  color: var(--local-color);
-}
-
-.bespoke-boxoffice-value {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-}
-
-.bespoke-boxoffice-stat--profit .bespoke-boxoffice-icon-wrapper {
-  color: var(--color-state-success);
-  background: color-mix(in srgb, var(--color-state-success) 10%, transparent);
-}
-
-.bespoke-boxoffice-stat--loss .bespoke-boxoffice-icon-wrapper {
-  --local-color: var(--color-state-danger);
-  color: var(--local-color);
-  --local-bg: color-mix(in srgb, var(--color-state-danger) 10%, transparent);
-  background: var(--local-bg);
-}
-
-/* Production Companies / Networks */
-.bespoke-companies-section {
-  margin-top: var(--space-md);
-}
-
-.bespoke-companies-card {
-  background: var(--color-surface-card);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-lg);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.bespoke-companies-body {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: var(--space-md);
-  padding: var(--space-md) var(--space-md);
-  align-items: center;
-  overflow-x: auto;
-}
-
-.bespoke-company-item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 4rem;
-  padding: var(--space-sm) var(--space-md);
-  --local-bg: color-mix(in srgb, var(--color-text-primary) 2%, transparent);
-  background: var(--local-bg);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-sm);
-  flex-shrink: 0;
-}
-
-.bespoke-company-logo {
-  height: 2.375rem;
-  max-width: 10rem;
-  object-fit: contain;
-  opacity: 0.9;
-  filter: drop-shadow(0 0 0.0625rem color-mix(in srgb, var(--color-text-primary) 85%, transparent)) 
-          drop-shadow(0 0 0.1875rem color-mix(in srgb, var(--color-text-primary) 25%, transparent));
-  transition: filter var(--motion-duration-fast) var(--motion-ease-standard), opacity var(--motion-duration-fast) var(--motion-ease-standard);
-}
-
-.bespoke-company-logo:hover {
-  opacity: 1;
-  filter: drop-shadow(0 0 0.0625rem color-mix(in srgb, var(--color-text-primary) 95%, transparent)) 
-          drop-shadow(0 0 0.3125rem color-mix(in srgb, var(--color-text-primary) 40%, transparent));
-}
-
-.bespoke-company-name-only {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-secondary);
-}
 
 
 

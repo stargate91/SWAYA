@@ -11,6 +11,7 @@ import Stack from '@/ui/Stack';
 import Text from '@/ui/Text';
 import Inline from '@/ui/Inline';
 import styles from './BespokeCastSection.module.css';
+import './BespokeCompaniesSection.css';
 
 export default function BespokeCastSection({ item, t, navigate }) {
   const settings = useMediaDetailContext()?.state?.settings;
@@ -170,16 +171,16 @@ export default function BespokeCastSection({ item, t, navigate }) {
             })}
 
             {activeTab === 'companies' && item.companies.map((c, i) => (
-              <div key={i} className={styles['company-card']}>
+              <div key={i} className="bespoke-company-card">
                 <Tooltip content={c.name} side="top">
                   {c.logo_path ? (
                     <img
                       src={resolveCompanyLogoUrl(c.logo_path)}
                       alt={c.name}
-                      className={styles['company-logo']}
+                      className="bespoke-company-logo"
                     />
                   ) : (
-                    <Text variant="small" weight="bold" color="secondary" className={styles['company-text']}>
+                    <Text variant="small" weight="bold" color="secondary" className="bespoke-company-text">
                       {c.name}
                     </Text>
                   )}
@@ -188,16 +189,16 @@ export default function BespokeCastSection({ item, t, navigate }) {
             ))}
 
             {activeTab === 'networks' && item.networks.map((n, i) => (
-              <div key={i} className={styles['company-card']}>
+              <div key={i} className="bespoke-company-card">
                 <Tooltip content={n.name} side="top">
                   {n.logo_path ? (
                     <img
                       src={resolveCompanyLogoUrl(n.logo_path)}
                       alt={n.name}
-                      className={styles['company-logo']}
+                      className="bespoke-company-logo"
                     />
                   ) : (
-                    <Text variant="small" weight="bold" color="secondary" className={styles['company-text']}>
+                    <Text variant="small" weight="bold" color="secondary" className="bespoke-company-text">
                       {n.name}
                     </Text>
                   )}

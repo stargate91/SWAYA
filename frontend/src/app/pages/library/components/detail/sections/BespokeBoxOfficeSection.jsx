@@ -1,5 +1,6 @@
 import { DollarSign, Coins, TrendingUp } from '@/ui/icons';
 import Card from '@/ui/Card';
+import './BespokeBoxOfficeSection.css';
 
 export default function BespokeBoxOfficeSection({ item, t }) {
   if (!item || (item.budget <= 0 && item.revenue <= 0)) return null;

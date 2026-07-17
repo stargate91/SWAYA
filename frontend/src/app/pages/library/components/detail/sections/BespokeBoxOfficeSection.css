@@ -1,0 +1,76 @@
+.bespoke-boxoffice-section {
+  margin-top: var(--space-md);
+}
+
+.bespoke-boxoffice-card {
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.bespoke-boxoffice-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11.25rem, 1fr));
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-md);
+}
+
+.bespoke-boxoffice-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  --local-bg: color-mix(in srgb, var(--color-text-primary) 2%, transparent);
+  background: var(--local-bg);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+}
+
+.bespoke-boxoffice-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  --local-bg: color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+  background: var(--local-bg);
+  color: var(--color-text-secondary);
+}
+
+.bespoke-boxoffice-info {
+  display: flex;
+  flex-direction: column;
+  --local-gap: 0.125rem;
+  gap: var(--local-gap);
+}
+
+.bespoke-boxoffice-label {
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  --local-color: color-mix(in srgb, var(--color-text-primary) 45%, transparent);
+  color: var(--local-color);
+}
+
+.bespoke-boxoffice-value {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.bespoke-boxoffice-stat--profit .bespoke-boxoffice-icon-wrapper {
+  color: var(--color-state-success);
+  background: color-mix(in srgb, var(--color-state-success) 10%, transparent);
+}
+
+.bespoke-boxoffice-stat--loss .bespoke-boxoffice-icon-wrapper {
+  --local-color: var(--color-state-danger);
+  color: var(--local-color);
+  --local-bg: color-mix(in srgb, var(--color-state-danger) 10%, transparent);
+  background: var(--local-bg);
+}

@@ -1,3 +1,5 @@
+import './EntityDetailStatusSection.css';
+
 export default function EntityDetailStatusSection({ title, message }) {
   return (
     <section className="entity-detail-page__content-section entity-detail-page__content-section--status">

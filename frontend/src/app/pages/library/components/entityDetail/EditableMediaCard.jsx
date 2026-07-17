@@ -1,6 +1,7 @@
 import { Layers, User, PenLine, Maximize2 } from '@/ui/icons';
 import PosterCard from '@/ui/PosterCard';
 import buttonStyles from '@/ui/IconButton.module.css';
+import './EditableMediaCard.css';
 
 export default function EditableMediaCard({
   mediaUrl,

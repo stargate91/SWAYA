@@ -5,6 +5,7 @@ import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { formatEpisodeNumber, formatTime } from '../../../utils/detailUtils';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import Inline from '@/ui/Inline';
+import './BespokeEpisodeDetail.css';
 
 const LPAR = '(';
 const RPAR = ')';
