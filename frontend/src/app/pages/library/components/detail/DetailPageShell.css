@@ -106,8 +106,18 @@
 .shell__utility-bar-bottom {
   --local-fade-duration: 500ms;
   --local-fade-ease: ease-in-out;
+  --local-slide-duration: 250ms;
+  --local-slide-ease: cubic-bezier(0.16, 1, 0.3, 1);
   transition: opacity var(--local-fade-duration) var(--local-fade-ease),
-    visibility var(--local-fade-duration) var(--local-fade-ease);
+    visibility var(--local-fade-duration) var(--local-fade-ease),
+    left var(--local-slide-duration) var(--local-slide-ease),
+    right var(--local-slide-duration) var(--local-slide-ease);
+  left: var(--space-5xl);
+  right: var(--space-5xl);
+}
+
+.shell:has(.media-detail-page__container--panel-open) .shell__utility-bar-bottom {
+  right: 31.25rem;
 }
 
 .shell:has(.media-detail-page.is-preview-playing) .shell__utility-bar-bottom {

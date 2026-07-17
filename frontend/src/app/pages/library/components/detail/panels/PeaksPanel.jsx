@@ -2,7 +2,11 @@ import { Trash2, Droplets } from '@/ui/icons';
 import { formatTime } from '../../../utils/detailUtils';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import Pill from '@/ui/Pill';
-import './PeaksPanel.css';
+import Text from '@/ui/Text';
+import Stack from '@/ui/Stack';
+import IconButton from '@/ui/IconButton';
+import Table from '@/ui/Table';
+import EmptyState from '@/ui/EmptyState';
 
 const LPAR = '(';
 const RPAR = ')';
@@ -29,59 +33,64 @@ export default function PeaksPanel() {
 
   const peaks = item?.peaks_history || [];
 
+  const columns = [
+    {
+      key: 'watched_at',
+      label: t('library.details.peakDate') || 'Date',
+      render: (value, log) => formatLogDate(log.watched_at),
+    },
+    {
+      key: 'video_position',
+      label: t('library.details.peakPosition') || 'Position',
+      render: (value, log) => (
+        log.video_position != null ? (
+          <Pill variant="default" icon={<Droplets size={12} />}>
+            {formatTime(log.video_position)}
+          </Pill>
+        ) : (
+          <Text color="muted">{DASH_CHAR}</Text>
+        )
+      ),
+    },
+    {
+      key: 'actions',
+      label: '',
+      align: 'right',
+      width: '2.5rem',
+      render: (value, log) => (
+        <IconButton
+          variant="flat-danger"
+          size="sm"
+          onClick={() => handleDeletelog(log.id)}
+          disabled={deletePeakMutation.isPending}
+          title={t('library.details.deletePeakBtn') || 'Delete Peak'}
+        >
+          <Trash2 size={14} />
+        </IconButton>
+      ),
+    },
+  ];
+
   return (
-    <div className="peaks-panel">
-      <div className="peaks-panel__header-row">
-        <h4 className="peaks-panel__title">
+    <Stack gap="lg">
+      <div>
+        <h4>
           {t('library.details.peaksTitle') || 'Peak Moments'} {LPAR}{peaks.length}{RPAR}
         </h4>
       </div>
 
-      <div className="peaks-panel__list-container">
-        {peaks.length > 0 ? (
-          <div className="peaks-table">
-            <div className="peaks-table__header">
-              <div className="peaks-table__col-header">{t('library.details.peakDate') || 'Date'}</div>
-              <div className="peaks-table__col-header">{t('library.details.peakPosition') || 'Position'}</div>
-              <div className="peaks-table__col-header peaks-table__col-header--actions"></div>
-            </div>
-            <div className="peaks-table__body">
-              {peaks.map((log, index) => (
-                <div key={log.id || index} className="peaks-table__row">
-                  <div className="peaks-table__cell peaks-table__cell--date">
-                    {formatLogDate(log.watched_at)}
-                  </div>
-                  <div className="peaks-table__cell peaks-table__cell--position">
-                    {log.video_position != null ? (
-                      <Pill variant="neutral" className="peak-position-pill">
-                        <Droplets size={12} className="peak-position-pill__icon" />
-                        {formatTime(log.video_position)}
-                      </Pill>
-                    ) : (
-                      <span className="peaks-table__empty-cell">{DASH_CHAR}</span>
-                    )}
-                  </div>
-                  <div className="peaks-table__cell peaks-table__cell--actions">
-                    <button
-                      type="button"
-                      className="peak-delete-btn"
-                      onClick={() => handleDeletelog(log.id)}
-                      disabled={deletePeakMutation.isPending}
-                      title={t('library.details.deletePeakBtn') || 'Delete Peak'}
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="peaks-panel__empty">
-            {t('library.details.noPeaks') || 'No peak moments recorded yet.'}
-          </div>
-        )}
-      </div>
-    </div>
+      <Table
+        columns={columns}
+        rows={peaks}
+        emptyContent={
+          <EmptyState
+            border="solid"
+            background="solid"
+            size="md"
+            title={t('library.details.noPeaks') || 'No peak moments recorded yet.'}
+          />
+        }
+      />
+    </Stack>
   );
 }

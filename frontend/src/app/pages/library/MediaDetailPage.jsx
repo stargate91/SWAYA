@@ -45,6 +45,9 @@ import CompactWatchStatsSection from './components/detail/sections/CompactWatchS
 import ImagePickerDrawer from './components/ImagePickerDrawer';
 import Lightbox from '@/ui/Lightbox';
 import EditableMediaCard from './components/entityDetail/EditableMediaCard';
+import Stack from '@/ui/Stack';
+import Card from '@/ui/Card';
+import SegmentedControl from '@/ui/SegmentedControl';
 
 import DetailsMetadataDrawer from './components/detail/DetailsMetadataDrawer';
 import BespokeBoxOfficeSection from './components/detail/sections/BespokeBoxOfficeSection';
@@ -71,7 +74,8 @@ export default function MediaDetailPage({ type = 'movie' }) {
     closeModal
   });
 
-  const { state } = detailState;
+  const { state, actions } = detailState;
+  const { renderReviewDrawer } = actions;
   const {
     backdropUrl,
     posterUrl,
@@ -218,20 +222,20 @@ export default function MediaDetailPage({ type = 'movie' }) {
           </div>
 
           <div className="media-detail-page__inline-sections">
-            <div className="media-detail-page__inline-main-col">
+            <Stack gap="2xl">
               {item && <BespokeCastSection item={item} t={t} navigate={navigate} />}
               {isScene && item?.technical && (
                 <div className="bespoke-boxoffice-section">
-                  <div className="bespoke-boxoffice-card">
+                  <Card variant="glass-shaded" padding="none">
                     <div className="bespoke-browser-card__pills-header">
                       <span className="bespoke-cast-title">
                         {t('library.details.technicalInfo') || 'Technical Info'}
                       </span>
                     </div>
-                    <div className="media-detail-page__technical-container">
+                    <Card variant="transparent" padding="md">
                       <TechnicalPanel showTitle={false} />
-                    </div>
-                  </div>
+                    </Card>
+                  </Card>
                 </div>
               )}
               {!isMovie && !isScene && item && <BespokeSeasonsSection />}
@@ -244,24 +248,19 @@ export default function MediaDetailPage({ type = 'movie' }) {
 
               {/* Ratings Section */}
               {(isMovie || isScene) && <BespokeRatingsSection item={item} t={t} />}
-            </div>
-            <div className="media-detail-page__inline-side-col">
-              <div className="media-side-tabs">
-                <button
-                  type="button"
-                  className={`media-side-tab-btn ${activeSideTab === 'activity' ? 'is-active' : ''}`}
-                  onClick={() => setActiveSideTab('activity')}
-                >
-                  {t('library.details.tab_activity') || 'Activity'}
-                </button>
-                <button
-                  type="button"
-                  className={`media-side-tab-btn ${activeSideTab === 'organize' ? 'is-active' : ''}`}
-                  onClick={() => setActiveSideTab('organize')}
-                >
-                  {t('library.details.tab_organize') || 'Organize'}
-                </button>
-              </div>
+            </Stack>
+            <Stack gap="md">
+              <SegmentedControl
+                variant="glass"
+                size="sm"
+                options={[
+                  { value: 'activity', label: t('library.details.tab_activity') || 'Activity' },
+                  { value: 'organize', label: t('library.details.tab_organize') || 'Organize' }
+                ]}
+                value={activeSideTab}
+                onChange={setActiveSideTab}
+                className="side-tab-control"
+              />
 
               {activeSideTab === 'activity' && (
                 <>
@@ -283,7 +282,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
                   {item && item.is_adult && (isMovie || isScene) && <BespokeScenePeaks />}
                 </>
               )}
-            </div>
+            </Stack>
           </div>
         </div>
 
@@ -308,6 +307,8 @@ export default function MediaDetailPage({ type = 'movie' }) {
 
         <BottomSocialsBar socialLinks={socialLinks} t={t} />
       </DetailPageShell>
+
+      {renderReviewDrawer()}
 
       <DetailsMetadataDrawer
         isOpen={isDrawerOpen}

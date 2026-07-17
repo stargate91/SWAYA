@@ -184,3 +184,21 @@
   grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
   gap: var(--space-md);
 }
+
+/* Actor Picker Variant */
+.grid[data-variant="actor-picker"] {
+  grid-template-columns: repeat(auto-fill, minmax(13.75rem, 1fr));
+  gap: var(--space-md);
+}
+
+/* Specs Variant (4 cols descending to 2 cols) */
+.grid[data-variant="specs"] {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+
+@media (max-width: 57.5rem) {
+  .grid[data-variant="specs"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

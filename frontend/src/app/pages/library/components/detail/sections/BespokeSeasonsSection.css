@@ -115,6 +115,8 @@
 /* Card Bodies */
 .bespoke-browser-card__body {
   position: relative;
+  display: flex;
+  gap: var(--space-md);
   padding: var(--space-md) var(--space-md);
   min-height: 0;
 }

@@ -4,6 +4,7 @@ import Pill from '@/ui/Pill';
 import { useAllTagsQuery } from '@/queries/libraryQueries';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import Inline from '@/ui/Inline';
+import Card from '@/ui/Card';
 import './BespokeSceneTagger.css';
 
 function HorizontalPillList({ children }) {
@@ -160,7 +161,7 @@ export default function BespokeSceneTagger() {
   }, []);
 
   return (
-    <div className="bespoke-scene-tagger-card">
+    <Card variant="glass-shaded" padding="none" className="bespoke-scene-tagger-card">
       <Inline gap="sm" align="center" className="bespoke-scene-tagger-header">
         <span className="bespoke-scene-tagger-title">
           {t('library.details.tagger') || 'Tags & Keywords'}
@@ -282,6 +283,6 @@ export default function BespokeSceneTagger() {
           </div>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

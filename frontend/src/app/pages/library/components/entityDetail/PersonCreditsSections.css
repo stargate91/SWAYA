@@ -430,3 +430,19 @@
   background: var(--ui-utility-button-bg-hover);
   color: var(--color-text-primary);
 }
+
+.person-credits-discover-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  --discover-empty-padding: var(--space-4xl);
+  padding: var(--discover-empty-padding);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-align: center;
+  border: 1px dashed var(--color-line);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-line) 3%, transparent);
+  width: 100%;
+  box-sizing: border-box;
+}

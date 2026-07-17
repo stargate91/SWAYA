@@ -1,6 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Button from '@/ui/Button';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUpdatePersonStatusMutation } from '@/queries';
 import { useOverrideBackdropMutation, useUploadBackdropMutation } from '@/queries';
@@ -16,18 +15,18 @@ import {
   resolveSocialLinks,
 } from './utils/externalLinksUtils';
 import { getPosterImagePath, getProfileImagePath } from '@/lib/imageUrls';
-import ReviewModalContent from './components/detail/modals/ReviewModalContent';
+import RatingsReviewDrawer from '@/pages/ratings/components/RatingsReviewDrawer';
 
 export default function usePeopleCollectionDetailController({
   id,
   isPeople,
   t,
-  openModal,
-  closeModal,
 }) {
   const { locale } = useTranslation();
   const metadataLanguage = locale === 'en' ? 'en-US' : locale;
   const [isActivateHovered, setIsActivateHovered] = useState(false);
+  const [editingReviewItem, setEditingReviewItem] = useState(null);
+  const [reviewText, setReviewText] = useState('');
 
   const personQuery = usePersonDetailQuery(id, { enabled: isPeople && Boolean(id) });
   const collectionQuery = useLibraryCollectionDetailQuery(id, {
@@ -121,36 +120,33 @@ export default function usePeopleCollectionDetailController({
     if (!isPeople || !item?.id) {
       return;
     }
+    setEditingReviewItem(item || { name: item?.name });
+    setReviewText(item?.user_comment || '');
+  };
 
-    openModal({
-      title: t('library.details.writeReview') || 'Write Review',
-      content: (
-        <ReviewModalContent
-          initialComment={item?.user_comment}
-          onSave={(newComment) => {
-            updatePersonStatusMutation.mutate({
-              personId: item.id,
-              routeId: id,
-              payload: {
-                user_comment: newComment || null,
-              },
-            });
-            closeModal();
-          }}
-          t={t}
-        />
-      ),
-      footer: (
-        <div className="modal-footer-row">
-          <Button variant="secondary-neutral" onClick={closeModal}>
-            {t('common.close') || 'Close'}
-          </Button>
-          <Button variant="primary" type="submit" form="review-modal-form">
-            {t('common.save') || 'Save'}
-          </Button>
-        </div>
-      ),
-    });
+  const renderReviewDrawer = () => {
+    if (!isPeople || !item?.id) {
+      return null;
+    }
+    return (
+      <RatingsReviewDrawer
+        editingItem={editingReviewItem}
+        setEditingItem={setEditingReviewItem}
+        reviewText={reviewText}
+        setReviewText={setReviewText}
+        handleSaveReview={() => {
+          updatePersonStatusMutation.mutate({
+            personId: item.id,
+            routeId: id,
+            payload: {
+              user_comment: reviewText || null,
+            },
+          });
+          setEditingReviewItem(null);
+        }}
+        t={t}
+      />
+    );
   };
 
   return {
@@ -176,5 +172,6 @@ export default function usePeopleCollectionDetailController({
     handleOpenReviewModal,
     overrideBackdropMutation,
     uploadBackdropMutation,
+    renderReviewDrawer,
   };
 }

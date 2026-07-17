@@ -12,13 +12,12 @@ import {
   getDurationText,
   resolveDetailsImageUrl
 } from '../utils/detailUtils';
-import { PenLine, Info } from '@/ui/icons';
-import ReviewModalContent from '../components/detail/modals/ReviewModalContent';
-import Button from '@/ui/Button';
+import { Info } from '@/ui/icons';
+import RatingsReviewDrawer from '@/pages/ratings/components/RatingsReviewDrawer';
 import { useMediaMutations } from './useMediaMutations';
 import { useMediaDetailTabs } from './useMediaDetailTabs';
 
-export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
+export default function useMediaDetail({ id, type, t, openModal }) {
   const normalizedId = id == null ? '' : String(id);
   const cleanId = normalizedId.startsWith('tv_') ? normalizedId.replace('tv_', '') : normalizedId;
   const isMovie = isMovieMediaType(type);
@@ -28,6 +27,8 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
   const [hoveredRating, setHoveredRating] = useState(null);
   const [expandedSeasons, setExpandedSeasons] = useState({ 1: true });
   const [isWatchLogsExpanded, setIsWatchLogsExpanded] = useState(false);
+  const [editingReviewItem, setEditingReviewItem] = useState(null);
+  const [reviewText, setReviewText] = useState('');
   const [isTruncated, setIsTruncated] = useState(false);
 
   const overviewRef = useRef(null);
@@ -262,38 +263,31 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
 
   const handleOpenReviewModal = () => {
     const currentComment = item?.user_comment !== undefined ? item.user_comment : item?.overrides?.user_comment;
+    setEditingReviewItem(item || { title: title });
+    setReviewText(currentComment || '');
+  };
 
-    openModal({
-      title: t('library.details.writeReview') || 'Write Review',
-      icon: PenLine,
-      content: (
-        <ReviewModalContent
-          initialComment={currentComment}
-          onSave={(newComment) => {
-            updateStatusMutation.mutate({
-              itemId: effectiveId,
-              tvId: cleanId,
-              payload: {
-                user_comment: newComment || null,
-                media_type: type
-              }
-            });
-            closeModal();
-          }}
-          t={t}
-        />
-      ),
-      footer: (
-        <div className="modal-footer-row">
-          <Button variant="secondary-neutral" onClick={closeModal}>
-            {t('common.close') || 'Close'}
-          </Button>
-          <Button variant="primary" type="submit" form="review-modal-form">
-            {t('common.save') || 'Save'}
-          </Button>
-        </div>
-      ),
-    });
+  const renderReviewDrawer = () => {
+    return (
+      <RatingsReviewDrawer
+        editingItem={editingReviewItem}
+        setEditingItem={setEditingReviewItem}
+        reviewText={reviewText}
+        setReviewText={setReviewText}
+        handleSaveReview={() => {
+          updateStatusMutation.mutate({
+            itemId: effectiveId,
+            tvId: cleanId,
+            payload: {
+              user_comment: reviewText || null,
+              media_type: type
+            }
+          });
+          setEditingReviewItem(null);
+        }}
+        t={t}
+      />
+    );
   };
 
   const title = item?.title || item?.filename || (isMovie ? 'Movie Title Placeholder' : isScene ? 'Scene Title Placeholder' : 'Tv Title Placeholder');
@@ -716,7 +710,8 @@ export default function useMediaDetail({ id, type, t, openModal, closeModal }) {
       handleToggleWatched,
       handleToggleTracked,
       handleReadMore,
-      setIsWatchLogsExpanded
+      setIsWatchLogsExpanded,
+      renderReviewDrawer
     },
     mutations: {
       updateStatusMutation,

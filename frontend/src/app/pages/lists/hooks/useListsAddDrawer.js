@@ -149,8 +149,9 @@ export default function useListsAddDrawer({
 
   const handleAdd = async (item) => {
     try {
+      let result;
       if (listType === 'person') {
-        await addListItemMutation.mutateAsync({
+        result = await addListItemMutation.mutateAsync({
           listId: activeList.id,
           payload: {
             person_id: item.id
@@ -161,7 +162,7 @@ export default function useListsAddDrawer({
         const isSceneItem = item.media_type === 'scene' || mediaType === 'scene' || item.media_type === 'videos' || mediaType === 'videos';
         const poster = isSceneItem ? (item.backdrop_path || item.poster_path) : (item.poster_path || item.profile_path);
 
-        await addListItemMutation.mutateAsync({
+        result = await addListItemMutation.mutateAsync({
           listId: activeList.id,
           payload: {
             media_item_id: (source === 'library' && !isTvItem) ? item.id : undefined,
@@ -174,7 +175,11 @@ export default function useListsAddDrawer({
           }
         });
       }
-      toast(t('lists.item_added_success') || 'Item added successfully!', 'success');
+      if (result?.already_exists) {
+        toast(t('lists.item_already_exists') || 'Item is already on this list', 'warning');
+      } else {
+        toast(t('lists.item_added_success') || 'Item added successfully!', 'success');
+      }
     } catch (err) {
       toast(err.message || 'Failed to add item', 'danger');
     }

@@ -1,12 +1,17 @@
-import { useState, useEffect, useRef } from 'react';
-import { ChevronDown } from '@/ui/icons';
+import { useState } from 'react';
+import { X } from '@/ui/icons';
 import Pill from '@/ui/Pill';
 import { useAllTagsQuery, useCreateTagMutation } from '@/queries';
 import { useMediaDetailContext } from '../MediaDetailContext';
-import './PanelsCommon.css';
-import './TagsPanel.css';
 import Inline from '@/ui/Inline';
-
+import Divider from '@/ui/Divider';
+import Input from '@/ui/Input';
+import IconButton from '@/ui/IconButton';
+import Stack from '@/ui/Stack';
+import Card from '@/ui/Card';
+import Dropdown from '@/ui/Dropdown';
+import Text from '@/ui/Text';
+import Alert from '@/ui/Alert';
 
 export default function TagsPanel() {
   const { state, mutations, type, t } = useMediaDetailContext();
@@ -23,14 +28,11 @@ export default function TagsPanel() {
   const [newTagName, setNewTagName] = useState('');
   const [newTagColor, setNewTagColor] = useState('var(--color-accent-blue)');
   const [newTagError, setNewTagError] = useState('');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
 
   const { data: allTags = [] } = useAllTagsQuery(item?.is_adult);
   const createTagMutation = useCreateTagMutation();
 
   const currentTags = item?.custom_tags || [];
-
 
   const handleToggleTag = (tagName) => {
     const isAssigned = currentTags.includes(tagName);
@@ -47,7 +49,6 @@ export default function TagsPanel() {
       }
     });
   };
-
 
   const handleCreateTag = async (e) => {
     e.preventDefault();
@@ -84,169 +85,124 @@ export default function TagsPanel() {
     }
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+  const assignableOptions = allTags
+    .filter(tag => !currentTags.includes(tag.name))
+    .map(tag => ({ value: tag.name, label: tag.name }));
 
   return (
-    <div className="tags-panel">
-      <h4 className="details-panel__section-title">
+    <Stack gap="lg">
+      <Text as="h4" variant="caption" uppercase color="muted">
         {t('library.details.tagger') || 'Tagger'}
-      </h4>
+      </Text>
 
       {/* Currently Assigned Tags */}
-      <div className="tags-panel__assigned-section">
-        <span className="tags-panel__section-subtitle">
+      <Stack gap="xs">
+        <Text variant="caption" uppercase color="muted">
           {t('library.tags.assignedTitle') || 'Assigned'}
-        </span>
-        <Inline gap="sm" align="center" className="tags-panel__assigned-list">
-          {currentTags.map(tagName => {
-            const tagObj = allTags.find(t => t.name === tagName);
-            const color = tagObj?.color || 'var(--color-accent)';
-            return (
-              <Pill
-                key={tagName}
-                variant="tag"
-                className="tags-panel__assigned-pill"
-                customStyle={{ '--pill-tag-color': color }}
-              >
-                <span>{tagName}</span>
-                <button
-                  type="button"
-                  onClick={() => handleToggleTag(tagName)}
-                  className="tags-panel__assigned-pill-remove"
-                  title={t('common.remove') || 'Remove'}
-                >
-                  {String.fromCharCode(0x2715)}
-                </button>
-              </Pill>
-            );
-          })}
-          {currentTags.length === 0 && (
-            <div className="tags-panel__no-tags">
-              {t('library.tags.noTagsAssigned') || 'No tags assigned.'}
-            </div>
-          )}
-        </Inline>
-      </div>
-
-      {/* Suggested Tags */}
-      {item?.suggested_tags && item.suggested_tags.length > 0 && (
-        <div className="tags-panel__assigned-section">
-          <span className="tags-panel__section-subtitle">
-            {t('library.details.suggestedTags') || 'Suggested Tags'}
-          </span>
-          <Inline gap="sm" align="center" className="tags-panel__assigned-list">
-            {item.suggested_tags.map(tagName => {
-              const isAssigned = currentTags.includes(tagName);
-              if (isAssigned) return null;
+        </Text>
+        <Card variant="default" padding="md">
+          <Inline gap="sm" align="center">
+            {currentTags.map(tagName => {
+              const tagObj = allTags.find(t => t.name === tagName);
+              const color = tagObj?.color || 'var(--color-accent)';
               return (
                 <Pill
                   key={tagName}
                   variant="tag"
-                  className="tags-panel__assigned-pill tags-panel__assigned-pill--suggested"
-                  onClick={() => handleToggleTag(tagName)}
+                  customStyle={{ '--pill-tag-color': color }}
                 >
                   <span>{tagName}</span>
+                  <IconButton
+                    size="xs"
+                    variant="ghost"
+                    onClick={() => handleToggleTag(tagName)}
+                    title={t('common.remove') || 'Remove'}
+                  >
+                    <X size={10} />
+                  </IconButton>
                 </Pill>
               );
             })}
-            {item.suggested_tags.every(t => currentTags.includes(t)) && (
-              <div className="tags-panel__no-tags">
-                {t('library.tags.allTagsAssigned') || 'All suggested tags assigned.'}
-              </div>
+            {currentTags.length === 0 && (
+              <Text variant="small" color="muted" italic>
+                {t('library.tags.noTagsAssigned') || 'No tags assigned.'}
+              </Text>
             )}
           </Inline>
-        </div>
+        </Card>
+      </Stack>
+
+      {/* Suggested Tags */}
+      {item?.suggested_tags && item.suggested_tags.length > 0 && (
+        <Stack gap="xs">
+          <Text variant="caption" uppercase color="muted">
+            {t('library.details.suggestedTags') || 'Suggested Tags'}
+          </Text>
+          <Card variant="default" padding="md">
+            <Inline gap="sm" align="center">
+              {item.suggested_tags.map(tagName => {
+                const isAssigned = currentTags.includes(tagName);
+                if (isAssigned) return null;
+                return (
+                  <Pill
+                    key={tagName}
+                    variant="tag"
+                    onClick={() => handleToggleTag(tagName)}
+                  >
+                    <span>{tagName}</span>
+                  </Pill>
+                );
+              })}
+              {item.suggested_tags.every(t => currentTags.includes(t)) && (
+                <Text variant="small" color="muted" italic>
+                  {t('library.tags.allTagsAssigned') || 'All suggested tags assigned.'}
+                </Text>
+              )}
+            </Inline>
+          </Card>
+        </Stack>
       )}
 
       {/* Add Tag Dropdown */}
-      <div className="tags-panel__select-section" ref={dropdownRef}>
-        <span className="tags-panel__section-subtitle">
-          {t('library.tags.addTagLabel') || 'Add Tag'}
-        </span>
-        <button
-          type="button"
-          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          className="tags-panel__select-trigger"
-        >
-          <span>{t('library.tags.addTagPlaceholder') || 'Add Tag...'}</span>
-          <ChevronDown size={16} />
-        </button>
+      <Dropdown
+        label={t('library.tags.addTagLabel') || 'Add Tag'}
+        placeholder={t('library.tags.addTagPlaceholder') || 'Add Tag...'}
+        options={assignableOptions}
+        value=""
+        onChange={(e) => handleToggleTag(e.target.value)}
+      />
 
-        {isDropdownOpen && (
-          <div className="tags-panel__select-dropdown">
-            {allTags
-              .filter(tag => !currentTags.includes(tag.name))
-              .map(tag => {
-                return (
-                  <button
-                    key={tag.id}
-                    type="button"
-                    onClick={() => handleToggleTag(tag.name)}
-                    className="tags-panel__dropdown-item"
-                  >
-                    {/* eslint-disable-next-line react/forbid-dom-props */}
-                    <div className="tags-panel__dropdown-item-color" style={{ backgroundColor: tag.color }} />
-                    <span className="tags-panel__dropdown-item-name">{tag.name}</span>
-                  </button>
-                );
-              })}
-            {allTags.length === 0 && (
-              <div className="tags-panel__dropdown-empty">
-                {t('library.emptyStates.tags.description') || 'No tags created yet.'}
-              </div>
-            )}
-            {allTags.length > 0 && allTags.filter(tag => !currentTags.includes(tag.name)).length === 0 && (
-              <div className="tags-panel__dropdown-empty">
-                {t('library.tags.allTagsAssigned') || 'All tags assigned.'}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      <Divider />
 
-      <div className="tags-panel__divider" />
+      <form onSubmit={handleCreateTag}>
+        <Card variant="default" padding="xl" title={t('library.tags.modalTitle') || 'Create Tag'}>
+          <Stack gap="md">
+            <Inline gap="sm" align="end" fullWidth>
+              <Inline flex={1} fullWidth>
+                <Input
+                  type="text"
+                  value={newTagName}
+                  onChange={(e) => {
+                    setNewTagName(e.target.value);
+                    setNewTagError('');
+                  }}
+                  placeholder={t('library.tags.namePlaceholder') || 'Enter tag name...'}
+                />
+              </Inline>
+              <IconButton
+                type="submit"
+                disabled={!newTagName.trim() || createTagMutation.isPending}
+                variant="secondary-neutral"
+                size="md-btn"
+              >
+                {String.fromCharCode(0x002B)}
+              </IconButton>
+            </Inline>
 
-      <form onSubmit={handleCreateTag} className="tags-panel__create-form">
-        <h5 className="tags-panel__create-title">
-          {t('library.tags.modalTitle') || 'Create Tag'}
-        </h5>
-
-        <div className="tags-panel__input-row">
-          <input
-            type="text"
-            value={newTagName}
-            onChange={(e) => {
-              setNewTagName(e.target.value);
-              setNewTagError('');
-            }}
-            placeholder={t('library.tags.namePlaceholder') || 'Enter tag name...'}
-            className="tags-panel__input"
-          />
-          <button
-            type="submit"
-            disabled={!newTagName.trim() || createTagMutation.isPending}
-            className="tags-panel__submit-btn"
-          >
-            {String.fromCharCode(0x002B)}
-          </button>
-        </div>
-
-        {newTagError && (
-          <span className="tags-panel__error">
-            {newTagError}
-          </span>
-        )}
+            {newTagError && <Alert>{newTagError}</Alert>}
+          </Stack>
+        </Card>
       </form>
-    </div>
+    </Stack>
   );
 }

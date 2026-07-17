@@ -2,6 +2,7 @@ import { Droplets, X } from '@/ui/icons';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import { formatTime } from '../../../utils/detailUtils';
 import Inline from '@/ui/Inline';
+import Card from '@/ui/Card';
 import './BespokeScenePeaks.css';
 
 const LPAR = '(';
@@ -31,7 +32,7 @@ export default function BespokeScenePeaks() {
   };
 
   return (
-    <div className="bespoke-scene-peaks-card">
+    <Card variant="glass-shaded" padding="none" className="bespoke-scene-peaks-card">
       <Inline justify="between" align="center" className="bespoke-scene-peaks-header">
         <Inline gap="sm" align="center" className="bespoke-scene-peaks-header-left">
           <Droplets size={12} className="bespoke-scene-peaks-title-icon" />
@@ -93,6 +94,6 @@ export default function BespokeScenePeaks() {
           </span>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

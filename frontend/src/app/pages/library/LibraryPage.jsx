@@ -11,6 +11,8 @@ import Button from '@/ui/Button';
 import { UserPlus, Plus, Play } from '@/ui/icons';
 import LibraryGrid from './components/LibraryGrid';
 import LibraryFilters from './components/LibraryFilters';
+import Card from '@/ui/Card';
+import Grid from '@/ui/Grid';
 import { useDeleteTagMutation, usePlayMediaMutation, useUpdatePersonStatusMutation } from '@/queries';
 import api from '@/lib/api';
 import React, { useEffect, useMemo, useState, useRef } from 'react';
@@ -26,7 +28,10 @@ import Dropdown from '@/ui/Dropdown';
 import Input from '@/ui/Input';
 import { Search } from '@/ui/icons';
 import { useDebounce } from '@/hooks/useDebounce';
-import './LibraryPage.css';
+import Stack from '@/ui/Stack';
+import Inline from '@/ui/Inline';
+import Spinner from '@/ui/Spinner';
+import styles from './LibraryPage.module.css';
 
 const SearchInput = React.memo(({ placeholder, onSearchChange, initialValue = '' }) => {
   const [value, setValue] = useState(initialValue);
@@ -235,27 +240,29 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
   if (state.isLoading) {
     return (
       <Page className="library-page">
-        <div className="library-skeleton-wrapper">
-          <div className="library-skeleton-header">
-            <div className="library-skeleton-title-wrap">
-              <Skeleton.Title className="library-skeleton-title" />
+        <Stack gap="lg" fullWidth>
+          <Inline justify="space-between" align="center">
+            <div>
+              <Skeleton.Title />
             </div>
-            <div className="library-skeleton-actions">
-              <Skeleton className="library-skeleton-action-btn" variant="rect" />
-              <Skeleton className="library-skeleton-action-btn" variant="rect" />
-            </div>
-          </div>
-          <div className="library-skeleton-filters">
-            <Skeleton className="library-skeleton-filter-1" variant="rect" />
-            <Skeleton className="library-skeleton-filter-2" variant="rect" />
-            <Skeleton className="library-skeleton-filter-3" variant="rect" />
-          </div>
-          <div className="library-skeleton-grid">
+            <Inline gap="md">
+              <Skeleton className={styles['header-skeleton-btn']} variant="rect" />
+              <Skeleton className={styles['header-skeleton-btn']} variant="rect" />
+            </Inline>
+          </Inline>
+          <Card variant="soft" padding="md">
+            <Inline gap="lg">
+              <Skeleton className={styles['filter-skeleton-1']} variant="rect" />
+              <Skeleton className={styles['filter-skeleton-2']} variant="rect" />
+              <Skeleton className={styles['filter-skeleton-3']} variant="rect" />
+            </Inline>
+          </Card>
+          <Grid variant="poster">
             {Array.from({ length: 12 }).map((_, idx) => (
-              <Skeleton.Card key={idx} className="library-skeleton-card" />
+              <Skeleton.Card key={idx} aspect="poster" />
             ))}
-          </div>
-        </div>
+          </Grid>
+        </Stack>
       </Page>
     );
   }
@@ -278,7 +285,7 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
         />,
         utilityBarTarget
       )}
-      <div className="library-main">
+      <Stack gap="3xl">
         <PanelHeader
           title={pageTitle || state.t('library.title')}
           sessionMode={state.activeSessionMode}
@@ -295,7 +302,7 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
                 tabClassName={panelHeaderStyles['panel-tab']}
               />
             ) : (
-              <div className="library-header__inline-tools">
+              <Inline gap="2xl" align="center">
                 {showInlineSorter ? (
                   <Dropdown
                     layout="inline"
@@ -316,7 +323,7 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
                     ]}
                   />
                 ) : null}
-              </div>
+              </Inline>
             )}
             <SearchInput
               key={state.resolvedTab}
@@ -415,7 +422,7 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
           showPageSizes
         />
 
-        <div className="library-grid-container">
+        <Stack gap="xl">
           <LibraryGrid
             key={state.resolvedTab}
             t={state.t}
@@ -443,17 +450,17 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
           />
 
           {state.paginationMode === 'infinite' && state.currentPage < state.totalPages && (
-            <div ref={sentinelRef} className="library-infinite-sentinel">
-              <div className="library-spinner library-infinite-spinner" />
-            </div>
+            <Inline ref={sentinelRef} justify="center" align="center" className={styles.sentinel}>
+              <Spinner size="var(--space-2xl)" />
+            </Inline>
           )}
 
           <LibraryPagination
             state={state}
             isTagFocusMode={isTagFocusMode}
           />
-        </div>
-      </div>
+        </Stack>
+      </Stack>
 
       <ImagePickerDrawer
         isOpen={!!imagePickerData}

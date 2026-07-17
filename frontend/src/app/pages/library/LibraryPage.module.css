@@ -1,0 +1,24 @@
+.sentinel {
+  height: 1.875rem;
+  margin: var(--space-xl) 0;
+}
+
+.header-skeleton-btn {
+  width: 5rem;
+  height: 2.25rem;
+}
+
+.filter-skeleton-1 {
+  width: 7.5rem;
+  height: 2rem;
+}
+
+.filter-skeleton-2 {
+  width: 6.25rem;
+  height: 2rem;
+}
+
+.filter-skeleton-3 {
+  width: 9.375rem;
+  height: 2rem;
+}

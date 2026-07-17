@@ -1,26 +1,16 @@
 import { countEpisodesInNumber } from '../../../utils/detailUtils';
 import { useMediaDetailContext } from '../MediaDetailContext';
-import Pill from '@/ui/Pill';
-import Tooltip from '@/ui/Tooltip';
-import Inline from '@/ui/Inline';
+import SpecCard from '@/ui/SpecCard';
+import Grid from '@/ui/Grid';
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
+import BrandCard from '@/ui/BrandCard';
+import Divider from '@/ui/Divider';
 import { buildTmdbImageUrl, resolveMediaImageUrl, TMDB_IMAGE_SIZES } from '@/lib/imageUrls';
-import './PanelsCommon.css';
-import './DetailsPanel.css';
 
-function SpecCard({ label, value, className = '' }) {
-  if (!value) return null;
-  return (
-    <div className={`specs-card ${className}`}>
-      <Tooltip content={String(value)} side="top" triggerClassName="specs-card__tooltip-trigger">
-        <span className="specs-card__label">{label}</span>
-        <span className="specs-card__value">{value}</span>
-      </Tooltip>
-    </div>
-  );
-}
-
-export default function DetailsPanel() {
-  const { state, t } = useMediaDetailContext();
+export default function DetailsPanel({ variant: propVariant }) {
+  const { state, t, variant: contextVariant } = useMediaDetailContext();
+  const variant = propVariant || contextVariant;
   const {
     item,
     isMovie
@@ -53,63 +43,65 @@ export default function DetailsPanel() {
   const episodeCount = Number(item?.number_of_episodes ?? 0) || derivedEpisodeCount;
   const tvStatus = item?.release_status;
 
+  const gridVariant = variant === 'drawer' ? 'split' : 'specs';
+
   return (
-    <div className="details-panel details-panel--custom">
+    <Stack gap="xl">
 
       {!isMovie && (
-        <div className="details-panel__section">
-          <h4 className="details-panel__section-title">
-            {t('library.details.tvInfo') || 'Tv Info'}
-          </h4>
-          <div className="specs-grid">
-            <SpecCard className="specs-card--tall" label={t('library.details.seasons') || 'Seasons'} value={seasonCount} />
-            <SpecCard className="specs-card--tall" label={t('library.details.episodes') || 'Episodes'} value={episodeCount} />
+        <Stack gap="md">
+          <Stack gap="xs">
+            <Text as="h4" variant="caption" uppercase color={variant === 'drawer' ? 'faint' : 'muted'}>
+              {t('library.details.tvInfo') || 'Tv Info'}
+            </Text>
+            {variant === 'drawer' && <Divider />}
+          </Stack>
+          <Grid variant={gridVariant} gap="sm">
+            <SpecCard tall label={t('library.details.seasons') || 'Seasons'} value={seasonCount} />
+            <SpecCard tall label={t('library.details.episodes') || 'Episodes'} value={episodeCount} />
             {tvStatus && (
-              <SpecCard className="specs-card--tall specs-card--span-2" label={t('library.details.status') || 'Status'} value={tvStatus} />
+              <SpecCard tall span={2} label={t('library.details.status') || 'Status'} value={tvStatus} />
             )}
-          </div>
-        </div>
+          </Grid>
+        </Stack>
       )}
 
       {hasBoxOffice && (
-        <div className="details-panel__section">
-          <h4 className="details-panel__section-title">
-            {t('library.details.boxOffice') || 'Box Office'}
-          </h4>
-          <div className="specs-grid">
+        <Stack gap="md">
+          <Stack gap="xs">
+            <Text as="h4" variant="caption" uppercase color={variant === 'drawer' ? 'faint' : 'muted'}>
+              {t('library.details.boxOffice') || 'Box Office'}
+            </Text>
+            {variant === 'drawer' && <Divider />}
+          </Stack>
+          <Grid variant="specs" gap="sm">
             {item.budget > 0 && (
-              <div className="specs-card">
-                <span className="specs-card__label">{t('library.details.budget') || 'Budget'}</span>
-                <span className="specs-card__value" title={formatCurrency(item.budget)}>{formatCurrency(item.budget)}</span>
-              </div>
+              <SpecCard label={t('library.details.budget') || 'Budget'} value={formatCurrency(item.budget)} />
             )}
             {item.revenue > 0 && (
-              <div className="specs-card">
-                <span className="specs-card__label">{t('library.details.revenue') || 'Revenue'}</span>
-                <span className="specs-card__value" title={formatCurrency(item.revenue)}>{formatCurrency(item.revenue)}</span>
-              </div>
+              <SpecCard label={t('library.details.revenue') || 'Revenue'} value={formatCurrency(item.revenue)} />
             )}
             {item.budget > 0 && item.revenue > 0 && (
-              <div className="specs-card specs-card--span-2">
-                <span className="specs-card__label">{t('library.details.profit') || 'Profit'}</span>
-                <span
-                  className={`specs-card__value ${(item.revenue - item.budget) >= 0 ? 'specs-card__value--success' : 'specs-card__value--danger'}`}
-                  title={formatCurrency(item.revenue - item.budget)}
-                >
-                  {formatCurrency(item.revenue - item.budget)}
-                </span>
-              </div>
+              <SpecCard
+                span={2}
+                label={t('library.details.profit') || 'Profit'}
+                value={formatCurrency(item.revenue - item.budget)}
+                status={(item.revenue - item.budget) >= 0 ? 'success' : 'danger'}
+              />
             )}
-          </div>
-        </div>
+          </Grid>
+        </Stack>
       )}
 
       {companies.length > 0 && !isSceneType && (
-        <div className="details-panel__section">
-          <h4 className="details-panel__section-title">
-            {item.is_adult ? (t('library.details.studio') || 'Studio') : (t('library.details.productionCompanies') || 'Production Companies')}
-          </h4>
-          <div className="companies-networks-container">
+        <Stack gap="md">
+          <Stack gap="xs">
+            <Text as="h4" variant="caption" uppercase color={variant === 'drawer' ? 'faint' : 'muted'}>
+              {item.is_adult ? (t('library.details.studio') || 'Studio') : (t('library.details.productionCompanies') || 'Production Companies')}
+            </Text>
+            {variant === 'drawer' && <Divider />}
+          </Stack>
+          <Grid variant="split" gap="md">
             {companies.map((it, idx) => {
               const logoUrl = it.logo_path
                 ? (it.logo_path.startsWith('http') || it.logo_path.startsWith('/media/') || it.logo_path.startsWith('data/'))
@@ -117,34 +109,26 @@ export default function DetailsPanel() {
                   : buildTmdbImageUrl(it.logo_path, TMDB_IMAGE_SIZES.posterThumb)
                 : null;
               return (
-                <Inline key={idx} gap="md" align="center" justify="center" className="specs-card specs-card--company">
-                  <Tooltip content={it.name} side="top" triggerClassName="specs-card-company__tooltip-trigger">
-                    {logoUrl && (
-                      <img
-                        src={logoUrl}
-                        alt={it.name}
-                        className="specs-card__company-logo"
-                      />
-                    )}
-                    {!logoUrl && (
-                      <span className="specs-card__company-text">
-                        {it.name}
-                      </span>
-                    )}
-                  </Tooltip>
-                </Inline>
+                <BrandCard
+                  key={idx}
+                  name={it.name}
+                  logoUrl={logoUrl}
+                />
               );
             })}
-          </div>
-        </div>
+          </Grid>
+        </Stack>
       )}
 
       {networks.length > 0 && !isSceneType && (
-        <div className="details-panel__section">
-          <h4 className="details-panel__section-title">
-            {item.is_adult ? (t('library.details.network') || 'Network') : (t('library.details.platformsNetworks') || 'Platforms & Networks')}
-          </h4>
-          <div className="companies-networks-container">
+        <Stack gap="md">
+          <Stack gap="xs">
+            <Text as="h4" variant="caption" uppercase color={variant === 'drawer' ? 'faint' : 'muted'}>
+              {item.is_adult ? (t('library.details.network') || 'Network') : (t('library.details.platformsNetworks') || 'Platforms & Networks')}
+            </Text>
+            {variant === 'drawer' && <Divider />}
+          </Stack>
+          <Grid variant="split" gap="md">
             {networks.map((it, idx) => {
               const logoUrl = it.logo_path
                 ? (it.logo_path.startsWith('http') || it.logo_path.startsWith('/media/') || it.logo_path.startsWith('data/'))
@@ -152,46 +136,16 @@ export default function DetailsPanel() {
                   : buildTmdbImageUrl(it.logo_path, TMDB_IMAGE_SIZES.posterThumb)
                 : null;
               return (
-                <Inline key={idx} gap="md" align="center" justify="center" className="specs-card specs-card--company">
-                  <Tooltip content={it.name} side="top" triggerClassName="specs-card-company__tooltip-trigger">
-                    {logoUrl && (
-                      <img
-                        src={logoUrl}
-                        alt={it.name}
-                        className="specs-card__company-logo"
-                      />
-                    )}
-                    {!logoUrl && (
-                      <span className="specs-card__company-text">
-                        {it.name}
-                      </span>
-                    )}
-                  </Tooltip>
-                </Inline>
+                <BrandCard
+                  key={idx}
+                  name={it.name}
+                  logoUrl={logoUrl}
+                />
               );
             })}
-          </div>
-        </div>
+          </Grid>
+        </Stack>
       )}
-
-      {Array.isArray(item?.keywords) && item.keywords.filter(Boolean).length > 0 && (
-        <div className="details-panel__section">
-          <h4 className="details-panel__section-title">
-            {t('library.details.keywords') || 'Keywords'}
-          </h4>
-          <Inline gap="sm" className="details-panel__keywords-list">
-            {item.keywords.filter(Boolean).map((keyword, idx) => (
-              <Pill
-                key={idx}
-                variant="meta"
-                className="details-panel__keyword-pill"
-              >
-                {keyword}
-              </Pill>
-            ))}
-          </Inline>
-        </div>
-      )}
-    </div>
+    </Stack>
   );
 }

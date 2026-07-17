@@ -1,14 +1,10 @@
-import PropTypes from 'prop-types';
-import { FolderOpen } from '@/ui/icons';
-import Button from '@/ui/Button';
-import Tooltip from '@/ui/Tooltip';
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
+import FileCard from '@/ui/FileCard';
 import { useMediaDetailContext } from '../MediaDetailContext';
-import './PanelsCommon.css';
-import './ExtrasPanel.css';
 import { showItemInFolder } from '@/lib/ipc';
 
-
-export default function ExtrasPanel({ variant }) {
+export default function ExtrasPanel() {
   const { state, t, toast } = useMediaDetailContext();
   const {
     item,
@@ -52,80 +48,44 @@ export default function ExtrasPanel({ variant }) {
   };
 
   return (
-    <div className={`details-panel details-panel--custom extras-panel ${variant === 'drawer' ? 'details-panel--drawer' : ''}`.trim()}>
-      <h4 className="details-panel__section-title">
+    <Stack gap="xl">
+      <Text as="h4" variant="caption" uppercase color="muted">
         {t('library.details.extras') || 'Film Extras'}
-      </h4>
-      <div className="extras-panel__list">
+      </Text>
+      <Stack scrollable gap="md">
         {extraGroups.map((group, groupIndex) => (
-          <div
+          <Stack
             key={group.label || `extras-group-${groupIndex}`}
-            className="extras-panel__group"
+            gap="md"
           >
             {group.label ? (
-              <span className="tags-panel__section-subtitle extras-panel__group-title">
+              <Text variant="caption" color="muted">
                 {group.label}
-              </span>
+              </Text>
             ) : null}
             {group.items.map((extra) => (
-              <div key={extra.id} className="details-panel__section extras-panel__section">
-                <div className="extras-panel__header">
-                  <div className="extras-panel__header-copy">
-                    <div className="extras-panel__title-row">
-                      <Tooltip content={extra.name} side="top" triggerClassName="extras-panel__tooltip-trigger">
-                        <div className="extras-panel__filename">
-                          {extra.name}
-                        </div>
-                      </Tooltip>
-                    </div>
-                    {extra.path ? (
-                      <Tooltip content={extra.path} side="top" triggerClassName="extras-panel__tooltip-trigger">
-                        <div className="extras-panel__path">
-                          {extra.path}
-                        </div>
-                      </Tooltip>
-                    ) : null}
-                    {getExtraMeta(extra) ? (
-                      <Tooltip content={getExtraMeta(extra)} side="top" triggerClassName="extras-panel__tooltip-trigger">
-                        <span className="extras-panel__inline-meta">
-                          {getExtraMeta(extra)}
-                        </span>
-                      </Tooltip>
-                    ) : null}
-                  </div>
-                  {extra.path ? (
-                    <Tooltip content={t('library.details.showInFolder') || 'Show in Folder'} side="top">
-                      <Button
-                        variant="secondary-neutral"
-                        size="sm"
-                        className="extras-panel__browse-btn"
-                        onClick={async () => {
-                          const result = await showItemInFolder(extra.path);
-                          if (!result?.success) {
-                            toast(result?.error || t('organizer.toasts.showInFolderFailed'), 'danger');
-                          }
-                        }}
-                        title={null}
-                      >
-                        <FolderOpen size={14} />
-                      </Button>
-                    </Tooltip>
-                  ) : null}
-                </div>
-              </div>
+              <FileCard
+                key={extra.id}
+                name={extra.name}
+                path={extra.path}
+                meta={getExtraMeta(extra)}
+                browseTooltip={t('library.details.showInFolder') || 'Show in Folder'}
+                onBrowse={extra.path ? async () => {
+                  const result = await showItemInFolder(extra.path);
+                  if (!result?.success) {
+                    toast(result?.error || t('organizer.toasts.showInFolderFailed'), 'danger');
+                  }
+                } : undefined}
+              />
             ))}
-          </div>
+          </Stack>
         ))}
         {extras.length === 0 && (
-          <div className="details-panel__no-ratings">
+          <Text variant="small" color="secondary">
             {t('library.details.noExtraFilesFound') || 'No extra files found.'}
-          </div>
+          </Text>
         )}
-      </div>
-    </div>
+      </Stack>
+    </Stack>
   );
 }
-
-ExtrasPanel.propTypes = {
-  variant: PropTypes.string,
-};

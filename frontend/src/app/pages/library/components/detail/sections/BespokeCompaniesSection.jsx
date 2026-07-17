@@ -3,6 +3,7 @@ import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { API_BASE } from '@/lib/backend';
 import Tooltip from '@/ui/Tooltip';
 import ScrollRow from '@/ui/ScrollRow';
+import Card from '@/ui/Card';
 import './BespokeCompaniesSection.css';
 
 export default function BespokeCompaniesSection({ item, t }) {
@@ -30,7 +31,7 @@ export default function BespokeCompaniesSection({ item, t }) {
 
   return (
     <div className="bespoke-companies-section">
-      <div className="bespoke-companies-card">
+      <Card variant="glass-shaded" padding="none">
         <div className="bespoke-browser-card__pills-header">
           <span className="bespoke-cast-title">
             {sectionLabel}
@@ -54,7 +55,7 @@ export default function BespokeCompaniesSection({ item, t }) {
             ))}
           </ScrollRow>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

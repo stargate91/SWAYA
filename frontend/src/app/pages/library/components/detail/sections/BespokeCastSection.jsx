@@ -5,6 +5,8 @@ import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { API_BASE } from '@/lib/backend';
 import Tooltip from '@/ui/Tooltip';
 import ScrollRow from '@/ui/ScrollRow';
+import Card from '@/ui/Card';
+import SegmentedControl from '@/ui/SegmentedControl';
 import './BespokeCastSection.css';
 
 export default function BespokeCastSection({ item, t, navigate }) {
@@ -99,36 +101,20 @@ export default function BespokeCastSection({ item, t, navigate }) {
 
   return (
     <div className="bespoke-cast-section">
-      <div className="bespoke-cast-browser-card">
+      <Card variant="glass-shaded" padding="none" className="bespoke-cast-browser-card">
         <div className="bespoke-browser-card__pills-header">
           {showTabs ? (
-            <div className="bespoke-cast-tabs">
-              <button
-                type="button"
-                className={`bespoke-cast-tab-btn ${activeTab === 'cast' ? 'is-active' : ''}`}
-                onClick={() => setActiveTab('cast')}
-              >
-                {t('library.details.cast') || 'Cast & Crew'}
-              </button>
-              {showCompanies && (
-                <button
-                  type="button"
-                  className={`bespoke-cast-tab-btn ${activeTab === 'companies' ? 'is-active' : ''}`}
-                  onClick={() => setActiveTab('companies')}
-                >
-                  {t('library.details.productionCompanies') || 'Production Companies'}
-                </button>
-              )}
-              {showNetworks && (
-                <button
-                  type="button"
-                  className={`bespoke-cast-tab-btn ${activeTab === 'networks' ? 'is-active' : ''}`}
-                  onClick={() => setActiveTab('networks')}
-                >
-                  {t('library.details.platformsNetworks') || 'Networks'}
-                </button>
-              )}
-            </div>
+            <SegmentedControl
+              variant="filter"
+              size="xs"
+              options={[
+                { value: 'cast', label: t('library.details.cast') || 'Cast & Crew' },
+                showCompanies && { value: 'companies', label: t('library.details.productionCompanies') || 'Production Companies' },
+                showNetworks && { value: 'networks', label: t('library.details.platformsNetworks') || 'Networks' }
+              ].filter(Boolean)}
+              value={activeTab}
+              onChange={setActiveTab}
+            />
           ) : (
             <span className="bespoke-cast-title">
               {t('library.details.cast') || 'Cast & Crew'}
@@ -202,7 +188,7 @@ export default function BespokeCastSection({ item, t, navigate }) {
             ))}
           </ScrollRow>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

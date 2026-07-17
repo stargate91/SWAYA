@@ -9,6 +9,7 @@ import {
 import { useMediaDetailContext } from '../MediaDetailContext';
 import { useSettingsQuery } from '@/queries/settingsQueries';
 import { Plus, Check, Loader2 } from '@/ui/icons';
+import Card from '@/ui/Card';
 import './BespokeListPanel.css';
 
 export default function BespokeListPanel() {
@@ -146,7 +147,7 @@ export default function BespokeListPanel() {
   const loading = listsLoading || membershipLoading;
 
   return (
-    <div className="bespoke-list-panel-card">
+    <Card variant="glass-shaded" padding="none">
       <div className="bespoke-list-panel-header">
         <span className="bespoke-list-panel-title">
           {t('lists.title') || 'Lists'}
@@ -171,41 +172,24 @@ export default function BespokeListPanel() {
           </div>
         ) : (
           <>
-            {otherLists.length > 0 ? (
-              <div className="bespoke-list-panel-list custom-scrollbar">
-                {otherLists.map((list) => {
-                  const isAdded = actualListIds.includes(list.id);
-                  return (
-                    <div
-                      key={list.id}
-                      className={`bespoke-list-panel-item ${isAdded ? 'is-added' : ''}`}
-                      onClick={() => handleToggleList(list)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleToggleList(list);
-                        }
-                      }}
-                      /* eslint-disable-next-line react/forbid-dom-props */
-                      style={{ '--list-color': list.color || 'var(--color-accent-blue)' }}
-                    >
-                      <div className="bespoke-list-panel-item-checkbox">
-                        {isAdded && <Check size={12} />}
-                      </div>
-                      <span className="bespoke-list-panel-item-name">{list.name}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="bespoke-list-panel-empty">
-                {t('lists.no_lists_yet') || 'No custom lists created yet.'}
-              </div>
-            )}
+            <div className="bespoke-list-panel-items-wrapper">
+              {otherLists.map((list) => {
+                const isAdded = actualListIds.includes(list.id);
+                return (
+                  <button
+                    key={list.id}
+                    type="button"
+                    className={`bespoke-list-panel-item ${isAdded ? 'is-active' : ''}`}
+                    onClick={() => handleToggleList(list)}
+                  >
+                    <span className="bespoke-list-panel-item-name">{list.name}</span>
+                    {isAdded ? <Check size={12} className="bespoke-list-panel-check" /> : <Plus size={12} className="bespoke-list-panel-plus" />}
+                  </button>
+                );
+              })}
+            </div>
 
-            <form onSubmit={handleCreateList} className="bespoke-list-panel-create-form">
+            <form className="bespoke-list-panel-form" onSubmit={handleCreateList}>
               <input
                 type="text"
                 value={newListName}
@@ -225,6 +209,6 @@ export default function BespokeListPanel() {
           </>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

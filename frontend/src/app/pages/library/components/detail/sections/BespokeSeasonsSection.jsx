@@ -14,6 +14,7 @@ import Lightbox from '@/ui/Lightbox';
 import PosterCard from '@/ui/PosterCard';
 import ScrollRow from '@/ui/ScrollRow';
 import Inline from '@/ui/Inline';
+import Card from '@/ui/Card';
 import './BespokeSeasonsSection.css';
 
 export default function BespokeSeasonsSection() {
@@ -158,7 +159,7 @@ export default function BespokeSeasonsSection() {
   return (
     <div className="bespoke-seasons-section">
       {/* Unified Season & Episode Browser Card */}
-      <div className="bespoke-unified-browser-card">
+      <Card variant="glass-shaded" padding="none" className="bespoke-unified-browser-card">
         
         {/* Row 1 Header: Seasons Horizontal Pills */}
         <Inline gap="sm" align="center" className="bespoke-browser-card__pills-header">
@@ -279,7 +280,7 @@ export default function BespokeSeasonsSection() {
           stepEpisode={stepEpisode}
           handleOpenLightbox={handleOpenLightbox}
         />
-      </div>
+      </Card>
 
       <Lightbox
         imageUrl={lightboxUrl}

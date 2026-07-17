@@ -4,14 +4,6 @@
   gap: var(--space-lg);
 }
 
-.backdrops-panel__empty {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  text-align: center;
-  padding: var(--space-2xl) 0;
-  font-style: italic;
-}
-
 .backdrops-panel__empty-state {
   grid-column: 1 / -1;
   width: 100%;

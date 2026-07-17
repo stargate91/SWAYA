@@ -1,11 +1,14 @@
 import { ChevronDown, ChevronRight } from '@/ui/icons';
 import { formatTime, countEpisodesInNumber, formatEpisodeNumber } from '../../../../utils/detailUtils';
 import { useMediaDetailContext } from '../../MediaDetailContext';
-import '../PanelsCommon.css';
-import './WatchedStats.css';
+import SpecCard from '@/ui/SpecCard';
+import Grid from '@/ui/Grid';
+import Stack from '@/ui/Stack';
+import Card from '@/ui/Card';
+import Text from '@/ui/Text';
 import Pill from '@/ui/Pill';
 import Inline from '@/ui/Inline';
-
+import LinearProgress from '@/ui/LinearProgress';
 
 export default function TvWatchedStats() {
   const { state, actions, t } = useMediaDetailContext();
@@ -79,40 +82,28 @@ export default function TvWatchedStats() {
   const watchActivityTitleText = `${t('library.details.watchActivity') || 'Watch Activity'} (${allPlaybackLogs.length})`;
 
   return (
-    <div className="watched-panel">
-      <div>
-        <h4 className="details-panel__ratings-title">
+    <Stack gap="xl">
+      <Stack gap="md">
+        <Text as="h4" variant="caption" uppercase color="muted">
           {t('library.details.watchStats') || 'Watch Stats'}
-        </h4>
-        <div className="specs-grid">
-          <div className="specs-card">
-            <span className="specs-card__label">{t('library.details.episodesCompleted') || 'Completed'}</span>
-            <span className="specs-card__value" title={episodesCompletedText}>
-              {episodesCompletedText}
-            </span>
-          </div>
-          <div className="specs-card">
-            <span className="specs-card__label">{t('library.details.completionRate') || 'Completion'}</span>
-            <span className="specs-card__value" title={completionRateText}>
-              {completionRateText}
-            </span>
-          </div>
-          <div className="specs-card specs-card--span-2">
-            <span className="specs-card__label">{t('library.details.watchStatus') || 'Status'}</span>
-            <span className={`specs-card__value status-${watchedEpisodesCount === totalEpisodesCount && totalEpisodesCount > 0 ? 'watched' : (isInProgress || watchedEpisodesCount > 0 ? 'progress' : 'unwatched')}`} title={tvStatus}>
-              {tvStatus}
-            </span>
-          </div>
-          <div className="specs-card specs-card--span-2">
-            <span className="specs-card__label">{t('library.details.lastWatched') || 'Last Watched'}</span>
-            <span className="specs-card__value" title={tvLastWatched ? formatLogDate(tvLastWatched) : 'Never'}>
-              {tvLastWatched ? formatLogDate(tvLastWatched) : (t('library.details.never') || 'Never')}
-            </span>
-          </div>
+        </Text>
+        <Grid variant="specs" gap="sm">
+          <SpecCard label={t('library.details.episodesCompleted') || 'Completed'} value={episodesCompletedText} />
+          <SpecCard label={t('library.details.completionRate') || 'Completion'} value={completionRateText} />
+          <SpecCard
+            span={2}
+            label={t('library.details.watchStatus') || 'Status'}
+            value={tvStatus}
+            status={watchedEpisodesCount === totalEpisodesCount && totalEpisodesCount > 0 ? 'success' : (isInProgress || watchedEpisodesCount > 0 ? 'success' : 'danger')}
+          />
+          <SpecCard
+            span={2}
+            label={t('library.details.lastWatched') || 'Last Watched'}
+            value={tvLastWatched ? formatLogDate(tvLastWatched) : (t('library.details.never') || 'Never')}
+          />
           {isInProgress && (
-            <div className="specs-card specs-card--span-2">
-              <span className="specs-card__label">{t('library.details.inProgressEpisodes') || 'Episodes in Progress'}</span>
-              <span className="specs-card__value specs-card__value--in-progress">
+            <SpecCard label={t('library.details.inProgressEpisodes') || 'Episodes in Progress'} span={2}>
+              <Text variant="small" color="secondary" style={{ whiteSpace: 'normal', lineBreak: 'anywhere' }}>
                 {inProgressEpisodes.map((ep, idx) => {
                   const epNumStr = ep.episode_number
                     ? (ep.episode_number.toString().includes('.') ? ep.episode_number : String(ep.episode_number).padStart(2, '0'))
@@ -127,18 +118,18 @@ export default function TvWatchedStats() {
                     </div>
                   );
                 })}
-              </span>
-            </div>
+              </Text>
+            </SpecCard>
           )}
-        </div>
-      </div>
+        </Grid>
+      </Stack>
 
       {/* Season Progress List */}
-      <div>
-        <h4 className="details-panel__ratings-title">
+      <Stack gap="sm">
+        <Text as="h4" variant="caption" uppercase color="muted">
           {t('library.details.seasonProgress') || 'Season Progress'}
-        </h4>
-        <div className="watched-panel__seasons-list">
+        </Text>
+        <Stack gap="sm">
           {regularSeasons.map(season => {
             const sEp = season.episodes || [];
             const totalEp = sEp.length;
@@ -148,74 +139,71 @@ export default function TvWatchedStats() {
             const seasonMetaText = `${watchedEp} / ${totalEp} (${seasonProgPercent}%)`;
 
             return (
-              <div
-                key={season.season_number}
-                className="season-progress-card"
-              >
-                <div className="season-progress-card__header">
-                  <span className="season-progress-card__title">
-                    {seasonTitleText}
-                  </span>
-                  <span className="season-progress-card__meta">
-                    {seasonMetaText}
-                  </span>
-                </div>
-                <progress
-                  className="season-progress-card__progress"
-                  value={seasonProgPercent}
-                  max={100}
-                />
-              </div>
+              <Card key={season.season_number} variant="default" padding="md">
+                <Stack gap="sm">
+                  <Inline justify="between" align="center">
+                    <Text variant="body" weight="bold">{seasonTitleText}</Text>
+                    <Text variant="small" weight="bold" color="secondary">{seasonMetaText}</Text>
+                  </Inline>
+                  <LinearProgress value={seasonProgPercent} variant="accent" />
+                </Stack>
+              </Card>
             );
           })}
-        </div>
-      </div>
+        </Stack>
+      </Stack>
 
       {/* Collapsible Watch Activity */}
-      <div>
-        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-        <div
-          className="activity-header watched-panel__activity-header"
+      <Stack gap="sm">
+        <Card
+          variant="interactive-glass"
+          padding="md"
           onClick={() => setIsWatchLogsExpanded(prev => !prev)}
+          style={{ cursor: 'pointer', userSelect: 'none' }}
         >
-          <h4 className="watched-panel__activity-title">
-            {watchActivityTitleText}
-          </h4>
-          {isWatchLogsExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-        </div>
+          <Inline justify="between" align="center">
+            <Text as="h4" variant="caption" uppercase weight="bold" color="secondary">
+              {watchActivityTitleText}
+            </Text>
+            {isWatchLogsExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+          </Inline>
+        </Card>
 
         {isWatchLogsExpanded && (
-          <div className="activity-list">
+          <Card variant="soft" padding="md">
             {allPlaybackLogs.length > 0 ? (
-              allPlaybackLogs.map((log, index) => {
-                const logCodeText = `S${log.seasonNumber}E${formatEpisodeNumber(log.episodeNumber)}`;
-                return (
-                  <div
-                    key={log.id || index}
-                    className="activity-item activity-item--tv"
-                  >
-                    <Inline gap="md" align="center" className="activity-item__tv-top">
-                      <Pill variant="meta" className="activity-item__token">
-                        {logCodeText}
-                      </Pill>
-                      <span className="activity-item__title" title={log.episodeTitle}>
-                        {log.episodeTitle}
-                      </span>
-                    </Inline>
-                    <span className="activity-item__date">
-                      {formatLogDate(log.watched_at)}
-                    </span>
-                  </div>
-                );
-              })
+              <Stack gap="none">
+                {allPlaybackLogs.map((log, index) => {
+                  const logCodeText = `S${log.seasonNumber}E${formatEpisodeNumber(log.episodeNumber)}`;
+                  return (
+                    <Stack
+                      key={log.id || index}
+                      gap="xs"
+                      style={index > 0 ? { borderTop: '1px solid var(--color-surface-glass)', paddingTop: 'var(--space-sm)', marginTop: 'var(--space-sm)' } : undefined}
+                    >
+                      <Inline gap="md" align="center">
+                        <Pill variant="meta">
+                          {logCodeText}
+                        </Pill>
+                        <Text variant="small" weight="medium" truncate style={{ flex: 1 }} title={log.episodeTitle}>
+                          {log.episodeTitle}
+                        </Text>
+                      </Inline>
+                      <Text variant="small" color="muted">
+                        {formatLogDate(log.watched_at)}
+                      </Text>
+                    </Stack>
+                  );
+                })}
+              </Stack>
             ) : (
-              <div className="activity-list__empty">
+              <Text variant="small" color="secondary" italic>
                 {t('library.details.noActivity') || 'No recorded watch logs.'}
-              </div>
+              </Text>
             )}
-          </div>
+          </Card>
         )}
-      </div>
-    </div>
+      </Stack>
+    </Stack>
   );
 }

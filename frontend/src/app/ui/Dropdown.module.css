@@ -17,6 +17,14 @@
   padding-left: var(--space-lg);
 }
 
+.trigger:focus-visible,
+.trigger:focus,
+.trigger.is-open {
+  border-color: var(--ui-dropdown-accent-color, var(--color-accent));
+  box-shadow: 0 0 0 0.1875rem color-mix(in srgb, var(--ui-dropdown-accent-color, var(--color-accent)) 15%, transparent);
+  outline: none;
+}
+
 .trigger-text {
   flex: 1;
   text-overflow: ellipsis;
@@ -319,12 +327,12 @@
 }
 
 /* Theme Color System rules built directly into the component module */
-.dropdown[style*="--list-theme-color"] .trigger-sorter:hover {
+.dropdown[style*="--list-theme-color"] .trigger:hover {
   border-color: color-mix(in srgb, var(--list-theme-color) 45%, var(--ui-control-border));
 }
 
-.dropdown[style*="--list-theme-color"] .trigger-sorter.is-open,
-.dropdown[style*="--list-theme-color"] .trigger-sorter:focus {
+.dropdown[style*="--list-theme-color"] .trigger.is-open,
+.dropdown[style*="--list-theme-color"] .trigger:focus {
   border-color: var(--list-theme-color);
   box-shadow: 0 0 0 0.1875rem color-mix(in srgb, var(--list-theme-color) 15%, transparent);
 }
@@ -373,4 +381,8 @@
   flex: 1;
   min-width: 0;
   width: 0;
+}
+
+.trigger:hover:not(:disabled):not(.is-open):not(:focus-visible):not(:focus) {
+  border-color: color-mix(in srgb, var(--ui-dropdown-accent-color, var(--color-accent)) 45%, var(--ui-control-border));
 }

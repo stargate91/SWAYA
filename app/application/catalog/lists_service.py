@@ -614,7 +614,9 @@ class ListsService:
 
         exists = exists_query.first()
         if exists:
-            return self._serialize_item(exists)
+            result = self._serialize_item(exists)
+            result["already_exists"] = True
+            return result
 
         from app.domains.users.services.lists_domain_service import ListsDomainService
         item = ListsDomainService.create_list_item(

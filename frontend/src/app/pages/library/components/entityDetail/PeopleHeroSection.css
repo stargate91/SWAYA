@@ -826,7 +826,7 @@
   cursor: pointer;
   --arrow-transition: all 0.3s ease;
   transition: var(--arrow-transition);
-  --arrow-animation: bounceArrow 2s infinite;
+  --arrow-animation: bouncearrow 2s infinite;
   animation: var(--arrow-animation);
 }
 
@@ -843,7 +843,7 @@
   transform: translateY(0.625rem);
 }
 
-@keyframes bounceArrow {
+@keyframes bouncearrow {
   0%, 20%, 50%, 80%, 100% {
     transform: translateY(0);
   }

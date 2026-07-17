@@ -1,17 +1,22 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { ChevronDown, ChevronRight, ChevronLeft, Check, Eye, Play, Clapperboard, Calendar, Tv, Star, Droplets, Trash2 } from '@/ui/icons';
+import { ChevronDown, Check, Eye, Play, Clapperboard, Calendar, Tv, Star, Droplets, Trash2 } from '@/ui/icons';
 import IconButton from '@/ui/IconButton';
 import Pill from '@/ui/Pill';
 import PosterCard from '@/ui/PosterCard';
+import Card from '@/ui/Card';
+import Stack from '@/ui/Stack';
+import Inline from '@/ui/Inline';
+import ScrollRow from '@/ui/ScrollRow';
+import Text from '@/ui/Text';
+import Button from '@/ui/Button';
+import Alert from '@/ui/Alert';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { formatEpisodeNumber, formatTime } from '../../../utils/detailUtils';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import { useTranslation as useLangTranslation } from '@/providers/LanguageContext';
 import api from '@/lib/api';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
-import Inline from '@/ui/Inline';
-import './SeasonsPanel.css';
 
 const LPAR = '(';
 const RPAR = ')';
@@ -85,18 +90,6 @@ export default function SeasonsPanel() {
   };
 
   const selectedSeasonIndex = seasonsList.findIndex((s) => s.season_number === selectedSeasonNumber);
-
-  const handlePrevSeason = () => {
-    if (selectedSeasonIndex > 0) {
-      setSelectedSeasonNumber(seasonsList[selectedSeasonIndex - 1].season_number);
-    }
-  };
-
-  const handleNextSeason = () => {
-    if (selectedSeasonIndex < seasonsCount - 1) {
-      setSelectedSeasonNumber(seasonsList[selectedSeasonIndex + 1].season_number);
-    }
-  };
 
   const toggleEpisodeOverview = (episodeId) => {
     setExpandedEpisodes((prev) => ({
@@ -174,9 +167,11 @@ export default function SeasonsPanel() {
 
   if (!activeSeason) {
     return (
-      <div className="seasons-panel__empty">
-        {t('library.details.noSeasonsFound') || 'No seasons found.'}
-      </div>
+      <Card variant="transparent" padding="md">
+        <Text variant="body" color="muted" italic align="center">
+          {t('library.details.noSeasonsFound') || 'No seasons found.'}
+        </Text>
+      </Card>
     );
   }
 
@@ -192,112 +187,88 @@ export default function SeasonsPanel() {
   };
 
   return (
-    <div className="seasons-panel">
-      {/* Title with navigation arrows */}
-      <Inline justify="between" className="seasons-panel__header">
-        <h4 className="details-panel__section-title">
+    <Stack gap="lg">
+      {/* Title */}
+      <Inline justify="between" align="center">
+        <Text as="h4" variant="title">
           {t('library.details.seasons') || 'Seasons'}
-        </h4>
-        <Inline gap="sm" align="center" className="seasons-panel__nav-arrows">
-          <button
-            type="button"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={handlePrevSeason}
-            disabled={selectedSeasonIndex <= 0}
-            className="seasons-panel__nav-arrow-btn"
-            title={t('library.details.previousSeason') || 'Previous Season'}
-          >
-            <ChevronLeft size={16} />
-          </button>
-          <button
-            type="button"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={handleNextSeason}
-            disabled={selectedSeasonIndex >= seasonsCount - 1}
-            className="seasons-panel__nav-arrow-btn"
-            title={t('library.details.nextSeason') || 'Next Season'}
-          >
-            <ChevronRight size={16} />
-          </button>
-        </Inline>
+        </Text>
       </Inline>
 
-      {/* Seasons Posters Carousel (no absolute scroll buttons) */}
-      <div className="seasons-carousel-wrapper">
-        <div className="seasons-carousel" ref={scrollContainerRef}>
-          {seasonsList.map((season) => {
-            const isActive = season.season_number === selectedSeasonNumber;
-            const posterUrl = getPosterUrl(season.poster_path);
-            const title = season.title || `Season ${season.season_number}`;
+      {/* Seasons Posters Scroll Row */}
+      <ScrollRow showArrows={true} enableWheelScroll={true} ref={scrollContainerRef}>
+        {seasonsList.map((season) => {
+          const isActive = season.season_number === selectedSeasonNumber;
+          const posterUrl = getPosterUrl(season.poster_path);
+          const title = season.title || `Season ${season.season_number}`;
 
-            return (
-              <PosterCard
-                key={season.season_number}
-                className="season-poster-card"
-                active={isActive}
-                imageUrl={posterUrl}
-                title={title}
-                onClick={() => setSelectedSeasonNumber(season.season_number)}
-                onMouseDown={(e) => e.preventDefault()}
-                icon={Clapperboard}
-                disableHoverAnimation={true}
-              />
-            );
-          })}
-        </div>
-      </div>
+          return (
+            <PosterCard
+              key={season.season_number}
+              active={isActive}
+              imageUrl={posterUrl}
+              title={title}
+              onClick={() => setSelectedSeasonNumber(season.season_number)}
+              onMouseDown={(e) => e.preventDefault()}
+              icon={Clapperboard}
+              disableHoverAnimation={true}
+              style={{ width: '5.375rem', flexShrink: 0 }}
+            />
+          );
+        })}
+      </ScrollRow>
 
       {/* Selected Season Header / Details */}
-      <div className="active-season-info">
-        <Inline justify="between" gap="md" align="center" className="active-season-info__header">
-          <div>
-            <h3 className="active-season-info__title">
-              {activeSeason.title || `Season ${activeSeason.season_number}`}
-            </h3>
-            <Inline gap="lg" align="center" className="active-season-info__meta">
-              {activeSeason.air_date && (
-                <span className="active-season-info__meta-date">
-                  <Calendar size={12} />
-                  {String(activeSeason.air_date).slice(0, 10)}
-                </span>
-              )}
-              {activeSeason.air_date && totalEpisodesCount > 0 && <span className="active-season-info__meta-spacer" />}
-              {totalEpisodesCount > 0 && (
-                <span className="active-season-info__meta-episodes">
-                  <Tv size={12} />
-                  {localEpisodesCount < totalEpisodesCount
-                    ? `Available ${localEpisodesCount}/${totalEpisodesCount}`
-                    : `${totalEpisodesCount} ${t('library.details.episodes') || 'Episodes'}`}
-                </span>
-              )}
-            </Inline>
-          </div>
+      <Card variant="soft" padding="md">
+        <Stack gap="sm">
+          <Inline justify="between" gap="md" align="center">
+            <div>
+              <Text as="h3" variant="title">
+                {activeSeason.title || `Season ${activeSeason.season_number}`}
+              </Text>
+              <Inline gap="lg" align="center">
+                {activeSeason.air_date && (
+                  <Text variant="small" color="muted">
+                    <Calendar size={12} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                    {String(activeSeason.air_date).slice(0, 10)}
+                  </Text>
+                )}
+                {totalEpisodesCount > 0 && (
+                  <Text variant="small" color="muted">
+                    <Tv size={12} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                    {localEpisodesCount < totalEpisodesCount
+                      ? `Available ${localEpisodesCount}/${totalEpisodesCount}`
+                      : `${totalEpisodesCount} ${t('library.details.episodes') || 'Episodes'}`}
+                  </Text>
+                )}
+              </Inline>
+            </div>
 
-          {!isSeasonWatchedWithDate && (
-            <button
-              type="button"
-              className={`season-watch-btn ${isSeasonWatched ? 'season-watch-btn--watched' : ''}`}
-              onClick={handleSeasonWatchedToggle}
-            >
-              <Check size={16} />
-              <span>
+            {!isSeasonWatchedWithDate && (
+              <Button
+                variant={isSeasonWatched ? 'secondary-neutral' : 'primary'}
+                onClick={handleSeasonWatchedToggle}
+                icon={<Check size={16} />}
+              >
                 {isSeasonWatched
                   ? (t('library.details.watched') || 'Watched')
                   : isSeasonPartiallyWatched
                   ? `${t('library.details.markWatched') || 'Mark Watched'} (-)`
                   : (t('library.details.markWatched') || 'Mark Watched')}
-              </span>
-            </button>
-          )}
-        </Inline>
+              </Button>
+            )}
+          </Inline>
 
-        {activeSeason.overview && (
-          <p className="active-season-info__overview">{activeSeason.overview}</p>
-        )}
-      </div>
+          {activeSeason.overview && (
+            <Text variant="body" color="secondary">
+              {activeSeason.overview}
+            </Text>
+          )}
+        </Stack>
+      </Card>
 
       {/* Episode Cards List */}
-      <div className="episodes-cards-list">
+      <Stack gap="md">
         {visibleEpisodes.map((episode) => {
           const isExpanded = !!expandedEpisodes[episode.id];
           const stillUrl = getStillUrl(episode.still_path);
@@ -305,7 +276,6 @@ export default function SeasonsPanel() {
           const episodeText = `${formattedEpNum.padStart(2, '0')}. ${episode.title || `Episode ${episode.episode_number}`}`;
           const episodeTmdbRating = episode.vote_average ?? episode.rating_tmdb ?? episode.rating;
 
-          // Format metadata tags
           const durationMins = episode.runtime
             ? `${episode.runtime}m`
             : episode.technical?.duration
@@ -321,27 +291,29 @@ export default function SeasonsPanel() {
           ].filter(Boolean);
 
           return (
-            // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-            <div
+            <Card
               key={episode.id}
-              className={`episode-card ${isExpanded ? 'is-expanded' : ''} ${
-                episode.is_watched ? 'is-watched' : ''
-              } ${!episode.path || episode.is_missing ? 'is-unowned' : ''}`}
+              variant={episode.is_watched ? 'soft' : 'default'}
+              padding="md"
+              style={{
+                cursor: 'pointer',
+                opacity: (!episode.path || episode.is_missing) ? 0.6 : 1,
+              }}
               onClick={() => toggleEpisodeOverview(episode.id)}
             >
-              {/* Left Side: Still Image */}
-              <div className="episode-card__media-column">
-                <div className="episode-card__still-wrapper">
+              <Inline gap="md" align="start" fullWidth>
+                {/* Still Image */}
+                <div style={{ width: '120px', flexShrink: 0, position: 'relative', aspectRatio: '16/9', borderRadius: '4px', overflow: 'hidden', background: 'var(--color-surface-glass)' }}>
                   {stillUrl ? (
-                    <img src={stillUrl} alt="" className="episode-card__still" />
+                    <img src={stillUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
-                    <div className="episode-card__still-placeholder">
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-surface-glass-strong)' }}>
                       <Clapperboard size={24} />
                     </div>
                   )}
                   {episode.is_watched && (
-                    <div className="episode-card__still-watched-overlay">
-                      <Check size={16} />
+                    <div style={{ position: 'absolute', top: '4px', right: '4px', background: 'var(--color-state-success)', color: '#fff', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Check size={12} />
                     </div>
                   )}
                   {episode.path && !episode.is_missing && (
@@ -352,154 +324,162 @@ export default function SeasonsPanel() {
                         playMutation.mutate(episode.id);
                       }}
                       title={t('library.details.playEpisode') || 'Play Episode'}
+                      style={{ position: 'absolute', inset: 0, margin: 'auto' }}
                     >
                       <Play size={12} fill="currentColor" />
                     </IconButton>
                   )}
                 </div>
-              </div>
 
-              {/* Center: Info copy */}
-              <div className="episode-card__details">
-                <h4 className="episode-card__title">{episodeText}</h4>
-                
-                {(metaItems.length > 0 || episode.is_multi_episode || (episodeTmdbRating !== undefined && episodeTmdbRating !== null && episodeTmdbRating !== '' && Number(episodeTmdbRating) > 0)) && (
-                  <Inline gap="sm" align="center" className="episode-card__meta">
-                    {episode.is_multi_episode && (
-                      <Pill variant="neutral" className="episode-card__shared-pill">
-                        {t('library.details.sharedFile') || 'Shared File'}
-                      </Pill>
-                    )}
-                    {metaItems.map((meta, idx) => (
-                      <span key={idx} className="episode-card__meta-item">
-                        {meta}
-                      </span>
-                    ))}
-                    {(episodeTmdbRating !== undefined && episodeTmdbRating !== null && episodeTmdbRating !== '' && Number(episodeTmdbRating) > 0) && (
-                      <Pill variant="tmdb" className="episode-card__tmdb-pill">
-                        <Star size={10} fill="currentColor" strokeWidth={1.8} />
-                        {isNaN(parseFloat(episodeTmdbRating))
-                          ? episodeTmdbRating
-                          : parseFloat(episodeTmdbRating).toFixed(1)}
-                      </Pill>
-                    )}
-                  </Inline>
-                )}
-
-                {episode.overview && (
-                  <p className={`episode-card__overview ${isExpanded ? '' : 'is-truncated'}`}>
-                    {episode.overview}
-                  </p>
-                )}
-
-                {item.is_adult && episode.peaks_history && episode.peaks_history.length > 0 && isExpanded && (
-                  <div className="episode-card__peaks-list" role="presentation" onClick={(e) => e.stopPropagation()}>
-                    <Inline gap="sm" align="center" className="episode-card__peaks-title">
-                      <Droplets size={12} fill="currentColor" />
-                      <span>{t('library.details.peaksTitle') || 'Peak Moments'} {LPAR}{episode.peaks_history.length}{RPAR}</span>
-                    </Inline>
-                    <div className="episode-card__peaks-items">
-                      {episode.peaks_history.map((log) => (
-                        <Inline key={log.id} justify="between" gap="md" align="center" className="episode-card__peak-item">
-                          <span className="episode-card__peak-date">
-                            {new Date(log.watched_at).toLocaleString()}
-                          </span>
-                          {log.video_position != null && (
-                            <span className="episode-card__peak-position">
-                              {formatTime(log.video_position)}
-                            </span>
-                          )}
-                          <button
-                            type="button"
-                            className="episode-card__peak-delete"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deletePeakMutation.mutate({ itemId: episode.id, logId: log.id });
-                            }}
-                            disabled={deletePeakMutation.isPending}
-                            title={t('library.details.deletePeakBtn') || 'Delete Peak'}
-                          >
-                            <Trash2 size={12} />
-                          </button>
-                        </Inline>
+                {/* Details */}
+                <Stack gap="xs" flex={1}>
+                  <Text as="h4" variant="body" weight="bold">
+                    {episodeText}
+                  </Text>
+                  
+                  {(metaItems.length > 0 || episode.is_multi_episode || (episodeTmdbRating !== undefined && episodeTmdbRating !== null && episodeTmdbRating !== '' && Number(episodeTmdbRating) > 0)) && (
+                    <Inline gap="sm" align="center">
+                      {episode.is_multi_episode && (
+                        <Pill variant="neutral">
+                          {t('library.details.sharedFile') || 'Shared File'}
+                        </Pill>
+                      )}
+                      {metaItems.map((meta, idx) => (
+                        <Text key={idx} variant="small" color="muted">
+                          {meta}
+                        </Text>
                       ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+                      {(episodeTmdbRating !== undefined && episodeTmdbRating !== null && episodeTmdbRating !== '' && Number(episodeTmdbRating) > 0) && (
+                        <Pill variant="tmdb">
+                          <Star size={10} fill="currentColor" strokeWidth={1.8} />
+                          {isNaN(parseFloat(episodeTmdbRating))
+                            ? episodeTmdbRating
+                            : parseFloat(episodeTmdbRating).toFixed(1)}
+                        </Pill>
+                      )}
+                    </Inline>
+                  )}
 
-              <Inline gap="sm" align="center" className="episode-card__actions" onClick={(e) => e.stopPropagation()}>
-                {isExpanded && (
-                  <>
-                    {/* Flame/Peak button */}
-                    {item.is_adult && episode.path && !episode.is_missing && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          addPeakMutation.mutate(episode.id);
-                        }}
-                        disabled={addPeakMutation.isPending}
-                        className="episode-card__action-btn episode-card__action-btn--peak"
-                        title={t('library.details.addPeak') || 'Add Peak'}
-                      >
-                        <Droplets size={16} />
-                      </button>
-                    )}
-
-                    {/* Watch toggle */}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        updateStatusMutation.mutate({
-                          itemId: episode.id,
-                          tvId: cleanId,
-                          payload: {
-                            is_watched: !episode.is_watched,
-                            media_type: 'episode',
-                          },
-                        })
-                      }
-                      className={`episode-card__action-btn episode-card__action-btn--watch ${
-                        episode.is_watched ? 'is-watched' : ''
-                      }`}
-                      title={episode.is_watched ? 'Mark unwatched' : 'Mark watched'}
+                  {episode.overview && (
+                    <Text
+                      variant="small"
+                      color="secondary"
+                      truncate={!isExpanded}
+                      style={!isExpanded ? { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', whiteSpace: 'normal' } : undefined}
                     >
-                      {episode.is_watched ? <Check size={16} /> : <Eye size={16} />}
-                    </button>
+                      {episode.overview}
+                    </Text>
+                  )}
 
+                  {item.is_adult && episode.peaks_history && episode.peaks_history.length > 0 && isExpanded && (
+                    <Card variant="transparent" padding="none">
+                      <Stack gap="xs" onClick={(e) => e.stopPropagation()}>
+                        <Inline gap="sm" align="center">
+                          <Droplets size={12} color="var(--color-state-danger)" />
+                          <Text variant="small" weight="bold">
+                            {t('library.details.peaksTitle') || 'Peak Moments'} {LPAR}{episode.peaks_history.length}{RPAR}
+                          </Text>
+                        </Inline>
+                        <Stack gap="xs">
+                          {episode.peaks_history.map((log) => (
+                            <Card key={log.id} variant="soft" padding="md">
+                              <Inline justify="between" align="center">
+                                <Text variant="small" color="secondary">
+                                  {new Date(log.watched_at).toLocaleString()}
+                                </Text>
+                                <Inline gap="sm" align="center">
+                                  {log.video_position != null && (
+                                    <Pill variant="default">
+                                      {formatTime(log.video_position)}
+                                    </Pill>
+                                  )}
+                                  <IconButton
+                                    variant="flat-danger"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      deletePeakMutation.mutate({ itemId: episode.id, logId: log.id });
+                                    }}
+                                    disabled={deletePeakMutation.isPending}
+                                    title={t('library.details.deletePeakBtn') || 'Delete Peak'}
+                                  >
+                                    <Trash2 size={12} />
+                                  </IconButton>
+                                </Inline>
+                              </Inline>
+                            </Card>
+                          ))}
+                        </Stack>
+                      </Stack>
+                    </Card>
+                  )}
+                </Stack>
 
-                  </>
-                )}
+                {/* Actions */}
+                <Inline gap="sm" align="center" onClick={(e) => e.stopPropagation()}>
+                  {isExpanded && (
+                    <>
+                      {item.is_adult && episode.path && !episode.is_missing && (
+                        <IconButton
+                          variant="secondary-neutral"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addPeakMutation.mutate(episode.id);
+                          }}
+                          disabled={addPeakMutation.isPending}
+                          title={t('library.details.addPeak') || 'Add Peak'}
+                        >
+                          <Droplets size={16} />
+                        </IconButton>
+                      )}
 
-                {/* Chevron expand toggle */}
-                <button
-                  type="button"
-                  className={`episode-card__action-btn episode-card__action-btn--chevron ${
-                    isExpanded ? 'is-expanded' : ''
-                  }`}
-                  onClick={() => toggleEpisodeOverview(episode.id)}
-                  aria-label="Toggle details"
-                >
-                  <ChevronDown size={16} />
-                </button>
+                      <IconButton
+                        variant={episode.is_watched ? 'success' : 'secondary-neutral'}
+                        onClick={() =>
+                          updateStatusMutation.mutate({
+                            itemId: episode.id,
+                            tvId: cleanId,
+                            payload: {
+                              is_watched: !episode.is_watched,
+                              media_type: 'episode',
+                            },
+                          })
+                        }
+                        title={episode.is_watched ? 'Mark unwatched' : 'Mark watched'}
+                      >
+                        {episode.is_watched ? <Check size={16} /> : <Eye size={16} />}
+                      </IconButton>
+                    </>
+                  )}
+
+                  <IconButton
+                    variant="secondary-neutral"
+                    onClick={() => toggleEpisodeOverview(episode.id)}
+                    title="Toggle details"
+                    style={{ transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform var(--motion-slow)' }}
+                  >
+                    <ChevronDown size={16} />
+                  </IconButton>
+                </Inline>
               </Inline>
-            </div>
+            </Card>
           );
         })}
 
         {(!activeSeason.episodes || activeSeason.episodes.length === 0) && (
-          <div className="episodes-list__empty">
-            {item?.progressive_seasons && activeSeason.episodes_complete === false
-              ? (t('library.details.loadingSeason') || 'Loading season...')
-              : (t('library.details.noEpisodesFound') || 'No episodes found.')}
-          </div>
+          <Card variant="transparent" padding="md">
+            <Text variant="body" color="muted" italic align="center">
+              {item?.progressive_seasons && activeSeason.episodes_complete === false
+                ? (t('library.details.loadingSeason') || 'Loading season...')
+                : (t('library.details.noEpisodesFound') || 'No episodes found.')}
+            </Text>
+          </Card>
         )}
 
         {hasMoreEpisodes && (
-          <div ref={loadMoreTriggerRef} className="episodes-list__load-more-trigger" aria-hidden="true" />
+          <div ref={loadMoreTriggerRef} aria-hidden="true" />
         )}
-      </div>
-    </div>
+      </Stack>
+    </Stack>
   );
 }

@@ -1,7 +1,8 @@
-import { Users } from '@/ui/icons';
 import { useMediaDetailContext } from '../MediaDetailContext';
-import './CastPanel.css';
-import Inline from '@/ui/Inline';
+import Stack from '@/ui/Stack';
+import Grid from '@/ui/Grid';
+import Text from '@/ui/Text';
+import PersonCard from '@/ui/PersonCard';
 
 import { API_BASE } from '@/lib/backend';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
@@ -32,123 +33,64 @@ export default function CastPanel() {
   const resolvePersonAvatarUrl = (path) => resolveMediaImageUrl(path, 'person', API_BASE);
 
   return (
-    <div className="cast-panel">
+    <Stack gap="xl">
       {filteredDirectors && filteredDirectors.length > 0 && (
-        <div>
-          <h4 className="cast-panel__title">
+        <Stack gap="md">
+          <Text as="h4" variant="caption" uppercase color="muted">
             {t('library.details.directors') || 'Directors / Creators'}
-          </h4>
-          <div className="cast-panel__list">
-            {filteredDirectors.map(director => {
-              return (
-                <Inline
-                  key={director.id}
-                  gap="md"
-                  align="center"
-                  className="person-card"
-                  onClick={() => navigate(`/library/people/${director.id}`, { state: { allowAdult: true } })}
-                >
-                  {director.profile_path ? (
-                    <img
-                      src={resolvePersonAvatarUrl(director.profile_path)}
-                      alt={director.name}
-                      className="person-card__avatar"
-                    />
-                  ) : (
-                    <div className="person-card__avatar-fallback">
-                      <Users size={16} />
-                    </div>
-                  )}
-                  <div className="person-card__info">
-                    <span className="person-card__name">{director.name}</span>
-                    <span className="person-card__role">
-                      {t(`library.people.roles.${String(director.job || 'director').toLowerCase()}`, director.job || 'Director')}
-                    </span>
-                  </div>
-                </Inline>
-              );
-            })}
-          </div>
-        </div>
+          </Text>
+          <Grid variant="actor-picker" gap="md">
+            {filteredDirectors.map(director => (
+              <PersonCard
+                key={director.id}
+                name={director.name}
+                role={t(`library.people.roles.${String(director.job || 'director').toLowerCase()}`, director.job || 'Director')}
+                avatarUrl={director.profile_path ? resolvePersonAvatarUrl(director.profile_path) : undefined}
+                onClick={() => navigate(`/library/people/${director.id}`, { state: { allowAdult: true } })}
+              />
+            ))}
+          </Grid>
+        </Stack>
       )}
 
       {filteredWriters && filteredWriters.length > 0 && (
-        <div>
-          <h4 className="cast-panel__title">
+        <Stack gap="md">
+          <Text as="h4" variant="caption" uppercase color="muted">
             {t('library.details.writers') || 'Writers / Creators'}
-          </h4>
-          <div className="cast-panel__list">
-            {filteredWriters.map(writer => {
-              return (
-                <Inline
-                  key={writer.id}
-                  gap="md"
-                  align="center"
-                  className="person-card"
-                  onClick={() => navigate(`/library/people/${writer.id}`, { state: { allowAdult: true } })}
-                >
-                  {writer.profile_path ? (
-                    <img
-                      src={resolvePersonAvatarUrl(writer.profile_path)}
-                      alt={writer.name}
-                      className="person-card__avatar"
-                    />
-                  ) : (
-                    <div className="person-card__avatar-fallback">
-                      <Users size={16} />
-                    </div>
-                  )}
-                  <div className="person-card__info">
-                    <span className="person-card__name">{writer.name}</span>
-                    <span className="person-card__role">
-                      {t(`library.people.roles.${String(writer.job || 'writer').toLowerCase()}`, writer.job || 'Writer')}
-                    </span>
-                  </div>
-                </Inline>
-              );
-            })}
-          </div>
-        </div>
+          </Text>
+          <Grid variant="actor-picker" gap="md">
+            {filteredWriters.map(writer => (
+              <PersonCard
+                key={writer.id}
+                name={writer.name}
+                role={t(`library.people.roles.${String(writer.job || 'writer').toLowerCase()}`, writer.job || 'Writer')}
+                avatarUrl={writer.profile_path ? resolvePersonAvatarUrl(writer.profile_path) : undefined}
+                onClick={() => navigate(`/library/people/${writer.id}`, { state: { allowAdult: true } })}
+              />
+            ))}
+          </Grid>
+        </Stack>
       )}
 
       {filteredCast && filteredCast.length > 0 && (
-        <div>
-          <h4 className="cast-panel__title">
+        <Stack gap="md">
+          <Text as="h4" variant="caption" uppercase color="muted">
             {t('library.details.actors') || 'Actors'}
-          </h4>
-          <div className="cast-panel__list cast-panel__list--actors">
-            {filteredCast.map(actor => {
-              return (
-                <Inline
-                  key={actor.id}
-                  gap="md"
-                  align="center"
-                  className="person-card"
-                  onClick={() => navigate(`/library/people/${actor.id}`, { state: { allowAdult: true } })}
-                >
-                  {actor.profile_path ? (
-                    <img
-                      src={resolvePersonAvatarUrl(actor.profile_path)}
-                      alt={actor.name}
-                      className="person-card__avatar person-card__avatar--actor"
-                    />
-                  ) : (
-                    <div className="person-card__avatar-fallback person-card__avatar-fallback--actor">
-                      <Users size={18} />
-                    </div>
-                  )}
-                  <div className="person-card__info">
-                    <span className="person-card__name">{actor.name}</span>
-                    <span className="person-card__role">
-                      {actor.character || t('library.people.roles.actor') || 'Actor'}
-                    </span>
-                  </div>
-                </Inline>
-              );
-            })}
-          </div>
-        </div>
+          </Text>
+          <Grid variant="actor-picker" gap="md">
+            {filteredCast.map(actor => (
+              <PersonCard
+                key={actor.id}
+                name={actor.name}
+                role={actor.character || t('library.people.roles.actor') || 'Actor'}
+                avatarUrl={actor.profile_path ? resolvePersonAvatarUrl(actor.profile_path) : undefined}
+                isActor={true}
+                onClick={() => navigate(`/library/people/${actor.id}`, { state: { allowAdult: true } })}
+              />
+            ))}
+          </Grid>
+        </Stack>
       )}
-    </div>
+    </Stack>
   );
 }

@@ -3,6 +3,8 @@ import Button from '@/ui/Button';
 import AddPeopleModalContent from '../modals/add-people/AddPeopleModalContent';
 import CreateTagModalContent from '../modals/CreateTagModalContent';
 import { Pencil, Tag, Trash2, Users } from '@/ui/icons';
+import Text from '@/ui/Text';
+import Inline from '@/ui/Inline';
 
 export function useLibraryModals({ state, focusedTagName, setFocusedTagName, deleteTagMutation }) {
   const { openModal, closeModal, toast } = useUi();
@@ -50,14 +52,14 @@ export function useLibraryModals({ state, focusedTagName, setFocusedTagName, del
         />
       ),
       footer: (
-        <div className="library-modal-footer">
+        <Inline justify="end" gap="md" fullWidth>
           <Button variant="secondary-neutral" onClick={closeModal}>
             {state.t('common.close') || 'Close'}
           </Button>
           <Button variant="primary" type="submit" form="create-tag-form">
             {state.t('common.create') || 'Create'}
           </Button>
-        </div>
+        </Inline>
       ),
     });
   };
@@ -83,14 +85,14 @@ export function useLibraryModals({ state, focusedTagName, setFocusedTagName, del
         />
       ),
       footer: (
-        <div className="library-modal-footer">
+        <Inline justify="end" gap="md" fullWidth>
           <Button variant="secondary-neutral" onClick={closeModal}>
             {state.t('common.close') || 'Close'}
           </Button>
           <Button variant="primary" type="submit" form="edit-tag-form">
             {state.t('common.save') || 'Save'}
           </Button>
-        </div>
+        </Inline>
       ),
     });
   };
@@ -102,12 +104,12 @@ export function useLibraryModals({ state, focusedTagName, setFocusedTagName, del
       icon: Trash2,
       variant: 'danger',
       content: (
-        <div className="library-modal-confirm-text">
+        <Text color="muted">
           {(state.t('library.tags.deleteConfirm') || 'Delete "{name}" and remove it from all tagged items?').replace('{name}', tag.name)}
-        </div>
+        </Text>
       ),
       footer: (
-        <div className="library-modal-footer">
+        <Inline justify="end" gap="md" fullWidth>
           <Button variant="secondary-neutral" onClick={closeModal}>
             {state.t('common.cancel') || 'Cancel'}
           </Button>
@@ -127,7 +129,7 @@ export function useLibraryModals({ state, focusedTagName, setFocusedTagName, del
           >
             {state.t('library.tags.deleteBtn') || 'Delete Tag'}
           </Button>
-        </div>
+        </Inline>
       ),
     });
   };

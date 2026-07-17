@@ -1,11 +1,14 @@
 import { ChevronDown, ChevronRight } from '@/ui/icons';
 import { formatTime } from '../../../../utils/detailUtils';
 import { useMediaDetailContext } from '../../MediaDetailContext';
-import '../PanelsCommon.css';
-import './WatchedStats.css';
+import SpecCard from '@/ui/SpecCard';
+import Grid from '@/ui/Grid';
+import Stack from '@/ui/Stack';
+import Card from '@/ui/Card';
+import Text from '@/ui/Text';
 import Pill from '@/ui/Pill';
 import Inline from '@/ui/Inline';
-
+import LinearProgress from '@/ui/LinearProgress';
 
 export default function MovieWatchedStats() {
   const { state, actions, t } = useMediaDetailContext();
@@ -41,82 +44,77 @@ export default function MovieWatchedStats() {
   const watchActivityTitle = `${t('library.details.watchActivity') || 'Watch Activity'} (${item.playback_logs?.length || 0})`;
 
   return (
-    <div className="watched-panel">
-      <div>
-        <h4 className="details-panel__ratings-title">
+    <Stack gap="xl">
+      <Stack gap="md">
+        <Text as="h4" variant="caption" uppercase color="muted">
           {t('library.details.watchStats') || 'Watch Stats'}
-        </h4>
-        <div className="specs-grid">
-          <div className="specs-card">
-            <span className="specs-card__label">{t('library.details.watchCount') || 'Watch Count'}</span>
-            <span className="specs-card__value" title={item.watch_count || 0}>{item.watch_count || 0}</span>
-          </div>
-          <div className="specs-card">
-            <span className="specs-card__label">{t('library.details.watchStatus') || 'Status'}</span>
-            <span className={`specs-card__value status-${item.is_watched ? 'watched' : (item.resume_position > 0 ? 'progress' : 'unwatched')}`} title={movieStatus}>
-              {movieStatus}
-            </span>
-          </div>
-          <div className="specs-card specs-card--progress">
-            <span className="specs-card__label">{t('library.details.movieProgress') || 'Progress'}</span>
-            <div className="specs-card__progress-header">
-              <span>{movieProgressText}</span>
-              <span>{progressPercentText}</span>
-            </div>
-            <progress
-              className="specs-card__progress"
-              value={item.is_watched ? 100 : progressPercent}
-              max={100}
-            />
-          </div>
-          <div className="specs-card specs-card--span-2">
-            <span className="specs-card__label">{t('library.details.lastWatched') || 'Last Watched'}</span>
-            <span className="specs-card__value" title={item.last_watched_at ? formatLogDate(item.last_watched_at) : 'Never'}>
-              {item.last_watched_at ? formatLogDate(item.last_watched_at) : (t('library.details.never') || 'Never')}
-            </span>
-          </div>
-        </div>
-      </div>
+        </Text>
+        <Grid variant="specs" gap="sm">
+          <SpecCard label={t('library.details.watchCount') || 'Watch Count'} value={item.watch_count || 0} />
+          <SpecCard
+            label={t('library.details.watchStatus') || 'Status'}
+            value={movieStatus}
+            status={item.is_watched ? 'success' : (item.resume_position > 0 ? 'success' : 'danger')}
+          />
+          <SpecCard label={t('library.details.movieProgress') || 'Progress'} span={2}>
+            <Inline justify="between">
+              <Text variant="small" weight="bold" color="secondary">{movieProgressText}</Text>
+              <Text variant="small" weight="bold" color="secondary">{progressPercentText}</Text>
+            </Inline>
+            <LinearProgress value={item.is_watched ? 100 : progressPercent} variant="accent" />
+          </SpecCard>
+          <SpecCard
+            span={2}
+            label={t('library.details.lastWatched') || 'Last Watched'}
+            value={item.last_watched_at ? formatLogDate(item.last_watched_at) : (t('library.details.never') || 'Never')}
+          />
+        </Grid>
+      </Stack>
 
       {/* Collapsible Watch Activity */}
-      <div>
-        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-        <div
-          className="activity-header watched-panel__activity-header"
+      <Stack gap="sm">
+        <Card
+          variant="interactive-glass"
+          padding="md"
           onClick={() => setIsWatchLogsExpanded(prev => !prev)}
+          style={{ cursor: 'pointer', userSelect: 'none' }}
         >
-          <h4 className="watched-panel__activity-title">
-            {watchActivityTitle}
-          </h4>
-          {isWatchLogsExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-        </div>
+          <Inline justify="between" align="center">
+            <Text as="h4" variant="caption" uppercase weight="bold" color="secondary">
+              {watchActivityTitle}
+            </Text>
+            {isWatchLogsExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+          </Inline>
+        </Card>
 
         {isWatchLogsExpanded && (
-          <div className="activity-list">
+          <Card variant="soft" padding="md">
             {item.playback_logs && item.playback_logs.length > 0 ? (
-              item.playback_logs.map((log, index) => (
-                <Inline
-                  key={log.id || index}
-                  gap="md"
-                  align="center"
-                  className="activity-item"
-                >
-                  <Pill variant="success" className="activity-item__token">
-                    {t('library.details.watched') || 'Watched'}
-                  </Pill>
-                  <span className="activity-item__date">
-                    {formatLogDate(log.watched_at)}
-                  </span>
-                </Inline>
-              ))
+              <Stack gap="none">
+                {item.playback_logs.map((log, index) => (
+                  <Inline
+                    key={log.id || index}
+                    gap="md"
+                    align="center"
+                    style={index > 0 ? { borderTop: '1px solid var(--color-surface-glass)', paddingTop: 'var(--space-sm)', marginTop: 'var(--space-sm)' } : undefined}
+                  >
+                    <Pill variant="success">
+                      {t('library.details.watched') || 'Watched'}
+                    </Pill>
+                    <Text variant="small" color="muted">
+                      {formatLogDate(log.watched_at)}
+                    </Text>
+                  </Inline>
+                ))}
+              </Stack>
             ) : (
-              <div className="activity-list__empty">
+              <Text variant="small" color="secondary" italic>
                 {t('library.details.noActivity') || 'No recorded watch logs.'}
-              </div>
+              </Text>
             )}
-          </div>
+          </Card>
         )}
-      </div>
-    </div>
+      </Stack>
+    </Stack>
   );
 }

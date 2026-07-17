@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronRight } from '@/ui/icons';
 import { countEpisodesInNumber } from '@/pages/library/utils/detailUtils';
+import Card from '@/ui/Card';
 import './CompactWatchStatsSection.css';
 
 export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) {
@@ -137,7 +138,7 @@ export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) 
 
   return (
     <div className="bespoke-boxoffice-section compact-watch-stats-section">
-      <div className="bespoke-boxoffice-card">
+      <Card variant="glass-shaded" padding="none">
         <div className="bespoke-browser-card__pills-header">
           <span className="bespoke-cast-title">
             {t('library.details.watchStats') || 'Watch Stats'}
@@ -149,7 +150,7 @@ export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) 
               <span className="bespoke-boxoffice-label">
                 {t('library.details.watchStatus') || 'Status'}
               </span>
-              <span className={`specs-card__value status-${statusClass} bespoke-boxoffice-value`}>
+              <span className={`status-${statusClass} bespoke-boxoffice-value`}>
                 {watchStatus}
                 {((isMovie || isScene) && watchCount > 0) && (
                   <span className="compact-watch-stats__count">
@@ -170,7 +171,7 @@ export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) 
                 <span>{progressPercentText}</span>
               </div>
               <progress
-                className="specs-card__progress compact-watch-stats__progress-bar"
+                className="compact-watch-stats__progress-bar"
                 value={progressPercent}
                 max={100}
               />
@@ -218,7 +219,7 @@ export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) 
             </div>
           )}
         </div>
+        </Card>
       </div>
-    </div>
-  );
-}
+    );
+  }

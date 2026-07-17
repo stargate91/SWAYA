@@ -20,7 +20,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { openModal, closeModal, toast } = useUi();
+  const { openModal, toast } = useUi();
   const isPeople = type === 'people';
   const {
     item,
@@ -43,12 +43,11 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
     handleToggleFavorite,
     handleToggleActive,
     handleOpenReviewModal,
+    renderReviewDrawer,
   } = usePeopleCollectionDetailController({
     id,
     isPeople,
     t,
-    openModal,
-    closeModal,
   });
 
   useScrollRestoration('.media-detail-page__container', [isLoading]);
@@ -284,6 +283,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
         toast={toast}
         closeOnSelect={false}
       />
+      {renderReviewDrawer()}
     </DetailPageShell>
   );
 }

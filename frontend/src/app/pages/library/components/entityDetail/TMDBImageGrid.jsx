@@ -9,7 +9,7 @@ import EmptyState from '@/ui/EmptyState';
 import SelectableCard from '@/ui/SelectableCard';
 import Grid from '@/ui/Grid';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
-import '../detail/panels/BackdropsPanel.css'; // Reuse existing backdrop panel grid styles
+import './TMDBImageGrid.css';
 
 
 export default function TMDBImageGrid({

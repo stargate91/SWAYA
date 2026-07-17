@@ -1,4 +1,5 @@
 import { DollarSign, Coins, TrendingUp } from '@/ui/icons';
+import Card from '@/ui/Card';
 
 export default function BespokeBoxOfficeSection({ item, t }) {
   if (!item || (item.budget <= 0 && item.revenue <= 0)) return null;
@@ -20,7 +21,7 @@ export default function BespokeBoxOfficeSection({ item, t }) {
 
   return (
     <div className="bespoke-boxoffice-section">
-      <div className="bespoke-boxoffice-card">
+      <Card variant="glass-shaded" padding="none">
         <div className="bespoke-browser-card__pills-header">
           <span className="bespoke-cast-title">
             {t('library.details.boxOffice') || 'Box Office'}
@@ -71,7 +72,7 @@ export default function BespokeBoxOfficeSection({ item, t }) {
             </div>
           )}
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

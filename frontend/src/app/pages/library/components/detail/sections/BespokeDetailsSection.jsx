@@ -1,5 +1,6 @@
 import { resolveMediaImageUrl, buildTmdbImageUrl, TMDB_IMAGE_SIZES } from '@/lib/imageUrls';
 import Tooltip from '@/ui/Tooltip';
+import Card from '@/ui/Card';
 import './BespokeDetailsSection.css';
 
 export default function BespokeDetailsSection({ item, t }) {
@@ -32,7 +33,7 @@ export default function BespokeDetailsSection({ item, t }) {
   return (
     <div className="media-detail-dashboard-container">
       {ratings.length > 0 && (
-        <div className="dashboard-section">
+        <Card variant="dashboard-section" padding="none" className="dashboard-section">
           <h4 className="dashboard-section__title">{t('library.details.ratingsSection') || 'Ratings'}</h4>
           <div className="dashboard-ratings-grid">
             {ratings.map(rating => (
@@ -44,10 +45,10 @@ export default function BespokeDetailsSection({ item, t }) {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
 
-      <div className="dashboard-section">
+      <Card variant="dashboard-section" padding="none" className="dashboard-section">
         <h4 className="dashboard-section__title">{t('library.details.details') || 'Details'}</h4>
         <div className="dashboard-metadata-grid">
           {item.release_date && (
@@ -87,10 +88,10 @@ export default function BespokeDetailsSection({ item, t }) {
             </div>
           )}
         </div>
-      </div>
+      </Card>
 
       {companies.length > 0 && !isSceneType && (
-        <div className="dashboard-section">
+        <Card variant="dashboard-section" padding="none" className="dashboard-section">
           <h4 className="dashboard-section__title">
             {item.is_adult ? (t('library.details.studio') || 'Studio') : (t('library.details.productionCompanies') || 'Production Companies')}
           </h4>
@@ -111,7 +112,7 @@ export default function BespokeDetailsSection({ item, t }) {
               );
             })}
           </div>
-        </div>
+        </Card>
       )}
     </div>
   );

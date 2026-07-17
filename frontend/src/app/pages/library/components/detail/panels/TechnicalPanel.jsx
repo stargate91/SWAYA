@@ -1,7 +1,11 @@
 import PropTypes from 'prop-types';
 import { EDITION_LABELS, SOURCE_LABELS, AUDIO_TYPE_LABELS, formatTime } from '../../../utils/detailUtils';
 import { useMediaDetailContext } from '../MediaDetailContext';
-import './PanelsCommon.css';
+import SpecCard from '@/ui/SpecCard';
+import Grid from '@/ui/Grid';
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
+import Divider from '@/ui/Divider';
 
 export default function TechnicalPanel({ showTitle = true, variant }) {
   const { state, t } = useMediaDetailContext();
@@ -33,102 +37,80 @@ export default function TechnicalPanel({ showTitle = true, variant }) {
   );
   const hasSpecs = !!item?.technical;
 
+  const gridVariant = variant === 'drawer' ? 'split' : 'specs';
+
   return (
-    <div className={`details-panel details-panel--custom ${variant === 'drawer' ? 'details-panel--drawer' : ''}`.trim()}>
+    <Stack gap="xl">
       {showTitle && hasEditionSource && (
-        <div className="details-panel__section">
-          <h4 className="details-panel__section-title">
-            {t('library.details.editionAndSource') || 'Edition & Source'}
-          </h4>
-          <div className="specs-grid">
+        <Stack gap="md">
+          <Stack gap="xs">
+            <Text as="h4" variant="caption" uppercase color={variant === 'drawer' ? 'faint' : 'muted'}>
+              {t('library.details.editionAndSource') || 'Edition & Source'}
+            </Text>
+            {variant === 'drawer' && <Divider />}
+          </Stack>
+          <Grid variant={gridVariant} gap="sm">
             {item.technical?.edition && item.technical.edition !== 'none' && (
-              <div className="specs-card">
-                <span className="specs-card__label">{t('library.details.edition') || 'Edition'}</span>
-                <span className="specs-card__value" title={EDITION_LABELS[item.technical.edition] || item.technical.edition}>
-                  {EDITION_LABELS[item.technical.edition] || item.technical.edition}
-                </span>
-              </div>
+              <SpecCard
+                label={t('library.details.edition') || 'Edition'}
+                value={EDITION_LABELS[item.technical.edition] || item.technical.edition}
+              />
             )}
             {item.technical?.source && item.technical.source !== 'none' && (
-              <div className="specs-card">
-                <span className="specs-card__label">{t('library.details.source') || 'Source'}</span>
-                <span className="specs-card__value" title={SOURCE_LABELS[item.technical.source] || item.technical.source}>
-                  {SOURCE_LABELS[item.technical.source] || item.technical.source}
-                </span>
-              </div>
+              <SpecCard
+                label={t('library.details.source') || 'Source'}
+                value={SOURCE_LABELS[item.technical.source] || item.technical.source}
+              />
             )}
             {item.technical?.audio_type && item.technical.audio_type !== 'none' && (
-              <div className="specs-card">
-                <span className="specs-card__label">{t('library.details.audioStyle') || 'Audio Style'}</span>
-                <span className="specs-card__value" title={AUDIO_TYPE_LABELS[item.technical.audio_type] || item.technical.audio_type}>
-                  {AUDIO_TYPE_LABELS[item.technical.audio_type] || item.technical.audio_type}
-                </span>
-              </div>
+              <SpecCard
+                label={t('library.details.audioStyle') || 'Audio Style'}
+                value={AUDIO_TYPE_LABELS[item.technical.audio_type] || item.technical.audio_type}
+              />
             )}
-          </div>
-        </div>
+          </Grid>
+        </Stack>
       )}
 
       {hasSpecs ? (
-        <div className="details-panel__section">
+        <Stack gap="md">
           {showTitle && (
-            <h4 className="details-panel__section-title">
-              {t('library.details.technicalInfo') || 'Technical Info'}
-            </h4>
+            <Stack gap="xs">
+              <Text as="h4" variant="caption" uppercase color={variant === 'drawer' ? 'faint' : 'muted'}>
+                {t('library.details.technicalInfo') || 'Technical Info'}
+              </Text>
+              {variant === 'drawer' && <Divider />}
+            </Stack>
           )}
-          <div className="specs-grid">
+          <Grid variant={gridVariant} gap="sm">
             {item.technical.resolution && (
-              <div className="specs-card">
-                <span className="specs-card__label">{t('library.details.resolution') || 'Resolution'}</span>
-                <span className="specs-card__value" title={item.technical.resolution}>{item.technical.resolution}</span>
-              </div>
+              <SpecCard label={t('library.details.resolution') || 'Resolution'} value={item.technical.resolution} />
             )}
             {item.technical.video_codec && (
-              <div className="specs-card">
-                <span className="specs-card__label">{t('library.details.videoCodec') || 'Video Codec'}</span>
-                <span className="specs-card__value" title={item.technical.video_codec.toUpperCase()}>{item.technical.video_codec.toUpperCase()}</span>
-              </div>
+              <SpecCard label={t('library.details.videoCodec') || 'Video Codec'} value={item.technical.video_codec.toUpperCase()} />
             )}
             {item.technical.audio_codec && (
-              <div className="specs-card">
-                <span className="specs-card__label">{t('library.details.audioCodec') || 'Audio Codec'}</span>
-                <span className="specs-card__value" title={audioCodecText}>{audioCodecText}</span>
-              </div>
+              <SpecCard label={t('library.details.audioCodec') || 'Audio Codec'} value={audioCodecText} />
             )}
             {item.technical.duration && (
-              <div className="specs-card">
-                <span className="specs-card__label">{t('library.details.duration') || 'Duration'}</span>
-                <span className="specs-card__value" title={formatTime(item.technical.duration)}>{formatTime(item.technical.duration)}</span>
-              </div>
+              <SpecCard label={t('library.details.duration') || 'Duration'} value={formatTime(item.technical.duration)} />
             )}
             {item.technical.size_bytes && (
-              <div className="specs-card">
-                <span className="specs-card__label">{t('library.details.fileSize') || 'File Size'}</span>
-                <span className="specs-card__value" title={bytesToSize(item.technical.size_bytes)}>{bytesToSize(item.technical.size_bytes)}</span>
-              </div>
+              <SpecCard label={t('library.details.fileSize') || 'File Size'} value={bytesToSize(item.technical.size_bytes)} />
             )}
             {item.technical.hdr_type && (
-              <div className="specs-card">
-                <span className="specs-card__label">{t('library.details.hdr') || 'HDR'}</span>
-                <span className="specs-card__value" title={item.technical.hdr_type}>{item.technical.hdr_type}</span>
-              </div>
+              <SpecCard label={t('library.details.hdr') || 'HDR'} value={item.technical.hdr_type} />
             )}
             {item.technical.bit_depth && (
-              <div className="specs-card">
-                <span className="specs-card__label">{t('library.details.bitDepth') || 'Bit Depth'}</span>
-                <span className="specs-card__value" title={bitDepthText}>{bitDepthText}</span>
-              </div>
+              <SpecCard label={t('library.details.bitDepth') || 'Bit Depth'} value={bitDepthText} />
             )}
             {item.technical.framerate && (
-              <div className="specs-card">
-                <span className="specs-card__label">{t('library.details.framerate') || 'Framerate'}</span>
-                <span className="specs-card__value" title={framerateText}>{framerateText}</span>
-              </div>
+              <SpecCard label={t('library.details.framerate') || 'Framerate'} value={framerateText} />
             )}
-          </div>
-        </div>
+          </Grid>
+        </Stack>
       ) : null}
-    </div>
+    </Stack>
   );
 }
 

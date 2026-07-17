@@ -1,4 +1,5 @@
 import Tooltip from '@/ui/Tooltip';
+import Card from '@/ui/Card';
 import './BespokeRatingsSection.css';
 
 export default function BespokeRatingsSection({ item, t }) {
@@ -15,6 +16,10 @@ export default function BespokeRatingsSection({ item, t }) {
     activeHeaderRatingType = 'imdb';
   } else if (hasTmdb) {
     activeHeaderRatingType = 'tmdb';
+  } else if (hasRotten) {
+    activeHeaderRatingType = 'rotten';
+  } else if (hasMeta) {
+    activeHeaderRatingType = 'meta';
   } else if (hasPorndb) {
     activeHeaderRatingType = 'porndb';
   }
@@ -22,15 +27,15 @@ export default function BespokeRatingsSection({ item, t }) {
   const ratings = [];
   if (hasImdb && activeHeaderRatingType !== 'imdb') ratings.push({ id: 'imdb', logo: '/rating/imdb.png', alt: 'IMDb', value: `${item.rating_imdb.toFixed(1)}/10` });
   if (hasTmdb && activeHeaderRatingType !== 'tmdb') ratings.push({ id: 'tmdb', logo: '/rating/tmdb.png', alt: 'TMDb', value: `${item.rating_tmdb.toFixed(1)}/10` });
-  if (hasRotten) ratings.push({ id: 'rotten', logo: '/rating/rottan_tomatoes.png', alt: 'Rotten Tomatoes', value: item.rating_rotten });
-  if (hasMeta) ratings.push({ id: 'meta', logo: '/rating/metacritic.png', alt: 'Metacritic', value: `${item.rating_meta}/100` });
+  if (hasRotten && activeHeaderRatingType !== 'rotten') ratings.push({ id: 'rotten', logo: '/rating/rottan_tomatoes.png', alt: 'Rotten Tomatoes', value: item.rating_rotten });
+  if (hasMeta && activeHeaderRatingType !== 'meta') ratings.push({ id: 'meta', logo: '/rating/metacritic.png', alt: 'Metacritic', value: `${item.rating_meta}/100` });
   if (hasPorndb && activeHeaderRatingType !== 'porndb') ratings.push({ id: 'porndb', logo: '/rating/theporndb.png', alt: 'ThePornDB', value: `${item.rating_porndb.toFixed(1)}/10` });
 
   if (ratings.length === 0) return null;
 
   return (
     <div className="bespoke-ratings-section">
-      <div className="bespoke-ratings-card">
+      <Card variant="glass-shaded" padding="none">
         <div className="bespoke-browser-card__pills-header">
           <span className="bespoke-cast-title">
             {t('library.details.ratingsSection') || 'Ratings'}
@@ -46,7 +51,7 @@ export default function BespokeRatingsSection({ item, t }) {
             </div>
           ))}
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

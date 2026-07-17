@@ -3,6 +3,7 @@ import { Pencil, Play, Minus, Check, Eye, EyeOff } from '@/ui/icons';
 import PosterCard from '@/ui/PosterCard';
 import posterCardStyles from '@/ui/PosterCard.module.css';
 import buttonStyles from '@/ui/IconButton.module.css';
+import Text from '@/ui/Text';
 import { useBulkUpdateWatchedMutation } from '@/queries';
 import {
   getPosterImagePath,
@@ -156,7 +157,7 @@ export const LibraryPosterCard = memo(({
       }
 
       ratingPill = pillText ? (
-        <span className="library-scene-date">{pillText}</span>
+        <Text size="xs" color="muted" shrink={false}>{pillText}</Text>
       ) : undefined;
 
       imageUrl = resolvePosterUrl(item.backdrop_path) || item.displayPosterRemote || resolvePosterUrl(getPosterImagePath(item));

@@ -27,7 +27,11 @@ export default function SegmentedControl({
     }
   }, [value, options, animated]);
 
-  const variantClass = variant === 'filter' ? styles['variant-filter'] : styles['variant-default'];
+  const variantClass = variant === 'filter'
+    ? styles['variant-filter']
+    : variant === 'glass'
+      ? styles['variant-glass']
+      : styles['variant-default'];
   
   const sizeClassMap = {
     xs: styles['size-xs'],

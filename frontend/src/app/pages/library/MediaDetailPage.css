@@ -12,34 +12,9 @@
 
 .dashboard-section {
   padding: var(--space-lg);
-  border-radius: var(--radius-xl);
-  background: var(--media-detail-panel-section-bg);
-  border: 1px solid var(--media-detail-panel-section-border);
-  box-shadow: var(--media-detail-panel-section-shadow);
-  backdrop-filter: blur(1rem);
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
-}
-
-.media-detail-page__inline-main-col {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2xl);
-  min-width: 0;
-}
-
-.media-detail-page__inline-side-col {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
-  min-width: 0;
-}
-
-.trailer-iframe {
-  aspect-ratio: 16/9;
-  border: none;
-  width: 100%;
 }
 
 .read-more-overview {
@@ -58,109 +33,12 @@
   text-indent: 1rem;
 }
 
-.modal-footer-row {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-md);
-  width: 100%;
+.trailer-iframe {
+  aspect-ratio: 16/9;
+  border: none;
 }
 
-/* Scene Detail Page - Layout adjustments to bring metadata, user rating, and description closer to title */
-.media-detail-page--scene .media-detail-page__details-group {
-  margin-top: calc(-1 * var(--button-height-sm));
-}
-
-.media-detail-page--scene .media-detail-page__container {
-  gap: var(--space-md);
-}
-
-/* Glassmorphic cards legibility improvements (Vibrant Shaded Glass) */
-.media-detail-page .bespoke-unified-browser-card,
-.media-detail-page .bespoke-cast-browser-card,
-.media-detail-page .bespoke-boxoffice-card,
-.media-detail-page .bespoke-companies-card,
-.media-detail-page .bespoke-ratings-card,
-.media-detail-page .bespoke-scene-tagger-card,
-.media-detail-page .bespoke-scene-peaks-card,
-.media-detail-page .bespoke-list-panel-card {
-  background: color-mix(in srgb, var(--color-bg-elevated) 78%, transparent);
-  border: 1px solid var(--color-border-default);
-  box-shadow: inset 0 1px 0 0 color-mix(in srgb, var(--color-text-primary) 5%, transparent), 0 1rem 2.5rem 0 color-mix(in srgb, var(--color-bg-canvas) 45%, transparent);
-  /* GPU layer isolation */
-  transform: translate3d(0, 0, 0);
-  will-change: transform;
-  backface-visibility: hidden;
-}
-
-/* Side Column Tabs styling */
-.media-side-tabs {
-  display: flex;
-  background: color-mix(in srgb, var(--color-bg-elevated) 45%, transparent);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-md);
-  padding: var(--space-xs);
-  gap: var(--space-xs);
+.side-tab-control {
   margin-top: 0.375rem;
   margin-bottom: var(--space-sm);
-  box-shadow: inset 0 1px 0 0 color-mix(in srgb, var(--color-text-primary) 2%, transparent);
-}
-
-.media-side-tab-btn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-sm) var(--space-md);
-  font-size: 0.6875rem;
-  font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wide);
-  color: var(--color-text-muted);
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all var(--motion-fast);
-}
-
-.media-side-tab-btn:hover {
-  color: var(--color-text-secondary);
-}
-
-.media-side-tab-btn.is-active {
-  background: color-mix(in srgb, var(--color-surface-glass-strong) 40%, color-mix(in srgb, var(--color-text-primary) 5%, transparent));
-  border: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 5%, transparent);
-  color: var(--color-text-primary);
-  box-shadow: 0 0.25rem 0.75rem color-mix(in srgb, var(--color-bg-canvas) 25%, transparent);
-}
-
-.media-detail-page__technical-container {
-  padding: var(--space-md);
-}
-
-.media-detail-dashboard-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2xl);
-}
-
-.bespoke-cast-tab-btn {
-  background: transparent;
-  border: none;
-  color: var(--color-text-muted);
-  padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-md, 0.5rem);
-  cursor: pointer;
-  font-weight: var(--font-weight-semibold);
-  font-size: 0.8125rem;
-}
-
-.bespoke-cast-tab-btn.is-active {
-  background: var(--color-bg-subtle);
-  color: var(--color-text-primary);
-}
-
-.bespoke-cast-tabs {
-  display: flex;
-  gap: var(--space-sm);
 }
