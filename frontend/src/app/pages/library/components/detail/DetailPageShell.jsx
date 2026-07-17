@@ -4,6 +4,8 @@ import Skeleton from '@/ui/Skeleton';
 import { Eye, EyeOff } from '@/ui/icons';
 import HeroSection from './HeroSection';
 import '../../MediaDetailPage.css';
+import './DetailPageLoading.css';
+import './DetailPageShell.css';
 
 export default function DetailPageShell({
   children,

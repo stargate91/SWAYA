@@ -5,6 +5,7 @@ import Tooltip from '@/ui/Tooltip';
 import Button from '@/ui/Button';
 import Field from '@/ui/Field';
 import { API_BASE } from '@/lib/backend';
+import './CreateTagForm.css';
 
 const REMOVE_SYMBOL = '✕';
 const BULLET_POINT = '• ';

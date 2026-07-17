@@ -1,0 +1,42 @@
+/* Compact Ratings Row */
+.dashboard-ratings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6.25rem, 1fr));
+  gap: var(--space-md);
+}
+
+.dashboard-rating-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border-radius: var(--radius-lg);
+  background: var(--media-detail-panel-card-bg);
+  border: 1px solid var(--media-detail-panel-card-border);
+  box-shadow: var(--media-detail-panel-card-shadow);
+  backdrop-filter: blur(0.5rem);
+}
+
+.dashboard-rating-box__logo {
+  height: 1.25rem;
+  object-fit: contain;
+}
+
+.dashboard-rating-box__value {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.dashboard-rating-box .dashboard-rating-box__tooltip-trigger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  width: 100%;
+  height: 100%;
+  flex: 1;
+}

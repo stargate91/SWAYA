@@ -1,0 +1,204 @@
+.detail-shell-people-loading-hero {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-2xl);
+  width: 100%;
+  height: calc(100vh - var(--page-top-offset, 4rem) - 7.5rem);
+  align-items: stretch;
+  box-sizing: border-box;
+}
+
+.detail-shell-people-loading-sidebar {
+  width: 20rem;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-radius: var(--radius-xl);
+  background: color-mix(in srgb, var(--color-panel-translucent, var(--color-panel)) 22%, transparent);
+  border: 0.0625rem solid color-mix(in srgb, var(--color-border-default) 40%, transparent);
+  backdrop-filter: blur(1rem);
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.detail-shell-people-loading-actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin: var(--space-sm) 0;
+}
+
+.detail-shell-people-loading-infogrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+  margin: var(--space-sm) 0;
+}
+
+.detail-shell-people-loading-right-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: var(--space-lg);
+  box-sizing: border-box;
+}
+
+.detail-shell-people-loading-knownfor-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.detail-shell-people-loading-cards-row {
+  display: flex;
+  gap: var(--space-md);
+  overflow: hidden;
+}
+
+.detail-shell-people-loading-card-item {
+  width: 7.5rem;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.detail-shell-loading-wrapper {
+  width: 100%;
+}
+
+.detail-shell-loading-banner {
+  height: 23.75rem;
+  border-radius: var(--radius-3xl);
+  margin-bottom: var(--space-xl);
+}
+
+.detail-shell-loading-content {
+  padding: 0 var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.detail-shell-loading-title {
+  width: 18.75rem;
+}
+
+.detail-shell-loading-title-skeleton {
+  margin-bottom: var(--space-md);
+}
+
+.detail-shell-loading-meta {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.detail-shell-loading-meta-item-1 {
+  width: 5rem;
+  height: 1.25rem;
+}
+
+.detail-shell-loading-meta-item-2 {
+  width: 7.5rem;
+  height: 1.25rem;
+}
+
+.detail-shell-loading-meta-item-3 {
+  width: 3.75rem;
+  height: 1.25rem;
+}
+
+.detail-shell-loading-description {
+  margin-top: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.detail-shell-loading-desc-line-1 {
+  height: 1.125rem;
+  width: 100%;
+}
+
+.detail-shell-loading-desc-line-2 {
+  height: 1.125rem;
+  width: 95%;
+}
+
+.detail-shell-loading-desc-line-3 {
+  height: 1.125rem;
+  width: 60%;
+}
+
+.detail-shell-people-loading-title-line {
+  width: 80%;
+  height: 1.5rem;
+  margin-bottom: var(--space-sm);
+}
+
+.detail-shell-people-loading-subtitle-line {
+  width: 60%;
+  height: 0.875rem;
+  margin-bottom: var(--space-md);
+}
+
+.detail-shell-people-loading-profile {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-lg);
+}
+
+.detail-shell-people-loading-action-btn {
+  flex: 1;
+  height: 2rem;
+  border-radius: var(--radius-sm);
+}
+
+.detail-shell-people-loading-rating {
+  width: 100%;
+  height: 0.75rem;
+  border-radius: var(--radius-xs);
+  margin: var(--space-sm) 0;
+}
+
+.detail-shell-people-loading-info-label {
+  width: 50%;
+  height: 0.625rem;
+  margin-bottom: var(--space-xs);
+}
+
+.detail-shell-people-loading-info-value {
+  width: 80%;
+  height: 0.875rem;
+}
+
+.detail-shell-people-loading-bio-btn {
+  width: 100%;
+  height: 2.25rem;
+  border-radius: 0.625rem;
+  margin-top: auto;
+}
+
+.detail-shell-people-loading-knownfor-title {
+  width: 7.5rem;
+  height: 1.125rem;
+  margin-bottom: var(--space-sm);
+}
+
+.detail-shell-people-loading-card-poster {
+  width: 100%;
+  height: 11.25rem;
+  border-radius: var(--radius-md);
+}
+
+.detail-shell-people-loading-card-title {
+  width: 90%;
+  height: 0.75rem;
+}
+
+.detail-shell-people-loading-card-meta {
+  width: 60%;
+  height: 0.625rem;
+}

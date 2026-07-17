@@ -21,6 +21,7 @@ import { Search, Link as LinkIcon, User, Trash2, GitFork, Star, ArrowLeft, Alert
 import Modal from '@/ui/Modal';
 import Grid from '@/ui/Grid';
 import Inline from '@/ui/Inline';
+import './PerformerLinkingTab.css';
 
 const FemaleSilhouette = () => (
   <div className="performer-gender-silhouette performer-gender-silhouette--mask performer-gender-silhouette--female" />

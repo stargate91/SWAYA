@@ -3,6 +3,7 @@ import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { API_BASE } from '@/lib/backend';
 import Tooltip from '@/ui/Tooltip';
 import ScrollRow from '@/ui/ScrollRow';
+import './BespokeCompaniesSection.css';
 
 export default function BespokeCompaniesSection({ item, t }) {
   const isSceneType = item?.type === 'scene';

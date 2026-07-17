@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import './HeroSection.css';
 
 export default function HeroSection({ backdropUrl, isFallback, isPreviewPlaying, previewSrc }) {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);

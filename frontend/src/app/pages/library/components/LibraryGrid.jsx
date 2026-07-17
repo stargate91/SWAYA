@@ -2,6 +2,8 @@ import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import './entityDetail/EntityDetailHeroSection.css';
+import './LibraryTagsTab.css';
+import './LibraryTagExpandedPanel.css';
 import { usePlayMediaMutation, useSettingsQuery } from '@/queries';
 import api from '@/lib/api';
 import { QK } from '@/lib/queryKeys';

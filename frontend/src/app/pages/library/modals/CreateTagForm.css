@@ -1,0 +1,186 @@
+.create-tag-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.create-tag-form__field-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.create-tag-form__color-list {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.create-tag-form__color-btn {
+  width: calc(2 * var(--space-lg));
+  height: calc(2 * var(--space-lg));
+  border-radius: 50%;
+  outline: none;
+  cursor: pointer;
+  transition: all var(--motion-fast);
+}
+
+.create-tag-form__color-btn[data-selected="true"] {
+  border: 2px solid var(--color-accent);
+  transform: scale(1.1);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--color-accent) 40%, transparent);
+}
+
+.create-tag-form__color-btn[data-selected="false"],
+.create-tag-form__color-btn:not([data-selected="true"]) {
+  border: 2px solid transparent;
+  transform: scale(1);
+  box-shadow: none;
+}
+
+.create-tag-form__custom-color-label {
+  position: relative;
+  height: calc(2 * var(--space-lg));
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  flex: 1;
+  min-width: 5rem;
+  padding: 0 var(--space-md);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-family-mono);
+  color: var(--color-text-secondary);
+  transition: all var(--motion-fast);
+  outline: none;
+}
+
+.create-tag-form__color-list>.create-tag-form__custom-color-label {
+  flex: 1;
+  display: flex;
+}
+
+.create-tag-form__custom-color-label:focus-within {
+  outline: none;
+}
+
+.create-tag-form__custom-color-label.is-active {
+  color: var(--color-text-primary);
+}
+
+.create-tag-form__paintbrush {
+  color: var(--color-muted);
+}
+
+.create-tag-form__custom-color-label.is-active .create-tag-form__paintbrush,
+.create-tag-form__custom-color-label.is-active span {
+  mix-blend-mode: difference;
+}
+
+.create-tag-form__custom-color-label.is-active .create-tag-form__paintbrush {
+  color: var(--color-text-primary);
+}
+
+.create-tag-form__color-input.create-tag-form__color-input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  outline: none;
+  border: none;
+  box-shadow: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+}
+
+.create-tag-form__color-input.create-tag-form__color-input:focus,
+.create-tag-form__color-input.create-tag-form__color-input:focus-visible,
+.create-tag-form__color-input.create-tag-form__color-input:active {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+.create-tag-form__image-list {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-sm);
+}
+
+.create-tag-form__image-preview-wrapper {
+  position: relative;
+  width: 5rem;
+  height: 5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-subtle);
+  overflow: hidden;
+}
+
+.create-tag-form__image-preview {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  cursor: move;
+  user-select: none;
+}
+
+.create-tag-form__remove-image-btn {
+  position: absolute;
+  top: var(--space-xs);
+  right: var(--space-xs);
+  width: var(--space-xl);
+  height: var(--space-xl);
+  border-radius: 50%;
+  background-color: color-mix(in srgb, var(--color-bg-canvas) 60%, transparent);
+  color: var(--color-text-primary);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-2xs);
+  line-height: 1;
+  z-index: var(--z-index-step-2);
+}
+
+.create-tag-form__add-image-row {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.create-tag-form__input-wrapper {
+  flex: 1;
+}
+
+.create-tag-form .create-tag-form__action-btn.create-tag-form__action-btn {
+  height: var(--ui-control-height-md);
+  padding: 0 var(--space-lg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.create-tag-form__action-btn--upload {
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.create-tag-form__file-input {
+  display: none;
+}
+
+.create-tag-form__help-text {
+  font-size: var(--font-size-2xs);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-xs);
+  line-height: 1.4;
+}

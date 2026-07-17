@@ -4,6 +4,7 @@ import { useUi } from '@/providers/UiProvider';
 import { useSetPersonFieldRoutingMutation, useSettingsQuery } from '@/queries';
 import { usePersonDetailQuery } from '@/queries/metadataQueries';
 import { Check } from '@/ui/icons';
+import './PerformerMixerTab.css';
 
 export default function PerformerMixerTab({ person: initialPerson }) {
   const { t } = useTranslation();

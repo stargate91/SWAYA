@@ -15,6 +15,7 @@ import LibraryAdvancedFilters from './LibraryAdvancedFilters';
 import AttributeFilterDropdown from './AttributeFilterDropdown';
 import PanelHeader from '@/ui/PanelHeader';
 import Inline from '@/ui/Inline';
+import styles from './LibraryFilters.module.css';
 
 
 const dummyFunc = () => { };
@@ -111,8 +112,8 @@ export default function LibraryFilters({
 
   return (
     <>
-      <PanelHeader.Row className="library-filters-row">
-        <Inline gap="2xl" align="center" className="library-filters-left">
+      <PanelHeader.Row className={styles.row}>
+        <Inline gap="2xl" align="center" flex={1}>
           {(isVideoTab || isCollectionTab || isPeopleTab || isTagsTab) && (
             <Dropdown
               layout="inline"
@@ -430,7 +431,7 @@ export default function LibraryFilters({
           )}
         </Inline>
 
-        <Inline gap="md" align="center" className="library-filters-right">
+        <Inline gap="md" align="center" style={{ flex: '0 0 auto' }}>
           {isPeople && (
             <Pill
               variant={favoriteFilter === 'favorite' ? 'favorite-active' : 'favorite'}

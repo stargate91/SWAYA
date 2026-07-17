@@ -184,6 +184,12 @@ class LibraryListingService:
             tab="adult_people" if include_adult else "people",
             include_adult=include_adult,
         )
+        if include_adult and people_items:
+            gender_pref = self.settings.get_setting("adult_gender_preference") or "all"
+            if gender_pref == "female":
+                people_items = [p for p in people_items if p.gender == 1]
+            elif gender_pref == "male":
+                people_items = [p for p in people_items if p.gender == 2]
         people_count = len(people_items) if people_items else 0
         
         # Collections count

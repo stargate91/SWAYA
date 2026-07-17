@@ -1,4 +1,5 @@
 import Tooltip from '@/ui/Tooltip';
+import './BespokeRatingsSection.css';
 
 export default function BespokeRatingsSection({ item, t }) {
   const isSceneType = item?.type === 'scene';

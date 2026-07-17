@@ -23,6 +23,7 @@ import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import MediaHeaderInfo from './components/detail/MediaHeaderInfo';
 import UserRatingSection from './components/detail/UserRatingSection';
 import MediaOverview from './components/detail/MediaOverview';
+import './components/detail/FallbackGrid.css';
 import MediaActions from './components/detail/MediaActions';
 import DetailPageShell from './components/detail/DetailPageShell';
 import UtilityBarBottomPortal from '../../../components/UtilityBarBottomPortal';

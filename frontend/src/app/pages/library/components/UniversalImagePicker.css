@@ -128,8 +128,6 @@
   white-space: nowrap;
 }
 
-
-
 .person-backdrop-fallback-section {
   margin-bottom: var(--space-md);
 }
@@ -155,5 +153,3 @@
   background: var(--color-surface-glass);
   border: 0.0625rem solid var(--color-border-subtle);
 }
-
-

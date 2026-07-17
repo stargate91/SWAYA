@@ -1,5 +1,6 @@
 import { resolveMediaImageUrl, buildTmdbImageUrl, TMDB_IMAGE_SIZES } from '@/lib/imageUrls';
 import Tooltip from '@/ui/Tooltip';
+import './BespokeDetailsSection.css';
 
 export default function BespokeDetailsSection({ item, t }) {
   const isSceneType = item?.type === 'scene';

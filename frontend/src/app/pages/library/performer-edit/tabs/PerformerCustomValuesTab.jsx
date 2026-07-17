@@ -23,6 +23,7 @@ import BioSection from './components/BioSection';
 import PhysicalAttributesSection from './components/PhysicalAttributesSection';
 import MeasurementsSection from './components/MeasurementsSection';
 import ModificationsSection from './components/ModificationsSection';
+import './PerformerCustomValuesTab.css';
 import { useSettingsQuery } from '@/queries';
 
 export default function PerformerCustomValuesTab({ personId, person: initialPerson, onDirtyChange, isShaking }) {

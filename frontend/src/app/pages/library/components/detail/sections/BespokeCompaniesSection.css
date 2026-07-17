@@ -1,0 +1,8 @@
+.bespoke-company-item {
+  flex-shrink: 0;
+}
+
+.bespoke-company-logo {
+  max-height: 2.5rem;
+  object-fit: contain;
+}
