@@ -35,7 +35,7 @@ import TechnicalPanel from './components/detail/panels/TechnicalPanel';
 import BespokeSceneTagger from './components/detail/scene/BespokeSceneTagger';
 import BespokeScenePeaks from './components/detail/scene/BespokeScenePeaks';
 import BespokeListPanel from './components/detail/sections/BespokeListPanel';
-import './components/entityDetail/EntityDetailHeroSection.css';
+import './components/entityDetail/EntityDetailHeroSectionShared.css';
 
 import BespokeCastSection from './components/detail/sections/BespokeCastSection';
 import BespokeCompaniesSection from './components/detail/sections/BespokeCompaniesSection';

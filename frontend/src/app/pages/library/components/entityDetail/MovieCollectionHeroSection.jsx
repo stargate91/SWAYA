@@ -6,7 +6,8 @@ import { API_BASE } from '@/lib/backend';
 import EditableMediaCard from './EditableMediaCard';
 import { getOriginalImageUrlHelper } from '../../utils/heroSectionUtils';
 import EntityDetailDrawer from './EntityDetailDrawer';
-import './EntityDetailHeroSection.css';
+import './EntityDetailHeroSectionShared.css';
+import './MovieCollectionHeroSection.css';
 import Inline from '@/ui/Inline';
 
 export default function MovieCollectionHeroSection({

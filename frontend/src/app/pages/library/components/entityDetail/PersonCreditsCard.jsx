@@ -4,6 +4,7 @@ import { API_BASE } from '@/lib/backend';
 import { getCreditSource, navigateToCreditDetail } from '../../utils/mediaNavigation';
 import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
 import PosterCard from '@/ui/PosterCard';
+import './PersonCreditsCard.css';
 
 export default function PersonCreditsCard({
   item,

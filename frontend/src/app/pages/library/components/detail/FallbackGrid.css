@@ -9,8 +9,10 @@
 
 .media-detail-page__fallback-poster-col {
   position: relative;
-  width: 15.625rem;
-  height: 23.4375rem;
+  --ui-poster-card-width: 15.625rem;
+  --ui-poster-card-height: 23.4375rem;
+  width: var(--ui-poster-card-width);
+  height: var(--ui-poster-card-height);
   flex-shrink: 0;
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -49,8 +51,10 @@
   }
 
   .media-detail-page__fallback-poster-col {
-    width: 10rem;
-    height: 15rem;
+    --ui-poster-card-width: 10rem;
+    --ui-poster-card-height: 15rem;
+    width: var(--ui-poster-card-width);
+    height: var(--ui-poster-card-height);
     align-self: center;
   }
 }

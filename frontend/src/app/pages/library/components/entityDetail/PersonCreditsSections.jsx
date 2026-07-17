@@ -12,7 +12,7 @@ import PersonCreditsCard from './PersonCreditsCard';
 import { API_BASE } from '@/lib/backend';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import Inline from '@/ui/Inline';
-import './PersonCreditsShared.css';
+import './PersonCreditsSections.css';
 
 
 export default function PersonCreditsSections({ id, item, navigate, t }) {

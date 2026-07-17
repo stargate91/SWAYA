@@ -10,7 +10,7 @@ import { ENTITY_ICONS } from '@/ui/icons';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
 import { navigateToCreditDetail } from '../../utils/mediaNavigation';
 import Inline from '@/ui/Inline';
-import './PersonCreditsShared.css';
+import './EntityDetailSections.css';
 
 export function OverviewContent({ text, emptyText, t, openDrawer, className = '' }) {
   const overviewRef = useRef(null);
