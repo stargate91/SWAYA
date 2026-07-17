@@ -7,6 +7,7 @@ import OrganizerResultsPanel from '../OrganizerResultsPanel';
 import { useOrganizerColumns } from '../useOrganizerColumns.jsx';
 import { normalizeStatusTone, PAGE_SIZE_OPTIONS } from '../organizerMappers';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
+import { isSceneMediaType } from '@/lib/mediaTypes';
 import { API_BASE } from '../../../lib/backend';
 import ImageTooltip from '../../../ui/ImageTooltip';
 import Stack from '../../../ui/Stack';
@@ -101,8 +102,14 @@ export default function OrganizerPageContent({
       ? t('organizer.table.emptySearch', { context: currentContextLabel }) || `No items match your search in ${currentContextLabel}.`
       : t('organizer.table.emptyCategory', { context: currentContextLabel }) || `No items in ${currentContextLabel}.`;
 
+  const isScene = tooltipRow && (
+    isSceneMediaType(tooltipRow.rawType) ||
+    activeMainTab === 'scenes' ||
+    (activeMainTab === 'manual' && activeManualTab === 'scenes')
+  );
+
   const tooltipImageUrl = tooltipRow?.images?.length > 0
-    ? resolveMediaImageUrl(tooltipRow.images[0].path, 'poster', API_BASE)
+    ? resolveMediaImageUrl(tooltipRow.images[0].path, isScene ? 'backdrop' : 'poster', API_BASE)
     : null;
 
   return (
@@ -186,6 +193,7 @@ export default function OrganizerPageContent({
         visible={tooltipVisible}
         x={tooltipInitialCoords.x}
         y={tooltipInitialCoords.y}
+        aspect={isScene ? 'landscape' : 'poster'}
       />
     </Page>
   );

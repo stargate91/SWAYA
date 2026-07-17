@@ -20,6 +20,7 @@ export default function RecentlyActivePeopleWidget() {
   const { data: settings = {} } = useSettingsQuery();
   const includeAdult = settings?.include_adult && sessionMode === 'nsfw';
   const language = settings?.ui_language || settings?.primary_metadata_language;
+  const genderPref = includeAdult ? settings?.adult_gender_preference : undefined;
 
   const { data: recommendations, isLoading: isRecsLoading } = useRecommendationsQuery(language, includeAdult);
   const watchlistIdsFromQuery = recommendations?.watchlist_item_ids;
@@ -41,7 +42,7 @@ export default function RecentlyActivePeopleWidget() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useRecentlyActivatedPeopleInfiniteQuery(includeAdult);
+  } = useRecentlyActivatedPeopleInfiniteQuery(includeAdult, genderPref);
 
   const handleLoadMorePeople = () => {
     if (!isFetchingNextPage && hasNextPage) {

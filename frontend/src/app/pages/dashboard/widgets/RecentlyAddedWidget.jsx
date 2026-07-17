@@ -53,7 +53,7 @@ export default function RecentlyAddedWidget() {
     const list = paginatedData?.pages ? paginatedData.pages.flat() : [];
     return list.filter((item) => {
       if (sessionMode === 'sfw') {
-        const isAdult = item.is_adult || item.adult || item.media_type === 'scene' || item.type === 'scene';
+        const isAdult = item.is_adult || item.adult;
         return !isAdult;
       }
       return true;

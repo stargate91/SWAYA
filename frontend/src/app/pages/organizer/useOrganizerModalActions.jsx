@@ -228,6 +228,7 @@ export function useOrganizerModalActions({
           t={t}
           toast={toast}
           scanMode={scanMode}
+          sessionMode={sessionMode}
           onResolved={(performMutationFn) =>
             handleResolveOrganizerRows(targetRows, performMutationFn)
           }
@@ -239,7 +240,7 @@ export function useOrganizerModalActions({
         </Button>
       ),
     });
-  }, [closeModal, handleResolveOrganizerRows, openModal, scanMode, t, toast]);
+  }, [closeModal, handleResolveOrganizerRows, openModal, scanMode, sessionMode, t, toast]);
 
   const openOverrideModal = useCallback((row) => {
     openModal({

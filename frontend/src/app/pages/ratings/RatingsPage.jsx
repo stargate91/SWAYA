@@ -54,7 +54,13 @@ export default function RatingsPage() {
       return tooltipRow.profile_path ? resolveMediaImageUrl(tooltipRow.profile_path, 'poster') : null;
     }
     if (state.mediaType === 'scenes' || state.mediaType === 'videos') {
-      return tooltipRow.still_path ? resolveMediaImageUrl(tooltipRow.still_path, 'backdrop') : (tooltipRow.backdrop ? resolveMediaImageUrl(tooltipRow.backdrop, 'backdrop') : null);
+      return tooltipRow.still_path
+        ? resolveMediaImageUrl(tooltipRow.still_path, 'backdrop')
+        : (tooltipRow.backdrop_path
+          ? resolveMediaImageUrl(tooltipRow.backdrop_path, 'backdrop')
+          : (tooltipRow.backdrop
+            ? resolveMediaImageUrl(tooltipRow.backdrop, 'backdrop')
+            : null));
     }
     return tooltipRow.poster_path ? resolveMediaImageUrl(tooltipRow.poster_path, 'poster') : null;
   };

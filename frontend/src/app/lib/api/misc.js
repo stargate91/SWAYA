@@ -112,9 +112,10 @@ export const recommendations = {
     if (language) params.append('language', language);
     return fetchJson(`/api/recommendations/recently-added?${params.toString()}`);
   },
-  getRecentlyActivatedPeople: (page, limit, includeAdult) => {
+  getRecentlyActivatedPeople: (page, limit, includeAdult, gender) => {
     const params = new URLSearchParams({ page: String(page), limit: String(limit) });
     if (includeAdult !== undefined) params.append('include_adult', includeAdult);
+    if (gender) params.append('gender', gender);
     return fetchJson(`/api/recommendations/recently-activated-people?${params.toString()}`);
   },
   addToWatchlist: ({ tmdbId, mediaItemId, type }) => fetchJson('/api/watchlist', {

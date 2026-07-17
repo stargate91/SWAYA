@@ -12,9 +12,9 @@ export const useRecommendationsQuery = (language, includeAdult) => useQuery({
   queryFn: () => api.recommendations.get(language, includeAdult),
 });
 
-export const useRecentlyActivatedPeopleInfiniteQuery = (includeAdult) => useInfiniteQuery({
-  queryKey: ['recently-activated-people', includeAdult],
-  queryFn: ({ pageParam = 1 }) => api.recommendations.getRecentlyActivatedPeople(pageParam, 20, includeAdult),
+export const useRecentlyActivatedPeopleInfiniteQuery = (includeAdult, gender) => useInfiniteQuery({
+  queryKey: ['recently-activated-people', includeAdult, gender],
+  queryFn: ({ pageParam = 1 }) => api.recommendations.getRecentlyActivatedPeople(pageParam, 20, includeAdult, gender),
   initialPageParam: 1,
   getNextPageParam: (lastPage, allPages) => {
     return lastPage.length === 20 ? allPages.length + 1 : undefined;

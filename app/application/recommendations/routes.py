@@ -69,10 +69,12 @@ def get_recently_activated_people(
     page: int = 1,
     limit: int = 20,
     include_adult: Optional[bool] = None,
+    gender: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
     return RecommendationsService(db, scraper_gateway).get_recently_activated_people_paginated(
         page=page,
         limit=limit,
-        include_adult=include_adult
+        include_adult=include_adult,
+        gender=gender
     )

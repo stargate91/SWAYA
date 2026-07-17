@@ -632,7 +632,8 @@ class RecommendationsService:
         self,
         page: int = 1,
         limit: int = 20,
-        include_adult: Optional[bool] = None
+        include_adult: Optional[bool] = None,
+        gender: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         if include_adult is None:
             include_adult_val = self.settings.get_setting("include_adult")
@@ -643,10 +644,21 @@ class RecommendationsService:
         
         offset = (page - 1) * limit
         
-        recent_people = self.db.query(Person).filter(
+        query = self.db.query(Person).filter(
             Person.is_active,
             Person.is_adult == include_adult
-        ).order_by(desc(Person.id)).offset(offset).limit(limit).all()
+        )
+        
+        effective_gender = gender
+        if effective_gender is None and include_adult:
+            effective_gender = self.settings.get_setting("adult_gender_preference")
+            
+        if effective_gender == "female":
+            query = query.filter(Person.gender == 1)
+        elif effective_gender == "male":
+            query = query.filter(Person.gender == 2)
+            
+        recent_people = query.order_by(desc(Person.id)).offset(offset).limit(limit).all()
         
         from app.domains.users.models import UserOverride
         from app.shared_kernel.user_context import get_current_user_id
