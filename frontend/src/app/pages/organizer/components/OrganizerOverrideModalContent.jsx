@@ -281,43 +281,53 @@ export default function OrganizerOverrideModalContent({ row, onClose, toast, sca
                 </Text>
               </Stack>
 
-              <SelectableCard
-                as="div"
-                className={styles['match-action-option']}
-                selected={matchAction === 'keep'}
-                onClick={() => setMatchAction('keep')}
-              >
-                <Radio
-                  name="matchAction"
-                  checked={matchAction === 'keep'}
-                  onChange={() => setMatchAction('keep')}
-                  className={styles['match-action-option__radio-label']}
+              <Stack gap="sm">
+                <SelectableCard
+                  as="div"
+                  className={styles['match-action-option']}
+                  selected={matchAction === 'keep'}
+                  onClick={() => setMatchAction('keep')}
                 >
-                  {t('organizer.overrideModal.matchAction.keep') || 'Keep current tv match'}
-                </Radio>
-                <Text variant="xs" color="muted" className={styles['match-action-option__description']}>
-                  {t('organizer.overrideModal.matchAction.keepDesc') || 'Update season/episode under the tv.'}
-                </Text>
-              </SelectableCard>
+                  <div className={styles['match-action-option__content']}>
+                    <Radio
+                      name="matchAction"
+                      checked={matchAction === 'keep'}
+                      onChange={() => setMatchAction('keep')}
+                    />
+                    <div className={styles['match-action-option__text']}>
+                      <span className={styles['match-action-option__title']}>
+                        {t('organizer.overrideModal.matchAction.keep') || 'Keep current tv match'}
+                      </span>
+                      <span className={styles['match-action-option__description']}>
+                        {t('organizer.overrideModal.matchAction.keepDesc') || 'Update season/episode under the tv.'}
+                      </span>
+                    </div>
+                  </div>
+                </SelectableCard>
 
-              <SelectableCard
-                as="div"
-                className={styles['match-action-option']}
-                selected={matchAction === 'reset'}
-                onClick={() => setMatchAction('reset')}
-              >
-                <Radio
-                  name="matchAction"
-                  checked={matchAction === 'reset'}
-                  onChange={() => setMatchAction('reset')}
-                  className={styles['match-action-option__radio-label']}
+                <SelectableCard
+                  as="div"
+                  className={styles['match-action-option']}
+                  selected={matchAction === 'reset'}
+                  onClick={() => setMatchAction('reset')}
                 >
-                  {t('organizer.overrideModal.matchAction.reset') || 'Reset match (Pending)'}
-                </Radio>
-                <Text variant="xs" color="muted" className={styles['match-action-option__description']}>
-                  {t('organizer.overrideModal.matchAction.resetDesc') || 'Remove match and return to Review Needed.'}
-                </Text>
-              </SelectableCard>
+                  <div className={styles['match-action-option__content']}>
+                    <Radio
+                      name="matchAction"
+                      checked={matchAction === 'reset'}
+                      onChange={() => setMatchAction('reset')}
+                    />
+                    <div className={styles['match-action-option__text']}>
+                      <span className={styles['match-action-option__title']}>
+                        {t('organizer.overrideModal.matchAction.reset') || 'Reset match (Pending)'}
+                      </span>
+                      <span className={styles['match-action-option__description']}>
+                        {t('organizer.overrideModal.matchAction.resetDesc') || 'Remove match and return to Review Needed.'}
+                      </span>
+                    </div>
+                  </div>
+                </SelectableCard>
+              </Stack>
             </Stack>
           }
         >

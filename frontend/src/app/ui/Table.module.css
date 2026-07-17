@@ -187,6 +187,7 @@
   min-height: auto;
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
   outline: none;
   transition: color var(--motion-fast);

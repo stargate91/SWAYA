@@ -294,7 +294,11 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
 
   return (
     <form id="organizer-bulk-override-form" className={isSidebarActive ? styles['bulk-override-layout'] : styles['organizer-override-modal']} onSubmit={handleSubmit}>
-      <div className={isSidebarActive ? styles['bulk-override-layout__form'] : 'contents'}>
+      <Stack
+        gap={isSidebarActive ? 'lg' : 'md'}
+        className={isSidebarActive ? styles['bulk-override-layout__form'] : ''}
+        fullWidth
+      >
         {/* Main Category override (only for movie, episode, bonus) */}
         {(initialMainType === 'movie' || initialMainType === 'episode' || initialMainType === 'bonus' || initialMainType === 'scene') && (
           <BulkOverrideFieldRow
@@ -456,57 +460,67 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
 
         {showMatchActionSelector && (
           <Card variant="soft" padding="md" className={styles['organizer-override-modal__section--match-actions']}>
-            <Stack gap="2xs" className="mb-4">
-              <Text variant="small" weight="bold">
-                {t('organizer.overrideModal.matchAction.title') || 'Match Action'}
-              </Text>
-              <Text variant="small" color="muted">
-                {t('organizer.overrideModal.matchAction.description') || 'Choose what to do with the current tv match since season or episode changed:'}
-              </Text>
+            <Stack gap="md">
+              <Stack gap="2xs">
+                <Text variant="small" weight="bold">
+                  {t('organizer.overrideModal.matchAction.title') || 'Match Action'}
+                </Text>
+                <Text variant="small" color="muted">
+                  {t('organizer.overrideModal.matchAction.description') || 'Choose what to do with the current tv match since season or episode changed:'}
+                </Text>
+              </Stack>
+
+              <div className={styles['organizer-match-action-grid']}>
+                <SelectableCard
+                  as="div"
+                  className={styles['match-action-option']}
+                  selected={matchAction === 'keep'}
+                  onClick={() => setMatchAction('keep')}
+                >
+                  <div className={styles['match-action-option__content']}>
+                    <Radio
+                      name="bulkMatchAction"
+                      checked={matchAction === 'keep'}
+                      onChange={() => setMatchAction('keep')}
+                    />
+                    <div className={styles['match-action-option__text']}>
+                      <span className={styles['match-action-option__title']}>
+                        {t('organizer.overrideModal.matchAction.keep') || 'Keep current tv match'}
+                      </span>
+                      <span className={styles['match-action-option__description']}>
+                        {t('organizer.overrideModal.matchAction.keepDesc') || 'Update season/episode under the tv.'}
+                      </span>
+                    </div>
+                  </div>
+                </SelectableCard>
+
+                <SelectableCard
+                  as="div"
+                  className={styles['match-action-option']}
+                  selected={matchAction === 'reset'}
+                  onClick={() => setMatchAction('reset')}
+                >
+                  <div className={styles['match-action-option__content']}>
+                    <Radio
+                      name="bulkMatchAction"
+                      checked={matchAction === 'reset'}
+                      onChange={() => setMatchAction('reset')}
+                    />
+                    <div className={styles['match-action-option__text']}>
+                      <span className={styles['match-action-option__title']}>
+                        {t('organizer.overrideModal.matchAction.reset') || 'Reset match (Pending)'}
+                      </span>
+                      <span className={styles['match-action-option__description']}>
+                        {t('organizer.overrideModal.matchAction.resetDesc') || 'Remove match and return to Review Needed.'}
+                      </span>
+                    </div>
+                  </div>
+                </SelectableCard>
+              </div>
             </Stack>
-
-            <div className={styles['organizer-match-action-grid']}>
-              <SelectableCard
-                as="div"
-                className={styles['match-action-option']}
-                selected={matchAction === 'keep'}
-                onClick={() => setMatchAction('keep')}
-              >
-                <Radio
-                  name="bulkMatchAction"
-                  checked={matchAction === 'keep'}
-                  onChange={() => setMatchAction('keep')}
-                  className={styles['match-action-option__radio-label']}
-                >
-                  {t('organizer.overrideModal.matchAction.keep') || 'Keep current tv match'}
-                </Radio>
-                <Text variant="xs" color="muted" className={styles['match-action-option__description']}>
-                  {t('organizer.overrideModal.matchAction.keepDesc') || 'Update season/episode under the tv.'}
-                </Text>
-              </SelectableCard>
-
-              <SelectableCard
-                as="div"
-                className={styles['match-action-option']}
-                selected={matchAction === 'reset'}
-                onClick={() => setMatchAction('reset')}
-              >
-                <Radio
-                  name="bulkMatchAction"
-                  checked={matchAction === 'reset'}
-                  onChange={() => setMatchAction('reset')}
-                  className={styles['match-action-option__radio-label']}
-                >
-                  {t('organizer.overrideModal.matchAction.reset') || 'Reset match (Pending)'}
-                </Radio>
-                <Text variant="xs" color="muted" className={styles['match-action-option__description']}>
-                  {t('organizer.overrideModal.matchAction.resetDesc') || 'Remove match and return to Review Needed.'}
-                </Text>
-              </SelectableCard>
-            </div>
           </Card>
         )}
-      </div>
+      </Stack>
 
       {isSidebarActive && (
         <div className={`${styles['bulk-override-layout__side-panel']} has-bulk-override-side-panel`}>
@@ -542,29 +556,29 @@ export default function OrganizerBulkOverrideModalContent({ rows, onClose, toast
                       <GripVertical className={styles['organizer-override-bulk-episodes__grip']} size={14} />
                       <Text variant="xs" weight="bold" color="accent" className={styles['organizer-override-bulk-episodes__index']}>{index + parseInt(startEpisodeNum, 10) || (index + 1)}{DOT}</Text>
                       <Tooltip content={item.source} side="top" triggerClassName={styles['tooltip-trigger']}>
-                        <span className={styles['organizer-override-bulk-episodes__filename']}>
+                        <Text variant="xs" truncate className={styles['organizer-override-bulk-episodes__filename']}>
                           {item.source}
-                        </span>
+                        </Text>
                       </Tooltip>
                     </Inline>
                     <div className={styles['organizer-override-bulk-episodes__item-actions']}>
                       <IconButton
                         type="button"
-                        size="xs"
+                        size="sm"
                         className={styles['episode-action-btn']}
                         onClick={() => handleMoveUp(index)}
                         disabled={index === 0}
                       >
-                        <ArrowUp size={12} />
+                        <ArrowUp size={14} />
                       </IconButton>
                       <IconButton
                         type="button"
-                        size="xs"
+                        size="sm"
                         className={styles['episode-action-btn']}
                         onClick={() => handleMoveDown(index)}
                         disabled={index === orderedItems.length - 1}
                       >
-                        <ArrowDown size={12} />
+                        <ArrowDown size={14} />
                       </IconButton>
                     </div>
                   </Inline>

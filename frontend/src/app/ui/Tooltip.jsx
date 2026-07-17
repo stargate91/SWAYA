@@ -16,7 +16,10 @@ export default function Tooltip({
     <RadixTooltip.Provider delayDuration={delay}>
       <RadixTooltip.Root>
         <RadixTooltip.Trigger asChild>
-          <span className={`${styles.tooltip} ${triggerClassName}`.trim()}>
+          <span
+            className={`${styles.tooltip} ${triggerClassName}`.trim()}
+            onFocus={(e) => e.preventDefault()}
+          >
             {children}
           </span>
         </RadixTooltip.Trigger>

@@ -20,7 +20,9 @@
 }
 
 .radio {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: var(--space-lg);
   height: var(--space-lg);
   border-radius: var(--radius-full);
@@ -46,10 +48,7 @@
 
 .radio::after {
   content: '';
-  position: absolute;
   display: none;
-  left: var(--space-xs);
-  top: var(--space-xs);
   width: var(--space-sm);
   height: var(--space-sm);
   border-radius: var(--radius-full);
