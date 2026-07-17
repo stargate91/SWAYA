@@ -17,6 +17,11 @@
   gap: var(--space-md);
   align-items: end;
   --year-column-width: 6.5rem;
+  grid-template-columns: minmax(0, 1fr) var(--year-column-width);
+}
+
+.organizer-match-modal__search-grid[data-tv-layout="true"] {
+  grid-template-columns: minmax(0, 1fr) var(--year-column-width) var(--space-7xl) var(--space-7xl);
 }
 
 .organizer-match-modal__field {

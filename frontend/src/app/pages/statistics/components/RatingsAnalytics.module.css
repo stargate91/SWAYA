@@ -1,0 +1,11 @@
+.rating-label-wrapper {
+  width: 1.25rem;
+  text-align: right;
+  display: inline-block;
+}
+
+.rating-count-wrapper {
+  width: 1.875rem;
+  text-align: left;
+  display: inline-block;
+}

@@ -176,7 +176,7 @@ export function buildOrganizerColumns({
             return <></>;
           }
         }
-        return <ArrowRight size={14} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />;
+        return <ArrowRight size={14} className={tableStyles['cell-arrow']} />;
       },
     },
     {

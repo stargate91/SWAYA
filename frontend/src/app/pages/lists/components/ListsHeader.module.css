@@ -216,3 +216,7 @@
 .lists-header__cover-wrapper:hover .lists-header__cover-overlay {
   opacity: 1;
 }
+
+.contents {
+  display: contents;
+}

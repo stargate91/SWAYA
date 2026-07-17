@@ -616,6 +616,19 @@
   transition: all var(--motion-fast);
 }
 
+.create-tag-form__color-btn[data-selected="true"] {
+  border: 2px solid var(--color-accent);
+  transform: scale(1.1);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--color-accent) 40%, transparent);
+}
+
+.create-tag-form__color-btn[data-selected="false"],
+.create-tag-form__color-btn:not([data-selected="true"]) {
+  border: 2px solid transparent;
+  transform: scale(1);
+  box-shadow: none;
+}
+
 .create-tag-form__custom-color-label {
   position: relative;
   height: calc(2 * var(--space-lg));

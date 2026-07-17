@@ -185,7 +185,8 @@
   border: none;
   padding: 0;
   min-height: auto;
-  font: inherit;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
   cursor: pointer;
   outline: none;
   transition: color var(--motion-fast);
@@ -318,4 +319,9 @@
 
 .table.table-minimal tbody tr:hover {
   background: color-mix(in srgb, var(--color-line) 6%, transparent);
+}
+
+.cell-arrow {
+  color: var(--color-accent);
+  flex-shrink: 0;
 }

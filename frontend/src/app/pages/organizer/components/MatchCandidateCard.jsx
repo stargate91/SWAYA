@@ -67,7 +67,7 @@ export default function MatchCandidateCard({
     return (
       <PosterCard
         key={`${sourceLabel}-${candidateId}`}
-        style={{
+        customStyle={{
           '--ui-poster-card-width': mediaType === 'scene' ? '17.5rem' : '9rem',
           flexShrink: 0,
         }}

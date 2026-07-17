@@ -32,7 +32,7 @@ export default function ListsGrid({
         size="lg"
         border="dashed"
         background="solid"
-        style={activeList?.color ? {
+        customStyle={activeList?.color ? {
           '--ui-empty-icon-color': activeList.color,
           '--ui-empty-icon-bg': `color-mix(in srgb, ${activeList.color} 14%, transparent)`,
           '--ui-empty-icon-border': `color-mix(in srgb, ${activeList.color} 20%, transparent)`,
@@ -50,7 +50,7 @@ export default function ListsGrid({
         size="lg"
         border="dashed"
         background="solid"
-        style={activeList?.color ? {
+        customStyle={activeList?.color ? {
           '--ui-empty-icon-color': activeList.color,
           '--ui-empty-icon-bg': `color-mix(in srgb, ${activeList.color} 14%, transparent)`,
           '--ui-empty-icon-border': `color-mix(in srgb, ${activeList.color} 20%, transparent)`,

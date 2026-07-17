@@ -7,6 +7,7 @@ import Stack from '@/ui/Stack';
 import Text from '@/ui/Text';
 import LinearProgress from '@/ui/LinearProgress';
 import SegmentedRating from '@/ui/SegmentedRating';
+import styles from './RatingsAnalytics.module.css';
 
 const bulletSep = '\u2022';
 
@@ -290,13 +291,13 @@ export function RatingDistribution({
             const ratingLabel = ((index + 1) / 2).toString();
             return (
               <Inline key={index} gap="md" align="center" justify="between">
-                <span style={{ width: '1.25rem', textAlign: 'right', display: 'inline-block' }}>
+                <span className={styles['rating-label-wrapper']}>
                   <Text variant="small" color="secondary" weight="bold">
                     {ratingLabel}
                   </Text>
                 </span>
                 <LinearProgress value={percentage} />
-                <span style={{ width: '1.875rem', textAlign: 'left', display: 'inline-block' }}>
+                <span className={styles['rating-count-wrapper']}>
                   <Text variant="small" color="muted" weight="medium">
                     {count}
                   </Text>

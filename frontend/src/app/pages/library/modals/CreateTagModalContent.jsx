@@ -18,6 +18,25 @@ const PREDEFINED_COLORS = [
   'var(--color-state-danger)'
 ];
 
+function TagColorBtn({ colorValue, isSelected, onClick }) {
+  const btnRef = useCallback((node) => {
+    if (node) {
+      node.style.backgroundColor = colorValue;
+    }
+  }, [colorValue]);
+
+  return (
+    <button
+      ref={btnRef}
+      type="button"
+      className="create-tag-form__color-btn"
+      data-selected={isSelected}
+      onClick={onClick}
+      aria-label={colorValue}
+    />
+  );
+}
+
 export default function CreateTagModalContent({ onClose, t, initialTag = null, mode = 'create', onSuccess, defaultColor = 'var(--color-accent-blue)', isAdult = false }) {
   const [name, setName] = useState(initialTag?.name || '');
   const [color, setColor] = useState(initialTag?.color || defaultColor);
@@ -244,17 +263,10 @@ export default function CreateTagModalContent({ onClose, t, initialTag = null, m
             const isSelected = color === c;
             return (
               <Tooltip key={c} content={c} side="top">
-                <button
-                  type="button"
+                <TagColorBtn
+                  colorValue={c}
+                  isSelected={isSelected}
                   onClick={() => setColor(c)}
-                  aria-label={c}
-                  className="create-tag-form__color-btn"
-                  style={{
-                    backgroundColor: c,
-                    border: isSelected ? '2px solid var(--color-accent)' : '2px solid transparent',
-                    transform: isSelected ? 'scale(1.1)' : 'scale(1)',
-                    boxShadow: isSelected ? '0 0 8px color-mix(in srgb, var(--color-accent) 40%, transparent)' : 'none',
-                  }}
                 />
               </Tooltip>
             );

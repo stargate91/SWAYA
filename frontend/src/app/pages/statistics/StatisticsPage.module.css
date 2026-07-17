@@ -1,0 +1,13 @@
+.adult-sup {
+  font-size: 0.45em;
+  top: -0.7em;
+  position: relative;
+}
+
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xl);
+  margin-top: var(--space-lg);
+  padding: 0 var(--space-sm);
+}

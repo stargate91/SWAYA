@@ -26,10 +26,7 @@ export default function MatchModalResults({
         <ScrollRow
           enableWheelScroll
           showArrows
-          className={styles['organizer-match-modal__poster-results']}
-          style={{
-            gridAutoColumns: isScene ? 'minmax(17.5rem, 20rem)' : 'minmax(8.25rem, 9.75rem)',
-          }}
+          className={`${styles['organizer-match-modal__poster-results']} ${isScene ? styles['is-scene'] : ''}`.trim()}
         >
           {visibleResultCandidates.map((candidate) => (
             <MatchCandidateCard

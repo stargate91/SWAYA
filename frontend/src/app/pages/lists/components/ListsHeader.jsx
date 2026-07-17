@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Button from '@/ui/Button';
 import Input from '@/ui/Input';
 import Dropdown from '@/ui/Dropdown';
@@ -57,8 +57,14 @@ export default function ListsHeader({
     };
   }, [activeList.id]);
 
+  const themeRef = useCallback((node) => {
+    if (node) {
+      node.style.setProperty('--list-theme-color', activeList.color || 'var(--color-accent-blue)');
+    }
+  }, [activeList.color]);
+
   return (
-    <div style={{ '--list-theme-color': activeList.color || 'var(--color-accent-blue)', display: 'contents' }}>
+    <div ref={themeRef} className={styles.contents}>
       <div ref={heroRef} className={styles['lists-header-hero']}>
         <Inline align="start" className={styles['lists-header__top-row']}>
           <div className={styles['lists-header__left-group']}>
@@ -113,13 +119,21 @@ export default function ListsHeader({
               </Button>
             </Tooltip>
             <span
-              style={activeList?.color ? {
-                '--button-primary-bg': (activeList.color.includes('success') || activeList.color.includes('warning'))
-                  ? `color-mix(in srgb, ${activeList.color} 80%, black)`
-                  : activeList.color,
-                '--button-primary-color': '#ffffff',
-                display: 'contents',
-              } : { display: 'contents' }}
+              ref={(node) => {
+                if (node) {
+                  if (activeList?.color) {
+                    const bg = (activeList.color.includes('success') || activeList.color.includes('warning'))
+                      ? `color-mix(in srgb, ${activeList.color} 80%, black)`
+                      : activeList.color;
+                    node.style.setProperty('--button-primary-bg', bg);
+                    node.style.setProperty('--button-primary-color', '#ffffff');
+                  } else {
+                    node.style.removeProperty('--button-primary-bg');
+                    node.style.removeProperty('--button-primary-color');
+                  }
+                }
+              }}
+              className={styles.contents}
             >
               <Button
                 variant="primary"

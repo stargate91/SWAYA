@@ -13,6 +13,7 @@ import Inline from '@/ui/Inline';
 import Stack from '@/ui/Stack';
 import Grid from '@/ui/Grid';
 import SectionHeader from '@/ui/SectionHeader';
+import styles from './StatisticsPage.module.css';
 
 export default function StatisticsPage() {
   const { t } = useTranslation();
@@ -41,7 +42,7 @@ export default function StatisticsPage() {
     <Inline gap="md" align="center">
       {t('sidebar.statistics') || 'Statistics'}
       {isAdultMode && (
-        <sup style={{ fontSize: '0.45em', top: '-0.7em', position: 'relative' }}>
+        <sup className={styles['adult-sup']}>
           <Badge
             family="adult"
             tone="danger"
@@ -61,7 +62,7 @@ export default function StatisticsPage() {
       description={t('statistics.description') || 'Visual overview and breakdown of your media library'}
       className="u-fade-in"
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3xl)', marginTop: 'var(--space-lg)', padding: '0 var(--space-sm)' }}>
+      <div className={styles['content-wrapper']}>
         {/* Section 1: Overview */}
         <Stack gap="lg">
           <SectionHeader title={t('statistics.sections.overview') || 'Overview'} />

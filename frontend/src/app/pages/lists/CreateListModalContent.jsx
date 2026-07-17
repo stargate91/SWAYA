@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Input from '@/ui/Input';
 import Radio from '@/ui/Radio';
 import Tooltip from '@/ui/Tooltip';
@@ -15,16 +15,18 @@ const PRESET_COLORS = [
 ];
 
 function ColorPresetBtn({ colorValue, isSelected, onClick }) {
+  const btnRef = useCallback((node) => {
+    if (node) {
+      node.style.backgroundColor = colorValue;
+    }
+  }, [colorValue]);
+
   return (
     <button
+      ref={btnRef}
       type="button"
       className={styles['create-list-form__color-btn']}
-      style={{
-        backgroundColor: colorValue,
-        border: isSelected ? '2px solid var(--color-accent)' : '2px solid transparent',
-        transform: isSelected ? 'scale(1.1)' : 'scale(1)',
-        boxShadow: isSelected ? '0 0 8px color-mix(in srgb, var(--color-accent) 40%, transparent)' : 'none',
-      }}
+      data-selected={isSelected}
       onClick={onClick}
       aria-label={colorValue}
     />
