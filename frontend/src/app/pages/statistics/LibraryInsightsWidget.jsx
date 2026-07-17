@@ -167,7 +167,7 @@ export const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
   }), [hasEnoughData]);
 
   return (
-    <Card variant="interactive-glass" padding="xl" glowBlob={true} className="u-insights-panel u-flex-1">
+    <Card variant="interactive-glass" padding="xl" glowBlob={true} flex={1} className="u-insights-panel">
       {/* eslint-disable-next-line react/forbid-dom-props */}
       <div style={{ marginBottom: 'var(--space-xl)' }}>
         <Text variant="title" color="primary" weight="extrabold" as="h3">
@@ -343,7 +343,7 @@ export const TimeTravelTimeline = ({ decades, insightTitleCount, T }) => {
   }), [hasEnoughData]);
 
   return (
-    <Card variant="interactive-glass" padding="xl" glowBlob={true} className="u-insights-panel u-flex-1">
+    <Card variant="interactive-glass" padding="xl" glowBlob={true} flex={1} className="u-insights-panel">
       {/* eslint-disable-next-line react/forbid-dom-props */}
       <div style={{ marginBottom: 'var(--space-xl)' }}>
         <Text variant="title" color="primary" weight="extrabold" as="h3">

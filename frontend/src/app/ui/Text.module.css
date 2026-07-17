@@ -25,6 +25,13 @@
   font-family: var(--font-display);
 }
 
+.variant-hero {
+  font-size: var(--font-size-4xl);
+  letter-spacing: -0.0625rem;
+  font-family: var(--font-display);
+}
+
+
 /* Colors */
 .color-primary {
   color: var(--color-text-primary);
@@ -55,4 +62,11 @@
 
 .uppercase {
   text-transform: uppercase;
+}
+
+.truncate {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

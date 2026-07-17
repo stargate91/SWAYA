@@ -1,9 +1,10 @@
 import Checkbox from '../../../ui/Checkbox';
+import Inline from '../../../ui/Inline';
 import styles from './OrganizerOverrideModalContent.module.css';
 
 export default function BulkOverrideFieldRow({ label, checked, onChange, children }) {
   return (
-    <div className={styles['organizer-override-field']}>
+    <Inline align="center" justify="between" className={styles['organizer-override-field']}>
       <Checkbox
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
@@ -11,10 +12,10 @@ export default function BulkOverrideFieldRow({ label, checked, onChange, childre
       >
         <span className={styles['organizer-override-field__label-text']}>{label}</span>
       </Checkbox>
-      <div className={`${styles['organizer-override-field__input']} ${!checked ? styles['is-disabled'] : ''}`}>
+      <div className={styles['organizer-override-field__input']}>
         {children}
       </div>
-    </div>
+    </Inline>
   );
 }
 

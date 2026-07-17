@@ -2,6 +2,7 @@ import Button from '@/ui/Button';
 import SettingsTextField from './SettingsTextField.jsx';
 import { useSettingsFormContext, useSettingsField } from '../../SettingsFormContext.jsx';
 import Inline from '@/ui/Inline';
+import Stack from '@/ui/Stack';
 import styles from '../../SettingsPage.module.css';
 
 export default function SettingsPathField({
@@ -23,9 +24,9 @@ export default function SettingsPathField({
 
   return (
     <Inline gap="md" align="end" className="settings-input-row">
-      <div className="u-flex-1">
+      <Stack flex={1}>
         <SettingsTextField field={field} {...props} />
-      </div>
+      </Stack>
       <Button
         variant="secondary"
         onClick={handlePick}

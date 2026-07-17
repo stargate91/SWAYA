@@ -11,6 +11,8 @@ import useMatchModalViewModel from './components/useMatchModalViewModel';
 import EmptyState from '../../ui/EmptyState';
 import Stack from '../../ui/Stack';
 import Inline from '../../ui/Inline';
+import Card from '../../ui/Card';
+import Text from '../../ui/Text';
 import styles from './MatchModal.module.css';
 
 function getInitialMatchEmptyState({ row, mode, t }) {
@@ -158,7 +160,7 @@ export default function OrganizerMatchModalContent({
         ) : (
           <>
             <Stack gap="2xs">
-              <strong>
+              <Text variant="small" weight="bold">
                 {browserState.view === 'results'
                   ? (hasSearched
                       ? t('organizer.details.matchModal.searchResults')
@@ -166,8 +168,8 @@ export default function OrganizerMatchModalContent({
                   : browserState.view === 'seasons'
                     ? t('organizer.details.matchModal.seasons')
                     : t('organizer.details.matchModal.episodes')}
-              </strong>
-              <span>
+              </Text>
+              <Text variant="small" color="muted">
                 {browserState.view === 'results'
                   ? (hasSearched
                       ? t('organizer.details.matchModal.searchResultsHint')
@@ -175,7 +177,7 @@ export default function OrganizerMatchModalContent({
                   : browserState.view === 'seasons'
                     ? t('organizer.details.matchModal.seasonsHint')
                     : t('organizer.details.matchModal.episodesHint')}
-              </span>
+              </Text>
             </Stack>
 
             <MatchModalBrowserToolbar
@@ -204,14 +206,16 @@ export default function OrganizerMatchModalContent({
               hasSearched ? (
                 <Stack gap="md">
                   {Array.from({ length: 3 }).map((_, idx) => (
-                    <Inline key={idx} gap="md" className={styles['organizer-match-modal__skeleton-list-item']}>
-                      <Skeleton className={`${styles['organizer-match-modal__skeleton-image']} ${mode === 'scene' ? styles['organizer-match-modal__skeleton-image--scene'] : styles['organizer-match-modal__skeleton-image--poster']}`} variant="rect" />
-                      <div className={styles['organizer-match-modal__skeleton-text-container']}>
-                        <Skeleton className={styles['organizer-match-modal__skeleton-text-title']} variant="text" />
-                        <Skeleton className={styles['organizer-match-modal__skeleton-text-subtitle']} variant="text" />
-                        <Skeleton className={styles['organizer-match-modal__skeleton-text-body']} variant="text" />
-                      </div>
-                    </Inline>
+                    <Card key={idx} variant="default" padding="md">
+                      <Inline gap="md">
+                        <Skeleton className={`${styles['organizer-match-modal__skeleton-image']} ${mode === 'scene' ? styles['organizer-match-modal__skeleton-image--scene'] : styles['organizer-match-modal__skeleton-image--poster']}`} variant="rect" />
+                        <Stack gap="sm" flex={1} justify="center">
+                          <Skeleton className={styles['organizer-match-modal__skeleton-text-title']} variant="text" />
+                          <Skeleton className={styles['organizer-match-modal__skeleton-text-subtitle']} variant="text" />
+                          <Skeleton className={styles['organizer-match-modal__skeleton-text-body']} variant="text" />
+                        </Stack>
+                      </Inline>
+                    </Card>
                   ))}
                 </Stack>
               ) : (

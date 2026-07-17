@@ -28,8 +28,8 @@ function createChipLayout(chips) {
   const radiusY = 70;
   const centerX = 160;
   const centerY = 84;
-  const exclusionRadiusX = 86;
-  const exclusionRadiusY = 58;
+  const exclusionRadiusX = 96;
+  const exclusionRadiusY = 66;
 
   const chipModels = chips.map((chip, index) => ({
     ...chip,
@@ -42,7 +42,7 @@ function createChipLayout(chips) {
 
     for (let attempt = 0; attempt < 40; attempt += 1) {
       const angle = Math.random() * Math.PI * 2;
-      const distanceFactor = 0.48 + (Math.random() * 0.42);
+      const distanceFactor = 0.85 + (Math.random() * 0.35);
       const candidate = {
         x: centerX + Math.cos(angle) * radiusX * distanceFactor,
         y: centerY + Math.sin(angle) * radiusY * distanceFactor,

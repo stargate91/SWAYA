@@ -1,7 +1,7 @@
 .wrap {
   display: inline-flex;
   align-items: center;
-  justify-content: var(--ui-checkbox-justify);
+  justify-content: var(--ui-checkbox-justify, flex-start);
   cursor: pointer;
   user-select: none;
   position: relative;

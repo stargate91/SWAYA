@@ -4,7 +4,7 @@ import IconButton from '@/ui/IconButton';
 
 export default function SearchInput({ localQuery, setLocalQuery, handleSearchSubmit, t }) {
   return (
-    <form onSubmit={handleSearchSubmit} className="u-w-full">
+    <form onSubmit={handleSearchSubmit}>
       <Input
         type="text"
         className="search-page-input"

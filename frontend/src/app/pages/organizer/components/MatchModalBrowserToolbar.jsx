@@ -2,7 +2,8 @@ import Button from '../../../ui/Button';
 import CardMetadata from '../../../ui/CardMetadata';
 import { ArrowLeft } from '../../../ui/icons';
 import Inline from '../../../ui/Inline';
-import styles from '../MatchModal.module.css';
+import Stack from '../../../ui/Stack';
+import Text from '../../../ui/Text';
 
 export default function MatchModalBrowserToolbar({
   view,
@@ -21,16 +22,16 @@ export default function MatchModalBrowserToolbar({
   }
 
   return (
-    <div className={styles['organizer-match-modal__browser-toolbar']}>
+    <Inline justify="between" align="center" gap="md" fullWidth>
       <Button variant="secondary-neutral" size="sm" leftIcon={<ArrowLeft size={14} />} animateIcon onClick={onBack}>
         {t('common.back')}
       </Button>
-      <div className={styles['organizer-match-modal__browser-copy']}>
-        <strong className={styles['organizer-match-modal__browser-title']}>
+      <Stack gap="2xs" flex={1} className="u-min-w-0">
+        <Text weight="bold" truncate>
           {browserTitle}
-        </strong>
-        <CardMetadata.Row className={styles['organizer-match-modal__browser-meta']} items={browserMetaItems} />
-      </div>
+        </Text>
+        <CardMetadata.Row items={browserMetaItems} />
+      </Stack>
       {view === 'seasons' ? (
         <Button
           type="button"
@@ -42,7 +43,7 @@ export default function MatchModalBrowserToolbar({
         </Button>
       ) : null}
       {view === 'episodes' ? (
-        <Inline align="center" gap="sm" className={styles['organizer-match-modal__browser-actions']}>
+        <Inline align="center" gap="sm" className="u-flex-shrink-0">
           <Button
             type="button"
             variant="secondary-neutral"
@@ -65,6 +66,6 @@ export default function MatchModalBrowserToolbar({
           </Button>
         </Inline>
       ) : null}
-    </div>
+    </Inline>
   );
 }

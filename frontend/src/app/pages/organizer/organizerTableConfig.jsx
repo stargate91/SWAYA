@@ -5,8 +5,8 @@ import Tooltip from '../../ui/Tooltip';
 import { isEpisodeMediaType, isMovieMediaType, isMovieOrEpisodeMediaType, isSceneMediaType } from '@/lib/mediaTypes';
 import { mapCollisionStrategyLabel, shouldShowCollisionStrategy } from './organizerMappers';
 import Inline from '../../ui/Inline';
-import Button from '../../ui/Button';
 import Badge from '../../ui/Badge';
+import tableStyles from '../../ui/Table.module.css';
 
 const renderSelectColumn = (paginatedRows, selectedRowIds, handleToggleAll, handleToggleRow) => ({
   key: 'select',
@@ -33,7 +33,6 @@ const renderSelectColumn = (paginatedRows, selectedRowIds, handleToggleAll, hand
 });
 
 const renderProposedFilename = (value, row, activeMainTab, onOpenMatch, onOpenOverride, t) => {
-  /* eslint-disable react/forbid-component-props */
   const isManualReview = activeMainTab === 'manual';
 
   const content = (() => {
@@ -49,7 +48,7 @@ const renderProposedFilename = (value, row, activeMainTab, onOpenMatch, onOpenOv
         return <Badge family="status" tone="danger">{t('organizer.table.targetNotes.delete')}</Badge>;
       }
     }
-    return value;
+    return <span className={tableStyles['cell-value']}>{value}</span>;
   })();
 
   if (isManualReview && row.rawType !== 'extra') {
@@ -69,38 +68,33 @@ const renderProposedFilename = (value, row, activeMainTab, onOpenMatch, onOpenOv
       })();
 
       return (
-        <Button
+        <button
           type="button"
-          variant="ghost"
-          size="sm"
-          style={{ color: 'var(--color-accent-yellow-soft)' }}
+          className={`${tableStyles['table-action-btn']} ${tableStyles['is-warning']}`}
           onClick={(e) => {
             e.stopPropagation();
             onOpenOverride(row);
           }}
         >
           {label}
-        </Button>
+        </button>
       );
     }
 
     return (
-      <Button
+      <button
         type="button"
-        variant="ghost"
-        size="sm"
-        style={{ color: 'var(--color-accent)' }}
+        className={tableStyles['table-action-btn']}
         onClick={(e) => {
           e.stopPropagation();
           onOpenMatch(row);
         }}
       >
         {t('organizer.actions.fixMatch')}
-      </Button>
+      </button>
     );
   }
 
-  /* eslint-enable react/forbid-component-props */
   return content;
 };
 
@@ -154,6 +148,7 @@ export function buildOrganizerColumns({
       render: (value, row) => (
         /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
         <span
+          className={tableStyles['cell-value']}
           onMouseEnter={(e) => onMouseEnterSource && onMouseEnterSource(e, row)}
           onMouseMove={(e) => onMouseMoveSource && onMouseMoveSource(e)}
           onMouseLeave={() => onMouseLeaveSource && onMouseLeaveSource()}
@@ -181,7 +176,6 @@ export function buildOrganizerColumns({
             return <></>;
           }
         }
-        /* eslint-disable-next-line react/forbid-component-props */
         return <ArrowRight size={14} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />;
       },
     },

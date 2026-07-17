@@ -25,22 +25,6 @@
 }
 
 /* Layout utilities to avoid inline styles on components */
-.u-flex-1 {
-  flex: 1;
-}
-
-.u-flex-column {
-  display: flex;
-  flex-direction: column;
-}
-
-.u-h-full {
-  height: 100%;
-}
-
-.u-w-full {
-  width: 100%;
-}
 
 .u-min-h-row {
   min-height: 2rem;
@@ -62,28 +46,6 @@
   margin-left: auto;
 }
 
-/* Skeleton custom dimensions */
-.u-skeleton-title {
-  height: 1.25rem;
-  width: 7.5rem;
-  margin-bottom: var(--space-md);
-}
-
-.u-skeleton-text {
-  height: 0.875rem;
-}
-
-.u-skeleton-dist-title {
-  height: 1.5rem;
-  width: 12.5rem;
-  margin-bottom: var(--space-md);
-}
-
-.u-skeleton-dist-bar {
-  height: 0.875rem;
-  margin-bottom: var(--space-sm);
-}
-
 /* Reset / general helpers */
 .link-reset {
   text-decoration: none;
@@ -97,8 +59,6 @@
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
-
-
 
 /* Floating overlay icon wrappers for insights */
 .u-insights-overlay-icon-wrapper {
@@ -141,15 +101,6 @@
   margin-bottom: var(--space-sm);
 }
 
-/* Typography sizing overrides */
-.u-text-4xl {
-  font-size: var(--font-size-4xl);
-}
-
-.u-tracking-tight {
-  letter-spacing: -0.0625rem;
-}
-
 /* Statistics title helper utilities */
 .u-stats-title-sup {
   font-size: 0.45em;
@@ -174,12 +125,3 @@
   border-top: 1px solid var(--color-border-default);
   margin: 0;
 }
-
-
-
-
-
-
-
-
-

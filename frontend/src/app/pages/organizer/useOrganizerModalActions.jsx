@@ -2,6 +2,7 @@ import { useMemo, useCallback } from 'react';
 import { FolderOpen, Play, Search, Sliders, Trash2, X, EyeOff, FileJson } from '@/ui/icons';
 import { useQueryClient } from '@tanstack/react-query';
 import Button from '../../ui/Button';
+import Card from '../../ui/Card';
 import FloatingActionBar from '../../ui/FloatingActionBar';
 import OrganizerMatchModalContent from './OrganizerMatchModalContent';
 import OrganizerOverrideModalContent from './components/OrganizerOverrideModalContent';
@@ -385,9 +386,11 @@ export function useOrganizerModalActions({
           icon: FileJson,
           variant: 'wide',
           content: (
-            <pre className={styles['inspect-json']}>
-              {inspectJson}
-            </pre>
+            <Card variant="soft" padding="lg">
+              <pre className={`u-font-mono u-text-2xs u-pre-wrap u-overflow-auto u-max-h-60vh ${styles['inspect-pre']}`}>
+                {inspectJson}
+              </pre>
+            </Card>
           ),
           footer: (
             <>

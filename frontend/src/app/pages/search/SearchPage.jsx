@@ -67,7 +67,7 @@ export default function SearchPage() {
 
       <Stack gap="md">
         {isLoading ? (
-          <Grid variant={urlType === 'scene' ? 'scene' : 'poster'} className="u-w-full">
+          <Grid variant={urlType === 'scene' ? 'scene' : 'poster'}>
             {Array.from({ length: 12 }).map((_, idx) => (
               <Skeleton.Card
                 key={idx}

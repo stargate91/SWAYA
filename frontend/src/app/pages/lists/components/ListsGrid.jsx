@@ -32,7 +32,6 @@ export default function ListsGrid({
         size="lg"
         border="dashed"
         background="solid"
-        // eslint-disable-next-line react/forbid-component-props
         style={activeList?.color ? {
           '--ui-empty-icon-color': activeList.color,
           '--ui-empty-icon-bg': `color-mix(in srgb, ${activeList.color} 14%, transparent)`,
@@ -51,7 +50,6 @@ export default function ListsGrid({
         size="lg"
         border="dashed"
         background="solid"
-        // eslint-disable-next-line react/forbid-component-props
         style={activeList?.color ? {
           '--ui-empty-icon-color': activeList.color,
           '--ui-empty-icon-bg': `color-mix(in srgb, ${activeList.color} 14%, transparent)`,

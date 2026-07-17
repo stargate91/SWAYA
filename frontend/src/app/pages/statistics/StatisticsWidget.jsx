@@ -14,11 +14,11 @@ const StatisticsWidget = ({ T }) => {
   return (
     <WidgetShell loading={isLoading} size="sm" transparent={true}>
       <Grid variant="stats">
-        <Card variant="interactive-glass" padding="xl" glowBlob={true} className="u-flex-1">
+        <Card variant="interactive-glass" padding="xl" glowBlob={true} flex={1}>
           <Text variant="caption" color="secondary" weight="extrabold" uppercase className="u-mb-xl" as="div">
             {T('statistics.stats.total_movies') || 'Total Movies'}
           </Text>
-          <Text color="primary" weight="extrabold" className="u-text-4xl u-mb-sm u-tracking-tight" as="div">
+          <Text variant="hero" color="primary" weight="extrabold" className="u-mb-sm" as="div">
             {(stats.total_movies || 0).toLocaleString()}
           </Text>
           <Inline gap="sm" align="center">
@@ -28,14 +28,14 @@ const StatisticsWidget = ({ T }) => {
           </Inline>
         </Card>
 
-        <Card variant="interactive-glass" padding="xl" glowBlob={true} className="u-flex-1">
+        <Card variant="interactive-glass" padding="xl" glowBlob={true} flex={1}>
           <Text variant="caption" color="secondary" weight="extrabold" uppercase className="u-mb-xl" as="div">
             {sessionMode === 'nsfw' 
               ? (T('statistics.stats.total_scenes_videos') || 'Scenes & Videos')
               : (T('statistics.stats.total_scenes') || 'Total Scenes')
             }
           </Text>
-          <Text color="primary" weight="extrabold" className="u-text-4xl u-mb-sm u-tracking-tight" as="div">
+          <Text variant="hero" color="primary" weight="extrabold" className="u-mb-sm" as="div">
             {sessionMode === 'nsfw'
               ? ((stats.total_scenes || 0) + (stats.total_videos || 0)).toLocaleString()
               : (stats.total_scenes || 0).toLocaleString()
@@ -51,11 +51,11 @@ const StatisticsWidget = ({ T }) => {
           </Inline>
         </Card>
 
-        <Card variant="interactive-glass" padding="xl" glowBlob={true} className="u-flex-1">
+        <Card variant="interactive-glass" padding="xl" glowBlob={true} flex={1}>
           <Text variant="caption" color="secondary" weight="extrabold" uppercase className="u-mb-xl" as="div">
             {T('statistics.stats.total_tv') || 'TV Shows'}
           </Text>
-          <Text color="primary" weight="extrabold" className="u-text-4xl u-mb-sm u-tracking-tight" as="div">
+          <Text variant="hero" color="primary" weight="extrabold" className="u-mb-sm" as="div">
             {(stats.total_tv || 0).toLocaleString()}
           </Text>
           <Inline gap="sm" align="center">
@@ -65,11 +65,11 @@ const StatisticsWidget = ({ T }) => {
           </Inline>
         </Card>
 
-        <Card variant="interactive-glass" padding="xl" glowBlob={true} className="u-flex-1">
+        <Card variant="interactive-glass" padding="xl" glowBlob={true} flex={1}>
           <Text variant="caption" color="secondary" weight="extrabold" uppercase className="u-mb-xl" as="div">
             {T('statistics.stats.storage_used') || 'Storage Used'}
           </Text>
-          <Text color="primary" weight="extrabold" className="u-text-4xl u-mb-sm u-tracking-tight" as="div">
+          <Text variant="hero" color="primary" weight="extrabold" className="u-mb-sm" as="div">
             {stats.storage || '0.0 GB'}
           </Text>
           <Inline gap="sm" align="center">
@@ -79,11 +79,11 @@ const StatisticsWidget = ({ T }) => {
           </Inline>
         </Card>
 
-        <Card variant="interactive-glass" padding="xl" glowBlob={true} className="u-flex-1">
+        <Card variant="interactive-glass" padding="xl" glowBlob={true} flex={1}>
           <Text variant="caption" color="secondary" weight="extrabold" uppercase className="u-mb-xl" as="div">
             {T('statistics.stats.unmatched') || 'Review Needed'}
           </Text>
-          <Text color="primary" weight="extrabold" className="u-text-4xl u-mb-sm u-tracking-tight" as="div">
+          <Text variant="hero" color="primary" weight="extrabold" className="u-mb-sm" as="div">
             {(stats.unmatched || 0).toLocaleString()}
           </Text>
           <Inline gap="sm" align="center">

@@ -388,3 +388,22 @@
   color: var(--current-tag-color);
   filter: drop-shadow(0 0 0.5rem color-mix(in srgb, var(--current-tag-color, transparent) 25%, transparent));
 }
+
+/* Override Side Panel Layouts */
+.root:global(.ui-modal--bulk-override) {
+  --modal-width: min(36.25rem, 100%);
+  width: var(--modal-width);
+  transition: width var(--motion-slow);
+}
+
+.root:global(.has-side-panel),
+.root:has(:global(.has-bulk-override-side-panel)) {
+  --modal-width: min(65rem, 100%);
+  width: var(--modal-width);
+}
+
+.root:has(:global(.has-single-override-side-panel)) {
+  --modal-width: min(60rem, 100%);
+  width: var(--modal-width);
+}
+

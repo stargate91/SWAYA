@@ -19,7 +19,6 @@ function ColorPresetBtn({ colorValue, isSelected, onClick }) {
     <button
       type="button"
       className={styles['create-list-form__color-btn']}
-      // eslint-disable-next-line react/forbid-dom-props
       style={{
         backgroundColor: colorValue,
         border: isSelected ? '2px solid var(--color-accent)' : '2px solid transparent',

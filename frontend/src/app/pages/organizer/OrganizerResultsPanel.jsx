@@ -6,7 +6,6 @@ import FileDropZone from '../../ui/FileDropZone';
 import Stack from '../../ui/Stack';
 import { usePaginationVisibility } from '../../hooks/usePaginationVisibility';
 import { useOrganizerModals } from './useOrganizerModals';
-import styles from './OrganizerResultsPanel.module.css';
 
 export default function OrganizerResultsPanel({
   activeRowId,
@@ -85,25 +84,22 @@ export default function OrganizerResultsPanel({
             />
           ) : null}
 
-          <div className={styles['table-wrapper']}>
-            <Stack fill>
-              <Table
-                columns={columns}
-                rows={rows}
-                activeRowId={activeRowId}
-                onRowClick={onRowClick}
-                emptyText={emptyText}
-                emptyContent={<EmptyState size="sm" border="none" background="none" title={emptyText} />}
-                rowActions={rowActions}
-                selectedRows={selectedRows}
-                openBulkDeleteModal={openBulkDeleteModal}
-                openMatchModal={openMatchModal}
-                openBulkOverrideModal={openBulkOverrideModal}
-                dismissRows={dismissRows}
-                clearSelectedRows={clearSelectedRows}
-              />
-            </Stack>
-          </div>
+          <Table
+            columns={columns}
+            rows={rows}
+            activeRowId={activeRowId}
+            onRowClick={onRowClick}
+            emptyText={emptyText}
+            emptyContent={<EmptyState size="sm" border="none" background="none" title={emptyText} />}
+            rowActions={rowActions}
+            selectedRows={selectedRows}
+            openBulkDeleteModal={openBulkDeleteModal}
+            openMatchModal={openMatchModal}
+            openBulkOverrideModal={openBulkOverrideModal}
+            dismissRows={dismissRows}
+            clearSelectedRows={clearSelectedRows}
+            className="u-flex-grow-1"
+          />
         </Stack>
       )}
     </FileDropZone>

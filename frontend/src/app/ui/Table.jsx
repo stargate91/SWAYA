@@ -246,8 +246,13 @@ export default function Table({
     return items;
   }, [activeRow, useBulkActions, selectedRows, dismissRows, clearSelectedRows, openBulkDeleteModal, openMatchModal, openBulkOverrideModal, rowActions, t]);
 
-  const wrapClass = `${styles.wrap} ${variant === 'minimal' ? styles['wrap-minimal'] : ''} ${className}`.trim();
-  const tableClass = `${styles.table} ${variant === 'minimal' ? styles['table-minimal'] : ''}`.trim();
+  const isMinimalOrGrid = variant === 'minimal' || variant === 'grid';
+  const wrapClass = `${styles.wrap} ${isMinimalOrGrid ? styles['wrap-minimal'] : ''} ${className}`.trim();
+  const tableClass = [
+    styles.table,
+    variant === 'minimal' && styles['table-minimal'],
+    variant === 'grid' && styles['table-grid']
+  ].filter(Boolean).join(' ');
 
   return (
     <div className={wrapClass}>

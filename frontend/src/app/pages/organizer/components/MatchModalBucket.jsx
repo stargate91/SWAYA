@@ -1,6 +1,8 @@
 import Chip from '../../../ui/Chip';
 import Inline from '../../../ui/Inline';
-import styles from '../MatchModal.module.css';
+import Card from '../../../ui/Card';
+import Text from '../../../ui/Text';
+import Stack from '../../../ui/Stack';
 
 const getEpisodeLabel = (num) => `E${num}`;
 
@@ -15,20 +17,22 @@ export default function MatchModalBucket({
   }
 
   return (
-    <div className={styles['organizer-match-modal__bucket']}>
-      <strong className={styles['organizer-match-modal__bucket-title']}>
-        {t('organizer.details.matchModal.bucketTitle')}
-      </strong>
-      <Inline gap="sm" className={styles['organizer-match-modal__bucket-items']}>
-        {bucketEpisodeNumbers.map((episodeNumber) => (
-          <Chip
-            key={`bucket-${episodeNumber}`}
-            onRemove={() => onToggle(episodeNumber)}
-          >
-            {getEpisodeLabel(episodeNumber)}
-          </Chip>
-        ))}
-      </Inline>
-    </div>
+    <Card variant="soft" padding="md">
+      <Stack gap="sm">
+        <Text variant="small" weight="bold">
+          {t('organizer.details.matchModal.bucketTitle')}
+        </Text>
+        <Inline gap="sm">
+          {bucketEpisodeNumbers.map((episodeNumber) => (
+            <Chip
+              key={`bucket-${episodeNumber}`}
+              onRemove={() => onToggle(episodeNumber)}
+            >
+              {getEpisodeLabel(episodeNumber)}
+            </Chip>
+          ))}
+        </Inline>
+      </Stack>
+    </Card>
   );
 }

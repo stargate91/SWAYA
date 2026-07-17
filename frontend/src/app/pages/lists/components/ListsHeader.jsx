@@ -58,7 +58,6 @@ export default function ListsHeader({
   }, [activeList.id]);
 
   return (
-    // eslint-disable-next-line react/forbid-dom-props
     <div style={{ '--list-theme-color': activeList.color || 'var(--color-accent-blue)', display: 'contents' }}>
       <div ref={heroRef} className={styles['lists-header-hero']}>
         <Inline align="start" className={styles['lists-header__top-row']}>
@@ -114,7 +113,6 @@ export default function ListsHeader({
               </Button>
             </Tooltip>
             <span
-              // eslint-disable-next-line react/forbid-dom-props
               style={activeList?.color ? {
                 '--button-primary-bg': (activeList.color.includes('success') || activeList.color.includes('warning'))
                   ? `color-mix(in srgb, ${activeList.color} 80%, black)`

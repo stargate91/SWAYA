@@ -27,7 +27,6 @@ export default function MatchModalResults({
           enableWheelScroll
           showArrows
           className={styles['organizer-match-modal__poster-results']}
-          /* eslint-disable-next-line react/forbid-component-props */
           style={{
             gridAutoColumns: isScene ? 'minmax(17.5rem, 20rem)' : 'minmax(8.25rem, 9.75rem)',
           }}

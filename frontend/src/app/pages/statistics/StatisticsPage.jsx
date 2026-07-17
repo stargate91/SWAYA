@@ -41,7 +41,6 @@ export default function StatisticsPage() {
     <Inline gap="md" align="center">
       {t('sidebar.statistics') || 'Statistics'}
       {isAdultMode && (
-        // eslint-disable-next-line react/forbid-dom-props
         <sup style={{ fontSize: '0.45em', top: '-0.7em', position: 'relative' }}>
           <Badge
             family="adult"
@@ -62,7 +61,6 @@ export default function StatisticsPage() {
       description={t('statistics.description') || 'Visual overview and breakdown of your media library'}
       className="u-fade-in"
     >
-      {/* eslint-disable-next-line react/forbid-dom-props */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3xl)', marginTop: 'var(--space-lg)', padding: '0 var(--space-sm)' }}>
         {/* Section 1: Overview */}
         <Stack gap="lg">

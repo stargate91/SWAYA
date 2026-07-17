@@ -23,14 +23,25 @@ export default function Card({
   divider = false,
   glowBlob = false,
   padding = 'default',
+  flex,
+  fullWidth,
+  fullHeight,
   className = '',
   ...props
 }) {
+  const classes = [
+    styles.card,
+    flex === 1 && styles['flex-1'],
+    fullWidth && styles['full-width'],
+    fullHeight && styles['full-height'],
+    className
+  ].filter(Boolean).join(' ');
+
   return (
     <section
       data-variant={variant}
       data-padding={padding}
-      className={`${styles.card} ${className}`.trim()}
+      className={classes}
       {...props}
     >
       {glowBlob ? <div className={styles['glow-blob']} /> : null}
@@ -47,5 +58,6 @@ export default function Card({
     </section>
   );
 }
+
 
 

@@ -67,7 +67,6 @@ export default function MatchCandidateCard({
     return (
       <PosterCard
         key={`${sourceLabel}-${candidateId}`}
-        /* eslint-disable-next-line react/forbid-component-props */
         style={{
           '--ui-poster-card-width': mediaType === 'scene' ? '17.5rem' : '9rem',
           flexShrink: 0,

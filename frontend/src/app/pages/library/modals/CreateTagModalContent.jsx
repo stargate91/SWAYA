@@ -249,7 +249,6 @@ export default function CreateTagModalContent({ onClose, t, initialTag = null, m
                   onClick={() => setColor(c)}
                   aria-label={c}
                   className="create-tag-form__color-btn"
-                  /* eslint-disable-next-line react/forbid-dom-props */
                   style={{
                     backgroundColor: c,
                     border: isSelected ? '2px solid var(--color-accent)' : '2px solid transparent',

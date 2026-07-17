@@ -5,10 +5,13 @@ import Input from '../../ui/Input';
 import Tooltip from '../../ui/Tooltip';
 import Checkbox from '../../ui/Checkbox';
 import Table from '../../ui/Table';
+import Inline from '../../ui/Inline';
+import Stack from '../../ui/Stack';
+import Card from '../../ui/Card';
+import Text from '../../ui/Text';
 import { useOrganizerSort } from './useOrganizerSort';
 import { useLocalListSearch } from '../../hooks/useLocalListSearch';
-import styles from './RenameModal.module.css';
-import Inline from '../../ui/Inline';
+import styles from './OrganizerRenameModalContent.module.css';
 
 const RENAME_SEARCH_KEYS = ['source', 'target', 'type'];
 
@@ -37,12 +40,11 @@ export default function OrganizerRenameModalContent({ items = [], t, organizeInP
       label: t('organizer.renameModal.currentFilename') || 'Current Filename',
       sortable: true,
       width: '45%',
-      className: styles['source-column'],
       render: (value, row) => (
         <Tooltip content={row.sourcePath} side="top" align="start">
-          <span className={styles['organizer-rename-modal__cell-text']}>
+          <Text color="secondary" truncate>
             {row.source}
-          </span>
+          </Text>
         </Tooltip>
       )
     },
@@ -51,12 +53,16 @@ export default function OrganizerRenameModalContent({ items = [], t, organizeInP
       label: t('organizer.renameModal.newFilename') || 'New Filename',
       sortable: true,
       width: '45%',
-      className: styles['target-column'],
       render: (value, row) => (
         <Tooltip content={organizeInPlace ? row.sourcePath : row.targetPath} side="top" align="start">
-          <span className={`${styles['organizer-rename-modal__cell-text']} ${organizeInPlace ? styles['is-organize-in-place'] : ''}`}>
+          <Text
+            color={organizeInPlace ? 'muted' : 'accent'}
+            weight={organizeInPlace ? undefined : 'medium'}
+            truncate
+            className={organizeInPlace ? styles['in-place-disabled'] : undefined}
+          >
             {organizeInPlace ? row.source : row.target}
-          </span>
+          </Text>
         </Tooltip>
       )
     },
@@ -70,23 +76,22 @@ export default function OrganizerRenameModalContent({ items = [], t, organizeInP
   ], [t, organizeInPlace]);
 
   return (
-    <div className={styles['organizer-rename-modal']}>
-      <div className={styles['organizer-rename-modal__search']}>
-        <Input
-          type="text"
-          placeholder={t('organizer.searchPlaceholder') || 'Search files...'}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          leftElement={<Search size={18} />}
-        />
-      </div>
+    <Stack gap="lg" fullWidth className="u-max-h-70vh">
+      <Input
+        type="text"
+        placeholder={t('organizer.searchPlaceholder') || 'Search files...'}
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        leftElement={<Search size={18} />}
+        className="u-flex-shrink-0"
+      />
 
-      <Inline gap="lg" align="center" className={styles['organizer-rename-modal__summary']}>
-        <span>
+      <Inline align="center" justify="between" className="u-flex-shrink-0">
+        <Text variant="small" color="muted">
           {t('organizer.renameModal.showing')
             .replace('{count}', sortedItems.length)
             .replace('{total}', items.length)}
-        </span>
+        </Text>
         <Checkbox
           checked={organizeInPlace}
           onChange={(e) => setOrganizeInPlace(e.target.checked)}
@@ -95,17 +100,19 @@ export default function OrganizerRenameModalContent({ items = [], t, organizeInP
         </Checkbox>
       </Inline>
 
-      <div className={styles['organizer-rename-modal__list-container']}>
-        <Table
-          variant="minimal"
-          columns={columns}
-          rows={sortedItems}
-          sortKey={sortConfig.key}
-          sortDirection={sortConfig.direction}
-          onSort={handleSortToggle}
-          emptyText={t('organizer.renameModal.noMatching')}
-        />
+      <div className="u-overflow-y-auto u-max-h-45vh u-flex-grow-1">
+        <Card variant="soft" padding="none">
+          <Table
+            variant="grid"
+            columns={columns}
+            rows={sortedItems}
+            sortKey={sortConfig.key}
+            sortDirection={sortConfig.direction}
+            onSort={handleSortToggle}
+            emptyText={t('organizer.renameModal.noMatching')}
+          />
+        </Card>
       </div>
-    </div>
+    </Stack>
   );
 }

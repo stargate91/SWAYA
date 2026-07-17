@@ -1,0 +1,59 @@
+.root {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+
+.root--right {
+  gap: var(--space-2xl);
+}
+
+.root--left {
+  gap: var(--space-2xl);
+}
+
+.main {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.panel {
+  width: var(--side-panel-width, 25rem);
+  flex-shrink: 0;
+  animation-duration: var(--motion-slow);
+  animation-fill-mode: forwards;
+}
+
+.panel--right {
+  border-left: 1px solid var(--color-line);
+  padding-left: var(--space-2xl);
+  animation-name: slideInRight;
+}
+
+.panel--left {
+  border-right: 1px solid var(--color-line);
+  padding-right: var(--space-2xl);
+  animation-name: slideInLeft;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(var(--space-xl));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(calc(-1 * var(--space-xl)));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

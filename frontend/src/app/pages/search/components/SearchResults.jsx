@@ -24,7 +24,7 @@ export default function SearchResults({
 }) {
   return (
     <>
-      <Grid variant={urlType === 'scene' ? 'scene' : 'poster'} className="u-w-full">
+      <Grid variant={urlType === 'scene' ? 'scene' : 'poster'}>
         {filteredResults.map((item, idx) => {
           const n = normalizeMediaEntity(item, { context: 'search', settings });
           const isAdultItem = urlSource !== 'tmdb' || item.is_adult || item.media_type === 'scene';
@@ -65,9 +65,9 @@ export default function SearchResults({
       </Grid>
 
       {hasMorePages && (
-        <Stack gap="lg" className="u-w-full u-mt-sm">
+        <Stack gap="lg" fullWidth className="u-mt-sm">
           <hr className="u-divider" />
-          <Inline justify="center" className="u-w-full">
+          <Inline justify="center" fullWidth>
             {isMoreLoading ? (
               <Spinner label={t('common.loading') || 'Loading...'} />
             ) : (

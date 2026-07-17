@@ -19,11 +19,11 @@ const getPercentageText = (rated, unrated) => {
 export function RatingsSummary({ state, t }) {
   if (state.isStatsLoading) {
     return (
-      <Stack gap="md" className="u-w-full">
+      <Stack gap="md" fullWidth>
         {Array.from({ length: 3 }).map((_, idx) => (
           <Card key={idx} variant="interactive-glass" className="u-min-h-card-loading">
-            <Skeleton className="u-skeleton-title" variant="rect" />
-            <Skeleton className="u-skeleton-text" variant="text" />
+            <Skeleton variant="title-sm" />
+            <Skeleton variant="text" />
           </Card>
         ))}
       </Stack>
@@ -37,7 +37,7 @@ export function RatingsSummary({ state, t }) {
         variant="interactive-glass"
         padding="md"
         divider
-        className="u-flex-1 u-flex-column"
+        flex={1}
         eyebrow={t('ratings.stats.mediaAverages', { defaultValue: 'Average Ratings' })}
         actions={<BarChart2 size={16} className="icon-glow-blue" />}
       >
@@ -115,7 +115,7 @@ export function RatingsSummary({ state, t }) {
         variant="interactive-glass"
         padding="md"
         divider
-        className="u-flex-1 u-flex-column"
+        flex={1}
         eyebrow={t('ratings.stats.mediaItems', { defaultValue: 'Library Items' })}
         actions={<CheckCircle size={16} className="icon-glow-success" />}
       >
@@ -189,7 +189,7 @@ export function RatingsSummary({ state, t }) {
         variant="interactive-glass"
         padding="md"
         divider
-        className="u-flex-1 u-flex-column"
+        flex={1}
         eyebrow={t('ratings.subtabs.people', { defaultValue: 'People' })}
         actions={<Users size={16} className="icon-glow-muted" />}
       >
@@ -253,9 +253,9 @@ export function RatingDistribution({
   if (state.isStatsLoading) {
     return (
       <Card variant="interactive-glass" className="u-min-h-dist-card-loading">
-        <Skeleton className="u-skeleton-dist-title" variant="rect" />
+        <Skeleton variant="dist-title" />
         {Array.from({ length: 10 }).map((_, idx) => (
-          <Skeleton key={idx} className="u-skeleton-dist-bar" variant="text" />
+          <Skeleton key={idx} variant="dist-bar" />
         ))}
       </Card>
     );
@@ -265,7 +265,7 @@ export function RatingDistribution({
     <Card
       variant="interactive-glass"
       divider
-      className="u-h-full"
+      fullHeight
       eyebrow={t('ratings.stats.distribution', { defaultValue: 'Rating Distribution' })}
       actions={
         <SegmentedControl
@@ -290,14 +290,12 @@ export function RatingDistribution({
             const ratingLabel = ((index + 1) / 2).toString();
             return (
               <Inline key={index} gap="md" align="center" justify="between">
-                {/* eslint-disable-next-line react/forbid-dom-props */}
                 <span style={{ width: '1.25rem', textAlign: 'right', display: 'inline-block' }}>
                   <Text variant="small" color="secondary" weight="bold">
                     {ratingLabel}
                   </Text>
                 </span>
                 <LinearProgress value={percentage} />
-                {/* eslint-disable-next-line react/forbid-dom-props */}
                 <span style={{ width: '1.875rem', textAlign: 'left', display: 'inline-block' }}>
                   <Text variant="small" color="muted" weight="medium">
                     {count}

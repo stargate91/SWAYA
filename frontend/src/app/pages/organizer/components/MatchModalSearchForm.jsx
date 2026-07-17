@@ -33,7 +33,6 @@ export default function MatchModalSearchForm({
       <div className={styles['organizer-match-modal__search-layout']}>
         <div
           className={styles['organizer-match-modal__search-grid']}
-          /* eslint-disable-next-line react/forbid-dom-props */
           style={{
             gridTemplateColumns: isTvMode && !isBulk
               ? 'minmax(0, 1fr) var(--year-column-width) var(--space-7xl) var(--space-7xl)'

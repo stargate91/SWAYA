@@ -73,8 +73,26 @@
   border-bottom: var(--ui-table-cell-border-bottom);
 }
 
+.table.table-grid th,
+.table.table-grid td {
+  padding: var(--space-md) var(--space-lg);
+}
+
+.table.table-grid th {
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.table.table-grid td {
+  border-bottom: 1px solid var(--color-border-subtle);
+  border-right: 1px solid var(--color-border-subtle);
+}
+
 .table tr:last-child td {
   border-bottom: var(--ui-table-last-row-cell-border-bottom, 1px solid var(--color-line));
+}
+
+.table.table-grid td:last-child {
+  border-right: none;
 }
 
 .cell-content {
@@ -160,6 +178,35 @@
 .table th.align-center .sort-btn,
 .table td.align-center .sort-btn {
   margin-inline: auto;
+}
+
+.table-action-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  min-height: auto;
+  font: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: color var(--motion-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  color: var(--color-accent);
+}
+
+.table-action-btn:hover,
+.table-action-btn:focus-visible {
+  color: color-mix(in srgb, var(--color-accent) 80%, var(--color-text-primary));
+}
+
+.table-action-btn.is-warning {
+  color: var(--color-accent-yellow-soft);
+}
+
+.table-action-btn.is-warning:hover,
+.table-action-btn.is-warning:focus-visible {
+  color: var(--color-accent-yellow);
 }
 
 .table tbody tr {

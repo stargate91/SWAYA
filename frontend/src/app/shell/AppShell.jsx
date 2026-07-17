@@ -186,10 +186,10 @@ export default function AppShell() {
           }>
             <Outlet />
           </Suspense>
-          <footer className={styles['utility-bar-bottom']}>
-            <div className={styles['utility-bar-bottom-left']} aria-label="Context bottom-left actions placeholder" />
-            <div className={styles['utility-bar-bottom-center']} id="shell-utility-bar-bottom-center" />
-            <div className={styles['utility-bar-bottom-right']} aria-label="Context bottom-right actions placeholder" />
+          <footer className={`${styles['utility-bar-bottom']} shell__utility-bar-bottom`}>
+            <div className={`${styles['utility-bar-bottom-left']} shell__utility-bar-bottom-left`} aria-label="Context bottom-left actions placeholder" />
+            <div className={`${styles['utility-bar-bottom-center']} shell__utility-bar-bottom-center`} id="shell-utility-bar-bottom-center" />
+            <div className={`${styles['utility-bar-bottom-right']} shell__utility-bar-bottom-right`} aria-label="Context bottom-right actions placeholder" />
           </footer>
         </main>
       </div>

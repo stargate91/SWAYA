@@ -3,6 +3,9 @@ import Dropdown from '../../../ui/Dropdown';
 import SelectableCard from '../../../ui/SelectableCard';
 import Radio from '../../../ui/Radio';
 import styles from './OrganizerOverrideModalContent.module.css';
+import Stack from '../../../ui/Stack';
+import Text from '../../../ui/Text';
+import SidePanelLayout from '../../../ui/SidePanelLayout';
 import { useTranslation } from '../../../providers/LanguageContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUpdateMediaMutation, getOrganizerQueryKey } from '../../../queries';
@@ -261,61 +264,71 @@ export default function OrganizerOverrideModalContent({ row, onClose, toast, sca
   );
 
   return (
-    <form id="organizer-override-form" className={`${styles['organizer-override-modal']} ${styles['organizer-override-modal--clip-x']}`} onSubmit={handleSubmit}>
+    <form id="organizer-override-form" className={styles['organizer-override-modal']} onSubmit={handleSubmit}>
       {showSelector ? (
-        <div className={styles['single-override-layout']}>
-          <div className={`${styles['single-override-layout__side-panel']} has-single-override-side-panel`}>
-            <h4 className={styles['organizer-override-modal__section-title']}>
-              {t('organizer.overrideModal.matchAction.title') || 'Match Action'}
-            </h4>
-            <p className={`${styles['organizer-override-field__label-text']} ${styles['organizer-override-field__label-text--support']} ${styles['organizer-override-field__label-text--spaced']}`}>
-              {t('organizer.overrideModal.matchAction.description') || 'Choose what to do with the current tv match since season or episode changed:'}
-            </p>
+        <SidePanelLayout
+          side="left"
+          panelWidth="20rem"
+          panelClassName="has-single-override-side-panel"
+          panelContent={
+            <Stack gap="lg">
+              <Stack gap="2xs">
+                <Text variant="small" weight="bold">
+                  {t('organizer.overrideModal.matchAction.title') || 'Match Action'}
+                </Text>
+                <Text variant="small" color="muted">
+                  {t('organizer.overrideModal.matchAction.description') || 'Choose what to do with the current tv match since season or episode changed:'}
+                </Text>
+              </Stack>
 
-            <SelectableCard
-              as="div"
-              className={styles['match-action-option']}
-              selected={matchAction === 'keep'}
-              onClick={() => setMatchAction('keep')}
-            >
-              <Radio
-                name="matchAction"
-                checked={matchAction === 'keep'}
-                onChange={() => setMatchAction('keep')}
-                className={styles['match-action-option__radio-label']}
+              <SelectableCard
+                as="div"
+                className={styles['match-action-option']}
+                selected={matchAction === 'keep'}
+                onClick={() => setMatchAction('keep')}
               >
-                {t('organizer.overrideModal.matchAction.keep') || 'Keep current tv match'}
-              </Radio>
-              <span className={styles['match-action-option__description']}>
-                {t('organizer.overrideModal.matchAction.keepDesc') || 'Update season/episode under the tv.'}
-              </span>
-            </SelectableCard>
+                <Radio
+                  name="matchAction"
+                  checked={matchAction === 'keep'}
+                  onChange={() => setMatchAction('keep')}
+                  className={styles['match-action-option__radio-label']}
+                >
+                  {t('organizer.overrideModal.matchAction.keep') || 'Keep current tv match'}
+                </Radio>
+                <Text variant="xs" color="muted" className={styles['match-action-option__description']}>
+                  {t('organizer.overrideModal.matchAction.keepDesc') || 'Update season/episode under the tv.'}
+                </Text>
+              </SelectableCard>
 
-            <SelectableCard
-              as="div"
-              className={styles['match-action-option']}
-              selected={matchAction === 'reset'}
-              onClick={() => setMatchAction('reset')}
-            >
-              <Radio
-                name="matchAction"
-                checked={matchAction === 'reset'}
-                onChange={() => setMatchAction('reset')}
-                className={styles['match-action-option__radio-label']}
+              <SelectableCard
+                as="div"
+                className={styles['match-action-option']}
+                selected={matchAction === 'reset'}
+                onClick={() => setMatchAction('reset')}
               >
-                {t('organizer.overrideModal.matchAction.reset') || 'Reset match (Pending)'}
-              </Radio>
-              <span className={styles['match-action-option__description']}>
-                {t('organizer.overrideModal.matchAction.resetDesc') || 'Remove match and return to Review Needed.'}
-              </span>
-            </SelectableCard>
-          </div>
-          <div className={styles['single-override-layout__form']}>
+                <Radio
+                  name="matchAction"
+                  checked={matchAction === 'reset'}
+                  onChange={() => setMatchAction('reset')}
+                  className={styles['match-action-option__radio-label']}
+                >
+                  {t('organizer.overrideModal.matchAction.reset') || 'Reset match (Pending)'}
+                </Radio>
+                <Text variant="xs" color="muted" className={styles['match-action-option__description']}>
+                  {t('organizer.overrideModal.matchAction.resetDesc') || 'Remove match and return to Review Needed.'}
+                </Text>
+              </SelectableCard>
+            </Stack>
+          }
+        >
+          <Stack gap="lg">
             {renderFormFields()}
-          </div>
-        </div>
+          </Stack>
+        </SidePanelLayout>
       ) : (
-        renderFormFields()
+        <Stack gap="lg">
+          {renderFormFields()}
+        </Stack>
       )}
     </form>
   );

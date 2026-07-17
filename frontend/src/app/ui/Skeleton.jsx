@@ -14,9 +14,10 @@ export default function Skeleton({ className = '', variant = 'rect', shimmer = t
 
 Skeleton.propTypes = {
   className: PropTypes.string,
-  variant: PropTypes.oneOf(['rect', 'circle', 'text']),
+  variant: PropTypes.oneOf(['rect', 'circle', 'text', 'title-sm', 'dist-title', 'dist-bar']),
   shimmer: PropTypes.bool,
 };
+
 
 Skeleton.Row = function SkeletonRow({ children, className = '', ...props }) {
   return <div className={`${styles.row} ${className}`.trim()} {...props}>{children}</div>;

@@ -6,7 +6,7 @@ import styles from './Text.module.css';
  *
  * @param {object} props
  * @param {React.ElementType} [props.as] - HTML tag to render
- * @param {'body' | 'caption' | 'title' | 'display' | 'small'} [props.variant] - Text styling flavor
+ * @param {'body' | 'caption' | 'title' | 'display' | 'small' | 'hero'} [props.variant] - Text styling flavor
  * @param {'primary' | 'secondary' | 'muted' | 'faint' | 'accent'} [props.color] - Text color
  * @param {'normal' | 'medium' | 'semibold' | 'bold' | 'extrabold'} [props.weight] - Font weight override
  * @param {boolean} [props.uppercase] - Whether to transform text to uppercase
@@ -19,6 +19,7 @@ export default function Text({
   color = 'primary',
   weight,
   uppercase = false,
+  truncate = false,
   className = '',
   children,
   ...props
@@ -29,6 +30,7 @@ export default function Text({
     styles[`color-${color}`],
     weight && styles[`weight-${weight}`],
     uppercase && styles.uppercase,
+    truncate && styles.truncate,
     className
   ].filter(Boolean).join(' ');
 
@@ -41,10 +43,11 @@ export default function Text({
 
 Text.propTypes = {
   as: PropTypes.elementType,
-  variant: PropTypes.oneOf(['body', 'caption', 'title', 'display', 'small']),
+  variant: PropTypes.oneOf(['body', 'caption', 'title', 'display', 'small', 'hero']),
   color: PropTypes.oneOf(['primary', 'secondary', 'muted', 'faint', 'accent']),
   weight: PropTypes.oneOf(['normal', 'medium', 'semibold', 'bold', 'extrabold']),
   uppercase: PropTypes.bool,
+  truncate: PropTypes.bool,
   className: PropTypes.string,
   children: PropTypes.node,
 };
