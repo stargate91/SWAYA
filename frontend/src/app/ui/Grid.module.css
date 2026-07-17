@@ -63,12 +63,6 @@
 .grid[data-variant="backdrop"] {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-md);
-  contain: layout paint;
-}
-
-.grid[data-variant="backdrop"]>* {
-  content-visibility: auto;
-  contain-intrinsic-size: 11.25rem 6.75rem;
 }
 
 @media (max-width: 37.5rem) {
@@ -81,12 +75,6 @@
 .grid[data-variant="logo"] {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-md);
-  contain: layout paint;
-}
-
-.grid[data-variant="logo"]>* {
-  content-visibility: auto;
-  contain-intrinsic-size: 11.25rem 6.75rem;
 }
 
 /* Mixed List Variant (8 cols dense flow) */
