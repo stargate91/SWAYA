@@ -6,6 +6,7 @@ import Dropdown from '@/ui/Dropdown';
 import CompactCard from '@/ui/CompactCard';
 import ActivationButton from './ActivationButton';
 import Inline from '@/ui/Inline';
+import Stack from '@/ui/Stack';
 
 
 export default function AddPeopleLocal({
@@ -63,7 +64,7 @@ export default function AddPeopleLocal({
   const hasActiveFilters = roleFilter !== 'all' || (!hideGenderFilter && genderFilter !== 'all') || statusFilter !== 'all';
 
   return (
-    <div className="add-people-modal__local-panel">
+    <Stack gap="md" fill className="add-people-modal__local-panel">
 
       <Inline gap="md" align="center" className="add-people-modal__filter-row">
         <Dropdown
@@ -75,6 +76,7 @@ export default function AddPeopleLocal({
           onChange={(e) => setSortBy(e.target.value)}
           sortDirection={sortDirection}
           onSortDirectionToggle={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+          themeColor="var(--color-accent)"
           options={[
             { value: 'library_count', label: t('library.sort.libraryCount') || 'Library Count' },
             { value: 'name', label: t('library.sort.name') || 'Name' },
@@ -88,6 +90,7 @@ export default function AddPeopleLocal({
           label={t('library.filter.roleLabel') || 'Role:'}
           value={roleFilter}
           onChange={(e) => setRoleFilter(e.target.value)}
+          themeColor="var(--color-accent)"
           options={[
             { value: 'all', label: t('library.filter.all') || 'All Roles' },
             { value: 'actor', label: t('library.people.roles.actor') || 'Actor' },
@@ -105,6 +108,7 @@ export default function AddPeopleLocal({
             label={t('library.filter.genderLabel') || 'Gender:'}
             value={genderFilter}
             onChange={(e) => setGenderFilter(e.target.value)}
+            themeColor="var(--color-accent)"
             options={[
               { value: 'all', label: t('library.filter.all') || 'All Genders' },
               { value: 'female', label: t('library.filter.female') || 'Female' },
@@ -120,6 +124,7 @@ export default function AddPeopleLocal({
           label={t('library.filter.statusLabel') || 'Status:'}
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
+          themeColor="var(--color-accent)"
           options={[
             { value: 'not_added', label: t('library.filter.notAdded') || 'Not Added' },
             { value: 'added', label: t('library.filter.added') || 'Added' },
@@ -128,11 +133,11 @@ export default function AddPeopleLocal({
       </Inline>
 
       {isLoading ? (
-        <div className="add-people-modal__loading-wrapper">
+        <Stack align="center" justify="center" className="add-people-modal__loading-wrapper">
           <Spinner label={t('library.addPeople.loading') || 'Loading people...'} />
-        </div>
+        </Stack>
       ) : visiblePeople.length === 0 ? (
-        <div className="add-people-modal__empty-fill">
+        <Stack fill className="add-people-modal__empty-fill">
           <EmptyState
             title={hasSearchQuery
               ? (isAdult
@@ -163,9 +168,11 @@ export default function AddPeopleLocal({
             background="translucent"
             fillHeight={true}
           />
-        </div>
+        </Stack>
       ) : (
-        <div
+        <Stack
+          gap="sm"
+          scrollable
           onScroll={(e) => {
             const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
             if (scrollHeight - scrollTop - clientHeight < 50 && hasNextPage && !isFetchingNextPage) {
@@ -206,8 +213,8 @@ export default function AddPeopleLocal({
               />
             );
           })}
-        </div>
+        </Stack>
       )}
-    </div>
+    </Stack>
   );
 }

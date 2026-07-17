@@ -96,6 +96,12 @@
   border-color: var(--button-danger-border);
 }
 
+.icon-button[data-variant="success"] {
+  color: var(--color-state-success);
+  background: var(--color-state-success-bg);
+  border-color: color-mix(in srgb, var(--color-state-success) 40%, transparent);
+}
+
 .icon-button[data-variant="flat-danger"] {
   background: color-mix(in srgb, var(--color-bg-canvas) 60%, transparent);
   color: color-mix(in srgb, var(--color-text-primary) 70%, transparent);

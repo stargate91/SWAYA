@@ -6,7 +6,7 @@ import styles from './IconButton.module.css';
  * @param {object} props
  * @param {React.ReactNode} props.children - Icon element to render
  * @param {string} [props.className] - Additional custom class names
- * @param {'primary' | 'primary-neutral' | 'secondary' | 'secondary-neutral' | 'ghost' | 'danger' | 'flat-danger' | 'close' | 'play-overlay' | 'carousel-arrow' | 'glass'} [props.variant] - Button variant
+ * @param {'primary' | 'primary-neutral' | 'secondary' | 'secondary-neutral' | 'ghost' | 'danger' | 'flat-danger' | 'close' | 'play-overlay' | 'carousel-arrow' | 'glass' | 'success'} [props.variant] - Button variant
  * @param {'xs' | 'sm' | 'md' | 'lg' | 'md-btn'} [props.size] - Button size
  * @param {string} [props.label] - Accessible label
  * @param {string} [props.title] - Tooltip text

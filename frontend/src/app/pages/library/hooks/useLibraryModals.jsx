@@ -18,6 +18,8 @@ export function useLibraryModals({ state, focusedTagName, setFocusedTagName, del
         : (state.t('library.addPeople.modalDescription') || 'Track or search for people to add to the library.'),
       icon: Users,
       className: 'ui-modal--wide',
+      height: 'lg',
+      bodyClassName: 'add-people-modal-body',
       content: (
         <AddPeopleModalContent
           isAdult={isAdult}

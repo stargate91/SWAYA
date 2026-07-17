@@ -4,10 +4,14 @@ import Input from '@/ui/Input';
 import Tooltip from '@/ui/Tooltip';
 import Button from '@/ui/Button';
 import Field from '@/ui/Field';
+import Stack from '@/ui/Stack';
+import Inline from '@/ui/Inline';
+import Text from '@/ui/Text';
+import ColorSwatch from '@/ui/ColorSwatch';
+import Thumbnail from '@/ui/Thumbnail';
 import { API_BASE } from '@/lib/backend';
 import './CreateTagForm.css';
 
-const REMOVE_SYMBOL = '✕';
 const BULLET_POINT = '• ';
 
 const PREDEFINED_COLORS = [
@@ -18,25 +22,6 @@ const PREDEFINED_COLORS = [
   'var(--color-state-warning)',
   'var(--color-state-danger)'
 ];
-
-function TagColorBtn({ colorValue, isSelected, onClick }) {
-  const btnRef = useCallback((node) => {
-    if (node) {
-      node.style.backgroundColor = colorValue;
-    }
-  }, [colorValue]);
-
-  return (
-    <button
-      ref={btnRef}
-      type="button"
-      className="create-tag-form__color-btn"
-      data-selected={isSelected}
-      onClick={onClick}
-      aria-label={colorValue}
-    />
-  );
-}
 
 export default function CreateTagModalContent({ onClose, t, initialTag = null, mode = 'create', onSuccess, defaultColor = 'var(--color-accent-blue)', isAdult = false }) {
   const [name, setName] = useState(initialTag?.name || '');
@@ -168,113 +153,114 @@ export default function CreateTagModalContent({ onClose, t, initialTag = null, m
   };
 
   return (
-    <form id={formId} onSubmit={handleSubmit} className="create-tag-form">
+    <form id={formId} onSubmit={handleSubmit}>
+      <Stack gap="xl" fullWidth>
+        <Input
+          label={t('library.tags.nameLabel') || 'Tag Name'}
+          placeholder={t('library.tags.namePlaceholder') || 'Enter tag name...'}
+          value={name}
+          onChange={(e) => {
+            setName(e.target.value);
+            setError('');
+          }}
+          error={error}
+          autoFocus
+        />
 
-      <Input
-        label={t('library.tags.nameLabel') || 'Tag Name'}
-        placeholder={t('library.tags.namePlaceholder') || 'Enter tag name...'}
-        value={name}
-        onChange={(e) => {
-          setName(e.target.value);
-          setError('');
-        }}
-        error={error}
-        autoFocus
-      />
+        <Field label={t('library.tags.customImagesLabel') || 'Custom Images (Max 3)'}>
+          <Stack gap="sm" fullWidth>
+            {customImages.length > 0 && (
+              <Inline gap="md">
+                {customImages.map((img, idx) => {
+                  const imgObj = typeof img === 'string' ? { path: img, position_y: 50 } : img;
+                  const imageUrl = imgObj.path.startsWith('data:') || imgObj.path.startsWith('http')
+                    ? imgObj.path
+                    : `${API_BASE}${imgObj.path}`;
+                  return (
+                    <Thumbnail
+                      key={idx}
+                      onRemove={() => setCustomImages(customImages.filter((_, i) => i !== idx))}
+                      removeLabel={t('library.tags.removeImage') || 'Remove image'}
+                    >
+                      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+                      <div
+                        className="create-tag-form__image-preview"
+                        /* eslint-disable-next-line react/forbid-dom-props */
+                        style={{
+                          backgroundImage: `url(${imageUrl})`,
+                          backgroundPosition: `${imgObj.position_x ?? 50}% ${imgObj.position_y ?? 50}%`,
+                        }}
+                        onMouseDown={(e) => handleDragStart(idx, e)}
+                        onTouchStart={(e) => handleDragStart(idx, e)}
+                        title={t('library.tags.dragToReposition') || 'Drag to reposition'}
+                      />
+                    </Thumbnail>
+                  );
+                })}
+              </Inline>
+            )}
 
-      <Field label={t('library.tags.customImagesLabel') || 'Custom Images (Max 3)'}>
-        {customImages.length > 0 && (
-          <div className="create-tag-form__image-list">
-            {customImages.map((img, idx) => {
-              const imgObj = typeof img === 'string' ? { path: img, position_y: 50 } : img;
-              const imageUrl = imgObj.path.startsWith('data:') || imgObj.path.startsWith('http')
-                ? imgObj.path
-                : `${API_BASE}${imgObj.path}`;
-              return (
-                <div key={idx} className="create-tag-form__image-preview-wrapper">
-                  {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-                  <div
-                    className="create-tag-form__image-preview"
-                    /* eslint-disable-next-line react/forbid-dom-props */
-                    style={{
-                      backgroundImage: `url(${imageUrl})`,
-                      backgroundPosition: `${imgObj.position_x ?? 50}% ${imgObj.position_y ?? 50}%`,
-                    }}
-                    onMouseDown={(e) => handleDragStart(idx, e)}
-                    onTouchStart={(e) => handleDragStart(idx, e)}
-                    title={t('library.tags.dragToReposition') || 'Drag to reposition'}
+            {customImages.length < 3 && (
+              <Inline gap="sm" align="center">
+                <Input
+                  placeholder={t('library.tags.imageUrlPlaceholder') || 'Paste image URL...'}
+                  value={newUrl}
+                  onChange={(e) => setNewUrl(e.target.value)}
+                  className="create-tag-form__input-wrapper"
+                />
+                <Button
+                  type="button"
+                  onClick={handleAddUrl}
+                  variant="secondary"
+                >
+                  {t('library.tags.addImageUrl') || 'Add URL'}
+                </Button>
+                <Button
+                  as="label"
+                  variant="secondary"
+                >
+                  {t('library.tags.uploadImage') || 'Upload'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    hidden
                   />
-                  <button
-                    type="button"
-                    onClick={() => setCustomImages(customImages.filter((_, i) => i !== idx))}
-                    className="create-tag-form__remove-image-btn"
-                  >
-                    {REMOVE_SYMBOL}
-                  </button>
-                </div>
+                </Button>
+              </Inline>
+            )}
+
+            <div className="create-tag-form__help-text-wrapper">
+              {customImages.length <= 1 ? (
+                <Text variant="caption" color="secondary">
+                  {BULLET_POINT}{t('library.tags.aspectRatioOne') || 'Ideal aspect ratio is 16:9 (landscape/backdrop)'}
+                </Text>
+              ) : (
+                <Text variant="caption" color="secondary">
+                  {BULLET_POINT}{t('library.tags.aspectRatioMultiple') || 'Ideal aspect ratio is 2:3 (portrait/portrait)'}
+                </Text>
+              )}
+            </div>
+          </Stack>
+        </Field>
+
+        <Field label={t('library.tags.colorLabel') || 'Select Color'}>
+          <Inline gap="md" fullWidth>
+            {PREDEFINED_COLORS.map((c) => {
+              const isSelected = color === c;
+              return (
+                <Tooltip key={c} content={c} side="top">
+                  <ColorSwatch
+                    color={c}
+                    selected={isSelected}
+                    onClick={() => setColor(c)}
+                  />
+                </Tooltip>
               );
             })}
-          </div>
-        )}
-
-        {customImages.length < 3 && (
-          <div className="create-tag-form__add-image-row">
-            <Input
-              placeholder={t('library.tags.imageUrlPlaceholder') || 'Paste image URL...'}
-              value={newUrl}
-              onChange={(e) => setNewUrl(e.target.value)}
-              className="create-tag-form__input-wrapper"
-            />
-            <Button
-              type="button"
-              onClick={handleAddUrl}
-              variant="secondary"
-              className="create-tag-form__action-btn"
-            >
-              {t('library.tags.addImageUrl') || 'Add URL'}
-            </Button>
-            <Button
-              as="label"
-              variant="secondary"
-              className="create-tag-form__action-btn create-tag-form__action-btn--upload"
-            >
-              {t('library.tags.uploadImage') || 'Upload'}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileUpload}
-                className="create-tag-form__file-input"
-              />
-            </Button>
-          </div>
-        )}
-
-        <div className="create-tag-form__help-text">
-          {customImages.length <= 1 ? (
-            <div>{BULLET_POINT}{t('library.tags.aspectRatioOne') || 'Ideal aspect ratio is 16:9 (landscape/backdrop)'}</div>
-          ) : (
-            <div>{BULLET_POINT}{t('library.tags.aspectRatioMultiple') || 'Ideal aspect ratio is 2:3 (portrait/portrait)'}</div>
-          )}
-        </div>
-      </Field>
-
-      <Field label={t('library.tags.colorLabel') || 'Select Color'}>
-        <div className="create-tag-form__color-list">
-          {PREDEFINED_COLORS.map((c) => {
-            const isSelected = color === c;
-            return (
-              <Tooltip key={c} content={c} side="top">
-                <TagColorBtn
-                  colorValue={c}
-                  isSelected={isSelected}
-                  onClick={() => setColor(c)}
-                />
-              </Tooltip>
-            );
-          })}
-
-        </div>
-      </Field>
+          </Inline>
+        </Field>
+      </Stack>
     </form>
   );
 }

@@ -8,13 +8,12 @@ export default function ActivationButton({ isActive, onClick, disabled }) {
   if (isActive) {
     return (
       <IconButton
-        variant={isHovered ? 'danger' : 'ghost'}
+        variant={isHovered ? 'danger' : 'success'}
         size="sm"
         onClick={() => onClick(false)}
         disabled={disabled}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className={!isHovered ? 'add-people-modal__activation-btn--active' : ''}
       >
         {isHovered ? <Minus size={16} /> : <Check size={16} />}
       </IconButton>

@@ -229,6 +229,13 @@
   min-width: 0;
 }
 
+/* Picker Logo Overrides */
+.card[data-variant="picker-logo"] {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
 .card[data-variant="picker"]:hover:not([data-disabled="true"]),
 .card[data-variant="picker-logo"]:hover:not([data-disabled="true"]) {
   transform: translateY(-0.125rem);
@@ -252,12 +259,6 @@
   background: color-mix(in srgb, var(--color-accent) 10%, transparent);
 }
 
-/* Picker Logo Overrides */
-.card[data-variant="picker-logo"] {
-  background: transparent;
-  border-color: transparent;
-  box-shadow: none;
-}
 
 .picker-img-wrapper {
   width: 100%;

@@ -13,32 +13,6 @@
   margin-top: var(--space-sm);
 }
 
-.create-list-form__color-btn {
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  padding: 0;
-  transition: all var(--motion-fast);
-}
-
-.create-list-form__color-btn[data-selected="true"] {
-  border: 2px solid var(--color-accent);
-  transform: scale(1.1);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--color-accent) 40%, transparent);
-}
-
-.create-list-form__color-btn[data-selected="false"],
-.create-list-form__color-btn:not([data-selected="true"]) {
-  border: 2px solid transparent;
-  transform: scale(1);
-  box-shadow: none;
-}
-
-.create-list-form__color-btn:hover {
-  transform: scale(1.15);
-}
-
 .create-list-form__error {
   color: var(--color-state-danger);
   font-size: var(--font-size-2xs);

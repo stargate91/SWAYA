@@ -177,7 +177,8 @@
     "addTagPlaceholder": "Add Tag...",
     "allTagsAssigned": "All tags assigned.",
     "searchOrAdd": "Search or add tag...",
-    "dragToReposition": "Drag to reposition"
+    "dragToReposition": "Drag to reposition",
+    "removeImage": "Remove image"
   },
   "collections": {
     "partsCount": "{{owned}} / {{total}} movies"

@@ -8,6 +8,7 @@ export default function Stack({
   flex,
   fullWidth,
   fullHeight,
+  scrollable = false,
   className = '',
   children,
   ...props
@@ -21,6 +22,7 @@ export default function Stack({
     flex === 1 && styles['flex-1'],
     fullWidth && styles['full-width'],
     fullHeight && styles['full-height'],
+    scrollable && styles.scrollable,
     className,
   ].filter(Boolean).join(' ');
 

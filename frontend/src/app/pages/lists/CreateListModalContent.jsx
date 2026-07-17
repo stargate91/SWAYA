@@ -1,8 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import Input from '@/ui/Input';
 import Radio from '@/ui/Radio';
 import Tooltip from '@/ui/Tooltip';
 import Field from '@/ui/Field';
+import ColorSwatch from '@/ui/ColorSwatch';
 import styles from './CreateListModalContent.module.css';
 
 const PRESET_COLORS = [
@@ -13,25 +14,6 @@ const PRESET_COLORS = [
   'var(--color-state-warning)',
   'var(--color-state-danger)'
 ];
-
-function ColorPresetBtn({ colorValue, isSelected, onClick }) {
-  const btnRef = useCallback((node) => {
-    if (node) {
-      node.style.backgroundColor = colorValue;
-    }
-  }, [colorValue]);
-
-  return (
-    <button
-      ref={btnRef}
-      type="button"
-      className={styles['create-list-form__color-btn']}
-      data-selected={isSelected}
-      onClick={onClick}
-      aria-label={colorValue}
-    />
-  );
-}
 
 export default function CreateListModalContent({
   onSave,
@@ -128,10 +110,11 @@ export default function CreateListModalContent({
             const isSelected = color === c;
             return (
               <Tooltip key={c} content={c} side="top">
-                <ColorPresetBtn
-                  colorValue={c}
-                  isSelected={isSelected}
+                <ColorSwatch
+                  color={c}
+                  selected={isSelected}
                   onClick={() => setColor(c)}
+                  shape="square"
                 />
               </Tooltip>
             );

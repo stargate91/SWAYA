@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { useUpdatePersonStatusMutation, useAddPersonTmdbMutation } from '@/queries';
 import SearchInputCombo from '@/ui/SearchInputCombo';
+import Stack from '@/ui/Stack';
 import './AddPeopleModalContent.css';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import api from '@/lib/api';
@@ -138,25 +139,9 @@ export default function AddPeopleModalContent({ isAdult, t }) {
     : t(textKey('library.addPeople.adultTmdbSearchPlaceholder', 'library.addPeople.tmdbSearchPlaceholder'));
 
   return (
-    <div className="add-people-modal add-people-modal--people">
-      <div className="add-people-modal__mode-selector">
-        {activeMode === 'search' ? (
-          <form onSubmit={handleSearchSubmit} className="add-people-modal__search-form-wrapper">
-            <SearchInputCombo
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={placeholderText}
-              selectedOption={selectedOption}
-              onOptionChange={(val) => {
-                setSelectedOption(val);
-                setSearchQuery('');
-                setHasSearched(false);
-                setTmdbResults([]);
-              }}
-              options={options}
-            />
-          </form>
-        ) : (
+    <Stack gap="lg" fullWidth fill>
+      {activeMode === 'search' ? (
+        <form onSubmit={handleSearchSubmit} className="add-people-modal__search-form-wrapper">
           <SearchInputCombo
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -170,8 +155,22 @@ export default function AddPeopleModalContent({ isAdult, t }) {
             }}
             options={options}
           />
-        )}
-      </div>
+        </form>
+      ) : (
+        <SearchInputCombo
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder={placeholderText}
+          selectedOption={selectedOption}
+          onOptionChange={(val) => {
+            setSelectedOption(val);
+            setSearchQuery('');
+            setHasSearched(false);
+            setTmdbResults([]);
+          }}
+          options={options}
+        />
+      )}
 
       {activeMode === 'local' && (
         <AddPeopleLocal
@@ -203,6 +202,6 @@ export default function AddPeopleModalContent({ isAdult, t }) {
           hasSearched={hasSearched}
         />
       )}
-    </div>
+    </Stack>
   );
 }

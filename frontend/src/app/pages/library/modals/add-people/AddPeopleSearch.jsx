@@ -4,6 +4,8 @@ import Spinner from '@/ui/Spinner';
 import EmptyState from '@/ui/EmptyState';
 import CompactCard from '@/ui/CompactCard';
 import ActivationButton from './ActivationButton';
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
 
 
 export default function AddPeopleSearch({
@@ -36,18 +38,18 @@ export default function AddPeopleSearch({
   }, [tmdbResults, isAdult, settings?.adult_gender_preference]);
 
   return (
-    <div className="add-people-modal__tab-panel">
+    <Stack gap="lg" fill className="add-people-modal__tab-panel">
 
       {isSearching ? (
-        <div className="add-people-modal__loading-wrapper">
+        <Stack align="center" justify="center" className="add-people-modal__loading-wrapper">
           <Spinner label={t('library.addPeople.searching') || 'Searching...'} />
-        </div>
+        </Stack>
       ) : searchingError ? (
-        <div className="add-people-modal__error-message">
+        <Text color="danger" align="center" className="add-people-modal__error-message">
           {searchingError}
-        </div>
+        </Text>
       ) : !hasSearched ? (
-        <div className="add-people-modal__empty-fill">
+        <Stack fill className="add-people-modal__empty-fill">
           <EmptyState
             title={t(textKey('library.addPeople.adultSearchEmptyTitle', 'library.addPeople.searchEmptyTitle'))}
             description={t(textKey('library.addPeople.adultSearchEmptyDesc', 'library.addPeople.searchEmptyDesc'))}
@@ -56,9 +58,9 @@ export default function AddPeopleSearch({
             background="translucent"
             fillHeight={true}
           />
-        </div>
+        </Stack>
       ) : filteredTmdbResults.length === 0 ? (
-        <div className="add-people-modal__empty-fill">
+        <Stack fill className="add-people-modal__empty-fill">
           <EmptyState
             title={t(textKey('library.addPeople.adultSearchNoResultsTitle', 'library.addPeople.searchNoResultsTitle'))}
             description={t(textKey('library.addPeople.adultSearchNoResultsDesc', 'library.addPeople.searchNoResultsDesc'))}
@@ -67,9 +69,9 @@ export default function AddPeopleSearch({
             background="translucent"
             fillHeight={true}
           />
-        </div>
+        </Stack>
       ) : (
-        <div className="add-people-modal__list">
+        <Stack gap="sm" scrollable className="add-people-modal__list">
           {filteredTmdbResults.map((person) => {
             const isActive = optimisticStatus[person.id] !== undefined
               ? optimisticStatus[person.id]
@@ -107,8 +109,8 @@ export default function AddPeopleSearch({
               />
             );
           })}
-        </div>
+        </Stack>
       )}
-    </div>
+    </Stack>
   );
 }
