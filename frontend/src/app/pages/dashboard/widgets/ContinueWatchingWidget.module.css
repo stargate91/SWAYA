@@ -17,17 +17,6 @@
   animation: pulse var(--motion-duration-pulse-slow) var(--motion-ease-standard) infinite;
 }
 
-.continue-watching-row {
-  display: flex;
-  gap: var(--space-xl);
-  overflow-x: auto;
-  padding-bottom: var(--space-xl);
-}
-
-.continue-watching-shell {
-  position: relative;
-}
-
 .continue-watching-card {
   --ui-poster-card-width: var(--ui-card-width-poster);
   --ui-poster-card-min-width: var(--ui-card-width-poster);
@@ -51,14 +40,13 @@
 .continue-watching-card-image {
   opacity: 0.7;
   filter: brightness(0.85);
-  transition: opacity var(--motion-duration-hover) var(--motion-ease-hover), filter var(--motion-duration-hover) var(--motion-ease-hover), transform var(--motion-duration-hover) var(--motion-ease-hover);
+  transition: opacity var(--motion-duration-hover) var(--motion-ease-hover), filter var(--motion-duration-hover) var(--motion-ease-hover);
 }
 
 .continue-watching-card:hover .continue-watching-card-image {
-  will-change: opacity, filter, transform;
+  will-change: opacity, filter;
   opacity: 1;
   filter: brightness(1);
-  transform: scale(1.03);
 }
 
 .card-tooltip {
@@ -94,7 +82,8 @@
   opacity: 0.45;
 }
 
-.continue-watching-play-active {
+.continue-watching-play-active,
+.continue-watching-card--active :global(.ui-icon-button[data-variant="play-overlay"]) {
   opacity: 1;
   pointer-events: none;
   animation: continue-watching-play-pulse var(--motion-duration-pulse-slow) infinite var(--motion-ease-standard);
@@ -117,85 +106,6 @@
   }
 }
 
-.continue-watching-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, color-mix(in srgb, var(--color-bg-canvas) 90%, transparent) 0%, color-mix(in srgb, var(--color-bg-canvas) 30%, transparent) 60%, transparent 100%);
-}
-
-
-.continue-watching-progress-track {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: var(--space-xs);
-  background: color-mix(in srgb, var(--color-text-primary) 20%, transparent);
-}
-
-.continue-watching-progress-svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.continue-watching-progress-bg {
-  fill: color-mix(in srgb, var(--color-text-primary) 20%, transparent);
-}
-
-.continue-watching-progress-fill {
-  fill: var(--color-accent-blue-soft);
-  filter: drop-shadow(0 0 var(--space-md) color-mix(in srgb, var(--color-accent-blue-soft) 80%, transparent));
-}
-
-.continue-watching-copy {
-  position: absolute;
-  right: var(--space-lg);
-  bottom: var(--space-lg);
-  left: var(--space-lg);
-  pointer-events: none;
-}
-
-.continue-watching-title {
-  overflow: hidden;
-  color: var(--color-text-primary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  margin-bottom: var(--space-xs);
-}
-
-.continue-watching-meta {
-  position: relative;
-  min-height: var(--font-size-lg);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-xs);
-}
-
-.continue-watching-meta-default,
-.continue-watching-meta-episode {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  transition: opacity var(--motion-duration-fast) var(--motion-ease-standard);
-}
-
-.continue-watching-meta-episode {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-}
-
-.continue-watching-card:hover .continue-watching-meta-episode {
-  opacity: 1;
-}
-
-.continue-watching-card:hover .continue-watching-meta--has-episode .continue-watching-meta-default {
-  opacity: 0;
-}
-
 @keyframes pulse {
   0% {
     transform: scale(1);
@@ -214,14 +124,6 @@
   }
 }
 
-.is-left {
-  left: var(--space-md);
-}
-
-.is-right {
-  right: var(--space-md);
-}
-
 .continue-watching-title-skeleton {
   width: calc(12 * var(--space-lg));
   height: calc(1.75 * var(--space-lg));
@@ -233,4 +135,3 @@
   border-radius: var(--radius-lg);
   flex-shrink: 0;
 }
-

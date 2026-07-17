@@ -1,0 +1,83 @@
+.recommend-spotlight {
+  position: relative;
+  width: 100%;
+  height: var(--ui-spotlight-height);
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: var(--color-bg-elevated);
+  box-shadow: 0 var(--space-xl) 2.5rem color-mix(in srgb, var(--color-bg-canvas) 40%, transparent);
+  border: 0;
+}
+
+.recommend-spotlight-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.75;
+  filter: blur(0.05rem) contrast(1.08);
+}
+
+.recommend-spotlight-gradient {
+  position: absolute;
+  inset: 0;
+}
+
+.recommend-spotlight-gradient--side {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--color-bg-canvas) 95%, transparent) 0%, color-mix(in srgb, var(--color-bg-canvas) 60%, transparent) 35%, transparent 65%);
+}
+
+.recommend-spotlight-gradient--bottom {
+  background: linear-gradient(0deg, color-mix(in srgb, var(--color-bg-canvas) 96%, transparent) 0%, transparent 50%);
+}
+
+.recommend-spotlight-copy {
+  position: absolute;
+  bottom: var(--space-4xl);
+  left: var(--space-4xl);
+  z-index: var(--z-index-base);
+  max-width: var(--ui-spotlight-max-width);
+}
+
+.recommend-spotlight-title {
+  margin: 0 0 var(--space-md);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-5xl);
+  font-weight: var(--font-weight-black);
+  text-shadow: 0 0.25rem 0.5rem color-mix(in srgb, var(--color-bg-canvas) 80%, transparent);
+  transition: color var(--motion-duration-fast) var(--motion-ease-standard), opacity var(--motion-duration-fast) var(--motion-ease-standard);
+  cursor: pointer;
+  display: inline-block;
+  width: fit-content;
+}
+
+.recommend-spotlight-title:hover {
+  color: var(--color-accent);
+  opacity: 0.95;
+}
+
+.recommend-spotlight-actions {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.recommend-spotlight-meta {
+  margin-bottom: var(--space-xl);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-bold);
+}
+
+.recommend-spotlight-year {
+  color: color-mix(in srgb, var(--color-text-primary) 92%, transparent);
+  text-shadow: 0 0.125rem 0.25rem color-mix(in srgb, var(--color-bg-canvas) 80%, transparent);
+}
+
+.recommend-spotlight-overview {
+  display: -webkit-box;
+  overflow: hidden;
+  margin-bottom: var(--space-2xl);
+  color: color-mix(in srgb, var(--color-text-primary) 80%, transparent);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}

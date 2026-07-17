@@ -102,3 +102,7 @@
   overflow-y: auto;
   scrollbar-gutter: stable;
 }
+
+.content[data-padded="true"] {
+  padding: var(--space-2xl);
+}

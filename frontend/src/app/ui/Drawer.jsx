@@ -15,6 +15,7 @@ export default function Drawer({
   style = {},
   variant = 'default',
   hasBackdrop,
+  padded = false,
   children,
 }) {
   const { t } = useTranslation();
@@ -88,7 +89,7 @@ export default function Drawer({
             <X size={18} />
           </IconButton>
         </div>
-        <div className={styles.content}>
+        <div className={styles.content} data-padded={padded}>
           {children}
         </div>
       </div>
@@ -106,5 +107,6 @@ Drawer.propTypes = {
   style: PropTypes.object,
   variant: PropTypes.oneOf(['default', 'glass', 'contrast']),
   hasBackdrop: PropTypes.bool,
+  padded: PropTypes.bool,
   children: PropTypes.node,
 };

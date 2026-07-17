@@ -2,9 +2,10 @@ import PropTypes from 'prop-types';
 import { Star, Check, Plus } from '@/ui/icons';
 import { resolveMediaImageUrl } from '../../../../lib/imageUrls';
 import Button from '../../../../ui/Button';
-import styles from '../RecommendationsWidget.module.css';
 import { useTranslation } from '../../../../providers/LanguageContext';
 import Inline from '@/ui/Inline';
+import Pill from '@/ui/Pill';
+import styles from './SpotlightBanner.module.css';
 
 export const SpotlightBanner = ({ item, watchlistIds, onWatchlist, onCardClick }) => {
   const { t: T } = useTranslation();
@@ -28,9 +29,10 @@ export const SpotlightBanner = ({ item, watchlistIds, onWatchlist, onCardClick }
         <h2 className={styles['recommend-spotlight-title']} onClick={() => onCardClick(item)}>{title}</h2>
         <Inline gap="lg" align="center" className={styles['recommend-spotlight-meta']}>
           {ratingToDisplay ? (
-            <span className={`${styles['recommend-spotlight-rating']} ${styles[`is-${ratingSource}`]}`}>
-              <Star size={14} fill="currentColor" /> {ratingToDisplay.toFixed(1)}
-            </span>
+            <Pill variant={ratingSource} size="lg">
+              <Star size={14} fill="currentColor" strokeWidth={2.0} />
+              {ratingToDisplay.toFixed(1)}
+            </Pill>
           ) : null}
           {year ? <span className={styles['recommend-spotlight-year']}>{year}</span> : null}
         </Inline>
@@ -42,7 +44,7 @@ export const SpotlightBanner = ({ item, watchlistIds, onWatchlist, onCardClick }
               const type = item.media_type || item.type || (item.title ? 'movie' : 'tv');
               onWatchlist(item, type);
             }}
-            className={`${styles['recommend-watchlist-btn']} ${isWatchlisted ? 'is-watchlisted' : ''}`}
+            size="md"
             variant="secondary"
           >
             {isWatchlisted ? (

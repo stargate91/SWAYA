@@ -178,6 +178,7 @@ export default function AppShell() {
           <header className={styles['utility-bar']}>
             <div className={`${styles['utility-bar-left']} shell__utility-bar-left`} aria-label="Context actions placeholder" />
             <div className={styles['utility-bar-center']} id="shell-utility-bar-center" />
+            <div className={`${styles['utility-bar-right']} shell__utility-bar-right`} aria-label="Context right actions placeholder" />
           </header>
           <Suspense fallback={
             <div className={styles['suspense-fallback']}>

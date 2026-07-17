@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types';
 import Skeleton from '../../../../ui/Skeleton';
-import styles from '../RecommendationsWidget.module.css';
 
 export const RecommendationSkeleton = ({ showBanner = false }) => (
-  <div className={styles['recommend-skeleton']}>
+  <div>
     {showBanner && <Skeleton.Banner />}
     <Skeleton.Title />
     <Skeleton.Row>

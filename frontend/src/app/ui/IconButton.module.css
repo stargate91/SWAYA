@@ -54,6 +54,11 @@
   height: var(--button-height-lg);
 }
 
+.icon-button[data-size="md-btn"] {
+  width: var(--button-height-md);
+  height: var(--button-height-md);
+}
+
 .icon-button[data-variant="primary"] {
   background: var(--button-primary-bg);
   color: var(--button-primary-color);
@@ -89,6 +94,13 @@
   background: var(--button-danger-bg);
   color: var(--button-danger-color);
   border-color: var(--button-danger-border);
+}
+
+.icon-button[data-variant="flat-danger"] {
+  background: color-mix(in srgb, var(--color-bg-canvas) 60%, transparent);
+  color: color-mix(in srgb, var(--color-text-primary) 70%, transparent);
+  border: 0;
+  border-radius: var(--radius-sm);
 }
 
 .icon-button[data-variant="close"] {
@@ -179,6 +191,30 @@
 
 .icon-button[data-variant="danger"]:hover:not(:disabled) {
   background: var(--button-danger-hover-bg);
+}
+
+.icon-button[data-variant="flat-danger"]:hover:not(:disabled) {
+  background: var(--color-state-danger);
+  color: var(--color-text-primary);
+  transform: none;
+}
+
+.icon-button[data-variant="glass"] {
+  background: var(--media-detail-side-nav-bg);
+  border: 1px solid var(--media-detail-side-nav-border);
+  color: var(--color-text-secondary);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, var(--color-bg-canvas) 10%, transparent);
+  opacity: 0.6;
+  transition: all var(--motion-duration-base) var(--motion-ease-standard);
+}
+
+.icon-button[data-variant="glass"]:hover:not(:disabled) {
+  color: var(--color-text-primary);
+  opacity: 1;
+  background: var(--media-detail-side-nav-bg);
+  border-color: var(--media-detail-side-nav-border);
+  transform: none;
 }
 
 

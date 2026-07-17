@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from '@/ui/icons';
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
 import {
   useRecommendationsQuery,
@@ -11,14 +10,16 @@ import {
 import Dropdown from '../../../ui/Dropdown';
 import WidgetShell from '@/ui/WidgetShell';
 import PosterCard from '../../../ui/PosterCard';
-import IconButton from '../../../ui/IconButton';
 import posterCardStyles from '../../../ui/PosterCard.module.css';
-import styles from './RecommendationsWidget.module.css';
 import { useWatchlistHandler } from './hooks/useWatchlistHandler';
 import Button from '../../../ui/Button';
 import Inline from '../../../ui/Inline';
 import { Check, Plus, Minus } from '@/ui/icons';
 import { useTranslation } from '../../../providers/LanguageContext';
+import Stack from '../../../ui/Stack';
+import ScrollRow from '../../../ui/ScrollRow';
+import EmptyState from '../../../ui/EmptyState';
+import Text from '../../../ui/Text';
 
 const GENRES = [
   { value: '', label: 'All Genres' },
@@ -58,8 +59,6 @@ const TMDBDiscoveryWidget = () => {
   const [year, setYear] = useState('');
 
   const scrollRef = useRef(null);
-  const [showLeft, setShowLeft] = useState(false);
-  const [showRight, setShowRight] = useState(true);
 
   const { data: recommendations } = useRecommendationsQuery();
   const watchlistIdsFromQuery = recommendations?.watchlist_item_ids;
@@ -75,31 +74,16 @@ const TMDBDiscoveryWidget = () => {
 
   const { data: items = [], isLoading: loading } = useDiscoverQuery(genreId, year);
 
-  const updateArrows = useCallback(() => {
-    const element = scrollRef.current;
-    if (!element) return;
-    setShowLeft(element.scrollLeft > 10);
-    setShowRight(element.scrollLeft < element.scrollWidth - element.clientWidth - 10);
-  }, []);
-
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollLeft = 0;
     }
-    setTimeout(updateArrows, 100);
-  }, [genreId, year, items, updateArrows]);
+  }, [genreId, year, items]);
 
   const handleCardClick = (item) => {
     const type = item.media_type || 'movie';
     const idToUse = item.in_library ? item.media_item_id : `tmdb_${item.id}`;
     navigate(`/library/${type}/${idToUse}`, { state: { allowAdult: true } });
-  };
-
-  const scroll = (direction) => {
-    const element = scrollRef.current;
-    if (!element) return;
-    const amount = element.clientWidth * 0.75;
-    element.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
   };
 
   const translatedGenres = useMemo(() => {
@@ -117,61 +101,39 @@ const TMDBDiscoveryWidget = () => {
   }, [T]);
 
   return (
-    <div className={styles['recommend-carousel']}>
-      <Inline gap="lg" align="center" className={styles['recommend-carousel-header']}>
-        <h3 className={`${styles['recommend-carousel-title']} ${styles['recommend-carousel-title--header']}`}>
+    <Stack gap="xl">
+      <Inline gap="lg" align="center" justify="between" fullWidth>
+        <Text as="h3" variant="display" weight="extrabold">
           {T('dashboard.recommendations.discovery_title') || 'Top 20 Discoveries'}
-        </h3>
+        </Text>
         
-        <Inline gap="md" align="center" className={styles['recommend-carousel-filters']}>
+        <Inline gap="md" align="center">
           <Dropdown
             options={translatedGenres}
             value={genreId}
             onChange={(e) => setGenreId(e.target.value)}
-            className={styles['recommend-carousel-filter-genre']}
+            className="u-w-genre"
           />
 
           <Dropdown
             options={translatedYears}
             value={year}
             onChange={(e) => setYear(e.target.value)}
-            className={styles['recommend-carousel-filter-year']}
+            className="u-w-year"
           />
         </Inline>
       </Inline>
 
       <WidgetShell loading={loading} size="lg" transparent={true}>
         {items.length === 0 ? (
-          <div className={styles['recommend-carousel-no-results']}>
-            {T('dashboard.recommendations.discovery_no_results') || 'No popular movies found matching filters.'}
-          </div>
+          <EmptyState
+            title={T('dashboard.recommendations.discovery_no_results') || 'No popular movies found matching filters.'}
+            size="sm"
+            background="none"
+            border="none"
+          />
         ) : (
-          <div className={styles['recommend-carousel-shell']}>
-            {showLeft && (
-              <IconButton
-                variant="carousel-arrow"
-                className={styles['is-left']}
-                onClick={() => scroll('left')}
-              >
-                <ChevronLeft size={24} />
-              </IconButton>
-            )}
-
-            {showRight && (
-              <IconButton
-                variant="carousel-arrow"
-                className={styles['is-right']}
-                onClick={() => scroll('right')}
-              >
-                <ChevronRight size={24} />
-              </IconButton>
-            )}
-
-            <div
-              ref={scrollRef}
-              className={`${styles['recommend-carousel-track']} no-scrollbar ${loading ? styles['is-loading'] : ''}`}
-              onScroll={updateArrows}
-            >
+            <ScrollRow ref={scrollRef}>
               {items.map((item) => {
                 const posterUrl = resolveMediaImageUrl(item.poster_path, 'poster');
                 const isWatchlisted = actualWatchlistIds.includes(item.id);
@@ -182,8 +144,7 @@ const TMDBDiscoveryWidget = () => {
                 return (
                   <PosterCard
                     key={item.id}
-                    className={styles['recommend-card']}
-                    imageWrapperClassName={styles['recommend-card-image-wrapper']}
+                    size="default"
                     imageUrl={posterUrl}
                     onClick={() => handleCardClick(item)}
                     title={item.title}
@@ -191,7 +152,6 @@ const TMDBDiscoveryWidget = () => {
                     ratingImdb={ratingImdb}
                     ratingTmdb={ratingTmdb}
                   >
-                    <div className={styles['recommend-card-overlay']}>
                       <Button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -216,15 +176,13 @@ const TMDBDiscoveryWidget = () => {
                           </>
                         )}
                       </Button>
-                    </div>
                   </PosterCard>
                 );
               })}
-            </div>
-          </div>
+            </ScrollRow>
         )}
       </WidgetShell>
-    </div>
+    </Stack>
   );
 };
 

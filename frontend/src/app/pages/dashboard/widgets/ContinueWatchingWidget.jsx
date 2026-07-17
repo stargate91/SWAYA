@@ -1,14 +1,14 @@
-import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Play, Minus, ChevronLeft, ChevronRight } from '@/ui/icons';
+import { Play, Minus } from '@/ui/icons';
 import PosterCard from '../../../ui/PosterCard';
 import { useContinueWatchingQuery } from '../../../queries';
 import { usePlayMediaMutation, useResetProgressMutation, useSettingsQuery } from '../../../queries';
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 import Tooltip from '../../../ui/Tooltip';
-import IconButton from '../../../ui/IconButton';
 import Skeleton from '../../../ui/Skeleton';
+import ScrollRow from '../../../ui/ScrollRow';
 import styles from './ContinueWatchingWidget.module.css';
 
 import { formatEpisodeCode } from '../../../lib/episodeFormat';
@@ -27,17 +27,6 @@ const ContinueWatchingWidget = () => {
   const playMutation = usePlayMediaMutation();
   const resetProgressMutation = useResetProgressMutation();
   const { data: settings = {} } = useSettingsQuery();
-  const scrollRef = useRef(null);
-  const [showLeft, setShowLeft] = useState(false);
-  const [showRight, setShowRight] = useState(false);
-
-  const updateArrows = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const { scrollLeft, scrollWidth, clientWidth } = el;
-    setShowLeft(scrollLeft > 10);
-    setShowRight(scrollLeft + clientWidth < scrollWidth - 10);
-  }, []);
 
   const [prevItems, setPrevItems] = useState(items);
   const [localItems, setLocalItems] = useState(items);
@@ -46,13 +35,6 @@ const ContinueWatchingWidget = () => {
     setPrevItems(items);
     setLocalItems(items);
   }
-
-
-  useEffect(() => {
-    updateArrows();
-    window.addEventListener('resize', updateArrows);
-    return () => window.removeEventListener('resize', updateArrows);
-  }, [localItems, updateArrows]);
 
   const [activePlayback, setActivePlayback] = useState(null);
 
@@ -120,13 +102,6 @@ const ContinueWatchingWidget = () => {
     };
   }, [queryClient]);
 
-  const scroll = (direction) => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const amount = el.clientWidth * 0.75;
-    el.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
-  };
-
   if (isLoading) {
     return (
       <div className={styles['continue-watching-widget']}>
@@ -155,33 +130,14 @@ const ContinueWatchingWidget = () => {
       <div className={styles['continue-watching-header']}>
         {T('dashboard.continue_watching.title') || 'Continue Watching'}
       </div>
-      <div className={styles['continue-watching-shell']}>
-        {showLeft && (
-          <IconButton
-            variant="carousel-arrow"
-            className={styles['is-left']}
-            onClick={() => scroll('left')}
-          >
-            <ChevronLeft size={24} />
-          </IconButton>
-        )}
-        {showRight && (
-          <IconButton
-            variant="carousel-arrow"
-            className={styles['is-right']}
-            onClick={() => scroll('right')}
-          >
-            <ChevronRight size={24} />
-          </IconButton>
-        )}
-        <div ref={scrollRef} onScroll={updateArrows} className={`${styles['continue-watching-row']} no-scrollbar`}>
+      <ScrollRow>
         {localItems.map((item) => {
           const isCurrentlyPlaying = activePlayback && String(activePlayback.itemId) === String(item.id);
           const currentResumePos = isCurrentlyPlaying ? activePlayback.currentTime : item.resume_position;
           const currentDuration = isCurrentlyPlaying
             ? (activePlayback.duration || item.duration || 1)
             : (item.duration || 1);
- 
+
           const progressPercent = Math.min(100, (currentResumePos / currentDuration) * 100);
           const isEpisode = item.type === 'episode';
           const episodeCode = isEpisode ? formatEpisodeCode(item.season_number, item.episode_number) : null;
@@ -194,10 +150,16 @@ const ContinueWatchingWidget = () => {
             <PosterCard
               key={`cw-${item.id}`}
               aspect="landscape"
-              className={`${styles['continue-watching-card']} ${item.is_active ? styles['continue-watching-card--active'] : ''}`}
+              variant="overlay-title"
+              disableHoverAnimation
+              title={item.title}
+              subtitle={T('dashboard.continue_watching.minutes_left', { minutes: minutesLeft }) || `${minutesLeft}m left`}
+              hoverSubtitle={episodeMeta}
+              className={`${styles['continue-watching-card']} ${(item.is_active && activePlayback) ? styles['continue-watching-card--active'] : ''}`}
               imageWrapperClassName={styles['continue-watching-card-image-wrapper']}
               imageClassName={styles['continue-watching-card-image']}
               imageUrl={resolvedImageUrl}
+              progressPercent={progressPercent}
               onClick={() => {
                 const preferredPlayer = settings.preferred_player || 'swaya';
                 if (item.is_active && preferredPlayer !== 'swaya') return;
@@ -212,14 +174,14 @@ const ContinueWatchingWidget = () => {
                   triggerClassName={styles['card-tooltip']}
                 >
                   <button
+                    type="button"
                     className={styles['continue-watching-remove']}
                     onClick={async (e) => {
                       e.stopPropagation();
                       resetProgressMutation.mutate(item.id);
                     }}
-                    aria-label={T('dashboard.continue_watching.remove') || 'Remove progress'}
                   >
-                    <Minus size={14} color="var(--color-text-primary)" />
+                    <Minus size={14} />
                   </button>
                 </Tooltip>
               }
@@ -233,34 +195,10 @@ const ContinueWatchingWidget = () => {
                   }
                 }
               }}
-            >
-              <div className={styles['continue-watching-overlay']} />
-              <div className={styles['continue-watching-progress-track']}>
-                <svg viewBox="0 0 100 4" preserveAspectRatio="none" className={styles['continue-watching-progress-svg']}>
-                  <rect x="0" y="0" width="100" height="4" className={styles['continue-watching-progress-bg']} />
-                  <rect x="0" y="0" width={progressPercent} height="4" className={styles['continue-watching-progress-fill']} />
-                </svg>
-              </div>
-              <div className={styles['continue-watching-copy']}>
-                <div className={styles['continue-watching-title']}>
-                  {item.title}
-                </div>
-                <div className={`${styles['continue-watching-meta']} ${episodeMeta ? styles['continue-watching-meta--has-episode'] : ''}`}>
-                  <span className={styles['continue-watching-meta-default']}>
-                    {T('dashboard.continue_watching.minutes_left', { minutes: minutesLeft }) || `${minutesLeft}m left`}
-                  </span>
-                  {episodeMeta ? (
-                    <span className={styles['continue-watching-meta-episode']}>
-                      {episodeMeta}
-                    </span>
-                  ) : null}
-                </div>
-              </div>
-            </PosterCard>
+            />
           );
         })}
-      </div>
-      </div>
+      </ScrollRow>
     </div>
   );
 };

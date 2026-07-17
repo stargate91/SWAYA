@@ -115,6 +115,16 @@
   backdrop-filter: none;
 }
 
+.card[data-drag-over="true"] {
+  background: var(--color-surface-hover);
+  border: 1px dashed var(--color-accent-blue);
+  box-shadow: 0 0 var(--space-md) color-mix(in srgb, var(--color-accent-blue) 15%, transparent);
+}
+
+.card[draggable="true"] {
+  cursor: grab;
+}
+
 .card[data-variant="soft"] a {
   color: var(--color-accent);
   text-decoration: underline;

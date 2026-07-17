@@ -17,6 +17,7 @@ export default function Tooltip({
       <RadixTooltip.Root>
         <RadixTooltip.Trigger asChild>
           <span
+            role="presentation"
             className={`${styles.tooltip} ${triggerClassName}`.trim()}
             onFocus={(e) => e.preventDefault()}
           >

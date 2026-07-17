@@ -6,6 +6,9 @@ import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 import Drawer from '@/ui/Drawer';
 import { useTranslation } from '../../../providers/LanguageContext';
 import Inline from '@/ui/Inline';
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
+import Card from '@/ui/Card';
 
 export default function DashboardCustomizerDrawer({
   isOpen,
@@ -15,7 +18,6 @@ export default function DashboardCustomizerDrawer({
   widgetOrder = [],
   handleOrderChange,
   showAdult,
-  styles = {},
   widgetRegistry = {},
 }) {
   const { t } = useTranslation();
@@ -62,15 +64,15 @@ export default function DashboardCustomizerDrawer({
       onClose={onClose}
       title={t('dashboard.customize') || 'Customize Dashboard'}
       size="sm"
-      className={styles['dashboard-customizer-drawer']}
       variant="glass"
+      padded={true}
     >
-      <div className={styles['dashboard-customizer-content']}>
-        <p className={styles['dashboard-customizer-desc']}>
+      <Stack gap="3xl">
+        <Text as="p" variant="small" color="muted">
           {t('dashboard.customize_desc') || 'Select which widgets you want to display on your dashboard.'}
-        </p>
+        </Text>
 
-        <div className={styles['dashboard-customizer-list']}>
+        <Stack gap="xl">
           {widgetOrder.map((key, index) => {
             const widgetConfig = widgetRegistry[key];
             if (!widgetConfig) return null;
@@ -97,22 +99,24 @@ export default function DashboardCustomizerDrawer({
 
             return (
                 // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-                <div
+                <Card
                   key={key}
+                  variant="soft"
+                  padding="md"
                   draggable
                   onDragStart={(e) => handleDragStart(e, index)}
                   onDragOver={(e) => handleDragOver(e, index)}
                   onDragLeave={handleDragLeave}
                   onDrop={(e) => handleDrop(e, index)}
                   onDragEnd={handleDragEnd}
-                  className={`${styles['dashboard-customizer-item']} ${isDragOver ? styles['is-drag-over'] : ''}`}
+                  data-drag-over={isDragOver}
                 >
-                  <Inline align="center" className={styles['dashboard-customizer-item-header']}>
-                    <Inline gap="md" align="center" className={styles['dashboard-customizer-item-left']}>
-                      <div className={styles['dashboard-customizer-grip']}>
+                  <Inline align="center" justify="between">
+                    <Inline gap="md" align="center">
+                      <Text color="muted">
                         <GripVertical size={16} />
-                      </div>
-                      <span className={styles['dashboard-customizer-item-label']}>{label}</span>
+                      </Text>
+                      <Text variant="body" weight="semibold">{label}</Text>
                     </Inline>
 
                     <Switch
@@ -120,11 +124,11 @@ export default function DashboardCustomizerDrawer({
                       onChange={() => toggleWidget(switchKey)}
                     />
                   </Inline>
-                </div>
+                </Card>
               );
             })}
-          </div>
-        </div>
+          </Stack>
+        </Stack>
     </Drawer>
   );
 }

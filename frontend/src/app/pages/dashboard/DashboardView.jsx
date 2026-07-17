@@ -15,8 +15,9 @@ import TvDiscoveryWidget from './widgets/TvDiscoveryWidget';
 import AdultRecommendationsWidget from './widgets/AdultRecommendationsWidget';
 import TMDBDiscoveryWidget from './widgets/TMDBDiscoveryWidget';
 import DashboardCustomizerDrawer from './widgets/DashboardCustomizerDrawer';
+import PageHeader from '@/ui/PageHeader';
+import Stack from '@/ui/Stack';
 import WidgetErrorBoundary from '../../../components/WidgetErrorBoundary';
-import styles from './DashboardView.module.css';
 
 const WIDGET_REGISTRY = {
   continue_watching: {
@@ -164,62 +165,64 @@ const DashboardView = () => {
 
   return (
     <>
-      <UtilityBarPortal>
-        <div className={styles['dashboard-utility-bar-wrapper']}>
-          <Tooltip
-            content={t('dashboard.customize') || 'Customize Dashboard'}
-            side="bottom"
-            triggerClassName={styles['dashboard-utility-bar-tooltip']}
+      <UtilityBarPortal align="right">
+        <Tooltip
+          content={t('dashboard.customize') || 'Customize Dashboard'}
+          side="bottom"
+        >
+          <IconButton
+            onClick={() => setIsCustomizerOpen(true)}
+            variant="glass"
+            size="md-btn"
+            title={null}
           >
-            <IconButton
-              onClick={() => setIsCustomizerOpen(true)}
-              className={styles['dashboard-customizer-btn']}
-              title={null}
-            >
-              <SlidersHorizontal size={18} />
-            </IconButton>
-          </Tooltip>
-        </div>
+            <SlidersHorizontal size={18} />
+          </IconButton>
+        </Tooltip>
       </UtilityBarPortal>
 
-      <div className={styles['dashboard-header']}>
-        <h1 className={styles['dashboard-header__title']}>{welcomeTitle}</h1>
-        <p className={styles['dashboard-header__subtitle']}>{t('dashboard.subtitle') || 'Here is an overview of your media library.'}</p>
-      </div>
+      <Stack gap="4xl">
+        <PageHeader
+          title={welcomeTitle}
+          description={t('dashboard.subtitle') || 'Here is an overview of your media library.'}
+        />
 
-      {widgetOrder.map((key) => {
-        const widgetConfig = WIDGET_REGISTRY[key];
-        if (!widgetConfig) return null;
+        <Stack gap="4xl">
+          {widgetOrder.map((key) => {
+            const widgetConfig = WIDGET_REGISTRY[key];
+            if (!widgetConfig) return null;
 
-        const lang = settings?.ui_language || settings?.primary_metadata_language;
+            const lang = settings?.ui_language || settings?.primary_metadata_language;
 
-        if (widgetConfig.show && !widgetConfig.show(settings, isNsfw)) {
-          return null;
-        }
+            if (widgetConfig.show && !widgetConfig.show(settings, isNsfw)) {
+              return null;
+            }
 
-        const titleKey = typeof widgetConfig.titleKey === 'function'
-          ? widgetConfig.titleKey(isNsfw)
-          : widgetConfig.titleKey;
+            const titleKey = typeof widgetConfig.titleKey === 'function'
+              ? widgetConfig.titleKey(isNsfw)
+              : widgetConfig.titleKey;
 
-        const fallbackTitle = typeof widgetConfig.fallbackTitle === 'function'
-          ? widgetConfig.fallbackTitle(isNsfw)
-          : widgetConfig.fallbackTitle;
+            const fallbackTitle = typeof widgetConfig.fallbackTitle === 'function'
+              ? widgetConfig.fallbackTitle(isNsfw)
+              : widgetConfig.fallbackTitle;
 
-        const title = t(titleKey) || fallbackTitle;
-        const WidgetComponent = widgetConfig.component;
-        const customProps = widgetConfig.getProps ? widgetConfig.getProps(settings, lang) : {};
+            const title = t(titleKey) || fallbackTitle;
+            const WidgetComponent = widgetConfig.component;
+            const customProps = widgetConfig.getProps ? widgetConfig.getProps(settings, lang) : {};
 
-        const widgetEl = visibleWidgets[key] && <WidgetComponent {...customProps} />;
+            const widgetEl = visibleWidgets[key] && <WidgetComponent {...customProps} />;
 
-        if (widgetEl) {
-          return (
-            <WidgetErrorBoundary key={key} name={key} title={title} t={t}>
-              {widgetEl}
-            </WidgetErrorBoundary>
-          );
-        }
-        return null;
-      })}
+            if (widgetEl) {
+              return (
+                <WidgetErrorBoundary key={key} name={key} title={title} t={t}>
+                  {widgetEl}
+                </WidgetErrorBoundary>
+              );
+            }
+            return null;
+          })}
+        </Stack>
+      </Stack>
 
       <DashboardCustomizerDrawer
         isOpen={isCustomizerOpen}
@@ -229,7 +232,6 @@ const DashboardView = () => {
         widgetOrder={widgetOrder}
         handleOrderChange={handleOrderChange}
         showAdult={showAdult}
-        styles={styles}
         widgetRegistry={WIDGET_REGISTRY}
       />
     </>

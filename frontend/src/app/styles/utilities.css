@@ -125,3 +125,25 @@
   border-top: 1px solid var(--color-border-default);
   margin: 0;
 }
+
+/* Width utilities */
+.u-w-genre {
+  width: calc(4 * var(--space-4xl)); /* 10rem */
+}
+
+.u-w-year {
+  width: 8.125rem;
+}
+
+/* Loading card utilities */
+.u-loading-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 9.375rem;
+  height: 14.0625rem;
+}
+
+.u-color-accent-soft {
+  color: var(--color-accent-blue-soft);
+}

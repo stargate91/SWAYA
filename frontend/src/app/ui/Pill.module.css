@@ -11,6 +11,22 @@
   font-family: var(--font-sans);
 }
 
+/* Size variants */
+.size-sm {
+  /* Default styles inherited from .pill */
+}
+
+.size-md {
+  font-size: var(--font-size-xs);
+  padding: calc(var(--space-xs) / 1.5) var(--space-md);
+}
+
+.size-lg {
+  font-size: var(--font-size-sm);
+  padding: calc(var(--space-xs) * 1.2) var(--space-md);
+  gap: var(--space-xs);
+}
+
 /* Status variants */
 .success {
   background: var(--color-state-success-bg);
@@ -74,8 +90,6 @@
   display: block;
   align-self: center;
   flex-shrink: 0;
-  position: relative;
-  top: -0.03125rem;
 }
 
 /* Favorite toggle variants */

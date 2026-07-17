@@ -15,17 +15,20 @@ const PosterCard = memo(function PosterCard({
   className = '',
   variant = 'default',
   aspect = 'poster', // 'poster', 'landscape', or 'mixed-landscape'
+  size,
   imageUrl,
   backgroundColor,
   icon: IconComponent,
   placeholderText,
   title,
   subtitle,
+  hoverSubtitle,
   userRating = 0,
   isFavorite = false,
   topRightAction,
   topLeftAction,
   isWatched = false,
+  progressPercent,
   overlay,
   playOverlay,
   ratingImdb,
@@ -132,6 +135,11 @@ const PosterCard = memo(function PosterCard({
     interactiveProps.onKeyDown = handleKeyDown;
   }
 
+  const widthStyle = size ? {
+    '--ui-poster-card-width': size === 'scene' ? '25.875rem' : (size === 'default' ? '12.5rem' : size),
+    '--ui-poster-card-min-width': size === 'scene' ? '25.875rem' : (size === 'default' ? '12.5rem' : size),
+  } : {};
+
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
@@ -144,7 +152,7 @@ const PosterCard = memo(function PosterCard({
       data-clickable={!!onClick || undefined}
       data-missing={isMissing || undefined}
       // eslint-disable-next-line react/forbid-dom-props
-      style={customStyle || style}
+      style={{ ...widthStyle, ...(customStyle || style) }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={disabled ? undefined : onClick}
@@ -225,11 +233,27 @@ const PosterCard = memo(function PosterCard({
             {isOverlayTitle && title ? (
               <div className={styles['title-overlay']}>
                 <div className={styles['title-overlay-gradient']} />
-                <Tooltip content={title} side="top" triggerClassName={styles['tooltip-trigger']}>
-                  <div className={styles['title-overlay-label']}>{title}</div>
-                </Tooltip>
+                <div className={styles['title-overlay-content']}>
+                  <Tooltip content={title} side="top" triggerClassName={styles['tooltip-trigger']}>
+                    <div className={styles['title-overlay-label']}>{title}</div>
+                  </Tooltip>
+                  {subtitle && (
+                    <div className={`${styles['title-overlay-subtitle']} ${hoverSubtitle ? styles['title-overlay-subtitle--has-hover'] : ''}`}>
+                      <span className={styles['title-overlay-subtitle-default']}>{subtitle}</span>
+                      {hoverSubtitle && (
+                        <span className={styles['title-overlay-subtitle-hover']}>{hoverSubtitle}</span>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             ) : null}
+            {progressPercent !== undefined && progressPercent !== null && (
+              <div className={styles['progress-track']}>
+                {/* eslint-disable-next-line react/forbid-dom-props */}
+                <div className={styles['progress-fill']} style={{ width: `${progressPercent}%` }} />
+              </div>
+            )}
             {children}
           </div>
         </DefaultComponent>
@@ -285,11 +309,13 @@ PosterCard.propTypes = {
   placeholderText: PropTypes.string,
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   subtitle: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  hoverSubtitle: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   userRating: PropTypes.number,
   isFavorite: PropTypes.bool,
   topRightAction: PropTypes.node,
   topLeftAction: PropTypes.node,
   isWatched: PropTypes.bool,
+  progressPercent: PropTypes.number,
   overlay: PropTypes.node,
   playOverlay: PropTypes.shape({
     onClick: PropTypes.func.isRequired,
@@ -322,6 +348,7 @@ PosterCard.propTypes = {
   previewEnabled: PropTypes.bool,
   previewDelay: PropTypes.number,
   isMissing: PropTypes.bool,
+  size: PropTypes.string,
 };
 
 export default PosterCard;

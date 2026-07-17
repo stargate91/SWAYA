@@ -201,14 +201,18 @@ div.image-wrapper:focus-visible {
   transition: opacity var(--motion-fast), transform var(--motion-fast);
 }
 
-.media-shell:hover .user-rating-badge,
-.media-shell:focus-within .user-rating-badge,
 .media-shell:hover .watched-badge,
 .media-shell:focus-within .watched-badge,
 .media-shell:hover .favorite-badge,
 .media-shell:focus-within .favorite-badge {
   opacity: 0;
   transform: translateY(calc(-1 * var(--space-xs)));
+  pointer-events: none;
+}
+
+.media-shell:hover .user-rating-badge,
+.media-shell:focus-within .user-rating-badge {
+  opacity: 0;
   pointer-events: none;
 }
 
@@ -389,6 +393,56 @@ div.image-wrapper:focus-visible {
   -webkit-line-clamp: 2;
   overflow: hidden;
   pointer-events: auto;
+}
+
+.title-overlay-content {
+  position: absolute;
+  left: var(--space-md);
+  right: var(--space-md);
+  bottom: var(--space-md);
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.title-overlay-content .title-overlay-label {
+  position: static;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  margin-bottom: 0;
+}
+
+.title-overlay-subtitle {
+  position: relative;
+  min-height: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  text-shadow: 0 var(--radius-2xs) var(--space-md) color-mix(in srgb, var(--color-bg-canvas) 40%, transparent);
+}
+
+.title-overlay-subtitle-default,
+.title-overlay-subtitle-hover {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: opacity var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.title-overlay-subtitle-hover {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.card:hover .title-overlay-subtitle-hover {
+  opacity: 1;
+}
+
+.card:hover .title-overlay-subtitle--has-hover .title-overlay-subtitle-default {
+  opacity: 0;
 }
 
 .details {
@@ -608,4 +662,20 @@ button.image-wrapper:hover:not(:disabled) {
 
 .card[data-clickable="true"]:hover:not(:has(a:hover)):not(:has(button:not(.image-wrapper):hover)) .title {
   color: var(--color-accent-blue-soft);
+}
+
+.progress-track {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--space-xs);
+  background: color-mix(in srgb, var(--color-text-primary) 20%, transparent);
+  z-index: var(--z-index-step-3);
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--color-accent-blue-soft);
+  filter: drop-shadow(0 0 var(--space-md) color-mix(in srgb, var(--color-accent-blue-soft) 80%, transparent));
 }
