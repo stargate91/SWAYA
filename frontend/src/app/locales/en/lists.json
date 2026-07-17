@@ -21,6 +21,7 @@
   "add_titles_title": "Add Titles to List",
   "add_people_title": "Add Artists to List",
   "item_added_success": "Item added successfully!",
+  "item_already_exists": "Item is already on this list",
   "name_label": "Name",
   "description_label": "Description",
   "theme_color_label": "Theme Color",

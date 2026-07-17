@@ -32,8 +32,8 @@ import UtilityBarBottomPortal from '../../../components/UtilityBarBottomPortal';
 // Panels
 import BespokeSeasonsSection from './components/detail/sections/BespokeSeasonsSection';
 import TechnicalPanel from './components/detail/panels/TechnicalPanel';
-import BespokeSceneTagger from './components/detail/scene/BespokeSceneTagger';
-import BespokeScenePeaks from './components/detail/scene/BespokeScenePeaks';
+import BespokeSceneTagger from './components/detail/sections/BespokeSceneTagger';
+import BespokeScenePeaks from './components/detail/sections/BespokeScenePeaks';
 import BespokeListPanel from './components/detail/sections/BespokeListPanel';
 import './components/entityDetail/EntityDetailHeroSectionShared.css';
 

@@ -7,7 +7,10 @@ import Tooltip from '@/ui/Tooltip';
 import ScrollRow from '@/ui/ScrollRow';
 import Card from '@/ui/Card';
 import SegmentedControl from '@/ui/SegmentedControl';
-import './BespokeCastSection.css';
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
+import Inline from '@/ui/Inline';
+import styles from './BespokeCastSection.module.css';
 
 export default function BespokeCastSection({ item, t, navigate }) {
   const settings = useMediaDetailContext()?.state?.settings;
@@ -100,95 +103,110 @@ export default function BespokeCastSection({ item, t, navigate }) {
   if (activeTab === 'cast' && allPeople.length === 0) return null;
 
   return (
-    <div className="bespoke-cast-section">
-      <Card variant="glass-shaded" padding="none" className="bespoke-cast-browser-card">
-        <div className="bespoke-browser-card__pills-header">
-          {showTabs ? (
-            <SegmentedControl
-              variant="filter"
-              size="xs"
-              options={[
-                { value: 'cast', label: t('library.details.cast') || 'Cast & Crew' },
-                showCompanies && { value: 'companies', label: t('library.details.productionCompanies') || 'Production Companies' },
-                showNetworks && { value: 'networks', label: t('library.details.platformsNetworks') || 'Networks' }
-              ].filter(Boolean)}
-              value={activeTab}
-              onChange={setActiveTab}
-            />
-          ) : (
-            <span className="bespoke-cast-title">
-              {t('library.details.cast') || 'Cast & Crew'}
-            </span>
-          )}
-        </div>
-        <div className="bespoke-cast-browser-card__body">
-          <ScrollRow
-            className={activeTab === 'cast' ? "dashboard-cast-grid no-scrollbar" : "bespoke-companies-body no-scrollbar"}
-            showArrows={true}
-          >
-            {activeTab === 'cast' && allPeople.map(person => (
-              <div
-                key={person.id}
-                className={`dashboard-cast-card ${person.isFilteredOut ? 'dashboard-cast-card--filtered' : ''}`}
-                onClick={person.isFilteredOut ? undefined : () => navigate(`/library/people/${person.id}`, { state: { allowAdult: true } })}
-              >
-                <div className={`dashboard-cast-card__avatar-wrapper ${person.isFilteredOut ? 'dashboard-cast-card__avatar-wrapper--filtered' : ''}`}>
-                  {person.profile_path && !person.isFilteredOut ? (
-                    <img
-                      src={resolvePersonAvatarUrl(person.profile_path)}
-                      alt={person.name}
-                      className="dashboard-cast-card__avatar"
-                    />
-                  ) : (
-                    <div className="dashboard-cast-card__avatar-fallback">
-                      <User size={24} />
-                    </div>
+    <Card variant="glass-shaded" padding="none">
+      <Inline
+        justify="between"
+        align="center"
+        className={styles.header}
+      >
+        {showTabs ? (
+          <SegmentedControl
+            variant="filter"
+            size="xs"
+            options={[
+              { value: 'cast', label: t('library.details.cast') || 'Cast & Crew' },
+              showCompanies && { value: 'companies', label: t('library.details.productionCompanies') || 'Production Companies' },
+              showNetworks && { value: 'networks', label: t('library.details.platformsNetworks') || 'Networks' }
+            ].filter(Boolean)}
+            value={activeTab}
+            onChange={setActiveTab}
+          />
+        ) : (
+          <Text variant="caption" uppercase weight="bold" color="muted" className={styles.title}>
+            {t('library.details.cast') || 'Cast & Crew'}
+          </Text>
+        )}
+      </Inline>
+
+      <div className={styles.body}>
+        <ScrollRow showArrows={true}>
+          <Inline gap="md" wrap={false} className={styles['scroll-container']}>
+            {activeTab === 'cast' && allPeople.map(person => {
+              const opacity = person.isFilteredOut ? 0.35 : 1;
+              return (
+                <Stack
+                  key={person.id}
+                  align="center"
+                  gap="xs"
+                  onClick={person.isFilteredOut ? undefined : () => navigate(`/library/people/${person.id}`, { state: { allowAdult: true } })}
+                  className={styles.card}
+                  // eslint-disable-next-line react/forbid-component-props
+                  style={{ opacity, cursor: person.isFilteredOut ? 'default' : 'pointer' }}
+                >
+                  <div className={styles['avatar-wrapper']}>
+                    {person.profile_path && !person.isFilteredOut ? (
+                      <img
+                        src={resolvePersonAvatarUrl(person.profile_path)}
+                        alt={person.name}
+                        className={styles.avatar}
+                      />
+                    ) : (
+                      <div className={styles['avatar-fallback']}>
+                        <User size={24} />
+                      </div>
+                    )}
+                  </div>
+                  <Text variant="body" weight="bold" className={styles.name}>
+                    {person.name}
+                    {person.age_at_release != null && ` (${person.age_at_release})`}
+                  </Text>
+                  {person.displayRole && (
+                    <Text variant="xs" color="muted" className={styles.role}>
+                      {person.displayRole}
+                    </Text>
                   )}
-                </div>
-                <span className="dashboard-cast-card__name">
-                  {person.name}
-                  {person.age_at_release != null && ` (${person.age_at_release})`}
-                </span>
-                {person.displayRole && (
-                  <span className="dashboard-cast-card__role">{person.displayRole}</span>
-                )}
-              </div>
-            ))}
+                </Stack>
+              );
+            })}
 
             {activeTab === 'companies' && item.companies.map((c, i) => (
-              <div key={i} className="bespoke-company-item">
+              <div key={i} className={styles['company-card']}>
                 <Tooltip content={c.name} side="top">
                   {c.logo_path ? (
                     <img
                       src={resolveCompanyLogoUrl(c.logo_path)}
                       alt={c.name}
-                      className="bespoke-company-logo"
+                      className={styles['company-logo']}
                     />
                   ) : (
-                    <span className="bespoke-company-name-only">{c.name}</span>
+                    <Text variant="small" weight="bold" color="secondary" className={styles['company-text']}>
+                      {c.name}
+                    </Text>
                   )}
                 </Tooltip>
               </div>
             ))}
 
             {activeTab === 'networks' && item.networks.map((n, i) => (
-              <div key={i} className="bespoke-company-item">
+              <div key={i} className={styles['company-card']}>
                 <Tooltip content={n.name} side="top">
                   {n.logo_path ? (
                     <img
                       src={resolveCompanyLogoUrl(n.logo_path)}
                       alt={n.name}
-                      className="bespoke-company-logo"
+                      className={styles['company-logo']}
                     />
                   ) : (
-                    <span className="bespoke-company-name-only">{n.name}</span>
+                    <Text variant="small" weight="bold" color="secondary" className={styles['company-text']}>
+                      {n.name}
+                    </Text>
                   )}
                 </Tooltip>
               </div>
             ))}
-          </ScrollRow>
-        </div>
-      </Card>
-    </div>
+          </Inline>
+        </ScrollRow>
+      </div>
+    </Card>
   );
 }

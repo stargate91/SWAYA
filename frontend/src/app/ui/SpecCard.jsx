@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import styles from './SpecCard.module.css';
 import Tooltip from './Tooltip';
 
-export default function SpecCard({ label, value, tall = false, span, status, className = '', children, ...props }) {
-  if (!children && (value === undefined || value === null || value === '')) return null;
+export default function SpecCard({ label, value, tall = false, span, status, className = '', ...props }) {
+  if (value === undefined || value === null || value === '') return null;
 
   const classes = [
     styles.card,
@@ -11,15 +11,6 @@ export default function SpecCard({ label, value, tall = false, span, status, cla
     span && styles[`card--span-${span}`],
     className
   ].filter(Boolean).join(' ');
-
-  if (children) {
-    return (
-      <div className={classes} {...props}>
-        <span className={styles.label}>{label}</span>
-        {children}
-      </div>
-    );
-  }
 
   const valueClasses = [
     styles.value,
@@ -42,7 +33,5 @@ SpecCard.propTypes = {
   tall: PropTypes.bool,
   span: PropTypes.oneOf([1, 2, 3, 4]),
   status: PropTypes.oneOf(['success', 'danger']),
-  className: PropTypes.string,
-  children: PropTypes.node
+  className: PropTypes.string
 };
-
