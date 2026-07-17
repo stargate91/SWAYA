@@ -178,9 +178,21 @@
   width: 100%;
 }
 
-.library-filters-row {
-  justify-content: space-between;
+.library-filters-row.library-filters-row {
+  height: auto;
+  min-height: var(--layout-window-titlebar-height);
+  padding-top: var(--space-xs);
+  padding-bottom: var(--space-xs);
+  align-items: center;
   background: color-mix(in srgb, var(--color-line) 10%, transparent);
+}
+
+.library-filters-row .library-filters-left {
+  flex: 1 1 auto;
+}
+
+.library-filters-row .library-filters-right {
+  flex: 0 0 auto;
 }
 
 .library-filters-row.library-filters-advanced-row {

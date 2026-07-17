@@ -101,10 +101,10 @@ export function formatMediaSubtitle(item, sortKey, t, defaultSubtitle = '') {
     return date || defaultSubtitle;
   }
   if (sortKey === 'year') {
-    return item.year ? `${t('library.sort.year') || 'Year'}: ${item.year}` : defaultSubtitle;
+    return item.year ? String(item.year) : defaultSubtitle;
   }
   if (sortKey === 'rating_imdb') {
-    return item.rating_imdb ? `IMDb: ${Number(item.rating_imdb).toFixed(1)}` : defaultSubtitle;
+    return defaultSubtitle;
   }
   if (sortKey === 'rating') {
     return defaultSubtitle;

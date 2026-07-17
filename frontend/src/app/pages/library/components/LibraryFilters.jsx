@@ -281,16 +281,6 @@ export default function LibraryFilters({
               setCurrentPage={setCurrentPage}
             />
           )}
-          {isPeople && (
-            <AttributeFilterDropdown
-              label={t('library.filter.eyeColorLabel') || 'Eye Color:'}
-              value={eyeColorFilter}
-              onChange={setEyeColorFilter}
-              items={filterData?.eye_colors}
-              allLabel={t('library.filter.allEyeColors') || 'All'}
-              setCurrentPage={setCurrentPage}
-            />
-          )}
           {isVideoTab && (
             <Dropdown
               layout="inline"
@@ -499,6 +489,8 @@ export default function LibraryFilters({
           setTattoosFilter={setTattoosFilter}
           piercingsFilter={piercingsFilter}
           setPiercingsFilter={setPiercingsFilter}
+          eyeColorFilter={eyeColorFilter}
+          setEyeColorFilter={setEyeColorFilter}
           filterData={filterData}
           setCurrentPage={setCurrentPage}
           activeSessionMode={activeSessionMode}

@@ -419,7 +419,7 @@ function ExpandedTagPanel({ tag, t, emptyIcon, isFocusMode = false, activeSessio
           </div>
         </div>
       ) : null}
-      <Grid variant="poster">
+      <Grid variant="mixed">
         {paginatedItems.map((item) => (
           <LibraryPosterCard
             key={item.id}

@@ -58,7 +58,8 @@ export const RecommendationCarousel = ({
             sessionMode,
             isAdultContext: isAdultCarousel,
           });
-          const isWatchlisted = watchlistIds.includes(item.id);
+          const watchlistId = n.isScene ? item.id : (item.tmdb_id || item.tv_tmdb_id || item.id);
+          const isWatchlisted = watchlistIds.includes(watchlistId);
           const rawPosterUrl = n.isPerson
             ? resolveMediaImageUrl(item.profile_path || item.local_profile_path, 'personThumb')
             : resolveMediaImageUrl(n.isScene ? (item.backdrop_path || item.poster_path) : item.poster_path, n.isScene ? 'backdrop' : 'poster');

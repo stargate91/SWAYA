@@ -303,26 +303,54 @@ class OverridePersister:
                     if match and match.media_type == MediaType.TV:
                         is_tv = True
 
-                # Skip changing status if the item has a real play-button playback history and we're marking as watched
-                if not is_tv and is_watched and resolved_media_item_id in has_playback_log:
-                    continue
-
                 if is_watched:
-                    if override.is_watched and not is_tv:
-                        continue
+                    if override.is_watched and (override.resume_position or 0) == 0 and not is_tv:
+                        if not physical_override or (physical_override.is_watched and (physical_override.resume_position or 0) == 0):
+                            continue
                     override.is_watched = True
                     override.watch_count = max(override.watch_count or 0, 1)
                     if watched_at:
                         override.last_watched_at = parsed_date
+                    else:
+                        from datetime import datetime, timezone
+                        override.last_watched_at = datetime.now(timezone.utc)
                     override.is_tracked = True
+                    override.resume_position = 0
                     
                     if physical_override:
                         physical_override.is_watched = True
                         physical_override.watch_count = max(physical_override.watch_count or 0, 1)
                         if watched_at:
                             physical_override.last_watched_at = parsed_date
+                        else:
+                            from datetime import datetime, timezone
+                            physical_override.last_watched_at = datetime.now(timezone.utc)
                         physical_override.is_tracked = True
                         physical_override.resume_position = 0
+
+                    if not is_tv and resolved_media_item_id:
+                        from app.domains.history.models import PlaybackLog
+                        from app.domains.library.models import MediaItem
+                        from datetime import datetime, timezone
+                        item = db.query(MediaItem).filter(MediaItem.id == resolved_media_item_id).first()
+                        duration = item.duration if (item and item.duration) else 0
+                        has_completed = False
+                        logs = db.query(PlaybackLog).filter(PlaybackLog.media_item_id == resolved_media_item_id).all()
+                        for log in logs:
+                            if duration > 0 and log.position_seconds / duration >= 0.90:
+                                has_completed = True
+                                break
+                            elif duration == 0 and log.position_seconds > 0:
+                                has_completed = True
+                                break
+                        if not has_completed:
+                            new_log = PlaybackLog(
+                                media_item_id=resolved_media_item_id,
+                                user_id=override.user_id,
+                                watched_at=datetime.now(timezone.utc),
+                                position_seconds=duration if duration > 0 else 1
+                            )
+                            db.add(new_log)
                     
                     if is_tv and match:
                         from sqlalchemy import or_

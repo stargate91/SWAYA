@@ -81,16 +81,11 @@ export const LibraryPosterCard = memo(({
       </button>
     );
     imageUrl = n.imageUrl;
-    
-    if (isScene) {
-      performers = n.performers;
-      const displayDate = item.release_date ? item.release_date.substring(0, 10) : item.year;
-      ratingPill = displayDate ? (
-        <span className="library-scene-date">{displayDate}</span>
-      ) : undefined;
-    } else {
-      subtitle = n.subtitle;
-    }
+    performers = undefined;
+    ratingPill = undefined;
+    subtitle = undefined;
+    ratingImdb = undefined;
+    ratingTmdb = undefined;
   } else {
     // Standard library card behavior
     const handleEditClick = (e) => {
@@ -255,7 +250,8 @@ export const LibraryPosterCard = memo(({
 
   return (
     <PosterCard
-      aspect={isScene ? 'landscape' : 'poster'}
+      aspect={isScene ? (onRemove ? 'mixed-landscape' : 'landscape') : 'poster'}
+      fillHeight={Boolean(onRemove)}
       customStyle={{ '--item-index': index }}
       onClick={() => onItemClick(item)}
       isWatched={item.is_watched}
@@ -275,7 +271,6 @@ export const LibraryPosterCard = memo(({
       isFavorite={Boolean(item.is_favorite)}
       playOverlay={playOverlay}
       className={className}
-      isMissing={item.in_library === false}
       previewItemId={previewItemId}
       previewEnabled={onRemove ? false : Boolean(settings?.hover_previews_enabled ?? true)}
       previewDelay={onRemove ? 800 : Number(settings?.hover_previews_delay ?? 800)}

@@ -136,7 +136,8 @@ const TMDBDiscoveryWidget = () => {
             <ScrollRow ref={scrollRef}>
               {items.map((item) => {
                 const posterUrl = resolveMediaImageUrl(item.poster_path, 'poster');
-                const isWatchlisted = actualWatchlistIds.includes(item.id);
+                const watchlistId = item.tmdb_id || item.tv_tmdb_id || item.id;
+                const isWatchlisted = actualWatchlistIds.includes(watchlistId);
                 const ratingImdb = item.rating_imdb;
                 const ratingTmdb = item.rating_tmdb || item.vote_average;
                 const yearLabel = item.release_date ? new Date(item.release_date).getFullYear() : null;

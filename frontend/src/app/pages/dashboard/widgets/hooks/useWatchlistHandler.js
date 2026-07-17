@@ -14,16 +14,20 @@ export const useWatchlistHandler = (watchlistIdsFromQuery, addToWatchlistMutatio
   }, [optimisticWatchlistIds, watchlistIdsFromQuery]);
 
   const handleWatchlist = useCallback((item, type) => {
-    const id = item.id;
-    const isWatchlisted = actualWatchlistIds.includes(id);
+    const isScene = type === 'scene';
+    const tmdbId = isScene ? undefined : (item.tmdb_id || item.tv_tmdb_id || item.id);
+    const mediaItemId = (isScene || item.tmdb_id || item.tv_tmdb_id) ? item.id : undefined;
+    const watchlistId = isScene ? item.id : tmdbId;
+
+    const isWatchlisted = actualWatchlistIds.includes(watchlistId);
     if (isWatchlisted) {
-      setOptimisticWatchlistIds((prev) => (prev || watchlistIdsFromQuery || []).filter((i) => i !== id));
-      removeFromWatchlistMutation.mutate(id);
+      setOptimisticWatchlistIds((prev) => (prev || watchlistIdsFromQuery || []).filter((i) => i !== watchlistId));
+      removeFromWatchlistMutation.mutate(watchlistId);
     } else {
-      setOptimisticWatchlistIds((prev) => [...(prev || watchlistIdsFromQuery || []), id]);
+      setOptimisticWatchlistIds((prev) => [...(prev || watchlistIdsFromQuery || []), watchlistId]);
       addToWatchlistMutation.mutate({
-        tmdbId: item.in_library ? undefined : id,
-        mediaItemId: item.in_library ? id : undefined,
+        tmdbId,
+        mediaItemId,
         type
       });
     }

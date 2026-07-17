@@ -1,5 +1,6 @@
 import AttributeFilterDropdown from './AttributeFilterDropdown';
 import PanelHeader from '@/ui/PanelHeader';
+import Inline from '@/ui/Inline';
 
 export default function LibraryAdvancedFilters({
   t,
@@ -15,6 +16,8 @@ export default function LibraryAdvancedFilters({
   setTattoosFilter,
   piercingsFilter,
   setPiercingsFilter,
+  eyeColorFilter,
+  setEyeColorFilter,
   filterData,
   setCurrentPage,
   settings
@@ -60,7 +63,7 @@ export default function LibraryAdvancedFilters({
 
   return (
     <PanelHeader.Row className="library-filters-row library-filters-advanced-row">
-      <div className="library-filters-left">
+      <Inline gap="2xl" align="center" className="library-filters-left">
 
         {settings?.include_adult && (
           <AttributeFilterDropdown
@@ -122,7 +125,16 @@ export default function LibraryAdvancedFilters({
           allLabel={t('library.filter.allPiercings') || 'All Options'}
           setCurrentPage={setCurrentPage}
         />
-      </div>
+
+        <AttributeFilterDropdown
+          label={t('library.filter.eyeColorLabel') || 'Eye Color:'}
+          value={eyeColorFilter}
+          onChange={setEyeColorFilter}
+          items={filterData?.eye_colors}
+          allLabel={t('library.filter.allEyeColors') || 'All'}
+          setCurrentPage={setCurrentPage}
+        />
+      </Inline>
     </PanelHeader.Row>
   );
 }
