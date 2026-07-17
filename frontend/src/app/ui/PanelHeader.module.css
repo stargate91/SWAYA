@@ -32,6 +32,27 @@
   background: color-mix(in srgb, var(--color-line) 25%, transparent);
 }
 
+.panel-header__row--filters {
+  height: auto;
+  min-height: var(--layout-window-titlebar-height);
+  padding-top: var(--space-xs);
+  padding-bottom: var(--space-xs);
+  background: color-mix(in srgb, var(--color-line) 10%, transparent);
+}
+
+.panel-header__row--filters > *:last-child {
+  flex: 0 0 auto;
+}
+
+.panel-header__row--advanced-filters {
+  height: auto;
+  min-height: var(--layout-window-titlebar-height);
+  padding-top: var(--space-xs);
+  padding-bottom: var(--space-xs);
+  border-top: 0;
+  background: color-mix(in srgb, var(--color-line) 5%, transparent);
+}
+
 .panel-header__title {
   font-family: var(--font-display);
   font-size: var(--font-size-sm);

@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import TMDBImageGrid from './entityDetail/TMDBImageGrid';
 import SegmentedControl from '@/ui/SegmentedControl';
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
+import Grid from '@/ui/Grid';
+import Inline from '@/ui/Inline';
 import useImagePicker from '../hooks/useImagePicker';
 import ImageUploadPanel from '@/ui/ImageUploadPanel';
 import ImageOptionCard from './entityDetail/ImageOptionCard';
 import { resolveMediaImageUrl, pathsMatch } from '@/lib/imageUrls';
 import PersonBackdropPickerModal from './entityDetail/PersonBackdropPickerModal';
-import './UniversalImagePicker.css';
 
 
 export default function UniversalImagePicker({
@@ -80,7 +83,7 @@ export default function UniversalImagePicker({
   const imageLookupId = entityType === 'tv' && tmdbId ? tmdbId : entityId;
 
   return (
-    <div className="universal-image-picker">
+    <Stack gap="md" fullWidth className="universal-image-picker">
       <ImageUploadPanel
         imageType={imageType}
         isPending={isPending}
@@ -90,9 +93,11 @@ export default function UniversalImagePicker({
       />
 
       {isScene && imageType === 'logo' && (
-        <div className="scene-image-picker-options scene-image-picker-options--logo">
-          <h4 className="scene-image-picker-title">{t('library.details.availableLogos') || 'Available Logos'}</h4>
-          <div className="scene-image-picker-grid">
+        <Stack gap="md" fullWidth className="scene-image-picker-options scene-image-picker-options--logo">
+          <Text as="h4" variant="body" weight="semibold">
+            {t('library.details.availableLogos') || 'Available Logos'}
+          </Text>
+          <Grid variant="picker">
             {(() => {
               const logoOptions = [];
               const seenLogos = new Set();
@@ -133,21 +138,22 @@ export default function UniversalImagePicker({
                   isSelected={pathsMatch(selectedPath || currentPath, opt.path)}
                   onClick={() => handleSelectTmdbImage(opt.path)}
                   aspect="square"
+                  variant="picker-logo"
                 />
               ));
             })()}
-          </div>
-        </div>
+          </Grid>
+        </Stack>
       )}
 
       {isScene && (imageType === 'poster' || imageType === 'backdrop') && (
-        <div className="scene-image-picker-options">
-          <h4 className="scene-image-picker-title">
+        <Stack gap="md" fullWidth className="scene-image-picker-options">
+          <Text as="h4" variant="body" weight="semibold">
             {imageType === 'poster'
               ? (t('library.details.availablePosters') || 'Available Posters')
               : (t('library.details.availableBackdrops') || 'Available Backdrops')}
-          </h4>
-          <div className="scene-image-picker-grid">
+          </Text>
+          <Grid variant="picker">
             {(() => {
               const options = [];
               if (item?.original_backdrop_path) {
@@ -170,19 +176,18 @@ export default function UniversalImagePicker({
                 />
               ));
             })()}
-          </div>
-        </div>
+          </Grid>
+        </Stack>
       )}
 
       {sources.length > 1 && (
-        <div className="universal-image-picker__source-filter">
+        <Inline align="center" justify="center" data-divider="bottom" fullWidth>
           <SegmentedControl
-            className="universal-image-picker__segmented-control"
             value={imageSource}
             onChange={(val) => setImageSource(val)}
             options={sources}
           />
-        </div>
+        </Inline>
       )}
 
       {!isScene && (
@@ -199,6 +204,6 @@ export default function UniversalImagePicker({
           />
         </div>
       )}
-    </div>
+    </Stack>
   );
 }

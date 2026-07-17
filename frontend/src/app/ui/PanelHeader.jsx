@@ -11,13 +11,21 @@ import Inline from '@/ui/Inline';
  * PanelHeader provides a unified, consistent header panel layout
  * with support for title, adult badge, action buttons, tabs, search, and custom extra rows.
  */
-export function PanelHeaderRow({ children, className = '' }) {
-  return <div className={`${styles['panel-header__row']} ${className}`.trim()}>{children}</div>;
+export function PanelHeaderRow({ children, variant, className = '' }) {
+  const classes = [
+    styles['panel-header__row'],
+    variant === 'filters' && styles['panel-header__row--filters'],
+    variant === 'advanced-filters' && styles['panel-header__row--advanced-filters'],
+    className
+  ].filter(Boolean).join(' ');
+
+  return <div className={classes}>{children}</div>;
 }
 
 PanelHeaderRow.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
+  variant: PropTypes.oneOf(['filters', 'advanced-filters']),
 };
 
 export default function PanelHeader({

@@ -1,15 +1,18 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import './entityDetail/EntityDetailHeroSection.css';
-import './LibraryTagsTab.css';
-import './LibraryTagExpandedPanel.css';
 import { usePlayMediaMutation, useSettingsQuery } from '@/queries';
+import './entityDetail/EntityDetailHeroSection.css';
 import api from '@/lib/api';
 import { QK } from '@/lib/queryKeys';
 import EmptyState from '@/ui/EmptyState';
 import Button from '@/ui/Button';
 import IconButton from '@/ui/IconButton';
+import Stack from '@/ui/Stack';
+import Inline from '@/ui/Inline';
+import Text from '@/ui/Text';
+import Card from '@/ui/Card';
+import cardStyles from '@/ui/Card.module.css';
 
 import Grid from '@/ui/Grid';
 import {
@@ -180,12 +183,12 @@ export default function LibraryGrid({
       {focusedTag || paginatedItems.length > 0 ? (
         isTags ? (
           focusedTag ? (
-            <div className="library-tag-focus-view">
-              <div className="library-tag-focus-view__toolbar">
-                <Button variant="secondary-neutral" leftIcon={<ArrowLeft size={14} />} animateIcon className="library-tag-focus-view__back" onClick={onExitTagFocus}>
+            <Stack gap="lg" fullWidth>
+              <Inline align="center" justify="start">
+                <Button variant="secondary-neutral" leftIcon={<ArrowLeft size={14} />} animateIcon onClick={onExitTagFocus}>
                   {t('library.tags.backToTags') || 'Back to Tags'}
                 </Button>
-              </div>
+              </Inline>
               <ExpandedTagPanel
                 key={focusedTag.name}
                 tag={focusedTag}
@@ -195,9 +198,9 @@ export default function LibraryGrid({
                 isFocusMode
                 activeSessionMode={activeSessionMode}
               />
-            </div>
+            </Stack>
           ) : (
-            <div className="library-tags-grid">
+            <Grid variant="tags">
               {paginatedItems.map((item, index) => {
                 const samplePreviews = Array.isArray(item.sample_previews) ? item.sample_previews.slice(0, 3) : [];
                 const previewCount = samplePreviews.length;
@@ -217,28 +220,31 @@ export default function LibraryGrid({
                 return (
                   <div
                     key={item.name}
-                    role="button"
-                    tabIndex={0}
-                    className={`library-tag-card ${previewCount > 0 ? `library-tag-card--preview-${Math.min(previewCount, 3)}` : ''}`.trim()}
-                    onClick={() => onFocusTag?.(item.name)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        onFocusTag?.(item.name);
-                      }
-                    }}
                     /* eslint-disable-next-line react/forbid-dom-props */
                     style={{
                       '--tag-color': item.color || 'var(--color-accent)',
                       '--item-index': index,
                     }}
                   >
+                    <Card
+                      variant="tag"
+                      role="button"
+                      tabIndex={0}
+                      data-preview={previewCount}
+                      onClick={() => onFocusTag?.(item.name)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          onFocusTag?.(item.name);
+                        }
+                      }}
+                    >
                     {(previewCount > 1 || singlePreviewImage) ? (
-                      <div className="library-tag-card__preview" aria-hidden="true">
+                      <div className={cardStyles['tag-preview']} aria-hidden="true">
                         {samplePreviews.map((preview, index) => (
                           <div
                             key={`${item.name}-preview-${index}`}
-                            className="library-tag-card__preview-image"
+                            className={cardStyles['tag-preview-image']}
                             /* eslint-disable-next-line react/forbid-dom-props */
                             style={{
                               backgroundImage: `url(${
@@ -255,7 +261,7 @@ export default function LibraryGrid({
                         ))}
                       </div>
                     ) : null}
-                    <div className="library-tag-card__actions">
+                    <div className={cardStyles['tag-actions']}>
                       <IconButton
                         type="button"
                         size="xs"
@@ -281,16 +287,19 @@ export default function LibraryGrid({
                         <Trash2 size={12} />
                       </IconButton>
                     </div>
-                    <div className="library-tag-card__content">
-                      <span className="library-tag-card__name">{item.name}</span>
-                      <span className="library-tag-card__count">
+                    <Stack gap="2xs" className={cardStyles['tag-content']}>
+                      <Text truncate weight="bold" variant="small">
+                        {item.name}
+                      </Text>
+                      <Text color="secondary" className={cardStyles['tag-count']}>
                         {t('library.tags.itemsCount', { count: item.total_count })}
-                      </span>
-                    </div>
-                  </div>
+                      </Text>
+                    </Stack>
+                  </Card>
+                </div>
                 );
               })}
-            </div>
+            </Grid>
           )
         ) : (
           <Grid variant={isLibraryScenesTab(resolvedTab) ? 'scene' : 'poster'}>
@@ -381,18 +390,20 @@ function ExpandedTagPanel({ tag, t, emptyIcon, isFocusMode = false, activeSessio
   if (allItems.length === 0) {
     return (
       <div
-        className={`library-tag-expanded-panel ${isFocusMode ? 'is-focus-mode' : ''}`.trim()}
         /* eslint-disable-next-line react/forbid-dom-props */
         style={{ '--tag-color': tag.color || 'var(--color-accent)' }}
       >
+        <Card
+          variant={isFocusMode ? 'focus-panel' : 'transparent'}
+        >
         {isFocusMode ? (
-          <div className="library-tag-expanded-panel__header">
-            <div className="library-tag-expanded-panel__title-row">
-              <h2 className="library-tag-expanded-panel__title">
+          <Stack gap="sm">
+            <Inline gap="md" align="center">
+              <Text as="h2" variant="hero" weight="bold">
                 {(t('library.tags.focusTitle') || 'Items tagged with "{name}"').replace('{name}', tag.name)}
-              </h2>
-            </div>
-          </div>
+              </Text>
+            </Inline>
+          </Stack>
         ) : null}
         <EmptyState
           layout="left"
@@ -402,24 +413,27 @@ function ExpandedTagPanel({ tag, t, emptyIcon, isFocusMode = false, activeSessio
           title={(t('library.tags.emptyFocusTitle') || 'This tag is ready to use.').replace('{name}', tag.name)}
           description={(t('library.tags.emptyFocusDescription') || 'Add this tag to movies, shows, or people and they will appear here.').replace('{name}', tag.name)}
         />
+      </Card>
       </div>
     );
   }
 
   return (
     <div
-      className={`library-tag-expanded-panel ${isFocusMode ? 'is-focus-mode' : ''}`.trim()}
       /* eslint-disable-next-line react/forbid-dom-props */
       style={{ '--tag-color': tag.color || 'var(--color-accent)' }}
     >
+      <Card
+        variant={isFocusMode ? 'focus-panel' : 'transparent'}
+      >
       {isFocusMode ? (
-        <div className="library-tag-expanded-panel__header">
-          <div className="library-tag-expanded-panel__title-row">
-            <h2 className="library-tag-expanded-panel__title">
+        <Stack gap="sm">
+          <Inline gap="md" align="center">
+            <Text as="h2" variant="hero" weight="bold">
               {(t('library.tags.focusTitle') || 'Items tagged with "{name}"').replace('{name}', tag.name)}
-            </h2>
-          </div>
-        </div>
+            </Text>
+          </Inline>
+        </Stack>
       ) : null}
       <Grid variant="mixed">
         {paginatedItems.map((item) => (
@@ -454,6 +468,7 @@ function ExpandedTagPanel({ tag, t, emptyIcon, isFocusMode = false, activeSessio
           </Button>
         </div>
       )}
+    </Card>
     </div>
   );
 }

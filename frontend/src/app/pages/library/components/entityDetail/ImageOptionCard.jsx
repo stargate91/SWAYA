@@ -1,4 +1,6 @@
 import SelectableCard from '@/ui/SelectableCard';
+import Text from '@/ui/Text';
+import styles from '@/ui/SelectableCard.module.css';
 
 export default function ImageOptionCard({
   imageUrl,
@@ -9,23 +11,33 @@ export default function ImageOptionCard({
   aspect = 'square', // 'square' | 'backdrop'
   className = '',
   imgClassName = '',
+  variant = 'picker', // 'picker' | 'picker-logo'
+  blur = false,
 }) {
   return (
     <SelectableCard
       selected={isSelected}
       onClick={onClick}
-      className={`scene-image-picker-card ${className}`.trim()}
+      className={className}
       as="div"
-      variant="picker"
+      variant={variant}
     >
-      <div className={`scene-image-picker-img-wrapper ${aspect === 'backdrop' ? 'backdrop-variant' : ''} ${imgClassName}`.trim()}>
+      <div
+        className={`${styles['picker-img-wrapper']} ${imgClassName}`.trim()}
+        data-aspect={aspect === 'backdrop' ? 'backdrop' : 'square'}
+        data-blur={blur || undefined}
+      >
         {imageUrl ? (
           <img src={imageUrl} alt={alt} />
         ) : (
-          <div className="scene-image-picker-placeholder">{alt}</div>
+          <div className={styles.placeholder}>{alt}</div>
         )}
       </div>
-      {label && <span className="scene-image-picker-label">{label}</span>}
+      {label && (
+        <Text variant="small" color="secondary" truncate>
+          {label}
+        </Text>
+      )}
     </SelectableCard>
   );
 }

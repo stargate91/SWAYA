@@ -30,7 +30,7 @@ export default function ImagePickerDrawer({
       variant={variant}
     >
       {isOpen && (
-        <div className="entity-detail-page__drawer-content entity-detail-page__drawer-content--padded">
+        <div className="entity-detail-page__drawer-content">
           {children || (
             <UniversalImagePicker
               key={`${entityId}-${imageType}`}

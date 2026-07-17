@@ -124,7 +124,7 @@ export default function PersonBackdropPickerModal({
         {activeTab === 'default' ? (
           <div className="person-backdrop-picker__default-tab-content">
             {profileUrl ? (
-              <div className="scene-image-picker-grid">
+              <Grid variant="picker">
                 <ImageOptionCard
                   imageUrl={profileUrl}
                   alt="Default blurred fallback"
@@ -133,9 +133,9 @@ export default function PersonBackdropPickerModal({
                   onClick={() => handleSaveBackdropUrl("")}
                   aspect="backdrop"
                   className="person-backdrop-picker__fallback-card"
-                  imgClassName="person-backdrop-fallback-blur"
+                  blur
                 />
-              </div>
+              </Grid>
             ) : (
               <EmptyState
                 size="md"

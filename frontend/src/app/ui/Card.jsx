@@ -7,7 +7,7 @@ import styles from './Card.module.css';
  * @param {string} [props.title] - Card header title text
  * @param {React.ReactNode} [props.eyebrow] - Small text label above the title
  * @param {React.ReactNode} [props.actions] - Toolbar button items in the header
- * @param {'default' | 'danger' | 'flat-glass' | 'interactive-glass' | 'soft'} [props.variant] - Card color scheme style flavor
+ * @param {'default' | 'danger' | 'flat-glass' | 'interactive-glass' | 'soft' | 'focus-panel' | 'transparent'} [props.variant] - Card color scheme style flavor
  * @param {boolean} [props.divider] - Whether to show a divider line below the header
  * @param {boolean} [props.glowBlob] - Whether to show a decorative glowing blur blob in background
  * @param {'default' | 'md' | 'xl' | 'none'} [props.padding] - Inner padding variant

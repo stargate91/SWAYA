@@ -98,37 +98,36 @@ export default function DashboardCustomizerDrawer({
             const isDragOver = index === dragOverIndex;
 
             return (
-                // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-                <Card
-                  key={key}
-                  variant="soft"
-                  padding="md"
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, index)}
-                  onDragOver={(e) => handleDragOver(e, index)}
-                  onDragLeave={handleDragLeave}
-                  onDrop={(e) => handleDrop(e, index)}
-                  onDragEnd={handleDragEnd}
-                  data-drag-over={isDragOver}
-                >
-                  <Inline align="center" justify="between">
-                    <Inline gap="md" align="center">
-                      <Text color="muted">
-                        <GripVertical size={16} />
-                      </Text>
-                      <Text variant="body" weight="semibold">{label}</Text>
-                    </Inline>
-
-                    <Switch
-                      checked={Boolean(visibleWidgets[switchKey])}
-                      onChange={() => toggleWidget(switchKey)}
-                    />
+              <Card
+                key={key}
+                variant="soft"
+                padding="md"
+                draggable
+                onDragStart={(e) => handleDragStart(e, index)}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, index)}
+                onDragEnd={handleDragEnd}
+                data-drag-over={isDragOver}
+              >
+                <Inline align="center" justify="between">
+                  <Inline gap="md" align="center">
+                    <Text color="muted">
+                      <GripVertical size={16} />
+                    </Text>
+                    <Text variant="body" weight="semibold">{label}</Text>
                   </Inline>
-                </Card>
-              );
-            })}
-          </Stack>
+
+                  <Switch
+                    checked={Boolean(visibleWidgets[switchKey])}
+                    onChange={() => toggleWidget(switchKey)}
+                  />
+                </Inline>
+              </Card>
+            );
+          })}
         </Stack>
+      </Stack>
     </Drawer>
   );
 }

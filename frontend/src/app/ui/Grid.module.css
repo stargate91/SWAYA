@@ -172,3 +172,15 @@
   grid-template-columns: repeat(auto-fill, minmax(13.75rem, 1fr));
   gap: var(--space-md);
 }
+
+/* Tags Variant */
+.grid[data-variant="tags"] {
+  grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr));
+  gap: var(--space-xl);
+}
+
+/* Picker Variant */
+.grid[data-variant="picker"] {
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: var(--space-md);
+}

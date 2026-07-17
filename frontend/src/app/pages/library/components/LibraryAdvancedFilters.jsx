@@ -1,7 +1,6 @@
 import AttributeFilterDropdown from './AttributeFilterDropdown';
 import PanelHeader from '@/ui/PanelHeader';
 import Inline from '@/ui/Inline';
-import styles from './LibraryFilters.module.css';
 
 export default function LibraryAdvancedFilters({
   t,
@@ -63,7 +62,7 @@ export default function LibraryAdvancedFilters({
   ], filterData?.piercings);
 
   return (
-    <PanelHeader.Row className={`${styles.row} ${styles.advancedRow}`}>
+    <PanelHeader.Row variant="advanced-filters">
       <Inline gap="2xl" align="center" flex={1}>
 
         {settings?.include_adult && (
