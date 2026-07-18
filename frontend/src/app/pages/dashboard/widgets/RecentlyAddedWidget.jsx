@@ -7,7 +7,7 @@ import {
   useRecentlyAddedInfiniteQuery,
 } from '../../../queries/dashboardQueries';
 import RecommendationCarousel from './components/RecommendationCarousel';
-import RecommendationSkeleton from './components/RecommendationSkeleton';
+import WidgetShell from '@/ui/WidgetShell';
 import useRecommendationActions from './hooks/useRecommendationActions';
 import useWatchlistHandler from './hooks/useWatchlistHandler';
 
@@ -62,27 +62,25 @@ export default function RecentlyAddedWidget() {
 
   const isLoading = isRecsLoading || isAddedLoading;
 
-  if (isLoading) {
-    return <RecommendationSkeleton />;
-  }
-
-  if (!filteredItems?.length) {
+  if (!isLoading && !filteredItems?.length) {
     return null;
   }
 
   return (
-    <RecommendationCarousel
-      title={T('dashboard.recommendations.recently_added') || 'Recently Added'}
-      items={filteredItems}
-      watchlistIds={actualWatchlistIds}
-      onWatchlist={handleWatchlist}
-      onCardClick={handleCardClick}
-      onLoadMore={handleLoadMoreAdded}
-      hasMore={hasNextPage}
-      isLoadingMore={isFetchingNextPage}
-      settings={settings}
-      onPlayClick={handlePlayClick}
-      playMutationPending={playMutationPending}
-    />
+    <WidgetShell loading={isLoading} size="lg" transparent={true}>
+      <RecommendationCarousel
+        title={T('dashboard.recommendations.recently_added') || 'Recently Added'}
+        items={filteredItems || []}
+        watchlistIds={actualWatchlistIds}
+        onWatchlist={handleWatchlist}
+        onCardClick={handleCardClick}
+        onLoadMore={handleLoadMoreAdded}
+        hasMore={hasNextPage}
+        isLoadingMore={isFetchingNextPage}
+        settings={settings}
+        onPlayClick={handlePlayClick}
+        playMutationPending={playMutationPending}
+      />
+    </WidgetShell>
   );
 }

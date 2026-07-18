@@ -4,7 +4,7 @@ import {
   useRemoveFromWatchlistMutation,
 } from '../../../queries/dashboardQueries';
 import RecommendationCarousel from './components/RecommendationCarousel';
-import RecommendationSkeleton from './components/RecommendationSkeleton';
+import WidgetShell from '@/ui/WidgetShell';
 import useRecommendationActions from './hooks/useRecommendationActions';
 import useWatchlistHandler from './hooks/useWatchlistHandler';
 import { useTranslation } from '../../../providers/LanguageContext';
@@ -25,23 +25,21 @@ export default function TvDiscoveryWidget() {
 
   const { handlePlayClick, handleCardClick, playMutationPending } = useRecommendationActions();
 
-  if (isLoading) {
-    return <RecommendationSkeleton />;
-  }
-
-  if (!recommendations?.discover_tv?.length) {
+  if (!isLoading && !recommendations?.discover_tv?.length) {
     return null;
   }
 
   return (
-    <RecommendationCarousel
-      title={T('dashboard.recommendations.discover_series') || 'Discover TV Shows'}
-      items={recommendations.discover_tv}
-      watchlistIds={actualWatchlistIds}
-      onWatchlist={handleWatchlist}
-      onCardClick={handleCardClick}
-      onPlayClick={handlePlayClick}
-      playMutationPending={playMutationPending}
-    />
+    <WidgetShell loading={isLoading} size="lg" transparent={true}>
+      <RecommendationCarousel
+        title={T('dashboard.recommendations.discover_series') || 'Discover TV Shows'}
+        items={recommendations?.discover_tv || []}
+        watchlistIds={actualWatchlistIds}
+        onWatchlist={handleWatchlist}
+        onCardClick={handleCardClick}
+        onPlayClick={handlePlayClick}
+        playMutationPending={playMutationPending}
+      />
+    </WidgetShell>
   );
 }

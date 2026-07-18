@@ -5,7 +5,7 @@ import {
   useRemoveFromWatchlistMutation,
 } from '../../../queries/dashboardQueries';
 import RecommendationCarousel from './components/RecommendationCarousel';
-import RecommendationSkeleton from './components/RecommendationSkeleton';
+import WidgetShell from '@/ui/WidgetShell';
 import useRecommendationActions from './hooks/useRecommendationActions';
 import useWatchlistHandler from './hooks/useWatchlistHandler';
 import { useTranslation } from '../../../providers/LanguageContext';
@@ -33,24 +33,22 @@ export default function AdultRecommendationsWidget() {
     return null;
   }
 
-  if (isLoading) {
-    return <RecommendationSkeleton />;
-  }
-
-  if (!recommendations?.discover_adult?.length) {
+  if (!isLoading && !recommendations?.discover_adult?.length) {
     return null;
   }
 
   return (
-    <RecommendationCarousel
-      title={T('dashboard.recommendations.discover_adult') || 'Discover Adult Movies'}
-      items={recommendations.discover_adult}
-      watchlistIds={actualWatchlistIds}
-      onWatchlist={handleWatchlist}
-      onCardClick={handleCardClick}
-      isAdultCarousel={true}
-      onPlayClick={handlePlayClick}
-      playMutationPending={playMutationPending}
-    />
+    <WidgetShell loading={isLoading} size="lg" transparent={true}>
+      <RecommendationCarousel
+        title={T('dashboard.recommendations.discover_adult') || 'Discover Adult Movies'}
+        items={recommendations?.discover_adult || []}
+        watchlistIds={actualWatchlistIds}
+        onWatchlist={handleWatchlist}
+        onCardClick={handleCardClick}
+        isAdultCarousel={true}
+        onPlayClick={handlePlayClick}
+        playMutationPending={playMutationPending}
+      />
+    </WidgetShell>
   );
 }

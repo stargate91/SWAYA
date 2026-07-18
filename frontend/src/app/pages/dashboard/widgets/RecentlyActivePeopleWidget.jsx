@@ -7,7 +7,7 @@ import {
   useRecentlyActivatedPeopleInfiniteQuery,
 } from '../../../queries/dashboardQueries';
 import RecommendationCarousel from './components/RecommendationCarousel';
-import RecommendationSkeleton from './components/RecommendationSkeleton';
+import WidgetShell from '@/ui/WidgetShell';
 import useRecommendationActions from './hooks/useRecommendationActions';
 import useWatchlistHandler from './hooks/useWatchlistHandler';
 
@@ -63,27 +63,25 @@ export default function RecentlyActivePeopleWidget() {
 
   const isLoading = isRecsLoading || isPeopleLoading;
 
-  if (isLoading) {
-    return <RecommendationSkeleton />;
-  }
-
-  if (!filteredPeople?.length) {
+  if (!isLoading && !filteredPeople?.length) {
     return null;
   }
 
   return (
-    <RecommendationCarousel
-      title={T(includeAdult ? 'dashboard.recommendations.recently_activated_people_adult' : 'dashboard.recommendations.recently_activated_people') || (includeAdult ? 'Recently Followed Adult Stars' : 'Recently Tracked People')}
-      items={filteredPeople.map(p => ({
-        ...p,
-        media_type: 'person'
-      }))}
-      watchlistIds={actualWatchlistIds}
-      onWatchlist={handleWatchlist}
-      onCardClick={handleCardClick}
-      onLoadMore={handleLoadMorePeople}
-      hasMore={hasNextPage}
-      isLoadingMore={isFetchingNextPage}
-    />
+    <WidgetShell loading={isLoading} size="lg" transparent={true}>
+      <RecommendationCarousel
+        title={T(includeAdult ? 'dashboard.recommendations.recently_activated_people_adult' : 'dashboard.recommendations.recently_activated_people') || (includeAdult ? 'Recently Followed Adult Stars' : 'Recently Tracked People')}
+        items={filteredPeople.map(p => ({
+          ...p,
+          media_type: 'person'
+        }))}
+        watchlistIds={actualWatchlistIds}
+        onWatchlist={handleWatchlist}
+        onCardClick={handleCardClick}
+        onLoadMore={handleLoadMorePeople}
+        hasMore={hasNextPage}
+        isLoadingMore={isFetchingNextPage}
+      />
+    </WidgetShell>
   );
 }
