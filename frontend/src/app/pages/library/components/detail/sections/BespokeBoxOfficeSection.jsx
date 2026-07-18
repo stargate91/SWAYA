@@ -1,6 +1,8 @@
 import { DollarSign, Coins, TrendingUp } from '@/ui/icons';
 import Card from '@/ui/Card';
-import './BespokeBoxOfficeSection.css';
+import Grid from '@/ui/Grid';
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
 
 export default function BespokeBoxOfficeSection({ item, t }) {
   if (!item || (item.budget <= 0 && item.revenue <= 0)) return null;
@@ -20,60 +22,51 @@ export default function BespokeBoxOfficeSection({ item, t }) {
   const hasProfitInfo = item.budget > 0 && item.revenue > 0;
   const isProfit = netProfit >= 0;
 
-  return (
-    <div className="bespoke-boxoffice-section">
-      <Card variant="glass-shaded" padding="none">
-        <div className="bespoke-browser-card__pills-header">
-          <span className="bespoke-cast-title">
-            {t('library.details.boxOffice') || 'Box Office'}
-          </span>
+  const renderStat = (icon, label, value, themeType) => {
+    return (
+      <Card
+        variant="stat"
+        data-state={themeType}
+      >
+        <div className="icon-wrapper">
+          {icon}
         </div>
-        <div className="bespoke-boxoffice-body">
-          {item.budget > 0 && (
-            <div className="bespoke-boxoffice-stat">
-              <div className="bespoke-boxoffice-icon-wrapper">
-                <DollarSign size={16} />
-              </div>
-              <div className="bespoke-boxoffice-info">
-                <span className="bespoke-boxoffice-label">
-                  {t('library.details.budget') || 'Budget'}
-                </span>
-                <span className="bespoke-boxoffice-value">{budgetStr}</span>
-              </div>
-            </div>
-          )}
-
-          {item.revenue > 0 && (
-            <div className="bespoke-boxoffice-stat">
-              <div className="bespoke-boxoffice-icon-wrapper">
-                <Coins size={16} />
-              </div>
-              <div className="bespoke-boxoffice-info">
-                <span className="bespoke-boxoffice-label">
-                  {t('library.details.revenue') || 'Revenue'}
-                </span>
-                <span className="bespoke-boxoffice-value">{revenueStr}</span>
-              </div>
-            </div>
-          )}
-
-          {hasProfitInfo && (
-            <div className={`bespoke-boxoffice-stat ${isProfit ? 'bespoke-boxoffice-stat--profit' : 'bespoke-boxoffice-stat--loss'}`}>
-              <div className="bespoke-boxoffice-icon-wrapper">
-                <TrendingUp size={16} />
-              </div>
-              <div className="bespoke-boxoffice-info">
-                <span className="bespoke-boxoffice-label">
-                  {isProfit ? (t('library.details.profit') || 'Net Profit') : (t('library.details.loss') || 'Net Loss')}
-                </span>
-                <span className="bespoke-boxoffice-value">
-                  {formatCurrency(Math.abs(netProfit))}
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
+        <Stack gap="3xs">
+          <Text
+            variant="caption"
+            color="muted"
+            weight="bold"
+            uppercase
+          >
+            {label}
+          </Text>
+          <Text variant="small" weight="semibold">
+            {value}
+          </Text>
+        </Stack>
       </Card>
-    </div>
+    );
+  };
+
+  return (
+    <Card
+      variant="glass-shaded"
+      headerVariant="shaded"
+      padding="md"
+      title={t('library.details.boxOffice') || 'Box Office'}
+    >
+      <Grid variant="auto-fit">
+        {item.budget > 0 && renderStat(<DollarSign size={16} />, t('library.details.budget') || 'Budget', budgetStr, 'default')}
+        {item.revenue > 0 && renderStat(<Coins size={16} />, t('library.details.revenue') || 'Revenue', revenueStr, 'default')}
+        {hasProfitInfo && renderStat(
+          <TrendingUp size={16} />,
+          isProfit ? (t('library.details.profit') || 'Net Profit') : (t('library.details.loss') || 'Net Loss'),
+          formatCurrency(Math.abs(netProfit)),
+          isProfit ? 'profit' : 'loss'
+        )}
+      </Grid>
+    </Card>
   );
 }
+
+

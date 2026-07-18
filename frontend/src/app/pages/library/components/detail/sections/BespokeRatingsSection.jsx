@@ -35,12 +35,12 @@ export default function BespokeRatingsSection({ item, t }) {
 
   return (
     <div className="bespoke-ratings-section">
-      <Card variant="glass-shaded" padding="none">
-        <div className="bespoke-browser-card__pills-header">
-          <span className="bespoke-cast-title">
-            {t('library.details.ratingsSection') || 'Ratings'}
-          </span>
-        </div>
+      <Card
+        variant="glass-shaded"
+        headerVariant="shaded"
+        padding="md"
+        title={t('library.details.ratingsSection') || 'Ratings'}
+      >
         <div className="bespoke-ratings-body">
           {ratings.map(rating => (
             <div key={rating.id} className="bespoke-rating-item">

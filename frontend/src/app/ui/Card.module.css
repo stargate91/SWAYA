@@ -26,6 +26,23 @@
   font: var(--text-title);
 }
 
+.header[data-header-variant="shaded"] {
+  position: relative;
+  padding: var(--space-sm) var(--space-md);
+  background: color-mix(in srgb, var(--color-bg-canvas) 15%, transparent);
+  border-bottom: 1px solid var(--color-border-default);
+  align-items: center;
+}
+
+.header[data-header-variant="shaded"] .title {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+}
+
 .body {
   padding: var(--space-xl);
 }
@@ -46,7 +63,7 @@
 
 .card[data-variant="danger"] {
   border: 0.0625rem solid var(--ui-surface-danger-border);
-  background: 
+  background:
     linear-gradient(180deg, var(--ui-surface-danger-tint) 0%, transparent 50%),
     var(--ui-surface-card-gradient);
   box-shadow: var(--ui-surface-danger-shadow), var(--shadow-md);
@@ -77,9 +94,9 @@
   position: relative;
   overflow: hidden;
   transition: border-color var(--motion-duration-emphasized) var(--motion-ease-emphasized),
-              background var(--motion-duration-emphasized) var(--motion-ease-emphasized),
-              transform var(--motion-duration-emphasized) var(--motion-ease-emphasized),
-              box-shadow var(--motion-duration-emphasized) var(--motion-ease-emphasized);
+    background var(--motion-duration-emphasized) var(--motion-ease-emphasized),
+    transform var(--motion-duration-emphasized) var(--motion-ease-emphasized),
+    box-shadow var(--motion-duration-emphasized) var(--motion-ease-emphasized);
 }
 
 .card[data-variant="interactive-glass"]:hover {
@@ -173,6 +190,41 @@
   transform: translate3d(0, 0, 0);
   will-change: transform;
   backface-visibility: hidden;
+}
+
+.card[data-variant="stat"] {
+  background: color-mix(in srgb, var(--color-text-primary) 2%, transparent);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.card[data-variant="stat"] .body {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+}
+
+.card[data-variant="stat"][data-state="profit"] {
+  --stat-color: var(--color-state-success);
+  --stat-icon-bg: color-mix(in srgb, var(--color-state-success) 10%, transparent);
+}
+
+.card[data-variant="stat"][data-state="loss"] {
+  --stat-color: var(--color-state-danger);
+  --stat-icon-bg: color-mix(in srgb, var(--color-state-danger) 10%, transparent);
+}
+
+.card[data-variant="stat"] :global(.icon-wrapper) {
+  display: grid;
+  place-items: center;
+  width: var(--space-4xl);
+  height: var(--space-4xl);
+  border-radius: var(--radius-full);
+  background: var(--stat-icon-bg, color-mix(in srgb, var(--color-text-primary) 4%, transparent));
+  color: var(--stat-color, var(--color-text-secondary));
 }
 
 .card[data-variant="dashboard-section"] {
@@ -348,6 +400,7 @@
     opacity: 0;
     transform: translateY(var(--space-md));
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -360,13 +413,9 @@
     opacity: 0;
     transform: translateY(calc(-1 * var(--space-sm)));
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-
-
-
-
-

@@ -138,12 +138,12 @@ export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) 
 
   return (
     <div className="bespoke-boxoffice-section compact-watch-stats-section">
-      <Card variant="glass-shaded" padding="none">
-        <div className="bespoke-browser-card__pills-header">
-          <span className="bespoke-cast-title">
-            {t('library.details.watchStats') || 'Watch Stats'}
-          </span>
-        </div>
+      <Card
+        variant="glass-shaded"
+        headerVariant="shaded"
+        padding="md"
+        title={t('library.details.watchStats') || 'Watch Stats'}
+      >
         <div className="bespoke-boxoffice-body">
           <div className="bespoke-boxoffice-stat">
             <div className="bespoke-boxoffice-info">

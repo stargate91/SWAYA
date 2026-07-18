@@ -2,20 +2,10 @@
   margin-top: var(--space-md);
 }
 
-.bespoke-companies-card {
-  background: var(--color-surface-card);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-lg);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
 .bespoke-companies-body {
   display: flex;
   flex-wrap: nowrap;
   gap: var(--space-md);
-  padding: var(--space-md) var(--space-md);
   align-items: center;
   overflow-x: auto;
 }

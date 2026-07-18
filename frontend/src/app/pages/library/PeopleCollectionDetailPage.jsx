@@ -15,7 +15,7 @@ import UtilityBarBottomPortal from '../../../components/UtilityBarBottomPortal';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import './PeopleCollectionDetailPage.css';
 import './components/detail/UserRatingSection.css';
-import './components/detail/panels/BackdropsPanel.css';
+
 export default function PeopleCollectionDetailPage({ type = 'people' }) {
   const { id } = useParams();
   const navigate = useNavigate();

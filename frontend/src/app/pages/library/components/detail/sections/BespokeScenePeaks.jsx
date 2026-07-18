@@ -31,17 +31,23 @@ export default function BespokeScenePeaks() {
     playMutation.mutate(item.id);
   };
 
-  return (
-    <Card variant="glass-shaded" padding="none" className="bespoke-scene-peaks-card">
-      <Inline justify="between" align="center" className="bespoke-scene-peaks-header">
-        <Inline gap="sm" align="center" className="bespoke-scene-peaks-header-left">
-          <Droplets size={12} className="bespoke-scene-peaks-title-icon" />
-          <span className="bespoke-scene-peaks-title">
-            {t('library.details.peaksTitle') || 'Peak Moments'} {LPAR}{peaks.length}{RPAR}
-          </span>
-        </Inline>
-      </Inline>
+  const titleContent = (
+    <Inline gap="sm" align="center">
+      <Droplets size={12} className="bespoke-scene-peaks-title-icon" />
+      <span>
+        {t('library.details.peaksTitle') || 'Peak Moments'} {LPAR}{peaks.length}{RPAR}
+      </span>
+    </Inline>
+  );
 
+  return (
+    <Card
+      variant="glass-shaded"
+      headerVariant="shaded"
+      padding="md"
+      title={titleContent}
+      className="bespoke-scene-peaks-card"
+    >
       <div className="bespoke-scene-peaks-body">
         {peaks.length > 0 ? (
           <div className="bespoke-scene-peaks-list custom-scrollbar">

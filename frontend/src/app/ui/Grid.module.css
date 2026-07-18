@@ -202,3 +202,9 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Auto-fit Variant to stretch columns evenly */
+.grid[data-variant="auto-fit"] {
+  grid-template-columns: repeat(auto-fit, minmax(11.25rem, 1fr));
+  gap: var(--space-md);
+}

@@ -479,7 +479,6 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(8.125rem, 1fr));
   gap: var(--space-md);
-  padding: var(--space-md) var(--space-md);
 }
 
 .bespoke-rating-item {

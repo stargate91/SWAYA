@@ -161,13 +161,13 @@ export default function BespokeSceneTagger() {
   }, []);
 
   return (
-    <Card variant="glass-shaded" padding="none" className="bespoke-scene-tagger-card">
-      <Inline gap="sm" align="center" className="bespoke-scene-tagger-header">
-        <span className="bespoke-scene-tagger-title">
-          {t('library.details.tagger') || 'Tags & Keywords'}
-        </span>
-      </Inline>
-
+    <Card
+      variant="glass-shaded"
+      headerVariant="shaded"
+      padding="md"
+      title={t('library.details.tagger') || 'Tags & Keywords'}
+      className="bespoke-scene-tagger-card"
+    >
       <div className="bespoke-scene-tagger-body">
         {/* Active Tags */}
         <div className="bespoke-scene-tagger-active-section">

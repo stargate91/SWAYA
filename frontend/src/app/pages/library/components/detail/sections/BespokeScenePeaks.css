@@ -1,40 +1,13 @@
 .bespoke-scene-peaks-card {
-  background: var(--color-surface-card);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-lg);
-  display: flex;
-  flex-direction: column;
-  overflow: visible;
   margin-top: var(--space-md);
 }
-
-.bespoke-scene-peaks-header {
-  position: relative;
-  padding: var(--space-sm) var(--space-md);
-  --local-bg: color-mix(in srgb, var(--color-bg-canvas) 15%, transparent);
-  background: var(--local-bg);
-  border-top-left-radius: var(--radius-lg);
-  border-top-right-radius: var(--radius-lg);
-  border-bottom: 1px solid var(--color-border-default);
-}
-
-
 
 .bespoke-scene-peaks-title-icon {
   --peaks-color: var(--color-state-danger);
   color: var(--peaks-color);
 }
 
-.bespoke-scene-peaks-title {
-  font-size: var(--font-size-2xs);
-  font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-text-muted);
-}
-
 .bespoke-scene-peaks-body {
-  padding: var(--space-md);
   display: flex;
   flex-direction: column;
   --local-gap: var(--space-sm);

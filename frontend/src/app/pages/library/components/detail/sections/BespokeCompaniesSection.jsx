@@ -32,17 +32,17 @@ export default function BespokeCompaniesSection({ item, t }) {
 
   return (
     <div className="bespoke-companies-section">
-      <Card variant="glass-shaded" padding="none">
-        <div className="bespoke-browser-card__pills-header">
-          <span className="bespoke-cast-title">
-            {sectionLabel}
-          </span>
-        </div>
-        <div className="bespoke-cast-browser-card__body">
-          <ScrollRow
-            className="bespoke-companies-body no-scrollbar"
-            showArrows={true}
-          >
+      <Card
+        variant="glass-shaded"
+        headerVariant="shaded"
+        padding="md"
+        title={sectionLabel}
+      >
+        <ScrollRow
+          className="no-scrollbar"
+          showArrows={true}
+        >
+          <div className="bespoke-companies-body">
             {allCompanies.map((c, i) => (
               <div key={i} className="bespoke-company-card">
                 <Tooltip content={c.name} side="top">
@@ -56,8 +56,8 @@ export default function BespokeCompaniesSection({ item, t }) {
                 </Tooltip>
               </div>
             ))}
-          </ScrollRow>
-        </div>
+          </div>
+        </ScrollRow>
       </Card>
     </div>
   );
