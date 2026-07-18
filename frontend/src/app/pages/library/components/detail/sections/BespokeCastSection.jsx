@@ -10,7 +10,6 @@ import SegmentedControl from '@/ui/SegmentedControl';
 import Inline from '@/ui/Inline';
 import CastCard from '@/ui/data/CastCard';
 import LogoCard from '@/ui/data/LogoCard';
-import styles from './BespokeCastSection.module.css';
 
 export default function BespokeCastSection({ item, t, navigate }) {
   const settings = useMediaDetailContext()?.state?.settings;
@@ -124,47 +123,42 @@ export default function BespokeCastSection({ item, t, navigate }) {
       padding="md"
       title={headerContent}
     >
-      <ScrollRow showArrows={true}>
-        <Inline gap="md" wrap={false} className={styles['scroll-container']}>
-          {activeTab === 'cast' && allPeople.map(person => {
-            const opacity = person.isFilteredOut ? 0.35 : 1;
-            return (
-              <CastCard
-                key={person.id}
-                src={person.profile_path && !person.isFilteredOut ? resolvePersonAvatarUrl(person.profile_path) : undefined}
-                name={person.name}
-                character={person.displayRole}
-                fallbackIcon={<User size={24} />}
-                onClick={person.isFilteredOut ? undefined : () => navigate(`/library/people/${person.id}`, { state: { allowAdult: true } })}
-                className={styles.card}
-                // eslint-disable-next-line react/forbid-component-props
-                style={{ opacity, cursor: person.isFilteredOut ? 'default' : 'pointer' }}
-              />
-            );
-          })}
+      <ScrollRow showArrows={true} className="u-pt-xs">
+        {activeTab === 'cast' && allPeople.map(person => {
+          return (
+            <CastCard
+              key={person.id}
+              src={person.profile_path && !person.isFilteredOut ? resolvePersonAvatarUrl(person.profile_path) : undefined}
+              name={person.name}
+              character={person.displayRole}
+              fallbackIcon={<User size={24} />}
+              onClick={person.isFilteredOut ? undefined : () => navigate(`/library/people/${person.id}`, { state: { allowAdult: true } })}
+              data-filtered={person.isFilteredOut || undefined}
+            />
+          );
+        })}
 
-          {activeTab === 'companies' && item.companies.map((c, i) => (
-            <Tooltip key={i} content={c.name} side="top">
-              <LogoCard
-                src={c.logo_path ? resolveCompanyLogoUrl(c.logo_path) : undefined}
-                alt={c.name}
-                size="lg"
-                invert
-              />
-            </Tooltip>
-          ))}
+        {activeTab === 'companies' && item.companies.map((c, i) => (
+          <Tooltip key={i} content={c.name} side="top">
+            <LogoCard
+              src={c.logo_path ? resolveCompanyLogoUrl(c.logo_path) : undefined}
+              alt={c.name}
+              size="lg"
+              invert
+            />
+          </Tooltip>
+        ))}
 
-          {activeTab === 'networks' && item.networks.map((n, i) => (
-            <Tooltip key={i} content={n.name} side="top">
-              <LogoCard
-                src={n.logo_path ? resolveCompanyLogoUrl(n.logo_path) : undefined}
-                alt={n.name}
-                size="lg"
-                invert
-              />
-            </Tooltip>
-          ))}
-        </Inline>
+        {activeTab === 'networks' && item.networks.map((n, i) => (
+          <Tooltip key={i} content={n.name} side="top">
+            <LogoCard
+              src={n.logo_path ? resolveCompanyLogoUrl(n.logo_path) : undefined}
+              alt={n.name}
+              size="lg"
+              invert
+            />
+          </Tooltip>
+        ))}
       </ScrollRow>
     </Card>
   );

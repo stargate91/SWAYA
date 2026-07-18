@@ -54,6 +54,10 @@
   padding-bottom: var(--space-sm);
 }
 
+.u-pt-xs {
+  padding-top: var(--space-xs);
+}
+
 .u-w-genre {
   width: calc(4 * var(--space-4xl)); /* 10rem */
 }
@@ -106,6 +110,10 @@
   display: flex;
   align-items: center;
   gap: var(--space-xs);
+  flex-wrap: nowrap;
+}
+
+.u-wrap-none {
   flex-wrap: nowrap;
 }
 
