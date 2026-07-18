@@ -66,3 +66,8 @@
 .container--size-sm .arrow.is-right {
   right: var(--space-xs);
 }
+
+.container--size-sm .track {
+  gap: var(--space-sm);
+}
+

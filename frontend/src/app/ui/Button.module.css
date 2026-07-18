@@ -110,7 +110,7 @@
 }
 
 .button[data-variant="success"] .icon {
-  color: inherit;
+  color: var(--color-state-success);
 }
 
 /* Onboarding Wizard Variants (migrated from NavButton) */

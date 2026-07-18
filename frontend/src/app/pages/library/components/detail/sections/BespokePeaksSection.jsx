@@ -108,11 +108,14 @@ export default function BespokePeaksSection() {
                   <Inline gap="xs" align="center">
                     <Droplets size={11} color="var(--color-state-danger)" />
                     <Text variant="small" weight="semibold">
-                      {log.season_number != null && log.episode_number != null && (
-                        <span className="u-text-muted" style={{ marginRight: 'var(--space-xs)' }}>
-                          {`S${log.season_number}E${String(log.episode_number).padStart(2, '0')}`}
-                        </span>
-                      )}
+                      {log.season_number != null && log.episode_number != null && (() => {
+                        const epLabel = `S${log.season_number}E${String(log.episode_number).padStart(2, '0')} `;
+                        return (
+                          <span className="u-text-muted">
+                            {epLabel}
+                          </span>
+                        );
+                      })()}
                       {hasPosition ? formatTime(log.video_position) : (t('library.details.playSession') || 'Play Session')}
                     </Text>
                   </Inline>

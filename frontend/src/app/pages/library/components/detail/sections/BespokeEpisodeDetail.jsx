@@ -160,18 +160,21 @@ export default function BespokeEpisodeDetail({
 
         {/* Episode Meta details */}
         <Inline gap="xs" align="center">
-          {metaItems.map((meta, idx) => (
-            <span key={meta} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-xs)' }}>
-              {idx > 0 && (
-                <Text variant="small" color="muted" className="u-opacity-60">
-                  {"•"}
+          {metaItems.map((meta, idx) => {
+            const bullet = '•';
+            return (
+              <Inline key={meta} gap="xs" align="center">
+                {idx > 0 && (
+                  <Text variant="small" color="muted" className="u-opacity-60">
+                    {bullet}
+                  </Text>
+                )}
+                <Text variant="small" color="muted">
+                  {meta}
                 </Text>
-              )}
-              <Text variant="small" color="muted">
-                {meta}
-              </Text>
-            </span>
-          ))}
+              </Inline>
+            );
+          })}
           {activeEpisode.vote_average != null && activeEpisode.vote_average > 0 && (
             <Pill variant="tmdb">
               <Star size={10} fill="currentColor" strokeWidth={1.8} />

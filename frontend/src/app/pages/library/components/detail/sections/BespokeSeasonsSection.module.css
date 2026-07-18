@@ -7,15 +7,15 @@
 }
 
 /* Card Header with Pills */
-.pillsHeader {
+.pills-header {
   position: relative;
   padding: var(--space-sm) var(--space-md);
   background: color-mix(in srgb, var(--color-bg-canvas) 15%, transparent);
   border-bottom: 1px solid var(--color-border-default);
 }
 
-.seasonsPills,
-.episodesPills {
+.seasons-pills,
+.episodes-pills {
   display: flex;
   overflow-x: auto;
   gap: 0.375rem;
@@ -70,7 +70,7 @@
   border-color: var(--color-accent);
 }
 
-.nextDot {
+.next-dot {
   width: 0.375rem;
   height: 0.375rem;
   border-radius: 50%;
@@ -121,4 +121,8 @@
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.container {
+  user-select: none;
 }

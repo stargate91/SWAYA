@@ -212,8 +212,8 @@ export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) 
                     : '';
                   return (
                     <Inline key={log.id || idx} justify="between" align="center" fullWidth className="u-panel-item">
-                      <Text weight="bold">{epText || (t('library.details.playSession') || 'Session')}</Text>
-                      <span className="u-opacity-60">{dateStr}</span>
+                      <Text variant="small" weight="bold">{epText || (t('library.details.playSession') || 'Session')}</Text>
+                      <Text variant="caption" color="muted">{dateStr}</Text>
                     </Inline>
                   );
                 })}

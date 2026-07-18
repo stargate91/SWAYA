@@ -8,7 +8,7 @@
   border: none;
   padding: 0;
   margin: 0;
-  font-family: inherit;
+  font-family: var(--font-sans);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.05em;
@@ -24,8 +24,9 @@
 
 .tab.is-active {
   color: var(--color-text-primary);
-  border-bottom: 2px solid var(--color-accent);
-  padding-bottom: 2px;
+  border-bottom: 0.125rem solid var(--color-accent);
+  padding-bottom: 0.125rem;
   /* Shift margin to prevent layout shift due to border-bottom */
-  margin-bottom: -4px; 
+  margin-bottom: -0.25rem; 
 }
+

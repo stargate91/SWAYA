@@ -133,6 +133,24 @@ export default function BespokeCastSection({ item, t, navigate }) {
     t('library.details.cast') || 'Cast & Crew'
   );
 
+  const getAge = (birthday) => {
+    if (!birthday) return null;
+    const birthDate = new Date(birthday);
+    if (isNaN(birthDate.getTime())) return null;
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  const getDisplayName = (person) => {
+    const age = person.age_at_release || person.age || (person.birthday ? getAge(person.birthday) : null);
+    return age ? `${person.name} (${age})` : person.name;
+  };
+
   return (
     <Card
       variant="glass-shaded"
@@ -146,7 +164,7 @@ export default function BespokeCastSection({ item, t, navigate }) {
             <CastCard
               key={person.id}
               src={person.profile_path && !person.isFilteredOut ? resolvePersonAvatarUrl(person.profile_path) : undefined}
-              name={person.name}
+              name={getDisplayName(person)}
               character={person.displayRole}
               fallbackIcon={<User size={24} />}
               onClick={person.isFilteredOut ? undefined : () => navigate(`/library/people/${person.id}`, { state: { allowAdult: true } })}

@@ -160,13 +160,13 @@ export default function BespokeSeasonsSection() {
   if (seasonsCount === 0) return null;
 
   return (
-    <Stack gap="md" style={{ userSelect: 'none' }}>
+    <Stack gap="md" className={styles.container}>
       {/* Unified Season & Episode Browser Card */}
       <Card variant="glass-shaded" padding="none" className={styles.card}>
         
         {/* Row 1 Header: Seasons Horizontal Pills */}
-        <Inline gap="sm" align="center" className={styles.pillsHeader}>
-          <ScrollRow ref={seasonsScrollRef} containerClassName="u-flex-1" className={`${styles.seasonsPills} no-scrollbar`} showArrows={true} enableWheelScroll={true} arrowsLayout="column" size="sm">
+        <Inline gap="sm" align="center" className={styles['pills-header']}>
+          <ScrollRow ref={seasonsScrollRef} className={`${styles['seasons-pills']} no-scrollbar`} showArrows={true} enableWheelScroll={true} size="sm">
             {seasonsList.map((season) => {
               const isActive = season.season_number === selectedSeasonNumber;
               const title = season.title || `Season ${season.season_number}`;
@@ -193,8 +193,9 @@ export default function BespokeSeasonsSection() {
           <PosterCard
             size="6.5rem"
             fillHeight={true}
-            imageUrl={getPosterUrl(activeSeason.poster_path)}
-            onClick={getPosterUrl(activeSeason.poster_path) ? () => handleOpenLightbox(getOriginalPosterUrl(activeSeason.poster_path)) : undefined}
+            imageUrl={activeSeason.poster_path ? resolveMediaImageUrl(activeSeason.poster_path, 'poster') : undefined}
+            altText={activeSeason.title || `Season ${activeSeason.season_number}`}
+            onClick={activeSeason.poster_path ? () => handleOpenLightbox(resolveMediaImageUrl(activeSeason.poster_path, 'originalPoster')) : undefined}
             icon={Clapperboard}
             disableHoverAnimation={true}
           />
@@ -247,8 +248,8 @@ export default function BespokeSeasonsSection() {
 
         {/* Row 2 Header: Episode Pills */}
         {episodes.length > 0 && (
-          <Inline gap="sm" align="center" className={styles.pillsHeader}>
-            <ScrollRow ref={episodesScrollRef} containerClassName="u-flex-1" className={`${styles.episodesPills} no-scrollbar`} showArrows={true} enableWheelScroll={true} arrowsLayout="column" size="sm">
+          <Inline gap="sm" align="center" className={styles['pills-header']}>
+            <ScrollRow ref={episodesScrollRef} className={`${styles['episodes-pills']} no-scrollbar`} showArrows={true} enableWheelScroll={true} size="sm">
               {episodes.map((episode) => {
                 const isActive = episode.id === selectedEpisodeId;
                 const formattedEpNum = formatEpisodeNumber(episode.episode_number);
@@ -263,7 +264,7 @@ export default function BespokeSeasonsSection() {
                     } ${!episode.path || episode.is_missing ? styles['is-unowned'] : ''} ${isNextUp ? styles['is-next-up'] : ''}`}
                     onClick={() => setSelectedEpisodeId(episode.id)}
                   >
-                    {isNextUp && <span className={styles.nextDot} />}
+                    {isNextUp && <span className={styles['next-dot']} />}
                     <span>{formattedEpNum}</span>
                   </button>
                 );

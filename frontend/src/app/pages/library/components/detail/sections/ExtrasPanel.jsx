@@ -1,7 +1,5 @@
-import PropTypes from 'prop-types';
 import Stack from '@/ui/Stack';
 import Text from '@/ui/Text';
-import Divider from '@/ui/Divider';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import { showItemInFolder } from '@/lib/ipc';
 import FileCard from '@/ui/data/FileCard';
@@ -9,12 +7,13 @@ import Tooltip from '@/ui/Tooltip';
 import Button from '@/ui/Button';
 import { FolderOpen } from '@/ui/icons';
 
-export default function ExtrasPanel({ variant }) {
+export default function ExtrasPanel() {
   const { state, t, toast } = useMediaDetailContext();
   const {
     item,
     isMovie
   } = state;
+
 
 
 
@@ -130,7 +129,4 @@ export default function ExtrasPanel({ variant }) {
   );
 }
 
-ExtrasPanel.propTypes = {
-  variant: PropTypes.string,
-};
 
