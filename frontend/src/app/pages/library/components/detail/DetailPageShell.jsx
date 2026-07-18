@@ -146,7 +146,7 @@ export default function DetailPageShell({
 
         <div
           ref={containerRef}
-          className={styles.container}
+          className={`${styles.container} media-detail-page__container`}
         >
           {children}
         </div>

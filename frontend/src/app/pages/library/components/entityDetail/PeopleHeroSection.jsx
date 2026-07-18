@@ -291,12 +291,6 @@ export default function PeopleHeroSection({
                             <Layers size={20} />
                           </div>
                         )}
-                        {/* Bookmark badge to represent "In Library" / "Owned" */}
-                        {credit.in_library && (
-                          <div className="entity-detail-page__known-for-library-badge" title={t('library.details.inLibrary') || 'In Library'}>
-                            <Bookmark size={10} />
-                          </div>
-                        )}
                       </div>
                       <span className="entity-detail-page__known-for-card-title">{creditTitle}</span>
                     </div>

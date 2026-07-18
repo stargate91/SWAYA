@@ -13,7 +13,6 @@ import CollectionDetailSections from './components/entityDetail/CollectionDetail
 import usePeopleCollectionDetailController from './usePeopleCollectionDetailController.jsx';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import './PeopleCollectionDetailPage.css';
-import './components/detail/UserRatingSection.css';
 import BottomSocialsBar from './components/detail/sections/BottomSocialsBar';
 
 export default function PeopleCollectionDetailPage({ type = 'people' }) {

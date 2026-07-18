@@ -1,11 +1,11 @@
 /* People Hero Layout Overrides & Sidebar Columns */
 .entity-detail-page--people .entity-detail-page__hero-section-wrapper {
-  height: calc(100vh - var(--page-top-offset) - 7.5rem);
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   box-sizing: border-box;
-  margin-bottom: var(--space-2xl);
+  flex-shrink: 0;
 }
 
 .entity-detail-page--people .entity-detail-page__media-column {
@@ -31,7 +31,7 @@
 }
 
 .entity-detail-page--people.is-scrolled .entity-detail-page__media-column {
-  transform: translateY(calc(100vh - var(--page-top-offset) - 7.5rem + var(--space-2xl)));
+  transform: translateY(calc(100% + var(--space-2xl)));
 }
 
 .entity-detail-page--people .entity-detail-page__summary {

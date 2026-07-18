@@ -3,20 +3,17 @@
   grid-template-columns: minmax(15rem, 20.625rem) minmax(0, 1fr);
   gap: var(--space-2xl);
   width: 100%;
-  --container-margin-top: 7.5rem;
-  margin-top: var(--container-margin-top);
-  --container-pb: 11.25rem;
-  padding-bottom: var(--container-pb);
+  height: 100%;
+  flex-shrink: 0;
+  padding-bottom: 0;
   --container-pr: 5rem;
   padding-right: var(--container-pr);
-  --container-transition: margin-top 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-  transition: var(--container-transition);
+  box-sizing: border-box;
 }
 
 .is-scrolled .person-credits-section-container {
-  --container-scrolled-mt: -1.5rem;
-  margin-top: var(--container-scrolled-mt);
-  height: calc(100vh - var(--page-top-offset) - 7.5rem);
+  height: 100%;
+  margin-top: 0;
   overflow: hidden;
   grid-template-rows: auto 1fr;
   row-gap: 0;
