@@ -129,9 +129,6 @@
   transform: none;
 }
 
-.button[data-variant="success"][aria-pressed="true"]:hover:not(:disabled) .icon {
-  color: var(--button-danger-color);
-}
 
 /* Onboarding Wizard Variants (migrated from NavButton) */
 .button[data-variant="onboarding-back"] {
@@ -348,5 +345,9 @@
 
 .button[data-variant="glass-accent"]:hover:not(:disabled) .icon {
   color: var(--color-accent);
+}
+
+.button[data-variant="success"][aria-pressed="true"]:hover:not(:disabled) .icon {
+  color: var(--button-danger-color);
 }
 

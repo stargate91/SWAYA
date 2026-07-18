@@ -135,9 +135,6 @@ export default function BespokeSeasonsSection() {
     }
   };
 
-  const getPosterUrl = (path) => path ? resolveMediaImageUrl(path, 'poster') : '';
-  const getOriginalPosterUrl = (path) => path ? resolveMediaImageUrl(path, 'originalPoster') : '';
-
   const isSeasonWatched = useMemo(() => {
     return episodes.length > 0 && episodes.every((ep) => ep.is_watched);
   }, [episodes]);
@@ -215,7 +212,7 @@ export default function BespokeSeasonsSection() {
                     </Inline>
                   )}
                   {activeSeason.air_date && activeSeason.episode_count > 0 && (
-                    <span className={styles['bullet-separator']}>•</span>
+                    <span className={styles['bullet-separator']}>{"\u2022"}</span>
                   )}
                   {activeSeason.episode_count > 0 && (
                     <Inline gap="3xs" align="center" className={styles['item-text']}>
