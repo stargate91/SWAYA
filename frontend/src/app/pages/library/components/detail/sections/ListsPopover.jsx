@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import useListManagement from '../../../hooks/useListManagement';
-import { List, Plus, Check, Loader2 } from '@/ui/icons';
+import { List, Plus, Check, Minus, Loader2 } from '@/ui/icons';
 import Checkbox from '@/ui/Checkbox';
 import Input from '@/ui/Input';
 import Button from '@/ui/Button';
@@ -11,6 +11,7 @@ import Inline from '@/ui/Inline';
 import Popover from '@/ui/Popover';
 import Card from '@/ui/Card';
 import Text from '@/ui/Text';
+import styles from './ListsPopover.module.css';
 
 export default function ListsPopover({ item, type, t }) {
   const {
@@ -25,6 +26,7 @@ export default function ListsPopover({ item, type, t }) {
   } = useListManagement({ item, type, t });
 
   const [newListName, setNewListName] = useState('');
+  const [isHovered, setIsHovered] = useState(false);
 
   const onSubmitCreate = async (e) => {
     e.preventDefault();
@@ -56,11 +58,14 @@ export default function ListsPopover({ item, type, t }) {
           <Button
             type="button"
             variant="glass"
+            className={styles['watchlist-btn']}
             aria-pressed={isWatchlistAdded}
             size="sm"
             onClick={() => handleToggleList(watchlist)}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
             title={isWatchlistAdded ? (t('lists.remove_from_watchlist') || 'Remove from Watchlist') : (t('lists.add_to_watchlist') || 'Add to Watchlist')}
-            leftIcon={isWatchlistAdded ? <Check size={14} /> : <Plus size={14} />}
+            leftIcon={isWatchlistAdded ? (isHovered ? <Minus size={14} /> : <Check size={14} />) : <Plus size={14} />}
           >
             {t('lists.watchlist_name') || 'Watchlist'}
           </Button>

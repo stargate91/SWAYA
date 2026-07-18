@@ -160,13 +160,13 @@ export default function BespokeSeasonsSection() {
   if (seasonsCount === 0) return null;
 
   return (
-    <Stack gap="md" className={styles.container}>
+    <Stack gap="md">
       {/* Unified Season & Episode Browser Card */}
-      <Card variant="glass-shaded" padding="none" className={styles.card}>
+      <Card variant="glass-shaded" padding="none">
         
         {/* Row 1 Header: Seasons Horizontal Pills */}
         <Inline gap="sm" align="center" className={styles['pills-header']}>
-          <ScrollRow ref={seasonsScrollRef} className={`${styles['seasons-pills']} no-scrollbar`} showArrows={true} enableWheelScroll={true} size="sm">
+          <ScrollRow ref={seasonsScrollRef} className="no-scrollbar u-flex-1" showArrows={true} enableWheelScroll={true} size="sm">
             {seasonsList.map((season) => {
               const isActive = season.season_number === selectedSeasonNumber;
               const title = season.title || `Season ${season.season_number}`;
@@ -207,18 +207,21 @@ export default function BespokeSeasonsSection() {
                 <h3 className={styles.title}>
                   {activeSeason.title || `Season ${activeSeason.season_number}`}
                 </h3>
-                <Inline gap="sm" align="center">
+                <Inline gap="xs" align="center">
                   {activeSeason.air_date && (
-                    <span className={styles.item}>
+                    <Inline gap="3xs" align="center" className={styles['item-text']}>
                       <Calendar size={12} />
-                      {String(activeSeason.air_date).slice(0, 10)}
-                    </span>
+                      <span>{String(activeSeason.air_date).slice(0, 10)}</span>
+                    </Inline>
+                  )}
+                  {activeSeason.air_date && activeSeason.episode_count > 0 && (
+                    <span className={styles['bullet-separator']}>•</span>
                   )}
                   {activeSeason.episode_count > 0 && (
-                    <span className={styles.item}>
+                    <Inline gap="3xs" align="center" className={styles['item-text']}>
                       <Tv size={12} />
-                      {episodesText}
-                    </span>
+                      <span>{episodesText}</span>
+                    </Inline>
                   )}
                 </Inline>
               </div>
@@ -249,7 +252,7 @@ export default function BespokeSeasonsSection() {
         {/* Row 2 Header: Episode Pills */}
         {episodes.length > 0 && (
           <Inline gap="sm" align="center" className={styles['pills-header']}>
-            <ScrollRow ref={episodesScrollRef} className={`${styles['episodes-pills']} no-scrollbar`} showArrows={true} enableWheelScroll={true} size="sm">
+            <ScrollRow ref={episodesScrollRef} className="no-scrollbar u-flex-1" showArrows={true} enableWheelScroll={true} size="sm">
               {episodes.map((episode) => {
                 const isActive = episode.id === selectedEpisodeId;
                 const formattedEpNum = formatEpisodeNumber(episode.episode_number);

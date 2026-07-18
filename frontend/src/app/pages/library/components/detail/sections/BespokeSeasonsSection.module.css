@@ -1,27 +1,9 @@
-/* Symmetrical Single Unified Card */
-.card {
-  background: var(--color-surface-card);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
 /* Card Header with Pills */
 .pills-header {
   position: relative;
   padding: var(--space-sm) var(--space-md);
   background: color-mix(in srgb, var(--color-bg-canvas) 15%, transparent);
   border-bottom: 1px solid var(--color-border-default);
-}
-
-.seasons-pills,
-.episodes-pills {
-  display: flex;
-  overflow-x: auto;
-  gap: 0.375rem;
-  flex: 1;
-  padding: var(--space-3xs) 0;
-  scroll-behavior: smooth;
 }
 
 /* Pills styling */
@@ -53,7 +35,7 @@
   --local-color: color-mix(in srgb, var(--color-accent) 88%, var(--color-text-primary));
   color: var(--local-color);
   border-color: var(--local-color);
-  box-shadow: 0 0 0.625rem color-mix(in srgb, var(--color-accent) 25%, transparent);
+  box-shadow: 0 0 var(--space-xs) color-mix(in srgb, var(--color-accent) 25%, transparent);
   font-weight: var(--font-weight-bold);
 }
 
@@ -71,12 +53,12 @@
 }
 
 .next-dot {
-  width: 0.375rem;
-  height: 0.375rem;
+  width: var(--space-3xs);
+  height: var(--space-3xs);
   border-radius: 50%;
   background: var(--color-accent);
   display: inline-block;
-  box-shadow: 0 0 0.375rem color-mix(in srgb, var(--color-accent) 50%, transparent);
+  box-shadow: 0 0 var(--space-3xs) color-mix(in srgb, var(--color-accent) 50%, transparent);
 }
 
 /* Card Bodies */
@@ -97,17 +79,12 @@
   color: var(--color-text-primary);
 }
 
-.item {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-sm);
+.item-text {
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
 
-.item:not(:last-of-type)::after {
-  content: "•";
-  margin-left: var(--space-md);
+.bullet-separator {
   color: var(--color-text-muted);
   opacity: 0.4;
 }
@@ -121,8 +98,4 @@
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-.container {
-  user-select: none;
 }
