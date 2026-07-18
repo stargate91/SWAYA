@@ -113,6 +113,26 @@
   color: var(--color-state-success);
 }
 
+/* Sizing override for success variant when toggled as glass control */
+.button[data-variant="success"][aria-pressed="true"][data-size="sm"] {
+  padding: var(--space-xs) var(--space-md);
+  min-height: auto;
+  border-radius: var(--radius-sm);
+}
+
+/* Hover override for success in active state -> Danger state */
+.button[data-variant="success"][aria-pressed="true"]:hover:not(:disabled) {
+  background: var(--button-danger-bg);
+  border-color: var(--button-danger-border);
+  color: var(--button-danger-color);
+  box-shadow: 0 2px 0.5rem color-mix(in srgb, var(--color-state-danger) 20%, transparent);
+  transform: none;
+}
+
+.button[data-variant="success"][aria-pressed="true"]:hover:not(:disabled) .icon {
+  color: var(--button-danger-color);
+}
+
 /* Onboarding Wizard Variants (migrated from NavButton) */
 .button[data-variant="onboarding-back"] {
   min-height: var(--ui-overlay-top);
@@ -298,4 +318,35 @@
   border-color: var(--color-accent);
   color: var(--color-accent);
   box-shadow: 0 2px 0.5rem color-mix(in srgb, var(--color-accent) 20%, transparent);
-}
+}
+
+.button[data-variant="glass-accent"] {
+  min-height: auto;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
+  background: color-mix(in srgb, var(--color-accent) 15%, var(--color-surface-overlay));
+  border: 1px solid var(--color-accent);
+  color: var(--color-text-primary);
+  box-shadow: 0 2px 0.5rem color-mix(in srgb, var(--color-accent) 20%, transparent);
+}
+
+.button[data-variant="glass-accent"][data-size="sm"] {
+  padding: var(--space-xs) var(--space-md);
+}
+
+.button[data-variant="glass-accent"] .icon {
+  color: var(--color-text-primary);
+}
+
+.button[data-variant="glass-accent"]:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-accent) 25%, var(--color-surface-overlay));
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  transform: none;
+}
+
+.button[data-variant="glass-accent"]:hover:not(:disabled) .icon {
+  color: var(--color-accent);
+}
+

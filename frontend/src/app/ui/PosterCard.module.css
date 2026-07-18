@@ -319,6 +319,10 @@ div.image-wrapper:focus-visible {
   color: var(--color-state-danger);
 }
 
+.media-shell:hover .action-btn:hover:not(:disabled) {
+  transform: translateX(-50%) translateY(0);
+}
+
 .media-shell .action-btn:hover .action-btn-state-default {
   display: none;
 }

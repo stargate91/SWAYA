@@ -1,20 +1,4 @@
-.watchlist-btn[data-variant="glass"][aria-pressed="true"] {
-  color: var(--color-state-success);
-  background: var(--color-state-success-bg);
-  border-color: color-mix(in srgb, var(--color-state-success) 40%, transparent);
-}
-
-.watchlist-btn[data-variant="glass"][aria-pressed="true"] svg {
-  color: var(--color-state-success);
-}
-
-.watchlist-btn[data-variant="glass"][aria-pressed="true"]:hover:not(:disabled) {
-  background: var(--color-state-danger-bg, var(--button-danger-bg));
-  border-color: var(--button-danger-border);
-  color: var(--button-danger-color);
-  box-shadow: 0 2px 0.5rem color-mix(in srgb, var(--color-state-danger) 20%, transparent);
-}
-
-.watchlist-btn[data-variant="glass"][aria-pressed="true"]:hover:not(:disabled) svg {
-  color: var(--button-danger-color);
+.watchlist-btn {
+  width: 7.25rem;
+  justify-content: center;
 }

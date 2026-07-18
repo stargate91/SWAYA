@@ -122,8 +122,10 @@ export const RecommendationCarousel = ({
                     const type = n.isScene ? 'scene' : (item.media_type || item.type || (item.title ? 'movie' : 'tv'));
                     onWatchlist(item, type);
                   }}
-                  className={`${posterCardStyles['action-btn']} ${isWatchlisted ? '' : posterCardStyles['action-btn--neutral']}`}
-                  variant="unstyled"
+                  className={posterCardStyles['action-btn']}
+                  variant={isWatchlisted ? 'success' : 'glass-accent'}
+                  aria-pressed={isWatchlisted}
+                  size="sm"
                 >
                   {isWatchlisted ? (
                     <>

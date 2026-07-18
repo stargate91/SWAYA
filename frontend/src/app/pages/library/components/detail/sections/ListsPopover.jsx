@@ -57,7 +57,7 @@ export default function ListsPopover({ item, type, t }) {
         actions={watchlist && (
           <Button
             type="button"
-            variant="glass"
+            variant={isWatchlistAdded ? 'success' : 'glass-accent'}
             className={styles['watchlist-btn']}
             aria-pressed={isWatchlistAdded}
             size="sm"
@@ -67,7 +67,7 @@ export default function ListsPopover({ item, type, t }) {
             title={isWatchlistAdded ? (t('lists.remove_from_watchlist') || 'Remove from Watchlist') : (t('lists.add_to_watchlist') || 'Add to Watchlist')}
             leftIcon={isWatchlistAdded ? (isHovered ? <Minus size={14} /> : <Check size={14} />) : <Plus size={14} />}
           >
-            {t('lists.watchlist_name') || 'Watchlist'}
+            {isWatchlistAdded ? (isHovered ? (t('common.remove') || 'Remove') : (t('lists.watchlist_name') || 'Watchlist')) : (t('lists.watchlist_name') || 'Watchlist')}
           </Button>
         )}
       >

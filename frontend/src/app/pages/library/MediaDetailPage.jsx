@@ -231,15 +231,13 @@ export default function MediaDetailPage({ type = 'movie' }) {
               {item && <BespokeCastSection item={item} t={t} navigate={navigate} />}
               {isScene && item?.technical && (
                 <div className="bespoke-boxoffice-section">
-                  <Card variant="glass-shaded" padding="none">
-                    <div className="bespoke-browser-card__pills-header">
-                      <span className="bespoke-cast-title">
-                        {t('library.details.technicalInfo') || 'Technical Info'}
-                      </span>
-                    </div>
-                    <Card variant="transparent" padding="md">
-                      <TechnicalPanel showTitle={false} />
-                    </Card>
+                  <Card
+                    variant="glass-shaded"
+                    headerVariant="shaded"
+                    padding="md"
+                    title={t('library.details.technicalInfo') || 'Technical Info'}
+                  >
+                    <TechnicalPanel showTitle={false} />
                   </Card>
                 </div>
               )}

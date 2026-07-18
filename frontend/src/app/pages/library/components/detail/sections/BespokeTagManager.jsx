@@ -155,7 +155,6 @@ export default function BespokeTagManager({
                 size="sm"
                 leftElement={<Plus size={10} />}
                 onClick={() => handleAddTag(tag)}
-                title={t('library.details.addTag') || 'Add tag'}
               >
                 {tag}
               </Chip>
