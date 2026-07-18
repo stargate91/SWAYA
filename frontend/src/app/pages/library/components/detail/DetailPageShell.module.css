@@ -3,7 +3,7 @@
   --local-padding-bottom: 1.875rem;
   --local-offset-right: 5rem;
   --local-slide-offset: 1.875rem;
-  --local-toggle-size: 2.375rem;
+  --local-toggle-size: 1.875rem;
   --local-scroll-shadow-color: var(--color-surface-overlay);
   --local-panel-width: 31.25rem;
   --local-border-width: 0.0625rem;
@@ -35,6 +35,17 @@
     --local-container-ease: cubic-bezier(0.16, 1, 0.3, 1);
     transition: padding-right var(--local-container-duration) var(--local-container-ease);
     will-change: padding-right;
+  }
+
+  &:global(.entity-detail-page--people) {
+    .container {
+      gap: var(--space-2xl);
+      overflow: hidden;
+      margin-top: var(--page-top-offset);
+      padding-top: 0;
+      padding-bottom: 0;
+      height: calc(100% - var(--page-top-offset));
+    }
   }
 
   .side-panel {
@@ -215,7 +226,6 @@
   flex: 1;
 }
 
-/* Scroll Toggle Button (Mover) Styles */
 .scroll-toggle-btn {
   display: flex;
   align-items: center;
@@ -223,23 +233,22 @@
   width: var(--local-toggle-size);
   height: var(--local-toggle-size);
   border-radius: var(--radius-md);
-  --scroll-border: var(--local-border-width) solid color-mix(in srgb, var(--color-border-default) 45%, transparent);
-  border: var(--scroll-border);
-  --scroll-bg: color-mix(in srgb, var(--color-panel-translucent) 75%, transparent);
-  background-color: var(--scroll-bg);
-  color: var(--color-text-primary);
+  border: var(--local-border-width) solid transparent;
+  background-color: transparent;
+  color: var(--color-text-secondary);
   cursor: pointer;
-  --scroll-shadow: 0 var(--space-sm) var(--space-3xl) var(--local-scroll-shadow-color);
-  box-shadow: var(--scroll-shadow);
-  backdrop-filter: blur(1rem);
+  box-shadow: none;
+  backdrop-filter: none;
   transition: all var(--motion-base);
   --scroll-animation: bouncearrowscroll 2s infinite;
   animation: var(--scroll-animation);
 
   &:hover {
-    --scroll-hover-bg: color-mix(in srgb, var(--color-panel-translucent) 85%, transparent);
-    background-color: var(--scroll-hover-bg);
-    border-color: color-mix(in srgb, var(--color-border-default) 70%, transparent);
+    background-color: color-mix(in srgb, var(--color-panel-translucent) 75%, transparent);
+    border-color: color-mix(in srgb, var(--color-border-default) 45%, transparent);
+    box-shadow: 0 var(--space-sm) var(--space-3xl) var(--local-scroll-shadow-color);
+    backdrop-filter: blur(1rem);
+    color: var(--color-text-primary);
     transform: scale(1.1);
     animation-play-state: paused;
   }
@@ -251,4 +260,53 @@
   :global(.media-detail-page)[data-scrolled="true"] & {
     animation: none;
   }
+}
+
+@keyframes bouncearrowscroll {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(0.3125rem);
+  }
+  60% {
+    transform: translateY(0.15625rem);
+  }
+}
+
+.trailer-iframe {
+  aspect-ratio: 16/9;
+  border: none;
+}
+
+.inline-sections {
+  height: 100%;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) minmax(22.5rem, 1.2fr);
+  gap: var(--space-2xl);
+  padding: var(--space-md) 0 5rem 0;
+  box-sizing: border-box;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.read-more-overview {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--color-text-primary);
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: var(--space-md);
+  font-family: var(--font-base);
+  text-align: justify;
+}
+
+.read-more-paragraph {
+  margin: 0 0 1rem;
+  text-indent: 1rem;
 }

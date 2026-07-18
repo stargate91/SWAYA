@@ -8,8 +8,10 @@ import PlayerControlBar from './PlayerControlBar';
 import Sidebar from './Sidebar';
 import Spinner from '../ui/Spinner';
 import { useSettingsQuery } from '../queries';
+import { useScanStatusQuery, useHydrateStatusQuery } from '../queries/scanQueries';
 import { useNavigationStore } from '../stores/useNavigationStore';
 import styles from './AppShell.module.css';
+import { useRef } from 'react';
 
 export default function AppShell() {
   const { data: settings } = useSettingsQuery();
@@ -19,6 +21,44 @@ export default function AppShell() {
   const pushPath = useNavigationStore((state) => state.pushPath);
   const navType = useNavigationType();
   const queryClient = useQueryClient();
+
+  const scanStatusQuery = useScanStatusQuery();
+  const hydrateStatusQuery = useHydrateStatusQuery();
+
+  const prevScanActiveRef = useRef(false);
+  const prevHydrateActiveRef = useRef(false);
+
+  useEffect(() => {
+    const scanActive = Boolean(scanStatusQuery.data?.active);
+    const wasScanActive = prevScanActiveRef.current;
+    
+    if (wasScanActive && !scanActive) {
+      queryClient.invalidateQueries({ queryKey: ['library'] });
+      queryClient.invalidateQueries({ queryKey: ['people'] });
+      queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['person-credits'] });
+      queryClient.invalidateQueries({ queryKey: ['library-item-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['library-tv-detail'] });
+    }
+    
+    prevScanActiveRef.current = scanActive;
+  }, [scanStatusQuery.data?.active, queryClient]);
+
+  useEffect(() => {
+    const hydrateActive = Boolean(hydrateStatusQuery.data?.active);
+    const wasHydrateActive = prevHydrateActiveRef.current;
+    
+    if (wasHydrateActive && !hydrateActive) {
+      queryClient.invalidateQueries({ queryKey: ['library'] });
+      queryClient.invalidateQueries({ queryKey: ['people'] });
+      queryClient.invalidateQueries({ queryKey: ['people-infinite'] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['person-credits'] });
+    }
+    
+    prevHydrateActiveRef.current = hydrateActive;
+  }, [hydrateStatusQuery.data?.active, queryClient]);
 
   useEffect(() => {
     if (navType !== 'POP') {

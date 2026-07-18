@@ -51,6 +51,8 @@ import Stack from '@/ui/Stack';
 import Card from '@/ui/Card';
 
 import DetailsMetadataDrawer from './components/detail/DetailsMetadataDrawer';
+import Drawer from '@/ui/Drawer';
+import ParsedParagraphs from '@/ui/ParsedParagraphs';
 import BespokeBoxOfficeSection from './components/detail/sections/BespokeBoxOfficeSection';
 import BottomSocialsBar from './components/detail/sections/BottomSocialsBar';
 import IconButton from '@/ui/IconButton';
@@ -90,6 +92,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
   useScrollRestoration('.media-detail-page__container', [isLoading]);
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isOverviewDrawerOpen, setIsOverviewDrawerOpen] = useState(false);
   const [isLogoDrawerOpen, setIsLogoDrawerOpen] = useState(false);
   const [isPosterDrawerOpen, setIsPosterDrawerOpen] = useState(false);
   const [isBackdropDrawerOpen, setIsBackdropDrawerOpen] = useState(false);
@@ -119,7 +122,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
 
   const [isScrolled, handleScrollToggle] = useHeaderScrollTransition(
     id,
-    isLogoDrawerOpen || isPosterDrawerOpen || isBackdropDrawerOpen || isDrawerOpen,
+    isLogoDrawerOpen || isPosterDrawerOpen || isBackdropDrawerOpen || isDrawerOpen || isOverviewDrawerOpen,
     isPreviewPlaying
   );
 
@@ -159,7 +162,11 @@ export default function MediaDetailPage({ type = 'movie' }) {
       handleOpenLogoModal,
       handleOpenPosterModal,
       isDrawerOpen,
-      setIsDrawerOpen
+      setIsDrawerOpen,
+      actions: {
+        ...detailState.actions,
+        handleReadMore: () => setIsOverviewDrawerOpen(true)
+      }
     }}>
       <DetailPageShell
         backdropUrl={backdropUrl}
@@ -170,7 +177,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
         backLabel={t('common.back') || 'Back'}
         pageClassName={shellStyles['scroll-transition']}
         isScrolled={isScrolled}
-        isDrawerOpen={isLogoDrawerOpen || isPosterDrawerOpen || isBackdropDrawerOpen || isDrawerOpen}
+        isDrawerOpen={isLogoDrawerOpen || isPosterDrawerOpen || isBackdropDrawerOpen || isDrawerOpen || isOverviewDrawerOpen}
         containerRef={containerRef}
         onVideoPlayingChange={setIsVideoPlaying}
         topRightControls={(
@@ -235,7 +242,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
             )}
           </div>
 
-          <div className="media-detail-page__inline-sections">
+          <div className={`${shellStyles['inline-sections']} media-detail-page__inline-sections`}>
             <Stack gap="2xl">
               {item && <BespokeCastSection item={item} t={t} navigate={navigate} />}
               {isScene && item?.technical && (
@@ -283,6 +290,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
         <UtilityBarBottomPortal side="center">
           <IconButton
             variant="ghost"
+            size="sm"
             className={shellStyles['scroll-toggle-btn']}
             onClick={handleScrollToggle}
             title={
@@ -308,6 +316,23 @@ export default function MediaDetailPage({ type = 'movie' }) {
         isScene={isScene}
         t={t}
       />
+
+      <Drawer
+        isOpen={isOverviewDrawerOpen}
+        onClose={() => setIsOverviewDrawerOpen(false)}
+        title={item?.title || item?.name || t('library.details.overview') || 'Overview'}
+        size="md"
+        padded
+      >
+        <div className={shellStyles['read-more-overview']}>
+          {item?.overview && (
+            <ParsedParagraphs
+              text={item.overview}
+              paragraphClassName={shellStyles['read-more-paragraph']}
+            />
+          )}
+        </div>
+      </Drawer>
 
       <ImagePickerDrawer
         isOpen={isLogoDrawerOpen}

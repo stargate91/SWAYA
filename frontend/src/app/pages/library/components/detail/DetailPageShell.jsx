@@ -1,7 +1,6 @@
 import Page from '@/ui/Page';
 import Skeleton from '@/ui/Skeleton';
 import HeroSection from './HeroSection';
-import '../../MediaDetailPage.css';
 import loadingStyles from './DetailPageLoading.module.css';
 import styles from './DetailPageShell.module.css';
 

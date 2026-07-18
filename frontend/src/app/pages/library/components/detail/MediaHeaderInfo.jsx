@@ -54,7 +54,7 @@ export default function MediaHeaderInfo({ isFallbackGrid = false }) {
 
   return (
     <div className={`${styles.layout} ${isFallbackGrid ? styles['layout-fallback'] : ''}`}>
-      <Stack gap="4xl" className={styles.copy}>
+      <div className={styles.copy}>
         <div
           className={`${styles['logo-container']} ${styles.clickable}`}
           role="button"
@@ -158,7 +158,7 @@ export default function MediaHeaderInfo({ isFallbackGrid = false }) {
             </Inline>
           )}
         </Stack>
-      </Stack>
+      </div>
     </div>
   );
 }

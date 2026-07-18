@@ -12,8 +12,12 @@ import PersonCreditsSections from './components/entityDetail/PersonCreditsSectio
 import CollectionDetailSections from './components/entityDetail/CollectionDetailSections';
 import usePeopleCollectionDetailController from './usePeopleCollectionDetailController.jsx';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
-import './PeopleCollectionDetailPage.css';
+import PeopleLeftSidebar from './components/entityDetail/PeopleLeftSidebar';
+import PeopleRightHeroSection from './components/entityDetail/PeopleRightHeroSection';
 import BottomSocialsBar from './components/detail/sections/BottomSocialsBar';
+import IconButton from '@/ui/IconButton';
+import UtilityBarBottomPortal from '../../../components/UtilityBarBottomPortal';
+import shellStyles from './components/detail/DetailPageShell.module.css';
 
 export default function PeopleCollectionDetailPage({ type = 'people' }) {
   const { id } = useParams();
@@ -121,6 +125,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
       backLabel={t('common.back') || 'Back'}
       isLoading={isLoading}
       isPeople={isPeople}
+      isScrolled={isScrolled}
       pageClassName={`entity-detail-page ${isPeople ? 'entity-detail-page--people' : 'entity-detail-page--collection'} ${isScrolled ? 'is-scrolled' : ''} ${(isImagePickerDrawerOpen || isBackdropDrawerOpen || isDetailsDrawerOpen) ? 'logo-drawer-open' : ''}`}
       topRightControls={
         <EntityDetailTopControls
@@ -144,58 +149,73 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
         />
       )}
 
-      {!hasError && !item && !isLoading && (
-        <EntityDetailStatusSection
-          title={isPeople ? 'Person not found' : 'Collection not found'}
-          message={isPeople ? 'No person detail was returned for this route.' : 'No collection detail was returned for this route.'}
-        />
-      )}
-
-      {!hasError && (
-        <div className="entity-detail-page__transition-wrapper">
-          <EntityDetailHeroSection
-            isPeople={isPeople}
-            item={item}
-            isScrolled={isScrolled}
-            onScrollArrowClick={handleScrollArrowClick}
-            mediaUrl={mediaUrl}
-            profileLinks={profileLinks}
-            extraLinks={extraLinks}
-            socialLinks={socialLinks}
-            overviewText={overviewText}
-            overviewTitle={overviewTitle}
-            overviewEmptyText={overviewEmptyText}
-            isActivateHovered={isActivateHovered}
-            t={t}
-            openModal={openModal}
-            setIsActivateHovered={setIsActivateHovered}
-            handleToggleFavorite={handleToggleFavorite}
-            handleToggleActive={handleToggleActive}
-            handleOpenReviewModal={handleOpenReviewModal}
-            onMediaCardClick={handleOpenImagePickerModal}
-            updatePersonStatusMutation={updatePersonStatusMutation}
-            isDrawerOpen={isDetailsDrawerOpen}
-            setIsDrawerOpen={setIsDetailsDrawerOpen}
-          />
-
-          {isPeople && (
-            <PersonCreditsSections
-              id={id}
-              item={item}
-              isScrolled={isScrolled}
-              navigate={navigate}
-              t={t}
-            />
+      {!hasError && item && !isLoading && (
+        <>
+          {isPeople ? (
+            <div className="people-detail-layout">
+              <PeopleLeftSidebar
+                item={item}
+                mediaUrl={mediaUrl}
+                overviewText={overviewText}
+                overviewTitle={overviewTitle}
+                overviewEmptyText={overviewEmptyText}
+                isActivateHovered={isActivateHovered}
+                setIsActivateHovered={setIsActivateHovered}
+                handleToggleFavorite={handleToggleFavorite}
+                handleToggleActive={handleToggleActive}
+                handleOpenReviewModal={handleOpenReviewModal}
+                onMediaCardClick={handleOpenImagePickerModal}
+                updatePersonStatusMutation={updatePersonStatusMutation}
+                isDrawerOpen={isDetailsDrawerOpen}
+                setIsDrawerOpen={setIsDetailsDrawerOpen}
+              />
+              <div className="people-detail-right-column">
+                <div className="entity-detail-page__transition-wrapper">
+                  <PeopleRightHeroSection item={item} />
+                  <PersonCreditsSections
+                    id={id}
+                    item={item}
+                    isScrolled={isScrolled}
+                    navigate={navigate}
+                    t={t}
+                  />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="entity-detail-page__transition-wrapper">
+              <EntityDetailHeroSection
+                isPeople={isPeople}
+                item={item}
+                isScrolled={isScrolled}
+                onScrollArrowClick={handleScrollArrowClick}
+                mediaUrl={mediaUrl}
+                profileLinks={profileLinks}
+                extraLinks={extraLinks}
+                socialLinks={socialLinks}
+                overviewText={overviewText}
+                overviewTitle={overviewTitle}
+                overviewEmptyText={overviewEmptyText}
+                isActivateHovered={isActivateHovered}
+                t={t}
+                openModal={openModal}
+                setIsActivateHovered={setIsActivateHovered}
+                handleToggleFavorite={handleToggleFavorite}
+                handleToggleActive={handleToggleActive}
+                handleOpenReviewModal={handleOpenReviewModal}
+                onMediaCardClick={handleOpenImagePickerModal}
+                updatePersonStatusMutation={updatePersonStatusMutation}
+                isDrawerOpen={isDetailsDrawerOpen}
+                setIsDrawerOpen={setIsDetailsDrawerOpen}
+              />
+              <CollectionDetailSections
+                item={item}
+                navigate={navigate}
+                t={t}
+              />
+            </div>
           )}
-
-          {!isPeople && (
-            <CollectionDetailSections
-              item={item}
-              navigate={navigate}
-              t={t}
-            />
-          )}
-        </div>
+        </>
       )}
       {!hasError && isPeople && socialLinks.length > 0 && (
         <BottomSocialsBar socialLinks={socialLinks} t={t} />
@@ -203,16 +223,21 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
 
 
       {!hasError && isPeople && (
-        <div className={`entity-detail-page__scroll-toggle-container ${isScrolled ? 'is-scrolled' : ''}`}>
-          <button
-            type="button"
-            className="entity-detail-page__scroll-toggle-btn"
+        <UtilityBarBottomPortal side="center">
+          <IconButton
+            variant="ghost"
+            size="sm"
+            className={shellStyles['scroll-toggle-btn']}
             onClick={() => setIsScrolled(!isScrolled)}
-            title={isScrolled ? (t('library.details.backToProfile') || 'Back to Profile') : (t('library.details.scrollToCredits') || 'Scroll to Credits')}
+            title={
+              isScrolled
+                ? (t('library.details.backToProfile') || 'Back to Profile')
+                : (t('library.details.scrollToCredits') || 'Scroll to Credits')
+            }
           >
             {isScrolled ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-          </button>
-        </div>
+          </IconButton>
+        </UtilityBarBottomPortal>
       )}
 
       {/* Image Picker Drawer */}

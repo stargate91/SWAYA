@@ -1,31 +1,21 @@
 .person-credits-section-container {
-  display: grid;
-  grid-template-columns: minmax(15rem, 20.625rem) minmax(0, 1fr);
-  gap: var(--space-2xl);
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
   flex-shrink: 0;
-  padding-bottom: 0;
+  overflow: hidden;
+  box-sizing: border-box;
   --container-pr: 5rem;
   padding-right: var(--container-pr);
-  box-sizing: border-box;
-}
-
-.is-scrolled .person-credits-section-container {
-  height: 100%;
-  margin-top: 0;
-  overflow: hidden;
-  grid-template-rows: auto 1fr;
-  row-gap: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  box-sizing: border-box;
 }
 
 .person-credits-detail-panel {
-  grid-column: 2;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
   --local-bg: color-mix(in srgb, var(--color-panel-translucent) 22%, transparent);
   background: var(--local-bg);
   --local-border: 0.0625rem solid color-mix(in srgb, var(--color-border-default) 40%, transparent);
@@ -36,38 +26,19 @@
   backdrop-filter: blur(1rem);
   --local-shadow: 0 1rem 2.5rem color-mix(in srgb, var(--color-bg-canvas) 20%, transparent);
   box-shadow: var(--local-shadow);
-  margin-bottom: var(--space-2xl);
-}
-
-.is-scrolled .person-credits-detail-panel {
-  height: 100%;
-  max-height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  margin-bottom: var(--space-md);
+  box-sizing: border-box;
 }
 
 .person-credits-discover-grid-wrapper {
-  grid-column: 2;
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: var(--space-xl);
-  --local-padding-top: 0.625rem;
-  padding-top: var(--local-padding-top);
-}
-
-.is-scrolled .person-credits-discover-grid-wrapper {
   overflow-y: auto;
   min-height: 0;
   --local-padding-top: 0.625rem;
   padding-top: var(--local-padding-top);
   padding-bottom: var(--space-2xl);
-}
-
-.person-credits-section-container>* {
-  grid-column: 2;
 }
 
 .person-credits-section-container.is-scrolled .person-credits-tabs {

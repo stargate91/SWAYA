@@ -16,6 +16,7 @@ import { Info } from '@/ui/icons';
 import RatingsReviewDrawer from '@/pages/ratings/components/RatingsReviewDrawer';
 import { useMediaMutations } from './useMediaMutations';
 import { useMediaDetailTabs } from './useMediaDetailTabs';
+import shellStyles from '../components/detail/DetailPageShell.module.css';
 
 export default function useMediaDetail({ id, type, t, openModal }) {
   const normalizedId = id == null ? '' : String(id);
@@ -548,7 +549,7 @@ export default function useMediaDetail({ id, type, t, openModal }) {
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
-            className="trailer-iframe"
+            className={shellStyles['trailer-iframe']}
           />
         )
       });
@@ -602,22 +603,6 @@ export default function useMediaDetail({ id, type, t, openModal }) {
       setIsTruncated(el.scrollHeight > el.clientHeight);
     }
   }, [overview, isLoading]);
-
-  const handleReadMore = () => {
-    openModal({
-      title: title,
-      icon: Info,
-      variant: 'wide',
-      description: t('library.details.overview') || 'Overview',
-      content: (
-        <div className="read-more-overview">
-          {overview.split('\n\n').map((paragraph, index) => (
-            <p key={index} className="read-more-paragraph">{paragraph}</p>
-          ))}
-        </div>
-      )
-    });
-  };
 
   const backdropPath = item?.backdrop_path || '';
   const backdropUrl = resolveDetailsImageUrl(backdropPath, API_BASE, 'backdrop');
@@ -709,7 +694,6 @@ export default function useMediaDetail({ id, type, t, openModal }) {
       handlePlayClick,
       handleToggleWatched,
       handleToggleTracked,
-      handleReadMore,
       setIsWatchLogsExpanded,
       renderReviewDrawer
     },
