@@ -4,6 +4,8 @@
   flex-wrap: nowrap;
   width: 100%;
   align-items: flex-start;
+  padding-top: var(--space-xs);
+  margin-top: calc(-1 * var(--space-xs));
 }
 
 .card {

@@ -1,8 +1,7 @@
 import { DollarSign, Coins, TrendingUp } from '@/ui/icons';
 import Card from '@/ui/Card';
 import Grid from '@/ui/Grid';
-import Stack from '@/ui/Stack';
-import Text from '@/ui/Text';
+import StatCard from '@/ui/data/StatCard';
 
 export default function BespokeBoxOfficeSection({ item, t }) {
   if (!item || (item.budget <= 0 && item.revenue <= 0)) return null;
@@ -24,27 +23,12 @@ export default function BespokeBoxOfficeSection({ item, t }) {
 
   const renderStat = (icon, label, value, themeType) => {
     return (
-      <Card
-        variant="stat"
-        data-state={themeType}
-      >
-        <div className="icon-wrapper">
-          {icon}
-        </div>
-        <Stack gap="3xs">
-          <Text
-            variant="caption"
-            color="muted"
-            weight="bold"
-            uppercase
-          >
-            {label}
-          </Text>
-          <Text variant="small" weight="semibold">
-            {value}
-          </Text>
-        </Stack>
-      </Card>
+      <StatCard
+        icon={icon}
+        label={label}
+        value={value}
+        state={themeType}
+      />
     );
   };
 

@@ -7,12 +7,10 @@ import Tooltip from '@/ui/Tooltip';
 import ScrollRow from '@/ui/ScrollRow';
 import Card from '@/ui/Card';
 import SegmentedControl from '@/ui/SegmentedControl';
-import Stack from '@/ui/Stack';
-import Text from '@/ui/Text';
 import Inline from '@/ui/Inline';
-import Avatar from '@/ui/Avatar';
+import CastCard from '@/ui/data/CastCard';
+import LogoCard from '@/ui/data/LogoCard';
 import styles from './BespokeCastSection.module.css';
-import './BespokeCompaniesSection.css';
 
 export default function BespokeCastSection({ item, t, navigate }) {
   const settings = useMediaDetailContext()?.state?.settings;
@@ -131,69 +129,40 @@ export default function BespokeCastSection({ item, t, navigate }) {
           {activeTab === 'cast' && allPeople.map(person => {
             const opacity = person.isFilteredOut ? 0.35 : 1;
             return (
-              <Stack
+              <CastCard
                 key={person.id}
-                align="center"
-                gap="xs"
+                src={person.profile_path && !person.isFilteredOut ? resolvePersonAvatarUrl(person.profile_path) : undefined}
+                name={person.name}
+                character={person.displayRole}
+                fallbackIcon={<User size={24} />}
                 onClick={person.isFilteredOut ? undefined : () => navigate(`/library/people/${person.id}`, { state: { allowAdult: true } })}
                 className={styles.card}
                 // eslint-disable-next-line react/forbid-component-props
                 style={{ opacity, cursor: person.isFilteredOut ? 'default' : 'pointer' }}
-              >
-                <Avatar
-                  src={person.profile_path && !person.isFilteredOut ? resolvePersonAvatarUrl(person.profile_path) : undefined}
-                  alt={person.name}
-                  fallbackIcon={<User size={24} />}
-                  className="avatar-wrapper"
-                  style={{ '--avatar-size': '5rem' }}
-                />
-                <Text variant="body" weight="bold" className={styles.name}>
-                  {person.name}
-                  {person.age_at_release != null && ` (${person.age_at_release})`}
-                </Text>
-                {person.displayRole && (
-                  <Text variant="xs" color="muted" className={styles.role}>
-                    {person.displayRole}
-                  </Text>
-                )}
-              </Stack>
+              />
             );
           })}
 
           {activeTab === 'companies' && item.companies.map((c, i) => (
-            <div key={i} className="bespoke-company-card">
-              <Tooltip content={c.name} side="top">
-                {c.logo_path ? (
-                  <img
-                    src={resolveCompanyLogoUrl(c.logo_path)}
-                    alt={c.name}
-                    className="bespoke-company-logo"
-                  />
-                ) : (
-                  <Text variant="small" weight="bold" color="secondary" className="bespoke-company-text">
-                    {c.name}
-                  </Text>
-                )}
-              </Tooltip>
-            </div>
+            <Tooltip key={i} content={c.name} side="top">
+              <LogoCard
+                src={c.logo_path ? resolveCompanyLogoUrl(c.logo_path) : undefined}
+                alt={c.name}
+                size="lg"
+                invert
+              />
+            </Tooltip>
           ))}
 
           {activeTab === 'networks' && item.networks.map((n, i) => (
-            <div key={i} className="bespoke-company-card">
-              <Tooltip content={n.name} side="top">
-                {n.logo_path ? (
-                  <img
-                    src={resolveCompanyLogoUrl(n.logo_path)}
-                    alt={n.name}
-                    className="bespoke-company-logo"
-                  />
-                ) : (
-                  <Text variant="small" weight="bold" color="secondary" className="bespoke-company-text">
-                    {n.name}
-                  </Text>
-                )}
-              </Tooltip>
-            </div>
+            <Tooltip key={i} content={n.name} side="top">
+              <LogoCard
+                src={n.logo_path ? resolveCompanyLogoUrl(n.logo_path) : undefined}
+                alt={n.name}
+                size="lg"
+                invert
+              />
+            </Tooltip>
           ))}
         </Inline>
       </ScrollRow>

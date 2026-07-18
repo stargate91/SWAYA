@@ -8,7 +8,7 @@ import {
 } from '@/queries';
 import { useSettingsQuery } from '@/queries/settingsQueries';
 
-export default function useListManagement({ item, type, t }) {
+export default function useListManagement({ item, type }) {
   const isTv = type === 'tv';
   const isPerson = type === 'person' || type === 'people';
   const listType = isPerson ? 'person' : 'media';

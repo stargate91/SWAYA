@@ -2,6 +2,11 @@
   display: inline-flex;
 }
 
+.trigger-full-width {
+  width: 100%;
+  display: flex;
+}
+
 .content {
   z-index: var(--z-index-toast);
   max-width: var(--tooltip-max-width);

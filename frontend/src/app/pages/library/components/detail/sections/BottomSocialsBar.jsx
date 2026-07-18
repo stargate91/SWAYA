@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { Minus, Plus } from '@/ui/icons';
 import UtilityBarBottomPortal from '../../../../../../components/UtilityBarBottomPortal';
-import Inline from '@/ui/Inline';
 export default function BottomSocialsBar({
   socialLinks,
   t

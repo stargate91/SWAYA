@@ -194,22 +194,6 @@
   padding-right: var(--space-sm);
 }
 
-.history-card__files-list::-webkit-scrollbar {
-  width: var(--space-sm);
-}
-
-.history-card__files-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.history-card__files-list::-webkit-scrollbar-thumb {
-  background: var(--color-border-heavy);
-  border-radius: var(--radius-full);
-}
-
-.history-card__files-list::-webkit-scrollbar-thumb:hover {
-  background: var(--color-accent-blue);
-}
 
 .history-card__file-item {
   display: flex;

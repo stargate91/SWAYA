@@ -176,14 +176,6 @@
   padding-right: var(--space-sm);
 }
 
-.bespoke-season-meta__content-col::-webkit-scrollbar {
-  width: 0.25rem;
-}
-
-.bespoke-season-meta__content-col::-webkit-scrollbar-thumb {
-  background: var(--color-border-default);
-  border-radius: var(--radius-sm);
-}
 
 
 

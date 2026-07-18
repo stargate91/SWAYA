@@ -87,7 +87,7 @@
 .icon-button[data-variant="ghost"] {
   background: var(--button-ghost-bg);
   color: var(--button-ghost-color);
-  border-color: var(--button-ghost-border);
+  border-color: transparent;
 }
 
 .icon-button[data-variant="danger"] {
@@ -193,6 +193,7 @@
 .icon-button[data-variant="ghost"]:hover:not(:disabled) {
   background: var(--button-ghost-hover-bg);
   color: var(--button-ghost-hover-color);
+  border-color: var(--button-ghost-border);
 }
 
 .icon-button[data-variant="danger"]:hover:not(:disabled) {

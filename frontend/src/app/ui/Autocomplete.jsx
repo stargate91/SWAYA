@@ -66,7 +66,7 @@ export default function Autocomplete({
               {renderItem ? renderItem(opt) : (opt.name || opt.label || String(opt))}
             </button>
           ))}
-          {renderFooter && renderFooter(() => setIsOpen(false), styles.item, styles.itemCreate)}
+          {renderFooter && renderFooter(() => setIsOpen(false), styles.item, styles['item-create'])}
         </div>
       )}
     </div>

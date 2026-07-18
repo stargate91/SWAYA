@@ -41,7 +41,7 @@
   background: color-mix(in srgb, var(--color-ink) 5%, transparent);
 }
 
-.itemCreate {
+.item-create {
   color: var(--color-accent-blue);
   border-top: 1px solid var(--color-border-default);
   margin-top: var(--space-xs);

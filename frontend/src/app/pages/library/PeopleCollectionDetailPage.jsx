@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
-import { Plus, Minus, ChevronDown, ChevronUp } from '@/ui/icons';
+import { ChevronDown, ChevronUp } from '@/ui/icons';
 import ImagePickerDrawer from './components/ImagePickerDrawer';
 import DetailPageShell from './components/detail/DetailPageShell';
 import EntityDetailTopControls from './components/entityDetail/EntityDetailTopControls';
@@ -11,11 +11,9 @@ import EntityDetailHeroSection from './components/entityDetail/EntityDetailHeroS
 import PersonCreditsSections from './components/entityDetail/PersonCreditsSections';
 import CollectionDetailSections from './components/entityDetail/CollectionDetailSections';
 import usePeopleCollectionDetailController from './usePeopleCollectionDetailController.jsx';
-import UtilityBarBottomPortal from '../../../components/UtilityBarBottomPortal';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import './PeopleCollectionDetailPage.css';
 import './components/detail/UserRatingSection.css';
-import OnboardingWizard from '../onboarding/OnboardingWizard';
 import BottomSocialsBar from './components/detail/sections/BottomSocialsBar';
 
 export default function PeopleCollectionDetailPage({ type = 'people' }) {
@@ -56,7 +54,6 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
 
   const handleOpenPeopleBackdropModal = () => setIsBackdropDrawerOpen(true);
 
-  const [isSocialExpanded, setIsSocialExpanded] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isImagePickerDrawerOpen, setIsImagePickerDrawerOpen] = useState(false);
   const [isBackdropDrawerOpen, setIsBackdropDrawerOpen] = useState(false);
@@ -110,11 +107,6 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
   const handleScrollArrowClick = useCallback(() => {
     setIsScrolled(true);
   }, [setIsScrolled]);
-
-  const hasExtraSocials = socialLinks.length > 4;
-  const visibleSocialLinks = (hasExtraSocials && !isSocialExpanded)
-    ? socialLinks.slice(socialLinks.length - 4)
-    : socialLinks;
 
   const handleOpenImagePickerModal = () => {
     setIsImagePickerDrawerOpen(true);

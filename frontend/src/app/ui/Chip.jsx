@@ -47,11 +47,6 @@ export default function Chip({
     ${className}
   `.trim();
 
-  const combinedStyle = {
-    ...style,
-    ...(color ? { '--chip-color': color } : {}),
-  };
-
   return (
     <button
       type="button"
@@ -60,7 +55,18 @@ export default function Chip({
       data-active={active || undefined}
       onClick={isRemovable && !onClick ? handleRemove : handleClick}
       disabled={disabled}
-      style={combinedStyle}
+      ref={(el) => {
+        if (el) {
+          if (color) {
+            el.style.setProperty('--chip-color', color);
+          }
+          if (style) {
+            Object.keys(style).forEach((key) => {
+              el.style[key] = style[key];
+            });
+          }
+        }
+      }}
       {...props}
     >
       {leftElement && <span className={styles['left-element']}>{leftElement}</span>}

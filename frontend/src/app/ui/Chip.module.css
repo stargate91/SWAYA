@@ -121,15 +121,15 @@
 
 /* Dynamic Color Token Support */
 .chip[style*="--chip-color"] {
-  background-color: color-mix(in srgb, var(--chip-color) 16%, rgba(10, 10, 15, 0.45));
-  border-color: color-mix(in srgb, var(--chip-color) 40%, rgba(255, 255, 255, 0.15));
-  color: color-mix(in srgb, var(--chip-color) 90%, white);
+  background-color: color-mix(in srgb, var(--chip-color) 16%, var(--color-bg-elevated));
+  border-color: color-mix(in srgb, var(--chip-color) 40%, var(--color-border-subtle));
+  color: color-mix(in srgb, var(--chip-color) 90%, var(--color-text-primary));
 }
 
 .chip[style*="--chip-color"].chip--interactive:hover {
-  background-color: color-mix(in srgb, var(--chip-color) 25%, rgba(10, 10, 15, 0.6));
-  border-color: color-mix(in srgb, var(--chip-color) 60%, rgba(255, 255, 255, 0.25));
-  color: white;
+  background-color: color-mix(in srgb, var(--chip-color) 25%, var(--color-bg-elevated));
+  border-color: color-mix(in srgb, var(--chip-color) 60%, var(--color-border-strong));
+  color: var(--color-text-primary);
 }
 
 /* Disabled State */

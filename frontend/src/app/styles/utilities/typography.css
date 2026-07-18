@@ -26,3 +26,11 @@
   color: var(--color-text-muted);
 }
 
+.u-font-2xs {
+  font-size: var(--font-size-2xs);
+}
+
+.u-opacity-60 {
+  opacity: 0.6;
+}
+

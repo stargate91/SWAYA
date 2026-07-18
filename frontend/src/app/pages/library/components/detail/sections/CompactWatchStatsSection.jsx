@@ -6,6 +6,7 @@ import Grid from '@/ui/Grid';
 import Inline from '@/ui/Inline';
 import Stack from '@/ui/Stack';
 import Text from '@/ui/Text';
+import WatchStatsCard from '@/ui/data/WatchStatsCard';
 import LinearProgress from '@/ui/LinearProgress';
 
 export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) {
@@ -135,8 +136,13 @@ export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) 
     lastWatchedText = tvLastWatched ? formatLogDate(tvLastWatched) : (t('library.details.never') || 'Never');
   }
 
-  const statusClass = watchStatus === 'Watched' ? 'watched' : (watchStatus === 'In Progress' ? 'progress' : 'unwatched');
-  const watchCountText = watchCount > 0 ? `(${watchCount}x)` : '';
+  const watchCountText = `(${watchCount}x)`;
+  const statusClass = watchStatus === (t('library.details.statusWatched') || 'Watched')
+    ? 'watched'
+    : watchStatus === (t('library.details.statusInProgress') || 'In Progress')
+      ? 'in-progress'
+      : 'unwatched';
+
   const progressPercentText = `${progressPercent}%`;
   const watchActivityText = `${t('library.details.watchActivity') || 'Watch History'} (${logs.length})`;
 
@@ -149,48 +155,34 @@ export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) 
     >
       <Stack gap="md" fullWidth>
         <Grid variant="three-cols">
-          <Card variant="stat">
-            <Stack gap="3xs">
-              <Text variant="caption" color="muted" weight="bold" uppercase>
-                {t('library.details.watchStatus') || 'Status'}
-              </Text>
-              <Text variant="small" weight="semibold" className={`status-${statusClass}`}>
+          <WatchStatsCard
+            label={t('library.details.watchStatus') || 'Status'}
+            value={
+              <span className={`status-${statusClass}`}>
                 {watchStatus}
                 {((isMovie || isScene) && watchCount > 0) && (
-                  <span className="u-ml-xs" style={{ opacity: 0.6 }}>
+                  <span className="u-ml-xs u-opacity-60">
                     {watchCountText}
                   </span>
                 )}
-              </Text>
-            </Stack>
-          </Card>
+              </span>
+            }
+          />
 
-          <Card variant="stat">
-            <Stack gap="3xs" fullWidth>
-              <Text variant="caption" color="muted" weight="bold" uppercase>
-                {t('library.details.movieProgress') || 'Progress'}
-              </Text>
-              <Inline justify="between" fullWidth className="u-mb-2xs">
-                <Text variant="small" weight="semibold">{progressText}</Text>
-                <Text variant="small" color="muted">{progressPercentText}</Text>
-              </Inline>
-              <LinearProgress
-                value={progressPercent}
-                variant="accent"
-              />
-            </Stack>
-          </Card>
+          <WatchStatsCard
+            label={t('library.details.movieProgress') || 'Progress'}
+          >
+            <Inline justify="between" fullWidth className="u-mb-2xs">
+              <Text variant="small" weight="semibold">{progressText}</Text>
+              <Text variant="small" color="muted">{progressPercentText}</Text>
+            </Inline>
+            <LinearProgress value={progressPercent} variant="accent" />
+          </WatchStatsCard>
 
-          <Card variant="stat">
-            <Stack gap="3xs">
-              <Text variant="caption" color="muted" weight="bold" uppercase>
-                {t('library.details.lastWatched') || 'Last Watched'}
-              </Text>
-              <Text variant="small" weight="semibold">
-                {lastWatchedText}
-              </Text>
-            </Stack>
-          </Card>
+          <WatchStatsCard
+            label={t('library.details.lastWatched') || 'Last Watched'}
+            value={lastWatchedText}
+          />
         </Grid>
 
         {logs.length > 0 && (
@@ -221,7 +213,7 @@ export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) 
                   return (
                     <Inline key={log.id || idx} justify="between" align="center" fullWidth className="u-panel-item">
                       <Text weight="bold">{epText || (t('library.details.playSession') || 'Session')}</Text>
-                      <span style={{ opacity: 0.6 }}>{dateStr}</span>
+                      <span className="u-opacity-60">{dateStr}</span>
                     </Inline>
                   );
                 })}

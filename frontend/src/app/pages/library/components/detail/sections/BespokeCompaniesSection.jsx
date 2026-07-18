@@ -4,8 +4,8 @@ import { API_BASE } from '@/lib/backend';
 import Tooltip from '@/ui/Tooltip';
 import ScrollRow from '@/ui/ScrollRow';
 import Card from '@/ui/Card';
-import Text from '@/ui/Text';
-import './BespokeCompaniesSection.css';
+import Inline from '@/ui/Inline';
+import LogoCard from '@/ui/data/LogoCard';
 
 export default function BespokeCompaniesSection({ item, t }) {
   const isSceneType = item?.type === 'scene';
@@ -42,21 +42,18 @@ export default function BespokeCompaniesSection({ item, t }) {
           className="no-scrollbar"
           showArrows={true}
         >
-          <div className="bespoke-companies-body">
+          <Inline gap="md" wrap={false}>
             {allCompanies.map((c, i) => (
-              <div key={i} className="bespoke-company-card">
-                <Tooltip content={c.name} side="top">
-                  {c.logo_path ? (
-                    <img src={resolveMediaImageUrl(c.logo_path, 'logo', API_BASE)} alt={c.name} className="bespoke-company-logo" />
-                  ) : (
-                    <Text variant="small" weight="bold" color="secondary" className="bespoke-company-text">
-                      {c.name}
-                    </Text>
-                  )}
-                </Tooltip>
-              </div>
+              <Tooltip key={i} content={c.name} side="top">
+                <LogoCard
+                  src={c.logo_path ? resolveMediaImageUrl(c.logo_path, 'logo', API_BASE) : undefined}
+                  alt={c.name}
+                  size="lg"
+                  invert
+                />
+              </Tooltip>
             ))}
-          </div>
+          </Inline>
         </ScrollRow>
       </Card>
     </div>

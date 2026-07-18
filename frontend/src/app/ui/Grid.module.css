@@ -209,6 +209,18 @@
   gap: var(--space-md);
 }
 
+/* Auto-fill Extra Small Variant (e.g. Ratings, compact badges) */
+.grid[data-variant="auto-fill-xs"] {
+  grid-template-columns: repeat(auto-fill, minmax(6.25rem, 1fr));
+  gap: var(--space-md);
+}
+
+/* Auto-fit Extra Small Variant (e.g. Ratings, compact badges) */
+.grid[data-variant="auto-fit-xs"] {
+  grid-template-columns: repeat(auto-fit, minmax(6.25rem, 1fr));
+  gap: var(--space-md);
+}
+
 /* Forces exactly 3 equal columns */
 .grid[data-variant="three-cols"] {
   grid-template-columns: repeat(3, minmax(0, 1fr));

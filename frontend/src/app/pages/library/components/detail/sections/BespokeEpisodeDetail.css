@@ -12,14 +12,6 @@
   padding-right: var(--space-sm);
 }
 
-.bespoke-episode-detail-card__content-col::-webkit-scrollbar {
-  width: 0.25rem;
-}
-
-.bespoke-episode-detail-card__content-col::-webkit-scrollbar-thumb {
-  background: var(--color-border-default);
-  border-radius: var(--radius-sm);
-}
 
 .bespoke-episode-detail-card__title {
   margin: 0;

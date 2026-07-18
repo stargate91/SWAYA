@@ -9,6 +9,7 @@ export default function Tooltip({
   side = 'top',
   delay = 600,
   children,
+  fullWidth = false,
 }) {
   if (!content) return children;
 
@@ -18,7 +19,7 @@ export default function Tooltip({
         <RadixTooltip.Trigger asChild>
           <span
             role="presentation"
-            className={`${styles.tooltip} ${triggerClassName}`.trim()}
+            className={`${styles.tooltip} ${fullWidth ? styles['trigger-full-width'] : ''} ${triggerClassName}`.trim()}
             onFocus={(e) => e.preventDefault()}
           >
             {children}
@@ -45,4 +46,5 @@ Tooltip.propTypes = {
   side: PropTypes.oneOf(['top', 'bottom', 'left', 'right']),
   delay: PropTypes.number,
   children: PropTypes.node.isRequired,
+  fullWidth: PropTypes.bool,
 };

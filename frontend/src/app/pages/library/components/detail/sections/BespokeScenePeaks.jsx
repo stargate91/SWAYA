@@ -3,7 +3,10 @@ import { useMediaDetailContext } from '../MediaDetailContext';
 import { formatTime } from '../../../utils/detailUtils';
 import Inline from '@/ui/Inline';
 import Card from '@/ui/Card';
-import './BespokeScenePeaks.css';
+import Stack from '@/ui/Stack';
+import IconButton from '@/ui/IconButton';
+import Text from '@/ui/Text';
+import styles from './BespokeScenePeaks.module.css';
 
 const LPAR = '(';
 const RPAR = ')';
@@ -33,7 +36,7 @@ export default function BespokeScenePeaks() {
 
   const titleContent = (
     <Inline gap="sm" align="center">
-      <Droplets size={12} className="bespoke-scene-peaks-title-icon" />
+      <Droplets size={12} color="var(--color-state-danger)" />
       <span>
         {t('library.details.peaksTitle') || 'Peak Moments'} {LPAR}{peaks.length}{RPAR}
       </span>
@@ -46,11 +49,10 @@ export default function BespokeScenePeaks() {
       headerVariant="shaded"
       padding="md"
       title={titleContent}
-      className="bespoke-scene-peaks-card"
     >
-      <div className="bespoke-scene-peaks-body">
+      <Stack gap="sm" className="bespoke-scene-peaks-body">
         {peaks.length > 0 ? (
-          <div className="bespoke-scene-peaks-list custom-scrollbar">
+          <Stack gap="2xs" scrollable className={`${styles.list} custom-scrollbar`}>
             {peaks.map((log, index) => {
               const hasPosition = log.video_position != null && log.video_position > 0;
               return (
@@ -58,7 +60,7 @@ export default function BespokeScenePeaks() {
                   justify="between"
                   align="center"
                   key={log.id || index}
-                  className={`bespoke-scene-peaks-item ${hasPosition ? 'bespoke-scene-peaks-item--playable' : ''}`}
+                  className={`${styles.item} ${hasPosition ? styles['item--playable'] : ''}`}
                   onClick={hasPosition ? handlePlayMedia : undefined}
                   role="button"
                   tabIndex={hasPosition ? 0 : -1}
@@ -70,36 +72,38 @@ export default function BespokeScenePeaks() {
                   title={hasPosition ? (t('library.details.playVideo') || PLAY_VIDEO_FALLBACK) : undefined}
                 >
                   <Inline gap="xs" align="center" className="bespoke-scene-peaks-item-left">
-                    <Droplets size={11} className="bespoke-scene-peaks-item-icon" />
-                    <span className="bespoke-scene-peaks-item-time">
+                    <Droplets size={11} color="var(--color-state-danger)" />
+                    <Text variant="small" weight="semibold">
                       {hasPosition ? formatTime(log.video_position) : (t('library.details.playSession') || 'Play Session')}
-                    </span>
+                    </Text>
                   </Inline>
 
                   <Inline gap="sm" align="center" className="bespoke-scene-peaks-item-right">
-                    <span className="bespoke-scene-peaks-item-date">
+                    <Text color="muted" className="u-font-2xs">
                       {new Date(log.watched_at).toLocaleDateString()}
-                    </span>
-                    <button
-                      type="button"
-                      className="bespoke-scene-peaks-item-delete"
+                    </Text>
+                    <IconButton
+                      variant="ghost"
+                      size="sm"
                       onClick={(e) => handleDeletePeak(e, log.id)}
                       disabled={deletePeakMutation.isPending}
                       title={t('library.details.deletePeakBtn') || 'Delete Peak'}
+                      className={styles['delete-btn']}
                     >
-                      <X size={12} />
-                    </button>
+                      <X size={14} />
+                    </IconButton>
                   </Inline>
                 </Inline>
               );
             })}
-          </div>
+          </Stack>
         ) : (
-          <span className="bespoke-scene-peaks-empty-text">
+          <Text variant="small" color="muted" className="u-font-italic">
             {t('library.details.noPeaks') || 'No peak moments recorded yet.'}
-          </span>
+          </Text>
         )}
-      </div>
+      </Stack>
     </Card>
   );
 }
+

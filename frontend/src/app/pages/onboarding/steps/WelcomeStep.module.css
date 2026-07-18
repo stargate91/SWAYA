@@ -62,19 +62,6 @@
   padding-right: var(--space-xs);
 }
 
-/* Custom Scrollbar */
-.language-list-scroll::-webkit-scrollbar {
-  width: var(--space-xs);
-}
-
-.language-list-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.language-list-scroll::-webkit-scrollbar-thumb {
-  background: var(--color-border-strong);
-  border-radius: var(--radius-2xs);
-}
 
 .language-row-item {
   --row-trans-dur: 0.22s;

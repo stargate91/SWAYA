@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Plus, X, Search } from '@/ui/icons';
 import Chip from '@/ui/Chip';

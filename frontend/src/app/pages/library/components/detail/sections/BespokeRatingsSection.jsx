@@ -1,6 +1,7 @@
-import Tooltip from '@/ui/Tooltip';
 import Card from '@/ui/Card';
-import './BespokeRatingsSection.css';
+import Grid from '@/ui/Grid';
+import Tooltip from '@/ui/Tooltip';
+import RatingCard from '@/ui/data/RatingCard';
 
 export default function BespokeRatingsSection({ item, t }) {
   const isSceneType = item?.type === 'scene';
@@ -34,24 +35,25 @@ export default function BespokeRatingsSection({ item, t }) {
   if (ratings.length === 0) return null;
 
   return (
-    <div className="bespoke-ratings-section">
-      <Card
-        variant="glass-shaded"
-        headerVariant="shaded"
-        padding="md"
-        title={t('library.details.ratingsSection') || 'Ratings'}
-      >
-        <div className="bespoke-ratings-body">
-          {ratings.map(rating => (
-            <div key={rating.id} className="bespoke-rating-item">
-              <Tooltip content={rating.alt} side="top" triggerClassName="bespoke-rating-item__tooltip-trigger">
-                <img src={rating.logo} alt={rating.alt} className="bespoke-rating-logo" />
-                <span className="bespoke-rating-value">{rating.value}</span>
-              </Tooltip>
-            </div>
-          ))}
-        </div>
-      </Card>
-    </div>
+    <Card
+      variant="glass-shaded"
+      headerVariant="shaded"
+      padding="md"
+      title={t('library.details.ratingsSection') || 'Ratings'}
+    >
+      <Grid variant="auto-fit-xs">
+        {ratings.map(rating => (
+          <Tooltip key={rating.id} content={rating.alt} side="top" fullWidth>
+            <RatingCard
+              logoSrc={rating.logo}
+              logoAlt={rating.alt}
+              value={rating.value}
+              size="sm"
+              fullWidth
+            />
+          </Tooltip>
+        ))}
+      </Grid>
+    </Card>
   );
 }
