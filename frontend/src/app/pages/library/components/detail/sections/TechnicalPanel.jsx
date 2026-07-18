@@ -4,9 +4,17 @@ import { useMediaDetailContext } from '../MediaDetailContext';
 import Grid from '@/ui/Grid';
 import Stack from '@/ui/Stack';
 import Text from '@/ui/Text';
-import Divider from '@/ui/Divider';
 import SpecCard from '@/ui/data/SpecCard';
-import Tooltip from '@/ui/Tooltip';
+import {
+  Clapperboard,
+  Film,
+  Volume2,
+  Clock,
+  Database,
+  Sparkles,
+  Layers,
+  FastForward
+} from '@/ui/icons';
 
 export default function TechnicalPanel({ showTitle = true, variant }) {
   const { state, t } = useMediaDetailContext();
@@ -40,38 +48,37 @@ export default function TechnicalPanel({ showTitle = true, variant }) {
 
   const gridVariant = variant === 'drawer' ? 'split' : 'auto-fit';
 
-  const renderSpec = (label, value, span) => {
+  const renderSpec = (label, value, icon, span) => {
     if (value === undefined || value === null || value === '') return null;
     const specClassName = span === 2 ? 'u-span-2' : '';
     return (
-      <Tooltip content={String(value)} side="top" fullWidth>
-        <SpecCard label={label} value={value} className={specClassName} fullWidth />
-      </Tooltip>
+      <SpecCard icon={icon} label={label} value={value} className={specClassName} fullWidth />
     );
   };
+
 
   return (
     <Stack gap="xl">
       {showTitle && hasEditionSource && (
         <Stack gap="md">
-          <Stack gap="xs">
-            <Text as="h4" variant="caption" uppercase color={variant === 'drawer' ? 'faint' : 'muted'}>
-              {t('library.details.editionAndSource') || 'Edition & Source'}
-            </Text>
-            {variant === 'drawer' && <Divider />}
-          </Stack>
+          <Text as="h4" variant="caption" uppercase color="muted">
+            {t('library.details.editionAndSource') || 'Edition & Source'}
+          </Text>
           <Grid variant={gridVariant} gap="sm">
             {item.technical?.edition && item.technical.edition !== 'none' && renderSpec(
               t('library.details.edition') || 'Edition',
-              EDITION_LABELS[item.technical.edition] || item.technical.edition
+              EDITION_LABELS[item.technical.edition] || item.technical.edition,
+              <Sparkles size={16} />
             )}
             {item.technical?.source && item.technical.source !== 'none' && renderSpec(
               t('library.details.source') || 'Source',
-              SOURCE_LABELS[item.technical.source] || item.technical.source
+              SOURCE_LABELS[item.technical.source] || item.technical.source,
+              <Film size={16} />
             )}
             {item.technical?.audio_type && item.technical.audio_type !== 'none' && renderSpec(
               t('library.details.audioStyle') || 'Audio Style',
-              AUDIO_TYPE_LABELS[item.technical.audio_type] || item.technical.audio_type
+              AUDIO_TYPE_LABELS[item.technical.audio_type] || item.technical.audio_type,
+              <Volume2 size={16} />
             )}
           </Grid>
         </Stack>
@@ -80,28 +87,26 @@ export default function TechnicalPanel({ showTitle = true, variant }) {
       {hasSpecs ? (
         <Stack gap="md">
           {showTitle && (
-            <Stack gap="xs">
-              <Text as="h4" variant="caption" uppercase color={variant === 'drawer' ? 'faint' : 'muted'}>
-                {t('library.details.technicalInfo') || 'Technical Info'}
-              </Text>
-              {variant === 'drawer' && <Divider />}
-            </Stack>
+            <Text as="h4" variant="caption" uppercase color="muted">
+              {t('library.details.technicalInfo') || 'Technical Info'}
+            </Text>
           )}
           <Grid variant={gridVariant} gap="sm">
-            {renderSpec(t('library.details.resolution') || 'Resolution', item.technical.resolution)}
-            {renderSpec(t('library.details.videoCodec') || 'Video Codec', item.technical.video_codec?.toUpperCase())}
-            {renderSpec(t('library.details.audioCodec') || 'Audio Codec', audioCodecText)}
-            {renderSpec(t('library.details.duration') || 'Duration', formatTime(item.technical.duration))}
-            {renderSpec(t('library.details.fileSize') || 'File Size', bytesToSize(item.technical.size_bytes))}
-            {renderSpec(t('library.details.hdr') || 'HDR', item.technical.hdr_type)}
-            {renderSpec(t('library.details.bitDepth') || 'Bit Depth', bitDepthText)}
-            {renderSpec(t('library.details.framerate') || 'Framerate', framerateText)}
+            {renderSpec(t('library.details.resolution') || 'Resolution', item.technical.resolution, <Clapperboard size={16} />)}
+            {renderSpec(t('library.details.videoCodec') || 'Video Codec', item.technical.video_codec?.toUpperCase(), <Film size={16} />)}
+            {renderSpec(t('library.details.audioCodec') || 'Audio Codec', audioCodecText, <Volume2 size={16} />)}
+            {renderSpec(t('library.details.duration') || 'Duration', formatTime(item.technical.duration), <Clock size={16} />)}
+            {renderSpec(t('library.details.fileSize') || 'File Size', bytesToSize(item.technical.size_bytes), <Database size={16} />)}
+            {renderSpec(t('library.details.hdr') || 'HDR', item.technical.hdr_type, <Sparkles size={16} />)}
+            {renderSpec(t('library.details.bitDepth') || 'Bit Depth', bitDepthText, <Layers size={16} />)}
+            {renderSpec(t('library.details.framerate') || 'Framerate', framerateText, <FastForward size={16} />)}
           </Grid>
         </Stack>
       ) : null}
     </Stack>
   );
 }
+
 
 TechnicalPanel.propTypes = {
   showTitle: PropTypes.bool,

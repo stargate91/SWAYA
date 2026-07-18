@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import TechnicalPanel from './sections/TechnicalPanel';
 import ExtrasPanel from './sections/ExtrasPanel';
 import Drawer from '@/ui/Drawer';
+import Stack from '@/ui/Stack';
 
 export default function DetailsMetadataDrawer({
   isOpen,
@@ -16,19 +17,19 @@ export default function DetailsMetadataDrawer({
       onClose={onClose}
       title={t('library.details.details') || 'Details'}
       size="md"
+      padded
     >
-      <div className="entity-detail-page__drawer-content">
-
-
+      <Stack gap="xl">
         {/* Extras section */}
         {item?.extras && item.extras.length > 0 && <ExtrasPanel variant="drawer" />}
 
         {/* Technical / Specs section */}
         {!isScene && item?.technical && <TechnicalPanel variant="drawer" />}
-      </div>
+      </Stack>
     </Drawer>
   );
 }
+
 
 DetailsMetadataDrawer.propTypes = {
   isOpen: PropTypes.bool.isRequired,
