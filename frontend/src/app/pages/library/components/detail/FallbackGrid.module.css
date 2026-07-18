@@ -1,0 +1,48 @@
+/* Fallback Grid Layout when no logo is available */
+.grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-2xl);
+  align-items: stretch;
+  margin-top: var(--media-detail-content-start-y);
+}
+
+.poster-col {
+  position: relative;
+  --ui-poster-card-width: 15.625rem;
+  --ui-poster-card-height: 23.4375rem;
+  width: var(--ui-poster-card-width);
+  height: var(--ui-poster-card-height);
+  flex-shrink: 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  --local-shadow-color: color-mix(in srgb, var(--color-bg-canvas) 50%, transparent);
+  --local-border-color: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+  --local-border-width: 0.0625rem;
+  box-shadow: 0 1.25rem 2.5rem var(--local-shadow-color), 0 0 0 var(--local-border-width) var(--local-border-color);
+  cursor: pointer;
+  transition: transform var(--motion-base), box-shadow var(--motion-base);
+  align-self: flex-start;
+}
+
+.poster-col:hover {
+  transform: scale(1.02);
+}
+
+.poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.content-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  min-width: 0;
+}
+
+.header-layout-fallback {
+  margin-top: 0;
+}

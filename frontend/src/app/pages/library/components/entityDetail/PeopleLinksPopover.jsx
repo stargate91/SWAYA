@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Globe } from '@/ui/icons';
 import './PeopleLinksPopover.css';
 import Inline from '@/ui/Inline';
+import Tooltip from '@/ui/Tooltip';
 
 export default function PeopleLinksPopover({ extraLinks, t }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,15 +29,16 @@ export default function PeopleLinksPopover({ extraLinks, t }) {
 
   return (
     <div ref={popoverRef} className={`entity-detail-page__links-popover-wrap${isOpen ? ' is-open' : ''}`}>
-      <button
-        type="button"
-        onClick={() => setIsOpen((prev) => !prev)}
-        className="media-detail-page__side-nav-toggle"
-        title={t?.('library.details.externalLinks') || 'External Links'}
-        aria-expanded={isOpen}
-      >
-        <Globe size={18} />
-      </button>
+      <Tooltip content={t?.('library.details.externalLinks') || 'External Links'} side="top">
+        <button
+          type="button"
+          onClick={() => setIsOpen((prev) => !prev)}
+          className="media-detail-page__side-nav-toggle"
+          aria-expanded={isOpen}
+        >
+          <Globe size={18} />
+        </button>
+      </Tooltip>
 
       {isOpen && (
         <div className="entity-detail-page__links-popover">

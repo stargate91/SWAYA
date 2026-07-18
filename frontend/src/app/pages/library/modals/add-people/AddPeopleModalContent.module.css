@@ -1,0 +1,40 @@
+.dropdown {
+  flex: 1;
+}
+
+:global(.add-people-modal-body) {
+  overflow-y: hidden;
+}
+
+.loading-wrapper {
+  padding: var(--space-3xl);
+}
+
+.list {
+  padding-right: var(--space-xs);
+}
+
+.error-message {
+  padding: var(--space-lg);
+}
+
+/* Empty selectors for other modularized BEM class bindings to keep modular CSS clean */
+.local-panel {
+  display: flex;
+}
+
+.filter-row {
+  display: flex;
+}
+
+.empty-fill {
+  display: flex;
+}
+
+.tab-panel {
+  display: flex;
+}
+
+.search-form-wrapper {
+  display: block;
+}

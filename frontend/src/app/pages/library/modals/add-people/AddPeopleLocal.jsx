@@ -7,6 +7,7 @@ import CompactCard from '@/ui/CompactCard';
 import ActivationButton from './ActivationButton';
 import Inline from '@/ui/Inline';
 import Stack from '@/ui/Stack';
+import styles from './AddPeopleModalContent.module.css';
 
 
 export default function AddPeopleLocal({
@@ -64,11 +65,11 @@ export default function AddPeopleLocal({
   const hasActiveFilters = roleFilter !== 'all' || (!hideGenderFilter && genderFilter !== 'all') || statusFilter !== 'all';
 
   return (
-    <Stack gap="md" fill className="add-people-modal__local-panel">
+    <Stack gap="md" fill className={styles['local-panel']}>
 
-      <Inline gap="md" align="center" className="add-people-modal__filter-row">
+      <Inline gap="md" align="center" className={styles['filter-row']}>
         <Dropdown
-          className="add-people-dropdown"
+          className={styles.dropdown}
           variant="sorter"
           layout="inline"
           label={t('library.sort.label') || 'Sort:'}
@@ -84,7 +85,7 @@ export default function AddPeopleLocal({
         />
 
         <Dropdown
-          className="add-people-dropdown"
+          className={styles.dropdown}
           variant="sorter"
           layout="inline"
           label={t('library.filter.roleLabel') || 'Role:'}
@@ -102,7 +103,7 @@ export default function AddPeopleLocal({
 
         {!hideGenderFilter && (
           <Dropdown
-            className="add-people-dropdown"
+            className={styles.dropdown}
             variant="sorter"
             layout="inline"
             label={t('library.filter.genderLabel') || 'Gender:'}
@@ -118,7 +119,7 @@ export default function AddPeopleLocal({
         )}
 
         <Dropdown
-          className="add-people-dropdown"
+          className={styles.dropdown}
           variant="sorter"
           layout="inline"
           label={t('library.filter.statusLabel') || 'Status:'}
@@ -133,11 +134,11 @@ export default function AddPeopleLocal({
       </Inline>
 
       {isLoading ? (
-        <Stack align="center" justify="center" className="add-people-modal__loading-wrapper">
+        <Stack align="center" justify="center" className={styles['loading-wrapper']}>
           <Spinner label={t('library.addPeople.loading') || 'Loading people...'} />
         </Stack>
       ) : visiblePeople.length === 0 ? (
-        <Stack fill className="add-people-modal__empty-fill">
+        <Stack fill className={styles['empty-fill']}>
           <EmptyState
             title={hasSearchQuery
               ? (isAdult
@@ -179,7 +180,7 @@ export default function AddPeopleLocal({
               fetchNextPage();
             }
           }}
-          className="add-people-modal__list"
+          className={styles.list}
         >
           {visiblePeople.map((person) => {
             const isActive = optimisticStatus[person.id] !== undefined

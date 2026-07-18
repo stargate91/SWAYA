@@ -1,4 +1,4 @@
-.create-tag-form__image-preview {
+.image-preview {
   width: 100%;
   height: 100%;
   background-size: cover;
@@ -6,10 +6,10 @@
   user-select: none;
 }
 
-.create-tag-form__input-wrapper {
+.input-wrapper {
   flex: 1;
 }
 
-.create-tag-form__help-text-wrapper {
+.help-text-wrapper {
   margin-top: var(--space-xs);
 }

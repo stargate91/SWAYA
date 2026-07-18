@@ -1,7 +1,8 @@
- 
 import { useState } from 'react';
 import { Minus, Plus } from '@/ui/icons';
 import UtilityBarBottomPortal from '../../../../../../components/UtilityBarBottomPortal';
+import Tooltip from '@/ui/Tooltip';
+
 export default function BottomSocialsBar({
   socialLinks,
   t
@@ -24,44 +25,48 @@ export default function BottomSocialsBar({
               data-expanded={isSocialExpanded}
             >
               {extraSocialLinks.map((link) => (
-                <a
-                  key={link.key}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="u-icon-btn-round"
-                  title={link.label}
-                >
-                  <img src={link.iconSrc || '/links/website.svg'} alt={link.label} />
-                </a>
+                <Tooltip key={link.key} content={link.label} side="top">
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="u-icon-btn-round"
+                  >
+                    <img src={link.iconSrc || '/links/website.svg'} alt={link.label} />
+                  </a>
+                </Tooltip>
               ))}
             </div>
           )}
 
           <div className="u-flex-nowrap">
             {mainSocialLinks.map((link) => (
-              <a
-                key={link.key}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="u-icon-btn-round"
-                title={link.label}
-              >
-                <img src={link.iconSrc || '/links/website.svg'} alt={link.label} />
-              </a>
+              <Tooltip key={link.key} content={link.label} side="top">
+                <a
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="u-icon-btn-round"
+                >
+                  <img src={link.iconSrc || '/links/website.svg'} alt={link.label} />
+                </a>
+              </Tooltip>
             ))}
           </div>
 
           {hasExtraSocials && (
-            <button
-              type="button"
-              className="u-icon-btn-round u-text-muted u-hover-no-transform"
-              onClick={() => setIsSocialExpanded(!isSocialExpanded)}
-              title={isSocialExpanded ? (t('common.showLess') || 'Show Less') : (t('common.showMore') || 'Show More')}
+            <Tooltip
+              content={isSocialExpanded ? (t('common.showLess') || 'Show Less') : (t('common.showMore') || 'Show More')}
+              side="top"
             >
-              {isSocialExpanded ? <Minus size={14} /> : <Plus size={14} />}
-            </button>
+              <button
+                type="button"
+                className="u-icon-btn-round u-text-muted u-hover-no-transform"
+                onClick={() => setIsSocialExpanded(!isSocialExpanded)}
+              >
+                {isSocialExpanded ? <Minus size={14} /> : <Plus size={14} />}
+              </button>
+            </Tooltip>
           )}
         </div>
       </div>

@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { useUpdatePersonStatusMutation, useAddPersonTmdbMutation } from '@/queries';
 import SearchInputCombo from '@/ui/SearchInputCombo';
 import Stack from '@/ui/Stack';
-import './AddPeopleModalContent.css';
+import styles from './AddPeopleModalContent.module.css';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import api from '@/lib/api';
 import AddPeopleLocal from './AddPeopleLocal';
@@ -141,7 +141,7 @@ export default function AddPeopleModalContent({ isAdult, t }) {
   return (
     <Stack gap="lg" fullWidth fill>
       {activeMode === 'search' ? (
-        <form onSubmit={handleSearchSubmit} className="add-people-modal__search-form-wrapper">
+        <form onSubmit={handleSearchSubmit} className={styles['search-form-wrapper']}>
           <SearchInputCombo
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}

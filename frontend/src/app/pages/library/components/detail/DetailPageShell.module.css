@@ -119,6 +119,8 @@
     justify-content: flex-start;
     flex-shrink: 0;
     position: relative;
+    gap: var(--space-xl);
+    padding-top: var(--space-xl);
 
     &>*:not(:global(.media-detail-page__center-play-btn)) {
       --local-fade-duration: 500ms;

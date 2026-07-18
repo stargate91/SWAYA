@@ -10,7 +10,7 @@ import Text from '@/ui/Text';
 import ColorSwatch from '@/ui/ColorSwatch';
 import Thumbnail from '@/ui/Thumbnail';
 import { API_BASE } from '@/lib/backend';
-import './CreateTagForm.css';
+import styles from './CreateTagForm.module.css';
 
 const BULLET_POINT = '• ';
 
@@ -184,7 +184,7 @@ export default function CreateTagModalContent({ onClose, t, initialTag = null, m
                     >
                       {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
                       <div
-                        className="create-tag-form__image-preview"
+                        className={styles['image-preview']}
                         /* eslint-disable-next-line react/forbid-dom-props */
                         style={{
                           backgroundImage: `url(${imageUrl})`,
@@ -206,7 +206,7 @@ export default function CreateTagModalContent({ onClose, t, initialTag = null, m
                   placeholder={t('library.tags.imageUrlPlaceholder') || 'Paste image URL...'}
                   value={newUrl}
                   onChange={(e) => setNewUrl(e.target.value)}
-                  className="create-tag-form__input-wrapper"
+                  className={styles['input-wrapper']}
                 />
                 <Button
                   type="button"
@@ -230,7 +230,7 @@ export default function CreateTagModalContent({ onClose, t, initialTag = null, m
               </Inline>
             )}
 
-            <div className="create-tag-form__help-text-wrapper">
+            <div className={styles['help-text-wrapper']}>
               {customImages.length <= 1 ? (
                 <Text variant="caption" color="secondary">
                   {BULLET_POINT}{t('library.tags.aspectRatioOne') || 'Ideal aspect ratio is 16:9 (landscape/backdrop)'}

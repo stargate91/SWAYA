@@ -23,7 +23,7 @@ import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import MediaHeaderInfo from './components/detail/MediaHeaderInfo';
 import UserRatingSection from './components/detail/UserRatingSection';
 import MediaOverview from './components/detail/MediaOverview';
-import './components/detail/FallbackGrid.css';
+import fallbackStyles from './components/detail/FallbackGrid.module.css';
 import MediaActions from './components/detail/MediaActions';
 import DetailPageShell from './components/detail/DetailPageShell';
 import shellStyles from './components/detail/DetailPageShell.module.css';
@@ -206,7 +206,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
               />
             )}
             {(!state.logoUrl && state.posterUrl && !isScene) ? (
-              <div className="media-detail-page__fallback-grid">
+              <div className={fallbackStyles.grid}>
                 <EditableMediaCard
                   mediaUrl={state.posterUrl}
                   altText={state.title}
@@ -218,9 +218,9 @@ export default function MediaDetailPage({ type = 'movie' }) {
                   editTitle={t('library.details.changePoster') || 'Change Poster'}
                   viewOriginalTitle={t('library.details.viewOriginalImage') || 'View Original Image'}
                   type="poster"
-                  className="media-detail-page__fallback-poster-col"
+                  className={fallbackStyles['poster-col']}
                 />
-                <div className="media-detail-page__fallback-content-col">
+                <div className={fallbackStyles['content-col']}>
                   <MediaHeaderInfo isFallbackGrid={true} />
                   <UserRatingSection />
                   <MediaOverview />
