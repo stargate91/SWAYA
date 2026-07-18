@@ -3,12 +3,13 @@ import { Calendar, Clock, Video, Globe } from '@/ui/icons';
 import Pill from '@/ui/Pill';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useMediaDetailContext } from './MediaDetailContext';
-import './MediaHeaderInfo.css';
+import styles from './MediaHeaderInfo.module.css';
 import Inline from '@/ui/Inline';
-
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
 
 export default function MediaHeaderInfo({ isFallbackGrid = false }) {
-  const { t } = useTranslation();
+  const t = useTranslation().t;
   const { state, handleOpenLogoModal } = useMediaDetailContext();
   const {
     title,
@@ -52,10 +53,10 @@ export default function MediaHeaderInfo({ isFallbackGrid = false }) {
   }, [showImdb, ratingImdb, showTmdb, ratingTmdb, showPorndb, ratingPorndb]);
 
   return (
-    <div className={`media-detail-page__header-layout ${isFallbackGrid ? 'media-detail-page__header-layout--fallback' : ''}`}>
-      <div className="media-detail-page__header-copy">
+    <div className={`${styles.layout} ${isFallbackGrid ? styles['layout-fallback'] : ''}`}>
+      <Stack gap="4xl" className={styles.copy}>
         <div
-          className="media-detail-page__logo-container clickable"
+          className={`${styles['logo-container']} ${styles.clickable}`}
           role="button"
           tabIndex={0}
           onClick={handleOpenLogoModal}
@@ -67,31 +68,31 @@ export default function MediaHeaderInfo({ isFallbackGrid = false }) {
           title={logoUrl ? 'Change Logo' : 'Add Logo'}
         >
           {logoUrl ? (
-            <img src={logoUrl} alt={title} className="media-detail-page__logo" />
+            <img src={logoUrl} alt={title} className={styles.logo} />
           ) : (
-            <h1 className="media-detail-page__fallback-title">{title}</h1>
+            <Text as="h1" variant="title" shadow="title" className={styles['fallback-title']}>{title}</Text>
           )}
         </div>
 
         {logoUrl && item?.type === 'scene' && (
-          <h1 className="media-detail-page__scene-title-below-logo">{title}</h1>
+          <Text as="h1" variant="title" shadow="title" className={styles['scene-title-below-logo']}>{title}</Text>
         )}
 
-        <div className="media-detail-page__details-group">
+        <Stack gap="md" className={styles['details-group']}>
           {showOriginalTitle && (
-            <div className="media-detail-page__original-title">
+            <Text as="div" variant="body" color="muted" weight="medium" italic className={styles['original-title']}>
               {originalTitle}
-            </div>
+            </Text>
           )}
 
           {tagline && (
-            <div className="media-detail-page__tagline">
+            <Text as="div" variant="body" color="accent" weight="medium" italic shadow="tagline" className={styles.tagline}>
               {taglineText}
-            </div>
+            </Text>
           )}
 
           {(metaDate || formattedDuration || seasonsText || episodesText || langText || ratingImdb || ratingTmdb || showStudioPill || showNetworkPill) && (
-            <Inline gap="lg" align="center" className="media-detail-page__meta-row">
+            <Inline gap="lg" align="center" className={styles['meta-row']}>
               {showStudioPill && (
                 <Pill variant="meta">
                   <Video size={14} />
@@ -132,11 +133,10 @@ export default function MediaHeaderInfo({ isFallbackGrid = false }) {
                 </Pill>
               )}
               {activeRating && (
-                <Pill variant="meta" className="media-detail-page__rating-pill">
+                <Pill variant="meta">
                   <img
                     src={activeRating.logo}
                     alt={activeRating.type === 'imdb' ? 'IMDb' : activeRating.type === 'tmdb' ? 'TMDb' : 'ThePornDB'}
-                    className="rating-pill-img"
                   />
                   <span>
                     {isNaN(parseFloat(activeRating.val))
@@ -149,7 +149,7 @@ export default function MediaHeaderInfo({ isFallbackGrid = false }) {
           )}
 
           {normalizedGenres && normalizedGenres.length > 0 && (
-            <Inline gap="lg" align="center" className="media-detail-page__meta-row">
+            <Inline gap="lg" align="center" className={styles['meta-row']}>
               {normalizedGenres.map((genre, idx) => (
                 <Pill key={idx} variant="meta">
                   {t(`library.genres.${genre}`, { defaultValue: genre }).toUpperCase()}
@@ -157,8 +157,8 @@ export default function MediaHeaderInfo({ isFallbackGrid = false }) {
               ))}
             </Inline>
           )}
-        </div>
-      </div>
+        </Stack>
+      </Stack>
     </div>
   );
 }

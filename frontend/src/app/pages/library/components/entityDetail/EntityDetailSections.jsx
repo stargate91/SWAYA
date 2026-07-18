@@ -10,9 +10,10 @@ import { ENTITY_ICONS } from '@/ui/icons';
 import { resolveDetailsImageUrl } from '../../utils/detailUtils';
 import { navigateToCreditDetail } from '../../utils/mediaNavigation';
 import Inline from '@/ui/Inline';
+import Text from '@/ui/Text';
 import './EntityDetailSections.css';
 
-export function OverviewContent({ text, emptyText, t, openDrawer, className = '' }) {
+export function OverviewContent({ text, emptyText, t, openDrawer, className = '', clamp = 3 }) {
   const overviewRef = useRef(null);
   const [isTruncated, setIsTruncated] = useState(false);
 
@@ -57,16 +58,21 @@ export function OverviewContent({ text, emptyText, t, openDrawer, className = ''
   }, [text]);
 
   return (
-    <div className={`media-detail-page__overview entity-detail-page__overview ${className}`.trim()}>
+    <div className={`entity-detail-page__overview ${className}`.trim()}>
       {text ? (
         <>
-          <div ref={overviewRef} className="media-detail-page__overview-text">
+          <Text
+            ref={overviewRef}
+            as="div"
+            clamp={clamp}
+            className="entity-detail-page__overview-text"
+          >
             {text}
-          </div>
+          </Text>
           {isTruncated && (
             <button
               type="button"
-              className="media-detail-page__read-more-btn"
+              className="entity-detail-page__read-more-btn"
               onClick={openDrawer}
             >
               {t('library.details.readMore') || 'Read More'}
@@ -76,8 +82,6 @@ export function OverviewContent({ text, emptyText, t, openDrawer, className = ''
       ) : (
         <p className="entity-detail-page__overview-text entity-detail-page__overview-text--muted">
           {emptyText}
-
-
         </p>
       )}
     </div>

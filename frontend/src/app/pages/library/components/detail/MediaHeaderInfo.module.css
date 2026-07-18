@@ -1,0 +1,60 @@
+.layout {
+  display: block;
+  margin-top: var(--media-detail-content-start-y);
+}
+
+.copy {
+  min-width: 0;
+}
+
+.logo-container {
+  display: flex;
+  align-items: flex-start;
+  width: fit-content;
+  max-width: min(45rem, 100%);
+  max-height: 12.5rem;
+  min-width: 0;
+}
+
+.logo {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: 13.75rem;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0.625rem 2.125rem color-mix(in srgb, var(--color-bg-canvas) 56%, transparent)) drop-shadow(0 0 1.5rem var(--color-border-default));
+  transition: transform var(--motion-base), filter var(--motion-base);
+}
+
+.fallback-title,
+.scene-title-below-logo {
+  line-height: 1.15;
+  max-width: min(50rem, 100%);
+  overflow-wrap: break-word;
+  transition: transform var(--motion-base), color var(--motion-base);
+}
+
+.details-group {
+  max-width: min(56.25rem, calc(100% - 2rem));
+}
+
+.meta-row {
+  margin: 0;
+}
+
+.logo-container.clickable {
+  position: relative;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.logo-container.clickable:hover .logo {
+  transform: scale(1.015);
+}
+
+.logo-container.clickable:hover .fallback-title,
+.logo-container.clickable:hover .scene-title-below-logo {
+  transform: scale(1.01);
+  color: var(--color-accent);
+}

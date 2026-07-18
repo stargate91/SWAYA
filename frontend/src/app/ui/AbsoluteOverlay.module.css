@@ -1,0 +1,31 @@
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+  --local-duration: var(--motion-duration-slow-expressive, 500ms);
+  --local-ease: var(--motion-ease-in-out, ease-in-out);
+  transition: opacity var(--local-duration) var(--local-ease);
+}
+
+.overlay--hidden {
+  opacity: 0;
+}
+
+.overlay--hero {
+  --local-white-soft: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+  --local-white-faint: color-mix(in srgb, var(--color-text-primary) 3%, transparent);
+  --local-black-soft: color-mix(in srgb, var(--color-text-inverse) 16%, transparent);
+  --local-black-medium: color-mix(in srgb, var(--color-text-inverse) 28%, transparent);
+  --local-dark-36: color-mix(in srgb, var(--color-bg-canvas) 36%, transparent);
+  --local-dark-78: color-mix(in srgb, var(--color-bg-canvas) 78%, transparent);
+  --local-dark-24: color-mix(in srgb, var(--color-bg-canvas) 24%, transparent);
+  --local-dark-18: color-mix(in srgb, var(--color-bg-canvas) 18%, transparent);
+  
+  --local-bg:
+    radial-gradient(circle at 50% 22%, var(--local-white-soft) 0%, var(--local-white-faint) 20%, transparent 44%),
+    radial-gradient(circle at 50% 50%, transparent 48%, var(--local-black-soft) 78%, var(--local-black-medium) 100%),
+    linear-gradient(180deg, var(--local-dark-36) 0%, var(--local-dark-78) 100%),
+    linear-gradient(90deg, var(--local-dark-24) 0%, var(--local-dark-18) 100%);
+  background: var(--local-bg);
+}

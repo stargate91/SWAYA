@@ -11,6 +11,7 @@
  * @returns {React.ReactElement|null}
  */
 import styles from './DescriptionList.module.css';
+import Text from './Text';
 
 export default function DescriptionList({
   items,
@@ -40,7 +41,14 @@ export default function DescriptionList({
         return (
           <div key={idx} className={itemClassName}>
             <span className={styles.label}>{item.label}</span>
-            <span className={styles.value}>{item.value}</span>
+            <Text
+              as="span"
+              className={styles.value}
+              truncate={!item.fullWidth}
+              clamp={item.fullWidth ? 3 : undefined}
+            >
+              {item.value}
+            </Text>
           </div>
         );
       })}

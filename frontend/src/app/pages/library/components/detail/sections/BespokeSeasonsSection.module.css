@@ -88,14 +88,3 @@
   color: var(--color-text-muted);
   opacity: 0.4;
 }
-
-.overview {
-  margin: var(--space-3xs) 0 0 0;
-  font-size: var(--font-size-xs);
-  line-height: 1.5;
-  color: var(--color-text-secondary);
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}

@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import './HeroSection.css';
+import AbsoluteOverlay from '@/ui/AbsoluteOverlay';
+import styles from './HeroSection.module.css';
 
-export default function HeroSection({ backdropUrl, isFallback, isPreviewPlaying, previewSrc }) {
+export default function HeroSection({ backdropUrl, isFallback, isPreviewPlaying, previewSrc, onPlayingChange }) {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const videoRef = useRef(null);
 
@@ -12,6 +13,10 @@ export default function HeroSection({ backdropUrl, isFallback, isPreviewPlaying,
       setIsVideoPlaying(false);
     }
   }
+
+  useEffect(() => {
+    onPlayingChange?.(isVideoPlaying);
+  }, [isVideoPlaying, onPlayingChange]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -25,12 +30,12 @@ export default function HeroSection({ backdropUrl, isFallback, isPreviewPlaying,
   }, [isPreviewPlaying]);
 
   return (
-    <div className="media-detail-page__hero">
+    <div className={styles.hero}>
       {backdropUrl && (
         <img
           src={backdropUrl}
           alt="Backdrop"
-          className={`media-detail-page__hero-backdrop ${isFallback ? 'media-detail-page__hero-backdrop--blurred' : ''} ${isVideoPlaying && isPreviewPlaying ? 'media-detail-page__hero-backdrop--hidden' : ''}`}
+          className={`${styles.backdrop} ${isFallback ? styles['backdrop--blurred'] : ''} ${isVideoPlaying && isPreviewPlaying ? styles['backdrop--hidden'] : ''}`}
         />
       )}
       {previewSrc && (
@@ -47,12 +52,18 @@ export default function HeroSection({ backdropUrl, isFallback, isPreviewPlaying,
           muted
           loop
           playsInline
-          onPlay={() => setIsVideoPlaying(true)}
-          onPlaying={() => setIsVideoPlaying(true)}
-          className={`media-detail-page__hero-video ${isVideoPlaying && isPreviewPlaying ? 'media-detail-page__hero-video--visible' : ''}`}
+          onTimeUpdate={(e) => {
+            if (e.target.currentTime > 0) {
+              setIsVideoPlaying(true);
+            }
+          }}
+          className={`${styles.video} ${isVideoPlaying && isPreviewPlaying ? styles['video--visible'] : ''}`}
         />
       )}
-      <div className="media-detail-page__hero-overlay" />
+      <AbsoluteOverlay
+        variant="hero"
+        hidden={isPreviewPlaying && isVideoPlaying}
+      />
     </div>
   );
 }

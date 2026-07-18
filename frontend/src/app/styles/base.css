@@ -170,7 +170,26 @@ a {
   50% { transform: translateY(-0.25rem) scale(1.03); }
 }
 
+@keyframes slideInRight {
+  from {
+    transform: translateX(var(--slide-in-offset, 1.875rem));
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
 
-
-
+@keyframes bouncearrowscroll {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(var(--bounce-y-1, 0.3125rem));
+  }
+  60% {
+    transform: translateY(var(--bounce-y-2, 0.15625rem));
+  }
+}
 

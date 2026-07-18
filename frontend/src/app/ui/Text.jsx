@@ -20,6 +20,10 @@ export default function Text({
   weight,
   uppercase = false,
   truncate = false,
+  clamp,
+  italic = false,
+  shadow,
+  style,
   className = '',
   children,
   ...props
@@ -31,11 +35,18 @@ export default function Text({
     weight && styles[`weight-${weight}`],
     uppercase && styles.uppercase,
     truncate && styles.truncate,
+    clamp && styles.clamp,
+    italic && styles.italic,
+    shadow && styles[`shadow-${shadow}`],
     className
   ].filter(Boolean).join(' ');
 
+  const mergedStyle = clamp
+    ? { ...style, '--text-clamp': clamp }
+    : style;
+
   return (
-    <Component className={classes} {...props}>
+    <Component className={classes} style={mergedStyle} {...props}>
       {children}
     </Component>
   );
@@ -48,6 +59,9 @@ Text.propTypes = {
   weight: PropTypes.oneOf(['normal', 'medium', 'semibold', 'bold', 'extrabold']),
   uppercase: PropTypes.bool,
   truncate: PropTypes.bool,
+  clamp: PropTypes.number,
+  italic: PropTypes.bool,
+  shadow: PropTypes.oneOf(['title', 'tagline']),
   className: PropTypes.string,
   children: PropTypes.node,
 };

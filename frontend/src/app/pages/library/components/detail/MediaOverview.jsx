@@ -1,6 +1,6 @@
 import { useMediaDetailContext } from './MediaDetailContext';
-import './MediaOverview.css';
-
+import Text from '@/ui/Text';
+import styles from './MediaOverview.module.css';
 
 export default function MediaOverview() {
   const { state, actions, t } = useMediaDetailContext();
@@ -17,17 +17,18 @@ export default function MediaOverview() {
   if (!overview) return null;
 
   return (
-    <div className="media-detail-page__overview">
-      <div
+    <div className={styles.overview}>
+      <Text
+        as="div"
         ref={overviewRef}
-        className="media-detail-page__overview-text"
+        clamp={3}
       >
         {overview}
-      </div>
+      </Text>
       {isTruncated && (
         <button
           type="button"
-          className="media-detail-page__read-more-btn"
+          className={styles['read-more-btn']}
           onClick={handleReadMore}
         >
           {t('library.details.readMore') || 'Read More'}

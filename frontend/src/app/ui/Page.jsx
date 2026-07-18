@@ -11,6 +11,7 @@ export default function Page({
   contentBottom = false,
   className = '',
   children,
+  ...rest
 }) {
   const classes = [
     styles.root,
@@ -21,7 +22,7 @@ export default function Page({
   ].filter(Boolean).join(' ');
 
   return (
-    <div className={classes} data-viewport={viewport || undefined}>
+    <div className={classes} data-viewport={viewport || undefined} {...rest}>
       {(title || description || eyebrow || actions) ? (
         <PageHeader
           eyebrow={eyebrow}

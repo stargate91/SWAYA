@@ -18,20 +18,9 @@
   font-size: var(--font-size-xs);
   color: var(--color-text-primary);
   font-weight: var(--font-weight-medium);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
-
 .item--full {
   grid-column: span 2;
-}
-
-.item--full .value {
-  white-space: normal;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
 }
 
 .label {

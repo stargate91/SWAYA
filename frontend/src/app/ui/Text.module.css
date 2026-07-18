@@ -70,3 +70,25 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: var(--text-clamp, 1);
+}
+
+.italic {
+  font-style: italic;
+}
+
+.shadow-title {
+  text-shadow:
+    0 0.625rem 1.875rem color-mix(in srgb, var(--color-bg-canvas) 62%, transparent),
+    0 0 1.125rem var(--color-surface-glass);
+}
+
+.shadow-tagline {
+  text-shadow: 0 0.5rem 1.375rem color-mix(in srgb, var(--color-bg-canvas) 32%, transparent);
+}
+

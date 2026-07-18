@@ -180,24 +180,17 @@
   letter-spacing: 0.015em;
 }
 
-.button:hover:not(:disabled) .icon {
-  color: var(--color-ink);
-}
 
 .button[data-variant="onboarding-back"]:hover:not(:disabled) {
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--color-text-primary) 3.5%, transparent), color-mix(in srgb, var(--color-text-primary) 1.2%, transparent)),
-    linear-gradient(180deg, color-mix(in srgb, var(--color-text-inverse) 96%, transparent), var(--color-text-inverse));
+    linear-gradient(180deg, color-mix(in srgb, var(--color-text-inverse) 96%, transparent), var(--text-inverse));
   border-color: color-mix(in srgb, var(--button-secondary-color) 18%, var(--color-border-default));
   color: color-mix(in srgb, var(--button-secondary-color) 68%, var(--color-text-primary) 8%);
   box-shadow:
     0 0.75rem 1.75rem color-mix(in srgb, var(--color-bg-canvas) 22%, transparent),
     0 0 0 1px color-mix(in srgb, var(--color-text-primary) 1.8%, transparent),
     inset 0 1px 0 var(--var-color-border-default, var(--color-border-default));
-}
-
-.button[data-variant="onboarding-back"]:hover:not(:disabled) .icon {
-  color: color-mix(in srgb, var(--button-secondary-color) 74%, var(--color-text-primary) 10%);
 }
 
 .button[data-variant="onboarding-continue"]:hover:not(:disabled) {
@@ -210,10 +203,6 @@
     0 1rem 2.125rem color-mix(in srgb, var(--color-bg-canvas) 28%, transparent),
     0 0 0 1px color-mix(in srgb, var(--color-text-primary) 2.8%, transparent),
     inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 10%, transparent);
-}
-
-.button[data-variant="onboarding-continue"]:hover:not(:disabled) .icon {
-  color: var(--color-text-primary);
 }
 
 .button:disabled {
@@ -343,6 +332,10 @@
   transform: none;
 }
 
+.button:hover:not(:disabled) .icon {
+  color: var(--color-ink);
+}
+
 .button[data-variant="glass-accent"]:hover:not(:disabled) .icon {
   color: var(--color-accent);
 }
@@ -350,4 +343,13 @@
 .button[data-variant="success"][aria-pressed="true"]:hover:not(:disabled) .icon {
   color: var(--button-danger-color);
 }
+
+.button[data-variant="onboarding-back"]:hover:not(:disabled) .icon {
+  color: color-mix(in srgb, var(--button-secondary-color) 74%, var(--color-text-primary) 10%);
+}
+
+.button[data-variant="onboarding-continue"]:hover:not(:disabled) .icon {
+  color: var(--color-text-primary);
+}
+
 

@@ -11,6 +11,7 @@ import Inline from '@/ui/Inline';
 import Popover from '@/ui/Popover';
 import Card from '@/ui/Card';
 import Text from '@/ui/Text';
+import Tooltip from '@/ui/Tooltip';
 import styles from './ListsPopover.module.css';
 
 export default function ListsPopover({ item, type, t }) {
@@ -43,9 +44,10 @@ export default function ListsPopover({ item, type, t }) {
         <button
           type="button"
           className="media-detail-page__side-nav-toggle"
-          title={t('lists.title') || 'Lists'}
         >
-          <List size={18} />
+          <Tooltip content={t('lists.title') || 'Lists'}>
+            <List size={18} />
+          </Tooltip>
         </button>
       }
     >

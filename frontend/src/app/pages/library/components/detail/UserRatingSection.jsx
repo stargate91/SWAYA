@@ -3,7 +3,9 @@ import Pill from '@/ui/Pill';
 import SegmentedRating from '@/ui/SegmentedRating';
 import { useMediaDetailContext } from './MediaDetailContext';
 import Inline from '@/ui/Inline';
-import './UserRatingSection.css';
+import IconButton from '@/ui/IconButton';
+import Tooltip from '@/ui/Tooltip';
+import styles from './UserRatingSection.module.css';
 
 export default function UserRatingSection() {
   const { state, actions, t } = useMediaDetailContext();
@@ -19,15 +21,18 @@ export default function UserRatingSection() {
 
   return (
     <Inline gap="lg" align="center" className="media-detail-page__meta-row">
-      <Pill variant="meta-large" className="rating-pill--large">
-        <button
-          onClick={handleOpenReviewModal}
-          className="review-trigger-btn"
-          title={t('library.details.writeReview') || 'Write Review'}
-        >
-          <PenLine size={15} />
-        </button>
-        <span className="pill-vertical-separator">{verticalBarText}</span>
+      <Pill variant="meta-large" className={styles.pill}>
+        <Tooltip content={t('library.details.writeReview') || 'Write Review'}>
+          <IconButton
+            variant="ghost"
+            size="xs"
+            onClick={handleOpenReviewModal}
+            title={null}
+          >
+            <PenLine size={15} />
+          </IconButton>
+        </Tooltip>
+        <span className={styles.separator}>{verticalBarText}</span>
 
         <SegmentedRating
           value={currentRating}

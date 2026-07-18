@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Text from './Text';
 import styles from './CompactCard.module.css';
 
 /**
@@ -81,7 +82,11 @@ export default function CompactCard({
         </div>
 
         {meta && <div className={styles.meta}>{meta}</div>}
-        {description && <p className={styles.description}>{description}</p>}
+        {description && (
+          <Text as="p" clamp={2} className={styles.description}>
+            {description}
+          </Text>
+        )}
       </div>
 
       {rightElement && (

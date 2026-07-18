@@ -64,6 +64,7 @@ export default function MovieCollectionHeroSection({
                   text={overviewText}
                   t={t}
                   openDrawer={() => setIsDrawerOpen(true)}
+                  clamp={9}
                 />
               </div>
             </div>

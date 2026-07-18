@@ -12,10 +12,7 @@
   gap: var(--space-md);
 }
 
-.entity-detail-page--collection .media-detail-page__overview {
+.entity-detail-page--collection .entity-detail-page__overview {
   max-width: 32rem;
 }
 
-.entity-detail-page--collection .media-detail-page__overview-text {
-  -webkit-line-clamp: 9;
-}

@@ -18,6 +18,7 @@ import Card from '@/ui/Card';
 import Divider from '@/ui/Divider';
 import Stack from '@/ui/Stack';
 import Button from '@/ui/Button';
+import Text from '@/ui/Text';
 import styles from './BespokeSeasonsSection.module.css';
 
 export default function BespokeSeasonsSection() {
@@ -238,7 +239,9 @@ export default function BespokeSeasonsSection() {
             </Inline>
 
             {activeSeason.overview && (
-              <p className={styles.overview}>{activeSeason.overview}</p>
+              <Text as="p" variant="small" color="secondary" clamp={3}>
+                {activeSeason.overview}
+              </Text>
             )}
           </Stack>
         </div>

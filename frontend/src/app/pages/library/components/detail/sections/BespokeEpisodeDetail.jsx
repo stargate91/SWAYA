@@ -185,7 +185,7 @@ export default function BespokeEpisodeDetail({
 
         {/* Episode description */}
         {activeEpisode.overview && (
-          <Text as="p" variant="small" color="secondary" className={styles.overview}>
+          <Text as="p" variant="small" color="secondary" clamp={3}>
             {activeEpisode.overview}
           </Text>
         )}

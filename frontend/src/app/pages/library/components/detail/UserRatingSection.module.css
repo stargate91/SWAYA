@@ -1,0 +1,13 @@
+.pill {
+  width: 17.875rem;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  color: color-mix(in srgb, var(--color-text-primary) 64%, var(--color-text-muted));
+  border-color: color-mix(in srgb, var(--color-border-subtle) 78%, transparent);
+}
+
+.separator {
+  margin: 0 var(--space-sm);
+  color: color-mix(in srgb, var(--color-text-primary) 10%, transparent);
+  user-select: none;
+}

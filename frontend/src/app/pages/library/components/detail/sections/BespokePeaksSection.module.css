@@ -4,7 +4,7 @@
 }
 
 .item {
-  padding: calc(var(--space-xs) - 1px) var(--space-md);
+  padding: calc(var(--space-xs) - 0.0625rem) var(--space-md);
   border-radius: var(--radius-sm);
   background: var(--color-surface-card);
   border: 1px solid var(--color-border-default);

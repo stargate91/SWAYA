@@ -26,6 +26,8 @@ import MediaOverview from './components/detail/MediaOverview';
 import './components/detail/FallbackGrid.css';
 import MediaActions from './components/detail/MediaActions';
 import DetailPageShell from './components/detail/DetailPageShell';
+import shellStyles from './components/detail/DetailPageShell.module.css';
+import GlassPlayButton from '@/ui/GlassPlayButton';
 import UtilityBarBottomPortal from '../../../components/UtilityBarBottomPortal';
 
 
@@ -52,6 +54,7 @@ import DetailsMetadataDrawer from './components/detail/DetailsMetadataDrawer';
 import BespokeBoxOfficeSection from './components/detail/sections/BespokeBoxOfficeSection';
 import BottomSocialsBar from './components/detail/sections/BottomSocialsBar';
 import IconButton from '@/ui/IconButton';
+import Tooltip from '@/ui/Tooltip';
 import { ChevronDown, ChevronUp } from '@/ui/icons';
 
 
@@ -92,11 +95,13 @@ export default function MediaDetailPage({ type = 'movie' }) {
   const [isBackdropDrawerOpen, setIsBackdropDrawerOpen] = useState(false);
   const [lightboxUrl, setLightboxUrl] = useState(null);
   const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [previewSrc, setPreviewSrc] = useState(null);
   const [prevId, setPrevId] = useState(id);
   if (id !== prevId) {
     setPrevId(id);
     setIsPreviewPlaying(false);
+    setIsVideoPlaying(false);
     setPreviewSrc(null);
   }
   const containerRef = useRef(null);
@@ -104,6 +109,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
   const handleTogglePreview = () => {
     if (isPreviewPlaying) {
       setIsPreviewPlaying(false);
+      setIsVideoPlaying(false);
     } else {
       const url = `${API_BASE}/api/v1/media/${id}/preview?resolution=1080`;
       setPreviewSrc(url);
@@ -162,8 +168,11 @@ export default function MediaDetailPage({ type = 'movie' }) {
         isPreviewPlaying={isPreviewPlaying}
         previewSrc={previewSrc}
         backLabel={t('common.back') || 'Back'}
-        pageClassName={`media-detail-page--scroll-transition ${isScrolled ? 'is-scrolled' : ''} ${isPreviewPlaying ? 'is-preview-playing' : ''} ${isLogoDrawerOpen || isPosterDrawerOpen || isBackdropDrawerOpen || isDrawerOpen ? 'logo-drawer-open' : ''}`}
+        pageClassName={shellStyles['scroll-transition']}
+        isScrolled={isScrolled}
+        isDrawerOpen={isLogoDrawerOpen || isPosterDrawerOpen || isBackdropDrawerOpen || isDrawerOpen}
         containerRef={containerRef}
+        onVideoPlayingChange={setIsVideoPlaying}
         topRightControls={(
           <>
             {item && (
@@ -173,28 +182,28 @@ export default function MediaDetailPage({ type = 'movie' }) {
                 t={t}
               />
             )}
-            <button
-              type="button"
-              onClick={handleOpenBackdropModal}
-              className="media-detail-page__side-nav-toggle"
-              title={t('library.details.backdrops') || 'Choose Backdrop'}
-            >
-              <ImageIcon size={18} />
-            </button>
+            <Tooltip content={t('library.details.backdrops') || 'Choose Backdrop'}>
+              <button
+                type="button"
+                onClick={handleOpenBackdropModal}
+                className="media-detail-page__side-nav-toggle"
+              >
+                <ImageIcon size={18} />
+              </button>
+            </Tooltip>
           </>
         )}
       >
-        <div className="media-detail-page__transition-wrapper">
-          <div className="media-detail-page__hero-content-section">
+        <div className={shellStyles['transition-wrapper']}>
+          <div className={shellStyles['hero-content-section']}>
             {isScene && !isScrolled && item?.in_library && (
-              <button
-                type="button"
-                className={`media-detail-page__center-play-btn ${isPreviewPlaying ? 'is-playing' : ''}`}
+              <GlassPlayButton
+                isPlaying={isPreviewPlaying}
                 onClick={handleTogglePreview}
                 title={isPreviewPlaying ? 'Pause Preview' : 'Play Preview'}
-              >
-                {isPreviewPlaying ? <Pause size={32} /> : <Play size={32} className="play-icon-offset" />}
-              </button>
+                className="media-detail-page__center-play-btn"
+                isLoading={isPreviewPlaying && !isVideoPlaying}
+              />
             )}
             {(!state.logoUrl && state.posterUrl && !isScene) ? (
               <div className="media-detail-page__fallback-grid">
@@ -274,7 +283,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
         <UtilityBarBottomPortal side="center">
           <IconButton
             variant="ghost"
-            className="entity-detail-page__scroll-toggle-btn"
+            className={shellStyles['scroll-toggle-btn']}
             onClick={handleScrollToggle}
             title={
               isScrolled

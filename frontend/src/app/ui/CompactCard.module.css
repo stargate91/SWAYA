@@ -129,10 +129,6 @@ button.card:not([data-disabled="true"]):focus-visible {
   font-size: var(--font-size-xs);
   line-height: 1.5;
   color: var(--color-text-muted);
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
 }
 
 .right {

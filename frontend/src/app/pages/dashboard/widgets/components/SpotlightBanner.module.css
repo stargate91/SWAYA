@@ -72,12 +72,8 @@
 }
 
 .recommend-spotlight-overview {
-  display: -webkit-box;
-  overflow: hidden;
   margin-bottom: var(--space-2xl);
   color: color-mix(in srgb, var(--color-text-primary) 80%, transparent);
   font-size: var(--font-size-sm);
   line-height: 1.5;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
 }

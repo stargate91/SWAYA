@@ -92,6 +92,13 @@
   flex-shrink: 0;
 }
 
+.pill img {
+  height: 1rem;
+  width: auto;
+  display: block;
+  border-radius: var(--radius-xs);
+}
+
 /* Favorite toggle variants */
 .favorite {
   padding: var(--space-sm) var(--space-md);

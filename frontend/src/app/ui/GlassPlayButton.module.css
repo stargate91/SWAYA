@@ -1,0 +1,69 @@
+.btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  --local-btn-size: 5rem;
+  width: var(--local-btn-size);
+  height: var(--local-btn-size);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+  backdrop-filter: blur(0.75rem) saturate(120%);
+  --local-border-width: 0.09375rem;
+  border: var(--local-border-width) solid var(--color-border-default);
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: var(--z-index-step-2);
+  transition: transform var(--motion-fast) var(--motion-ease-spring), background var(--motion-fast), border-color var(--motion-fast), color var(--motion-fast), box-shadow var(--motion-fast);
+  --local-shadow-color: color-mix(in srgb, var(--color-bg-canvas) 37%, transparent);
+  box-shadow: 0 0.5rem 2rem 0 var(--local-shadow-color);
+  outline: none;
+}
+
+.btn:hover {
+  background: color-mix(in srgb, var(--color-accent) 18%, color-mix(in srgb, var(--color-text-primary) 12%, transparent));
+  border-color: var(--color-accent);
+  transform: translate(-50%, -50%) scale(1.1);
+  --local-hover-shadow-color: color-mix(in srgb, var(--color-accent) 20%, transparent);
+  box-shadow: 0 0.75rem 2rem 0 var(--local-hover-shadow-color);
+  color: var(--color-text-primary);
+}
+
+.btn:active {
+  transform: translate(-50%, -50%) scale(0.95);
+}
+
+.btn svg {
+  --local-svg-duration: 300ms;
+  --local-svg-ease: ease;
+  transition: transform var(--local-svg-duration) var(--local-svg-ease);
+}
+
+.btn:hover svg {
+  transform: scale(1.08);
+}
+
+.play-icon {
+  margin-left: 0.25rem;
+}
+
+.spinner {
+  display: block;
+  position: absolute;
+  inset: calc(-1 * var(--local-border-width));
+  border-radius: var(--radius-full);
+  border: var(--local-border-width) solid transparent;
+  border-top-color: var(--color-accent);
+  animation: glass-btn-spin var(--motion-duration-spinner-slow, 800ms) var(--motion-ease-linear, linear) infinite;
+  pointer-events: none;
+  z-index: var(--z-index-step-1);
+}
+
+@keyframes glass-btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

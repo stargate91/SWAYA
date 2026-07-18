@@ -1,0 +1,59 @@
+.hero {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  z-index: var(--z-index-zero);
+}
+
+.hero::before,
+.hero::after,
+.backdrop::after {
+  display: none;
+}
+
+.backdrop {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 1;
+  filter: none;
+  transform: none;
+  --local-duration: var(--motion-duration-slow-expressive, 500ms);
+  --local-ease: var(--motion-ease-in-out, ease-in-out);
+  transition: opacity var(--local-duration) var(--local-ease);
+}
+
+.backdrop--hidden {
+  opacity: 0;
+}
+
+.video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  z-index: var(--z-index-zero);
+  --local-duration: var(--motion-duration-slow-expressive, 500ms);
+  --local-ease: var(--motion-ease-in-out, ease-in-out);
+  transition: opacity var(--local-duration) var(--local-ease);
+}
+
+.video--visible {
+  opacity: 1;
+}
+
+.backdrop--blurred {
+  --local-blur-radius: 3.125rem;
+  --local-brightness: 0.45;
+  --local-scale: 1.2;
+  filter: blur(var(--local-blur-radius)) brightness(var(--local-brightness));
+  transform: scale(var(--local-scale)) translate3d(0, 0, 0);
+  will-change: filter, transform;
+  backface-visibility: hidden;
+}
