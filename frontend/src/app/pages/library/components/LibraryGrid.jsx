@@ -213,7 +213,7 @@ export default function LibraryGrid({
                   }
                   const isScene = isSceneMediaType(singlePreview.kind);
                   if (isScene) {
-                    return singlePreview.still ? resolveMediaImageUrl(singlePreview.still, 'backdrop') : '';
+                    return singlePreview.still ? resolveMediaImageUrl(singlePreview.still, 'still') : '';
                   }
                   return resolveMediaImageUrl(singlePreview.backdrop || singlePreview.poster, 'backdrop');
                 })();
@@ -251,7 +251,7 @@ export default function LibraryGrid({
                                 previewCount === 1
                                   ? singlePreviewImage
                                   : isSceneMediaType(preview.kind)
-                                    ? resolveMediaImageUrl(preview.still || preview.backdrop || preview.poster, 'backdrop')
+                                    ? resolveMediaImageUrl(preview.still || preview.backdrop || preview.poster, 'still')
                                     : resolvePosterUrl(preview.poster)
                               })`,
                               backgroundPositionX: preview.position_x != null ? `${preview.position_x}%` : 'center',

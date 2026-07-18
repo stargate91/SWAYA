@@ -280,6 +280,7 @@ class CustomListItemResponse(BaseModel):
     is_home_video: Optional[bool] = False
     last_air_date: Optional[str] = None
     release_status: Optional[str] = None
+    already_exists: Optional[bool] = False
 
 
 class CustomListResponse(BaseModel):

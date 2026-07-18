@@ -1,0 +1,4 @@
+.tagger {
+  position: relative;
+  z-index: var(--z-index-step-2);
+}

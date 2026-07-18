@@ -6,6 +6,7 @@ import Card from '@/ui/Card';
 import Stack from '@/ui/Stack';
 import Text from '@/ui/Text';
 import IconButton from '@/ui/IconButton';
+import Tooltip from '@/ui/Tooltip';
 import { formatTime } from '../../../utils/detailUtils';
 import styles from './BespokePeaksSection.module.css';
 
@@ -124,16 +125,18 @@ export default function BespokePeaksSection() {
                     <Text color="muted" className="u-font-2xs">
                       {new Date(log.watched_at).toLocaleDateString()}
                     </Text>
-                    <IconButton
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => handleDeletePeak(e, log)}
-                      disabled={deletePeakMutation.isPending}
-                      title={t('library.details.deletePeakBtn') || 'Delete Peak'}
-                      className={styles['delete-btn']}
-                    >
-                      <X size={14} />
-                    </IconButton>
+                    <Tooltip content={t('library.details.deletePeakBtn') || 'Delete Peak'} side="top">
+                      <IconButton
+                        variant="ghost"
+                        size="xs"
+                        onClick={(e) => handleDeletePeak(e, log)}
+                        disabled={deletePeakMutation.isPending}
+                        title={null}
+                        className={styles['delete-btn']}
+                      >
+                        <X size={14} />
+                      </IconButton>
+                    </Tooltip>
                   </Inline>
                 </Inline>
               );

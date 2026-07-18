@@ -1,6 +1,7 @@
 import { useMediaDetailContext } from '../MediaDetailContext';
 import Card from '@/ui/Card';
 import BespokeTagManager from './BespokeTagManager';
+import styles from './BespokeTagger.module.css';
 
 export default function BespokeTagger() {
   const { state, mutations, type, t } = useMediaDetailContext();
@@ -24,6 +25,7 @@ export default function BespokeTagger() {
       headerVariant="shaded"
       padding="md"
       title={t('library.details.tagger') || 'Tags & Keywords'}
+      className={styles.tagger}
     >
       <BespokeTagManager
         customTags={item?.custom_tags}

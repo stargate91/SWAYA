@@ -55,7 +55,7 @@ export default function RatingsPage() {
     }
     if (state.mediaType === 'scenes' || state.mediaType === 'videos') {
       return tooltipRow.still_path
-        ? resolveMediaImageUrl(tooltipRow.still_path, 'backdrop')
+        ? resolveMediaImageUrl(tooltipRow.still_path, 'still')
         : (tooltipRow.backdrop_path
           ? resolveMediaImageUrl(tooltipRow.backdrop_path, 'backdrop')
           : (tooltipRow.backdrop

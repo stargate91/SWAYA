@@ -23,6 +23,9 @@ export const useUpdateTagMutation = () => {
       queryClient.invalidateQueries({ queryKey: QK.allTags });
       queryClient.invalidateQueries({ queryKey: QK.libraryFilters });
       queryClient.invalidateQueries({ queryKey: QK.library });
+      queryClient.invalidateQueries({ queryKey: ['library-item-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['library-tv-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail'] });
     },
   });
 };
@@ -36,6 +39,9 @@ export const useDeleteTagMutation = () => {
       queryClient.invalidateQueries({ queryKey: QK.allTags });
       queryClient.invalidateQueries({ queryKey: QK.libraryFilters });
       queryClient.invalidateQueries({ queryKey: QK.library });
+      queryClient.invalidateQueries({ queryKey: ['library-item-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['library-tv-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['person-detail'] });
     },
   });
 };

@@ -23,16 +23,19 @@ export default function useHeaderScrollTransition(id, isAnyDrawerOpen, isPreview
     if (isAnyDrawerOpen || isPreviewPlaying) return;
 
     const handleWheel = (e) => {
-      if (e.target.closest('.global-search') || e.target.closest('.global-search__overlay')) {
+      if (
+        e.target.closest('.global-search') ||
+        e.target.closest('.global-search__overlay') ||
+        e.target.closest('.custom-scrollbar') ||
+        e.target.closest('[class*="dropdown"]') ||
+        e.target.closest('[class*="ScrollRow"]')
+      ) {
         return;
       }
       if (Math.abs(e.deltaY) > 5) {
         if (e.deltaY > 0 && !isScrolled) {
           setIsScrolled(true);
         } else if (e.deltaY < 0 && isScrolled) {
-          if (e.target.closest('.custom-scrollbar')) {
-            return;
-          }
           const isInsideSection = e.target.closest(scrollSectionSelector);
           if (isInsideSection) {
             const scrollable = isInsideSection.querySelector('.person-credits-discover-grid-wrapper, .person-credits-discover-grid');
