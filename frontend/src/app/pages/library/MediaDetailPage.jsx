@@ -31,8 +31,8 @@ import UtilityBarBottomPortal from '../../../components/UtilityBarBottomPortal';
 
 // Panels
 import BespokeSeasonsSection from './components/detail/sections/BespokeSeasonsSection';
-import TechnicalPanel from './components/detail/panels/TechnicalPanel';
-import BespokeSceneTagger from './components/detail/sections/BespokeSceneTagger';
+import TechnicalPanel from './components/detail/sections/TechnicalPanel';
+import BespokeTagger from './components/detail/sections/BespokeTagger';
 import BespokeScenePeaks from './components/detail/sections/BespokeScenePeaks';
 import BespokeListPanel from './components/detail/sections/BespokeListPanel';
 import './components/entityDetail/EntityDetailHeroSectionShared.css';
@@ -272,7 +272,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
                       t={t}
                     />
                   )}
-                  {item && <BespokeSceneTagger />}
+                  {item && <BespokeTagger />}
                 </>
               )}
 

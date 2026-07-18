@@ -80,6 +80,7 @@ export default function ExtrasPanel() {
             ))}
           </Stack>
         ))}
+
         {extras.length === 0 && (
           <Text variant="small" color="secondary">
             {t('library.details.noExtraFilesFound') || 'No extra files found.'}

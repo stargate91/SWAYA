@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
-import TechnicalPanel from './panels/TechnicalPanel';
-import ExtrasPanel from './panels/ExtrasPanel';
+import TechnicalPanel from './sections/TechnicalPanel';
+import ExtrasPanel from './sections/ExtrasPanel';
 import Drawer from '@/ui/Drawer';
 
 export default function DetailsMetadataDrawer({
