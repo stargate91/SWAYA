@@ -1,8 +1,10 @@
-import { ChevronRight, ChevronLeft, Check, Eye, Play, Clapperboard, Star, Droplets, Trash2 } from '@/ui/icons';
+import { ChevronRight, ChevronLeft, Check, Eye, Play, Clapperboard, Star, Droplets } from '@/ui/icons';
 import Pill from '@/ui/Pill';
 import PosterCard from '@/ui/PosterCard';
+import IconButton from '@/ui/IconButton';
+import Stack from '@/ui/Stack';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
-import { formatEpisodeNumber, formatTime } from '../../../utils/detailUtils';
+import { formatEpisodeNumber } from '../../../utils/detailUtils';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import Inline from '@/ui/Inline';
 import './BespokeEpisodeDetail.css';
@@ -37,76 +39,88 @@ export default function BespokeEpisodeDetail({
   return (
     <div className="bespoke-browser-card__body bespoke-browser-card__body--episode">
       {/* Overlaid Nav Chevrons */}
-      <button
-        type="button"
-        className="bespoke-card-nav bespoke-card-nav--left"
-        disabled={activeEpisodeIndex <= 0}
-        onClick={() => stepEpisode('left')}
-        title={t('library.details.previousEpisode') || 'Previous Episode'}
-      >
-        <ChevronLeft size={24} />
-      </button>
+      {activeEpisodeIndex > 0 && (
+        <button
+          type="button"
+          className="ui-carousel-arrow is-left"
+          onClick={() => stepEpisode('left')}
+          title={t('library.details.previousEpisode') || 'Previous Episode'}
+        >
+          <ChevronLeft size={20} />
+        </button>
+      )}
 
-      <button
-        type="button"
-        className="bespoke-card-nav bespoke-card-nav--right"
-        disabled={activeEpisodeIndex >= episodes.length - 1}
-        onClick={() => stepEpisode('right')}
-        title={t('library.details.nextEpisode') || 'Next Episode'}
-      >
-        <ChevronRight size={24} />
-      </button>
+      {activeEpisodeIndex < episodes.length - 1 && (
+        <button
+          type="button"
+          className="ui-carousel-arrow is-right"
+          onClick={() => stepEpisode('right')}
+          title={t('library.details.nextEpisode') || 'Next Episode'}
+        >
+          <ChevronRight size={20} />
+        </button>
+      )}
 
-      {/* Left Column: Large Cinematic 16:9 Still */}
-      <div className="bespoke-episode-detail-card__still-col">
-        <PosterCard
-          className="bespoke-episode-detail-card__still"
-          aspect="landscape"
-          imageUrl={getStillUrl(activeEpisode.still_path)}
-          onClick={getStillUrl(activeEpisode.still_path) ? () => handleOpenLightbox(getOriginalStillUrl(activeEpisode.still_path)) : undefined}
-          icon={Clapperboard}
-          disableHoverAnimation={true}
-          playOverlay={activeEpisode.path && !activeEpisode.is_missing ? {
-            onClick: (e) => {
-              e.stopPropagation();
-              playMutation.mutate(activeEpisode.id);
-            },
-            label: t('library.details.playEpisode') || 'Play Episode',
-            icon: <Play size={20} fill="currentColor" />,
-          } : null}
-        />
-      </div>
+      {/* Cinematic 16:9 Still */}
+      <PosterCard
+        className="bespoke-episode-detail-card__still"
+        aspect="landscape"
+        imageUrl={getStillUrl(activeEpisode.still_path)}
+        onClick={getStillUrl(activeEpisode.still_path) ? () => handleOpenLightbox(getOriginalStillUrl(activeEpisode.still_path)) : undefined}
+        icon={Clapperboard}
+        disableHoverAnimation={true}
+        playOverlay={activeEpisode.path && !activeEpisode.is_missing ? {
+          onClick: (e) => {
+            e.stopPropagation();
+            playMutation.mutate(activeEpisode.id);
+          },
+          label: t('library.details.playEpisode') || 'Play Episode',
+          icon: <Play size={20} fill="currentColor" />,
+        } : null}
+      />
 
       {/* Right Column: Metadata & Copy */}
-      <div className="bespoke-episode-detail-card__content-col">
-        <div className="bespoke-episode-detail-card__header">
+      <Stack
+        gap="2xs"
+        scrollable
+        className="bespoke-episode-detail-card__content-col"
+      >
+        <Inline
+          justify="between"
+          align="center"
+          gap="md"
+          fullWidth
+          className="bespoke-episode-detail-card__header"
+        >
           <h4 className="bespoke-episode-detail-card__title">
             {/* eslint-disable-next-line react/jsx-no-literals */}
-            {`${formatEpisodeNumber(activeEpisode.episode_number)}. ${
-              activeEpisode.title || `Episode ${activeEpisode.episode_number}`
-            }`}
+            {`${formatEpisodeNumber(activeEpisode.episode_number)}. ${activeEpisode.title || `Episode ${activeEpisode.episode_number}`
+              }`}
           </h4>
 
           <Inline gap="sm" align="center" className="bespoke-episode-detail-card__actions">
             {/* Flame/Peak button */}
             {item.is_adult && activeEpisode.path && !activeEpisode.is_missing && (
-              <button
-                type="button"
+              <IconButton
+                variant="ghost"
+                size="sm"
+                wrapped
                 onClick={(e) => {
                   e.stopPropagation();
-                  addPeakMutation.mutate(activeEpisode.id);
+                  addPeakMutation.mutate({ itemId: activeEpisode.id, tvId: cleanId });
                 }}
                 disabled={addPeakMutation.isPending}
-                className="bespoke-action-btn bespoke-action-btn--peak"
                 title={t('library.details.addPeak') || 'Add Peak'}
               >
-                <Droplets size={15} />
-              </button>
+                <Droplets size={15} color="var(--color-state-danger)" />
+              </IconButton>
             )}
 
             {/* Watch toggle */}
-            <button
-              type="button"
+            <IconButton
+              variant={activeEpisode.is_watched ? 'success' : 'ghost'}
+              size="sm"
+              wrapped
               onClick={() =>
                 updateStatusMutation.mutate({
                   itemId: activeEpisode.id,
@@ -117,15 +131,12 @@ export default function BespokeEpisodeDetail({
                   },
                 })
               }
-              className={`bespoke-action-btn bespoke-action-btn--watch ${
-                activeEpisode.is_watched ? 'is-watched' : ''
-              }`}
               title={activeEpisode.is_watched ? 'Mark unwatched' : 'Mark watched'}
             >
               {activeEpisode.is_watched ? <Check size={15} /> : <Eye size={15} />}
-            </button>
+            </IconButton>
           </Inline>
-        </div>
+        </Inline>
 
         {/* Episode Meta details */}
         <Inline gap="md" align="center" className="bespoke-episode-detail-card__meta">
@@ -157,7 +168,7 @@ export default function BespokeEpisodeDetail({
             </span>
           )}
           {activeEpisode.vote_average != null && activeEpisode.vote_average > 0 && (
-            <Pill variant="tmdb" className="bespoke-episode-detail-card__tmdb-pill">
+            <Pill variant="tmdb">
               <Star size={10} fill="currentColor" strokeWidth={1.8} />
               {parseFloat(activeEpisode.vote_average).toFixed(1)}
             </Pill>
@@ -170,42 +181,7 @@ export default function BespokeEpisodeDetail({
             {activeEpisode.overview}
           </p>
         )}
-
-        {/* Adult Peaks History */}
-        {item.is_adult && activeEpisode.peaks_history && activeEpisode.peaks_history.length > 0 && (
-          <div className="bespoke-episode-detail-card__peaks">
-            <Inline gap="sm" align="center" className="bespoke-episode-detail-card__peaks-title">
-              <Droplets size={12} fill="currentColor" />
-              <span>{t('library.details.peaksTitle') || 'Peak Moments'} {LPAR}{activeEpisode.peaks_history.length}{RPAR}</span>
-            </Inline>
-            <div className="bespoke-episode-detail-card__peaks-list">
-              {activeEpisode.peaks_history.map((log) => (
-                <Inline key={log.id} justify="between" gap="sm" align="center" className="bespoke-episode-detail-card__peak-item">
-                  <span className="bespoke-episode-detail-card__peak-date">
-                    {new Date(log.watched_at).toLocaleDateString()}
-                  </span>
-                  {log.video_position != null && (
-                    <span className="bespoke-episode-detail-card__peak-position">
-                      {formatTime(log.video_position)}
-                    </span>
-                  )}
-                  <button
-                    type="button"
-                    className="bespoke-episode-detail-card__peak-delete"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deletePeakMutation.mutate({ itemId: activeEpisode.id, logId: log.id });
-                    }}
-                    disabled={deletePeakMutation.isPending}
-                  >
-                    <Trash2 size={12} />
-                  </button>
-                </Inline>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+      </Stack>
     </div>
   );
 }

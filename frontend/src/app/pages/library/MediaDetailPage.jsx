@@ -33,7 +33,7 @@ import UtilityBarBottomPortal from '../../../components/UtilityBarBottomPortal';
 import BespokeSeasonsSection from './components/detail/sections/BespokeSeasonsSection';
 import TechnicalPanel from './components/detail/sections/TechnicalPanel';
 import BespokeTagger from './components/detail/sections/BespokeTagger';
-import BespokeScenePeaks from './components/detail/sections/BespokeScenePeaks';
+import BespokePeaksSection from './components/detail/sections/BespokePeaksSection';
 import ListsPopover from './components/detail/sections/ListsPopover';
 import './components/entityDetail/EntityDetailHeroSectionShared.css';
 
@@ -264,7 +264,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
                 />
               )}
               {item && <BespokeTagger />}
-              {item && item.is_adult && (isMovie || isScene) && <BespokeScenePeaks />}
+              {item && item.is_adult && <BespokePeaksSection />}
             </Stack>
           </div>
         </div>
