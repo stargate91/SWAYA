@@ -3,8 +3,6 @@ import { useState } from 'react';
 import { Minus, Plus } from '@/ui/icons';
 import UtilityBarBottomPortal from '../../../../../../components/UtilityBarBottomPortal';
 import Inline from '@/ui/Inline';
-import './BottomSocialsBar.css';
-
 export default function BottomSocialsBar({
   socialLinks,
   t
@@ -19,17 +17,20 @@ export default function BottomSocialsBar({
 
   return (
     <UtilityBarBottomPortal side="right">
-      <div className={`entity-detail-page__bottom-socials ${isSocialExpanded ? 'entity-detail-page__bottom-socials--expanded' : ''}`}>
-        <Inline gap="sm" align="center" className="entity-detail-page__bottom-socials-wrapper">
+      <div className="u-hover-reveal" data-active={isSocialExpanded}>
+        <div className="u-pill-panel">
           {hasExtraSocials && (
-            <div className="entity-detail-page__bottom-socials-extra">
+            <div
+              className="u-collapse-horizontal"
+              data-expanded={isSocialExpanded}
+            >
               {extraSocialLinks.map((link) => (
                 <a
                   key={link.key}
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="entity-detail-page__bottom-social-btn"
+                  className="u-icon-btn-round"
                   title={link.label}
                 >
                   <img src={link.iconSrc || '/links/website.svg'} alt={link.label} />
@@ -38,14 +39,14 @@ export default function BottomSocialsBar({
             </div>
           )}
 
-          <div className="entity-detail-page__bottom-socials-main">
+          <div className="u-flex-nowrap">
             {mainSocialLinks.map((link) => (
               <a
                 key={link.key}
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="entity-detail-page__bottom-social-btn"
+                className="u-icon-btn-round"
                 title={link.label}
               >
                 <img src={link.iconSrc || '/links/website.svg'} alt={link.label} />
@@ -56,14 +57,14 @@ export default function BottomSocialsBar({
           {hasExtraSocials && (
             <button
               type="button"
-              className="entity-detail-page__bottom-social-toggle"
+              className="u-icon-btn-round u-text-muted u-hover-no-transform"
               onClick={() => setIsSocialExpanded(!isSocialExpanded)}
               title={isSocialExpanded ? (t('common.showLess') || 'Show Less') : (t('common.showMore') || 'Show More')}
             >
               {isSocialExpanded ? <Minus size={14} /> : <Plus size={14} />}
             </button>
           )}
-        </Inline>
+        </div>
       </div>
     </UtilityBarBottomPortal>
   );

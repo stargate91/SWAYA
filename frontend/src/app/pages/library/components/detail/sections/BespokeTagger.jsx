@@ -24,7 +24,6 @@ export default function BespokeTagger() {
       headerVariant="shaded"
       padding="md"
       title={t('library.details.tagger') || 'Tags & Keywords'}
-      className="bespoke-tagger-card"
     >
       <BespokeTagManager
         customTags={item?.custom_tags}

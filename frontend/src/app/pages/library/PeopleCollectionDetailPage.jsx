@@ -15,6 +15,8 @@ import UtilityBarBottomPortal from '../../../components/UtilityBarBottomPortal';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import './PeopleCollectionDetailPage.css';
 import './components/detail/UserRatingSection.css';
+import OnboardingWizard from '../onboarding/OnboardingWizard';
+import BottomSocialsBar from './components/detail/sections/BottomSocialsBar';
 
 export default function PeopleCollectionDetailPage({ type = 'people' }) {
   const { id } = useParams();
@@ -205,38 +207,9 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
         </div>
       )}
       {!hasError && isPeople && socialLinks.length > 0 && (
-        <UtilityBarBottomPortal side="right">
-          <div className={`entity-detail-page__bottom-socials ${isSocialExpanded ? 'entity-detail-page__bottom-socials--expanded' : ''}`}>
-            <div className="entity-detail-page__bottom-socials-wrapper">
-              <div className="entity-detail-page__bottom-socials-main">
-                {visibleSocialLinks.map((link) => (
-                  <a
-                    key={link.key}
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="entity-detail-page__bottom-social-btn"
-                    title={link.label}
-                  >
-                    <img src={link.iconSrc || '/links/website.svg'} alt={link.label} />
-                  </a>
-                ))}
-              </div>
-
-              {hasExtraSocials && (
-                <button
-                  type="button"
-                  className="entity-detail-page__bottom-social-toggle"
-                  onClick={() => setIsSocialExpanded(!isSocialExpanded)}
-                  title={isSocialExpanded ? (t('common.showLess') || 'Show Less') : (t('common.showMore') || 'Show More')}
-                >
-                  {isSocialExpanded ? <Minus size={14} /> : <Plus size={14} />}
-                </button>
-              )}
-            </div>
-          </div>
-        </UtilityBarBottomPortal>
+        <BottomSocialsBar socialLinks={socialLinks} t={t} />
       )}
+
 
       {!hasError && isPeople && (
         <div className={`entity-detail-page__scroll-toggle-container ${isScrolled ? 'is-scrolled' : ''}`}>

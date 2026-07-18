@@ -17,6 +17,7 @@ export default function Input({
   leftElement,
   rightElement,
   expandOnFocus = false,
+  flex,
   ...props
 }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -36,7 +37,7 @@ export default function Input({
 
   const fieldClass = `${styles['input-field']} ${
     expandOnFocus ? styles['input-field--expand-on-focus'] : ''
-  } ${className}`.trim();
+  } ${flex === 1 ? styles['flex-1'] : ''} ${className}`.trim();
 
   const inputClass = `${styles['input']} ${styles[`input--${size}`]}`.trim();
 
@@ -104,4 +105,5 @@ Input.propTypes = {
   leftElement: PropTypes.node,
   rightElement: PropTypes.node,
   expandOnFocus: PropTypes.bool,
+  flex: PropTypes.number,
 };

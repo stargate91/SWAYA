@@ -1,0 +1,28 @@
+/* Typography utilities */
+.u-stats-title-sup {
+  font-size: 0.45em;
+  top: -0.7em;
+  position: relative;
+}
+
+.u-stats-title-badge {
+  padding: calc(var(--space-xs) / 2) var(--space-sm);
+  font-size: var(--font-size-2xs);
+}
+
+.u-text-center {
+  text-align: center;
+}
+
+.u-font-italic {
+  font-style: italic;
+}
+
+.u-color-accent-soft {
+  color: var(--color-accent-blue-soft);
+}
+
+.u-text-muted {
+  color: var(--color-text-muted);
+}
+

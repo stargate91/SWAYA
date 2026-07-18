@@ -43,7 +43,7 @@ export default function Button({
 Button.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
-  variant: PropTypes.oneOf(['primary', 'primary-neutral', 'secondary', 'secondary-neutral', 'ghost', 'danger', 'onboarding-back', 'onboarding-continue', 'tag']),
+  variant: PropTypes.oneOf(['primary', 'primary-neutral', 'secondary', 'secondary-neutral', 'ghost', 'danger', 'onboarding-back', 'onboarding-continue', 'tag', 'glass']),
   size: PropTypes.oneOf(['sm', 'md', 'lg']),
   leftIcon: PropTypes.node,
   rightIcon: PropTypes.node,

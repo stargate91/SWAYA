@@ -34,7 +34,7 @@ import BespokeSeasonsSection from './components/detail/sections/BespokeSeasonsSe
 import TechnicalPanel from './components/detail/sections/TechnicalPanel';
 import BespokeTagger from './components/detail/sections/BespokeTagger';
 import BespokeScenePeaks from './components/detail/sections/BespokeScenePeaks';
-import BespokeListPanel from './components/detail/sections/BespokeListPanel';
+import ListsPopover from './components/detail/sections/ListsPopover';
 import './components/entityDetail/EntityDetailHeroSectionShared.css';
 
 import BespokeCastSection from './components/detail/sections/BespokeCastSection';
@@ -47,7 +47,6 @@ import Lightbox from '@/ui/Lightbox';
 import EditableMediaCard from './components/entityDetail/EditableMediaCard';
 import Stack from '@/ui/Stack';
 import Card from '@/ui/Card';
-import SegmentedControl from '@/ui/SegmentedControl';
 
 import DetailsMetadataDrawer from './components/detail/DetailsMetadataDrawer';
 import BespokeBoxOfficeSection from './components/detail/sections/BespokeBoxOfficeSection';
@@ -92,7 +91,6 @@ export default function MediaDetailPage({ type = 'movie' }) {
   const [isPosterDrawerOpen, setIsPosterDrawerOpen] = useState(false);
   const [isBackdropDrawerOpen, setIsBackdropDrawerOpen] = useState(false);
   const [lightboxUrl, setLightboxUrl] = useState(null);
-  const [activeSideTab, setActiveSideTab] = useState('activity');
   const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
   const [previewSrc, setPreviewSrc] = useState(null);
   const [prevId, setPrevId] = useState(id);
@@ -168,6 +166,13 @@ export default function MediaDetailPage({ type = 'movie' }) {
         containerRef={containerRef}
         topRightControls={(
           <>
+            {item && (
+              <ListsPopover
+                item={item}
+                type={normalizedType}
+                t={t}
+              />
+            )}
             <button
               type="button"
               onClick={handleOpenBackdropModal}
@@ -250,38 +255,16 @@ export default function MediaDetailPage({ type = 'movie' }) {
               {(isMovie || isScene) && <BespokeRatingsSection item={item} t={t} />}
             </Stack>
             <Stack gap="md">
-              <SegmentedControl
-                variant="glass"
-                size="sm"
-                options={[
-                  { value: 'activity', label: t('library.details.tab_activity') || 'Activity' },
-                  { value: 'organize', label: t('library.details.tab_organize') || 'Organize' }
-                ]}
-                value={activeSideTab}
-                onChange={setActiveSideTab}
-                className="side-tab-control"
-              />
-
-              {activeSideTab === 'activity' && (
-                <>
-                  {item && (
-                    <CompactWatchStatsSection
-                      item={item}
-                      isMovie={isMovie}
-                      isScene={isScene}
-                      t={t}
-                    />
-                  )}
-                  {item && <BespokeTagger />}
-                </>
+              {item && (
+                <CompactWatchStatsSection
+                  item={item}
+                  isMovie={isMovie}
+                  isScene={isScene}
+                  t={t}
+                />
               )}
-
-              {activeSideTab === 'organize' && (
-                <>
-                  {item && <BespokeListPanel />}
-                  {item && item.is_adult && (isMovie || isScene) && <BespokeScenePeaks />}
-                </>
-              )}
+              {item && <BespokeTagger />}
+              {item && item.is_adult && (isMovie || isScene) && <BespokeScenePeaks />}
             </Stack>
           </div>
         </div>

@@ -205,6 +205,8 @@
   align-items: center;
   gap: var(--space-md);
   padding: var(--space-sm) var(--space-md);
+  min-height: 3.75rem;
+  box-sizing: border-box;
 }
 
 .card[data-variant="stat"][data-state="profit"] {

@@ -1,0 +1,114 @@
+/* Layout & Spacing utilities */
+.u-min-h-row {
+  min-height: 2rem;
+}
+
+.u-min-h-card-loading {
+  min-height: 7.5rem;
+}
+
+.u-min-h-dist-card-loading {
+  min-height: 21.25rem;
+}
+
+.u-mt-sm {
+  margin-top: var(--space-sm);
+}
+
+.u-margin-left-auto {
+  margin-left: auto;
+}
+
+.u-ml-xs {
+  margin-left: var(--space-xs);
+}
+
+.u-insights-panel {
+  min-width: 20rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.u-mb-xl {
+  margin-bottom: var(--space-xl);
+}
+
+.u-mb-sm {
+  margin-bottom: var(--space-sm);
+}
+
+.u-mb-xs {
+  margin-bottom: var(--space-xs);
+}
+
+.u-py-sm {
+  padding-top: var(--space-sm);
+  padding-bottom: var(--space-sm);
+}
+
+.u-w-genre {
+  width: calc(4 * var(--space-4xl)); /* 10rem */
+}
+
+.u-w-year {
+  width: 8.125rem;
+}
+
+.u-w-full {
+  width: 100%;
+}
+
+.u-max-h-10rem {
+  max-height: 10rem;
+}
+
+.u-max-h-7rem {
+  max-height: 7.2rem;
+}
+
+.u-pr-xs {
+  padding-right: var(--space-xs);
+}
+
+.u-divider {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid var(--color-border-default);
+  margin: 0;
+}
+
+.u-collapse-horizontal {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-width 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.u-collapse-horizontal[data-expanded="true"] {
+  max-width: 75rem;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.u-flex-nowrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-wrap: nowrap;
+}
+
+.u-hover-no-transform:hover {
+  transform: none;
+}
+
+.u-overflow-x-auto {
+  overflow-x: auto;
+}
+
+.u-scroll-smooth {
+  scroll-behavior: smooth;
+}

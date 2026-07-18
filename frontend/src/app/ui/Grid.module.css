@@ -208,3 +208,9 @@
   grid-template-columns: repeat(auto-fit, minmax(11.25rem, 1fr));
   gap: var(--space-md);
 }
+
+/* Forces exactly 3 equal columns */
+.grid[data-variant="three-cols"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-md);
+}

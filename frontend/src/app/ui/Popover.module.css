@@ -1,0 +1,15 @@
+.popover {
+  position: absolute;
+  top: var(--popover-top);
+  z-index: var(--z-index-popover);
+  width: var(--popover-width, auto);
+}
+
+.align-right {
+  left: var(--popover-left);
+  transform: translateX(-100%);
+}
+
+.align-left {
+  left: var(--popover-left);
+}

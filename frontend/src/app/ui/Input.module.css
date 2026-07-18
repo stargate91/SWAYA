@@ -156,3 +156,7 @@
   white-space: nowrap;
   border: 0;
 }
+
+.flex-1 {
+  flex: 1 1 0;
+}

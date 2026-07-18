@@ -10,12 +10,20 @@ export default function Chip({
   onClick,
   onRemove,
   variant = 'default',
+  size = 'md',
+  color,
+  leftElement,
+  rightElement,
+  active = false,
+  disabled = false,
   className = '',
+  style = {},
   ...props
 }) {
   const isRemovable = Boolean(onRemove) || variant === 'removable';
 
   const handleClick = (e) => {
+    if (disabled) return;
     if (onClick) {
       onClick(e);
     }
@@ -23,24 +31,45 @@ export default function Chip({
 
   const handleRemove = (e) => {
     e.stopPropagation();
+    if (disabled) return;
     if (onRemove) {
       onRemove(e);
     }
   };
 
+  const hasAction = Boolean(onClick) || isRemovable;
+
+  const chipClass = `
+    ${styles.chip}
+    ${styles[`chip--${variant}`]}
+    ${styles[`chip--${size}`]}
+    ${hasAction ? styles['chip--interactive'] : ''}
+    ${className}
+  `.trim();
+
+  const combinedStyle = {
+    ...style,
+    ...(color ? { '--chip-color': color } : {}),
+  };
+
   return (
     <button
       type="button"
-      className={`${styles.chip} ${className}`.trim()}
-      data-variant={isRemovable ? 'removable' : 'default'}
+      className={chipClass}
+      data-variant={isRemovable ? 'removable' : variant}
+      data-active={active || undefined}
       onClick={isRemovable && !onClick ? handleRemove : handleClick}
+      disabled={disabled}
+      style={combinedStyle}
       {...props}
     >
-      <span>{children}</span>
+      {leftElement && <span className={styles['left-element']}>{leftElement}</span>}
+      <span className={styles.content}>{children}</span>
+      {!isRemovable && rightElement && <span className={styles['right-element']}>{rightElement}</span>}
       {isRemovable && (
         /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
         <span className={styles.icon} onClick={onClick ? handleRemove : undefined}>
-          <X size={12} />
+          <X size={size === 'xs' || size === 'sm' ? 10 : 12} />
         </span>
       )}
     </button>
@@ -51,6 +80,13 @@ Chip.propTypes = {
   children: PropTypes.node.isRequired,
   onClick: PropTypes.func,
   onRemove: PropTypes.func,
-  variant: PropTypes.oneOf(['default', 'removable']),
+  variant: PropTypes.oneOf(['default', 'outline', 'glass', 'ghost', 'dashed', 'removable']),
+  size: PropTypes.oneOf(['xs', 'sm', 'md', 'lg']),
+  color: PropTypes.string,
+  leftElement: PropTypes.node,
+  rightElement: PropTypes.node,
+  active: PropTypes.bool,
+  disabled: PropTypes.bool,
   className: PropTypes.string,
+  style: PropTypes.object,
 };

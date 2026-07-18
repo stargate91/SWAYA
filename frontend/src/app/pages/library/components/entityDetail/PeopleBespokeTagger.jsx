@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
+import Card from '@/ui/Card';
 import BespokeTagManager from '../detail/sections/BespokeTagManager';
-import '../detail/sections/BespokeTagger.css';
 
 export default function PeopleBespokeTagger({ item, t, updatePersonStatusMutation }) {
   const handleUpdateTags = (nextTags) => {
@@ -14,12 +14,12 @@ export default function PeopleBespokeTagger({ item, t, updatePersonStatusMutatio
   };
 
   return (
-    <div className="bespoke-tagger-card bespoke-tagger-card--spaced">
-      <div className="bespoke-tagger-header">
-        <span className="bespoke-tagger-title">
-          {t('library.details.tagger') || 'Tags & Keywords'}
-        </span>
-      </div>
+    <Card
+      variant="glass-shaded"
+      headerVariant="shaded"
+      padding="md"
+      title={t('library.details.tagger') || 'Tags & Keywords'}
+    >
       <BespokeTagManager
         customTags={item?.custom_tags}
         suggestedTags={item?.suggested_tags}
@@ -27,7 +27,7 @@ export default function PeopleBespokeTagger({ item, t, updatePersonStatusMutatio
         onUpdateTags={handleUpdateTags}
         t={t}
       />
-    </div>
+    </Card>
   );
 }
 

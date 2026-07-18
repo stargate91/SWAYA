@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { ChevronDown, ChevronRight } from '@/ui/icons';
 import { countEpisodesInNumber } from '@/pages/library/utils/detailUtils';
 import Card from '@/ui/Card';
-import './CompactWatchStatsSection.css';
+import Grid from '@/ui/Grid';
+import Inline from '@/ui/Inline';
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
+import LinearProgress from '@/ui/LinearProgress';
 
 export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) {
   const [isHistoryExpanded, setIsHistoryExpanded] = useState(false);
@@ -137,89 +141,95 @@ export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) 
   const watchActivityText = `${t('library.details.watchActivity') || 'Watch History'} (${logs.length})`;
 
   return (
-    <div className="bespoke-boxoffice-section compact-watch-stats-section">
-      <Card
-        variant="glass-shaded"
-        headerVariant="shaded"
-        padding="md"
-        title={t('library.details.watchStats') || 'Watch Stats'}
-      >
-        <div className="bespoke-boxoffice-body">
-          <div className="bespoke-boxoffice-stat">
-            <div className="bespoke-boxoffice-info">
-              <span className="bespoke-boxoffice-label">
+    <Card
+      variant="glass-shaded"
+      headerVariant="shaded"
+      padding="md"
+      title={t('library.details.watchStats') || 'Watch Stats'}
+    >
+      <Stack gap="md" fullWidth>
+        <Grid variant="three-cols">
+          <Card variant="stat">
+            <Stack gap="3xs">
+              <Text variant="caption" color="muted" weight="bold" uppercase>
                 {t('library.details.watchStatus') || 'Status'}
-              </span>
-              <span className={`status-${statusClass} bespoke-boxoffice-value`}>
+              </Text>
+              <Text variant="small" weight="semibold" className={`status-${statusClass}`}>
                 {watchStatus}
                 {((isMovie || isScene) && watchCount > 0) && (
-                  <span className="compact-watch-stats__count">
+                  <span className="u-ml-xs" style={{ opacity: 0.6 }}>
                     {watchCountText}
                   </span>
                 )}
-              </span>
-            </div>
-          </div>
+              </Text>
+            </Stack>
+          </Card>
 
-          <div className="bespoke-boxoffice-stat">
-            <div className="bespoke-boxoffice-info compact-watch-stats__info-full">
-              <span className="bespoke-boxoffice-label">
+          <Card variant="stat">
+            <Stack gap="3xs" fullWidth>
+              <Text variant="caption" color="muted" weight="bold" uppercase>
                 {t('library.details.movieProgress') || 'Progress'}
-              </span>
-              <div className="compact-watch-stats__progress-labels">
-                <span>{progressText}</span>
-                <span>{progressPercentText}</span>
-              </div>
-              <progress
-                className="compact-watch-stats__progress-bar"
+              </Text>
+              <Inline justify="between" fullWidth className="u-mb-2xs">
+                <Text variant="small" weight="semibold">{progressText}</Text>
+                <Text variant="small" color="muted">{progressPercentText}</Text>
+              </Inline>
+              <LinearProgress
                 value={progressPercent}
-                max={100}
+                variant="accent"
               />
-            </div>
-          </div>
+            </Stack>
+          </Card>
 
-          <div className="bespoke-boxoffice-stat">
-            <div className="bespoke-boxoffice-info">
-              <span className="bespoke-boxoffice-label">
+          <Card variant="stat">
+            <Stack gap="3xs">
+              <Text variant="caption" color="muted" weight="bold" uppercase>
                 {t('library.details.lastWatched') || 'Last Watched'}
-              </span>
-              <span className="bespoke-boxoffice-value compact-watch-stats__last-watched">{lastWatchedText}</span>
-            </div>
-          </div>
+              </Text>
+              <Text variant="small" weight="semibold">
+                {lastWatchedText}
+              </Text>
+            </Stack>
+          </Card>
+        </Grid>
 
-          {logs.length > 0 && (
-            <div className="bespoke-boxoffice-stat compact-watch-stats__history-wrapper">
-              <button
-                type="button"
-                onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}
-                className="compact-watch-stats__toggle-btn"
-              >
-                <span>{watchActivityText}</span>
+        {logs.length > 0 && (
+          <Stack gap="sm" fullWidth>
+            <hr className="u-divider" />
+            <button
+              type="button"
+              onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}
+              className="u-btn-reset u-w-full"
+            >
+              <Inline justify="between" align="center" fullWidth>
+                <Text variant="small" color="secondary">{watchActivityText}</Text>
                 {isHistoryExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-              </button>
+              </Inline>
+            </button>
 
-              {isHistoryExpanded && (
-                <div
-                  className={`compact-watch-stats__history-list ${logs.length > 3 ? 'compact-watch-stats__history-list--scrollable custom-scrollbar' : ''}`}
-                >
-                  {logs.map((log, idx) => {
-                    const dateStr = formatLogDate(log.watched_at);
-                    const epText = log.seasonNumber != null && log.episodeNumber != null
-                      ? `S${log.seasonNumber.toString().padStart(2, '0')}E${log.episodeNumber.toString().padStart(2, '0')}`
-                      : '';
-                    return (
-                      <div key={log.id || idx} className="compact-watch-stats__history-item">
-                        <span className="compact-watch-stats__history-label">{epText || (t('library.details.playSession') || 'Session')}</span>
-                        <span className="compact-watch-stats__history-date">{dateStr}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-        </Card>
-      </div>
-    );
-  }
+            {isHistoryExpanded && (
+              <Stack
+                gap="xs"
+                scrollable={logs.length > 3}
+                className={logs.length > 3 ? 'u-max-h-7rem u-pr-xs custom-scrollbar' : ''}
+              >
+                {logs.map((log, idx) => {
+                  const dateStr = formatLogDate(log.watched_at);
+                  const epText = log.seasonNumber != null && log.episodeNumber != null
+                    ? `S${log.seasonNumber.toString().padStart(2, '0')}E${log.episodeNumber.toString().padStart(2, '0')}`
+                    : '';
+                  return (
+                    <Inline key={log.id || idx} justify="between" align="center" fullWidth className="u-panel-item">
+                      <Text weight="bold">{epText || (t('library.details.playSession') || 'Session')}</Text>
+                      <span style={{ opacity: 0.6 }}>{dateStr}</span>
+                    </Inline>
+                  );
+                })}
+              </Stack>
+            )}
+          </Stack>
+        )}
+      </Stack>
+    </Card>
+  );
+}

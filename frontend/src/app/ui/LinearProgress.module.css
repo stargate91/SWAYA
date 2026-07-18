@@ -1,5 +1,7 @@
 .container {
-  flex: 1;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
   height: 0.5rem;
   background: color-mix(in srgb, var(--color-ink) 4%, transparent);
   border-radius: var(--radius-full);
@@ -10,9 +12,8 @@
 .bar {
   height: 100%;
   border-radius: var(--radius-full);
-  animation: growWidth var(--motion-duration-lazy) var(--motion-ease-emphasized) forwards;
-  transform-origin: left;
-  transition: width var(--motion-duration-fast) var(--motion-ease-standard);
+  background: var(--color-accent-blue);
+  transition: width var(--motion-duration-slow-expressive) var(--motion-ease-emphasized);
 }
 
 .bar[data-variant="blue"] {

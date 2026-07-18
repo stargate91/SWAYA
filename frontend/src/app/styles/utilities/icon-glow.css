@@ -1,0 +1,23 @@
+/* Icon glow helper utilities */
+.icon-glow-blue {
+  color: var(--color-accent-blue);
+  filter: drop-shadow(0 0 0.25rem var(--color-accent-blue));
+  opacity: 0.8;
+}
+
+.icon-glow-success {
+  color: var(--color-state-success);
+  filter: drop-shadow(0 0 var(--space-xs) color-mix(in srgb, var(--color-state-success) 50%, transparent));
+  opacity: 0.8;
+}
+
+.icon-glow-danger {
+  color: var(--color-accent-pink);
+  filter: drop-shadow(0 0 var(--space-xs) var(--color-accent-pink));
+  opacity: 0.8;
+}
+
+.icon-glow-muted {
+  color: var(--color-text-faint);
+  opacity: 0.8;
+}
