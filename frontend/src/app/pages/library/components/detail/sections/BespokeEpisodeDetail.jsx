@@ -3,14 +3,13 @@ import Pill from '@/ui/Pill';
 import PosterCard from '@/ui/PosterCard';
 import IconButton from '@/ui/IconButton';
 import Stack from '@/ui/Stack';
+import Inline from '@/ui/Inline';
+import Text from '@/ui/Text';
+import EmptyState from '@/ui/EmptyState';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { formatEpisodeNumber } from '../../../utils/detailUtils';
 import { useMediaDetailContext } from '../MediaDetailContext';
-import Inline from '@/ui/Inline';
-import './BespokeEpisodeDetail.css';
-
-const LPAR = '(';
-const RPAR = ')';
+import styles from './BespokeEpisodeDetail.module.css';
 
 export default function BespokeEpisodeDetail({
   activeEpisode,
@@ -21,14 +20,20 @@ export default function BespokeEpisodeDetail({
 }) {
   const { state, mutations, t } = useMediaDetailContext();
   const { item, cleanId } = state;
-  const { updateStatusMutation, playMutation, addPeakMutation, deletePeakMutation } = mutations;
+  const { updateStatusMutation, playMutation, addPeakMutation } = mutations;
 
   if (!activeEpisode) {
     return (
-      <div className="bespoke-episode-browser-card__empty">
-        {item?.progressive_seasons && activeEpisode === false
-          ? (t('library.details.loadingSeason') || 'Loading season...')
-          : (t('library.details.noEpisodesFound') || 'No episodes found.')}
+      <div className={styles.body}>
+        <EmptyState
+          size="sm"
+          background="none"
+          border="none"
+          title={item?.progressive_seasons && activeEpisode === false
+            ? (t('library.details.loadingSeason') || 'Loading season...')
+            : (t('library.details.noEpisodesFound') || 'No episodes found.')
+          }
+        />
       </div>
     );
   }
@@ -36,8 +41,20 @@ export default function BespokeEpisodeDetail({
   const getStillUrl = (path) => path ? resolveMediaImageUrl(path, 'still') : '';
   const getOriginalStillUrl = (path) => path ? resolveMediaImageUrl(path, 'originalStill') : '';
 
+  const metaItems = [
+    activeEpisode.air_date && String(activeEpisode.air_date).slice(0, 10),
+    (activeEpisode.runtime || activeEpisode.technical?.duration) && (
+      activeEpisode.runtime
+        ? `${activeEpisode.runtime}m`
+        : `${Math.round(activeEpisode.technical.duration / 60)}m`
+    ),
+    activeEpisode.technical?.resolution,
+    activeEpisode.technical?.video_codec,
+    activeEpisode.technical?.hdr_type
+  ].filter(Boolean);
+
   return (
-    <div className="bespoke-browser-card__body bespoke-browser-card__body--episode">
+    <div className={styles.body}>
       {/* Overlaid Nav Chevrons */}
       {activeEpisodeIndex > 0 && (
         <button
@@ -63,7 +80,9 @@ export default function BespokeEpisodeDetail({
 
       {/* Cinematic 16:9 Still */}
       <PosterCard
-        className="bespoke-episode-detail-card__still"
+        className={styles.still}
+        size="17.3125rem"
+        fillHeight={true}
         aspect="landscape"
         imageUrl={getStillUrl(activeEpisode.still_path)}
         onClick={getStillUrl(activeEpisode.still_path) ? () => handleOpenLightbox(getOriginalStillUrl(activeEpisode.still_path)) : undefined}
@@ -83,28 +102,28 @@ export default function BespokeEpisodeDetail({
       <Stack
         gap="2xs"
         scrollable
-        className="bespoke-episode-detail-card__content-col"
+        className="u-pt-xs u-pr-sm"
       >
         <Inline
           justify="between"
           align="center"
           gap="md"
           fullWidth
-          className="bespoke-episode-detail-card__header"
+          className="u-wrap-none"
         >
-          <h4 className="bespoke-episode-detail-card__title">
+          <Text as="h4" variant="display" weight="bold" truncate>
             {/* eslint-disable-next-line react/jsx-no-literals */}
-            {`${formatEpisodeNumber(activeEpisode.episode_number)}. ${activeEpisode.title || `Episode ${activeEpisode.episode_number}`
-              }`}
-          </h4>
+            {`${formatEpisodeNumber(activeEpisode.episode_number)}. ${activeEpisode.title || `Episode ${activeEpisode.episode_number}`}`}
+          </Text>
 
-          <Inline gap="sm" align="center" className="bespoke-episode-detail-card__actions">
+          <Inline gap="sm" align="center">
             {/* Flame/Peak button */}
             {item.is_adult && activeEpisode.path && !activeEpisode.is_missing && (
               <IconButton
                 variant="ghost"
                 size="sm"
                 wrapped
+                className="u-hover-no-transform"
                 onClick={(e) => {
                   e.stopPropagation();
                   addPeakMutation.mutate({ itemId: activeEpisode.id, tvId: cleanId });
@@ -121,6 +140,7 @@ export default function BespokeEpisodeDetail({
               variant={activeEpisode.is_watched ? 'success' : 'ghost'}
               size="sm"
               wrapped
+              className="u-hover-no-transform"
               onClick={() =>
                 updateStatusMutation.mutate({
                   itemId: activeEpisode.id,
@@ -139,34 +159,19 @@ export default function BespokeEpisodeDetail({
         </Inline>
 
         {/* Episode Meta details */}
-        <Inline gap="md" align="center" className="bespoke-episode-detail-card__meta">
-          {activeEpisode.air_date && (
-            <span className="bespoke-episode-detail-card__meta-item">
-              {String(activeEpisode.air_date).slice(0, 10)}
+        <Inline gap="xs" align="center">
+          {metaItems.map((meta, idx) => (
+            <span key={meta} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-xs)' }}>
+              {idx > 0 && (
+                <Text variant="small" color="muted" className="u-opacity-60">
+                  {"•"}
+                </Text>
+              )}
+              <Text variant="small" color="muted">
+                {meta}
+              </Text>
             </span>
-          )}
-          {(activeEpisode.runtime || activeEpisode.technical?.duration) && (
-            <span className="bespoke-episode-detail-card__meta-item">
-              {activeEpisode.runtime
-                ? `${activeEpisode.runtime}m`
-                : `${Math.round(activeEpisode.technical.duration / 60)}m`}
-            </span>
-          )}
-          {activeEpisode.technical?.resolution && (
-            <span className="bespoke-episode-detail-card__meta-item">
-              {activeEpisode.technical.resolution}
-            </span>
-          )}
-          {activeEpisode.technical?.video_codec && (
-            <span className="bespoke-episode-detail-card__meta-item">
-              {activeEpisode.technical.video_codec}
-            </span>
-          )}
-          {activeEpisode.technical?.hdr_type && (
-            <span className="bespoke-episode-detail-card__meta-item">
-              {activeEpisode.technical.hdr_type}
-            </span>
-          )}
+          ))}
           {activeEpisode.vote_average != null && activeEpisode.vote_average > 0 && (
             <Pill variant="tmdb">
               <Star size={10} fill="currentColor" strokeWidth={1.8} />
@@ -177,9 +182,9 @@ export default function BespokeEpisodeDetail({
 
         {/* Episode description */}
         {activeEpisode.overview && (
-          <p className="bespoke-episode-detail-card__overview">
+          <Text as="p" variant="small" color="secondary" className={styles.overview}>
             {activeEpisode.overview}
-          </p>
+          </Text>
         )}
       </Stack>
     </div>

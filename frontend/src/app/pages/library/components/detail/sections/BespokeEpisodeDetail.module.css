@@ -1,0 +1,22 @@
+.body {
+  position: relative;
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  min-height: 0;
+  height: 11.25rem;
+  overflow: hidden;
+}
+
+.still {
+  flex-shrink: 0;
+}
+
+.overview {
+  margin: var(--space-3xs) 0 0 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

@@ -15,7 +15,10 @@ import PosterCard from '@/ui/PosterCard';
 import ScrollRow from '@/ui/ScrollRow';
 import Inline from '@/ui/Inline';
 import Card from '@/ui/Card';
-import './BespokeSeasonsSection.css';
+import Divider from '@/ui/Divider';
+import Stack from '@/ui/Stack';
+import Button from '@/ui/Button';
+import styles from './BespokeSeasonsSection.module.css';
 
 export default function BespokeSeasonsSection() {
   const { state, mutations, t } = useMediaDetailContext();
@@ -124,7 +127,7 @@ export default function BespokeSeasonsSection() {
       setSelectedEpisodeId(episodes[nextIndex].id);
       // Auto-scroll pill into view
       setTimeout(() => {
-        const activePill = episodesScrollRef.current?.querySelector('.bespoke-episode-pill.is-active');
+        const activePill = episodesScrollRef.current?.querySelector(`.${styles.pill}.${styles['is-active']}`);
         if (activePill && episodesScrollRef.current) {
           activePill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         }
@@ -157,13 +160,13 @@ export default function BespokeSeasonsSection() {
   if (seasonsCount === 0) return null;
 
   return (
-    <div className="bespoke-seasons-section">
+    <Stack gap="md" style={{ userSelect: 'none' }}>
       {/* Unified Season & Episode Browser Card */}
-      <Card variant="glass-shaded" padding="none" className="bespoke-unified-browser-card">
+      <Card variant="glass-shaded" padding="none" className={styles.card}>
         
         {/* Row 1 Header: Seasons Horizontal Pills */}
-        <Inline gap="sm" align="center" className="bespoke-browser-card__pills-header">
-          <ScrollRow ref={seasonsScrollRef} containerClassName="bespoke-browser-card__pills-header-scroll-container" className="bespoke-seasons-pills no-scrollbar" showArrows={true} enableWheelScroll={true} arrowsLayout="column" size="sm">
+        <Inline gap="sm" align="center" className={styles.pillsHeader}>
+          <ScrollRow ref={seasonsScrollRef} containerClassName="u-flex-1" className={`${styles.seasonsPills} no-scrollbar`} showArrows={true} enableWheelScroll={true} arrowsLayout="column" size="sm">
             {seasonsList.map((season) => {
               const isActive = season.season_number === selectedSeasonNumber;
               const title = season.title || `Season ${season.season_number}`;
@@ -172,8 +175,8 @@ export default function BespokeSeasonsSection() {
                 <button
                   key={season.season_number}
                   type="button"
-                  className={`bespoke-season-pill ${isActive ? 'is-active' : ''} ${
-                    season.is_watched ? 'is-watched' : ''
+                  className={`${styles.pill} ${isActive ? styles['is-active'] : ''} ${
+                    season.is_watched ? styles['is-watched'] : ''
                   }`}
                   onClick={() => setSelectedSeasonNumber(season.season_number)}
                 >
@@ -185,34 +188,33 @@ export default function BespokeSeasonsSection() {
         </Inline>
 
         {/* Row 1 Body: Season Details */}
-        <Inline gap="md" className="bespoke-browser-card__body bespoke-browser-card__body--season">
+        <div className={styles.body}>
           {/* Left Column: Large Season Poster */}
-          <div className="bespoke-season-detail-card__poster-col">
-            <PosterCard
-              className="bespoke-season-detail-card__poster"
-              imageUrl={getPosterUrl(activeSeason.poster_path)}
-              onClick={getPosterUrl(activeSeason.poster_path) ? () => handleOpenLightbox(getOriginalPosterUrl(activeSeason.poster_path)) : undefined}
-              icon={Clapperboard}
-              disableHoverAnimation={true}
-            />
-          </div>
+          <PosterCard
+            size="6.5rem"
+            fillHeight={true}
+            imageUrl={getPosterUrl(activeSeason.poster_path)}
+            onClick={getPosterUrl(activeSeason.poster_path) ? () => handleOpenLightbox(getOriginalPosterUrl(activeSeason.poster_path)) : undefined}
+            icon={Clapperboard}
+            disableHoverAnimation={true}
+          />
 
           {/* Right Column: Metadata & Overview */}
-          <div className="bespoke-season-meta__content-col">
-            <Inline justify="between" align="center" className="bespoke-season-meta__header">
+          <Stack gap="xs" scrollable className="u-min-w-0 u-pr-sm">
+            <Inline justify="between" align="center">
               <div>
-                <h3 className="bespoke-season-meta__title">
+                <h3 className={styles.title}>
                   {activeSeason.title || `Season ${activeSeason.season_number}`}
                 </h3>
-                <Inline gap="sm" align="center" className="bespoke-season-meta__sub">
+                <Inline gap="sm" align="center">
                   {activeSeason.air_date && (
-                    <span className="bespoke-season-meta__item">
+                    <span className={styles.item}>
                       <Calendar size={12} />
                       {String(activeSeason.air_date).slice(0, 10)}
                     </span>
                   )}
                   {activeSeason.episode_count > 0 && (
-                    <span className="bespoke-season-meta__item">
+                    <span className={styles.item}>
                       <Tv size={12} />
                       {episodesText}
                     </span>
@@ -220,35 +222,33 @@ export default function BespokeSeasonsSection() {
                 </Inline>
               </div>
 
-              <button
-                type="button"
-                className={`bespoke-season-watch-btn ${isSeasonWatched ? 'is-watched' : ''}`}
+              <Button
+                variant={isSeasonWatched ? 'success' : 'secondary-neutral'}
+                size="sm"
+                leftIcon={<Check size={14} />}
                 onClick={handleSeasonWatchedToggle}
               >
-                <Check size={14} />
-                <span>
-                  {isSeasonWatched
-                    ? (t('library.details.watched') || 'Watched')
-                    : isSeasonPartiallyWatched
-                    ? `${t('library.details.markWatched') || 'Mark Watched'} (-)`
-                    : (t('library.details.markWatched') || 'Mark Watched')}
-                </span>
-              </button>
+                {isSeasonWatched
+                  ? (t('library.details.watched') || 'Watched')
+                  : isSeasonPartiallyWatched
+                  ? `${t('library.details.markWatched') || 'Mark Watched'} (-)`
+                  : (t('library.details.markWatched') || 'Mark Watched')}
+              </Button>
             </Inline>
 
             {activeSeason.overview && (
-              <p className="bespoke-season-meta__overview">{activeSeason.overview}</p>
+              <p className={styles.overview}>{activeSeason.overview}</p>
             )}
-          </div>
-        </Inline>
+          </Stack>
+        </div>
 
         {/* Subtle Divider Line */}
-        <div className="bespoke-browser-card__divider" />
+        <Divider />
 
         {/* Row 2 Header: Episode Pills */}
         {episodes.length > 0 && (
-          <Inline gap="sm" align="center" className="bespoke-browser-card__pills-header">
-            <ScrollRow ref={episodesScrollRef} containerClassName="bespoke-browser-card__pills-header-scroll-container" className="bespoke-episodes-pills no-scrollbar" showArrows={true} enableWheelScroll={true} arrowsLayout="column" size="sm">
+          <Inline gap="sm" align="center" className={styles.pillsHeader}>
+            <ScrollRow ref={episodesScrollRef} containerClassName="u-flex-1" className={`${styles.episodesPills} no-scrollbar`} showArrows={true} enableWheelScroll={true} arrowsLayout="column" size="sm">
               {episodes.map((episode) => {
                 const isActive = episode.id === selectedEpisodeId;
                 const formattedEpNum = formatEpisodeNumber(episode.episode_number);
@@ -258,12 +258,12 @@ export default function BespokeSeasonsSection() {
                   <button
                     key={episode.id}
                     type="button"
-                    className={`bespoke-episode-pill ${isActive ? 'is-active' : ''} ${
-                      episode.is_watched ? 'is-watched' : ''
-                    } ${!episode.path || episode.is_missing ? 'is-unowned' : ''} ${isNextUp ? 'is-next-up' : ''}`}
+                    className={`${styles.pill} ${isActive ? styles['is-active'] : ''} ${
+                      episode.is_watched ? styles['is-watched'] : ''
+                    } ${!episode.path || episode.is_missing ? styles['is-unowned'] : ''} ${isNextUp ? styles['is-next-up'] : ''}`}
                     onClick={() => setSelectedEpisodeId(episode.id)}
                   >
-                    {isNextUp && <span className="bespoke-episode-pill__next-dot" />}
+                    {isNextUp && <span className={styles.nextDot} />}
                     <span>{formattedEpNum}</span>
                   </button>
                 );
@@ -287,6 +287,7 @@ export default function BespokeSeasonsSection() {
         onClose={() => setLightboxUrl(null)}
         t={t}
       />
-    </div>
+    </Stack>
   );
 }
+

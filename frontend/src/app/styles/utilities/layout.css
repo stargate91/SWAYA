@@ -82,6 +82,10 @@
   padding-right: var(--space-xs);
 }
 
+.u-pr-sm {
+  padding-right: var(--space-sm);
+}
+
 .u-divider {
   width: 100%;
   border: 0;
@@ -127,4 +131,12 @@
 
 .u-scroll-smooth {
   scroll-behavior: smooth;
+}
+
+.u-flex-1 {
+  flex: 1;
+}
+
+.u-overflow-y-auto {
+  overflow-y: auto;
 }

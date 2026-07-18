@@ -6,10 +6,11 @@ import { API_BASE } from '@/lib/backend';
 import Tooltip from '@/ui/Tooltip';
 import ScrollRow from '@/ui/ScrollRow';
 import Card from '@/ui/Card';
-import SegmentedControl from '@/ui/SegmentedControl';
 import Inline from '@/ui/Inline';
 import CastCard from '@/ui/data/CastCard';
 import LogoCard from '@/ui/data/LogoCard';
+import styles from './BespokeCastSection.module.css';
+
 
 export default function BespokeCastSection({ item, t, navigate }) {
   const settings = useMediaDetailContext()?.state?.settings;
@@ -101,17 +102,33 @@ export default function BespokeCastSection({ item, t, navigate }) {
   if (activeTab === 'cast' && allPeople.length === 0) return null;
 
   const headerContent = showTabs ? (
-    <SegmentedControl
-      variant="filter"
-      size="xs"
-      options={[
-        { value: 'cast', label: t('library.details.cast') || 'Cast & Crew' },
-        showCompanies && { value: 'companies', label: t('library.details.productionCompanies') || 'Production Companies' },
-        showNetworks && { value: 'networks', label: t('library.details.platformsNetworks') || 'Networks' }
-      ].filter(Boolean)}
-      value={activeTab}
-      onChange={setActiveTab}
-    />
+    <Inline gap="md" className={styles.tabs}>
+      <button
+        type="button"
+        className={`${styles.tab} ${activeTab === 'cast' ? styles['is-active'] : ''}`}
+        onClick={() => setActiveTab('cast')}
+      >
+        {t('library.details.cast') || 'Cast & Crew'}
+      </button>
+      {showCompanies && (
+        <button
+          type="button"
+          className={`${styles.tab} ${activeTab === 'companies' ? styles['is-active'] : ''}`}
+          onClick={() => setActiveTab('companies')}
+        >
+          {t('library.details.productionCompanies') || 'Production Companies'}
+        </button>
+      )}
+      {showNetworks && (
+        <button
+          type="button"
+          className={`${styles.tab} ${activeTab === 'networks' ? styles['is-active'] : ''}`}
+          onClick={() => setActiveTab('networks')}
+        >
+          {t('library.details.platformsNetworks') || 'Networks'}
+        </button>
+      )}
+    </Inline>
   ) : (
     t('library.details.cast') || 'Cast & Crew'
   );
