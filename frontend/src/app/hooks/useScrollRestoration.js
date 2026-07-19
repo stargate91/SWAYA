@@ -31,11 +31,7 @@ export function useScrollRestoration(selector, dependencies = []) {
       const target = savedState.scrollTop;
 
       // Find the main page content container instead of the absolute header
-      const children = Array.from(container.children);
-      const contentEl = children.find(el =>
-        !el.classList.contains('shell__utility-bar') &&
-        !el.classList.contains('shell__utility-bar-bottom')
-      ) || container.firstElementChild;
+      const contentEl = container.firstElementChild;
 
       if (savedState.scrollHeight !== undefined && contentEl) {
         contentEl.style.minHeight = `${savedState.scrollHeight}px`;

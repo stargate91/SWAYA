@@ -156,7 +156,7 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
   };
 
   const isAdultMode = state.activeSessionMode === 'nsfw';
-  const utilityBarTarget = typeof document !== 'undefined' ? document.getElementById('shell-utility-bar-center') : null;
+  const utilityBarTarget = typeof document !== 'undefined' ? document.getElementById('page-bar-top-center') : null;
   const showOwnershipSegment = state.resolvedTab === 'movies' || state.resolvedTab === 'tv' || state.resolvedTab === 'scenes';
 
 

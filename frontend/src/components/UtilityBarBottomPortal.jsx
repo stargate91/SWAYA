@@ -6,14 +6,14 @@ export default function UtilityBarBottomPortal({ children, side = 'left', enable
 
   useEffect(() => {
     if (enabled) {
-      let selector = '.shell__utility-bar-bottom-left';
+      let selector = 'page-bar-bottom-left';
       if (side === 'center') {
-        selector = '.shell__utility-bar-bottom-center';
+        selector = 'page-bar-bottom-center';
       } else if (side === 'right') {
-        selector = '.shell__utility-bar-bottom-right';
+        selector = 'page-bar-bottom-right';
       }
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setTargetEl(document.querySelector(selector));
+      setTargetEl(document.getElementById(selector));
     } else {
       setTargetEl(null);
     }

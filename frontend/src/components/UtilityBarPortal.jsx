@@ -7,7 +7,7 @@ export default function UtilityBarPortal({ children, enabled = true, align = 'le
   useEffect(() => {
     if (enabled) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setTargetEl(document.querySelector(`.shell__utility-bar-${align}`));
+      setTargetEl(document.getElementById(`page-bar-top-${align}`));
     } else {
       setTargetEl(null);
     }

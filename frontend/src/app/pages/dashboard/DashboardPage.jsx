@@ -9,7 +9,7 @@ export default function DashboardPage() {
   useScrollRestoration('.shell__content', [isSettingsLoading]);
 
   return (
-    <Page contentBottom={false}>
+    <Page>
       <DashboardView />
     </Page>
   );

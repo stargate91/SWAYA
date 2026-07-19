@@ -214,12 +214,7 @@ export default function AppShell() {
       <Sidebar isCollapsed={isSidebarCollapsed} onToggle={handleToggleSidebar} />
 
       <div className={styles.main}>
-        <main className={`${styles.content} shell__content ${location.pathname === '/dashboard' ? styles['content-dashboard'] : ''}`.trim()}>
-          <header className={styles['utility-bar']}>
-            <div className={`${styles['utility-bar-left']} shell__utility-bar-left`} aria-label="Context actions placeholder" />
-            <div className={styles['utility-bar-center']} id="shell-utility-bar-center" />
-            <div className={`${styles['utility-bar-right']} shell__utility-bar-right`} aria-label="Context right actions placeholder" />
-          </header>
+        <main className={`${styles.content} shell__content`}>
           <Suspense fallback={
             <div className={styles['suspense-fallback']}>
               <Spinner label="Loading page..." />
@@ -227,11 +222,6 @@ export default function AppShell() {
           }>
             <Outlet />
           </Suspense>
-          <footer className={`${styles['utility-bar-bottom']} shell__utility-bar-bottom`}>
-            <div className={`${styles['utility-bar-bottom-left']} shell__utility-bar-bottom-left`} aria-label="Context bottom-left actions placeholder" />
-            <div className={`${styles['utility-bar-bottom-center']} shell__utility-bar-bottom-center`} id="shell-utility-bar-bottom-center" />
-            <div className={`${styles['utility-bar-bottom-right']} shell__utility-bar-bottom-right`} aria-label="Context bottom-right actions placeholder" />
-          </footer>
         </main>
       </div>
       <PlayerControlBar

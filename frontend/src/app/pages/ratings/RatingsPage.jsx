@@ -147,7 +147,7 @@ export default function RatingsPage() {
   ];
 
   return (
-    <Page viewport={true} className={styles['ratings-page']}>
+    <Page variant="viewport" className={styles['ratings-page']}>
       <div className={styles['ratings-main']}>
         <div className={styles['ratings-main__content']}>
           <PanelHeader

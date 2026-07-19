@@ -1,6 +1,7 @@
 import Page from '@/ui/Page';
 import Skeleton from '@/ui/Skeleton';
 import HeroSection from './HeroSection';
+import UtilityBarPortal from '../../../../../components/UtilityBarPortal';
 import loadingStyles from './DetailPageLoading.module.css';
 import styles from './DetailPageShell.module.css';
 
@@ -26,7 +27,7 @@ export default function DetailPageShell({
   if (isLoading) {
     if (isPeople) {
       return (
-        <Page className={`${combinedClassName} entity-detail-page--people`}>
+        <Page variant="viewport-flush" className={`${combinedClassName} entity-detail-page--people`}>
           <div className={loadingStyles['people-hero']}>
             {/* Left Sidebar Panel (Glass panel structure) */}
             <div className={`entity-detail-page__media-column no-scrollbar ${loadingStyles['people-sidebar']}`}>
@@ -78,7 +79,7 @@ export default function DetailPageShell({
               <div className={loadingStyles['people-knownfor-container']}>
                 {/* Title: KNOWN FOR */}
                 <Skeleton className={loadingStyles['people-knownfor-title']} variant="text" />
-                
+
                 {/* Horizontal row of cards */}
                 <div className={loadingStyles['people-cards-row']}>
                   {[...Array(8)].map((_, idx) => (
@@ -97,7 +98,7 @@ export default function DetailPageShell({
     }
 
     return (
-      <Page className={combinedClassName}>
+      <Page variant="viewport-flush" className={combinedClassName}>
         <div className={loadingStyles['loading-wrapper']}>
           <Skeleton.Banner className={loadingStyles['loading-banner']} />
           <div className={loadingStyles['loading-content']}>
@@ -122,27 +123,31 @@ export default function DetailPageShell({
 
   return (
     <Page
+      variant="viewport-flush"
+      backdrop={
+        <HeroSection
+          backdropUrl={backdropUrl || fallbackUrl}
+          isFallback={!backdropUrl && !isScene}
+          isPreviewPlaying={isPreviewPlaying}
+          previewSrc={previewSrc}
+          onPlayingChange={onVideoPlayingChange}
+        />
+      }
       className={combinedClassName}
       data-scrolled={isScrolled}
       data-preview-playing={isPreviewPlaying}
       data-drawer-open={isDrawerOpen}
     >
 
-      <HeroSection
-        backdropUrl={backdropUrl || fallbackUrl}
-        isFallback={!backdropUrl && !isScene}
-        isPreviewPlaying={isPreviewPlaying}
-        previewSrc={previewSrc}
-        onPlayingChange={onVideoPlayingChange}
-      />
-
-      <div className={styles['layout-wrapper']}>
-        {topRightControls ? (
+      {topRightControls && (
+        <UtilityBarPortal align="right">
           <div className={styles['top-right-controls']}>
             {topRightControls}
           </div>
-        ) : null}
+        </UtilityBarPortal>
+      )}
 
+      <div className={styles['layout-wrapper']}>
         <div
           ref={containerRef}
           className={`${styles.container} media-detail-page__container`}

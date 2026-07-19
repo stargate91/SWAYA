@@ -43,7 +43,7 @@ export default function HistoryPage() {
     triggerUndo,
   } = useHistoryPage();
 
-  const utilityBarTarget = typeof document !== 'undefined' ? document.getElementById('shell-utility-bar-center') : null;
+  const utilityBarTarget = typeof document !== 'undefined' ? document.getElementById('page-bar-top-center') : null;
 
   const handleConfirmUndo = (batch) => {
     openModal({

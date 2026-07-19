@@ -33,6 +33,7 @@
   /* Status Badge Tokens */
   --status-badge-bottom: 0.75rem;
   --status-badge-overlay-bg: color-mix(in srgb, var(--color-state-info) 88%, transparent);
+  --page-inline-padding: var(--space-3xl);
 }
 
 * {

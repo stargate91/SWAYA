@@ -113,7 +113,7 @@ export default function OrganizerPageContent({
     : null;
 
   return (
-    <Page viewport={true}>
+    <Page variant="viewport">
       <Stack fill gap="3xl">
         <PanelHeader
             title={t('organizer.title')}

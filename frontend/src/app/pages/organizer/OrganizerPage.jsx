@@ -97,7 +97,7 @@ export default function OrganizerPage() {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setUtilityBarTarget(document.getElementById('shell-utility-bar-center'));
+    setUtilityBarTarget(document.getElementById('page-bar-top-center'));
   }, []);
   const isScanActive = Boolean(scanStatus?.active);
   const rawOrganizerItemCount = organizerCountQuery.data?.count ?? null;
