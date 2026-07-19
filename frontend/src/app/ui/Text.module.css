@@ -6,6 +6,11 @@
   font-size: var(--font-size-sm);
 }
 
+stylelint-disable-next-line
+.variant-xsmall {
+  font-size: var(--font-size-2xs);
+}
+
 .variant-small {
   font-size: var(--font-size-xs);
 }

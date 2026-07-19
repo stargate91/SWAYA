@@ -115,7 +115,8 @@ export default function ListsPopover({ item, type, t }) {
                   as="div"
                   variant="small"
                   color="muted"
-                  className="u-text-center u-font-italic u-py-sm"
+                  italic
+                  className="u-text-center u-py-sm"
                 >
                   {t('lists.no_lists_yet') || 'No custom lists created yet.'}
                 </Text>

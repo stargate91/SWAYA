@@ -201,8 +201,11 @@
     visibility var(--local-fade-duration) var(--local-fade-ease),
     left var(--local-slide-duration) var(--local-slide-ease),
     right var(--local-slide-duration) var(--local-slide-ease);
-  left: var(--space-5xl);
-  right: var(--space-5xl);
+  position: absolute;
+  bottom: 0;
+  height: var(--page-bottom-offset);
+  left: 0;
+  right: 0;
 }
 
 .page:has(.container--panel-open) :global(.ui-page-bar-bottom) {

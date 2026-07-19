@@ -12,8 +12,8 @@ import PersonCreditsCard from './PersonCreditsCard';
 import GalleryCard from '@/ui/GalleryCard';
 import EmptyState from '@/ui/EmptyState';
 import { API_BASE } from '@/lib/backend';
-import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import Inline from '@/ui/Inline';
+import Text from '@/ui/Text';
 import styles from './PersonCreditsSections.module.css';
 
 
@@ -383,9 +383,9 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
                   {hasMore && <div ref={observerRef} />}
 
                   {!hasMore && accumulatedItems.length > 0 && (
-                    <div className={`${styles['grid-finished']} u-font-2xs u-text-muted u-text-center`}>
+                    <Text as="div" variant="xsmall" color="muted" className={`${styles['grid-finished']} u-text-center`}>
                       {t('library.details.finishedCredits') || 'All credits loaded.'}
-                    </div>
+                    </Text>
                   )}
                 </>
               )}

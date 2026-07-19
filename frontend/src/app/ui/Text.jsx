@@ -6,7 +6,7 @@ import styles from './Text.module.css';
  *
  * @param {object} props
  * @param {React.ElementType} [props.as] - HTML tag to render
- * @param {'body' | 'caption' | 'title' | 'display' | 'small' | 'hero'} [props.variant] - Text styling flavor
+ * @param {'body' | 'caption' | 'title' | 'display' | 'small' | 'xsmall' | 'hero'} [props.variant] - Text styling flavor
  * @param {'primary' | 'secondary' | 'muted' | 'faint' | 'accent'} [props.color] - Text color
  * @param {'normal' | 'medium' | 'semibold' | 'bold' | 'extrabold'} [props.weight] - Font weight override
  * @param {boolean} [props.uppercase] - Whether to transform text to uppercase
@@ -54,7 +54,7 @@ export default function Text({
 
 Text.propTypes = {
   as: PropTypes.elementType,
-  variant: PropTypes.oneOf(['body', 'caption', 'title', 'display', 'small', 'hero']),
+  variant: PropTypes.oneOf(['body', 'caption', 'title', 'display', 'small', 'xsmall', 'hero']),
   color: PropTypes.oneOf(['primary', 'secondary', 'muted', 'faint', 'accent']),
   weight: PropTypes.oneOf(['normal', 'medium', 'semibold', 'bold', 'extrabold']),
   uppercase: PropTypes.bool,

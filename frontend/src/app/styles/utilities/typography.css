@@ -14,22 +14,6 @@
   text-align: center;
 }
 
-.u-font-italic {
-  font-style: italic;
-}
-
-.u-color-accent-soft {
-  color: var(--color-accent-blue-soft);
-}
-
-.u-text-muted {
-  color: var(--color-text-muted);
-}
-
-.u-font-2xs {
-  font-size: var(--font-size-2xs);
-}
-
 .u-opacity-60 {
   opacity: 0.6;
 }

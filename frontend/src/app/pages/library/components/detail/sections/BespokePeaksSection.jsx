@@ -112,9 +112,9 @@ export default function BespokePeaksSection() {
                       {log.season_number != null && log.episode_number != null && (() => {
                         const epLabel = `S${log.season_number}E${String(log.episode_number).padStart(2, '0')} `;
                         return (
-                          <span className="u-text-muted">
+                          <Text as="span" color="muted">
                             {epLabel}
-                          </span>
+                          </Text>
                         );
                       })()}
                       {hasPosition ? formatTime(log.video_position) : (t('library.details.playSession') || 'Play Session')}
@@ -122,7 +122,7 @@ export default function BespokePeaksSection() {
                   </Inline>
 
                   <Inline gap="sm" align="center">
-                    <Text color="muted" className="u-font-2xs">
+                    <Text color="muted" variant="xsmall">
                       {new Date(log.watched_at).toLocaleDateString()}
                     </Text>
                     <Tooltip content={t('library.details.deletePeakBtn') || 'Delete Peak'} side="top">
@@ -143,7 +143,7 @@ export default function BespokePeaksSection() {
             })}
           </Stack>
         ) : (
-          <Text variant="small" color="muted" className="u-font-italic">
+          <Text variant="small" color="muted" italic>
             {t('library.details.noPeaks') || 'No peak moments recorded yet.'}
           </Text>
         )}

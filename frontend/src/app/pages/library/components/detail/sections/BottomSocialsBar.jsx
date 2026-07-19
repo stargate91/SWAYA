@@ -61,7 +61,8 @@ export default function BottomSocialsBar({
             >
               <button
                 type="button"
-                className="u-icon-btn-round u-text-muted u-hover-no-transform"
+                className="u-icon-btn-round u-hover-no-transform"
+                style={{ color: 'var(--color-text-muted)' }}
                 onClick={() => setIsSocialExpanded(!isSocialExpanded)}
               >
                 {isSocialExpanded ? <Minus size={14} /> : <Plus size={14} />}

@@ -153,7 +153,7 @@ export const RecommendationCarousel = ({
         })}
         {isLoadingMore && (
           <div className="u-loading-card">
-            <Spinner className="u-color-accent-soft" />
+            <Spinner style={{ color: 'var(--color-accent-blue-soft)' }} />
           </div>
         )}
       </ScrollRow>
