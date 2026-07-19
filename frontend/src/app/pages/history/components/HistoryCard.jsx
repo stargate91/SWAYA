@@ -4,8 +4,11 @@ import Button from '@/ui/Button';
 import Tooltip from '@/ui/Tooltip';
 import Spinner from '@/ui/Spinner';
 import { useTranslation } from '@/providers/LanguageContext';
-import styles from './HistoryCard.module.css';
 import Inline from '@/ui/Inline';
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
+import Badge from '@/ui/Badge';
+import Card from '@/ui/Card';
 
 const getCardIconAndClass = (status) => {
   switch (status) {
@@ -48,84 +51,80 @@ export default function HistoryCard({
   const hasLogs = batch.logs && batch.logs.length > 0;
 
   return (
-    <div
-      className={`${styles['history-card']} ${styles[`history-card--${batch.status}`]} ${isExpanded ? styles['is-expanded'] : ''}`}
-      ref={(el) => {
-        if (el) {
-          el.style.setProperty('--item-index', index);
-          el.style.setProperty('--accent-color', accentColor);
-        }
+    <Card
+      variant="soft"
+      padding="none"
+      className="animate-fade-in-up u-card-badge-override"
+      style={{
+        '--item-index': index,
+        '--accent-color': accentColor,
       }}
     >
-      <Inline align="center" className={styles['history-card__main-row']}>
-        <div className={styles['history-card__icon-wrapper']}>
+      <Inline align="center" style={{ padding: 'var(--space-xl)', width: '100%', justifyContent: 'space-between' }}>
+        <div className="u-icon-box">
           {icon}
         </div>
-        <div className={styles['history-card__left']}>
-          <div className={styles['history-card__header']}>
+        <Stack gap="sm" flex={1}>
+          <Inline gap="md" align="center">
             {batch.success_count > 0 && (
-              <Inline gap="md" align="center" className={styles['history-card__detailed-stats']}>
+              <Inline gap="md" align="center">
                 {batch.movie_count > 0 && (
-                  <div className={styles['history-card__stat-badge']}>
-                    <span className={styles['history-card__badge-val']}>{batch.movie_count}</span>
-                    <span className={styles['history-card__badge-lbl']}>{t('historyPage.badgeMovies') || 'Movies'}</span>
-                  </div>
+                  <Badge size="sm">
+                    <strong>{batch.movie_count}</strong> {t('historyPage.badgeMovies') || 'Movies'}
+                  </Badge>
                 )}
                 {batch.episode_count > 0 && (
-                  <div className={styles['history-card__stat-badge']}>
-                    <span className={styles['history-card__badge-val']}>{batch.episode_count}</span>
-                    <span className={styles['history-card__badge-lbl']}>{t('historyPage.badgeEpisodes') || 'Episodes'}</span>
-                  </div>
+                  <Badge size="sm">
+                    <strong>{batch.episode_count}</strong> {t('historyPage.badgeEpisodes') || 'Episodes'}
+                  </Badge>
                 )}
                 {batch.extra_count > 0 && (
-                  <div className={styles['history-card__stat-badge']}>
-                    <span className={styles['history-card__badge-val']}>{batch.extra_count}</span>
-                    <span className={styles['history-card__badge-lbl']}>{t('historyPage.badgeExtras') || 'Extras'}</span>
-                  </div>
+                  <Badge size="sm">
+                    <strong>{batch.extra_count}</strong> {t('historyPage.badgeExtras') || 'Extras'}
+                  </Badge>
                 )}
-                <div className={`${styles['history-card__stat-badge']} ${styles['history-card__stat-badge--total']}`}>
-                  <span className={styles['history-card__badge-val']}>{batch.success_count}</span>
-                  <span className={styles['history-card__badge-lbl']}>{t('historyPage.statTotal') || 'Total'}</span>
-                </div>
+                <Badge family="status" tone="accent" size="sm">
+                  <strong>{batch.success_count}</strong> {t('historyPage.statTotal') || 'Total'}
+                </Badge>
                 {batch.undone_count > 0 && batch.remaining_count > 0 && (
                   <>
-                    <div className={`${styles['history-card__stat-badge']} ${styles['history-card__stat-badge--undone']}`}>
-                      <span className={styles['history-card__badge-val']}>{batch.undone_count}</span>
-                      <span className={styles['history-card__badge-lbl']}>{t('historyPage.statReverted') || 'Reverted'}</span>
-                    </div>
-                    <div className={`${styles['history-card__stat-badge']} ${styles['history-card__stat-badge--remaining']}`}>
-                      <span className={styles['history-card__badge-val']}>{batch.remaining_count}</span>
-                      <span className={styles['history-card__badge-lbl']}>{t('historyPage.statRemaining') || 'Remaining'}</span>
-                    </div>
+                    <Badge size="sm">
+                      <strong>{batch.undone_count}</strong> {t('historyPage.statReverted') || 'Reverted'}
+                    </Badge>
+                    <Badge family="status" tone="warning" size="sm">
+                      <strong>{batch.remaining_count}</strong> {t('historyPage.statRemaining') || 'Remaining'}
+                    </Badge>
                   </>
                 )}
               </Inline>
             )}
             {batch.failed_count > 0 && (
-              <div className={`${styles['history-card__stat-badge']} ${styles['history-card__stat-badge--failed']}`}>
-                <span className={styles['history-card__badge-val']}>{batch.failed_count}</span>
-                <span className={styles['history-card__badge-lbl']}>{t('historyPage.statFailed') || 'Failed'}</span>
-              </div>
+              <Badge family="status" tone="danger" size="sm">
+                <strong>{batch.failed_count}</strong> {t('historyPage.statFailed') || 'Failed'}
+              </Badge>
             )}
-          </div>
-          <Inline gap="lg" align="center" className={styles['history-card__meta']}>
-            <Inline gap="xs" align="center" className={styles['history-card__meta-item']}>
-              <Calendar size={14} />
-              <span>{new Date(batch.created_at).toLocaleString()}</span>
+          </Inline>
+          <Inline gap="lg" align="center">
+            <Inline gap="xs" align="center">
+              <Calendar size={14} style={{ color: 'var(--color-text-muted)' }} />
+              <Text variant="small" color="secondary">
+                {new Date(batch.created_at).toLocaleString()}
+              </Text>
             </Inline>
-            <Inline gap="xs" align="center" className={styles['history-card__meta-item']}>
-              <Clock size={14} />
-              <span>{t('historyPage.batchIdLabel', { defaultValue: 'ID: #{{id}}', id: batch.id })}</span>
+            <Inline gap="xs" align="center">
+              <Clock size={14} style={{ color: 'var(--color-text-muted)' }} />
+              <Text variant="small" color="secondary">
+                {t('historyPage.batchIdLabel', { defaultValue: 'ID: #{{id}}', id: batch.id })}
+              </Text>
             </Inline>
           </Inline>
-        </div>
-        <div className={styles['history-card__right']}>
-          <Inline align="center" className={styles['history-card__actions']}>
+        </Stack>
+        <div style={{ display: 'flex', alignItems: 'center', position: 'relative', zIndex: 'var(--z-index-step-2)' }}>
+          <Inline align="center" gap="sm">
             {hasLogs && (
               <Button
                 variant="ghost"
                 size="sm"
-                className={styles['history-card__toggle-btn']}
                 onClick={() => setIsExpanded(!isExpanded)}
               >
                 {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -157,31 +156,53 @@ export default function HistoryCard({
       </Inline>
 
       {isExpanded && hasLogs && (
-        <div className={styles['history-card__details']}>
-          <div className={styles['history-card__files-title']}>
+        <div className="u-card-details">
+          <Text variant="xsmall" weight="bold" color="muted" uppercase style={{ letterSpacing: '0.08em', display: 'block', marginBottom: 'var(--space-md)' }}>
             {t('historyPage.renamedFilesTitle') || 'Renamed Files:'}
-          </div>
-          <div className={styles['history-card__files-list']}>
+          </Text>
+          <div className="u-scroll-list">
             {batch.logs.map((log) => {
               const oldFile = log.old_value ? log.old_value.split(/[\\/]/).pop() : '';
               const newFile = log.new_value ? log.new_value.split(/[\\/]/).pop() : '';
               const oldDir = log.old_value ? log.old_value.substring(0, log.old_value.length - oldFile.length) : '';
               const newDir = log.new_value ? log.new_value.substring(0, log.new_value.length - newFile.length) : '';
               return (
-                <div key={log.id} className={`${styles['history-card__file-item']} ${styles[`history-card__file-item--${log.status}`]}`}>
-                  <Inline gap="md" align="center" className={styles['history-card__file-paths']}>
-                    <div className={styles['history-card__file-path-group']}>
-                      <span className={styles['history-card__file-dir']}>{oldDir}</span>
-                      <span className={styles['history-card__file-name']}>{oldFile}</span>
-                    </div>
-                    <ArrowRight size={14} className={styles['history-card__file-arrow']} />
-                    <div className={styles['history-card__file-path-group']}>
-                      <span className={styles['history-card__file-dir']}>{newDir}</span>
-                      <span className={`${styles['history-card__file-name']} ${styles['history-card__file-name--new']}`}>{newFile}</span>
-                    </div>
+                <div
+                  key={log.id}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--space-xs)',
+                    padding: 'var(--space-sm) var(--space-md)',
+                    background: 'var(--ui-control-bg-subtle)',
+                    border: '0.0625rem solid var(--color-border-subtle)',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: 'var(--font-size-xs)',
+                  }}
+                >
+                  <Inline gap="md" align="center" style={{ flexWrap: 'nowrap', minWidth: 0 }}>
+                    <Stack gap="none" flex={1} style={{ minWidth: 0 }}>
+                      <Text variant="xsmall" color="muted" truncate>
+                        {oldDir}
+                      </Text>
+                      <Text variant="small" weight="medium" color="primary" truncate>
+                        {oldFile}
+                      </Text>
+                    </Stack>
+                    <ArrowRight size={14} style={{ color: 'var(--color-text-muted)', flexShrink: 0 }} />
+                    <Stack gap="none" flex={1} style={{ minWidth: 0 }}>
+                      <Text variant="xsmall" color="muted" truncate>
+                        {newDir}
+                      </Text>
+                      <Text variant="small" weight="medium" color="primary" truncate style={{ color: 'var(--color-accent-blue-pale)' }}>
+                        {newFile}
+                      </Text>
+                    </Stack>
                   </Inline>
                   {log.error_message && (
-                    <div className={styles['history-card__file-error']}>{log.error_message}</div>
+                    <Text variant="xsmall" style={{ color: 'var(--color-state-danger)', marginTop: 'var(--radius-2xs)', display: 'block' }}>
+                      {log.error_message}
+                    </Text>
                   )}
                 </div>
               );
@@ -189,6 +210,6 @@ export default function HistoryCard({
           </div>
         </div>
       )}
-    </div>
+    </Card>
   );
 }

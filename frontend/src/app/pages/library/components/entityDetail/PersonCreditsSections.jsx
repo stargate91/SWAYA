@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { usePlayMediaMutation } from '@/queries';
 import { usePersonCreditsQuery, usePersonCreditsInfiniteQuery } from '@/queries/metadataQueries';
 import { usePersonCreditsStore } from '@/stores/usePersonCreditsStore';
+import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import Spinner from '@/ui/Spinner';
 import Grid from '@/ui/Grid';
 import { X } from '@/ui/icons';

@@ -218,3 +218,74 @@
   transform: translateY(-0.0625rem);
   color: var(--color-text-primary);
 }
+
+.u-icon-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--button-height-md);
+  height: var(--button-height-md);
+  border-radius: var(--radius-sm);
+  background: var(--ui-surface-soft);
+  box-shadow: inset 0 0 0 0.0625rem var(--color-border-subtle);
+  color: var(--accent-color, var(--color-accent));
+  flex-shrink: 0;
+  transition: all var(--motion-base);
+}
+
+.u-card-details {
+  border-top: 0.0625rem solid var(--color-border-subtle);
+  background: color-mix(in srgb, var(--color-bg-canvas) 35%, transparent);
+  padding: var(--space-lg) var(--space-xl) var(--space-xl) var(--space-xl);
+}
+
+.u-scroll-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  max-height: 15rem;
+  overflow-y: auto;
+  padding-right: var(--space-sm);
+}
+
+.u-card-badge-override :global(.badge) {
+  background: var(--ui-control-bg-subtle);
+  border: 0.0625rem solid color-mix(in srgb, var(--accent-color, var(--color-accent)) 12%, var(--color-border-subtle));
+  color: var(--color-text-secondary);
+}
+
+.u-poster-wrapper {
+  width: var(--layout-window-titlebar-height);
+  height: var(--space-7xl);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--ui-surface-soft);
+  box-shadow: inset 0 0 0 0.0625rem var(--color-border-subtle),
+              0 0.25rem 0.5rem color-mix(in srgb, var(--color-bg-canvas) 20%, transparent);
+  flex-shrink: 0;
+  margin-right: var(--space-lg);
+  position: relative;
+  z-index: var(--z-index-step-2);
+  transition: width 0.2s ease;
+}
+
+.u-poster-wrapper.is-scene {
+  width: 8rem;
+}
+
+.u-card-active {
+  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border-subtle)) !important;
+  box-shadow: 0 0 var(--space-md) color-mix(in srgb, var(--color-accent) 15%, transparent),
+              0 var(--space-xs) var(--space-md) color-mix(in srgb, var(--color-bg-canvas) 25%, transparent) !important;
+}
+
+.u-progress-bar-width {
+  width: 15rem;
+  margin-top: var(--space-xs);
+}
+
+@media (max-width: 40rem) {
+  .u-progress-bar-width {
+    width: 100%;
+  }
+}

@@ -4,9 +4,13 @@ import Button from '@/ui/Button';
 import Spinner from '@/ui/Spinner';
 import { Clock, CheckCircle2, RotateCcw, Play, ENTITY_ICONS } from '@/ui/icons';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
-import styles from './WatchedHistoryList.module.css';
 import historyPageStyles from '../HistoryPage.module.css';
 import Inline from '@/ui/Inline';
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
+import Badge from '@/ui/Badge';
+import Card from '@/ui/Card';
+import LinearProgress from '@/ui/LinearProgress';
 
 const LPAR = '(';
 const RPAR = ')';
@@ -41,15 +45,15 @@ export default function WatchedHistoryList({
 }) {
   if (isLoading) {
     return (
-      <div className={styles['watched-history-list--loading']}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
         {Array.from({ length: 4 }).map((_, idx) => (
-          <div key={idx} className={styles['watched-history-skeleton-card']}>
-            <div className={styles['watched-history-skeleton-poster-wrapper']}>
-              <Skeleton className={styles['watched-history-skeleton-poster']} variant="rect" />
+          <div key={idx} style={{ display: 'flex', gap: 'var(--space-lg)', padding: 'var(--space-lg)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-lg)', border: '0.0625rem solid var(--color-border-default)' }}>
+            <div style={{ width: '6.25rem', height: '3.5rem', borderRadius: 'var(--radius-md)', overflow: 'hidden', flexShrink: 0 }}>
+              <Skeleton style={{ width: '100%', height: '100%' }} variant="rect" />
             </div>
-            <div className={styles['watched-history-skeleton-content']}>
-              <div className={styles['watched-history-skeleton-title']}><Skeleton variant="rect" /></div>
-              <div className={styles['watched-history-skeleton-text']}><Skeleton variant="rect" /></div>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', justifyContent: 'center' }}>
+              <div style={{ width: '15.625rem', height: '1.25rem' }}><Skeleton variant="rect" /></div>
+              <div style={{ width: '9.375rem', height: '0.875rem' }}><Skeleton variant="rect" /></div>
             </div>
           </div>
         ))}
@@ -73,7 +77,7 @@ export default function WatchedHistoryList({
   }
 
   return (
-    <div className={styles['watched-history-list']}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)', marginTop: 'var(--space-xl)' }}>
       {watchedHistory.map((log, index) => {
         const isSingle = log.type === 'movie' || log.type === 'scene';
         const isScene = log.type === 'scene';
@@ -84,120 +88,128 @@ export default function WatchedHistoryList({
         const percent = log.duration > 0 ? Math.round((log.resume_position / log.duration) * 100) : 0;
 
         return (
-          <div
+          <Card
             key={log.id}
-            className={`${styles['watched-history-card']} ${log.is_active ? styles['is-active'] : ''}`}
-            ref={(el) => {
-              if (el) el.style.setProperty('--item-index', index);
+            variant="soft"
+            padding="none"
+            className={`animate-fade-in-up ${log.is_active ? 'u-card-active' : ''}`}
+            style={{
+              '--item-index': index,
             }}
           >
-            <div className={`${styles['watched-history-card__poster-wrapper']} ${isScene ? styles['is-scene'] : ''}`}>
-              {posterUrl ? (
-                <img 
-                  src={posterUrl} 
-                  alt="" 
-                  className={styles['watched-history-card__poster']} 
-                  onError={(e) => console.error("History image failed:", { src: posterUrl, log, e })}
-                />
-              ) : (
-                <div className={styles['watched-history-card__poster-placeholder']}>
-                  {isScene ? (
-                    <ENTITY_ICONS.episode size={18} />
-                  ) : isSingle ? (
-                    <ENTITY_ICONS.movie size={18} />
+            <Inline align="center" style={{ padding: 'var(--space-lg)', width: '100%', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-md)' }}>
+              <Inline align="center" style={{ flex: 1, minWidth: 0, gap: 'var(--space-md)' }}>
+                <div className={`u-poster-wrapper ${isScene ? 'is-scene' : ''}`}>
+                  {posterUrl ? (
+                    <img 
+                      src={posterUrl} 
+                      alt="" 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e) => console.error("History image failed:", { src: posterUrl, log, e })}
+                    />
                   ) : (
-                    <ENTITY_ICONS.tv size={18} />
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-muted)' }}>
+                      {isScene ? (
+                        <ENTITY_ICONS.episode size={18} />
+                      ) : isSingle ? (
+                        <ENTITY_ICONS.movie size={18} />
+                      ) : (
+                        <ENTITY_ICONS.tv size={18} />
+                      )}
+                    </div>
                   )}
                 </div>
-              )}
-            </div>
 
-            <div className={styles['watched-history-card__content']}>
-              <div className={styles['watched-history-card__title-group']}>
-                {isSingle ? (
-                  <>
-                    <h3 className={styles['watched-history-card__title']}>{log.title}</h3>
-                    {log.year && <span className={styles['watched-history-card__year']}>{LPAR}{log.year}{RPAR}</span>}
-                  </>
-                ) : (
-                  <>
-                    <h3 className={styles['watched-history-card__title']}>
-                      {log.tv_title}{DASH}{S_CHAR}{String(log.season_number).padStart(2, '0')}{E_CHAR}{String(log.episode_number).padStart(2, '0')}{DASH}{log.episode_title || log.title}
-                    </h3>
-                    {log.year && <span className={styles['watched-history-card__year']}>{LPAR}{log.year}{RPAR}</span>}
-                  </>
-                )}
-              </div>
+                <Stack gap="sm" flex={1} style={{ minWidth: 0 }}>
+                  <Inline gap="sm" align="baseline" style={{ flexWrap: 'wrap' }}>
+                    {isSingle ? (
+                      <>
+                        <Text variant="body" weight="semibold" truncate style={{ maxWidth: '20rem' }}>
+                          {log.title}
+                        </Text>
+                        {log.year && <Text variant="small" color="muted">{LPAR}{log.year}{RPAR}</Text>}
+                      </>
+                    ) : (
+                      <>
+                        <Text variant="body" weight="semibold" truncate style={{ maxWidth: '20rem' }}>
+                          {log.tv_title}{DASH}{S_CHAR}{String(log.season_number).padStart(2, '0')}{E_CHAR}{String(log.episode_number).padStart(2, '0')}{DASH}{log.episode_title || log.title}
+                        </Text>
+                        {log.year && <Text variant="small" color="muted">{LPAR}{log.year}{RPAR}</Text>}
+                      </>
+                    )}
+                  </Inline>
 
-              <Inline gap="lg" align="center" className={styles['watched-history-card__meta']}>
-                <Inline gap="xs" align="center" className={styles['watched-history-card__meta-item']}>
-                  <Clock size={12} />
-                  <span>{new Date(log.watched_at).toLocaleString()}</span>
-                </Inline>
+                  <Inline gap="lg" align="center">
+                    <Inline gap="xs" align="center">
+                      <Clock size={12} style={{ color: 'var(--color-text-muted)' }} />
+                      <Text variant="small" color="muted">
+                        {new Date(log.watched_at).toLocaleString()}
+                      </Text>
+                    </Inline>
 
-                {log.is_watched ? (
-                  <div className={`${styles['watched-history-card__status']} ${styles['watched-history-card__status--watched']}`}>
-                    <CheckCircle2 size={12} />
-                    <span>{t('historyPage.watchedStatus') || 'Watched'}</span>
-                  </div>
-                ) : log.is_active ? (
-                  <div className={styles['watched-history-card__active-info']}>
-                    <span className={styles['watched-history-card__percent']}>{percent}{PERCENT}</span>
-                    <span className={styles['watched-history-card__time']}>
-                      {LPAR}{formatTime(log.resume_position)}{SLASH}{formatTime(log.duration)}{RPAR}
-                    </span>
-                  </div>
-                ) : (
-                  percent > 0 && (
-                    <div className={styles['watched-history-card__progress-info']}>
-                      <span className={styles['watched-history-card__percent']}>{percent}{PERCENT}</span>
-                      <span className={styles['watched-history-card__time']}>
-                        {LPAR}{formatTime(log.resume_position)}{SLASH}{formatTime(log.duration)}{RPAR}
-                      </span>
-                    </div>
-                  )
-                )}
+                    {log.is_watched ? (
+                      <Badge family="status" tone="success" size="sm">
+                        <CheckCircle2 size={12} style={{ marginRight: 'var(--space-2xs)' }} />
+                        {t('historyPage.watchedStatus') || 'Watched'}
+                      </Badge>
+                    ) : log.is_active ? (
+                      <Inline gap="xs" align="center">
+                        {log.is_active && <span className="u-pulse-dot" />}
+                        <Text variant="small" color="accent" weight="bold">{percent}{PERCENT}</Text>
+                        <Text variant="small" color="accent" style={{ opacity: 0.8 }}>
+                          {LPAR}{formatTime(log.resume_position)}{SLASH}{formatTime(log.duration)}{RPAR}
+                        </Text>
+                      </Inline>
+                    ) : (
+                      percent > 0 && (
+                        <Inline gap="xs" align="center">
+                          <Text variant="small" color="accent" weight="bold">{percent}{PERCENT}</Text>
+                          <Text variant="small" color="muted">
+                            {LPAR}{formatTime(log.resume_position)}{SLASH}{formatTime(log.duration)}{RPAR}
+                          </Text>
+                        </Inline>
+                      )
+                    )}
+                  </Inline>
+
+                  {!log.is_watched && (log.is_active || percent > 0) && (
+                    <LinearProgress
+                      value={percent}
+                      variant={log.is_active ? 'accent' : 'blue'}
+                      className="u-progress-bar-width"
+                    />
+                  )}
+                </Stack>
               </Inline>
 
-              {!log.is_watched && (log.is_active || percent > 0) && (
-                <div className={styles['watched-history-card__progress-bar-wrapper']}>
-                  <div
-                    className={`${styles['watched-history-card__progress-bar']} ${log.is_active ? styles['watched-history-card__progress-bar--active'] : ''}`}
-                    ref={(el) => {
-                      if (el) el.style.width = `${Math.max(percent, log.is_active ? 2 : 0)}%`;
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-
-            <div className={styles['watched-history-card__right']}>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => handlePlay(log.media_item_id)}
-                disabled={log.is_active || (playMutation.isPending && playMutation.variables === log.media_item_id)}
-                icon={
-                  playMutation.isPending && playMutation.variables === log.media_item_id ? (
-                    <Spinner size={14} />
-                  ) : log.is_active ? (
-                    null
-                  ) : log.is_watched ? (
-                    <RotateCcw size={14} />
-                  ) : (
-                    <Play size={14} />
-                  )
-                }
-              >
-                {log.is_active
-                  ? 'Playing'
-                  : log.is_watched
-                  ? t('historyPage.watchedRewatch') || 'Rewatch'
-                  : t('historyPage.watchedContinue') || 'Continue'
-                }
-              </Button>
-            </div>
-          </div>
+              <div style={{ display: 'flex', alignItems: 'center', position: 'relative', zIndex: 'var(--z-index-step-2)' }}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handlePlay(log.media_item_id)}
+                  disabled={log.is_active || (playMutation.isPending && playMutation.variables === log.media_item_id)}
+                  icon={
+                    playMutation.isPending && playMutation.variables === log.media_item_id ? (
+                      <Spinner size={14} />
+                    ) : log.is_active ? (
+                      null
+                    ) : log.is_watched ? (
+                      <RotateCcw size={14} />
+                    ) : (
+                      <Play size={14} />
+                    )
+                  }
+                >
+                  {log.is_active
+                    ? 'Playing'
+                    : log.is_watched
+                    ? t('historyPage.watchedRewatch') || 'Rewatch'
+                    : t('historyPage.watchedContinue') || 'Continue'
+                  }
+                </Button>
+              </div>
+            </Inline>
+          </Card>
         );
       })}
       {hasNextPage && (

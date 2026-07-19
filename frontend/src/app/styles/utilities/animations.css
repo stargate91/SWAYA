@@ -1,0 +1,44 @@
+/* Swaya Global Animation System */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-md));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  opacity: 0;
+  animation: fadeInUp var(--motion-duration-slow) var(--motion-ease-emphasized) both;
+  animation-delay: calc(var(--item-index) * var(--motion-delay-step));
+}
+
+.u-pulse-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  background-color: var(--color-accent);
+  display: inline-block;
+  margin-right: var(--space-xs);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 70%, transparent);
+  animation: u-pulse-anim 1.5s infinite;
+}
+
+@keyframes u-pulse-anim {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 70%, transparent);
+  }
+  70% {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--color-accent) 0%, transparent);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 0%, transparent);
+  }
+}

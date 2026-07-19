@@ -3,8 +3,12 @@ import EmptyState from '@/ui/EmptyState';
 import Button from '@/ui/Button';
 import { Droplets, Clock, Play, Loader2 } from '@/ui/icons';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
-import styles from './WatchedHistoryList.module.css';
 import historyPageStyles from '../HistoryPage.module.css';
+import Card from '@/ui/Card';
+import Inline from '@/ui/Inline';
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
+import Badge from '@/ui/Badge';
 
 const formatTime = (seconds) => {
   if (!seconds) return '0:00';
@@ -51,7 +55,7 @@ export default function PeaksHistoryList({
   }
 
   return (
-    <div className={styles['watched-history-list']}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)', marginTop: 'var(--space-xl)' }}>
       {peaksData.map((log, index) => {
         const snapshotUrl = log.snapshot_path ? resolveMediaImageUrl(log.snapshot_path, 'backdrop') : '';
         const poster = log.poster_path || log.backdrop_path;
@@ -59,70 +63,76 @@ export default function PeaksHistoryList({
         const peakText = t('historyPage.peakAt', { defaultValue: 'Finish at' }) + ' ' + formatTime(log.video_position);
 
         return (
-          <div
+          <Card
             key={log.id}
-            className={styles['watched-history-card']}
-            ref={(el) => {
-              if (el) el.style.setProperty('--item-index', index);
+            variant="soft"
+            padding="none"
+            className="animate-fade-in-up"
+            style={{
+              '--item-index': index,
             }}
           >
-            <div className={`${styles['watched-history-card__poster-wrapper']} ${styles['is-scene']}`}>
-              {posterUrl ? (
-                <img 
-                  src={posterUrl} 
-                  alt="" 
-                  className={`${styles['watched-history-card__poster']} ${snapshotUrl ? styles['is-zoomable'] : ''}`} 
-                  onClick={() => {
-                    if (snapshotUrl) {
-                      setLightboxImage(snapshotUrl);
-                    }
-                  }}
-                />
-              ) : (
-                <div className={styles['watched-history-card__poster-placeholder']}>
-                  <Droplets size={18} color="var(--color-state-danger)" />
-                </div>
-              )}
-            </div>
-
-            <div className={styles['watched-history-card__content']}>
-              <div className={styles['watched-history-card__header']}>
-                <div className={styles['watched-history-card__title-group']}>
-                  <h3 className={styles['watched-history-card__title']}>{log.title}</h3>
-                </div>
-              </div>
-
-              <div className={styles['watched-history-card__meta']}>
-                <div className={styles['watched-history-card__meta-item']}>
-                  <Clock size={12} />
-                  <span>{new Date(log.created_at).toLocaleString()}</span>
-                </div>
-
-                <div className={`${styles['watched-history-card__status']} ${styles['watched-history-card__status--peak']}`}>
-                  <Droplets size={12} fill="currentColor" />
-                  <span>{peakText}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles['watched-history-card__right']}>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => handlePlayMoment(log.media_item_id, log.video_position)}
-                disabled={playMutation.isPending && playMutation.variables?.itemId === log.media_item_id}
-                icon={
-                  playMutation.isPending && playMutation.variables?.itemId === log.media_item_id ? (
-                    <Loader2 className="spinner" size={14} />
+            <Inline align="center" style={{ padding: 'var(--space-lg)', width: '100%', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-md)' }}>
+              <Inline align="center" style={{ flex: 1, minWidth: 0, gap: 'var(--space-md)' }}>
+                <div className="u-poster-wrapper is-scene">
+                  {posterUrl ? (
+                    <img 
+                      src={posterUrl} 
+                      alt="" 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: snapshotUrl ? 'zoom-in' : 'default' }}
+                      onClick={() => {
+                        if (snapshotUrl) {
+                          setLightboxImage(snapshotUrl);
+                        }
+                      }}
+                    />
                   ) : (
-                    <Play size={14} />
-                  )
-                }
-              >
-                {t('historyPage.playMoment', { defaultValue: 'Play Moment' })}
-              </Button>
-            </div>
-          </div>
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-muted)' }}>
+                      <Droplets size={18} color="var(--color-state-danger)" />
+                    </div>
+                  )}
+                </div>
+
+                <Stack gap="sm" flex={1} style={{ minWidth: 0 }}>
+                  <h3 style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--color-text-primary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '20rem' }}>
+                    {log.title}
+                  </h3>
+
+                  <Inline gap="lg" align="center">
+                    <Inline gap="xs" align="center">
+                      <Clock size={12} style={{ color: 'var(--color-text-muted)' }} />
+                      <Text variant="small" color="muted">
+                        {new Date(log.created_at).toLocaleString()}
+                      </Text>
+                    </Inline>
+
+                    <Badge family="status" tone="danger" size="sm">
+                      <Droplets size={12} fill="currentColor" style={{ marginRight: 'var(--space-2xs)' }} />
+                      {peakText}
+                    </Badge>
+                  </Inline>
+                </Stack>
+              </Inline>
+
+              <div style={{ display: 'flex', alignItems: 'center', position: 'relative', zIndex: 'var(--z-index-step-2)' }}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handlePlayMoment(log.media_item_id, log.video_position)}
+                  disabled={playMutation.isPending && playMutation.variables?.itemId === log.media_item_id}
+                  icon={
+                    playMutation.isPending && playMutation.variables?.itemId === log.media_item_id ? (
+                      <Loader2 className="spinner" size={14} />
+                    ) : (
+                      <Play size={14} />
+                    )
+                  }
+                >
+                  {t('historyPage.playMoment', { defaultValue: 'Play Moment' })}
+                </Button>
+              </div>
+            </Inline>
+          </Card>
         );
       })}
     </div>
