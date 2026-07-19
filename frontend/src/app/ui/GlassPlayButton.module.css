@@ -58,8 +58,8 @@
   border: var(--local-border-width) solid transparent;
   border-top-color: var(--color-accent);
   animation-name: glass-btn-spin;
-  animation-duration: var(--motion-duration-spinner-slow, 800ms);
-  animation-timing-function: var(--motion-ease-linear, linear);
+  animation-duration: var(--motion-duration-spinner-slow);
+  animation-timing-function: var(--motion-ease-linear);
   animation-iteration-count: infinite;
   pointer-events: none;
   z-index: var(--z-index-step-1);

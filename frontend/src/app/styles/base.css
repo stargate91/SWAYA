@@ -192,4 +192,9 @@ a {
     transform: translateY(var(--bounce-y-2, 0.15625rem));
   }
 }
+
+.span-full {
+  grid-column: 1 / -1;
+  width: 100%;
+}
 

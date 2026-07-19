@@ -21,7 +21,7 @@ export default function DetailPageShell({
   onVideoPlayingChange,
 }) {
 
-  const combinedClassName = `${styles.page} ${isScene ? styles.pageScene : ''} ${pageClassName}`.trim();
+  const combinedClassName = `${styles.page} ${isScene ? styles['page-scene'] : ''} ${pageClassName}`.trim();
 
   if (isLoading) {
     if (isPeople) {

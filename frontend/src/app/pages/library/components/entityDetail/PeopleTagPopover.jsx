@@ -1,56 +1,27 @@
-import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, Plus, Tag } from '@/ui/icons';
-import Pill from '@/ui/Pill';
+import { useState } from 'react';
+import { Plus, Tag, Search, X } from '@/ui/icons';
+import Chip from '@/ui/Chip';
 import { useAllTagsQuery, useCreateTagMutation } from '@/queries';
 
-import './PeopleTagPopover.css';
 import Inline from '@/ui/Inline';
+import Popover from '@/ui/Popover';
+import Autocomplete from '@/ui/Autocomplete';
+import Card from '@/ui/Card';
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
 
-
+function TagColorDot({ color }) {
+  // eslint-disable-next-line react/forbid-dom-props
+  return <span className="u-color-dot" style={{ backgroundColor: color }} />;
+}
 
 export default function PeopleTagPopover({ item, t, updatePersonStatusMutation }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [newTagName, setNewTagName] = useState('');
-  const [newTagColor, setNewTagColor] = useState('var(--color-accent-blue)');
-  const [newTagError, setNewTagError] = useState('');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const popoverRef = useRef(null);
-  const dropdownRef = useRef(null);
+  const [searchQuery, setSearchQuery] = useState('');
   
   const { data: allTags = [] } = useAllTagsQuery(item?.is_adult);
   const createTagMutation = useCreateTagMutation();
   const currentTags = item?.custom_tags || [];
   const isBusy = updatePersonStatusMutation.isPending || createTagMutation.isPending;
-
-  useEffect(() => {
-    if (!isOpen) {
-      return undefined;
-    }
-
-    const handleClickOutside = (event) => {
-      if (popoverRef.current && !popoverRef.current.contains(event.target)) {
-        setIsOpen(false);
-        setIsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
-    const handleClickDropdownOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickDropdownOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickDropdownOutside);
-    };
-  }, []);
 
   const handleToggleTag = (tagName) => {
     if (!item?.id || !tagName) {
@@ -70,205 +41,189 @@ export default function PeopleTagPopover({ item, t, updatePersonStatusMutation }
     });
   };
 
-  const handleCreateTag = async (event) => {
-    event.preventDefault();
-    const trimmedName = newTagName.trim();
-    if (!item?.id || !trimmedName) {
+  const handleAddTag = async (tagName) => {
+    if (!item?.id || !tagName) {
       return;
     }
+    const trimmedName = tagName.trim();
+    if (currentTags.includes(trimmedName)) return;
 
-    const exists = allTags.some((tag) => tag.name.toLowerCase() === trimmedName.toLowerCase());
+    const exists = allTags.find((tag) => tag.name.toLowerCase() === trimmedName.toLowerCase());
+
     if (exists) {
-      setNewTagError(t('library.tags.errorExists') || 'A tag with this name already exists');
-      return;
-    }
-
-    try {
-      await createTagMutation.mutateAsync({
-        name: trimmedName,
-        color: newTagColor,
-        is_adult: item?.is_adult || false,
-      });
-
-      await updatePersonStatusMutation.mutateAsync({
+      updatePersonStatusMutation.mutate({
         personId: item.id,
         payload: {
-          custom_tags: [...currentTags, trimmedName],
+          custom_tags: [...currentTags, exists.name],
         },
       });
+      setSearchQuery('');
+    } else {
+      try {
+        await createTagMutation.mutateAsync({
+          name: trimmedName,
+          color: 'var(--color-accent-blue)',
+          is_adult: item?.is_adult || false,
+        });
 
-      setNewTagName('');
-      setNewTagColor('var(--color-accent-blue)');
-      setNewTagError('');
-    } catch (err) {
-      setNewTagError(err.message || 'Failed to create tag');
+        await updatePersonStatusMutation.mutateAsync({
+          personId: item.id,
+          payload: {
+            custom_tags: [...currentTags, trimmedName],
+          },
+        });
+        setSearchQuery('');
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 
-  return (
-    <div ref={popoverRef} className={`entity-detail-page__tag-popover-wrap${isOpen ? ' is-open' : ''}`}>
-      <button
-        type="button"
-        onClick={() => setIsOpen((prev) => !prev)}
-        className="media-detail-page__side-nav-toggle"
-        title={t('library.details.tagger') || 'Tagger'}
-        aria-expanded={isOpen}
-      >
-        <Tag size={18} />
-      </button>
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const trimmed = searchQuery.trim();
+      if (!trimmed) return;
+      handleAddTag(trimmed);
+    }
+  };
 
-      {isOpen ? (
-        <div className="entity-detail-page__tag-popover tags-panel">
+  const filteredTags = allTags.filter((tag) => {
+    const isAssigned = currentTags.some((ct) => ct.toLowerCase() === tag.name.toLowerCase());
+    const matchesSearch = tag.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return !isAssigned && matchesSearch;
+  });
+
+  return (
+    <Popover
+      align="right"
+      width="min(24rem, calc(100vw - 2.5rem))"
+      trigger={
+        <button
+          type="button"
+          className="media-detail-page__side-nav-toggle"
+          title={t('library.details.tagger') || 'Tagger'}
+        >
+          <Tag size={18} />
+        </button>
+      }
+    >
+      <Card
+        variant="glass-shaded"
+        title={t('library.details.tagger') || 'Tagger'}
+        headerVariant="shaded"
+        padding="md"
+        fullWidth
+      >
+        <Stack gap="md">
           {/* Currently Assigned Tags */}
-          <div className="tags-panel__assigned-section">
-            <span className="tags-panel__section-subtitle">
+          <Stack gap="xs">
+            <Text variant="caption" weight="bold" color="muted" uppercase>
               {t('library.tags.assignedTitle') || 'Assigned'}
-            </span>
-            <Inline gap="sm" align="center" className="tags-panel__assigned-list">
+            </Text>
+            <Inline gap="sm" align="center" className="u-max-h-10rem u-overflow-y-auto custom-scrollbar">
               {currentTags.map((tagName) => {
                 const tagObj = allTags.find((tag) => tag.name === tagName);
                 const color = tagObj?.color || 'var(--color-accent)';
                 return (
-                  <Pill
+                  <Chip
                     key={tagName}
-                    variant="tag"
-                    className="tags-panel__assigned-pill"
-                    customStyle={{ '--pill-tag-color': color }}
+                    color={color}
+                    size="sm"
+                    onRemove={() => handleToggleTag(tagName)}
+                    disabled={isBusy}
+                    title={t('common.remove') || 'Remove'}
                   >
-                    <span>{tagName}</span>
-                    <button
-                      type="button"
-                      className="tags-panel__assigned-pill-remove"
-                      onClick={() => handleToggleTag(tagName)}
-                      disabled={isBusy}
-                      title={t('common.remove') || 'Remove'}
-                    >
-                      {String.fromCharCode(0x2715)}
-                    </button>
-                  </Pill>
+                    {tagName}
+                  </Chip>
                 );
               })}
               {currentTags.length === 0 && (
-                <div className="tags-panel__no-tags">
+                <Text variant="small" color="muted" italic>
                   {t('library.tags.noTagsAssigned') || 'No tags assigned.'}
-                </div>
+                </Text>
               )}
             </Inline>
-          </div>
+          </Stack>
 
           {/* Suggested Tags */}
           {item?.suggested_tags && item.suggested_tags.length > 0 && (
-            <div className="tags-panel__assigned-section">
-              <span className="tags-panel__section-subtitle">
+            <Stack gap="xs">
+              <Text variant="caption" weight="bold" color="muted" uppercase>
                 {t('library.details.suggestedTags') || 'Suggested Tags'}
-              </span>
-              <Inline gap="sm" align="center" className="tags-panel__assigned-list">
+              </Text>
+              <Inline gap="sm" align="center" className="u-max-h-10rem u-overflow-y-auto custom-scrollbar">
                 {item.suggested_tags.map(tagName => {
                   const isAssigned = currentTags.includes(tagName);
                   if (isAssigned) return null;
                   return (
-                    <Pill
+                    <Chip
                       key={tagName}
-                      variant="tag"
-                      className="tags-panel__assigned-pill tags-panel__assigned-pill--suggested"
-                      onClick={() => handleToggleTag(tagName)}
+                      variant="dashed"
+                      size="sm"
+                      leftElement={<Plus size={10} />}
+                      onClick={() => handleAddTag(tagName)}
+                      disabled={isBusy}
                     >
-                      <span>{tagName}</span>
-                    </Pill>
+                      {tagName}
+                    </Chip>
                   );
                 })}
                 {item.suggested_tags.every(t => currentTags.includes(t)) && (
-                  <div className="tags-panel__no-tags">
+                  <Text variant="small" color="muted" italic>
                     {t('library.tags.allTagsAssigned') || 'All suggested tags assigned.'}
-                  </div>
+                  </Text>
                 )}
               </Inline>
-            </div>
+            </Stack>
           )}
 
-          {/* Add Tag Dropdown */}
-          <div className="tags-panel__select-section" ref={dropdownRef}>
-            <span className="tags-panel__section-subtitle">
-              {t('library.tags.addTagLabel') || 'Add Tag'}
-            </span>
-            <button
-              type="button"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="tags-panel__select-trigger"
-            >
-              <span>{t('library.tags.addTagPlaceholder') || 'Add Tag...'}</span>
-              <ChevronDown size={16} />
-            </button>
-
-            {isDropdownOpen && (
-              <div className="tags-panel__select-dropdown">
-                {allTags
-                  .filter(tag => !currentTags.includes(tag.name))
-                  .map(tag => {
-                    return (
-                      <button
-                        key={tag.id}
-                        type="button"
-                        onClick={() => handleToggleTag(tag.name)}
-                        disabled={isBusy}
-                        className="tags-panel__dropdown-item"
-                      >
-                        {/* eslint-disable-next-line react/forbid-dom-props */}
-                        <div className="tags-panel__dropdown-item-color" style={{ backgroundColor: tag.color }} />
-                        <span className="tags-panel__dropdown-item-name">{tag.name}</span>
-                      </button>
-                    );
-                  })}
-                {allTags.length === 0 && (
-                  <div className="tags-panel__dropdown-empty">
-                    {t('library.emptyStates.tags.description') || 'No tags created yet.'}
-                  </div>
-                )}
-                {allTags.length > 0 && allTags.filter(tag => !currentTags.includes(tag.name)).length === 0 && (
-                  <div className="tags-panel__dropdown-empty">
-                    {t('library.tags.allTagsAssigned') || 'All tags assigned.'}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="tags-panel__divider" />
-
-          {/* Create Tag Form */}
-          <form onSubmit={handleCreateTag} className="tags-panel__create-form">
-            <h5 className="tags-panel__create-title">
-              {t('library.tags.modalTitle') || 'Create Tag'}
-            </h5>
-
-            <div className="tags-panel__input-row">
-              <input
-                type="text"
-                value={newTagName}
-                onChange={(e) => {
-                  setNewTagName(e.target.value);
-                  setNewTagError('');
-                }}
-                placeholder={t('library.tags.namePlaceholder') || 'Enter tag name...'}
-                className="tags-panel__input"
-              />
+          {/* Add Tag Autocomplete */}
+          <Autocomplete
+            size="sm"
+            leftElement={<Search size={13} />}
+            rightElement={searchQuery && (
               <button
-                type="submit"
-                disabled={!newTagName.trim() || isBusy}
-                className="tags-panel__submit-btn"
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="bespoke-tagger-clear-btn"
               >
-                <Plus size={16} />
+                <X size={12} />
               </button>
-            </div>
-
-            {newTagError && (
-              <span className="tags-panel__error">
-                {newTagError}
-              </span>
             )}
-          </form>
-        </div>
-      ) : null}
-    </div>
+            placeholder={t('library.tags.searchOrAdd') || 'Search or add tag...'}
+            value={searchQuery}
+            onChange={setSearchQuery}
+            options={filteredTags}
+            onSelect={(tag) => handleAddTag(tag.name)}
+            onKeyDown={handleKeyDown}
+            renderItem={(tag) => (
+              <Inline gap="sm" align="center">
+                <TagColorDot color={tag.color} />
+                <span>{tag.name}</span>
+              </Inline>
+            )}
+            renderFooter={(closeDropdown, itemClass, createClass) => {
+              const trimmed = searchQuery.trim();
+              const tagExists = allTags.some((t) => t.name.toLowerCase() === trimmed.toLowerCase());
+              if (!trimmed || tagExists) return null;
+              return (
+                <button
+                  type="button"
+                  onClick={() => {
+                    void handleAddTag(trimmed);
+                    closeDropdown();
+                  }}
+                  className={`${itemClass} ${createClass}`}
+                >
+                  <Plus size={12} />
+                  <span>{t('library.details.createTag', { name: trimmed })}</span>
+                </button>
+              );
+            }}
+          />
+        </Stack>
+      </Card>
+    </Popover>
   );
 }

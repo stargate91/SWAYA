@@ -5,6 +5,7 @@ import Tooltip from '@/ui/Tooltip';
 import EmptyState from '@/ui/EmptyState';
 import SegmentedControl from '@/ui/SegmentedControl';
 import SelectableCard from '@/ui/SelectableCard';
+import PosterCard from '@/ui/PosterCard';
 import Grid from '@/ui/Grid';
 import ImageUploadPanel from '@/ui/ImageUploadPanel';
 import { API_BASE } from '@/lib/backend';
@@ -16,7 +17,8 @@ import PersonBackdropBrowser from './PersonBackdropBrowser';
 import ImageOptionCard from './ImageOptionCard';
 import { useOverridePersonBackdropMutation } from '@/queries';
 import usePersonBackdropPicker from '../../hooks/usePersonBackdropPicker';
-import './PersonBackdropPickerModal.css';
+import Stack from '@/ui/Stack';
+import styles from './PersonBackdropPickerModal.module.css';
 
 export default function PersonBackdropPickerModal({
   personId,
@@ -64,7 +66,7 @@ export default function PersonBackdropPickerModal({
 
   if (isBackdropBrowserOpen) {
     return (
-      <div className="person-backdrop-picker">
+      <Stack gap="lg" fullHeight>
         <PersonBackdropBrowser
           selectedCredit={selectedCredit}
           selectedBackdropMetadataQuery={selectedBackdropMetadataQuery}
@@ -77,14 +79,14 @@ export default function PersonBackdropPickerModal({
           t={t}
           handleBackToCredits={handleBackToCredits}
         />
-      </div>
+      </Stack>
     );
   }
 
   return (
-    <div className="person-backdrop-picker">
+    <Stack gap="lg" fullHeight>
       {headerDescription && (
-        <div className="person-backdrop-picker__progress-banner">
+        <div className={styles['progress-banner']}>
           <span>{headerDescription}</span>
         </div>
       )}
@@ -99,16 +101,14 @@ export default function PersonBackdropPickerModal({
 
       <SegmentedControl
         ariaLabel={t('library.details.chooseBackdrop') || 'Choose backdrop source'}
-        className="person-backdrop-picker__tabs"
         options={tabsOptions}
         value={activeTab}
         onChange={(value) => patchSession(personId, { activeTab: value, selectedCredit: null })}
       />
 
       {activeTab === 'scenes' && sceneSourceOptions.length >= 2 && (
-        <div className="person-backdrop-picker__source-selector">
+        <div>
           <SegmentedControl
-            className="person-backdrop-picker__source-control"
             options={sceneSourceOptions}
             value={activeSceneSource}
             onChange={(val) => patchSession(personId, { selectedSceneSource: val, scenesPages: [], scenesNextPage: 2 })}
@@ -118,11 +118,11 @@ export default function PersonBackdropPickerModal({
 
       <div
         ref={viewportRef}
-        className="person-backdrop-picker__viewport"
+        className={styles.viewport}
         onScroll={handleViewportScroll}
       >
         {activeTab === 'default' ? (
-          <div className="person-backdrop-picker__default-tab-content">
+          <div className={styles['default-tab-content']}>
             {profileUrl ? (
               <Grid variant="picker">
                 <ImageOptionCard
@@ -132,7 +132,6 @@ export default function PersonBackdropPickerModal({
                   isSelected={!selectedBackdropPath}
                   onClick={() => handleSaveBackdropUrl("")}
                   aspect="backdrop"
-                  className="person-backdrop-picker__fallback-card"
                   blur
                 />
               </Grid>
@@ -150,17 +149,11 @@ export default function PersonBackdropPickerModal({
         ) : (
           <Grid variant={activeTab === 'scenes' ? 'backdrop' : 'logo'}>
             {isLoading && visibleItems.length === 0 && Array.from({ length: initialTabPageSize }).map((_, index) => (
-              activeTab === 'scenes' ? (
-                <SelectableCard key={`person-backdrop-skeleton-${activeTab}-${index}`} disabled={true} aspect="landscape" />
-              ) : (
-                <div key={`person-backdrop-skeleton-${activeTab}-${index}`} className="person-backdrop-picker__credit-card skeleton">
-                  <div className="person-backdrop-picker__credit-poster-wrap skeleton-shimmer" />
-                  <div className="person-backdrop-picker__credit-info">
-                    <div className="entity-detail-page__skeleton-block entity-detail-page__skeleton-block--credit-title" />
-                    <div className="entity-detail-page__skeleton-block entity-detail-page__skeleton-block--credit-meta" />
-                  </div>
-                </div>
-              )
+              <SelectableCard
+                key={`person-backdrop-skeleton-${activeTab}-${index}`}
+                disabled={true}
+                aspect={activeTab === 'scenes' ? 'landscape' : 'poster'}
+              />
             ))}
 
             {!isLoading && visibleItems.length === 0 && (
@@ -170,7 +163,7 @@ export default function PersonBackdropPickerModal({
                 background="translucent"
                 iconColor="muted"
                 icon={ImageOff}
-                className="backdrops-panel__empty-state person-backdrop-picker__empty"
+                className="backdrops-panel__empty-state"
                 title={t('library.details.noBackdropsAvailable') || 'No good backdrop options found.'}
               />
             )}
@@ -213,38 +206,22 @@ export default function PersonBackdropPickerModal({
               const isTv = isTvLikeMediaType(credit.media_type || credit.type);
 
               return (
-                <button
-                  type="button"
+                <PosterCard
                   key={`person-backdrop-${activeTab}-${credit.tmdb_id || credit.id}`}
-                  className={`person-backdrop-picker__credit-card ${isSelected ? 'is-selected' : ''} ${isPending ? 'backdrop-card--disabled' : ''}`}
+                  imageUrl={posterUrl}
+                  title={credit.title}
+                  subtitle={credit.year || (credit.release_date && credit.release_date.split('-')[0])}
+                  selected={isSelected}
                   onClick={() => handleOpenBackdropBrowser(credit)}
                   disabled={overridePersonBackdropMutation.isPending || isUploadPending}
-                >
-                  <div className="person-backdrop-picker__credit-poster-wrap">
-                    {posterUrl ? (
-                      <img src={posterUrl} alt={credit.title} className="person-backdrop-picker__credit-poster" />
-                    ) : (
-                      <div className="person-backdrop-picker__credit-poster person-backdrop-picker__credit-poster--placeholder">
-                        {isTv ? <ENTITY_ICONS.tv size={24} /> : <ENTITY_ICONS.movie size={24} />}
-                      </div>
-                    )}
-                  </div>
-                  <div className="person-backdrop-picker__credit-info">
-                    <Tooltip content={credit.title} side="top">
-                      <div className="person-backdrop-picker__credit-title">
-                        {credit.title}
-                      </div>
-                    </Tooltip>
-                    <div className="person-backdrop-picker__credit-meta">
-                      {credit.year ? <span>{credit.year}</span> : (credit.release_date && <span>{credit.release_date.split('-')[0]}</span>)}
-                    </div>
-                  </div>
-                </button>
+                  aspect="poster"
+                  icon={isTv ? ENTITY_ICONS.tv : ENTITY_ICONS.movie}
+                />
               );
             })}
           </Grid>
         )}
       </div>
-    </div>
+    </Stack>
   );
 }

@@ -143,6 +143,60 @@
   opacity: 0.95;
 }
 
+/* Glass Pill Tabs */
+.tabs--glass-pill {
+  display: flex;
+  background: color-mix(in srgb, var(--color-surface-glass) 50%, transparent);
+  border: 1px solid var(--color-border-subtle);
+  padding: var(--space-xs);
+  border-radius: var(--radius-full);
+  height: 2.25rem;
+  width: max-content;
+  align-items: center;
+  gap: var(--space-xs);
+  backdrop-filter: blur(0.5rem);
+}
+
+.tab--glass-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-full);
+  font-family: var(--font-base);
+  font-size: 0.72rem;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0 var(--space-md);
+  height: 100%;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--motion-fast);
+  outline: none;
+}
+
+.tab--glass-pill:hover {
+  background: var(--color-surface-glass);
+  color: var(--color-text-primary);
+}
+
+.tab--glass-pill:active {
+  transform: scale(0.97);
+}
+
+.tab--glass-pill.is-active {
+  background: var(--color-surface-glass-heavy);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-strong);
+  box-shadow: var(--shadow-xs);
+}
+
+.tab--glass-pill.is-active > .tab-icon {
+  opacity: 0.95;
+}
+
 .tab-panel {
   display: flex;
   flex-direction: column;

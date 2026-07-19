@@ -1,0 +1,41 @@
+.viewport {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-top: var(--space-sm);
+  padding-bottom: var(--space-sm);
+}
+
+.progress-banner {
+  padding: var(--space-sm) var(--space-sm);
+  background: color-mix(in srgb, var(--color-accent-blue) 8%, var(--color-surface-card));
+  border: 1px solid color-mix(in srgb, var(--color-accent-blue) 15%, var(--color-border-default));
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  --pulse-anim: backdrop-progress-fade 2s infinite ease-in-out;
+  animation: var(--pulse-anim);
+}
+
+@keyframes backdrop-progress-fade {
+
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.default-tab-content {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-2xl);
+  padding-bottom: var(--space-2xl);
+}

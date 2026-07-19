@@ -3,6 +3,7 @@ import Button from '@/ui/Button';
 import TMDBImageGrid from './TMDBImageGrid';
 import { useOverridePersonBackdropMutation } from '@/queries';
 import Inline from '@/ui/Inline';
+import Text from '@/ui/Text';
 
 export default function PersonBackdropBrowser({
   selectedCredit,
@@ -18,16 +19,16 @@ export default function PersonBackdropBrowser({
   const overridePersonBackdropMutation = useOverridePersonBackdropMutation();
   return (
     <>
-      <Inline gap="md" align="center" className="person-backdrop-picker__detail-toolbar">
-        <Button variant="secondary-neutral" leftIcon={<ChevronLeft size={14} />} animateIcon className="person-backdrop-picker__back-btn" onClick={handleBackToCredits}>
+      <Inline gap="md" align="center">
+        <Button variant="secondary-neutral" size="sm" leftIcon={<ChevronLeft size={14} />} animateIcon onClick={handleBackToCredits}>
           {t('common.back') || 'Back'}
         </Button>
-        <h4 className="details-panel__section-title person-backdrop-picker__detail-title">
+        <Text truncate variant="title" as="h4" className="details-panel__section-title">
           {selectedBackdropMetadataQuery.data?.title || selectedCredit?.title}
-        </h4>
+        </Text>
       </Inline>
 
-      <div className="person-backdrop-picker__detail-view">
+      <div>
         <TMDBImageGrid
           customImages={selectedBackdrops}
           imageType="backdrop"

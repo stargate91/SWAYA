@@ -4,7 +4,8 @@ import { API_BASE } from '@/lib/backend';
 import { getCreditSource, navigateToCreditDetail } from '../../utils/mediaNavigation';
 import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
 import PosterCard from '@/ui/PosterCard';
-import './PersonCreditsCard.css';
+import Badge from '@/ui/Badge';
+import styles from './PersonCreditsCard.module.css';
 
 export default function PersonCreditsCard({
   item,
@@ -37,16 +38,27 @@ export default function PersonCreditsCard({
 
   const subtitleText = rightText ? `${leftText} (${rightText})` : leftText;
 
+  const sourceClass = resolvedSource === 'tmdb' ? styles['source-tmdb'] :
+                      resolvedSource === 'porndb' ? styles['source-porndb'] :
+                      resolvedSource === 'theporndb' ? styles['source-theporndb'] :
+                      resolvedSource === 'stashdb' ? styles['source-stashdb'] :
+                      resolvedSource === 'fansdb' ? styles['source-fansdb'] : '';
+
   const overlay = (
     <>
       {(alwaysShowSourceBadge || (showLibraryBadge && item.in_library)) && (
-        <span className={`person-credits-card__source-badge source-${resolvedSource}`}>
+        <Badge
+          size="sm"
+          variant="inline"
+          roundness="sm"
+          className={`${styles['source-badge']} ${sourceClass}`}
+        >
           {resolvedSource === 'porndb' || resolvedSource === 'theporndb' ? 'PornDB' : resolvedSource === 'stashdb' ? 'Stash' : resolvedSource === 'fansdb' ? 'Fans' : 'TMDb'}
-        </span>
+        </Badge>
       )}
 
       {showLibraryBadge && item.in_library && (
-        <div className="person-credits-card__library-badge" title={t('library.details.inLibrary') || 'In Library'}>
+        <div className={styles['library-badge']} title={t('library.details.inLibrary') || 'In Library'}>
           <Bookmark size={10} />
         </div>
       )}
@@ -64,7 +76,7 @@ export default function PersonCreditsCard({
 
   return (
     <PosterCard
-      className="person-credits-card"
+      className={styles.card}
       aspect={isScene ? 'landscape' : 'poster'}
       imageUrl={posterUrl}
       title={creditTitle}

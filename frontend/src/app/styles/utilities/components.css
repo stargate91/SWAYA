@@ -31,6 +31,26 @@
   height: 14.0625rem;
 }
 
+.skeleton-shimmer {
+  --shimmer-bg: linear-gradient(90deg, color-mix(in srgb, var(--color-text-primary) 2%, transparent) 25%, color-mix(in srgb, var(--color-text-primary) 6%, transparent) 50%, color-mix(in srgb, var(--color-text-primary) 2%, transparent) 75%);
+  background: var(--shimmer-bg);
+  background-size: 200% 100%;
+  animation-name: loading-shimmer;
+  animation-duration: var(--motion-duration-pulse);
+  animation-iteration-count: infinite;
+  animation-timing-function: var(--motion-ease-linear);
+}
+
+@keyframes loading-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+
 .u-interactive-list-item {
   display: flex;
   align-items: center;
@@ -124,6 +144,14 @@
   opacity: 1;
 }
 
+.u-glass-panel {
+  background: color-mix(in srgb, var(--color-panel-translucent) 22%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-border-default) 40%, transparent);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(var(--space-lg));
+  box-shadow: 0 var(--space-lg) var(--space-4xl) color-mix(in srgb, var(--color-bg-canvas) 20%, transparent);
+}
+
 .u-pill-panel {
   display: inline-flex;
   align-items: center;
@@ -158,4 +186,35 @@
   height: 0.5rem;
   border-radius: var(--radius-full);
   flex-shrink: 0;
+}
+
+.u-btn-glass-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  --switch-btn-bg: color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+  background: var(--switch-btn-bg);
+  --switch-btn-border: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+  border: var(--switch-btn-border);
+  color: var(--color-accent-blue);
+  font-size: 0.68rem;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  --switch-btn-transition: all 0.2s ease;
+  transition: var(--switch-btn-transition);
+  margin-left: auto;
+  outline: none;
+}
+
+.u-btn-glass-pill:hover {
+  --switch-btn-hover-bg: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+  background: var(--switch-btn-hover-bg);
+  --switch-btn-hover-bc: color-mix(in srgb, var(--color-text-primary) 15%, transparent);
+  border-color: var(--switch-btn-hover-bc);
+  transform: translateY(-0.0625rem);
+  color: var(--color-text-primary);
 }

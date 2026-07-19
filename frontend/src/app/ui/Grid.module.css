@@ -119,6 +119,12 @@
   gap: var(--space-lg) var(--space-md);
 }
 
+/* Auto-fill Gallery Variant */
+.grid[data-variant="auto-gallery"] {
+  grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr));
+  gap: var(--space-md);
+}
+
 /* Stats Overview Variant (5 cols descending) */
 .grid[data-variant="stats"] {
   grid-template-columns: repeat(5, minmax(0, 1fr));

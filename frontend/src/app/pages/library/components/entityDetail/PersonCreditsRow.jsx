@@ -1,7 +1,6 @@
 import { usePlayMediaMutation } from '@/queries';
 import Grid from '@/ui/Grid';
 import PersonCreditsCard from './PersonCreditsCard';
-import './PersonCreditsRow.css';
 
 export default function PersonCreditsRow({
   items,

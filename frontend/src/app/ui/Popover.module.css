@@ -3,6 +3,7 @@
   top: var(--popover-top);
   z-index: var(--z-index-popover);
   width: var(--popover-width, auto);
+  overscroll-behavior: contain;
 }
 
 .align-right {

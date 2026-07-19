@@ -9,7 +9,7 @@ import EmptyState from '@/ui/EmptyState';
 import SelectableCard from '@/ui/SelectableCard';
 import Grid from '@/ui/Grid';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
-import './TMDBImageGrid.css';
+import styles from './TMDBImageGrid.module.css';
 
 
 export default function TMDBImageGrid({
@@ -428,73 +428,71 @@ export default function TMDBImageGrid({
   }
 
   return (
-    <div className="backdrops-panel">
-      <Grid variant={imageType === 'logo' ? 'logo' : 'backdrop'}>
-        {displayedImages.map((img, idx) => {
-          const path = img.file_path || img.backdrop_path || img.poster_path || img.logo_path;
-          if (!path) return null;
+    <Grid variant={imageType === 'logo' ? 'logo' : 'backdrop'}>
+      {displayedImages.map((img, idx) => {
+        const path = img.file_path || img.backdrop_path || img.poster_path || img.logo_path;
+        if (!path) return null;
 
-          // Determine sizes and urls based on imageType
-          let thumbUrl;
-          if (imageType === 'backdrop') {
-            thumbUrl = path.startsWith('/media/')
-              ? resolveDetailsImageUrl(path, API_BASE, 'backdrop')
-              : path.startsWith('/')
-                ? buildTmdbImageUrl(path, TMDB_IMAGE_SIZES.backdropThumb)
-                : resolveDetailsImageUrl(path, API_BASE, 'backdropThumb');
-          } else if (imageType === 'poster') {
-            thumbUrl = path.startsWith('/media/')
-              ? resolveDetailsImageUrl(path, API_BASE, isPerson ? 'person' : 'poster')
-              : path.startsWith('/')
-                ? buildTmdbImageUrl(path, isPerson ? TMDB_IMAGE_SIZES.personThumb : TMDB_IMAGE_SIZES.posterThumb)
-                : resolveDetailsImageUrl(path, API_BASE, isPerson ? 'person' : 'poster');
-          } else {
-            // Logo or generic
-            thumbUrl = path.startsWith('/media/')
-              ? resolveDetailsImageUrl(path, API_BASE, 'logo')
-              : buildTmdbImageUrl(path, TMDB_IMAGE_SIZES.posterThumb);
-          }
+        // Determine sizes and urls based on imageType
+        let thumbUrl;
+        if (imageType === 'backdrop') {
+          thumbUrl = path.startsWith('/media/')
+            ? resolveDetailsImageUrl(path, API_BASE, 'backdrop')
+            : path.startsWith('/')
+              ? buildTmdbImageUrl(path, TMDB_IMAGE_SIZES.backdropThumb)
+              : resolveDetailsImageUrl(path, API_BASE, 'backdropThumb');
+        } else if (imageType === 'poster') {
+          thumbUrl = path.startsWith('/media/')
+            ? resolveDetailsImageUrl(path, API_BASE, isPerson ? 'person' : 'poster')
+            : path.startsWith('/')
+              ? buildTmdbImageUrl(path, isPerson ? TMDB_IMAGE_SIZES.personThumb : TMDB_IMAGE_SIZES.posterThumb)
+              : resolveDetailsImageUrl(path, API_BASE, isPerson ? 'person' : 'poster');
+        } else {
+          // Logo or generic
+          thumbUrl = path.startsWith('/media/')
+            ? resolveDetailsImageUrl(path, API_BASE, 'logo')
+            : buildTmdbImageUrl(path, TMDB_IMAGE_SIZES.posterThumb);
+        }
 
-          const isImagePending = isPending && pendingPath === path;
-          const isSelected = pathsMatch(path, currentPath) || isImagePending;
+        const isImagePending = isPending && pendingPath === path;
+        const isSelected = pathsMatch(path, currentPath) || isImagePending;
 
-          const infoLeft = img.width && img.height ? `${img.width}×${img.height}` : '';
-          const infoRight = img.vote_average ? `★ ${img.vote_average.toFixed(1)}` : '';
+        const infoLeft = img.width && img.height ? `${img.width}×${img.height}` : '';
+        const infoRight = img.vote_average ? `★ ${img.vote_average.toFixed(1)}` : '';
 
-          return (
-            <SelectableCard
-              key={`${path}-${idx}`}
-              imageUrl={thumbUrl}
-              alt={`${imageType} ${idx + 1}`}
-              selected={isSelected}
-              isPending={isImagePending}
-              aspect={imageType === 'backdrop' ? 'landscape' : imageType}
-              infoLeft={infoLeft}
-              infoRight={infoRight}
-              variant="picker"
-              showCheckmark={false}
-              onClick={() => handleSelectImage(path)}
-            />
-          );
-        })}
-
-        {images.length === 0 && (
-          <EmptyState
-            size="md"
-            border="dashed"
-            background="translucent"
-            iconColor="muted"
-            icon={ImageOff}
-            className="backdrops-panel__empty-state"
-            title={t?.('library.details.noImagesAvailable') || `No ${imageType} options found.`}
+        return (
+          <SelectableCard
+            key={`${path}-${idx}`}
+            imageUrl={thumbUrl}
+            alt={`${imageType} ${idx + 1}`}
+            selected={isSelected}
+            isPending={isImagePending}
+            aspect={imageType === 'backdrop' ? 'landscape' : imageType}
+            infoLeft={infoLeft}
+            infoRight={infoRight}
+            variant="picker"
+            showCheckmark={false}
+            onClick={() => handleSelectImage(path)}
           />
-        )}
+        );
+      })}
 
-        {hasMore && (
-          <div ref={loadMoreRef} className="backdrops-panel__load-more-trigger" aria-hidden="true" />
-        )}
-      </Grid>
-    </div>
+      {images.length === 0 && (
+        <EmptyState
+          size="md"
+          border="dashed"
+          background="translucent"
+          iconColor="muted"
+          icon={ImageOff}
+          className="span-full"
+          title={t?.('library.details.noImagesAvailable') || `No ${imageType} options found.`}
+        />
+      )}
+
+      {hasMore && (
+        <div ref={loadMoreRef} className={`span-full ${styles['load-more-trigger']}`} aria-hidden="true" />
+      )}
+    </Grid>
   );
 }
 

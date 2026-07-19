@@ -5,14 +5,16 @@ import { usePersonCreditsQuery, usePersonCreditsInfiniteQuery } from '@/queries/
 import { usePersonCreditsStore } from '@/stores/usePersonCreditsStore';
 import Spinner from '@/ui/Spinner';
 import Grid from '@/ui/Grid';
-import { X, Play } from '@/ui/icons';
+import { X } from '@/ui/icons';
 import { Tabs } from '@/ui/Tabs';
 import PersonCreditsRow from './PersonCreditsRow';
 import PersonCreditsCard from './PersonCreditsCard';
+import GalleryCard from '@/ui/GalleryCard';
+import EmptyState from '@/ui/EmptyState';
 import { API_BASE } from '@/lib/backend';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import Inline from '@/ui/Inline';
-import './PersonCreditsSections.css';
+import styles from './PersonCreditsSections.module.css';
 
 
 export default function PersonCreditsSections({ id, item, navigate, t }) {
@@ -20,6 +22,10 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
   const hasStashDb = !!item?.external_ids?.stashdb_id;
   const hasFansDb = !!item?.external_ids?.fansdb_id;
   const hasPornDb = !!item?.external_ids?.theporndb_id || !!item?.external_ids?.porndb_id || !!item?.external_ids?.porndb;
+
+  const validFinishes = useMemo(() => {
+    return item?.finishes?.filter(f => f.snapshot_path && f.video_position) || [];
+  }, [item?.finishes]);
 
   const hasTmdbMovies = !!item?.external_ids?.tmdb && Number(item?.total_movie_credits) > 0;
   const hasMovies = hasTmdbMovies || (item?.is_adult && hasPornDb);
@@ -186,7 +192,7 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
   const observerRef = useInfiniteScroll({
     onIntersect: () => activeGridQuery.fetchNextPage(),
     enabled: hasMore && !isFetchingNextPage,
-    root: '.person-credits-discover-grid-wrapper',
+    root: `.${styles['discover-grid-wrapper']}`,
     threshold: 0.1,
   });
 
@@ -213,66 +219,66 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
   const isSceneGrid = activeMediaType === 'scenes';
 
   return (
-    <div className="person-credits-section-container">
+    <div className={`${styles.container} u-flex-column u-flex-shrink-0 u-overflow-hidden`}>
       {viewMode === 'library' && myLibraryTabs.length > 0 && (
-        <div className="person-credits-detail-panel">
-            <Inline justify="between" align="center" className="person-credits-discover-header person-credits-discover-header-layout">
-              <h4 className="person-credits-row__title person-credits-row-title-style">{t('library.details.inLibrary') || 'My Library'}</h4>
+        <div className={`${styles['detail-panel']} u-flex-column u-glass-panel`}>
+          <Inline justify="between" align="center" className="person-credits-discover-header person-credits-discover-header-layout">
+            <h4 className={styles.title}>{t('library.details.inLibrary') || 'My Library'}</h4>
 
-              {/* Toggle button to switch to Discover mode */}
-              <div className="person-credits-header-actions">
-                {item?.is_adult && item?.finishes?.length > 0 && (
-                  <button
-                    type="button"
-                    className="person-credits-row__mode-switch-btn"
-                    onClick={() => setViewMode('gallery')}
-                  >
-                    {t('library.details.gallery') || 'Climax Gallery'}
-                  </button>
-                )}
+            {/* Toggle button to switch to Discover mode */}
+            <Inline gap="md">
+              {item?.is_adult && validFinishes.length > 0 && (
                 <button
                   type="button"
-                  className="person-credits-row__mode-switch-btn"
-                  onClick={() => setViewMode('discover')}
+                  className="u-btn-glass-pill"
+                  onClick={() => setViewMode('gallery')}
                 >
-                  {t('library.details.wantToDiscover') || 'Want to discover?'}
+                  {t('library.details.gallery') || 'Climax Gallery'}
                 </button>
-              </div>
+              )}
+              <button
+                type="button"
+                className="u-btn-glass-pill"
+                onClick={() => setViewMode('discover')}
+              >
+                {t('library.details.wantToDiscover') || 'Want to discover?'}
+              </button>
             </Inline>
+          </Inline>
 
-            <div className="person-credits-discover-groups person-credits-discover-groups-style">
-              <Tabs
-                tabs={formattedLibraryTabs}
-                value={activeLibraryTab}
-                onChange={setActiveLibraryTab}
-                variant="sub"
-              />
-            </div>
+          <Inline gap="2xl">
+            <Tabs
+              tabs={formattedLibraryTabs}
+              value={activeLibraryTab}
+              onChange={setActiveLibraryTab}
+              variant="glass-pill"
+            />
+          </Inline>
 
-            <div className="person-credits-discover-grid-wrapper">
-              <PersonCreditsRow
-                items={activeLibraryItems}
-                mediaType={activeLibraryTab}
-                navigate={navigate}
-                t={t}
-              />
-            </div>
+          <div className={`${styles['discover-grid-wrapper']} u-flex-column u-w-full u-overflow-y-auto`}>
+            <PersonCreditsRow
+              items={activeLibraryItems}
+              mediaType={activeLibraryTab}
+              navigate={navigate}
+              t={t}
+            />
           </div>
+        </div>
       )}
 
       {/* STATE 2: DISCOVER PICKER PANEL & INFINITE GRID */}
       {viewMode === 'discover' && (
-        <div className="person-credits-detail-panel">
+        <div className={`${styles['detail-panel']} u-flex-column u-glass-panel`}>
           <Inline justify="between" align="center" className="person-credits-discover-header person-credits-discover-header-layout">
-            <h4 className="person-credits-row__title person-credits-row-title-style">{t('library.details.discoverFilmography') || 'Discover Filmography'}</h4>
+            <h4 className={styles.title}>{t('library.details.discoverFilmography') || 'Discover Filmography'}</h4>
 
             {/* Back to Library button (only shown if user has library items) */}
             {myLibraryTabs.length > 0 && (
-              <div className="person-credits-header-actions">
-                {item?.is_adult && item?.finishes?.length > 0 && (
+              <Inline gap="md">
+                {item?.is_adult && validFinishes.length > 0 && (
                   <button
                     type="button"
-                    className="person-credits-row__mode-switch-btn"
+                    className="u-btn-glass-pill"
                     onClick={() => setViewMode('gallery')}
                   >
                     {t('library.details.gallery') || 'Climax Gallery'}
@@ -280,58 +286,58 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
                 )}
                 <button
                   type="button"
-                  className="person-credits-row__mode-switch-btn"
+                  className="u-btn-glass-pill"
                   onClick={() => setViewMode('library')}
                 >
                   {t('library.details.backToMyLibrary') || 'Back to My Library'}
                 </button>
-              </div>
+              </Inline>
             )}
           </Inline>
 
-          <div className="person-credits-discover-groups person-credits-discover-groups-discover-style">
+          <Inline gap="2xl">
             {hasMovies && (
               <Inline gap="sm" align="center" className="person-credits-discover-group">
-                <span className="person-credits-discover-group-title">{t('library.details.movies') || 'Movies'}</span>
+                <span className="u-text-muted-caps">{t('library.details.movies') || 'Movies'}</span>
                 <Tabs
                   tabs={movieTabs}
                   value={activeDiscoverTab}
                   onChange={setActiveDiscoverTab}
-                  variant="sub"
+                  variant="glass-pill"
                 />
               </Inline>
             )}
 
             {hasTv && (
               <Inline gap="sm" align="center" className="person-credits-discover-group">
-                <span className="person-credits-discover-group-title">{t('library.details.tvShows') || 'TV Shows'}</span>
+                <span className="u-text-muted-caps">{t('library.details.tvShows') || 'TV Shows'}</span>
                 <Tabs
                   tabs={tvTabs}
                   value={activeDiscoverTab}
                   onChange={setActiveDiscoverTab}
-                  variant="sub"
+                  variant="glass-pill"
                 />
               </Inline>
             )}
 
             {hasScenes && (
               <Inline gap="sm" align="center" className="person-credits-discover-group">
-                <span className="person-credits-discover-group-title">{t('library.details.scenes') || 'Scenes'}</span>
+                <span className="u-text-muted-caps">{t('library.details.scenes') || 'Scenes'}</span>
                 <Tabs
                   tabs={sceneTabs}
                   value={activeDiscoverTab}
                   onChange={setActiveDiscoverTab}
-                  variant="sub"
+                  variant="glass-pill"
                 />
               </Inline>
             )}
-          </div>
+          </Inline>
 
           {/* DISCOVER INFINITE GRID */}
           {activeDiscoverTab && (
-            <div className="person-credits-discover-grid-wrapper">
+            <div className={`${styles['discover-grid-wrapper']} u-flex-column u-w-full u-overflow-y-auto`}>
               {activeGridQuery.isLoading ? (
-                <div className="person-credits-discover-loading">
+                <div className={styles['discover-loading']}>
                   <Spinner label={(() => {
                     const name = item?.name || 'this performer';
                     const sourceName = activeSource === 'porndb' ? 'PornDB' : (activeSource === 'stashdb' ? 'StashDB' : (activeSource === 'fansdb' ? 'FansDB' : 'TMDb'));
@@ -339,9 +345,12 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
                   })()} />
                 </div>
               ) : !activeGridQuery.isLoading && accumulatedItems.length === 0 ? (
-                <div className="person-credits-discover-empty">
-                  {t(`library.details.emptyCredits_${activeDiscoverTab}`) || t('library.details.emptyCredits') || 'No credits found for this source.'}
-                </div>
+                <EmptyState
+                  title={t(`library.details.emptyCredits_${activeDiscoverTab}`) || t('library.details.emptyCredits') || 'No credits found for this source.'}
+                  border="dashed"
+                  background="translucent"
+                  size="sm"
+                />
               ) : (
                 <>
                   <Grid variant={isSceneGrid ? 'auto-scene' : 'auto-poster'}>
@@ -363,18 +372,18 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
                     {isFetchingNextPage && Array.from({ length: 12 }).map((_, idx) => (
                       <div
                         key={`loading-skeleton-${idx}`}
-                        className={`person-credits-card skeleton-card`}
+                        className={`${styles.card} ${styles['skeleton-card']}`}
                       >
-                        <div className="person-credits-card__poster-container skeleton-shimmer" />
+                        <div className={`${styles['poster-container']} skeleton-shimmer`} />
                       </div>
                     ))}
                   </Grid>
 
                   {/* Sentinel element to trigger next page load */}
-                  {hasMore && <div ref={observerRef} className="person-credits-grid__sentinel" />}
+                  {hasMore && <div ref={observerRef} />}
 
                   {!hasMore && accumulatedItems.length > 0 && (
-                    <div className="person-credits-grid__finished">
+                    <div className={`${styles['grid-finished']} u-font-2xs u-text-muted u-text-center`}>
                       {t('library.details.finishedCredits') || 'All credits loaded.'}
                     </div>
                   )}
@@ -386,15 +395,15 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
       )}
 
       {viewMode === 'gallery' && (
-        <div className="person-credits-detail-panel">
+        <div className={`${styles['detail-panel']} u-flex-column u-glass-panel`}>
           <div className="person-credits-discover-header person-credits-discover-header-layout">
-            <h4 className="person-credits-row__title person-credits-row-title-style">
+            <h4 className={styles.title}>
               {t('library.details.galleryTitle') || 'Climax Gallery'}
             </h4>
-            <div className="person-credits-header-actions">
+            <Inline gap="md">
               <button
                 type="button"
-                className="person-credits-row__mode-switch-btn"
+                className="u-btn-glass-pill"
                 onClick={() => setViewMode('discover')}
               >
                 {t('library.details.wantToDiscover') || 'Want to discover?'}
@@ -402,44 +411,31 @@ export default function PersonCreditsSections({ id, item, navigate, t }) {
               {myLibraryTabs.length > 0 && (
                 <button
                   type="button"
-                  className="person-credits-row__mode-switch-btn"
+                  className="u-btn-glass-pill"
                   onClick={() => setViewMode('library')}
                 >
                   {t('library.details.backToMyLibrary') || 'Back to My Library'}
                 </button>
               )}
-            </div>
+            </Inline>
           </div>
 
-          <div className="person-credits-gallery-grid">
-            {item.finishes?.map((finish) => {
+          <Grid variant="auto-gallery" className="u-overflow-y-auto u-flex-1 u-py-sm">
+            {validFinishes.map((finish) => {
               const fullSnapUrl = getSnapshotUrl(finish.snapshot_path);
               return (
-                <div key={finish.id} className="person-credits-gallery-item">
-                  <img
-                    src={fullSnapUrl}
-                    alt={finish.media_title}
-                    className="person-credits-gallery-img"
-                    onClick={() => setLightboxUrl(fullSnapUrl)}
-                  />
-                  <div className="person-credits-gallery-overlay">
-                    <div className="person-credits-gallery-info">
-                      <span className="person-credits-gallery-title">{finish.media_title}</span>
-                      <span className="person-credits-gallery-time">{formatTime(finish.video_position)}</span>
-                    </div>
-                    <button
-                      type="button"
-                      className="person-credits-gallery-play-btn"
-                      onClick={() => playMutation.mutate({ itemId: finish.media_item_id, start: finish.video_position })}
-                      title={t('library.details.playMoment') || 'Play Moment'}
-                    >
-                      <Play size={14} fill="currentColor" />
-                    </button>
-                  </div>
-                </div>
+                <GalleryCard
+                  key={finish.id}
+                  imageUrl={fullSnapUrl}
+                  title={finish.media_title}
+                  timeLabel={formatTime(finish.video_position)}
+                  onPlayClick={() => playMutation.mutate({ itemId: finish.media_item_id, start: finish.video_position })}
+                  onImageClick={() => setLightboxUrl(fullSnapUrl)}
+                  playTitle={t('library.details.playMoment') || 'Play Moment'}
+                />
               );
             })}
-          </div>
+          </Grid>
         </div>
       )}
 

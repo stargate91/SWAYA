@@ -83,6 +83,7 @@ export default function Popover({
         <div
           ref={popoverRef}
           className={`${styles.popover} ${align === 'right' ? styles['align-right'] : styles['align-left']} ${coords.openUpwards ? styles['is-upwards'] : ''}`}
+          onWheel={(e) => e.stopPropagation()}
           // eslint-disable-next-line react/forbid-dom-props
           style={{
             '--popover-top': `${coords.top}px`,

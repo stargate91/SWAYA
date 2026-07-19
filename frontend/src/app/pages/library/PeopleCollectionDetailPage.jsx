@@ -89,7 +89,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
       }
       if (!isPeople) return;
 
-      const scrollableGrid = e.target.closest('.person-credits-discover-grid-wrapper, .person-credits-gallery-grid');
+      const scrollableGrid = e.target.closest('[class*="discover-grid-wrapper"], .u-overflow-y-auto');
 
       if (Math.abs(e.deltaY) > 5) {
         if (e.deltaY > 0) {
@@ -101,7 +101,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
           }
         } else if (e.deltaY < 0) {
           if (isScrolled) {
-            if (scrollableGrid && scrollableGrid.scrollTop > 0) {
+            if (scrollableGrid) {
               return;
             }
             setIsScrolled(false);

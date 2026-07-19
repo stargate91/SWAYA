@@ -3,6 +3,14 @@
   min-width: 0;
 }
 
+.u-flex-shrink-0 {
+  flex-shrink: 0;
+}
+
+.u-overflow-hidden {
+  overflow: hidden;
+}
+
 .u-span-2 {
   grid-column: span 2;
 }
@@ -59,7 +67,8 @@
 }
 
 .u-w-genre {
-  width: calc(4 * var(--space-4xl)); /* 10rem */
+  width: calc(4 * var(--space-4xl));
+  /* 10rem */
 }
 
 .u-w-year {
@@ -131,4 +140,9 @@
 
 .u-overflow-y-auto {
   overflow-y: auto;
+}
+
+.u-flex-column {
+  display: flex;
+  flex-direction: column;
 }

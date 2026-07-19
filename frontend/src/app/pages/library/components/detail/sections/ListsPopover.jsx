@@ -52,6 +52,7 @@ export default function ListsPopover({ item, type, t }) {
       }
     >
       <Card
+        variant="glass-shaded"
         title={t('lists.title') || 'Lists'}
         headerVariant="shaded"
         padding="md"

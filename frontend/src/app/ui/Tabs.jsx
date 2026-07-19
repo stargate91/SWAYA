@@ -3,8 +3,22 @@ import styles from './Tabs.module.css';
 
 export function Tabs({ tabs, value, onChange, variant, className = '', tabClassName = '' }) {
   const isSub = variant === 'sub';
-  const containerClass = `${isSub ? styles['tabs--sub'] : styles['tabs']} ${className}`.trim();
-  const tabClassBase = isSub ? styles['tab--sub'] : styles['tab'];
+  const isGlassPill = variant === 'glass-pill';
+
+  let containerClass = styles['tabs'];
+  if (isSub) {
+    containerClass = styles['tabs--sub'];
+  } else if (isGlassPill) {
+    containerClass = styles['tabs--glass-pill'];
+  }
+  containerClass = `${containerClass} ${className}`.trim();
+
+  let tabClassBase = styles['tab'];
+  if (isSub) {
+    tabClassBase = styles['tab--sub'];
+  } else if (isGlassPill) {
+    tabClassBase = styles['tab--glass-pill'];
+  }
 
   return (
     <div className={containerClass} role="tablist" aria-label="Sections">
@@ -24,7 +38,7 @@ export function Tabs({ tabs, value, onChange, variant, className = '', tabClassN
             className={buttonClass}
             onClick={() => onChange(tab.value)}
           >
-            {Icon && <Icon size={isSub ? 12 : 14} className={styles['tab-icon']} />}
+            {Icon && <Icon size={isSub || isGlassPill ? 12 : 14} className={styles['tab-icon']} />}
             <span className={styles['tab-label']}>{tab.label}</span>
             {typeof tab.count === 'number' ? (
               <strong className={countClass}>
@@ -50,7 +64,7 @@ Tabs.propTypes = {
   ).isRequired,
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
-  variant: PropTypes.oneOf(['sub']),
+  variant: PropTypes.oneOf(['sub', 'glass-pill']),
   className: PropTypes.string,
   tabClassName: PropTypes.string,
 };
