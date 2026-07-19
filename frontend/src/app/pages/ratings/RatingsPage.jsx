@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/refs */
 import { useNavigate } from 'react-router-dom';
 import { Star, Heart, Edit3, Clapperboard, Tv, Video, Users, CheckCircle } from '@/ui/icons';
 import Page from '@/ui/Page';

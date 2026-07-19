@@ -341,7 +341,7 @@ export function useRatingsPageState() {
     if (!editingItem) return;
     await handleSaveComment(editingItem, reviewText);
     setEditingItem(null);
-  }, [editingItem, reviewText]);
+  }, [editingItem, reviewText, handleSaveComment]);
 
   // Close drawer on ESC
   useEffect(() => {
