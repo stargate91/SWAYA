@@ -67,9 +67,9 @@ export default function ProfileStep({
           <OnboardingOrbitHero
             icon={User}
             chips={[
-              { label: t('onboarding.profile.pill1', { defaultValue: 'Nickname' }), position: 'top-right' },
-              { label: t('onboarding.profile.pill2', { defaultValue: 'Avatar' }), position: 'bottom-left' },
-              { label: t('onboarding.profile.pill3', { defaultValue: 'Identity' }), position: 'top-left' },
+              { label: 'Aka', position: 'top-right' },
+              { label: 'Alter Ego', position: 'bottom-left' },
+              { label: 'Who Dis?', position: 'top-left' },
             ]}
           />
         )}

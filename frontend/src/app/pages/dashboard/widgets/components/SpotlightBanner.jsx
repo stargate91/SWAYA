@@ -27,7 +27,9 @@ export const SpotlightBanner = ({ item, watchlistIds, onWatchlist, onCardClick }
       <div className={`${styles['recommend-spotlight-gradient']} ${styles['recommend-spotlight-gradient--bottom']}`} />
 
       <div className={styles['recommend-spotlight-copy']}>
-        <h2 className={styles['recommend-spotlight-title']} onClick={() => onCardClick(item)}>{title}</h2>
+        <Text as="h2" variant="hero" weight="extrabold" className={styles['recommend-spotlight-title']} onClick={() => onCardClick(item)}>
+          {title}
+        </Text>
         <Inline gap="lg" align="center" className={styles['recommend-spotlight-meta']}>
           {ratingToDisplay ? (
             <Pill variant={ratingSource} size="lg">
@@ -35,9 +37,9 @@ export const SpotlightBanner = ({ item, watchlistIds, onWatchlist, onCardClick }
               {ratingToDisplay.toFixed(1)}
             </Pill>
           ) : null}
-          {year ? <span className={styles['recommend-spotlight-year']}>{year}</span> : null}
+          {year ? <Text color="primary" className={styles['recommend-spotlight-year']}>{year}</Text> : null}
         </Inline>
-        <Text as="p" clamp={3} className={styles['recommend-spotlight-overview']}>
+        <Text as="p" clamp={3} variant="small" color="secondary" style={{ marginBottom: 'var(--space-2xl)' }}>
           {item.overview}
         </Text>
         <div className={styles['recommend-spotlight-actions']}>

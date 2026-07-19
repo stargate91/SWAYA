@@ -6,6 +6,7 @@
   place-items: center;
   margin-bottom: 0.25rem;
   isolation: isolate;
+  overflow: hidden;
 }
 
 .welcome-hero-shell::before {
@@ -119,6 +120,8 @@
   text-transform: uppercase;
   white-space: nowrap;
   backdrop-filter: blur(0.75rem);
+  animation: heroFloat var(--hero-float-dur, 5.2s) var(--hero-float-ease, ease-in-out) infinite;
+  animation-delay: var(--hero-float-delay, 0s);
 }
 
 .welcome-hero-chip svg {
@@ -126,12 +129,9 @@
 }
 
 .welcome-hero-chip-orbit {
-  --hero-float-dur: 5.2s;
-  --hero-float-ease: ease-in-out;
   position: absolute;
   transform: translate(-50%, -50%);
   pointer-events: none;
-  animation: heroFloat var(--hero-float-dur) var(--hero-float-ease) infinite;
 }
 
 @keyframes pulseGlow {

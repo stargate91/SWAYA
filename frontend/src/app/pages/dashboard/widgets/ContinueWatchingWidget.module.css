@@ -8,9 +8,6 @@
   align-items: center;
   gap: var(--space-md);
   margin-bottom: var(--space-lg);
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-extrabold);
-  color: var(--color-text-primary);
 }
 
 .continue-watching-header__icon {

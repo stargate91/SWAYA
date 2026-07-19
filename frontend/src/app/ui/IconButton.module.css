@@ -66,12 +66,6 @@
   border: 0;
 }
 
-.icon-button[data-variant="primary-neutral"] {
-  background: var(--button-primary-neutral-bg);
-  color: var(--button-primary-neutral-color);
-  border-color: var(--button-primary-neutral-border);
-}
-
 .icon-button[data-variant="secondary"] {
   background: var(--button-secondary-bg);
   color: var(--button-secondary-color);
@@ -176,10 +170,6 @@
 
 .icon-button[data-variant="primary"]:hover:not(:disabled) {
   filter: var(--button-primary-hover-filter);
-}
-
-.icon-button[data-variant="primary-neutral"]:hover:not(:disabled) {
-  background: var(--button-primary-neutral-hover-bg);
 }
 
 .icon-button[data-variant="secondary"]:hover:not(:disabled) {
@@ -360,3 +350,42 @@
   background: color-mix(in srgb, var(--color-text-primary) 15%, transparent);
   transform: translateY(-50%);
 }
+
+/* Generalized Toggle state children swap */
+.icon-button[aria-pressed="true"] .state-active {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-button[aria-pressed="true"] .state-hover {
+  display: none;
+}
+
+.icon-button[aria-pressed="true"]:hover:not(:disabled) .state-active {
+  display: none !important;
+}
+
+.icon-button[aria-pressed="true"]:hover:not(:disabled) .state-hover {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Generalized destructive hover styling */
+.icon-button[aria-pressed="true"][data-destructive-hover="true"]:hover:not(:disabled) {
+  background: var(--button-danger-bg);
+  border-color: var(--button-danger-border);
+  color: var(--button-danger-color);
+  box-shadow: 0 2px 0.5rem color-mix(in srgb, var(--color-state-danger) 20%, transparent);
+  transform: none;
+}
+
+/* Border Radius Overrides */
+.icon-button[data-radius="none"] { border-radius: 0; }
+.icon-button[data-radius="xs"] { border-radius: var(--radius-xs); }
+.icon-button[data-radius="sm"] { border-radius: var(--radius-sm); }
+.icon-button[data-radius="md"] { border-radius: var(--radius-md); }
+.icon-button[data-radius="lg"] { border-radius: var(--radius-lg); }
+.icon-button[data-radius="xl"] { border-radius: var(--radius-xl); }
+.icon-button[data-radius="full"] { border-radius: var(--radius-full); }

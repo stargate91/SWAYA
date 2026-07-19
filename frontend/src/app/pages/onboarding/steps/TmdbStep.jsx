@@ -25,9 +25,9 @@ export default function TmdbStep({
           <OnboardingOrbitHero
             icon={Key}
             chips={[
-              { label: 'TMDB' },
-              { label: 'v3 Key' },
-              { label: 'v4 Token' },
+              { label: 'Movie Catalog' },
+              { label: 'Art Finder' },
+              { label: 'Cast Info' },
             ]}
           />
         )}

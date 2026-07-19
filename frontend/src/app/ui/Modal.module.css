@@ -32,6 +32,10 @@
   animation: scale-up var(--motion-duration-slow) var(--motion-ease-emphasized) forwards;
 }
 
+.root:focus {
+  outline: none;
+}
+
 @keyframes scale-up {
   from {
     transform: scale(0.97) translateY(0.5rem);

@@ -3,39 +3,12 @@
   gap: var(--space-md);
 }
 
-
-
-.review-drawer-media-title {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  font-weight: var(--font-weight-semibold);
-}
-
 .review-drawer__content {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
   flex: 1;
   overflow-y: auto;
-}
-
-.review-drawer__textarea {
-  flex: 1;
-  width: 100%;
-  min-height: 9.375rem;
-  background: var(--color-bg-elevated);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-sm);
-  color: var(--color-text-primary);
-  padding: var(--space-md);
-  font-family: var(--font-sans);
-  font-size: var(--font-size-sm);
-  resize: none;
-  outline: none;
-}
-
-.review-drawer__textarea:focus {
-  border-color: var(--color-accent-blue);
 }
 
 .review-drawer__footer {

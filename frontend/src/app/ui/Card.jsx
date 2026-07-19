@@ -7,7 +7,7 @@ import styles from './Card.module.css';
  * @param {string} [props.title] - Card header title text
  * @param {React.ReactNode} [props.eyebrow] - Small text label above the title
  * @param {React.ReactNode} [props.actions] - Toolbar button items in the header
- * @param {'default' | 'danger' | 'flat-glass' | 'interactive-glass' | 'soft' | 'focus-panel' | 'transparent' | 'stat'} [props.variant] - Card color scheme style flavor
+ * @param {'default' | 'flat-glass' | 'interactive-glass' | 'soft' | 'glass-shaded' | 'tag'} [props.variant] - Card color scheme style flavor
  * @param {'default' | 'shaded'} [props.headerVariant] - Card header design flavor
  * @param {boolean} [props.divider] - Whether to show a divider line below the header
  * @param {boolean} [props.glowBlob] - Whether to show a decorative glowing blur blob in background
@@ -15,6 +15,8 @@ import styles from './Card.module.css';
  * @param {React.ReactNode} props.children - Inner card content body
  * @param {string} [props.className] - Additional custom class names
  */
+import PropTypes from 'prop-types';
+
 export default function Card({
   title,
   eyebrow,
@@ -64,6 +66,22 @@ export default function Card({
     </section>
   );
 }
+
+Card.propTypes = {
+  title: PropTypes.string,
+  eyebrow: PropTypes.node,
+  actions: PropTypes.node,
+  children: PropTypes.node,
+  variant: PropTypes.oneOf(['default', 'flat-glass', 'interactive-glass', 'soft', 'glass-shaded', 'tag']),
+  headerVariant: PropTypes.oneOf(['default', 'shaded']),
+  divider: PropTypes.bool,
+  glowBlob: PropTypes.bool,
+  padding: PropTypes.oneOf(['default', 'md', 'xl', 'none']),
+  flex: PropTypes.number,
+  fullWidth: PropTypes.bool,
+  fullHeight: PropTypes.bool,
+  className: PropTypes.string,
+};
 
 
 

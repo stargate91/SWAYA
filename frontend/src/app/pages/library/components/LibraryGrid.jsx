@@ -199,7 +199,7 @@ export default function LibraryGrid({
               />
             </Stack>
           ) : (
-            <Grid variant="tags">
+            <Grid variant="auto-gallery" gap="xl">
               {paginatedItems.map((item, index) => {
                 const samplePreviews = Array.isArray(item.sample_previews) ? item.sample_previews.slice(0, 3) : [];
                 const previewCount = samplePreviews.length;

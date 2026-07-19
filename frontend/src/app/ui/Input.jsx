@@ -18,6 +18,8 @@ export default function Input({
   rightElement,
   expandOnFocus = false,
   flex,
+  multiline = false,
+  resizable = 'vertical',
   ...props
 }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -33,13 +35,13 @@ export default function Input({
 
   const wrapperClass = `${styles['input-wrapper']} ${styles[`input-wrapper--${size}`]} ${
     error ? styles['input-wrapper--error'] : ''
-  }`.trim();
+  } ${multiline ? styles['input-wrapper--multiline'] : ''}`.trim();
 
   const fieldClass = `${styles['input-field']} ${
     expandOnFocus ? styles['input-field--expand-on-focus'] : ''
   } ${flex === 1 ? styles['flex-1'] : ''} ${className}`.trim();
 
-  const inputClass = `${styles['input']} ${styles[`input--${size}`]}`.trim();
+  const inputClass = `${styles['input']} ${styles[`input--${size}`]} ${multiline ? styles['textarea'] : ''}`.trim();
 
   return (
     <Field
@@ -56,18 +58,33 @@ export default function Input({
             {leftElement}
           </div>
         )}
-        <input
-          id={inputId}
-          ref={inputRef}
-          className={inputClass}
-          type={inputType}
-          aria-invalid={error ? 'true' : undefined}
-          aria-describedby={[
-            hint ? hintId : null,
-            error ? errorId : null,
-          ].filter(Boolean).join(' ') || undefined}
-          {...props}
-        />
+        {multiline ? (
+          <textarea
+            id={inputId}
+            ref={inputRef}
+            className={inputClass}
+            style={{ resize: resizable }}
+            aria-invalid={error ? 'true' : undefined}
+            aria-describedby={[
+              hint ? hintId : null,
+              error ? errorId : null,
+            ].filter(Boolean).join(' ') || undefined}
+            {...props}
+          />
+        ) : (
+          <input
+            id={inputId}
+            ref={inputRef}
+            className={inputClass}
+            type={inputType}
+            aria-invalid={error ? 'true' : undefined}
+            aria-describedby={[
+              hint ? hintId : null,
+              error ? errorId : null,
+            ].filter(Boolean).join(' ') || undefined}
+            {...props}
+          />
+        )}
         {isPassword && (
           <button
             type="button"

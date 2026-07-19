@@ -27,7 +27,6 @@ export default function ListsPopover({ item, type, t }) {
   } = useListManagement({ item, type, t });
 
   const [newListName, setNewListName] = useState('');
-  const [isHovered, setIsHovered] = useState(false);
 
   const onSubmitCreate = async (e) => {
     e.preventDefault();
@@ -60,17 +59,24 @@ export default function ListsPopover({ item, type, t }) {
         actions={watchlist && (
           <Button
             type="button"
-            variant={isWatchlistAdded ? 'success' : 'glass-accent'}
+            variant={isWatchlistAdded ? 'success' : 'glass'}
             className={styles['watchlist-btn']}
             aria-pressed={isWatchlistAdded}
+            destructiveHover={true}
             size="sm"
             onClick={() => handleToggleList(watchlist)}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
             title={isWatchlistAdded ? (t('lists.remove_from_watchlist') || 'Remove from Watchlist') : (t('lists.add_to_watchlist') || 'Add to Watchlist')}
-            leftIcon={isWatchlistAdded ? (isHovered ? <Minus size={14} /> : <Check size={14} />) : <Plus size={14} />}
           >
-            {isWatchlistAdded ? (isHovered ? (t('common.remove') || 'Remove') : (t('lists.watchlist_name') || 'Watchlist')) : (t('lists.watchlist_name') || 'Watchlist')}
+            {isWatchlistAdded ? (
+              <>
+                <span className="state-active"><Check size={14} /> {t('lists.watchlist_name') || 'Watchlist'}</span>
+                <span className="state-hover"><Minus size={14} /> {t('common.remove') || 'Remove'}</span>
+              </>
+            ) : (
+              <>
+                <Plus size={14} /> {t('lists.watchlist_name') || 'Watchlist'}
+              </>
+            )}
           </Button>
         )}
       >

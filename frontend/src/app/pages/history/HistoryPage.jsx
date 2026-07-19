@@ -10,6 +10,8 @@ import WatchedHistoryList from './components/WatchedHistoryList';
 import PeaksHistoryList from './components/PeaksHistoryList';
 import styles from './HistoryPage.module.css';
 import Inline from '@/ui/Inline';
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
 import useHistoryPage from './hooks/useHistoryPage';
 
 export default function HistoryPage() {
@@ -51,26 +53,26 @@ export default function HistoryPage() {
       description: t('historyPage.confirmDesc') || 'This will physically move and rename all successfully organized files back to their previous naming scheme and folders.',
       icon: AlertTriangle,
       content: (
-        <div className="history-undo-modal">
-          <p className="history-undo-modal__warning">
+        <Stack gap="md" style={{ padding: 'var(--space-sm) 0' }}>
+          <Text variant="body" color="primary" style={{ display: 'block', marginBottom: 'var(--space-lg)' }}>
             {t('historyPage.confirmWarning') || 'Are you sure you want to revert this batch?'}
-          </p>
-          <div className="history-undo-modal__details">
-            <Inline align="center" justify="between" className="history-undo-modal__row">
-              <span className="history-undo-modal__label">{t('historyPage.batchLabel') || 'Batch:'}</span>
-              <span className="history-undo-modal__value">{batch.name}</span>
+          </Text>
+          <Stack gap="sm" style={{ background: 'var(--ui-surface-soft)', padding: 'var(--space-md)', borderRadius: 'var(--radius-md)' }}>
+            <Inline align="center" justify="between">
+              <Text variant="small" color="secondary">{t('historyPage.batchLabel') || 'Batch:'}</Text>
+              <Text variant="small" color="primary" weight="semibold">{batch.name}</Text>
             </Inline>
-            <Inline align="center" justify="between" className="history-undo-modal__row">
-              <span className="history-undo-modal__label">{t('historyPage.filesLabel') || 'Files:'}</span>
-              <span className="history-undo-modal__value--success">
+            <Inline align="center" justify="between">
+              <Text variant="small" color="secondary">{t('historyPage.filesLabel') || 'Files:'}</Text>
+              <Text variant="small" weight="bold" style={{ color: 'var(--color-state-success)' }}>
                 {t('historyPage.succeededCount', { defaultValue: '{{count}} succeeded', count: batch.success_count })}
-              </span>
+              </Text>
             </Inline>
-          </div>
-        </div>
+          </Stack>
+        </Stack>
       ),
       footer: (
-        <Inline gap="md" align="center" justify="end" className="history-undo-modal__footer">
+        <Inline gap="md" align="center" justify="end" fullWidth>
           <Button variant="secondary-neutral" onClick={closeModal}>
             {t('common.cancel') || 'Cancel'}
           </Button>

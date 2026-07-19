@@ -26,9 +26,9 @@ export default function FolderStep({
           <OnboardingOrbitHero
             icon={FolderOpen}
             chips={[
-              { label: 'Scan folder' },
-              { label: 'Library' },
-              { label: 'Organize' },
+              { label: 'Watch Zone' },
+              { label: 'Media Vault' },
+              { label: 'Tidy Up' },
             ]}
           />
         )}

@@ -25,6 +25,10 @@
     transform var(--motion-fast);
 }
 
+.container .option.is-active {
+  color: var(--color-text-primary);
+}
+
 .option:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);

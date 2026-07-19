@@ -1,5 +1,6 @@
 import SegmentedControl from '@/ui/SegmentedControl';
 import { Search } from '@/ui/icons';
+import Input from '@/ui/Input';
 import styles from './ListsAddDrawer.module.css';
 
 export default function DrawerSearchHeader({
@@ -103,15 +104,13 @@ export default function DrawerSearchHeader({
         />
       )}
 
-      <div className={styles['lists-drawer__search-input-wrap']}>
-        <Search size={16} className={styles['lists-drawer__search-icon']} />
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={listType === 'person' ? 'Search performers...' : 'Search movies, series...'}
-        />
-      </div>
+      <Input
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder={listType === 'person' ? 'Search performers...' : 'Search movies, series...'}
+        leftElement={<Search size={16} />}
+      />
     </div>
   );
 }

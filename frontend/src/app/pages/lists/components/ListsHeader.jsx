@@ -5,8 +5,10 @@ import Dropdown from '@/ui/Dropdown';
 import Tooltip from '@/ui/Tooltip';
 import { Plus, Download, Search, PenLine } from '@/ui/icons';
 import ListCollageIcon from './ListCollageIcon';
-import styles from './ListsHeader.module.css';
 import Inline from '@/ui/Inline';
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
+import styles from './ListsHeader.module.css';
 
 export default function ListsHeader({
   activeList,
@@ -66,8 +68,8 @@ export default function ListsHeader({
   return (
     <div ref={themeRef} className={styles.contents}>
       <div ref={heroRef} className={styles['lists-header-hero']}>
-        <Inline align="start" className={styles['lists-header__top-row']}>
-          <div className={styles['lists-header__left-group']}>
+        <Inline justify="between" align="start" fullWidth>
+          <Inline align="end" flex={1} style={{ minWidth: 0 }}>
             <div className={styles['lists-header__cover-container']}>
               <div
                 className={styles['lists-header__cover-wrapper']}
@@ -93,21 +95,27 @@ export default function ListsHeader({
                 </div>
               </div>
             </div>
-            <div className={styles['lists-header__meta-stack']}>
-              <Inline gap="md" align="center" className={styles['lists-header__title-row']}>
-                <h1 className={styles['lists-header__title']}>{activeList.name}</h1>
+            <Stack gap="sm">
+              <Inline gap="md" align="center">
+                <Text as="h1" variant="hero" weight="extrabold" truncate style={{ fontSize: '3.5rem', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+                  {activeList.name}
+                </Text>
               </Inline>
               {activeList.description && (
-                <p className={styles['lists-header__description']}>{activeList.description}</p>
+                <Text as="p" variant="small" color="secondary" style={{ opacity: 0.8, maxWidth: '37.5rem', lineHeight: 1.5 }}>
+                  {activeList.description}
+                </Text>
               )}
               {activeList.created_at && (
-                <div className={styles['lists-header__meta-row']}>
-                  <span className={styles['lists-header__date']}>{createdLabel}</span>
-                </div>
+                <Inline align="center" style={{ marginTop: 'var(--space-xs)' }}>
+                  <Text variant="small" weight="semibold" style={{ opacity: 0.85 }}>
+                    {createdLabel}
+                  </Text>
+                </Inline>
               )}
-            </div>
-          </div>
-          <Inline gap="md" align="center" className={styles['lists-header__right']}>
+            </Stack>
+          </Inline>
+          <Inline gap="md" align="center">
             <Tooltip content={t('lists.export') || 'Export JSON'} side="top">
               <Button
                 variant="secondary-neutral"
@@ -149,7 +157,7 @@ export default function ListsHeader({
       </div>
 
       <div className={`${styles['lists-header-filters']} ${isStuck ? styles['is-stuck'] : ''}`}>
-        <Inline gap="lg" align="center" className={styles['lists-header__bottom-left']}>
+        <Inline gap="lg" align="center" style={{ flex: 1, minWidth: 0, flexWrap: 'nowrap' }}>
           <div className={styles['lists-header__search-wrapper']}>
             <Input
               type="text"
@@ -162,8 +170,8 @@ export default function ListsHeader({
             />
           </div>
           {activeList.list_type !== 'person' && (
-            <Inline gap="sm" align="center" className={styles['lists-header__filter-wrapper']}>
-              <span className={styles['library-sorter-label']}>{t('library.filter.statusLabel') || 'Status:'}</span>
+            <Inline gap="sm" align="center">
+              <Text variant="small" weight="bold" color="muted" uppercase style={{ userSelect: 'none' }}>{t('library.filter.statusLabel') || 'Status:'}</Text>
               <Dropdown
                 value={watchedFilter}
                 onChange={(e) => setWatchedFilter(e.target.value)}
@@ -178,8 +186,8 @@ export default function ListsHeader({
             </Inline>
           )}
           {activeList.list_type !== 'person' && (
-            <Inline gap="sm" align="center" className={styles['lists-header__filter-wrapper']}>
-              <span className={styles['library-sorter-label']}>{t('lists.filter_media_type_label') || 'Type:'}</span>
+            <Inline gap="sm" align="center">
+              <Text variant="small" weight="bold" color="muted" uppercase style={{ userSelect: 'none' }}>{t('lists.filter_media_type_label') || 'Type:'}</Text>
               <Dropdown
                 value={mediaTypeFilter}
                 onChange={(e) => setMediaTypeFilter(e.target.value)}
@@ -196,8 +204,8 @@ export default function ListsHeader({
             </Inline>
           )}
           {activeList.list_type !== 'person' && (
-            <Inline gap="sm" align="center" className={styles['lists-header__filter-wrapper']}>
-              <span className={styles['library-sorter-label']}>{t('library.filter.genreLabel') || 'Genre:'}</span>
+            <Inline gap="sm" align="center">
+              <Text variant="small" weight="bold" color="muted" uppercase style={{ userSelect: 'none' }}>{t('library.filter.genreLabel') || 'Genre:'}</Text>
               <Dropdown
                 value={genreFilter}
                 onChange={(e) => setGenreFilter(e.target.value)}
@@ -211,8 +219,8 @@ export default function ListsHeader({
             </Inline>
           )}
           {activeList.list_type === 'person' && (
-            <Inline gap="sm" align="center" className={styles['lists-header__filter-wrapper']}>
-              <span className={styles['library-sorter-label']}>{t('library.filter.genderLabel') || 'Gender:'}</span>
+            <Inline gap="sm" align="center">
+              <Text variant="small" weight="bold" color="muted" uppercase style={{ userSelect: 'none' }}>{t('library.filter.genderLabel') || 'Gender:'}</Text>
               <Dropdown
                 value={genderFilter}
                 onChange={(e) => setGenderFilter(e.target.value)}
@@ -227,8 +235,8 @@ export default function ListsHeader({
             </Inline>
           )}
           {activeList.list_type === 'person' && (
-            <Inline gap="sm" align="center" className={styles['lists-header__filter-wrapper']}>
-              <span className={styles['library-sorter-label']}>{t('lists.filter_role_label') || 'Role:'}</span>
+            <Inline gap="sm" align="center">
+              <Text variant="small" weight="bold" color="muted" uppercase style={{ userSelect: 'none' }}>{t('lists.filter_role_label') || 'Role:'}</Text>
               <Dropdown
                 value={jobFilter}
                 onChange={(e) => setJobFilter(e.target.value)}
@@ -245,8 +253,8 @@ export default function ListsHeader({
             </Inline>
           )}
         </Inline>
-        <Inline gap="md" align="center" className={styles['lists-header__sorting-wrapper']}>
-          <span className={styles['library-sorter-label']}>{t('lists.sort_label') || 'Sort:'}</span>
+        <Inline gap="md" align="center">
+          <Text variant="small" weight="bold" color="muted" uppercase style={{ userSelect: 'none' }}>{t('lists.sort_label') || 'Sort:'}</Text>
           <Dropdown
             value={sortKey}
             options={sortOptions}

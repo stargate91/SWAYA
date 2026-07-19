@@ -1,15 +1,16 @@
 import styles from './OnboardingTimeline.module.css';
 
-export default function OnboardingTimeline({ step, isAnyGuideOpen }) {
+export default function OnboardingTimeline({ step, totalSteps = 7, isAnyGuideOpen }) {
+  const stepNums = Array.from({ length: totalSteps }, (_, i) => i + 1);
   return (
     <div className={`${styles['onboarding-timeline']} ${isAnyGuideOpen ? styles['is-hidden'] : ''}`}>
-      {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+      {stepNums.map((num) => (
         <div 
           key={num} 
           className={`${styles['timeline-dot-wrapper']} ${num <= step ? styles['is-active'] : ''} ${num === step ? styles['is-current'] : ''}`}
         >
           <div className={styles['timeline-dot']} />
-          {num < 7 && <div className={styles['timeline-line']} />}
+          {num < totalSteps && <div className={styles['timeline-line']} />}
         </div>
       ))}
     </div>

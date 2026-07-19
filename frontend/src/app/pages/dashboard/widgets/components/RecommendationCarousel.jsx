@@ -123,16 +123,17 @@ export const RecommendationCarousel = ({
                     onWatchlist(item, type);
                   }}
                   className={posterCardStyles['action-btn']}
-                  variant={isWatchlisted ? 'success' : 'glass-accent'}
+                  variant={isWatchlisted ? 'success' : 'glass'}
                   aria-pressed={isWatchlisted}
+                  destructiveHover={true}
                   size="sm"
                 >
                   {isWatchlisted ? (
                     <>
-                      <span className={posterCardStyles['action-btn-state-default']}>
+                      <span className="state-active">
                         <Check size={12} strokeWidth={3} /> {T('dashboard.watchlist.added') || 'Watchlisted'}
                       </span>
-                      <span className={posterCardStyles['action-btn-state-hover']}>
+                      <span className="state-hover">
                         <Minus size={12} strokeWidth={3} /> {T('common.remove') || 'Remove'}
                       </span>
                     </>

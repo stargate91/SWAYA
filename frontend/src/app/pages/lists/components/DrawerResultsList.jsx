@@ -4,6 +4,8 @@ import DrawerItemImage from './DrawerItemImage';
 import ResultAddButton from './ResultAddButton';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
 import styles from './ListsAddDrawer.module.css';
 
 export default function DrawerResultsList({
@@ -40,15 +42,15 @@ export default function DrawerResultsList({
       )}
 
       {!searching && results.length === 0 && query && (
-        <div className={styles['lists-drawer__empty']}>
+        <Text color="secondary" style={{ textAlign: 'center', display: 'block', padding: 'var(--space-2xl) 0', fontSize: 'var(--font-size-2xs)' }}>
           {t('common.noResults', { defaultValue: 'No results found.' })}
-        </div>
+        </Text>
       )}
 
       {!searching && results.length > 0 && filteredResults.length === 0 && (
-        <div className={styles['lists-drawer__empty']}>
+        <Text color="secondary" style={{ textAlign: 'center', display: 'block', padding: 'var(--space-2xl) 0', fontSize: 'var(--font-size-2xs)' }}>
           {t('lists.no_status_match', { defaultValue: 'No items match the selected status filter.' })}
-        </div>
+        </Text>
       )}
 
       {!searching && filteredResults.map((item) => {
@@ -77,10 +79,10 @@ export default function DrawerResultsList({
                 isBlurred={isBlurred}
               />
             </div>
-            <div className={styles['lists-drawer__item-info']}>
-              <span className={styles['lists-drawer__item-title']}>{n.title}</span>
-              <span className={styles['lists-drawer__item-subtitle']}>{n.subtitle}</span>
-            </div>
+            <Stack gap="none" flex={1} style={{ minWidth: 0 }}>
+              <Text variant="small" weight="semibold" color="primary" truncate>{n.title}</Text>
+              <Text variant="xsmall" color="secondary" style={{ opacity: 0.6 }}>{n.subtitle}</Text>
+            </Stack>
             <ResultAddButton
               added={added}
               onAdd={() => handleAdd(item)}

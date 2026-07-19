@@ -61,22 +61,6 @@
 
 
 
-.card[data-variant="danger"] {
-  border: 0.0625rem solid var(--ui-surface-danger-border);
-  background:
-    linear-gradient(180deg, var(--ui-surface-danger-tint) 0%, transparent 50%),
-    var(--ui-surface-card-gradient);
-  box-shadow: var(--ui-surface-danger-shadow), var(--shadow-md);
-}
-
-.card[data-variant="danger"] .eyebrow {
-  color: var(--color-state-danger);
-  font-weight: var(--font-weight-semibold);
-}
-
-.card[data-variant="danger"] .title {
-  color: color-mix(in srgb, var(--color-state-danger) 26%, var(--color-text-primary));
-}
 
 .card[data-variant="flat-glass"] {
   border: 1px solid color-mix(in srgb, var(--color-border-subtle) 88%, transparent);
@@ -159,28 +143,7 @@
   height: 100%;
 }
 
-.card[data-variant="focus-panel"] {
-  width: 100%;
-  background: var(--ui-library-tag-focus-bg);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-lg);
-  box-shadow:
-    var(--shadow-lg),
-    0 0 0 1px var(--color-border-subtle),
-    inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 4%, transparent);
-  backdrop-filter: none;
-  animation: slideDownFade var(--motion-slow);
-}
 
-.card[data-variant="transparent"] {
-  width: 100%;
-  background: transparent;
-  border-color: transparent;
-  border-radius: var(--radius-lg);
-  box-shadow: none;
-  backdrop-filter: none;
-  animation: slideDownFade var(--motion-slow);
-}
 
 .card[data-variant="glass-shaded"] {
   background: var(--media-detail-panel-section-bg);
@@ -192,21 +155,7 @@
   backface-visibility: hidden;
 }
 
-.card[data-variant="dashboard-section"] {
-  background: var(--media-detail-panel-section-bg);
-  border: 1px solid var(--media-detail-panel-section-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--media-detail-panel-section-shadow);
-  backdrop-filter: blur(1rem);
-}
 
-.card[data-variant="focus-panel"] .body,
-.card[data-variant="transparent"] .body {
-  padding: var(--space-2xl);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
-}
 
 /* Tag Card Variant */
 .card[data-variant="tag"] {

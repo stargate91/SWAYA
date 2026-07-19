@@ -23,9 +23,9 @@ export default function OmdbStep({
           <OnboardingOrbitHero
             icon={Key}
             chips={[
-              { label: 'OMDb' },
-              { label: 'Ratings' },
-              { label: 'IMDb' },
+              { label: 'Score Card' },
+              { label: 'Review Radar' },
+              { label: 'Tomato Meter' },
             ]}
           />
         )}

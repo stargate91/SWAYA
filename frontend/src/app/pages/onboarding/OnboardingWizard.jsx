@@ -14,8 +14,12 @@ const BRAND_TEXT = 'SWAYA';
 import WelcomeStep from './steps/WelcomeStep';
 import ChoiceStep from './steps/ChoiceStep';
 import ProfileStep from './steps/ProfileStep';
+import ContentTypeStep from './steps/ContentTypeStep';
 import TmdbStep from './steps/TmdbStep';
 import OmdbStep from './steps/OmdbStep';
+import StashdbStep from './steps/StashdbStep';
+import FansdbStep from './steps/FansdbStep';
+import PorndbStep from './steps/PorndbStep';
 import FolderStep from './steps/FolderStep';
 import CompletionStep from './steps/CompletionStep';
 import OnboardingTimeline from './components/OnboardingTimeline';
@@ -54,6 +58,7 @@ export default function OnboardingWizard() {
     locale,
     setLocale,
     step,
+    stepsList,
     stepDirection,
     configChoice,
     setConfigChoice,
@@ -67,17 +72,37 @@ export default function OnboardingWizard() {
     setUserName,
     avatarPath,
     setAvatarPath,
+    contentTypeChoice,
+    setContentTypeChoice,
     tmdbApiKey,
     setTmdbApiKey,
     tmdbBearerToken,
     setTmdbBearerToken,
     tmdbValidation,
     validateTmdb,
-    isValidatingApi,
     omdbApiKey,
     setOmdbApiKey,
     omdbValidation,
     validateOmdb,
+    stashdbApiKey,
+    setStashdbApiKey,
+    stashdbEndpoint,
+    setStashdbEndpoint,
+    stashdbValidation,
+    validateStashdb,
+    fansdbApiKey,
+    setFansdbApiKey,
+    fansdbEndpoint,
+    setFansdbEndpoint,
+    fansdbValidation,
+    validateFansdb,
+    porndbApiKey,
+    setPorndbApiKey,
+    porndbEndpoint,
+    setPorndbEndpoint,
+    porndbValidation,
+    validatePorndb,
+    isValidatingApi,
     scanDir,
     setScanDir,
     pickScanDir,
@@ -98,6 +123,8 @@ export default function OnboardingWizard() {
   const { data: settings = {} } = useSettingsQuery();
   const updateSettingsMutation = useUpdateSettingsMutation();
 
+  const currentStepKey = stepsList[step - 1];
+
   return (
     <div className="onboarding-wizard">
       <div className="onboarding-container">
@@ -107,15 +134,15 @@ export default function OnboardingWizard() {
           <div className="onboarding-title-group">
             <h1>{BRAND_TEXT}</h1>
           </div>
-          <OnboardingTimeline step={step} isAnyGuideOpen={false} />
+          <OnboardingTimeline step={step} totalSteps={stepsList.length} isAnyGuideOpen={false} />
         </div>
 
         {/* Content Panel */}
         <div className="onboarding-content">
           <div key={step} className={`step-transition step-transition--${stepDirection}`}>
 
-            {/* Step 1: Welcome & Lang */}
-            {step === 1 && (
+            {/* Step: Welcome & Lang */}
+            {currentStepKey === 'welcome' && (
               <WelcomeStep
                 locale={locale}
                 setLocale={setLocale}
@@ -126,8 +153,8 @@ export default function OnboardingWizard() {
               />
             )}
 
-            {/* Step 2: Config Choice */}
-            {step === 2 && (
+            {/* Step: Config Choice */}
+            {currentStepKey === 'choice' && (
               <ChoiceStep
                 configChoice={configChoice}
                 setConfigChoice={setConfigChoice}
@@ -136,8 +163,8 @@ export default function OnboardingWizard() {
               />
             )}
 
-            {/* Step 3: Profile Builder */}
-            {step === 3 && (
+            {/* Step: Profile Builder */}
+            {currentStepKey === 'profile' && (
               <ProfileStep
                 userName={userName}
                 setUserName={setUserName}
@@ -146,8 +173,16 @@ export default function OnboardingWizard() {
               />
             )}
 
-            {/* Step 4: TMDB API Setup */}
-            {step === 4 && (
+            {/* Step: Content Type Choice */}
+            {currentStepKey === 'content-type' && (
+              <ContentTypeStep
+                contentTypeChoice={contentTypeChoice}
+                setContentTypeChoice={setContentTypeChoice}
+              />
+            )}
+
+            {/* Step: TMDB API Setup */}
+            {currentStepKey === 'tmdb' && (
               <TmdbStep
                 tmdbApiKey={tmdbApiKey}
                 setTmdbApiKey={setTmdbApiKey}
@@ -160,8 +195,8 @@ export default function OnboardingWizard() {
               />
             )}
 
-            {/* Step 5: OMDB API Setup */}
-            {step === 5 && (
+            {/* Step: OMDB API Setup */}
+            {currentStepKey === 'omdb' && (
               <OmdbStep
                 omdbApiKey={omdbApiKey}
                 setOmdbApiKey={setOmdbApiKey}
@@ -172,8 +207,50 @@ export default function OnboardingWizard() {
               />
             )}
 
-            {/* Step 6: Folders Setup */}
-            {step === 6 && (
+            {/* Step: StashDB API Setup */}
+            {currentStepKey === 'stashdb' && (
+              <StashdbStep
+                stashdbApiKey={stashdbApiKey}
+                setStashdbApiKey={setStashdbApiKey}
+                stashdbEndpoint={stashdbEndpoint}
+                setStashdbEndpoint={setStashdbEndpoint}
+                stashdbValidation={stashdbValidation}
+                validateStashdb={validateStashdb}
+                isValidatingApi={isValidatingApi}
+                onOpenDocs={() => setDocsModal('docs_stashdb')}
+              />
+            )}
+
+            {/* Step: FansDB API Setup */}
+            {currentStepKey === 'fansdb' && (
+              <FansdbStep
+                fansdbApiKey={fansdbApiKey}
+                setFansdbApiKey={setFansdbApiKey}
+                fansdbEndpoint={fansdbEndpoint}
+                setFansdbEndpoint={setFansdbEndpoint}
+                fansdbValidation={fansdbValidation}
+                validateFansdb={validateFansdb}
+                isValidatingApi={isValidatingApi}
+                onOpenDocs={() => setDocsModal('docs_fansdb')}
+              />
+            )}
+
+            {/* Step: PornDB API Setup */}
+            {currentStepKey === 'porndb' && (
+              <PorndbStep
+                porndbApiKey={porndbApiKey}
+                setPorndbApiKey={setPorndbApiKey}
+                porndbEndpoint={porndbEndpoint}
+                setPorndbEndpoint={setPorndbEndpoint}
+                porndbValidation={porndbValidation}
+                validatePorndb={validatePorndb}
+                isValidatingApi={isValidatingApi}
+                onOpenDocs={() => setDocsModal('docs_porndb')}
+              />
+            )}
+
+            {/* Step: Folders Setup */}
+            {currentStepKey === 'folders' && (
               <FolderStep
                 scanDir={scanDir}
                 setScanDir={setScanDir}
@@ -187,8 +264,8 @@ export default function OnboardingWizard() {
               />
             )}
 
-            {/* Step 7: Completion */}
-            {step === 7 && <CompletionStep />}
+            {/* Step: Completion */}
+            {currentStepKey === 'completion' && <CompletionStep />}
 
           </div>
         </div>
@@ -196,7 +273,7 @@ export default function OnboardingWizard() {
         {/* Footer */}
         <div className="onboarding-footer">
           <>
-            {step > 1 && step < 7 ? (
+            {step > 1 && currentStepKey !== 'completion' ? (
               <Button variant="onboarding-back" leftIcon={<ArrowLeft size={14} />} animateIcon onClick={handlePrev}>
                 {t('common.back')}
               </Button>
@@ -204,20 +281,20 @@ export default function OnboardingWizard() {
               <div />
             )}
 
-            {step < 6 ? (
+            {currentStepKey !== 'folders' && currentStepKey !== 'completion' ? (
               <Button
                 variant="onboarding-continue"
                 rightIcon={<ArrowRight size={14} />}
                 animateIcon
                 onClick={handleNext}
                 disabled={
-                  (step === 2 && configChoice === 'import') ||
-                  (step === 3 && !userName.trim())
+                  (currentStepKey === 'choice' && configChoice === 'import') ||
+                  (currentStepKey === 'profile' && !userName.trim())
                 }
               >
                 {t('onboarding.buttons.continue')}
               </Button>
-            ) : step === 6 ? (
+            ) : currentStepKey === 'folders' ? (
               <Button
                 variant="onboarding-continue"
                 rightIcon={<ArrowRight size={14} />}

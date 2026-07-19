@@ -6,7 +6,7 @@ import styles from './IconButton.module.css';
  * @param {object} props
  * @param {React.ReactNode} props.children - Icon element to render
  * @param {string} [props.className] - Additional custom class names
- * @param {'primary' | 'primary-neutral' | 'secondary' | 'secondary-neutral' | 'ghost' | 'danger' | 'flat-danger' | 'close' | 'play-overlay' | 'carousel-arrow' | 'glass' | 'success'} [props.variant] - Button variant
+ * @param {'primary' | 'secondary' | 'secondary-neutral' | 'ghost' | 'danger' | 'flat-danger' | 'close' | 'play-overlay' | 'carousel-arrow' | 'glass' | 'success'} [props.variant] - Button variant
  * @param {'xs' | 'sm' | 'md' | 'lg' | 'md-btn'} [props.size] - Button size
  * @param {string} [props.label] - Accessible label
  * @param {string} [props.title] - Tooltip text
@@ -22,6 +22,8 @@ export default function IconButton({
   title,
   wrapped = false,
   wrapperHoverOnly = false,
+  destructiveHover = false,
+  radius,
   ...props
 }) {
   const accessibleLabel = label || title;
@@ -30,6 +32,8 @@ export default function IconButton({
     <button
       data-variant={variant}
       data-size={size}
+      data-destructive-hover={destructiveHover}
+      data-radius={radius}
       className={`${styles['icon-button']} ui-icon-button ${className}`.trim()}
       aria-label={accessibleLabel}
       title={title === null ? undefined : (title || accessibleLabel)}
@@ -52,3 +56,29 @@ export default function IconButton({
 
   return button;
 }
+
+import PropTypes from 'prop-types';
+IconButton.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+  variant: PropTypes.oneOf([
+    'primary',
+    'secondary',
+    'secondary-neutral',
+    'ghost',
+    'danger',
+    'flat-danger',
+    'close',
+    'play-overlay',
+    'carousel-arrow',
+    'glass',
+    'success',
+  ]),
+  size: PropTypes.oneOf(['xs', 'sm', 'md', 'lg', 'md-btn']),
+  label: PropTypes.string,
+  title: PropTypes.string,
+  wrapped: PropTypes.bool,
+  wrapperHoverOnly: PropTypes.bool,
+  destructiveHover: PropTypes.bool,
+  radius: PropTypes.oneOf(['none', 'xs', 'sm', 'md', 'lg', 'xl', 'full']),
+};

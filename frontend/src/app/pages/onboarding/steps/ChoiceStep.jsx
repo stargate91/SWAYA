@@ -20,9 +20,9 @@ export default function ChoiceStep({
           <OnboardingOrbitHero
             icon={Cpu}
             chips={[
-              { label: 'Setup', position: 'top-right' },
-              { label: 'Import', position: 'bottom-left' },
-              { label: 'Profile', position: 'top-left' },
+              { label: 'Fresh Start', position: 'top-right' },
+              { label: 'Time Machine', position: 'bottom-left' },
+              { label: 'Fast Track', position: 'top-left' },
             ]}
           />
         )}

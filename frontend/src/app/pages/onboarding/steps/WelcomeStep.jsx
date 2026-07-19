@@ -23,9 +23,9 @@ export default function WelcomeStep({
           <OnboardingOrbitHero
             icon={Globe}
             chips={[
-              { label: 'Locale', position: 'top-right' },
-              { label: 'Native', position: 'bottom-left' },
-              { label: 'Localized', position: 'top-left' },
+              { label: 'Hello!', position: 'top-right' },
+              { label: 'Szia!', position: 'bottom-left' },
+              { label: 'Global Vibe', position: 'top-left' },
             ]}
           />
         )}

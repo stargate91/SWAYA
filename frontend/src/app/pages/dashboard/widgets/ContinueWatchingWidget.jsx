@@ -8,6 +8,7 @@ import styles from './ContinueWatchingWidget.module.css';
 import { formatEpisodeCode } from '../../../lib/episodeFormat';
 import { useTranslation } from '../../../providers/LanguageContext';
 import useContinueWatching from './hooks/useContinueWatching';
+import Text from '../../../ui/Text';
 
 const ContinueWatchingWidget = () => {
   const { t: T } = useTranslation();
@@ -44,9 +45,9 @@ const ContinueWatchingWidget = () => {
 
   return (
     <div className={styles['continue-watching-widget']}>
-      <div className={styles['continue-watching-header']}>
+      <Text as="h3" variant="display" weight="extrabold" className={styles['continue-watching-header']}>
         {T('dashboard.continue_watching.title') || 'Continue Watching'}
-      </div>
+      </Text>
       <ScrollRow>
         {localItems.map((item) => {
           const isCurrentlyPlaying = activePlayback && String(activePlayback.itemId) === String(item.id);

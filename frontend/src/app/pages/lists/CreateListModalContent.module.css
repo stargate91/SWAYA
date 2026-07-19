@@ -20,11 +20,6 @@
   display: block;
 }
 
-.create-list-form__desc-textarea {
-  min-height: 5rem;
-  resize: vertical;
-  padding: var(--space-md);
-}
 
 .create-list-form__type-radio-group {
   display: flex;

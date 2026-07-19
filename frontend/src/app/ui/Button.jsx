@@ -22,6 +22,8 @@ export default function Button({
   leftIcon,
   rightIcon,
   animateIcon = false,
+  destructiveHover = false,
+  radius,
   as: Component = 'button',
   ...props
 }) {
@@ -30,6 +32,8 @@ export default function Button({
       data-variant={variant}
       data-size={size}
       data-animate-icon={animateIcon}
+      data-destructive-hover={destructiveHover}
+      data-radius={radius}
       className={`${styles.button} ${className}`.trim()}
       {...props}
     >
@@ -43,10 +47,12 @@ export default function Button({
 Button.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
-  variant: PropTypes.oneOf(['primary', 'primary-neutral', 'secondary', 'secondary-neutral', 'ghost', 'danger', 'success', 'onboarding-back', 'onboarding-continue', 'tag', 'glass', 'glass-accent']),
+  variant: PropTypes.oneOf(['primary', 'secondary', 'secondary-neutral', 'ghost', 'danger', 'success', 'onboarding-back', 'onboarding-continue', 'tag', 'glass']),
   size: PropTypes.oneOf(['sm', 'md', 'lg']),
   leftIcon: PropTypes.node,
   rightIcon: PropTypes.node,
   animateIcon: PropTypes.bool,
+  destructiveHover: PropTypes.bool,
+  radius: PropTypes.oneOf(['none', 'xs', 'sm', 'md', 'lg', 'xl', 'full']),
   as: PropTypes.elementType,
 };

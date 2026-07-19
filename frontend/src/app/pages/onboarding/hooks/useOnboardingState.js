@@ -24,6 +24,14 @@ export default function useOnboardingState() {
   const [langSearch, setLangSearch] = useState('');
   const [docsModal, setDocsModal] = useState(null); // null | 'docs_tmdb' | 'docs_omdb'
 
+  // Content selection & adult scraper states
+  const [contentTypeChoice, setContentTypeChoice] = useState('sfw'); // 'sfw', 'nsfw', 'hybrid'
+  const [stashdbApiKey, setStashdbApiKey] = useState('');
+  const [stashdbEndpoint, setStashdbEndpoint] = useState('https://stashdb.org/graphql');
+  const [fansdbApiKey, setFansdbApiKey] = useState('');
+  const [fansdbEndpoint, setFansdbEndpoint] = useState('https://fansdb.cc/graphql');
+  const [porndbApiKey, setPorndbApiKey] = useState('');
+  const [porndbEndpoint, setPorndbEndpoint] = useState('https://theporndb.net/graphql');
 
   const AVAILABLE_LANGUAGES = TARGET_LANGUAGE_OPTIONS.map(lang => {
     const nativeMatch = lang.label.match(/\(([^)]+)\)/);
@@ -51,6 +59,9 @@ export default function useOnboardingState() {
   // Validation states
   const [tmdbValidation, setTmdbValidation] = useState({ valid: null, message: '' });
   const [omdbValidation, setOmdbValidation] = useState({ valid: null, message: '' });
+  const [stashdbValidation, setStashdbValidation] = useState({ valid: null, message: '' });
+  const [fansdbValidation, setFansdbValidation] = useState({ valid: null, message: '' });
+  const [porndbValidation, setPorndbValidation] = useState({ valid: null, message: '' });
   const [isValidatingApi, setIsValidatingApi] = useState(false);
 
   // Folder paths state
@@ -62,9 +73,28 @@ export default function useOnboardingState() {
   // Final completion state
   const [isFinishing, setIsFinishing] = useState(false);
 
+  // Dynamic steps calculation
+  const getStepsList = () => {
+    if (configChoice === 'import') {
+      return ['welcome', 'choice', 'completion'];
+    }
+    const base = ['welcome', 'choice', 'profile', 'content-type'];
+    let scrapers = [];
+    if (contentTypeChoice === 'sfw') {
+      scrapers = ['tmdb', 'omdb'];
+    } else if (contentTypeChoice === 'nsfw') {
+      scrapers = ['stashdb', 'fansdb', 'porndb'];
+    } else if (contentTypeChoice === 'hybrid') {
+      scrapers = ['tmdb', 'omdb', 'stashdb', 'fansdb', 'porndb'];
+    }
+    return [...base, ...scrapers, 'folders', 'completion'];
+  };
+
+  const stepsList = getStepsList();
+
   const goToStep = (nextStep, direction = 'forward') => {
     setStepDirection(direction);
-    setStep(Math.max(1, Math.min(nextStep, 7)));
+    setStep(Math.max(1, Math.min(nextStep, stepsList.length)));
   };
 
   const handleNext = () => goToStep(step + 1, 'forward');
@@ -100,7 +130,7 @@ export default function useOnboardingState() {
         toast(t('settingsPage.sections.backup.importSuccess') || 'Settings imported successfully!', 'success');
         
         // Skip straight to completion/finish step
-        goToStep(7, 'forward');
+        goToStep(stepsList.indexOf('completion') + 1, 'forward');
       } catch (err) {
         console.error(err);
         toast(t('settingsPage.sections.backup.importError') || 'Failed to import settings file.', 'danger');
@@ -132,7 +162,7 @@ export default function useOnboardingState() {
         setTmdbValidation({ valid: true, message: response.tmdb.message });
         toast(t('onboarding.toasts.tmdbVerified') || 'TMDB credentials successfully verified.', 'success');
         setTimeout(() => {
-          goToStep(4, 'forward');
+          handleNext();
         }, 800);
       } else {
         setTmdbValidation({ valid: false, message: response?.tmdb?.message || t('onboarding.toasts.verificationFailed') || 'Verification failed.' });
@@ -167,7 +197,7 @@ export default function useOnboardingState() {
         setOmdbValidation({ valid: true, message: response.omdb.message });
         toast(t('onboarding.toasts.omdbVerified') || 'OMDB API Key successfully verified.', 'success');
         setTimeout(() => {
-          goToStep(5, 'forward');
+          handleNext();
         }, 800);
       } else {
         setOmdbValidation({ valid: false, message: response?.omdb?.message || t('onboarding.toasts.verificationFailed') || 'Verification failed.' });
@@ -176,6 +206,114 @@ export default function useOnboardingState() {
     } catch (err) {
       console.error(err);
       setOmdbValidation({ valid: false, message: t('onboarding.toasts.connectionError') || 'Connection error during validation.' });
+      toast(t('onboarding.toasts.validationServerFailed') || 'Failed to connect to validation server.', 'danger');
+    } finally {
+      setIsValidatingApi(false);
+    }
+  };
+
+  // Validate StashDB Credentials
+  const validateStashdb = async () => {
+    if (!stashdbApiKey.trim()) {
+      setStashdbValidation({
+        valid: false,
+        message: t('onboarding.toasts.stashdbKeyRequired') || 'StashDB API Key is required.'
+      });
+      return;
+    }
+
+    setIsValidatingApi(true);
+    try {
+      const response = await api.settings.validateApiKeys({
+        stashdb_api_key: stashdbApiKey,
+        stashdb_endpoint: stashdbEndpoint,
+      });
+
+      if (response?.stashdb?.valid) {
+        setStashdbValidation({ valid: true, message: response.stashdb.message });
+        toast(t('onboarding.toasts.stashdbVerified') || 'StashDB credentials successfully verified.', 'success');
+        setTimeout(() => {
+          handleNext();
+        }, 800);
+      } else {
+        setStashdbValidation({ valid: false, message: response?.stashdb?.message || t('onboarding.toasts.verificationFailed') || 'Verification failed.' });
+        toast(response?.stashdb?.message || t('onboarding.toasts.stashdbVerificationFailed') || 'StashDB credentials verification failed.', 'danger');
+      }
+    } catch (err) {
+      console.error(err);
+      setStashdbValidation({ valid: false, message: t('onboarding.toasts.connectionError') || 'Connection error during validation.' });
+      toast(t('onboarding.toasts.validationServerFailed') || 'Failed to connect to validation server.', 'danger');
+    } finally {
+      setIsValidatingApi(false);
+    }
+  };
+
+  // Validate FansDB Credentials
+  const validateFansdb = async () => {
+    if (!fansdbApiKey.trim()) {
+      setFansdbValidation({
+        valid: false,
+        message: t('onboarding.toasts.fansdbKeyRequired') || 'FansDB API Key is required.'
+      });
+      return;
+    }
+
+    setIsValidatingApi(true);
+    try {
+      const response = await api.settings.validateApiKeys({
+        fansdb_api_key: fansdbApiKey,
+        fansdb_endpoint: fansdbEndpoint,
+      });
+
+      if (response?.fansdb?.valid) {
+        setFansdbValidation({ valid: true, message: response.fansdb.message });
+        toast(t('onboarding.toasts.fansdbVerified') || 'FansDB credentials successfully verified.', 'success');
+        setTimeout(() => {
+          handleNext();
+        }, 800);
+      } else {
+        setFansdbValidation({ valid: false, message: response?.fansdb?.message || t('onboarding.toasts.verificationFailed') || 'Verification failed.' });
+        toast(response?.fansdb?.message || t('onboarding.toasts.fansdbVerificationFailed') || 'FansDB credentials verification failed.', 'danger');
+      }
+    } catch (err) {
+      console.error(err);
+      setFansdbValidation({ valid: false, message: t('onboarding.toasts.connectionError') || 'Connection error during validation.' });
+      toast(t('onboarding.toasts.validationServerFailed') || 'Failed to connect to validation server.', 'danger');
+    } finally {
+      setIsValidatingApi(false);
+    }
+  };
+
+  // Validate PornDB Credentials
+  const validatePorndb = async () => {
+    if (!porndbApiKey.trim()) {
+      setPorndbValidation({
+        valid: false,
+        message: t('onboarding.toasts.porndbKeyRequired') || 'PornDB API Key is required.'
+      });
+      return;
+    }
+
+    setIsValidatingApi(true);
+    try {
+      const response = await api.settings.validateApiKeys({
+        porndb_api_key: porndbApiKey,
+        porndb_endpoint: porndbEndpoint,
+      });
+
+      if (response?.porndb?.valid) {
+        setPorndbValidation({ valid: true, message: response.porndb.message });
+        toast(t('onboarding.toasts.porndbVerified') || 'PornDB credentials successfully verified.', 'success');
+        setTimeout(() => {
+          handleNext();
+        }, 800);
+      } else {
+        setPorndbValidation({ valid: false, message: response?.porndb?.message || t('onboarding.toasts.verificationFailed') || 'Verification failed.' });
+        toast(response?.porndb?.message || t('onboarding.toasts.porndbVerificationFailed') || 'PornDB credentials verification failed.', 'danger');
+      }
+    } catch (err) {
+      console.error(err);
+      setPorndbValidation({ valid: false, message: t('onboarding.toasts.connectionError') || 'Connection error during validation.' });
       toast(t('onboarding.toasts.validationServerFailed') || 'Failed to connect to validation server.', 'danger');
     } finally {
       setIsValidatingApi(false);
@@ -212,7 +350,7 @@ export default function useOnboardingState() {
         setFolderValidation({ valid: true, message: t('onboarding.toasts.foldersReady') || 'Folders validated and ready.' });
         toast(t('onboarding.toasts.folderValid') || 'Folder configuration is valid.', 'success');
         setTimeout(() => {
-          goToStep(6, 'forward');
+          handleNext();
         }, 800);
       } else {
         const firstErr = response.errors 
@@ -249,6 +387,15 @@ export default function useOnboardingState() {
         tmdb_api_key: tmdbApiKey,
         tmdb_bearer_token: tmdbBearerToken,
         omdb_api_key: omdbApiKey,
+        // Adult settings
+        include_adult: contentTypeChoice !== 'sfw',
+        stashdb_api_key: stashdbApiKey,
+        stashdb_endpoint: stashdbEndpoint,
+        fansdb_api_key: fansdbApiKey,
+        fansdb_endpoint: fansdbEndpoint,
+        porndb_api_key: porndbApiKey,
+        porndb_endpoint: porndbEndpoint,
+        // folders
         default_scan_dir: scanDir,
         folder_library_path: libraryPath,
         folder_move_to_library: Boolean(libraryPath.trim()),
@@ -275,6 +422,7 @@ export default function useOnboardingState() {
     setLocale,
     t,
     step,
+    stepsList,
     goToStep,
     stepDirection,
     configChoice,
@@ -289,17 +437,37 @@ export default function useOnboardingState() {
     setUserName,
     avatarPath,
     setAvatarPath,
+    contentTypeChoice,
+    setContentTypeChoice,
     tmdbApiKey,
     setTmdbApiKey,
     tmdbBearerToken,
     setTmdbBearerToken,
     tmdbValidation,
     validateTmdb,
-    isValidatingApi,
     omdbApiKey,
     setOmdbApiKey,
     omdbValidation,
     validateOmdb,
+    stashdbApiKey,
+    setStashdbApiKey,
+    stashdbEndpoint,
+    setStashdbEndpoint,
+    stashdbValidation,
+    validateStashdb,
+    fansdbApiKey,
+    setFansdbApiKey,
+    fansdbEndpoint,
+    setFansdbEndpoint,
+    fansdbValidation,
+    validateFansdb,
+    porndbApiKey,
+    setPorndbApiKey,
+    porndbEndpoint,
+    setPorndbEndpoint,
+    porndbValidation,
+    validatePorndb,
+    isValidatingApi,
     scanDir,
     setScanDir,
     pickScanDir,

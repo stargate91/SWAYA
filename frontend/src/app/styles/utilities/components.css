@@ -266,17 +266,17 @@
   margin-right: var(--space-lg);
   position: relative;
   z-index: var(--z-index-step-2);
-  transition: width 0.2s ease;
+  transition: width var(--motion-base);
 }
 
 .u-poster-wrapper.is-scene {
   width: 8rem;
 }
 
-.u-card-active {
-  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border-subtle)) !important;
+:global(.card).u-card-active {
+  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border-subtle));
   box-shadow: 0 0 var(--space-md) color-mix(in srgb, var(--color-accent) 15%, transparent),
-              0 var(--space-xs) var(--space-md) color-mix(in srgb, var(--color-bg-canvas) 25%, transparent) !important;
+              0 var(--space-xs) var(--space-md) color-mix(in srgb, var(--color-bg-canvas) 25%, transparent);
 }
 
 .u-progress-bar-width {

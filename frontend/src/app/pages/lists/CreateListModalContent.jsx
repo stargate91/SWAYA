@@ -68,18 +68,16 @@ export default function CreateListModalContent({
         error={error}
       />
 
-      <Field
+      <Input
+        id="list-desc"
         label={t('lists.description_label') || 'Description'}
-        htmlFor="list-desc"
-      >
-        <textarea
-          id="list-desc"
-          className={`ui-input ${styles['create-list-form__desc-textarea']}`}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder={t('lists.desc_placeholder') || 'Description...'}
-        />
-      </Field>
+        multiline={true}
+        resizable="vertical"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        placeholder={t('lists.desc_placeholder') || 'Description...'}
+        rows={3}
+      />
 
       <Field label={t('lists.type_label') || 'List Type'}>
         <div className={styles['create-list-form__type-radio-group']}>

@@ -1,5 +1,6 @@
 import useListsAddDrawer from '../hooks/useListsAddDrawer';
 import Pill from '@/ui/Pill';
+import Text from '@/ui/Text';
 import DrawerSearchHeader from './DrawerSearchHeader';
 import DrawerResultsList from './DrawerResultsList';
 import Drawer from '@/ui/Drawer';
@@ -27,7 +28,7 @@ export default function ListsAddDrawer({
 
   const headerTitle = (
     <div className={styles['lists-add-drawer-header-title']}>
-      <span>{listType === 'person' ? (t('lists.add_people_title') || 'Add People') : (t('lists.add_titles_title') || 'Add Titles')}</span>
+      <Text variant="body" weight="bold">{listType === 'person' ? (t('lists.add_people_title') || 'Add People') : (t('lists.add_titles_title') || 'Add Titles')}</Text>
       {settings?.include_adult && (
         <Pill
           as="button"

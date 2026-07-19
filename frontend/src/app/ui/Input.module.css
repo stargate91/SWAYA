@@ -160,3 +160,15 @@
 .flex-1 {
   flex: 1 1 0;
 }
+
+.input-wrapper--multiline {
+  align-items: flex-start;
+  min-height: auto;
+  height: auto;
+  padding: var(--space-sm) var(--space-md);
+}
+
+.textarea {
+  min-height: 4rem;
+  line-height: var(--line-height-base);
+}
