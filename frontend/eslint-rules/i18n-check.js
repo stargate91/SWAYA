@@ -7,22 +7,52 @@ const __dirname = path.dirname(__filename);
 
 // Load all localization JSON files
 const localesDir = path.resolve(__dirname, '../src/app/locales/en');
+const localesFixDir = path.resolve(__dirname, '../src/app/locales-fix/en');
 const localesCache = {};
 
-try {
-  if (fs.existsSync(localesDir)) {
-    const files = fs.readdirSync(localesDir);
-    for (const file of files) {
-      if (file.endsWith('.json')) {
-        const filePath = path.join(localesDir, file);
-        const content = fs.readFileSync(filePath, 'utf8');
-        localesCache[path.basename(file, '.json')] = JSON.parse(content);
+function mergeDeep(target, source) {
+  const output = { ...target };
+  if (target && typeof target === 'object' && source && typeof source === 'object') {
+    Object.keys(source).forEach(key => {
+      if (source[key] && typeof source[key] === 'object') {
+        if (!(key in target)) {
+          output[key] = source[key];
+        } else {
+          output[key] = mergeDeep(target[key], source[key]);
+        }
+      } else {
+        output[key] = source[key];
+      }
+    });
+  }
+  return output;
+}
+
+const loadDir = (dir) => {
+  try {
+    if (fs.existsSync(dir)) {
+      const files = fs.readdirSync(dir);
+      for (const file of files) {
+        if (file.endsWith('.json')) {
+          const filePath = path.join(dir, file);
+          const content = fs.readFileSync(filePath, 'utf8');
+          const parsed = JSON.parse(content);
+          const name = path.basename(file, '.json');
+          if (localesCache[name]) {
+            localesCache[name] = mergeDeep(localesCache[name], parsed);
+          } else {
+            localesCache[name] = parsed;
+          }
+        }
       }
     }
+  } catch (e) {
+    console.error(`Failed to load translations from ${dir} for ESLint rule:`, e);
   }
-} catch (e) {
-  console.error('Failed to load translations for ESLint rule:', e);
-}
+};
+
+loadDir(localesDir);
+loadDir(localesFixDir);
 
 // Reconstruct the translation tree exactly as LanguageProvider.jsx does
 const translationTree = {

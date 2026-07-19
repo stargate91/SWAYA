@@ -12,6 +12,7 @@
     "pack": "electron-builder build --dir",
     "dist": "electron-builder build",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "lint:style": "stylelint \"src/**/*.css\"",
     "preview": "vite preview",
     "test:smoke": "playwright test"

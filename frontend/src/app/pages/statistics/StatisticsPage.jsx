@@ -1,20 +1,22 @@
 import Page from '@/ui/Page';
 import Badge from '@/ui/Badge';
 import StatisticsWidget from './StatisticsWidget';
-import { LibraryDNA, TimeTravelTimeline } from './LibraryInsightsWidget';
-import { RatingsSummary, RatingDistribution } from './components/RatingsAnalytics';
+import { LibraryDNA } from './components/LibraryDNA';
+import { TimeTravelTimeline } from './components/TimeTravelTimeline';
+import { RatingsSummary } from './components/RatingsSummary';
+import { RatingDistribution } from './components/RatingDistribution';
 import Inline from '@/ui/Inline';
 import Stack from '@/ui/Stack';
 import Grid from '@/ui/Grid';
 import SectionHeader from '@/ui/SectionHeader';
-import { useStatisticsPageState } from './useStatisticsPageState';
+import { useStatisticsPage } from './useStatisticsPage';
 import styles from './StatisticsPage.module.css';
 
 export default function StatisticsPage() {
   const {
     t,
     isAdultMode,
-  } = useStatisticsPageState();
+  } = useStatisticsPage();
 
   const pageTitle = (
     <Inline gap="md" align="center">

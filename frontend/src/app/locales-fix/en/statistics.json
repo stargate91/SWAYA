@@ -1,0 +1,48 @@
+{
+  "description": "Visual overview and breakdown of your media library",
+  "sections": {
+    "overview": "Overview",
+    "ratings": "Ratings & Reviews",
+    "insights": "Library DNA & Timeline"
+  },
+  "stats": {
+    "total_movies": "Total Movies",
+    "movies_sub": "In Library",
+    "total_scenes": "Total Scenes",
+    "scenes_sub": "Scenes in library",
+    "total_videos": "Total Videos",
+    "videos_sub": "Videos in library",
+    "total_tv": "TV Shows",
+    "tv_sub": "{count} Episodes",
+    "storage_used": "Storage Used",
+    "storage_sub": "across {count} drives",
+    "unmatched": "Unmatched",
+    "unmatched_sub": "Pending in Organizer",
+    "total_scenes_videos": "Scenes & Videos",
+    "library_dna": "Library DNA",
+    "timeline": "Time-Travel Timeline",
+    "decade_label": "{decade}s",
+    "top_decade": "You are a {decade} fanatic!",
+    "other_genres": "Other Genres",
+    "items_count_tooltip": "{label}: {count} items",
+    "dna_overlay_title": "Library DNA Blueprint",
+    "dna_overlay_copy_sfw": "Scan and match SFW movies to reveal your library's unique genre DNA blueprint.",
+    "dna_overlay_copy_nsfw": "Match and organize adult scenes to map your library's NSFW genre footprint.",
+    "dna_progress_text": "{count} of {limit} titles",
+    "timeline_overlay_title": "Time-Travel Timeline",
+    "timeline_overlay_copy_sfw": "Add more movies to map your collection across the history of cinema.",
+    "timeline_overlay_copy_nsfw": "Match more adult scenes to build a chronological timeline of your collection.",
+    "timeline_progress_text": "{count} of {limit} items"
+  },
+  "ratings": {
+    "mediaAverages": "Average Ratings",
+    "mediaItems": "Library Items",
+    "rated": "rated",
+    "unrated": "unrated",
+    "average": "Average Rating",
+    "totalRated": "Items",
+    "favoritePerformers": "Favorite Performers",
+    "favoriteArtists": "Favorite Artists",
+    "distribution": "Rating Distribution"
+  }
+}

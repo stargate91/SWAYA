@@ -1,8 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { usePlayMediaMutation, useSettingsQuery } from '@/queries';
-import './entityDetail/EntityDetailHeroSectionShared.css';
 import api from '@/lib/api';
 import { QK } from '@/lib/queryKeys';
 import EmptyState from '@/ui/EmptyState';

@@ -1,14 +1,11 @@
-import { useStatisticsPageState } from '../useStatisticsPageState';
+import { useStatisticsPage } from '../useStatisticsPage';
 import { BarChart2, CheckCircle, Users, Heart } from '@/ui/icons';
-import SegmentedControl from '@/ui/SegmentedControl';
 import Skeleton from '@/ui/Skeleton';
 import Inline from '@/ui/Inline';
 import Card from '@/ui/Card';
 import Stack from '@/ui/Stack';
 import Text from '@/ui/Text';
-import LinearProgress from '@/ui/LinearProgress';
 import SegmentedRating from '@/ui/SegmentedRating';
-import styles from './RatingsAnalytics.module.css';
 
 const bulletSep = '\u2022';
 
@@ -19,7 +16,7 @@ const getPercentageText = (rated, unrated) => {
 };
 
 export function RatingsSummary() {
-  const { ratingsState, t } = useStatisticsPageState();
+  const { ratingsState, t } = useStatisticsPage();
 
   if (ratingsState.isStatsLoading) {
     return (
@@ -41,14 +38,14 @@ export function RatingsSummary() {
         variant="interactive-glass"
         padding="md"
         divider
-        eyebrow={t('ratings.stats.mediaAverages', { defaultValue: 'Average Ratings' })}
+        eyebrow={t('statistics.ratings.mediaAverages', { defaultValue: 'Average Ratings' })}
         actions={<BarChart2 size={16} className="icon-glow-blue" />}
       >
         <Stack gap="sm" justify="center">
           {/* Movies Row */}
           <Inline gap="md" align="center" justify="between" className="u-min-h-row">
             <Text variant="body" color="muted" weight="medium">
-              {t('ratings.subtabs.movies', { defaultValue: 'Movies' })}
+              {t('tabs.movies', { defaultValue: 'Movies' })}
             </Text>
             <Inline gap="md" align="center">
               <Text variant="title" color="primary" weight="bold">{ratingsState.moviesStats.average}</Text>
@@ -64,7 +61,7 @@ export function RatingsSummary() {
           {/* TV Shows Row */}
           <Inline gap="md" align="center" justify="between" className="u-min-h-row">
             <Text variant="body" color="muted" weight="medium">
-              {t('ratings.subtabs.tvShows', { defaultValue: 'TV Shows' })}
+              {t('tabs.tvShows', { defaultValue: 'TV Shows' })}
             </Text>
             <Inline gap="md" align="center">
               <Text variant="title" color="primary" weight="bold">{ratingsState.tvStats.average}</Text>
@@ -81,7 +78,7 @@ export function RatingsSummary() {
           {ratingsState.activeSessionMode === 'nsfw' && (
             <Inline gap="md" align="center" justify="between" className="u-min-h-row">
               <Text variant="body" color="muted" weight="medium">
-                {t('ratings.subtabs.scenes', { defaultValue: 'Scenes' })}
+                {t('tabs.scenes', { defaultValue: 'Scenes' })}
               </Text>
               <Inline gap="md" align="center">
                 <Text variant="title" color="primary" weight="bold">{ratingsState.scenesStats.average}</Text>
@@ -98,7 +95,7 @@ export function RatingsSummary() {
           {/* Videos Row */}
           <Inline gap="md" align="center" justify="between" className="u-min-h-row">
             <Text variant="body" color="muted" weight="medium">
-              {t('library.tabs.videos') || 'Videos'}
+              {t('tabs.videos', { defaultValue: 'Videos' })}
             </Text>
             <Inline gap="md" align="center">
               <Text variant="title" color="primary" weight="bold">{ratingsState.videosStats.average}</Text>
@@ -118,20 +115,20 @@ export function RatingsSummary() {
         variant="interactive-glass"
         padding="md"
         divider
-        eyebrow={t('ratings.stats.mediaItems', { defaultValue: 'Library Items' })}
+        eyebrow={t('statistics.ratings.mediaItems', { defaultValue: 'Library Items' })}
         actions={<CheckCircle size={16} className="icon-glow-success" />}
       >
         <Stack gap="sm" justify="center">
           {/* Movies counts */}
           <Inline gap="md" align="center" justify="between" className="u-min-h-row">
             <Text variant="body" color="muted" weight="medium">
-              {t('ratings.subtabs.movies', { defaultValue: 'Movies' })}
+              {t('tabs.movies', { defaultValue: 'Movies' })}
             </Text>
             <Inline gap="sm" align="center">
-              <Text variant="body" color="primary" weight="semibold">{ratingsState.moviesStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</Text>
+              <Text variant="body" color="primary" weight="semibold">{ratingsState.moviesStats.totalRated} {t('statistics.ratings.rated', { defaultValue: 'rated' })}</Text>
               <Text variant="body" color="muted">{bulletSep}</Text>
               <Text variant="body" color="muted">
-                {ratingsState.moviesStats.totalUnrated} {t('ratings.stats.unrated', { defaultValue: 'unrated' })}
+                {ratingsState.moviesStats.totalUnrated} {t('statistics.ratings.unrated', { defaultValue: 'unrated' })}
                 {getPercentageText(ratingsState.moviesStats.totalRated, ratingsState.moviesStats.totalUnrated)}
               </Text>
             </Inline>
@@ -140,13 +137,13 @@ export function RatingsSummary() {
           {/* TV Shows counts */}
           <Inline gap="md" align="center" justify="between" className="u-min-h-row">
             <Text variant="body" color="muted" weight="medium">
-              {t('ratings.subtabs.tvShows', { defaultValue: 'TV Shows' })}
+              {t('tabs.tvShows', { defaultValue: 'TV Shows' })}
             </Text>
             <Inline gap="sm" align="center">
-              <Text variant="body" color="primary" weight="semibold">{ratingsState.tvStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</Text>
+              <Text variant="body" color="primary" weight="semibold">{ratingsState.tvStats.totalRated} {t('statistics.ratings.rated', { defaultValue: 'rated' })}</Text>
               <Text variant="body" color="muted">{bulletSep}</Text>
               <Text variant="body" color="muted">
-                {ratingsState.tvStats.totalUnrated} {t('ratings.stats.unrated', { defaultValue: 'unrated' })}
+                {ratingsState.tvStats.totalUnrated} {t('statistics.ratings.unrated', { defaultValue: 'unrated' })}
                 {getPercentageText(ratingsState.tvStats.totalRated, ratingsState.tvStats.totalUnrated)}
               </Text>
             </Inline>
@@ -156,13 +153,13 @@ export function RatingsSummary() {
           {ratingsState.activeSessionMode === 'nsfw' && (
             <Inline gap="md" align="center" justify="between" className="u-min-h-row">
               <Text variant="body" color="muted" weight="medium">
-                {t('ratings.subtabs.scenes', { defaultValue: 'Scenes' })}
+                {t('tabs.scenes', { defaultValue: 'Scenes' })}
               </Text>
               <Inline gap="sm" align="center">
-                <Text variant="body" color="primary" weight="semibold">{ratingsState.scenesStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</Text>
+                <Text variant="body" color="primary" weight="semibold">{ratingsState.scenesStats.totalRated} {t('statistics.ratings.rated', { defaultValue: 'rated' })}</Text>
                 <Text variant="body" color="muted">{bulletSep}</Text>
                 <Text variant="body" color="muted">
-                  {ratingsState.scenesStats.totalUnrated} {t('ratings.stats.unrated', { defaultValue: 'unrated' })}
+                  {ratingsState.scenesStats.totalUnrated} {t('statistics.ratings.unrated', { defaultValue: 'unrated' })}
                   {getPercentageText(ratingsState.scenesStats.totalRated, ratingsState.scenesStats.totalUnrated)}
                 </Text>
               </Inline>
@@ -172,13 +169,13 @@ export function RatingsSummary() {
           {/* Videos counts */}
           <Inline gap="md" align="center" justify="between" className="u-min-h-row">
             <Text variant="body" color="muted" weight="medium">
-              {t('library.tabs.videos') || 'Videos'}
+              {t('tabs.videos', { defaultValue: 'Videos' })}
             </Text>
             <Inline gap="sm" align="center">
-              <Text variant="body" color="primary" weight="semibold">{ratingsState.videosStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</Text>
+              <Text variant="body" color="primary" weight="semibold">{ratingsState.videosStats.totalRated} {t('statistics.ratings.rated', { defaultValue: 'rated' })}</Text>
               <Text variant="body" color="muted">{bulletSep}</Text>
               <Text variant="body" color="muted">
-                {ratingsState.videosStats.totalUnrated} {t('ratings.stats.unrated', { defaultValue: 'unrated' })}
+                {ratingsState.videosStats.totalUnrated} {t('statistics.ratings.unrated', { defaultValue: 'unrated' })}
                 {getPercentageText(ratingsState.videosStats.totalRated, ratingsState.videosStats.totalUnrated)}
               </Text>
             </Inline>
@@ -191,14 +188,14 @@ export function RatingsSummary() {
         variant="interactive-glass"
         padding="md"
         divider
-        eyebrow={t('ratings.subtabs.people', { defaultValue: 'People' })}
+        eyebrow={t('tabs.people', { defaultValue: 'People' })}
         actions={<Users size={16} className="icon-glow-muted" />}
       >
         <Stack gap="sm" justify="center">
           {/* People Avg Rating */}
           <Inline gap="md" align="center" justify="between" className="u-min-h-row">
             <Text variant="body" color="muted" weight="medium">
-              {t('ratings.stats.average', { defaultValue: 'Average Rating' })}
+              {t('statistics.ratings.average', { defaultValue: 'Average Rating' })}
             </Text>
             <Inline gap="md" align="center">
               <Text variant="title" color="primary" weight="bold">{ratingsState.peopleStats.average}</Text>
@@ -214,13 +211,13 @@ export function RatingsSummary() {
           {/* People counts */}
           <Inline gap="md" align="center" justify="between" className="u-min-h-row">
             <Text variant="body" color="muted" weight="medium">
-              {t('ratings.stats.totalRated', { defaultValue: 'Items' })}
+              {t('statistics.ratings.totalRated', { defaultValue: 'Items' })}
             </Text>
             <Inline gap="sm" align="center">
-              <Text variant="body" color="primary" weight="semibold">{ratingsState.peopleStats.totalRated} {t('ratings.stats.rated', { defaultValue: 'rated' })}</Text>
+              <Text variant="body" color="primary" weight="semibold">{ratingsState.peopleStats.totalRated} {t('statistics.ratings.rated', { defaultValue: 'rated' })}</Text>
               <Text variant="body" color="muted">{bulletSep}</Text>
               <Text variant="body" color="muted">
-                {ratingsState.peopleStats.totalUnrated} {t('ratings.stats.unrated', { defaultValue: 'unrated' })}
+                {ratingsState.peopleStats.totalUnrated} {t('statistics.ratings.unrated', { defaultValue: 'unrated' })}
                 {getPercentageText(ratingsState.peopleStats.totalRated, ratingsState.peopleStats.totalUnrated)}
               </Text>
             </Inline>
@@ -230,8 +227,8 @@ export function RatingsSummary() {
           <Inline gap="md" align="center" justify="between" className="u-min-h-row">
             <Text variant="body" color="muted" weight="medium">
               {ratingsState.activeSessionMode === 'nsfw'
-                ? (t('ratings.stats.favoritePerformers') || 'Favorite Performers')
-                : (t('ratings.stats.favoriteArtists') || 'Favorite Artists')}
+                ? (t('statistics.ratings.favoritePerformers') || 'Favorite Performers')
+                : (t('statistics.ratings.favoriteArtists') || 'Favorite Artists')}
             </Text>
             <Inline gap="sm" align="center">
               <Text variant="title" color="primary" weight="bold">{ratingsState.peopleStats.favoritesCount}</Text>
@@ -241,61 +238,5 @@ export function RatingsSummary() {
         </Stack>
       </Card>
     </Stack>
-  );
-}
-
-export function RatingDistribution() {
-  const {
-    ratingsState,
-    t,
-    distTabs,
-    effectiveDistTab,
-    setDistTab,
-    activeDistStats,
-  } = useStatisticsPageState();
-
-  if (ratingsState.isStatsLoading) {
-    return (
-      <Card variant="interactive-glass" className="u-min-h-dist-card-loading">
-        <Skeleton variant="dist-title" />
-        {Array.from({ length: 10 }).map((_, idx) => (
-          <Skeleton key={idx} variant="dist-bar" />
-        ))}
-      </Card>
-    );
-  }
-
-  return (
-    <Card
-      variant="interactive-glass"
-      divider
-      eyebrow={t('ratings.stats.distribution', { defaultValue: 'Rating Distribution' })}
-      actions={
-        <SegmentedControl
-          options={distTabs}
-          value={effectiveDistTab}
-          onChange={setDistTab}
-          variant="filter"
-        />
-      }
-    >
-      <Stack gap="sm" className="u-mt-sm">
-        {activeDistStats?.distributionRows?.map((row, index) => (
-          <div key={index} className={styles['distribution-row']}>
-            <span className={styles['rating-label-wrapper']}>
-              <Text variant="small" color="secondary" weight="bold">
-                {row.ratingLabel}
-              </Text>
-            </span>
-            <LinearProgress value={row.percentage} />
-            <span className={styles['rating-count-wrapper']}>
-              <Text variant="small" color="muted" weight="medium">
-                {row.count}
-              </Text>
-            </span>
-          </div>
-        ))}
-      </Stack>
-    </Card>
   );
 }

@@ -26,7 +26,7 @@ const isSingleGenreLabel = (label) => {
   return true;
 };
 
-export function useStatisticsPageState() {
+export function useStatisticsPage() {
   const { t } = useTranslation();
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const { data: stats = {}, isLoading } = useStatsQuery(sessionMode === 'nsfw');
@@ -37,16 +37,16 @@ export function useStatisticsPageState() {
   const effectiveDistTab = !isAdultMode && distTab === 'scenes' ? 'movies' : distTab;
 
   const distTabs = useMemo(() => [
-    { value: 'movies', label: t('ratings.subtabs.movies', { defaultValue: 'Movies' }), icon: Clapperboard },
-    { value: 'tv', label: t('ratings.subtabs.tvShows', { defaultValue: 'TV Shows' }), icon: Tv },
-    ...(ratingsState.hasAdultSupport ? [{ value: 'scenes', label: t('ratings.subtabs.scenes', { defaultValue: 'Scenes' }), icon: Video }] : []),
-    { value: 'videos', label: t('library.tabs.videos') || 'Videos', icon: Video },
-    { value: 'people', label: t('ratings.subtabs.people', { defaultValue: 'People' }), icon: Users },
+    { value: 'movies', label: t('tabs.movies', { defaultValue: 'Movies' }), icon: Clapperboard },
+    { value: 'tv', label: t('tabs.tvShows', { defaultValue: 'TV Shows' }), icon: Tv },
+    ...(ratingsState.hasAdultSupport ? [{ value: 'scenes', label: t('tabs.scenes', { defaultValue: 'Scenes' }), icon: Video }] : []),
+    { value: 'videos', label: t('tabs.videos', { defaultValue: 'Videos' }) || 'Videos', icon: Video },
+    { value: 'people', label: t('tabs.people', { defaultValue: 'People' }), icon: Users },
   ], [t, ratingsState.hasAdultSupport]);
 
   const insightTitleCount = useMemo(
     () => Object.values(stats?.decade_distribution || {}).reduce((sum, value) => sum + Number(value || 0), 0),
-    [stats?.decade_distribution]
+    [stats.decade_distribution]
   );
 
   const scenesStats = useMemo(() => {
@@ -57,13 +57,15 @@ export function useStatisticsPageState() {
     return {
       title: isNsfw
         ? (t('statistics.stats.total_scenes_videos') || 'Scenes & Videos')
-        : (t('statistics.stats.total_scenes') || 'Total Scenes'),
+        : (t('statistics.stats.total_videos') || 'Total Videos'),
       value: isNsfw
         ? (totalScenes + totalVideos).toLocaleString()
         : totalScenes.toLocaleString(),
       subText: isNsfw && totalVideos > 0
         ? `${totalScenes} scenes, ${totalVideos} videos`
-        : (t('statistics.stats.scenes_sub') || 'Scenes in library'),
+        : isNsfw
+          ? (t('statistics.stats.scenes_sub') || 'Scenes in library')
+          : (t('statistics.stats.videos_sub') || 'Videos in library'),
     };
   }, [stats.total_scenes, stats.total_videos, sessionMode, t]);
 
@@ -116,11 +118,10 @@ export function useStatisticsPageState() {
       isMocked,
       hasEnoughData,
     };
-  }, [stats?.genre_constellation, stats?.genre_distribution, sessionMode, t, insightTitleCount]);
+  }, [stats.genre_constellation, stats.genre_distribution, sessionMode, t, insightTitleCount]);
 
   const timelineData = useMemo(() => {
     const decades = stats?.decade_distribution;
-    const isNsfw = sessionMode === 'nsfw';
 
     let mockDecades = decades;
     const isMocked = !decades || Object.keys(decades).length < 2;
@@ -153,7 +154,7 @@ export function useStatisticsPageState() {
       hasEnoughData,
       formatDecade,
     };
-  }, [stats?.decade_distribution, sessionMode, t, insightTitleCount]);
+  }, [stats.decade_distribution, t, insightTitleCount]);
 
   const activeDistStats = useMemo(() => {
     if (ratingsState.isStatsLoading) return null;

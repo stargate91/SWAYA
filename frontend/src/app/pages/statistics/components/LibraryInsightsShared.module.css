@@ -1,0 +1,28 @@
+.stage-base {
+  position: relative;
+  min-height: 13.75rem;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--color-accent-blue-soft) 14%, transparent), color-mix(in srgb, var(--color-accent-blue) 4%, transparent) 35%, color-mix(in srgb, var(--color-bg-elevated) 8%, transparent) 70%, transparent 100%);
+}
+
+.ghost {
+  opacity: 0.15;
+  filter: grayscale(1) blur(0.03125rem);
+  pointer-events: none;
+  transition: opacity var(--motion-duration-emphasized) var(--motion-ease-ease), filter var(--motion-duration-emphasized) var(--motion-ease-ease);
+}
+
+.overlay-card {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl) var(--space-xl);
+  background: radial-gradient(circle at center, color-mix(in srgb, var(--color-bg-elevated) 72%, transparent) 0%, var(--color-surface-overlay-heavy) 100%);
+  backdrop-filter: var(--glass-blur-md);
+  z-index: var(--z-index-step-2);
+  text-align: center;
+}

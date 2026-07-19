@@ -1,4 +1,4 @@
-import { useStatisticsPageState } from './useStatisticsPageState';
+import { useStatisticsPage } from './useStatisticsPage';
 import WidgetShell from '@/ui/WidgetShell';
 import Card from '@/ui/Card';
 import Text from '@/ui/Text';
@@ -6,7 +6,7 @@ import Inline from '@/ui/Inline';
 import Grid from '@/ui/Grid';
 
 const StatisticsWidget = () => {
-  const { stats, isLoading, t, scenesStats } = useStatisticsPageState();
+  const { stats, isLoading, t, scenesStats } = useStatisticsPage();
 
   return (
     <WidgetShell loading={isLoading} size="sm" transparent={true}>
