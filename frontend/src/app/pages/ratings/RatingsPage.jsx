@@ -1,4 +1,3 @@
-import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Star, Heart, Edit3, Clapperboard, Tv, Video, Users, CheckCircle } from '@/ui/icons';
 import Page from '@/ui/Page';
@@ -11,10 +10,8 @@ import Skeleton from '@/ui/Skeleton';
 import SegmentedRating from '@/ui/SegmentedRating';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useRatingsPageState } from './useRatingsPageState';
-import { useDebounce } from '@/hooks/useDebounce';
 import LibraryPagination from '../library/components/LibraryPagination';
 import RatingsReviewDrawer from './components/RatingsReviewDrawer';
-import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import ImageTooltip from '@/ui/ImageTooltip';
 import styles from './RatingsPage.module.css';
 import Inline from '@/ui/Inline';
@@ -25,88 +22,7 @@ export default function RatingsPage() {
   const state = useRatingsPageState();
   const isAdultMode = state.activeSessionMode === 'nsfw';
 
-  // Tooltip state
-  const [tooltipRow, setTooltipRow] = useState(null);
-  const [tooltipVisible, setTooltipVisible] = useState(false);
-  const [tooltipInitialCoords, setTooltipInitialCoords] = useState({ x: 0, y: 0 });
-  const tooltipRef = useRef(null);
 
-  const handleMouseEnter = (e, row) => {
-    setTooltipRow(row);
-    setTooltipInitialCoords({ x: e.clientX, y: e.clientY });
-    setTooltipVisible(true);
-  };
-
-  const handleMouseMove = (e) => {
-    if (tooltipRef.current) {
-      tooltipRef.current.style.transform = `translate3d(${e.clientX + 15}px, ${e.clientY + 15}px, 0)`;
-    }
-  };
-
-  const handleMouseLeave = () => {
-    setTooltipVisible(false);
-    setTooltipRow(null);
-  };
-
-  const getTooltipImageUrl = () => {
-    if (!tooltipRow) return null;
-    if (state.mediaType === 'people') {
-      return tooltipRow.profile_path ? resolveMediaImageUrl(tooltipRow.profile_path, 'poster') : null;
-    }
-    if (state.mediaType === 'scenes' || state.mediaType === 'videos') {
-      return tooltipRow.still_path
-        ? resolveMediaImageUrl(tooltipRow.still_path, 'still')
-        : (tooltipRow.backdrop_path
-          ? resolveMediaImageUrl(tooltipRow.backdrop_path, 'backdrop')
-          : (tooltipRow.backdrop
-            ? resolveMediaImageUrl(tooltipRow.backdrop, 'backdrop')
-            : null));
-    }
-    return tooltipRow.poster_path ? resolveMediaImageUrl(tooltipRow.poster_path, 'poster') : null;
-  };
-
-  const tooltipImageUrl = getTooltipImageUrl();
-  const tooltipAspect = (state.mediaType === 'scenes' || state.mediaType === 'videos') ? 'landscape' : 'poster';
-
-  // Review Drawer state
-  const [editingItem, setEditingItem] = useState(null);
-  const [reviewText, setReviewText] = useState('');
-
-  const handleOpenReviewDrawer = (e, item) => {
-    e.stopPropagation();
-    setEditingItem(item);
-    setReviewText(item.user_comment || '');
-  };
-
-  const handleSaveReview = async () => {
-    if (!editingItem) return;
-    await state.handleSaveComment(editingItem, reviewText);
-    setEditingItem(null);
-  };
-
-  // Close drawer on ESC
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') setEditingItem(null);
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  // Local Search Input with Debounce Sync
-  const [localSearch, setLocalSearch] = useState(state.searchQuery);
-  const debouncedSearch = useDebounce(localSearch, 150);
-
-  const stateRef = useRef(state);
-  useEffect(() => {
-    stateRef.current = state;
-  });
-
-  useEffect(() => {
-    if (debouncedSearch !== stateRef.current.searchQuery) {
-      stateRef.current.setSearchQuery(debouncedSearch);
-    }
-  }, [debouncedSearch]);
 
   // Tabs configurations
   const ratingTabs = [
@@ -155,9 +71,9 @@ export default function RatingsPage() {
                 handleClick();
               }
             }}
-            onMouseEnter={(e) => handleMouseEnter(e, row)}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
+            onMouseEnter={(e) => state.handleMouseEnter(e, row)}
+            onMouseMove={state.handleMouseMove}
+            onMouseLeave={state.handleMouseLeave}
           >
             {row.name || row.title || row.displayTitle}
           </span>
@@ -183,7 +99,7 @@ export default function RatingsPage() {
               variant="secondary-neutral"
               size="xs"
               className={styles['review-edit-btn']}
-              onClick={(e) => handleOpenReviewDrawer(e, row)}
+              onClick={(e) => state.handleOpenReviewDrawer(e, row)}
             >
               <Edit3 size={12} />
               {hasComment ? t('common.edit') || 'Edit' : t('common.add') || 'Add'}
@@ -242,10 +158,10 @@ export default function RatingsPage() {
               state.setActiveTab(val);
               state.setCurrentPage(1);
             }}
-            showSearch={true}
+             showSearch={true}
             searchPlaceholder={t('common.search') || 'Search...'}
-            searchQuery={localSearch}
-            onSearchQueryChange={(e) => setLocalSearch(e.target.value)}
+            searchQuery={state.localSearch}
+            onSearchQueryChange={(e) => state.setLocalSearch(e.target.value)}
           >
             <PanelHeader.Row>
               <Tabs
@@ -310,20 +226,20 @@ export default function RatingsPage() {
       </div>
 
       <RatingsReviewDrawer
-        editingItem={editingItem}
-        setEditingItem={setEditingItem}
-        reviewText={reviewText}
-        setReviewText={setReviewText}
-        handleSaveReview={handleSaveReview}
+        editingItem={state.editingItem}
+        setEditingItem={state.setEditingItem}
+        reviewText={state.reviewText}
+        setReviewText={state.setReviewText}
+        handleSaveReview={state.handleSaveReview}
         t={t}
       />
       <ImageTooltip
-        ref={tooltipRef}
-        imageUrl={tooltipImageUrl}
-        visible={tooltipVisible}
-        x={tooltipInitialCoords.x}
-        y={tooltipInitialCoords.y}
-        aspect={tooltipAspect}
+        ref={state.tooltipRef}
+        imageUrl={state.tooltipImageUrl}
+        visible={state.tooltipVisible}
+        x={state.tooltipInitialCoords.x}
+        y={state.tooltipInitialCoords.y}
+        aspect={state.tooltipAspect}
       />
     </Page>
   );

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import {
   useLibraryQuery,
   usePeopleQuery,
@@ -8,6 +8,8 @@ import {
 } from '@/queries';
 import { resolveLibraryBackendTab } from '@/lib/libraryTabs';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
+import { useDebounce } from '@/hooks/useDebounce';
+import { resolveMediaImageUrl } from '@/lib/imageUrls';
 
 export function useRatingsPageState() {
   const { data: settings } = useSettingsQuery();
@@ -282,6 +284,89 @@ export function useRatingsPageState() {
     }
   };
 
+  // Tooltip state
+  const [tooltipRow, setTooltipRow] = useState(null);
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [tooltipInitialCoords, setTooltipInitialCoords] = useState({ x: 0, y: 0 });
+  const tooltipRef = useRef(null);
+
+  const handleMouseEnter = useCallback((e, row) => {
+    setTooltipRow(row);
+    setTooltipInitialCoords({ x: e.clientX, y: e.clientY });
+    setTooltipVisible(true);
+  }, []);
+
+  const handleMouseMove = useCallback((e) => {
+    if (tooltipRef.current) {
+      tooltipRef.current.style.transform = `translate3d(${e.clientX + 15}px, ${e.clientY + 15}px, 0)`;
+    }
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setTooltipVisible(false);
+    setTooltipRow(null);
+  }, []);
+
+  const getTooltipImageUrl = () => {
+    if (!tooltipRow) return null;
+    if (effectiveMediaType === 'people') {
+      return tooltipRow.profile_path ? resolveMediaImageUrl(tooltipRow.profile_path, 'poster') : null;
+    }
+    if (effectiveMediaType === 'scenes' || effectiveMediaType === 'videos') {
+      return tooltipRow.still_path
+        ? resolveMediaImageUrl(tooltipRow.still_path, 'still')
+        : (tooltipRow.backdrop_path
+          ? resolveMediaImageUrl(tooltipRow.backdrop_path, 'backdrop')
+          : (tooltipRow.backdrop
+            ? resolveMediaImageUrl(tooltipRow.backdrop, 'backdrop')
+            : null));
+    }
+    return tooltipRow.poster_path ? resolveMediaImageUrl(tooltipRow.poster_path, 'poster') : null;
+  };
+
+  const tooltipImageUrl = getTooltipImageUrl();
+  const tooltipAspect = (effectiveMediaType === 'scenes' || effectiveMediaType === 'videos') ? 'landscape' : 'poster';
+
+  // Review Drawer state
+  const [editingItem, setEditingItem] = useState(null);
+  const [reviewText, setReviewText] = useState('');
+
+  const handleOpenReviewDrawer = useCallback((e, item) => {
+    e.stopPropagation();
+    setEditingItem(item);
+    setReviewText(item.user_comment || '');
+  }, []);
+
+  const handleSaveReview = useCallback(async () => {
+    if (!editingItem) return;
+    await handleSaveComment(editingItem, reviewText);
+    setEditingItem(null);
+  }, [editingItem, reviewText]);
+
+  // Close drawer on ESC
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setEditingItem(null);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Local Search Input with Debounce Sync
+  const [localSearch, setLocalSearch] = useState(searchQuery);
+  const debouncedSearch = useDebounce(localSearch, 150);
+
+  const stateRef = useRef({ searchQuery, setSearchQuery: handleSetSearchQuery });
+  useEffect(() => {
+    stateRef.current = { searchQuery, setSearchQuery: handleSetSearchQuery };
+  });
+
+  useEffect(() => {
+    if (debouncedSearch !== stateRef.current.searchQuery) {
+      stateRef.current.setSearchQuery(debouncedSearch);
+    }
+  }, [debouncedSearch]);
+
   return {
     activeTab,
     setActiveTab: handleSetActiveTab,
@@ -311,5 +396,23 @@ export function useRatingsPageState() {
     handleSaveComment,
     activeSessionMode,
     hasAdultSupport,
+    // UI exports
+    tooltipRow,
+    tooltipVisible,
+    tooltipInitialCoords,
+    tooltipRef,
+    handleMouseEnter,
+    handleMouseMove,
+    handleMouseLeave,
+    tooltipImageUrl,
+    tooltipAspect,
+    editingItem,
+    setEditingItem,
+    reviewText,
+    setReviewText,
+    handleOpenReviewDrawer,
+    handleSaveReview,
+    localSearch,
+    setLocalSearch,
   };
 }
