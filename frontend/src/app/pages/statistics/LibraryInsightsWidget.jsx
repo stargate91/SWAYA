@@ -1,8 +1,5 @@
 import { useMemo } from 'react';
-import PropTypes from 'prop-types';
-import WidgetShell from '@/ui/WidgetShell';
-import { useStatsQuery } from '../../queries';
-import { useLibraryModeStore } from '../../stores/useLibraryModeStore';
+import { useStatisticsPageState } from './useStatisticsPageState';
 import Inline from '@/ui/Inline';
 import Card from '@/ui/Card';
 import Stack from '@/ui/Stack';
@@ -62,49 +59,17 @@ const OVERLAY_CARD_STYLE = {
   textAlign: 'center',
 };
 
-export const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
-  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
+export const LibraryDNA = () => {
+  const { dnaData, t: T, sessionMode, insightTitleCount, MIN_DNA_TITLES } = useStatisticsPageState();
   const isNsfw = sessionMode === 'nsfw';
 
-  const insightData = useMemo(() => {
-    const sanitizeNodes = (nodes = []) => (
-      nodes.filter((node) => isSingleGenreLabel(node?.label))
-    );
-
-    let fallbackNodes = !genres || Object.keys(genres).length === 0
-      ? []
-      : Object.entries(genres)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, RADAR_GENRE_LIMIT + 6)
-        .map(([label, count], index) => ({ id: `fallback-${index}`, label, count }));
-
-    let sourceNodes = sanitizeNodes(constellation?.nodes?.length ? constellation.nodes : fallbackNodes);
-    
-    const isMocked = sourceNodes.length < 3;
-    if (isMocked) {
-      const mockLabels = isNsfw
-        ? ['Anal', 'Blowjob', 'All Sex', 'POV', 'Hardcore', 'Solo']
-        : ['Action', 'Comedy', 'Drama', 'Thriller', 'Sci-Fi', 'Adventure'];
-      
-      sourceNodes = mockLabels.map((label, index) => ({
-        id: `mock-${index}`,
-        label,
-        count: 10 - index,
-      }));
-    }
-
-    const sortedNodes = [...sourceNodes].sort((a, b) => (b.count || 0) - (a.count || 0));
-    const nodes = sortedNodes.slice(0, RADAR_GENRE_LIMIT);
-    const otherGenres = sortedNodes.slice(RADAR_GENRE_LIMIT).map((node) => ({
-      ...node,
-      translatedLabel: translateGenreLabel(node.label, T),
-    }));
+  const plotted = useMemo(() => {
     const center = 150;
     const radius = 92;
     const levels = 4;
-    const maxNodeCount = Math.max(...nodes.map((node) => Number(node.count || 0)), 1);
-    const plottedNodes = nodes.map((node, index) => {
-      const angle = (-Math.PI / 2) + ((Math.PI * 2) / nodes.length) * index;
+    const maxNodeCount = Math.max(...dnaData.nodes.map((node) => Number(node.count || 0)), 1);
+    const plottedNodes = dnaData.nodes.map((node, index) => {
+      const angle = (-Math.PI / 2) + ((Math.PI * 2) / dnaData.nodes.length) * index;
       const valueRatio = Number(node.count || 0) / maxNodeCount;
       const pointRadius = radius * valueRatio;
       const axisX = center + Math.cos(angle) * radius;
@@ -117,7 +82,6 @@ export const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
 
       return {
         ...node,
-        translatedLabel: translateGenreLabel(node.label, T),
         angle,
         axisX,
         axisY,
@@ -145,16 +109,10 @@ export const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
 
     return {
       nodes: plottedNodes,
-      otherGenres: isMocked ? [] : otherGenres,
-      maxNodeCount,
       polygonPoints,
       rings,
-      isMocked,
     };
-  }, [constellation, genres, T, isNsfw]);
-
-  const isMocked = insightData?.isMocked;
-  const hasEnoughData = !isMocked && insightTitleCount >= MIN_DNA_TITLES && insightData.nodes.length >= 3;
+  }, [dnaData.nodes]);
 
   const stageStyle = useMemo(() => ({
     ...STAGE_STYLE_BASE,
@@ -163,8 +121,8 @@ export const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
     gridTemplateColumns: 'minmax(0, 1.35fr) minmax(11.25rem, 0.8fr)',
     gap: 'var(--space-xl)',
     alignItems: 'center',
-    ...(!hasEnoughData ? GHOST_STYLE : {})
-  }), [hasEnoughData]);
+    ...(!dnaData.hasEnoughData ? GHOST_STYLE : {})
+  }), [dnaData.hasEnoughData]);
 
   return (
     <Card variant="interactive-glass" padding="xl" glowBlob={true} flex={1} className="u-insights-panel">
@@ -180,15 +138,15 @@ export const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
         {/* eslint-disable-next-line react/forbid-dom-props */}
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <RadarChart
-            nodes={insightData.nodes}
-            rings={insightData.rings}
-            polygonPoints={insightData.polygonPoints}
+            nodes={plotted.nodes}
+            rings={plotted.rings}
+            polygonPoints={plotted.polygonPoints}
           />
         </div>
 
-        {hasEnoughData && (
+        {dnaData.hasEnoughData && (
           <Stack gap="sm">
-            {insightData.nodes.map((node) => (
+            {dnaData.nodes.map((node) => (
               <Card key={node.id} variant="flat-glass" padding="none">
                 {/* eslint-disable-next-line react/forbid-dom-props */}
                 <div style={{ padding: 'var(--space-sm) var(--space-md)' }}>
@@ -209,14 +167,14 @@ export const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
               </Card>
             ))}
 
-            {insightData.otherGenres.length > 0 && (
+            {dnaData.otherGenres.length > 0 && (
               // eslint-disable-next-line react/forbid-dom-props
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', marginTop: 'var(--space-xs)' }}>
                 <Text variant="caption" color="secondary" weight="extrabold" uppercase as="span">
                   {T('statistics.stats.other_genres') || 'Other Genres'}
                 </Text>
                 <Inline gap="sm">
-                  {insightData.otherGenres.map((node) => (
+                  {dnaData.otherGenres.map((node) => (
                     <span
                       key={`other-${node.id}`}
                       // eslint-disable-next-line react/forbid-dom-props
@@ -244,7 +202,7 @@ export const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
         )}
       </div>
 
-      {!hasEnoughData && (
+      {!dnaData.hasEnoughData && (
         // eslint-disable-next-line react/forbid-dom-props
         <div style={OVERLAY_CARD_STYLE}>
           <div className="u-insights-overlay-icon-wrapper u-insights-overlay-icon-wrapper--dna">
@@ -285,62 +243,17 @@ export const LibraryDNA = ({ constellation, genres, insightTitleCount, T }) => {
   );
 };
 
-LibraryDNA.propTypes = {
-  constellation: PropTypes.object,
-  genres: PropTypes.object,
-  insightTitleCount: PropTypes.number.isRequired,
-  T: PropTypes.func.isRequired,
-};
-
-export const TimeTravelTimeline = ({ decades, insightTitleCount, T }) => {
-  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
+export const TimeTravelTimeline = () => {
+  const { timelineData, t: T, sessionMode, insightTitleCount, MIN_TIMELINE_TITLES } = useStatisticsPageState();
   const isNsfw = sessionMode === 'nsfw';
-
-  const { sorted, maxCount, topDecadeLabel, isMocked } = useMemo(() => {
-    let mockDecades = decades;
-    const isMocked = !decades || Object.keys(decades).length < 2;
-    if (isMocked) {
-      mockDecades = {
-        '1980s': 3,
-        '1990s': 6,
-        '2000s': 12,
-        '2010s': 8,
-        '2020s': 5
-      };
-    }
-    const sorted = Object.entries(mockDecades).sort((a, b) => a[0].localeCompare(b[0]));
-    const maxCount = Math.max(...sorted.map(([, count]) => count), 1);
-    const topDecade = [...sorted].sort((a, b) => b[1] - a[1])[0][0];
-    
-    const formatDecade = (decade) => {
-      const match = String(decade || '').match(/^(\d{4})s$/);
-      return match ? T('statistics.stats.decade_label', { decade: match[1] }) || `${match[1]}s` : decade;
-    };
-    const topDecadeLabel = formatDecade(topDecade);
-
-    return {
-      sorted,
-      maxCount,
-      topDecade,
-      topDecadeLabel,
-      isMocked
-    };
-  }, [decades, T]);
-
-  const hasEnoughData = !isMocked && insightTitleCount >= MIN_TIMELINE_TITLES && sorted.length >= 2;
-
-  const formatDecade = (decade) => {
-    const match = String(decade || '').match(/^(\d{4})s$/);
-    return match ? T('statistics.stats.decade_label', { decade: match[1] }) || `${match[1]}s` : decade;
-  };
 
   const stageStyle = useMemo(() => ({
     ...STAGE_STYLE_BASE,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    ...(!hasEnoughData ? GHOST_STYLE : {})
-  }), [hasEnoughData]);
+    ...(!timelineData.hasEnoughData ? GHOST_STYLE : {})
+  }), [timelineData.hasEnoughData]);
 
   return (
     <Card variant="interactive-glass" padding="xl" glowBlob={true} flex={1} className="u-insights-panel">
@@ -350,11 +263,11 @@ export const TimeTravelTimeline = ({ decades, insightTitleCount, T }) => {
           {T('statistics.stats.timeline') || 'Time Travel'}
         </Text>
       </div>
-      {hasEnoughData && (
+      {timelineData.hasEnoughData && (
         // eslint-disable-next-line react/forbid-dom-props
         <div style={{ marginBottom: 'var(--space-2xl)' }}>
           <Text variant="body" color="accent" weight="semibold" as="p">
-            {T('statistics.stats.top_decade', { decade: topDecadeLabel }) || `Most files are from the ${topDecadeLabel}`}
+            {T('statistics.stats.top_decade', { decade: timelineData.topDecadeLabel }) || `Most files are from the ${timelineData.topDecadeLabel}`}
           </Text>
         </div>
       )}
@@ -362,14 +275,14 @@ export const TimeTravelTimeline = ({ decades, insightTitleCount, T }) => {
       {/* eslint-disable-next-line react/forbid-dom-props */}
       <div style={stageStyle}>
         <BarChart
-          sortedData={sorted}
-          maxCount={maxCount}
+          sortedData={timelineData.sorted}
+          maxCount={timelineData.maxCount}
           T={T}
-          formatDecade={formatDecade}
+          formatDecade={timelineData.formatDecade}
         />
       </div>
 
-      {!hasEnoughData && (
+      {!timelineData.hasEnoughData && (
         // eslint-disable-next-line react/forbid-dom-props
         <div style={OVERLAY_CARD_STYLE}>
           <div className="u-insights-overlay-icon-wrapper u-insights-overlay-icon-wrapper--timeline">
@@ -409,48 +322,3 @@ export const TimeTravelTimeline = ({ decades, insightTitleCount, T }) => {
   );
 };
 
-TimeTravelTimeline.propTypes = {
-  decades: PropTypes.object,
-  insightTitleCount: PropTypes.number.isRequired,
-  T: PropTypes.func.isRequired,
-};
-
-const LibraryInsightsWidget = ({ T, showDna = true, showTimeline = true }) => {
-  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
-  const { data: stats = {}, isLoading } = useStatsQuery(sessionMode === 'nsfw');
-  const insightTitleCount = useMemo(
-    () => Object.values(stats?.decade_distribution || {}).reduce((sum, value) => sum + Number(value || 0), 0),
-    [stats?.decade_distribution]
-  );
-
-  return (
-    <WidgetShell loading={isLoading} size="lg" transparent={true}>
-      {/* eslint-disable-next-line react/forbid-dom-props */}
-      <div style={{ display: 'flex', gap: 'var(--space-xl)', alignItems: 'stretch', width: '100%' }}>
-        {showDna && (
-          <LibraryDNA
-            constellation={stats?.genre_constellation}
-            genres={stats?.genre_distribution}
-            insightTitleCount={insightTitleCount}
-            T={T}
-          />
-        )}
-        {showTimeline && (
-          <TimeTravelTimeline
-            decades={stats?.decade_distribution}
-            insightTitleCount={insightTitleCount}
-            T={T}
-          />
-        )}
-      </div>
-    </WidgetShell>
-  );
-};
-
-LibraryInsightsWidget.propTypes = {
-  T: PropTypes.func.isRequired,
-  showDna: PropTypes.bool,
-  showTimeline: PropTypes.bool,
-};
-
-export default LibraryInsightsWidget;

@@ -1,89 +1,49 @@
-import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
-import { usePreservedState } from '@/hooks/usePreservedState';
-import { useScrollRestoration } from '@/hooks/useScrollRestoration';
-import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import Page from '@/ui/Page';
 import Button from '@/ui/Button';
 import PageHeader from '@/ui/PageHeader';
 import SegmentedControl from '@/ui/SegmentedControl';
-import { useTranslation } from '@/providers/LanguageContext';
-import { useUi } from '@/providers/UiProvider';
 import Lightbox from '@/ui/Lightbox';
-import { useHistoryQuery, useUndoMutation, useScanStatusQuery, useWatchedHistoryQuery, usePlayMediaMutation, usePeaksQuery } from '@/queries';
 import { AlertTriangle } from '@/ui/icons';
-import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import RenameHistoryList from './components/RenameHistoryList';
 import WatchedHistoryList from './components/WatchedHistoryList';
 import PeaksHistoryList from './components/PeaksHistoryList';
 import styles from './HistoryPage.module.css';
 import Inline from '@/ui/Inline';
+import useHistoryPage from './hooks/useHistoryPage';
 
 export default function HistoryPage() {
-  const { t } = useTranslation();
-  const { openModal, closeModal, toast } = useUi();
-  const [activeTab, setActiveTab] = usePreservedState('activeTab', 'rename');
-  const [lightboxImage, setLightboxImage] = useState(null);
-  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
+  const {
+    t,
+    openModal,
+    closeModal,
+    activeTab,
+    setActiveTab,
+    lightboxImage,
+    setLightboxImage,
+    sessionMode,
+    history,
+    isHistoryLoading,
+    hasNextHistoryPage,
+    isFetchingNextHistoryPage,
+    historySentinelRef,
+    isAnyTaskActive,
+    isUndoing,
+    revertingBatchIds,
+    watchedHistory,
+    isWatchedLoading,
+    hasNextWatchedPage,
+    isFetchingNextWatchedPage,
+    watchedSentinelRef,
+    playMutation,
+    peaksData,
+    isPeaksLoading,
+    handlePlayMoment,
+    handlePlay,
+    triggerUndo,
+  } = useHistoryPage();
 
-  useScrollRestoration('.shell__content', [activeTab]);
-  const navigate = useNavigate();
   const utilityBarTarget = typeof document !== 'undefined' ? document.getElementById('shell-utility-bar-center') : null;
-
-  useEffect(() => {
-    if (sessionMode !== 'nsfw' && activeTab === 'peaks') {
-      navigate('/dashboard');
-    }
-  }, [sessionMode, activeTab, navigate]);
-
-  // Rename History
-  const {
-    data: historyData,
-    isLoading: isHistoryLoading,
-    fetchNextPage: fetchNextHistoryPage,
-    hasNextPage: hasNextHistoryPage,
-    isFetchingNextPage: isFetchingNextHistoryPage,
-  } = useHistoryQuery();
-  const history = historyData?.pages.flatMap((page) => Array.isArray(page) ? page : (page?.items || [])) || [];
-
-  const { data: scanStatus } = useScanStatusQuery();
-  const undoMutation = useUndoMutation();
-  const [revertingBatchIds, setRevertingBatchIds] = useState(new Set());
-
-  const isAnyTaskActive = scanStatus?.active;
-  const isUndoing = scanStatus?.active && scanStatus?.phase === 'undoing';
-
-  // Playback History
-  const {
-    data: watchedHistoryData,
-    isLoading: isWatchedLoading,
-    fetchNextPage: fetchNextWatchedPage,
-    hasNextPage: hasNextWatchedPage,
-    isFetchingNextPage: isFetchingNextWatchedPage,
-  } = useWatchedHistoryQuery();
-  const watchedHistory = watchedHistoryData?.pages.flatMap((page) => Array.isArray(page) ? page : (page?.items || [])) || [];
-
-  const playMutation = usePlayMediaMutation();
-
-  // Peak Moments History
-  const { data: peaksData = [], isLoading: isPeaksLoading } = usePeaksQuery();
-
-  const handlePlayMoment = (itemId, videoPosition) => {
-    playMutation.mutate({ itemId, start: videoPosition });
-  };
-
-  const historySentinelRef = useInfiniteScroll({
-    onIntersect: fetchNextHistoryPage,
-    enabled: hasNextHistoryPage && !isFetchingNextHistoryPage && activeTab === 'rename',
-    root: '.shell__content',
-  });
-
-  const watchedSentinelRef = useInfiniteScroll({
-    onIntersect: fetchNextWatchedPage,
-    enabled: hasNextWatchedPage && !isFetchingNextWatchedPage && activeTab === 'watched',
-    root: '.shell__content',
-  });
 
   const handleConfirmUndo = (batch) => {
     openModal({
@@ -118,24 +78,7 @@ export default function HistoryPage() {
             variant="primary"
             onClick={() => {
               closeModal();
-              setRevertingBatchIds((prev) => {
-                const next = new Set(prev);
-                next.add(batch.id);
-                return next;
-              });
-              undoMutation.mutate(batch.id, {
-                onSuccess: () => {
-                  toast(t('historyPage.toastStartedDesc') || 'Reverting batch in the background...', 'success');
-                },
-                onError: (err) => {
-                  setRevertingBatchIds((prev) => {
-                    const next = new Set(prev);
-                    next.delete(batch.id);
-                    return next;
-                  });
-                  toast(err?.message || t('historyPage.toastErrorDesc') || 'Could not launch undo operation.', 'danger');
-                }
-              });
+              triggerUndo(batch.id);
             }}
           >
             {t('historyPage.confirmButton') || 'Revert Action'}
@@ -143,10 +86,6 @@ export default function HistoryPage() {
         </Inline>
       ),
     });
-  };
-
-  const handlePlay = (itemId) => {
-    playMutation.mutate(itemId);
   };
 
   const tabOptions = [

@@ -1,27 +1,15 @@
-import {
-  useRecommendationsQuery,
-  useAddToWatchlistMutation,
-  useRemoveFromWatchlistMutation,
-} from '../../../queries/dashboardQueries';
 import SpotlightBanner from './components/SpotlightBanner';
 import RecommendationSkeleton from './components/RecommendationSkeleton';
-import useRecommendationActions from './hooks/useRecommendationActions';
-import useWatchlistHandler from './hooks/useWatchlistHandler';
+import useSpotlight from './hooks/useSpotlight';
 
 export default function SpotlightWidget() {
-  const { data: recommendations, isLoading } = useRecommendationsQuery();
-  const watchlistIdsFromQuery = recommendations?.watchlist_item_ids;
-
-  const addToWatchlistMutation = useAddToWatchlistMutation();
-  const removeFromWatchlistMutation = useRemoveFromWatchlistMutation();
-
-  const { actualWatchlistIds, handleWatchlist } = useWatchlistHandler(
-    watchlistIdsFromQuery,
-    addToWatchlistMutation,
-    removeFromWatchlistMutation
-  );
-
-  const { handleCardClick } = useRecommendationActions();
+  const {
+    recommendations,
+    isLoading,
+    actualWatchlistIds,
+    handleWatchlist,
+    handleCardClick,
+  } = useSpotlight();
 
   if (isLoading) {
     return <RecommendationSkeleton showBanner />;

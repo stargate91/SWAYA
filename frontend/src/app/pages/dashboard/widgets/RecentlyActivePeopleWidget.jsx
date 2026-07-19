@@ -1,69 +1,23 @@
-import { useMemo } from 'react';
-import { useSettingsQuery } from '../../../queries/settingsQueries';
-import {
-  useRecommendationsQuery,
-  useAddToWatchlistMutation,
-  useRemoveFromWatchlistMutation,
-  useRecentlyActivatedPeopleInfiniteQuery,
-} from '../../../queries/dashboardQueries';
 import RecommendationCarousel from './components/RecommendationCarousel';
 import WidgetShell from '@/ui/WidgetShell';
-import useRecommendationActions from './hooks/useRecommendationActions';
-import useWatchlistHandler from './hooks/useWatchlistHandler';
-
-import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 import { useTranslation } from '../../../providers/LanguageContext';
+import useRecentlyActivePeople from './hooks/useRecentlyActivePeople';
 
 export default function RecentlyActivePeopleWidget() {
   const { t: T } = useTranslation();
-  const sessionMode = useLibraryModeStore((state) => state.sessionMode);
-  const { data: settings = {} } = useSettingsQuery();
-  const includeAdult = settings?.include_adult && sessionMode === 'nsfw';
-  const language = settings?.ui_language || settings?.primary_metadata_language;
-  const genderPref = includeAdult ? settings?.adult_gender_preference : undefined;
-
-  const { data: recommendations, isLoading: isRecsLoading } = useRecommendationsQuery(language, includeAdult);
-  const watchlistIdsFromQuery = recommendations?.watchlist_item_ids;
-
-  const addToWatchlistMutation = useAddToWatchlistMutation();
-  const removeFromWatchlistMutation = useRemoveFromWatchlistMutation();
-
-  const { actualWatchlistIds, handleWatchlist } = useWatchlistHandler(
-    watchlistIdsFromQuery,
-    addToWatchlistMutation,
-    removeFromWatchlistMutation
-  );
-
-  const { handleCardClick } = useRecommendationActions();
-
   const {
-    data: paginatedData,
-    isLoading: isPeopleLoading,
-    fetchNextPage,
+    includeAdult,
+    items,
+    isLoading,
+    actualWatchlistIds,
+    handleWatchlist,
+    handleCardClick,
+    handleLoadMorePeople,
     hasNextPage,
     isFetchingNextPage,
-  } = useRecentlyActivatedPeopleInfiniteQuery(includeAdult, genderPref);
+  } = useRecentlyActivePeople();
 
-  const handleLoadMorePeople = () => {
-    if (!isFetchingNextPage && hasNextPage) {
-      fetchNextPage();
-    }
-  };
-
-  const filteredPeople = useMemo(() => {
-    const list = paginatedData?.pages ? paginatedData.pages.flat() : [];
-    return list.filter((p) => {
-      if (sessionMode === 'sfw') {
-        const isAdult = p.is_adult || p.adult || p.known_for_department?.toLowerCase() === 'performer';
-        return !isAdult;
-      }
-      return true;
-    });
-  }, [paginatedData, sessionMode]);
-
-  const isLoading = isRecsLoading || isPeopleLoading;
-
-  if (!isLoading && !filteredPeople?.length) {
+  if (!isLoading && !items?.length) {
     return null;
   }
 
@@ -71,10 +25,7 @@ export default function RecentlyActivePeopleWidget() {
     <WidgetShell loading={isLoading} size="lg" transparent={true}>
       <RecommendationCarousel
         title={T(includeAdult ? 'dashboard.recommendations.recently_activated_people_adult' : 'dashboard.recommendations.recently_activated_people') || (includeAdult ? 'Recently Followed Adult Stars' : 'Recently Tracked People')}
-        items={filteredPeople.map(p => ({
-          ...p,
-          media_type: 'person'
-        }))}
+        items={items}
         watchlistIds={actualWatchlistIds}
         onWatchlist={handleWatchlist}
         onCardClick={handleCardClick}

@@ -1,33 +1,20 @@
-import { useSettingsQuery } from '../../../queries/settingsQueries';
-import {
-  useRecommendationsQuery,
-  useAddToWatchlistMutation,
-  useRemoveFromWatchlistMutation,
-} from '../../../queries/dashboardQueries';
 import RecommendationCarousel from './components/RecommendationCarousel';
 import WidgetShell from '@/ui/WidgetShell';
-import useRecommendationActions from './hooks/useRecommendationActions';
-import useWatchlistHandler from './hooks/useWatchlistHandler';
 import { useTranslation } from '../../../providers/LanguageContext';
+import useAdultRecommendations from './hooks/useAdultRecommendations';
 
 export default function AdultRecommendationsWidget() {
   const { t: T } = useTranslation();
-  const { data: settings = {} } = useSettingsQuery();
-  const includeAdult = settings?.include_adult;
-
-  const { data: recommendations, isLoading } = useRecommendationsQuery();
-  const watchlistIdsFromQuery = recommendations?.watchlist_item_ids;
-
-  const addToWatchlistMutation = useAddToWatchlistMutation();
-  const removeFromWatchlistMutation = useRemoveFromWatchlistMutation();
-
-  const { actualWatchlistIds, handleWatchlist } = useWatchlistHandler(
-    watchlistIdsFromQuery,
-    addToWatchlistMutation,
-    removeFromWatchlistMutation
-  );
-
-  const { handlePlayClick, handleCardClick, playMutationPending } = useRecommendationActions();
+  const {
+    includeAdult,
+    recommendations,
+    isLoading,
+    actualWatchlistIds,
+    handleWatchlist,
+    handlePlayClick,
+    handleCardClick,
+    playMutationPending,
+  } = useAdultRecommendations();
 
   if (!includeAdult) {
     return null;
