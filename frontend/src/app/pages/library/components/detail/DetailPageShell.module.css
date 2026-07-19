@@ -37,6 +37,18 @@
     will-change: padding-right;
   }
 
+  .inline-sections {
+    height: 100%;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 2.2fr) minmax(22.5rem, 1.2fr);
+    gap: var(--space-2xl);
+    padding: var(--space-md) 0 5rem 0;
+    box-sizing: border-box;
+    width: 100%;
+    flex-shrink: 0;
+  }
+
   &:global(.entity-detail-page--people) {
     .container {
       gap: var(--space-2xl);
@@ -283,17 +295,6 @@
   border: none;
 }
 
-.inline-sections {
-  height: 100%;
-  overflow-y: auto;
-  display: grid;
-  grid-template-columns: minmax(0, 2.2fr) minmax(22.5rem, 1.2fr);
-  gap: var(--space-2xl);
-  padding: var(--space-md) 0 5rem 0;
-  box-sizing: border-box;
-  width: 100%;
-  flex-shrink: 0;
-}
 
 .read-more-overview {
   font-size: 0.9375rem;
@@ -309,4 +310,11 @@
 .read-more-paragraph {
   margin: 0 0 1rem;
   text-indent: 1rem;
+}
+
+.pageScene {
+  .hero-content-section {
+    justify-content: flex-start;
+    padding-top: 12vh;
+  }
 }

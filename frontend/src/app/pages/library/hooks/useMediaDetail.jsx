@@ -12,7 +12,7 @@ import {
   getDurationText,
   resolveDetailsImageUrl
 } from '../utils/detailUtils';
-import { Info } from '@/ui/icons';
+
 import RatingsReviewDrawer from '@/pages/ratings/components/RatingsReviewDrawer';
 import { useMediaMutations } from './useMediaMutations';
 import { useMediaDetailTabs } from './useMediaDetailTabs';

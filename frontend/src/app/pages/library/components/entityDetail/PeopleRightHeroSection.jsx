@@ -8,7 +8,9 @@ export default function PeopleRightHeroSection({ item }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  if (!item?.known_for || item.known_for.length === 0) return null;
+  if (!item?.known_for || item.known_for.length === 0) {
+    return <div className="entity-detail-page__summary" />;
+  }
 
   return (
     <div className="entity-detail-page__summary">

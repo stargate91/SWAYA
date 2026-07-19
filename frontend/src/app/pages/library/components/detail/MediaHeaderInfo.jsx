@@ -70,93 +70,95 @@ export default function MediaHeaderInfo({ isFallbackGrid = false }) {
           {logoUrl ? (
             <img src={logoUrl} alt={title} className={styles.logo} />
           ) : (
-            <Text as="h1" variant="title" shadow="title" className={styles['fallback-title']}>{title}</Text>
+            <Text as="h1" variant={(isFallbackGrid || isScene) ? 'hero' : 'title'} shadow="title" className={styles['fallback-title']}>{title}</Text>
           )}
         </div>
 
-        {logoUrl && item?.type === 'scene' && (
-          <Text as="h1" variant="title" shadow="title" className={styles['scene-title-below-logo']}>{title}</Text>
-        )}
-
-        <Stack gap="md" className={styles['details-group']}>
-          {showOriginalTitle && (
-            <Text as="div" variant="body" color="muted" weight="medium" italic className={styles['original-title']}>
-              {originalTitle}
-            </Text>
+        <Stack gap="md" className={styles['details-group-wrapper']}>
+          {logoUrl && item?.type === 'scene' && (
+            <Text as="h1" variant="title" shadow="title" className={styles['scene-title-below-logo']}>{title}</Text>
           )}
 
-          {tagline && (
-            <Text as="div" variant="body" color="accent" weight="medium" italic shadow="tagline" className={styles.tagline}>
-              {taglineText}
-            </Text>
-          )}
+          <Stack gap="md" className={styles['details-group']}>
+            {showOriginalTitle && (
+              <Text as="div" variant="body" color="muted" weight="medium" italic className={styles['original-title']}>
+                {originalTitle}
+              </Text>
+            )}
 
-          {(metaDate || formattedDuration || seasonsText || episodesText || langText || ratingImdb || ratingTmdb || showStudioPill || showNetworkPill) && (
-            <Inline gap="lg" align="center" className={styles['meta-row']}>
-              {showStudioPill && (
-                <Pill variant="meta">
-                  <Video size={14} />
-                  {studioName}
-                </Pill>
-              )}
-              {showNetworkPill && (
-                <Pill variant="meta">
-                  <Globe size={14} />
-                  {networkName}
-                </Pill>
-              )}
-              {metaDate && (
-                <Pill variant="meta">
-                  <Calendar size={14} />
-                  {metaDate}
-                </Pill>
-              )}
-              {(isMovie || isScene) && formattedDuration && (
-                <Pill variant="meta">
-                  <Clock size={14} />
-                  {formattedDuration}
-                </Pill>
-              )}
-              {!isMovie && !isScene && seasonsText && (
-                <Pill variant="meta">
-                  {seasonsText}
-                </Pill>
-              )}
-              {!isMovie && !isScene && episodesText && (
-                <Pill variant="meta">
-                  {episodesText}
-                </Pill>
-              )}
-              {langText && (
-                <Pill variant="meta">
-                  {langText}
-                </Pill>
-              )}
-              {activeRating && (
-                <Pill variant="meta">
-                  <img
-                    src={activeRating.logo}
-                    alt={activeRating.type === 'imdb' ? 'IMDb' : activeRating.type === 'tmdb' ? 'TMDb' : 'ThePornDB'}
-                  />
-                  <span>
-                    {isNaN(parseFloat(activeRating.val))
-                      ? activeRating.val
-                      : parseFloat(activeRating.val).toFixed(1)}
-                  </span>
-                </Pill>
-              )}
-            </Inline>
-          )}
+            {tagline && (
+              <Text as="div" variant="body" color="accent" weight="medium" italic shadow="tagline" className={styles.tagline}>
+                {taglineText}
+              </Text>
+            )}
 
-          {normalizedGenres && normalizedGenres.length > 0 && (
-            <Inline gap="lg" align="center" className={styles['meta-row']}>
-              {normalizedGenres.map((genre, idx) => (
-                <Pill key={idx} variant="meta">
-                  {t(`library.genres.${genre}`, { defaultValue: genre }).toUpperCase()}
-                </Pill>
-              ))}
-            </Inline>
-          )}
+            {(metaDate || formattedDuration || seasonsText || episodesText || langText || ratingImdb || ratingTmdb || showStudioPill || showNetworkPill) && (
+              <Inline gap="lg" align="center" className={styles['meta-row']}>
+                {showStudioPill && (
+                  <Pill variant="meta">
+                    <Video size={14} />
+                    {studioName}
+                  </Pill>
+                )}
+                {showNetworkPill && (
+                  <Pill variant="meta">
+                    <Globe size={14} />
+                    {networkName}
+                  </Pill>
+                )}
+                {metaDate && (
+                  <Pill variant="meta">
+                    <Calendar size={14} />
+                    {metaDate}
+                  </Pill>
+                )}
+                {(isMovie || isScene) && formattedDuration && (
+                  <Pill variant="meta">
+                    <Clock size={14} />
+                    {formattedDuration}
+                  </Pill>
+                )}
+                {!isMovie && !isScene && seasonsText && (
+                  <Pill variant="meta">
+                    {seasonsText}
+                  </Pill>
+                )}
+                {!isMovie && !isScene && episodesText && (
+                  <Pill variant="meta">
+                    {episodesText}
+                  </Pill>
+                )}
+                {langText && (
+                  <Pill variant="meta">
+                    {langText}
+                  </Pill>
+                )}
+                {activeRating && (
+                  <Pill variant="meta">
+                    <img
+                      src={activeRating.logo}
+                      alt={activeRating.type === 'imdb' ? 'IMDb' : activeRating.type === 'tmdb' ? 'TMDb' : 'ThePornDB'}
+                    />
+                    <span>
+                      {isNaN(parseFloat(activeRating.val))
+                        ? activeRating.val
+                        : parseFloat(activeRating.val).toFixed(1)}
+                    </span>
+                  </Pill>
+                )}
+              </Inline>
+            )}
+
+            {normalizedGenres && normalizedGenres.length > 0 && (
+              <Inline gap="lg" align="center" className={styles['meta-row']}>
+                {normalizedGenres.map((genre, idx) => (
+                  <Pill key={idx} variant="meta">
+                    {t(`library.genres.${genre}`, { defaultValue: genre }).toUpperCase()}
+                  </Pill>
+                ))}
+              </Inline>
+            )}
+          </Stack>
         </Stack>
       </div>
     </div>

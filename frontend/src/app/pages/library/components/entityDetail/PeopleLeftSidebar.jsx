@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Layers, PenLine, Heart, Check, Minus, Plus, Info } from '@/ui/icons';
+import { PenLine, Heart, Check, Minus, Plus, Info } from '@/ui/icons';
 import Lightbox from '@/ui/Lightbox';
 import SegmentedRating from '@/ui/SegmentedRating';
 import EntityDetailDrawer from './EntityDetailDrawer';

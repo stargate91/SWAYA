@@ -30,8 +30,17 @@
   transition: transform var(--motion-base), filter var(--motion-base);
 }
 
-.fallback-title,
+.fallback-title {
+  line-height: 1.15;
+  max-width: min(50rem, 100%);
+  overflow-wrap: break-word;
+  transition: transform var(--motion-base), color var(--motion-base);
+}
+
 .scene-title-below-logo {
+  font-size: var(--font-size-3xl);
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-semibold);
   line-height: 1.15;
   max-width: min(50rem, 100%);
   overflow-wrap: break-word;

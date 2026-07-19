@@ -18,6 +18,8 @@ import Card from '@/ui/Card';
 import Divider from '@/ui/Divider';
 import Stack from '@/ui/Stack';
 import Button from '@/ui/Button';
+
+const BULLET_CHAR = '\u2022';
 import Text from '@/ui/Text';
 import styles from './BespokeSeasonsSection.module.css';
 
@@ -213,7 +215,7 @@ export default function BespokeSeasonsSection() {
                     </Inline>
                   )}
                   {activeSeason.air_date && activeSeason.episode_count > 0 && (
-                    <span className={styles['bullet-separator']}>{"\u2022"}</span>
+                    <span className={styles['bullet-separator']}>{BULLET_CHAR}</span>
                   )}
                   {activeSeason.episode_count > 0 && (
                     <Inline gap="3xs" align="center" className={styles['item-text']}>

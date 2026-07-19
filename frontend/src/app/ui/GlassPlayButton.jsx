@@ -14,7 +14,7 @@ export default function GlassPlayButton({
       type="button"
       className={`${styles.btn} ${isLoading ? styles['btn--loading'] : ''} ${className}`.trim()}
       onClick={onClick}
-      title={title}
+      aria-label={title}
     >
       {isLoading && <span className={styles.spinner} />}
       {isPlaying ? (

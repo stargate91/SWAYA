@@ -1,8 +1,7 @@
 import { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Image as ImageIcon,
-  Play, Pause
+  Image as ImageIcon
 } from '@/ui/icons';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';

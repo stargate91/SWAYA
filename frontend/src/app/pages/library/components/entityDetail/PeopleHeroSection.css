@@ -5,6 +5,7 @@
   width: 100%;
   height: 100%;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .people-detail-right-column {
@@ -57,6 +58,7 @@
   align-self: stretch;
   flex-shrink: 0;
 }
+
 
 /* Sidebar alternate names / aliases */
 .entity-detail-page__sidebar-aliases {

@@ -340,16 +340,16 @@
   color: var(--color-accent);
 }
 
-.button[data-variant="success"][aria-pressed="true"]:hover:not(:disabled) .icon {
-  color: var(--button-danger-color);
-}
-
 .button[data-variant="onboarding-back"]:hover:not(:disabled) .icon {
   color: color-mix(in srgb, var(--button-secondary-color) 74%, var(--color-text-primary) 10%);
 }
 
 .button[data-variant="onboarding-continue"]:hover:not(:disabled) .icon {
   color: var(--color-text-primary);
+}
+
+.button[data-variant="success"][aria-pressed="true"]:hover:not(:disabled) .icon {
+  color: var(--button-danger-color);
 }
 
 

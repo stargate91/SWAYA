@@ -46,7 +46,7 @@ export default function Text({
     : style;
 
   return (
-    <Component className={classes} style={mergedStyle} {...props}>
+    <Component {...props} {...{ className: classes, style: mergedStyle }}>
       {children}
     </Component>
   );

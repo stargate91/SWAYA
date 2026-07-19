@@ -58,6 +58,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
   const handleOpenPeopleBackdropModal = () => setIsBackdropDrawerOpen(true);
 
   const [isScrolled, setIsScrolled] = useState(false);
+
   const [isImagePickerDrawerOpen, setIsImagePickerDrawerOpen] = useState(false);
   const [isBackdropDrawerOpen, setIsBackdropDrawerOpen] = useState(false);
   const [isDetailsDrawerOpen, setIsDetailsDrawerOpen] = useState(false);
@@ -87,18 +88,24 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
         return;
       }
       if (!isPeople) return;
+
+      const scrollableGrid = e.target.closest('.person-credits-discover-grid-wrapper, .person-credits-gallery-grid');
+
       if (Math.abs(e.deltaY) > 5) {
-        if (e.deltaY > 0 && !isScrolled) {
-          setIsScrolled(true);
-        } else if (e.deltaY < 0 && isScrolled) {
-          const isInsideSection = e.target.closest('.person-credits-section-container');
-          if (isInsideSection) {
-            const scrollable = isInsideSection.querySelector('.person-credits-discover-grid-wrapper, .person-credits-discover-grid');
-            if (scrollable && scrollable.scrollTop > 0) {
+        if (e.deltaY > 0) {
+          if (scrollableGrid) {
+            return;
+          }
+          if (!isScrolled) {
+            setIsScrolled(true);
+          }
+        } else if (e.deltaY < 0) {
+          if (isScrolled) {
+            if (scrollableGrid && scrollableGrid.scrollTop > 0) {
               return;
             }
+            setIsScrolled(false);
           }
-          setIsScrolled(false);
         }
       }
     };
@@ -175,7 +182,6 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
                   <PersonCreditsSections
                     id={id}
                     item={item}
-                    isScrolled={isScrolled}
                     navigate={navigate}
                     t={t}
                   />
