@@ -3,8 +3,10 @@ import { toTitleCase, formatListAttr } from '../../utils/heroSectionUtils';
 import Drawer from '@/ui/Drawer';
 import ParsedParagraphs from '@/ui/ParsedParagraphs';
 import DescriptionList from '@/ui/DescriptionList';
-
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
 import { useSettingsQuery } from '@/queries';
+import styles from './EntityDetailHeroSectionShared.module.css';
 
 const DASH_CHAR = ' - ';
 const CM_CHAR = ' cm';
@@ -51,8 +53,8 @@ export default function EntityDetailDrawer({
       { label: t('library.details.measurements'), value: item.measurements },
       { label: t('library.details.cupSize') || 'Cup Size', value: item.cup_size },
       { label: t('library.details.bandSize') || 'Band Size', value: item.band_size },
-      { label: t('library.details.waist') || 'Waist', value: formatBodyDim(item.waist) },
-      { label: t('library.details.hip') || 'Hip', value: formatBodyDim(item.hip) },
+      { label: t('library.details.waist') || formatBodyDim(item.waist) },
+      { label: t('library.details.hip') || formatBodyDim(item.hip) },
       { label: t('library.details.breastType'), value: item.breast_type ? (t(`library.performerEdit.breastTypes.${item.breast_type.toLowerCase()}`) || toTitleCase(item.breast_type)) : null },
       { label: t('library.details.breastSize') || 'Breast Size', value: item.breast_size ? (t(`library.performerEdit.breastSizes.${item.breast_size.toLowerCase()}`) || toTitleCase(item.breast_size)) : null },
       { label: t('library.details.buttShape') || 'Butt Shape', value: item.butt_shape ? (t(`library.performerEdit.buttShapes.${item.butt_shape.toLowerCase()}`) || toTitleCase(item.butt_shape)) : null },
@@ -72,43 +74,43 @@ export default function EntityDetailDrawer({
       title={item?.name || overviewTitle}
       size="md"
     >
-      <div className="entity-detail-page__drawer-content">
-          {/* Section 1: Alternate Names */}
-          {drawerAliases.length > 0 && (
-            <div className="entity-detail-page__drawer-section">
-              <h4 className="entity-detail-page__drawer-section-title">
-                {t('library.details.alsoKnownAs') || 'Also known as'}
-              </h4>
-              <div className="entity-detail-page__drawer-aliases-text">
-                {drawerAliases.join(', ')}
-              </div>
-            </div>
-          )}
+      <Stack gap="xl" padding="md" className="u-flex-1 u-overflow-y-auto">
+        {/* Section 1: Alternate Names */}
+        {drawerAliases.length > 0 && (
+          <Stack gap="md">
+            <h4 className={styles['drawer-section-title']}>
+              {t('library.details.alsoKnownAs') || 'Also known as'}
+            </h4>
+            <Text variant="small" color="secondary" className="u-leading-normal">
+              {drawerAliases.join(', ')}
+            </Text>
+          </Stack>
+        )}
 
-          {/* Section 2: Physical Specs */}
-           {hasAnySpecs && (
-            <div className="entity-detail-page__drawer-section">
-              <h4 className="entity-detail-page__drawer-section-title">
-                {t('library.details.specsTitle') || 'Physical Specs'}
-              </h4>
-              <DescriptionList items={specItems} spaced />
-            </div>
-          )}
+        {/* Section 2: Physical Specs */}
+        {hasAnySpecs && (
+          <Stack gap="md">
+            <h4 className={styles['drawer-section-title']}>
+              {t('library.details.specsTitle') || 'Physical Specs'}
+            </h4>
+            <DescriptionList items={specItems} spaced />
+          </Stack>
+        )}
 
-          {/* Section 3: Biography */}
-          {overviewText && (
-            <div className="entity-detail-page__drawer-section">
-              <h4 className="entity-detail-page__drawer-section-title">
-                {t('library.details.biographyTitle') || 'Biography'}
-              </h4>
-              <ParsedParagraphs
-                text={overviewText}
-                className="entity-detail-page__drawer-bio"
-                paragraphClassName="entity-detail-page__drawer-paragraph"
-              />
-            </div>
-          )}
-        </div>
+        {/* Section 3: Biography */}
+        {overviewText && (
+          <Stack gap="md">
+            <h4 className={styles['drawer-section-title']}>
+              {t('library.details.biographyTitle') || 'Biography'}
+            </h4>
+            <ParsedParagraphs
+              text={overviewText}
+              paragraphClassName="u-mb-md u-leading-relaxed"
+            />
+          </Stack>
+        )}
+      </Stack>
     </Drawer>
   );
 }
+

@@ -1,7 +1,6 @@
  
 import { useRef } from 'react';
 import { ImageOff, ENTITY_ICONS } from '@/ui/icons';
-import Tooltip from '@/ui/Tooltip';
 import EmptyState from '@/ui/EmptyState';
 import SegmentedControl from '@/ui/SegmentedControl';
 import SelectableCard from '@/ui/SelectableCard';

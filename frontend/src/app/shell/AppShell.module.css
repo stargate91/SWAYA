@@ -139,7 +139,7 @@
   padding-bottom: var(--space-7xl);
 }
 
-.shell:has(:global(#shell-utility-bar-bottom-center) > *:not(:empty)) .content > div:not([data-viewport]) {
+.shell:has(:global(#shell-utility-bar-bottom-center) > *:not(:empty)) .content>div:not([data-viewport]) {
   --page-pb: var(--space-7xl);
   padding-bottom: var(--page-pb);
 }

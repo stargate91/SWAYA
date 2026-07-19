@@ -7,9 +7,9 @@
 }
 
 .progress-banner {
-  padding: var(--space-sm) var(--space-sm);
+  padding: var(--space-sm);
   background: color-mix(in srgb, var(--color-accent-blue) 8%, var(--color-surface-card));
-  border: 1px solid color-mix(in srgb, var(--color-accent-blue) 15%, var(--color-border-default));
+  border: 0.0625rem solid color-mix(in srgb, var(--color-accent-blue) 15%, var(--color-border-default));
   border-radius: var(--radius-sm);
   font-size: 0.75rem;
   color: var(--color-text-secondary);
@@ -17,15 +17,13 @@
   align-items: center;
   gap: var(--space-sm);
   margin-bottom: var(--space-md);
-  --pulse-anim: backdrop-progress-fade 2s infinite ease-in-out;
-  animation: var(--pulse-anim);
+  animation: backdrop-progress-fade var(--motion-duration-pulse) infinite var(--motion-ease-in-out);
 }
 
 @keyframes backdrop-progress-fade {
-
   0%,
   100% {
-    opacity: 0.85;
+    opacity: 0.45;
   }
 
   50% {

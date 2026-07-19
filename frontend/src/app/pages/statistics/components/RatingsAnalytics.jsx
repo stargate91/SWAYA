@@ -32,17 +32,16 @@ export function RatingsSummary({ state, t }) {
   }
 
   return (
-    <Stack gap="5xl" fill>
+    <Stack gap="lg">
       {/* CARD 1: Media Average Ratings */}
       <Card
         variant="interactive-glass"
         padding="md"
         divider
-        flex={1}
         eyebrow={t('ratings.stats.mediaAverages', { defaultValue: 'Average Ratings' })}
         actions={<BarChart2 size={16} className="icon-glow-blue" />}
       >
-        <Stack gap="sm" fill justify="center">
+        <Stack gap="sm" justify="center">
           {/* Movies Row */}
           <Inline gap="md" align="center" justify="between" className="u-min-h-row">
             <Text variant="body" color="muted" weight="medium">
@@ -116,11 +115,10 @@ export function RatingsSummary({ state, t }) {
         variant="interactive-glass"
         padding="md"
         divider
-        flex={1}
         eyebrow={t('ratings.stats.mediaItems', { defaultValue: 'Library Items' })}
         actions={<CheckCircle size={16} className="icon-glow-success" />}
       >
-        <Stack gap="sm" fill justify="center">
+        <Stack gap="sm" justify="center">
           {/* Movies counts */}
           <Inline gap="md" align="center" justify="between" className="u-min-h-row">
             <Text variant="body" color="muted" weight="medium">
@@ -190,11 +188,10 @@ export function RatingsSummary({ state, t }) {
         variant="interactive-glass"
         padding="md"
         divider
-        flex={1}
         eyebrow={t('ratings.subtabs.people', { defaultValue: 'People' })}
         actions={<Users size={16} className="icon-glow-muted" />}
       >
-        <Stack gap="sm" fill justify="center">
+        <Stack gap="sm" justify="center">
           {/* People Avg Rating */}
           <Inline gap="md" align="center" justify="between" className="u-min-h-row">
             <Text variant="body" color="muted" weight="medium">
@@ -266,7 +263,6 @@ export function RatingDistribution({
     <Card
       variant="interactive-glass"
       divider
-      fullHeight
       eyebrow={t('ratings.stats.distribution', { defaultValue: 'Rating Distribution' })}
       actions={
         <SegmentedControl
@@ -290,7 +286,7 @@ export function RatingDistribution({
             const percentage = (count / maxCount) * 100;
             const ratingLabel = ((index + 1) / 2).toString();
             return (
-              <Inline key={index} gap="md" align="center" justify="between">
+              <div key={index} className={styles['distribution-row']}>
                 <span className={styles['rating-label-wrapper']}>
                   <Text variant="small" color="secondary" weight="bold">
                     {ratingLabel}
@@ -302,7 +298,7 @@ export function RatingDistribution({
                     {count}
                   </Text>
                 </span>
-              </Inline>
+              </div>
             );
           });
         })()}

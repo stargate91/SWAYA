@@ -1,0 +1,59 @@
+.right-column {
+  height: 100%;
+  overflow: hidden;
+}
+
+.known-for-card {
+  flex: 0 0 6.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 0;
+  transition: transform var(--motion-base);
+}
+
+.known-for-card--clickable {
+  cursor: pointer;
+}
+
+.known-for-card--clickable:hover {
+  transform: translateY(-0.25rem);
+}
+
+.poster-container {
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: color-mix(in srgb, var(--color-text-primary) 2%, transparent);
+  border: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+  position: relative;
+  transition: var(--motion-base);
+  box-shadow: 0 0.25rem 0.75rem color-mix(in srgb, var(--color-bg-canvas) 15%, transparent);
+}
+
+.known-for-card--clickable:hover .poster-container {
+  border-color: color-mix(in srgb, var(--color-text-primary) 20%, transparent);
+  box-shadow: 0 0.5rem 1.5rem color-mix(in srgb, var(--color-bg-canvas) 40%, transparent);
+}
+
+.poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0.8;
+  filter: grayscale(10%);
+  transition: opacity var(--motion-base), filter var(--motion-base);
+}
+
+.known-for-card:hover .poster {
+  opacity: 1;
+  filter: grayscale(0%);
+}
+
+:global(.entity-detail-page__summary).summary-wrapper {
+  justify-content: flex-end;
+  height: 100%;
+  align-self: stretch;
+  flex-shrink: 0;
+}

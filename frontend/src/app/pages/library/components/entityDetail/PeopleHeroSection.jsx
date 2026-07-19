@@ -16,8 +16,7 @@ import { navigateToCreditDetail } from '../../utils/mediaNavigation';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import { API_BASE } from '@/lib/backend';
-import './EntityDetailHeroSectionShared.css';
-import './PeopleHeroSection.css';
+import './EntityDetailHeroSectionShared.module.css';
 import Inline from '@/ui/Inline';
 
 export default function PeopleHeroSection({

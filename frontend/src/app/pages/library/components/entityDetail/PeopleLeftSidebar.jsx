@@ -5,6 +5,7 @@ import SegmentedRating from '@/ui/SegmentedRating';
 import EntityDetailDrawer from './EntityDetailDrawer';
 import EditableMediaCard from './EditableMediaCard';
 import IconButton from '@/ui/IconButton';
+import Button from '@/ui/Button';
 import {
   getCountryISO,
   getFlagEmoji,
@@ -15,8 +16,9 @@ import { useTranslation } from '@/providers/LanguageContext';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import { API_BASE } from '@/lib/backend';
 import Inline from '@/ui/Inline';
-import './EntityDetailHeroSectionShared.css';
-import './PeopleLeftSidebar.css';
+import Text from '@/ui/Text';
+import './EntityDetailHeroSectionShared.module.css';
+import styles from './PeopleLeftSidebar.module.css';
 
 export default function PeopleLeftSidebar({
   item,
@@ -46,16 +48,16 @@ export default function PeopleLeftSidebar({
   const flagEmoji = getFlagEmoji(countryISO);
 
   return (
-    <div className="entity-detail-page__media-column no-scrollbar">
+    <div className={`${styles['media-column']} no-scrollbar`}>
       {/* 1. Elegant Header (Name & Aliases) */}
       <div className="entity-detail-page__headline-block">
         <h1 className="entity-detail-page__title">
           {item?.name || item?.title || 'Unknown Person'}
         </h1>
         {candidateAliases.length > 0 && (
-          <span className="entity-detail-page__sidebar-aliases">
+          <Text variant="2xs" color="secondary" truncate weight="medium" className="u-mt-xs">
             {candidateAliases.join(', ')}
-          </span>
+          </Text>
         )}
       </div>
 
@@ -76,11 +78,11 @@ export default function PeopleLeftSidebar({
       />
 
       {/* 3. Integrated Sidebar Action Toolbar (Clean 3-button row, no rating pill) */}
-      <Inline gap="sm" align="center" className="entity-detail-page__sidebar-actions">
+      <Inline gap="sm" align="center" className="u-w-full u-mt-xs">
         <IconButton
           variant="none"
           size="none"
-          className={`entity-detail-page__sidebar-action entity-detail-page__sidebar-action--favorite ${item?.is_favorite ? 'is-active' : ''}`}
+          className={`${styles['sidebar-action']} ${item?.is_favorite ? styles['sidebar-action-fav--active'] : ''}`}
           onClick={handleToggleFavorite}
           title={t('library.details.favorite') || 'Favorite'}
         >
@@ -89,7 +91,7 @@ export default function PeopleLeftSidebar({
         <IconButton
           variant="none"
           size="none"
-          className={`entity-detail-page__sidebar-action entity-detail-page__sidebar-action--activate ${item?.is_active ? 'is-active' : ''}`}
+          className={`${styles['sidebar-action']} ${item?.is_active ? styles['sidebar-action-act--active'] : ''}`}
           onClick={handleToggleActive}
           onMouseEnter={() => setIsActivateHovered(true)}
           onMouseLeave={() => setIsActivateHovered(false)}
@@ -104,7 +106,7 @@ export default function PeopleLeftSidebar({
         <IconButton
           variant="none"
           size="none"
-          className="entity-detail-page__sidebar-action"
+          className={styles['sidebar-action']}
           onClick={handleOpenReviewModal}
           title={t('library.details.writeReview') || 'Write Review'}
         >
@@ -127,11 +129,11 @@ export default function PeopleLeftSidebar({
           }
         }}
         t={t}
-        className="entity-detail-page__segmented-rating-container"
-        barClassName="entity-detail-page__segmented-rating-bar"
-        segmentClassName="entity-detail-page__rating-segment"
-        segmentFillClassName="entity-detail-page__rating-segment-fill"
-        labelClassName="entity-detail-page__segmented-rating-label"
+        className={styles['rating-container']}
+        barClassName={styles['rating-bar']}
+        segmentClassName={styles['rating-segment']}
+        segmentFillClassName={styles['rating-fill']}
+        labelClassName={styles['rating-label']}
         formatLabel={(displayVal) => {
           return displayVal !== null && displayVal !== undefined
             ? `${t('library.details.yourRating') || 'Your Rating'}: ${displayVal.toFixed(1)}`
@@ -174,38 +176,60 @@ export default function PeopleLeftSidebar({
           : (item?.is_adult ? (t('lists.roles.performer') || 'Performer') : (t('lists.roles.artist') || 'Artist'));
 
         return (
-          <div className="entity-detail-page__sidebar-info-table">
-            <div className="entity-detail-page__info-row">
-              <div className="entity-detail-page__info-cell">
-                <span className="entity-detail-page__info-label">{t('library.details.gender') || 'Gender'}</span>
-                <span className="entity-detail-page__info-value">{genderVal || '—'}</span>
+          <div className={styles['info-table']}>
+            <div className={styles['info-row']}>
+              <div className={styles['info-cell']}>
+                <Text variant="2xs" color="muted" weight="semibold" uppercase>
+                  {t('library.details.gender') || 'Gender'}
+                </Text>
+                <Text variant="small" weight="semibold" color="primary" truncate>
+                  {genderVal || '—'}
+                </Text>
               </div>
-              <div className="entity-detail-page__info-cell">
-                <span className="entity-detail-page__info-label">{t('library.details.role') || 'Role'}</span>
-                <span className="entity-detail-page__info-value">{deptVal}</span>
+              <div className={styles['info-cell']}>
+                <Text variant="2xs" color="muted" weight="semibold" uppercase>
+                  {t('library.details.role') || 'Role'}
+                </Text>
+                <Text variant="small" weight="semibold" color="primary" truncate>
+                  {deptVal}
+                </Text>
               </div>
             </div>
-            <div className="entity-detail-page__info-row">
-              <div className="entity-detail-page__info-cell">
-                <span className="entity-detail-page__info-label">{t('library.details.born') || 'Born'}</span>
-                <span className="entity-detail-page__info-value">{item?.birthday || '—'}</span>
+            <div className={styles['info-row']}>
+              <div className={styles['info-cell']}>
+                <Text variant="2xs" color="muted" weight="semibold" uppercase>
+                  {t('library.details.born') || 'Born'}
+                </Text>
+                <Text variant="small" weight="semibold" color="primary" truncate>
+                  {item?.birthday || '—'}
+                </Text>
               </div>
-              <div className="entity-detail-page__info-cell">
-                <span className="entity-detail-page__info-label">{t('library.details.age') || 'Age'}</span>
-                <span className="entity-detail-page__info-value">
+              <div className={styles['info-cell']}>
+                <Text variant="2xs" color="muted" weight="semibold" uppercase>
+                  {t('library.details.age') || 'Age'}
+                </Text>
+                <Text variant="small" weight="semibold" color="primary" truncate>
                   {item?.birthday ? calculateAge(item.birthday) : '—'}
-                </span>
+                </Text>
               </div>
             </div>
             {item?.is_adult && sessionMode === 'nsfw' && (
-              <div className="entity-detail-page__info-row">
-                <div className="entity-detail-page__info-cell">
-                  <span className="entity-detail-page__info-label">{t('library.details.finishes') || 'Finishes'}</span>
-                  <span className="entity-detail-page__info-value">{item?.finish_count ?? 0}</span>
+              <div className={styles['info-row']}>
+                <div className={styles['info-cell']}>
+                  <Text variant="2xs" color="muted" weight="semibold" uppercase>
+                    {t('library.details.finishes') || 'Finishes'}
+                  </Text>
+                  <Text variant="small" weight="semibold" color="primary" truncate>
+                    {item?.finish_count ?? 0}
+                  </Text>
                 </div>
-                <div className="entity-detail-page__info-cell">
-                  <span className="entity-detail-page__info-label">{t('library.details.lastFinish') || 'Last Finish'}</span>
-                  <span className="entity-detail-page__info-value">{formatLastFinish(item?.last_finish_at)}</span>
+                <div className={styles['info-cell']}>
+                  <Text variant="2xs" color="muted" weight="semibold" uppercase>
+                    {t('library.details.lastFinish') || 'Last Finish'}
+                  </Text>
+                  <Text variant="small" weight="semibold" color="primary" truncate>
+                    {formatLastFinish(item?.last_finish_at)}
+                  </Text>
                 </div>
               </div>
             )}
@@ -234,14 +258,15 @@ export default function PeopleLeftSidebar({
         </div>
       )}
 
-      <button
-        type="button"
-        className="entity-detail-page__sidebar-more-btn"
+      <Button
+        variant="secondary-neutral"
+        icon={Info}
         onClick={() => setIsDrawerOpen(true)}
+        fullWidth
+        className="u-mt-auto"
       >
-        <Info size={13} />
         {t('library.details.needMoreBtn') || 'Biography & Details'}
-      </button>
+      </Button>
 
       <EntityDetailDrawer
         isDrawerOpen={isDrawerOpen}

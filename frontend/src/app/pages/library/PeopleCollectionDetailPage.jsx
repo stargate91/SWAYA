@@ -18,6 +18,7 @@ import BottomSocialsBar from './components/detail/sections/BottomSocialsBar';
 import IconButton from '@/ui/IconButton';
 import UtilityBarBottomPortal from '../../../components/UtilityBarBottomPortal';
 import shellStyles from './components/detail/DetailPageShell.module.css';
+import styles from './PeopleCollectionDetailPage.module.css';
 
 export default function PeopleCollectionDetailPage({ type = 'people' }) {
   const { id } = useParams();
@@ -122,7 +123,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
     setIsImagePickerDrawerOpen(true);
   };
 
-
+  const wrapperClass = `${styles['transition-wrapper']} ${isScrolled ? styles['transition-wrapper--scrolled'] : ''}`;
 
   return (
     <DetailPageShell
@@ -159,7 +160,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
       {!hasError && item && !isLoading && (
         <>
           {isPeople ? (
-            <div className="people-detail-layout">
+            <div className={styles.layout}>
               <PeopleLeftSidebar
                 item={item}
                 mediaUrl={mediaUrl}
@@ -176,8 +177,8 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
                 isDrawerOpen={isDetailsDrawerOpen}
                 setIsDrawerOpen={setIsDetailsDrawerOpen}
               />
-              <div className="people-detail-right-column">
-                <div className="entity-detail-page__transition-wrapper">
+              <div className={styles['right-column']}>
+                <div className={wrapperClass}>
                   <PeopleRightHeroSection item={item} />
                   <PersonCreditsSections
                     id={id}
@@ -189,7 +190,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
               </div>
             </div>
           ) : (
-            <div className="entity-detail-page__transition-wrapper">
+            <div className={wrapperClass}>
               <EntityDetailHeroSection
                 isPeople={isPeople}
                 item={item}
@@ -214,6 +215,7 @@ export default function PeopleCollectionDetailPage({ type = 'people' }) {
                 isDrawerOpen={isDetailsDrawerOpen}
                 setIsDrawerOpen={setIsDetailsDrawerOpen}
               />
+
               <CollectionDetailSections
                 item={item}
                 navigate={navigate}
