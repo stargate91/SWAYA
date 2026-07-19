@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { ChevronDown, ChevronRight } from '@/ui/icons';
 import { countEpisodesInNumber } from '@/pages/library/utils/detailUtils';
 import Card from '@/ui/Card';
@@ -9,7 +9,7 @@ import Text from '@/ui/Text';
 import WatchStatsCard from '@/ui/data/WatchStatsCard';
 import LinearProgress from '@/ui/LinearProgress';
 
-export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) {
+function CompactWatchStatsSection({ item, isMovie, isScene, t }) {
   const [isHistoryExpanded, setIsHistoryExpanded] = useState(false);
 
   if (!item) return null;
@@ -225,3 +225,5 @@ export default function CompactWatchStatsSection({ item, isMovie, isScene, t }) 
     </Card>
   );
 }
+
+export default memo(CompactWatchStatsSection);

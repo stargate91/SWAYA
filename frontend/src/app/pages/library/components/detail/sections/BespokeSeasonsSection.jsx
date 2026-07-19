@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, memo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   Check, Clapperboard, Calendar, Tv
@@ -23,7 +23,7 @@ const BULLET_CHAR = '\u2022';
 import Text from '@/ui/Text';
 import styles from './BespokeSeasonsSection.module.css';
 
-export default function BespokeSeasonsSection() {
+function BespokeSeasonsSection() {
   const { state, mutations, t } = useMediaDetailContext();
   const { locale } = useLangTranslation();
   const metadataLanguage = locale === 'en' ? 'en-US' : locale;
@@ -296,4 +296,6 @@ export default function BespokeSeasonsSection() {
     </Stack>
   );
 }
+
+export default memo(BespokeSeasonsSection);
 

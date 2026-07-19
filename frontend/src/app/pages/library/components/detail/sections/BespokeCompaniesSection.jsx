@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { API_BASE } from '@/lib/backend';
 import Tooltip from '@/ui/Tooltip';
@@ -7,7 +7,7 @@ import Card from '@/ui/Card';
 import Inline from '@/ui/Inline';
 import LogoCard from '@/ui/data/LogoCard';
 
-export default function BespokeCompaniesSection({ item, t }) {
+function BespokeCompaniesSection({ item, t }) {
   const isSceneType = item?.type === 'scene';
 
   const allCompanies = useMemo(() => {
@@ -59,3 +59,5 @@ export default function BespokeCompaniesSection({ item, t }) {
     </div>
   );
 }
+
+export default memo(BespokeCompaniesSection);

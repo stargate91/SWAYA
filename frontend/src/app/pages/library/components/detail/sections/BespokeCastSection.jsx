@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, memo } from 'react';
 import { User } from '@/ui/icons';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import { resolveMediaImageUrl } from '@/lib/imageUrls';
@@ -12,7 +12,7 @@ import LogoCard from '@/ui/data/LogoCard';
 import styles from './BespokeCastSection.module.css';
 
 
-export default function BespokeCastSection({ item, t, navigate }) {
+function BespokeCastSection({ item, t, navigate }) {
   const settings = useMediaDetailContext()?.state?.settings;
   const isAdult = item.is_adult;
   const genderPref = settings?.adult_gender_preference;
@@ -198,3 +198,5 @@ export default function BespokeCastSection({ item, t, navigate }) {
     </Card>
   );
 }
+
+export default memo(BespokeCastSection);

@@ -2,8 +2,9 @@ import { useMediaDetailContext } from '../MediaDetailContext';
 import Card from '@/ui/Card';
 import BespokeTagManager from './BespokeTagManager';
 import styles from './BespokeTagger.module.css';
+import { memo } from 'react';
 
-export default function BespokeTagger() {
+function BespokeTagger() {
   const { state, mutations, type, t } = useMediaDetailContext();
   const { item, cleanId, effectiveId } = state;
   const { updateStatusMutation } = mutations;
@@ -37,3 +38,5 @@ export default function BespokeTagger() {
     </Card>
   );
 }
+
+export default memo(BespokeTagger);

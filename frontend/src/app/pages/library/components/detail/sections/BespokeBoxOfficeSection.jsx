@@ -2,8 +2,9 @@ import { DollarSign, Coins, TrendingUp } from '@/ui/icons';
 import Card from '@/ui/Card';
 import Grid from '@/ui/Grid';
 import StatCard from '@/ui/data/StatCard';
+import { memo } from 'react';
 
-export default function BespokeBoxOfficeSection({ item, t }) {
+function BespokeBoxOfficeSection({ item, t }) {
   if (!item || (item.budget <= 0 && item.revenue <= 0)) return null;
 
   const formatCurrency = (val) => {
@@ -52,5 +53,7 @@ export default function BespokeBoxOfficeSection({ item, t }) {
     </Card>
   );
 }
+
+export default memo(BespokeBoxOfficeSection);
 
 

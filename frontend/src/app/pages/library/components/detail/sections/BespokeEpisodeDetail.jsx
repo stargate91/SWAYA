@@ -10,8 +10,9 @@ import { resolveMediaImageUrl } from '@/lib/imageUrls';
 import { formatEpisodeNumber } from '../../../utils/detailUtils';
 import { useMediaDetailContext } from '../MediaDetailContext';
 import styles from './BespokeEpisodeDetail.module.css';
+import { memo } from 'react';
 
-export default function BespokeEpisodeDetail({
+function BespokeEpisodeDetail({
   activeEpisode,
   activeEpisodeIndex,
   episodes,
@@ -193,3 +194,5 @@ export default function BespokeEpisodeDetail({
     </div>
   );
 }
+
+export default memo(BespokeEpisodeDetail);

@@ -2,8 +2,9 @@ import Card from '@/ui/Card';
 import Grid from '@/ui/Grid';
 import Tooltip from '@/ui/Tooltip';
 import RatingCard from '@/ui/data/RatingCard';
+import { memo } from 'react';
 
-export default function BespokeRatingsSection({ item, t }) {
+function BespokeRatingsSection({ item, t }) {
   const isSceneType = item?.type === 'scene';
   const hasImdb = !isSceneType && item?.rating_imdb != null && Number(item.rating_imdb) > 0;
   const hasTmdb = !isSceneType && item?.rating_tmdb != null && Number(item.rating_tmdb) > 0;
@@ -57,3 +58,5 @@ export default function BespokeRatingsSection({ item, t }) {
     </Card>
   );
 }
+
+export default memo(BespokeRatingsSection);
