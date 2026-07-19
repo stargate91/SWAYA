@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import PeopleTagPopover from './PeopleTagPopover';
 import ListsPopover from '../detail/sections/ListsPopover';
 import Inline from '@/ui/Inline';
-import './EntityDetailTopControls.css';
 
 export default function EntityDetailTopControls({
   isPeople,
@@ -19,7 +18,7 @@ export default function EntityDetailTopControls({
 
   if (isPeople) {
     return (
-      <Inline gap="sm" align="center" className="entity-detail-page__top-controls">
+      <Inline gap="sm" align="center">
         <ListsPopover
           item={item}
           type="person"

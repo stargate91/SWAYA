@@ -1,7 +1,6 @@
 import { Layers, User, PenLine, Maximize2 } from '@/ui/icons';
 import PosterCard from '@/ui/PosterCard';
 import buttonStyles from '@/ui/IconButton.module.css';
-import './EditableMediaCard.css';
 
 export default function EditableMediaCard({
   mediaUrl,
@@ -48,7 +47,7 @@ export default function EditableMediaCard({
       topRightAction={editButton}
       overlay={overlay}
       title={viewOriginalTitle}
-      className={`entity-detail-page__media-card ${type === 'profile' ? 'entity-detail-page__media-card--profile' : ''} entity-detail-page__media-card--editable ${className}`.trim()}
+      className={`entity-detail-page__media-card entity-detail-page__media-card--editable ${className}`.trim()}
       previewEnabled={false}
       disableHoverAnimation={true}
     >

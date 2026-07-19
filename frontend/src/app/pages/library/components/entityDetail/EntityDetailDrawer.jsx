@@ -3,7 +3,6 @@ import { toTitleCase, formatListAttr } from '../../utils/heroSectionUtils';
 import Drawer from '@/ui/Drawer';
 import ParsedParagraphs from '@/ui/ParsedParagraphs';
 import DescriptionList from '@/ui/DescriptionList';
-import './EntityDetailDrawer.css';
 
 import { useSettingsQuery } from '@/queries';
 

@@ -79,6 +79,8 @@ class PlaybackLoggingService:
                 log_is_watched = (duration > 0 and log_position / duration > 0.90)
                 log_is_active = False
 
+            log_position = int(log_position) if log_position is not None else 0
+
             from app.shared_kernel.enums import MediaType
             tv_title = None
             episode_title = None

@@ -7,7 +7,6 @@ import EditableMediaCard from './EditableMediaCard';
 import { getOriginalImageUrlHelper } from '../../utils/heroSectionUtils';
 import EntityDetailDrawer from './EntityDetailDrawer';
 import './EntityDetailHeroSectionShared.css';
-import './MovieCollectionHeroSection.css';
 import Inline from '@/ui/Inline';
 
 export default function MovieCollectionHeroSection({

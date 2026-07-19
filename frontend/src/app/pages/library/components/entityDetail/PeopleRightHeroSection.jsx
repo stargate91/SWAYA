@@ -2,7 +2,7 @@ import { Layers } from '@/ui/icons';
 import { navigateToCreditDetail } from '../../utils/mediaNavigation';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '@/providers/LanguageContext';
-import './PeopleHeroSection.css';
+import './PeopleRightHeroSection.css';
 
 export default function PeopleRightHeroSection({ item }) {
   const navigate = useNavigate();

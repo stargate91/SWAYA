@@ -16,7 +16,7 @@ import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import { API_BASE } from '@/lib/backend';
 import Inline from '@/ui/Inline';
 import './EntityDetailHeroSectionShared.css';
-import './PeopleHeroSection.css';
+import './PeopleLeftSidebar.css';
 
 export default function PeopleLeftSidebar({
   item,
