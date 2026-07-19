@@ -5,6 +5,11 @@ import { useTranslation } from '@/providers/LanguageContext';
 import { useUi } from '@/providers/UiProvider';
 import FloatingActionBar from '@/ui/FloatingActionBar';
 import Button from '@/ui/Button';
+import Card from '@/ui/Card';
+import Grid from '@/ui/Grid';
+import Stack from '@/ui/Stack';
+import Inline from '@/ui/Inline';
+import Text from '@/ui/Text';
 import api from '@/lib/api';
 import { TARGET_LANGUAGE_OPTIONS } from '@/pages/settings/settingsLanguageOptions';
 import {
@@ -23,7 +28,6 @@ import BioSection from './components/BioSection';
 import PhysicalAttributesSection from './components/PhysicalAttributesSection';
 import MeasurementsSection from './components/MeasurementsSection';
 import ModificationsSection from './components/ModificationsSection';
-import './PerformerCustomValuesTab.css';
 import { useSettingsQuery } from '@/queries';
 
 export default function PerformerCustomValuesTab({ personId, person: initialPerson, onDirtyChange, isShaking }) {
@@ -303,37 +307,41 @@ export default function PerformerCustomValuesTab({ personId, person: initialPers
   }));
 
   return (
-    <form onSubmit={handleSave} className="custom-values-form settings-tab-content">
-      <div className="custom-values-header">
+    <form onSubmit={handleSave} className="u-w-full settings-tab-content">
+      <Stack gap="sm" className="u-mb-xl">
         <h3 className="settings-section-title">{t('library.performerEdit.manualOverrides') || 'Manual Overrides'}</h3>
         <p className="settings-section-subtitle">{t('library.performerEdit.manualOverridesSubtitle') || 'Set your own values for performer attributes. These take priority if manual routing is selected.'}</p>
-      </div>
+      </Stack>
 
-      <div className="healthyceleb-import-box">
-        <h4 className="healthyceleb-import-title">{t('library.performerEdit.custom.import_healthyceleb_title') || 'Import physical statistics from HealthyCeleb'}</h4>
-        <div className="healthyceleb-import-row">
-          <input
-            type="text"
-            placeholder={t('library.performerEdit.custom.import_healthyceleb_placeholder') || 'HealthyCeleb URL (optional, e.g. https://healthyceleb.com/james-cameron/)'}
-            value={healthyCelebUrl}
-            onChange={(e) => setHealthyCelebUrl(e.target.value)}
-            className="healthyceleb-import-input"
-          />
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={handleFetchHealthyCeleb}
-            disabled={isFetchingHealthyCeleb}
-          >
-            {isFetchingHealthyCeleb ? (t('library.performerEdit.custom.import_healthyceleb_btn_fetching') || 'Fetching...') : (t('library.performerEdit.custom.import_healthyceleb_btn') || 'Import Data')}
-          </Button>
-        </div>
-        <p className="healthyceleb-import-desc">
-          {t('library.performerEdit.custom.import_healthyceleb_desc') || 'This will fetch stats like height, weight, cup size, measurements, and eye/hair color, then populate the fields below. You can review them before saving.'}
-        </p>
-      </div>
+      <Card variant="flat-glass" padding="md" className="u-mb-xl">
+        <Stack gap="sm">
+          <Text as="h4" variant="small" weight="semibold">
+            {t('library.performerEdit.custom.import_healthyceleb_title') || 'Import physical statistics from HealthyCeleb'}
+          </Text>
+          <Inline gap="sm" align="center">
+            <input
+              type="text"
+              placeholder={t('library.performerEdit.custom.import_healthyceleb_placeholder') || 'HealthyCeleb URL (optional, e.g. https://healthyceleb.com/james-cameron/)'}
+              value={healthyCelebUrl}
+              onChange={(e) => setHealthyCelebUrl(e.target.value)}
+              className="ui-input u-flex-1"
+            />
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleFetchHealthyCeleb}
+              disabled={isFetchingHealthyCeleb}
+            >
+              {isFetchingHealthyCeleb ? (t('library.performerEdit.custom.import_healthyceleb_btn_fetching') || 'Fetching...') : (t('library.performerEdit.custom.import_healthyceleb_btn') || 'Import Data')}
+            </Button>
+          </Inline>
+          <Text variant="small" color="muted">
+            {t('library.performerEdit.custom.import_healthyceleb_desc') || 'This will fetch stats like height, weight, cup size, measurements, and eye/hair color, then populate the fields below. You can review them before saving.'}
+          </Text>
+        </Stack>
+      </Card>
 
-      <div className="custom-values-cards-grid">
+      <Grid variant="split">
         <BioSection
           form={form}
           setForm={setForm}
@@ -381,7 +389,7 @@ export default function PerformerCustomValuesTab({ personId, person: initialPers
           handleChange={handleChange}
           t={t}
         />
-      </div>
+      </Grid>
 
       <FloatingActionBar
         visible={Boolean(isDirty)}

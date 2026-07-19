@@ -21,18 +21,20 @@ import { Search, Link as LinkIcon, User, Trash2, GitFork, Star, ArrowLeft, Alert
 import Modal from '@/ui/Modal';
 import Grid from '@/ui/Grid';
 import Inline from '@/ui/Inline';
-import './PerformerLinkingTab.css';
+import Stack from '@/ui/Stack';
+import Text from '@/ui/Text';
+import styles from './PerformerLinkingTab.module.css';
 
 const FemaleSilhouette = () => (
-  <div className="performer-gender-silhouette performer-gender-silhouette--mask performer-gender-silhouette--female" />
+  <div className={`${styles['gender-silhouette']} ${styles['gender-silhouette--mask']} ${styles['gender-silhouette--female']}`} />
 );
 
 const MaleSilhouette = () => (
-  <div className="performer-gender-silhouette performer-gender-silhouette--mask performer-gender-silhouette--male" />
+  <div className={`${styles['gender-silhouette']} ${styles['gender-silhouette--mask']} ${styles['gender-silhouette--male']}`} />
 );
 
 const OtherSilhouette = () => (
-  <svg viewBox="0 0 24 24" className="performer-gender-silhouette performer-gender-silhouette--other" fill="currentColor">
+  <svg viewBox="0 0 24 24" className={`${styles['gender-silhouette']} ${styles['gender-silhouette--other']}`} fill="currentColor">
     <circle cx="12" cy="8" r="4" />
     <path d="M12 14c-6.1 0-10 4-10 8h20c0-4-3.9-8-10-8zm-7.9 6c.9-2.5 4-4 7.9-4s7 1.5 7.9 4H4.1z" />
   </svg>
@@ -280,8 +282,8 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
 
   if (activeSearchSource) {
     return (
-      <div className="performer-linker performer-linker--search">
-        <Inline gap="lg" align="center" className="performer-linker__header">
+      <Stack gap="xl" className="u-w-full">
+        <Inline gap="lg" align="center">
           <Button
             variant="secondary-neutral"
             leftIcon={<ArrowLeft size={14} />}
@@ -291,17 +293,16 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
               setResults([]);
               setHasSearched(false);
             }}
-            className="performer-linker__back"
           >
             {t('library.performerEdit.backToSources') || 'Back to Sources'}
           </Button>
-          <span className="performer-linker__title">
+          <Text variant="title" weight="semibold">
             {t('common.search') || 'Search'} {SOURCE_BUCKETS.find((b) => b.key === activeSearchSource)?.label}
-          </span>
+          </Text>
         </Inline>
 
-        <Inline as="form" onSubmit={handleSearch} gap="md" align="center" className="performer-linker__search-form">
-          <div className="performer-linker__input-wrapper">
+        <Inline as="form" onSubmit={handleSearch} gap="md" align="center" className={styles['search-form']}>
+          <div className="u-flex-1">
             <Input
               type="text"
               placeholder={t('library.addPeople.adultTmdbSearchPlaceholder') || 'Search performer...'}
@@ -321,45 +322,47 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
           </Tooltip>
         </Inline>
 
-        <div className="performer-linker__results">
+        <div>
           {isSearching ? (
-            <div className="performer-linker__loading">
+            <Stack align="center" justify="center" className="u-py-sm">
               <Spinner size="md" />
-            </div>
+            </Stack>
           ) : error ? (
-            <div className="performer-linker__error">{error}</div>
+            <div className={`${styles['placeholder-board']} ${styles['placeholder-board--error']}`}>{error}</div>
           ) : filteredResults.length > 0 ? (
             <Grid variant="auto-poster">
               {filteredResults.map((item) => {
                 const rawProfileUrl = item.profile_path || item.poster_path;
                 const profileUrl = rawProfileUrl ? resolveMediaImageUrl(rawProfileUrl, 'personThumb') : null;
                 return (
-                  <div key={item.id} className="performer-linker__result-card">
-                    <div className="performer-linker__result-image-wrapper">
+                  <div key={item.id} className={styles['result-card']}>
+                    <div className={styles['result-image-wrapper']}>
                       {profileUrl ? (
-                        <img src={profileUrl} alt={item.name} className="performer-linker__result-img" />
+                        <img src={profileUrl} alt={item.name} className={styles['result-img']} />
                       ) : (
-                        <div className="performer-linker__result-avatar-placeholder">
+                        <div className={styles['result-avatar-placeholder']}>
                           {renderSilhouette(item.gender !== undefined ? item.gender : person?.gender)}
                         </div>
                       )}
                     </div>
-                    <div className="performer-linker__result-content">
-                      <div className="performer-linker__result-info">
-                        <div className="performer-linker__result-name" title={item.name}>{item.name}</div>
+                    <div className={styles['result-content']}>
+                      <Stack gap="2xs">
+                        <Text variant="small" weight="semibold" clamp={2} color="primary" title={item.name}>
+                          {item.name}
+                        </Text>
                         {item.disambiguation && (
-                          <div className="performer-linker__result-disambiguation" title={item.disambiguation}>
+                          <Text variant="2xs" color="muted" truncate title={item.disambiguation}>
                             {item.disambiguation}
-                          </div>
+                          </Text>
                         )}
-                      </div>
+                      </Stack>
                       <Button
                         variant="secondary"
                         size="sm"
                         onClick={() => handleLink(item)}
                         disabled={linkMutation.isPending}
                         icon={LinkIcon}
-                        className="performer-linker__result-link-btn"
+                        fullWidth
                       >
                         {t('library.performerEdit.link') || 'Link'}
                       </Button>
@@ -369,19 +372,19 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
               })}
             </Grid>
           ) : hasSearched ? (
-            <div className="performer-linker__placeholder">{t('library.performerEdit.noResultsMatch') || 'No results match the query. Try a different name.'}</div>
+            <div className={styles['placeholder-board']}>{t('library.performerEdit.noResultsMatch') || 'No results match the query. Try a different name.'}</div>
           ) : (
-            <div className="performer-linker__placeholder">
+            <div className={styles['placeholder-board']}>
               {t('library.performerEdit.typeANameHint') || 'Type a name above and press search to locate performer data.'}
             </div>
           )}
         </div>
-      </div>
+      </Stack>
     );
   }
 
   return (
-    <div className="performer-linker performer-linker--grid">
+    <Stack gap="md" className="u-w-full">
       <Grid variant="scene">
         {SOURCE_BUCKETS.map((bucket) => {
           const linkedInfo = getLinkedInfo(bucket);
@@ -390,54 +393,63 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
           const profileImg = isLinked ? (linkedInfo.profile_url ? resolveMediaImageUrl(linkedInfo.profile_url, 'personThumb') : (person.profile_path ? resolveMediaImageUrl(person.profile_path, 'personThumb') : null)) : null;
           const isLinking = linkingSource === bucket.key;
 
+          const cardClass = `
+            ${styles['linker-card']}
+            ${styles[`linker-card--${bucket.key}`]}
+            ${isLinked ? styles['linker-card--linked'] : styles['linker-card--unlinked']}
+            ${isPrimary ? styles['linker-card--primary'] : ''}
+            ${isLinking ? styles['linker-card--linking'] : ''}
+          `.trim().replace(/\s+/g, ' ');
+
           return (
-            <div
-              key={bucket.key}
-              className={`performer-linker-card performer-linker-card--${bucket.key} ${isLinked ? 'performer-linker-card--linked' : 'performer-linker-card--unlinked'} ${isPrimary ? 'performer-linker-card--primary' : ''} ${isLinking ? 'performer-linker-card--linking' : ''}`}
-            >
-              <div className="performer-linker-card__image-wrapper">
+            <div key={bucket.key} className={cardClass}>
+              <div className={styles['image-wrapper']}>
                 {isLinking ? (
-                  <div className="performer-linker-card__silhouette">
+                  <div className={styles['silhouette-container']}>
                     {renderSilhouette(person?.gender)}
                   </div>
                 ) : isLinked ? (
                   profileImg ? (
-                    <img src={profileImg} alt={person.name} className="performer-linker-card__img" />
+                    <img src={profileImg} alt={person.name} className={styles['card-img']} />
                   ) : (
-                    <div className="performer-linker-card__avatar-placeholder">
+                    <div className={styles['avatar-placeholder']}>
                       <User size={32} />
                     </div>
                   )
                 ) : (
-                  <div className="performer-linker-card__silhouette">
+                  <div className={styles['silhouette-container']}>
                     {renderSilhouette(person?.gender)}
                   </div>
                 )}
-                <div className="performer-linker-card__badge">{bucket.label}</div>
+                <div className={styles['card-badge']}>{bucket.label}</div>
               </div>
 
-              <div className="performer-linker-card__content">
-                <div className="performer-linker-card__info">
+              <div className={styles['card-content']}>
+                <Stack gap="2xs">
                   {isLinking ? (
-                    <div className="performer-linker-card__linking-msg">
+                    <div className={styles['linking-msg']}>
                       <Spinner label={t('library.performerEdit.linkingEnriching') || 'Linking & Enriching...'} />
                     </div>
                   ) : isLinked ? (
                     <>
-                      <div className="performer-linker-card__name">{person.name}</div>
-                      <div className="performer-linker-card__ext-id" title={linkedInfo.external_id}>
+                      <Text variant="small" weight="semibold" truncate color="primary">
+                        {person.name}
+                      </Text>
+                      <Text variant="2xs" color="muted" title={linkedInfo.external_id}>
                         {t('library.performerEdit.idLabel') || 'ID:'} {linkedInfo.external_id}
-                      </div>
+                      </Text>
                     </>
                   ) : (
-                    <div className="performer-linker-card__unlinked-text">{t('library.performerEdit.notConnected') || 'Not Connected'}</div>
+                    <Text variant="small" color="muted" italic>
+                      {t('library.performerEdit.notConnected') || 'Not Connected'}
+                    </Text>
                   )}
-                </div>
+                </Stack>
 
-                <div className="performer-linker-card__actions">
+                <Stack gap="sm">
                   {isLinking ? null : isLinked ? (
-                    <div className="performer-linker-card__linked-actions-wrapper">
-                      <div className="performer-linker-card__linked-actions">
+                    <Stack gap="sm">
+                      <Grid variant="split">
                         <Tooltip content="Separate profile connection" side="top">
                           <Button
                             variant="secondary-neutral"
@@ -445,7 +457,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
                             onClick={() => handleUnlink(bucket.key, 'split')}
                             disabled={unlinkMutation.isPending}
                             icon={GitFork}
-                            className="performer-linker-card__action-btn"
+                            fullWidth
                           >
                             {t('library.performerEdit.split') || 'Split'}
                           </Button>
@@ -457,24 +469,24 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
                             onClick={() => handleUnlink(bucket.key, 'remove')}
                             disabled={unlinkMutation.isPending}
                             icon={Trash2}
-                            className="performer-linker-card__action-btn"
+                            fullWidth
                           >
                             {t('common.remove') || 'Remove'}
                           </Button>
                         </Tooltip>
-                      </div>
+                      </Grid>
 
-                       <Button
+                      <Button
                         variant={isPrimary ? "primary" : "secondary-neutral"}
                         size="sm"
                         onClick={() => handleSetPrimary(isPrimary ? "none" : bucket.key)}
                         disabled={setPrimaryMutation.isPending}
                         icon={Star}
-                        className="performer-linker-card__primary-btn"
+                        fullWidth
                       >
                         {isPrimary ? (t('library.performerEdit.primarySource') || "Primary Source") : (t('library.performerEdit.setPrimary') || "Set Primary")}
                       </Button>
-                    </div>
+                    </Stack>
                   ) : (
                     <Button
                       variant="secondary"
@@ -484,12 +496,12 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
                         setQuery(person?.name || '');
                       }}
                       icon={Search}
-                      className="performer-linker-card__link-btn"
+                      fullWidth
                     >
                       {t('library.performerEdit.connect') || 'Connect'}
                     </Button>
                   )}
-                </div>
+                </Stack>
               </div>
             </div>
           );
@@ -502,7 +514,7 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
         variant="danger"
         icon={AlertTriangle}
         footer={
-          <Inline gap="md" align="center" justify="end" className="performer-linker-modal-footer">
+          <Inline gap="md" align="center" justify="end">
             <Button
               variant="secondary-neutral"
               onClick={() => setShowDeleteConfirm(false)}
@@ -520,10 +532,11 @@ export default function PerformerLinkingTab({ personId, defaultQuery = '', perso
           </Inline>
         }
       >
-        <p className="performer-linker-modal-body">
+        <Text as="p" variant="body" color="secondary">
           {t('library.details.deletePerformerWarning') || 'Are you sure you want to permanently delete this performer? All manually entered attributes, custom biographies, overrides, and ratings will be lost.'}
-        </p>
+        </Text>
       </Modal>
-    </div>
+    </Stack>
   );
 }
+

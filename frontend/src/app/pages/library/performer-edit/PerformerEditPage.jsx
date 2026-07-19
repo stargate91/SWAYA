@@ -8,7 +8,9 @@ import PerformerCustomValuesTab from './tabs/PerformerCustomValuesTab';
 import { useTranslation } from '@/providers/LanguageContext';
 import Sidebar from '@/ui/Sidebar';
 import Overlay from '@/ui/Overlay';
-import './PerformerEditPage.css';
+import Text from '@/ui/Text';
+import Stack from '@/ui/Stack';
+import styles from './PerformerEditPage.module.css';
 
 export default function PerformerEditPage() {
   const { t } = useTranslation();
@@ -97,11 +99,13 @@ export default function PerformerEditPage() {
 
   const sidebarHeader = (
     <>
-      <h1 className="ui-sidebar-header performer-edit-sidebar-header">
+      <Text as="h1" variant="body" color="primary" className="ui-sidebar-header">
         {person.is_adult ? (t('library.performerEdit.editPerformer') || 'Edit Star') : (t('library.performerEdit.editArtist') || 'Edit Artist')}
-      </h1>
-      <div className="performer-edit-sidebar-title-container">
-        <h2 className="performer-edit-sidebar-name">{person.name}</h2>
+      </Text>
+      <div className={styles['sidebar-header-container']}>
+        <Text as="h2" variant="display" weight="semibold">
+          {person.name}
+        </Text>
       </div>
     </>
   );
@@ -115,43 +119,56 @@ export default function PerformerEditPage() {
       />
 
       <Overlay.ContentWrapper>
-        <Overlay.Content className="performer-edit-content-wrapper--wide">
+        <Overlay.Content className={styles['content-wrapper--wide']}>
           {activeTab === 'linking' && (
-            <div className="performer-edit-section">
-              <h3 className="settings-section-title performer-edit-section-title">{t('library.performerEdit.linkedProfiles') || 'Linked Profiles'}</h3>
-              <p className="settings-section-subtitle performer-edit-section-subtitle">{t('library.performerEdit.linkedProfilesSubtitle') || 'Manage connections to external performer registries to import attributes automatically.'}</p>
+            <Stack gap="md">
+              <Stack gap="2xs">
+                <Text as="h3" variant="title">
+                  {t('library.performerEdit.linkedProfiles') || 'Linked Profiles'}
+                </Text>
+                <Text variant="small" color="muted">
+                  {t('library.performerEdit.linkedProfilesSubtitle') || 'Manage connections to external performer registries to import attributes automatically.'}
+                </Text>
+              </Stack>
               <PerformerLinkingTab
                 personId={person.id}
                 defaultQuery={person.name}
                 person={person}
                 onClose={handleClose}
               />
-            </div>
+            </Stack>
           )}
 
           {activeTab === 'mixer' && (
-            <div className="performer-edit-section">
-              <h3 className="settings-section-title performer-edit-section-title">{t('library.performerEdit.dataMixerGrid') || 'Data Mixer Grid'}</h3>
-              <p className="settings-section-subtitle performer-edit-section-subtitle">{t('library.performerEdit.dataMixerGridSubtitle') || 'Select which provider source takes priority on a per-field basis.'}</p>
+            <Stack gap="md">
+              <Stack gap="2xs">
+                <Text as="h3" variant="title">
+                  {t('library.performerEdit.dataMixerGrid') || 'Data Mixer Grid'}
+                </Text>
+                <Text variant="small" color="muted">
+                  {t('library.performerEdit.dataMixerGridSubtitle') || 'Select which provider source takes priority on a per-field basis.'}
+                </Text>
+              </Stack>
               <PerformerMixerTab
                 person={person}
                 onBack={handleClose}
               />
-            </div>
+            </Stack>
           )}
 
           {activeTab === 'custom' && (
-            <div className="performer-edit-section">
+            <Stack gap="md">
               <PerformerCustomValuesTab
                 personId={person.id}
                 person={person}
                 onDirtyChange={setIsCustomDirty}
                 isShaking={isShaking}
               />
-            </div>
+            </Stack>
           )}
         </Overlay.Content>
       </Overlay.ContentWrapper>
     </Overlay>
   );
 }
+

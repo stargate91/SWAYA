@@ -4,7 +4,9 @@ import { useUi } from '@/providers/UiProvider';
 import { useSetPersonFieldRoutingMutation, useSettingsQuery } from '@/queries';
 import { usePersonDetailQuery } from '@/queries/metadataQueries';
 import { Check } from '@/ui/icons';
-import './PerformerMixerTab.css';
+import Text from '@/ui/Text';
+import Inline from '@/ui/Inline';
+import styles from './PerformerMixerTab.module.css';
 
 export default function PerformerMixerTab({ person: initialPerson }) {
   const { t } = useTranslation();
@@ -220,17 +222,33 @@ export default function PerformerMixerTab({ person: initialPerson }) {
 
   return (
     <div className="link-source-modal link-source-modal--mixer-view link-source-modal--embedded">
-      <div className="data-mixer-grid-container">
-        <table className="data-mixer-table">
+      <div className={styles['grid-container']}>
+        <table className={styles.table}>
           <thead>
             <tr>
-              <th className="mixer-th-field">{t('library.performerEdit.field') || 'Field'}</th>
-              <th className="mixer-th-source">{t('library.performerEdit.autoDefault') || 'Auto (Default)'}</th>
-              {PROVIDERS.map(p => (
-                <th key={p.key} className={`mixer-th-source ${!isSourceLinked(p.key) ? 'mixer-th-disabled' : ''}`}>
-                  {p.label}
-                </th>
-              ))}
+              <th className={styles['th-field']}>
+                <Text variant="small" color="secondary" weight="semibold">
+                  {t('library.performerEdit.field') || 'Field'}
+                </Text>
+              </th>
+              <th className={styles['th-source']}>
+                <Text variant="small" color="secondary" weight="semibold">
+                  {t('library.performerEdit.autoDefault') || 'Auto (Default)'}
+                </Text>
+              </th>
+              {PROVIDERS.map(p => {
+                const isLinked = isSourceLinked(p.key);
+                return (
+                  <th
+                    key={p.key}
+                    className={`${styles['th-source']} ${!isLinked ? styles['th-source--disabled'] : ''}`}
+                  >
+                    <Text variant="small" color="secondary" weight="semibold">
+                      {p.label}
+                    </Text>
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
@@ -240,28 +258,36 @@ export default function PerformerMixerTab({ person: initialPerson }) {
               const formattedAutoVal = formatValue(autoVal, field.type, field.key);
 
               return (
-                <tr key={field.key} className="mixer-row">
-                  <td className="mixer-td-field-label">
-                    {field.label}
+                <tr key={field.key} className={styles.row}>
+                  <td className={styles['td-field-label']}>
+                    <Text weight="semibold" color="primary" variant="small">
+                      {field.label}
+                    </Text>
                   </td>
                   {/* Auto routing option */}
                   <td
                     onClick={() => handleSelectRoute(field.key, 'auto')}
-                    className={`mixer-td-cell mixer-td-cell--auto ${activeRoute === 'auto' ? 'mixer-td-cell--active' : ''}`}
+                    className={`${styles['td-cell']} ${styles['td-cell--auto']} ${activeRoute === 'auto' ? styles['td-cell--active'] : ''}`}
                   >
-                    <div className="mixer-cell-content">
+                    <Inline justify="between" align="center" gap="sm">
                       <span className="mixer-cell-value">
                         {formattedAutoVal !== '-' ? (
                           <>
-                            <span className="mixer-cell-auto-label">{t('library.performerEdit.custom.autoPrefix', { defaultValue: 'Auto: ' })}</span>
-                            <span className="mixer-cell-auto-value">{formattedAutoVal}</span>
+                            <Text variant="small" color="muted" uppercase weight="bold" className="u-pr-xs">
+                              {t('library.performerEdit.custom.autoPrefix', { defaultValue: 'Auto' })}
+                            </Text>
+                            <Text variant="small" weight="medium" color="primary">
+                              {formattedAutoVal}
+                            </Text>
                           </>
                         ) : (
-                          t('library.performerEdit.defaultPriority') || 'Default Priority'
+                          <Text variant="small" color="muted">
+                            {t('library.performerEdit.defaultPriority') || 'Default Priority'}
+                          </Text>
                         )}
                       </span>
-                      {activeRoute === 'auto' && <Check size={14} className="mixer-check-icon" />}
-                    </div>
+                      {activeRoute === 'auto' && <Check size={14} className={styles['check-icon']} />}
+                    </Inline>
                   </td>
                   {PROVIDERS.map(p => {
                     const isLinked = isSourceLinked(p.key);
@@ -281,18 +307,27 @@ export default function PerformerMixerTab({ person: initialPerson }) {
                       return true;
                     })();
 
+                    const cellClass = `
+                      ${styles['td-cell']}
+                      ${!isLinked || !hasValue ? styles['td-cell--disabled'] : ''}
+                      ${isSelected ? styles['td-cell--active'] : ''}
+                      ${p.key === 'manual' ? styles['td-cell--manual'] : ''}
+                    `.trim().replace(/\s+/g, ' ');
+
                     return (
                       <td
                         key={p.key}
                         onClick={() => isLinked && hasValue && handleSelectRoute(field.key, p.key)}
-                        className={`mixer-td-cell ${!isLinked || !hasValue ? 'mixer-td-cell--disabled' : ''} ${isSelected ? 'mixer-td-cell--active' : ''} ${p.key === 'manual' ? 'mixer-td-cell--manual' : ''}`}
+                        className={cellClass}
                       >
-                        <div className="mixer-cell-content">
+                        <Inline justify="between" align="center" gap="sm">
                           <span className="mixer-cell-value" title={rawVal && typeof rawVal === 'string' ? rawVal : ''}>
-                            {formatted}
+                            <Text variant="small" color={isSelected ? 'primary' : 'secondary'}>
+                              {formatted}
+                            </Text>
                           </span>
-                          {isSelected && <Check size={14} className="mixer-check-icon" />}
-                        </div>
+                          {isSelected && <Check size={14} className={styles['check-icon']} />}
+                        </Inline>
                       </td>
                     );
                   })}
@@ -305,3 +340,4 @@ export default function PerformerMixerTab({ person: initialPerson }) {
     </div>
   );
 }
+

@@ -1,3 +1,8 @@
+import Card from '@/ui/Card';
+import Text from '@/ui/Text';
+import Inline from '@/ui/Inline';
+import Grid from '@/ui/Grid';
+import Stack from '@/ui/Stack';
 import Dropdown from '@/ui/Dropdown';
 import Input from '@/ui/Input';
 import Field from '@/ui/Field';
@@ -18,17 +23,20 @@ export default function BioSection({
   t,
 }) {
   return (
-    <div className="custom-values-card">
-      <div className="custom-values-card__header">
-        <h4 className="custom-values-card__title">{t('library.performerEdit.profileIdentity') || 'Profile & Identity'}</h4>
-      </div>
-      <div className="custom-values-card__body">
-        <Field className="custom-values-field--full">
-          <div className="performer-custom-values-header-row">
-            <span className={`${fieldStyles.label} performer-custom-values-biography-label`}>{t('library.performerEdit.biography') || 'Biography'}</span>
-            <div className="performer-custom-values-language-selector-wrapper">
-              <span className="performer-custom-values-language-label">{t('library.performerEdit.language') || 'Language:'}</span>
-              <div className="performer-custom-values-language-dropdown-container">
+    <Card
+      title={t('library.performerEdit.profileIdentity') || 'Profile & Identity'}
+      variant="flat-glass"
+      padding="md"
+    >
+      <Stack gap="md">
+        <Field fullWidth>
+          <Inline justify="between" align="center" className="u-mb-xs">
+            <span className={fieldStyles.label}>{t('library.performerEdit.biography') || 'Biography'}</span>
+            <Inline gap="sm" align="center">
+              <Text variant="small" color="secondary" className="u-wrap-none">
+                {t('library.performerEdit.language') || 'Language:'}
+              </Text>
+              <div className="u-flex-1">
                 <Dropdown
                   options={bioLanguageOptions}
                   value={selectedBioLang}
@@ -36,10 +44,11 @@ export default function BioSection({
                   placeholder={t('library.performerEdit.language') || 'Language'}
                 />
               </div>
-            </div>
-          </div>
+            </Inline>
+          </Inline>
           <textarea
-            className="ui-input performer-custom-values-bio"
+            className="ui-input"
+            rows={3}
             value={form.biographies?.[selectedBioLang] || ''}
             onChange={e => {
               const val = e.target.value;
@@ -54,7 +63,7 @@ export default function BioSection({
             placeholder={`Write a custom biography in ${TARGET_LANGUAGE_OPTIONS.find(o => o.value === selectedBioLang)?.label || selectedBioLang}...`}
           />
         </Field>
-        <div className="custom-values-card__grid-2">
+        <Grid variant="split">
           {person?.is_adult && (
             <Dropdown
               label={t('library.performerEdit.gender') || 'Gender'}
@@ -87,8 +96,9 @@ export default function BioSection({
               placeholder="- Select -"
             />
           )}
-        </div>
-      </div>
-    </div>
+        </Grid>
+      </Stack>
+    </Card>
   );
 }
+
