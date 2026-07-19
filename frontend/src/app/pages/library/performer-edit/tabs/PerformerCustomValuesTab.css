@@ -1,12 +1,4 @@
 /* Custom Values Tab */
-.performer-custom-values-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-xl);
-  --grid-mt: 1.25rem;
-  margin-top: var(--grid-mt);
-}
-
 .custom-values-form {
   width: 100%;
 }
@@ -100,13 +92,6 @@
   line-height: 1.4;
 }
 
-.performer-custom-values-actions {
-  display: flex;
-  justify-content: flex-end;
-  --actions-mt: 1.5rem;
-  margin-top: var(--actions-mt);
-}
-
 .performer-custom-values-header-row {
   display: flex;
   justify-content: space-between;
@@ -134,3 +119,44 @@
 .performer-custom-values-language-dropdown-container {
   flex: 1;
 }
+
+/* HealthyCeleb import box styles */
+.healthyceleb-import-box {
+  padding: var(--space-lg);
+  border: 0.0625rem solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-card);
+  margin-bottom: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.healthyceleb-import-title {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.healthyceleb-import-row {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.healthyceleb-import-input {
+  flex: 1;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  border: 0.0625rem solid var(--color-border-default);
+  background: var(--color-surface-card);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xs);
+  outline: none;
+}
+
+.healthyceleb-import-desc {
+  margin: 0;
+  font-size: var(--font-size-2xs);
+  color: var(--color-text-secondary);
+}
+

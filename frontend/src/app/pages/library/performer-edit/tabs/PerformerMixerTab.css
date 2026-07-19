@@ -138,54 +138,7 @@
   color: var(--blue-color);
 }
 
-/* Custom performer override styles */
-.mixer-edit-icon {
-  opacity: 0;
-  color: var(--color-text-muted);
-  transition: opacity var(--motion-fast);
-  flex-shrink: 0;
-  margin-left: auto;
-}
 
-.mixer-td-cell--manual:hover .mixer-edit-icon {
-  opacity: 0.6;
-}
-
-.mixer-td-cell--manual .mixer-edit-icon:hover {
-  opacity: 1;
-}
-
-.mixer-custom-textarea {
-  resize: vertical;
-  min-height: 3rem;
-}
-
-.mixer-td-cell .mixer-custom-input,
-.mixer-td-cell .mixer-custom-select,
-.mixer-td-cell .mixer-custom-textarea {
-  width: 100%;
-  --input-bg: var(--color-bg-dark);
-  background: var(--input-bg);
-  --input-border: 0.0625rem solid color-mix(in srgb, var(--color-text-primary) 15%, transparent);
-  border: var(--input-border);
-  border-radius: var(--radius-sm);
-  color: var(--color-text-primary);
-  --input-padding: 0.25rem 0.5rem;
-  padding: var(--input-padding);
-  font-size: var(--font-size-xs);
-  font-family: var(--font-sans);
-  outline: none;
-  box-sizing: border-box;
-}
-
-.mixer-td-cell .mixer-custom-input:focus,
-.mixer-td-cell .mixer-custom-select:focus,
-.mixer-td-cell .mixer-custom-textarea:focus {
-  --focus-border: color-mix(in srgb, #a855f7 60%, transparent);
-  border-color: var(--focus-border);
-  --focus-shadow: 0 0 0 0.125rem color-mix(in srgb, #a855f7 20%, transparent);
-  box-shadow: var(--focus-shadow);
-}
 
 /* Specific active styling for manual route */
 .mixer-td-cell.mixer-td-cell--manual.mixer-td-cell--active {
@@ -205,49 +158,7 @@
   color: var(--purple-color);
 }
 
-.mixer-td-cell.mixer-td-cell--editing {
-  --edit-padding: 0.125rem;
-  padding: var(--edit-padding);
-}
 
-.healthyceleb-import-box {
-  padding: var(--space-lg);
-  border: 0.0625rem solid var(--color-border-subtle);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface-card);
-  margin-bottom: var(--space-xl);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.healthyceleb-import-title {
-  margin: 0;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-}
-
-.healthyceleb-import-row {
-  display: flex;
-  gap: var(--space-sm);
-}
-
-.healthyceleb-import-input {
-  flex: 1;
-  padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-sm);
-  border: 0.0625rem solid var(--color-border-default);
-  background: var(--color-surface-card);
-  color: var(--color-text-primary);
-  font-size: var(--font-size-xs);
-  outline: none;
-}
-
-.healthyceleb-import-desc {
-  margin: 0;
-  font-size: var(--font-size-2xs);
-  color: var(--color-text-secondary);
-}
 
 .mixer-cell-auto-label {
   opacity: 0.45;

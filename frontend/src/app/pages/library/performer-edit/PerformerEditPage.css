@@ -18,17 +18,6 @@
   margin: 0;
 }
 
-.performer-edit-sidebar-menu {
-  --menu-mt: 0.9375rem;
-  margin-top: var(--menu-mt);
-}
-
-.performer-edit-content-wrapper {
-  --wrapper-padding: 2.5rem 3.75rem;
-  padding: var(--wrapper-padding);
-  max-width: 50rem;
-}
-
 .performer-edit-content-wrapper--wide {
   --wrapper-wide-padding: 1.25rem 2.5rem;
   padding: var(--wrapper-wide-padding);
