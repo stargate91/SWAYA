@@ -6,7 +6,7 @@ import { useUi } from '@/providers/UiProvider';
 import {
   createAdvancedThresholdSection,
   createAdvancedLanguageSection
-} from '../settingsSectionConfigs.jsx';
+} from '../settingsSectionConfigs.js';
 
 export default function AdvancedTab() {
   const { t, metadataLanguageOptions, targetLanguageOptions, isBackgroundActive } = useSettingsViewContext();

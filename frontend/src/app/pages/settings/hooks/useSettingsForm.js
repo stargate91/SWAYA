@@ -3,12 +3,12 @@ import { useRef } from 'react';
 import { useUi } from '@/providers/UiProvider';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useScanStatusQuery, useImageStatusQuery, useHydrateStatusQuery } from '@/queries';
-import useSettingsNavigation from './useSettingsNavigation.jsx';
-import useTemplateTagInsertion from './useTemplateTagInsertion.jsx';
-import useFolderValidation from './useFolderValidation.jsx';
-import useSettingsBackup from './useSettingsBackup.jsx';
+import useSettingsNavigation from './useSettingsNavigation.js';
+import useTemplateTagInsertion from './useTemplateTagInsertion.js';
+import useFolderValidation from './useFolderValidation.js';
+import useSettingsBackup from './useSettingsBackup.js';
 import useSettingsPersistence from './useSettingsPersistence.jsx';
-import useSettingsPickers from './useSettingsPickers.jsx';
+import useSettingsPickers from './useSettingsPickers.js';
 import useSettingsDangerZone from './useSettingsDangerZone.jsx';
 import { SETTINGS_TAB_IDS } from '../settingsConstants.js';
 

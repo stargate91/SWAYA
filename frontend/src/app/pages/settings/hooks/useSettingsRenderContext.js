@@ -1,4 +1,4 @@
-import { getTabDefinition, getVisibleOrganizationTabs } from '../settingsTabs.config.jsx';
+import { getTabDefinition, getVisibleOrganizationTabs } from '../settingsTabs.config.js';
 
 export default function useSettingsRenderContext({
   t,

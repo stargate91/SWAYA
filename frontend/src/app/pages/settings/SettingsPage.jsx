@@ -9,7 +9,7 @@ import {
 } from './components';
 import Overlay from '@/ui/Overlay';
 import Stack from '@/ui/Stack';
-import { settingsTabGroups } from './settingsTabs.config.jsx';
+import { settingsTabGroups } from './settingsTabs.config.js';
 import { SETTINGS_TAB_IDS } from './settingsConstants.js';
 
 export default function SettingsPage() {

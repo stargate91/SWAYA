@@ -5,7 +5,7 @@ import { API_BASE } from '@/lib/backend';
 import Button from '@/ui/Button';
 import SettingsSectionRenderer from './SettingsSectionRenderer.jsx';
 import { useSettingsFormContext } from '../SettingsFormContext.jsx';
-import { createGeneralProfileSection } from '../settingsSectionConfigs.jsx';
+import { createGeneralProfileSection } from '../settingsSectionConfigs.js';
 import Inline from '@/ui/Inline';
 import Avatar from '@/ui/Avatar';
 import styles from '../SettingsPage.module.css';

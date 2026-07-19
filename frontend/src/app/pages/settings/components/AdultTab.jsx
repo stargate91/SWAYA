@@ -7,7 +7,7 @@ import {
   createAdultFansdbSection,
   createAdultTheporndbSection,
   createAdultPreviewsSection,
-} from '../settingsSectionConfigs.jsx';
+} from '../settingsSectionConfigs.js';
 
 export default function AdultTab() {
   const { adultGenderPreferenceOptions, t } = useSettingsViewContext();

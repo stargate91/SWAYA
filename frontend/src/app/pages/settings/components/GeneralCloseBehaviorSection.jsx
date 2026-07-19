@@ -1,6 +1,6 @@
 import { useSettingsViewContext } from '../SettingsFormContext.jsx';
 import SettingsSectionRenderer from './SettingsSectionRenderer.jsx';
-import { createGeneralCloseBehaviorSection } from '../settingsSectionConfigs.jsx';
+import { createGeneralCloseBehaviorSection } from '../settingsSectionConfigs.js';
 
 export default function GeneralCloseBehaviorSection() {
   const { t, closeBehaviorOptions } = useSettingsViewContext();
