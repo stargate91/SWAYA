@@ -18,6 +18,7 @@ export function useOrganizerRename({
   toast,
   openModal,
   closeModal,
+  settings,
 }) {
   const [isRenameStarting, setIsRenameStarting] = useState(false);
 
@@ -136,10 +137,11 @@ export function useOrganizerRename({
       });
     };
 
+    const defaultInPlace = organizeInPlaceDefault || (settings?.folder_organization_enabled === false);
     if (organizeInPlaceDefault) {
       executeRename(true);
     } else {
-      showModal(false);
+      showModal(defaultInPlace);
     }
   };
 

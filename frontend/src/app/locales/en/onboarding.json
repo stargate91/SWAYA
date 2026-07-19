@@ -104,7 +104,15 @@
     "scanPlaceholder": "Select source folder (optional)",
     "targetPlaceholder": "Select target library folder",
     "validating": "Validating...",
-    "validateBtn": "Validate Folders"
+    "validateBtn": "Validate Folders",
+    "modeTitle": "Organization Mode",
+    "modeDesc": "Select how SWAYA should manage your media files.",
+    "registerTitle": "Register Only",
+    "registerDesc": "Imports metadata to the database, leaving files completely untouched.",
+    "renameTitle": "Rename In-Place",
+    "renameDesc": "Renames and formats files directly in their current directories.",
+    "moveTitle": "Move & Organize",
+    "moveDesc": "Renames, structures, and moves files into a dedicated target folder."
   },
   "tmdbGuide": {
     "activateTmdb": "Unlock TMDb metadata to continue",

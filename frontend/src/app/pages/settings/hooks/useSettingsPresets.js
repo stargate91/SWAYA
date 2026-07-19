@@ -8,11 +8,12 @@ export default function useSettingsPresets() {
 
   const presetCards = useMemo(() => getPresetCards(t), [t]);
 
-  const setMoveToLibrary = useCallback((enabled) => {
+  const setOrganizationMode = useCallback((mode) => {
     if (isBackgroundActive) return;
     setForm((prev) => ({
       ...prev,
-      folder_move_to_library: enabled,
+      folder_organization_enabled: mode !== 'register',
+      folder_move_to_library: mode === 'move_organize',
     }));
   }, [setForm, isBackgroundActive]);
 
@@ -44,7 +45,7 @@ export default function useSettingsPresets() {
     t,
     presetCards,
     applyPreset,
-    setMoveToLibrary,
+    setOrganizationMode,
     setCustomOrganizationEnabled,
     isScanActive: isBackgroundActive,
   };

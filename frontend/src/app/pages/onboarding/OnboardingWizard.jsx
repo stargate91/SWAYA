@@ -118,6 +118,8 @@ export default function OnboardingWizard() {
     handleNext,
     docsModal,
     setDocsModal,
+    orgMode,
+    setOrgMode,
   } = useOnboardingState();
 
   const { data: settings = {} } = useSettingsQuery();
@@ -261,6 +263,8 @@ export default function OnboardingWizard() {
                 validateDirs={validateDirs}
                 isValidatingFolders={isValidatingFolders}
                 folderValidation={folderValidation}
+                orgMode={orgMode}
+                setOrgMode={setOrgMode}
               />
             )}
 
@@ -300,6 +304,7 @@ export default function OnboardingWizard() {
                 rightIcon={<ArrowRight size={14} />}
                 animateIcon
                 onClick={handleNext}
+                disabled={orgMode === 'move_organize' && folderValidation.valid !== true}
               >
                 {t('onboarding.buttons.continue')}
               </Button>

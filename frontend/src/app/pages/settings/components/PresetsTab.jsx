@@ -20,11 +20,15 @@ export default function PresetsTab() {
     t,
     presetCards,
     applyPreset,
-    setMoveToLibrary,
+    setOrganizationMode,
     setCustomOrganizationEnabled,
   } = useSettingsPresets();
   const { renderContext } = useSettingsFormContext();
   const isScanActive = Boolean(renderContext?.isBackgroundActive);
+
+  const isRegisterSelected = !form.folder_organization_enabled;
+  const isInplaceSelected = form.folder_organization_enabled && !form.folder_move_to_library;
+  const isLibrarySelected = form.folder_organization_enabled && form.folder_move_to_library;
 
   return (
     <Stack gap="3xl">
@@ -36,28 +40,28 @@ export default function PresetsTab() {
           <Hint className={styles['hint-tight-top']}>
             {t('settingsPage.sections.mode.hint')}
           </Hint>
-          <Grid variant="split">
-            {/* Mode A: Library sorting */}
+          <Grid variant="auto-card">
+            {/* Mode A: Register Only */}
             <SelectableCard
               as="div"
-              onClick={isScanActive ? undefined : () => setMoveToLibrary(true)}
-              selected={form.folder_move_to_library}
+              onClick={isScanActive ? undefined : () => setOrganizationMode('register')}
+              selected={isRegisterSelected}
               disabled={isScanActive}
             >
               <Stack gap="sm">
                 <Inline gap="md" align="center" className="settings-choice-header">
                   <ChoiceField.Input
                     type="radio"
-                    checked={form.folder_move_to_library}
+                    checked={isRegisterSelected}
                     onChange={() => {}}
                     disabled={isScanActive}
                   />
-                  <ChoiceField.Title isActive={form.folder_move_to_library}>
-                    {t('settingsPage.sections.mode.library')}
+                  <ChoiceField.Title isActive={isRegisterSelected}>
+                    {t('settingsPage.sections.mode.register')}
                   </ChoiceField.Title>
                 </Inline>
                 <ChoiceField.Description>
-                  {t('settingsPage.sections.mode.libraryHint')}
+                  {t('settingsPage.sections.mode.registerHint')}
                 </ChoiceField.Description>
               </Stack>
             </SelectableCard>
@@ -65,24 +69,49 @@ export default function PresetsTab() {
             {/* Mode B: In-place Rename */}
             <SelectableCard
               as="div"
-              onClick={isScanActive ? undefined : () => setMoveToLibrary(false)}
-              selected={!form.folder_move_to_library}
+              onClick={isScanActive ? undefined : () => setOrganizationMode('rename_inplace')}
+              selected={isInplaceSelected}
               disabled={isScanActive}
             >
               <Stack gap="sm">
                 <Inline gap="md" align="center" className="settings-choice-header">
                   <ChoiceField.Input
                     type="radio"
-                    checked={!form.folder_move_to_library}
+                    checked={isInplaceSelected}
                     onChange={() => {}}
                     disabled={isScanActive}
                   />
-                  <ChoiceField.Title isActive={!form.folder_move_to_library}>
+                  <ChoiceField.Title isActive={isInplaceSelected}>
                     {t('settingsPage.sections.mode.inplace')}
                   </ChoiceField.Title>
                 </Inline>
                 <ChoiceField.Description>
                   {t('settingsPage.sections.mode.inplaceHint')}
+                </ChoiceField.Description>
+              </Stack>
+            </SelectableCard>
+
+            {/* Mode C: Move & Organize */}
+            <SelectableCard
+              as="div"
+              onClick={isScanActive ? undefined : () => setOrganizationMode('move_organize')}
+              selected={isLibrarySelected}
+              disabled={isScanActive}
+            >
+              <Stack gap="sm">
+                <Inline gap="md" align="center" className="settings-choice-header">
+                  <ChoiceField.Input
+                    type="radio"
+                    checked={isLibrarySelected}
+                    onChange={() => {}}
+                    disabled={isScanActive}
+                  />
+                  <ChoiceField.Title isActive={isLibrarySelected}>
+                    {t('settingsPage.sections.mode.library')}
+                  </ChoiceField.Title>
+                </Inline>
+                <ChoiceField.Description>
+                  {t('settingsPage.sections.mode.libraryHint')}
                 </ChoiceField.Description>
               </Stack>
             </SelectableCard>

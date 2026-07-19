@@ -23,6 +23,7 @@ export function useOrganizerActions({
   sessionMode,
   includeAdult,
   provider,
+  settings,
 }) {
   const [isLoadingAll, setIsLoadingAll] = useState(false);
   const [isRenamePending, setIsRenamePending] = useState(false);
@@ -90,6 +91,7 @@ export function useOrganizerActions({
     toast,
     openModal,
     closeModal,
+    settings,
   });
 
   const handleLoadAll = async () => {

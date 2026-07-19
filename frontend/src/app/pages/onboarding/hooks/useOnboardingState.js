@@ -65,6 +65,7 @@ export default function useOnboardingState() {
   const [isValidatingApi, setIsValidatingApi] = useState(false);
 
   // Folder paths state
+  const [orgMode, setOrgMode] = useState('move_organize'); // 'register' | 'rename_inplace' | 'move_organize'
   const [scanDir, setScanDir] = useState('');
   const [libraryPath, setLibraryPath] = useState('');
   const [folderValidation, setFolderValidation] = useState({ valid: null, message: '' });
@@ -333,6 +334,16 @@ export default function useOnboardingState() {
 
   // Validate Folders
   const validateDirs = async () => {
+    if (orgMode !== 'move_organize') {
+      // In register or rename in-place, target library is not validated or required
+      setFolderValidation({ valid: true, message: t('onboarding.toasts.foldersReady') || 'Folders validated and ready.' });
+      toast(t('onboarding.toasts.folderValid') || 'Folder configuration is valid.', 'success');
+      setTimeout(() => {
+        handleNext();
+      }, 800);
+      return;
+    }
+
     if (!libraryPath.trim()) {
       setFolderValidation({ valid: false, message: t('onboarding.toasts.targetFolderRequired') || 'Target library folder is required.' });
       return;
@@ -397,8 +408,9 @@ export default function useOnboardingState() {
         porndb_endpoint: porndbEndpoint,
         // folders
         default_scan_dir: scanDir,
-        folder_library_path: libraryPath,
-        folder_move_to_library: Boolean(libraryPath.trim()),
+        folder_library_path: orgMode === 'move_organize' ? libraryPath : '',
+        folder_organization_enabled: orgMode !== 'register',
+        folder_move_to_library: orgMode === 'move_organize',
         onboarding_completed: true,
       };
 
@@ -483,5 +495,7 @@ export default function useOnboardingState() {
     handleNext,
     docsModal,
     setDocsModal,
+    orgMode,
+    setOrgMode,
   };
 }

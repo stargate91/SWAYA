@@ -72,13 +72,18 @@ export default function StructurePreviewPanel({ form, t }) {
             <div className={styles['structure-preview-rename-list']}>
               {model.items.map((item, index) => (
                 <div key={`${item.before}-${index}`} className={index === 0 ? '' : styles['structure-preview-rename-item']}>
-                  <span className={`${styles['structure-preview-line']} ${styles['structure-preview-line--muted']} ${styles['structure-preview-line--strike']}`}>
+                  <span className={`${styles['structure-preview-line']} ${styles['structure-preview-line--muted']} ${item.noStrikeBefore ? '' : styles['structure-preview-line--strike']}`}>
                     {model.fileIcon} {item.before}
                   </span>
                   <PreviewArrow arrow={model.arrow} />
                   <span className={`${styles['structure-preview-line']} ${styles[`structure-preview-line--${item.afterTone}`]}${item.strike ? ` ${styles['structure-preview-line--strike']}` : ''}`}>
                     {model.fileIcon} {item.after}
                   </span>
+                  {item.registered && (
+                    <span className={styles['structure-preview-registered-badge']}>
+                      {t('settingsPage.sections.organization.previewRegisteredBadge', { defaultValue: 'In Library' })}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>

@@ -37,10 +37,12 @@
       "title": "How SWAYA Organizes Files",
       "eyebrow": "General",
       "hint": "Choose how you want SWAYA to handle your files.",
-      "library": "Sort into Library (Recommended)",
-      "libraryHint": "SWAYA renames files and moves them into a clean movie and TV library.",
-      "inplace": "In-place Rename",
-      "inplaceHint": "SWAYA only cleans up file names and keeps everything where it already is.",
+      "register": "Register Only",
+      "registerHint": "SWAYA only imports media metadata into the database. Your files remain untouched.",
+      "inplace": "Rename In-Place",
+      "inplaceHint": "SWAYA renames and formats your files directly inside their current directories.",
+      "library": "Move & Organize",
+      "libraryHint": "SWAYA renames, structures, and moves files into a dedicated target library folder.",
       "warningHint": "If you don't set a target folder, SWAYA will organize files inside the source folder. That can create duplicate folders and may confuse torrent clients."
     },
     "profile": {

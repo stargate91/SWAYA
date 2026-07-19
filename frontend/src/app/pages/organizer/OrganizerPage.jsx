@@ -241,6 +241,7 @@ export default function OrganizerPage() {
     sessionMode,
     includeAdult: Boolean(settings.include_adult && sessionMode === 'nsfw'),
     provider,
+    settings,
   });
 
 

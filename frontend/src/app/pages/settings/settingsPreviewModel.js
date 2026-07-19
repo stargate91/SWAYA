@@ -319,10 +319,30 @@ function buildUnorganizedNodes(form, assets) {
 }
 
 function buildRenameItems(form, assets) {
+  const isRegisterOnly = !form.folder_organization_enabled;
+
   const items = [
-    { before: 'original_movie_file.mp4', after: assets.movieFile, afterTone: 'success' },
-    { before: 'original_episode_file.mp4', after: assets.episodeFile, afterTone: 'success' },
-    { before: 'original_video_file.mp4', after: assets.videoFile, afterTone: 'success' },
+    { 
+      before: 'original_movie_file.mp4', 
+      after: isRegisterOnly ? 'original_movie_file.mp4' : assets.movieFile, 
+      afterTone: isRegisterOnly ? 'muted' : 'success',
+      noStrikeBefore: isRegisterOnly,
+      registered: isRegisterOnly
+    },
+    { 
+      before: 'original_episode_file.mp4', 
+      after: isRegisterOnly ? 'original_episode_file.mp4' : assets.episodeFile, 
+      afterTone: isRegisterOnly ? 'muted' : 'success',
+      noStrikeBefore: isRegisterOnly,
+      registered: isRegisterOnly
+    },
+    { 
+      before: 'original_video_file.mp4', 
+      after: isRegisterOnly ? 'original_video_file.mp4' : assets.videoFile, 
+      afterTone: isRegisterOnly ? 'muted' : 'success',
+      noStrikeBefore: isRegisterOnly,
+      registered: isRegisterOnly
+    },
   ];
 
   if (form.extras_enabled) {
@@ -337,17 +357,45 @@ function buildRenameItems(form, assets) {
     for (const t of types) {
       const action = t.action || 'rename';
       if (action === 'delete') {
-        items.push({ before: t.origName, after: 'Deleted', afterTone: 'danger', strike: true });
+        if (isRegisterOnly) {
+          items.push({ 
+            before: t.origName, 
+            after: t.origName, 
+            afterTone: 'muted',
+            noStrikeBefore: true,
+            registered: true
+          });
+        } else {
+          items.push({ before: t.origName, after: 'Deleted', afterTone: 'danger', strike: true });
+        }
       } else if (action === 'ignore') {
-        items.push({ before: t.origName, after: t.origName, afterTone: 'muted' });
+        items.push({ 
+          before: t.origName, 
+          after: t.origName, 
+          afterTone: 'muted',
+          noStrikeBefore: isRegisterOnly,
+          registered: isRegisterOnly
+        });
       } else {
-        items.push({ before: t.origName, after: assets[t.assetKey] || t.origName, afterTone: 'muted' });
+        items.push({ 
+          before: t.origName, 
+          after: isRegisterOnly ? t.origName : (assets[t.assetKey] || t.origName), 
+          afterTone: 'muted',
+          noStrikeBefore: isRegisterOnly,
+          registered: isRegisterOnly
+        });
       }
     }
   }
 
   if (form.include_adult) {
-    items.push({ before: 'original_adult_movie_file.mp4', after: assets.adultMovieFile, afterTone: 'adult' });
+    items.push({ 
+      before: 'original_adult_movie_file.mp4', 
+      after: isRegisterOnly ? 'original_adult_movie_file.mp4' : assets.adultMovieFile, 
+      afterTone: isRegisterOnly ? 'muted' : 'adult',
+      noStrikeBefore: isRegisterOnly,
+      registered: isRegisterOnly
+    });
   }
 
   return items;
