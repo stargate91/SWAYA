@@ -22,7 +22,10 @@ export default function SettingsPage() {
     setActiveTab,
     isOrgExpanded,
     setIsOrgExpanded,
+    isAdultExpanded,
+    setIsAdultExpanded,
     isOrganizationTabActive,
+    isAdultTabActive,
     isSaving,
     isWiping,
     isScanActive,
@@ -76,6 +79,7 @@ export default function SettingsPage() {
   const {
     renderContext,
     visibleOrganizationTabs,
+    visibleAdultTabs,
     activeTabDefinition,
     formContextActions,
   } = useSettingsRenderContext({
@@ -106,6 +110,9 @@ export default function SettingsPage() {
   const activeOrganizationIndex = visibleOrganizationTabs
     .filter((tab) => tab.isCurrentlyVisible)
     .findIndex((tab) => tab.id === activeTab);
+  const activeAdultIndex = visibleAdultTabs
+    .filter((tab) => tab.isCurrentlyVisible)
+    .findIndex((tab) => tab.id === activeTab);
   if (settingsQuery.isLoading) {
     return <SettingsLoadingState t={t} />;
   }
@@ -127,15 +134,24 @@ export default function SettingsPage() {
         tabGroups={settingsTabGroups}
         visibleOrganizationTabs={visibleOrganizationTabs}
         activeOrganizationIndex={activeOrganizationIndex}
+        visibleAdultTabs={visibleAdultTabs}
+        activeAdultIndex={activeAdultIndex}
         activeTab={activeTab}
         isOrgExpanded={isOrgExpanded}
         isOrganizationTabActive={isOrganizationTabActive}
+        isAdultExpanded={isAdultExpanded}
+        isAdultTabActive={isAdultTabActive}
         onTabSelect={setActiveTab}
         onOrganizationToggle={() => {
           setActiveTab(SETTINGS_TAB_IDS.PRESETS);
           setIsOrgExpanded(!isOrgExpanded);
         }}
+        onAdultToggle={() => {
+          setActiveTab(SETTINGS_TAB_IDS.ADULT_GENERAL);
+          setIsAdultExpanded(!isAdultExpanded);
+        }}
       />
+
 
       <Overlay.ContentWrapper>
 

@@ -47,6 +47,7 @@ export function useSettingsField(name) {
   const errorMap = {
     default_scan_dir: validationErrors?.scanFolder,
     folder_library_path: validationErrors?.targetFolder,
+    folder_adult_library_path: validationErrors?.adultTargetFolder,
   };
 
   return {

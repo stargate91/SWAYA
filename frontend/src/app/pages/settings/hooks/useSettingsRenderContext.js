@@ -1,4 +1,4 @@
-import { getTabDefinition, getVisibleOrganizationTabs } from '../settingsTabs.config.js';
+import { getTabDefinition, getVisibleOrganizationTabs, getVisibleAdultTabs } from '../settingsTabs.config.js';
 
 export default function useSettingsRenderContext({
   t,
@@ -55,6 +55,7 @@ export default function useSettingsRenderContext({
   return {
     renderContext,
     visibleOrganizationTabs: getVisibleOrganizationTabs(renderContext),
+    visibleAdultTabs: getVisibleAdultTabs(renderContext),
     activeTabDefinition: getTabDefinition(activeTab),
     formContextActions: {
       handleChange,

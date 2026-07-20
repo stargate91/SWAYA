@@ -141,6 +141,7 @@ def load_formatter_config_from_db(db_session, user_id: int = 1) -> FormatterConf
         config.org_enabled = settings.get("folder_organization_enabled", True)
         config.move_to_library = settings.get("folder_move_to_library", True)
         config.library_path = settings.get("folder_library_path", "")
+        config.folder_adult_library_path = settings.get("folder_adult_library_path", "")
         config.sort_by_type = settings.get("folder_sort_by_type", True)
         config.movies_dir_name = _localized_builtin_folder_name(settings, "folder_movies_name", settings.get("folder_movies_name", "Movies"))
         config.tv_dir_name = _localized_builtin_folder_name(settings, "folder_tv_name", settings.get("folder_tv_name", "TV Shows"))

@@ -5,13 +5,18 @@ export default function SettingsSidebar({
   t,
   tabGroups,
   visibleOrganizationTabs,
+  visibleAdultTabs,
   activeTab,
   isOrgExpanded,
   isOrganizationTabActive,
+  isAdultExpanded,
+  isAdultTabActive,
   onTabSelect,
   onOrganizationToggle,
+  onAdultToggle,
 }) {
-  const isSubMenuVisible = isOrgExpanded || isOrganizationTabActive;
+  const isOrgSubMenuVisible = isOrgExpanded || isOrganizationTabActive;
+  const isAdultSubMenuVisible = isAdultExpanded || isAdultTabActive;
 
   const sidebarGroups = tabGroups.map((group) => {
     if (group.id === SETTINGS_TAB_GROUP_IDS.ORGANIZATION) {
@@ -20,9 +25,25 @@ export default function SettingsSidebar({
         label: t(group.labelKey),
         icon: group.icon,
         isActive: isOrganizationTabActive,
-        isExpanded: isSubMenuVisible,
+        isExpanded: isOrgSubMenuVisible,
         onToggle: onOrganizationToggle,
         subItems: visibleOrganizationTabs.map((tab) => ({
+          id: tab.id,
+          label: t(tab.labelKey),
+          isActive: activeTab === tab.id,
+        })),
+      };
+    }
+
+    if (group.id === SETTINGS_TAB_GROUP_IDS.ADULT) {
+      return {
+        id: group.id,
+        label: t(group.labelKey),
+        icon: group.icon,
+        isActive: isAdultTabActive,
+        isExpanded: isAdultSubMenuVisible,
+        onToggle: onAdultToggle,
+        subItems: visibleAdultTabs.map((tab) => ({
           id: tab.id,
           label: t(tab.labelKey),
           isActive: activeTab === tab.id,

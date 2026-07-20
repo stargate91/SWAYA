@@ -3,16 +3,17 @@ export const SETTINGS_TAB_IDS = {
   THEME: 'theme',
   ORGANIZATION: 'organization',
   PRESETS: 'presets',
-  FILE_NAMING: 'fileNaming',
-  FOLDER_STRUCTURE: 'folderStructure',
+  ORG_GENERAL: 'orgGeneral',
+  MOVIES: 'movies',
+  TV_SHOWS: 'tvShows',
   EXTRAS: 'extras',
   SCENES: 'scenes',
-  RULES: 'rules',
-  COLLECTIONS: 'collections',
   API_KEYS: 'apiKeys',
   ADVANCED: 'advanced',
   MAINTENANCE: 'maintenance',
   ADULT: 'adult',
+  ADULT_GENERAL: 'adultGeneral',
+  ADULT_API: 'adultApi',
 };
 
 export const SETTINGS_TAB_GROUP_IDS = {
@@ -25,14 +26,18 @@ export const SETTINGS_TAB_GROUP_IDS = {
   ADULT: SETTINGS_TAB_IDS.ADULT,
 };
 
+export const ADULT_TAB_IDS = [
+  SETTINGS_TAB_IDS.ADULT_GENERAL,
+  SETTINGS_TAB_IDS.SCENES,
+  SETTINGS_TAB_IDS.ADULT_API,
+];
+
 export const ORGANIZATION_TAB_IDS = [
   SETTINGS_TAB_IDS.PRESETS,
-  SETTINGS_TAB_IDS.FILE_NAMING,
-  SETTINGS_TAB_IDS.FOLDER_STRUCTURE,
+  SETTINGS_TAB_IDS.ORG_GENERAL,
+  SETTINGS_TAB_IDS.MOVIES,
+  SETTINGS_TAB_IDS.TV_SHOWS,
   SETTINGS_TAB_IDS.EXTRAS,
-  SETTINGS_TAB_IDS.SCENES,
-  SETTINGS_TAB_IDS.RULES,
-  SETTINGS_TAB_IDS.COLLECTIONS,
 ];
 
 export const SETTINGS_PRESET_IDS = {

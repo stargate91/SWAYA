@@ -49,8 +49,8 @@ function renderTreeNode(node, icons) {
   );
 }
 
-export default function StructurePreviewPanel({ form, t }) {
-  const model = buildStructurePreviewModel(form, t);
+export default function StructurePreviewPanel({ form, t, filterType }) {
+  const model = buildStructurePreviewModel(form, t, filterType);
 
   return (
     <div className={styles['structure-preview-container']}>

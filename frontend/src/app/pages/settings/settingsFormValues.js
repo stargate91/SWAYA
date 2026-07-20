@@ -4,11 +4,13 @@ import {
   SETTINGS_PRESET_IDS,
 } from './settingsConstants.js';
 
+// This chunk replaces the first chunk in settingsFormValues.js
 export const SETTINGS_BASE_DEFAULTS = {
   user_name: '',
   avatar_path: '',
   default_scan_dir: '',
   folder_library_path: '',
+  folder_adult_library_path: '',
   collision_strategy: 'keep_both',
   collision_duration_tolerance_seconds: '10',
   extras_video_action: 'rename',
@@ -174,6 +176,7 @@ export function getInitialFormValues(settingsData = null, t = null) {
     avatar_path: getStringValue(settingsData.avatar_path, defaults.avatar_path),
     default_scan_dir: getStringValue(settingsData.default_scan_dir, defaults.default_scan_dir),
     folder_library_path: getStringValue(settingsData.folder_library_path, defaults.folder_library_path),
+    folder_adult_library_path: getStringValue(settingsData.folder_adult_library_path, defaults.folder_adult_library_path),
     collision_strategy: getStringValue(settingsData.collision_strategy, defaults.collision_strategy),
     collision_duration_tolerance_seconds: getStringValue(
       settingsData.collision_duration_tolerance_seconds,

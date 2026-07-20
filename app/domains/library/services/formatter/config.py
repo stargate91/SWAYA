@@ -48,6 +48,7 @@ class FormatterConfig:
     org_enabled: bool = True
     move_to_library: bool = True
     library_path: str = ""
+    folder_adult_library_path: str = ""
     sort_by_type: bool = True
     movies_dir_name: str = "Movies"
     tv_dir_name: str = "TV Shows"

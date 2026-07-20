@@ -9,6 +9,7 @@ export default function SettingsLiveImpact({
   title,
   eyebrow,
   hint,
+  filterType,
 }) {
   return (
     <Card title={title} eyebrow={eyebrow}>
@@ -16,7 +17,7 @@ export default function SettingsLiveImpact({
         <Hint>
           {hint}
         </Hint>
-        <StructurePreviewPanel form={form} t={t} />
+        <StructurePreviewPanel form={form} t={t} filterType={filterType} />
       </Stack>
     </Card>
   );

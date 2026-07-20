@@ -27,16 +27,18 @@ class PlanGenerator:
         people_links: Optional[List[Any]] = None
     ) -> Tuple[str, str]:
         scan_mode = str((item.parsed_info or {}).get("scan_mode") or "").lower()
-        is_inplace = not self.config.org_enabled or not self.config.move_to_library or not self.config.library_path
+        is_adult = bool(match and getattr(match, "is_adult", False))
+        effective_library_path = self.config.folder_adult_library_path if (is_adult and self.config.folder_adult_library_path) else self.config.library_path
+        is_inplace = not self.config.org_enabled or not self.config.move_to_library or not effective_library_path
 
         if scan_mode == "offline":
             target_name = item.filename
             if is_inplace:
                 return target_name, ""
             sub_path_parts = []
-            is_adult = match and getattr(match, "is_adult", False)
             if is_adult:
-                sub_path_parts.append(self.config.adult_dir_name)
+                if not getattr(self.config, "folder_adult_library_path", ""):
+                    sub_path_parts.append(self.config.adult_dir_name)
                 if self.config.naming_adult_subfolders_enabled:
                     sub_path_parts.append(getattr(self.config, "adult_videos_dir_name", "Videos"))
             else:
@@ -76,8 +78,9 @@ class PlanGenerator:
             target_name = self.formatter.format_scene_filename(context)
             
             sub_path_parts = []
-            if match and getattr(match, "is_adult", False):
-                sub_path_parts.append(self.config.adult_dir_name)
+            if is_adult:
+                if not getattr(self.config, "folder_adult_library_path", ""):
+                    sub_path_parts.append(self.config.adult_dir_name)
                 if self.config.naming_adult_subfolders_enabled:
                     sub_path_parts.append(self.config.adult_scenes_dir_name)
                 
@@ -114,8 +117,9 @@ class PlanGenerator:
             target_name = self.formatter.format_movie_filename(context)
             
             sub_path_parts = []
-            if match and getattr(match, "is_adult", False):
-                sub_path_parts.append(self.config.adult_dir_name)
+            if is_adult:
+                if not getattr(self.config, "folder_adult_library_path", ""):
+                    sub_path_parts.append(self.config.adult_dir_name)
                 if self.config.naming_adult_subfolders_enabled:
                     sub_path_parts.append(self.config.adult_movies_dir_name)
             else:
@@ -137,8 +141,9 @@ class PlanGenerator:
             target_name = self.formatter.format_episode_filename(context)
                 
             sub_path_parts = []
-            if match and getattr(match, "is_adult", False):
-                sub_path_parts.append(self.config.adult_dir_name)
+            if is_adult:
+                if not getattr(self.config, "folder_adult_library_path", ""):
+                    sub_path_parts.append(self.config.adult_dir_name)
                 if self.config.naming_adult_subfolders_enabled:
                     sub_path_parts.append(self.config.adult_tv_dir_name)
             else:
@@ -168,7 +173,9 @@ class PlanGenerator:
     def format_item(self, item: Any, match: Any, loc: Any, people_links: Optional[List[Any]] = None) -> RenamePreview:
         orig_path = self.formatter._get_absolute_path(item)
         target_name, target_subpath = self._get_target_name_and_subpath(item, match, loc, people_links=people_links)
-        dest_root = self.config.library_path if self.config.move_to_library and self.config.library_path else os.path.dirname(orig_path)
+        is_adult = bool(match and getattr(match, "is_adult", False))
+        effective_library_path = self.config.folder_adult_library_path if (is_adult and self.config.folder_adult_library_path) else self.config.library_path
+        dest_root = effective_library_path if self.config.move_to_library and effective_library_path else os.path.dirname(orig_path)
         media_type = getattr(match, "media_type", None) if match else None
         if not media_type:
             inferred = str((item.parsed_info or {}).get("type") or "").lower()
@@ -208,12 +215,14 @@ class PlanGenerator:
         orig_path = self.formatter._get_absolute_path(item)
         media_type = getattr(match, "media_type", MediaType.MOVIE)
 
-        is_inplace = not self.config.org_enabled or not self.config.move_to_library or not self.config.library_path
+        is_adult = bool(match and getattr(match, "is_adult", False))
+        effective_library_path = self.config.folder_adult_library_path if (is_adult and self.config.folder_adult_library_path) else self.config.library_path
+        is_inplace = not self.config.org_enabled or not self.config.move_to_library or not effective_library_path
         target_name, target_subpath = self._get_target_name_and_subpath(item, match, loc)
 
         effective_root = destination_root
-        if self.config.move_to_library and self.config.library_path:
-            effective_root = self.config.library_path
+        if self.config.move_to_library and effective_library_path:
+            effective_root = effective_library_path
         elif not destination_root:
             effective_root = os.path.dirname(orig_path)
 

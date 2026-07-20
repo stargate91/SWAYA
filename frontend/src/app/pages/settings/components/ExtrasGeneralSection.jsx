@@ -12,6 +12,7 @@ export default function ExtrasGeneralSection({ t }) {
   const { extrasFolderModeOptions } = useSettingsViewContext();
   const extrasEnabledField = useSettingsField('extras_enabled');
   const moveToLibraryField = useSettingsField('folder_move_to_library');
+  const orgEnabledField = useSettingsField('folder_organization_enabled');
   const folderModeField = useSettingsField('extras_folder_mode');
 
   return (
@@ -32,7 +33,11 @@ export default function ExtrasGeneralSection({ t }) {
 
         {extrasEnabledField.checked && (
           <>
-            {moveToLibraryField.checked ? (
+            {!orgEnabledField.checked ? (
+              <InfoBox>
+                {t('settingsPage.sections.extras.registerInfo')}
+              </InfoBox>
+            ) : moveToLibraryField.checked ? (
               <>
                 <SettingsSelectField
                   field="extras_folder_mode"
@@ -48,6 +53,10 @@ export default function ExtrasGeneralSection({ t }) {
                     placeholder={t('settingsPage.sections.extras.defaultSubfolderName')}
                   />
                 )}
+
+                <InfoBox>
+                  {t('settingsPage.sections.extras.libraryInfo')}
+                </InfoBox>
               </>
             ) : (
               <InfoBox>

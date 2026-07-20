@@ -4,6 +4,7 @@ import Stack from '@/ui/Stack';
 import SettingsTextField from './fields/SettingsTextField.jsx';
 import SettingsSwitchField from './fields/SettingsSwitchField.jsx';
 import SettingsSelectField from './fields/SettingsSelectField.jsx';
+import SettingsPathField from './fields/SettingsPathField.jsx';
 
 function renderItem(item, context) {
   if (item.visible && !item.visible(context)) {
@@ -22,6 +23,22 @@ function renderItem(item, context) {
         min={item.min}
         className={item.className}
         inputRef={item.inputRef}
+      />
+    );
+  }
+
+  if (item.type === 'path') {
+    return (
+      <SettingsPathField
+        key={item.key || item.field}
+        field={item.field}
+        label={item.label}
+        hint={item.hint}
+        placeholder={item.placeholder}
+        picker={item.picker}
+        buttonLabel={item.buttonLabel}
+        className={item.className}
+        t={item.t || context.t}
       />
     );
   }

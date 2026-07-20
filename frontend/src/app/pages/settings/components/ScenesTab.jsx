@@ -295,6 +295,7 @@ export default function ScenesTab({
         title={t('settingsPage.sections.liveImpact.title')}
         eyebrow={t('settingsPage.sections.liveImpact.eyebrow')}
         hint={t('settingsPage.sections.liveImpact.folderStructureHint')}
+        filterType="scenes"
       />
     </Stack>
   );

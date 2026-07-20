@@ -128,6 +128,7 @@ class SettingsService:
     def validate_folders(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         scan_dir = (payload.get("default_scan_dir") or "").strip()
         library_dir = (payload.get("folder_library_path") or "").strip()
+        adult_library_dir = (payload.get("folder_adult_library_path") or "").strip()
         move_to_library = bool(payload.get("folder_move_to_library"))
 
         errors = {}
@@ -142,9 +143,16 @@ class SettingsService:
             elif scan_dir and os.path.abspath(scan_dir) == os.path.abspath(library_dir):
                 errors["targetFolder"] = "foldersCannotBeSame"
 
+            if adult_library_dir:
+                if not os.path.exists(adult_library_dir):
+                    errors["adultTargetFolder"] = "adultTargetFolderNotExist"
+                elif scan_dir and os.path.abspath(scan_dir) == os.path.abspath(adult_library_dir):
+                    errors["adultTargetFolder"] = "foldersCannotBeSame"
+
         if errors:
             return {"valid": False, "errors": errors}
         return {"valid": True, "message": "foldersVerified"}
+
 
     def get_changelog(self) -> Dict[str, Any]:
         project_root = Path(__file__).resolve().parents[4]

@@ -17,16 +17,17 @@
     "theme": "Theme",
     "organization": "Organization",
     "presets": "Presets",
-    "fileNaming": "File Names",
-    "folderStructure": "Folders",
+    "movies": "Movies",
+    "tvShows": "TV Shows",
     "scenes": "Scenes",
     "extras": "Extras",
     "rules": "File Conflicts",
-    "collections": "Collections",
     "apiKeys": "API Keys",
     "advanced": "Advanced",
     "maintenance": "Maintenance",
-    "adult": "Adult Content"
+    "adult": "Adult Content",
+    "adultGeneral": "General",
+    "adultApi": "API Integrations"
   },
   "templateTags": {
     "common": "Common Tags",
@@ -145,7 +146,10 @@
         "all": "All",
         "female": "Female",
         "male": "Male"
-      }
+      },
+      "customTargetFolder": "Custom Target Library Folder",
+      "customTargetFolderHint": "Separate target folder for organized adult media assets (optional). If empty, the main target library folder is used.",
+      "customTargetFolderPlaceholder": "Select separate target folder (optional)"
     },
     "adultPreviews": {
       "title": "Hover Previews",
@@ -372,6 +376,9 @@
       "structureTitle": "Folder Layout",
       "structureEyebrow": "Folder Structure",
       "movieShowFoldersTitle": "Movie and Show Folders",
+      "movieFoldersTitle": "Movie Folders",
+      "tvFoldersTitle": "TV Show Folders",
+      "showFoldersTitle": "Show Folders",
       "seasonEpisodeFoldersTitle": "Season and Episode Folders",
       "createMovieSubdir": "Create Movie Folders",
       "createMovieSubdirHint": "Give each movie its own folder.",
@@ -434,6 +441,8 @@
       "folderModeLabel": "Where to Put Extras",
       "folderModeHint": "Choose whether extras go into their own folder or stay next to the video file.",
       "inplaceInfo": "With in-place renaming, subtitles and other extras stay next to the main media file.",
+      "libraryInfo": "When organizing files into your library folder, subtitles and other extras will automatically be moved to the correct destination folders alongside the video.",
+      "registerInfo": "With Register Only, extra files are registered in the database, but they will not be renamed, moved, or deleted.",
       "folderModeOptions": {
         "subfolder": "In a separate folder (for example Extras/)",
         "flat": "Next to the video file"
@@ -464,7 +473,8 @@
       "metadataTemplate": "Info File Naming Pattern",
       "actionOptions": {
         "rename": "Rename",
-        "ignore": "Leave As Is"
+        "ignore": "Leave As Is",
+        "delete": "Delete"
       }
     },
     "playback": {
@@ -551,6 +561,7 @@
     "libraryDirNotFolder": "The target path needs to point to a folder.",
     "libraryDirNotWritable": "SWAYA can't write to that target folder.",
     "libraryDirInvalid": "That target folder isn't valid.",
+    "adultTargetFolderNotExist": "That adult target folder doesn't exist.",
     "foldersCannotBeSame": "The scan folder and target folder can't be the same.",
     "foldersVerified": "Your folder settings look good.",
     "adultProviderNames": {

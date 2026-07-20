@@ -188,16 +188,22 @@ function buildMovieNodes(form, assets) {
   return nodes;
 }
 
-function buildAdultNodes(form, assets) {
-  const movieNodes = form.folder_create_movie_subdir
+function buildAdultMovieNodes(form, assets) {
+  return form.folder_create_movie_subdir
     ? [createFolderNode(getFolderLabel(assets.adultFolderMovie), { tone: 'adult', children: [createFileNode(assets.adultMovieFile, { tone: 'adult' })] })]
     : [createFileNode(assets.adultMovieFile, { tone: 'adult' })];
-  const tvNodes = [
+}
+
+function buildAdultTvNodes(form, assets) {
+  return [
     createFolderNode(getFolderLabel(assets.adultFolderTv), {
       tone: 'adult',
       children: [createFileNode(assets.adultEpisodeFile, { tone: 'adult' })],
     }),
   ];
+}
+
+function buildAdultSceneNodes(form, assets) {
   let sceneNodes = [createFileNode(assets.adultSceneFile, { tone: 'adult' })];
   if (assets.adultSceneFolder) {
     sceneNodes = [createFolderNode(getFolderLabel(assets.adultSceneFolder), { tone: 'adult', children: sceneNodes })];
@@ -214,10 +220,20 @@ function buildAdultNodes(form, assets) {
       }),
     ];
   }
+  return sceneNodes;
+}
 
-  const videoNodes = form.folder_create_video_subdir
+function buildAdultVideoNodes(form, assets) {
+  return form.folder_create_video_subdir
     ? [createFolderNode(assets.adultVideoFile.replace(/\.mp4$/, ''), { tone: 'adult', children: [createFileNode(assets.adultVideoFile, { tone: 'adult' })] })]
     : [createFileNode(assets.adultVideoFile, { tone: 'adult' })];
+}
+
+function buildAdultNodes(form, assets) {
+  const movieNodes = buildAdultMovieNodes(form, assets);
+  const tvNodes = buildAdultTvNodes(form, assets);
+  const sceneNodes = buildAdultSceneNodes(form, assets);
+  const videoNodes = buildAdultVideoNodes(form, assets);
 
   if (!form.naming_adult_subfolders_enabled) {
     return [...movieNodes, ...tvNodes, ...sceneNodes, ...videoNodes];
@@ -267,25 +283,120 @@ function buildVideoNodes(form, assets) {
   return [createFileNode(assets.videoFile)];
 }
 
-function buildOrganizedNodes(form, assets) {
-  if (form.folder_sort_by_type) {
-    return [
-      createFolderNode(form.folder_movies_name, { children: buildMovieNodes(form, assets) }),
-      createFolderNode(form.folder_tv_name, { topSpacing: true, children: buildShowNodes(form, assets) }),
-      createFolderNode(form.folder_videos_name, { topSpacing: true, children: buildVideoNodes(form, assets) }),
-      ...(form.include_adult ? [createFolderNode(form.folder_adult_name, { tone: 'adult', topSpacing: true, children: buildAdultNodes(form, assets) })] : []),
-    ];
+function buildOrganizedNodes(form, assets, filterType) {
+  const isSort = form.folder_sort_by_type;
+  const movieNodes = buildMovieNodes(form, assets);
+  const tvNodes = buildShowNodes(form, assets);
+  const videoNodes = buildVideoNodes(form, assets);
+  const adultNodes = form.include_adult ? buildAdultNodes(form, assets) : [];
+
+  if (filterType === 'movies') {
+    const result = [];
+    if (isSort) {
+      result.push(createFolderNode(form.folder_movies_name, { children: movieNodes }));
+    } else {
+      result.push(...movieNodes);
+    }
+
+    if (form.include_adult) {
+      const adultMovieNodes = buildAdultMovieNodes(form, assets);
+      const innerNodes = form.naming_adult_subfolders_enabled
+        ? [createFolderNode(form.folder_adult_movies_name, { tone: 'adult', children: adultMovieNodes })]
+        : adultMovieNodes;
+
+      if (form.folder_adult_library_path) {
+        const adultRootLabel = `➔ ${form.folder_adult_library_path}`;
+        result.push(createFolderNode(adultRootLabel, { tone: 'adult', topSpacing: true, children: innerNodes }));
+      } else if (isSort) {
+        result.push(createFolderNode(form.folder_adult_name, { tone: 'adult', topSpacing: true, children: innerNodes }));
+      } else {
+        result.push(...innerNodes.map(node => ({ ...node, tone: 'adult', topSpacing: true })));
+      }
+    }
+
+    return result;
   }
 
-  return [
-    ...buildMovieNodes(form, assets),
-    ...buildShowNodes(form, assets, { topSpacing: true }),
-    ...buildVideoNodes(form, assets).map((node, index) => ({ ...node, topSpacing: index === 0 })),
-    ...(form.include_adult ? buildAdultNodes(form, assets).map((node, index) => ({ ...node, topSpacing: index === 0 })) : []),
+  if (filterType === 'tv') {
+    const result = [];
+    if (isSort) {
+      result.push(createFolderNode(form.folder_tv_name, { children: tvNodes }));
+    } else {
+      result.push(...tvNodes);
+    }
+
+    if (form.include_adult) {
+      const adultTvNodes = buildAdultTvNodes(form, assets);
+      const innerNodes = form.naming_adult_subfolders_enabled
+        ? [createFolderNode(form.folder_adult_tv_name, { tone: 'adult', children: adultTvNodes })]
+        : adultTvNodes;
+
+      if (form.folder_adult_library_path) {
+        const adultRootLabel = `➔ ${form.folder_adult_library_path}`;
+        result.push(createFolderNode(adultRootLabel, { tone: 'adult', topSpacing: true, children: innerNodes }));
+      } else if (isSort) {
+        result.push(createFolderNode(form.folder_adult_name, { tone: 'adult', topSpacing: true, children: innerNodes }));
+      } else {
+        result.push(...innerNodes.map(node => ({ ...node, tone: 'adult', topSpacing: true })));
+      }
+    }
+
+    return result;
+  }
+
+  if (filterType === 'scenes') {
+    const adultSceneNodes = buildAdultSceneNodes(form, assets);
+    const innerNodes = form.naming_adult_subfolders_enabled
+      ? [createFolderNode(form.folder_adult_scenes_name, { tone: 'adult', children: adultSceneNodes })]
+      : adultSceneNodes;
+
+    if (form.folder_adult_library_path) {
+      const adultRootLabel = `➔ ${form.folder_adult_library_path}`;
+      return [createFolderNode(adultRootLabel, { tone: 'adult', children: innerNodes })];
+    }
+    if (isSort) {
+      return [createFolderNode(form.folder_adult_name, { tone: 'adult', children: innerNodes })];
+    }
+    return innerNodes.map(node => ({ ...node, tone: 'adult' }));
+  }
+
+  const sfwNodes = [
+    createFolderNode(form.folder_movies_name, { children: movieNodes }),
+    createFolderNode(form.folder_tv_name, { topSpacing: true, children: tvNodes }),
+    createFolderNode(form.folder_videos_name, { topSpacing: true, children: videoNodes }),
   ];
+
+  if (isSort) {
+    if (form.include_adult) {
+      if (form.folder_adult_library_path) {
+        const adultRootLabel = `${form.folder_adult_name} ➔ ${form.folder_adult_library_path}`;
+        sfwNodes.push(createFolderNode(adultRootLabel, { tone: 'adult', topSpacing: true, children: adultNodes }));
+      } else {
+        sfwNodes.push(createFolderNode(form.folder_adult_name, { tone: 'adult', topSpacing: true, children: adultNodes }));
+      }
+    }
+    return sfwNodes;
+  }
+
+  const flatNodes = [
+    ...movieNodes,
+    ...tvNodes.map((node, index) => ({ ...node, topSpacing: index === 0 })),
+    ...videoNodes.map((node, index) => ({ ...node, topSpacing: index === 0 })),
+  ];
+
+  if (form.include_adult) {
+    if (form.folder_adult_library_path) {
+      const adultRootLabel = `➔ ${form.folder_adult_library_path}`;
+      flatNodes.push(createFolderNode(adultRootLabel, { tone: 'adult', topSpacing: true, children: adultNodes }));
+    } else {
+      flatNodes.push(...adultNodes.map((node) => ({ ...node, tone: 'adult' })));
+    }
+  }
+
+  return flatNodes;
 }
 
-function buildUnorganizedNodes(form, assets) {
+function buildUnorganizedNodes(form, assets, filterType) {
   const extraNodes = [];
   if (form.extras_enabled) {
     const types = [
@@ -309,40 +420,70 @@ function buildUnorganizedNodes(form, assets) {
     }
   }
 
-  return [
+  if (filterType === 'movies') {
+    const result = [createFileNode(assets.movieFile), ...extraNodes];
+    if (form.include_adult) {
+      if (form.folder_adult_library_path) {
+        const adultRootLabel = `➔ ${form.folder_adult_library_path}`;
+        result.push(createFolderNode(adultRootLabel, { tone: 'adult', topSpacing: true, children: [createFileNode(assets.adultMovieFile, { tone: 'adult' })] }));
+      } else {
+        result.push(createFileNode(assets.adultMovieFile, { tone: 'adult', topSpacing: true }));
+      }
+    }
+    return result;
+  }
+
+  if (filterType === 'tv') {
+    const result = [createFileNode(assets.episodeFile)];
+    if (form.include_adult) {
+      if (form.folder_adult_library_path) {
+        const adultRootLabel = `➔ ${form.folder_adult_library_path}`;
+        result.push(createFolderNode(adultRootLabel, { tone: 'adult', topSpacing: true, children: [createFileNode(assets.adultEpisodeFile, { tone: 'adult' })] }));
+      } else {
+        result.push(createFileNode(assets.adultEpisodeFile, { tone: 'adult', topSpacing: true }));
+      }
+    }
+    return result;
+  }
+
+  if (filterType === 'scenes') {
+    if (form.folder_adult_library_path) {
+      const adultRootLabel = `➔ ${form.folder_adult_library_path}`;
+      return [createFolderNode(adultRootLabel, { tone: 'adult', children: [createFileNode(assets.adultMovieFile, { tone: 'adult' })] })];
+    }
+    return [createFileNode(assets.adultMovieFile, { tone: 'adult' })];
+  }
+
+  const nodes = [
     createFileNode(assets.movieFile),
     ...extraNodes,
     createFileNode(assets.episodeFile),
     createFileNode(assets.videoFile, { topSpacing: true }),
-    ...(form.include_adult ? [createFileNode(assets.adultMovieFile, { topSpacing: true })] : []),
   ];
+
+  if (form.include_adult) {
+    if (form.folder_adult_library_path) {
+      const adultRootLabel = `➔ ${form.folder_adult_library_path}`;
+      nodes.push(createFolderNode(adultRootLabel, { tone: 'adult', topSpacing: true, children: [createFileNode(assets.adultMovieFile, { tone: 'adult' })] }));
+    } else {
+      nodes.push(createFileNode(assets.adultMovieFile, { tone: 'adult', topSpacing: true }));
+    }
+  }
+
+  return nodes;
 }
 
-function buildRenameItems(form, assets) {
+function buildRenameItems(form, assets, filterType) {
   const isRegisterOnly = !form.folder_organization_enabled;
 
-  const items = [
+  const movieItems = [
     { 
       before: 'original_movie_file.mp4', 
       after: isRegisterOnly ? 'original_movie_file.mp4' : assets.movieFile, 
       afterTone: isRegisterOnly ? 'muted' : 'success',
       noStrikeBefore: isRegisterOnly,
       registered: isRegisterOnly
-    },
-    { 
-      before: 'original_episode_file.mp4', 
-      after: isRegisterOnly ? 'original_episode_file.mp4' : assets.episodeFile, 
-      afterTone: isRegisterOnly ? 'muted' : 'success',
-      noStrikeBefore: isRegisterOnly,
-      registered: isRegisterOnly
-    },
-    { 
-      before: 'original_video_file.mp4', 
-      after: isRegisterOnly ? 'original_video_file.mp4' : assets.videoFile, 
-      afterTone: isRegisterOnly ? 'muted' : 'success',
-      noStrikeBefore: isRegisterOnly,
-      registered: isRegisterOnly
-    },
+    }
   ];
 
   if (form.extras_enabled) {
@@ -358,7 +499,7 @@ function buildRenameItems(form, assets) {
       const action = t.action || 'rename';
       if (action === 'delete') {
         if (isRegisterOnly) {
-          items.push({ 
+          movieItems.push({ 
             before: t.origName, 
             after: t.origName, 
             afterTone: 'muted',
@@ -366,10 +507,10 @@ function buildRenameItems(form, assets) {
             registered: true
           });
         } else {
-          items.push({ before: t.origName, after: 'Deleted', afterTone: 'danger', strike: true });
+          movieItems.push({ before: t.origName, after: 'Deleted', afterTone: 'danger', strike: true });
         }
       } else if (action === 'ignore') {
-        items.push({ 
+        movieItems.push({ 
           before: t.origName, 
           after: t.origName, 
           afterTone: 'muted',
@@ -377,7 +518,7 @@ function buildRenameItems(form, assets) {
           registered: isRegisterOnly
         });
       } else {
-        items.push({ 
+        movieItems.push({ 
           before: t.origName, 
           after: isRegisterOnly ? t.origName : (assets[t.assetKey] || t.origName), 
           afterTone: 'muted',
@@ -388,8 +529,29 @@ function buildRenameItems(form, assets) {
     }
   }
 
+  const tvItems = [
+    { 
+      before: 'original_episode_file.mp4', 
+      after: isRegisterOnly ? 'original_episode_file.mp4' : assets.episodeFile, 
+      afterTone: isRegisterOnly ? 'muted' : 'success',
+      noStrikeBefore: isRegisterOnly,
+      registered: isRegisterOnly
+    }
+  ];
+
+  const videoItems = [
+    { 
+      before: 'original_video_file.mp4', 
+      after: isRegisterOnly ? 'original_video_file.mp4' : assets.videoFile, 
+      afterTone: isRegisterOnly ? 'muted' : 'success',
+      noStrikeBefore: isRegisterOnly,
+      registered: isRegisterOnly
+    }
+  ];
+
+  const adultItems = [];
   if (form.include_adult) {
-    items.push({ 
+    adultItems.push({ 
       before: 'original_adult_movie_file.mp4', 
       after: isRegisterOnly ? 'original_adult_movie_file.mp4' : assets.adultMovieFile, 
       afterTone: isRegisterOnly ? 'muted' : 'adult',
@@ -398,10 +560,20 @@ function buildRenameItems(form, assets) {
     });
   }
 
-  return items;
+  if (filterType === 'movies') {
+    return movieItems;
+  }
+  if (filterType === 'tv') {
+    return tvItems;
+  }
+  if (filterType === 'scenes') {
+    return adultItems;
+  }
+
+  return [...movieItems, ...tvItems, ...videoItems, ...adultItems];
 }
 
-export function buildStructurePreviewModel(form, t) {
+export function buildStructurePreviewModel(form, t, filterType) {
   const assets = buildPreviewAssets(form);
 
   if (!form.folder_move_to_library) {
@@ -411,8 +583,13 @@ export function buildStructurePreviewModel(form, t) {
       fileIcon: FILE_ICON,
       arrow: RENAME_ARROW,
       rootLabel: t('settingsPage.sections.organization.previewScanFolderPlaceholder'),
-      items: buildRenameItems(form, assets),
+      items: buildRenameItems(form, assets, filterType),
     };
+  }
+
+  let rootLabel = (form.folder_library_path || '').trim() || t('settingsPage.sections.organization.previewTargetFolderPlaceholder');
+  if (filterType === 'scenes' && form.folder_adult_library_path) {
+    rootLabel = form.folder_adult_library_path;
   }
 
   return {
@@ -420,9 +597,9 @@ export function buildStructurePreviewModel(form, t) {
     rootIcon: FOLDER_ICON,
     fileIcon: FILE_ICON,
     folderIcon: FOLDER_ICON,
-    rootLabel: (form.folder_library_path || '').trim() || t('settingsPage.sections.organization.previewTargetFolderPlaceholder'),
+    rootLabel,
     nodes: form.folder_organization_enabled
-      ? buildOrganizedNodes(form, assets)
-      : buildUnorganizedNodes(form, assets),
+      ? buildOrganizedNodes(form, assets, filterType)
+      : buildUnorganizedNodes(form, assets, filterType),
   };
 }

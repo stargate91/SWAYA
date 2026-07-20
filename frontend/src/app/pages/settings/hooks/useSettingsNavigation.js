@@ -1,16 +1,21 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ORGANIZATION_TAB_IDS, SETTINGS_TAB_IDS } from '../settingsConstants.js';
+import { ORGANIZATION_TAB_IDS, ADULT_TAB_IDS, SETTINGS_TAB_IDS } from '../settingsConstants.js';
 
 export default function useSettingsNavigation(form, isDirty) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(SETTINGS_TAB_IDS.GENERAL);
   const [isOrgExpanded, setIsOrgExpanded] = useState(true);
+  const [isAdultExpanded, setIsAdultExpanded] = useState(true);
   const [isShaking, setIsShaking] = useState(false);
 
   const isOrganizationTabActive = useMemo(
     () => ORGANIZATION_TAB_IDS.includes(activeTab),
+    [activeTab]
+  );
+
+  const isAdultTabActive = useMemo(
+    () => ADULT_TAB_IDS.includes(activeTab),
     [activeTab]
   );
 
@@ -30,19 +35,10 @@ export default function useSettingsNavigation(form, isDirty) {
   }, [isOrganizationTabActive]);
 
   useEffect(() => {
-    if ((!form.include_adult || !form.custom_organization_enabled) && activeTab === SETTINGS_TAB_IDS.SCENES) {
-      setActiveTab(SETTINGS_TAB_IDS.PRESETS);
+    if (!isAdultTabActive) {
+      setIsAdultExpanded(false);
     }
-    if (!form.folder_organization_enabled && activeTab === SETTINGS_TAB_IDS.COLLECTIONS) {
-      setActiveTab(SETTINGS_TAB_IDS.PRESETS);
-    }
-    if (
-      !form.folder_move_to_library &&
-      [SETTINGS_TAB_IDS.FOLDER_STRUCTURE, SETTINGS_TAB_IDS.COLLECTIONS].includes(activeTab)
-    ) {
-      setActiveTab(SETTINGS_TAB_IDS.PRESETS);
-    }
-  }, [form.folder_move_to_library, form.folder_organization_enabled, form.include_adult, form.custom_organization_enabled, activeTab]);
+  }, [isAdultTabActive]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -62,8 +58,12 @@ export default function useSettingsNavigation(form, isDirty) {
     setActiveTab,
     isOrgExpanded,
     setIsOrgExpanded,
+    isAdultExpanded,
+    setIsAdultExpanded,
     isOrganizationTabActive,
+    isAdultTabActive,
     organizationTabs: ORGANIZATION_TAB_IDS,
+    adultTabs: ADULT_TAB_IDS,
     handleClose,
     isShaking,
   };

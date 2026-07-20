@@ -6,7 +6,7 @@ export default function useSettingsPickers({ form, setForm, clearFolderValidatio
     const value = event.target.value;
     setForm((current) => ({ ...current, [key]: value }));
 
-    if (key === 'default_scan_dir' || key === 'folder_library_path') {
+    if (key === 'default_scan_dir' || key === 'folder_library_path' || key === 'folder_adult_library_path') {
       clearFolderValidation();
     }
   }, [clearFolderValidation, setForm]);
@@ -29,7 +29,7 @@ export default function useSettingsPickers({ form, setForm, clearFolderValidatio
     }
 
     setForm((current) => ({ ...current, [key]: selectedPath }));
-    if (key === 'default_scan_dir' || key === 'folder_library_path') {
+    if (key === 'default_scan_dir' || key === 'folder_library_path' || key === 'folder_adult_library_path') {
       clearFolderValidation();
     }
   }, [form, setForm, clearFolderValidation]);

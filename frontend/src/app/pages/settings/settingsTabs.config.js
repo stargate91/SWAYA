@@ -1,15 +1,15 @@
 import { Settings2, FolderTree, KeyRound, Wrench, Palette, Cpu, Flame } from '@/ui/icons';
-import { ORGANIZATION_TAB_IDS, SETTINGS_TAB_GROUP_IDS, SETTINGS_TAB_IDS } from './settingsConstants.js';
+import { ORGANIZATION_TAB_IDS, ADULT_TAB_IDS, SETTINGS_TAB_GROUP_IDS, SETTINGS_TAB_IDS } from './settingsConstants.js';
 
 import {
   GeneralTab,
   ThemeTab,
-  AdultTab,
+  AdultGeneralTab,
+  AdultApiTab,
   PresetsTab,
-  FileNamingTab,
-  FolderStructureTab,
-  CollisionRulesTab,
-  CollectionsTab,
+  OrganizationGeneralTab,
+  MoviesTab,
+  TvShowsTab,
   ExtrasTab,
   ApiKeysTab,
   AdvancedTab,
@@ -35,15 +35,16 @@ export const settingsTabGroups = [
     icon: Palette,
   },
   {
-    id: SETTINGS_TAB_GROUP_IDS.ADULT,
-    labelKey: 'settingsPage.sidebar.adult',
-    icon: Flame,
-  },
-  {
     id: SETTINGS_TAB_GROUP_IDS.ORGANIZATION,
     labelKey: 'settingsPage.sidebar.organization',
     icon: FolderTree,
     children: ORGANIZATION_TAB_IDS,
+  },
+  {
+    id: SETTINGS_TAB_GROUP_IDS.ADULT,
+    labelKey: 'settingsPage.sidebar.adult',
+    icon: Flame,
+    children: ADULT_TAB_IDS,
   },
   {
     id: SETTINGS_TAB_GROUP_IDS.API_KEYS,
@@ -74,13 +75,18 @@ export const settingsTabDefinitions = [
     component: ThemeTab,
   },
   {
-    id: SETTINGS_TAB_IDS.ADULT,
+    id: SETTINGS_TAB_IDS.ADULT_GENERAL,
     group: SETTINGS_TAB_GROUP_IDS.ADULT,
-    component: AdultTab,
-    getProps: (ctx) => ({
-      form: ctx.form,
-      setForm: ctx.setForm,
-    }),
+    labelKey: 'settingsPage.sidebar.adultGeneral',
+    component: AdultGeneralTab,
+    isVisible: alwaysVisible,
+  },
+  {
+    id: SETTINGS_TAB_IDS.ADULT_API,
+    group: SETTINGS_TAB_GROUP_IDS.ADULT,
+    labelKey: 'settingsPage.sidebar.adultApi',
+    component: AdultApiTab,
+    isVisible: alwaysVisible,
   },
   {
     id: SETTINGS_TAB_IDS.PRESETS,
@@ -90,52 +96,40 @@ export const settingsTabDefinitions = [
     isVisible: alwaysVisible,
   },
   {
-    id: SETTINGS_TAB_IDS.FILE_NAMING,
+    id: SETTINGS_TAB_IDS.ORG_GENERAL,
     group: SETTINGS_TAB_GROUP_IDS.ORGANIZATION,
-    labelKey: 'settingsPage.sidebar.fileNaming',
-    component: FileNamingTab,
-    isVisible: whenCustomOrganization,
-    className: 'custom-only',
-    getProps: (ctx) => ({
-      form: ctx.form,
-      t: ctx.t,
-      handleChange: ctx.handleChange,
-      insertTag: ctx.insertTag,
-      casingOptions: ctx.casingOptions,
-      separatorOptions: ctx.separatorOptions,
-      formInputs: ctx.formInputs,
-    }),
+    labelKey: 'settingsPage.sidebar.general',
+    component: OrganizationGeneralTab,
+    isVisible: alwaysVisible,
   },
   {
-    id: SETTINGS_TAB_IDS.FOLDER_STRUCTURE,
+    id: SETTINGS_TAB_IDS.MOVIES,
     group: SETTINGS_TAB_GROUP_IDS.ORGANIZATION,
-    labelKey: 'settingsPage.sidebar.folderStructure',
-    component: FolderStructureTab,
-    isVisible: whenMoveToLibraryAndCustomOrganization,
-    className: 'custom-only',
-    getProps: (ctx) => ({
-      form: ctx.form,
-      t: ctx.t,
-      handleChange: ctx.handleChange,
-      handleCheckboxChange: ctx.handleCheckboxChange,
-      insertTag: ctx.insertTag,
-      formInputs: ctx.formInputs,
-    }),
+    labelKey: 'settingsPage.sidebar.movies',
+    component: MoviesTab,
+    isVisible: alwaysVisible,
+  },
+  {
+    id: SETTINGS_TAB_IDS.TV_SHOWS,
+    group: SETTINGS_TAB_GROUP_IDS.ORGANIZATION,
+    labelKey: 'settingsPage.sidebar.tvShows',
+    component: TvShowsTab,
+    isVisible: alwaysVisible,
   },
   {
     id: SETTINGS_TAB_IDS.EXTRAS,
     group: SETTINGS_TAB_GROUP_IDS.ORGANIZATION,
     labelKey: 'settingsPage.sidebar.extras',
     component: ExtrasTab,
-    isVisible: whenCustomOrganization,
+    isVisible: alwaysVisible,
     className: 'custom-only',
   },
   {
     id: SETTINGS_TAB_IDS.SCENES,
-    group: SETTINGS_TAB_GROUP_IDS.ORGANIZATION,
+    group: SETTINGS_TAB_GROUP_IDS.ADULT,
     labelKey: 'settingsPage.sidebar.scenes',
     component: ScenesTab,
-    isVisible: whenAdultScenes,
+    isVisible: alwaysVisible,
     className: 'custom-only',
     getProps: (ctx) => ({
       form: ctx.form,
@@ -143,31 +137,6 @@ export const settingsTabDefinitions = [
       handleChange: ctx.handleChange,
       handleCheckboxChange: ctx.handleCheckboxChange,
       insertTag: ctx.insertTag,
-      formInputs: ctx.formInputs,
-    }),
-  },
-
-  {
-    id: SETTINGS_TAB_IDS.RULES,
-    group: SETTINGS_TAB_GROUP_IDS.ORGANIZATION,
-    labelKey: 'settingsPage.sidebar.rules',
-    component: CollisionRulesTab,
-    isVisible: alwaysVisible,
-  },
-  {
-    id: SETTINGS_TAB_IDS.COLLECTIONS,
-    group: SETTINGS_TAB_GROUP_IDS.ORGANIZATION,
-    labelKey: 'settingsPage.sidebar.collections',
-    component: CollectionsTab,
-    isVisible: whenCollectionsEnabled,
-    className: 'custom-only',
-    getProps: (ctx) => ({
-      form: ctx.form,
-      setForm: ctx.setForm,
-      t: ctx.t,
-      handleChange: ctx.handleChange,
-      insertTag: ctx.insertTag,
-      collectionModeOptions: ctx.collectionModeOptions,
       formInputs: ctx.formInputs,
     }),
   },
@@ -204,6 +173,15 @@ export const settingsTabDefinitions = [
 export function getVisibleOrganizationTabs(ctx) {
   return settingsTabDefinitions
     .filter((tab) => tab.group === SETTINGS_TAB_GROUP_IDS.ORGANIZATION)
+    .map((tab) => ({
+      ...tab,
+      isCurrentlyVisible: tab.isVisible ? tab.isVisible(ctx) : true,
+    }));
+}
+
+export function getVisibleAdultTabs(ctx) {
+  return settingsTabDefinitions
+    .filter((tab) => tab.group === SETTINGS_TAB_GROUP_IDS.ADULT)
     .map((tab) => ({
       ...tab,
       isCurrentlyVisible: tab.isVisible ? tab.isVisible(ctx) : true,

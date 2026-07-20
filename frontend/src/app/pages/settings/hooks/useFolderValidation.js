@@ -9,12 +9,13 @@ export default function useFolderValidation({ t, onInvalid }) {
   const validateFoldersMutation = useValidateFoldersMutation();
   const [validationErrors, setValidationErrors] = useState({});
 
-  const validateFolders = useCallback(async (scanDir, libraryPath, moveToLibrary) => {
+  const validateFolders = useCallback(async (scanDir, libraryPath, moveToLibrary, adultLibraryPath) => {
     try {
       return await validateFoldersMutation.mutateAsync({
         default_scan_dir: scanDir,
         folder_library_path: libraryPath,
         folder_move_to_library: moveToLibrary,
+        folder_adult_library_path: adultLibraryPath,
       });
     } catch (err) {
       console.error(err);
@@ -28,6 +29,7 @@ export default function useFolderValidation({ t, onInvalid }) {
       folders: null,
       scanFolder: null,
       targetFolder: null,
+      adultTargetFolder: null,
     }));
   }, []);
 
@@ -35,7 +37,8 @@ export default function useFolderValidation({ t, onInvalid }) {
     const result = await validateFolders(
       form.default_scan_dir,
       form.folder_library_path,
-      form.folder_move_to_library
+      form.folder_move_to_library,
+      form.folder_adult_library_path
     );
 
     if (!result.valid) {
@@ -46,6 +49,9 @@ export default function useFolderValidation({ t, onInvalid }) {
       const targetError = fieldErrors.targetFolder
         ? (t(`settingsPage.validation.${fieldErrors.targetFolder}`) || fieldErrors.targetFolder)
         : null;
+      const adultTargetError = fieldErrors.adultTargetFolder
+        ? (t(`settingsPage.validation.${fieldErrors.adultTargetFolder}`) || fieldErrors.adultTargetFolder)
+        : null;
       const generalError = fieldErrors.general
         ? (t(`settingsPage.validation.${fieldErrors.general}`) || fieldErrors.general)
         : null;
@@ -53,12 +59,15 @@ export default function useFolderValidation({ t, onInvalid }) {
         ? 'scanFolder'
         : targetError
           ? 'targetFolder'
-          : null;
+          : adultTargetError
+            ? 'adultTargetFolder'
+            : null;
 
       setValidationErrors((prev) => ({
         ...prev,
         scanFolder: scanError,
         targetFolder: targetError,
+        adultTargetFolder: adultTargetError,
         folders: generalError,
       }));
 
@@ -66,6 +75,7 @@ export default function useFolderValidation({ t, onInvalid }) {
         firstField,
         scanError,
         targetError,
+        adultTargetError,
         generalError,
       });
     } else {
