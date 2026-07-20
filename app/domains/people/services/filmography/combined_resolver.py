@@ -21,14 +21,23 @@ class CombinedFilmographyResolver:
         local_movies: List[Dict[str, Any]],
         local_tv: List[Dict[str, Any]],
         local_scenes: List[Dict[str, Any]],
-        person_name: Optional[str] = None
+        person_name: Optional[str] = None,
+        remote_scenes: Optional[List[Dict[str, Any]]] = None
     ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]]]:
         """Combines local database records with TMDB details to compile actor filmography lists."""
         if not tmdb_id:
             local_movies.sort(key=lambda x: x.get("year") or 0, reverse=True)
             local_tv.sort(key=lambda x: x.get("year") or 0, reverse=True)
             local_scenes.sort(key=lambda x: x.get("year") or 0, reverse=True)
+            
             known_for = []
+            if is_adult and remote_scenes:
+                # We resolve image URLs for the remote scenes
+                for s in remote_scenes:
+                    s["poster_path"] = self.resolve_img_fn(s.get("poster_path"), "posters")
+                    s["backdrop_path"] = self.resolve_img_fn(s.get("backdrop_path"), "backdrops", size="original")
+                known_for = remote_scenes[:10]
+                
             return local_movies, local_tv, local_scenes, known_for
 
         try:
@@ -147,7 +156,7 @@ class CombinedFilmographyResolver:
         known_for = select_known_for(
             ordered_credits,
             known_for_department,
-            limit=8,
+            limit=10,
             adult_only=is_adult,
             person_name=person_name
         )

@@ -52,7 +52,7 @@ export default function DashboardCustomizerDrawer({
             const widgetConfig = widgetRegistry[key];
             if (!widgetConfig) return null;
 
-            if (key === 'adult' && !showAdult) return null;
+            if ((key === 'adult' || key === 'stashdb_discovery' || key === 'fansdb_discovery') && !showAdult) return null;
 
             const titleKey = typeof widgetConfig.titleKey === 'function'
               ? widgetConfig.titleKey(isNsfw)

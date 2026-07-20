@@ -16,6 +16,8 @@ export default function EntityDetailTopControls({
 }) {
   const navigate = useNavigate();
 
+  if (!item) return null;
+
   if (isPeople) {
     return (
       <Inline gap="sm" align="center">

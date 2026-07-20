@@ -14,6 +14,7 @@ export default function AdultRecommendationsWidget() {
     handlePlayClick,
     handleCardClick,
     playMutationPending,
+    settings,
   } = useAdultRecommendations();
 
   if (!includeAdult) {
@@ -33,6 +34,7 @@ export default function AdultRecommendationsWidget() {
         onWatchlist={handleWatchlist}
         onCardClick={handleCardClick}
         isAdultCarousel={true}
+        settings={settings}
         onPlayClick={handlePlayClick}
         playMutationPending={playMutationPending}
       />

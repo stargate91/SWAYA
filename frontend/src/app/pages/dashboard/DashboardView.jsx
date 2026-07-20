@@ -10,6 +10,8 @@ import MoviesDiscoveryWidget from './widgets/MoviesDiscoveryWidget';
 import TvDiscoveryWidget from './widgets/TvDiscoveryWidget';
 import AdultRecommendationsWidget from './widgets/AdultRecommendationsWidget';
 import TMDBDiscoveryWidget from './widgets/TMDBDiscoveryWidget';
+import StashDbDiscoveryWidget from './widgets/StashDbDiscoveryWidget';
+import FansDbDiscoveryWidget from './widgets/FansDbDiscoveryWidget';
 import DashboardCustomizerDrawer from './widgets/DashboardCustomizerDrawer';
 import PageHeader from '@/ui/PageHeader';
 import Stack from '@/ui/Stack';
@@ -60,6 +62,18 @@ const WIDGET_REGISTRY = {
     titleKey: 'dashboard.widget_adult',
     fallbackTitle: 'Adult recommendations',
     show: (settings) => Boolean(settings?.include_adult),
+  },
+  stashdb_discovery: {
+    component: StashDbDiscoveryWidget,
+    titleKey: 'dashboard.widget_stashdb_discovery',
+    fallbackTitle: 'StashDB Discovery',
+    show: (settings) => Boolean(settings?.include_adult && settings?.stashdb_api_key),
+  },
+  fansdb_discovery: {
+    component: FansDbDiscoveryWidget,
+    titleKey: 'dashboard.widget_fansdb_discovery',
+    fallbackTitle: 'FansDB Discovery',
+    show: (settings) => Boolean(settings?.include_adult && settings?.fansdb_api_key),
   },
 };
 

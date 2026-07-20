@@ -322,7 +322,7 @@ class PersonDetailCollator:
                     "poster_path": self._resolve_img(item.get("poster_path"), "posters") if item.get("poster_path") else None,
                     "backdrop_path": self._resolve_img(item.get("backdrop_path"), "backdrops", size="original") if item.get("backdrop_path") else None,
                 }
-                for item in known_for[:8]
+                for item in known_for[:10]
             ],
             **stats,
             "external_links": [],

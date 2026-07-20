@@ -100,7 +100,11 @@ def undo_rename(batch_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/media/image-proxy")
-def image_proxy(url: str = Query(..., description="The remote image URL to proxy"), blur: bool = Query(False)):
+def image_proxy(
+    url: str = Query(..., description="The remote image URL to proxy"),
+    blur: bool = Query(False),
+    width: Optional[int] = Query(None, description="Optional target width for resizing")
+):
     import requests
     from fastapi import HTTPException
     from fastapi.responses import StreamingResponse
@@ -130,12 +134,19 @@ def image_proxy(url: str = Query(..., description="The remote image URL to proxy
         
         content_type = response.headers.get("Content-Type", "image/jpeg")
         
-        if blur:
+        if blur or width:
             img = Image.open(io.BytesIO(response.content))
-            img = img.filter(ImageFilter.GaussianBlur(32))
-            enhancer = ImageEnhance.Brightness(img)
-            img = enhancer.enhance(0.20)
             
+            if width and img.width > width:
+                aspect = img.height / img.width
+                new_height = int(width * aspect)
+                img = img.resize((width, new_height), Image.Resampling.LANCZOS)
+                
+            if blur:
+                img = img.filter(ImageFilter.GaussianBlur(32))
+                enhancer = ImageEnhance.Brightness(img)
+                img = enhancer.enhance(0.20)
+                
             out_io = io.BytesIO()
             fmt = "JPEG"
             if "png" in content_type.lower():

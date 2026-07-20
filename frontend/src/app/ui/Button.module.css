@@ -312,22 +312,22 @@
 }
 
 /* Generalized Toggle state children swap */
-.button[aria-pressed="true"] .state-active {
+.button[aria-pressed="true"] :global(.state-active) {
   display: inline-flex;
   align-items: center;
   gap: inherit;
 }
 
-.button[aria-pressed="true"] .state-hover {
+.button[aria-pressed="true"] :global(.state-hover) {
   display: none;
 }
 
-.button[aria-pressed="true"]:hover:not(:disabled) .state-active {
-  display: none !important;
+.button[aria-pressed="true"]:hover:not(:disabled) :global(.state-active) {
+  display: none;
 }
 
-.button[aria-pressed="true"]:hover:not(:disabled) .state-hover {
-  display: inline-flex !important;
+.button[aria-pressed="true"]:hover:not(:disabled) :global(.state-hover) {
+  display: inline-flex;
   align-items: center;
   gap: inherit;
 }

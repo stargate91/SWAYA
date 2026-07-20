@@ -63,9 +63,16 @@ export const RecommendationCarousel = ({
           const rawPosterUrl = n.isPerson
             ? resolveMediaImageUrl(item.profile_path || item.local_profile_path, 'personThumb')
             : resolveMediaImageUrl(n.isScene ? (item.backdrop_path || item.poster_path) : item.poster_path, n.isScene ? 'backdrop' : 'poster');
-          const posterUrl = (n.shouldBlur && rawPosterUrl)
-            ? `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(rawPosterUrl)}&blur=true`
-            : rawPosterUrl;
+          const posterUrl = (() => {
+            if (!rawPosterUrl) return '';
+            if (n.shouldBlur) {
+              return `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(rawPosterUrl)}&blur=true&width=600`;
+            }
+            if (n.isScene) {
+              return `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(rawPosterUrl)}&width=600`;
+            }
+            return rawPosterUrl;
+          })();
           const yearLabel = n.subtitle;
           const performers = n.performers;
           const displayDate = item.release_date ? item.release_date.substring(0, 10) : '';

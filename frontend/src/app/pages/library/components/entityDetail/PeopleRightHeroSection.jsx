@@ -3,7 +3,7 @@ import { navigateToCreditDetail } from '../../utils/mediaNavigation';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '@/providers/LanguageContext';
 import SectionHeader from '@/ui/SectionHeader';
-import Inline from '@/ui/Inline';
+import ScrollRow from '@/ui/ScrollRow';
 import Stack from '@/ui/Stack';
 import Text from '@/ui/Text';
 import styles from './PeopleRightHeroSection.module.css';
@@ -20,15 +20,17 @@ export default function PeopleRightHeroSection({ item }) {
     <div className={`entity-detail-page__summary ${styles['summary-wrapper']}`}>
       <Stack gap="md" className="u-w-full">
         <SectionHeader title={t('library.details.knownForTitle') || 'Known For'} />
-        <Inline gap="md" align="center" className="u-overflow-x-auto no-scrollbar">
+        <ScrollRow className={styles['known-for-list']}>
           {item.known_for.map((credit) => {
             const creditTitle = credit.title || credit.name || 'Unknown';
             const handleCardClick = () => {
               navigateToCreditDetail(navigate, credit, credit.media_type || credit.type);
             };
 
+            const isScene = credit.type === 'scene' || credit.media_type === 'scene';
             const cardClass = `
               ${styles['known-for-card']}
+              ${isScene ? styles['known-for-card--scene'] : ''}
               ${styles['known-for-card--clickable']}
             `.trim().replace(/\s+/g, ' ');
 
@@ -66,9 +68,8 @@ export default function PeopleRightHeroSection({ item }) {
               </div>
             );
           })}
-        </Inline>
+        </ScrollRow>
       </Stack>
     </div>
   );
 }
-

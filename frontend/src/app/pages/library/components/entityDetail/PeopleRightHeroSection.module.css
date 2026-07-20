@@ -12,6 +12,10 @@
   transition: transform var(--motion-base);
 }
 
+.known-for-card--scene {
+  flex: 0 0 12rem;
+}
+
 .known-for-card--clickable {
   cursor: pointer;
 }
@@ -29,6 +33,10 @@
   position: relative;
   transition: var(--motion-base);
   box-shadow: 0 0.25rem 0.75rem color-mix(in srgb, var(--color-bg-canvas) 15%, transparent);
+}
+
+.known-for-card--scene .poster-container {
+  aspect-ratio: 16 / 9;
 }
 
 .known-for-card--clickable:hover .poster-container {
@@ -56,4 +64,10 @@
   height: 100%;
   align-self: stretch;
   flex-shrink: 0;
+}
+
+.known-for-list {
+  flex-wrap: nowrap !important;
+  justify-content: flex-start !important;
+  width: 100%;
 }

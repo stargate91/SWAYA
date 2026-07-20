@@ -35,6 +35,8 @@
     "discover_movies": "Discover Movies",
     "discover_series": "Discover TV Shows",
     "discover_adult": "Discover Adult Movies",
+    "discover_stashdb": "StashDB Discovery",
+    "discover_fansdb": "FansDB Discovery",
     "discovery_title": "Top 20 Discoveries",
     "discovery_no_results": "Nothing popped up! Try swapping those filters.",
     "recently_added": "Fresh Arrivals",
@@ -55,6 +57,8 @@
   "widget_tv_discovery": "Discover TV Shows",
   "widget_top_20": "Top 20 Discoveries",
   "widget_adult": "Adult Movies",
+  "widget_stashdb_discovery": "StashDB Discovery",
+  "widget_fansdb_discovery": "FansDB Discovery",
   "continue_watching": {
     "title": "Pick up where you left off",
     "remove": "Kick out of Continue Watching",

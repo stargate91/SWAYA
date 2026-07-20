@@ -39,6 +39,11 @@ export const getCreditDetailPath = (item, fallbackType, fallbackSource) => {
   const resolvedTypeKey = String(resolvedType || '').toLowerCase();
   const source = getCreditSource(item, fallbackSource);
 
+  if (resolvedTypeKey === 'person' || resolvedTypeKey === 'performer') {
+    const personId = firstValue(item?.person_id, item?.id);
+    return personId ? `/library/people/${personId}` : '';
+  }
+
   if (isSceneMediaType(resolvedType)) {
     if (item?.in_library) {
       return `/library/scene/${item.library_item_id || item.id}`;

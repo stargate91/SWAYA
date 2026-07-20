@@ -28,9 +28,12 @@ function BespokeCastSection({ item, t, navigate }) {
     }
     return list.map(person => {
       let isFilteredOut = false;
-      if (genderPref === 'female' && person.gender !== 1) {
+      const g = typeof person.gender === 'string'
+        ? (person.gender.toUpperCase().includes('FEMALE') ? 1 : person.gender.toUpperCase().includes('MALE') ? 2 : 0)
+        : person.gender;
+      if (genderPref === 'female' && g !== 1) {
         isFilteredOut = true;
-      } else if (genderPref === 'male' && person.gender !== 2) {
+      } else if (genderPref === 'male' && g !== 2) {
         isFilteredOut = true;
       }
       return { ...person, isFilteredOut };

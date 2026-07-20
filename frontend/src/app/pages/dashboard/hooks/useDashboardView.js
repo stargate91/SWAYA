@@ -12,6 +12,8 @@ const DEFAULT_WIDGETS = {
   tv_discovery: true,
   top_20: true,
   adult: true,
+  stashdb_discovery: true,
+  fansdb_discovery: true,
 };
 
 const DEFAULT_ORDER = [
@@ -23,6 +25,8 @@ const DEFAULT_ORDER = [
   'tv_discovery',
   'top_20',
   'adult',
+  'stashdb_discovery',
+  'fansdb_discovery',
 ];
 
 export default function useDashboardView() {

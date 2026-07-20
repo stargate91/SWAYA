@@ -57,7 +57,30 @@ class ProfileMerger:
                     raw_backdrop, "backdrops", size="original"
                 )
 
-
+        if not effective_backdrop and person.is_adult and known_for:
+            # Find a scene image >= 1280x720
+            selected_scene = None
+            for item in known_for:
+                if item.get("poster_path") or item.get("backdrop_path"):
+                    w = item.get("image_width")
+                    h = item.get("image_height")
+                    if w and h:
+                        try:
+                            if int(w) >= 1280 and int(h) >= 720:
+                                selected_scene = item
+                                break
+                        except Exception:
+                            pass
+            
+            # Fallback to the first one with an image
+            if not selected_scene:
+                for item in known_for:
+                    if item.get("poster_path") or item.get("backdrop_path"):
+                        selected_scene = item
+                        break
+            
+            if selected_scene:
+                effective_backdrop = selected_scene.get("poster_path") or selected_scene.get("backdrop_path")
 
         return effective_backdrop, source_tmdb_id, source_media_type
 

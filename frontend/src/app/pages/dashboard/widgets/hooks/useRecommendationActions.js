@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { usePlayMediaMutation } from '../../../../queries';
 import api from '../../../../lib/api';
+import { getCreditDetailPath } from '@/pages/library/utils/mediaNavigation';
 
 export const useRecommendationActions = () => {
   const navigate = useNavigate();
@@ -84,16 +85,10 @@ export const useRecommendationActions = () => {
 
   const handleCardClick = useCallback((item) => {
     const type = item.media_type || (item.title ? 'movie' : (item.profile_path ? 'person' : 'tv'));
-    if (type === 'person') {
-      navigate(`/library/people/${item.id}`, { state: { allowAdult: true } });
-      return;
+    const path = getCreditDetailPath(item, type, item.source);
+    if (path) {
+      navigate(path, { state: { allowAdult: true } });
     }
-    if (type === 'tv' || type === 'episode') {
-      navigate(`/library/tv/tmdb_${item.id}`, { state: { allowAdult: true } });
-      return;
-    }
-    const idToUse = item.in_library ? item.media_item_id : `tmdb_${item.id}`;
-    navigate(`/library/${type}/${idToUse}`, { state: { allowAdult: true } });
   }, [navigate]);
 
   return { handlePlayClick, handleCardClick, playMutationPending: playMutation.isPending };

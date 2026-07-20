@@ -22,6 +22,146 @@ class RemoteCreditsFetcher:
     def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
         return self.image_service.resolve_image_url(path, subfolder, size)
 
+    def fetch_remote_known_for(self, person_id: int, source: str, ext_id: str) -> list[dict[str, Any]]:
+        db = self.db
+        
+        # Check Cache
+        from app.domains.people.models import RemoteFilmographyCache
+        cache_entry = db.query(RemoteFilmographyCache).filter(
+            RemoteFilmographyCache.person_id == person_id,
+            RemoteFilmographyCache.provider == source.lower(),
+            RemoteFilmographyCache.media_type == "known_for"
+        ).first()
+
+        mapped_items = []
+        if cache_entry and cache_entry.data is not None:
+            mapped_items = cache_entry.data.get("items") or []
+        else:
+            # Query remote source using sort: POPULARITY
+            try:
+                from app.shared_kernel.enums import Provider
+                prov_enum = Provider(source.lower())
+                scraper = self.scrapers.adult(prov_enum, db)
+                query = """
+                query QueryScenes($input: SceneQueryInput!) {
+                  queryScenes(input: $input) {
+                    scenes {
+                      id
+                      title
+                      date
+                      studio {
+                        id
+                        name
+                      }
+                      images {
+                        url
+                        width
+                        height
+                      }
+                    }
+                  }
+                }
+                """
+                variables = {
+                    "input": {
+                        "performers": {
+                            "value": [ext_id],
+                            "modifier": "INCLUDES"
+                        },
+                        "page": 1,
+                        "per_page": 10,
+                        "direction": "DESC",
+                        "sort": "POPULARITY"
+                    }
+                }
+                res_data = scraper.execute_query(query, variables)
+                if res_data and "queryScenes" in res_data:
+                    raw_scenes = res_data["queryScenes"].get("scenes") or []
+                    for s in raw_scenes:
+                        sid = s.get("id")
+                        title = s.get("title") or "Unknown"
+                        date_str = s.get("date")
+                        year = None
+                        if date_str:
+                            try:
+                                year = int(date_str.split("-")[0])
+                            except Exception:
+                                pass
+                        studio_name = s.get("studio", {}).get("name") if s.get("studio") else None
+                        poster_url = s["images"][0].get("url") if s.get("images") else None
+                        img_width = s["images"][0].get("width") if s.get("images") else None
+                        img_height = s["images"][0].get("height") if s.get("images") else None
+                        
+                        mapped_items.append({
+                            "id": sid,
+                            "title": title,
+                            "type": "scene",
+                            "media_type": "scene",
+                            "year": year,
+                            "release_date": date_str,
+                            "studio": studio_name,
+                            "poster_path": poster_url,
+                            "backdrop_path": poster_url,
+                            "image_width": img_width,
+                            "image_height": img_height,
+                            "in_library": False,
+                            "stash_id": sid,
+                            "source": source.lower(),
+                        })
+
+                    # Save to Cache
+                    if mapped_items:
+                        if not cache_entry:
+                            cache_entry = RemoteFilmographyCache(
+                                person_id=person_id,
+                                provider=source.lower(),
+                                media_type="known_for",
+                                data={"items": mapped_items}
+                            )
+                            db.add(cache_entry)
+                        else:
+                            cache_entry.data = {"items": mapped_items}
+                        try:
+                            db.commit()
+                        except Exception as e:
+                            db.rollback()
+                            logger.error(f"Error saving remote known_for cache: {e}")
+            except Exception as e:
+                logger.error(f"Error fetching remote known_for: {e}")
+
+        if not mapped_items:
+            return []
+
+        # Check local matches to set in_library and library_item_id
+        try:
+            from app.domains.people.models import MediaPersonLink
+            active_match_ids = self.library_port.get_active_match_ids(media_type="scene", provider=source.lower())
+            links = db.query(MediaPersonLink).filter(
+                MediaPersonLink.person_id == person_id,
+                MediaPersonLink.match_id.in_(active_match_ids)
+            ).all()
+            
+            local_by_ext_id = {}
+            for link in links:
+                match = link.match
+                if match and match.media_item:
+                    ext_id_key = str(match.external_id).lower().strip()
+                    local_by_ext_id[ext_id_key] = match.media_item.id
+
+            for item in mapped_items:
+                ext_id_key = str(item["id"]).lower().strip()
+                if ext_id_key in local_by_ext_id:
+                    item["in_library"] = True
+                    item["library_item_id"] = local_by_ext_id[ext_id_key]
+                    item["id"] = local_by_ext_id[ext_id_key]
+                else:
+                    item["in_library"] = False
+                    item["library_item_id"] = None
+        except Exception as e:
+            logger.error(f"Error checking local matches for known_for: {e}")
+
+        return mapped_items
+
     def fetch_remote_credits(
         self,
         person_id: int,
