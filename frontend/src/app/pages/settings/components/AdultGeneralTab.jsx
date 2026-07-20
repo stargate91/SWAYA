@@ -1,6 +1,7 @@
 import Stack from '@/ui/Stack';
 import { useSettingsField, useSettingsViewContext } from '../SettingsFormContext.jsx';
 import SettingsSectionRenderer from './SettingsSectionRenderer.jsx';
+import TagSafetyFilters from './TagSafetyFilters.jsx';
 import {
   createAdultGeneralSection,
   createAdultPreviewsSection,
@@ -19,14 +20,17 @@ export default function AdultGeneralTab() {
   return (
     <Stack gap="xl">
       <SettingsSectionRenderer
-        section={createAdultGeneralSection(t, adultGenderPreferenceOptions)}
-        context={context}
+          section={createAdultGeneralSection(t, adultGenderPreferenceOptions)}
+          context={context}
       />
       {includeAdultField.checked && (
-        <SettingsSectionRenderer
-          section={createAdultPreviewsSection(t)}
-          context={context}
-        />
+        <>
+          <TagSafetyFilters t={t} />
+          <SettingsSectionRenderer
+            section={createAdultPreviewsSection(t)}
+            context={context}
+          />
+        </>
       )}
     </Stack>
   );

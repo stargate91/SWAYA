@@ -154,6 +154,21 @@
       "customTargetFolderHint": "Separate target folder for organized adult media assets (optional). If empty, the main target library folder is used.",
       "customTargetFolderPlaceholder": "Select separate target folder (optional)"
     },
+    "adultSafety": {
+      "title": "Adult Content Safety Filters",
+      "eyebrow": "SAFETY",
+      "blacklistTitle": "Tag Blacklist",
+      "blacklistHint": "Items containing any of these tags (or title keywords) will be hidden completely.",
+      "emptyBlacklist": "No blacklisted tags.",
+      "addCustomPlaceholder": "Add custom tag...",
+      "recommendedBlacklist": "Recommended blocks:",
+      "whitelistTitle": "Tag Whitelist",
+      "whitelistHint": "If configured, only items matching at least one of these tags (or title keywords) will be shown.",
+      "emptyWhitelist": "No whitelist tags configured (displaying all non-blacklisted content).",
+      "recommendedWhitelist": "Quick-add preferences:",
+      "boostTitle": "Whitelist Boost Multiplier",
+      "boostHint": "Items matching whitelisted tags will have their recommendation scores multiplied by this factor to bubble them to the top."
+    },
     "adultPreviews": {
       "title": "Hover Previews",
       "eyebrow": "PREVIEWS",

@@ -205,20 +205,86 @@ class AdultDiscoveryService:
         ).all()
         in_library_ids = {m.external_id for m in matches}
 
-        # 3. Filter and score scenes
+        # 3. Fetch blacklist and whitelist settings
+        blacklist_setting = self.settings.get_setting("adult_tag_blacklist") or ""
+        whitelist_setting = self.settings.get_setting("adult_tag_whitelist") or ""
+        boost_mult_setting = self.settings.get_setting("adult_boost_multiplier")
+        
+        try:
+            boost_multiplier = float(boost_mult_setting) if boost_mult_setting is not None else 1.5
+        except Exception:
+            boost_multiplier = 1.5
+
+        import re
+
+        def normalize_tag(tag: str) -> str:
+            if not tag:
+                return ""
+            return re.sub(r'[^a-z0-9]', '', tag.lower())
+
+        # Define tag synonyms/aliases for robust filtering (strictly semantic synonyms, in normalized form)
+        TAG_SYNONYMS = {
+            "bisexual": {"bisexual", "bi", "bisex"},
+            "gay": {"gay", "maleonmale", "mm", "homosexual", "gaypornography"},
+            "transgender": {"transgender", "trans", "transexual", "transsexual", "shemale", "ts",
+                            "transwomen", "transwoman", "transgenderwomen", "transgenderwoman",
+                            "transfem", "transontrans", "transonfemale", "transsexuality",
+                            "transpornography", "translesbian"},
+            "straight": {"straight", "hetero", "heterosexual"},
+            "bdsm": {"bdsm", "sadomasochism", "bondage", "sm"},
+            "anal": {"anal", "analsex", "analcreampie", "firstanal", "doubleanal"},
+            "interracial": {"interracial", "interracialsex"},
+            "dp": {"dp", "doublepenetration", "dped", "doubledrilling"},
+            "facial": {"facial", "facials", "facialcumshot", "cumface", "cumonface", "cumonherface", "cumontoface", "cumonmouth", "cumshotfacial", "facialize", "facecumshot"},
+            "fetish": {"fetish", "sexualfetish"},
+            "feet": {"feet", "footfetish"},
+            "parody": {"parody", "parodies"},
+        }
+
+        def expand_tags(tag_set):
+            normalized_set = {normalize_tag(t) for t in tag_set}
+            expanded = set(normalized_set)
+            for tag in normalized_set:
+                if tag in TAG_SYNONYMS:
+                    expanded.update({normalize_tag(syn) for syn in TAG_SYNONYMS[tag]})
+            return expanded
+
+        blacklist = expand_tags({t.strip() for t in blacklist_setting.split(",") if t.strip()})
+        whitelist = expand_tags({t.strip() for t in whitelist_setting.split(",") if t.strip()})
+
+        # 4. Filter and score scenes
         scored_scenes = []
         for s in raw_scenes:
             sid = s.get("id")
             if not sid or sid in in_library_ids:
                 continue
 
-            # Calculate preference score: sum of matching signal-tag weights
             scene_tags = s.get("tags") or []
+            scene_tag_names = {
+                normalize_tag(t_item.get("name") if isinstance(t_item, dict) else t_item)
+                for t_item in scene_tags
+                if (t_item.get("name") if isinstance(t_item, dict) else t_item)
+            }
+
+            # A. Blacklist check: discard item if it contains any blacklisted tag
+            if blacklist and any(b_tag in scene_tag_names for b_tag in blacklist):
+                continue
+
+            # B. Whitelist check: discard item if whitelist is set and item contains none of the whitelisted tags
+            if whitelist and not any(w_tag in scene_tag_names for w_tag in whitelist):
+                continue
+
+            # Calculate preference score: sum of matching signal-tag weights
             score = 0
-            for t_item in scene_tags:
-                t_name = t_item.get("name") if isinstance(t_item, dict) else t_item
-                if t_name:
-                    score += tag_weights.get(t_name.lower(), 0)
+            has_whitelist_match = False
+            for t_name in scene_tag_names:
+                score += tag_weights.get(t_name, 0)
+                if whitelist and t_name in whitelist:
+                    has_whitelist_match = True
+
+            # C. Whitelist Boost multiplier: multiply score if a whitelisted tag is matched
+            if has_whitelist_match:
+                score = score * boost_multiplier
 
             scored_scenes.append((score, s))
 

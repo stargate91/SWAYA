@@ -129,13 +129,100 @@ class RecommendationsService:
             from datetime import datetime
             import math
             
+            # Fetch settings
+            blacklist_setting = self.settings.get_setting("adult_tag_blacklist") or ""
+            whitelist_setting = self.settings.get_setting("adult_tag_whitelist") or ""
+            boost_mult_setting = self.settings.get_setting("adult_boost_multiplier")
+            
+            try:
+                boost_multiplier = float(boost_mult_setting) if boost_mult_setting is not None else 1.5
+            except Exception:
+                boost_multiplier = 1.5
+
+            import re
+
+            def normalize_tag(tag: str) -> str:
+                if not tag:
+                    return ""
+                return re.sub(r'[^a-z0-9]', '', tag.lower())
+
+            # Define tag synonyms/aliases for robust filtering (strictly semantic synonyms, in normalized form)
+            TAG_SYNONYMS = {
+                "bisexual": {"bisexual", "bi", "bisex"},
+                "gay": {"gay", "maleonmale", "mm", "homosexual", "gaypornography"},
+                "transgender": {"transgender", "trans", "transexual", "transsexual", "shemale", "ts",
+                                "transwomen", "transwoman", "transgenderwomen", "transgenderwoman",
+                                "transfem", "transontrans", "transonfemale", "transsexuality",
+                                "transpornography", "translesbian"},
+                "straight": {"straight", "hetero", "heterosexual"},
+                "bdsm": {"bdsm", "sadomasochism", "bondage", "sm"},
+                "anal": {"anal", "analsex", "analcreampie", "firstanal", "doubleanal"},
+                "interracial": {"interracial", "interracialsex"},
+                "dp": {"dp", "doublepenetration", "dped", "doubledrilling"},
+                "facial": {"facial", "facials", "facialcumshot", "cumface", "cumonface", "cumonherface", "cumontoface", "cumonmouth", "cumshotfacial", "facialize", "facecumshot"},
+                "fetish": {"fetish", "sexualfetish"},
+                "feet": {"feet", "footfetish"},
+                "parody": {"parody", "parodies"},
+            }
+
+            def expand_tags(tag_set):
+                normalized_set = {normalize_tag(t) for t in tag_set}
+                expanded = set(normalized_set)
+                for tag in normalized_set:
+                    if tag in TAG_SYNONYMS:
+                        expanded.update({normalize_tag(syn) for syn in TAG_SYNONYMS[tag]})
+                return expanded
+
+            blacklist = expand_tags({t.strip() for t in blacklist_setting.split(",") if t.strip()})
+            whitelist = expand_tags({t.strip() for t in whitelist_setting.split(",") if t.strip()})
+
+            def has_word_match(text, word_set):
+                if not word_set or not text:
+                    return False
+                # To compare text keywords with normalized word_set:
+                # We split the title/overview text into words, normalize each, and check if any is in word_set.
+                # This guarantees matches like "male-on-male" -> "maleonmale" -> match!
+                words = re.findall(r'[a-zA-Z0-9]+', text)
+                for w in words:
+                    if normalize_tag(w) in word_set:
+                        return True
+                return False
+
             def get_score(x):
+                # Base score calculation
                 pop = float(x.get("popularity") or 0.0)
                 vote_avg = float(x.get("vote_average") or 0.0)
                 vote_cnt = int(x.get("vote_count") or 0)
-                return pop * (vote_avg + 1.0) * math.log10(max(vote_cnt, 2))
+                base_score = pop * (vote_avg + 1.0) * math.log10(max(vote_cnt, 2))
+                
+                # Check for whitelist boost
+                has_whitelist_match = False
+                if whitelist:
+                    title_text = f"{x.get('title') or ''} {x.get('original_title') or ''} {x.get('overview') or ''}".lower()
+                    if has_word_match(title_text, whitelist):
+                        has_whitelist_match = True
+                        
+                if has_whitelist_match:
+                    return base_score * boost_multiplier
+                return base_score
 
-            filtered_adult_pool = [item for item in discover_adult_pool if not is_in_library(item)]
+            filtered_adult_pool = []
+            for item in discover_adult_pool:
+                if is_in_library(item):
+                    continue
+                    
+                title_text = f"{item.get('title') or ''} {item.get('original_title') or ''} {item.get('overview') or ''}".lower()
+                
+                # Blacklist filter check: check if any blacklisted tag/keyword is in title or overview
+                if blacklist and has_word_match(title_text, blacklist):
+                    continue
+                        
+                # Whitelist filter check: if whitelist is specified, item must match at least one keyword in title or overview
+                if whitelist and not has_word_match(title_text, whitelist):
+                    continue
+                        
+                filtered_adult_pool.append(item)
+
             filtered_adult_pool.sort(key=get_score, reverse=True)
             top_pool = filtered_adult_pool[:40]
             

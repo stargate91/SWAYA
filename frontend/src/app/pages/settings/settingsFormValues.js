@@ -116,6 +116,9 @@ export const SETTINGS_BASE_DEFAULTS = {
   hover_previews_duration: 16,
   previews_cache_max_size_mb: 2048,
   previews_cache_max_age_days: 30,
+  adult_tag_blacklist: '',
+  adult_tag_whitelist: '',
+  adult_boost_multiplier: 1.5,
 };
 
 export function getLocalizedSettingsDefaults(t = null) {
@@ -352,6 +355,9 @@ export function getInitialFormValues(settingsData = null, t = null) {
     hover_previews_duration: settingsData.hover_previews_duration !== undefined && settingsData.hover_previews_duration !== null ? Number(settingsData.hover_previews_duration) : defaults.hover_previews_duration,
     previews_cache_max_size_mb: settingsData.previews_cache_max_size_mb !== undefined && settingsData.previews_cache_max_size_mb !== null ? Number(settingsData.previews_cache_max_size_mb) : defaults.previews_cache_max_size_mb,
     previews_cache_max_age_days: settingsData.previews_cache_max_age_days !== undefined && settingsData.previews_cache_max_age_days !== null ? Number(settingsData.previews_cache_max_age_days) : defaults.previews_cache_max_age_days,
+    adult_tag_blacklist: getStringValue(settingsData.adult_tag_blacklist, defaults.adult_tag_blacklist),
+    adult_tag_whitelist: getStringValue(settingsData.adult_tag_whitelist, defaults.adult_tag_whitelist),
+    adult_boost_multiplier: settingsData.adult_boost_multiplier !== undefined && settingsData.adult_boost_multiplier !== null ? Number(settingsData.adult_boost_multiplier) : defaults.adult_boost_multiplier,
   };
 }
 
