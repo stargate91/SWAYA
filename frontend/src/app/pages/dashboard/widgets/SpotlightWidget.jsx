@@ -22,43 +22,59 @@ export default function SpotlightWidget() {
     handleCardClick,
   } = useSpotlight();
 
-  // 'stashdb' or 'fansdb'
+  // 'stashdb', 'tmdb' or 'fansdb'
   const [adultProvider, setAdultProvider] = useState('stashdb');
 
-  const stashdbItems = recommendations?.discover_stashdb || [];
-  const fansdbItems = recommendations?.discover_fansdb || [];
+  const stashdbItems = (recommendations?.discover_stashdb || []).filter(item => item.backdrop_path || item.poster_path);
+  const tmdbAdultItems = (recommendations?.discover_adult || []).filter(item => item.backdrop_path || item.poster_path);
+  const fansdbItems = (recommendations?.discover_fansdb || []).filter(item => item.backdrop_path || item.poster_path);
 
-  // If one of the providers is empty but the other has items, auto-select the active one
+  // Set initial provider based on priority StashDB > TMDb > FansDB and availability
   useEffect(() => {
     if (isNsfw) {
-      if (stashdbItems.length === 0 && fansdbItems.length > 0) {
-        setAdultProvider('fansdb');
-      } else if (fansdbItems.length === 0 && stashdbItems.length > 0) {
+      if (stashdbItems.length > 0) {
         setAdultProvider('stashdb');
+      } else if (tmdbAdultItems.length > 0) {
+        setAdultProvider('tmdb');
+      } else if (fansdbItems.length > 0) {
+        setAdultProvider('fansdb');
       }
     }
-  }, [isNsfw, stashdbItems.length, fansdbItems.length]);
+  }, [isNsfw, stashdbItems.length, tmdbAdultItems.length, fansdbItems.length]);
 
   if (isLoading) {
     return <RecommendationSkeleton showBanner />;
   }
 
   if (isNsfw) {
-    const currentItems = adultProvider === 'stashdb' ? stashdbItems : fansdbItems;
-    const hasStash = stashdbItems.length > 0;
-    const hasFans = fansdbItems.length > 0;
+    const providersList = [];
+    if (stashdbItems.length > 0) providersList.push({ id: 'stashdb', label: 'StashDB', items: stashdbItems });
+    if (tmdbAdultItems.length > 0) providersList.push({ id: 'tmdb', label: 'TMDb Adult', items: tmdbAdultItems });
+    if (fansdbItems.length > 0) providersList.push({ id: 'fansdb', label: 'FansDB', items: fansdbItems });
 
-    if (!hasStash && !hasFans) {
+    if (providersList.length === 0) {
       return null;
     }
 
+    // Ensure currently selected provider actually has items, fallback to first available
+    const activeProviderObj = providersList.find(p => p.id === adultProvider) || providersList[0];
+    const currentItems = activeProviderObj.items;
     const item = currentItems[0];
+    
     if (!item) return null;
 
-    const handleToggleProvider = () => {
-      if (hasStash && hasFans) {
-        setAdultProvider((prev) => (prev === 'stashdb' ? 'fansdb' : 'stashdb'));
-      }
+    const handleNextProvider = () => {
+      if (providersList.length <= 1) return;
+      const currentIndex = providersList.findIndex(p => p.id === activeProviderObj.id);
+      const nextIndex = (currentIndex + 1) % providersList.length;
+      setAdultProvider(providersList[nextIndex].id);
+    };
+
+    const handlePrevProvider = () => {
+      if (providersList.length <= 1) return;
+      const currentIndex = providersList.findIndex(p => p.id === activeProviderObj.id);
+      const prevIndex = (currentIndex - 1 + providersList.length) % providersList.length;
+      setAdultProvider(providersList[prevIndex].id);
     };
 
     return (
@@ -68,9 +84,9 @@ export default function SpotlightWidget() {
           watchlistIds={actualWatchlistIds}
           onWatchlist={handleWatchlist}
           onCardClick={handleCardClick}
-          isAdult={true}
+          isAdult={activeProviderObj.id !== 'tmdb'} /* TMDb backdrops do not need local api proxying */
         />
-        {hasStash && hasFans && (
+        {providersList.length > 1 && (
           <div
             style={{
               position: 'absolute',
@@ -89,7 +105,7 @@ export default function SpotlightWidget() {
           >
             <span
               style={{
-                minWidth: '70px',
+                minWidth: '85px',
                 padding: '0 var(--space-xs)',
                 textTransform: 'uppercase',
                 fontSize: '0.75rem',
@@ -99,13 +115,13 @@ export default function SpotlightWidget() {
                 cursor: 'pointer',
                 userSelect: 'none',
               }}
-              onClick={handleToggleProvider}
+              onClick={handleNextProvider}
             >
-              {adultProvider === 'stashdb' ? 'StashDB' : 'FansDB'}
+              {activeProviderObj.label}
             </span>
             <div style={{ display: 'flex', gap: '2px' }}>
               <button
-                onClick={handleToggleProvider}
+                onClick={handlePrevProvider}
                 style={{
                   background: 'none',
                   border: 'none',
@@ -119,7 +135,7 @@ export default function SpotlightWidget() {
                 <ChevronLeft size={16} />
               </button>
               <button
-                onClick={handleToggleProvider}
+                onClick={handleNextProvider}
                 style={{
                   background: 'none',
                   border: 'none',

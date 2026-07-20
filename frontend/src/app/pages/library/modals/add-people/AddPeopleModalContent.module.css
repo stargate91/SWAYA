@@ -1,9 +1,26 @@
 .dropdown {
   flex: 1;
+  min-width: 0;
 }
 
-:global(.add-people-modal-body) {
-  overflow-y: hidden;
+.filter-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--space-xs); /* Use tighter gap to save space */
+  width: 100%;
+}
+
+.filter-row :global(.ui-field) {
+  flex: 1;
+  min-width: 0;
+  width: 0; /* Forces flexbox to respect min-width: 0 and shrink children */
+}
+
+/* Adjust dropdown widths inside sorter layout context */
+.filter-row :global(.dropdown-sorter) {
+  flex: 1.2; /* Give slightly more weight to sorting dropdown */
+  min-width: 0;
+  width: 0;
 }
 
 .loading-wrapper {
@@ -20,10 +37,6 @@
 
 /* Empty selectors for other modularized BEM class bindings to keep modular CSS clean */
 .local-panel {
-  display: flex;
-}
-
-.filter-row {
   display: flex;
 }
 

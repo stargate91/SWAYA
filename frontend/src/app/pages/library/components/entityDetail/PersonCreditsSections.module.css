@@ -16,6 +16,10 @@
   min-height: 0;
   padding-top: var(--space-sm);
   padding-bottom: var(--space-2xl);
+  padding-left: var(--space-xs);
+  padding-right: var(--space-xs);
+  margin-left: calc(-1 * var(--space-xs));
+  margin-right: calc(-1 * var(--space-xs));
 }
 
 .grid-finished {

@@ -125,11 +125,35 @@ def image_proxy(
         raise HTTPException(status_code=400, detail="Invalid URL")
         
     try:
+        # Check if local cache folder exists in the data directory and use it to store proxy files
+        cache_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "data", "media", "images", "cache", "proxy"))
+        os.makedirs(cache_dir, exist_ok=True)
+        
+        import hashlib
+        url_hash = hashlib.md5(url.encode('utf-8')).hexdigest()
+        cache_key = f"{url_hash}_b_{blur}_w_{width or 'orig'}"
+        cache_path = os.path.join(cache_dir, cache_key)
+        
+        # If cache hit, return directly
+        if os.path.exists(cache_path):
+            # Guess content type or default
+            ext_type = "image/jpeg"
+            if "png" in url.lower():
+                ext_type = "image/png"
+            elif "webp" in url.lower():
+                ext_type = "image/webp"
+            
+            def iter_file():
+                with open(cache_path, "rb") as f:
+                    yield from f
+            return StreamingResponse(iter_file(), media_type=ext_type)
+
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             "Referer": f"{parsed.scheme}://{parsed.netloc}/"
         }
-        response = requests.get(url, headers=headers, stream=True, timeout=1.5, verify=False)
+        # Increased timeout to 5.0s to accommodate slow adult/nsfw scrapers CDNs
+        response = requests.get(url, headers=headers, stream=True, timeout=5.0, verify=False)
         response.raise_for_status()
         
         content_type = response.headers.get("Content-Type", "image/jpeg")
@@ -154,10 +178,20 @@ def image_proxy(
             elif "webp" in content_type.lower():
                 fmt = "WEBP"
             img.save(out_io, format=fmt)
+            
+            # Save to cache
+            with open(cache_path, "wb") as cache_file:
+                cache_file.write(out_io.getvalue())
+                
             out_io.seek(0)
             return StreamingResponse(out_io, media_type=content_type)
             
-        return StreamingResponse(response.iter_content(chunk_size=4096), media_type=content_type)
+        # For raw stream, download and cache it while streaming
+        raw_data = response.content
+        with open(cache_path, "wb") as cache_file:
+            cache_file.write(raw_data)
+            
+        return StreamingResponse(io.BytesIO(raw_data), media_type=content_type)
     except Exception as e:
         logger.warning(f"Image proxy failed for URL {url}, redirecting client directly: {e}")
         from fastapi.responses import RedirectResponse

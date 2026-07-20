@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import Page from '@/ui/Page';
 import Button from '@/ui/Button';
@@ -45,7 +46,11 @@ export default function HistoryPage() {
     triggerUndo,
   } = useHistoryPage();
 
-  const utilityBarTarget = typeof document !== 'undefined' ? document.getElementById('page-bar-top-center') : null;
+  const [utilityBarTarget, setUtilityBarTarget] = useState(null);
+
+  useEffect(() => {
+    setUtilityBarTarget(document.getElementById('page-bar-top-center'));
+  }, []);
 
   const handleConfirmUndo = (batch) => {
     openModal({
