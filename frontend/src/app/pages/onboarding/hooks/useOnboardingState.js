@@ -49,7 +49,7 @@ export default function useOnboardingState() {
 
   // Profile builder state
   const [userName, setUserName] = useState('');
-  const [avatarPath, setAvatarPath] = useState('');
+  const [avatarPath, setAvatarPath] = useState('https://api.dicebear.com/7.x/bottts/svg?seed=Bender');
 
   // API credentials state
   const [tmdbApiKey, setTmdbApiKey] = useState('');

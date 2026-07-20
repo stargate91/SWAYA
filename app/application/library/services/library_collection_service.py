@@ -14,6 +14,8 @@ from app.domains.library.schemas import MovieCollectionsResponse
 
 logger = logging.getLogger(__name__)
 
+_COLLECTION_DETAILS_CACHE = {}
+
 class LibraryCollectionService:
     def __init__(self, db_session: Session, settings_port: Optional[SettingsPort] = None, image_downloader: Optional[ImageDownloadPort] = None, tmdb_scraper: Optional[Any] = None):
         self.db = db_session
@@ -21,6 +23,23 @@ class LibraryCollectionService:
         self.image_downloader = image_downloader
         self.tmdb_scraper = tmdb_scraper
 
+    def _fetch_collection_details(self, external_id: str, ui_lang: str) -> dict:
+        if not external_id:
+            return {}
+        cache_key = f"{external_id}_{ui_lang}"
+        if cache_key in _COLLECTION_DETAILS_CACHE:
+            return _COLLECTION_DETAILS_CACHE[cache_key]
+
+        details = {}
+        if self.tmdb_scraper:
+            try:
+                col_id_int = int(external_id)
+                details = self.tmdb_scraper.get_collection_details(col_id_int, language=ui_lang) or {}
+                _COLLECTION_DETAILS_CACHE[cache_key] = details
+            except Exception as e:
+                logger.error(f"Failed to fetch collection details for {external_id}: {e}")
+                _COLLECTION_DETAILS_CACHE[cache_key] = {}
+        return details
 
     def get_movie_collections(
         self,
@@ -57,8 +76,6 @@ class LibraryCollectionService:
             selectinload(MetadataMatch.overrides)
         ).all()
 
-        tmdb_scraper = self.tmdb_scraper
-
         collections_map = {}
         normalized_search = search.strip().lower() if search else ""
 
@@ -69,13 +86,14 @@ class LibraryCollectionService:
 
             col_loc = LangHelper.get_best_localization(collection.localizations, ui_lang) if collection.localizations else None
             
-            if not col_loc and tmdb_scraper:
+            if not col_loc:
                 try:
                     col_id_int = int(collection.external_id)
-                    details = tmdb_scraper.get_collection_details(col_id_int, language=ui_lang) or {}
+                    details = self._fetch_collection_details(collection.external_id, ui_lang)
                     if details:
                         if details.get("backdrop_path"):
                             collection.backdrop_path = details["backdrop_path"]
+                        collection.parts_count = len(details.get("parts", []) or [])
                         from app.domains.metadata.models import MediaCollectionLocalization
                         lang_code = LangHelper.clean_locale(ui_lang)
                         col_loc = MediaCollectionLocalization(
@@ -122,14 +140,16 @@ class LibraryCollectionService:
             col_id = collection.id
             entry = collections_map.get(col_id)
             if not entry:
-                total_parts = 0
-                if tmdb_scraper:
+                total_parts = collection.parts_count
+                if total_parts is None:
                     try:
-                        col_id_int = int(collection.external_id)
-                        details = tmdb_scraper.get_collection_details(col_id_int, language=ui_lang) or {}
+                        details = self._fetch_collection_details(collection.external_id, ui_lang)
                         total_parts = len(details.get("parts", []) or [])
+                        collection.parts_count = total_parts
+                        self.db.commit()
                     except Exception as e:
                         logger.error(f"Failed to get collection parts count: {e}")
+                        total_parts = 0
 
                 from app.shared_kernel.user_context import get_current_user_id
                 current_uid = get_current_user_id()

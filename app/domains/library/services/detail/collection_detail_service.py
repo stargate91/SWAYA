@@ -73,6 +73,8 @@ class CollectionDetailService(DetailFormatter):
                 
             if tmdb_details.get("backdrop_path"):
                 collection.backdrop_path = tmdb_details["backdrop_path"]
+
+            collection.parts_count = len(tmdb_details.get("parts", []) or [])
                 
             if not collection_loc:
                 collection_loc = MediaCollectionLocalization(

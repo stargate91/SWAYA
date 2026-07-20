@@ -28,6 +28,7 @@
 }
 
 .center-container {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -57,21 +58,29 @@
 }
 
 .progress-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  z-index: var(--z-index-step-10);
+  flex: 1 1 auto;
+  min-width: 0;
+  -webkit-app-region: no-drag;
+}
+
+.progress-wrapper.is-single {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: var(--space-md);
-  z-index: var(--z-index-step-10);
+  flex: none;
 }
 
 .progress-wrapper :global(.ui-progress-bar-container) {
-  flex: 1 1 23.75rem;
+  flex: 0 1 23.75rem;
   max-width: 42.5rem;
-  min-width: 20rem;
+  min-width: 10rem;
   width: 23.75rem;
 }
 

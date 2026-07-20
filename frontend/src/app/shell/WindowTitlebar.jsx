@@ -138,7 +138,7 @@ export default function WindowTitlebar() {
           <GlobalSearch />
         </div>
         {hasProgress && (
-          <div className={styles['progress-wrapper']}>
+          <div className={`${styles['progress-wrapper']} ${[scanProgress, imageProgress, hydrateProgress, syncProgress].filter(Boolean).length === 1 ? styles['is-single'] : ''}`}>
             {scanProgress ? <ProgressBar {...scanProgress} onAbort={handleAbort} /> : null}
             {imageProgress ? <ProgressBar {...imageProgress} variant="sub" /> : null}
             {hydrateProgress ? <ProgressBar {...hydrateProgress} variant="sub" /> : null}

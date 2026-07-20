@@ -20,6 +20,7 @@ export default function Input({
   flex,
   multiline = false,
   resizable = 'vertical',
+  invalid,
   ...props
 }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -33,8 +34,10 @@ export default function Input({
 
   const { t } = useTranslation();
 
+  const hasError = invalid !== undefined ? invalid : !!error;
+
   const wrapperClass = `${styles['input-wrapper']} ${styles[`input-wrapper--${size}`]} ${
-    error ? styles['input-wrapper--error'] : ''
+    hasError ? styles['input-wrapper--error'] : ''
   } ${multiline ? styles['input-wrapper--multiline'] : ''}`.trim();
 
   const fieldClass = `${styles['input-field']} ${
@@ -42,6 +45,7 @@ export default function Input({
   } ${flex === 1 ? styles['flex-1'] : ''} ${className}`.trim();
 
   const inputClass = `${styles['input']} ${styles[`input--${size}`]} ${multiline ? styles['textarea'] : ''}`.trim();
+
 
   return (
     <Field

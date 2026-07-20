@@ -42,8 +42,7 @@
       "inplace": "Rename In-Place",
       "inplaceHint": "SWAYA renames and formats your files directly inside their current directories.",
       "library": "Move & Organize",
-      "libraryHint": "SWAYA renames, structures, and moves files into a dedicated target library folder.",
-      "warningHint": "If you don't set a target folder, SWAYA will organize files inside the source folder. That can create duplicate folders and may confuse torrent clients."
+      "libraryHint": "SWAYA renames, structures, and moves files into a dedicated target library folder."
     },
     "profile": {
       "title": "Profile",

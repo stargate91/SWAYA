@@ -170,6 +170,7 @@ class MediaCollection(Base):
     external_id: Mapped[str] = mapped_column(String, index=True)
     backdrop_path: Mapped[Optional[str]] = mapped_column(String)
     local_backdrop_path: Mapped[Optional[str]] = mapped_column(String)
+    parts_count: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     
     # Relationships
     matches: Mapped[List["MetadataMatch"]] = relationship("MetadataMatch", back_populates="collection")

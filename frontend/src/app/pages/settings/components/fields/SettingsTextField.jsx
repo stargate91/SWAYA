@@ -8,9 +8,10 @@ export default function SettingsTextField({ field, onChange, ...props }) {
     <Input
       {...props}
       value={fieldState.value ?? ''}
-      error={props.error ?? fieldState.error}
-      disabled={props.disabled || fieldState.disabled}
+      error={'error' in props ? props.error : fieldState.error}
+      disabled={'disabled' in props ? props.disabled : fieldState.disabled}
       onChange={onChange || fieldState.onChange}
     />
   );
 }
+

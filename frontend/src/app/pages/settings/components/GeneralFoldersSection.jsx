@@ -36,23 +36,15 @@ export default function GeneralFoldersSection({ t }) {
           />
         </Stack>
 
-        {moveToLibraryField.checked && (
-          <Stack gap="xs" className={styles['nested-block-top']}>
-            <SettingsPathField
-              field="folder_library_path"
-              t={t}
-              label={t('settingsPage.sections.folders.targetFolder')}
-              placeholder={t('settingsPage.sections.folders.targetFolderPlaceholder')}
-              inputRef={targetFolderInputRef}
-            />
-            {!(targetFolderField.value || '').trim() && (
-              <Alert variant="warning">
-                <AlertTriangle size={16} className="settings-icon-shrink-0" />
-                <span>{t('settingsPage.sections.mode.warningHint')}</span>
-              </Alert>
-            )}
-          </Stack>
-        )}
+        <Stack gap="xs">
+          <SettingsPathField
+            field="folder_library_path"
+            t={t}
+            label={t('settingsPage.sections.folders.targetFolder')}
+            placeholder={t('settingsPage.sections.folders.targetFolderPlaceholder')}
+            inputRef={targetFolderInputRef}
+          />
+        </Stack>
       </Stack>
     </Card>
   );

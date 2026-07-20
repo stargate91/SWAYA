@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 
 export default function usePlayerState(isTrailer, queryTitle) {
   const [isPlaying, setIsPlaying] = useState(isTrailer);
@@ -28,7 +29,14 @@ export default function usePlayerState(isTrailer, queryTitle) {
   const [episodeNumber, setEpisodeNumber] = useState(null);
   const [countdown, setCountdown] = useState(10);
   const [speed, setSpeed] = useState(1.0);
-  const [isAdult, setIsAdult] = useState(false);
+  const [isAdult, setIsAdult] = useState(() => {
+    try {
+      const mode = useLibraryModeStore.getState().sessionMode;
+      return mode === 'nsfw';
+    } catch {
+      return false;
+    }
+  });
   const [mediaType, setMediaType] = useState(null);
   const [justAddedPeak, setJustAddedPeak] = useState(false);
   const [logoError, setLogoError] = useState(false);

@@ -79,7 +79,7 @@ class SettingsService:
         # Default hover preview settings
         preview_defaults = {
             "hover_previews_enabled": True,
-            "hover_previews_delay": 500,
+            "hover_previews_delay": 800,
             "hover_previews_duration": 16,
             "previews_cache_max_size_mb": 2048,
             "previews_cache_max_age_days": 30

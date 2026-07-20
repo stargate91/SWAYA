@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import enCommon from '../locales/en/common.json';
-import enCommonFix from '../locales-fix/en/common.json';
 import enDashboard from '../locales/en/dashboard.json';
 import enSettings from '../locales/en/settings.json';
 import enOrganizer from '../locales/en/organizer.json';
@@ -11,19 +10,16 @@ import enRatings from '../locales/en/ratings.json';
 import enLists from '../locales/en/lists.json';
 import enSearch from '../locales/en/search.json';
 import enAbout from '../locales/en/about.json';
-import enStatistics from '../locales-fix/en/statistics.json';
+import enStatistics from '../locales/en/statistics.json';
 import { LanguageContext } from './LanguageContext';
 
 const en = {
   ...enCommon,
-  ...enCommonFix,
   common: {
     ...(enCommon.common || {}),
-    ...(enCommonFix.common || {}),
   },
   sidebar: {
     ...(enCommon.sidebar || {}),
-    ...(enCommonFix.sidebar || {}),
   },
   dashboard: enDashboard,
   settingsPage: enSettings,

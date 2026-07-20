@@ -130,9 +130,13 @@ export default function useSettingsForm() {
     handleWipeDatabase: dangerZone.handleWipeDatabase,
     isWipingCache: dangerZone.isWipingCache,
     handleWipeCache: dangerZone.handleWipeCache,
-    handleReset: persistence.handleReset,
+    handleReset: () => {
+      persistence.handleReset();
+      clearFolderValidation();
+    },
     isShaking: navigation.isShaking,
     openModal,
     closeModal,
   };
 }
+

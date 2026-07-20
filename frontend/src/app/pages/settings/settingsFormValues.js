@@ -152,7 +152,14 @@ function getStringValue(value, fallback) {
 
 
 function getBooleanValue(value, fallback) {
-  return value === undefined ? fallback : value;
+  if (value === undefined || value === null) return fallback;
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'string') {
+    const lower = value.toLowerCase().trim();
+    if (lower === 'true' || lower === '1') return true;
+    if (lower === 'false' || lower === '0') return false;
+  }
+  return Boolean(value);
 }
 
 export function getInitialFormValues(settingsData = null, t = null) {
