@@ -4,13 +4,19 @@ export const useNavigationStore = create((set, get) => ({
   historyStack: [],
   currentIndex: -1,
 
-  pushPath: (path) => {
+  syncPath: (path, navType) => {
     const { historyStack, currentIndex } = get();
     
-    // Prevent duplicate consecutive entries
+    if (navType === 'POP') {
+      const idx = historyStack.lastIndexOf(path);
+      if (idx !== -1) {
+        set({ currentIndex: idx });
+        return;
+      }
+    }
+    
     if (historyStack[currentIndex] === path) return;
-
-    // Discard any forward history if we navigated back and then pushed a new path
+    
     const cleanStack = historyStack.slice(0, currentIndex + 1);
     const newStack = [...cleanStack, path];
     

@@ -18,7 +18,7 @@ export default function AppShell() {
   const theme = settings?.ui_theme || 'dark';
   const navigate = useNavigate();
   const location = useLocation();
-  const pushPath = useNavigationStore((state) => state.pushPath);
+  const syncPath = useNavigationStore((state) => state.syncPath);
   const navType = useNavigationType();
   const queryClient = useQueryClient();
 
@@ -61,10 +61,8 @@ export default function AppShell() {
   }, [hydrateStatusQuery.data?.active, queryClient]);
 
   useEffect(() => {
-    if (navType !== 'POP') {
-      pushPath(location.pathname + location.search);
-    }
-  }, [location, pushPath, navType]);
+    syncPath(location.pathname + location.search, navType);
+  }, [location, syncPath, navType]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);

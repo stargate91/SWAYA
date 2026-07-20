@@ -111,14 +111,14 @@ export const RecommendationCarousel = ({
               playOverlay={
                 !n.isPerson && item.in_library && onPlayClick
                   ? {
-                      title: null,
-                      onClick: (e) => {
-                        e.stopPropagation();
-                        onPlayClick(item);
-                      },
-                      pending: playMutationPending,
-                      icon: <Play size={16} fill="currentColor" />,
-                    }
+                    title: null,
+                    onClick: (e) => {
+                      e.stopPropagation();
+                      onPlayClick(item);
+                    },
+                    pending: playMutationPending,
+                    icon: <Play size={16} fill="currentColor" />,
+                  }
                   : null
               }
             >

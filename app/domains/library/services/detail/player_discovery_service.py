@@ -247,7 +247,7 @@ class PlayerDiscoveryService:
             if media_type == "scene":
                 from app.domains.people.models import MediaPersonLink, Person
                 
-                gender_pref = settings_adapter.get_setting("naming_performer_gender_filter", user_id=current_uid) or "all"
+                gender_pref = settings_adapter.get_setting("adult_gender_preference", user_id=current_uid) or "all"
                 
                 perf_links = db.query(MediaPersonLink, Person.gender).join(Person, Person.id == MediaPersonLink.person_id).filter(
                     MediaPersonLink.match_id == match.id
