@@ -50,6 +50,7 @@ class AdultDiscoveryService:
                   id
                   title
                   date
+                  details
                   studio {
                     id
                     name
@@ -289,7 +290,7 @@ class AdultDiscoveryService:
                 "poster_path": resolved_img,
                 "backdrop_path": resolved_img,
                 "release_date": s.get("date"),
-                "overview": studio_name,
+                "overview": s.get("details") or studio_name,
                 "is_adult": True,
                 "image_width": img_width,
                 "image_height": img_height,

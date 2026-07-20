@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { Star, Check, Plus } from '@/ui/icons';
 import { resolveMediaImageUrl } from '../../../../lib/imageUrls';
+import { API_BASE } from '../../../../lib/backend';
 import Button from '../../../../ui/Button';
 import Text from '../../../../ui/Text';
 import { useTranslation } from '../../../../providers/LanguageContext';
@@ -8,10 +9,15 @@ import Inline from '@/ui/Inline';
 import Pill from '@/ui/Pill';
 import styles from './SpotlightBanner.module.css';
 
-export const SpotlightBanner = ({ item, watchlistIds, onWatchlist, onCardClick }) => {
+export const SpotlightBanner = ({ item, watchlistIds, onWatchlist, onCardClick, isAdult = false }) => {
   const { t: T } = useTranslation();
   if (!item) return null;
-  const imageUrl = resolveMediaImageUrl(item.backdrop_path, 'backdrop');
+  
+  const rawBackdrop = item.backdrop_path || item.poster_path;
+  const imageUrl = isAdult && rawBackdrop
+    ? `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(rawBackdrop)}&width=1280`
+    : resolveMediaImageUrl(rawBackdrop, 'backdrop');
+  
   const title = item.title || item.name;
   const isWatchlisted = watchlistIds.includes(item.id);
   const imdbRating = item.rating_imdb;
@@ -73,6 +79,7 @@ SpotlightBanner.propTypes = {
   watchlistIds: PropTypes.array.isRequired,
   onWatchlist: PropTypes.func.isRequired,
   onCardClick: PropTypes.func.isRequired,
+  isAdult: PropTypes.bool,
 };
 
 export default SpotlightBanner;

@@ -234,11 +234,13 @@ class LibraryContentService:
 
             recently_added.append({
                 "id": int(show_match.external_id) if show_match.external_id and show_match.external_id.isdigit() else item.id,
+                "tmdb_id": int(show_match.external_id) if (show_match.external_id and show_match.external_id.isdigit() and match.media_type.value in ["movie", "tv", "episode"]) else None,
                 "title": title,
                 "name": title,
                 "media_type": "tv" if match.media_type == MediaType.EPISODE else match.media_type.value,
                 "in_library": True,
                 "media_item_id": item.id,
+                "library_item_id": item.id,
                 "is_adult": bool(match.is_adult),
                 "rating_imdb": rating_imdb,
                 "rating_tmdb": rating_tmdb,

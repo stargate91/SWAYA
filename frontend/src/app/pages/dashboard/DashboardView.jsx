@@ -28,7 +28,6 @@ const WIDGET_REGISTRY = {
     component: SpotlightWidget,
     titleKey: 'dashboard.widget_spotlight',
     fallbackTitle: 'Spotlight (Trending)',
-    show: (settings, isNsfw) => !isNsfw,
   },
   recently_added_movies: {
     component: RecentlyAddedWidget,
