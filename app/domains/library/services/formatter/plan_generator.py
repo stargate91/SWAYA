@@ -68,9 +68,9 @@ class PlanGenerator:
             if media_type == MediaType.SCENE:
                 target_name = self.formatter.format_scene_filename(self.formatter.build_scene_context(item, match, loc, people_links=people_links))
             elif media_type == MediaType.MOVIE:
-                target_name = self.formatter.format_movie_filename(self.formatter.build_movie_context(item, match, loc))
+                target_name = self.formatter.format_movie_filename(self.formatter.build_movie_context(item, match, loc), is_adult=is_adult)
             else:
-                target_name = self.formatter.format_episode_filename(self.formatter.build_tv_context(item, match, loc))
+                target_name = self.formatter.format_episode_filename(self.formatter.build_tv_context(item, match, loc), is_adult=is_adult)
             return target_name, ""
 
         if media_type == MediaType.SCENE:
@@ -114,7 +114,7 @@ class PlanGenerator:
             
         elif media_type == MediaType.MOVIE:
             context = self.formatter.build_movie_context(item, match, loc)
-            target_name = self.formatter.format_movie_filename(context)
+            target_name = self.formatter.format_movie_filename(context, is_adult=is_adult)
             
             sub_path_parts = []
             if is_adult:
@@ -127,7 +127,7 @@ class PlanGenerator:
                     sub_path_parts.append(self.config.movies_dir_name)
                     
             if self.config.create_movie_subdir:
-                folder_name = self.formatter.format_movie_foldername(context, match)
+                folder_name = self.formatter.format_movie_foldername(context, match, is_adult=is_adult)
                 sub_path_parts.append(folder_name)
                 
             sub_path_obj = Path()
@@ -138,7 +138,7 @@ class PlanGenerator:
             
         elif media_type in [MediaType.TV, MediaType.SEASON, MediaType.EPISODE]:
             context = self.formatter.build_tv_context(item, match, loc)
-            target_name = self.formatter.format_episode_filename(context)
+            target_name = self.formatter.format_episode_filename(context, is_adult=is_adult)
                 
             sub_path_parts = []
             if is_adult:
@@ -151,10 +151,10 @@ class PlanGenerator:
                     sub_path_parts.append(self.config.tv_dir_name)
                     
             if self.config.create_tv_dir:
-                tv_folder = self.formatter.format_tv_foldername(context)
+                tv_folder = self.formatter.format_tv_foldername(context, is_adult=is_adult)
                 sub_path_parts.append(tv_folder)
             if self.config.create_season_dir:
-                season_folder = self.formatter.format_season_foldername(context)
+                season_folder = self.formatter.format_season_foldername(context, is_adult=is_adult)
                 sub_path_parts.append(season_folder)
                 
             sub_path_obj = Path()

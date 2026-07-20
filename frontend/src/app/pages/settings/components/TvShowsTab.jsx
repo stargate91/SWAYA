@@ -8,7 +8,7 @@ import SettingsLiveImpact from './SettingsLiveImpact.jsx';
 import { useSettingsFormContext, useSettingsViewContext } from '../SettingsFormContext.jsx';
 import styles from '../SettingsPage.module.css';
 
-export default function TvShowsTab() {
+export default function TvShowsTab({ isAdult = false }) {
   const { form, actions, formInputs } = useSettingsFormContext();
   const { t, realBackgroundActive } = useSettingsViewContext();
   const isScanActive = Boolean(realBackgroundActive);
@@ -20,10 +20,14 @@ export default function TvShowsTab() {
     tvName: form.folder_tv_name
   };
 
+  const folderTvField = isAdult ? 'folder_adult_tv_template' : 'folder_tv_template';
+  const folderSeasonField = isAdult ? 'folder_adult_season_template' : 'folder_season_template';
+  const namingEpisodeField = isAdult ? 'naming_adult_episode_template' : 'naming_episode_template';
+
   return (
     <Stack gap="xl">
       <Card
-        title={t('settingsPage.sections.folderStructure.tvFoldersTitle')}
+        title={isAdult ? t('settingsPage.sections.folderStructure.adultTvFoldersTitle') : t('settingsPage.sections.folderStructure.tvFoldersTitle')}
         eyebrow={t('settingsPage.sections.folderStructure.structureEyebrow')}
       >
         <Stack gap="xl">
@@ -49,14 +53,14 @@ export default function TvShowsTab() {
                 t={t}
                 inputRef={formInputs.folderTv}
                 label={t('settingsPage.sections.folderStructure.showTemplate')}
-                value={form.folder_tv_template}
+                value={form[folderTvField]}
                 disabled={isScanActive}
-                onChange={actions.handleChange('folder_tv_template')}
-                placeholder="{tv_title} ({year_range})"
+                onChange={actions.handleChange(folderTvField)}
+                placeholder={isAdult ? "Leave empty to use standard TV folder pattern" : "{tv_title} ({year_range})"}
                 tags={FOLDER_SHOW_TAGS}
-                fieldKey="folder_tv_template"
+                fieldKey={folderTvField}
                 insertTag={actions.insertTag}
-                previewText={getPreview(form.folder_tv_template, 'tv', { isFile: false, sortOptions })}
+                previewText={getPreview(form[folderTvField] || form.folder_tv_template, 'tv', { isFile: false, sortOptions })}
                 className={`${styles['nested-block']} ${styles['nested-block-top']}`}
               />
             )}
@@ -98,14 +102,14 @@ export default function TvShowsTab() {
                 t={t}
                 inputRef={formInputs.folderSeason}
                 label={t('settingsPage.sections.folderStructure.seasonTemplate')}
-                value={form.folder_season_template}
+                value={form[folderSeasonField]}
                 disabled={isScanActive}
-                onChange={actions.handleChange('folder_season_template')}
-                placeholder={t('settingsPage.sections.folderStructure.seasonTemplatePlaceholder')}
+                onChange={actions.handleChange(folderSeasonField)}
+                placeholder={isAdult ? "Leave empty to use standard season folder pattern" : t('settingsPage.sections.folderStructure.seasonTemplatePlaceholder')}
                 tags={FOLDER_SEASON_TAGS}
-                fieldKey="folder_season_template"
+                fieldKey={folderSeasonField}
                 insertTag={actions.insertTag}
-                previewText={getPreview(form.folder_season_template, 'season', { isFile: false, sortOptions })}
+                previewText={getPreview(form[folderSeasonField] || form.folder_season_template, 'season', { isFile: false, sortOptions })}
                 className={`${styles['nested-block']} ${styles['nested-block-top']}`}
               />
             )}
@@ -145,23 +149,23 @@ export default function TvShowsTab() {
       </Card>
 
       <Card
-        title={t('settingsPage.sections.fileNaming.episodeTemplateLabel')}
+        title={isAdult ? t('settingsPage.sections.folderStructure.adultEpisodeTemplateLabel') : t('settingsPage.sections.fileNaming.episodeTemplateLabel')}
         eyebrow={t('settingsPage.sections.fileNaming.eyebrow')}
       >
         <Stack gap="lg">
           <TemplateFieldSection
             t={t}
             inputRef={formInputs.namingEpisode}
-            label={t('settingsPage.sections.fileNaming.episodeTemplateLabel')}
-            hint={t('settingsPage.sections.fileNaming.episodeTemplateHint')}
-            value={form.naming_episode_template}
+            label={isAdult ? t('settingsPage.sections.folderStructure.adultEpisodeTemplateLabel') : t('settingsPage.sections.fileNaming.episodeTemplateLabel')}
+            hint={isAdult ? "Configure a separate template for adult TV episodes, or leave empty to inherit standard TV naming style." : t('settingsPage.sections.fileNaming.episodeTemplateHint')}
+            value={form[namingEpisodeField]}
             disabled={isScanActive}
-            onChange={actions.handleChange('naming_episode_template')}
-            placeholder="{tv_title} - S{season}E{episode} - {episode_title}"
+            onChange={actions.handleChange(namingEpisodeField)}
+            placeholder={isAdult ? "Leave empty to use standard episode file pattern" : "{tv_title} - S{season}E{episode} - {episode_title}"}
             tags={EPISODE_TAGS}
-            fieldKey="naming_episode_template"
+            fieldKey={namingEpisodeField}
             insertTag={actions.insertTag}
-            previewText={getPreview(form.naming_episode_template, 'episode')}
+            previewText={getPreview(form[namingEpisodeField] || form.naming_episode_template, 'episode')}
           />
         </Stack>
       </Card>
@@ -172,7 +176,7 @@ export default function TvShowsTab() {
         title={t('settingsPage.sections.liveImpact.title')}
         eyebrow={t('settingsPage.sections.liveImpact.eyebrow')}
         hint={t('settingsPage.sections.liveImpact.fileNamingHint')}
-        filterType="tv"
+        filterType={isAdult ? "adult_tv" : "tv"}
       />
     </Stack>
   );

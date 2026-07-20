@@ -35,16 +35,6 @@ export function createAdultGeneralSection(t, adultGenderPreferenceOptions) {
         options: adultGenderPreferenceOptions,
         visible: (context) => Boolean(context.include_adult),
       },
-      {
-        type: 'path',
-        field: 'folder_adult_library_path',
-        label: t('settingsPage.sections.adult.customTargetFolder'),
-        hint: t('settingsPage.sections.adult.customTargetFolderHint'),
-        placeholder: t('settingsPage.sections.adult.customTargetFolderPlaceholder'),
-        picker: 'folder',
-        t: t,
-        visible: (context) => Boolean(context.include_adult),
-      },
     ],
   };
 }

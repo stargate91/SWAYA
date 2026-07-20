@@ -15,19 +15,20 @@ class DirectoryFormatter:
     def config(self):
         return self.formatter.config
 
-    def format_movie_foldername(self, context: Dict[str, Any], match: Optional[Any] = None) -> str:
+    def format_movie_foldername(self, context: Dict[str, Any], match: Optional[Any] = None, is_adult: bool = False) -> str:
         if not self.config.create_movie_subdir:
             return ""
             
+        movie_folder_tmpl = self.config.adult_movie_folder if (is_adult and self.config.adult_movie_folder) else self.config.movie_folder
         coll_val = context.get("Collection") or context.get("collection")
         if self._should_use_collection_folder(match, coll_val):
             coll_name = self.format_collection_foldername(context)
-            movie_name = self.formatter._render(self.config.movie_folder, context, is_file=False)
+            movie_name = self.formatter._render(movie_folder_tmpl, context, is_file=False)
             if coll_name and movie_name:
                 return f"{coll_name}/{movie_name}"
             return movie_name or coll_name
             
-        return self.formatter._render(self.config.movie_folder, context, is_file=False)
+        return self.formatter._render(movie_folder_tmpl, context, is_file=False)
 
     def format_collection_foldername(self, context: Dict[str, Any]) -> str:
         tmpl = self.config.collection_folder or "{Collection}"
@@ -85,18 +86,21 @@ class DirectoryFormatter:
         except (TypeError, ValueError):
             return 0
 
-    def format_tv_foldername(self, context: Dict[str, Any]) -> str:
+    def format_tv_foldername(self, context: Dict[str, Any], is_adult: bool = False) -> str:
         if not self.config.create_tv_dir:
             return ""
-        return self.formatter._render(self.config.tv_folder, context, is_file=False)
+        tv_folder_tmpl = self.config.adult_tv_folder if (is_adult and self.config.adult_tv_folder) else self.config.tv_folder
+        return self.formatter._render(tv_folder_tmpl, context, is_file=False)
 
-    def format_season_foldername(self, context: Dict[str, Any]) -> str:
+    def format_season_foldername(self, context: Dict[str, Any], is_adult: bool = False) -> str:
         if not self.config.create_season_dir:
             return ""
-        return self.formatter._render(self.config.season_folder, context, is_file=False)
+        season_folder_tmpl = self.config.adult_season_folder if (is_adult and self.config.adult_season_folder) else self.config.season_folder
+        return self.formatter._render(season_folder_tmpl, context, is_file=False)
 
-    def format_episode_filename(self, context: Dict[str, Any]) -> str:
-        return self.formatter._render(self.config.episode_file, context, is_file=True)
+    def format_episode_filename(self, context: Dict[str, Any], is_adult: bool = False) -> str:
+        episode_file_tmpl = self.config.adult_episode_file if (is_adult and self.config.adult_episode_file) else self.config.episode_file
+        return self.formatter._render(episode_file_tmpl, context, is_file=True)
 
     def format_extra_filename(self, context: Dict[str, Any]) -> str:
         cat = context.get("category", "").lower()

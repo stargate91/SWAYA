@@ -97,10 +97,10 @@ function buildPreviewAssets(form) {
     movieExtraAudio: helper(form.extras_audio_template, 'extraAudio', '{parent_name} {sub_category}', '.commentary.ac3'),
     movieExtraImg: helper(form.extras_img_template, 'extraImg', '{parent_name} {sub_category}', '-poster.jpg'),
     movieExtraMeta: helper(form.extras_meta_template, 'extraMeta', '{parent_name} {sub_category}', '.nfo'),
-    adultMovieFile: generatePreview(form.naming_movie_template, 'adultMovie', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, true),
-    adultFolderMovie: generatePreview(form.folder_movie_template, 'adultMovie', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, false),
+    adultMovieFile: generatePreview(form.naming_adult_movie_template || form.naming_movie_template, 'adultMovie', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, true),
+    adultFolderMovie: generatePreview(form.folder_adult_movie_template || form.folder_movie_template, 'adultMovie', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, false),
     adultSceneFile: generatePreview(
-      form.naming_scene_template || '{studio} - {performers} - {date} - {title} [{resolution}]',
+      form.naming_scene_template || '{studio} - {date} - {performers} - {title} [{resolution}]',
       'scene',
       form.naming_filename_casing,
       form.naming_word_separator,
@@ -122,11 +122,12 @@ function buildPreviewAssets(form) {
         )
       : '',
     episodeFile: generatePreview(form.naming_episode_template, 'episode', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, true),
-    adultEpisodeFile: generatePreview(form.naming_episode_template, 'adultEpisode', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, true),
+    adultEpisodeFile: generatePreview(form.naming_adult_episode_template || form.naming_episode_template, 'adultEpisode', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, true),
     folderMovie: generatePreview(form.folder_movie_template, 'movie', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, false),
     folderTv: generatePreview(form.folder_tv_template, 'tv', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, false),
-    adultFolderTv: generatePreview(form.folder_tv_template, 'adultTv', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, false),
+    adultFolderTv: generatePreview(form.folder_adult_tv_template || form.folder_tv_template, 'adultTv', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, false),
     folderSeason: generatePreview(form.folder_season_template, 'season', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, false),
+    adultFolderSeason: generatePreview(form.folder_adult_season_template || form.folder_season_template, 'adultSeason', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, false),
     folderEpisode: generatePreview(form.folder_episode_template, 'episode', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, false),
     folderCollection: generatePreview(form.folder_collection_template || '{Collection}', 'collection', form.naming_filename_casing, form.naming_word_separator, form.naming_custom_tag, true),
     videoFile: 'Family Vacation 2024.mp4',
@@ -194,11 +195,26 @@ function buildAdultMovieNodes(form, assets) {
     : [createFileNode(assets.adultMovieFile, { tone: 'adult' })];
 }
 
-function buildAdultTvNodes(form, assets) {
+function buildAdultTvNodes(form, assets, options = {}) {
+  const isAdultProps = { tone: 'adult' };
+
+  if (!form.folder_create_show_dir) {
+    return [createFileNode(assets.adultEpisodeFile, { ...isAdultProps, topSpacing: Boolean(options.topSpacing) })];
+  }
+
+  if (!form.folder_create_season_dir) {
+    return [createFolderNode(getFolderLabel(assets.adultFolderTv), { ...isAdultProps, topSpacing: Boolean(options.topSpacing), children: [createFileNode(assets.adultEpisodeFile, isAdultProps)] })];
+  }
+
+  const seasonChildren = form.folder_create_episode_dir
+    ? [createFolderNode(getFolderLabel(assets.folderEpisode), { ...isAdultProps, children: [createFileNode(assets.adultEpisodeFile, isAdultProps)] })]
+    : [createFileNode(assets.adultEpisodeFile, isAdultProps)];
+
   return [
     createFolderNode(getFolderLabel(assets.adultFolderTv), {
-      tone: 'adult',
-      children: [createFileNode(assets.adultEpisodeFile, { tone: 'adult' })],
+      ...isAdultProps,
+      topSpacing: Boolean(options.topSpacing),
+      children: [createFolderNode(getFolderLabel(assets.adultFolderSeason), { ...isAdultProps, children: seasonChildren })],
     }),
   ];
 }
@@ -298,22 +314,6 @@ function buildOrganizedNodes(form, assets, filterType) {
       result.push(...movieNodes);
     }
 
-    if (form.include_adult) {
-      const adultMovieNodes = buildAdultMovieNodes(form, assets);
-      const innerNodes = form.naming_adult_subfolders_enabled
-        ? [createFolderNode(form.folder_adult_movies_name, { tone: 'adult', children: adultMovieNodes })]
-        : adultMovieNodes;
-
-      if (form.folder_adult_library_path) {
-        const adultRootLabel = `➔ ${form.folder_adult_library_path}`;
-        result.push(createFolderNode(adultRootLabel, { tone: 'adult', topSpacing: true, children: innerNodes }));
-      } else if (isSort) {
-        result.push(createFolderNode(form.folder_adult_name, { tone: 'adult', topSpacing: true, children: innerNodes }));
-      } else {
-        result.push(...innerNodes.map(node => ({ ...node, tone: 'adult', topSpacing: true })));
-      }
-    }
-
     return result;
   }
 
@@ -325,23 +325,41 @@ function buildOrganizedNodes(form, assets, filterType) {
       result.push(...tvNodes);
     }
 
-    if (form.include_adult) {
-      const adultTvNodes = buildAdultTvNodes(form, assets);
-      const innerNodes = form.naming_adult_subfolders_enabled
-        ? [createFolderNode(form.folder_adult_tv_name, { tone: 'adult', children: adultTvNodes })]
-        : adultTvNodes;
-
-      if (form.folder_adult_library_path) {
-        const adultRootLabel = `➔ ${form.folder_adult_library_path}`;
-        result.push(createFolderNode(adultRootLabel, { tone: 'adult', topSpacing: true, children: innerNodes }));
-      } else if (isSort) {
-        result.push(createFolderNode(form.folder_adult_name, { tone: 'adult', topSpacing: true, children: innerNodes }));
-      } else {
-        result.push(...innerNodes.map(node => ({ ...node, tone: 'adult', topSpacing: true })));
-      }
-    }
-
     return result;
+  }
+
+  if (filterType === 'adult_movies') {
+    if (!form.include_adult) return [];
+    const adultMovieNodes = buildAdultMovieNodes(form, assets);
+    const innerNodes = form.naming_adult_subfolders_enabled
+      ? [createFolderNode(form.folder_adult_movies_name, { tone: 'adult', children: adultMovieNodes })]
+      : adultMovieNodes;
+
+    if (form.folder_adult_library_path) {
+      const adultRootLabel = `➔ ${form.folder_adult_library_path}`;
+      return [createFolderNode(adultRootLabel, { tone: 'adult', children: innerNodes })];
+    }
+    if (isSort) {
+      return [createFolderNode(form.folder_adult_name, { tone: 'adult', children: innerNodes })];
+    }
+    return innerNodes.map(node => ({ ...node, tone: 'adult' }));
+  }
+
+  if (filterType === 'adult_tv') {
+    if (!form.include_adult) return [];
+    const adultTvNodes = buildAdultTvNodes(form, assets);
+    const innerNodes = form.naming_adult_subfolders_enabled
+      ? [createFolderNode(form.folder_adult_tv_name, { tone: 'adult', children: adultTvNodes })]
+      : adultTvNodes;
+
+    if (form.folder_adult_library_path) {
+      const adultRootLabel = `➔ ${form.folder_adult_library_path}`;
+      return [createFolderNode(adultRootLabel, { tone: 'adult', children: innerNodes })];
+    }
+    if (isSort) {
+      return [createFolderNode(form.folder_adult_name, { tone: 'adult', children: innerNodes })];
+    }
+    return innerNodes.map(node => ({ ...node, tone: 'adult' }));
   }
 
   if (filterType === 'scenes') {
@@ -421,29 +439,29 @@ function buildUnorganizedNodes(form, assets, filterType) {
   }
 
   if (filterType === 'movies') {
-    const result = [createFileNode(assets.movieFile), ...extraNodes];
-    if (form.include_adult) {
-      if (form.folder_adult_library_path) {
-        const adultRootLabel = `➔ ${form.folder_adult_library_path}`;
-        result.push(createFolderNode(adultRootLabel, { tone: 'adult', topSpacing: true, children: [createFileNode(assets.adultMovieFile, { tone: 'adult' })] }));
-      } else {
-        result.push(createFileNode(assets.adultMovieFile, { tone: 'adult', topSpacing: true }));
-      }
+    return [createFileNode(assets.movieFile), ...extraNodes];
+  }
+
+  if (filterType === 'adult_movies') {
+    if (!form.include_adult) return [];
+    if (form.folder_adult_library_path) {
+      const adultRootLabel = `➔ ${form.folder_adult_library_path}`;
+      return [createFolderNode(adultRootLabel, { tone: 'adult', children: [createFileNode(assets.adultMovieFile, { tone: 'adult' })] })];
     }
-    return result;
+    return [createFileNode(assets.adultMovieFile, { tone: 'adult' })];
   }
 
   if (filterType === 'tv') {
-    const result = [createFileNode(assets.episodeFile)];
-    if (form.include_adult) {
-      if (form.folder_adult_library_path) {
-        const adultRootLabel = `➔ ${form.folder_adult_library_path}`;
-        result.push(createFolderNode(adultRootLabel, { tone: 'adult', topSpacing: true, children: [createFileNode(assets.adultEpisodeFile, { tone: 'adult' })] }));
-      } else {
-        result.push(createFileNode(assets.adultEpisodeFile, { tone: 'adult', topSpacing: true }));
-      }
+    return [createFileNode(assets.episodeFile)];
+  }
+
+  if (filterType === 'adult_tv') {
+    if (!form.include_adult) return [];
+    if (form.folder_adult_library_path) {
+      const adultRootLabel = `➔ ${form.folder_adult_library_path}`;
+      return [createFolderNode(adultRootLabel, { tone: 'adult', children: [createFileNode(assets.adultEpisodeFile, { tone: 'adult' })] })];
     }
-    return result;
+    return [createFileNode(assets.adultEpisodeFile, { tone: 'adult' })];
   }
 
   if (filterType === 'scenes') {
@@ -549,11 +567,22 @@ function buildRenameItems(form, assets, filterType) {
     }
   ];
 
-  const adultItems = [];
+  const adultMovieItems = [];
   if (form.include_adult) {
-    adultItems.push({ 
+    adultMovieItems.push({ 
       before: 'original_adult_movie_file.mp4', 
       after: isRegisterOnly ? 'original_adult_movie_file.mp4' : assets.adultMovieFile, 
+      afterTone: isRegisterOnly ? 'muted' : 'adult',
+      noStrikeBefore: isRegisterOnly,
+      registered: isRegisterOnly
+    });
+  }
+
+  const adultTvItems = [];
+  if (form.include_adult) {
+    adultTvItems.push({ 
+      before: 'original_adult_episode_file.mp4', 
+      after: isRegisterOnly ? 'original_adult_episode_file.mp4' : assets.adultEpisodeFile, 
       afterTone: isRegisterOnly ? 'muted' : 'adult',
       noStrikeBefore: isRegisterOnly,
       registered: isRegisterOnly
@@ -563,14 +592,20 @@ function buildRenameItems(form, assets, filterType) {
   if (filterType === 'movies') {
     return movieItems;
   }
+  if (filterType === 'adult_movies') {
+    return adultMovieItems;
+  }
   if (filterType === 'tv') {
     return tvItems;
   }
+  if (filterType === 'adult_tv') {
+    return adultTvItems;
+  }
   if (filterType === 'scenes') {
-    return adultItems;
+    return []; // Scenes has no rename items in unorganized rename mode, or wait - is it adultItems? Yes, scenes use scenes!
   }
 
-  return [...movieItems, ...tvItems, ...videoItems, ...adultItems];
+  return [...movieItems, ...tvItems, ...videoItems, ...adultMovieItems, ...adultTvItems];
 }
 
 export function buildStructurePreviewModel(form, t, filterType) {
@@ -588,7 +623,8 @@ export function buildStructurePreviewModel(form, t, filterType) {
   }
 
   let rootLabel = (form.folder_library_path || '').trim() || t('settingsPage.sections.organization.previewTargetFolderPlaceholder');
-  if (filterType === 'scenes' && form.folder_adult_library_path) {
+  const isAdultTab = ['adultGeneral', 'adultMovies', 'adultTvShows', 'scenes', 'adult_movies', 'adult_tv'].includes(filterType);
+  if (isAdultTab && form.folder_adult_library_path) {
     rootLabel = form.folder_adult_library_path;
   }
 

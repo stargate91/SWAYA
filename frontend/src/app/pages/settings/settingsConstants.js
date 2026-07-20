@@ -13,6 +13,8 @@ export const SETTINGS_TAB_IDS = {
   MAINTENANCE: 'maintenance',
   ADULT: 'adult',
   ADULT_GENERAL: 'adultGeneral',
+  ADULT_MOVIES: 'adultMovies',
+  ADULT_TV_SHOWS: 'adultTvShows',
   ADULT_API: 'adultApi',
 };
 
@@ -28,8 +30,9 @@ export const SETTINGS_TAB_GROUP_IDS = {
 
 export const ADULT_TAB_IDS = [
   SETTINGS_TAB_IDS.ADULT_GENERAL,
+  SETTINGS_TAB_IDS.ADULT_MOVIES,
+  SETTINGS_TAB_IDS.ADULT_TV_SHOWS,
   SETTINGS_TAB_IDS.SCENES,
-  SETTINGS_TAB_IDS.ADULT_API,
 ];
 
 export const ORGANIZATION_TAB_IDS = [

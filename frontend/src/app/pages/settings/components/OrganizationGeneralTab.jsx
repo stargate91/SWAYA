@@ -7,16 +7,18 @@ import { useSettingsFormContext, useSettingsViewContext, useSettingsField } from
 import SettingsLiveImpact from './SettingsLiveImpact.jsx';
 import SettingsSelectField from './fields/SettingsSelectField.jsx';
 import SettingsTextField from './fields/SettingsTextField.jsx';
+import GeneralFoldersSection from './GeneralFoldersSection.jsx';
 import styles from '../SettingsPage.module.css';
 
 export default function OrganizationGeneralTab() {
-  const { form, actions, formInputs } = useSettingsFormContext();
+  const { form, actions } = useSettingsFormContext();
   const { t, casingOptions, separatorOptions, collisionOptions, realBackgroundActive } = useSettingsViewContext();
   const isScanActive = Boolean(realBackgroundActive);
   const collisionStrategyField = useSettingsField('collision_strategy');
 
   return (
     <Stack gap="xl">
+      <GeneralFoldersSection t={t} />
       <Card
         title={t('settingsPage.sections.fileNaming.title')}
         eyebrow={t('settingsPage.sections.fileNaming.eyebrow')}
@@ -108,120 +110,124 @@ export default function OrganizationGeneralTab() {
                 {t('settingsPage.sections.folderStructure.moveToLibraryHint')}
               </span>
 
-              <h3 className="settings-section-heading">
-                {t('settingsPage.sections.folderStructure.rootFoldersTitle')}
-              </h3>
-              <Switch
-                id="folder_sort_by_type"
-                checked={form.folder_sort_by_type}
-                disabled={isScanActive}
-                onChange={actions.handleCheckboxChange('folder_sort_by_type')}
-              >
-                {t('settingsPage.sections.folderStructure.sortByType')}
-              </Switch>
-              <span className={`settings-field-hint ${styles['hint-tight-top']}`}>
-                {t('settingsPage.sections.folderStructure.sortByTypeHint')}
-              </span>
-
-              {form.folder_sort_by_type && (
-                <div className={styles['nested-block']}>
-                  <Stack gap="md">
-                    <Input
-                      label={t('settingsPage.sections.folderStructure.moviesDirName')}
-                      value={form.folder_movies_name}
-                      disabled={isScanActive}
-                      onChange={actions.handleChange('folder_movies_name')}
-                      placeholder={t('settingsPage.sections.folderStructure.defaultMoviesName')}
-                    />
-                    <Input
-                      label={t('settingsPage.sections.folderStructure.tvDirName')}
-                      value={form.folder_tv_name}
-                      disabled={isScanActive}
-                      onChange={actions.handleChange('folder_tv_name')}
-                      placeholder={t('settingsPage.sections.folderStructure.defaultTvName')}
-                    />
-                    <Input
-                      label={t('settingsPage.sections.folderStructure.videosDirName')}
-                      value={form.folder_videos_name}
-                      disabled={isScanActive}
-                      onChange={actions.handleChange('folder_videos_name')}
-                      placeholder={t('settingsPage.sections.folderStructure.defaultVideosName')}
-                    />
-                  </Stack>
-                </div>
-              )}
-
-              {form.include_adult && (
-                <Stack gap="md">
+              {form.folder_move_to_library && (
+                <>
                   <h3 className="settings-section-heading">
-                    {t('settingsPage.sections.folderStructure.adultFoldersTitle')}
+                    {t('settingsPage.sections.folderStructure.rootFoldersTitle')}
                   </h3>
-                  <Input
-                    label={t('settingsPage.sections.folderStructure.adultDirName')}
-                    value={form.folder_adult_name}
-                    disabled={isScanActive}
-                    onChange={actions.handleChange('folder_adult_name')}
-                    placeholder={t('common.adult')}
-                  />
                   <Switch
-                    id="naming_adult_subfolders_enabled"
-                    checked={form.naming_adult_subfolders_enabled}
+                    id="folder_sort_by_type"
+                    checked={form.folder_sort_by_type}
                     disabled={isScanActive}
-                    onChange={actions.handleCheckboxChange('naming_adult_subfolders_enabled')}
+                    onChange={actions.handleCheckboxChange('folder_sort_by_type')}
                   >
-                    {t('settingsPage.sections.folderStructure.organizeAdultByType')}
+                    {t('settingsPage.sections.folderStructure.sortByType')}
                   </Switch>
                   <span className={`settings-field-hint ${styles['hint-tight-top']}`}>
-                    {t('settingsPage.sections.folderStructure.organizeAdultByTypeHint')}
+                    {t('settingsPage.sections.folderStructure.sortByTypeHint')}
                   </span>
-                  {form.naming_adult_subfolders_enabled && (
+
+                  {form.folder_sort_by_type && (
                     <div className={styles['nested-block']}>
                       <Stack gap="md">
                         <Input
-                          label={t('settingsPage.sections.folderStructure.adultMoviesDirName')}
-                          value={form.folder_adult_movies_name}
+                          label={t('settingsPage.sections.folderStructure.moviesDirName')}
+                          value={form.folder_movies_name}
                           disabled={isScanActive}
-                          onChange={actions.handleChange('folder_adult_movies_name')}
-                          placeholder={t('settingsPage.sections.folderStructure.defaultAdultMoviesName')}
+                          onChange={actions.handleChange('folder_movies_name')}
+                          placeholder={t('settingsPage.sections.folderStructure.defaultMoviesName')}
                         />
                         <Input
-                          label={t('settingsPage.sections.folderStructure.adultTvDirName')}
-                          value={form.folder_adult_tv_name}
+                          label={t('settingsPage.sections.folderStructure.tvDirName')}
+                          value={form.folder_tv_name}
                           disabled={isScanActive}
-                          onChange={actions.handleChange('folder_adult_tv_name')}
-                          placeholder={t('settingsPage.sections.folderStructure.defaultAdultTvName')}
+                          onChange={actions.handleChange('folder_tv_name')}
+                          placeholder={t('settingsPage.sections.folderStructure.defaultTvName')}
                         />
                         <Input
-                          label={t('settingsPage.sections.folderStructure.adultScenesDirName')}
-                          value={form.folder_adult_scenes_name}
+                          label={t('settingsPage.sections.folderStructure.videosDirName')}
+                          value={form.folder_videos_name}
                           disabled={isScanActive}
-                          onChange={actions.handleChange('folder_adult_scenes_name')}
-                          placeholder={t('settingsPage.sections.folderStructure.defaultAdultScenesName')}
-                        />
-                        <Input
-                          label={t('settingsPage.sections.folderStructure.adultVideosDirName')}
-                          value={form.folder_adult_videos_name}
-                          disabled={isScanActive}
-                          onChange={actions.handleChange('folder_adult_videos_name')}
-                          placeholder={t('settingsPage.sections.folderStructure.defaultAdultVideosName')}
+                          onChange={actions.handleChange('folder_videos_name')}
+                          placeholder={t('settingsPage.sections.folderStructure.defaultVideosName')}
                         />
                       </Stack>
                     </div>
                   )}
-                </Stack>
-              )}
 
-              <Switch
-                id="folder_remove_empty"
-                checked={form.folder_remove_empty}
-                disabled={isScanActive}
-                onChange={actions.handleCheckboxChange('folder_remove_empty')}
-              >
-                {t('settingsPage.sections.folderStructure.removeEmpty')}
-              </Switch>
-              <span className={`settings-field-hint ${styles['hint-tight-top']}`}>
-                {t('settingsPage.sections.folderStructure.removeEmptyHint')}
-              </span>
+                  {form.include_adult && (
+                    <Stack gap="md">
+                      <h3 className="settings-section-heading">
+                        {t('settingsPage.sections.folderStructure.adultFoldersTitle')}
+                      </h3>
+                      <Input
+                        label={t('settingsPage.sections.folderStructure.adultDirName')}
+                        value={form.folder_adult_name}
+                        disabled={isScanActive}
+                        onChange={actions.handleChange('folder_adult_name')}
+                        placeholder={t('common.adult')}
+                      />
+                      <Switch
+                        id="naming_adult_subfolders_enabled"
+                        checked={form.naming_adult_subfolders_enabled}
+                        disabled={isScanActive}
+                        onChange={actions.handleCheckboxChange('naming_adult_subfolders_enabled')}
+                      >
+                        {t('settingsPage.sections.folderStructure.organizeAdultByType')}
+                      </Switch>
+                      <span className={`settings-field-hint ${styles['hint-tight-top']}`}>
+                        {t('settingsPage.sections.folderStructure.organizeAdultByTypeHint')}
+                      </span>
+                      {form.naming_adult_subfolders_enabled && (
+                        <div className={styles['nested-block']}>
+                          <Stack gap="md">
+                            <Input
+                              label={t('settingsPage.sections.folderStructure.adultMoviesDirName')}
+                              value={form.folder_adult_movies_name}
+                              disabled={isScanActive}
+                              onChange={actions.handleChange('folder_adult_movies_name')}
+                              placeholder={t('settingsPage.sections.folderStructure.defaultAdultMoviesName')}
+                            />
+                            <Input
+                              label={t('settingsPage.sections.folderStructure.adultTvDirName')}
+                              value={form.folder_adult_tv_name}
+                              disabled={isScanActive}
+                              onChange={actions.handleChange('folder_adult_tv_name')}
+                              placeholder={t('settingsPage.sections.folderStructure.defaultAdultTvName')}
+                            />
+                            <Input
+                              label={t('settingsPage.sections.folderStructure.adultScenesDirName')}
+                              value={form.folder_adult_scenes_name}
+                              disabled={isScanActive}
+                              onChange={actions.handleChange('folder_adult_scenes_name')}
+                              placeholder={t('settingsPage.sections.folderStructure.defaultAdultScenesName')}
+                            />
+                            <Input
+                              label={t('settingsPage.sections.folderStructure.adultVideosDirName')}
+                              value={form.folder_adult_videos_name}
+                              disabled={isScanActive}
+                              onChange={actions.handleChange('folder_adult_videos_name')}
+                              placeholder={t('settingsPage.sections.folderStructure.defaultAdultVideosName')}
+                            />
+                          </Stack>
+                        </div>
+                      )}
+                    </Stack>
+                  )}
+
+                  <Switch
+                    id="folder_remove_empty"
+                    checked={form.folder_remove_empty}
+                    disabled={isScanActive}
+                    onChange={actions.handleCheckboxChange('folder_remove_empty')}
+                  >
+                    {t('settingsPage.sections.folderStructure.removeEmpty')}
+                  </Switch>
+                  <span className={`settings-field-hint ${styles['hint-tight-top']}`}>
+                    {t('settingsPage.sections.folderStructure.removeEmptyHint')}
+                  </span>
+                </>
+              )}
             </>
           )}
         </Stack>

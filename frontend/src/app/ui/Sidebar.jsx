@@ -14,6 +14,14 @@ export default function Sidebar({ header, groups, onTabSelect }) {
       )}
       <nav className={styles.menu}>
         {groups.map((group) => {
+          if (group.type === 'section-header') {
+            return (
+              <div key={group.id} className={styles['section-header']}>
+                {group.label}
+              </div>
+            );
+          }
+
           const Icon = group.icon;
           const hasSubItems = !!group.subItems;
 
@@ -40,13 +48,14 @@ export default function Sidebar({ header, groups, onTabSelect }) {
                   className={`${styles['sub-menu']} ${isSubMenuVisible ? styles['is-open'] : styles['is-closed']}`.trim()}
                   aria-hidden={!isSubMenuVisible}
                 >
-                  {activeSubIndex !== -1 && (
-                    <div
-                      className={styles['sub-indicator']}
-                      // eslint-disable-next-line react/forbid-dom-props
-                      style={{ top: `calc(${activeSubIndex} * (2 * var(--space-lg) + var(--space-xs)))` }}
-                    />
-                  )}
+                  <div
+                    className={styles['sub-indicator']}
+                    // eslint-disable-next-line react/forbid-dom-props
+                    style={{
+                      top: `calc(${activeSubIndex === -1 ? 0 : activeSubIndex} * (2 * var(--space-lg) + var(--space-xs)))`,
+                      opacity: activeSubIndex === -1 ? 0 : 1,
+                    }}
+                  />
                   {group.subItems.map((sub) => {
                     return (
                       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -93,7 +102,7 @@ Sidebar.propTypes = {
     PropTypes.shape({
       id: PropTypes.string.isRequired,
       label: PropTypes.string.isRequired,
-      icon: PropTypes.elementType.isRequired,
+      icon: PropTypes.elementType,
       isActive: PropTypes.bool,
       onSelect: PropTypes.func,
       onToggle: PropTypes.func,

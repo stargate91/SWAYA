@@ -12,7 +12,7 @@ import SettingsLiveImpact from './SettingsLiveImpact.jsx';
 import { useSettingsFormContext, useSettingsViewContext } from '../SettingsFormContext.jsx';
 import styles from '../SettingsPage.module.css';
 
-export default function MoviesTab() {
+export default function MoviesTab({ isAdult = false }) {
   const { form, setForm, actions, formInputs } = useSettingsFormContext();
   const { t, collectionModeOptions, realBackgroundActive } = useSettingsViewContext();
   const isScanActive = Boolean(realBackgroundActive);
@@ -25,10 +25,13 @@ export default function MoviesTab() {
     tvName: form.folder_tv_name
   };
 
+  const folderField = isAdult ? 'folder_adult_movie_template' : 'folder_movie_template';
+  const namingField = isAdult ? 'naming_adult_movie_template' : 'naming_movie_template';
+
   return (
     <Stack gap="xl">
       <Card
-        title={t('settingsPage.sections.folderStructure.movieFoldersTitle')}
+        title={isAdult ? t('settingsPage.sections.folderStructure.adultMovieFoldersTitle') : t('settingsPage.sections.folderStructure.movieFoldersTitle')}
         eyebrow={t('settingsPage.sections.folderStructure.structureEyebrow')}
       >
         <Stack gap="lg">
@@ -50,14 +53,14 @@ export default function MoviesTab() {
                 t={t}
                 inputRef={formInputs.folderMovie}
                 label={t('settingsPage.sections.folderStructure.movieTemplate')}
-                value={form.folder_movie_template}
+                value={form[folderField]}
                 disabled={isScanActive}
-                onChange={actions.handleChange('folder_movie_template')}
-                placeholder="{title} ({year})"
+                onChange={actions.handleChange(folderField)}
+                placeholder={isAdult ? "Leave empty to use standard movie folder pattern" : "{title} ({year})"}
                 tags={FOLDER_MOVIE_TAGS}
-                fieldKey="folder_movie_template"
+                fieldKey={folderField}
                 insertTag={actions.insertTag}
-                previewText={getPreview(form.folder_movie_template, 'movie', { isFile: false, sortOptions })}
+                previewText={getPreview(form[folderField] || form.folder_movie_template, 'movie', { isFile: false, sortOptions })}
                 className={`${styles['nested-block']} ${styles['nested-block-top']}`}
               />
             )}
@@ -66,97 +69,99 @@ export default function MoviesTab() {
       </Card>
 
       <Card
-        title={t('settingsPage.sections.fileNaming.movieTemplateLabel')}
+        title={isAdult ? t('settingsPage.sections.folderStructure.adultMovieTemplateLabel') : t('settingsPage.sections.fileNaming.movieTemplateLabel')}
         eyebrow={t('settingsPage.sections.fileNaming.eyebrow')}
       >
         <Stack gap="lg">
           <TemplateFieldSection
             t={t}
             inputRef={formInputs.namingMovie}
-            label={t('settingsPage.sections.fileNaming.movieTemplateLabel')}
-            hint={t('settingsPage.sections.fileNaming.movieTemplateHint')}
-            value={form.naming_movie_template}
+            label={isAdult ? t('settingsPage.sections.folderStructure.adultMovieTemplateLabel') : t('settingsPage.sections.fileNaming.movieTemplateLabel')}
+            hint={isAdult ? "Configure a separate template for adult movies, or leave empty to inherit standard movie naming style." : t('settingsPage.sections.fileNaming.movieTemplateHint')}
+            value={form[namingField]}
             disabled={isScanActive}
-            onChange={actions.handleChange('naming_movie_template')}
-            placeholder="{title} ({year}) {resolution}"
+            onChange={actions.handleChange(namingField)}
+            placeholder={isAdult ? "Leave empty to use standard movie file pattern" : "{title} ({year}) {resolution}"}
             tags={MOVIE_TAGS}
-            fieldKey="naming_movie_template"
+            fieldKey={namingField}
             insertTag={actions.insertTag}
-            previewText={getPreview(form.naming_movie_template, 'movie')}
+            previewText={getPreview(form[namingField] || form.naming_movie_template, 'movie')}
           />
         </Stack>
       </Card>
 
-      <Card
-        title={t('settingsPage.sections.collections.title')}
-        eyebrow={t('settingsPage.sections.collections.eyebrow')}
-      >
-        <Stack>
-          <Switch
-            id="folder_create_collection_dir"
-            checked={form.folder_create_collection_dir}
-            disabled={isScanActive}
-            onChange={(e) => {
-              const checked = e.target.checked;
-              setForm(prev => {
-                const next = { ...prev, folder_create_collection_dir: checked };
-                if (
-                  checked &&
-                  (next.folder_collection_mode === FOLDER_COLLECTION_MODES.NEVER || !next.folder_collection_mode)
-                ) {
-                  next.folder_collection_mode = FOLDER_COLLECTION_MODES.THRESHOLD;
-                }
-                return next;
-              });
-            }}
-          >
-            {t('settingsPage.sections.collections.createCollectionDir')}
-          </Switch>
-          <Hint className={styles['hint-spaced']}>
-            {t('settingsPage.sections.collections.createCollectionDirHint')}
-          </Hint>
+      {!isAdult && (
+        <Card
+          title={t('settingsPage.sections.collections.title')}
+          eyebrow={t('settingsPage.sections.collections.eyebrow')}
+        >
+          <Stack>
+            <Switch
+              id="folder_create_collection_dir"
+              checked={form.folder_create_collection_dir}
+              disabled={isScanActive}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                setForm(prev => {
+                  const next = { ...prev, folder_create_collection_dir: checked };
+                  if (
+                    checked &&
+                    (next.folder_collection_mode === FOLDER_COLLECTION_MODES.NEVER || !next.folder_collection_mode)
+                  ) {
+                    next.folder_collection_mode = FOLDER_COLLECTION_MODES.THRESHOLD;
+                  }
+                  return next;
+                });
+              }}
+            >
+              {t('settingsPage.sections.collections.createCollectionDir')}
+            </Switch>
+            <Hint className={styles['hint-spaced']}>
+              {t('settingsPage.sections.collections.createCollectionDirHint')}
+            </Hint>
 
-          {form.folder_create_collection_dir && (
-            <Stack gap="lg">
-              <Dropdown
-                label={t('settingsPage.sections.collections.collectionMode')}
-                value={form.folder_collection_mode}
-                options={collectionModeOptions}
-                disabled={isScanActive}
-                onChange={actions.handleChange('folder_collection_mode')}
-                hint={t('settingsPage.sections.collections.collectionModeHint')}
-              />
-
-              {shouldShowCollectionThreshold && (
-                <Input
-                  label={t('settingsPage.sections.collections.collectionThreshold')}
-                  value={form.folder_collection_threshold}
+            {form.folder_create_collection_dir && (
+              <Stack gap="lg">
+                <Dropdown
+                  label={t('settingsPage.sections.collections.collectionMode')}
+                  value={form.folder_collection_mode}
+                  options={collectionModeOptions}
                   disabled={isScanActive}
-                  onChange={actions.handleChange('folder_collection_threshold')}
-                  placeholder="3"
-                  type="number"
-                  min="1"
-                  hint={t('settingsPage.sections.collections.collectionThresholdHint')}
+                  onChange={actions.handleChange('folder_collection_mode')}
+                  hint={t('settingsPage.sections.collections.collectionModeHint')}
                 />
-              )}
 
-              <TemplateFieldSection
-                t={t}
-                inputRef={formInputs.folderCollection}
-                label={t('settingsPage.sections.collections.collectionTemplate')}
-                value={form.folder_collection_template}
-                disabled={isScanActive}
-                onChange={actions.handleChange('folder_collection_template')}
-                placeholder="{collection}"
-                tags={['{collection}']}
-                fieldKey="folder_collection_template"
-                insertTag={actions.insertTag}
-                previewText={getPreview(form.folder_collection_template, 'collection', { isFile: false, sortOptions })}
-              />
-            </Stack>
-          )}
-        </Stack>
-      </Card>
+                {shouldShowCollectionThreshold && (
+                  <Input
+                    label={t('settingsPage.sections.collections.collectionThreshold')}
+                    value={form.folder_collection_threshold}
+                    disabled={isScanActive}
+                    onChange={actions.handleChange('folder_collection_threshold')}
+                    placeholder="3"
+                    type="number"
+                    min="1"
+                    hint={t('settingsPage.sections.collections.collectionThresholdHint')}
+                  />
+                )}
+
+                <TemplateFieldSection
+                  t={t}
+                  inputRef={formInputs.folderCollection}
+                  label={t('settingsPage.sections.collections.collectionTemplate')}
+                  value={form.folder_collection_template}
+                  disabled={isScanActive}
+                  onChange={actions.handleChange('folder_collection_template')}
+                  placeholder="{collection}"
+                  tags={['{collection}']}
+                  fieldKey="folder_collection_template"
+                  insertTag={actions.insertTag}
+                  previewText={getPreview(form.folder_collection_template, 'collection', { isFile: false, sortOptions })}
+                />
+              </Stack>
+            )}
+          </Stack>
+        </Card>
+      )}
 
       <SettingsLiveImpact
         form={form}
@@ -164,7 +169,7 @@ export default function MoviesTab() {
         title={t('settingsPage.sections.liveImpact.title')}
         eyebrow={t('settingsPage.sections.liveImpact.eyebrow')}
         hint={t('settingsPage.sections.liveImpact.fileNamingHint')}
-        filterType="movies"
+        filterType={isAdult ? "adult_movies" : "movies"}
       />
     </Stack>
   );

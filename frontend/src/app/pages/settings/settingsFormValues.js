@@ -54,6 +54,11 @@ export const SETTINGS_BASE_DEFAULTS = {
   naming_word_separator: 'space',
   naming_movie_template: '{title} ({year}) {resolution}',
   naming_episode_template: '{tv_title} - S{season}E{episode} - {episode_title}',
+  naming_adult_movie_template: '',
+  folder_adult_movie_template: '',
+  naming_adult_episode_template: '',
+  folder_adult_tv_template: '',
+  folder_adult_season_template: '',
   naming_scene_template: '{studio} - {date} - {performers} - {title} [{resolution}]',
   naming_scene_date_format: '%Y-%m-%d',
   naming_scene_prevent_title_performer: true,
@@ -255,6 +260,8 @@ export function getInitialFormValues(settingsData = null, t = null) {
     naming_word_separator: getStringValue(settingsData.naming_word_separator, defaults.naming_word_separator),
     naming_movie_template: getStringValue(settingsData.naming_movie_template, defaults.naming_movie_template),
     naming_episode_template: getStringValue(settingsData.naming_episode_template, defaults.naming_episode_template),
+    naming_adult_movie_template: getStringValue(settingsData.naming_adult_movie_template, defaults.naming_adult_movie_template),
+    naming_adult_episode_template: getStringValue(settingsData.naming_adult_episode_template, defaults.naming_adult_episode_template),
     naming_scene_template: getStringValue(settingsData.naming_scene_template, defaults.naming_scene_template),
     naming_scene_date_format: getStringValue(settingsData.naming_scene_date_format, defaults.naming_scene_date_format),
     naming_scene_prevent_title_performer: getBooleanValue(settingsData.naming_scene_prevent_title_performer, defaults.naming_scene_prevent_title_performer),
@@ -307,14 +314,17 @@ export function getInitialFormValues(settingsData = null, t = null) {
       defaults.folder_create_movie_subdir
     ),
     folder_movie_template: getStringValue(settingsData.folder_movie_template, defaults.folder_movie_template),
+    folder_adult_movie_template: getStringValue(settingsData.folder_adult_movie_template, defaults.folder_adult_movie_template),
     folder_create_show_dir: getBooleanValue(settingsData.folder_create_show_dir, defaults.folder_create_show_dir),
     folder_tv_template: getStringValue(settingsData.folder_tv_template, defaults.folder_tv_template),
+    folder_adult_tv_template: getStringValue(settingsData.folder_adult_tv_template, defaults.folder_adult_tv_template),
     folder_create_video_subdir: getBooleanValue(settingsData.folder_create_video_subdir, defaults.folder_create_video_subdir),
     folder_create_season_dir: getBooleanValue(
       settingsData.folder_create_season_dir,
       defaults.folder_create_season_dir
     ),
     folder_season_template: getStringValue(settingsData.folder_season_template, defaults.folder_season_template),
+    folder_adult_season_template: getStringValue(settingsData.folder_adult_season_template, defaults.folder_adult_season_template),
     folder_create_episode_dir: getBooleanValue(
       settingsData.folder_create_episode_dir,
       defaults.folder_create_episode_dir

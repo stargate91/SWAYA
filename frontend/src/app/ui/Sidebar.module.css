@@ -19,6 +19,18 @@
   letter-spacing: var(--letter-spacing-wide);
 }
 
+.section-header {
+  font-family: var(--font-display);
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-muted);
+  padding-left: var(--space-lg);
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
 .menu {
   display: flex;
   flex-direction: column;
@@ -87,7 +99,7 @@
   height: calc(2 * var(--space-lg));
   background: var(--color-accent);
   border-radius: var(--radius-sm);
-  transition: top var(--motion-slow), height var(--motion-base);
+  transition: top var(--motion-base), height var(--motion-base);
   pointer-events: none;
 }
 

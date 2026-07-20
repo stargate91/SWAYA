@@ -11,7 +11,8 @@ export const getFolderValidationFieldErrors = (result) => {
     return {
       scanFolder: result.errors.scanFolder || null,
       targetFolder: result.errors.targetFolder || null,
-      general: result.errors.scanFolder || result.errors.targetFolder || null,
+      adultTargetFolder: result.errors.adultTargetFolder || null,
+      general: result.errors.scanFolder || result.errors.targetFolder || result.errors.adultTargetFolder || null,
     };
   }
 
@@ -27,10 +28,12 @@ export const getFolderValidationFieldErrors = (result) => {
   )
     ? code
     : null;
+  const adultTargetFolder = code.includes('adultTargetFolder') ? code : null;
 
   return {
     scanFolder,
     targetFolder,
+    adultTargetFolder,
     general: code || null,
   };
 };

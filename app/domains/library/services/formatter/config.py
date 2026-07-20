@@ -28,6 +28,11 @@ class FormatterConfig:
     movie_file: str = "{title} ({year}) {resolution}"
     episode_file: str = "{tv_title} - S{season}E{episode} - {episode_title}"
     scene_file: str = "{studio} {performers} {date} {title} [{resolution}]"
+    adult_movie_file: str = ""
+    adult_movie_folder: str = ""
+    adult_episode_file: str = ""
+    adult_tv_folder: str = ""
+    adult_season_folder: str = ""
     scene_date_format: str = "%Y-%m-%d"
     scene_prevent_title_performer: bool = True
     scene_tag_limit: int = 0

@@ -107,6 +107,8 @@ def load_formatter_config_from_db(db_session, user_id: int = 1) -> FormatterConf
         config.movie_file = _normalize_template(settings.get("naming_movie_template", config.movie_file))
         config.episode_file = _normalize_template(settings.get("naming_episode_template", config.episode_file))
         config.scene_file = _normalize_template(settings.get("naming_scene_template", config.scene_file))
+        config.adult_movie_file = _normalize_template(settings.get("naming_adult_movie_template", ""))
+        config.adult_episode_file = _normalize_template(settings.get("naming_adult_episode_template", ""))
         config.scene_date_format = settings.get("naming_scene_date_format", config.scene_date_format)
         config.scene_prevent_title_performer = settings.get("naming_scene_prevent_title_performer", config.scene_prevent_title_performer)
         try:
@@ -131,6 +133,10 @@ def load_formatter_config_from_db(db_session, user_id: int = 1) -> FormatterConf
         config.tv_folder = _normalize_template(settings.get("folder_tv_template", config.tv_folder))
         config.season_folder = _normalize_template(settings.get("folder_season_template", config.season_folder))
         config.episode_folder = _normalize_template(settings.get("folder_episode_template", config.episode_folder))
+
+        config.adult_movie_folder = _normalize_template(settings.get("folder_adult_movie_template", ""))
+        config.adult_tv_folder = _normalize_template(settings.get("folder_adult_tv_template", ""))
+        config.adult_season_folder = _normalize_template(settings.get("folder_adult_season_template", ""))
 
         config.extra_video_template = _normalize_template(settings.get("extras_video_template", config.extra_video_template))
         config.extra_sub_template = _normalize_template(settings.get("extras_sub_template", config.extra_sub_template))

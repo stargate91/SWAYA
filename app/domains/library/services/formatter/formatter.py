@@ -96,14 +96,15 @@ class Formatter:
     # Delegated Directory Formatting API
     # =========================================================================
 
-    def format_movie_filename(self, context: Dict[str, Any]) -> str:
-        return self._render(self.config.movie_file, context, is_file=True)
+    def format_movie_filename(self, context: Dict[str, Any], is_adult: bool = False) -> str:
+        movie_file_tmpl = self.config.adult_movie_file if (is_adult and self.config.adult_movie_file) else self.config.movie_file
+        return self._render(movie_file_tmpl, context, is_file=True)
 
     def format_scene_filename(self, context: Dict[str, Any]) -> str:
         return self._render(self.config.scene_file, context, is_file=True)
 
-    def format_movie_foldername(self, context: Dict[str, Any], match: Optional[Any] = None) -> str:
-        return self.directory_formatter.format_movie_foldername(context, match)
+    def format_movie_foldername(self, context: Dict[str, Any], match: Optional[Any] = None, is_adult: bool = False) -> str:
+        return self.directory_formatter.format_movie_foldername(context, match, is_adult=is_adult)
 
     def format_collection_foldername(self, context: Dict[str, Any]) -> str:
         return self.directory_formatter.format_collection_foldername(context)
@@ -117,14 +118,14 @@ class Formatter:
     def _get_collection_total_parts(self, match: Optional[Any]) -> int:
         return self.directory_formatter._get_collection_total_parts(match)
 
-    def format_tv_foldername(self, context: Dict[str, Any]) -> str:
-        return self.directory_formatter.format_tv_foldername(context)
+    def format_tv_foldername(self, context: Dict[str, Any], is_adult: bool = False) -> str:
+        return self.directory_formatter.format_tv_foldername(context, is_adult=is_adult)
 
-    def format_season_foldername(self, context: Dict[str, Any]) -> str:
-        return self.directory_formatter.format_season_foldername(context)
+    def format_season_foldername(self, context: Dict[str, Any], is_adult: bool = False) -> str:
+        return self.directory_formatter.format_season_foldername(context, is_adult=is_adult)
 
-    def format_episode_filename(self, context: Dict[str, Any]) -> str:
-        return self.directory_formatter.format_episode_filename(context)
+    def format_episode_filename(self, context: Dict[str, Any], is_adult: bool = False) -> str:
+        return self.directory_formatter.format_episode_filename(context, is_adult=is_adult)
 
     def format_extra_filename(self, context: Dict[str, Any]) -> str:
         return self.directory_formatter.format_extra_filename(context)

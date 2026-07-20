@@ -9,7 +9,6 @@ import {
 } from './components';
 import Overlay from '@/ui/Overlay';
 import Stack from '@/ui/Stack';
-import { settingsTabGroups } from './settingsTabs.config.js';
 import { SETTINGS_TAB_IDS } from './settingsConstants.js';
 
 export default function SettingsPage() {
@@ -107,12 +106,6 @@ export default function SettingsPage() {
     activeTab,
     optionContext,
   });
-  const activeOrganizationIndex = visibleOrganizationTabs
-    .filter((tab) => tab.isCurrentlyVisible)
-    .findIndex((tab) => tab.id === activeTab);
-  const activeAdultIndex = visibleAdultTabs
-    .filter((tab) => tab.isCurrentlyVisible)
-    .findIndex((tab) => tab.id === activeTab);
   if (settingsQuery.isLoading) {
     return <SettingsLoadingState t={t} />;
   }
@@ -131,25 +124,11 @@ export default function SettingsPage() {
     <Overlay onClose={handleClose} closeLabel={t('settingsPage.closeSettings')}>
       <SettingsSidebar
         t={t}
-        tabGroups={settingsTabGroups}
         visibleOrganizationTabs={visibleOrganizationTabs}
-        activeOrganizationIndex={activeOrganizationIndex}
         visibleAdultTabs={visibleAdultTabs}
-        activeAdultIndex={activeAdultIndex}
         activeTab={activeTab}
-        isOrgExpanded={isOrgExpanded}
-        isOrganizationTabActive={isOrganizationTabActive}
-        isAdultExpanded={isAdultExpanded}
-        isAdultTabActive={isAdultTabActive}
         onTabSelect={setActiveTab}
-        onOrganizationToggle={() => {
-          setActiveTab(SETTINGS_TAB_IDS.PRESETS);
-          setIsOrgExpanded(!isOrgExpanded);
-        }}
-        onAdultToggle={() => {
-          setActiveTab(SETTINGS_TAB_IDS.ADULT_GENERAL);
-          setIsAdultExpanded(!isAdultExpanded);
-        }}
+        includeAdult={form.include_adult}
       />
 
 

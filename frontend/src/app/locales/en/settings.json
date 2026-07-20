@@ -21,13 +21,16 @@
     "tvShows": "TV Shows",
     "scenes": "Scenes",
     "extras": "Extras",
+    "templates": "Templates",
+    "adultTemplates": "Adult Templates",
     "rules": "File Conflicts",
     "apiKeys": "API Keys",
     "advanced": "Advanced",
     "maintenance": "Maintenance",
     "adult": "Adult Content",
     "adultGeneral": "General",
-    "adultApi": "API Integrations"
+    "adultApi": "API Integrations",
+    "system": "System"
   },
   "templateTags": {
     "common": "Common Tags",
@@ -379,6 +382,10 @@
       "movieFoldersTitle": "Movie Folders",
       "tvFoldersTitle": "TV Show Folders",
       "showFoldersTitle": "Show Folders",
+      "adultMovieFoldersTitle": "Adult Movie Folders",
+      "adultTvFoldersTitle": "Adult TV Show Folders",
+      "adultMovieTemplateLabel": "Adult Movie Naming Pattern",
+      "adultEpisodeTemplateLabel": "Adult TV Episode Naming Pattern",
       "seasonEpisodeFoldersTitle": "Season and Episode Folders",
       "createMovieSubdir": "Create Movie Folders",
       "createMovieSubdirHint": "Give each movie its own folder.",
