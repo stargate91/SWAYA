@@ -131,13 +131,6 @@ class RecommendationsService:
             
             # Fetch settings
             blacklist_setting = self.settings.get_setting("adult_tag_blacklist") or ""
-            whitelist_setting = self.settings.get_setting("adult_tag_whitelist") or ""
-            boost_mult_setting = self.settings.get_setting("adult_boost_multiplier")
-            
-            try:
-                boost_multiplier = float(boost_mult_setting) if boost_mult_setting is not None else 1.5
-            except Exception:
-                boost_multiplier = 1.5
 
             import re
 
@@ -157,12 +150,14 @@ class RecommendationsService:
                 "straight": {"straight", "hetero", "heterosexual"},
                 "bdsm": {"bdsm", "sadomasochism", "bondage", "sm"},
                 "anal": {"anal", "analsex", "analcreampie", "firstanal", "doubleanal"},
-                "interracial": {"interracial", "interracialsex"},
+                "interracial": {"interracial", "interracialsex", "ir"},
                 "dp": {"dp", "doublepenetration", "dped", "doubledrilling"},
                 "facial": {"facial", "facials", "facialcumshot", "cumface", "cumonface", "cumonherface", "cumontoface", "cumonmouth", "cumshotfacial", "facialize", "facecumshot"},
                 "fetish": {"fetish", "sexualfetish"},
                 "feet": {"feet", "footfetish"},
                 "parody": {"parody", "parodies"},
+                "bigdick": {"bigdick", "bigcock", "bigcocks", "bigdicks", "bigpenis", "fatcock", "fatdick", "largecock", "largedick", "longcock", "longdick", "hung"},
+                "bbc": {"bbc", "bigblackcock", "bigblackdick", "bigblackdong", "bbcworship", "bigblackcockworship"},
             }
 
             def expand_tags(tag_set):
@@ -174,7 +169,6 @@ class RecommendationsService:
                 return expanded
 
             blacklist = expand_tags({t.strip() for t in blacklist_setting.split(",") if t.strip()})
-            whitelist = expand_tags({t.strip() for t in whitelist_setting.split(",") if t.strip()})
 
             def has_word_match(text, word_set):
                 if not word_set or not text:
@@ -189,22 +183,10 @@ class RecommendationsService:
                 return False
 
             def get_score(x):
-                # Base score calculation
                 pop = float(x.get("popularity") or 0.0)
                 vote_avg = float(x.get("vote_average") or 0.0)
                 vote_cnt = int(x.get("vote_count") or 0)
-                base_score = pop * (vote_avg + 1.0) * math.log10(max(vote_cnt, 2))
-                
-                # Check for whitelist boost
-                has_whitelist_match = False
-                if whitelist:
-                    title_text = f"{x.get('title') or ''} {x.get('original_title') or ''} {x.get('overview') or ''}".lower()
-                    if has_word_match(title_text, whitelist):
-                        has_whitelist_match = True
-                        
-                if has_whitelist_match:
-                    return base_score * boost_multiplier
-                return base_score
+                return pop * (vote_avg + 1.0) * math.log10(max(vote_cnt, 2))
 
             filtered_adult_pool = []
             for item in discover_adult_pool:
@@ -215,10 +197,6 @@ class RecommendationsService:
                 
                 # Blacklist filter check: check if any blacklisted tag/keyword is in title or overview
                 if blacklist and has_word_match(title_text, blacklist):
-                    continue
-                        
-                # Whitelist filter check: if whitelist is specified, item must match at least one keyword in title or overview
-                if whitelist and not has_word_match(title_text, whitelist):
                     continue
                         
                 filtered_adult_pool.append(item)

@@ -100,57 +100,59 @@ class AdultDiscoveryService:
         # 1. Fetch user's local tag preferences using TF-IDF weighted scoring
         tag_weights = {}
         # Tags that describe appearance/demographics/meta — not actual content preferences
-        noise_keywords = {
-            # Hair
-            "brown hair", "blond hair", "blonde hair", "black hair", "red hair",
-            "brunette", "blonde", "brown hair (female)", "brown hair (male)",
-            "blond hair (female)", "black hair (female)", "red hair (female)",
-            "long hair", "short hair", "straight hair", "wavy hair", "curly hair",
-            # Body descriptors
-            "tattoos", "tattoo", "piercings", "piercing", "nose piercing", "navel piercing",
-            "natural tits", "fake boobs", "big tits", "small tits", "big breasts", "medium tits",
-            "big ass", "small ass", "medium ass", "athletic", "athletic woman", "slim",
-            "shaved", "hairy", "tall", "short", "petite", "chubby", "bbw", "average body",
-            "big dick", "innie pussy", "outie pussy", "hairless pussy", "trimmed pussy",
-            "tan lines", "freckles", "gauges",
+        noise_keywords_raw = {
+            # Meta & Technical descriptors
+            "hd available", "4k available", "professional production", "pornstar",
             # Eye color
             "brown eyes", "blue eyes", "green eyes", "hazel eyes",
-            # Skin/ethnicity/nationality
-            "white woman", "white man", "pale skin", "medium skin", "dark skin",
-            "american", "european", "latina woman", "asian", "asian woman",
-            # Production/meta
-            "hd available", "4k available",
-            "indoors", "outdoors", "professional production", "pornstar",
+            # Locations (generic house parts)
             "bedroom", "living room", "home", "bathroom",
-            "nude", "barefoot", "no bra", "no condom",
-            # Clothing that's not a preference
-            "panties", "thong", "lingerie", "dress", "skirt", "short skirt",
-            "tank top", "strapless top", "blouse", "sandals", "casual wear",
-            "stockings", "choker", "necklace", "headband", "leash", "bondage collar",
-            # Gender labels
-            "male - pov", "straight", "twosome",
-            # Too generic
-            "narrative", "3rd person narrative", "taboo",
-            "step brother", "step sister",
-            # Height/body variants with gender suffix
-            "short woman", "tall woman", "short man", "tall man",
-            # Hair (male)
-            "short hair (male)", "bald (male)",
-            # Footwear/accessories
-            "woman's heels", "high heels", "boots", "sneakers",
-            # Generic sex position labels that are too broad
-            "twosome (straight)", "threesome (bgg)", "threesome (bbg)",
-            # Caught/voyeur meta
-            "caught", "voyeur",
-            # Age bracket labels
-            "teen (18-22)", "teen girl (18-22)", "teen boy (18-22)", "milf (30+)",
-            # Other noise
-            "orgasm", "kissing", "rubbing", "moaning", "dirty talk",
-            "cum in mouth", "cum swapping", "swallowing",
-            "adorable", "slutty", "upskirt",
-            "puppy play", "breast play", "dick play",
+            # Generic/Too broad labels
+            "narrative", "3rd person narrative", "taboo", "step brother", "step sister",
             "missing performer (male)",
+            # Dick size / BBC (always noise, handled with synonyms)
+            "big dick", "bbc"
         }
+
+        # Normalize string helper
+        import re
+        def normalize_tag(tag: str) -> str:
+            if not tag:
+                return ""
+            return re.sub(r'[^a-z0-9]', '', tag.lower())
+
+        # Define tag synonyms/aliases for robust filtering (strictly semantic synonyms, in normalized form)
+        TAG_SYNONYMS = {
+            "bisexual": {"bisexual", "bi", "bisex"},
+            "gay": {"gay", "maleonmale", "mm", "homosexual", "gaypornography"},
+            "transgender": {"transgender", "trans", "transexual", "transsexual", "shemale", "ts",
+                            "transwomen", "transwoman", "transgenderwomen", "transgenderwoman",
+                            "transfem", "transontrans", "transonfemale", "transsexuality",
+                            "transpornography", "translesbian"},
+            "straight": {"straight", "hetero", "heterosexual"},
+            "bdsm": {"bdsm", "sadomasochism", "bondage", "sm"},
+            "anal": {"anal", "analsex", "analcreampie", "firstanal", "doubleanal"},
+            "interracial": {"interracial", "interracialsex", "ir"},
+            "dp": {"dp", "doublepenetration", "dped", "doubledrilling"},
+            "facial": {"facial", "facials", "facialcumshot", "cumface", "cumonface", "cumonherface", "cumontoface", "cumonmouth", "cumshotfacial", "facialize", "facecumshot"},
+            "fetish": {"fetish", "sexualfetish"},
+            "feet": {"feet", "footfetish"},
+            "parody": {"parody", "parodies"},
+            "bigdick": {"bigdick", "bigcock", "bigcocks", "bigdicks", "bigpenis", "fatcock", "fatdick", "largecock", "largedick", "longcock", "longdick", "hung"},
+            "bbc": {"bbc", "bigblackcock", "bigblackdick", "bigblackdong", "bbcworship", "bigblackcockworship"},
+        }
+
+        def expand_tags(tag_set):
+            normalized_set = {normalize_tag(t) for t in tag_set}
+            expanded = set(normalized_set)
+            for tag in normalized_set:
+                if tag in TAG_SYNONYMS:
+                    expanded.update({normalize_tag(syn) for syn in TAG_SYNONYMS[tag]})
+            return expanded
+
+        # Expand noise keywords using synonym mappings
+        noise_keywords = expand_tags(noise_keywords_raw)
+
         try:
             # Build tag frequency from metadata_matches.suggested_tags
             tag_counter = Counter()
@@ -181,14 +183,15 @@ class AdultDiscoveryService:
                             tag_rating_count[t_name] = tag_rating_count.get(t_name, 0) + 1
 
             # Frequency-based: high library count = strong preference
-            # Noise is handled by the noise_keywords set, not by IDF
+            # Noise is handled by the expanded noise_keywords set
             for t_name, count in tag_counter.items():
-                if t_name in noise_keywords:
+                norm_t = normalize_tag(t_name)
+                if norm_t in noise_keywords:
                     continue  # Skip noise entirely
                 avg_rating = (tag_rating_sum.get(t_name, 0) / tag_rating_count[t_name]) if tag_rating_count.get(t_name) else 4.0
                 weight = math.log2(1 + count) * avg_rating
                 if weight > 0:
-                    tag_weights[t_name] = weight
+                    tag_weights[norm_t] = weight
 
             # Keep only top 50 signal tags for scoring
             if len(tag_weights) > 50:
@@ -205,15 +208,8 @@ class AdultDiscoveryService:
         ).all()
         in_library_ids = {m.external_id for m in matches}
 
-        # 3. Fetch blacklist and whitelist settings
+        # 3. Fetch blacklist settings
         blacklist_setting = self.settings.get_setting("adult_tag_blacklist") or ""
-        whitelist_setting = self.settings.get_setting("adult_tag_whitelist") or ""
-        boost_mult_setting = self.settings.get_setting("adult_boost_multiplier")
-        
-        try:
-            boost_multiplier = float(boost_mult_setting) if boost_mult_setting is not None else 1.5
-        except Exception:
-            boost_multiplier = 1.5
 
         import re
 
@@ -233,12 +229,14 @@ class AdultDiscoveryService:
             "straight": {"straight", "hetero", "heterosexual"},
             "bdsm": {"bdsm", "sadomasochism", "bondage", "sm"},
             "anal": {"anal", "analsex", "analcreampie", "firstanal", "doubleanal"},
-            "interracial": {"interracial", "interracialsex"},
+            "interracial": {"interracial", "interracialsex", "ir"},
             "dp": {"dp", "doublepenetration", "dped", "doubledrilling"},
             "facial": {"facial", "facials", "facialcumshot", "cumface", "cumonface", "cumonherface", "cumontoface", "cumonmouth", "cumshotfacial", "facialize", "facecumshot"},
             "fetish": {"fetish", "sexualfetish"},
             "feet": {"feet", "footfetish"},
             "parody": {"parody", "parodies"},
+            "bigdick": {"bigdick", "bigcock", "bigcocks", "bigdicks", "bigpenis", "fatcock", "fatdick", "largecock", "largedick", "longcock", "longdick", "hung"},
+            "bbc": {"bbc", "bigblackcock", "bigblackdick", "bigblackdong", "bbcworship", "bigblackcockworship"},
         }
 
         def expand_tags(tag_set):
@@ -250,7 +248,6 @@ class AdultDiscoveryService:
             return expanded
 
         blacklist = expand_tags({t.strip() for t in blacklist_setting.split(",") if t.strip()})
-        whitelist = expand_tags({t.strip() for t in whitelist_setting.split(",") if t.strip()})
 
         # 4. Filter and score scenes
         scored_scenes = []
@@ -270,21 +267,10 @@ class AdultDiscoveryService:
             if blacklist and any(b_tag in scene_tag_names for b_tag in blacklist):
                 continue
 
-            # B. Whitelist check: discard item if whitelist is set and item contains none of the whitelisted tags
-            if whitelist and not any(w_tag in scene_tag_names for w_tag in whitelist):
-                continue
-
             # Calculate preference score: sum of matching signal-tag weights
             score = 0
-            has_whitelist_match = False
             for t_name in scene_tag_names:
                 score += tag_weights.get(t_name, 0)
-                if whitelist and t_name in whitelist:
-                    has_whitelist_match = True
-
-            # C. Whitelist Boost multiplier: multiply score if a whitelisted tag is matched
-            if has_whitelist_match:
-                score = score * boost_multiplier
 
             scored_scenes.append((score, s))
 

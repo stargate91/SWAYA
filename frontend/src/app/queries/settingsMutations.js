@@ -8,6 +8,7 @@ const SETTINGS_INVALIDATION_KEYS = [
   ['organizer-count'],
   ['stats'],
   ['lists'],
+  ['recommendations'],
 ];
 
 export const useUpdateSettingsMutation = () => {
