@@ -106,10 +106,11 @@ export const recommendations = {
     if (includeAdult !== undefined) params.append('include_adult', includeAdult);
     return fetchJson(`/api/recommendations?${params.toString()}`);
   },
-  getRecentlyAdded: (page, limit, includeAdult, language) => {
+  getRecentlyAdded: (page, limit, includeAdult, language, mediaType) => {
     const params = new URLSearchParams({ page: String(page), limit: String(limit) });
     if (includeAdult !== undefined) params.append('include_adult', includeAdult);
     if (language) params.append('language', language);
+    if (mediaType) params.append('media_type', mediaType);
     return fetchJson(`/api/recommendations/recently-added?${params.toString()}`);
   },
   getRecentlyActivatedPeople: (page, limit, includeAdult, gender) => {

@@ -54,13 +54,15 @@ def get_recently_added(
     limit: int = 20,
     include_adult: Optional[bool] = None,
     language: Optional[str] = None,
+    media_type: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
     return RecommendationsService(db, scraper_gateway).get_recently_added_paginated(
         page=page,
         limit=limit,
         include_adult=include_adult,
-        language=language
+        language=language,
+        media_type=media_type
     )
 
 

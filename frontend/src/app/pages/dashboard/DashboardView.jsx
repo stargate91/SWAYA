@@ -28,12 +28,32 @@ const WIDGET_REGISTRY = {
     component: SpotlightWidget,
     titleKey: 'dashboard.widget_spotlight',
     fallbackTitle: 'Spotlight (Trending)',
+    show: (settings, isNsfw) => !isNsfw,
   },
-  recently_added: {
+  recently_added_movies: {
     component: RecentlyAddedWidget,
-    titleKey: 'dashboard.widget_recently_added',
-    fallbackTitle: 'Recently Added',
-    getProps: (settings, lang) => ({ language: lang }),
+    titleKey: 'dashboard.widget_recently_added_movies',
+    fallbackTitle: 'Freshly Added Movies',
+    getProps: (settings, lang) => ({ mediaType: 'movie' }),
+  },
+  recently_added_tv: {
+    component: RecentlyAddedWidget,
+    titleKey: 'dashboard.widget_recently_added_tv',
+    fallbackTitle: 'Freshly Added TV Shows',
+    getProps: (settings, lang) => ({ mediaType: 'tv' }),
+  },
+  recently_added_scenes: {
+    component: RecentlyAddedWidget,
+    titleKey: 'dashboard.widget_recently_added_scenes',
+    fallbackTitle: 'Freshly Added Scenes',
+    getProps: (settings, lang) => ({ mediaType: 'scene' }),
+    show: (settings, isNsfw) => isNsfw,
+  },
+  recently_added_videos: {
+    component: RecentlyAddedWidget,
+    titleKey: 'dashboard.widget_recently_added_videos',
+    fallbackTitle: 'Freshly Added Videos',
+    getProps: (settings, lang) => ({ mediaType: 'video' }),
   },
   recently_activated_people: {
     component: RecentlyActivePeopleWidget,
@@ -45,35 +65,37 @@ const WIDGET_REGISTRY = {
     component: MoviesDiscoveryWidget,
     titleKey: 'dashboard.widget_movies_discovery',
     fallbackTitle: 'Discover Movies',
+    show: (settings, isNsfw) => !isNsfw,
   },
   tv_discovery: {
     component: TvDiscoveryWidget,
     titleKey: 'dashboard.widget_tv_discovery',
     fallbackTitle: 'Discover TV Shows',
+    show: (settings, isNsfw) => !isNsfw,
   },
   top_20: {
     component: TMDBDiscoveryWidget,
     titleKey: 'dashboard.widget_top_20',
     fallbackTitle: 'Top 20 Discoveries',
-    show: (settings) => Boolean(settings?.tmdb_api_key),
+    show: (settings, isNsfw) => !isNsfw && Boolean(settings?.tmdb_api_key),
   },
   adult: {
     component: AdultRecommendationsWidget,
     titleKey: 'dashboard.widget_adult',
     fallbackTitle: 'Adult recommendations',
-    show: (settings) => Boolean(settings?.include_adult),
+    show: (settings, isNsfw) => isNsfw && Boolean(settings?.include_adult),
   },
   stashdb_discovery: {
     component: StashDbDiscoveryWidget,
     titleKey: 'dashboard.widget_stashdb_discovery',
     fallbackTitle: 'StashDB Discovery',
-    show: (settings) => Boolean(settings?.include_adult && settings?.stashdb_api_key),
+    show: (settings, isNsfw) => isNsfw && Boolean(settings?.include_adult && settings?.stashdb_api_key),
   },
   fansdb_discovery: {
     component: FansDbDiscoveryWidget,
     titleKey: 'dashboard.widget_fansdb_discovery',
     fallbackTitle: 'FansDB Discovery',
-    show: (settings) => Boolean(settings?.include_adult && settings?.fansdb_api_key),
+    show: (settings, isNsfw) => isNsfw && Boolean(settings?.include_adult && settings?.fansdb_api_key),
   },
 };
 
@@ -137,9 +159,9 @@ const DashboardView = () => {
 
             const title = t(titleKey) || fallbackTitle;
             const WidgetComponent = widgetConfig.component;
-            const customProps = widgetConfig.getProps ? widgetConfig.getProps(settings, lang) : {};
+            const customProps = widgetConfig.getProps ? widgetConfig.getProps(settings, lang, t) : {};
 
-            const widgetEl = visibleWidgets[key] && <WidgetComponent {...customProps} />;
+            const widgetEl = visibleWidgets[key] && <WidgetComponent {...customProps} title={title} />;
 
             if (widgetEl) {
               return (
@@ -162,6 +184,7 @@ const DashboardView = () => {
         handleOrderChange={handleOrderChange}
         showAdult={showAdult}
         widgetRegistry={WIDGET_REGISTRY}
+        settings={settings}
       />
     </>
   );

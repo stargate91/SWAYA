@@ -10,7 +10,7 @@ import useWatchlistHandler from './useWatchlistHandler';
 import useRecommendationActions from './useRecommendationActions';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 
-export default function useRecentlyAdded() {
+export default function useRecentlyAdded(mediaType) {
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const { data: settings = {} } = useSettingsQuery();
   const includeAdult = settings?.include_adult && sessionMode === 'nsfw';
@@ -36,7 +36,7 @@ export default function useRecentlyAdded() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useRecentlyAddedInfiniteQuery(language, includeAdult);
+  } = useRecentlyAddedInfiniteQuery(language, includeAdult, mediaType);
 
   const handleLoadMoreAdded = () => {
     if (!isFetchingNextPage && hasNextPage) {

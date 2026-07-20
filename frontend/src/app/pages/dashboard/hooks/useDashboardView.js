@@ -6,7 +6,10 @@ import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 const DEFAULT_WIDGETS = {
   continue_watching: true,
   spotlight: true,
-  recently_added: true,
+  recently_added_movies: true,
+  recently_added_tv: true,
+  recently_added_scenes: true,
+  recently_added_videos: true,
   recently_activated_people: true,
   movies_discovery: true,
   tv_discovery: true,
@@ -19,7 +22,10 @@ const DEFAULT_WIDGETS = {
 const DEFAULT_ORDER = [
   'continue_watching',
   'spotlight',
-  'recently_added',
+  'recently_added_movies',
+  'recently_added_tv',
+  'recently_added_scenes',
+  'recently_added_videos',
   'recently_activated_people',
   'movies_discovery',
   'tv_discovery',

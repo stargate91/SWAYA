@@ -19,6 +19,7 @@ export default function DashboardCustomizerDrawer({
   handleOrderChange,
   showAdult,
   widgetRegistry = {},
+  settings = {},
 }) {
   const { t } = useTranslation();
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
@@ -52,7 +53,7 @@ export default function DashboardCustomizerDrawer({
             const widgetConfig = widgetRegistry[key];
             if (!widgetConfig) return null;
 
-            if ((key === 'adult' || key === 'stashdb_discovery' || key === 'fansdb_discovery') && !showAdult) return null;
+            if (widgetConfig.show && !widgetConfig.show(settings, isNsfw)) return null;
 
             const titleKey = typeof widgetConfig.titleKey === 'function'
               ? widgetConfig.titleKey(isNsfw)

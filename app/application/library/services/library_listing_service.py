@@ -47,7 +47,9 @@ class LibraryListingService:
             joinedload(UserOverride.media_item).joinedload(MediaItem.matches).joinedload(MetadataMatch.localizations),
             joinedload(UserOverride.media_item).joinedload(MediaItem.matches).joinedload(MetadataMatch.parent).joinedload(MetadataMatch.parent).joinedload(MetadataMatch.localizations)
         )
-        if not include_adult:
+        if include_adult:
+            query = query.filter(MetadataMatch.is_adult == True)
+        else:
             query = query.filter((MetadataMatch.id.is_(None)) | (MetadataMatch.is_adult == False) | (MetadataMatch.is_adult.is_(None)))
 
         overrides = query.order_by(UserOverride.last_watched_at.desc()).limit(limit).all()

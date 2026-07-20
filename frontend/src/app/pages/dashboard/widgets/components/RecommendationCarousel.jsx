@@ -95,7 +95,7 @@ export const RecommendationCarousel = ({
               key={item.id}
               size={n.isScene ? 'scene' : 'default'}
               className={n.shouldBlur ? 'is-blurred' : ''}
-              aspect={n.isScene ? 'mixed-landscape' : 'poster'}
+              aspect={n.isScene ? 'landscape' : 'poster'}
               imageUrl={posterUrl}
               onClick={() => onCardClick(item)}
               isWatched={item.is_watched}

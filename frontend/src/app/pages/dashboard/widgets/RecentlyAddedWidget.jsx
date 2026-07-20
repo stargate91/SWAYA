@@ -3,7 +3,7 @@ import WidgetShell from '@/ui/WidgetShell';
 import { useTranslation } from '../../../providers/LanguageContext';
 import useRecentlyAdded from './hooks/useRecentlyAdded';
 
-export default function RecentlyAddedWidget() {
+export default function RecentlyAddedWidget({ mediaType, title }) {
   const { t: T } = useTranslation();
   const {
     settings,
@@ -17,7 +17,7 @@ export default function RecentlyAddedWidget() {
     handleLoadMoreAdded,
     hasNextPage,
     isFetchingNextPage,
-  } = useRecentlyAdded();
+  } = useRecentlyAdded(mediaType);
 
   if (!isLoading && !filteredItems?.length) {
     return null;
@@ -26,7 +26,7 @@ export default function RecentlyAddedWidget() {
   return (
     <WidgetShell loading={isLoading} size="lg" transparent={true}>
       <RecommendationCarousel
-        title={T('dashboard.recommendations.recently_added') || 'Recently Added'}
+        title={title || T('dashboard.recommendations.recently_added') || 'Recently Added'}
         items={filteredItems || []}
         watchlistIds={actualWatchlistIds}
         onWatchlist={handleWatchlist}

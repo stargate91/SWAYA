@@ -21,9 +21,9 @@ export const useRecentlyActivatedPeopleInfiniteQuery = (includeAdult, gender) =>
   },
 });
 
-export const useRecentlyAddedInfiniteQuery = (language, includeAdult) => useInfiniteQuery({
-  queryKey: ['recently-added', language, includeAdult],
-  queryFn: ({ pageParam = 1 }) => api.recommendations.getRecentlyAdded(pageParam, 20, includeAdult, language),
+export const useRecentlyAddedInfiniteQuery = (language, includeAdult, mediaType) => useInfiniteQuery({
+  queryKey: ['recently-added', language, includeAdult, mediaType],
+  queryFn: ({ pageParam = 1 }) => api.recommendations.getRecentlyAdded(pageParam, 20, includeAdult, language, mediaType),
   initialPageParam: 1,
   getNextPageParam: (lastPage, allPages) => {
     return lastPage.length === 20 ? allPages.length + 1 : undefined;
