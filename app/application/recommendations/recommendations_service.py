@@ -29,7 +29,7 @@ class RecommendationsService:
         return lang if lang else DEFAULT_FALLBACK_LANGUAGE
 
     def get_recommendations(self, language: Optional[str] = None, include_adult: Optional[bool] = None) -> RecommendationsResponse:
-        watchlist_tmdb_ids = self._fetch_watchlist_tmdb_ids()
+        watchlist_ids = self._fetch_watchlist_ids()
         pref_lang = language or self._preferred_metadata_language()
         
         if include_adult is None:
@@ -182,12 +182,12 @@ class RecommendationsService:
             discover_fansdb=self._get_adult_discovery("fansdb") if include_adult else [],
             top_movie_genre="Action",
             top_tv_genre="Drama",
-            watchlist_item_ids=watchlist_tmdb_ids,
+            watchlist_item_ids=watchlist_ids,
             recently_added=recently_added,
             recently_activated_people=recently_activated_people
         )
 
-    def add_to_watchlist(self, tmdb_id: Optional[Union[int, str]], media_type: str, media_item_id: Optional[int] = None) -> ActionResponse:
+    def add_to_watchlist(self, tmdb_id: Optional[Union[int, str]], media_type: str, media_item_id: Optional[Union[int, str]] = None) -> ActionResponse:
         # Get watchlist ID
         lists = self.lists_service.get_all_lists()
         watchlist = next((lst for lst in lists if lst.name == "Watchlist"), None)
@@ -257,14 +257,20 @@ class RecommendationsService:
             })
         return annotated
 
-    def _fetch_watchlist_tmdb_ids(self) -> List[int]:
+    def _fetch_watchlist_ids(self) -> List[Union[int, str]]:
         watchlist = self.db.query(CustomList).filter(CustomList.name == "Watchlist").first()
         if not watchlist:
             return []
-        return [
-            int(item.match.external_id) for item in watchlist.items
-            if item.match and item.match.provider == Provider.TMDB and item.match.external_id.isdigit()
-        ]
+        ids = []
+        for item in watchlist.items:
+            if item.match:
+                if item.match.provider == Provider.TMDB and item.match.external_id.isdigit():
+                    ids.append(int(item.match.external_id))
+                else:
+                    ids.append(f"{item.match.provider.value}_{item.match.external_id}")
+            elif item.media_item_id:
+                ids.append(item.media_item_id)
+        return ids
 
     def _resolve_local_recommendation_bindings(self, items: List[Dict[str, Any]]) -> Dict[tuple, Dict[str, Any]]:
         movie_ids = set()
@@ -966,7 +972,7 @@ class RecommendationsService:
                     })
             
             result.append({
-                "id": s.get("id"),
+                "id": f"{provider}_{s.get('id')}",
                 "title": s.get("title") or "Unknown",
                 "media_type": "scene",
                 "in_library": False,

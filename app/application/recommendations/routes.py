@@ -14,7 +14,7 @@ router = APIRouter(prefix="/api/v1", tags=["Recommendations"])
 
 class WatchlistRequest(BaseModel):
     tmdb_id: Optional[Union[int, str]] = None
-    media_item_id: Optional[int] = None
+    media_item_id: Optional[Union[int, str]] = None
     type: str = "movie"
 
 @router.get("/recommendations", response_model=RecommendationsResponse)
