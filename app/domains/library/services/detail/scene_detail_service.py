@@ -13,7 +13,7 @@ from app.domains.library.services.detail.detail_mixins import OverrideResolver, 
 # Sub-services
 from app.domains.library.services.detail.scene.cast_builder import SceneCastBuilder
 from app.domains.library.services.detail.scene.playback_resolver import ScenePlaybackResolver
-from app.domains.library.services.detail.scene.metadata_syncer import SceneMetadataSyncer, _queue_image
+from app.domains.library.services.detail.scene.metadata_syncer import SceneMetadataSyncer, _queue_image, _download_image_now
 
 logger = logging.getLogger(__name__)
 
@@ -172,7 +172,7 @@ class SceneDetailService(DetailFormatter):
                     external_id=scene_uuid,
                     ttl_seconds=None # Permanent local cache
                 )
-                # Enqueue scene still, performer profiles, and studio logo
+                # Synchronously download scene still, performer profiles, and studio logo before rendering
                 if self.image_downloader:
                     asset_prefix = f"{effective_provider.value}_{scene_uuid}"
 
@@ -180,9 +180,9 @@ class SceneDetailService(DetailFormatter):
                     if images_list:
                         img_url = images_list[0].get("url") if isinstance(images_list[0], dict) else None
                         if img_url and img_url.startswith(("http://", "https://")):
-                            _queue_image(self.image_downloader, img_url, "scene_stills", asset_prefix)
+                            _download_image_now(self.image_downloader, img_url, "scene_stills", asset_prefix)
 
-                    # Enqueue performer images — GraphQL structure: performers[].performer.images[].url
+                    # Download performer images — GraphQL structure: performers[].performer.images[].url
                     for p_entry in (scene_data.get("performers") or []):
                         perf = p_entry.get("performer") or p_entry
                         p_images = perf.get("images") or []
@@ -191,23 +191,23 @@ class SceneDetailService(DetailFormatter):
                         p_id_val = perf.get("id")
                         if p_img and p_img.startswith(("http://", "https://")) and p_name:
                             p_prefix = f"{effective_provider.value}_{p_id_val}" if (effective_provider and p_id_val) else f"person_{p_name}"
-                            _queue_image(self.image_downloader, p_img, "people", p_prefix)
+                            _download_image_now(self.image_downloader, p_img, "people", p_prefix)
 
-                    # Enqueue studio logo — GraphQL structure: studio.image_path or studio.images[].url
+                    # Download studio logo — GraphQL structure: studio.image_path or studio.images[].url
                     st_data = scene_data.get("studio") or scene_data.get("site") or {}
                     st_images = st_data.get("images") or []
                     st_logo = st_data.get("image_path") or (st_images[0].get("url") if st_images and isinstance(st_images[0], dict) else None)
                     st_name = st_data.get("name")
                     if st_logo and st_logo.startswith(("http://", "https://")) and st_name:
-                        _queue_image(self.image_downloader, st_logo, "logos", f"studio_{st_name}")
+                        _download_image_now(self.image_downloader, st_logo, "logos", f"studio_{st_name}")
 
-                    # Enqueue parent/network studio logo — GraphQL structure: studio.parent.image_path or studio.parent.images[].url
+                    # Download parent/network studio logo — GraphQL structure: studio.parent.image_path or studio.parent.images[].url
                     parent_data = st_data.get("parent") or st_data.get("network") or {}
                     parent_images = parent_data.get("images") or []
                     parent_logo = parent_data.get("image_path") or (parent_images[0].get("url") if parent_images and isinstance(parent_images[0], dict) else None)
                     parent_name = parent_data.get("name")
                     if parent_logo and parent_logo.startswith(("http://", "https://")) and parent_name:
-                        _queue_image(self.image_downloader, parent_logo, "logos", f"studio_{parent_name}")
+                        _download_image_now(self.image_downloader, parent_logo, "logos", f"studio_{parent_name}")
 
         if not scene_data and match:
             from app.shared_kernel.language import LanguageService
@@ -313,8 +313,8 @@ class SceneDetailService(DetailFormatter):
         
         if not studio_logo:
             studio_images = studio_data.get("images") or []
-            studio_logo = studio_data.get("image_path") or (studio_images[0].get("url") if studio_images else (studio_data.get("logo") or studio_data.get("image") or studio_data.get("poster")))
-            if studio_name and studio_logo:
+            studio_logo = studio_images[0].get("url") if studio_images else (studio_data.get("logo") or studio_data.get("image") or studio_data.get("poster"))
+            if studio_name and studio_logo and studio_logo.startswith(("http://", "https://")):
                 studio_db = db.query(Studio).filter(Studio.name == studio_name).first()
                 if studio_db and not studio_db.logo_path:
                     studio_db.logo_path = studio_logo
@@ -334,8 +334,8 @@ class SceneDetailService(DetailFormatter):
                 
         if not parent_logo:
             parent_images = parent_data.get("images") or []
-            parent_logo = parent_data.get("image_path") or (parent_images[0].get("url") if parent_images else (parent_data.get("logo") or parent_data.get("image") or parent_data.get("poster")))
-            if parent_name and parent_logo:
+            parent_logo = parent_images[0].get("url") if parent_images else (parent_data.get("logo") or parent_data.get("image") or parent_data.get("poster"))
+            if parent_name and parent_logo and parent_logo.startswith(("http://", "https://")):
                 parent_studio_db = db.query(Studio).filter(Studio.name == parent_name).first()
                 if parent_studio_db and not parent_studio_db.logo_path:
                     parent_studio_db.logo_path = parent_logo

@@ -50,6 +50,32 @@ def _queue_image(image_downloader: ImageDownloadPort, path: Optional[str], subfo
     return f"{subfolder}/{filename}"
 
 
+def _download_image_now(image_downloader: ImageDownloadPort, path: Optional[str], subfolder: str, prefix: str) -> Optional[str]:
+    """Download a remote image asset synchronously to disk before response rendering."""
+    if not path:
+        return None
+
+    url = image_downloader.get_download_url(path, subfolder)
+    if not url:
+        return None
+
+    basename = os.path.basename(urlparse(path).path)
+    if not basename:
+        return None
+
+    ext = os.path.splitext(basename)[1].lower()
+    if ext not in {'.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg'}:
+        ext = ".png"
+        basename = f"{basename}{ext}"
+
+    safe_prefix = re.sub(r"[^A-Za-z0-9_.-]+", "_", prefix).strip("_")
+    filename = f"{safe_prefix}_{basename}"
+    res = image_downloader.download_now(url, subfolder, filename)
+    if res:
+        return f"{subfolder}/{filename}"
+    return None
+
+
 class SceneMetadataSyncer:
     def sync_metadata(
         self,

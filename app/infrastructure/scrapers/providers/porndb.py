@@ -312,7 +312,6 @@ class PornDBScraper(BaseScraper):
             if res_data:
                 mapped_data = self._map_rest_scene_to_graphql(res_data)
                 mapped_data = self.enrich_scene_ratings(mapped_data)
-                logger.info(f"[DEBUG PORNDB STUDIO RAW] scene_id={scene_id} studio={mapped_data.get('studio')}")
                 self.cache.set(Provider.PORNDB, cache_key, mapped_data, status_code=200, media_type=MediaType.SCENE, external_id=scene_id)
                 return mapped_data
 
