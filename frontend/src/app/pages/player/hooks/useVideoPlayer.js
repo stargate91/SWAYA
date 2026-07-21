@@ -289,6 +289,8 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     setTrackList: state.setTrackList,
     setSubDelay: state.setSubDelay,
     setAudioDelay: state.setAudioDelay,
+    setIsPip: state.setIsPip,
+    setVideoParams: state.setVideoParams,
     countdownIntervalRef,
     updateStatusMutation,
   });

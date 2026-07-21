@@ -61,6 +61,7 @@ class Person(Base):
     localizations: Mapped[List["PersonLocalization"]] = relationship(back_populates="person", cascade="all, delete-orphan")
     external_links: Mapped[List["ExternalSourceLink"]] = relationship(back_populates="person", cascade="all, delete-orphan")
     filmography_caches: Mapped[List["RemoteFilmographyCache"]] = relationship(back_populates="person", cascade="all, delete-orphan")
+    overrides: Mapped[List["UserOverride"]] = relationship("UserOverride", back_populates="person", cascade="all, delete-orphan")
 
     @property
     def availability_type(self) -> str:
@@ -101,6 +102,7 @@ class MediaPersonLink(Base):
     order: Mapped[int] = mapped_column(Integer, default=0)
     
     person: Mapped["Person"] = relationship(back_populates="media_links")
+    match: Mapped["MetadataMatch"] = relationship("MetadataMatch", back_populates="people_links")
 
 class ExternalSourceLink(Base):
     __tablename__ = "external_source_links"

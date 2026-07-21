@@ -82,6 +82,56 @@ class PeopleSearchResponse(BaseModel):
     offset: int
     limit: int
 
+# --- Unified Frontend DTOs for People ---
+
+class PersonCardDTO(BaseSchema):
+    """Clean, light-weight Person card DTO used for UI performer grids, search & lists."""
+    id: int
+    name: str
+    availability_type: str # "in_library" or "tracked_only"
+    person_status: str     # "LOCAL_ACTOR", "TRACKED_REMOTE", "DISCOVERED"
+    is_adult: bool
+    profile_url: str
+    backdrop_url: str
+    popularity: Optional[float] = None
+    rating_porndb: Optional[float] = None
+    library_count: int = 0
+    is_favorite: bool = False
+
+class PersonDetailDTO(PersonCardDTO, NumericAttributesMixin):
+    """Extended detail page DTO for Person profile views."""
+    aliases: List[str] = []
+    biography: Optional[str] = None
+    birthday: Optional[str] = None
+    deathday: Optional[str] = None
+    place_of_birth: Optional[str] = None
+    gender: Optional[int] = None
+    known_for_department: Optional[str] = None
+    homepage: Optional[str] = None
+    career_start_year: Optional[int] = None
+    career_end_year: Optional[int] = None
+    
+    # Physical / Adult Attributes
+    hair_color: Optional[str] = None
+    eye_color: Optional[str] = None
+    ethnicity: Optional[str] = None
+    height: Optional[int] = None
+    weight: Optional[int] = None
+    measurements: Optional[str] = None
+    cup_size: Optional[str] = None
+    band_size: Optional[int] = None
+    waist: Optional[int] = None
+    hip: Optional[int] = None
+    breast_type: Optional[str] = None
+    butt_shape: Optional[str] = None
+    butt_size: Optional[str] = None
+    tattoos: Optional[str] = None
+    piercings: Optional[str] = None
+    
+    external_ids: dict[str, str] = {}
+    gallery_urls: List[str] = []
+    user_comment: Optional[str] = None
+
 class PersonCreditItem(BaseSchema):
     id: Any
     title: str

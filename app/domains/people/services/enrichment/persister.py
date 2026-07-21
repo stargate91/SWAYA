@@ -89,6 +89,7 @@ def apply_enriched_data(enricher, person: Person, data: dict):
 
     profile_path = person.profile_path
     if profile_path:
+        existing_file = None
         tmdb_id = person.external_ids.get("tmdb") if person.external_ids else None
         
         from app.domains.media_assets.services.images import image_processing_service

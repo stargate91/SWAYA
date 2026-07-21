@@ -515,6 +515,7 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
       mpvPlayerWindow.setAlwaysOnTop(true, 'screen-saver');
 
       if (controlsWindow && !controlsWindow.isDestroyed()) {
+        controlsWindow.setParentWindow(null);
         controlsWindow.setResizable(true);
         controlsWindow.setMinimumSize(280, 157);
         controlsWindow.setMaximumSize(960, 540);
@@ -530,6 +531,7 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
       }
     } else {
       if (controlsWindow && !controlsWindow.isDestroyed()) {
+        controlsWindow.setParentWindow(mpvPlayerWindow);
         controlsWindow.setResizable(false);
       }
       mpvPlayerWindow.setAlwaysOnTop(false);

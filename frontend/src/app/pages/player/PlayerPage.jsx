@@ -132,10 +132,13 @@ export default function PlayerPage() {
       <div
         className="player-page player-page--transparent player-page--pip"
         onMouseMove={handleMouseMove}
-        onWheel={handleWheel}
-        onDoubleClick={handleDoubleClick}
       >
         <div className="player-page__pip-drag-handle" />
+        <div 
+          className="player-page__pip-interactive-area" 
+          onWheel={handleWheel}
+          onDoubleClick={handleDoubleClick}
+        />
         <div className="player-page__pip-overlay">
           <button className="player-page__pip-btn" onClick={handleMinimizePip}>
             <Minimize2 size={16} />

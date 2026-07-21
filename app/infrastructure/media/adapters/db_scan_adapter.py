@@ -108,7 +108,13 @@ class DbScanAdapter(ScanPort):
 
     def get_metadata_match_ids_for_media_items(self, item_ids: List[int]) -> List[int]:
         matches = self.db.query(MetadataMatch).filter(MetadataMatch.media_item_id.in_(item_ids)).all()
-        return [m.id for m in matches]
+        result_ids = set(m.id for m in matches)
+        for m in matches:
+            curr = m
+            while curr and curr.parent_id:
+                result_ids.add(curr.parent_id)
+                curr = self.db.get(MetadataMatch, curr.parent_id)
+        return list(result_ids)
 
     def get_items_for_scan_retry(self, scan_mode: Any) -> List[Any]:
         review_statuses = [ItemStatus.NO_MATCH, ItemStatus.UNCERTAIN, ItemStatus.MULTIPLE, ItemStatus.ERROR]

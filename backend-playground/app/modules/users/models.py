@@ -55,6 +55,9 @@ class User(Base):
     )
     overrides: Mapped[List["UserOverride"]] = relationship("UserOverride", back_populates="user", cascade="all, delete-orphan")
     custom_lists: Mapped[List["CustomList"]] = relationship("CustomList", back_populates="user", cascade="all, delete-orphan")
+    playback_logs: Mapped[List["PlaybackLog"]] = relationship(
+        "PlaybackLog", back_populates="user", cascade="all, delete-orphan"
+    )
 
 class Tag(Base):
     __tablename__ = "tags"
@@ -115,6 +118,11 @@ class UserOverride(Base):
     is_tracked: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     
     user: Mapped["User"] = relationship("User", back_populates="overrides")
+    media_item: Mapped[Optional["MediaItem"]] = relationship("MediaItem", back_populates="overrides")
+    metadata_match: Mapped[Optional["MetadataMatch"]] = relationship("MetadataMatch", back_populates="overrides")
+    person: Mapped[Optional["Person"]] = relationship("Person", back_populates="overrides")
+    studio: Mapped[Optional["Studio"]] = relationship("Studio", back_populates="overrides")
+    collection: Mapped[Optional["MediaCollection"]] = relationship("MediaCollection", back_populates="overrides")
     tags: Mapped[List["Tag"]] = relationship(
         "Tag", secondary=user_override_tags, back_populates="overrides"
     )

@@ -59,3 +59,39 @@ class MetadataResolveRequest(BaseSchema):
 
 class BulkResolveRequest(BaseSchema):
     resolutions: List[MetadataResolveRequest]
+
+# --- Unified Frontend DTOs ---
+
+class MediaCardDTO(BaseSchema):
+    """Clean, light-weight card DTO used across UI grids, search, recommendations & lists."""
+    id: int
+    media_item_id: Optional[int] = None
+    title: str
+    year: Optional[int] = None
+    media_type: str
+    availability_type: str # "in_library" or "tracked_only"
+    is_adult: bool
+    rating: Optional[float] = None
+    poster_url: str
+    backdrop_url: str
+    user_rating: Optional[float] = None
+    is_favorite: bool = False
+    is_watched: bool = False
+
+class MediaDetailDTO(MediaCardDTO):
+    """Extended detail page DTO inheriting all card fields + adding full metadata context."""
+    release_date: Optional[str] = None
+    overview: Optional[str] = None
+    tagline: Optional[str] = None
+    runtime: Optional[int] = None
+    vote_count_tmdb: Optional[int] = None
+    vote_count_imdb: Optional[int] = None
+    genres: List[str] = []
+    studios: List[str] = []
+    director: Optional[str] = None
+    cast: List[dict[str, Any]] = []
+    stills: List[str] = []
+    provider_ids: dict[str, str] = {}
+    user_comment: Optional[str] = None
+    custom_tags: List[str] = []
+    file_info: Optional[dict[str, Any]] = None
