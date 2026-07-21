@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 
 from app.core.database import get_db
-from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
-from app.domains.library.services.library_service import LibraryService
+from app.modules.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+from app.modules.library.services.library_service import LibraryService
 from app.modules.metadata.schemas import MetadataMatchRead
 from app.modules.library.schemas import (
     MediaItemRead,
@@ -21,18 +21,18 @@ from app.modules.library.schemas import (
     TvSeasonDetailResponse,
     CollectionDetailResponse,
 )
-from app.application.people.schemas import PeopleGroupItem
-from app.application.library.services.library_stats_service import LibraryStatsService
-from app.application.library.services.library_listing_service import LibraryListingService
-from app.application.library.services.library_collection_service import LibraryCollectionService
-from app.application.library.services.library_filter_service import LibraryFilterService
+from app.modules.people.schemas import PeopleGroupItem
+from app.modules.library.services.library_stats_service import LibraryStatsService
+from app.modules.library.services.library_listing_service import LibraryListingService
+from app.modules.library.services.library_collection_service import LibraryCollectionService
+from app.modules.library.services.library_filter_service import LibraryFilterService
 from typing import Union
-from app.domains.people.services.people_library_service import PeopleLibraryService
-from app.domains.library.services.detail.movie_detail_service import MovieDetailService
-from app.domains.library.services.detail.tv_detail_service import TvDetailService
-from app.domains.library.services.detail.scene_detail_service import SceneDetailService
-from app.domains.library.services.detail.collection_detail_service import CollectionDetailService
-from app.shared_kernel.ports.scrapers import ScraperGatewayPort
+from app.modules.people.services.people_library_service import PeopleLibraryService
+from app.modules.library.services.detail.movie_detail_service import MovieDetailService
+from app.modules.library.services.detail.tv_detail_service import TvDetailService
+from app.modules.library.services.detail.scene_detail_service import SceneDetailService
+from app.modules.library.services.detail.collection_detail_service import CollectionDetailService
+
 
 # Mainstream (SFW) Media Router
 mainstream_router = APIRouter(prefix="/api/v1/mainstream/media", tags=["Mainstream Media"])
@@ -78,15 +78,15 @@ def list_libraries(db: Session = Depends(get_db)):
 
 @library_router.get("/library/stats", response_model=LibraryStatsResponse)
 def get_stats(db: Session = Depends(get_db), include_adult: bool = False):
-    from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+    from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
     return LibraryStatsService(db, settings_port=DbSettingsAdapter(db)).get_stats(include_adult=include_adult)
 
 
 @library_router.get("/library/continue-watching", response_model=List[ContinueWatchingItem])
 def get_continue_watching(db: Session = Depends(get_db), limit: int = 12, include_adult: bool = False):
-    from app.infrastructure.media.db_media_resolver import DbMediaResolver
-    from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
-    from app.infrastructure.playback.playback_monitor import active_sessions
+    from app.modules.library.db_media_resolver import DbMediaResolver
+    from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
+    from app.modules.history.playback.playback_monitor import active_sessions
     return LibraryListingService(
         db,
         library_port=DbMediaResolver(db),
@@ -127,8 +127,8 @@ def get_library_items(
     filter_butt_shape: Optional[str] = None,
     filter_butt_size: Optional[str] = None,
 ):
-    from app.infrastructure.media.db_media_resolver import DbMediaResolver
-    from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+    from app.modules.library.db_media_resolver import DbMediaResolver
+    from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
     service = LibraryListingService(db, library_port=DbMediaResolver(db), settings_port=DbSettingsAdapter(db))
     if tab:
         tags_list = None
@@ -170,7 +170,7 @@ def get_library_items(
 
 @library_router.get("/library/tags", response_model=List[TagGroupItem])
 def get_library_tags(db: Session = Depends(get_db), is_adult: bool = False):
-    from app.infrastructure.repositories.db_user_repository import DbUserRepository
+    from app.modules.users.db_user_repository import DbUserRepository
     user_repo = DbUserRepository(db)
     return LibraryFilterService(db, user_repository=user_repo).get_tag_groups(is_adult)
 
@@ -203,8 +203,8 @@ def get_library_filters(
     filter_butt_shape: Optional[str] = None,
     filter_butt_size: Optional[str] = None,
 ):
-    from app.infrastructure.repositories.db_user_repository import DbUserRepository
-    from app.domains.library.services.listing.filter_params import ListingFilterParams
+    from app.modules.users.db_user_repository import DbUserRepository
+    from app.modules.library.services.listing.filter_params import ListingFilterParams
     user_repo = DbUserRepository(db)
     
     tags_list = None
@@ -249,8 +249,8 @@ def get_movie_collections(
     tab: str = "movies",
     include_adult: bool = False,
 ):
-    from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
-    from app.infrastructure.scrapers.providers.tmdb import TMDBScraper
+    from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
+    from app.modules.scrapers.providers.tmdb import TMDBScraper
     return LibraryCollectionService(
         db,
         settings_port=DbSettingsAdapter(db),
@@ -275,7 +275,7 @@ def get_library_people(
     tab: str = "people",
     include_adult: bool = False,
 ):
-    from app.infrastructure.media.db_media_resolver import DbMediaResolver
+    from app.modules.library.db_media_resolver import DbMediaResolver
     return PeopleLibraryService(db, library_port=DbMediaResolver(db)).get_people_group(
         role=role,
         filter_status=filter_status,
@@ -287,7 +287,7 @@ def get_library_people(
 
 
 def get_scraper_gateway() -> ScraperGatewayPort:
-    from app.infrastructure.scrapers.support.gateway import scraper_gateway
+    from app.modules.scrapers.support.gateway import scraper_gateway
     return scraper_gateway
 
 DETAIL_DISPATCH = {
@@ -302,7 +302,7 @@ def get_library_item_detail(
     full_people: bool = False,
     media_type: Optional[str] = None,
     db: Session = Depends(get_db),
-    scrapers: ScraperGatewayPort = Depends(get_scraper_gateway)
+    scrapers: Any = Depends(get_scraper_gateway)
 ):
     # Explicit media_type from query param
     if media_type and media_type.lower() in DETAIL_DISPATCH:
@@ -339,7 +339,7 @@ def get_library_tv_detail(
     initial_episodes_limit: int = 999,
     language: str = None,
     db: Session = Depends(get_db),
-    scrapers: ScraperGatewayPort = Depends(get_scraper_gateway)
+    scrapers: Any = Depends(get_scraper_gateway)
 ):
     return TvDetailService(db, scrapers).get_library_tv_detail(
         tv_tmdb_id, seasons_limit=seasons_limit, initial_episodes_limit=initial_episodes_limit, language=language
@@ -351,7 +351,7 @@ def get_library_tv_season_detail(
     tv_tmdb_id: str,
     season_number: int,
     db: Session = Depends(get_db),
-    scrapers: ScraperGatewayPort = Depends(get_scraper_gateway)
+    scrapers: Any = Depends(get_scraper_gateway)
 ):
     return TvDetailService(db, scrapers).get_library_tv_season_detail(tv_tmdb_id, season_number)
 
@@ -361,6 +361,6 @@ def get_library_collection_detail(
     collection_tmdb_id: str,
     language: str | None = None,
     db: Session = Depends(get_db),
-    scrapers: ScraperGatewayPort = Depends(get_scraper_gateway)
+    scrapers: Any = Depends(get_scraper_gateway)
 ):
     return CollectionDetailService(db, scrapers, image_downloader=TasksImageDownloadAdapter()).get_collection_detail(collection_tmdb_id, language=language)

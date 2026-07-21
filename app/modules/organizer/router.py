@@ -4,9 +4,9 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 from app.core.database import get_db
-from app.application.organizer.organizer_service import OrganizerService
+from app.modules.organizer.services.organizer_service import OrganizerService
 from app.modules.organizer.schemas import OrganizerGroupsResponse, ActionResponse
-from app.infrastructure.scrapers.support.gateway import scraper_gateway
+from app.modules.scrapers.support.gateway import scraper_gateway
 
 router = APIRouter(prefix="/api/v1", tags=["Organizer"])
 

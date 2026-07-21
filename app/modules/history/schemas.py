@@ -50,3 +50,29 @@ class ActionBatchRead(BaseSchema):
     is_reversible: bool
     created_at: datetime
     logs: List[ActionLogRead] = []
+
+class HistoryLogItem(BaseModel):
+    id: int
+    old_value: Optional[str] = None
+    new_value: Optional[str] = None
+    status: str
+    error_message: Optional[str] = None
+
+class HistoryBatchItem(BaseModel):
+    id: int
+    name: str
+    created_at: str
+    success_count: int
+    failed_count: int
+    movie_count: int
+    episode_count: int
+    extra_count: int
+    remaining_count: int
+    undone_count: int
+    status: str
+    logs: List[HistoryLogItem]
+
+class HistoryResponse(BaseModel):
+    items: List[HistoryBatchItem]
+    page: int
+    has_more: bool

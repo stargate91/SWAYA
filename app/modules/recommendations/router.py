@@ -4,9 +4,9 @@ from typing import Optional
 from pydantic import BaseModel
 
 from app.core.database import get_db
-from app.application.recommendations.recommendations_service import RecommendationsService
+from app.modules.recommendations.services.recommendations_service import RecommendationsService
 from app.modules.recommendations.schemas import RecommendationsResponse, ActionResponse
-from app.infrastructure.scrapers.support.gateway import scraper_gateway
+from app.modules.scrapers.support.gateway import scraper_gateway
 
 from typing import Union
 

@@ -36,15 +36,36 @@ class MetadataMatchRead(BaseSchema):
     episode_number: Optional[Any] = None
     number_of_seasons: Optional[int] = None
     number_of_episodes: Optional[int] = None
+
     rating_tmdb: Optional[float] = None
     rating_porndb: Optional[float] = None
     rating_imdb: Optional[float] = None
+    rating_rotten: Optional[str] = None
+    rating_meta: Optional[int] = None
+    vote_count_tmdb: Optional[int] = None
+    vote_count_imdb: Optional[int] = None
+    budget: Optional[int] = None
+    revenue: Optional[int] = None
+    release_status: Optional[str] = None
+    tv_type: Optional[str] = None
+    release_date: Optional[datetime] = None
+    last_air_date: Optional[datetime] = None
     popularity: Optional[float] = None
     runtime: Optional[int] = None
     imdb_id: Optional[str] = None
     original_title: Optional[str] = None
+    backdrop_path: Optional[str] = None
+    local_backdrop_path: Optional[str] = None
+    still_path: Optional[str] = None
+    local_still_path: Optional[str] = None
+    suggested_tags: Optional[List[str]] = None
+    stills: Optional[List[str]] = None
+    local_stills: Optional[List[str]] = None
+    fetched_locales: Optional[List[str]] = None
+    raw_metadata: Optional[dict[str, Any]] = None
     is_active: bool
     is_adult: bool
+    confidence_score: float
 
 class MetadataResolveRequest(BaseSchema):
     item_id: int
@@ -59,6 +80,14 @@ class MetadataResolveRequest(BaseSchema):
 
 class BulkResolveRequest(BaseSchema):
     resolutions: List[MetadataResolveRequest]
+
+class GenericSuccessResponse(BaseSchema):
+    status: str = "success"
+    message: Optional[str] = None
+
+class BulkActionResponse(BaseSchema):
+    status: str = "success"
+    count: int = 0
 
 # --- Unified Frontend DTOs ---
 

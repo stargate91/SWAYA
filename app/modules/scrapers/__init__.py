@@ -1,1 +1,1 @@
-# app/modules/scrapers/__init__.py
+from .scraper_service import ScraperService

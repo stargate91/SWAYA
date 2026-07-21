@@ -18,7 +18,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.core.database import init_databases
 from app.core.logging import setup_logger
-from app.domains.media_assets.services.images import image_processing_service
+from app.modules.media_assets.services.images import image_processing_service
 
 # Setup logging
 setup_logger()
@@ -47,7 +47,7 @@ async def lifespan(app: FastAPI):
             session.commit()
     
     # Ensure image folders are created
-    from app.shared_kernel.ports.image_service_port import ImageServiceRegistry
+    
     ImageServiceRegistry.register(image_processing_service)
     image_processing_service.ensure_folders()
     logger.info("Image directories ensured.")
@@ -55,17 +55,17 @@ async def lifespan(app: FastAPI):
     # Clean preview cache on startup
     try:
         from app.core.database import SessionLocal
-        from app.domains.library.tasks.preview_cleanup import clean_preview_cache
+        from app.modules.library.tasks.preview_cleanup import clean_preview_cache
         with SessionLocal() as db_session:
             clean_preview_cache(db_session)
     except Exception as e:
         logger.error(f"Failed to run preview cache cleanup on startup: {e}")
     
     # Start background download worker on the main event loop
-    from app.domains.tasks import task_manager
-    from app.infrastructure.scrapers.support.gateway import scraper_gateway
-    from app.application.people.enrich_worker import PeopleEnrichWorker
-    from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+    from app.modules.tasks import task_manager
+    from app.modules.scrapers.support.gateway import scraper_gateway
+    from app.modules.people.enrich_worker import PeopleEnrichWorker
+    from app.modules.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
     
     image_downloader = TasksImageDownloadAdapter(task_manager.download_worker)
     
@@ -79,10 +79,10 @@ async def lifespan(app: FastAPI):
     await task_manager.download_worker.start()
     await task_manager.people_enrich_worker.start()
     if sys.platform == "win32":
-        from app.infrastructure.playback.hotkey_listener import start_hotkey_listener
+        from app.modules.history.playback.hotkey_listener import start_hotkey_listener
         start_hotkey_listener()
     
-    from app.infrastructure.filesystem.folder_watcher import start_watcher, stop_watcher
+    from app.modules.library.filesystem.folder_watcher import start_watcher, stop_watcher
     start_watcher()
     
     yield
@@ -144,17 +144,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from app.application.tasks.routes import router as tasks_router  # noqa: E402
-from app.application.library.routes import router as media_router, mainstream_router as media_mainstream_router, adult_router as media_adult_router, library_router  # noqa: E402
-from app.application.metadata.routes import library_router as metadata_router  # noqa: E402
-from app.application.people.routes import router as people_router, mainstream_router as people_mainstream_router, adult_router as people_adult_router  # noqa: E402
-from app.application.settings.routes import router as settings_router, db_router  # noqa: E402
-from app.application.users.routes import router as users_router, catalog_router  # noqa: E402
-from app.application.history.routes import router as history_router  # noqa: E402
-from app.application.media.routes import router as app_media_router  # noqa: E402
-from app.application.media.playback_routes import router as app_playback_router  # noqa: E402
-from app.application.recommendations.routes import router as app_rec_router  # noqa: E402
-from app.application.organizer.routes import router as app_organizer_router  # noqa: E402
+from app.modules.tasks.router import router as tasks_router  # noqa: E402
+from app.modules.library.router import router as media_router, mainstream_router as media_mainstream_router, adult_router as media_adult_router, library_router  # noqa: E402
+from app.modules.metadata.router import library_router as metadata_router  # noqa: E402
+from app.modules.people.router import router as people_router, mainstream_router as people_mainstream_router, adult_router as people_adult_router  # noqa: E402
+from app.modules.settings.router import router as settings_router, db_router  # noqa: E402
+from app.modules.users.router import router as users_router, catalog_router  # noqa: E402
+from app.modules.history.router import router as history_router  # noqa: E402
+from app.modules.media.router import router as app_media_router  # noqa: E402
+from app.modules.recommendations.router import router as app_rec_router  # noqa: E402
+from app.modules.organizer.router import router as app_organizer_router  # noqa: E402
 
 app.include_router(tasks_router)
 app.include_router(media_router)
@@ -171,7 +170,6 @@ app.include_router(users_router)
 app.include_router(catalog_router)
 app.include_router(history_router)
 app.include_router(app_media_router)
-app.include_router(app_playback_router)
 app.include_router(app_rec_router)
 app.include_router(app_organizer_router)
 

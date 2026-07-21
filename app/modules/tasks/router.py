@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from typing import List
 
 from app.modules.tasks.schemas import BackgroundTaskRead
-from app.domains.tasks import task_manager
+from app.modules.tasks import task_manager
 
 router = APIRouter(prefix="/api/tasks", tags=["Tasks"])
 

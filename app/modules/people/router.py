@@ -5,21 +5,21 @@ from pydantic import BaseModel
 from typing import List, Any, Optional
 
 from app.core.database import get_db
-from app.infrastructure.scrapers.support.gateway import scraper_gateway
-from app.domains.people.services.people_status_service import PeopleStatusService, _enrichment_queue
-from app.domains.people.services.linking_data_mapper import LinkingDataMapper
-from app.domains.people.services.person_linker_service import PersonLinkerService
+from app.modules.scrapers.support.gateway import scraper_gateway
+from app.modules.people.services.people_status_service import PeopleStatusService, _enrichment_queue
+from app.modules.people.services.linking_data_mapper import LinkingDataMapper
+from app.modules.people.services.person_linker_service import PersonLinkerService
 from app.modules.people.schemas import (
     PersonRead,
     PeopleSearchResponse,
-    PersonDetailResponse,
+    PersonDetailDTO,
     PersonFilmographyResponse,
     PersonAddTmdb,
     PersonStatusUpdate,
     PersonLinkPayload,
     PersonUnlinkPayload,
 )
-from app.application.users.schemas import ImageOverrideUpdate
+from app.modules.users.schemas import ImageOverrideUpdate
 
 _enrichment_queue.configure(scraper_gateway)
 
@@ -30,13 +30,13 @@ adult_router = APIRouter(prefix="/api/v1/adult/people", tags=["Adult People"])
 
 
 def _people_status_service(db: Session, scrapers=None) -> PeopleStatusService:
-    from app.infrastructure.media.db_media_resolver import DbMediaResolver
+    from app.modules.library.db_media_resolver import DbMediaResolver
     return PeopleStatusService(db, scrapers=scrapers, library_port=DbMediaResolver(db))
 
 def _people_detail_service(db: Session, scrapers=None) -> Any:
-    from app.infrastructure.media.db_media_resolver import DbMediaResolver
-    from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
-    from app.domains.people.services.people_detail_service import PeopleDetailService
+    from app.modules.library.db_media_resolver import DbMediaResolver
+    from app.modules.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+    from app.modules.people.services.people_detail_service import PeopleDetailService
     return PeopleDetailService(
         db,
         scrapers or scraper_gateway,
@@ -115,12 +115,12 @@ def enrich_people(match_ids: List[int], db: Session = Depends(get_db)):
     Triggers a background task to enrich people details (bio, physical traits, profiles)
     for the given MetadataMatch IDs.
     """
-    from app.domains.tasks import task_manager
+    from app.modules.tasks import task_manager
     task_manager.people_enrich_worker.enqueue_enrich(match_ids)
     task_id = task_manager.people_enrich_worker.active_task_id
     return {"status": "enrichment_pending", "task_id": task_id}
 
-@router.get("/{person_id}", response_model=PersonDetailResponse)
+@router.get("/{person_id}", response_model=PersonDetailDTO)
 def get_person_detail(person_id: str, db: Session = Depends(get_db)):
     return _people_detail_service(db).get_person_detail(person_id)
 

@@ -3,10 +3,10 @@ from sqlalchemy.orm import Session
 from typing import Optional
 
 from app.core.database import get_db
-from app.infrastructure.scrapers.support.gateway import scraper_gateway
-from app.domains.metadata.services.metadata_service import MetadataService
+from app.modules.scrapers.support.gateway import scraper_gateway
+from app.modules.metadata.services.metadata_service import MetadataService
 from app.modules.metadata.schemas import MetadataResolveRequest, BulkResolveRequest
-from app.infrastructure.media.db_media_resolver import DbMediaResolver
+from app.modules.library.db_media_resolver import DbMediaResolver
 
 library_router = APIRouter(prefix="/api/v1", tags=["Metadata"])
 

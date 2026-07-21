@@ -4,9 +4,9 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 
 from app.core.database import get_db
-from app.application.maintenance.database_maintenance_service import DatabaseMaintenanceService
-from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
-from app.domains.settings.services.settings_service import SettingsService
+from app.modules.settings.services.database_maintenance_service import DatabaseMaintenanceService
+from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
+from app.modules.settings.services.settings_service import SettingsService
 from app.modules.settings.schemas import (
     SystemSettingRead,
     SystemSettingUpdate,
@@ -18,7 +18,7 @@ router = APIRouter(prefix="/api/v1/settings", tags=["Settings"])
 
 
 def _settings_service(db: Session, user_id: Optional[int] = None) -> SettingsService:
-    from app.infrastructure.media.db_media_resolver import DbMediaResolver
+    from app.modules.library.db_media_resolver import DbMediaResolver
     return SettingsService(
         db,
         library_port=DbMediaResolver(db),

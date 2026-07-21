@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 
 from app.core.database import get_db
-from app.domains.users.services.user_service import UserService
-from app.application.users.schemas import (
+from app.modules.users.services.user_service import UserService
+from app.modules.users.schemas import (
     UserRead,
     UserCreate,
     UserOverrideRead,
@@ -25,11 +25,11 @@ from app.application.users.schemas import (
     CatalogResponse,
     BulkUpdateResponse,
 )
-from app.domains.users.services.tags_service import TagsService
-from app.application.catalog.lists_service import ListsService
-from app.domains.users.services.overrides_service import OverridesService
-from app.infrastructure.media.db_media_resolver import DbMediaResolver
-from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+from app.modules.users.services.tags_service import TagsService
+from app.modules.users.services.lists_service import ListsService
+from app.modules.users.services.overrides_service import OverridesService
+from app.modules.library.db_media_resolver import DbMediaResolver
+from app.modules.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ router = APIRouter(prefix="/api/v1/users", tags=["Users"])
 
 
 def _user_service(db: Session) -> UserService:
-    from app.infrastructure.media.db_media_resolver import DbMediaResolver
+    from app.modules.library.db_media_resolver import DbMediaResolver
     return UserService(db, library_port=DbMediaResolver(db))
 
 # --- User Profiles ---
@@ -185,9 +185,9 @@ def _img_dl():
     return TasksImageDownloadAdapter()
 
 def _overrides_service(db: Session, image_downloader=None) -> OverridesService:
-    from app.infrastructure.media.db_media_resolver import DbMediaResolver
-    from app.infrastructure.scrapers.support.gateway import scraper_gateway
-    from app.infrastructure.scrapers.enrichment.mainstream_enricher import MainstreamEnricher
+    from app.modules.library.db_media_resolver import DbMediaResolver
+    from app.modules.scrapers.support.gateway import scraper_gateway
+    from app.modules.scrapers.enrichment.mainstream_enricher import MainstreamEnricher
     return OverridesService(
         db,
         DbMediaResolver(db),
@@ -270,8 +270,8 @@ class AddPeakRequest(BaseModel):
 @catalog_router.post("/library/item/{item_id}/peaks")
 def add_item_peak(item_id: str, payload: Optional[AddPeakRequest] = None, db: Session = Depends(get_db)):
     from app.core.user_context import get_current_user_id
-    from app.infrastructure.media.db_media_resolver import DbMediaResolver
-    from app.domains.history.services.playback_peak_service import PlaybackPeakService
+    from app.modules.library.db_media_resolver import DbMediaResolver
+    from app.modules.history.services.playback_peak_service import PlaybackPeakService
     
     current_uid = get_current_user_id() or 1
     service = PlaybackPeakService(db, DbMediaResolver(db))
@@ -287,8 +287,8 @@ def add_item_peak(item_id: str, payload: Optional[AddPeakRequest] = None, db: Se
 @catalog_router.delete("/library/item/{item_id}/peaks/{log_id}")
 def delete_item_peak(item_id: str, log_id: int, db: Session = Depends(get_db)):
     from app.core.user_context import get_current_user_id
-    from app.infrastructure.media.db_media_resolver import DbMediaResolver
-    from app.domains.history.services.playback_peak_service import PlaybackPeakService
+    from app.modules.library.db_media_resolver import DbMediaResolver
+    from app.modules.history.services.playback_peak_service import PlaybackPeakService
     
     current_uid = get_current_user_id() or 1
     service = PlaybackPeakService(db, DbMediaResolver(db))

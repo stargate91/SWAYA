@@ -33,7 +33,7 @@ def get_peak_history(db: Session = Depends(get_db), limit: int = 50):
 def get_peaks_decorated(db: Session = Depends(get_db), limit: int = 50):
     """Retrieve peak moments decorated with media item info."""
     from app.modules.library.models import MediaItem
-    from app.shared_kernel.ports.image_service_port import ImageServiceRegistry
+    
     from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
     from app.core.language import LanguageService
     
@@ -106,16 +106,16 @@ def get_action_history(db: Session = Depends(get_db), limit: int = 50):
 
 async def run_undo_coroutine(task_id: int, batch_id: int):
     import logging
-    from app.application.media.renamer_engine import RenamerEngine
+    from app.modules.media.services.renamer_engine import RenamerEngine
     from app.core.database import SessionLocal
-    from app.domains.tasks import task_manager
+    from app.modules.tasks import task_manager
 
     logger = logging.getLogger(__name__)
     db = SessionLocal()
     try:
-        from app.infrastructure.media.db_media_resolver import DbMediaResolver
-        from app.infrastructure.filesystem.fs_utils import move_with_progress, send_to_trash
-        from app.infrastructure.settings.formatter_config_adapter import build_formatter_from_db
+        from app.modules.library.db_media_resolver import DbMediaResolver
+        from app.modules.library.filesystem.fs_utils import move_with_progress, send_to_trash
+        from app.modules.settings.adapters.formatter_config_adapter import build_formatter_from_db
         engine = RenamerEngine(
             db,
             library_port=DbMediaResolver(db),
@@ -148,7 +148,7 @@ def undo_action_batch(batch_id: int, db: Session = Depends(get_db)):
     if not batch:
         raise HTTPException(status_code=404, detail="Action batch not found")
     
-    from app.domains.tasks import task_manager
+    from app.modules.tasks import task_manager
     task_id = task_manager.create_task(name=f"undo_batch_{batch_id}")
     task_manager.start_task(task_id, run_undo_coroutine, batch_id)
     

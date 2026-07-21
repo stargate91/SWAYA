@@ -14,9 +14,9 @@ import logging
 
 from app.core.database import get_db
 from app.core.enums import ScanMode
-from app.domains.library.services.scanner_service import ScannerService
-from app.application.history.schemas import HistoryResponse
-from app.application.media.playback_service import PlaybackService
+from app.modules.library.services.scanner_service import ScannerService
+from app.modules.history.schemas import HistoryResponse
+from app.modules.media.services.playback_service import PlaybackService
 from app.modules.media.schemas import (
     PlayMediaRequest,
     PreviewMediaRequest,
@@ -34,10 +34,10 @@ router = APIRouter(prefix="/api/v1", tags=["Media Operations & Playback"])
 
 
 def _scanner_service(db: Session, scan_resolver_factory=None) -> ScannerService:
-    from app.infrastructure.media.db_media_resolver import DbMediaResolver
-    from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
-    from app.infrastructure.filesystem.fs_utils import DbFileSystemAdapter, move_with_progress, send_to_trash
-    from app.infrastructure.settings.formatter_config_adapter import build_formatter_from_db
+    from app.modules.library.db_media_resolver import DbMediaResolver
+    from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
+    from app.modules.library.filesystem.fs_utils import DbFileSystemAdapter, move_with_progress, send_to_trash
+    from app.modules.settings.adapters.formatter_config_adapter import build_formatter_from_db
     return ScannerService(
         db,
         scan_resolver_factory=scan_resolver_factory,
@@ -83,7 +83,7 @@ def reset_image_status(db: Session = Depends(get_db)):
 
 @router.post("/scan")
 def start_scan(request: ScanRequest, db: Session = Depends(get_db)):
-    from app.infrastructure.scrapers.scan_resolver import ScanResolver
+    from app.modules.scrapers.scan_resolver import ScanResolver
     return _scanner_service(db, scan_resolver_factory=ScanResolver).start_scan(
         request.paths,
         request.stop_after,
@@ -94,7 +94,7 @@ def start_scan(request: ScanRequest, db: Session = Depends(get_db)):
 
 @router.post("/scan/retry")
 def start_retry(request: RetryRequest, db: Session = Depends(get_db)):
-    from app.infrastructure.scrapers.scan_resolver import ScanResolver
+    from app.modules.scrapers.scan_resolver import ScanResolver
     return _scanner_service(db, scan_resolver_factory=ScanResolver).start_retry(
         request.mode,
         request.include_adult,
@@ -114,7 +114,7 @@ def start_rename(request: Optional[RenameRequest] = None, db: Session = Depends(
 
 @router.get("/history", response_model=HistoryResponse)
 def get_history(page: int = 1, limit: int = 20, db: Session = Depends(get_db)):
-    from app.domains.history.services.history_service import HistoryService
+    from app.modules.history.services.history_service import HistoryService
     return HistoryService(db).get_history(page, limit)
 
 @router.post("/rename/undo/{batch_id}")
@@ -207,7 +207,7 @@ def image_proxy(
 @router.get("/media/{item_id}/preview")
 def get_media_preview(item_id: int, resolution: int = 720, db: Session = Depends(get_db)):
     from app.modules.library.models import MediaItem
-    from app.domains.library.services.preview_service import PreviewService
+    from app.modules.library.services.preview_service import PreviewService
 
     item = db.query(MediaItem).filter(MediaItem.id == item_id).first()
     if not item:
@@ -219,7 +219,7 @@ def get_media_preview(item_id: int, resolution: int = 720, db: Session = Depends
     filepath = os.path.join(item.library.root_path, item.relative_path)
     
     try:
-        from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
+        from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
         settings_adapter = DbSettingsAdapter(db)
         duration = settings_adapter.get_setting("hover_previews_duration") or 16
 
@@ -283,5 +283,5 @@ def reset_item_progress(item_id: int, db: Session = Depends(get_db)):
 
 @router.get("/media/active-sessions", response_model=List[int])
 def get_active_sessions():
-    from app.infrastructure.playback.playback_monitor import active_sessions
+    from app.modules.history.playback.playback_monitor import active_sessions
     return list(active_sessions)
