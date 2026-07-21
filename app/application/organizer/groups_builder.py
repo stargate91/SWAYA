@@ -3,8 +3,8 @@ from pathlib import Path
 from typing import Any, Optional
 from sqlalchemy.orm import Session
 
-from app.shared_kernel.enums import MediaType, ItemStatus
-from app.shared_kernel.language import LanguageService
+from app.core.enums import MediaType, ItemStatus
+from app.core.language import LanguageService
 from app.application.organizer.schemas import OrganizerGroupsResponse
 from app.application.organizer.strategies.base_organizer import BaseMediaOrganizer
 from app.application.organizer.organizer_helper import OrganizerHelper
@@ -31,7 +31,7 @@ class OrganizerGroupsBuilder:
         """Processes unorganized files and categorizes them into Movies, TV Shows, Extras, and Manual resolution groups."""
         items = OrganizerHelper.get_unorganized_media_items(db, scan_mode, session_mode)
 
-        from app.shared_kernel.user_context import get_current_user_id
+        from app.core.user_context import get_current_user_id
         current_uid = get_current_user_id()
 
         from app.infrastructure.settings.formatter_config_adapter import build_formatter_from_db
@@ -55,7 +55,7 @@ class OrganizerGroupsBuilder:
             target_lang = overrides.custom_language if (overrides and overrides.custom_language) else (formatter.config.default_target_language or pref_lang)
             loc = None
             if active_match:
-                from app.shared_kernel.enums import Provider
+                from app.core.enums import Provider
                 if active_match.provider == Provider.TMDB and target_lang:
                     target_lang_clean = LanguageService.resolve_request_locale(Provider.TMDB, target_lang)
                     if target_lang_clean:

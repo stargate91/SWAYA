@@ -4,8 +4,8 @@ from typing import Any, Dict, Optional
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.shared_kernel.database import Base
-from app.domains.users.models import User
+from app.core.database import Base
+from app.modules.users.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -22,8 +22,8 @@ class DatabaseMaintenanceService:
             deleted_tables = []
 
             from sqlalchemy import delete
-            from app.domains.users.models import CustomList, CustomListItem
-            from app.domains.history.models import PlaybackLog, PlaybackPeakLog, ActionLog, ActionBatch
+            from app.modules.users.models import CustomList, CustomListItem
+            from app.modules.history.models import PlaybackLog, PlaybackPeakLog, ActionLog, ActionBatch
 
             if options.get("all") or options.get("wipe"):
                 excluded_tables = {"api_caches", "alembic_version", "system_settings", "user_settings", "users"}

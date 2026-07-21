@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
-from app.shared_kernel.enums import MediaType
+from app.core.enums import MediaType
 from app.domains.library.services.formatter.models import RenamePreview
 
 logger = logging.getLogger(__name__)

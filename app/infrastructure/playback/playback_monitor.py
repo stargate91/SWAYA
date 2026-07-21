@@ -3,7 +3,7 @@ import re
 import requests
 import logging
 import subprocess
-from app.shared_kernel.constants import PLAYBACK_CHECK_TIMEOUT
+from app.core.constants import PLAYBACK_CHECK_TIMEOUT
 
 logger = logging.getLogger(__name__)
 
@@ -111,7 +111,7 @@ def monitor_playback(item_id: int, player_type: str, proc: subprocess.Popen, por
 
 
 def _save_position(item_id: int, current_time: int, total_length: int, user_id: int):
-    from app.shared_kernel.database import SessionLocal
+    from app.core.database import SessionLocal
     from app.infrastructure.media.db_media_resolver import DbMediaResolver
     
     db_session = SessionLocal()

@@ -1,9 +1,9 @@
 import logging
 from typing import Optional
 from sqlalchemy.orm import Session
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch
-from app.shared_kernel.enums import Provider, MediaType, ItemStatus
+from app.modules.library.models import MediaItem
+from app.modules.metadata.models import MetadataMatch
+from app.core.enums import Provider, MediaType, ItemStatus
 
 logger = logging.getLogger(__name__)
 

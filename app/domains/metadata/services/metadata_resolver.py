@@ -1,10 +1,10 @@
 import logging
 from typing import Dict, Any, Optional
 
-from app.shared_kernel.enums import Provider, MediaType, ItemStatus
-from app.domains.metadata.models import MetadataMatch
+from app.core.enums import Provider, MediaType, ItemStatus
+from app.modules.metadata.models import MetadataMatch
 from app.domains.metadata.schemas import MetadataResolveRequest, BulkResolveRequest
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.shared_kernel.ports.media_item_port import MediaItemPort
 
 logger = logging.getLogger(__name__)
@@ -26,16 +26,16 @@ class MetadataResolver:
         provider_str = request.provider or "tmdb"
 
         if not item_id or not external_id:
-            from app.shared_kernel.exceptions import BadRequestException
+            from app.core.exceptions import BadRequestException
             raise BadRequestException("item_id and external_id (tmdb_id) are required")
 
         if not self.media_item_port:
-            from app.shared_kernel.exceptions import BadRequestException
+            from app.core.exceptions import BadRequestException
             raise BadRequestException("media_item_port must be configured to resolve items")
 
         item = self.media_item_port.get_item_by_id(int(item_id))
         if not item:
-            from app.shared_kernel.exceptions import NotFoundException
+            from app.core.exceptions import NotFoundException
             raise NotFoundException("Media item not found")
 
         # Delete any existing metadata match mappings for this physical item
@@ -92,13 +92,13 @@ class MetadataResolver:
                 scraper = self.scrapers.adult(Provider.FANSDB, db)
 
             if not scraper:
-                from app.shared_kernel.exceptions import BadRequestException
+                from app.core.exceptions import BadRequestException
                 raise BadRequestException("Selected adult scraper is not configured")
 
             if provider == Provider.PORNDB and mtype == MediaType.MOVIE:
                 movie_data = scraper.fetch_movie(str(external_id))
                 if not movie_data:
-                    from app.shared_kernel.exceptions import BadRequestException
+                    from app.core.exceptions import BadRequestException
                     raise BadRequestException(f"Failed to fetch movie details from {provider.value}")
 
                 normalized = self.scrapers.normalize_porndb_movie(movie_data)
@@ -111,7 +111,7 @@ class MetadataResolver:
 
             scene_data = scraper.fetch_scene(str(external_id))
             if not scene_data:
-                from app.shared_kernel.exceptions import BadRequestException
+                from app.core.exceptions import BadRequestException
                 raise BadRequestException(f"Failed to fetch scene details from {provider.value}")
 
             normalized = self.scrapers.normalize_adult_scene(provider, scene_data)
@@ -162,7 +162,7 @@ class MetadataResolver:
 
 
         # Enrich item metadata
-        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.core.language import get_user_ui_language
         from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
         settings_port = DbSettingsAdapter(db)
         ui_lang = get_user_ui_language(settings_port)

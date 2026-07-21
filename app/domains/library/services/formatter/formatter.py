@@ -1,7 +1,7 @@
 from typing import Callable, Optional, Dict, Any, List
 
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
-from app.shared_kernel.language import LanguageService
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.language import LanguageService
 from .config import FormatterConfig
 from .models import RenamePreview
 from .context_builder import ContextBuilder

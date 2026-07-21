@@ -3,20 +3,15 @@ from typing import List, Optional, Any, TYPE_CHECKING
 from sqlalchemy import String, Integer, Float, DateTime, Enum as SQLEnum, JSON, Boolean, ForeignKey, UniqueConstraint, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.shared_kernel.database import Base
-from app.shared_kernel.enums import ItemStatus, MovieEdition, MediaAudioType, MediaSource, ExtraCategory, ExtraSubtype
+from app.core.database import Base
+from app.core.enums import ItemStatus, MovieEdition, MediaAudioType, MediaSource, ExtraCategory, ExtraSubtype
 
 if TYPE_CHECKING:
-    from app.domains.metadata.models import MetadataMatch
-    from app.domains.users.models import UserOverride
-    from app.domains.history.models import PlaybackLog
-
+    from app.modules.metadata.models import MetadataMatch
+    from app.modules.users.models import UserOverride
+    from app.modules.history.models import PlaybackLog
 
 class Library(Base):
-    """
-    Core Level 1: Represents a watched directory root on the file system.
-    Enables path relativization so that drive letter changes can be fixed instantly.
-    """
     __tablename__ = "libraries"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -27,12 +22,7 @@ class Library(Base):
 
     media_items: Mapped[List["MediaItem"]] = relationship("MediaItem", back_populates="library", cascade="all, delete-orphan")
 
-
 class MediaItem(Base):
-    """
-    Core Level 1: Represents a physical file on the disk (video clip, scene, movie).
-    Contains purely technical, filesystem, and codec specifications.
-    """
     __tablename__ = "media_items"
     __table_args__ = (UniqueConstraint("library_id", "relative_path", name="uq_library_relative_path"),)
 
@@ -107,12 +97,7 @@ class MediaItem(Base):
         except ValueError:
             self.relative_path = os.path.normpath(val).replace("\\", "/")
 
-
 class ExtraFile(Base):
-    """
-    Core Level 1: Associated files like subtitles, local images, and trailers.
-    Keeps track of helper files accompanying the main media files.
-    """
     __tablename__ = "extra_files"
 
     id: Mapped[int] = mapped_column(primary_key=True)

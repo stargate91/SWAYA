@@ -6,8 +6,8 @@ from typing import List, Dict, Any
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
-from app.shared_kernel.enums import Provider as ProviderEnum, MediaType
-from app.domains.metadata.models import MetadataMatch
+from app.core.enums import Provider as ProviderEnum, MediaType
+from app.modules.metadata.models import MetadataMatch
 
 logger = logging.getLogger(__name__)
 
@@ -258,7 +258,7 @@ class AdultDiscoveryService:
         ext_to_local = {}
         if all_performer_ids:
             try:
-                from app.domains.people.models import ExternalSourceLink
+                from app.modules.people.models import ExternalSourceLink
                 links = self.db.query(
                     ExternalSourceLink.person_id,
                     ExternalSourceLink.external_id

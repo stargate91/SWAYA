@@ -134,7 +134,7 @@ class PeopleDetailService:
         from datetime import datetime
         from html.parser import HTMLParser
         from fastapi import HTTPException
-        from app.domains.people.models import Person
+        from app.modules.people.models import Person
 
         person = self.db.query(Person).filter(Person.id == person_id).first()
         if not person:
@@ -358,7 +358,7 @@ class PeopleDetailService:
         import re
         import requests
         import unicodedata
-        from app.domains.people.models import Person
+        from app.modules.people.models import Person
 
         person = self.db.query(Person).filter(Person.id == person_id).first()
         if not person:

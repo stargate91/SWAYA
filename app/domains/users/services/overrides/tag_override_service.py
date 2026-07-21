@@ -2,7 +2,7 @@ import logging
 from typing import Dict, Any
 from sqlalchemy import func
 
-from app.domains.users.models import Tag
+from app.modules.users.models import Tag
 from app.domains.users.schemas import BulkTagsUpdate
 
 logger = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ class TagOverrideService:
             return {"status": "success", "count": 0}
 
         resolved_tags = []
-        from app.domains.metadata.models import MetadataMatch
+        from app.modules.metadata.models import MetadataMatch
         is_adult_item = False
         if item_ids:
             first_match = self.db.query(MetadataMatch).filter(

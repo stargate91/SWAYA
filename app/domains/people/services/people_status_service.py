@@ -5,11 +5,11 @@ from datetime import datetime, timezone
 from typing import Any, List, Dict, Optional
 from sqlalchemy.orm import Session
 
-from app.domains.people.models import Person, ExternalSourceLink
-from app.domains.users.models import UserOverride, Tag
-from app.shared_kernel.enums import Provider
-from app.shared_kernel.exceptions import NotFoundException
-from app.shared_kernel.user_context import get_current_user_id
+from app.modules.people.models import Person, ExternalSourceLink
+from app.modules.users.models import UserOverride, Tag
+from app.core.enums import Provider
+from app.core.exceptions import NotFoundException
+from app.core.user_context import get_current_user_id
 from sqlalchemy import func
 
 logger = logging.getLogger(__name__)
@@ -87,7 +87,7 @@ class PersonEnrichmentQueue:
         from app.domains.people.services.people_enricher import PeopleEnricher
 
         if not self.session_factory:
-            from app.shared_kernel.database import SessionLocal
+            from app.core.database import SessionLocal
             self.session_factory = SessionLocal
 
         db = self.session_factory()

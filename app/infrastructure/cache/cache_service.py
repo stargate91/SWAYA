@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Any
 
-from app.shared_kernel.database import CacheSessionLocal
-from app.shared_kernel.enums import Provider, MediaType, CacheStatus
-from app.infrastructure.cache.models import APICache
-from app.shared_kernel.constants import DEFAULT_TTLS
+from app.core.database import CacheSessionLocal
+from app.core.enums import Provider, MediaType, CacheStatus
+from app.modules.scrapers.models import APICache
+from app.core.constants import DEFAULT_TTLS
 
 
 class CacheService:

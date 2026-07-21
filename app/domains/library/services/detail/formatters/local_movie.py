@@ -3,13 +3,13 @@ from typing import Any
 from sqlalchemy.orm import joinedload
 from fastapi.responses import JSONResponse
 
-from app.shared_kernel.enums import Provider, MediaType
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch, MediaCollection
-from app.domains.users.models import UserOverride
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
-from app.shared_kernel.language import LanguageService
-from app.shared_kernel.genre_utils import split_genres as _split_genres
+from app.core.enums import Provider, MediaType
+from app.modules.library.models import MediaItem
+from app.modules.metadata.models import MetadataMatch, MediaCollection
+from app.modules.users.models import UserOverride
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.language import LanguageService
+from app.core.genre_utils import split_genres as _split_genres
 from app.domains.library.schemas import MovieDetailResponse
 from app.domains.library.services.detail.formatters.base import MovieDetailFormatter
 from app.domains.library.services.detail.detail_mixins import OverrideResolver, PlaybackResolver, ExternalLinksBuilder
@@ -49,7 +49,7 @@ class LocalMovieFormatter(MovieDetailFormatter):
         if not active_match and item.matches:
             active_match = item.matches[0]
             
-        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.core.language import get_user_ui_language
         from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
         settings_port = DbSettingsAdapter(db)
         ui_lang = get_user_ui_language(settings_port)

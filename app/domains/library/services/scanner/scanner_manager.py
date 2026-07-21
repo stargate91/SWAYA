@@ -2,9 +2,9 @@ import logging
 from typing import Optional, List, Tuple, Dict, Any
 from sqlalchemy.orm import Session
 
-from app.shared_kernel.enums import ScanMode
+from app.core.enums import ScanMode
 
-from app.domains.library.models import Library, MediaItem
+from app.modules.library.models import Library, MediaItem
 from app.domains.library.services.scanner.categorizer import Categorizer
 from app.domains.library.services.scanner.linker import Linker
 from app.domains.library.services.scanner.probe import TechnicalProber
@@ -39,7 +39,7 @@ class ScannerManager:
         self.fs_port = fs_port
 
     def _get_numeric_setting(self, key: str, default: float) -> float:
-        from app.shared_kernel.user_context import get_current_user_id
+        from app.core.user_context import get_current_user_id
         current_user_id = get_current_user_id()
         val = self.settings.get_setting(key, user_id=current_user_id)
 

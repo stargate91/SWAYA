@@ -1,6 +1,6 @@
 import threading
 from typing import Optional
-from app.shared_kernel.constants import YOUTUBE_WATCH_BASE, DEFAULT_FALLBACK_LANGUAGE
+from app.core.constants import YOUTUBE_WATCH_BASE, DEFAULT_FALLBACK_LANGUAGE
 
 tv_enrich_lock = threading.Lock()
 

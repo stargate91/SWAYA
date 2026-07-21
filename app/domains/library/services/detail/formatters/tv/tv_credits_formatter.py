@@ -4,8 +4,8 @@ from typing import Any, Optional, List, Dict, Tuple
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 
-from app.domains.people.models import Person
-from app.domains.users.models import UserOverride
+from app.modules.people.models import Person
+from app.modules.users.models import UserOverride
 
 logger = logging.getLogger(__name__)
 

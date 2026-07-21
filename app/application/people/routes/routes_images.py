@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, File, UploadFile
 from sqlalchemy.orm import Session
 from typing import Any
 
-from app.shared_kernel.database import get_db
+from app.core.database import get_db
 from app.infrastructure.scrapers.support.gateway import scraper_gateway
 from app.domains.people.services.people_status_service import PeopleStatusService
 from app.application.users.schemas import ImageOverrideUpdate

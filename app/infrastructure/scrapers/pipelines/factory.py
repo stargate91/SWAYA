@@ -1,5 +1,5 @@
 from typing import Optional
-from app.shared_kernel.enums import Provider, ScanMode
+from app.core.enums import Provider, ScanMode
 
 from app.infrastructure.scrapers.pipelines.porndb_movie import PornDbMovieResolverPipeline
 from app.infrastructure.scrapers.pipelines.scenes import (

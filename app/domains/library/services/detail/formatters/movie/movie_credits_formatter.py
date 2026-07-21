@@ -1,8 +1,8 @@
 import logging
 from typing import List, Dict, Any, Tuple
 from sqlalchemy.orm import Session
-from app.domains.people.models import Person
-from app.domains.users.models import UserOverride
+from app.modules.people.models import Person
+from app.modules.users.models import UserOverride
 
 logger = logging.getLogger(__name__)
 

@@ -3,7 +3,7 @@ import logging
 import time
 from typing import List, Optional, Any, Dict
 
-from app.shared_kernel.enums import ScanMode
+from app.core.enums import ScanMode
 from app.domains.library.services.scanner.service.status_coordinator import StatusCoordinator
 
 logger = logging.getLogger(__name__)
@@ -109,7 +109,7 @@ class LibraryScanner:
                         lib.name = os.path.basename(p) or "Library"
                         
                         # Update relative paths of media items in this library
-                        from app.domains.library.models import MediaItem, ExtraFile
+                        from app.modules.library.models import MediaItem, ExtraFile
                         items = self.db.query(MediaItem).filter(MediaItem.library_id == lib.id).all()
                         for item in items:
                             abs_path = os.path.join(old_root, item.relative_path)

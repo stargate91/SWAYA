@@ -2,12 +2,16 @@ import os
 import logging
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, Session
-from app.shared_kernel.constants import DATABASE_TIMEOUT_SECONDS
+from app.core.constants import DATABASE_TIMEOUT_SECONDS
 
 logger = logging.getLogger(__name__)
 
 class Base(DeclarativeBase):
     """SQLAlchemy Declarative Base class shared by all domain models."""
+    pass
+
+class CacheBase(DeclarativeBase):
+    """SQLAlchemy Declarative Base class for API cache models."""
     pass
 
 
@@ -61,9 +65,6 @@ def configure_sqlite_engine(target_engine):
         cursor.execute("PRAGMA journal_size_limit=67108864;")  # 64MB WAL size limit
         cursor.close()
 
-    # Remove BEGIN IMMEDIATE to prevent deadlocking read-only transactions in WAL mode.
-    # SQLite will upgrade read locks to write locks automatically.
-
 
 # Configure both engines with optimal SQLite PRAGMAs
 configure_sqlite_engine(engine)
@@ -96,13 +97,11 @@ def init_databases():
     Main database tables are usually managed by Alembic, but this can serve
     as a fallback. Cache tables are created directly.
     """
-    # Import all models here to ensure they register on Base.metadata
-    
     # Create main database tables if they do not exist
     Base.metadata.create_all(bind=engine)
     
     # Create cache tables in cache.db
-    from app.infrastructure.cache.models import APICache
+    from app.modules.scrapers.models import APICache
     APICache.__table__.create(bind=cache_engine, checkfirst=True)
     
     # Clean up orphaned child records in metadata tables due to legacy SQLite runs without foreign_keys=ON
@@ -138,4 +137,3 @@ def init_databases():
         except Exception as orphan_ex:
             logger.warning(f"Failed to clean up database orphans: {orphan_ex}")
             session.rollback()
-

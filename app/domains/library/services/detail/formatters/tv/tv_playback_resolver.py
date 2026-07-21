@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
 from sqlalchemy.orm import Session
-from app.domains.history.models import PlaybackLog
-from app.domains.metadata.models import MetadataLocalization
+from app.modules.history.models import PlaybackLog
+from app.modules.metadata.models import MetadataLocalization
 
 class TvPlaybackResolver:
     def resolve_playback_and_progress(

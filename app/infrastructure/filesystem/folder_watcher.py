@@ -7,9 +7,9 @@ from typing import Set, Dict, Any, Optional
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
-from app.shared_kernel.database import SessionLocal
-from app.domains.library.models import Library, MediaItem
-from app.shared_kernel.enums import ItemStatus
+from app.core.database import SessionLocal
+from app.modules.library.models import Library, MediaItem
+from app.core.enums import ItemStatus
 
 logger = logging.getLogger("app.folder_watcher")
 

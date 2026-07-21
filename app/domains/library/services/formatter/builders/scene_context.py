@@ -45,7 +45,7 @@ def build_scene_context(
     source_val = getattr(item, "source", None)
     audio_type_val = getattr(item, "audio_type", None)
     
-    from app.shared_kernel.enums import MovieEdition, MediaSource, MediaAudioType
+    from app.core.enums import MovieEdition, MediaSource, MediaAudioType
     if getattr(item, "custom_edition", None) and item.custom_edition != MovieEdition.NONE:
         edition_val = item.custom_edition
     if getattr(item, "custom_source", None) and item.custom_source != MediaSource.NONE:

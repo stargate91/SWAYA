@@ -1,5 +1,5 @@
-from app.domains.library.models import MediaItem
-from app.domains.users.models import UserOverride
+from app.modules.library.models import MediaItem
+from app.modules.users.models import UserOverride
 from app.shared_kernel.ports.playback_port import PlaybackPort
 
 class DbPlaybackAdapter(PlaybackPort):
@@ -17,7 +17,7 @@ class DbPlaybackAdapter(PlaybackPort):
                 self.db.add(override)
             
             # Find the latest playback log to update
-            from app.domains.history.models import PlaybackLog
+            from app.modules.history.models import PlaybackLog
             log = self.db.query(PlaybackLog).filter(
                 PlaybackLog.media_item_id == item_id,
                 PlaybackLog.user_id == user_id

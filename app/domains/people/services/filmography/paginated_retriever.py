@@ -2,9 +2,9 @@ import math
 from typing import Optional, Any
 from sqlalchemy.orm import Session
 
-from app.domains.people.models import MediaPersonLink
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
-from app.shared_kernel.language import LanguageService
+from app.modules.people.models import MediaPersonLink
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.language import LanguageService
 
 class PaginatedCreditsRetriever:
     def __init__(self, db: Session, library_port: Any, resolve_img_fn: Any, fetch_remote_credits_fn: Any):
@@ -28,7 +28,7 @@ class PaginatedCreditsRetriever:
         ).all()
         
         movies = []
-        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.core.language import get_user_ui_language
         from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
         settings_port = DbSettingsAdapter(db)
         ui_lang = get_user_ui_language(settings_port)
@@ -77,7 +77,7 @@ class PaginatedCreditsRetriever:
         ).all()
         
         tv_map = {}
-        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.core.language import get_user_ui_language
         from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
         settings_port = DbSettingsAdapter(db)
         ui_lang = get_user_ui_language(settings_port)
@@ -134,7 +134,7 @@ class PaginatedCreditsRetriever:
         ).all()
         
         scenes = []
-        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.core.language import get_user_ui_language
         from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
         settings_port = DbSettingsAdapter(db)
         ui_lang = get_user_ui_language(settings_port)

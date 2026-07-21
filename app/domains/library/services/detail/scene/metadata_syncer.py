@@ -5,7 +5,7 @@ from typing import Dict, Any, Optional
 from datetime import datetime
 from urllib.parse import urlparse
 from sqlalchemy.orm import Session
-from app.domains.metadata.models import MetadataMatch
+from app.modules.metadata.models import MetadataMatch
 from app.shared_kernel.ports.image_download_port import ImageDownloadPort
 
 logger = logging.getLogger(__name__)
@@ -117,7 +117,7 @@ class SceneMetadataSyncer:
         loc_db = next((x for x in match_db.localizations if x.locale == "en"), None)
 
         if not loc_db:
-            from app.domains.metadata.models import MetadataLocalization
+            from app.modules.metadata.models import MetadataLocalization
             loc_db = MetadataLocalization(
                 match_id=match_db.id,
                 locale="en",

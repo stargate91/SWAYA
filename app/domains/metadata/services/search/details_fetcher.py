@@ -1,8 +1,8 @@
 import logging
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
-from app.shared_kernel.enums import Provider, MediaType
-from app.domains.metadata.models import MetadataMatch
+from app.core.enums import Provider, MediaType
+from app.modules.metadata.models import MetadataMatch
 from app.shared_kernel.ports.media_item_port import MediaItemPort
 
 logger = logging.getLogger(__name__)
@@ -87,16 +87,16 @@ class DetailsFetcher:
         try:
             item_id_int = int(item_id)
         except ValueError:
-            from app.shared_kernel.exceptions import BadRequestException
+            from app.core.exceptions import BadRequestException
             raise BadRequestException("Invalid item ID format")
 
         if not media_item_port:
-            from app.shared_kernel.exceptions import BadRequestException
+            from app.core.exceptions import BadRequestException
             raise BadRequestException("media_item_port is required for this operation")
 
         item = media_item_port.get_item_by_id(item_id_int)
         if not item:
-            from app.shared_kernel.exceptions import NotFoundException
+            from app.core.exceptions import NotFoundException
             raise NotFoundException("Item not found")
 
         match = db.query(MetadataMatch).filter(MetadataMatch.media_item_id == item.id).first()

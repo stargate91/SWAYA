@@ -3,9 +3,9 @@ from datetime import datetime
 from typing import Optional, Any, Dict, List, Tuple
 from sqlalchemy.orm import Session
 
-from app.domains.metadata.models import MetadataLocalization, MetadataMatch
-from app.shared_kernel.enums import Provider, MediaType
-from app.shared_kernel.genre_utils import split_genres as _split_genres
+from app.modules.metadata.models import MetadataLocalization, MetadataMatch
+from app.core.enums import Provider, MediaType
+from app.core.genre_utils import split_genres as _split_genres
 
 logger = logging.getLogger(__name__)
 

@@ -11,11 +11,11 @@ from app.domains.library.services.detail.formatters.tv.tv_local_resolver import 
 from app.domains.library.services.detail.formatters.tv.tv_playback_resolver import TvPlaybackResolver
 from app.domains.library.services.detail.formatters.tv.tv_credits_formatter import TvCreditsFormatter
 from app.domains.library.services.detail.formatters.tv.tv_metadata_resolver import TvShowMetadataResolver
-from app.domains.metadata.models import MetadataMatch
-from app.domains.users.models import UserOverride
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
-from app.shared_kernel.enums import Provider, MediaType
-from app.shared_kernel.genre_utils import split_genres as _split_genres
+from app.modules.metadata.models import MetadataMatch
+from app.modules.users.models import UserOverride
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.enums import Provider, MediaType
+from app.core.genre_utils import split_genres as _split_genres
 
 logger = logging.getLogger(__name__)
 
@@ -45,12 +45,12 @@ class TvShowFormatter(DetailFormatter):
         except (ValueError, IndexError):
             return JSONResponse(status_code=400, content={"error": "Invalid tv TMDB ID"})
         
-        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.core.language import get_user_ui_language
         from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
         settings_port = DbSettingsAdapter(db)
         ui_lang = language or get_user_ui_language(settings_port)
         
-        from app.domains.metadata.models import MetadataMatch
+        from app.modules.metadata.models import MetadataMatch
         series_match = db.query(MetadataMatch).filter(
             MetadataMatch.provider == Provider.TMDB,
             MetadataMatch.external_id == str(tv_tmdb_id_int),
@@ -64,7 +64,7 @@ class TvShowFormatter(DetailFormatter):
             tmdb_data = None
 
         if not tmdb_data and series_match:
-            from app.shared_kernel.language import LanguageService
+            from app.core.language import LanguageService
             loc_db = LanguageService.get_best_localization(series_match.localizations, ui_lang)
             if loc_db and loc_db.title:
                 local_seasons = db.query(MetadataMatch).filter(
@@ -137,7 +137,7 @@ class TvShowFormatter(DetailFormatter):
         if not tmdb_data:
             return JSONResponse(status_code=404, content={"error": "TV Show not found"})
         
-        from app.shared_kernel.user_context import get_current_user_id
+        from app.core.user_context import get_current_user_id
         current_uid = get_current_user_id()
 
         (
@@ -187,7 +187,7 @@ class TvShowFormatter(DetailFormatter):
             MetadataMatch.media_type == MediaType.TV
         ).first()
         
-        from app.shared_kernel.language import LanguageService
+        from app.core.language import LanguageService
         loc_db = LanguageService.get_best_localization(series_match.localizations, ui_lang) if series_match else None
 
         from app.domains.media_assets.services.images import image_processing_service

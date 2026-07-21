@@ -4,7 +4,7 @@ import logging
 from typing import Dict, Any, Optional
 
 from app.domains.media_assets.services.images import image_processing_service
-from app.shared_kernel.exceptions import NotFoundException, BadRequestException
+from app.core.exceptions import NotFoundException, BadRequestException
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ class ImageOverrideService:
 
     def _get_bg_session(self):
         """Create a fresh session for background threads without module-level SessionLocal import."""
-        from app.shared_kernel.database import SessionLocal
+        from app.core.database import SessionLocal
         return SessionLocal()
 
     def update_item_image(self, item_id: str, image_type: str, path: str, media_type: Optional[str] = None) -> Dict[str, Any]:
@@ -90,7 +90,7 @@ class ImageOverrideService:
                                 if downloaded_filename:
                                     db_bg = self._get_bg_session()
                                     try:
-                                        from app.domains.users.models import UserOverride
+                                        from app.modules.users.models import UserOverride
                                         override_bg = db_bg.query(UserOverride).filter(UserOverride.id == override_id).first()
                                         if override_bg:
                                             local_path = f"{subfolder}/{downloaded_filename}"

@@ -2,10 +2,10 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
-from app.domains.library.models import Library, MediaItem
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.modules.library.models import Library, MediaItem
 from app.domains.library.services.formatter.config import Casing, FormatterConfig, Separator
-from app.domains.settings.models import SystemSetting, UserSetting
+from app.modules.settings.models import SystemSetting, UserSetting
 
 logger = logging.getLogger(__name__)
 

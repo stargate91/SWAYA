@@ -2,10 +2,10 @@ import logging
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session, joinedload
 
-from app.shared_kernel.enums import Provider
-from app.domains.people.models import Person, MediaPersonLink, ExternalSourceLink
-from app.domains.users.models import UserOverride
-from app.domains.metadata.models import MetadataMatch
+from app.core.enums import Provider
+from app.modules.people.models import Person, MediaPersonLink, ExternalSourceLink
+from app.modules.users.models import UserOverride
+from app.modules.metadata.models import MetadataMatch
 
 logger = logging.getLogger(__name__)
 

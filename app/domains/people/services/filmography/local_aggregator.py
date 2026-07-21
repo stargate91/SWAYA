@@ -2,10 +2,10 @@ import logging
 from typing import List, Dict, Any, Tuple, Optional
 from sqlalchemy.orm import Session
 
-from app.shared_kernel.enums import MediaType, Provider
-from app.domains.people.models import MediaPersonLink
-from app.shared_kernel.language import LanguageService
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.enums import MediaType, Provider
+from app.modules.people.models import MediaPersonLink
+from app.core.language import LanguageService
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.shared_kernel.ports.library_port import LibraryPort
 from app.shared_kernel.ports.image_service_port import ImageServicePort
 
@@ -22,7 +22,7 @@ class LocalCreditsAggregator:
 
     def aggregate_credits(self, person_id: int) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]]]:
         db = self.db
-        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.core.language import get_user_ui_language
         from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
         settings_port = DbSettingsAdapter(db)
         ui_lang = get_user_ui_language(settings_port)

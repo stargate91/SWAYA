@@ -3,8 +3,8 @@ import concurrent.futures
 import time
 from typing import List, Optional, Callable
 
-from app.domains.people.models import Person, MediaPersonLink, ExternalSourceLink
-from app.shared_kernel.constants import DEFAULT_MAX_WORKERS
+from app.modules.people.models import Person, MediaPersonLink, ExternalSourceLink
+from app.core.constants import DEFAULT_MAX_WORKERS
 
 logger = logging.getLogger(__name__)
 

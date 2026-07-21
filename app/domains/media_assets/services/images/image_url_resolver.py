@@ -1,6 +1,6 @@
 import os
 from typing import Optional
-from app.shared_kernel.constants import (
+from app.core.constants import (
     TMDB_IMAGE_BASE,
     TMDB_DOWNLOAD_SIZES,
     MEDIA_IMAGE_SUBFOLDERS,

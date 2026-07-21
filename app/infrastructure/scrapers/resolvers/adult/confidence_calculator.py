@@ -1,7 +1,7 @@
 import difflib
 import logging
 from typing import Dict, Any, Optional
-from app.domains.library.models import MediaItem
+from app.modules.library.models import MediaItem
 from app.infrastructure.scrapers.resolver import normalize_title
 
 logger = logging.getLogger(__name__)

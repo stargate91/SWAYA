@@ -3,11 +3,11 @@ from typing import Any
 from sqlalchemy.orm import Session
 
 from app.domains.media.services.playback_domain_service import PlaybackDomainService
-from app.shared_kernel.exceptions import NotFoundException
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
-from app.shared_kernel.language import LanguageService
+from app.core.exceptions import NotFoundException
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.language import LanguageService
 from app.application.media.schemas import WatchedHistoryResponse
-from app.domains.users.models import UserOverride
+from app.modules.users.models import UserOverride
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +48,7 @@ class PlaybackLoggingService:
             logs = logs[:limit]
 
         results = []
-        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.core.language import get_user_ui_language
         from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
         settings_port = DbSettingsAdapter(db)
         ui_lang = get_user_ui_language(settings_port)
@@ -81,7 +81,7 @@ class PlaybackLoggingService:
 
             log_position = int(log_position) if log_position is not None else 0
 
-            from app.shared_kernel.enums import MediaType
+            from app.core.enums import MediaType
             tv_title = None
             episode_title = None
             tv_poster_path = None
@@ -95,7 +95,7 @@ class PlaybackLoggingService:
                     tv_match = active_match.parent
                 
                 if tv_match:
-                    from app.domains.users.models import UserOverride
+                    from app.modules.users.models import UserOverride
                     tv_override = db.query(UserOverride).filter(
                         UserOverride.metadata_match_id == tv_match.id,
                         UserOverride.user_id == log.user_id

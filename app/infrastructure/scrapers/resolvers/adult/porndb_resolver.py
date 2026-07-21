@@ -1,8 +1,8 @@
 import logging
 from typing import Optional, List, Tuple
-from app.shared_kernel.enums import Provider, ItemStatus
-from app.domains.library.models import MediaItem
-from app.shared_kernel.constants import PORNDB_API_BASE, SCRAPER_REQUEST_TIMEOUT
+from app.core.enums import Provider, ItemStatus
+from app.modules.library.models import MediaItem
+from app.core.constants import PORNDB_API_BASE, SCRAPER_REQUEST_TIMEOUT
 from app.infrastructure.scrapers.resolvers.adult.stashdb_resolver import SEARCH_QUERY
 
 logger = logging.getLogger(__name__)

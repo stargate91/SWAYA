@@ -4,7 +4,7 @@ from typing import Optional
 from PIL import Image
 from io import BytesIO
 import requests
-from app.shared_kernel.constants import (
+from app.core.constants import (
     TMDB_IMAGE_BASE,
     DEFAULT_FALLBACK_LANGUAGE,
     LOGO_MAX_DARK_PIXELS_RATIO,

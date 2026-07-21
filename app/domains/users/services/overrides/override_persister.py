@@ -2,13 +2,13 @@ import logging
 from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 
-from app.domains.metadata.models import MetadataMatch
+from app.modules.metadata.models import MetadataMatch
 from app.domains.users.schemas import (
     ItemOverridesUpdate,
     BulkOverridesUpdate,
     BulkWatchedUpdate,
 )
-from app.shared_kernel.exceptions import NotFoundException, BadRequestException
+from app.core.exceptions import NotFoundException, BadRequestException
 from app.domains.users.services.overrides.lock_validator import LockValidator
 
 logger = logging.getLogger(__name__)
@@ -101,8 +101,8 @@ class OverridePersister:
                 has_active_interaction = True
                 self._track_parent_tv_show_if_episode(db, str(item_id), media_item_id, metadata_match_id, track_item_fn)
                 if media_item_id:
-                    from app.domains.history.models import PlaybackLog
-                    from app.domains.library.models import MediaItem
+                    from app.modules.history.models import PlaybackLog
+                    from app.modules.library.models import MediaItem
                     from datetime import datetime, timezone
                     item = db.query(MediaItem).filter(MediaItem.id == media_item_id).first()
                     duration = item.duration if (item and item.duration) else 0
@@ -128,7 +128,7 @@ class OverridePersister:
                 m_override.watch_count = 0
                 m_override.last_watched_at = None
                 if media_item_id:
-                    from app.domains.history.models import PlaybackLog
+                    from app.modules.history.models import PlaybackLog
                     db.query(PlaybackLog).filter(PlaybackLog.media_item_id == media_item_id).delete()
 
         if has_active_interaction:
@@ -250,7 +250,7 @@ class OverridePersister:
         request: BulkWatchedUpdate
     ) -> Dict[str, Any]:
         """Toggles watched status in bulk across multiple items."""
-        from app.domains.users.models import UserOverride
+        from app.modules.users.models import UserOverride
         item_ids = request.item_ids or []
         is_watched = bool(request.is_watched)
         watched_at = request.watched_at or request.last_watched_at
@@ -272,7 +272,7 @@ class OverridePersister:
                 if resolved_id:
                     media_item_ids.append(resolved_id)
 
-        from app.domains.history.models import PlaybackLog
+        from app.modules.history.models import PlaybackLog
         has_playback_log = set()
         if media_item_ids:
             logs = db.query(PlaybackLog.media_item_id).filter(PlaybackLog.media_item_id.in_(media_item_ids)).all()
@@ -297,8 +297,8 @@ class OverridePersister:
                 is_tv = False
                 match = None
                 if override.metadata_match_id:
-                    from app.domains.metadata.models import MetadataMatch
-                    from app.shared_kernel.enums import MediaType
+                    from app.modules.metadata.models import MetadataMatch
+                    from app.core.enums import MediaType
                     match = db.query(MetadataMatch).filter(MetadataMatch.id == override.metadata_match_id).first()
                     if match and match.media_type == MediaType.TV:
                         is_tv = True
@@ -329,8 +329,8 @@ class OverridePersister:
                         physical_override.resume_position = 0
 
                     if not is_tv and resolved_media_item_id:
-                        from app.domains.history.models import PlaybackLog
-                        from app.domains.library.models import MediaItem
+                        from app.modules.history.models import PlaybackLog
+                        from app.modules.library.models import MediaItem
                         from datetime import datetime, timezone
                         item = db.query(MediaItem).filter(MediaItem.id == resolved_media_item_id).first()
                         duration = item.duration if (item and item.duration) else 0
@@ -448,11 +448,11 @@ class OverridePersister:
                             ep_ov.resume_position = 0
                         
                         if episode_media_item_ids:
-                            from app.domains.history.models import PlaybackLog
+                            from app.modules.history.models import PlaybackLog
                             db.query(PlaybackLog).filter(PlaybackLog.media_item_id.in_(episode_media_item_ids)).delete()
                     else:
                         if resolved_media_item_id:
-                            from app.domains.history.models import PlaybackLog
+                            from app.modules.history.models import PlaybackLog
                             db.query(PlaybackLog).filter(PlaybackLog.media_item_id == resolved_media_item_id).delete()
                 count += 1
 
@@ -504,7 +504,7 @@ class OverridePersister:
                         # If the match still has no localizations, release date, or backdrop, 
                         # try to merge/redirect to a sibling match that does.
                         if match and media_type == 'scene':
-                            from app.shared_kernel.enums import MediaType
+                            from app.core.enums import MediaType
                             has_loc = db.query(MetadataMatch).filter(MetadataMatch.id == match.id).join(MetadataMatch.localizations).first() is not None
                             if not has_loc and not match.release_date and not match.backdrop_path:
                                 # Look for a sibling match that is fully enriched
@@ -563,7 +563,7 @@ class OverridePersister:
                 tv_tmdb_id = parts[1]
         
         if not tv_tmdb_id:
-            from app.shared_kernel.enums import MediaType
+            from app.core.enums import MediaType
             match = None
             if metadata_match_id:
                 match = db.query(MetadataMatch).filter(MetadataMatch.id == metadata_match_id).first()

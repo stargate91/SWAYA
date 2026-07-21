@@ -3,10 +3,10 @@ from datetime import datetime
 from typing import Dict, Any
 from sqlalchemy.orm import Session
 
-from app.domains.metadata.models import MetadataMatch, MetadataLocalization
-from app.shared_kernel.enums import Provider
-from app.shared_kernel.language import LanguageService
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.modules.metadata.models import MetadataMatch, MetadataLocalization
+from app.core.enums import Provider
+from app.core.language import LanguageService
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 
 from app.infrastructure.scrapers.enrichment.parsers import (
     enrich_movie,
@@ -95,7 +95,7 @@ class TMDBEnrichmentParser:
                     if local_logo:
                         studio.logo_path = local_logo
 
-                from app.domains.metadata.models import metadata_match_studios
+                from app.modules.metadata.models import metadata_match_studios
                 conn_exists = self.db.query(metadata_match_studios).filter(
                     metadata_match_studios.c.metadata_match_id == match.id,
                     metadata_match_studios.c.studio_id == studio.id,

@@ -5,18 +5,18 @@ from urllib.parse import urlparse
 from typing import Optional, Dict, Any
 from sqlalchemy.orm import Session
 
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch
-from app.shared_kernel.enums import Provider, MediaType
+from app.modules.library.models import MediaItem
+from app.modules.metadata.models import MetadataMatch
+from app.core.enums import Provider, MediaType
 from app.infrastructure.scrapers.providers.tmdb import TMDBScraper
 from app.infrastructure.scrapers.providers.omdb import OMDBScraper
-from app.shared_kernel.language import LanguageService
+from app.core.language import LanguageService
 from app.shared_kernel.ports.metadata_repository_port import MetadataRepositoryPort
 from app.shared_kernel.ports.people_repository_port import PeopleRepositoryPort
 from app.shared_kernel.ports.settings_port import SettingsPort
 from app.shared_kernel.ports.image_download_port import ImageDownloadPort
 
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.infrastructure.scrapers.enrichment.tmdb_parser import TMDBEnrichmentParser
 from app.infrastructure.scrapers.enrichment.omdb_parser import OMDBEnrichmentParser
 
@@ -91,7 +91,7 @@ class MainstreamEnricher:
 
         # Retrieve target language and overrides so they are also cached in the DB
         try:
-            from app.shared_kernel.user_context import get_current_user_id
+            from app.core.user_context import get_current_user_id
             current_user_id = get_current_user_id()
             
             follow_naming = self.settings_port.get_setting("follow_app_language_for_naming", current_user_id)

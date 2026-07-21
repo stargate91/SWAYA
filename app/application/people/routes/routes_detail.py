@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from typing import Any, Optional
 
-from app.shared_kernel.database import get_db
+from app.core.database import get_db
 from app.infrastructure.scrapers.support.gateway import scraper_gateway
 from app.application.people.schemas import (
     PeopleSearchResponse,

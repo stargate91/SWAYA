@@ -5,8 +5,8 @@ from typing import Dict, Any, Optional
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from app.domains.people.models import Person
-from app.shared_kernel.user_context import get_current_user_id
+from app.modules.people.models import Person
+from app.core.user_context import get_current_user_id
 from app.shared_kernel.ports.library_port import LibraryPort
 from app.shared_kernel.ports.image_service_port import ImageServicePort
 from app.shared_kernel.ports.image_download_port import ImageDownloadPort
@@ -29,7 +29,7 @@ class PerformerAssetManager:
 
     def _get_bg_session(self):
         """Create a fresh session for background threads."""
-        from app.shared_kernel.database import SessionLocal
+        from app.core.database import SessionLocal
         return SessionLocal()
 
     def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
@@ -78,7 +78,7 @@ class PerformerAssetManager:
                     def bg_download():
                         try:
                             downloader.download_now(url, "backdrops", filename)
-                            from app.domains.users.models import UserOverride
+                            from app.modules.users.models import UserOverride
                             db_bg = self._get_bg_session()
                             try:
                                 override = db_bg.query(UserOverride).filter(UserOverride.person_id == person_id).first()
@@ -188,7 +188,7 @@ class PerformerAssetManager:
                     def bg_download():
                         try:
                             downloader.download_now(url, "people", filename)
-                            from app.domains.users.models import UserOverride
+                            from app.modules.users.models import UserOverride
                             db_bg = self._get_bg_session()
                             try:
                                 override = db_bg.query(UserOverride).filter(UserOverride.person_id == person_id).first()

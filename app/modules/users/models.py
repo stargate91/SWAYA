@@ -3,16 +3,15 @@ from typing import List, Optional, TYPE_CHECKING
 from sqlalchemy import String, Integer, Float, DateTime, Boolean, ForeignKey, Table, Column, Enum as SQLEnum, UniqueConstraint, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.shared_kernel.database import Base
-from app.shared_kernel.enums import CustomListType
+from app.core.database import Base
+from app.core.enums import CustomListType
 
 if TYPE_CHECKING:
-    from app.domains.history.models import PlaybackLog
-    from app.domains.settings.models import UserSetting
-    from app.domains.library.models import MediaItem
-    from app.domains.metadata.models import MetadataMatch, Studio, MediaCollection
-    from app.domains.people.models import Person
-
+    from app.modules.history.models import PlaybackLog
+    from app.modules.settings.models import UserSetting
+    from app.modules.library.models import MediaItem
+    from app.modules.metadata.models import MetadataMatch, Studio, MediaCollection
+    from app.modules.people.models import Person
 
 # Association table for UserOverride many-to-many relationship with Tag
 user_override_tags = Table(
@@ -22,12 +21,7 @@ user_override_tags = Table(
     Column("tag_id", Integer, ForeignKey("tags.id", ondelete="CASCADE"), primary_key=True, index=True)
 )
 
-
 class User(Base):
-    """
-    Central user account table. Enables multi-user preferences, custom lists,
-    playback logs, and serves as the single-sign-on anchor for dating/social modules.
-    """
     __tablename__ = "users"
     __table_args__ = (
         CheckConstraint("role IN ('owner', 'member', 'child')", name="ck_users_role"),
@@ -61,14 +55,14 @@ class User(Base):
     )
     overrides: Mapped[List["UserOverride"]] = relationship("UserOverride", back_populates="user", cascade="all, delete-orphan")
     custom_lists: Mapped[List["CustomList"]] = relationship("CustomList", back_populates="user", cascade="all, delete-orphan")
-    playback_logs: Mapped[List["PlaybackLog"]] = relationship("PlaybackLog", back_populates="user", cascade="all, delete-orphan")
-    settings: Mapped[List["UserSetting"]] = relationship("UserSetting", back_populates="user", cascade="all, delete-orphan")
-
+    playback_logs: Mapped[List["PlaybackLog"]] = relationship(
+        "PlaybackLog", back_populates="user", cascade="all, delete-orphan"
+    )
+    settings: Mapped[List["UserSetting"]] = relationship(
+        "UserSetting", back_populates="user", cascade="all, delete-orphan"
+    )
 
 class Tag(Base):
-    """
-    Global user-defined tags that can be SFW or NSFW (is_adult).
-    """
     __tablename__ = "tags"
     __table_args__ = (
         UniqueConstraint("name", "is_adult", name="uq_tag_name_is_adult"),
@@ -76,26 +70,19 @@ class Tag(Base):
     
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String, index=True)
-    color: Mapped[Optional[str]] = mapped_column(String, default="#3b82f6") # Hex color code for UI
-    is_adult: Mapped[bool] = mapped_column(Boolean, default=False, index=True) # Tag separation SFW vs NSFW
+    color: Mapped[Optional[str]] = mapped_column(String, default="#3b82f6")
+    is_adult: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
-    # User overrides for the three image slots
     custom_image_backdrop: Mapped[Optional[str]] = mapped_column(String)
     custom_image_poster_1: Mapped[Optional[str]] = mapped_column(String)
     custom_image_poster_2: Mapped[Optional[str]] = mapped_column(String)
     
-    # Relationships
     overrides: Mapped[List["UserOverride"]] = relationship(
         "UserOverride", secondary=user_override_tags, back_populates="tags"
     )
 
-
 class UserOverride(Base):
-    """
-    Stores all manual user adjustments. This isolates user data completely
-    from incoming scraped data so that rescrapes NEVER overwrite user edits.
-    """
     __tablename__ = "user_overrides"
     __table_args__ = (
         UniqueConstraint("user_id", "media_item_id", name="uq_user_media_item"),
@@ -118,8 +105,8 @@ class UserOverride(Base):
     custom_overview: Mapped[Optional[str]] = mapped_column(String)
     custom_poster: Mapped[Optional[str]] = mapped_column(String)
     custom_backdrop: Mapped[Optional[str]] = mapped_column(String)
-    custom_logo: Mapped[Optional[str]] = mapped_column(String) # For custom studio/performer logos
-    custom_language: Mapped[Optional[str]] = mapped_column(String) # Custom per-item language override (e.g. 'hu')
+    custom_logo: Mapped[Optional[str]] = mapped_column(String)
+    custom_language: Mapped[Optional[str]] = mapped_column(String)
     
     user_rating: Mapped[Optional[float]] = mapped_column(Float)
     user_rating_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True, index=True)
@@ -131,37 +118,19 @@ class UserOverride(Base):
     last_watched_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True, index=True)
     watch_count: Mapped[int] = mapped_column(Integer, default=0, index=True)
     resume_position: Mapped[int] = mapped_column(Integer, default=0)
-    is_tracked: Mapped[bool] = mapped_column(Boolean, default=False, index=True) # For watchlist / item tracking SFW or NSFW
+    is_tracked: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     
-    # Relationships
     user: Mapped["User"] = relationship("User", back_populates="overrides")
     media_item: Mapped[Optional["MediaItem"]] = relationship("MediaItem", back_populates="overrides")
     metadata_match: Mapped[Optional["MetadataMatch"]] = relationship("MetadataMatch", back_populates="overrides")
+    person: Mapped[Optional["Person"]] = relationship("Person", back_populates="overrides")
     studio: Mapped[Optional["Studio"]] = relationship("Studio", back_populates="overrides")
     collection: Mapped[Optional["MediaCollection"]] = relationship("MediaCollection", back_populates="overrides")
     tags: Mapped[List["Tag"]] = relationship(
         "Tag", secondary=user_override_tags, back_populates="overrides"
     )
 
-    def set_rating(self, rating: Optional[float]) -> bool:
-        self.user_rating = rating
-        self.user_rating_at = datetime.now(timezone.utc) if rating is not None else None
-        return rating is not None
-
-    def set_comment(self, comment: Optional[str]) -> bool:
-        self.user_comment = comment
-        self.user_comment_at = datetime.now(timezone.utc) if comment is not None else None
-        return bool(comment)
-
-    def set_favorite(self, is_fav: bool) -> bool:
-        self.is_favorite = is_fav
-        self.is_favorite_at = datetime.now(timezone.utc) if is_fav else None
-        return is_fav
-
-
-
 class CustomList(Base):
-    """User-defined collections (e.g., 'Favorite Sci-Fi', 'To Watch on Weekend')."""
     __tablename__ = "custom_lists"
     
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -169,7 +138,8 @@ class CustomList(Base):
     name: Mapped[str] = mapped_column(String, index=True)
     description: Mapped[Optional[str]] = mapped_column(String)
     list_type: Mapped[CustomListType] = mapped_column(SQLEnum(CustomListType), default=CustomListType.MEDIA, index=True)
-    color: Mapped[Optional[str]] = mapped_column(String) # For UI customization
+    is_adult: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    color: Mapped[Optional[str]] = mapped_column(String)
     custom_image_path: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     
@@ -178,11 +148,7 @@ class CustomList(Base):
         "CustomListItem", back_populates="custom_list", cascade="all, delete-orphan"
     )
 
-
 class CustomListItem(Base):
-    """
-    Items inside a custom list. Can link to a physical file, external match, performer, studio, or collection.
-    """
     __tablename__ = "custom_list_items"
     
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -196,8 +162,3 @@ class CustomListItem(Base):
     order: Mapped[int] = mapped_column(Integer, default=0, index=True)
     
     custom_list: Mapped["CustomList"] = relationship(back_populates="items")
-    media_item: Mapped[Optional["MediaItem"]] = relationship("MediaItem")
-    match: Mapped[Optional["MetadataMatch"]] = relationship("MetadataMatch")
-    person: Mapped[Optional["Person"]] = relationship("Person")
-    studio: Mapped[Optional["Studio"]] = relationship("Studio")
-    collection: Mapped[Optional["MediaCollection"]] = relationship("MediaCollection")

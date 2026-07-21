@@ -1,6 +1,6 @@
 import logging
 from typing import List, Dict, Any, Optional
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 
 logger = logging.getLogger(__name__)
 

@@ -2,15 +2,15 @@ import logging
 from typing import Any
 from fastapi.responses import JSONResponse
 
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
-from app.shared_kernel.enums import Provider, MediaType
-from app.domains.users.models import UserOverride
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.enums import Provider, MediaType
+from app.modules.users.models import UserOverride
 from app.domains.library.schemas import MovieDetailResponse
 from app.domains.library.services.detail.formatters.base import MovieDetailFormatter
 from app.domains.library.services.detail.detail_mixins import OverrideResolver, PlaybackResolver, ExternalLinksBuilder
-from app.domains.metadata.models import MetadataMatch
+from app.modules.metadata.models import MetadataMatch
 
-from app.domains.people.models import Person, ExternalSourceLink
+from app.modules.people.models import Person, ExternalSourceLink
 
 logger = logging.getLogger(__name__)
 
@@ -56,13 +56,13 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             return JSONResponse(status_code=400, content={"error": "Invalid PornDB ID format"})
             
         print(f"[DEBUG] PornDbMovieFormatter.format called with item_id={item_id}, parsed porndb_id={porndb_id}")
-        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.core.language import get_user_ui_language
         from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
         settings_port = DbSettingsAdapter(db)
         ui_lang = get_user_ui_language(settings_port)
         
-        from app.domains.metadata.models import MetadataMatch
-        from app.shared_kernel.enums import Provider, MediaType
+        from app.modules.metadata.models import MetadataMatch
+        from app.core.enums import Provider, MediaType
         
         match = db.query(MetadataMatch).filter(
             MetadataMatch.provider == Provider.PORNDB,
@@ -78,7 +78,7 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             movie_data = None
 
         if not movie_data and match:
-            from app.shared_kernel.language import LanguageService
+            from app.core.language import LanguageService
             loc_db = LanguageService.get_best_localization(match.localizations, ui_lang)
             if loc_db and loc_db.title:
                 performers = []
@@ -210,7 +210,7 @@ class PornDbMovieFormatter(MovieDetailFormatter):
                 ).first()
 
         if match:
-            from app.shared_kernel.language import LanguageService
+            from app.core.language import LanguageService
             loc_db = LanguageService.get_best_localization(match.localizations, ui_lang)
             if loc_db and loc_db.local_poster_path:
                 poster_url = loc_db.local_poster_path
@@ -239,7 +239,7 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             
             loc_db = next((x for x in match.localizations if x.locale == "en"), None)
             if not loc_db:
-                from app.domains.metadata.models import MetadataLocalization
+                from app.modules.metadata.models import MetadataLocalization
                 loc_db = MetadataLocalization(
                     match_id=match.id,
                     locale="en",

@@ -5,8 +5,8 @@ from app.shared_kernel.ports.file_system_port import FileSystemPort
 
 from sqlalchemy.orm import Session
 
-from app.shared_kernel.enums import ScanMode
-from app.domains.library.models import Library
+from app.core.enums import ScanMode
+from app.modules.library.models import Library
 from app.domains.library.services.scanner.collector import Collector
 from app.domains.library.services.scanner.scan_collector import ScanCollector
 

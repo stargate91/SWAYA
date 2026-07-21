@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict, model_validator
 from typing import Optional, List, Any, Union
 from datetime import datetime
-from app.shared_kernel.enums import MovieEdition, MediaAudioType, MediaSource, CustomListType
+from app.core.enums import MovieEdition, MediaAudioType, MediaSource, CustomListType
 
 class BaseSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)

@@ -3,7 +3,7 @@ import requests
 from typing import Optional, Dict, Any, List
 
 from app.infrastructure.cache.cache_service import CacheService
-from app.shared_kernel.enums import Provider
+from app.core.enums import Provider
 from app.shared_kernel.ports.settings_port import SettingsPort
 
 logger = logging.getLogger(__name__)

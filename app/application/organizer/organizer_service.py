@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.shared_kernel.ports.settings_port import SettingsPort
 from app.domains.media_assets.services.images import image_processing_service
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.application.organizer.schemas import OrganizerGroupsResponse, ActionResponse
 from app.application.organizer.organizer_helper import OrganizerHelper
 from app.application.organizer.groups_builder import OrganizerGroupsBuilder

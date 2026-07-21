@@ -2,7 +2,7 @@ import logging
 from typing import Optional, List, Dict, Any, Tuple
 from sqlalchemy.orm import Session
 
-from app.domains.people.models import Person
+from app.modules.people.models import Person
 
 logger = logging.getLogger(__name__)
 

@@ -10,14 +10,14 @@ from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 
 from app.domains.media_assets.services.images import image_processing_service
-from app.shared_kernel.exceptions import NotFoundException
+from app.core.exceptions import NotFoundException
 from app.application.media.schemas import (
     PlaybackStatusResponse,
     WatchHistoryResponse,
     WatchedHistoryResponse,
 )
 from app.domains.media.services.playback_domain_service import PlaybackDomainService
-from app.shared_kernel.enums import Provider, MediaType
+from app.core.enums import Provider, MediaType
 
 logger = logging.getLogger(__name__)
 
@@ -223,7 +223,7 @@ class PlaybackService:
         )
 
     def get_playback_info(self, item_id: Any):
-        from app.domains.library.models import MediaItem
+        from app.modules.library.models import MediaItem
         
         try:
             item_id_int = int(item_id)
@@ -245,7 +245,7 @@ class PlaybackService:
         media_type = None
         match = next((m for m in item.matches), None)
         if match:
-            from app.domains.metadata.models import MetadataMatch
+            from app.modules.metadata.models import MetadataMatch
             is_adult = bool(match.is_adult)
             media_type = match.media_type.value if match.media_type else None
             
@@ -264,7 +264,7 @@ class PlaybackService:
             # Extract logo from show match
             logo_match = show_match or match
             if logo_match:
-                from app.domains.metadata.models import MetadataLocalization
+                from app.modules.metadata.models import MetadataLocalization
                 from app.shared_kernel.ports.image_service_port import ImageServiceRegistry
                 loc_logo = self.db.query(MetadataLocalization).filter(MetadataLocalization.match_id == logo_match.id).first()
                 if loc_logo:
@@ -277,7 +277,7 @@ class PlaybackService:
 
             # Prioritize studio logo if available (for scenes)
             if match.media_type and match.media_type.value == "scene":
-                from app.domains.metadata.models import metadata_match_studios, Studio
+                from app.modules.metadata.models import metadata_match_studios, Studio
                 from app.shared_kernel.ports.image_service_port import ImageServiceRegistry
                 studio_row = self.db.query(Studio).join(metadata_match_studios).filter(
                     metadata_match_studios.c.metadata_match_id == match.id
@@ -298,7 +298,7 @@ class PlaybackService:
                             logo_path = resolved_studio
 
             # Extract title from current match localization
-            from app.domains.metadata.models import MetadataLocalization
+            from app.modules.metadata.models import MetadataLocalization
             loc = self.db.query(MetadataLocalization).filter(MetadataLocalization.match_id == match.id).first()
             if match.media_type and match.media_type.value == "episode":
                 ep_title = loc.title if loc else (match.original_title or item.filename)
@@ -398,7 +398,7 @@ class PlaybackService:
             logo_path = ImageServiceRegistry.get().resolve_image_url(logo_path, "logos")
                 
         # Collect subtitle and audio extras
-        from app.shared_kernel.enums import ExtraCategory
+        from app.core.enums import ExtraCategory
         extras_list = []
         for extra in item.extras:
             if extra.category in (ExtraCategory.SUBTITLE, ExtraCategory.AUDIO):
@@ -461,7 +461,7 @@ class PlaybackService:
                 if tv_override:
                     tv_show_rating = tv_override.user_rating
 
-                from app.domains.metadata.models import MetadataLocalization
+                from app.modules.metadata.models import MetadataLocalization
                 loc_show = self.db.query(MetadataLocalization).filter(MetadataLocalization.match_id == show_match.id).first()
                 raw_show_poster = None
                 if loc_show:

@@ -1,8 +1,8 @@
 from typing import Tuple, List, Dict, Any, Optional
 from sqlalchemy.orm import Session
-from app.domains.metadata.models import MetadataMatch
-from app.domains.users.models import UserOverride
-from app.domains.history.models import PlaybackLog, PlaybackPeakLog
+from app.modules.metadata.models import MetadataMatch
+from app.modules.users.models import UserOverride
+from app.modules.history.models import PlaybackLog, PlaybackPeakLog
 
 class ScenePlaybackResolver:
     def resolve_playback_and_peaks(

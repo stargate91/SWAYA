@@ -3,7 +3,7 @@ import requests
 import concurrent.futures
 from typing import List, Tuple, Dict, Any
 from app.domains.people.services.filmography.strategies.base_strategy import BaseFilmographyStrategy
-from app.shared_kernel.enums import Provider
+from app.core.enums import Provider
 
 logger = logging.getLogger(__name__)
 
@@ -103,7 +103,7 @@ class PornDbFilmographyStrategy(BaseFilmographyStrategy):
 
                     # If there are more pages, spawn a background thread to fetch them and update the cache
                     if last_page > 1:
-                        from app.domains.people.models import ExternalSourceLink
+                        from app.modules.people.models import ExternalSourceLink
                         link = self.db.query(ExternalSourceLink).filter(
                             ExternalSourceLink.provider == Provider.PORNDB,
                             ExternalSourceLink.external_id == ext_id
@@ -124,8 +124,8 @@ class PornDbFilmographyStrategy(BaseFilmographyStrategy):
         return mapped_items, total_items
 
     def _fetch_remaining_pages_bg(self, person_id: int, ext_id: str, media_type: str, source: str, headers: dict, last_page: int, page_1_items: list, total_items: int):
-        from app.shared_kernel.database import SessionLocal
-        from app.domains.people.models import RemoteFilmographyCache
+        from app.core.database import SessionLocal
+        from app.modules.people.models import RemoteFilmographyCache
         
         endpoint_type = "movies" if media_type == "movie" else "scenes"
         data_list = []

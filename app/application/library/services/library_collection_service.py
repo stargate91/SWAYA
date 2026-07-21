@@ -2,12 +2,12 @@ import logging
 from typing import Optional, Any
 from sqlalchemy.orm import Session, selectinload
 
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch, MediaCollection
-from app.domains.users.models import UserOverride
-from app.shared_kernel.enums import ItemStatus, MediaType
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
-from app.shared_kernel.language import LanguageService as LangHelper
+from app.modules.library.models import MediaItem
+from app.modules.metadata.models import MetadataMatch, MediaCollection
+from app.modules.users.models import UserOverride
+from app.core.enums import ItemStatus, MediaType
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.language import LanguageService as LangHelper
 from app.shared_kernel.ports.settings_port import SettingsPort
 from app.shared_kernel.ports.image_download_port import ImageDownloadPort
 from app.domains.library.schemas import MovieCollectionsResponse
@@ -53,7 +53,7 @@ class LibraryCollectionService:
         Retrieves a paginated and filtered list of movie collections in the library.
         """
         # Get ui language
-        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.core.language import get_user_ui_language
         ui_lang = get_user_ui_language(self.settings)
 
         lib_statuses = [ItemStatus.RENAMED, ItemStatus.ORGANIZED]
@@ -94,7 +94,7 @@ class LibraryCollectionService:
                         if details.get("backdrop_path"):
                             collection.backdrop_path = details["backdrop_path"]
                         collection.parts_count = len(details.get("parts", []) or [])
-                        from app.domains.metadata.models import MediaCollectionLocalization
+                        from app.modules.metadata.models import MediaCollectionLocalization
                         lang_code = LangHelper.clean_locale(ui_lang)
                         col_loc = MediaCollectionLocalization(
                             collection=collection,
@@ -151,7 +151,7 @@ class LibraryCollectionService:
                         logger.error(f"Failed to get collection parts count: {e}")
                         total_parts = 0
 
-                from app.shared_kernel.user_context import get_current_user_id
+                from app.core.user_context import get_current_user_id
                 current_uid = get_current_user_id()
                 col_override = self.db.query(UserOverride).filter(
                     UserOverride.user_id == current_uid,
@@ -180,7 +180,7 @@ class LibraryCollectionService:
             loc = match.localizations[0] if match.localizations else None
             item = match.media_item
             
-            from app.shared_kernel.user_context import get_current_user_id
+            from app.core.user_context import get_current_user_id
             current_uid = get_current_user_id()
             o = match.overrides if (match.overrides and match.overrides.user_id == current_uid) else None
             

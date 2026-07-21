@@ -2,9 +2,9 @@ import logging
 from typing import List, Dict, Any
 from sqlalchemy.orm import Session
 
-from app.shared_kernel.enums import ItemStatus
-from app.domains.library.models import MediaItem, ExtraFile
-from app.shared_kernel.enums import ExtraSubtype, ExtraCategory, MovieEdition, MediaAudioType, MediaSource
+from app.core.enums import ItemStatus
+from app.modules.library.models import MediaItem, ExtraFile
+from app.core.enums import ExtraSubtype, ExtraCategory, MovieEdition, MediaAudioType, MediaSource
 from app.infrastructure.media.adapters.structure.tv_episode_shifter import TvEpisodeShifter
 
 logger = logging.getLogger(__name__)
@@ -39,7 +39,7 @@ class StructureUpdater:
         if is_extra:
             extra = db.query(ExtraFile).filter(ExtraFile.id == int(item_id)).first()
             if not extra:
-                from app.shared_kernel.exceptions import NotFoundException
+                from app.core.exceptions import NotFoundException
                 raise NotFoundException("Target extra item not found")
 
             if main_type in ("movie", "episode", "scene"):
@@ -88,7 +88,7 @@ class StructureUpdater:
             item = db.query(MediaItem).filter(MediaItem.id == media_item_id).first()
 
         if not item:
-            from app.shared_kernel.exceptions import NotFoundException
+            from app.core.exceptions import NotFoundException
             raise NotFoundException("Target media item not found")
 
         if main_type == "bonus" and parent_id is not None:

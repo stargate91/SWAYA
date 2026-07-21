@@ -2,7 +2,7 @@ import logging
 from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
-from app.shared_kernel.enums import Provider
+from app.core.enums import Provider
 
 logger = logging.getLogger(__name__)
 

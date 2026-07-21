@@ -1,8 +1,8 @@
 import logging
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
-from app.domains.users.models import User, UserOverride, CustomList
-from app.shared_kernel.exceptions import BadRequestException
+from app.modules.users.models import User, UserOverride, CustomList
+from app.core.exceptions import BadRequestException
 
 logger = logging.getLogger(__name__)
 

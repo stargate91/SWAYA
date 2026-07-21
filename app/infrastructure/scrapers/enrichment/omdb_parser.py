@@ -1,6 +1,6 @@
 import logging
 
-from app.domains.metadata.models import MetadataMatch
+from app.modules.metadata.models import MetadataMatch
 
 logger = logging.getLogger(__name__)
 

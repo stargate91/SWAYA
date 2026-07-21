@@ -1,8 +1,8 @@
 from typing import Any, Optional
 from sqlalchemy.orm import Session
 from app.shared_kernel.ports.metadata_repository_port import MetadataRepositoryPort
-from app.shared_kernel.enums import Provider, MediaType
-from app.domains.metadata.models import MetadataMatch, Studio, MediaCollection, MetadataLocalization, MediaCollectionLocalization, StudioAlias
+from app.core.enums import Provider, MediaType
+from app.modules.metadata.models import MetadataMatch, Studio, MediaCollection, MetadataLocalization, MediaCollectionLocalization, StudioAlias
 
 class DbMetadataRepository(MetadataRepositoryPort):
     def __init__(self, db: Session):

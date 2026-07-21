@@ -1,10 +1,10 @@
 import logging
 from typing import Optional
 
-from app.shared_kernel.enums import Provider, MediaType
+from app.core.enums import Provider, MediaType
 from app.infrastructure.scrapers.support.base import BaseScraper
 from app.infrastructure.scrapers.providers.porndb_client import PornDbClient
-from app.shared_kernel.constants import PORNDB_DEFAULT_ENDPOINT, PORNDB_API_BASE, SCRAPER_REQUEST_TIMEOUT
+from app.core.constants import PORNDB_DEFAULT_ENDPOINT, PORNDB_API_BASE, SCRAPER_REQUEST_TIMEOUT
 
 logger = logging.getLogger(__name__)
 

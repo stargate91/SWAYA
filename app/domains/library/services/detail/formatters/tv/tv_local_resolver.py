@@ -1,9 +1,9 @@
 from typing import Any, Dict, List, Set, Tuple
 from sqlalchemy.orm import Session, joinedload
-from app.shared_kernel.enums import MediaType, ItemStatus, Provider
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch
-from app.domains.users.models import UserOverride
+from app.core.enums import MediaType, ItemStatus, Provider
+from app.modules.library.models import MediaItem
+from app.modules.metadata.models import MetadataMatch
+from app.modules.users.models import UserOverride
 
 class TvLocalResolver:
     def resolve_local_data(

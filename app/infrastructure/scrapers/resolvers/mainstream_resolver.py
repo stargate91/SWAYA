@@ -2,11 +2,11 @@ import logging
 from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 
-from app.domains.library.models import MediaItem
-from app.shared_kernel.enums import Provider
-from app.domains.settings.models import SystemSetting, UserSetting
+from app.modules.library.models import MediaItem
+from app.core.enums import Provider
+from app.modules.settings.models import SystemSetting, UserSetting
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 
 from app.infrastructure.scrapers.resolvers.mainstream import (
     QuerySanitizer,
@@ -75,7 +75,7 @@ class MainstreamResolver:
         candidates: Dict[int, Dict[str, Any]] = {}
 
         if include_adult is None:
-            from app.shared_kernel.user_context import get_current_user_id
+            from app.core.user_context import get_current_user_id
             current_user_id = get_current_user_id()
             include_adult_setting = self.db.query(UserSetting).filter(
                 UserSetting.user_id == current_user_id,

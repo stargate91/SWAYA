@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Optional, List, TYPE_CHECKING
 
 from app.domains.media_assets.services.images import image_processing_service, ImageProcessingService
-from app.shared_kernel.constants import HEAVY_IMAGE_DOWNLOAD_TIMEOUT
+from app.core.constants import HEAVY_IMAGE_DOWNLOAD_TIMEOUT
 
 if TYPE_CHECKING:
     from app.shared_kernel.ports.task_monitor_port import TaskMonitorPort

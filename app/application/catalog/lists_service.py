@@ -2,12 +2,12 @@ import logging
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session, joinedload
 
-from app.domains.users.models import CustomList, CustomListItem, UserOverride
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch
-from app.domains.people.models import Person
-from app.shared_kernel.enums import Provider, MediaType, CustomListType
-from app.shared_kernel.exceptions import NotFoundException, BadRequestException
+from app.modules.users.models import CustomList, CustomListItem, UserOverride
+from app.modules.library.models import MediaItem
+from app.modules.metadata.models import MetadataMatch
+from app.modules.people.models import Person
+from app.core.enums import Provider, MediaType, CustomListType
+from app.core.exceptions import NotFoundException, BadRequestException
 from app.application.users.schemas import (
     CustomListItemResponse,
     CustomListResponse,
@@ -28,8 +28,8 @@ class ListsService:
     def _resolve_tv_show_tmdb_id(self, match) -> Optional[int]:
         if not match:
             return None
-        from app.domains.metadata.models import MetadataMatch
-        from app.shared_kernel.enums import MediaType
+        from app.modules.metadata.models import MetadataMatch
+        from app.core.enums import MediaType
         
         parent = match
         visited = set()
@@ -148,7 +148,7 @@ class ListsService:
                 })
             res["people"] = p_list
 
-        from app.domains.users.models import UserOverride
+        from app.modules.users.models import UserOverride
         user_rating = None
         is_watched = False
         override = None
@@ -181,7 +181,7 @@ class ListsService:
             resolved_loc = next((x for x in item.match.localizations), None)
             
         if resolved_loc and resolved_loc.genres:
-            from app.shared_kernel.genre_utils import split_genres as _split_genres
+            from app.core.genre_utils import split_genres as _split_genres
             genres_list = _split_genres(resolved_loc.genres)
             
         res["genres"] = genres_list
@@ -198,7 +198,7 @@ class ListsService:
         return CustomListItemResponse(**res)
 
     def _adult_access_enabled(self) -> bool:
-        from app.domains.settings.models import SystemSetting, UserSetting
+        from app.modules.settings.models import SystemSetting, UserSetting
         
         # Check user setting
         us = self.db.query(UserSetting).filter(
@@ -451,8 +451,8 @@ class ListsService:
 
         # If we have a matching provider/external_id, check if it already exists as a local MediaItem
         if external_id and not media_item_id:
-            from app.domains.library.models import MediaItem
-            from app.domains.metadata.models import MetadataMatch
+            from app.modules.library.models import MediaItem
+            from app.modules.metadata.models import MetadataMatch
             local_item = self.db.query(MediaItem).join(MediaItem.matches).filter(
                 MetadataMatch.provider == provider,
                 MetadataMatch.external_id == str(external_id)
@@ -466,7 +466,7 @@ class ListsService:
 
         match_id = None
         if external_id:
-            from app.domains.metadata.models import MetadataMatch
+            from app.modules.metadata.models import MetadataMatch
             from datetime import datetime
             # Use robust deduplicated lookup for adult scenes
             if media_type == "scene" or provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB):
@@ -515,7 +515,7 @@ class ListsService:
                 title = payload.get("title")
                 poster_path = payload.get("poster_path")
                 if title or poster_path:
-                    from app.domains.metadata.models import MetadataLocalization
+                    from app.modules.metadata.models import MetadataLocalization
                     loc = MetadataLocalization(
                         match_id=match.id,
                         locale="en",
@@ -530,7 +530,7 @@ class ListsService:
         person_id = payload.get("person_id")
 
         if person_id:
-            from app.domains.people.models import Person, ExternalSourceLink
+            from app.modules.people.models import Person, ExternalSourceLink
             resolved_person = None
             
             def find_by_direct_id(pid_val):

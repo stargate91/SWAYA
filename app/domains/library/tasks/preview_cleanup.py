@@ -2,7 +2,7 @@ import os
 import time
 import logging
 from sqlalchemy.orm import Session
-from app.shared_kernel.database import SWAYA_DB_PATH
+from app.core.database import SWAYA_DB_PATH
 from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
 
 logger = logging.getLogger("app.tasks.preview_cleanup")

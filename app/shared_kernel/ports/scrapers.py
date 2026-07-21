@@ -1,6 +1,6 @@
 from typing import Any, Optional, Protocol
 
-from app.shared_kernel.enums import MediaType, Provider
+from app.core.enums import MediaType, Provider
 
 
 class ScraperGatewayPort(Protocol):

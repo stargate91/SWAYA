@@ -1,6 +1,6 @@
 import os
 from typing import Dict, List, Optional
-from app.domains.library.models import Library, MediaItem, ExtraFile
+from app.modules.library.models import Library, MediaItem, ExtraFile
 from app.shared_kernel.ports.file_system_port import FileSystemPort
 
 class DuplicateFinder:

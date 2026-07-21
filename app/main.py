@@ -4,20 +4,20 @@ import sys
 from contextlib import asynccontextmanager
 
 # Force-import all SQLAlchemy models on startup to prevent registry relationship errors
-import app.infrastructure.cache.models
-import app.domains.users.models
-import app.domains.tasks.models
-import app.domains.settings.models
-import app.domains.people.models
-import app.domains.metadata.models
-import app.domains.library.models
-import app.domains.history.models
+import app.modules.scrapers.models
+import app.modules.users.models
+import app.modules.tasks.models
+import app.modules.settings.models
+import app.modules.people.models
+import app.modules.metadata.models
+import app.modules.library.models
+import app.modules.history.models
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from app.shared_kernel.database import init_databases
-from app.shared_kernel.logging import setup_logger
+from app.core.database import init_databases
+from app.core.logging import setup_logger
 from app.domains.media_assets.services.images import image_processing_service
 
 # Setup logging
@@ -32,8 +32,8 @@ async def lifespan(app: FastAPI):
     
     # Ensure default user with id=1 exists to satisfy foreign key constraints
     from sqlalchemy.orm import Session
-    from app.shared_kernel.database import engine
-    from app.domains.users.models import User
+    from app.core.database import engine
+    from app.modules.users.models import User
     with Session(engine) as session:
         if not session.get(User, 1):
             default_user = User(
@@ -54,7 +54,7 @@ async def lifespan(app: FastAPI):
 
     # Clean preview cache on startup
     try:
-        from app.shared_kernel.database import SessionLocal
+        from app.core.database import SessionLocal
         from app.domains.library.tasks.preview_cleanup import clean_preview_cache
         with SessionLocal() as db_session:
             clean_preview_cache(db_session)
@@ -98,10 +98,10 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-from app.shared_kernel.exceptions import DomainException  # noqa: E402
+from app.core.exceptions import DomainException  # noqa: E402
 from fastapi.responses import JSONResponse  # noqa: E402
 from fastapi import Request  # noqa: E402
-from app.shared_kernel.user_context import set_current_user_id, reset_current_user_id  # noqa: E402
+from app.core.user_context import set_current_user_id, reset_current_user_id  # noqa: E402
 
 @app.exception_handler(DomainException)
 async def domain_exception_handler(request, exc: DomainException):

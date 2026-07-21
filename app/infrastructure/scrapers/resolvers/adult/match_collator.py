@@ -1,5 +1,5 @@
 from typing import List, Tuple, Dict, Any
-from app.domains.library.models import MediaItem
+from app.modules.library.models import MediaItem
 from app.infrastructure.scrapers.resolvers.adult.confidence_calculator import AdultConfidenceCalculator
 
 class AdultMatchCollator:

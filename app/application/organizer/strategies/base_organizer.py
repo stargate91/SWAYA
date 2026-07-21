@@ -1,7 +1,7 @@
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch
+from app.modules.library.models import MediaItem
+from app.modules.metadata.models import MetadataMatch
 
 class BaseMediaOrganizer:
     def __init__(self, db: Session, img_service: Any):

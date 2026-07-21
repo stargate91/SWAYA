@@ -21,7 +21,7 @@ class MovieDetailService(DetailFormatter):
         self.local_formatter = LocalMovieFormatter()
 
     def get_library_item_detail(self, item_id: str, full_people: bool = False):
-        from app.shared_kernel.user_context import get_current_user_id
+        from app.core.user_context import get_current_user_id
         current_uid = get_current_user_id()
 
         # Resolve TV Episode string (e.g. tmdb_1863_1_1) to local media item ID if possible

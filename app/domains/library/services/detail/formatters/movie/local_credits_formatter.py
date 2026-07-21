@@ -3,8 +3,8 @@ from typing import Any, Tuple, List, Dict
 from sqlalchemy.orm import Session, joinedload
 from datetime import datetime
 
-from app.domains.people.models import Person, MediaPersonLink
-from app.domains.users.models import UserOverride
+from app.modules.people.models import Person, MediaPersonLink
+from app.modules.users.models import UserOverride
 
 logger = logging.getLogger(__name__)
 

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.shared_kernel.ports.settings_port import SettingsPort
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.application.recommendations.schemas import RecommendationsResponse, ActionResponse
 
 logger = logging.getLogger(__name__)

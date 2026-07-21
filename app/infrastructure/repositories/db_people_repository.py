@@ -1,8 +1,8 @@
 from typing import Any, Optional
 from sqlalchemy.orm import Session
 from app.shared_kernel.ports.people_repository_port import PeopleRepositoryPort
-from app.shared_kernel.enums import Provider, RoleType
-from app.domains.people.models import Person, MediaPersonLink, ExternalSourceLink
+from app.core.enums import Provider, RoleType
+from app.modules.people.models import Person, MediaPersonLink, ExternalSourceLink
 
 class DbPeopleRepository(PeopleRepositoryPort):
     def __init__(self, db: Session):

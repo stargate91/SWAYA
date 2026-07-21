@@ -1,6 +1,6 @@
 import logging
 from typing import Optional, Dict
-from app.shared_kernel.enums import ScanMode
+from app.core.enums import ScanMode
 from app.shared_kernel.ports.file_system_port import FileSystemPort
 
 logger = logging.getLogger(__name__)

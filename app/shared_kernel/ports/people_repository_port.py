@@ -1,5 +1,5 @@
 from typing import Protocol, Any, Optional
-from app.shared_kernel.enums import Provider, RoleType
+from app.core.enums import Provider, RoleType
 
 class PeopleRepositoryPort(Protocol):
     def get_person_by_external_id(self, provider: Provider, external_id: str) -> Optional[Any]:

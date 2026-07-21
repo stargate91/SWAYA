@@ -68,7 +68,7 @@ class PeopleQueryBuilder:
             people_items = [item for item in people_items if not item.is_favorite]
 
         if params.selected_tags:
-            from app.domains.users.models import UserOverride, Tag, user_override_tags
+            from app.modules.users.models import UserOverride, Tag, user_override_tags
             matching_person_ids = [
                 r[0] for r in self.db.query(UserOverride.person_id).join(
                     user_override_tags, UserOverride.id == user_override_tags.c.user_override_id

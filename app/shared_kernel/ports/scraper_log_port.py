@@ -1,5 +1,5 @@
 from typing import Protocol, Optional, Dict, Any
-from app.shared_kernel.enums import Provider
+from app.core.enums import Provider
 
 class ScraperLogPort(Protocol):
     def log_search(

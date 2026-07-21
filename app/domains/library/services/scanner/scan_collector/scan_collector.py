@@ -5,8 +5,8 @@ from typing import List, Optional, Tuple, Dict, Any
 from sqlalchemy.orm import Session
 from concurrent.futures import ThreadPoolExecutor
 
-from app.shared_kernel.enums import ScanMode
-from app.domains.library.models import Library, MediaItem, ExtraFile
+from app.core.enums import ScanMode
+from app.modules.library.models import Library, MediaItem, ExtraFile
 from app.domains.library.services.scanner.collector import Collector
 from app.domains.library.services.scanner.categorizer import Categorizer
 from app.domains.library.services.scanner.linker import Linker

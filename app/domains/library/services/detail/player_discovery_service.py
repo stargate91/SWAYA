@@ -3,11 +3,11 @@ from typing import Optional, Dict, Any
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
-from app.domains.users.models import UserOverride
-from app.domains.metadata.models import MetadataMatch, MetadataLocalization
-from app.shared_kernel.enums import MediaType, ItemStatus
-from app.domains.library.models import MediaItem
-from app.shared_kernel.language import LanguageService
+from app.modules.users.models import UserOverride
+from app.modules.metadata.models import MetadataMatch, MetadataLocalization
+from app.core.enums import MediaType, ItemStatus
+from app.modules.library.models import MediaItem
+from app.core.language import LanguageService
 
 logger = logging.getLogger(__name__)
 
@@ -245,7 +245,7 @@ class PlayerDiscoveryService:
 
             # Performer Unwatched (for Scene performers)
             if media_type == "scene":
-                from app.domains.people.models import MediaPersonLink, Person
+                from app.modules.people.models import MediaPersonLink, Person
                 
                 gender_pref = settings_adapter.get_setting("adult_gender_preference", user_id=current_uid) or "all"
                 
@@ -282,7 +282,7 @@ class PlayerDiscoveryService:
                                 excluded_discovery_ids.add(performer_unwatched_info["id"])
 
             # Studio Unwatched (for Movie/Scene studios)
-            from app.domains.metadata.models import metadata_match_studios
+            from app.modules.metadata.models import metadata_match_studios
             studio_link = db.query(metadata_match_studios).filter(
                 metadata_match_studios.c.metadata_match_id == match.id
             ).first()
@@ -300,7 +300,7 @@ class PlayerDiscoveryService:
                 if next_stud_match:
                     studio_unwatched_info = cls.to_discovery_item(db, next_stud_match, current_uid, settings_adapter)
                     if studio_unwatched_info:
-                        from app.domains.metadata.models import Studio
+                        from app.modules.metadata.models import Studio
                         studio_row = db.query(Studio).filter(Studio.id == stud_id).first()
                         studio_unwatched_info["studio_name"] = studio_row.name if studio_row else "Unknown Studio"
                         if studio_unwatched_info.get("id"):
@@ -325,7 +325,7 @@ class PlayerDiscoveryService:
         # 3. Fetch Peaks count (if adult scene)
         peaks_count = 0
         if is_adult and media_type == "scene":
-            from app.domains.history.models import PlaybackPeakLog
+            from app.modules.history.models import PlaybackPeakLog
             peaks_count = db.query(PlaybackPeakLog).filter(
                 PlaybackPeakLog.user_id == current_uid,
                 PlaybackPeakLog.media_item_id == item.id

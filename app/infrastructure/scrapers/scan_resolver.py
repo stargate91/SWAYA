@@ -8,12 +8,12 @@ from sqlalchemy.exc import OperationalError
 if TYPE_CHECKING:
     from app.shared_kernel.ports.task_monitor_port import TaskMonitorPort
 
-from app.domains.library.models import MediaItem
-from app.shared_kernel.enums import ItemStatus, ScanMode
-from app.domains.settings.models import UserSetting, SystemSetting
+from app.modules.library.models import MediaItem
+from app.core.enums import ItemStatus, ScanMode
+from app.modules.settings.models import UserSetting, SystemSetting
 from app.infrastructure.scrapers.scan_resolution_pipelines import get_scan_resolution_pipeline
-from app.shared_kernel.database import SessionLocal
-from app.shared_kernel.constants import DEFAULT_MAX_WORKERS, DEFAULT_FALLBACK_LANGUAGE
+from app.core.database import SessionLocal
+from app.core.constants import DEFAULT_MAX_WORKERS, DEFAULT_FALLBACK_LANGUAGE
 
 logger = logging.getLogger(__name__)
 

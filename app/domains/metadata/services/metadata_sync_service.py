@@ -3,9 +3,9 @@ import asyncio
 from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 
-from app.domains.metadata.models import MetadataMatch
-from app.shared_kernel.enums import Provider, MediaType
-from app.shared_kernel.language_settings import get_user_ui_language, get_user_fallback_language
+from app.modules.metadata.models import MetadataMatch
+from app.core.enums import Provider, MediaType
+from app.core.language import get_user_ui_language, get_user_fallback_language
 from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
 from app.infrastructure.scrapers.support.gateway import scraper_gateway
 from app.infrastructure.scrapers.enrichment.mainstream_enricher import MainstreamEnricher
@@ -40,7 +40,7 @@ class MetadataSyncService:
     async def run_sync_task(self, task_id: int):
         """Asynchronously updates metadata language and assets for matched items in the background."""
         from app.domains.tasks import task_manager
-        from app.shared_kernel.database import SessionLocal
+        from app.core.database import SessionLocal
 
         logger.info(f"Background metadata language sync task {task_id} starting.")
         

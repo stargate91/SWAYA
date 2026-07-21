@@ -6,9 +6,9 @@ from typing import Dict, Any, Optional
 import requests
 from sqlalchemy.orm import Session
 
-from app.domains.history.models import PlaybackPeakLog
-from app.domains.library.models import MediaItem
-from app.shared_kernel.exceptions import NotFoundException
+from app.modules.history.models import PlaybackPeakLog
+from app.modules.library.models import MediaItem
+from app.core.exceptions import NotFoundException
 
 logger = logging.getLogger(__name__)
 

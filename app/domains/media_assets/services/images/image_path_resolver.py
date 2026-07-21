@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from app.shared_kernel.constants import (
+from app.core.constants import (
     MEDIA_IMAGE_SUBFOLDERS,
     MIN_CACHED_IMAGE_BYTES,
 )

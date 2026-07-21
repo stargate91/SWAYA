@@ -3,7 +3,7 @@ from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
-from app.domains.users.models import Tag, user_override_tags
+from app.modules.users.models import Tag, user_override_tags
 from app.domains.users.schemas import TagResponse
 
 logger = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ class TagsService:
         custom_images = payload.get("custom_images", [])
 
         if not name:
-            from app.shared_kernel.exceptions import BadRequestException
+            from app.core.exceptions import BadRequestException
             raise BadRequestException("Name required")
 
         existing = self.db.query(Tag).filter(
@@ -62,7 +62,7 @@ class TagsService:
         ).first()
 
         if existing:
-            from app.shared_kernel.exceptions import BadRequestException
+            from app.core.exceptions import BadRequestException
             raise BadRequestException("Tag already exists")
 
         paths = self._parse_custom_images(custom_images)
@@ -85,7 +85,7 @@ class TagsService:
     def update_tag(self, tag_id: int, payload: Dict[str, Any]) -> TagResponse:
         tag = self.db.query(Tag).filter(Tag.id == tag_id).first()
         if not tag:
-            from app.shared_kernel.exceptions import NotFoundException
+            from app.core.exceptions import NotFoundException
             raise NotFoundException("Not found")
 
         if "name" in payload:
@@ -97,7 +97,7 @@ class TagsService:
                     Tag.id != tag_id
                 ).first()
                 if existing:
-                    from app.shared_kernel.exceptions import BadRequestException
+                    from app.core.exceptions import BadRequestException
                     raise BadRequestException("Name already taken")
                 tag.name = name
 
@@ -116,7 +116,7 @@ class TagsService:
     def delete_tag(self, tag_id: int) -> Dict[str, Any]:
         tag = self.db.query(Tag).filter(Tag.id == tag_id).first()
         if not tag:
-            from app.shared_kernel.exceptions import NotFoundException
+            from app.core.exceptions import NotFoundException
             raise NotFoundException("Not found")
 
         # Delete association links

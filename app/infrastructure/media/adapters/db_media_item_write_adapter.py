@@ -1,7 +1,7 @@
 from typing import List, Any, Optional
 
-from app.shared_kernel.enums import ItemStatus
-from app.domains.library.models import MediaItem, Library, ExtraFile
+from app.core.enums import ItemStatus
+from app.modules.library.models import MediaItem, Library, ExtraFile
 
 class DbMediaItemWriteAdapter:
     def create_library(self, name: str, root_path: str) -> Any:

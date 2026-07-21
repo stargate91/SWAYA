@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from app.shared_kernel.enums import MediaType, Provider
+from app.core.enums import MediaType, Provider
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.infrastructure.scrapers.providers.fansdb import FansDBScraper
 from app.infrastructure.scrapers.enrichment.mainstream_enricher import MainstreamEnricher

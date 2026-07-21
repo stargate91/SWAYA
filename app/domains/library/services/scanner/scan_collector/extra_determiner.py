@@ -1,7 +1,7 @@
 from typing import Tuple, Optional, Any
 from pathlib import Path
 from sqlalchemy.orm import Session
-from app.shared_kernel.enums import ScanMode, ExtraCategory, ExtraSubtype
+from app.core.enums import ScanMode, ExtraCategory, ExtraSubtype
 
 class ExtraDeterminer:
     def __init__(self, categorizer: Any, mode: ScanMode, settings_port: Optional[Any] = None):

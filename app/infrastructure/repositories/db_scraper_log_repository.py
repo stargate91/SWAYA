@@ -2,8 +2,8 @@ import logging
 from typing import Optional, Dict, Any
 from sqlalchemy.orm import Session
 from app.shared_kernel.ports.scraper_log_port import ScraperLogPort
-from app.shared_kernel.enums import Provider
-from app.domains.tasks.models import ScraperLog
+from app.core.enums import Provider
+from app.modules.tasks.models import ScraperLog
 
 logger = logging.getLogger(__name__)
 

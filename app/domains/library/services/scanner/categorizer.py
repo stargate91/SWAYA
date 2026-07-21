@@ -1,9 +1,9 @@
 import logging
 from pathlib import Path
 from typing import Tuple, Optional
-from app.shared_kernel.enums import ExtraCategory, ExtraSubtype
+from app.core.enums import ExtraCategory, ExtraSubtype
 from app.shared_kernel.ports.settings_port import SettingsPort
-from app.shared_kernel.constants import (
+from app.core.constants import (
     SCANNER_SUBTYPE_MAP,
     CATEGORIZER_VIDEO_EXTS,
     CATEGORIZER_SUBTITLE_EXTS,

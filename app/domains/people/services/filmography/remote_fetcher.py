@@ -3,11 +3,11 @@ import math
 from typing import Optional, Any
 from sqlalchemy.orm import Session
 
-from app.shared_kernel.enums import Provider
-from app.domains.people.models import Person, MediaPersonLink
+from app.core.enums import Provider
+from app.modules.people.models import Person, MediaPersonLink
 from app.shared_kernel.ports.library_port import LibraryPort
 from app.shared_kernel.ports.image_service_port import ImageServicePort
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.domains.people.services.filmography.strategies.base_strategy import BaseFilmographyStrategy
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ class RemoteCreditsFetcher:
         db = self.db
         
         # Check Cache
-        from app.domains.people.models import RemoteFilmographyCache
+        from app.modules.people.models import RemoteFilmographyCache
         cache_entry = db.query(RemoteFilmographyCache).filter(
             RemoteFilmographyCache.person_id == person_id,
             RemoteFilmographyCache.provider == source.lower(),
@@ -39,7 +39,7 @@ class RemoteCreditsFetcher:
         else:
             # Query remote source using sort: POPULARITY
             try:
-                from app.shared_kernel.enums import Provider
+                from app.core.enums import Provider
                 prov_enum = Provider(source.lower())
                 scraper = self.scrapers.adult(prov_enum, db)
                 query = """
@@ -134,7 +134,7 @@ class RemoteCreditsFetcher:
 
         # Check local matches to set in_library and library_item_id
         try:
-            from app.domains.people.models import MediaPersonLink
+            from app.modules.people.models import MediaPersonLink
             active_match_ids = self.library_port.get_active_match_ids(media_type="scene", provider=source.lower())
             links = db.query(MediaPersonLink).filter(
                 MediaPersonLink.person_id == person_id,
@@ -194,7 +194,7 @@ class RemoteCreditsFetcher:
             return None
             
         # Check Cache
-        from app.domains.people.models import RemoteFilmographyCache
+        from app.modules.people.models import RemoteFilmographyCache
         cache_entry = db.query(RemoteFilmographyCache).filter(
             RemoteFilmographyCache.person_id == person_id,
             RemoteFilmographyCache.provider == source.lower(),
@@ -262,14 +262,14 @@ class RemoteCreditsFetcher:
         try:
             prov_enum = Provider(source.lower())
             active_match_ids = self.library_port.get_active_match_ids(media_type=media_type, provider=source.lower())
-            from app.shared_kernel.language import LanguageService
+            from app.core.language import LanguageService
             
             links = db.query(MediaPersonLink).filter(
                 MediaPersonLink.person_id == person_id,
                 MediaPersonLink.match_id.in_(active_match_ids)
             ).all()
             
-            from app.shared_kernel.language_settings import get_user_ui_language
+            from app.core.language import get_user_ui_language
             from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
             settings_port = DbSettingsAdapter(db)
             ui_lang = get_user_ui_language(settings_port)

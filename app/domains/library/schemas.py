@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List, Optional, Any, Dict, Union
 from pydantic import BaseModel, ConfigDict
 
-from app.shared_kernel.enums import (
+from app.core.enums import (
     ItemStatus,
     MovieEdition,
     MediaSource,

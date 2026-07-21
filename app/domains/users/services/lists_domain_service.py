@@ -1,8 +1,8 @@
 from typing import Optional
 from datetime import datetime
 
-from app.domains.users.models import CustomList, CustomListItem
-from app.shared_kernel.enums import CustomListType
+from app.modules.users.models import CustomList, CustomListItem
+from app.core.enums import CustomListType
 
 class ListsDomainService:
     @staticmethod

@@ -1,7 +1,7 @@
 from typing import Dict, Any, Callable, Optional
 from sqlalchemy.orm import Session
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 
 class TMDBEnricher:
     def __init__(self, scrapers: ScraperGatewayPort, get_temp_db_cb: Callable[[], Session], close_temp_db_cb: Optional[Callable[[Session], None]] = None):

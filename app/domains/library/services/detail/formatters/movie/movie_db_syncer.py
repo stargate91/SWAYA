@@ -1,8 +1,8 @@
 import logging
 from typing import Dict, Any
 from sqlalchemy.orm import Session
-from app.domains.metadata.models import MetadataMatch, MetadataLocalization
-from app.shared_kernel.genre_utils import split_genres as _split_genres
+from app.modules.metadata.models import MetadataMatch, MetadataLocalization
+from app.core.genre_utils import split_genres as _split_genres
 
 logger = logging.getLogger(__name__)
 

@@ -1,7 +1,7 @@
 import os
 import subprocess
 import logging
-from app.shared_kernel.database import SWAYA_DB_PATH
+from app.core.database import SWAYA_DB_PATH
 from app.infrastructure.filesystem.fs_utils import to_win_long_path
 
 logger = logging.getLogger(__name__)

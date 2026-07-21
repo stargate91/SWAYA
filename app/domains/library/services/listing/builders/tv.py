@@ -2,10 +2,10 @@ from typing import Tuple, Any, List
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import selectinload
 
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch
-from app.domains.users.models import UserOverride
-from app.shared_kernel.enums import MediaType
+from app.modules.library.models import MediaItem
+from app.modules.metadata.models import MetadataMatch
+from app.modules.users.models import UserOverride
+from app.core.enums import MediaType
 from app.domains.library.services.listing.filter_params import ListingFilterParams
 from app.domains.library.services.listing.builders.base import BaseQueryBuilder
 
@@ -95,7 +95,7 @@ class TvQueryBuilder(BaseQueryBuilder):
             )
 
         if params.selected_network_id:
-            from app.domains.metadata.models import metadata_match_studios
+            from app.modules.metadata.models import metadata_match_studios
             query = query.join(
                 metadata_match_studios, metadata_match_studios.c.metadata_match_id == MetadataMatch.id
             ).filter(

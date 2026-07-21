@@ -1,7 +1,7 @@
 import logging
 from typing import List, Tuple, Dict, Any
 from app.domains.people.services.filmography.strategies.base_strategy import BaseFilmographyStrategy
-from app.shared_kernel.enums import Provider
+from app.core.enums import Provider
 
 logger = logging.getLogger(__name__)
 

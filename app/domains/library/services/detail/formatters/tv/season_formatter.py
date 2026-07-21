@@ -38,7 +38,7 @@ class TvSeasonFormatter:
                             ep_match = next((m for m in media_item.matches if m.season_number == season_number and m.episode_number == ep_num), None)
                             ep_loc = None
                             if ep_match:
-                                from app.shared_kernel.language import LanguageService
+                                from app.core.language import LanguageService
                                 ep_loc = LanguageService.get_best_localization(ep_match.localizations, ui_lang)
                             
                             all_episodes.append({
@@ -80,15 +80,15 @@ class TvSeasonFormatter:
             is_season_watched = episode_count > 0 and watched_count >= episode_count
             
             poster = None
-            from app.domains.metadata.models import MetadataMatch
-            from app.shared_kernel.enums import Provider, MediaType
+            from app.modules.metadata.models import MetadataMatch
+            from app.core.enums import Provider, MediaType
             s_match = db.query(MetadataMatch).filter(
                 MetadataMatch.provider == Provider.TMDB,
                 MetadataMatch.external_id == f"{tv_tmdb_id_int}-s{season_number}",
                 MetadataMatch.media_type == MediaType.SEASON
             ).first()
             if s_match:
-                from app.shared_kernel.language import LanguageService
+                from app.core.language import LanguageService
                 s_loc = LanguageService.get_best_localization(s_match.localizations, ui_lang)
                 if s_loc:
                     poster = s_loc.local_poster_path or s_loc.poster_path

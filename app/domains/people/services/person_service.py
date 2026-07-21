@@ -1,8 +1,8 @@
 import logging
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from app.domains.people.models import Person
-from app.shared_kernel.enums import Provider
+from app.modules.people.models import Person
+from app.core.enums import Provider
 from app.shared_kernel.ports.people_repository_port import PeopleRepositoryPort
 
 logger = logging.getLogger(__name__)

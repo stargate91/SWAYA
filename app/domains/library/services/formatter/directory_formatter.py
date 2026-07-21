@@ -1,6 +1,6 @@
 import logging
 from typing import Dict, Any, Optional
-from app.shared_kernel.enums import MediaType, ItemStatus
+from app.core.enums import MediaType, ItemStatus
 
 logger = logging.getLogger(__name__)
 

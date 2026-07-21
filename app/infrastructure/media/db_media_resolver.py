@@ -3,9 +3,9 @@ import logging
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 
-from app.shared_kernel.enums import Provider, MediaType, ItemStatus
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch
+from app.core.enums import Provider, MediaType, ItemStatus
+from app.modules.library.models import MediaItem
+from app.modules.metadata.models import MetadataMatch
 from app.shared_kernel.ports.media_resolver import MediaResolverPort
 from app.shared_kernel.ports.library_port import LibraryPort
 
@@ -252,13 +252,13 @@ class DbMediaResolver(
     def update_item_status(self, item_id: int, status: str) -> Dict[str, Any]:
         item = self.db.query(MediaItem).filter(MediaItem.id == item_id).first()
         if not item:
-            from app.shared_kernel.exceptions import NotFoundException
+            from app.core.exceptions import NotFoundException
             raise NotFoundException("Item not found")
 
         try:
             new_status = ItemStatus(status.lower())
         except ValueError:
-            from app.shared_kernel.exceptions import BadRequestException
+            from app.core.exceptions import BadRequestException
             raise BadRequestException(f"Invalid status: {status}")
 
         if new_status == ItemStatus.IGNORED and item.status != ItemStatus.IGNORED:

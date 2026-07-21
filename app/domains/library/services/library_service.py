@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from typing import List
 
-from app.domains.library.models import MediaItem, Library
-from app.domains.metadata.models import MetadataMatch
+from app.modules.library.models import MediaItem, Library
+from app.modules.metadata.models import MetadataMatch
 
 
 class LibraryService:

@@ -1,8 +1,8 @@
 from typing import List, Dict, Any, Optional
 import pathlib
 
-from app.shared_kernel.enums import ItemStatus
-from app.domains.library.models import MediaItem, Library, ExtraFile
+from app.core.enums import ItemStatus
+from app.modules.library.models import MediaItem, Library, ExtraFile
 
 class DbMediaItemReadAdapter:
     def get_ignored_items(self, search: str = "", offset: int = 0, limit: int = 40) -> Dict[str, Any]:

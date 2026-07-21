@@ -2,7 +2,7 @@ import logging
 from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 
-from app.domains.users.models import UserOverride
+from app.modules.users.models import UserOverride
 from app.domains.users.schemas import (
     ItemOverridesUpdate,
     BulkOverridesUpdate,
@@ -26,7 +26,7 @@ class OverridesService:
         self.library_port: LibraryPort = resolver  # type: ignore[assignment]
         self.image_downloader = image_downloader
         if user_id is None:
-            from app.shared_kernel.user_context import get_current_user_id
+            from app.core.user_context import get_current_user_id
             user_id = get_current_user_id()
         self.user_id = user_id
         self.scrapers = scrapers

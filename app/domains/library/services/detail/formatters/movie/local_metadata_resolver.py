@@ -1,7 +1,7 @@
 import logging
 from typing import Any, Tuple, List, Optional
 from sqlalchemy.orm import Session
-from app.shared_kernel.enums import Provider
+from app.core.enums import Provider
 
 logger = logging.getLogger(__name__)
 

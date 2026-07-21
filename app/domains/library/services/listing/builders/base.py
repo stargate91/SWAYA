@@ -3,13 +3,13 @@ from typing import Tuple, Any, List
 from sqlalchemy import func, or_, and_, desc
 from sqlalchemy.orm import Session, joinedload, aliased
 
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch, MetadataLocalization
-from app.domains.users.models import UserOverride, Tag, user_override_tags
-from app.domains.people.models import MediaPersonLink
-from app.shared_kernel.enums import ItemStatus, MediaType, Provider
-from app.shared_kernel.user_context import get_current_user_id
-from app.shared_kernel.language import LanguageService
+from app.modules.library.models import MediaItem
+from app.modules.metadata.models import MetadataMatch, MetadataLocalization
+from app.modules.users.models import UserOverride, Tag, user_override_tags
+from app.modules.people.models import MediaPersonLink
+from app.core.enums import ItemStatus, MediaType, Provider
+from app.core.user_context import get_current_user_id
+from app.core.language import LanguageService
 from app.domains.library.services.listing.filter_params import ListingFilterParams
 
 class BaseQueryBuilder:
@@ -18,7 +18,7 @@ class BaseQueryBuilder:
         self.current_user_id = get_current_user_id()
         self.lib_statuses = [ItemStatus.RENAMED, ItemStatus.ORGANIZED]
         
-        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.core.language import get_user_ui_language
         from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
         settings_port = DbSettingsAdapter(self.db)
         self.ui_lang = get_user_ui_language(settings_port)
@@ -303,7 +303,7 @@ class BaseQueryBuilder:
             else:
                 query = query.order_by(val_col.asc())
         elif params.sort_by in ("finish_count_desc", "finish_count_asc"):
-            from app.domains.history.models import PlaybackPeakLog
+            from app.modules.history.models import PlaybackPeakLog
             peak_subquery = self.db.query(
                 PlaybackPeakLog.media_item_id,
                 func.count(PlaybackPeakLog.id).label("finish_count")
@@ -314,7 +314,7 @@ class BaseQueryBuilder:
             else:
                 query = query.order_by(func.coalesce(peak_subquery.c.finish_count, 0).asc())
         elif params.sort_by in ("last_finish_desc", "last_finish_asc"):
-            from app.domains.history.models import PlaybackPeakLog
+            from app.modules.history.models import PlaybackPeakLog
             peak_subquery = self.db.query(
                 PlaybackPeakLog.media_item_id,
                 func.max(PlaybackPeakLog.created_at).label("last_finish_at")
@@ -356,7 +356,7 @@ class BaseQueryBuilder:
             for link in links:
                 people_links_dict.setdefault(link.match_id, []).append(link)
 
-        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.core.language import get_user_ui_language
         from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
         settings_port = DbSettingsAdapter(self.db)
         ui_lang = get_user_ui_language(settings_port)

@@ -9,9 +9,9 @@ from pathlib import Path
 from sqlalchemy.orm import Session
 
 
-from app.domains.settings.models import UserSetting, SystemSetting
+from app.modules.settings.models import UserSetting, SystemSetting
 from app.shared_kernel.ports.library_port import LibraryPort
-from app.shared_kernel.constants import STASHDB_DEFAULT_ENDPOINT, FANSDB_DEFAULT_ENDPOINT, PORNDB_DEFAULT_ENDPOINT
+from app.core.constants import STASHDB_DEFAULT_ENDPOINT, FANSDB_DEFAULT_ENDPOINT, PORNDB_DEFAULT_ENDPOINT
 from app.domains.media_assets.services.images import image_processing_service
 from app.shared_kernel.ports.settings_port import SettingsPort
 
@@ -28,7 +28,7 @@ class SettingsService:
         self.db = db
         self.library_port = library_port
         if user_id is None:
-            from app.shared_kernel.user_context import get_current_user_id
+            from app.core.user_context import get_current_user_id
             user_id = get_current_user_id()
         self.user_id = user_id
         self.settings_port = settings_port

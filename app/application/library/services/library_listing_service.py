@@ -2,11 +2,11 @@ import logging
 from typing import List, Optional
 from sqlalchemy.orm import Session, joinedload
 
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch
-from app.domains.users.models import UserOverride
+from app.modules.library.models import MediaItem
+from app.modules.metadata.models import MetadataMatch
+from app.modules.users.models import UserOverride
 from app.domains.people.services.people_library_service import PeopleLibraryService
-from app.shared_kernel.enums import ItemStatus, MediaType
+from app.core.enums import ItemStatus, MediaType
 from app.domains.library.schemas import (
     ContinueWatchingItem,
     LibraryTabResponse,
@@ -54,8 +54,8 @@ class LibraryListingService:
 
         overrides = query.order_by(UserOverride.last_watched_at.desc()).limit(limit).all()
 
-        from app.shared_kernel.language_settings import get_user_ui_language
-        from app.shared_kernel.language import LanguageService
+        from app.core.language import get_user_ui_language
+        from app.core.language import LanguageService
         ui_lang = get_user_ui_language(self.settings)
 
         results = []

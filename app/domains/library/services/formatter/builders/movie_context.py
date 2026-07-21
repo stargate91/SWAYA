@@ -12,7 +12,7 @@ def build_movie_context(
     ctx = tech_parser.get_tech_context(item)
     collection_name = name_parser.resolve_collection_name(match, loc)
     
-    from app.shared_kernel.enums import Provider, MovieEdition, MediaSource, MediaAudioType
+    from app.core.enums import Provider, MovieEdition, MediaSource, MediaAudioType
     tmdb_id = ""
     if match and getattr(match, "provider", None) == Provider.TMDB:
         tmdb_id = str(match.external_id)

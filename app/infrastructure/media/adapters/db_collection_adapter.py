@@ -1,5 +1,5 @@
-from app.shared_kernel.enums import Provider
-from app.domains.metadata.models import MediaCollection
+from app.core.enums import Provider
+from app.modules.metadata.models import MediaCollection
 from app.shared_kernel.ports.collection_port import CollectionPort
 
 class DbCollectionAdapter(CollectionPort):

@@ -1,8 +1,8 @@
 from typing import List, Dict, Any
 from sqlalchemy.orm import Session
-from app.shared_kernel.enums import Provider, MediaType
-from app.domains.metadata.models import MetadataMatch
-from app.domains.users.models import UserOverride
+from app.core.enums import Provider, MediaType
+from app.modules.metadata.models import MetadataMatch
+from app.modules.users.models import UserOverride
 
 class TvEpisodeFormatter:
     def format_episodes(

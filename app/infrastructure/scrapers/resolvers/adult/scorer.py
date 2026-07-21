@@ -1,7 +1,7 @@
 import difflib
 import logging
-from app.shared_kernel.enums import ItemStatus
-from app.domains.library.models import MediaItem
+from app.core.enums import ItemStatus
+from app.modules.library.models import MediaItem
 from app.infrastructure.scrapers.resolver import normalize_title, normalize_title_words
 
 logger = logging.getLogger(__name__)

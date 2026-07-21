@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import Any
 
-from app.shared_kernel.database import get_db
+from app.core.database import get_db
 from app.domains.people.services.people_status_service import PeopleStatusService
 from app.domains.people.services.linking_data_mapper import LinkingDataMapper
 from app.domains.people.services.person_linker_service import PersonLinkerService
@@ -37,8 +37,8 @@ def link_person_source_preview(
     if not person:
         raise HTTPException(status_code=404, detail="Person not found")
 
-    from app.domains.users.models import UserOverride
-    from app.shared_kernel.user_context import get_current_user_id
+    from app.modules.users.models import UserOverride
+    from app.core.user_context import get_current_user_id
     try:
         current_uid = get_current_user_id()
     except Exception:
@@ -90,7 +90,7 @@ def link_person_source(
     if not person:
         raise HTTPException(status_code=404, detail="Person not found")
 
-    from app.shared_kernel.user_context import get_current_user_id
+    from app.core.user_context import get_current_user_id
     try:
         current_uid = get_current_user_id()
     except Exception:
@@ -136,7 +136,7 @@ def set_primary_person_source(
     db: Session = Depends(get_db)
 ):
     """Configures the primary metadata source preference for a person."""
-    from app.shared_kernel.enums import Provider
+    from app.core.enums import Provider
     person = resolve_person(person_id, db)
     if not person:
         raise HTTPException(status_code=404, detail="Person not found")
@@ -188,8 +188,8 @@ def save_custom_fields(
     if not person:
         raise HTTPException(status_code=404, detail="Person not found")
 
-    from app.domains.people.models import ExternalSourceLink
-    from app.shared_kernel.enums import Provider
+    from app.modules.people.models import ExternalSourceLink
+    from app.core.enums import Provider
 
     manual_link = next((x for x in person.external_links if x.provider == Provider.MANUAL), None)
     if not manual_link:

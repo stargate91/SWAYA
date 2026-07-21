@@ -4,9 +4,9 @@ from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
-from app.domains.people.models import Person, ExternalSourceLink, MediaPersonLink
-from app.domains.users.models import UserOverride, Tag
-from app.shared_kernel.enums import Provider, RoleType
+from app.modules.people.models import Person, ExternalSourceLink, MediaPersonLink
+from app.modules.users.models import UserOverride, Tag
+from app.core.enums import Provider, RoleType
 from app.infrastructure.scrapers.support.gateway import scraper_gateway
 
 logger = logging.getLogger(__name__)
@@ -285,7 +285,7 @@ class PersonLinkerService:
                 except Exception as e:
                     logger.error(f"Failed to enrich split person {new_person.id}: {e}", exc_info=True)
 
-            from app.domains.metadata.models import MetadataMatch
+            from app.modules.metadata.models import MetadataMatch
             match_ids = db.query(MetadataMatch.id).filter(MetadataMatch.provider == provider_enum).all()
             match_ids_set = {mid for (mid,) in match_ids}
 
@@ -310,8 +310,8 @@ class PersonLinkerService:
         if not providers:
             return
             
-        from app.domains.metadata.models import MetadataMatch
-        from app.domains.people.models import MediaPersonLink
+        from app.modules.metadata.models import MetadataMatch
+        from app.modules.people.models import MediaPersonLink
         
         matches = db.query(MetadataMatch).filter(MetadataMatch.provider.in_(providers)).all()
         

@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 from PIL import Image
 
-from app.shared_kernel.constants import MEDIA_THUMBNAIL_LIMITS
+from app.core.constants import MEDIA_THUMBNAIL_LIMITS
 from app.domains.media_assets.services.images import image_path_resolver
 
 logger = logging.getLogger(__name__)

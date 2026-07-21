@@ -3,9 +3,9 @@ import threading
 from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 
-from app.shared_kernel.enums import Provider, MediaType
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
-from app.domains.metadata.models import MetadataMatch, Studio
+from app.core.enums import Provider, MediaType
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.modules.metadata.models import MetadataMatch, Studio
 from app.shared_kernel.ports.metadata_repository_port import MetadataRepositoryPort
 from app.shared_kernel.ports.people_repository_port import PeopleRepositoryPort
 from app.shared_kernel.ports.image_download_port import ImageDownloadPort

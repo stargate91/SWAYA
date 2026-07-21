@@ -4,9 +4,9 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
-from app.shared_kernel.enums import ItemStatus, MediaType, Provider
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch
+from app.core.enums import ItemStatus, MediaType, Provider
+from app.modules.library.models import MediaItem
+from app.modules.metadata.models import MetadataMatch
 from app.infrastructure.scrapers.support.normalizer import ScraperNormalizer
 from app.infrastructure.scrapers.providers.omdb import OMDBScraper
 from app.infrastructure.scrapers.support.persistence import ScraperPersister

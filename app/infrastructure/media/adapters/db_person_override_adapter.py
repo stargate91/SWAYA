@@ -1,6 +1,6 @@
 from typing import Optional, Dict, Any
 
-from app.domains.users.models import UserOverride
+from app.modules.users.models import UserOverride
 from app.shared_kernel.ports.person_override_port import PersonOverridePort
 
 class DbPersonOverrideAdapter(PersonOverridePort):

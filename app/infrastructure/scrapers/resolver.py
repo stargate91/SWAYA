@@ -2,12 +2,12 @@ import re
 import unicodedata
 from typing import Any, Optional
 from sqlalchemy.orm import Session
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch, MetadataLocalization
-from app.domains.settings.models import SystemSetting, UserSetting
-from app.shared_kernel.enums import MediaType, ItemStatus, ScanMode
+from app.modules.library.models import MediaItem
+from app.modules.metadata.models import MetadataMatch, MetadataLocalization
+from app.modules.settings.models import SystemSetting, UserSetting
+from app.core.enums import MediaType, ItemStatus, ScanMode
 from app.infrastructure.scrapers.resolve_pipelines import get_resolver_pipeline
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 
 def _has_episode_value(episode) -> bool:
     if isinstance(episode, list):

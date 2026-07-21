@@ -1,8 +1,8 @@
 import logging
 from typing import List, Dict, Any
 
-from app.shared_kernel.enums import Provider, ItemStatus
-from app.domains.metadata.models import MetadataMatch
+from app.core.enums import Provider, ItemStatus
+from app.modules.metadata.models import MetadataMatch
 from app.infrastructure.media.adapters.structure.structure_updater import StructureUpdater
 
 logger = logging.getLogger(__name__)

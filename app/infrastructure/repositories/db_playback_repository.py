@@ -2,10 +2,10 @@ import logging
 from typing import Optional, List, Any
 from sqlalchemy.orm import Session, joinedload, selectinload
 from app.shared_kernel.ports.playback_repository_port import PlaybackRepositoryPort
-from app.shared_kernel.enums import MediaType
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch
-from app.domains.history.models import PlaybackLog
+from app.core.enums import MediaType
+from app.modules.library.models import MediaItem
+from app.modules.metadata.models import MetadataMatch
+from app.modules.history.models import PlaybackLog
 
 logger = logging.getLogger(__name__)
 

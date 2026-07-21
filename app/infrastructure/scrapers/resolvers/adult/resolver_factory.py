@@ -1,7 +1,7 @@
 import logging
 from typing import List, Any, Optional, Tuple
 from sqlalchemy.orm import Session
-from app.shared_kernel.enums import Provider
+from app.core.enums import Provider
 
 from app.infrastructure.scrapers.resolvers.adult.stashdb_resolver import StashDbResolver
 from app.infrastructure.scrapers.resolvers.adult.porndb_resolver import PornDbResolver

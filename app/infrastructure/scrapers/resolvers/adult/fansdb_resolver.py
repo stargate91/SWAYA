@@ -1,7 +1,7 @@
 import logging
 from typing import Optional, List, Tuple
-from app.shared_kernel.enums import Provider, ItemStatus
-from app.domains.library.models import MediaItem
+from app.core.enums import Provider, ItemStatus
+from app.modules.library.models import MediaItem
 from app.infrastructure.scrapers.resolvers.adult.stashdb_resolver import HASH_QUERY, SEARCH_QUERY
 
 logger = logging.getLogger(__name__)

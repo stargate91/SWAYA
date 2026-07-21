@@ -3,10 +3,10 @@ import logging
 from typing import List, Optional, Dict, Any
 from sqlalchemy.orm import Session, joinedload
 
-from app.shared_kernel.enums import MediaType, ItemStatus
-from app.domains.library.models import MediaItem, ExtraFile
-from app.domains.metadata.models import MetadataMatch
-from app.domains.people.models import MediaPersonLink
+from app.core.enums import MediaType, ItemStatus
+from app.modules.library.models import MediaItem, ExtraFile
+from app.modules.metadata.models import MetadataMatch
+from app.modules.people.models import MediaPersonLink
 
 logger = logging.getLogger(__name__)
 

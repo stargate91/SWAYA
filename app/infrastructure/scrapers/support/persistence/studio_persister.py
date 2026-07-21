@@ -6,7 +6,7 @@ import logging
 from typing import Dict, Any, Optional, List
 from sqlalchemy.orm import Session
 
-from app.domains.metadata.models import MetadataMatch, Studio
+from app.modules.metadata.models import MetadataMatch, Studio
 from app.shared_kernel.ports.metadata_repository_port import MetadataRepositoryPort
 
 logger = logging.getLogger(__name__)
@@ -148,7 +148,7 @@ class StudioPersister:
             
             # If the scraper name is different from the canonical name, create a StudioAlias
             if studio and raw_s_name and raw_s_name.strip().lower() != studio.name.lower():
-                from app.domains.metadata.models import StudioAlias
+                from app.modules.metadata.models import StudioAlias
                 alias_exists = self.db.query(StudioAlias).filter(
                     func.lower(StudioAlias.alias_name) == func.lower(raw_s_name.strip())
                 ).first()

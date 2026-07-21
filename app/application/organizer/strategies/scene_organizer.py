@@ -1,8 +1,8 @@
 from typing import List, Dict, Any, Optional
 from app.application.organizer.strategies.base_organizer import BaseMediaOrganizer
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch
-from app.shared_kernel.language import LanguageService
+from app.modules.library.models import MediaItem
+from app.modules.metadata.models import MetadataMatch
+from app.core.language import LanguageService
 
 class SceneOrganizer(BaseMediaOrganizer):
     def build_images_list(self, item: MediaItem, active_m: Optional[MetadataMatch], target_lang: str) -> List[Dict[str, Any]]:

@@ -2,9 +2,9 @@ import logging
 from typing import Optional, List, Any
 from sqlalchemy.orm import Session
 
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch
-from app.shared_kernel.enums import ItemStatus, Provider, ScanMode
+from app.modules.library.models import MediaItem
+from app.modules.metadata.models import MetadataMatch
+from app.core.enums import ItemStatus, Provider, ScanMode
 from app.infrastructure.scrapers.resolvers.adult.confidence_calculator import AdultConfidenceCalculator
 from app.infrastructure.scrapers.resolvers.adult.match_collator import AdultMatchCollator
 from app.infrastructure.scrapers.resolvers.adult.scorer import validate_hash_match

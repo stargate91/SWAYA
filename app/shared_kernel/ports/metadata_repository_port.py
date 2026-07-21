@@ -1,5 +1,5 @@
 from typing import Protocol, Any, Optional
-from app.shared_kernel.enums import Provider, MediaType
+from app.core.enums import Provider, MediaType
 
 class MetadataRepositoryPort(Protocol):
     def get_match(self, provider: Provider, external_id: str, media_type: MediaType, media_item_id: Optional[int] = None) -> Optional[Any]:

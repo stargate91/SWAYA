@@ -1,6 +1,6 @@
 import re
 from typing import List, Optional
-from app.shared_kernel.enums import Provider
+from app.core.enums import Provider
 
 class EnrichmentHelpers:
     @staticmethod

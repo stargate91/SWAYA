@@ -1,8 +1,8 @@
 import logging
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from app.domains.metadata.models import MetadataMatch, MetadataLocalization
-from app.domains.users.models import Tag
+from app.modules.metadata.models import MetadataMatch, MetadataLocalization
+from app.modules.users.models import Tag
 from app.domains.library.schemas import FilterOptionsResponse, TagGroupItem
 from app.shared_kernel.ports.user_repository_port import UserRepositoryPort
 
@@ -20,8 +20,8 @@ class LibraryFilterService:
         tab = params.tab
         is_adult = "adult" in tab.lower() or tab.lower() == "scenes"
         
-        from app.domains.library.models import MediaItem
-        from app.shared_kernel.enums import ItemStatus, MediaType
+        from app.modules.library.models import MediaItem
+        from app.core.enums import ItemStatus, MediaType
         from sqlalchemy import select
         
         lib_statuses = [ItemStatus.ORGANIZED, ItemStatus.RENAMED]
@@ -68,7 +68,7 @@ class LibraryFilterService:
         years = sorted(list(set(r.release_date.year for r in query_years if r.release_date)), reverse=True)
 
         # 2. Fetch genres
-        from app.shared_kernel.genre_utils import split_genres as _split_genres
+        from app.core.genre_utils import split_genres as _split_genres
         query_genres = self.db.query(MetadataLocalization.genres).filter(
             MetadataLocalization.match_id.in_(get_subquery(["selected_genre"])),
             MetadataLocalization.genres.isnot(None)
@@ -105,8 +105,8 @@ class LibraryFilterService:
         butt_shapes = []
         butt_sizes = []
         if True:
-            from app.domains.people.models import Person, MediaPersonLink
-            from app.domains.metadata.models import Studio
+            from app.modules.people.models import Person, MediaPersonLink
+            from app.modules.metadata.models import Studio
             from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
 
             settings_adapter = DbSettingsAdapter(self.db)
@@ -139,7 +139,7 @@ class LibraryFilterService:
 
                 # Apply favorite filter
                 if params.filter_favorite and params.filter_favorite != "all":
-                    from app.domains.users.models import UserOverride
+                    from app.modules.users.models import UserOverride
                     fav_person_ids = select(UserOverride.person_id).filter(
                         UserOverride.person_id.isnot(None),
                         UserOverride.is_favorite == True
@@ -190,7 +190,7 @@ class LibraryFilterService:
 
                 # Apply tags filter
                 if params.selected_tags:
-                    from app.domains.users.models import UserOverride, Tag as UserTag, user_override_tags
+                    from app.modules.users.models import UserOverride, Tag as UserTag, user_override_tags
                     tagged_person_ids = select(UserOverride.person_id).join(
                         user_override_tags, UserOverride.id == user_override_tags.c.user_override_id
                     ).join(
@@ -276,7 +276,7 @@ class LibraryFilterService:
                 studios.append({"id": s.id, "name": name})
 
             # Fetch networks for TV Shows
-            from app.domains.metadata.models import metadata_match_studios
+            from app.modules.metadata.models import metadata_match_studios
             active_networks = self.db.query(Studio).join(
                 metadata_match_studios, metadata_match_studios.c.studio_id == Studio.id
             ).filter(
@@ -459,9 +459,9 @@ class LibraryFilterService:
         if self.user_repository:
             self.user_repository.auto_heal_adult_tags()
 
-        from app.shared_kernel.enums import MediaType
-        from app.domains.metadata.models import MetadataMatch, MetadataLocalization
-        from app.domains.people.models import Person
+        from app.core.enums import MediaType
+        from app.modules.metadata.models import MetadataMatch, MetadataLocalization
+        from app.modules.people.models import Person
         from app.domains.media_assets.services.images import image_processing_service
 
         tags_query = self.db.query(Tag).filter(Tag.is_adult == is_adult).all()

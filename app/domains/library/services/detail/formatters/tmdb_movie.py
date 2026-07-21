@@ -2,12 +2,12 @@ import logging
 from typing import Any
 from fastapi.responses import JSONResponse
 
-from app.shared_kernel.enums import Provider, MediaType
-from app.domains.users.models import UserOverride
-from app.domains.metadata.models import MetadataMatch
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
-from app.shared_kernel.language import LanguageService
-from app.shared_kernel.genre_utils import split_genres as _split_genres
+from app.core.enums import Provider, MediaType
+from app.modules.users.models import UserOverride
+from app.modules.metadata.models import MetadataMatch
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.language import LanguageService
+from app.core.genre_utils import split_genres as _split_genres
 from app.domains.library.schemas import MovieDetailResponse
 from app.domains.library.services.detail.formatters.base import MovieDetailFormatter
 from app.domains.library.services.detail.detail_mixins import OverrideResolver, PlaybackResolver, ExternalLinksBuilder
@@ -28,13 +28,13 @@ class TmdbMovieFormatter(MovieDetailFormatter):
         except (ValueError, IndexError):
             return JSONResponse(status_code=400, content={"error": "Invalid TMDB ID format"})
         
-        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.core.language import get_user_ui_language
         from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
         settings_port = DbSettingsAdapter(db)
         ui_lang = get_user_ui_language(settings_port)
         
-        from app.domains.metadata.models import MetadataMatch
-        from app.shared_kernel.enums import Provider, MediaType
+        from app.modules.metadata.models import MetadataMatch
+        from app.core.enums import Provider, MediaType
         
         match = db.query(MetadataMatch).filter(
             MetadataMatch.provider == Provider.TMDB,

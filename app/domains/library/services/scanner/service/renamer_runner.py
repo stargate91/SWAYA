@@ -3,7 +3,7 @@ import logging
 import time
 from typing import List, Optional, Dict, Any
 
-from app.domains.history.models import ActionBatch
+from app.modules.history.models import ActionBatch
 from app.domains.library.services.scanner.service.status_coordinator import StatusCoordinator
 
 import os

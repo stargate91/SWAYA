@@ -3,8 +3,8 @@ import logging
 import threading
 from typing import Dict, Any
 
-from app.shared_kernel.enums import TaskStatus
-from app.domains.tasks.models import BackgroundTask
+from app.core.enums import TaskStatus
+from app.modules.tasks.models import BackgroundTask
 
 logger = logging.getLogger(__name__)
 

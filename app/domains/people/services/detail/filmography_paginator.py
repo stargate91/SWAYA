@@ -1,10 +1,10 @@
 import math
 from typing import Optional, Any
 
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.domains.people.services.filmography_service import FilmographyService
 from app.domains.people.schemas import PersonFilmographyResponse
-from app.domains.people.models import Person
+from app.modules.people.models import Person
 
 class FilmographyPaginator:
     def __init__(self, tmdb: Any, filmography_service: FilmographyService):

@@ -3,8 +3,8 @@ from typing import Any
 from sqlalchemy.orm import Session, joinedload
 from fastapi import HTTPException
 
-from app.shared_kernel.enums import Provider
-from app.domains.people.models import Person, ExternalSourceLink
+from app.core.enums import Provider
+from app.modules.people.models import Person, ExternalSourceLink
 
 logger = logging.getLogger(__name__)
 

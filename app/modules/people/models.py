@@ -3,51 +3,46 @@ from datetime import datetime
 from sqlalchemy import String, Integer, Float, Enum as SQLEnum, JSON, Boolean, ForeignKey, UniqueConstraint, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.shared_kernel.database import Base
-from app.shared_kernel.enums import RoleType, Provider
+from app.core.database import Base
+from app.core.enums import RoleType, Provider
 
 if TYPE_CHECKING:
-    from app.domains.metadata.models import MetadataMatch
-
+    from app.modules.metadata.models import MetadataMatch
+    from app.modules.users.models import UserOverride
 
 class Person(Base):
-    """
-    Global cast/crew database entry. Can be referenced by mainstream and adult matches.
-    Supports extended metadata for mainstream alternative names and adult performer attributes.
-    """
     __tablename__ = "people"
     
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String, index=True)
-    aliases: Mapped[Optional[List[str]]] = mapped_column(JSON) # Alternative names (also_known_as / aliases)
+    aliases: Mapped[Optional[List[str]]] = mapped_column(JSON)
     birthday: Mapped[Optional[str]] = mapped_column(String)
     deathday: Mapped[Optional[str]] = mapped_column(String)
     place_of_birth: Mapped[Optional[str]] = mapped_column(String)
     gender: Mapped[Optional[int]] = mapped_column(Integer)
-    known_for_department: Mapped[Optional[str]] = mapped_column(String, index=True) # e.g. "Acting", "Directing"
+    known_for_department: Mapped[Optional[str]] = mapped_column(String, index=True)
     popularity: Mapped[Optional[float]] = mapped_column(Float)
     rating_porndb: Mapped[Optional[float]] = mapped_column(Float, index=True)
     scene_count: Mapped[Optional[int]] = mapped_column(Integer, index=True)
     profile_path: Mapped[Optional[str]] = mapped_column(String)
-    local_profile_path: Mapped[Optional[str]] = mapped_column(String) # Local path to cached profile image
+    local_profile_path: Mapped[Optional[str]] = mapped_column(String)
     backdrop_path: Mapped[Optional[str]] = mapped_column(String)
-    local_backdrop_path: Mapped[Optional[str]] = mapped_column(String) # Local path to cached backdrop image
+    local_backdrop_path: Mapped[Optional[str]] = mapped_column(String)
     homepage: Mapped[Optional[str]] = mapped_column(String)
-    images: Mapped[Optional[List[str]]] = mapped_column(JSON) # List of alternative profile image URLs
-    external_ids: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON) # {"tmdb": "123", "stashdb": "uuid-xyz"}
-    socials: Mapped[Optional[dict[str, str]]] = mapped_column(JSON) # Social media handles/links (e.g. instagram, twitter)
-    is_active: Mapped[bool] = mapped_column(Boolean, default=False, index=True) # True if the person has local files or user interaction
+    images: Mapped[Optional[List[str]]] = mapped_column(JSON)
+    external_ids: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON)
+    socials: Mapped[Optional[dict[str, str]]] = mapped_column(JSON)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     is_adult: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
-    primary_provider: Mapped[Optional[Provider]] = mapped_column(SQLEnum(Provider), nullable=True)
+    primary_provider: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     field_routing: Mapped[Optional[dict[str, str]]] = mapped_column(JSON, nullable=True)
     
-    # Extended/Adult Performer attributes (allows structured filtering)
     hair_color: Mapped[Optional[str]] = mapped_column(String, index=True)
     eye_color: Mapped[Optional[str]] = mapped_column(String)
     ethnicity: Mapped[Optional[str]] = mapped_column(String, index=True)
-    height: Mapped[Optional[int]] = mapped_column(Integer, index=True) # in cm
-    weight: Mapped[Optional[int]] = mapped_column(Integer) # in kg
-    measurements: Mapped[Optional[str]] = mapped_column(String) # e.g., "34B-24-34"
+    height: Mapped[Optional[int]] = mapped_column(Integer, index=True)
+    weight: Mapped[Optional[int]] = mapped_column(Integer)
+    measurements: Mapped[Optional[str]] = mapped_column(String)
     cup_size: Mapped[Optional[str]] = mapped_column(String, index=True)
     band_size: Mapped[Optional[int]] = mapped_column(Integer)
     waist: Mapped[Optional[int]] = mapped_column(Integer)
@@ -60,29 +55,45 @@ class Person(Base):
     butt_size: Mapped[Optional[str]] = mapped_column(String, index=True)
     breast_size: Mapped[Optional[str]] = mapped_column(String, index=True)
     
-    # Career & Origin details
     career_start_year: Mapped[Optional[int]] = mapped_column(Integer)
     career_end_year: Mapped[Optional[int]] = mapped_column(Integer)
     
-    # Relationships
     media_links: Mapped[List["MediaPersonLink"]] = relationship(back_populates="person", cascade="all, delete-orphan")
     localizations: Mapped[List["PersonLocalization"]] = relationship(back_populates="person", cascade="all, delete-orphan")
     external_links: Mapped[List["ExternalSourceLink"]] = relationship(back_populates="person", cascade="all, delete-orphan")
     filmography_caches: Mapped[List["RemoteFilmographyCache"]] = relationship(back_populates="person", cascade="all, delete-orphan")
+    overrides: Mapped[List["UserOverride"]] = relationship("UserOverride", back_populates="person", cascade="all, delete-orphan")
+
+    @property
+    def availability_type(self) -> str:
+        """Computed state flag for frontend consumption (in_library or tracked_only)."""
+        if self.media_links and any(getattr(link.match, "media_item_id", None) is not None for link in self.media_links if link.match):
+            return "in_library"
+        return "tracked_only"
+
+    @property
+    def raw_profile_source(self) -> Optional[str]:
+        """Prioritized raw profile path: Local Cached > Remote API URL"""
+        return self.local_profile_path or self.profile_path
+
+    @property
+    def raw_backdrop_source(self) -> Optional[str]:
+        """Prioritized raw backdrop path: Local Cached > Remote API URL"""
+        return self.local_backdrop_path or self.backdrop_path
 
     def recalculate_projection(self, db):
         priority_map = {
-            Provider.TMDB: 4,
-            Provider.STASHDB: 3,
-            Provider.FANSDB: 2,
-            Provider.PORNDB: 1
+            "tmdb": 4,
+            "stashdb": 3,
+            "fansdb": 2,
+            "porndb": 1
         }
         if self.primary_provider:
             priority_map[self.primary_provider] = 10
         
         sorted_links = sorted(
             self.external_links,
-            key=lambda x: priority_map.get(x.provider, 0)
+            key=lambda x: priority_map.get(x.provider.value if hasattr(x.provider, 'value') else x.provider, 0)
         )
         
         routing = dict(self.field_routing or {})
@@ -91,10 +102,11 @@ class Person(Base):
             routed_provider = routing.get(field_name)
             if routed_provider:
                 for link in self.external_links:
-                    if link.provider.value == routed_provider and link.source_data:
-                        val = link.source_data.get(field_name)
-                        if val is not None and val != "":
-                            return val
+                    prov_val = link.provider.value if hasattr(link.provider, 'value') else link.provider
+                    if prov_val == routed_provider and link.source_data:
+                          val = link.source_data.get(field_name)
+                          if val is not None and val != "":
+                              return val
             # Fallback to priority loop (highest priority link overwrites lower)
             for link in sorted_links:
                 data = link.source_data
@@ -333,10 +345,10 @@ class Person(Base):
         
         ext_ids = dict(self.external_ids or {})
         for link in self.external_links:
-            key = link.provider.value
+            key = link.provider.value if hasattr(link.provider, 'value') else link.provider
             ext_ids[key] = str(link.external_id)
             ext_ids[f"{key}_id"] = str(link.external_id)
-        active_providers = {link.provider.value for link in self.external_links}
+        active_providers = {link.provider.value if hasattr(link.provider, 'value') else link.provider for link in self.external_links}
         for provider_val in [Provider.TMDB.value, Provider.STASHDB.value, Provider.FANSDB.value, Provider.PORNDB.value]:
             if provider_val not in active_providers:
                 ext_ids.pop(provider_val, None)
@@ -348,7 +360,7 @@ class Person(Base):
             if loc in existing_localizations:
                 existing_localizations[loc].biography = bio_text
             else:
-                from app.domains.people.models import PersonLocalization
+                from app.modules.people.models import PersonLocalization
                 new_loc = PersonLocalization(person_id=self.id, locale=loc, biography=bio_text)
                 db.add(new_loc)
                 self.localizations.append(new_loc)
@@ -356,74 +368,53 @@ class Person(Base):
             if loc not in biographies:
                 db.delete(loc_obj)
 
-
 class PersonLocalization(Base):
-    """
-    Multi-language metadata for actors/performers (e.g. biography).
-    """
     __tablename__ = "person_localizations"
     __table_args__ = (UniqueConstraint("person_id", "locale", name="uq_person_locale"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     person_id: Mapped[int] = mapped_column(ForeignKey("people.id", ondelete="CASCADE"), index=True)
-    locale: Mapped[str] = mapped_column(String, default="en", index=True) # "hu", "en"
-    
+    locale: Mapped[str] = mapped_column(String, default="en", index=True)
     biography: Mapped[Optional[str]] = mapped_column(String)
     
-    # Relationships
     person: Mapped["Person"] = relationship(back_populates="localizations")
 
-
 class MediaPersonLink(Base):
-    """
-    Link mapping people to movies/shows/scenes with roles.
-    """
     __tablename__ = "media_person_links"
     
     id: Mapped[int] = mapped_column(primary_key=True)
     match_id: Mapped[int] = mapped_column(ForeignKey("metadata_matches.id", ondelete="CASCADE"), index=True)
     person_id: Mapped[int] = mapped_column(ForeignKey("people.id", ondelete="CASCADE"), index=True)
-    role: Mapped[RoleType] = mapped_column(SQLEnum(RoleType), index=True) # Actor, Director, etc.
+    role: Mapped[RoleType] = mapped_column(SQLEnum(RoleType), index=True)
     character_name: Mapped[Optional[str]] = mapped_column(String)
-    order: Mapped[int] = mapped_column(Integer, default=0) # Order of appearance in cast list
+    order: Mapped[int] = mapped_column(Integer, default=0)
     
-    # Relationships
     person: Mapped["Person"] = relationship(back_populates="media_links")
-    match: Mapped["MetadataMatch"] = relationship(back_populates="people_links")
-
+    match: Mapped["MetadataMatch"] = relationship("MetadataMatch", back_populates="people_links")
 
 class ExternalSourceLink(Base):
-    """
-    Links multiple external APIs to a single Person.
-    Allows merging TMDB, StashDB, and PornDB profiles for the same actor.
-    """
     __tablename__ = "external_source_links"
     __table_args__ = (UniqueConstraint("person_id", "provider", "external_id", name="uq_person_external_source"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     person_id: Mapped[int] = mapped_column(ForeignKey("people.id", ondelete="CASCADE"), index=True)
     provider: Mapped[Provider] = mapped_column(SQLEnum(Provider), index=True)
-    external_id: Mapped[str] = mapped_column(String, index=True) # e.g., StashDB performer UUID
+    external_id: Mapped[str] = mapped_column(String, index=True)
     profile_url: Mapped[Optional[str]] = mapped_column(String)
+    is_primary: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     source_data: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON)
 
-    # Relationships
     person: Mapped["Person"] = relationship(back_populates="external_links")
 
-
 class RemoteFilmographyCache(Base):
-    """
-    Caches external filmography credits (movies/scenes) statically for performers.
-    """
     __tablename__ = "remote_filmography_caches"
     __table_args__ = (UniqueConstraint("person_id", "provider", "media_type", name="uq_person_provider_mediatype"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     person_id: Mapped[int] = mapped_column(ForeignKey("people.id", ondelete="CASCADE"), index=True)
-    provider: Mapped[str] = mapped_column(String, index=True) # "stashdb", "fansdb", "porndb"
-    media_type: Mapped[str] = mapped_column(String, index=True) # "scene", "movie"
-    data: Mapped[dict] = mapped_column(JSON) # Array of serialized filmography items (excluding live 'in_library' status)
+    provider: Mapped[str] = mapped_column(String, index=True)
+    media_type: Mapped[str] = mapped_column(String, index=True)
+    data: Mapped[dict] = mapped_column(JSON)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=func.now(), onupdate=func.now())
 
-    # Relationships
     person: Mapped["Person"] = relationship(back_populates="filmography_caches")

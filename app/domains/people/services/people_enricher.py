@@ -2,7 +2,7 @@ import logging
 from typing import List, Optional, Callable, Any
 import requests
 from sqlalchemy.orm import Session
-from app.domains.people.models import Person
+from app.modules.people.models import Person
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 
 from app.shared_kernel.ports.task_monitor_port import TaskMonitorPort

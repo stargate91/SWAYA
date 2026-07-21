@@ -2,8 +2,8 @@ import logging
 from typing import List, Optional
 from sqlalchemy.orm import Session, selectinload
 
-from app.domains.people.models import Person, MediaPersonLink
-from app.shared_kernel.user_context import get_current_user_id
+from app.modules.people.models import Person, MediaPersonLink
+from app.core.user_context import get_current_user_id
 from app.domains.people.schemas import PeopleGroupItem
 from app.shared_kernel.ports.library_port import LibraryPort
 from app.shared_kernel.ports.image_service_port import ImageServicePort
@@ -75,8 +75,8 @@ class PeopleLibraryService:
         }
 
         # Calculate watch, tag and finish counts for sorting/display
-        from app.domains.metadata.models import MetadataMatch
-        from app.domains.history.models import PlaybackLog, PlaybackPeakLog
+        from app.modules.metadata.models import MetadataMatch
+        from app.modules.history.models import PlaybackLog, PlaybackPeakLog
         from sqlalchemy import func
 
         match_media_map = {}
@@ -159,7 +159,7 @@ class PeopleLibraryService:
             person_finish_counts[pid] = f_count
             person_last_finish[pid] = l_finish
 
-        from app.domains.users.models import UserOverride, user_override_tags
+        from app.modules.users.models import UserOverride, user_override_tags
         tag_counts = dict(
             self.db.query(
                 UserOverride.person_id,

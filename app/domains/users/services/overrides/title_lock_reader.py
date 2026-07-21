@@ -1,7 +1,7 @@
 import logging
 from typing import Optional, Any
 from sqlalchemy.orm import Session
-from app.domains.users.models import UserOverride
+from app.modules.users.models import UserOverride
 
 logger = logging.getLogger(__name__)
 
@@ -19,8 +19,8 @@ class TitleLockReader:
             if isinstance(item_id, str) and "_" in item_id:
                 prefix, val = item_id.split("_", 1)
                 if prefix in ("tmdb", "porndb", "theporndb", "stash", "stashdb", "fansdb", "scene", "movie"):
-                    from app.shared_kernel.enums import Provider, MediaType
-                    from app.domains.metadata.models import MetadataMatch
+                    from app.core.enums import Provider, MediaType
+                    from app.modules.metadata.models import MetadataMatch
                     
                     provider = Provider.TMDB
                     if prefix == "tmdb":

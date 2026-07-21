@@ -2,7 +2,7 @@ import logging
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 
-from app.shared_kernel.enums import Provider
+from app.core.enums import Provider
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 
 from app.domains.metadata.services.search.adult_search_resolver import AdultSearchResolver

@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 from typing import List, Dict, Optional, Any
 from app.shared_kernel.ports.settings_port import SettingsPort
-from app.shared_kernel.constants import (
+from app.core.constants import (
     DEFAULT_VIDEO_EXTS,
     DEFAULT_SUBTITLE_EXTS,
     DEFAULT_IMAGE_EXTS,

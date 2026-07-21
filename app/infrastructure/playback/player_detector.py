@@ -8,7 +8,7 @@ from typing import Optional, Tuple
 logger = logging.getLogger(__name__)
 
 def find_media_player(settings_port) -> Tuple[Optional[str], Optional[str]]:
-    from app.shared_kernel.user_context import get_current_user_id
+    from app.core.user_context import get_current_user_id
     current_user_id = get_current_user_id()
     vlc_path = settings_port.get_setting("vlc_path", user_id=current_user_id)
     mpc_path = settings_port.get_setting("mpc_path", user_id=current_user_id)

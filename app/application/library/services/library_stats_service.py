@@ -4,9 +4,9 @@ from itertools import combinations
 from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
 
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch
-from app.shared_kernel.enums import ItemStatus, MediaType
+from app.modules.library.models import MediaItem
+from app.modules.metadata.models import MetadataMatch
+from app.core.enums import ItemStatus, MediaType
 from app.domains.library.schemas import LibraryStatsResponse
 
 from app.shared_kernel.ports.settings_port import SettingsPort
@@ -98,7 +98,7 @@ class LibraryStatsService:
         settings_adapter = self.settings
         # Mock user context if needed, or fallback to system settings
         try:
-            import app.shared_kernel.user_context
+            import app.core.user_context
             current_user_id = app.shared_kernel.user_context.get_current_user_id()
         except Exception:
             current_user_id = 1
@@ -253,7 +253,7 @@ class LibraryStatsService:
         decade_dist = {}
         genre_pair_dist = {}
 
-        from app.shared_kernel.genre_utils import split_genres as _split_genres
+        from app.core.genre_utils import split_genres as _split_genres
 
         for m in unique_matches:
             # Decade

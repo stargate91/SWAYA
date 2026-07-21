@@ -3,10 +3,10 @@ from typing import Any
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 
-from app.shared_kernel.enums import Provider, MediaType
-from app.domains.users.models import UserOverride
+from app.core.enums import Provider, MediaType
+from app.modules.users.models import UserOverride
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
-from app.domains.metadata.models import Studio, MetadataMatch
+from app.modules.metadata.models import Studio, MetadataMatch
 from app.domains.library.services.detail._detail_formatter import DetailFormatter
 from app.domains.library.services.detail.detail_mixins import OverrideResolver, ExternalLinksBuilder
 
@@ -51,7 +51,7 @@ class SceneDetailService(DetailFormatter):
             scene_uuid = _strip_provider_prefix(parts[1])
         else:
             if str(item_id).isdigit():
-                from app.domains.library.models import MediaItem
+                from app.modules.library.models import MediaItem
                 item = db.query(MediaItem).filter(MediaItem.id == int(item_id)).first()
                 if item:
                     match_db = db.query(MetadataMatch).filter(
@@ -210,8 +210,8 @@ class SceneDetailService(DetailFormatter):
                         _download_image_now(self.image_downloader, parent_logo, "logos", f"studio_{parent_name}")
 
         if not scene_data and match:
-            from app.shared_kernel.language import LanguageService
-            from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+            from app.core.language import LanguageService
+            from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
             loc_db = LanguageService.get_best_localization(match.localizations, DEFAULT_FALLBACK_LANGUAGE)
             if loc_db and loc_db.title:
                 performers = []
@@ -350,10 +350,10 @@ class SceneDetailService(DetailFormatter):
         ).first()
 
         if match_db and match_db.media_item_id and not item:
-            from app.domains.library.models import MediaItem
+            from app.modules.library.models import MediaItem
             item = db.query(MediaItem).filter(MediaItem.id == match_db.media_item_id).first()
 
-        from app.shared_kernel.user_context import get_current_user_id
+        from app.core.user_context import get_current_user_id
         current_uid = get_current_user_id() or 1
 
         # 1. Build performers list using CastBuilder
@@ -484,8 +484,8 @@ class SceneDetailService(DetailFormatter):
         return SceneDetailResponse(**result)
 
     def _get_sibling_matches(self, db: Session, match_db: MetadataMatch) -> list:
-        from app.domains.metadata.models import MetadataMatch
-        from app.shared_kernel.enums import MediaType
+        from app.modules.metadata.models import MetadataMatch
+        from app.core.enums import MediaType
         if not match_db or match_db.media_type != MediaType.SCENE:
             return [match_db] if match_db else []
         
@@ -502,8 +502,8 @@ class SceneDetailService(DetailFormatter):
 
     def _sync_performer_links(self, db: Session, match_db: MetadataMatch, scene_data: dict, provider_prefix: str):
         """Ensure performer links exist in the DB for this match so list views can display them."""
-        from app.domains.people.models import Person, MediaPersonLink, ExternalSourceLink
-        from app.shared_kernel.enums import RoleType
+        from app.modules.people.models import Person, MediaPersonLink, ExternalSourceLink
+        from app.core.enums import RoleType
 
         performers = scene_data.get("performers") or []
         if not performers:
@@ -606,7 +606,7 @@ class SceneDetailService(DetailFormatter):
 
     def _sync_studios(self, db: Session, match_db: MetadataMatch, scene_data: dict, image_downloader: Optional[ImageDownloadPort] = None):
         """Ensure studios exist in the DB and are linked to the match."""
-        from app.domains.metadata.models import Studio
+        from app.modules.metadata.models import Studio
         from app.domains.library.services.detail.scene.metadata_syncer import _queue_image
 
         studio_data = scene_data.get("studio") or scene_data.get("site") or {}

@@ -1,9 +1,9 @@
 import logging
 from datetime import datetime
-from app.domains.metadata.models import MetadataMatch
-from app.shared_kernel.enums import MediaType
+from app.modules.metadata.models import MetadataMatch
+from app.core.enums import MediaType
 from app.domains.media_assets.services.images import image_processing_service
-from app.shared_kernel.genre_utils import split_genres as _split_genres
+from app.core.genre_utils import split_genres as _split_genres
 from app.infrastructure.scrapers.enrichment.parsers.common import _pick_trailer_key, tv_enrich_lock
 
 logger = logging.getLogger(__name__)

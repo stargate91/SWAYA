@@ -2,9 +2,9 @@ import logging
 from typing import Optional, Any
 from sqlalchemy.orm import Session
 
-from app.shared_kernel.enums import Provider
-from app.domains.people.models import Person, PersonLocalization, ExternalSourceLink
-from app.shared_kernel.language import LanguageService
+from app.core.enums import Provider
+from app.modules.people.models import Person, PersonLocalization, ExternalSourceLink
+from app.core.language import LanguageService
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.shared_kernel.ports.library_port import LibraryPort
 from app.shared_kernel.ports.image_service_port import ImageServicePort
@@ -81,7 +81,7 @@ class PersonDetailCollator:
                             new_imgs.insert(0, person.profile_path)
                         person.images = merge_images(person.images, new_imgs)
                         
-                        from app.domains.people.models import PersonLocalization
+                        from app.modules.people.models import PersonLocalization
                         if tmdb_details.get("biography"):
                             if not loc:
                                 loc = PersonLocalization(person_id=person.id, locale=ui_lang, biography=tmdb_details["biography"])
@@ -280,9 +280,9 @@ class PersonDetailCollator:
         last_finish_at = None
         finishes = []
         if person.is_adult:
-            from app.domains.history.models import PlaybackPeakLog
-            from app.domains.metadata.models import MetadataMatch
-            from app.domains.people.models import MediaPersonLink
+            from app.modules.history.models import PlaybackPeakLog
+            from app.modules.metadata.models import MetadataMatch
+            from app.modules.people.models import MediaPersonLink
             from sqlalchemy import desc
 
             peaks = (

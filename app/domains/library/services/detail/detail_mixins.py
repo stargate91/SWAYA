@@ -9,8 +9,8 @@ from typing import Optional, Tuple, List, Dict, Any
 
 from sqlalchemy.orm import Session
 
-from app.domains.users.models import UserOverride
-from app.domains.metadata.models import MetadataMatch
+from app.modules.users.models import UserOverride
+from app.modules.metadata.models import MetadataMatch
 
 
 class OverrideResolver:
@@ -94,7 +94,7 @@ class PlaybackResolver:
     ) -> List[Dict[str, Any]]:
         if not media_item_id:
             return []
-        from app.domains.history.models import PlaybackLog
+        from app.modules.history.models import PlaybackLog
         logs = db.query(PlaybackLog).filter(
             PlaybackLog.user_id == current_uid,
             PlaybackLog.media_item_id == media_item_id
@@ -110,7 +110,7 @@ class PlaybackResolver:
     ) -> Tuple[int, List[Dict[str, Any]]]:
         if not media_item_id:
             return 0, []
-        from app.domains.history.models import PlaybackPeakLog
+        from app.modules.history.models import PlaybackPeakLog
         peaks = db.query(PlaybackPeakLog).filter(
             PlaybackPeakLog.user_id == current_uid,
             PlaybackPeakLog.media_item_id == media_item_id

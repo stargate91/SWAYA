@@ -1,6 +1,6 @@
 import enum
 
-class Provider(enum.Enum):
+class Provider(str, enum.Enum):
     """Supported metadata and content providers."""
     TMDB = "tmdb"
     OMDB = "omdb"
@@ -9,7 +9,7 @@ class Provider(enum.Enum):
     FANSDB = "fansdb"
     MANUAL = "manual"
 
-class ScanMode(enum.Enum):
+class ScanMode(str, enum.Enum):
     """Explicit metadata strategy for a scan run."""
     MOVIES_TV = "movies_tv"
     SCENES = "scenes"
@@ -24,7 +24,7 @@ class ScanMode(enum.Enum):
     def requires_adult_access(self) -> bool:
         return self in (ScanMode.SCENES, ScanMode.PORNDB_MOVIE)
 
-class MediaType(enum.Enum):
+class MediaType(str, enum.Enum):
     """Types of media content supported by the application."""
     MOVIE = "movie"
     TV = "tv"
@@ -35,7 +35,7 @@ class MediaType(enum.Enum):
     VIDEO = "video"
     COLLECTION = "collection"
 
-class ItemStatus(enum.Enum):
+class ItemStatus(str, enum.Enum):
     """Indexing and matching status of a media item on disk."""
     NEW = "new"
     NO_MATCH = "no_match"
@@ -48,7 +48,7 @@ class ItemStatus(enum.Enum):
     IGNORED = "ignored"
     MISSING = "missing"
 
-class RoleType(enum.Enum):
+class RoleType(str, enum.Enum):
     """Credits role types for cast and crew."""
     ACTOR = "actor"
     DIRECTOR = "director"
@@ -57,7 +57,7 @@ class RoleType(enum.Enum):
     CREATOR = "creator"
     SOUND = "sound"
 
-class TaskStatus(enum.Enum):
+class TaskStatus(str, enum.Enum):
     """Current execution state of background tasks."""
     PENDING = "pending"
     RUNNING = "running"
@@ -66,7 +66,7 @@ class TaskStatus(enum.Enum):
     FAILED = "failed"
     ABORTED = "aborted"
 
-class TaskErrorCode(enum.Enum):
+class TaskErrorCode(str, enum.Enum):
     """Categorized error codes for background task failures."""
     RATE_LIMIT = "rate_limit"
     API_KEY_MISSING = "api_key_missing"
@@ -75,14 +75,14 @@ class TaskErrorCode(enum.Enum):
     NO_MATCH = "no_match"
     UNKNOWN = "unknown"
 
-class AssetStatus(enum.Enum):
+class AssetStatus(str, enum.Enum):
     """Status of downloading associated media assets (covers, posters, etc.)."""
     PENDING = "pending"
     DOWNLOADING = "downloading"
     COMPLETED = "completed"
     FAILED = "failed"
 
-class CacheStatus(enum.Enum):
+class CacheStatus(str, enum.Enum):
     """Status/Lifecycle of API cache records."""
     VALID = "valid"
     PARTIAL = "partial"
@@ -90,7 +90,7 @@ class CacheStatus(enum.Enum):
     FAILED = "failed"
     NOT_FOUND = "not_found"
 
-class MovieEdition(enum.Enum):
+class MovieEdition(str, enum.Enum):
     """Special editions or cuts of movies."""
     NONE = "none"
     THEATRICAL = "theatrical"
@@ -103,7 +103,7 @@ class MovieEdition(enum.Enum):
     COLLECTORS_EDITION = "collectors_edition"
     FAN_EDIT = "fan_edit"
 
-class MediaSource(enum.Enum):
+class MediaSource(str, enum.Enum):
     """Source medium of the media file."""
     NONE = "none"
     BLURAY = "bluray"
@@ -112,7 +112,7 @@ class MediaSource(enum.Enum):
     TV = "tv"
     CAM = "cam"
 
-class MediaAudioType(enum.Enum):
+class MediaAudioType(str, enum.Enum):
     """Audio configuration of the media file."""
     NONE = "none"
     MONO = "mono"
@@ -121,7 +121,7 @@ class MediaAudioType(enum.Enum):
     DUAL_AUDIO = "dual_audio"
     MULTI_AUDIO = "multi_audio"
 
-class ActionType(enum.Enum):
+class ActionType(str, enum.Enum):
     """File or metadata operations logged in action batches."""
     RENAME = "rename"
     MOVE = "move"
@@ -130,14 +130,14 @@ class ActionType(enum.Enum):
     METADATA_UPDATE = "metadata_update"
     IDENTIFY = "identify"
 
-class ActionStatus(enum.Enum):
+class ActionStatus(str, enum.Enum):
     """Status of a logged file operation batch."""
     SUCCESS = "success"
     FAILED = "failed"
     PENDING = "pending"
     UNDONE = "undone"
 
-class ExtraCategory(enum.Enum):
+class ExtraCategory(str, enum.Enum):
     """General category of associated extra files."""
     VIDEO = "video"
     IMAGE = "image"
@@ -145,7 +145,7 @@ class ExtraCategory(enum.Enum):
     SUBTITLE = "subtitle"
     AUDIO = "audio"
 
-class ExtraSubtype(enum.Enum):
+class ExtraSubtype(str, enum.Enum):
     """Specific subtype of associated extra files."""
     TRAILER = "trailer"
     SAMPLE = "sample"
@@ -185,7 +185,7 @@ class ExtraSubtype(enum.Enum):
     OTHER = "other"
 
 
-class CustomListType(enum.Enum):
+class CustomListType(str, enum.Enum):
     """Types of items allowed in a custom user list to prevent mixing."""
     MEDIA = "media"
     PERSON = "person"

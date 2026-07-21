@@ -2,9 +2,9 @@ import logging
 from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
 
-from app.domains.people.models import Person
+from app.modules.people.models import Person
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.shared_kernel.ports.library_port import LibraryPort
 from app.domains.people.services.filmography_service import FilmographyService
 from app.domains.people.schemas import (
@@ -86,7 +86,7 @@ class PerformerDetailReader:
     def get_person_credit_backdrops(self, person_id: Any, tmdb_id: int, media_type: str) -> Dict[str, Any]:
         self._resolve_person(person_id)
         normalized_type = "tv" if str(media_type or "").lower() in {"tv", "series"} else "movie"
-        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.core.language import get_user_ui_language
         from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
         settings_port = DbSettingsAdapter(self.db)
         ui_lang = get_user_ui_language(settings_port)

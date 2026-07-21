@@ -2,10 +2,10 @@ import asyncio
 import logging
 from typing import List, Optional, Set
 
-from app.domains.people.models import Person, MediaPersonLink
+from app.modules.people.models import Person, MediaPersonLink
 from app.domains.people.services.people_enricher import PeopleEnricher
-from app.domains.tasks.models import BackgroundTask
-from app.shared_kernel.enums import TaskStatus
+from app.modules.tasks.models import BackgroundTask
+from app.core.enums import TaskStatus
 
 logger = logging.getLogger(__name__)
 
@@ -192,7 +192,7 @@ class PeopleEnrichWorker:
                 await asyncio.sleep(2)
 
     def _enrich_single_person(self, person_id: int) -> bool:
-        from app.domains.people.models import ExternalSourceLink
+        from app.modules.people.models import ExternalSourceLink
         db = self.session_factory()
         try:
             person = db.query(Person).filter(Person.id == person_id).first()

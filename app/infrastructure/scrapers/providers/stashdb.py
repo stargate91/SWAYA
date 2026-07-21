@@ -1,10 +1,10 @@
 import logging
 from typing import Optional
 
-from app.shared_kernel.enums import Provider, MediaType
+from app.core.enums import Provider, MediaType
 from app.infrastructure.scrapers.support.base import BaseScraper
 
-from app.shared_kernel.constants import STASHDB_DEFAULT_ENDPOINT, SCRAPER_REQUEST_TIMEOUT
+from app.core.constants import STASHDB_DEFAULT_ENDPOINT, SCRAPER_REQUEST_TIMEOUT
 
 logger = logging.getLogger(__name__)
 

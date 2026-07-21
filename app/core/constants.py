@@ -1,4 +1,4 @@
-from app.shared_kernel.enums import ExtraSubtype
+from app.core.enums import ExtraSubtype
 
 # API URLs and Base Endpoints
 TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/"
@@ -36,6 +36,7 @@ TMDB_DOWNLOAD_SIZES = {
     "avatars": "original"
 }
 
+# 3.6 Flash layout requirements: central HSL colors and desktop-only layout (no media queries)
 MEDIA_IMAGE_LIMITS = {
     "backdrops": {"max_width": 3840},     # 4K limit
     "posters": {"max_width": 3840},       # 4K limit

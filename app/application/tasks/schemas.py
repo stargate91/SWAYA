@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional, Dict, Any
 from datetime import datetime
-from app.shared_kernel.enums import TaskStatus, TaskErrorCode, Provider
+from app.core.enums import TaskStatus, TaskErrorCode, Provider
 
 class BaseSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)

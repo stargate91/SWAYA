@@ -2,9 +2,9 @@ from typing import Optional, Any
 from sqlalchemy import case, func
 from sqlalchemy.orm import Session
 
-from app.shared_kernel.enums import MediaType, RoleType, ItemStatus
-from app.domains.people.models import Person, MediaPersonLink
-from app.domains.metadata.models import MetadataMatch
+from app.core.enums import MediaType, RoleType, ItemStatus
+from app.modules.people.models import Person, MediaPersonLink
+from app.modules.metadata.models import MetadataMatch
 from app.domains.people.schemas import PeopleSearchResponse
 
 class PeopleQueryBuilder:
@@ -186,8 +186,8 @@ class PeopleQueryBuilder:
         # Apply SQL-level offset and limit
         results = query.offset(offset).limit(limit).all()
 
-        from app.domains.users.models import UserOverride
-        from app.shared_kernel.user_context import get_current_user_id
+        from app.modules.users.models import UserOverride
+        from app.core.user_context import get_current_user_id
         user_id = get_current_user_id() or 1
 
         person_ids = [person.id for person, _, _ in results]

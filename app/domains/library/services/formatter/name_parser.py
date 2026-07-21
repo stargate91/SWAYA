@@ -1,8 +1,8 @@
 import logging
 from typing import List, Dict, Any, Optional
 from datetime import datetime
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
-from app.shared_kernel.language import LanguageService
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.language import LanguageService
 
 logger = logging.getLogger(__name__)
 
@@ -132,7 +132,7 @@ class NameParser:
 
     def resolve_performers(self, match: Any, people_links: Optional[List[Any]] = None) -> str:
         performer_names = []
-        from app.shared_kernel.enums import RoleType
+        from app.core.enums import RoleType
         
         if people_links is None and match:
             if hasattr(match, "people_links") and match.people_links is not None:
@@ -141,7 +141,7 @@ class NameParser:
                 from sqlalchemy import inspect
                 insp = inspect(match)
                 if insp.session:
-                    from app.domains.people.models import MediaPersonLink
+                    from app.modules.people.models import MediaPersonLink
                     from sqlalchemy.orm import joinedload
                     people_links = insp.session.query(MediaPersonLink).options(
                         joinedload(MediaPersonLink.person)

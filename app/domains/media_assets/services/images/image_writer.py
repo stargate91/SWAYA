@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import BinaryIO, Iterable, Optional
 from PIL import Image
 
-from app.shared_kernel.constants import MIN_CACHED_IMAGE_BYTES
+from app.core.constants import MIN_CACHED_IMAGE_BYTES
 
 logger = logging.getLogger(__name__)
 

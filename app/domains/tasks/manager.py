@@ -9,9 +9,9 @@ from sqlalchemy.exc import OperationalError
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 
-from app.shared_kernel.enums import TaskStatus, TaskErrorCode
-from app.domains.tasks.models import BackgroundTask
-from app.shared_kernel.constants import DEFAULT_MAX_WORKERS
+from app.core.enums import TaskStatus, TaskErrorCode
+from app.modules.tasks.models import BackgroundTask
+from app.core.constants import DEFAULT_MAX_WORKERS
 from app.shared_kernel.ports.task_monitor_port import TaskMonitorPort
 
 logger = logging.getLogger(__name__)

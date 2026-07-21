@@ -5,10 +5,10 @@ from urllib.parse import urlparse
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 
-from app.domains.metadata.models import MetadataMatch
-from app.domains.people.models import Person
+from app.modules.metadata.models import MetadataMatch
+from app.modules.people.models import Person
 from app.domains.people.services import PersonService
-from app.shared_kernel.enums import Provider, RoleType
+from app.core.enums import Provider, RoleType
 from app.shared_kernel.ports.people_repository_port import PeopleRepositoryPort
 
 logger = logging.getLogger(__name__)

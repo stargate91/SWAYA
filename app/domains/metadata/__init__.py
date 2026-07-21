@@ -1,5 +1,5 @@
 # Metadata Domain
-from app.domains.metadata.models import (
+from app.modules.metadata.models import (
     metadata_match_studios,
     Studio,
     MetadataMatch,

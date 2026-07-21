@@ -2,8 +2,8 @@ import logging
 from typing import List, Optional, Union
 from sqlalchemy.orm import Session
 
-from app.shared_kernel.enums import Provider
-from app.domains.users.models import CustomList
+from app.core.enums import Provider
+from app.modules.users.models import CustomList
 from app.application.recommendations.schemas import ActionResponse
 from app.application.catalog.lists_service import ListsService as DomainListsService
 

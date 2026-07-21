@@ -1,7 +1,7 @@
 from typing import Optional
 
-from app.domains.library.models import MediaItem
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.modules.library.models import MediaItem
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 
 from app.infrastructure.scrapers.pipelines.base import BaseResolverPipeline
 

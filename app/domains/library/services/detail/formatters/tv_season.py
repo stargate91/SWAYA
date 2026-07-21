@@ -2,11 +2,11 @@ from typing import Any
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 
-from app.shared_kernel.enums import Provider, MediaType, ItemStatus
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch
-from app.domains.users.models import UserOverride
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.enums import Provider, MediaType, ItemStatus
+from app.modules.library.models import MediaItem
+from app.modules.metadata.models import MetadataMatch
+from app.modules.users.models import UserOverride
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.domains.library.services.detail._detail_formatter import DetailFormatter
 
 class TvSeasonFormatter(DetailFormatter):
@@ -23,13 +23,13 @@ class TvSeasonFormatter(DetailFormatter):
         except (ValueError, IndexError):
             return JSONResponse(status_code=400, content={"error": "Invalid tv TMDB ID"})
         
-        from app.shared_kernel.language_settings import get_user_ui_language
+        from app.core.language import get_user_ui_language
         from app.infrastructure.settings.db_settings_adapter import DbSettingsAdapter
         settings_port = DbSettingsAdapter(db)
         ui_lang = get_user_ui_language(settings_port)
         
-        from app.domains.metadata.models import MetadataMatch
-        from app.shared_kernel.enums import Provider, MediaType
+        from app.modules.metadata.models import MetadataMatch
+        from app.core.enums import Provider, MediaType
         
         series_match = db.query(MetadataMatch).filter(
             MetadataMatch.provider == Provider.TMDB,
@@ -47,7 +47,7 @@ class TvSeasonFormatter(DetailFormatter):
 
         season_detail = None
         if season_match:
-            from app.shared_kernel.language import LanguageService
+            from app.core.language import LanguageService
             loc_db = LanguageService.get_best_localization(season_match.localizations, ui_lang)
             if loc_db and loc_db.title:
                 local_episodes = db.query(MetadataMatch).filter(
@@ -110,7 +110,7 @@ class TvSeasonFormatter(DetailFormatter):
             local_item = local_episodes_map.get(ep_num)
             
             override = None
-            from app.shared_kernel.user_context import get_current_user_id
+            from app.core.user_context import get_current_user_id
             current_uid = get_current_user_id()
             
             episode_match = db.query(MetadataMatch).filter(

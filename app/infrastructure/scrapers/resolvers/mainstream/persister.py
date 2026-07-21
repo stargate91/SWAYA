@@ -3,9 +3,9 @@ from datetime import datetime
 from typing import Dict, Set, Any, Optional
 from sqlalchemy.orm import Session
 
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch, MetadataLocalization
-from app.shared_kernel.enums import Provider, MediaType, ItemStatus
+from app.modules.library.models import MediaItem
+from app.modules.metadata.models import MetadataMatch, MetadataLocalization
+from app.core.enums import Provider, MediaType, ItemStatus
 from app.infrastructure.scrapers.resolver import normalize_title
 
 logger = logging.getLogger(__name__)

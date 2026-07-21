@@ -2,8 +2,8 @@ import logging
 from pathlib import Path
 from typing import List, Dict, Any, Tuple, Optional
 
-from app.shared_kernel.enums import ItemStatus, ScanMode
-from app.domains.library.models import Library, MediaItem, ExtraFile
+from app.core.enums import ItemStatus, ScanMode
+from app.modules.library.models import Library, MediaItem, ExtraFile
 
 logger = logging.getLogger(__name__)
 

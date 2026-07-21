@@ -1,6 +1,6 @@
 from typing import Dict, Any
-from app.domains.metadata.models import MetadataMatch
-from app.shared_kernel.enums import MediaType, RoleType
+from app.modules.metadata.models import MetadataMatch
+from app.core.enums import MediaType, RoleType
 from app.domains.people.services import PersonService
 
 def process_people(parser, match: MetadataMatch, details: Dict[str, Any]):

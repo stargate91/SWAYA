@@ -1,5 +1,5 @@
 import uvicorn
-from app.shared_kernel.logging import setup_logger
+from app.core.logging import setup_logger
 
 if __name__ == "__main__":
     setup_logger()

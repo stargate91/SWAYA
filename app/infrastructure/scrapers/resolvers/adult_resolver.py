@@ -3,8 +3,8 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
-from app.domains.library.models import MediaItem
-from app.shared_kernel.enums import Provider, ScanMode
+from app.modules.library.models import MediaItem
+from app.core.enums import Provider, ScanMode
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
 from app.infrastructure.scrapers.resolvers.adult.resolution_orchestrator import AdultResolutionOrchestrator
 

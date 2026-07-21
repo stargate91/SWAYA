@@ -3,7 +3,7 @@ import win32con
 import ctypes
 import ctypes.wintypes
 import logging
-from app.shared_kernel.database import SessionLocal
+from app.core.database import SessionLocal
 from app.infrastructure.media.db_media_resolver import DbMediaResolver
 from app.domains.history.services.playback_peak_service import PlaybackPeakService
 from app.infrastructure.playback.playback_monitor import active_sessions
@@ -21,7 +21,7 @@ def trigger_peak_moment():
     
     db = SessionLocal()
     try:
-        from app.domains.metadata.models import MetadataMatch
+        from app.modules.metadata.models import MetadataMatch
         is_adult = db.query(MetadataMatch).filter(
             MetadataMatch.media_item_id == item_id,
             MetadataMatch.is_adult

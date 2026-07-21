@@ -1,10 +1,10 @@
 import logging
 from typing import Set, List, Optional, Any
 
-from app.shared_kernel.enums import Provider, MediaType, ItemStatus
+from app.core.enums import Provider, MediaType, ItemStatus
 
-from app.domains.library.models import MediaItem
-from app.domains.metadata.models import MetadataMatch
+from app.modules.library.models import MediaItem
+from app.modules.metadata.models import MetadataMatch
 from app.shared_kernel.ports.scan_port import ScanPort
 
 logger = logging.getLogger(__name__)
@@ -123,7 +123,7 @@ class DbScanAdapter(ScanPort):
         items_to_retry = []
         for item in all_items:
             item_scan_mode = (item.parsed_info or {}).get("scan_mode") or ""
-            from app.shared_kernel.enums import ScanMode
+            from app.core.enums import ScanMode
             if scan_mode == ScanMode.SCENES:
                 match = (item_scan_mode == "scenes")
             elif scan_mode == ScanMode.MOVIES_TV:

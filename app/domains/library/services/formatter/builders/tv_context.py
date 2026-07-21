@@ -1,7 +1,7 @@
 import logging
 from typing import List, Dict, Any
 from sqlalchemy.orm import object_session
-from app.shared_kernel.constants import DEFAULT_FALLBACK_LANGUAGE
+from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ def build_tv_context(
         ctx["Resolution"] = mixed_res
         ctx["resolution"] = mixed_res
 
-    from app.shared_kernel.enums import MediaType
+    from app.core.enums import MediaType
     
     locale = getattr(loc, "locale", DEFAULT_FALLBACK_LANGUAGE) if loc else DEFAULT_FALLBACK_LANGUAGE
     
@@ -39,14 +39,14 @@ def build_tv_context(
         if not parent and getattr(current, "parent_id", None) is not None:
             session = object_session(current)
             if session:
-                from app.domains.metadata.models import MetadataMatch
+                from app.modules.metadata.models import MetadataMatch
                 parent = session.query(MetadataMatch).filter(MetadataMatch.id == current.parent_id).first()
         current = parent
 
     if match and getattr(match, "media_type", None) == MediaType.EPISODE:
         session = object_session(match)
         if session:
-            from app.domains.metadata.models import MetadataMatch
+            from app.modules.metadata.models import MetadataMatch
             if not tv_match and getattr(match, "external_id", None):
                 tv_match = session.query(MetadataMatch).filter(
                     MetadataMatch.provider == match.provider,
@@ -157,7 +157,7 @@ def build_tv_context(
             if tv_match:
                 session = object_session(tv_match)
                 if session:
-                    from app.domains.metadata.models import MetadataMatch
+                    from app.modules.metadata.models import MetadataMatch
                     try:
                         target_season_num = int(custom_season) if custom_season is not None and str(custom_season).isdigit() else (getattr(season_match, "season_number", None) or getattr(match, "season_number", None))
                         target_ep_num = int(custom_episode) if str(custom_episode).isdigit() else None
@@ -218,7 +218,7 @@ def build_tv_context(
     source_val = getattr(item, "source", None)
     audio_type_val = getattr(item, "audio_type", None)
     
-    from app.shared_kernel.enums import MovieEdition, MediaSource, MediaAudioType
+    from app.core.enums import MovieEdition, MediaSource, MediaAudioType
     if getattr(item, "custom_edition", None) and item.custom_edition != MovieEdition.NONE:
         edition_val = item.custom_edition
     if getattr(item, "custom_source", None) and item.custom_source != MediaSource.NONE:
