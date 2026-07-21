@@ -15,6 +15,7 @@ import FansDbDiscoveryWidget from './widgets/FansDbDiscoveryWidget';
 import DashboardCustomizerDrawer from './widgets/DashboardCustomizerDrawer';
 import PageHeader from '@/ui/PageHeader';
 import Stack from '@/ui/Stack';
+import Inline from '@/ui/Inline';
 import WidgetErrorBoundary from '../../../components/WidgetErrorBoundary';
 import useDashboardView from './hooks/useDashboardView';
 

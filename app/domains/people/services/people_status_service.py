@@ -99,7 +99,8 @@ class PersonEnrichmentQueue:
             with self._lock:
                 self._current_person_name = person.name
             logger.info(f"Background enriching activated person: {person.name} (ID: {person_id})")
-            enricher = PeopleEnricher(db, scrapers=self.scrapers)
+            from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+            enricher = PeopleEnricher(db, scrapers=self.scrapers, image_downloader=TasksImageDownloadAdapter())
             
             ext_ids = person.external_ids or {}
             links = db.query(ExternalSourceLink).filter(ExternalSourceLink.person_id == person_id).all()

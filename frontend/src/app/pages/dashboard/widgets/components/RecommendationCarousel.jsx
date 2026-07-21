@@ -17,8 +17,8 @@ import Text from '../../../../ui/Text';
 
 export const RecommendationCarousel = ({
   title,
-  items,
-  watchlistIds,
+  items = [],
+  watchlistIds = [],
   onWatchlist,
   onCardClick,
   isAdultCarousel = false,
@@ -28,6 +28,7 @@ export const RecommendationCarousel = ({
   settings = {},
   onPlayClick,
   playMutationPending,
+  headerActions = null,
 }) => {
   const { t: T } = useTranslation();
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
@@ -42,129 +43,132 @@ export const RecommendationCarousel = ({
     }
   }, [hasMore, isLoadingMore, onLoadMore]);
 
-  if (!items?.length) {
-    return null;
-  }
-
   return (
     <Stack gap="xl">
-      <Text as="h3" variant="display" weight="extrabold">{title}</Text>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+        <Text as="h3" variant="display" weight="extrabold">{title}</Text>
+        {headerActions}
+      </div>
 
-      <ScrollRow onScroll={handleScroll}>
-        {items.map((item) => {
-          const n = normalizeMediaEntity(item, {
-            context: 'recommendations',
-            settings,
-            sessionMode,
-            isAdultContext: isAdultCarousel,
-          });
-          const watchlistId = n.isScene ? item.id : (item.tmdb_id || item.tv_tmdb_id || item.id);
-          const isWatchlisted = watchlistIds.includes(watchlistId);
-          const rawPosterUrl = n.isPerson
-            ? resolveMediaImageUrl(item.profile_path || item.local_profile_path, 'personThumb')
-            : resolveMediaImageUrl(n.isScene ? (item.backdrop_path || item.poster_path) : item.poster_path, n.isScene ? 'backdrop' : 'poster');
-          const posterUrl = (() => {
-            if (!rawPosterUrl) return '';
-            if (n.shouldBlur) {
-              return `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(rawPosterUrl)}&blur=true&width=600`;
-            }
-            if (n.isScene) {
-              return `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(rawPosterUrl)}&width=600`;
-            }
-            return rawPosterUrl;
-          })();
-          const yearLabel = n.subtitle;
-          const performers = n.performers;
-          const displayDate = item.release_date ? item.release_date.substring(0, 10) : '';
-
-          let roleLabel = null;
-          if (n.isPerson) {
-            const dept = item.known_for_department || (item.is_adult ? 'performer' : 'artist');
-            roleLabel = T(`lists.roles.${dept.toLowerCase()}`) || dept;
-          }
-
-          let subtitle = null;
-          if (n.isPerson) {
-            subtitle = roleLabel;
-          } else if (!n.isScene) {
-            subtitle = yearLabel;
-          }
-
-          return (
-            <PosterCard
-              key={item.id}
-              size={n.isScene ? 'scene' : 'default'}
-              className={n.shouldBlur ? 'is-blurred' : ''}
-              aspect={n.isScene ? 'landscape' : 'poster'}
-              imageUrl={posterUrl}
-              onClick={() => onCardClick(item)}
-              isWatched={item.is_watched}
-              title={item.title || item.name}
-              subtitle={subtitle}
-              performers={n.isScene ? performers : null}
-              date={n.isScene ? displayDate : null}
-              ratingImdb={n.ratingImdb}
-              ratingTmdb={n.ratingTmdb}
-              ratingPill={null}
-              userRating={Number(item?.user_rating) || 0}
-              isFavorite={!!item?.is_favorite}
-              playOverlay={
-                !n.isPerson && item.in_library && onPlayClick
-                  ? {
-                    title: null,
-                    onClick: (e) => {
-                      e.stopPropagation();
-                      onPlayClick(item);
-                    },
-                    pending: playMutationPending,
-                    icon: <Play size={16} fill="currentColor" />,
-                  }
-                  : null
+      {!items || items.length === 0 ? (
+        <div style={{ padding: 'var(--space-xl)', background: 'var(--color-background-soft)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-default)', textAlign: 'center' }}>
+          <Text color="muted" italic size="sm">
+            {T('dashboard.recommendations.discovery_no_results') || 'No discoveries found matching the selected focus.'}
+          </Text>
+        </div>
+      ) : (
+        <ScrollRow onScroll={handleScroll}>
+          {items.map((item) => {
+            const n = normalizeMediaEntity(item, {
+              context: 'recommendations',
+              settings,
+              sessionMode,
+              isAdultContext: isAdultCarousel,
+            });
+            const watchlistId = n.isScene ? item.id : (item.tmdb_id || item.tv_tmdb_id || item.id);
+            const isWatchlisted = watchlistIds.includes(watchlistId);
+            const rawPosterUrl = n.isPerson
+              ? resolveMediaImageUrl(item.profile_path || item.local_profile_path, 'personThumb')
+              : resolveMediaImageUrl(n.isScene ? (item.backdrop_path || item.poster_path) : item.poster_path, n.isScene ? 'backdrop' : 'poster');
+            const posterUrl = (() => {
+              if (!rawPosterUrl) return '';
+              if (n.shouldBlur) {
+                return `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(rawPosterUrl)}&blur=true&width=600`;
               }
-            >
-              {!n.isPerson && (
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const type = n.isScene ? 'scene' : (item.media_type || item.type || (item.title ? 'movie' : 'tv'));
-                    onWatchlist(item, type);
-                  }}
-                  className={posterCardStyles['action-btn']}
-                  variant={isWatchlisted ? 'success' : 'glass'}
-                  aria-pressed={isWatchlisted}
-                  destructiveHover={true}
-                  size="sm"
-                >
-                  {isWatchlisted ? (
-                    <>
-                      <span className="state-active">
-                        <Check size={12} strokeWidth={3} /> {T('dashboard.watchlist.added') || 'Watchlisted'}
-                      </span>
-                      <span className="state-hover">
-                        <Minus size={12} strokeWidth={3} /> {T('common.remove') || 'Remove'}
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <Plus size={12} strokeWidth={3} /> {T('dashboard.watchlist.add_short') || 'Watchlist'}
-                    </>
-                  )}
-                </Button>
-              )}
-              {n.shouldBlur && (
-                <div className="recommend-card-blur-overlay">
-                  <AdultOverlay isNsfw={sessionMode === 'nsfw'} />
-                </div>
-              )}
-            </PosterCard>
-          );
-        })}
-        {isLoadingMore && (
-          <div className="u-loading-card">
-            <Spinner style={{ color: 'var(--color-accent-blue-soft)' }} />
-          </div>
-        )}
-      </ScrollRow>
+              if (n.isScene) {
+                return `${API_BASE}/api/v1/media/image-proxy?url=${encodeURIComponent(rawPosterUrl)}&width=600`;
+              }
+              return rawPosterUrl;
+            })();
+            const yearLabel = n.subtitle;
+            const performers = n.performers;
+            const displayDate = item.release_date ? item.release_date.substring(0, 10) : '';
+
+            let roleLabel = null;
+            if (n.isPerson) {
+              const dept = item.known_for_department || (item.is_adult ? 'performer' : 'artist');
+              roleLabel = T(`lists.roles.${dept.toLowerCase()}`) || dept;
+            }
+
+            let subtitle = null;
+            if (n.isPerson) {
+              subtitle = roleLabel;
+            } else if (!n.isScene) {
+              subtitle = yearLabel;
+            }
+
+            return (
+              <PosterCard
+                key={item.id}
+                size={n.isScene ? 'scene' : 'default'}
+                className={n.shouldBlur ? 'is-blurred' : ''}
+                aspect={n.isScene ? 'landscape' : 'poster'}
+                imageUrl={posterUrl}
+                onClick={() => onCardClick(item)}
+                isWatched={item.is_watched}
+                title={item.title || item.name}
+                subtitle={subtitle}
+                performers={n.isScene ? performers : null}
+                date={n.isScene ? displayDate : null}
+                ratingImdb={n.ratingImdb}
+                ratingTmdb={n.ratingTmdb}
+                ratingPill={null}
+                userRating={Number(item?.user_rating) || 0}
+                isFavorite={!!item?.is_favorite}
+                playOverlay={
+                  !n.isPerson && item.in_library && onPlayClick
+                    ? {
+                      title: null,
+                      onClick: (e) => {
+                        e.stopPropagation();
+                        onPlayClick(item);
+                      },
+                      pending: playMutationPending,
+                      icon: <Play size={16} fill="currentColor" />,
+                    }
+                    : null
+                }
+              >
+                {!n.isPerson && (
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const type = n.isScene ? 'scene' : (item.media_type || item.type || (item.title ? 'movie' : 'tv'));
+                      onWatchlist(item, type);
+                    }}
+                    className={posterCardStyles['action-btn']}
+                    variant={isWatchlisted ? 'success' : 'glass'}
+                    aria-pressed={isWatchlisted}
+                    destructiveHover={true}
+                    size="sm"
+                  >
+                    {isWatchlisted ? (
+                      <>
+                        <span className="state-active">
+                          <Check size={12} strokeWidth={3} /> {T('dashboard.watchlist.added') || 'Watchlisted'}
+                        </span>
+                        <span className="state-hover">
+                          <Minus size={12} strokeWidth={3} /> {T('common.remove') || 'Remove'}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <Plus size={12} strokeWidth={3} /> {T('dashboard.watchlist.add_short') || 'Watchlist'}
+                      </>
+                    )}
+                  </Button>
+                )}
+                {n.shouldBlur && <AdultOverlay />}
+              </PosterCard>
+            );
+          })}
+          {isLoadingMore && (
+            <div className="u-loading-card">
+              <Spinner style={{ color: 'var(--color-accent-blue-soft)' }} />
+            </div>
+          )}
+        </ScrollRow>
+      )}
     </Stack>
   );
 };
@@ -182,6 +186,7 @@ RecommendationCarousel.propTypes = {
   settings: PropTypes.object,
   onPlayClick: PropTypes.func,
   playMutationPending: PropTypes.bool,
+  headerActions: PropTypes.node,
 };
 
 export default RecommendationCarousel;

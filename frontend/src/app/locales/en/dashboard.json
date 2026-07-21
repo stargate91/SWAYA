@@ -67,5 +67,9 @@
     "title": "Pick up where you left off",
     "remove": "Kick out of Continue Watching",
     "minutes_left": "{minutes}m to go"
-  }
+  },
+  "focus": "Focusing on",
+  "set_focus": "Set Focus Tag",
+  "focus_title": "Select Focus Category",
+  "search_tag_placeholder": "Search categories..."
 }

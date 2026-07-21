@@ -10,6 +10,8 @@
   gap: var(--space-md);
   overflow-x: auto;
   scroll-behavior: smooth;
+  padding-top: var(--space-sm);
+  padding-bottom: var(--space-sm);
 }
 
 /* Column layout: Chevrons occupy their own layout slots beside the track */

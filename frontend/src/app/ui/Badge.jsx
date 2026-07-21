@@ -7,7 +7,7 @@ import styles from './Badge.module.css';
  * @param {React.ReactNode} [props.children] - Badge content text or elements
  * @param {'default' | 'status' | 'adult'} [props.family] - Styling group family
  * @param {'neutral' | 'accent' | 'success' | 'danger' | 'warning' | 'overlay'} [props.tone] - Theme/color flavor
- * @param {'inline' | 'overlay'} [props.variant] - Placement variant behavior
+ * @param {'inline' | 'overlay' | 'top-left'} [props.variant] - Placement variant behavior
  * @param {'sm' | 'md' | 'lg'} [props.size] - Sizing scale
  * @param {'none' | 'sm' | 'md' | 'full'} [props.roundness] - Corner radius rounding variant
  * @param {React.ReactNode} [props.leftIcon] - Leading icon element to render on the left

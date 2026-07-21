@@ -57,7 +57,7 @@ export default function PeopleRightHeroSection({ item }) {
                       loading="lazy"
                     />
                   ) : (
-                    <div className="u-h-full u-w-full u-flex u-items-center u-justify-center u-color-text-faint">
+                    <div className={styles['poster-fallback']}>
                       <Layers size={20} />
                     </div>
                   )}

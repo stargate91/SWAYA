@@ -26,7 +26,11 @@ class AdultDiscoveryService:
         cache_srv = CacheService()
         
         provider_enum = ProviderEnum(provider.lower())
+        focus_tag = self.settings.get_setting(f"adult_{provider.lower()}_focus_tag") or ""
+        
         cache_key = f"adult_discovery_{provider}"
+        if focus_tag:
+            cache_key = f"adult_discovery_{provider}_{focus_tag.lower().replace(' ', '_')}"
         
         # Try to load from cache
         cached_data = cache_srv.get(provider_enum, cache_key)
@@ -75,6 +79,32 @@ class AdultDiscoveryService:
               }
             }
             """
+            # If focus tag is set, fetch the tag ID from the provider first
+            resolved_tag_id = None
+            if focus_tag:
+                tag_query = """
+                query QueryTags($input: TagQueryInput!) {
+                  queryTags(input: $input) {
+                    tags {
+                      id
+                      name
+                    }
+                  }
+                }
+                """
+                try:
+                    tag_res = scraper.execute_query(tag_query, {"input": {"name": focus_tag, "page": 1, "per_page": 5}})
+                    if tag_res and "queryTags" in tag_res:
+                        tags_list = tag_res["queryTags"].get("tags") or []
+                        # Find exact name match or fallback to first
+                        matched_tag = next((t for t in tags_list if t.get("name").lower() == focus_tag.lower()), None)
+                        if not matched_tag and tags_list:
+                            matched_tag = tags_list[0]
+                        if matched_tag:
+                            resolved_tag_id = matched_tag.get("id")
+                except Exception as e:
+                    logger.error(f"Failed to resolve focus tag ID for '{focus_tag}': {e}")
+
             variables = {
                 "input": {
                   "page": 1,
@@ -83,6 +113,15 @@ class AdultDiscoveryService:
                   "sort": "TRENDING"
                 }
             }
+            if resolved_tag_id:
+                # StashDB/FansDB supports tags filter as a MultiIDCriterionInput
+                variables["input"]["tags"] = {
+                    "value": [resolved_tag_id],
+                    "modifier": "INCLUDES"
+                }
+            elif focus_tag:
+                # If focus_tag was set but tag ID could not be resolved, return empty to prevent invalid query
+                return []
             
             try:
                 res_data = scraper.execute_query(query, variables)
@@ -101,10 +140,6 @@ class AdultDiscoveryService:
         tag_weights = {}
         # Tags that describe appearance/demographics/meta — not actual content preferences
         noise_keywords_raw = {
-            # Meta & Technical descriptors
-            "hd available", "4k available", "professional production", "pornstar",
-            # Eye color
-            "brown eyes", "blue eyes", "green eyes", "hazel eyes",
             # Locations (generic house parts)
             "bedroom", "living room", "home", "bathroom",
             # Generic/Too broad labels
@@ -153,53 +188,54 @@ class AdultDiscoveryService:
         # Expand noise keywords using synonym mappings
         noise_keywords = expand_tags(noise_keywords_raw)
 
-        try:
-            # Build tag frequency from metadata_matches.suggested_tags
-            tag_counter = Counter()
-            tag_rating_sum = {}
-            tag_rating_count = {}
-            total_scenes = 0
+        if not focus_tag:
+            try:
+                # Build tag frequency from metadata_matches.suggested_tags
+                tag_counter = Counter()
+                tag_rating_sum = {}
+                tag_rating_count = {}
+                total_scenes = 0
 
-            sql = """
-                SELECT mm.suggested_tags, uo.user_rating
-                FROM metadata_matches mm
-                LEFT JOIN user_overrides uo ON uo.media_item_id = mm.media_item_id
-                WHERE mm.is_adult = 1
-                  AND mm.suggested_tags IS NOT NULL
-                  AND mm.media_item_id IS NOT NULL
-            """
-            rows = self.db.execute(text(sql)).fetchall()
-            for r in rows:
-                total_scenes += 1
-                tags_json = r[0]
-                user_rating = r[1]
-                tags = _json.loads(tags_json) if tags_json else []
-                for tag in tags:
-                    t_name = (tag.get("name") if isinstance(tag, dict) else str(tag)).lower()
-                    if t_name:
-                        tag_counter[t_name] += 1
-                        if user_rating is not None:
-                            tag_rating_sum[t_name] = tag_rating_sum.get(t_name, 0) + user_rating
-                            tag_rating_count[t_name] = tag_rating_count.get(t_name, 0) + 1
+                sql = """
+                    SELECT mm.suggested_tags, uo.user_rating
+                    FROM metadata_matches mm
+                    LEFT JOIN user_overrides uo ON uo.media_item_id = mm.media_item_id
+                    WHERE mm.is_adult = 1
+                      AND mm.suggested_tags IS NOT NULL
+                      AND mm.media_item_id IS NOT NULL
+                """
+                rows = self.db.execute(text(sql)).fetchall()
+                for r in rows:
+                    total_scenes += 1
+                    tags_json = r[0]
+                    user_rating = r[1]
+                    tags = _json.loads(tags_json) if tags_json else []
+                    for tag in tags:
+                        t_name = (tag.get("name") if isinstance(tag, dict) else str(tag)).lower()
+                        if t_name:
+                            tag_counter[t_name] += 1
+                            if user_rating is not None:
+                                tag_rating_sum[t_name] = tag_rating_sum.get(t_name, 0) + user_rating
+                                tag_rating_count[t_name] = tag_rating_count.get(t_name, 0) + 1
 
-            # Frequency-based: high library count = strong preference
-            # Noise is handled by the expanded noise_keywords set
-            for t_name, count in tag_counter.items():
-                norm_t = normalize_tag(t_name)
-                if norm_t in noise_keywords:
-                    continue  # Skip noise entirely
-                avg_rating = (tag_rating_sum.get(t_name, 0) / tag_rating_count[t_name]) if tag_rating_count.get(t_name) else 4.0
-                weight = math.log2(1 + count) * avg_rating
-                if weight > 0:
-                    tag_weights[norm_t] = weight
+                # Frequency-based: high library count = strong preference
+                # Noise is handled by the expanded noise_keywords set
+                for t_name, count in tag_counter.items():
+                    norm_t = normalize_tag(t_name)
+                    if norm_t in noise_keywords:
+                        continue  # Skip noise entirely
+                    avg_rating = (tag_rating_sum.get(t_name, 0) / tag_rating_count[t_name]) if tag_rating_count.get(t_name) else 4.0
+                    weight = math.log2(1 + count) * avg_rating
+                    if weight > 0:
+                        tag_weights[norm_t] = weight
 
-            # Keep only top 50 signal tags for scoring
-            if len(tag_weights) > 50:
-                top_entries = sorted(tag_weights.items(), key=lambda x: x[1], reverse=True)[:50]
-                tag_weights = dict(top_entries)
+                # Keep only top 50 signal tags for scoring
+                if len(tag_weights) > 50:
+                    top_entries = sorted(tag_weights.items(), key=lambda x: x[1], reverse=True)[:50]
+                    tag_weights = dict(top_entries)
 
-        except Exception as e:
-            logger.error(f"Failed to fetch library tag weights: {e}")
+            except Exception as e:
+                logger.error(f"Failed to fetch library tag weights: {e}")
 
         # 2. Fetch local library matches for this provider to filter out already owned scenes
         matches = self.db.query(MetadataMatch).filter(

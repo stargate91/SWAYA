@@ -273,6 +273,18 @@ class PeopleSearchService:
             
             person.is_active = is_active
             db.commit()
+            if profile_url:
+                try:
+                    from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+                    adapter = TasksImageDownloadAdapter()
+                    ext = ".jpg"
+                    filename = f"{provider_enum.value}_{uuid_str}{ext}"
+                    adapter.enqueue_download(profile_url, "people", filename)
+                except Exception as img_err:
+                    logger.warning(f"Failed to enqueue image download for adult performer {person.name}: {img_err}")
+            if is_active:
+                from app.domains.people.services.people_status_service import enqueue_person_enrichment
+                enqueue_person_enrichment(person.id)
             return {"status": "success", "id": person.id, "name": person.name}
             
         else:

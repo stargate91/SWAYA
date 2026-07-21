@@ -117,6 +117,8 @@ export const SETTINGS_BASE_DEFAULTS = {
   previews_cache_max_size_mb: 2048,
   previews_cache_max_age_days: 30,
   adult_tag_blacklist: '',
+  adult_stashdb_focus_tag: '',
+  adult_fansdb_focus_tag: '',
 };
 
 export function getLocalizedSettingsDefaults(t = null) {
@@ -354,6 +356,8 @@ export function getInitialFormValues(settingsData = null, t = null) {
     previews_cache_max_size_mb: settingsData.previews_cache_max_size_mb !== undefined && settingsData.previews_cache_max_size_mb !== null ? Number(settingsData.previews_cache_max_size_mb) : defaults.previews_cache_max_size_mb,
     previews_cache_max_age_days: settingsData.previews_cache_max_age_days !== undefined && settingsData.previews_cache_max_age_days !== null ? Number(settingsData.previews_cache_max_age_days) : defaults.previews_cache_max_age_days,
     adult_tag_blacklist: getStringValue(settingsData.adult_tag_blacklist, defaults.adult_tag_blacklist),
+    adult_stashdb_focus_tag: getStringValue(settingsData.adult_stashdb_focus_tag, defaults.adult_stashdb_focus_tag),
+    adult_fansdb_focus_tag: getStringValue(settingsData.adult_fansdb_focus_tag, defaults.adult_fansdb_focus_tag),
   };
 }
 

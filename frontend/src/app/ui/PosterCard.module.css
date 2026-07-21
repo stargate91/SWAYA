@@ -5,7 +5,7 @@
   width: var(--ui-poster-card-width);
   min-width: var(--ui-poster-card-min-width);
   height: var(--ui-poster-card-height, auto);
-  transition: var(--ui-poster-card-transition);
+  transition: transform var(--motion-duration-fast) var(--motion-ease-emphasized), box-shadow var(--motion-duration-slow) var(--motion-ease-standard);
 }
 
 .card[data-fluid="true"] {
@@ -25,6 +25,7 @@
 .card:hover {
   --adult-overlay-opacity: 0;
   --adult-overlay-blur: 0;
+  transform: var(--ui-poster-card-hover-transform, translateY(calc(-1 * var(--space-xs))) scale(1.02));
 }
 
 .media-shell {
@@ -42,11 +43,10 @@
   text-align: left;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: transform var(--motion-duration-fast) var(--motion-ease-emphasized), box-shadow var(--motion-duration-slow) var(--motion-ease-standard);
+  transition: box-shadow var(--motion-duration-slow) var(--motion-ease-standard);
 }
 
 .card:hover .image-wrapper {
-  transform: var(--ui-poster-card-hover-transform, translateY(calc(-1 * var(--space-xs))) scale(1.02));
   box-shadow: var(--ui-poster-card-hover-shadow, var(--shadow-sm));
 }
 
@@ -75,8 +75,11 @@ div.image-wrapper:focus-visible {
 }
 
 .placeholder {
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
   width: 100%;
   height: 100%;
   color: var(--color-muted);
@@ -101,6 +104,12 @@ div.image-wrapper:focus-visible {
 .card[data-aspect="mixed-landscape"] .media,
 .card[data-aspect="mixed-landscape"] .placeholder {
   aspect-ratio: var(--ui-poster-card-aspect-ratio, 1.38);
+}
+
+.card[data-aspect="auto"] .media,
+.card[data-aspect="auto"] .placeholder {
+  aspect-ratio: auto;
+  height: 100%;
 }
 
 .image {
@@ -205,6 +214,13 @@ div.image-wrapper:focus-visible {
 .media-shell:focus-within .watched-badge,
 .media-shell:hover .favorite-badge,
 .media-shell:focus-within .favorite-badge {
+  opacity: 0;
+  transform: translateY(calc(-1 * var(--space-xs)));
+  pointer-events: none;
+}
+
+.media-shell:hover :global([data-variant="top-left"]),
+.media-shell:focus-within :global([data-variant="top-left"]) {
   opacity: 0;
   transform: translateY(calc(-1 * var(--space-xs)));
   pointer-events: none;

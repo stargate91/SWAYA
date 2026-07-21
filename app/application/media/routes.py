@@ -111,6 +111,7 @@ def image_proxy(
     from urllib.parse import urlparse
     import logging
     import urllib3
+    import os
     from PIL import Image, ImageFilter, ImageEnhance
     import io
     

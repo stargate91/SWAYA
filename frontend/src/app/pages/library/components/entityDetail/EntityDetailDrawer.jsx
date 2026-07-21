@@ -73,6 +73,7 @@ export default function EntityDetailDrawer({
       onClose={() => setIsDrawerOpen(false)}
       title={item?.name || overviewTitle}
       size="md"
+      padded
     >
       <Stack gap="xl" padding="md" className="u-flex-1 u-overflow-y-auto">
         {/* Section 1: Alternate Names */}

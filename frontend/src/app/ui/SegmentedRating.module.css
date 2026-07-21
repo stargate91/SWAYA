@@ -62,8 +62,12 @@
 }
 
 .label.has-value {
-  color: color-mix(in srgb, var(--color-accent-blue) 84%, var(--color-text-secondary));
+  color: var(--color-text-primary);
   font-weight: var(--font-weight-bold);
+}
+
+.container:hover .label.has-value {
+  color: var(--color-accent-blue);
 }
 
 .container.layout-column {

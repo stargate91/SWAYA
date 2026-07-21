@@ -9,12 +9,14 @@ import {
 } from '@/queries/dashboardQueries';
 import useWatchlistHandler from './hooks/useWatchlistHandler';
 import useRecommendationActions from './hooks/useRecommendationActions';
+import AdultDashboardFocusSelector from '../components/AdultDashboardFocusSelector';
 
 export default function StashDbDiscoveryWidget() {
   const { t: T } = useTranslation();
   const { data: settings = {} } = useSettingsQuery();
   const includeAdult = settings?.include_adult;
   const stashDbKey = settings?.stashdb_api_key;
+  const currentFocus = settings?.adult_stashdb_focus_tag || '';
 
   const { data: recommendations, isLoading } = useRecommendationsQuery();
   const watchlistIdsFromQuery = recommendations?.watchlist_item_ids;
@@ -34,7 +36,7 @@ export default function StashDbDiscoveryWidget() {
     return null;
   }
 
-  if (!isLoading && !recommendations?.discover_stashdb?.length) {
+  if (!isLoading && !recommendations?.discover_stashdb?.length && !currentFocus) {
     return null;
   }
 
@@ -50,6 +52,13 @@ export default function StashDbDiscoveryWidget() {
         settings={settings}
         onPlayClick={handlePlayClick}
         playMutationPending={playMutationPending}
+        headerActions={
+          <AdultDashboardFocusSelector
+            provider="stashdb"
+            currentFocus={currentFocus}
+            t={T}
+          />
+        }
       />
     </WidgetShell>
   );

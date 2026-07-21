@@ -129,7 +129,16 @@ class CacheService:
                     expires_at=expires_at
                 )
                 db.add(cache)
-            db.commit()
+            try:
+                db.commit()
+            except Exception:
+                db.rollback()
+                # Try fallback merge or update on conflict
+                try:
+                    db.merge(cache)
+                    db.commit()
+                except Exception:
+                    db.rollback()
 
     def invalidate(self, provider: Provider, cache_key: str) -> None:
         """Removes a specific cache key entry."""

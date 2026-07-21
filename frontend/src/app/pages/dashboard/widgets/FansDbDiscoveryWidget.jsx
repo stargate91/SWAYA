@@ -9,12 +9,14 @@ import {
 } from '@/queries/dashboardQueries';
 import useWatchlistHandler from './hooks/useWatchlistHandler';
 import useRecommendationActions from './hooks/useRecommendationActions';
+import AdultDashboardFocusSelector from '../components/AdultDashboardFocusSelector';
 
 export default function FansDbDiscoveryWidget() {
   const { t: T } = useTranslation();
   const { data: settings = {} } = useSettingsQuery();
   const includeAdult = settings?.include_adult;
   const fansDbKey = settings?.fansdb_api_key;
+  const currentFocus = settings?.adult_fansdb_focus_tag || '';
 
   const { data: recommendations, isLoading } = useRecommendationsQuery();
   const watchlistIdsFromQuery = recommendations?.watchlist_item_ids;
@@ -34,7 +36,7 @@ export default function FansDbDiscoveryWidget() {
     return null;
   }
 
-  if (!isLoading && !recommendations?.discover_fansdb?.length) {
+  if (!isLoading && !recommendations?.discover_fansdb?.length && !currentFocus) {
     return null;
   }
 
@@ -50,6 +52,13 @@ export default function FansDbDiscoveryWidget() {
         settings={settings}
         onPlayClick={handlePlayClick}
         playMutationPending={playMutationPending}
+        headerActions={
+          <AdultDashboardFocusSelector
+            provider="fansdb"
+            currentFocus={currentFocus}
+            t={T}
+          />
+        }
       />
     </WidgetShell>
   );

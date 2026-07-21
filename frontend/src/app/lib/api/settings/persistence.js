@@ -125,6 +125,8 @@ export const buildSettingsPayload = (form) => ({
   folder_jav_template: (form.folder_jav_template || '').trim(),
   folder_adult_jav_name: (form.folder_adult_jav_name || '').trim(),
   adult_tag_blacklist: (form.adult_tag_blacklist || '').trim(),
+  adult_stashdb_focus_tag: (form.adult_stashdb_focus_tag || '').trim(),
+  adult_fansdb_focus_tag: (form.adult_fansdb_focus_tag || '').trim(),
 });
 
 export const settingsPersistenceApi = {

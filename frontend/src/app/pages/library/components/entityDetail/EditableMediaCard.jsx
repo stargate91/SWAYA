@@ -1,5 +1,6 @@
 import { Layers, User, PenLine, Maximize2 } from '@/ui/icons';
 import PosterCard from '@/ui/PosterCard';
+import Badge from '@/ui/Badge';
 import buttonStyles from '@/ui/IconButton.module.css';
 
 export default function EditableMediaCard({
@@ -30,6 +31,15 @@ export default function EditableMediaCard({
     </button>
   ) : null;
 
+  const flagBadge = flagEmoji ? (
+    <Badge
+      variant="top-left"
+      title={flagTooltip}
+    >
+      {flagEmoji}
+    </Badge>
+  ) : null;
+
   const overlay = mediaUrl ? (
     <div className="entity-detail-page__media-card-hover-overlay">
       <div className="entity-detail-page__media-card-hover-icon">
@@ -42,24 +52,19 @@ export default function EditableMediaCard({
     <PosterCard
       imageUrl={mediaUrl}
       onClick={onClick}
+      aspect="auto"
+      fillHeight={true}
+      fluid={true}
       placeholderText={null}
       icon={PlaceholderIcon}
+      topLeftAction={flagBadge}
       topRightAction={editButton}
       overlay={overlay}
       title={viewOriginalTitle}
       className={`entity-detail-page__media-card entity-detail-page__media-card--editable ${className}`.trim()}
       previewEnabled={false}
       disableHoverAnimation={true}
-    >
-      {flagEmoji && (
-        <div
-          className="entity-detail-page__media-flag-badge"
-          title={flagTooltip}
-        >
-          {flagEmoji}
-        </div>
-      )}
-    </PosterCard>
+    />
   );
 }
 
