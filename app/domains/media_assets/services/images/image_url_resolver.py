@@ -32,6 +32,7 @@ def resolve_image_url(
     path_parts = [part for part in normalized_path.split("/") if part]
     filename = path_parts[-1] if path_parts else os.path.basename(path)
 
+    # Determine subfolder
     embedded_subfolder = subfolder
     if len(path_parts) >= 2 and path_parts[0] in MEDIA_IMAGE_SUBFOLDERS:
         embedded_subfolder = path_parts[0]
@@ -44,7 +45,7 @@ def resolve_image_url(
         else:
             size = "w500"
 
-    # 1. Local disk check FIRST
+    # 1. Local disk check FIRST (checks if file is downloaded on disk)
     if size == "original":
         orig_path = image_path_resolver.get_original_path(image_root, embedded_subfolder, filename)
         if image_path_resolver.exists(orig_path):
@@ -52,6 +53,13 @@ def resolve_image_url(
         existing_orig = image_path_resolver.find_existing_file_by_stem(image_root, "original", embedded_subfolder, filename)
         if existing_orig:
             return f"/media/images/original/{embedded_subfolder}/{existing_orig.name}"
+
+        # If path is a remote URL, also check for any local file in the subfolder ending with this filename or matching its stem
+        if path.startswith(("http://", "https://")):
+            stem = os.path.splitext(filename)[0]
+            existing_by_suffix = image_path_resolver.find_existing_file_by_stem(image_root, "original", embedded_subfolder, stem)
+            if existing_by_suffix:
+                return f"/media/images/original/{embedded_subfolder}/{existing_by_suffix.name}"
 
     thumb_subfolder = embedded_subfolder if embedded_subfolder in MEDIA_IMAGE_SUBFOLDERS else subfolder
     thumb_path = image_path_resolver.get_thumbnail_path(image_root, thumb_subfolder, filename)

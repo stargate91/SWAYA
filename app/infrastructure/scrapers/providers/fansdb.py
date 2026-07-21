@@ -121,6 +121,7 @@ class FansDBScraper(BaseScraper):
                             }
                             if "urls" in perf and isinstance(perf["urls"], list):
                                 perf["urls"] = [u.get("url") for u in perf["urls"] if u and u.get("url")]
+                    logger.info(f"[DEBUG FANSDB STUDIO RAW] scene_id={scene_id} studio={data.get('studio')}")
                     self.cache.set(Provider.FANSDB, cache_key, data, status_code=200, media_type=MediaType.SCENE, external_id=scene_id)
                     return data
                 else:

@@ -1,12 +1,11 @@
 import logging
-from typing import Any, Optional
+from typing import Any
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 
 from app.shared_kernel.enums import Provider, MediaType
 from app.domains.users.models import UserOverride
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
-from app.shared_kernel.ports.image_download_port import ImageDownloadPort
 from app.domains.metadata.models import Studio, MetadataMatch
 from app.domains.library.services.detail._detail_formatter import DetailFormatter
 from app.domains.library.services.detail.detail_mixins import OverrideResolver, ExternalLinksBuilder
@@ -14,7 +13,7 @@ from app.domains.library.services.detail.detail_mixins import OverrideResolver, 
 # Sub-services
 from app.domains.library.services.detail.scene.cast_builder import SceneCastBuilder
 from app.domains.library.services.detail.scene.playback_resolver import ScenePlaybackResolver
-from app.domains.library.services.detail.scene.metadata_syncer import SceneMetadataSyncer
+from app.domains.library.services.detail.scene.metadata_syncer import SceneMetadataSyncer, _queue_image
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +27,6 @@ def _strip_provider_prefix(value: str) -> str:
             break
         cleaned = rest
     return cleaned
-
 
 class SceneDetailService(DetailFormatter):
     def __init__(self, db: Session, scrapers: ScraperGatewayPort, image_downloader: Optional[ImageDownloadPort] = None):
@@ -104,46 +102,112 @@ class SceneDetailService(DetailFormatter):
                 MetadataMatch.media_type == MediaType.SCENE
             ).first()
             
-        scene_data = None
+        from app.infrastructure.cache.cache_service import CacheService
+        cache_srv = CacheService()
+        effective_provider = None
         if provider_prefix in ("stashdb", "stash"):
-            stash_scraper = self.scrapers.adult(Provider.STASHDB, db)
-            try:
-                scene_data = stash_scraper.fetch_scene(scene_uuid)
-            except Exception:
-                scene_data = None
+            effective_provider = Provider.STASHDB
         elif provider_prefix == "fansdb":
-            fans_scraper = self.scrapers.adult(Provider.FANSDB, db)
-            try:
-                scene_data = fans_scraper.fetch_scene(scene_uuid)
-            except Exception:
-                scene_data = None
+            effective_provider = Provider.FANSDB
         elif provider_prefix in ("porndb", "theporndb"):
-            porndb_scraper = self.scrapers.adult(Provider.PORNDB, db)
-            try:
-                scene_data = porndb_scraper.fetch_scene(scene_uuid)
-                if not scene_data:
-                    scene_data = porndb_scraper.fetch_scene(f"scene_{scene_uuid}")
-            except Exception:
-                scene_data = None
-        else:
-            if is_uuid:
+            effective_provider = Provider.PORNDB
+        
+        cache_key = f"{effective_provider.value if effective_provider else 'porndb'}_scene_{scene_uuid}"
+        
+        scene_data = None
+        # Check permanent APICache first
+        if effective_provider:
+            cached_scene = cache_srv.get(effective_provider, cache_key)
+            if cached_scene and isinstance(cached_scene, dict) and cached_scene.get("title"):
+                scene_data = cached_scene
+
+        if not scene_data:
+            if provider_prefix in ("stashdb", "stash"):
                 stash_scraper = self.scrapers.adult(Provider.STASHDB, db)
                 try:
                     scene_data = stash_scraper.fetch_scene(scene_uuid)
                 except Exception:
                     scene_data = None
-                if not scene_data:
-                    fans_scraper = self.scrapers.adult(Provider.FANSDB, db)
-                    try:
-                        scene_data = fans_scraper.fetch_scene(scene_uuid)
-                    except Exception:
-                        scene_data = None
-            else:
+            elif provider_prefix == "fansdb":
+                fans_scraper = self.scrapers.adult(Provider.FANSDB, db)
+                try:
+                    scene_data = fans_scraper.fetch_scene(scene_uuid)
+                except Exception:
+                    scene_data = None
+            elif provider_prefix in ("porndb", "theporndb"):
                 porndb_scraper = self.scrapers.adult(Provider.PORNDB, db)
                 try:
                     scene_data = porndb_scraper.fetch_scene(scene_uuid)
+                    if not scene_data:
+                        scene_data = porndb_scraper.fetch_scene(f"scene_{scene_uuid}")
                 except Exception:
                     scene_data = None
+            else:
+                if is_uuid:
+                    stash_scraper = self.scrapers.adult(Provider.STASHDB, db)
+                    try:
+                        scene_data = stash_scraper.fetch_scene(scene_uuid)
+                    except Exception:
+                        scene_data = None
+                    if not scene_data:
+                        fans_scraper = self.scrapers.adult(Provider.FANSDB, db)
+                        try:
+                            scene_data = fans_scraper.fetch_scene(scene_uuid)
+                        except Exception:
+                            scene_data = None
+                else:
+                    porndb_scraper = self.scrapers.adult(Provider.PORNDB, db)
+                    try:
+                        scene_data = porndb_scraper.fetch_scene(scene_uuid)
+                    except Exception:
+                        scene_data = None
+
+            # Store in APICache permanently if fetched successfully
+            if scene_data and effective_provider:
+                cache_srv.set(
+                    provider=effective_provider,
+                    cache_key=cache_key,
+                    raw_data=scene_data,
+                    media_type=MediaType.SCENE,
+                    external_id=scene_uuid,
+                    ttl_seconds=None # Permanent local cache
+                )
+                # Enqueue scene still, performer profiles, and studio logo
+                if self.image_downloader:
+                    asset_prefix = f"{effective_provider.value}_{scene_uuid}"
+
+                    images_list = scene_data.get("images") or []
+                    if images_list:
+                        img_url = images_list[0].get("url") if isinstance(images_list[0], dict) else None
+                        if img_url and img_url.startswith(("http://", "https://")):
+                            _queue_image(self.image_downloader, img_url, "scene_stills", asset_prefix)
+
+                    # Enqueue performer images — GraphQL structure: performers[].performer.images[].url
+                    for p_entry in (scene_data.get("performers") or []):
+                        perf = p_entry.get("performer") or p_entry
+                        p_images = perf.get("images") or []
+                        p_img = p_images[0].get("url") if p_images and isinstance(p_images[0], dict) else None
+                        p_name = perf.get("name")
+                        p_id_val = perf.get("id")
+                        if p_img and p_img.startswith(("http://", "https://")) and p_name:
+                            p_prefix = f"{effective_provider.value}_{p_id_val}" if (effective_provider and p_id_val) else f"person_{p_name}"
+                            _queue_image(self.image_downloader, p_img, "people", p_prefix)
+
+                    # Enqueue studio logo — GraphQL structure: studio.image_path or studio.images[].url
+                    st_data = scene_data.get("studio") or scene_data.get("site") or {}
+                    st_images = st_data.get("images") or []
+                    st_logo = st_data.get("image_path") or (st_images[0].get("url") if st_images and isinstance(st_images[0], dict) else None)
+                    st_name = st_data.get("name")
+                    if st_logo and st_logo.startswith(("http://", "https://")) and st_name:
+                        _queue_image(self.image_downloader, st_logo, "logos", f"studio_{st_name}")
+
+                    # Enqueue parent/network studio logo — GraphQL structure: studio.parent.image_path or studio.parent.images[].url
+                    parent_data = st_data.get("parent") or st_data.get("network") or {}
+                    parent_images = parent_data.get("images") or []
+                    parent_logo = parent_data.get("image_path") or (parent_images[0].get("url") if parent_images and isinstance(parent_images[0], dict) else None)
+                    parent_name = parent_data.get("name")
+                    if parent_logo and parent_logo.startswith(("http://", "https://")) and parent_name:
+                        _queue_image(self.image_downloader, parent_logo, "logos", f"studio_{parent_name}")
 
         if not scene_data and match:
             from app.shared_kernel.language import LanguageService
@@ -249,7 +313,15 @@ class SceneDetailService(DetailFormatter):
         
         if not studio_logo:
             studio_images = studio_data.get("images") or []
-            studio_logo = studio_images[0].get("url") if studio_images else (studio_data.get("logo") or studio_data.get("image") or studio_data.get("poster"))
+            studio_logo = studio_data.get("image_path") or (studio_images[0].get("url") if studio_images else (studio_data.get("logo") or studio_data.get("image") or studio_data.get("poster")))
+            if studio_name and studio_logo:
+                studio_db = db.query(Studio).filter(Studio.name == studio_name).first()
+                if studio_db and not studio_db.logo_path:
+                    studio_db.logo_path = studio_logo
+                    try:
+                        db.commit()
+                    except Exception:
+                        db.rollback()
         
         parent_data = studio_data.get("parent") or studio_data.get("network") or {}
         parent_name = parent_data.get("name")
@@ -262,7 +334,15 @@ class SceneDetailService(DetailFormatter):
                 
         if not parent_logo:
             parent_images = parent_data.get("images") or []
-            parent_logo = parent_images[0].get("url") if parent_images else (parent_data.get("logo") or parent_data.get("image") or parent_data.get("poster"))
+            parent_logo = parent_data.get("image_path") or (parent_images[0].get("url") if parent_images else (parent_data.get("logo") or parent_data.get("image") or parent_data.get("poster")))
+            if parent_name and parent_logo:
+                parent_studio_db = db.query(Studio).filter(Studio.name == parent_name).first()
+                if parent_studio_db and not parent_studio_db.logo_path:
+                    parent_studio_db.logo_path = parent_logo
+                    try:
+                        db.commit()
+                    except Exception:
+                        db.rollback()
 
         match_db = match or db.query(MetadataMatch).filter(
             MetadataMatch.external_id == scene_uuid,
@@ -301,8 +381,7 @@ class SceneDetailService(DetailFormatter):
         # 2. Sync metadata via MetadataSyncer
         if match_db:
             self.metadata_syncer.sync_metadata(
-                db, match_db, title, scene_data, poster_url, ext_background, date_str,
-                image_downloader=self.image_downloader
+                db, match_db, title, scene_data, poster_url, ext_background, date_str
             )
             # 2b. Sync performer links so they appear in list views
             self._sync_performer_links(db, match_db, scene_data, provider_prefix)
@@ -550,11 +629,16 @@ class SceneDetailService(DetailFormatter):
                 db.add(studio_db)
                 db.flush()
 
-            # Localize studio logo if it's still a remote URL
+            # Queue studio logo and only write to DB if the file is already downloaded
             if image_downloader and studio_db.logo_path and studio_db.logo_path.startswith(("http://", "https://")):
                 local_logo = _queue_image(image_downloader, studio_db.logo_path, "logos", f"studio_{studio_name}")
                 if local_logo:
-                    studio_db.logo_path = local_logo
+                    from app.domains.media_assets.services.images.image_path_resolver import get_original_path, exists
+                    from app.shared_kernel.ports.image_service_port import ImageServiceRegistry
+                    image_root = ImageServiceRegistry.get().image_root
+                    filename = local_logo.split("/")[-1]
+                    if exists(get_original_path(image_root, "logos", filename)):
+                        studio_db.logo_path = local_logo
 
             if parent_name:
                 parent_studio_db = db.query(Studio).filter(Studio.name == parent_name).first()
@@ -563,11 +647,16 @@ class SceneDetailService(DetailFormatter):
                     db.add(parent_studio_db)
                     db.flush()
 
-                # Localize parent logo
+                # Queue parent studio logo
                 if image_downloader and parent_studio_db.logo_path and parent_studio_db.logo_path.startswith(("http://", "https://")):
                     local_parent_logo = _queue_image(image_downloader, parent_studio_db.logo_path, "logos", f"studio_{parent_name}")
                     if local_parent_logo:
-                        parent_studio_db.logo_path = local_parent_logo
+                        from app.domains.media_assets.services.images.image_path_resolver import get_original_path, exists
+                        from app.shared_kernel.ports.image_service_port import ImageServiceRegistry
+                        image_root = ImageServiceRegistry.get().image_root
+                        filename = local_parent_logo.split("/")[-1]
+                        if exists(get_original_path(image_root, "logos", filename)):
+                            parent_studio_db.logo_path = local_parent_logo
 
                 studio_db.parent_studio_id = parent_studio_db.id
 

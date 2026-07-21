@@ -291,7 +291,7 @@ def get_scraper_gateway() -> ScraperGatewayPort:
     return scraper_gateway
 
 DETAIL_DISPATCH = {
-    "scene": lambda db, scrapers, item_id, **kw: SceneDetailService(db, scrapers).get_scene_detail(item_id),
+    "scene": lambda db, scrapers, item_id, **kw: SceneDetailService(db, scrapers, image_downloader=TasksImageDownloadAdapter()).get_scene_detail(item_id),
     "movie": lambda db, scrapers, item_id, **kw: MovieDetailService(db, scrapers).get_library_item_detail(item_id, full_people=kw.get("full_people", False)),
     "tv":    lambda db, scrapers, item_id, **kw: TvDetailService(db, scrapers).get_library_tv_detail(item_id),
 }

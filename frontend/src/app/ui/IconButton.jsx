@@ -46,7 +46,7 @@ export default function IconButton({
   if (wrapped) {
     return (
       <div
-        data-hover-only={wrapperHoverOnly}
+        data-hover-only={wrapperHoverOnly ? 'true' : undefined}
         className={`${styles['icon-button-wrapper']} ui-icon-button-wrapper`}
       >
         {button}
