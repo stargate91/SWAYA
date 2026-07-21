@@ -7,8 +7,8 @@ export const useContinueWatchingQuery = (params) => useQuery({
   queryFn: () => api.library.getContinueWatching(params),
 });
 
-export const useRecommendationsQuery = (language, includeAdult) => useQuery({
-  queryKey: ['recommendations', language, includeAdult],
+export const useRecommendationsQuery = (language, includeAdult, adultTagBlacklist) => useQuery({
+  queryKey: ['recommendations', language, includeAdult, adultTagBlacklist],
   queryFn: () => api.recommendations.get(language, includeAdult),
 });
 

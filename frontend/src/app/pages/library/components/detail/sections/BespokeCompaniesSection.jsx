@@ -43,16 +43,19 @@ function BespokeCompaniesSection({ item, t }) {
           showArrows={true}
         >
           <Inline gap="md" wrap={false}>
-            {allCompanies.map((c, i) => (
-              <Tooltip key={i} content={c.name} side="top">
-                <LogoCard
-                  src={c.logo_path ? resolveMediaImageUrl(c.logo_path, 'logo', API_BASE) : undefined}
-                  alt={c.name}
-                  size="lg"
-                  invert
-                />
-              </Tooltip>
-            ))}
+            {allCompanies.map((c, i) => {
+              const logo = c.logo_path || c.logo || c.image || c.logo_url;
+              return (
+                <Tooltip key={i} content={c.name} side="top">
+                  <LogoCard
+                    src={logo ? resolveMediaImageUrl(logo, 'logo', API_BASE) : undefined}
+                    alt={c.name}
+                    size="lg"
+                    invert
+                  />
+                </Tooltip>
+              );
+            })}
           </Inline>
         </ScrollRow>
       </Card>

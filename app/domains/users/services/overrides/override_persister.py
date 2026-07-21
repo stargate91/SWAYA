@@ -489,7 +489,7 @@ class OverridePersister:
             scraper_gateway = scrapers
             if scraper_gateway and media_type:
                 _ENRICH_DISPATCH = {
-                    'scene': lambda: __import__('app.domains.library.services.detail.scene_detail_service', fromlist=['SceneDetailService']).SceneDetailService(db, scraper_gateway).get_scene_detail(item_id),
+                    'scene': lambda: __import__('app.domains.library.services.detail.scene_detail_service', fromlist=['SceneDetailService']).SceneDetailService(db, scraper_gateway, image_downloader=__import__('app.infrastructure.tasks.tasks_image_download_adapter', fromlist=['TasksImageDownloadAdapter']).TasksImageDownloadAdapter()).get_scene_detail(item_id),
                     'tv': lambda: __import__('app.domains.library.services.detail.tv_detail_service', fromlist=['TvDetailService']).TvDetailService(db, scraper_gateway).get_library_tv_detail(item_id),
                     'movie': lambda: __import__('app.domains.library.services.detail.movie_detail_service', fromlist=['MovieDetailService']).MovieDetailService(db, scraper_gateway).get_library_item_detail(item_id),
                 }

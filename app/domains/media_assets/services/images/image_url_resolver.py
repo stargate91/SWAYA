@@ -26,10 +26,15 @@ def resolve_image_url(
         return path
 
     # 2. Local check
-    normalized_path = path.replace("\\", "/").lstrip("/")
+    from urllib.parse import urlparse
+    parsed_path = urlparse(path).path or path
+    normalized_path = parsed_path.replace("\\", "/").lstrip("/")
     path_parts = [part for part in normalized_path.split("/") if part]
-    embedded_subfolder = path_parts[0] if len(path_parts) >= 2 else subfolder
     filename = path_parts[-1] if path_parts else os.path.basename(path)
+
+    embedded_subfolder = subfolder
+    if len(path_parts) >= 2 and path_parts[0] in MEDIA_IMAGE_SUBFOLDERS:
+        embedded_subfolder = path_parts[0]
 
     if embedded_subfolder == "logos":
         size = "original"
@@ -39,7 +44,38 @@ def resolve_image_url(
         else:
             size = "w500"
 
-    # 1. Remote URL fallback
+    # 1. Local disk check FIRST
+    if size == "original":
+        orig_path = image_path_resolver.get_original_path(image_root, embedded_subfolder, filename)
+        if image_path_resolver.exists(orig_path):
+            return f"/media/images/original/{embedded_subfolder}/{filename}"
+        existing_orig = image_path_resolver.find_existing_file_by_stem(image_root, "original", embedded_subfolder, filename)
+        if existing_orig:
+            return f"/media/images/original/{embedded_subfolder}/{existing_orig.name}"
+
+    thumb_subfolder = embedded_subfolder if embedded_subfolder in MEDIA_IMAGE_SUBFOLDERS else subfolder
+    thumb_path = image_path_resolver.get_thumbnail_path(image_root, thumb_subfolder, filename)
+    if image_path_resolver.exists(thumb_path):
+        return f"/media/images/thumbnails/{thumb_subfolder}/{thumb_path.name}"
+    existing_thumb = image_path_resolver.find_existing_file_by_stem(image_root, "thumbnails", thumb_subfolder, filename)
+    if existing_thumb:
+        return f"/media/images/thumbnails/{thumb_subfolder}/{existing_thumb.name}"
+
+    if thumb_subfolder == "scene_stills":
+        source_orig_path = image_path_resolver.get_original_path(image_root, "scene_stills", filename) or image_path_resolver.find_existing_file_by_stem(image_root, "original", "scene_stills", filename)
+        if source_orig_path and image_path_resolver.exists(source_orig_path):
+            image_thumbnailer.generate_thumbnail(source_orig_path, thumb_path, "scene_stills")
+            if image_path_resolver.exists(thumb_path):
+                return f"/media/images/thumbnails/scene_stills/{thumb_path.name}"
+
+    orig_path = image_path_resolver.get_original_path(image_root, embedded_subfolder, filename)
+    if image_path_resolver.exists(orig_path):
+        return f"/media/images/original/{embedded_subfolder}/{filename}"
+    existing_orig = image_path_resolver.find_existing_file_by_stem(image_root, "original", embedded_subfolder, filename)
+    if existing_orig:
+        return f"/media/images/original/{embedded_subfolder}/{existing_orig.name}"
+
+    # 2. Remote URL fallback (Only reached if not cached locally on disk)
     if path.startswith(("http://", "https://")):
         # PornDB CDN image sizing
         if "cdn.theporndb.net" in path and "/background/" in path and "/background/c/" not in path:
@@ -67,27 +103,6 @@ def resolve_image_url(
                 if len(subparts) == 2:
                     return f"{parts[0]}/t/p/{size}/{subparts[1]}"
         return path
-
-    if size == "original":
-        orig_path = image_path_resolver.get_original_path(image_root, embedded_subfolder, filename)
-        if image_path_resolver.exists(orig_path):
-            return f"/media/images/original/{embedded_subfolder}/{filename}"
-
-    thumb_subfolder = embedded_subfolder if embedded_subfolder in MEDIA_IMAGE_SUBFOLDERS else subfolder
-    thumb_path = image_path_resolver.get_thumbnail_path(image_root, thumb_subfolder, filename)
-    if image_path_resolver.exists(thumb_path):
-        return f"/media/images/thumbnails/{thumb_subfolder}/{thumb_path.name}"
-
-    if thumb_subfolder == "scene_stills":
-        source_orig_path = image_path_resolver.get_original_path(image_root, "scene_stills", filename)
-        if image_path_resolver.exists(source_orig_path):
-            image_thumbnailer.generate_thumbnail(source_orig_path, thumb_path, "scene_stills")
-            if image_path_resolver.exists(thumb_path):
-                return f"/media/images/thumbnails/scene_stills/{thumb_path.name}"
-
-    orig_path = image_path_resolver.get_original_path(image_root, embedded_subfolder, filename)
-    if image_path_resolver.exists(orig_path):
-        return f"/media/images/original/{embedded_subfolder}/{filename}"
 
     # 3. TMDB CDN fallback
     if path.startswith("/") and not path.startswith("/media/"):

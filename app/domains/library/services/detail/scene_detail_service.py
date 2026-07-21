@@ -1,11 +1,12 @@
 import logging
-from typing import Any
+from typing import Any, Optional
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 
 from app.shared_kernel.enums import Provider, MediaType
 from app.domains.users.models import UserOverride
 from app.shared_kernel.ports.scrapers import ScraperGatewayPort
+from app.shared_kernel.ports.image_download_port import ImageDownloadPort
 from app.domains.metadata.models import Studio, MetadataMatch
 from app.domains.library.services.detail._detail_formatter import DetailFormatter
 from app.domains.library.services.detail.detail_mixins import OverrideResolver, ExternalLinksBuilder
@@ -30,10 +31,11 @@ def _strip_provider_prefix(value: str) -> str:
 
 
 class SceneDetailService(DetailFormatter):
-    def __init__(self, db: Session, scrapers: ScraperGatewayPort):
+    def __init__(self, db: Session, scrapers: ScraperGatewayPort, image_downloader: Optional[ImageDownloadPort] = None):
         super().__init__()
         self.db = db
         self.scrapers = scrapers
+        self.image_downloader = image_downloader
         self.cast_builder = SceneCastBuilder()
         self.playback_resolver = ScenePlaybackResolver()
         self.metadata_syncer = SceneMetadataSyncer()
@@ -299,11 +301,12 @@ class SceneDetailService(DetailFormatter):
         # 2. Sync metadata via MetadataSyncer
         if match_db:
             self.metadata_syncer.sync_metadata(
-                db, match_db, title, scene_data, poster_url, ext_background, date_str
+                db, match_db, title, scene_data, poster_url, ext_background, date_str,
+                image_downloader=self.image_downloader
             )
             # 2b. Sync performer links so they appear in list views
             self._sync_performer_links(db, match_db, scene_data, provider_prefix)
-            self._sync_studios(db, match_db, scene_data)
+            self._sync_studios(db, match_db, scene_data, image_downloader=self.image_downloader)
 
         local_poster = override.custom_poster if override else None
         local_backdrop = override.custom_backdrop if override else None
@@ -522,9 +525,10 @@ class SceneDetailService(DetailFormatter):
             logger.debug(f"Failed to sync performer links: {e}")
             db.rollback()
 
-    def _sync_studios(self, db: Session, match_db: MetadataMatch, scene_data: dict):
+    def _sync_studios(self, db: Session, match_db: MetadataMatch, scene_data: dict, image_downloader: Optional[ImageDownloadPort] = None):
         """Ensure studios exist in the DB and are linked to the match."""
         from app.domains.metadata.models import Studio
+        from app.domains.library.services.detail.scene.metadata_syncer import _queue_image
 
         studio_data = scene_data.get("studio") or scene_data.get("site") or {}
         studio_name = studio_data.get("name")
@@ -546,12 +550,25 @@ class SceneDetailService(DetailFormatter):
                 db.add(studio_db)
                 db.flush()
 
+            # Localize studio logo if it's still a remote URL
+            if image_downloader and studio_db.logo_path and studio_db.logo_path.startswith(("http://", "https://")):
+                local_logo = _queue_image(image_downloader, studio_db.logo_path, "logos", f"studio_{studio_name}")
+                if local_logo:
+                    studio_db.logo_path = local_logo
+
             if parent_name:
                 parent_studio_db = db.query(Studio).filter(Studio.name == parent_name).first()
                 if not parent_studio_db:
                     parent_studio_db = Studio(name=parent_name, logo_path=parent_logo)
                     db.add(parent_studio_db)
                     db.flush()
+
+                # Localize parent logo
+                if image_downloader and parent_studio_db.logo_path and parent_studio_db.logo_path.startswith(("http://", "https://")):
+                    local_parent_logo = _queue_image(image_downloader, parent_studio_db.logo_path, "logos", f"studio_{parent_name}")
+                    if local_parent_logo:
+                        parent_studio_db.logo_path = local_parent_logo
+
                 studio_db.parent_studio_id = parent_studio_db.id
 
             sibling_matches = self._get_sibling_matches(db, match_db)

@@ -133,7 +133,7 @@ class PornDBScraper(BaseScraper):
         )
         return self.enrich_movie_ratings(data) if data else None
 
-    def search_performers(self, query_str: str) -> list[dict]:
+    def search_performers(self, query_str: str, page: int = 1) -> list[dict]:
         normalized_query = str(query_str or "").strip()
         if not normalized_query:
             return []
@@ -150,7 +150,7 @@ class PornDBScraper(BaseScraper):
         try:
             resp = self.session.get(
                 f"{PORNDB_API_BASE}/performers",
-                params={"q": normalized_query},
+                params={"q": normalized_query, "page": page},
                 headers=headers,
                 timeout=SCRAPER_REQUEST_TIMEOUT,
             )
@@ -189,18 +189,19 @@ class PornDBScraper(BaseScraper):
         query: str,
         year: Optional[int] = None,
         per_page: int = 10,
+        page: int = 1,
         force_refresh: bool = False,
     ) -> list[dict]:
         normalized_query = str(query or "").strip()
         if not normalized_query:
             return []
 
-        cache_key = f"porndb/movie/search/v1/{normalized_query.lower()}/{year or 'all'}"
+        cache_key = f"porndb/movie/search/v1/{normalized_query.lower()}/{year or 'all'}/{page}"
         cached_data = self.cache.get(Provider.PORNDB, cache_key, force_refresh=force_refresh)
         if cached_data is not None:
             return [] if cached_data.get("cached_error") else cached_data.get("data", [])
 
-        res_json = self.client.search_movies(normalized_query, year, per_page)
+        res_json = self.client.search_movies(normalized_query, year, per_page, page=page)
         movies = res_json.get("data") or [] if res_json else []
         self.cache.set(
             Provider.PORNDB,

@@ -161,14 +161,8 @@ def probe_backdrop_tone(file_path: str, image_root: Path, session: requests.Sess
     except Exception as e:
         logger.debug(f"Swallowed exception in domains/media_assets/services/image_selectors.py:154: {e}", exc_info=True)
 
-    try:
-        url = f"{TMDB_IMAGE_BASE}original{file_path}"
-        response = session.get(url, timeout=IMAGE_DOWNLOAD_TIMEOUT)
-        response.raise_for_status()
-        with Image.open(BytesIO(response.content)) as image:
-            return measure_backdrop_tone(image)
-    except Exception:
-        return None
+    # Do not execute synchronous HTTP downloads on the main thread during page rendering
+    return None
 
 
 
@@ -300,13 +294,10 @@ def pick_poster_path(
     Selects the best poster from TMDB metadata images based on preferred language and ratings.
     """
     raw = raw_data or {}
-    if raw.get("poster_path"):
-        return raw.get("poster_path")
-
     images = raw.get("images") or {}
     posters = images.get("posters") or []
     if not posters:
-        return None
+        return raw.get("poster_path")
 
     original_lang = str(raw.get("original_language") or "").split("-", 1)[0].strip().lower()
 
@@ -320,6 +311,8 @@ def pick_poster_path(
         preferred_langs.append(original_lang)
     preferred_langs.extend([None, ""])
 
+    raw_main_poster = raw.get("poster_path")
+
     def poster_score(poster):
         lang = poster.get("iso_639_1")
         normalized_lang = lang.lower() if isinstance(lang, str) else lang
@@ -327,10 +320,14 @@ def pick_poster_path(
             lang_rank = preferred_langs.index(normalized_lang)
         except ValueError:
             lang_rank = len(preferred_langs)
+        
+        file_path = poster.get("file_path")
+        is_main_default = 0 if (raw_main_poster and file_path == raw_main_poster) else 1
+
         vote_count = int(poster.get("vote_count") or 0)
         vote_average = float(poster.get("vote_average") or 0)
         width = int(poster.get("width") or 0)
-        return (lang_rank, -vote_count, -vote_average, -width)
+        return (lang_rank, is_main_default, -vote_count, -vote_average, -width)
 
     ranked_posters = sorted(posters, key=poster_score)
     return ranked_posters[0].get("file_path") or raw.get("poster_path")

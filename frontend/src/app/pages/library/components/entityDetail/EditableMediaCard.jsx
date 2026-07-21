@@ -60,7 +60,7 @@ export default function EditableMediaCard({
       topLeftAction={flagBadge}
       topRightAction={editButton}
       overlay={overlay}
-      title={viewOriginalTitle}
+      title={null}
       className={`entity-detail-page__media-card entity-detail-page__media-card--editable ${className}`.trim()}
       previewEnabled={false}
       disableHoverAnimation={true}

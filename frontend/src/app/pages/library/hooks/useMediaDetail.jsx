@@ -452,22 +452,16 @@ export default function useMediaDetail({ id, type, t, openModal }) {
                 : 'stash_';
             return `${prefix}${item.external_ids.stash_id}`;
           }
+          if (item?.id) return String(item.id);
           return cleanId.startsWith('porndb_') || cleanId.startsWith('fansdb_') || cleanId.startsWith('stash_')
             ? cleanId
             : `stash_${cleanId}`;
         })()
-      : (cleanId.startsWith('porndb_') || cleanId.startsWith('fansdb_') ? cleanId : Number(item?.tv_tmdb_id || item?.tmdb_id || cleanId || 0))
+      : (cleanId.startsWith('porndb_') || cleanId.startsWith('fansdb_') || cleanId.startsWith('stash_') || cleanId.startsWith('tmdb_') ? cleanId : Number(item?.tv_tmdb_id || item?.tmdb_id || cleanId || 0))
     )
     : 0;
   const trackedMediaType = isScene ? 'scene' : (isMovie ? 'movie' : 'tv');
-  const canToggleTracked = !isOwned && (
-    isScene
-      ? !!trackedExternalId
-      : (typeof trackedExternalId === 'string' && (trackedExternalId.startsWith('porndb_') || trackedExternalId.startsWith('fansdb_'))
-        ? true
-        : (Number.isFinite(trackedExternalId) && trackedExternalId > 0)
-      )
-  );
+  const canToggleTracked = !isOwned && Boolean(trackedExternalId);
 
   const getIsTvWatched = () => {
     if (!item) return false;
@@ -610,8 +604,10 @@ export default function useMediaDetail({ id, type, t, openModal }) {
   const logoPathRaw = item?.logo_path || '';
   let logoPath = logoPathRaw;
   if (!logoPath && item?.type === 'scene') {
-    const studioLogo = item?.companies?.[0]?.logo_path;
-    const networkLogo = item?.networks?.[0]?.logo_path;
+    const c = item?.companies?.[0];
+    const n = item?.networks?.[0];
+    const studioLogo = c?.logo_path || c?.logo || c?.image || c?.logo_url;
+    const networkLogo = n?.logo_path || n?.logo || n?.image || n?.logo_url;
     logoPath = studioLogo || networkLogo || '';
   }
   const logoUrl = resolveDetailsImageUrl(logoPath, API_BASE, 'logo');

@@ -79,10 +79,19 @@ class PerformerPersister:
         prov_val = "perf"
         if person.external_ids:
             for k, v in person.external_ids.items():
-                prov_val = k
-                ext_id = v
-                break
-        filename = f"{prov_val}_{ext_id}{ext}"
+                if k != "urls" and v:
+                    prov_val = k
+                    ext_id = v
+                    break
+        stem_filename = f"{prov_val}_{ext_id}"
+        from app.domains.media_assets.services.images import image_processing_service
+        from app.domains.media_assets.services.images import image_path_resolver
+        existing_file = image_path_resolver.find_existing_file_by_stem(image_processing_service.image_root, "original", "people", stem_filename) or image_path_resolver.find_existing_file_by_stem(image_processing_service.image_root, "thumbnails", "people", stem_filename)
+        if existing_file:
+            person.local_profile_path = f"people/{existing_file.name}"
+            return
+
+        filename = f"{stem_filename}{ext}"
         person.local_profile_path = f"people/{filename}"
         self.image_downloader.enqueue_download(url, "people", filename)
 

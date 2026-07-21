@@ -8,10 +8,9 @@ import { X } from '@/ui/icons';
 import { useSettingsField } from '../SettingsFormContext.jsx';
 import styles from './TagSafetyFilters.module.css';
 
-// Pre-defined chip recommendations to minimize cognitive load (covering 80%+ of the adult space)
 const PRESET_BLACKLIST = [
   'gay', 'bisexual', 'transgender', 'cuckold', 
-  'group sex', 'gangbang', 'hentai', 'parody', 'anal', 'bdsm', 'feet',
+  'group sex', 'gangbang', 'hentai', 'parody', 'anal', 'pegging', 'bdsm', 'feet',
   'pregnant', 'cartoon', 'anime', 'fetish',
   'ebony', 'black man', 'black woman', 'asian', 'latina', 'interracial'
 ];

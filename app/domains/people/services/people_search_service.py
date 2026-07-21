@@ -275,11 +275,24 @@ class PeopleSearchService:
             db.commit()
             if profile_url:
                 try:
+                    import os
                     from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+                    from app.domains.media_assets.services.images import image_processing_service, image_path_resolver
                     adapter = TasksImageDownloadAdapter()
-                    ext = ".jpg"
-                    filename = f"{provider_enum.value}_{uuid_str}{ext}"
-                    adapter.enqueue_download(profile_url, "people", filename)
+                    ext = os.path.splitext(profile_url)[1].lower() or ".jpg"
+                    if ext == ".jpeg":
+                        ext = ".jpg"
+                    stem_filename = f"{provider_enum.value}_{uuid_str}"
+                    existing_file = image_path_resolver.find_existing_file_by_stem(image_processing_service.image_root, "original", "people", stem_filename) or image_path_resolver.find_existing_file_by_stem(image_processing_service.image_root, "thumbnails", "people", stem_filename)
+                    if existing_file:
+                        filename = existing_file.name
+                        person.local_profile_path = f"people/{filename}"
+                        db.commit()
+                    else:
+                        filename = f"{stem_filename}{ext}"
+                        person.local_profile_path = f"people/{filename}"
+                        db.commit()
+                        adapter.enqueue_download(profile_url, "people", filename)
                 except Exception as img_err:
                     logger.warning(f"Failed to enqueue image download for adult performer {person.name}: {img_err}")
             if is_active:

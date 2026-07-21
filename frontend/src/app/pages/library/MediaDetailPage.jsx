@@ -224,6 +224,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
                   editTitle={t('library.details.changePoster') || 'Change Poster'}
                   viewOriginalTitle={t('library.details.viewOriginalImage') || 'View Original Image'}
                   type="poster"
+                  fluid={false}
                   className={fallbackStyles['poster-col']}
                 />
                 <div className={fallbackStyles['content-col']}>

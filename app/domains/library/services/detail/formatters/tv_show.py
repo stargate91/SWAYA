@@ -63,17 +63,6 @@ class TvShowFormatter(DetailFormatter):
         except Exception:
             tmdb_data = None
 
-        if tmdb_data and series_match:
-            from app.shared_kernel.language import LanguageService
-            loc_db = LanguageService.get_best_localization(series_match.localizations, ui_lang)
-            if loc_db:
-                if loc_db.local_poster_path:
-                    tmdb_data["poster_path"] = loc_db.local_poster_path
-                if loc_db.local_logo_path:
-                    tmdb_data["logo_path"] = loc_db.local_logo_path
-            if series_match.local_backdrop_path:
-                tmdb_data["backdrop_path"] = series_match.local_backdrop_path
-
         if not tmdb_data and series_match:
             from app.shared_kernel.language import LanguageService
             loc_db = LanguageService.get_best_localization(series_match.localizations, ui_lang)
@@ -198,18 +187,41 @@ class TvShowFormatter(DetailFormatter):
             MetadataMatch.media_type == MediaType.TV
         ).first()
         
+        from app.shared_kernel.language import LanguageService
+        loc_db = LanguageService.get_best_localization(series_match.localizations, ui_lang) if series_match else None
+
         from app.domains.media_assets.services.images import image_processing_service
+        effective_poster = None
+        if override and override.custom_poster:
+            effective_poster = override.custom_poster
+        elif loc_db and loc_db.local_poster_path:
+            effective_poster = loc_db.local_poster_path
+        else:
+            effective_poster = image_processing_service.pick_poster_path(tmdb_data, preferred_language=ui_lang) or tmdb_data.get("poster_path")
+
         effective_backdrop = None
         if override and override.custom_backdrop:
             effective_backdrop = override.custom_backdrop
+        elif series_match and series_match.local_backdrop_path:
+            effective_backdrop = series_match.local_backdrop_path
         else:
             effective_backdrop = image_processing_service.pick_backdrop_path(tmdb_data, preferred_language=ui_lang, allow_low_res=True)
 
         effective_logo = None
         if override and override.custom_logo:
             effective_logo = override.custom_logo
+        elif loc_db and loc_db.local_logo_path:
+            effective_logo = loc_db.local_logo_path
         else:
             effective_logo = tmdb_data.get("logo_path") or image_processing_service.pick_logo_path(tmdb_data, preferred_language=ui_lang)
+
+        # Enqueue local asset downloads for TMDB TV show assets (poster, backdrop, logo, cast profiles, season posters)
+        try:
+            from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+            image_downloader = TasksImageDownloadAdapter()
+            self._queue_tmdb_tv_assets(image_downloader, tv_tmdb_id_int, tmdb_data, effective_poster, effective_backdrop, effective_logo)
+        except Exception as err:
+            logger.warning(f"Failed to queue TMDB TV assets for {tv_tmdb_id_int}: {err}")
 
         series_match, loc_db = self.metadata_resolver.sync_metadata_match_and_localization(
             db=db,
@@ -245,7 +257,7 @@ class TvShowFormatter(DetailFormatter):
             "tagline": loc_db.tagline if (loc_db and loc_db.tagline) else tmdb_data.get("tagline"),
             "logo_path": self._resolve_img(effective_logo, "logos"),
             "backdrop_path": self._resolve_img(effective_backdrop, "backdrops", size="original"),
-            "poster_path": self._resolve_img(override.custom_poster if (override and override.custom_poster) else tmdb_data.get("poster_path"), "posters"),
+            "poster_path": self._resolve_img(effective_poster, "posters"),
             "year": int(tmdb_data.get("first_air_date", "").split("-")[0]) if tmdb_data.get("first_air_date") else None,
             "first_air_date": tmdb_data.get("first_air_date"),
             "last_air_date": tmdb_data.get("last_air_date"),
@@ -292,3 +304,69 @@ class TvShowFormatter(DetailFormatter):
         from app.domains.library.services.detail.external_links import generate_external_links
         result["external_links"] = generate_external_links(ext_ids, "tv")
         return TvShowDetailResponse(**result)
+
+    def _queue_tmdb_tv_assets(self, image_downloader, tv_tmdb_id: int, tmdb_data: dict, effective_poster: str = None, effective_backdrop: str = None, effective_logo: str = None):
+        if not image_downloader or not tmdb_data:
+            return
+
+        import os
+        from urllib.parse import urlparse
+        from typing import Optional
+        from app.domains.media_assets.services.images import image_processing_service, image_path_resolver
+
+        def queue_img(path: str, subfolder: str, prefix: str) -> Optional[str]:
+            if not path:
+                return None
+            if path.startswith("/media/"):
+                return path
+
+            if path.startswith(("http://", "https://")):
+                url = path
+                raw_filename = os.path.basename(urlparse(path).path)
+            else:
+                url = image_downloader.get_download_url(path, subfolder) or f"https://image.tmdb.org/t/p/original{path}"
+                raw_filename = os.path.basename(path)
+
+            if not raw_filename:
+                return None
+
+            clean_filename = f"{prefix}_{raw_filename}"
+            existing = image_path_resolver.find_existing_file_by_stem(
+                image_processing_service.image_root, "original", subfolder, clean_filename
+            ) or image_path_resolver.find_existing_file_by_stem(
+                image_processing_service.image_root, "thumbnails", subfolder, clean_filename
+            )
+            if not existing:
+                image_downloader.enqueue_download(url, subfolder, clean_filename)
+            return f"{subfolder}/{clean_filename}"
+
+        # 1. Poster
+        poster_path = effective_poster or tmdb_data.get("poster_path")
+        if poster_path:
+            queue_img(poster_path, "posters", f"tmdb_{tv_tmdb_id}")
+
+        # 2. Backdrop
+        b_path = effective_backdrop or tmdb_data.get("backdrop_path")
+        if b_path:
+            queue_img(b_path, "backdrops", f"tmdb_{tv_tmdb_id}")
+
+        # 3. Logo
+        l_path = effective_logo or tmdb_data.get("logo_path")
+        if l_path:
+            queue_img(l_path, "logos", f"tmdb_{tv_tmdb_id}")
+
+        # 4. Cast & Crew Profiles
+        credits = tmdb_data.get("aggregate_credits") or tmdb_data.get("credits") or {}
+        all_people = (credits.get("cast") or []) + (credits.get("crew") or [])
+        for person in all_people:
+            p_profile = person.get("profile_path")
+            p_id = person.get("id")
+            if p_profile and p_id:
+                queue_img(p_profile, "people", f"tmdb_{p_id}")
+
+        # 5. Season Posters
+        for season in tmdb_data.get("seasons", []) or []:
+            s_poster = season.get("poster_path")
+            s_num = season.get("season_number")
+            if s_poster and s_num is not None:
+                queue_img(s_poster, "posters", f"tmdb_tv_{tv_tmdb_id}_season_{s_num}")

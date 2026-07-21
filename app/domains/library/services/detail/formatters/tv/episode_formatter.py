@@ -97,7 +97,29 @@ class TvEpisodeFormatter:
                 still = episode_match.local_still_path or episode_match.still_path
             if not still:
                 still = ep.get("still_path")
-                
+
+            if still and not still.startswith("/media/"):
+                try:
+                    import os
+                    from urllib.parse import urlparse
+                    from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+                    from app.domains.media_assets.services.images import image_processing_service, image_path_resolver
+
+                    raw_fn = os.path.basename(urlparse(still).path or still)
+                    if raw_fn:
+                        filename = f"tmdb_tv_{tv_tmdb_id_int}_s{season_number}_e{ep_num}_{raw_fn}"
+                        existing = image_path_resolver.find_existing_file_by_stem(
+                            image_processing_service.image_root, "original", "stills", filename
+                        ) or image_path_resolver.find_existing_file_by_stem(
+                            image_processing_service.image_root, "thumbnails", "stills", filename
+                        )
+                        if not existing:
+                            adapter = TasksImageDownloadAdapter()
+                            url = adapter.get_download_url(still, "stills") or f"https://image.tmdb.org/t/p/original{still}"
+                            adapter.enqueue_download(url, "stills", filename)
+                except Exception:
+                    pass
+
             episodes.append({
                 "id": f"tmdb_{tv_tmdb_id_int}_{season_number}_{ep_num}",
                 "episode_number": ep_num,

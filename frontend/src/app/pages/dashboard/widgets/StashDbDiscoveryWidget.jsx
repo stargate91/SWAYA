@@ -15,10 +15,12 @@ export default function StashDbDiscoveryWidget() {
   const { t: T } = useTranslation();
   const { data: settings = {} } = useSettingsQuery();
   const includeAdult = settings?.include_adult;
+  const language = settings?.primary_metadata_language;
+  const adultTagBlacklist = settings?.adult_tag_blacklist;
   const stashDbKey = settings?.stashdb_api_key;
   const currentFocus = settings?.adult_stashdb_focus_tag || '';
 
-  const { data: recommendations, isLoading } = useRecommendationsQuery();
+  const { data: recommendations, isLoading } = useRecommendationsQuery(language, includeAdult, adultTagBlacklist);
   const watchlistIdsFromQuery = recommendations?.watchlist_item_ids;
 
   const addToWatchlistMutation = useAddToWatchlistMutation();

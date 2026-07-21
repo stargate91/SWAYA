@@ -21,9 +21,9 @@ class PorndbMovieNormalizer:
             return None
 
         poster = (
-            movie.get("poster_image")
+            movie.get("image")
+            or movie.get("poster_image")
             or movie.get("poster")
-            or movie.get("image")
             or image_variant(movie.get("posters"))
         )
         backdrop = None

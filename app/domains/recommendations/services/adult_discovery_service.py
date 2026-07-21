@@ -149,41 +149,7 @@ class AdultDiscoveryService:
             "big dick", "bbc"
         }
 
-        # Normalize string helper
-        import re
-        def normalize_tag(tag: str) -> str:
-            if not tag:
-                return ""
-            return re.sub(r'[^a-z0-9]', '', tag.lower())
-
-        # Define tag synonyms/aliases for robust filtering (strictly semantic synonyms, in normalized form)
-        TAG_SYNONYMS = {
-            "bisexual": {"bisexual", "bi", "bisex"},
-            "gay": {"gay", "maleonmale", "mm", "homosexual", "gaypornography"},
-            "transgender": {"transgender", "trans", "transexual", "transsexual", "shemale", "ts",
-                            "transwomen", "transwoman", "transgenderwomen", "transgenderwoman",
-                            "transfem", "transontrans", "transonfemale", "transsexuality",
-                            "transpornography", "translesbian"},
-            "straight": {"straight", "hetero", "heterosexual"},
-            "bdsm": {"bdsm", "sadomasochism", "bondage", "sm"},
-            "anal": {"anal", "analsex", "analcreampie", "firstanal", "doubleanal"},
-            "interracial": {"interracial", "interracialsex", "ir"},
-            "dp": {"dp", "doublepenetration", "dped", "doubledrilling"},
-            "facial": {"facial", "facials", "facialcumshot", "cumface", "cumonface", "cumonherface", "cumontoface", "cumonmouth", "cumshotfacial", "facialize", "facecumshot"},
-            "fetish": {"fetish", "sexualfetish"},
-            "feet": {"feet", "footfetish"},
-            "parody": {"parody", "parodies"},
-            "bigdick": {"bigdick", "bigcock", "bigcocks", "bigdicks", "bigpenis", "fatcock", "fatdick", "largecock", "largedick", "longcock", "longdick", "hung"},
-            "bbc": {"bbc", "bigblackcock", "bigblackdick", "bigblackdong", "bbcworship", "bigblackcockworship"},
-        }
-
-        def expand_tags(tag_set):
-            normalized_set = {normalize_tag(t) for t in tag_set}
-            expanded = set(normalized_set)
-            for tag in normalized_set:
-                if tag in TAG_SYNONYMS:
-                    expanded.update({normalize_tag(syn) for syn in TAG_SYNONYMS[tag]})
-            return expanded
+        from app.domains.recommendations.services.tag_safety import normalize_tag, expand_tags, has_word_match
 
         # Expand noise keywords using synonym mappings
         noise_keywords = expand_tags(noise_keywords_raw)
@@ -247,42 +213,6 @@ class AdultDiscoveryService:
         # 3. Fetch blacklist settings
         blacklist_setting = self.settings.get_setting("adult_tag_blacklist") or ""
 
-        import re
-
-        def normalize_tag(tag: str) -> str:
-            if not tag:
-                return ""
-            return re.sub(r'[^a-z0-9]', '', tag.lower())
-
-        # Define tag synonyms/aliases for robust filtering (strictly semantic synonyms, in normalized form)
-        TAG_SYNONYMS = {
-            "bisexual": {"bisexual", "bi", "bisex"},
-            "gay": {"gay", "maleonmale", "mm", "homosexual", "gaypornography"},
-            "transgender": {"transgender", "trans", "transexual", "transsexual", "shemale", "ts",
-                            "transwomen", "transwoman", "transgenderwomen", "transgenderwoman",
-                            "transfem", "transontrans", "transonfemale", "transsexuality",
-                            "transpornography", "translesbian"},
-            "straight": {"straight", "hetero", "heterosexual"},
-            "bdsm": {"bdsm", "sadomasochism", "bondage", "sm"},
-            "anal": {"anal", "analsex", "analcreampie", "firstanal", "doubleanal"},
-            "interracial": {"interracial", "interracialsex", "ir"},
-            "dp": {"dp", "doublepenetration", "dped", "doubledrilling"},
-            "facial": {"facial", "facials", "facialcumshot", "cumface", "cumonface", "cumonherface", "cumontoface", "cumonmouth", "cumshotfacial", "facialize", "facecumshot"},
-            "fetish": {"fetish", "sexualfetish"},
-            "feet": {"feet", "footfetish"},
-            "parody": {"parody", "parodies"},
-            "bigdick": {"bigdick", "bigcock", "bigcocks", "bigdicks", "bigpenis", "fatcock", "fatdick", "largecock", "largedick", "longcock", "longdick", "hung"},
-            "bbc": {"bbc", "bigblackcock", "bigblackdick", "bigblackdong", "bbcworship", "bigblackcockworship"},
-        }
-
-        def expand_tags(tag_set):
-            normalized_set = {normalize_tag(t) for t in tag_set}
-            expanded = set(normalized_set)
-            for tag in normalized_set:
-                if tag in TAG_SYNONYMS:
-                    expanded.update({normalize_tag(syn) for syn in TAG_SYNONYMS[tag]})
-            return expanded
-
         blacklist = expand_tags({t.strip() for t in blacklist_setting.split(",") if t.strip()})
 
         # 4. Filter and score scenes
@@ -299,8 +229,10 @@ class AdultDiscoveryService:
                 if (t_item.get("name") if isinstance(t_item, dict) else t_item)
             }
 
-            # A. Blacklist check: discard item if it contains any blacklisted tag
-            if blacklist and any(b_tag in scene_tag_names for b_tag in blacklist):
+            scene_title = f"{s.get('title') or ''} {s.get('details') or ''}"
+
+            # A. Blacklist check: discard item if it contains any blacklisted tag or keyword
+            if blacklist and (any(b_tag in scene_tag_names for b_tag in blacklist) or has_word_match(scene_title, blacklist)):
                 continue
 
             # Calculate preference score: sum of matching signal-tag weights

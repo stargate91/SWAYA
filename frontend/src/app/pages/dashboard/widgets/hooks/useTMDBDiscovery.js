@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSettingsQuery } from '@/queries/settingsQueries';
 import {
   useRecommendationsQuery,
   useAddToWatchlistMutation,
@@ -48,7 +49,12 @@ export default function useTMDBDiscovery() {
 
   const scrollRef = useRef(null);
 
-  const { data: recommendations } = useRecommendationsQuery();
+  const { data: settings = {} } = useSettingsQuery();
+  const includeAdult = settings?.include_adult;
+  const language = settings?.primary_metadata_language;
+  const adultTagBlacklist = settings?.adult_tag_blacklist;
+
+  const { data: recommendations } = useRecommendationsQuery(language, includeAdult, adultTagBlacklist);
   const watchlistIdsFromQuery = recommendations?.watchlist_item_ids;
 
   const addToWatchlistMutation = useAddToWatchlistMutation();

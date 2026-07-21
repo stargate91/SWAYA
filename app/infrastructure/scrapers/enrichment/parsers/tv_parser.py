@@ -63,7 +63,7 @@ def enrich_tv(parser, match: MetadataMatch, language: str, include_ratings: bool
         tv_loc.original_language = tv_details.get("original_language")
         tv_loc.trailer_url = _pick_trailer_key(tv_details, language, tv_details.get("original_language"))
 
-        localized_asset_prefix = f"tmdb_tv_{tv_match.external_id}_{language}"
+        localized_asset_prefix = f"tmdb_{tv_match.external_id}"
         tv_match.local_backdrop_path = parser.enricher._queue_image(
             tv_match.backdrop_path,
             "backdrops",

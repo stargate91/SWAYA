@@ -132,55 +132,9 @@ class RecommendationsService:
             # Fetch settings
             blacklist_setting = self.settings.get_setting("adult_tag_blacklist") or ""
 
-            import re
-
-            def normalize_tag(tag: str) -> str:
-                if not tag:
-                    return ""
-                return re.sub(r'[^a-z0-9]', '', tag.lower())
-
-            # Define tag synonyms/aliases for robust filtering (strictly semantic synonyms, in normalized form)
-            TAG_SYNONYMS = {
-                "bisexual": {"bisexual", "bi", "bisex"},
-                "gay": {"gay", "maleonmale", "mm", "homosexual", "gaypornography"},
-                "transgender": {"transgender", "trans", "transexual", "transsexual", "shemale", "ts",
-                                "transwomen", "transwoman", "transgenderwomen", "transgenderwoman",
-                                "transfem", "transontrans", "transonfemale", "transsexuality",
-                                "transpornography", "translesbian"},
-                "straight": {"straight", "hetero", "heterosexual"},
-                "bdsm": {"bdsm", "sadomasochism", "bondage", "sm"},
-                "anal": {"anal", "analsex", "analcreampie", "firstanal", "doubleanal"},
-                "interracial": {"interracial", "interracialsex", "ir"},
-                "dp": {"dp", "doublepenetration", "dped", "doubledrilling"},
-                "facial": {"facial", "facials", "facialcumshot", "cumface", "cumonface", "cumonherface", "cumontoface", "cumonmouth", "cumshotfacial", "facialize", "facecumshot"},
-                "fetish": {"fetish", "sexualfetish"},
-                "feet": {"feet", "footfetish"},
-                "parody": {"parody", "parodies"},
-                "bigdick": {"bigdick", "bigcock", "bigcocks", "bigdicks", "bigpenis", "fatcock", "fatdick", "largecock", "largedick", "longcock", "longdick", "hung"},
-                "bbc": {"bbc", "bigblackcock", "bigblackdick", "bigblackdong", "bbcworship", "bigblackcockworship"},
-            }
-
-            def expand_tags(tag_set):
-                normalized_set = {normalize_tag(t) for t in tag_set}
-                expanded = set(normalized_set)
-                for tag in normalized_set:
-                    if tag in TAG_SYNONYMS:
-                        expanded.update({normalize_tag(syn) for syn in TAG_SYNONYMS[tag]})
-                return expanded
+            from app.domains.recommendations.services.tag_safety import normalize_tag, expand_tags, has_word_match
 
             blacklist = expand_tags({t.strip() for t in blacklist_setting.split(",") if t.strip()})
-
-            def has_word_match(text, word_set):
-                if not word_set or not text:
-                    return False
-                # To compare text keywords with normalized word_set:
-                # We split the title/overview text into words, normalize each, and check if any is in word_set.
-                # This guarantees matches like "male-on-male" -> "maleonmale" -> match!
-                words = re.findall(r'[a-zA-Z0-9]+', text)
-                for w in words:
-                    if normalize_tag(w) in word_set:
-                        return True
-                return False
 
             def get_score(x):
                 pop = float(x.get("popularity") or 0.0)
@@ -221,9 +175,7 @@ class RecommendationsService:
                     details = self.scraper.get_details(
                         tmdb_id=item["id"],
                         item_type="tv",
-                        language=pref_lang,
-                        include_images=False,
-                        append_parts=[]
+                        language=pref_lang
                     )
                     if details:
                         item["last_air_date"] = details.get("last_air_date")

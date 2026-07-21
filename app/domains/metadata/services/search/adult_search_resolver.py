@@ -55,14 +55,12 @@ class AdultSearchResolver:
 
         if prov_enum == Provider.PORNDB and item_type == "movie":
             try:
-                # Add page to request params
-                movies = scraper.search_movies(query, year=year, page=page) if hasattr(scraper, "search_movies") else []
-                if not movies and hasattr(scraper, "search_movies"):
-                    # fallback if signature doesn't take page
+                movies = []
+                if hasattr(scraper, "search_movies"):
                     try:
-                        movies = scraper.search_movies(query, year=year)
+                        movies = scraper.search_movies(query, year=year, page=page)
                     except TypeError:
-                        movies = []
+                        movies = scraper.search_movies(query, year=year)
                 formatted = []
                 for m in movies:
                     poster = (
@@ -251,13 +249,15 @@ class AdultSearchResolver:
         if not scraper:
             return []
         try:
-            # Pass page parameter if supported
-            results = scraper.search_performers(query, page=page) if hasattr(scraper, "search_performers") and prov_enum == Provider.PORNDB else scraper.search_performers(query)
-            if not results and prov_enum == Provider.PORNDB and hasattr(scraper, "search_performers"):
-                try:
+            results = []
+            if hasattr(scraper, "search_performers"):
+                if prov_enum == Provider.PORNDB:
+                    try:
+                        results = scraper.search_performers(query, page=page)
+                    except TypeError:
+                        results = scraper.search_performers(query)
+                else:
                     results = scraper.search_performers(query)
-                except TypeError:
-                    results = []
             source_name = _provider_source_name(prov_enum)
             formatted = []
             for p in results:

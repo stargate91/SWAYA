@@ -131,6 +131,12 @@ class TmdbMovieFormatter(MovieDetailFormatter):
         override = metadata_override
         
         from app.domains.media_assets.services.images import image_processing_service
+        effective_poster = None
+        if override and override.custom_poster:
+            effective_poster = override.custom_poster
+        else:
+            effective_poster = image_processing_service.pick_poster_path(tmdb_data, preferred_language=ui_lang) or tmdb_data.get("poster_path")
+
         effective_backdrop = None
         if override and override.custom_backdrop:
             effective_backdrop = override.custom_backdrop
@@ -142,6 +148,14 @@ class TmdbMovieFormatter(MovieDetailFormatter):
             effective_logo = override.custom_logo
         else:
             effective_logo = tmdb_data.get("logo_path") or image_processing_service.pick_logo_path(tmdb_data, preferred_language=ui_lang)
+
+        # Enqueue local asset downloads for TMDB movie assets (poster, backdrop, logo, cast profiles)
+        try:
+            from app.infrastructure.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+            image_downloader = TasksImageDownloadAdapter()
+            self._queue_tmdb_movie_assets(image_downloader, tmdb_id, tmdb_data, effective_poster, effective_backdrop, effective_logo)
+        except Exception as err:
+            logger.warning(f"Failed to queue TMDB movie assets for {tmdb_id}: {err}")
 
         imdb_id = tmdb_data.get("imdb_id")
         if match:
@@ -206,7 +220,7 @@ class TmdbMovieFormatter(MovieDetailFormatter):
             "revenue": tmdb_data.get("revenue") or (match.revenue if match else None),
             "companies": [{"name": c.get("name"), "logo_path": self._resolve_img(c.get("logo_path"), "logos")} for c in tmdb_data.get("production_companies", [])] if tmdb_data.get("production_companies") else [],
             "networks": [],
-            "poster_path": self._resolve_img(override.custom_poster if (override and override.custom_poster) else tmdb_data.get("poster_path"), "posters"),
+            "poster_path": self._resolve_img(effective_poster, "posters"),
             "backdrop_path": self._resolve_img(effective_backdrop, "backdrops", size="original"),
             "original_language": tmdb_data.get("original_language"),
             "type": "movie",
@@ -247,3 +261,62 @@ class TmdbMovieFormatter(MovieDetailFormatter):
             ext_ids["imdb"] = imdb_id
         ExternalLinksBuilder.append_links(result, ext_ids, "movie")
         return MovieDetailResponse(**result)
+
+    def _queue_tmdb_movie_assets(self, image_downloader, tmdb_id: int, tmdb_data: dict, effective_poster: str = None, effective_backdrop: str = None, effective_logo: str = None):
+        if not image_downloader or not tmdb_data:
+            return
+
+        import os
+        from urllib.parse import urlparse
+        from typing import Optional
+        from app.domains.media_assets.services.images import image_processing_service, image_path_resolver
+
+        def queue_img(path: str, subfolder: str, prefix: str) -> Optional[str]:
+            if not path:
+                return None
+            if path.startswith("/media/"):
+                return path
+
+            if path.startswith(("http://", "https://")):
+                url = path
+                raw_filename = os.path.basename(urlparse(path).path)
+            else:
+                url = image_downloader.get_download_url(path, subfolder) or f"https://image.tmdb.org/t/p/original{path}"
+                raw_filename = os.path.basename(path)
+
+            if not raw_filename:
+                return None
+
+            clean_filename = f"{prefix}_{raw_filename}"
+            existing = image_path_resolver.find_existing_file_by_stem(
+                image_processing_service.image_root, "original", subfolder, clean_filename
+            ) or image_path_resolver.find_existing_file_by_stem(
+                image_processing_service.image_root, "thumbnails", subfolder, clean_filename
+            )
+            if not existing:
+                image_downloader.enqueue_download(url, subfolder, clean_filename)
+            return f"{subfolder}/{clean_filename}"
+
+        # 1. Poster
+        poster_path = effective_poster or tmdb_data.get("poster_path")
+        if poster_path:
+            queue_img(poster_path, "posters", f"tmdb_{tmdb_id}")
+
+        # 2. Backdrop
+        b_path = effective_backdrop or tmdb_data.get("backdrop_path")
+        if b_path:
+            queue_img(b_path, "backdrops", f"tmdb_{tmdb_id}")
+
+        # 3. Logo
+        l_path = effective_logo or tmdb_data.get("logo_path")
+        if l_path:
+            queue_img(l_path, "logos", f"tmdb_{tmdb_id}")
+
+        # 4. Cast & Crew Profiles
+        credits = tmdb_data.get("credits", {})
+        all_people = (credits.get("cast") or []) + (credits.get("crew") or [])
+        for person in all_people:
+            p_profile = person.get("profile_path")
+            p_id = person.get("id")
+            if p_profile and p_id:
+                queue_img(p_profile, "people", f"tmdb_{p_id}")

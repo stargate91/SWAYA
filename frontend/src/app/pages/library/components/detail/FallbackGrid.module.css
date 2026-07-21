@@ -13,6 +13,8 @@
   --ui-poster-card-height: 23.4375rem;
   width: var(--ui-poster-card-width);
   height: var(--ui-poster-card-height);
+  max-width: var(--ui-poster-card-width);
+  max-height: var(--ui-poster-card-height);
   flex-shrink: 0;
   border-radius: var(--radius-lg);
   overflow: hidden;

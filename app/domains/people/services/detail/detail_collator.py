@@ -188,6 +188,60 @@ class PersonDetailCollator:
                 person.local_backdrop_path, "backdrops", size="original"
             ) is not None
 
+        # Enqueue profile image download if remote and not yet cached locally
+        effective_profile = person.profile_path
+        local_profile_exists = False
+        if person.local_profile_path:
+            from app.domains.media_assets.services.images import image_processing_service
+            local_profile_exists = image_processing_service.resolve_image_url(
+                person.local_profile_path, "people", size="w500"
+            ) is not None
+
+        if effective_profile and self.image_downloader and not local_profile_exists:
+            is_remote_profile = False
+            profile_url = None
+            if effective_profile.startswith(("http://", "https://")):
+                is_remote_profile = True
+                profile_url = effective_profile
+            elif effective_profile.startswith("/"):
+                is_remote_profile = True
+                profile_url = self.image_downloader.get_download_url(effective_profile, "people") or f"https://image.tmdb.org/t/p/h632{effective_profile}"
+
+            if is_remote_profile and profile_url:
+                import os
+                ext = os.path.splitext(profile_url)[1].lower() or ".jpg"
+                if ext == ".jpeg":
+                    ext = ".jpg"
+
+                tmdb_id = (person.external_ids or {}).get("tmdb")
+                if tmdb_id:
+                    clean_path = effective_profile.lstrip("/")
+                    profile_filename = f"tmdb_{tmdb_id}_{clean_path}"
+                else:
+                    ext_id = person.id
+                    prov_val = "person"
+                    if person.external_ids:
+                        for k, v in person.external_ids.items():
+                            if k != "urls" and v:
+                                prov_val = k
+                                ext_id = v
+                                break
+                    stem_filename = f"{prov_val}_{ext_id}"
+                    from app.domains.media_assets.services.images import image_processing_service, image_path_resolver
+                    existing_file = image_path_resolver.find_existing_file_by_stem(image_processing_service.image_root, "original", "people", stem_filename) or image_path_resolver.find_existing_file_by_stem(image_processing_service.image_root, "thumbnails", "people", stem_filename)
+                    if existing_file:
+                        profile_filename = existing_file.name
+                    else:
+                        profile_filename = f"{stem_filename}{ext}"
+
+                person.local_profile_path = f"people/{profile_filename}"
+                try:
+                    self.db.commit()
+                    if not existing_file:
+                        self.image_downloader.enqueue_download(profile_url, "people", profile_filename)
+                except Exception as e:
+                    logger.error(f"Failed to save and enqueue person profile image: {e}")
+
         if effective_backdrop and self.image_downloader and not local_file_exists:
             is_remote = False
             url = None

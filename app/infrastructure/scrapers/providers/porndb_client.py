@@ -86,11 +86,11 @@ class PornDbClient(BaseScraper):
             logger.error(f"Error fetching PornDB movie {movie_id}: {e}")
             return None
 
-    def search_movies(self, query: str, year: Optional[int] = None, per_page: int = 10) -> Optional[Dict[str, Any]]:
+    def search_movies(self, query: str, year: Optional[int] = None, per_page: int = 10, page: int = 1) -> Optional[Dict[str, Any]]:
         headers = self._get_headers()
         if not headers:
             return None
-        params = {"q": query, "per_page": max(1, min(per_page, 25))}
+        params = {"q": query, "per_page": max(1, min(per_page, 25)), "page": page}
         if year:
             params["year"] = year
         try:

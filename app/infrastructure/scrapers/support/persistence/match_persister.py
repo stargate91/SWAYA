@@ -72,14 +72,11 @@ class MatchPersister:
         backdrop_subfolder = "scene_stills" if match.media_type == MediaType.SCENE else "backdrops"
         match.local_backdrop_path = queue_image(match.backdrop_path, backdrop_subfolder, asset_prefix)
 
-        if match.media_type == MediaType.SCENE:
-            for loc in match.localizations:
-                loc.poster_path = None
-                loc.local_poster_path = None
-        else:
-            loc = next((x for x in match.localizations if x.locale == DEFAULT_FALLBACK_LANGUAGE), None)
-            if loc:
-                loc.local_poster_path = queue_image(loc.poster_path, "posters", asset_prefix)
+        loc = next((x for x in match.localizations if x.locale == DEFAULT_FALLBACK_LANGUAGE), None)
+        if not loc and match.localizations:
+            loc = match.localizations[0]
+        if loc and loc.poster_path:
+            loc.local_poster_path = queue_image(loc.poster_path, "posters", asset_prefix)
 
     def persist_collection(self, coll_info: Dict[str, Any], match: MetadataMatch, language: str):
         coll_id = coll_info["external_id"]

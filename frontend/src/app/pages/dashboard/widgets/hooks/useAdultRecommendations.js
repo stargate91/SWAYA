@@ -10,8 +10,10 @@ import useRecommendationActions from './useRecommendationActions';
 export default function useAdultRecommendations() {
   const { data: settings = {} } = useSettingsQuery();
   const includeAdult = settings?.include_adult;
+  const language = settings?.primary_metadata_language;
+  const adultTagBlacklist = settings?.adult_tag_blacklist;
 
-  const { data: recommendations, isLoading } = useRecommendationsQuery();
+  const { data: recommendations, isLoading } = useRecommendationsQuery(language, includeAdult, adultTagBlacklist);
   const watchlistIdsFromQuery = recommendations?.watchlist_item_ids;
 
   const addToWatchlistMutation = useAddToWatchlistMutation();

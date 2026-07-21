@@ -27,6 +27,32 @@ def exists(path: str | Path) -> bool:
     p = Path(path)
     return p.exists() and p.stat().st_size > MIN_CACHED_IMAGE_BYTES
 
+def find_existing_file_by_stem(image_root: Path, folder_type: str, subfolder: str, filename: str) -> Optional[Path]:
+    """
+    Finds an existing cached file in original/subfolder or thumbnails/subfolder that shares
+    the same filename stem (e.g. porndb_26d101c0-1e23-4e1f-ac12-8c30e0e2f451.*), regardless of extension,
+    or matches files ending with _{stem}.* (e.g. tmdb_123_{stem}.jpg).
+    """
+    from urllib.parse import urlparse
+    clean_fn = os.path.basename(urlparse(filename).path or filename)
+    stem = Path(clean_fn).stem
+    if not stem:
+        return None
+    dir_path = image_root / folder_type / subfolder
+    if not dir_path.exists():
+        return None
+    for ext in ('.jpg', '.jpeg', '.webp', '.png', '.gif'):
+        candidate = dir_path / f"{stem}{ext}"
+        if exists(candidate):
+            return candidate
+    try:
+        for item in dir_path.glob(f"*_{stem}.*"):
+            if exists(item):
+                return item
+    except Exception:
+        pass
+    return None
+
 def get_db_relative_paths(filename: str, subfolder: str) -> tuple[str, str]:
     """
     Returns relative paths for storing in the database.

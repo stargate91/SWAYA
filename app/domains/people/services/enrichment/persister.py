@@ -101,17 +101,25 @@ def apply_enriched_data(enricher, person: Person, data: dict):
         else:
             import os
             ext = os.path.splitext(profile_path)[1] or ".jpg"
+            if ext.lower() == ".jpeg":
+                ext = ".jpg"
             ext_id = "unknown"
             prov_val = "perf"
             if person.external_ids:
                 for k, v in person.external_ids.items():
-                    if k != "urls":
+                    if k != "urls" and v:
                         prov_val = k
                         ext_id = v
                         break
-            filename = f"{prov_val}_{ext_id}{ext}"
+            stem_filename = f"{prov_val}_{ext_id}"
+            from app.domains.media_assets.services.images import image_processing_service, image_path_resolver
+            existing_file = image_path_resolver.find_existing_file_by_stem(image_processing_service.image_root, "original", "people", stem_filename) or image_path_resolver.find_existing_file_by_stem(image_processing_service.image_root, "thumbnails", "people", stem_filename)
+            if existing_file:
+                filename = existing_file.name
+            else:
+                filename = f"{stem_filename}{ext}"
 
-        if enricher.image_downloader:
+        if enricher.image_downloader and not existing_file:
             enricher.image_downloader.enqueue_download(url, "people", filename)
         else:
             logger.warning("No image_downloader available for profile image download")
