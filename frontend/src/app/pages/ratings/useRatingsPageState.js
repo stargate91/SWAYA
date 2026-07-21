@@ -142,7 +142,7 @@ export function useRatingsPageState() {
     }
   };
 
-  const handleSaveComment = async (item, comment) => {
+  const handleSaveComment = useCallback(async (item, comment) => {
     if (effectiveMediaType === 'people') {
       await updatePersonMutation.mutateAsync({
         personId: item.id,
@@ -154,7 +154,7 @@ export function useRatingsPageState() {
         payload: { user_comment: comment },
       });
     }
-  };
+  }, [effectiveMediaType, updatePersonMutation, updateMediaMutation]);
 
   // Filter items by Tab (Unrated vs Rated)
   const tabFilteredItems = useMemo(() => {

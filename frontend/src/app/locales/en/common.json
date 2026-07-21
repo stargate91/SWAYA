@@ -1,6 +1,7 @@
 {
   "common": {
     "back": "Back",
+    "clear": "Clear",
     "forward": "Forward",
     "cancel": "Cancel",
     "error": "Error",
@@ -31,6 +32,13 @@
     "subtitles": "Subtitles",
     "subtitle": "Subtitle",
     "adult": "Adult"
+  },
+  "tabs": {
+    "movies": "Movies",
+    "tvShows": "TV Shows",
+    "scenes": "Scenes",
+    "videos": "Videos",
+    "people": "People"
   },
   "dropzone": {
     "label": "Drop your files or folders here",

@@ -119,9 +119,10 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
-  backdrop-filter: blur(0.75rem);
-  animation: heroFloat var(--hero-float-dur, 5.2s) var(--hero-float-ease, ease-in-out) infinite;
-  animation-delay: var(--hero-float-delay, 0s);
+  animation-name: heroFloat;
+  animation-duration: 5.2s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
 }
 
 .welcome-hero-chip svg {

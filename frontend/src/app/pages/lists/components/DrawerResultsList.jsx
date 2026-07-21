@@ -42,13 +42,13 @@ export default function DrawerResultsList({
       )}
 
       {!searching && results.length === 0 && query && (
-        <Text color="secondary" style={{ textAlign: 'center', display: 'block', padding: 'var(--space-2xl) 0', fontSize: 'var(--font-size-2xs)' }}>
+        <Text color="secondary" className={styles['drawer-empty-text']}>
           {t('common.noResults', { defaultValue: 'No results found.' })}
         </Text>
       )}
 
       {!searching && results.length > 0 && filteredResults.length === 0 && (
-        <Text color="secondary" style={{ textAlign: 'center', display: 'block', padding: 'var(--space-2xl) 0', fontSize: 'var(--font-size-2xs)' }}>
+        <Text color="secondary" className={styles['drawer-empty-text']}>
           {t('lists.no_status_match', { defaultValue: 'No items match the selected status filter.' })}
         </Text>
       )}
@@ -79,9 +79,9 @@ export default function DrawerResultsList({
                 isBlurred={isBlurred}
               />
             </div>
-            <Stack gap="none" flex={1} style={{ minWidth: 0 }}>
+            <Stack gap="none" flex={1} className="u-min-w-0">
               <Text variant="small" weight="semibold" color="primary" truncate>{n.title}</Text>
-              <Text variant="xsmall" color="secondary" style={{ opacity: 0.6 }}>{n.subtitle}</Text>
+              <Text variant="xsmall" color="secondary" className={styles['drawer-item-subtitle']}>{n.subtitle}</Text>
             </Stack>
             <ResultAddButton
               added={added}

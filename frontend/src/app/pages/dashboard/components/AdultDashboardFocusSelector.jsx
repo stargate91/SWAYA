@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Autocomplete from '@/ui/Autocomplete';
-import IconButton from '@/ui/IconButton';
 import Inline from '@/ui/Inline';
 import { X, Search } from '@/ui/icons';
 import api from '@/lib/api';

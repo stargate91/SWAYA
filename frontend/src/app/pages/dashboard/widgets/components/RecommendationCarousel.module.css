@@ -1,0 +1,18 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.empty-state {
+  padding: var(--space-xl);
+  background: var(--color-background-soft);
+  border-radius: var(--radius-md);
+  border: 0.0625rem solid var(--color-border-default);
+  text-align: center;
+}
+
+.spinner {
+  color: var(--color-accent-blue-soft);
+}

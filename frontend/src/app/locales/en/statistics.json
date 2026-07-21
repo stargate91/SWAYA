@@ -5,6 +5,17 @@
     "ratings": "Ratings & Reviews",
     "insights": "Library DNA & Timeline"
   },
+  "ratings": {
+    "distribution": "Rating Distribution",
+    "mediaAverages": "Average Ratings",
+    "mediaItems": "Rated & Unrated Items",
+    "rated": "Rated",
+    "unrated": "Unrated",
+    "average": "Average Rating",
+    "totalRated": "Total Rated",
+    "favoritePerformers": "Top Performers",
+    "favoriteArtists": "Top Artists"
+  },
   "stats": {
     "total_movies": "Total Movies",
     "movies_sub": "In Library",

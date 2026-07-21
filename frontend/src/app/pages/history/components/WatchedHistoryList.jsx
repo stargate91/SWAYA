@@ -11,6 +11,7 @@ import Text from '@/ui/Text';
 import Badge from '@/ui/Badge';
 import Card from '@/ui/Card';
 import LinearProgress from '@/ui/LinearProgress';
+import styles from './WatchedHistoryList.module.css';
 
 const LPAR = '(';
 const RPAR = ')';
@@ -45,15 +46,15 @@ export default function WatchedHistoryList({
 }) {
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+      <div className={styles['skeleton-container']}>
         {Array.from({ length: 4 }).map((_, idx) => (
-          <div key={idx} style={{ display: 'flex', gap: 'var(--space-lg)', padding: 'var(--space-lg)', background: 'var(--color-panel-soft)', borderRadius: 'var(--radius-lg)', border: '0.0625rem solid var(--color-border-default)' }}>
-            <div style={{ width: '6.25rem', height: '3.5rem', borderRadius: 'var(--radius-md)', overflow: 'hidden', flexShrink: 0 }}>
-              <Skeleton style={{ width: '100%', height: '100%' }} variant="rect" />
+          <div key={idx} className={styles['skeleton-card']}>
+            <div className={styles['skeleton-poster-box']}>
+              <Skeleton className={styles['skeleton-full']} variant="rect" />
             </div>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', justifyContent: 'center' }}>
-              <div style={{ width: '15.625rem', height: '1.25rem' }}><Skeleton variant="rect" /></div>
-              <div style={{ width: '9.375rem', height: '0.875rem' }}><Skeleton variant="rect" /></div>
+            <div className={styles['skeleton-text-box']}>
+              <div className={styles['skeleton-title-line']}><Skeleton variant="rect" /></div>
+              <div className={styles['skeleton-sub-line']}><Skeleton variant="rect" /></div>
             </div>
           </div>
         ))}
@@ -77,7 +78,7 @@ export default function WatchedHistoryList({
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)', marginTop: 'var(--space-xl)' }}>
+    <div className={styles['list-container']}>
       {watchedHistory.map((log, index) => {
         const isSingle = log.type === 'movie' || log.type === 'scene';
         const isScene = log.type === 'scene';
@@ -93,22 +94,20 @@ export default function WatchedHistoryList({
             variant="soft"
             padding="none"
             className={`animate-fade-in-up ${log.is_active ? 'u-card-active' : ''}`}
-            style={{
-              '--item-index': index,
-            }}
+            data-item-index={index}
           >
-            <Inline align="center" style={{ padding: 'var(--space-lg)', width: '100%', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-md)' }}>
-              <Inline align="center" style={{ flex: 1, minWidth: 0, gap: 'var(--space-md)' }}>
+            <Inline align="center" className={styles['row-inline']}>
+              <Inline align="center" className={styles['item-inline']}>
                 <div className={`u-poster-wrapper ${isScene ? 'is-scene' : ''}`}>
                   {posterUrl ? (
                     <img 
                       src={posterUrl} 
                       alt="" 
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      className={styles['poster-img']}
                       onError={(e) => console.error("History image failed:", { src: posterUrl, log, e })}
                     />
                   ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-muted)' }}>
+                    <div className={styles['poster-fallback']}>
                       {isScene ? (
                         <ENTITY_ICONS.episode size={18} />
                       ) : isSingle ? (
@@ -120,18 +119,18 @@ export default function WatchedHistoryList({
                   )}
                 </div>
 
-                <Stack gap="sm" flex={1} style={{ minWidth: 0 }}>
-                  <Inline gap="sm" align="baseline" style={{ flexWrap: 'wrap' }}>
+                <Stack gap="sm" flex={1} className={styles['item-inline']}>
+                  <Inline gap="sm" align="baseline">
                     {isSingle ? (
                       <>
-                        <Text variant="body" weight="semibold" truncate style={{ maxWidth: '20rem' }}>
+                        <Text variant="body" weight="semibold" truncate className={styles['text-title-max']}>
                           {log.title}
                         </Text>
                         {log.year && <Text variant="small" color="muted">{LPAR}{log.year}{RPAR}</Text>}
                       </>
                     ) : (
                       <>
-                        <Text variant="body" weight="semibold" truncate style={{ maxWidth: '20rem' }}>
+                        <Text variant="body" weight="semibold" truncate className={styles['text-title-max']}>
                           {log.tv_title}{DASH}{S_CHAR}{String(log.season_number).padStart(2, '0')}{E_CHAR}{String(log.episode_number).padStart(2, '0')}{DASH}{log.episode_title || log.title}
                         </Text>
                         {log.year && <Text variant="small" color="muted">{LPAR}{log.year}{RPAR}</Text>}
@@ -141,7 +140,7 @@ export default function WatchedHistoryList({
 
                   <Inline gap="lg" align="center">
                     <Inline gap="xs" align="center">
-                      <Clock size={12} style={{ color: 'var(--color-text-muted)' }} />
+                      <Clock size={12} className={styles['icon-muted']} />
                       <Text variant="small" color="muted">
                         {new Date(log.watched_at).toLocaleString()}
                       </Text>
@@ -149,14 +148,14 @@ export default function WatchedHistoryList({
 
                     {log.is_watched ? (
                       <Badge family="status" tone="success" size="sm">
-                        <CheckCircle2 size={12} style={{ marginRight: 'var(--space-2xs)' }} />
+                        <CheckCircle2 size={12} className={styles['badge-icon-margin']} />
                         {t('historyPage.watchedStatus') || 'Watched'}
                       </Badge>
                     ) : log.is_active ? (
                       <Inline gap="xs" align="center">
                         {log.is_active && <span className="u-pulse-dot" />}
                         <Text variant="small" color="accent" weight="bold">{percent}{PERCENT}</Text>
-                        <Text variant="small" color="accent" style={{ opacity: 0.8 }}>
+                        <Text variant="small" color="accent" className={styles['text-opacity-80']}>
                           {LPAR}{formatTime(log.resume_position)}{SLASH}{formatTime(log.duration)}{RPAR}
                         </Text>
                       </Inline>
@@ -182,7 +181,7 @@ export default function WatchedHistoryList({
                 </Stack>
               </Inline>
 
-              <div style={{ display: 'flex', alignItems: 'center', position: 'relative', zIndex: 'var(--z-index-step-2)' }}>
+              <div className={styles['action-wrapper']}>
                 <Button
                   variant="secondary"
                   size="sm"

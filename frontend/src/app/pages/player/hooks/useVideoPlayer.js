@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSettingsQuery, useUpdateMediaStatusMutation } from '../../../queries';
 import { resolveMediaImageUrl } from '../../../lib/imageUrls';
@@ -39,7 +39,6 @@ export default function useVideoPlayer({ itemId, containerRef }) {
 
   const countdownIntervalRef = useRef(null);
   const hasTriggeredEndRef = useRef(false);
-  const controlsTimeoutRef = useRef(null);
   const osdTimeoutRef = useRef(null);
 
   // Sync theme
@@ -126,27 +125,26 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     handleCloseRef.current = handleClose;
   }, [handleClose]);
 
-  const handlePlayNext = useCallback(async () => {
-    if (!state.nextEpisode) return;
-    if (countdownIntervalRef.current) {
-      clearInterval(countdownIntervalRef.current);
-    }
-    state.setShowEndOverlay(false);
+  const { nextEpisode, setShowEndOverlay, isMuted, setIsMuted, currentTime, duration, setClockTime, setEndTime, setJustAddedPeak, setOsdMessage } = state;
 
-    const savedVolume = parseInt(localStorage.getItem('player_volume'), 10);
-    const savedMute = localStorage.getItem('player_mute') === 'true';
+  const handlePlayNext = useCallback(() => {
+    setShowEndOverlay(false);
+    if (!nextEpisode?.id) return;
 
     try {
+      const savedVolume = parseInt(localStorage.getItem('player_volume'), 10);
+      const savedMute = localStorage.getItem('player_mute') === 'true';
+
       const { ipcRenderer } = window.require('electron');
       ipcRenderer.invoke('mpv-open-fullscreen', {
-        itemId: state.nextEpisode.id,
+        itemId: nextEpisode.id,
         volume: isNaN(savedVolume) ? undefined : savedVolume,
         mute: savedMute,
       }).catch(() => {});
     } catch {
-      navigate(`/player/${state.nextEpisode.id}`);
+      navigate(`/player/${nextEpisode.id}`);
     }
-  }, [state.nextEpisode, navigate, state.setShowEndOverlay]);
+  }, [nextEpisode, navigate, setShowEndOverlay]);
 
   const handlePlayNextRef = useRef(handlePlayNext);
   useEffect(() => {
@@ -180,11 +178,11 @@ export default function useVideoPlayer({ itemId, containerRef }) {
   };
 
   const toggleMute = useCallback(() => {
-    const nextMuted = !state.isMuted;
-    state.setIsMuted(nextMuted);
+    const nextMuted = !isMuted;
+    setIsMuted(nextMuted);
     localStorage.setItem('player_mute', String(nextMuted));
     sendCommand(['set_property', 'mute', nextMuted]);
-  }, [state.isMuted, state.setIsMuted, sendCommand]);
+  }, [isMuted, setIsMuted, sendCommand]);
 
   const handleSpeedUp = () => {
     const nextSpeed = Math.min(16.0, state.speed * 2);
@@ -200,8 +198,8 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     if (e && e.currentTarget) {
       e.currentTarget.blur();
     }
-    state.setJustAddedPeak(true);
-    setTimeout(() => state.setJustAddedPeak(false), 1500);
+    setJustAddedPeak(true);
+    setTimeout(() => setJustAddedPeak(false), 1500);
 
     let snapshotPath = null;
     try {
@@ -221,14 +219,14 @@ export default function useVideoPlayer({ itemId, containerRef }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          video_position: Math.round(state.currentTime),
+          video_position: Math.round(currentTime),
           snapshot_path: snapshotPath
         })
       });
     } catch (e) {
       console.error('Failed to add peak:', e);
     }
-  }, [itemId, state.currentTime, state.setJustAddedPeak]);
+  }, [itemId, currentTime, setJustAddedPeak]);
 
   const handleAddPeakRef = useRef(handleAddPeak);
   useEffect(() => {
@@ -237,14 +235,14 @@ export default function useVideoPlayer({ itemId, containerRef }) {
 
   // Helper to trigger OSD message
   const triggerOsd = useCallback((text) => {
-    state.setOsdMessage(text);
+    setOsdMessage(text);
     if (osdTimeoutRef.current) {
       clearTimeout(osdTimeoutRef.current);
     }
     osdTimeoutRef.current = setTimeout(() => {
-      state.setOsdMessage('');
+      setOsdMessage('');
     }, 2000);
-  }, [state]);
+  }, [setOsdMessage]);
 
   // Key & Mouse Controls Hook
   const { handleMouseMove, handleWheel, handleDoubleClick } = usePlayerKeyboardControls({
@@ -262,7 +260,9 @@ export default function useVideoPlayer({ itemId, containerRef }) {
       try {
         const { ipcRenderer } = window.require('electron');
         ipcRenderer.send('mpv-toggle-pip');
-      } catch {}
+      } catch (err) {
+        console.warn('Failed to toggle PiP:', err);
+      }
     },
     triggerOsd,
     handleAddPeakRef,
@@ -289,12 +289,8 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     setTrackList: state.setTrackList,
     setSubDelay: state.setSubDelay,
     setAudioDelay: state.setAudioDelay,
-    setSpeed: state.setSpeed,
-    setVideoParams: state.setVideoParams,
-    setIsPip: state.setIsPip,
-    handleCloseRef,
-    updateBottomOffset,
-    sendCommand,
+    countdownIntervalRef,
+    updateStatusMutation,
   });
 
   // Periodic progress saving
@@ -309,20 +305,44 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     const updateClock = () => {
       const now = new Date();
       const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
-      state.setClockTime(now.toLocaleTimeString('en-US', timeOptions));
+      setClockTime(now.toLocaleTimeString('en-US', timeOptions));
 
-      if (state.duration > 0) {
-        const remainingSeconds = state.duration - state.currentTime;
+      if (duration > 0) {
+        const remainingSeconds = duration - currentTime;
         const end = new Date(now.getTime() + remainingSeconds * 1000);
-        state.setEndTime(end.toLocaleTimeString('en-US', timeOptions));
+        setEndTime(end.toLocaleTimeString('en-US', timeOptions));
       }
     };
     updateClock();
     const clockInterval = setInterval(updateClock, 1000);
     return () => clearInterval(clockInterval);
-  }, [state.currentTime, state.duration, state.setClockTime, state.setEndTime]);
+  }, [currentTime, duration, setClockTime, setEndTime]);
 
   // Page Load / Controls Only
+  const {
+    setIsPlaying,
+    setTitle,
+    setIsAdult,
+    setMediaType,
+    setUserRating,
+    setNextEpisode,
+    setFirstEpisode,
+    setPeaksCount,
+    setCollectionNext,
+    setPerformerUnwatched,
+    setStudioUnwatched,
+    setSurpriseMe,
+    setTvShowId,
+    setTvShowTitle,
+    setTvShowRating,
+    setSeasonNumber,
+    setEpisodeNumber,
+    setTvShowPoster,
+    setSeasonPoster,
+    setLogoUrl,
+    setMediaImage
+  } = state;
+
   useEffect(() => {
     if (!itemId) return;
 
@@ -330,8 +350,8 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     let ipcRenderer = null;
     try {
       ipcRenderer = window.require('electron').ipcRenderer;
-    } catch {
-      console.warn('Electron IPC not available');
+    } catch (err) {
+      console.warn('Electron IPC not available:', err);
     }
 
     const fetchInfoAndStart = async () => {
@@ -344,33 +364,33 @@ export default function useVideoPlayer({ itemId, containerRef }) {
         const data = await res.json();
 
         if (!isMounted) return;
-        state.setTitle(data.title);
-        state.setIsAdult(data.is_adult);
-        state.setMediaType(data.media_type);
-        state.setUserRating(data.user_rating);
-        state.setNextEpisode(data.next_episode);
-        state.setFirstEpisode(data.first_episode);
-        state.setPeaksCount(data.peaks_count || 0);
-        state.setCollectionNext(data.collection_next);
-        state.setPerformerUnwatched(data.performer_unwatched);
-        state.setStudioUnwatched(data.studio_unwatched);
-        state.setSurpriseMe(data.surprise_me);
-        state.setTvShowId(data.tv_show_id);
-        state.setTvShowTitle(data.tv_show_title);
-        state.setTvShowRating(data.tv_show_rating);
-        state.setSeasonNumber(data.season_number);
-        state.setEpisodeNumber(data.episode_number);
+        setTitle(data.title);
+        setIsAdult(data.is_adult);
+        setMediaType(data.media_type);
+        setUserRating(data.user_rating);
+        setNextEpisode(data.next_episode);
+        setFirstEpisode(data.first_episode);
+        setPeaksCount(data.peaks_count || 0);
+        setCollectionNext(data.collection_next);
+        setPerformerUnwatched(data.performer_unwatched);
+        setStudioUnwatched(data.studio_unwatched);
+        setSurpriseMe(data.surprise_me);
+        setTvShowId(data.tv_show_id);
+        setTvShowTitle(data.tv_show_title);
+        setTvShowRating(data.tv_show_rating);
+        setSeasonNumber(data.season_number);
+        setEpisodeNumber(data.episode_number);
         if (data.tv_show_poster) {
           const resolvedTvPoster = resolveMediaImageUrl(data.tv_show_poster, 'poster', `http://localhost:${backendPort}`);
-          state.setTvShowPoster(resolvedTvPoster);
+          setTvShowPoster(resolvedTvPoster);
         }
         if (data.season_poster) {
           const resolvedSeasonPoster = resolveMediaImageUrl(data.season_poster, 'poster', `http://localhost:${backendPort}`);
-          state.setSeasonPoster(resolvedSeasonPoster);
+          setSeasonPoster(resolvedSeasonPoster);
         }
         if (data.logo_path) {
           const resolved = resolveMediaImageUrl(data.logo_path, 'logo', `http://localhost:${backendPort}`);
-          state.setLogoUrl(resolved);
+          setLogoUrl(resolved);
         }
         if (data.media_image) {
           const resolvedImage = resolveMediaImageUrl(
@@ -378,11 +398,11 @@ export default function useVideoPlayer({ itemId, containerRef }) {
             data.media_type === 'episode' ? 'still' : (data.media_type === 'scene' || data.is_adult ? 'scene_stills' : 'poster'),
             `http://localhost:${backendPort}`
           );
-          state.setMediaImage(resolvedImage);
+          setMediaImage(resolvedImage);
         }
 
         if (controlsOnly) {
-          state.setIsPlaying(true);
+          setIsPlaying(true);
           return;
         }
 
@@ -404,11 +424,11 @@ export default function useVideoPlayer({ itemId, containerRef }) {
             ipcRenderer.send('mpv-command', ['seek', startSec, 'absolute']);
           }
 
-          state.setIsPlaying(true);
+          setIsPlaying(true);
         }
       } catch (err) {
         console.error(err);
-        state.setTitle('Error playing file');
+        setTitle('Error playing file');
       }
     };
 
@@ -430,7 +450,7 @@ export default function useVideoPlayer({ itemId, containerRef }) {
         document.documentElement.style.background = '';
       }
     };
-  }, [itemId, isTrailer, containerRef, state.setIsPlaying, state.setTitle, state.setIsAdult, state.setMediaType, state.setUserRating, state.setNextEpisode, state.setFirstEpisode, state.setPeaksCount, state.setCollectionNext, state.setPerformerUnwatched, state.setStudioUnwatched, state.setSurpriseMe, state.setTvShowId, state.setTvShowTitle, state.setTvShowRating, state.setSeasonNumber, state.setEpisodeNumber, state.setTvShowPoster, state.setSeasonPoster, state.setLogoUrl, state.setMediaImage]);
+  }, [itemId, isTrailer, containerRef, setIsPlaying, setTitle, setIsAdult, setMediaType, setUserRating, setNextEpisode, setFirstEpisode, setPeaksCount, setCollectionNext, setPerformerUnwatched, setStudioUnwatched, setSurpriseMe, setTvShowId, setTvShowTitle, setTvShowRating, setSeasonNumber, setEpisodeNumber, setTvShowPoster, setSeasonPoster, setLogoUrl, setMediaImage]);
 
   const handleRate = async (rating) => {
     if (state.tvShowId) {
@@ -490,14 +510,18 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     try {
       const { ipcRenderer } = window.require('electron');
       ipcRenderer.send('mpv-toggle-pip');
-    } catch {}
+    } catch (err) {
+      console.warn('Failed to toggle PiP:', err);
+    }
   }, []);
 
   function handleMinimizePip() {
     try {
       const { ipcRenderer } = window.require('electron');
       ipcRenderer.send('mpv-minimize');
-    } catch {}
+    } catch (err) {
+      console.warn('Failed to minimize PiP:', err);
+    }
   }
 
   return {

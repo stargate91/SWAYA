@@ -28,6 +28,21 @@
   color: var(--color-text-primary);
 }
 
+.lists-drawer__item--scene {
+  gap: var(--space-md);
+}
+
+.drawer-empty-text {
+  text-align: center;
+  display: block;
+  padding: var(--space-2xl) 0;
+  font-size: var(--font-size-2xs);
+}
+
+.drawer-item-subtitle {
+  opacity: 0.6;
+}
+
 .lists-drawer__search-area {
   padding: var(--space-lg) var(--space-xl);
   display: flex;

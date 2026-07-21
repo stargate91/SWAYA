@@ -4,6 +4,7 @@ import Stack from '@/ui/Stack';
 import Inline from '@/ui/Inline';
 import Input from '@/ui/Input';
 import Button from '@/ui/Button';
+import { X } from '@/ui/icons';
 import { useSettingsField } from '../SettingsFormContext.jsx';
 import styles from './TagSafetyFilters.module.css';
 
@@ -66,7 +67,7 @@ export default function TagSafetyFilters({ t }) {
                   onClick={() => handleRemoveBlacklist(tag)}
                   title={t('common.remove') || 'Remove'}
                 >
-                  &times;
+                  <X size={12} />
                 </button>
               </span>
             ))}
@@ -119,7 +120,7 @@ export default function TagSafetyFilters({ t }) {
                     onClick={() => isAdded ? handleRemoveBlacklist(tag) : handleAddBlacklist(tag)}
                     disabled={isAdded}
                   >
-                    + {tag}
+                    {['+ ', tag]}
                   </button>
                 );
               })}

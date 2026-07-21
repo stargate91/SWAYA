@@ -315,7 +315,6 @@
 .button[aria-pressed="true"] :global(.state-active) {
   display: inline-flex;
   align-items: center;
-  gap: inherit;
 }
 
 .button[aria-pressed="true"] :global(.state-hover) {
@@ -329,7 +328,6 @@
 .button[aria-pressed="true"]:hover:not(:disabled) :global(.state-hover) {
   display: inline-flex;
   align-items: center;
-  gap: inherit;
 }
 
 /* Generalized destructive hover styling */

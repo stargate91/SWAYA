@@ -14,6 +14,7 @@ import { useTranslation } from '../../../../providers/LanguageContext';
 import Stack from '../../../../ui/Stack';
 import ScrollRow from '../../../../ui/ScrollRow';
 import Text from '../../../../ui/Text';
+import styles from './RecommendationCarousel.module.css';
 
 export const RecommendationCarousel = ({
   title,
@@ -45,13 +46,13 @@ export const RecommendationCarousel = ({
 
   return (
     <Stack gap="xl">
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+      <div className={styles.header}>
         <Text as="h3" variant="display" weight="extrabold">{title}</Text>
         {headerActions}
       </div>
 
       {!items || items.length === 0 ? (
-        <div style={{ padding: 'var(--space-xl)', background: 'var(--color-background-soft)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border-default)', textAlign: 'center' }}>
+        <div className={styles['empty-state']}>
           <Text color="muted" italic size="sm">
             {T('dashboard.recommendations.discovery_no_results') || 'No discoveries found matching the selected focus.'}
           </Text>
@@ -164,7 +165,7 @@ export const RecommendationCarousel = ({
           })}
           {isLoadingMore && (
             <div className="u-loading-card">
-              <Spinner style={{ color: 'var(--color-accent-blue-soft)' }} />
+              <Spinner className={styles.spinner} />
             </div>
           )}
         </ScrollRow>

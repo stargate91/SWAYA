@@ -363,11 +363,11 @@
 }
 
 .icon-button[aria-pressed="true"]:hover:not(:disabled) .state-active {
-  display: none !important;
+  display: none;
 }
 
 .icon-button[aria-pressed="true"]:hover:not(:disabled) .state-hover {
-  display: inline-flex !important;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 }

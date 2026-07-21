@@ -15,7 +15,6 @@ import FansDbDiscoveryWidget from './widgets/FansDbDiscoveryWidget';
 import DashboardCustomizerDrawer from './widgets/DashboardCustomizerDrawer';
 import PageHeader from '@/ui/PageHeader';
 import Stack from '@/ui/Stack';
-import Inline from '@/ui/Inline';
 import WidgetErrorBoundary from '../../../components/WidgetErrorBoundary';
 import useDashboardView from './hooks/useDashboardView';
 
@@ -34,32 +33,32 @@ const WIDGET_REGISTRY = {
     component: RecentlyAddedWidget,
     titleKey: 'dashboard.widget_recently_added_movies',
     fallbackTitle: 'Freshly Added Movies',
-    getProps: (settings, lang) => ({ mediaType: 'movie' }),
+    getProps: () => ({ mediaType: 'movie' }),
   },
   recently_added_tv: {
     component: RecentlyAddedWidget,
     titleKey: 'dashboard.widget_recently_added_tv',
     fallbackTitle: 'Freshly Added TV Shows',
-    getProps: (settings, lang) => ({ mediaType: 'tv' }),
+    getProps: () => ({ mediaType: 'tv' }),
   },
   recently_added_scenes: {
     component: RecentlyAddedWidget,
     titleKey: 'dashboard.widget_recently_added_scenes',
     fallbackTitle: 'Freshly Added Scenes',
-    getProps: (settings, lang) => ({ mediaType: 'scene' }),
+    getProps: () => ({ mediaType: 'scene' }),
     show: (settings, isNsfw) => isNsfw,
   },
   recently_added_videos: {
     component: RecentlyAddedWidget,
     titleKey: 'dashboard.widget_recently_added_videos',
     fallbackTitle: 'Freshly Added Videos',
-    getProps: (settings, lang) => ({ mediaType: 'video' }),
+    getProps: () => ({ mediaType: 'video' }),
   },
   recently_activated_people: {
     component: RecentlyActivePeopleWidget,
     titleKey: (isNsfw) => isNsfw ? 'dashboard.widget_recently_activated_people_adult' : 'dashboard.widget_recently_activated_people',
     fallbackTitle: (isNsfw) => isNsfw ? 'Lately Tracked Adult Stars' : 'Lately Tracked Artists',
-    getProps: (settings, lang) => ({ language: lang }),
+    getProps: (_settings, lang) => ({ language: lang }),
   },
   movies_discovery: {
     component: MoviesDiscoveryWidget,

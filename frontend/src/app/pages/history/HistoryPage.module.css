@@ -23,3 +23,23 @@
   justify-content: center;
   align-items: center;
 }
+
+.confirm-modal-body {
+  padding: var(--space-sm) 0;
+}
+
+.confirm-warning {
+  display: block;
+  margin-bottom: var(--space-lg);
+}
+
+.confirm-box {
+  background: var(--ui-surface-soft);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+}
+
+.text-success {
+  color: var(--color-state-success);
+}
+

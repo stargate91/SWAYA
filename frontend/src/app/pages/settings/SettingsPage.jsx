@@ -9,8 +9,6 @@ import {
 } from './components';
 import Overlay from '@/ui/Overlay';
 import Stack from '@/ui/Stack';
-import { SETTINGS_TAB_IDS } from './settingsConstants.js';
-
 export default function SettingsPage() {
   const {
     t,
@@ -19,12 +17,6 @@ export default function SettingsPage() {
     setForm,
     activeTab,
     setActiveTab,
-    isOrgExpanded,
-    setIsOrgExpanded,
-    isAdultExpanded,
-    setIsAdultExpanded,
-    isOrganizationTabActive,
-    isAdultTabActive,
     isSaving,
     isWiping,
     isScanActive,

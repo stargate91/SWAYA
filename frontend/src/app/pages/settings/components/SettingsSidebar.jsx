@@ -1,12 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Sidebar from '@/ui/Sidebar';
 import { SETTINGS_TAB_IDS } from '../settingsConstants.js';
 import {
   Settings2,
   Palette,
   FolderTree,
-  Film,
-  Tv,
   Layers,
   Flame,
   KeyRound,
@@ -23,33 +21,18 @@ export default function SettingsSidebar({
   onTabSelect,
   includeAdult = false,
 }) {
-  const [isTemplatesExpanded, setIsTemplatesExpanded] = useState(() => {
-    return activeTab === SETTINGS_TAB_IDS.MOVIES || activeTab === SETTINGS_TAB_IDS.TV_SHOWS;
-  });
+  const [manualTemplatesExpanded, setManualTemplatesExpanded] = useState(null);
+  const [manualAdultTemplatesExpanded, setManualAdultTemplatesExpanded] = useState(null);
 
-  const [isAdultTemplatesExpanded, setIsAdultTemplatesExpanded] = useState(() => {
-    return activeTab === SETTINGS_TAB_IDS.ADULT_MOVIES ||
-           activeTab === SETTINGS_TAB_IDS.ADULT_TV_SHOWS ||
-           activeTab === SETTINGS_TAB_IDS.SCENES;
-  });
+  const isTemplatesExpanded = manualTemplatesExpanded !== null
+    ? manualTemplatesExpanded
+    : (activeTab === SETTINGS_TAB_IDS.MOVIES || activeTab === SETTINGS_TAB_IDS.TV_SHOWS);
 
-  useEffect(() => {
-    if (activeTab === SETTINGS_TAB_IDS.MOVIES || activeTab === SETTINGS_TAB_IDS.TV_SHOWS) {
-      setIsTemplatesExpanded(true);
-    } else {
-      setIsTemplatesExpanded(false);
-    }
-  }, [activeTab]);
-
-  useEffect(() => {
-    if (activeTab === SETTINGS_TAB_IDS.ADULT_MOVIES ||
-        activeTab === SETTINGS_TAB_IDS.ADULT_TV_SHOWS ||
-        activeTab === SETTINGS_TAB_IDS.SCENES) {
-      setIsAdultTemplatesExpanded(true);
-    } else {
-      setIsAdultTemplatesExpanded(false);
-    }
-  }, [activeTab]);
+  const isAdultTemplatesExpanded = manualAdultTemplatesExpanded !== null
+    ? manualAdultTemplatesExpanded
+    : (activeTab === SETTINGS_TAB_IDS.ADULT_MOVIES ||
+       activeTab === SETTINGS_TAB_IDS.ADULT_TV_SHOWS ||
+       activeTab === SETTINGS_TAB_IDS.SCENES);
 
   const sidebarGroups = [];
 
@@ -141,7 +124,7 @@ export default function SettingsSidebar({
       isExpanded: isTemplatesExpanded,
       onToggle: () => {
         const nextExpanded = !isTemplatesExpanded;
-        setIsTemplatesExpanded(nextExpanded);
+        setManualTemplatesExpanded(nextExpanded);
         if (nextExpanded && activeTab !== SETTINGS_TAB_IDS.MOVIES && activeTab !== SETTINGS_TAB_IDS.TV_SHOWS) {
           onTabSelect(SETTINGS_TAB_IDS.MOVIES);
         }
@@ -181,7 +164,7 @@ export default function SettingsSidebar({
       isExpanded: isAdultTemplatesExpanded,
       onToggle: () => {
         const nextExpanded = !isAdultTemplatesExpanded;
-        setIsAdultTemplatesExpanded(nextExpanded);
+        setManualAdultTemplatesExpanded(nextExpanded);
         if (nextExpanded &&
             activeTab !== SETTINGS_TAB_IDS.ADULT_MOVIES &&
             activeTab !== SETTINGS_TAB_IDS.ADULT_TV_SHOWS &&

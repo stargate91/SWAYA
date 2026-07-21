@@ -17,10 +17,6 @@ import {
 } from './components';
 
 const alwaysVisible = () => true;
-const whenCustomOrganization = ({ form }) => form.folder_organization_enabled && form.custom_organization_enabled;
-const whenAdultScenes = ({ form }) => form.folder_organization_enabled && form.custom_organization_enabled && form.include_adult;
-const whenMoveToLibraryAndCustomOrganization = ({ form }) => form.folder_organization_enabled && form.folder_move_to_library && form.custom_organization_enabled;
-const whenCollectionsEnabled = ({ form }) => form.folder_organization_enabled && form.folder_move_to_library;
 
 export const settingsTabGroups = [
   {

@@ -1,5 +1,3 @@
-import { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import Page from '@/ui/Page';
 import Button from '@/ui/Button';
 import PageHeader from '@/ui/PageHeader';
@@ -9,6 +7,7 @@ import { AlertTriangle } from '@/ui/icons';
 import RenameHistoryList from './components/RenameHistoryList';
 import WatchedHistoryList from './components/WatchedHistoryList';
 import PeaksHistoryList from './components/PeaksHistoryList';
+import UtilityBarPortal from '../../../components/UtilityBarPortal';
 import styles from './HistoryPage.module.css';
 import Inline from '@/ui/Inline';
 import Stack from '@/ui/Stack';
@@ -46,30 +45,24 @@ export default function HistoryPage() {
     triggerUndo,
   } = useHistoryPage();
 
-  const [utilityBarTarget, setUtilityBarTarget] = useState(null);
-
-  useEffect(() => {
-    setUtilityBarTarget(document.getElementById('page-bar-top-center'));
-  }, []);
-
   const handleConfirmUndo = (batch) => {
     openModal({
       title: t('historyPage.confirmTitle') || 'Confirm Action Reversion',
       description: t('historyPage.confirmDesc') || 'This will physically move and rename all successfully organized files back to their previous naming scheme and folders.',
       icon: AlertTriangle,
       content: (
-        <Stack gap="md" style={{ padding: 'var(--space-sm) 0' }}>
-          <Text variant="body" color="primary" style={{ display: 'block', marginBottom: 'var(--space-lg)' }}>
+        <Stack gap="md" className={styles['confirm-modal-body']}>
+          <Text variant="body" color="primary" className={styles['confirm-warning']}>
             {t('historyPage.confirmWarning') || 'Are you sure you want to revert this batch?'}
           </Text>
-          <Stack gap="sm" style={{ background: 'var(--ui-surface-soft)', padding: 'var(--space-md)', borderRadius: 'var(--radius-md)' }}>
+          <Stack gap="sm" className={styles['confirm-box']}>
             <Inline align="center" justify="between">
               <Text variant="small" color="secondary">{t('historyPage.batchLabel') || 'Batch:'}</Text>
               <Text variant="small" color="primary" weight="semibold">{batch.name}</Text>
             </Inline>
             <Inline align="center" justify="between">
               <Text variant="small" color="secondary">{t('historyPage.filesLabel') || 'Files:'}</Text>
-              <Text variant="small" weight="bold" style={{ color: 'var(--color-state-success)' }}>
+              <Text variant="small" weight="bold" className={styles['text-success']}>
                 {t('historyPage.succeededCount', { defaultValue: '{{count}} succeeded', count: batch.success_count })}
               </Text>
             </Inline>
@@ -163,16 +156,15 @@ export default function HistoryPage() {
 
   return (
     <Page>
-      {utilityBarTarget && createPortal(
+      <UtilityBarPortal align="center">
         <SegmentedControl
           value={activeTab}
           onChange={setActiveTab}
           options={tabOptions}
           size="sm"
           animated={true}
-        />,
-        utilityBarTarget
-      )}
+        />
+      </UtilityBarPortal>
       <div className={styles['history-page']}>
         <PageHeader
           title={getPageTitle()}

@@ -111,8 +111,8 @@
   color: var(--color-accent);
   background: color-mix(in srgb, var(--color-accent) 12%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
-  border-radius: 4px;
-  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+  padding: 0.0625rem var(--space-xs);
   margin-left: var(--space-sm);
   vertical-align: middle;
 }

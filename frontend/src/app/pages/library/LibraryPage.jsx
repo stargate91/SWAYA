@@ -16,13 +16,13 @@ import Grid from '@/ui/Grid';
 import { useDeleteTagMutation, usePlayMediaMutation, useUpdatePersonStatusMutation } from '@/queries';
 import api from '@/lib/api';
 import React, { useEffect, useMemo, useState, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import { Tabs } from '@/ui/Tabs';
 import { isLibraryTagsTab, isLibraryPeopleTab } from '@/lib/libraryTabs';
 import { useUi } from '@/providers/UiProvider';
 import { useQueryClient } from '@tanstack/react-query';
 import { QK } from '@/lib/queryKeys';
 import ImagePickerDrawer from './components/ImagePickerDrawer';
+import UtilityBarPortal from '../../../components/UtilityBarPortal';
 import SegmentedControl from '@/ui/SegmentedControl';
 import Dropdown from '@/ui/Dropdown';
 import Input from '@/ui/Input';
@@ -156,11 +156,6 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
   };
 
   const isAdultMode = state.activeSessionMode === 'nsfw';
-  const [utilityBarTarget, setUtilityBarTarget] = useState(null);
-
-  useEffect(() => {
-    setUtilityBarTarget(document.getElementById('page-bar-top-center'));
-  }, []);
 
   const showOwnershipSegment = state.resolvedTab === 'movies' || state.resolvedTab === 'tv' || state.resolvedTab === 'scenes';
 
@@ -274,21 +269,22 @@ export default function LibraryPage({ initialTab = 'movies', lockTab = false, sh
 
   return (
     <Page className={`library-page ${isAdultMode ? 'library-page--nsfw' : ''}`}>
-      {utilityBarTarget && showOwnershipSegment && createPortal(
-        <SegmentedControl
-          value={state.ownershipFilter}
-          onChange={(val) => {
-            state.setOwnershipFilter(val);
-            state.setCurrentPage(1);
-          }}
-          options={[
-            { value: 'owned', label: state.t('library.filter.have') || 'Have' },
-            { value: 'unowned', label: state.t('library.filter.missing') || 'Missing' },
-          ]}
-          size="sm"
-          animated={true}
-        />,
-        utilityBarTarget
+      {showOwnershipSegment && (
+        <UtilityBarPortal align="center">
+          <SegmentedControl
+            value={state.ownershipFilter}
+            onChange={(val) => {
+              state.setOwnershipFilter(val);
+              state.setCurrentPage(1);
+            }}
+            options={[
+              { value: 'owned', label: state.t('library.filter.have') || 'Have' },
+              { value: 'unowned', label: state.t('library.filter.missing') || 'Missing' },
+            ]}
+            size="sm"
+            animated={true}
+          />
+        </UtilityBarPortal>
       )}
       <Stack gap="3xl">
         <PanelHeader

@@ -12,13 +12,6 @@ function estimateChipSize(label) {
 }
 
 function chipOverlapsBadge(cx, cy, halfW, halfH, badgeCx, badgeCy, badgeR, gap) {
-  const closestX = clamp(cx, cx - halfW, cx + halfW) < badgeCx
-    ? cx + halfW
-    : cx - halfW;
-  const closestY = clamp(cy, cy - halfH, cy + halfH) < badgeCy
-    ? cy + halfH
-    : cy - halfH;
-
   // Check if the chip's bounding box (with gap) overlaps the badge circle
   const nearX = clamp(badgeCx, cx - halfW - gap, cx + halfW + gap);
   const nearY = clamp(badgeCy, cy - halfH - gap, cy + halfH + gap);

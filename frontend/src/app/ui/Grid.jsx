@@ -11,14 +11,12 @@ import styles from './Grid.module.css';
  * @param {string} [props.className] - Additional class name
  * @param {object} [props.style] - Inline style override
  */
-export default function Grid({ children, variant = 'default', gap, className = '', style, ...props }) {
-  const mergedStyle = gap ? { ...style, gap: `var(--space-${gap})` } : style;
-
+export default function Grid({ children, variant = 'default', gap, className = '', ...props }) {
   return (
     <div
       data-variant={variant}
+      {...(gap ? { 'data-gap': gap } : {})}
       className={`${styles.grid} ui-grid ${className}`.trim()}
-      style={mergedStyle}
       {...props}
     >
       {children}

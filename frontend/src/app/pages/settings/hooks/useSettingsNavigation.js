@@ -5,8 +5,6 @@ import { ORGANIZATION_TAB_IDS, ADULT_TAB_IDS, SETTINGS_TAB_IDS } from '../settin
 export default function useSettingsNavigation(form, isDirty) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(SETTINGS_TAB_IDS.GENERAL);
-  const [isOrgExpanded, setIsOrgExpanded] = useState(true);
-  const [isAdultExpanded, setIsAdultExpanded] = useState(true);
   const [isShaking, setIsShaking] = useState(false);
 
   const isOrganizationTabActive = useMemo(
@@ -28,17 +26,11 @@ export default function useSettingsNavigation(form, isDirty) {
     }
   }, [navigate, isDirty]);
 
-  useEffect(() => {
-    if (!isOrganizationTabActive) {
-      setIsOrgExpanded(false);
-    }
-  }, [isOrganizationTabActive]);
+  const [isOrgExpandedManual, setIsOrgExpandedManual] = useState(true);
+  const [isAdultExpandedManual, setIsAdultExpandedManual] = useState(true);
 
-  useEffect(() => {
-    if (!isAdultTabActive) {
-      setIsAdultExpanded(false);
-    }
-  }, [isAdultTabActive]);
+  const isOrgExpanded = isOrganizationTabActive && isOrgExpandedManual;
+  const isAdultExpanded = isAdultTabActive && isAdultExpandedManual;
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -57,9 +49,9 @@ export default function useSettingsNavigation(form, isDirty) {
     activeTab,
     setActiveTab,
     isOrgExpanded,
-    setIsOrgExpanded,
+    setIsOrgExpanded: setIsOrgExpandedManual,
     isAdultExpanded,
-    setIsAdultExpanded,
+    setIsAdultExpanded: setIsAdultExpandedManual,
     isOrganizationTabActive,
     isAdultTabActive,
     organizationTabs: ORGANIZATION_TAB_IDS,

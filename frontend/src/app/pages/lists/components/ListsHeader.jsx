@@ -69,7 +69,7 @@ export default function ListsHeader({
     <div ref={themeRef} className={styles.contents}>
       <div ref={heroRef} className={styles['lists-header-hero']}>
         <Inline justify="between" align="start" fullWidth>
-          <Inline align="end" flex={1} style={{ minWidth: 0 }}>
+          <Inline align="end" flex={1} className="u-min-w-0">
             <div className={styles['lists-header__cover-container']}>
               <div
                 className={styles['lists-header__cover-wrapper']}
@@ -97,18 +97,18 @@ export default function ListsHeader({
             </div>
             <Stack gap="sm">
               <Inline gap="md" align="center">
-                <Text as="h1" variant="hero" weight="extrabold" truncate style={{ fontSize: '3.5rem', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+                <Text as="h1" variant="hero" weight="extrabold" truncate className={styles['lists-header__title']}>
                   {activeList.name}
                 </Text>
               </Inline>
               {activeList.description && (
-                <Text as="p" variant="small" color="secondary" style={{ opacity: 0.8, maxWidth: '37.5rem', lineHeight: 1.5 }}>
+                <Text as="p" variant="small" color="secondary" className={styles['lists-header__desc']}>
                   {activeList.description}
                 </Text>
               )}
               {activeList.created_at && (
-                <Inline align="center" style={{ marginTop: 'var(--space-xs)' }}>
-                  <Text variant="small" weight="semibold" style={{ opacity: 0.85 }}>
+                <Inline align="center" className={styles['lists-header__created-wrap']}>
+                  <Text variant="small" weight="semibold" className={styles['lists-header__created-label']}>
                     {createdLabel}
                   </Text>
                 </Inline>
@@ -141,7 +141,6 @@ export default function ListsHeader({
                   }
                 }
               }}
-              className={styles.contents}
             >
               <Button
                 variant="primary"
@@ -157,7 +156,7 @@ export default function ListsHeader({
       </div>
 
       <div className={`${styles['lists-header-filters']} ${isStuck ? styles['is-stuck'] : ''}`}>
-        <Inline gap="lg" align="center" style={{ flex: 1, minWidth: 0, flexWrap: 'nowrap' }}>
+        <Inline gap="lg" align="center" className="u-min-w-0 u-nowrap-flex" flex={1}>
           <div className={styles['lists-header__search-wrapper']}>
             <Input
               type="text"
@@ -171,7 +170,7 @@ export default function ListsHeader({
           </div>
           {activeList.list_type !== 'person' && (
             <Inline gap="sm" align="center">
-              <Text variant="small" weight="bold" color="muted" uppercase style={{ userSelect: 'none' }}>{t('library.filter.statusLabel') || 'Status:'}</Text>
+              <Text variant="small" weight="bold" color="muted" uppercase className={styles['lists-header__filter-label']}>{t('library.filter.statusLabel') || 'Status:'}</Text>
               <Dropdown
                 value={watchedFilter}
                 onChange={(e) => setWatchedFilter(e.target.value)}
@@ -187,7 +186,7 @@ export default function ListsHeader({
           )}
           {activeList.list_type !== 'person' && (
             <Inline gap="sm" align="center">
-              <Text variant="small" weight="bold" color="muted" uppercase style={{ userSelect: 'none' }}>{t('lists.filter_media_type_label') || 'Type:'}</Text>
+              <Text variant="small" weight="bold" color="muted" uppercase className={styles['lists-header__filter-label']}>{t('lists.filter_media_type_label') || 'Type:'}</Text>
               <Dropdown
                 value={mediaTypeFilter}
                 onChange={(e) => setMediaTypeFilter(e.target.value)}
@@ -205,7 +204,7 @@ export default function ListsHeader({
           )}
           {activeList.list_type !== 'person' && (
             <Inline gap="sm" align="center">
-              <Text variant="small" weight="bold" color="muted" uppercase style={{ userSelect: 'none' }}>{t('library.filter.genreLabel') || 'Genre:'}</Text>
+              <Text variant="small" weight="bold" color="muted" uppercase className={styles['lists-header__filter-label']}>{t('library.filter.genreLabel') || 'Genre:'}</Text>
               <Dropdown
                 value={genreFilter}
                 onChange={(e) => setGenreFilter(e.target.value)}
@@ -220,7 +219,7 @@ export default function ListsHeader({
           )}
           {activeList.list_type === 'person' && (
             <Inline gap="sm" align="center">
-              <Text variant="small" weight="bold" color="muted" uppercase style={{ userSelect: 'none' }}>{t('library.filter.genderLabel') || 'Gender:'}</Text>
+              <Text variant="small" weight="bold" color="muted" uppercase className={styles['lists-header__filter-label']}>{t('library.filter.genderLabel') || 'Gender:'}</Text>
               <Dropdown
                 value={genderFilter}
                 onChange={(e) => setGenderFilter(e.target.value)}
@@ -236,7 +235,7 @@ export default function ListsHeader({
           )}
           {activeList.list_type === 'person' && (
             <Inline gap="sm" align="center">
-              <Text variant="small" weight="bold" color="muted" uppercase style={{ userSelect: 'none' }}>{t('lists.filter_role_label') || 'Role:'}</Text>
+              <Text variant="small" weight="bold" color="muted" uppercase className={styles['lists-header__filter-label']}>{t('lists.filter_role_label') || 'Role:'}</Text>
               <Dropdown
                 value={jobFilter}
                 onChange={(e) => setJobFilter(e.target.value)}
@@ -254,7 +253,7 @@ export default function ListsHeader({
           )}
         </Inline>
         <Inline gap="md" align="center">
-          <Text variant="small" weight="bold" color="muted" uppercase style={{ userSelect: 'none' }}>{t('lists.sort_label') || 'Sort:'}</Text>
+          <Text variant="small" weight="bold" color="muted" uppercase className={styles['lists-header__filter-label']}>{t('lists.sort_label') || 'Sort:'}</Text>
           <Dropdown
             value={sortKey}
             options={sortOptions}

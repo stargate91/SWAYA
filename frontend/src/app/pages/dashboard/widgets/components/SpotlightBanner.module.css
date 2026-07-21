@@ -66,3 +66,55 @@
 .recommend-spotlight-year {
   text-shadow: 0 0.125rem 0.25rem color-mix(in srgb, var(--color-bg-canvas) 80%, transparent);
 }
+
+.recommend-spotlight-desc {
+  margin-bottom: var(--space-2xl);
+}
+
+.spotlight-wrapper {
+  position: relative;
+}
+
+.provider-controls {
+  position: absolute;
+  bottom: var(--space-4xl);
+  right: var(--space-4xl);
+  z-index: var(--z-index-sticky);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  background: color-mix(in srgb, var(--color-bg-canvas) 80%, transparent);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(0.625rem);
+  border: 0.0625rem solid color-mix(in srgb, var(--color-border) 20%, transparent);
+}
+
+.provider-label {
+  min-width: 5.3125rem;
+  padding: 0 var(--space-xs);
+  text-transform: uppercase;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  text-align: center;
+  user-select: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.provider-btn-group {
+  display: flex;
+  gap: 0.125rem;
+}
+
+.provider-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 0.125rem;
+  display: flex;
+  align-items: center;
+}

@@ -45,7 +45,7 @@ export const SpotlightBanner = ({ item, watchlistIds, onWatchlist, onCardClick, 
           ) : null}
           {year ? <Text color="primary" className={styles['recommend-spotlight-year']}>{year}</Text> : null}
         </Inline>
-        <Text as="p" clamp={3} variant="small" color="secondary" style={{ marginBottom: 'var(--space-2xl)' }}>
+        <Text as="p" clamp={3} variant="small" color="secondary" className={styles['recommend-spotlight-desc']}>
           {item.overview}
         </Text>
         <div className={styles['recommend-spotlight-actions']}>

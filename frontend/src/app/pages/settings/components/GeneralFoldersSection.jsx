@@ -2,9 +2,8 @@ import { AlertTriangle } from '@/ui/icons';
 import Card from '@/ui/Card';
 import Stack from '@/ui/Stack';
 import Alert from '@/ui/Alert';
-import { useSettingsField, useSettingsFormContext, useSettingsInputRef } from '../SettingsFormContext.jsx';
+import { useSettingsFormContext, useSettingsInputRef } from '../SettingsFormContext.jsx';
 import SettingsPathField from './fields/SettingsPathField.jsx';
-import styles from '../SettingsPage.module.css';
 
 export default function GeneralFoldersSection({ t }) {
   const { form, validationErrors } = useSettingsFormContext();

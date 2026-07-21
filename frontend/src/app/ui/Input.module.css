@@ -172,3 +172,8 @@
   min-height: 4rem;
   line-height: var(--line-height-base);
 }
+
+.textarea[data-resize="none"] { resize: none; }
+.textarea[data-resize="vertical"] { resize: vertical; }
+.textarea[data-resize="horizontal"] { resize: horizontal; }
+.textarea[data-resize="both"] { resize: both; }

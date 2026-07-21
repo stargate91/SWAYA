@@ -260,6 +260,7 @@
       "previewHint": "See how your folders and file names will look with the current setup.",
       "previewTargetFolderPlaceholder": "[Target Library Folder]",
       "previewScanFolderPlaceholder": "[Scan Source Folder]",
+      "previewRegisteredBadge": "In Library",
       "activePreset": "Active",
       "previewBadge": "Preview"
     },

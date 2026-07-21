@@ -67,7 +67,7 @@ export default function Input({
             id={inputId}
             ref={inputRef}
             className={inputClass}
-            style={{ resize: resizable }}
+            data-resize={resizable}
             aria-invalid={error ? 'true' : undefined}
             aria-describedby={[
               hint ? hintId : null,

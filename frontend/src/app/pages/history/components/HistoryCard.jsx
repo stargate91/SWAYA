@@ -9,6 +9,7 @@ import Stack from '@/ui/Stack';
 import Text from '@/ui/Text';
 import Badge from '@/ui/Badge';
 import Card from '@/ui/Card';
+import styles from './HistoryCard.module.css';
 
 const getCardIconAndClass = (status) => {
   switch (status) {
@@ -55,12 +56,10 @@ export default function HistoryCard({
       variant="soft"
       padding="none"
       className="animate-fade-in-up u-card-badge-override"
-      style={{
-        '--item-index': index,
-        '--accent-color': accentColor,
-      }}
+      data-item-index={index}
+      data-accent-color={accentColor}
     >
-      <Inline align="center" style={{ padding: 'var(--space-xl)', width: '100%', justifyContent: 'space-between' }}>
+      <Inline align="center" className={styles['card-body']}>
         <div className="u-icon-box">
           {icon}
         </div>
@@ -106,20 +105,20 @@ export default function HistoryCard({
           </Inline>
           <Inline gap="lg" align="center">
             <Inline gap="xs" align="center">
-              <Calendar size={14} style={{ color: 'var(--color-text-muted)' }} />
+              <Calendar size={14} className={styles['text-muted']} />
               <Text variant="small" color="secondary">
                 {new Date(batch.created_at).toLocaleString()}
               </Text>
             </Inline>
             <Inline gap="xs" align="center">
-              <Clock size={14} style={{ color: 'var(--color-text-muted)' }} />
+              <Clock size={14} className={styles['text-muted']} />
               <Text variant="small" color="secondary">
                 {t('historyPage.batchIdLabel', { defaultValue: 'ID: #{{id}}', id: batch.id })}
               </Text>
             </Inline>
           </Inline>
         </Stack>
-        <div style={{ display: 'flex', alignItems: 'center', position: 'relative', zIndex: 'var(--z-index-step-2)' }}>
+        <div className={styles['action-container']}>
           <Inline align="center" gap="sm">
             {hasLogs && (
               <Button
@@ -157,7 +156,7 @@ export default function HistoryCard({
 
       {isExpanded && hasLogs && (
         <div className="u-card-details">
-          <Text variant="xsmall" weight="bold" color="muted" uppercase style={{ letterSpacing: '0.08em', display: 'block', marginBottom: 'var(--space-md)' }}>
+          <Text variant="xsmall" weight="bold" color="muted" uppercase className={styles['log-title-header']}>
             {t('historyPage.renamedFilesTitle') || 'Renamed Files:'}
           </Text>
           <div className="u-scroll-list">
@@ -169,19 +168,10 @@ export default function HistoryCard({
               return (
                 <div
                   key={log.id}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--space-xs)',
-                    padding: 'var(--space-sm) var(--space-md)',
-                    background: 'var(--ui-control-bg-subtle)',
-                    border: '0.0625rem solid var(--color-border-subtle)',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: 'var(--font-size-xs)',
-                  }}
+                  className={styles['log-row']}
                 >
-                  <Inline gap="md" align="center" style={{ flexWrap: 'nowrap', minWidth: 0 }}>
-                    <Stack gap="none" flex={1} style={{ minWidth: 0 }}>
+                  <Inline gap="md" align="center" className={styles['inline-nowrap']}>
+                    <Stack gap="none" flex={1} className={styles['min-w-0']}>
                       <Text variant="xsmall" color="muted" truncate>
                         {oldDir}
                       </Text>
@@ -189,18 +179,18 @@ export default function HistoryCard({
                         {oldFile}
                       </Text>
                     </Stack>
-                    <ArrowRight size={14} style={{ color: 'var(--color-text-muted)', flexShrink: 0 }} />
-                    <Stack gap="none" flex={1} style={{ minWidth: 0 }}>
+                    <ArrowRight size={14} className={styles['arrow-icon']} />
+                    <Stack gap="none" flex={1} className={styles['min-w-0']}>
                       <Text variant="xsmall" color="muted" truncate>
                         {newDir}
                       </Text>
-                      <Text variant="small" weight="medium" color="primary" truncate style={{ color: 'var(--color-accent-blue-pale)' }}>
+                      <Text variant="small" weight="medium" color="primary" truncate className={styles['text-accent-pale']}>
                         {newFile}
                       </Text>
                     </Stack>
                   </Inline>
                   {log.error_message && (
-                    <Text variant="xsmall" style={{ color: 'var(--color-state-danger)', marginTop: 'var(--radius-2xs)', display: 'block' }}>
+                    <Text variant="xsmall" className={styles['text-danger-margin']}>
                       {log.error_message}
                     </Text>
                   )}

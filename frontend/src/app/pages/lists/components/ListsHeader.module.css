@@ -129,6 +129,30 @@
   opacity: 1;
 }
 
+.lists-header__title {
+  font-size: 3.5rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.lists-header__desc {
+  opacity: 0.8;
+  max-width: 37.5rem;
+  line-height: 1.5;
+}
+
+.lists-header__created-label {
+  opacity: 0.85;
+}
+
+.lists-header__created-wrap {
+  margin-top: var(--space-xs);
+}
+
+.lists-header__filter-label {
+  user-select: none;
+}
+
 .contents {
   display: contents;
 }

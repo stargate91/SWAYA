@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import SpotlightBanner from './components/SpotlightBanner';
 import RecommendationSkeleton from './components/RecommendationSkeleton';
 import useSpotlight from './hooks/useSpotlight';
 import { useLibraryModeStore } from '../../../stores/useLibraryModeStore';
 import { useSettingsQuery } from '@/queries/settingsQueries';
 import { ChevronLeft, ChevronRight } from '@/ui/icons';
-import Button from '@/ui/Button';
 import styles from './components/SpotlightBanner.module.css';
 
 export default function SpotlightWidget() {
@@ -22,25 +21,20 @@ export default function SpotlightWidget() {
     handleCardClick,
   } = useSpotlight();
 
-  // 'stashdb', 'tmdb' or 'fansdb'
-  const [adultProvider, setAdultProvider] = useState('stashdb');
-
   const stashdbItems = (recommendations?.discover_stashdb || []).filter(item => item.backdrop_path || item.poster_path);
   const tmdbAdultItems = (recommendations?.discover_adult || []).filter(item => item.backdrop_path || item.poster_path);
   const fansdbItems = (recommendations?.discover_fansdb || []).filter(item => item.backdrop_path || item.poster_path);
 
-  // Set initial provider based on priority StashDB > TMDb > FansDB and availability
-  useEffect(() => {
-    if (isNsfw) {
-      if (stashdbItems.length > 0) {
-        setAdultProvider('stashdb');
-      } else if (tmdbAdultItems.length > 0) {
-        setAdultProvider('tmdb');
-      } else if (fansdbItems.length > 0) {
-        setAdultProvider('fansdb');
-      }
-    }
-  }, [isNsfw, stashdbItems.length, tmdbAdultItems.length, fansdbItems.length]);
+  // Compute default provider initial value based on items availability
+  const initialAdultProvider = (() => {
+    if (stashdbItems.length > 0) return 'stashdb';
+    if (tmdbAdultItems.length > 0) return 'tmdb';
+    if (fansdbItems.length > 0) return 'fansdb';
+    return 'stashdb';
+  })();
+
+  // 'stashdb', 'tmdb' or 'fansdb'
+  const [adultProvider, setAdultProvider] = useState(initialAdultProvider);
 
   if (isLoading) {
     return <RecommendationSkeleton showBanner />;
@@ -78,7 +72,7 @@ export default function SpotlightWidget() {
     };
 
     return (
-      <div style={{ position: 'relative' }}>
+      <div className={styles['spotlight-wrapper']}>
         <SpotlightBanner
           item={item}
           watchlistIds={actualWatchlistIds}
@@ -87,64 +81,26 @@ export default function SpotlightWidget() {
           isAdult={activeProviderObj.id !== 'tmdb'} /* TMDb backdrops do not need local api proxying */
         />
         {providersList.length > 1 && (
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 'var(--space-4xl)',
-              right: 'var(--space-4xl)',
-              zIndex: 'var(--z-index-sticky)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'var(--space-xs)',
-              background: 'color-mix(in srgb, var(--color-bg-canvas) 80%, transparent)',
-              padding: 'var(--space-xs) var(--space-md)',
-              borderRadius: 'var(--radius-full)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid color-mix(in srgb, var(--color-border) 20%, transparent)',
-            }}
-          >
-            <span
-              style={{
-                minWidth: '85px',
-                padding: '0 var(--space-xs)',
-                textTransform: 'uppercase',
-                fontSize: '0.75rem',
-                fontWeight: 'bold',
-                color: 'var(--color-text-primary)',
-                textAlign: 'center',
-                cursor: 'pointer',
-                userSelect: 'none',
-              }}
+          <div className={styles['provider-controls']}>
+            <button
+              type="button"
+              className={styles['provider-label']}
               onClick={handleNextProvider}
             >
               {activeProviderObj.label}
-            </span>
-            <div style={{ display: 'flex', gap: '2px' }}>
+            </button>
+            <div className={styles['provider-btn-group']}>
               <button
+                type="button"
                 onClick={handlePrevProvider}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--color-text-secondary)',
-                  cursor: 'pointer',
-                  padding: '2px',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
+                className={styles['provider-btn']}
               >
                 <ChevronLeft size={16} />
               </button>
               <button
+                type="button"
                 onClick={handleNextProvider}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--color-text-secondary)',
-                  cursor: 'pointer',
-                  padding: '2px',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
+                className={styles['provider-btn']}
               >
                 <ChevronRight size={16} />
               </button>
