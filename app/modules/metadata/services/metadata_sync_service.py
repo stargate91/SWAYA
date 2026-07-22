@@ -7,7 +7,6 @@ from app.modules.metadata.models import MetadataMatch
 from app.core.enums import Provider, MediaType
 from app.core.language import get_user_ui_language, get_user_fallback_language
 from app.modules.settings.services.settings_service import SettingsService
-from app.modules.scrapers.support.gateway import scraper_gateway
 from app.modules.scrapers.enrichment.mainstream_enricher import MainstreamEnricher
 
 logger = logging.getLogger(__name__)
@@ -49,7 +48,7 @@ class MetadataSyncService:
             # Query all active TMDB matches linked to local files
             matches = db.query(MetadataMatch).filter(
                 MetadataMatch.provider == Provider.TMDB,
-                MetadataMatch.is_active == True,
+                MetadataMatch.is_active,
                 MetadataMatch.media_item_id.isnot(None),
                 MetadataMatch.media_type.in_([MediaType.MOVIE, MediaType.TV, MediaType.EPISODE])
             ).all()

@@ -19,7 +19,7 @@ class TitleLockReader:
                 from app.modules.scrapers.support.registry import ProviderRegistry
                 try:
                     provider, external_id = ProviderRegistry.clean_id(item_id)
-                    from app.core.enums import Provider, MediaType
+                    from app.core.enums import MediaType
                     from app.modules.metadata.models import MetadataMatch
                     
                     config = ProviderRegistry.get_config(provider)

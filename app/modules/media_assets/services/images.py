@@ -117,7 +117,6 @@ class ImageProcessingService:
         and returns a tuple of (local_cache_path, mime_type).
         """
         import hashlib
-        import os
         import urllib3
         import io
         from PIL import Image, ImageFilter, ImageEnhance

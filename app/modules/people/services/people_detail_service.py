@@ -219,35 +219,56 @@ class PeopleDetailService:
 
         def map_hair_color(val: str) -> Optional[str]:
             val = val.lower().strip()
-            if "blonde" in val: return "BLONDE"
-            if "brown" in val: return "BRUNETTE"
-            if "black" in val: return "BLACK"
-            if "red" in val or "ginger" in val: return "RED"
-            if "auburn" in val: return "AUBURN"
-            if "grey" in val or "gray" in val: return "GREY"
-            if "bald" in val: return "BALD"
-            if "white" in val: return "WHITE"
+            if "blonde" in val:
+                return "BLONDE"
+            if "brown" in val:
+                return "BRUNETTE"
+            if "black" in val:
+                return "BLACK"
+            if "red" in val or "ginger" in val:
+                return "RED"
+            if "auburn" in val:
+                return "AUBURN"
+            if "grey" in val or "gray" in val:
+                return "GREY"
+            if "bald" in val:
+                return "BALD"
+            if "white" in val:
+                return "WHITE"
             return "OTHER"
 
         def map_eye_color(val: str) -> Optional[str]:
             val = val.lower().strip()
-            if "blue" in val: return "BLUE"
-            if "brown" in val: return "BROWN"
-            if "grey" in val or "gray" in val: return "GREY"
-            if "green" in val: return "GREEN"
-            if "hazel" in val: return "HAZEL"
-            if "red" in val: return "RED"
+            if "blue" in val:
+                return "BLUE"
+            if "brown" in val:
+                return "BROWN"
+            if "grey" in val or "gray" in val:
+                return "GREY"
+            if "green" in val:
+                return "GREEN"
+            if "hazel" in val:
+                return "HAZEL"
+            if "red" in val:
+                return "RED"
             return None
 
         def map_ethnicity(val: str) -> Optional[str]:
             val = val.lower().strip()
-            if "caucasian" in val or "white" in val: return "CAUCASIAN"
-            if "black" in val or "african" in val: return "BLACK"
-            if "asian" in val: return "ASIAN"
-            if "indian" in val: return "INDIAN"
-            if "latin" in val or "hispanic" in val or "spanish" in val: return "LATIN"
-            if "middle eastern" in val: return "MIDDLE_EASTERN"
-            if "mixed" in val: return "MIXED"
+            if "caucasian" in val or "white" in val:
+                return "CAUCASIAN"
+            if "black" in val or "african" in val:
+                return "BLACK"
+            if "asian" in val:
+                return "ASIAN"
+            if "indian" in val:
+                return "INDIAN"
+            if "latin" in val or "hispanic" in val or "spanish" in val:
+                return "LATIN"
+            if "middle eastern" in val:
+                return "MIDDLE_EASTERN"
+            if "mixed" in val:
+                return "MIXED"
             return "OTHER"
 
         if "height" in data:

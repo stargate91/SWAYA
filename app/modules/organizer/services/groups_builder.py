@@ -3,9 +3,8 @@ from pathlib import Path
 from typing import Any, Optional
 from sqlalchemy.orm import Session
 
-from app.core.enums import MediaType, ItemStatus
+from app.core.enums import ItemStatus
 from app.core.language import LanguageService
-from app.modules.organizer.schemas import OrganizerGroupsResponse
 from app.modules.organizer.services.strategies.base_organizer import BaseMediaOrganizer
 from app.modules.organizer.services.organizer_helper import OrganizerHelper
 

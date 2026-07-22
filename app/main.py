@@ -47,7 +47,6 @@ async def lifespan(app: FastAPI):
             session.commit()
     
     # Ensure image folders are created
-    from app.modules.media_assets.services.images import image_processing_service
     image_processing_service.ensure_folders()
     logger.info("Image directories ensured.")
 

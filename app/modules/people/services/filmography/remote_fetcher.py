@@ -7,7 +7,6 @@ from app.core.enums import Provider
 from app.modules.people.models import Person, MediaPersonLink
 
 
-from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.modules.people.services.filmography.strategies.base_strategy import BaseFilmographyStrategy
 
 logger = logging.getLogger(__name__)

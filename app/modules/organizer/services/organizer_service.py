@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.modules.media_assets.services.images import image_processing_service
 from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
-from app.modules.organizer.schemas import OrganizerGroupsResponse, ActionResponse
+from app.modules.organizer.schemas import ActionResponse
 from app.modules.organizer.services.organizer_helper import OrganizerHelper
 from app.modules.organizer.services.groups_builder import OrganizerGroupsBuilder
 

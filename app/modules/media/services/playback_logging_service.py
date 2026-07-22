@@ -1,8 +1,12 @@
 import logging
 from typing import Any
 from sqlalchemy.orm import Session
-
 from datetime import datetime, timezone
+
+from app.core.exceptions import NotFoundException
+from app.core.language import LanguageService
+from app.modules.media.schemas import WatchedHistoryResponse
+from app.modules.users.models import UserOverride
 
 def parse_watched_at(value) -> datetime:
     if not value:
@@ -14,11 +18,6 @@ def parse_watched_at(value) -> datetime:
         return datetime.fromisoformat(normalized)
     except Exception as exc:
         raise ValueError("Invalid watched_at datetime format") from exc
-from app.core.exceptions import NotFoundException
-from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
-from app.core.language import LanguageService
-from app.modules.media.schemas import WatchedHistoryResponse
-from app.modules.users.models import UserOverride
 
 logger = logging.getLogger(__name__)
 

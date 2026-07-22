@@ -3,7 +3,7 @@ import time
 import logging
 import threading
 from pathlib import Path
-from typing import Set, Dict, Any, Optional
+from typing import Set, Any, Optional
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -181,7 +181,7 @@ def start_watcher() -> None:
     logger.info("Watcher: Starting folder watcher service...")
     try:
         with SessionLocal() as session:
-            libraries = session.query(Library).filter(Library.watch_for_changes == True).all()
+            libraries = session.query(Library).filter(Library.watch_for_changes).all()
             if not libraries:
                 logger.info("Watcher: No libraries configured for real-time monitoring.")
                 return

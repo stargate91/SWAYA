@@ -3,14 +3,8 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from pydantic import BaseModel
 from fastapi.responses import StreamingResponse, FileResponse, RedirectResponse
-import os
-import requests
-import urllib3
-import hashlib
-from urllib.parse import urlparse
-from PIL import Image, ImageFilter, ImageEnhance
-import io
 import logging
+import os
 
 from app.core.database import get_db
 from app.core.enums import ScanMode

@@ -1,6 +1,5 @@
 import logging
-from typing import Optional, Dict
-from app.core.enums import ScanMode
+from typing import Optional, Dict, Any
 
 
 logger = logging.getLogger(__name__)

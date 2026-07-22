@@ -8,8 +8,6 @@ from sqlalchemy.orm import Session
 from app.modules.library.models import MediaItem
 from app.modules.metadata.models import MetadataMatch
 from app.core.enums import Provider, MediaType
-from app.modules.scrapers.providers.tmdb import TMDBScraper
-from app.modules.scrapers.providers.omdb import OMDBScraper
 from app.core.language import LanguageService
 
 

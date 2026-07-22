@@ -3,7 +3,6 @@ from typing import Any
 from sqlalchemy.orm import Session, joinedload
 from fastapi import HTTPException
 
-from app.core.enums import Provider
 from app.modules.people.models import Person, ExternalSourceLink
 
 logger = logging.getLogger(__name__)

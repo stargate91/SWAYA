@@ -6,7 +6,6 @@ from fastapi.responses import JSONResponse
 from app.core.enums import Provider, MediaType
 from app.modules.library.models import MediaItem
 from app.modules.metadata.models import MetadataMatch, MediaCollection
-from app.modules.users.models import UserOverride
 from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.core.language import LanguageService
 from app.core.genre_utils import split_genres as _split_genres

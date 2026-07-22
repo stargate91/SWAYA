@@ -6,7 +6,6 @@ from app.modules.library.models import MediaItem
 from app.modules.metadata.models import MetadataMatch, MediaCollection
 from app.modules.users.models import UserOverride
 from app.core.enums import ItemStatus, MediaType
-from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.core.language import LanguageService as LangHelper
 
 

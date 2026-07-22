@@ -48,7 +48,7 @@ class PeopleEnrichWorker:
             db = self.session_factory()
             try:
                 unenriched = db.query(Person.id).filter(
-                    Person.is_active == True,
+                    Person.is_active,
                     Person.birthday.is_(None)
                 ).all()
                 unenriched_ids = [p[0] for p in unenriched]

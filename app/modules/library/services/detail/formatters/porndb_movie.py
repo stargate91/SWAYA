@@ -1,8 +1,7 @@
 import logging
-from typing import Any
+from typing import Any, Optional
 from fastapi.responses import JSONResponse
 
-from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.core.enums import Provider, MediaType
 from app.modules.users.models import UserOverride
 from app.modules.library.schemas import MovieDetailResponse
@@ -61,8 +60,6 @@ class PornDbMovieFormatter(MovieDetailFormatter):
         settings = SettingsService(db)
         ui_lang = get_user_ui_language(settings)
         
-        from app.modules.metadata.models import MetadataMatch
-        from app.core.enums import Provider, MediaType
         
         match = db.query(MetadataMatch).filter(
             MetadataMatch.provider == Provider.PORNDB,

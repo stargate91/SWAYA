@@ -13,7 +13,6 @@ from app.modules.library.services.detail.formatters.tv.tv_credits_formatter impo
 from app.modules.library.services.detail.formatters.tv.tv_metadata_resolver import TvShowMetadataResolver
 from app.modules.metadata.models import MetadataMatch
 from app.modules.users.models import UserOverride
-from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.core.enums import Provider, MediaType
 from app.core.genre_utils import split_genres as _split_genres
 
@@ -50,7 +49,6 @@ class TvShowFormatter(DetailFormatter):
         settings = SettingsService(db)
         ui_lang = language or get_user_ui_language(settings)
         
-        from app.modules.metadata.models import MetadataMatch
         series_match = db.query(MetadataMatch).filter(
             MetadataMatch.provider == Provider.TMDB,
             MetadataMatch.external_id == str(tv_tmdb_id_int),

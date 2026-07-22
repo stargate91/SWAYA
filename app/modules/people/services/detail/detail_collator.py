@@ -3,7 +3,7 @@ from typing import Optional, Any
 from sqlalchemy.orm import Session
 
 from app.core.enums import Provider
-from app.modules.people.models import Person, PersonLocalization, ExternalSourceLink
+from app.modules.people.models import Person, ExternalSourceLink
 from app.core.language import LanguageService
 
 

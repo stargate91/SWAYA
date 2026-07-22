@@ -16,6 +16,7 @@ from app.modules.users.services.overrides.title_lock_service import TitleLockSer
 from app.modules.users.services.overrides.image_override_service import ImageOverrideService
 from app.modules.users.services.overrides.tag_override_service import TagOverrideService
 from app.modules.users.services.overrides.title_lock_reader import TitleLockReader
+from app.modules.library.services.media_item_service import MediaItemService
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,6 @@ class OverridesService:
     def __init__(self, db: Session, resolver: Optional[Any] = None, user_id: Optional[int] = None, image_downloader: Optional[Any] = None, scrapers: Optional[Any] = None, mainstream_enricher: Optional[Any] = None):
         self.db = db
         if resolver is None:
-            from app.modules.library.services.media_item_service import MediaItemService
             resolver = MediaItemService(db)
         self.resolver = resolver
         self.image_downloader = image_downloader

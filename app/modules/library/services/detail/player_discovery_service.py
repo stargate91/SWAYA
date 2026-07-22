@@ -1,7 +1,6 @@
 import logging
 from typing import Optional, Dict, Any
 from sqlalchemy.orm import Session
-from sqlalchemy import func
 
 from app.modules.users.models import UserOverride
 from app.modules.metadata.models import MetadataMatch, MetadataLocalization

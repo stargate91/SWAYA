@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 from pathlib import Path
 from app.core.constants import (
     MEDIA_IMAGE_SUBFOLDERS,

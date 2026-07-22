@@ -11,7 +11,6 @@ from sqlalchemy.orm import Session
 
 from app.modules.settings.models import UserSetting, SystemSetting
 
-from app.core.constants import STASHDB_DEFAULT_ENDPOINT, FANSDB_DEFAULT_ENDPOINT, PORNDB_DEFAULT_ENDPOINT
 from app.modules.media_assets.services.images import image_processing_service
 
 
@@ -89,18 +88,6 @@ class SettingsService:
             self.db.add(setting)
         self.db.flush()
 
-    def get_system_settings(self) -> Any:
-        return self.db.query(SystemSetting).all()
-
-    def set_system_setting(self, key: str, value: Any, description: Optional[str] = None) -> Any:
-        setting = self.db.query(SystemSetting).filter(SystemSetting.key == key).first()
-        if not setting:
-            setting = SystemSetting(key=key, value=value, description=description)
-            self.db.add(setting)
-        else:
-            setting.value = value
-        self.db.flush()
-        return setting
 
     def get_settings(self) -> Dict[str, Any]:
         # Auto-detect VLC path

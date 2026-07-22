@@ -4,7 +4,6 @@ from typing import Dict, Any, Optional
 from app.core.enums import Provider, MediaType, ItemStatus
 from app.modules.metadata.models import MetadataMatch
 from app.modules.metadata.schemas import MetadataResolveRequest, BulkResolveRequest
-from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 
 
 logger = logging.getLogger(__name__)

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional, Any
+from typing import List, Optional, Any, Union
 
 class OrganizerItemImage(BaseModel):
     path: str
@@ -81,7 +81,6 @@ class OrganizerTabCounts(BaseModel):
     extraMetadataCount: int
 
 
-from typing import Union
 
 class OrganizerPaginatedResponse(BaseModel):
     items: List[Union[OrganizerItem, OrganizerExtra]]

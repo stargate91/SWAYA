@@ -1,8 +1,6 @@
-import logging
 from fastapi import APIRouter, Depends, HTTPException, Query, File, UploadFile
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
-from typing import List, Any, Optional
+from typing import List, Any
 
 from app.core.database import get_db
 from app.modules.scrapers.support.gateway import scraper_gateway

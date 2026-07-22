@@ -1,6 +1,4 @@
 import logging
-import time
-import random
 from typing import Optional, List, Dict, Any
 
 from app.core.enums import Provider
@@ -157,7 +155,7 @@ class TMDBScraper(BaseScraper):
             orig_lang = details.get("original_language")
             img_langs = dict.fromkeys([normalized_lang, DEFAULT_FALLBACK_LANGUAGE, orig_lang, "null"])
             img_params = {
-                "include_image_language": ",".join([l for l in img_langs if l])
+                "include_image_language": ",".join([lang for lang in img_langs if lang])
             }
             try:
                 images_data = self._call_api(f"/{item_type}/{tmdb_id}/images", img_params, force_refresh=force_refresh)

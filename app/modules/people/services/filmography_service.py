@@ -70,7 +70,6 @@ class FilmographyService:
         adult_known_for = []
         if is_adult:
             from app.modules.people.models import Person
-            from app.core.enums import Provider
             person = self.db.query(Person).filter(Person.id == person_id).first()
             if person:
                 ext_ids = person.external_ids or {}

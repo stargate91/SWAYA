@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import List, Optional, Union, Any
+
+from app.core.enums import Provider, MediaType
 
 from app.core.database import get_db
 from app.modules.tasks.image_download_service import ImageDownloadService
@@ -14,24 +16,22 @@ from app.modules.library.schemas import (
     ContinueWatchingItem,
     LibraryTabResponse,
     GroupedLibraryResponse,
-    TagGroupItem,
     FilterOptionsResponse,
     MovieCollectionsResponse,
     TvShowDetailResponse,
     TvSeasonDetailResponse,
     CollectionDetailResponse,
+    LibraryTagsResponse,
+    TagItem,
 )
 from app.modules.people.schemas import PeopleGroupItem
 from app.modules.library.services.library_stats_service import LibraryStatsService
 from app.modules.library.services.library_listing_service import LibraryListingService
 from app.modules.library.services.library_collection_service import LibraryCollectionService
 from app.modules.library.services.library_filter_service import LibraryFilterService
-from typing import Union
-from app.modules.people.services.people_library_service import PeopleLibraryService
-from app.modules.library.services.detail.movie_detail_service import MovieDetailService
 from app.modules.library.services.detail.tv_detail_service import TvDetailService
-from app.modules.library.services.detail.scene_detail_service import SceneDetailService
 from app.modules.library.services.detail.collection_detail_service import CollectionDetailService
+from app.modules.people.services.people_library_service import PeopleLibraryService
 
 
 # Mainstream (SFW) Media Router
@@ -183,7 +183,6 @@ def get_library_items(
     return service.get_grouped_library(include_adult=include_adult)
 
 
-from app.modules.library.schemas import LibraryTagsResponse, TagItem
 
 @library_router.get("/library/tags", response_model=LibraryTagsResponse)
 def get_library_tags(
@@ -341,7 +340,6 @@ def get_library_item_detail(
     scrapers: Any = Depends(get_scraper_gateway)
 ):
     from app.modules.scrapers.support.registry import MediaTypeRegistry, ProviderRegistry
-    from app.core.enums import MediaType
 
     # Explicit media_type from query param
     if media_type:

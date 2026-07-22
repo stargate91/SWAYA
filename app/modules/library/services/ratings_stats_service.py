@@ -1,6 +1,6 @@
 import logging
 from typing import Dict, Any, List, Optional
-from sqlalchemy import and_, or_
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from app.core.enums import ItemStatus, MediaType

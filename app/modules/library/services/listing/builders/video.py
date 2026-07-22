@@ -1,10 +1,9 @@
 from typing import Tuple, Any, List
-from sqlalchemy import func, and_, or_
+from sqlalchemy import func, or_
 from sqlalchemy.orm import selectinload
 
 from app.modules.library.models import MediaItem
 from app.modules.metadata.models import MetadataMatch
-from app.modules.users.models import UserOverride
 from app.core.enums import MediaType
 from app.modules.library.services.listing.filter_params import ListingFilterParams
 from app.modules.library.services.listing.builders.base import BaseQueryBuilder

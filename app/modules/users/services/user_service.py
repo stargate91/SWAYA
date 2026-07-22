@@ -3,6 +3,9 @@ from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 from app.modules.users.models import User, UserOverride, CustomList
 from app.core.exceptions import BadRequestException
+from app.modules.library.services.media_item_service import MediaItemService
+from app.modules.users.services.overrides_service import OverridesService
+from app.modules.users.schemas import ItemOverridesUpdate
 
 logger = logging.getLogger(__name__)
 
@@ -10,7 +13,6 @@ class UserService:
     def __init__(self, db: Session, resolver: Optional[Any] = None):
         self.db = db
         if resolver is None:
-            from app.modules.library.services.media_item_service import MediaItemService
             resolver = MediaItemService(db)
         self.resolver = resolver
 
@@ -140,9 +142,6 @@ class UserService:
         resolver,
     ) -> Dict[str, Any]:
         """Composite update status and overrides."""
-        from app.modules.users.services.overrides_service import OverridesService
-        from app.modules.users.schemas import ItemOverridesUpdate
-
         service = OverridesService(self.db, resolver)
         res = {}
         status = payload_data.get("status")

@@ -2,7 +2,6 @@ import logging
 from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 
-from app.core.enums import Provider
 
 logger = logging.getLogger(__name__)
 

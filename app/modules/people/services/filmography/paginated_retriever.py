@@ -3,7 +3,6 @@ from typing import Optional, Any
 from sqlalchemy.orm import Session
 
 from app.modules.people.models import MediaPersonLink
-from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.core.language import LanguageService
 
 class PaginatedCreditsRetriever:

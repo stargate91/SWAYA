@@ -132,7 +132,7 @@ class RecommendationsService:
             # Fetch settings
             blacklist_setting = self.settings.get_setting("adult_tag_blacklist") or ""
 
-            from app.modules.recommendations.services.tag_safety import normalize_tag, expand_tags, has_word_match
+            from app.modules.recommendations.services.tag_safety import expand_tags, has_word_match
 
             blacklist = expand_tags({t.strip() for t in blacklist_setting.split(",") if t.strip()})
 

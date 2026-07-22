@@ -822,7 +822,6 @@ class ListsService:
         return {"status": "success"}
 
     def get_item_membership(self, item_id: str) -> ListMembershipResponse:
-        tmdb_id = None
         media_item_id = None
         person_id = None
         provider = None

@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from pathlib import Path
-from typing import Optional, List, TYPE_CHECKING
+from typing import Optional, List, Any
 
 from app.modules.media_assets.services.images import image_processing_service, ImageProcessingService
 from app.core.constants import HEAVY_IMAGE_DOWNLOAD_TIMEOUT
@@ -125,10 +125,10 @@ class DownloadWorker:
                 MetadataLocalization.poster_path.isnot(None), 
                 MetadataLocalization.local_poster_path.isnot(None)
             ).all()
-            for l in locs:
-                local_path = Path(l.local_poster_path)
+            for loc in locs:
+                local_path = Path(loc.local_poster_path)
                 if not local_path.exists():
-                    self.enqueue_download(l.poster_path, "posters", local_path.name)
+                    self.enqueue_download(loc.poster_path, "posters", local_path.name)
         except Exception as e:
             logger.error(f"Failed to recover missing images: {e}")
         finally:

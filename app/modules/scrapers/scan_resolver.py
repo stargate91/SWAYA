@@ -1,7 +1,7 @@
 import time
 import logging
 import concurrent.futures
-from typing import List, Optional, Callable, Any, TYPE_CHECKING
+from typing import List, Optional, Callable, Any
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import OperationalError
 

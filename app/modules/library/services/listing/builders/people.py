@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import Tuple, List, Any
 from sqlalchemy.orm import Session
 
 from app.modules.people.services.people_library_service import PeopleLibraryService
@@ -161,15 +161,24 @@ class PeopleQueryBuilder:
                 cup_str = str(item.cup_size or "").strip().upper()
                 cup_val = cup_order.get(cup_str, 0)
                 if cup_val == 0:
-                    if cup_str.startswith("A"): cup_val = 1
-                    elif cup_str.startswith("B"): cup_val = 2
-                    elif cup_str.startswith("C"): cup_val = 3
-                    elif cup_str.startswith("D"): cup_val = 4
-                    elif "E" in cup_str: cup_val = 5
-                    elif "F" in cup_str: cup_val = 6
-                    elif "G" in cup_str: cup_val = 7
-                    elif "H" in cup_str: cup_val = 8
-                    else: return None
+                    if cup_str.startswith("A"):
+                        cup_val = 1
+                    elif cup_str.startswith("B"):
+                        cup_val = 2
+                    elif cup_str.startswith("C"):
+                        cup_val = 3
+                    elif cup_str.startswith("D"):
+                        cup_val = 4
+                    elif "E" in cup_str:
+                        cup_val = 5
+                    elif "F" in cup_str:
+                        cup_val = 6
+                    elif "G" in cup_str:
+                        cup_val = 7
+                    elif "H" in cup_str:
+                        cup_val = 8
+                    else:
+                        return None
                 band_val = float(item.band_size) if item.band_size else 32.0
                 height_val = float(item.height) if item.height else 165.0
                 return cup_val + (band_val - 32.0) * 0.5 - (height_val - 165.0) * 0.05

@@ -1,6 +1,6 @@
 from __future__ import annotations
 import logging
-from typing import Optional
+from typing import Optional, Any
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 
@@ -10,7 +10,6 @@ from app.modules.metadata.models import MetadataMatch
 from app.modules.users.models import UserOverride
 
 
-from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.core.language import LanguageService
 from app.modules.library.services.detail._detail_formatter import DetailFormatter
 from app.modules.library.schemas import CollectionDetailResponse

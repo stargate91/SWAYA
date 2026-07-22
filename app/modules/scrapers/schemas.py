@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, Any
+from typing import Optional
 from datetime import datetime
 from app.core.enums import Provider, MediaType, CacheStatus
 

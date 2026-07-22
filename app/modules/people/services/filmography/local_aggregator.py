@@ -5,7 +5,6 @@ from sqlalchemy.orm import Session
 from app.core.enums import MediaType, Provider
 from app.modules.people.models import MediaPersonLink
 from app.core.language import LanguageService
-from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 
 
 

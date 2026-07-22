@@ -1,6 +1,6 @@
 import difflib
 import logging
-from typing import Optional
+from typing import Optional, Any
 
 from sqlalchemy.orm import Session
 

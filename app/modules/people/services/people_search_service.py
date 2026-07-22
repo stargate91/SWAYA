@@ -4,7 +4,6 @@ from typing import Optional, List, Dict, Any
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from app.core.enums import Provider
 from app.modules.people.models import Person, ExternalSourceLink, MediaPersonLink
 from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 

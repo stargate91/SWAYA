@@ -1,10 +1,11 @@
 import logging
-from typing import Any
+from typing import Any, Optional
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 
 from app.core.enums import Provider, MediaType
 from app.modules.users.models import UserOverride
+from app.modules.scrapers.support.registry import ProviderRegistry
 
 from app.modules.metadata.models import Studio, MetadataMatch
 from app.modules.library.services.detail._detail_formatter import DetailFormatter
@@ -13,11 +14,9 @@ from app.modules.library.services.detail.detail_mixins import OverrideResolver, 
 # Sub-services
 from app.modules.library.services.detail.scene.cast_builder import SceneCastBuilder
 from app.modules.library.services.detail.scene.playback_resolver import ScenePlaybackResolver
-from app.modules.library.services.detail.scene.metadata_syncer import SceneMetadataSyncer, _queue_image, _download_image_now
+from app.modules.library.services.detail.scene.metadata_syncer import SceneMetadataSyncer, _download_image_now
 
 logger = logging.getLogger(__name__)
-
-from app.modules.scrapers.support.registry import ProviderRegistry
 
 PROVIDER_PREFIXES = tuple(ProviderRegistry.get_all_prefixes())
 
@@ -72,14 +71,10 @@ class SceneDetailService(DetailFormatter):
                 scene_uuid = item_id
 
         print(f"[DEBUG] SceneDetailService.get_scene_detail: resolved provider_prefix={provider_prefix}, scene_uuid={scene_uuid}")
-        import re
-        is_uuid = bool(re.match(r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", scene_uuid))
         # Try to load scene details from the local database
         prov_enum = None
         if provider_prefix:
             prov_enum = ProviderRegistry.get_provider_by_prefix(provider_prefix)
-        elif match:
-            prov_enum = match.provider
         
         match = None
         if prov_enum:

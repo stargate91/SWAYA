@@ -1,9 +1,9 @@
 import logging
-from typing import List, Optional
+from typing import Optional
 from sqlalchemy.orm import Session
 from app.modules.metadata.models import MetadataMatch, MetadataLocalization
 from app.modules.users.models import Tag
-from app.modules.library.schemas import FilterOptionsResponse, TagGroupItem
+from app.modules.library.schemas import FilterOptionsResponse, LibraryTagsResponse, TagGroupItem
 
 
 logger = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ class LibraryFilterService:
         is_adult = "adult" in tab.lower() or tab.lower() == "scenes"
         
         from app.modules.library.models import MediaItem
-        from app.core.enums import ItemStatus, MediaType
+        from app.core.enums import ItemStatus
         from sqlalchemy import select
         
         lib_statuses = [ItemStatus.ORGANIZED, ItemStatus.RENAMED]
@@ -464,70 +464,10 @@ class LibraryFilterService:
         from app.modules.users.services.tags_service import TagsService
         TagsService(self.db).auto_heal_adult_tags()
 
-        def calculate_card_subtitle(match, people_list) -> str:
-            parts = []
-            m_type = match.media_type
-            
-            if m_type in (MediaType.SCENE, MediaType.VIDEO):
-                perf_names = [p["name"] for p in people_list if p.get("name")][:3]
-                if perf_names:
-                    parts.append(", ".join(perf_names))
-                date_part = ""
-                if match.release_date:
-                    date_part = match.release_date.strftime("%Y-%m-%d")
-                if date_part:
-                    parts.append(date_part)
-            elif m_type == MediaType.TV:
-                first_year = None
-                if hasattr(match, "first_air_date") and match.first_air_date:
-                    first_year = match.first_air_date.year
-                elif match.release_date:
-                    first_year = match.release_date.year
-                last_year = match.last_air_date.year if (hasattr(match, "last_air_date") and match.last_air_date) else None
-                status_lower = str(getattr(match, "release_status", "") or "").lower()
-                is_ended = status_lower in ("ended", "canceled", "cancelled")
-                tv_year = ""
-                if first_year:
-                    if is_ended and last_year:
-                        tv_year = str(first_year) if first_year == last_year else f"{first_year} - {last_year}"
-                    else:
-                        tv_year = f"{first_year} - "
-                if tv_year:
-                    parts.append(tv_year)
-                info = getattr(match, "info", None)
-                if info:
-                    parts.append(str(info))
-            else:
-                year_part = ""
-                if match.release_date:
-                    year_part = str(match.release_date.year)
-                if year_part:
-                    parts.append(year_part)
-                info = getattr(match, "info", None)
-                if info:
-                    parts.append(str(info))
-            return " • ".join(parts)
-
-    def get_tag_groups(
-        self,
-        is_adult: bool = False,
-        page: int = 1,
-        page_size: int = 40,
-        search: Optional[str] = None
-    ) -> LibraryTagsResponse:
-        """
-        Retrieves available tag groups, with each tag enriched with its associated items.
-        """
-        # Self-healing: Mark tags as adult if they are linked to adult items/performers
-        from app.modules.users.services.tags_service import TagsService
-        TagsService(self.db).auto_heal_adult_tags()
-
-        from app.core.enums import MediaType
         from app.modules.people.models import Person
         from app.modules.metadata.models import MetadataMatch
         from app.modules.users.models import user_override_tags, UserOverride
         from app.modules.media_assets.services.images import image_processing_service
-        from app.modules.library.schemas import LibraryTagsResponse, TagGroupItem, TagItem
         from sqlalchemy import func
 
         base_query = self.db.query(Tag).filter(Tag.is_adult == is_adult)

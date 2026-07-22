@@ -264,7 +264,6 @@ class PlaybackService:
         )
 
     def get_playback_info(self, item_id: Any):
-        from app.modules.library.models import MediaItem
         
         try:
             item_id_int = int(item_id)

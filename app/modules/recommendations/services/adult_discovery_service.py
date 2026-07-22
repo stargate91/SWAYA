@@ -6,7 +6,7 @@ from typing import List, Dict, Any
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
-from app.core.enums import Provider as ProviderEnum, MediaType
+from app.core.enums import Provider as ProviderEnum
 from app.modules.metadata.models import MetadataMatch
 
 logger = logging.getLogger(__name__)

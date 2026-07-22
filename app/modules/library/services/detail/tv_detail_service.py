@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 from sqlalchemy.orm import Session
 
 from app.modules.library.services.detail._detail_formatter import DetailFormatter

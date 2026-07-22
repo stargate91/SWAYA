@@ -4,7 +4,7 @@ from sqlalchemy import String, Float, DateTime, Enum as SQLEnum, ForeignKey, Int
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
-from app.core.enums import TaskStatus, TaskErrorCode, Provider
+from app.core.enums import TaskStatus, TaskErrorCode
 
 if TYPE_CHECKING:
     from app.modules.users.models import User

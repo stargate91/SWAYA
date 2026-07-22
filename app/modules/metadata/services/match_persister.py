@@ -6,7 +6,7 @@ from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 
 from app.modules.metadata.models import MetadataMatch
-from app.core.enums import Provider, MediaType
+from app.core.enums import Provider
 from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.core.language import LanguageService
 

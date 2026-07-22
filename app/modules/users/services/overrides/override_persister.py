@@ -271,12 +271,6 @@ class OverridePersister:
                 if resolved_id:
                     media_item_ids.append(resolved_id)
 
-        from app.modules.history.models import PlaybackLog
-        has_playback_log = set()
-        if media_item_ids:
-            logs = db.query(PlaybackLog.media_item_id).filter(PlaybackLog.media_item_id.in_(media_item_ids)).all()
-            has_playback_log = {log[0] for log in logs}
-
         tracked_parent_ids = set()
         count = 0
         for item_id in item_ids:

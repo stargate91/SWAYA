@@ -115,11 +115,12 @@ def fetch_external_details(
 
         result.set_provider(provider)
 
+        from app.modules.scrapers.support.registry import ProviderRegistry
+
         if provider == Provider.TMDB:
             if enricher.tmdb_enricher:
                 if enricher.tmdb_enricher.enrich_tmdb(external_id, result):
                     has_data = True
-        from app.modules.scrapers.support.registry import ProviderRegistry
         elif ProviderRegistry.is_adult_provider(provider):
             if enricher.adult_enricher:
                 if enricher.adult_enricher.enrich_adult(provider, external_id, result, to_process, processed_pairs):

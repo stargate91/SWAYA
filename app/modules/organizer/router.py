@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from app.core.database import get_db
 from app.modules.organizer.services.organizer_service import OrganizerService
-from app.modules.organizer.schemas import OrganizerGroupsResponse, ActionResponse, OrganizerPaginatedResponse
+from app.modules.organizer.schemas import ActionResponse, OrganizerPaginatedResponse
 from app.modules.scrapers.support.gateway import scraper_gateway
 
 router = APIRouter(prefix="/api/v1", tags=["Organizer"])

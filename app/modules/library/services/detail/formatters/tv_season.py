@@ -2,12 +2,10 @@ from typing import Any
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 
-from app.core.enums import Provider, MediaType, ItemStatus
 from app.modules.library.models import MediaItem
-from app.modules.metadata.models import MetadataMatch
-from app.modules.users.models import UserOverride
-from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.modules.library.services.detail._detail_formatter import DetailFormatter
+from app.core.enums import ItemStatus
+from app.modules.users.models import UserOverride
 
 class TvSeasonFormatter(DetailFormatter):
     def format(
@@ -109,7 +107,6 @@ class TvSeasonFormatter(DetailFormatter):
             ep_num = ep.get("episode_number")
             local_item = local_episodes_map.get(ep_num)
             
-            override = None
             from app.core.user_context import get_current_user_id
             current_uid = get_current_user_id()
             

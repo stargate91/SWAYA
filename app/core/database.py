@@ -2,6 +2,7 @@ import os
 import logging
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, Session
+from contextlib import contextmanager
 from app.core.constants import DATABASE_TIMEOUT_SECONDS
 
 logger = logging.getLogger(__name__)
@@ -120,7 +121,6 @@ def init_databases():
             session.rollback()
 
 
-from contextlib import contextmanager
 
 @contextmanager
 def transaction_scope(db_session):

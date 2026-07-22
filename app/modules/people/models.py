@@ -307,15 +307,24 @@ class Person(Base):
                     }
                     cup_val = cup_map.get(cup_str, 0)
                     if cup_val == 0:
-                        if cup_str.startswith("A"): cup_val = 1
-                        elif cup_str.startswith("B"): cup_val = 2
-                        elif cup_str.startswith("C"): cup_val = 3
-                        elif cup_str.startswith("D"): cup_val = 4
-                        elif "E" in cup_str: cup_val = 5
-                        elif "F" in cup_str: cup_val = 6
-                        elif "G" in cup_str: cup_val = 7
-                        elif "H" in cup_str: cup_val = 8
-                        else: cup_val = 4
+                        if cup_str.startswith("A"):
+                            cup_val = 1
+                        elif cup_str.startswith("B"):
+                            cup_val = 2
+                        elif cup_str.startswith("C"):
+                            cup_val = 3
+                        elif cup_str.startswith("D"):
+                            cup_val = 4
+                        elif "E" in cup_str:
+                            cup_val = 5
+                        elif "F" in cup_str:
+                            cup_val = 6
+                        elif "G" in cup_str:
+                            cup_val = 7
+                        elif "H" in cup_str:
+                            cup_val = 8
+                        else:
+                            cup_val = 4
 
                     band_val = float(calc_band)
                     height_val = float(calc_height) if calc_height is not None else 165.0
