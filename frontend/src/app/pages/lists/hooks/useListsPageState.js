@@ -16,7 +16,6 @@ import {
 } from '@/queries';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import { useUi } from '@/providers/UiProvider';
-import { getAvailableGenres, getFilteredListItems } from '../utils/listsFilterUtils';
 
 export default function useListsPageState() {
   const { t } = useTranslation();
@@ -47,9 +46,20 @@ export default function useListsPageState() {
   const [genderFilter, setGenderFilter] = useState('all');
   const [jobFilter, setJobFilter] = useState('all');
   const activeList = lists.find((l) => l.id === activeListId);
-  const { data: activeListDetails, isLoading: isDetailsLoading } = useListDetailsQuery(activeListId, {
-    enabled: !!activeListId
-  });
+  const { data: activeListDetails, isLoading: isDetailsLoading } = useListDetailsQuery(
+    activeListId,
+    {
+      watched_filter: watchedFilter,
+      media_type_filter: mediaTypeFilter,
+      genre_filter: genreFilter,
+      gender_filter: genderFilter,
+      job_filter: jobFilter,
+      search: listSearchQuery,
+      sort_by: sortKey,
+      sort_direction: sortDirection,
+    },
+    { enabled: !!activeListId }
+  );
 
   const [prevActiveListId, setPrevActiveListId] = useState(null);
   const listsDeps = lists.map((l) => l.id).join(',');
@@ -195,37 +205,19 @@ export default function useListsPageState() {
 
 
   const handleCardClick = (item) => {
+    if (item.target_path) {
+      navigate(item.target_path, { state: { allowAdult: true } });
+      return;
+    }
     const rawType = item.media_type || 'movie';
     let mediaType = rawType === 'show' ? 'tv' : rawType;
     if (mediaType === 'episode' || mediaType === 'season') {
       mediaType = 'tv';
     }
-
-    let itemId;
-    if (mediaType === 'tv') {
-      itemId = item.tmdb_id || item.external_id || item.match_id || item.media_item_id;
-    } else {
-      itemId = item.media_item_id;
-    }
-
-    if (!itemId) {
-      if (mediaType === 'movie') {
-        const prefix = item.provider === 'porndb' ? 'porndb_' : 'tmdb_';
-        itemId = item.external_id ? `${prefix}${item.external_id}` : (item.tmdb_id ? `tmdb_${item.tmdb_id}` : item.match_id);
-      } else if (mediaType === 'tv') {
-        itemId = item.external_id || item.tmdb_id || item.match_id;
-      } else if (mediaType === 'scene') {
-        const prefix = item.provider === 'porndb' ? 'porndb' : item.provider === 'fansdb' ? 'fansdb' : 'stash';
-        itemId = item.external_id ? `${prefix}_${item.external_id}` : item.match_id;
-      } else {
-        itemId = item.match_id;
-      }
-    }
-
+    let itemId = item.media_item_id || item.tmdb_id || item.external_id || item.match_id;
     const targetPath = mediaType === 'person'
       ? `/library/people/${item.person_id || itemId}`
       : `/library/${mediaType}/${itemId}`;
-
     navigate(targetPath, { state: { allowAdult: true } });
   };
 
@@ -234,7 +226,7 @@ export default function useListsPageState() {
     : '';
 
   const availableGenres = useMemo(() => {
-    return getAvailableGenres(activeListDetails?.items);
+    return ['all', ...(activeListDetails?.genres || [])];
   }, [activeListDetails]);
 
   const sortOptions = useMemo(() => {
@@ -251,19 +243,8 @@ export default function useListsPageState() {
   }, [activeList, t]);
 
   const filteredListItems = useMemo(() => {
-    return getFilteredListItems({
-      items: activeListDetails?.items,
-      watchedFilter,
-      mediaTypeFilter,
-      genreFilter,
-      genderFilter,
-      jobFilter,
-      listSearchQuery,
-      sortKey,
-      sortDirection,
-      listType: activeList?.list_type,
-    });
-  }, [activeListDetails, listSearchQuery, sortKey, sortDirection, watchedFilter, mediaTypeFilter, genreFilter, genderFilter, jobFilter, activeList]);
+    return activeListDetails?.items || [];
+  }, [activeListDetails]);
 
   return {
     t,

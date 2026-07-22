@@ -58,7 +58,7 @@ const ContinueWatchingWidget = () => {
 
           const progressPercent = Math.min(100, (currentResumePos / currentDuration) * 100);
           const isEpisode = item.type === 'episode';
-          const episodeCode = isEpisode ? formatEpisodeCode(item.season_number, item.episode_number) : null;
+          const episodeCode = isEpisode ? (item.display_episode_code || formatEpisodeCode(item.season_number, item.episode_number)) : null;
           const minutesLeft = Math.max(0, Math.floor(currentDuration / 60) - Math.floor(currentResumePos / 60));
           const episodeMeta = episodeCode ? `${episodeCode} - ${(item.tv_title || '')}` : null;
           const imagePath = item.still_path || item.backdrop_path;

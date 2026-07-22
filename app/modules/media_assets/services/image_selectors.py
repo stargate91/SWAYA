@@ -50,7 +50,7 @@ def probe_logo_darkness(file_path: str, image_root: Path, session: requests.Sess
             with Image.open(local_file) as image:
                 return measure_logo_darkness(image)
     except Exception as e:
-        logger.debug(f"Swallowed exception in domains/media_assets/services/image_selectors.py:51: {e}", exc_info=True)
+        logger.debug(f"Swallowed exception in app/modules/media_assets/services/image_selectors.py:51: {e}", exc_info=True)
 
     try:
         url = f"{TMDB_IMAGE_BASE}original{file_path}"
@@ -159,7 +159,7 @@ def probe_backdrop_tone(file_path: str, image_root: Path, session: requests.Sess
             with Image.open(local_file) as image:
                 return measure_backdrop_tone(image)
     except Exception as e:
-        logger.debug(f"Swallowed exception in domains/media_assets/services/image_selectors.py:154: {e}", exc_info=True)
+        logger.debug(f"Swallowed exception in app/modules/media_assets/services/image_selectors.py:154: {e}", exc_info=True)
 
     # Do not execute synchronous HTTP downloads on the main thread during page rendering
     return None

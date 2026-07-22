@@ -39,5 +39,5 @@ class NFOParser:
             if match:
                 return match.group(0)
         except Exception as e:
-            logger.debug(f"Swallowed exception in domains/library/services/scanner/scan_collector/nfo_parser.py:38: {e}", exc_info=True)
+            logger.debug(f"Swallowed exception in app/modules/library/services/scanner/scan_collector/nfo_parser.py:38: {e}", exc_info=True)
         return None

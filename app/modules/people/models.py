@@ -82,12 +82,13 @@ class Person(Base):
         return self.local_backdrop_path or self.backdrop_path
 
     def recalculate_projection(self, db):
-        priority_map = {
-            "tmdb": 4,
-            "stashdb": 3,
-            "fansdb": 2,
-            "porndb": 1
-        }
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        priority_map = {}
+        for provider in ProviderRegistry.get_all_providers():
+            cfg = ProviderRegistry.get_config(provider)
+            if cfg:
+                priority_map[cfg.prefix] = cfg.priority
+                priority_map[provider] = cfg.priority
         if self.primary_provider:
             priority_map[self.primary_provider] = 10
         
@@ -349,7 +350,9 @@ class Person(Base):
             ext_ids[key] = str(link.external_id)
             ext_ids[f"{key}_id"] = str(link.external_id)
         active_providers = {link.provider.value if hasattr(link.provider, 'value') else link.provider for link in self.external_links}
-        for provider_val in [Provider.TMDB.value, Provider.STASHDB.value, Provider.FANSDB.value, Provider.PORNDB.value]:
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        registered_providers = [p.value for p in ProviderRegistry.get_all_providers()]
+        for provider_val in registered_providers:
             if provider_val not in active_providers:
                 ext_ids.pop(provider_val, None)
                 ext_ids.pop(f"{provider_val}_id", None)

@@ -44,8 +44,8 @@ class ScanCollector:
         min_video_duration_minutes: float = 10,
         progress_callback: Optional[callable] = None,
         provider: Optional[str] = None,
-        fs: Optional[FileSystemPort] = None,
-        settings_port: Optional[Any] = None,
+        fs: Optional[Any] = None,
+        settings: Optional[Any] = None,
     ):
         self.db = db
         self.library = library
@@ -58,8 +58,11 @@ class ScanCollector:
         self.min_video_duration_minutes = min_video_duration_minutes
         self.progress_callback = progress_callback
         self.provider = str(provider or "").strip().lower()
+        if fs is None:
+            from app.modules.library.filesystem.fs_utils import FileSystemService
+            fs = FileSystemService()
         self.fs = fs
-        self.settings_port = settings_port
+        self.settings = settings
 
         # Instantiate modular subcomponents
         self.hash_calculator = HashCalculator(self.fs)
@@ -70,12 +73,12 @@ class ScanCollector:
             mode=self.mode,
             min_video_duration_minutes=self.min_video_duration_minutes,
             provider=self.provider,
-            settings_port=settings_port
+            settings=settings
         )
 
         # New instantiated sub-services
-        self.video_prober = VideoProber(self.prober, self.hash_calculator, self.analyzer, self.mode)
-        self.extra_determiner = ExtraDeterminer(self.categorizer, self.mode, settings_port=settings_port)
+        self.video_prober = VideoProber(self.prober, self.hash_calculator, self.analyzer, library.is_adult)
+        self.extra_determiner = ExtraDeterminer(self.categorizer, library.is_adult, settings=settings)
         self.scan_persister = ScanPersister(db, library, mode, self.hash_calculator, self.duplicate_finder, self.analyzer)
 
     def _duration_limit_seconds(self) -> float:
@@ -103,7 +106,7 @@ class ScanCollector:
 
         files = self.collector.collect(
             [self.library.root_path],
-            settings_port=self.settings_port,
+            settings=self.settings,
             progress_callback=collect_progress_cb
         )
         potential_media = files["potential_media"]
@@ -134,9 +137,9 @@ class ScanCollector:
 
         # Get video extensions to identify files in potential_extras that need probing
         video_exts = set(self.categorizer.CATEGORIZER_VIDEO_EXTS)
-        if self.settings_port:
+        if self.settings:
             try:
-                settings = self.settings_port.get_all_system_settings()
+                settings = self.settings.get_all_system_settings()
                 if settings and "naming_video_exts" in settings:
                     video_exts = {
                         e.strip().lower() if e.strip().startswith('.') else f".{e.strip().lower()}"

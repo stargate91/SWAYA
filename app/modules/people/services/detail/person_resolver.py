@@ -54,11 +54,9 @@ class PersonResolver:
                 parts = person_id_str.split(":", 1)
                 source_name = parts[0]
                 uuid_str = parts[1]
-                scraper_name = "porndb" if source_name == "theporndb" else source_name
-                if scraper_name == "stash":
-                    scraper_name = "stashdb"
+                from app.modules.scrapers.support.registry import ProviderRegistry
+                provider_enum = ProviderRegistry.resolve_prefix(source_name)
                 try:
-                    provider_enum = Provider(scraper_name)
                     link = db.query(ExternalSourceLink).filter(
                         ExternalSourceLink.provider == provider_enum,
                         ExternalSourceLink.external_id == uuid_str

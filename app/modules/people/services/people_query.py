@@ -8,9 +8,12 @@ from app.modules.metadata.models import MetadataMatch
 from app.modules.people.schemas import PeopleSearchResponse
 
 class PeopleQueryBuilder:
-    def __init__(self, db: Session, library_port: Any, image_service: Any):
+    def __init__(self, db: Session, resolver: Optional[Any] = None, image_service: Any = None):
         self.db = db
-        self.library_port = library_port
+        if resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            resolver = MediaItemService(db)
+        self.resolver = resolver
         self.image_service = image_service
 
     def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
@@ -30,7 +33,7 @@ class PeopleQueryBuilder:
         db = self.db
         statuses = [ItemStatus.RENAMED, ItemStatus.ORGANIZED]
 
-        matched_match_ids = self.library_port.get_matched_match_ids(statuses)
+        matched_match_ids = self.resolver.get_matched_match_ids(statuses)
         
         join_cond = (MediaPersonLink.person_id == Person.id)
         if matched_match_ids:
@@ -205,20 +208,15 @@ class PeopleQueryBuilder:
         for person, library_count, linked_adult_flag in results:
             external_ids = dict(person.external_ids or {})
             for link in person.external_links:
-                prov_key = link.provider.value
-                if prov_key not in external_ids:
+                from app.modules.scrapers.support.registry import ProviderRegistry
+                cfg = ProviderRegistry.get_config(link.provider)
+                if cfg:
+                    prov_key = cfg.prefix
                     external_ids[prov_key] = link.external_id
-                alt_key = f"{prov_key}_id" if prov_key != "porndb" else "theporndb_id"
-                if alt_key not in external_ids:
-                    external_ids[alt_key] = link.external_id
-            if "tmdb" in external_ids and "tmdb_id" not in external_ids:
-                external_ids["tmdb_id"] = external_ids["tmdb"]
-            if "stashdb" in external_ids and "stashdb_id" not in external_ids:
-                external_ids["stashdb_id"] = external_ids["stashdb"]
-            if "porndb" in external_ids and "theporndb_id" not in external_ids:
-                external_ids["theporndb_id"] = external_ids["porndb"]
-            if "fansdb" in external_ids and "fansdb_id" not in external_ids:
-                external_ids["fansdb_id"] = external_ids["fansdb"]
+                    external_ids[f"{prov_key}_id"] = link.external_id
+                    for alias in cfg.aliases:
+                        external_ids[alias] = link.external_id
+                        external_ids[f"{alias}_id"] = link.external_id
 
             override = overrides.get(person.id)
             people_list.append({

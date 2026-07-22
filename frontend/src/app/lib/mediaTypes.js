@@ -6,6 +6,7 @@ export const MEDIA_TYPES = Object.freeze({
   PERSON: 'person',
   COLLECTION: 'collection',
   SCENE: 'scene',
+  VIDEO: 'video',
 });
 
 const MEDIA_TYPE_ALIASES = Object.freeze({
@@ -26,6 +27,8 @@ const MEDIA_TYPE_ALIASES = Object.freeze({
   scenes: MEDIA_TYPES.SCENE,
   adult_scenes: MEDIA_TYPES.SCENE,
   adult_scene: MEDIA_TYPES.SCENE,
+  video: MEDIA_TYPES.VIDEO,
+  videos: MEDIA_TYPES.VIDEO,
 });
 
 export const normalizeMediaType = (value, fallback = null) => {
@@ -41,7 +44,10 @@ export const normalizeMediaType = (value, fallback = null) => {
 
 export const isMovieMediaType = (value) => normalizeMediaType(value) === MEDIA_TYPES.MOVIE;
 
-export const isSceneMediaType = (value) => normalizeMediaType(value) === MEDIA_TYPES.SCENE;
+export const isSceneMediaType = (value) => {
+  const normalized = normalizeMediaType(value);
+  return normalized === MEDIA_TYPES.SCENE || normalized === MEDIA_TYPES.VIDEO;
+};
 
 
 

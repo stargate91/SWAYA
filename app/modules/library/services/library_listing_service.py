@@ -26,10 +26,13 @@ from app.modules.library.services.listing.query_builders import (
 logger = logging.getLogger(__name__)
 
 class LibraryListingService:
-    def __init__(self, db_session: Session, library_port: Optional[LibraryPort] = None, settings_port: Optional[SettingsPort] = None, active_sessions: Optional[set[int]] = None):
+    def __init__(self, db_session: Session, resolver: Optional[Any] = None, settings: Optional[Any] = None, active_sessions: Optional[set[int]] = None):
         self.db = db_session
-        self.library_port = library_port
-        self.settings = settings_port
+        if resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            resolver = MediaItemService(db_session)
+        self.resolver = resolver
+        self.settings = settings
         self.active_sessions = active_sessions
 
     def get_continue_watching(self, limit: int = 12, include_adult: bool = False) -> List[ContinueWatchingItem]:
@@ -107,8 +110,17 @@ class LibraryListingService:
                             return get_first_int(parsed[0]) if parsed else None
                         return int(parsed)
                     except Exception as e:
-                        logger.debug(f"Swallowed exception in domains/library/services/library_listing_service.py:100: {e}", exc_info=True)
+                        logger.debug(f"Swallowed exception in app/modules/library/services/library_listing_service.py:100: {e}", exc_info=True)
                 return None
+
+            rp = int(o.resume_position) if o.resume_position else 0
+            dur = int(item.duration) if (item and item.duration) else 0
+            prog = round((rp / dur) * 100, 1) if dur > 0 else 0.0
+            prog = min(100.0, prog)
+            rem = max(0, dur - rp) if dur > 0 else 0
+
+            from app.core.episode_utils import format_episode_code
+            disp_code = format_episode_code(match.season_number, match.episode_number) if (match and match.media_type.value == "episode") else None
 
             results.append(ContinueWatchingItem(
                 id=item.id,
@@ -122,11 +134,14 @@ class LibraryListingService:
                 tmdb_id=int(match.external_id) if (match and match.external_id.isdigit()) else None,
                 backdrop_path=match.backdrop_path if match else None,
                 still_path=match.still_path if match else None,
-                resume_position=int(o.resume_position) if o.resume_position else 0,
-                duration=int(item.duration) if (item and item.duration) else 0,
+                resume_position=rp,
+                duration=dur,
+                progress_percent=prog,
+                time_remaining_seconds=rem,
                 is_watched=o.is_watched,
                 last_watched_at=o.last_watched_at.isoformat() if o.last_watched_at else None,
                 is_active=is_active,
+                display_episode_code=disp_code,
             ))
         return results
 
@@ -145,15 +160,13 @@ class LibraryListingService:
             MetadataMatch.media_type == MediaType.SCENE,
             MetadataMatch.is_active,
             MetadataMatch.is_adult == include_adult,
-            MetadataMatch.is_home_video == False
         )
 
         videos_cnt_query = self.db.query(MediaItem).select_from(MediaItem).join(MetadataMatch).filter(
             MediaItem.status.in_(lib_statuses),
-            MetadataMatch.media_type == MediaType.SCENE,
+            MetadataMatch.media_type == MediaType.VIDEO,
             MetadataMatch.is_active,
             MetadataMatch.is_adult == include_adult,
-            MetadataMatch.is_home_video == True
         )
         
         # Unique TV shows count
@@ -179,7 +192,7 @@ class LibraryListingService:
         ).count()
         
         # People count
-        people_service = PeopleLibraryService(self.db, library_port=self.library_port)
+        people_service = PeopleLibraryService(self.db, resolver=self.resolver)
         people_items = people_service.get_people_group(
             role="all",
             filter_status="active",
@@ -275,6 +288,7 @@ class LibraryListingService:
         filter_breast_size: Optional[str] = None,
         filter_butt_shape: Optional[str] = None,
         filter_butt_size: Optional[str] = None,
+        filter_rating: str = "all",
     ) -> LibraryTabResponse:
         """
         Retrieves a paginated, filtered, and sorted list of library items for a specific UI tab.
@@ -308,10 +322,11 @@ class LibraryListingService:
             filter_breast_size=filter_breast_size,
             filter_butt_shape=filter_butt_shape,
             filter_butt_size=filter_butt_size,
+            filter_rating=filter_rating,
         )
 
         if tab in ("people", "adult_people"):
-            builder = PeopleQueryBuilder(self.db, library_port=self.library_port)
+            builder = PeopleQueryBuilder(self.db, resolver=self.resolver)
             total_items, formatted_items = builder.query_people(params)
         else:
             if tab in ("tv", "adult_tv"):

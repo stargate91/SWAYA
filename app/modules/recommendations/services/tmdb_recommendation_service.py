@@ -12,10 +12,10 @@ logger = logging.getLogger(__name__)
 
 
 class TmdbRecommendationService:
-    def __init__(self, db: Session, scraper, settings_port):
+    def __init__(self, db: Session, scraper, settings):
         self.db = db
         self.scraper = scraper
-        self.settings = settings_port
+        self.settings = settings
 
     def _preferred_metadata_language(self) -> str:
         lang = self.settings.get_setting("primary_metadata_language")

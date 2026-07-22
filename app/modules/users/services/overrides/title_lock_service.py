@@ -24,10 +24,6 @@ class TitleLockService:
         return self.service.resolver
 
     @property
-    def library_port(self):
-        return self.service.library_port
-
-    @property
     def scrapers(self):
         return self.service.scrapers
 
@@ -40,7 +36,6 @@ class TitleLockService:
         return self.persister.update_item_overrides(
             db=self.db,
             resolver=self.resolver,
-            library_port=self.library_port,
             title_lock_reader=self.service.title_lock_reader,
             enrich_language_fn=self.service._enrich_language_if_needed,
             track_item_fn=self.track_item,
@@ -51,7 +46,7 @@ class TitleLockService:
         """Applies bulk user override updates across multiple items."""
         return self.persister.bulk_update(
             db=self.db,
-            library_port=self.library_port,
+            resolver=self.resolver,
             title_lock_reader=self.service.title_lock_reader,
             enrich_language_fn=self.service._enrich_language_if_needed,
             request=request

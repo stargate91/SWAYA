@@ -20,15 +20,19 @@ class RenamerEngine:
     def __init__(
         self,
         db_session: Session,
-        library_port: Optional[LibraryPort] = None,
+        resolver: Optional[Any] = None,
         formatter: Optional[Any] = None,
         move_with_progress_fn: Optional[Any] = None,
         send_to_trash_fn: Optional[Any] = None,
     ):
         self.db = db_session
-        self.compiler = PathTemplateCompiler(library_port, formatter)
+        if resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            resolver = MediaItemService(db_session)
+        self.resolver = resolver
+        self.compiler = PathTemplateCompiler(resolver, formatter)
         self.renamer = FilesystemRenamer(
-            db_session, library_port, self.compiler, move_with_progress_fn, send_to_trash_fn
+            db_session, resolver, self.compiler, move_with_progress_fn, send_to_trash_fn
         )
 
     def execute_batch(self, previews: List[RenamePreview], batch_name: Optional[str] = None) -> int:

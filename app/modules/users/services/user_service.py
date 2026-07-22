@@ -7,9 +7,12 @@ from app.core.exceptions import BadRequestException
 logger = logging.getLogger(__name__)
 
 class UserService:
-    def __init__(self, db: Session, library_port: Optional[Any] = None):
+    def __init__(self, db: Session, resolver: Optional[Any] = None):
         self.db = db
-        self.library_port = library_port
+        if resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            resolver = MediaItemService(db)
+        self.resolver = resolver
 
     def list_users(self) -> List[User]:
         """Retrieve all users."""
@@ -111,8 +114,8 @@ class UserService:
         override.custom_logo = override_data_dict.get("custom_logo")
         override.custom_language = override_data_dict.get("custom_language")
 
-        if media_item_id and self.library_port:
-            self.library_port.update_custom_media_item_fields(
+        if media_item_id and self.resolver:
+            self.resolver.update_custom_media_item_fields(
                 media_item_id,
                 edition=override_data_dict.get("custom_edition"),
                 audio_type=override_data_dict.get("custom_audio_type"),
@@ -148,7 +151,7 @@ class UserService:
                 item_id_int = int(item_id)
                 res.update(service.update_item_status(item_id_int, status))
             except ValueError as e:
-                logger.debug(f"Swallowed exception in domains/users/services/user_service.py:149: {e}", exc_info=True)
+                logger.debug(f"Swallowed exception in app/modules/users/services/user_service.py:149: {e}", exc_info=True)
 
         has_overrides = any(
             field in model_fields_set

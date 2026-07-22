@@ -280,10 +280,10 @@ class CustomListItemResponse(BaseModel):
     provider: Optional[str] = None
     release_date: Optional[str] = None
     people: Optional[List[dict[str, Any]]] = None
-    is_home_video: Optional[bool] = False
     last_air_date: Optional[str] = None
     release_status: Optional[str] = None
     already_exists: Optional[bool] = False
+    target_path: Optional[str] = None
 
 
 class CustomListResponse(BaseModel):
@@ -309,6 +309,7 @@ class CustomListDetailResponse(BaseModel):
     created_at: Optional[str] = None
     items: List[CustomListItemResponse]
     custom_image_path: Optional[str] = None
+    genres: Optional[List[str]] = None
 
 
 class ListMembershipItem(BaseModel):

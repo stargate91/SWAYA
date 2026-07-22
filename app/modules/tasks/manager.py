@@ -281,6 +281,24 @@ class TaskManager:
                     return True
         return False
 
+    def cleanup_stale_tasks(self) -> None:
+        """Mark any PENDING or RUNNING tasks from a previous session as FAILED/ABORTED."""
+        db = self.session_factory()
+        try:
+            stale_tasks = db.query(BackgroundTask).filter(
+                BackgroundTask.status.in_([TaskStatus.PENDING, TaskStatus.RUNNING])
+            ).all()
+            for t in stale_tasks:
+                t.status = TaskStatus.FAILED
+                t.error_code = TaskErrorCode.UNKNOWN
+                t.error_message = "Task aborted due to system shutdown or restart."
+            db.commit()
+            logger.info(f"Cleaned up {len(stale_tasks)} stale background tasks.")
+        except Exception as e:
+            logger.error(f"Failed to cleanup stale tasks: {e}")
+        finally:
+            db.close()
+
     @property
     def executor(self) -> Any:
         return self._executor

@@ -27,7 +27,7 @@ class VideoQueryBuilder(BaseQueryBuilder):
             MetadataMatch.media_item_id.isnot(None),
             MediaItem.status.in_(self.lib_statuses),
             MetadataMatch.is_active,
-            MetadataMatch.is_home_video == True
+            MetadataMatch.media_type == MediaType.VIDEO
         )
 
         if params.selected_performer_id:
@@ -55,8 +55,7 @@ class VideoQueryBuilder(BaseQueryBuilder):
             MetadataMatch.media_item_id.isnot(None),
             MetadataMatch.is_active,
             MetadataMatch.is_adult == params.include_adult,
-            MetadataMatch.media_type == MediaType.SCENE,
-            MetadataMatch.is_home_video == True
+            MetadataMatch.media_type == MediaType.VIDEO
         ).group_by(MetadataMatch.media_item_id).subquery()
         query = query.filter(MetadataMatch.id.in_(select(canonical_match_ids.c.min_id)))
 

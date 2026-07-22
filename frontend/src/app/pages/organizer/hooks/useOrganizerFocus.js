@@ -12,12 +12,12 @@ import { isMovieMediaType, isTvLikeMediaType } from '@/lib/mediaTypes';
 const normalizeType = (value) => String(value || '').toLowerCase();
 const isSceneType = (value) => normalizeType(value) === 'scene';
 const isRegularMovieType = (value) => isMovieMediaType(value);
-const isPornDbMovieMode = (scanMode) => scanMode === 'porndb_movie';
+const isAdultMovieMode = (scanMode, sessionMode) => scanMode === 'movies_tv' && sessionMode === 'nsfw';
 
-const isExtraForMode = (item, scanMode) => {
+const isExtraForMode = (item, scanMode, sessionMode) => {
   const parentType = String(item.parent_type || '').toLowerCase();
   if (scanMode === 'scenes') return parentType === 'scene';
-  if (isPornDbMovieMode(scanMode)) return parentType === 'movie';
+  if (isAdultMovieMode(scanMode, sessionMode)) return parentType === 'movie';
   return parentType !== 'scene';
 };
 
@@ -34,6 +34,7 @@ export function useOrganizerFocus({
   setCurrentPage,
   setIsDetailsCollapsed,
   scanMode,
+  sessionMode,
   activeMainTab,
   activeManualTab,
   activeExtrasTab,
@@ -103,7 +104,7 @@ export function useOrganizerFocus({
           { mainTab: 'manual', rows: manualSceneRows, manualTab: 'scenes' },
           { mainTab: 'extras', rows: extraRows, extrasTab: firstExtraTab },
         ]
-      : isPornDbMovieMode(scanMode)
+      : isAdultMovieMode(scanMode, sessionMode)
         ? [
             { mainTab: 'movies', rows: movieRows },
             { mainTab: 'manual', rows: manualMovieRows, manualTab: 'movies' },

@@ -40,8 +40,8 @@ class BaseScanPipeline:
         min_duration_minutes: float,
         progress_callback: Optional[Callable],
         provider: Optional[str] = None,
-        fs_port: Optional[FileSystemPort] = None,
-        settings_port: Optional[Any] = None,
+        fs: Optional[Any] = None,
+        settings: Optional[Any] = None,
     ) -> ScanCollector:
         collector = Collector(min_size_mb)
         return ScanCollector(
@@ -55,8 +55,8 @@ class BaseScanPipeline:
             min_video_duration_minutes=min_duration_minutes,
             progress_callback=progress_callback,
             provider=provider,
-            fs=fs_port,
-            settings_port=settings_port,
+            fs=fs,
+            settings=settings,
         )
 
 
@@ -86,19 +86,6 @@ class ScenesScanPipeline(BaseScanPipeline):
         )
 
 
-class PornDbMovieScanPipeline(BaseScanPipeline):
-    def __init__(self):
-        super().__init__(ScanMode.PORNDB_MOVIE)
-
-    def threshold_config(self) -> ScanThresholdConfig:
-        return ScanThresholdConfig(
-            size_key='adult_min_video_size_mb',
-            duration_key='adult_min_video_duration_minutes',
-            default_size_mb=1.0,
-            default_duration_minutes=0.1,
-        )
-
-
 class OfflineScanPipeline(BaseScanPipeline):
     def __init__(self):
         super().__init__(ScanMode.OFFLINE)
@@ -115,8 +102,6 @@ class OfflineScanPipeline(BaseScanPipeline):
 def get_scan_pipeline(mode: ScanMode) -> BaseScanPipeline:
     if mode == ScanMode.SCENES:
         return ScenesScanPipeline()
-    if mode == ScanMode.PORNDB_MOVIE:
-        return PornDbMovieScanPipeline()
     if mode == ScanMode.OFFLINE:
         return OfflineScanPipeline()
     return MainstreamScanPipeline()

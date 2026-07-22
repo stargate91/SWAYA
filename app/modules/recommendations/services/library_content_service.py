@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 
 
 class LibraryContentService:
-    def __init__(self, db: Session, settings_port):
+    def __init__(self, db: Session, settings):
         self.db = db
-        self.settings = settings_port
+        self.settings = settings
 
     def _preferred_metadata_language(self) -> str:
         lang = self.settings.get_setting("primary_metadata_language")
@@ -68,12 +68,12 @@ class LibraryContentService:
             filter_conds.append(MetadataMatch.media_type == MediaType.EPISODE)
         elif media_type == "scene":
             filter_conds.append(MetadataMatch.media_type == MediaType.SCENE)
-            filter_conds.append(MetadataMatch.is_home_video == False)
         elif media_type == "video":
-            filter_conds.append(MetadataMatch.media_type == MediaType.SCENE)
-            filter_conds.append(MetadataMatch.is_home_video == True)
+            filter_conds.append(MetadataMatch.media_type == MediaType.VIDEO)
         else:
-            filter_conds.append(MetadataMatch.media_type.in_([MediaType.MOVIE, MediaType.EPISODE, MediaType.SCENE]))
+            types = [MediaType.MOVIE, MediaType.EPISODE]
+            types.extend([x for x in MediaType if x.is_adult])
+            filter_conds.append(MetadataMatch.media_type.in_(types))
             
         recent_matches = self.db.query(
             func.max(MediaItem.id).label("max_media_id"),

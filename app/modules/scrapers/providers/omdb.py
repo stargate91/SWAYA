@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 class OMDBScraper(BaseScraper):
     """OMDB-specific metadata retriever."""
 
-    def __init__(self, settings_port, cache_service=None):
-        super().__init__(settings_port, cache_service, Provider.OMDB)
+    def __init__(self, settings, cache_service=None):
+        super().__init__(settings, cache_service, Provider.OMDB)
 
     def fetch_omdb(self, imdb_id: str, force_refresh: bool = False) -> Optional[dict]:
         """Fetches additional ratings/details from OMDB (always SFW and non-localized)."""
@@ -25,30 +25,19 @@ class OMDBScraper(BaseScraper):
             return None
 
         cache_key = f"omdb/{imdb_id}"
-        cached_data = self.cache.get(Provider.OMDB, cache_key, force_refresh=force_refresh)
-        if cached_data:
-            if cached_data.get("cached_error"):
-                return None
-            return cached_data
-
         url = OMDB_DEFAULT_ENDPOINT
         params = {"apikey": api_key, "i": imdb_id}
-        try:
-            resp = self.session.get(url, params=params, timeout=OMDB_REQUEST_TIMEOUT)
-            if resp.status_code == 200:
-                data = resp.json()
-                if data.get("Response") == "True":
-                    self.cache.set(Provider.OMDB, cache_key, data, status_code=200, external_id=imdb_id)
-                    return data
-                else:
-                    self.cache.set(Provider.OMDB, cache_key, {}, status_code=404, external_id=imdb_id)
-                    return None
-            else:
-                self.cache.set(Provider.OMDB, cache_key, {}, status_code=resp.status_code, external_id=imdb_id)
-                return None
-        except Exception as e:
-            logger.error(f"Error querying OMDB for {imdb_id}: {e}")
-            return None
+        
+        return self.get_json_cached(
+            Provider.OMDB,
+            cache_key,
+            url,
+            params=params,
+            force_refresh=force_refresh,
+            external_id=imdb_id,
+            result_extractor=lambda d: d if d.get("Response") == "True" else None,
+            timeout=OMDB_REQUEST_TIMEOUT,
+        )
 
     def update_omdb_ratings(self, match: MetadataMatch, raw_data: dict) -> None:
         """Parses OMDB raw ratings and updates the MetadataMatch record."""

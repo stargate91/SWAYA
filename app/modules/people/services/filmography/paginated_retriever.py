@@ -7,21 +7,26 @@ from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.core.language import LanguageService
 
 class PaginatedCreditsRetriever:
-    def __init__(self, db: Session, library_port: Any, resolve_img_fn: Any, fetch_remote_credits_fn: Any):
+    def __init__(self, db: Session, resolver: Optional[Any] = None, resolve_img_fn: Any = None, fetch_remote_credits_fn: Any = None):
         self.db = db
-        self.library_port = library_port
+        if resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            resolver = MediaItemService(db)
+        self.resolver = resolver
         self.resolve_img_fn = resolve_img_fn
         self.fetch_remote_credits_fn = fetch_remote_credits_fn
 
     def get_person_movies(self, person_id: int, page: int = 1, page_size: int = 12, source: Optional[str] = None, local_only: bool = False):
         """Fetches paginated, formatted movies that a performer is credited in."""
-        if not local_only and source and source.lower() in ("porndb", "stashdb", "fansdb"):
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        resolved = ProviderRegistry.resolve_prefix(source) if source else None
+        if not local_only and resolved and ProviderRegistry.is_adult_provider(resolved):
             res = self.fetch_remote_credits_fn(person_id, source, "movie", page, page_size)
             if res:
                 return res
                 
         db = self.db
-        active_match_ids = self.library_port.get_active_match_ids(media_type="movie", provider=source)
+        active_match_ids = self.resolver.get_active_match_ids(media_type="movie", provider=source)
         links = db.query(MediaPersonLink).filter(
             MediaPersonLink.person_id == person_id,
             MediaPersonLink.match_id.in_(active_match_ids)
@@ -29,9 +34,9 @@ class PaginatedCreditsRetriever:
         
         movies = []
         from app.core.language import get_user_ui_language
-        from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-        settings_port = DbSettingsAdapter(db)
-        ui_lang = get_user_ui_language(settings_port)
+        from app.modules.settings.services.settings_service import SettingsService
+        settings = SettingsService(db)
+        ui_lang = get_user_ui_language(settings)
         for link in links:
             match = link.match
             item = match.media_item
@@ -70,7 +75,7 @@ class PaginatedCreditsRetriever:
     def get_person_tv(self, person_id: int, page: int = 1, page_size: int = 12):
         """Fetches paginated, formatted TV shows that a performer is credited in."""
         db = self.db
-        active_match_ids = self.library_port.get_active_match_ids(media_type="tv_or_episode")
+        active_match_ids = self.resolver.get_active_match_ids(media_type="tv_or_episode")
         links = db.query(MediaPersonLink).filter(
             MediaPersonLink.person_id == person_id,
             MediaPersonLink.match_id.in_(active_match_ids)
@@ -78,9 +83,9 @@ class PaginatedCreditsRetriever:
         
         tv_map = {}
         from app.core.language import get_user_ui_language
-        from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-        settings_port = DbSettingsAdapter(db)
-        ui_lang = get_user_ui_language(settings_port)
+        from app.modules.settings.services.settings_service import SettingsService
+        settings = SettingsService(db)
+        ui_lang = get_user_ui_language(settings)
         for link in links:
             match = link.match
             item = match.media_item
@@ -121,13 +126,15 @@ class PaginatedCreditsRetriever:
 
     def get_person_scenes(self, person_id: int, page: int = 1, page_size: int = 12, source: Optional[str] = None, local_only: bool = False):
         """Fetches paginated, formatted scenes (adult) that a performer is credited in."""
-        if not local_only and source and source.lower() in ("porndb", "stashdb", "fansdb"):
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        resolved = ProviderRegistry.resolve_prefix(source) if source else None
+        if not local_only and resolved and ProviderRegistry.is_adult_provider(resolved):
             res = self.fetch_remote_credits_fn(person_id, source, "scene", page, page_size)
             if res:
                 return res
                 
         db = self.db
-        active_match_ids = self.library_port.get_active_match_ids(media_type="scene", provider=source)
+        active_match_ids = self.resolver.get_active_match_ids(media_type="scene", provider=source)
         links = db.query(MediaPersonLink).filter(
             MediaPersonLink.person_id == person_id,
             MediaPersonLink.match_id.in_(active_match_ids)
@@ -135,9 +142,9 @@ class PaginatedCreditsRetriever:
         
         scenes = []
         from app.core.language import get_user_ui_language
-        from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-        settings_port = DbSettingsAdapter(db)
-        ui_lang = get_user_ui_language(settings_port)
+        from app.modules.settings.services.settings_service import SettingsService
+        settings = SettingsService(db)
+        ui_lang = get_user_ui_language(settings)
         for link in links:
             match = link.match
             item = match.media_item

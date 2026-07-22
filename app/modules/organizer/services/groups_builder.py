@@ -24,20 +24,26 @@ class OrganizerGroupsBuilder:
     def get_organizer_groups(
         self,
         db: Session,
-        scan_mode: Optional[str],
-        session_mode: Optional[str],
-        pref_lang: str
-    ) -> OrganizerGroupsResponse:
-        """Processes unorganized files and categorizes them into Movies, TV Shows, Extras, and Manual resolution groups."""
+        page: int = 1,
+        page_size: int = 40,
+        tab: str = "manual",
+        sub_tab: Optional[str] = None,
+        q: Optional[str] = None,
+        sort_by: str = "source",
+        sort_dir: str = "asc",
+        scan_mode: Optional[str] = None,
+        session_mode: Optional[str] = None,
+        pref_lang: str = "en"
+    ) -> Any:
+        """Processes unorganized files and categorizes them into Movies, TV Shows, Extras, and Manual resolution groups with server-side pagination, sorting, and search."""
         items = OrganizerHelper.get_unorganized_media_items(db, scan_mode, session_mode)
 
         from app.core.user_context import get_current_user_id
         current_uid = get_current_user_id()
 
-        from app.modules.settings.adapters.formatter_config_adapter import build_formatter_from_db
+        from app.modules.settings.services.formatter_config_service import build_formatter_from_db
         formatter = build_formatter_from_db(db, user_id=current_uid)
 
-        groups = {"manual": [], "movies": [], "tv": [], "extras": [], "collisions": []}
         parent_planned_paths = {}
         parent_types = {}
         parent_statuses = {}
@@ -82,6 +88,7 @@ class OrganizerGroupsBuilder:
         if previews:
             formatter.resolve_collisions(previews)
 
+        all_item_dtos = []
         for item in items:
             active_match = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
             if active_match and not active_match.is_active:
@@ -105,7 +112,7 @@ class OrganizerGroupsBuilder:
                 tv_loc = None
                 
                 resolved_poster = None
-                if m.media_type.value == "scene":
+                if m.media_type.is_adult:
                     resolved_poster = self._resolve_image_with_fallback(m.local_backdrop_path, m.backdrop_path, "scene_stills")
                     if not resolved_poster:
                         resolved_poster = self._resolve_image_with_fallback(m.local_still_path, m.still_path, "stills")
@@ -141,7 +148,6 @@ class OrganizerGroupsBuilder:
                     "confidence": m.confidence_score,
                     "is_adult": m.is_adult,
                     "provider": m.provider.value if m.provider else None,
-                    "is_home_video": m.is_home_video,
                     "last_air_date": (tv_show_match.last_air_date.isoformat() if tv_show_match.last_air_date else None) if tv_show_match else (m.last_air_date.isoformat() if m.last_air_date else None),
                     "release_status": tv_show_match.release_status if tv_show_match else m.release_status
                 })
@@ -182,6 +188,54 @@ class OrganizerGroupsBuilder:
             custom_audio_type_val = item.custom_audio_type.value if item.custom_audio_type else (item.audio_type.value if item.audio_type else "none")
             custom_source_val = item.custom_source.value if item.custom_source else (item.source.value if item.source else "none")
 
+            has_collision = getattr(preview, "has_collision", False) if preview else False
+            source_fn = item.filename.split("/")[-1].split("\\")[-1]
+            target_fn = planned_path.split("/")[-1] if planned_path else "-"
+            
+            st_lower = item.status.value.lower()
+            if has_collision or st_lower == "error":
+                status_tone = "danger"
+            elif st_lower in ("new", "uncertain", "no_match", "multiple"):
+                status_tone = "warning"
+            elif st_lower in ("matched", "renamed", "organized"):
+                status_tone = "success"
+            else:
+                status_tone = "default"
+                
+            if has_collision:
+                display_status = "Collision"
+            elif st_lower in ("matched", "renamed", "organized"):
+                display_status = "Ready"
+            elif st_lower == "no_match":
+                display_status = "No Match"
+            elif st_lower == "uncertain":
+                display_status = "Uncertain"
+            elif st_lower == "multiple":
+                display_status = "Multiple Matches"
+            elif st_lower == "error":
+                display_status = "Error"
+            else:
+                display_status = "Pending"
+                
+            type_lower = itype.lower()
+            if type_lower == "episode":
+                display_type = "Episode"
+            elif type_lower == "movie":
+                display_type = "Movie"
+            elif type_lower == "tv":
+                display_type = "TV Show"
+            elif type_lower == "scene":
+                display_type = "Adult Scene"
+            elif type_lower == "extra":
+                display_type = "Extra"
+            else:
+                display_type = "Media"
+
+            is_manual_val = item.status in [ItemStatus.NEW, ItemStatus.UNCERTAIN, ItemStatus.NO_MATCH, ItemStatus.MULTIPLE, ItemStatus.ERROR]
+            is_movie_val = itype == "movie"
+            is_tv_val = itype in ("tv", "season", "episode")
+            is_scene_val = itype in ("scene", "video")
+
             item_dto = {
                 "id": item.id,
                 "filename": item.filename,
@@ -202,17 +256,19 @@ class OrganizerGroupsBuilder:
                 "custom_edition": custom_edition_val,
                 "custom_audio_type": custom_audio_type_val,
                 "custom_source": custom_source_val,
-                "parsed_info": item.parsed_info or {}
+                "parsed_info": item.parsed_info or {},
+                "source_filename": source_fn,
+                "target_filename": target_fn,
+                "status_tone": status_tone,
+                "display_type": display_type,
+                "display_status": display_status,
+                "has_collision": has_collision,
+                "is_manual": is_manual_val,
+                "is_movie": is_movie_val,
+                "is_tv": is_tv_val,
+                "is_scene": is_scene_val
             }
-
-            if item.status in [ItemStatus.NEW, ItemStatus.UNCERTAIN, ItemStatus.NO_MATCH, ItemStatus.MULTIPLE, ItemStatus.ERROR]:
-                groups["manual"].append(item_dto)
-            else:
-                is_movie = any(m.media_type == MediaType.MOVIE for m in item.matches)
-                if is_movie:
-                    groups["movies"].append(item_dto)
-                else:
-                    groups["tv"].append(item_dto)
+            all_item_dtos.append(item_dto)
 
         extras = OrganizerHelper.get_unorganized_extra_files(db, scan_mode, session_mode)
 
@@ -257,10 +313,11 @@ class OrganizerGroupsBuilder:
 
         formatter.resolve_collisions(extra_previews)
 
+        all_extra_dtos = []
         for ex, preview in zip(extras, extra_previews):
             parent_p_path = parent_planned_paths.get(ex.media_item_id) or ""
             parent_name = Path(parent_p_path).stem if parent_p_path else Path(ex.media_item.filename).stem
-            groups["extras"].append({
+            all_extra_dtos.append({
                 "id": ex.id,
                 "parent_id": ex.media_item_id,
                 "parent_type": parent_types.get(ex.media_item_id, "unknown"),
@@ -278,4 +335,127 @@ class OrganizerGroupsBuilder:
                 "parent_is_adult": parent_is_adults.get(ex.media_item_id, False)
             })
 
-        return OrganizerGroupsResponse(**groups)
+        # Calculate counts
+        manual_movies = [it for it in all_item_dtos if it["is_manual"] and it["is_movie"]]
+        manual_episodes = [it for it in all_item_dtos if it["is_manual"] and it["is_tv"]]
+        manual_scenes = [it for it in all_item_dtos if it["is_manual"] and it["is_scene"]]
+
+        movies = [it for it in all_item_dtos if not it["is_manual"] and it["is_movie"]]
+        episodes = [it for it in all_item_dtos if not it["is_manual"] and it["is_tv"]]
+        scenes = [it for it in all_item_dtos if not it["is_manual"] and it["is_scene"]]
+
+        matched_parent_ids = {it["id"] for it in movies + episodes + scenes}
+        valid_extras = [ex for ex in all_extra_dtos if ex["parent_id"] in matched_parent_ids]
+
+        tab_counts = {
+            "manualCount": len(manual_movies) + len(manual_episodes) + len(manual_scenes),
+            "manualMoviesCount": len(manual_movies),
+            "manualEpisodesCount": len(manual_episodes),
+            "manualScenesCount": len(manual_scenes),
+            "moviesCount": len(movies),
+            "episodesCount": len(episodes),
+            "scenesCount": len(scenes),
+            "extrasCount": len(valid_extras),
+            "extraBonusCount": len([ex for ex in valid_extras if ex["category"] == "video"]),
+            "extraSubtitlesCount": len([ex for ex in valid_extras if ex["category"] == "subtitle"]),
+            "extraAudioCount": len([ex for ex in valid_extras if ex["category"] == "audio"]),
+            "extraImagesCount": len([ex for ex in valid_extras if ex["category"] == "image"]),
+            "extraMetadataCount": len([ex for ex in valid_extras if ex["category"] == "metadata"]),
+        }
+
+        # Filter target list
+        EXTRA_CATEGORY_BY_TAB = {
+            "bonus": "video",
+            "subtitles": "subtitle",
+            "audio": "audio",
+            "images": "image",
+            "metadata": "metadata"
+        }
+
+        if tab == "manual":
+            target_list = [it for it in all_item_dtos if it["is_manual"]]
+            if sub_tab == "movies":
+                target_list = [it for it in target_list if it["is_movie"]]
+            elif sub_tab == "episodes":
+                target_list = [it for it in target_list if it["is_tv"]]
+            elif sub_tab == "scenes":
+                target_list = [it for it in target_list if it["is_scene"]]
+        elif tab == "movies":
+            target_list = [it for it in all_item_dtos if not it["is_manual"] and it["is_movie"]]
+        elif tab == "episodes":
+            target_list = [it for it in all_item_dtos if not it["is_manual"] and it["is_tv"]]
+        elif tab == "scenes":
+            target_list = [it for it in all_item_dtos if not it["is_manual"] and it["is_scene"]]
+        elif tab == "extras":
+            target_list = valid_extras
+            if sub_tab in EXTRA_CATEGORY_BY_TAB:
+                target_list = [ex for ex in target_list if ex["category"] == EXTRA_CATEGORY_BY_TAB[sub_tab]]
+        else:
+            target_list = []
+
+        # Apply search filter q
+        if q:
+            q_clean = q.lower().strip()
+            def matches_query(dto: dict) -> bool:
+                fields = [
+                    dto.get("source_filename"),
+                    dto.get("target_filename"),
+                    dto.get("display_type"),
+                    dto.get("display_status"),
+                    dto.get("target_language"),
+                    dto.get("extension")
+                ]
+                return any(q_clean in str(f).lower() for f in fields if f)
+
+            def matches_query_extra(dto: dict) -> bool:
+                fields = [
+                    dto.get("filename"),
+                    dto.get("planned_path", "").split("/")[-1],
+                    dto.get("parent_name"),
+                    dto.get("category"),
+                    dto.get("subtype"),
+                    dto.get("language"),
+                    dto.get("extension")
+                ]
+                return any(q_clean in str(f).lower() for f in fields if f)
+
+            if tab == "extras":
+                target_list = [ex for ex in target_list if matches_query_extra(ex)]
+            else:
+                target_list = [it for it in target_list if matches_query(it)]
+
+        # Apply sorting
+        def get_sort_key(x, sort_by):
+            if sort_by == "source":
+                return str(x.get("source_filename") or x.get("filename") or "").lower()
+            if sort_by == "target":
+                t_fn = x.get("target_filename")
+                if not t_fn and "planned_path" in x:
+                    t_fn = x["planned_path"].split("/")[-1]
+                return str(t_fn or "").lower()
+            if sort_by == "type":
+                return str(x.get("display_type") or "extra").lower()
+            if sort_by == "status":
+                return str(x.get("display_status") or x.get("action") or "").lower()
+            if sort_by == "category":
+                return str(x.get("category") or "-").lower()
+            if sort_by == "language":
+                return str(x.get("target_language") or x.get("language") or "-").lower()
+            if sort_by == "extension":
+                return str(x.get("extension") or "").lower()
+            return ""
+
+        reverse_sort = (sort_dir == "desc")
+        target_list.sort(key=lambda x: get_sort_key(x, sort_by), reverse=reverse_sort)
+
+        # Slice for pagination
+        total_items = len(target_list)
+        start = (page - 1) * page_size
+        end = start + page_size
+        paginated_items = target_list[start:end]
+
+        return {
+            "items": paginated_items,
+            "total_items": total_items,
+            "tab_counts": tab_counts
+        }

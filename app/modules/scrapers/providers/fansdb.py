@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 class FansDBScraper(BaseScraper):
     """FansDB-specific metadata retriever and parser utilizing GraphQL and ScraperNormalizer."""
 
-    def __init__(self, settings_port, cache_service=None):
-        super().__init__(settings_port, cache_service, Provider.FANSDB)
+    def __init__(self, settings, cache_service=None):
+        super().__init__(settings, cache_service, Provider.FANSDB)
 
     def fetch_scene(self, scene_id: str, force_refresh: bool = False) -> Optional[dict]:
         """Queries FansDB GraphQL endpoint for scene info. Always mapped to English locale."""
@@ -101,36 +101,37 @@ class FansDBScraper(BaseScraper):
         headers = {"ApiKey": api_token, "Content-Type": "application/json"}
         payload = {"query": query, "variables": {"id": scene_id}}
 
-        try:
-            resp = self.session.post(endpoint, json=payload, headers=headers, timeout=SCRAPER_REQUEST_TIMEOUT)
-            if resp.status_code == 200:
-                result = resp.json()
-                if "errors" in result:
-                    logger.error(f"GraphQL errors from FansDB: {result['errors']}")
-                    return None
-                data = result.get("data", {}).get("findScene")
-                if data:
-                    for p_entry in data.get("performers") or []:
-                        perf = p_entry.get("performer")
-                        if perf:
-                            perf["measurements"] = {
-                                "band_size": perf.get("band_size"),
-                                "cup_size": perf.get("cup_size"),
-                                "waist": perf.get("waist_size"),
-                                "hip": perf.get("hip_size"),
-                            }
-                            if "urls" in perf and isinstance(perf["urls"], list):
-                                perf["urls"] = [u.get("url") for u in perf["urls"] if u and u.get("url")]
-                    self.cache.set(Provider.FANSDB, cache_key, data, status_code=200, media_type=MediaType.SCENE, external_id=scene_id)
-                    return data
-                else:
-                    self.cache.set(Provider.FANSDB, cache_key, {}, status_code=404, media_type=MediaType.SCENE, external_id=scene_id)
-                    return None
-            else:
-                self.cache.set(Provider.FANSDB, cache_key, {}, status_code=resp.status_code, media_type=MediaType.SCENE, external_id=scene_id)
+        def extract_and_map_measurements(result):
+            if "errors" in result:
+                logger.error(f"GraphQL errors from FansDB: {result['errors']}")
                 return None
-        except Exception as e:
-            logger.error(f"Error querying FansDB GraphQL for scene {scene_id}: {e}")
-            return None
+            data = result.get("data", {}).get("findScene")
+            if data:
+                for p_entry in data.get("performers") or []:
+                    perf = p_entry.get("performer")
+                    if perf:
+                        perf["measurements"] = {
+                            "band_size": perf.get("band_size"),
+                            "cup_size": perf.get("cup_size"),
+                            "waist": perf.get("waist_size"),
+                            "hip": perf.get("hip_size"),
+                        }
+                        if "urls" in perf and isinstance(perf["urls"], list):
+                            perf["urls"] = [u.get("url") for u in perf["urls"] if u and u.get("url")]
+            return data
+
+        return self.get_json_cached(
+            Provider.FANSDB,
+            cache_key,
+            endpoint,
+            method="POST",
+            json_data=payload,
+            headers=headers,
+            force_refresh=force_refresh,
+            media_type=MediaType.SCENE,
+            external_id=scene_id,
+            result_extractor=extract_and_map_measurements,
+            timeout=SCRAPER_REQUEST_TIMEOUT,
+        )
 
 

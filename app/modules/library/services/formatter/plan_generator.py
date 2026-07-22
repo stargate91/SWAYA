@@ -65,7 +65,7 @@ class PlanGenerator:
                 media_type = MediaType.MOVIE
 
         if is_inplace:
-            if media_type == MediaType.SCENE:
+            if MediaType.is_adult_type(media_type) or media_type == MediaType.VIDEO:
                 target_name = self.formatter.format_scene_filename(self.formatter.build_scene_context(item, match, loc, people_links=people_links))
             elif media_type == MediaType.MOVIE:
                 target_name = self.formatter.format_movie_filename(self.formatter.build_movie_context(item, match, loc), is_adult=is_adult)
@@ -73,7 +73,7 @@ class PlanGenerator:
                 target_name = self.formatter.format_episode_filename(self.formatter.build_tv_context(item, match, loc), is_adult=is_adult)
             return target_name, ""
 
-        if media_type == MediaType.SCENE:
+        if MediaType.is_adult_type(media_type) or media_type == MediaType.VIDEO:
             context = self.formatter.build_scene_context(item, match, loc, people_links=people_links)
             target_name = self.formatter.format_scene_filename(context)
             

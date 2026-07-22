@@ -11,15 +11,21 @@ from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 logger = logging.getLogger(__name__)
 
 class PeopleSearchService:
-    def __init__(self, db: Session, scrapers: Any, library_port: Any, image_service: Any, people_repo: Any = None):
+    def __init__(self, db: Session, scrapers: Any, resolver: Optional[Any] = None, image_service: Optional[Any] = None, people_repo: Any = None):
         self.db = db
         self.scrapers = scrapers
         self.tmdb = scrapers.tmdb(db)
-        self.library_port = library_port
+        if resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            resolver = MediaItemService(db)
+        self.resolver = resolver
+        if image_service is None:
+            from app.modules.images.services.image_processing_service import ImageProcessingService
+            image_service = ImageProcessingService(db)
         self.image_service = image_service
         if people_repo is None:
-            from app.modules.people.db_people_repository import DbPeopleRepository
-            people_repo = DbPeopleRepository(db)
+            from app.modules.people.services.person_service import PersonService
+            people_repo = PersonService(db)
         self.people_repo = people_repo
 
     def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
@@ -39,12 +45,18 @@ class PeopleSearchService:
                 h = hashlib.sha256(f"{src}:{u_str}".encode()).hexdigest()
                 return int(h[:7], 16)
 
-            sources_to_search = ["stashdb", "fansdb", "theporndb"] if source == "all" else [source]
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            if source == "all":
+                sources_to_search = [cfg.prefix for cfg in ProviderRegistry._configs.values() if cfg.is_adult]
+            else:
+                sources_to_search = [source]
+
             for source_name in sources_to_search:
                 try:
-                    scraper_name = "porndb" if source_name == "theporndb" else source_name
+                    provider_enum = ProviderRegistry.get_provider_by_prefix(source_name)
+                    if not provider_enum:
+                        continue
                     try:
-                        provider_enum = Provider(scraper_name)
                         scraper_client = self.scrapers.adult(provider_enum, db)
                     except Exception:
                         scraper_client = None
@@ -80,7 +92,7 @@ class PeopleSearchService:
 
                         is_linked = False
                         if person:
-                            active_match_ids = self.library_port.get_active_match_ids()
+                            active_match_ids = self.resolver.get_active_match_ids()
                             linked_rows = (
                                 db.query(MediaPersonLink.person_id)
                                 .filter(
@@ -97,7 +109,7 @@ class PeopleSearchService:
                             "name": perf.get("name"),
                             "adult": True,
                             "gender": mapped_gender,
-                            "profile_path": profile_url,
+                            "profile_path": self._resolve_img(profile_url, "people") if profile_url else None,
                             "known_for_department": "Acting",
                             "known_for": [],
                             "is_active": bool(person.is_active) if person else False,
@@ -140,7 +152,7 @@ class PeopleSearchService:
                 ).all()
             }
 
-            active_match_ids = self.library_port.get_active_match_ids()
+            active_match_ids = self.resolver.get_active_match_ids()
             linked_rows = (
                 db.query(MediaPersonLink.person_id)
                 .filter(
@@ -210,10 +222,10 @@ class PeopleSearchService:
             source_name = parts[0]
             uuid_str = parts[1]
             
-            scraper_name = "porndb" if source_name == "theporndb" else source_name
-            if scraper_name == "stash":
-                scraper_name = "stashdb"
-            provider_enum = Provider(scraper_name)
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            provider_enum = ProviderRegistry.resolve_prefix(source_name)
+            if not provider_enum:
+                return {"status": "error", "message": f"Unsupported provider: {source_name}"}
 
             link = db.query(ExternalSourceLink).filter(
                 ExternalSourceLink.provider == provider_enum,
@@ -276,9 +288,9 @@ class PeopleSearchService:
             if profile_url:
                 try:
                     import os
-                    from app.modules.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+                    from app.modules.tasks.image_download_service import ImageDownloadService
                     from app.modules.media_assets.services.images import image_processing_service, image_path_resolver
-                    adapter = TasksImageDownloadAdapter()
+                    adapter = ImageDownloadService()
                     ext = os.path.splitext(profile_url)[1].lower() or ".jpg"
                     if ext == ".jpeg":
                         ext = ".jpg"

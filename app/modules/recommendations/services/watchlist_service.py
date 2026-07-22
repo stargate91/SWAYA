@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.core.enums import Provider
 from app.modules.users.models import CustomList
 from app.modules.recommendations.schemas import ActionResponse
-from app.modules.users.services.lists_service import ListsService as DomainListsService
+from app.modules.users.services.lists_service import ListsService
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class RecommendationWatchlistService:
     def __init__(self, db: Session):
         self.db = db
-        self.lists_service = DomainListsService(db)
+        self.lists_service = ListsService(db)
 
     def fetch_watchlist_ids(self) -> List[Union[int, str]]:
         watchlist = self.db.query(CustomList).filter(CustomList.name == "Watchlist").first()
@@ -55,12 +55,10 @@ class RecommendationWatchlistService:
         external_id = str(tmdb_id)
         if isinstance(tmdb_id, str) and "_" in tmdb_id:
             prefix, val = tmdb_id.split("_", 1)
-            if prefix in ("porndb", "theporndb", "stash", "stashdb", "fansdb"):
-                provider = Provider.PORNDB
-                if prefix in ("stash", "stashdb"):
-                    provider = Provider.STASHDB
-                elif prefix == "fansdb":
-                    provider = Provider.FANSDB
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            resolved = ProviderRegistry.resolve_prefix(prefix)
+            if resolved:
+                provider = resolved
                 external_id = val
 
         list_item_id = None

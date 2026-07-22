@@ -17,11 +17,14 @@ from app.modules.people.services.detail.profile_merger import ProfileMerger
 logger = logging.getLogger(__name__)
 
 class PersonDetailCollator:
-    def __init__(self, db: Session, scrapers: Any, tmdb: Any, library_port: Any, image_service: Any, filmography_service: FilmographyService, image_downloader: Optional[Any] = None):
+    def __init__(self, db: Session, scrapers: Any, tmdb: Any, resolver: Optional[Any] = None, image_service: Any = None, filmography_service: FilmographyService = None, image_downloader: Optional[Any] = None):
         self.db = db
         self.scrapers = scrapers
         self.tmdb = tmdb
-        self.library_port = library_port
+        if resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            resolver = MediaItemService(db)
+        self.resolver = resolver
         self.image_service = image_service
         self.filmography_service = filmography_service
         self.stats_calculator = PerformerStatsCalculator()
@@ -36,7 +39,7 @@ class PersonDetailCollator:
         db = self.db
         person = db.merge(person)
         person_id = person.id
-        override_dict = self.library_port.get_person_user_override(user_id, person_id)
+        override_dict = self.resolver.get_person_user_override(user_id, person_id)
         
         loc = LanguageService.get_best_localization(person.localizations, ui_lang)
 

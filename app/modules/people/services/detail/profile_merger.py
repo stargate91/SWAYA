@@ -107,20 +107,15 @@ class ProfileMerger:
         """Constructs external IDs payload combining DB sources, links, and actor attributes."""
         external_ids = dict(person.external_ids or {})
         for link in person.external_links:
-            prov_key = link.provider.value
-            if prov_key not in external_ids:
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            cfg = ProviderRegistry.get_config(link.provider)
+            if cfg:
+                prov_key = cfg.prefix
                 external_ids[prov_key] = link.external_id
-            alt_key = f"{prov_key}_id" if prov_key != "porndb" else "theporndb_id"
-            if alt_key not in external_ids:
-                external_ids[alt_key] = link.external_id
-        if "tmdb" in external_ids and "tmdb_id" not in external_ids:
-            external_ids["tmdb_id"] = external_ids["tmdb"]
-        if "stashdb" in external_ids and "stashdb_id" not in external_ids:
-            external_ids["stashdb_id"] = external_ids["stashdb"]
-        if "porndb" in external_ids and "theporndb_id" not in external_ids:
-            external_ids["theporndb_id"] = external_ids["porndb"]
-        if "fansdb" in external_ids and "fansdb_id" not in external_ids:
-            external_ids["fansdb_id"] = external_ids["fansdb"]
+                external_ids[f"{prov_key}_id"] = link.external_id
+                for alias in cfg.aliases:
+                    external_ids[alias] = link.external_id
+                    external_ids[f"{alias}_id"] = link.external_id
         
         if person.socials:
             for k, v in person.socials.items():
@@ -166,15 +161,13 @@ class ProfileMerger:
             prov_lower = prov_val.lower()
             
             helper_ids = {}
-            if prov_lower == "stashdb":
-                helper_ids["stash_id"] = link.external_id
-                helper_ids["source"] = "stash"
-            elif prov_lower == "fansdb":
-                helper_ids["fansdb_id"] = link.external_id
-                helper_ids["source"] = "fansdb"
-            elif prov_lower == "porndb":
-                helper_ids["porndb_id"] = link.external_id
-                helper_ids["source"] = "porndb"
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            p_enum = ProviderRegistry.get_provider_by_prefix(prov_lower)
+            if p_enum:
+                cfg = ProviderRegistry.get_config(p_enum)
+                if cfg:
+                    helper_ids[f"{cfg.prefix}_id"] = link.external_id
+                    helper_ids["source"] = cfg.prefix
             elif prov_lower == "data18":
                 helper_ids["data18_id"] = link.external_id
             

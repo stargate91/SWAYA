@@ -16,19 +16,19 @@ class FilesystemRenamer:
     def __init__(
         self,
         db_session: Session,
-        library_port: Any,
+        resolver: Any,
         compiler: PathTemplateCompiler,
         move_with_progress_fn: Optional[Any] = None,
         send_to_trash_fn: Optional[Any] = None,
     ):
         self.db = db_session
-        self.library_port = library_port
+        self.resolver = resolver
         self.compiler = compiler
         self.move_with_progress_fn = move_with_progress_fn
         self.send_to_trash_fn = send_to_trash_fn
 
     def execute_batch(self, previews: List[RenamePreview], batch_name: Optional[str] = None) -> int:
-        batch_id = self.library_port.create_action_batch(batch_name or "Rename batch")
+        batch_id = self.resolver.create_action_batch(batch_name or "Rename batch")
 
         success_count = 0
         for preview in previews:
@@ -39,7 +39,7 @@ class FilesystemRenamer:
         return success_count
 
     def execute_single(self, preview: RenamePreview, batch_id: Optional[int] = None, progress_callback=None, organize_in_place: bool = False) -> bool:
-        item = self.library_port.get_item_by_id(preview.item_id)
+        item = self.resolver.get_item_by_id(preview.item_id)
         if not item:
             return False
         batch_id = self._ensure_batch_id(batch_id)
@@ -78,7 +78,7 @@ class FilesystemRenamer:
                     raise FileExistsError(f"File exists at target: {target_path}")
 
             for extra_preview in preview.extra_previews:
-                extra = self.library_port.get_extra_by_id(extra_preview.extra_id)
+                extra = self.resolver.get_extra_by_id(extra_preview.extra_id)
                 if not extra:
                     continue
 
@@ -103,7 +103,7 @@ class FilesystemRenamer:
                 paths_to_ignore.append(str(old_path.resolve()))
                 paths_to_ignore.append(str(target_path.resolve()))
             for extra_preview in preview.extra_previews:
-                extra = self.library_port.get_extra_by_id(extra_preview.extra_id)
+                extra = self.resolver.get_extra_by_id(extra_preview.extra_id)
                 if extra:
                     paths_to_ignore.append(str(Path(extra.current_path).resolve()))
                     if extra_preview.target_path:
@@ -121,7 +121,7 @@ class FilesystemRenamer:
                 successful_moves.append((old_path, target_path))
             
             for extra_preview in preview.extra_previews:
-                extra = self.library_port.get_extra_by_id(extra_preview.extra_id)
+                extra = self.resolver.get_extra_by_id(extra_preview.extra_id)
                 if not extra:
                     continue
 
@@ -152,12 +152,12 @@ class FilesystemRenamer:
 
             old_item_path = item.current_path
             status_to_set = ItemStatus.ORGANIZED if organize_in_place else ItemStatus.RENAMED
-            self.library_port.update_item_path_and_status(item.id, str(target_path), status_to_set)
+            self.resolver.update_item_path_and_status(item.id, str(target_path), status_to_set)
             self._log_action(batch_id, item_id=item.id, action_type=ActionType.RENAME, 
                             status=ActionStatus.SUCCESS, old_val=old_item_path, new_val=str(target_path))
 
             for extra_preview in preview.extra_previews:
-                extra = self.library_port.get_extra_by_id(extra_preview.extra_id)
+                extra = self.resolver.get_extra_by_id(extra_preview.extra_id)
                 if extra:
                     old_e_path = extra.current_path
                     extra_action = self.compiler._preview_action(extra_preview)
@@ -166,11 +166,11 @@ class FilesystemRenamer:
                                         status=ActionStatus.SUCCESS, old_val=old_e_path,
                                         new_val=old_e_path, error="Skipped due to collision strategy.")
                     elif extra_action == "delete":
-                        self.library_port.delete_extra(extra.id)
+                        self.resolver.delete_extra(extra.id)
                         self._log_action(batch_id, extra_id=None, action_type=ActionType.DELETE, 
                                         status=ActionStatus.SUCCESS, old_val=old_e_path, new_val=None)
                     else:
-                        self.library_port.update_extra_path(extra.id, extra_preview.target_path)
+                        self.resolver.update_extra_path(extra.id, extra_preview.target_path)
                         self._log_action(batch_id, extra_id=extra.id, action_type=ActionType.RENAME, 
                                         status=ActionStatus.SUCCESS, old_val=old_e_path, new_val=extra_preview.target_path)
 
@@ -212,19 +212,19 @@ class FilesystemRenamer:
     def _ensure_batch_id(self, batch_id: Optional[int]) -> int:
         if batch_id is not None:
             return batch_id
-        return self.library_port.create_action_batch("Single rename")
+        return self.resolver.create_action_batch("Single rename")
 
     def _remove_existing_target(self, target_path: Path, batch_id: int, source_item: Any):
-        target_item = self.library_port.get_item_by_relative_path(str(target_path).replace("\\", "/"))
+        target_item = self.resolver.get_item_by_relative_path(str(target_path).replace("\\", "/"))
         if not target_item:
-            target_item = self.library_port.get_item_by_absolute_path(str(target_path))
+            target_item = self.resolver.get_item_by_absolute_path(str(target_path))
 
         if target_item:
-            self.library_port.relink_relations_for_collision(target_item.id, source_item.id)
+            self.resolver.relink_relations_for_collision(target_item.id, source_item.id)
             self._log_action(batch_id, item_id=target_item.id, action_type=ActionType.DELETE,
                             status=ActionStatus.SUCCESS, old_val=target_item.current_path,
                             new_val=None, error="Replaced by collision strategy.")
-            self.library_port.delete_item(target_item.id)
+            self.resolver.delete_item(target_item.id)
         
         if target_path.exists():
             try:
@@ -233,7 +233,7 @@ class FilesystemRenamer:
                 logger.warning(f"Failed to delete collision target file {target_path}: {e}")
 
     def _log_action(self, batch_id, item_id=None, extra_id=None, action_type=None, status=None, old_val=None, new_val=None, error=None):
-        self.library_port.log_rename_action(
+        self.resolver.log_rename_action(
             batch_id=batch_id,
             item_id=item_id,
             extra_id=extra_id,
@@ -245,7 +245,7 @@ class FilesystemRenamer:
         )
 
     def undo_batch(self, batch_id: int, progress_callback=None, stop_check=None) -> int:
-        logs = self.library_port.get_action_logs_for_undo(batch_id)
+        logs = self.resolver.get_action_logs_for_undo(batch_id)
 
         undo_count = 0
         total = len(logs)
@@ -271,7 +271,7 @@ class FilesystemRenamer:
 
             if not new_path.exists():
                 logger.error(f"Undo hiba: A fájl már nem található a célhelyen: {new_path}")
-                self.library_port.update_action_log_status(log.id, ActionStatus.FAILED, "File missing at destination")
+                self.resolver.update_action_log_status(log.id, ActionStatus.FAILED, "File missing at destination")
                 return False
 
             from app.modules.library.filesystem.folder_watcher import ignore_path
@@ -287,11 +287,11 @@ class FilesystemRenamer:
                 shutil.move(str(new_path), str(old_path))
 
             if log.media_item_id:
-                self.library_port.update_item_path_and_status(log.media_item_id, str(old_path), ItemStatus.MATCHED)
+                self.resolver.update_item_path_and_status(log.media_item_id, str(old_path), ItemStatus.MATCHED)
             elif log.extra_file_id:
-                self.library_port.update_extra_path(log.extra_file_id, str(old_path))
+                self.resolver.update_extra_path(log.extra_file_id, str(old_path))
 
-            self.library_port.update_action_log_status(log.id, ActionStatus.UNDONE)
+            self.resolver.update_action_log_status(log.id, ActionStatus.UNDONE)
             if not is_same_path:
                 self._cleanup_empty_parent(new_path.parent)
             return True
@@ -321,7 +321,7 @@ class FilesystemRenamer:
 
             protected_paths = set()
             try:
-                libraries = self.library_port.get_all_libraries()
+                libraries = self.resolver.get_all_libraries()
                 for lib in libraries:
                     protected_paths.add(Path(lib.root_path).resolve())
             except Exception as e:

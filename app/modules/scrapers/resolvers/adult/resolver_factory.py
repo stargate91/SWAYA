@@ -15,15 +15,12 @@ class AdultResolverFactory:
         stash_scraper = scraper_gateway.adult(Provider.STASHDB, db)
         order_setting = stash_scraper.get_setting('scenes_scraper_order') or 'stashdb,porndb,fansdb'
         order = []
+        from app.modules.scrapers.support.registry import ProviderRegistry
         for value in str(order_setting).split(','):
-            name = value.strip().lower()
-            if name == 'stashdb':
-                order.append(Provider.STASHDB)
-            elif name == 'fansdb':
-                order.append(Provider.FANSDB)
-            elif name == 'porndb':
-                order.append(Provider.PORNDB)
-        return order or [Provider.STASHDB, Provider.PORNDB, Provider.FANSDB]
+            p_enum = ProviderRegistry.get_provider_by_prefix(value.strip())
+            if p_enum:
+                order.append(p_enum)
+        return order or ProviderRegistry.get_adult_providers()
 
     def build_scrapers_to_try(
         self,
@@ -32,15 +29,18 @@ class AdultResolverFactory:
         preferred_provider: Optional[Provider] = None
     ) -> List[Tuple[Any, Provider]]:
         """Instantiates resolvers and filters them based on settings and configuration status."""
-        stash_scraper = scraper_gateway.adult(Provider.STASHDB, db)
-        porndb_scraper = scraper_gateway.adult(Provider.PORNDB, db)
-        fans_scraper = scraper_gateway.adult(Provider.FANSDB, db)
-
-        resolvers = {
-            Provider.STASHDB: (StashDbResolver(stash_scraper), Provider.STASHDB),
-            Provider.PORNDB: (PornDbResolver(porndb_scraper), Provider.PORNDB),
-            Provider.FANSDB: (FansDbResolver(fans_scraper), Provider.FANSDB),
-        }
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        
+        resolvers = {}
+        for provider in ProviderRegistry.get_adult_providers():
+            scraper = scraper_gateway.adult(provider, db)
+            resolver_class = {
+                Provider.STASHDB: StashDbResolver,
+                Provider.PORNDB: PornDbResolver,
+                Provider.FANSDB: FansDbResolver,
+            }.get(provider)
+            if resolver_class:
+                resolvers[provider] = (resolver_class(scraper), provider)
 
         available = {}
         for provider, (res_obj, _) in resolvers.items():

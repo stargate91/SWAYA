@@ -4,7 +4,7 @@ import ctypes
 import ctypes.wintypes
 import logging
 from app.core.database import SessionLocal
-from app.modules.library.db_media_resolver import DbMediaResolver
+from app.modules.library.services.media_item_service import MediaItemService
 from app.modules.history.services.playback_peak_service import PlaybackPeakService
 from app.modules.history.playback.playback_monitor import active_sessions
 
@@ -32,7 +32,7 @@ def trigger_peak_moment():
             return
             
         logger.info(f"Adding peak moment for active media item_id: {item_id}")
-        resolver = DbMediaResolver(db)
+        resolver = MediaItemService(db)
         service = PlaybackPeakService(db, resolver)
         # default user_id is 1
         service.add_peak(str(item_id), 1)

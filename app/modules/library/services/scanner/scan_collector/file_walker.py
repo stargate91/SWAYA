@@ -37,14 +37,14 @@ class FileWalker:
         mode: ScanMode = ScanMode.MOVIES_TV,
         min_video_duration_minutes: float = 10,
         provider: Optional[str] = None,
-        settings_port: Optional[Any] = None,
+        settings: Optional[Any] = None,
     ):
         self.library = library
         self.categorizer = categorizer
         self.mode = mode
         self.min_video_duration_minutes = min_video_duration_minutes
         self.provider = str(provider or "").strip().lower()
-        self.settings = settings_port
+        self.settings = settings
 
     def get_rel_path(self, p: Path) -> str:
         try:
@@ -58,7 +58,7 @@ class FileWalker:
         }
         default_minutes = max(0.0, float(self.min_video_duration_minutes or 0))
 
-        if not self.provider or self.mode != ScanMode.SCENES:
+        if not self.provider or not self.library.is_adult:
             return default_minutes * 60
 
         setting_key = provider_duration_overrides.get(self.provider)
@@ -83,12 +83,12 @@ class FileWalker:
             return False
 
         category, subtype = self.categorizer.categorize(path, settings_port=self.settings)
-        forced_subtypes = SCENE_FORCE_EXTRA_VIDEO_SUBTYPES if self.mode == ScanMode.SCENES else FORCED_EXTRA_VIDEO_SUBTYPES
+        forced_subtypes = SCENE_FORCE_EXTRA_VIDEO_SUBTYPES if self.library.is_adult else FORCED_EXTRA_VIDEO_SUBTYPES
         if category == ExtraCategory.VIDEO and subtype in forced_subtypes:
             return True
 
         joined_parts = " ".join(part.lower() for part in path.parts)
-        force_extra_pattern = r"\b(sample|samples|extra|extras|trailer|trailers)\b" if self.mode == ScanMode.SCENES else r"\b(sample|samples|extra|extras|trailer|trailers|bonus|featurette|promo|clip)\b"
+        force_extra_pattern = r"\b(sample|samples|extra|extras|trailer|trailers)\b" if self.library.is_adult else r"\b(sample|samples|extra|extras|trailer|trailers|bonus|featurette|promo|clip)\b"
         if re.search(force_extra_pattern, joined_parts):
             return True
 

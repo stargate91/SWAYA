@@ -28,7 +28,7 @@ class Collector:
     def __init__(self, min_video_size_mb: float = 50.0):
         self.fast_track_size = min_video_size_mb * 1024 * 1024
 
-    def collect(self, paths: List[str], settings_port: Optional[SettingsPort] = None, progress_callback: Optional[Any] = None) -> Dict[str, List[Path]]:
+    def collect(self, paths: List[str], settings: Optional[Any] = None, progress_callback: Optional[Any] = None) -> Dict[str, List[Path]]:
         """
         Recursively traverses directories and groups files into categories.
         """
@@ -41,11 +41,11 @@ class Collector:
         # Load dynamic video extensions from database settings if available
         video_exts = self.VIDEO_EXTS
         setting_val = None
-        if settings_port:
+        if settings:
             try:
-                setting_val = settings_port.get_system_setting("naming_video_exts")
+                setting_val = settings.get_system_setting("naming_video_exts")
             except Exception as e:
-                logger.debug(f"Swallowed exception in domains/library/services/scanner/collector.py:46: {e}", exc_info=True)
+                logger.debug(f"Swallowed exception in app/modules/library/services/scanner/collector.py:46: {e}", exc_info=True)
 
         if setting_val:
             video_exts = {

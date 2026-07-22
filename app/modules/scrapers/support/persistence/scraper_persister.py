@@ -10,9 +10,9 @@ from app.modules.metadata.models import MetadataMatch, Studio
 
 
 
-from app.modules.scrapers.support.persistence.match_persister import MatchPersister
-from app.modules.scrapers.support.persistence.studio_persister import StudioPersister
-from app.modules.scrapers.support.persistence.performer_persister import PerformerPersister
+from app.modules.metadata.services.match_persister import MatchPersister
+from app.modules.metadata.services.studio_persister import StudioPersister
+from app.modules.people.services.performer_persister import PerformerPersister
 
 logger = logging.getLogger(__name__)
 
@@ -27,21 +27,21 @@ class ScraperPersister:
     def __init__(
         self,
         db: Session,
-        metadata_repo: Optional[MetadataRepositoryPort] = None,
-        people_repo: Optional[PeopleRepositoryPort] = None,
-        image_downloader: Optional[ImageDownloadPort] = None,
+        metadata_repo: Optional[Any] = None,
+        people_repo: Optional[Any] = None,
+        image_downloader: Optional[Any] = None,
     ):
         self.db = db
-        from app.modules.metadata.db_metadata_repository import DbMetadataRepository
-        from app.modules.people.db_people_repository import DbPeopleRepository
-        from app.modules.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
-        self.metadata_repo = metadata_repo or DbMetadataRepository(db)
-        self.people_repo = people_repo or DbPeopleRepository(db)
-        self.image_downloader = image_downloader or TasksImageDownloadAdapter()
+        from app.modules.metadata.services.metadata_service import MetadataService
+        from app.modules.people.services.person_service import PersonService
+        from app.modules.tasks.image_download_service import ImageDownloadService
+        self.metadata_repo = metadata_repo or MetadataService(db)
+        self.people_repo = people_repo or PersonService(db)
+        self.image_downloader = image_downloader or ImageDownloadService()
 
-        self.match_persister = MatchPersister(self)
-        self.studio_persister = StudioPersister(self)
-        self.performer_persister = PerformerPersister(self)
+        self.match_persister = MatchPersister(db, self.metadata_repo, self.image_downloader)
+        self.studio_persister = StudioPersister(db, self.metadata_repo, self.image_downloader)
+        self.performer_persister = PerformerPersister(db, self.image_downloader)
 
     def persist_normalized_scene(
         self,

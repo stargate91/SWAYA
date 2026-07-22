@@ -24,8 +24,8 @@ class ScanResolver:
         stop_checker: Optional[Callable[[], bool]] = None,
         include_adult: Optional[bool] = None,
         provider: Optional[str] = None,
-        library_port: Optional[Any] = None,
-        task_monitor: Optional["TaskMonitorPort"] = None,
+        resolver: Optional[Any] = None,
+        task_monitor: Optional["Any"] = None,
     ):
         self.db = db_session
         self.mode = mode
@@ -35,11 +35,11 @@ class ScanResolver:
         self.task_monitor = task_monitor
         import threading
         self._db_write_lock = threading.Lock()
-        if library_port is None:
-            from app.modules.library.db_media_resolver import DbMediaResolver
-            self.library_port = DbMediaResolver(db_session)
+        if resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            self.resolver = MediaItemService(db_session)
         else:
-            self.library_port = library_port
+            self.resolver = resolver
 
     def _stop_requested(self, task_id: Optional[int] = None) -> bool:
         if self.stop_checker and self.stop_checker():
@@ -63,7 +63,7 @@ class ScanResolver:
         unique_items = []
         seen_hashes = set()
         for item in items:
-            if not item.group_hash or self.mode in (ScanMode.SCENES, ScanMode.OFFLINE):
+            if not item.group_hash or item.library.is_adult or (item.library.target_media_types and "video" in item.library.target_media_types):
                 unique_items.append(item)
             elif item.group_hash not in seen_hashes:
                 unique_items.append(item)
@@ -100,9 +100,9 @@ class ScanResolver:
                         return
                     local_db = SessionLocal()
                     try:
-                        from app.modules.library.db_media_resolver import DbMediaResolver
-                        local_port = DbMediaResolver(local_db)
-                        item = local_port.get_item_by_id(item_id)
+                        from app.modules.library.services.media_item_service import MediaItemService
+                        local_repo = MediaItemService(local_db)
+                        item = local_repo.get_item_by_id(item_id)
                         if not item:
                             return
 
@@ -113,7 +113,7 @@ class ScanResolver:
                             mode=self.mode,
                             include_adult=self.include_adult,
                             provider=self.provider,
-                            library_port=local_port,
+                            resolver=local_repo,
                         )
                         pipeline.resolve_and_enrich(
                             item,
@@ -142,12 +142,12 @@ class ScanResolver:
                 for attempt in range(3):
                     local_db = SessionLocal()
                     try:
-                        from app.modules.library.db_media_resolver import DbMediaResolver
-                        local_port = DbMediaResolver(local_db)
-                        db_item = local_port.get_item_by_id(item_id)
+                        from app.modules.library.services.media_item_service import MediaItemService
+                        local_repo = MediaItemService(local_db)
+                        db_item = local_repo.get_item_by_id(item_id)
                         if db_item:
                             with self._db_write_lock:
-                                local_port.set_item_status(item_id, ItemStatus.ERROR)
+                                local_repo.set_item_status(item_id, ItemStatus.ERROR)
                                 local_db.commit()
                         break
                     except OperationalError as status_ex:

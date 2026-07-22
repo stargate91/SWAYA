@@ -102,7 +102,7 @@ class TvEpisodeFormatter:
                 try:
                     import os
                     from urllib.parse import urlparse
-                    from app.modules.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+                    from app.modules.tasks.image_download_service import ImageDownloadService
                     from app.modules.media_assets.services.images import image_processing_service, image_path_resolver
 
                     raw_fn = os.path.basename(urlparse(still).path or still)
@@ -114,7 +114,7 @@ class TvEpisodeFormatter:
                             image_processing_service.image_root, "thumbnails", "stills", filename
                         )
                         if not existing:
-                            adapter = TasksImageDownloadAdapter()
+                            adapter = ImageDownloadService()
                             url = adapter.get_download_url(still, "stills") or f"https://image.tmdb.org/t/p/original{still}"
                             adapter.enqueue_download(url, "stills", filename)
                 except Exception:

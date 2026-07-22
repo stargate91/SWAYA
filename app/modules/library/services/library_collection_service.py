@@ -17,9 +17,9 @@ logger = logging.getLogger(__name__)
 _COLLECTION_DETAILS_CACHE = {}
 
 class LibraryCollectionService:
-    def __init__(self, db_session: Session, settings_port: Optional[SettingsPort] = None, image_downloader: Optional[ImageDownloadPort] = None, tmdb_scraper: Optional[Any] = None):
+    def __init__(self, db_session: Session, settings: Optional[Any] = None, image_downloader: Optional[Any] = None, tmdb_scraper: Optional[Any] = None):
         self.db = db_session
-        self.settings = settings_port
+        self.settings = settings
         self.image_downloader = image_downloader
         self.tmdb_scraper = tmdb_scraper
 
@@ -48,6 +48,9 @@ class LibraryCollectionService:
         search: str = "",
         tab: str = "movies",
         include_adult: bool = False,
+        collection_status: str = "all",
+        sort_by: str = "owned_count",
+        sort_direction: str = "desc",
     ) -> MovieCollectionsResponse:
         """
         Retrieves a paginated and filtered list of movie collections in the library.
@@ -230,16 +233,40 @@ class LibraryCollectionService:
             if collection_mode == "never":
                 continue
             elif collection_mode == "threshold":
-                if col["owned_count"] >= threshold:
-                    filtered_collections.append(col)
+                if col["owned_count"] < threshold:
+                    continue
             else:
-                if col["owned_count"] >= 1:
-                    filtered_collections.append(col)
+                if col["owned_count"] < 1:
+                    continue
 
-        sorted_collections = sorted(
-            filtered_collections,
-            key=lambda c: (-c["owned_count"], str(c["title"]).lower(), c["tmdb_id"])
-        )
+            owned = col["owned_count"]
+            total = col["total_count"]
+            if collection_status == "complete":
+                if owned != total:
+                    continue
+            elif collection_status == "in_progress":
+                if not (0 < owned < total):
+                    continue
+
+            filtered_collections.append(col)
+
+        reverse_sort = (sort_direction.lower() == "desc")
+        if sort_by == "title":
+            sorted_collections = sorted(
+                filtered_collections,
+                key=lambda c: str(c["title"]).lower(),
+                reverse=reverse_sort
+            )
+        else:  # "owned_count" or default
+            # To handle combined sorting key, we sort primary and secondary key
+            sorted_collections = sorted(
+                filtered_collections,
+                key=lambda c: (c["owned_count"], -c["tmdb_id"]),
+                reverse=reverse_sort
+            )
+            # Ensure titles sorted alphabetically within same count if not reversed
+            if not reverse_sort:
+                sorted_collections.sort(key=lambda c: (c["owned_count"], [ord(char) for char in str(c["title"]).lower()]))
 
         total_items = len(sorted_collections)
         total_pages = (total_items + page_size - 1) // page_size if page_size and total_items > 0 else 1

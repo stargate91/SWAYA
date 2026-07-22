@@ -73,7 +73,7 @@ class ScanPersister:
                         moved_item.hash_phash = res.get("hash_phash")
                         moved_item.hash_sha256 = res.get("hash_sha256")
                     else:
-                        if self.mode == ScanMode.SCENES:
+                        if self.library.is_adult:
                             moved_item.hash_md5 = None
                             moved_item.hash_oshash = self.hash_calculator.calculate_oshash(str(p))
                             moved_item.hash_phash = self.hash_calculator.calculate_phash(str(p))
@@ -97,7 +97,7 @@ class ScanPersister:
                             existing.hash_phash = res.get("hash_phash")
                             existing.hash_sha256 = res.get("hash_sha256")
                         else:
-                            if self.mode == ScanMode.SCENES:
+                            if self.library.is_adult:
                                 existing.hash_md5 = None
                                 existing.hash_oshash = self.hash_calculator.calculate_oshash(str(p))
                                 existing.hash_phash = self.hash_calculator.calculate_phash(str(p))
@@ -125,7 +125,7 @@ class ScanPersister:
                             item.hash_phash = res.get("hash_phash")
                             item.hash_sha256 = res.get("hash_sha256")
                         else:
-                            if self.mode == ScanMode.SCENES:
+                            if self.library.is_adult:
                                 item.hash_md5 = None
                                 item.hash_oshash = self.hash_calculator.calculate_oshash(str(p))
                                 item.hash_phash = self.hash_calculator.calculate_phash(str(p))
@@ -167,14 +167,15 @@ class ScanPersister:
                 if not existing or existing.size != size or existing.mtime != mtime:
                     triple = res.get("guessit_info") if res else self.analyzer.get_triple_data(item_entity.internal_title, item_entity.filename, item_entity.folder_name)
                     triple = {**(triple or {}), "scan_mode": self.mode.value}
-                    if self.mode in (ScanMode.SCENES, ScanMode.PORNDB_MOVIE):
+                    if self.library.is_adult:
+                        is_movie_target = self.library.target_media_types and "movie" in self.library.target_media_types
                         for pk in ["fn", "it", "fd"]:
                             if pk in triple and isinstance(triple[pk], dict):
                                 triple[pk].pop("season", None)
                                 triple[pk].pop("episode", None)
                                 triple[pk].pop("season_count", None)
                                 triple[pk].pop("episode_count", None)
-                                triple[pk]["type"] = "movie" if self.mode == ScanMode.PORNDB_MOVIE else "scene"
+                                triple[pk]["type"] = "movie" if is_movie_target else "scene"
                     item_entity.parsed_info = sanitize_parsed_info(triple)
                     logger.info("[scan:%s] Parsed %s | fn.type=%s | fd.type=%s | scan_mode=%s", self.mode.value, item_entity.filename, (triple.get("fn") or {}).get("type") if triple else None, (triple.get("fd") or {}).get("type") if triple else None, triple.get("scan_mode") if triple else None)
                     

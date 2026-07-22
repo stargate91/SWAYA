@@ -60,6 +60,8 @@ export const getBackdropImagePath = (item) => pickFirstImagePath(
 
 export const resolveMediaImageUrl = (path, imageType = 'poster', apiBase = API_BASE) => {
   if (!path) return '';
+  // Note: Backend now returns resolved paths starting with /media/ or http://.
+  // Fallbacks below are kept for legacy compatibility.
   let pathStr = String(path);
   if (pathStr.startsWith('//')) {
     pathStr = `https:${pathStr}`;
@@ -67,7 +69,9 @@ export const resolveMediaImageUrl = (path, imageType = 'poster', apiBase = API_B
   if (pathStr.startsWith(apiBase) || pathStr.startsWith('http://localhost') || pathStr.startsWith('http://127.0.0.1')) {
     return pathStr;
   }
-  const isOriginalType = imageType === 'backdrop' || imageType === 'logo' || imageType === 'originalPoster' || imageType === 'originalStill' || imageType === 'originalPerson' || imageType === 'originalSceneStill';
+  
+  const isOriginalType = ['backdrop', 'logo', 'originalPoster', 'originalStill', 'originalPerson', 'originalSceneStill'].includes(imageType);
+
   if (pathStr.startsWith('/media/') || pathStr.startsWith('/api/') || pathStr.startsWith('media/')) {
     const relPath = pathStr.startsWith('media/') ? `/${pathStr}` : pathStr;
     if (isOriginalType && relPath.includes('/thumbnails/')) {
@@ -75,6 +79,7 @@ export const resolveMediaImageUrl = (path, imageType = 'poster', apiBase = API_B
     }
     return `${apiBase}${relPath}`;
   }
+  
   if (pathStr.startsWith('http://') || pathStr.startsWith('https://')) {
     if (pathStr.includes('image.tmdb.org/t/p/')) {
       const parts = pathStr.split('/t/p/');
@@ -90,6 +95,7 @@ export const resolveMediaImageUrl = (path, imageType = 'poster', apiBase = API_B
     }
     return `${apiBase}/api/v1/media/image-proxy?url=${encodeURIComponent(pathStr)}`;
   }
+  
   if (pathStr.startsWith('/')) {
     const size = TMDB_IMAGE_SIZES[imageType] || TMDB_IMAGE_SIZES.poster;
     return buildTmdbImageUrl(pathStr, size);

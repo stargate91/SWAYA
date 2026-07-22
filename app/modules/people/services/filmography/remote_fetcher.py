@@ -13,9 +13,12 @@ from app.modules.people.services.filmography.strategies.base_strategy import Bas
 logger = logging.getLogger(__name__)
 
 class RemoteCreditsFetcher:
-    def __init__(self, db: Session, library_port: Any, image_service: Any, scrapers: Optional[Any] = None):
+    def __init__(self, db: Session, resolver: Optional[Any] = None, image_service: Any = None, scrapers: Optional[Any] = None):
         self.db = db
-        self.library_port = library_port
+        if resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            resolver = MediaItemService(db)
+        self.resolver = resolver
         self.image_service = image_service
         self.scrapers = scrapers
 
@@ -135,7 +138,7 @@ class RemoteCreditsFetcher:
         # Check local matches to set in_library and library_item_id
         try:
             from app.modules.people.models import MediaPersonLink
-            active_match_ids = self.library_port.get_active_match_ids(media_type="scene", provider=source.lower())
+            active_match_ids = self.resolver.get_active_match_ids(media_type="scene", provider=source.lower())
             links = db.query(MediaPersonLink).filter(
                 MediaPersonLink.person_id == person_id,
                 MediaPersonLink.match_id.in_(active_match_ids)
@@ -176,19 +179,26 @@ class RemoteCreditsFetcher:
         if not person:
             return None
             
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        prov_enum = ProviderRegistry.resolve_prefix(source)
         ext_ids = person.external_ids or {}
-        ext_id = ext_ids.get(source.lower()) or ext_ids.get(f"{source.lower()}_id")
-        if not ext_id and source.lower() == "porndb":
-            ext_id = ext_ids.get("theporndb") or ext_ids.get("theporndb_id")
-            
-        if not ext_id:
+        ext_id = None
+        if prov_enum:
+            cfg = ProviderRegistry.get_config(prov_enum)
+            if cfg:
+                keys_to_try = [cfg.prefix] + cfg.aliases
+                for k in keys_to_try:
+                    ext_id = ext_ids.get(k) or ext_ids.get(f"{k}_id")
+                    if ext_id:
+                        break
+
+        if not ext_id and prov_enum:
             try:
-                prov_enum = Provider(source.lower())
                 link = next((x for x in person.external_links if x.provider == prov_enum), None)
                 if link:
                     ext_id = link.external_id
-            except ValueError as e:
-                logger.debug(f"Swallowed exception in domains/people/services/filmography/remote_fetcher.py:50: {e}", exc_info=True)
+            except Exception as e:
+                logger.debug(f"Swallowed exception in app/modules/people/services/filmography/remote_fetcher.py:50: {e}", exc_info=True)
                 
         if not ext_id:
             return None
@@ -261,7 +271,7 @@ class RemoteCreditsFetcher:
         local_items = []
         try:
             prov_enum = Provider(source.lower())
-            active_match_ids = self.library_port.get_active_match_ids(media_type=media_type, provider=source.lower())
+            active_match_ids = self.resolver.get_active_match_ids(media_type=media_type, provider=source.lower())
             from app.core.language import LanguageService
             
             links = db.query(MediaPersonLink).filter(
@@ -270,9 +280,9 @@ class RemoteCreditsFetcher:
             ).all()
             
             from app.core.language import get_user_ui_language
-            from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-            settings_port = DbSettingsAdapter(db)
-            ui_lang = get_user_ui_language(settings_port)
+            from app.modules.settings.services.settings_service import SettingsService
+            settings = SettingsService(db)
+            ui_lang = get_user_ui_language(settings)
             for link in links:
                 match = link.match
                 item = match.media_item

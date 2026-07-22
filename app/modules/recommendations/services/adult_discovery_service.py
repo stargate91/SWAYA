@@ -13,9 +13,9 @@ logger = logging.getLogger(__name__)
 
 
 class AdultDiscoveryService:
-    def __init__(self, db: Session, settings_port):
+    def __init__(self, db: Session, settings):
         self.db = db
-        self.settings = settings_port
+        self.settings = settings
 
     def get_adult_discovery(self, provider: str) -> List[Dict[str, Any]]:
         api_key = self.settings.get_setting(f"{provider}_api_key")

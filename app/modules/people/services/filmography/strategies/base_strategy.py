@@ -14,10 +14,16 @@ class BaseFilmographyStrategy:
         from app.modules.people.services.filmography.strategies.stashdb_strategy import StashDbFilmographyStrategy
         from app.modules.people.services.filmography.strategies.porndb_strategy import PornDbFilmographyStrategy
 
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        from app.core.enums import Provider
+
         source_lower = str(source or "").lower()
-        if source_lower in ("stashdb", "fansdb"):
-            return StashDbFilmographyStrategy(scrapers, db)
-        elif source_lower == "porndb":
-            return PornDbFilmographyStrategy(scrapers, db)
-        else:
-            raise ValueError(f"Unsupported remote credits source: {source}")
+        p_enum = ProviderRegistry.get_provider_by_prefix(source_lower)
+        if p_enum:
+            cfg = ProviderRegistry.get_config(p_enum)
+            if cfg and cfg.uses_flat_measurements:
+                return StashDbFilmographyStrategy(scrapers, db)
+            elif p_enum == Provider.PORNDB:
+                return PornDbFilmographyStrategy(scrapers, db)
+        
+        raise ValueError(f"Unsupported remote credits source: {source}")

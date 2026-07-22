@@ -28,8 +28,7 @@ class SceneQueryBuilder(BaseQueryBuilder):
             query = query.filter(
                 MetadataMatch.media_item_id.is_(None),
                 UserOverride.is_tracked,
-                MetadataMatch.media_type == MediaType.SCENE,
-                MetadataMatch.is_home_video == False
+                MetadataMatch.media_type == MediaType.SCENE
             )
         elif params.filter_ownership == "all":
             query = query.outerjoin(UserOverride, and_(UserOverride.metadata_match_id == MetadataMatch.id, UserOverride.user_id == self.current_user_id))
@@ -40,15 +39,14 @@ class SceneQueryBuilder(BaseQueryBuilder):
                     and_(MetadataMatch.media_item_id.is_(None), UserOverride.is_tracked)
                 ),
                 MetadataMatch.is_active,
-                MetadataMatch.media_type == MediaType.SCENE,
-                MetadataMatch.is_home_video == False
+                MetadataMatch.media_type == MediaType.SCENE
             )
         else:
             query = query.filter(
                 MetadataMatch.media_item_id.isnot(None),
                 MediaItem.status.in_(self.lib_statuses),
                 MetadataMatch.is_active,
-                MetadataMatch.is_home_video == False
+                MetadataMatch.media_type == MediaType.SCENE
             )
 
         if params.selected_performer_id:
@@ -75,8 +73,7 @@ class SceneQueryBuilder(BaseQueryBuilder):
                 MetadataMatch.media_item_id.isnot(None),
                 MetadataMatch.is_active,
                 MetadataMatch.is_adult == params.include_adult,
-                MetadataMatch.media_type == MediaType.SCENE,
-                MetadataMatch.is_home_video == False
+                MetadataMatch.media_type == MediaType.SCENE
             ).group_by(MetadataMatch.media_item_id).subquery()
             query = query.filter(MetadataMatch.id.in_(canonical_match_ids))
         elif params.filter_ownership == "all":
@@ -86,8 +83,7 @@ class SceneQueryBuilder(BaseQueryBuilder):
                 MetadataMatch.media_item_id.isnot(None),
                 MetadataMatch.is_active,
                 MetadataMatch.is_adult == params.include_adult,
-                MetadataMatch.media_type == MediaType.SCENE,
-                MetadataMatch.is_home_video == False
+                MetadataMatch.media_type == MediaType.SCENE
             ).group_by(MetadataMatch.media_item_id).subquery()
             query = query.filter(
                 or_(

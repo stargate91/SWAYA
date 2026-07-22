@@ -170,7 +170,7 @@ export default function MediaDetailPage({ type = 'movie' }) {
       <DetailPageShell
         backdropUrl={backdropUrl}
         fallbackUrl={posterUrl}
-        isScene={item?.type === 'scene'}
+        isScene={item?.type === 'scene' || item?.type === 'video'}
         isPreviewPlaying={isPreviewPlaying}
         previewSrc={previewSrc}
         backLabel={t('common.back') || 'Back'}

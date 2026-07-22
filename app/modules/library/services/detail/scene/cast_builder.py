@@ -36,6 +36,9 @@ class SceneCastBuilder:
             except Exception:
                 return None
 
+        from app.modules.settings.services.settings_service import SettingsService
+        gender_pref = SettingsService(db).get_setting("adult_gender_preference") or "all"
+
         # 1. Add performers from local database match
         if match_db:
             people_links = db.query(MediaPersonLink).options(
@@ -53,19 +56,25 @@ class SceneCastBuilder:
 
             for link in sorted(people_links, key=lambda x: x.order if x.order is not None else 0):
                 person = link.person
-                custom_img = override_map.get(person.id)
-                cast_by_name[person.name.lower()] = {
-                    "id": f"local:{person.id}",
-                    "name": person.name,
-                    "character": link.character_name,
-                    "job": link.role.value if hasattr(link.role, "value") else str(link.role),
-                    "profile_path": resolve_img_fn(custom_img or person.local_profile_path or person.profile_path, "people"),
-                    "popularity": person.rating_porndb if person.rating_porndb is not None else person.popularity or 0,
-                    "rating_porndb": person.rating_porndb,
-                    "scene_count": person.scene_count,
-                    "gender": person.gender,
-                    "age_at_release": calculate_age_at_release(person.birthday, date_str)
-                }
+                if person:
+                    if gender_pref != "all":
+                        if gender_pref == "female" and person.gender != 1:
+                            continue
+                        if gender_pref == "male" and person.gender != 2:
+                            continue
+                    custom_img = override_map.get(person.id)
+                    cast_by_name[person.name.lower()] = {
+                        "id": f"local:{person.id}",
+                        "name": person.name,
+                        "character": link.character_name,
+                        "job": link.role.value if hasattr(link.role, "value") else str(link.role),
+                        "profile_path": resolve_img_fn(custom_img or person.local_profile_path or person.profile_path, "people"),
+                        "popularity": person.rating_porndb if person.rating_porndb is not None else person.popularity or 0,
+                        "rating_porndb": person.rating_porndb,
+                        "scene_count": person.scene_count,
+                        "gender": person.gender,
+                        "age_at_release": calculate_age_at_release(person.birthday, date_str)
+                    }
 
         # 2. Add/merge performers from external scraper details
         for p_entry in scene_data.get("performers") or []:
@@ -86,6 +95,12 @@ class SceneCastBuilder:
                 mapped_gender = 2
             elif gender_str:
                 mapped_gender = 3
+
+            if gender_pref != "all":
+                if gender_pref == "female" and mapped_gender != 1:
+                    continue
+                if gender_pref == "male" and mapped_gender != 2:
+                    continue
 
             person_db = None
             perf_ext_id = perf.get("id")

@@ -106,6 +106,7 @@ class MediaCardDTO(BaseSchema):
     user_rating: Optional[float] = None
     is_favorite: bool = False
     is_watched: bool = False
+    display_episode_code: Optional[str] = None
 
 class MediaDetailDTO(MediaCardDTO):
     """Extended detail page DTO inheriting all card fields + adding full metadata context."""

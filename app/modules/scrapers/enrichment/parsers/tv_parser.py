@@ -42,13 +42,13 @@ def enrich_tv(parser, match: MetadataMatch, language: str, include_ratings: bool
             try:
                 tv_match.first_air_date = datetime.strptime(tv_first_air_date, "%Y-%m-%d")
             except Exception as e:
-                logger.debug(f"Swallowed exception in infrastructure/scrapers/enrichment/parsers/tv_parser.py:44: {e}", exc_info=True)
+                logger.debug(f"Swallowed exception in modules/scrapers/enrichment/parsers/tv_parser.py:44: {e}", exc_info=True)
         tv_last_air_date = tv_details.get("last_air_date")
         if tv_last_air_date:
             try:
                 tv_match.last_air_date = datetime.strptime(tv_last_air_date, "%Y-%m-%d")
             except Exception as e:
-                logger.debug(f"Swallowed exception in infrastructure/scrapers/enrichment/parsers/tv_parser.py:50: {e}", exc_info=True)
+                logger.debug(f"Swallowed exception in modules/scrapers/enrichment/parsers/tv_parser.py:50: {e}", exc_info=True)
 
         selected_backdrop_path = image_processing_service.pick_backdrop_path(tv_details, preferred_language=language)
         if selected_backdrop_path:
@@ -195,6 +195,6 @@ def enrich_tv(parser, match: MetadataMatch, language: str, include_ratings: bool
                 try:
                     match.release_date = datetime.strptime(first_air_date, "%Y-%m-%d")
                 except Exception as e:
-                    logger.debug(f"Swallowed exception in infrastructure/scrapers/enrichment/parsers/tv_parser.py:187: {e}", exc_info=True)
+                    logger.debug(f"Swallowed exception in modules/scrapers/enrichment/parsers/tv_parser.py:187: {e}", exc_info=True)
             
             match.media_type = MediaType.EPISODE

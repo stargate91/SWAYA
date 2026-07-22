@@ -4,7 +4,8 @@ import {
   usePeopleQuery,
   useUpdatePersonStatusMutation,
   useUpdateMediaStatusMutation,
-  useSettingsQuery
+  useSettingsQuery,
+  useRatingsStatsQuery
 } from '@/queries';
 import { resolveLibraryBackendTab } from '@/lib/libraryTabs';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
@@ -32,88 +33,73 @@ export function useRatingsPageState() {
     ? 'movies'
     : mediaType;
 
+  const getSortParam = (key, dir) => {
+    if (key === 'rating') {
+      return dir === 'desc' ? 'rating_desc' : 'user_rating_asc';
+    }
+    if (key === 'comment') {
+      return dir === 'desc' ? 'comment_desc' : 'comment_asc';
+    }
+    return dir === 'desc' ? 'title_desc' : 'title_asc';
+  };
+
   // Fetch all media items in parallel to display unified dashboard stats
-  const moviesQuery = useLibraryQuery({
-    tab: resolveLibraryBackendTab('movies', activeSessionMode),
-    page: 1,
-    pageSize: 5000,
-    filter_ownership: 'all',
-    filter_status: 'all',
-    include_adult: activeSessionMode === 'nsfw',
-  });
-
-  const tvQuery = useLibraryQuery({
-    tab: resolveLibraryBackendTab('tv', activeSessionMode),
-    page: 1,
-    pageSize: 5000,
-    filter_ownership: 'all',
-    filter_status: 'all',
-    include_adult: activeSessionMode === 'nsfw',
-  });
-
-  const scenesQuery = useLibraryQuery(
-    activeSessionMode === 'nsfw'
+  // Active tab/type paginated query
+  const activeListQuery = useLibraryQuery(
+    activeTab !== 'analytics' && effectiveMediaType !== 'people'
       ? {
-          tab: resolveLibraryBackendTab('scenes', activeSessionMode),
-          page: 1,
-          pageSize: 5000,
+          tab: resolveLibraryBackendTab(effectiveMediaType, activeSessionMode),
+          page: currentPage,
+          pageSize: pageSize,
+          search: searchQuery,
           filter_ownership: 'all',
           filter_status: 'all',
-          include_adult: true,
+          include_adult: activeSessionMode === 'nsfw',
+          filter_rating: activeTab,
+          sort_by: getSortParam(sortKey, sortDirection),
         }
       : null
   );
 
-  const videosQuery = useLibraryQuery({
-    tab: resolveLibraryBackendTab('videos', activeSessionMode),
-    page: 1,
-    pageSize: 5000,
-    filter_ownership: 'all',
-    filter_status: 'all',
-    include_adult: activeSessionMode === 'nsfw',
-  });
+  const activePeopleQuery = usePeopleQuery(
+    activeTab !== 'analytics' && effectiveMediaType === 'people'
+      ? {
+          include_inactive: false,
+          page: currentPage,
+          pageSize: pageSize,
+          search: searchQuery,
+          adult_only: activeSessionMode === 'nsfw',
+          gender: resolvedAdultGenderPreference,
+          filter_rating: activeTab,
+          sort_by: getSortParam(sortKey, sortDirection),
+        }
+      : null
+  );
 
-  const peopleQuery = usePeopleQuery({
-    include_inactive: false,
-    pageSize: 5000,
-    adult_only: activeSessionMode === 'nsfw',
-    gender: resolvedAdultGenderPreference,
-  });
+  // Fetch pre-aggregated statistics from the backend on the analytics tab
+  const ratingsStatsQuery = useRatingsStatsQuery(
+    activeSessionMode === 'nsfw',
+    resolvedAdultGenderPreference
+  );
 
   const rawItems = useMemo(() => {
-    if (effectiveMediaType === 'people') {
-      return peopleQuery.data?.items || [];
-    }
-    if (effectiveMediaType === 'movies') {
-      return moviesQuery.data?.items || [];
-    }
-    if (effectiveMediaType === 'series') {
-      return tvQuery.data?.items || [];
-    }
-    if (effectiveMediaType === 'scenes') {
-      return scenesQuery?.data?.items || [];
-    }
-    if (effectiveMediaType === 'videos') {
-      return videosQuery.data?.items || [];
+    if (activeTab !== 'analytics') {
+      if (effectiveMediaType === 'people') {
+        return activePeopleQuery.data?.items || [];
+      }
+      return activeListQuery.data?.items || [];
     }
     return [];
-  }, [effectiveMediaType, moviesQuery.data, tvQuery.data, scenesQuery?.data, videosQuery.data, peopleQuery.data]);
+  }, [activeTab, effectiveMediaType, activeListQuery.data, activePeopleQuery.data]);
 
   const isLoading = useMemo(() => {
-    if (effectiveMediaType === 'people') return peopleQuery.isLoading;
-    if (effectiveMediaType === 'movies') return moviesQuery.isLoading;
-    if (effectiveMediaType === 'series') return tvQuery.isLoading;
-    if (effectiveMediaType === 'scenes') return scenesQuery?.isLoading || false;
-    if (effectiveMediaType === 'videos') return videosQuery.isLoading;
-    return false;
-  }, [effectiveMediaType, moviesQuery.isLoading, tvQuery.isLoading, scenesQuery?.isLoading, videosQuery.isLoading, peopleQuery.isLoading]);
+    if (activeTab !== 'analytics') {
+      return effectiveMediaType === 'people' ? activePeopleQuery.isLoading : activeListQuery.isLoading;
+    }
+    return ratingsStatsQuery.isLoading;
+  }, [activeTab, effectiveMediaType, activeListQuery.isLoading, activePeopleQuery.isLoading, ratingsStatsQuery.isLoading]);
 
-  const isStatsLoading =
-    moviesQuery.isLoading ||
-    tvQuery.isLoading ||
-    (activeSessionMode === 'nsfw' && (scenesQuery?.isLoading ?? false)) ||
-    videosQuery.isLoading ||
-    peopleQuery.isLoading;
+  const isStatsLoading = ratingsStatsQuery.isLoading;
 
   // Mutations
   const updateMediaMutation = useUpdateMediaStatusMutation();
@@ -156,71 +142,23 @@ export function useRatingsPageState() {
     }
   }, [effectiveMediaType, updatePersonMutation, updateMediaMutation]);
 
-  // Filter items by Tab (Unrated vs Rated)
-  const tabFilteredItems = useMemo(() => {
-    return rawItems.filter((item) => {
-      const hasRating = item.user_rating !== null && item.user_rating !== undefined;
-      const hasComment = item.user_comment !== null && item.user_comment !== undefined && String(item.user_comment).trim() !== '';
-      const isFavorite = item.is_favorite === true;
+  // Pagination and Items (fully managed by backend)
+  const totalPages = useMemo(() => {
+    if (activeTab !== 'analytics') {
+      const total = effectiveMediaType === 'people' ? (activePeopleQuery.data?.total_items || 0) : (activeListQuery.data?.total_items || 0);
+      return Math.max(1, Math.ceil(total / pageSize));
+    }
+    return 1;
+  }, [activeTab, effectiveMediaType, activeListQuery.data, activePeopleQuery.data, pageSize]);
 
-      if (activeTab === 'unrated') {
-        return !hasRating;
-      }
-      if (activeTab === 'rated') {
-        return hasRating || hasComment || isFavorite;
-      }
-      return true;
-    });
-  }, [rawItems, activeTab]);
-
-  // Filter items by Search
-  const searchFilteredItems = useMemo(() => {
-    const query = searchQuery.toLowerCase().trim();
-    if (!query) return tabFilteredItems;
-    return tabFilteredItems.filter((item) => {
-      const name = (item.name || item.title || item.displayTitle || '').toLowerCase();
-      return name.includes(query);
-    });
-  }, [tabFilteredItems, searchQuery]);
-
-  // Sort items
-  const sortedItems = useMemo(() => {
-    const items = [...searchFilteredItems];
-    items.sort((a, b) => {
-      let valA;
-      let valB;
-
-      if (sortKey === 'rating') {
-        valA = a.user_rating ?? -1;
-        valB = b.user_rating ?? -1;
-      } else if (sortKey === 'comment') {
-        valA = a.user_comment || '';
-        valB = b.user_comment || '';
-      } else {
-        // Default to name / title sorting
-        valA = a.name || a.title || a.displayTitle || '';
-        valB = b.name || b.title || b.displayTitle || '';
-      }
-
-      if (typeof valA === 'string' && typeof valB === 'string') {
-        return sortDirection === 'asc'
-          ? valA.localeCompare(valB, undefined, { numeric: true, sensitivity: 'base' })
-          : valB.localeCompare(valA, undefined, { numeric: true, sensitivity: 'base' });
-      }
-
-      if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
-      if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
-    return items;
-  }, [searchFilteredItems, sortKey, sortDirection]);
-
-  // Pagination
-  const totalPages = Math.max(1, Math.ceil(sortedItems.length / pageSize));
   const paginatedItems = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    return sortedItems.slice(startIndex, startIndex + pageSize);
-  }, [sortedItems, currentPage, pageSize]);
+    if (activeTab !== 'analytics') {
+      return rawItems;
+    }
+    return [];
+  }, [activeTab, rawItems]);
+
+  const sortedItems = paginatedItems;
 
   // Wrap state setters to reset pagination
   const handleSetActiveTab = (tab) => {
@@ -238,42 +176,15 @@ export function useRatingsPageState() {
     setCurrentPage(1);
   };
 
-  // Compute Analytics Stats (calculated over all items that have rating/comment/fav)
-  const computeStats = (items, isPeople = false) => {
-    const ratedItems = items.filter((item) => item.user_rating !== null && item.user_rating !== undefined);
-    const totalRated = ratedItems.length;
-    const totalUnrated = items.length - totalRated;
-    const favoritesCount = isPeople ? items.filter((item) => item.is_favorite === true).length : 0;
+  // Compute Analytics Stats from pre-aggregated backend query
+  const ratingsStats = ratingsStatsQuery.data || {};
+  const defaultStat = { average: '0.0', totalRated: 0, totalUnrated: 0, favoritesCount: 0, distribution: Array(20).fill(0) };
 
-    const sum = ratedItems.reduce((acc, curr) => acc + Number(curr.user_rating), 0);
-    const average = totalRated > 0 ? (sum / totalRated).toFixed(1) : '0.0';
-
-    // Distribution 0.5-10 (20 slots)
-    const distribution = Array(20).fill(0);
-    ratedItems.forEach((item) => {
-      const val = Number(item.user_rating);
-      if (val >= 0.5 && val <= 10) {
-        const idx = Math.round(val * 2) - 1;
-        if (idx >= 0 && idx < 20) {
-          distribution[idx]++;
-        }
-      }
-    });
-
-    return {
-      average,
-      totalRated,
-      totalUnrated,
-      favoritesCount,
-      distribution,
-    };
-  };
-
-  const moviesStats = useMemo(() => computeStats(moviesQuery.data?.items || []), [moviesQuery.data]);
-  const tvStats = useMemo(() => computeStats(tvQuery.data?.items || []), [tvQuery.data]);
-  const scenesStats = useMemo(() => computeStats(scenesQuery?.data?.items || []), [scenesQuery?.data]);
-  const videosStats = useMemo(() => computeStats(videosQuery.data?.items || []), [videosQuery.data]);
-  const peopleStats = useMemo(() => computeStats(peopleQuery.data?.items || [], true), [peopleQuery.data]);
+  const moviesStats = ratingsStats.movies || defaultStat;
+  const tvStats = ratingsStats.tv || defaultStat;
+  const scenesStats = ratingsStats.scenes || defaultStat;
+  const videosStats = ratingsStats.videos || defaultStat;
+  const peopleStats = ratingsStats.people || defaultStat;
 
   const handleSortToggle = (key) => {
     if (sortKey === key) {

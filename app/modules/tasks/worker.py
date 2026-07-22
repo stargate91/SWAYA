@@ -18,7 +18,7 @@ class DownloadWorker:
     Supports concurrent processing of downloads.
     """
 
-    def __init__(self, image_service: Optional[ImageProcessingService] = None, concurrency: int = 6, task_monitor: Optional["TaskMonitorPort"] = None):
+    def __init__(self, image_service: Optional[ImageProcessingService] = None, concurrency: int = 6, task_monitor: Optional["Any"] = None):
         self.image_service = image_service or image_processing_service
         self.task_monitor = task_monitor
         self.concurrency = concurrency
@@ -97,6 +97,42 @@ class DownloadWorker:
             for i in range(self.concurrency)
         ]
         logger.info(f"DownloadWorker started with {self.concurrency} concurrent workers on loop {self.loop}.")
+
+        # Recover missing images in the background on startup
+        self.loop.create_task(self._recover_missing_images())
+
+    async def _recover_missing_images(self) -> None:
+        db = self.task_monitor.session_factory() if (self.task_monitor and hasattr(self.task_monitor, "session_factory")) else None
+        if not db:
+            return
+        try:
+            from app.modules.metadata.models import MetadataLocalization
+            from app.modules.people.models import Person
+            from pathlib import Path
+            
+            # 1. Recover performer profiles
+            people = db.query(Person).filter(
+                Person.profile_path.isnot(None), 
+                Person.local_profile_path.isnot(None)
+            ).all()
+            for p in people:
+                local_path = Path(p.local_profile_path)
+                if not local_path.exists():
+                    self.enqueue_download(p.profile_path, "people", local_path.name)
+
+            # 2. Recover localized posters
+            locs = db.query(MetadataLocalization).filter(
+                MetadataLocalization.poster_path.isnot(None), 
+                MetadataLocalization.local_poster_path.isnot(None)
+            ).all()
+            for l in locs:
+                local_path = Path(l.local_poster_path)
+                if not local_path.exists():
+                    self.enqueue_download(l.poster_path, "posters", local_path.name)
+        except Exception as e:
+            logger.error(f"Failed to recover missing images: {e}")
+        finally:
+            db.close()
 
     async def stop(self) -> None:
         """Stops the background worker and cancels all running worker tasks."""

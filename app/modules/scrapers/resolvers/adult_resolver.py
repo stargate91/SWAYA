@@ -13,12 +13,12 @@ logger = logging.getLogger(__name__)
 class AdultResolver:
     """Handles resolving adult scene items against StashDB, PornDB, and FansDB APIs."""
 
-    def __init__(self, db_session: Session, scraper_gateway: Optional[ScraperGatewayPort] = None):
+    def __init__(self, db_session: Session, scraper_gateway: Optional[Any] = None):
         self.db = db_session
-        from app.modules.scrapers.db_scraper_log_repository import DbScraperLogRepository
+        from app.modules.scrapers.scraper_service import ScraperService
         from app.modules.scrapers.support.gateway import scraper_gateway as default_gateway
         self.scraper_gateway = scraper_gateway or default_gateway
-        self.scraper_log_repo = DbScraperLogRepository(db_session)
+        self.scraper_log_repo = ScraperService(db_session)
         self.orchestrator = AdultResolutionOrchestrator()
 
     def resolve_primary_scene_item(self, item: MediaItem, task_id: Optional[int] = None):

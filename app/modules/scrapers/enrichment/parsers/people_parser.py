@@ -11,8 +11,7 @@ def process_people(parser, match: MetadataMatch, details: Dict[str, Any]):
     cast = credits.get("cast", [])[:15]
     crew = credits.get("crew", [])
     
-    from app.modules.people.db_people_repository import DbPeopleRepository
-    person_service = PersonService(parser.db, people_repo=DbPeopleRepository(parser.db))
+    person_service = PersonService(parser.db)
     
     # Link Actors
     for idx, cast_member in enumerate(cast):

@@ -114,7 +114,7 @@ function BespokeEpisodeDetail({
         >
           <Text as="h4" variant="display" weight="bold" truncate>
             {/* eslint-disable-next-line react/jsx-no-literals */}
-            {`${formatEpisodeNumber(activeEpisode.episode_number)}. ${activeEpisode.title || `Episode ${activeEpisode.episode_number}`}`}
+            {`${activeEpisode.display_episode_code ? activeEpisode.display_episode_code.split('E').pop() : formatEpisodeNumber(activeEpisode.episode_number)}. ${activeEpisode.title || `Episode ${activeEpisode.episode_number}`}`}
           </Text>
 
           <Inline gap="sm" align="center">

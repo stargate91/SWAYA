@@ -86,7 +86,7 @@ class SceneMetadataSyncer:
         poster_url: Optional[str],
         ext_background: Optional[str],
         date_str: Optional[str],
-        image_downloader: Optional[ImageDownloadPort] = None
+        image_downloader: Optional[Any] = None
     ):
         db_updated = False
         if not match_db.backdrop_path and ext_background:

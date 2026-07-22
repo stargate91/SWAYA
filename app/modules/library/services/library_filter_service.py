@@ -9,9 +9,8 @@ from app.modules.library.schemas import FilterOptionsResponse, TagGroupItem
 logger = logging.getLogger(__name__)
 
 class LibraryFilterService:
-    def __init__(self, db_session: Session, user_repository: Optional[UserRepositoryPort] = None):
+    def __init__(self, db_session: Session):
         self.db = db_session
-        self.user_repository = user_repository
 
     def get_library_filter_options(self, params) -> FilterOptionsResponse:
         """
@@ -107,9 +106,9 @@ class LibraryFilterService:
         if True:
             from app.modules.people.models import Person, MediaPersonLink
             from app.modules.metadata.models import Studio
-            from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
+            from app.modules.settings.services.settings_service import SettingsService
 
-            settings_adapter = DbSettingsAdapter(self.db)
+            settings_adapter = SettingsService(self.db)
             gender_pref = settings_adapter.get_setting("adult_gender_preference") if is_adult else "all"
 
             if "people" in tab.lower():
@@ -451,25 +450,184 @@ class LibraryFilterService:
             roles=roles
         )
 
-    def get_tag_groups(self, is_adult: bool = False) -> List[TagGroupItem]:
+    def get_tag_groups(
+        self,
+        is_adult: bool = False,
+        page: int = 1,
+        page_size: int = 40,
+        search: Optional[str] = None
+    ) -> LibraryTagsResponse:
         """
         Retrieves available tag groups, with each tag enriched with its associated items.
         """
         # Self-healing: Mark tags as adult if they are linked to adult items/performers
-        if self.user_repository:
-            self.user_repository.auto_heal_adult_tags()
+        from app.modules.users.services.tags_service import TagsService
+        TagsService(self.db).auto_heal_adult_tags()
+
+        def calculate_card_subtitle(match, people_list) -> str:
+            parts = []
+            m_type = match.media_type
+            
+            if m_type in (MediaType.SCENE, MediaType.VIDEO):
+                perf_names = [p["name"] for p in people_list if p.get("name")][:3]
+                if perf_names:
+                    parts.append(", ".join(perf_names))
+                date_part = ""
+                if match.release_date:
+                    date_part = match.release_date.strftime("%Y-%m-%d")
+                if date_part:
+                    parts.append(date_part)
+            elif m_type == MediaType.TV:
+                first_year = None
+                if hasattr(match, "first_air_date") and match.first_air_date:
+                    first_year = match.first_air_date.year
+                elif match.release_date:
+                    first_year = match.release_date.year
+                last_year = match.last_air_date.year if (hasattr(match, "last_air_date") and match.last_air_date) else None
+                status_lower = str(getattr(match, "release_status", "") or "").lower()
+                is_ended = status_lower in ("ended", "canceled", "cancelled")
+                tv_year = ""
+                if first_year:
+                    if is_ended and last_year:
+                        tv_year = str(first_year) if first_year == last_year else f"{first_year} - {last_year}"
+                    else:
+                        tv_year = f"{first_year} - "
+                if tv_year:
+                    parts.append(tv_year)
+                info = getattr(match, "info", None)
+                if info:
+                    parts.append(str(info))
+            else:
+                year_part = ""
+                if match.release_date:
+                    year_part = str(match.release_date.year)
+                if year_part:
+                    parts.append(year_part)
+                info = getattr(match, "info", None)
+                if info:
+                    parts.append(str(info))
+            return " • ".join(parts)
+
+    def get_tag_groups(
+        self,
+        is_adult: bool = False,
+        page: int = 1,
+        page_size: int = 40,
+        search: Optional[str] = None
+    ) -> LibraryTagsResponse:
+        """
+        Retrieves available tag groups, with each tag enriched with its associated items.
+        """
+        # Self-healing: Mark tags as adult if they are linked to adult items/performers
+        from app.modules.users.services.tags_service import TagsService
+        TagsService(self.db).auto_heal_adult_tags()
 
         from app.core.enums import MediaType
-        from app.modules.metadata.models import MetadataMatch, MetadataLocalization
         from app.modules.people.models import Person
+        from app.modules.metadata.models import MetadataMatch
+        from app.modules.users.models import user_override_tags, UserOverride
         from app.modules.media_assets.services.images import image_processing_service
+        from app.modules.library.schemas import LibraryTagsResponse, TagGroupItem, TagItem
+        from sqlalchemy import func
 
-        tags_query = self.db.query(Tag).filter(Tag.is_adult == is_adult).all()
-        if not tags_query:
-            return []
+        base_query = self.db.query(Tag).filter(Tag.is_adult == is_adult)
+        if search:
+            base_query = base_query.filter(Tag.name.ilike(f"%{search}%"))
+
+        total_items = base_query.count()
+        total_pages = max(1, (total_items + page_size - 1) // page_size)
+
+        base_query = base_query.order_by(Tag.name.asc())
+        paginated_tags = base_query.offset((page - 1) * page_size).limit(page_size).all()
+
+        if not paginated_tags:
+            return LibraryTagsResponse(
+                items=[],
+                total_items=total_items,
+                page=page,
+                page_size=page_size,
+                total_pages=total_pages
+            )
 
         tags = []
-        for t in tags_query:
+        for t in paginated_tags:
+            # Optimize counts: count people overrides and media match overrides for this tag
+            people_count = self.db.query(func.count(Person.id)).join(
+                UserOverride, UserOverride.person_id == Person.id
+            ).join(
+                user_override_tags, user_override_tags.c.user_override_id == UserOverride.id
+            ).filter(
+                user_override_tags.c.tag_id == t.id,
+                Person.is_adult == is_adult
+            ).scalar() or 0
+
+            match_count = self.db.query(func.count(MetadataMatch.id)).join(
+                UserOverride, UserOverride.metadata_match_id == MetadataMatch.id
+            ).join(
+                user_override_tags, user_override_tags.c.user_override_id == UserOverride.id
+            ).filter(
+                user_override_tags.c.tag_id == t.id,
+                MetadataMatch.is_adult == is_adult
+            ).scalar() or 0
+
+            total_count = people_count + match_count
+
+            # Optimize previews: get top 3 people + match overrides
+            people_previews = self.db.query(Person.profile_path).join(
+                UserOverride, UserOverride.person_id == Person.id
+            ).join(
+                user_override_tags, user_override_tags.c.user_override_id == UserOverride.id
+            ).filter(
+                user_override_tags.c.tag_id == t.id,
+                Person.is_adult == is_adult,
+                Person.profile_path.isnot(None),
+                Person.profile_path != ""
+            ).limit(3).all()
+
+            match_previews = self.db.query(MetadataMatch.media_type, MetadataMatch.poster_path, MetadataMatch.backdrop_path, MetadataMatch.still_path, MetadataMatch.local_backdrop_path, MetadataMatch.local_still_path).join(
+                UserOverride, UserOverride.metadata_match_id == MetadataMatch.id
+            ).join(
+                user_override_tags, user_override_tags.c.user_override_id == UserOverride.id
+            ).filter(
+                user_override_tags.c.tag_id == t.id,
+                MetadataMatch.is_adult == is_adult
+            ).limit(3).all()
+
+            sample_previews = []
+            seen_paths = set()
+
+            for r in people_previews:
+                p_path = r[0]
+                p_img = image_processing_service.resolve_image_url(p_path, "people")
+                if p_img and p_img not in seen_paths:
+                    seen_paths.add(p_img)
+                    sample_previews.append({
+                        "poster": p_img,
+                        "backdrop": None,
+                        "still": p_img,
+                        "kind": "person"
+                    })
+                if len(sample_previews) >= 3:
+                    break
+
+            if len(sample_previews) < 3:
+                for r in match_previews:
+                    m_type, poster_path, backdrop_path, still_path, local_backdrop, local_still = r
+                    resolved_poster = image_processing_service.resolve_image_url(poster_path, "posters") if poster_path else None
+                    resolved_backdrop = image_processing_service.resolve_image_url(local_backdrop or backdrop_path, "backdrops") if (local_backdrop or backdrop_path) else None
+                    resolved_still = image_processing_service.resolve_image_url(local_still or still_path, "stills") if (local_still or still_path) else None
+                    path = resolved_poster or resolved_backdrop or resolved_still
+                    if path and path not in seen_paths:
+                        seen_paths.add(path)
+                        sample_previews.append({
+                            "poster": resolved_poster,
+                            "backdrop": resolved_backdrop,
+                            "still": resolved_still or resolved_backdrop or resolved_poster,
+                            "kind": m_type.value
+                        })
+                    if len(sample_previews) >= 3:
+                        break
+
             tag_data = {
                 "id": t.id,
                 "name": t.name,
@@ -484,117 +642,238 @@ class LibraryFilterService:
                 "adult_scenes": [],
                 "videos": [],
                 "adult_videos": [],
+                "sample_previews": sample_previews,
+                "total_count": total_count,
             }
-
-            for o in t.overrides:
-                if o.person_id:
-                    person = self.db.query(Person).filter(Person.id == o.person_id).first()
-                    if person:
-                        p_img = image_processing_service.resolve_image_url(person.profile_path, "people")
-                        
-                        # Dynamically resolve an automatic backdrop from the person's linked media items
-                        p_backdrop = None
-                        for link in person.media_links:
-                            if link.match and (link.match.local_backdrop_path or link.match.backdrop_path):
-                                p_backdrop = image_processing_service.resolve_image_url(
-                                    link.match.local_backdrop_path or link.match.backdrop_path, 
-                                    "backdrops"
-                                )
-                                break
-
-                        p_item = {
-                            "id": person.id,
-                            "title": person.name,
-                            "name": person.name,
-                            "poster_path": p_img,
-                            "profile_path": p_img,
-                            "backdrop_path": p_backdrop,
-                            "type": "person",
-                        }
-                        if person.is_adult:
-                            tag_data["adult_people"].append(p_item)
-                        else:
-                            tag_data["people"].append(p_item)
-                else:
-                    match = None
-                    if o.metadata_match_id:
-                        match = self.db.query(MetadataMatch).filter(MetadataMatch.id == o.metadata_match_id).first()
-                    elif o.media_item_id:
-                        match = self.db.query(MetadataMatch).filter(
-                            MetadataMatch.media_item_id == o.media_item_id,
-                            MetadataMatch.is_active
-                        ).first()
-
-                    if match:
-                        loc = self.db.query(MetadataLocalization).filter(MetadataLocalization.match_id == match.id).first()
-                        item = match.media_item
-
-                        title = (o.custom_title if o.custom_title else None) or (loc.title if loc else (item.filename if item else "Unknown"))
-                        poster_path = (o.custom_poster if o.custom_poster else None) or (loc.local_poster_path if (loc and loc.local_poster_path) else (loc.poster_path if loc else None))
-                        resolved_poster = image_processing_service.resolve_image_url(poster_path, "posters")
-
-                        resolved_backdrop = image_processing_service.resolve_image_url(
-                            match.local_backdrop_path or match.backdrop_path, 
-                            "backdrops"
-                        )
-                        resolved_still = image_processing_service.resolve_image_url(
-                            match.local_still_path or match.still_path, 
-                            "stills"
-                        )
-
-                        p_list = []
-                        if match.people_links:
-                            for pl in match.people_links:
-                                if pl.person:
-                                    p_list.append({
-                                        "id": pl.person.id,
-                                        "name": pl.person.name,
-                                        "gender": pl.person.gender
-                                    })
-
-                        m_item = {
-                            "id": item.id if item else (f"{match.provider.value}_{match.external_id}" if (match.media_type == MediaType.SCENE and match.provider in (Provider.PORNDB, Provider.FANSDB)) else (f"stash_{match.external_id}" if match.media_type == MediaType.SCENE else f"tmdb_{match.external_id}")),
-                            "title": title,
-                            "poster_path": resolved_poster,
-                            "backdrop_path": resolved_backdrop,
-                            "still_path": resolved_still or resolved_backdrop,
-                            "type": match.media_type.value,
-                            "year": match.release_date.year if match.release_date else None,
-                            "release_date": match.release_date.isoformat() if match.release_date else None,
-                            "is_favorite": o.is_favorite,
-                            "user_rating": o.user_rating,
-                            "is_adult": bool(match.is_adult),
-                            "is_home_video": bool(match.is_home_video),
-                            "people": p_list,
-                            "last_air_date": match.last_air_date.isoformat() if (hasattr(match, "last_air_date") and match.last_air_date) else None,
-                            "release_status": match.release_status if hasattr(match, "release_status") else None,
-                        }
-
-                        if match.media_type == MediaType.MOVIE:
-                            if match.is_adult:
-                                tag_data["adult"].append(m_item)
-                            else:
-                                tag_data["movies"].append(m_item)
-                        elif match.media_type == MediaType.TV:
-                            if match.is_adult:
-                                tag_data["adult_tv"].append(m_item)
-                            else:
-                                tag_data["tv"].append(m_item)
-                        elif match.media_type == MediaType.SCENE:
-                            if match.is_home_video:
-                                if match.is_adult:
-                                    tag_data["adult_videos"].append(m_item)
-                                else:
-                                    tag_data["videos"].append(m_item)
-                            else:
-                                tag_data["adult_scenes"].append(m_item)
-
             tags.append(tag_data)
 
-        return [
-            TagGroupItem(
-                id=1,
-                name="General" if not is_adult else "Adult",
-                tags=tags
-            )
-        ]
+        return LibraryTagsResponse(
+            items=[
+                TagGroupItem(
+                    id=1,
+                    name="General" if not is_adult else "Adult",
+                    tags=tags
+                )
+            ] if tags else [],
+            total_items=total_items,
+            page=page,
+            page_size=page_size,
+            total_pages=total_pages
+        )
+
+    def get_tag_items(self, tag_name: str, is_adult: bool = False):
+        """
+        Retrieves all items associated with a single tag.
+        """
+        from app.core.enums import MediaType
+        from app.modules.metadata.models import MetadataMatch, MetadataLocalization
+        from app.modules.people.models import Person
+        from app.modules.media_assets.services.images import image_processing_service
+
+        t = self.db.query(Tag).filter(Tag.name == tag_name, Tag.is_adult == is_adult).first()
+        if not t:
+            return {
+                "id": 0,
+                "name": tag_name,
+                "color": "#3b82f6",
+                "is_adult": is_adult,
+                "movies": [],
+                "tv": [],
+                "people": [],
+                "adult": [],
+                "adult_tv": [],
+                "adult_people": [],
+                "adult_scenes": [],
+                "videos": [],
+                "adult_videos": [],
+                "sample_previews": [],
+                "total_count": 0
+            }
+
+        def calculate_card_subtitle(match, people_list) -> str:
+            parts = []
+            m_type = match.media_type
+
+            if m_type in (MediaType.SCENE, MediaType.VIDEO):
+                perf_names = [p["name"] for p in people_list if p.get("name")][:3]
+                if perf_names:
+                    parts.append(", ".join(perf_names))
+                date_part = ""
+                if match.release_date:
+                    date_part = match.release_date.strftime("%Y-%m-%d")
+                if date_part:
+                    parts.append(date_part)
+            elif m_type == MediaType.TV:
+                first_year = None
+                if hasattr(match, "first_air_date") and match.first_air_date:
+                    first_year = match.first_air_date.year
+                elif match.release_date:
+                    first_year = match.release_date.year
+                last_year = match.last_air_date.year if (hasattr(match, "last_air_date") and match.last_air_date) else None
+                status_lower = str(getattr(match, "release_status", "") or "").lower()
+                is_ended = status_lower in ("ended", "canceled", "cancelled")
+                tv_year = ""
+                if first_year:
+                    if is_ended and last_year:
+                        tv_year = str(first_year) if first_year == last_year else f"{first_year} - {last_year}"
+                    else:
+                        tv_year = f"{first_year} - "
+                if tv_year:
+                    parts.append(tv_year)
+                info = getattr(match, "info", None)
+                if info:
+                    parts.append(str(info))
+            else:
+                year_part = ""
+                if match.release_date:
+                    year_part = str(match.release_date.year)
+                if year_part:
+                    parts.append(year_part)
+                info = getattr(match, "info", None)
+                if info:
+                    parts.append(str(info))
+            return " • ".join(parts)
+
+        tag_data = {
+            "id": t.id,
+            "name": t.name,
+            "color": t.color,
+            "is_adult": t.is_adult,
+            "movies": [],
+            "tv": [],
+            "people": [],
+            "adult": [],
+            "adult_tv": [],
+            "adult_people": [],
+            "adult_scenes": [],
+            "videos": [],
+            "adult_videos": [],
+        }
+
+        for o in t.overrides:
+            if o.person_id:
+                person = self.db.query(Person).filter(Person.id == o.person_id).first()
+                if person:
+                    p_img = image_processing_service.resolve_image_url(person.profile_path, "people")
+                    p_backdrop = None
+                    for link in person.media_links:
+                        if link.match and (link.match.local_backdrop_path or link.match.backdrop_path):
+                            p_backdrop = image_processing_service.resolve_image_url(
+                                link.match.local_backdrop_path or link.match.backdrop_path,
+                                "backdrops"
+                            )
+                            break
+                    p_item = {
+                        "id": person.id,
+                        "title": person.name,
+                        "name": person.name,
+                        "poster_path": p_img,
+                        "profile_path": p_img,
+                        "backdrop_path": p_backdrop,
+                        "type": "person",
+                    }
+                    if person.is_adult:
+                        tag_data["adult_people"].append(p_item)
+                    else:
+                        tag_data["people"].append(p_item)
+            else:
+                match = None
+                if o.metadata_match_id:
+                    match = self.db.query(MetadataMatch).filter(MetadataMatch.id == o.metadata_match_id).first()
+                elif o.media_item_id:
+                    match = self.db.query(MetadataMatch).filter(
+                        MetadataMatch.media_item_id == o.media_item_id,
+                        MetadataMatch.is_active
+                    ).first()
+
+                if match:
+                    loc = self.db.query(MetadataLocalization).filter(MetadataLocalization.match_id == match.id).first()
+                    item = match.media_item
+
+                    title = (o.custom_title if o.custom_title else None) or (loc.title if loc else (item.filename if item else "Unknown"))
+                    poster_path = (o.custom_poster if o.custom_poster else None) or (loc.local_poster_path if (loc and loc.local_poster_path) else (loc.poster_path if loc else None))
+                    resolved_poster = image_processing_service.resolve_image_url(poster_path, "posters")
+
+                    resolved_backdrop = image_processing_service.resolve_image_url(
+                        match.local_backdrop_path or match.backdrop_path,
+                        "backdrops"
+                    )
+                    resolved_still = image_processing_service.resolve_image_url(
+                        match.local_still_path or match.still_path,
+                        "stills"
+                    )
+
+                    p_list = []
+                    if match.people_links:
+                        for pl in match.people_links:
+                            if pl.person:
+                                p_list.append({
+                                    "id": pl.person.id,
+                                    "name": pl.person.name,
+                                    "gender": pl.person.gender
+                                })
+
+                    from app.modules.scrapers.support.registry import ProviderRegistry
+                    from app.modules.scrapers.support.registry import MediaTypeRegistry
+                    cfg = MediaTypeRegistry.get_config(match.media_type)
+                    card_aspect = cfg.card_aspect_ratio if cfg else "poster"
+                    image_sub = cfg.image_subfolder if cfg else "posters"
+
+                    backdrop_path = (o.custom_backdrop if o.custom_backdrop else None) or (match.local_backdrop_path or match.backdrop_path or None)
+                    if card_aspect == "landscape":
+                        ideal_path = backdrop_path or poster_path
+                        card_image_folder = "backdrops"
+                    else:
+                        ideal_path = poster_path or backdrop_path
+                        card_image_folder = "posters"
+                    card_image_url = image_processing_service.resolve_image_url(ideal_path, card_image_folder) if ideal_path else ""
+
+                    card_subtitle = calculate_card_subtitle(match, p_list)
+
+                    m_item = {
+                        "id": item.id if item else f"{ProviderRegistry.get_config(match.provider).prefix if ProviderRegistry.get_config(match.provider) else match.provider.value.lower()}_{match.external_id}",
+                        "title": title,
+                        "poster_path": resolved_poster,
+                        "backdrop_path": resolved_backdrop,
+                        "still_path": resolved_still or resolved_backdrop,
+                        "type": match.media_type.value,
+                        "card_aspect_ratio": card_aspect,
+                        "image_subfolder": image_sub,
+                        "card_image_url": card_image_url,
+                        "card_subtitle": card_subtitle,
+                        "year": match.release_date.year if match.release_date else None,
+                        "release_date": match.release_date.isoformat() if match.release_date else None,
+                        "is_favorite": o.is_favorite,
+                        "user_rating": o.user_rating,
+                        "is_adult": bool(match.is_adult),
+                        "should_blur_sfw": bool(match.is_adult) or match.media_type == MediaType.SCENE,
+                        "people": p_list,
+                        "last_air_date": match.last_air_date.isoformat() if (hasattr(match, "last_air_date") and match.last_air_date) else None,
+                        "release_status": match.release_status if hasattr(match, "release_status") else None,
+                    }
+
+                    if match.media_type == MediaType.MOVIE:
+                        if match.is_adult:
+                            tag_data["adult"].append(m_item)
+                        else:
+                            tag_data["movies"].append(m_item)
+                    elif match.media_type == MediaType.TV:
+                        if match.is_adult:
+                            tag_data["adult_tv"].append(m_item)
+                        else:
+                            tag_data["tv"].append(m_item)
+                    elif match.media_type == MediaType.SCENE:
+                        tag_data["adult_scenes"].append(m_item)
+                    elif match.media_type == MediaType.VIDEO:
+                        if match.is_adult:
+                            tag_data["adult_videos"].append(m_item)
+                        else:
+                            tag_data["videos"].append(m_item)
+
+        bucket_keys = ['adult', 'adult_tv', 'adult_people', 'adult_scenes', 'adult_videos'] if is_adult else ['movies', 'tv', 'people', 'videos']
+        mode_items = []
+        for bk in bucket_keys:
+            mode_items.extend(tag_data[bk])
+
+        tag_data["total_count"] = len(mode_items)
+        return tag_data

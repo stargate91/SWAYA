@@ -26,8 +26,8 @@ class ScannerManager:
         categorizer: Optional[Any] = None,
         linker: Optional[Any] = None,
         prober: Optional[Any] = None,
-        settings_port: Optional[Any] = None,
-        fs_port: Optional[Any] = None,
+        settings: Optional[Any] = None,
+        fs: Optional[Any] = None,
     ):
         self.db = db_session
         self.default_min_video_size_mb = min_video_size_mb
@@ -35,8 +35,8 @@ class ScannerManager:
         self.categorizer = categorizer or Categorizer()
         self.linker = linker or Linker()
         self.prober = prober or TechnicalProber()
-        self.settings = settings_port
-        self.fs_port = fs_port
+        self.settings = settings
+        self.fs = fs
 
     def _get_numeric_setting(self, key: str, default: float) -> float:
         from app.core.user_context import get_current_user_id
@@ -74,7 +74,7 @@ class ScannerManager:
 
         logger.info(f"Scan settings ({mode.value}) - min_size_mb: {min_size_mb}, min_duration_mins: {min_duration_mins}")
 
-        collector_provider = provider if mode == ScanMode.SCENES else None
+        collector_provider = provider
 
         collector_phase = pipeline.build_collector_phase(
             self.db,
@@ -86,7 +86,7 @@ class ScannerManager:
             min_duration_minutes=min_duration_mins,
             progress_callback=progress_callback,
             provider=collector_provider,
-            fs_port=self.fs_port,
+            fs=self.fs,
             settings_port=self.settings,
         )
         

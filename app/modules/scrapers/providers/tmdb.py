@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 class TMDBScraper(BaseScraper):
     """TMDB-specific metadata retriever and parser utilizing ScraperNormalizer."""
 
-    def __init__(self, settings_port, cache_service=None):
-        super().__init__(settings_port, cache_service, Provider.TMDB)
+    def __init__(self, settings, cache_service=None):
+        super().__init__(settings, cache_service, Provider.TMDB)
 
     def _call_api(self, endpoint: str, params: Dict[str, Any], max_retries: int = 3, force_refresh: bool = False) -> Dict[str, Any]:
         """Central API caller with caching and rate limit (429) handling."""
@@ -35,36 +35,18 @@ class TMDBScraper(BaseScraper):
         param_str = "&".join(f"{k}={v}" for k, v in sorted_params)
         cache_key = f"tmdb{endpoint}?{param_str}"
 
-        # Check Cache
-        cached_data = self.cache.get(Provider.TMDB, cache_key, force_refresh=force_refresh)
-        if cached_data:
-            if cached_data.get("cached_error"):
-                return {}
-            return cached_data
-
         url = f"{TMDB_API_BASE}{endpoint}"
-        for attempt in range(max_retries):
-            try:
-                resp = self.session.get(url, params=p, timeout=SCRAPER_REQUEST_TIMEOUT)
-                if resp.status_code == 200:
-                    data = resp.json()
-                    self.cache.set(Provider.TMDB, cache_key, data, status_code=200, external_id=str(data.get("id")))
-                    return data
-                elif resp.status_code == 429:
-                    retry_after = int(resp.headers.get("Retry-After", 1))
-                    logger.warning(f"TMDB Rate Limit (429). Waiting {retry_after}s...")
-                    time.sleep(retry_after)
-                    continue
-                else:
-                    self.cache.set(Provider.TMDB, cache_key, {}, status_code=resp.status_code)
-                    return {}
-            except Exception as e:
-                if attempt == max_retries - 1:
-                    logger.error(f"TMDB API Error ({endpoint}): {e}")
-                    raise e
-                time.sleep(2 ** attempt + random.uniform(0, 0.5))
-        
-        return {}
+        res = self.get_json_cached(
+            Provider.TMDB,
+            cache_key,
+            url,
+            params=p,
+            force_refresh=force_refresh,
+            external_id=lambda d: str(d.get("id")) if d else None,
+            max_retries=max_retries,
+            timeout=SCRAPER_REQUEST_TIMEOUT,
+        )
+        return res or {}
 
     def search(self, query: str, item_type: str = "movie", year: Optional[int] = None, language: Optional[str] = None, include_adult: bool = False, page: int = 1) -> List[Dict[str, Any]]:
         """Search TMDB (Movie or TV Show)."""
@@ -167,7 +149,7 @@ class TMDBScraper(BaseScraper):
                     params.pop("append_to_response", None)
                     details = self._call_api(endpoint, params, force_refresh=force_refresh)
                 except Exception as ex:
-                    logger.debug(f"Swallowed exception in infrastructure/scrapers/providers/tmdb.py:170: {ex}", exc_info=True)
+                    logger.debug(f"Swallowed exception in modules/scrapers/providers/tmdb.py:170: {ex}", exc_info=True)
                     raise e
 
         # If details were fetched successfully and images are requested, fetch them separately incorporating original_language
@@ -232,7 +214,7 @@ class TMDBScraper(BaseScraper):
                     params.pop("append_to_response", None)
                     return self._call_api(endpoint, params, force_refresh=force_refresh)
                 except Exception as e:
-                    logger.debug(f"Swallowed exception in infrastructure/scrapers/providers/tmdb.py:219: {e}", exc_info=True)
+                    logger.debug(f"Swallowed exception in modules/scrapers/providers/tmdb.py:219: {e}", exc_info=True)
             
             # If all original language attempts failed, try English fallback
             normalized_lang = str(language or DEFAULT_FALLBACK_LANGUAGE).split("-", 1)[0].strip() or DEFAULT_FALLBACK_LANGUAGE
@@ -250,7 +232,7 @@ class TMDBScraper(BaseScraper):
                             params.pop("append_to_response", None)
                             return self._call_api(endpoint, params, force_refresh=force_refresh)
                         except Exception as e:
-                            logger.debug(f"Swallowed exception in infrastructure/scrapers/providers/tmdb.py:237: {e}", exc_info=True)
+                            logger.debug(f"Swallowed exception in modules/scrapers/providers/tmdb.py:237: {e}", exc_info=True)
             raise e
 
     def fetch_movie(self, movie_id: str, language: Optional[str] = None, force_refresh: bool = False) -> Optional[dict]:

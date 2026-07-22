@@ -1,16 +1,23 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
 
-export const getOrganizerQueryKey = (scanMode, sessionMode) => [
+export const getOrganizerQueryKey = (scanMode, sessionMode, page, pageSize, tab, subTab, q, sortBy, sortDir) => [
   'organizer',
   scanMode || 'all',
   sessionMode || 'sfw',
+  page || 1,
+  pageSize || 40,
+  tab || 'manual',
+  subTab || 'all',
+  q || '',
+  sortBy || 'source',
+  sortDir || 'asc',
 ];
 
-export const useOrganizerQuery = (scanMode, sessionMode) => useQuery({
-  queryKey: getOrganizerQueryKey(scanMode, sessionMode),
-  queryFn: () => api.organizer.get({ scanMode, sessionMode }),
-  enabled: false,
+export const useOrganizerQuery = (scanMode, sessionMode, page, pageSize, tab, subTab, q, sortBy, sortDir) => useQuery({
+  queryKey: getOrganizerQueryKey(scanMode, sessionMode, page, pageSize, tab, subTab, q, sortBy, sortDir),
+  queryFn: () => api.organizer.get({ scanMode, sessionMode, page, pageSize, tab, subTab, q, sortBy, sortDir }),
+  keepPreviousData: true,
 });
 
 export const useOrganizerCountQuery = (scanMode, sessionMode) => useQuery({

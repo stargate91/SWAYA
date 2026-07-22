@@ -21,7 +21,6 @@ class OverridePersister:
         self,
         db: Session,
         resolver: Any,
-        library_port: Any,
         title_lock_reader: Any,
         enrich_language_fn: Any,
         track_item_fn: Any,
@@ -47,7 +46,7 @@ class OverridePersister:
                 "reset_match": request.reset_match,
                 "media_type": request.media_type,
             }
-            result = library_port.update_library_item_type_or_hierarchy(str(item_id), payload)
+            result = resolver.update_library_item_type_or_hierarchy(str(item_id), payload)
             if result.get("converted") and result.get("new_item_id"):
                 item_id = result["new_item_id"]
             elif is_extra or result.get("converted"):
@@ -157,7 +156,7 @@ class OverridePersister:
     def bulk_update(
         self,
         db: Session,
-        library_port: Any,
+        resolver: Any,
         title_lock_reader: Any,
         enrich_language_fn: Any,
         request: BulkOverridesUpdate
@@ -180,7 +179,7 @@ class OverridePersister:
             "custom_language": request.custom_language if request.custom_language is not None else request.language,
         }
         
-        library_port.bulk_update_library_items(item_ids, is_extra, library_payload)
+        resolver.bulk_update_library_items(item_ids, is_extra, library_payload)
 
         count = 0
         if not is_extra:
@@ -213,7 +212,7 @@ class OverridePersister:
                         "subtype": u_updates.get("subtype"),
                         "language": u_updates.get("language"),
                     }
-                    library_port.update_library_item_type_or_hierarchy(str(u_id), payload)
+                    resolver.update_library_item_type_or_hierarchy(str(u_id), payload)
                 else:
                     is_converting_to_bonus = u_updates.get("main_type") == "bonus" and u_updates.get("parent_id") is not None
                     
@@ -229,7 +228,7 @@ class OverridePersister:
                         "reset_match": u_updates.get("reset_match") or request.reset_match,
                         "custom_language": u_updates.get("custom_language") or u_updates.get("language"),
                     }
-                    library_port.update_library_item_type_or_hierarchy(str(u_id), payload)
+                    resolver.update_library_item_type_or_hierarchy(str(u_id), payload)
                     
                     if not is_converting_to_bonus:
                         m_override = title_lock_reader.get_or_create_metadata_override(str(u_id)) or title_lock_reader.get_or_create_physical_override(str(u_id))
@@ -489,7 +488,7 @@ class OverridePersister:
             scraper_gateway = scrapers
             if scraper_gateway and media_type:
                 _ENRICH_DISPATCH = {
-                    'scene': lambda: __import__('app.modules.library.services.detail.scene_detail_service', fromlist=['SceneDetailService']).SceneDetailService(db, scraper_gateway, image_downloader=__import__('app.modules.tasks.tasks_image_download_adapter', fromlist=['TasksImageDownloadAdapter']).TasksImageDownloadAdapter()).get_scene_detail(item_id),
+                    'scene': lambda: __import__('app.modules.library.services.detail.scene_detail_service', fromlist=['SceneDetailService']).SceneDetailService(db, scraper_gateway, image_downloader=__import__('app.modules.tasks.image_download_service', fromlist=['ImageDownloadService']).ImageDownloadService()).get_scene_detail(item_id),
                     'tv': lambda: __import__('app.modules.library.services.detail.tv_detail_service', fromlist=['TvDetailService']).TvDetailService(db, scraper_gateway).get_library_tv_detail(item_id),
                     'movie': lambda: __import__('app.modules.library.services.detail.movie_detail_service', fromlist=['MovieDetailService']).MovieDetailService(db, scraper_gateway).get_library_item_detail(item_id),
                 }
@@ -503,8 +502,8 @@ class OverridePersister:
                         # Post-enrichment self-healing check:
                         # If the match still has no localizations, release date, or backdrop, 
                         # try to merge/redirect to a sibling match that does.
-                        if match and media_type == 'scene':
-                            from app.core.enums import MediaType
+                        from app.core.enums import MediaType
+                        if match and MediaType.is_adult_type(media_type):
                             has_loc = db.query(MetadataMatch).filter(MetadataMatch.id == match.id).join(MetadataMatch.localizations).first() is not None
                             if not has_loc and not match.release_date and not match.backdrop_path:
                                 # Look for a sibling match that is fully enriched

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 
 from app.core.database import get_db
-from app.modules.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+from app.modules.tasks.image_download_service import ImageDownloadService
 from app.modules.library.services.library_service import LibraryService
 from app.modules.metadata.schemas import MetadataMatchRead
 from app.modules.library.schemas import (
@@ -78,19 +78,33 @@ def list_libraries(db: Session = Depends(get_db)):
 
 @library_router.get("/library/stats", response_model=LibraryStatsResponse)
 def get_stats(db: Session = Depends(get_db), include_adult: bool = False):
-    from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-    return LibraryStatsService(db, settings_port=DbSettingsAdapter(db)).get_stats(include_adult=include_adult)
+    from app.modules.settings.services.settings_service import SettingsService
+    return LibraryStatsService(db, settings=SettingsService(db)).get_stats(include_adult=include_adult)
+
+
+@library_router.get("/library/ratings/stats")
+def get_ratings_stats(
+    db: Session = Depends(get_db),
+    include_adult: bool = False,
+    gender: Optional[str] = None
+):
+    from app.core.user_context import get_current_user_id
+    from app.modules.library.services.ratings_stats_service import RatingsStatsService
+    current_uid = get_current_user_id() or 1
+    return RatingsStatsService(db).get_ratings_stats(
+        current_uid=current_uid,
+        include_adult=include_adult,
+        adult_gender_preference=gender
+    )
 
 
 @library_router.get("/library/continue-watching", response_model=List[ContinueWatchingItem])
 def get_continue_watching(db: Session = Depends(get_db), limit: int = 12, include_adult: bool = False):
-    from app.modules.library.db_media_resolver import DbMediaResolver
-    from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
+    from app.modules.settings.services.settings_service import SettingsService
     from app.modules.history.playback.playback_monitor import active_sessions
     return LibraryListingService(
         db,
-        library_port=DbMediaResolver(db),
-        settings_port=DbSettingsAdapter(db),
+        settings=SettingsService(db),
         active_sessions=active_sessions
     ).get_continue_watching(limit=limit, include_adult=include_adult)
 
@@ -126,10 +140,10 @@ def get_library_items(
     filter_breast_size: Optional[str] = None,
     filter_butt_shape: Optional[str] = None,
     filter_butt_size: Optional[str] = None,
+    filter_rating: str = "all",
 ):
-    from app.modules.library.db_media_resolver import DbMediaResolver
-    from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-    service = LibraryListingService(db, library_port=DbMediaResolver(db), settings_port=DbSettingsAdapter(db))
+    from app.modules.settings.services.settings_service import SettingsService
+    service = LibraryListingService(db, settings=SettingsService(db))
     if tab:
         tags_list = None
         if selected_tags:
@@ -163,16 +177,40 @@ def get_library_items(
             filter_breast_size=filter_breast_size,
             filter_butt_shape=filter_butt_shape,
             filter_butt_size=filter_butt_size,
+            filter_rating=filter_rating,
         )
 
     return service.get_grouped_library(include_adult=include_adult)
 
 
-@library_router.get("/library/tags", response_model=List[TagGroupItem])
-def get_library_tags(db: Session = Depends(get_db), is_adult: bool = False):
-    from app.modules.users.db_user_repository import DbUserRepository
-    user_repo = DbUserRepository(db)
-    return LibraryFilterService(db, user_repository=user_repo).get_tag_groups(is_adult)
+from app.modules.library.schemas import LibraryTagsResponse, TagItem
+
+@library_router.get("/library/tags", response_model=LibraryTagsResponse)
+def get_library_tags(
+    db: Session = Depends(get_db),
+    is_adult: bool = False,
+    page: int = 1,
+    page_size: int = 40,
+    q: Optional[str] = None
+):
+    return LibraryFilterService(db).get_tag_groups(
+        is_adult=is_adult,
+        page=page,
+        page_size=page_size,
+        search=q
+    )
+
+
+@library_router.get("/library/tags/{tag_name}/items", response_model=TagItem)
+def get_library_tag_items(
+    tag_name: str,
+    is_adult: bool = False,
+    db: Session = Depends(get_db)
+):
+    return LibraryFilterService(db).get_tag_items(
+        tag_name=tag_name,
+        is_adult=is_adult
+    )
 
 
 @library_router.get("/library/filters", response_model=FilterOptionsResponse)
@@ -203,14 +241,12 @@ def get_library_filters(
     filter_butt_shape: Optional[str] = None,
     filter_butt_size: Optional[str] = None,
 ):
-    from app.modules.users.db_user_repository import DbUserRepository
     from app.modules.library.services.listing.filter_params import ListingFilterParams
-    user_repo = DbUserRepository(db)
     
     tags_list = None
     if selected_tags:
         tags_list = [t.strip() for t in selected_tags.split(",") if t.strip()]
-
+ 
     params = ListingFilterParams(
         tab=tab,
         selected_tags=tags_list,
@@ -237,7 +273,7 @@ def get_library_filters(
         filter_butt_shape=filter_butt_shape,
         filter_butt_size=filter_butt_size,
     )
-    return LibraryFilterService(db, user_repository=user_repo).get_library_filter_options(params)
+    return LibraryFilterService(db).get_library_filter_options(params)
 
 
 @library_router.get("/library/collections", response_model=MovieCollectionsResponse)
@@ -248,20 +284,27 @@ def get_movie_collections(
     search: str = "",
     tab: str = "movies",
     include_adult: bool = False,
+    collection_status: str = "all",
+    sort_by: str = "owned_count",
+    sort_direction: str = "desc",
 ):
-    from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-    from app.modules.scrapers.providers.tmdb import TMDBScraper
+    from app.modules.settings.services.settings_service import SettingsService
+    from app.modules.scrapers.support.gateway import scraper_gateway
+    from app.core.enums import Provider
     return LibraryCollectionService(
         db,
-        settings_port=DbSettingsAdapter(db),
-        image_downloader=TasksImageDownloadAdapter(),
-        tmdb_scraper=TMDBScraper(db)
+        settings=SettingsService(db),
+        image_downloader=ImageDownloadService(),
+        tmdb_scraper=scraper_gateway.get_scraper(Provider.TMDB, db)
     ).get_movie_collections(
         page=page,
         page_size=page_size,
         search=search,
         tab=tab,
         include_adult=include_adult,
+        collection_status=collection_status,
+        sort_by=sort_by,
+        sort_direction=sort_direction,
     )
 
 
@@ -275,8 +318,7 @@ def get_library_people(
     tab: str = "people",
     include_adult: bool = False,
 ):
-    from app.modules.library.db_media_resolver import DbMediaResolver
-    return PeopleLibraryService(db, library_port=DbMediaResolver(db)).get_people_group(
+    return PeopleLibraryService(db).get_people_group(
         role=role,
         filter_status=filter_status,
         tab=tab,
@@ -286,15 +328,9 @@ def get_library_people(
 
 
 
-def get_scraper_gateway() -> ScraperGatewayPort:
+def get_scraper_gateway():
     from app.modules.scrapers.support.gateway import scraper_gateway
     return scraper_gateway
-
-DETAIL_DISPATCH = {
-    "scene": lambda db, scrapers, item_id, **kw: SceneDetailService(db, scrapers, image_downloader=TasksImageDownloadAdapter()).get_scene_detail(item_id),
-    "movie": lambda db, scrapers, item_id, **kw: MovieDetailService(db, scrapers).get_library_item_detail(item_id, full_people=kw.get("full_people", False)),
-    "tv":    lambda db, scrapers, item_id, **kw: TvDetailService(db, scrapers).get_library_tv_detail(item_id),
-}
 
 @library_router.get("/library/item/{item_id}")
 def get_library_item_detail(
@@ -304,32 +340,51 @@ def get_library_item_detail(
     db: Session = Depends(get_db),
     scrapers: Any = Depends(get_scraper_gateway)
 ):
+    from app.modules.scrapers.support.registry import MediaTypeRegistry, ProviderRegistry
+    from app.core.enums import MediaType
+
     # Explicit media_type from query param
-    if media_type and media_type.lower() in DETAIL_DISPATCH:
-        return DETAIL_DISPATCH[media_type.lower()](db, scrapers, item_id, full_people=full_people)
+    if media_type:
+        try:
+            m_enum = MediaType(media_type.lower())
+        except ValueError:
+            m_enum = MediaType.MOVIE
+        cfg = MediaTypeRegistry.get_config(m_enum)
+        if cfg and cfg.detail_loader:
+            return cfg.detail_loader(db, scrapers, item_id, full_people=full_people)
 
     # Auto-detect from ID prefix
+    detected_type = MediaType.MOVIE
     if "_" in item_id:
         prefix = item_id.split("_", 1)[0].lower()
-        if prefix in ("stash", "stashdb", "fansdb", "scene"):
-            return DETAIL_DISPATCH["scene"](db, scrapers, item_id)
-        elif prefix in ("porndb", "theporndb"):
+        resolved = ProviderRegistry.resolve_prefix(prefix)
+        if resolved in (Provider.STASHDB, Provider.FANSDB) or prefix == "scene":
+            detected_type = MediaType.SCENE
+        elif prefix == "manual":
+            detected_type = MediaType.VIDEO
+        elif resolved == Provider.PORNDB:
             scene_uuid = item_id.split("_", 1)[1]
             from app.modules.metadata.models import MetadataMatch
-            from app.core.enums import MediaType
             match_db = db.query(MetadataMatch).filter(
                 MetadataMatch.external_id == scene_uuid,
                 MetadataMatch.media_type == MediaType.SCENE
             ).first()
             if match_db:
-                return DETAIL_DISPATCH["scene"](db, scrapers, item_id)
-            
-            scene_resp = DETAIL_DISPATCH["scene"](db, scrapers, item_id)
-            if isinstance(scene_resp, JSONResponse) and scene_resp.status_code == 404:
-                return DETAIL_DISPATCH["movie"](db, scrapers, item_id, full_people=full_people)
-            return scene_resp
+                detected_type = MediaType.SCENE
+            else:
+                scene_cfg = MediaTypeRegistry.get_config(MediaType.SCENE)
+                if scene_cfg and scene_cfg.detail_loader:
+                    scene_resp = scene_cfg.detail_loader(db, scrapers, item_id)
+                    if isinstance(scene_resp, JSONResponse) and scene_resp.status_code == 404:
+                        detected_type = MediaType.MOVIE
+                    else:
+                        return scene_resp
 
-    return DETAIL_DISPATCH["movie"](db, scrapers, item_id, full_people=full_people)
+    cfg = MediaTypeRegistry.get_config(detected_type)
+    if cfg and cfg.detail_loader:
+        return cfg.detail_loader(db, scrapers, item_id, full_people=full_people)
+
+    return JSONResponse(status_code=404, content={"detail": "Detail loader not found for this media type"})
 
 
 @library_router.get("/library/tv/{tv_tmdb_id}", response_model=TvShowDetailResponse)
@@ -363,4 +418,4 @@ def get_library_collection_detail(
     db: Session = Depends(get_db),
     scrapers: Any = Depends(get_scraper_gateway)
 ):
-    return CollectionDetailService(db, scrapers, image_downloader=TasksImageDownloadAdapter()).get_collection_detail(collection_tmdb_id, language=language)
+    return CollectionDetailService(db, scrapers, image_downloader=ImageDownloadService()).get_collection_detail(collection_tmdb_id, language=language)

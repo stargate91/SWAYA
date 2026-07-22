@@ -19,6 +19,8 @@ export function useOrganizerRename({
   openModal,
   closeModal,
   settings,
+  scanMode,
+  sessionMode,
 }) {
   const [isRenameStarting, setIsRenameStarting] = useState(false);
 
@@ -31,8 +33,30 @@ export function useOrganizerRename({
       return;
     }
 
-    const matchedItems = modeVisibleMatchedItems || [];
-    const matchedExtras = modeVisibleExtrasForRename || [];
+    setIsRenameStarting(true);
+    let matchedItems = [];
+    let matchedExtras = [];
+    try {
+      const [moviesRes, tvRes, scenesRes, extrasRes] = await Promise.all([
+        api.organizer.get({ scanMode, sessionMode, pageSize: 1000000, tab: 'movies' }),
+        api.organizer.get({ scanMode, sessionMode, pageSize: 1000000, tab: 'episodes' }),
+        api.organizer.get({ scanMode, sessionMode, pageSize: 1000000, tab: 'scenes' }),
+        api.organizer.get({ scanMode, sessionMode, pageSize: 1000000, tab: 'extras' }),
+      ]);
+      matchedItems = [
+        ...(moviesRes?.items || []),
+        ...(tvRes?.items || []),
+        ...(scenesRes?.items || []),
+      ];
+      matchedExtras = extrasRes?.items || [];
+    } catch (err) {
+      console.error(err);
+      toast(t('organizer.toasts.failedToFetchMatchedItems') || 'Failed to fetch items for renaming.', 'danger');
+      setIsRenameStarting(false);
+      return;
+    } finally {
+      setIsRenameStarting(false);
+    }
 
     if (matchedItems.length === 0) {
       toast(t('organizer.toasts.noMatchedItems'), 'danger');

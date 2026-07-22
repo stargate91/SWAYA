@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.core.enums import ItemStatus
 from app.modules.library.models import MediaItem, ExtraFile
 from app.core.enums import ExtraSubtype, ExtraCategory, MovieEdition, MediaAudioType, MediaSource
-from app.modules.library.adapters.structure.tv_episode_shifter import TvEpisodeShifter
+from app.modules.library.services.tv_episode_shifter import TvEpisodeShifter
 
 logger = logging.getLogger(__name__)
 

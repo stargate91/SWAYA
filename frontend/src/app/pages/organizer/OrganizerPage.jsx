@@ -78,7 +78,46 @@ export default function OrganizerPage() {
     }
   }
 
-  const organizerQuery = useOrganizerQuery(scanMode, sessionMode);
+  const {
+    activeExtrasTab,
+    activeManualTab,
+    activeMainTab,
+    activeRow,
+    currentPage,
+    handleSortToggle,
+    handleToggleAll,
+    handleToggleRow,
+    pageSize,
+    pageStart,
+    pageEnd,
+    paginatedRows,
+    searchQuery,
+    selectedRows,
+    selectedRowIds,
+    clearSelectedRows,
+    setActiveExtrasTab,
+    setActiveManualTab,
+    setActiveMainTab,
+    setActiveRowId,
+    setPageAndScrollToTop,
+    setPageSize,
+    setSearchQuery,
+    focusFirstAvailableResult,
+    sortConfig,
+    sortedRows,
+    tabCounts,
+    totalPages,
+    dismissRows,
+    restoreDismissedRows,
+    dismissedCount,
+    dismissedRowIds,
+    addPendingResolvedIds,
+    removePendingResolvedIds,
+    visibleExtraCount,
+    visibleMediaCount,
+    organizerQuery,
+  } = useOrganizerPageState({ t, scanMode, sessionMode });
+
   const organizer = organizerQuery.data || EMPTY_ORGANIZER;
   const organizerCountQuery = useOrganizerCountQuery(scanMode, sessionMode);
   const [provider, setProvider] = useState('tmdb');
@@ -171,47 +210,6 @@ export default function OrganizerPage() {
   ]);
   const previousRuleSignatureRef = useRef(null);
   const {
-    activeExtrasTab,
-    activeManualTab,
-    activeMainTab,
-    activeRow,
-    currentPage,
-    handleSortToggle,
-    handleToggleAll,
-    handleToggleRow,
-    pageSize,
-    pageStart,
-    pageEnd,
-    paginatedRows,
-    searchQuery,
-    selectedRows,
-    selectedRowIds,
-    clearSelectedRows,
-    setActiveExtrasTab,
-    setActiveManualTab,
-    setActiveMainTab,
-    setActiveRowId,
-    setPageAndScrollToTop,
-    setPageSize,
-    setSearchQuery,
-    focusFirstAvailableResult,
-    sortConfig,
-    sortedRows,
-    tabCounts,
-    totalPages,
-    dismissRows,
-    restoreDismissedRows,
-    dismissedCount,
-    dismissedRowIds,
-    addPendingResolvedIds,
-    removePendingResolvedIds,
-    visibleExtraCount,
-    visibleMediaCount,
-    modeVisibleMatchedItems,
-    modeVisibleExtrasForRename,
-  } = useOrganizerPageState({ organizer, t, scanMode, sessionMode });
-
-  const {
     handleBrowseAndScan,
     handleLoadAll,
     handleRename,
@@ -234,8 +232,6 @@ export default function OrganizerPage() {
     openModal,
     closeModal,
     sortedRows,
-    modeVisibleMatchedItems,
-    modeVisibleExtrasForRename,
     scanStatusQuery,
     scanMode,
     sessionMode,
@@ -246,11 +242,10 @@ export default function OrganizerPage() {
 
 
   const { computedExtrasTabs, computedManualTabs, computedMainTabs } = useOrganizerTabs({
-    organizerExtras: organizer.extras,
     t,
     tabCounts,
-    dismissedRowIds,
     scanMode,
+    sessionMode,
   });
 
   const {

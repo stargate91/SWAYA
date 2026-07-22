@@ -6,7 +6,6 @@ from app.core.database import get_db
 from app.modules.scrapers.support.gateway import scraper_gateway
 from app.modules.metadata.services.metadata_service import MetadataService
 from app.modules.metadata.schemas import MetadataResolveRequest, BulkResolveRequest
-from app.modules.library.db_media_resolver import DbMediaResolver
 
 library_router = APIRouter(prefix="/api/v1", tags=["Metadata"])
 
@@ -29,18 +28,15 @@ def get_metadata_episodes(tmdb_id: int, season_number: int, db: Session = Depend
 
 @library_router.post("/metadata/resolve")
 def resolve_metadata_item(payload: MetadataResolveRequest, db: Session = Depends(get_db)):
-    media_item_port = DbMediaResolver(db)
-    return MetadataService(db, scraper_gateway, media_item_port=media_item_port).resolve_item(payload)
+    return MetadataService(db, scraper_gateway).resolve_item(payload)
 
 @library_router.post("/metadata/bulk-resolve")
 def bulk_resolve_metadata(payload: BulkResolveRequest, db: Session = Depends(get_db)):
-    media_item_port = DbMediaResolver(db)
-    return MetadataService(db, scraper_gateway, media_item_port=media_item_port).bulk_resolve(payload)
+    return MetadataService(db, scraper_gateway).bulk_resolve(payload)
 
 @library_router.get("/metadata/item/{item_id}/full-metadata")
 def get_full_metadata(item_id: str, media_type: str = None, language: str = None, db: Session = Depends(get_db)):
-    media_item_port = DbMediaResolver(db)
-    return MetadataService(db, scraper_gateway, media_item_port=media_item_port).get_full_metadata(item_id, media_type=media_type, language=language)
+    return MetadataService(db, scraper_gateway).get_full_metadata(item_id, media_type=media_type, language=language)
 
 @library_router.get("/metadata/sync-language/status")
 def get_sync_language_status(db: Session = Depends(get_db)):

@@ -22,26 +22,29 @@ class PeopleDetailService:
         self,
         db: Session,
         scrapers: Any,
-        library_port: Optional[LibraryPort] = None,
-        image_service: Optional[ImageServicePort] = None,
-        image_downloader: Optional[ImageDownloadPort] = None
+        resolver: Optional[Any] = None,
+        image_service: Optional[Any] = None,
+        image_downloader: Optional[Any] = None
     ):
         self.db = db
         self.scrapers = scrapers
         
-        self.library_port = library_port
+        if resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            resolver = MediaItemService(db)
+        self.resolver = resolver
         
         if image_service is None:
             from app.modules.media_assets.services.images import image_processing_service
             image_service = image_processing_service
         self.image_service = image_service
         
-        self.filmography_service = FilmographyService(db, library_port=library_port, image_service=image_service, scrapers=scrapers)
+        self.filmography_service = FilmographyService(db, resolver=self.resolver, image_service=image_service, scrapers=scrapers)
         
         self.reader = PerformerDetailReader(
             db=db,
             scrapers=scrapers,
-            library_port=library_port,
+            resolver=self.resolver,
             image_service=image_service,
             filmography_service=self.filmography_service,
             image_downloader=image_downloader
@@ -49,7 +52,7 @@ class PeopleDetailService:
         
         self.asset_manager = PerformerAssetManager(
             db=db,
-            library_port=library_port,
+            resolver=self.resolver,
             image_service=image_service,
             image_downloader=image_downloader
         )

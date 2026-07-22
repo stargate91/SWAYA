@@ -57,9 +57,9 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             
         print(f"[DEBUG] PornDbMovieFormatter.format called with item_id={item_id}, parsed porndb_id={porndb_id}")
         from app.core.language import get_user_ui_language
-        from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-        settings_port = DbSettingsAdapter(db)
-        ui_lang = get_user_ui_language(settings_port)
+        from app.modules.settings.services.settings_service import SettingsService
+        settings = SettingsService(db)
+        ui_lang = get_user_ui_language(settings)
         
         from app.modules.metadata.models import MetadataMatch
         from app.core.enums import Provider, MediaType
@@ -123,8 +123,11 @@ class PornDbMovieFormatter(MovieDetailFormatter):
             try:
                 year = int(date_str.split("-")[0])
             except Exception as e:
-                logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/porndb_movie.py:37: {e}", exc_info=True)
+                logger.debug(f"Swallowed exception in app/modules/library/services/detail/formatters/porndb_movie.py:37: {e}", exc_info=True)
                 
+        from app.modules.settings.services.settings_service import SettingsService
+        gender_pref = SettingsService(db).get_setting("adult_gender_preference") or "all"
+
         cast = []
         for perf in movie_data.get("performers") or []:
             p_info = perf.get("parent") or perf.get("performer") or perf
@@ -137,6 +140,12 @@ class PornDbMovieFormatter(MovieDetailFormatter):
                 mapped_gender = 1
             elif "MALE" in gender_str:
                 mapped_gender = 2
+            
+            if gender_pref != "all":
+                if gender_pref == "female" and mapped_gender != 1:
+                    continue
+                if gender_pref == "male" and mapped_gender != 2:
+                    continue
                 
             # Check if person exists in DB
             person_db = None
@@ -229,13 +238,13 @@ class PornDbMovieFormatter(MovieDetailFormatter):
                     match.release_date = datetime.strptime(date_str, "%Y-%m-%d")
                     db_updated = True
                 except Exception as e:
-                    logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/porndb_movie.py:91: {e}", exc_info=True)
+                    logger.debug(f"Swallowed exception in app/modules/library/services/detail/formatters/porndb_movie.py:91: {e}", exc_info=True)
             if movie_data.get("rating") is not None and float(movie_data.get("rating")) > 0:
                 try:
                     match.rating_porndb = float(movie_data.get("rating"))
                     db_updated = True
                 except Exception as e:
-                    logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/porndb_movie.py:97: {e}", exc_info=True)
+                    logger.debug(f"Swallowed exception in app/modules/library/services/detail/formatters/porndb_movie.py:97: {e}", exc_info=True)
             
             loc_db = next((x for x in match.localizations if x.locale == "en"), None)
             if not loc_db:
@@ -262,12 +271,12 @@ class PornDbMovieFormatter(MovieDetailFormatter):
 
             # Enqueue PornDB movie local asset downloads
             try:
-                from app.modules.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+                from app.modules.tasks.image_download_service import ImageDownloadService
                 from app.modules.media_assets.services.images import image_processing_service, image_path_resolver
                 import os
                 from urllib.parse import urlparse
 
-                image_downloader = TasksImageDownloadAdapter()
+                image_downloader = ImageDownloadService()
                 clean_poster = raw_poster or loc_db.poster_path
                 if clean_poster and clean_poster.startswith(("http://", "https://")):
                     raw_filename = os.path.basename(urlparse(clean_poster).path)
@@ -356,7 +365,7 @@ class PornDbMovieFormatter(MovieDetailFormatter):
                         elif len(parts) == 3:
                             duration_val = int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
                     except ValueError as e:
-                        logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/porndb_movie.py:217: {e}", exc_info=True)
+                        logger.debug(f"Swallowed exception in app/modules/library/services/detail/formatters/porndb_movie.py:217: {e}", exc_info=True)
 
         result = {
             "id": f"porndb_{porndb_id}",

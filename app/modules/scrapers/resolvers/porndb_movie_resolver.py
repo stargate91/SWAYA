@@ -20,13 +20,13 @@ logger = logging.getLogger(__name__)
 class PornDBMovieResolver:
     """Resolves adult movies without mixing PornDB scene results into the profile."""
 
-    def __init__(self, db_session: Session, scraper_gateway: Optional[ScraperGatewayPort] = None):
+    def __init__(self, db_session: Session, scraper_gateway: Optional[Any] = None):
         self.db = db_session
-        from app.modules.scrapers.db_scraper_log_repository import DbScraperLogRepository
+        from app.modules.scrapers.scraper_service import ScraperService
         from app.modules.scrapers.support.gateway import scraper_gateway as default_gateway
         self.scraper_gateway = scraper_gateway or default_gateway
         self.scraper = self.scraper_gateway.adult(Provider.PORNDB, db_session)
-        self.scraper_log_repo = DbScraperLogRepository(db_session)
+        self.scraper_log_repo = ScraperService(db_session)
 
     def _log_search(self, task_id: Optional[int], media_item_id: Optional[int], provider: Provider, search_query: str, result_count: int, details: dict) -> None:
         self.scraper_log_repo.log_search(
@@ -165,7 +165,7 @@ class PornDBMovieResolver:
                     try:
                         candidate_year = int(str(candidate_date).split("-")[0])
                     except (TypeError, ValueError) as e:
-                        logger.debug(f"Swallowed exception in infrastructure/scrapers/resolvers/porndb_movie_resolver.py:168: {e}", exc_info=True)
+                        logger.debug(f"Swallowed exception in modules/scrapers/resolvers/porndb_movie_resolver.py:168: {e}", exc_info=True)
                 
                 if year and candidate_year:
                     if year != candidate_year:

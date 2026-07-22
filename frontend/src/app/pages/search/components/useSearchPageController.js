@@ -132,22 +132,16 @@ export default function useSearchPageController() {
     };
   }, [urlQuery, urlSource, urlType, hasAdult, loadedPage]);
 
-  // Client-side preference filtering for adult performers
+  // Client-side preference filtering for adult performers is offloaded to the backend
   const filteredResults = useMemo(() => {
-    const pref = settings?.adult_gender_preference;
-    const isAdultSource = SOURCES.find((s) => s.id === urlSource)?.adult;
-    if (!isAdultSource || urlType !== 'person' || !pref || pref === 'all') {
-      return results;
-    }
-    return results.filter((item) => {
-      const g = item.gender;
-      if (pref === 'female') return g === 1 || g === '1';
-      if (pref === 'male') return g === 2 || g === '2';
-      return true;
-    });
-  }, [results, urlSource, urlType, settings?.adult_gender_preference]);
+    return results;
+  }, [results]);
 
   const handleCardClick = (item) => {
+    if (item.target_path) {
+      navigate(item.target_path, { state: { allowAdult: true } });
+      return;
+    }
     const provider = item.provider || urlSource;
     if (item.media_type === 'movie') {
       const prefix = provider === 'porndb' ? 'porndb_' : 'tmdb_';

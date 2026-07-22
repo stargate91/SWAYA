@@ -4,8 +4,8 @@ from app.modules.library.services.formatter.models import RenamePreview
 
 
 class PathTemplateCompiler:
-    def __init__(self, library_port: Any, formatter: Any):
-        self.library_port = library_port
+    def __init__(self, resolver: Any, formatter: Any):
+        self.resolver = resolver
         self.formatter = formatter
 
     def _preview_action(self, preview: RenamePreview) -> str:
@@ -13,9 +13,9 @@ class PathTemplateCompiler:
         return str(getattr(preview, "action", "rename") or "rename").strip().lower()
 
     def _is_better_replacement(self, source_item: Any, target_path: Path) -> bool:
-        target_item = self.library_port.get_item_by_relative_path(str(target_path).replace("\\", "/"))
+        target_item = self.resolver.get_item_by_relative_path(str(target_path).replace("\\", "/"))
         if not target_item:
-            target_item = self.library_port.get_item_by_absolute_path(str(target_path))
+            target_item = self.resolver.get_item_by_absolute_path(str(target_path))
 
         if not target_item:
             return False

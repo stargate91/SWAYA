@@ -50,8 +50,8 @@ class LocalMovieFormatter(MovieDetailFormatter):
             active_match = item.matches[0]
             
         from app.core.language import get_user_ui_language
-        from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-        settings_port = DbSettingsAdapter(db)
+        from app.modules.settings.services.settings_service import SettingsService
+        settings_port = SettingsService(db)
         ui_lang = get_user_ui_language(settings_port)
         loc = LanguageService.get_best_localization(active_match.localizations, ui_lang) if active_match else None
         
@@ -214,17 +214,16 @@ class LocalMovieFormatter(MovieDetailFormatter):
         if active_match:
             p_val = active_match.provider.value if hasattr(active_match.provider, "value") else str(active_match.provider)
             p_val = p_val.lower()
-            if p_val == "tmdb":
-                ext_ids["tmdb"] = active_match.external_id
-            elif p_val in ("porndb", "theporndb"):
-                ext_ids["porndb_id"] = active_match.external_id
-                ext_ids["source"] = "porndb"
-            elif p_val == "fansdb":
-                ext_ids["fansdb_id"] = active_match.external_id
-                ext_ids["source"] = "fansdb"
-            elif p_val in ("stash", "stashdb"):
-                ext_ids["stash_id"] = active_match.external_id
-                ext_ids["source"] = "stash"
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            p_enum = ProviderRegistry.get_provider_by_prefix(p_val)
+            if p_enum:
+                cfg = ProviderRegistry.get_config(p_enum)
+                if cfg:
+                    if cfg.prefix == "tmdb":
+                        ext_ids["tmdb"] = active_match.external_id
+                    else:
+                        ext_ids[f"{cfg.prefix}_id"] = active_match.external_id
+                        ext_ids["source"] = cfg.prefix
             if active_match.imdb_id:
                 ext_ids["imdb"] = active_match.imdb_id
 

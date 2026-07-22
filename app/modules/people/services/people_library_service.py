@@ -18,14 +18,15 @@ class PeopleLibraryService:
     queries and formats Person entities.
     """
 
-    def __init__(self, db_session: Session, library_port: Any, user_id: Optional[int] = None, image_service: Optional[ImageServicePort] = None):
+    def __init__(self, db_session: Session, resolver: Optional[Any] = None, user_id: Optional[int] = None, image_service: Optional[Any] = None):
         self.db = db_session
         if user_id is None:
             user_id = get_current_user_id()
         self.user_id = user_id
-        if library_port is None:
-            raise ValueError("library_port is required")
-        self.library_port = library_port
+        if resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            resolver = MediaItemService(db_session)
+        self.resolver = resolver
         if image_service is None:
             from app.modules.media_assets.services.images import image_processing_service
             image_service = image_processing_service
@@ -53,7 +54,7 @@ class PeopleLibraryService:
             normalized_role = "sound"
 
         # Resolve which matches are in the library using the port
-        all_valid_match_ids = self.library_port.get_active_match_ids()
+        all_valid_match_ids = self.resolver.get_active_match_ids()
 
         # Fetch link counts
         links = self.db.query(
@@ -204,7 +205,7 @@ class PeopleLibraryService:
 
         people_list = []
         for person in people:
-            override_dict = self.library_port.get_person_user_override(self.user_id, person.id)
+            override_dict = self.resolver.get_person_user_override(self.user_id, person.id)
             
             raw_poster = (override_dict.get("custom_poster") if override_dict else None) or person.local_profile_path or person.profile_path
             poster_path = self.image_service.resolve_image_url(raw_poster, "people")

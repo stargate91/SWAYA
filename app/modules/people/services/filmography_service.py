@@ -14,20 +14,23 @@ from app.modules.people.services.filmography.paginated_retriever import Paginate
 logger = logging.getLogger(__name__)
 
 class FilmographyService:
-    def __init__(self, db: Session, library_port: Optional[LibraryPort] = None, image_service: Optional[ImageServicePort] = None, scrapers: Optional[Any] = None):
+    def __init__(self, db: Session, resolver: Optional[Any] = None, image_service: Optional[Any] = None, scrapers: Optional[Any] = None):
         self.db = db
-        self.library_port = library_port
+        if resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            resolver = MediaItemService(db)
+        self.resolver = resolver
         
         if image_service is None:
             from app.modules.media_assets.services.images import image_processing_service
             image_service = image_processing_service
         self.image_service = image_service
 
-        self.local_aggregator = LocalCreditsAggregator(db, library_port, image_service)
+        self.local_aggregator = LocalCreditsAggregator(db, resolver, image_service)
         self.prioritizer = CreditsPrioritizer()
-        self.remote_fetcher = RemoteCreditsFetcher(db, library_port, image_service, scrapers=scrapers)
+        self.remote_fetcher = RemoteCreditsFetcher(db, resolver, image_service, scrapers=scrapers)
         self.combined_resolver = CombinedFilmographyResolver(self.prioritizer, self._resolve_img)
-        self.paginated_retriever = PaginatedCreditsRetriever(db, library_port, self._resolve_img, self._fetch_remote_credits)
+        self.paginated_retriever = PaginatedCreditsRetriever(db, resolver, self._resolve_img, self._fetch_remote_credits)
 
     def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
         return self.image_service.resolve_image_url(path, subfolder, size)
@@ -71,11 +74,13 @@ class FilmographyService:
             person = self.db.query(Person).filter(Person.id == person_id).first()
             if person:
                 ext_ids = person.external_ids or {}
-                for prov in ("stashdb", "fansdb", "porndb"):
+                from app.modules.scrapers.support.registry import ProviderRegistry
+                adult_providers = [cfg.prefix for cfg in ProviderRegistry._configs.values() if cfg.is_adult]
+                for prov in adult_providers:
                     ext_id = ext_ids.get(prov) or ext_ids.get(f"{prov}_id")
                     if not ext_id:
                         try:
-                            prov_enum = Provider(prov)
+                            prov_enum = ProviderRegistry.get_provider_by_prefix(prov)
                             link = next((x for x in person.external_links if x.provider == prov_enum), None)
                             if link:
                                 ext_id = link.external_id

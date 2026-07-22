@@ -4,11 +4,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useNavigationStateStore } from '@/stores/useNavigationStateStore';
 import api from '@/lib/api';
 import { useSettingsQuery } from '@/queries/settingsQueries';
-import { useLibraryQuery, useCollectionsQuery, useLibraryFiltersQuery } from '@/queries/libraryQueries';
+import { useLibraryQuery, useCollectionsQuery, useLibraryFiltersQuery, useLibraryInfiniteQuery } from '@/queries/libraryQueries';
 import { useLibraryTags } from './useLibraryTags';
 import { usePaginationVisibility } from '../../../hooks/usePaginationVisibility';
 import { useTranslation } from '@/providers/LanguageContext';
-import { useLocalListSearch } from '../../../hooks/useLocalListSearch';
 import { Clapperboard, Tv, Users, Tag, Layers, Video } from '@/ui/icons';
 import {
   getLibraryEmptyStateKey,
@@ -18,7 +17,6 @@ import {
   isLibraryTagsTab,
   resolveLibraryBackendTab,
 } from '@/lib/libraryTabs';
-import { sortLibraryItems } from '../utils/librarySort';
 
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 
@@ -320,19 +318,53 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     selectedTags,
   ]);
 
+  const isInfinite = paginationMode === 'infinite';
+
+  const libraryQueryParamsNoPage = useMemo(() => {
+    if (!libraryQueryParams) return null;
+    const { page, ...rest } = libraryQueryParams;
+    return rest;
+  }, [libraryQueryParams]);
+
   const { data: libraryData, isLoading: isLibraryLoading } = useLibraryQuery(
-    libraryQueryParams || { tab: 'movies', page: 1, pageSize: 1, include_adult: activeSessionMode === 'nsfw' }
+    !isInfinite && libraryQueryParams
+      ? libraryQueryParams
+      : null
+  );
+
+  const {
+    data: libraryInfiniteData,
+    isLoading: isLibraryInfiniteLoading,
+    fetchNextPage,
+  } = useLibraryInfiniteQuery(
+    isInfinite && libraryQueryParamsNoPage
+      ? libraryQueryParamsNoPage
+      : null
   );
 
   const { data: filterData } = useLibraryFiltersQuery(filtersQueryParams);
 
   const { data: collectionsData, isLoading: isCollectionsLoading } = useCollectionsQuery(
     isCollections && activeSessionMode
-      ? { page: 1, pageSize: 10000, tab: activeSessionMode === 'nsfw' ? 'adult' : 'movies', include_adult: activeSessionMode === 'nsfw' }
+      ? {
+          page: currentPage,
+          pageSize: pageSize,
+          search: searchQuery || undefined,
+          tab: activeSessionMode === 'nsfw' ? 'adult' : 'movies',
+          include_adult: activeSessionMode === 'nsfw',
+          status: collectionStatusFilter,
+          sort_by: sortKey,
+          sort_direction: sortDirection,
+        }
       : null
   );
 
-  const { processedTags, isTagsLoading } = useLibraryTags({ activeSessionMode });
+  const { processedTags, isTagsLoading, tagsResponse } = useLibraryTags({
+    activeSessionMode,
+    page: isTags ? currentPage : 1,
+    pageSize: isTags ? pageSize : 40,
+    searchQuery: isTags ? searchQuery : '',
+  });
 
   const counts = libraryData?.counts || {};
   const movieCountKey = resolveLibraryBackendTab('movies', activeSessionMode);
@@ -456,7 +488,11 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
   };
 
   const handlePageChange = (page) => {
-    setCurrentPage(Math.max(1, Number(page) || 1));
+    const pageNum = Math.max(1, Number(page) || 1);
+    if (isInfinite && pageNum > currentPage) {
+      fetchNextPage();
+    }
+    setCurrentPage(pageNum);
   };
 
   const handlePageSizeChange = (size) => {
@@ -481,182 +517,72 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     }
   };
 
-  const isServerPaged = !isCollections && !isTags;
+  const isServerPaged = true;
 
   const allItems = useMemo(() => {
-    return isCollections
-      ? (collectionsData?.items || [])
-      : isTags
-        ? processedTags
-        : (libraryData?.items || []);
-  }, [isCollections, collectionsData?.items, isTags, processedTags, libraryData?.items]);
-
-  const localFilteredItems = useLocalListSearch(allItems, searchQuery);
-
-  const filterParamsHash = useMemo(() => {
-    if (!libraryQueryParams) return '';
-    const rest = { ...libraryQueryParams };
-    delete rest.page;
-    return JSON.stringify(rest);
-  }, [libraryQueryParams]);
-
-  if (filterParamsHash !== prevFilterParamsHash) {
-    setPrevFilterParamsHash(filterParamsHash);
-    setAccumulatedItems([]);
-    setPrevLibraryItems(null);
-    setPrevCurrentPage(1);
-    setPrevPaginationMode('');
-    setPrevIsServerPaged(false);
-  } else if (
-    libraryData?.items !== prevLibraryItems ||
-    currentPage !== prevCurrentPage ||
-    paginationMode !== prevPaginationMode ||
-    isServerPaged !== prevIsServerPaged
-  ) {
-    setPrevLibraryItems(libraryData?.items);
-    setPrevCurrentPage(currentPage);
-    setPrevPaginationMode(paginationMode);
-    setPrevIsServerPaged(isServerPaged);
-
-    if (paginationMode === 'infinite') {
-      if (isServerPaged && libraryData?.items) {
-        if (currentPage === 1) {
-          setAccumulatedItems(libraryData.items);
-        } else {
-          setAccumulatedItems((prev) => {
-            const freshMap = new Map(libraryData.items.map(item => [item.id, item]));
-            const updatedPrev = prev.map(item => {
-              if (freshMap.has(item.id)) {
-                return freshMap.get(item.id);
-              }
-              return item;
-            });
-            const prevIds = new Set(prev.map(item => item.id));
-            const newItems = libraryData.items.filter(item => !prevIds.has(item.id));
-            return [...updatedPrev, ...newItems];
-          });
-        }
-      }
-    } else {
-      setAccumulatedItems([]);
+    if (isCollections) {
+      return collectionsData?.items || [];
     }
-  }
-
-  useEffect(() => {
-    if (paginationMode !== 'infinite') return;
-
-    const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
-      if (event.type === 'updated' && event.query.queryKey[0] === 'library') {
-        const queryData = event.query.state.data;
-        if (queryData?.items) {
-          setAccumulatedItems((prev) => {
-            const freshMap = new Map(queryData.items.map(item => [item.id, item]));
-            let changed = false;
-            const updated = prev.map(item => {
-              if (freshMap.has(item.id)) {
-                const freshItem = freshMap.get(item.id);
-                if (
-                  item.poster_path !== freshItem.poster_path ||
-                  item.displayPoster !== freshItem.displayPoster ||
-                  item.profile_path !== freshItem.profile_path ||
-                  item.local_profile_path !== freshItem.local_profile_path ||
-                  item.local_poster_path !== freshItem.local_poster_path ||
-                  item.tv_poster_path !== freshItem.tv_poster_path
-                ) {
-                  changed = true;
-                  return {
-                    ...item,
-                    poster_path: freshItem.poster_path,
-                    displayPoster: freshItem.displayPoster,
-                    profile_path: freshItem.profile_path,
-                    local_profile_path: freshItem.local_profile_path,
-                    local_poster_path: freshItem.local_poster_path,
-                    tv_poster_path: freshItem.tv_poster_path,
-                  };
-                }
-              }
-              return item;
-            });
-            return changed ? updated : prev;
-          });
-        }
-      }
-    });
-
-    return () => unsubscribe();
-  }, [queryClient, paginationMode]);
-
+    if (isTags) {
+      return processedTags;
+    }
+    if (isInfinite) {
+      if (!libraryInfiniteData) return [];
+      return libraryInfiniteData.pages.flatMap((page) => page.items || []);
+    }
+    return libraryData?.items || [];
+  }, [isCollections, collectionsData?.items, isTags, processedTags, isInfinite, libraryInfiniteData, libraryData?.items]);
 
   const { sortedItems, paginatedItems, totalItems, totalPages } = useMemo(() => {
-    if (isServerPaged) {
-      return {
-        sortedItems: allItems,
-        paginatedItems: paginationMode === 'infinite' ? accumulatedItems : allItems,
-        totalItems: libraryData?.total_items || 0,
-        totalPages: libraryData?.total_pages || 1,
-      };
-    }
-
-    let filtered = localFilteredItems;
-    if (isCollections) {
-      filtered = filtered.filter(item => {
-        const owned = Number(item.owned_count) || 0;
-        const total = Number(item.total_count) || 0;
-        if (collectionStatusFilter === 'complete') return owned === total;
-        if (collectionStatusFilter === 'in_progress') return owned > 0 && owned < total;
-        return true;
-      });
-    }
-
-    const sorted = sortLibraryItems(filtered, resolvedTab, sortKey, sortDirection);
-    const total = sorted.length;
-    const pages = Math.max(1, Math.ceil(total / pageSize));
-    const paginated = paginationMode === 'infinite'
-      ? sorted.slice(0, currentPage * pageSize)
-      : sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-
     return {
-      sortedItems: sorted,
-      paginatedItems: paginated,
-      totalItems: total,
-      totalPages: pages,
+      sortedItems: allItems,
+      paginatedItems: allItems,
+      totalItems: isCollections
+        ? (collectionsData?.total_items || 0)
+        : isTags
+          ? (tagsResponse?.total_items || 0)
+          : isInfinite
+            ? (libraryInfiniteData?.pages[0]?.total_items || 0)
+            : (libraryData?.total_items || 0),
+      totalPages: isCollections
+        ? (collectionsData?.total_pages || 1)
+        : isTags
+          ? (tagsResponse?.total_pages || 1)
+          : isInfinite
+            ? (libraryInfiniteData?.pages[0]?.total_pages || 1)
+            : (libraryData?.total_pages || 1),
     };
   }, [
-    isServerPaged,
     allItems,
     libraryData?.total_items,
     libraryData?.total_pages,
-    localFilteredItems,
+    collectionsData?.total_items,
+    collectionsData?.total_pages,
+    tagsResponse?.total_items,
+    tagsResponse?.total_pages,
+    libraryInfiniteData?.pages,
     isCollections,
-    collectionStatusFilter,
-    resolvedTab,
-    sortKey,
-    sortDirection,
-    currentPage,
-    pageSize,
-    paginationMode,
-    accumulatedItems,
+    isTags,
+    isInfinite,
   ]);
 
-  // Background Prefetch next/prev pages
+  // Background Prefetch next/prev pages (only for normal page mode)
   useEffect(() => {
-    if (isServerPaged && libraryQueryParams) {
-      if (currentPage < totalPages) {
-        const nextParams = { ...libraryQueryParams, page: currentPage + 1 };
-        queryClient.prefetchQuery({
-          queryKey: ['library', nextParams],
-          queryFn: ({ signal }) => api.library.getItems(nextParams, { signal }),
-        });
-      }
-      if (currentPage > 1) {
-        const prevParams = { ...libraryQueryParams, page: currentPage - 1 };
-        queryClient.prefetchQuery({
-          queryKey: ['library', prevParams],
-          queryFn: ({ signal }) => api.library.getItems(prevParams, { signal }),
-        });
-      }
+    if (!isInfinite && libraryQueryParams && currentPage < totalPages) {
+      const nextParams = { ...libraryQueryParams, page: currentPage + 1 };
+      queryClient.prefetchQuery({
+        queryKey: ['library', nextParams],
+        queryFn: ({ signal }) => api.library.getItems(nextParams, { signal }),
+      });
     }
-  }, [isServerPaged, libraryQueryParams, currentPage, totalPages, queryClient]);
+    if (!isInfinite && libraryQueryParams && currentPage > 1) {
+      const prevParams = { ...libraryQueryParams, page: currentPage - 1 };
+      queryClient.prefetchQuery({
+        queryKey: ['library', prevParams],
+        queryFn: ({ signal }) => api.library.getItems(prevParams, { signal }),
+      });
+    }
+  }, [isInfinite, libraryQueryParams, currentPage, totalPages, queryClient]);
 
   const translationKey = getLibraryTabTranslationKey(resolvedTab, activeSessionMode);
   const emptyStateTranslationKey = getLibraryEmptyStateKey(resolvedTab, activeSessionMode);
@@ -714,7 +640,7 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     ? `${(currentPage - 1) * pageSize + 1}-${Math.min(currentPage * pageSize, totalItems)} / ${totalItems}`
     : '0-0 / 0';
 
-  const isDataLoading = (!isCollections && !isTags && isLibraryLoading) ||
+  const isDataLoading = (!isCollections && !isTags && (isInfinite ? isLibraryInfiniteLoading : isLibraryLoading)) ||
     (isCollections && isCollectionsLoading) ||
     (isTags && isTagsLoading);
 

@@ -11,9 +11,9 @@ export const useListsQuery = (includeAdult = false) => useQuery({
   queryFn: () => api.lists.getLists(includeAdult),
 });
 
-export const useListDetailsQuery = (listId, options = {}) => useQuery({
-  queryKey: listsKeys.details(listId),
-  queryFn: () => api.lists.getListDetails(listId),
+export const useListDetailsQuery = (listId, params = {}, options = {}) => useQuery({
+  queryKey: [...listsKeys.details(listId), params],
+  queryFn: () => api.lists.getListDetails(listId, params),
   enabled: !!listId,
   ...options,
 });

@@ -27,13 +27,9 @@ class PrioritizedResultDict(dict):
                 super().__setitem__(key, value)
                 return
             
-            priorities = {
-                Provider.TMDB: 4,
-                Provider.STASHDB: 3,
-                Provider.FANSDB: 2,
-                Provider.PORNDB: 1
-            }
-            prio = priorities.get(self.current_provider, 0)
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            cfg = ProviderRegistry.get_config(self.current_provider)
+            prio = cfg.priority if cfg else 0
             existing_prio = self._priorities.get(key, -1)
             if prio >= existing_prio:
                 super().__setitem__(key, value)
@@ -42,13 +38,9 @@ class PrioritizedResultDict(dict):
             if key == "biographies" and isinstance(value, dict):
                 if key not in self:
                     super().__setitem__(key, {})
-                priorities = {
-                    Provider.TMDB: 4,
-                    Provider.STASHDB: 3,
-                    Provider.FANSDB: 2,
-                    Provider.PORNDB: 1
-                }
-                prio = priorities.get(self.current_provider, 0)
+                from app.modules.scrapers.support.registry import ProviderRegistry
+                cfg = ProviderRegistry.get_config(self.current_provider)
+                prio = cfg.priority if cfg else 0
                 for loc, bio in value.items():
                     bio_key = f"bio_{loc}"
                     existing_prio = self._priorities.get(bio_key, -1)
@@ -73,7 +65,7 @@ def fetch_external_details(
                 prov = Provider(prov_name)
                 all_links.append({"provider": prov, "external_id": str(ext_id)})
             except ValueError as e:
-                logger.debug(f"Swallowed exception in domains/people/services/enrichment/fetcher.py:72: {e}", exc_info=True)
+                logger.debug(f"Swallowed exception in app/modules/people/services/enrichment/fetcher.py:72: {e}", exc_info=True)
 
     result = PrioritizedResultDict({
         "birthday": None,
@@ -127,7 +119,8 @@ def fetch_external_details(
             if enricher.tmdb_enricher:
                 if enricher.tmdb_enricher.enrich_tmdb(external_id, result):
                     has_data = True
-        elif provider in (Provider.STASHDB, Provider.PORNDB, Provider.FANSDB):
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        elif ProviderRegistry.is_adult_provider(provider):
             if enricher.adult_enricher:
                 if enricher.adult_enricher.enrich_adult(provider, external_id, result, to_process, processed_pairs):
                     has_data = True
@@ -140,6 +133,6 @@ def fetch_external_details(
                 result.set_provider(prov)
                 result["links_to_create"].append({"provider": prov, "external_id": str(ext_id)})
         except ValueError as e:
-            logger.debug(f"Swallowed exception in domains/people/services/enrichment/fetcher.py:139: {e}", exc_info=True)
+            logger.debug(f"Swallowed exception in app/modules/people/services/enrichment/fetcher.py:139: {e}", exc_info=True)
 
     return result if has_data else None

@@ -14,11 +14,14 @@ from app.modules.metadata.services.search.details_fetcher import DetailsFetcher
 logger = logging.getLogger(__name__)
 
 class MetadataSearchService:
-    def __init__(self, db: Session, scrapers: Any, tmdb: Any, media_item_port: Optional[MediaItemPort] = None):
+    def __init__(self, db: Session, scrapers: Any, tmdb: Any, media_resolver: Optional[Any] = None):
         self.db = db
         self.scrapers = scrapers
         self.tmdb = tmdb
-        self.media_item_port = media_item_port
+        if media_resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            media_resolver = MediaItemService(db)
+        self.media_resolver = media_resolver
         self.adult_resolver = AdultSearchResolver()
         self.tmdb_resolver = TmdbSearchResolver()
         self.details_fetcher = DetailsFetcher()
@@ -27,16 +30,16 @@ class MetadataSearchService:
         """Coordinates metadata searches for movies, tv shows, or scenes across multiple providers."""
         prov_enum = None
         if provider:
-            try:
-                prov_enum = Provider(provider.lower())
-            except ValueError as e:
-                logger.debug(f"Swallowed exception: {e}", exc_info=True)
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            prov_enum = ProviderRegistry.resolve_prefix(provider)
 
         if not prov_enum and item_type in ("scene", "adult"):
             prov_enum = Provider.STASHDB
 
-        if prov_enum in (Provider.STASHDB, Provider.PORNDB, Provider.FANSDB):
-            return self.adult_resolver.search_metadata(
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        if prov_enum and ProviderRegistry.is_adult_provider(prov_enum):
+            results = self.adult_resolver.search_metadata(
                 db=self.db,
                 scrapers=self.scrapers,
                 query=query,
@@ -44,16 +47,30 @@ class MetadataSearchService:
                 year=year,
                 prov_enum=prov_enum
             )
+        else:
+            results = self.tmdb_resolver.search_tmdb(
+                tmdb_client=self.tmdb,
+                query=query,
+                item_type=item_type,
+                year=year,
+                language=language,
+                include_adult=include_adult,
+                page=page
+            )
 
-        return self.tmdb_resolver.search_tmdb(
-            tmdb_client=self.tmdb,
-            query=query,
-            item_type=item_type,
-            year=year,
-            language=language,
-            include_adult=include_adult,
-            page=page
-        )
+        from app.modules.media_assets.services.images import image_processing_service
+        for r in results:
+            m_type = r.get("media_type") or item_type
+            if r.get("poster_path"):
+                subfolder = "people" if m_type == "person" else ("scene_stills" if m_type == "scene" else "posters")
+                r["poster_path"] = image_processing_service.resolve_image_url(r["poster_path"], subfolder)
+            if r.get("backdrop_path"):
+                subfolder = "scene_stills" if m_type == "scene" else "backdrops"
+                r["backdrop_path"] = image_processing_service.resolve_image_url(r["backdrop_path"], subfolder)
+            if r.get("profile_path"):
+                r["profile_path"] = image_processing_service.resolve_image_url(r["profile_path"], "people")
+
+        return results
 
     def get_seasons(self, tmdb_id: int) -> List[Dict[str, Any]]:
         """Retrieves seasons list for a TV show."""
@@ -70,16 +87,17 @@ class MetadataSearchService:
 
         source_lower = source.lower()
         type_lower = search_type.lower()
+        results = []
 
         if source_lower == "tmdb":
             if type_lower == "all":
-                return self.tmdb_resolver.global_search_all(self.tmdb, query, include_adult, language, page=page)
+                results = self.tmdb_resolver.global_search_all(self.tmdb, query, include_adult, language, page=page)
             elif type_lower == "movie":
-                return self.search_metadata(query, item_type="movie", provider="tmdb", include_adult=include_adult, language=language, page=page)
+                results = self.search_metadata(query, item_type="movie", provider="tmdb", include_adult=include_adult, language=language, page=page)
             elif type_lower == "tv":
-                return self.search_metadata(query, item_type="tv", provider="tmdb", include_adult=include_adult, language=language, page=page)
+                results = self.search_metadata(query, item_type="tv", provider="tmdb", include_adult=include_adult, language=language, page=page)
             elif type_lower == "person":
-                return self.tmdb_resolver.global_search_person(self.tmdb, query, include_adult, language, page=page)
+                results = self.tmdb_resolver.global_search_person(self.tmdb, query, include_adult, language, page=page)
         else:
             try:
                 prov_enum = Provider(source_lower)
@@ -87,13 +105,61 @@ class MetadataSearchService:
                 return []
 
             if type_lower == "scene":
-                return self.search_metadata(query, item_type="scene", provider=source_lower, include_adult=include_adult, language=language, page=page)
+                results = self.search_metadata(query, item_type="scene", provider=source_lower, include_adult=include_adult, language=language, page=page)
             elif type_lower == "movie":
-                return self.search_metadata(query, item_type="movie", provider=source_lower, include_adult=include_adult, language=language, page=page)
+                results = self.search_metadata(query, item_type="movie", provider=source_lower, include_adult=include_adult, language=language, page=page)
             elif type_lower == "person":
-                return self.adult_resolver.search_performers(self.db, self.scrapers, query, prov_enum, page=page)
+                results = self.adult_resolver.search_performers(self.db, self.scrapers, query, prov_enum, page=page)
 
-        return []
+        # 1. Post-process to calculate and append target_path
+        from app.modules.media_assets.services.images import image_processing_service
+        for r in results:
+            target_path = None
+            m_type = r.get("media_type")
+            prov = r.get("provider") or source_lower
+            r_id = r.get("id")
+            
+            if m_type == "movie":
+                prefix = "porndb_" if prov == "porndb" else "tmdb_"
+                target_path = f"/library/movie/{prefix}{r_id}"
+            elif m_type == "tv":
+                target_path = f"/library/tv/{r_id}"
+            elif m_type == "person":
+                target_path = f"/library/people/{r_id}"
+            elif m_type == "scene":
+                prefix = "porndb" if prov == "porndb" else ("fansdb" if prov == "fansdb" else "stash")
+                target_path = f"/library/scene/{prefix}_{r_id}"
+            elif m_type == "video":
+                target_path = f"/library/video/{r_id}"
+                
+            r["target_path"] = target_path
+
+            # Resolve image paths
+            if r.get("poster_path"):
+                subfolder = "people" if m_type == "person" else ("scene_stills" if m_type == "scene" else "posters")
+                r["poster_path"] = image_processing_service.resolve_image_url(r["poster_path"], subfolder)
+            if r.get("backdrop_path"):
+                subfolder = "scene_stills" if m_type == "scene" else "backdrops"
+                r["backdrop_path"] = image_processing_service.resolve_image_url(r["backdrop_path"], subfolder)
+            if r.get("profile_path"):
+                r["profile_path"] = image_processing_service.resolve_image_url(r["profile_path"], "people")
+
+        # 2. Post-process to filter by performer gender preference
+        if source_lower != "tmdb" and type_lower == "person":
+            from app.modules.settings.services.settings_service import SettingsService
+            settings_svc = SettingsService(self.db)
+            pref = settings_svc.get_setting("adult_gender_preference") or "all"
+            if pref != "all":
+                def match_pref(item):
+                    g = item.get("gender")
+                    if pref == "female":
+                        return g in (1, "1")
+                    elif pref == "male":
+                        return g in (2, "2")
+                    return True
+                results = [r for r in results if match_pref(r)]
+
+        return results
 
     def get_full_metadata(self, item_id: str, media_type: str = None, language: str = None) -> Dict[str, Any]:
         """Fetches detailed full metadata details for a matched item."""
@@ -104,5 +170,5 @@ class MetadataSearchService:
             item_id=item_id,
             media_type=media_type,
             language=language,
-            media_item_port=self.media_item_port
+            media_resolver=self.media_resolver
         )

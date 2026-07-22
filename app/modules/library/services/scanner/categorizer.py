@@ -28,7 +28,7 @@ class Categorizer:
     # Keyword mapping for automated subtype detection
     SUBTYPE_MAP = SCANNER_SUBTYPE_MAP
 
-    def categorize(self, file_path: Path, settings_port: Optional[SettingsPort] = None, is_audio_only: bool = False) -> Tuple[Optional[ExtraCategory], Optional[ExtraSubtype]]:
+    def categorize(self, file_path: Path, settings: Optional[Any] = None, is_audio_only: bool = False) -> Tuple[Optional[ExtraCategory], Optional[ExtraSubtype]]:
         """
         Determines the category and subtype of a file.
         Uses extensions for primary categorization and keywords for subtype refinement.
@@ -43,26 +43,26 @@ class Categorizer:
         meta_exts = list(CATEGORIZER_META_EXTS)
         video_exts = list(CATEGORIZER_VIDEO_EXTS)
         
-        settings = None
-        if settings_port:
-            try:
-                settings = settings_port.get_all_system_settings()
-            except Exception as e:
-                logger.debug(f"Swallowed exception in domains/library/services/scanner/categorizer.py:42: {e}", exc_info=True)
-
+        settings_dict = None
         if settings:
-            if "extras_sub_exts" in settings:
-                sub_exts = [e.strip() for e in settings["extras_sub_exts"].split(",")]
-            if "extras_audio_exts" in settings:
-                audio_exts = [e.strip() for e in settings["extras_audio_exts"].split(",")]
-            if "extras_img_exts" in settings:
-                img_exts = [e.strip() for e in settings["extras_img_exts"].split(",")]
-            if "extras_meta_exts" in settings:
-                meta_exts = [e.strip() for e in settings["extras_meta_exts"].split(",")]
-            if "naming_video_exts" in settings:
+            try:
+                settings_dict = settings.get_all_system_settings()
+            except Exception as e:
+                logger.debug(f"Swallowed exception in app/modules/library/services/scanner/categorizer.py:42: {e}", exc_info=True)
+
+        if settings_dict:
+            if "extras_sub_exts" in settings_dict:
+                sub_exts = [e.strip() for e in settings_dict["extras_sub_exts"].split(",")]
+            if "extras_audio_exts" in settings_dict:
+                audio_exts = [e.strip() for e in settings_dict["extras_audio_exts"].split(",")]
+            if "extras_img_exts" in settings_dict:
+                img_exts = [e.strip() for e in settings_dict["extras_img_exts"].split(",")]
+            if "extras_meta_exts" in settings_dict:
+                meta_exts = [e.strip() for e in settings_dict["extras_meta_exts"].split(",")]
+            if "naming_video_exts" in settings_dict:
                 video_exts = [
                     e.strip().lower() if e.strip().startswith('.') else f".{e.strip().lower()}"
-                    for e in settings["naming_video_exts"].split(",") if e.strip()
+                    for e in settings_dict["naming_video_exts"].split(",") if e.strip()
                 ]
 
         # Primary categorization based on extensions

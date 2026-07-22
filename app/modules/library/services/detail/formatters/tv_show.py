@@ -46,9 +46,9 @@ class TvShowFormatter(DetailFormatter):
             return JSONResponse(status_code=400, content={"error": "Invalid tv TMDB ID"})
         
         from app.core.language import get_user_ui_language
-        from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-        settings_port = DbSettingsAdapter(db)
-        ui_lang = language or get_user_ui_language(settings_port)
+        from app.modules.settings.services.settings_service import SettingsService
+        settings = SettingsService(db)
+        ui_lang = language or get_user_ui_language(settings)
         
         from app.modules.metadata.models import MetadataMatch
         series_match = db.query(MetadataMatch).filter(
@@ -217,8 +217,8 @@ class TvShowFormatter(DetailFormatter):
 
         # Enqueue local asset downloads for TMDB TV show assets (poster, backdrop, logo, cast profiles, season posters)
         try:
-            from app.modules.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
-            image_downloader = TasksImageDownloadAdapter()
+            from app.modules.tasks.image_download_service import ImageDownloadService
+            image_downloader = ImageDownloadService()
             self._queue_tmdb_tv_assets(image_downloader, tv_tmdb_id_int, tmdb_data, effective_poster, effective_backdrop, effective_logo)
         except Exception as err:
             logger.warning(f"Failed to queue TMDB TV assets for {tv_tmdb_id_int}: {err}")

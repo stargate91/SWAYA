@@ -222,7 +222,7 @@ def resolve_person_known_for_backdrop(
                 language=preferred_languages[0]
             )
         except Exception as e:
-            logger.debug(f"Swallowed exception in domains/people/helpers.py:222: {e}", exc_info=True)
+            logger.debug(f"Swallowed exception in app/modules/people/helpers.py:222: {e}", exc_info=True)
 
         backdrop_path = image_processing_service.pick_backdrop_path(raw_data, preferred_language=preferred_languages[0]) if raw_data else None
         if backdrop_path:

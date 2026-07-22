@@ -16,33 +16,74 @@ from app.modules.media.schemas import (
     WatchHistoryResponse,
     WatchedHistoryResponse,
 )
-from app.modules.media.services.playback_domain_service import PlaybackDomainService
 from app.core.enums import Provider, MediaType
 
 logger = logging.getLogger(__name__)
+
+
+def parse_watched_at(value) -> datetime:
+    if not value:
+        return datetime.now(timezone.utc)
+    if isinstance(value, datetime):
+        return value
+    try:
+        normalized = str(value).strip().replace("Z", "+00:00")
+        return datetime.fromisoformat(normalized)
+    except Exception as exc:
+        raise ValueError("Invalid watched_at datetime format") from exc
+
+
+def recalculate_watch_state(playback_logs, override) -> None:
+    logs = sorted(
+        [log for log in (playback_logs or []) if log.watched_at],
+        key=lambda x: x.watched_at,
+        reverse=True,
+    )
+        
+    def is_log_completed(log):
+        duration = log.media_item.duration if (log.media_item and log.media_item.duration) else 0
+        if duration > 0:
+            return (log.position_seconds or 0) / duration >= 0.90
+        return (log.position_seconds or 0) > 0
+
+    completed_count = sum(1 for log in logs if is_log_completed(log))
+    override.watch_count = completed_count
+    override.last_watched_at = logs[0].watched_at if logs else None
+    
+    if logs:
+        latest_log = logs[0]
+        is_latest_completed = is_log_completed(latest_log)
+        override.is_watched = is_latest_completed
+        if is_latest_completed:
+            override.resume_position = 0
+        else:
+            override.resume_position = latest_log.position_seconds or 0
+    else:
+        override.is_watched = False
+        override.resume_position = 0
 
 
 class PlaybackService:
     def __init__(
         self,
         db: Session,
-        settings_port: Optional[Any] = None,
+        settings: Optional[Any] = None,
         overrides_service: Optional[Any] = None,
         playback_repo: Optional[Any] = None,
-        library_port: Optional[Any] = None
+        resolver: Optional[Any] = None
     ):
-        from app.modules.library.db_media_resolver import DbMediaResolver
-        from app.modules.history.db_playback_repository import DbPlaybackRepository
+        from app.modules.library.services.media_item_service import MediaItemService
+        from app.modules.history.services.playback_service import PlaybackService
         from app.modules.users.services.overrides_service import OverridesService
 
 
         self.db = db
-        self.library_port = library_port or DbMediaResolver(db)
-        self.playback_repo = playback_repo or DbPlaybackRepository(db)
-        self.overrides = overrides_service or OverridesService(db, self.library_port)
+        self.resolver = resolver or MediaItemService(db)
+        self.playback_repo = playback_repo or PlaybackService(db)
+        self.overrides = overrides_service or OverridesService(db, self.resolver)
 
-        from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-        self.settings = settings_port or DbSettingsAdapter(db)
+        from app.modules.settings.services.settings_service import SettingsService
+        self.settings = settings or SettingsService(db)
         self.playback_logging_service = PlaybackLoggingService()
 
     def track_playback_start(self, item_id: Any) -> Tuple[Any, Any, int]:
@@ -53,7 +94,7 @@ class PlaybackService:
             if not item_id_int:
                 raise NotFoundException(f"Media item not found for ID: {item_id}")
 
-        item = self.library_port.get_item_by_id(item_id_int)
+        item = self.resolver.get_item_by_id(item_id_int)
         if not item:
             raise NotFoundException("Media item not found")
 
@@ -90,11 +131,11 @@ class PlaybackService:
         return item, override, start_seconds
 
     def add_watch_history_entry_core(self, item_id: int, watched_at_raw: Any = None) -> Any:
-        item = self.library_port.get_item_by_id(item_id)
+        item = self.resolver.get_item_by_id(item_id)
         if not item:
             raise NotFoundException("Item not found")
 
-        watched_at = PlaybackDomainService.parse_watched_at(watched_at_raw)
+        watched_at = parse_watched_at(watched_at_raw)
         self.playback_repo.create_playback_log(item.id, watched_at)
         self.db.refresh(item)
         self._recalculate_watch_state(item)
@@ -103,7 +144,7 @@ class PlaybackService:
         return item
 
     def update_watch_history_entry_core(self, item_id: int, log_id: int, watched_at_raw: Any = None) -> Any:
-        item = self.library_port.get_item_by_id(item_id)
+        item = self.resolver.get_item_by_id(item_id)
         if not item:
             raise NotFoundException("Item not found")
 
@@ -111,7 +152,7 @@ class PlaybackService:
         if not log:
             raise NotFoundException("Watch history entry not found")
 
-        new_watched_at = PlaybackDomainService.parse_watched_at(watched_at_raw)
+        new_watched_at = parse_watched_at(watched_at_raw)
         self.playback_repo.update_playback_log_watched_at(log.id, new_watched_at)
         self.db.refresh(item)
         self._recalculate_watch_state(item)
@@ -120,7 +161,7 @@ class PlaybackService:
         return item
 
     def delete_watch_history_entry_core(self, item_id: int, log_id: int) -> Any:
-        item = self.library_port.get_item_by_id(item_id)
+        item = self.resolver.get_item_by_id(item_id)
         if not item:
             raise NotFoundException("Item not found")
 
@@ -155,7 +196,7 @@ class PlaybackService:
 
     def _recalculate_watch_state(self, item) -> None:
         override = self.overrides.get_or_create_media_item_override(item.id)
-        PlaybackDomainService.recalculate_watch_state(item.playback_logs, override)
+        recalculate_watch_state(item.playback_logs, override)
 
     def _resolve_img(self, path: Optional[str], subfolder: str) -> Optional[str]:
         return image_processing_service.resolve_image_url(path, subfolder)
@@ -232,7 +273,7 @@ class PlaybackService:
             if not item_id_int:
                 raise NotFoundException(f"Media item not found for ID: {item_id}")
                 
-        item = self.library_port.get_item_by_id(item_id_int)
+        item = self.resolver.get_item_by_id(item_id_int)
         if not item:
             raise NotFoundException("Media item not found")
             
@@ -270,13 +311,13 @@ class PlaybackService:
                 if loc_logo:
                     resolved = None
                     if loc_logo.local_logo_path:
-                        resolved = ImageServiceRegistry.get().resolve_image_url(loc_logo.local_logo_path, "logos")
+                        resolved = image_processing_service.resolve_image_url(loc_logo.local_logo_path, "logos")
                     if not resolved and loc_logo.logo_path:
-                        resolved = ImageServiceRegistry.get().resolve_image_url(loc_logo.logo_path, "logos")
+                        resolved = image_processing_service.resolve_image_url(loc_logo.logo_path, "logos")
                     logo_path = resolved
 
-            # Prioritize studio logo if available (for scenes)
-            if match.media_type and match.media_type.value == "scene":
+            # Prioritize studio logo if available (for adult/scene content)
+            if match.media_type and MediaType.is_adult_type(match.media_type):
                 from app.modules.metadata.models import metadata_match_studios, Studio
                 
                 studio_row = self.db.query(Studio).join(metadata_match_studios).filter(
@@ -293,7 +334,7 @@ class PlaybackService:
                     
                     chosen_logo = studio_logo or parent_logo
                     if chosen_logo:
-                        resolved_studio = ImageServiceRegistry.get().resolve_image_url(chosen_logo, "logos")
+                        resolved_studio = image_processing_service.resolve_image_url(chosen_logo, "logos")
                         if resolved_studio:
                             logo_path = resolved_studio
 
@@ -358,7 +399,7 @@ class PlaybackService:
                 if media_type == "episode":
                     raw_image = match.local_still_path or match.still_path
                     image_category = "stills"
-                elif media_type == "scene":
+                elif MediaType.is_adult_type(media_type):
                     raw_image = match.local_backdrop_path or match.backdrop_path
                     image_category = "scene_stills"
                 else:
@@ -375,19 +416,19 @@ class PlaybackService:
                     media_image = raw_image
                 else:
                     
-                    media_image = ImageServiceRegistry.get().resolve_image_url(raw_image, image_category)
+                    media_image = image_processing_service.resolve_image_url(raw_image, image_category)
         else:
             # Check override poster without match
             if override and override.custom_poster:
                 media_image = override.custom_poster
                 if media_image and not media_image.startswith(("/media/", "http://", "https://")):
                     
-                    media_image = ImageServiceRegistry.get().resolve_image_url(media_image, "posters")
+                    media_image = image_processing_service.resolve_image_url(media_image, "posters")
         
         # Make sure media_image gets resolved if it's set
         if media_image and not media_image.startswith(("/media/", "http://", "https://")):
             
-            media_image = ImageServiceRegistry.get().resolve_image_url(media_image, "posters")
+            media_image = image_processing_service.resolve_image_url(media_image, "posters")
         
         if override and override.custom_logo:
             logo_path = override.custom_logo
@@ -395,7 +436,7 @@ class PlaybackService:
         # Resolve logo path using ImageServiceRegistry so the client gets a fully qualified URL
         if logo_path and not logo_path.startswith(("/media/", "http://", "https://")):
             
-            logo_path = ImageServiceRegistry.get().resolve_image_url(logo_path, "logos")
+            logo_path = image_processing_service.resolve_image_url(logo_path, "logos")
                 
         # Collect subtitle and audio extras
         from app.core.enums import ExtraCategory
@@ -474,7 +515,7 @@ class PlaybackService:
 
                 
                 if raw_show_poster:
-                    tv_show_poster = ImageServiceRegistry.get().resolve_image_url(raw_show_poster, "posters")
+                    tv_show_poster = image_processing_service.resolve_image_url(raw_show_poster, "posters")
 
                 # Resolve season poster
                 season_match = self.db.query(MetadataMatch).filter(
@@ -492,7 +533,7 @@ class PlaybackService:
                         raw_season_poster = season_match.local_poster_path or season_match.poster_path
                     
                     if raw_season_poster:
-                        season_poster = ImageServiceRegistry.get().resolve_image_url(raw_season_poster, "posters")
+                        season_poster = image_processing_service.resolve_image_url(raw_season_poster, "posters")
 
         return {
             "file_path": item.current_path,
@@ -534,7 +575,7 @@ class PlaybackService:
             if not item_id_int:
                 raise NotFoundException(f"Media item not found for ID: {item_id}")
 
-        self.library_port.save_playback_position(item_id_int, current_time, total_length, self.overrides.user_id)
+        self.resolver.save_playback_position(item_id_int, current_time, total_length, self.overrides.user_id)
         
         # Track active session for embedded/MPV players
         from app.modules.history.playback.playback_monitor import active_sessions

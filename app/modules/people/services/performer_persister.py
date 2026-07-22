@@ -7,27 +7,16 @@ from sqlalchemy.orm import Session
 
 from app.modules.metadata.models import MetadataMatch
 from app.modules.people.models import Person
-from app.modules.people.services import PersonService
+from app.modules.people.services.person_service import PersonService
 from app.core.enums import Provider, RoleType
 
 
 logger = logging.getLogger(__name__)
 
 class PerformerPersister:
-    def __init__(self, parent_persister):
-        self.persister = parent_persister
-
-    @property
-    def db(self) -> Session:
-        return self.persister.db
-
-    @property
-    def people_repo(self) -> PeopleRepositoryPort:
-        return self.persister.people_repo
-
-    @property
-    def image_downloader(self):
-        return self.persister.image_downloader
+    def __init__(self, db: Session, image_downloader: Any):
+        self.db = db
+        self.image_downloader = image_downloader
 
     def _local_image_exists(self, path: Optional[str], subfolder: str) -> bool:
         return bool(path and path.startswith(f"{subfolder}/"))
@@ -96,8 +85,7 @@ class PerformerPersister:
         self.image_downloader.enqueue_download(url, "people", filename)
 
     def persist_performers(self, performers_info: List[Dict[str, Any]], match: MetadataMatch, limit_cast: int = 15):
-        from app.modules.people.db_people_repository import DbPeopleRepository
-        person_service = PersonService(self.db, people_repo=DbPeopleRepository(self.db))
+        person_service = PersonService(self.db)
         
         # In movies we only persist up to limit_cast performers (usually 15)
         target_performers = performers_info[:limit_cast] if limit_cast > 0 else performers_info
@@ -108,7 +96,7 @@ class PerformerPersister:
                 try:
                     prov_enum = Provider(perf["provider"])
                 except Exception as e:
-                    logger.debug(f"Swallowed exception in infrastructure/scrapers/support/persistence/performer_persister.py:100: {e}", exc_info=True)
+                    logger.debug(f"Swallowed exception in modules/scrapers/support/persistence/performer_persister.py:100: {e}", exc_info=True)
             person = person_service.update_or_create_person(
                 name=perf["name"],
                 profile_path=perf["profile_path"],

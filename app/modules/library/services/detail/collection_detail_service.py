@@ -18,7 +18,7 @@ from app.modules.library.schemas import CollectionDetailResponse
 logger = logging.getLogger(__name__)
 
 class CollectionDetailService(DetailFormatter):
-    def __init__(self, db: Session, scrapers: Any, image_downloader: Optional[ImageDownloadPort] = None):
+    def __init__(self, db: Session, scrapers: Any, image_downloader: Optional[Any] = None):
         super().__init__()
         self.db = db
         self.scrapers = scrapers
@@ -33,9 +33,9 @@ class CollectionDetailService(DetailFormatter):
             return JSONResponse(status_code=400, content={"error": "Invalid collection TMDB ID"})
         
         from app.core.language import get_user_ui_language
-        from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-        settings_port = DbSettingsAdapter(db)
-        ui_lang = language or get_user_ui_language(settings_port)
+        from app.modules.settings.services.settings_service import SettingsService
+        settings = SettingsService(db)
+        ui_lang = language or get_user_ui_language(settings)
         
         from app.modules.metadata.models import MediaCollection, MediaCollectionLocalization
         from app.core.enums import Provider
@@ -169,7 +169,7 @@ class CollectionDetailService(DetailFormatter):
                 try:
                     year = int(release_date.split("-")[0])
                 except Exception as e:
-                    logger.debug(f"Swallowed exception in domains/library/services/detail/collection_detail_service.py:165: {e}", exc_info=True)
+                    logger.debug(f"Swallowed exception in app/modules/library/services/detail/collection_detail_service.py:165: {e}", exc_info=True)
             
             movies.append({
                 "id": part_tmdb_id,

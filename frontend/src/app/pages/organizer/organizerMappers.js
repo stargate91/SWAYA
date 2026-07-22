@@ -25,6 +25,7 @@ export const mapOrganizerTypeLabel = (type, t) => {
 };
 
 export const normalizeStatusTone = (value, t) => {
+  if (value === 'success' || value === 'danger' || value === 'warning' || value === 'default') return value;
   if (value === t('organizer.status.ready')) return 'success';
   if (value === t('organizer.status.collision') || value === t('organizer.status.error')) return 'danger';
   if (value === t('organizer.status.pending') || value === t('organizer.status.uncertain') || value === t('organizer.status.multiple') || value === t('organizer.status.noMatch')) return 'warning';
@@ -75,12 +76,13 @@ export const compareOrganizerValues = (left, right) => {
 export const mapOrganizerItemRow = (item, t) => ({
   id: `item-${item.id}`,
   itemId: item.id,
-  source: getFilenameFromPath(item.filename),
-  target: getFilenameFromPath(item.planned_path),
+  source: item.source_filename || getFilenameFromPath(item.filename),
+  target: item.target_filename || getFilenameFromPath(item.planned_path),
   sourcePath: item.current_path || item.filename,
   targetPath: item.planned_path || '-',
-  type: mapItemType(item.type, t),
-  status: mapItemStatus(item.status, item.has_collision, t),
+  type: item.display_type || mapItemType(item.type, t),
+  status: item.display_status || mapItemStatus(item.status, item.has_collision, t),
+  statusTone: item.status_tone,
   hasCollision: Boolean(item.has_collision),
   rawAction: String(item.action || '').toLowerCase(),
   rawType: String(item.type || '').toLowerCase(),

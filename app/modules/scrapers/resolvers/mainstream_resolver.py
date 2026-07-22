@@ -22,13 +22,13 @@ class MainstreamResolver:
     Scraper match resolver that scores and matches MediaItems to TMDB candidates.
     """
 
-    def __init__(self, db_session: Session, scraper_gateway: Optional[ScraperGatewayPort] = None):
+    def __init__(self, db_session: Session, scraper_gateway: Optional[Any] = None):
         self.db = db_session
-        from app.modules.scrapers.db_scraper_log_repository import DbScraperLogRepository
+        from app.modules.scrapers.scraper_service import ScraperService
         from app.modules.scrapers.support.gateway import scraper_gateway as default_gateway
         self.scraper_gateway = scraper_gateway or default_gateway
         self.api = self.scraper_gateway.tmdb(db_session)
-        self.scraper_log_repo = DbScraperLogRepository(db_session)
+        self.scraper_log_repo = ScraperService(db_session)
 
         # Helper instances
         self.sanitizer = QuerySanitizer()
@@ -148,7 +148,7 @@ class MainstreamResolver:
                         if abs(c_year - target_year) <= 1:
                             year_match = True
                     except Exception as e:
-                        logger.debug(f"Swallowed exception in infrastructure/scrapers/resolvers/mainstream_resolver.py:150: {e}", exc_info=True)
+                        logger.debug(f"Swallowed exception in modules/scrapers/resolvers/mainstream_resolver.py:150: {e}", exc_info=True)
                 else:
                     year_match = True
                 

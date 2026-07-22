@@ -14,9 +14,9 @@ from app.modules.library.schemas import LibraryStatsResponse
 logger = logging.getLogger(__name__)
 
 class LibraryStatsService:
-    def __init__(self, db_session: Session, settings_port: Optional[SettingsPort] = None):
+    def __init__(self, db_session: Session, settings: Optional[Any] = None):
         self.db = db_session
-        self.settings = settings_port
+        self.settings = settings
 
     def _format_size(self, size_bytes: int) -> str:
         if size_bytes >= 1024 ** 4:
@@ -106,21 +106,18 @@ class LibraryStatsService:
         include_adult_setting_val = settings_adapter.get_setting("include_adult", user_id=current_user_id)
         include_adult_setting = str(include_adult_setting_val).lower() == "true"
 
-        scenes_query = self.db.query(func.count(MediaItem.id)).select_from(MediaItem).join(
-            MetadataMatch, (MetadataMatch.media_item_id == MediaItem.id)
-        ).filter(
-            MediaItem.status.in_(library_statuses),
-            MetadataMatch.media_type == MediaType.SCENE,
-            MetadataMatch.is_active
-        )
-        if include_adult:
-            scenes_query = scenes_query.filter(MetadataMatch.is_adult)
-            total_scenes = scenes_query.filter(MetadataMatch.is_home_video == False).scalar() or 0
-            total_videos = scenes_query.filter(MetadataMatch.is_home_video == True).scalar() or 0
-        else:
-            scenes_query = scenes_query.filter(~MetadataMatch.is_adult)
-            total_scenes = scenes_query.scalar() or 0
-            total_videos = 0
+        def get_count(m_type, adult_val):
+            return self.db.query(func.count(MediaItem.id)).select_from(MediaItem).join(
+                MetadataMatch, (MetadataMatch.media_item_id == MediaItem.id)
+            ).filter(
+                MediaItem.status.in_(library_statuses),
+                MetadataMatch.media_type == m_type,
+                MetadataMatch.is_active,
+                MetadataMatch.is_adult == adult_val
+            ).scalar() or 0
+
+        total_scenes = get_count(MediaType.SCENE, include_adult)
+        total_videos = get_count(MediaType.VIDEO, include_adult)
 
         # Calculate storage sizes
         items = self.db.query(MediaItem).select_from(MediaItem).join(MetadataMatch).filter(
@@ -149,7 +146,7 @@ class LibraryStatsService:
                     is_adult_item = True
                 if m.media_type in (MediaType.TV, MediaType.EPISODE):
                     is_tv = True
-                elif m.media_type == MediaType.SCENE:
+                elif m.media_type.is_adult:
                     is_scene = True
 
             if include_adult:
@@ -231,7 +228,7 @@ class LibraryStatsService:
 
             if m.media_type == MediaType.MOVIE:
                 unique_matches.append(m)
-            elif m.media_type == MediaType.SCENE:
+            elif m.media_type.is_adult:
                 unique_matches.append(m)
             elif m.media_type == MediaType.EPISODE:
                 tv_match = None
@@ -291,32 +288,93 @@ class LibraryStatsService:
                     pair_key = f"{source_id}|{target_id}"
                     genre_pair_dist[pair_key] = genre_pair_dist.get(pair_key, 0) + 1
 
+        def is_single_genre_label(label: str) -> bool:
+            normalized = str(label or "").strip().lower()
+            if not normalized:
+                return False
+            if "&" in normalized or "/" in normalized or "," in normalized:
+                return False
+            import re
+            if re.search(r"\b(and|és)\b", normalized):
+                return False
+            return True
+
         for genre_id, count in genre_dist_ids.items():
             label = genre_labels.get(genre_id, genre_id)
             genre_dist[label] = count
 
-        top_genre_ids = sorted(genre_dist_ids.items(), key=lambda x: x[1], reverse=True)[:12]
-        top_genre_id_set = {genre_id for genre_id, _ in top_genre_ids}
-        constellation_nodes = [
-            {
-                "id": genre_id,
-                "label": genre_labels.get(genre_id, genre_id),
-                "count": count,
+        filtered_genre_dist_ids = {gid: cnt for gid, cnt in genre_dist_ids.items() if is_single_genre_label(genre_labels.get(gid, gid))}
+        top_genre_ids = sorted(filtered_genre_dist_ids.items(), key=lambda x: x[1], reverse=True)[:12]
+
+        is_mocked = False
+        has_enough_data = False
+
+        if len(top_genre_ids) < 3:
+            is_mocked = True
+            if include_adult:
+                mock_labels = ["Anal", "Blowjob", "All Sex", "POV", "Hardcore", "Solo"]
+            else:
+                mock_labels = ["Action", "Comedy", "Drama", "Thriller", "Sci-Fi", "Adventure"]
+
+            top_genre_ids = [(label.lower(), 10 - idx) for idx, label in enumerate(mock_labels)]
+            genre_labels.update({label.lower(): label for label in mock_labels})
+
+            constellation_nodes = [
+                {
+                    "id": genre_id,
+                    "label": genre_labels.get(genre_id, genre_id),
+                    "count": count,
+                }
+                for genre_id, count in top_genre_ids
+            ]
+
+            constellation_links = []
+            for a_idx, b_idx in [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (0, 2), (1, 3)]:
+                constellation_links.append({
+                    "source": mock_labels[a_idx].lower(),
+                    "target": mock_labels[b_idx].lower(),
+                    "count": 5
+                })
+        else:
+            is_mocked = False
+            insight_title_count = sum(1 for m in unique_matches if m.release_date and m.release_date.year >= 1900)
+            has_enough_data = (insight_title_count >= 4) and (len(top_genre_ids) >= 3)
+
+            constellation_nodes = [
+                {
+                    "id": genre_id,
+                    "label": genre_labels.get(genre_id, genre_id),
+                    "count": count,
+                }
+                for genre_id, count in top_genre_ids
+            ]
+            top_genre_id_set = {genre_id for genre_id, _ in top_genre_ids}
+            constellation_links = []
+            for pair_key, count in sorted(genre_pair_dist.items(), key=lambda x: x[1], reverse=True):
+                source_id, target_id = pair_key.split("|", 1)
+                if source_id not in top_genre_id_set or target_id not in top_genre_id_set:
+                    continue
+                constellation_links.append({
+                    "source": source_id,
+                    "target": target_id,
+                    "count": count,
+                })
+                if len(constellation_links) >= 24:
+                    break
+
+        # Calculate decade timeline sufficiency and mock it if needed
+        insight_title_count = sum(1 for m in unique_matches if m.release_date and m.release_date.year >= 1900)
+        timeline_is_mocked = len(decade_dist) < 2
+        timeline_has_enough_data = (not timeline_is_mocked) and (insight_title_count >= 5)
+
+        if timeline_is_mocked:
+            decade_dist = {
+                "1980s": 3,
+                "1990s": 6,
+                "2000s": 12,
+                "2010s": 8,
+                "2020s": 5
             }
-            for genre_id, count in top_genre_ids
-        ]
-        constellation_links = []
-        for pair_key, count in sorted(genre_pair_dist.items(), key=lambda x: x[1], reverse=True):
-            source_id, target_id = pair_key.split("|", 1)
-            if source_id not in top_genre_id_set or target_id not in top_genre_id_set:
-                continue
-            constellation_links.append({
-                "source": source_id,
-                "target": target_id,
-                "count": count,
-            })
-            if len(constellation_links) >= 24:
-                break
 
         return LibraryStatsResponse(
             total_movies=total_movies,
@@ -344,6 +402,13 @@ class LibraryStatsService:
             genre_distribution=genre_dist,
             genre_distribution_ids=genre_dist_ids,
             genre_labels=genre_labels,
-            genre_constellation={"nodes": constellation_nodes, "links": constellation_links},
-            decade_distribution=decade_dist
+            genre_constellation={
+                "nodes": constellation_nodes,
+                "links": constellation_links,
+                "is_mocked": is_mocked,
+                "has_enough_data": has_enough_data
+            },
+            decade_distribution=decade_dist,
+            timeline_is_mocked=timeline_is_mocked,
+            timeline_has_enough_data=timeline_has_enough_data
         )

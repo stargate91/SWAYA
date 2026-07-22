@@ -45,8 +45,9 @@ export const getCreditDetailPath = (item, fallbackType, fallbackSource) => {
   }
 
   if (isSceneMediaType(resolvedType)) {
+    const routePrefix = (resolvedTypeKey === 'video' || resolvedTypeKey === 'videos') ? 'video' : 'scene';
     if (item?.in_library) {
-      return `/library/scene/${item.library_item_id || item.id}`;
+      return `/library/${routePrefix}/${item.library_item_id || item.id}`;
     }
     const prefix = isPornDbSource(source) ? 'porndb' : (source === 'fansdb' ? 'fansdb' : 'stash');
     const externalId = firstValue(
@@ -59,7 +60,7 @@ export const getCreditDetailPath = (item, fallbackType, fallbackSource) => {
       item?.uuid,
       item?.id
     );
-    return externalId ? `/library/scene/${prefixedId(prefix, externalId)}` : '';
+    return externalId ? `/library/${routePrefix}/${prefixedId(prefix, externalId)}` : '';
   }
 
   if (isTvLikeMediaType(resolvedType) || resolvedTypeKey === 'tvshows') {

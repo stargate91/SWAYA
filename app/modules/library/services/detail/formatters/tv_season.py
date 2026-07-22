@@ -24,9 +24,9 @@ class TvSeasonFormatter(DetailFormatter):
             return JSONResponse(status_code=400, content={"error": "Invalid tv TMDB ID"})
         
         from app.core.language import get_user_ui_language
-        from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-        settings_port = DbSettingsAdapter(db)
-        ui_lang = get_user_ui_language(settings_port)
+        from app.modules.settings.services.settings_service import SettingsService
+        settings = SettingsService(db)
+        ui_lang = get_user_ui_language(settings)
         
         from app.modules.metadata.models import MetadataMatch
         from app.core.enums import Provider, MediaType
@@ -185,6 +185,9 @@ class TvSeasonFormatter(DetailFormatter):
                     "audio_type": local_item.audio_type.value if hasattr(local_item.audio_type, "value") else str(local_item.audio_type),
                 }
 
+            from app.core.episode_utils import format_episode_code
+            disp_code = format_episode_code(season_number, ep_num)
+
             episodes.append({
                 "id": f"tmdb_{tv_tmdb_id_int}_{season_number}_{ep_num}",
                 "episode_number": ep_num,
@@ -206,6 +209,7 @@ class TvSeasonFormatter(DetailFormatter):
                 "is_multi_episode": is_multi_episode,
                 "playback_logs": playback_logs,
                 "technical": technical,
+                "display_episode_code": disp_code,
             })
             
         local_count = sum(1 for ep in all_episodes if ep.get("episode_number") in local_episodes_map)

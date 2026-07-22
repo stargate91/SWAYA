@@ -7,11 +7,11 @@ from typing import Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
-def find_media_player(settings_port) -> Tuple[Optional[str], Optional[str]]:
+def find_media_player(settings) -> Tuple[Optional[str], Optional[str]]:
     from app.core.user_context import get_current_user_id
     current_user_id = get_current_user_id()
-    vlc_path = settings_port.get_setting("vlc_path", user_id=current_user_id)
-    mpc_path = settings_port.get_setting("mpc_path", user_id=current_user_id)
+    vlc_path = settings.get_setting("vlc_path", user_id=current_user_id)
+    mpc_path = settings.get_setting("mpc_path", user_id=current_user_id)
 
     if isinstance(vlc_path, str):
         vlc_path = vlc_path.strip().strip('"').strip("'")
@@ -20,9 +20,9 @@ def find_media_player(settings_port) -> Tuple[Optional[str], Optional[str]]:
 
     def save_setting(key, val):
         try:
-            settings_port.set_setting(key, val, current_user_id)
-            if hasattr(settings_port, "db"):
-                settings_port.db.commit()
+            settings.set_setting(key, val, current_user_id)
+            if hasattr(settings, "db"):
+                settings.db.commit()
         except Exception as e:
             logger.error(f"Failed to save player setting {key}: {e}")
 
@@ -71,7 +71,7 @@ def find_media_player(settings_port) -> Tuple[Optional[str], Optional[str]]:
             save_setting("mpc_path", mpc_path)
 
     # Preferred order based on settings
-    preferred_player = settings_port.get_setting("preferred_player", user_id=current_user_id) or "swaya"
+    preferred_player = settings.get_setting("preferred_player", user_id=current_user_id) or "swaya"
 
     players_to_check = []
     if preferred_player == "vlc":
@@ -92,9 +92,9 @@ def find_media_player(settings_port) -> Tuple[Optional[str], Optional[str]]:
 
 
 
-def launch_media_file(file_path: str, settings_port, start_seconds: int = 0) -> dict:
+def launch_media_file(file_path: str, settings, start_seconds: int = 0) -> dict:
     normalized_path = os.path.normpath(file_path)
-    player_path, player_type = find_media_player(settings_port)
+    player_path, player_type = find_media_player(settings)
 
     if player_path and player_type:
         proc = None

@@ -19,13 +19,13 @@ class PeopleEnricher:
     def __init__(
         self,
         db: Optional[Session],
-        scrapers: Optional[ScraperGatewayPort] = None,
+        scrapers: Optional[Any] = None,
         session_factory: Optional[Callable[[], Session]] = None,
         is_cancelled: Optional[Callable[[int], bool]] = None,
         has_active_heavy_tasks: Optional[Callable[[], bool]] = None,
         executor: Optional[Any] = None,
         update_progress: Optional[Callable[[int, float], None]] = None,
-        task_monitor: Optional[TaskMonitorPort] = None,
+        task_monitor: Optional[Any] = None,
         image_downloader: Optional[Any] = None,
     ):
         self.db = db
@@ -73,7 +73,7 @@ class PeopleEnricher:
         elif self.task_monitor:
             self.task_monitor.update_progress(task_id, progress)
 
-    def _require_scrapers(self) -> ScraperGatewayPort:
+    def _require_scrapers(self) -> Any:
         if self.scrapers is None:
             raise RuntimeError("Scraper gateway is required for people enrichment")
         return self.scrapers

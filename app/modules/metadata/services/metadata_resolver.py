@@ -10,13 +10,18 @@ from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 logger = logging.getLogger(__name__)
 
 class MetadataResolver:
-    def __init__(self, db: Any, scrapers: Any, tmdb: Any, media_item_port: Optional[MediaItemPort] = None):
+    def __init__(self, db: Any, scrapers: Any, tmdb: Any, media_resolver: Optional[Any] = None, metadata_repo: Optional[Any] = None):
         self.db = db
         self.scrapers = scrapers
         self.tmdb = tmdb
-        self.media_item_port = media_item_port
-        from app.modules.metadata.db_metadata_repository import DbMetadataRepository
-        self.metadata_repo = DbMetadataRepository(db)
+        if media_resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            media_resolver = MediaItemService(db)
+        self.media_resolver = media_resolver
+        if metadata_repo is None:
+            from app.modules.metadata.services.metadata_service import MetadataService
+            metadata_repo = MetadataService(db, scrapers)
+        self.metadata_repo = metadata_repo
 
     def resolve_item(self, request: MetadataResolveRequest) -> Dict[str, Any]:
         db = self.db
@@ -31,11 +36,11 @@ class MetadataResolver:
             from app.core.exceptions import BadRequestException
             raise BadRequestException("item_id and external_id (tmdb_id) are required")
 
-        if not self.media_item_port:
+        if not self.media_resolver:
             from app.core.exceptions import BadRequestException
-            raise BadRequestException("media_item_port must be configured to resolve items")
+            raise BadRequestException("media_resolver must be configured to resolve items")
 
-        item = self.media_item_port.get_item_by_id(int(item_id))
+        item = self.media_resolver.get_item_by_id(int(item_id))
         if not item:
             from app.core.exceptions import NotFoundException
             raise NotFoundException("Media item not found")
@@ -71,7 +76,7 @@ class MetadataResolver:
                 try:
                     season_number = int(season_number)
                 except (ValueError, TypeError) as e:
-                    logger.debug(f"Swallowed exception in domains/metadata/services/metadata_resolver.py:62: {e}", exc_info=True)
+                    logger.debug(f"Swallowed exception in app/modules/metadata/services/metadata_resolver.py:62: {e}", exc_info=True)
             if episode_number is not None:
                 try:
                     if isinstance(episode_number, list):
@@ -79,19 +84,14 @@ class MetadataResolver:
                     elif str(episode_number).isdigit():
                         episode_number = int(episode_number)
                 except (ValueError, TypeError) as e:
-                    logger.debug(f"Swallowed exception in domains/metadata/services/metadata_resolver.py:70: {e}", exc_info=True)
+                    logger.debug(f"Swallowed exception in app/modules/metadata/services/metadata_resolver.py:70: {e}", exc_info=True)
 
             if season_number is not None and episode_number is not None:
                 mtype = MediaType.EPISODE
 
-        if provider in (Provider.STASHDB, Provider.PORNDB, Provider.FANSDB):
-            scraper = None
-            if provider == Provider.STASHDB:
-                scraper = self.scrapers.adult(Provider.STASHDB, db)
-            elif provider == Provider.PORNDB:
-                scraper = self.scrapers.adult(Provider.PORNDB, db)
-            elif provider == Provider.FANSDB:
-                scraper = self.scrapers.adult(Provider.FANSDB, db)
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        if ProviderRegistry.is_adult_provider(provider):
+            scraper = self.scrapers.adult(provider, db)
 
             if not scraper:
                 from app.core.exceptions import BadRequestException
@@ -162,9 +162,9 @@ class MetadataResolver:
 
         # Enrich item metadata
         from app.core.language import get_user_ui_language
-        from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-        settings_port = DbSettingsAdapter(db)
-        ui_lang = get_user_ui_language(settings_port)
+        from app.modules.settings.services.settings_service import SettingsService
+        settings = SettingsService(db)
+        ui_lang = get_user_ui_language(settings)
         try:
             self.scrapers.enrich_mainstream(db, item, ui_lang, commit=True)
         except Exception as e:

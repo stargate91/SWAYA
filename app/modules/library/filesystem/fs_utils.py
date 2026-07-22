@@ -301,7 +301,7 @@ def calculate_full_sha256(filepath: str) -> Optional[str]:
 
 
 
-class DbFileSystemAdapter:
+class FileSystemService:
     def calculate_fast_hash(self, file_path: str) -> str:
         return calculate_fast_hash(file_path)
 

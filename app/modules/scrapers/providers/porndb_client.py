@@ -8,8 +8,8 @@ from app.core.constants import PORNDB_API_BASE, SCRAPER_REQUEST_TIMEOUT
 logger = logging.getLogger(__name__)
 
 class PornDbClient(BaseScraper):
-    def __init__(self, settings_port):
-        super().__init__(settings_port, cache_service=None, provider=Provider.PORNDB)
+    def __init__(self, settings):
+        super().__init__(settings, cache_service=None, provider=Provider.PORNDB)
 
     def _get_headers(self) -> Dict[str, str]:
         api_token = self.get_setting("porndb_api_key") or self.get_setting("porndb_api_token")

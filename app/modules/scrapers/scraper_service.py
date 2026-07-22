@@ -1,11 +1,6 @@
 from typing import Optional, Any
 
 from app.core.cache_service import CacheService
-from app.modules.scrapers.providers.tmdb import TMDBScraper
-from app.modules.scrapers.providers.omdb import OMDBScraper
-from app.modules.scrapers.providers.stashdb import StashDBScraper
-from app.modules.scrapers.providers.porndb import PornDBScraper
-from app.modules.scrapers.providers.fansdb import FansDBScraper
 
 
 class ScraperService:
@@ -14,20 +9,22 @@ class ScraperService:
     sub-scraper classes (TMDB, OMDB, StashDB, PornDB, FansDB) to maintain domain separation.
     """
 
-    def __init__(self, settings_port_or_db: Any, cache_service: Optional[CacheService] = None):
-        # Workaround for Python 3.10+ Protocol check: we check if it has the required methods or uses DbSettingsAdapter
-        if hasattr(settings_port_or_db, "get_setting") and hasattr(settings_port_or_db, "get_system_setting"):
-            self.settings_port = settings_port_or_db
+    def __init__(self, db: Any, cache_service: Optional[CacheService] = None):
+        from app.modules.settings.services.settings_service import SettingsService
+        self.db = db
+        if isinstance(db, SettingsService):
+            self.settings_service = db
         else:
-            from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-            self.settings_port = DbSettingsAdapter(settings_port_or_db)
+            self.settings_service = SettingsService(db)
             
         self.cache = cache_service or CacheService()
-        self.tmdb = TMDBScraper(self.settings_port, self.cache)
-        self.omdb = OMDBScraper(self.settings_port, self.cache)
-        self.stashdb = StashDBScraper(self.settings_port, self.cache)
-        self.porndb = PornDBScraper(self.settings_port, self.cache)
-        self.fansdb = FansDBScraper(self.settings_port, self.cache)
+        from app.core.enums import Provider
+        from app.modules.scrapers.support.gateway import scraper_gateway
+        self.tmdb = scraper_gateway.get_scraper(Provider.TMDB, self.settings_service)
+        self.omdb = scraper_gateway.get_scraper(Provider.OMDB, self.settings_service)
+        self.stashdb = scraper_gateway.get_scraper(Provider.STASHDB, self.settings_service)
+        self.porndb = scraper_gateway.get_scraper(Provider.PORNDB, self.settings_service)
+        self.fansdb = scraper_gateway.get_scraper(Provider.FANSDB, self.settings_service)
 
     def fetch_tmdb_movie(self, movie_id: str, language: Optional[str] = None, force_refresh: bool = False) -> Optional[dict]:
         return self.tmdb.fetch_movie(movie_id, language, force_refresh)
@@ -46,3 +43,29 @@ class ScraperService:
 
     def fetch_fansdb_scene(self, scene_id: str, force_refresh: bool = False) -> Optional[dict]:
         return self.fansdb.fetch_scene(scene_id, force_refresh)
+
+    def log_search(
+        self,
+        task_id: Optional[int],
+        media_item_id: Optional[int],
+        provider: Any,
+        search_query: str,
+        result_count: int,
+        details: Dict[str, Any]
+    ) -> None:
+        import logging
+        from app.modules.tasks.models import ScraperLog
+        logger = logging.getLogger(__name__)
+        try:
+            log_entry = ScraperLog(
+                task_id=task_id,
+                media_item_id=media_item_id,
+                provider=provider,
+                search_query=search_query,
+                result_count=result_count,
+                details=details
+            )
+            self.db.add(log_entry)
+            self.db.flush()
+        except Exception as e:
+            logger.warning(f"Failed to save structured scraper search log: {e}")

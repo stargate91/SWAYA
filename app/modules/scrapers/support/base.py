@@ -11,16 +11,21 @@ logger = logging.getLogger(__name__)
 class BaseScraper:
     """
     Base scraper class containing cache services, reusable request sessions,
-    and configuration helpers using SettingsPort.
+    and configuration helpers using SettingsService.
     """
 
-    def __init__(self, settings_port: Any, cache_service: Optional[CacheService] = None, provider: Optional[Provider] = None):
+    def __init__(self, db: Any, cache_service: Optional[CacheService] = None, provider: Optional[Provider] = None):
         from sqlalchemy.orm import Session
-        if isinstance(settings_port, Session):
-            from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-            self.settings_port = DbSettingsAdapter(settings_port)
+        from app.modules.settings.services.settings_service import SettingsService
+        if isinstance(db, Session):
+            self.db = db
+            self.settings_service = SettingsService(db)
+        elif isinstance(db, SettingsService):
+            self.settings_service = db
+            self.db = db.db
         else:
-            self.settings_port = settings_port
+            self.db = None
+            self.settings_service = db
         self.cache = cache_service or CacheService()
         self.session = requests.Session()
         
@@ -39,8 +44,16 @@ class BaseScraper:
         self.session.mount("https://", adapter)
         self.provider = provider
 
+    def search(self, query: str, **kwargs) -> List[Dict[str, Any]]:
+        """Search metadata provider for matching items."""
+        raise NotImplementedError("Subclasses must implement search()")
+
+    def get_details(self, external_id: str, **kwargs) -> Dict[str, Any]:
+        """Fetch full details of an item by external ID."""
+        raise NotImplementedError("Subclasses must implement get_details()")
+
     def get_setting(self, key: str, default: Optional[str] = None) -> Optional[str]:
-        """Helper to get a setting from settings port, falling back to environment."""
+        """Helper to get a setting from settings service, falling back to environment."""
         if not hasattr(self, "_settings_cache"):
             self._settings_cache = {}
         if key in self._settings_cache:
@@ -49,9 +62,9 @@ class BaseScraper:
         import os
         val = None
         try:
-            val = self.settings_port.get_setting(key)
+            val = self.settings_service.get_setting(key)
         except Exception as e:
-            logger.debug(f"Failed to query setting {key} from settings port: {e}")
+            logger.debug(f"Failed to query setting {key} from settings service: {e}")
         
         if val is not None:
             ret = str(val)
@@ -64,32 +77,113 @@ class BaseScraper:
         return ret
 
 
+    def get_json_cached(
+        self,
+        provider: Provider,
+        cache_key: str,
+        url: str,
+        method: str = "GET",
+        params: Optional[Dict[str, Any]] = None,
+        json_data: Optional[Dict[str, Any]] = None,
+        headers: Optional[Dict[str, Any]] = None,
+        force_refresh: bool = False,
+        media_type: Optional[Any] = None,
+        external_id: Optional[str] = None,
+        result_extractor: Optional[Any] = None,
+        max_retries: int = 3,
+        timeout: int = 15,
+    ) -> Optional[Any]:
+        """Centralized HTTP request caller with caching, error logging, and rate-limiting retry."""
+        cached_data = self.cache.get(provider, cache_key, force_refresh=force_refresh)
+        if cached_data:
+            if cached_data.get("cached_error"):
+                return None
+            return cached_data
+
+        import time
+        for attempt in range(max_retries):
+            try:
+                resp = self.session.request(
+                    method,
+                    url,
+                    params=params,
+                    json=json_data,
+                    headers=headers,
+                    timeout=timeout,
+                )
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if result_extractor:
+                        data = result_extractor(data)
+                    
+                    if data is not None and data != {}:
+                        ext_id = external_id(data) if callable(external_id) else external_id
+                        self.cache.set(
+                            provider,
+                            cache_key,
+                            data,
+                            status_code=200,
+                            media_type=media_type,
+                            external_id=ext_id,
+                        )
+                        return data
+                    else:
+                        ext_id = external_id(data) if callable(external_id) else external_id
+                        self.cache.set(
+                            provider,
+                            cache_key,
+                            {"cached_error": True},
+                            status_code=404,
+                            media_type=media_type,
+                            external_id=ext_id,
+                        )
+                        return None
+                elif resp.status_code == 429:
+                    retry_after = int(resp.headers.get("Retry-After", 1))
+                    logger.warning(f"Rate Limit (429) from {provider.value}. Waiting {retry_after}s...")
+                    time.sleep(retry_after)
+                    continue
+                else:
+                    ext_id = external_id(None) if callable(external_id) else external_id
+                    self.cache.set(
+                        provider,
+                        cache_key,
+                        {"cached_error": True},
+                        status_code=resp.status_code,
+                        media_type=media_type,
+                        external_id=ext_id,
+                    )
+                    return None
+            except Exception as e:
+                logger.error(f"Error querying {provider.value} API (attempt {attempt+1}/{max_retries}): {e}")
+                if attempt == max_retries - 1:
+                    return None
+                time.sleep(1)
+        return None
+
+
     def execute_query(self, query: str, variables: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
         """Executes a GraphQL query against the provider's endpoint."""
         if not self.provider:
             return None
 
         # Resolve endpoint and API keys
-        pref = self.provider.value  # e.g. 'stashdb', 'fansdb', 'porndb'
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        config = ProviderRegistry.get_config(self.provider)
+        pref = self.provider.value if self.provider else ""
         endpoint = self.get_setting(f"{pref}_endpoint")
         api_key = self.get_setting(f"{pref}_api_key") or self.get_setting(f"{pref}_api_token")
 
-        if not endpoint:
-            if pref == "stashdb":
-                endpoint = "https://stashdb.org/graphql"
-            elif pref == "fansdb":
-                endpoint = "https://fansdb.cc/graphql"
-            elif pref == "porndb":
-                endpoint = "https://theporndb.net/graphql"
+        if not endpoint and config:
+            endpoint = config.default_endpoint
 
         headers = {
             "Content-Type": "application/json",
         }
-        if api_key:
-            # StashDB and FansDB use ApiKey header, PornDB uses Authorization Bearer
-            if pref in ("stashdb", "fansdb"):
+        if api_key and config:
+            if config.auth_header_type == "ApiKey":
                 headers["ApiKey"] = api_key
-            else:
+            elif config.auth_header_type == "Bearer":
                 headers["Authorization"] = f"Bearer {api_key}"
 
         try:
@@ -159,13 +253,16 @@ class BaseScraper:
 
     def get_performer_details(self, performer_id: str) -> Optional[Dict[str, Any]]:
         """Gets detailed performer metadata using GraphQL."""
-        is_stash = self.provider == Provider.STASHDB
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        config = ProviderRegistry.get_config(self.provider) if self.provider else None
+        uses_flat = config.uses_flat_measurements if config else False
+
         measurements_field = """
             band_size
             cup_size
             waist_size
             hip_size
-        """ if is_stash else """
+        """ if uses_flat else """
             measurements {
               cup_size
               band_size
@@ -234,7 +331,7 @@ class BaseScraper:
                 res["urls"] = [u.get("url") for u in res["urls"] if u and u.get("url")]
 
             # Map measurements
-            if is_stash:
+            if uses_flat:
                 res["measurements"] = {
                     "band_size": res.get("band_size"),
                     "cup_size": res.get("cup_size"),

@@ -92,6 +92,8 @@ export function useOrganizerActions({
     openModal,
     closeModal,
     settings,
+    scanMode,
+    sessionMode,
   });
 
   const handleLoadAll = async () => {

@@ -5,11 +5,11 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 class VideoProber:
-    def __init__(self, prober: Any, hash_calculator: Any, analyzer: Any, mode: Any):
+    def __init__(self, prober: Any, hash_calculator: Any, analyzer: Any, is_adult: bool):
         self.prober = prober
         self.hash_calculator = hash_calculator
         self.analyzer = analyzer
-        self.mode = mode
+        self.is_adult = is_adult
 
     def probe_and_analyze_target(self, filepath: Path) -> Dict[str, Any]:
         """
@@ -39,7 +39,7 @@ class VideoProber:
         if result.get("probe_info"):
             duration = result["probe_info"].get("duration")
 
-        hashes = self.hash_calculator.calculate_hashes(filepath_str, self.mode, duration)
+        hashes = self.hash_calculator.calculate_hashes(filepath_str, self.is_adult, duration)
         result.update(hashes)
 
         # 3. Analyze text with Guessit

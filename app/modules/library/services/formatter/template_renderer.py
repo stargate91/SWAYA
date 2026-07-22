@@ -101,7 +101,7 @@ class TemplateRenderer:
                      if isinstance(parsed, list):
                          return self.format_number(parsed, width)
                  except Exception as e:
-                     logger.debug(f"Swallowed exception in domains/library/services/formatter/template_renderer.py:100: {e}", exc_info=True)
+                     logger.debug(f"Swallowed exception in app/modules/library/services/formatter/template_renderer.py:100: {e}", exc_info=True)
             return str(num) if num else ""
             
         return str(n).zfill(width) if self.config.zero_pad else str(n)

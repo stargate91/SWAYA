@@ -25,7 +25,7 @@ const isPersonEntity = (item) => {
 
 const isSceneEntity = (item) => {
   const mt = resolveMediaType(item);
-  return mt === 'scene' || mt === 'scenes';
+  return mt === 'scene' || mt === 'scenes' || mt === 'video' || mt === 'videos';
 };
 
 const isTvEntity = (item) => {
@@ -40,6 +40,9 @@ const resolveTitle = (item) => item.title || item.name || 'Unknown';
 // ─── Image URL ───────────────────────────────────────────────────
 
 const resolveImageUrl = (item, opts = {}) => {
+  if (item.card_image_url) {
+    return item.card_image_url;
+  }
   const { context } = opts;
   const isPerson = isPersonEntity(item);
   const isScene = isSceneEntity(item);
@@ -96,20 +99,7 @@ const resolvePerformers = (item, settings, maxCount = 4, opts = {}) => {
   const allPeople = item.people || item.performers || item.cast || [];
   if (!allPeople.length) return [];
 
-  const pref = settings?.adult_gender_preference;
-  let filtered = allPeople;
-  if (pref && pref !== 'all') {
-    filtered = allPeople.filter((p) => {
-      const g = typeof p.gender === 'string'
-        ? (p.gender.toUpperCase().includes('FEMALE') ? 1 : p.gender.toUpperCase().includes('MALE') ? 2 : 0)
-        : p.gender;
-      if (pref === 'female') return g === 1;
-      if (pref === 'male') return g === 2;
-      return true;
-    });
-  }
-
-  const sliced = filtered.slice(0, maxCount);
+  const sliced = allPeople.slice(0, maxCount);
   if (opts.context === 'search') {
     const provider = item.provider || 'tmdb';
     return sliced.map(p => {
@@ -124,6 +114,9 @@ const resolvePerformers = (item, settings, maxCount = 4, opts = {}) => {
 // ─── Subtitle ────────────────────────────────────────────────────
 
 const resolveSubtitle = (item, opts = {}) => {
+  if (item.card_subtitle) {
+    return item.card_subtitle;
+  }
   const { context } = opts;
   const isPerson = isPersonEntity(item);
   const isScene = isSceneEntity(item);
@@ -192,17 +185,7 @@ const resolveSubtitle = (item, opts = {}) => {
 const resolveShouldBlur = (item, opts = {}) => {
   const { sessionMode, isAdultContext } = opts;
   if (sessionMode === 'nsfw') return false;
-  const isScene = isSceneEntity(item);
-  const isAdultItem = !!item.is_adult || !!item.adult;
-  
-  if (isScene) {
-    const isExplicitlySfw = item.is_adult === false || item.adult === false;
-    if (isExplicitlySfw) {
-      return !!isAdultContext;
-    }
-    return true;
-  }
-  
+  const isAdultItem = item.should_blur_sfw !== undefined ? !!item.should_blur_sfw : (!!item.is_adult || !!item.adult || isSceneEntity(item));
   return !!isAdultContext || isAdultItem;
 };
 

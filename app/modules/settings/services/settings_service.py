@@ -21,21 +21,90 @@ class SettingsService:
     def __init__(
         self,
         db: Session,
-        library_port: Optional[LibraryPort] = None,
-        user_id: Optional[int] = None,
-        settings_port: Optional[SettingsPort] = None
+        resolver: Optional[Any] = None,
+        user_id: Optional[int] = None
     ):
         self.db = db
-        self.library_port = library_port
+        if resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            resolver = MediaItemService(db)
+        self.resolver = resolver
         if user_id is None:
             from app.core.user_context import get_current_user_id
-            user_id = get_current_user_id()
+            try:
+                user_id = get_current_user_id()
+            except Exception:
+                user_id = None
         self.user_id = user_id
-        self.settings_port = settings_port
+
+    def get_system_setting(self, key: str) -> Optional[Any]:
+        setting = self.db.query(SystemSetting).filter(SystemSetting.key == key).first()
+        return setting.value if setting else None
+
+    def get_all_system_settings(self) -> Dict[str, Any]:
+        return {s.key: s.value for s in self.db.query(SystemSetting).all()}
+
+    def get_setting(self, key: str, user_id: Optional[int] = None) -> Optional[Any]:
+        if user_id is None:
+            user_id = self.user_id
+        if user_id is None:
+            from app.core.user_context import get_current_user_id
+            try:
+                user_id = get_current_user_id()
+            except Exception:
+                user_id = None
+        if user_id is not None:
+            user_setting = self.db.query(UserSetting).filter(UserSetting.user_id == user_id, UserSetting.key == key).first()
+            if user_setting is not None:
+                return user_setting.value
+        return self.get_system_setting(key)
+
+    def get_user_settings(self, user_id: int) -> Any:
+        return self.db.query(UserSetting).filter(UserSetting.user_id == user_id).all()
+
+    def get_user_setting_obj(self, user_id: int, key: str) -> Optional[Any]:
+        return self.db.query(UserSetting).filter(UserSetting.user_id == user_id, UserSetting.key == key).first()
+
+    def create_user_setting(self, user_id: int, key: str, value: Any, description: Optional[str] = None) -> Any:
+        setting = UserSetting(user_id=user_id, key=key, value=value, description=description)
+        self.db.add(setting)
+        self.db.flush()
+        return setting
+
+    def set_setting(self, key: str, value: Any, user_id: Optional[int] = None) -> None:
+        if user_id is None:
+            user_id = self.user_id
+        if user_id is None:
+            from app.core.user_context import get_current_user_id
+            try:
+                user_id = get_current_user_id()
+            except Exception:
+                user_id = None
+        
+        setting = self.db.query(UserSetting).filter(UserSetting.user_id == user_id, UserSetting.key == key).first()
+        if setting:
+            setting.value = value
+        else:
+            setting = UserSetting(user_id=user_id, key=key, value=value)
+            self.db.add(setting)
+        self.db.flush()
+
+    def get_system_settings(self) -> Any:
+        return self.db.query(SystemSetting).all()
+
+    def set_system_setting(self, key: str, value: Any, description: Optional[str] = None) -> Any:
+        setting = self.db.query(SystemSetting).filter(SystemSetting.key == key).first()
+        if not setting:
+            setting = SystemSetting(key=key, value=value, description=description)
+            self.db.add(setting)
+        else:
+            setting.value = value
+        self.db.flush()
+        return setting
 
     def get_settings(self) -> Dict[str, Any]:
         # Auto-detect VLC path
-        vlc_setting = self.settings_port.get_user_setting_obj(self.user_id, "vlc_path")
+        vlc_setting = self.get_user_setting_obj(self.user_id, "vlc_path")
         if not vlc_setting or not vlc_setting.value:
             vlc_path = ""
             which_vlc = shutil.which("vlc")
@@ -47,13 +116,13 @@ class SettingsService:
                         vlc_path = p
                         break
             if not vlc_setting:
-                self.settings_port.create_user_setting(self.user_id, "vlc_path", vlc_path)
+                self.create_user_setting(self.user_id, "vlc_path", vlc_path)
             else:
-                self.settings_port.set_setting("vlc_path", vlc_path, self.user_id)
+                self.set_setting("vlc_path", vlc_path, self.user_id)
             self.db.commit()
 
         # Auto-detect MPC path
-        mpc_setting = self.settings_port.get_user_setting_obj(self.user_id, "mpc_path")
+        mpc_setting = self.get_user_setting_obj(self.user_id, "mpc_path")
         if not mpc_setting or not mpc_setting.value:
             mpc_path = ""
             which_mpc = shutil.which("mpc-hc") or shutil.which("mpc-hc64")
@@ -65,15 +134,15 @@ class SettingsService:
                         mpc_path = p
                         break
             if not mpc_setting:
-                self.settings_port.create_user_setting(self.user_id, "mpc_path", mpc_path)
+                self.create_user_setting(self.user_id, "mpc_path", mpc_path)
             else:
-                self.settings_port.set_setting("mpc_path", mpc_path, self.user_id)
+                self.set_setting("mpc_path", mpc_path, self.user_id)
             self.db.commit()
 
         # Auto-detect or default preferred_player
-        player_setting = self.settings_port.get_user_setting_obj(self.user_id, "preferred_player")
+        player_setting = self.get_user_setting_obj(self.user_id, "preferred_player")
         if not player_setting:
-            self.settings_port.create_user_setting(self.user_id, "preferred_player", "swaya")
+            self.create_user_setting(self.user_id, "preferred_player", "swaya")
             self.db.commit()
 
         # Default hover preview settings
@@ -86,18 +155,18 @@ class SettingsService:
         }
         db_changed = False
         for k, v in preview_defaults.items():
-            if not self.settings_port.get_user_setting_obj(self.user_id, k):
-                self.settings_port.create_user_setting(self.user_id, k, v)
+            if not self.get_user_setting_obj(self.user_id, k):
+                self.create_user_setting(self.user_id, k, v)
                 db_changed = True
         if db_changed:
             self.db.commit()
 
-        settings = self.settings_port.get_user_settings(self.user_id)
+        settings = self.get_user_settings(self.user_id)
         return {s.key: s.value for s in settings}
 
     def update_settings(self, settings: Dict[str, Any]) -> Dict[str, Any]:
         for key, value in settings.items():
-            self.settings_port.set_setting(key, value, self.user_id)
+            self.set_setting(key, value, self.user_id)
         self.db.commit()
         return {"status": "success"}
 
@@ -118,11 +187,11 @@ class SettingsService:
             raise ValueError("Failed to process avatar")
 
         avatar_path = image_service.resolve_image_url(avatar_filename, "avatars")
-        setting = self.settings_port.get_user_setting_obj(self.user_id, "avatar_path")
+        setting = self.get_user_setting_obj(self.user_id, "avatar_path")
         if setting:
-            self.settings_port.set_setting("avatar_path", avatar_path, self.user_id)
+            self.set_setting("avatar_path", avatar_path, self.user_id)
         else:
-            self.settings_port.create_user_setting(self.user_id, "avatar_path", avatar_path)
+            self.create_user_setting(self.user_id, "avatar_path", avatar_path)
         self.db.commit()
         return {"avatar_path": avatar_path}
     def validate_folders(self, payload: Dict[str, Any]) -> Dict[str, Any]:
@@ -164,30 +233,23 @@ class SettingsService:
         return {"status": "error", "message": "CHANGELOG.md not found.", "content": ""}
 
     def get_ignored_items(self, search: str = "", offset: int = 0, limit: int = 40) -> Dict[str, Any]:
-        return self.library_port.get_ignored_items(search, offset, limit)
+        return self.resolver.get_ignored_items(search, offset, limit)
 
     def restore_ignored_items(self, item_ids: List[int]) -> Dict[str, Any]:
-        restored_count = self.library_port.restore_ignored_items(item_ids)
+        restored_count = self.resolver.restore_ignored_items(item_ids)
         return {"status": "success", "restored": restored_count}
 
     def validate_api_keys(self, payload: dict) -> Dict[str, Any]:
+        from app.modules.scrapers.support.registry import ProviderRegistry
         tmdb_api_key = (payload.get("tmdb_api_key") or "").strip()
         tmdb_bearer_token = (payload.get("tmdb_bearer_token") or "").strip()
         omdb_api_key = (payload.get("omdb_api_key") or "").strip()
-        stashdb_api_key = (payload.get("stashdb_api_key") or "").strip()
-        fansdb_api_key = (payload.get("fansdb_api_key") or "").strip()
-        porndb_api_key = (payload.get("porndb_api_key") or "").strip()
-        stashdb_endpoint = (payload.get("stashdb_endpoint") or STASHDB_DEFAULT_ENDPOINT).strip()
-        fansdb_endpoint = (payload.get("fansdb_endpoint") or FANSDB_DEFAULT_ENDPOINT).strip()
-        porndb_endpoint = (payload.get("porndb_endpoint") or PORNDB_DEFAULT_ENDPOINT).strip()
 
-        result = {
-            "tmdb": {"valid": False, "message": None},
-            "omdb": {"valid": False, "message": None},
-            "stashdb": {"valid": False, "message": None},
-            "fansdb": {"valid": False, "message": None},
-            "porndb": {"valid": False, "message": None},
-        }
+        result = {}
+        for p in ProviderRegistry.get_all_providers():
+            cfg = ProviderRegistry.get_config(p)
+            if cfg:
+                result[cfg.prefix] = {"valid": False, "message": None}
 
         def validate_graphql_provider(provider_key: str, endpoint: str, api_key: str, use_bearer: bool = False) -> Dict[str, Any]:
             if not api_key:
@@ -289,24 +351,42 @@ class SettingsService:
             except requests.RequestException:
                 result["omdb"]["message"] = "OMDb validation failed. Check your connection and try again."
 
-        result["stashdb"] = validate_graphql_provider("stashdb", stashdb_endpoint, stashdb_api_key)
-        result["fansdb"] = validate_graphql_provider("fansdb", fansdb_endpoint, fansdb_api_key)
-        result["porndb"] = validate_graphql_provider("porndb", porndb_endpoint, porndb_api_key, use_bearer=True)
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        for p in ProviderRegistry.get_adult_providers():
+            cfg = ProviderRegistry.get_config(p)
+            if cfg:
+                api_key = (payload.get(f"{cfg.prefix}_api_key") or "").strip()
+                endpoint = (payload.get(f"{cfg.prefix}_endpoint") or cfg.default_endpoint).strip()
+                use_bearer = (cfg.auth_header_type == "Bearer")
+                result[cfg.prefix] = validate_graphql_provider(cfg.prefix, endpoint, api_key, use_bearer=use_bearer)
 
         return result
 
     def get_system_settings(self) -> List[SystemSetting]:
-        return self.settings_port.get_system_settings()
+        return self.db.query(SystemSetting).all()
 
     def set_system_setting(self, key: str, value: Any, description: Optional[str] = None) -> SystemSetting:
-        setting = self.settings_port.set_system_setting(key, value, description)
+        setting = self.db.query(SystemSetting).filter(SystemSetting.key == key).first()
+        if not setting:
+            setting = SystemSetting(key=key, value=value, description=description)
+            self.db.add(setting)
+        else:
+            setting.value = value
+        self.db.flush()
         self.db.commit()
         return setting
 
     def get_user_settings_list(self, user_id: int) -> List[UserSetting]:
-        return self.settings_port.get_user_settings(user_id)
+        return self.get_user_settings(user_id)
 
     def set_user_setting(self, user_id: int, key: str, value: Any, description: Optional[str] = None) -> UserSetting:
-        setting = self.settings_port.set_user_setting(user_id, key, value, description)
+        setting = self.get_user_setting_obj(user_id, key)
+        if not setting:
+            setting = self.create_user_setting(user_id, key, value, description)
+        else:
+            setting.value = value
+            if description:
+                setting.description = description
+            self.db.flush()
         self.db.commit()
         return setting

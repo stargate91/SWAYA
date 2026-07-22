@@ -13,18 +13,18 @@ class BaseScanResolutionPipeline:
         mode: ScanMode,
         include_adult: Optional[bool] = None,
         provider: Optional[str] = None,
-        library_port: Optional[LibraryPort] = None,
+        media_resolver: Optional[Any] = None,
         resolver: Optional[Any] = None
     ):
         self.db = db_session
         self.mode = mode
         self.include_adult = include_adult
         self.provider = provider
-        if library_port is None:
-            from app.modules.library.db_media_resolver import DbMediaResolver
-            self.library_port = DbMediaResolver(db_session)
+        if media_resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            self.media_resolver = MediaItemService(db_session)
         else:
-            self.library_port = library_port
+            self.media_resolver = media_resolver
 
         if resolver is None:
             from app.modules.scrapers.resolver import Resolver
@@ -53,7 +53,7 @@ class BaseScanResolutionPipeline:
         if stop_requested and stop_requested():
             return
 
-        if self.mode not in (ScanMode.SCENES, ScanMode.OFFLINE):
+        if not item.library.is_adult and not (item.library.target_media_types and "video" in item.library.target_media_types):
             self.resolver.propagate_match(item)
 
         if item.status != ItemStatus.MATCHED:
@@ -70,7 +70,7 @@ class BaseScanResolutionPipeline:
         if not item.group_hash:
             return
 
-        siblings = self.library_port.get_siblings_by_group_hash(item.group_hash, item.id)
+        siblings = self.media_resolver.get_siblings_by_group_hash(item.group_hash, item.id)
         for sibling in siblings:
             if stop_requested and stop_requested():
                 return
@@ -103,7 +103,7 @@ class MainstreamScanResolutionPipeline(BaseScanResolutionPipeline):
         mode: ScanMode,
         include_adult: Optional[bool] = None,
         provider: Optional[str] = None,
-        library_port: Optional[LibraryPort] = None,
+        media_resolver: Optional[Any] = None,
         resolver: Optional[Any] = None,
         enricher: Optional[Any] = None
     ):
@@ -112,7 +112,7 @@ class MainstreamScanResolutionPipeline(BaseScanResolutionPipeline):
             mode=mode,
             include_adult=include_adult,
             provider=provider,
-            library_port=library_port,
+            media_resolver=media_resolver,
             resolver=resolver
         )
         self.enricher = enricher
@@ -163,16 +163,12 @@ class OfflineScanResolutionPipeline(BaseScanResolutionPipeline):
         return
 
 
-class PornDbMovieScanResolutionPipeline(MainstreamScanResolutionPipeline):
-    pass
-
-
 def get_scan_resolution_pipeline(
     db_session,
     mode: ScanMode = ScanMode.MOVIES_TV,
     include_adult: Optional[bool] = None,
     provider: Optional[str] = None,
-    library_port: Optional[LibraryPort] = None,
+    media_resolver: Optional[Any] = None,
     resolver: Optional[Any] = None,
     enricher: Optional[Any] = None
 ):
@@ -182,7 +178,7 @@ def get_scan_resolution_pipeline(
             mode=mode,
             include_adult=include_adult,
             provider=provider,
-            library_port=library_port,
+            media_resolver=media_resolver,
             resolver=resolver
         )
     if mode == ScanMode.SCENES:
@@ -191,25 +187,15 @@ def get_scan_resolution_pipeline(
             mode=mode,
             include_adult=include_adult,
             provider=provider,
-            library_port=library_port,
+            media_resolver=media_resolver,
             resolver=resolver
-        )
-    if mode == ScanMode.PORNDB_MOVIE:
-        return PornDbMovieScanResolutionPipeline(
-            db_session,
-            mode=mode,
-            include_adult=include_adult,
-            provider=provider,
-            library_port=library_port,
-            resolver=resolver,
-            enricher=enricher
         )
     return MainstreamScanResolutionPipeline(
         db_session,
         mode=mode,
         include_adult=include_adult,
         provider=provider,
-        library_port=library_port,
+        media_resolver=media_resolver,
         resolver=resolver,
         enricher=enricher
     )

@@ -21,9 +21,12 @@ def fnv1a_hash(s: str) -> str:
     return f"{hash_val:08x}"
 
 class PerformerAssetManager:
-    def __init__(self, db: Session, library_port: Any, image_service: Any, image_downloader: Any):
+    def __init__(self, db: Session, resolver: Optional[Any] = None, image_service: Any = None, image_downloader: Any = None):
         self.db = db
-        self.library_port = library_port
+        if resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            resolver = MediaItemService(db)
+        self.resolver = resolver
         self.image_service = image_service
         self.image_downloader = image_downloader
 
@@ -93,7 +96,7 @@ class PerformerAssetManager:
             except Exception as e:
                 logger.error(f"Failed to download person backdrop override image: {e}")
 
-        self.library_port.update_person_user_override(
+        self.resolver.update_person_user_override(
             user_id=user_id,
             person_id=person_id,
             custom_backdrop=backdrop_path,
@@ -133,7 +136,7 @@ class PerformerAssetManager:
 
         img_service.generate_thumbnail(original_path, thumbnail_path, "backdrops")
 
-        self.library_port.update_person_user_override(
+        self.resolver.update_person_user_override(
             user_id=user_id,
             person_id=person_id,
             custom_backdrop=new_filename,
@@ -203,7 +206,7 @@ class PerformerAssetManager:
             except Exception as e:
                 logger.error(f"Failed to download person profile override image: {e}")
 
-        self.library_port.update_person_user_override(
+        self.resolver.update_person_user_override(
             user_id=user_id,
             person_id=person_id,
             custom_poster=profile_path,
@@ -240,7 +243,7 @@ class PerformerAssetManager:
 
         img_service.generate_thumbnail(original_path, thumbnail_path, "people")
 
-        self.library_port.update_person_user_override(
+        self.resolver.update_person_user_override(
             user_id=user_id,
             person_id=person_id,
             custom_poster=new_filename,

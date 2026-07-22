@@ -25,17 +25,16 @@ class OfflineResolverPipeline(BaseResolverPipeline):
         from pathlib import Path
         filename_stem = Path(item.filename).stem
 
-        # 2. Create the offline metadata match (using Provider.MANUAL and MediaType.SCENE)
+        # 2. Create the offline metadata match (using Provider.MANUAL and MediaType.VIDEO)
         match = MetadataMatch(
             media_item_id=item.id,
             provider=Provider.MANUAL,
             external_id=f"offline_{item.id}",
-            media_type=MediaType.SCENE,
+            media_type=MediaType.VIDEO,
             original_title=filename_stem,
             confidence_score=1.0,
             is_active=True,
             is_adult=self.include_adult,
-            is_home_video=True,
         )
 
         # Extract still frame at 50% mark using ffmpeg/ffprobe

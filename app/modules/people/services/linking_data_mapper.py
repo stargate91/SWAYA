@@ -7,7 +7,7 @@ from app.core.enums import Provider
 logger = logging.getLogger(__name__)
 
 class LinkingDataMapper:
-    def fetch_and_map_external_performer(self, db: Session, source: str, external_id: str, scrapers: Optional[ScraperGatewayPort] = None) -> Dict[str, Any]:
+    def fetch_and_map_external_performer(self, db: Session, source: str, external_id: str, scrapers: Optional[Any] = None) -> Dict[str, Any]:
         """Fetches performer details from external scraper and normalizes fields to a unified format."""
         external_data = {
             "name": None,
@@ -49,8 +49,10 @@ class LinkingDataMapper:
         else:
             perf = None
             try:
-                scraper_name = "porndb" if source_lower == "theporndb" else source_lower
-                provider_enum = Provider(scraper_name)
+                from app.modules.scrapers.support.registry import ProviderRegistry
+                provider_enum = ProviderRegistry.resolve_prefix(source_lower)
+                if not provider_enum:
+                    raise ValueError(f"Unsupported provider: {source_lower}")
                 scraper_client = scrapers.adult(provider_enum, db)
                 perf = scraper_client.get_performer_details(external_id)
             except Exception as e:

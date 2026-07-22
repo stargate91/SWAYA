@@ -15,16 +15,25 @@ class ScannerService:
     scan_status_lock = StatusCoordinator.scan_status_lock
     scan_status = StatusCoordinator.scan_status
 
-    def __init__(self, db: Session, scan_resolver_factory: Optional[Any] = None, library_port: Optional[LibraryPort] = None, task_manager=None, settings_port: Optional[Any] = None, fs_port: Optional[Any] = None, formatter_factory: Optional[Any] = None, move_with_progress_fn: Optional[Any] = None, send_to_trash_fn: Optional[Any] = None):
+    def __init__(self, db: Session, scan_resolver_factory: Optional[Any] = None, resolver: Optional[Any] = None, task_manager=None, settings: Optional[Any] = None, fs: Optional[Any] = None, formatter_factory: Optional[Any] = None, move_with_progress_fn: Optional[Any] = None, send_to_trash_fn: Optional[Any] = None):
         self.db = db
         if task_manager is None:
             from app.modules.tasks import task_manager as _tm
             task_manager = _tm
         self.task_manager = task_manager
         self.scan_resolver_factory = scan_resolver_factory
-        self.library_port = library_port
-        self.settings_port = settings_port
-        self.fs_port = fs_port
+        if resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            resolver = MediaItemService(db)
+        self.resolver = resolver
+        if settings is None:
+            from app.modules.settings.services.settings_service import SettingsService
+            settings = SettingsService(db)
+        self.settings = settings
+        if fs is None:
+            from app.modules.library.filesystem.fs_utils import FileSystemService
+            fs = FileSystemService()
+        self.fs = fs
         self.formatter_factory = formatter_factory
         self.move_with_progress_fn = move_with_progress_fn
         self.send_to_trash_fn = send_to_trash_fn

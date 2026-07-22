@@ -12,9 +12,12 @@ from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 logger = logging.getLogger(__name__)
 
 class LocalCreditsAggregator:
-    def __init__(self, db: Session, library_port: Any, image_service: Any):
+    def __init__(self, db: Session, resolver: Optional[Any] = None, image_service: Any = None):
         self.db = db
-        self.library_port = library_port
+        if resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            resolver = MediaItemService(db)
+        self.resolver = resolver
         self.image_service = image_service
 
     def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
@@ -23,12 +26,12 @@ class LocalCreditsAggregator:
     def aggregate_credits(self, person_id: int) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]]]:
         db = self.db
         from app.core.language import get_user_ui_language
-        from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-        settings_port = DbSettingsAdapter(db)
-        ui_lang = get_user_ui_language(settings_port)
+        from app.modules.settings.services.settings_service import SettingsService
+        settings = SettingsService(db)
+        ui_lang = get_user_ui_language(settings)
         
         # Load credits linked to this person
-        active_match_ids = self.library_port.get_active_match_ids()
+        active_match_ids = self.resolver.get_active_match_ids()
         links = db.query(MediaPersonLink).filter(
             MediaPersonLink.person_id == person_id,
             MediaPersonLink.match_id.in_(active_match_ids)
@@ -62,10 +65,11 @@ class LocalCreditsAggregator:
                 "in_library": True,
             }
             
-            if match.media_type == MediaType.SCENE:
+            if match.media_type.is_adult:
                 scenes.append(credit_entry)
             elif match.media_type == MediaType.MOVIE:
-                if match.provider in (Provider.TMDB, Provider.PORNDB, Provider.FANSDB, Provider.STASHDB):
+                from app.modules.scrapers.support.registry import ProviderRegistry
+                if match.provider in ProviderRegistry.get_all_providers():
                     movies.append(credit_entry)
             elif match.media_type in (MediaType.TV, MediaType.EPISODE):
                 if match.provider == Provider.TMDB:

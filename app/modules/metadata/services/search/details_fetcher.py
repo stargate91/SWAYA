@@ -13,12 +13,16 @@ class DetailsFetcher:
         details = tmdb_client.get_details(tmdb_id, "tv")
         seasons = details.get("seasons", []) or []
         formatted = []
+        from app.modules.media_assets.services.images import image_processing_service
         for s in seasons:
+            poster_path = s.get("poster_path")
+            if poster_path:
+                poster_path = image_processing_service.resolve_image_url(poster_path, "posters")
             formatted.append({
                 "season_number": s.get("season_number"),
                 "name": s.get("name"),
                 "episode_count": s.get("episode_count"),
-                "poster_path": s.get("poster_path"),
+                "poster_path": poster_path,
                 "air_date": s.get("air_date"),
             })
         return formatted
@@ -28,12 +32,16 @@ class DetailsFetcher:
         details = tmdb_client.get_season_details(tmdb_id, season_number)
         episodes = details.get("episodes", []) or []
         formatted = []
+        from app.modules.media_assets.services.images import image_processing_service
         for ep in episodes:
+            still_path = ep.get("still_path")
+            if still_path:
+                still_path = image_processing_service.resolve_image_url(still_path, "stills")
             formatted.append({
                 "episode_number": ep.get("episode_number"),
                 "name": ep.get("name"),
                 "overview": ep.get("overview"),
-                "still_path": ep.get("still_path"),
+                "still_path": still_path,
                 "air_date": ep.get("air_date"),
                 "vote_average": ep.get("vote_average"),
             })
@@ -47,7 +55,7 @@ class DetailsFetcher:
         item_id: str,
         media_type: Optional[str] = None,
         language: Optional[str] = None,
-        media_item_port: Optional[MediaItemPort] = None
+        media_resolver: Optional[Any] = None
     ) -> Dict[str, Any]:
         """Retrieves complete metadata details (raw details + local match metadata) for an item."""
         is_tmdb_direct = False
@@ -90,11 +98,11 @@ class DetailsFetcher:
             from app.core.exceptions import BadRequestException
             raise BadRequestException("Invalid item ID format")
 
-        if not media_item_port:
-            from app.core.exceptions import BadRequestException
-            raise BadRequestException("media_item_port is required for this operation")
+        if not media_resolver:
+            from app.modules.library.services.media_item_service import MediaItemService
+            media_resolver = MediaItemService(db)
 
-        item = media_item_port.get_item_by_id(item_id_int)
+        item = media_resolver.get_item_by_id(item_id_int)
         if not item:
             from app.core.exceptions import NotFoundException
             raise NotFoundException("Item not found")
@@ -109,14 +117,9 @@ class DetailsFetcher:
 
         details = {}
         try:
-            if match.provider in (Provider.STASHDB, Provider.PORNDB, Provider.FANSDB):
-                scraper = None
-                if match.provider == Provider.STASHDB:
-                    scraper = scrapers.adult(Provider.STASHDB, db)
-                elif match.provider == Provider.PORNDB:
-                    scraper = scrapers.adult(Provider.PORNDB, db)
-                elif match.provider == Provider.FANSDB:
-                    scraper = scrapers.adult(Provider.FANSDB, db)
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            if ProviderRegistry.is_adult_provider(match.provider):
+                scraper = scrapers.adult(match.provider, db)
 
                 if scraper:
                     details = scraper.fetch_scene(match.external_id) or {}

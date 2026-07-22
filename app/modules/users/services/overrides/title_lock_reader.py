@@ -6,10 +6,9 @@ from app.modules.users.models import UserOverride
 logger = logging.getLogger(__name__)
 
 class TitleLockReader:
-    def __init__(self, db: Session, resolver: Any, library_port: Any, user_id: int):
+    def __init__(self, db: Session, resolver: Any, user_id: int):
         self.db = db
         self.resolver = resolver
-        self.library_port = library_port
         self.user_id = user_id
 
     def get_or_create_metadata_override(self, item_id: str, media_type: Optional[str] = None) -> Optional[UserOverride]:
@@ -17,47 +16,31 @@ class TitleLockReader:
 
         if not media_item_id and not metadata_match_id:
             if isinstance(item_id, str) and "_" in item_id:
-                prefix, val = item_id.split("_", 1)
-                if prefix in ("tmdb", "porndb", "theporndb", "stash", "stashdb", "fansdb", "scene", "movie"):
+                from app.modules.scrapers.support.registry import ProviderRegistry
+                try:
+                    provider, external_id = ProviderRegistry.clean_id(item_id)
                     from app.core.enums import Provider, MediaType
                     from app.modules.metadata.models import MetadataMatch
                     
-                    provider = Provider.TMDB
-                    if prefix == "tmdb":
-                        provider = Provider.TMDB
-                    elif prefix in ("porndb", "theporndb"):
-                        provider = Provider.PORNDB
-                    elif prefix in ("stash", "stashdb"):
-                        provider = Provider.STASHDB
-                    elif prefix == "fansdb":
-                        provider = Provider.FANSDB
-                    elif prefix in ("scene", "movie"):
-                        # If prefix is generic scene/movie, try to detect the provider from existing matches
-                        import re
-                        is_uuid = bool(re.match(r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", val))
-                        if is_uuid:
-                            provider = Provider.STASHDB
-                        else:
-                            provider = Provider.PORNDB
-                    external_id = val
-                    
+                    config = ProviderRegistry.get_config(provider)
+                    is_adult_provider = config.is_adult if config else False
+
                     m_type_guessed = MediaType.MOVIE
                     if media_type:
                         try:
                             m_type_guessed = MediaType(media_type.lower())
                         except ValueError:
                             m_type_guessed = MediaType.SCENE if media_type == "scene" else MediaType.MOVIE
-                    elif prefix in ("porndb", "theporndb", "stash", "stashdb", "fansdb", "scene"):
+                    elif is_adult_provider:
                         m_type_guessed = MediaType.SCENE
 
                     match = None
-                    if m_type_guessed == MediaType.SCENE or provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB):
+                    if m_type_guessed == MediaType.SCENE or is_adult_provider:
                         clean_id = str(external_id)
-                        if clean_id.startswith("scene_"):
-                            clean_id = clean_id.split("_", 1)[1]
-                        candidates = [clean_id, f"scene_{clean_id}"]
+                        candidates = [clean_id]
+                        from app.modules.scrapers.support.registry import ProviderRegistry
                         match = self.db.query(MetadataMatch).filter(
-                            MetadataMatch.provider.in_([Provider.STASHDB, Provider.PORNDB, Provider.FANSDB]),
+                            MetadataMatch.provider.in_(ProviderRegistry.get_adult_providers()),
                             MetadataMatch.external_id.in_(candidates),
                             MetadataMatch.media_type == MediaType.SCENE
                         ).first()
@@ -85,10 +68,10 @@ class TitleLockReader:
                                 m_type = MediaType(media_type.lower())
                             except ValueError:
                                 m_type = MediaType.SCENE if media_type == "scene" else MediaType.MOVIE
-                        elif prefix in ("porndb", "theporndb", "stash", "stashdb", "fansdb", "scene", "movie"):
-                            m_type = MediaType.SCENE if prefix != "movie" else MediaType.MOVIE
+                        elif is_adult_provider:
+                            m_type = MediaType.SCENE
                         
-                        is_adult_item = (provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB)) or (m_type == MediaType.SCENE)
+                        is_adult_item = is_adult_provider or m_type.is_adult
                         match = MetadataMatch(
                             provider=provider,
                             external_id=str(external_id),
@@ -99,11 +82,13 @@ class TitleLockReader:
                         self.db.commit()
                     
                     metadata_match_id = match.id
+                except ValueError:
+                    pass
             if not metadata_match_id:
                 return None
 
         if media_item_id and not metadata_match_id:
-            metadata_match_id = self.library_port.get_active_match_id(media_item_id)
+            metadata_match_id = self.resolver.get_active_match_id(media_item_id)
 
         if not metadata_match_id:
             return None
@@ -209,7 +194,7 @@ class TitleLockReader:
     def get_or_create_override(self, item_id: str, media_type: Optional[str] = None) -> Optional[UserOverride]:
         if isinstance(item_id, str) and item_id.startswith("collection_"):
             collection_tmdb_id = item_id.split("_")[1]
-            collection_id = self.library_port.get_or_create_collection_id(collection_tmdb_id, "tmdb")
+            collection_id = self.resolver.get_or_create_collection_id(collection_tmdb_id, "tmdb")
             
             def query_coll():
                 return self.db.query(UserOverride).filter(

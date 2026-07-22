@@ -3,7 +3,7 @@ import time
 import logging
 from sqlalchemy.orm import Session
 from app.core.database import SWAYA_DB_PATH
-from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
+from app.modules.settings.services.settings_service import SettingsService
 
 logger = logging.getLogger("app.tasks.preview_cleanup")
 
@@ -17,7 +17,7 @@ def clean_preview_cache(db: Session):
     if not os.path.exists(previews_dir):
         return
 
-    settings = DbSettingsAdapter(db)
+    settings = SettingsService(db)
     
     max_age_days = settings.get_setting("previews_cache_max_age_days")
     max_size_mb = settings.get_setting("previews_cache_max_size_mb")

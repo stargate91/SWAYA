@@ -46,7 +46,7 @@ class MetadataMatch(Base):
     provider: Mapped[Provider] = mapped_column(SQLEnum(Provider), index=True)
     external_id: Mapped[str] = mapped_column(String, index=True)
     provider_ids: Mapped[Optional[dict[str, str]]] = mapped_column(JSON, nullable=True)
-    media_type: Mapped[MediaType] = mapped_column(SQLEnum(MediaType), index=True, default=MediaType.MOVIE)
+    media_type: Mapped[str] = mapped_column(String(50), index=True, default="movie")
     season_number: Mapped[Optional[int]] = mapped_column(Integer)
     episode_number: Mapped[Optional[Any]] = mapped_column(JSON)
     number_of_seasons: Mapped[Optional[int]] = mapped_column(Integer)
@@ -82,7 +82,6 @@ class MetadataMatch(Base):
     
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True) # Active selected match for media item
     is_adult: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
-    is_home_video: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     confidence_score: Mapped[float] = mapped_column(Float, default=1.0)
     
     media_item: Mapped[Optional["MediaItem"]] = relationship("MediaItem", back_populates="matches")

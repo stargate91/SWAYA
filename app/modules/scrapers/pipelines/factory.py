@@ -1,16 +1,6 @@
+import inspect
 from typing import Optional
-from app.core.enums import Provider, ScanMode
-
-from app.modules.scrapers.pipelines.porndb_movie import PornDbMovieResolverPipeline
-from app.modules.scrapers.pipelines.scenes import (
-    FansDbSceneResolverPipeline,
-    PornDbSceneResolverPipeline,
-    SceneAutoResolverPipeline,
-    StashDbSceneResolverPipeline,
-)
-from app.modules.scrapers.pipelines.tmdb_omdb import TmdbOmdbResolverPipeline
-from app.modules.scrapers.pipelines.offline import OfflineResolverPipeline
-
+from app.core.enums import Provider, ScanMode, MediaType
 
 def get_resolver_pipeline(
     mode: ScanMode,
@@ -20,25 +10,26 @@ def get_resolver_pipeline(
     include_adult: bool = False,
     provider: Optional[str] = None,
 ):
-    # Normalized provider string
-    p = str(provider or '').strip().lower()
-
     if mode == ScanMode.OFFLINE:
-        return OfflineResolverPipeline(mainstream_resolver, include_adult)
+        m_type = MediaType.VIDEO
+        p_val = Provider.MANUAL
+    elif mode == ScanMode.SCENES:
+        m_type = MediaType.SCENE
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        p_val = ProviderRegistry.get_provider_by_prefix(provider) or Provider.STASHDB
+    else:
+        m_type = MediaType.MOVIE
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        p_val = ProviderRegistry.get_provider_by_prefix(provider) or Provider.TMDB
 
-    if mode == ScanMode.SCENES:
-        if p == "stashdb":
-            return StashDbSceneResolverPipeline(adult_resolver)
-        elif p == "porndb":
-            return PornDbSceneResolverPipeline(adult_resolver)
-        elif p == "fansdb":
-            return FansDbSceneResolverPipeline(adult_resolver)
-        return SceneAutoResolverPipeline(adult_resolver)
-
-    if mode == ScanMode.PORNDB_MOVIE or (mode == ScanMode.MOVIES_TV and include_adult and p == "porndb"):
-        return PornDbMovieResolverPipeline(porndb_movie_resolver)
-
-    return TmdbOmdbResolverPipeline(mainstream_resolver, include_adult)
+    return get_manual_resolver_pipeline(
+        provider=p_val,
+        media_type=m_type,
+        mainstream_resolver=mainstream_resolver,
+        adult_resolver=adult_resolver,
+        porndb_movie_resolver=porndb_movie_resolver,
+        include_adult=include_adult
+    )
 
 
 def get_manual_resolver_pipeline(
@@ -50,14 +41,33 @@ def get_manual_resolver_pipeline(
     include_adult: bool = False,
 ):
     normalized_type = str(media_type or '').lower()
-    if provider == Provider.TMDB:
-        return TmdbOmdbResolverPipeline(mainstream_resolver, include_adult)
-    if provider == Provider.PORNDB and normalized_type == 'movie':
-        return PornDbMovieResolverPipeline(porndb_movie_resolver)
-    if provider == Provider.STASHDB:
-        return StashDbSceneResolverPipeline(adult_resolver)
-    if provider == Provider.FANSDB:
-        return FansDbSceneResolverPipeline(adult_resolver)
-    if provider == Provider.PORNDB and normalized_type == 'scene':
-        return PornDbSceneResolverPipeline(adult_resolver)
+    from app.modules.scrapers.support.registry import MediaTypeRegistry
+    
+    try:
+        m_enum = MediaType(normalized_type)
+    except ValueError:
+        m_enum = MediaType.MOVIE
+
+    cfg = MediaTypeRegistry.get_config(m_enum)
+    if cfg:
+        pipeline_cls = cfg.get_resolver_pipeline(provider)
+        if pipeline_cls:
+            sig = inspect.signature(pipeline_cls)
+            params = sig.parameters
+            
+            # Map parameters by name to appropriate constructor arguments
+            kwargs = {}
+            if "adult_resolver" in params:
+                kwargs["adult_resolver"] = adult_resolver
+            if "porndb_movie_resolver" in params:
+                kwargs["porndb_movie_resolver"] = porndb_movie_resolver
+            if "mainstream_resolver" in params:
+                kwargs["mainstream_resolver"] = mainstream_resolver
+            if "include_adult" in params:
+                kwargs["include_adult"] = include_adult
+                
+            return pipeline_cls(**kwargs)
+
+    # Fallback to mainstream
+    from app.modules.scrapers.pipelines.tmdb_omdb import TmdbOmdbResolverPipeline
     return TmdbOmdbResolverPipeline(mainstream_resolver, include_adult)

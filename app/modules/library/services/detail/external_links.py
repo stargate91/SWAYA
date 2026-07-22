@@ -31,48 +31,37 @@ def generate_external_links(external_ids: Dict[str, Any], media_type: str, homep
         elif mt == "person":
             add_link("imdb", "IMDb", f"https://www.imdb.com/name/{imdb_id}")
 
-    # 3. Adult scraper links (StashDB, FansDB, PornDB, Data18)
-    stash_id = external_ids.get("stash_id") or external_ids.get("stashdb_id")
-    if stash_id:
-        source = external_ids.get("source") or ""
-        source = source.lower()
-        if source == "fansdb":
-            if mt == "scene":
-                add_link("fansdb", "FansDB", f"https://fansdb.cc/scenes/{stash_id}")
-            elif mt == "person":
-                add_link("fansdb", "FansDB", f"https://fansdb.cc/performers/{stash_id}")
-        elif source in ("porndb", "theporndb"):
-            if mt == "scene":
-                add_link("porndb", "ThePornDB", f"https://theporndb.net/scenes/{stash_id}")
-            elif mt == "person":
-                add_link("porndb", "ThePornDB", f"https://theporndb.net/performers/{stash_id}")
-            elif mt == "movie":
-                add_link("porndb", "ThePornDB", f"https://theporndb.net/movies/{stash_id}")
-        else:
-            if mt == "scene":
-                add_link("stashdb", "StashDB", f"https://stashdb.org/scenes/{stash_id}")
-            elif mt == "person":
-                add_link("stashdb", "StashDB", f"https://stashdb.org/performers/{stash_id}")
-            elif mt == "movie":
-                add_link("stashdb", "StashDB", f"https://stashdb.org/movies/{stash_id}")
+    # 3. Dynamic adult/mainstream provider links from Registry
+    from app.modules.scrapers.support.registry import ProviderRegistry
+    for provider in ProviderRegistry.get_all_providers():
+        cfg = ProviderRegistry.get_config(provider)
+        if not cfg or not cfg.web_base_url:
+            continue
 
-    # Direct FansDB link
-    fansdb_id = external_ids.get("fansdb_id")
-    if fansdb_id:
-        if mt == "person":
-            add_link("fansdb", "FansDB", f"https://fansdb.cc/performers/{fansdb_id}")
-        elif mt == "scene":
-            add_link("fansdb", "FansDB", f"https://fansdb.cc/scenes/{fansdb_id}")
+        keys_to_try = [cfg.prefix] + cfg.aliases
+        if cfg.prefix == "stashdb":
+            keys_to_try.append("stash")
 
-    # Direct PornDB/ThePornDB link
-    porndb_id = external_ids.get("porndb_id") or external_ids.get("theporndb_id")
-    if porndb_id:
-        if mt == "person":
-            add_link("porndb", "ThePornDB", f"https://theporndb.net/performers/{porndb_id}")
-        elif mt == "scene":
-            add_link("porndb", "ThePornDB", f"https://theporndb.net/scenes/{porndb_id}")
-        elif mt == "movie":
-            add_link("porndb", "ThePornDB", f"https://theporndb.net/movies/{porndb_id}")
+        source = (external_ids.get("source") or "").lower()
+        resolved_source = ProviderRegistry.resolve_prefix(source)
+
+        prov_id = None
+        if resolved_source == provider:
+            prov_id = external_ids.get("stash_id") or external_ids.get("stashdb_id")
+
+        if not prov_id:
+            for k in keys_to_try:
+                prov_id = external_ids.get(f"{k}_id") or external_ids.get(k)
+                if prov_id:
+                    break
+
+        if prov_id:
+            if mt == "scene":
+                add_link(cfg.prefix, cfg.display_name, f"{cfg.web_base_url}/scenes/{prov_id}")
+            elif mt == "person":
+                add_link(cfg.prefix, cfg.display_name, f"{cfg.web_base_url}/performers/{prov_id}")
+            elif mt == "movie" and cfg.prefix != "tmdb":
+                add_link(cfg.prefix, cfg.display_name, f"{cfg.web_base_url}/movies/{prov_id}")
 
     # Data18
     data18_id = external_ids.get("data18_id")

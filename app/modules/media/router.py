@@ -34,16 +34,11 @@ router = APIRouter(prefix="/api/v1", tags=["Media Operations & Playback"])
 
 
 def _scanner_service(db: Session, scan_resolver_factory=None) -> ScannerService:
-    from app.modules.library.db_media_resolver import DbMediaResolver
-    from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-    from app.modules.library.filesystem.fs_utils import DbFileSystemAdapter, move_with_progress, send_to_trash
-    from app.modules.settings.adapters.formatter_config_adapter import build_formatter_from_db
+    from app.modules.library.filesystem.fs_utils import move_with_progress, send_to_trash
+    from app.modules.settings.services.formatter_config_service import build_formatter_from_db
     return ScannerService(
         db,
         scan_resolver_factory=scan_resolver_factory,
-        library_port=DbMediaResolver(db),
-        settings_port=DbSettingsAdapter(db),
-        fs_port=DbFileSystemAdapter(),
         formatter_factory=build_formatter_from_db,
         move_with_progress_fn=move_with_progress,
         send_to_trash_fn=send_to_trash
@@ -128,77 +123,14 @@ def image_proxy(
     blur: bool = Query(False),
     width: Optional[int] = Query(None, description="Optional target width for resizing")
 ):
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    from app.modules.media_assets.services.images import image_processing_service
     logger = logging.getLogger("app.media.image_proxy")
-    
-    if url.startswith("//"):
-        url = "https:" + url
-        
-    parsed = urlparse(url)
-    if not parsed.scheme or not parsed.netloc:
-        raise HTTPException(status_code=400, detail="Invalid URL")
-        
     try:
-        cache_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "data", "media", "images", "cache", "proxy"))
-        os.makedirs(cache_dir, exist_ok=True)
-        
-        url_hash = hashlib.md5(url.encode('utf-8')).hexdigest()
-        cache_key = f"{url_hash}_b_{blur}_w_{width or 'orig'}"
-        cache_path = os.path.join(cache_dir, cache_key)
-        
-        if os.path.exists(cache_path):
-            ext_type = "image/jpeg"
-            if "png" in url.lower():
-                ext_type = "image/png"
-            elif "webp" in url.lower():
-                ext_type = "image/webp"
-            
-            def iter_file():
-                with open(cache_path, "rb") as f:
-                    yield from f
-            return StreamingResponse(iter_file(), media_type=ext_type)
-
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Referer": f"{parsed.scheme}://{parsed.netloc}/"
-        }
-        response = requests.get(url, headers=headers, stream=True, timeout=5.0, verify=False)
-        response.raise_for_status()
-        
-        content_type = response.headers.get("Content-Type", "image/jpeg")
-        
-        if blur or width:
-            img = Image.open(io.BytesIO(response.content))
-            
-            if width and img.width > width:
-                aspect = img.height / img.width
-                new_height = int(width * aspect)
-                img = img.resize((width, new_height), Image.Resampling.LANCZOS)
-                
-            if blur:
-                img = img.filter(ImageFilter.GaussianBlur(32))
-                enhancer = ImageEnhance.Brightness(img)
-                img = enhancer.enhance(0.20)
-                
-            out_io = io.BytesIO()
-            fmt = "JPEG"
-            if "png" in content_type.lower():
-                fmt = "PNG"
-            elif "webp" in content_type.lower():
-                fmt = "WEBP"
-            img.save(out_io, format=fmt)
-            
-            with open(cache_path, "wb") as cache_file:
-                cache_file.write(out_io.getvalue())
-                
-            out_io.seek(0)
-            return StreamingResponse(out_io, media_type=content_type)
-            
-        raw_data = response.content
-        with open(cache_path, "wb") as cache_file:
-            cache_file.write(raw_data)
-            
-        return StreamingResponse(io.BytesIO(raw_data), media_type=content_type)
+        cache_path, mime_type = image_processing_service.proxy_image(url, blur, width)
+        def iter_file():
+            with open(cache_path, "rb") as f:
+                yield from f
+        return StreamingResponse(iter_file(), media_type=mime_type)
     except Exception as e:
         logger.warning(f"Image proxy failed for URL {url}, redirecting client directly: {e}")
         return RedirectResponse(url)
@@ -219,9 +151,9 @@ def get_media_preview(item_id: int, resolution: int = 720, db: Session = Depends
     filepath = os.path.join(item.library.root_path, item.relative_path)
     
     try:
-        from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-        settings_adapter = DbSettingsAdapter(db)
-        duration = settings_adapter.get_setting("hover_previews_duration") or 16
+        from app.modules.settings.services.settings_service import SettingsService
+        settings_service = SettingsService(db)
+        duration = settings_service.get_setting("hover_previews_duration") or 16
 
         preview_service = PreviewService()
         preview_path = preview_service.generate_preview(filepath, str(item_id), preview_duration=int(duration), resolution=resolution)

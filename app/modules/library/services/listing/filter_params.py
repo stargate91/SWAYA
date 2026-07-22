@@ -31,6 +31,7 @@ class ListingFilterParams:
         filter_breast_size: Optional[str] = None,
         filter_butt_shape: Optional[str] = None,
         filter_butt_size: Optional[str] = None,
+        filter_rating: str = "all",
     ):
         self.tab = tab
         self.page = page
@@ -60,3 +61,4 @@ class ListingFilterParams:
         self.filter_breast_size = filter_breast_size
         self.filter_butt_shape = filter_butt_shape
         self.filter_butt_size = filter_butt_size
+        self.filter_rating = filter_rating

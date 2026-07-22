@@ -56,8 +56,12 @@ class PersonLinkerService:
             ext_ids["source"] = source
         person.external_ids = ext_ids
 
-        if source in ("stashdb", "fansdb", "theporndb", "porndb"):
-            person.is_adult = True
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        p_enum = ProviderRegistry.get_provider_by_prefix(source)
+        if p_enum:
+            cfg = ProviderRegistry.get_config(p_enum)
+            if cfg and cfg.is_adult:
+                person.is_adult = True
 
         link = db.query(ExternalSourceLink).filter(
             ExternalSourceLink.person_id == person.id,
@@ -223,7 +227,8 @@ class PersonLinkerService:
         ext_ids.pop(f"{source}_id", None)
         if ext_ids.get("source") == source:
             ext_ids.pop("source", None)
-            for k in ["tmdb", "stashdb", "fansdb", "porndb", "theporndb"]:
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            for k in ProviderRegistry.get_all_prefixes():
                 if k in ext_ids:
                     ext_ids["source"] = k
                     break

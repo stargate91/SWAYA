@@ -91,8 +91,8 @@ class PersonEnrichmentQueue:
             self.session_factory = SessionLocal
 
         db = self.session_factory()
-        from app.modules.people.db_people_repository import DbPeopleRepository
-        people_repo = DbPeopleRepository(db)
+        from app.modules.people.services.person_service import PersonService
+        people_repo = PersonService(db)
         try:
             person = people_repo.get_person_by_id(person_id)
             if not person:
@@ -101,8 +101,8 @@ class PersonEnrichmentQueue:
             with self._lock:
                 self._current_person_name = person.name
             logger.info(f"Background enriching activated person: {person.name} (ID: {person_id})")
-            from app.modules.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
-            enricher = PeopleEnricher(db, scrapers=self.scrapers, image_downloader=TasksImageDownloadAdapter())
+            from app.modules.tasks.image_download_service import ImageDownloadService
+            enricher = PeopleEnricher(db, scrapers=self.scrapers, image_downloader=ImageDownloadService())
             
             ext_ids = person.external_ids or {}
             links = people_repo.get_external_links_by_person_id(person_id)
@@ -114,7 +114,7 @@ class PersonEnrichmentQueue:
                      if not any(ld["provider"] == prov for ld in link_data):
                          link_data.append({"provider": prov, "external_id": str(ext_id)})
                 except Exception as e:
-                     logger.debug(f"Swallowed exception in domains/people/services/people_status_service.py:71: {e}", exc_info=True)
+                     logger.debug(f"Swallowed exception in app/modules/people/services/people_status_service.py:71: {e}", exc_info=True)
 
             fetched_data = enricher.fetch_external_details(
                 person.name,
@@ -269,21 +269,24 @@ class PeopleStatusService:
         self,
         db: Session,
         scrapers: Optional[Any] = None,
-        library_port: Optional[Any] = None,
+        resolver: Optional[Any] = None,
         image_service: Optional[Any] = None
     ):
         self.db = db
         self.scrapers = scrapers
 
-        self.library_port = library_port
+        if resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            resolver = MediaItemService(db)
+        self.resolver = resolver
 
         if image_service is None:
             from app.modules.media_assets.services.images import image_processing_service
             image_service = image_processing_service
         self.image_service = image_service
 
-        from app.modules.people.db_people_repository import DbPeopleRepository
-        self.people_repo = DbPeopleRepository(db)
+        from app.modules.people.services.person_service import PersonService
+        self.people_repo = PersonService(db)
 
     def resolve_person(self, person_id: Any) -> Optional[Person]:
         """Resolves a person by numeric ID or by provider:external_id format."""
@@ -293,12 +296,14 @@ class PeopleStatusService:
             source_name = parts[0]
             uuid_str = parts[1]
             
-            scraper_name = "porndb" if source_name == "theporndb" else source_name
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            provider_enum = ProviderRegistry.resolve_prefix(source_name)
+            if not provider_enum:
+                return None
             try:
-                provider_enum = Provider(scraper_name)
                 return self.people_repo.get_person_by_external_id(provider_enum, uuid_str)
             except Exception as e:
-                logger.debug(f"Swallowed exception in domains/people/services/people_status_service.py:135: {e}", exc_info=True)
+                logger.debug(f"Swallowed exception in app/modules/people/services/people_status_service.py:135: {e}", exc_info=True)
             return None
         else:
             try:
@@ -321,7 +326,7 @@ class PeopleStatusService:
                 search_service = PeopleSearchService(
                     self.db,
                     self.scrapers,
-                    self.library_port,
+                    self.resolver,
                     self.image_service
                 )
                 try:

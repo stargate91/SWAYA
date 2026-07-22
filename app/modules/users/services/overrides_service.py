@@ -20,10 +20,12 @@ from app.modules.users.services.overrides.title_lock_reader import TitleLockRead
 logger = logging.getLogger(__name__)
 
 class OverridesService:
-    def __init__(self, db: Session, resolver: Any, user_id: Optional[int] = None, image_downloader: Optional[ImageDownloadPort] = None, scrapers: Optional[Any] = None, mainstream_enricher: Optional[Any] = None):
+    def __init__(self, db: Session, resolver: Optional[Any] = None, user_id: Optional[int] = None, image_downloader: Optional[Any] = None, scrapers: Optional[Any] = None, mainstream_enricher: Optional[Any] = None):
         self.db = db
+        if resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            resolver = MediaItemService(db)
         self.resolver = resolver
-        self.library_port: Any = resolver  # type: ignore[assignment]
         self.image_downloader = image_downloader
         if user_id is None:
             from app.core.user_context import get_current_user_id
@@ -32,7 +34,7 @@ class OverridesService:
         self.scrapers = scrapers
         self.mainstream_enricher = mainstream_enricher
 
-        self.title_lock_reader = TitleLockReader(db, resolver, self.library_port, self.user_id)
+        self.title_lock_reader = TitleLockReader(db, resolver, self.user_id)
         self.title_lock_service = TitleLockService(self)
         self.image_override_service = ImageOverrideService(self)
         self.tag_override_service = TagOverrideService(self)
@@ -41,7 +43,7 @@ class OverridesService:
         if not language or language == "none":
             return
         try:
-            self.library_port.enrich_item_language(media_item_id, language)
+            self.resolver.enrich_item_language(media_item_id, language)
         except Exception as e:
             logger.error(f"Error enriching language {language} for item {media_item_id}: {e}")
 

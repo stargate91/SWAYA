@@ -62,13 +62,14 @@ def get_peaks_decorated(db: Session = Depends(get_db), limit: int = 50):
                 if active_match.original_title:
                     title = active_match.original_title
                     
+        from app.modules.media_assets.services.images import image_processing_service
         resolved_poster = None
         resolved_backdrop = None
         resolved_snapshot = None
         if poster_path:
-            resolved_poster = ImageServiceRegistry.get().resolve_image_url(poster_path, "posters")
+            resolved_poster = image_processing_service.resolve_image_url(poster_path, "posters")
         if backdrop_path:
-            resolved_backdrop = ImageServiceRegistry.get().resolve_image_url(backdrop_path, "backdrops")
+            resolved_backdrop = image_processing_service.resolve_image_url(backdrop_path, "backdrops")
         if getattr(log, "snapshot_path", None):
             snap_path = log.snapshot_path
             if not snap_path.startswith("/media/"):
@@ -76,7 +77,7 @@ def get_peaks_decorated(db: Session = Depends(get_db), limit: int = 50):
                     snap_path = f"/media/images/{snap_path}"
                 else:
                     snap_path = f"/media/images/snapshots/{snap_path}"
-            resolved_snapshot = ImageServiceRegistry.get().resolve_image_url(snap_path, "snapshots")
+            resolved_snapshot = image_processing_service.resolve_image_url(snap_path, "snapshots")
             
         results.append({
             "id": log.id,
@@ -113,12 +114,10 @@ async def run_undo_coroutine(task_id: int, batch_id: int):
     logger = logging.getLogger(__name__)
     db = SessionLocal()
     try:
-        from app.modules.library.db_media_resolver import DbMediaResolver
         from app.modules.library.filesystem.fs_utils import move_with_progress, send_to_trash
-        from app.modules.settings.adapters.formatter_config_adapter import build_formatter_from_db
+        from app.modules.settings.services.formatter_config_service import build_formatter_from_db
         engine = RenamerEngine(
             db,
-            library_port=DbMediaResolver(db),
             formatter=build_formatter_from_db(db),
             move_with_progress_fn=move_with_progress,
             send_to_trash_fn=send_to_trash

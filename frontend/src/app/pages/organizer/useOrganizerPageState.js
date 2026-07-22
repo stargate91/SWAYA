@@ -1,15 +1,16 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useOrganizerTabState } from './hooks/useOrganizerTabState';
 import { useOrganizerPaginationSort } from './hooks/useOrganizerPaginationSort';
 import { useOrganizerDetailsState } from './hooks/useOrganizerDetailsState';
 import { useFileSelection } from './hooks/useFileSelection';
 import { useOrganizerDismissState } from './hooks/useOrganizerDismissState';
-import { useOrganizerFilteredRows } from './hooks/useOrganizerFilteredRows';
 import { useOrganizerFocus } from './hooks/useOrganizerFocus';
+import { mapOrganizerItemRow, mapExtraRow } from './organizerMappers';
+import { useOrganizerQuery } from '@/queries';
 
-const isPornDbMovieMode = (scanMode) => scanMode === 'porndb_movie';
+const isAdultMovieMode = (scanMode, sessionMode) => scanMode === 'movies_tv' && sessionMode === 'nsfw';
 
-export function useOrganizerPageState({ organizer, t, scanMode, sessionMode }) {
+export function useOrganizerPageState({ t, scanMode, sessionMode }) {
   const dismissScopeKey = `${sessionMode || 'sfw'}:${scanMode || 'movies_tv'}`;
   const [pendingResolvedIds, setPendingResolvedIds] = useState(new Set());
 
@@ -19,7 +20,6 @@ export function useOrganizerPageState({ organizer, t, scanMode, sessionMode }) {
       ids.forEach((id) => next.add(id));
       return next;
     });
-    // Safety net fallback in case API or refresh fails/stalls
     setTimeout(() => {
       setPendingResolvedIds((prev) => {
         const next = new Set(prev);
@@ -48,53 +48,14 @@ export function useOrganizerPageState({ organizer, t, scanMode, sessionMode }) {
 
   const {
     dismissedRowIds,
-    dismissedCount,
+    setDismissedRowIds,
     dismissRows,
     restoreDismissedRows,
-  } = useOrganizerDismissState({ organizer, scopeKey: dismissScopeKey });
+    dismissedCount,
+  } = useOrganizerDismissState({ dismissScopeKey });
 
-  const {
-    visibleMediaCount,
-    visibleExtraCount,
-    sessionVisibleMediaCount,
-    sessionVisibleExtraCount,
-    tabCounts,
-    tabFilteredRows,
-    modeVisibleMatchedItems,
-    modeVisibleExtrasForRename,
-  } = useOrganizerFilteredRows({
-    organizer,
-    t,
-    activeMainTab,
-    activeExtrasTab,
-    activeManualTab,
-    dismissedRowIds,
-    pendingResolvedIds,
-    scanMode,
-    sessionMode,
-  });
-  useEffect(() => {
-    const allowedMainTabs = scanMode === 'offline'
-      ? ['scenes', 'extras']
-      : (scanMode === 'scenes')
-        ? ['manual', 'scenes', 'extras']
-        : isPornDbMovieMode(scanMode)
-          ? ['manual', 'movies', 'extras']
-          : ['manual', 'movies', 'episodes', 'extras'];
-    const allowedManualTabs = (scanMode === 'scenes' || scanMode === 'offline')
-      ? ['scenes']
-      : isPornDbMovieMode(scanMode)
-        ? ['movies']
-        : ['movies', 'episodes'];
-
-    if (!allowedMainTabs.includes(activeMainTab)) {
-      setActiveMainTab(allowedMainTabs.includes('manual') ? 'manual' : allowedMainTabs[0]);
-    }
-    if (!allowedManualTabs.includes(activeManualTab)) {
-      setActiveManualTab(allowedManualTabs[0]);
-    }
-  }, [activeMainTab, activeManualTab, scanMode, setActiveMainTab, setActiveManualTab]);
-
+  // 1. We first initialize the pagination/sort helper with a temporary/actual count of items.
+  const [totalItems, setTotalItems] = useState(0);
 
   const {
     searchQuery,
@@ -105,26 +66,80 @@ export function useOrganizerPageState({ organizer, t, scanMode, sessionMode }) {
     setPageSize,
     sortConfig,
     handleSortToggle,
-    sortedRows,
     totalPages,
-    paginatedRows,
     pageStart,
     pageEnd,
     setPageAndScrollToTop,
   } = useOrganizerPaginationSort({
-    tabFilteredRows,
     activeMainTab,
     activeExtrasTab,
     activeManualTab,
+    totalItems,
   });
+
+  // 2. Query data from backend using the current states.
+  const subTab = activeMainTab === 'manual' ? activeManualTab : (activeMainTab === 'extras' ? activeExtrasTab : null);
+  const organizerQuery = useOrganizerQuery(
+    scanMode,
+    sessionMode,
+    currentPage,
+    pageSize,
+    activeMainTab,
+    subTab,
+    searchQuery,
+    sortConfig?.key || 'source',
+    sortConfig?.direction || 'asc'
+  );
+  
+  const organizer = organizerQuery.data || { items: [], total_items: 0, tab_counts: {} };
+
+  // Sync totalItems state when query resolves
+  const fetchedTotalItems = organizer.total_items || 0;
+  useEffect(() => {
+    setTotalItems(fetchedTotalItems);
+  }, [fetchedTotalItems]);
+
+  const tabCounts = useMemo(() => {
+    const counts = organizer.tab_counts || {};
+    return {
+      manualCount: counts.manualCount || 0,
+      manualMoviesCount: counts.manualMoviesCount || 0,
+      manualEpisodesCount: counts.manualEpisodesCount || 0,
+      manualScenesCount: counts.manualScenesCount || 0,
+      moviesCount: counts.moviesCount || 0,
+      episodesCount: counts.episodesCount || 0,
+      scenesCount: counts.scenesCount || 0,
+      extrasCount: counts.extrasCount || 0,
+    };
+  }, [organizer.tab_counts]);
+
+  // Map backend items to frontend rows
+  const paginatedRows = useMemo(() => {
+    const items = organizer.items || [];
+    return items.map((item) => {
+      if (activeMainTab === 'extras') {
+        return mapExtraRow(item, t);
+      }
+      return mapOrganizerItemRow(item, t);
+    });
+  }, [organizer.items, activeMainTab, t]);
+
+  // Instantly filter out dismissed or resolved items from the current page
+  const visiblePaginatedRows = useMemo(() => {
+    return paginatedRows.filter(
+      (row) => !dismissedRowIds.has(row.id)
+        && !pendingResolvedIds?.has(row.id)
+        && (row.rawType !== 'extra' || (!dismissedRowIds.has(`item-${row.parent_id}`) && !pendingResolvedIds?.has(`item-${row.parent_id}`)))
+    );
+  }, [paginatedRows, dismissedRowIds, pendingResolvedIds]);
 
   const {
     activeRowId,
     setActiveRowId,
     activeRow,
   } = useOrganizerDetailsState({
-    sortedRows,
-    paginatedRows,
+    sortedRows: visiblePaginatedRows,
+    paginatedRows: visiblePaginatedRows,
   });
 
   const {
@@ -135,17 +150,17 @@ export function useOrganizerPageState({ organizer, t, scanMode, sessionMode }) {
     handleToggleAll,
     clearSelectedRows,
   } = useFileSelection({
-    sortedRows,
-    paginatedRows,
+    sortedRows: visiblePaginatedRows,
+    paginatedRows: visiblePaginatedRows,
   });
 
   useEffect(() => {
     setSelectedRowIds((current) => {
-      const visibleIds = new Set(paginatedRows.map((row) => row.id));
+      const visibleIds = new Set(visiblePaginatedRows.map((row) => row.id));
       const next = new Set([...current].filter((id) => visibleIds.has(id)));
       return next.size === current.size ? current : next;
     });
-  }, [paginatedRows, setSelectedRowIds]);
+  }, [visiblePaginatedRows, setSelectedRowIds]);
 
   const { focusFirstAvailableResult } = useOrganizerFocus({
     organizer,
@@ -158,13 +173,35 @@ export function useOrganizerPageState({ organizer, t, scanMode, sessionMode }) {
     setSearchQuery,
     setSelectedRowIds,
     setCurrentPage,
-    setIsDetailsCollapsed: () => {}, // No-op, details sidebar is gone
+    setIsDetailsCollapsed: () => {},
     scanMode,
     activeMainTab,
     activeManualTab,
     activeExtrasTab,
     pendingResolvedIds,
   });
+
+  useEffect(() => {
+    const allowedMainTabs = scanMode === 'offline'
+      ? ['scenes', 'extras']
+      : (scanMode === 'scenes')
+        ? ['manual', 'scenes', 'extras']
+        : isAdultMovieMode(scanMode, sessionMode)
+          ? ['manual', 'movies', 'extras']
+          : ['manual', 'movies', 'episodes', 'extras'];
+    const allowedManualTabs = (scanMode === 'scenes' || scanMode === 'offline')
+      ? ['scenes']
+      : isAdultMovieMode(scanMode, sessionMode)
+        ? ['movies']
+        : ['movies', 'episodes'];
+
+    if (!allowedMainTabs.includes(activeMainTab)) {
+      setActiveMainTab(allowedMainTabs.includes('manual') ? 'manual' : allowedMainTabs[0]);
+    }
+    if (!allowedManualTabs.includes(activeManualTab)) {
+      setActiveManualTab(allowedManualTabs[0]);
+    }
+  }, [activeMainTab, activeManualTab, scanMode, setActiveMainTab, setActiveManualTab]);
 
   return {
     dismissRows,
@@ -174,10 +211,10 @@ export function useOrganizerPageState({ organizer, t, scanMode, sessionMode }) {
     pendingResolvedIds,
     addPendingResolvedIds,
     removePendingResolvedIds,
-    visibleMediaCount,
-    visibleExtraCount,
-    sessionVisibleMediaCount,
-    sessionVisibleExtraCount,
+    visibleMediaCount: tabCounts.moviesCount + tabCounts.episodesCount + tabCounts.scenesCount,
+    visibleExtraCount: tabCounts.extrasCount,
+    sessionVisibleMediaCount: tabCounts.moviesCount + tabCounts.episodesCount + tabCounts.scenesCount,
+    sessionVisibleExtraCount: tabCounts.extrasCount,
     activeExtrasTab,
     activeManualTab,
     activeMainTab,
@@ -189,7 +226,7 @@ export function useOrganizerPageState({ organizer, t, scanMode, sessionMode }) {
     pageSize,
     pageStart,
     pageEnd,
-    paginatedRows,
+    paginatedRows: visiblePaginatedRows,
     searchQuery,
     selectedRows,
     selectedRowIds,
@@ -203,11 +240,9 @@ export function useOrganizerPageState({ organizer, t, scanMode, sessionMode }) {
     setSearchQuery,
     focusFirstAvailableResult,
     sortConfig,
-    sortedRows,
+    sortedRows: visiblePaginatedRows,
     tabCounts,
     totalPages,
-    modeVisibleMatchedItems,
-    modeVisibleExtrasForRename,
+    organizerQuery,
   };
 }
-

@@ -16,7 +16,6 @@ class OrganizerMatch(BaseModel):
     confidence: Optional[float] = None
     is_adult: Optional[bool] = None
     provider: Optional[str] = None
-    is_home_video: Optional[bool] = None
     last_air_date: Optional[str] = None
     release_status: Optional[str] = None
 
@@ -65,6 +64,30 @@ class OrganizerGroupsResponse(BaseModel):
     tv: List[OrganizerItem]
     extras: List[OrganizerExtra]
     collisions: List[Any] = Field(default_factory=list)
+
+class OrganizerTabCounts(BaseModel):
+    manualCount: int
+    manualMoviesCount: int
+    manualEpisodesCount: int
+    manualScenesCount: int
+    moviesCount: int
+    episodesCount: int
+    scenesCount: int
+    extrasCount: int
+    extraBonusCount: int
+    extraSubtitlesCount: int
+    extraAudioCount: int
+    extraImagesCount: int
+    extraMetadataCount: int
+
+
+from typing import Union
+
+class OrganizerPaginatedResponse(BaseModel):
+    items: List[Union[OrganizerItem, OrganizerExtra]]
+    total_items: int
+    tab_counts: OrganizerTabCounts
+
 
 class ActionResponse(BaseModel):
     status: str

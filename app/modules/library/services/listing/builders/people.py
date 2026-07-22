@@ -7,12 +7,12 @@ from app.modules.library.services.listing.filter_params import ListingFilterPara
 
 
 class PeopleQueryBuilder:
-    def __init__(self, db: Session, library_port: Any):
+    def __init__(self, db: Session, resolver: Any):
         self.db = db
-        self.library_port = library_port
+        self.resolver = resolver
 
     def query_people(self, params: ListingFilterParams) -> Tuple[int, List[dict]]:
-        people_service = PeopleLibraryService(self.db, library_port=self.library_port)
+        people_service = PeopleLibraryService(self.db, resolver=self.resolver)
         people_items = people_service.get_people_group(
             role=params.people_role,
             filter_status=params.filter_status,
@@ -66,6 +66,21 @@ class PeopleQueryBuilder:
             people_items = [item for item in people_items if item.is_favorite]
         elif params.filter_favorite == "not_favorite":
             people_items = [item for item in people_items if not item.is_favorite]
+
+        if params.filter_rating == "rated":
+            people_items = [
+                item for item in people_items 
+                if item.user_rating is not None 
+                or (item.user_comment is not None and str(item.user_comment).strip() != "")
+                or item.is_favorite
+            ]
+        elif params.filter_rating == "unrated":
+            people_items = [
+                item for item in people_items 
+                if item.user_rating is None 
+                and (item.user_comment is None or str(item.user_comment).strip() == "")
+                and not item.is_favorite
+            ]
 
         if params.selected_tags:
             from app.modules.users.models import UserOverride, Tag, user_override_tags
@@ -121,6 +136,10 @@ class PeopleQueryBuilder:
             people_items.sort(key=lambda item: (item.last_finish_at or "0000-00-00T00:00:00", (item.name or "").lower()), reverse=True)
         elif params.sort_by == "last_finish_asc":
             people_items.sort(key=lambda item: (item.last_finish_at or "9999-12-31T23:59:59", (item.name or "").lower()))
+        elif params.sort_by in ("comment_desc", "user_comment_desc"):
+            people_items.sort(key=lambda item: (-(len(item.user_comment) if item.user_comment else 0), (item.user_comment or "").lower(), (item.name or "").lower()), reverse=True)
+        elif params.sort_by in ("comment_asc", "user_comment_asc"):
+            people_items.sort(key=lambda item: ((len(item.user_comment) if item.user_comment else 0), (item.user_comment or "").lower(), (item.name or "").lower()))
         elif params.sort_by in ("rating_desc", "user_rating_desc"):
             people_items.sort(key=lambda item: (-(item.user_rating if item.user_rating is not None else item.rating or 0.0), -(item.library_count or 0), (item.name or "").lower()))
         elif params.sort_by in ("user_rating_asc", "rating_asc"):

@@ -20,6 +20,10 @@ class Library(Base):
     watch_for_changes: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
+    target_media_types: Mapped[Optional[list[str]]] = mapped_column(JSON, nullable=True)
+    providers: Mapped[Optional[list[str]]] = mapped_column(JSON, nullable=True)
+    is_adult: Mapped[bool] = mapped_column(Boolean, default=False)
+
     media_items: Mapped[List["MediaItem"]] = relationship("MediaItem", back_populates="library", cascade="all, delete-orphan")
 
 class MediaItem(Base):

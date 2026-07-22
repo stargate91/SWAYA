@@ -112,11 +112,11 @@ def monitor_playback(item_id: int, player_type: str, proc: subprocess.Popen, por
 
 def _save_position(item_id: int, current_time: int, total_length: int, user_id: int):
     from app.core.database import SessionLocal
-    from app.modules.library.db_media_resolver import DbMediaResolver
+    from app.modules.library.services.media_item_service import MediaItemService
     
     db_session = SessionLocal()
     try:
-        resolver = DbMediaResolver(db_session)
+        resolver = MediaItemService(db_session)
         resolver.save_playback_position(item_id, current_time, total_length, user_id)
         db_session.commit()
     except Exception as ex:

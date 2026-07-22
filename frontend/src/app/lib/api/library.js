@@ -6,13 +6,19 @@ export const library = {
     if (include_adult !== undefined) params.append('include_adult', String(include_adult));
     return fetchJson(`/api/library/stats?${params.toString()}`);
   },
+  getRatingsStats: ({ include_adult, gender } = {}) => {
+    const params = new URLSearchParams();
+    if (include_adult !== undefined) params.append('include_adult', String(include_adult));
+    if (gender !== undefined) params.append('gender', gender);
+    return fetchJson(`/api/library/ratings/stats?${params.toString()}`);
+  },
   getContinueWatching: ({ limit, include_adult } = {}) => {
     const params = new URLSearchParams();
     if (limit) params.append('limit', String(limit));
     if (include_adult !== undefined) params.append('include_adult', String(include_adult));
     return fetchJson(`/api/library/continue-watching?${params.toString()}`);
   },
-  getItems: ({ tab, page, pageSize, search, sortBy, filter_ownership, filter_watched, selected_genre, people_role, filter_gender, filter_favorite, selected_decade, selected_year, include_adult, selected_performer_id, selected_studio_id, selected_network_id, filter_hair_color, filter_ethnicity, filter_eye_color, filter_tattoos, filter_piercings, filter_breast_type, filter_breast_size, filter_butt_shape, filter_butt_size, selected_tags }, options = {}) => {
+  getItems: ({ tab, page, pageSize, search, sortBy, filter_ownership, filter_watched, selected_genre, people_role, filter_gender, filter_favorite, selected_decade, selected_year, include_adult, selected_performer_id, selected_studio_id, selected_network_id, filter_hair_color, filter_ethnicity, filter_eye_color, filter_tattoos, filter_piercings, filter_breast_type, filter_breast_size, filter_butt_shape, filter_butt_size, selected_tags, filter_rating }, options = {}) => {
     const params = new URLSearchParams();
     if (tab) params.append('tab', tab);
     if (include_adult !== undefined) params.append('include_adult', String(include_adult));
@@ -41,6 +47,7 @@ export const library = {
     if (filter_butt_shape) params.append('filter_butt_shape', filter_butt_shape);
     if (filter_butt_size) params.append('filter_butt_size', filter_butt_size);
     if (selected_tags) params.append('selected_tags', selected_tags);
+    if (filter_rating) params.append('filter_rating', filter_rating);
     return fetchJson(`/api/library?${params.toString()}`, options);
   },
   getFilters: (filterParams, options = {}) => {
@@ -54,19 +61,30 @@ export const library = {
     }
     return fetchJson(`/api/library/filters?${params.toString()}`, options);
   },
-  getCollections: ({ page, pageSize, search, tab, include_adult }, options = {}) => {
+  getCollections: ({ page, pageSize, search, tab, include_adult, status, sort_by, sort_direction }, options = {}) => {
     const params = new URLSearchParams();
     if (page) params.append('page', page);
     if (pageSize) params.append('page_size', pageSize);
     if (search) params.append('search', search);
     if (tab) params.append('tab', tab);
     if (include_adult !== undefined) params.append('include_adult', String(include_adult));
+    if (status) params.append('collection_status', status);
+    if (sort_by) params.append('sort_by', sort_by);
+    if (sort_direction) params.append('sort_direction', sort_direction);
     return fetchJson(`/api/library/collections?${params.toString()}`, options);
   },
-  getTags: (isAdult) => {
+  getTags: (isAdult, page = 1, pageSize = 40, searchQuery = '') => {
     const params = new URLSearchParams();
     if (isAdult !== undefined) params.append('is_adult', String(isAdult));
+    if (page) params.append('page', String(page));
+    if (pageSize) params.append('page_size', String(pageSize));
+    if (searchQuery) params.append('q', searchQuery);
     return fetchJson(`/api/library/tags?${params.toString()}`);
+  },
+  getTagItems: (tagName, isAdult) => {
+    const params = new URLSearchParams();
+    if (isAdult !== undefined) params.append('is_adult', String(isAdult));
+    return fetchJson(`/api/library/tags/${encodeURIComponent(tagName)}/items?${params.toString()}`);
   },
   getItemDetail: (itemId, { fullPeople = false, mediaType = null } = {}) => {
     const params = new URLSearchParams();

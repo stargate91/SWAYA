@@ -14,7 +14,16 @@ export const lists = {
   deleteList: (listId) => fetchJson(`/api/lists/${listId}`, {
     method: 'DELETE',
   }),
-  getListDetails: (listId) => fetchJson(`/api/lists/${listId}`),
+  getListDetails: (listId, params = {}) => {
+    const qs = new URLSearchParams();
+    Object.entries(params).forEach(([key, val]) => {
+      if (val !== undefined && val !== null) {
+        qs.append(key, val);
+      }
+    });
+    const queryStr = qs.toString();
+    return fetchJson(`/api/lists/${listId}${queryStr ? `?${queryStr}` : ''}`);
+  },
   addToList: (listId, payload) => fetchJson(`/api/lists/${listId}/items`, {
     method: 'POST',
     body: JSON.stringify(payload),

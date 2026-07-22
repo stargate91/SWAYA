@@ -31,23 +31,22 @@ class MainstreamEnricher:
     def __init__(
         self,
         db_session: Session,
-        metadata_repo: Optional[MetadataRepositoryPort] = None,
-        people_repo: Optional[PeopleRepositoryPort] = None,
-        settings_port: Optional[SettingsPort] = None,
-        image_downloader: Optional[ImageDownloadPort] = None,
+        metadata_repo: Optional[Any] = None,
+        people_repo: Optional[Any] = None,
+        settings: Optional[Any] = None,
+        image_downloader: Optional[Any] = None,
     ):
         self.db = db_session
-        from app.modules.metadata.db_metadata_repository import DbMetadataRepository
-        from app.modules.people.db_people_repository import DbPeopleRepository
-        from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-        from app.modules.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
-        self.metadata_repo = metadata_repo or DbMetadataRepository(db_session)
-        self.people_repo = people_repo or DbPeopleRepository(db_session)
-        self.settings_port = settings_port or DbSettingsAdapter(db_session)
-        self.image_downloader = image_downloader or TasksImageDownloadAdapter()
+        from app.modules.metadata.services.metadata_service import MetadataService
+        from app.modules.settings.services.settings_service import SettingsService
+        from app.modules.tasks.image_download_service import ImageDownloadService
+        self.metadata_repo = metadata_repo or MetadataService(db_session)
+        self.settings = settings or SettingsService(db_session)
+        self.image_downloader = image_downloader or ImageDownloadService()
 
-        self.api = TMDBScraper(db_session)
-        self.omdb = OMDBScraper(db_session)
+        from app.modules.scrapers.support.gateway import scraper_gateway
+        self.api = scraper_gateway.get_scraper(Provider.TMDB, db_session)
+        self.omdb = scraper_gateway.get_scraper(Provider.OMDB, db_session)
         self._details_cache: Dict[tuple[str, int, str], Dict[str, Any]] = {}
         self._episode_cache: Dict[tuple[int, int, int, str], Dict[str, Any]] = {}
         self._omdb_cache: Dict[str, Dict[str, Any]] = {}
@@ -94,15 +93,15 @@ class MainstreamEnricher:
             from app.core.user_context import get_current_user_id
             current_user_id = get_current_user_id()
             
-            follow_naming = self.settings_port.get_setting("follow_app_language_for_naming", current_user_id)
+            follow_naming = self.settings.get_setting("follow_app_language_for_naming", current_user_id)
             if follow_naming is None:
                 follow_naming = True
             
             t_lang = None
             if follow_naming:
-                t_lang = self.settings_port.get_setting("ui_language", current_user_id)
+                t_lang = self.settings.get_setting("ui_language", current_user_id)
             else:
-                t_lang = self.settings_port.get_setting("default_target_language", current_user_id)
+                t_lang = self.settings.get_setting("default_target_language", current_user_id)
             
             if t_lang:
                 langs_to_enrich.append(t_lang)

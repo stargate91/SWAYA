@@ -19,9 +19,9 @@ class BaseQueryBuilder:
         self.lib_statuses = [ItemStatus.RENAMED, ItemStatus.ORGANIZED]
         
         from app.core.language import get_user_ui_language
-        from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-        settings_port = DbSettingsAdapter(self.db)
-        self.ui_lang = get_user_ui_language(settings_port)
+        from app.modules.settings.services.settings_service import SettingsService
+        settings = SettingsService(self.db)
+        self.ui_lang = get_user_ui_language(settings)
         self.loc_alias = aliased(MetadataLocalization, name="search_loc")
 
     def _apply_common_filters(
@@ -64,7 +64,7 @@ class BaseQueryBuilder:
                 )
 
         # Favorite and Watched filters
-        if params.filter_favorite in ("favorite", "not_favorite") or params.filter_watched in ("watched", "unwatched"):
+        if params.filter_favorite in ("favorite", "not_favorite") or params.filter_watched in ("watched", "unwatched") or params.filter_rating in ("rated", "unrated"):
             override_match = aliased(UserOverride, name="filter_override_match")
             override_item = aliased(UserOverride, name="filter_override_item")
             
@@ -92,6 +92,25 @@ class BaseQueryBuilder:
                 query = query.filter(
                     or_(~override_match.is_watched, override_match.is_watched.is_(None)),
                     or_(~override_item.is_watched, override_item.is_watched.is_(None))
+                )
+
+            if params.filter_rating == "rated":
+                query = query.filter(or_(
+                    override_match.user_rating.isnot(None),
+                    override_item.user_rating.isnot(None),
+                    and_(override_match.user_comment.isnot(None), override_match.user_comment != ""),
+                    and_(override_item.user_comment.isnot(None), override_item.user_comment != ""),
+                    override_match.is_favorite == True,
+                    override_item.is_favorite == True
+                ))
+            elif params.filter_rating == "unrated":
+                query = query.filter(
+                    or_(override_match.user_rating.is_(None), override_match.user_rating == None),
+                    or_(override_item.user_rating.is_(None), override_item.user_rating == None),
+                    or_(override_match.user_comment.is_(None), override_match.user_comment == ""),
+                    or_(override_item.user_comment.is_(None), override_item.user_comment == ""),
+                    or_(~override_match.is_favorite, override_match.is_favorite.is_(None)),
+                    or_(~override_item.is_favorite, override_item.is_favorite.is_(None))
                 )
 
         # Genre filter
@@ -186,6 +205,38 @@ class BaseQueryBuilder:
             query = query.order_by(desc(MetadataMatch.release_date))
         elif params.sort_by in ("date_asc", "release_date_asc", "year_asc"):
             query = query.order_by(MetadataMatch.release_date.asc())
+        elif params.sort_by in ("comment_desc", "user_comment_desc"):
+            override_match = aliased(UserOverride, name="override_match")
+            override_item = aliased(UserOverride, name="override_item")
+            query = query.outerjoin(override_match, and_(
+                override_match.metadata_match_id == MetadataMatch.id,
+                override_match.user_id == self.current_user_id
+            )).outerjoin(override_item, and_(
+                override_item.media_item_id == MetadataMatch.media_item_id,
+                override_item.metadata_match_id.is_(None),
+                override_item.user_id == self.current_user_id
+            ))
+            query = query.order_by(desc(func.coalesce(
+                override_match.user_comment,
+                override_item.user_comment,
+                ""
+            )))
+        elif params.sort_by in ("comment_asc", "user_comment_asc"):
+            override_match = aliased(UserOverride, name="override_match")
+            override_item = aliased(UserOverride, name="override_item")
+            query = query.outerjoin(override_match, and_(
+                override_match.metadata_match_id == MetadataMatch.id,
+                override_match.user_id == self.current_user_id
+            )).outerjoin(override_item, and_(
+                override_item.media_item_id == MetadataMatch.media_item_id,
+                override_item.metadata_match_id.is_(None),
+                override_item.user_id == self.current_user_id
+            ))
+            query = query.order_by(func.coalesce(
+                override_match.user_comment,
+                override_item.user_comment,
+                ""
+            ).asc())
         elif params.sort_by in ("rating_desc", "user_rating_desc"):
             override_match = aliased(UserOverride, name="override_match")
             override_item = aliased(UserOverride, name="override_item")
@@ -330,6 +381,50 @@ class BaseQueryBuilder:
         return query
 
     def format_results(self, items: List[MetadataMatch]) -> List[dict]:
+        def calculate_card_subtitle(match, people_list) -> str:
+            parts = []
+            m_type = match.media_type
+            
+            if m_type in (MediaType.SCENE, MediaType.VIDEO):
+                perf_names = [p["name"] for p in people_list if p.get("name")][:3]
+                if perf_names:
+                    parts.append(", ".join(perf_names))
+                date_part = ""
+                if match.release_date:
+                    date_part = match.release_date.strftime("%Y-%m-%d")
+                if date_part:
+                    parts.append(date_part)
+            elif m_type == MediaType.TV:
+                first_year = None
+                if hasattr(match, "first_air_date") and match.first_air_date:
+                    first_year = match.first_air_date.year
+                elif match.release_date:
+                    first_year = match.release_date.year
+                last_year = match.last_air_date.year if (hasattr(match, "last_air_date") and match.last_air_date) else None
+                status_lower = str(getattr(match, "release_status", "") or "").lower()
+                is_ended = status_lower in ("ended", "canceled", "cancelled")
+                tv_year = ""
+                if first_year:
+                    if is_ended and last_year:
+                        tv_year = str(first_year) if first_year == last_year else f"{first_year} - {last_year}"
+                    else:
+                        tv_year = f"{first_year} - "
+                if tv_year:
+                    parts.append(tv_year)
+                info = getattr(match, "info", None)
+                if info:
+                    parts.append(str(info))
+            else:
+                year_part = ""
+                if match.release_date:
+                    year_part = str(match.release_date.year)
+                if year_part:
+                    parts.append(year_part)
+                info = getattr(match, "info", None)
+                if info:
+                    parts.append(str(info))
+            return " • ".join(parts)
+
         match_ids = [m.id for m in items]
         media_item_ids = [m.media_item_id for m in items if m.media_item_id is not None]
         metadata_overrides = {}
@@ -357,9 +452,10 @@ class BaseQueryBuilder:
                 people_links_dict.setdefault(link.match_id, []).append(link)
 
         from app.core.language import get_user_ui_language
-        from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-        settings_port = DbSettingsAdapter(self.db)
-        ui_lang = get_user_ui_language(settings_port)
+        from app.modules.settings.services.settings_service import SettingsService
+        settings = SettingsService(self.db)
+        ui_lang = get_user_ui_language(settings)
+        gender_pref = settings.get_setting("adult_gender_preference") or "all"
 
         formatted_items = []
         for match in items:
@@ -390,12 +486,30 @@ class BaseQueryBuilder:
             resolved_poster = image_processing_service.resolve_image_url(poster_path, "posters")
             resolved_backdrop = image_processing_service.resolve_image_url(backdrop_path, "backdrops")
 
+            from app.modules.scrapers.support.registry import MediaTypeRegistry
+            cfg = MediaTypeRegistry.get_config(match.media_type)
+            card_aspect = cfg.card_aspect_ratio if cfg else "poster"
+            
+            if card_aspect == "landscape":
+                ideal_path = backdrop_path or poster_path
+                card_image_folder = "backdrops"
+            else:
+                ideal_path = poster_path or backdrop_path
+                card_image_folder = "posters"
+            card_image_url = image_processing_service.resolve_image_url(ideal_path, card_image_folder) if ideal_path else ""
+
             people_list = []
             match_people = people_links_dict.get(match.id, [])
             if match_people:
+                is_adult_item = bool(match.is_adult) or (match.media_type == MediaType.SCENE)
                 for link in sorted(match_people, key=lambda x: x.order):
                     person = link.person
                     if person:
+                        if is_adult_item and gender_pref != "all":
+                            if gender_pref == "female" and person.gender != 1:
+                                continue
+                            if gender_pref == "male" and person.gender != 2:
+                                continue
                         people_list.append({
                             "id": person.id,
                             "name": person.name,
@@ -491,8 +605,19 @@ class BaseQueryBuilder:
             elif p_lw:
                 last_watched_at = p_lw.isoformat()
 
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            from app.modules.scrapers.support.registry import MediaTypeRegistry
+            cfg = MediaTypeRegistry.get_config(match.media_type)
+            card_aspect = cfg.card_aspect_ratio if cfg else "poster"
+            image_sub = cfg.image_subfolder if cfg else "posters"
+
+            card_subtitle = calculate_card_subtitle(match, people_list)
+
+            from app.core.episode_utils import format_episode_code
+            disp_code = format_episode_code(match.season_number, match.episode_number) if (match.media_type == MediaType.EPISODE) else None
+
             formatted_items.append({
-                "id": item.id if item else (f"{match.provider.value}_{match.external_id}" if (match.media_type == MediaType.SCENE and match.provider in (Provider.PORNDB, Provider.FANSDB)) else (f"stash_{match.external_id}" if match.media_type == MediaType.SCENE else f"tmdb_{match.external_id}")),
+                "id": item.id if item else f"{ProviderRegistry.get_config(match.provider).prefix if ProviderRegistry.get_config(match.provider) else match.provider.value.lower()}_{match.external_id}",
                 "title": title,
                 "year": match.release_date.year if match.release_date else None,
                 "poster_path": resolved_poster,
@@ -501,6 +626,10 @@ class BaseQueryBuilder:
                 "rating_porndb": match.rating_porndb,
                 "rating_imdb": match.rating_imdb,
                 "type": match.media_type.value,
+                "card_aspect_ratio": card_aspect,
+                "image_subfolder": image_sub,
+                "card_image_url": card_image_url,
+                "card_subtitle": card_subtitle,
                 "tmdb_id": int(match.external_id) if (match.provider == Provider.TMDB and match.external_id and match.external_id.isdigit()) else None,
                 "tv_tmdb_id": int(match.external_id) if (match.media_type == MediaType.TV and match.provider == Provider.TMDB and match.external_id and match.external_id.isdigit()) else None,
                 "path": item.current_path if item else None,
@@ -516,9 +645,10 @@ class BaseQueryBuilder:
                 "watch_count": watch_count,
                 "last_watched_at": last_watched_at,
                 "people": people_list,
-                "is_adult": bool(match.is_adult) or match.provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB),
-                "is_home_video": bool(match.is_home_video),
+                "is_adult": bool(match.is_adult) or ProviderRegistry.is_adult_provider(match.provider),
+                "should_blur_sfw": bool(match.is_adult) or ProviderRegistry.is_adult_provider(match.provider) or match.media_type == MediaType.SCENE,
                 "last_air_date": match.last_air_date.isoformat() if (hasattr(match, "last_air_date") and match.last_air_date) else None,
                 "release_status": match.release_status if hasattr(match, "release_status") else None,
+                "display_episode_code": disp_code,
             })
         return formatted_items

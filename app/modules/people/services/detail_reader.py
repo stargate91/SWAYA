@@ -24,19 +24,22 @@ from app.modules.people.services.detail.filmography_paginator import Filmography
 logger = logging.getLogger(__name__)
 
 class PerformerDetailReader:
-    def __init__(self, db: Session, scrapers: Any, library_port: Any, image_service: Any, filmography_service: FilmographyService, image_downloader: Optional[Any] = None):
+    def __init__(self, db: Session, scrapers: Any, resolver: Optional[Any] = None, image_service: Any = None, filmography_service: FilmographyService = None, image_downloader: Optional[Any] = None):
         self.db = db
         self.scrapers = scrapers
         self.tmdb = scrapers.tmdb(db)
-        self.library_port = library_port
+        if resolver is None:
+            from app.modules.library.services.media_item_service import MediaItemService
+            resolver = MediaItemService(db)
+        self.resolver = resolver
         self.image_service = image_service
         self.filmography_service = filmography_service
 
         # Instantiate helper services
-        self.query_builder = PeopleQueryBuilder(db, library_port, image_service)
-        self.search_service = PeopleSearchService(db, scrapers, library_port, image_service)
-        self.resolver = PersonResolver(db, self.search_service)
-        self.collator = PersonDetailCollator(db, scrapers, self.tmdb, library_port, image_service, filmography_service, image_downloader=image_downloader)
+        self.query_builder = PeopleQueryBuilder(db, resolver, image_service)
+        self.search_service = PeopleSearchService(db, scrapers, resolver, image_service)
+        self.resolver_helper = PersonResolver(db, self.search_service)
+        self.collator = PersonDetailCollator(db, scrapers, self.tmdb, resolver, image_service, filmography_service, image_downloader=image_downloader)
         self.paginator = FilmographyPaginator(self.tmdb, filmography_service)
 
     def _resolve_img(self, path: Optional[str], subfolder: str, size: str = "w500") -> Optional[str]:
@@ -65,7 +68,7 @@ class PerformerDetailReader:
         )
 
     def _resolve_person(self, person_id: Any, load_localizations: bool = False) -> Person:
-        return self.resolver.resolve_person(person_id, load_localizations)
+        return self.resolver_helper.resolve_person(person_id, load_localizations)
 
     def get_person_detail(self, person_id: Any) -> PersonDetailDTO:
         person = self._resolve_person(person_id, load_localizations=True)
@@ -87,9 +90,9 @@ class PerformerDetailReader:
         self._resolve_person(person_id)
         normalized_type = "tv" if str(media_type or "").lower() in {"tv", "series"} else "movie"
         from app.core.language import get_user_ui_language
-        from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-        settings_port = DbSettingsAdapter(self.db)
-        ui_lang = get_user_ui_language(settings_port)
+        from app.modules.settings.services.settings_service import SettingsService
+        settings = SettingsService(self.db)
+        ui_lang = get_user_ui_language(settings)
 
         raw_data = self.tmdb.get_details(tmdb_id, normalized_type, language=ui_lang, include_images=True, append_parts=["images"])
         backdrops = ((raw_data or {}).get("images") or {}).get("backdrops") or []

@@ -11,7 +11,15 @@ from app.modules.scrapers.providers.stashdb import StashDBScraper
 from app.modules.scrapers.providers.tmdb import TMDBScraper
 
 
-class InfrastructureScraperGateway:
+class ScraperGateway:
+    def get_scraper(self, provider: Provider, db_session: Any) -> Any:
+        if provider == Provider.TMDB:
+            return self.tmdb(db_session)
+        elif provider == Provider.OMDB:
+            return self.omdb(db_session)
+        else:
+            return self.adult(provider, db_session)
+
     def tmdb(self, db_session: Any) -> TMDBScraper:
         return TMDBScraper(db_session)
 
@@ -69,4 +77,4 @@ class InfrastructureScraperGateway:
         )
 
 
-scraper_gateway = InfrastructureScraperGateway()
+scraper_gateway = ScraperGateway()

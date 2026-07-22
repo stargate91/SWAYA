@@ -1,4 +1,5 @@
 import logging
+import json
 from typing import Optional, List, Any
 from sqlalchemy.orm import Session, joinedload, selectinload
 
@@ -9,7 +10,7 @@ from app.modules.history.models import PlaybackLog
 
 logger = logging.getLogger(__name__)
 
-class DbPlaybackRepository:
+class PlaybackService:
     def __init__(self, db: Session):
         self.db = db
 
@@ -41,7 +42,6 @@ class DbPlaybackRepository:
                         break
                     elif isinstance(ep_val, str):
                         try:
-                            import json
                             loaded = json.loads(ep_val)
                             if loaded == ep_num or (isinstance(loaded, list) and ep_num in loaded):
                                 match_db = ep
@@ -51,7 +51,7 @@ class DbPlaybackRepository:
                                 match_db = ep
                                 break
             except ValueError as e:
-                logger.debug(f"Swallowed exception in infrastructure/repositories/db_playback_repository.py:50: {e}", exc_info=True)
+                logger.debug(f"Swallowed exception in PlaybackService.resolve_item_id_from_external: {e}", exc_info=True)
         elif len(parts) == 3:
             try:
                 tv_show_id = parts[0]
@@ -74,7 +74,6 @@ class DbPlaybackRepository:
                         break
                     elif isinstance(ep_val, str):
                         try:
-                            import json
                             loaded = json.loads(ep_val)
                             if loaded == ep_num or (isinstance(loaded, list) and ep_num in loaded):
                                 match_db = ep
@@ -84,7 +83,7 @@ class DbPlaybackRepository:
                                 match_db = ep
                                 break
             except ValueError as e:
-                logger.debug(f"Swallowed exception in infrastructure/repositories/db_playback_repository.py:83: {e}", exc_info=True)
+                logger.debug(f"Swallowed exception in PlaybackService.resolve_item_id_from_external: {e}", exc_info=True)
 
         if not match_db and "_" in item_str:
             parts = item_str.split("_", 1)

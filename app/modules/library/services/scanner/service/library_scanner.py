@@ -24,8 +24,8 @@ class LibraryScanner:
         return self.service.task_manager
 
     @property
-    def library_port(self):
-        return self.service.library_port
+    def resolver(self):
+        return self.service.resolver
 
     @property
     def scan_resolver_factory(self):
@@ -85,12 +85,12 @@ class LibraryScanner:
             StatusCoordinator.scan_status["scan_mode"] = scan_mode.value
         logger.info("[scan:%s] Starting background scan | task_id=%s | paths=%s | include_adult=%s", scan_mode.value, task_id, paths, include_adult)
         try:
-            repaired_count = self.library_port.repair_inconsistent_matched_items()
+            repaired_count = self.resolver.repair_inconsistent_matched_items()
             if repaired_count > 0:
                 logger.info(f"Automatically repaired {repaired_count} inconsistent matched items by resetting status to NEW.")
 
             libraries_to_scan = []
-            all_libs = self.library_port.get_all_libraries()
+            all_libs = self.resolver.get_all_libraries()
             
             import os
             for p in paths:
@@ -127,7 +127,7 @@ class LibraryScanner:
                     if matched_lib not in libraries_to_scan:
                         libraries_to_scan.append(matched_lib)
                 else:
-                    new_lib = self.library_port.create_library(name=os.path.basename(p) or "Library", root_path=p)
+                    new_lib = self.resolver.create_library(name=os.path.basename(p) or "Library", root_path=p)
                     libraries_to_scan.append(new_lib)
 
             if not libraries_to_scan:
@@ -137,7 +137,7 @@ class LibraryScanner:
 
             total_items_to_enrich = []
             from app.modules.library.services.scanner.scanner_manager import ScannerManager
-            scanner = ScannerManager(self.db, settings_port=self.service.settings_port, fs_port=self.service.fs_port)
+            scanner = ScannerManager(self.db, settings=self.service.settings, fs=self.service.fs)
             
             logger.info("[scan:%s] Libraries selected: %s", scan_mode.value, [lib.root_path for lib in libraries_to_scan])
 
@@ -193,7 +193,7 @@ class LibraryScanner:
                 logger.info("[scan:%s] Resolver phase finished for %s items", scan_mode.value, len(total_items_to_enrich))
 
             if total_items_to_enrich:
-                match_ids = self.library_port.get_metadata_match_ids_for_media_items([item.id for item in total_items_to_enrich])
+                match_ids = self.resolver.get_metadata_match_ids_for_media_items([item.id for item in total_items_to_enrich])
                 if match_ids:
                     logger.info("[scan:%s] Queueing %s match ids for people enrichment", scan_mode.value, len(match_ids))
                     self.task_manager.people_enrich_worker.enqueue_enrich(match_ids)
@@ -259,11 +259,11 @@ class LibraryScanner:
             
         logger.info("[scan:%s] Starting background scan retry | task_id=%s | provider=%s", scan_mode.value, task_id, provider)
         try:
-            items_to_retry = self.library_port.get_items_for_scan_retry(scan_mode)
+            items_to_retry = self.resolver.get_items_for_scan_retry(scan_mode)
             logger.info("[scan:%s] Found %s items to retry resolving.", scan_mode.value, len(items_to_retry))
             
             if items_to_retry and not self.service._is_stop_requested():
-                self.library_port.reset_items_for_retry([item.id for item in items_to_retry])
+                self.resolver.reset_items_for_retry([item.id for item in items_to_retry])
                 
                 with StatusCoordinator.scan_status_lock:
                     StatusCoordinator.scan_status["phase"] = "resolving"
@@ -291,7 +291,7 @@ class LibraryScanner:
                 await asyncio.to_thread(resolver.resolve_all, items_to_retry, progress_callback=resolve_progress_cb, task_id=task_id)
                 logger.info("[scan:%s] Retry Resolver phase finished for %s items", scan_mode.value, len(items_to_retry))
                 
-                match_ids = self.library_port.get_metadata_match_ids_for_media_items([item.id for item in items_to_retry])
+                match_ids = self.resolver.get_metadata_match_ids_for_media_items([item.id for item in items_to_retry])
                 if match_ids:
                     logger.info("[scan:%s] Queueing %s match ids for people enrichment", scan_mode.value, len(match_ids))
                     self.task_manager.people_enrich_worker.enqueue_enrich(match_ids)

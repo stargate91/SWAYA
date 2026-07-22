@@ -26,8 +26,8 @@ class RenamerRunner:
         return self.service.task_manager
 
     @property
-    def library_port(self):
-        return self.service.library_port
+    def resolver(self):
+        return self.service.resolver
 
     @property
     def formatter_factory(self):
@@ -51,7 +51,7 @@ class RenamerRunner:
         return {"status": "success", "message": "Organizing items in background"}
 
     async def _run_rename(self, task_id: int, item_ids: Optional[List[int]] = None, organize_in_place: bool = False):
-        items = self.library_port.get_items_for_renaming(item_ids)
+        items = self.resolver.get_items_for_renaming(item_ids)
 
         if not items:
             with StatusCoordinator.scan_status_lock:
@@ -87,7 +87,7 @@ class RenamerRunner:
         formatter = self.formatter_factory(self.db) if self.formatter_factory else None
         engine = RenamerEngine(
             self.db,
-            library_port=self.library_port,
+            resolver=self.resolver,
             formatter=formatter,
             move_with_progress_fn=self.move_with_progress_fn,
             send_to_trash_fn=self.send_to_trash_fn
@@ -111,7 +111,7 @@ class RenamerRunner:
                         preview.target_subpath = ""
                         preview.target_name = os.path.basename(m_item.current_path)
                     for extra_prev in preview.extra_previews:
-                        extra_obj = self.library_port.get_extra_by_id(extra_prev.extra_id)
+                        extra_obj = self.resolver.get_extra_by_id(extra_prev.extra_id)
                         if extra_obj:
                             extra_prev.destination_root = os.path.dirname(extra_obj.current_path).replace("\\", "/")
                             extra_prev.target_subpath = ""
@@ -189,7 +189,7 @@ class RenamerRunner:
             
         engine = RenamerEngine(
             self.db,
-            library_port=self.library_port,
+            resolver=self.resolver,
             move_with_progress_fn=self.move_with_progress_fn,
             send_to_trash_fn=self.send_to_trash_fn
         )

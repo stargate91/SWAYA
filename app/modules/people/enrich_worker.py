@@ -43,6 +43,23 @@ class PeopleEnrichWorker:
         ]
         logger.info(f"PeopleEnrichWorker started with {self.concurrency} workers.")
 
+        # Enqueue active performers without birthday on start
+        if self.session_factory:
+            db = self.session_factory()
+            try:
+                unenriched = db.query(Person.id).filter(
+                    Person.is_active == True,
+                    Person.birthday.is_(None)
+                ).all()
+                unenriched_ids = [p[0] for p in unenriched]
+                if unenriched_ids:
+                    logger.info(f"Found {len(unenriched_ids)} unenriched performers on startup. Enqueueing them.")
+                    self.loop.create_task(self._enqueue_items(unenriched_ids))
+            except Exception as e:
+                logger.error(f"Failed to enqueue unenriched performers on startup: {e}")
+            finally:
+                db.close()
+
     async def stop(self) -> None:
         self.is_running = False
         for t in self._worker_tasks:

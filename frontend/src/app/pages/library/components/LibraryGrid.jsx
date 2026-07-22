@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { usePlayMediaMutation, useSettingsQuery } from '@/queries';
+import { usePlayMediaMutation, useSettingsQuery, useTagItemsQuery } from '@/queries';
 import api from '@/lib/api';
 import { QK } from '@/lib/queryKeys';
 import EmptyState from '@/ui/EmptyState';
@@ -372,19 +372,28 @@ function ExpandedTagPanel({ tag, t, emptyIcon, isFocusMode = false, activeSessio
       queryClient.invalidateQueries({ queryKey: QK.libraryTags });
       queryClient.invalidateQueries({ queryKey: QK.allTags });
       queryClient.invalidateQueries({ queryKey: QK.library });
+      queryClient.invalidateQueries({ queryKey: ['tagItems', tag.name, activeSessionMode === 'nsfw'] });
     }
   });
 
+  const { data: tagDetails, isLoading } = useTagItemsQuery(tag.name, activeSessionMode === 'nsfw');
+
   const allItems = useMemo(() => {
-    if (Array.isArray(tag.mode_items)) {
-      return tag.mode_items;
-    }
-    return getLibraryTagBucketKeys(activeSessionMode).flatMap((key) => tag[key] || []);
-  }, [tag, activeSessionMode]);
+    if (!tagDetails) return [];
+    return getLibraryTagBucketKeys(activeSessionMode).flatMap((key) => tagDetails[key] || []);
+  }, [tagDetails, activeSessionMode]);
 
   const [visibleCount, setVisibleCount] = useState(20);
   const paginatedItems = allItems.slice(0, visibleCount);
   const hasMore = allItems.length > visibleCount;
+
+  if (isLoading) {
+    return (
+      <div className="library-content" style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-xl) 0' }}>
+        <div className="library-spinner" />
+      </div>
+    );
+  }
 
   if (allItems.length === 0) {
     return (

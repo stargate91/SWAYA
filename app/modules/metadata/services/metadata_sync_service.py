@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.modules.metadata.models import MetadataMatch
 from app.core.enums import Provider, MediaType
 from app.core.language import get_user_ui_language, get_user_fallback_language
-from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
+from app.modules.settings.services.settings_service import SettingsService
 from app.modules.scrapers.support.gateway import scraper_gateway
 from app.modules.scrapers.enrichment.mainstream_enricher import MainstreamEnricher
 
@@ -60,9 +60,9 @@ class MetadataSyncService:
                 task_manager.update_progress(task_id, 100.0)
                 return
 
-            settings_port = DbSettingsAdapter(db)
-            primary_lang = get_user_ui_language(settings_port)
-            fallback_lang = get_user_fallback_language(settings_port)
+            settings = SettingsService(db)
+            primary_lang = get_user_ui_language(settings)
+            fallback_lang = get_user_fallback_language(settings)
 
             enricher = MainstreamEnricher(db)
 

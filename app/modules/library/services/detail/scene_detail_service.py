@@ -17,19 +17,21 @@ from app.modules.library.services.detail.scene.metadata_syncer import SceneMetad
 
 logger = logging.getLogger(__name__)
 
-PROVIDER_PREFIXES = ("stashdb", "stash", "fansdb", "porndb", "theporndb", "scene", "movie")
+from app.modules.scrapers.support.registry import ProviderRegistry
+
+PROVIDER_PREFIXES = tuple(ProviderRegistry.get_all_prefixes())
 
 def _strip_provider_prefix(value: str) -> str:
     cleaned = str(value or "")
     while "_" in cleaned:
         prefix, rest = cleaned.split("_", 1)
-        if prefix.lower() not in PROVIDER_PREFIXES:
+        if not ProviderRegistry.is_valid_prefix(prefix):
             break
         cleaned = rest
     return cleaned
 
 class SceneDetailService(DetailFormatter):
-    def __init__(self, db: Session, scrapers: Any, image_downloader: Optional[ImageDownloadPort] = None):
+    def __init__(self, db: Session, scrapers: Any, image_downloader: Optional[Any] = None):
         super().__init__()
         self.db = db
         self.scrapers = scrapers
@@ -74,12 +76,10 @@ class SceneDetailService(DetailFormatter):
         is_uuid = bool(re.match(r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", scene_uuid))
         # Try to load scene details from the local database
         prov_enum = None
-        if provider_prefix in ("stashdb", "stash"):
-            prov_enum = Provider.STASHDB
-        elif provider_prefix == "fansdb":
-            prov_enum = Provider.FANSDB
-        elif provider_prefix in ("porndb", "theporndb"):
-            prov_enum = Provider.PORNDB
+        if provider_prefix:
+            prov_enum = ProviderRegistry.get_provider_by_prefix(provider_prefix)
+        elif match:
+            prov_enum = match.provider
         
         match = None
         if prov_enum:
@@ -101,16 +101,12 @@ class SceneDetailService(DetailFormatter):
                 ),
                 MetadataMatch.media_type == MediaType.SCENE
             ).first()
+            if match:
+                prov_enum = match.provider
             
         from app.core.cache_service import CacheService
         cache_srv = CacheService()
-        effective_provider = None
-        if provider_prefix in ("stashdb", "stash"):
-            effective_provider = Provider.STASHDB
-        elif provider_prefix == "fansdb":
-            effective_provider = Provider.FANSDB
-        elif provider_prefix in ("porndb", "theporndb"):
-            effective_provider = Provider.PORNDB
+        effective_provider = prov_enum
         
         cache_key = f"{effective_provider.value if effective_provider else 'porndb'}_scene_{scene_uuid}"
         
@@ -122,45 +118,14 @@ class SceneDetailService(DetailFormatter):
                 scene_data = cached_scene
 
         if not scene_data:
-            if provider_prefix in ("stashdb", "stash"):
-                stash_scraper = self.scrapers.adult(Provider.STASHDB, db)
+            if effective_provider:
+                scraper = self.scrapers.adult(effective_provider, db)
                 try:
-                    scene_data = stash_scraper.fetch_scene(scene_uuid)
+                    scene_data = scraper.fetch_scene(scene_uuid)
+                    if not scene_data and effective_provider == Provider.PORNDB:
+                        scene_data = scraper.fetch_scene(f"scene_{scene_uuid}")
                 except Exception:
                     scene_data = None
-            elif provider_prefix == "fansdb":
-                fans_scraper = self.scrapers.adult(Provider.FANSDB, db)
-                try:
-                    scene_data = fans_scraper.fetch_scene(scene_uuid)
-                except Exception:
-                    scene_data = None
-            elif provider_prefix in ("porndb", "theporndb"):
-                porndb_scraper = self.scrapers.adult(Provider.PORNDB, db)
-                try:
-                    scene_data = porndb_scraper.fetch_scene(scene_uuid)
-                    if not scene_data:
-                        scene_data = porndb_scraper.fetch_scene(f"scene_{scene_uuid}")
-                except Exception:
-                    scene_data = None
-            else:
-                if is_uuid:
-                    stash_scraper = self.scrapers.adult(Provider.STASHDB, db)
-                    try:
-                        scene_data = stash_scraper.fetch_scene(scene_uuid)
-                    except Exception:
-                        scene_data = None
-                    if not scene_data:
-                        fans_scraper = self.scrapers.adult(Provider.FANSDB, db)
-                        try:
-                            scene_data = fans_scraper.fetch_scene(scene_uuid)
-                        except Exception:
-                            scene_data = None
-                else:
-                    porndb_scraper = self.scrapers.adult(Provider.PORNDB, db)
-                    try:
-                        scene_data = porndb_scraper.fetch_scene(scene_uuid)
-                    except Exception:
-                        scene_data = None
 
             # Store in APICache permanently if fetched successfully
             if scene_data and effective_provider:
@@ -426,7 +391,13 @@ class SceneDetailService(DetailFormatter):
                 "audio_type": item.audio_type.value if hasattr(item.audio_type, "value") else str(item.audio_type),
             }
 
-        is_adult_val = bool(match_db.is_adult if match_db else (provider_prefix in ("stashdb", "stash", "fansdb", "porndb", "theporndb")))
+        is_adult_provider = False
+        if provider_prefix:
+            p_enum = ProviderRegistry.get_provider_by_prefix(provider_prefix)
+            if p_enum:
+                cfg = ProviderRegistry.get_config(p_enum)
+                is_adult_provider = cfg.is_adult if cfg else False
+        is_adult_val = bool(match_db.is_adult if match_db else is_adult_provider)
         result = {
             "id": f"scene_{scene_uuid}",
             "title": title,
@@ -463,7 +434,7 @@ class SceneDetailService(DetailFormatter):
             "user_comment": effective_override.user_comment if effective_override else None,
             "external_ids": {
                 "stash_id": scene_uuid,
-                "source": provider_prefix or "stash",
+                "source": (ProviderRegistry.get_config(ProviderRegistry.resolve_prefix(provider_prefix)).prefix if ProviderRegistry.resolve_prefix(provider_prefix) else None) or provider_prefix or "stashdb",
             },
             "custom_tags": [t.name for t in effective_override.tags if t.is_adult == is_adult_val] if (effective_override and effective_override.tags) else [],
             "suggested_tags": [t.get("name") for t in scene_data.get("tags") or [] if t.get("name")] if scene_data.get("tags") else (match_db.suggested_tags if (match_db and match_db.suggested_tags) else []),
@@ -513,13 +484,8 @@ class SceneDetailService(DetailFormatter):
         for target_match in sibling_matches:
             existing_person_ids = {link.person_id for link in target_match.people_links}
 
-            prov_enum = None
-            if provider_prefix in ("stashdb", "stash"):
-                prov_enum = Provider.STASHDB
-            elif provider_prefix == "fansdb":
-                prov_enum = Provider.FANSDB
-            elif provider_prefix in ("porndb", "theporndb"):
-                prov_enum = Provider.PORNDB
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            prov_enum = ProviderRegistry.resolve_prefix(provider_prefix)
 
             order = 0
             for p_entry in performers:
@@ -604,7 +570,7 @@ class SceneDetailService(DetailFormatter):
             logger.debug(f"Failed to sync performer links: {e}")
             db.rollback()
 
-    def _sync_studios(self, db: Session, match_db: MetadataMatch, scene_data: dict, image_downloader: Optional[ImageDownloadPort] = None):
+    def _sync_studios(self, db: Session, match_db: MetadataMatch, scene_data: dict, image_downloader: Optional[Any] = None):
         """Ensure studios exist in the DB and are linked to the match."""
         from app.modules.metadata.models import Studio
         from app.modules.library.services.detail.scene.metadata_syncer import _queue_image
@@ -634,8 +600,9 @@ class SceneDetailService(DetailFormatter):
                 local_logo = _queue_image(image_downloader, studio_db.logo_path, "logos", f"studio_{studio_name}")
                 if local_logo:
                     from app.modules.media_assets.services.images.image_path_resolver import get_original_path, exists
+                    from app.modules.media_assets.services.images import image_processing_service
                     
-                    image_root = ImageServiceRegistry.get().image_root
+                    image_root = image_processing_service.image_root
                     filename = local_logo.split("/")[-1]
                     if exists(get_original_path(image_root, "logos", filename)):
                         studio_db.logo_path = local_logo
@@ -652,8 +619,9 @@ class SceneDetailService(DetailFormatter):
                     local_parent_logo = _queue_image(image_downloader, parent_studio_db.logo_path, "logos", f"studio_{parent_name}")
                     if local_parent_logo:
                         from app.modules.media_assets.services.images.image_path_resolver import get_original_path, exists
+                        from app.modules.media_assets.services.images import image_processing_service
                         
-                        image_root = ImageServiceRegistry.get().image_root
+                        image_root = image_processing_service.image_root
                         filename = local_parent_logo.split("/")[-1]
                         if exists(get_original_path(image_root, "logos", filename)):
                             parent_studio_db.logo_path = local_parent_logo

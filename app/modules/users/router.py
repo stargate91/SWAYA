@@ -28,8 +28,8 @@ from app.modules.users.schemas import (
 from app.modules.users.services.tags_service import TagsService
 from app.modules.users.services.lists_service import ListsService
 from app.modules.users.services.overrides_service import OverridesService
-from app.modules.library.db_media_resolver import DbMediaResolver
-from app.modules.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+from app.modules.library.services.media_item_service import MediaItemService
+from app.modules.tasks.image_download_service import ImageDownloadService
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
@@ -38,8 +38,7 @@ router = APIRouter(prefix="/api/v1/users", tags=["Users"])
 
 
 def _user_service(db: Session) -> UserService:
-    from app.modules.library.db_media_resolver import DbMediaResolver
-    return UserService(db, library_port=DbMediaResolver(db))
+    return UserService(db)
 
 # --- User Profiles ---
 
@@ -121,8 +120,29 @@ def get_item_membership(item_id: str, db: Session = Depends(get_db)):
 
 
 @catalog_router.get("/lists/{list_id}", response_model=CustomListDetailResponse)
-def get_list_details(list_id: int, db: Session = Depends(get_db)):
-    return ListsService(db).get_list_details(list_id)
+def get_list_details(
+    list_id: int,
+    watched_filter: str = "all",
+    media_type_filter: str = "all",
+    genre_filter: str = "all",
+    gender_filter: str = "all",
+    job_filter: str = "all",
+    search: str = "",
+    sort_by: str = "added_at",
+    sort_direction: str = "desc",
+    db: Session = Depends(get_db)
+):
+    return ListsService(db).get_list_details(
+        list_id=list_id,
+        watched_filter=watched_filter,
+        media_type_filter=media_type_filter,
+        genre_filter=genre_filter,
+        gender_filter=gender_filter,
+        job_filter=job_filter,
+        search=search,
+        sort_by=sort_by,
+        sort_direction=sort_direction
+    )
 
 
 @catalog_router.post("/lists", response_model=CustomListResponse)
@@ -182,15 +202,15 @@ def bulk_update_catalog_status(payload: dict, db: Session = Depends(get_db)):
 
 
 def _img_dl():
-    return TasksImageDownloadAdapter()
+    return ImageDownloadService()
 
 def _overrides_service(db: Session, image_downloader=None) -> OverridesService:
-    from app.modules.library.db_media_resolver import DbMediaResolver
+    from app.modules.library.services.media_item_service import MediaItemService
     from app.modules.scrapers.support.gateway import scraper_gateway
     from app.modules.scrapers.enrichment.mainstream_enricher import MainstreamEnricher
     return OverridesService(
         db,
-        DbMediaResolver(db),
+        MediaItemService(db),
         image_downloader=image_downloader,
         scrapers=scraper_gateway,
         mainstream_enricher=MainstreamEnricher
@@ -206,7 +226,7 @@ def update_item_status(item_id: str, payload: ItemStatusUpdate, db: Session = De
         item_id=item_id,
         payload_data=payload.model_dump(),
         model_fields_set=payload.model_fields_set,
-        resolver=DbMediaResolver(db),
+        resolver=MediaItemService(db),
     )
 
 @catalog_router.post("/item/{item_id}/poster")
@@ -270,11 +290,11 @@ class AddPeakRequest(BaseModel):
 @catalog_router.post("/library/item/{item_id}/peaks")
 def add_item_peak(item_id: str, payload: Optional[AddPeakRequest] = None, db: Session = Depends(get_db)):
     from app.core.user_context import get_current_user_id
-    from app.modules.library.db_media_resolver import DbMediaResolver
+    from app.modules.library.services.media_item_service import MediaItemService
     from app.modules.history.services.playback_peak_service import PlaybackPeakService
     
     current_uid = get_current_user_id() or 1
-    service = PlaybackPeakService(db, DbMediaResolver(db))
+    service = PlaybackPeakService(db, MediaItemService(db))
     try:
         video_pos = payload.video_position if payload else None
         snap_path = payload.snapshot_path if payload else None
@@ -287,11 +307,11 @@ def add_item_peak(item_id: str, payload: Optional[AddPeakRequest] = None, db: Se
 @catalog_router.delete("/library/item/{item_id}/peaks/{log_id}")
 def delete_item_peak(item_id: str, log_id: int, db: Session = Depends(get_db)):
     from app.core.user_context import get_current_user_id
-    from app.modules.library.db_media_resolver import DbMediaResolver
+    from app.modules.library.services.media_item_service import MediaItemService
     from app.modules.history.services.playback_peak_service import PlaybackPeakService
     
     current_uid = get_current_user_id() or 1
-    service = PlaybackPeakService(db, DbMediaResolver(db))
+    service = PlaybackPeakService(db, MediaItemService(db))
     try:
         return service.delete_peak(item_id, log_id, current_uid)
     except Exception as e:

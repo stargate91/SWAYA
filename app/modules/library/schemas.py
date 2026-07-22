@@ -22,12 +22,18 @@ class LibraryCreate(BaseSchema):
     name: str
     root_path: str
     watch_for_changes: bool = True
+    target_media_types: Optional[list[str]] = None
+    providers: Optional[list[str]] = None
+    is_adult: bool = False
 
 
 class LibraryUpdate(BaseSchema):
     name: Optional[str] = None
     root_path: Optional[str] = None
     watch_for_changes: Optional[bool] = None
+    target_media_types: Optional[list[str]] = None
+    providers: Optional[list[str]] = None
+    is_adult: Optional[bool] = None
 
 
 class LibraryRead(BaseSchema):
@@ -36,6 +42,9 @@ class LibraryRead(BaseSchema):
     root_path: str
     watch_for_changes: bool
     created_at: datetime
+    target_media_types: Optional[list[str]] = None
+    providers: Optional[list[str]] = None
+    is_adult: bool
 
 
 # --- ExtraFile Schemas ---
@@ -140,6 +149,8 @@ class GenreConstellationLink(BaseModel):
 class GenreConstellation(BaseModel):
     nodes: List[GenreConstellationNode]
     links: List[GenreConstellationLink]
+    is_mocked: Optional[bool] = False
+    has_enough_data: Optional[bool] = False
 
 
 class LibraryStatsResponse(BaseModel):
@@ -159,6 +170,8 @@ class LibraryStatsResponse(BaseModel):
     genre_labels: Dict[str, str]
     genre_constellation: GenreConstellation
     decade_distribution: Dict[str, int]
+    timeline_is_mocked: Optional[bool] = False
+    timeline_has_enough_data: Optional[bool] = False
 
 
 class ContinueWatchingItem(BaseModel):
@@ -175,9 +188,12 @@ class ContinueWatchingItem(BaseModel):
     still_path: Optional[str] = None
     resume_position: int
     duration: int
+    progress_percent: float = 0.0
+    time_remaining_seconds: int = 0
     is_watched: bool
     last_watched_at: Optional[str] = None
     is_active: bool = False
+    display_episode_code: Optional[str] = None
 
 
 class LibraryTabItem(BaseModel):
@@ -262,6 +278,9 @@ class TagItem(BaseModel):
     adult_scenes: Optional[List[Any]] = None
     videos: Optional[List[Any]] = None
     adult_videos: Optional[List[Any]] = None
+    sample_previews: Optional[List[Any]] = None
+    total_count: Optional[int] = None
+
 
 
 class TagGroupItem(BaseModel):
@@ -269,6 +288,15 @@ class TagGroupItem(BaseModel):
     id: int
     name: str
     tags: List[TagItem]
+
+
+class LibraryTagsResponse(BaseModel):
+    items: List[TagGroupItem]
+    total_items: int
+    page: int
+    page_size: int
+    total_pages: int
+
 
 
 class PerformerFilterItem(BaseModel):

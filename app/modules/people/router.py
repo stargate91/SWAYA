@@ -30,18 +30,15 @@ adult_router = APIRouter(prefix="/api/v1/adult/people", tags=["Adult People"])
 
 
 def _people_status_service(db: Session, scrapers=None) -> PeopleStatusService:
-    from app.modules.library.db_media_resolver import DbMediaResolver
-    return PeopleStatusService(db, scrapers=scrapers, library_port=DbMediaResolver(db))
+    return PeopleStatusService(db, scrapers=scrapers)
 
 def _people_detail_service(db: Session, scrapers=None) -> Any:
-    from app.modules.library.db_media_resolver import DbMediaResolver
-    from app.modules.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+    from app.modules.tasks.image_download_service import ImageDownloadService
     from app.modules.people.services.people_detail_service import PeopleDetailService
     return PeopleDetailService(
         db,
         scrapers or scraper_gateway,
-        library_port=DbMediaResolver(db),
-        image_downloader=TasksImageDownloadAdapter()
+        image_downloader=ImageDownloadService()
     )
 
 def resolve_person(person_id: Any, db: Session):
@@ -345,6 +342,7 @@ def delete_person(person_id: str, db: Session = Depends(get_db)):
     person = resolve_person(person_id, db)
     if not person:
         raise HTTPException(status_code=404, detail="Person not found")
-    db.delete(person)
-    db.commit()
+    from app.core.database import transaction_scope
+    with transaction_scope(db):
+        db.delete(person)
     return {"status": "success"}

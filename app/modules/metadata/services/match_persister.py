@@ -14,20 +14,10 @@ from app.core.language import LanguageService
 logger = logging.getLogger(__name__)
 
 class MatchPersister:
-    def __init__(self, parent_persister):
-        self.persister = parent_persister
-
-    @property
-    def db(self) -> Session:
-        return self.persister.db
-
-    @property
-    def metadata_repo(self) -> MetadataRepositoryPort:
-        return self.persister.metadata_repo
-
-    @property
-    def image_downloader(self):
-        return self.persister.image_downloader
+    def __init__(self, db: Session, metadata_repo: Any, image_downloader: Any):
+        self.db = db
+        self.metadata_repo = metadata_repo
+        self.image_downloader = image_downloader
 
     def queue_adult_assets(self, match: MetadataMatch) -> None:
         """Queues poster/backdrop downloads for adult matches."""
@@ -69,7 +59,7 @@ class MatchPersister:
             return f"{subfolder}/{filename}"
 
         asset_prefix = f"{match.provider.value}_{match.external_id}"
-        backdrop_subfolder = "scene_stills" if match.media_type == MediaType.SCENE else "backdrops"
+        backdrop_subfolder = "scene_stills" if match.media_type.is_adult else "backdrops"
         match.local_backdrop_path = queue_image(match.backdrop_path, backdrop_subfolder, asset_prefix)
 
         loc = next((x for x in match.localizations if x.locale == DEFAULT_FALLBACK_LANGUAGE), None)

@@ -28,8 +28,8 @@ class MovieDetailService(DetailFormatter):
         if isinstance(item_id, str) and "_" in item_id:
             parts = item_id.split("_")
             if len(parts) >= 4 and parts[0] in ("tmdb", "tv"):
-                from app.modules.history.db_playback_repository import DbPlaybackRepository
-                playback_repo = DbPlaybackRepository(self.db)
+                from app.modules.history.services.playback_service import PlaybackService
+                playback_repo = PlaybackService(self.db)
                 resolved_id = playback_repo.resolve_item_id_from_external(item_id)
                 if resolved_id:
                     item_id = resolved_id

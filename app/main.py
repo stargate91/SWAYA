@@ -47,8 +47,7 @@ async def lifespan(app: FastAPI):
             session.commit()
     
     # Ensure image folders are created
-    
-    ImageServiceRegistry.register(image_processing_service)
+    from app.modules.media_assets.services.images import image_processing_service
     image_processing_service.ensure_folders()
     logger.info("Image directories ensured.")
 
@@ -65,9 +64,9 @@ async def lifespan(app: FastAPI):
     from app.modules.tasks import task_manager
     from app.modules.scrapers.support.gateway import scraper_gateway
     from app.modules.people.enrich_worker import PeopleEnrichWorker
-    from app.modules.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
+    from app.modules.tasks.image_download_service import ImageDownloadService
     
-    image_downloader = TasksImageDownloadAdapter(task_manager.download_worker)
+    image_downloader = ImageDownloadService(task_manager.download_worker)
     
     task_manager.people_enrich_worker = PeopleEnrichWorker(
         session_factory=task_manager.session_factory,
@@ -76,6 +75,7 @@ async def lifespan(app: FastAPI):
         image_downloader=image_downloader,
     )
     task_manager.people_enrich_worker.scrapers = scraper_gateway
+    task_manager.cleanup_stale_tasks()
     await task_manager.download_worker.start()
     await task_manager.people_enrich_worker.start()
     if sys.platform == "win32":
@@ -98,13 +98,13 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-from app.core.exceptions import DomainException  # noqa: E402
+from app.core.exceptions import AppException  # noqa: E402
 from fastapi.responses import JSONResponse  # noqa: E402
 from fastapi import Request  # noqa: E402
 from app.core.user_context import set_current_user_id, reset_current_user_id  # noqa: E402
 
-@app.exception_handler(DomainException)
-async def domain_exception_handler(request, exc: DomainException):
+@app.exception_handler(AppException)
+async def app_exception_handler(request, exc: AppException):
     return JSONResponse(
         status_code=exc.status_code,
         content={"error": exc.message}

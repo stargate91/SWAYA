@@ -21,10 +21,17 @@ export const hydrate = {
 };
 
 export const organizer = {
-  get: ({ scanMode, sessionMode } = {}) => {
+  get: ({ scanMode, sessionMode, page, pageSize, tab, subTab, q, sortBy, sortDir } = {}) => {
     const params = new URLSearchParams();
     if (scanMode) params.append('scan_mode', scanMode);
     if (sessionMode) params.append('session_mode', sessionMode);
+    if (page) params.append('page', page);
+    if (pageSize) params.append('page_size', pageSize);
+    if (tab) params.append('tab', tab);
+    if (subTab) params.append('sub_tab', subTab);
+    if (q !== undefined && q !== null) params.append('q', q);
+    if (sortBy) params.append('sort_by', sortBy);
+    if (sortDir) params.append('sort_dir', sortDir);
     return fetchJson(`/api/organizer${params.toString() ? `?${params.toString()}` : ''}`);
   },
   getCount: ({ scanMode, sessionMode } = {}) => {

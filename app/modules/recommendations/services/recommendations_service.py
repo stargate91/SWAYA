@@ -11,11 +11,11 @@ logger = logging.getLogger(__name__)
 
 
 class RecommendationsService:
-    def __init__(self, db: Session, scrapers: Any, settings_port: Optional[SettingsPort] = None):
+    def __init__(self, db: Session, scrapers: Any, settings: Optional[Any] = None):
         self.db = db
         self.scraper = scrapers.tmdb(db)
-        from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-        self.settings = settings_port or DbSettingsAdapter(db)
+        from app.modules.settings.services.settings_service import SettingsService
+        self.settings = settings or SettingsService(db)
         
         from app.modules.recommendations.services.watchlist_service import RecommendationWatchlistService
         from app.modules.recommendations.services.adult_discovery_service import AdultDiscoveryService
@@ -193,13 +193,20 @@ class RecommendationsService:
         def annotate(items):
             return self.tmdb_recommendation_service.annotate_recommendations(items, bindings)
 
+        discover_adult_providers = {}
+        if include_adult:
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            for provider in ProviderRegistry.get_adult_providers():
+                cfg = ProviderRegistry.get_config(provider)
+                if cfg:
+                    discover_adult_providers[cfg.prefix] = self._get_adult_discovery(cfg.prefix)
+
         return RecommendationsResponse(
             trending=annotate(trending_results),
             discover_movies=annotate(clean_discover_movies),
             discover_tv=annotate(clean_discover_tv),
             discover_adult=annotate(clean_discover_adult),
-            discover_stashdb=self._get_adult_discovery("stashdb") if include_adult else [],
-            discover_fansdb=self._get_adult_discovery("fansdb") if include_adult else [],
+            discover_adult_providers=discover_adult_providers,
             top_movie_genre="Action",
             top_tv_genre="Drama",
             watchlist_item_ids=watchlist_ids,

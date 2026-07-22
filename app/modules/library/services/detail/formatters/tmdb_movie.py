@@ -29,9 +29,9 @@ class TmdbMovieFormatter(MovieDetailFormatter):
             return JSONResponse(status_code=400, content={"error": "Invalid TMDB ID format"})
         
         from app.core.language import get_user_ui_language
-        from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-        settings_port = DbSettingsAdapter(db)
-        ui_lang = get_user_ui_language(settings_port)
+        from app.modules.settings.services.settings_service import SettingsService
+        settings = SettingsService(db)
+        ui_lang = get_user_ui_language(settings)
         
         from app.modules.metadata.models import MetadataMatch
         from app.core.enums import Provider, MediaType
@@ -116,7 +116,7 @@ class TmdbMovieFormatter(MovieDetailFormatter):
             try:
                 year = int(release_date.split("-")[0])
             except Exception as e:
-                logger.debug(f"Swallowed exception in domains/library/services/detail/formatters/tmdb_movie.py:143: {e}", exc_info=True)
+                logger.debug(f"Swallowed exception in app/modules/library/services/detail/formatters/tmdb_movie.py:143: {e}", exc_info=True)
         
         match = db.query(MetadataMatch).filter(
             MetadataMatch.provider == Provider.TMDB,
@@ -151,8 +151,8 @@ class TmdbMovieFormatter(MovieDetailFormatter):
 
         # Enqueue local asset downloads for TMDB movie assets (poster, backdrop, logo, cast profiles)
         try:
-            from app.modules.tasks.tasks_image_download_adapter import TasksImageDownloadAdapter
-            image_downloader = TasksImageDownloadAdapter()
+            from app.modules.tasks.image_download_service import ImageDownloadService
+            image_downloader = ImageDownloadService()
             self._queue_tmdb_movie_assets(image_downloader, tmdb_id, tmdb_data, effective_poster, effective_backdrop, effective_logo)
         except Exception as err:
             logger.warning(f"Failed to queue TMDB movie assets for {tmdb_id}: {err}")

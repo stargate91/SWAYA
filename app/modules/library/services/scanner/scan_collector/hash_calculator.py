@@ -15,11 +15,11 @@ class HashCalculator:
     def calculate_hashes(
         self,
         filepath_str: str,
-        mode: ScanMode,
+        is_adult: bool,
         duration: Optional[float] = None
     ) -> Dict[str, Optional[str]]:
         """
-        Calculates all relevant hashes for a given filepath based on ScanMode.
+        Calculates all relevant hashes for a given filepath.
         """
         hashes = {
             "hash_md5": None,
@@ -33,7 +33,7 @@ class HashCalculator:
         except Exception as e:
             logger.debug(f"Failed to calculate OSHASH for {filepath_str}: {e}", exc_info=True)
 
-        if mode == ScanMode.SCENES:
+        if is_adult:
             try:
                 hashes["hash_phash"] = self.fs.calculate_phash(filepath_str, duration)
             except Exception as e:

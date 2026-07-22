@@ -46,7 +46,7 @@ class ListsService:
             return int(parent.external_id) if parent.external_id.isdigit() else None
         return int(match.external_id) if match.external_id.isdigit() else None
 
-    def _serialize_item(self, item: CustomListItem) -> CustomListItemResponse:
+    def _serialize_item(self, item: CustomListItem, overrides_lookup: Optional[Dict[str, Any]] = None) -> CustomListItemResponse:
         res = {
             "id": item.id,
             "media_item_id": item.media_item_id,
@@ -62,7 +62,6 @@ class ListsService:
             "year": None,
             "rating": None,
             "is_adult": False,
-            "is_home_video": False,
             "external_id": None,
             "provider": None,
             "release_date": None,
@@ -86,13 +85,14 @@ class ListsService:
                 res["tmdb_id"] = self._resolve_tv_show_tmdb_id(match)
                 res["media_type"] = match.media_type.value
                 res["rating"] = match.rating_imdb or match.rating_tmdb
-                res["is_adult"] = bool(match.is_adult) or match.provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB)
+                from app.modules.scrapers.support.registry import ProviderRegistry
+                res["is_adult"] = bool(match.is_adult) or ProviderRegistry.is_adult_provider(match.provider)
                 res["external_id"] = match.external_id
                 res["provider"] = match.provider.value if hasattr(match.provider, "value") else str(match.provider)
                 if match.release_date:
                     res["year"] = match.release_date.year
                 loc = next((x for x in match.localizations), None)
-                if match.media_type.value in ("scene", "still"):
+                if MediaType.is_adult_type(match.media_type):
                     res["poster_path"] = match.backdrop_path or match.still_path
                     scene_title = loc.title if loc else match.original_title
                     if scene_title:
@@ -115,14 +115,15 @@ class ListsService:
             res["tmdb_id"] = self._resolve_tv_show_tmdb_id(match)
             res["media_type"] = match.media_type.value
             res["rating"] = match.rating_imdb or match.rating_tmdb
-            res["is_adult"] = bool(match.is_adult) or match.provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB)
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            res["is_adult"] = bool(match.is_adult) or ProviderRegistry.is_adult_provider(match.provider)
             res["external_id"] = match.external_id
             res["provider"] = match.provider.value if hasattr(match.provider, "value") else str(match.provider)
             if match.release_date:
                 res["year"] = match.release_date.year
             loc = next((x for x in match.localizations), None)
             res["title"] = loc.title if loc else match.original_title or f"Match #{match.id}"
-            if match.media_type.value in ("scene", "still"):
+            if MediaType.is_adult_type(match.media_type):
                 res["poster_path"] = match.backdrop_path or match.still_path
             elif loc:
                 res["poster_path"] = loc.poster_path
@@ -135,7 +136,6 @@ class ListsService:
             res["known_for_department"] = item.person.known_for_department
 
         if match:
-            res["is_home_video"] = bool(match.is_home_video)
             res["release_date"] = match.release_date.isoformat() if match.release_date else None
             res["last_air_date"] = match.last_air_date.isoformat() if (hasattr(match, "last_air_date") and match.last_air_date) else None
             res["release_status"] = match.release_status if hasattr(match, "release_status") else None
@@ -152,14 +152,24 @@ class ListsService:
         user_rating = None
         is_watched = False
         override = None
-        if item.media_item:
-            override = self.db.query(UserOverride).filter(UserOverride.media_item_id == item.media_item_id).first()
+        if overrides_lookup:
+            if item.media_item_id:
+                override = overrides_lookup["media_item"].get(item.media_item_id)
             if not override and match:
-                override = self.db.query(UserOverride).filter(UserOverride.metadata_match_id == match.id).first()
-        elif item.match_id:
-            override = self.db.query(UserOverride).filter(UserOverride.metadata_match_id == item.match_id).first()
-        elif item.person_id:
-            override = self.db.query(UserOverride).filter(UserOverride.person_id == item.person_id).first()
+                override = overrides_lookup["match"].get(match.id)
+            if not override and item.match_id:
+                override = overrides_lookup["match"].get(item.match_id)
+            if not override and item.person_id:
+                override = overrides_lookup["person"].get(item.person_id)
+        else:
+            if item.media_item:
+                override = self.db.query(UserOverride).filter(UserOverride.media_item_id == item.media_item_id).first()
+                if not override and match:
+                    override = self.db.query(UserOverride).filter(UserOverride.metadata_match_id == match.id).first()
+            elif item.match_id:
+                override = self.db.query(UserOverride).filter(UserOverride.metadata_match_id == item.match_id).first()
+            elif item.person_id:
+                override = self.db.query(UserOverride).filter(UserOverride.person_id == item.person_id).first()
             
         if override:
             user_rating = override.user_rating
@@ -191,9 +201,35 @@ class ListsService:
             subfolder = "posters"
             if res["media_type"] == "person":
                 subfolder = "people"
-            elif res["media_type"] in ("scene", "still"):
+            elif MediaType.is_adult_type(res["media_type"]):
                 subfolder = "backdrops"
             res["poster_path"] = image_processing_service.resolve_image_url(res["poster_path"], subfolder)
+
+        # Calculate target_path
+        target_path = None
+        m_type = res["media_type"]
+        if m_type == "movie":
+            prefix = "porndb_" if res["provider"] == "porndb" else "tmdb_"
+            ext_id = res["external_id"] or res["tmdb_id"] or item.match_id or item.media_item_id
+            if ext_id:
+                target_path = f"/library/movie/{prefix}{ext_id}"
+        elif m_type in ("tv", "episode", "season"):
+            ext_id = res["external_id"] or res["tmdb_id"] or item.match_id or item.media_item_id
+            if ext_id:
+                target_path = f"/library/tv/{ext_id}"
+        elif m_type == "scene":
+            prefix = "porndb" if res["provider"] == "porndb" else ("fansdb" if res["provider"] == "fansdb" else "stash")
+            ext_id = res["external_id"] or item.match_id
+            if ext_id:
+                target_path = f"/library/scene/{prefix}_{ext_id}"
+        elif m_type == "video":
+            ext_id = res["external_id"] or item.media_item_id or item.match_id
+            if ext_id:
+                target_path = f"/library/video/{ext_id}"
+        elif m_type == "person":
+            target_path = f"/library/people/{item.person_id or res['id']}"
+            
+        res["target_path"] = target_path
 
         return CustomListItemResponse(**res)
 
@@ -220,10 +256,12 @@ class ListsService:
     def _is_item_adult(self, item: CustomListItem) -> bool:
         if item.media_item:
             match = next((m for m in item.media_item.matches), None)
-            if match and (match.is_adult or match.provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB)):
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            if match and (match.is_adult or ProviderRegistry.is_adult_provider(match.provider)):
                 return True
         elif item.match:
-            if item.match.is_adult or item.match.provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB):
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            if item.match.is_adult or ProviderRegistry.is_adult_provider(item.match.provider):
                 return True
         elif item.person and item.person.is_adult:
             return True
@@ -233,11 +271,14 @@ class ListsService:
         return any(self._is_item_adult(item) for item in custom_list.items)
 
     def get_all_lists(self, include_adult: bool = False) -> List[CustomListResponse]:
-        # Ensure Watchlist exists
         watchlist = self.db.query(CustomList).filter(CustomList.name == "Watchlist").first()
         if not watchlist:
-            from app.modules.users.services.lists_domain_service import ListsDomainService
-            watchlist = ListsDomainService.create_default_watchlist()
+            watchlist = CustomList(
+                name="Watchlist",
+                description="Your go-to space for everything you want to watch later.",
+                list_type=CustomListType.MEDIA,
+                color="#3b82f6"
+            )
             self.db.add(watchlist)
             self.db.commit()
 
@@ -288,7 +329,18 @@ class ListsService:
             ))
         return result
 
-    def get_list_details(self, list_id: int) -> CustomListDetailResponse:
+    def get_list_details(
+        self,
+        list_id: int,
+        watched_filter: str = "all",
+        media_type_filter: str = "all",
+        genre_filter: str = "all",
+        gender_filter: str = "all",
+        job_filter: str = "all",
+        search: str = "",
+        sort_by: str = "added_at",
+        sort_direction: str = "desc"
+    ) -> CustomListDetailResponse:
         custom_list = self.db.query(CustomList).filter(CustomList.id == list_id).first()
         if not custom_list:
             raise NotFoundException("Not found")
@@ -298,11 +350,119 @@ class ListsService:
             if custom_list.items and all(self._is_item_adult(item) for item in custom_list.items):
                 raise NotFoundException("Not found")
                 
+        # Batch load UserOverrides to prevent N+1 queries
+        media_item_ids = [item.media_item_id for item in custom_list.items if item.media_item_id]
+        match_ids = [item.match_id for item in custom_list.items if item.match_id]
+        for item in custom_list.items:
+            if item.media_item:
+                for m in item.media_item.matches:
+                    match_ids.append(m.id)
+        person_ids = [item.person_id for item in custom_list.items if item.person_id]
+
+        from sqlalchemy import or_
+        overrides = self.db.query(UserOverride).filter(
+            or_(
+                UserOverride.media_item_id.in_(media_item_ids) if media_item_ids else False,
+                UserOverride.metadata_match_id.in_(match_ids) if match_ids else False,
+                UserOverride.person_id.in_(person_ids) if person_ids else False
+            )
+        ).all()
+
+        overrides_lookup = {
+            "media_item": {o.media_item_id: o for o in overrides if o.media_item_id},
+            "match": {o.metadata_match_id: o for o in overrides if o.metadata_match_id},
+            "person": {o.person_id: o for o in overrides if o.person_id}
+        }
+
         serialized_items = []
+        all_genres = set()
         for item in custom_list.items:
             if not adult_enabled and self._is_item_adult(item):
                 continue
-            serialized_items.append(self._serialize_item(item))
+            serialized = self._serialize_item(item, overrides_lookup)
+            serialized_items.append(serialized)
+            if serialized.genres:
+                for g in serialized.genres:
+                    all_genres.add(g.strip())
+
+        # 1. Filter by watched
+        if watched_filter != "all":
+            want_watched = watched_filter == "watched"
+            serialized_items = [x for x in serialized_items if bool(x.is_watched) == want_watched]
+
+        # 2. Filter by media type
+        if custom_list.list_type != CustomListType.PERSON.value and media_type_filter != "all":
+            def match_type(item_type):
+                if media_type_filter == "movie":
+                    return item_type == "movie"
+                elif media_type_filter == "show":
+                    return item_type in ("show", "tv", "episode", "season")
+                elif media_type_filter == "scene":
+                    return item_type == "scene"
+                elif media_type_filter == "videos":
+                    return item_type == "video"
+                return True
+            serialized_items = [x for x in serialized_items if match_type(x.media_type)]
+
+        # 3. Filter by genre
+        if custom_list.list_type != CustomListType.PERSON.value and genre_filter != "all":
+            g_lower = genre_filter.lower().strip()
+            serialized_items = [
+                x for x in serialized_items 
+                if x.genres and any(g.lower().strip() == g_lower for g in x.genres)
+            ]
+
+        # 4. Filter by person gender
+        if custom_list.list_type == CustomListType.PERSON.value and gender_filter != "all":
+            g_val = 1 if gender_filter == "female" else (2 if gender_filter == "male" else None)
+            if g_val is not None:
+                serialized_items = [x for x in serialized_items if x.gender == g_val]
+
+        # 5. Filter by person job
+        if custom_list.list_type == CustomListType.PERSON.value and job_filter != "all":
+            def match_job(dept):
+                dept_str = str(dept or "")
+                if job_filter == "actor":
+                    return dept_str == "Acting"
+                elif job_filter == "director":
+                    return dept_str in ("Directing", "Creator")
+                elif job_filter == "writer":
+                    return dept_str == "Writing"
+                elif job_filter == "sound":
+                    return dept_str == "Sound"
+                return True
+            serialized_items = [x for x in serialized_items if match_job(x.known_for_department)]
+
+        # 6. Text Search Query
+        search_query = search.strip().lower()
+        if search_query:
+            def matches_search(x):
+                t_match = search_query in (x.title or "").lower()
+                p_match = False
+                if x.people:
+                    p_match = any(search_query in (p.get("name") or "").lower() for p in x.people)
+                return t_match or p_match
+            serialized_items = [x for x in serialized_items if matches_search(x)]
+
+        # 7. Sorting
+        def get_sort_val(x):
+            if sort_by == "release_date":
+                return x.release_date or ""
+            elif sort_by == "user_rating":
+                return x.user_rating or 0.0
+            elif sort_by == "title":
+                return (x.title or "").lower()
+            else:
+                # Default added_at
+                return x.added_at or ""
+
+        reverse_sort = sort_direction == "desc"
+        if sort_by == "title" and sort_direction == "desc":
+            reverse_sort = True
+        elif sort_by == "title":
+            reverse_sort = False
+
+        serialized_items.sort(key=get_sort_val, reverse=reverse_sort)
 
         resolved_image = None
         if custom_list.custom_image_path:
@@ -318,7 +478,8 @@ class ListsService:
             list_type=custom_list.list_type,
             created_at=custom_list.created_at.isoformat() if custom_list.created_at else None,
             items=serialized_items,
-            custom_image_path=resolved_image
+            custom_image_path=resolved_image,
+            genres=sorted(list(all_genres))
         )
 
     def create_list(self, payload: Dict[str, Any]) -> CustomListResponse:
@@ -338,9 +499,11 @@ class ListsService:
         if existing:
             raise BadRequestException("A list with this name already exists")
 
-        from app.modules.users.services.lists_domain_service import ListsDomainService
-        new_list = ListsDomainService.create_custom_list(
-            name=name, description=description, color=color, list_type=list_type
+        new_list = CustomList(
+            name=name,
+            description=description,
+            color=color,
+            list_type=list_type
         )
         self.db.add(new_list)
         self.db.commit()
@@ -394,60 +557,36 @@ class ListsService:
         provider_name = payload.get("provider")
 
         # Parse unified string IDs (e.g. "tmdb_46459" or "porndb_123")
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        adult_providers = ProviderRegistry.get_adult_providers()
+        default_adult = adult_providers[0] if adult_providers else Provider.PORNDB
+        provider = default_adult if media_type == "scene" else Provider.TMDB
+        external_id = str(tmdb_id) if tmdb_id else None
+
         if isinstance(media_item_id, str):
             if "_" in media_item_id:
-                prefix, val = media_item_id.split("_", 1)
-                if prefix == "tmdb":
-                    tmdb_id = int(val) if val.isdigit() else val
+                try:
+                    provider, external_id = ProviderRegistry.clean_id(media_item_id)
                     media_item_id = None
-                elif prefix in ("porndb", "theporndb", "stash", "stashdb", "fansdb", "scene", "movie"):
-                    tmdb_id = media_item_id
-                    media_item_id = None
-                elif val.isdigit():
-                    media_item_id = int(val)
+                except ValueError:
+                    if media_item_id.isdigit():
+                        media_item_id = int(media_item_id)
             elif media_item_id.isdigit():
                 media_item_id = int(media_item_id)
 
-        # Determine provider and clean external ID
-        provider = Provider.PORNDB if media_type == "scene" else Provider.TMDB
-        external_id = str(tmdb_id) if tmdb_id else None
-        
         if tmdb_id and isinstance(tmdb_id, str):
             if "_" in tmdb_id:
-                prefix, val = tmdb_id.split("_", 1)
-                if prefix in ("tmdb", "porndb", "theporndb", "stash", "stashdb", "fansdb", "scene", "movie"):
-                    if prefix == "tmdb":
-                        provider = Provider.TMDB
-                    elif prefix in ("porndb", "theporndb"):
-                        provider = Provider.PORNDB
-                    elif prefix in ("stash", "stashdb"):
-                        provider = Provider.STASHDB
-                    elif prefix == "fansdb":
-                        provider = Provider.FANSDB
-                    elif prefix in ("scene", "movie"):
-                        # If prefix is generic scene/movie, try to detect the provider from existing matches
-                        import re
-                        is_uuid = bool(re.match(r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", val))
-                        if is_uuid:
-                            provider = Provider.STASHDB
-                        else:
-                            provider = Provider.PORNDB
-                    external_id = val
-                else:
+                try:
+                    provider, external_id = ProviderRegistry.clean_id(tmdb_id)
+                except ValueError:
                     external_id = tmdb_id
             else:
                 external_id = tmdb_id
 
         if provider_name:
-            p_clean = provider_name.lower()
-            if p_clean == "tmdb":
-                provider = Provider.TMDB
-            elif p_clean in ("porndb", "theporndb"):
-                provider = Provider.PORNDB
-            elif p_clean in ("stash", "stashdb"):
-                provider = Provider.STASHDB
-            elif p_clean == "fansdb":
-                provider = Provider.FANSDB
+            p_enum = ProviderRegistry.get_provider_by_prefix(provider_name)
+            if p_enum:
+                provider = p_enum
 
         # If we have a matching provider/external_id, check if it already exists as a local MediaItem
         if external_id and not media_item_id:
@@ -469,13 +608,14 @@ class ListsService:
             from app.modules.metadata.models import MetadataMatch
             from datetime import datetime
             # Use robust deduplicated lookup for adult scenes
-            if media_type == "scene" or provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB):
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            if MediaType.is_adult_type(media_type) or ProviderRegistry.is_adult_provider(provider):
                 clean_id = str(external_id)
                 if clean_id.startswith("scene_"):
                     clean_id = clean_id.split("_", 1)[1]
                 candidates = [clean_id, f"scene_{clean_id}"]
                 match = self.db.query(MetadataMatch).filter(
-                    MetadataMatch.provider.in_([Provider.STASHDB, Provider.PORNDB, Provider.FANSDB]),
+                    MetadataMatch.provider.in_(ProviderRegistry.get_adult_providers()),
                     MetadataMatch.external_id.in_(candidates),
                     MetadataMatch.media_type == MediaType.SCENE
                 ).first()
@@ -498,14 +638,15 @@ class ListsService:
                     except Exception:
                         pass
 
-                is_adult_item = (provider in (Provider.PORNDB, Provider.STASHDB, Provider.FANSDB)) or (m_type.value == "scene")
+                from app.modules.scrapers.support.registry import ProviderRegistry
+                is_adult_item = ProviderRegistry.is_adult_provider(provider) or m_type.is_adult
                 match = MetadataMatch(
                     provider=provider,
                     external_id=str(external_id),
                     media_type=m_type,
                     original_title=payload.get("title"),
                     release_date=rel_date,
-                    backdrop_path=payload.get("poster_path") if m_type.value == "scene" else None,
+                    backdrop_path=payload.get("poster_path") if m_type.is_adult else None,
                     is_adult=is_adult_item
                 )
                 self.db.add(match)
@@ -552,15 +693,8 @@ class ListsService:
                     prefix, val = person_id.split("_", 1)
                     
                 if prefix and val:
-                    p_enum = None
-                    if prefix == "tmdb":
-                        p_enum = Provider.TMDB
-                    elif prefix in ("porndb", "theporndb"):
-                        p_enum = Provider.PORNDB
-                    elif prefix in ("stash", "stashdb"):
-                        p_enum = Provider.STASHDB
-                    elif prefix == "fansdb":
-                        p_enum = Provider.FANSDB
+                    from app.modules.scrapers.support.registry import ProviderRegistry
+                    p_enum = ProviderRegistry.get_provider_by_prefix(prefix)
                         
                     if p_enum:
                         link = self.db.query(ExternalSourceLink).filter(
@@ -577,21 +711,22 @@ class ListsService:
                 person_id = resolved_person.id
             else:
                 from app.modules.scrapers.support.gateway import scraper_gateway
-                from app.modules.library.db_media_resolver import DbMediaResolver
+                from app.modules.library.services.media_item_service import MediaItemService
                 from app.modules.media_assets.services.images import image_processing_service
                 from app.modules.people.services.people_search_service import PeopleSearchService
                 
                 search_service = PeopleSearchService(
                     db=self.db,
                     scrapers=scraper_gateway,
-                    library_port=DbMediaResolver(self.db),
+                    resolver=MediaItemService(self.db),
                     image_service=image_processing_service
                 )
                 try:
                     import_id = str(person_id)
                     if isinstance(person_id, str) and "_" in person_id and ":" not in person_id:
                         prefix, val = person_id.split("_", 1)
-                        if prefix in ("tmdb", "porndb", "stash", "fansdb"):
+                        from app.modules.scrapers.support.registry import ProviderRegistry
+                        if ProviderRegistry.is_valid_prefix(prefix):
                             import_id = f"{prefix}:{val}"
                             
                     res = search_service.add_person_tmdb(import_id, is_active=True)
@@ -618,12 +753,13 @@ class ListsService:
             result.already_exists = True
             return result
 
-        from app.modules.users.services.lists_domain_service import ListsDomainService
-        item = ListsDomainService.create_list_item(
+        from datetime import datetime
+        item = CustomListItem(
             list_id=list_id,
             media_item_id=media_item_id,
             match_id=match_id,
-            person_id=person_id
+            person_id=person_id,
+            added_at=datetime.utcnow()
         )
         self.db.add(item)
         self.db.commit()
@@ -634,11 +770,11 @@ class ListsService:
         # Track the item immediately so it gets enriched and fully imported into the database
         try:
             from app.modules.users.services.overrides_service import OverridesService
-            from app.modules.library.db_media_resolver import DbMediaResolver
+            from app.modules.library.services.media_item_service import MediaItemService
             from app.modules.scrapers.support.gateway import scraper_gateway
             from app.modules.scrapers.enrichment.mainstream_enricher import MainstreamEnricher
             
-            resolver = DbMediaResolver(self.db)
+            resolver = MediaItemService(self.db)
             scrapers = scraper_gateway
             mainstream = MainstreamEnricher
             
@@ -653,7 +789,9 @@ class ListsService:
             if media_item_id:
                 track_id = str(media_item_id)
             elif external_id:
-                prefix = "stash" if provider == Provider.STASHDB else provider.value.lower()
+                from app.modules.scrapers.support.registry import ProviderRegistry
+                cfg = ProviderRegistry.get_config(provider)
+                prefix = cfg.prefix if cfg else provider.value.lower()
                 track_id = f"{prefix}_{external_id}"
                 
             if track_id:
@@ -690,25 +828,18 @@ class ListsService:
         provider = None
         external_id = None
 
-        if item_id.startswith("tmdb_"):
-            tmdb_id = item_id.split("_")[1]
-            provider = Provider.TMDB
-            external_id = tmdb_id
-        elif item_id.startswith("person_"):
+        if item_id.startswith("person_"):
             p_val = item_id.split("_")[1]
             if p_val.isdigit():
                 person_id = int(p_val)
             else:
                 person_id = p_val
         elif "_" in item_id:
-            prefix, val = item_id.split("_", 1)
-            if prefix in ("porndb", "theporndb", "stash", "stashdb", "fansdb"):
-                provider = Provider.PORNDB
-                if prefix in ("stash", "stashdb"):
-                    provider = Provider.STASHDB
-                elif prefix == "fansdb":
-                    provider = Provider.FANSDB
-                external_id = val
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            try:
+                provider, external_id = ProviderRegistry.clean_id(item_id)
+            except ValueError:
+                pass
         else:
             try:
                 media_item_id = int(item_id)

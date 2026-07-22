@@ -2,31 +2,31 @@ import { useMemo } from 'react';
 import { EXTRA_CATEGORY_BY_TAB } from './organizerMappers';
 import { EXTRAS_TABS, MAIN_TABS, MANUAL_TABS } from './organizerConstants';
 
-const isPornDbMovieMode = (scanMode) => scanMode === 'porndb_movie';
+const isAdultMovieMode = (scanMode, sessionMode) => scanMode === 'movies_tv' && sessionMode === 'nsfw';
 
-const getMainTabsForMode = (scanMode) => {
+const getMainTabsForMode = (scanMode, sessionMode) => {
   if (scanMode === 'offline') return ['scenes', 'extras'];
   if (scanMode === 'scenes') return ['manual', 'scenes', 'extras'];
-  if (isPornDbMovieMode(scanMode)) return ['manual', 'movies', 'extras'];
+  if (isAdultMovieMode(scanMode, sessionMode)) return ['manual', 'movies', 'extras'];
   return ['manual', 'movies', 'episodes', 'extras'];
 };
 
-const isExtraForMode = (item, scanMode) => {
+const isExtraForMode = (item, scanMode, sessionMode) => {
   const parentType = String(item.parent_type || '').toLowerCase();
   if (scanMode === 'scenes' || scanMode === 'offline') return parentType === 'scene';
-  if (isPornDbMovieMode(scanMode)) return parentType === 'movie';
+  if (isAdultMovieMode(scanMode, sessionMode)) return parentType === 'movie';
   return parentType !== 'scene';
 };
 
-const getManualTabsForMode = (scanMode) => {
+const getManualTabsForMode = (scanMode, sessionMode) => {
   if (scanMode === 'scenes' || scanMode === 'offline') return ['scenes'];
-  if (isPornDbMovieMode(scanMode)) return ['movies'];
+  if (isAdultMovieMode(scanMode, sessionMode)) return ['movies'];
   return ['movies', 'episodes'];
 };
 
-export function useOrganizerTabs({ organizerExtras, t, tabCounts, dismissedRowIds, scanMode }) {
+export function useOrganizerTabs({ organizerExtras, t, tabCounts, dismissedRowIds, scanMode, sessionMode }) {
   const computedMainTabs = useMemo(() => {
-    const allowedTabs = new Set(getMainTabsForMode(scanMode));
+    const allowedTabs = new Set(getMainTabsForMode(scanMode, sessionMode));
     return MAIN_TABS.filter((tab) => allowedTabs.has(tab.value)).map((tab) => {
       let label = t(tab.labelKey);
       if (scanMode === 'offline' && tab.value === 'scenes') {
@@ -46,10 +46,10 @@ export function useOrganizerTabs({ organizerExtras, t, tabCounts, dismissedRowId
                 : tabCounts.extrasCount,
       };
     });
-  }, [t, tabCounts, scanMode]);
+  }, [t, tabCounts, scanMode, sessionMode]);
 
   const computedManualTabs = useMemo(() => {
-    const allowedTabs = new Set(getManualTabsForMode(scanMode));
+    const allowedTabs = new Set(getManualTabsForMode(scanMode, sessionMode));
     return MANUAL_TABS.filter((tab) => allowedTabs.has(tab.value)).map((tab) => ({
       ...tab,
       label: t(tab.labelKey),
@@ -59,26 +59,23 @@ export function useOrganizerTabs({ organizerExtras, t, tabCounts, dismissedRowId
           ? tabCounts.manualEpisodesCount
           : tabCounts.manualScenesCount,
     }));
-  }, [t, tabCounts, scanMode]);
+  }, [t, tabCounts, scanMode, sessionMode]);
 
   const computedExtrasTabs = useMemo(() => EXTRAS_TABS
-    .map((tab) => ({
-      ...tab,
-      label: t(tab.labelKey),
-      count: (organizerExtras || []).filter((item) => {
-        if (!isExtraForMode(item, scanMode) || item.category !== EXTRA_CATEGORY_BY_TAB[tab.value]) {
-          return false;
-        }
-        if (dismissedRowIds) {
-          const id = `extra-${item.id}`;
-          const parentId = `item-${item.parent_id || item.parent_item_id}`;
-          if (dismissedRowIds.has(id) || dismissedRowIds.has(parentId)) {
-            return false;
-          }
-        }
-        return true;
-      }).length,
-    })), [organizerExtras, t, dismissedRowIds, scanMode]);
+    .map((tab) => {
+      let count = 0;
+      if (tab.value === 'bonus') count = tabCounts.extraBonusCount || 0;
+      else if (tab.value === 'subtitles') count = tabCounts.extraSubtitlesCount || 0;
+      else if (tab.value === 'audio') count = tabCounts.extraAudioCount || 0;
+      else if (tab.value === 'images') count = tabCounts.extraImagesCount || 0;
+      else if (tab.value === 'metadata') count = tabCounts.extraMetadataCount || 0;
+
+      return {
+        ...tab,
+        label: t(tab.labelKey),
+        count,
+      };
+    }), [tabCounts, t]);
 
   return {
     computedExtrasTabs,

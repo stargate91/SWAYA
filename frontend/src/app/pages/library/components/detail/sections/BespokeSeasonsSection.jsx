@@ -257,7 +257,9 @@ function BespokeSeasonsSection() {
             <ScrollRow ref={episodesScrollRef} className="no-scrollbar u-flex-1" showArrows={true} enableWheelScroll={true} size="sm">
               {episodes.map((episode) => {
                 const isActive = episode.id === selectedEpisodeId;
-                const formattedEpNum = formatEpisodeNumber(episode.episode_number);
+                const formattedEpNum = episode.display_episode_code
+                  ? episode.display_episode_code.split('E').pop()
+                  : formatEpisodeNumber(episode.episode_number);
                 const isNextUp = nextEpisodeInfo?.episode?.id === episode.id;
 
                 return (

@@ -1,4 +1,5 @@
 import enum
+from typing import Any
 
 class Provider(str, enum.Enum):
     """Supported metadata and content providers."""
@@ -13,16 +14,7 @@ class ScanMode(str, enum.Enum):
     """Explicit metadata strategy for a scan run."""
     MOVIES_TV = "movies_tv"
     SCENES = "scenes"
-    PORNDB_MOVIE = "porndb_movie"
     OFFLINE = "offline"
-
-    @property
-    def uses_scene_pipeline(self) -> bool:
-        return self in (ScanMode.SCENES, ScanMode.OFFLINE)
-
-    @property
-    def requires_adult_access(self) -> bool:
-        return self in (ScanMode.SCENES, ScanMode.PORNDB_MOVIE)
 
 class MediaType(str, enum.Enum):
     """Types of media content supported by the application."""
@@ -34,6 +26,23 @@ class MediaType(str, enum.Enum):
     PERSON = "person"
     VIDEO = "video"
     COLLECTION = "collection"
+
+    @property
+    def is_adult(self) -> bool:
+        """Returns True if this media type represents adult content."""
+        from app.modules.scrapers.support.registry import MediaTypeRegistry
+        return MediaTypeRegistry.is_strictly_adult(self)
+
+    @classmethod
+    def is_adult_type(cls, val: Any) -> bool:
+        """Safely checks if a string or Enum value is an adult media type."""
+        if not val:
+            return False
+        try:
+            m_enum = val if isinstance(val, cls) else cls(str(val).lower())
+            return m_enum.is_adult
+        except ValueError:
+            return False
 
 class ItemStatus(str, enum.Enum):
     """Indexing and matching status of a media item on disk."""

@@ -111,5 +111,83 @@ class ImageProcessingService:
         """Returns relative paths for storing in the database."""
         return image_path_resolver.get_db_relative_paths(filename, subfolder)
 
+    def proxy_image(self, url: str, blur: bool = False, width: Optional[int] = None) -> tuple[str, str]:
+        """
+        Downloads a remote image, processes it (resize, blur), caches it,
+        and returns a tuple of (local_cache_path, mime_type).
+        """
+        import hashlib
+        import os
+        import urllib3
+        import io
+        from PIL import Image, ImageFilter, ImageEnhance
+        from urllib.parse import urlparse
+        
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        
+        if url.startswith("//"):
+            url = "https:" + url
+            
+        parsed = urlparse(url)
+        if not parsed.scheme or not parsed.netloc:
+            raise ValueError("Invalid URL")
+            
+        cache_dir = self.image_root / "cache" / "proxy"
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        
+        url_hash = hashlib.md5(url.encode('utf-8')).hexdigest()
+        cache_key = f"{url_hash}_b_{blur}_w_{width or 'orig'}"
+        cache_path = cache_dir / cache_key
+        
+        ext_type = "image/jpeg"
+        if "png" in url.lower():
+            ext_type = "image/png"
+        elif "webp" in url.lower():
+            ext_type = "image/webp"
+            
+        if cache_path.exists():
+            return str(cache_path), ext_type
+            
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Referer": f"{parsed.scheme}://{parsed.netloc}/"
+        }
+        response = self.session.get(url, headers=headers, stream=True, timeout=5.0, verify=False)
+        response.raise_for_status()
+        
+        content_type = response.headers.get("Content-Type", ext_type)
+        
+        if blur or width:
+            img = Image.open(io.BytesIO(response.content))
+            
+            if width and img.width > width:
+                aspect = img.height / img.width
+                new_height = int(width * aspect)
+                img = img.resize((width, new_height), Image.Resampling.LANCZOS)
+                
+            if blur:
+                img = img.filter(ImageFilter.GaussianBlur(32))
+                enhancer = ImageEnhance.Brightness(img)
+                img = enhancer.enhance(0.20)
+                
+            out_io = io.BytesIO()
+            fmt = "JPEG"
+            if "png" in content_type.lower():
+                fmt = "PNG"
+            elif "webp" in content_type.lower():
+                fmt = "WEBP"
+            img.save(out_io, format=fmt)
+            
+            with open(cache_path, "wb") as cache_file:
+                cache_file.write(out_io.getvalue())
+                
+            return str(cache_path), content_type
+            
+        raw_data = response.content
+        with open(cache_path, "wb") as cache_file:
+            cache_file.write(raw_data)
+            
+        return str(cache_path), content_type
+
 
 image_processing_service = ImageProcessingService()

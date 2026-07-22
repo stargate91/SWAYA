@@ -2,7 +2,18 @@ import logging
 from typing import Any
 from sqlalchemy.orm import Session
 
-from app.modules.media.services.playback_domain_service import PlaybackDomainService
+from datetime import datetime, timezone
+
+def parse_watched_at(value) -> datetime:
+    if not value:
+        return datetime.now(timezone.utc)
+    if isinstance(value, datetime):
+        return value
+    try:
+        normalized = str(value).strip().replace("Z", "+00:00")
+        return datetime.fromisoformat(normalized)
+    except Exception as exc:
+        raise ValueError("Invalid watched_at datetime format") from exc
 from app.core.exceptions import NotFoundException
 from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.core.language import LanguageService
@@ -12,12 +23,12 @@ from app.modules.users.models import UserOverride
 logger = logging.getLogger(__name__)
 
 class PlaybackLoggingService:
-    def add_watch_history_entry_core(self, db: Session, library_port: Any, playback_repo: Any, item_id: int, watched_at_raw: Any = None) -> Any:
-        item = library_port.get_item_by_id(item_id)
+    def add_watch_history_entry_core(self, db: Session, resolver: Any, playback_repo: Any, item_id: int, watched_at_raw: Any = None) -> Any:
+        item = resolver.get_item_by_id(item_id)
         if not item:
             raise NotFoundException("Item not found")
 
-        watched_at = PlaybackDomainService.parse_watched_at(watched_at_raw)
+        watched_at = parse_watched_at(watched_at_raw)
         playback_repo.create_playback_log(item.id, watched_at)
         db.refresh(item)
         
@@ -49,9 +60,9 @@ class PlaybackLoggingService:
 
         results = []
         from app.core.language import get_user_ui_language
-        from app.modules.settings.adapters.db_settings_adapter import DbSettingsAdapter
-        settings_port = DbSettingsAdapter(db)
-        ui_lang = get_user_ui_language(settings_port)
+        from app.modules.settings.services.settings_service import SettingsService
+        settings = SettingsService(db)
+        ui_lang = get_user_ui_language(settings)
         for log in logs:
             item = log.media_item
             if not item:

@@ -100,7 +100,7 @@ const renderProposedFilename = (value, row, activeMainTab, onOpenMatch, onOpenOv
 
 const renderStatusCell = (value, row, collisionStrategy, normalizeStatusTone, t) => (
   <Inline gap="sm" align="center" justify="center">
-    <Pill variant={normalizeStatusTone(value, t)}>{value}</Pill>
+    <Pill variant={normalizeStatusTone(row.statusTone || value, t)}>{value}</Pill>
     {isMovieOrEpisodeMediaType(row.rawType) && shouldShowCollisionStrategy(row) ? (
       <Pill variant="default">
         {mapCollisionStrategyLabel(row.rawAction || collisionStrategy, t)}

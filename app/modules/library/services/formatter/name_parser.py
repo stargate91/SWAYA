@@ -88,7 +88,7 @@ class NameParser:
                 try:
                     num = json.loads(num)
                 except Exception as e:
-                    logger.debug(f"Swallowed exception in domains/library/services/formatter/name_parser.py:91: {e}", exc_info=True)
+                    logger.debug(f"Swallowed exception in app/modules/library/services/formatter/name_parser.py:91: {e}", exc_info=True)
             elif "," in num:
                 num = [n.strip() for n in num.split(",")]
 

@@ -4,7 +4,7 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-class TasksImageDownloadAdapter:
+class ImageDownloadService:
     def __init__(self, download_worker=None):
         self._download_worker = download_worker
 
@@ -24,7 +24,7 @@ class TasksImageDownloadAdapter:
             else:
                 logger.warning("DownloadWorker not available for image download.")
         except Exception as e:
-            logger.error(f"Failed to enqueue download via TasksImageDownloadAdapter: {e}")
+            logger.error(f"Failed to enqueue download via ImageDownloadService: {e}")
 
     def download_now(self, url: str, subfolder: str, filename: str) -> Optional[str]:
         try:
@@ -37,7 +37,7 @@ class TasksImageDownloadAdapter:
             else:
                 logger.warning("DownloadWorker not available for immediate image download.")
         except Exception as e:
-            logger.error(f"Failed to download immediately via TasksImageDownloadAdapter: {e}")
+            logger.error(f"Failed to download immediately via ImageDownloadService: {e}")
         return None
 
     def get_download_url(self, path: str, subfolder: str) -> Optional[str]:
@@ -46,5 +46,5 @@ class TasksImageDownloadAdapter:
             if worker and worker.image_service:
                 return worker.image_service.get_download_url(path, subfolder)
         except Exception as e:
-            logger.error(f"Failed to get download URL via TasksImageDownloadAdapter: {e}")
+            logger.error(f"Failed to get download URL via ImageDownloadService: {e}")
         return None

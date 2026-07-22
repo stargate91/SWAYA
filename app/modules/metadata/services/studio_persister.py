@@ -56,7 +56,7 @@ def _detect_remote_image_extension(url: str, fallback_name: str = "") -> str:
         if ext:
             return ext
     except Exception as e:
-        logger.debug(f"Swallowed exception in infrastructure/scrapers/support/persistence/studio_persister.py:57: {e}", exc_info=True)
+        logger.debug(f"Swallowed exception in modules/scrapers/support/persistence/studio_persister.py:57: {e}", exc_info=True)
 
     try:
         import requests
@@ -75,7 +75,7 @@ def _detect_remote_image_extension(url: str, fallback_name: str = "") -> str:
                 break
         resp.close()
     except Exception as e:
-        logger.debug(f"Swallowed exception in infrastructure/scrapers/support/persistence/studio_persister.py:76: {e}", exc_info=True)
+        logger.debug(f"Swallowed exception in modules/scrapers/support/persistence/studio_persister.py:76: {e}", exc_info=True)
 
     return '.jpg'
 
@@ -88,20 +88,10 @@ def clean_studio_name(name: str) -> str:
     return name.strip()
 
 class StudioPersister:
-    def __init__(self, parent_persister):
-        self.persister = parent_persister
-
-    @property
-    def db(self) -> Session:
-        return self.persister.db
-
-    @property
-    def metadata_repo(self) -> MetadataRepositoryPort:
-        return self.persister.metadata_repo
-
-    @property
-    def image_downloader(self):
-        return self.persister.image_downloader
+    def __init__(self, db: Session, metadata_repo: Any, image_downloader: Any):
+        self.db = db
+        self.metadata_repo = metadata_repo
+        self.image_downloader = image_downloader
 
     def _local_image_exists(self, path: Optional[str], subfolder: str) -> bool:
         return bool(path and path.startswith(f"{subfolder}/"))

@@ -10,9 +10,9 @@ SCRAPER_REQUEST_TIMEOUT = 15
 
 
 def _provider_source_name(prov_enum: Provider) -> str:
-    if prov_enum == Provider.PORNDB:
-        return "theporndb"
-    return prov_enum.value
+    from app.modules.scrapers.support.registry import ProviderRegistry
+    cfg = ProviderRegistry.get_config(prov_enum)
+    return cfg.prefix if cfg else prov_enum.value
 
 
 def _map_performer_gender(gender_val) -> int:
@@ -42,13 +42,8 @@ class AdultSearchResolver:
         page: int = 1
     ) -> List[Dict[str, Any]]:
         """Handles searches on adult metadata providers (StashDB, PornDB, FansDB) for movies and scenes."""
-        scraper = None
-        if prov_enum == Provider.STASHDB:
-            scraper = scrapers.adult(Provider.STASHDB, db)
-        elif prov_enum == Provider.PORNDB:
-            scraper = scrapers.adult(Provider.PORNDB, db)
-        elif prov_enum == Provider.FANSDB:
-            scraper = scrapers.adult(Provider.FANSDB, db)
+        from app.modules.scrapers.support.registry import ProviderRegistry
+        scraper = scrapers.adult(prov_enum, db) if ProviderRegistry.is_adult_provider(prov_enum) else None
 
         if not scraper:
             return []

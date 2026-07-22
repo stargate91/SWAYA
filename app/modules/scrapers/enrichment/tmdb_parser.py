@@ -53,7 +53,7 @@ class TMDBEnrichmentParser:
             try:
                 match.release_date = datetime.strptime(release_date, "%Y-%m-%d")
             except Exception as e:
-                logger.debug(f"Swallowed exception in infrastructure/scrapers/enrichment/tmdb_parser.py:55: {e}", exc_info=True)
+                logger.debug(f"Swallowed exception in modules/scrapers/enrichment/tmdb_parser.py:55: {e}", exc_info=True)
         
         ext_ids = details.get("external_ids", {})
         imdb_id = ext_ids.get("imdb_id") or match.imdb_id
