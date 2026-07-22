@@ -10,17 +10,11 @@ def get_resolver_pipeline(
     include_adult: bool = False,
     provider: Optional[str] = None,
 ):
-    if mode == ScanMode.OFFLINE:
-        m_type = MediaType.VIDEO
-        p_val = Provider.MANUAL
-    elif mode == ScanMode.SCENES:
-        m_type = MediaType.SCENE
-        from app.modules.scrapers.support.registry import ProviderRegistry
-        p_val = ProviderRegistry.get_provider_by_prefix(provider) or Provider.STASHDB
-    else:
-        m_type = MediaType.MOVIE
-        from app.modules.scrapers.support.registry import ProviderRegistry
-        p_val = ProviderRegistry.get_provider_by_prefix(provider) or Provider.TMDB
+    profile = mode.profile
+    from app.modules.scrapers.support.registry import ProviderRegistry
+    
+    m_type = profile.default_media_type
+    p_val = ProviderRegistry.get_provider_by_prefix(provider) if provider else Provider(profile.default_provider)
 
     return get_manual_resolver_pipeline(
         provider=p_val,

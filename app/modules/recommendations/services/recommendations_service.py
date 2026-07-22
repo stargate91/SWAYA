@@ -147,6 +147,9 @@ class RecommendationsService:
                 if is_in_library(item):
                     continue
                     
+                if not item.get("backdrop_path") and not item.get("poster_path"):
+                    continue
+                    
                 title_text = f"{item.get('title') or ''} {item.get('original_title') or ''} {item.get('overview') or ''}".lower()
                 
                 # Blacklist filter check: check if any blacklisted tag/keyword is in title or overview

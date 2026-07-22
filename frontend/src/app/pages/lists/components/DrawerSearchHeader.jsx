@@ -47,14 +47,20 @@ export default function DrawerSearchHeader({
         }}
       />
 
-      {listType === 'media' && (
+      {listType !== 'person' && (
         <SegmentedControl
-          options={[
-            { label: 'Movies', value: 'movie' },
-            { label: 'TV Shows', value: 'tv' },
-            ...(isAdultActive ? [{ label: 'Scenes', value: 'scene' }] : []),
-            ...(source === 'library' ? [{ label: 'Videos', value: 'videos' }] : [])
-          ]}
+          options={
+            listType === 'video_scene'
+              ? [
+                  { label: 'Scenes', value: 'scene' },
+                  ...(source === 'library' ? [{ label: 'Videos', value: 'videos' }] : [])
+                ]
+              : [
+                  { label: 'Movies', value: 'movie' },
+                  { label: 'TV Shows', value: 'tv' },
+                  ...(source === 'library' ? [{ label: 'Videos', value: 'videos' }] : [])
+                ]
+          }
           value={mediaType}
           onChange={(val) => {
             setMediaType(val);

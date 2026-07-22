@@ -152,7 +152,7 @@ class CustomList(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), default=1, index=True)
     name: Mapped[str] = mapped_column(String, index=True)
     description: Mapped[Optional[str]] = mapped_column(String)
-    list_type: Mapped[CustomListType] = mapped_column(SQLEnum(CustomListType), default=CustomListType.MEDIA, index=True)
+    list_type: Mapped[CustomListType] = mapped_column(SQLEnum(CustomListType), default=CustomListType.MOVIE_TV, index=True)
     is_adult: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     color: Mapped[Optional[str]] = mapped_column(String)
     custom_image_path: Mapped[Optional[str]] = mapped_column(String, nullable=True)
@@ -177,3 +177,8 @@ class CustomListItem(Base):
     order: Mapped[int] = mapped_column(Integer, default=0, index=True)
     
     custom_list: Mapped["CustomList"] = relationship(back_populates="items")
+    media_item: Mapped[Optional["MediaItem"]] = relationship()
+    match: Mapped[Optional["MetadataMatch"]] = relationship()
+    person: Mapped[Optional["Person"]] = relationship()
+    studio: Mapped[Optional["Studio"]] = relationship()
+    collection: Mapped[Optional["MediaCollection"]] = relationship()

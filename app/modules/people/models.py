@@ -410,7 +410,7 @@ class ExternalSourceLink(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     person_id: Mapped[int] = mapped_column(ForeignKey("people.id", ondelete="CASCADE"), index=True)
-    provider: Mapped[Provider] = mapped_column(SQLEnum(Provider), index=True)
+    provider: Mapped[str] = mapped_column(String, index=True)
     external_id: Mapped[str] = mapped_column(String, index=True)
     profile_url: Mapped[Optional[str]] = mapped_column(String)
     is_primary: Mapped[bool] = mapped_column(Boolean, default=False, index=True)

@@ -72,7 +72,7 @@ export function useStatisticsPage() {
   const dnaData = useMemo(() => {
     const constellation = stats?.genre_constellation;
     const sourceNodes = constellation?.nodes || [];
-    
+
     const isMocked = constellation?.is_mocked ?? false;
     const sortedNodes = [...sourceNodes].sort((a, b) => (b.count || 0) - (a.count || 0));
     const nodes = sortedNodes.slice(0, RADAR_GENRE_LIMIT).map((node) => ({
@@ -100,7 +100,7 @@ export function useStatisticsPage() {
     const sorted = Object.entries(decades).sort((a, b) => a[0].localeCompare(b[0]));
     const maxCount = Math.max(...sorted.map(([, count]) => count), 1);
     const topDecade = sorted.length > 0 ? [...sorted].sort((a, b) => b[1] - a[1])[0][0] : '2000s';
-    
+
     const formatDecade = (decade) => {
       const match = String(decade || '').match(/^(\d{4})s$/);
       return match ? t('statistics.stats.decade_label', { decade: match[1] }) || `${match[1]}s` : decade;
@@ -121,12 +121,12 @@ export function useStatisticsPage() {
 
   const activeDistStats = useMemo(() => {
     if (ratingsState.isStatsLoading) return null;
-    const statsObj = 
+    const statsObj =
       effectiveDistTab === 'people' ? ratingsState.peopleStats :
-      effectiveDistTab === 'tv' ? ratingsState.tvStats :
-      effectiveDistTab === 'scenes' ? ratingsState.scenesStats :
-      effectiveDistTab === 'videos' ? ratingsState.videosStats :
-      ratingsState.moviesStats;
+        effectiveDistTab === 'tv' ? ratingsState.tvStats :
+          effectiveDistTab === 'scenes' ? ratingsState.scenesStats :
+            effectiveDistTab === 'videos' ? ratingsState.videosStats :
+              ratingsState.moviesStats;
 
     if (!statsObj || !statsObj.distributionRows) return null;
 

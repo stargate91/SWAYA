@@ -101,6 +101,7 @@ export const library = {
     return fetchJson(`/api/library/tv/${tvId}${params.toString() ? `?${params.toString()}` : ''}`);
   },
   getTvSeasonDetail: (tvId, seasonNumber) => fetchJson(`/api/library/tv/${tvId}/season/${seasonNumber}`),
+  getTvNextEpisode: (tvId) => fetchJson(`/api/library/tv/${tvId}/next-episode`),
   getCollectionDetail: (collectionId, { language } = {}) => {
     const params = new URLSearchParams();
     if (language) params.append('language', language);

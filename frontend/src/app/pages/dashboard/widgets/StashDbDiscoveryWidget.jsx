@@ -38,7 +38,7 @@ export default function StashDbDiscoveryWidget() {
     return null;
   }
 
-  if (!isLoading && !recommendations?.discover_stashdb?.length && !currentFocus) {
+  if (!isLoading && !recommendations?.discover_adult_providers?.stashdb?.length && !currentFocus) {
     return null;
   }
 
@@ -46,7 +46,7 @@ export default function StashDbDiscoveryWidget() {
     <WidgetShell loading={isLoading} size="lg" transparent={true}>
       <RecommendationCarousel
         title={T('dashboard.recommendations.discover_stashdb') || 'StashDB Discovery'}
-        items={recommendations?.discover_stashdb || []}
+        items={recommendations?.discover_adult_providers?.stashdb || []}
         watchlistIds={actualWatchlistIds}
         onWatchlist={handleWatchlist}
         onCardClick={handleCardClick}

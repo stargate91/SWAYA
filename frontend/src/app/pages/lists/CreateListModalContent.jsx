@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Input from '@/ui/Input';
 import Radio from '@/ui/Radio';
+import Checkbox from '@/ui/Checkbox';
 import Tooltip from '@/ui/Tooltip';
 import Field from '@/ui/Field';
 import ColorSwatch from '@/ui/ColorSwatch';
@@ -21,12 +22,34 @@ export default function CreateListModalContent({
   initialList = null,
   mode = 'create',
   existingNames = [],
+  defaultIsAdult = false,
 }) {
+  const getInitialListType = () => {
+    if (initialList?.list_type) {
+      if (initialList.list_type === 'media') {
+        return initialList.is_adult ? 'video_scene' : 'movie_tv';
+      }
+      return initialList.list_type;
+    }
+    return defaultIsAdult ? 'video_scene' : 'movie_tv';
+  };
   const [name, setName] = useState(initialList?.name || '');
   const [description, setDescription] = useState(initialList?.description || '');
   const [color, setColor] = useState(initialList?.color || PRESET_COLORS[0]);
-  const [listType, setListType] = useState(initialList?.list_type || 'media');
+  const [listType, setListType] = useState(getInitialListType);
+  const [isAdult, setIsAdult] = useState(initialList ? !!initialList.is_adult : defaultIsAdult);
   const [error, setError] = useState('');
+
+  const handleIsAdultChange = (checked) => {
+    setIsAdult(checked);
+    if (mode === 'create') {
+      if (checked && listType === 'movie_tv') {
+        setListType('video_scene');
+      } else if (!checked && listType === 'video_scene') {
+        setListType('movie_tv');
+      }
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -48,6 +71,7 @@ export default function CreateListModalContent({
       description: description.trim(),
       color,
       list_type: listType,
+      is_adult: isAdult,
     });
   };
 
@@ -81,15 +105,27 @@ export default function CreateListModalContent({
 
       <Field label={t('lists.type_label') || 'List Type'}>
         <div className={styles['create-list-form__type-radio-group']}>
-          <Radio
-            name="listType"
-            value="media"
-            checked={listType === 'media'}
-            onChange={() => setListType('media')}
-            disabled={mode === 'edit'}
-          >
-            {t('lists.type_media') || 'Media'}
-          </Radio>
+          {isAdult ? (
+            <Radio
+              name="listType"
+              value="video_scene"
+              checked={listType === 'video_scene'}
+              onChange={() => setListType('video_scene')}
+              disabled={mode === 'edit'}
+            >
+              {t('lists.type_video_scene') || 'Videos & Scenes'}
+            </Radio>
+          ) : (
+            <Radio
+              name="listType"
+              value="movie_tv"
+              checked={listType === 'movie_tv'}
+              onChange={() => setListType('movie_tv')}
+              disabled={mode === 'edit'}
+            >
+              {t('lists.type_movie_tv') || 'Movies & TV'}
+            </Radio>
+          )}
           <Radio
             name="listType"
             value="person"
@@ -119,6 +155,14 @@ export default function CreateListModalContent({
           })}
         </div>
       </Field>
+
+      <Checkbox
+        id="list-is-adult"
+        checked={isAdult}
+        onChange={(e) => handleIsAdultChange(e.target.checked)}
+      >
+        {t('lists.is_adult_label') || 'NSFW / Adult List'}
+      </Checkbox>
     </form>
   );
 }

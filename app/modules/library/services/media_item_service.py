@@ -146,36 +146,60 @@ class MediaItemService:
         elif isinstance(item_id, str) and "_" in item_id:
             from app.modules.scrapers.support.registry import ProviderRegistry
             try:
-                provider, scene_id = ProviderRegistry.clean_id(item_id)
-                config = ProviderRegistry.get_config(provider)
-                is_adult = config.is_adult if config else False
-                
-                default_adult_type = next((t for t in MediaType if t.is_adult), MediaType.SCENE)
-                resolved_media_type = default_adult_type if is_adult else MediaType.MOVIE
-                if media_type:
-                    try:
-                        resolved_media_type = MediaType(media_type.lower())
-                    except ValueError:
-                        if media_type.lower() == 'movie':
-                            resolved_media_type = MediaType.MOVIE
-                        elif media_type.lower() == 'tv':
-                            resolved_media_type = MediaType.TV
- 
-                match = self.db.query(MetadataMatch).filter(
-                    MetadataMatch.provider == provider,
-                    MetadataMatch.external_id == scene_id,
-                    MetadataMatch.media_type == resolved_media_type
-                ).first()
- 
-                if not match:
-                    match = MetadataMatch(
-                        provider=provider, 
-                        external_id=scene_id, 
-                        media_type=resolved_media_type,
-                        is_adult=is_adult
-                    )
-                    self.db.add(match)
-                    self.db.flush()
+                if item_id.startswith("scene_"):
+                    scene_id = item_id.split("_", 1)[1]
+                    match = self.db.query(MetadataMatch).filter(
+                        MetadataMatch.external_id == scene_id,
+                        MetadataMatch.media_type == MediaType.SCENE
+                    ).first()
+                    if not match and not scene_id.startswith("scene_"):
+                        match = self.db.query(MetadataMatch).filter(
+                            MetadataMatch.external_id == f"scene_{scene_id}",
+                            MetadataMatch.media_type == MediaType.SCENE
+                        ).first()
+                    
+                    if not match:
+                        adult_providers = ProviderRegistry.get_adult_providers()
+                        provider = adult_providers[0] if adult_providers else Provider.STASHDB
+                        match = MetadataMatch(
+                            provider=provider,
+                            external_id=scene_id,
+                            media_type=MediaType.SCENE,
+                            is_adult=True
+                        )
+                        self.db.add(match)
+                        self.db.flush()
+                else:
+                    provider, scene_id = ProviderRegistry.clean_id(item_id)
+                    config = ProviderRegistry.get_config(provider)
+                    is_adult = config.is_adult if config else False
+                    
+                    default_adult_type = next((t for t in MediaType if t.is_adult), MediaType.SCENE)
+                    resolved_media_type = default_adult_type if is_adult else MediaType.MOVIE
+                    if media_type:
+                        try:
+                            resolved_media_type = MediaType(media_type.lower())
+                        except ValueError:
+                            if media_type.lower() == 'movie':
+                                resolved_media_type = MediaType.MOVIE
+                            elif media_type.lower() == 'tv':
+                                resolved_media_type = MediaType.TV
+     
+                    match = self.db.query(MetadataMatch).filter(
+                        MetadataMatch.provider == provider,
+                        MetadataMatch.external_id == scene_id,
+                        MetadataMatch.media_type == resolved_media_type
+                    ).first()
+     
+                    if not match:
+                        match = MetadataMatch(
+                            provider=provider, 
+                            external_id=scene_id, 
+                            media_type=resolved_media_type,
+                            is_adult=is_adult
+                        )
+                        self.db.add(match)
+                        self.db.flush()
                 metadata_match_id = match.id
                 media_item_id = match.media_item_id
             except ValueError:

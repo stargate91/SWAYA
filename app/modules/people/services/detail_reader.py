@@ -74,13 +74,13 @@ class PerformerDetailReader:
         person = self._resolve_person(person_id, load_localizations=True)
         return self.collator.get_person_detail(person, user_id=1, ui_lang=DEFAULT_FALLBACK_LANGUAGE)
 
-    def get_person_movies(self, person_id: Any, page: int = 1, page_size: int = 12, source: Optional[str] = None, local_only: bool = False) -> PersonFilmographyResponse:
+    def get_person_movies(self, person_id: Any, page: int = 1, page_size: int = 12, source: Optional[str] = None, local_only: bool = False, sort_by: Optional[str] = None) -> PersonFilmographyResponse:
         person = self._resolve_person(person_id)
-        return self.paginator.get_person_movies(person, page=page, page_size=page_size, source=source, local_only=local_only)
+        return self.paginator.get_person_movies(person, page=page, page_size=page_size, source=source, local_only=local_only, sort_by=sort_by)
 
-    def get_person_tv(self, person_id: Any, page: int = 1, page_size: int = 12, local_only: bool = False) -> PersonFilmographyResponse:
+    def get_person_tv(self, person_id: Any, page: int = 1, page_size: int = 12, local_only: bool = False, sort_by: Optional[str] = None) -> PersonFilmographyResponse:
         person = self._resolve_person(person_id)
-        return self.paginator.get_person_tv(person, page=page, page_size=page_size, local_only=local_only)
+        return self.paginator.get_person_tv(person, page=page, page_size=page_size, local_only=local_only, sort_by=sort_by)
 
     def get_person_scenes(self, person_id: Any, page: int = 1, page_size: int = 12, source: Optional[str] = None, local_only: bool = False) -> PersonFilmographyResponse:
         person = self._resolve_person(person_id)

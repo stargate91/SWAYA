@@ -89,10 +89,12 @@ export default function usePersonBackdropPicker({
   const moviesQuery = usePersonCreditsQuery(personId, 'movies', 1, PERSON_BACKDROP_PAGE_SIZE, {
     enabled: Boolean(personId) && activeTab === 'movies' && isTmdbPerformer,
     excludeKnownFor: false,
+    sort_by: 'backdrop_score',
   });
   const tvQuery = usePersonCreditsQuery(personId, 'tv', 1, PERSON_BACKDROP_PAGE_SIZE, {
     enabled: Boolean(personId) && activeTab === 'tv' && isTmdbPerformer,
     excludeKnownFor: false,
+    sort_by: 'backdrop_score',
   });
 
   useEffect(() => {
@@ -148,18 +150,12 @@ export default function usePersonBackdropPicker({
 
   const currentBackdropKey = normalizeBackdropKey(selectedBackdropPath || person?.backdrop_path || item?.backdrop_path);
   const movieItems = useMemo(
-    () => prioritizePersonCredits(
-      sortBackdropCredits(mergeBackdropCreditPages(moviePages)),
-      person?.known_for || item?.known_for || []
-    ),
-    [item?.known_for, person?.known_for, moviePages]
+    () => mergeBackdropCreditPages(moviePages || []),
+    [moviePages]
   );
   const tvItems = useMemo(
-    () => prioritizePersonCredits(
-      sortBackdropCredits(mergeBackdropCreditPages(tvPages)),
-      person?.known_for || item?.known_for || []
-    ),
-    [item?.known_for, person?.known_for, tvPages]
+    () => mergeBackdropCreditPages(tvPages || []),
+    [tvPages]
   );
   const scenesItems = useMemo(() => {
     return mergeBackdropCreditPages(scenesPages || []);
@@ -259,6 +255,7 @@ export default function usePersonBackdropPicker({
           page: movieNextPage,
           pageSize: PERSON_BACKDROP_PAGE_SIZE,
           excludeKnownFor: false,
+          sort_by: 'backdrop_score',
         });
         patchSession(personId, (current) => ({
           moviePages: [...(current.moviePages || []), nextPage],
@@ -281,6 +278,7 @@ export default function usePersonBackdropPicker({
           page: tvNextPage,
           pageSize: PERSON_BACKDROP_PAGE_SIZE,
           excludeKnownFor: false,
+          sort_by: 'backdrop_score',
         });
         patchSession(personId, (current) => ({
           tvPages: [...(current.tvPages || []), nextPage],

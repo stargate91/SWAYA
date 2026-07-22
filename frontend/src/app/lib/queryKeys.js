@@ -8,23 +8,23 @@
 
 // ─── Query Key Constants ─────────────────────────────────────────
 export const QK = Object.freeze({
-  library:             ['library'],
-  libraryCollections:  ['libraryCollections'],
-  libraryTags:         ['libraryTags'],
-  libraryFilters:      ['libraryFilters'],
-  allTags:             ['allTags'],
-  stats:               ['stats'],
-  continueWatching:    ['continue-watching'],
-  watchedHistory:      ['watched-history'],
-  recommendations:     ['recommendations'],
-  recentlyAdded:       ['recently-added'],
-  recentlyActivated:   ['recently-activated-people'],
-  discover:            ['discover'],
-  lists:               ['lists'],
-  organizer:           ['organizer'],
-  organizerCount:      ['organizer-count'],
-  people:              ['people'],
-  peopleInfinite:      ['people-infinite'],
+  library: ['library'],
+  libraryCollections: ['libraryCollections'],
+  libraryTags: ['libraryTags'],
+  libraryFilters: ['libraryFilters'],
+  allTags: ['allTags'],
+  stats: ['stats'],
+  continueWatching: ['continue-watching'],
+  watchedHistory: ['watched-history'],
+  recommendations: ['recommendations'],
+  recentlyAdded: ['recently-added'],
+  recentlyActivated: ['recently-activated-people'],
+  discover: ['discover'],
+  lists: ['lists'],
+  organizer: ['organizer'],
+  organizerCount: ['organizer-count'],
+  people: ['people'],
+  peopleInfinite: ['people-infinite'],
 });
 
 // ─── ID Variant Generator ────────────────────────────────────────
@@ -87,7 +87,7 @@ export const invalidateEntity = (qc, rawId, opts = {}) => {
     qc.invalidateQueries({ queryKey: QK.library });
     qc.invalidateQueries({ queryKey: QK.libraryCollections });
   }
-  if (opts.stats)            qc.invalidateQueries({ queryKey: QK.stats });
+  if (opts.stats) qc.invalidateQueries({ queryKey: QK.stats });
   if (opts.tags) {
     qc.invalidateQueries({ queryKey: QK.libraryTags });
     qc.invalidateQueries({ queryKey: QK.allTags });
@@ -100,12 +100,12 @@ export const invalidateEntity = (qc, rawId, opts = {}) => {
     qc.invalidateQueries({ queryKey: QK.discover });
   }
   if (opts.continueWatching) qc.invalidateQueries({ queryKey: QK.continueWatching });
-  if (opts.watchedHistory)   qc.invalidateQueries({ queryKey: QK.watchedHistory });
+  if (opts.watchedHistory) qc.invalidateQueries({ queryKey: QK.watchedHistory });
   if (opts.organizer) {
     qc.invalidateQueries({ queryKey: QK.organizer });
     qc.invalidateQueries({ queryKey: QK.organizerCount });
   }
-  if (opts.listsList)        qc.invalidateQueries({ queryKey: QK.lists });
+  if (opts.listsList) qc.invalidateQueries({ queryKey: QK.lists });
 };
 
 /**
@@ -136,13 +136,13 @@ export const invalidatePerson = (qc, personId, opts = {}) => {
   qc.invalidateQueries({ queryKey: QK.peopleInfinite });
   qc.invalidateQueries({ queryKey: QK.libraryFilters });
 
-  if (opts.lists)           qc.invalidateQueries({ queryKey: QK.library });
-  if (opts.stats)           qc.invalidateQueries({ queryKey: QK.stats });
+  if (opts.lists) qc.invalidateQueries({ queryKey: QK.library });
+  if (opts.stats) qc.invalidateQueries({ queryKey: QK.stats });
   if (opts.recommendations) {
     qc.invalidateQueries({ queryKey: QK.recommendations });
     qc.invalidateQueries({ queryKey: QK.recentlyAdded });
     qc.invalidateQueries({ queryKey: QK.recentlyActivated });
     qc.invalidateQueries({ queryKey: QK.discover });
   }
-  if (opts.listsList)       qc.invalidateQueries({ queryKey: QK.lists });
+  if (opts.listsList) qc.invalidateQueries({ queryKey: QK.lists });
 };

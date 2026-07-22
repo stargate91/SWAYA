@@ -43,10 +43,10 @@ class MetadataMatch(Base):
     parent_id: Mapped[Optional[int]] = mapped_column(ForeignKey("metadata_matches.id", ondelete="CASCADE"), nullable=True, index=True)
     collection_id: Mapped[Optional[int]] = mapped_column(ForeignKey("media_collections.id", ondelete="SET NULL"), nullable=True, index=True)
     
-    provider: Mapped[Provider] = mapped_column(SQLEnum(Provider), index=True)
+    provider: Mapped[str] = mapped_column(String, index=True)
     external_id: Mapped[str] = mapped_column(String, index=True)
     provider_ids: Mapped[Optional[dict[str, str]]] = mapped_column(JSON, nullable=True)
-    media_type: Mapped[str] = mapped_column(String(50), index=True, default="movie")
+    media_type: Mapped[str] = mapped_column(String, index=True, default="movie")
     season_number: Mapped[Optional[int]] = mapped_column(Integer)
     episode_number: Mapped[Optional[Any]] = mapped_column(JSON)
     number_of_seasons: Mapped[Optional[int]] = mapped_column(Integer)

@@ -126,9 +126,10 @@ def get_person_movies(
     page_size: int = Query(default=12, ge=1),
     source: str = Query(default=None),
     local_only: bool = Query(default=False),
+    sort_by: str = Query(default=None),
     db: Session = Depends(get_db)
 ):
-    return _people_detail_service(db).get_person_movies(person_id, page=page, page_size=page_size, source=source, local_only=local_only)
+    return _people_detail_service(db).get_person_movies(person_id, page=page, page_size=page_size, source=source, local_only=local_only, sort_by=sort_by)
 
 @router.get("/{person_id}/tv", response_model=PersonFilmographyResponse)
 def get_person_tv(
@@ -136,9 +137,10 @@ def get_person_tv(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=12, ge=1),
     local_only: bool = Query(default=False),
+    sort_by: str = Query(default=None),
     db: Session = Depends(get_db)
 ):
-    return _people_detail_service(db).get_person_tv(person_id, page=page, page_size=page_size, local_only=local_only)
+    return _people_detail_service(db).get_person_tv(person_id, page=page, page_size=page_size, local_only=local_only, sort_by=sort_by)
 
 @router.get("/{person_id}/scenes", response_model=PersonFilmographyResponse)
 def get_person_scenes(

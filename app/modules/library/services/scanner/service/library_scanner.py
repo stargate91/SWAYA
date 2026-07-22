@@ -148,7 +148,7 @@ class LibraryScanner:
                     with StatusCoordinator.scan_status_lock:
                         StatusCoordinator.scan_status["current"] = int(pct * 100)
                         StatusCoordinator.scan_status["total"] = 100
-                    scale = 90.0 if scan_mode == ScanMode.OFFLINE else 50.0
+                    scale = scan_mode.profile.collect_progress_weight
                     self.task_manager.update_progress(task_id, pct * scale)
                 to_enrich, _ = await asyncio.to_thread(
                     scanner.scan_library,

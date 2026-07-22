@@ -3,13 +3,14 @@ import { API_BASE } from '../backend';
 
 export const people = {
   getDetail: (personId) => fetchJson(`/api/people/${personId}`),
-  getCredits: (personId, mediaType, { page, pageSize, excludeKnownFor, source, local_only } = {}) => {
+  getCredits: (personId, mediaType, { page, pageSize, excludeKnownFor, source, local_only, sort_by } = {}) => {
     const params = new URLSearchParams();
     if (page) params.append('page', String(page));
     if (pageSize) params.append('page_size', String(pageSize));
     if (excludeKnownFor !== undefined) params.append('exclude_known_for', String(excludeKnownFor));
     if (source) params.append('source', String(source));
     if (local_only !== undefined) params.append('local_only', String(local_only));
+    if (sort_by) params.append('sort_by', sort_by);
     return fetchJson(`/api/people/${personId}/${mediaType}?${params.toString()}`);
   },
   getCreditBackdrops: (personId, tmdbId, mediaType) => {

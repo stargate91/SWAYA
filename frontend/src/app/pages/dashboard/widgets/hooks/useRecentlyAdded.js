@@ -45,15 +45,8 @@ export default function useRecentlyAdded(mediaType) {
   };
 
   const filteredItems = useMemo(() => {
-    const list = paginatedData?.pages ? paginatedData.pages.flat() : [];
-    return list.filter((item) => {
-      if (sessionMode === 'sfw') {
-        const isAdult = item.is_adult || item.adult;
-        return !isAdult;
-      }
-      return true;
-    });
-  }, [paginatedData, sessionMode]);
+    return paginatedData?.pages ? paginatedData.pages.flat() : [];
+  }, [paginatedData]);
 
   const isLoading = isRecsLoading || isAddedLoading;
 

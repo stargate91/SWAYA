@@ -50,8 +50,8 @@ class LocalMovieFormatter(MovieDetailFormatter):
             
         from app.core.language import get_user_ui_language
         from app.modules.settings.services.settings_service import SettingsService
-        settings_port = SettingsService(db)
-        ui_lang = get_user_ui_language(settings_port)
+        settings = SettingsService(db)
+        ui_lang = get_user_ui_language(settings)
         loc = LanguageService.get_best_localization(active_match.localizations, ui_lang) if active_match else None
         
         cast, directors, writers = self.credits_formatter.format_credits(

@@ -82,7 +82,7 @@ class FileWalker:
         if existing:
             return False
 
-        category, subtype = self.categorizer.categorize(path, settings_port=self.settings)
+        category, subtype = self.categorizer.categorize(path, settings=self.settings)
         forced_subtypes = SCENE_FORCE_EXTRA_VIDEO_SUBTYPES if self.library.is_adult else FORCED_EXTRA_VIDEO_SUBTYPES
         if category == ExtraCategory.VIDEO and subtype in forced_subtypes:
             return True

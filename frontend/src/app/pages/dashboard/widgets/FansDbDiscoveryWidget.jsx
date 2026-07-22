@@ -38,7 +38,7 @@ export default function FansDbDiscoveryWidget() {
     return null;
   }
 
-  if (!isLoading && !recommendations?.discover_fansdb?.length && !currentFocus) {
+  if (!isLoading && !recommendations?.discover_adult_providers?.fansdb?.length && !currentFocus) {
     return null;
   }
 
@@ -46,7 +46,7 @@ export default function FansDbDiscoveryWidget() {
     <WidgetShell loading={isLoading} size="lg" transparent={true}>
       <RecommendationCarousel
         title={T('dashboard.recommendations.discover_fansdb') || 'FansDB Discovery'}
-        items={recommendations?.discover_fansdb || []}
+        items={recommendations?.discover_adult_providers?.fansdb || []}
         watchlistIds={actualWatchlistIds}
         onWatchlist={handleWatchlist}
         onCardClick={handleCardClick}

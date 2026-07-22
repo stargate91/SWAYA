@@ -22,7 +22,8 @@ class CombinedFilmographyResolver:
         local_tv: List[Dict[str, Any]],
         local_scenes: List[Dict[str, Any]],
         person_name: Optional[str] = None,
-        remote_scenes: Optional[List[Dict[str, Any]]] = None
+        remote_scenes: Optional[List[Dict[str, Any]]] = None,
+        sort_by: Optional[str] = None
     ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]]]:
         """Combines local database records with TMDB details to compile actor filmography lists."""
         if not tmdb_id:
@@ -161,8 +162,8 @@ class CombinedFilmographyResolver:
             person_name=person_name
         )
 
-        parsed_movies = self.prioritizer.prioritize_person_credits(parsed_movies, known_for)
-        parsed_tv = self.prioritizer.prioritize_person_credits(parsed_tv, known_for)
+        parsed_movies = self.prioritizer.prioritize_person_credits(parsed_movies, known_for, sort_by=sort_by)
+        parsed_tv = self.prioritizer.prioritize_person_credits(parsed_tv, known_for, sort_by=sort_by)
         local_scenes.sort(key=lambda x: x.get("year") or 0, reverse=True)
 
         return parsed_movies, parsed_tv, local_scenes, known_for

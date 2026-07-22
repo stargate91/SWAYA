@@ -520,7 +520,7 @@ class SceneDetailService(DetailFormatter):
                         name=perf_name,
                         is_adult=True,
                         known_for_department="Acting",
-                        is_active=True,
+                        is_active=False,
                         profile_path=p_img,
                         gender=mapped_gender,
                         popularity=perf.get("rating_porndb") or 0,

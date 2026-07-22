@@ -38,7 +38,10 @@ class MainstreamEnricher:
         from app.modules.metadata.services.metadata_service import MetadataService
         from app.modules.settings.services.settings_service import SettingsService
         from app.modules.tasks.image_download_service import ImageDownloadService
-        self.metadata_repo = metadata_repo or MetadataService(db_session)
+        from app.modules.scrapers.support.gateway import scraper_gateway
+        from app.modules.people.services.person_service import PersonService
+        self.metadata_repo = metadata_repo or MetadataService(db_session, scraper_gateway)
+        self.people_repo = people_repo or PersonService(db_session)
         self.settings = settings or SettingsService(db_session)
         self.image_downloader = image_downloader or ImageDownloadService()
 

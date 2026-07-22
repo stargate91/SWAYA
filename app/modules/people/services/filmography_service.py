@@ -62,7 +62,8 @@ class FilmographyService:
         tmdb_client: Any,
         is_adult: bool,
         known_for_department: Optional[str],
-        person_name: Optional[str] = None
+        person_name: Optional[str] = None,
+        sort_by: Optional[str] = None
     ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]]]:
         """Combines local database and remote details to compile actor filmography lists."""
         local_movies, local_tv, local_scenes = self.aggregate_credits(person_id)
@@ -101,16 +102,17 @@ class FilmographyService:
             local_tv=local_tv,
             local_scenes=local_scenes,
             person_name=person_name,
-            remote_scenes=adult_known_for
+            remote_scenes=adult_known_for,
+            sort_by=sort_by
         )
 
-    def get_person_movies(self, person_id: int, page: int = 1, page_size: int = 12, source: Optional[str] = None, local_only: bool = False):
+    def get_person_movies(self, person_id: int, page: int = 1, page_size: int = 12, source: Optional[str] = None, local_only: bool = False, sort_by: Optional[str] = None):
         """Delegates query for movies list."""
-        return self.paginated_retriever.get_person_movies(person_id, page, page_size, source, local_only)
+        return self.paginated_retriever.get_person_movies(person_id, page, page_size, source, local_only, sort_by=sort_by)
 
-    def get_person_tv(self, person_id: int, page: int = 1, page_size: int = 12):
+    def get_person_tv(self, person_id: int, page: int = 1, page_size: int = 12, sort_by: Optional[str] = None):
         """Delegates query for TV shows list."""
-        return self.paginated_retriever.get_person_tv(person_id, page, page_size)
+        return self.paginated_retriever.get_person_tv(person_id, page, page_size, sort_by=sort_by)
 
     def get_person_scenes(self, person_id: int, page: int = 1, page_size: int = 12, source: Optional[str] = None, local_only: bool = False):
         """Delegates query for adult scenes list."""

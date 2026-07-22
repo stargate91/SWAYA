@@ -18,68 +18,95 @@ class TitleLockReader:
             if isinstance(item_id, str) and "_" in item_id:
                 from app.modules.scrapers.support.registry import ProviderRegistry
                 try:
-                    provider, external_id = ProviderRegistry.clean_id(item_id)
-                    from app.core.enums import MediaType
-                    from app.modules.metadata.models import MetadataMatch
-                    
-                    config = ProviderRegistry.get_config(provider)
-                    is_adult_provider = config.is_adult if config else False
-
-                    m_type_guessed = MediaType.MOVIE
-                    if media_type:
-                        try:
-                            m_type_guessed = MediaType(media_type.lower())
-                        except ValueError:
-                            m_type_guessed = MediaType.SCENE if media_type == "scene" else MediaType.MOVIE
-                    elif is_adult_provider:
-                        m_type_guessed = MediaType.SCENE
-
-                    match = None
-                    if m_type_guessed == MediaType.SCENE or is_adult_provider:
-                        clean_id = str(external_id)
-                        candidates = [clean_id]
-                        from app.modules.scrapers.support.registry import ProviderRegistry
+                    if item_id.startswith("scene_"):
+                        scene_id = item_id.split("_", 1)[1]
+                        from app.core.enums import MediaType
+                        from app.modules.metadata.models import MetadataMatch
+                        
                         match = self.db.query(MetadataMatch).filter(
-                            MetadataMatch.provider.in_(ProviderRegistry.get_adult_providers()),
-                            MetadataMatch.external_id.in_(candidates),
+                            MetadataMatch.external_id == scene_id,
                             MetadataMatch.media_type == MediaType.SCENE
                         ).first()
+                        if not match and not scene_id.startswith("scene_"):
+                            match = self.db.query(MetadataMatch).filter(
+                                MetadataMatch.external_id == f"scene_{scene_id}",
+                                MetadataMatch.media_type == MediaType.SCENE
+                            ).first()
+                        
+                        if not match:
+                            adult_providers = ProviderRegistry.get_adult_providers()
+                            provider = adult_providers[0] if adult_providers else Provider.STASHDB
+                            match = MetadataMatch(
+                                provider=provider,
+                                external_id=scene_id,
+                                media_type=MediaType.SCENE,
+                                is_adult=True
+                            )
+                            self.db.add(match)
+                            self.db.commit()
                     else:
-                        match = self.db.query(MetadataMatch).filter(
-                            MetadataMatch.provider == provider,
-                            MetadataMatch.external_id == str(external_id)
-                        ).first()
-                    
-                    # When multiple matches share the same external_id (e.g. TMDB TV shows
-                    # and their episodes), prefer the parent type over episodes
-                    if match and match.media_type == MediaType.EPISODE:
-                        preferred = self.db.query(MetadataMatch).filter(
-                            MetadataMatch.provider == provider,
-                            MetadataMatch.external_id == str(external_id),
-                            MetadataMatch.media_type.in_([MediaType.TV, MediaType.MOVIE])
-                        ).first()
-                        if preferred:
-                            match = preferred
-                    
-                    if not match:
-                        m_type = MediaType.MOVIE
+                        provider, external_id = ProviderRegistry.clean_id(item_id)
+                        from app.core.enums import MediaType
+                        from app.modules.metadata.models import MetadataMatch
+                        
+                        config = ProviderRegistry.get_config(provider)
+                        is_adult_provider = config.is_adult if config else False
+
+                        m_type_guessed = MediaType.MOVIE
                         if media_type:
                             try:
-                                m_type = MediaType(media_type.lower())
+                                m_type_guessed = MediaType(media_type.lower())
                             except ValueError:
-                                m_type = MediaType.SCENE if media_type == "scene" else MediaType.MOVIE
+                                m_type_guessed = MediaType.SCENE if media_type == "scene" else MediaType.MOVIE
                         elif is_adult_provider:
-                            m_type = MediaType.SCENE
+                            m_type_guessed = MediaType.SCENE
+
+                        match = None
+                        if m_type_guessed == MediaType.SCENE or is_adult_provider:
+                            clean_id = str(external_id)
+                            candidates = [clean_id]
+                            from app.modules.scrapers.support.registry import ProviderRegistry
+                            match = self.db.query(MetadataMatch).filter(
+                                MetadataMatch.provider.in_(ProviderRegistry.get_adult_providers()),
+                                MetadataMatch.external_id.in_(candidates),
+                                MetadataMatch.media_type == MediaType.SCENE
+                            ).first()
+                        else:
+                            match = self.db.query(MetadataMatch).filter(
+                                MetadataMatch.provider == provider,
+                                MetadataMatch.external_id == str(external_id)
+                            ).first()
                         
-                        is_adult_item = is_adult_provider or m_type.is_adult
-                        match = MetadataMatch(
-                            provider=provider,
-                            external_id=str(external_id),
-                            media_type=m_type,
-                            is_adult=is_adult_item
-                        )
-                        self.db.add(match)
-                        self.db.commit()
+                        # When multiple matches share the same external_id (e.g. TMDB TV shows
+                        # and their episodes), prefer the parent type over episodes
+                        if match and match.media_type == MediaType.EPISODE:
+                            preferred = self.db.query(MetadataMatch).filter(
+                                MetadataMatch.provider == provider,
+                                MetadataMatch.external_id == str(external_id),
+                                MetadataMatch.media_type.in_([MediaType.TV, MediaType.MOVIE])
+                            ).first()
+                            if preferred:
+                                match = preferred
+                        
+                        if not match:
+                            m_type = MediaType.MOVIE
+                            if media_type:
+                                try:
+                                    m_type = MediaType(media_type.lower())
+                                except ValueError:
+                                    m_type = MediaType.SCENE if media_type == "scene" else MediaType.MOVIE
+                            elif is_adult_provider:
+                                m_type = MediaType.SCENE
+                            
+                            is_adult_item = is_adult_provider or m_type.is_adult
+                            match = MetadataMatch(
+                                provider=provider,
+                                external_id=str(external_id),
+                                media_type=m_type,
+                                is_adult=is_adult_item
+                            )
+                            self.db.add(match)
+                            self.db.commit()
                     
                     metadata_match_id = match.id
                 except ValueError:
@@ -107,7 +134,7 @@ class TitleLockReader:
             physical_override = self.db.query(UserOverride).filter(
                 UserOverride.user_id == self.user_id,
                 UserOverride.media_item_id == media_item_id,
-                UserOverride.metadata_match_id is None
+                UserOverride.metadata_match_id == None
             ).first()
             if physical_override:
                 try:
@@ -173,7 +200,7 @@ class TitleLockReader:
             return self.db.query(UserOverride).filter(
                 UserOverride.user_id == self.user_id,
                 UserOverride.media_item_id == media_item_id,
-                UserOverride.metadata_match_id is None
+                UserOverride.metadata_match_id == None
             ).first()
 
         override = query_physical()

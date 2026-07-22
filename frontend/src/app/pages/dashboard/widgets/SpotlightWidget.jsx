@@ -21,9 +21,9 @@ export default function SpotlightWidget() {
     handleCardClick,
   } = useSpotlight();
 
-  const stashdbItems = (recommendations?.discover_stashdb || []).filter(item => item.backdrop_path || item.poster_path);
-  const tmdbAdultItems = (recommendations?.discover_adult || []).filter(item => item.backdrop_path || item.poster_path);
-  const fansdbItems = (recommendations?.discover_fansdb || []).filter(item => item.backdrop_path || item.poster_path);
+  const stashdbItems = recommendations?.discover_adult_providers?.stashdb || [];
+  const tmdbAdultItems = recommendations?.discover_adult || [];
+  const fansdbItems = recommendations?.discover_adult_providers?.fansdb || [];
 
   // Compute default provider initial value based on items availability
   const initialAdultProvider = (() => {

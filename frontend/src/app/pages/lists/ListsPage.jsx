@@ -74,6 +74,7 @@ export default function ListsPage() {
           t={t}
           mode="create"
           existingNames={lists.map((l) => l.name)}
+          defaultIsAdult={sessionMode === 'nsfw'}
           onSave={(payload) => {
             createMutation.mutate(payload, {
               onSuccess: (newList) => {

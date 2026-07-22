@@ -16,6 +16,21 @@ class ScanMode(str, enum.Enum):
     SCENES = "scenes"
     OFFLINE = "offline"
 
+    @property
+    def profile(self):
+        from app.core.scan_profiles import ScanProfileRegistry
+        return ScanProfileRegistry.get(self.value)
+
+    @property
+    def uses_scene_pipeline(self) -> bool:
+        prof = self.profile
+        return bool(prof and prof.pipeline_type in ("scene", "offline"))
+
+    @property
+    def requires_adult_access(self) -> bool:
+        prof = self.profile
+        return bool(prof and prof.requires_adult)
+
 class MediaType(str, enum.Enum):
     """Types of media content supported by the application."""
     MOVIE = "movie"
@@ -196,5 +211,6 @@ class ExtraSubtype(str, enum.Enum):
 
 class CustomListType(str, enum.Enum):
     """Types of items allowed in a custom user list to prevent mixing."""
-    MEDIA = "media"
+    MOVIE_TV = "movie_tv"
+    VIDEO_SCENE = "video_scene"
     PERSON = "person"

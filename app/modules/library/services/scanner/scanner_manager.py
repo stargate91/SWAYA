@@ -68,9 +68,9 @@ class ScannerManager:
         logger.info(f"Starting scan for source root: {library.name} (Root: {library.root_path}, Mode: {mode.value})")
 
         pipeline = get_scan_pipeline(mode)
-        thresholds = pipeline.threshold_config()
-        min_size_mb = self._get_numeric_setting(thresholds.size_key, thresholds.default_size_mb)
-        min_duration_mins = self._get_numeric_setting(thresholds.duration_key, thresholds.default_duration_minutes)
+        profile = mode.profile
+        min_size_mb = self._get_numeric_setting(profile.size_setting_key, profile.default_min_size_mb)
+        min_duration_mins = self._get_numeric_setting(profile.duration_setting_key, profile.default_min_duration_minutes)
 
         logger.info(f"Scan settings ({mode.value}) - min_size_mb: {min_size_mb}, min_duration_mins: {min_duration_mins}")
 
@@ -87,7 +87,7 @@ class ScannerManager:
             progress_callback=progress_callback,
             provider=collector_provider,
             fs=self.fs,
-            settings_port=self.settings,
+            settings=self.settings,
         )
         
         try:

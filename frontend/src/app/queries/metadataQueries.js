@@ -94,10 +94,10 @@ export const usePersonDetailQuery = (personId, options = {}) => useQuery({
 });
 
 export const usePersonCreditsQuery = (personId, mediaType, page, pageSize, options = {}) => {
-  const { excludeKnownFor = false, source, local_only, ...queryOptions } = options;
+  const { excludeKnownFor = false, source, local_only, sort_by, ...queryOptions } = options;
   return useQuery({
-    queryKey: ['person-credits', personId, mediaType, page, pageSize, excludeKnownFor, source || null, local_only || null],
-    queryFn: () => api.people.getCredits(personId, mediaType, { page, pageSize, excludeKnownFor, source, local_only }),
+    queryKey: ['person-credits', personId, mediaType, page, pageSize, excludeKnownFor, source || null, local_only || null, sort_by || null],
+    queryFn: () => api.people.getCredits(personId, mediaType, { page, pageSize, excludeKnownFor, source, local_only, sort_by }),
     placeholderData: (previousData) => previousData,
     ...queryOptions,
   });

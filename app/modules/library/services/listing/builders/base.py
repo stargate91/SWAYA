@@ -625,7 +625,7 @@ class BaseQueryBuilder:
                 "rating": rating,
                 "rating_porndb": match.rating_porndb,
                 "rating_imdb": match.rating_imdb,
-                "type": match.media_type.value,
+                "type": match.media_type.value if hasattr(match.media_type, "value") else match.media_type,
                 "card_aspect_ratio": card_aspect,
                 "image_subfolder": image_sub,
                 "card_image_url": card_image_url,

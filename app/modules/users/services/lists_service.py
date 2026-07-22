@@ -83,7 +83,7 @@ class ListsService:
                     match = parent_show
             if match:
                 res["tmdb_id"] = self._resolve_tv_show_tmdb_id(match)
-                res["media_type"] = match.media_type.value
+                res["media_type"] = match.media_type.value if hasattr(match.media_type, "value") else match.media_type
                 res["rating"] = match.rating_imdb or match.rating_tmdb
                 from app.modules.scrapers.support.registry import ProviderRegistry
                 res["is_adult"] = bool(match.is_adult) or ProviderRegistry.is_adult_provider(match.provider)
@@ -113,7 +113,7 @@ class ListsService:
                 if parent_show:
                     match = parent_show
             res["tmdb_id"] = self._resolve_tv_show_tmdb_id(match)
-            res["media_type"] = match.media_type.value
+            res["media_type"] = match.media_type.value if hasattr(match.media_type, "value") else match.media_type
             res["rating"] = match.rating_imdb or match.rating_tmdb
             from app.modules.scrapers.support.registry import ProviderRegistry
             res["is_adult"] = bool(match.is_adult) or ProviderRegistry.is_adult_provider(match.provider)
@@ -276,7 +276,7 @@ class ListsService:
             watchlist = CustomList(
                 name="Watchlist",
                 description="Your go-to space for everything you want to watch later.",
-                list_type=CustomListType.MEDIA,
+                list_type=CustomListType.MOVIE_TV,
                 color="#3b82f6"
             )
             self.db.add(watchlist)
@@ -322,6 +322,7 @@ class ListsService:
                 description=custom_list.description,
                 color=custom_list.color or "#3b82f6",
                 list_type=custom_list.list_type,
+                is_adult=custom_list.is_adult,
                 created_at=custom_list.created_at.isoformat() if custom_list.created_at else None,
                 item_count=item_count,
                 sample_posters=posters,
@@ -476,6 +477,7 @@ class ListsService:
             description=custom_list.description,
             color=custom_list.color,
             list_type=custom_list.list_type,
+            is_adult=custom_list.is_adult,
             created_at=custom_list.created_at.isoformat() if custom_list.created_at else None,
             items=serialized_items,
             custom_image_path=resolved_image,
@@ -486,11 +488,11 @@ class ListsService:
         name = payload.get("name", "").strip()
         description = payload.get("description", "")
         color = payload.get("color", "")
-        list_type_str = payload.get("list_type", "media")
+        list_type_str = payload.get("list_type", "movie_tv")
         try:
             list_type = CustomListType(list_type_str.lower())
         except ValueError:
-            list_type = CustomListType.MEDIA
+            list_type = CustomListType.MOVIE_TV
 
         if not name:
             raise BadRequestException("List name is required")
@@ -503,7 +505,8 @@ class ListsService:
             name=name,
             description=description,
             color=color,
-            list_type=list_type
+            list_type=list_type,
+            is_adult=bool(payload.get("is_adult", False))
         )
         self.db.add(new_list)
         self.db.commit()
@@ -515,6 +518,7 @@ class ListsService:
             description=new_list.description,
             color=new_list.color,
             list_type=new_list.list_type,
+            is_adult=new_list.is_adult,
             created_at=new_list.created_at.isoformat() if new_list.created_at else None,
             item_count=0,
             sample_posters=[],
@@ -529,6 +533,7 @@ class ListsService:
         name = payload.get("name")
         description = payload.get("description")
         color = payload.get("color")
+        is_adult = payload.get("is_adult")
 
         if name is not None:
             custom_list.name = name.strip()
@@ -536,6 +541,8 @@ class ListsService:
             custom_list.description = description
         if color is not None:
             custom_list.color = color.strip()
+        if is_adult is not None:
+            custom_list.is_adult = bool(is_adult)
         self.db.commit()
         return self.get_list_details(list_id)
 
@@ -551,10 +558,15 @@ class ListsService:
         return {"status": "success"}
 
     def add_item_to_list(self, list_id: int, payload: Dict[str, Any]) -> CustomListItemResponse:
+        from app.modules.library.models import MediaItem
+        from app.modules.metadata.models import MetadataMatch
+
         media_item_id = payload.get("media_item_id")
         tmdb_id = payload.get("tmdb_id")
         media_type = payload.get("media_type", "movie")
         provider_name = payload.get("provider")
+        person_id = payload.get("person_id")
+        match_id = payload.get("match_id")
 
         # Parse unified string IDs (e.g. "tmdb_46459" or "porndb_123")
         from app.modules.scrapers.support.registry import ProviderRegistry
@@ -590,8 +602,6 @@ class ListsService:
 
         # If we have a matching provider/external_id, check if it already exists as a local MediaItem
         if external_id and not media_item_id:
-            from app.modules.library.models import MediaItem
-            from app.modules.metadata.models import MetadataMatch
             local_item = self.db.query(MediaItem).join(MediaItem.matches).filter(
                 MetadataMatch.provider == provider,
                 MetadataMatch.external_id == str(external_id)
@@ -603,9 +613,57 @@ class ListsService:
         if not custom_list:
             raise NotFoundException("Not found")
 
-        match_id = None
-        if external_id:
-            from app.modules.metadata.models import MetadataMatch
+        # Check list type constraints
+        if custom_list.list_type == CustomListType.PERSON or custom_list.list_type == CustomListType.PERSON.value:
+            if not person_id:
+                raise BadRequestException("This list only accepts people/performers.")
+        elif custom_list.list_type == CustomListType.MOVIE_TV or custom_list.list_type == CustomListType.MOVIE_TV.value:
+            if person_id:
+                raise BadRequestException("Cannot add a person to a media list.")
+            from app.core.enums import MediaType
+            resolved_type = None
+            if match_id:
+                m_obj = self.db.query(MetadataMatch).filter(MetadataMatch.id == match_id).first()
+                if m_obj:
+                    resolved_type = m_obj.media_type
+            elif media_item_id:
+                med_item = self.db.query(MediaItem).filter(MediaItem.id == media_item_id).first()
+                if med_item and med_item.matches:
+                    resolved_type = med_item.matches[0].media_type
+            
+            if not resolved_type and media_type:
+                try:
+                    resolved_type = MediaType(media_type.lower())
+                except ValueError:
+                    pass
+            
+            if resolved_type and resolved_type not in (MediaType.MOVIE, MediaType.TV, MediaType.EPISODE, MediaType.SEASON, MediaType.VIDEO):
+                raise BadRequestException("This list only accepts movies, TV shows, and videos.")
+                
+        elif custom_list.list_type == CustomListType.VIDEO_SCENE or custom_list.list_type == CustomListType.VIDEO_SCENE.value:
+            if person_id:
+                raise BadRequestException("Cannot add a person to a media list.")
+            from app.core.enums import MediaType
+            resolved_type = None
+            if match_id:
+                m_obj = self.db.query(MetadataMatch).filter(MetadataMatch.id == match_id).first()
+                if m_obj:
+                    resolved_type = m_obj.media_type
+            elif media_item_id:
+                med_item = self.db.query(MediaItem).filter(MediaItem.id == media_item_id).first()
+                if med_item and med_item.matches:
+                    resolved_type = med_item.matches[0].media_type
+            
+            if not resolved_type and media_type:
+                try:
+                    resolved_type = MediaType(media_type.lower())
+                except ValueError:
+                    pass
+            
+            if resolved_type and resolved_type not in (MediaType.SCENE, MediaType.VIDEO):
+                raise BadRequestException("This list only accepts videos and scenes.")
+
+        if not match_id and external_id:
             from datetime import datetime
             # Use robust deduplicated lookup for adult scenes
             from app.modules.scrapers.support.registry import ProviderRegistry
@@ -735,6 +793,28 @@ class ListsService:
                 except Exception as e:
                     logger.error(f"Failed to dynamically import person {person_id} for custom list: {e}")
                     raise BadRequestException(f"Failed to import performer: {str(e)}")
+
+        # Ensure item adult status matches list adult status
+        is_item_adult = False
+        if person_id:
+            from app.modules.people.models import Person
+            p_obj = self.db.query(Person).filter(Person.id == person_id).first()
+            is_item_adult = bool(p_obj and p_obj.is_adult)
+        elif match_id:
+            from app.modules.metadata.models import MetadataMatch
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            m_obj = self.db.query(MetadataMatch).filter(MetadataMatch.id == match_id).first()
+            if m_obj:
+                is_item_adult = bool(m_obj.is_adult or ProviderRegistry.is_adult_provider(m_obj.provider))
+        elif media_item_id:
+            from app.modules.library.models import MediaItem
+            from app.modules.scrapers.support.registry import ProviderRegistry
+            med_item = self.db.query(MediaItem).filter(MediaItem.id == media_item_id).first()
+            if med_item and med_item.matches:
+                is_item_adult = bool(med_item.matches[0].is_adult or ProviderRegistry.is_adult_provider(med_item.matches[0].provider))
+        
+        if custom_list.is_adult != is_item_adult:
+            raise BadRequestException("Cannot mix SFW and NSFW items in a custom list.")
 
         # Check if already exists
         exists_query = self.db.query(CustomListItem).filter(CustomListItem.list_id == list_id)
@@ -920,7 +1000,7 @@ class ListsService:
                 items_list.append({
                     "id": item.id,
                     "title": item.filename,
-                    "media_type": match.media_type.value if match else "movie",
+                    "media_type": (match.media_type.value if hasattr(match.media_type, "value") else match.media_type) if match else "movie",
                     "user_rating": override.user_rating if override else 0,
                     "is_favorite": override.is_favorite if override else False,
                 })

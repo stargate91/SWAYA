@@ -91,7 +91,7 @@ class CustomListCreate(BaseSchema):
     user_id: int
     name: str
     description: Optional[str] = None
-    list_type: CustomListType = CustomListType.MEDIA
+    list_type: CustomListType = CustomListType.MOVIE_TV
     is_adult: bool = False
     color: Optional[str] = None
 
@@ -292,7 +292,8 @@ class CustomListResponse(BaseModel):
     is_watchlist: bool
     description: Optional[str] = None
     color: str
-    list_type: CustomListType = CustomListType.MEDIA
+    list_type: CustomListType = CustomListType.MOVIE_TV
+    is_adult: bool = False
     created_at: Optional[str] = None
     item_count: int
     sample_posters: List[str]
@@ -305,7 +306,8 @@ class CustomListDetailResponse(BaseModel):
     is_watchlist: bool
     description: Optional[str] = None
     color: Optional[str] = None
-    list_type: CustomListType = CustomListType.MEDIA
+    list_type: CustomListType = CustomListType.MOVIE_TV
+    is_adult: bool = False
     created_at: Optional[str] = None
     items: List[CustomListItemResponse]
     custom_image_path: Optional[str] = None

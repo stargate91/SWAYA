@@ -72,7 +72,8 @@ class LibraryContentService:
             filter_conds.append(MetadataMatch.media_type == MediaType.VIDEO)
         else:
             types = [MediaType.MOVIE, MediaType.EPISODE]
-            types.extend([x for x in MediaType if x.is_adult])
+            if include_adult:
+                types.extend([x for x in MediaType if x.is_adult])
             filter_conds.append(MetadataMatch.media_type.in_(types))
             
         recent_matches = self.db.query(
@@ -272,10 +273,13 @@ class LibraryContentService:
             
         offset = (page - 1) * limit
         
-        query = self.db.query(Person).filter(
-            Person.is_active,
-            Person.is_adult == include_adult
-        )
+        query = self.db.query(Person).filter(Person.is_active)
+        if not include_adult:
+            query = query.filter(
+                Person.is_adult == False
+            )
+        else:
+            query = query.filter(Person.is_adult == True)
         
         effective_gender = gender
         if effective_gender is None and include_adult:

@@ -45,25 +45,15 @@ export default function useRecentlyActivePeople() {
     }
   };
 
-  const filteredPeople = useMemo(() => {
-    const list = paginatedData?.pages ? paginatedData.pages.flat() : [];
-    return list.filter((p) => {
-      if (sessionMode === 'sfw') {
-        const isAdult = p.is_adult || p.adult || p.known_for_department?.toLowerCase() === 'performer';
-        return !isAdult;
-      }
-      return true;
-    });
-  }, [paginatedData, sessionMode]);
-
-  const isLoading = isRecsLoading || isPeopleLoading;
-
   const items = useMemo(() => {
-    return filteredPeople.map(p => ({
+    const list = paginatedData?.pages ? paginatedData.pages.flat() : [];
+    return list.map(p => ({
       ...p,
       media_type: 'person'
     }));
-  }, [filteredPeople]);
+  }, [paginatedData]);
+
+  const isLoading = isRecsLoading || isPeopleLoading;
 
   return {
     includeAdult,

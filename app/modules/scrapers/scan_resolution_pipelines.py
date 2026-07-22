@@ -172,7 +172,8 @@ def get_scan_resolution_pipeline(
     resolver: Optional[Any] = None,
     enricher: Optional[Any] = None
 ):
-    if mode == ScanMode.OFFLINE:
+    profile = mode.profile
+    if profile.pipeline_type == "offline":
         return OfflineScanResolutionPipeline(
             db_session,
             mode=mode,
@@ -181,7 +182,7 @@ def get_scan_resolution_pipeline(
             media_resolver=media_resolver,
             resolver=resolver
         )
-    if mode == ScanMode.SCENES:
+    if profile.pipeline_type == "scene":
         return ScenesScanResolutionPipeline(
             db_session,
             mode=mode,

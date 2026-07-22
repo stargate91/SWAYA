@@ -35,7 +35,8 @@ class ScraperPersister:
         from app.modules.metadata.services.metadata_service import MetadataService
         from app.modules.people.services.person_service import PersonService
         from app.modules.tasks.image_download_service import ImageDownloadService
-        self.metadata_repo = metadata_repo or MetadataService(db)
+        from app.modules.scrapers.support.gateway import scraper_gateway
+        self.metadata_repo = metadata_repo or MetadataService(db, scraper_gateway)
         self.people_repo = people_repo or PersonService(db)
         self.image_downloader = image_downloader or ImageDownloadService()
 

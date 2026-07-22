@@ -124,10 +124,10 @@ class MetadataService:
         if studio:
             return studio
         for obj in self.db.new:
-            if isinstance(obj, StudioAlias) and obj.name and obj.name.lower() == cleaned_name.lower():
+            if isinstance(obj, StudioAlias) and obj.alias_name and obj.alias_name.lower() == cleaned_name.lower():
                 return obj.studio
         alias = self.db.query(StudioAlias).filter(
-            func.lower(StudioAlias.name) == func.lower(cleaned_name)
+            func.lower(StudioAlias.alias_name) == func.lower(cleaned_name)
         ).first()
         return alias.studio if alias else None
 
@@ -154,30 +154,30 @@ class MetadataService:
     def get_localization(self, match_id: int, language: str) -> Optional[Any]:
         for obj in self.db.new:
             if isinstance(obj, MetadataLocalization):
-                if obj.match_id == match_id and obj.language == language:
+                if obj.match_id == match_id and obj.locale == language:
                     return obj
         return self.db.query(MetadataLocalization).filter(
             MetadataLocalization.match_id == match_id,
-            MetadataLocalization.language == language
+            MetadataLocalization.locale == language
         ).first()
 
     def create_localization(self, match_id: int, language: str) -> Any:
-        loc = MetadataLocalization(match_id=match_id, language=language)
+        loc = MetadataLocalization(match_id=match_id, locale=language)
         self.db.add(loc)
         return loc
 
     def get_collection_localization(self, collection_id: int, language: str) -> Optional[Any]:
         for obj in self.db.new:
             if isinstance(obj, MediaCollectionLocalization):
-                if obj.collection_id == collection_id and obj.language == language:
+                if obj.collection_id == collection_id and obj.locale == language:
                     return obj
         return self.db.query(MediaCollectionLocalization).filter(
             MediaCollectionLocalization.collection_id == collection_id,
-            MediaCollectionLocalization.language == language
+            MediaCollectionLocalization.locale == language
         ).first()
 
     def create_collection_localization(self, collection_id: int, language: str) -> Any:
-        loc = MediaCollectionLocalization(collection_id=collection_id, language=language)
+        loc = MediaCollectionLocalization(collection_id=collection_id, locale=language)
         self.db.add(loc)
         return loc
 

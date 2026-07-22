@@ -16,12 +16,19 @@ export default function useListsAddDrawer({
 
   const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
   const [prevSessionMode, setPrevSessionMode] = useState(sessionMode);
+  const [prevActiveListId, setPrevActiveListId] = useState(null);
 
-  if (isOpen !== prevIsOpen || sessionMode !== prevSessionMode) {
+  if (isOpen !== prevIsOpen || sessionMode !== prevSessionMode || (activeList && activeList.id !== prevActiveListId)) {
     setPrevIsOpen(isOpen);
     setPrevSessionMode(sessionMode);
+    if (activeList) {
+      setPrevActiveListId(activeList.id);
+    }
     if (isOpen) {
       setIsAdultActive(sessionMode === 'nsfw');
+      if (activeList) {
+        setMediaType(activeList.list_type === 'video_scene' ? 'scene' : 'movie');
+      }
     }
   }
 

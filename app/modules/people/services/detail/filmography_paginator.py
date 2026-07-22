@@ -11,7 +11,7 @@ class FilmographyPaginator:
         self.tmdb = tmdb
         self.filmography_service = filmography_service
 
-    def get_person_movies(self, person: Person, page: int = 1, page_size: int = 12, source: Optional[str] = None, local_only: bool = False) -> PersonFilmographyResponse:
+    def get_person_movies(self, person: Person, page: int = 1, page_size: int = 12, source: Optional[str] = None, local_only: bool = False, sort_by: Optional[str] = None) -> PersonFilmographyResponse:
         person_id = person.id
         ext_ids = person.external_ids or {}
         tmdb_id = ext_ids.get("tmdb") or ext_ids.get("tmdb_id")
@@ -24,7 +24,7 @@ class FilmographyPaginator:
             tmdb_id = person_id
 
         if local_only or (source and source.lower() != "tmdb"):
-            res = self.filmography_service.get_person_movies(person_id, page, page_size, source, local_only=local_only)
+            res = self.filmography_service.get_person_movies(person_id, page, page_size, source, local_only=local_only, sort_by=sort_by)
             return PersonFilmographyResponse(**res)
 
         movies, _, _, _ = self.filmography_service.get_combined_filmography(
@@ -34,7 +34,8 @@ class FilmographyPaginator:
             tmdb_client=self.tmdb,
             is_adult=person.is_adult,
             known_for_department=person.known_for_department,
-            person_name=person.name
+            person_name=person.name,
+            sort_by=sort_by
         )
 
         total_items = len(movies)
@@ -51,10 +52,10 @@ class FilmographyPaginator:
         }
         return PersonFilmographyResponse(**res)
 
-    def get_person_tv(self, person: Person, page: int = 1, page_size: int = 12, local_only: bool = False) -> PersonFilmographyResponse:
+    def get_person_tv(self, person: Person, page: int = 1, page_size: int = 12, local_only: bool = False, sort_by: Optional[str] = None) -> PersonFilmographyResponse:
         person_id = person.id
         if local_only:
-            res = self.filmography_service.get_person_tv(person_id, page, page_size)
+            res = self.filmography_service.get_person_tv(person_id, page, page_size, sort_by=sort_by)
             return PersonFilmographyResponse(**res)
 
         ext_ids = person.external_ids or {}
@@ -74,7 +75,8 @@ class FilmographyPaginator:
             tmdb_client=self.tmdb,
             is_adult=person.is_adult,
             known_for_department=person.known_for_department,
-            person_name=person.name
+            person_name=person.name,
+            sort_by=sort_by
         )
         
         total_items = len(tv)

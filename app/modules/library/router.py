@@ -23,6 +23,7 @@ from app.modules.library.schemas import (
     CollectionDetailResponse,
     LibraryTagsResponse,
     TagItem,
+    NextEpisodeResponse,
 )
 from app.modules.people.schemas import PeopleGroupItem
 from app.modules.library.services.library_stats_service import LibraryStatsService
@@ -407,6 +408,21 @@ def get_library_tv_season_detail(
     scrapers: Any = Depends(get_scraper_gateway)
 ):
     return TvDetailService(db, scrapers).get_library_tv_season_detail(tv_tmdb_id, season_number)
+
+
+@library_router.get("/library/tv/{tv_tmdb_id}/next-episode", response_model=NextEpisodeResponse)
+def get_library_tv_next_episode(
+    tv_tmdb_id: str,
+    db: Session = Depends(get_db),
+    scrapers: Any = Depends(get_scraper_gateway)
+):
+    from app.core.user_context import get_current_user_id
+    current_uid = get_current_user_id() or 1
+    next_ep = TvDetailService(db, scrapers).get_next_episode(tv_tmdb_id, current_uid)
+    if not next_ep:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="No owned episodes found for this show")
+    return next_ep
 
 
 @library_router.get("/library/collection/{collection_tmdb_id}", response_model=CollectionDetailResponse)

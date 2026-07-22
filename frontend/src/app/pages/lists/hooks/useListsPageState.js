@@ -24,7 +24,15 @@ export default function useListsPageState() {
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const { data: settings } = useSettingsQuery();
   const isAdultSettingEnabled = settings?.include_adult === true || settings?.include_adult === 'true';
-  const { data: lists = [], isLoading } = useListsQuery(isAdultSettingEnabled);
+  const { data: rawLists = [], isLoading } = useListsQuery(isAdultSettingEnabled);
+
+  const lists = useMemo(() => {
+    return rawLists.filter((l) => {
+      if (l.is_watchlist) return true;
+      const isAdultList = !!l.is_adult;
+      return sessionMode === 'nsfw' ? isAdultList : !isAdultList;
+    });
+  }, [rawLists, sessionMode]);
 
   const createMutation = useCreateListMutation();
   const updateMutation = useUpdateListMutation();
@@ -115,7 +123,10 @@ export default function useListsPageState() {
           name: listName,
           description: data.description || '',
           color: data.color || 'var(--color-accent-blue)',
-          list_type: data.list_type || 'media'
+          list_type: data.list_type === 'media' || !data.list_type
+            ? (data.is_adult ? 'video_scene' : 'movie_tv')
+            : data.list_type,
+          is_adult: !!data.is_adult
         });
 
         if (data.items && Array.isArray(data.items)) {
@@ -163,7 +174,9 @@ export default function useListsPageState() {
         name: listToExport.name,
         description: listToExport.description || '',
         color: listToExport.color || 'var(--color-accent-blue)',
-        list_type: listToExport.list_type || 'media',
+        list_type: listToExport.list_type === 'media'
+          ? (listToExport.is_adult ? 'video_scene' : 'movie_tv')
+          : listToExport.list_type,
         items: items.map((item) => ({
           media_item_id: item.media_item_id,
           tmdb_id: item.tmdb_id,

@@ -17,6 +17,7 @@ class PerformerPersister:
     def __init__(self, db: Session, image_downloader: Any):
         self.db = db
         self.image_downloader = image_downloader
+        self.people_repo = PersonService(db)
 
     def _local_image_exists(self, path: Optional[str], subfolder: str) -> bool:
         return bool(path and path.startswith(f"{subfolder}/"))

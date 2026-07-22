@@ -279,7 +279,9 @@ class AdultDiscoveryService:
             img_width = images[0].get("width") if images else None
             img_height = images[0].get("height") if images else None
             
-            resolved_img = image_processing_service.resolve_image_url(poster_url, "posters") if poster_url else None
+            resolved_img = image_processing_service.resolve_image_url(poster_url, "scene_stills") if poster_url else None
+            if not resolved_img:
+                continue
             
             studio_name = s.get("studio", {}).get("name") if s.get("studio") else None
             

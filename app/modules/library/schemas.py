@@ -370,3 +370,12 @@ class MovieCollectionsResponse(BaseModel):
     page: int
     page_size: Optional[int] = None
     total_pages: int
+
+
+class NextEpisodeResponse(BaseModel):
+    id: Optional[str] = None
+    media_item_id: Optional[int] = None
+    season_number: Optional[int] = None
+    episode_number: Optional[int] = None
+    title: Optional[str] = None
+
