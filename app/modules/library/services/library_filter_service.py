@@ -524,10 +524,19 @@ class LibraryFilterService:
                 Person.profile_path != ""
             ).limit(3).all()
 
-            match_previews = self.db.query(MetadataMatch.media_type, MetadataMatch.poster_path, MetadataMatch.backdrop_path, MetadataMatch.still_path, MetadataMatch.local_backdrop_path, MetadataMatch.local_still_path).join(
+            match_previews = self.db.query(
+                MetadataMatch.media_type,
+                MetadataLocalization.poster_path,
+                MetadataMatch.backdrop_path,
+                MetadataMatch.still_path,
+                MetadataMatch.local_backdrop_path,
+                MetadataMatch.local_still_path
+            ).join(
                 UserOverride, UserOverride.metadata_match_id == MetadataMatch.id
             ).join(
                 user_override_tags, user_override_tags.c.user_override_id == UserOverride.id
+            ).outerjoin(
+                MetadataLocalization, MetadataLocalization.match_id == MetadataMatch.id
             ).filter(
                 user_override_tags.c.tag_id == t.id,
                 MetadataMatch.is_adult == is_adult

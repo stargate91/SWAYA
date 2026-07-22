@@ -53,7 +53,7 @@ class OrganizerHelper:
         if normalized_filter == "scenes":
             return normalized_item == "scenes"
         if normalized_filter == "movies_tv":
-            return normalized_item in {"", "movies_tv", "porndb_movie"}
+            return normalized_item in {"", "movies_tv"}
         return normalized_item == normalized_filter
 
     @staticmethod
@@ -63,7 +63,7 @@ class OrganizerHelper:
         item_scan_mode = (item.parsed_info or {}).get("scan_mode") or ""
         normalized_item = str(item_scan_mode).strip().lower()
         
-        if normalized_item in {"scenes", "porndb_movie"}:
+        if normalized_item == "scenes":
             is_adult = True
         else:
             active_match = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)

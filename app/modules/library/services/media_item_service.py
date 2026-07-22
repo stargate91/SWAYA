@@ -704,7 +704,7 @@ class MediaItemService:
             if scan_mode == ScanMode.SCENES:
                 match = (item_scan_mode == "scenes")
             elif scan_mode == ScanMode.MOVIES_TV:
-                match = (item_scan_mode in {"", "movies_tv", "porndb_movie"})
+                match = (item_scan_mode in {"", "movies_tv"})
             else:
                 match = (item_scan_mode == scan_mode.value)
             

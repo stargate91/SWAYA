@@ -165,7 +165,7 @@ class OrganizerGroupsBuilder:
                 self._parent_scan_modes = parent_scan_modes
             parent_scan_modes[item.id] = item_scan_mode
             
-            if item_scan_mode in {"scenes", "porndb_movie"}:
+            if item_scan_mode == "scenes":
                 item_is_adult = True
             else:
                 active_match = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
@@ -282,7 +282,7 @@ class OrganizerGroupsBuilder:
                 parent_statuses[parent.id] = parent.status.value
                 p_scan_mode = str((parent.parsed_info or {}).get("scan_mode") or "").lower()
                 parent_scan_modes[parent.id] = p_scan_mode
-                if p_scan_mode in {"scenes", "porndb_movie"}:
+                if p_scan_mode == "scenes":
                     p_is_adult = True
                 else:
                     active_match = next((m for m in parent.matches if m.is_active), None) or next((m for m in parent.matches), None)

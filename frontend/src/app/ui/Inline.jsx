@@ -8,6 +8,7 @@ export default function Inline({
   flex,
   fullWidth,
   fullHeight,
+  wrap,
   className = '',
   children,
   ...props
@@ -20,6 +21,7 @@ export default function Inline({
     flex === 1 && styles['flex-1'],
     fullWidth && styles['full-width'],
     fullHeight && styles['full-height'],
+    wrap === false && styles.nowrap,
     className
   ].filter(Boolean).join(' ');
 
@@ -37,6 +39,7 @@ Inline.propTypes = {
   flex: PropTypes.number,
   fullWidth: PropTypes.bool,
   fullHeight: PropTypes.bool,
+  wrap: PropTypes.bool,
   className: PropTypes.string,
   children: PropTypes.node,
 };

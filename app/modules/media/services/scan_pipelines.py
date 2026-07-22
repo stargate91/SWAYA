@@ -3,7 +3,6 @@ from app.modules.library.services.scanner.scan_pipelines import (
     BaseScanPipeline,
     MainstreamScanPipeline,
     ScenesScanPipeline,
-    PornDbMovieScanPipeline,
 )
 
 __all__ = [
@@ -11,5 +10,4 @@ __all__ = [
     "BaseScanPipeline",
     "MainstreamScanPipeline",
     "ScenesScanPipeline",
-    "PornDbMovieScanPipeline",
 ]

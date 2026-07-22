@@ -45,7 +45,6 @@ export default function OrganizerOverrideModalContent({ row, onClose, toast, sca
     const itemScanMode = item.scan_mode || '';
     return item.matches?.some((m) => m.is_adult)
       || String(item.type).toLowerCase() === 'scene'
-      || itemScanMode === 'porndb_movie'
       || itemScanMode === 'scenes';
   };
 

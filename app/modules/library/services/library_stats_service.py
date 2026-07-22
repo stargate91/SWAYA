@@ -33,7 +33,7 @@ class LibraryStatsService:
         library_statuses = [ItemStatus.ORGANIZED, ItemStatus.RENAMED]
 
         # 1. Total storage size (sum of file size on organized library items)
-        storage_bytes = self.db.query(func.sum(MediaItem.file_size)).filter(
+        storage_bytes = self.db.query(func.sum(MediaItem.size)).filter(
             MediaItem.status.in_(library_statuses)
         ).scalar() or 0
         storage_str = self._format_size(storage_bytes)
@@ -147,7 +147,7 @@ class LibraryStatsService:
         for item in unmatched_items:
             # Check if item is adult
             item_scan_mode = (item.parsed_info or {}).get("scan_mode") or ""
-            if str(item_scan_mode).strip().lower() in {"scenes", "porndb_movie"}:
+            if str(item_scan_mode).strip().lower() == "scenes":
                 is_adult = True
             else:
                 active_match = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
