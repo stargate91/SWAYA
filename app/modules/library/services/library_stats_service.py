@@ -112,7 +112,7 @@ class LibraryStatsService:
                     is_adult_item = True
                 if m.media_type in (MediaType.TV, MediaType.EPISODE):
                     is_tv = True
-                elif m.media_type.is_adult:
+                elif MediaType.is_adult_type(m.media_type):
                     is_scene = True
 
             if include_adult:
@@ -194,7 +194,7 @@ class LibraryStatsService:
 
             if m.media_type == MediaType.MOVIE:
                 unique_matches.append(m)
-            elif m.media_type.is_adult:
+            elif MediaType.is_adult_type(m.media_type):
                 unique_matches.append(m)
             elif m.media_type == MediaType.EPISODE:
                 tv_match = None

@@ -30,6 +30,7 @@ export const RecommendationCarousel = ({
   onPlayClick,
   playMutationPending,
   headerActions = null,
+  showWatchlist = true,
 }) => {
   const { t: T } = useTranslation();
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
@@ -130,7 +131,7 @@ export const RecommendationCarousel = ({
                     : null
                 }
               >
-                {!n.isPerson && (
+                {!n.isPerson && showWatchlist && (
                   <Button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -138,7 +139,7 @@ export const RecommendationCarousel = ({
                       onWatchlist(item, type);
                     }}
                     className={posterCardStyles['action-btn']}
-                    variant={isWatchlisted ? 'success' : 'glass'}
+                    variant="glass"
                     aria-pressed={isWatchlisted}
                     destructiveHover={true}
                     size="sm"

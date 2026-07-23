@@ -330,7 +330,7 @@ class MediaItemService:
             "id": item.id,
             "filename": item.filename,
             "current_path": item.current_path,
-            "item_type": item.matches[0].media_type.value if item.matches else None,
+            "item_type": (item.matches[0].media_type.value if hasattr(item.matches[0].media_type, "value") else item.matches[0].media_type) if item.matches else None,
             "status": item.status.value,
             "ignored_at": item.ignored_at.isoformat() if item.ignored_at else None,
         } for item in items]

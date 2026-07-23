@@ -14,6 +14,7 @@ let mpvProcess = null;
 let mpvSocket = null;
 let mpvSocketPath = null;
 let isPip = false;
+let isTogglingPip = false;
 let lastPipBounds = null;
 let latestMpvProperties = {};
 let isOpeningMpv = false;
@@ -200,7 +201,7 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
 
     // Transition to minimized/mini-player mode when focus is lost (e.g., Alt-Tab out)
     controlsWindow.on('blur', () => {
-      if (isPip) return;
+      if (isPip || isTogglingPip) return;
       if (mpvPlayerWindow && !mpvPlayerWindow.isDestroyed() && !mpvPlayerWindow.isMinimized()) {
         mpvPlayerWindow.setAlwaysOnTop(false);
         mpvPlayerWindow.minimize();
@@ -494,6 +495,7 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
     const primaryDisplay = screen.getPrimaryDisplay();
     const { width, height } = primaryDisplay.bounds;
 
+    isTogglingPip = true;
     isPip = enable;
 
     if (isPip) {
@@ -550,6 +552,10 @@ export function setupMpvPlayer(mainWindow, isDev, writeElectronLog) {
         mainWindow.webContents.send('player-state-update', { event: 'pip-change', isPip: false });
       }
     }
+
+    setTimeout(() => {
+      isTogglingPip = false;
+    }, 500);
   }
 
   ipcMain.on('mpv-toggle-pip', () => {

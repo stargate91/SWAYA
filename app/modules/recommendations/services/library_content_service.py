@@ -134,14 +134,16 @@ class LibraryContentService:
             if not match:
                 continue
 
+            mtype = match.media_type.value if hasattr(match.media_type, "value") else match.media_type
+
             # Resolve parent show match for TV shows / episodes to get show-level metadata
             show_match = match
-            if match.media_type.value == "episode":
+            if mtype == "episode":
                 if match.parent and match.parent.parent:
                     show_match = match.parent.parent
                 elif match.parent:
                     show_match = match.parent
-            elif match.media_type.value == "season":
+            elif mtype == "season":
                 if match.parent:
                     show_match = match.parent
             
@@ -189,9 +191,9 @@ class LibraryContentService:
                 is_watched = True
             elif o_media and o_media.is_watched:
                 is_watched = True
-            elif match.media_type == MediaType.EPISODE:
+            elif mtype == "episode":
                 is_watched = bool(o_media and o_media.is_watched)
-            elif match.media_type == MediaType.TV or (match.media_type == MediaType.EPISODE and show_match != match):
+            elif mtype == "tv" or (mtype == "episode" and show_match != match):
                 # Count total episodes and check how many are watched
                 total_episodes_query = self.db.query(MetadataMatch.id).outerjoin(
                     season_alias, MetadataMatch.parent_id == season_alias.id
@@ -235,10 +237,10 @@ class LibraryContentService:
 
             recently_added.append({
                 "id": int(show_match.external_id) if show_match.external_id and show_match.external_id.isdigit() else item.id,
-                "tmdb_id": int(show_match.external_id) if (show_match.external_id and show_match.external_id.isdigit() and match.media_type.value in ["movie", "tv", "episode"]) else None,
+                "tmdb_id": int(show_match.external_id) if (show_match.external_id and show_match.external_id.isdigit() and mtype in ["movie", "tv", "episode"]) else None,
                 "title": title,
                 "name": title,
-                "media_type": "tv" if match.media_type == MediaType.EPISODE else match.media_type.value,
+                "media_type": "tv" if mtype == "episode" else mtype,
                 "in_library": True,
                 "media_item_id": item.id,
                 "library_item_id": item.id,

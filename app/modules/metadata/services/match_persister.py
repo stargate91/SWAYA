@@ -6,7 +6,7 @@ from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 
 from app.modules.metadata.models import MetadataMatch
-from app.core.enums import Provider
+from app.core.enums import Provider, MediaType
 from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.core.language import LanguageService
 
@@ -59,7 +59,7 @@ class MatchPersister:
             return f"{subfolder}/{filename}"
 
         asset_prefix = f"{match.provider.value if hasattr(match.provider, 'value') else match.provider}_{match.external_id}"
-        backdrop_subfolder = "scene_stills" if match.media_type.is_adult else "backdrops"
+        backdrop_subfolder = "scene_stills" if MediaType.is_adult_type(match.media_type) else "backdrops"
         match.local_backdrop_path = queue_image(match.backdrop_path, backdrop_subfolder, asset_prefix)
 
         loc = next((x for x in match.localizations if x.locale == DEFAULT_FALLBACK_LANGUAGE), None)

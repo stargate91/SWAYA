@@ -152,7 +152,7 @@ class CollectionDetailService(DetailFormatter):
                 "rating_imdb": active_match.rating_imdb,
                 "rating_tmdb": active_match.rating_tmdb,
                 "rating_porndb": active_match.rating_porndb,
-                "type": active_match.media_type.value,
+                "type": active_match.media_type.value if hasattr(active_match.media_type, "value") else active_match.media_type,
                 "path": item.current_path,
                 "in_library": True,
             })

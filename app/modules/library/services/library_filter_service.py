@@ -468,7 +468,7 @@ class LibraryFilterService:
         from app.modules.metadata.models import MetadataMatch
         from app.modules.users.models import user_override_tags, UserOverride
         from app.modules.media_assets.services.images import image_processing_service
-        from sqlalchemy import func
+        from sqlalchemy import func, or_, and_
 
         base_query = self.db.query(Tag).filter(Tag.is_adult == is_adult)
         if search:
@@ -502,7 +502,11 @@ class LibraryFilterService:
             ).scalar() or 0
 
             match_count = self.db.query(func.count(MetadataMatch.id)).join(
-                UserOverride, UserOverride.metadata_match_id == MetadataMatch.id
+                UserOverride,
+                or_(
+                    UserOverride.metadata_match_id == MetadataMatch.id,
+                    and_(UserOverride.media_item_id == MetadataMatch.media_item_id, MetadataMatch.is_active == True)
+                )
             ).join(
                 user_override_tags, user_override_tags.c.user_override_id == UserOverride.id
             ).filter(
@@ -532,7 +536,11 @@ class LibraryFilterService:
                 MetadataMatch.local_backdrop_path,
                 MetadataMatch.local_still_path
             ).join(
-                UserOverride, UserOverride.metadata_match_id == MetadataMatch.id
+                UserOverride,
+                or_(
+                    UserOverride.metadata_match_id == MetadataMatch.id,
+                    and_(UserOverride.media_item_id == MetadataMatch.media_item_id, MetadataMatch.is_active == True)
+                )
             ).join(
                 user_override_tags, user_override_tags.c.user_override_id == UserOverride.id
             ).outerjoin(
@@ -572,7 +580,7 @@ class LibraryFilterService:
                             "poster": resolved_poster,
                             "backdrop": resolved_backdrop,
                             "still": resolved_still or resolved_backdrop or resolved_poster,
-                            "kind": m_type.value
+                            "kind": m_type.value if hasattr(m_type, "value") else m_type
                         })
                     if len(sample_previews) >= 3:
                         break
@@ -783,6 +791,7 @@ class LibraryFilterService:
                     m_item = {
                         "id": item.id if item else f"{ProviderRegistry.get_config(match.provider).prefix if ProviderRegistry.get_config(match.provider) else match.provider.value.lower()}_{match.external_id}",
                         "title": title,
+                        "displayPoster": card_image_url or resolved_poster or resolved_backdrop or resolved_still,
                         "poster_path": resolved_poster,
                         "backdrop_path": resolved_backdrop,
                         "still_path": resolved_still or resolved_backdrop,

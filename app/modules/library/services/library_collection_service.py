@@ -203,7 +203,7 @@ class LibraryCollectionService:
                 "rating": rating,
                 "rating_porndb": match.rating_porndb,
                 "rating_imdb": match.rating_imdb,
-                "type": match.media_type.value,
+                "type": match.media_type.value if hasattr(match.media_type, "value") else match.media_type,
                 "tmdb_id": int(match.external_id) if match.external_id.isdigit() else 0,
                 "path": item.current_path if item else None,
                 "is_favorite": o.is_favorite if o else False,

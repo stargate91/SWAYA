@@ -89,8 +89,9 @@ const TMDBDiscoveryWidget = () => {
                       const type = item.media_type || 'movie';
                       handleWatchlist(item, type);
                     }}
-                    className={`${posterCardStyles['action-btn']} ${isWatchlisted ? '' : posterCardStyles['action-btn--neutral']}`}
-                    variant="unstyled"
+                    className={posterCardStyles['action-btn']}
+                    variant="glass"
+                    aria-pressed={isWatchlisted}
                   >
                     {isWatchlisted ? (
                       <>

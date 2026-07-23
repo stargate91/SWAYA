@@ -288,30 +288,9 @@ div.image-wrapper:focus-visible {
   left: 50%;
   transform: translateX(-50%) translateY(var(--space-xs));
   z-index: var(--z-index-step-10);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-sm);
-  border-radius: var(--radius-full);
-  border: 1px solid color-mix(in srgb, var(--color-state-success) 48%, var(--button-secondary-border));
-  background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
-  color: var(--color-state-success);
-  box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, var(--color-bg-canvas) 35%, transparent);
-  backdrop-filter: var(--glass-blur-md);
-  cursor: pointer;
   opacity: 0;
-  font-size: var(--font-size-2xs);
-  font-weight: var(--font-weight-semibold);
-  transition: opacity var(--motion-base), transform var(--motion-base), color var(--motion-base), border-color var(--motion-base), background-color var(--motion-base);
+  transition: opacity var(--motion-base), transform var(--motion-base);
   pointer-events: auto;
-  white-space: nowrap;
-}
-
-.action-btn,
-.action-btn[data-size] {
-  min-height: var(--space-2xl);
-  padding: 0 var(--space-sm);
-  gap: var(--space-xs);
 }
 
 .media-shell:hover .action-btn,
@@ -330,11 +309,6 @@ div.image-wrapper:focus-visible {
   display: none;
 }
 
-.media-shell .action-btn:hover {
-  border-color: color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border));
-  color: var(--color-state-danger);
-}
-
 .media-shell:hover .action-btn:hover:not(:disabled) {
   transform: translateX(-50%) translateY(0);
 }
@@ -347,30 +321,6 @@ div.image-wrapper:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: var(--space-sm);
-}
-
-/* Danger variant for direct remove actions (Lists, Tags) */
-.action-btn--danger {
-  border-color: color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border));
-  color: var(--color-state-danger);
-}
-
-.media-shell .action-btn--danger:hover {
-  border-color: color-mix(in srgb, var(--color-state-danger) 80%, var(--button-secondary-border));
-  background-color: color-mix(in srgb, var(--color-state-danger) 15%, var(--color-panel-translucent));
-  color: var(--color-state-danger);
-}
-
-/* Neutral variant for default action state (e.g. Add to Watchlist on Dashboard) */
-.action-btn--neutral {
-  border-color: color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border));
-  color: var(--color-accent-blue);
-}
-
-.media-shell .action-btn--neutral:hover {
-  border-color: color-mix(in srgb, var(--color-accent-blue) 80%, var(--button-secondary-border));
-  background-color: color-mix(in srgb, var(--color-accent-blue) 15%, var(--color-panel-translucent));
-  color: var(--color-text-primary);
 }
 
 .favorite-badge svg {

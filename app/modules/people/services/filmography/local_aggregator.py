@@ -64,7 +64,7 @@ class LocalCreditsAggregator:
                 "in_library": True,
             }
             
-            if match.media_type.is_adult:
+            if MediaType.is_adult_type(match.media_type):
                 scenes.append(credit_entry)
             elif match.media_type == MediaType.MOVIE:
                 from app.modules.scrapers.support.registry import ProviderRegistry

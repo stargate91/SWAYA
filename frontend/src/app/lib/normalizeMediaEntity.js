@@ -185,7 +185,9 @@ const resolveSubtitle = (item, opts = {}) => {
 const resolveShouldBlur = (item, opts = {}) => {
   const { sessionMode, isAdultContext } = opts;
   if (sessionMode === 'nsfw') return false;
-  const isAdultItem = item.should_blur_sfw !== undefined ? !!item.should_blur_sfw : (!!item.is_adult || !!item.adult || isSceneEntity(item));
+  const mt = resolveMediaType(item);
+  const isAdultScene = mt === 'scene' || mt === 'scenes';
+  const isAdultItem = item.should_blur_sfw !== undefined ? !!item.should_blur_sfw : (!!item.is_adult || !!item.adult || isAdultScene);
   return !!isAdultContext || isAdultItem;
 };
 

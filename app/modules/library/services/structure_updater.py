@@ -118,7 +118,7 @@ class StructureUpdater:
             if not old_type:
                 active_m = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
                 if active_m:
-                    old_type = active_m.media_type.value
+                    old_type = active_m.media_type.value if hasattr(active_m.media_type, "value") else active_m.media_type
                 else:
                     fn_data = parsed.get("fn") or {}
                     it_data = parsed.get("it") or {}
@@ -262,7 +262,7 @@ class StructureUpdater:
                             if not old_type:
                                 active_m = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
                                 if active_m:
-                                    old_type = active_m.media_type.value
+                                    old_type = active_m.media_type.value if hasattr(active_m.media_type, "value") else active_m.media_type
                                 else:
                                     fn_data = parsed.get("fn") or {}
                                     it_data = parsed.get("it") or {}

@@ -134,14 +134,15 @@ class PlaybackService:
             self.db.flush()
 
     def get_watched_history_logs(self, offset: int, limit: int, include_adult: bool) -> List[Any]:
-        query = self.db.query(PlaybackLog).join(MediaItem)
+        from app.modules.library.models import Library
+        query = self.db.query(PlaybackLog).join(MediaItem).join(Library)
         if not include_adult:
             active_adult_match = self.db.query(MetadataMatch.id).filter(
                 MetadataMatch.media_item_id == MediaItem.id,
                 MetadataMatch.is_active,
                 MetadataMatch.is_adult,
             ).exists()
-            query = query.filter(~active_adult_match)
+            query = query.filter(~active_adult_match).filter(Library.is_adult == False)
 
         return query.options(
             joinedload(PlaybackLog.media_item).options(

@@ -39,8 +39,11 @@ class LibraryListingService:
         """
         Retrieves the queue of items currently being watched by the user, ordered by watch date.
         """
+        from app.modules.library.models import Library
         query = self.db.query(UserOverride).join(
             MediaItem, UserOverride.media_item_id == MediaItem.id
+        ).join(
+            Library, MediaItem.library_id == Library.id
         ).outerjoin(
             MetadataMatch, (MetadataMatch.media_item_id == MediaItem.id) & (MetadataMatch.is_active)
         ).filter(
@@ -51,9 +54,14 @@ class LibraryListingService:
             joinedload(UserOverride.media_item).joinedload(MediaItem.matches).joinedload(MetadataMatch.parent).joinedload(MetadataMatch.parent).joinedload(MetadataMatch.localizations)
         )
         if include_adult:
-            query = query.filter(MetadataMatch.is_adult == True)
+            query = query.filter(
+                (Library.is_adult == True) | (MetadataMatch.is_adult == True)
+            )
         else:
-            query = query.filter((MetadataMatch.id.is_(None)) | (MetadataMatch.is_adult == False) | (MetadataMatch.is_adult.is_(None)))
+            query = query.filter(
+                (Library.is_adult == False) &
+                ((MetadataMatch.id.is_(None)) | (MetadataMatch.is_adult == False) | (MetadataMatch.is_adult.is_(None)))
+            )
 
         overrides = query.order_by(UserOverride.last_watched_at.desc()).limit(limit).all()
 
@@ -120,14 +128,14 @@ class LibraryListingService:
             rem = max(0, dur - rp) if dur > 0 else 0
 
             from app.core.episode_utils import format_episode_code
-            disp_code = format_episode_code(match.season_number, match.episode_number) if (match and match.media_type.value == "episode") else None
+            disp_code = format_episode_code(match.season_number, match.episode_number) if (match and match.media_type == MediaType.EPISODE) else None
 
             results.append(ContinueWatchingItem(
                 id=item.id,
                 title=title,
                 tv_title=tv_title,
                 episode_title=episode_title,
-                type=match.media_type.value if match else "movie",
+                type=match.media_type.value if hasattr(match.media_type, "value") else match.media_type,
                 season_number=get_first_int(match.season_number) if match else None,
                 episode_number=get_first_int(match.episode_number) if match else None,
                 tv_tmdb_id=tv_tmdb_id,

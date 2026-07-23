@@ -1,4 +1,5 @@
 import { Minus } from '@/ui/icons';
+import Button from '@/ui/Button';
 import { normalizeMediaEntity } from '@/lib/normalizeMediaEntity';
 import AdultOverlay from '@/ui/AdultOverlay';
 import { API_BASE } from '@/lib/backend';
@@ -37,9 +38,10 @@ export default function ListsCard({
   }
 
   const removeAction = (
-    <button
-      type="button"
-      className={`${posterCardStyles['action-btn']} ${posterCardStyles['action-btn--danger']}`}
+    <Button
+      className={posterCardStyles['action-btn']}
+      variant="glass"
+      aria-invalid={true}
       onClick={(e) => {
         e.stopPropagation();
         handleRemoveListItem(item.id);
@@ -47,7 +49,7 @@ export default function ListsCard({
       title={t('lists.remove_from_list') || 'Remove from list'}
     >
       <Minus size={11} strokeWidth={3.5} /> {t('common.remove') || 'Remove'}
-    </button>
+    </Button>
   );
 
   const overlay = shouldBlur ? (

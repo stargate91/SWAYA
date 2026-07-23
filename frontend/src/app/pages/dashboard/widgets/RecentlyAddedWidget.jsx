@@ -37,6 +37,7 @@ export default function RecentlyAddedWidget({ mediaType, title }) {
         settings={settings}
         onPlayClick={handlePlayClick}
         playMutationPending={playMutationPending}
+        showWatchlist={false}
       />
     </WidgetShell>
   );

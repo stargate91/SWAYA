@@ -120,14 +120,13 @@ const DashboardView = () => {
           content={t('dashboard.customize') || 'Customize Dashboard'}
           side="bottom"
         >
-          <IconButton
+          <button
+            type="button"
             onClick={() => setIsCustomizerOpen(true)}
-            variant="glass"
-            size="md-btn"
-            title={null}
+            className="media-detail-page__side-nav-toggle"
           >
             <SlidersHorizontal size={18} />
-          </IconButton>
+          </button>
         </Tooltip>
       </UtilityBarPortal>
 

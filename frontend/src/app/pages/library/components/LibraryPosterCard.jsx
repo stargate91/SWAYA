@@ -4,6 +4,7 @@ import PosterCard from '@/ui/PosterCard';
 import posterCardStyles from '@/ui/PosterCard.module.css';
 import buttonStyles from '@/ui/IconButton.module.css';
 import Text from '@/ui/Text';
+import Button from '@/ui/Button';
 import { useBulkUpdateWatchedMutation } from '@/queries';
 import {
   getPosterImagePath,
@@ -57,6 +58,7 @@ export const LibraryPosterCard = memo(({
   let ratingImdb = (isPeople || onRemove) ? undefined : (sortKey === 'rating' ? undefined : n.ratingImdb);
   let ratingTmdb = (isPeople || onRemove) ? undefined : n.ratingTmdb;
   const ratingPorndb = (isPeople || onRemove) ? undefined : item.rating_porndb;
+
   const isScene = isSceneMediaType(item.type) || isLibraryScenes;
 
   let topRightAction;
@@ -68,20 +70,22 @@ export const LibraryPosterCard = memo(({
   if (onRemove) {
     // Tag card behavior
     topRightAction = (
-      <button
-        type="button"
-        className={`${posterCardStyles['action-btn']} ${posterCardStyles['action-btn--danger']}`}
+      <Button
+        variant="glass"
+        aria-invalid={true}
+        className={posterCardStyles['action-btn']}
         title={t('common.remove') || 'Remove'}
         aria-label={t('common.remove') || 'Remove'}
+        leftIcon={<Minus size={12} strokeWidth={3} />}
         onClick={(e) => {
           e.stopPropagation();
           onRemove(item);
         }}
       >
-        <Minus size={11} strokeWidth={3.5} /> {t('common.remove') || 'Remove'}
-      </button>
+        {t('common.remove') || 'Remove'}
+      </Button>
     );
-    imageUrl = n.imageUrl;
+    imageUrl = resolvePosterUrl(n.imageUrl);
     performers = undefined;
     ratingPill = undefined;
     subtitle = undefined;
@@ -125,7 +129,7 @@ export const LibraryPosterCard = memo(({
       performers = n.performers;
 
       const displayDate = item.release_date ? item.release_date.substring(0, 10) : item.year;
-      
+
       let pillText = displayDate;
       if (sortKey === 'release_date') {
         pillText = item.release_date ? item.release_date.substring(0, 10) : item.year;

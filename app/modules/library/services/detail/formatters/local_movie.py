@@ -179,7 +179,7 @@ class LocalMovieFormatter(MovieDetailFormatter):
             "poster_path": self._resolve_img(override.custom_poster if (override and override.custom_poster) else (loc.poster_path if loc else None), "posters"),
             "backdrop_path": self._resolve_img(override.custom_backdrop if (override and override.custom_backdrop) else (active_match.backdrop_path if active_match else None), "backdrops", size="original"),
             "original_language": loc.original_language if loc else DEFAULT_FALLBACK_LANGUAGE,
-            "type": active_match.media_type.value if active_match else "movie",
+            "type": (active_match.media_type.value if hasattr(active_match.media_type, "value") else active_match.media_type) if active_match else "movie",
             "tmdb_id": int(active_match.external_id) if (active_match and active_match.provider == Provider.TMDB and active_match.external_id.isdigit()) else None,
             "imdb_id": active_match.imdb_id if active_match else None,
             "collection_data": collection_data,

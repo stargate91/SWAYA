@@ -268,13 +268,43 @@
 }
 
 .button[data-variant="glass"] {
-  min-height: auto;
+  min-height: var(--space-2xl);
+  padding: 0 var(--space-sm);
+  gap: var(--space-xs);
   border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border));
+  background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
+  color: var(--color-text-primary);
+  box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, var(--color-bg-canvas) 35%, transparent);
+  backdrop-filter: var(--glass-blur-md);
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-semibold);
-  background: var(--color-surface-glass);
-  border: 1px solid var(--color-border-default);
-  color: var(--color-text-secondary);
+  transition: opacity var(--motion-base), transform var(--motion-base), color var(--motion-base), border-color var(--motion-base), background-color var(--motion-base);
+  white-space: nowrap;
+}
+
+.button[data-variant="glass"] .icon {
+  color: var(--color-text-primary);
+}
+
+.button[data-variant="glass"]:hover:not(:disabled) .icon {
+  color: var(--color-accent-blue);
+}
+
+.button[data-variant="glass"][aria-pressed="true"] .icon {
+  color: var(--color-state-success);
+}
+
+.button[data-variant="glass"][aria-pressed="true"]:hover:not(:disabled) .icon {
+  color: var(--color-state-danger);
+}
+
+.button[data-variant="glass"][aria-invalid="true"] .icon {
+  color: var(--color-text-primary);
+}
+
+.button[data-variant="glass"][aria-invalid="true"]:hover:not(:disabled) .icon {
+  color: var(--color-state-danger);
 }
 
 .button[data-variant="glass"][data-size="sm"] {
@@ -282,17 +312,38 @@
 }
 
 .button[data-variant="glass"]:hover:not(:disabled) {
-  background: var(--color-surface-glass-strong);
-  border-color: var(--color-border-strong);
-  color: var(--color-text-primary);
+  border-color: color-mix(in srgb, var(--color-accent-blue) 80%, var(--button-secondary-border));
+  background-color: color-mix(in srgb, var(--color-accent-blue) 15%, var(--color-panel-translucent));
+  color: var(--color-accent-blue);
   transform: none;
 }
 
 .button[data-variant="glass"][aria-pressed="true"] {
-  background: color-mix(in srgb, var(--color-accent) 15%, var(--color-surface-overlay));
-  border-color: var(--color-accent);
-  color: var(--color-accent);
-  box-shadow: 0 2px 0.5rem color-mix(in srgb, var(--color-accent) 20%, transparent);
+  border-color: color-mix(in srgb, var(--color-state-success) 48%, var(--button-secondary-border));
+  background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
+  color: var(--color-state-success);
+  box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, var(--color-bg-canvas) 35%, transparent);
+}
+
+.button[data-variant="glass"][aria-pressed="true"]:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border));
+  background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
+  color: var(--color-state-danger);
+  transform: none;
+}
+
+.button[data-variant="glass"][aria-invalid="true"] {
+  border-color: color-mix(in srgb, var(--color-state-danger) 48%, var(--button-secondary-border));
+  background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
+  color: var(--color-text-primary);
+  box-shadow: 0 var(--space-xs) var(--space-md) color-mix(in srgb, var(--color-bg-canvas) 35%, transparent);
+}
+
+.button[data-variant="glass"][aria-invalid="true"]:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--color-state-danger) 80%, var(--button-secondary-border));
+  background-color: color-mix(in srgb, var(--color-state-danger) 15%, var(--color-panel-translucent));
+  color: var(--color-state-danger);
+  transform: none;
 }
 
 .button:hover:not(:disabled) .icon {

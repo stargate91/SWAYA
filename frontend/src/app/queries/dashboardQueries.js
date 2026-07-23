@@ -5,6 +5,7 @@ import { QK } from '../lib/queryKeys';
 export const useContinueWatchingQuery = (params) => useQuery({
   queryKey: ['continue-watching', params],
   queryFn: () => api.library.getContinueWatching(params),
+  staleTime: 30000,
 });
 
 export const useRecommendationsQuery = (language, includeAdult, adultTagBlacklist) => useQuery({

@@ -80,8 +80,8 @@ export default function WatchedHistoryList({
   return (
     <div className={styles['list-container']}>
       {watchedHistory.map((log, index) => {
-        const isSingle = log.type === 'movie' || log.type === 'scene';
-        const isScene = log.type === 'scene';
+        const isSingle = log.type !== 'episode';
+        const isScene = log.type === 'scene' || log.type === 'video';
         const poster = isScene
           ? (log.backdrop_path || log.poster_path)
           : (isSingle ? log.poster_path : (log.tv_poster_path || log.poster_path));
