@@ -28,6 +28,8 @@ export default function ImagePickerDrawer({
       size="md"
       className={className}
       variant={variant}
+      padded
+      hasBackdrop={false}
     >
       {isOpen && (
         <div className="entity-detail-page__drawer-content">

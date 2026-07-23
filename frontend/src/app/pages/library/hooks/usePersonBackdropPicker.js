@@ -7,8 +7,6 @@ import { isTvLikeMediaType } from '@/lib/mediaTypes';
 import {
   mergeBackdropCreditPages,
   normalizeBackdropKey,
-  prioritizePersonCredits,
-  sortBackdropCredits,
 } from '../utils/personCreditsUtils';
 import { checkImageResolution } from '../utils/personBackdropUtils';
 import useImagePicker from './useImagePicker';

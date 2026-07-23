@@ -1,6 +1,5 @@
 import { SlidersHorizontal } from '@/ui/icons';
 import UtilityBarPortal from '../../../components/UtilityBarPortal';
-import IconButton from '@/ui/IconButton';
 import Tooltip from '@/ui/Tooltip';
 import ContinueWatchingWidget from './widgets/ContinueWatchingWidget';
 import SpotlightWidget from './widgets/SpotlightWidget';

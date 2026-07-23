@@ -48,7 +48,6 @@ export function useOrganizerPageState({ t, scanMode, sessionMode }) {
 
   const {
     dismissedRowIds,
-    setDismissedRowIds,
     dismissRows,
     restoreDismissedRows,
     dismissedCount,
@@ -96,11 +95,13 @@ export function useOrganizerPageState({ t, scanMode, sessionMode }) {
   
   const organizer = organizerQuery.data || { items: [], total_items: 0, tab_counts: {} };
 
-  // Sync totalItems state when query resolves
   const fetchedTotalItems = organizer.total_items || 0;
-  useEffect(() => {
+  const [prevFetchedTotalItems, setPrevFetchedTotalItems] = useState(0);
+
+  if (fetchedTotalItems !== prevFetchedTotalItems) {
+    setPrevFetchedTotalItems(fetchedTotalItems);
     setTotalItems(fetchedTotalItems);
-  }, [fetchedTotalItems]);
+  }
 
   const tabCounts = useMemo(() => {
     const counts = organizer.tab_counts || {};
@@ -204,7 +205,7 @@ export function useOrganizerPageState({ t, scanMode, sessionMode }) {
     if (!allowedManualTabs.includes(activeManualTab)) {
       setActiveManualTab(allowedManualTabs[0]);
     }
-  }, [activeMainTab, activeManualTab, scanMode, setActiveMainTab, setActiveManualTab]);
+  }, [activeMainTab, activeManualTab, scanMode, sessionMode, setActiveMainTab, setActiveManualTab]);
 
   return {
     dismissRows,

@@ -16,7 +16,7 @@ class RecommendationWatchlistService:
         self.lists_service = ListsService(db)
 
     def fetch_watchlist_ids(self) -> List[Union[int, str]]:
-        watchlists = self.db.query(CustomList).filter(CustomList.name.in_(["Watchlist", "NSFW Watchlist"])).all()
+        watchlists = self.db.query(CustomList).filter(CustomList.name.in_(["Watchlist", "NSFW Watchlist", "NSFW Movie/TV Watchlist"])).all()
         ids = []
         for wl in watchlists:
             for item in wl.items:
@@ -55,7 +55,13 @@ class RecommendationWatchlistService:
                 from app.core.enums import MediaType
                 is_adult = any(MediaType.is_adult_type(m.media_type) for m in item.matches)
 
-        target_watchlist_name = "NSFW Watchlist" if is_adult else "Watchlist"
+        if is_adult:
+            if media_type and str(media_type).lower() in ("movie", "tv"):
+                target_watchlist_name = "NSFW Movie/TV Watchlist"
+            else:
+                target_watchlist_name = "NSFW Watchlist"
+        else:
+            target_watchlist_name = "Watchlist"
 
         lists = self.lists_service.get_all_lists(include_adult=True)
         watchlist = next((lst for lst in lists if lst.name == target_watchlist_name), None)
@@ -72,7 +78,7 @@ class RecommendationWatchlistService:
         return ActionResponse(status="success", id=item.id)
 
     def remove_from_watchlist(self, tmdb_id: Union[int, str]) -> ActionResponse:
-        watchlists = self.db.query(CustomList).filter(CustomList.name.in_(["Watchlist", "NSFW Watchlist"])).all()
+        watchlists = self.db.query(CustomList).filter(CustomList.name.in_(["Watchlist", "NSFW Watchlist", "NSFW Movie/TV Watchlist"])).all()
         if not watchlists:
             return ActionResponse(status="error", message="Watchlists not found")
         

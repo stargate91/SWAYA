@@ -7,8 +7,6 @@ import { mapOrganizerItemRow, mapExtraRow } from '../organizerMappers';
 import api from '../../../lib/api';
 
 export function useOrganizerRename({
-  modeVisibleMatchedItems,
-  modeVisibleExtrasForRename,
   scanStatusQuery,
   renameMutation,
   queryClient,
@@ -34,8 +32,8 @@ export function useOrganizerRename({
     }
 
     setIsRenameStarting(true);
-    let matchedItems = [];
-    let matchedExtras = [];
+    let matchedItems;
+    let matchedExtras;
     try {
       const [moviesRes, tvRes, scenesRes, extrasRes] = await Promise.all([
         api.organizer.get({ scanMode, sessionMode, pageSize: 1000000, tab: 'movies' }),

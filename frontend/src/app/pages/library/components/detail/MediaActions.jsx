@@ -4,7 +4,7 @@ import { formatEpisodeNumber } from '../../utils/detailUtils';
 import { useMediaDetailContext } from './MediaDetailContext';
 import Inline from '@/ui/Inline';
 import { useState } from 'react';
-import TorrentSearchModal from '../../../dashboard/widgets/components/TorrentSearchModal.jsx';
+import TorrentSearchModal from '../../../../../components/TorrentSearchModal';
 import { useSettingsQuery } from '@/queries/settingsQueries';
 
 export default function MediaActions() {
@@ -56,7 +56,7 @@ export default function MediaActions() {
             onClick={() => setModalOpen(true)}
           >
             <Download size={16} />
-            Download
+            {t('common.download') || 'Download'}
           </Button>
           <TorrentSearchModal
             open={modalOpen}

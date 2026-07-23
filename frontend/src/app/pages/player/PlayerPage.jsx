@@ -135,6 +135,7 @@ export default function PlayerPage() {
       >
         <div className="player-page__pip-drag-handle" />
         <div 
+          role="presentation"
           className="player-page__pip-interactive-area" 
           onWheel={handleWheel}
           onDoubleClick={handleDoubleClick}

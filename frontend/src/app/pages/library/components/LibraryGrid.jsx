@@ -392,8 +392,10 @@ function ExpandedTagPanel({ tag, t, emptyIcon, isFocusMode = false, activeSessio
 
   if (isLoading) {
     return (
-      <div className="library-content" style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-xl) 0' }}>
-        <div className="library-spinner" />
+      <div className="library-content">
+        <div className="library-loading">
+          <div className="library-spinner" />
+        </div>
       </div>
     );
   }

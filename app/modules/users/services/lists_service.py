@@ -294,6 +294,18 @@ class ListsService:
             self.db.add(nsfw_watchlist)
             self.db.commit()
 
+        nsfw_movie_watchlist = self.db.query(CustomList).filter(CustomList.name == "NSFW Movie/TV Watchlist").first()
+        if not nsfw_movie_watchlist:
+            nsfw_movie_watchlist = CustomList(
+                name="NSFW Movie/TV Watchlist",
+                description="Your go-to space for adult movies and TV shows you want to watch later.",
+                list_type=CustomListType.MOVIE_TV,
+                color="#ec4899",
+                is_adult=True
+            )
+            self.db.add(nsfw_movie_watchlist)
+            self.db.commit()
+
         adult_enabled = self._adult_access_enabled() and include_adult
 
         lists = self.db.query(CustomList).all()
@@ -330,7 +342,7 @@ class ListsService:
             result.append(CustomListResponse(
                 id=custom_list.id,
                 name=custom_list.name,
-                is_watchlist=custom_list.name in ("Watchlist", "NSFW Watchlist"),
+                is_watchlist=custom_list.name in ("Watchlist", "NSFW Watchlist", "NSFW Movie/TV Watchlist"),
                 description=custom_list.description,
                 color=custom_list.color or "#3b82f6",
                 list_type=custom_list.list_type,
@@ -485,7 +497,7 @@ class ListsService:
         return CustomListDetailResponse(
             id=custom_list.id,
             name=custom_list.name,
-            is_watchlist=custom_list.name == "Watchlist",
+            is_watchlist=custom_list.name in ("Watchlist", "NSFW Watchlist", "NSFW Movie/TV Watchlist"),
             description=custom_list.description,
             color=custom_list.color,
             list_type=custom_list.list_type,
@@ -562,7 +574,7 @@ class ListsService:
         custom_list = self.db.query(CustomList).filter(CustomList.id == list_id).first()
         if not custom_list:
             raise NotFoundException("Not found")
-        if custom_list.name in ("Watchlist", "NSFW Watchlist"):
+        if custom_list.name in ("Watchlist", "NSFW Watchlist", "NSFW Movie/TV Watchlist"):
             raise BadRequestException("Watchlist cannot be deleted")
 
         self.db.delete(custom_list)

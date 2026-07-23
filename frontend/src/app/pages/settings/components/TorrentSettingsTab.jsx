@@ -1,4 +1,3 @@
-import React from 'react';
 import Stack from '@/ui/Stack';
 import Card from '@/ui/Card';
 import Button from '@/ui/Button';
@@ -7,6 +6,7 @@ import SettingsSwitchField from './fields/SettingsSwitchField.jsx';
 import SettingsPathField from './fields/SettingsPathField.jsx';
 import SettingsTextField from './fields/SettingsTextField.jsx';
 import { Info, ExternalLink } from '@/ui/icons';
+import styles from './TorrentSettingsTab.module.css';
 
 export default function TorrentSettingsTab() {
   const { t } = useSettingsViewContext();
@@ -43,7 +43,7 @@ export default function TorrentSettingsTab() {
 
           <Card title={t?.('settingsPage.sections.torrent.qbSettings') || 'qBittorrent WebUI Connection'}>
             <Stack gap="md">
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+              <div className={styles['fields-grid']}>
                 <SettingsTextField
                   field="torrent_qbittorrent_port"
                   label={t?.('settingsPage.sections.torrent.qbPort') || 'WebUI Port'}
@@ -61,17 +61,7 @@ export default function TorrentSettingsTab() {
                   type="password"
                 />
               </div>
-              <div style={{ 
-                marginTop: '8px',
-                padding: '12px',
-                borderRadius: '6px',
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                color: 'var(--text-secondary)',
-                fontSize: '0.9em',
-                lineHeight: '1.4',
-                whiteSpace: 'pre-line'
-              }}>
+              <div className={styles['help-box']}>
                 {t?.('settingsPage.sections.torrent.qbHelpText') || 
                  'To integrate qBittorrent with SWAYA:\n1. Open your qBittorrent client.\n2. Go to Tools -> Options -> Web UI.\n3. Enable the Web User Interface (Remote control).\n4. Set a port (default: 8080), username, and password.\n5. Paste the port, username, and password in the fields above.'}
               </div>
@@ -80,7 +70,7 @@ export default function TorrentSettingsTab() {
 
           <Card title={t?.('settingsPage.sections.torrent.jackett') || 'Jackett Trackers Configuration'}>
             <Stack gap="md">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)' }}>
+              <div className={styles['info-container']}>
                 <Info size={18} />
                 <span>
                   {t?.('settingsPage.sections.torrent.jackettInfo') || 
@@ -91,7 +81,7 @@ export default function TorrentSettingsTab() {
                 <Button 
                   onClick={() => window.open('http://127.0.0.1:9117', '_blank')}
                   variant="primary"
-                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                  className={styles['jackett-button']}
                 >
                   <ExternalLink size={16} />
                   {t?.('settingsPage.sections.torrent.openJackett') || 'Open Jackett Dashboard'}

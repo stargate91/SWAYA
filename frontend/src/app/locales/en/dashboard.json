@@ -71,5 +71,20 @@
   "focus": "Focusing on",
   "set_focus": "Set Focus Tag",
   "focus_title": "Select Focus Category",
-  "search_tag_placeholder": "Search categories..."
+  "search_tag_placeholder": "Search categories...",
+  "torrent_modal": {
+    "title": "Search and Download Torrents",
+    "search": "Search",
+    "search_placeholder": "Search term...",
+    "no_torrents": "No torrents found. Try searching.",
+    "col_title": "Title",
+    "col_size": "Size",
+    "col_seeders": "Seeders",
+    "col_peers": "Peers",
+    "col_source": "Source",
+    "col_action": "Action",
+    "btn_get": "Get",
+    "net_error": "Network error performing search.",
+    "no_link": "No valid magnet link or torrent file found."
+  }
 }

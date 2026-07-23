@@ -87,28 +87,30 @@ export default function ImageUploadPanel({
           }}
         />
 
-        <Button
-          type="button"
-          onClick={handleSaveUrl}
-          disabled={!urlInput.trim() || isPending}
-          variant="secondary-neutral"
-          size="md"
-          className={styles['save-button']}
-        >
-          {t?.('common.save') || 'Save'}
-        </Button>
+        <div className={styles['button-row']}>
+          <Button
+            type="button"
+            onClick={handleSaveUrl}
+            disabled={!urlInput.trim() || isPending}
+            variant="secondary-neutral"
+            size="md"
+            className={styles['save-button']}
+          >
+            {t?.('common.save') || 'Save'}
+          </Button>
 
-        <Button
-          type="button"
-          variant="secondary-neutral"
-          size="md"
-          className={styles['upload-button']}
-          disabled={isPending}
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <Upload size={16} />
-          <span>{t?.('library.details.uploadCustom') || 'Upload Custom'}</span>
-        </Button>
+          <Button
+            type="button"
+            variant="secondary-neutral"
+            size="md"
+            className={styles['upload-button']}
+            disabled={isPending}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Upload size={16} />
+            <span>{t?.('library.details.uploadCustom') || 'Upload Custom'}</span>
+          </Button>
+        </div>
       </div>
 
       {hasUploadPreview || uploadFile || isPending ? (

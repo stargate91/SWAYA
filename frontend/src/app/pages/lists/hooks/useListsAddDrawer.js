@@ -14,6 +14,18 @@ export default function useListsAddDrawer({
   const sessionMode = useLibraryModeStore((state) => state.sessionMode);
   const [isAdultActive, setIsAdultActive] = useState(sessionMode === 'nsfw');
 
+  const [query, setQuery] = useState('');
+  const [source, setSource] = useState('library'); // 'library' or 'discover'
+  const [mediaType, setMediaType] = useState('movie'); // 'movie', 'tv', 'scene'
+  const [provider, setProvider] = useState('tmdb'); // 'tmdb', 'porndb', 'stashdb'
+  const [results, setResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('not_added'); // 'added', 'not_added'
+  const { toast } = useUi();
+
   const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
   const [prevSessionMode, setPrevSessionMode] = useState(sessionMode);
   const [prevActiveListId, setPrevActiveListId] = useState(null);
@@ -37,18 +49,6 @@ export default function useListsAddDrawer({
   };
 
   const removeListItemMutation = useRemoveListItemMutation();
-
-  const [query, setQuery] = useState('');
-  const [source, setSource] = useState('library'); // 'library' or 'discover'
-  const [mediaType, setMediaType] = useState('movie'); // 'movie', 'tv', 'scene'
-  const [provider, setProvider] = useState('tmdb'); // 'tmdb', 'porndb', 'stashdb'
-  const [results, setResults] = useState([]);
-  const [searching, setSearching] = useState(false);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [statusFilter, setStatusFilter] = useState('not_added'); // 'added', 'not_added'
-  const { toast } = useUi();
 
   const [prevResetDeps, setPrevResetDeps] = useState(null);
   const resetDepsStr = `${isOpen}_${activeList?.id || ''}_${source}_${mediaType}_${isAdultActive}`;

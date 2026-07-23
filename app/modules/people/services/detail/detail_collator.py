@@ -47,7 +47,8 @@ class PersonDetailCollator:
         tmdb_id = ext_ids.get("tmdb") or ext_ids.get("tmdb_id")
         if not tmdb_id:
             for link in person.external_links:
-                if link.provider.value == "tmdb":
+                provider_val = getattr(link.provider, "value", link.provider)
+                if provider_val == "tmdb":
                     tmdb_id = link.external_id
                     break
         if not tmdb_id and not person.is_adult and str(person_id).isdigit() and person_id < 100000000:

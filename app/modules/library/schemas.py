@@ -172,6 +172,8 @@ class LibraryStatsResponse(BaseModel):
     decade_distribution: Dict[str, int]
     timeline_is_mocked: Optional[bool] = False
     timeline_has_enough_data: Optional[bool] = False
+    actual_dna_titles: Optional[int] = 0
+    actual_timeline_items: Optional[int] = 0
 
 
 class ContinueWatchingItem(BaseModel):

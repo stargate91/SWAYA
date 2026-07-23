@@ -222,8 +222,7 @@
   transition:
     border-color var(--motion-fast),
     background-color var(--motion-fast),
-    box-shadow var(--motion-fast),
-    transform var(--motion-fast);
+    box-shadow var(--motion-fast);
   align-items: center;
   text-align: center;
   min-width: 0;
@@ -236,21 +235,20 @@
   box-shadow: none;
 }
 
-.card[data-variant="picker"]:hover:not([data-disabled="true"]),
-.card[data-variant="picker-logo"]:hover:not([data-disabled="true"]) {
-  transform: translateY(-0.125rem);
-  box-shadow: var(--shadow-md);
+.card[data-variant="picker"]:hover:not([data-disabled="true"]):not([data-selected="true"]) {
+  border-color: var(--color-accent-subtle);
+  background: color-mix(in srgb, var(--color-accent) 4%, var(--modal-surface-card));
 }
 
-.card[data-variant="picker"]:hover:not([data-disabled="true"]):not([data-selected="true"]),
 .card[data-variant="picker-logo"]:hover:not([data-disabled="true"]):not([data-selected="true"]) {
-  border-color: var(--color-accent);
+  border-color: var(--color-accent-subtle);
+  background: color-mix(in srgb, var(--color-accent) 4%, transparent);
 }
 
 .card[data-variant="picker"][data-selected="true"],
 .card[data-variant="picker-logo"][data-selected="true"] {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 0.125rem var(--color-accent);
+  box-shadow: 0 0 0 0.0625rem var(--color-accent);
   background: color-mix(in srgb, var(--color-accent) 10%, transparent);
 }
 
@@ -302,4 +300,15 @@
 .picker-img-wrapper[data-blur="true"] img {
   filter: blur(0.5rem) brightness(0.6);
   transform: scale(1.2);
+}
+
+:global(.ui-selectable-card__text-preview) {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
 }

@@ -9,7 +9,7 @@ import RadarChart from '@/ui/RadarChart';
 import styles from './LibraryInsightsShared.module.css';
 
 export const LibraryDNA = () => {
-  const { dnaData, t: T, sessionMode, insightTitleCount, MIN_DNA_TITLES } = useStatisticsPage();
+  const { dnaData, t: T, sessionMode, dnaProgressCount, MIN_DNA_TITLES } = useStatisticsPage();
   const isNsfw = sessionMode === 'nsfw';
 
   const plotted = useMemo(() => {
@@ -169,11 +169,11 @@ export const LibraryDNA = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', width: '100%', maxWidth: '11.25rem', alignItems: 'center' }}>
             <Inline justify="center">
               <Text variant="caption" color="secondary" weight="extrabold" uppercase>
-                {T('statistics.stats.dna_progress_text', { count: insightTitleCount, limit: MIN_DNA_TITLES }) || `${insightTitleCount} of ${MIN_DNA_TITLES} titles`}
+                {T('statistics.stats.dna_progress_text', { count: dnaProgressCount, limit: MIN_DNA_TITLES }) || `${dnaProgressCount} of ${MIN_DNA_TITLES} titles`}
               </Text>
             </Inline>
             <LinearProgress
-              value={(insightTitleCount / MIN_DNA_TITLES) * 100}
+              value={(dnaProgressCount / MIN_DNA_TITLES) * 100}
               variant="dna"
             />
           </div>

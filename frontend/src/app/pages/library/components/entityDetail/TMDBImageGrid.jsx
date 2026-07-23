@@ -429,6 +429,21 @@ export default function TMDBImageGrid({
 
   return (
     <Grid variant={imageType === 'logo' ? 'logo' : 'backdrop'}>
+      {imageType === 'logo' && (
+        <SelectableCard
+          selected={pathsMatch(currentPath, "none") || !currentPath}
+          onClick={() => handleSelectImage("none")}
+          aspect="logo"
+          variant="picker"
+          showCheckmark={false}
+          alt=" "
+          infoLeft={t?.('library.details.defaultText') || 'Default Text'}
+        >
+          <div className="ui-selectable-card__text-preview">
+            Aa
+          </div>
+        </SelectableCard>
+      )}
       {displayedImages.map((img, idx) => {
         const path = img.file_path || img.backdrop_path || img.poster_path || img.logo_path;
         if (!path) return null;

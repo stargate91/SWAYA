@@ -16,15 +16,6 @@ const translateGenreLabel = (label, T) => {
   return (translated && translated !== genreKey) ? translated : label;
 };
 
-const isSingleGenreLabel = (label) => {
-  const normalized = String(label || '').trim().toLowerCase();
-  if (!normalized) return false;
-  if (normalized.includes('&')) return false;
-  if (normalized.includes('/')) return false;
-  if (normalized.includes(',')) return false;
-  if (/\b(and|és)\b/.test(normalized)) return false;
-  return true;
-};
 
 export function useStatisticsPage() {
   const { t } = useTranslation();
@@ -44,10 +35,8 @@ export function useStatisticsPage() {
     { value: 'people', label: t('tabs.people', { defaultValue: 'People' }), icon: Users },
   ], [t, ratingsState.hasAdultSupport]);
 
-  const insightTitleCount = useMemo(
-    () => Object.values(stats?.decade_distribution || {}).reduce((sum, value) => sum + Number(value || 0), 0),
-    [stats.decade_distribution]
-  );
+  const dnaProgressCount = stats?.actual_dna_titles || 0;
+  const timelineProgressCount = stats?.actual_timeline_items || 0;
 
   const scenesStats = useMemo(() => {
     const totalScenes = stats.total_scenes || 0;
@@ -60,7 +49,7 @@ export function useStatisticsPage() {
         : (t('statistics.stats.total_videos') || 'Total Videos'),
       value: isNsfw
         ? (totalScenes + totalVideos).toLocaleString()
-        : totalScenes.toLocaleString(),
+        : totalVideos.toLocaleString(),
       subText: isNsfw && totalVideos > 0
         ? `${totalScenes} scenes, ${totalVideos} videos`
         : isNsfw
@@ -146,7 +135,8 @@ export function useStatisticsPage() {
     isAdultMode,
     effectiveDistTab,
     distTabs,
-    insightTitleCount,
+    dnaProgressCount,
+    timelineProgressCount,
     scenesStats,
     dnaData,
     timelineData,

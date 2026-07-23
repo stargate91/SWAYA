@@ -32,7 +32,8 @@
     "subtitles": "Subtitles",
     "subtitle": "Subtitle",
     "adult": "Adult",
-    "browse": "Browse"
+    "browse": "Browse",
+    "download": "Download"
   },
   "tabs": {
     "movies": "Movies",

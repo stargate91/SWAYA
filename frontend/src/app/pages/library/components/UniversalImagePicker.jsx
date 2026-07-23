@@ -7,10 +7,11 @@ import Grid from '@/ui/Grid';
 import Inline from '@/ui/Inline';
 import useImagePicker from '../hooks/useImagePicker';
 import ImageUploadPanel from '@/ui/ImageUploadPanel';
-import ImageOptionCard from './entityDetail/ImageOptionCard';
 import { resolveMediaImageUrl, pathsMatch } from '@/lib/imageUrls';
 import PersonBackdropPickerModal from './entityDetail/PersonBackdropPickerModal';
+import SelectableCard from '@/ui/SelectableCard';
 
+const DEFAULT_TEXT_LETTERS = 'Aa';
 
 export default function UniversalImagePicker({
   entityId,
@@ -92,12 +93,26 @@ export default function UniversalImagePicker({
         onUploadFile={handleUploadFile}
       />
 
-      {isScene && imageType === 'logo' && (
+      {imageType === 'logo' && isScene && (
         <Stack gap="md" fullWidth className="scene-image-picker-options scene-image-picker-options--logo">
           <Text as="h4" variant="body" weight="semibold">
             {t('library.details.availableLogos') || 'Available Logos'}
           </Text>
-          <Grid variant="picker">
+          <Grid variant="logo">
+            <SelectableCard
+              selected={!(selectedPath || currentPath)}
+              onClick={() => handleSelectTmdbImage("none")}
+              aspect="logo"
+              variant="picker"
+              showCheckmark={false}
+              alt=" "
+              infoLeft={t('library.details.defaultText') || 'Default Text'}
+            >
+              <div className="ui-selectable-card__text-preview">
+                {DEFAULT_TEXT_LETTERS}
+              </div>
+            </SelectableCard>
+
             {(() => {
               const logoOptions = [];
               const seenLogos = new Set();
@@ -130,15 +145,16 @@ export default function UniversalImagePicker({
               }
 
               return logoOptions.map((opt, idx) => (
-                <ImageOptionCard
+                <SelectableCard
                   key={idx}
                   imageUrl={resolveMediaImageUrl(opt.path, 'logo')}
                   alt={opt.alt}
-                  label={opt.label}
-                  isSelected={pathsMatch(selectedPath || currentPath, opt.path)}
+                  selected={pathsMatch(selectedPath || currentPath, opt.path)}
                   onClick={() => handleSelectTmdbImage(opt.path)}
-                  aspect="square"
-                  variant="picker-logo"
+                  aspect="logo"
+                  variant="picker"
+                  showCheckmark={false}
+                  infoLeft={opt.label}
                 />
               ));
             })()}
@@ -165,14 +181,16 @@ export default function UniversalImagePicker({
               }
 
               return options.map((opt, idx) => (
-                <ImageOptionCard
+                <SelectableCard
                   key={idx}
                   imageUrl={resolveMediaImageUrl(opt.path, imageType)}
                   alt={opt.alt}
-                  label={opt.label}
-                  isSelected={pathsMatch(selectedPath || currentPath, opt.path)}
+                  selected={pathsMatch(selectedPath || currentPath, opt.path)}
                   onClick={() => handleSelectTmdbImage(opt.path)}
-                  aspect="backdrop"
+                  aspect={imageType === 'backdrop' ? 'landscape' : 'poster'}
+                  variant="picker"
+                  showCheckmark={false}
+                  infoLeft={opt.label}
                 />
               ));
             })()}

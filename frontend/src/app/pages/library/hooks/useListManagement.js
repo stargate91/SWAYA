@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   useListsQuery,
   useItemMembershipQuery,
@@ -7,8 +7,11 @@ import {
   useCreateListMutation
 } from '@/queries';
 import { useSettingsQuery } from '@/queries/settingsQueries';
+import { useTranslation } from '@/providers/LanguageContext';
+import { translateListName, translateListDescription } from '@/lib/listTranslations';
 
 export default function useListManagement({ item, type }) {
+  const { t } = useTranslation();
   const isTv = type === 'tv';
   const isPerson = type === 'person' || type === 'people';
   const listType = isPerson ? 'person' : 'media';
@@ -24,7 +27,15 @@ export default function useListManagement({ item, type }) {
         : item?.id);
 
   // Queries
-  const { data: lists = [], isLoading: listsLoading } = useListsQuery(includeAdult);
+  const { data: rawLists = [], isLoading: listsLoading } = useListsQuery(includeAdult);
+  const lists = useMemo(() => {
+    return rawLists.map((l) => ({
+      ...l,
+      name: translateListName(l.name, t),
+      description: translateListDescription(l.name, l.description, t),
+    }));
+  }, [rawLists, t]);
+
   const { data: membershipData = { list_ids: [], memberships: [] }, isLoading: membershipLoading } =
     useItemMembershipQuery(membershipItemId);
 

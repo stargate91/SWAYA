@@ -4,6 +4,8 @@
   background: var(--ui-surface-card-gradient);
   box-shadow: var(--shadow-md);
   backdrop-filter: blur(var(--space-2xl)) saturate(118%);
+  display: flex;
+  flex-direction: column;
 }
 
 .header {
@@ -12,6 +14,7 @@
   align-items: flex-start;
   gap: var(--space-lg);
   padding: var(--space-xl) var(--space-xl) 0;
+  flex-shrink: 0;
 }
 
 .eyebrow {
@@ -32,6 +35,7 @@
   background: color-mix(in srgb, var(--color-bg-canvas) 15%, transparent);
   border-bottom: 1px solid var(--color-border-default);
   align-items: center;
+  flex-shrink: 0;
 }
 
 .header[data-header-variant="shaded"] .title {
@@ -45,6 +49,9 @@
 
 .body {
   padding: var(--space-xl);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .card[data-padding="md"] .body {

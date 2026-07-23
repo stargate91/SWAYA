@@ -7,7 +7,7 @@ import BarChart from '@/ui/BarChart';
 import styles from './LibraryInsightsShared.module.css';
 
 export const TimeTravelTimeline = () => {
-  const { timelineData, t: T, sessionMode, insightTitleCount, MIN_TIMELINE_TITLES } = useStatisticsPage();
+  const { timelineData, t: T, sessionMode, timelineProgressCount, MIN_TIMELINE_TITLES } = useStatisticsPage();
   const isNsfw = sessionMode === 'nsfw';
 
   const wrapperClass = `${styles['stage-base']} ${!timelineData.hasEnoughData ? styles['ghost'] : ''}`.trim();
@@ -64,11 +64,11 @@ export const TimeTravelTimeline = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', width: '100%', maxWidth: '11.25rem', alignItems: 'center' }}>
             <Inline justify="center">
               <Text variant="caption" color="secondary" weight="extrabold" uppercase>
-                {T('statistics.stats.timeline_progress_text', { count: insightTitleCount, limit: MIN_TIMELINE_TITLES }) || `${insightTitleCount} of ${MIN_TIMELINE_TITLES} items`}
+                {T('statistics.stats.timeline_progress_text', { count: timelineProgressCount, limit: MIN_TIMELINE_TITLES }) || `${timelineProgressCount} of ${MIN_TIMELINE_TITLES} items`}
               </Text>
             </Inline>
             <LinearProgress
-              value={(insightTitleCount / MIN_TIMELINE_TITLES) * 100}
+              value={(timelineProgressCount / MIN_TIMELINE_TITLES) * 100}
               variant="timeline"
             />
           </div>

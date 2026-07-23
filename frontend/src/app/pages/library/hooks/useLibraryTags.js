@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useTagsQuery } from '@/queries/libraryQueries';
-import { getLibraryTagBucketKeys } from '@/lib/libraryTabs';
 
 export function useLibraryTags({ activeSessionMode, page = 1, pageSize = 40, searchQuery = '' }) {
   const isNsfw = activeSessionMode === 'nsfw';

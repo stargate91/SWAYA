@@ -1,6 +1,11 @@
 {
   "error_duplicate_name": "A list with this name already exists.",
   "watchlist_name": "Watchlist",
+  "watchlist_description": "Your go-to space for everything you want to watch later.",
+  "nsfw_watchlist_name": "NSFW Watchlist",
+  "nsfw_watchlist_description": "Your go-to space for adult items you want to watch later.",
+  "nsfw_movie_watchlist_name": "NSFW Movie/TV Watchlist",
+  "nsfw_movie_watchlist_description": "Your go-to space for adult movies and TV shows you want to watch later.",
   "sidebar_title": "Lists",
   "items_suffix": "Items",
   "type_custom": "Watchlist",
@@ -80,5 +85,8 @@
   "add_to_watchlist": "Add to Watchlist",
   "no_lists_yet": "No custom lists created yet.",
   "create_quick_placeholder": "Quick create list...",
+  "type_video_scene": "Videos & Scenes",
+  "type_movie_tv": "Movies & TV",
+  "is_adult_label": "NSFW / Adult List",
   "title": "Lists"
 }

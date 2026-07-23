@@ -8,7 +8,7 @@ import SplitButton from '../../ui/SplitButton';
 import { getFirstEnabledProvider, getOrganizerProviderOptions } from '../../lib/providerAvailability';
 import Inline from '../../ui/Inline';
 
-import { useOrganizerCountQuery, useOrganizerQuery, useScanStatusQuery, useSettingsQuery } from '../../queries';
+import { useOrganizerCountQuery, useScanStatusQuery, useSettingsQuery } from '../../queries';
 import { useUi } from '@/providers/UiProvider';
 import { useTranslation } from '../../providers/LanguageContext';
 import { EMPTY_ORGANIZER } from './organizerConstants';
@@ -116,7 +116,6 @@ export default function OrganizerPage() {
     visibleExtraCount,
     visibleMediaCount,
     organizerQuery,
-    isLoaded,
     setIsLoaded,
   } = useOrganizerPageState({ t, scanMode, sessionMode });
 

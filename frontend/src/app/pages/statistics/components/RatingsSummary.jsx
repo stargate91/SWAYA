@@ -20,9 +20,9 @@ export function RatingsSummary() {
 
   if (ratingsState.isStatsLoading) {
     return (
-      <Stack gap="md" fullWidth>
+      <Stack gap="md" fullHeight>
         {Array.from({ length: 3 }).map((_, idx) => (
-          <Card key={idx} variant="interactive-glass" className="u-min-h-card-loading">
+          <Card key={idx} variant="interactive-glass" className="u-min-h-card-loading u-flex-1">
             <Skeleton variant="title-sm" />
             <Skeleton variant="text" />
           </Card>
@@ -32,7 +32,7 @@ export function RatingsSummary() {
   }
 
   return (
-    <Stack gap="lg">
+    <Stack gap="lg" fullHeight>
       {/* CARD 1: Media Average Ratings */}
       <Card
         variant="interactive-glass"
@@ -40,8 +40,9 @@ export function RatingsSummary() {
         divider
         eyebrow={t('statistics.ratings.mediaAverages', { defaultValue: 'Average Ratings' })}
         actions={<BarChart2 size={16} className="icon-glow-blue" />}
+        className="u-flex-1"
       >
-        <Stack gap="sm" justify="center">
+        <Stack gap="sm" justify="center" fullHeight>
           {/* Movies Row */}
           <Inline gap="md" align="center" justify="between" className="u-min-h-row">
             <Text variant="body" color="muted" weight="medium">
@@ -117,8 +118,9 @@ export function RatingsSummary() {
         divider
         eyebrow={t('statistics.ratings.mediaItems', { defaultValue: 'Library Items' })}
         actions={<CheckCircle size={16} className="icon-glow-success" />}
+        className="u-flex-1"
       >
-        <Stack gap="sm" justify="center">
+        <Stack gap="sm" justify="center" fullHeight>
           {/* Movies counts */}
           <Inline gap="md" align="center" justify="between" className="u-min-h-row">
             <Text variant="body" color="muted" weight="medium">
@@ -190,8 +192,9 @@ export function RatingsSummary() {
         divider
         eyebrow={t('tabs.people', { defaultValue: 'People' })}
         actions={<Users size={16} className="icon-glow-muted" />}
+        className="u-flex-1"
       >
-        <Stack gap="sm" justify="center">
+        <Stack gap="sm" justify="center" fullHeight>
           {/* People Avg Rating */}
           <Inline gap="md" align="center" justify="between" className="u-min-h-row">
             <Text variant="body" color="muted" weight="medium">

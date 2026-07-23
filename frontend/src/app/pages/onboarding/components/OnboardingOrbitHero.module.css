@@ -119,9 +119,11 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
+  --welcome-hero-float-duration: 5.2s;
+  --welcome-hero-float-timing: ease-in-out;
   animation-name: heroFloat;
-  animation-duration: 5.2s;
-  animation-timing-function: ease-in-out;
+  animation-duration: var(--welcome-hero-float-duration);
+  animation-timing-function: var(--welcome-hero-float-timing);
   animation-iteration-count: infinite;
 }
 

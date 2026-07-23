@@ -622,6 +622,8 @@ class BaseQueryBuilder:
                 "year": match.release_date.year if match.release_date else None,
                 "poster_path": resolved_poster,
                 "backdrop_path": resolved_backdrop,
+                "original_poster_path": loc.poster_path if loc else None,
+                "original_backdrop_path": match.backdrop_path,
                 "rating": rating,
                 "rating_porndb": match.rating_porndb,
                 "rating_imdb": match.rating_imdb,

@@ -72,13 +72,9 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     setCurrentPage(1);
   };
 
-  const [accumulatedItems, setAccumulatedItems] = useState(savedState.accumulatedItems ?? []);
 
-  const [prevFilterParamsHash, setPrevFilterParamsHash] = useState('');
-  const [prevLibraryItems, setPrevLibraryItems] = useState(null);
-  const [prevCurrentPage, setPrevCurrentPage] = useState(1);
-  const [prevPaginationMode, setPrevPaginationMode] = useState('');
-  const [prevIsServerPaged, setPrevIsServerPaged] = useState(false);
+
+  const [accumulatedItems] = useState(savedState.accumulatedItems ?? []);
 
   const { sessionMode, setSessionMode } = useLibraryModeStore();
 
@@ -322,7 +318,8 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
 
   const libraryQueryParamsNoPage = useMemo(() => {
     if (!libraryQueryParams) return null;
-    const { page, ...rest } = libraryQueryParams;
+    const rest = { ...libraryQueryParams };
+    delete rest.page;
     return rest;
   }, [libraryQueryParams]);
 
@@ -517,7 +514,6 @@ export function useLibraryState({ initialTab = 'movies', lockTab = false, includ
     }
   };
 
-  const isServerPaged = true;
 
   const allItems = useMemo(() => {
     if (isCollections) {

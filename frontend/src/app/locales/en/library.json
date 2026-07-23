@@ -489,6 +489,7 @@
     "imageUploadFailed": "Oops! We couldn't upload the image.",
     "defaultBlurredProfile": "Blurred Profile Picture",
     "defaultBackdrop": "Default Backdrop",
+    "defaultText": "Default Text",
     "availableBackdrops": "Available Backdrops",
     "originalSceneBackdrop": "Original Scene Still",
     "availableLogos": "Available Logos",

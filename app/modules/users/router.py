@@ -232,21 +232,27 @@ def update_item_status(item_id: str, payload: ItemStatusUpdate, db: Session = De
 @catalog_router.post("/item/{item_id}/poster")
 def update_item_poster(item_id: str, payload: ImageOverrideUpdate, db: Session = Depends(get_db)):
     path = payload.path or payload.url or payload.poster_path
-    if not path:
+    if path in ("none", "clear", "default"):
+        path = ""
+    elif not path:
         raise HTTPException(status_code=400, detail="Image path/url is required")
     return _overrides_service(db, image_downloader=_img_dl()).update_item_image(item_id, "poster", path, media_type=payload.media_type)
 
 @catalog_router.post("/item/{item_id}/backdrop")
 def update_item_backdrop(item_id: str, payload: ImageOverrideUpdate, db: Session = Depends(get_db)):
     path = payload.path or payload.url or payload.backdrop_path
-    if not path:
+    if path in ("none", "clear", "default"):
+        path = ""
+    elif not path:
         raise HTTPException(status_code=400, detail="Image path/url is required")
     return _overrides_service(db, image_downloader=_img_dl()).update_item_image(item_id, "backdrop", path, media_type=payload.media_type)
 
 @catalog_router.post("/item/{item_id}/logo")
 def update_item_logo(item_id: str, payload: ImageOverrideUpdate, db: Session = Depends(get_db)):
     path = payload.path or payload.url or payload.logo_path
-    if not path:
+    if path in ("none", "clear", "default"):
+        path = ""
+    elif not path:
         raise HTTPException(status_code=400, detail="Image path/url is required")
     return _overrides_service(db, image_downloader=_img_dl()).update_item_image(item_id, "logo", path, media_type=payload.media_type)
 

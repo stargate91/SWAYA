@@ -102,7 +102,7 @@ export default function useWindowProgress() {
   if (isTorrentActive) {
     const totalProgress = activeDownloads.reduce((sum, d) => sum + d.progress, 0) / activeDownloads.length;
     const overallSpeed = activeDownloads.reduce((sum, d) => sum + d.speed, 0);
-    let taskName = '';
+    let taskName;
     if (activeDownloads.length === 1) {
       const name = activeDownloads[0].name;
       taskName = t('progress.torrent.downloading_single', { name }) || `Downloading ${name}...`;

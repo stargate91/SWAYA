@@ -16,6 +16,7 @@ import {
 } from '@/queries';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
 import { useUi } from '@/providers/UiProvider';
+import { translateListName, translateListDescription } from '@/lib/listTranslations';
 
 export default function useListsPageState() {
   const { t } = useTranslation();
@@ -28,11 +29,14 @@ export default function useListsPageState() {
 
   const lists = useMemo(() => {
     return rawLists.filter((l) => {
-      if (l.is_watchlist) return true;
       const isAdultList = !!l.is_adult;
       return sessionMode === 'nsfw' ? isAdultList : !isAdultList;
-    });
-  }, [rawLists, sessionMode]);
+    }).map((l) => ({
+      ...l,
+      name: translateListName(l.name, t),
+      description: translateListDescription(l.name, l.description, t),
+    }));
+  }, [rawLists, sessionMode, t]);
 
   const createMutation = useCreateListMutation();
   const updateMutation = useUpdateListMutation();

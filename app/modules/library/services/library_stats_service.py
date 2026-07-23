@@ -44,19 +44,24 @@ class LibraryStatsService:
         ).filter(
             MediaItem.status.in_(library_statuses),
             MetadataMatch.media_type == MediaType.MOVIE,
-            MetadataMatch.is_active
+            MetadataMatch.is_active,
+            MetadataMatch.is_adult == include_adult
         )
-        if not include_adult:
-            movies_query = movies_query.filter(~MetadataMatch.is_adult)
         total_movies = movies_query.scalar() or 0
 
-        # 3. Total TV shows (unique tv show matches)
-        tv_shows_query = self.db.query(func.count(MetadataMatch.id)).filter(
-            MetadataMatch.media_type == MediaType.TV,
-            MetadataMatch.is_active
+        # 3. Total TV shows (unique tv show matches that have at least one local episode)
+        from sqlalchemy.orm import aliased
+        Season = aliased(MetadataMatch)
+        tv_shows_query = self.db.query(func.count(func.distinct(func.coalesce(Season.parent_id, Season.id)))).select_from(MediaItem).join(
+            MetadataMatch, (MetadataMatch.media_item_id == MediaItem.id)
+        ).join(
+            Season, MetadataMatch.parent_id == Season.id
+        ).filter(
+            MediaItem.status.in_(library_statuses),
+            MetadataMatch.media_type == MediaType.EPISODE,
+            MetadataMatch.is_active,
+            MetadataMatch.is_adult == include_adult
         )
-        if not include_adult:
-            tv_shows_query = tv_shows_query.filter(~MetadataMatch.is_adult)
         total_tv = tv_shows_query.scalar() or 0
 
         # 4. Total episodes
@@ -65,10 +70,9 @@ class LibraryStatsService:
         ).filter(
             MediaItem.status.in_(library_statuses),
             MetadataMatch.media_type == MediaType.EPISODE,
-            MetadataMatch.is_active
+            MetadataMatch.is_active,
+            MetadataMatch.is_adult == include_adult
         )
-        if not include_adult:
-            episodes_query = episodes_query.filter(~MetadataMatch.is_adult)
         total_episodes = episodes_query.scalar() or 0
 
 
@@ -342,6 +346,20 @@ class LibraryStatsService:
                 "2020s": 5
             }
 
+        actual_dna_titles = 0
+        for m in unique_matches:
+            has_genres = False
+            if include_adult and m.is_adult and m.suggested_tags:
+                has_genres = any(t for t in m.suggested_tags)
+            else:
+                loc = m.localizations[0] if m.localizations else None
+                if loc and loc.genres:
+                    has_genres = len(loc.genres) > 0
+            if has_genres:
+                actual_dna_titles += 1
+
+        actual_timeline_items = insight_title_count
+
         return LibraryStatsResponse(
             total_movies=total_movies,
             total_tv=total_tv,
@@ -376,5 +394,7 @@ class LibraryStatsService:
             },
             decade_distribution=decade_dist,
             timeline_is_mocked=timeline_is_mocked,
-            timeline_has_enough_data=timeline_has_enough_data
+            timeline_has_enough_data=timeline_has_enough_data,
+            actual_dna_titles=actual_dna_titles,
+            actual_timeline_items=actual_timeline_items
         )

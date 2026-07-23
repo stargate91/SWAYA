@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { EXTRA_CATEGORY_BY_TAB } from './organizerMappers';
 import { EXTRAS_TABS, MAIN_TABS, MANUAL_TABS } from './organizerConstants';
 
 const isAdultMovieMode = (scanMode, sessionMode) => scanMode === 'movies_tv' && sessionMode === 'nsfw';
@@ -11,20 +10,13 @@ const getMainTabsForMode = (scanMode, sessionMode) => {
   return ['manual', 'movies', 'episodes', 'extras'];
 };
 
-const isExtraForMode = (item, scanMode, sessionMode) => {
-  const parentType = String(item.parent_type || '').toLowerCase();
-  if (scanMode === 'scenes' || scanMode === 'offline') return parentType === 'scene';
-  if (isAdultMovieMode(scanMode, sessionMode)) return parentType === 'movie';
-  return parentType !== 'scene';
-};
-
 const getManualTabsForMode = (scanMode, sessionMode) => {
   if (scanMode === 'scenes' || scanMode === 'offline') return ['scenes'];
   if (isAdultMovieMode(scanMode, sessionMode)) return ['movies'];
   return ['movies', 'episodes'];
 };
 
-export function useOrganizerTabs({ organizerExtras, t, tabCounts, dismissedRowIds, scanMode, sessionMode }) {
+export function useOrganizerTabs({ t, tabCounts, scanMode, sessionMode }) {
   const computedMainTabs = useMemo(() => {
     const allowedTabs = new Set(getMainTabsForMode(scanMode, sessionMode));
     return MAIN_TABS.filter((tab) => allowedTabs.has(tab.value)).map((tab) => {

@@ -8,7 +8,6 @@ export default function EditableMediaCard({
   onClick,
   onEditClick,
   editTitle,
-  viewOriginalTitle,
   type = 'poster', // 'poster' or 'profile'
   flagEmoji,
   flagTooltip,
