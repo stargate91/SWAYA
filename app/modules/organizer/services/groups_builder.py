@@ -82,7 +82,7 @@ class OrganizerGroupsBuilder:
                 previews.append(preview)
                 preview_map[item.id] = preview
             except Exception as e:
-                logger.debug(f"Swallowed exception in get_organizer_groups formatting: {e}", exc_info=True)
+                logger.error(f"Swallowed exception in get_organizer_groups formatting: {e}", exc_info=True)
 
         if previews:
             formatter.resolve_collisions(previews)
@@ -111,7 +111,7 @@ class OrganizerGroupsBuilder:
                 tv_loc = None
                 
                 resolved_poster = None
-                if m.media_type.is_adult:
+                if m.is_adult:
                     resolved_poster = self._resolve_image_with_fallback(m.local_backdrop_path, m.backdrop_path, "scene_stills")
                     if not resolved_poster:
                         resolved_poster = self._resolve_image_with_fallback(m.local_still_path, m.still_path, "stills")
@@ -119,7 +119,8 @@ class OrganizerGroupsBuilder:
                     tv_show_match = None
                     curr = m
                     while curr:
-                        if curr.media_type.value == "tv":
+                        curr_mtype = curr.media_type.value if hasattr(curr.media_type, "value") else curr.media_type
+                        if curr_mtype == "tv":
                             tv_show_match = curr
                             break
                         curr = curr.parent
@@ -138,7 +139,7 @@ class OrganizerGroupsBuilder:
                 matches_dto.append({
                     "id": m.id,
                     "tmdb_id": int(m.external_id) if m.external_id.isdigit() else m.external_id,
-                    "type": m.media_type.value,
+                    "type": m.media_type.value if hasattr(m.media_type, "value") else m.media_type,
                     "title": tv_loc.title if tv_loc else (loc.title if loc else ""),
                     "year": m.release_date.year if m.release_date else None,
                     "poster_path": resolved_poster,
@@ -146,7 +147,7 @@ class OrganizerGroupsBuilder:
                     "is_active": m.is_active,
                     "confidence": m.confidence_score,
                     "is_adult": m.is_adult,
-                    "provider": m.provider.value if m.provider else None,
+                    "provider": m.provider.value if hasattr(m.provider, "value") else m.provider,
                     "last_air_date": (tv_show_match.last_air_date.isoformat() if tv_show_match.last_air_date else None) if tv_show_match else (m.last_air_date.isoformat() if m.last_air_date else None),
                     "release_status": tv_show_match.release_status if tv_show_match else m.release_status
                 })

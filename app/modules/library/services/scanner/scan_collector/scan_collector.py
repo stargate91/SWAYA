@@ -46,6 +46,7 @@ class ScanCollector:
         provider: Optional[str] = None,
         fs: Optional[Any] = None,
         settings: Optional[Any] = None,
+        paths: Optional[List[str]] = None,
     ):
         self.db = db
         self.library = library
@@ -63,6 +64,7 @@ class ScanCollector:
             fs = FileSystemService()
         self.fs = fs
         self.settings = settings
+        self.paths = paths
 
         # Instantiate modular subcomponents
         self.hash_calculator = HashCalculator(self.fs)
@@ -104,8 +106,9 @@ class ScanCollector:
                 pct = 0.05 + (1.0 - 1.0 / (1.0 + count / 1000.0)) * 0.35
                 self.progress_callback(pct)
 
+        search_roots = self.paths if (self.paths and len(self.paths) > 0) else [self.library.root_path]
         files = self.collector.collect(
-            [self.library.root_path],
+            search_roots,
             settings=self.settings,
             progress_callback=collect_progress_cb
         )
@@ -113,7 +116,7 @@ class ScanCollector:
         potential_extras = files["potential_extras"]
 
         total_files = len(potential_media) + len(potential_extras)
-        logger.info("[scan:%s] Collected %s media candidates and %s extra candidates from %s", self.mode.value, len(potential_media), len(potential_extras), self.library.root_path)
+        logger.info("[scan:%s] Collected %s media candidates and %s extra candidates from %s", self.mode.value, len(potential_media), len(potential_extras), search_roots)
         if total_files == 0:
             return [], {}
 

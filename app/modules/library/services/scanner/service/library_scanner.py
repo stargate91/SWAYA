@@ -123,12 +123,30 @@ class LibraryScanner:
                             
                         matched_lib = lib
                         break
+            lib_to_paths = {}
+            for p in paths:
+                norm_p = p.replace("\\", "/").rstrip("/")
+                matched_lib = None
+                for lib in all_libs:
+                    lib_p = lib.root_path.replace("\\", "/").rstrip("/")
+                    if lib_p == norm_p or norm_p.startswith(lib_p + "/"):
+                        matched_lib = lib
+                        break
+                    elif lib_p.startswith(norm_p + "/"):
+                        matched_lib = lib
+                        break
                 if matched_lib:
                     if matched_lib not in libraries_to_scan:
                         libraries_to_scan.append(matched_lib)
+                    if matched_lib.id not in lib_to_paths:
+                        lib_to_paths[matched_lib.id] = []
+                    lib_to_paths[matched_lib.id].append(p)
                 else:
                     new_lib = self.resolver.create_library(name=os.path.basename(p) or "Library", root_path=p)
                     libraries_to_scan.append(new_lib)
+                    if new_lib.id not in lib_to_paths:
+                        lib_to_paths[new_lib.id] = []
+                    lib_to_paths[new_lib.id].append(p)
 
             if not libraries_to_scan:
                 libraries_to_scan = all_libs
@@ -150,14 +168,17 @@ class LibraryScanner:
                         StatusCoordinator.scan_status["total"] = 100
                     scale = scan_mode.profile.collect_progress_weight
                     self.task_manager.update_progress(task_id, pct * scale)
+                
+                lib_paths = lib_to_paths.get(lib.id)
                 to_enrich, _ = await asyncio.to_thread(
                     scanner.scan_library,
                     lib.id,
                     mode=scan_mode,
                     progress_callback=progress_cb,
                     provider=provider,
+                    paths=lib_paths
                 )
-                logger.info("[scan:%s] Library %s produced %s items to enrich", scan_mode.value, lib.root_path, len(to_enrich))
+                logger.info("[scan:%s] Library %s produced %s items to enrich (paths=%s)", scan_mode.value, lib.root_path, len(to_enrich), lib_paths)
                 total_items_to_enrich.extend(to_enrich)
 
             logger.info("[scan:%s] Total items queued for resolver: %s", scan_mode.value, len(total_items_to_enrich))

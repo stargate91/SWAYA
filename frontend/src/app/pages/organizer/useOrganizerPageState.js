@@ -77,6 +77,8 @@ export function useOrganizerPageState({ t, scanMode, sessionMode }) {
     totalItems,
   });
 
+  const [isLoaded, setIsLoaded] = useState(false);
+
   // 2. Query data from backend using the current states.
   const subTab = activeMainTab === 'manual' ? activeManualTab : (activeMainTab === 'extras' ? activeExtrasTab : null);
   const organizerQuery = useOrganizerQuery(
@@ -88,7 +90,8 @@ export function useOrganizerPageState({ t, scanMode, sessionMode }) {
     subTab,
     searchQuery,
     sortConfig?.key || 'source',
-    sortConfig?.direction || 'asc'
+    sortConfig?.direction || 'asc',
+    isLoaded
   );
   
   const organizer = organizerQuery.data || { items: [], total_items: 0, tab_counts: {} };
@@ -244,5 +247,7 @@ export function useOrganizerPageState({ t, scanMode, sessionMode }) {
     tabCounts,
     totalPages,
     organizerQuery,
+    isLoaded,
+    setIsLoaded,
   };
 }

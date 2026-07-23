@@ -192,7 +192,7 @@ class PlanGenerator:
             original_path=orig_path,
             target_name=target_name,
             target_subpath=target_subpath,
-            item_type=media_type.value,
+            item_type=media_type.value if hasattr(media_type, "value") else media_type,
             destination_root=dest_root,
             source_size=getattr(item, "size", 0),
             source_duration=getattr(item, "duration", None),

@@ -1,4 +1,4 @@
-import { Settings2, FolderTree, KeyRound, Wrench, Palette, Cpu, Flame } from '@/ui/icons';
+import { Settings2, FolderTree, KeyRound, Wrench, Palette, Cpu, Flame, Download } from '@/ui/icons';
 import { ORGANIZATION_TAB_IDS, ADULT_TAB_IDS, SETTINGS_TAB_GROUP_IDS, SETTINGS_TAB_IDS } from './settingsConstants.js';
 
 import {
@@ -14,6 +14,7 @@ import {
   AdvancedTab,
   MaintenanceTab,
   ScenesTab,
+  TorrentSettingsTab,
 } from './components';
 
 const alwaysVisible = () => true;
@@ -55,6 +56,11 @@ export const settingsTabGroups = [
     id: SETTINGS_TAB_GROUP_IDS.MAINTENANCE,
     labelKey: 'settingsPage.sidebar.maintenance',
     icon: Wrench,
+  },
+  {
+    id: SETTINGS_TAB_GROUP_IDS.TORRENT,
+    labelKey: 'settingsPage.sidebar.torrent',
+    icon: Download,
   },
 ];
 
@@ -169,6 +175,16 @@ export const settingsTabDefinitions = [
       handleImportSettings: ctx.handleImportSettings,
       handleWipeDatabase: ctx.handleWipeDatabase,
       handleWipeCache: ctx.handleWipeCache,
+      formInputs: ctx.formInputs,
+    }),
+  },
+  {
+    id: SETTINGS_TAB_IDS.TORRENT,
+    group: SETTINGS_TAB_GROUP_IDS.TORRENT,
+    component: TorrentSettingsTab,
+    getProps: (ctx) => ({
+      form: ctx.form,
+      handleChange: ctx.handleChange,
       formInputs: ctx.formInputs,
     }),
   },

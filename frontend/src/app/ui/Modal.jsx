@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { FocusScope } from '@radix-ui/react-focus-scope';
 import PropTypes from 'prop-types';
 import { X } from '@/ui/icons';
@@ -25,6 +26,16 @@ export default function Modal({
   headerStyle = null,
 }) {
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (open) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [open]);
 
   if (!open) return null;
 

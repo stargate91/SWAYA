@@ -177,7 +177,7 @@ class PeopleEnrichWorker:
                 try:
                     await asyncio.to_thread(self._enrich_single_person, person_id)
                 except Exception as e:
-                    logger.error(f"Worker-{worker_id} failed to enrich person {person_id}: {e}")
+                    logger.error(f"Worker-{worker_id} failed to enrich person {person_id}: {e}", exc_info=True)
 
                 self.completed_count += 1
                 self._pending_person_ids.discard(person_id)

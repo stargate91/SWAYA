@@ -22,7 +22,7 @@ const BRAND_NAME = 'SWAYA';
 export default function WindowTitlebar() {
   const { data: settings } = useSettingsQuery();
   const { sessionMode, toggleSessionMode } = useLibraryModeStore();
-  const { hasProgress, scanProgress, imageProgress, hydrateProgress, syncProgress } = useWindowProgress();
+  const { hasProgress, scanProgress, imageProgress, hydrateProgress, torrentProgress, syncProgress } = useWindowProgress();
   const { openModal, closeModal, toast } = useUi();
   const { t } = useTranslation();
   const { minimize, toggleMaximize, close, resizeToMinimum } = useWindowControls();
@@ -138,10 +138,11 @@ export default function WindowTitlebar() {
           <GlobalSearch />
         </div>
         {hasProgress && (
-          <div className={`${styles['progress-wrapper']} ${[scanProgress, imageProgress, hydrateProgress, syncProgress].filter(Boolean).length === 1 ? styles['is-single'] : ''}`}>
+          <div className={`${styles['progress-wrapper']} ${[scanProgress, imageProgress, hydrateProgress, torrentProgress, syncProgress].filter(Boolean).length === 1 ? styles['is-single'] : ''}`}>
             {scanProgress ? <ProgressBar {...scanProgress} onAbort={handleAbort} /> : null}
             {imageProgress ? <ProgressBar {...imageProgress} variant="sub" /> : null}
             {hydrateProgress ? <ProgressBar {...hydrateProgress} variant="sub" /> : null}
+            {torrentProgress ? <ProgressBar {...torrentProgress} variant="sub" /> : null}
             {syncProgress ? <ProgressBar {...syncProgress} variant="sub" /> : null}
           </div>
         )}

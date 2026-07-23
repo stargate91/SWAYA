@@ -15,5 +15,6 @@ export { default as SettingsLiveImpact } from './SettingsLiveImpact.jsx';
 export { default as SettingsSidebar } from './SettingsSidebar.jsx';
 export { default as ThemeTab } from './ThemeTab.jsx';
 export { default as AdultGeneralTab } from './AdultGeneralTab.jsx';
+export { default as TorrentSettingsTab } from './TorrentSettingsTab.jsx';
 
 

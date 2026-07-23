@@ -200,7 +200,7 @@ class AdultEnricher:
 
             if "provider_profiles" not in result:
                 result["provider_profiles"] = {}
-            result["provider_profiles"][provider.value] = source_data
+            result["provider_profiles"][provider.value if hasattr(provider, "value") else provider] = source_data
 
             perf_urls = perf.get("urls") or []
             if perf_urls:

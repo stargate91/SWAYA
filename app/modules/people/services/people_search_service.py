@@ -216,6 +216,9 @@ class PeopleSearchService:
         db = self.db
         from app.modules.people.services.person_service import PersonService
         
+        if isinstance(db_id_or_external, str) and db_id_or_external.startswith("tmdb:"):
+            db_id_or_external = db_id_or_external.split(":", 1)[1]
+
         if isinstance(db_id_or_external, str) and ":" in db_id_or_external:
             parts = db_id_or_external.split(":", 1)
             source_name = parts[0]
@@ -270,7 +273,7 @@ class PeopleSearchService:
             images = perf.get("images") or []
             profile_url = images[0].get("url") if images else None
             
-            service = PersonService(db, people_repo=self.people_repo)
+            service = PersonService(db)
             person = service.update_or_create_person(
                 name=perf.get("name"),
                 profile_path=profile_url,
@@ -352,7 +355,7 @@ class PeopleSearchService:
                 
             resolved_is_adult = is_adult if is_adult is not None else bool(tmdb_details.get("adult"))
             
-            service = PersonService(db, people_repo=self.people_repo)
+            service = PersonService(db)
             person = service.update_or_create_person(
                 name=tmdb_details.get("name"),
                 profile_path=tmdb_details.get("profile_path"),

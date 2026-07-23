@@ -84,8 +84,37 @@ async def lifespan(app: FastAPI):
     from app.modules.library.filesystem.folder_watcher import start_watcher, stop_watcher
     start_watcher()
     
+    # Start Jackett and qBittorrent if torrent feature is enabled
+    try:
+        from app.modules.settings.services.settings_service import SettingsService
+        with Session(engine) as session:
+            settings = SettingsService(session)
+            if settings.get_setting("torrent_enabled"):
+                import socket
+                import threading
+                from app.modules.torrent.services import jackett_manager, qbittorrent_watcher
+                
+                def is_port_in_use(port: int) -> bool:
+                    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                        s.settimeout(1.0)
+                        return s.connect_ex(('127.0.0.1', port)) == 0
+
+                if not is_port_in_use(jackett_manager.port):
+                    threading.Thread(target=jackett_manager.start, daemon=True).start()
+                
+                # Start watching completed torrents in the user's running qBittorrent instance
+                qbittorrent_watcher.start()
+    except Exception as e:
+        logger.error(f"Failed to start torrent managers at startup: {e}")
+    
     yield
     # Shutdown logic if any goes here
+    try:
+        from app.modules.torrent.services import jackett_manager
+        jackett_manager.stop()
+    except Exception as e:
+        logger.error(f"Failed to stop torrent managers at shutdown: {e}")
+        
     stop_watcher()
     await task_manager.download_worker.stop()
     await task_manager.people_enrich_worker.stop()
@@ -153,6 +182,7 @@ from app.modules.history.router import router as history_router  # noqa: E402
 from app.modules.media.router import router as app_media_router  # noqa: E402
 from app.modules.recommendations.router import router as app_rec_router  # noqa: E402
 from app.modules.organizer.router import router as app_organizer_router  # noqa: E402
+from app.modules.torrent.router import router as app_torrent_router  # noqa: E402
 
 app.include_router(tasks_router)
 app.include_router(media_router)
@@ -171,6 +201,7 @@ app.include_router(history_router)
 app.include_router(app_media_router)
 app.include_router(app_rec_router)
 app.include_router(app_organizer_router)
+app.include_router(app_torrent_router)
 
 
 

@@ -127,6 +127,8 @@ export const buildSettingsPayload = (form) => ({
   adult_tag_blacklist: (form.adult_tag_blacklist || '').trim(),
   adult_stashdb_focus_tag: (form.adult_stashdb_focus_tag || '').trim(),
   adult_fansdb_focus_tag: (form.adult_fansdb_focus_tag || '').trim(),
+  torrent_enabled: Boolean(form.torrent_enabled),
+  torrent_download_dir: (form.torrent_download_dir || '').trim(),
 });
 
 export const settingsPersistenceApi = {

@@ -54,7 +54,7 @@ def apply_enriched_data(enricher, person: Person, data: dict):
             ExternalSourceLink.external_id == link_to_create["external_id"]
         ).first()
 
-        src_data = provider_profiles.get(prov_enum.value)
+        src_data = provider_profiles.get(prov_enum.value if hasattr(prov_enum, "value") else prov_enum)
         profile_url = None
         if src_data and isinstance(src_data, dict):
             profile_url = src_data.get("profile_path")
@@ -76,7 +76,7 @@ def apply_enriched_data(enricher, person: Person, data: dict):
                     link.profile_url = profile_url
 
     for ext_link in person.external_links:
-        prov_key = ext_link.provider.value
+        prov_key = ext_link.provider.value if hasattr(ext_link.provider, "value") else ext_link.provider
         if prov_key in provider_profiles:
             src_data = provider_profiles[prov_key]
             if isinstance(src_data, dict):

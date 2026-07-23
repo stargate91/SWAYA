@@ -31,7 +31,8 @@
     "searchPlaceholder": "Search...",
     "subtitles": "Subtitles",
     "subtitle": "Subtitle",
-    "adult": "Adult"
+    "adult": "Adult",
+    "browse": "Browse"
   },
   "tabs": {
     "movies": "Movies",
@@ -99,6 +100,10 @@
     },
     "sync": {
       "running": "Syncing metadata languages..."
+    },
+    "torrent": {
+      "downloading_single": "Downloading {{name}}...",
+      "downloading_multiple": "Downloading {{count}} torrents..."
     },
     "scan": {
       "collecting": "Scanning files...",

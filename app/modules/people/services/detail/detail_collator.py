@@ -216,6 +216,7 @@ class PersonDetailCollator:
                 if ext == ".jpeg":
                     ext = ".jpg"
 
+                existing_file = None
                 tmdb_id = (person.external_ids or {}).get("tmdb")
                 if tmdb_id:
                     clean_path = effective_profile.lstrip("/")

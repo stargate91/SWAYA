@@ -53,6 +53,24 @@ class RenamerRunner:
     async def _run_rename(self, task_id: int, item_ids: Optional[List[int]] = None, organize_in_place: bool = False):
         items = self.resolver.get_items_for_renaming(item_ids)
 
+        # Never rename or move torrent files from the download directory to preserve seeding
+        try:
+            from app.modules.settings.services.settings_service import SettingsService
+            settings_service = SettingsService(self.db)
+            torrent_dir = settings_service.get_setting("torrent_download_dir")
+            if torrent_dir:
+                norm_torrent_dir = os.path.normpath(torrent_dir).lower() + os.sep
+                filtered_items = []
+                for item in items:
+                    norm_item_path = os.path.normpath(item.current_path).lower()
+                    if norm_item_path.startswith(norm_torrent_dir):
+                        logger.info(f"Skipping rename/move for torrent item to preserve seeding: {item.current_path}")
+                        continue
+                    filtered_items.append(item)
+                items = filtered_items
+        except Exception as e:
+            logger.warning(f"Error filtering torrent files in renamer: {e}")
+
         if not items:
             with StatusCoordinator.scan_status_lock:
                 StatusCoordinator.scan_status.update({

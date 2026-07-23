@@ -30,7 +30,8 @@
     "adult": "Adult Content",
     "adultGeneral": "General",
     "adultApi": "API Integrations",
-    "system": "System"
+    "system": "System",
+    "torrent": "Torrent"
   },
   "templateTags": {
     "common": "Common Tags",
@@ -566,6 +567,26 @@
       "fileNamingHint": "See how your naming choices change the final movie and episode file names.",
       "folderStructureHint": "See how your folder choices change the final library layout.",
       "extrasHint": "See how your extras settings change where extra files end up."
+    },
+    "torrent": {
+      "title": "Torrent Integration",
+      "eyebrow": "Downloads",
+      "enable": "Enable Download Automation",
+      "hint": "Automatically downloads, runs, and integrates Jackett and qBittorrent-nox in the background to search and download movies.",
+      "qbittorrent": "Storage Settings",
+      "qbUrl": "Download Directory",
+      "qbUrlPlaceholder": "Choose folder where completed torrent downloads will save...",
+      "qbSettings": "qBittorrent WebUI Connection",
+      "qbPort": "WebUI Port",
+      "qbPortPlaceholder": "Default: 8080",
+      "qbUser": "WebUI Username",
+      "qbUserPlaceholder": "Default: admin",
+      "qbPass": "WebUI Password",
+      "qbPassPlaceholder": "WebUI password...",
+      "qbHelpText": "To integrate qBittorrent with SWAYA:\n1. Open your qBittorrent client.\n2. Go to Tools -> Options -> Web UI.\n3. Enable the Web User Interface (Remote control).\n4. Set a port (default: 8080), username, and password.\n5. Paste the port, username, and password in the fields above.",
+      "jackett": "Jackett Trackers Configuration",
+      "jackettInfo": "Jackett runs automatically in the background. Use the dashboard link below to add indexers (e.g. nCore, 1337x) with your credentials.",
+      "openJackett": "Open Jackett Dashboard"
     }
   },
   "validation": {

@@ -31,6 +31,7 @@ class BaseScanPipeline:
         provider: Optional[str] = None,
         fs: Optional[Any] = None,
         settings: Optional[Any] = None,
+        paths: Optional[List[str]] = None,
     ) -> ScanCollector:
         collector = Collector(min_size_mb)
         return ScanCollector(
@@ -46,6 +47,7 @@ class BaseScanPipeline:
             provider=provider,
             fs=fs,
             settings=settings,
+            paths=paths,
         )
 
 

@@ -14,10 +14,11 @@ export const getOrganizerQueryKey = (scanMode, sessionMode, page, pageSize, tab,
   sortDir || 'asc',
 ];
 
-export const useOrganizerQuery = (scanMode, sessionMode, page, pageSize, tab, subTab, q, sortBy, sortDir) => useQuery({
+export const useOrganizerQuery = (scanMode, sessionMode, page, pageSize, tab, subTab, q, sortBy, sortDir, enabled = true) => useQuery({
   queryKey: getOrganizerQueryKey(scanMode, sessionMode, page, pageSize, tab, subTab, q, sortBy, sortDir),
   queryFn: () => api.organizer.get({ scanMode, sessionMode, page, pageSize, tab, subTab, q, sortBy, sortDir }),
   keepPreviousData: true,
+  enabled,
 });
 
 export const useOrganizerCountQuery = (scanMode, sessionMode) => useQuery({

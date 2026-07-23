@@ -116,6 +116,8 @@ export default function OrganizerPage() {
     visibleExtraCount,
     visibleMediaCount,
     organizerQuery,
+    isLoaded,
+    setIsLoaded,
   } = useOrganizerPageState({ t, scanMode, sessionMode });
 
   const organizer = organizerQuery.data || EMPTY_ORGANIZER;
@@ -238,7 +240,14 @@ export default function OrganizerPage() {
     includeAdult: Boolean(settings.include_adult && sessionMode === 'nsfw'),
     provider,
     settings,
+    setIsLoaded,
   });
+
+  useEffect(() => {
+    if (isScanActive) {
+      setIsLoaded(true);
+    }
+  }, [isScanActive, setIsLoaded]);
 
 
   const { computedExtrasTabs, computedManualTabs, computedMainTabs } = useOrganizerTabs({

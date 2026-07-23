@@ -11,6 +11,7 @@ import {
   Cpu,
   Wrench,
   Clapperboard,
+  Download,
 } from '@/ui/icons';
 
 export default function SettingsSidebar({
@@ -77,6 +78,13 @@ export default function SettingsSidebar({
     label: t('settingsPage.sidebar.maintenance'),
     icon: Wrench,
     isActive: activeTab === SETTINGS_TAB_IDS.MAINTENANCE,
+  });
+
+  sidebarGroups.push({
+    id: SETTINGS_TAB_IDS.TORRENT,
+    label: t('settingsPage.sidebar.torrent') || 'Torrent',
+    icon: Download,
+    isActive: activeTab === SETTINGS_TAB_IDS.TORRENT,
   });
 
   // Group 2: Organization Section Header

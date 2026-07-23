@@ -82,6 +82,7 @@ export function useOrganizerScan({
   sessionMode,
   includeAdult,
   provider,
+  setIsLoaded,
 }) {
   const queryKey = getOrganizerQueryKey(scanMode, sessionMode);
   const [isBrowseStarting, setIsBrowseStarting] = useState(false);
@@ -175,6 +176,7 @@ export function useOrganizerScan({
     }
 
     setIsBrowseStarting(true);
+    setIsLoaded(true);
     try {
       lastScanPathsRef.current = uniquePaths;
 

@@ -113,7 +113,7 @@ class ScanResolver:
                             mode=self.mode,
                             include_adult=self.include_adult,
                             provider=self.provider,
-                            resolver=local_repo,
+                            media_resolver=local_repo,
                         )
                         pipeline.resolve_and_enrich(
                             item,

@@ -78,10 +78,10 @@
 }
 
 .progress-wrapper :global(.ui-progress-bar-container) {
-  flex: 0 1 23.75rem;
+  flex: 0 1 32rem;
   max-width: 42.5rem;
   min-width: 10rem;
-  width: 23.75rem;
+  width: 32rem;
 }
 
 .brand-text {

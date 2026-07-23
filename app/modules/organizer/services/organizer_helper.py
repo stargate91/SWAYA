@@ -23,9 +23,10 @@ class OrganizerHelper:
 
         active_match = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
         if active_match:
-            if active_match.media_type == MediaType.TV:
+            active_mtype = active_match.media_type.value if hasattr(active_match.media_type, "value") else active_match.media_type
+            if active_mtype == "tv":
                 return MediaType.EPISODE.value
-            return active_match.media_type.value
+            return active_mtype
 
         gtype = None
         if item.parsed_info:

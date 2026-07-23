@@ -1,8 +1,11 @@
-import { FolderOpen, Video, Check, Eye, Play, BellPlus, Droplets, Info } from '@/ui/icons';
+import { FolderOpen, Video, Check, Eye, Play, BellPlus, Droplets, Info, Download } from '@/ui/icons';
 import Button from '@/ui/Button';
 import { formatEpisodeNumber } from '../../utils/detailUtils';
 import { useMediaDetailContext } from './MediaDetailContext';
 import Inline from '@/ui/Inline';
+import { useState } from 'react';
+import TorrentSearchModal from '../../../dashboard/widgets/components/TorrentSearchModal.jsx';
+import { useSettingsQuery } from '@/queries/settingsQueries';
 
 export default function MediaActions() {
   const { state, actions, mutations, t, navigate, setIsDrawerOpen } = useMediaDetailContext();
@@ -38,10 +41,30 @@ export default function MediaActions() {
   const hasCollection = isMovie && item?.collection_data;
   const hasTrailer = item?.trailer_key;
 
-  if (!isOwned && !canToggleTracked && !canToggleWatched && !hasCollection && !hasTrailer) return null;
+  const [modalOpen, setModalOpen] = useState(false);
+  const { data: settings = {} } = useSettingsQuery();
+  const torrentEnabled = settings?.torrent_enabled;
+
+  if (!isOwned && !canToggleTracked && !canToggleWatched && !hasCollection && !hasTrailer && !(!isOwned && torrentEnabled)) return null;
 
   return (
     <Inline gap="lg" align="center" className="media-detail-page__actions-row">
+      {!isOwned && torrentEnabled && (
+        <>
+          <Button
+            variant="ghost"
+            onClick={() => setModalOpen(true)}
+          >
+            <Download size={16} />
+            Download
+          </Button>
+          <TorrentSearchModal
+            open={modalOpen}
+            onClose={() => setModalOpen(false)}
+            defaultQuery={item?.title || item?.name}
+          />
+        </>
+      )}
       {hasCollection && (
         <Button
           variant="ghost"

@@ -55,6 +55,7 @@ class ScannerManager:
         mode: ScanMode = ScanMode.MOVIES_TV,
         progress_callback: Optional[callable] = None,
         provider: Optional[str] = None,
+        paths: Optional[List[str]] = None,
     ) -> Tuple[List[MediaItem], Dict[str, Any]]:
         """
         Runs Phase 1 scanning on a specific Library.
@@ -65,7 +66,7 @@ class ScannerManager:
             logger.error(f"Library {library_id} not found in database.")
             return [], {}
 
-        logger.info(f"Starting scan for source root: {library.name} (Root: {library.root_path}, Mode: {mode.value})")
+        logger.info(f"Starting scan for source root: {library.name} (Root: {library.root_path}, Mode: {mode.value}, Paths: {paths})")
 
         pipeline = get_scan_pipeline(mode)
         profile = mode.profile
@@ -88,6 +89,7 @@ class ScannerManager:
             provider=collector_provider,
             fs=self.fs,
             settings=self.settings,
+            paths=paths,
         )
         
         try:

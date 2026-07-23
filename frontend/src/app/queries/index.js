@@ -14,3 +14,4 @@ export * from './personMutations';
 export * from './historyQueries';
 export * from './dashboardQueries';
 export * from './listsQueries';
+export * from './torrentQueries';

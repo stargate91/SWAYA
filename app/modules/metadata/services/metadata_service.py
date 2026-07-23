@@ -146,8 +146,8 @@ class MetadataService:
             MediaCollection.external_id == str(external_id)
         ).first()
 
-    def create_collection(self, provider: Provider, external_id: str, name: str) -> Any:
-        collection = MediaCollection(provider=provider, external_id=str(external_id), name=name)
+    def create_collection(self, provider: Provider, external_id: str, backdrop_path: Optional[str] = None) -> Any:
+        collection = MediaCollection(provider=provider, external_id=str(external_id), backdrop_path=backdrop_path)
         self.db.add(collection)
         return collection
 
@@ -176,8 +176,8 @@ class MetadataService:
             MediaCollectionLocalization.locale == language
         ).first()
 
-    def create_collection_localization(self, collection_id: int, language: str) -> Any:
-        loc = MediaCollectionLocalization(collection_id=collection_id, locale=language)
+    def create_collection_localization(self, collection_id: int, locale: str) -> Any:
+        loc = MediaCollectionLocalization(collection_id=collection_id, locale=locale)
         self.db.add(loc)
         return loc
 

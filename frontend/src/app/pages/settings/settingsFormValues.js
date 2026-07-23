@@ -119,6 +119,11 @@ export const SETTINGS_BASE_DEFAULTS = {
   adult_tag_blacklist: '',
   adult_stashdb_focus_tag: '',
   adult_fansdb_focus_tag: '',
+  torrent_enabled: false,
+  torrent_download_dir: '',
+  torrent_qbittorrent_port: '8080',
+  torrent_qbittorrent_user: 'admin',
+  torrent_qbittorrent_pass: 'adminadmin',
 };
 
 export function getLocalizedSettingsDefaults(t = null) {
@@ -358,6 +363,11 @@ export function getInitialFormValues(settingsData = null, t = null) {
     adult_tag_blacklist: getStringValue(settingsData.adult_tag_blacklist, defaults.adult_tag_blacklist),
     adult_stashdb_focus_tag: getStringValue(settingsData.adult_stashdb_focus_tag, defaults.adult_stashdb_focus_tag),
     adult_fansdb_focus_tag: getStringValue(settingsData.adult_fansdb_focus_tag, defaults.adult_fansdb_focus_tag),
+    torrent_enabled: getBooleanValue(settingsData.torrent_enabled, defaults.torrent_enabled),
+    torrent_download_dir: getStringValue(settingsData.torrent_download_dir, defaults.torrent_download_dir),
+    torrent_qbittorrent_port: getStringValue(settingsData.torrent_qbittorrent_port, defaults.torrent_qbittorrent_port),
+    torrent_qbittorrent_user: getStringValue(settingsData.torrent_qbittorrent_user, defaults.torrent_qbittorrent_user),
+    torrent_qbittorrent_pass: getStringValue(settingsData.torrent_qbittorrent_pass, defaults.torrent_qbittorrent_pass),
   };
 }
 

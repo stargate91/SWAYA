@@ -157,7 +157,7 @@ class ProfileMerger:
         seen_keys = set()
 
         for link in person.external_links:
-            prov_val = link.provider.value
+            prov_val = link.provider.value if hasattr(link.provider, "value") else link.provider
             prov_lower = prov_val.lower()
             
             helper_ids = {}

@@ -132,16 +132,19 @@ class SettingsService:
             self.create_user_setting(self.user_id, "preferred_player", "swaya")
             self.db.commit()
 
-        # Default hover preview settings
-        preview_defaults = {
+        # Default hover preview and qBittorrent settings
+        defaults = {
             "hover_previews_enabled": True,
             "hover_previews_delay": 800,
             "hover_previews_duration": 16,
             "previews_cache_max_size_mb": 2048,
-            "previews_cache_max_age_days": 30
+            "previews_cache_max_age_days": 30,
+            "torrent_qbittorrent_port": "8080",
+            "torrent_qbittorrent_user": "admin",
+            "torrent_qbittorrent_pass": "adminadmin"
         }
         db_changed = False
-        for k, v in preview_defaults.items():
+        for k, v in defaults.items():
             if not self.get_user_setting_obj(self.user_id, k):
                 self.create_user_setting(self.user_id, k, v)
                 db_changed = True
@@ -152,9 +155,42 @@ class SettingsService:
         return {s.key: s.value for s in settings}
 
     def update_settings(self, settings: Dict[str, Any]) -> Dict[str, Any]:
+        # Convert values to correct types if needed (e.g. check current value of torrent_enabled)
+        from app.modules.settings.models import UserSetting
+        old_torrent_enabled_setting = self.db.query(UserSetting).filter(UserSetting.key == "torrent_enabled", UserSetting.user_id == self.user_id).first()
+        old_enabled = False
+        if old_torrent_enabled_setting:
+            old_enabled = str(old_torrent_enabled_setting.value).lower() in ("true", "1")
+
         for key, value in settings.items():
             self.set_setting(key, value, self.user_id)
         self.db.commit()
+
+        new_enabled = settings.get("torrent_enabled")
+        if isinstance(new_enabled, str):
+            new_enabled = new_enabled.lower() in ("true", "1")
+        elif new_enabled is not None:
+            new_enabled = bool(new_enabled)
+
+        if new_enabled:
+            import socket
+            import threading
+            try:
+                from app.modules.torrent.services import jackett_manager, qbittorrent_watcher
+                
+                def is_port_in_use(port: int) -> bool:
+                    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                        s.settimeout(1.0)
+                        return s.connect_ex(('127.0.0.1', port)) == 0
+
+                if not is_port_in_use(jackett_manager.port):
+                    threading.Thread(target=jackett_manager.start, daemon=True).start()
+                
+                # Start watching completed torrents in the user's running qBittorrent instance
+                qbittorrent_watcher.start()
+            except Exception as e:
+                logger.error(f"Failed to dynamically start torrent managers: {e}")
+
         return {"status": "success"}
 
     def upload_avatar(self, filename: str, file_stream) -> Dict[str, str]:

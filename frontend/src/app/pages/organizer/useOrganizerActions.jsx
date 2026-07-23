@@ -24,6 +24,7 @@ export function useOrganizerActions({
   includeAdult,
   provider,
   settings,
+  setIsLoaded,
 }) {
   const [isLoadingAll, setIsLoadingAll] = useState(false);
   const [isRenamePending, setIsRenamePending] = useState(false);
@@ -75,6 +76,7 @@ export function useOrganizerActions({
     sessionMode,
     includeAdult,
     provider,
+    setIsLoaded,
   });
 
   const { handleRename, isRenameStarting } = useOrganizerRename({
@@ -102,6 +104,7 @@ export function useOrganizerActions({
     }
 
     setIsLoadingAll(true);
+    setIsLoaded(true);
     try {
       const result = await organizerQuery.refetch();
       if (result.data) {

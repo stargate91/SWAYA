@@ -39,12 +39,19 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--space-sm);
+  min-width: 0;
 }
 
 .title {
   margin: 0;
   font: var(--text-section);
   color: var(--color-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
 }
 
 .close {
