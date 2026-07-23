@@ -56,7 +56,7 @@ export default function DrawerResultsList({
       {!searching && filteredResults.map((item) => {
         const added = isAdded(item);
         const n = normalizeMediaEntity(item, { context: 'drawer', sessionMode });
-        const isSceneItem = item.media_type === 'scene' || mediaType === 'scene' || item.media_type === 'videos' || mediaType === 'videos';
+        const isSceneItem = item.media_type === 'scene' || mediaType === 'scene' || item.media_type === 'video' || mediaType === 'video' || item.media_type === 'videos' || mediaType === 'videos';
         const poster = isSceneItem ? (item.backdrop_path || item.poster_path) : (item.poster_path || item.profile_path);
         const imageSize = listType === 'person' ? 'person' : (isSceneItem ? 'backdrop' : 'poster');
 

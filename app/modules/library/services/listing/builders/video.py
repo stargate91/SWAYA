@@ -26,7 +26,8 @@ class VideoQueryBuilder(BaseQueryBuilder):
             MetadataMatch.media_item_id.isnot(None),
             MediaItem.status.in_(self.lib_statuses),
             MetadataMatch.is_active,
-            MetadataMatch.media_type == MediaType.VIDEO
+            MetadataMatch.media_type == MediaType.VIDEO,
+            MetadataMatch.is_adult == params.include_adult
         )
 
         if params.selected_performer_id:

@@ -84,6 +84,7 @@ export default function WindowTitlebar() {
           path.startsWith('/library/movie/') ||
           path.startsWith('/library/tv/') ||
           path.startsWith('/library/scene/') ||
+          path.startsWith('/library/video/') ||
           path.startsWith('/library/people/')
         ) {
           navigate('/dashboard');

@@ -16,6 +16,7 @@ import RatingsReviewDrawer from './components/RatingsReviewDrawer';
 import ImageTooltip from '@/ui/ImageTooltip';
 import styles from './RatingsPage.module.css';
 import Inline from '@/ui/Inline';
+import { isVideoMediaType } from '@/lib/mediaTypes';
 
 export default function RatingsPage() {
   const navigate = useNavigate();
@@ -57,7 +58,11 @@ export default function RatingsPage() {
           } else if (state.mediaType === 'series') {
             navigate(`/library/tv/${row.id}`, { state: { allowAdult: true } });
           } else if (state.mediaType === 'scenes' || state.mediaType === 'videos') {
-            navigate(`/library/scene/${row.id}`, { state: { allowAdult: true } });
+            if (row.type === 'video' || isVideoMediaType(row.type)) {
+              navigate(`/library/video/${row.id}`, { state: { allowAdult: true } });
+            } else {
+              navigate(`/library/scene/${row.id}`, { state: { allowAdult: true } });
+            }
           }
         };
 

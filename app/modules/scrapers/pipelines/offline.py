@@ -7,8 +7,13 @@ from app.core.constants import DEFAULT_FALLBACK_LANGUAGE
 from app.modules.scrapers.pipelines.base import BaseResolverPipeline
 
 class OfflineResolverPipeline(BaseResolverPipeline):
-    def __init__(self, mainstream_resolver, include_adult: bool = False):
-        self.db: Session = mainstream_resolver.db
+    def __init__(self, mainstream_resolver=None, include_adult: bool = False, *, db=None):
+        if db is not None:
+            self.db: Session = db
+        elif mainstream_resolver is not None:
+            self.db: Session = mainstream_resolver.db if hasattr(mainstream_resolver, 'db') else mainstream_resolver
+        else:
+            raise ValueError("Either db or mainstream_resolver must be provided")
         self.include_adult = include_adult
 
     def resolve_item(

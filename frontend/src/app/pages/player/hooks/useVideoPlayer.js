@@ -293,6 +293,9 @@ export default function useVideoPlayer({ itemId, containerRef }) {
     setVideoParams: state.setVideoParams,
     countdownIntervalRef,
     updateStatusMutation,
+    updateBottomOffset,
+    handleCloseRef,
+    sendCommand,
   });
 
   // Periodic progress saving

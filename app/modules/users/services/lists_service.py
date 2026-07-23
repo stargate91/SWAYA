@@ -282,14 +282,26 @@ class ListsService:
             self.db.add(watchlist)
             self.db.commit()
 
+        nsfw_watchlist = self.db.query(CustomList).filter(CustomList.name == "NSFW Watchlist").first()
+        if not nsfw_watchlist:
+            nsfw_watchlist = CustomList(
+                name="NSFW Watchlist",
+                description="Your go-to space for adult items you want to watch later.",
+                list_type=CustomListType.VIDEO_SCENE,
+                color="#ec4899",
+                is_adult=True
+            )
+            self.db.add(nsfw_watchlist)
+            self.db.commit()
+
         adult_enabled = self._adult_access_enabled() and include_adult
 
         lists = self.db.query(CustomList).all()
         result = []
         for custom_list in lists:
-            # Hide the entire list if adult is disabled and it has ONLY adult items (Watchlist is never hidden)
+            # Hide the entire list if adult is disabled and it has ONLY adult items or is marked as adult
             if not adult_enabled and custom_list.name != "Watchlist":
-                if custom_list.items and all(self._is_item_adult(item) for item in custom_list.items):
+                if custom_list.is_adult or (custom_list.items and all(self._is_item_adult(item) for item in custom_list.items)):
                     continue
 
             global_adult_enabled = self._adult_access_enabled()
@@ -318,7 +330,7 @@ class ListsService:
             result.append(CustomListResponse(
                 id=custom_list.id,
                 name=custom_list.name,
-                is_watchlist=custom_list.name == "Watchlist",
+                is_watchlist=custom_list.name in ("Watchlist", "NSFW Watchlist"),
                 description=custom_list.description,
                 color=custom_list.color or "#3b82f6",
                 list_type=custom_list.list_type,
@@ -550,7 +562,7 @@ class ListsService:
         custom_list = self.db.query(CustomList).filter(CustomList.id == list_id).first()
         if not custom_list:
             raise NotFoundException("Not found")
-        if custom_list.name == "Watchlist":
+        if custom_list.name in ("Watchlist", "NSFW Watchlist"):
             raise BadRequestException("Watchlist cannot be deleted")
 
         self.db.delete(custom_list)
@@ -581,7 +593,14 @@ class ListsService:
                     provider, external_id = ProviderRegistry.clean_id(media_item_id)
                     media_item_id = None
                 except ValueError:
-                    if media_item_id.isdigit():
+                    from app.modules.library.services.media_item_service import MediaItemService
+                    resolved_item_id, resolved_match_id = MediaItemService(self.db).resolve_ids(media_item_id, media_type)
+                    if resolved_item_id:
+                        media_item_id = resolved_item_id
+                    if resolved_match_id and not match_id:
+                        match_id = resolved_match_id
+                    
+                    if not resolved_item_id and isinstance(media_item_id, str) and media_item_id.isdigit():
                         media_item_id = int(media_item_id)
             elif media_item_id.isdigit():
                 media_item_id = int(media_item_id)

@@ -198,7 +198,7 @@ export default function Table({
         });
       }
 
-      if (!hasExtras && openMatchModal) {
+      if (!hasExtras && !selectedRows.some((r) => r.rawType === 'video') && openMatchModal) {
         items.push({
           key: 'bulk-match',
           label: t('organizer.actions.match') || 'Match',
@@ -207,7 +207,7 @@ export default function Table({
         });
       }
 
-      if (allSameType && openBulkOverrideModal) {
+      if (allSameType && selectedRows[0]?.rawType !== 'video' && openBulkOverrideModal) {
         items.push({
           key: 'bulk-override',
           label: t('organizer.actions.override') || 'Override',

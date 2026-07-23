@@ -51,7 +51,7 @@ const renderProposedFilename = (value, row, activeMainTab, onOpenMatch, onOpenOv
     return <span className={tableStyles['cell-value']}>{value}</span>;
   })();
 
-  if (isManualReview && row.rawType !== 'extra') {
+  if (isManualReview && row.rawType !== 'extra' && row.rawType !== 'video') {
     const isEpisode = isEpisodeMediaType(row.rawType);
     const isMissingSeason = isEpisode && (row.season === null || row.season === undefined || row.season === '');
     const isMissingEpisode = isEpisode && (row.episode === null || row.episode === undefined || row.episode === '');

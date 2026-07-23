@@ -303,7 +303,7 @@
   border: 0.0625rem solid color-mix(in srgb, var(--color-accent-blue) 48%, var(--button-secondary-border));
   background-color: color-mix(in srgb, var(--color-panel-translucent) 82%, transparent);
   background-image: var(--button-secondary-bg);
-  color: var(--button-secondary-color);
+  color: var(--color-text-primary);
   box-shadow: 0 0.25rem 0.625rem color-mix(in srgb, var(--color-bg-canvas) 22%, transparent);
   backdrop-filter: blur(0.625rem);
   display: flex;
@@ -318,7 +318,7 @@
 
 .image-edit-badge:hover,
 .image-edit-badge:focus-visible {
-  color: var(--color-text-primary);
+  color: var(--button-secondary-color);
   border-color: color-mix(in srgb, var(--color-accent-blue) 72%, var(--button-secondary-border));
   outline: none;
 }

@@ -57,7 +57,7 @@ class SceneDetailService(DetailFormatter):
                 if item:
                     match_db = db.query(MetadataMatch).filter(
                         MetadataMatch.media_item_id == item.id,
-                        MetadataMatch.media_type == MediaType.SCENE
+                        MetadataMatch.media_type.in_([MediaType.SCENE, MediaType.VIDEO])
                     ).first()
                     if match_db:
                         p_val = match_db.provider.value if hasattr(match_db.provider, "value") else str(match_db.provider)
@@ -85,8 +85,18 @@ class SceneDetailService(DetailFormatter):
                     MetadataMatch.external_id == scene_uuid,
                     MetadataMatch.external_id == f"scene_{scene_uuid}"
                 ) if prov_enum == Provider.PORNDB else MetadataMatch.external_id == scene_uuid,
-                MetadataMatch.media_type == MediaType.SCENE
+                MetadataMatch.media_type.in_([MediaType.SCENE, MediaType.VIDEO]),
+                MetadataMatch.media_item_id.isnot(None)
             ).first()
+            if not match:
+                match = db.query(MetadataMatch).filter(
+                    MetadataMatch.provider == prov_enum,
+                    or_(
+                        MetadataMatch.external_id == scene_uuid,
+                        MetadataMatch.external_id == f"scene_{scene_uuid}"
+                    ) if prov_enum == Provider.PORNDB else MetadataMatch.external_id == scene_uuid,
+                    MetadataMatch.media_type.in_([MediaType.SCENE, MediaType.VIDEO])
+                ).first()
         else:
             from sqlalchemy import or_
             match = db.query(MetadataMatch).filter(
@@ -94,8 +104,17 @@ class SceneDetailService(DetailFormatter):
                     MetadataMatch.external_id == scene_uuid,
                     MetadataMatch.external_id == f"scene_{scene_uuid}"
                 ),
-                MetadataMatch.media_type == MediaType.SCENE
+                MetadataMatch.media_type.in_([MediaType.SCENE, MediaType.VIDEO]),
+                MetadataMatch.media_item_id.isnot(None)
             ).first()
+            if not match:
+                match = db.query(MetadataMatch).filter(
+                    or_(
+                        MetadataMatch.external_id == scene_uuid,
+                        MetadataMatch.external_id == f"scene_{scene_uuid}"
+                    ),
+                    MetadataMatch.media_type.in_([MediaType.SCENE, MediaType.VIDEO])
+                ).first()
             if match:
                 prov_enum = match.provider
             
@@ -103,7 +122,8 @@ class SceneDetailService(DetailFormatter):
         cache_srv = CacheService()
         effective_provider = prov_enum
         
-        cache_key = f"{effective_provider.value if effective_provider else 'porndb'}_scene_{scene_uuid}"
+        prov_str = (effective_provider.value if hasattr(effective_provider, "value") else str(effective_provider)) if effective_provider else "porndb"
+        cache_key = f"{prov_str}_scene_{scene_uuid}"
         
         scene_data = None
         # Check permanent APICache first
@@ -113,7 +133,7 @@ class SceneDetailService(DetailFormatter):
                 scene_data = cached_scene
 
         if not scene_data:
-            if effective_provider:
+            if effective_provider and effective_provider != Provider.MANUAL:
                 scraper = self.scrapers.adult(effective_provider, db)
                 try:
                     scene_data = scraper.fetch_scene(scene_uuid)
@@ -452,7 +472,7 @@ class SceneDetailService(DetailFormatter):
     def _get_sibling_matches(self, db: Session, match_db: MetadataMatch) -> list:
         from app.modules.metadata.models import MetadataMatch
         from app.core.enums import MediaType
-        if not match_db or match_db.media_type != MediaType.SCENE:
+        if not match_db or match_db.media_type not in (MediaType.SCENE, MediaType.VIDEO):
             return [match_db] if match_db else []
         
         clean_id = str(match_db.external_id)
@@ -461,7 +481,7 @@ class SceneDetailService(DetailFormatter):
             
         candidates = [clean_id, f"scene_{clean_id}"]
         siblings = db.query(MetadataMatch).filter(
-            MetadataMatch.media_type == MediaType.SCENE,
+            MetadataMatch.media_type.in_([MediaType.SCENE, MediaType.VIDEO]),
             MetadataMatch.external_id.in_(candidates)
         ).all()
         return siblings

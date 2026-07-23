@@ -49,6 +49,8 @@ export const isSceneMediaType = (value) => {
   return normalized === MEDIA_TYPES.SCENE || normalized === MEDIA_TYPES.VIDEO;
 };
 
+export const isVideoMediaType = (value) => normalizeMediaType(value) === MEDIA_TYPES.VIDEO;
+
 
 
 export const isSeasonMediaType = (value) => normalizeMediaType(value) === MEDIA_TYPES.SEASON;

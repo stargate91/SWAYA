@@ -152,6 +152,14 @@ ProviderRegistry.register(ProviderConfig(
     web_base_url="https://theporndb.net",
     display_name="ThePornDB"
 ))
+ProviderRegistry.register(ProviderConfig(
+    provider=Provider.MANUAL,
+    prefix="manual",
+    is_adult=False,
+    id_pattern=r"^[a-zA-Z0-9\-\_]+$",
+    priority=0,
+    display_name="Manual"
+))
 
 
 class MediaTypeConfig:

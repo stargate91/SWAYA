@@ -16,26 +16,51 @@ class RecommendationWatchlistService:
         self.lists_service = ListsService(db)
 
     def fetch_watchlist_ids(self) -> List[Union[int, str]]:
-        watchlist = self.db.query(CustomList).filter(CustomList.name == "Watchlist").first()
-        if not watchlist:
-            return []
+        watchlists = self.db.query(CustomList).filter(CustomList.name.in_(["Watchlist", "NSFW Watchlist"])).all()
         ids = []
-        for item in watchlist.items:
-            if item.match:
-                if item.match.provider == Provider.TMDB and item.match.external_id.isdigit():
-                    ids.append(int(item.match.external_id))
-                else:
-                    ids.append(f"{item.match.provider.value}_{item.match.external_id}")
-            elif item.media_item_id:
-                ids.append(item.media_item_id)
-        return ids
+        for wl in watchlists:
+            for item in wl.items:
+                if item.match:
+                    if item.match.provider == Provider.TMDB and item.match.external_id.isdigit():
+                        ids.append(int(item.match.external_id))
+                    else:
+                        prov_val = item.match.provider.value if hasattr(item.match.provider, 'value') else item.match.provider
+                        ids.append(f"{prov_val}_{item.match.external_id}")
+                elif item.media_item_id:
+                    ids.append(item.media_item_id)
+        return list(set(ids))
 
     def add_to_watchlist(self, tmdb_id: Optional[Union[int, str]], media_type: str, media_item_id: Optional[Union[int, str]] = None) -> ActionResponse:
-        # Get watchlist ID
-        lists = self.lists_service.get_all_lists()
-        watchlist = next((lst for lst in lists if lst.name == "Watchlist"), None)
+        is_adult = False
+        if media_type and str(media_type).lower() == "scene":
+            is_adult = True
+        elif tmdb_id and isinstance(tmdb_id, str):
+            if ":" in tmdb_id:
+                prefix = tmdb_id.split(":")[0]
+                from app.modules.scrapers.support.registry import ProviderRegistry
+                prov = ProviderRegistry.resolve_prefix(prefix)
+                if prov and ProviderRegistry.is_adult_provider(prov):
+                    is_adult = True
+            elif "_" in tmdb_id:
+                prefix = tmdb_id.split("_")[0]
+                from app.modules.scrapers.support.registry import ProviderRegistry
+                prov = ProviderRegistry.resolve_prefix(prefix)
+                if prov and ProviderRegistry.is_adult_provider(prov):
+                    is_adult = True
+
+        if media_item_id:
+            from app.modules.library.models import MediaItem
+            item = self.db.query(MediaItem).filter(MediaItem.id == media_item_id).first()
+            if item:
+                from app.core.enums import MediaType
+                is_adult = any(MediaType.is_adult_type(m.media_type) for m in item.matches)
+
+        target_watchlist_name = "NSFW Watchlist" if is_adult else "Watchlist"
+
+        lists = self.lists_service.get_all_lists(include_adult=True)
+        watchlist = next((lst for lst in lists if lst.name == target_watchlist_name), None)
         if not watchlist:
-            return ActionResponse(status="error", message="Watchlist not found")
+            return ActionResponse(status="error", message=f"{target_watchlist_name} not found")
         
         payload = {"media_type": media_type}
         if media_item_id:
@@ -47,9 +72,9 @@ class RecommendationWatchlistService:
         return ActionResponse(status="success", id=item.id)
 
     def remove_from_watchlist(self, tmdb_id: Union[int, str]) -> ActionResponse:
-        watchlist = self.db.query(CustomList).filter(CustomList.name == "Watchlist").first()
-        if not watchlist:
-            return ActionResponse(status="error", message="Watchlist not found")
+        watchlists = self.db.query(CustomList).filter(CustomList.name.in_(["Watchlist", "NSFW Watchlist"])).all()
+        if not watchlists:
+            return ActionResponse(status="error", message="Watchlists not found")
         
         provider = Provider.TMDB
         external_id = str(tmdb_id)
@@ -61,17 +86,18 @@ class RecommendationWatchlistService:
                 provider = resolved
                 external_id = val
 
-        list_item_id = None
-        for item in watchlist.items:
-            if item.match and item.match.provider == provider and item.match.external_id == external_id:
-                list_item_id = item.id
-                break
-            if item.media_item_id and str(item.media_item_id) == str(tmdb_id):
-                list_item_id = item.id
-                break
-        
-        if list_item_id is not None:
-            self.lists_service.remove_item_from_list(watchlist.id, list_item_id)
-            return ActionResponse(status="success")
+        for wl in watchlists:
+            list_item_id = None
+            for item in wl.items:
+                if item.match and item.match.provider == provider and item.match.external_id == external_id:
+                    list_item_id = item.id
+                    break
+                if item.media_item_id and str(item.media_item_id) == str(tmdb_id):
+                    list_item_id = item.id
+                    break
+            
+            if list_item_id is not None:
+                self.lists_service.remove_item_from_list(wl.id, list_item_id)
+                return ActionResponse(status="success")
             
         return ActionResponse(status="error", message="Item not found in watchlist")

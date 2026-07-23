@@ -34,8 +34,9 @@ class PlayerDiscoveryService:
 
         # Resolve image path — return raw DB path, frontend resolveMediaImageUrl handles the rest
         p_path = None
-        is_episode = active_match.media_type and active_match.media_type.value == "episode"
-        is_scene = active_match.media_type and active_match.media_type.value == "scene"
+        active_media_type = getattr(active_match.media_type, "value", active_match.media_type) if active_match else None
+        is_episode = active_media_type == "episode"
+        is_scene = active_media_type == "scene"
 
         # 1. Highest Priority: User Override
         if active_match.media_item_id:
@@ -63,7 +64,7 @@ class PlayerDiscoveryService:
             "id": active_match.media_item_id or f"external_{active_match.provider.value}_{active_match.external_id}",
             "title": title_val,
             "poster_path": p_path,
-            "media_type": active_match.media_type.value if active_match.media_type else "movie",
+            "media_type": active_media_type if active_media_type else "movie",
             "overview": overview
         }
 
@@ -93,7 +94,8 @@ class PlayerDiscoveryService:
         )
 
         # TV Show Next Episode check
-        if match and match.media_type and match.media_type.value == "episode":
+        match_media_type = getattr(match.media_type, "value", match.media_type) if match else None
+        if match and match_media_type == "episode":
             current_season = match.season_number
             current_ep = match.episode_number
             current_ep_num = 0

@@ -142,7 +142,8 @@ class LibraryScanner:
                         lib_to_paths[matched_lib.id] = []
                     lib_to_paths[matched_lib.id].append(p)
                 else:
-                    new_lib = self.resolver.create_library(name=os.path.basename(p) or "Library", root_path=p)
+                    is_adult_lib = bool(include_adult or scan_mode == ScanMode.SCENES)
+                    new_lib = self.resolver.create_library(name=os.path.basename(p) or "Library", root_path=p, is_adult=is_adult_lib)
                     libraries_to_scan.append(new_lib)
                     if new_lib.id not in lib_to_paths:
                         lib_to_paths[new_lib.id] = []

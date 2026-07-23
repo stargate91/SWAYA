@@ -27,8 +27,9 @@ import {
   isLibraryTvTab,
   isLibraryTagsTab,
   isLibraryScenesTab,
+  isLibraryVideosTab,
 } from '@/lib/libraryTabs';
-import { isMovieMediaType, isPersonMediaType, isTvLikeMediaType, isSceneMediaType } from '@/lib/mediaTypes';
+import { isMovieMediaType, isPersonMediaType, isTvLikeMediaType, isSceneMediaType, isVideoMediaType } from '@/lib/mediaTypes';
 import { Pencil, Plus, Trash2, UserPlus, ArrowLeft } from '@/ui/icons';
 import { LibraryPosterCard } from './LibraryPosterCard';
 
@@ -117,6 +118,8 @@ export default function LibraryGrid({
       navigate(`/library/movie/${item.id}`, { state: { allowAdult: true } });
     } else if (isLibraryTvTab(resolvedTab)) {
       navigate(`/library/tv/${item.id}`, { state: { allowAdult: true } });
+    } else if (isLibraryVideosTab(resolvedTab)) {
+      navigate(`/library/video/${item.id}`, { state: { allowAdult: true } });
     } else if (isLibraryScenesTab(resolvedTab)) {
       navigate(`/library/scene/${item.id}`, { state: { allowAdult: true } });
     }
@@ -461,6 +464,8 @@ function ExpandedTagPanel({ tag, t, emptyIcon, isFocusMode = false, activeSessio
                 navigate(`/library/movie/${item.id}`, { state: { allowAdult: true } });
               } else if (isTvLikeMediaType(item.type)) {
                 navigate(`/library/tv/${item.id}`, { state: { allowAdult: true } });
+              } else if (isVideoMediaType(item.type)) {
+                navigate(`/library/video/${item.id}`, { state: { allowAdult: true } });
               } else if (isSceneMediaType(item.type)) {
                 navigate(`/library/scene/${item.id}`, { state: { allowAdult: true } });
               }

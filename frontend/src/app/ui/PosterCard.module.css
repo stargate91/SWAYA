@@ -270,7 +270,7 @@ div.image-wrapper:focus-visible {
 
 .watch-toggle:hover,
 .watch-toggle:focus-visible {
-  color: var(--color-text-primary);
+  color: var(--button-secondary-color);
   border-color: color-mix(in srgb, var(--color-accent-blue) 72%, var(--button-secondary-border));
   outline: none;
 }

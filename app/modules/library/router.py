@@ -359,7 +359,7 @@ def get_library_item_detail(
         resolved = ProviderRegistry.resolve_prefix(prefix)
         if resolved in (Provider.STASHDB, Provider.FANSDB) or prefix == "scene":
             detected_type = MediaType.SCENE
-        elif prefix == "manual":
+        elif prefix in ("manual", "offline"):
             detected_type = MediaType.VIDEO
         elif resolved == Provider.PORNDB:
             scene_uuid = item_id.split("_", 1)[1]
@@ -378,6 +378,25 @@ def get_library_item_detail(
                         detected_type = MediaType.MOVIE
                     else:
                         return scene_resp
+    elif item_id.isdigit():
+        from app.modules.library.models import MediaItem
+        from app.modules.metadata.models import MetadataMatch
+        item = db.query(MediaItem).filter(MediaItem.id == int(item_id)).first()
+        if item:
+            match_db = db.query(MetadataMatch).filter(
+                MetadataMatch.media_item_id == item.id,
+                MetadataMatch.is_active
+            ).first()
+            if not match_db:
+                match_db = db.query(MetadataMatch).filter(
+                    MetadataMatch.media_item_id == item.id
+                ).first()
+            if match_db:
+                m_type_str = match_db.media_type.value if hasattr(match_db.media_type, "value") else match_db.media_type
+                try:
+                    detected_type = MediaType(m_type_str.lower())
+                except ValueError:
+                    pass
 
     cfg = MediaTypeRegistry.get_config(detected_type)
     if cfg and cfg.detail_loader:

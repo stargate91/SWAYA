@@ -151,15 +151,28 @@ class ScenesScanResolutionPipeline(BaseScanResolutionPipeline):
 
 
 class OfflineScanResolutionPipeline(BaseScanResolutionPipeline):
-    def enrich_matched_item(
+    """Completely self-contained offline pipeline — no API resolvers, no Resolver facade."""
+
+    def __init__(self, db_session, *, mode, include_adult=None, provider=None, media_resolver=None, resolver=None):
+        # Skip BaseScanResolutionPipeline.__init__ entirely — we don't need Resolver
+        self.db = db_session
+        self.mode = mode
+        self.include_adult = bool(include_adult)
+
+    def resolve_and_enrich(
         self,
-        item: MediaItem,
+        item,
         *,
         primary_language: str = DEFAULT_FALLBACK_LANGUAGE,
-        fallback_language: Optional[str] = None,
-        task_id: Optional[int] = None,
+        fallback_language=None,
+        task_id=None,
         stop_requested=None,
     ):
+        from app.modules.scrapers.pipelines.offline import OfflineResolverPipeline
+        pipeline = OfflineResolverPipeline(db=self.db, include_adult=self.include_adult)
+        pipeline.resolve_item(item, language=primary_language, task_id=task_id)
+
+    def enrich_matched_item(self, item, *, primary_language=DEFAULT_FALLBACK_LANGUAGE, fallback_language=None, task_id=None, stop_requested=None):
         return
 
 

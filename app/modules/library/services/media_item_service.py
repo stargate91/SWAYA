@@ -150,13 +150,26 @@ class MediaItemService:
                     scene_id = item_id.split("_", 1)[1]
                     match = self.db.query(MetadataMatch).filter(
                         MetadataMatch.external_id == scene_id,
-                        MetadataMatch.media_type == MediaType.SCENE
+                        MetadataMatch.media_type.in_([MediaType.SCENE, MediaType.VIDEO]),
+                        MetadataMatch.media_item_id.isnot(None)
                     ).first()
+                    if not match:
+                        match = self.db.query(MetadataMatch).filter(
+                            MetadataMatch.external_id == scene_id,
+                            MetadataMatch.media_type.in_([MediaType.SCENE, MediaType.VIDEO])
+                        ).first()
+                    
                     if not match and not scene_id.startswith("scene_"):
                         match = self.db.query(MetadataMatch).filter(
                             MetadataMatch.external_id == f"scene_{scene_id}",
-                            MetadataMatch.media_type == MediaType.SCENE
+                            MetadataMatch.media_type.in_([MediaType.SCENE, MediaType.VIDEO]),
+                            MetadataMatch.media_item_id.isnot(None)
                         ).first()
+                        if not match:
+                            match = self.db.query(MetadataMatch).filter(
+                                MetadataMatch.external_id == f"scene_{scene_id}",
+                                MetadataMatch.media_type.in_([MediaType.SCENE, MediaType.VIDEO])
+                            ).first()
                     
                     if not match:
                         adult_providers = ProviderRegistry.get_adult_providers()
@@ -185,11 +198,26 @@ class MediaItemService:
                             elif media_type.lower() == 'tv':
                                 resolved_media_type = MediaType.TV
      
-                    match = self.db.query(MetadataMatch).filter(
-                        MetadataMatch.provider == provider,
-                        MetadataMatch.external_id == scene_id,
-                        MetadataMatch.media_type == resolved_media_type
-                    ).first()
+                    if is_adult:
+                        types = [MediaType.SCENE, MediaType.VIDEO]
+                        match = self.db.query(MetadataMatch).filter(
+                            MetadataMatch.provider == provider,
+                            MetadataMatch.external_id == scene_id,
+                            MetadataMatch.media_type.in_(types),
+                            MetadataMatch.media_item_id.isnot(None)
+                        ).first()
+                        if not match:
+                            match = self.db.query(MetadataMatch).filter(
+                                MetadataMatch.provider == provider,
+                                MetadataMatch.external_id == scene_id,
+                                MetadataMatch.media_type.in_(types)
+                            ).first()
+                    else:
+                        match = self.db.query(MetadataMatch).filter(
+                            MetadataMatch.provider == provider,
+                            MetadataMatch.external_id == scene_id,
+                            MetadataMatch.media_type == resolved_media_type
+                        ).first()
      
                     if not match:
                         match = MetadataMatch(

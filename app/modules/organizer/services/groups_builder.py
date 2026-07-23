@@ -89,9 +89,13 @@ class OrganizerGroupsBuilder:
 
         all_item_dtos = []
         for item in items:
-            active_match = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
-            if active_match and not active_match.is_active:
-                active_match = None
+            if scan_mode == "offline":
+                active_match = next((m for m in item.matches if m.provider == "manual"), None)
+            else:
+                active_match = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
+                if active_match and not active_match.is_active:
+                    active_match = None
+
             m_override = active_match.overrides if (active_match and active_match.overrides and active_match.overrides.user_id == current_uid) else None
             overrides = m_override or item.overrides
             target_lang = overrides.custom_language if (overrides and overrides.custom_language) else (formatter.config.default_target_language or pref_lang)
@@ -106,6 +110,8 @@ class OrganizerGroupsBuilder:
             parent_planned_paths[item.id] = planned_path
             matches_dto = []
             for m in item.matches:
+                if scan_mode == "offline" and m.provider != "manual":
+                    continue
                 loc = LanguageService.get_best_localization(m.localizations, pref_lang)
                 tv_show_match = None
                 tv_loc = None
@@ -154,8 +160,46 @@ class OrganizerGroupsBuilder:
 
             itype = OrganizerHelper.infer_organizer_type(item)
             strategy = BaseMediaOrganizer.get_strategy(itype, db, self.img_service)
-            active_m = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
-            images_list = strategy.build_images_list(item, active_m, target_lang)
+            
+            if scan_mode == "offline":
+                image_filename = f"offline_{item.id}.jpg"
+                target_image_path = self.img_service.get_original_path("scene_stills", image_filename)
+                
+                if not Path(target_image_path).exists() and Path(item.current_path).exists():
+                    from app.modules.library.filesystem.fs_utils import to_win_long_path
+                    import subprocess
+                    long_path = to_win_long_path(item.current_path)
+                    
+                    cmd_duration = [
+                        'ffprobe', '-v', 'error',
+                        '-show_entries', 'format=duration',
+                        '-of', 'default=noprint_wrappers=1:nokey=1',
+                        long_path
+                    ]
+                    try:
+                        res_duration = subprocess.run(cmd_duration, capture_output=True, text=True, check=True, timeout=10)
+                        duration = float(res_duration.stdout.strip())
+                    except Exception:
+                        duration = 0.0
+
+                    seek_seconds = duration * 0.5
+                    cmd_extract = [
+                        'ffmpeg', '-y',
+                        '-ss', f'{seek_seconds:.3f}',
+                        '-i', long_path,
+                        '-vframes', '1',
+                        '-q:v', '2',
+                        str(target_image_path)
+                    ]
+                    try:
+                        subprocess.run(cmd_extract, capture_output=True, check=True, timeout=15)
+                    except Exception as e:
+                        logger.error(f"Failed to dynamically extract still for offline video {item.id}: {e}")
+                
+                resolved_img = self.img_service.resolve_image_url(f"scene_stills/{image_filename}", "scene_stills")
+                images_list = [{"path": resolved_img}] if resolved_img else []
+            else:
+                images_list = strategy.build_images_list(item, active_match, target_lang)
 
             parent_types[item.id] = itype
             parent_statuses[item.id] = item.status.value
@@ -168,8 +212,9 @@ class OrganizerGroupsBuilder:
             
             if item_scan_mode == "scenes":
                 item_is_adult = True
+            elif scan_mode == "offline":
+                item_is_adult = False
             else:
-                active_match = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)
                 item_is_adult = active_match.is_adult if active_match else False
             parent_is_adults[item.id] = item_is_adult
 
@@ -226,15 +271,17 @@ class OrganizerGroupsBuilder:
                 display_type = "TV Show"
             elif type_lower == "scene":
                 display_type = "Adult Scene"
+            elif type_lower == "video":
+                display_type = "Video"
             elif type_lower == "extra":
                 display_type = "Extra"
             else:
                 display_type = "Media"
 
-            is_manual_val = item.status in [ItemStatus.NEW, ItemStatus.UNCERTAIN, ItemStatus.NO_MATCH, ItemStatus.MULTIPLE, ItemStatus.ERROR]
-            is_movie_val = itype == "movie"
-            is_tv_val = itype in ("tv", "season", "episode")
-            is_scene_val = itype in ("scene", "video")
+            is_manual_val = item.status in [ItemStatus.NEW, ItemStatus.UNCERTAIN, ItemStatus.NO_MATCH, ItemStatus.MULTIPLE, ItemStatus.ERROR] and scan_mode != "offline"
+            is_movie_val = itype == "movie" and scan_mode != "offline"
+            is_tv_val = itype in ("tv", "season", "episode") and scan_mode != "offline"
+            is_scene_val = itype in ("scene", "video") or scan_mode == "offline"
 
             item_dto = {
                 "id": item.id,

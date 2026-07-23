@@ -15,8 +15,10 @@ class OrganizerHelper:
     def infer_organizer_type(item: MediaItem) -> str:
         """Infers whether the media item is a movie, tv show episode, or adult scene."""
         scan_mode = str((item.parsed_info or {}).get("scan_mode") or "").lower()
-        if scan_mode in ("scenes", "offline"):
+        if scan_mode == "scenes":
             return MediaType.SCENE.value
+        if scan_mode == "offline":
+            return MediaType.VIDEO.value
 
         if item.parsed_info and item.parsed_info.get("type"):
             return str(item.parsed_info.get("type")).lower()
@@ -64,7 +66,12 @@ class OrganizerHelper:
         item_scan_mode = (item.parsed_info or {}).get("scan_mode") or ""
         normalized_item = str(item_scan_mode).strip().lower()
         
-        if normalized_item == "scenes":
+        if item.library and item.library.is_adult:
+            is_adult = True
+        elif normalized_item == "offline":
+            active_match = next((m for m in item.matches if m.provider == "manual"), None) or next((m for m in item.matches), None)
+            is_adult = active_match.is_adult if active_match else False
+        elif normalized_item == "scenes":
             is_adult = True
         else:
             active_match = next((m for m in item.matches if m.is_active), None) or next((m for m in item.matches), None)

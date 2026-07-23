@@ -58,7 +58,7 @@ class MatchPersister:
             self.image_downloader.enqueue_download(url, subfolder, filename)
             return f"{subfolder}/{filename}"
 
-        asset_prefix = f"{match.provider.value}_{match.external_id}"
+        asset_prefix = f"{match.provider.value if hasattr(match.provider, 'value') else match.provider}_{match.external_id}"
         backdrop_subfolder = "scene_stills" if match.media_type.is_adult else "backdrops"
         match.local_backdrop_path = queue_image(match.backdrop_path, backdrop_subfolder, asset_prefix)
 

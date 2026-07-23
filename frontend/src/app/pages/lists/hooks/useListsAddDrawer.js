@@ -166,7 +166,7 @@ export default function useListsAddDrawer({
         });
       } else {
         const isTvItem = item.media_type === 'tv' || mediaType === 'tv';
-        const isSceneItem = item.media_type === 'scene' || mediaType === 'scene' || item.media_type === 'videos' || mediaType === 'videos';
+        const isSceneItem = item.media_type === 'scene' || mediaType === 'scene' || item.media_type === 'video' || mediaType === 'video' || item.media_type === 'videos' || mediaType === 'videos';
         const poster = isSceneItem ? (item.backdrop_path || item.poster_path) : (item.poster_path || item.profile_path);
 
         result = await addListItemMutation.mutateAsync({

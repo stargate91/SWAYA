@@ -17,7 +17,8 @@ class FilmographyPaginator:
         tmdb_id = ext_ids.get("tmdb") or ext_ids.get("tmdb_id")
         if not tmdb_id:
             for link in person.external_links:
-                if link.provider.value == "tmdb":
+                prov_val = link.provider.value if hasattr(link.provider, "value") else link.provider
+                if prov_val == "tmdb":
                     tmdb_id = link.external_id
                     break
         if not tmdb_id and not person.is_adult and str(person_id).isdigit() and person_id < 100000000:
@@ -62,7 +63,8 @@ class FilmographyPaginator:
         tmdb_id = ext_ids.get("tmdb") or ext_ids.get("tmdb_id")
         if not tmdb_id:
             for link in person.external_links:
-                if link.provider.value == "tmdb":
+                prov_val = link.provider.value if hasattr(link.provider, "value") else link.provider
+                if prov_val == "tmdb":
                     tmdb_id = link.external_id
                     break
         if not tmdb_id and not person.is_adult and str(person_id).isdigit() and person_id < 100000000:

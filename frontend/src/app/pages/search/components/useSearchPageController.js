@@ -5,6 +5,7 @@ import api from '@/lib/api';
 import { useSettingsQuery } from '@/queries/settingsQueries';
 import { useTranslation } from '@/providers/LanguageContext';
 import { useLibraryModeStore } from '@/stores/useLibraryModeStore';
+import { isVideoMediaType } from '../../../lib/mediaTypes';
 
 export const SOURCES = [
   { id: 'tmdb', name: 'TMDb', adult: false },
@@ -151,10 +152,14 @@ export default function useSearchPageController() {
       navigate(`/library/tv/${item.id}`, { state: { allowAdult: true } });
     } else if (item.media_type === 'person') {
       navigate(`/library/people/${item.id}`, { state: { allowAdult: true } });
-    } else if (item.media_type === 'scene') {
-      const prefix = provider === 'porndb' ? 'porndb' : provider === 'fansdb' ? 'fansdb' : 'stash';
-      const id = String(item.id).startsWith(`${prefix}_`) ? item.id : `${prefix}_${item.id}`;
-      navigate(`/library/scene/${id}`, { state: { allowAdult: true } });
+    } else if (item.media_type === 'scene' || item.media_type === 'video' || isVideoMediaType(item.media_type)) {
+      if (item.media_type === 'video' || isVideoMediaType(item.media_type)) {
+        navigate(`/library/video/${item.id}`, { state: { allowAdult: true } });
+      } else {
+        const prefix = provider === 'porndb' ? 'porndb' : provider === 'fansdb' ? 'fansdb' : 'stash';
+        const id = String(item.id).startsWith(`${prefix}_`) ? item.id : `${prefix}_${item.id}`;
+        navigate(`/library/scene/${id}`, { state: { allowAdult: true } });
+      }
     }
   };
 

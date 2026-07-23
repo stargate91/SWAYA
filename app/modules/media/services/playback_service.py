@@ -287,16 +287,16 @@ class PlaybackService:
         if match:
             from app.modules.metadata.models import MetadataMatch
             is_adult = bool(match.is_adult)
-            media_type = match.media_type.value if match.media_type else None
+            media_type = match.media_type.value if hasattr(match.media_type, "value") else match.media_type
             
             # Resolve parent show match for TV shows using explicit queries to avoid lazy loading issues
             show_match = None
             season_match = None
-            if match.media_type and match.media_type.value == "episode":
+            if media_type == "episode":
                 season_match = self.db.query(MetadataMatch).filter(MetadataMatch.id == match.parent_id).first()
                 if season_match:
                     show_match = self.db.query(MetadataMatch).filter(MetadataMatch.id == season_match.parent_id).first()
-            elif match.media_type and match.media_type.value == "season":
+            elif media_type == "season":
                 show_match = self.db.query(MetadataMatch).filter(MetadataMatch.id == match.parent_id).first()
             else:
                 show_match = match
@@ -340,7 +340,8 @@ class PlaybackService:
             # Extract title from current match localization
             from app.modules.metadata.models import MetadataLocalization
             loc = self.db.query(MetadataLocalization).filter(MetadataLocalization.match_id == match.id).first()
-            if match.media_type and match.media_type.value == "episode":
+            match_media_type = getattr(match.media_type, "value", match.media_type)
+            if match_media_type == "episode":
                 ep_title = loc.title if loc else (match.original_title or item.filename)
                 show_title = ""
                 if show_match:
@@ -405,9 +406,9 @@ class PlaybackService:
                     if loc:
                         raw_image = loc.local_poster_path or loc.poster_path
                     if not raw_image:
-                        raw_image = match.local_poster_path or match.poster_path
-                    if raw_image:
-                        image_category = "posters"
+                        raw_image = match.local_backdrop_path or match.backdrop_path
+                        if raw_image:
+                            image_category = "backdrops"
 
             # Resolve the raw_image
             if raw_image:
@@ -469,7 +470,7 @@ class PlaybackService:
         season_poster = None
 
         episode_number = None
-        if match and match.media_type and match.media_type.value == "episode":
+        if match and media_type == "episode":
             season_number = match.season_number
             
             # Parse episode number

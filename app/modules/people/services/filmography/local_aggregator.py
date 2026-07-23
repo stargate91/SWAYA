@@ -51,7 +51,7 @@ class LocalCreditsAggregator:
             credit_entry = {
                 "id": item.id,
                 "title": title,
-                "type": match.media_type.value,
+                "type": match.media_type.value if hasattr(match.media_type, "value") else match.media_type,
                 "tmdb_id": int(match.external_id) if match.external_id.isdigit() else 0,
                 "year": match.release_date.year if match.release_date else None,
                 "release_date": match.release_date.isoformat() if match.release_date else None,

@@ -420,13 +420,14 @@ export function useOrganizerModalActions({
       key: 'match',
       label: t('organizer.actions.match'),
       icon: Search,
-      isVisible: (row) => row.rawType !== 'extra',
+      isVisible: (row) => row.rawType !== 'extra' && row.rawType !== 'video',
       onClick: (row) => openMatchModal(row),
     },
     {
       key: 'override',
       label: t('organizer.actions.override'),
       icon: Sliders,
+      isVisible: (row) => row.rawType !== 'video',
       onClick: (row) => openOverrideModal(row),
     },
     {
@@ -509,7 +510,7 @@ export function useOrganizerModalActions({
           onClick: () => openBulkDeleteModal(selectedRows),
           disabled: selectedRows.length === 0,
         },
-        (!selectedRows.some((row) => row.rawType === 'extra') && scanMode !== 'scenes' && provider !== 'porndb') ? {
+        (!selectedRows.some((row) => row.rawType === 'extra' || row.rawType === 'video') && scanMode !== 'scenes' && provider !== 'porndb') ? {
           key: 'match',
           label: t('organizer.actions.match') || 'Match',
           icon: Search,
@@ -517,7 +518,7 @@ export function useOrganizerModalActions({
           disabled: selectedRows.length === 0,
         } : null,
 
-        selectedRows.length > 0 && selectedRows.every((r) => r.rawType === selectedRows[0].rawType) ? {
+        (selectedRows.length > 0 && selectedRows.every((r) => r.rawType === selectedRows[0].rawType) && selectedRows[0].rawType !== 'video') ? {
           key: 'override',
           label: t('organizer.actions.override') || 'Override',
           icon: Sliders,

@@ -133,9 +133,9 @@ class DetailsFetcher:
             "item_id": item.id,
             "match": {
                 "id": match.id,
-                "provider": match.provider.value,
+                "provider": match.provider.value if hasattr(match.provider, "value") else match.provider,
                 "external_id": match.external_id,
-                "media_type": match.media_type.value,
+                "media_type": match.media_type.value if hasattr(match.media_type, "value") else match.media_type,
                 "season_number": match.season_number,
                 "episode_number": match.episode_number,
                 "release_date": match.release_date.isoformat() if match.release_date else None,

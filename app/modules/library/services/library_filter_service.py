@@ -764,7 +764,8 @@ class LibraryFilterService:
 
                     from app.modules.scrapers.support.registry import ProviderRegistry
                     from app.modules.scrapers.support.registry import MediaTypeRegistry
-                    cfg = MediaTypeRegistry.get_config(match.media_type)
+                    match_media_type = getattr(match.media_type, "value", match.media_type)
+                    cfg = MediaTypeRegistry.get_config(match_media_type)
                     card_aspect = cfg.card_aspect_ratio if cfg else "poster"
                     image_sub = cfg.image_subfolder if cfg else "posters"
 
@@ -785,7 +786,7 @@ class LibraryFilterService:
                         "poster_path": resolved_poster,
                         "backdrop_path": resolved_backdrop,
                         "still_path": resolved_still or resolved_backdrop,
-                        "type": match.media_type.value,
+                        "type": match_media_type,
                         "card_aspect_ratio": card_aspect,
                         "image_subfolder": image_sub,
                         "card_image_url": card_image_url,
@@ -795,25 +796,25 @@ class LibraryFilterService:
                         "is_favorite": o.is_favorite,
                         "user_rating": o.user_rating,
                         "is_adult": bool(match.is_adult),
-                        "should_blur_sfw": bool(match.is_adult) or match.media_type == MediaType.SCENE,
+                        "should_blur_sfw": bool(match.is_adult) or match_media_type == MediaType.SCENE,
                         "people": p_list,
                         "last_air_date": match.last_air_date.isoformat() if (hasattr(match, "last_air_date") and match.last_air_date) else None,
                         "release_status": match.release_status if hasattr(match, "release_status") else None,
                     }
 
-                    if match.media_type == MediaType.MOVIE:
+                    if match_media_type == MediaType.MOVIE:
                         if match.is_adult:
                             tag_data["adult"].append(m_item)
                         else:
                             tag_data["movies"].append(m_item)
-                    elif match.media_type == MediaType.TV:
+                    elif match_media_type == MediaType.TV:
                         if match.is_adult:
                             tag_data["adult_tv"].append(m_item)
                         else:
                             tag_data["tv"].append(m_item)
-                    elif match.media_type == MediaType.SCENE:
+                    elif match_media_type == MediaType.SCENE:
                         tag_data["adult_scenes"].append(m_item)
-                    elif match.media_type == MediaType.VIDEO:
+                    elif match_media_type == MediaType.VIDEO:
                         if match.is_adult:
                             tag_data["adult_videos"].append(m_item)
                         else:
